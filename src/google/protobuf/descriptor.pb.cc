@@ -364,14 +364,16 @@ const int FileDescriptorSet::_offsets_[1] = {
 };
 
 FileDescriptorSet::FileDescriptorSet()
-  : _cached_size_(0) {
+  : ::google::protobuf::Message(),
+    _cached_size_(0) {
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   if (this == &default_instance_) {
   }
 }
 
 FileDescriptorSet::FileDescriptorSet(const FileDescriptorSet& from)
-  : _cached_size_(0) {
+  : ::google::protobuf::Message(),
+    _cached_size_(0) {
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   MergeFrom(from);
 }
@@ -536,7 +538,8 @@ const int FileDescriptorProto::_offsets_[8] = {
 };
 
 FileDescriptorProto::FileDescriptorProto()
-  : _cached_size_(0),
+  : ::google::protobuf::Message(),
+    _cached_size_(0),
     name_(const_cast< ::std::string*>(&_default_name_)),
     package_(const_cast< ::std::string*>(&_default_package_)),
     options_(NULL) {
@@ -547,7 +550,8 @@ FileDescriptorProto::FileDescriptorProto()
 }
 
 FileDescriptorProto::FileDescriptorProto(const FileDescriptorProto& from)
-  : _cached_size_(0),
+  : ::google::protobuf::Message(),
+    _cached_size_(0),
     name_(const_cast< ::std::string*>(&_default_name_)),
     package_(const_cast< ::std::string*>(&_default_package_)),
     options_(NULL) {
@@ -923,7 +927,8 @@ const int DescriptorProto_ExtensionRange::_offsets_[2] = {
 };
 
 DescriptorProto_ExtensionRange::DescriptorProto_ExtensionRange()
-  : _cached_size_(0),
+  : ::google::protobuf::Message(),
+    _cached_size_(0),
     start_(0),
     end_(0) {
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
@@ -932,7 +937,8 @@ DescriptorProto_ExtensionRange::DescriptorProto_ExtensionRange()
 }
 
 DescriptorProto_ExtensionRange::DescriptorProto_ExtensionRange(const DescriptorProto_ExtensionRange& from)
-  : _cached_size_(0),
+  : ::google::protobuf::Message(),
+    _cached_size_(0),
     start_(0),
     end_(0) {
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
@@ -1133,7 +1139,8 @@ const int DescriptorProto::_offsets_[7] = {
 };
 
 DescriptorProto::DescriptorProto()
-  : _cached_size_(0),
+  : ::google::protobuf::Message(),
+    _cached_size_(0),
     name_(const_cast< ::std::string*>(&_default_name_)),
     options_(NULL) {
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
@@ -1143,7 +1150,8 @@ DescriptorProto::DescriptorProto()
 }
 
 DescriptorProto::DescriptorProto(const DescriptorProto& from)
-  : _cached_size_(0),
+  : ::google::protobuf::Message(),
+    _cached_size_(0),
     name_(const_cast< ::std::string*>(&_default_name_)),
     options_(NULL) {
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
@@ -1571,7 +1579,8 @@ const int FieldDescriptorProto::_offsets_[8] = {
 };
 
 FieldDescriptorProto::FieldDescriptorProto()
-  : _cached_size_(0),
+  : ::google::protobuf::Message(),
+    _cached_size_(0),
     name_(const_cast< ::std::string*>(&_default_name_)),
     number_(0),
     label_(1),
@@ -1587,7 +1596,8 @@ FieldDescriptorProto::FieldDescriptorProto()
 }
 
 FieldDescriptorProto::FieldDescriptorProto(const FieldDescriptorProto& from)
-  : _cached_size_(0),
+  : ::google::protobuf::Message(),
+    _cached_size_(0),
     name_(const_cast< ::std::string*>(&_default_name_)),
     number_(0),
     label_(1),
@@ -1990,7 +2000,8 @@ const int EnumDescriptorProto::_offsets_[3] = {
 };
 
 EnumDescriptorProto::EnumDescriptorProto()
-  : _cached_size_(0),
+  : ::google::protobuf::Message(),
+    _cached_size_(0),
     name_(const_cast< ::std::string*>(&_default_name_)),
     options_(NULL) {
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
@@ -2000,7 +2011,8 @@ EnumDescriptorProto::EnumDescriptorProto()
 }
 
 EnumDescriptorProto::EnumDescriptorProto(const EnumDescriptorProto& from)
-  : _cached_size_(0),
+  : ::google::protobuf::Message(),
+    _cached_size_(0),
     name_(const_cast< ::std::string*>(&_default_name_)),
     options_(NULL) {
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
@@ -2228,7 +2240,8 @@ const int EnumValueDescriptorProto::_offsets_[3] = {
 };
 
 EnumValueDescriptorProto::EnumValueDescriptorProto()
-  : _cached_size_(0),
+  : ::google::protobuf::Message(),
+    _cached_size_(0),
     name_(const_cast< ::std::string*>(&_default_name_)),
     number_(0),
     options_(NULL) {
@@ -2239,7 +2252,8 @@ EnumValueDescriptorProto::EnumValueDescriptorProto()
 }
 
 EnumValueDescriptorProto::EnumValueDescriptorProto(const EnumValueDescriptorProto& from)
-  : _cached_size_(0),
+  : ::google::protobuf::Message(),
+    _cached_size_(0),
     name_(const_cast< ::std::string*>(&_default_name_)),
     number_(0),
     options_(NULL) {
@@ -2469,7 +2483,8 @@ const int ServiceDescriptorProto::_offsets_[3] = {
 };
 
 ServiceDescriptorProto::ServiceDescriptorProto()
-  : _cached_size_(0),
+  : ::google::protobuf::Message(),
+    _cached_size_(0),
     name_(const_cast< ::std::string*>(&_default_name_)),
     options_(NULL) {
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
@@ -2479,7 +2494,8 @@ ServiceDescriptorProto::ServiceDescriptorProto()
 }
 
 ServiceDescriptorProto::ServiceDescriptorProto(const ServiceDescriptorProto& from)
-  : _cached_size_(0),
+  : ::google::protobuf::Message(),
+    _cached_size_(0),
     name_(const_cast< ::std::string*>(&_default_name_)),
     options_(NULL) {
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
@@ -2709,7 +2725,8 @@ const int MethodDescriptorProto::_offsets_[4] = {
 };
 
 MethodDescriptorProto::MethodDescriptorProto()
-  : _cached_size_(0),
+  : ::google::protobuf::Message(),
+    _cached_size_(0),
     name_(const_cast< ::std::string*>(&_default_name_)),
     input_type_(const_cast< ::std::string*>(&_default_input_type_)),
     output_type_(const_cast< ::std::string*>(&_default_output_type_)),
@@ -2721,7 +2738,8 @@ MethodDescriptorProto::MethodDescriptorProto()
 }
 
 MethodDescriptorProto::MethodDescriptorProto(const MethodDescriptorProto& from)
-  : _cached_size_(0),
+  : ::google::protobuf::Message(),
+    _cached_size_(0),
     name_(const_cast< ::std::string*>(&_default_name_)),
     input_type_(const_cast< ::std::string*>(&_default_input_type_)),
     output_type_(const_cast< ::std::string*>(&_default_output_type_)),
@@ -3022,7 +3040,8 @@ const int FileOptions::_offsets_[9] = {
 };
 
 FileOptions::FileOptions()
-  : _cached_size_(0),
+  : ::google::protobuf::Message(),
+    _cached_size_(0),
     java_package_(const_cast< ::std::string*>(&_default_java_package_)),
     java_outer_classname_(const_cast< ::std::string*>(&_default_java_outer_classname_)),
     java_multiple_files_(false),
@@ -3038,7 +3057,8 @@ FileOptions::FileOptions()
 }
 
 FileOptions::FileOptions(const FileOptions& from)
-  : _cached_size_(0),
+  : ::google::protobuf::Message(),
+    _cached_size_(0),
     java_package_(const_cast< ::std::string*>(&_default_java_package_)),
     java_outer_classname_(const_cast< ::std::string*>(&_default_java_outer_classname_)),
     java_multiple_files_(false),
@@ -3461,7 +3481,8 @@ const int MessageOptions::_offsets_[1] = {
 };
 
 MessageOptions::MessageOptions()
-  : _cached_size_(0),
+  : ::google::protobuf::Message(),
+    _cached_size_(0),
     message_set_wire_format_(false) {
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   if (this == &default_instance_) {
@@ -3469,7 +3490,8 @@ MessageOptions::MessageOptions()
 }
 
 MessageOptions::MessageOptions(const MessageOptions& from)
-  : _cached_size_(0),
+  : ::google::protobuf::Message(),
+    _cached_size_(0),
     message_set_wire_format_(false) {
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   MergeFrom(from);
@@ -3647,7 +3669,8 @@ const int FieldOptions::_offsets_[2] = {
 };
 
 FieldOptions::FieldOptions()
-  : _cached_size_(0),
+  : ::google::protobuf::Message(),
+    _cached_size_(0),
     ctype_(1),
     experimental_map_key_(const_cast< ::std::string*>(&_default_experimental_map_key_)) {
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
@@ -3656,7 +3679,8 @@ FieldOptions::FieldOptions()
 }
 
 FieldOptions::FieldOptions(const FieldOptions& from)
-  : _cached_size_(0),
+  : ::google::protobuf::Message(),
+    _cached_size_(0),
     ctype_(1),
     experimental_map_key_(const_cast< ::std::string*>(&_default_experimental_map_key_)) {
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
@@ -3850,14 +3874,16 @@ const int EnumOptions::_offsets_[1] = {
 };
 
 EnumOptions::EnumOptions()
-  : _cached_size_(0) {
+  : ::google::protobuf::Message(),
+    _cached_size_(0) {
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   if (this == &default_instance_) {
   }
 }
 
 EnumOptions::EnumOptions(const EnumOptions& from)
-  : _cached_size_(0) {
+  : ::google::protobuf::Message(),
+    _cached_size_(0) {
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   MergeFrom(from);
 }
@@ -3963,14 +3989,16 @@ const int EnumValueOptions::_offsets_[1] = {
 };
 
 EnumValueOptions::EnumValueOptions()
-  : _cached_size_(0) {
+  : ::google::protobuf::Message(),
+    _cached_size_(0) {
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   if (this == &default_instance_) {
   }
 }
 
 EnumValueOptions::EnumValueOptions(const EnumValueOptions& from)
-  : _cached_size_(0) {
+  : ::google::protobuf::Message(),
+    _cached_size_(0) {
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   MergeFrom(from);
 }
@@ -4076,14 +4104,16 @@ const int ServiceOptions::_offsets_[1] = {
 };
 
 ServiceOptions::ServiceOptions()
-  : _cached_size_(0) {
+  : ::google::protobuf::Message(),
+    _cached_size_(0) {
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   if (this == &default_instance_) {
   }
 }
 
 ServiceOptions::ServiceOptions(const ServiceOptions& from)
-  : _cached_size_(0) {
+  : ::google::protobuf::Message(),
+    _cached_size_(0) {
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   MergeFrom(from);
 }
@@ -4189,14 +4219,16 @@ const int MethodOptions::_offsets_[1] = {
 };
 
 MethodOptions::MethodOptions()
-  : _cached_size_(0) {
+  : ::google::protobuf::Message(),
+    _cached_size_(0) {
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   if (this == &default_instance_) {
   }
 }
 
 MethodOptions::MethodOptions(const MethodOptions& from)
-  : _cached_size_(0) {
+  : ::google::protobuf::Message(),
+    _cached_size_(0) {
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   MergeFrom(from);
 }
