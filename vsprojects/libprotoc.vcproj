@@ -4,8 +4,9 @@
 	Version="9.00"
 	Name="libprotoc"
 	ProjectGUID="{B84FF31A-5F9A-46F8-AB22-DBFC9BECE3BE}"
+	RootNamespace="libprotoc"
 	Keyword="Win32Proj"
-	TargetFrameworkVersion="0"
+	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
 		<Platform
@@ -19,7 +20,7 @@
 			Name="Debug|Win32"
 			OutputDirectory="Debug"
 			IntermediateDirectory="Debug"
-			ConfigurationType="4"
+			ConfigurationType="2"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -60,10 +61,19 @@
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
-				Name="VCLibrarianTool"
+				Name="VCLinkerTool"
+				LinkIncremental="2"
+				GenerateDebugInformation="true"
+				SubSystem="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
+				TargetMachine="1"
 			/>
 			<Tool
 				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -75,6 +85,9 @@
 				Name="VCFxCopTool"
 			/>
 			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
@@ -82,7 +95,7 @@
 			Name="Release|Win32"
 			OutputDirectory="Release"
 			IntermediateDirectory="Release"
-			ConfigurationType="4"
+			ConfigurationType="2"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -120,10 +133,21 @@
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
-				Name="VCLibrarianTool"
+				Name="VCLinkerTool"
+				LinkIncremental="2"
+				GenerateDebugInformation="true"
+				SubSystem="2"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
+				TargetMachine="1"
 			/>
 			<Tool
 				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -133,6 +157,9 @@
 			/>
 			<Tool
 				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -156,101 +183,157 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\google\protobuf\compiler\cpp\cpp_enum.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\google\protobuf\compiler\cpp\cpp_enum_field.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\google\protobuf\compiler\cpp\cpp_extension.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\google\protobuf\compiler\cpp\cpp_field.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\google\protobuf\compiler\cpp\cpp_file.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\google\protobuf\compiler\cpp\cpp_generator.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\google\protobuf\compiler\cpp\cpp_helpers.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\google\protobuf\compiler\cpp\cpp_message.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\google\protobuf\compiler\cpp\cpp_message_field.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\google\protobuf\compiler\cpp\cpp_primitive_field.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\google\protobuf\compiler\cpp\cpp_service.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\google\protobuf\compiler\cpp\cpp_string_field.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\google\protobuf\compiler\java\java_enum.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\google\protobuf\compiler\java\java_enum_field.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\google\protobuf\compiler\java\java_extension.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\google\protobuf\compiler\java\java_field.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\google\protobuf\compiler\java\java_file.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\google\protobuf\compiler\java\java_generator.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\google\protobuf\compiler\java\java_helpers.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\google\protobuf\compiler\java\java_message.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\google\protobuf\compiler\java\java_message_field.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\google\protobuf\compiler\java\java_primitive_field.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\google\protobuf\compiler\java\java_service.h"
-				>
-			</File>
-			<File
 				RelativePath="..\src\google\protobuf\compiler\python\python_generator.h"
 				>
 			</File>
+			<Filter
+				Name="cpp"
+				>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\cpp\cpp_enum.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\cpp\cpp_enum_field.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\cpp\cpp_extension.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\cpp\cpp_field.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\cpp\cpp_file.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\cpp\cpp_generator.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\cpp\cpp_helpers.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\cpp\cpp_message.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\cpp\cpp_message_field.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\cpp\cpp_primitive_field.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\cpp\cpp_service.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\cpp\cpp_string_field.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="java"
+				>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\java\java_enum.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\java\java_enum_field.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\java\java_extension.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\java\java_field.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\java\java_file.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\java\java_generator.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\java\java_helpers.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\java\java_message.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\java\java_message_field.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\java\java_primitive_field.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\java\java_service.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="csharp"
+				>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\csharp\csharp_enum.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\csharp\csharp_enum_field.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\csharp\csharp_extension.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\csharp\csharp_field.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\csharp\csharp_file.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\csharp\csharp_generator.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\csharp\csharp_helpers.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\csharp\csharp_message.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\csharp\csharp_message_field.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\csharp\csharp_primitive_field.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\csharp\csharp_service.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Resource Files"
@@ -272,101 +355,157 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\google\protobuf\compiler\cpp\cpp_enum.cc"
-				>
-			</File>
-			<File
-				RelativePath="..\src\google\protobuf\compiler\cpp\cpp_enum_field.cc"
-				>
-			</File>
-			<File
-				RelativePath="..\src\google\protobuf\compiler\cpp\cpp_extension.cc"
-				>
-			</File>
-			<File
-				RelativePath="..\src\google\protobuf\compiler\cpp\cpp_field.cc"
-				>
-			</File>
-			<File
-				RelativePath="..\src\google\protobuf\compiler\cpp\cpp_file.cc"
-				>
-			</File>
-			<File
-				RelativePath="..\src\google\protobuf\compiler\cpp\cpp_generator.cc"
-				>
-			</File>
-			<File
-				RelativePath="..\src\google\protobuf\compiler\cpp\cpp_helpers.cc"
-				>
-			</File>
-			<File
-				RelativePath="..\src\google\protobuf\compiler\cpp\cpp_message.cc"
-				>
-			</File>
-			<File
-				RelativePath="..\src\google\protobuf\compiler\cpp\cpp_message_field.cc"
-				>
-			</File>
-			<File
-				RelativePath="..\src\google\protobuf\compiler\cpp\cpp_primitive_field.cc"
-				>
-			</File>
-			<File
-				RelativePath="..\src\google\protobuf\compiler\cpp\cpp_service.cc"
-				>
-			</File>
-			<File
-				RelativePath="..\src\google\protobuf\compiler\cpp\cpp_string_field.cc"
-				>
-			</File>
-			<File
-				RelativePath="..\src\google\protobuf\compiler\java\java_enum.cc"
-				>
-			</File>
-			<File
-				RelativePath="..\src\google\protobuf\compiler\java\java_enum_field.cc"
-				>
-			</File>
-			<File
-				RelativePath="..\src\google\protobuf\compiler\java\java_extension.cc"
-				>
-			</File>
-			<File
-				RelativePath="..\src\google\protobuf\compiler\java\java_field.cc"
-				>
-			</File>
-			<File
-				RelativePath="..\src\google\protobuf\compiler\java\java_file.cc"
-				>
-			</File>
-			<File
-				RelativePath="..\src\google\protobuf\compiler\java\java_generator.cc"
-				>
-			</File>
-			<File
-				RelativePath="..\src\google\protobuf\compiler\java\java_helpers.cc"
-				>
-			</File>
-			<File
-				RelativePath="..\src\google\protobuf\compiler\java\java_message.cc"
-				>
-			</File>
-			<File
-				RelativePath="..\src\google\protobuf\compiler\java\java_message_field.cc"
-				>
-			</File>
-			<File
-				RelativePath="..\src\google\protobuf\compiler\java\java_primitive_field.cc"
-				>
-			</File>
-			<File
-				RelativePath="..\src\google\protobuf\compiler\java\java_service.cc"
-				>
-			</File>
-			<File
 				RelativePath="..\src\google\protobuf\compiler\python\python_generator.cc"
 				>
 			</File>
+			<Filter
+				Name="csharp"
+				>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\csharp\csharp_enum.cc"
+					>
+				</File>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\csharp\csharp_enum_field.cc"
+					>
+				</File>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\csharp\csharp_extension.cc"
+					>
+				</File>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\csharp\csharp_field.cc"
+					>
+				</File>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\csharp\csharp_file.cc"
+					>
+				</File>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\csharp\csharp_generator.cc"
+					>
+				</File>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\csharp\csharp_helpers.cc"
+					>
+				</File>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\csharp\csharp_message.cc"
+					>
+				</File>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\csharp\csharp_message_field.cc"
+					>
+				</File>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\csharp\csharp_primitive_field.cc"
+					>
+				</File>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\csharp\csharp_service.cc"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="java"
+				>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\java\java_enum.cc"
+					>
+				</File>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\java\java_enum_field.cc"
+					>
+				</File>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\java\java_extension.cc"
+					>
+				</File>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\java\java_field.cc"
+					>
+				</File>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\java\java_file.cc"
+					>
+				</File>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\java\java_generator.cc"
+					>
+				</File>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\java\java_helpers.cc"
+					>
+				</File>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\java\java_message.cc"
+					>
+				</File>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\java\java_message_field.cc"
+					>
+				</File>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\java\java_primitive_field.cc"
+					>
+				</File>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\java\java_service.cc"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="cpp"
+				>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\cpp\cpp_enum.cc"
+					>
+				</File>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\cpp\cpp_enum_field.cc"
+					>
+				</File>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\cpp\cpp_extension.cc"
+					>
+				</File>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\cpp\cpp_field.cc"
+					>
+				</File>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\cpp\cpp_file.cc"
+					>
+				</File>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\cpp\cpp_generator.cc"
+					>
+				</File>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\cpp\cpp_helpers.cc"
+					>
+				</File>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\cpp\cpp_message.cc"
+					>
+				</File>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\cpp\cpp_message_field.cc"
+					>
+				</File>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\cpp\cpp_primitive_field.cc"
+					>
+				</File>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\cpp\cpp_service.cc"
+					>
+				</File>
+				<File
+					RelativePath="..\src\google\protobuf\compiler\cpp\cpp_string_field.cc"
+					>
+				</File>
+			</Filter>
 		</Filter>
 	</Files>
 	<Globals>
