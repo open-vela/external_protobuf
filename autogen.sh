@@ -15,13 +15,8 @@ fi
 
 set -ex
 
-rm -rf autom4te.cache
-
-aclocal-1.10 --force -I m4
-libtoolize -c -f
-autoheader -f -W all
-automake-1.10 --foreign -a -c -f -W all
-autoconf -f -W all,no-obsolete
+# TODO(kenton):  Remove the ",no-obsolete" part and fix the resulting warnings.
+autoreconf -f -i -Wall,no-obsolete
 
 rm -rf autom4te.cache config.h.in~
 exit 0
