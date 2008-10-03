@@ -2,11 +2,9 @@
 
 ACLOCAL_AMFLAGS = -I m4
 
-if MONO
-SUBDIRS = src csharp
-else
+AUTOMAKE_OPTIONS = foreign
+
 SUBDIRS = src
-endif
 
 EXTRA_DIST =                                                                 \
   autogen.sh                                                                 \
@@ -88,6 +86,7 @@ EXTRA_DIST =                                                                 \
   python/google/protobuf/internal/service_reflection_test.py                 \
   python/google/protobuf/internal/test_util.py                               \
   python/google/protobuf/internal/text_format_test.py                        \
+  python/google/protobuf/internal/type_checkers.py                           \
   python/google/protobuf/internal/wire_format.py                             \
   python/google/protobuf/internal/wire_format_test.py                        \
   python/google/protobuf/internal/__init__.py                                \
