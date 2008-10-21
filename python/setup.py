@@ -47,11 +47,6 @@ def generate_proto(source):
       sys.exit(-1)
 
 def MakeTestSuite():
-  # This is apparently needed on some systems to make sure that the tests
-  # work even if a previous version is already installed.
-  if 'google' in sys.modules:
-    del sys.modules['google']
-
   generate_proto("../src/google/protobuf/unittest.proto")
   generate_proto("../src/google/protobuf/unittest_import.proto")
   generate_proto("../src/google/protobuf/unittest_mset.proto")
@@ -102,7 +97,7 @@ if __name__ == '__main__':
     generate_proto("../src/google/protobuf/descriptor.proto")
 
   setup(name = 'protobuf',
-        version = '2.0.3-SNAPSHOT',
+        version = '2.0.1-SNAPSHOT',
         packages = [ 'google' ],
         namespace_packages = [ 'google' ],
         test_suite = 'setup.MakeTestSuite',
@@ -113,7 +108,6 @@ if __name__ == '__main__':
           'google.protobuf.internal.input_stream',
           'google.protobuf.internal.message_listener',
           'google.protobuf.internal.output_stream',
-          'google.protobuf.internal.type_checkers',
           'google.protobuf.internal.wire_format',
           'google.protobuf.descriptor',
           'google.protobuf.descriptor_pb2',
@@ -121,11 +115,11 @@ if __name__ == '__main__':
           'google.protobuf.reflection',
           'google.protobuf.service',
           'google.protobuf.service_reflection',
-          'google.protobuf.text_format' ],
+          'google.protobuf.text_format'],
         url = 'http://code.google.com/p/protobuf/',
         maintainer = maintainer_email,
         maintainer_email = 'protobuf@googlegroups.com',
-        license = 'New BSD License',
+        license = 'Apache License, Version 2.0',
         description = 'Protocol Buffers',
         long_description =
           "Protocol Buffers are Google's data interchange format.",

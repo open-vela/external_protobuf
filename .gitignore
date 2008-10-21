@@ -1,0 +1,25 @@
+# Untracked files
+
+csharp/ProtocolBuffers/bin/
+csharp/ProtocolBuffers/obj/
+csharp/ProtocolBuffers.Test/bin/
+csharp/ProtocolBuffers.Test/obj/
+csharp/ProtoGen/bin/
+csharp/ProtoGen/obj/
+csharp/ProtoGen.Test/bin/
+csharp/ProtoGen.Test/obj/
+csharp/TestBed
+java/.classpath
+java/.project
+java/.settings/
+java/bin/
+java/lib/
+java/src/.classpath
+java/src/.project
+java/src/bin/
+java/target/
+src/tmp/
+tmp/
+vsprojects/*
+vsprojects/protobuf.sln
+benchmark.txt
