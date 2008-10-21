@@ -14,45 +14,36 @@ Compiling and Installing
    "include" directory (under the top-level package directory).
 6) Copy the contents of the include directory to wherever you want to put
    headers.
-7) Copy protoc.exe wherever you put build tools (probably somewhere in your
-   PATH).
-8) Copy libprotobuf.lib and libprotoc.lib wherever you put libraries.
+7) Copy protoc.exe and the two DLLs (libprotobuf and libprotoc) wherever you
+   put build tools.
+8) Copy libprotobuf.{lib,dll} and libprotoc.{lib,dll} wherever you put
+   libraries.
 
 * To avoid conflicts between the MSVC debug and release runtime libraries, when
-  compiling a debug build of your application, you may need to link against a
-  debug build of libprotobuf.lib.  Similarly, release builds should link against
-  release libs.
+  compiling a debug build of your application, you must link against a debug
+  build of libprotobuf.dll.  Similarly, release builds must link against
+  release DLLs.
 
-DLLs vs. static linking
-=======================
-
-Static linking is now the default for the Protocol Buffer libraries.  Due to
-issues with Win32's use of a separate heap for each DLL, as well as binary
-compatibility issues between different versions of MSVC's STL library, it is
-recommended that you use static linkage only.  However, it is possible to
-build libprotobuf and libprotoc as DLLs if you really want.  To do this,
-do the following:
-
-  1) Open protobuf.sln in MSVC.
-  2) For each of the projects libprotobuf and libprotoc, do the following:
-    2a) Right-click the project and choose "properties".
-    2b) From the side bar, choose "General", under "Configuration Properties".
-    2c) Change the "Configuration Type" to "Dynamic Library (.dll)".
-    2d) From the side bar, choose "Preprocessor", under "C/C++".
-    2e) Add PROTOBUF_USE_DLLS to the list of preprocessor defines.
-  3) When compiling your project, make sure to #define PROTOBUF_USE_DLLS.
+DLLs and Distribution
+=====================
 
 When distributing your software to end users, we strongly recommend that you
 do NOT install libprotobuf.dll or libprotoc.dll to any shared location.
 Instead, keep these libraries next to your binaries, in your application's
 own install directory.  C++ makes it very difficult to maintain binary
 compatibility between releases, so it is likely that future versions of these
-libraries will *not* be usable as drop-in replacements.
+libraries will *not* be usable as drop-in replacements.  The only reason we
+provide these libraries as DLLs rather than static libs is so that a program
+which is itself split into multiple DLLs can safely pass protocol buffer
+objects between them.
 
 If your project is itself a DLL intended for use by third-party software, we
 recommend that you do NOT expose protocol buffer objects in your library's
 public interface, and that you statically link protocol buffers into your
 library.
+
+TODO(kenton):  This sounds kind of scary.  Maybe we should only provide static
+  libraries?
 
 Notes on Compiler Warnings
 ==========================
@@ -72,8 +63,7 @@ C4355 - 'this' : used in base member initializer list
 C4800 - 'type' : forcing value to bool 'true' or 'false' (performance warning)
 C4996 - 'function': was declared deprecated
 
-C4251 is of particular note, if you are compiling the Protocol Buffer library
-as a DLL (see previous section).  The protocol buffer library uses templates in
+C4251 is of particular note.  The protocol buffer library uses templates in
 its public interfaces.  MSVC does not provide any reasonable way to export
 template classes from a DLL.  However, in practice, it appears that exporting
 templates is not necessary anyway.  Since the complete definition of any

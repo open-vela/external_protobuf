@@ -7,10 +7,10 @@ AC_PREREQ(2.59)
 # * java/pom.xml
 # * python/setup.py
 # * src/google/protobuf/stubs/common.h
-AC_INIT([protobuf],[2.0.3-SNAPSHOT],[protobuf@googlegroups.com])
+AC_INIT(protobuf, 2.0.1-SNAPSHOT, protobuf@googlegroups.com)
 
 AC_CONFIG_SRCDIR(src/google/protobuf/message.cc)
-AC_CONFIG_HEADERS([config.h])
+AM_CONFIG_HEADER(config.h)
 AM_INIT_AUTOMAKE
 
 # Checks for programs.
@@ -23,6 +23,11 @@ AM_CONDITIONAL(GCC, test "$GCC" = yes)   # let the Makefile know if we're gcc
 AC_HEADER_STDC
 AC_CHECK_HEADERS([fcntl.h inttypes.h limits.h stdlib.h unistd.h])
 
+if pkg-config --atleast-version=1.9 mono; then
+   with_mono=yes
+fi
+AM_CONDITIONAL(MONO, test x$with_mono = xyes)
+
 # Checks for library functions.
 AC_FUNC_MEMCMP
 AC_FUNC_STRTOD
@@ -31,5 +36,4 @@ AC_CHECK_FUNCS([ftruncate memset mkdir strchr strerror strtol])
 ACX_PTHREAD
 AC_CXX_STL_HASH
 
-AC_CONFIG_FILES([Makefile src/Makefile ])
-AC_OUTPUT
+AC_OUTPUT( Makefile src/Makefile csharp/Makefile )
