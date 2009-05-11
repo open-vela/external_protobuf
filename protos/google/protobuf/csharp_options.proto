@@ -1,0 +1,29 @@
+// Extra options for C# generator
+
+import "google/protobuf/descriptor.proto";
+
+package google.protobuf;
+
+message CSharpFileOptions {
+  optional string namespace = 1;
+  optional string umbrella_classname= 2;
+  optional bool public_classes = 3;
+  optional bool multiple_files = 4;
+  optional bool nest_classes = 5;
+}
+
+extend FileOptions {
+  optional CSharpFileOptions csharp_file_options = 1000;
+}
+
+extend FieldOptions {
+  optional CSharpFieldOptions csharp_field_options = 1000;
+}
+
+message CSharpFieldOptions {
+  // Provides the ability to override the name of the property
+  // generated for this field. This is applied to all properties
+  // and methods to do with this field, including HasFoo, FooCount,
+  // FooList etc.
+  optional string property_name = 1;
+}
