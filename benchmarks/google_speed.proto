@@ -1,3 +1,7 @@
+import "google/protobuf/csharp_options.proto";
+option (google.protobuf.csharp_file_options).namespace = "Google.ProtocolBuffers.ProtoBench";
+option (google.protobuf.csharp_file_options).umbrella_classname = "GoogleSpeedProtoFile";
+
 package benchmarks;
 
 option java_outer_classname = "GoogleSpeed";
