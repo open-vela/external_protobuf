@@ -30,4 +30,6 @@ mono/.libs
 mono/*.exe
 mono/*.dll
 
-src/ProtocolBuffers/objCF
+_tmp/
+_dist/
+_benchmark
