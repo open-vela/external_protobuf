@@ -113,14 +113,14 @@ namespace Google.ProtocolBuffers {
     /// byte array slice.
     /// </summary>
     public static CodedInputStream CreateInstance(byte[] buf, int offset, int length) {
-      return new CodedInputStream(buf, offset, length);
+        return new CodedInputStream(buf, offset, length);
     }
 
     private CodedInputStream(byte[] buffer, int offset, int length) {
-      this.buffer = buffer;
-      this.bufferPos = offset;
-      this.bufferSize = offset + length;
-      this.input = null;
+        this.buffer = buffer;
+        this.bufferPos = offset;
+        this.bufferSize = offset + length;
+        this.input = null;
     }
 
     private CodedInputStream(Stream input) {
@@ -258,7 +258,7 @@ namespace Google.ProtocolBuffers {
     /// <summary>
     /// Reads a group field value from the stream.
     /// </summary>    
-    public void ReadGroup(int fieldNumber, IBuilderLite builder,
+    public void ReadGroup(int fieldNumber, IBuilder builder,
                           ExtensionRegistry extensionRegistry) {
       if (recursionDepth >= recursionLimit) {
         throw InvalidProtocolBufferException.RecursionLimitExceeded();
@@ -273,14 +273,12 @@ namespace Google.ProtocolBuffers {
     /// Reads a group field value from the stream and merges it into the given
     /// UnknownFieldSet.
     /// </summary>   
-    [Obsolete]
-    public void ReadUnknownGroup(int fieldNumber, IBuilderLite builder)
-    {
+    public void ReadUnknownGroup(int fieldNumber, UnknownFieldSet.Builder builder) {
       if (recursionDepth >= recursionLimit) {
         throw InvalidProtocolBufferException.RecursionLimitExceeded();
       }
       ++recursionDepth;
-      builder.WeakMergeFrom(this);
+      builder.MergeFrom(this);
       CheckLastTagWas(WireFormat.MakeTag(fieldNumber, WireFormat.WireType.EndGroup));
       --recursionDepth;
     }
@@ -288,7 +286,7 @@ namespace Google.ProtocolBuffers {
     /// <summary>
     /// Reads an embedded message field value from the stream.
     /// </summary>   
-    public void ReadMessage(IBuilderLite builder, ExtensionRegistry extensionRegistry) {
+    public void ReadMessage(IBuilder builder, ExtensionRegistry extensionRegistry) {
       int length = (int) ReadRawVarint32();
       if (recursionDepth >= recursionLimit) {
         throw InvalidProtocolBufferException.RecursionLimitExceeded();
@@ -395,6 +393,7 @@ namespace Google.ProtocolBuffers {
           throw new ArgumentOutOfRangeException("Invalid field type " + fieldType);
       }
     }
+
     #endregion
 
     #region Underlying reading primitives

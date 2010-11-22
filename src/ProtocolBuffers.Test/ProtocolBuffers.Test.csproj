@@ -63,7 +63,6 @@
     <Compile Include="DescriptorsTest.cs" />
     <Compile Include="Descriptors\MessageDescriptorTest.cs" />
     <Compile Include="DynamicMessageTest.cs" />
-    <Compile Include="ExtendableMessageTest.cs" />
     <Compile Include="GeneratedMessageTest.cs" />
     <Compile Include="MessageStreamIteratorTest.cs" />
     <Compile Include="MessageStreamWriterTest.cs" />
@@ -76,12 +75,8 @@
     <Compile Include="TestProtos\UnitTestCSharpOptionsProtoFile.cs" />
     <Compile Include="TestProtos\UnitTestCustomOptionsProtoFile.cs" />
     <Compile Include="TestProtos\UnitTestEmbedOptimizeForProtoFile.cs" />
-    <Compile Include="TestProtos\UnitTestEmptyProtoFile.cs" />
-    <Compile Include="TestProtos\UnitTestEnormousDescriptorProtoFile.cs" />
-    <Compile Include="TestProtos\UnitTestImportLiteProtoFile.cs" />
     <Compile Include="TestProtos\UnitTestImportProtoFile.cs" />
     <Compile Include="TestProtos\UnitTestMessageSetProtoFile.cs" />
-    <Compile Include="TestProtos\UnitTestNoGenericServicesProtoFile.cs" />
     <Compile Include="TestProtos\UnitTestOptimizeForProtoFile.cs" />
     <Compile Include="TestProtos\UnitTestProtoFile.cs" />
     <Compile Include="TestUtil.cs" />
