@@ -39,21 +39,6 @@ using Google.ProtocolBuffers.Collections;
 using Google.ProtocolBuffers.Descriptors;
 
 namespace Google.ProtocolBuffers {
-
-  public interface IFieldDescriptorLite : IComparable<IFieldDescriptorLite> {
-    bool IsRepeated { get; }
-    bool IsRequired { get; }
-    bool IsPacked { get; }
-    bool IsExtension { get; }
-    bool MessageSetWireFormat { get; } //field.ContainingType.Options.MessageSetWireFormat
-    int FieldNumber { get; }
-    string FullName { get; }
-    IEnumLiteMap EnumType { get; }
-    FieldType FieldType { get; }
-    MappedType MappedType { get; }
-    object DefaultValue { get; }
-  }
-
   /// <summary>
   /// A class which represents an arbitrary set of fields of some message type.
   /// This is used to implement DynamicMessage, and also to represent extensions
@@ -71,17 +56,17 @@ namespace Google.ProtocolBuffers {
   /// </summary>
   internal sealed class FieldSet {
 
-    private static readonly FieldSet defaultInstance = new FieldSet(new Dictionary<IFieldDescriptorLite, object>()).MakeImmutable();
+    private static readonly FieldSet defaultInstance = new FieldSet(new Dictionary<FieldDescriptor, object>()).MakeImmutable();
 
-    private IDictionary<IFieldDescriptorLite, object> fields;
+    private IDictionary<FieldDescriptor, object> fields;
 
-    private FieldSet(IDictionary<IFieldDescriptorLite, object> fields) {
+    private FieldSet(IDictionary<FieldDescriptor, object> fields) {
       this.fields = fields;
     }
 
     public static FieldSet CreateInstance() {
       // Use SortedList to keep fields in the canonical order
-      return new FieldSet(new SortedList<IFieldDescriptorLite, object>());
+      return new FieldSet(new SortedList<FieldDescriptor, object>());
     }
 
     /// <summary>
@@ -100,8 +85,8 @@ namespace Google.ProtocolBuffers {
       }
 
       if (hasRepeats) {
-        var tmp = new SortedList<IFieldDescriptorLite, object>();
-        foreach (KeyValuePair<IFieldDescriptorLite, object> entry in fields) {
+        var tmp = new SortedList<FieldDescriptor, object>();
+        foreach (KeyValuePair<FieldDescriptor, object> entry in fields) {
           IList<object> list = entry.Value as IList<object>;
           tmp[entry.Key] = list == null ? entry.Value : Lists.AsReadOnly(list);
         }
@@ -125,26 +110,14 @@ namespace Google.ProtocolBuffers {
     /// is immutable, the entries may not be (i.e. any repeated values are represented by
     /// mutable lists). The behaviour is not specified if the contents are mutated.
     /// </summary>
-    internal IDictionary<IFieldDescriptorLite, object> AllFields {
+    internal IDictionary<FieldDescriptor, object> AllFields {
       get { return Dictionaries.AsReadOnly(fields); }
     }
-#if !LITE
+
     /// <summary>
-    /// Force coercion to full descriptor dictionary.
+    /// See <see cref="IMessage.HasField"/>.
     /// </summary>
-    internal IDictionary<Descriptors.FieldDescriptor, object> AllFieldDescriptors {
-      get {
-        SortedList<Descriptors.FieldDescriptor, object> copy = new SortedList<Google.ProtocolBuffers.Descriptors.FieldDescriptor, object>();
-        foreach (KeyValuePair<IFieldDescriptorLite, object> fd in fields)
-          copy.Add((Descriptors.FieldDescriptor)fd.Key, fd.Value);
-        return Dictionaries.AsReadOnly(copy); 
-      }
-    }
-#endif
-    /// <summary>
-    /// See <see cref="IMessageLite.HasField"/>.
-    /// </summary>
-    public bool HasField(IFieldDescriptorLite field) {
+    public bool HasField(FieldDescriptor field) {
       if (field.IsRepeated) {
         throw new ArgumentException("HasField() can only be called on non-repeated fields.");
       }
@@ -160,7 +133,7 @@ namespace Google.ProtocolBuffers {
     }
 
     /// <summary>
-    /// See <see cref="IMessageLite.Item(IFieldDescriptorLite)"/>
+    /// See <see cref="IMessage.Item(FieldDescriptor)"/>
     /// </summary>
     /// <remarks>
     /// If the field is not set, the behaviour when fetching this property varies by field type:
@@ -180,7 +153,7 @@ namespace Google.ProtocolBuffers {
     /// to ensure it is of an appropriate type.
     /// </remarks>
     /// 
-    internal object this[IFieldDescriptorLite field] {
+    internal object this[FieldDescriptor field] {
       get {
         object result;
         if (fields.TryGetValue(field, out result)) {
@@ -218,9 +191,9 @@ namespace Google.ProtocolBuffers {
     }
 
     /// <summary>
-    /// See <see cref="IMessageLite.Item(IFieldDescriptorLite,int)" />
+    /// See <see cref="IMessage.Item(FieldDescriptor,int)" />
     /// </summary>
-    internal object this[IFieldDescriptorLite field, int index] {
+    internal object this[FieldDescriptor field, int index] {
       get {
         if (!field.IsRepeated) {
           throw new ArgumentException("Indexer specifying field and index can only be called on repeated fields.");
@@ -244,7 +217,7 @@ namespace Google.ProtocolBuffers {
     /// <summary>
     /// See <see cref="IBuilder{TMessage, TBuilder}.AddRepeatedField" />
     /// </summary>
-    internal void AddRepeatedField(IFieldDescriptorLite field, object value) {
+    internal void AddRepeatedField(FieldDescriptor field, object value) {
       if (!field.IsRepeated) {
         throw new ArgumentException("AddRepeatedField can only be called on repeated fields.");
       }
@@ -260,12 +233,12 @@ namespace Google.ProtocolBuffers {
     /// <summary>
     /// Returns an enumerator for the field map. Used to write the fields out.
     /// </summary>
-    internal IEnumerator<KeyValuePair<IFieldDescriptorLite, object>> GetEnumerator() {
+    internal IEnumerator<KeyValuePair<FieldDescriptor, object>> GetEnumerator() {
       return fields.GetEnumerator();
     }
 
     /// <summary>
-    /// See <see cref="IMessageLite.IsInitialized" />
+    /// See <see cref="IMessage.IsInitialized" />
     /// </summary>
     /// <remarks>
     /// Since FieldSet itself does not have any way of knowing about
@@ -275,17 +248,17 @@ namespace Google.ProtocolBuffers {
     /// </remarks>
     internal bool IsInitialized {
       get {
-        foreach (KeyValuePair<IFieldDescriptorLite, object> entry in fields) {
-          IFieldDescriptorLite field = entry.Key;
+        foreach (KeyValuePair<FieldDescriptor, object> entry in fields) {
+          FieldDescriptor field = entry.Key;
           if (field.MappedType == MappedType.Message) {
             if (field.IsRepeated) {
-              foreach(IMessageLite message in (IEnumerable) entry.Value) {
+              foreach(IMessage message in (IEnumerable) entry.Value) {
                 if (!message.IsInitialized) {
                   return false;
                 }
               }
             } else {
-              if (!((IMessageLite)entry.Value).IsInitialized) {
+              if (!((IMessage) entry.Value).IsInitialized) {
                 return false;
               }
             }
@@ -300,8 +273,8 @@ namespace Google.ProtocolBuffers {
     /// descriptor are present in this field set, as well as whether
     /// all the embedded messages are themselves initialized.
     /// </summary>
-    internal bool IsInitializedWithRespectTo(IEnumerable typeFields) {
-      foreach (IFieldDescriptorLite field in typeFields) {
+    internal bool IsInitializedWithRespectTo(MessageDescriptor type) {
+      foreach (FieldDescriptor field in type.Fields) {
         if (field.IsRequired && !HasField(field)) {
           return false;
         }
@@ -312,14 +285,14 @@ namespace Google.ProtocolBuffers {
     /// <summary>
     /// See <see cref="IBuilder{TMessage, TBuilder}.ClearField" />
     /// </summary>
-    public void ClearField(IFieldDescriptorLite field) {
+    public void ClearField(FieldDescriptor field) {
       fields.Remove(field);
     }
 
     /// <summary>
-    /// See <see cref="IMessageLite.GetRepeatedFieldCount" />
+    /// See <see cref="IMessage.GetRepeatedFieldCount" />
     /// </summary>
-    public int GetRepeatedFieldCount(IFieldDescriptorLite field) {
+    public int GetRepeatedFieldCount(FieldDescriptor field) {
       if (!field.IsRepeated) {
         throw new ArgumentException("GetRepeatedFieldCount() can only be called on repeated fields.");
       }
@@ -327,63 +300,64 @@ namespace Google.ProtocolBuffers {
       return ((IList<object>) this[field]).Count;
     }
 
-#if !LITE
-    /// <summary>
-    /// See <see cref="IBuilder{TMessage, TBuilder}.MergeFrom(IMessageLite)" />
-    /// </summary>
-    public void MergeFrom(IMessage other) {
-      foreach (KeyValuePair<Descriptors.FieldDescriptor, object> fd in other.AllFields)
-        MergeField(fd.Key, fd.Value);
-    }
-#endif
-
     /// <summary>
     /// Implementation of both <c>MergeFrom</c> methods.
     /// </summary>
     /// <param name="otherFields"></param>
-    public void MergeFrom(FieldSet other) {
+    private void MergeFields(IEnumerable<KeyValuePair<FieldDescriptor, object>> otherFields) {
       // Note:  We don't attempt to verify that other's fields have valid
       //   types.  Doing so would be a losing battle.  We'd have to verify
       //   all sub-messages as well, and we'd have to make copies of all of
       //   them to insure that they don't change after verification (since
-      //   the IMessageLite interface itself cannot enforce immutability of
+      //   the IMessage interface itself cannot enforce immutability of
       //   implementations).
       // TODO(jonskeet):  Provide a function somewhere called MakeDeepCopy()
       //   which allows people to make secure deep copies of messages.
 
-      foreach (KeyValuePair<IFieldDescriptorLite, object> entry in other.fields) {
-        MergeField(entry.Key, entry.Value);
-      }
-    }
-
-    private void MergeField(IFieldDescriptorLite field, object mergeValue) {
-      object existingValue;
-      fields.TryGetValue(field, out existingValue);
-      if (field.IsRepeated) {
-        if (existingValue == null) {
-          existingValue = new List<object>();
-          fields[field] = existingValue;
+      foreach (KeyValuePair<FieldDescriptor, object> entry in otherFields) {
+        FieldDescriptor field = entry.Key;
+        object existingValue;
+        fields.TryGetValue(field, out existingValue);
+        if (field.IsRepeated) {
+          if (existingValue == null) {
+            existingValue = new List<object>();
+            fields[field] = existingValue;
+          }
+          IList<object> list = (IList<object>) existingValue;
+          foreach (object otherValue in (IEnumerable) entry.Value) {
+            list.Add(otherValue);
+          }
+        } else if (field.MappedType == MappedType.Message && existingValue != null) {
+          IMessage existingMessage = (IMessage)existingValue;
+          IMessage merged = existingMessage.WeakToBuilder()
+              .WeakMergeFrom((IMessage) entry.Value)
+              .WeakBuild();
+          this[field] = merged;
+        } else {
+          this[field] = entry.Value;
         }
-        IList<object> list = (IList<object>) existingValue;
-        foreach (object otherValue in (IEnumerable)mergeValue) {
-          list.Add(otherValue);
-        }
-      } else if (field.MappedType == MappedType.Message && existingValue != null) {
-        IMessageLite existingMessage = (IMessageLite)existingValue;
-        IMessageLite merged = existingMessage.WeakToBuilder()
-          .WeakMergeFrom((IMessageLite)mergeValue)
-          .WeakBuild();
-        this[field] = merged;
-      } else {
-        this[field] = mergeValue;
       }
     }
 
     /// <summary>
-    /// See <see cref="IMessageLite.WriteTo(CodedOutputStream)" />.
+    /// See <see cref="IBuilder{TMessage, TBuilder}.MergeFrom(IMessage)" />
+    /// </summary>
+    public void MergeFrom(IMessage other) {
+      MergeFields(other.AllFields);
+    }
+
+    /// <summary>
+    /// Like <see cref="MergeFrom(IMessage)"/>, but merges from another <c>FieldSet</c>.
+    /// </summary>
+    public void MergeFrom(FieldSet other) {
+      MergeFields(other.fields);
+    }
+
+    /// <summary>
+    /// See <see cref="IMessage.WriteTo(CodedOutputStream)" />.
     /// </summary>
     public void WriteTo(CodedOutputStream output) {
-      foreach (KeyValuePair<IFieldDescriptorLite, object> entry in fields) {
+      foreach (KeyValuePair<FieldDescriptor, object> entry in fields) {
         WriteField(entry.Key, entry.Value, output);
       }
     }
@@ -391,9 +365,9 @@ namespace Google.ProtocolBuffers {
     /// <summary>
     /// Writes a single field to a CodedOutputStream.
     /// </summary>
-    public void WriteField(IFieldDescriptorLite field, Object value, CodedOutputStream output) {
-      if (field.IsExtension && field.MessageSetWireFormat) {
-        output.WriteMessageSetExtension(field.FieldNumber, (IMessageLite) value);
+    public void WriteField(FieldDescriptor field, Object value, CodedOutputStream output) {
+      if (field.IsExtension && field.ContainingType.Options.MessageSetWireFormat) {
+        output.WriteMessageSetExtension(field.FieldNumber, (IMessage) value);
       } else {
         if (field.IsRepeated) {
           IEnumerable valueList = (IEnumerable) value;
@@ -421,18 +395,18 @@ namespace Google.ProtocolBuffers {
     }
 
     /// <summary>
-    /// See <see cref="IMessageLite.SerializedSize" />. It's up to the caller to
+    /// See <see cref="IMessage.SerializedSize" />. It's up to the caller to
     /// cache the resulting size if desired.
     /// </summary>
     public int SerializedSize {
       get {
         int size = 0;
-        foreach (KeyValuePair<IFieldDescriptorLite, object> entry in fields) {
-          IFieldDescriptorLite field = entry.Key;
+        foreach (KeyValuePair<FieldDescriptor, object> entry in fields) {
+          FieldDescriptor field = entry.Key;
           object value = entry.Value;
 
-          if (field.IsExtension && field.MessageSetWireFormat) {
-            size += CodedOutputStream.ComputeMessageSetExtensionSize(field.FieldNumber, (IMessageLite)value);
+          if (field.IsExtension && field.ContainingType.Options.MessageSetWireFormat) {
+            size += CodedOutputStream.ComputeMessageSetExtensionSize(field.FieldNumber, (IMessage)value);
           } else {
             if (field.IsRepeated) {
               IEnumerable valueList = (IEnumerable)value;
@@ -466,7 +440,7 @@ namespace Google.ProtocolBuffers {
     /// </remarks>
     /// <exception cref="ArgumentException">The value is not of the right type.</exception>
     /// <exception cref="ArgumentNullException">The value is null.</exception>
-    private static void VerifyType(IFieldDescriptorLite field, object value) {
+    private static void VerifyType(FieldDescriptor field, object value) {
       ThrowHelper.ThrowIfNull(value, "value");
       bool isValid = false;
       switch (field.MappedType) {
@@ -480,17 +454,12 @@ namespace Google.ProtocolBuffers {
         case MappedType.String:      isValid = value is string; break;
         case MappedType.ByteString:  isValid = value is ByteString; break;        
         case MappedType.Enum:
-          IEnumLite enumValue = value as IEnumLite;
-          isValid = enumValue != null && field.EnumType.IsValidValue(enumValue);
+          EnumValueDescriptor enumValue = value as EnumValueDescriptor;
+          isValid = enumValue != null && enumValue.EnumDescriptor == field.EnumType;
           break;
         case MappedType.Message:
-          IMessageLite messageValue = value as IMessageLite;
-          isValid = messageValue != null;
-#if !LITE
-          if (isValid && messageValue is IMessage && field is FieldDescriptor) {
-            isValid = ((IMessage) messageValue).DescriptorForType == ((FieldDescriptor) field).MessageType;
-          }
-#endif
+          IMessage messageValue = value as IMessage;
+          isValid = messageValue != null && messageValue.DescriptorForType == field.MessageType;
           break;
       }
 
@@ -499,16 +468,10 @@ namespace Google.ProtocolBuffers {
         // the stack trace which exact call failed, since the whole chain is
         // considered one line of code.  So, let's make sure to include the
         // field name and other useful info in the exception.
-        string message = "Wrong object type used with protocol message reflection.";
-#if !LITE
-        Google.ProtocolBuffers.Descriptors.FieldDescriptor fieldinfo = field as Google.ProtocolBuffers.Descriptors.FieldDescriptor;
-        if (fieldinfo != null) {
-          message += "Message type \"" + fieldinfo.ContainingType.FullName;
-          message += "\", field \"" + (fieldinfo.IsExtension ? fieldinfo.FullName : fieldinfo.Name);
-          message += "\", value was type \"" + value.GetType().Name + "\".";
-        }
-#endif
-        throw new ArgumentException(message);
+        throw new ArgumentException("Wrong object type used with protocol message reflection. "
+            + "Message type \"" + field.ContainingType.FullName
+            + "\", field \"" + (field.IsExtension ? field.FullName : field.Name)
+            + "\", value was type \"" + value.GetType().Name + "\".");
       }
     }     
   }

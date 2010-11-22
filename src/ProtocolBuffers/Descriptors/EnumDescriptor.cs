@@ -37,7 +37,7 @@ namespace Google.ProtocolBuffers.Descriptors {
   /// <summary>
   /// Descriptor for an enum type in a .proto file.
   /// </summary>
-  public sealed class EnumDescriptor : IndexedDescriptorBase<EnumDescriptorProto, EnumOptions>, IEnumLiteMap<EnumValueDescriptor> {
+  public sealed class EnumDescriptor : IndexedDescriptorBase<EnumDescriptorProto, EnumOptions> {
 
     private readonly MessageDescriptor containingType;
     private readonly IList<EnumValueDescriptor> values;
@@ -73,23 +73,13 @@ namespace Google.ProtocolBuffers.Descriptors {
     }
 
     /// <summary>
-    /// Logic moved from FieldSet to continue current behavior
-    /// </summary>
-    public bool IsValidValue(IEnumLite value) {
-      return value is EnumValueDescriptor && ((EnumValueDescriptor)value).EnumDescriptor == this;
-    }
-
-    /// <summary>
     /// Finds an enum value by number. If multiple enum values have the
     /// same number, this returns the first defined value with that number.
     /// </summary>
-    public EnumValueDescriptor FindValueByNumber(int number) {
+    internal EnumValueDescriptor FindValueByNumber(int number) {
       return File.DescriptorPool.FindEnumValueByNumber(this, number);
     }
 
-    IEnumLite IEnumLiteMap.FindValueByNumber(int number) {
-      return FindValueByNumber(number);
-    }
     /// <summary>
     /// Finds an enum value by name.
     /// </summary>
