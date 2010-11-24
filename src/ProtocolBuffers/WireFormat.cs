@@ -33,9 +33,7 @@
 #endregion
 
 using System;
-#if !LITE
 using Google.ProtocolBuffers.Descriptors;
-#endif
 
 namespace Google.ProtocolBuffers {
   
@@ -117,7 +115,6 @@ namespace Google.ProtocolBuffers {
       return (uint) (fieldNumber << TagTypeBits) | (uint) wireType;
     }
 
-#if !LITE
     [CLSCompliant(false)]
     public static uint MakeTag(FieldDescriptor field) {
       return MakeTag(field.FieldNumber, GetWireType(field));
@@ -173,6 +170,5 @@ namespace Google.ProtocolBuffers {
           throw new ArgumentOutOfRangeException("No such field type");
       }
     }
-#endif
   }
 }
