@@ -88,20 +88,23 @@ namespace Google.ProtocolBuffers {
   /// could take advantage of this to inject a mutable object into a message
   /// belonging to privileged code and create mischief.</para>
   /// </remarks>
-  public sealed partial class ExtensionRegistry {
-#if !LITE
+  public sealed class ExtensionRegistry {
+
     private static readonly ExtensionRegistry empty = new ExtensionRegistry(
         new Dictionary<string, ExtensionInfo>(),
-        new Dictionary<ExtensionIntPair, IGeneratedExtensionLite>(),
+        new Dictionary<DescriptorIntPair, ExtensionInfo>(),
         true);
 
     private readonly IDictionary<string, ExtensionInfo> extensionsByName;
+    private readonly IDictionary<DescriptorIntPair, ExtensionInfo> extensionsByNumber;
+    private readonly bool readOnly;
 
     private ExtensionRegistry(IDictionary<String, ExtensionInfo> extensionsByName,
-        IDictionary<ExtensionIntPair, IGeneratedExtensionLite> extensionsByNumber,
-        bool readOnly)
-      : this(extensionsByNumber, readOnly) {
+        IDictionary<DescriptorIntPair, ExtensionInfo> extensionsByNumber,
+        bool readOnly) {
       this.extensionsByName = extensionsByName;
+      this.extensionsByNumber = extensionsByNumber;
+      this.readOnly = readOnly;
     }
 
     /// <summary>
@@ -109,13 +112,19 @@ namespace Google.ProtocolBuffers {
     /// </summary>
     public static ExtensionRegistry CreateInstance() {
       return new ExtensionRegistry(new Dictionary<string, ExtensionInfo>(),
-        new Dictionary<ExtensionIntPair, IGeneratedExtensionLite>(), false);
+        new Dictionary<DescriptorIntPair, ExtensionInfo>(), false);
+    }
+
+    /// <summary>
+    /// Get the unmodifiable singleton empty instance.
+    /// </summary>
+    public static ExtensionRegistry Empty {
+      get { return empty; }
     }
 
     public ExtensionRegistry AsReadOnly() {
       return new ExtensionRegistry(extensionsByName, extensionsByNumber, true);
     }
-#endif
 
     /// <summary>
     /// Finds an extension by fully-qualified field name, in the
@@ -137,9 +146,9 @@ namespace Google.ProtocolBuffers {
     /// </summary>
     public ExtensionInfo this[MessageDescriptor containingType, int fieldNumber] {
       get {
-        IGeneratedExtensionLite ret;
-        extensionsByNumber.TryGetValue(new ExtensionIntPair(containingType, fieldNumber), out ret);
-        return ret as ExtensionInfo;
+        ExtensionInfo ret;
+        extensionsByNumber.TryGetValue(new DescriptorIntPair(containingType, fieldNumber), out ret);
+        return ret;
       }
     }
 
@@ -189,7 +198,7 @@ namespace Google.ProtocolBuffers {
       }
 
       extensionsByName[extension.Descriptor.FullName] = extension;
-      extensionsByNumber[new ExtensionIntPair(extension.Descriptor.ContainingType,
+      extensionsByNumber[new DescriptorIntPair(extension.Descriptor.ContainingType,
           extension.Descriptor.FieldNumber)] = extension;
 
       FieldDescriptor field = extension.Descriptor;
@@ -201,6 +210,35 @@ namespace Google.ProtocolBuffers {
         // type's own scope. For backwards-compatibility, allow it to be looked
         // up by type name.
         extensionsByName[field.MessageType.FullName] = extension;
+      }
+    }
+
+    /// <summary>
+    /// Nested type just used to represent a pair of MessageDescriptor and int, as
+    /// the key into the "by number" map.
+    /// </summary>
+    private struct DescriptorIntPair : IEquatable<DescriptorIntPair> {
+      readonly MessageDescriptor descriptor;
+      readonly int number;
+
+      internal DescriptorIntPair(MessageDescriptor descriptor, int number) {
+        this.descriptor = descriptor;
+        this.number = number;
+      }
+
+      public override int GetHashCode() {
+        return descriptor.GetHashCode() * ((1 << 16) - 1) + number;
+      }
+
+      public override bool Equals(object obj) {
+        if (!(obj is DescriptorIntPair)) {
+          return false;
+        }
+        return Equals((DescriptorIntPair)obj);
+      }
+
+      public bool Equals(DescriptorIntPair other) {
+        return descriptor == other.descriptor && number == other.number;
       }
     }
   }
