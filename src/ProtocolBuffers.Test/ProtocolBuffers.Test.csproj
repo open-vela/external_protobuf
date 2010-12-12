@@ -54,37 +54,16 @@
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug_Silverlight2|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug_Silverlight2\</OutputPath>
-    <DefineConstants>DEBUG;TRACE;SILVERLIGHT2</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <NoStdLib>true</NoStdLib>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release_Silverlight2|AnyCPU'">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release_Silverlight2\</OutputPath>
-    <DefineConstants>TRACE;SILVERLIGHT2</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <NoStdLib>true</NoStdLib>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
   <ItemGroup>
     <Reference Include="nunit.framework, Version=2.2.8.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\NUnit 2.2.8.0\nunit.framework.dll</HintPath>
+      <HintPath>..\..\lib\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="Rhino.Mocks, Version=3.5.0.2, Culture=neutral, PublicKeyToken=0b3305902db7183f, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\Rhino.Mocks.dll</HintPath>
     </Reference>
-    <Reference Include="mscorlib" />
+	  <Reference Include="mscorlib" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -99,7 +78,6 @@
     <Compile Include="DescriptorsTest.cs" />
     <Compile Include="Descriptors\MessageDescriptorTest.cs" />
     <Compile Include="DynamicMessageTest.cs" />
-    <Compile Include="ExtendableMessageTest.cs" />
     <Compile Include="GeneratedMessageTest.cs" />
     <Compile Include="MessageStreamIteratorTest.cs" />
     <Compile Include="MessageStreamWriterTest.cs" />
@@ -112,11 +90,8 @@
     <Compile Include="TestProtos\UnitTestCSharpOptionsProtoFile.cs" />
     <Compile Include="TestProtos\UnitTestCustomOptionsProtoFile.cs" />
     <Compile Include="TestProtos\UnitTestEmbedOptimizeForProtoFile.cs" />
-    <Compile Include="TestProtos\UnitTestEmptyProtoFile.cs" />
-    <Compile Include="TestProtos\UnitTestImportLiteProtoFile.cs" />
     <Compile Include="TestProtos\UnitTestImportProtoFile.cs" />
     <Compile Include="TestProtos\UnitTestMessageSetProtoFile.cs" />
-    <Compile Include="TestProtos\UnitTestNoGenericServicesProtoFile.cs" />
     <Compile Include="TestProtos\UnitTestOptimizeForProtoFile.cs" />
     <Compile Include="TestProtos\UnitTestProtoFile.cs" />
     <Compile Include="TestUtil.cs" />
@@ -150,7 +125,8 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" Condition=" '$(Configuration)' == 'Debug' " />  
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" Condition=" '$(Configuration)' == 'Release' " />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

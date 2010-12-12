@@ -80,18 +80,10 @@
   <ItemGroup>
     <Reference Include="mscorlib" />
     <Reference Include="System" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AbstractBuilder.cs" />
-    <Compile Include="AbstractBuilderLite.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="AbstractMessage.cs" />
-    <Compile Include="AbstractMessageLite.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="ByteString.cs" />
     <Compile Include="Collections\Enumerables.cs" />
     <Compile Include="Collections\IPopsicleList.cs" />
@@ -124,16 +116,10 @@
     <Compile Include="Descriptors\PackageDescriptor.cs" />
     <Compile Include="Descriptors\ServiceDescriptor.cs" />
     <Compile Include="DynamicMessage.cs" />
-    <Compile Include="EnumLite.cs" />
     <Compile Include="ExtendableBuilder.cs" />
-    <Compile Include="ExtendableBuilderLite.cs" />
     <Compile Include="ExtendableMessage.cs" />
-    <Compile Include="ExtendableMessageLite.cs" />
-    <Compile Include="ExtensionInfo.cs">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="ExtensionInfo.cs" />
     <Compile Include="ExtensionRegistry.cs" />
-    <Compile Include="ExtensionRegistryLite.cs" />
     <Compile Include="FieldAccess\ReflectionUtil.cs" />
     <Compile Include="FieldAccess\SingleEnumAccessor.cs" />
     <Compile Include="FieldAccess\SingleMessageAccessor.cs" />
@@ -145,19 +131,12 @@
     <Compile Include="FieldAccess\RepeatedMessageAccessor.cs" />
     <Compile Include="FieldSet.cs" />
     <Compile Include="GeneratedBuilder.cs" />
-    <Compile Include="GeneratedBuilderLite.cs" />
-    <Compile Include="GeneratedExtensionLite.cs" />
-    <Compile Include="GeneratedMessageLite.cs" />
     <Compile Include="GeneratedRepeatExtension.cs" />
     <Compile Include="GeneratedSingleExtension.cs" />
     <Compile Include="GeneratedMessage.cs" />
     <Compile Include="IBuilder.cs" />
     <Compile Include="GeneratedExtensionBase.cs" />
-    <Compile Include="IBuilderLite.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="IMessage.cs" />
-    <Compile Include="IMessageLite.cs" />
     <Compile Include="InvalidProtocolBufferException.cs" />
     <Compile Include="IRpcChannel.cs" />
     <Compile Include="IRpcController.cs" />
@@ -199,8 +178,10 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" Condition=" '$(Configuration)' != 'Silverlight2' " />
-  <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight\v2.0\Microsoft.Silverlight.CSharp.targets" Condition=" '$(Configuration)' == 'Silverlight2' " />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" Condition=" '$(Configuration)' == 'Debug' " />  
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" Condition=" '$(Configuration)' == 'Release' " />
+  <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight\v2.0\Microsoft.Silverlight.CSharp.targets" Condition=" '$(Configuration)' == 'Debug_Silverlight2' " />
+  <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight\v2.0\Microsoft.Silverlight.CSharp.targets" Condition=" '$(Configuration)' == 'Release_Silverlight2' " />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
