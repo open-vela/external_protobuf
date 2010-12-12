@@ -180,7 +180,7 @@ namespace Google.ProtocolBuffers {
     }
 
     public override IDictionary<FieldDescriptor, object> AllFields {
-      get { return fields.AllFieldDescriptors; }
+      get { return fields.AllFields; }
     }
 
     public override bool HasField(FieldDescriptor field) {
@@ -216,7 +216,7 @@ namespace Google.ProtocolBuffers {
     }
 
     public bool Initialized {
-      get { return fields.IsInitializedWithRespectTo(type.Fields); }
+      get { return fields.IsInitializedWithRespectTo(type); }
     }
 
     public override void WriteTo(CodedOutputStream output) {
@@ -295,8 +295,7 @@ namespace Google.ProtocolBuffers {
       }
 
       public override Builder MergeFrom(DynamicMessage other) {
-        IMessage downcast = other;
-        return MergeFrom(downcast);
+        return MergeFrom((IMessage)other);
       }
 
       public override DynamicMessage Build() {
@@ -336,7 +335,7 @@ namespace Google.ProtocolBuffers {
       }
 
       public override bool IsInitialized {
-          get { return fields.IsInitializedWithRespectTo(type.Fields); }
+          get { return fields.IsInitializedWithRespectTo(type); }
       }
 
       public override Builder MergeFrom(CodedInputStream input, ExtensionRegistry extensionRegistry) {
@@ -355,7 +354,7 @@ namespace Google.ProtocolBuffers {
       }
 
       public override IDictionary<FieldDescriptor, object> AllFields {
-        get { return fields.AllFieldDescriptors; }
+        get { return fields.AllFields; }
       }
 
       public override IBuilder CreateBuilderForField(FieldDescriptor field) {
