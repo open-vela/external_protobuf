@@ -1,6 +1,6 @@
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
-// https://developers.google.com/protocol-buffers/
+// http://code.google.com/p/protobuf/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -35,11 +35,8 @@
 #include <map>
 #include <string>
 
-#include <google/protobuf/compiler/java/java_context.h>
 #include <google/protobuf/compiler/java/java_enum.h>
-#include <google/protobuf/compiler/java/java_doc_comment.h>
 #include <google/protobuf/compiler/java/java_helpers.h>
-#include <google/protobuf/compiler/java/java_name_resolver.h>
 #include <google/protobuf/io/printer.h>
 #include <google/protobuf/descriptor.pb.h>
 #include <google/protobuf/stubs/strutil.h>
@@ -49,22 +46,8 @@ namespace protobuf {
 namespace compiler {
 namespace java {
 
-namespace {
-bool EnumHasCustomOptions(const EnumDescriptor* descriptor) {
-  if (descriptor->options().unknown_fields().field_count() > 0) return true;
-  for (int i = 0; i < descriptor->value_count(); ++i) {
-    const EnumValueDescriptor* value = descriptor->value(i);
-    if (value->options().unknown_fields().field_count() > 0) return true;
-  }
-  return false;
-}
-}  // namespace
-
-EnumGenerator::EnumGenerator(const EnumDescriptor* descriptor,
-                             bool immutable_api,
-                             Context* context)
-  : descriptor_(descriptor), immutable_api_(immutable_api),
-    name_resolver_(context->GetNameResolver())  {
+EnumGenerator::EnumGenerator(const EnumDescriptor* descriptor)
+  : descriptor_(descriptor) {
   for (int i = 0; i < descriptor_->value_count(); i++) {
     const EnumValueDescriptor* value = descriptor_->value(i);
     const EnumValueDescriptor* canonical_value =
@@ -84,7 +67,6 @@ EnumGenerator::EnumGenerator(const EnumDescriptor* descriptor,
 EnumGenerator::~EnumGenerator() {}
 
 void EnumGenerator::Generate(io::Printer* printer) {
-  WriteEnumDocComment(printer, descriptor_);
   if (HasDescriptorMethods(descriptor_)) {
     printer->Print(
       "public enum $classname$\n"
@@ -103,16 +85,8 @@ void EnumGenerator::Generate(io::Printer* printer) {
     vars["name"] = canonical_values_[i]->name();
     vars["index"] = SimpleItoa(canonical_values_[i]->index());
     vars["number"] = SimpleItoa(canonical_values_[i]->number());
-    WriteEnumValueDocComment(printer, canonical_values_[i]);
-    if (canonical_values_[i]->options().deprecated()) {
-      printer->Print("@java.lang.Deprecated\n");
-    }
     printer->Print(vars,
       "$name$($index$, $number$),\n");
-  }
-
-  if (SupportUnknownEnumValue(descriptor_->file())) {
-    printer->Print("UNRECOGNIZED(-1, -1),\n");
   }
 
   printer->Print(
@@ -126,7 +100,6 @@ void EnumGenerator::Generate(io::Printer* printer) {
     vars["classname"] = descriptor_->name();
     vars["name"] = aliases_[i].value->name();
     vars["canonical_name"] = aliases_[i].canonical_value->name();
-    WriteEnumValueDocComment(printer, aliases_[i].value);
     printer->Print(vars,
       "public static final $classname$ $name$ = $canonical_name$;\n");
   }
@@ -135,7 +108,6 @@ void EnumGenerator::Generate(io::Printer* printer) {
     map<string, string> vars;
     vars["name"] = descriptor_->value(i)->name();
     vars["number"] = SimpleItoa(descriptor_->value(i)->number());
-    WriteEnumValueDocComment(printer, descriptor_->value(i));
     printer->Print(vars,
       "public static final int $name$_VALUE = $number$;\n");
   }
@@ -145,17 +117,7 @@ void EnumGenerator::Generate(io::Printer* printer) {
 
   printer->Print(
     "\n"
-    "public final int getNumber() {\n");
-  if (SupportUnknownEnumValue(descriptor_->file())) {
-    printer->Print(
-      "  if (index == -1) {\n"
-      "    throw new java.lang.IllegalArgumentException(\n"
-      "        \"Can't get the number of an unknown enum value.\");\n"
-      "  }\n");
-  }
-  printer->Print(
-    "  return value;\n"
-    "}\n"
+    "public final int getNumber() { return value; }\n"
     "\n"
     "public static $classname$ valueOf(int value) {\n"
     "  switch (value) {\n",
@@ -211,105 +173,43 @@ void EnumGenerator::Generate(io::Printer* printer) {
     //   at module init time because it wouldn't work with descriptor.proto, but
     //   we can cache the value the first time getDescriptor() is called.
     if (descriptor_->containing_type() == NULL) {
-      if (!MultipleJavaFiles(descriptor_->file(), immutable_api_)) {
-        printer->Print(
-          "  return $file$.getDescriptor().getEnumTypes().get($index$);\n",
-          "file", name_resolver_->GetClassName(descriptor_->file(),
-                                               immutable_api_),
-          "index", SimpleItoa(descriptor_->index()));
-      } else {
-        printer->Indent();
-        if (EnumHasCustomOptions(descriptor_)) {
-          // We need to load the immutable classes in order to parse custom
-          // options. However, since file level enums (no outer class) are
-          // shared by immutable code and mutable code, the immutable classes
-          // may not exist. So we try to use Java reflection to retrieve the
-          // descriptor from immutable classes.
-          printer->Print(
-            "try {\n"
-            "  java.lang.Class immutableFileClass =\n"
-            "      java.lang.Class.forName(\"$immutable_file_class_name$\");\n"
-            "  @java.lang.SuppressWarnings(\"unchecked\")\n"
-            "  java.lang.reflect.Method m =\n"
-            "      immutableFileClass.getMethod(\"getDescriptor\");\n"
-            "  com.google.protobuf.Descriptors.FileDescriptor file =\n"
-            "      (com.google.protobuf.Descriptors.FileDescriptor)\n"
-            "          m.invoke(immutableFileClass);\n"
-            "  return file.getEnumTypes().get($index$);\n"
-            "} catch (Exception e) {\n"
-            // Immutable classes cannot be found. Proceed as if custom options
-            // don't exist.
-            "}\n",
-            "immutable_file_class_name",
-            name_resolver_->GetImmutableClassName(descriptor_->file()),
-            "index", SimpleItoa(descriptor_->index()));
-        }
-        printer->Print(
-          "return $immutable_package$.$descriptor_class$.$descriptor$\n"
-          "    .getEnumTypes().get($index$);\n",
-          "immutable_package", FileJavaPackage(descriptor_->file(), true),
-          "descriptor_class",
-          name_resolver_->GetDescriptorClassName(descriptor_->file()),
-          "descriptor", "getDescriptor()",
-          "index", SimpleItoa(descriptor_->index()));
-        printer->Outdent();
-      }
+      printer->Print(
+        "  return $file$.getDescriptor().getEnumTypes().get($index$);\n",
+        "file", ClassName(descriptor_->file()),
+        "index", SimpleItoa(descriptor_->index()));
     } else {
       printer->Print(
-          "  return $parent$.$descriptor$.getEnumTypes().get($index$);\n",
-          "parent", name_resolver_->GetClassName(descriptor_->containing_type(),
-                                                 immutable_api_),
-          "descriptor", descriptor_->containing_type()->options()
-                        .no_standard_descriptor_accessor()
-                        ? "getDefaultInstance().getDescriptorForType()"
-                        : "getDescriptor()",
-          "index", SimpleItoa(descriptor_->index()));
+        "  return $parent$.getDescriptor().getEnumTypes().get($index$);\n",
+        "parent", ClassName(descriptor_->containing_type()),
+        "index", SimpleItoa(descriptor_->index()));
     }
 
     printer->Print(
       "}\n"
       "\n"
-      "private static final $classname$[] VALUES = ",
+      "private static final $classname$[] VALUES = {\n"
+      "  ",
       "classname", descriptor_->name());
 
-    if (CanUseEnumValues()) {
-      // If the constants we are going to output are exactly the ones we
-      // have declared in the Java enum in the same order, then we can use
-      // the values() method that the Java compiler automatically generates
-      // for every enum.
-      printer->Print("values();\n");
-    } else {
-      printer->Print(
-        "{\n"
-        "  ");
-      for (int i = 0; i < descriptor_->value_count(); i++) {
-        printer->Print("$name$, ",
-          "name", descriptor_->value(i)->name());
-      }
-      printer->Print(
-          "\n"
-          "};\n");
+    for (int i = 0; i < descriptor_->value_count(); i++) {
+      printer->Print("$name$, ",
+        "name", descriptor_->value(i)->name());
     }
 
     printer->Print(
+      "\n"
+      "};\n"
       "\n"
       "public static $classname$ valueOf(\n"
       "    com.google.protobuf.Descriptors.EnumValueDescriptor desc) {\n"
       "  if (desc.getType() != getDescriptor()) {\n"
       "    throw new java.lang.IllegalArgumentException(\n"
       "      \"EnumValueDescriptor is not for this type.\");\n"
-      "  }\n",
-      "classname", descriptor_->name());
-    if (SupportUnknownEnumValue(descriptor_->file())) {
-      printer->Print(
-        "  if (desc.getIndex() == -1) {\n"
-        "    return UNRECOGNIZED;\n"
-        "  }\n");
-    }
-    printer->Print(
+      "  }\n"
       "  return VALUES[desc.getIndex()];\n"
       "}\n"
-      "\n");
+      "\n",
+      "classname", descriptor_->name());
 
     // index is only used for reflection; lite implementation does not need it
     printer->Print("private final int index;\n");
@@ -335,18 +235,6 @@ void EnumGenerator::Generate(io::Printer* printer) {
 
   printer->Outdent();
   printer->Print("}\n\n");
-}
-
-bool EnumGenerator::CanUseEnumValues() {
-  if (canonical_values_.size() != descriptor_->value_count()) {
-    return false;
-  }
-  for (int i = 0; i < descriptor_->value_count(); i++) {
-    if (descriptor_->value(i)->name() != canonical_values_[i]->name()) {
-      return false;
-    }
-  }
-  return true;
 }
 
 }  // namespace java

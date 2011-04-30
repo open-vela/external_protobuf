@@ -1,6 +1,6 @@
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
-// https://developers.google.com/protocol-buffers/
+// http://code.google.com/p/protobuf/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -33,7 +33,6 @@
 #include <google/protobuf/compiler/subprocess.h>
 
 #include <algorithm>
-#include <iostream>
 
 #ifndef _WIN32
 #include <errno.h>
@@ -295,8 +294,8 @@ void Subprocess::Start(const string& program, SearchMode search_mode) {
   int stdin_pipe[2];
   int stdout_pipe[2];
 
-  GOOGLE_CHECK(pipe(stdin_pipe) != -1);
-  GOOGLE_CHECK(pipe(stdout_pipe) != -1);
+  pipe(stdin_pipe);
+  pipe(stdout_pipe);
 
   char* argv[2] = { strdup(program.c_str()), NULL };
 
@@ -324,11 +323,9 @@ void Subprocess::Start(const string& program, SearchMode search_mode) {
 
     // Write directly to STDERR_FILENO to avoid stdio code paths that may do
     // stuff that is unsafe here.
-    int ignored;
-    ignored = write(STDERR_FILENO, argv[0], strlen(argv[0]));
+    write(STDERR_FILENO, argv[0], strlen(argv[0]));
     const char* message = ": program not found or is not executable\n";
-    ignored = write(STDERR_FILENO, message, strlen(message));
-    (void) ignored;
+    write(STDERR_FILENO, message, strlen(message));
 
     // Must use _exit() rather than exit() to avoid flushing output buffers
     // that will also be flushed by the parent.
@@ -449,7 +446,7 @@ bool Subprocess::Communicate(const Message& input, Message* output,
   }
 
   if (!output->ParseFromString(output_data)) {
-    *error = "Plugin output is unparseable: " + CEscape(output_data);
+    *error = "Plugin output is unparseable.";
     return false;
   }
 

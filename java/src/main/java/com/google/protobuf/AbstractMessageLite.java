@@ -1,6 +1,6 @@
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
-// https://developers.google.com/protocol-buffers/
+// http://code.google.com/p/protobuf/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -44,8 +44,6 @@ import java.util.Collection;
  * @author kenton@google.com Kenton Varda
  */
 public abstract class AbstractMessageLite implements MessageLite {
-  protected int memoizedHashCode = 0;
-
   public ByteString toByteString() {
     try {
       final ByteString.CodedBuilder out =
@@ -91,22 +89,6 @@ public abstract class AbstractMessageLite implements MessageLite {
     codedOutput.writeRawVarint32(serialized);
     writeTo(codedOutput);
     codedOutput.flush();
-  }
-
-
-  /**
-   * Package private helper method for AbstractParser to create
-   * UninitializedMessageException.
-   */
-  UninitializedMessageException newUninitializedMessageException() {
-    return new UninitializedMessageException(this);
-  }
-
-  protected static void checkByteStringIsUtf8(ByteString byteString)
-      throws IllegalArgumentException {
-    if (!byteString.isValidUtf8()) {
-      throw new IllegalArgumentException("Byte string is not UTF-8.");
-    }
   }
 
   /**
@@ -321,33 +303,21 @@ public abstract class AbstractMessageLite implements MessageLite {
      * used by generated code.  Users should ignore it.
      *
      * @throws NullPointerException if any of the elements of {@code values} is
-     * null. When that happens, some elements of {@code values} may have already
-     * been added to the result {@code list}.
+     * null.
      */
     protected static <T> void addAll(final Iterable<T> values,
                                      final Collection<? super T> list) {
-      if (values instanceof LazyStringList) {
-        // For StringOrByteStringLists, check the underlying elements to avoid
-        // forcing conversions of ByteStrings to Strings.
-        checkForNullValues(((LazyStringList) values).getUnderlyingElements());
-        list.addAll((Collection<T>) values);
-      } else if (values instanceof Collection) {
-        checkForNullValues(values);
-        list.addAll((Collection<T>) values);
-      } else {
-        for (final T value : values) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          list.add(value);
-        }
-      }
-    }
-
-    private static void checkForNullValues(final Iterable<?> values) {
-      for (final Object value : values) {
+      for (final T value : values) {
         if (value == null) {
           throw new NullPointerException();
+        }
+      }
+      if (values instanceof Collection) {
+        final Collection<T> collection = (Collection<T>) values;
+        list.addAll(collection);
+      } else {
+        for (final T value : values) {
+          list.add(value);
         }
       }
     }

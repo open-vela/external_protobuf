@@ -1,6 +1,6 @@
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
-// https://developers.google.com/protocol-buffers/
+// http://code.google.com/p/protobuf/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -30,19 +30,17 @@
 
 package com.google.protobuf;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.AbstractList;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.RandomAccess;
+import java.util.Collection;
 
 /**
  * An implementation of {@link LazyStringList} that wraps an ArrayList. Each
- * element is one of String, ByteString, or byte[]. It caches the last one
- * requested which is most likely the one needed next. This minimizes memory
- * usage while satisfying the most common use cases.
+ * element is either a ByteString or a String. It caches the last one requested
+ * which is most likely the one needed next. This minimizes memory usage while
+ * satisfying the most common use cases.
  * <p>
  * <strong>Note that this implementation is not synchronized.</strong>
  * If multiple threads access an <tt>ArrayList</tt> instance concurrently,
@@ -65,22 +63,13 @@ import java.util.RandomAccess;
 public class LazyStringArrayList extends AbstractList<String>
     implements LazyStringList, RandomAccess {
 
-  public static final LazyStringList EMPTY =
-      new LazyStringArrayList().getUnmodifiableView();
+  public final static LazyStringList EMPTY = new UnmodifiableLazyStringList(
+      new LazyStringArrayList());
 
   private final List<Object> list;
 
   public LazyStringArrayList() {
     list = new ArrayList<Object>();
-  }
-
-  public LazyStringArrayList(int intialCapacity) {
-    list = new ArrayList<Object>(intialCapacity);
-  }
-
-  public LazyStringArrayList(LazyStringList from) {
-    list = new ArrayList<Object>(from.size());
-    addAll(from);
   }
 
   public LazyStringArrayList(List<String> from) {
@@ -92,17 +81,10 @@ public class LazyStringArrayList extends AbstractList<String>
     Object o = list.get(index);
     if (o instanceof String) {
       return (String) o;
-    } else if (o instanceof ByteString) {
+    } else {
       ByteString bs = (ByteString) o;
       String s = bs.toStringUtf8();
-      if (bs.isValidUtf8()) {
-        list.set(index, s);
-      }
-      return s;
-    } else {
-      byte[] ba = (byte[]) o;
-      String s = Internal.toStringUtf8(ba);
-      if (Internal.isValidUtf8(ba)) {
+      if (Internal.isValidUtf8(bs)) {
         list.set(index, s);
       }
       return s;
@@ -127,35 +109,8 @@ public class LazyStringArrayList extends AbstractList<String>
   }
 
   @Override
-  public boolean addAll(Collection<? extends String> c) {
-    // The default implementation of AbstractCollection.addAll(Collection)
-    // delegates to add(Object). This implementation instead delegates to
-    // addAll(int, Collection), which makes a special case for Collections
-    // which are instances of LazyStringList.
-    return addAll(size(), c);
-  }
-
-  @Override
   public boolean addAll(int index, Collection<? extends String> c) {
-    // When copying from another LazyStringList, directly copy the underlying
-    // elements rather than forcing each element to be decoded to a String.
-    Collection<?> collection = c instanceof LazyStringList
-        ? ((LazyStringList) c).getUnderlyingElements() : c;
-    boolean ret = list.addAll(index, collection);
-    modCount++;
-    return ret;
-  }
-
-  // @Override
-  public boolean addAllByteString(Collection<? extends ByteString> values) {
-    boolean ret = list.addAll(values);
-    modCount++;
-    return ret;
-  }
-
-  // @Override
-  public boolean addAllByteArray(Collection<byte[]> c) {
-    boolean ret = list.addAll(c);
+    boolean ret = list.addAll(index, c);
     modCount++;
     return ret;
   }
@@ -167,7 +122,6 @@ public class LazyStringArrayList extends AbstractList<String>
     return asString(o);
   }
 
-  @Override
   public void clear() {
     list.clear();
     modCount++;
@@ -178,194 +132,24 @@ public class LazyStringArrayList extends AbstractList<String>
     list.add(element);
     modCount++;
   }
-  
-  // @Override
-  public void add(byte[] element) {
-    list.add(element);
-    modCount++;
-  }
 
   // @Override
   public ByteString getByteString(int index) {
     Object o = list.get(index);
-    ByteString b = asByteString(o);
-    if (b != o) {
+    if (o instanceof String) {
+      ByteString b = ByteString.copyFromUtf8((String) o);
       list.set(index, b);
+      return b;
+    } else {
+      return (ByteString) o;
     }
-    return b;
-  }
-  
-  // @Override
-  public byte[] getByteArray(int index) {
-    Object o = list.get(index);
-    byte[] b = asByteArray(o);
-    if (b != o) {
-      list.set(index, b);
-    }
-    return b;
   }
 
-  // @Override
-  public void set(int index, ByteString s) {
-    list.set(index, s);
-  }
-
-  // @Override
-  public void set(int index, byte[] s) {
-    list.set(index, s);
-  }
-
-
-  private static String asString(Object o) {
+  private String asString(Object o) {
     if (o instanceof String) {
       return (String) o;
-    } else if (o instanceof ByteString) {
+    } else {
       return ((ByteString) o).toStringUtf8();
-    } else {
-      return Internal.toStringUtf8((byte[]) o);
     }
   }
-  
-  private static ByteString asByteString(Object o) {
-    if (o instanceof ByteString) {
-      return (ByteString) o;
-    } else if (o instanceof String) {
-      return ByteString.copyFromUtf8((String) o);
-    } else {
-      return ByteString.copyFrom((byte[]) o);
-    }
-  }
-  
-  private static byte[] asByteArray(Object o) {
-    if (o instanceof byte[]) {
-      return (byte[]) o;
-    } else if (o instanceof String) {
-      return Internal.toByteArray((String) o);
-    } else {
-      return ((ByteString) o).toByteArray();
-    }
-  }
-
-  // @Override
-  public List<?> getUnderlyingElements() {
-    return Collections.unmodifiableList(list);
-  }
-
-  // @Override
-  public void mergeFrom(LazyStringList other) {
-    for (Object o : other.getUnderlyingElements()) {
-      if (o instanceof byte[]) {
-        byte[] b = (byte[]) o;
-        // Byte array's content is mutable so they should be copied rather than
-        // shared when merging from one message to another.
-        list.add(Arrays.copyOf(b, b.length));
-      } else {
-        list.add(o);
-      }
-    }
-  }
-
-  private static class ByteArrayListView extends AbstractList<byte[]>
-      implements RandomAccess {
-    private final List<Object> list;
-    
-    ByteArrayListView(List<Object> list) {
-      this.list = list;
-    }
-    
-    @Override
-    public byte[] get(int index) {
-      Object o = list.get(index);
-      byte[] b = asByteArray(o);
-      if (b != o) {
-        list.set(index, b);
-      }
-      return b;
-    }
-
-    @Override
-    public int size() {
-      return list.size();
-    }
-
-    @Override
-    public byte[] set(int index, byte[] s) {
-      Object o = list.set(index, s);
-      modCount++;
-      return asByteArray(o);
-    }
-
-    @Override
-    public void add(int index, byte[] s) {
-      list.add(index, s);
-      modCount++;
-    }
-
-    @Override
-    public byte[] remove(int index) {
-      Object o = list.remove(index);
-      modCount++;
-      return asByteArray(o);
-    }
-  }
-  
-  // @Override
-  public List<byte[]> asByteArrayList() {
-    return new ByteArrayListView(list);
-  }
-
-  private static class ByteStringListView extends AbstractList<ByteString>
-      implements RandomAccess {
-    private final List<Object> list;
-
-    ByteStringListView(List<Object> list) {
-      this.list = list;
-    }
-
-    @Override
-    public ByteString get(int index) {
-      Object o = list.get(index);
-      ByteString b = asByteString(o);
-      if (b != o) {
-        list.set(index, b);
-      }
-      return b;
-    }
-
-    @Override
-    public int size() {
-      return list.size();
-    }
-
-    @Override
-    public ByteString set(int index, ByteString s) {
-      Object o = list.set(index, s);
-      modCount++;
-      return asByteString(o);
-    }
-
-    @Override
-    public void add(int index, ByteString s) {
-      list.add(index, s);
-      modCount++;
-    }
-
-    @Override
-    public ByteString remove(int index) {
-      Object o = list.remove(index);
-      modCount++;
-      return asByteString(o);
-    }
-  }
-
-  // @Override
-  public List<ByteString> asByteStringList() {
-    return new ByteStringListView(list);
-  }
-
-  // @Override
-  public LazyStringList getUnmodifiableView() {
-    return new UnmodifiableLazyStringList(this);
-  }
-
 }

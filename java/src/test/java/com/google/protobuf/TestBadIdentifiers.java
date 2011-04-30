@@ -1,6 +1,6 @@
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
-// https://developers.google.com/protocol-buffers/
+// http://code.google.com/p/protobuf/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -35,7 +35,7 @@ import junit.framework.TestCase;
 /**
  * Tests that proto2 api generation doesn't cause compile errors when
  * compiling protocol buffers that have names that would otherwise conflict
- * if not fully qualified (like @Deprecated and @Override).
+ * if not fully qualified (like @Deprecated and @Override). 
  *
  * @author jonp@google.com (Jon Perlow)
  */
@@ -45,52 +45,5 @@ public class TestBadIdentifiers extends TestCase {
     // If this compiles, it means the generation was correct.
     TestBadIdentifiersProto.Deprecated.newBuilder();
     TestBadIdentifiersProto.Override.newBuilder();
-  }
-
-  public void testGetDescriptor() {
-    Descriptors.FileDescriptor fileDescriptor =
-        TestBadIdentifiersProto.getDescriptor();
-    String descriptorField = TestBadIdentifiersProto.Descriptor
-        .getDefaultInstance().getDescriptor();
-    Descriptors.Descriptor protoDescriptor = TestBadIdentifiersProto.Descriptor
-        .getDefaultInstance().getDescriptorForType();
-    String nestedDescriptorField = TestBadIdentifiersProto.Descriptor
-        .NestedDescriptor.getDefaultInstance().getDescriptor();
-    Descriptors.Descriptor nestedProtoDescriptor = TestBadIdentifiersProto
-        .Descriptor.NestedDescriptor.getDefaultInstance()
-        .getDescriptorForType();
-  }
-
-  public void testConflictingFieldNames() throws Exception {
-    TestBadIdentifiersProto.TestConflictingFieldNames message =
-        TestBadIdentifiersProto.TestConflictingFieldNames.getDefaultInstance();
-    // Make sure generated accessors are properly named.
-    assertEquals(0, message.getInt32Field1Count());
-    assertEquals(0, message.getEnumField2Count());
-    assertEquals(0, message.getStringField3Count());
-    assertEquals(0, message.getBytesField4Count());
-    assertEquals(0, message.getMessageField5Count());
-
-    assertEquals(0, message.getInt32FieldCount11());
-    assertEquals(0, message.getEnumFieldCount12().getNumber());
-    assertEquals("", message.getStringFieldCount13());
-    assertEquals(ByteString.EMPTY, message.getBytesFieldCount14());
-    assertEquals(0, message.getMessageFieldCount15().getSerializedSize());
-
-    assertEquals(0, message.getInt32Field21Count());
-    assertEquals(0, message.getEnumField22Count());
-    assertEquals(0, message.getStringField23Count());
-    assertEquals(0, message.getBytesField24Count());
-    assertEquals(0, message.getMessageField25Count());
-
-    assertEquals(0, message.getInt32Field1List().size());
-    assertEquals(0, message.getInt32FieldList31());
-
-    assertEquals(0, message.getInt64FieldCount());
-    assertEquals(0L, message.getExtension(
-        TestBadIdentifiersProto.TestConflictingFieldNames.int64FieldCount).longValue());
-    assertEquals(0L, message.getExtension(
-        TestBadIdentifiersProto.TestConflictingFieldNames.int64FieldList).longValue());
-
-  }
+  } 
 }
