@@ -1,6 +1,6 @@
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
-// https://developers.google.com/protocol-buffers/
+// http://code.google.com/p/protobuf/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -33,7 +33,6 @@
 // This file tests that various identifiers work as field and type names even
 // though the same identifiers are used internally by the java code generator.
 
-syntax = "proto2";
 
 // Some generic_services option(s) added automatically.
 // See:  http://go/proto2-generic-services-default
@@ -43,44 +42,13 @@ package io_protocol_tests;
 
 option java_package = "com.google.protobuf";
 option java_outer_classname = "TestBadIdentifiersProto";
-option java_generate_equals_and_hash = true;
-
 
 message TestMessage {
-  optional string cached_size = 1;
-  optional string serialized_size = 2;
-  optional string class = 3;
-}
-
-message Descriptor {
-  option no_standard_descriptor_accessor = true;
-  optional string descriptor = 1;
-  message NestedDescriptor {
-    option no_standard_descriptor_accessor = true;
-    optional string descriptor = 1;
-  }
-  optional NestedDescriptor nested_descriptor = 2;
-  enum NestedEnum {
-    UNKNOWN = 0;
-    FOO = 1;
-  }
-}
-
-message Parser {
-  enum ParserEnum {
-    UNKNOWN = 0;
-    PARSER = 1;
-  }
-  optional ParserEnum parser = 1;
 }
 
 message Deprecated {
   enum TestEnum {
-    UNKNOWN = 0;
     FOO = 1;
-
-    // Test if @Deprecated annotation conflicts with Deprecated message name.
-    BAR = 2 [ deprecated = true ];
   }
 
   optional int32 field1 = 1 [deprecated=true];
@@ -94,77 +62,9 @@ message Override {
 
 message Object {
   optional int32 object = 1;
-  optional string string_object = 2;
-}
-
-message String {
-  optional string string = 1;
-}
-
-message Integer {
-  optional int32 integer = 1;
-}
-
-message Long {
-  optional int32 long = 1;
-}
-
-message Float {
-  optional float float = 1;
-}
-
-message Double {
-  optional double double = 1;
 }
 
 service TestConflictingMethodNames {
   rpc Override(TestMessage) returns (TestMessage);
 }
 
-message TestConflictingFieldNames {
-  enum TestEnum {
-    UNKNOWN = 0;
-    FOO = 1;
-  }
-  message TestMessage {
-  }
-  repeated int32 int32_field = 1;
-  repeated TestEnum enum_field = 2;
-  repeated string string_field = 3;
-  repeated bytes bytes_field = 4;
-  repeated TestMessage message_field = 5;
-
-  optional int32 int32_field_count = 11;
-  optional TestEnum enum_field_count = 12;
-  optional string string_field_count = 13;
-  optional bytes bytes_field_count = 14;
-  optional TestMessage message_field_count = 15;
-
-  repeated int32 Int32Field = 21;
-  repeated TestEnum EnumField = 22;
-  repeated string StringField = 23;
-  repeated bytes BytesField = 24;
-  repeated TestMessage MessageField = 25;
-
-  // This field conflicts with "int32_field" as they both generate
-  // the method getInt32FieldList().
-  required int32 int32_field_list = 31;  // NO_PROTO3
-
-  extensions 1000 to max;  // NO_PROTO3
-
-  repeated int64 int64_field = 41;
-  extend TestConflictingFieldNames {  // NO_PROTO3
-    // We don't generate accessors for extensions so the following extension
-    // fields don't conflict with the repeated field "int64_field".
-    optional int64 int64_field_count = 1001;  // NO_PROTO3
-    optional int64 int64_field_list = 1002;  // NO_PROTO3
-  }  // NO_PROTO3
-}
-
-message TestMapField {
-  message MapField {}
-  message Pair {}
-  message Message {}
-
-  map<int32, int32> map_field = 1;
-}

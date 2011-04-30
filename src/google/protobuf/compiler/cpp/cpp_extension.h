@@ -1,6 +1,6 @@
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
-// https://developers.google.com/protocol-buffers/
+// http://code.google.com/p/protobuf/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -37,7 +37,6 @@
 
 #include <string>
 #include <google/protobuf/stubs/common.h>
-#include <google/protobuf/compiler/cpp/cpp_options.h>
 
 namespace google {
 namespace protobuf {
@@ -58,7 +57,7 @@ class ExtensionGenerator {
  public:
   // See generator.cc for the meaning of dllexport_decl.
   explicit ExtensionGenerator(const FieldDescriptor* descriptor,
-                              const Options& options);
+                              const string& dllexport_decl);
   ~ExtensionGenerator();
 
   // Header stuff.
@@ -73,7 +72,7 @@ class ExtensionGenerator {
  private:
   const FieldDescriptor* descriptor_;
   string type_traits_;
-  Options options_;
+  string dllexport_decl_;
 
   GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(ExtensionGenerator);
 };

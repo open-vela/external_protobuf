@@ -1,6 +1,6 @@
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
-// https://developers.google.com/protocol-buffers/
+// http://code.google.com/p/protobuf/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -32,7 +32,7 @@
 
 #include <google/protobuf/stubs/substitute.h>
 #include <google/protobuf/stubs/strutil.h>
-#include <google/protobuf/stubs/stl_util.h>
+#include <google/protobuf/stubs/stl_util-inl.h>
 
 namespace google {
 namespace protobuf {

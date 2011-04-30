@@ -1,6 +1,6 @@
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
-// https://developers.google.com/protocol-buffers/
+// http://code.google.com/p/protobuf/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -30,7 +30,6 @@
 
 package com.google.protobuf;
 
-import com.google.protobuf.Descriptors.FieldDescriptor;
 import protobuf_unittest.UnittestOptimizeFor.TestOptimizedForSize;
 import protobuf_unittest.UnittestProto;
 import protobuf_unittest.UnittestProto.ForeignMessage;
@@ -168,13 +167,6 @@ public class AbstractMessageTest extends TestCase {
         wrappedBuilder.setUnknownFields(unknownFields);
         return this;
       }
-      @Override
-      public Message.Builder getFieldBuilder(FieldDescriptor field) {
-        return wrappedBuilder.getFieldBuilder(field);
-      }
-    }
-    public Parser<? extends Message> getParserForType() {
-      return wrappedMessage.getParserForType();
     }
   }
 
@@ -226,34 +218,6 @@ public class AbstractMessageTest extends TestCase {
     AbstractMessageWrapper message =
       builder.mergeFrom(TestUtil.getAllSet().toByteString()).build();
     TestUtil.assertAllFieldsSet((TestAllTypes) message.wrappedMessage);
-  }
-
-  public void testParsingUninitialized() throws Exception {
-    TestRequiredForeign.Builder builder = TestRequiredForeign.newBuilder();
-    builder.getOptionalMessageBuilder().setDummy2(10);
-    ByteString bytes = builder.buildPartial().toByteString();
-    Message.Builder abstractMessageBuilder =
-        new AbstractMessageWrapper.Builder(TestRequiredForeign.newBuilder());
-    // mergeFrom() should not throw initialization error.
-    abstractMessageBuilder.mergeFrom(bytes).buildPartial();
-    try {
-      abstractMessageBuilder.mergeFrom(bytes).build();
-      fail();
-    } catch (UninitializedMessageException ex) {
-      // pass
-    }
-
-    // test DynamicMessage directly.
-    Message.Builder dynamicMessageBuilder = DynamicMessage.newBuilder(
-        TestRequiredForeign.getDescriptor());
-    // mergeFrom() should not throw initialization error.
-    dynamicMessageBuilder.mergeFrom(bytes).buildPartial();
-    try {
-      dynamicMessageBuilder.mergeFrom(bytes).build();
-      fail();
-    } catch (UninitializedMessageException ex) {
-      // pass
-    }
   }
 
   public void testPackedSerialization() throws Exception {
@@ -334,16 +298,12 @@ public class AbstractMessageTest extends TestCase {
       new AbstractMessageWrapper.Builder(builder);
 
     assertFalse(abstractBuilder.isInitialized());
-    assertEquals("a, b, c", abstractBuilder.getInitializationErrorString());
     builder.setA(1);
     assertFalse(abstractBuilder.isInitialized());
-    assertEquals("b, c", abstractBuilder.getInitializationErrorString());
     builder.setB(1);
     assertFalse(abstractBuilder.isInitialized());
-    assertEquals("c", abstractBuilder.getInitializationErrorString());
     builder.setC(1);
     assertTrue(abstractBuilder.isInitialized());
-    assertEquals("", abstractBuilder.getInitializationErrorString());
   }
 
   public void testForeignIsInitialized() throws Exception {
@@ -352,27 +312,18 @@ public class AbstractMessageTest extends TestCase {
       new AbstractMessageWrapper.Builder(builder);
 
     assertTrue(abstractBuilder.isInitialized());
-    assertEquals("", abstractBuilder.getInitializationErrorString());
 
     builder.setOptionalMessage(TEST_REQUIRED_UNINITIALIZED);
     assertFalse(abstractBuilder.isInitialized());
-    assertEquals(
-        "optional_message.a, optional_message.b, optional_message.c",
-        abstractBuilder.getInitializationErrorString());
 
     builder.setOptionalMessage(TEST_REQUIRED_INITIALIZED);
     assertTrue(abstractBuilder.isInitialized());
-    assertEquals("", abstractBuilder.getInitializationErrorString());
 
     builder.addRepeatedMessage(TEST_REQUIRED_UNINITIALIZED);
     assertFalse(abstractBuilder.isInitialized());
-    assertEquals(
-        "repeated_message[0].a, repeated_message[0].b, repeated_message[0].c",
-        abstractBuilder.getInitializationErrorString());
 
     builder.setRepeatedMessage(0, TEST_REQUIRED_INITIALIZED);
     assertTrue(abstractBuilder.isInitialized());
-    assertEquals("", abstractBuilder.getInitializationErrorString());
   }
 
   // -----------------------------------------------------------------
@@ -470,7 +421,7 @@ public class AbstractMessageTest extends TestCase {
 
 
   /**
-   * Asserts that the given proto has symmetric equals and hashCode methods.
+   * Asserts that the given proto has symetric equals and hashCode methods.
    */
   private void checkEqualsIsConsistent(Message message) {
     // Object should be equal to itself.
@@ -506,22 +457,4 @@ public class AbstractMessageTest extends TestCase {
         String.format("%s should have a different hash code from %s", m1, m2),
         m1.hashCode() == m2.hashCode());
   }
-
-  public void testCheckByteStringIsUtf8OnUtf8() {
-    ByteString byteString = ByteString.copyFromUtf8("some text");
-    AbstractMessageLite.checkByteStringIsUtf8(byteString);
-    // No exception thrown.
-  }
-
-  public void testCheckByteStringIsUtf8OnNonUtf8() {
-    ByteString byteString =
-        ByteString.copyFrom(new byte[]{(byte) 0x80}); // A lone continuation byte.
-    try {
-      AbstractMessageLite.checkByteStringIsUtf8(byteString);
-      fail("Expected AbstractMessageLite.checkByteStringIsUtf8 to throw IllegalArgumentException");
-    } catch (IllegalArgumentException exception) {
-      assertEquals("Byte string is not UTF-8.", exception.getMessage());
-    }
-  }
-
 }

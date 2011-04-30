@@ -1,6 +1,6 @@
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
-// https://developers.google.com/protocol-buffers/
+// http://code.google.com/p/protobuf/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -32,12 +32,8 @@
 //  Based on original Protocol Buffers design by
 //  Sanjay Ghemawat, Jeff Dean, and others.
 
-#include <string>
-#include <vector>
-
 #include <google/protobuf/reflection_ops.h>
 #include <google/protobuf/descriptor.h>
-#include <google/protobuf/descriptor.pb.h>
 #include <google/protobuf/unknown_field_set.h>
 #include <google/protobuf/stubs/strutil.h>
 
@@ -56,9 +52,7 @@ void ReflectionOps::Merge(const Message& from, Message* to) {
 
   const Descriptor* descriptor = from.GetDescriptor();
   GOOGLE_CHECK_EQ(to->GetDescriptor(), descriptor)
-    << "Tried to merge messages of different types "
-    << "(merge " << descriptor->full_name()
-    << " to " << to->GetDescriptor()->full_name() << ")";
+    << "Tried to merge messages of different types.";
 
   const Reflection* from_reflection = from.GetReflection();
   const Reflection* to_reflection = to->GetReflection();
@@ -157,12 +151,11 @@ bool ReflectionOps::IsInitialized(const Message& message) {
   for (int i = 0; i < fields.size(); i++) {
     const FieldDescriptor* field = fields[i];
     if (field->cpp_type() == FieldDescriptor::CPPTYPE_MESSAGE) {
-
       if (field->is_repeated()) {
         int size = reflection->FieldSize(message, field);
 
-        for (int j = 0; j < size; j++) {
-          if (!reflection->GetRepeatedMessage(message, field, j)
+        for (int i = 0; i < size; i++) {
+          if (!reflection->GetRepeatedMessage(message, field, i)
                           .IsInitialized()) {
             return false;
           }
@@ -190,8 +183,8 @@ void ReflectionOps::DiscardUnknownFields(Message* message) {
     if (field->cpp_type() == FieldDescriptor::CPPTYPE_MESSAGE) {
       if (field->is_repeated()) {
         int size = reflection->FieldSize(*message, field);
-        for (int j = 0; j < size; j++) {
-          reflection->MutableRepeatedMessage(message, field, j)
+        for (int i = 0; i < size; i++) {
+          reflection->MutableRepeatedMessage(message, field, i)
                     ->DiscardUnknownFields();
         }
       } else {
@@ -247,11 +240,11 @@ void ReflectionOps::FindInitializationErrors(
       if (field->is_repeated()) {
         int size = reflection->FieldSize(message, field);
 
-        for (int j = 0; j < size; j++) {
+        for (int i = 0; i < size; i++) {
           const Message& sub_message =
-            reflection->GetRepeatedMessage(message, field, j);
+            reflection->GetRepeatedMessage(message, field, i);
           FindInitializationErrors(sub_message,
-                                   SubMessagePrefix(prefix, field, j),
+                                   SubMessagePrefix(prefix, field, i),
                                    errors);
         }
       } else {

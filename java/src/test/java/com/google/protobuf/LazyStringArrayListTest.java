@@ -1,6 +1,6 @@
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
-// https://developers.google.com/protocol-buffers/
+// http://code.google.com/p/protobuf/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -31,9 +31,6 @@
 package com.google.protobuf;
 
 import junit.framework.TestCase;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Tests for {@link LazyStringArrayList}.
@@ -67,14 +64,6 @@ public class LazyStringArrayListTest extends TestCase {
     list.remove(1);
     assertSame(STRING_A, list.get(0));
     assertSame(STRING_C, list.get(1));
-
-    List<ByteString> byteStringList = list.asByteStringList();
-    assertEquals(BYTE_STRING_A, byteStringList.get(0));
-    assertEquals(BYTE_STRING_C, byteStringList.get(1));
-
-    // Underlying list should be transformed.
-    assertSame(byteStringList.get(0), list.getByteString(0));
-    assertSame(byteStringList.get(1), list.getByteString(1));
   }
 
   public void testJustByteString() {
@@ -91,10 +80,6 @@ public class LazyStringArrayListTest extends TestCase {
     list.remove(1);
     assertSame(BYTE_STRING_A, list.getByteString(0));
     assertSame(BYTE_STRING_C, list.getByteString(1));
-
-    List<ByteString> byteStringList = list.asByteStringList();
-    assertSame(BYTE_STRING_A, byteStringList.get(0));
-    assertSame(BYTE_STRING_C, byteStringList.get(1));
   }
 
   public void testConversionBackAndForth() {
@@ -129,46 +114,5 @@ public class LazyStringArrayListTest extends TestCase {
     // Once cached, ByteString should stay cached.
     assertSame(aPrimeByteString, list.getByteString(0));
     assertSame(bPrimeByteString, list.getByteString(1));
-  }
-
-  public void testCopyConstructorCopiesByReference() {
-    LazyStringArrayList list1 = new LazyStringArrayList();
-    list1.add(STRING_A);
-    list1.add(BYTE_STRING_B);
-    list1.add(BYTE_STRING_C);
-
-    LazyStringArrayList list2 = new LazyStringArrayList(list1);
-    assertEquals(3, list2.size());
-    assertSame(STRING_A, list2.get(0));
-    assertSame(BYTE_STRING_B, list2.getByteString(1));
-    assertSame(BYTE_STRING_C, list2.getByteString(2));
-  }
-
-  public void testListCopyConstructor() {
-    List<String> list1 = new ArrayList<String>();
-    list1.add(STRING_A);
-    list1.add(STRING_B);
-    list1.add(STRING_C);
-
-    LazyStringArrayList list2 = new LazyStringArrayList(list1);
-    assertEquals(3, list2.size());
-    assertSame(STRING_A, list2.get(0));
-    assertSame(STRING_B, list2.get(1));
-    assertSame(STRING_C, list2.get(2));
-  }
-
-  public void testAddAllCopiesByReferenceIfPossible() {
-    LazyStringArrayList list1 = new LazyStringArrayList();
-    list1.add(STRING_A);
-    list1.add(BYTE_STRING_B);
-    list1.add(BYTE_STRING_C);
-
-    LazyStringArrayList list2 = new LazyStringArrayList();
-    list2.addAll(list1);
-
-    assertEquals(3, list2.size());
-    assertSame(STRING_A, list2.get(0));
-    assertSame(BYTE_STRING_B, list2.getByteString(1));
-    assertSame(BYTE_STRING_C, list2.getByteString(2));
   }
 }

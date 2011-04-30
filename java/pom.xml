@@ -10,15 +10,15 @@
   </parent>
   <groupId>com.google.protobuf</groupId>
   <artifactId>protobuf-java</artifactId>
-  <version>3.0.0-alpha-3-pre</version>
-  <packaging>bundle</packaging>
+  <version>2.4.1</version>
+  <packaging>jar</packaging>
   <name>Protocol Buffer Java API</name>
   <description>
     Protocol Buffers are a way of encoding structured data in an efficient yet
     extensible format.
   </description>
   <inceptionYear>2008</inceptionYear>
-  <url>https://developers.google.com/protocol-buffers/</url>
+  <url>http://code.google.com/p/protobuf</url>
   <licenses>
     <license>
       <name>New BSD license</name>
@@ -27,9 +27,9 @@
     </license>
   </licenses>
   <scm>
-    <url>https://github.com/google/protobuf</url>
+    <url>http://code.google.com/p/protobuf/source/browse</url>
     <connection>
-      scm:git:https://github.com/google/protobuf.git
+      scm:svn:http://protobuf.googlecode.com/svn/trunk/
     </connection>
   </scm>
   <dependencies>
@@ -102,10 +102,7 @@
                   <arg value="--proto_path=src/test/java" />
                   <arg value="../src/google/protobuf/unittest.proto" />
                   <arg value="../src/google/protobuf/unittest_import.proto" />
-                  <arg value="../src/google/protobuf/unittest_import_public.proto" />
                   <arg value="../src/google/protobuf/unittest_mset.proto" />
-                  <arg value="src/test/java/com/google/protobuf/lazy_fields_lite.proto" />
-                  <arg value="src/test/java/com/google/protobuf/lite_equals_and_hash.proto" />
                   <arg
                     value="src/test/java/com/google/protobuf/multiple_files_test.proto" />
                   <arg value="src/test/java/com/google/protobuf/nested_builders_test.proto" />
@@ -113,27 +110,16 @@
                   <arg value="src/test/java/com/google/protobuf/nested_extension_lite.proto" />
                   <arg value="src/test/java/com/google/protobuf/non_nested_extension.proto" />
                   <arg value="src/test/java/com/google/protobuf/non_nested_extension_lite.proto" />
-                  <arg value="src/test/java/com/google/protobuf/outer_class_name_test.proto" />
-                  <arg value="src/test/java/com/google/protobuf/outer_class_name_test2.proto" />
-                  <arg value="src/test/java/com/google/protobuf/outer_class_name_test3.proto" />
                   <arg value="src/test/java/com/google/protobuf/test_bad_identifiers.proto" />
-                  <arg value="src/test/java/com/google/protobuf/test_check_utf8.proto" />
-                  <arg value="src/test/java/com/google/protobuf/test_check_utf8_size.proto" />
-                  <arg value="src/test/java/com/google/protobuf/test_custom_options.proto" />
                   <arg
                     value="../src/google/protobuf/unittest_optimize_for.proto" />
                   <arg
                     value="../src/google/protobuf/unittest_custom_options.proto" />
                   <arg value="../src/google/protobuf/unittest_lite.proto" />
                   <arg value="../src/google/protobuf/unittest_import_lite.proto" />
-                  <arg value="../src/google/protobuf/unittest_import_public_lite.proto" />
                   <arg value="../src/google/protobuf/unittest_lite_imports_nonlite.proto" />
                   <arg value="../src/google/protobuf/unittest_enormous_descriptor.proto" />
                   <arg value="../src/google/protobuf/unittest_no_generic_services.proto" />
-                  <arg value="src/test/java/com/google/protobuf/field_presence_test.proto" />
-                  <arg value="src/test/java/com/google/protobuf/map_for_proto2_lite_test.proto" />
-                  <arg value="src/test/java/com/google/protobuf/map_for_proto2_test.proto" />
-                  <arg value="src/test/java/com/google/protobuf/map_test.proto" />
                 </exec>
               </tasks>
               <testSourceRoot>target/generated-test-sources</testSourceRoot>
@@ -144,79 +130,9 @@
           </execution>
         </executions>
       </plugin>
-      <plugin>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>maven-bundle-plugin</artifactId>
-        <extensions>true</extensions>
-        <configuration>
-          <instructions>
-            <Bundle-DocURL>https://developers.google.com/protocol-buffers/</Bundle-DocURL>
-            <Bundle-SymbolicName>com.google.protobuf</Bundle-SymbolicName>
-            <Export-Package>com.google.protobuf;version=3.0.0-alpha-3-pre</Export-Package>
-          </instructions>
-        </configuration>
-      </plugin>
     </plugins>
   </build>
   <profiles>
-    <profile>
-      <id>release</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-source-plugin</artifactId>
-            <version>2.2.1</version>
-            <executions>
-              <execution>
-                <id>attach-sources</id>
-                <goals>
-                  <goal>jar-no-fork</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-javadoc-plugin</artifactId>
-            <version>2.9.1</version>
-            <executions>
-              <execution>
-                <id>attach-javadocs</id>
-                <goals>
-                  <goal>jar</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-gpg-plugin</artifactId>
-            <version>1.5</version>
-            <executions>
-              <execution>
-                <id>sign-artifacts</id>
-                <phase>verify</phase>
-                <goals>
-                  <goal>sign</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.sonatype.plugins</groupId>
-            <artifactId>nexus-staging-maven-plugin</artifactId>
-            <version>1.6.3</version>
-            <extensions>true</extensions>
-            <configuration>
-               <serverId>sonatype-nexus-staging</serverId>
-               <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-               <autoReleaseAfterClose>false</autoReleaseAfterClose>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
     <profile>
       <id>lite</id>
       <build>
@@ -226,40 +142,26 @@
             <configuration>
               <includes>
                 <include>**/AbstractMessageLite.java</include>
-                <include>**/AbstractParser.java</include>
-                <include>**/BoundedByteString.java</include>
                 <include>**/ByteString.java</include>
                 <include>**/CodedInputStream.java</include>
                 <include>**/CodedOutputStream.java</include>
-                <include>**/ExtensionLite.java</include>
                 <include>**/ExtensionRegistryLite.java</include>
                 <include>**/FieldSet.java</include>
                 <include>**/GeneratedMessageLite.java</include>
                 <include>**/Internal.java</include>
                 <include>**/InvalidProtocolBufferException.java</include>
-                <include>**/LazyFieldLite.java</include>
                 <include>**/LazyStringArrayList.java</include>
                 <include>**/LazyStringList.java</include>
-                <include>**/LiteralByteString.java</include>
-                <include>**/MapEntryLite.java</include>
-                <include>**/MapFieldLite.java</include>
                 <include>**/MessageLite.java</include>
                 <include>**/MessageLiteOrBuilder.java</include>
-                <include>**/Parser.java</include>
-                <include>**/ProtocolStringList.java</include>
-                <include>**/RopeByteString.java</include>
                 <include>**/SmallSortedMap.java</include>
                 <include>**/UninitializedMessageException.java</include>
-                <include>**/UnknownFieldSetLite.java</include>
                 <include>**/UnmodifiableLazyStringList.java</include>
-                <include>**/Utf8.java</include>
                 <include>**/WireFormat.java</include>
               </includes>
               <testIncludes>
-                <testInclude>**/*Lite.java</testInclude>
-                <testInclude>**/LazyMessageLiteTest.java</testInclude>
                 <testInclude>**/LiteTest.java</testInclude>
-                <testInclude>**/UnknownFieldSetLiteTest.java</testInclude>
+                <testInclude>**/*Lite.java</testInclude>
               </testIncludes>
             </configuration>
           </plugin>
@@ -267,7 +169,7 @@
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
               <includes>
-                <include>**/*Test.java</include>
+                <include>**/LiteTest.java</include>
               </includes>
             </configuration>
           </plugin>
