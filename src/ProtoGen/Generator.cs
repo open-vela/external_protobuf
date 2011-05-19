@@ -63,7 +63,8 @@ namespace Google.ProtocolBuffers.ProtoGen {
       List<FileDescriptorSet> descriptorProtos = new List<FileDescriptorSet>();
       foreach (string inputFile in options.InputFiles) {
         ExtensionRegistry extensionRegistry = ExtensionRegistry.CreateInstance();
-        CSharpOptions.RegisterAllExtensions(extensionRegistry);
+        extensionRegistry.Add(CSharpOptions.CSharpFileOptions);
+        extensionRegistry.Add(CSharpOptions.CSharpFieldOptions);
         using (Stream inputStream = File.OpenRead(inputFile)) {
             descriptorProtos.Add(FileDescriptorSet.ParseFrom(inputStream, extensionRegistry));
         }
