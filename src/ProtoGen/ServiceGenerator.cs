@@ -35,14 +35,14 @@
 using Google.ProtocolBuffers.Descriptors;
 
 namespace Google.ProtocolBuffers.ProtoGen {
-  internal class GenericServiceGenerator : SourceGeneratorBase<ServiceDescriptor>, ISourceGenerator {
+  internal class ServiceGenerator : SourceGeneratorBase<ServiceDescriptor>, ISourceGenerator {
 
     private enum RequestOrResponse {
       Request,
       Response
     }
 
-    internal GenericServiceGenerator(ServiceDescriptor descriptor)
+    internal ServiceGenerator(ServiceDescriptor descriptor)
       : base(descriptor) {
     }
 
