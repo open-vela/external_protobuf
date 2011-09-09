@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using Google.ProtocolBuffers.Descriptors;
@@ -52,19 +52,6 @@ namespace Google.ProtocolBuffers.Serialization
         {
             message.WriteTo(this);
         }
-
-
-        /// <summary>
-        /// No-op
-        /// </summary>
-        public override void WriteMessageStart()
-        { }
-
-        /// <summary>
-        /// No-op
-        /// </summary>
-        public override void WriteMessageEnd()
-        { }
 
         /// <summary>
         /// Writes a Boolean value
