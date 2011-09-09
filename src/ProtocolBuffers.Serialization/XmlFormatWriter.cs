@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.IO;
 using System.Text;
@@ -14,12 +14,10 @@ namespace Google.ProtocolBuffers.Serialization
     /// </summary>
     public class XmlFormatWriter : AbstractTextWriter
     {
-        private static readonly Encoding DefaultEncoding = new UTF8Encoding(false);
         public const string DefaultRootElementName = "root";
         private const int NestedArrayFlag = 0x0001;
         private readonly XmlWriter _output;
         private string _rootElementName;
-        private int _messageOpenCount;
 
         private static XmlWriterSettings DefaultSettings(Encoding encoding)
         {
@@ -45,7 +43,7 @@ namespace Google.ProtocolBuffers.Serialization
         /// </summary>
         public static XmlFormatWriter CreateInstance(Stream output)
         {
-            return new XmlFormatWriter(XmlWriter.Create(output, DefaultSettings(DefaultEncoding)));
+            return new XmlFormatWriter(XmlWriter.Create(output, DefaultSettings(Encoding.UTF8)));
         }
 
         /// <summary>
@@ -67,7 +65,6 @@ namespace Google.ProtocolBuffers.Serialization
         protected XmlFormatWriter(XmlWriter output)
         {
             _output = output;
-            _messageOpenCount = 0;
             _rootElementName = DefaultRootElementName;
         }
 
@@ -78,13 +75,8 @@ namespace Google.ProtocolBuffers.Serialization
         {
             if (disposing)
             {
-                while(_messageOpenCount > 0)
-                    WriteMessageEnd();
-
                 _output.Close();
             }
-
-            base.Dispose(disposing);
         }
 
         /// <summary>
@@ -120,57 +112,6 @@ namespace Google.ProtocolBuffers.Serialization
         }
 
         /// <summary>
-        /// Completes any pending write operations
-        /// </summary>
-        public override void Flush()
-        {
-            _output.Flush();
-            base.Flush();
-        }
-
-        /// <summary>
-        /// Used to write the root-message preamble, in xml this is open element for RootElementName,
-        /// by default "&lt;root&gt;". After this call you can call IMessageLite.MergeTo(...) and 
-        /// complete the message with a call to WriteMessageEnd().
-        /// </summary>
-        public override void WriteMessageStart()
-        {
-            StartMessage(_rootElementName);
-        }
-
-        /// <summary>
-        /// Used to write the root-message preamble, in xml this is open element for elementName. 
-        /// After this call you can call IMessageLite.MergeTo(...) and  complete the message with 
-        /// a call to WriteMessageEnd().
-        /// </summary>
-        public void StartMessage(string elementName)
-        {
-            if (TestOption(XmlWriterOptions.OutputJsonTypes))
-            {
-                _output.WriteStartElement("root"); // json requires this is the root-element
-                _output.WriteAttributeString("type", "object");
-            }
-            else
-            {
-                _output.WriteStartElement(elementName);
-            }
-            _messageOpenCount++;
-        }
-
-        /// <summary>
-        /// Used to complete a root-message previously started with a call to WriteMessageStart()
-        /// </summary>
-        public override void WriteMessageEnd()
-        {
-            if (_messageOpenCount <= 0)
-                throw new InvalidOperationException();
-
-            _output.WriteEndElement();
-            _output.Flush();
-            _messageOpenCount--;
-        }
-
-        /// <summary>
         /// Writes a message as an element using the name defined in <see cref="RootElementName"/>
         /// </summary>
         public override void WriteMessage(IMessageLite message)
@@ -183,9 +124,19 @@ namespace Google.ProtocolBuffers.Serialization
         /// </summary>
         public void WriteMessage(string elementName, IMessageLite message)
         {
-            StartMessage(elementName);
+            if (TestOption(XmlWriterOptions.OutputJsonTypes))
+            {
+                _output.WriteStartElement("root"); // json requires this is the root-element
+                _output.WriteAttributeString("type", "object");
+            }
+            else
+            {
+                _output.WriteStartElement(elementName);
+            }
+
             message.WriteTo(this);
-            WriteMessageEnd();
+            _output.WriteEndElement();
+            _output.Flush();
         }
 
         /// <summary>
