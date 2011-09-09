@@ -144,9 +144,6 @@ namespace Google.ProtocolBuffers
 
         #endregion
 
-        void ICodedInputStream.ReadMessageStart() { }
-        void ICodedInputStream.ReadMessageEnd() { }
-
         #region Validation
 
         /// <summary>

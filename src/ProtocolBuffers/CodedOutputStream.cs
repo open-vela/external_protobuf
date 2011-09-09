@@ -57,7 +57,7 @@ namespace Google.ProtocolBuffers
     /// methods are taken from the protocol buffer type names, not .NET types.
     /// (Hence WriteFloat instead of WriteSingle, and WriteBool instead of WriteBoolean.)
     /// </remarks>
-    public sealed partial class CodedOutputStream : ICodedOutputStream, IDisposable
+    public sealed partial class CodedOutputStream : ICodedOutputStream
     {
         /// <summary>
         /// The buffer size used by CreateInstance(Stream).
@@ -125,19 +125,6 @@ namespace Google.ProtocolBuffers
         }
 
         #endregion
-        
-        public void Dispose()
-        {
-            if (output != null)
-            {
-                if (position > 0)
-                    Flush();
-                output.Dispose();
-            }
-        }
-
-        void ICodedOutputStream.WriteMessageStart() { }
-        void ICodedOutputStream.WriteMessageEnd() { Flush(); }
 
         #region Writing of unknown fields
 
@@ -386,7 +373,7 @@ namespace Google.ProtocolBuffers
         public void WriteEnum(int fieldNumber, string fieldName, int value, object rawValue)
         {
             WriteTag(fieldNumber, WireFormat.WireType.Varint);
-            WriteRawVarint32((uint) value);
+            WriteInt32NoTag(value);
         }
 
         public void WriteSFixed32(int fieldNumber, string fieldName, int value)
@@ -661,7 +648,7 @@ namespace Google.ProtocolBuffers
 
         public void WriteEnumNoTag(int value)
         {
-            WriteRawVarint32((uint) value);
+            WriteInt32NoTag(value);
         }
 
         public void WriteSFixed32NoTag(int value)
