@@ -41,7 +41,7 @@ using Google.ProtocolBuffers.Descriptors;
 
 namespace Google.ProtocolBuffers
 {
-    public abstract partial class ExtendableMessage<TMessage, TBuilder> : GeneratedMessage<TMessage, TBuilder>
+    public abstract class ExtendableMessage<TMessage, TBuilder> : GeneratedMessage<TMessage, TBuilder>
         where TMessage : GeneratedMessage<TMessage, TBuilder>
         where TBuilder : GeneratedBuilder<TMessage, TBuilder>, new()
     {
