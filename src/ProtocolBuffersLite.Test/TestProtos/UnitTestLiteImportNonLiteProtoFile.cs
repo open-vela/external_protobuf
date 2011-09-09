@@ -139,7 +139,7 @@ namespace Google.ProtocolBuffers.TestProtos {
     public override Builder ToBuilder() { return CreateBuilder(this); }
     public override Builder CreateBuilderForType() { return new Builder(); }
     public static Builder CreateBuilder(TestLiteImportsNonlite prototype) {
-      return new Builder(prototype);
+      return (Builder) new Builder().MergeFrom(prototype);
     }
     
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -149,48 +149,21 @@ namespace Google.ProtocolBuffers.TestProtos {
       protected override Builder ThisBuilder {
         get { return this; }
       }
-      public Builder() {
-        result = DefaultInstance ?? new TestLiteImportsNonlite();
-        builderIsReadOnly = result == DefaultInstance;
-      }
-      internal Builder(TestLiteImportsNonlite cloneFrom) {
-        result = cloneFrom;
-        builderIsReadOnly = true;
-      }
+      public Builder() {}
       
-      bool builderIsReadOnly;
-      TestLiteImportsNonlite result;
-      
-      private TestLiteImportsNonlite PrepareBuilder() {
-        if (builderIsReadOnly) {
-          TestLiteImportsNonlite original = result;
-          result = new TestLiteImportsNonlite();
-          builderIsReadOnly = false;
-          MergeFrom(original);
-        }
-        return result;
-      }
-      
-      public override bool IsInitialized {
-        get { return result.IsInitialized; }
-      }
+      TestLiteImportsNonlite result = new TestLiteImportsNonlite();
       
       protected override TestLiteImportsNonlite MessageBeingBuilt {
-        get { return PrepareBuilder(); }
+        get { return result; }
       }
       
       public override Builder Clear() {
-        result = DefaultInstance ?? new TestLiteImportsNonlite();
-        builderIsReadOnly = true;
+        result = new TestLiteImportsNonlite();
         return this;
       }
       
       public override Builder Clone() {
-        if (builderIsReadOnly) {
-          return new Builder(result);
-        } else {
-          return new Builder().MergeFrom(result);
-        }
+        return new Builder().MergeFrom(result);
       }
       
       public override TestLiteImportsNonlite DefaultInstanceForType {
@@ -198,11 +171,12 @@ namespace Google.ProtocolBuffers.TestProtos {
       }
       
       public override TestLiteImportsNonlite BuildPartial() {
-        if (builderIsReadOnly) {
-          return result;
+        if (result == null) {
+          throw new global::System.InvalidOperationException("build() has already been called on this Builder");
         }
-        builderIsReadOnly = true;
-        return result;
+        TestLiteImportsNonlite returnMe = result;
+        result = null;
+        return returnMe;
       }
       
       public override Builder MergeFrom(pb::IMessageLite other) {
@@ -216,7 +190,6 @@ namespace Google.ProtocolBuffers.TestProtos {
       
       public override Builder MergeFrom(TestLiteImportsNonlite other) {
         if (other == global::Google.ProtocolBuffers.TestProtos.TestLiteImportsNonlite.DefaultInstance) return this;
-        PrepareBuilder();
         if (other.HasMessage) {
           MergeMessage(other.Message);
         }
@@ -228,7 +201,6 @@ namespace Google.ProtocolBuffers.TestProtos {
       }
       
       public override Builder MergeFrom(pb::ICodedInputStream input, pb::ExtensionRegistry extensionRegistry) {
-        PrepareBuilder();
         uint tag;
         string field_name;
         while (input.ReadTag(out tag, out field_name)) {
@@ -277,21 +249,18 @@ namespace Google.ProtocolBuffers.TestProtos {
       }
       public Builder SetMessage(global::Google.ProtocolBuffers.TestProtos.TestAllTypes value) {
         pb::ThrowHelper.ThrowIfNull(value, "value");
-        PrepareBuilder();
         result.hasMessage = true;
         result.message_ = value;
         return this;
       }
       public Builder SetMessage(global::Google.ProtocolBuffers.TestProtos.TestAllTypes.Builder builderForValue) {
         pb::ThrowHelper.ThrowIfNull(builderForValue, "builderForValue");
-        PrepareBuilder();
         result.hasMessage = true;
         result.message_ = builderForValue.Build();
         return this;
       }
       public Builder MergeMessage(global::Google.ProtocolBuffers.TestProtos.TestAllTypes value) {
         pb::ThrowHelper.ThrowIfNull(value, "value");
-        PrepareBuilder();
         if (result.hasMessage &&
             result.message_ != global::Google.ProtocolBuffers.TestProtos.TestAllTypes.DefaultInstance) {
             result.message_ = global::Google.ProtocolBuffers.TestProtos.TestAllTypes.CreateBuilder(result.message_).MergeFrom(value).BuildPartial();
@@ -302,7 +271,6 @@ namespace Google.ProtocolBuffers.TestProtos {
         return this;
       }
       public Builder ClearMessage() {
-        PrepareBuilder();
         result.hasMessage = false;
         result.message_ = global::Google.ProtocolBuffers.TestProtos.TestAllTypes.DefaultInstance;
         return this;

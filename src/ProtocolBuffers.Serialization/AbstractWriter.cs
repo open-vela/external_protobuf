@@ -44,6 +44,26 @@ namespace Google.ProtocolBuffers.Serialization
         public abstract void WriteMessage(IMessageLite message);
 
         /// <summary>
+        /// Used to write any nessary root-message preamble. After this call you can call 
+        /// IMessageLite.MergeTo(...) and complete the message with a call to WriteMessageEnd().
+        /// These three calls are identical to just calling WriteMessage(message);
+        /// </summary>
+        /// <example>
+        /// AbstractWriter writer;
+        /// writer.WriteMessageStart();
+        /// message.WriteTo(writer);
+        /// writer.WriteMessageEnd();
+        /// // ... or, but not both ...
+        /// writer.WriteMessage(message);
+        /// </example>
+        public abstract void WriteMessageStart();
+
+        /// <summary>
+        /// Used to complete a root-message previously started with a call to WriteMessageStart()
+        /// </summary>
+        public abstract void WriteMessageEnd();
+
+        /// <summary>
         /// Writes a Boolean value
         /// </summary>
         protected abstract void Write(string field, Boolean value);

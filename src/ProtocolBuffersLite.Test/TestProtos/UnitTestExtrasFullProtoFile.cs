@@ -241,7 +241,7 @@ namespace Google.ProtocolBuffers.TestProtos {
         public override Builder ToBuilder() { return CreateBuilder(this); }
         public override Builder CreateBuilderForType() { return new Builder(); }
         public static Builder CreateBuilder(PhoneNumber prototype) {
-          return new Builder(prototype);
+          return (Builder) new Builder().MergeFrom(prototype);
         }
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -251,48 +251,21 @@ namespace Google.ProtocolBuffers.TestProtos {
           protected override Builder ThisBuilder {
             get { return this; }
           }
-          public Builder() {
-            result = DefaultInstance ?? new PhoneNumber();
-            builderIsReadOnly = result == DefaultInstance;
-          }
-          internal Builder(PhoneNumber cloneFrom) {
-            result = cloneFrom;
-            builderIsReadOnly = true;
-          }
+          public Builder() {}
           
-          bool builderIsReadOnly;
-          PhoneNumber result;
-          
-          private PhoneNumber PrepareBuilder() {
-            if (builderIsReadOnly) {
-              PhoneNumber original = result;
-              result = new PhoneNumber();
-              builderIsReadOnly = false;
-              MergeFrom(original);
-            }
-            return result;
-          }
-          
-          public override bool IsInitialized {
-            get { return result.IsInitialized; }
-          }
+          PhoneNumber result = new PhoneNumber();
           
           protected override PhoneNumber MessageBeingBuilt {
-            get { return PrepareBuilder(); }
+            get { return result; }
           }
           
           public override Builder Clear() {
-            result = DefaultInstance ?? new PhoneNumber();
-            builderIsReadOnly = true;
+            result = new PhoneNumber();
             return this;
           }
           
           public override Builder Clone() {
-            if (builderIsReadOnly) {
-              return new Builder(result);
-            } else {
-              return new Builder().MergeFrom(result);
-            }
+            return new Builder().MergeFrom(result);
           }
           
           public override pbd::MessageDescriptor DescriptorForType {
@@ -304,11 +277,12 @@ namespace Google.ProtocolBuffers.TestProtos {
           }
           
           public override PhoneNumber BuildPartial() {
-            if (builderIsReadOnly) {
-              return result;
+            if (result == null) {
+              throw new global::System.InvalidOperationException("build() has already been called on this Builder");
             }
-            builderIsReadOnly = true;
-            return result;
+            PhoneNumber returnMe = result;
+            result = null;
+            return returnMe;
           }
           
           
@@ -321,13 +295,11 @@ namespace Google.ProtocolBuffers.TestProtos {
           }
           public Builder SetNumber(string value) {
             pb::ThrowHelper.ThrowIfNull(value, "value");
-            PrepareBuilder();
             result.hasNumber = true;
             result.number_ = value;
             return this;
           }
           public Builder ClearNumber() {
-            PrepareBuilder();
             result.hasNumber = false;
             result.number_ = "";
             return this;
@@ -341,13 +313,11 @@ namespace Google.ProtocolBuffers.TestProtos {
             set { SetType(value); }
           }
           public Builder SetType(global::Google.ProtocolBuffers.TestProtos.TestInteropPerson.Types.PhoneType value) {
-            PrepareBuilder();
             result.hasType = true;
             result.type_ = value;
             return this;
           }
           public Builder ClearType() {
-            PrepareBuilder();
             result.hasType = false;
             result.type_ = global::Google.ProtocolBuffers.TestProtos.TestInteropPerson.Types.PhoneType.HOME;
             return this;
@@ -468,7 +438,7 @@ namespace Google.ProtocolBuffers.TestProtos {
         public override Builder ToBuilder() { return CreateBuilder(this); }
         public override Builder CreateBuilderForType() { return new Builder(); }
         public static Builder CreateBuilder(Addresses prototype) {
-          return new Builder(prototype);
+          return (Builder) new Builder().MergeFrom(prototype);
         }
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -478,48 +448,21 @@ namespace Google.ProtocolBuffers.TestProtos {
           protected override Builder ThisBuilder {
             get { return this; }
           }
-          public Builder() {
-            result = DefaultInstance ?? new Addresses();
-            builderIsReadOnly = result == DefaultInstance;
-          }
-          internal Builder(Addresses cloneFrom) {
-            result = cloneFrom;
-            builderIsReadOnly = true;
-          }
+          public Builder() {}
           
-          bool builderIsReadOnly;
-          Addresses result;
-          
-          private Addresses PrepareBuilder() {
-            if (builderIsReadOnly) {
-              Addresses original = result;
-              result = new Addresses();
-              builderIsReadOnly = false;
-              MergeFrom(original);
-            }
-            return result;
-          }
-          
-          public override bool IsInitialized {
-            get { return result.IsInitialized; }
-          }
+          Addresses result = new Addresses();
           
           protected override Addresses MessageBeingBuilt {
-            get { return PrepareBuilder(); }
+            get { return result; }
           }
           
           public override Builder Clear() {
-            result = DefaultInstance ?? new Addresses();
-            builderIsReadOnly = true;
+            result = new Addresses();
             return this;
           }
           
           public override Builder Clone() {
-            if (builderIsReadOnly) {
-              return new Builder(result);
-            } else {
-              return new Builder().MergeFrom(result);
-            }
+            return new Builder().MergeFrom(result);
           }
           
           public override pbd::MessageDescriptor DescriptorForType {
@@ -531,11 +474,12 @@ namespace Google.ProtocolBuffers.TestProtos {
           }
           
           public override Addresses BuildPartial() {
-            if (builderIsReadOnly) {
-              return result;
+            if (result == null) {
+              throw new global::System.InvalidOperationException("build() has already been called on this Builder");
             }
-            builderIsReadOnly = true;
-            return result;
+            Addresses returnMe = result;
+            result = null;
+            return returnMe;
           }
           
           
@@ -548,13 +492,11 @@ namespace Google.ProtocolBuffers.TestProtos {
           }
           public Builder SetAddress(string value) {
             pb::ThrowHelper.ThrowIfNull(value, "value");
-            PrepareBuilder();
             result.hasAddress = true;
             result.address_ = value;
             return this;
           }
           public Builder ClearAddress() {
-            PrepareBuilder();
             result.hasAddress = false;
             result.address_ = "";
             return this;
@@ -569,13 +511,11 @@ namespace Google.ProtocolBuffers.TestProtos {
           }
           public Builder SetAddress2(string value) {
             pb::ThrowHelper.ThrowIfNull(value, "value");
-            PrepareBuilder();
             result.hasAddress2 = true;
             result.address2_ = value;
             return this;
           }
           public Builder ClearAddress2() {
-            PrepareBuilder();
             result.hasAddress2 = false;
             result.address2_ = "";
             return this;
@@ -590,13 +530,11 @@ namespace Google.ProtocolBuffers.TestProtos {
           }
           public Builder SetCity(string value) {
             pb::ThrowHelper.ThrowIfNull(value, "value");
-            PrepareBuilder();
             result.hasCity = true;
             result.city_ = value;
             return this;
           }
           public Builder ClearCity() {
-            PrepareBuilder();
             result.hasCity = false;
             result.city_ = "";
             return this;
@@ -611,13 +549,11 @@ namespace Google.ProtocolBuffers.TestProtos {
           }
           public Builder SetState(string value) {
             pb::ThrowHelper.ThrowIfNull(value, "value");
-            PrepareBuilder();
             result.hasState = true;
             result.state_ = value;
             return this;
           }
           public Builder ClearState() {
-            PrepareBuilder();
             result.hasState = false;
             result.state_ = "";
             return this;
@@ -633,13 +569,11 @@ namespace Google.ProtocolBuffers.TestProtos {
           }
           [global::System.CLSCompliant(false)]
           public Builder SetZip(uint value) {
-            PrepareBuilder();
             result.hasZip = true;
             result.zip_ = value;
             return this;
           }
           public Builder ClearZip() {
-            PrepareBuilder();
             result.hasZip = false;
             result.zip_ = 0;
             return this;
@@ -753,7 +687,7 @@ namespace Google.ProtocolBuffers.TestProtos {
     public override Builder ToBuilder() { return CreateBuilder(this); }
     public override Builder CreateBuilderForType() { return new Builder(); }
     public static Builder CreateBuilder(TestInteropPerson prototype) {
-      return new Builder(prototype);
+      return (Builder) new Builder().MergeFrom(prototype);
     }
     
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -763,48 +697,21 @@ namespace Google.ProtocolBuffers.TestProtos {
       protected override Builder ThisBuilder {
         get { return this; }
       }
-      public Builder() {
-        result = DefaultInstance ?? new TestInteropPerson();
-        builderIsReadOnly = result == DefaultInstance;
-      }
-      internal Builder(TestInteropPerson cloneFrom) {
-        result = cloneFrom;
-        builderIsReadOnly = true;
-      }
+      public Builder() {}
       
-      bool builderIsReadOnly;
-      TestInteropPerson result;
-      
-      private TestInteropPerson PrepareBuilder() {
-        if (builderIsReadOnly) {
-          TestInteropPerson original = result;
-          result = new TestInteropPerson();
-          builderIsReadOnly = false;
-          MergeFrom(original);
-        }
-        return result;
-      }
-      
-      public override bool IsInitialized {
-        get { return result.IsInitialized; }
-      }
+      TestInteropPerson result = new TestInteropPerson();
       
       protected override TestInteropPerson MessageBeingBuilt {
-        get { return PrepareBuilder(); }
+        get { return result; }
       }
       
       public override Builder Clear() {
-        result = DefaultInstance ?? new TestInteropPerson();
-        builderIsReadOnly = true;
+        result = new TestInteropPerson();
         return this;
       }
       
       public override Builder Clone() {
-        if (builderIsReadOnly) {
-          return new Builder(result);
-        } else {
-          return new Builder().MergeFrom(result);
-        }
+        return new Builder().MergeFrom(result);
       }
       
       public override pbd::MessageDescriptor DescriptorForType {
@@ -816,14 +723,15 @@ namespace Google.ProtocolBuffers.TestProtos {
       }
       
       public override TestInteropPerson BuildPartial() {
-        if (builderIsReadOnly) {
-          return result;
+        if (result == null) {
+          throw new global::System.InvalidOperationException("build() has already been called on this Builder");
         }
         result.codes_.MakeReadOnly();
         result.phone_.MakeReadOnly();
         result.addresses_.MakeReadOnly();
-        builderIsReadOnly = true;
-        return result;
+        TestInteropPerson returnMe = result;
+        result = null;
+        return returnMe;
       }
       
       
@@ -836,13 +744,11 @@ namespace Google.ProtocolBuffers.TestProtos {
       }
       public Builder SetName(string value) {
         pb::ThrowHelper.ThrowIfNull(value, "value");
-        PrepareBuilder();
         result.hasName = true;
         result.name_ = value;
         return this;
       }
       public Builder ClearName() {
-        PrepareBuilder();
         result.hasName = false;
         result.name_ = "";
         return this;
@@ -856,13 +762,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetId(value); }
       }
       public Builder SetId(int value) {
-        PrepareBuilder();
         result.hasId = true;
         result.id_ = value;
         return this;
       }
       public Builder ClearId() {
-        PrepareBuilder();
         result.hasId = false;
         result.id_ = 0;
         return this;
@@ -877,20 +781,18 @@ namespace Google.ProtocolBuffers.TestProtos {
       }
       public Builder SetEmail(string value) {
         pb::ThrowHelper.ThrowIfNull(value, "value");
-        PrepareBuilder();
         result.hasEmail = true;
         result.email_ = value;
         return this;
       }
       public Builder ClearEmail() {
-        PrepareBuilder();
         result.hasEmail = false;
         result.email_ = "";
         return this;
       }
       
       public pbc::IPopsicleList<int> CodesList {
-        get { return PrepareBuilder().codes_; }
+        get { return result.codes_; }
       }
       public int CodesCount {
         get { return result.CodesCount; }
@@ -899,28 +801,24 @@ namespace Google.ProtocolBuffers.TestProtos {
         return result.GetCodes(index);
       }
       public Builder SetCodes(int index, int value) {
-        PrepareBuilder();
         result.codes_[index] = value;
         return this;
       }
       public Builder AddCodes(int value) {
-        PrepareBuilder();
         result.codes_.Add(value);
         return this;
       }
       public Builder AddRangeCodes(scg::IEnumerable<int> values) {
-        PrepareBuilder();
         base.AddRange(values, result.codes_);
         return this;
       }
       public Builder ClearCodes() {
-        PrepareBuilder();
         result.codes_.Clear();
         return this;
       }
       
       public pbc::IPopsicleList<global::Google.ProtocolBuffers.TestProtos.TestInteropPerson.Types.PhoneNumber> PhoneList {
-        get { return PrepareBuilder().phone_; }
+        get { return result.phone_; }
       }
       public int PhoneCount {
         get { return result.PhoneCount; }
@@ -930,41 +828,35 @@ namespace Google.ProtocolBuffers.TestProtos {
       }
       public Builder SetPhone(int index, global::Google.ProtocolBuffers.TestProtos.TestInteropPerson.Types.PhoneNumber value) {
         pb::ThrowHelper.ThrowIfNull(value, "value");
-        PrepareBuilder();
         result.phone_[index] = value;
         return this;
       }
       public Builder SetPhone(int index, global::Google.ProtocolBuffers.TestProtos.TestInteropPerson.Types.PhoneNumber.Builder builderForValue) {
         pb::ThrowHelper.ThrowIfNull(builderForValue, "builderForValue");
-        PrepareBuilder();
         result.phone_[index] = builderForValue.Build();
         return this;
       }
       public Builder AddPhone(global::Google.ProtocolBuffers.TestProtos.TestInteropPerson.Types.PhoneNumber value) {
         pb::ThrowHelper.ThrowIfNull(value, "value");
-        PrepareBuilder();
         result.phone_.Add(value);
         return this;
       }
       public Builder AddPhone(global::Google.ProtocolBuffers.TestProtos.TestInteropPerson.Types.PhoneNumber.Builder builderForValue) {
         pb::ThrowHelper.ThrowIfNull(builderForValue, "builderForValue");
-        PrepareBuilder();
         result.phone_.Add(builderForValue.Build());
         return this;
       }
       public Builder AddRangePhone(scg::IEnumerable<global::Google.ProtocolBuffers.TestProtos.TestInteropPerson.Types.PhoneNumber> values) {
-        PrepareBuilder();
         base.AddRange(values, result.phone_);
         return this;
       }
       public Builder ClearPhone() {
-        PrepareBuilder();
         result.phone_.Clear();
         return this;
       }
       
       public pbc::IPopsicleList<global::Google.ProtocolBuffers.TestProtos.TestInteropPerson.Types.Addresses> AddressesList {
-        get { return PrepareBuilder().addresses_; }
+        get { return result.addresses_; }
       }
       public int AddressesCount {
         get { return result.AddressesCount; }
@@ -974,35 +866,29 @@ namespace Google.ProtocolBuffers.TestProtos {
       }
       public Builder SetAddresses(int index, global::Google.ProtocolBuffers.TestProtos.TestInteropPerson.Types.Addresses value) {
         pb::ThrowHelper.ThrowIfNull(value, "value");
-        PrepareBuilder();
         result.addresses_[index] = value;
         return this;
       }
       public Builder SetAddresses(int index, global::Google.ProtocolBuffers.TestProtos.TestInteropPerson.Types.Addresses.Builder builderForValue) {
         pb::ThrowHelper.ThrowIfNull(builderForValue, "builderForValue");
-        PrepareBuilder();
         result.addresses_[index] = builderForValue.Build();
         return this;
       }
       public Builder AddAddresses(global::Google.ProtocolBuffers.TestProtos.TestInteropPerson.Types.Addresses value) {
         pb::ThrowHelper.ThrowIfNull(value, "value");
-        PrepareBuilder();
         result.addresses_.Add(value);
         return this;
       }
       public Builder AddAddresses(global::Google.ProtocolBuffers.TestProtos.TestInteropPerson.Types.Addresses.Builder builderForValue) {
         pb::ThrowHelper.ThrowIfNull(builderForValue, "builderForValue");
-        PrepareBuilder();
         result.addresses_.Add(builderForValue.Build());
         return this;
       }
       public Builder AddRangeAddresses(scg::IEnumerable<global::Google.ProtocolBuffers.TestProtos.TestInteropPerson.Types.Addresses> values) {
-        PrepareBuilder();
         base.AddRange(values, result.addresses_);
         return this;
       }
       public Builder ClearAddresses() {
-        PrepareBuilder();
         result.addresses_.Clear();
         return this;
       }
@@ -1081,7 +967,7 @@ namespace Google.ProtocolBuffers.TestProtos {
     public override Builder ToBuilder() { return CreateBuilder(this); }
     public override Builder CreateBuilderForType() { return new Builder(); }
     public static Builder CreateBuilder(TestInteropEmployeeId prototype) {
-      return new Builder(prototype);
+      return (Builder) new Builder().MergeFrom(prototype);
     }
     
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -1091,48 +977,21 @@ namespace Google.ProtocolBuffers.TestProtos {
       protected override Builder ThisBuilder {
         get { return this; }
       }
-      public Builder() {
-        result = DefaultInstance ?? new TestInteropEmployeeId();
-        builderIsReadOnly = result == DefaultInstance;
-      }
-      internal Builder(TestInteropEmployeeId cloneFrom) {
-        result = cloneFrom;
-        builderIsReadOnly = true;
-      }
+      public Builder() {}
       
-      bool builderIsReadOnly;
-      TestInteropEmployeeId result;
-      
-      private TestInteropEmployeeId PrepareBuilder() {
-        if (builderIsReadOnly) {
-          TestInteropEmployeeId original = result;
-          result = new TestInteropEmployeeId();
-          builderIsReadOnly = false;
-          MergeFrom(original);
-        }
-        return result;
-      }
-      
-      public override bool IsInitialized {
-        get { return result.IsInitialized; }
-      }
+      TestInteropEmployeeId result = new TestInteropEmployeeId();
       
       protected override TestInteropEmployeeId MessageBeingBuilt {
-        get { return PrepareBuilder(); }
+        get { return result; }
       }
       
       public override Builder Clear() {
-        result = DefaultInstance ?? new TestInteropEmployeeId();
-        builderIsReadOnly = true;
+        result = new TestInteropEmployeeId();
         return this;
       }
       
       public override Builder Clone() {
-        if (builderIsReadOnly) {
-          return new Builder(result);
-        } else {
-          return new Builder().MergeFrom(result);
-        }
+        return new Builder().MergeFrom(result);
       }
       
       public override pbd::MessageDescriptor DescriptorForType {
@@ -1144,11 +1003,12 @@ namespace Google.ProtocolBuffers.TestProtos {
       }
       
       public override TestInteropEmployeeId BuildPartial() {
-        if (builderIsReadOnly) {
-          return result;
+        if (result == null) {
+          throw new global::System.InvalidOperationException("build() has already been called on this Builder");
         }
-        builderIsReadOnly = true;
-        return result;
+        TestInteropEmployeeId returnMe = result;
+        result = null;
+        return returnMe;
       }
       
       
@@ -1161,13 +1021,11 @@ namespace Google.ProtocolBuffers.TestProtos {
       }
       public Builder SetNumber(string value) {
         pb::ThrowHelper.ThrowIfNull(value, "value");
-        PrepareBuilder();
         result.hasNumber = true;
         result.number_ = value;
         return this;
       }
       public Builder ClearNumber() {
-        PrepareBuilder();
         result.hasNumber = false;
         result.number_ = "";
         return this;
@@ -1289,7 +1147,7 @@ namespace Google.ProtocolBuffers.TestProtos {
         public override Builder ToBuilder() { return CreateBuilder(this); }
         public override Builder CreateBuilderForType() { return new Builder(); }
         public static Builder CreateBuilder(SubA prototype) {
-          return new Builder(prototype);
+          return (Builder) new Builder().MergeFrom(prototype);
         }
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -1299,48 +1157,21 @@ namespace Google.ProtocolBuffers.TestProtos {
           protected override Builder ThisBuilder {
             get { return this; }
           }
-          public Builder() {
-            result = DefaultInstance ?? new SubA();
-            builderIsReadOnly = result == DefaultInstance;
-          }
-          internal Builder(SubA cloneFrom) {
-            result = cloneFrom;
-            builderIsReadOnly = true;
-          }
+          public Builder() {}
           
-          bool builderIsReadOnly;
-          SubA result;
-          
-          private SubA PrepareBuilder() {
-            if (builderIsReadOnly) {
-              SubA original = result;
-              result = new SubA();
-              builderIsReadOnly = false;
-              MergeFrom(original);
-            }
-            return result;
-          }
-          
-          public override bool IsInitialized {
-            get { return result.IsInitialized; }
-          }
+          SubA result = new SubA();
           
           protected override SubA MessageBeingBuilt {
-            get { return PrepareBuilder(); }
+            get { return result; }
           }
           
           public override Builder Clear() {
-            result = DefaultInstance ?? new SubA();
-            builderIsReadOnly = true;
+            result = new SubA();
             return this;
           }
           
           public override Builder Clone() {
-            if (builderIsReadOnly) {
-              return new Builder(result);
-            } else {
-              return new Builder().MergeFrom(result);
-            }
+            return new Builder().MergeFrom(result);
           }
           
           public override pbd::MessageDescriptor DescriptorForType {
@@ -1352,12 +1183,13 @@ namespace Google.ProtocolBuffers.TestProtos {
           }
           
           public override SubA BuildPartial() {
-            if (builderIsReadOnly) {
-              return result;
+            if (result == null) {
+              throw new global::System.InvalidOperationException("build() has already been called on this Builder");
             }
             result.values_.MakeReadOnly();
-            builderIsReadOnly = true;
-            return result;
+            SubA returnMe = result;
+            result = null;
+            return returnMe;
           }
           
           
@@ -1369,20 +1201,18 @@ namespace Google.ProtocolBuffers.TestProtos {
             set { SetCount(value); }
           }
           public Builder SetCount(int value) {
-            PrepareBuilder();
             result.hasCount = true;
             result.count_ = value;
             return this;
           }
           public Builder ClearCount() {
-            PrepareBuilder();
             result.hasCount = false;
             result.count_ = 0;
             return this;
           }
           
           public pbc::IPopsicleList<string> ValuesList {
-            get { return PrepareBuilder().values_; }
+            get { return result.values_; }
           }
           public int ValuesCount {
             get { return result.ValuesCount; }
@@ -1392,23 +1222,19 @@ namespace Google.ProtocolBuffers.TestProtos {
           }
           public Builder SetValues(int index, string value) {
             pb::ThrowHelper.ThrowIfNull(value, "value");
-            PrepareBuilder();
             result.values_[index] = value;
             return this;
           }
           public Builder AddValues(string value) {
             pb::ThrowHelper.ThrowIfNull(value, "value");
-            PrepareBuilder();
             result.values_.Add(value);
             return this;
           }
           public Builder AddRangeValues(scg::IEnumerable<string> values) {
-            PrepareBuilder();
             base.AddRange(values, result.values_);
             return this;
           }
           public Builder ClearValues() {
-            PrepareBuilder();
             result.values_.Clear();
             return this;
           }
@@ -1495,7 +1321,7 @@ namespace Google.ProtocolBuffers.TestProtos {
     public override Builder ToBuilder() { return CreateBuilder(this); }
     public override Builder CreateBuilderForType() { return new Builder(); }
     public static Builder CreateBuilder(TestMissingFieldsA prototype) {
-      return new Builder(prototype);
+      return (Builder) new Builder().MergeFrom(prototype);
     }
     
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -1505,48 +1331,21 @@ namespace Google.ProtocolBuffers.TestProtos {
       protected override Builder ThisBuilder {
         get { return this; }
       }
-      public Builder() {
-        result = DefaultInstance ?? new TestMissingFieldsA();
-        builderIsReadOnly = result == DefaultInstance;
-      }
-      internal Builder(TestMissingFieldsA cloneFrom) {
-        result = cloneFrom;
-        builderIsReadOnly = true;
-      }
+      public Builder() {}
       
-      bool builderIsReadOnly;
-      TestMissingFieldsA result;
-      
-      private TestMissingFieldsA PrepareBuilder() {
-        if (builderIsReadOnly) {
-          TestMissingFieldsA original = result;
-          result = new TestMissingFieldsA();
-          builderIsReadOnly = false;
-          MergeFrom(original);
-        }
-        return result;
-      }
-      
-      public override bool IsInitialized {
-        get { return result.IsInitialized; }
-      }
+      TestMissingFieldsA result = new TestMissingFieldsA();
       
       protected override TestMissingFieldsA MessageBeingBuilt {
-        get { return PrepareBuilder(); }
+        get { return result; }
       }
       
       public override Builder Clear() {
-        result = DefaultInstance ?? new TestMissingFieldsA();
-        builderIsReadOnly = true;
+        result = new TestMissingFieldsA();
         return this;
       }
       
       public override Builder Clone() {
-        if (builderIsReadOnly) {
-          return new Builder(result);
-        } else {
-          return new Builder().MergeFrom(result);
-        }
+        return new Builder().MergeFrom(result);
       }
       
       public override pbd::MessageDescriptor DescriptorForType {
@@ -1558,11 +1357,12 @@ namespace Google.ProtocolBuffers.TestProtos {
       }
       
       public override TestMissingFieldsA BuildPartial() {
-        if (builderIsReadOnly) {
-          return result;
+        if (result == null) {
+          throw new global::System.InvalidOperationException("build() has already been called on this Builder");
         }
-        builderIsReadOnly = true;
-        return result;
+        TestMissingFieldsA returnMe = result;
+        result = null;
+        return returnMe;
       }
       
       
@@ -1575,13 +1375,11 @@ namespace Google.ProtocolBuffers.TestProtos {
       }
       public Builder SetName(string value) {
         pb::ThrowHelper.ThrowIfNull(value, "value");
-        PrepareBuilder();
         result.hasName = true;
         result.name_ = value;
         return this;
       }
       public Builder ClearName() {
-        PrepareBuilder();
         result.hasName = false;
         result.name_ = "";
         return this;
@@ -1595,13 +1393,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetId(value); }
       }
       public Builder SetId(int value) {
-        PrepareBuilder();
         result.hasId = true;
         result.id_ = value;
         return this;
       }
       public Builder ClearId() {
-        PrepareBuilder();
         result.hasId = false;
         result.id_ = 0;
         return this;
@@ -1616,13 +1412,11 @@ namespace Google.ProtocolBuffers.TestProtos {
       }
       public Builder SetEmail(string value) {
         pb::ThrowHelper.ThrowIfNull(value, "value");
-        PrepareBuilder();
         result.hasEmail = true;
         result.email_ = value;
         return this;
       }
       public Builder ClearEmail() {
-        PrepareBuilder();
         result.hasEmail = false;
         result.email_ = "";
         return this;
@@ -1637,21 +1431,18 @@ namespace Google.ProtocolBuffers.TestProtos {
       }
       public Builder SetTestA(global::Google.ProtocolBuffers.TestProtos.TestMissingFieldsA.Types.SubA value) {
         pb::ThrowHelper.ThrowIfNull(value, "value");
-        PrepareBuilder();
         result.hasTestA = true;
         result.testA_ = value;
         return this;
       }
       public Builder SetTestA(global::Google.ProtocolBuffers.TestProtos.TestMissingFieldsA.Types.SubA.Builder builderForValue) {
         pb::ThrowHelper.ThrowIfNull(builderForValue, "builderForValue");
-        PrepareBuilder();
         result.hasTestA = true;
         result.testA_ = builderForValue.Build();
         return this;
       }
       public Builder MergeTestA(global::Google.ProtocolBuffers.TestProtos.TestMissingFieldsA.Types.SubA value) {
         pb::ThrowHelper.ThrowIfNull(value, "value");
-        PrepareBuilder();
         if (result.hasTestA &&
             result.testA_ != global::Google.ProtocolBuffers.TestProtos.TestMissingFieldsA.Types.SubA.DefaultInstance) {
             result.testA_ = global::Google.ProtocolBuffers.TestProtos.TestMissingFieldsA.Types.SubA.CreateBuilder(result.testA_).MergeFrom(value).BuildPartial();
@@ -1662,7 +1453,6 @@ namespace Google.ProtocolBuffers.TestProtos {
         return this;
       }
       public Builder ClearTestA() {
-        PrepareBuilder();
         result.hasTestA = false;
         result.testA_ = global::Google.ProtocolBuffers.TestProtos.TestMissingFieldsA.Types.SubA.DefaultInstance;
         return this;
@@ -1774,7 +1564,7 @@ namespace Google.ProtocolBuffers.TestProtos {
         public override Builder ToBuilder() { return CreateBuilder(this); }
         public override Builder CreateBuilderForType() { return new Builder(); }
         public static Builder CreateBuilder(SubB prototype) {
-          return new Builder(prototype);
+          return (Builder) new Builder().MergeFrom(prototype);
         }
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -1784,48 +1574,21 @@ namespace Google.ProtocolBuffers.TestProtos {
           protected override Builder ThisBuilder {
             get { return this; }
           }
-          public Builder() {
-            result = DefaultInstance ?? new SubB();
-            builderIsReadOnly = result == DefaultInstance;
-          }
-          internal Builder(SubB cloneFrom) {
-            result = cloneFrom;
-            builderIsReadOnly = true;
-          }
+          public Builder() {}
           
-          bool builderIsReadOnly;
-          SubB result;
-          
-          private SubB PrepareBuilder() {
-            if (builderIsReadOnly) {
-              SubB original = result;
-              result = new SubB();
-              builderIsReadOnly = false;
-              MergeFrom(original);
-            }
-            return result;
-          }
-          
-          public override bool IsInitialized {
-            get { return result.IsInitialized; }
-          }
+          SubB result = new SubB();
           
           protected override SubB MessageBeingBuilt {
-            get { return PrepareBuilder(); }
+            get { return result; }
           }
           
           public override Builder Clear() {
-            result = DefaultInstance ?? new SubB();
-            builderIsReadOnly = true;
+            result = new SubB();
             return this;
           }
           
           public override Builder Clone() {
-            if (builderIsReadOnly) {
-              return new Builder(result);
-            } else {
-              return new Builder().MergeFrom(result);
-            }
+            return new Builder().MergeFrom(result);
           }
           
           public override pbd::MessageDescriptor DescriptorForType {
@@ -1837,17 +1600,18 @@ namespace Google.ProtocolBuffers.TestProtos {
           }
           
           public override SubB BuildPartial() {
-            if (builderIsReadOnly) {
-              return result;
+            if (result == null) {
+              throw new global::System.InvalidOperationException("build() has already been called on this Builder");
             }
             result.values_.MakeReadOnly();
-            builderIsReadOnly = true;
-            return result;
+            SubB returnMe = result;
+            result = null;
+            return returnMe;
           }
           
           
           public pbc::IPopsicleList<string> ValuesList {
-            get { return PrepareBuilder().values_; }
+            get { return result.values_; }
           }
           public int ValuesCount {
             get { return result.ValuesCount; }
@@ -1857,23 +1621,19 @@ namespace Google.ProtocolBuffers.TestProtos {
           }
           public Builder SetValues(int index, string value) {
             pb::ThrowHelper.ThrowIfNull(value, "value");
-            PrepareBuilder();
             result.values_[index] = value;
             return this;
           }
           public Builder AddValues(string value) {
             pb::ThrowHelper.ThrowIfNull(value, "value");
-            PrepareBuilder();
             result.values_.Add(value);
             return this;
           }
           public Builder AddRangeValues(scg::IEnumerable<string> values) {
-            PrepareBuilder();
             base.AddRange(values, result.values_);
             return this;
           }
           public Builder ClearValues() {
-            PrepareBuilder();
             result.values_.Clear();
             return this;
           }
@@ -1960,7 +1720,7 @@ namespace Google.ProtocolBuffers.TestProtos {
     public override Builder ToBuilder() { return CreateBuilder(this); }
     public override Builder CreateBuilderForType() { return new Builder(); }
     public static Builder CreateBuilder(TestMissingFieldsB prototype) {
-      return new Builder(prototype);
+      return (Builder) new Builder().MergeFrom(prototype);
     }
     
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -1970,48 +1730,21 @@ namespace Google.ProtocolBuffers.TestProtos {
       protected override Builder ThisBuilder {
         get { return this; }
       }
-      public Builder() {
-        result = DefaultInstance ?? new TestMissingFieldsB();
-        builderIsReadOnly = result == DefaultInstance;
-      }
-      internal Builder(TestMissingFieldsB cloneFrom) {
-        result = cloneFrom;
-        builderIsReadOnly = true;
-      }
+      public Builder() {}
       
-      bool builderIsReadOnly;
-      TestMissingFieldsB result;
-      
-      private TestMissingFieldsB PrepareBuilder() {
-        if (builderIsReadOnly) {
-          TestMissingFieldsB original = result;
-          result = new TestMissingFieldsB();
-          builderIsReadOnly = false;
-          MergeFrom(original);
-        }
-        return result;
-      }
-      
-      public override bool IsInitialized {
-        get { return result.IsInitialized; }
-      }
+      TestMissingFieldsB result = new TestMissingFieldsB();
       
       protected override TestMissingFieldsB MessageBeingBuilt {
-        get { return PrepareBuilder(); }
+        get { return result; }
       }
       
       public override Builder Clear() {
-        result = DefaultInstance ?? new TestMissingFieldsB();
-        builderIsReadOnly = true;
+        result = new TestMissingFieldsB();
         return this;
       }
       
       public override Builder Clone() {
-        if (builderIsReadOnly) {
-          return new Builder(result);
-        } else {
-          return new Builder().MergeFrom(result);
-        }
+        return new Builder().MergeFrom(result);
       }
       
       public override pbd::MessageDescriptor DescriptorForType {
@@ -2023,11 +1756,12 @@ namespace Google.ProtocolBuffers.TestProtos {
       }
       
       public override TestMissingFieldsB BuildPartial() {
-        if (builderIsReadOnly) {
-          return result;
+        if (result == null) {
+          throw new global::System.InvalidOperationException("build() has already been called on this Builder");
         }
-        builderIsReadOnly = true;
-        return result;
+        TestMissingFieldsB returnMe = result;
+        result = null;
+        return returnMe;
       }
       
       
@@ -2040,13 +1774,11 @@ namespace Google.ProtocolBuffers.TestProtos {
       }
       public Builder SetName(string value) {
         pb::ThrowHelper.ThrowIfNull(value, "value");
-        PrepareBuilder();
         result.hasName = true;
         result.name_ = value;
         return this;
       }
       public Builder ClearName() {
-        PrepareBuilder();
         result.hasName = false;
         result.name_ = "";
         return this;
@@ -2060,13 +1792,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetId(value); }
       }
       public Builder SetId(int value) {
-        PrepareBuilder();
         result.hasId = true;
         result.id_ = value;
         return this;
       }
       public Builder ClearId() {
-        PrepareBuilder();
         result.hasId = false;
         result.id_ = 0;
         return this;
@@ -2081,13 +1811,11 @@ namespace Google.ProtocolBuffers.TestProtos {
       }
       public Builder SetWebsite(string value) {
         pb::ThrowHelper.ThrowIfNull(value, "value");
-        PrepareBuilder();
         result.hasWebsite = true;
         result.website_ = value;
         return this;
       }
       public Builder ClearWebsite() {
-        PrepareBuilder();
         result.hasWebsite = false;
         result.website_ = "";
         return this;
@@ -2102,21 +1830,18 @@ namespace Google.ProtocolBuffers.TestProtos {
       }
       public Builder SetTestB(global::Google.ProtocolBuffers.TestProtos.TestMissingFieldsB.Types.SubB value) {
         pb::ThrowHelper.ThrowIfNull(value, "value");
-        PrepareBuilder();
         result.hasTestB = true;
         result.testB_ = value;
         return this;
       }
       public Builder SetTestB(global::Google.ProtocolBuffers.TestProtos.TestMissingFieldsB.Types.SubB.Builder builderForValue) {
         pb::ThrowHelper.ThrowIfNull(builderForValue, "builderForValue");
-        PrepareBuilder();
         result.hasTestB = true;
         result.testB_ = builderForValue.Build();
         return this;
       }
       public Builder MergeTestB(global::Google.ProtocolBuffers.TestProtos.TestMissingFieldsB.Types.SubB value) {
         pb::ThrowHelper.ThrowIfNull(value, "value");
-        PrepareBuilder();
         if (result.hasTestB &&
             result.testB_ != global::Google.ProtocolBuffers.TestProtos.TestMissingFieldsB.Types.SubB.DefaultInstance) {
             result.testB_ = global::Google.ProtocolBuffers.TestProtos.TestMissingFieldsB.Types.SubB.CreateBuilder(result.testB_).MergeFrom(value).BuildPartial();
@@ -2127,7 +1852,6 @@ namespace Google.ProtocolBuffers.TestProtos {
         return this;
       }
       public Builder ClearTestB() {
-        PrepareBuilder();
         result.hasTestB = false;
         result.testB_ = global::Google.ProtocolBuffers.TestProtos.TestMissingFieldsB.Types.SubB.DefaultInstance;
         return this;
