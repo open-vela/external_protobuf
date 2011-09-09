@@ -165,13 +165,9 @@ namespace Google.ProtocolBuffers.ProtoGen
         {
             return SourceGenerators.CreateFieldGenerator(fieldDescriptor, FieldOrdinal(fieldDescriptor));
         }
-        
+
         public void Generate(TextGenerator writer)
         {
-            if (Descriptor.File.CSharpOptions.AddSerializable)
-            {
-                writer.WriteLine("[global::System.SerializableAttribute()]");
-            }
             writer.WriteLine("[global::System.Diagnostics.DebuggerNonUserCodeAttribute()]");
             writer.WriteLine("[global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]");
             writer.WriteLine("[global::System.CodeDom.Compiler.GeneratedCodeAttribute(\"{0}\", \"{1}\")]",
@@ -558,10 +554,6 @@ namespace Google.ProtocolBuffers.ProtoGen
             writer.WriteLine("  return (Builder) new Builder().MergeFrom(prototype);");
             writer.WriteLine("}");
             writer.WriteLine();
-            if (Descriptor.File.CSharpOptions.AddSerializable)
-            {
-                writer.WriteLine("[global::System.SerializableAttribute()]");
-            }
             writer.WriteLine("[global::System.Diagnostics.DebuggerNonUserCodeAttribute()]");
             writer.WriteLine("[global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]");
             writer.WriteLine("[global::System.CodeDom.Compiler.GeneratedCodeAttribute(\"{0}\", \"{1}\")]",

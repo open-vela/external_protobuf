@@ -76,9 +76,9 @@ namespace Google.ProtocolBuffers.TestProtos {
           "dGVuc2lvbl9udW1iZXISJy5wcm90b2J1Zl91bml0dGVzdF9leHRyYS5UZXN0" + 
           "WG1sTWVzc2FnZRhnIAMoBUICEAE6bgoRZXh0ZW5zaW9uX21lc3NhZ2USJy5w" + 
           "cm90b2J1Zl91bml0dGVzdF9leHRyYS5UZXN0WG1sTWVzc2FnZRjHASABKAsy" + 
-          "KS5wcm90b2J1Zl91bml0dGVzdF9leHRyYS5UZXN0WG1sRXh0ZW5zaW9uQk5I" + 
-          "AcI+SQohR29vZ2xlLlByb3RvY29sQnVmZmVycy5UZXN0UHJvdG9zEiJVbml0" + 
-          "VGVzdFhtbFNlcmlhbGl6ZXJUZXN0UHJvdG9GaWxlSAE=");
+          "KS5wcm90b2J1Zl91bml0dGVzdF9leHRyYS5UZXN0WG1sRXh0ZW5zaW9uQkxI" + 
+          "AcI+RwohR29vZ2xlLlByb3RvY29sQnVmZmVycy5UZXN0UHJvdG9zEiJVbml0" + 
+          "VGVzdFhtbFNlcmlhbGl6ZXJUZXN0UHJvdG9GaWxl");
       pbd::FileDescriptor.InternalDescriptorAssigner assigner = delegate(pbd::FileDescriptor root) {
         descriptor = root;
         internal__static_protobuf_unittest_extra_TestXmlChild__Descriptor = Descriptor.MessageTypes[0];
@@ -134,7 +134,6 @@ namespace Google.ProtocolBuffers.TestProtos {
   #endregion
   
   #region Messages
-  [global::System.SerializableAttribute()]
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
   [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
   [global::System.CodeDom.Compiler.GeneratedCodeAttribute("ProtoGen", "2.3.0.277")]
@@ -265,7 +264,6 @@ namespace Google.ProtocolBuffers.TestProtos {
       return (Builder) new Builder().MergeFrom(prototype);
     }
     
-    [global::System.SerializableAttribute()]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("ProtoGen", "2.3.0.277")]
@@ -445,7 +443,6 @@ namespace Google.ProtocolBuffers.TestProtos {
     }
   }
   
-  [global::System.SerializableAttribute()]
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
   [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
   [global::System.CodeDom.Compiler.GeneratedCodeAttribute("ProtoGen", "2.3.0.277")]
@@ -535,7 +532,6 @@ namespace Google.ProtocolBuffers.TestProtos {
       return (Builder) new Builder().MergeFrom(prototype);
     }
     
-    [global::System.SerializableAttribute()]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("ProtoGen", "2.3.0.277")]
@@ -645,7 +641,6 @@ namespace Google.ProtocolBuffers.TestProtos {
     }
   }
   
-  [global::System.SerializableAttribute()]
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
   [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
   [global::System.CodeDom.Compiler.GeneratedCodeAttribute("ProtoGen", "2.3.0.277")]
@@ -751,7 +746,6 @@ namespace Google.ProtocolBuffers.TestProtos {
       return (Builder) new Builder().MergeFrom(prototype);
     }
     
-    [global::System.SerializableAttribute()]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("ProtoGen", "2.3.0.277")]
@@ -909,7 +903,6 @@ namespace Google.ProtocolBuffers.TestProtos {
     }
   }
   
-  [global::System.SerializableAttribute()]
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
   [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
   [global::System.CodeDom.Compiler.GeneratedCodeAttribute("ProtoGen", "2.3.0.277")]
@@ -942,7 +935,6 @@ namespace Google.ProtocolBuffers.TestProtos {
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("ProtoGen", "2.3.0.277")]
     public static class Types {
-      [global::System.SerializableAttribute()]
       [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
       [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
       [global::System.CodeDom.Compiler.GeneratedCodeAttribute("ProtoGen", "2.3.0.277")]
@@ -1073,7 +1065,6 @@ namespace Google.ProtocolBuffers.TestProtos {
           return (Builder) new Builder().MergeFrom(prototype);
         }
         
-        [global::System.SerializableAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("ProtoGen", "2.3.0.277")]
@@ -1450,7 +1441,6 @@ namespace Google.ProtocolBuffers.TestProtos {
       return (Builder) new Builder().MergeFrom(prototype);
     }
     
-    [global::System.SerializableAttribute()]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("ProtoGen", "2.3.0.277")]
@@ -1802,7 +1792,6 @@ namespace Google.ProtocolBuffers.TestProtos {
     }
   }
   
-  [global::System.SerializableAttribute()]
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
   [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
   [global::System.CodeDom.Compiler.GeneratedCodeAttribute("ProtoGen", "2.3.0.277")]
@@ -1909,7 +1898,6 @@ namespace Google.ProtocolBuffers.TestProtos {
       return (Builder) new Builder().MergeFrom(prototype);
     }
     
-    [global::System.SerializableAttribute()]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("ProtoGen", "2.3.0.277")]
