@@ -318,7 +318,7 @@ namespace Google.ProtocolBuffers.TestProtos {
       public override Builder MergeFrom(TestXmlChild other) {
         if (other == global::Google.ProtocolBuffers.TestProtos.TestXmlChild.DefaultInstance) return this;
         if (other.options_.Count != 0) {
-          result.options_.Add(other.options_);
+          base.AddRange(other.options_, result.options_);
         }
         if (other.HasBinary) {
           Binary = other.Binary;
@@ -411,7 +411,7 @@ namespace Google.ProtocolBuffers.TestProtos {
         return this;
       }
       public Builder AddRangeOptions(scg::IEnumerable<global::Google.ProtocolBuffers.TestProtos.EnumOptions> values) {
-        result.options_.Add(values);
+        base.AddRange(values, result.options_);
         return this;
       }
       public Builder ClearOptions() {
@@ -1119,7 +1119,7 @@ namespace Google.ProtocolBuffers.TestProtos {
           public override Builder MergeFrom(Children other) {
             if (other == global::Google.ProtocolBuffers.TestProtos.TestXmlMessage.Types.Children.DefaultInstance) return this;
             if (other.options_.Count != 0) {
-              result.options_.Add(other.options_);
+              base.AddRange(other.options_, result.options_);
             }
             if (other.HasBinary) {
               Binary = other.Binary;
@@ -1212,7 +1212,7 @@ namespace Google.ProtocolBuffers.TestProtos {
             return this;
           }
           public Builder AddRangeOptions(scg::IEnumerable<global::Google.ProtocolBuffers.TestProtos.EnumOptions> values) {
-            result.options_.Add(values);
+            base.AddRange(values, result.options_);
             return this;
           }
           public Builder ClearOptions() {
@@ -1500,13 +1500,13 @@ namespace Google.ProtocolBuffers.TestProtos {
           Number = other.Number;
         }
         if (other.numbers_.Count != 0) {
-          result.numbers_.Add(other.numbers_);
+          base.AddRange(other.numbers_, result.numbers_);
         }
         if (other.HasText) {
           Text = other.Text;
         }
         if (other.textlines_.Count != 0) {
-          result.textlines_.Add(other.textlines_);
+          base.AddRange(other.textlines_, result.textlines_);
         }
         if (other.HasValid) {
           Valid = other.Valid;
@@ -1515,7 +1515,7 @@ namespace Google.ProtocolBuffers.TestProtos {
           MergeChild(other.Child);
         }
         if (other.children_.Count != 0) {
-          result.children_.Add(other.children_);
+          base.AddRange(other.children_, result.children_);
         }
           this.MergeExtensionFields(other);
         this.MergeUnknownFields(other.UnknownFields);
@@ -1640,7 +1640,7 @@ namespace Google.ProtocolBuffers.TestProtos {
         return this;
       }
       public Builder AddRangeNumbers(scg::IEnumerable<int> values) {
-        result.numbers_.Add(values);
+        base.AddRange(values, result.numbers_);
         return this;
       }
       public Builder ClearNumbers() {
@@ -1687,7 +1687,7 @@ namespace Google.ProtocolBuffers.TestProtos {
         return this;
       }
       public Builder AddRangeTextlines(scg::IEnumerable<string> values) {
-        result.textlines_.Add(values);
+        base.AddRange(values, result.textlines_);
         return this;
       }
       public Builder ClearTextlines() {
@@ -1779,7 +1779,7 @@ namespace Google.ProtocolBuffers.TestProtos {
         return this;
       }
       public Builder AddRangeChildren(scg::IEnumerable<global::Google.ProtocolBuffers.TestProtos.TestXmlMessage.Types.Children> values) {
-        result.children_.Add(values);
+        base.AddRange(values, result.children_);
         return this;
       }
       public Builder ClearChildren() {

@@ -1499,7 +1499,7 @@ namespace Google.ProtocolBuffers.TestProtos {
       public override Builder MergeFrom(RawMessageSet other) {
         if (other == global::Google.ProtocolBuffers.TestProtos.RawMessageSet.DefaultInstance) return this;
         if (other.item_.Count != 0) {
-          result.item_.Add(other.item_);
+          base.AddRange(other.item_, result.item_);
         }
         this.MergeUnknownFields(other.UnknownFields);
         return this;
@@ -1587,7 +1587,7 @@ namespace Google.ProtocolBuffers.TestProtos {
         return this;
       }
       public Builder AddRangeItem(scg::IEnumerable<global::Google.ProtocolBuffers.TestProtos.RawMessageSet.Types.Item> values) {
-        result.item_.Add(values);
+        base.AddRange(values, result.item_);
         return this;
       }
       public Builder ClearItem() {

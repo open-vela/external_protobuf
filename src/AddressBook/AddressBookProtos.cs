@@ -593,7 +593,7 @@ namespace Google.ProtocolBuffers.Examples.AddressBook {
           Email = other.Email;
         }
         if (other.phone_.Count != 0) {
-          result.phone_.Add(other.phone_);
+          base.AddRange(other.phone_, result.phone_);
         }
         this.MergeUnknownFields(other.UnknownFields);
         return this;
@@ -749,7 +749,7 @@ namespace Google.ProtocolBuffers.Examples.AddressBook {
         return this;
       }
       public Builder AddRangePhone(scg::IEnumerable<global::Google.ProtocolBuffers.Examples.AddressBook.Person.Types.PhoneNumber> values) {
-        result.phone_.Add(values);
+        base.AddRange(values, result.phone_);
         return this;
       }
       public Builder ClearPhone() {
@@ -926,7 +926,7 @@ namespace Google.ProtocolBuffers.Examples.AddressBook {
       public override Builder MergeFrom(AddressBook other) {
         if (other == global::Google.ProtocolBuffers.Examples.AddressBook.AddressBook.DefaultInstance) return this;
         if (other.person_.Count != 0) {
-          result.person_.Add(other.person_);
+          base.AddRange(other.person_, result.person_);
         }
         this.MergeUnknownFields(other.UnknownFields);
         return this;
@@ -1014,7 +1014,7 @@ namespace Google.ProtocolBuffers.Examples.AddressBook {
         return this;
       }
       public Builder AddRangePerson(scg::IEnumerable<global::Google.ProtocolBuffers.Examples.AddressBook.Person> values) {
-        result.person_.Add(values);
+        base.AddRange(values, result.person_);
         return this;
       }
       public Builder ClearPerson() {

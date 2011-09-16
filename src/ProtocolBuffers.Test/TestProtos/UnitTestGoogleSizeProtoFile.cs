@@ -877,7 +877,7 @@ namespace Google.ProtocolBuffers.TestProtos {
       }
       [global::System.CLSCompliant(false)]
       public Builder AddRangeField5(scg::IEnumerable<ulong> values) {
-        result.field5_.Add(values);
+        base.AddRange(values, result.field5_);
         return this;
       }
       public Builder ClearField5() {
@@ -2515,7 +2515,7 @@ namespace Google.ProtocolBuffers.TestProtos {
             return this;
           }
           public Builder AddRangeField14(scg::IEnumerable<string> values) {
-            result.field14_.Add(values);
+            base.AddRange(values, result.field14_);
             return this;
           }
           public Builder ClearField14() {
@@ -2656,7 +2656,7 @@ namespace Google.ProtocolBuffers.TestProtos {
             return this;
           }
           public Builder AddRangeField22(scg::IEnumerable<string> values) {
-            result.field22_.Add(values);
+            base.AddRange(values, result.field22_);
             return this;
           }
           public Builder ClearField22() {
@@ -2682,7 +2682,7 @@ namespace Google.ProtocolBuffers.TestProtos {
             return this;
           }
           public Builder AddRangeField73(scg::IEnumerable<int> values) {
-            result.field73_.Add(values);
+            base.AddRange(values, result.field73_);
             return this;
           }
           public Builder ClearField73() {
@@ -3591,7 +3591,7 @@ namespace Google.ProtocolBuffers.TestProtos {
         return this;
       }
       public Builder AddRangeGroup1(scg::IEnumerable<global::Google.ProtocolBuffers.TestProtos.SizeMessage2.Types.Group1> values) {
-        result.group1_.Add(values);
+        base.AddRange(values, result.group1_);
         return this;
       }
       public Builder ClearGroup1() {
@@ -3619,7 +3619,7 @@ namespace Google.ProtocolBuffers.TestProtos {
         return this;
       }
       public Builder AddRangeField128(scg::IEnumerable<string> values) {
-        result.field128_.Add(values);
+        base.AddRange(values, result.field128_);
         return this;
       }
       public Builder ClearField128() {
@@ -3665,7 +3665,7 @@ namespace Google.ProtocolBuffers.TestProtos {
         return this;
       }
       public Builder AddRangeField127(scg::IEnumerable<string> values) {
-        result.field127_.Add(values);
+        base.AddRange(values, result.field127_);
         return this;
       }
       public Builder ClearField127() {
@@ -3709,7 +3709,7 @@ namespace Google.ProtocolBuffers.TestProtos {
         return this;
       }
       public Builder AddRangeField130(scg::IEnumerable<long> values) {
-        result.field130_.Add(values);
+        base.AddRange(values, result.field130_);
         return this;
       }
       public Builder ClearField130() {
