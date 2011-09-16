@@ -415,7 +415,7 @@ namespace Google.ProtocolBuffers.DescriptorProtos {
     public override Builder ToBuilder() { return CreateBuilder(this); }
     public override Builder CreateBuilderForType() { return new Builder(); }
     public static Builder CreateBuilder(CSharpFileOptions prototype) {
-      return new Builder(prototype);
+      return (Builder) new Builder().MergeFrom(prototype);
     }
     
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -425,48 +425,21 @@ namespace Google.ProtocolBuffers.DescriptorProtos {
       protected override Builder ThisBuilder {
         get { return this; }
       }
-      public Builder() {
-        result = DefaultInstance ?? new CSharpFileOptions();
-        builderIsReadOnly = result == DefaultInstance;
-      }
-      internal Builder(CSharpFileOptions cloneFrom) {
-        result = cloneFrom;
-        builderIsReadOnly = true;
-      }
+      public Builder() {}
       
-      bool builderIsReadOnly;
-      CSharpFileOptions result;
-      
-      private CSharpFileOptions PrepareBuilder() {
-        if (builderIsReadOnly) {
-          CSharpFileOptions original = result;
-          result = new CSharpFileOptions();
-          builderIsReadOnly = false;
-          MergeFrom(original);
-        }
-        return result;
-      }
-      
-      public override bool IsInitialized {
-        get { return result.IsInitialized; }
-      }
+      CSharpFileOptions result = new CSharpFileOptions();
       
       protected override CSharpFileOptions MessageBeingBuilt {
-        get { return PrepareBuilder(); }
+        get { return result; }
       }
       
       public override Builder Clear() {
-        result = DefaultInstance ?? new CSharpFileOptions();
-        builderIsReadOnly = true;
+        result = new CSharpFileOptions();
         return this;
       }
       
       public override Builder Clone() {
-        if (builderIsReadOnly) {
-          return new Builder(result);
-        } else {
-          return new Builder().MergeFrom(result);
-        }
+        return new Builder().MergeFrom(result);
       }
       
       public override pbd::MessageDescriptor DescriptorForType {
@@ -478,11 +451,12 @@ namespace Google.ProtocolBuffers.DescriptorProtos {
       }
       
       public override CSharpFileOptions BuildPartial() {
-        if (builderIsReadOnly) {
-          return result;
+        if (result == null) {
+          throw new global::System.InvalidOperationException("build() has already been called on this Builder");
         }
-        builderIsReadOnly = true;
-        return result;
+        CSharpFileOptions returnMe = result;
+        result = null;
+        return returnMe;
       }
       
       public override Builder MergeFrom(pb::IMessage other) {
@@ -496,7 +470,6 @@ namespace Google.ProtocolBuffers.DescriptorProtos {
       
       public override Builder MergeFrom(CSharpFileOptions other) {
         if (other == global::Google.ProtocolBuffers.DescriptorProtos.CSharpFileOptions.DefaultInstance) return this;
-        PrepareBuilder();
         if (other.HasNamespace) {
           Namespace = other.Namespace;
         }
@@ -545,7 +518,6 @@ namespace Google.ProtocolBuffers.DescriptorProtos {
       }
       
       public override Builder MergeFrom(pb::ICodedInputStream input, pb::ExtensionRegistry extensionRegistry) {
-        PrepareBuilder();
         pb::UnknownFieldSet.Builder unknownFields = null;
         uint tag;
         string field_name;
@@ -658,13 +630,11 @@ namespace Google.ProtocolBuffers.DescriptorProtos {
       }
       public Builder SetNamespace(string value) {
         pb::ThrowHelper.ThrowIfNull(value, "value");
-        PrepareBuilder();
         result.hasNamespace = true;
         result.namespace_ = value;
         return this;
       }
       public Builder ClearNamespace() {
-        PrepareBuilder();
         result.hasNamespace = false;
         result.namespace_ = "";
         return this;
@@ -679,13 +649,11 @@ namespace Google.ProtocolBuffers.DescriptorProtos {
       }
       public Builder SetUmbrellaClassname(string value) {
         pb::ThrowHelper.ThrowIfNull(value, "value");
-        PrepareBuilder();
         result.hasUmbrellaClassname = true;
         result.umbrellaClassname_ = value;
         return this;
       }
       public Builder ClearUmbrellaClassname() {
-        PrepareBuilder();
         result.hasUmbrellaClassname = false;
         result.umbrellaClassname_ = "";
         return this;
@@ -699,13 +667,11 @@ namespace Google.ProtocolBuffers.DescriptorProtos {
         set { SetPublicClasses(value); }
       }
       public Builder SetPublicClasses(bool value) {
-        PrepareBuilder();
         result.hasPublicClasses = true;
         result.publicClasses_ = value;
         return this;
       }
       public Builder ClearPublicClasses() {
-        PrepareBuilder();
         result.hasPublicClasses = false;
         result.publicClasses_ = true;
         return this;
@@ -719,13 +685,11 @@ namespace Google.ProtocolBuffers.DescriptorProtos {
         set { SetMultipleFiles(value); }
       }
       public Builder SetMultipleFiles(bool value) {
-        PrepareBuilder();
         result.hasMultipleFiles = true;
         result.multipleFiles_ = value;
         return this;
       }
       public Builder ClearMultipleFiles() {
-        PrepareBuilder();
         result.hasMultipleFiles = false;
         result.multipleFiles_ = false;
         return this;
@@ -739,13 +703,11 @@ namespace Google.ProtocolBuffers.DescriptorProtos {
         set { SetNestClasses(value); }
       }
       public Builder SetNestClasses(bool value) {
-        PrepareBuilder();
         result.hasNestClasses = true;
         result.nestClasses_ = value;
         return this;
       }
       public Builder ClearNestClasses() {
-        PrepareBuilder();
         result.hasNestClasses = false;
         result.nestClasses_ = false;
         return this;
@@ -759,13 +721,11 @@ namespace Google.ProtocolBuffers.DescriptorProtos {
         set { SetCodeContracts(value); }
       }
       public Builder SetCodeContracts(bool value) {
-        PrepareBuilder();
         result.hasCodeContracts = true;
         result.codeContracts_ = value;
         return this;
       }
       public Builder ClearCodeContracts() {
-        PrepareBuilder();
         result.hasCodeContracts = false;
         result.codeContracts_ = false;
         return this;
@@ -779,13 +739,11 @@ namespace Google.ProtocolBuffers.DescriptorProtos {
         set { SetExpandNamespaceDirectories(value); }
       }
       public Builder SetExpandNamespaceDirectories(bool value) {
-        PrepareBuilder();
         result.hasExpandNamespaceDirectories = true;
         result.expandNamespaceDirectories_ = value;
         return this;
       }
       public Builder ClearExpandNamespaceDirectories() {
-        PrepareBuilder();
         result.hasExpandNamespaceDirectories = false;
         result.expandNamespaceDirectories_ = false;
         return this;
@@ -799,13 +757,11 @@ namespace Google.ProtocolBuffers.DescriptorProtos {
         set { SetClsCompliance(value); }
       }
       public Builder SetClsCompliance(bool value) {
-        PrepareBuilder();
         result.hasClsCompliance = true;
         result.clsCompliance_ = value;
         return this;
       }
       public Builder ClearClsCompliance() {
-        PrepareBuilder();
         result.hasClsCompliance = false;
         result.clsCompliance_ = true;
         return this;
@@ -820,13 +776,11 @@ namespace Google.ProtocolBuffers.DescriptorProtos {
       }
       public Builder SetFileExtension(string value) {
         pb::ThrowHelper.ThrowIfNull(value, "value");
-        PrepareBuilder();
         result.hasFileExtension = true;
         result.fileExtension_ = value;
         return this;
       }
       public Builder ClearFileExtension() {
-        PrepareBuilder();
         result.hasFileExtension = false;
         result.fileExtension_ = ".cs";
         return this;
@@ -841,13 +795,11 @@ namespace Google.ProtocolBuffers.DescriptorProtos {
       }
       public Builder SetUmbrellaNamespace(string value) {
         pb::ThrowHelper.ThrowIfNull(value, "value");
-        PrepareBuilder();
         result.hasUmbrellaNamespace = true;
         result.umbrellaNamespace_ = value;
         return this;
       }
       public Builder ClearUmbrellaNamespace() {
-        PrepareBuilder();
         result.hasUmbrellaNamespace = false;
         result.umbrellaNamespace_ = "";
         return this;
@@ -862,13 +814,11 @@ namespace Google.ProtocolBuffers.DescriptorProtos {
       }
       public Builder SetOutputDirectory(string value) {
         pb::ThrowHelper.ThrowIfNull(value, "value");
-        PrepareBuilder();
         result.hasOutputDirectory = true;
         result.outputDirectory_ = value;
         return this;
       }
       public Builder ClearOutputDirectory() {
-        PrepareBuilder();
         result.hasOutputDirectory = false;
         result.outputDirectory_ = ".";
         return this;
@@ -882,13 +832,11 @@ namespace Google.ProtocolBuffers.DescriptorProtos {
         set { SetIgnoreGoogleProtobuf(value); }
       }
       public Builder SetIgnoreGoogleProtobuf(bool value) {
-        PrepareBuilder();
         result.hasIgnoreGoogleProtobuf = true;
         result.ignoreGoogleProtobuf_ = value;
         return this;
       }
       public Builder ClearIgnoreGoogleProtobuf() {
-        PrepareBuilder();
         result.hasIgnoreGoogleProtobuf = false;
         result.ignoreGoogleProtobuf_ = false;
         return this;
@@ -902,13 +850,11 @@ namespace Google.ProtocolBuffers.DescriptorProtos {
         set { SetServiceGeneratorType(value); }
       }
       public Builder SetServiceGeneratorType(global::Google.ProtocolBuffers.DescriptorProtos.CSharpServiceType value) {
-        PrepareBuilder();
         result.hasServiceGeneratorType = true;
         result.serviceGeneratorType_ = value;
         return this;
       }
       public Builder ClearServiceGeneratorType() {
-        PrepareBuilder();
         result.hasServiceGeneratorType = false;
         result.serviceGeneratorType_ = global::Google.ProtocolBuffers.DescriptorProtos.CSharpServiceType.NONE;
         return this;
@@ -1021,7 +967,7 @@ namespace Google.ProtocolBuffers.DescriptorProtos {
     public override Builder ToBuilder() { return CreateBuilder(this); }
     public override Builder CreateBuilderForType() { return new Builder(); }
     public static Builder CreateBuilder(CSharpFieldOptions prototype) {
-      return new Builder(prototype);
+      return (Builder) new Builder().MergeFrom(prototype);
     }
     
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -1031,48 +977,21 @@ namespace Google.ProtocolBuffers.DescriptorProtos {
       protected override Builder ThisBuilder {
         get { return this; }
       }
-      public Builder() {
-        result = DefaultInstance ?? new CSharpFieldOptions();
-        builderIsReadOnly = result == DefaultInstance;
-      }
-      internal Builder(CSharpFieldOptions cloneFrom) {
-        result = cloneFrom;
-        builderIsReadOnly = true;
-      }
+      public Builder() {}
       
-      bool builderIsReadOnly;
-      CSharpFieldOptions result;
-      
-      private CSharpFieldOptions PrepareBuilder() {
-        if (builderIsReadOnly) {
-          CSharpFieldOptions original = result;
-          result = new CSharpFieldOptions();
-          builderIsReadOnly = false;
-          MergeFrom(original);
-        }
-        return result;
-      }
-      
-      public override bool IsInitialized {
-        get { return result.IsInitialized; }
-      }
+      CSharpFieldOptions result = new CSharpFieldOptions();
       
       protected override CSharpFieldOptions MessageBeingBuilt {
-        get { return PrepareBuilder(); }
+        get { return result; }
       }
       
       public override Builder Clear() {
-        result = DefaultInstance ?? new CSharpFieldOptions();
-        builderIsReadOnly = true;
+        result = new CSharpFieldOptions();
         return this;
       }
       
       public override Builder Clone() {
-        if (builderIsReadOnly) {
-          return new Builder(result);
-        } else {
-          return new Builder().MergeFrom(result);
-        }
+        return new Builder().MergeFrom(result);
       }
       
       public override pbd::MessageDescriptor DescriptorForType {
@@ -1084,11 +1003,12 @@ namespace Google.ProtocolBuffers.DescriptorProtos {
       }
       
       public override CSharpFieldOptions BuildPartial() {
-        if (builderIsReadOnly) {
-          return result;
+        if (result == null) {
+          throw new global::System.InvalidOperationException("build() has already been called on this Builder");
         }
-        builderIsReadOnly = true;
-        return result;
+        CSharpFieldOptions returnMe = result;
+        result = null;
+        return returnMe;
       }
       
       public override Builder MergeFrom(pb::IMessage other) {
@@ -1102,7 +1022,6 @@ namespace Google.ProtocolBuffers.DescriptorProtos {
       
       public override Builder MergeFrom(CSharpFieldOptions other) {
         if (other == global::Google.ProtocolBuffers.DescriptorProtos.CSharpFieldOptions.DefaultInstance) return this;
-        PrepareBuilder();
         if (other.HasPropertyName) {
           PropertyName = other.PropertyName;
         }
@@ -1115,7 +1034,6 @@ namespace Google.ProtocolBuffers.DescriptorProtos {
       }
       
       public override Builder MergeFrom(pb::ICodedInputStream input, pb::ExtensionRegistry extensionRegistry) {
-        PrepareBuilder();
         pb::UnknownFieldSet.Builder unknownFields = null;
         uint tag;
         string field_name;
@@ -1172,13 +1090,11 @@ namespace Google.ProtocolBuffers.DescriptorProtos {
       }
       public Builder SetPropertyName(string value) {
         pb::ThrowHelper.ThrowIfNull(value, "value");
-        PrepareBuilder();
         result.hasPropertyName = true;
         result.propertyName_ = value;
         return this;
       }
       public Builder ClearPropertyName() {
-        PrepareBuilder();
         result.hasPropertyName = false;
         result.propertyName_ = "";
         return this;
@@ -1291,7 +1207,7 @@ namespace Google.ProtocolBuffers.DescriptorProtos {
     public override Builder ToBuilder() { return CreateBuilder(this); }
     public override Builder CreateBuilderForType() { return new Builder(); }
     public static Builder CreateBuilder(CSharpServiceOptions prototype) {
-      return new Builder(prototype);
+      return (Builder) new Builder().MergeFrom(prototype);
     }
     
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -1301,48 +1217,21 @@ namespace Google.ProtocolBuffers.DescriptorProtos {
       protected override Builder ThisBuilder {
         get { return this; }
       }
-      public Builder() {
-        result = DefaultInstance ?? new CSharpServiceOptions();
-        builderIsReadOnly = result == DefaultInstance;
-      }
-      internal Builder(CSharpServiceOptions cloneFrom) {
-        result = cloneFrom;
-        builderIsReadOnly = true;
-      }
+      public Builder() {}
       
-      bool builderIsReadOnly;
-      CSharpServiceOptions result;
-      
-      private CSharpServiceOptions PrepareBuilder() {
-        if (builderIsReadOnly) {
-          CSharpServiceOptions original = result;
-          result = new CSharpServiceOptions();
-          builderIsReadOnly = false;
-          MergeFrom(original);
-        }
-        return result;
-      }
-      
-      public override bool IsInitialized {
-        get { return result.IsInitialized; }
-      }
+      CSharpServiceOptions result = new CSharpServiceOptions();
       
       protected override CSharpServiceOptions MessageBeingBuilt {
-        get { return PrepareBuilder(); }
+        get { return result; }
       }
       
       public override Builder Clear() {
-        result = DefaultInstance ?? new CSharpServiceOptions();
-        builderIsReadOnly = true;
+        result = new CSharpServiceOptions();
         return this;
       }
       
       public override Builder Clone() {
-        if (builderIsReadOnly) {
-          return new Builder(result);
-        } else {
-          return new Builder().MergeFrom(result);
-        }
+        return new Builder().MergeFrom(result);
       }
       
       public override pbd::MessageDescriptor DescriptorForType {
@@ -1354,11 +1243,12 @@ namespace Google.ProtocolBuffers.DescriptorProtos {
       }
       
       public override CSharpServiceOptions BuildPartial() {
-        if (builderIsReadOnly) {
-          return result;
+        if (result == null) {
+          throw new global::System.InvalidOperationException("build() has already been called on this Builder");
         }
-        builderIsReadOnly = true;
-        return result;
+        CSharpServiceOptions returnMe = result;
+        result = null;
+        return returnMe;
       }
       
       public override Builder MergeFrom(pb::IMessage other) {
@@ -1372,7 +1262,6 @@ namespace Google.ProtocolBuffers.DescriptorProtos {
       
       public override Builder MergeFrom(CSharpServiceOptions other) {
         if (other == global::Google.ProtocolBuffers.DescriptorProtos.CSharpServiceOptions.DefaultInstance) return this;
-        PrepareBuilder();
         if (other.HasInterfaceId) {
           InterfaceId = other.InterfaceId;
         }
@@ -1385,7 +1274,6 @@ namespace Google.ProtocolBuffers.DescriptorProtos {
       }
       
       public override Builder MergeFrom(pb::ICodedInputStream input, pb::ExtensionRegistry extensionRegistry) {
-        PrepareBuilder();
         pb::UnknownFieldSet.Builder unknownFields = null;
         uint tag;
         string field_name;
@@ -1442,13 +1330,11 @@ namespace Google.ProtocolBuffers.DescriptorProtos {
       }
       public Builder SetInterfaceId(string value) {
         pb::ThrowHelper.ThrowIfNull(value, "value");
-        PrepareBuilder();
         result.hasInterfaceId = true;
         result.interfaceId_ = value;
         return this;
       }
       public Builder ClearInterfaceId() {
-        PrepareBuilder();
         result.hasInterfaceId = false;
         result.interfaceId_ = "";
         return this;
@@ -1561,7 +1447,7 @@ namespace Google.ProtocolBuffers.DescriptorProtos {
     public override Builder ToBuilder() { return CreateBuilder(this); }
     public override Builder CreateBuilderForType() { return new Builder(); }
     public static Builder CreateBuilder(CSharpMethodOptions prototype) {
-      return new Builder(prototype);
+      return (Builder) new Builder().MergeFrom(prototype);
     }
     
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -1571,48 +1457,21 @@ namespace Google.ProtocolBuffers.DescriptorProtos {
       protected override Builder ThisBuilder {
         get { return this; }
       }
-      public Builder() {
-        result = DefaultInstance ?? new CSharpMethodOptions();
-        builderIsReadOnly = result == DefaultInstance;
-      }
-      internal Builder(CSharpMethodOptions cloneFrom) {
-        result = cloneFrom;
-        builderIsReadOnly = true;
-      }
+      public Builder() {}
       
-      bool builderIsReadOnly;
-      CSharpMethodOptions result;
-      
-      private CSharpMethodOptions PrepareBuilder() {
-        if (builderIsReadOnly) {
-          CSharpMethodOptions original = result;
-          result = new CSharpMethodOptions();
-          builderIsReadOnly = false;
-          MergeFrom(original);
-        }
-        return result;
-      }
-      
-      public override bool IsInitialized {
-        get { return result.IsInitialized; }
-      }
+      CSharpMethodOptions result = new CSharpMethodOptions();
       
       protected override CSharpMethodOptions MessageBeingBuilt {
-        get { return PrepareBuilder(); }
+        get { return result; }
       }
       
       public override Builder Clear() {
-        result = DefaultInstance ?? new CSharpMethodOptions();
-        builderIsReadOnly = true;
+        result = new CSharpMethodOptions();
         return this;
       }
       
       public override Builder Clone() {
-        if (builderIsReadOnly) {
-          return new Builder(result);
-        } else {
-          return new Builder().MergeFrom(result);
-        }
+        return new Builder().MergeFrom(result);
       }
       
       public override pbd::MessageDescriptor DescriptorForType {
@@ -1624,11 +1483,12 @@ namespace Google.ProtocolBuffers.DescriptorProtos {
       }
       
       public override CSharpMethodOptions BuildPartial() {
-        if (builderIsReadOnly) {
-          return result;
+        if (result == null) {
+          throw new global::System.InvalidOperationException("build() has already been called on this Builder");
         }
-        builderIsReadOnly = true;
-        return result;
+        CSharpMethodOptions returnMe = result;
+        result = null;
+        return returnMe;
       }
       
       public override Builder MergeFrom(pb::IMessage other) {
@@ -1642,7 +1502,6 @@ namespace Google.ProtocolBuffers.DescriptorProtos {
       
       public override Builder MergeFrom(CSharpMethodOptions other) {
         if (other == global::Google.ProtocolBuffers.DescriptorProtos.CSharpMethodOptions.DefaultInstance) return this;
-        PrepareBuilder();
         if (other.HasDispatchId) {
           DispatchId = other.DispatchId;
         }
@@ -1655,7 +1514,6 @@ namespace Google.ProtocolBuffers.DescriptorProtos {
       }
       
       public override Builder MergeFrom(pb::ICodedInputStream input, pb::ExtensionRegistry extensionRegistry) {
-        PrepareBuilder();
         pb::UnknownFieldSet.Builder unknownFields = null;
         uint tag;
         string field_name;
@@ -1711,13 +1569,11 @@ namespace Google.ProtocolBuffers.DescriptorProtos {
         set { SetDispatchId(value); }
       }
       public Builder SetDispatchId(int value) {
-        PrepareBuilder();
         result.hasDispatchId = true;
         result.dispatchId_ = value;
         return this;
       }
       public Builder ClearDispatchId() {
-        PrepareBuilder();
         result.hasDispatchId = false;
         result.dispatchId_ = 0;
         return this;
