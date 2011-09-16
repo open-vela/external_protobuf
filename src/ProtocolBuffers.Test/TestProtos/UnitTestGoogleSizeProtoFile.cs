@@ -606,7 +606,7 @@ namespace Google.ProtocolBuffers.TestProtos {
     public override Builder ToBuilder() { return CreateBuilder(this); }
     public override Builder CreateBuilderForType() { return new Builder(); }
     public static Builder CreateBuilder(SizeMessage1 prototype) {
-      return new Builder(prototype);
+      return (Builder) new Builder().MergeFrom(prototype);
     }
     
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -616,48 +616,21 @@ namespace Google.ProtocolBuffers.TestProtos {
       protected override Builder ThisBuilder {
         get { return this; }
       }
-      public Builder() {
-        result = DefaultInstance ?? new SizeMessage1();
-        builderIsReadOnly = result == DefaultInstance;
-      }
-      internal Builder(SizeMessage1 cloneFrom) {
-        result = cloneFrom;
-        builderIsReadOnly = true;
-      }
+      public Builder() {}
       
-      bool builderIsReadOnly;
-      SizeMessage1 result;
-      
-      private SizeMessage1 PrepareBuilder() {
-        if (builderIsReadOnly) {
-          SizeMessage1 original = result;
-          result = new SizeMessage1();
-          builderIsReadOnly = false;
-          MergeFrom(original);
-        }
-        return result;
-      }
-      
-      public override bool IsInitialized {
-        get { return result.IsInitialized; }
-      }
+      SizeMessage1 result = new SizeMessage1();
       
       protected override SizeMessage1 MessageBeingBuilt {
-        get { return PrepareBuilder(); }
+        get { return result; }
       }
       
       public override Builder Clear() {
-        result = DefaultInstance ?? new SizeMessage1();
-        builderIsReadOnly = true;
+        result = new SizeMessage1();
         return this;
       }
       
       public override Builder Clone() {
-        if (builderIsReadOnly) {
-          return new Builder(result);
-        } else {
-          return new Builder().MergeFrom(result);
-        }
+        return new Builder().MergeFrom(result);
       }
       
       public override pbd::MessageDescriptor DescriptorForType {
@@ -669,12 +642,13 @@ namespace Google.ProtocolBuffers.TestProtos {
       }
       
       public override SizeMessage1 BuildPartial() {
-        if (builderIsReadOnly) {
-          return result;
+        if (result == null) {
+          throw new global::System.InvalidOperationException("build() has already been called on this Builder");
         }
         result.field5_.MakeReadOnly();
-        builderIsReadOnly = true;
-        return result;
+        SizeMessage1 returnMe = result;
+        result = null;
+        return returnMe;
       }
       
       
@@ -687,13 +661,11 @@ namespace Google.ProtocolBuffers.TestProtos {
       }
       public Builder SetField1(string value) {
         pb::ThrowHelper.ThrowIfNull(value, "value");
-        PrepareBuilder();
         result.hasField1 = true;
         result.field1_ = value;
         return this;
       }
       public Builder ClearField1() {
-        PrepareBuilder();
         result.hasField1 = false;
         result.field1_ = "";
         return this;
@@ -708,13 +680,11 @@ namespace Google.ProtocolBuffers.TestProtos {
       }
       public Builder SetField9(string value) {
         pb::ThrowHelper.ThrowIfNull(value, "value");
-        PrepareBuilder();
         result.hasField9 = true;
         result.field9_ = value;
         return this;
       }
       public Builder ClearField9() {
-        PrepareBuilder();
         result.hasField9 = false;
         result.field9_ = "";
         return this;
@@ -729,13 +699,11 @@ namespace Google.ProtocolBuffers.TestProtos {
       }
       public Builder SetField18(string value) {
         pb::ThrowHelper.ThrowIfNull(value, "value");
-        PrepareBuilder();
         result.hasField18 = true;
         result.field18_ = value;
         return this;
       }
       public Builder ClearField18() {
-        PrepareBuilder();
         result.hasField18 = false;
         result.field18_ = "";
         return this;
@@ -749,13 +717,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField80(value); }
       }
       public Builder SetField80(bool value) {
-        PrepareBuilder();
         result.hasField80 = true;
         result.field80_ = value;
         return this;
       }
       public Builder ClearField80() {
-        PrepareBuilder();
         result.hasField80 = false;
         result.field80_ = false;
         return this;
@@ -769,13 +735,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField81(value); }
       }
       public Builder SetField81(bool value) {
-        PrepareBuilder();
         result.hasField81 = true;
         result.field81_ = value;
         return this;
       }
       public Builder ClearField81() {
-        PrepareBuilder();
         result.hasField81 = false;
         result.field81_ = true;
         return this;
@@ -789,13 +753,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField2(value); }
       }
       public Builder SetField2(int value) {
-        PrepareBuilder();
         result.hasField2 = true;
         result.field2_ = value;
         return this;
       }
       public Builder ClearField2() {
-        PrepareBuilder();
         result.hasField2 = false;
         result.field2_ = 0;
         return this;
@@ -809,13 +771,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField3(value); }
       }
       public Builder SetField3(int value) {
-        PrepareBuilder();
         result.hasField3 = true;
         result.field3_ = value;
         return this;
       }
       public Builder ClearField3() {
-        PrepareBuilder();
         result.hasField3 = false;
         result.field3_ = 0;
         return this;
@@ -829,13 +789,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField280(value); }
       }
       public Builder SetField280(int value) {
-        PrepareBuilder();
         result.hasField280 = true;
         result.field280_ = value;
         return this;
       }
       public Builder ClearField280() {
-        PrepareBuilder();
         result.hasField280 = false;
         result.field280_ = 0;
         return this;
@@ -849,13 +807,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField6(value); }
       }
       public Builder SetField6(int value) {
-        PrepareBuilder();
         result.hasField6 = true;
         result.field6_ = value;
         return this;
       }
       public Builder ClearField6() {
-        PrepareBuilder();
         result.hasField6 = false;
         result.field6_ = 0;
         return this;
@@ -869,13 +825,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField22(value); }
       }
       public Builder SetField22(long value) {
-        PrepareBuilder();
         result.hasField22 = true;
         result.field22_ = value;
         return this;
       }
       public Builder ClearField22() {
-        PrepareBuilder();
         result.hasField22 = false;
         result.field22_ = 0L;
         return this;
@@ -890,13 +844,11 @@ namespace Google.ProtocolBuffers.TestProtos {
       }
       public Builder SetField4(string value) {
         pb::ThrowHelper.ThrowIfNull(value, "value");
-        PrepareBuilder();
         result.hasField4 = true;
         result.field4_ = value;
         return this;
       }
       public Builder ClearField4() {
-        PrepareBuilder();
         result.hasField4 = false;
         result.field4_ = "";
         return this;
@@ -904,7 +856,7 @@ namespace Google.ProtocolBuffers.TestProtos {
       
       [global::System.CLSCompliant(false)]
       public pbc::IPopsicleList<ulong> Field5List {
-        get { return PrepareBuilder().field5_; }
+        get { return result.field5_; }
       }
       public int Field5Count {
         get { return result.Field5Count; }
@@ -915,24 +867,20 @@ namespace Google.ProtocolBuffers.TestProtos {
       }
       [global::System.CLSCompliant(false)]
       public Builder SetField5(int index, ulong value) {
-        PrepareBuilder();
         result.field5_[index] = value;
         return this;
       }
       [global::System.CLSCompliant(false)]
       public Builder AddField5(ulong value) {
-        PrepareBuilder();
         result.field5_.Add(value);
         return this;
       }
       [global::System.CLSCompliant(false)]
       public Builder AddRangeField5(scg::IEnumerable<ulong> values) {
-        PrepareBuilder();
         base.AddRange(values, result.field5_);
         return this;
       }
       public Builder ClearField5() {
-        PrepareBuilder();
         result.field5_.Clear();
         return this;
       }
@@ -945,13 +893,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField59(value); }
       }
       public Builder SetField59(bool value) {
-        PrepareBuilder();
         result.hasField59 = true;
         result.field59_ = value;
         return this;
       }
       public Builder ClearField59() {
-        PrepareBuilder();
         result.hasField59 = false;
         result.field59_ = false;
         return this;
@@ -966,13 +912,11 @@ namespace Google.ProtocolBuffers.TestProtos {
       }
       public Builder SetField7(string value) {
         pb::ThrowHelper.ThrowIfNull(value, "value");
-        PrepareBuilder();
         result.hasField7 = true;
         result.field7_ = value;
         return this;
       }
       public Builder ClearField7() {
-        PrepareBuilder();
         result.hasField7 = false;
         result.field7_ = "";
         return this;
@@ -986,13 +930,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField16(value); }
       }
       public Builder SetField16(int value) {
-        PrepareBuilder();
         result.hasField16 = true;
         result.field16_ = value;
         return this;
       }
       public Builder ClearField16() {
-        PrepareBuilder();
         result.hasField16 = false;
         result.field16_ = 0;
         return this;
@@ -1006,13 +948,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField130(value); }
       }
       public Builder SetField130(int value) {
-        PrepareBuilder();
         result.hasField130 = true;
         result.field130_ = value;
         return this;
       }
       public Builder ClearField130() {
-        PrepareBuilder();
         result.hasField130 = false;
         result.field130_ = 0;
         return this;
@@ -1026,13 +966,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField12(value); }
       }
       public Builder SetField12(bool value) {
-        PrepareBuilder();
         result.hasField12 = true;
         result.field12_ = value;
         return this;
       }
       public Builder ClearField12() {
-        PrepareBuilder();
         result.hasField12 = false;
         result.field12_ = true;
         return this;
@@ -1046,13 +984,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField17(value); }
       }
       public Builder SetField17(bool value) {
-        PrepareBuilder();
         result.hasField17 = true;
         result.field17_ = value;
         return this;
       }
       public Builder ClearField17() {
-        PrepareBuilder();
         result.hasField17 = false;
         result.field17_ = true;
         return this;
@@ -1066,13 +1002,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField13(value); }
       }
       public Builder SetField13(bool value) {
-        PrepareBuilder();
         result.hasField13 = true;
         result.field13_ = value;
         return this;
       }
       public Builder ClearField13() {
-        PrepareBuilder();
         result.hasField13 = false;
         result.field13_ = true;
         return this;
@@ -1086,13 +1020,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField14(value); }
       }
       public Builder SetField14(bool value) {
-        PrepareBuilder();
         result.hasField14 = true;
         result.field14_ = value;
         return this;
       }
       public Builder ClearField14() {
-        PrepareBuilder();
         result.hasField14 = false;
         result.field14_ = true;
         return this;
@@ -1106,13 +1038,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField104(value); }
       }
       public Builder SetField104(int value) {
-        PrepareBuilder();
         result.hasField104 = true;
         result.field104_ = value;
         return this;
       }
       public Builder ClearField104() {
-        PrepareBuilder();
         result.hasField104 = false;
         result.field104_ = 0;
         return this;
@@ -1126,13 +1056,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField100(value); }
       }
       public Builder SetField100(int value) {
-        PrepareBuilder();
         result.hasField100 = true;
         result.field100_ = value;
         return this;
       }
       public Builder ClearField100() {
-        PrepareBuilder();
         result.hasField100 = false;
         result.field100_ = 0;
         return this;
@@ -1146,13 +1074,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField101(value); }
       }
       public Builder SetField101(int value) {
-        PrepareBuilder();
         result.hasField101 = true;
         result.field101_ = value;
         return this;
       }
       public Builder ClearField101() {
-        PrepareBuilder();
         result.hasField101 = false;
         result.field101_ = 0;
         return this;
@@ -1167,13 +1093,11 @@ namespace Google.ProtocolBuffers.TestProtos {
       }
       public Builder SetField102(string value) {
         pb::ThrowHelper.ThrowIfNull(value, "value");
-        PrepareBuilder();
         result.hasField102 = true;
         result.field102_ = value;
         return this;
       }
       public Builder ClearField102() {
-        PrepareBuilder();
         result.hasField102 = false;
         result.field102_ = "";
         return this;
@@ -1188,13 +1112,11 @@ namespace Google.ProtocolBuffers.TestProtos {
       }
       public Builder SetField103(string value) {
         pb::ThrowHelper.ThrowIfNull(value, "value");
-        PrepareBuilder();
         result.hasField103 = true;
         result.field103_ = value;
         return this;
       }
       public Builder ClearField103() {
-        PrepareBuilder();
         result.hasField103 = false;
         result.field103_ = "";
         return this;
@@ -1208,13 +1130,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField29(value); }
       }
       public Builder SetField29(int value) {
-        PrepareBuilder();
         result.hasField29 = true;
         result.field29_ = value;
         return this;
       }
       public Builder ClearField29() {
-        PrepareBuilder();
         result.hasField29 = false;
         result.field29_ = 0;
         return this;
@@ -1228,13 +1148,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField30(value); }
       }
       public Builder SetField30(bool value) {
-        PrepareBuilder();
         result.hasField30 = true;
         result.field30_ = value;
         return this;
       }
       public Builder ClearField30() {
-        PrepareBuilder();
         result.hasField30 = false;
         result.field30_ = false;
         return this;
@@ -1248,13 +1166,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField60(value); }
       }
       public Builder SetField60(int value) {
-        PrepareBuilder();
         result.hasField60 = true;
         result.field60_ = value;
         return this;
       }
       public Builder ClearField60() {
-        PrepareBuilder();
         result.hasField60 = false;
         result.field60_ = -1;
         return this;
@@ -1268,13 +1184,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField271(value); }
       }
       public Builder SetField271(int value) {
-        PrepareBuilder();
         result.hasField271 = true;
         result.field271_ = value;
         return this;
       }
       public Builder ClearField271() {
-        PrepareBuilder();
         result.hasField271 = false;
         result.field271_ = -1;
         return this;
@@ -1288,13 +1202,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField272(value); }
       }
       public Builder SetField272(int value) {
-        PrepareBuilder();
         result.hasField272 = true;
         result.field272_ = value;
         return this;
       }
       public Builder ClearField272() {
-        PrepareBuilder();
         result.hasField272 = false;
         result.field272_ = -1;
         return this;
@@ -1308,13 +1220,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField150(value); }
       }
       public Builder SetField150(int value) {
-        PrepareBuilder();
         result.hasField150 = true;
         result.field150_ = value;
         return this;
       }
       public Builder ClearField150() {
-        PrepareBuilder();
         result.hasField150 = false;
         result.field150_ = 0;
         return this;
@@ -1328,13 +1238,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField23(value); }
       }
       public Builder SetField23(int value) {
-        PrepareBuilder();
         result.hasField23 = true;
         result.field23_ = value;
         return this;
       }
       public Builder ClearField23() {
-        PrepareBuilder();
         result.hasField23 = false;
         result.field23_ = 0;
         return this;
@@ -1348,13 +1256,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField24(value); }
       }
       public Builder SetField24(bool value) {
-        PrepareBuilder();
         result.hasField24 = true;
         result.field24_ = value;
         return this;
       }
       public Builder ClearField24() {
-        PrepareBuilder();
         result.hasField24 = false;
         result.field24_ = false;
         return this;
@@ -1368,13 +1274,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField25(value); }
       }
       public Builder SetField25(int value) {
-        PrepareBuilder();
         result.hasField25 = true;
         result.field25_ = value;
         return this;
       }
       public Builder ClearField25() {
-        PrepareBuilder();
         result.hasField25 = false;
         result.field25_ = 0;
         return this;
@@ -1389,21 +1293,18 @@ namespace Google.ProtocolBuffers.TestProtos {
       }
       public Builder SetField15(global::Google.ProtocolBuffers.TestProtos.SizeMessage1SubMessage value) {
         pb::ThrowHelper.ThrowIfNull(value, "value");
-        PrepareBuilder();
         result.hasField15 = true;
         result.field15_ = value;
         return this;
       }
       public Builder SetField15(global::Google.ProtocolBuffers.TestProtos.SizeMessage1SubMessage.Builder builderForValue) {
         pb::ThrowHelper.ThrowIfNull(builderForValue, "builderForValue");
-        PrepareBuilder();
         result.hasField15 = true;
         result.field15_ = builderForValue.Build();
         return this;
       }
       public Builder MergeField15(global::Google.ProtocolBuffers.TestProtos.SizeMessage1SubMessage value) {
         pb::ThrowHelper.ThrowIfNull(value, "value");
-        PrepareBuilder();
         if (result.hasField15 &&
             result.field15_ != global::Google.ProtocolBuffers.TestProtos.SizeMessage1SubMessage.DefaultInstance) {
             result.field15_ = global::Google.ProtocolBuffers.TestProtos.SizeMessage1SubMessage.CreateBuilder(result.field15_).MergeFrom(value).BuildPartial();
@@ -1414,7 +1315,6 @@ namespace Google.ProtocolBuffers.TestProtos {
         return this;
       }
       public Builder ClearField15() {
-        PrepareBuilder();
         result.hasField15 = false;
         result.field15_ = global::Google.ProtocolBuffers.TestProtos.SizeMessage1SubMessage.DefaultInstance;
         return this;
@@ -1428,13 +1328,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField78(value); }
       }
       public Builder SetField78(bool value) {
-        PrepareBuilder();
         result.hasField78 = true;
         result.field78_ = value;
         return this;
       }
       public Builder ClearField78() {
-        PrepareBuilder();
         result.hasField78 = false;
         result.field78_ = false;
         return this;
@@ -1448,13 +1346,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField67(value); }
       }
       public Builder SetField67(int value) {
-        PrepareBuilder();
         result.hasField67 = true;
         result.field67_ = value;
         return this;
       }
       public Builder ClearField67() {
-        PrepareBuilder();
         result.hasField67 = false;
         result.field67_ = 0;
         return this;
@@ -1468,13 +1364,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField68(value); }
       }
       public Builder SetField68(int value) {
-        PrepareBuilder();
         result.hasField68 = true;
         result.field68_ = value;
         return this;
       }
       public Builder ClearField68() {
-        PrepareBuilder();
         result.hasField68 = false;
         result.field68_ = 0;
         return this;
@@ -1488,13 +1382,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField128(value); }
       }
       public Builder SetField128(int value) {
-        PrepareBuilder();
         result.hasField128 = true;
         result.field128_ = value;
         return this;
       }
       public Builder ClearField128() {
-        PrepareBuilder();
         result.hasField128 = false;
         result.field128_ = 0;
         return this;
@@ -1509,13 +1401,11 @@ namespace Google.ProtocolBuffers.TestProtos {
       }
       public Builder SetField129(string value) {
         pb::ThrowHelper.ThrowIfNull(value, "value");
-        PrepareBuilder();
         result.hasField129 = true;
         result.field129_ = value;
         return this;
       }
       public Builder ClearField129() {
-        PrepareBuilder();
         result.hasField129 = false;
         result.field129_ = "xxxxxxxxxxxxxxxxxxxxx";
         return this;
@@ -1529,13 +1419,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField131(value); }
       }
       public Builder SetField131(int value) {
-        PrepareBuilder();
         result.hasField131 = true;
         result.field131_ = value;
         return this;
       }
       public Builder ClearField131() {
-        PrepareBuilder();
         result.hasField131 = false;
         result.field131_ = 0;
         return this;
@@ -1809,7 +1697,7 @@ namespace Google.ProtocolBuffers.TestProtos {
     public override Builder ToBuilder() { return CreateBuilder(this); }
     public override Builder CreateBuilderForType() { return new Builder(); }
     public static Builder CreateBuilder(SizeMessage1SubMessage prototype) {
-      return new Builder(prototype);
+      return (Builder) new Builder().MergeFrom(prototype);
     }
     
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -1819,48 +1707,21 @@ namespace Google.ProtocolBuffers.TestProtos {
       protected override Builder ThisBuilder {
         get { return this; }
       }
-      public Builder() {
-        result = DefaultInstance ?? new SizeMessage1SubMessage();
-        builderIsReadOnly = result == DefaultInstance;
-      }
-      internal Builder(SizeMessage1SubMessage cloneFrom) {
-        result = cloneFrom;
-        builderIsReadOnly = true;
-      }
+      public Builder() {}
       
-      bool builderIsReadOnly;
-      SizeMessage1SubMessage result;
-      
-      private SizeMessage1SubMessage PrepareBuilder() {
-        if (builderIsReadOnly) {
-          SizeMessage1SubMessage original = result;
-          result = new SizeMessage1SubMessage();
-          builderIsReadOnly = false;
-          MergeFrom(original);
-        }
-        return result;
-      }
-      
-      public override bool IsInitialized {
-        get { return result.IsInitialized; }
-      }
+      SizeMessage1SubMessage result = new SizeMessage1SubMessage();
       
       protected override SizeMessage1SubMessage MessageBeingBuilt {
-        get { return PrepareBuilder(); }
+        get { return result; }
       }
       
       public override Builder Clear() {
-        result = DefaultInstance ?? new SizeMessage1SubMessage();
-        builderIsReadOnly = true;
+        result = new SizeMessage1SubMessage();
         return this;
       }
       
       public override Builder Clone() {
-        if (builderIsReadOnly) {
-          return new Builder(result);
-        } else {
-          return new Builder().MergeFrom(result);
-        }
+        return new Builder().MergeFrom(result);
       }
       
       public override pbd::MessageDescriptor DescriptorForType {
@@ -1872,11 +1733,12 @@ namespace Google.ProtocolBuffers.TestProtos {
       }
       
       public override SizeMessage1SubMessage BuildPartial() {
-        if (builderIsReadOnly) {
-          return result;
+        if (result == null) {
+          throw new global::System.InvalidOperationException("build() has already been called on this Builder");
         }
-        builderIsReadOnly = true;
-        return result;
+        SizeMessage1SubMessage returnMe = result;
+        result = null;
+        return returnMe;
       }
       
       
@@ -1888,13 +1750,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField1(value); }
       }
       public Builder SetField1(int value) {
-        PrepareBuilder();
         result.hasField1 = true;
         result.field1_ = value;
         return this;
       }
       public Builder ClearField1() {
-        PrepareBuilder();
         result.hasField1 = false;
         result.field1_ = 0;
         return this;
@@ -1908,13 +1768,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField2(value); }
       }
       public Builder SetField2(int value) {
-        PrepareBuilder();
         result.hasField2 = true;
         result.field2_ = value;
         return this;
       }
       public Builder ClearField2() {
-        PrepareBuilder();
         result.hasField2 = false;
         result.field2_ = 0;
         return this;
@@ -1928,13 +1786,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField3(value); }
       }
       public Builder SetField3(int value) {
-        PrepareBuilder();
         result.hasField3 = true;
         result.field3_ = value;
         return this;
       }
       public Builder ClearField3() {
-        PrepareBuilder();
         result.hasField3 = false;
         result.field3_ = 0;
         return this;
@@ -1949,13 +1805,11 @@ namespace Google.ProtocolBuffers.TestProtos {
       }
       public Builder SetField15(string value) {
         pb::ThrowHelper.ThrowIfNull(value, "value");
-        PrepareBuilder();
         result.hasField15 = true;
         result.field15_ = value;
         return this;
       }
       public Builder ClearField15() {
-        PrepareBuilder();
         result.hasField15 = false;
         result.field15_ = "";
         return this;
@@ -1969,13 +1823,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField12(value); }
       }
       public Builder SetField12(bool value) {
-        PrepareBuilder();
         result.hasField12 = true;
         result.field12_ = value;
         return this;
       }
       public Builder ClearField12() {
-        PrepareBuilder();
         result.hasField12 = false;
         result.field12_ = true;
         return this;
@@ -1989,13 +1841,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField13(value); }
       }
       public Builder SetField13(long value) {
-        PrepareBuilder();
         result.hasField13 = true;
         result.field13_ = value;
         return this;
       }
       public Builder ClearField13() {
-        PrepareBuilder();
         result.hasField13 = false;
         result.field13_ = 0L;
         return this;
@@ -2009,13 +1859,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField14(value); }
       }
       public Builder SetField14(long value) {
-        PrepareBuilder();
         result.hasField14 = true;
         result.field14_ = value;
         return this;
       }
       public Builder ClearField14() {
-        PrepareBuilder();
         result.hasField14 = false;
         result.field14_ = 0L;
         return this;
@@ -2029,13 +1877,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField16(value); }
       }
       public Builder SetField16(int value) {
-        PrepareBuilder();
         result.hasField16 = true;
         result.field16_ = value;
         return this;
       }
       public Builder ClearField16() {
-        PrepareBuilder();
         result.hasField16 = false;
         result.field16_ = 0;
         return this;
@@ -2049,13 +1895,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField19(value); }
       }
       public Builder SetField19(int value) {
-        PrepareBuilder();
         result.hasField19 = true;
         result.field19_ = value;
         return this;
       }
       public Builder ClearField19() {
-        PrepareBuilder();
         result.hasField19 = false;
         result.field19_ = 2;
         return this;
@@ -2069,13 +1913,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField20(value); }
       }
       public Builder SetField20(bool value) {
-        PrepareBuilder();
         result.hasField20 = true;
         result.field20_ = value;
         return this;
       }
       public Builder ClearField20() {
-        PrepareBuilder();
         result.hasField20 = false;
         result.field20_ = true;
         return this;
@@ -2089,13 +1931,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField28(value); }
       }
       public Builder SetField28(bool value) {
-        PrepareBuilder();
         result.hasField28 = true;
         result.field28_ = value;
         return this;
       }
       public Builder ClearField28() {
-        PrepareBuilder();
         result.hasField28 = false;
         result.field28_ = true;
         return this;
@@ -2111,13 +1951,11 @@ namespace Google.ProtocolBuffers.TestProtos {
       }
       [global::System.CLSCompliant(false)]
       public Builder SetField21(ulong value) {
-        PrepareBuilder();
         result.hasField21 = true;
         result.field21_ = value;
         return this;
       }
       public Builder ClearField21() {
-        PrepareBuilder();
         result.hasField21 = false;
         result.field21_ = 0;
         return this;
@@ -2131,13 +1969,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField22(value); }
       }
       public Builder SetField22(int value) {
-        PrepareBuilder();
         result.hasField22 = true;
         result.field22_ = value;
         return this;
       }
       public Builder ClearField22() {
-        PrepareBuilder();
         result.hasField22 = false;
         result.field22_ = 0;
         return this;
@@ -2151,13 +1987,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField23(value); }
       }
       public Builder SetField23(bool value) {
-        PrepareBuilder();
         result.hasField23 = true;
         result.field23_ = value;
         return this;
       }
       public Builder ClearField23() {
-        PrepareBuilder();
         result.hasField23 = false;
         result.field23_ = false;
         return this;
@@ -2171,13 +2005,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField206(value); }
       }
       public Builder SetField206(bool value) {
-        PrepareBuilder();
         result.hasField206 = true;
         result.field206_ = value;
         return this;
       }
       public Builder ClearField206() {
-        PrepareBuilder();
         result.hasField206 = false;
         result.field206_ = false;
         return this;
@@ -2193,13 +2025,11 @@ namespace Google.ProtocolBuffers.TestProtos {
       }
       [global::System.CLSCompliant(false)]
       public Builder SetField203(uint value) {
-        PrepareBuilder();
         result.hasField203 = true;
         result.field203_ = value;
         return this;
       }
       public Builder ClearField203() {
-        PrepareBuilder();
         result.hasField203 = false;
         result.field203_ = 0;
         return this;
@@ -2213,13 +2043,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField204(value); }
       }
       public Builder SetField204(int value) {
-        PrepareBuilder();
         result.hasField204 = true;
         result.field204_ = value;
         return this;
       }
       public Builder ClearField204() {
-        PrepareBuilder();
         result.hasField204 = false;
         result.field204_ = 0;
         return this;
@@ -2234,13 +2062,11 @@ namespace Google.ProtocolBuffers.TestProtos {
       }
       public Builder SetField205(string value) {
         pb::ThrowHelper.ThrowIfNull(value, "value");
-        PrepareBuilder();
         result.hasField205 = true;
         result.field205_ = value;
         return this;
       }
       public Builder ClearField205() {
-        PrepareBuilder();
         result.hasField205 = false;
         result.field205_ = "";
         return this;
@@ -2256,13 +2082,11 @@ namespace Google.ProtocolBuffers.TestProtos {
       }
       [global::System.CLSCompliant(false)]
       public Builder SetField207(ulong value) {
-        PrepareBuilder();
         result.hasField207 = true;
         result.field207_ = value;
         return this;
       }
       public Builder ClearField207() {
-        PrepareBuilder();
         result.hasField207 = false;
         result.field207_ = 0UL;
         return this;
@@ -2278,13 +2102,11 @@ namespace Google.ProtocolBuffers.TestProtos {
       }
       [global::System.CLSCompliant(false)]
       public Builder SetField300(ulong value) {
-        PrepareBuilder();
         result.hasField300 = true;
         result.field300_ = value;
         return this;
       }
       public Builder ClearField300() {
-        PrepareBuilder();
         result.hasField300 = false;
         result.field300_ = 0UL;
         return this;
@@ -2551,7 +2373,7 @@ namespace Google.ProtocolBuffers.TestProtos {
         public override Builder ToBuilder() { return CreateBuilder(this); }
         public override Builder CreateBuilderForType() { return new Builder(); }
         public static Builder CreateBuilder(Group1 prototype) {
-          return new Builder(prototype);
+          return (Builder) new Builder().MergeFrom(prototype);
         }
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -2561,48 +2383,21 @@ namespace Google.ProtocolBuffers.TestProtos {
           protected override Builder ThisBuilder {
             get { return this; }
           }
-          public Builder() {
-            result = DefaultInstance ?? new Group1();
-            builderIsReadOnly = result == DefaultInstance;
-          }
-          internal Builder(Group1 cloneFrom) {
-            result = cloneFrom;
-            builderIsReadOnly = true;
-          }
+          public Builder() {}
           
-          bool builderIsReadOnly;
-          Group1 result;
-          
-          private Group1 PrepareBuilder() {
-            if (builderIsReadOnly) {
-              Group1 original = result;
-              result = new Group1();
-              builderIsReadOnly = false;
-              MergeFrom(original);
-            }
-            return result;
-          }
-          
-          public override bool IsInitialized {
-            get { return result.IsInitialized; }
-          }
+          Group1 result = new Group1();
           
           protected override Group1 MessageBeingBuilt {
-            get { return PrepareBuilder(); }
+            get { return result; }
           }
           
           public override Builder Clear() {
-            result = DefaultInstance ?? new Group1();
-            builderIsReadOnly = true;
+            result = new Group1();
             return this;
           }
           
           public override Builder Clone() {
-            if (builderIsReadOnly) {
-              return new Builder(result);
-            } else {
-              return new Builder().MergeFrom(result);
-            }
+            return new Builder().MergeFrom(result);
           }
           
           public override pbd::MessageDescriptor DescriptorForType {
@@ -2614,14 +2409,15 @@ namespace Google.ProtocolBuffers.TestProtos {
           }
           
           public override Group1 BuildPartial() {
-            if (builderIsReadOnly) {
-              return result;
+            if (result == null) {
+              throw new global::System.InvalidOperationException("build() has already been called on this Builder");
             }
             result.field14_.MakeReadOnly();
             result.field22_.MakeReadOnly();
             result.field73_.MakeReadOnly();
-            builderIsReadOnly = true;
-            return result;
+            Group1 returnMe = result;
+            result = null;
+            return returnMe;
           }
           
           
@@ -2633,13 +2429,11 @@ namespace Google.ProtocolBuffers.TestProtos {
             set { SetField11(value); }
           }
           public Builder SetField11(float value) {
-            PrepareBuilder();
             result.hasField11 = true;
             result.field11_ = value;
             return this;
           }
           public Builder ClearField11() {
-            PrepareBuilder();
             result.hasField11 = false;
             result.field11_ = 0F;
             return this;
@@ -2653,13 +2447,11 @@ namespace Google.ProtocolBuffers.TestProtos {
             set { SetField26(value); }
           }
           public Builder SetField26(float value) {
-            PrepareBuilder();
             result.hasField26 = true;
             result.field26_ = value;
             return this;
           }
           public Builder ClearField26() {
-            PrepareBuilder();
             result.hasField26 = false;
             result.field26_ = 0F;
             return this;
@@ -2674,13 +2466,11 @@ namespace Google.ProtocolBuffers.TestProtos {
           }
           public Builder SetField12(string value) {
             pb::ThrowHelper.ThrowIfNull(value, "value");
-            PrepareBuilder();
             result.hasField12 = true;
             result.field12_ = value;
             return this;
           }
           public Builder ClearField12() {
-            PrepareBuilder();
             result.hasField12 = false;
             result.field12_ = "";
             return this;
@@ -2695,20 +2485,18 @@ namespace Google.ProtocolBuffers.TestProtos {
           }
           public Builder SetField13(string value) {
             pb::ThrowHelper.ThrowIfNull(value, "value");
-            PrepareBuilder();
             result.hasField13 = true;
             result.field13_ = value;
             return this;
           }
           public Builder ClearField13() {
-            PrepareBuilder();
             result.hasField13 = false;
             result.field13_ = "";
             return this;
           }
           
           public pbc::IPopsicleList<string> Field14List {
-            get { return PrepareBuilder().field14_; }
+            get { return result.field14_; }
           }
           public int Field14Count {
             get { return result.Field14Count; }
@@ -2718,23 +2506,19 @@ namespace Google.ProtocolBuffers.TestProtos {
           }
           public Builder SetField14(int index, string value) {
             pb::ThrowHelper.ThrowIfNull(value, "value");
-            PrepareBuilder();
             result.field14_[index] = value;
             return this;
           }
           public Builder AddField14(string value) {
             pb::ThrowHelper.ThrowIfNull(value, "value");
-            PrepareBuilder();
             result.field14_.Add(value);
             return this;
           }
           public Builder AddRangeField14(scg::IEnumerable<string> values) {
-            PrepareBuilder();
             base.AddRange(values, result.field14_);
             return this;
           }
           public Builder ClearField14() {
-            PrepareBuilder();
             result.field14_.Clear();
             return this;
           }
@@ -2749,13 +2533,11 @@ namespace Google.ProtocolBuffers.TestProtos {
           }
           [global::System.CLSCompliant(false)]
           public Builder SetField15(ulong value) {
-            PrepareBuilder();
             result.hasField15 = true;
             result.field15_ = value;
             return this;
           }
           public Builder ClearField15() {
-            PrepareBuilder();
             result.hasField15 = false;
             result.field15_ = 0UL;
             return this;
@@ -2769,13 +2551,11 @@ namespace Google.ProtocolBuffers.TestProtos {
             set { SetField5(value); }
           }
           public Builder SetField5(int value) {
-            PrepareBuilder();
             result.hasField5 = true;
             result.field5_ = value;
             return this;
           }
           public Builder ClearField5() {
-            PrepareBuilder();
             result.hasField5 = false;
             result.field5_ = 0;
             return this;
@@ -2790,13 +2570,11 @@ namespace Google.ProtocolBuffers.TestProtos {
           }
           public Builder SetField27(string value) {
             pb::ThrowHelper.ThrowIfNull(value, "value");
-            PrepareBuilder();
             result.hasField27 = true;
             result.field27_ = value;
             return this;
           }
           public Builder ClearField27() {
-            PrepareBuilder();
             result.hasField27 = false;
             result.field27_ = "";
             return this;
@@ -2810,13 +2588,11 @@ namespace Google.ProtocolBuffers.TestProtos {
             set { SetField28(value); }
           }
           public Builder SetField28(int value) {
-            PrepareBuilder();
             result.hasField28 = true;
             result.field28_ = value;
             return this;
           }
           public Builder ClearField28() {
-            PrepareBuilder();
             result.hasField28 = false;
             result.field28_ = 0;
             return this;
@@ -2831,13 +2607,11 @@ namespace Google.ProtocolBuffers.TestProtos {
           }
           public Builder SetField29(string value) {
             pb::ThrowHelper.ThrowIfNull(value, "value");
-            PrepareBuilder();
             result.hasField29 = true;
             result.field29_ = value;
             return this;
           }
           public Builder ClearField29() {
-            PrepareBuilder();
             result.hasField29 = false;
             result.field29_ = "";
             return this;
@@ -2852,20 +2626,18 @@ namespace Google.ProtocolBuffers.TestProtos {
           }
           public Builder SetField16(string value) {
             pb::ThrowHelper.ThrowIfNull(value, "value");
-            PrepareBuilder();
             result.hasField16 = true;
             result.field16_ = value;
             return this;
           }
           public Builder ClearField16() {
-            PrepareBuilder();
             result.hasField16 = false;
             result.field16_ = "";
             return this;
           }
           
           public pbc::IPopsicleList<string> Field22List {
-            get { return PrepareBuilder().field22_; }
+            get { return result.field22_; }
           }
           public int Field22Count {
             get { return result.Field22Count; }
@@ -2875,29 +2647,25 @@ namespace Google.ProtocolBuffers.TestProtos {
           }
           public Builder SetField22(int index, string value) {
             pb::ThrowHelper.ThrowIfNull(value, "value");
-            PrepareBuilder();
             result.field22_[index] = value;
             return this;
           }
           public Builder AddField22(string value) {
             pb::ThrowHelper.ThrowIfNull(value, "value");
-            PrepareBuilder();
             result.field22_.Add(value);
             return this;
           }
           public Builder AddRangeField22(scg::IEnumerable<string> values) {
-            PrepareBuilder();
             base.AddRange(values, result.field22_);
             return this;
           }
           public Builder ClearField22() {
-            PrepareBuilder();
             result.field22_.Clear();
             return this;
           }
           
           public pbc::IPopsicleList<int> Field73List {
-            get { return PrepareBuilder().field73_; }
+            get { return result.field73_; }
           }
           public int Field73Count {
             get { return result.Field73Count; }
@@ -2906,22 +2674,18 @@ namespace Google.ProtocolBuffers.TestProtos {
             return result.GetField73(index);
           }
           public Builder SetField73(int index, int value) {
-            PrepareBuilder();
             result.field73_[index] = value;
             return this;
           }
           public Builder AddField73(int value) {
-            PrepareBuilder();
             result.field73_.Add(value);
             return this;
           }
           public Builder AddRangeField73(scg::IEnumerable<int> values) {
-            PrepareBuilder();
             base.AddRange(values, result.field73_);
             return this;
           }
           public Builder ClearField73() {
-            PrepareBuilder();
             result.field73_.Clear();
             return this;
           }
@@ -2934,13 +2698,11 @@ namespace Google.ProtocolBuffers.TestProtos {
             set { SetField20(value); }
           }
           public Builder SetField20(int value) {
-            PrepareBuilder();
             result.hasField20 = true;
             result.field20_ = value;
             return this;
           }
           public Builder ClearField20() {
-            PrepareBuilder();
             result.hasField20 = false;
             result.field20_ = 0;
             return this;
@@ -2955,13 +2717,11 @@ namespace Google.ProtocolBuffers.TestProtos {
           }
           public Builder SetField24(string value) {
             pb::ThrowHelper.ThrowIfNull(value, "value");
-            PrepareBuilder();
             result.hasField24 = true;
             result.field24_ = value;
             return this;
           }
           public Builder ClearField24() {
-            PrepareBuilder();
             result.hasField24 = false;
             result.field24_ = "";
             return this;
@@ -2976,21 +2736,18 @@ namespace Google.ProtocolBuffers.TestProtos {
           }
           public Builder SetField31(global::Google.ProtocolBuffers.TestProtos.SizeMessage2GroupedMessage value) {
             pb::ThrowHelper.ThrowIfNull(value, "value");
-            PrepareBuilder();
             result.hasField31 = true;
             result.field31_ = value;
             return this;
           }
           public Builder SetField31(global::Google.ProtocolBuffers.TestProtos.SizeMessage2GroupedMessage.Builder builderForValue) {
             pb::ThrowHelper.ThrowIfNull(builderForValue, "builderForValue");
-            PrepareBuilder();
             result.hasField31 = true;
             result.field31_ = builderForValue.Build();
             return this;
           }
           public Builder MergeField31(global::Google.ProtocolBuffers.TestProtos.SizeMessage2GroupedMessage value) {
             pb::ThrowHelper.ThrowIfNull(value, "value");
-            PrepareBuilder();
             if (result.hasField31 &&
                 result.field31_ != global::Google.ProtocolBuffers.TestProtos.SizeMessage2GroupedMessage.DefaultInstance) {
                 result.field31_ = global::Google.ProtocolBuffers.TestProtos.SizeMessage2GroupedMessage.CreateBuilder(result.field31_).MergeFrom(value).BuildPartial();
@@ -3001,7 +2758,6 @@ namespace Google.ProtocolBuffers.TestProtos {
             return this;
           }
           public Builder ClearField31() {
-            PrepareBuilder();
             result.hasField31 = false;
             result.field31_ = global::Google.ProtocolBuffers.TestProtos.SizeMessage2GroupedMessage.DefaultInstance;
             return this;
@@ -3357,7 +3113,7 @@ namespace Google.ProtocolBuffers.TestProtos {
     public override Builder ToBuilder() { return CreateBuilder(this); }
     public override Builder CreateBuilderForType() { return new Builder(); }
     public static Builder CreateBuilder(SizeMessage2 prototype) {
-      return new Builder(prototype);
+      return (Builder) new Builder().MergeFrom(prototype);
     }
     
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -3367,48 +3123,21 @@ namespace Google.ProtocolBuffers.TestProtos {
       protected override Builder ThisBuilder {
         get { return this; }
       }
-      public Builder() {
-        result = DefaultInstance ?? new SizeMessage2();
-        builderIsReadOnly = result == DefaultInstance;
-      }
-      internal Builder(SizeMessage2 cloneFrom) {
-        result = cloneFrom;
-        builderIsReadOnly = true;
-      }
+      public Builder() {}
       
-      bool builderIsReadOnly;
-      SizeMessage2 result;
-      
-      private SizeMessage2 PrepareBuilder() {
-        if (builderIsReadOnly) {
-          SizeMessage2 original = result;
-          result = new SizeMessage2();
-          builderIsReadOnly = false;
-          MergeFrom(original);
-        }
-        return result;
-      }
-      
-      public override bool IsInitialized {
-        get { return result.IsInitialized; }
-      }
+      SizeMessage2 result = new SizeMessage2();
       
       protected override SizeMessage2 MessageBeingBuilt {
-        get { return PrepareBuilder(); }
+        get { return result; }
       }
       
       public override Builder Clear() {
-        result = DefaultInstance ?? new SizeMessage2();
-        builderIsReadOnly = true;
+        result = new SizeMessage2();
         return this;
       }
       
       public override Builder Clone() {
-        if (builderIsReadOnly) {
-          return new Builder(result);
-        } else {
-          return new Builder().MergeFrom(result);
-        }
+        return new Builder().MergeFrom(result);
       }
       
       public override pbd::MessageDescriptor DescriptorForType {
@@ -3420,15 +3149,16 @@ namespace Google.ProtocolBuffers.TestProtos {
       }
       
       public override SizeMessage2 BuildPartial() {
-        if (builderIsReadOnly) {
-          return result;
+        if (result == null) {
+          throw new global::System.InvalidOperationException("build() has already been called on this Builder");
         }
         result.group1_.MakeReadOnly();
         result.field128_.MakeReadOnly();
         result.field127_.MakeReadOnly();
         result.field130_.MakeReadOnly();
-        builderIsReadOnly = true;
-        return result;
+        SizeMessage2 returnMe = result;
+        result = null;
+        return returnMe;
       }
       
       
@@ -3441,13 +3171,11 @@ namespace Google.ProtocolBuffers.TestProtos {
       }
       public Builder SetField1(string value) {
         pb::ThrowHelper.ThrowIfNull(value, "value");
-        PrepareBuilder();
         result.hasField1 = true;
         result.field1_ = value;
         return this;
       }
       public Builder ClearField1() {
-        PrepareBuilder();
         result.hasField1 = false;
         result.field1_ = "";
         return this;
@@ -3461,13 +3189,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField3(value); }
       }
       public Builder SetField3(long value) {
-        PrepareBuilder();
         result.hasField3 = true;
         result.field3_ = value;
         return this;
       }
       public Builder ClearField3() {
-        PrepareBuilder();
         result.hasField3 = false;
         result.field3_ = 0L;
         return this;
@@ -3481,13 +3207,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField4(value); }
       }
       public Builder SetField4(long value) {
-        PrepareBuilder();
         result.hasField4 = true;
         result.field4_ = value;
         return this;
       }
       public Builder ClearField4() {
-        PrepareBuilder();
         result.hasField4 = false;
         result.field4_ = 0L;
         return this;
@@ -3501,13 +3225,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField30(value); }
       }
       public Builder SetField30(long value) {
-        PrepareBuilder();
         result.hasField30 = true;
         result.field30_ = value;
         return this;
       }
       public Builder ClearField30() {
-        PrepareBuilder();
         result.hasField30 = false;
         result.field30_ = 0L;
         return this;
@@ -3521,13 +3243,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField75(value); }
       }
       public Builder SetField75(bool value) {
-        PrepareBuilder();
         result.hasField75 = true;
         result.field75_ = value;
         return this;
       }
       public Builder ClearField75() {
-        PrepareBuilder();
         result.hasField75 = false;
         result.field75_ = false;
         return this;
@@ -3542,13 +3262,11 @@ namespace Google.ProtocolBuffers.TestProtos {
       }
       public Builder SetField6(string value) {
         pb::ThrowHelper.ThrowIfNull(value, "value");
-        PrepareBuilder();
         result.hasField6 = true;
         result.field6_ = value;
         return this;
       }
       public Builder ClearField6() {
-        PrepareBuilder();
         result.hasField6 = false;
         result.field6_ = "";
         return this;
@@ -3563,13 +3281,11 @@ namespace Google.ProtocolBuffers.TestProtos {
       }
       public Builder SetField2(pb::ByteString value) {
         pb::ThrowHelper.ThrowIfNull(value, "value");
-        PrepareBuilder();
         result.hasField2 = true;
         result.field2_ = value;
         return this;
       }
       public Builder ClearField2() {
-        PrepareBuilder();
         result.hasField2 = false;
         result.field2_ = pb::ByteString.Empty;
         return this;
@@ -3583,13 +3299,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField21(value); }
       }
       public Builder SetField21(int value) {
-        PrepareBuilder();
         result.hasField21 = true;
         result.field21_ = value;
         return this;
       }
       public Builder ClearField21() {
-        PrepareBuilder();
         result.hasField21 = false;
         result.field21_ = 0;
         return this;
@@ -3603,13 +3317,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField71(value); }
       }
       public Builder SetField71(int value) {
-        PrepareBuilder();
         result.hasField71 = true;
         result.field71_ = value;
         return this;
       }
       public Builder ClearField71() {
-        PrepareBuilder();
         result.hasField71 = false;
         result.field71_ = 0;
         return this;
@@ -3623,13 +3335,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField25(value); }
       }
       public Builder SetField25(float value) {
-        PrepareBuilder();
         result.hasField25 = true;
         result.field25_ = value;
         return this;
       }
       public Builder ClearField25() {
-        PrepareBuilder();
         result.hasField25 = false;
         result.field25_ = 0F;
         return this;
@@ -3643,13 +3353,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField109(value); }
       }
       public Builder SetField109(int value) {
-        PrepareBuilder();
         result.hasField109 = true;
         result.field109_ = value;
         return this;
       }
       public Builder ClearField109() {
-        PrepareBuilder();
         result.hasField109 = false;
         result.field109_ = 0;
         return this;
@@ -3663,13 +3371,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField210(value); }
       }
       public Builder SetField210(int value) {
-        PrepareBuilder();
         result.hasField210 = true;
         result.field210_ = value;
         return this;
       }
       public Builder ClearField210() {
-        PrepareBuilder();
         result.hasField210 = false;
         result.field210_ = 0;
         return this;
@@ -3683,13 +3389,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField211(value); }
       }
       public Builder SetField211(int value) {
-        PrepareBuilder();
         result.hasField211 = true;
         result.field211_ = value;
         return this;
       }
       public Builder ClearField211() {
-        PrepareBuilder();
         result.hasField211 = false;
         result.field211_ = 0;
         return this;
@@ -3703,13 +3407,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField212(value); }
       }
       public Builder SetField212(int value) {
-        PrepareBuilder();
         result.hasField212 = true;
         result.field212_ = value;
         return this;
       }
       public Builder ClearField212() {
-        PrepareBuilder();
         result.hasField212 = false;
         result.field212_ = 0;
         return this;
@@ -3723,13 +3425,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField213(value); }
       }
       public Builder SetField213(int value) {
-        PrepareBuilder();
         result.hasField213 = true;
         result.field213_ = value;
         return this;
       }
       public Builder ClearField213() {
-        PrepareBuilder();
         result.hasField213 = false;
         result.field213_ = 0;
         return this;
@@ -3743,13 +3443,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField216(value); }
       }
       public Builder SetField216(int value) {
-        PrepareBuilder();
         result.hasField216 = true;
         result.field216_ = value;
         return this;
       }
       public Builder ClearField216() {
-        PrepareBuilder();
         result.hasField216 = false;
         result.field216_ = 0;
         return this;
@@ -3763,13 +3461,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField217(value); }
       }
       public Builder SetField217(int value) {
-        PrepareBuilder();
         result.hasField217 = true;
         result.field217_ = value;
         return this;
       }
       public Builder ClearField217() {
-        PrepareBuilder();
         result.hasField217 = false;
         result.field217_ = 0;
         return this;
@@ -3783,13 +3479,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField218(value); }
       }
       public Builder SetField218(int value) {
-        PrepareBuilder();
         result.hasField218 = true;
         result.field218_ = value;
         return this;
       }
       public Builder ClearField218() {
-        PrepareBuilder();
         result.hasField218 = false;
         result.field218_ = 0;
         return this;
@@ -3803,13 +3497,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField220(value); }
       }
       public Builder SetField220(int value) {
-        PrepareBuilder();
         result.hasField220 = true;
         result.field220_ = value;
         return this;
       }
       public Builder ClearField220() {
-        PrepareBuilder();
         result.hasField220 = false;
         result.field220_ = 0;
         return this;
@@ -3823,13 +3515,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField221(value); }
       }
       public Builder SetField221(int value) {
-        PrepareBuilder();
         result.hasField221 = true;
         result.field221_ = value;
         return this;
       }
       public Builder ClearField221() {
-        PrepareBuilder();
         result.hasField221 = false;
         result.field221_ = 0;
         return this;
@@ -3843,13 +3533,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField222(value); }
       }
       public Builder SetField222(float value) {
-        PrepareBuilder();
         result.hasField222 = true;
         result.field222_ = value;
         return this;
       }
       public Builder ClearField222() {
-        PrepareBuilder();
         result.hasField222 = false;
         result.field222_ = 0F;
         return this;
@@ -3863,20 +3551,18 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField63(value); }
       }
       public Builder SetField63(int value) {
-        PrepareBuilder();
         result.hasField63 = true;
         result.field63_ = value;
         return this;
       }
       public Builder ClearField63() {
-        PrepareBuilder();
         result.hasField63 = false;
         result.field63_ = 0;
         return this;
       }
       
       public pbc::IPopsicleList<global::Google.ProtocolBuffers.TestProtos.SizeMessage2.Types.Group1> Group1List {
-        get { return PrepareBuilder().group1_; }
+        get { return result.group1_; }
       }
       public int Group1Count {
         get { return result.Group1Count; }
@@ -3886,41 +3572,35 @@ namespace Google.ProtocolBuffers.TestProtos {
       }
       public Builder SetGroup1(int index, global::Google.ProtocolBuffers.TestProtos.SizeMessage2.Types.Group1 value) {
         pb::ThrowHelper.ThrowIfNull(value, "value");
-        PrepareBuilder();
         result.group1_[index] = value;
         return this;
       }
       public Builder SetGroup1(int index, global::Google.ProtocolBuffers.TestProtos.SizeMessage2.Types.Group1.Builder builderForValue) {
         pb::ThrowHelper.ThrowIfNull(builderForValue, "builderForValue");
-        PrepareBuilder();
         result.group1_[index] = builderForValue.Build();
         return this;
       }
       public Builder AddGroup1(global::Google.ProtocolBuffers.TestProtos.SizeMessage2.Types.Group1 value) {
         pb::ThrowHelper.ThrowIfNull(value, "value");
-        PrepareBuilder();
         result.group1_.Add(value);
         return this;
       }
       public Builder AddGroup1(global::Google.ProtocolBuffers.TestProtos.SizeMessage2.Types.Group1.Builder builderForValue) {
         pb::ThrowHelper.ThrowIfNull(builderForValue, "builderForValue");
-        PrepareBuilder();
         result.group1_.Add(builderForValue.Build());
         return this;
       }
       public Builder AddRangeGroup1(scg::IEnumerable<global::Google.ProtocolBuffers.TestProtos.SizeMessage2.Types.Group1> values) {
-        PrepareBuilder();
         base.AddRange(values, result.group1_);
         return this;
       }
       public Builder ClearGroup1() {
-        PrepareBuilder();
         result.group1_.Clear();
         return this;
       }
       
       public pbc::IPopsicleList<string> Field128List {
-        get { return PrepareBuilder().field128_; }
+        get { return result.field128_; }
       }
       public int Field128Count {
         get { return result.Field128Count; }
@@ -3930,23 +3610,19 @@ namespace Google.ProtocolBuffers.TestProtos {
       }
       public Builder SetField128(int index, string value) {
         pb::ThrowHelper.ThrowIfNull(value, "value");
-        PrepareBuilder();
         result.field128_[index] = value;
         return this;
       }
       public Builder AddField128(string value) {
         pb::ThrowHelper.ThrowIfNull(value, "value");
-        PrepareBuilder();
         result.field128_.Add(value);
         return this;
       }
       public Builder AddRangeField128(scg::IEnumerable<string> values) {
-        PrepareBuilder();
         base.AddRange(values, result.field128_);
         return this;
       }
       public Builder ClearField128() {
-        PrepareBuilder();
         result.field128_.Clear();
         return this;
       }
@@ -3959,20 +3635,18 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField131(value); }
       }
       public Builder SetField131(long value) {
-        PrepareBuilder();
         result.hasField131 = true;
         result.field131_ = value;
         return this;
       }
       public Builder ClearField131() {
-        PrepareBuilder();
         result.hasField131 = false;
         result.field131_ = 0L;
         return this;
       }
       
       public pbc::IPopsicleList<string> Field127List {
-        get { return PrepareBuilder().field127_; }
+        get { return result.field127_; }
       }
       public int Field127Count {
         get { return result.Field127Count; }
@@ -3982,23 +3656,19 @@ namespace Google.ProtocolBuffers.TestProtos {
       }
       public Builder SetField127(int index, string value) {
         pb::ThrowHelper.ThrowIfNull(value, "value");
-        PrepareBuilder();
         result.field127_[index] = value;
         return this;
       }
       public Builder AddField127(string value) {
         pb::ThrowHelper.ThrowIfNull(value, "value");
-        PrepareBuilder();
         result.field127_.Add(value);
         return this;
       }
       public Builder AddRangeField127(scg::IEnumerable<string> values) {
-        PrepareBuilder();
         base.AddRange(values, result.field127_);
         return this;
       }
       public Builder ClearField127() {
-        PrepareBuilder();
         result.field127_.Clear();
         return this;
       }
@@ -4011,20 +3681,18 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField129(value); }
       }
       public Builder SetField129(int value) {
-        PrepareBuilder();
         result.hasField129 = true;
         result.field129_ = value;
         return this;
       }
       public Builder ClearField129() {
-        PrepareBuilder();
         result.hasField129 = false;
         result.field129_ = 0;
         return this;
       }
       
       public pbc::IPopsicleList<long> Field130List {
-        get { return PrepareBuilder().field130_; }
+        get { return result.field130_; }
       }
       public int Field130Count {
         get { return result.Field130Count; }
@@ -4033,22 +3701,18 @@ namespace Google.ProtocolBuffers.TestProtos {
         return result.GetField130(index);
       }
       public Builder SetField130(int index, long value) {
-        PrepareBuilder();
         result.field130_[index] = value;
         return this;
       }
       public Builder AddField130(long value) {
-        PrepareBuilder();
         result.field130_.Add(value);
         return this;
       }
       public Builder AddRangeField130(scg::IEnumerable<long> values) {
-        PrepareBuilder();
         base.AddRange(values, result.field130_);
         return this;
       }
       public Builder ClearField130() {
-        PrepareBuilder();
         result.field130_.Clear();
         return this;
       }
@@ -4061,13 +3725,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField205(value); }
       }
       public Builder SetField205(bool value) {
-        PrepareBuilder();
         result.hasField205 = true;
         result.field205_ = value;
         return this;
       }
       public Builder ClearField205() {
-        PrepareBuilder();
         result.hasField205 = false;
         result.field205_ = false;
         return this;
@@ -4081,13 +3743,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField206(value); }
       }
       public Builder SetField206(bool value) {
-        PrepareBuilder();
         result.hasField206 = true;
         result.field206_ = value;
         return this;
       }
       public Builder ClearField206() {
-        PrepareBuilder();
         result.hasField206 = false;
         result.field206_ = false;
         return this;
@@ -4267,7 +3927,7 @@ namespace Google.ProtocolBuffers.TestProtos {
     public override Builder ToBuilder() { return CreateBuilder(this); }
     public override Builder CreateBuilderForType() { return new Builder(); }
     public static Builder CreateBuilder(SizeMessage2GroupedMessage prototype) {
-      return new Builder(prototype);
+      return (Builder) new Builder().MergeFrom(prototype);
     }
     
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -4277,48 +3937,21 @@ namespace Google.ProtocolBuffers.TestProtos {
       protected override Builder ThisBuilder {
         get { return this; }
       }
-      public Builder() {
-        result = DefaultInstance ?? new SizeMessage2GroupedMessage();
-        builderIsReadOnly = result == DefaultInstance;
-      }
-      internal Builder(SizeMessage2GroupedMessage cloneFrom) {
-        result = cloneFrom;
-        builderIsReadOnly = true;
-      }
+      public Builder() {}
       
-      bool builderIsReadOnly;
-      SizeMessage2GroupedMessage result;
-      
-      private SizeMessage2GroupedMessage PrepareBuilder() {
-        if (builderIsReadOnly) {
-          SizeMessage2GroupedMessage original = result;
-          result = new SizeMessage2GroupedMessage();
-          builderIsReadOnly = false;
-          MergeFrom(original);
-        }
-        return result;
-      }
-      
-      public override bool IsInitialized {
-        get { return result.IsInitialized; }
-      }
+      SizeMessage2GroupedMessage result = new SizeMessage2GroupedMessage();
       
       protected override SizeMessage2GroupedMessage MessageBeingBuilt {
-        get { return PrepareBuilder(); }
+        get { return result; }
       }
       
       public override Builder Clear() {
-        result = DefaultInstance ?? new SizeMessage2GroupedMessage();
-        builderIsReadOnly = true;
+        result = new SizeMessage2GroupedMessage();
         return this;
       }
       
       public override Builder Clone() {
-        if (builderIsReadOnly) {
-          return new Builder(result);
-        } else {
-          return new Builder().MergeFrom(result);
-        }
+        return new Builder().MergeFrom(result);
       }
       
       public override pbd::MessageDescriptor DescriptorForType {
@@ -4330,11 +3963,12 @@ namespace Google.ProtocolBuffers.TestProtos {
       }
       
       public override SizeMessage2GroupedMessage BuildPartial() {
-        if (builderIsReadOnly) {
-          return result;
+        if (result == null) {
+          throw new global::System.InvalidOperationException("build() has already been called on this Builder");
         }
-        builderIsReadOnly = true;
-        return result;
+        SizeMessage2GroupedMessage returnMe = result;
+        result = null;
+        return returnMe;
       }
       
       
@@ -4346,13 +3980,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField1(value); }
       }
       public Builder SetField1(float value) {
-        PrepareBuilder();
         result.hasField1 = true;
         result.field1_ = value;
         return this;
       }
       public Builder ClearField1() {
-        PrepareBuilder();
         result.hasField1 = false;
         result.field1_ = 0F;
         return this;
@@ -4366,13 +3998,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField2(value); }
       }
       public Builder SetField2(float value) {
-        PrepareBuilder();
         result.hasField2 = true;
         result.field2_ = value;
         return this;
       }
       public Builder ClearField2() {
-        PrepareBuilder();
         result.hasField2 = false;
         result.field2_ = 0F;
         return this;
@@ -4386,13 +4016,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField3(value); }
       }
       public Builder SetField3(float value) {
-        PrepareBuilder();
         result.hasField3 = true;
         result.field3_ = value;
         return this;
       }
       public Builder ClearField3() {
-        PrepareBuilder();
         result.hasField3 = false;
         result.field3_ = 0F;
         return this;
@@ -4406,13 +4034,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField4(value); }
       }
       public Builder SetField4(bool value) {
-        PrepareBuilder();
         result.hasField4 = true;
         result.field4_ = value;
         return this;
       }
       public Builder ClearField4() {
-        PrepareBuilder();
         result.hasField4 = false;
         result.field4_ = false;
         return this;
@@ -4426,13 +4052,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField5(value); }
       }
       public Builder SetField5(bool value) {
-        PrepareBuilder();
         result.hasField5 = true;
         result.field5_ = value;
         return this;
       }
       public Builder ClearField5() {
-        PrepareBuilder();
         result.hasField5 = false;
         result.field5_ = false;
         return this;
@@ -4446,13 +4070,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField6(value); }
       }
       public Builder SetField6(bool value) {
-        PrepareBuilder();
         result.hasField6 = true;
         result.field6_ = value;
         return this;
       }
       public Builder ClearField6() {
-        PrepareBuilder();
         result.hasField6 = false;
         result.field6_ = true;
         return this;
@@ -4466,13 +4088,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField7(value); }
       }
       public Builder SetField7(bool value) {
-        PrepareBuilder();
         result.hasField7 = true;
         result.field7_ = value;
         return this;
       }
       public Builder ClearField7() {
-        PrepareBuilder();
         result.hasField7 = false;
         result.field7_ = false;
         return this;
@@ -4486,13 +4106,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField8(value); }
       }
       public Builder SetField8(float value) {
-        PrepareBuilder();
         result.hasField8 = true;
         result.field8_ = value;
         return this;
       }
       public Builder ClearField8() {
-        PrepareBuilder();
         result.hasField8 = false;
         result.field8_ = 0F;
         return this;
@@ -4506,13 +4124,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField9(value); }
       }
       public Builder SetField9(bool value) {
-        PrepareBuilder();
         result.hasField9 = true;
         result.field9_ = value;
         return this;
       }
       public Builder ClearField9() {
-        PrepareBuilder();
         result.hasField9 = false;
         result.field9_ = false;
         return this;
@@ -4526,13 +4142,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField10(value); }
       }
       public Builder SetField10(float value) {
-        PrepareBuilder();
         result.hasField10 = true;
         result.field10_ = value;
         return this;
       }
       public Builder ClearField10() {
-        PrepareBuilder();
         result.hasField10 = false;
         result.field10_ = 0F;
         return this;
@@ -4546,13 +4160,11 @@ namespace Google.ProtocolBuffers.TestProtos {
         set { SetField11(value); }
       }
       public Builder SetField11(long value) {
-        PrepareBuilder();
         result.hasField11 = true;
         result.field11_ = value;
         return this;
       }
       public Builder ClearField11() {
-        PrepareBuilder();
         result.hasField11 = false;
         result.field11_ = 0L;
         return this;

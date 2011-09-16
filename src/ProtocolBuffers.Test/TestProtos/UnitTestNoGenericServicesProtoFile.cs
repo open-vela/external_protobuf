@@ -183,7 +183,7 @@ namespace Google.ProtocolBuffers.TestProtos.NoGenericService {
     public override Builder ToBuilder() { return CreateBuilder(this); }
     public override Builder CreateBuilderForType() { return new Builder(); }
     public static Builder CreateBuilder(TestMessage prototype) {
-      return new Builder(prototype);
+      return (Builder) new Builder().MergeFrom(prototype);
     }
     
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -193,48 +193,21 @@ namespace Google.ProtocolBuffers.TestProtos.NoGenericService {
       protected override Builder ThisBuilder {
         get { return this; }
       }
-      public Builder() {
-        result = DefaultInstance ?? new TestMessage();
-        builderIsReadOnly = result == DefaultInstance;
-      }
-      internal Builder(TestMessage cloneFrom) {
-        result = cloneFrom;
-        builderIsReadOnly = true;
-      }
+      public Builder() {}
       
-      bool builderIsReadOnly;
-      TestMessage result;
-      
-      private TestMessage PrepareBuilder() {
-        if (builderIsReadOnly) {
-          TestMessage original = result;
-          result = new TestMessage();
-          builderIsReadOnly = false;
-          MergeFrom(original);
-        }
-        return result;
-      }
-      
-      public override bool IsInitialized {
-        get { return result.IsInitialized; }
-      }
+      TestMessage result = new TestMessage();
       
       protected override TestMessage MessageBeingBuilt {
-        get { return PrepareBuilder(); }
+        get { return result; }
       }
       
       public override Builder Clear() {
-        result = DefaultInstance ?? new TestMessage();
-        builderIsReadOnly = true;
+        result = new TestMessage();
         return this;
       }
       
       public override Builder Clone() {
-        if (builderIsReadOnly) {
-          return new Builder(result);
-        } else {
-          return new Builder().MergeFrom(result);
-        }
+        return new Builder().MergeFrom(result);
       }
       
       public override pbd::MessageDescriptor DescriptorForType {
@@ -246,11 +219,12 @@ namespace Google.ProtocolBuffers.TestProtos.NoGenericService {
       }
       
       public override TestMessage BuildPartial() {
-        if (builderIsReadOnly) {
-          return result;
+        if (result == null) {
+          throw new global::System.InvalidOperationException("build() has already been called on this Builder");
         }
-        builderIsReadOnly = true;
-        return result;
+        TestMessage returnMe = result;
+        result = null;
+        return returnMe;
       }
       
       public override Builder MergeFrom(pb::IMessage other) {
@@ -264,7 +238,6 @@ namespace Google.ProtocolBuffers.TestProtos.NoGenericService {
       
       public override Builder MergeFrom(TestMessage other) {
         if (other == global::Google.ProtocolBuffers.TestProtos.NoGenericService.TestMessage.DefaultInstance) return this;
-        PrepareBuilder();
         if (other.HasA) {
           A = other.A;
         }
@@ -278,7 +251,6 @@ namespace Google.ProtocolBuffers.TestProtos.NoGenericService {
       }
       
       public override Builder MergeFrom(pb::ICodedInputStream input, pb::ExtensionRegistry extensionRegistry) {
-        PrepareBuilder();
         pb::UnknownFieldSet.Builder unknownFields = null;
         uint tag;
         string field_name;
@@ -334,13 +306,11 @@ namespace Google.ProtocolBuffers.TestProtos.NoGenericService {
         set { SetA(value); }
       }
       public Builder SetA(int value) {
-        PrepareBuilder();
         result.hasA = true;
         result.a_ = value;
         return this;
       }
       public Builder ClearA() {
-        PrepareBuilder();
         result.hasA = false;
         result.a_ = 0;
         return this;
