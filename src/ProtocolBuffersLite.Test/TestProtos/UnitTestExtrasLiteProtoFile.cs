@@ -1354,13 +1354,13 @@ namespace Google.ProtocolBuffers.TestProtos {
           Email = other.Email;
         }
         if (other.codes_.Count != 0) {
-          result.codes_.Add(other.codes_);
+          base.AddRange(other.codes_, result.codes_);
         }
         if (other.phone_.Count != 0) {
-          result.phone_.Add(other.phone_);
+          base.AddRange(other.phone_, result.phone_);
         }
         if (other.addresses_.Count != 0) {
-          result.addresses_.Add(other.addresses_);
+          base.AddRange(other.addresses_, result.addresses_);
         }
           this.MergeExtensionFields(other);
         return this;
@@ -1500,7 +1500,7 @@ namespace Google.ProtocolBuffers.TestProtos {
         return this;
       }
       public Builder AddRangeCodes(scg::IEnumerable<int> values) {
-        result.codes_.Add(values);
+        base.AddRange(values, result.codes_);
         return this;
       }
       public Builder ClearCodes() {
@@ -1538,7 +1538,7 @@ namespace Google.ProtocolBuffers.TestProtos {
         return this;
       }
       public Builder AddRangePhone(scg::IEnumerable<global::Google.ProtocolBuffers.TestProtos.TestInteropPersonLite.Types.PhoneNumber> values) {
-        result.phone_.Add(values);
+        base.AddRange(values, result.phone_);
         return this;
       }
       public Builder ClearPhone() {
@@ -1576,7 +1576,7 @@ namespace Google.ProtocolBuffers.TestProtos {
         return this;
       }
       public Builder AddRangeAddresses(scg::IEnumerable<global::Google.ProtocolBuffers.TestProtos.TestInteropPersonLite.Types.Addresses> values) {
-        result.addresses_.Add(values);
+        base.AddRange(values, result.addresses_);
         return this;
       }
       public Builder ClearAddresses() {
