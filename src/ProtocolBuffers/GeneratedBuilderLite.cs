@@ -44,7 +44,7 @@ namespace Google.ProtocolBuffers
     /// most of the IBuilder interface using reflection. Users can ignore this class
     /// as an implementation detail.
     /// </summary>
-    public abstract partial class GeneratedBuilderLite<TMessage, TBuilder> : AbstractBuilderLite<TMessage, TBuilder>
+    public abstract class GeneratedBuilderLite<TMessage, TBuilder> : AbstractBuilderLite<TMessage, TBuilder>
         where TMessage : GeneratedMessageLite<TMessage, TBuilder>
         where TBuilder : GeneratedBuilderLite<TMessage, TBuilder>
     {
@@ -61,9 +61,30 @@ namespace Google.ProtocolBuffers
 
         public abstract TBuilder MergeFrom(TMessage other);
 
-        public override bool IsInitialized
+        /// <summary>
+        /// Adds all of the specified values to the given collection.
+        /// </summary>
+        /// <exception cref="ArgumentNullException">Any element of the list is null</exception>
+        protected void AddRange<T>(IEnumerable<T> source, IList<T> destination)
         {
-            get { return MessageBeingBuilt.IsInitialized; }
+            ThrowHelper.ThrowIfNull(source);
+            // We only need to check this for nullable types.
+            if (default(T) == null)
+            {
+                ThrowHelper.ThrowIfAnyNull(source);
+            }
+            List<T> list = destination as List<T>;
+            if (list != null)
+            {
+                list.AddRange(source);
+            }
+            else
+            {
+                foreach (T element in source)
+                {
+                    destination.Add(element);
+                }
+            }
         }
 
         /// <summary>
@@ -96,7 +117,7 @@ namespace Google.ProtocolBuffers
         public override TMessage Build()
         {
             // If the message is null, we'll throw a more appropriate exception in BuildPartial.
-            if (MessageBeingBuilt != null && !IsInitialized)
+            if (!IsInitialized)
             {
                 throw new UninitializedMessageException(MessageBeingBuilt);
             }
