@@ -42,7 +42,6 @@ namespace Google.ProtocolBuffers.Collections
     /// </summary>
     public sealed class PopsicleList<T> : IPopsicleList<T>, ICastArray
     {
-        private static readonly bool CheckForNull = default(T) == null;
         private static readonly T[] EmptySet = new T[0];
 
         private List<T> items;
@@ -66,10 +65,6 @@ namespace Google.ProtocolBuffers.Collections
         public void Insert(int index, T item)
         {
             ValidateModification();
-            if (CheckForNull)
-            {
-                ThrowHelper.ThrowIfNull(item);
-            }
             items.Insert(index, item);
         }
 
@@ -92,10 +87,6 @@ namespace Google.ProtocolBuffers.Collections
             set
             {
                 ValidateModification();
-                if (CheckForNull)
-                {
-                    ThrowHelper.ThrowIfNull(value);
-                }
                 items[index] = value;
             }
         }
@@ -103,10 +94,6 @@ namespace Google.ProtocolBuffers.Collections
         public void Add(T item)
         {
             ValidateModification();
-            if (CheckForNull)
-            {
-                ThrowHelper.ThrowIfNull(item);
-            }
             items.Add(item);
         }
 
@@ -158,30 +145,15 @@ namespace Google.ProtocolBuffers.Collections
 
         public void Add(IEnumerable<T> collection)
         {
-            ValidateModification();
-            ThrowHelper.ThrowIfNull(collection);
-
-            if (!CheckForNull || collection is PopsicleList<T>)
+            if (readOnly)
             {
-                items.AddRange(collection);
+                throw new NotSupportedException("List is read-only");
             }
-            else
+            if (items == null)
             {
-                // Assumption, it's ok to enumerate collections more than once.
-                if (collection is ICollection<T>)
-                {
-                    ThrowHelper.ThrowIfAnyNull(collection);
-                    items.AddRange(collection);
-                }
-                else
-                {
-                    foreach (T item in collection)
-                    {
-                        ThrowHelper.ThrowIfNull(item);
-                        items.Add(item);
-                    }
-                }
+                items = new List<T>();
             }
+            items.AddRange(collection);
         }
 
         private void ValidateModification()
