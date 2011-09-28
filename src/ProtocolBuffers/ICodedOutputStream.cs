@@ -49,8 +49,26 @@ namespace Google.ProtocolBuffers
     /// in their binary form by creating a instance via the CodedOutputStream.CreateInstance
     /// static factory.
     /// </summary>
-    public interface ICodedOutputStream
+    public interface ICodedOutputStream : IDisposable
     {
+        /// <summary>
+        /// Writes any message initialization data needed to the output stream
+        /// </summary>
+        /// <remarks>
+        /// This is primarily used by text formats and unnecessary for protobuffers' own
+        /// binary format.  The API for MessageStart/End was added for consistent handling
+        /// of output streams regardless of the actual writer implementation.
+        /// </remarks>
+        void WriteMessageStart();
+        /// <summary>
+        /// Writes any message finalization data needed to the output stream
+        /// </summary>
+        /// <remarks>
+        /// This is primarily used by text formats and unnecessary for protobuffers' own
+        /// binary format.  The API for MessageStart/End was added for consistent handling
+        /// of output streams regardless of the actual writer implementation.
+        /// </remarks>
+        void WriteMessageEnd();
         /// <summary>
         /// Indicates that all temporary buffers be written to the final output.
         /// </summary>
