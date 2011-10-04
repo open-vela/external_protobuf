@@ -39,14 +39,14 @@ using System.Collections;
 using System.Collections.Generic;
 using Google.ProtocolBuffers;
 using Google.ProtocolBuffers.TestProtos;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace Google.ProtocolBuffers
 {
-    [TestClass]
+    [TestFixture]
     public class ExtendableBuilderLiteTest
     {
-        [TestMethod]
+        [Test]
         public void TestHasExtensionT()
         {
             TestAllExtensionsLite.Builder builder = TestAllExtensionsLite.CreateBuilder()
@@ -55,14 +55,14 @@ namespace Google.ProtocolBuffers
             Assert.IsTrue(builder.HasExtension(UnitTestLiteProtoFile.OptionalInt32ExtensionLite));
         }
 
-        [TestMethod]
+        [Test]
         public void TestHasExtensionTMissing()
         {
             TestAllExtensionsLite.Builder builder = TestAllExtensionsLite.CreateBuilder();
             Assert.IsFalse(builder.HasExtension(UnitTestLiteProtoFile.OptionalInt32ExtensionLite));
         }
 
-        [TestMethod]
+        [Test]
         public void TestGetExtensionCountT()
         {
             TestAllExtensionsLite.Builder builder = TestAllExtensionsLite.CreateBuilder()
@@ -73,14 +73,14 @@ namespace Google.ProtocolBuffers
             Assert.AreEqual(3, builder.GetExtensionCount(UnitTestLiteProtoFile.RepeatedInt32ExtensionLite));
         }
 
-        [TestMethod]
+        [Test]
         public void TestGetExtensionCountTEmpty()
         {
             TestAllExtensionsLite.Builder builder = TestAllExtensionsLite.CreateBuilder();
             Assert.AreEqual(0, builder.GetExtensionCount(UnitTestLiteProtoFile.RepeatedInt32ExtensionLite));
         }
 
-        [TestMethod]
+        [Test]
         public void TestGetExtensionTNull()
         {
             TestAllExtensionsLite.Builder builder = TestAllExtensionsLite.CreateBuilder();
@@ -88,7 +88,7 @@ namespace Google.ProtocolBuffers
             Assert.IsNull(value);
         }
 
-        [TestMethod]
+        [Test]
         public void TestGetExtensionTValue()
         {
             TestAllExtensionsLite.Builder builder = TestAllExtensionsLite.CreateBuilder()
@@ -97,14 +97,14 @@ namespace Google.ProtocolBuffers
             Assert.AreEqual(3, builder.GetExtension(UnitTestLiteProtoFile.OptionalInt32ExtensionLite));
         }
 
-        [TestMethod]
+        [Test]
         public void TestGetExtensionTEmpty()
         {
             TestAllExtensionsLite.Builder builder = TestAllExtensionsLite.CreateBuilder();
             Assert.AreEqual(0, builder.GetExtension(UnitTestLiteProtoFile.RepeatedInt32ExtensionLite).Count);
         }
 
-        [TestMethod]
+        [Test]
         public void TestGetExtensionTList()
         {
             TestAllExtensionsLite.Builder builder = TestAllExtensionsLite.CreateBuilder()
@@ -116,7 +116,7 @@ namespace Google.ProtocolBuffers
             Assert.AreEqual(3, values.Count);
         }
 
-        [TestMethod]
+        [Test]
         public void TestGetExtensionTIndex()
         {
             TestAllExtensionsLite.Builder builder = TestAllExtensionsLite.CreateBuilder()
@@ -128,14 +128,14 @@ namespace Google.ProtocolBuffers
                 Assert.AreEqual(i, builder.GetExtension(UnitTestLiteProtoFile.RepeatedInt32ExtensionLite, i));
         }
 
-        [TestMethod, ExpectedException(typeof (ArgumentOutOfRangeException))]
+        [Test, ExpectedException(typeof (ArgumentOutOfRangeException))]
         public void TestGetExtensionTIndexOutOfRange()
         {
             TestAllExtensionsLite.Builder builder = TestAllExtensionsLite.CreateBuilder();
             builder.GetExtension(UnitTestLiteProtoFile.RepeatedInt32ExtensionLite, 0);
         }
 
-        [TestMethod]
+        [Test]
         public void TestSetExtensionTIndex()
         {
             TestAllExtensionsLite.Builder builder = TestAllExtensionsLite.CreateBuilder()
@@ -154,14 +154,14 @@ namespace Google.ProtocolBuffers
                 Assert.AreEqual(5 + i, builder.GetExtension(UnitTestLiteProtoFile.RepeatedInt32ExtensionLite, i));
         }
 
-        [TestMethod, ExpectedException(typeof (ArgumentOutOfRangeException))]
+        [Test, ExpectedException(typeof (ArgumentOutOfRangeException))]
         public void TestSetExtensionTIndexOutOfRange()
         {
             TestAllExtensionsLite.Builder builder = TestAllExtensionsLite.CreateBuilder();
             builder.SetExtension(UnitTestLiteProtoFile.RepeatedInt32ExtensionLite, 0, -1);
         }
 
-        [TestMethod]
+        [Test]
         public void TestClearExtensionTList()
         {
             TestAllExtensionsLite.Builder builder = TestAllExtensionsLite.CreateBuilder()
@@ -172,7 +172,7 @@ namespace Google.ProtocolBuffers
             Assert.AreEqual(0, builder.GetExtensionCount(UnitTestLiteProtoFile.RepeatedInt32ExtensionLite));
         }
 
-        [TestMethod]
+        [Test]
         public void TestClearExtensionTValue()
         {
             TestAllExtensionsLite.Builder builder = TestAllExtensionsLite.CreateBuilder()
@@ -183,7 +183,7 @@ namespace Google.ProtocolBuffers
             Assert.IsFalse(builder.HasExtension(UnitTestLiteProtoFile.OptionalInt32ExtensionLite));
         }
 
-        [TestMethod]
+        [Test]
         public void TestIndexedByDescriptor()
         {
             TestAllExtensionsLite.Builder builder = TestAllExtensionsLite.CreateBuilder();
@@ -195,7 +195,7 @@ namespace Google.ProtocolBuffers
             Assert.AreEqual(123, builder.GetExtension(UnitTestLiteProtoFile.OptionalInt32ExtensionLite));
         }
 
-        [TestMethod]
+        [Test]
         public void TestIndexedByDescriptorAndOrdinal()
         {
             TestAllExtensionsLite.Builder builder = TestAllExtensionsLite.CreateBuilder()
@@ -209,7 +209,7 @@ namespace Google.ProtocolBuffers
             Assert.AreEqual(123, builder.GetExtension(UnitTestLiteProtoFile.RepeatedInt32ExtensionLite, 0));
         }
 
-        [TestMethod, ExpectedException(typeof (ArgumentOutOfRangeException))]
+        [Test, ExpectedException(typeof (ArgumentOutOfRangeException))]
         public void TestIndexedByDescriptorAndOrdinalOutOfRange()
         {
             TestAllExtensionsLite.Builder builder = TestAllExtensionsLite.CreateBuilder();
@@ -219,7 +219,7 @@ namespace Google.ProtocolBuffers
             builder[f, 0] = 123;
         }
 
-        [TestMethod]
+        [Test]
         public void TestClearFieldByDescriptor()
         {
             TestAllExtensionsLite.Builder builder = TestAllExtensionsLite.CreateBuilder()
@@ -231,7 +231,7 @@ namespace Google.ProtocolBuffers
             Assert.AreEqual(0, builder.GetExtensionCount(UnitTestLiteProtoFile.RepeatedInt32ExtensionLite));
         }
 
-        [TestMethod]
+        [Test]
         public void TestAddRepeatedFieldByDescriptor()
         {
             TestAllExtensionsLite.Builder builder = TestAllExtensionsLite.CreateBuilder()
@@ -244,7 +244,7 @@ namespace Google.ProtocolBuffers
             Assert.AreEqual(123, builder.GetExtension(UnitTestLiteProtoFile.RepeatedInt32ExtensionLite, 1));
         }
 
-        [TestMethod]
+        [Test]
         public void TestMissingExtensionsLite()
         {
             const int optionalInt32 = 12345678;
@@ -269,7 +269,7 @@ namespace Google.ProtocolBuffers
             Assert.AreEqual(0, copybits.Length);
         }
 
-        [TestMethod]
+        [Test]
         public void TestMissingFieldsLite()
         {
             TestAllTypesLite msg = TestAllTypesLite.CreateBuilder()

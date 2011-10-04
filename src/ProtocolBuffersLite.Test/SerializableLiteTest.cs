@@ -5,11 +5,11 @@ using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using Google.ProtocolBuffers.TestProtos;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace Google.ProtocolBuffers
 {
-    [TestClass]
+    [TestFixture]
     public class SerializableLiteTest
     {
         /// <summary>
@@ -18,7 +18,7 @@ namespace Google.ProtocolBuffers
         public static readonly ISerializable CompileTimeCheckSerializableMessage = TestRequiredLite.DefaultInstance;
         public static readonly ISerializable CompileTimeCheckSerializableBuilder = new TestRequiredLite.Builder();
 
-        [TestMethod]
+        [Test]
         public void TestPlainMessage()
         {
             TestRequiredLite message = TestRequiredLite.CreateBuilder()
@@ -34,7 +34,7 @@ namespace Google.ProtocolBuffers
             Assert.AreEqual(message, copy);
         }
 
-        [TestMethod]
+        [Test]
         public void TestPlainBuilder()
         {
             TestRequiredLite.Builder builder = TestRequiredLite.CreateBuilder()

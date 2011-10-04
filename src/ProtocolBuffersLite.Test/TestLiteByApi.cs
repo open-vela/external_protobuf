@@ -35,14 +35,14 @@
 #endregion
 
 using Google.ProtocolBuffers.TestProtos;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace Google.ProtocolBuffers
 {
-    [TestClass]
+    [TestFixture]
     public class TestLiteByApi
     {
-        [TestMethod]
+        [Test]
         public void TestAllTypesEquality()
         {
             TestAllTypesLite msg = TestAllTypesLite.DefaultInstance;
@@ -57,7 +57,7 @@ namespace Google.ProtocolBuffers
             Assert.IsTrue(msg.Equals(copy));
         }
 
-        [TestMethod]
+        [Test]
         public void TestEqualityOnExtensions()
         {
             TestAllExtensionsLite msg = TestAllExtensionsLite.DefaultInstance;
@@ -72,13 +72,13 @@ namespace Google.ProtocolBuffers
             Assert.IsTrue(msg.Equals(copy));
         }
 
-        [TestMethod]
+        [Test]
         public void TestAllTypesToString()
         {
             TestAllTypesLite msg = TestAllTypesLite.DefaultInstance;
             TestAllTypesLite copy = msg.ToBuilder().Build();
             Assert.AreEqual(msg.ToString(), copy.ToString());
-            Assert.AreEqual(0, msg.ToString().Length);
+            Assert.IsEmpty(msg.ToString());
             msg = msg.ToBuilder().SetOptionalInt32(-1).Build();
             Assert.AreEqual("optional_int32: -1", msg.ToString().TrimEnd());
             msg = msg.ToBuilder().SetOptionalString("abc123").Build();
@@ -86,16 +86,16 @@ namespace Google.ProtocolBuffers
                             msg.ToString().Replace("\r", "").TrimEnd());
         }
 
-        [TestMethod]
+        [Test]
         public void TestAllTypesDefaultedRoundTrip()
         {
             TestAllTypesLite msg = TestAllTypesLite.DefaultInstance;
             Assert.IsTrue(msg.IsInitialized);
             TestAllTypesLite copy = TestAllTypesLite.CreateBuilder().MergeFrom(msg.ToByteArray()).Build();
-            TestUtil.AssertBytesEqual(msg.ToByteArray(), copy.ToByteArray());
+            Assert.AreEqual(msg.ToByteArray(), copy.ToByteArray());
         }
 
-        [TestMethod]
+        [Test]
         public void TestAllTypesModifiedRoundTrip()
         {
             TestAllTypesLite msg = TestAllTypesLite.DefaultInstance;
@@ -115,7 +115,7 @@ namespace Google.ProtocolBuffers
                 .AddRepeatedGroup(TestAllTypesLite.Types.RepeatedGroup.CreateBuilder().SetA('A').Build())
                 ;
             TestAllTypesLite copy = TestAllTypesLite.CreateBuilder().MergeFrom(msg.ToByteArray()).Build();
-            TestUtil.AssertBytesEqual(msg.ToByteArray(), copy.ToByteArray());
+            Assert.AreEqual(msg.ToByteArray(), copy.ToByteArray());
         }
     }
 }

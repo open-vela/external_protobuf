@@ -38,14 +38,14 @@ using System;
 using System.Collections.Generic;
 using Google.ProtocolBuffers;
 using Google.ProtocolBuffers.TestProtos;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace Google.ProtocolBuffers
 {
-    [TestClass]
+    [TestFixture]
     public class InteropLiteTest
     {
-        [TestMethod]
+        [Test]
         public void TestConvertFromFullMinimal()
         {
             TestInteropPerson person = TestInteropPerson.CreateBuilder()
@@ -56,10 +56,10 @@ namespace Google.ProtocolBuffers
 
             TestInteropPersonLite copy = TestInteropPersonLite.ParseFrom(person.ToByteArray());
 
-            TestUtil.AssertBytesEqual(person.ToByteArray(), copy.ToByteArray());
+            Assert.AreEqual(person.ToByteArray(), copy.ToByteArray());
         }
 
-        [TestMethod]
+        [Test]
         public void TestConvertFromFullComplete()
         {
             TestInteropPerson person = TestInteropPerson.CreateBuilder()
@@ -82,10 +82,10 @@ namespace Google.ProtocolBuffers
 
             TestInteropPersonLite copy = TestInteropPersonLite.ParseFrom(person.ToByteArray(), registry);
 
-            TestUtil.AssertBytesEqual(person.ToByteArray(), copy.ToByteArray());
+            Assert.AreEqual(person.ToByteArray(), copy.ToByteArray());
         }
 
-        [TestMethod]
+        [Test]
         public void TestConvertFromLiteMinimal()
         {
             TestInteropPersonLite person = TestInteropPersonLite.CreateBuilder()
@@ -96,10 +96,10 @@ namespace Google.ProtocolBuffers
 
             TestInteropPerson copy = TestInteropPerson.ParseFrom(person.ToByteArray());
 
-            TestUtil.AssertBytesEqual(person.ToByteArray(), copy.ToByteArray());
+            Assert.AreEqual(person.ToByteArray(), copy.ToByteArray());
         }
 
-        [TestMethod]
+        [Test]
         public void TestConvertFromLiteComplete()
         {
             TestInteropPersonLite person = TestInteropPersonLite.CreateBuilder()
@@ -122,7 +122,7 @@ namespace Google.ProtocolBuffers
 
             TestInteropPerson copy = TestInteropPerson.ParseFrom(person.ToByteArray(), registry);
 
-            TestUtil.AssertBytesEqual(person.ToByteArray(), copy.ToByteArray());
+            Assert.AreEqual(person.ToByteArray(), copy.ToByteArray());
         }
 
         public ByteString AllBytes
@@ -136,7 +136,7 @@ namespace Google.ProtocolBuffers
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestCompareStringValues()
         {
             TestInteropPersonLite person = TestInteropPersonLite.CreateBuilder()
@@ -147,7 +147,7 @@ namespace Google.ProtocolBuffers
                 .AddPhone(TestInteropPersonLite.Types.PhoneNumber.CreateBuilder().SetNumber("555-1234").Build())
                 .AddPhone(
                     TestInteropPersonLite.Types.PhoneNumber.CreateBuilder().SetNumber(
-                        System.Text.Encoding.UTF8.GetString(AllBytes.ToByteArray(), 0, AllBytes.Length)).Build())
+                        System.Text.Encoding.ASCII.GetString(AllBytes.ToByteArray())).Build())
                 .AddAddresses(
                     TestInteropPersonLite.Types.Addresses.CreateBuilder().SetAddress("123 Seseme").SetCity("Wonderland")
                         .SetState("NA").SetZip(12345).Build())
@@ -161,7 +161,7 @@ namespace Google.ProtocolBuffers
 
             TestInteropPerson copy = TestInteropPerson.ParseFrom(person.ToByteArray(), registry);
 
-            TestUtil.AssertBytesEqual(person.ToByteArray(), copy.ToByteArray());
+            Assert.AreEqual(person.ToByteArray(), copy.ToByteArray());
 
             TestInteropPerson.Builder copyBuilder = TestInteropPerson.CreateBuilder();
             TextFormat.Merge(
@@ -169,7 +169,7 @@ namespace Google.ProtocolBuffers
                                           "[protobuf_unittest_extra.employee_id]"), registry, copyBuilder);
 
             copy = copyBuilder.Build();
-            TestUtil.AssertBytesEqual(person.ToByteArray(), copy.ToByteArray());
+            Assert.AreEqual(person.ToByteArray(), copy.ToByteArray());
 
             string liteText = person.ToString().TrimEnd().Replace("\r", "");
             string fullText = copy.ToString().TrimEnd().Replace("\r", "");

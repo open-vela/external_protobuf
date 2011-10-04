@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Text;
 using Google.ProtocolBuffers.TestProtos;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace Google.ProtocolBuffers
 {
-    [TestClass]
+    [TestFixture]
     public class GeneratedBuilderTest
     {
         class OneTimeEnumerator<T> : IEnumerable<T>
@@ -27,7 +27,7 @@ namespace Google.ProtocolBuffers
             { return GetEnumerator(); }
         }
 
-        [TestMethod]
+        [Test]
         public void DoesNotEnumerateTwiceForMessageList()
         {
             TestAllTypes.Builder b = new TestAllTypes.Builder();
@@ -35,19 +35,19 @@ namespace Google.ProtocolBuffers
                 new OneTimeEnumerator<ForeignMessage>(
                     ForeignMessage.DefaultInstance));
         }
-        [TestMethod]
+        [Test]
         public void DoesNotEnumerateTwiceForPrimitiveList()
         {
             TestAllTypes.Builder b = new TestAllTypes.Builder();
             b.AddRangeRepeatedInt32(new OneTimeEnumerator<int>(1));
         }
-        [TestMethod]
+        [Test]
         public void DoesNotEnumerateTwiceForStringList()
         {
             TestAllTypes.Builder b = new TestAllTypes.Builder();
             b.AddRangeRepeatedString(new OneTimeEnumerator<string>("test"));
         }
-        [TestMethod]
+        [Test]
         public void DoesNotEnumerateTwiceForEnumList()
         {
             TestAllTypes.Builder b = new TestAllTypes.Builder();
@@ -69,7 +69,7 @@ namespace Google.ProtocolBuffers
             Assert.Fail("Expected exception of type " + typeof(T));
         }
 
-        [TestMethod]
+        [Test]
         public void DoesNotAddNullToMessageListByAddRange()
         {
             TestAllTypes.Builder b = new TestAllTypes.Builder();
@@ -77,7 +77,7 @@ namespace Google.ProtocolBuffers
                 () => b.AddRangeRepeatedForeignMessage(new ForeignMessage[] { null })
                     );
         }
-        [TestMethod]
+        [Test]
         public void DoesNotAddNullToMessageListByAdd()
         {
             TestAllTypes.Builder b = new TestAllTypes.Builder();
@@ -85,7 +85,7 @@ namespace Google.ProtocolBuffers
                 () => b.AddRepeatedForeignMessage((ForeignMessage)null)
                     );
         }
-        [TestMethod]
+        [Test]
         public void DoesNotAddNullToMessageListBySet()
         {
             TestAllTypes.Builder b = new TestAllTypes.Builder();
@@ -94,7 +94,7 @@ namespace Google.ProtocolBuffers
                 () => b.SetRepeatedForeignMessage(0, (ForeignMessage)null)
                     );
         }
-        [TestMethod]
+        [Test]
         public void DoesNotAddNullToStringListByAddRange()
         {
             TestAllTypes.Builder b = new TestAllTypes.Builder();
@@ -102,7 +102,7 @@ namespace Google.ProtocolBuffers
                 () => b.AddRangeRepeatedString(new String[] { null })
                     );
         }
-        [TestMethod]
+        [Test]
         public void DoesNotAddNullToStringListByAdd()
         {
             TestAllTypes.Builder b = new TestAllTypes.Builder();
@@ -110,7 +110,7 @@ namespace Google.ProtocolBuffers
                 () => b.AddRepeatedString(null)
                     );
         }
-        [TestMethod]
+        [Test]
         public void DoesNotAddNullToStringListBySet()
         {
             TestAllTypes.Builder b = new TestAllTypes.Builder();

@@ -36,14 +36,14 @@
 
 using Google.ProtocolBuffers.DescriptorProtos;
 using Google.ProtocolBuffers.Descriptors;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace Google.ProtocolBuffers
 {
-    [TestClass]
+    [TestFixture]
     public class DescriptorUtilTest
     {
-        [TestMethod]
+        [Test]
         public void ExplicitNamespace()
         {
             FileDescriptorProto proto = new FileDescriptorProto.Builder
@@ -60,7 +60,7 @@ namespace Google.ProtocolBuffers
             Assert.AreEqual("Foo.Bar", descriptor.CSharpOptions.Namespace);
         }
 
-        [TestMethod]
+        [Test]
         public void NoNamespaceFallsBackToPackage()
         {
             FileDescriptorProto proto = new FileDescriptorProto.Builder {Name = "x", Package = "pack"}.Build();
@@ -68,7 +68,7 @@ namespace Google.ProtocolBuffers
             Assert.AreEqual("pack", descriptor.CSharpOptions.Namespace);
         }
 
-        [TestMethod]
+        [Test]
         public void NoNamespaceOrPackageFallsBackToEmptyString()
         {
             FileDescriptorProto proto = new FileDescriptorProto.Builder {Name = "x"}.Build();
@@ -76,7 +76,7 @@ namespace Google.ProtocolBuffers
             Assert.AreEqual("", descriptor.CSharpOptions.Namespace);
         }
 
-        [TestMethod]
+        [Test]
         public void ExplicitlyNamedFileClass()
         {
             FileDescriptorProto proto = new FileDescriptorProto.Builder
@@ -92,7 +92,7 @@ namespace Google.ProtocolBuffers
             Assert.AreEqual("Foo", descriptor.CSharpOptions.UmbrellaClassname);
         }
 
-        [TestMethod]
+        [Test]
         public void ImplicitFileClassWithProtoSuffix()
         {
             FileDescriptorProto proto = new FileDescriptorProto.Builder {Name = "foo_bar.proto"}.Build();
@@ -100,7 +100,7 @@ namespace Google.ProtocolBuffers
             Assert.AreEqual("FooBar", descriptor.CSharpOptions.UmbrellaClassname);
         }
 
-        [TestMethod]
+        [Test]
         public void ImplicitFileClassWithProtoDevelSuffix()
         {
             FileDescriptorProto proto = new FileDescriptorProto.Builder {Name = "foo_bar.protodevel"}.Build();
@@ -108,7 +108,7 @@ namespace Google.ProtocolBuffers
             Assert.AreEqual("FooBar", descriptor.CSharpOptions.UmbrellaClassname);
         }
 
-        [TestMethod]
+        [Test]
         public void ImplicitFileClassWithNoSuffix()
         {
             FileDescriptorProto proto = new FileDescriptorProto.Builder {Name = "foo_bar"}.Build();
@@ -116,7 +116,7 @@ namespace Google.ProtocolBuffers
             Assert.AreEqual("FooBar", descriptor.CSharpOptions.UmbrellaClassname);
         }
 
-        [TestMethod]
+        [Test]
         public void ImplicitFileClassWithDirectoryStructure()
         {
             FileDescriptorProto proto = new FileDescriptorProto.Builder {Name = "x/y/foo_bar"}.Build();

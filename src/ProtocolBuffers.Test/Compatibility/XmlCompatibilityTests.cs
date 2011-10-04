@@ -2,18 +2,11 @@ using System.IO;
 using System.Xml;
 using Google.ProtocolBuffers.Serialization;
 using Google.ProtocolBuffers.TestProtos;
-#if SILVERLIGHT
-using TestClass = Microsoft.VisualStudio.TestTools.UnitTesting.TestClassAttribute;
-using Test = Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute;
-using Assert = Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
-#else
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-#endif
-
+using NUnit.Framework;
 
 namespace Google.ProtocolBuffers.Compatibility
 {
-    [TestClass]
+    [TestFixture]
     public class XmlCompatibilityTests : CompatibilityTests
     {
         protected override object SerializeMessage<TMessage, TBuilder>(TMessage message)
@@ -31,7 +24,7 @@ namespace Google.ProtocolBuffers.Compatibility
         }
     }
 
-    [TestClass]
+    [TestFixture]
     public class XmlCompatibilityFormattedTests : CompatibilityTests
     {
         protected override object SerializeMessage<TMessage, TBuilder>(TMessage message)
