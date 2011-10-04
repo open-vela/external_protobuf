@@ -18,8 +18,7 @@ namespace Google.ProtocolBuffers
             TestXmlMessage.Builder builder = TestXmlMessage.CreateBuilder();
 
             XmlReader rdr = XmlReader.Create(new StringReader(@"<root><valid>true</valid></root>"));
-            //3.5: builder.MergeFromXml(rdr);
-            Extensions.MergeFromXml(builder, rdr);
+            builder.MergeFromXml(rdr);
 
             TestXmlMessage message = builder.Build();
             Assert.AreEqual(true, message.Valid);
@@ -33,8 +32,7 @@ namespace Google.ProtocolBuffers
                 .SetValid(true)
                 .Build();
 
-            //3.5: string Xml = message.ToXml();
-            string Xml = Extensions.ToXml(message);
+            string Xml = message.ToXml();
 
             Assert.AreEqual(@"<root><valid>true</valid></root>", Xml);
         }
@@ -77,9 +75,9 @@ namespace Google.ProtocolBuffers
         public void TestToXmlParseFromXml()
         {
             TestAllTypes msg = new TestAllTypes.Builder().SetDefaultBool(true).Build();
-            string xml = Extensions.ToXml(msg);
+            string xml = msg.ToXml();
             Assert.AreEqual("<root><default_bool>true</default_bool></root>", xml);
-            TestAllTypes copy = Extensions.MergeFromXml(new TestAllTypes.Builder(), XmlReader.Create(new StringReader(xml))).Build();
+            TestAllTypes copy = new TestAllTypes.Builder().MergeFromXml(XmlReader.Create(new StringReader(xml))).Build();
             Assert.IsTrue(copy.HasDefaultBool && copy.DefaultBool);
             Assert.AreEqual(msg, copy);
         }
@@ -88,9 +86,9 @@ namespace Google.ProtocolBuffers
         public void TestToXmlParseFromXmlWithRootName()
         {
             TestAllTypes msg = new TestAllTypes.Builder().SetDefaultBool(true).Build();
-            string xml = Extensions.ToXml(msg, "message");
+            string xml = msg.ToXml("message");
             Assert.AreEqual("<message><default_bool>true</default_bool></message>", xml);
-            TestAllTypes copy = Extensions.MergeFromXml(new TestAllTypes.Builder(), "message", XmlReader.Create(new StringReader(xml))).Build();
+            TestAllTypes copy = new TestAllTypes.Builder().MergeFromXml("message", XmlReader.Create(new StringReader(xml))).Build();
             Assert.IsTrue(copy.HasDefaultBool && copy.DefaultBool);
             Assert.AreEqual(msg, copy);
         }
@@ -449,7 +447,7 @@ namespace Google.ProtocolBuffers
             StringBuilder sb = new StringBuilder(8192);
             for (int i = 0; i < 80; i++)
                 sb.Append("<child>");
-            TestXmlRescursive msg = Extensions.MergeFromXml(new TestXmlRescursive.Builder(), "child", XmlReader.Create(new StringReader(sb.ToString()))).Build();
+            TestXmlRescursive msg = new TestXmlRescursive.Builder().MergeFromXml("child", XmlReader.Create(new StringReader(sb.ToString()))).Build();
         }
     }
 }

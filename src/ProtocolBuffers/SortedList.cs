@@ -34,7 +34,7 @@
 
 #endregion
 
-#if SILVERLIGHT
+#if SILVERLIGHT2
 using System.Collections;
 using System.Collections.Generic;
 
