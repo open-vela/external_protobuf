@@ -34,36 +34,36 @@
 
 #endregion
 
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using Google.ProtocolBuffers.TestProtos;
 
 namespace Google.ProtocolBuffers.Descriptors
 {
-    [TestClass]
+    [TestFixture]
     public class MessageDescriptorTest
     {
-        [TestMethod]
+        [Test]
         public void FindPropertyWithDefaultName()
         {
             Assert.AreSame(OptionsMessage.Descriptor.FindFieldByNumber(OptionsMessage.NormalFieldNumber),
                            OptionsMessage.Descriptor.FindFieldByPropertyName("Normal"));
         }
 
-        [TestMethod]
+        [Test]
         public void FindPropertyWithAutoModifiedName()
         {
             Assert.AreSame(OptionsMessage.Descriptor.FindFieldByNumber(OptionsMessage.OptionsMessage_FieldNumber),
                            OptionsMessage.Descriptor.FindFieldByPropertyName("OptionsMessage_"));
         }
 
-        [TestMethod]
+        [Test]
         public void FindPropertyWithCustomizedName()
         {
             Assert.AreSame(OptionsMessage.Descriptor.FindFieldByNumber(OptionsMessage.CustomNameFieldNumber),
                            OptionsMessage.Descriptor.FindFieldByPropertyName("CustomName"));
         }
 
-        [TestMethod]
+        [Test]
         public void FindPropertyWithInvalidName()
         {
             Assert.IsNull(OptionsMessage.Descriptor.FindFieldByPropertyName("Bogus"));

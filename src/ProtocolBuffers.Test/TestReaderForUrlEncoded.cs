@@ -1,16 +1,16 @@
 using System;
 using System.IO;
 using System.Text;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using Google.ProtocolBuffers.TestProtos;
 using Google.ProtocolBuffers.Serialization.Http;
 
 namespace Google.ProtocolBuffers
 {
-    [TestClass]
+    [TestFixture]
     public class TestReaderForUrlEncoded
     {
-        [TestMethod]
+        [Test]
         public void Example_FromQueryString()
         {
             Uri sampleUri = new Uri("http://sample.com/Path/File.ext?text=two+three%20four&valid=true&numbers=1&numbers=2", UriKind.Absolute);
@@ -28,7 +28,7 @@ namespace Google.ProtocolBuffers
             Assert.AreEqual(2, message.NumbersList[1]);
         }
 
-        [TestMethod]
+        [Test]
         public void Example_FromFormData()
         {
             Stream rawPost = new MemoryStream(Encoding.UTF8.GetBytes("text=two+three%20four&valid=true&numbers=1&numbers=2"), false);
@@ -46,7 +46,7 @@ namespace Google.ProtocolBuffers
             Assert.AreEqual(2, message.NumbersList[1]);
         }
 
-        [TestMethod]
+        [Test]
         public void TestEmptyValues()
         {
             ICodedInputStream input = FormUrlEncodedReader.CreateInstance("valid=true&text=&numbers=1");
@@ -60,7 +60,7 @@ namespace Google.ProtocolBuffers
             Assert.AreEqual(1, builder.NumbersList[0]);
         }
 
-        [TestMethod]
+        [Test]
         public void TestNoValue()
         {
             ICodedInputStream input = FormUrlEncodedReader.CreateInstance("valid=true&text&numbers=1");
@@ -74,7 +74,7 @@ namespace Google.ProtocolBuffers
             Assert.AreEqual(1, builder.NumbersList[0]);
         }
 
-        [TestMethod, ExpectedException(typeof(NotSupportedException))]
+        [Test, ExpectedException(typeof(NotSupportedException))]
         public void FormUrlEncodedReaderDoesNotSupportChildren()
         {
             ICodedInputStream input = FormUrlEncodedReader.CreateInstance("child=uh0");

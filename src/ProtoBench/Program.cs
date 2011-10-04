@@ -62,15 +62,6 @@ namespace Google.ProtocolBuffers.ProtoBench
 
         private static BenchmarkTest RunBenchmark;
 
-        private static string _logFile;
-        static void WriteLine(string format, params object[] arg)
-        {
-            if (arg.Length > 0) format = String.Format(format, arg);
-            Console.Out.WriteLine(format);
-            if (!String.IsNullOrEmpty(_logFile))
-                File.AppendAllText(_logFile, format + Environment.NewLine);
-        }
-
         [STAThread]
         public static int Main(string[] args)
         {
@@ -78,18 +69,6 @@ namespace Google.ProtocolBuffers.ProtoBench
 
             Verbose = temp.Remove("/verbose") || temp.Remove("-verbose");
             OtherFormats = temp.Remove("/formats") || temp.Remove("-formats");
-
-            foreach (string arg in temp)
-            {
-                if (arg.StartsWith("/log:", StringComparison.OrdinalIgnoreCase) || arg.StartsWith("-log:", StringComparison.OrdinalIgnoreCase))
-                {
-                    _logFile = arg.Substring(5);
-                    if (!String.IsNullOrEmpty(_logFile))
-                        File.AppendAllText(_logFile, Environment.NewLine + "Started benchmarks at " + DateTime.Now + Environment.NewLine);
-                    temp.Remove(arg);
-                    break;
-                }
-            }
 
             if (true == (FastTest = (temp.Remove("/fast") || temp.Remove("-fast"))))
             {
@@ -141,7 +120,7 @@ namespace Google.ProtocolBuffers.ProtoBench
         /// </summary>
         public static bool RunTest(string typeName, string file, byte[] inputData)
         {
-            WriteLine("Benchmarking {0} with file {1}", typeName, file);
+            Console.WriteLine("Benchmarking {0} with file {1}", typeName, file);
             IMessage defaultMessage;
             try
             {
@@ -259,7 +238,7 @@ namespace Google.ProtocolBuffers.ProtoBench
                                  new DictionaryReader(dictionary).Merge(defaultMessage.WeakCreateBuilderForType()).
                                      WeakBuild());
                 }
-                WriteLine(String.Empty);
+                Console.WriteLine();
                 return true;
             }
             catch (Exception e)
@@ -302,7 +281,7 @@ namespace Google.ProtocolBuffers.ProtoBench
             double first = (iterations*dataSize)/(elapsed.TotalSeconds*1024*1024);
             if (Verbose)
             {
-                WriteLine("Round ---: Count = {1,6}, Bps = {2,8:f3}", 0, iterations, first);
+                Console.WriteLine("Round ---: Count = {1,6}, Bps = {2,8:f3}", 0, iterations, first);
             }
             elapsed = TimeSpan.Zero;
             int max = (int) TargetTime.TotalSeconds;
@@ -315,7 +294,7 @@ namespace Google.ProtocolBuffers.ProtoBench
                 double bps = (iterations*dataSize)/(cycle.TotalSeconds*1024*1024);
                 if (Verbose)
                 {
-                    WriteLine("Round {1,3}: Count = {2,6}, Bps = {3,8:f3}",
+                    Console.WriteLine("Round {1,3}: Count = {2,6}, Bps = {3,8:f3}",
                                       0, runs, iterations, bps);
                 }
 
@@ -329,7 +308,7 @@ namespace Google.ProtocolBuffers.ProtoBench
             }
 
             Thread.EndThreadAffinity();
-            WriteLine(
+            Console.WriteLine(
                 "{1}: averages {2} per {3:f3}s for {4} runs; avg: {5:f3}mbps; best: {6:f3}mbps; worst: {7:f3}mbps",
                 0, name, totalCount/runs, elapsed.TotalSeconds/runs, runs,
                 (totalCount*dataSize)/(elapsed.TotalSeconds*1024*1024), best, worst);
@@ -352,7 +331,7 @@ namespace Google.ProtocolBuffers.ProtoBench
             // to avoid overflow issues.
             iterations = (int) ((TargetTime.Ticks/(double) elapsed.Ticks)*iterations);
             elapsed = TimeAction(action, iterations);
-            WriteLine("{0}: {1} iterations in {2:f3}s; {3:f3}MB/s",
+            Console.WriteLine("{0}: {1} iterations in {2:f3}s; {3:f3}MB/s",
                               name, iterations, elapsed.TotalSeconds,
                               (iterations*dataSize)/(elapsed.TotalSeconds*1024*1024));
         }

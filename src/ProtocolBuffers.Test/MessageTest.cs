@@ -37,7 +37,7 @@
 using System.IO;
 using Google.ProtocolBuffers.Descriptors;
 using Google.ProtocolBuffers.TestProtos;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace Google.ProtocolBuffers
 {
@@ -45,7 +45,7 @@ namespace Google.ProtocolBuffers
     /// Miscellaneous tests for message operations that apply to both
     /// generated and dynamic messages.
     /// </summary>
-    [TestClass]
+    [TestFixture]
     public class MessageTest
     {
         // =================================================================
@@ -77,7 +77,7 @@ namespace Google.ProtocolBuffers
             "repeated_string: \"qux\"\n" +
             "repeated_string: \"bar\"\n";
 
-        [TestMethod]
+        [Test]
         public void MergeFrom()
         {
             TestAllTypes result = TestAllTypes.CreateBuilder(MergeDest).MergeFrom(MergeSource).Build();
@@ -90,7 +90,7 @@ namespace Google.ProtocolBuffers
         /// As long as they have the same descriptor, this should work, but it is an
         /// entirely different code path.
         /// </summary>
-        [TestMethod]
+        [Test]
         public void MergeFromDynamic()
         {
             TestAllTypes result = (TestAllTypes) TestAllTypes.CreateBuilder(MergeDest)
@@ -103,7 +103,7 @@ namespace Google.ProtocolBuffers
         /// <summary>
         /// Test merging two DynamicMessages.
         /// </summary>
-        [TestMethod]
+        [Test]
         public void DynamicMergeFrom()
         {
             DynamicMessage result = (DynamicMessage) DynamicMessage.CreateBuilder(MergeDest)
@@ -127,7 +127,7 @@ namespace Google.ProtocolBuffers
                                                                                C = 3
                                                                            }.Build();
 
-        [TestMethod]
+        [Test]
         public void Initialization()
         {
             TestRequired.Builder builder = TestRequired.CreateBuilder();
@@ -141,7 +141,7 @@ namespace Google.ProtocolBuffers
             Assert.IsTrue(builder.IsInitialized);
         }
 
-        [TestMethod]
+        [Test]
         public void RequiredForeign()
         {
             TestRequiredForeign.Builder builder = TestRequiredForeign.CreateBuilder();
@@ -161,7 +161,7 @@ namespace Google.ProtocolBuffers
             Assert.IsTrue(builder.IsInitialized);
         }
 
-        [TestMethod]
+        [Test]
         public void RequiredExtension()
         {
             TestAllExtensions.Builder builder = TestAllExtensions.CreateBuilder();
@@ -181,7 +181,7 @@ namespace Google.ProtocolBuffers
             Assert.IsTrue(builder.IsInitialized);
         }
 
-        [TestMethod]
+        [Test]
         public void RequiredDynamic()
         {
             MessageDescriptor descriptor = TestRequired.Descriptor;
@@ -196,7 +196,7 @@ namespace Google.ProtocolBuffers
             Assert.IsTrue(builder.IsInitialized);
         }
 
-        [TestMethod]
+        [Test]
         public void RequiredDynamicForeign()
         {
             MessageDescriptor descriptor = TestRequiredForeign.Descriptor;
@@ -219,7 +219,7 @@ namespace Google.ProtocolBuffers
             Assert.IsTrue(builder.IsInitialized);
         }
 
-        [TestMethod]
+        [Test]
         public void UninitializedException()
         {
             try
@@ -233,7 +233,7 @@ namespace Google.ProtocolBuffers
             }
         }
 
-        [TestMethod]
+        [Test]
         public void BuildPartial()
         {
             // We're mostly testing that no exception is thrown.
@@ -241,7 +241,7 @@ namespace Google.ProtocolBuffers
             Assert.IsFalse(message.IsInitialized);
         }
 
-        [TestMethod]
+        [Test]
         public void NestedUninitializedException()
         {
             try
@@ -270,7 +270,7 @@ namespace Google.ProtocolBuffers
             }
         }
 
-        [TestMethod]
+        [Test]
         public void BuildNestedPartial()
         {
             // We're mostly testing that no exception is thrown.
@@ -283,7 +283,7 @@ namespace Google.ProtocolBuffers
             Assert.IsFalse(message.IsInitialized);
         }
 
-        [TestMethod]
+        [Test]
         public void ParseUnititialized()
         {
             try
@@ -297,7 +297,7 @@ namespace Google.ProtocolBuffers
             }
         }
 
-        [TestMethod]
+        [Test]
         public void ParseNestedUnititialized()
         {
             ByteString data =
@@ -329,7 +329,7 @@ namespace Google.ProtocolBuffers
             }
         }
 
-        [TestMethod]
+        [Test]
         public void DynamicUninitializedException()
         {
             try
@@ -343,7 +343,7 @@ namespace Google.ProtocolBuffers
             }
         }
 
-        [TestMethod]
+        [Test]
         public void DynamicBuildPartial()
         {
             // We're mostly testing that no exception is thrown.
@@ -351,7 +351,7 @@ namespace Google.ProtocolBuffers
             Assert.IsFalse(message.Initialized);
         }
 
-        [TestMethod]
+        [Test]
         public void DynamicParseUnititialized()
         {
             try
@@ -366,7 +366,7 @@ namespace Google.ProtocolBuffers
             }
         }
 
-        [TestMethod]
+        [Test]
         public void PackedTypesWrittenDirectlyToStream()
         {
             TestPackedTypes message = new TestPackedTypes.Builder {PackedInt32List = {0, 1, 2}}.Build();

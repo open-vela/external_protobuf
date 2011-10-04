@@ -36,27 +36,29 @@
 
 using System;
 using System.Collections.Generic;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
+
+internal delegate void Action();
 
 namespace Google.ProtocolBuffers.Collections
 {
-    [TestClass]
+    [TestFixture]
     public class PopsicleListTest
     {
-        [TestMethod]
+        [Test]
         public void MutatingOperationsOnFrozenList()
         {
             PopsicleList<string> list = new PopsicleList<string>();
             list.MakeReadOnly();
-            TestUtil.AssertNotSupported(() => list.Add(""));
-            TestUtil.AssertNotSupported(() => list.Clear());
-            TestUtil.AssertNotSupported(() => list.Insert(0, ""));
-            TestUtil.AssertNotSupported(() => list.Remove(""));
-            TestUtil.AssertNotSupported(() => list.RemoveAt(0));
-            TestUtil.AssertNotSupported(() => list.Add(new[] { "", "" }));
+            AssertNotSupported(() => list.Add(""));
+            AssertNotSupported(() => list.Clear());
+            AssertNotSupported(() => list.Insert(0, ""));
+            AssertNotSupported(() => list.Remove(""));
+            AssertNotSupported(() => list.RemoveAt(0));
+            AssertNotSupported(() => list.Add(new[] {"", ""}));
         }
 
-        [TestMethod]
+        [Test]
         public void NonMutatingOperationsOnFrozenList()
         {
             PopsicleList<string> list = new PopsicleList<string>();
@@ -69,7 +71,7 @@ namespace Google.ProtocolBuffers.Collections
             Assert.IsTrue(list.IsReadOnly);
         }
 
-        [TestMethod]
+        [Test]
         public void MutatingOperationsOnFluidList()
         {
             PopsicleList<string> list = new PopsicleList<string>();
@@ -81,7 +83,7 @@ namespace Google.ProtocolBuffers.Collections
             list.RemoveAt(0);
         }
 
-        [TestMethod]
+        [Test]
         public void NonMutatingOperationsOnFluidList()
         {
             PopsicleList<string> list = new PopsicleList<string>();
@@ -93,7 +95,7 @@ namespace Google.ProtocolBuffers.Collections
             Assert.IsFalse(list.IsReadOnly);
         }
 
-        [TestMethod]
+        [Test]
         public void DoesNotAddNullEnumerable()
         {
             PopsicleList<string> list = new PopsicleList<string>();
@@ -107,7 +109,7 @@ namespace Google.ProtocolBuffers.Collections
             Assert.Fail("List should not allow nulls.");
         }
 
-        [TestMethod]
+        [Test]
         public void DoesNotAddRangeWithNull()
         {
             PopsicleList<string> list = new PopsicleList<string>();
@@ -121,7 +123,7 @@ namespace Google.ProtocolBuffers.Collections
             Assert.Fail("List should not allow nulls.");
         }
 
-        [TestMethod]
+        [Test]
         public void DoesNotAddNull()
         {
             PopsicleList<string> list = new PopsicleList<string>();
@@ -135,7 +137,7 @@ namespace Google.ProtocolBuffers.Collections
             Assert.Fail("List should not allow nulls.");
         }
 
-        [TestMethod]
+        [Test]
         public void DoesNotSetNull()
         {
             PopsicleList<string> list = new PopsicleList<string>();
@@ -148,6 +150,20 @@ namespace Google.ProtocolBuffers.Collections
             { return; }
 
             Assert.Fail("List should not allow nulls.");
+        }
+
+
+        private static void AssertNotSupported(Action action)
+        {
+            try
+            {
+                action();
+                Assert.Fail("Expected NotSupportedException");
+            }
+            catch (NotSupportedException)
+            {
+                // Expected
+            }
         }
     }
 }

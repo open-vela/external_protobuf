@@ -43,7 +43,7 @@ namespace Google.ProtocolBuffers
     /// </summary>
     internal static class SilverlightCompatibility
     {
-#if SILVERLIGHT
+#if SILVERLIGHT2
         internal const RegexOptions CompiledRegexWhereAvailable = RegexOptions.None;
 #else
         internal const RegexOptions CompiledRegexWhereAvailable = RegexOptions.Compiled;

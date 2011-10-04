@@ -3,18 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Google.ProtocolBuffers.Serialization;
-#if SILVERLIGHT
-using TestClass = Microsoft.VisualStudio.TestTools.UnitTesting.TestClassAttribute;
-using Test = Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute;
-using Assert = Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
-#else
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-#endif
-
+using NUnit.Framework;
 
 namespace Google.ProtocolBuffers.Compatibility
 {
-    [TestClass]
+    [TestFixture]
     public class DictionaryCompatibilityTests : CompatibilityTests
     {
         protected override object SerializeMessage<TMessage, TBuilder>(TMessage message)

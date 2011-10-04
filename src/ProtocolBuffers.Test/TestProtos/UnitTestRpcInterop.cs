@@ -1391,7 +1391,7 @@ namespace Google.ProtocolBuffers.TestProtos {
     public SearchService(pb::IRpcDispatch dispatch) : this(dispatch, true) {
     }
     public SearchService(pb::IRpcDispatch dispatch, bool dispose) {
-      pb::ThrowHelper.ThrowIfNull(this.dispatch = dispatch, "dispatch");
+      if (null == (this.dispatch = dispatch)) throw new global::System.ArgumentNullException();
       this.dispose = dispose && dispatch is global::System.IDisposable;
     }
     
@@ -1421,7 +1421,7 @@ namespace Google.ProtocolBuffers.TestProtos {
       public Dispatch(ISearchService implementation) : this(implementation, true) {
       }
       public Dispatch(ISearchService implementation, bool dispose) {
-        pb::ThrowHelper.ThrowIfNull(this.implementation = implementation, "implementation");
+        if (null == (this.implementation = implementation)) throw new global::System.ArgumentNullException();
         this.dispose = dispose && implementation is global::System.IDisposable;
       }
       
@@ -1435,7 +1435,7 @@ namespace Google.ProtocolBuffers.TestProtos {
         switch(methodName) {
           case "Search": return response.MergeFrom(implementation.Search((global::Google.ProtocolBuffers.TestProtos.SearchRequest)request)).Build();
           case "RefineSearch": return response.MergeFrom(implementation.RefineSearch((global::Google.ProtocolBuffers.TestProtos.RefineSearchRequest)request)).Build();
-          default: throw pb::ThrowHelper.CreateMissingMethod(typeof(ISearchService), methodName);
+          default: throw new global::System.MissingMethodException(typeof(ISearchService).FullName, methodName);
         }
       }
     }
@@ -1453,7 +1453,7 @@ namespace Google.ProtocolBuffers.TestProtos {
       public ServerStub(pb::IRpcDispatch implementation) : this(implementation, true) {
       }
       public ServerStub(pb::IRpcDispatch implementation, bool dispose) {
-        pb::ThrowHelper.ThrowIfNull(this.implementation = implementation, "implementation");
+        if (null == (this.implementation = implementation)) throw new global::System.ArgumentNullException();
         this.dispose = dispose && implementation is global::System.IDisposable;
       }
       
@@ -1465,7 +1465,7 @@ namespace Google.ProtocolBuffers.TestProtos {
         switch(methodName) {
           case "Search": return implementation.CallMethod(methodName, global::Google.ProtocolBuffers.TestProtos.SearchRequest.ParseFrom(input, registry), global::Google.ProtocolBuffers.TestProtos.SearchResponse.CreateBuilder());
           case "RefineSearch": return implementation.CallMethod(methodName, global::Google.ProtocolBuffers.TestProtos.RefineSearchRequest.ParseFrom(input, registry), global::Google.ProtocolBuffers.TestProtos.SearchResponse.CreateBuilder());
-          default: throw pb::ThrowHelper.CreateMissingMethod(typeof(ISearchService), methodName);
+          default: throw new global::System.MissingMethodException(typeof(ISearchService).FullName, methodName);
         }
       }
     }

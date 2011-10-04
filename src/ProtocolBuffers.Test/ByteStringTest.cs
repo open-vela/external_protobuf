@@ -35,20 +35,20 @@
 #endregion
 
 using System.Text;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace Google.ProtocolBuffers
 {
-    [TestClass]
+    [TestFixture]
     public class ByteStringTest
     {
-        [TestMethod]
+        [Test]
         public void EmptyByteStringHasZeroSize()
         {
             Assert.AreEqual(0, ByteString.Empty.Length);
         }
 
-        [TestMethod]
+        [Test]
         public void CopyFromStringWithExplicitEncoding()
         {
             ByteString bs = ByteString.CopyFrom("AB", Encoding.Unicode);
@@ -59,19 +59,19 @@ namespace Google.ProtocolBuffers
             Assert.AreEqual(0, bs[3]);
         }
 
-        [TestMethod]
+        [Test]
         public void IsEmptyWhenEmpty()
         {
             Assert.IsTrue(ByteString.CopyFromUtf8("").IsEmpty);
         }
 
-        [TestMethod]
+        [Test]
         public void IsEmptyWhenNotEmpty()
         {
             Assert.IsFalse(ByteString.CopyFromUtf8("X").IsEmpty);
         }
 
-        [TestMethod]
+        [Test]
         public void CopyFromByteArrayCopiesContents()
         {
             byte[] data = new byte[1];
@@ -82,19 +82,19 @@ namespace Google.ProtocolBuffers
             Assert.AreEqual(10, bs[0]);
         }
 
-        [TestMethod]
+        [Test]
         public void ToByteArrayCopiesContents()
         {
             ByteString bs = ByteString.CopyFromUtf8("Hello");
             byte[] data = bs.ToByteArray();
-            Assert.AreEqual((byte)'H', data[0]);
-            Assert.AreEqual((byte)'H', bs[0]);
+            Assert.AreEqual('H', data[0]);
+            Assert.AreEqual('H', bs[0]);
             data[0] = 0;
             Assert.AreEqual(0, data[0]);
-            Assert.AreEqual((byte)'H', bs[0]);
+            Assert.AreEqual('H', bs[0]);
         }
 
-        [TestMethod]
+        [Test]
         public void CopyFromUtf8UsesUtf8()
         {
             ByteString bs = ByteString.CopyFromUtf8("\u20ac");
@@ -104,7 +104,7 @@ namespace Google.ProtocolBuffers
             Assert.AreEqual(0xac, bs[2]);
         }
 
-        [TestMethod]
+        [Test]
         public void CopyFromPortion()
         {
             byte[] data = new byte[] {0, 1, 2, 3, 4, 5, 6};
@@ -114,14 +114,14 @@ namespace Google.ProtocolBuffers
             Assert.AreEqual(3, bs[1]);
         }
 
-        [TestMethod]
+        [Test]
         public void ToStringUtf8()
         {
             ByteString bs = ByteString.CopyFromUtf8("\u20ac");
             Assert.AreEqual("\u20ac", bs.ToStringUtf8());
         }
 
-        [TestMethod]
+        [Test]
         public void ToStringWithExplicitEncoding()
         {
             ByteString bs = ByteString.CopyFrom("\u20ac", Encoding.Unicode);

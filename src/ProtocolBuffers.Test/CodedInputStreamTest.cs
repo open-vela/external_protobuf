@@ -38,12 +38,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Google.ProtocolBuffers.TestProtos;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using System.Diagnostics;
 
 namespace Google.ProtocolBuffers
 {
-    [TestClass]
+    [TestFixture]
     public class CodedInputStreamTest
     {
         /// <summary>
@@ -136,7 +136,7 @@ namespace Google.ProtocolBuffers
             }
         }
 
-        [TestMethod]
+        [Test]
         public void ReadVarint()
         {
             AssertReadVarint(Bytes(0x00), 0);
@@ -214,7 +214,7 @@ namespace Google.ProtocolBuffers
             }
         }
 
-        [TestMethod]
+        [Test]
         public void ReadLittleEndian()
         {
             AssertReadLittleEndian32(Bytes(0x78, 0x56, 0x34, 0x12), 0x12345678);
@@ -226,7 +226,7 @@ namespace Google.ProtocolBuffers
                 Bytes(0x78, 0x56, 0x34, 0x12, 0xf0, 0xde, 0xbc, 0x9a), 0x9abcdef012345678UL);
         }
 
-        [TestMethod]
+        [Test]
         public void DecodeZigZag32()
         {
             Assert.AreEqual(0, CodedInputStream.DecodeZigZag32(0));
@@ -239,7 +239,7 @@ namespace Google.ProtocolBuffers
             Assert.AreEqual(unchecked((int) 0x80000000), CodedInputStream.DecodeZigZag32(0xFFFFFFFF));
         }
 
-        [TestMethod]
+        [Test]
         public void DecodeZigZag64()
         {
             Assert.AreEqual(0, CodedInputStream.DecodeZigZag64(0));
@@ -254,7 +254,7 @@ namespace Google.ProtocolBuffers
             Assert.AreEqual(unchecked((long) 0x8000000000000000L), CodedInputStream.DecodeZigZag64(0xFFFFFFFFFFFFFFFFL));
         }
 
-        [TestMethod]
+        [Test]
         public void ReadWholeMessage()
         {
             TestAllTypes message = TestUtil.GetAllSet();
@@ -272,7 +272,7 @@ namespace Google.ProtocolBuffers
             }
         }
 
-        [TestMethod]
+        [Test]
         public void SkipWholeMessage()
         {
             TestAllTypes message = TestUtil.GetAllSet();
@@ -301,7 +301,7 @@ namespace Google.ProtocolBuffers
         /// Test that a bug in SkipRawBytes has been fixed: if the skip
         /// skips exactly up to a limit, this should bnot break things
         /// </summary>
-        [TestMethod]
+        [Test]
         public void SkipRawBytesBug()
         {
             byte[] rawBytes = new byte[] {1, 2};
@@ -342,7 +342,7 @@ namespace Google.ProtocolBuffers
             TestUtil.AssertAllFieldsSet(message3);
         }
 
-        [TestMethod]
+        [Test]
         public void ReadMaliciouslyLargeBlob()
         {
             MemoryStream ms = new MemoryStream();
@@ -400,7 +400,7 @@ namespace Google.ProtocolBuffers
             }
         }
 
-        [TestMethod]
+        [Test]
         public void MaliciousRecursion()
         {
             ByteString data64 = MakeRecursiveMessage(64).ToByteString();
@@ -431,7 +431,7 @@ namespace Google.ProtocolBuffers
             }
         }
 
-        [TestMethod]
+        [Test]
         public void SizeLimit()
         {
             // Have to use a Stream rather than ByteString.CreateCodedInput as SizeLimit doesn't
@@ -451,7 +451,7 @@ namespace Google.ProtocolBuffers
             }
         }
 
-        [TestMethod]
+        [Test]
         public void ResetSizeCounter()
         {
             CodedInputStream input = CodedInputStream.CreateInstance(
@@ -488,7 +488,7 @@ namespace Google.ProtocolBuffers
         /// is thrown.  Instead, the invalid bytes are replaced with the Unicode
         /// "replacement character" U+FFFD.
         /// </summary>
-        [TestMethod]
+        [Test]
         public void ReadInvalidUtf8()
         {
             MemoryStream ms = new MemoryStream();
@@ -536,7 +536,7 @@ namespace Google.ProtocolBuffers
 
         enum TestNegEnum { None = 0, Value = -2 }
 
-        [TestMethod]
+        [Test]
         public void TestNegativeEnum()
         {
             byte[] bytes = new byte[10] { 0xFE, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x01 };
@@ -549,7 +549,7 @@ namespace Google.ProtocolBuffers
             Assert.AreEqual(TestNegEnum.Value, val);
         }
 
-        [TestMethod]
+        [Test]
         public void TestNegativeEnumPackedArray()
         {
             int arraySize = 1 + (10 * 5);
@@ -577,7 +577,7 @@ namespace Google.ProtocolBuffers
             Assert.AreEqual(4, unk.Count);
         }
 
-        [TestMethod]
+        [Test]
         public void TestNegativeEnumArray()
         {
             int arraySize = 1 + 1 + (11 * 5);

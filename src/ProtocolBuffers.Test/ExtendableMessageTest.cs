@@ -38,21 +38,21 @@ using System;
 using System.Collections.Generic;
 using Google.ProtocolBuffers;
 using Google.ProtocolBuffers.TestProtos;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace Google.ProtocolBuffers
 {
-    [TestClass]
+    [TestFixture]
     public class ExtendableMessageTest
     {
-        [TestMethod, ExpectedException(typeof (ArgumentException))]
+        [Test, ExpectedException(typeof (ArgumentException))]
         public void ExtensionWriterInvalidExtension()
         {
             TestPackedExtensions.CreateBuilder()[UnitTestProtoFile.OptionalForeignMessageExtension.Descriptor] =
                 ForeignMessage.DefaultInstance;
         }
 
-        [TestMethod]
+        [Test]
         public void ExtensionWriterTest()
         {
             TestAllExtensions.Builder builder = TestAllExtensions.CreateBuilder()
@@ -128,7 +128,7 @@ namespace Google.ProtocolBuffers
                                                                                                 registry);
             TestAllExtensions copy = copyBuilder.Build();
 
-            TestUtil.AssertBytesEqual(msg.ToByteArray(), copy.ToByteArray());
+            Assert.AreEqual(msg.ToByteArray(), copy.ToByteArray());
 
             Assert.AreEqual(true, copy.GetExtension(UnitTestProtoFile.DefaultBoolExtension));
             Assert.AreEqual(ByteString.CopyFromUtf8("123"), copy.GetExtension(UnitTestProtoFile.DefaultBytesExtension));

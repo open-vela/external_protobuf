@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using UnitTest.Issues.TestProtos;
 
 namespace Google.ProtocolBuffers
 {
-    [TestClass]
+    [TestFixture]
     public class TestCornerCases
     {
-        [TestMethod]
+        [Test]
         public void TestRoundTripNegativeEnums()
         {
             NegativeEnumMessage msg = NegativeEnumMessage.CreateBuilder()

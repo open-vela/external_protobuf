@@ -37,15 +37,15 @@
 using System.Collections.Generic;
 using System.IO;
 using Google.ProtocolBuffers.TestProtos;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using NestedMessage = Google.ProtocolBuffers.TestProtos.TestAllTypes.Types.NestedMessage;
 
 namespace Google.ProtocolBuffers
 {
-    [TestClass]
+    [TestFixture]
     public class MessageStreamIteratorTest
     {
-        [TestMethod]
+        [Test]
         public void ThreeMessagesInMemory()
         {
             MemoryStream stream = new MemoryStream(MessageStreamWriterTest.ThreeMessageData);
@@ -58,7 +58,7 @@ namespace Google.ProtocolBuffers
             Assert.IsFalse(messages[2].HasBb);
         }
 
-        [TestMethod]
+        [Test]
         public void ManyMessagesShouldNotTriggerSizeAlert()
         {
             int messageSize = TestUtil.GetAllSet().SerializedSize;
