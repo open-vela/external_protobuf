@@ -98,9 +98,9 @@ namespace Google.ProtocolBuffers
         [Test]
         public void TestMergeFromJsonType()
         {
-            TestXmlMessage msg = Extensions.MergeFrom(new TestXmlMessage.Builder(),
+            TestXmlMessage msg = new TestXmlMessage.Builder().MergeFrom(
                 new MessageFormatOptions(), "application/json", new MemoryStream(Encoding.ASCII.GetBytes(
-                    Extensions.ToJson(TestXmlMessage.CreateBuilder().SetText("a").SetNumber(1).Build())
+                    TestXmlMessage.CreateBuilder().SetText("a").SetNumber(1).Build().ToJson()
                     )))
                 .Build();
             Assert.AreEqual("a", msg.Text);
@@ -109,9 +109,9 @@ namespace Google.ProtocolBuffers
         [Test]
         public void TestMergeFromXmlType()
         {
-            TestXmlMessage msg = Extensions.MergeFrom(new TestXmlMessage.Builder(),
+            TestXmlMessage msg = new TestXmlMessage.Builder().MergeFrom(
                 new MessageFormatOptions(), "application/xml", new MemoryStream(Encoding.ASCII.GetBytes(
-                    Extensions.ToXml(TestXmlMessage.CreateBuilder().SetText("a").SetNumber(1).Build())
+                    TestXmlMessage.CreateBuilder().SetText("a").SetNumber(1).Build().ToXml()
                     )))
                 .Build();
             Assert.AreEqual("a", msg.Text);
@@ -120,7 +120,7 @@ namespace Google.ProtocolBuffers
         [Test]
         public void TestMergeFromProtoType()
         {
-            TestXmlMessage msg = Extensions.MergeFrom(new TestXmlMessage.Builder(),
+            TestXmlMessage msg = new TestXmlMessage.Builder().MergeFrom(
                 new MessageFormatOptions(), "application/vnd.google.protobuf", new MemoryStream(
                     TestXmlMessage.CreateBuilder().SetText("a").SetNumber(1).Build().ToByteArray()
                     ))
@@ -132,8 +132,8 @@ namespace Google.ProtocolBuffers
         public void TestWriteToJsonType()
         {
             MemoryStream ms = new MemoryStream();
-            Extensions.WriteTo(TestXmlMessage.CreateBuilder().SetText("a").SetNumber(1).Build(),
-                new MessageFormatOptions(), "application/json", ms);
+            TestXmlMessage.CreateBuilder().SetText("a").SetNumber(1).Build()
+                .WriteTo(new MessageFormatOptions(), "application/json", ms);
 
             Assert.AreEqual(@"{""text"":""a"",""number"":1}", Encoding.UTF8.GetString(ms.ToArray()));
         }
@@ -141,8 +141,8 @@ namespace Google.ProtocolBuffers
         public void TestWriteToXmlType()
         {
             MemoryStream ms = new MemoryStream();
-            Extensions.WriteTo(TestXmlMessage.CreateBuilder().SetText("a").SetNumber(1).Build(),
-                new MessageFormatOptions(), "application/xml", ms);
+            TestXmlMessage.CreateBuilder().SetText("a").SetNumber(1).Build()
+                .WriteTo(new MessageFormatOptions(), "application/xml", ms);
 
             Assert.AreEqual("<root><text>a</text><number>1</number></root>", Encoding.UTF8.GetString(ms.ToArray()));
         }
@@ -150,8 +150,8 @@ namespace Google.ProtocolBuffers
         public void TestWriteToProtoType()
         {
             MemoryStream ms = new MemoryStream();
-            Extensions.WriteTo(TestXmlMessage.CreateBuilder().SetText("a").SetNumber(1).Build(),
-                new MessageFormatOptions(), "application/vnd.google.protobuf", ms);
+            TestXmlMessage.CreateBuilder().SetText("a").SetNumber(1).Build()
+                .WriteTo(new MessageFormatOptions(), "application/vnd.google.protobuf", ms);
 
             byte[] bytes = TestXmlMessage.CreateBuilder().SetText("a").SetNumber(1).Build().ToByteArray();
             Assert.AreEqual(bytes, ms.ToArray());
@@ -171,7 +171,7 @@ namespace Google.ProtocolBuffers
                 XmlReaderRootElementName = "my-root-node"
             };
 
-            TestXmlMessage msg = Extensions.MergeFrom(new TestXmlMessage.Builder(),
+            TestXmlMessage msg = new TestXmlMessage.Builder().MergeFrom(
                 options, "application/xml", ms)
                 .Build();
 
@@ -191,7 +191,7 @@ namespace Google.ProtocolBuffers
             };
 
             MemoryStream ms = new MemoryStream();
-            Extensions.WriteTo(message, options, "application/xml", ms);
+            message.WriteTo(options, "application/xml", ms);
             ms.Position = 0;
             
             TestXmlMessage.Builder builder = TestXmlMessage.CreateBuilder();
@@ -207,8 +207,8 @@ namespace Google.ProtocolBuffers
         public void TestJsonFormatted()
         {
             MemoryStream ms = new MemoryStream();
-            Extensions.WriteTo(TestXmlMessage.CreateBuilder().SetText("a").SetNumber(1).Build(),
-                new MessageFormatOptions() { FormattedOutput = true }, "application/json", ms);
+            TestXmlMessage.CreateBuilder().SetText("a").SetNumber(1).Build()
+                .WriteTo(new MessageFormatOptions() { FormattedOutput = true }, "application/json", ms);
 
             Assert.AreEqual("{\r\n    \"text\": \"a\",\r\n    \"number\": 1\r\n}", Encoding.UTF8.GetString(ms.ToArray()));
         }
@@ -216,8 +216,8 @@ namespace Google.ProtocolBuffers
         public void TestXmlFormatted()
         {
             MemoryStream ms = new MemoryStream();
-            Extensions.WriteTo(TestXmlMessage.CreateBuilder().SetText("a").SetNumber(1).Build(),
-                new MessageFormatOptions() { FormattedOutput = true }, "application/xml", ms);
+            TestXmlMessage.CreateBuilder().SetText("a").SetNumber(1).Build()
+                .WriteTo(new MessageFormatOptions() { FormattedOutput = true }, "application/xml", ms);
 
             Assert.AreEqual("<root>\r\n    <text>a</text>\r\n    <number>1</number>\r\n</root>", Encoding.UTF8.GetString(ms.ToArray()));
         }
@@ -233,10 +233,10 @@ namespace Google.ProtocolBuffers
             Assert.AreEqual(1, options.MimeInputTypes.Count);
 
             Stream xmlStream = new MemoryStream(Encoding.ASCII.GetBytes(
-                Extensions.ToXml(TestXmlMessage.CreateBuilder().SetText("a").SetNumber(1).Build())
-                ));
+                TestXmlMessage.CreateBuilder().SetText("a").SetNumber(1).Build().ToXml()
+                                                    ));
 
-            TestXmlMessage msg = Extensions.MergeFrom(new TestXmlMessage.Builder(),
+            TestXmlMessage msg = new TestXmlMessage.Builder().MergeFrom(
                 options, "-custom-XML-mime-type-", xmlStream)
                 .Build();
             Assert.AreEqual("a", msg.Text);
@@ -255,8 +255,8 @@ namespace Google.ProtocolBuffers
             Assert.AreEqual(1, options.MimeOutputTypes.Count);
 
             MemoryStream ms = new MemoryStream();
-            Extensions.WriteTo(TestXmlMessage.CreateBuilder().SetText("a").SetNumber(1).Build(),
-                options, "-custom-XML-mime-type-", ms);
+            TestXmlMessage.CreateBuilder().SetText("a").SetNumber(1).Build()
+                .WriteTo(options, "-custom-XML-mime-type-", ms);
 
             Assert.AreEqual("<root><text>a</text><number>1</number></root>", Encoding.UTF8.GetString(ms.ToArray()));
         }
