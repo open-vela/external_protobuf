@@ -35,14 +35,15 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Google.ProtocolBuffers.TestProtos;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Diagnostics;
 
 namespace Google.ProtocolBuffers
 {
-    [TestFixture]
+    [TestClass]
     public class CodedInputStreamTest
     {
         /// <summary>
@@ -135,7 +136,7 @@ namespace Google.ProtocolBuffers
             }
         }
 
-        [Test]
+        [TestMethod]
         public void ReadVarint()
         {
             AssertReadVarint(Bytes(0x00), 0);
@@ -213,7 +214,7 @@ namespace Google.ProtocolBuffers
             }
         }
 
-        [Test]
+        [TestMethod]
         public void ReadLittleEndian()
         {
             AssertReadLittleEndian32(Bytes(0x78, 0x56, 0x34, 0x12), 0x12345678);
@@ -225,7 +226,7 @@ namespace Google.ProtocolBuffers
                 Bytes(0x78, 0x56, 0x34, 0x12, 0xf0, 0xde, 0xbc, 0x9a), 0x9abcdef012345678UL);
         }
 
-        [Test]
+        [TestMethod]
         public void DecodeZigZag32()
         {
             Assert.AreEqual(0, CodedInputStream.DecodeZigZag32(0));
@@ -238,7 +239,7 @@ namespace Google.ProtocolBuffers
             Assert.AreEqual(unchecked((int) 0x80000000), CodedInputStream.DecodeZigZag32(0xFFFFFFFF));
         }
 
-        [Test]
+        [TestMethod]
         public void DecodeZigZag64()
         {
             Assert.AreEqual(0, CodedInputStream.DecodeZigZag64(0));
@@ -253,7 +254,7 @@ namespace Google.ProtocolBuffers
             Assert.AreEqual(unchecked((long) 0x8000000000000000L), CodedInputStream.DecodeZigZag64(0xFFFFFFFFFFFFFFFFL));
         }
 
-        [Test]
+        [TestMethod]
         public void ReadWholeMessage()
         {
             TestAllTypes message = TestUtil.GetAllSet();
@@ -271,7 +272,7 @@ namespace Google.ProtocolBuffers
             }
         }
 
-        [Test]
+        [TestMethod]
         public void SkipWholeMessage()
         {
             TestAllTypes message = TestUtil.GetAllSet();
@@ -300,7 +301,7 @@ namespace Google.ProtocolBuffers
         /// Test that a bug in SkipRawBytes has been fixed: if the skip
         /// skips exactly up to a limit, this should bnot break things
         /// </summary>
-        [Test]
+        [TestMethod]
         public void SkipRawBytesBug()
         {
             byte[] rawBytes = new byte[] {1, 2};
@@ -341,7 +342,7 @@ namespace Google.ProtocolBuffers
             TestUtil.AssertAllFieldsSet(message3);
         }
 
-        [Test]
+        [TestMethod]
         public void ReadMaliciouslyLargeBlob()
         {
             MemoryStream ms = new MemoryStream();
@@ -399,7 +400,7 @@ namespace Google.ProtocolBuffers
             }
         }
 
-        [Test]
+        [TestMethod]
         public void MaliciousRecursion()
         {
             ByteString data64 = MakeRecursiveMessage(64).ToByteString();
@@ -430,7 +431,7 @@ namespace Google.ProtocolBuffers
             }
         }
 
-        [Test]
+        [TestMethod]
         public void SizeLimit()
         {
             // Have to use a Stream rather than ByteString.CreateCodedInput as SizeLimit doesn't
@@ -450,7 +451,7 @@ namespace Google.ProtocolBuffers
             }
         }
 
-        [Test]
+        [TestMethod]
         public void ResetSizeCounter()
         {
             CodedInputStream input = CodedInputStream.CreateInstance(
@@ -487,7 +488,7 @@ namespace Google.ProtocolBuffers
         /// is thrown.  Instead, the invalid bytes are replaced with the Unicode
         /// "replacement character" U+FFFD.
         /// </summary>
-        [Test]
+        [TestMethod]
         public void ReadInvalidUtf8()
         {
             MemoryStream ms = new MemoryStream();
@@ -532,5 +533,77 @@ namespace Google.ProtocolBuffers
                 return base.Read(buffer, offset, Math.Min(count, blockSize));
             }
         }
+
+        enum TestNegEnum { None = 0, Value = -2 }
+
+        [TestMethod]
+        public void TestNegativeEnum()
+        {
+            byte[] bytes = new byte[10] { 0xFE, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x01 };
+            CodedInputStream input = CodedInputStream.CreateInstance(bytes);
+            object unk;
+            TestNegEnum val = TestNegEnum.None;
+
+            Assert.IsTrue(input.ReadEnum(ref val, out unk));
+            Assert.IsTrue(input.IsAtEnd);
+            Assert.AreEqual(TestNegEnum.Value, val);
+        }
+
+        [TestMethod]
+        public void TestNegativeEnumPackedArray()
+        {
+            int arraySize = 1 + (10 * 5);
+            int msgSize = 1 + 1 + arraySize;
+            byte[] bytes = new byte[msgSize];
+            CodedOutputStream output = CodedOutputStream.CreateInstance(bytes);
+            output.WritePackedInt32Array(8, "", arraySize, new int[] { 0, -1, -2, -3, -4, -5 });
+
+            Assert.AreEqual(0, output.SpaceLeft);
+
+            CodedInputStream input = CodedInputStream.CreateInstance(bytes);
+            uint tag;
+            string name;
+            Assert.IsTrue(input.ReadTag(out tag, out name));
+
+            List<TestNegEnum> values = new List<TestNegEnum>();
+            ICollection<object> unk;
+            input.ReadEnumArray(tag, name, values, out unk);
+
+            Assert.AreEqual(2, values.Count);
+            Assert.AreEqual(TestNegEnum.None, values[0]);
+            Assert.AreEqual(TestNegEnum.Value, values[1]);
+
+            Assert.IsNotNull(unk);
+            Assert.AreEqual(4, unk.Count);
+        }
+
+        [TestMethod]
+        public void TestNegativeEnumArray()
+        {
+            int arraySize = 1 + 1 + (11 * 5);
+            int msgSize = arraySize;
+            byte[] bytes = new byte[msgSize];
+            CodedOutputStream output = CodedOutputStream.CreateInstance(bytes);
+            output.WriteInt32Array(8, "", new int[] { 0, -1, -2, -3, -4, -5 });
+
+            Assert.AreEqual(0, output.SpaceLeft);
+
+            CodedInputStream input = CodedInputStream.CreateInstance(bytes);
+            uint tag;
+            string name;
+            Assert.IsTrue(input.ReadTag(out tag, out name));
+
+            List<TestNegEnum> values = new List<TestNegEnum>();
+            ICollection<object> unk;
+            input.ReadEnumArray(tag, name, values, out unk);
+
+            Assert.AreEqual(2, values.Count);
+            Assert.AreEqual(TestNegEnum.None, values[0]);
+            Assert.AreEqual(TestNegEnum.Value, values[1]);
+
+            Assert.IsNotNull(unk);
+            Assert.AreEqual(4, unk.Count);
+        }
+
     }
 }

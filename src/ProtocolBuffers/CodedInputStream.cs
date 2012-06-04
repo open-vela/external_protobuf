@@ -144,6 +144,9 @@ namespace Google.ProtocolBuffers
 
         #endregion
 
+        void ICodedInputStream.ReadMessageStart() { }
+        void ICodedInputStream.ReadMessageEnd() { }
+
         #region Validation
 
         /// <summary>
@@ -228,7 +231,7 @@ namespace Google.ProtocolBuffers
         /// </summary>
         public bool ReadDouble(ref double value)
         {
-#if SILVERLIGHT2 || COMPACT_FRAMEWORK_35
+#if SILVERLIGHT || COMPACT_FRAMEWORK_35
             if (BitConverter.IsLittleEndian && 8 <= bufferSize - bufferPos)
             {
                 value = BitConverter.ToDouble(buffer, bufferPos);
