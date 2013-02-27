@@ -1,6 +1,6 @@
 # Protocol Buffers - Google's data interchange format
 # Copyright 2008 Google Inc.  All rights reserved.
-# https://developers.google.com/protocol-buffers/
+# http://code.google.com/p/protobuf/
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -610,7 +610,7 @@ def _AddMessageMethods(message_descriptor, cls):
     return self._cmsg.FindInitializationErrors()
 
   def __str__(self):
-    return str(self._cmsg)
+    return self._cmsg.DebugString()
 
   def __eq__(self, other):
     if self is other:

@@ -1,6 +1,6 @@
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
-// https://developers.google.com/protocol-buffers/
+// http://code.google.com/p/protobuf/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -32,8 +32,6 @@ package com.google.protobuf;
 
 import com.google.protobuf.DescriptorProtos.*;
 
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -41,8 +39,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.WeakHashMap;
-import java.util.logging.Logger;
 import java.io.UnsupportedEncodingException;
 
 /**
@@ -64,26 +60,18 @@ import java.io.UnsupportedEncodingException;
  * @author kenton@google.com Kenton Varda
  */
 public final class Descriptors {
-  private static final Logger logger =
-      Logger.getLogger(Descriptors.class.getName());
   /**
    * Describes a {@code .proto} file, including everything defined within.
    * That includes, in particular, descriptors for all the messages and
    * file descriptors for all other imported {@code .proto} files
    * (dependencies).
    */
-  public static final class FileDescriptor extends GenericDescriptor {
+  public static final class FileDescriptor {
     /** Convert the descriptor to its protocol message representation. */
     public FileDescriptorProto toProto() { return proto; }
 
     /** Get the file name. */
     public String getName() { return proto.getName(); }
-
-    /** Returns this object. */
-    public FileDescriptor getFile() { return this; }
-
-    /** Returns the same as getName(). */
-    public String getFullName() { return proto.getName(); }
 
     /**
      * Get the proto package name.  This is the package name given by the
@@ -123,26 +111,6 @@ public final class Descriptors {
     /** Get a list of this file's public dependencies (public imports). */
     public List<FileDescriptor> getPublicDependencies() {
       return Collections.unmodifiableList(Arrays.asList(publicDependencies));
-    }
-
-    /** The syntax of the .proto file. */
-    public enum Syntax {
-      UNKNOWN("unknown"),
-      PROTO2("proto2"),
-      PROTO3("proto3");
-
-      Syntax(String name) {
-        this.name = name;
-      }
-      private final String name;
-    }
-
-    /** Get the syntax of the .proto file. */
-    public Syntax getSyntax() {
-      if (Syntax.PROTO3.name.equals(proto.getSyntax())) {
-        return Syntax.PROTO3;
-      }
-      return Syntax.PROTO2;
     }
 
     /**
@@ -245,7 +213,8 @@ public final class Descriptors {
      *
      * @param proto The protocol message form of the FileDescriptor.
      * @param dependencies {@code FileDescriptor}s corresponding to all of
-     *                     the file's dependencies.
+     *                     the file's dependencies, in the exact order listed
+     *                     in {@code proto}.
      * @throws DescriptorValidationException {@code proto} is not a valid
      *           descriptor.  This can occur for a number of reasons, e.g.
      *           because a field has an undefined type or because two messages
@@ -254,28 +223,6 @@ public final class Descriptors {
     public static FileDescriptor buildFrom(final FileDescriptorProto proto,
                                            final FileDescriptor[] dependencies)
                                     throws DescriptorValidationException {
-      return buildFrom(proto, dependencies, false);
-    }
-    
-
-    /**
-     * Construct a {@code FileDescriptor}.
-     *
-     * @param proto The protocol message form of the FileDescriptor.
-     * @param dependencies {@code FileDescriptor}s corresponding to all of
-     *                     the file's dependencies.
-     * @param allowUnknownDependencies If true, non-exist dependenncies will be
-     *           ignored and undefined message types will be replaced with a
-     *           placeholder type.
-     * @throws DescriptorValidationException {@code proto} is not a valid
-     *           descriptor.  This can occur for a number of reasons, e.g.
-     *           because a field has an undefined type or because two messages
-     *           were defined with the same name.
-     */
-    private static FileDescriptor buildFrom(
-        final FileDescriptorProto proto, final FileDescriptor[] dependencies,
-        final boolean allowUnknownDependencies)
-        throws DescriptorValidationException {
       // Building descriptors involves two steps:  translating and linking.
       // In the translation step (implemented by FileDescriptor's
       // constructor), we build an object tree mirroring the
@@ -285,10 +232,23 @@ public final class Descriptors {
       // FieldDescriptor for an embedded message contains a pointer directly
       // to the Descriptor for that message's type.  We also detect undefined
       // types in the linking step.
-      final DescriptorPool pool = new DescriptorPool(
-          dependencies, allowUnknownDependencies);
-      final FileDescriptor result = new FileDescriptor(
-          proto, dependencies, pool, allowUnknownDependencies);
+      final DescriptorPool pool = new DescriptorPool(dependencies);
+      final FileDescriptor result =
+          new FileDescriptor(proto, dependencies, pool);
+
+      if (dependencies.length != proto.getDependencyCount()) {
+        throw new DescriptorValidationException(result,
+          "Dependencies passed to FileDescriptor.buildFrom() don't match " +
+          "those listed in the FileDescriptorProto.");
+      }
+      for (int i = 0; i < proto.getDependencyCount(); i++) {
+        if (!dependencies[i].getName().equals(proto.getDependency(i))) {
+          throw new DescriptorValidationException(result,
+            "Dependencies passed to FileDescriptor.buildFrom() don't match " +
+            "those listed in the FileDescriptorProto.");
+        }
+      }
+
       result.crossLink();
       return result;
     }
@@ -336,9 +296,7 @@ public final class Descriptors {
 
       final FileDescriptor result;
       try {
-        // When building descriptors for generated code, we allow unknown
-        // dependencies by default.
-        result = buildFrom(proto, dependencies, true);
+        result = buildFrom(proto, dependencies);
       } catch (DescriptorValidationException e) {
         throw new IllegalArgumentException(
           "Invalid embedded descriptor for \"" + proto.getName() + "\".", e);
@@ -359,56 +317,6 @@ public final class Descriptors {
 
         result.setProto(proto);
       }
-    }
-
-    /**
-     * This method is to be called by generated code only.  It uses Java
-     * reflection to load the dependencies' descriptors.
-     */
-    public static void internalBuildGeneratedFileFrom(
-        final String[] descriptorDataParts,
-        final Class<?> descriptorOuterClass,
-        final String[] dependencies,
-        final String[] dependencyFileNames,
-        final InternalDescriptorAssigner descriptorAssigner) {
-      List<FileDescriptor> descriptors = new ArrayList<FileDescriptor>();
-      for (int i = 0; i < dependencies.length; i++) {
-        try {
-          Class<?> clazz =
-              descriptorOuterClass.getClassLoader().loadClass(dependencies[i]);
-          descriptors.add(
-              (FileDescriptor) clazz.getField("descriptor").get(null));
-        } catch (Exception e) {
-          // We allow unknown dependencies by default. If a dependency cannot
-          // be found we only generate a warning.
-          logger.warning("Descriptors for \"" + dependencyFileNames[i] +
-              "\" can not be found.");
-        }
-      }
-      FileDescriptor[] descriptorArray = new FileDescriptor[descriptors.size()];
-      descriptors.toArray(descriptorArray);
-      internalBuildGeneratedFileFrom(
-          descriptorDataParts, descriptorArray, descriptorAssigner);
-    }
-
-    /**
-     * This method is to be called by generated code only.  It is used to
-     * update the FileDescriptorProto associated with the descriptor by
-     * parsing it again with the given ExtensionRegistry. This is needed to
-     * recognize custom options.
-     */
-    public static void internalUpdateFileDescriptor(
-        final FileDescriptor descriptor,
-        final ExtensionRegistry registry) {
-      ByteString bytes = descriptor.proto.toByteString();
-      FileDescriptorProto proto;
-      try {
-        proto = FileDescriptorProto.parseFrom(bytes, registry);
-      } catch (InvalidProtocolBufferException e) {
-        throw new IllegalArgumentException(
-          "Failed to parse protocol buffer descriptor for generated code.", e);
-      }
-      descriptor.setProto(proto);
     }
 
     /**
@@ -438,38 +346,22 @@ public final class Descriptors {
 
     private FileDescriptor(final FileDescriptorProto proto,
                            final FileDescriptor[] dependencies,
-                           final DescriptorPool pool,
-                           boolean allowUnknownDependencies)
+                           final DescriptorPool pool)
                     throws DescriptorValidationException {
       this.pool = pool;
       this.proto = proto;
       this.dependencies = dependencies.clone();
-      HashMap<String, FileDescriptor> nameToFileMap =
-          new HashMap<String, FileDescriptor>();
-      for (FileDescriptor file : dependencies) {
-        nameToFileMap.put(file.getName(), file);
-      }
-      List<FileDescriptor> publicDependencies = new ArrayList<FileDescriptor>();
+      this.publicDependencies =
+          new FileDescriptor[proto.getPublicDependencyCount()];
       for (int i = 0; i < proto.getPublicDependencyCount(); i++) {
         int index = proto.getPublicDependency(i);
-        if (index < 0 || index >= proto.getDependencyCount()) {
+        if (index < 0 || index >= this.dependencies.length) {
           throw new DescriptorValidationException(this,
               "Invalid public dependency index.");
         }
-        String name = proto.getDependency(index);
-        FileDescriptor file = nameToFileMap.get(name);
-        if (file == null) {
-          if (!allowUnknownDependencies) {
-            throw new DescriptorValidationException(this,
-                "Invalid public dependency: " + name);
-          }
-          // Ignore unknown dependencies.
-        } else {
-          publicDependencies.add(file);
-        }
+        this.publicDependencies[i] =
+            this.dependencies[proto.getPublicDependency(i)];
       }
-      this.publicDependencies = new FileDescriptor[publicDependencies.size()];
-      publicDependencies.toArray(this.publicDependencies);
 
       pool.addPackage(getPackage(), this);
 
@@ -494,27 +386,6 @@ public final class Descriptors {
         extensions[i] = new FieldDescriptor(
           proto.getExtension(i), this, null, i, true);
       }
-    }
-    
-    /**
-     * Create a placeholder FileDescriptor for a message Descriptor. 
-     */
-    FileDescriptor(String packageName, Descriptor message)
-        throws DescriptorValidationException {
-      this.pool = new DescriptorPool(new FileDescriptor[0], true);
-      this.proto = FileDescriptorProto.newBuilder()
-          .setName(message.getFullName() + ".placeholder.proto")
-          .setPackage(packageName).addMessageType(message.toProto()).build();
-      this.dependencies = new FileDescriptor[0];
-      this.publicDependencies = new FileDescriptor[0];
-
-      messageTypes = new Descriptor[] {message};
-      enumTypes = new EnumDescriptor[0];
-      services = new ServiceDescriptor[0];
-      extensions = new FieldDescriptor[0];
-
-      pool.addPackage(packageName, this);
-      pool.addSymbol(message);
     }
 
     /** Look up and cross-link all field types, etc. */
@@ -561,16 +432,12 @@ public final class Descriptors {
         extensions[i].setProto(proto.getExtension(i));
       }
     }
-    
-    boolean supportsUnknownEnumValue() {
-      return getSyntax() == Syntax.PROTO3;
-    }
   }
 
   // =================================================================
 
   /** Describes a message type. */
-  public static final class Descriptor extends GenericDescriptor {
+  public static final class Descriptor implements GenericDescriptor {
     /**
      * Get the index of this descriptor within its parent.  In other words,
      * given a {@link FileDescriptor} {@code file}, the following is true:
@@ -619,11 +486,6 @@ public final class Descriptors {
       return Collections.unmodifiableList(Arrays.asList(fields));
     }
 
-    /** Get a list of this message type's oneofs. */
-    public List<OneofDescriptor> getOneofs() {
-      return Collections.unmodifiableList(Arrays.asList(oneofs));
-    }
-
     /** Get a list of this message type's extensions. */
     public List<FieldDescriptor> getExtensions() {
       return Collections.unmodifiableList(Arrays.asList(extensions));
@@ -648,14 +510,6 @@ public final class Descriptors {
         }
       }
       return false;
-    }
-
-    /**
-     * Indicates whether the message can be extended.  That is, whether it has
-     * any "extensions x to y" ranges declared on it.
-     */
-    public boolean isExtendable() {
-      return proto.getExtensionRangeList().size() != 0;
     }
 
     /**
@@ -722,33 +576,6 @@ public final class Descriptors {
     private final EnumDescriptor[] enumTypes;
     private final FieldDescriptor[] fields;
     private final FieldDescriptor[] extensions;
-    private final OneofDescriptor[] oneofs;
-
-    // Used to create a placeholder when the type cannot be found.
-    Descriptor(final String fullname) throws DescriptorValidationException {
-      String name = fullname;
-      String packageName = "";
-      int pos = fullname.lastIndexOf('.');
-      if (pos != -1) {
-        name = fullname.substring(pos + 1);
-        packageName = fullname.substring(0, pos);
-      }
-      this.index = 0;
-      this.proto = DescriptorProto.newBuilder().setName(name).addExtensionRange(
-          DescriptorProto.ExtensionRange.newBuilder().setStart(1)
-          .setEnd(536870912).build()).build();
-      this.fullName = fullname;
-      this.containingType = null;
-
-      this.nestedTypes = new Descriptor[0];
-      this.enumTypes = new EnumDescriptor[0];
-      this.fields = new FieldDescriptor[0];
-      this.extensions = new FieldDescriptor[0];
-      this.oneofs = new OneofDescriptor[0];
-      
-      // Create a placeholder FileDescriptor to hold this message.
-      this.file = new FileDescriptor(packageName, this);
-    }
 
     private Descriptor(final DescriptorProto proto,
                        final FileDescriptor file,
@@ -760,12 +587,6 @@ public final class Descriptors {
       fullName = computeFullName(file, parent, proto.getName());
       this.file = file;
       containingType = parent;
-
-      oneofs = new OneofDescriptor[proto.getOneofDeclCount()];
-      for (int i = 0; i < proto.getOneofDeclCount(); i++) {
-        oneofs[i] = new OneofDescriptor(
-          proto.getOneofDecl(i), file, this, i);
-      }
 
       nestedTypes = new Descriptor[proto.getNestedTypeCount()];
       for (int i = 0; i < proto.getNestedTypeCount(); i++) {
@@ -789,17 +610,6 @@ public final class Descriptors {
       for (int i = 0; i < proto.getExtensionCount(); i++) {
         extensions[i] = new FieldDescriptor(
           proto.getExtension(i), file, this, i, true);
-      }
-
-      for (int i = 0; i < proto.getOneofDeclCount(); i++) {
-        oneofs[i].fields = new FieldDescriptor[oneofs[i].getFieldCount()];
-        oneofs[i].fieldCount = 0;
-      }
-      for (int i = 0; i < proto.getFieldCount(); i++) {
-        OneofDescriptor oneofDescriptor = fields[i].getContainingOneof();
-        if (oneofDescriptor != null) {
-          oneofDescriptor.fields[oneofDescriptor.fieldCount++] = fields[i];
-        }
       }
 
       file.pool.addSymbol(this);
@@ -846,8 +656,7 @@ public final class Descriptors {
 
   /** Describes a field of a message type. */
   public static final class FieldDescriptor
-        extends GenericDescriptor
-        implements Comparable<FieldDescriptor>,
+      implements GenericDescriptor, Comparable<FieldDescriptor>,
                  FieldSet.FieldDescriptorLite<FieldDescriptor> {
     /**
      * Get the index of this descriptor within its parent.
@@ -891,17 +700,6 @@ public final class Descriptors {
     public WireFormat.FieldType getLiteType() {
       return table[type.ordinal()];
     }
-
-    /** For internal use only. */
-    public boolean needsUtf8Check() {
-      return (type == Type.STRING) && (getFile().getOptions().getJavaStringCheckUtf8());
-    }
-
-    public boolean isMapField() {
-      return getType() == Type.MESSAGE && isRepeated()
-          && getMessageType().getOptions().getMapEntry();
-    }
-
     // I'm pretty sure values() constructs a new array every time, since there
     // is nothing stopping the caller from mutating the array.  Therefore we
     // make a static copy here.
@@ -962,9 +760,6 @@ public final class Descriptors {
      * {@link #getExtensionScope()}.
      */
     public Descriptor getContainingType() { return containingType; }
-
-    /** Get the field's containing oneof. */
-    public OneofDescriptor getContainingOneof() { return containingOneof; }
 
     /**
      * For extensions defined nested within message types, gets the outer
@@ -1032,11 +827,6 @@ public final class Descriptors {
       return getNumber() - other.getNumber();
     }
 
-    @Override
-    public String toString() {
-      return getFullName();
-    }
-
     private final int index;
 
     private FieldDescriptorProto proto;
@@ -1048,7 +838,6 @@ public final class Descriptors {
     private Type type;
     private Descriptor containingType;
     private Descriptor messageType;
-    private OneofDescriptor containingOneof;
     private EnumDescriptor enumType;
     private Object defaultValue;
 
@@ -1139,6 +928,13 @@ public final class Descriptors {
           "Field numbers must be positive integers.");
       }
 
+      // Only repeated primitive fields may be packed.
+      if (proto.getOptions().getPacked() && !isPackable()) {
+        throw new DescriptorValidationException(this,
+          "[packed = true] can only be specified for repeated primitive " +
+          "fields.");
+      }
+
       if (isExtension) {
         if (!proto.hasExtendee()) {
           throw new DescriptorValidationException(this,
@@ -1150,31 +946,12 @@ public final class Descriptors {
         } else {
           extensionScope = null;
         }
-
-        if (proto.hasOneofIndex()) {
-          throw new DescriptorValidationException(this,
-            "FieldDescriptorProto.oneof_index set for extension field.");
-        }
-        containingOneof = null;
       } else {
         if (proto.hasExtendee()) {
           throw new DescriptorValidationException(this,
             "FieldDescriptorProto.extendee set for non-extension field.");
         }
         containingType = parent;
-
-        if (proto.hasOneofIndex()) {
-          if (proto.getOneofIndex() < 0 ||
-              proto.getOneofIndex() >= parent.toProto().getOneofDeclCount()) {
-            throw new DescriptorValidationException(this,
-              "FieldDescriptorProto.oneof_index is out of range for type "
-              + parent.getName());
-          }
-          containingOneof = parent.getOneofs().get(proto.getOneofIndex());
-          containingOneof.fieldCount++;
-        } else {
-          containingOneof = null;
-        }
         extensionScope = null;
       }
 
@@ -1245,13 +1022,6 @@ public final class Descriptors {
           throw new DescriptorValidationException(this,
             "Field with message or enum type missing type_name.");
         }
-      }
-
-      // Only repeated primitive fields may be packed.
-      if (proto.getOptions().getPacked() && !isPackable()) {
-        throw new DescriptorValidationException(this,
-          "[packed = true] can only be specified for repeated primitive " +
-          "fields.");
       }
 
       // We don't attempt to parse the default value until here because for
@@ -1391,14 +1161,13 @@ public final class Descriptors {
       // down-cast and call mergeFrom directly.
       return ((Message.Builder) to).mergeFrom((Message) from);
     }
-
   }
 
   // =================================================================
 
   /** Describes an enum type. */
-  public static final class EnumDescriptor extends GenericDescriptor
-      implements Internal.EnumLiteMap<EnumValueDescriptor> {
+  public static final class EnumDescriptor
+      implements GenericDescriptor, Internal.EnumLiteMap<EnumValueDescriptor> {
     /**
      * Get the index of this descriptor within its parent.
      * @see Descriptors.Descriptor#getIndex()
@@ -1456,64 +1225,6 @@ public final class Descriptors {
       return file.pool.enumValuesByNumber.get(
         new DescriptorPool.DescriptorIntPair(this, number));
     }
-    
-    /**
-     * Get the enum value for a number. If no enum value has this number,
-     * construct an EnumValueDescriptor for it.
-     */
-    public EnumValueDescriptor findValueByNumberCreatingIfUnknown(final int number) {
-      EnumValueDescriptor result = findValueByNumber(number);
-      if (result != null) {
-        return result;
-      }
-      // The number represents an unknown enum value.
-      synchronized (this) {
-        // Descriptors are compared by object identity so for the same number
-        // we need to return the same EnumValueDescriptor object. This means
-        // we have to store created EnumValueDescriptors. However, as there
-        // are potentially 2G unknown enum values, storing all of these
-        // objects persistently will consume lots of memory for long-running
-        // services and it's also unnecessary as not many EnumValueDescriptors
-        // will be used at the same time.
-        //
-        // To solve the problem we take advantage of Java's weak references and
-        // rely on gc to release unused descriptors.
-        //
-        // Here is how it works:
-        //   * We store unknown EnumValueDescriptors in a WeakHashMap with the
-        //     value being a weak reference to the descriptor.
-        //   * The descriptor holds a strong reference to the key so as long
-        //     as the EnumValueDescriptor is in use, the key will be there
-        //     and the corresponding map entry will be there. Following-up
-        //     queries with the same number will return the same descriptor.
-        //   * If the user no longer uses an unknown EnumValueDescriptor,
-        //     it will be gc-ed since we only hold a weak reference to it in
-        //     the map. The key in the corresponding map entry will also be
-        //     gc-ed as the only strong reference to it is in the descriptor
-        //     which is just gc-ed. With the key being gone WeakHashMap will
-        //     then remove the whole entry. This way unknown descriptors will
-        //     be freed automatically and we don't need to do anything to
-        //     clean-up unused map entries.
-        
-        // Note: We must use "new Integer(number)" here because we don't want
-        // these Integer objects to be cached.
-        Integer key = new Integer(number);
-        WeakReference<EnumValueDescriptor> reference = unknownValues.get(key);
-        if (reference != null) {
-          result = reference.get();
-        }
-        if (result == null) {
-          result = new EnumValueDescriptor(file, this, key);
-          unknownValues.put(key, new WeakReference<EnumValueDescriptor>(result));
-        }
-      }
-      return result;
-    }
-    
-    // Used in tests only.
-    int getUnknownEnumValueDescriptorCount() {
-      return unknownValues.size();
-    }
 
     private final int index;
     private EnumDescriptorProto proto;
@@ -1521,8 +1232,6 @@ public final class Descriptors {
     private final FileDescriptor file;
     private final Descriptor containingType;
     private EnumValueDescriptor[] values;
-    private final WeakHashMap<Integer, WeakReference<EnumValueDescriptor>> unknownValues =
-        new WeakHashMap<Integer, WeakReference<EnumValueDescriptor>>();
 
     private EnumDescriptor(final EnumDescriptorProto proto,
                            final FileDescriptor file,
@@ -1569,8 +1278,8 @@ public final class Descriptors {
    * with the same number after the first become aliases of the first.
    * However, they still have independent EnumValueDescriptors.
    */
-  public static final class EnumValueDescriptor extends GenericDescriptor
-      implements Internal.EnumLite {
+  public static final class EnumValueDescriptor
+      implements GenericDescriptor, Internal.EnumLite {
     /**
      * Get the index of this descriptor within its parent.
      * @see Descriptors.Descriptor#getIndex()
@@ -1585,9 +1294,6 @@ public final class Descriptors {
 
     /** Get the value's number. */
     public int getNumber() { return proto.getNumber(); }
-    
-    @Override
-    public String toString() { return proto.getName(); }
 
     /**
      * Get the value's fully-qualified name.
@@ -1627,25 +1333,6 @@ public final class Descriptors {
       file.pool.addSymbol(this);
       file.pool.addEnumValueByNumber(this);
     }
-    
-    private Integer number;
-    // Create an unknown enum value.
-    private EnumValueDescriptor(
-        final FileDescriptor file,
-        final EnumDescriptor parent,
-        final Integer number) {
-      String name = "UNKNOWN_ENUM_VALUE_" + parent.getName() + "_" + number;
-      EnumValueDescriptorProto proto = EnumValueDescriptorProto
-          .newBuilder().setName(name).setNumber(number).build();
-      this.index = -1;
-      this.proto = proto;
-      this.file = file;
-      this.type = parent;
-      this.fullName = parent.getFullName() + '.' + proto.getName();
-      this.number = number;
-      
-      // Don't add this descriptor into pool.
-    }
 
     /** See {@link FileDescriptor#setProto}. */
     private void setProto(final EnumValueDescriptorProto proto) {
@@ -1656,7 +1343,7 @@ public final class Descriptors {
   // =================================================================
 
   /** Describes a service type. */
-  public static final class ServiceDescriptor extends GenericDescriptor {
+  public static final class ServiceDescriptor implements GenericDescriptor {
     /**
      * Get the index of this descriptor within its parent.
      * * @see Descriptors.Descriptor#getIndex()
@@ -1746,7 +1433,7 @@ public final class Descriptors {
   /**
    * Describes one method within a service type.
    */
-  public static final class MethodDescriptor extends GenericDescriptor {
+  public static final class MethodDescriptor implements GenericDescriptor {
     /**
      * Get the index of this descriptor within its parent.
      * * @see Descriptors.Descriptor#getIndex()
@@ -1850,18 +1537,14 @@ public final class Descriptors {
   // =================================================================
 
   /**
-   * All descriptors implement this to make it easier to implement tools like
-   * {@code DescriptorPool}.<p>
-   *
-   * This class is public so that the methods it exposes can be called from
-   * outside of this package. However, it should only be subclassed from
-   * nested classes of Descriptors.
+   * All descriptors except {@code FileDescriptor} implement this to make
+   * {@code DescriptorPool}'s life easier.
    */
-  public abstract static class GenericDescriptor {
-    public abstract Message toProto();
-    public abstract String getName();
-    public abstract String getFullName();
-    public abstract FileDescriptor getFile();
+  private interface GenericDescriptor {
+    Message toProto();
+    String getName();
+    String getFullName();
+    FileDescriptor getFile();
   }
 
   /**
@@ -1937,10 +1620,8 @@ public final class Descriptors {
       TYPES_ONLY, AGGREGATES_ONLY, ALL_SYMBOLS
     }
     
-    DescriptorPool(final FileDescriptor[] dependencies,
-        boolean allowUnknownDependencies) {
+    DescriptorPool(final FileDescriptor[] dependencies) {
       this.dependencies = new HashSet<FileDescriptor>();
-      this.allowUnknownDependencies = allowUnknownDependencies;
 
       for (int i = 0; i < dependencies.length; i++) {
         this.dependencies.add(dependencies[i]);
@@ -1969,7 +1650,6 @@ public final class Descriptors {
     }
 
     private final Set<FileDescriptor> dependencies;
-    private boolean allowUnknownDependencies;
 
     private final Map<String, GenericDescriptor> descriptorsByName =
       new HashMap<String, GenericDescriptor>();
@@ -2038,11 +1718,9 @@ public final class Descriptors {
       // TODO(kenton):  This could be optimized in a number of ways.
 
       GenericDescriptor result;
-      String fullname;
       if (name.startsWith(".")) {
         // Fully-qualified name.
-        fullname = name.substring(1);
-        result = findSymbol(fullname, filter);
+        result = findSymbol(name.substring(1), filter);
       } else {
         // If "name" is a compound identifier, we want to search for the
         // first component of it, then search within it for the rest.
@@ -2074,7 +1752,6 @@ public final class Descriptors {
           // Chop off the last component of the scope.
           final int dotpos = scopeToTry.lastIndexOf(".");
           if (dotpos == -1) {
-            fullname = name;
             result = findSymbol(name, filter);
             break;
           } else {
@@ -2094,7 +1771,6 @@ public final class Descriptors {
                 scopeToTry.append(name);
                 result = findSymbol(scopeToTry.toString(), filter);
               }
-              fullname = scopeToTry.toString();
               break;
             }
 
@@ -2105,24 +1781,8 @@ public final class Descriptors {
       }
 
       if (result == null) {
-        if (allowUnknownDependencies && filter == SearchFilter.TYPES_ONLY) {
-          logger.warning("The descriptor for message type \"" + name +
-              "\" can not be found and a placeholder is created for it");
-          // We create a dummy message descriptor here regardless of the
-          // expected type. If the type should be message, this dummy
-          // descriptor will work well and if the type should be enum, a
-          // DescriptorValidationException will be thrown latter. In either
-          // case, the code works as expected: we allow unknown message types
-          // but not unknwon enum types.
-          result = new Descriptor(fullname);
-          // Add the placeholder file as a dependency so we can find the
-          // placeholder symbol when resolving other references.
-          this.dependencies.add(result.getFile());
-          return result;
-        } else {
-          throw new DescriptorValidationException(relativeTo,
-              '\"' + name + "\" is not defined.");
-        }
+        throw new DescriptorValidationException(relativeTo,
+            '\"' + name + "\" is not defined.");
       } else {
         return result;
       }
@@ -2166,7 +1826,7 @@ public final class Descriptors {
      * just as placeholders so that someone cannot define, say, a message type
      * that has the same name as an existing package.
      */
-    private static final class PackageDescriptor extends GenericDescriptor {
+    private static final class PackageDescriptor implements GenericDescriptor {
       public Message toProto()        { return file.toProto(); }
       public String getName()         { return name;           }
       public String getFullName()     { return fullName;       }
@@ -2251,7 +1911,7 @@ public final class Descriptors {
         fieldsByNumber.put(key, old);
         throw new DescriptorValidationException(field,
           "Field number " + field.getNumber() +
-          " has already been used in \"" +
+          "has already been used in \"" +
           field.getContainingType().getFullName() +
           "\" by field \"" + old.getName() + "\".");
       }
@@ -2306,48 +1966,5 @@ public final class Descriptors {
         }
       }
     }
-  }
-
-  /** Describes an oneof of a message type. */
-  public static final class OneofDescriptor {
-    /** Get the index of this descriptor within its parent. */
-    public int getIndex() { return index; }
-
-    public String getName() { return proto.getName(); }
-
-    public FileDescriptor getFile() { return file; }
-
-    public String getFullName() { return fullName; }
-
-    public Descriptor getContainingType() { return containingType; }
-
-    public int getFieldCount() { return fieldCount; }
-
-    public FieldDescriptor getField(int index) {
-      return fields[index];
-    }
-
-    private OneofDescriptor(final OneofDescriptorProto proto,
-                            final FileDescriptor file,
-                            final Descriptor parent,
-                            final int index)
-                     throws DescriptorValidationException {
-      this.proto = proto;
-      fullName = computeFullName(file, parent, proto.getName());
-      this.file = file;
-      this.index = index;
-
-      containingType = parent;
-      fieldCount = 0;
-    }
-
-    private final int index;
-    private OneofDescriptorProto proto;
-    private final String fullName;
-    private final FileDescriptor file;
-
-    private Descriptor containingType;
-    private int fieldCount;
-    private FieldDescriptor[] fields;
   }
 }

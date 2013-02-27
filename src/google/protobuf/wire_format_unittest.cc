@@ -1,6 +1,6 @@
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
-// https://developers.google.com/protocol-buffers/
+// http://code.google.com/p/protobuf/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -175,43 +175,6 @@ TEST(WireFormatTest, ParsePackedExtensions) {
   TestUtil::ExpectPackedExtensionsSet(dest);
 }
 
-TEST(WireFormatTest, ParseOneof) {
-  unittest::TestOneof2 source, dest;
-  string data;
-
-  // Serialize using the generated code.
-  TestUtil::SetOneof1(&source);
-  source.SerializeToString(&data);
-
-  // Parse using WireFormat.
-  io::ArrayInputStream raw_input(data.data(), data.size());
-  io::CodedInputStream input(&raw_input);
-  WireFormat::ParseAndMergePartial(&input, &dest);
-
-  // Check.
-  TestUtil::ExpectOneofSet1(dest);
-}
-
-TEST(WireFormatTest, OneofOnlySetLast) {
-  unittest::TestOneofBackwardsCompatible source;
-  unittest::TestOneof oneof_dest;
-  string data;
-
-  // Set two fields
-  source.set_foo_int(100);
-  source.set_foo_string("101");
-
-  // Serialize and parse to oneof message.
-  source.SerializeToString(&data);
-  io::ArrayInputStream raw_input(data.data(), data.size());
-  io::CodedInputStream input(&raw_input);
-  WireFormat::ParseAndMergePartial(&input, &oneof_dest);
-
-  // Only the last field is set.
-  EXPECT_FALSE(oneof_dest.has_foo_int());
-  EXPECT_TRUE(oneof_dest.has_foo_string());
-}
-
 TEST(WireFormatTest, ByteSize) {
   unittest::TestAllTypes message;
   TestUtil::SetAllFields(&message);
@@ -250,18 +213,6 @@ TEST(WireFormatTest, ByteSizePackedExtensions) {
   EXPECT_EQ(message.ByteSize(),
             WireFormat::ByteSize(message));
   message.Clear();
-  EXPECT_EQ(0, message.ByteSize());
-  EXPECT_EQ(0, WireFormat::ByteSize(message));
-}
-
-TEST(WireFormatTest, ByteSizeOneof) {
-  unittest::TestOneof2 message;
-  TestUtil::SetOneof1(&message);
-
-  EXPECT_EQ(message.ByteSize(),
-  WireFormat::ByteSize(message));
-  message.Clear();
-
   EXPECT_EQ(0, message.ByteSize());
   EXPECT_EQ(0, WireFormat::ByteSize(message));
 }
@@ -358,36 +309,6 @@ TEST(WireFormatTest, SerializeFieldsAndExtensions) {
   // Should output in canonical order.
   TestUtil::ExpectAllFieldsAndExtensionsInOrder(dynamic_data);
   TestUtil::ExpectAllFieldsAndExtensionsInOrder(generated_data);
-}
-
-TEST(WireFormatTest, SerializeOneof) {
-  unittest::TestOneof2 message;
-  string generated_data;
-  string dynamic_data;
-
-  TestUtil::SetOneof1(&message);
-  int size = message.ByteSize();
-
-  // Serialize using the generated code.
-  {
-    io::StringOutputStream raw_output(&generated_data);
-    io::CodedOutputStream output(&raw_output);
-    message.SerializeWithCachedSizes(&output);
-    ASSERT_FALSE(output.HadError());
-  }
-
-  // Serialize using WireFormat.
-  {
-    io::StringOutputStream raw_output(&dynamic_data);
-    io::CodedOutputStream output(&raw_output);
-    WireFormat::SerializeWithCachedSizes(message, size, &output);
-    ASSERT_FALSE(output.HadError());
-  }
-
-  // Should be the same.
-  // Don't use EXPECT_EQ here because we're comparing raw binary data and
-  // we really don't want it dumped to stdout on failure.
-  EXPECT_TRUE(dynamic_data == generated_data);
 }
 
 TEST(WireFormatTest, ParseMultipleExtensionRanges) {
@@ -766,34 +687,6 @@ TEST(WireFormatTest, RepeatedScalarsDifferentTagSizes) {
   EXPECT_EQ(msg1.DebugString(), msg2.DebugString());
 }
 
-TEST(WireFormatTest, CompatibleTypes) {
-  const int64 data = 0x100000000;
-  unittest::Int64Message msg1;
-  msg1.set_data(data);
-  string serialized;
-  msg1.SerializeToString(&serialized);
-
-  // Test int64 is compatible with bool
-  unittest::BoolMessage msg2;
-  ASSERT_TRUE(msg2.ParseFromString(serialized));
-  ASSERT_EQ(static_cast<bool>(data), msg2.data());
-
-  // Test int64 is compatible with uint64
-  unittest::Uint64Message msg3;
-  ASSERT_TRUE(msg3.ParseFromString(serialized));
-  ASSERT_EQ(static_cast<uint64>(data), msg3.data());
-
-  // Test int64 is compatible with int32
-  unittest::Int32Message msg4;
-  ASSERT_TRUE(msg4.ParseFromString(serialized));
-  ASSERT_EQ(static_cast<int32>(data), msg4.data());
-
-  // Test int64 is compatible with uint32
-  unittest::Uint32Message msg5;
-  ASSERT_TRUE(msg5.ParseFromString(serialized));
-  ASSERT_EQ(static_cast<uint32>(data), msg5.data());
-}
-
 class WireFormatInvalidInputTest : public testing::Test {
  protected:
   // Make a serialized TestAllTypes in which the field optional_nested_message
@@ -959,16 +852,7 @@ bool StartsWith(const string& s, const string& prefix) {
   return s.substr(0, prefix.length()) == prefix;
 }
 
-class Utf8ValidationTest : public ::testing::Test {
- protected:
-  Utf8ValidationTest() {}
-  virtual ~Utf8ValidationTest() {}
-  virtual void SetUp() {
-  }
-
-};
-
-TEST_F(Utf8ValidationTest, WriteInvalidUTF8String) {
+TEST(Utf8ValidationTest, WriteInvalidUTF8String) {
   string wire_buffer;
   protobuf_unittest::OneString input;
   vector<string> errors;
@@ -980,8 +864,7 @@ TEST_F(Utf8ValidationTest, WriteInvalidUTF8String) {
 #ifdef GOOGLE_PROTOBUF_UTF8_VALIDATION_ENABLED
   ASSERT_EQ(1, errors.size());
   EXPECT_TRUE(StartsWith(errors[0],
-                         "String field 'protobuf_unittest.OneString.data' "
-                         "contains invalid UTF-8 data when "
+                         "String field contains invalid UTF-8 data when "
                          "serializing a protocol buffer. Use the "
                          "'bytes' type if you intend to send raw bytes."));
 #else
@@ -989,8 +872,7 @@ TEST_F(Utf8ValidationTest, WriteInvalidUTF8String) {
 #endif  // GOOGLE_PROTOBUF_UTF8_VALIDATION_ENABLED
 }
 
-
-TEST_F(Utf8ValidationTest, ReadInvalidUTF8String) {
+TEST(Utf8ValidationTest, ReadInvalidUTF8String) {
   string wire_buffer;
   protobuf_unittest::OneString input;
   WriteMessage(kInvalidUTF8String, &input, &wire_buffer);
@@ -1004,8 +886,7 @@ TEST_F(Utf8ValidationTest, ReadInvalidUTF8String) {
 #ifdef GOOGLE_PROTOBUF_UTF8_VALIDATION_ENABLED
   ASSERT_EQ(1, errors.size());
   EXPECT_TRUE(StartsWith(errors[0],
-                         "String field 'protobuf_unittest.OneString.data' "
-                         "contains invalid UTF-8 data when "
+                         "String field contains invalid UTF-8 data when "
                          "parsing a protocol buffer. Use the "
                          "'bytes' type if you intend to send raw bytes."));
 
@@ -1014,8 +895,7 @@ TEST_F(Utf8ValidationTest, ReadInvalidUTF8String) {
 #endif  // GOOGLE_PROTOBUF_UTF8_VALIDATION_ENABLED
 }
 
-
-TEST_F(Utf8ValidationTest, WriteValidUTF8String) {
+TEST(Utf8ValidationTest, WriteValidUTF8String) {
   string wire_buffer;
   protobuf_unittest::OneString input;
   vector<string> errors;
@@ -1027,7 +907,7 @@ TEST_F(Utf8ValidationTest, WriteValidUTF8String) {
   ASSERT_EQ(0, errors.size());
 }
 
-TEST_F(Utf8ValidationTest, ReadValidUTF8String) {
+TEST(Utf8ValidationTest, ReadValidUTF8String) {
   string wire_buffer;
   protobuf_unittest::OneString input;
   WriteMessage(kValidUTF8String, &input, &wire_buffer);
@@ -1043,7 +923,7 @@ TEST_F(Utf8ValidationTest, ReadValidUTF8String) {
 }
 
 // Bytes: anything can pass as bytes, use invalid UTF-8 string to test
-TEST_F(Utf8ValidationTest, WriteArbitraryBytes) {
+TEST(Utf8ValidationTest, WriteArbitraryBytes) {
   string wire_buffer;
   protobuf_unittest::OneBytes input;
   vector<string> errors;
@@ -1055,7 +935,7 @@ TEST_F(Utf8ValidationTest, WriteArbitraryBytes) {
   ASSERT_EQ(0, errors.size());
 }
 
-TEST_F(Utf8ValidationTest, ReadArbitraryBytes) {
+TEST(Utf8ValidationTest, ReadArbitraryBytes) {
   string wire_buffer;
   protobuf_unittest::OneBytes input;
   WriteMessage(kInvalidUTF8String, &input, &wire_buffer);
@@ -1070,7 +950,7 @@ TEST_F(Utf8ValidationTest, ReadArbitraryBytes) {
   EXPECT_EQ(input.data(), output.data());
 }
 
-TEST_F(Utf8ValidationTest, ParseRepeatedString) {
+TEST(Utf8ValidationTest, ParseRepeatedString) {
   protobuf_unittest::MoreBytes input;
   input.add_data(kValidUTF8String);
   input.add_data(kInvalidUTF8String);
@@ -1091,30 +971,6 @@ TEST_F(Utf8ValidationTest, ParseRepeatedString) {
 #endif  // GOOGLE_PROTOBUF_UTF8_VALIDATION_ENABLED
   EXPECT_EQ(wire_buffer, output.SerializeAsString());
 }
-
-// Test the old VerifyUTF8String() function, which may still be called by old
-// generated code.
-TEST_F(Utf8ValidationTest, OldVerifyUTF8String) {
-  string data(kInvalidUTF8String);
-
-  vector<string> errors;
-  {
-    ScopedMemoryLog log;
-    WireFormat::VerifyUTF8String(data.data(), data.size(),
-                                 WireFormat::SERIALIZE);
-    errors = log.GetMessages(ERROR);
-  }
-#ifdef GOOGLE_PROTOBUF_UTF8_VALIDATION_ENABLED
-  ASSERT_EQ(1, errors.size());
-  EXPECT_TRUE(StartsWith(errors[0],
-                         "String field contains invalid UTF-8 data when "
-                         "serializing a protocol buffer. Use the "
-                         "'bytes' type if you intend to send raw bytes."));
-#else
-  ASSERT_EQ(0, errors.size());
-#endif
-}
-
 
 }  // namespace
 }  // namespace internal

@@ -1,6 +1,6 @@
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
-// https://developers.google.com/protocol-buffers/
+// http://code.google.com/p/protobuf/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -110,6 +110,10 @@ public abstract class AbstractParser<MessageType extends MessageLite>
       return message;
     } catch (InvalidProtocolBufferException e) {
       throw e;
+    } catch (IOException e) {
+      throw new RuntimeException(
+          "Reading from a ByteString threw an IOException (should " +
+          "never happen).", e);
     }
   }
 
@@ -143,6 +147,10 @@ public abstract class AbstractParser<MessageType extends MessageLite>
       return message;
     } catch (InvalidProtocolBufferException e) {
       throw e;
+    } catch (IOException e) {
+      throw new RuntimeException(
+          "Reading from a byte array threw an IOException (should " +
+          "never happen).", e);
     }
   }
 

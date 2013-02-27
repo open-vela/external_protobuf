@@ -1,6 +1,6 @@
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
-// https://developers.google.com/protocol-buffers/
+// http://code.google.com/p/protobuf/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -30,11 +30,6 @@
 
 package com.google.protobuf;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -116,46 +111,5 @@ public class RopeByteStringTest extends LiteralByteStringTest {
     assertEquals(classUnderTest + " string must equal the flat string", flatString, unicode);
     assertEquals(classUnderTest + " string must must have same hashCode as the flat string",
         flatString.hashCode(), unicode.hashCode());
-  }
-
-  @Override
-  public void testToString_returnsCanonicalEmptyString() throws UnsupportedEncodingException {
-    RopeByteString ropeByteString =
-        RopeByteString.newInstanceForTest(ByteString.EMPTY, ByteString.EMPTY);
-    assertSame(classUnderTest + " must be the same string references",
-        ByteString.EMPTY.toString(UTF_8), ropeByteString.toString(UTF_8));
-  }
-
-  public void testToString_raisesException() throws UnsupportedEncodingException{
-    try {
-      ByteString byteString =
-          RopeByteString.newInstanceForTest(ByteString.EMPTY, ByteString.EMPTY);
-      byteString.toString("invalid");
-      fail("Should have thrown an exception.");
-    } catch (UnsupportedEncodingException expected) {
-      // This is success
-    }
-
-    try {
-      ByteString byteString = RopeByteString.concatenate(ByteString.copyFromUtf8("foo"),
-          ByteString.copyFromUtf8("bar"));
-      byteString.toString("invalid");
-      fail("Should have thrown an exception.");
-    } catch (UnsupportedEncodingException expected) {
-      // This is success
-    }
-  }
-
-  public void testJavaSerialization() throws Exception {
-    ByteArrayOutputStream out = new ByteArrayOutputStream();
-    ObjectOutputStream oos = new ObjectOutputStream(out);
-    oos.writeObject(stringUnderTest);
-    oos.close();
-    byte[] pickled = out.toByteArray();
-    InputStream in = new ByteArrayInputStream(pickled);
-    ObjectInputStream ois = new ObjectInputStream(in);
-    Object o = ois.readObject();
-    assertTrue("Didn't get a ByteString back", o instanceof ByteString);
-    assertEquals("Should get an equal ByteString back", stringUnderTest, o);
   }
 }

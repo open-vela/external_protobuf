@@ -1,6 +1,6 @@
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
-// https://developers.google.com/protocol-buffers/
+// http://code.google.com/p/protobuf/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -34,8 +34,6 @@ import java.io.InputStream;
 
 /**
  * Abstract interface for parsing Protocol Messages.
- *
- * The implementation should be stateless and thread-safe.
  *
  * @author liujisi@google.com (Pherl Liu)
  */
@@ -227,8 +225,8 @@ public interface Parser<MessageType> {
    * {@link MessageLite#writeDelimitedTo(java.io.OutputStream)} to write
    * messages in this format.
    *
-   * @return Parsed message if successful, or null if the stream is at EOF when
-   *         the method starts. Any other error (including reaching EOF during
+   * @return True if successful, or false if the stream is at EOF when the
+   *         method starts. Any other error (including reaching EOF during
    *         parsing) will cause an exception to be thrown.
    */
   public MessageType parseDelimitedFrom(InputStream input)
