@@ -1,6 +1,6 @@
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
-// https://developers.google.com/protocol-buffers/
+// http://code.google.com/p/protobuf/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -33,12 +33,9 @@ package com.google.protobuf;
 import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Descriptors.FieldDescriptor;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * A table of known extensions, searchable by name or field number.  When
@@ -93,7 +90,7 @@ import java.util.Set;
  *
  * @author kenton@google.com Kenton Varda
  */
-public class ExtensionRegistry extends ExtensionRegistryLite {
+public final class ExtensionRegistry extends ExtensionRegistryLite {
   /** Construct a new, empty instance. */
   public static ExtensionRegistry newInstance() {
     return new ExtensionRegistry();
@@ -103,7 +100,6 @@ public class ExtensionRegistry extends ExtensionRegistryLite {
   public static ExtensionRegistry getEmptyRegistry() {
     return EMPTY;
   }
-
 
   /** Returns an unmodifiable view of the registry. */
   @Override
@@ -134,127 +130,42 @@ public class ExtensionRegistry extends ExtensionRegistryLite {
   }
 
   /**
-   * Deprecated. Use {@link #findImmutableExtensionByName(String)} instead.
+   * Find an extension by fully-qualified field name, in the proto namespace.
+   * I.e. {@code result.descriptor.fullName()} will match {@code fullName} if
+   * a match is found.
+   *
+   * @return Information about the extension if found, or {@code null}
+   *         otherwise.
    */
   public ExtensionInfo findExtensionByName(final String fullName) {
-    return findImmutableExtensionByName(fullName);
+    return extensionsByName.get(fullName);
   }
 
   /**
-   * Find an extension for immutable APIs by fully-qualified field name,
-   * in the proto namespace. i.e. {@code result.descriptor.fullName()} will
-   * match {@code fullName} if a match is found.
+   * Find an extension by containing type and field number.
    *
    * @return Information about the extension if found, or {@code null}
    *         otherwise.
    */
-  public ExtensionInfo findImmutableExtensionByName(final String fullName) {
-    return immutableExtensionsByName.get(fullName);
-  }
-
-  /**
-   * Find an extension for mutable APIs by fully-qualified field name,
-   * in the proto namespace. i.e. {@code result.descriptor.fullName()} will
-   * match {@code fullName} if a match is found.
-   *
-   * @return Information about the extension if found, or {@code null}
-   *         otherwise.
-   */
-  public ExtensionInfo findMutableExtensionByName(final String fullName) {
-    return mutableExtensionsByName.get(fullName);
-  }
-
-  /**
-   * Deprecated. Use {@link #findImmutableExtensionByNumber(
-   * Descriptors.Descriptor, int)}
-   */
-  public ExtensionInfo findExtensionByNumber(
-      final Descriptor containingType, final int fieldNumber) {
-    return findImmutableExtensionByNumber(containingType, fieldNumber);
-  }
-
-  /**
-   * Find an extension by containing type and field number for immutable APIs.
-   *
-   * @return Information about the extension if found, or {@code null}
-   *         otherwise.
-   */
-  public ExtensionInfo findImmutableExtensionByNumber(
-      final Descriptor containingType, final int fieldNumber) {
-    return immutableExtensionsByNumber.get(
+  public ExtensionInfo findExtensionByNumber(final Descriptor containingType,
+                                             final int fieldNumber) {
+    return extensionsByNumber.get(
       new DescriptorIntPair(containingType, fieldNumber));
   }
 
-  /**
-   * Find an extension by containing type and field number for mutable APIs.
-   *
-   * @return Information about the extension if found, or {@code null}
-   *         otherwise.
-   */
-  public ExtensionInfo findMutableExtensionByNumber(
-      final Descriptor containingType, final int fieldNumber) {
-    return mutableExtensionsByNumber.get(
-        new DescriptorIntPair(containingType, fieldNumber));
-  }
-
-  /**
-   * Find all extensions for mutable APIs by fully-qualified name of
-   * extended class. Note that this method is more computationally expensive
-   * than getting a single extension by name or number.
-   *
-   * @return Information about the extensions found, or {@code null} if there
-   *     are none.
-   */
-  public Set<ExtensionInfo> getAllMutableExtensionsByExtendedType(final String fullName) {
-    HashSet<ExtensionInfo> extensions = new HashSet<ExtensionInfo>();
-    for (DescriptorIntPair pair : mutableExtensionsByNumber.keySet()) {
-      if (pair.descriptor.getFullName().equals(fullName)) {
-        extensions.add(mutableExtensionsByNumber.get(pair));
-      }
-    }
-    return extensions;
-  }
-
-  /**
-   * Find all extensions for immutable APIs by fully-qualified name of
-   * extended class. Note that this method is more computationally expensive
-   * than getting a single extension by name or number.
-   *
-   * @return Information about the extensions found, or {@code null} if there
-   *     are none.
-   */
-  public Set<ExtensionInfo> getAllImmutableExtensionsByExtendedType(final String fullName) {
-    HashSet<ExtensionInfo> extensions = new HashSet<ExtensionInfo>();
-    for (DescriptorIntPair pair : immutableExtensionsByNumber.keySet()) {
-      if (pair.descriptor.getFullName().equals(fullName)) {
-        extensions.add(immutableExtensionsByNumber.get(pair));
-      }
-    }
-    return extensions;
-  }
-
   /** Add an extension from a generated file to the registry. */
-  public void add(final Extension<?, ?> extension) {
-    if (extension.getExtensionType() != Extension.ExtensionType.IMMUTABLE &&
-        extension.getExtensionType() != Extension.ExtensionType.MUTABLE) {
-      // do not support other extension types. ignore
-      return;
-    }
-    add(newExtensionInfo(extension), extension.getExtensionType());
-  }
-
-  static ExtensionInfo newExtensionInfo(final Extension<?, ?> extension) {
+  public void add(final GeneratedMessage.GeneratedExtension<?, ?> extension) {
     if (extension.getDescriptor().getJavaType() ==
         FieldDescriptor.JavaType.MESSAGE) {
       if (extension.getMessageDefaultInstance() == null) {
         throw new IllegalStateException(
             "Registered message-type extension had null default instance: " +
-                extension.getDescriptor().getFullName());
+            extension.getDescriptor().getFullName());
       }
-      return new ExtensionInfo(extension.getDescriptor(),
-          (Message) extension.getMessageDefaultInstance());
+      add(new ExtensionInfo(extension.getDescriptor(),
+                            extension.getMessageDefaultInstance()));
     } else {
-      return new ExtensionInfo(extension.getDescriptor(), null);
+      add(new ExtensionInfo(extension.getDescriptor(), null));
     }
   }
 
@@ -265,9 +176,7 @@ public class ExtensionRegistry extends ExtensionRegistryLite {
         "ExtensionRegistry.add() must be provided a default instance when " +
         "adding an embedded message extension.");
     }
-    ExtensionInfo info = new ExtensionInfo(type, null);
-    add(info, Extension.ExtensionType.IMMUTABLE);
-    add(info, Extension.ExtensionType.MUTABLE);
+    add(new ExtensionInfo(type, null));
   }
 
   /** Add a message-type extension to the registry by descriptor. */
@@ -277,75 +186,40 @@ public class ExtensionRegistry extends ExtensionRegistryLite {
         "ExtensionRegistry.add() provided a default instance for a " +
         "non-message extension.");
     }
-      add(new ExtensionInfo(type, defaultInstance),
-          Extension.ExtensionType.IMMUTABLE);
+    add(new ExtensionInfo(type, defaultInstance));
   }
 
   // =================================================================
   // Private stuff.
 
   private ExtensionRegistry() {
-    this.immutableExtensionsByName = new HashMap<String, ExtensionInfo>();
-    this.mutableExtensionsByName = new HashMap<String, ExtensionInfo>();
-    this.immutableExtensionsByNumber =
-        new HashMap<DescriptorIntPair, ExtensionInfo>();
-    this.mutableExtensionsByNumber =
-        new HashMap<DescriptorIntPair, ExtensionInfo>();
+    this.extensionsByName = new HashMap<String, ExtensionInfo>();
+    this.extensionsByNumber = new HashMap<DescriptorIntPair, ExtensionInfo>();
   }
 
   private ExtensionRegistry(ExtensionRegistry other) {
     super(other);
-    this.immutableExtensionsByName =
-        Collections.unmodifiableMap(other.immutableExtensionsByName);
-    this.mutableExtensionsByName =
-        Collections.unmodifiableMap(other.mutableExtensionsByName);
-    this.immutableExtensionsByNumber =
-        Collections.unmodifiableMap(other.immutableExtensionsByNumber);
-    this.mutableExtensionsByNumber =
-            Collections.unmodifiableMap(other.mutableExtensionsByNumber);
+    this.extensionsByName = Collections.unmodifiableMap(other.extensionsByName);
+    this.extensionsByNumber =
+        Collections.unmodifiableMap(other.extensionsByNumber);
   }
 
-  private final Map<String, ExtensionInfo> immutableExtensionsByName;
-  private final Map<String, ExtensionInfo> mutableExtensionsByName;
-  private final Map<DescriptorIntPair, ExtensionInfo> immutableExtensionsByNumber;
-  private final Map<DescriptorIntPair, ExtensionInfo> mutableExtensionsByNumber;
+  private final Map<String, ExtensionInfo> extensionsByName;
+  private final Map<DescriptorIntPair, ExtensionInfo> extensionsByNumber;
 
-  ExtensionRegistry(boolean empty) {
+  private ExtensionRegistry(boolean empty) {
     super(ExtensionRegistryLite.getEmptyRegistry());
-    this.immutableExtensionsByName =
-        Collections.<String, ExtensionInfo>emptyMap();
-    this.mutableExtensionsByName =
-        Collections.<String, ExtensionInfo>emptyMap();
-    this.immutableExtensionsByNumber =
+    this.extensionsByName = Collections.<String, ExtensionInfo>emptyMap();
+    this.extensionsByNumber =
         Collections.<DescriptorIntPair, ExtensionInfo>emptyMap();
-    this.mutableExtensionsByNumber =
-            Collections.<DescriptorIntPair, ExtensionInfo>emptyMap();
   }
   private static final ExtensionRegistry EMPTY = new ExtensionRegistry(true);
 
-  private void add(
-      final ExtensionInfo extension,
-      final Extension.ExtensionType extensionType) {
+  private void add(final ExtensionInfo extension) {
     if (!extension.descriptor.isExtension()) {
       throw new IllegalArgumentException(
-          "ExtensionRegistry.add() was given a FieldDescriptor for a regular " +
-              "(non-extension) field.");
-    }
-
-    Map<String, ExtensionInfo> extensionsByName;
-    Map<DescriptorIntPair, ExtensionInfo> extensionsByNumber;
-    switch (extensionType) {
-      case IMMUTABLE:
-        extensionsByName = immutableExtensionsByName;
-        extensionsByNumber = immutableExtensionsByNumber;
-        break;
-      case MUTABLE:
-        extensionsByName = mutableExtensionsByName;
-        extensionsByNumber = mutableExtensionsByNumber;
-        break;
-      default:
-        // Ignore the unknown supported type.
-        return;
+        "ExtensionRegistry.add() was given a FieldDescriptor for a regular " +
+        "(non-extension) field.");
     }
 
     extensionsByName.put(extension.descriptor.getFullName(), extension);

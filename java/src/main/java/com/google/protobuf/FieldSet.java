@@ -1,6 +1,6 @@
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
-// https://developers.google.com/protocol-buffers/
+// http://code.google.com/p/protobuf/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -145,7 +145,6 @@ final class FieldSet<FieldDescriptorType extends
     clone.hasLazyField = hasLazyField;
     return clone;
   }
-
 
   // =================================================================
 
@@ -377,13 +376,10 @@ final class FieldSet<FieldDescriptorType extends
       case DOUBLE:       isValid = value instanceof Double    ; break;
       case BOOLEAN:      isValid = value instanceof Boolean   ; break;
       case STRING:       isValid = value instanceof String    ; break;
-      case BYTE_STRING:
-        isValid = value instanceof ByteString || value instanceof byte[];
-        break;
+      case BYTE_STRING:  isValid = value instanceof ByteString; break;
       case ENUM:
         // TODO(kenton):  Caller must do type checking here, I guess.
-        isValid =
-            (value instanceof Integer || value instanceof Internal.EnumLite);
+        isValid = value instanceof Internal.EnumLite;
         break;
       case MESSAGE:
         // TODO(kenton):  Caller must do type checking here, I guess.
@@ -487,17 +483,6 @@ final class FieldSet<FieldDescriptorType extends
     }
   }
 
-  private Object cloneIfMutable(Object value) {
-    if (value instanceof byte[]) {
-      byte[] bytes = (byte[]) value;
-      byte[] copy = new byte[bytes.length];
-      System.arraycopy(bytes, 0, copy, 0, bytes.length);
-      return copy;
-    } else {
-      return value;
-    }
-  }
-
   @SuppressWarnings({"unchecked", "rawtypes"})
   private void mergeFromField(
       final Map.Entry<FieldDescriptorType, Object> entry) {
@@ -510,26 +495,28 @@ final class FieldSet<FieldDescriptorType extends
     if (descriptor.isRepeated()) {
       Object value = getField(descriptor);
       if (value == null) {
-        value = new ArrayList();
+        // Our list is empty, but we still need to make a defensive copy of
+        // the other list since we don't know if the other FieldSet is still
+        // mutable.
+        fields.put(descriptor, new ArrayList((List) otherValue));
+      } else {
+        // Concatenate the lists.
+        ((List) value).addAll((List) otherValue);
       }
-      for (Object element : (List) otherValue) {
-        ((List) value).add(cloneIfMutable(element));
-      }
-      fields.put(descriptor, value);
     } else if (descriptor.getLiteJavaType() == WireFormat.JavaType.MESSAGE) {
       Object value = getField(descriptor);
       if (value == null) {
-        fields.put(descriptor, cloneIfMutable(otherValue));
+        fields.put(descriptor, otherValue);
       } else {
         // Merge the messages.
-          value = descriptor.internalMergeFrom(
+        fields.put(
+            descriptor,
+            descriptor.internalMergeFrom(
                 ((MessageLite) value).toBuilder(), (MessageLite) otherValue)
-                .build();
-
-        fields.put(descriptor, value);
+            .build());
       }
     } else {
-      fields.put(descriptor, cloneIfMutable(otherValue));
+      fields.put(descriptor, otherValue);
     }
   }
 
@@ -537,13 +524,11 @@ final class FieldSet<FieldDescriptorType extends
   //   other class.  Probably WireFormat.
 
   /**
-   * Read a field of any primitive type for immutable messages from a
-   * CodedInputStream. Enums, groups, and embedded messages are not handled by
-   * this method.
+   * Read a field of any primitive type from a CodedInputStream.  Enums,
+   * groups, and embedded messages are not handled by this method.
    *
    * @param input The stream from which to read.
    * @param type Declared type of the field.
-   * @param checkUtf8 When true, check that the input is valid utf8.
    * @return An object representing the field's value, of the exact
    *         type which would be returned by
    *         {@link Message#getField(Descriptors.FieldDescriptor)} for
@@ -551,17 +536,40 @@ final class FieldSet<FieldDescriptorType extends
    */
   public static Object readPrimitiveField(
       CodedInputStream input,
-      final WireFormat.FieldType type,
-      boolean checkUtf8) throws IOException {
-    if (checkUtf8) {
-      return WireFormat.readPrimitiveField(input, type,
-          WireFormat.Utf8Validation.STRICT);
-    } else {
-      return WireFormat.readPrimitiveField(input, type,
-          WireFormat.Utf8Validation.LOOSE);
-    }
-  }
+      final WireFormat.FieldType type) throws IOException {
+    switch (type) {
+      case DOUBLE  : return input.readDouble  ();
+      case FLOAT   : return input.readFloat   ();
+      case INT64   : return input.readInt64   ();
+      case UINT64  : return input.readUInt64  ();
+      case INT32   : return input.readInt32   ();
+      case FIXED64 : return input.readFixed64 ();
+      case FIXED32 : return input.readFixed32 ();
+      case BOOL    : return input.readBool    ();
+      case STRING  : return input.readString  ();
+      case BYTES   : return input.readBytes   ();
+      case UINT32  : return input.readUInt32  ();
+      case SFIXED32: return input.readSFixed32();
+      case SFIXED64: return input.readSFixed64();
+      case SINT32  : return input.readSInt32  ();
+      case SINT64  : return input.readSInt64  ();
 
+      case GROUP:
+        throw new IllegalArgumentException(
+          "readPrimitiveField() cannot handle nested groups.");
+      case MESSAGE:
+        throw new IllegalArgumentException(
+          "readPrimitiveField() cannot handle embedded messages.");
+      case ENUM:
+        // We don't handle enums because we don't know what to do if the
+        // value is not recognized.
+        throw new IllegalArgumentException(
+          "readPrimitiveField() cannot handle enums.");
+    }
+
+    throw new RuntimeException(
+      "There is no way to get here, but the compiler thinks otherwise.");
+  }
 
   /** See {@link Message#writeTo(CodedOutputStream)}. */
   public void writeTo(final CodedOutputStream output)
@@ -597,12 +605,8 @@ final class FieldSet<FieldDescriptorType extends
     final FieldDescriptorType descriptor = entry.getKey();
     if (descriptor.getLiteJavaType() == WireFormat.JavaType.MESSAGE &&
         !descriptor.isRepeated() && !descriptor.isPacked()) {
-      Object value = entry.getValue();
-      if (value instanceof LazyField) {
-        value = ((LazyField) value).getValue();
-      }
       output.writeMessageSetExtension(entry.getKey().getNumber(),
-                                      (MessageLite) value);
+                                      (MessageLite) entry.getValue());
     } else {
       writeField(descriptor, entry.getValue(), output);
     }
@@ -626,7 +630,7 @@ final class FieldSet<FieldDescriptorType extends
     // Special case for groups, which need a start and end tag; other fields
     // can just use writeTag() and writeFieldNoTag().
     if (type == WireFormat.FieldType.GROUP) {
-        output.writeGroup(number, (MessageLite) value);
+      output.writeGroup(number, (MessageLite) value);
     } else {
       output.writeTag(number, getWireFormatForFieldType(type, false));
       writeElementNoTag(output, type, value);
@@ -643,7 +647,7 @@ final class FieldSet<FieldDescriptorType extends
    *               {@link Message#getField(Descriptors.FieldDescriptor)} for
    *               this field.
    */
-  static void writeElementNoTag(
+  private static void writeElementNoTag(
       final CodedOutputStream output,
       final WireFormat.FieldType type,
       final Object value) throws IOException {
@@ -656,22 +660,10 @@ final class FieldSet<FieldDescriptorType extends
       case FIXED64 : output.writeFixed64NoTag ((Long       ) value); break;
       case FIXED32 : output.writeFixed32NoTag ((Integer    ) value); break;
       case BOOL    : output.writeBoolNoTag    ((Boolean    ) value); break;
+      case STRING  : output.writeStringNoTag  ((String     ) value); break;
       case GROUP   : output.writeGroupNoTag   ((MessageLite) value); break;
       case MESSAGE : output.writeMessageNoTag ((MessageLite) value); break;
-      case STRING:
-        if (value instanceof ByteString) {
-          output.writeBytesNoTag((ByteString) value);
-        } else {
-          output.writeStringNoTag((String) value);
-        }
-        break;
-      case BYTES:
-        if (value instanceof ByteString) {
-          output.writeBytesNoTag((ByteString) value);
-        } else {
-          output.writeByteArrayNoTag((byte[]) value);
-        }
-        break;
+      case BYTES   : output.writeBytesNoTag   ((ByteString ) value); break;
       case UINT32  : output.writeUInt32NoTag  ((Integer    ) value); break;
       case SFIXED32: output.writeSFixed32NoTag((Integer    ) value); break;
       case SFIXED64: output.writeSFixed64NoTag((Long       ) value); break;
@@ -679,11 +671,7 @@ final class FieldSet<FieldDescriptorType extends
       case SINT64  : output.writeSInt64NoTag  ((Long       ) value); break;
 
       case ENUM:
-        if (value instanceof Internal.EnumLite) {
-          output.writeEnumNoTag(((Internal.EnumLite) value).getNumber());
-        } else {
-          output.writeEnumNoTag(((Integer) value).intValue());
-        }
+        output.writeEnumNoTag(((Internal.EnumLite) value).getNumber());
         break;
     }
   }
@@ -790,9 +778,7 @@ final class FieldSet<FieldDescriptorType extends
       final int number, final Object value) {
     int tagSize = CodedOutputStream.computeTagSize(number);
     if (type == WireFormat.FieldType.GROUP) {
-      // Only count the end group tag for proto2 messages as for proto1 the end
-      // group tag will be counted as a part of getSerializedSize().
-        tagSize *= 2;
+      tagSize *= 2;
     }
     return tagSize + computeElementSizeNoTag(type, value);
   }
@@ -807,7 +793,7 @@ final class FieldSet<FieldDescriptorType extends
    *               {@link Message#getField(Descriptors.FieldDescriptor)} for
    *               this field.
    */
-  static int computeElementSizeNoTag(
+  private static int computeElementSizeNoTag(
       final WireFormat.FieldType type, final Object value) {
     switch (type) {
       // Note:  Minor violation of 80-char limit rule here because this would
@@ -820,19 +806,9 @@ final class FieldSet<FieldDescriptorType extends
       case FIXED64 : return CodedOutputStream.computeFixed64SizeNoTag ((Long       )value);
       case FIXED32 : return CodedOutputStream.computeFixed32SizeNoTag ((Integer    )value);
       case BOOL    : return CodedOutputStream.computeBoolSizeNoTag    ((Boolean    )value);
+      case STRING  : return CodedOutputStream.computeStringSizeNoTag  ((String     )value);
       case GROUP   : return CodedOutputStream.computeGroupSizeNoTag   ((MessageLite)value);
-      case BYTES   :
-        if (value instanceof ByteString) {
-          return CodedOutputStream.computeBytesSizeNoTag((ByteString) value);
-        } else {
-          return CodedOutputStream.computeByteArraySizeNoTag((byte[]) value);
-        }
-      case STRING  :
-        if (value instanceof ByteString) {
-          return CodedOutputStream.computeBytesSizeNoTag((ByteString) value);
-        } else {
-          return CodedOutputStream.computeStringSizeNoTag((String) value);
-        }
+      case BYTES   : return CodedOutputStream.computeBytesSizeNoTag   ((ByteString )value);
       case UINT32  : return CodedOutputStream.computeUInt32SizeNoTag  ((Integer    )value);
       case SFIXED32: return CodedOutputStream.computeSFixed32SizeNoTag((Integer    )value);
       case SFIXED64: return CodedOutputStream.computeSFixed64SizeNoTag((Long       )value);
@@ -847,12 +823,8 @@ final class FieldSet<FieldDescriptorType extends
         }
 
       case ENUM:
-        if (value instanceof Internal.EnumLite) {
-          return CodedOutputStream.computeEnumSizeNoTag(
-              ((Internal.EnumLite) value).getNumber());
-        } else {
-          return CodedOutputStream.computeEnumSizeNoTag((Integer) value);
-        }
+        return CodedOutputStream.computeEnumSizeNoTag(
+            ((Internal.EnumLite) value).getNumber());
     }
 
     throw new RuntimeException(

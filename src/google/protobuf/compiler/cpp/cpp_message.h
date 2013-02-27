@@ -1,6 +1,6 @@
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
-// https://developers.google.com/protocol-buffers/
+// http://code.google.com/p/protobuf/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -35,12 +35,8 @@
 #ifndef GOOGLE_PROTOBUF_COMPILER_CPP_MESSAGE_H__
 #define GOOGLE_PROTOBUF_COMPILER_CPP_MESSAGE_H__
 
-#include <memory>
-#ifndef _SHARED_PTR_H
-#include <google/protobuf/stubs/shared_ptr.h>
-#endif
 #include <string>
-#include <vector>
+#include <google/protobuf/stubs/common.h>
 #include <google/protobuf/compiler/cpp/cpp_field.h>
 #include <google/protobuf/compiler/cpp/cpp_options.h>
 
@@ -61,7 +57,8 @@ class ExtensionGenerator;      // extension.h
 class MessageGenerator {
  public:
   // See generator.cc for the meaning of dllexport_decl.
-  MessageGenerator(const Descriptor* descriptor, const Options& options);
+  explicit MessageGenerator(const Descriptor* descriptor,
+                            const Options& options);
   ~MessageGenerator();
 
   // Header stuff.
@@ -82,7 +79,7 @@ class MessageGenerator {
 
   // Generate definitions of inline methods (placed at the end of the header
   // file).
-  void GenerateInlineMethods(io::Printer* printer, bool is_inline);
+  void GenerateInlineMethods(io::Printer* printer);
 
   // Source file stuff.
 
@@ -116,7 +113,7 @@ class MessageGenerator {
  private:
   // Generate declarations and definitions of accessors for fields.
   void GenerateFieldAccessorDeclarations(io::Printer* printer);
-  void GenerateFieldAccessorDefinitions(io::Printer* printer, bool is_inline);
+  void GenerateFieldAccessorDefinitions(io::Printer* printer);
 
   // Generate the field offsets array.
   void GenerateOffsets(io::Printer* printer);
@@ -132,12 +129,9 @@ class MessageGenerator {
   void GenerateSharedConstructorCode(io::Printer* printer);
   // Generate the shared destructor code.
   void GenerateSharedDestructorCode(io::Printer* printer);
-  // Generate the arena-specific destructor code.
-  void GenerateArenaDestructorCode(io::Printer* printer);
 
   // Generate standard Message methods.
   void GenerateClear(io::Printer* printer);
-  void GenerateOneofClear(io::Printer* printer);
   void GenerateMergeFromCodedStream(io::Printer* printer);
   void GenerateSerializeWithCachedSizes(io::Printer* printer);
   void GenerateSerializeWithCachedSizesToArray(io::Printer* printer);
@@ -162,12 +156,9 @@ class MessageGenerator {
   string classname_;
   Options options_;
   FieldGeneratorMap field_generators_;
-  vector< vector<string> > runs_of_fields_;  // that might be trivially cleared
-  google::protobuf::scoped_array<google::protobuf::scoped_ptr<MessageGenerator> > nested_generators_;
-  google::protobuf::scoped_array<google::protobuf::scoped_ptr<EnumGenerator> > enum_generators_;
-  google::protobuf::scoped_array<google::protobuf::scoped_ptr<ExtensionGenerator> > extension_generators_;
-  int num_required_fields_;
-  bool uses_string_;
+  scoped_array<scoped_ptr<MessageGenerator> > nested_generators_;
+  scoped_array<scoped_ptr<EnumGenerator> > enum_generators_;
+  scoped_array<scoped_ptr<ExtensionGenerator> > extension_generators_;
 
   GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(MessageGenerator);
 };

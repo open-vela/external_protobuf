@@ -1,6 +1,6 @@
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
-// https://developers.google.com/protocol-buffers/
+// http://code.google.com/p/protobuf/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -91,8 +91,9 @@ public final class RpcUtil {
   @SuppressWarnings("unchecked")
   private static <Type extends Message> Type copyAsType(
       final Type typeDefaultInstance, final Message source) {
-    return (Type) typeDefaultInstance
-        .newBuilderForType().mergeFrom(source).build();
+    return (Type)typeDefaultInstance.newBuilderForType()
+                                    .mergeFrom(source)
+                                    .build();
   }
 
   /**

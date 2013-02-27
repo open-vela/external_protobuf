@@ -1,6 +1,6 @@
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
-// https://developers.google.com/protocol-buffers/
+// http://code.google.com/p/protobuf/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -30,9 +30,6 @@
 
 package com.google.protobuf;
 
-import java.io.IOException;
-import java.io.InvalidObjectException;
-import java.io.ObjectInputStream;
 import java.util.NoSuchElementException;
 
 /**
@@ -123,20 +120,6 @@ class BoundedByteString extends LiteralByteString {
       int targetOffset, int numberToCopy) {
     System.arraycopy(bytes, getOffsetIntoBytes() + sourceOffset, target,
         targetOffset, numberToCopy);
-  }
-
-  // =================================================================
-  // Serializable
-
-  private static final long serialVersionUID = 1L;
-
-  Object writeReplace() {
-    return new LiteralByteString(toByteArray());
-  }
-
-  private void readObject(ObjectInputStream in) throws IOException {
-    throw new InvalidObjectException(
-        "BoundedByteStream instances are not to be serialized directly");
   }
 
   // =================================================================

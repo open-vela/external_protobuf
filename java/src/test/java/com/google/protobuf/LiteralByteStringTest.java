@@ -1,6 +1,6 @@
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
-// https://developers.google.com/protocol-buffers/
+// http://code.google.com/p/protobuf/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -32,12 +32,9 @@ package com.google.protobuf;
 
 import junit.framework.TestCase;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
@@ -289,6 +286,7 @@ public class LiteralByteStringTest extends TestCase {
     assertEquals("Output.reset() resets the output", 0, output.size());
     assertEquals("Output.reset() resets the output",
         ByteString.EMPTY, output.toByteString());
+    
   }
 
   public void testToString() throws UnsupportedEncodingException {
@@ -296,27 +294,6 @@ public class LiteralByteStringTest extends TestCase {
     LiteralByteString unicode = new LiteralByteString(testString.getBytes(UTF_8));
     String roundTripString = unicode.toString(UTF_8);
     assertEquals(classUnderTest + " unicode must match", testString, roundTripString);
-  }
-
-  public void testToString_returnsCanonicalEmptyString() throws UnsupportedEncodingException{
-    assertSame(classUnderTest + " must be the same string references",
-        ByteString.EMPTY.toString(UTF_8), new LiteralByteString(new byte[]{}).toString(UTF_8));
-  }
-
-  public void testToString_raisesException() throws UnsupportedEncodingException{
-    try {
-      ByteString.EMPTY.toString("invalid");
-      fail("Should have thrown an exception.");
-    } catch (UnsupportedEncodingException expected) {
-      // This is success
-    }
-
-    try {
-      new LiteralByteString(referenceBytes).toString("invalid");
-      fail("Should have thrown an exception.");
-    } catch (UnsupportedEncodingException expected) {
-      // This is success
-    }
   }
 
   public void testEquals() {
@@ -331,7 +308,7 @@ public class LiteralByteStringTest extends TestCase {
 
     byte[] mungedBytes = new byte[referenceBytes.length];
     System.arraycopy(referenceBytes, 0, mungedBytes, 0, referenceBytes.length);
-    mungedBytes[mungedBytes.length - 5] = (byte) (mungedBytes[mungedBytes.length - 5] ^ 0xFF);
+    mungedBytes[mungedBytes.length - 5] ^= 0xFF;
     assertFalse(classUnderTest + " must not equal every string with the same length",
         stringUnderTest.equals(new LiteralByteString(mungedBytes)));
   }
@@ -415,18 +392,5 @@ public class LiteralByteStringTest extends TestCase {
         stringUnderTest.concat(ByteString.EMPTY), stringUnderTest);
     assertSame("empty concatenated with " + classUnderTest + " must give " + classUnderTest,
         ByteString.EMPTY.concat(stringUnderTest), stringUnderTest);
-  }
-
-  public void testJavaSerialization() throws Exception {
-    ByteArrayOutputStream out = new ByteArrayOutputStream();
-    ObjectOutputStream oos = new ObjectOutputStream(out);
-    oos.writeObject(stringUnderTest);
-    oos.close();
-    byte[] pickled = out.toByteArray();
-    InputStream in = new ByteArrayInputStream(pickled);
-    ObjectInputStream ois = new ObjectInputStream(in);
-    Object o = ois.readObject();
-    assertTrue("Didn't get a ByteString back", o instanceof ByteString);
-    assertEquals("Should get an equal ByteString back", stringUnderTest, o);
   }
 }
