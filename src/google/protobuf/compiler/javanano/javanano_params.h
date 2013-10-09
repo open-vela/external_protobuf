@@ -60,7 +60,6 @@ class Params {
   bool generate_has_;
   bool java_enum_style_;
   bool optional_field_accessors_;
-  bool use_reference_types_for_primitives_;
 
  public:
   Params(const string & base_name) :
@@ -70,8 +69,7 @@ class Params {
     store_unknown_fields_(false),
     generate_has_(false),
     java_enum_style_(false),
-    optional_field_accessors_(false),
-    use_reference_types_for_primitives_(false) {
+    optional_field_accessors_(false) {
   }
 
   const string& base_name() const {
@@ -178,13 +176,6 @@ class Params {
   }
   bool optional_field_accessors() const {
     return optional_field_accessors_;
-  }
-
-  void set_use_reference_types_for_primitives(bool value) {
-    use_reference_types_for_primitives_ = value;
-  }
-  bool use_reference_types_for_primitives() const {
-    return use_reference_types_for_primitives_;
   }
 };
 
