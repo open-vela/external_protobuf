@@ -67,20 +67,16 @@ public abstract class MessageNano {
     }
 
     /**
-     * Serializes the message and writes it to {@code output}.
-     *
-     * @param output the output to receive the serialized form.
-     * @throws IOException if an error occurred writing to {@code output}.
+     * Serializes the message and writes it to {@code output}.  This does not
+     * flush or close the stream.
      */
-    public void writeTo(CodedOutputByteBufferNano output) throws IOException {
-        // Does nothing by default. Overridden by subclasses which have data to write.
-    }
+    abstract public void writeTo(CodedOutputByteBufferNano output) throws java.io.IOException;
 
     /**
      * Parse {@code input} as a message of this type and merge it with the
      * message being built.
      */
-    public abstract MessageNano mergeFrom(CodedInputByteBufferNano input) throws IOException;
+    abstract public MessageNano mergeFrom(final CodedInputByteBufferNano input) throws IOException;
 
     /**
      * Serialize to a byte array.
@@ -99,8 +95,9 @@ public abstract class MessageNano {
      * write more than length bytes OutOfSpaceException will be thrown
      * and if length bytes are not written then IllegalStateException
      * is thrown.
+     * @return byte array with the serialized data.
      */
-    public static final void toByteArray(MessageNano msg, byte[] data, int offset, int length) {
+    public static final void toByteArray(MessageNano msg, byte [] data, int offset, int length) {
         try {
             final CodedOutputByteBufferNano output =
                 CodedOutputByteBufferNano.newInstance(data, offset, length);
