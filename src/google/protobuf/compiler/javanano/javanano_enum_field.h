@@ -37,7 +37,6 @@
 
 #include <map>
 #include <string>
-#include <vector>
 #include <google/protobuf/compiler/javanano/javanano_field.h>
 
 namespace google {
@@ -63,7 +62,6 @@ class EnumFieldGenerator : public FieldGenerator {
  private:
   const FieldDescriptor* descriptor_;
   map<string, string> variables_;
-  vector<string> canonical_values_;
 
   GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(EnumFieldGenerator);
 };
@@ -86,7 +84,6 @@ class AccessorEnumFieldGenerator : public FieldGenerator {
  private:
   const FieldDescriptor* descriptor_;
   map<string, string> variables_;
-  vector<string> canonical_values_;
 
   GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(AccessorEnumFieldGenerator);
 };
@@ -112,7 +109,6 @@ class RepeatedEnumFieldGenerator : public FieldGenerator {
 
   const FieldDescriptor* descriptor_;
   map<string, string> variables_;
-  vector<string> canonical_values_;
 
   GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(RepeatedEnumFieldGenerator);
 };
