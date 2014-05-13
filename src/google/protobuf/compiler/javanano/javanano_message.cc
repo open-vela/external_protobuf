@@ -54,6 +54,14 @@ using internal::WireFormatLite;
 
 namespace {
 
+void PrintFieldComment(io::Printer* printer, const FieldDescriptor* field) {
+  // Print the field's proto-syntax definition as a comment.  We don't want to
+  // print group bodies so we cut off after the first line.
+  string def = field->DebugString();
+  printer->Print("// $def$\n",
+    "def", def.substr(0, def.find_first_of('\n')));
+}
+
 struct FieldOrderingByNumber {
   inline bool operator()(const FieldDescriptor* a,
                          const FieldDescriptor* b) const {
@@ -72,6 +80,13 @@ const FieldDescriptor** SortFieldsByNumber(const Descriptor* descriptor) {
   sort(fields, fields + descriptor->field_count(),
        FieldOrderingByNumber());
   return fields;
+}
+
+// Get an identifier that uniquely identifies this type within the file.
+// This is used to declare static variables related to this type at the
+// outermost file scope.
+string UniqueFileScopeIdentifier(const Descriptor* descriptor) {
+  return "static_" + StringReplace(descriptor->full_name(), ".", "_", true);
 }
 
 }  // namespace
@@ -132,17 +147,9 @@ void MessageGenerator::Generate(io::Printer* printer) {
       "public static final class $classname$ extends\n",
       "classname", descriptor_->name());
   }
-  if (params_.store_unknown_fields() && params_.parcelable_messages()) {
+  if (params_.store_unknown_fields()) {
     printer->Print(
-      "    com.google.protobuf.nano.android.ParcelableExtendableMessageNano<$classname$> {\n",
-      "classname", descriptor_->name());
-  } else if (params_.store_unknown_fields()) {
-    printer->Print(
-      "    com.google.protobuf.nano.ExtendableMessageNano<$classname$> {\n",
-      "classname", descriptor_->name());
-  } else if (params_.parcelable_messages()) {
-    printer->Print(
-      "    com.google.protobuf.nano.android.ParcelableMessageNano {\n");
+      "    com.google.protobuf.nano.ExtendableMessageNano {\n");
   } else {
     printer->Print(
       "    com.google.protobuf.nano.MessageNano {\n");
@@ -278,20 +285,22 @@ void MessageGenerator::Generate(io::Printer* printer) {
 
 void MessageGenerator::
 GenerateMessageSerializationMethods(io::Printer* printer) {
-  // Rely on the parent implementations of writeTo() and getSerializedSize()
-  // if there are no fields to serialize in this message.
-  if (descriptor_->field_count() == 0) {
-    return;
-  }
-
   scoped_array<const FieldDescriptor*> sorted_fields(
     SortFieldsByNumber(descriptor_));
 
-  printer->Print(
-    "\n"
-    "@Override\n"
-    "public void writeTo(com.google.protobuf.nano.CodedOutputByteBufferNano output)\n"
-    "    throws java.io.IOException {\n");
+  // writeTo only throws an exception if it contains one or more fields to write
+  if (descriptor_->field_count() > 0 || params_.store_unknown_fields()) {
+    printer->Print(
+      "\n"
+      "@Override\n"
+      "public void writeTo(com.google.protobuf.nano.CodedOutputByteBufferNano output)\n"
+      "    throws java.io.IOException {\n");
+  } else {
+    printer->Print(
+      "\n"
+      "@Override\n"
+      "public void writeTo(com.google.protobuf.nano.CodedOutputByteBufferNano output) {\n");
+  }
   printer->Indent();
 
   // Output the fields in sorted order
@@ -299,30 +308,36 @@ GenerateMessageSerializationMethods(io::Printer* printer) {
     GenerateSerializeOneField(printer, sorted_fields[i]);
   }
 
-  // The parent implementation will write any unknown fields if necessary.
-  printer->Print(
-    "super.writeTo(output);\n");
+  // Write unknown fields.
+  if (params_.store_unknown_fields()) {
+    printer->Print(
+      "com.google.protobuf.nano.WireFormatNano.writeUnknownFields(\n"
+      "    unknownFieldData, output);\n");
+  }
 
   printer->Outdent();
   printer->Print("}\n");
 
-  // The parent implementation will get the serialized size for unknown
-  // fields if necessary.
-  printer->Print(
-    "\n"
-    "@Override\n"
-    "protected int computeSerializedSize() {\n"
-    "  int size = super.computeSerializedSize();\n");
-  printer->Indent();
+  // Rely on the parent implementation of getSerializedSize if there are no fields to
+  // serialize in this MessageNano.
+  if (descriptor_->field_count() != 0) {
+    printer->Print(
+      "\n"
+      "@Override\n"
+      "public int getSerializedSize() {\n"
+      "  int size = super.getSerializedSize();\n");
+    printer->Indent();
 
-  for (int i = 0; i < descriptor_->field_count(); i++) {
-    field_generators_.get(sorted_fields[i]).GenerateSerializedSizeCode(printer);
+    for (int i = 0; i < descriptor_->field_count(); i++) {
+      field_generators_.get(sorted_fields[i]).GenerateSerializedSizeCode(printer);
+    }
+
+    printer->Outdent();
+    printer->Print(
+      "  cachedSize = size;\n"
+      "  return size;\n"
+      "}\n");
   }
-
-  printer->Outdent();
-  printer->Print(
-    "  return size;\n"
-    "}\n");
 }
 
 void MessageGenerator::GenerateMergeFromMethods(io::Printer* printer) {
@@ -356,7 +371,12 @@ void MessageGenerator::GenerateMergeFromMethods(io::Printer* printer) {
   printer->Indent();
   if (params_.store_unknown_fields()) {
     printer->Print(
-        "if (!storeUnknownField(input, tag)) {\n"
+        "if (unknownFieldData == null) {\n"
+        "  unknownFieldData =\n"
+        "      new java.util.ArrayList<com.google.protobuf.nano.UnknownFieldData>();\n"
+        "}\n"
+        "if (!com.google.protobuf.nano.WireFormatNano.storeUnknownField(\n"
+        "    unknownFieldData, input, tag)) {\n"
         "  return this;\n"
         "}\n");
   } else {
