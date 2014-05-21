@@ -38,7 +38,7 @@ import java.io.IOException;
  * @author wink@google.com Wink Saville
  */
 public abstract class MessageNano {
-    protected int cachedSize = -1;
+    protected volatile int cachedSize = -1;
 
     /**
      * Get the number of bytes required to encode this message.
@@ -61,22 +61,35 @@ public abstract class MessageNano {
      * using getCachedSize().
      */
     public int getSerializedSize() {
-        // This is overridden if the generated message has serialized fields.
-        cachedSize = 0;
-        return 0;
+        int size = computeSerializedSize();
+        cachedSize = size;
+        return size;
     }
 
     /**
-     * Serializes the message and writes it to {@code output}.  This does not
-     * flush or close the stream.
+     * Computes the number of bytes required to encode this message. This does not update the
+     * cached size.
      */
-    abstract public void writeTo(CodedOutputByteBufferNano output) throws java.io.IOException;
+    protected int computeSerializedSize() {
+      // This is overridden if the generated message has serialized fields.
+      return 0;
+    }
+
+    /**
+     * Serializes the message and writes it to {@code output}.
+     *
+     * @param output the output to receive the serialized form.
+     * @throws IOException if an error occurred writing to {@code output}.
+     */
+    public void writeTo(CodedOutputByteBufferNano output) throws IOException {
+        // Does nothing by default. Overridden by subclasses which have data to write.
+    }
 
     /**
      * Parse {@code input} as a message of this type and merge it with the
      * message being built.
      */
-    abstract public MessageNano mergeFrom(final CodedInputByteBufferNano input) throws IOException;
+    public abstract MessageNano mergeFrom(CodedInputByteBufferNano input) throws IOException;
 
     /**
      * Serialize to a byte array.
@@ -95,9 +108,8 @@ public abstract class MessageNano {
      * write more than length bytes OutOfSpaceException will be thrown
      * and if length bytes are not written then IllegalStateException
      * is thrown.
-     * @return byte array with the serialized data.
      */
-    public static final void toByteArray(MessageNano msg, byte [] data, int offset, int length) {
+    public static final void toByteArray(MessageNano msg, byte[] data, int offset, int length) {
         try {
             final CodedOutputByteBufferNano output =
                 CodedOutputByteBufferNano.newInstance(data, offset, length);
