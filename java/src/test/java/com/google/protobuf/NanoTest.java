@@ -33,6 +33,8 @@ package com.google.protobuf;
 import com.google.protobuf.nano.CodedInputByteBufferNano;
 import com.google.protobuf.nano.EnumClassNanoMultiple;
 import com.google.protobuf.nano.EnumClassNanos;
+import com.google.protobuf.nano.EnumValidity;
+import com.google.protobuf.nano.EnumValidityAccessors;
 import com.google.protobuf.nano.Extensions;
 import com.google.protobuf.nano.Extensions.AnotherMessage;
 import com.google.protobuf.nano.Extensions.MessageWithGroup;
@@ -50,6 +52,9 @@ import com.google.protobuf.nano.NanoOuterClass;
 import com.google.protobuf.nano.NanoOuterClass.TestAllTypesNano;
 import com.google.protobuf.nano.NanoReferenceTypes;
 import com.google.protobuf.nano.NanoRepeatedPackables;
+import com.google.protobuf.nano.PackedExtensions;
+import com.google.protobuf.nano.RepeatedExtensions;
+import com.google.protobuf.nano.SingularExtensions;
 import com.google.protobuf.nano.TestRepeatedMergeNano;
 import com.google.protobuf.nano.UnittestImportNano;
 import com.google.protobuf.nano.UnittestMultipleNano;
@@ -59,10 +64,8 @@ import com.google.protobuf.nano.UnittestSingleNano.SingleMessageNano;
 
 import junit.framework.TestCase;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 
 /**
  * Test nano runtime.
@@ -102,6 +105,12 @@ public class NanoTest extends TestCase {
     assertEquals(456, newMsg.d);
     assertEquals(2, msg.nestedMsg.bb);
     assertEquals(SimpleMessageNano.BAR, msg.defaultNestedEnum);
+
+    msg.nestedMsg = null;
+    assertTrue(msgSerializedSize != msg.getSerializedSize());
+
+    msg.clear();
+    assertEquals(0, msg.getSerializedSize());
   }
 
   public void testRecursiveMessageNano() throws Exception {
@@ -138,6 +147,12 @@ public class NanoTest extends TestCase {
     assertEquals(1, newMsg.nestedMessage.a.id);
     assertEquals(2, newMsg.optionalRecursiveMessageNano.id);
     assertEquals(3, newMsg.repeatedRecursiveMessageNano[0].id);
+  }
+
+  public void testMessageNoFields() {
+    SingleMessageNano msg = new SingleMessageNano();
+    assertEquals(0, msg.getSerializedSize());
+    assertEquals(0, MessageNano.toByteArray(msg).length);
   }
 
   public void testNanoRequiredInt32() throws Exception {
@@ -518,12 +533,12 @@ public class NanoTest extends TestCase {
     byte [] serialized = MessageNano.toByteArray(msg);
 
     MessageWithGroup parsed = MessageWithGroup.parseFrom(serialized);
-    assertTrue(msg.group != null);
-    assertEquals(1, msg.group.a);
+    assertEquals(1, parsed.group.a);
 
     byte [] serialized2 = MessageNano.toByteArray(parsed);
-    assertEquals(serialized2.length, serialized.length);
+    assertEquals(serialized.length, serialized2.length);
     MessageWithGroup parsed2 = MessageWithGroup.parseFrom(serialized2);
+    assertEquals(1, parsed2.group.a);
   }
 
   public void testNanoOptionalNestedMessage() throws Exception {
@@ -2093,6 +2108,126 @@ public class NanoTest extends TestCase {
   }
 
   /**
+   * Tests that invalid enum values from the wire are not accepted.
+   */
+  public void testNanoEnumValidity() throws Exception {
+    final int invalid = 120;
+    final int alsoInvalid = 121;
+
+    EnumValidity.M m = new EnumValidity.M();
+    // Sanity check & baseline of the assertions for the first case below.
+    assertEquals(EnumValidity.E.default_, m.optionalE);
+    assertEquals(EnumValidity.E.BAZ, m.defaultE);
+
+    m.optionalE = invalid;
+    m.defaultE = invalid;
+    // E contains all valid values
+    m.repeatedE = new int[] {EnumValidity.E.FOO, EnumValidity.E.BAR};
+    m.packedE = new int[] {EnumValidity.E.FOO, EnumValidity.E.BAZ};
+    // E2 contains some invalid values
+    m.repeatedE2 = new int[] {invalid, EnumValidity.E.BAR, alsoInvalid};
+    m.packedE2 = new int[] {EnumValidity.E.FOO, invalid, alsoInvalid};
+    // E3 contains all invalid values
+    m.repeatedE3 = new int[] {invalid, invalid};
+    m.packedE3 = new int[] {alsoInvalid, alsoInvalid};
+    byte[] serialized = MessageNano.toByteArray(m);
+    // Sanity check that we do have all data in the byte array.
+    assertEquals(31, serialized.length);
+
+    // Test 1: tests that invalid values aren't included in the deserialized message.
+    EnumValidity.M deserialized = MessageNano.mergeFrom(new EnumValidity.M(), serialized);
+    assertEquals(EnumValidity.E.default_, deserialized.optionalE);
+    assertEquals(EnumValidity.E.BAZ, deserialized.defaultE);
+    assertTrue(Arrays.equals(
+        new int[] {EnumValidity.E.FOO, EnumValidity.E.BAR}, deserialized.repeatedE));
+    assertTrue(Arrays.equals(
+        new int[] {EnumValidity.E.FOO, EnumValidity.E.BAZ}, deserialized.packedE));
+    assertTrue(Arrays.equals(
+        new int[] {EnumValidity.E.BAR}, deserialized.repeatedE2));
+    assertTrue(Arrays.equals(
+        new int[] {EnumValidity.E.FOO}, deserialized.packedE2));
+    assertEquals(0, deserialized.repeatedE3.length);
+    assertEquals(0, deserialized.packedE3.length);
+
+    // Test 2: tests that invalid values do not override previous values in the field, including
+    // arrays, including pre-existing invalid values.
+    deserialized.optionalE = EnumValidity.E.BAR;
+    deserialized.defaultE = alsoInvalid;
+    deserialized.repeatedE = new int[] {EnumValidity.E.BAZ};
+    deserialized.packedE = new int[] {EnumValidity.E.BAZ, alsoInvalid};
+    deserialized.repeatedE2 = new int[] {invalid, alsoInvalid};
+    deserialized.packedE2 = null;
+    deserialized.repeatedE3 = null;
+    deserialized.packedE3 = new int[0];
+    MessageNano.mergeFrom(deserialized, serialized);
+    assertEquals(EnumValidity.E.BAR, deserialized.optionalE);
+    assertEquals(alsoInvalid, deserialized.defaultE);
+    assertTrue(Arrays.equals(
+        new int[] {EnumValidity.E.BAZ, /* + */ EnumValidity.E.FOO, EnumValidity.E.BAR},
+        deserialized.repeatedE));
+    assertTrue(Arrays.equals(
+        new int[] {EnumValidity.E.BAZ, alsoInvalid, /* + */ EnumValidity.E.FOO, EnumValidity.E.BAZ},
+        deserialized.packedE));
+    assertTrue(Arrays.equals(
+        new int[] {invalid, alsoInvalid, /* + */ EnumValidity.E.BAR},
+        deserialized.repeatedE2));
+    assertTrue(Arrays.equals(
+        new int[] {/* <null> + */ EnumValidity.E.FOO},
+        deserialized.packedE2));
+    assertNull(deserialized.repeatedE3); // null + all invalid == null
+    assertEquals(0, deserialized.packedE3.length); // empty + all invalid == empty
+
+    // Test 3: reading by alternative forms
+    EnumValidity.Alt alt = MessageNano.mergeFrom(new EnumValidity.Alt(), serialized);
+    assertEquals(EnumValidity.E.BAR, // last valid value in m.repeatedE2
+        alt.repeatedE2AsOptional);
+    assertTrue(Arrays.equals(new int[] {EnumValidity.E.FOO}, alt.packedE2AsNonPacked));
+    assertEquals(0, alt.nonPackedE3AsPacked.length);
+  }
+
+  /**
+   * Tests the same as {@link #testNanoEnumValidity()} with accessor style. Repeated fields are
+   * not re-tested here because they are not affected by the accessor style.
+   */
+  public void testNanoEnumValidityAccessors() throws Exception {
+    final int invalid = 120;
+    final int alsoInvalid = 121;
+
+    EnumValidityAccessors.M m = new EnumValidityAccessors.M();
+    // Sanity check & baseline of the assertions for the first case below.
+    assertEquals(EnumValidityAccessors.default_, m.getOptionalE());
+    assertEquals(EnumValidityAccessors.BAZ, m.getDefaultE());
+
+    m.setOptionalE(invalid);
+    m.setDefaultE(invalid);
+    // Set repeatedE2 for Alt.repeatedE2AsOptional
+    m.repeatedE2 = new int[] {invalid, EnumValidityAccessors.BAR, alsoInvalid};
+    byte[] serialized = MessageNano.toByteArray(m);
+    // Sanity check that we do have all data in the byte array.
+    assertEquals(10, serialized.length);
+
+    // Test 1: tests that invalid values aren't included in the deserialized message.
+    EnumValidityAccessors.M deserialized =
+        MessageNano.mergeFrom(new EnumValidityAccessors.M(), serialized);
+    assertEquals(EnumValidityAccessors.default_, deserialized.getOptionalE());
+    assertEquals(EnumValidityAccessors.BAZ, deserialized.getDefaultE());
+
+    // Test 2: tests that invalid values do not override previous values in the field, including
+    // pre-existing invalid values.
+    deserialized.setOptionalE(EnumValidityAccessors.BAR);
+    deserialized.setDefaultE(alsoInvalid);
+    MessageNano.mergeFrom(deserialized, serialized);
+    assertEquals(EnumValidityAccessors.BAR, deserialized.getOptionalE());
+    assertEquals(alsoInvalid, deserialized.getDefaultE());
+
+    // Test 3: reading by alternative forms
+    EnumValidityAccessors.Alt alt =
+        MessageNano.mergeFrom(new EnumValidityAccessors.Alt(), serialized);
+    assertEquals(EnumValidityAccessors.BAR, // last valid value in m.repeatedE2
+        alt.getRepeatedE2AsOptional());
+  }
+
+  /**
    * Tests that code generation correctly wraps a single message into its outer
    * class. The class {@code SingleMessageNano} is imported from the outer
    * class {@code UnittestSingleNano}, whose name is implicit. Any error would
@@ -2100,6 +2235,7 @@ public class NanoTest extends TestCase {
    */
   public void testNanoSingle() throws Exception {
     SingleMessageNano msg = new SingleMessageNano();
+    assertNotNull(msg);
   }
 
   /**
@@ -2475,12 +2611,14 @@ public class NanoTest extends TestCase {
     msg.defaultFloatNan = 0;
     byte[] result = MessageNano.toByteArray(msg);
     int msgSerializedSize = msg.getSerializedSize();
+    assertTrue(result.length == msgSerializedSize);
     assertTrue(msgSerializedSize > 3);
 
     msg.defaultDoubleNan = Double.NaN;
     msg.defaultFloatNan = Float.NaN;
     result = MessageNano.toByteArray(msg);
     msgSerializedSize = msg.getSerializedSize();
+    assertEquals(3, result.length);
     assertEquals(3, msgSerializedSize);
   }
 
@@ -2613,57 +2751,177 @@ public class NanoTest extends TestCase {
   public void testExtensions() throws Exception {
     Extensions.ExtendableMessage message = new Extensions.ExtendableMessage();
     message.field = 5;
-    message.setExtension(Extensions.someString, "Hello World!");
-    message.setExtension(Extensions.someBool, true);
-    message.setExtension(Extensions.someInt, 42);
-    message.setExtension(Extensions.someLong, 124234234234L);
-    message.setExtension(Extensions.someFloat, 42.0f);
-    message.setExtension(Extensions.someDouble, 422222.0);
-    message.setExtension(Extensions.someEnum, Extensions.FIRST_VALUE);
-    AnotherMessage another = new AnotherMessage();
-    another.string = "Foo";
-    another.value = true;
-    message.setExtension(Extensions.someMessage, another);
-
-    message.setExtension(Extensions.someRepeatedString, list("a", "bee", "seeya"));
-    message.setExtension(Extensions.someRepeatedBool, list(true, false, true));
-    message.setExtension(Extensions.someRepeatedInt, list(4, 8, 15, 16, 23, 42));
-    message.setExtension(Extensions.someRepeatedLong, list(4L, 8L, 15L, 16L, 23L, 42L));
-    message.setExtension(Extensions.someRepeatedFloat, list(1.0f, 3.0f));
-    message.setExtension(Extensions.someRepeatedDouble, list(55.133, 3.14159));
-    message.setExtension(Extensions.someRepeatedEnum, list(Extensions.FIRST_VALUE,
-        Extensions.SECOND_VALUE));
-    AnotherMessage second = new AnotherMessage();
-    second.string = "Whee";
-    second.value = false;
-    message.setExtension(Extensions.someRepeatedMessage, list(another, second));
+    int[] int32s = {1, 2};
+    int[] uint32s = {3, 4};
+    int[] sint32s = {-5, -6};
+    long[] int64s = {7, 8};
+    long[] uint64s = {9, 10};
+    long[] sint64s = {-11, -12};
+    int[] fixed32s = {13, 14};
+    int[] sfixed32s = {-15, -16};
+    long[] fixed64s = {17, 18};
+    long[] sfixed64s = {-19, -20};
+    boolean[] bools = {true, false};
+    float[] floats = {2.1f, 2.2f};
+    double[] doubles = {2.3, 2.4};
+    int[] enums = {Extensions.SECOND_VALUE, Extensions.FIRST_VALUE};
+    String[] strings = {"vijfentwintig", "twenty-six"};
+    byte[][] bytess = {{2, 7}, {2, 8}};
+    AnotherMessage another1 = new AnotherMessage();
+    another1.string = "er shi jiu";
+    another1.value = false;
+    AnotherMessage another2 = new AnotherMessage();
+    another2.string = "trente";
+    another2.value = true;
+    AnotherMessage[] messages = {another1, another2};
+    RepeatedExtensions.RepeatedGroup group1 = new RepeatedExtensions.RepeatedGroup();
+    group1.a = 31;
+    RepeatedExtensions.RepeatedGroup group2 = new RepeatedExtensions.RepeatedGroup();
+    group2.a = 32;
+    RepeatedExtensions.RepeatedGroup[] groups = {group1, group2};
+    message.setExtension(RepeatedExtensions.repeatedInt32, int32s);
+    message.setExtension(RepeatedExtensions.repeatedUint32, uint32s);
+    message.setExtension(RepeatedExtensions.repeatedSint32, sint32s);
+    message.setExtension(RepeatedExtensions.repeatedInt64, int64s);
+    message.setExtension(RepeatedExtensions.repeatedUint64, uint64s);
+    message.setExtension(RepeatedExtensions.repeatedSint64, sint64s);
+    message.setExtension(RepeatedExtensions.repeatedFixed32, fixed32s);
+    message.setExtension(RepeatedExtensions.repeatedSfixed32, sfixed32s);
+    message.setExtension(RepeatedExtensions.repeatedFixed64, fixed64s);
+    message.setExtension(RepeatedExtensions.repeatedSfixed64, sfixed64s);
+    message.setExtension(RepeatedExtensions.repeatedBool, bools);
+    message.setExtension(RepeatedExtensions.repeatedFloat, floats);
+    message.setExtension(RepeatedExtensions.repeatedDouble, doubles);
+    message.setExtension(RepeatedExtensions.repeatedEnum, enums);
+    message.setExtension(RepeatedExtensions.repeatedString, strings);
+    message.setExtension(RepeatedExtensions.repeatedBytes, bytess);
+    message.setExtension(RepeatedExtensions.repeatedMessage, messages);
+    message.setExtension(RepeatedExtensions.repeatedGroup, groups);
 
     byte[] data = MessageNano.toByteArray(message);
+    message = Extensions.ExtendableMessage.parseFrom(data);
+    assertEquals(5, message.field);
 
-    Extensions.ExtendableMessage deserialized = Extensions.ExtendableMessage.parseFrom(data);
-    assertEquals(5, deserialized.field);
-    assertEquals("Hello World!", deserialized.getExtension(Extensions.someString));
-    assertEquals(Boolean.TRUE, deserialized.getExtension(Extensions.someBool));
-    assertEquals(Integer.valueOf(42), deserialized.getExtension(Extensions.someInt));
-    assertEquals(Long.valueOf(124234234234L), deserialized.getExtension(Extensions.someLong));
-    assertEquals(Float.valueOf(42.0f), deserialized.getExtension(Extensions.someFloat));
-    assertEquals(Double.valueOf(422222.0), deserialized.getExtension(Extensions.someDouble));
-    assertEquals(Integer.valueOf(Extensions.FIRST_VALUE),
-        deserialized.getExtension(Extensions.someEnum));
-    assertEquals(another.string, deserialized.getExtension(Extensions.someMessage).string);
-    assertEquals(another.value, deserialized.getExtension(Extensions.someMessage).value);
-    assertEquals(list("a", "bee", "seeya"), deserialized.getExtension(Extensions.someRepeatedString));
-    assertEquals(list(true, false, true), deserialized.getExtension(Extensions.someRepeatedBool));
-    assertEquals(list(4, 8, 15, 16, 23, 42), deserialized.getExtension(Extensions.someRepeatedInt));
-    assertEquals(list(4L, 8L, 15L, 16L, 23L, 42L), deserialized.getExtension(Extensions.someRepeatedLong));
-    assertEquals(list(1.0f, 3.0f), deserialized.getExtension(Extensions.someRepeatedFloat));
-    assertEquals(list(55.133, 3.14159), deserialized.getExtension(Extensions.someRepeatedDouble));
-    assertEquals(list(Extensions.FIRST_VALUE,
-        Extensions.SECOND_VALUE), deserialized.getExtension(Extensions.someRepeatedEnum));
-    assertEquals("Foo", deserialized.getExtension(Extensions.someRepeatedMessage).get(0).string);
-    assertEquals(true, deserialized.getExtension(Extensions.someRepeatedMessage).get(0).value);
-    assertEquals("Whee", deserialized.getExtension(Extensions.someRepeatedMessage).get(1).string);
-    assertEquals(false, deserialized.getExtension(Extensions.someRepeatedMessage).get(1).value);
+    // Test reading back using SingularExtensions: the retrieved value should equal the last
+    // in each array.
+    assertEquals(int32s[1], (int) message.getExtension(SingularExtensions.someInt32));
+    assertEquals(uint32s[1], (int) message.getExtension(SingularExtensions.someUint32));
+    assertEquals(sint32s[1], (int) message.getExtension(SingularExtensions.someSint32));
+    assertEquals(int64s[1], (long) message.getExtension(SingularExtensions.someInt64));
+    assertEquals(uint64s[1], (long) message.getExtension(SingularExtensions.someUint64));
+    assertEquals(sint64s[1], (long) message.getExtension(SingularExtensions.someSint64));
+    assertEquals(fixed32s[1], (int) message.getExtension(SingularExtensions.someFixed32));
+    assertEquals(sfixed32s[1], (int) message.getExtension(SingularExtensions.someSfixed32));
+    assertEquals(fixed64s[1], (long) message.getExtension(SingularExtensions.someFixed64));
+    assertEquals(sfixed64s[1], (long) message.getExtension(SingularExtensions.someSfixed64));
+    assertEquals(bools[1], (boolean) message.getExtension(SingularExtensions.someBool));
+    assertEquals(floats[1], (float) message.getExtension(SingularExtensions.someFloat));
+    assertEquals(doubles[1], (double) message.getExtension(SingularExtensions.someDouble));
+    assertEquals(enums[1], (int) message.getExtension(SingularExtensions.someEnum));
+    assertEquals(strings[1], message.getExtension(SingularExtensions.someString));
+    assertTrue(Arrays.equals(bytess[1], message.getExtension(SingularExtensions.someBytes)));
+    AnotherMessage deserializedMessage = message.getExtension(SingularExtensions.someMessage);
+    assertEquals(another2.string, deserializedMessage.string);
+    assertEquals(another2.value, deserializedMessage.value);
+    assertEquals(group2.a, message.getExtension(SingularExtensions.someGroup).a);
+
+    // Test reading back using RepeatedExtensions: the arrays should be equal.
+    assertTrue(Arrays.equals(int32s, message.getExtension(RepeatedExtensions.repeatedInt32)));
+    assertTrue(Arrays.equals(uint32s, message.getExtension(RepeatedExtensions.repeatedUint32)));
+    assertTrue(Arrays.equals(sint32s, message.getExtension(RepeatedExtensions.repeatedSint32)));
+    assertTrue(Arrays.equals(int64s, message.getExtension(RepeatedExtensions.repeatedInt64)));
+    assertTrue(Arrays.equals(uint64s, message.getExtension(RepeatedExtensions.repeatedUint64)));
+    assertTrue(Arrays.equals(sint64s, message.getExtension(RepeatedExtensions.repeatedSint64)));
+    assertTrue(Arrays.equals(fixed32s, message.getExtension(RepeatedExtensions.repeatedFixed32)));
+    assertTrue(Arrays.equals(sfixed32s, message.getExtension(RepeatedExtensions.repeatedSfixed32)));
+    assertTrue(Arrays.equals(fixed64s, message.getExtension(RepeatedExtensions.repeatedFixed64)));
+    assertTrue(Arrays.equals(sfixed64s, message.getExtension(RepeatedExtensions.repeatedSfixed64)));
+    assertTrue(Arrays.equals(bools, message.getExtension(RepeatedExtensions.repeatedBool)));
+    assertTrue(Arrays.equals(floats, message.getExtension(RepeatedExtensions.repeatedFloat)));
+    assertTrue(Arrays.equals(doubles, message.getExtension(RepeatedExtensions.repeatedDouble)));
+    assertTrue(Arrays.equals(enums, message.getExtension(RepeatedExtensions.repeatedEnum)));
+    assertTrue(Arrays.equals(strings, message.getExtension(RepeatedExtensions.repeatedString)));
+    byte[][] deserializedRepeatedBytes = message.getExtension(RepeatedExtensions.repeatedBytes);
+    assertEquals(2, deserializedRepeatedBytes.length);
+    assertTrue(Arrays.equals(bytess[0], deserializedRepeatedBytes[0]));
+    assertTrue(Arrays.equals(bytess[1], deserializedRepeatedBytes[1]));
+    AnotherMessage[] deserializedRepeatedMessage =
+        message.getExtension(RepeatedExtensions.repeatedMessage);
+    assertEquals(2, deserializedRepeatedMessage.length);
+    assertEquals(another1.string, deserializedRepeatedMessage[0].string);
+    assertEquals(another1.value, deserializedRepeatedMessage[0].value);
+    assertEquals(another2.string, deserializedRepeatedMessage[1].string);
+    assertEquals(another2.value, deserializedRepeatedMessage[1].value);
+    RepeatedExtensions.RepeatedGroup[] deserializedRepeatedGroup =
+        message.getExtension(RepeatedExtensions.repeatedGroup);
+    assertEquals(2, deserializedRepeatedGroup.length);
+    assertEquals(group1.a, deserializedRepeatedGroup[0].a);
+    assertEquals(group2.a, deserializedRepeatedGroup[1].a);
+
+    // Test reading back using PackedExtensions: the arrays should be equal, even the fields
+    // are non-packed.
+    assertTrue(Arrays.equals(int32s, message.getExtension(PackedExtensions.packedInt32)));
+    assertTrue(Arrays.equals(uint32s, message.getExtension(PackedExtensions.packedUint32)));
+    assertTrue(Arrays.equals(sint32s, message.getExtension(PackedExtensions.packedSint32)));
+    assertTrue(Arrays.equals(int64s, message.getExtension(PackedExtensions.packedInt64)));
+    assertTrue(Arrays.equals(uint64s, message.getExtension(PackedExtensions.packedUint64)));
+    assertTrue(Arrays.equals(sint64s, message.getExtension(PackedExtensions.packedSint64)));
+    assertTrue(Arrays.equals(fixed32s, message.getExtension(PackedExtensions.packedFixed32)));
+    assertTrue(Arrays.equals(sfixed32s, message.getExtension(PackedExtensions.packedSfixed32)));
+    assertTrue(Arrays.equals(fixed64s, message.getExtension(PackedExtensions.packedFixed64)));
+    assertTrue(Arrays.equals(sfixed64s, message.getExtension(PackedExtensions.packedSfixed64)));
+    assertTrue(Arrays.equals(bools, message.getExtension(PackedExtensions.packedBool)));
+    assertTrue(Arrays.equals(floats, message.getExtension(PackedExtensions.packedFloat)));
+    assertTrue(Arrays.equals(doubles, message.getExtension(PackedExtensions.packedDouble)));
+    assertTrue(Arrays.equals(enums, message.getExtension(PackedExtensions.packedEnum)));
+
+    // Now set the packable extension values using PackedExtensions so they're serialized packed.
+    message.setExtension(PackedExtensions.packedInt32, int32s);
+    message.setExtension(PackedExtensions.packedUint32, uint32s);
+    message.setExtension(PackedExtensions.packedSint32, sint32s);
+    message.setExtension(PackedExtensions.packedInt64, int64s);
+    message.setExtension(PackedExtensions.packedUint64, uint64s);
+    message.setExtension(PackedExtensions.packedSint64, sint64s);
+    message.setExtension(PackedExtensions.packedFixed32, fixed32s);
+    message.setExtension(PackedExtensions.packedSfixed32, sfixed32s);
+    message.setExtension(PackedExtensions.packedFixed64, fixed64s);
+    message.setExtension(PackedExtensions.packedSfixed64, sfixed64s);
+    message.setExtension(PackedExtensions.packedBool, bools);
+    message.setExtension(PackedExtensions.packedFloat, floats);
+    message.setExtension(PackedExtensions.packedDouble, doubles);
+    message.setExtension(PackedExtensions.packedEnum, enums);
+
+    // And read back using non-packed RepeatedExtensions.
+    byte[] data2 = MessageNano.toByteArray(message);
+    message = MessageNano.mergeFrom(new Extensions.ExtendableMessage(), data2);
+    assertTrue(Arrays.equals(int32s, message.getExtension(RepeatedExtensions.repeatedInt32)));
+    assertTrue(Arrays.equals(uint32s, message.getExtension(RepeatedExtensions.repeatedUint32)));
+    assertTrue(Arrays.equals(sint32s, message.getExtension(RepeatedExtensions.repeatedSint32)));
+    assertTrue(Arrays.equals(int64s, message.getExtension(RepeatedExtensions.repeatedInt64)));
+    assertTrue(Arrays.equals(uint64s, message.getExtension(RepeatedExtensions.repeatedUint64)));
+    assertTrue(Arrays.equals(sint64s, message.getExtension(RepeatedExtensions.repeatedSint64)));
+    assertTrue(Arrays.equals(fixed32s, message.getExtension(RepeatedExtensions.repeatedFixed32)));
+    assertTrue(Arrays.equals(sfixed32s, message.getExtension(RepeatedExtensions.repeatedSfixed32)));
+    assertTrue(Arrays.equals(fixed64s, message.getExtension(RepeatedExtensions.repeatedFixed64)));
+    assertTrue(Arrays.equals(sfixed64s, message.getExtension(RepeatedExtensions.repeatedSfixed64)));
+    assertTrue(Arrays.equals(bools, message.getExtension(RepeatedExtensions.repeatedBool)));
+    assertTrue(Arrays.equals(floats, message.getExtension(RepeatedExtensions.repeatedFloat)));
+    assertTrue(Arrays.equals(doubles, message.getExtension(RepeatedExtensions.repeatedDouble)));
+    assertTrue(Arrays.equals(enums, message.getExtension(RepeatedExtensions.repeatedEnum)));
+  }
+
+  public void testNullExtensions() throws Exception {
+    // Check that clearing the extension on an empty message is a no-op.
+    Extensions.ExtendableMessage message = new Extensions.ExtendableMessage();
+    message.setExtension(SingularExtensions.someMessage, null);
+    assertEquals(0, MessageNano.toByteArray(message).length);
+
+    // Check that the message is empty after setting and clearing an extension.
+    AnotherMessage another = new AnotherMessage();
+    message.setExtension(SingularExtensions.someMessage, another);
+    assertTrue(MessageNano.toByteArray(message).length > 0);
+    message.setExtension(SingularExtensions.someMessage, null);
+    assertEquals(0, MessageNano.toByteArray(message).length);
   }
 
   public void testUnknownFields() throws Exception {
@@ -3248,12 +3506,16 @@ public class NanoTest extends TestCase {
     // Check that repeated fields with packable types can accept both packed and unpacked
     // serialized forms.
     NanoRepeatedPackables.NonPacked nonPacked = new NanoRepeatedPackables.NonPacked();
-    nonPacked.int32S = new int[] {1, 2, 3};
-    nonPacked.int64S = new long[] {4, 5, 6};
-    nonPacked.uint32S = new int[] {7, 8, 9};
-    nonPacked.uint64S = new long[] {10, 11, 12};
-    nonPacked.sint32S = new int[] {13, 14, 15};
-    nonPacked.sint64S = new long[] {16, 17, 18};
+    // Exaggerates the first values of varint-typed arrays. This is to test that the parsing code
+    // of packed fields handles non-packed data correctly. If the code incorrectly thinks it is
+    // reading from a packed tag, it will read the first value as the byte length of the field,
+    // and the large number will cause the input to go out of bounds, thus capturing the error.
+    nonPacked.int32S = new int[] {1000, 2, 3};
+    nonPacked.int64S = new long[] {4000, 5, 6};
+    nonPacked.uint32S = new int[] {7000, 8, 9};
+    nonPacked.uint64S = new long[] {10000, 11, 12};
+    nonPacked.sint32S = new int[] {13000, 14, 15};
+    nonPacked.sint64S = new long[] {16000, 17, 18};
     nonPacked.fixed32S = new int[] {19, 20, 21};
     nonPacked.fixed64S = new long[] {22, 23, 24};
     nonPacked.sfixed32S = new int[] {25, 26, 27};
@@ -3290,8 +3552,8 @@ public class NanoTest extends TestCase {
     nonPacked = MessageNano.mergeFrom(new NanoRepeatedPackables.NonPacked(), mixedSerialized);
     packed = MessageNano.mergeFrom(new NanoRepeatedPackables.Packed(), mixedSerialized);
     assertRepeatedPackablesEqual(nonPacked, packed);
-    assertTrue(Arrays.equals(new int[] {1, 2, 3, 1, 2, 3}, nonPacked.int32S));
-    assertTrue(Arrays.equals(new int[] {13, 14, 15, 13, 14, 15}, nonPacked.sint32S));
+    assertTrue(Arrays.equals(new int[] {1000, 2, 3, 1000, 2, 3}, nonPacked.int32S));
+    assertTrue(Arrays.equals(new int[] {13000, 14, 15, 13000, 14, 15}, nonPacked.sint32S));
     assertTrue(Arrays.equals(new int[] {25, 26, 27, 25, 26, 27}, nonPacked.sfixed32S));
     assertTrue(Arrays.equals(new boolean[] {false, true, false, true}, nonPacked.bools));
   }
@@ -3335,14 +3597,5 @@ public class NanoTest extends TestCase {
       sb.append(String.format("%02x ", b));
     }
     return sb.toString();
-  }
-
-  private <T> List<T> list(T first, T... remaining) {
-    List<T> list = new ArrayList<T>();
-    list.add(first);
-    for (T item : remaining) {
-      list.add(item);
-    }
-    return list;
   }
 }
