@@ -501,7 +501,11 @@ void MessageGenerator::GenerateEquals(io::Printer* printer) {
 
   if (params_.store_unknown_fields()) {
     printer->Print(
-      "return unknownFieldDataEquals(other);\n");
+      "if (unknownFieldData == null || unknownFieldData.isEmpty()) {\n"
+      "  return other.unknownFieldData == null || other.unknownFieldData.isEmpty();"
+      "} else {\n"
+      "  return unknownFieldData.equals(other.unknownFieldData);\n"
+      "}\n");
   } else {
     printer->Print(
       "return true;\n");
@@ -530,7 +534,8 @@ void MessageGenerator::GenerateHashCode(io::Printer* printer) {
 
   if (params_.store_unknown_fields()) {
     printer->Print(
-      "result = 31 * result + unknownFieldDataHashCode();\n");
+      "result = 31 * result + (unknownFieldData == null || unknownFieldData.isEmpty()\n"
+      "    ? 0 : unknownFieldData.hashCode());\n");
   }
 
   printer->Print("return result;\n");
