@@ -31,8 +31,6 @@
 package com.google.protobuf.nano;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Base class of those Protocol Buffer messages that need to store unknown fields,
@@ -44,42 +42,79 @@ public abstract class ExtendableMessageNano<M extends ExtendableMessageNano<M>>
      * A container for fields unknown to the message, including extensions. Extension fields can
      * can be accessed through the {@link #getExtension} and {@link #setExtension} methods.
      */
-    protected List<UnknownFieldData> unknownFieldData;
+    protected FieldArray unknownFieldData;
 
     @Override
     protected int computeSerializedSize() {
         int size = 0;
-        int unknownFieldCount = unknownFieldData == null ? 0 : unknownFieldData.size();
-        for (int i = 0; i < unknownFieldCount; i++) {
-            UnknownFieldData unknownField = unknownFieldData.get(i);
-            size += CodedOutputByteBufferNano.computeRawVarint32Size(unknownField.tag);
-            size += unknownField.bytes.length;
+        if (unknownFieldData != null) {
+            for (int i = 0; i < unknownFieldData.size(); i++) {
+                FieldData field = unknownFieldData.dataAt(i);
+                size += field.computeSerializedSize();
+            }
         }
         return size;
     }
 
     @Override
     public void writeTo(CodedOutputByteBufferNano output) throws IOException {
-        int unknownFieldCount = unknownFieldData == null ? 0 : unknownFieldData.size();
-        for (int i = 0; i < unknownFieldCount; i++) {
-            UnknownFieldData unknownField = unknownFieldData.get(i);
-            output.writeRawVarint32(unknownField.tag);
-            output.writeRawBytes(unknownField.bytes);
+        if (unknownFieldData == null) {
+            return;
         }
+        for (int i = 0; i < unknownFieldData.size(); i++) {
+            FieldData field = unknownFieldData.dataAt(i);
+            field.writeTo(output);
+        }
+    }
+
+    /**
+     * Checks if there is a value stored for the specified extension in this
+     * message.
+     */
+    public final boolean hasExtension(Extension<M, ?> extension) {
+        if (unknownFieldData == null) {
+            return false;
+        }
+        FieldData field = unknownFieldData.get(WireFormatNano.getTagFieldNumber(extension.tag));
+        return field != null;
     }
 
     /**
      * Gets the value stored in the specified extension of this message.
      */
     public final <T> T getExtension(Extension<M, T> extension) {
-        return extension.getValueFrom(unknownFieldData);
+        if (unknownFieldData == null) {
+            return null;
+        }
+        FieldData field = unknownFieldData.get(WireFormatNano.getTagFieldNumber(extension.tag));
+        return field == null ? null : field.getValue(extension);
     }
 
     /**
      * Sets the value of the specified extension of this message.
      */
     public final <T> M setExtension(Extension<M, T> extension, T value) {
-        unknownFieldData = extension.setValueTo(value, unknownFieldData);
+        int fieldNumber = WireFormatNano.getTagFieldNumber(extension.tag);
+        if (value == null) {
+            if (unknownFieldData != null) {
+                unknownFieldData.remove(fieldNumber);
+                if (unknownFieldData.isEmpty()) {
+                    unknownFieldData = null;
+                }
+            }
+        } else {
+            FieldData field = null;
+            if (unknownFieldData == null) {
+                unknownFieldData = new FieldArray();
+            } else {
+                field = unknownFieldData.get(fieldNumber);
+            }
+            if (field == null) {
+                unknownFieldData.put(fieldNumber, new FieldData(extension, value));
+            } else {
+                field.setValue(extension, value);
+            }
+        }
 
         @SuppressWarnings("unchecked") // Generated code should guarantee type safety
         M typedThis = (M) this;
@@ -106,12 +141,47 @@ public abstract class ExtendableMessageNano<M extends ExtendableMessageNano<M>>
         if (!input.skipField(tag)) {
             return false;  // This wasn't an unknown field, it's an end-group tag.
         }
-        if (unknownFieldData == null) {
-            unknownFieldData = new ArrayList<UnknownFieldData>();
-        }
+        int fieldNumber = WireFormatNano.getTagFieldNumber(tag);
         int endPos = input.getPosition();
         byte[] bytes = input.getData(startPos, endPos - startPos);
-        unknownFieldData.add(new UnknownFieldData(tag, bytes));
+        UnknownFieldData unknownField = new UnknownFieldData(tag, bytes);
+
+        FieldData field = null;
+        if (unknownFieldData == null) {
+            unknownFieldData = new FieldArray();
+        } else {
+            field = unknownFieldData.get(fieldNumber);
+        }
+        if (field == null) {
+            field = new FieldData();
+            unknownFieldData.put(fieldNumber, field);
+        }
+        field.addUnknownField(unknownField);
         return true;
+    }
+
+    /**
+     * Returns whether the stored unknown field data in this message is equivalent to that in the
+     * other message.
+     *
+     * @param other the other message.
+     * @return whether the two sets of unknown field data are equal.
+     */
+    protected final boolean unknownFieldDataEquals(M other) {
+        if (unknownFieldData == null || unknownFieldData.isEmpty()) {
+            return other.unknownFieldData == null || other.unknownFieldData.isEmpty();
+        } else {
+            return unknownFieldData.equals(other.unknownFieldData);
+        }
+    }
+
+    /**
+     * Computes the hashcode representing the unknown field data stored in this message.
+     *
+     * @return the hashcode for the unknown field data.
+     */
+    protected final int unknownFieldDataHashCode() {
+        return (unknownFieldData == null || unknownFieldData.isEmpty()
+                ? 0 : unknownFieldData.hashCode());
     }
 }
