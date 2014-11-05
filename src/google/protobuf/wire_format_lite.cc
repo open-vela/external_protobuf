@@ -55,12 +55,11 @@ const int WireFormatLite::kMessageSetMessageTag;
 
 #endif
 
-// IBM xlC requires prefixing constants with WireFormatLite::
 const int WireFormatLite::kMessageSetItemTagsSize =
-  io::CodedOutputStream::StaticVarintSize32<WireFormatLite::kMessageSetItemStartTag>::value +
-  io::CodedOutputStream::StaticVarintSize32<WireFormatLite::kMessageSetItemEndTag>::value +
-  io::CodedOutputStream::StaticVarintSize32<WireFormatLite::kMessageSetTypeIdTag>::value +
-  io::CodedOutputStream::StaticVarintSize32<WireFormatLite::kMessageSetMessageTag>::value;
+  io::CodedOutputStream::StaticVarintSize32<kMessageSetItemStartTag>::value +
+  io::CodedOutputStream::StaticVarintSize32<kMessageSetItemEndTag>::value +
+  io::CodedOutputStream::StaticVarintSize32<kMessageSetTypeIdTag>::value +
+  io::CodedOutputStream::StaticVarintSize32<kMessageSetMessageTag>::value;
 
 const WireFormatLite::CppType
 WireFormatLite::kFieldTypeToCppTypeMap[MAX_FIELD_TYPE + 1] = {
