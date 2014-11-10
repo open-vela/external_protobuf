@@ -47,6 +47,9 @@
 #include <google/protobuf/compiler/cpp/cpp_unittest.h>
 
 #include <memory>
+#ifndef _SHARED_PTR_H
+#include <google/protobuf/stubs/shared_ptr.h>
+#endif
 #include <vector>
 
 #include <google/protobuf/unittest.pb.h>
@@ -1687,7 +1690,7 @@ TEST_F(OneofTest, SwapBothHasFields) {
   EXPECT_EQ(message2.foo_string(), "FOO");
 }
 
-TEST_F(OneofTest, CopyConstructor) {
+TEST_F(OneofTest, CopyContructor) {
   unittest::TestOneof2 message1;
   message1.set_foo_bytes("FOO");
 
