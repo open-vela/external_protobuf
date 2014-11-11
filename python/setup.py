@@ -20,7 +20,12 @@ except ImportError:
         "ez_setup installed.\n")
     raise
 from distutils.command.clean import clean as _clean
-from distutils.command.build_py import build_py as _build_py
+if sys.version_info[0] >= 3:
+    # Python 3
+    from distutils.command.build_py import build_py_2to3 as _build_py
+else:
+    # Python 2
+    from distutils.command.build_py import build_py as _build_py
 from distutils.spawn import find_executable
 
 maintainer_email = "protobuf@googlegroups.com"
@@ -81,6 +86,8 @@ def GenerateUnittestProtos():
   generate_proto("google/protobuf/internal/more_messages.proto")
   generate_proto("google/protobuf/internal/factory_test1.proto")
   generate_proto("google/protobuf/internal/factory_test2.proto")
+  generate_proto("google/protobuf/internal/import_test_package/inner.proto")
+  generate_proto("google/protobuf/internal/import_test_package/outer.proto")
   generate_proto("google/protobuf/pyext/python.proto")
 
 def MakeTestSuite():
@@ -180,6 +187,7 @@ if __name__ == '__main__':
           'google.protobuf.descriptor_database',
           'google.protobuf.descriptor_pool',
           'google.protobuf.message_factory',
+          'google.protobuf.proto_builder',
           'google.protobuf.pyext.cpp_message',
           'google.protobuf.reflection',
           'google.protobuf.service',
@@ -189,7 +197,11 @@ if __name__ == '__main__':
           'google.protobuf.text_format'],
         cmdclass = { 'clean': clean, 'build_py': build_py },
         install_requires = ['setuptools'],
-        setup_requires = ['google-apputils'],
+        # TODO: Restore dependency once a Python 3 compatible google-apputils
+        # is released.
+        setup_requires = (['google-apputils']
+                          if sys.version_info[0] < 3 else
+                          []),
         ext_modules = ext_module_list,
         url = 'https://developers.google.com/protocol-buffers/',
         maintainer = maintainer_email,
