@@ -430,11 +430,7 @@ const internal::RepeatedFieldAccessor* Reflection::RepeatedFieldAccessor(
       }
       break;
     case FieldDescriptor::CPPTYPE_MESSAGE:
-      if (field->is_map()) {
-        return internal::Singleton<internal::MapFieldAccessor>::get();
-      } else {
-        return internal::Singleton<internal::RepeatedPtrFieldMessageAccessor>::get();
-      }
+      return internal::Singleton<internal::RepeatedPtrFieldMessageAccessor>::get();
   }
   GOOGLE_LOG(FATAL) << "Should not reach here.";
   return NULL;

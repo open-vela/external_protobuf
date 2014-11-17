@@ -30,7 +30,6 @@
 
 syntax = "proto3";
 
-option cc_enable_arenas = true;
 
 import "google/protobuf/unittest_import.proto";
 

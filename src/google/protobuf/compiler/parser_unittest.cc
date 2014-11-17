@@ -178,9 +178,9 @@ class ParserTest : public testing::Test {
   MockErrorCollector error_collector_;
   DescriptorPool pool_;
 
-  google::protobuf::scoped_ptr<io::ZeroCopyInputStream> raw_input_;
-  google::protobuf::scoped_ptr<io::Tokenizer> input_;
-  google::protobuf::scoped_ptr<Parser> parser_;
+  scoped_ptr<io::ZeroCopyInputStream> raw_input_;
+  scoped_ptr<io::Tokenizer> input_;
+  scoped_ptr<Parser> parser_;
   bool require_syntax_identifier_;
 };
 
@@ -214,15 +214,6 @@ TEST_F(ParserTest, StopAfterSyntaxIdentifierWithErrors) {
   parser_->SetStopAfterSyntaxIdentifier(true);
   EXPECT_FALSE(parser_->Parse(input_.get(), NULL));
   EXPECT_EQ("1:9: Expected syntax identifier.\n", error_collector_.text_);
-}
-
-TEST_F(ParserTest, WarnIfSyntaxIdentifierOmmitted) {
-  SetupParser("message A {}");
-  FileDescriptorProto file;
-  CaptureTestStderr();
-  EXPECT_TRUE(parser_->Parse(input_.get(), &file));
-  EXPECT_TRUE(
-      GetCapturedTestStderr().find("No syntax specified") != string::npos);
 }
 
 // ===================================================================

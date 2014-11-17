@@ -126,7 +126,7 @@ class LIBPROTOBUF_EXPORT DynamicMessageFactory : public MessageFactory {
   // public header (for good reason), but dynamic_message.h is, and public
   // headers may only #include other public headers.
   struct PrototypeMap;
-  google::protobuf::scoped_ptr<PrototypeMap> prototypes_;
+  scoped_ptr<PrototypeMap> prototypes_;
   mutable Mutex prototypes_mutex_;
 
   friend class DynamicMessage;

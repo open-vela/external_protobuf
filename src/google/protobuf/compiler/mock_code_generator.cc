@@ -160,7 +160,7 @@ bool MockCodeGenerator::Generate(
 
     for (int i = 0; i < insert_into.size(); i++) {
       {
-        google::protobuf::scoped_ptr<io::ZeroCopyOutputStream> output(context->OpenForInsert(
+        scoped_ptr<io::ZeroCopyOutputStream> output(context->OpenForInsert(
             GetOutputFileName(insert_into[i], file), kFirstInsertionPointName));
         io::Printer printer(output.get(), '$');
         printer.PrintRaw(GetOutputFileContent(name_, "first_insert",
@@ -172,7 +172,7 @@ bool MockCodeGenerator::Generate(
       }
 
       {
-        google::protobuf::scoped_ptr<io::ZeroCopyOutputStream> output(
+        scoped_ptr<io::ZeroCopyOutputStream> output(
             context->OpenForInsert(GetOutputFileName(insert_into[i], file),
                                    kSecondInsertionPointName));
         io::Printer printer(output.get(), '$');
@@ -185,7 +185,7 @@ bool MockCodeGenerator::Generate(
       }
     }
   } else {
-    google::protobuf::scoped_ptr<io::ZeroCopyOutputStream> output(
+    scoped_ptr<io::ZeroCopyOutputStream> output(
         context->Open(GetOutputFileName(name_, file)));
 
     io::Printer printer(output.get(), '$');

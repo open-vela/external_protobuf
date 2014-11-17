@@ -105,7 +105,7 @@ bool CppGenerator::Generate(const FileDescriptor* file,
 
   // Generate header.
   {
-    google::protobuf::scoped_ptr<io::ZeroCopyOutputStream> output(
+    scoped_ptr<io::ZeroCopyOutputStream> output(
         generator_context->Open(basename + ".h"));
     io::Printer printer(output.get(), '$');
     file_generator.GenerateHeader(&printer);
@@ -113,7 +113,7 @@ bool CppGenerator::Generate(const FileDescriptor* file,
 
   // Generate cc file.
   {
-    google::protobuf::scoped_ptr<io::ZeroCopyOutputStream> output(
+    scoped_ptr<io::ZeroCopyOutputStream> output(
         generator_context->Open(basename + ".cc"));
     io::Printer printer(output.get(), '$');
     file_generator.GenerateSource(&printer);

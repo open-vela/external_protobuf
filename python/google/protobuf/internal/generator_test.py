@@ -281,6 +281,8 @@ class GeneratorTest(basetest.TestCase):
                      "baz")
     self.assertEqual(message.Extensions[test_bad_identifiers_pb2.service],
                      "qux")
+    self.assertEqual(message.Extensions[test_bad_identifiers_pb2.class_],
+                     "Foo")
 
   def testOneof(self):
     desc = unittest_pb2.TestAllTypes.DESCRIPTOR

@@ -149,10 +149,6 @@ inline bool UseUnknownFieldSet(const FileDescriptor* file) {
 }
 
 
-// Does the file have any map fields, necessitating the file to include
-// map_field_inl.h and map.h.
-bool HasMapFields(const FileDescriptor* file);
-
 // Does this file have any enum type definitions?
 bool HasEnumDefinitions(const FileDescriptor* file);
 
@@ -204,10 +200,6 @@ void PrintHandlingOptionalStaticInitializers(
     const char* without_static_init);
 
 
-inline bool IsMapEntryMessage(const Descriptor* descriptor) {
-  return descriptor->options().map_entry();
-}
-
 // Returns true if the field's CPPTYPE is string or message.
 bool IsStringOrMessage(const FieldDescriptor* field);
 
@@ -224,7 +216,7 @@ inline bool HasPreservingUnknownEnumSemantics(const FileDescriptor* file) {
 }
 
 inline bool SupportsArenas(const FileDescriptor* file) {
-  return file->options().cc_enable_arenas();
+  return true;
 }
 
 inline bool SupportsArenas(const Descriptor* desc) {
