@@ -117,6 +117,8 @@ struct SourceLocation {
   int end_column;
 
   // Doc comments found at the source location.
+  // TODO(kenton):  Maybe this struct should have been named SourceInfo or
+  //   something instead.  Oh well.
   string leading_comments;
   string trailing_comments;
 };
@@ -475,8 +477,6 @@ class LIBPROTOBUF_EXPORT FieldDescriptor {
                                  //               IsTypePackable(type())
   bool is_packed() const;        // shorthand for is_packable() &&
                                  //               options().packed()
-  bool is_map() const;           // shorthand for type() == TYPE_MESSAGE &&
-                                 // message_type()->options().map_entry()
 
   // Index of this field within the message's field array, or the file or
   // extension scope's extensions array.

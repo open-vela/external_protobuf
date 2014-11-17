@@ -73,6 +73,41 @@ namespace python {
 
 namespace {
 
+const char* const kKeywordList[] = {
+  "and", "as", "break", "class", "continue", "def", "elif", "else", "except",
+  "False", "for", "from", "if", "import", "not", "or", "raise", "return",
+  "True", "try", "with", "while", "yield"
+};
+
+hash_set<string> MakeKeywordsMap() {
+  hash_set<string> result;
+  for (int i = 0; i < GOOGLE_ARRAYSIZE(kKeywordList); ++i) {
+    result.insert(kKeywordList[i]);
+  }
+  return result;
+}
+
+hash_set<string>* keywords_ = NULL;
+GOOGLE_PROTOBUF_DECLARE_ONCE(keywords_once_);
+
+void InitKeywords() {
+  keywords_ = new hash_set<string>();
+  *keywords_ = MakeKeywordsMap();
+}
+
+hash_set<string>& GetKeywords() {
+  ::google::protobuf::GoogleOnceInit(&keywords_once_, &InitKeywords);
+  return *keywords_;
+}
+
+string FieldName(const FieldDescriptor& field) {
+  string result = field.name();
+  if (GetKeywords().count(result) > 0) {
+    result.append("_");
+  }
+  return result;
+}
+
 // Returns a copy of |filename| with any trailing ".protodevel" or ".proto
 // suffix stripped.
 // TODO(robinson): Unify with copy in compiler/cpp/internal/helpers.cc.
@@ -308,7 +343,7 @@ bool Generator::Generate(const FileDescriptor* file,
   fdp.SerializeToString(&file_descriptor_serialized_);
 
 
-  google::protobuf::scoped_ptr<io::ZeroCopyOutputStream> output(context->Open(filename));
+  scoped_ptr<io::ZeroCopyOutputStream> output(context->Open(filename));
   GOOGLE_CHECK(output.get());
   io::Printer printer(output.get(), '$');
   printer_ = &printer;
@@ -496,7 +531,7 @@ void Generator::PrintTopLevelExtensions() const {
     printer_->Print("$constant_name$ = $number$\n",
       "constant_name", constant_name,
       "number", SimpleItoa(extension_field.number()));
-    printer_->Print("$name$ = ", "name", extension_field.name());
+    printer_->Print("$name$ = ", "name", FieldName(extension_field));
     PrintFieldDescriptor(extension_field, is_extension);
     printer_->Print("\n");
   }
@@ -843,7 +878,7 @@ void Generator::AddExtensionToFileDescriptor(
     const FieldDescriptor& descriptor) const {
   map<string, string> m;
   m["descriptor_name"] = kDescriptorKey;
-  m["field_name"] = descriptor.name();
+  m["field_name"] = FieldName(descriptor);
   const char file_descriptor_template[] =
       "$descriptor_name$.extensions_by_name['$field_name$'] = "
       "$field_name$\n";
@@ -896,12 +931,12 @@ string Generator::FieldReferencingExpression(
   GOOGLE_CHECK_EQ(field.file(), file_) << field.file()->name() << " vs. "
                                 << file_->name();
   if (!containing_type) {
-    return field.name();
+    return FieldName(field);
   }
   return strings::Substitute(
       "$0.$1['$2']",
       ModuleLevelDescriptorName(*containing_type),
-      python_dict_name, field.name());
+      python_dict_name, FieldName(field));
 }
 
 // Prints containing_type for nested descriptors or enum descriptors.
@@ -1030,7 +1065,7 @@ void Generator::PrintFieldDescriptor(
   string options_string;
   field.options().SerializeToString(&options_string);
   map<string, string> m;
-  m["name"] = field.name();
+  m["name"] = FieldName(field);
   m["full_name"] = field.full_name();
   m["index"] = SimpleItoa(field.index());
   m["number"] = SimpleItoa(field.number());
@@ -1250,7 +1285,7 @@ void Generator::FixOptionsForField(
     if (field.is_extension()) {
       if (field.extension_scope() == NULL) {
         // Top level extensions.
-        field_name = field.name();
+        field_name = FieldName(field);
       } else {
         field_name = FieldReferencingExpression(
             field.extension_scope(), field, "extensions_by_name");

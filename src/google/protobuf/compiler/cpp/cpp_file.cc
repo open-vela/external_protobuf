@@ -59,13 +59,13 @@ namespace cpp {
 FileGenerator::FileGenerator(const FileDescriptor* file, const Options& options)
     : file_(file),
       message_generators_(
-          new google::protobuf::scoped_ptr<MessageGenerator>[file->message_type_count()]),
+          new scoped_ptr<MessageGenerator>[file->message_type_count()]),
       enum_generators_(
-          new google::protobuf::scoped_ptr<EnumGenerator>[file->enum_type_count()]),
+          new scoped_ptr<EnumGenerator>[file->enum_type_count()]),
       service_generators_(
-          new google::protobuf::scoped_ptr<ServiceGenerator>[file->service_count()]),
+          new scoped_ptr<ServiceGenerator>[file->service_count()]),
       extension_generators_(
-          new google::protobuf::scoped_ptr<ExtensionGenerator>[file->extension_count()]),
+          new scoped_ptr<ExtensionGenerator>[file->extension_count()]),
       options_(options) {
 
   for (int i = 0; i < file->message_type_count(); i++) {
@@ -105,6 +105,7 @@ void FileGenerator::GenerateHeader(io::Printer* printer) {
     "#define PROTOBUF_$filename_identifier$__INCLUDED\n"
     "\n"
     "#include <string>\n"
+    "#include <stdint.h>\n"  // INT32_MIN, INT32_MAX
     "\n",
     "filename", file_->name(),
     "filename_identifier", filename_identifier);
@@ -150,11 +151,6 @@ void FileGenerator::GenerateHeader(io::Printer* printer) {
   printer->Print(
     "#include <google/protobuf/repeated_field.h>\n"
     "#include <google/protobuf/extension_set.h>\n");
-  if (HasMapFields(file_)) {
-    printer->Print(
-      "#include <google/protobuf/map.h>\n"
-      "#include <google/protobuf/map_field_inl.h>\n");
-  }
 
   if (HasDescriptorMethods(file_) && HasEnumDefinitions(file_)) {
     printer->Print(
@@ -400,19 +396,6 @@ void FileGenerator::GenerateSource(io::Printer* printer) {
 
   // Generate classes.
   for (int i = 0; i < file_->message_type_count(); i++) {
-    if (i == 0 && HasGeneratedMethods(file_)) {
-      printer->Print(
-          "\n"
-          "namespace {\n"
-          "\n"
-          "static void MergeFromFail(int line) GOOGLE_ATTRIBUTE_COLD;\n"
-          "static void MergeFromFail(int line) {\n"
-          "  GOOGLE_CHECK(false) << __FILE__ << \":\" << line;\n"
-          "}\n"
-          "\n"
-          "}  // namespace\n"
-          "\n");
-    }
     printer->Print("\n");
     printer->Print(kThickSeparator);
     printer->Print("\n");

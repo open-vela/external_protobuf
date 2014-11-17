@@ -375,7 +375,7 @@ TEST(ExtensionSetTest, ArenaSetAllocatedMessageAndRelease) {
 
 TEST(ExtensionSetTest, SwapExtensionBothFullWithArena) {
   ::google::protobuf::Arena arena1;
-  google::protobuf::scoped_ptr<google::protobuf::Arena> arena2(new ::google::protobuf::Arena());
+  scoped_ptr<google::protobuf::Arena> arena2(new ::google::protobuf::Arena());
 
   unittest::TestAllExtensions* message1 =
       Arena::CreateMessage<unittest::TestAllExtensions>(&arena1);

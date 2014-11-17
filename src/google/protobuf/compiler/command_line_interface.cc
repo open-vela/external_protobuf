@@ -300,7 +300,7 @@ class CommandLineInterface::MemoryOutputStream
   bool append_mode_;
 
   // StringOutputStream writing to data_.
-  google::protobuf::scoped_ptr<io::StringOutputStream> inner_;
+  scoped_ptr<io::StringOutputStream> inner_;
 };
 
 // -------------------------------------------------------------------
@@ -1321,7 +1321,7 @@ bool CommandLineInterface::GeneratePluginOutput(
 
   // Write the files.  We do this even if there was a generator error in order
   // to match the behavior of a compiled-in generator.
-  google::protobuf::scoped_ptr<io::ZeroCopyOutputStream> current_output;
+  scoped_ptr<io::ZeroCopyOutputStream> current_output;
   for (int i = 0; i < response.file_size(); i++) {
     const CodeGeneratorResponse::File& output_file = response.file(i);
 
@@ -1370,7 +1370,7 @@ bool CommandLineInterface::EncodeOrDecode(const DescriptorPool* pool) {
   }
 
   DynamicMessageFactory dynamic_factory(pool);
-  google::protobuf::scoped_ptr<Message> message(dynamic_factory.GetPrototype(type)->New());
+  scoped_ptr<Message> message(dynamic_factory.GetPrototype(type)->New());
 
   if (mode_ == MODE_ENCODE) {
     SetFdToTextMode(STDIN_FILENO);

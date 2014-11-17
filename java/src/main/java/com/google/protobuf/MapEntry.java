@@ -282,7 +282,7 @@ public final class MapEntry<K, V> extends AbstractMessage {
     @Override
     public MapEntry<K, V> buildPartial() {
       if (dataBuilder != null) {
-        data = dataBuilder.buildPartial();
+        data = dataBuilder.build();
         dataBuilder = null;
       }
       return new MapEntry<K, V>(metadata, data);

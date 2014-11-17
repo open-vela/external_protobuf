@@ -251,7 +251,7 @@ TEST(GeneratedMessageTest, ReleaseString) {
 
   message.set_default_string("blah");
   EXPECT_TRUE(message.has_default_string());
-  google::protobuf::scoped_ptr<string> str(message.release_default_string());
+  scoped_ptr<string> str(message.release_default_string());
   EXPECT_FALSE(message.has_default_string());
   ASSERT_TRUE(str != NULL);
   EXPECT_EQ("blah", *str);
@@ -270,7 +270,7 @@ TEST(GeneratedMessageTest, ReleaseMessage) {
   EXPECT_FALSE(message.has_optional_nested_message());
 
   message.mutable_optional_nested_message()->set_bb(1);
-  google::protobuf::scoped_ptr<unittest::TestAllTypes::NestedMessage> nest(
+  scoped_ptr<unittest::TestAllTypes::NestedMessage> nest(
       message.release_optional_nested_message());
   EXPECT_FALSE(message.has_optional_nested_message());
   ASSERT_TRUE(nest != NULL);
@@ -534,7 +534,7 @@ TEST(GeneratedMessageTest, DynamicMessageCopyFrom) {
 
   // Construct a new version of the dynamic message via the factory.
   DynamicMessageFactory factory;
-  google::protobuf::scoped_ptr<Message> message1;
+  scoped_ptr<Message> message1;
   message1.reset(factory.GetPrototype(
                      unittest::TestAllTypes::descriptor())->New());
 
@@ -581,9 +581,9 @@ TEST(GeneratedMessageTest, NonEmptyMergeFrom) {
 
 TEST(GeneratedMessageTest, MergeFromSelf) {
   unittest::TestAllTypes message;
-  EXPECT_DEATH(message.MergeFrom(message), "Check failed:.*pb[.]cc");
+  EXPECT_DEATH(message.MergeFrom(message), "&from");
   EXPECT_DEATH(message.MergeFrom(implicit_cast<const Message&>(message)),
-               "Check failed:.*pb[.]cc");
+               "&from");
 }
 
 #endif  // PROTOBUF_HAS_DEATH_TEST
@@ -1221,7 +1221,7 @@ class GeneratedServiceTest : public testing::Test {
   unittest::FooResponse foo_response_;
   unittest::BarRequest bar_request_;
   unittest::BarResponse bar_response_;
-  google::protobuf::scoped_ptr<Closure> done_;
+  scoped_ptr<Closure> done_;
 };
 
 TEST_F(GeneratedServiceTest, GetDescriptor) {
@@ -1519,7 +1519,7 @@ TEST_F(OneofTest, ReleaseString) {
 
   message.set_foo_string("blah");
   EXPECT_TRUE(message.has_foo_string());
-  google::protobuf::scoped_ptr<string> str(message.release_foo_string());
+  scoped_ptr<string> str(message.release_foo_string());
   EXPECT_FALSE(message.has_foo_string());
   ASSERT_TRUE(str != NULL);
   EXPECT_EQ("blah", *str);
@@ -1573,7 +1573,7 @@ TEST_F(OneofTest, ReleaseMessage) {
 
   message.mutable_foo_message()->set_qux_int(1);
   EXPECT_TRUE(message.has_foo_message());
-  google::protobuf::scoped_ptr<unittest::TestOneof2_NestedMessage> mes(
+  scoped_ptr<unittest::TestOneof2_NestedMessage> mes(
       message.release_foo_message());
   EXPECT_FALSE(message.has_foo_message());
   ASSERT_TRUE(mes != NULL);
