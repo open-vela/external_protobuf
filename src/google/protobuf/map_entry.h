@@ -43,10 +43,6 @@ class Arena;
 namespace protobuf {
 namespace internal {
 
-// Register all MapEntry default instances so we can delete them in
-// ShutdownProtobufLibrary().
-void RegisterMapEntryDefaultInstance(MessageLite* default_instance);
-
 // This is the common base class for MapEntry. It is used by MapFieldBase in
 // reflection api, in which the static type of key and value is unknown.
 class LIBPROTOBUF_EXPORT MapEntryBase : public Message {
@@ -321,7 +317,6 @@ class LIBPROTOBUF_EXPORT MapEntry : public MapEntryBase {
     entry->reflection_ = reflection;
     entry->default_instance_ = entry;
     entry->InitAsDefaultInstance();
-    RegisterMapEntryDefaultInstance(entry);
     return entry;
   }
 
