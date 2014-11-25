@@ -34,7 +34,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -58,7 +57,7 @@ import java.util.NoSuchElementException;
  * @author carlanton@google.com Carl Haverl
  * @author martinrb@google.com Martin Buchholz
  */
-public abstract class ByteString implements Iterable<Byte>, Serializable {
+public abstract class ByteString implements Iterable<Byte> {
 
   /**
    * When two strings to be concatenated have a combined length shorter than
