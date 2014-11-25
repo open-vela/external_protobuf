@@ -51,8 +51,6 @@ import java.util.NoSuchElementException;
  */
 class LiteralByteString extends ByteString {
 
-  private static final long serialVersionUID = 1L;
-
   protected final byte[] bytes;
 
   /**
