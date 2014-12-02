@@ -46,10 +46,10 @@ void Arena::Init(const ArenaOptions& options) {
   max_block_size_ = options.max_block_size;
   block_alloc = options.block_alloc;
   block_dealloc = options.block_dealloc;
-  blocks_ = 0;
-  hint_ = 0;
+  blocks_ = NULL;
+  hint_ = NULL;
   owns_first_block_ = true;
-  cleanup_list_ = 0;
+  cleanup_list_ = NULL;
 
   if (options.initial_block != NULL && options.initial_block_size > 0) {
     // Add first unowned block to list.

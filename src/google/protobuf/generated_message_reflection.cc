@@ -487,11 +487,11 @@ void GeneratedMessageReflection::SwapOneofField(
   double temp_double;
   bool temp_bool;
   int temp_int;
-  Message* temp_message = NULL;
+  Message* temp_message;
   string temp_string;
 
   // Stores message1's oneof field to a temp variable.
-  const FieldDescriptor* field1 = NULL;
+  const FieldDescriptor* field1;
   if (oneof_case1 > 0) {
     field1 = descriptor_->FindFieldByNumber(oneof_case1);
     //oneof_descriptor->field(oneof_case1);
