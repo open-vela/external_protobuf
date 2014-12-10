@@ -345,10 +345,6 @@ typedef hash_map<string, const SourceCodeInfo_Location*> LocationsByPathMap;
 set<string>* allowed_proto3_extendees_ = NULL;
 GOOGLE_PROTOBUF_DECLARE_ONCE(allowed_proto3_extendees_init_);
 
-void DeleteAllowedProto3Extendee() {
-  delete allowed_proto3_extendees_;
-}
-
 void InitAllowedProto3Extendee() {
   allowed_proto3_extendees_ = new set<string>;
   allowed_proto3_extendees_->insert("google.protobuf.FileOptions");
@@ -358,7 +354,6 @@ void InitAllowedProto3Extendee() {
   allowed_proto3_extendees_->insert("google.protobuf.EnumValueOptions");
   allowed_proto3_extendees_->insert("google.protobuf.ServiceOptions");
   allowed_proto3_extendees_->insert("google.protobuf.MethodOptions");
-  google::protobuf::internal::OnShutdown(&DeleteAllowedProto3Extendee);
 }
 
 // Checks whether the extendee type is allowed in proto3.
