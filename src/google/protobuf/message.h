@@ -967,7 +967,6 @@ const RepeatedField<TYPE>& Reflection::GetRepeatedField<TYPE>(   \
     const Message& message, const FieldDescriptor* field) const; \
                                                                  \
 template<>                                                       \
-LIBPROTOBUF_EXPORT                                               \
 RepeatedField<TYPE>* Reflection::MutableRepeatedField<TYPE>(     \
     Message* message, const FieldDescriptor* field) const;
 
