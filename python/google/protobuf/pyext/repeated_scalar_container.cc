@@ -52,7 +52,7 @@
     #error "Python 3.0 - 3.2 are not supported."
   #else
   #define PyString_AsString(ob) \
-    (PyUnicode_Check(ob)? PyUnicode_AsUTF8(ob): PyBytes_AsString(ob))
+    (PyUnicode_Check(ob)? PyUnicode_AsUTF8(ob): PyBytes_AS_STRING(ob))
   #endif
 #endif
 
@@ -67,7 +67,7 @@ namespace repeated_scalar_container {
 static int InternalAssignRepeatedField(
     RepeatedScalarContainer* self, PyObject* list) {
   self->message->GetReflection()->ClearField(self->message,
-                                             self->parent_field_descriptor);
+                                             self->parent_field->descriptor);
   for (Py_ssize_t i = 0; i < PyList_GET_SIZE(list); ++i) {
     PyObject* value = PyList_GET_ITEM(list, i);
     if (Append(self, value) == NULL) {
@@ -80,7 +80,7 @@ static int InternalAssignRepeatedField(
 static Py_ssize_t Len(RepeatedScalarContainer* self) {
   google::protobuf::Message* message = self->message;
   return message->GetReflection()->FieldSize(*message,
-                                             self->parent_field_descriptor);
+                                             self->parent_field->descriptor);
 }
 
 static int AssignItem(RepeatedScalarContainer* self,
@@ -89,7 +89,12 @@ static int AssignItem(RepeatedScalarContainer* self,
   cmessage::AssureWritable(self->parent);
   google::protobuf::Message* message = self->message;
   const google::protobuf::FieldDescriptor* field_descriptor =
-      self->parent_field_descriptor;
+      self->parent_field->descriptor;
+  if (!FIELD_BELONGS_TO_MESSAGE(field_descriptor, message)) {
+    PyErr_SetString(
+        PyExc_KeyError, "Field does not belong to message!");
+    return -1;
+  }
 
   const google::protobuf::Reflection* reflection = message->GetReflection();
   int field_size = reflection->FieldSize(*message, field_descriptor);
@@ -170,7 +175,7 @@ static int AssignItem(RepeatedScalarContainer* self,
         ScopedPyObjectPtr s(PyObject_Str(arg));
         if (s != NULL) {
           PyErr_Format(PyExc_ValueError, "Unknown enum value: %s",
-                       PyString_AsString(s));
+                       PyString_AsString(s.get()));
         }
         return -1;
       }
@@ -188,7 +193,7 @@ static int AssignItem(RepeatedScalarContainer* self,
 static PyObject* Item(RepeatedScalarContainer* self, Py_ssize_t index) {
   google::protobuf::Message* message = self->message;
   const google::protobuf::FieldDescriptor* field_descriptor =
-      self->parent_field_descriptor;
+      self->parent_field->descriptor;
   const google::protobuf::Reflection* reflection = message->GetReflection();
 
   int field_size = reflection->FieldSize(*message, field_descriptor);
@@ -353,7 +358,13 @@ PyObject* Append(RepeatedScalarContainer* self, PyObject* item) {
   cmessage::AssureWritable(self->parent);
   google::protobuf::Message* message = self->message;
   const google::protobuf::FieldDescriptor* field_descriptor =
-      self->parent_field_descriptor;
+      self->parent_field->descriptor;
+
+  if (!FIELD_BELONGS_TO_MESSAGE(field_descriptor, message)) {
+    PyErr_SetString(
+        PyExc_KeyError, "Field does not belong to message!");
+    return NULL;
+  }
 
   const google::protobuf::Reflection* reflection = message->GetReflection();
   switch (field_descriptor->cpp_type()) {
@@ -411,7 +422,7 @@ PyObject* Append(RepeatedScalarContainer* self, PyObject* item) {
         ScopedPyObjectPtr s(PyObject_Str(item));
         if (s != NULL) {
           PyErr_Format(PyExc_ValueError, "Unknown enum value: %s",
-                       PyString_AsString(s));
+                       PyString_AsString(s.get()));
         }
         return NULL;
       }
@@ -440,7 +451,7 @@ static int AssSubscript(RepeatedScalarContainer* self,
   cmessage::AssureWritable(self->parent);
   google::protobuf::Message* message = self->message;
   const google::protobuf::FieldDescriptor* field_descriptor =
-      self->parent_field_descriptor;
+      self->parent_field->descriptor;
 
 #if PY_MAJOR_VERSION < 3
   if (PyInt_Check(slice)) {
@@ -627,25 +638,47 @@ static PyObject* Sort(RepeatedScalarContainer* self,
   Py_RETURN_NONE;
 }
 
-// The private constructor of RepeatedScalarContainer objects.
-PyObject *NewContainer(
-    CMessage* parent, const google::protobuf::FieldDescriptor* parent_field_descriptor) {
-  if (!CheckFieldBelongsToMessage(parent_field_descriptor, parent->message)) {
-    return NULL;
+static int Init(RepeatedScalarContainer* self,
+                PyObject* args,
+                PyObject* kwargs) {
+  PyObject* py_parent;
+  PyObject* py_parent_field;
+  if (!PyArg_UnpackTuple(args, "__init__()", 2, 2, &py_parent,
+                         &py_parent_field)) {
+    return -1;
   }
 
-  RepeatedScalarContainer* self = reinterpret_cast<RepeatedScalarContainer*>(
-      PyType_GenericAlloc(&RepeatedScalarContainer_Type, 0));
-  if (self == NULL) {
-    return NULL;
+  if (!PyObject_TypeCheck(py_parent, &CMessage_Type)) {
+    PyErr_Format(PyExc_TypeError,
+                 "expect %s, but got %s",
+                 CMessage_Type.tp_name,
+                 Py_TYPE(py_parent)->tp_name);
+    return -1;
   }
 
-  self->message = parent->message;
-  self->parent = parent;
-  self->parent_field_descriptor = parent_field_descriptor;
-  self->owner = parent->owner;
+  if (!PyObject_TypeCheck(py_parent_field, &CFieldDescriptor_Type)) {
+    PyErr_Format(PyExc_TypeError,
+                 "expect %s, but got %s",
+                 CFieldDescriptor_Type.tp_name,
+                 Py_TYPE(py_parent_field)->tp_name);
+    return -1;
+  }
 
-  return reinterpret_cast<PyObject*>(self);
+  CMessage* cmessage = reinterpret_cast<CMessage*>(py_parent);
+  CFieldDescriptor* cdescriptor = reinterpret_cast<CFieldDescriptor*>(
+      py_parent_field);
+
+  if (!FIELD_BELONGS_TO_MESSAGE(cdescriptor->descriptor, cmessage->message)) {
+    PyErr_SetString(
+        PyExc_KeyError, "Field does not belong to message!");
+    return -1;
+  }
+
+  self->message = cmessage->message;
+  self->parent = cmessage;
+  self->parent_field = cdescriptor;
+  self->owner = cmessage->owner;
+  return 0;
 }
 
 // Initializes the underlying Message object of "to" so it becomes a new parent
@@ -666,7 +699,10 @@ static int InitializeAndCopyToParentContainer(
   google::protobuf::Message* new_message = global_message_factory->GetPrototype(
       from->message->GetDescriptor())->New();
   to->parent = NULL;
-  to->parent_field_descriptor = from->parent_field_descriptor;
+  // TODO(anuraag): Document why it's OK to hang on to parent_field,
+  //     even though it's a weak reference. It ought to be enough to
+  //     hold on to the FieldDescriptor only.
+  to->parent_field = from->parent_field;
   to->message = new_message;
   to->owner.reset(new_message);
   if (InternalAssignRepeatedField(to, values) < 0) {
@@ -680,17 +716,23 @@ int Release(RepeatedScalarContainer* self) {
 }
 
 PyObject* DeepCopy(RepeatedScalarContainer* self, PyObject* arg) {
-  RepeatedScalarContainer* clone = reinterpret_cast<RepeatedScalarContainer*>(
-      PyType_GenericAlloc(&RepeatedScalarContainer_Type, 0));
+  ScopedPyObjectPtr init_args(
+      PyTuple_Pack(2, self->parent, self->parent_field));
+  PyObject* clone = PyObject_CallObject(
+      reinterpret_cast<PyObject*>(&RepeatedScalarContainer_Type), init_args);
   if (clone == NULL) {
     return NULL;
   }
-
-  if (InitializeAndCopyToParentContainer(self, clone) < 0) {
+  if (!PyObject_TypeCheck(clone, &RepeatedScalarContainer_Type)) {
     Py_DECREF(clone);
     return NULL;
   }
-  return reinterpret_cast<PyObject*>(clone);
+  if (InitializeAndCopyToParentContainer(
+          self, reinterpret_cast<RepeatedScalarContainer*>(clone)) < 0) {
+    Py_DECREF(clone);
+    return NULL;
+  }
+  return clone;
 }
 
 static void Dealloc(RepeatedScalarContainer* self) {
@@ -775,7 +817,7 @@ PyTypeObject RepeatedScalarContainer_Type = {
   0,                                   //  tp_descr_get
   0,                                   //  tp_descr_set
   0,                                   //  tp_dictoffset
-  0,                                   //  tp_init
+  (initproc)repeated_scalar_container::Init,  //  tp_init
 };
 
 }  // namespace python

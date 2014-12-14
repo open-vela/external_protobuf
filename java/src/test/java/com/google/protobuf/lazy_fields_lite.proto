@@ -32,7 +32,6 @@
 //
 // A proto file with lazy fields
 
-syntax = "proto2";
 
 package protobuf_unittest;
 

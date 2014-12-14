@@ -57,8 +57,6 @@ namespace protobuf {
 //    strings, so locale should not be taken into account.
 // ascii_isdigit()
 //    Like above, but only accepts digits.
-// ascii_isspace()
-//    Check if the character is a space character.
 // ----------------------------------------------------------------------
 
 inline bool ascii_isalnum(char c) {
@@ -69,10 +67,6 @@ inline bool ascii_isalnum(char c) {
 
 inline bool ascii_isdigit(char c) {
   return ('0' <= c && c <= '9');
-}
-
-inline bool ascii_isspace(char c) {
-  return c == ' ';
 }
 
 // ----------------------------------------------------------------------
@@ -125,14 +119,9 @@ inline string StripSuffixString(const string& str, const string& suffix) {
 //    in 'remove') with the character 'replacewith'.
 //    Good for keeping html characters or protocol characters (\t) out
 //    of places where they might cause a problem.
-// StripWhitespace
-//    Removes whitespaces from both ends of the given string.
 // ----------------------------------------------------------------------
 LIBPROTOBUF_EXPORT void StripString(string* s, const char* remove,
                                     char replacewith);
-
-LIBPROTOBUF_EXPORT void StripWhitespace(string* s);
-
 
 // ----------------------------------------------------------------------
 // LowerString()
@@ -512,16 +501,6 @@ inline string ToString(string a) {
 // StrCat()
 //    These methods join some strings together.
 // ----------------------------------------------------------------------
-template <typename T1, typename T2, typename T3, typename T4, typename T5,
-          typename T6, typename T7>
-string StrCat(
-    const T1& a, const T2& b, const T3& c, const T4& d, const T5& e,
-    const T6& f, const T7& g) {
-  return internal::ToString(a) + internal::ToString(b) +
-      internal::ToString(c) + internal::ToString(d) + internal::ToString(e) +
-      internal::ToString(f) + internal::ToString(g);
-}
-
 template <typename T1, typename T2, typename T3, typename T4, typename T5>
 string StrCat(
     const T1& a, const T2& b, const T3& c, const T4& d, const T5& e) {
@@ -576,17 +555,6 @@ string Join(const Range& components,
 //    Return a lower-case hex string representation of the given integer.
 // ----------------------------------------------------------------------
 LIBPROTOBUF_EXPORT string ToHex(uint64 num);
-
-// ----------------------------------------------------------------------
-// GlobalReplaceSubstring()
-//    Replaces all instances of a substring in a string.  Does nothing
-//    if 'substring' is empty.  Returns the number of replacements.
-//
-//    NOTE: The string pieces must not overlap s.
-// ----------------------------------------------------------------------
-LIBPROTOBUF_EXPORT int GlobalReplaceSubstring(const string& substring,
-                                              const string& replacement,
-                                              string* s);
 
 }  // namespace protobuf
 }  // namespace google
