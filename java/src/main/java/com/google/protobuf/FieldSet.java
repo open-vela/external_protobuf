@@ -672,7 +672,7 @@ final class FieldSet<FieldDescriptorType extends
    *               {@link Message#getField(Descriptors.FieldDescriptor)} for
    *               this field.
    */
-  static void writeElementNoTag(
+  private static void writeElementNoTag(
       final CodedOutputStream output,
       final WireFormat.FieldType type,
       final Object value) throws IOException {
@@ -830,7 +830,7 @@ final class FieldSet<FieldDescriptorType extends
    *               {@link Message#getField(Descriptors.FieldDescriptor)} for
    *               this field.
    */
-  static int computeElementSizeNoTag(
+  private static int computeElementSizeNoTag(
       final WireFormat.FieldType type, final Object value) {
     switch (type) {
       // Note:  Minor violation of 80-char limit rule here because this would

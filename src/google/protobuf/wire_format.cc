@@ -512,15 +512,10 @@ bool WireFormat::ParseAndMergeField(
           int value;
           if (!WireFormatLite::ReadPrimitive<int, WireFormatLite::TYPE_ENUM>(
                   input, &value)) return false;
-          if (message->GetDescriptor()->file()->syntax() ==
-              FileDescriptor::SYNTAX_PROTO3) {
-            message_reflection->AddEnumValue(message, field, value);
-          } else {
-            const EnumValueDescriptor* enum_value =
-                field->enum_type()->FindValueByNumber(value);
-            if (enum_value != NULL) {
-              message_reflection->AddEnum(message, field, enum_value);
-            }
+          const EnumValueDescriptor* enum_value =
+              field->enum_type()->FindValueByNumber(value);
+          if (enum_value != NULL) {
+            message_reflection->AddEnum(message, field, enum_value);
           }
         }
 
@@ -577,31 +572,21 @@ bool WireFormat::ParseAndMergeField(
         int value;
         if (!WireFormatLite::ReadPrimitive<int, WireFormatLite::TYPE_ENUM>(
                 input, &value)) return false;
-        if (message->GetDescriptor()->file()->syntax() ==
-            FileDescriptor::SYNTAX_PROTO3) {
+        const EnumValueDescriptor* enum_value =
+          field->enum_type()->FindValueByNumber(value);
+        if (enum_value != NULL) {
           if (field->is_repeated()) {
-            message_reflection->AddEnumValue(message, field, value);
+            message_reflection->AddEnum(message, field, enum_value);
           } else {
-            message_reflection->SetEnumValue(message, field, value);
+            message_reflection->SetEnum(message, field, enum_value);
           }
         } else {
-          const EnumValueDescriptor* enum_value =
-              field->enum_type()->FindValueByNumber(value);
-          if (enum_value != NULL) {
-            if (field->is_repeated()) {
-              message_reflection->AddEnum(message, field, enum_value);
-            } else {
-              message_reflection->SetEnum(message, field, enum_value);
-            }
-          } else {
-            // The enum value is not one of the known values.  Add it to the
-            // UnknownFieldSet.
-            int64 sign_extended_value = static_cast<int64>(value);
-            message_reflection->MutableUnknownFields(message)
-                              ->AddVarint(
-                                  WireFormatLite::GetTagFieldNumber(tag),
-                                  sign_extended_value);
-          }
+          // The enum value is not one of the known values.  Add it to the
+          // UnknownFieldSet.
+          int64 sign_extended_value = static_cast<int64>(value);
+          message_reflection->MutableUnknownFields(message)
+                            ->AddVarint(WireFormatLite::GetTagFieldNumber(tag),
+                                        sign_extended_value);
         }
         break;
       }

@@ -69,18 +69,13 @@ class TextFormatTest(basetest.TestCase):
     message.my_string = '115'
     message.my_int = 101
     message.my_float = 111
-    message.optional_nested_message.oo = 0
-    message.optional_nested_message.bb = 1
     self.CompareToGoldenText(
         self.RemoveRedundantZeros(text_format.MessageToString(
             message, use_index_order=True)),
-        'my_string: \"115\"\nmy_int: 101\nmy_float: 111\n'
-        'optional_nested_message {\n  oo: 0\n  bb: 1\n}\n')
+        'my_string: \"115\"\nmy_int: 101\nmy_float: 111\n')
     self.CompareToGoldenText(
         self.RemoveRedundantZeros(text_format.MessageToString(
-            message)),
-        'my_int: 101\nmy_string: \"115\"\nmy_float: 111\n'
-        'optional_nested_message {\n  bb: 1\n  oo: 0\n}\n')
+            message)), 'my_int: 101\nmy_string: \"115\"\nmy_float: 111\n')
 
   def testPrintAllExtensions(self):
     message = unittest_pb2.TestAllExtensions()
@@ -516,7 +511,7 @@ class TextFormatTest(basetest.TestCase):
                      message.repeated_string[4])
     self.assertEqual(SLASH + 'x20', message.repeated_string[5])
 
-  def testMergeDuplicateScalars(self):
+  def testMergeRepeatedScalars(self):
     message = unittest_pb2.TestAllTypes()
     text = ('optional_int32: 42 '
             'optional_int32: 67')
@@ -524,7 +519,7 @@ class TextFormatTest(basetest.TestCase):
     self.assertIs(r, message)
     self.assertEqual(67, message.optional_int32)
 
-  def testParseDuplicateScalars(self):
+  def testParseRepeatedScalars(self):
     message = unittest_pb2.TestAllTypes()
     text = ('optional_int32: 42 '
             'optional_int32: 67')
@@ -534,7 +529,7 @@ class TextFormatTest(basetest.TestCase):
          'have multiple "optional_int32" fields.'),
         text_format.Parse, text, message)
 
-  def testMergeDuplicateNestedMessageScalars(self):
+  def testMergeRepeatedNestedMessageScalars(self):
     message = unittest_pb2.TestAllTypes()
     text = ('optional_nested_message { bb: 1 } '
             'optional_nested_message { bb: 2 }')
@@ -542,7 +537,7 @@ class TextFormatTest(basetest.TestCase):
     self.assertTrue(r is message)
     self.assertEqual(2, message.optional_nested_message.bb)
 
-  def testParseDuplicateNestedMessageScalars(self):
+  def testParseRepeatedNestedMessageScalars(self):
     message = unittest_pb2.TestAllTypes()
     text = ('optional_nested_message { bb: 1 } '
             'optional_nested_message { bb: 2 }')
@@ -552,7 +547,7 @@ class TextFormatTest(basetest.TestCase):
          'should not have multiple "bb" fields.'),
         text_format.Parse, text, message)
 
-  def testMergeDuplicateExtensionScalars(self):
+  def testMergeRepeatedExtensionScalars(self):
     message = unittest_pb2.TestAllExtensions()
     text = ('[protobuf_unittest.optional_int32_extension]: 42 '
             '[protobuf_unittest.optional_int32_extension]: 67')
@@ -561,7 +556,7 @@ class TextFormatTest(basetest.TestCase):
         67,
         message.Extensions[unittest_pb2.optional_int32_extension])
 
-  def testParseDuplicateExtensionScalars(self):
+  def testParseRepeatedExtensionScalars(self):
     message = unittest_pb2.TestAllExtensions()
     text = ('[protobuf_unittest.optional_int32_extension]: 42 '
             '[protobuf_unittest.optional_int32_extension]: 67')
