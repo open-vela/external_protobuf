@@ -1,6 +1,8 @@
 Protocol Buffers - Google's data interchange format
 ===================================================
 
+[![Build Status](https://travis-ci.org/google/protobuf.svg?branch=master)](https://travis-ci.org/google/protobuf)
+
 Copyright 2008 Google Inc.
 
 https://developers.google.com/protocol-buffers/
@@ -126,6 +128,14 @@ For advanced usage information on configure and make, see INSTALL.txt.
     ./configure CXXFLAGS="-O -std ansi -ieee -D__USE_STD_IOSTREAM"
 
   Also, you will need to use gmake instead of make.
+
+**Note for AIX users**
+
+  Compile using the IBM xlC C++ compiler as follows:
+
+    ./configure CXX=xlC
+
+  Also, you will need to use GNU `make` (`gmake`) instead of AIX `make`.
 
 C++ Installation - Windows
 --------------------------
