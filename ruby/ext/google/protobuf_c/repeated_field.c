@@ -324,10 +324,6 @@ VALUE RepeatedField_deep_copy(VALUE _self) {
  * element types are equal, their lengths are equal, and each element is equal.
  * Elements are compared as per normal Ruby semantics, by calling their :==
  * methods (or performing a more efficient comparison for primitive types).
- *
- * Repeated fields with dissimilar element types are never equal, even if value
- * comparison (for example, between integers and floats) would have otherwise
- * indicated that every element has equal value.
  */
 VALUE RepeatedField_eq(VALUE _self, VALUE _other) {
   if (_self == _other) {
@@ -462,7 +458,7 @@ VALUE RepeatedField_plus(VALUE _self, VALUE list) {
   return dupped;
 }
 
-void validate_type_class(upb_fieldtype_t type, VALUE klass) {
+static void validate_type_class(upb_fieldtype_t type, VALUE klass) {
   if (rb_iv_get(klass, kDescriptorInstanceVar) == Qnil) {
     rb_raise(rb_eArgError,
              "Type class has no descriptor. Please pass a "
