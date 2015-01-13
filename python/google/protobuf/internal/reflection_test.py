@@ -39,10 +39,10 @@ import copy
 import gc
 import operator
 import struct
-import unittest
 
 import six
 
+from google.apputils import basetest
 from google.protobuf import unittest_import_pb2
 from google.protobuf import unittest_mset_pb2
 from google.protobuf import unittest_pb2
@@ -104,7 +104,7 @@ class _MiniDecoder(object):
     return self._pos == len(self._bytes)
 
 
-class ReflectionTest(unittest.TestCase):
+class ReflectionTest(basetest.TestCase):
 
   def assertListsEqual(self, values, others):
     self.assertEqual(len(values), len(others))
@@ -1623,7 +1623,7 @@ class ReflectionTest(unittest.TestCase):
     self.assertFalse(proto.IsInitialized(errors))
     self.assertEqual(errors, ['a', 'b', 'c'])
 
-  @unittest.skipIf(
+  @basetest.unittest.skipIf(
       api_implementation.Type() != 'cpp' or api_implementation.Version() != 2,
       'Errors are only available from the most recent C++ implementation.')
   def testFileDescriptorErrors(self):
@@ -1801,7 +1801,7 @@ class ReflectionTest(unittest.TestCase):
 #  into separate TestCase classes.
 
 
-class TestAllTypesEqualityTest(unittest.TestCase):
+class TestAllTypesEqualityTest(basetest.TestCase):
 
   def setUp(self):
     self.first_proto = unittest_pb2.TestAllTypes()
@@ -1817,7 +1817,7 @@ class TestAllTypesEqualityTest(unittest.TestCase):
     self.assertEqual(self.first_proto, self.second_proto)
 
 
-class FullProtosEqualityTest(unittest.TestCase):
+class FullProtosEqualityTest(basetest.TestCase):
 
   """Equality tests using completely-full protos as a starting point."""
 
@@ -1903,7 +1903,7 @@ class FullProtosEqualityTest(unittest.TestCase):
     self.assertEqual(self.first_proto, self.second_proto)
 
 
-class ExtensionEqualityTest(unittest.TestCase):
+class ExtensionEqualityTest(basetest.TestCase):
 
   def testExtensionEquality(self):
     first_proto = unittest_pb2.TestAllExtensions()
@@ -1936,7 +1936,7 @@ class ExtensionEqualityTest(unittest.TestCase):
     self.assertEqual(first_proto, second_proto)
 
 
-class MutualRecursionEqualityTest(unittest.TestCase):
+class MutualRecursionEqualityTest(basetest.TestCase):
 
   def testEqualityWithMutualRecursion(self):
     first_proto = unittest_pb2.TestMutualRecursionA()
@@ -1948,7 +1948,7 @@ class MutualRecursionEqualityTest(unittest.TestCase):
     self.assertEqual(first_proto, second_proto)
 
 
-class ByteSizeTest(unittest.TestCase):
+class ByteSizeTest(basetest.TestCase):
 
   def setUp(self):
     self.proto = unittest_pb2.TestAllTypes()
@@ -2244,7 +2244,7 @@ class ByteSizeTest(unittest.TestCase):
 #   * Handling of empty submessages (with and without "has"
 #     bits set).
 
-class SerializationTest(unittest.TestCase):
+class SerializationTest(basetest.TestCase):
 
   def testSerializeEmtpyMessage(self):
     first_proto = unittest_pb2.TestAllTypes()
@@ -2795,7 +2795,7 @@ class SerializationTest(unittest.TestCase):
     self.assertEqual(3, proto.repeated_int32[2])
 
 
-class OptionsTest(unittest.TestCase):
+class OptionsTest(basetest.TestCase):
 
   def testMessageOptions(self):
     proto = unittest_mset_pb2.TestMessageSet()
@@ -2822,9 +2822,9 @@ class OptionsTest(unittest.TestCase):
 
 
 
-class ClassAPITest(unittest.TestCase):
+class ClassAPITest(basetest.TestCase):
 
-  @unittest.skipIf(
+  @basetest.unittest.skipIf(
       api_implementation.Type() == 'cpp' and api_implementation.Version() == 2,
       'C++ implementation requires a call to MakeDescriptor()')
   def testMakeClassWithNestedDescriptor(self):
@@ -2955,4 +2955,4 @@ class ClassAPITest(unittest.TestCase):
     self.assertEqual(msg.bar.baz.deep, 4)
 
 if __name__ == '__main__':
-  unittest.main()
+  basetest.main()
