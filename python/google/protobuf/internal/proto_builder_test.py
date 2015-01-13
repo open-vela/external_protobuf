@@ -32,7 +32,7 @@
 
 """Tests for google.protobuf.proto_builder."""
 
-import unittest
+from google.apputils import basetest
 
 from google.protobuf import descriptor_pb2
 from google.protobuf import descriptor_pool
@@ -40,7 +40,7 @@ from google.protobuf import proto_builder
 from google.protobuf import text_format
 
 
-class ProtoBuilderTest(unittest.TestCase):
+class ProtoBuilderTest(basetest.TestCase):
 
   def setUp(self):
     self._fields = {
@@ -74,4 +74,4 @@ class ProtoBuilderTest(unittest.TestCase):
 
 
 if __name__ == '__main__':
-  unittest.main()
+  basetest.main()

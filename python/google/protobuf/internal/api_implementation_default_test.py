@@ -34,16 +34,16 @@
 
 import os
 import sys
-import unittest
 # Clear environment implementation settings before the google3 imports.
 os.environ.pop('PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION', None)
 os.environ.pop('PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION_VERSION', None)
 
 # pylint: disable=g-import-not-at-top
+from google.apputils import basetest
 from google.protobuf.internal import api_implementation
 
 
-class ApiImplementationDefaultTest(unittest.TestCase):
+class ApiImplementationDefaultTest(basetest.TestCase):
 
   if sys.version_info.major <= 2:
 
@@ -60,4 +60,4 @@ class ApiImplementationDefaultTest(unittest.TestCase):
 
 
 if __name__ == '__main__':
-  unittest.main()
+  basetest.main()
