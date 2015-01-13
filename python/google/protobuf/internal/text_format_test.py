@@ -37,8 +37,9 @@ __author__ = 'kenton@google.com (Kenton Varda)'
 import re
 import unittest
 
+import six
+
 from google.protobuf import text_format
-from google.protobuf.internal import api_implementation
 from google.protobuf.internal import test_util
 from google.protobuf import unittest_pb2
 from google.protobuf import unittest_mset_pb2
@@ -143,7 +144,7 @@ class TextFormatTest(unittest.TestCase):
         'repeated_string: "\\303\\274\\352\\234\\237"\n')
 
   def testPrintExoticUnicodeSubclass(self):
-    class UnicodeSub(unicode):
+    class UnicodeSub(six.text_type):
       pass
     message = unittest_pb2.TestAllTypes()
     message.repeated_string.append(UnicodeSub(u'\u00fc\ua71f'))
