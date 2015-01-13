@@ -28,6 +28,8 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+# Keep it Python2.5 compatible for GAE.
+#
 # Copyright 2007 Google Inc. All Rights Reserved.
 #
 # This code is meant to work on Python 2.4 and above only.
@@ -52,13 +54,18 @@ this file*.
 
 __author__ = 'robinson@google.com (Will Robinson)'
 
-from io import BytesIO
 import sys
+if sys.version_info[0] < 3:
+  try:
+    from cStringIO import StringIO as BytesIO
+  except ImportError:
+    from StringIO import StringIO as BytesIO
+  import copy_reg as copyreg
+else:
+  from io import BytesIO
+  import copyreg
 import struct
 import weakref
-
-import six
-import six.moves.copyreg as copyreg
 
 # We use "as" to avoid name collisions with variables.
 from google.protobuf.internal import containers
@@ -230,7 +237,7 @@ def _AttachFieldHelpers(cls, field_descriptor):
 
 def _AddClassAttributesForNestedExtensions(descriptor, dictionary):
   extension_dict = descriptor.extensions_by_name
-  for extension_name, extension_field in extension_dict.items():
+  for extension_name, extension_field in extension_dict.iteritems():
     assert extension_name not in dictionary
     dictionary[extension_name] = extension_field
 
@@ -307,7 +314,7 @@ def _ReraiseTypeErrorWithFieldName(message_name, field_name):
     exc = TypeError('%s for field %s.%s' % (str(exc), message_name, field_name))
 
   # re-raise possibly-amended exception with original traceback:
-  six.reraise(type(exc), exc, sys.exc_info()[2])
+  raise type(exc), exc, sys.exc_info()[2]
 
 
 def _AddInitMethod(message_descriptor, cls):
@@ -327,7 +334,7 @@ def _AddInitMethod(message_descriptor, cls):
     self._is_present_in_parent = False
     self._listener = message_listener_mod.NullMessageListener()
     self._listener_for_children = _Listener(self)
-    for field_name, field_value in kwargs.items():
+    for field_name, field_value in kwargs.iteritems():
       field = _GetFieldByName(message_descriptor, field_name)
       if field is None:
         raise TypeError("%s() got an unexpected keyword argument '%s'" %
@@ -556,7 +563,7 @@ def _AddPropertiesForNonRepeatedCompositeField(field, cls):
 def _AddPropertiesForExtensions(descriptor, cls):
   """Adds properties for all fields in this protocol message type."""
   extension_dict = descriptor.extensions_by_name
-  for extension_name, extension_field in extension_dict.items():
+  for extension_name, extension_field in extension_dict.iteritems():
     constant_name = extension_name.upper() + "_FIELD_NUMBER"
     setattr(cls, constant_name, extension_field.number)
 
@@ -611,7 +618,7 @@ def _AddListFieldsMethod(message_descriptor, cls):
   """Helper for _AddMessageMethods()."""
 
   def ListFields(self):
-    all_fields = [item for item in self._fields.items() if _IsPresent(item)]
+    all_fields = [item for item in self._fields.iteritems() if _IsPresent(item)]
     all_fields.sort(key = lambda item: item[0].number)
     return all_fields
 
@@ -856,7 +863,7 @@ def _AddMergeFromStringMethod(message_descriptor, cls):
     except (IndexError, TypeError):
       # Now ord(buf[p:p+1]) == ord('') gets TypeError.
       raise message_mod.DecodeError('Truncated message.')
-    except struct.error as e:
+    except struct.error, e:
       raise message_mod.DecodeError(e)
     return length   # Return this for legacy reasons.
   cls.MergeFromString = MergeFromString
@@ -956,7 +963,7 @@ def _AddIsInitializedMethod(message_descriptor, cls):
           name = field.name
 
         if field.label == _FieldDescriptor.LABEL_REPEATED:
-          for i in range(len(value)):
+          for i in xrange(len(value)):
             element = value[i]
             prefix = "%s[%d]." % (name, i)
             sub_errors = element.FindInitializationErrors()
@@ -986,7 +993,7 @@ def _AddMergeFromMethod(cls):
 
     fields = self._fields
 
-    for field, value in msg._fields.items():
+    for field, value in msg._fields.iteritems():
       if field.label == LABEL_REPEATED:
         field_value = fields.get(field)
         if field_value is None:

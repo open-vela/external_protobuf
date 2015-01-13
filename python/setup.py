@@ -8,12 +8,12 @@ import subprocess
 # We must use setuptools, not distutils, because we need to use the
 # namespace_packages option for the "google" package.
 try:
-  from setuptools import setup, Extension, find_packages
+  from setuptools import setup, Extension
 except ImportError:
   try:
     from ez_setup import use_setuptools
     use_setuptools()
-    from setuptools import setup, Extension, find_packages
+    from setuptools import setup, Extension
   except ImportError:
     sys.stderr.write(
         "Could not import setuptools; make sure you have setuptools or "
@@ -135,6 +135,13 @@ class build_py(_build_py):
         pass
     # _build_py is an old-style class, so super() doesn't work.
     _build_py.run(self)
+  # TODO(mrovner): Subclass to run 2to3 on some files only.
+  # Tracing what https://wiki.python.org/moin/PortingPythonToPy3k's "Approach 2"
+  # section on how to get 2to3 to run on source files during install under
+  # Python 3.  This class seems like a good place to put logic that calls
+  # python3's distutils.util.run_2to3 on the subset of the files we have in our
+  # release that are subject to conversion.
+  # See code reference in previous code review.
 
 if __name__ == '__main__':
   ext_module_list = []
@@ -157,30 +164,50 @@ if __name__ == '__main__':
 
   setup(name = 'protobuf',
         version = '3.0.0-pre',
-        description = 'Protocol Buffers',
-        long_description =
-          "Protocol Buffers are Google's data interchange format.",
+        packages = [ 'google' ],
+        namespace_packages = [ 'google' ],
+        test_suite = 'setup.MakeTestSuite',
+        google_test_dir = "google/protobuf/internal",
+        # Must list modules explicitly so that we don't install tests.
+        py_modules = [
+          'google.protobuf.internal.api_implementation',
+          'google.protobuf.internal.containers',
+          'google.protobuf.internal.cpp_message',
+          'google.protobuf.internal.decoder',
+          'google.protobuf.internal.encoder',
+          'google.protobuf.internal.enum_type_wrapper',
+          'google.protobuf.internal.message_listener',
+          'google.protobuf.internal.python_message',
+          'google.protobuf.internal.type_checkers',
+          'google.protobuf.internal.wire_format',
+          'google.protobuf.descriptor',
+          'google.protobuf.descriptor_pb2',
+          'google.protobuf.compiler.plugin_pb2',
+          'google.protobuf.message',
+          'google.protobuf.descriptor_database',
+          'google.protobuf.descriptor_pool',
+          'google.protobuf.message_factory',
+          'google.protobuf.proto_builder',
+          'google.protobuf.pyext.cpp_message',
+          'google.protobuf.reflection',
+          'google.protobuf.service',
+          'google.protobuf.service_reflection',
+          'google.protobuf.symbol_database',
+          'google.protobuf.text_encoding',
+          'google.protobuf.text_format'],
+        cmdclass = { 'clean': clean, 'build_py': build_py },
+        install_requires = ['setuptools'],
+        # TODO: Restore dependency once a Python 3 compatible google-apputils
+        # is released.
+        setup_requires = (['google-apputils']
+                          if sys.version_info[0] < 3 else
+                          []),
+        ext_modules = ext_module_list,
         url = 'https://developers.google.com/protocol-buffers/',
         maintainer = maintainer_email,
         maintainer_email = 'protobuf@googlegroups.com',
         license = 'New BSD License',
-        classifiers=[
-          "Programming Language :: Python",
-          "Programming Language :: Python :: 2",
-          "Programming Language :: Python :: 2.6",
-          "Programming Language :: Python :: 2.7",
-          "Programming Language :: Python :: 3",
-          "Programming Language :: Python :: 3.3",
-          "Programming Language :: Python :: 3.4",
-          ],
-        namespace_packages = [ 'google' ],
-        packages = find_packages(
-         exclude=[
-           "import_test_package",
-           ]),
-        test_suite = 'setup.MakeTestSuite',
-        google_test_dir = "google/protobuf/internal",
-        cmdclass = { 'clean': clean, 'build_py': build_py },
-        install_requires = ['setuptools', 'six'],
-        ext_modules = ext_module_list,
+        description = 'Protocol Buffers',
+        long_description =
+          "Protocol Buffers are Google's data interchange format.",
         )

@@ -34,8 +34,7 @@
 
 __author__ = 'robinson@google.com (Will Robinson)'
 
-import unittest
-
+from google.apputils import basetest
 from google.protobuf import unittest_custom_options_pb2
 from google.protobuf import unittest_import_pb2
 from google.protobuf import unittest_pb2
@@ -49,7 +48,7 @@ name: 'TestEmptyMessage'
 """
 
 
-class DescriptorTest(unittest.TestCase):
+class DescriptorTest(basetest.TestCase):
 
   def setUp(self):
     self.my_file = descriptor.FileDescriptor(
@@ -396,7 +395,7 @@ class DescriptorTest(unittest.TestCase):
     self.assertEqual(self.my_file.package, 'protobuf_unittest')
 
 
-class DescriptorCopyToProtoTest(unittest.TestCase):
+class DescriptorCopyToProtoTest(basetest.TestCase):
   """Tests for CopyTo functions of Descriptor."""
 
   def _AssertProtoEqual(self, actual_proto, expected_class, expected_ascii):
@@ -595,7 +594,7 @@ class DescriptorCopyToProtoTest(unittest.TestCase):
         TEST_SERVICE_ASCII)
 
 
-class MakeDescriptorTest(unittest.TestCase):
+class MakeDescriptorTest(basetest.TestCase):
 
   def testMakeDescriptorWithNestedFields(self):
     file_descriptor_proto = descriptor_pb2.FileDescriptorProto()
@@ -673,8 +672,8 @@ class MakeDescriptorTest(unittest.TestCase):
     reformed_descriptor = descriptor.MakeDescriptor(descriptor_proto)
 
     options = reformed_descriptor.GetOptions()
-    self.assertEqual(101,
+    self.assertEquals(101,
                       options.Extensions[unittest_custom_options_pb2.msgopt].i)
 
 if __name__ == '__main__':
-  unittest.main()
+  basetest.main()

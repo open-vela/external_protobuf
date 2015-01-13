@@ -35,16 +35,15 @@
 __author__ = 'kenton@google.com (Kenton Varda)'
 
 import re
-import unittest
 
-import six
-
+from google.apputils import basetest
 from google.protobuf import text_format
+from google.protobuf.internal import api_implementation
 from google.protobuf.internal import test_util
 from google.protobuf import unittest_pb2
 from google.protobuf import unittest_mset_pb2
 
-class TextFormatTest(unittest.TestCase):
+class TextFormatTest(basetest.TestCase):
 
   def ReadGolden(self, golden_filename):
     with test_util.GoldenFile(golden_filename) as f:
@@ -144,7 +143,7 @@ class TextFormatTest(unittest.TestCase):
         'repeated_string: "\\303\\274\\352\\234\\237"\n')
 
   def testPrintExoticUnicodeSubclass(self):
-    class UnicodeSub(six.text_type):
+    class UnicodeSub(unicode):
       pass
     message = unittest_pb2.TestAllTypes()
     message.repeated_string.append(UnicodeSub(u'\u00fc\ua71f'))
@@ -233,7 +232,7 @@ class TextFormatTest(unittest.TestCase):
     parsed_message = unittest_pb2.TestAllTypes()
     r = text_format.Parse(wire_text, parsed_message)
     self.assertIs(r, parsed_message)
-    self.assertEqual(message, parsed_message)
+    self.assertEquals(message, parsed_message)
 
     # Test as_utf8 = True.
     wire_text = text_format.MessageToString(
@@ -241,7 +240,7 @@ class TextFormatTest(unittest.TestCase):
     parsed_message = unittest_pb2.TestAllTypes()
     r = text_format.Parse(wire_text, parsed_message)
     self.assertIs(r, parsed_message)
-    self.assertEqual(message, parsed_message,
+    self.assertEquals(message, parsed_message,
                       '\n%s != %s' % (message, parsed_message))
 
   def testPrintRawUtf8String(self):
@@ -251,7 +250,7 @@ class TextFormatTest(unittest.TestCase):
     self.CompareToGoldenText(text, 'repeated_string: "\303\274\352\234\237"\n')
     parsed_message = unittest_pb2.TestAllTypes()
     text_format.Parse(text, parsed_message)
-    self.assertEqual(message, parsed_message,
+    self.assertEquals(message, parsed_message,
                       '\n%s != %s' % (message, parsed_message))
 
   def testPrintFloatFormat(self):
@@ -309,7 +308,7 @@ class TextFormatTest(unittest.TestCase):
 
     message = unittest_pb2.TestAllTypes()
     test_util.SetAllFields(message)
-    self.assertEqual(message, parsed_message)
+    self.assertEquals(message, parsed_message)
 
   def testParseGoldenExtensions(self):
     golden_text = '\n'.join(self.ReadGolden(
@@ -319,7 +318,7 @@ class TextFormatTest(unittest.TestCase):
 
     message = unittest_pb2.TestAllExtensions()
     test_util.SetAllExtensions(message)
-    self.assertEqual(message, parsed_message)
+    self.assertEquals(message, parsed_message)
 
   def testParseAllFields(self):
     message = unittest_pb2.TestAllTypes()
@@ -360,8 +359,8 @@ class TextFormatTest(unittest.TestCase):
     text_format.Parse(text, message)
     ext1 = unittest_mset_pb2.TestMessageSetExtension1.message_set_extension
     ext2 = unittest_mset_pb2.TestMessageSetExtension2.message_set_extension
-    self.assertEqual(23, message.message_set.Extensions[ext1].i)
-    self.assertEqual('foo', message.message_set.Extensions[ext2].str)
+    self.assertEquals(23, message.message_set.Extensions[ext1].i)
+    self.assertEquals('foo', message.message_set.Extensions[ext2].str)
 
   def testParseExotic(self):
     message = unittest_pb2.TestAllTypes()
@@ -408,7 +407,7 @@ class TextFormatTest(unittest.TestCase):
     message = unittest_pb2.TestAllTypes()
     text = ''
     text_format.Parse(text, message)
-    self.assertEqual(unittest_pb2.TestAllTypes(), message)
+    self.assertEquals(unittest_pb2.TestAllTypes(), message)
 
   def testParseInvalidUtf8(self):
     message = unittest_pb2.TestAllTypes()
@@ -581,7 +580,7 @@ class TextFormatTest(unittest.TestCase):
 
     message = unittest_pb2.TestAllTypes()
     test_util.SetAllFields(message)
-    self.assertEqual(message, parsed_message)
+    self.assertEquals(message, parsed_message)
 
   def testMergeLinesGolden(self):
     opened = self.ReadGolden('text_format_unittest_data.txt')
@@ -601,7 +600,7 @@ class TextFormatTest(unittest.TestCase):
     self.assertEqual('oneof_uint32', m2.WhichOneof('oneof_field'))
 
 
-class TokenizerTest(unittest.TestCase):
+class TokenizerTest(basetest.TestCase):
 
   def testSimpleTokenCases(self):
     text = ('identifier1:"string1"\n     \n\n'
@@ -746,4 +745,4 @@ class TokenizerTest(unittest.TestCase):
 
 
 if __name__ == '__main__':
-  unittest.main()
+  basetest.main()

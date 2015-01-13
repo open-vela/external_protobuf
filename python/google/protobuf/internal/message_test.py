@@ -48,8 +48,8 @@ import math
 import operator
 import pickle
 import sys
-import unittest
 
+from google.apputils import basetest
 from google.protobuf import unittest_pb2
 from google.protobuf.internal import api_implementation
 from google.protobuf.internal import test_util
@@ -69,7 +69,7 @@ def IsNegInf(val):
   return isinf(val) and (val < 0)
 
 
-class MessageTest(unittest.TestCase):
+class MessageTest(basetest.TestCase):
 
   def testBadUtf8String(self):
     if api_implementation.Type() != 'python':
@@ -98,7 +98,7 @@ class MessageTest(unittest.TestCase):
     golden_message.ParseFromString(golden_data)
     all_set = unittest_pb2.TestAllExtensions()
     test_util.SetAllExtensions(all_set)
-    self.assertEqual(all_set, golden_message)
+    self.assertEquals(all_set, golden_message)
     self.assertEqual(golden_data, golden_message.SerializeToString())
     golden_copy = copy.deepcopy(golden_message)
     self.assertEqual(golden_data, golden_copy.SerializeToString())
@@ -109,7 +109,7 @@ class MessageTest(unittest.TestCase):
     golden_message.ParseFromString(golden_data)
     all_set = unittest_pb2.TestPackedTypes()
     test_util.SetAllPackedFields(all_set)
-    self.assertEqual(all_set, golden_message)
+    self.assertEquals(all_set, golden_message)
     self.assertEqual(golden_data, all_set.SerializeToString())
     golden_copy = copy.deepcopy(golden_message)
     self.assertEqual(golden_data, golden_copy.SerializeToString())
@@ -120,7 +120,7 @@ class MessageTest(unittest.TestCase):
     golden_message.ParseFromString(golden_data)
     all_set = unittest_pb2.TestPackedExtensions()
     test_util.SetAllPackedExtensions(all_set)
-    self.assertEqual(all_set, golden_message)
+    self.assertEquals(all_set, golden_message)
     self.assertEqual(golden_data, all_set.SerializeToString())
     golden_copy = copy.deepcopy(golden_message)
     self.assertEqual(golden_data, golden_copy.SerializeToString())
@@ -132,7 +132,7 @@ class MessageTest(unittest.TestCase):
     pickled_message = pickle.dumps(golden_message)
 
     unpickled_message = pickle.loads(pickled_message)
-    self.assertEqual(unpickled_message, golden_message)
+    self.assertEquals(unpickled_message, golden_message)
 
 
   def testPickleIncompleteProto(self):
@@ -140,8 +140,8 @@ class MessageTest(unittest.TestCase):
     pickled_message = pickle.dumps(golden_message)
 
     unpickled_message = pickle.loads(pickled_message)
-    self.assertEqual(unpickled_message, golden_message)
-    self.assertEqual(unpickled_message.a, 1)
+    self.assertEquals(unpickled_message, golden_message)
+    self.assertEquals(unpickled_message.a, 1)
     # This is still an incomplete proto - so serializing should fail
     self.assertRaises(message.EncodeError, unpickled_message.SerializeToString)
 
@@ -344,11 +344,11 @@ class MessageTest(unittest.TestCase):
     msg.repeated_nested_message.add(bb=3)
     msg.repeated_nested_message.add(bb=4)
 
-    self.assertEqual([1, 2, 3, 4],
+    self.assertEquals([1, 2, 3, 4],
                       [m.bb for m in msg.repeated_nested_message])
-    self.assertEqual([4, 3, 2, 1],
+    self.assertEquals([4, 3, 2, 1],
                       [m.bb for m in reversed(msg.repeated_nested_message)])
-    self.assertEqual([4, 3, 2, 1],
+    self.assertEquals([4, 3, 2, 1],
                       [m.bb for m in msg.repeated_nested_message[::-1]])
 
   def testSortingRepeatedScalarFieldsDefaultComparator(self):
@@ -695,7 +695,7 @@ class MessageTest(unittest.TestCase):
       m.HasField('repeated_int32')
 
 
-class ValidTypeNamesTest(unittest.TestCase):
+class ValidTypeNamesTest(basetest.TestCase):
 
   def assertImportFromName(self, msg, base_name):
     # Parse <type 'module.class_name'> to extra 'some.name' as a string.
@@ -718,4 +718,4 @@ class ValidTypeNamesTest(unittest.TestCase):
 
 
 if __name__ == '__main__':
-  unittest.main()
+  basetest.main()
