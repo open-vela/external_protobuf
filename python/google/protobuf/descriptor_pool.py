@@ -57,6 +57,8 @@ directly instead of this class.
 
 __author__ = 'matthewtoia@google.com (Matt Toia)'
 
+import sys
+
 from google.protobuf import descriptor
 from google.protobuf import descriptor_database
 from google.protobuf import text_encoding
@@ -173,7 +175,8 @@ class DescriptorPool(object):
 
     try:
       file_proto = self._internal_db.FindFileByName(file_name)
-    except KeyError as error:
+    except KeyError:
+      _, error, _ = sys.exc_info()  #PY25 compatible for GAE.
       if self._descriptor_db:
         file_proto = self._descriptor_db.FindFileByName(file_name)
       else:
@@ -208,7 +211,8 @@ class DescriptorPool(object):
 
     try:
       file_proto = self._internal_db.FindFileContainingSymbol(symbol)
-    except KeyError as error:
+    except KeyError:
+      _, error, _ = sys.exc_info()  #PY25 compatible for GAE.
       if self._descriptor_db:
         file_proto = self._descriptor_db.FindFileContainingSymbol(symbol)
       else:
@@ -278,9 +282,9 @@ class DescriptorPool(object):
       # file proto.
       for dependency in built_deps:
         scope.update(self._ExtractSymbols(
-            list(dependency.message_types_by_name.values())))
+            dependency.message_types_by_name.values()))
         scope.update((_PrefixWithDot(enum.full_name), enum)
-                     for enum in list(dependency.enum_types_by_name.values()))
+                     for enum in dependency.enum_types_by_name.values())
 
       for message_type in file_proto.message_type:
         message_desc = self._ConvertMessageDescriptor(

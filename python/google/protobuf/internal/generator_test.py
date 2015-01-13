@@ -41,7 +41,8 @@ further ensures that we can use Python protocol message objects as we expect.
 
 __author__ = 'robinson@google.com (Will Robinson)'
 
-from google.apputils import basetest
+import unittest
+
 from google.protobuf.internal import test_bad_identifiers_pb2
 from google.protobuf import unittest_custom_options_pb2
 from google.protobuf import unittest_import_pb2
@@ -55,7 +56,7 @@ from google.protobuf import symbol_database
 MAX_EXTENSION = 536870912
 
 
-class GeneratorTest(basetest.TestCase):
+class GeneratorTest(unittest.TestCase):
 
   def testNestedMessageDescriptor(self):
     field_name = 'optional_nested_message'
@@ -294,14 +295,14 @@ class GeneratorTest(basetest.TestCase):
     self.assertSameElements(
         nested_names,
         [field.name for field in desc.oneofs[0].fields])
-    for field_name, field_desc in desc.fields_by_name.items():
+    for field_name, field_desc in desc.fields_by_name.iteritems():
       if field_name in nested_names:
         self.assertIs(desc.oneofs[0], field_desc.containing_oneof)
       else:
         self.assertIsNone(field_desc.containing_oneof)
 
 
-class SymbolDatabaseRegistrationTest(basetest.TestCase):
+class SymbolDatabaseRegistrationTest(unittest.TestCase):
   """Checks that messages, enums and files are correctly registered."""
 
   def testGetSymbol(self):
@@ -340,4 +341,4 @@ class SymbolDatabaseRegistrationTest(basetest.TestCase):
             'google/protobuf/unittest.proto').name)
 
 if __name__ == '__main__':
-  basetest.main()
+  unittest.main()
