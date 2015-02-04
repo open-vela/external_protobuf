@@ -112,11 +112,6 @@ class CommandLineInterfaceTest : public testing::Test {
   // Create a subdirectory within temp_directory_.
   void CreateTempDir(const string& name);
 
-  // Change working directory to temp directory.
-  void SwitchToTempDirectory() {
-    File::ChangeWorkingDirectory(temp_directory_);
-  }
-
   void SetInputsAreProtoPathRelative(bool enable) {
     cli_.SetInputsAreProtoPathRelative(enable);
   }
@@ -180,9 +175,6 @@ class CommandLineInterfaceTest : public testing::Test {
 
   void ReadDescriptorSet(const string& filename,
                          FileDescriptorSet* descriptor_set);
-
-  void ExpectFileContent(const string& filename,
-                         const string& content);
 
  private:
   // The object we are testing.
@@ -462,17 +454,6 @@ void CommandLineInterfaceTest::ReadDescriptorSet(
 void CommandLineInterfaceTest::ExpectCapturedStdout(
     const string& expected_text) {
   EXPECT_EQ(expected_text, captured_stdout_);
-}
-
-
-void CommandLineInterfaceTest::ExpectFileContent(
-    const string& filename, const string& content) {
-  string path = temp_directory_ + "/" + filename;
-  string file_contents;
-  GOOGLE_CHECK_OK(File::GetContents(path, &file_contents, true));
-
-  EXPECT_EQ(StringReplace(content, "$tmpdir", temp_directory_, true),
-            file_contents);
 }
 
 // ===================================================================
@@ -957,53 +938,6 @@ TEST_F(CommandLineInterfaceTest, WriteTransitiveDescriptorSetWithSourceInfo) {
   // Source code info included.
   EXPECT_TRUE(descriptor_set.file(0).has_source_code_info());
   EXPECT_TRUE(descriptor_set.file(1).has_source_code_info());
-}
-
-TEST_F(CommandLineInterfaceTest, WriteDependencyManifestFile) {
-  CreateTempFile("foo.proto",
-    "syntax = \"proto2\";\n"
-    "message Foo {}\n");
-  CreateTempFile("bar.proto",
-    "syntax = \"proto2\";\n"
-    "import \"foo.proto\";\n"
-    "message Bar {\n"
-    "  optional Foo foo = 1;\n"
-    "}\n");
-
-  Run("protocol_compiler --dependency_out=$tmpdir/manifest "
-      "--test_out=$tmpdir --proto_path=$tmpdir bar.proto");
-
-  ExpectNoErrors();
-
-  ExpectFileContent("manifest",
-                    "$tmpdir/manifest: $tmpdir/foo.proto\\\n"
-                    " $tmpdir/bar.proto");
-}
-
-TEST_F(CommandLineInterfaceTest, WriteDependencyManifestFileForRelativePath) {
-  CreateTempFile("foo.proto",
-    "syntax = \"proto2\";\n"
-    "message Foo {}\n");
-  CreateTempFile("bar.proto",
-    "syntax = \"proto2\";\n"
-    "import \"foo.proto\";\n"
-    "message Bar {\n"
-    "  optional Foo foo = 1;\n"
-    "}\n");
-
-  string current_working_directory = get_current_dir_name();
-  SwitchToTempDirectory();
-
-  Run("protocol_compiler --dependency_out=manifest "
-      "--test_out=$tmpdir --proto_path=$tmpdir bar.proto");
-
-  ExpectNoErrors();
-
-  ExpectFileContent("manifest",
-                    "$tmpdir/manifest: $tmpdir/foo.proto\\\n"
-                    " $tmpdir/bar.proto");
-
-  File::ChangeWorkingDirectory(current_working_directory);
 }
 
 // -------------------------------------------------------------------
