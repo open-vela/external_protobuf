@@ -247,11 +247,6 @@ class LIBPROTOC_EXPORT CommandLineInterface {
   // Implements the --descriptor_set_out option.
   bool WriteDescriptorSet(const vector<const FileDescriptor*> parsed_files);
 
-  // Implements the --dependency_out option
-  bool GenerateDependencyManifestFile(
-      const vector<const FileDescriptor*>& parsed_files,
-      DiskSourceTree* source_tree);
-
   // Get all transitive dependencies of the given file (including the file
   // itself), adding them to the given list of FileDescriptorProtos.  The
   // protos will be ordered such that every file is listed before any file that
@@ -357,10 +352,6 @@ class LIBPROTOC_EXPORT CommandLineInterface {
   // If --descriptor_set_out was given, this is the filename to which the
   // FileDescriptorSet should be written.  Otherwise, empty.
   string descriptor_set_name_;
-
-  // If --dependency_out was given, this is the path to the file where the
-  // dependency file will be written. Otherwise, empty.
-  string dependency_out_name_;
 
   // True if --include_imports was given, meaning that we should
   // write all transitive dependencies to the DescriptorSet.  Otherwise, only
