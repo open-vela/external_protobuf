@@ -30,31 +30,10 @@
 
 package com.google.protobuf.nano;
 
-import com.google.protobuf.nano.CodedInputByteBufferNano;
-import com.google.protobuf.nano.EnumClassNanoMultiple;
-import com.google.protobuf.nano.EnumClassNanos;
-import com.google.protobuf.nano.EnumValidity;
-import com.google.protobuf.nano.EnumValidityAccessors;
-import com.google.protobuf.nano.FileScopeEnumMultiple;
-import com.google.protobuf.nano.FileScopeEnumRefNano;
-import com.google.protobuf.nano.InternalNano;
-import com.google.protobuf.nano.InvalidProtocolBufferNanoException;
-import com.google.protobuf.nano.MessageNano;
-import com.google.protobuf.nano.MessageScopeEnumRefNano;
-import com.google.protobuf.nano.MultipleImportingNonMultipleNano1;
-import com.google.protobuf.nano.MultipleImportingNonMultipleNano2;
-import com.google.protobuf.nano.MultipleNameClashNano;
+import com.google.protobuf.nano.MapTestProto.TestMap;
 import com.google.protobuf.nano.NanoAccessorsOuterClass.TestNanoAccessors;
 import com.google.protobuf.nano.NanoHasOuterClass.TestAllTypesNanoHas;
-import com.google.protobuf.nano.NanoOuterClass;
 import com.google.protobuf.nano.NanoOuterClass.TestAllTypesNano;
-import com.google.protobuf.nano.NanoReferenceTypes;
-import com.google.protobuf.nano.NanoRepeatedPackables;
-import com.google.protobuf.nano.PackedExtensions;
-import com.google.protobuf.nano.RepeatedExtensions;
-import com.google.protobuf.nano.SingularExtensions;
-import com.google.protobuf.nano.TestRepeatedMergeNano;
-import com.google.protobuf.nano.UnittestMultipleNano;
 import com.google.protobuf.nano.UnittestRecursiveNano.RecursiveMessageNano;
 import com.google.protobuf.nano.UnittestSimpleNano.SimpleMessageNano;
 import com.google.protobuf.nano.UnittestSingleNano.SingleMessageNano;
@@ -67,6 +46,7 @@ import junit.framework.TestCase;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Test nano runtime.
@@ -3752,6 +3732,126 @@ public class NanoTest extends TestCase {
     assertTrue(Arrays.equals(new int[] {13000, 14, 15, 13000, 14, 15}, nonPacked.sint32S));
     assertTrue(Arrays.equals(new int[] {25, 26, 27, 25, 26, 27}, nonPacked.sfixed32S));
     assertTrue(Arrays.equals(new boolean[] {false, true, false, true}, nonPacked.bools));
+  }
+
+  public void testMapsSerializeAndParse() throws Exception {
+    TestMap origin = new TestMap();
+    setMapMessage(origin);
+    assertMapMessageSet(origin);
+
+    byte[] output = MessageNano.toByteArray(origin);
+    TestMap parsed = new TestMap();
+    MessageNano.mergeFrom(parsed, output);
+    // TODO(liujisi): Test null values in serialization.
+    // TODO(liujisi): Test merging message type values.
+    // TODO(liujisi): Test missing key/value in parsing.
+  }
+
+  private static final Integer[] int32Values = new Integer[] {
+    0, 1, -1, Integer.MAX_VALUE, Integer.MIN_VALUE,
+  };
+  private static final Long[] int64Values = new Long[] {
+    0L, 1L, -1L, Long.MAX_VALUE, Long.MIN_VALUE,
+  };
+  private static final String[] stringValues = new String[] {
+    "", "hello", "world", "foo", "bar",
+  };
+  private static final byte[][] bytesValues = new byte[][] {
+    new byte[] {},
+    new byte[] {0},
+    new byte[] {1, -1},
+    new byte[] {127, -128},
+    new byte[] {'a', 'b', '0', '1'},
+  };
+  private static final Boolean[] boolValues = new Boolean[] {
+    false, true,
+  };
+  private static final Integer[] enumValues = new Integer[] {
+    TestMap.FOO, TestMap.BAR, TestMap.BAZ, TestMap.QUX,
+    Integer.MAX_VALUE /* unknown */,
+  };
+  private static final TestMap.MessageValue[] messageValues =
+      new TestMap.MessageValue[] {
+    newMapValueMessage(0),
+    newMapValueMessage(1),
+    newMapValueMessage(-1),
+    newMapValueMessage(Integer.MAX_VALUE),
+    newMapValueMessage(Integer.MIN_VALUE),
+  };
+  private static TestMap.MessageValue newMapValueMessage(int value) {
+    TestMap.MessageValue result = new TestMap.MessageValue();
+    result.value = value;
+    return result;
+  }
+
+  private <K, V> void setMap(Map<K, V> map, K[] keys, V[] values) {
+    assert(keys.length == values.length);
+    for (int i = 0; i < keys.length; ++i) {
+      map.put(keys[i], values[i]);
+    }
+  }
+
+  private <K, V> void assertMapSet(
+      Map<K, V> map, K[] keys, V[] values) throws Exception {
+    assert(keys.length == values.length);
+    for (int i = 0; i < values.length; ++i) {
+      assertEquals(values[i], map.get(keys[i]));
+    }
+    assertEquals(keys.length, map.size());
+  }
+
+  private void setMapMessage(TestMap testMap) {
+    testMap.int32ToInt32Field = new HashMap<Integer, Integer>();
+    testMap.int32ToBytesField = new HashMap<Integer, byte[]>();
+    testMap.int32ToEnumField = new HashMap<Integer, Integer>();
+    testMap.int32ToMessageField =
+        new HashMap<Integer, MapTestProto.TestMap.MessageValue>();
+    testMap.int32ToStringField = new HashMap<Integer, String>();
+    testMap.stringToInt32Field = new HashMap<String, Integer>();
+    testMap.boolToBoolField = new HashMap<Boolean, Boolean>();
+    testMap.uint32ToUint32Field = new HashMap<Integer, Integer>();
+    testMap.sint32ToSint32Field = new HashMap<Integer, Integer>();
+    testMap.fixed32ToFixed32Field = new HashMap<Integer, Integer>();
+    testMap.sfixed32ToSfixed32Field = new HashMap<Integer, Integer>();
+    testMap.int64ToInt64Field = new HashMap<Long, Long>();
+    testMap.uint64ToUint64Field = new HashMap<Long, Long>();
+    testMap.sint64ToSint64Field = new HashMap<Long, Long>();
+    testMap.fixed64ToFixed64Field = new HashMap<Long, Long>();
+    testMap.sfixed64ToSfixed64Field = new HashMap<Long, Long>();
+    setMap(testMap.int32ToInt32Field, int32Values, int32Values);
+    setMap(testMap.int32ToBytesField, int32Values, bytesValues);
+    setMap(testMap.int32ToEnumField, int32Values, enumValues);
+    setMap(testMap.int32ToMessageField, int32Values, messageValues);
+    setMap(testMap.int32ToStringField, int32Values, stringValues);
+    setMap(testMap.stringToInt32Field, stringValues, int32Values);
+    setMap(testMap.boolToBoolField, boolValues, boolValues);
+    setMap(testMap.uint32ToUint32Field, int32Values, int32Values);
+    setMap(testMap.sint32ToSint32Field, int32Values, int32Values);
+    setMap(testMap.fixed32ToFixed32Field, int32Values, int32Values);
+    setMap(testMap.sfixed32ToSfixed32Field, int32Values, int32Values);
+    setMap(testMap.int64ToInt64Field, int64Values, int64Values);
+    setMap(testMap.uint64ToUint64Field, int64Values, int64Values);
+    setMap(testMap.sint64ToSint64Field, int64Values, int64Values);
+    setMap(testMap.fixed64ToFixed64Field, int64Values, int64Values);
+    setMap(testMap.sfixed64ToSfixed64Field, int64Values, int64Values);
+  }
+  private void assertMapMessageSet(TestMap testMap) throws Exception {
+    assertMapSet(testMap.int32ToInt32Field, int32Values, int32Values);
+    assertMapSet(testMap.int32ToBytesField, int32Values, bytesValues);
+    assertMapSet(testMap.int32ToEnumField, int32Values, enumValues);
+    assertMapSet(testMap.int32ToMessageField, int32Values, messageValues);
+    assertMapSet(testMap.int32ToStringField, int32Values, stringValues);
+    assertMapSet(testMap.stringToInt32Field, stringValues, int32Values);
+    assertMapSet(testMap.boolToBoolField, boolValues, boolValues);
+    assertMapSet(testMap.uint32ToUint32Field, int32Values, int32Values);
+    assertMapSet(testMap.sint32ToSint32Field, int32Values, int32Values);
+    assertMapSet(testMap.fixed32ToFixed32Field, int32Values, int32Values);
+    assertMapSet(testMap.sfixed32ToSfixed32Field, int32Values, int32Values);
+    assertMapSet(testMap.int64ToInt64Field, int64Values, int64Values);
+    assertMapSet(testMap.uint64ToUint64Field, int64Values, int64Values);
+    assertMapSet(testMap.sint64ToSint64Field, int64Values, int64Values);
+    assertMapSet(testMap.fixed64ToFixed64Field, int64Values, int64Values);
+    assertMapSet(testMap.sfixed64ToSfixed64Field, int64Values, int64Values);
   }
 
   private void assertRepeatedPackablesEqual(

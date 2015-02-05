@@ -192,9 +192,5 @@ void File::DeleteRecursively(const string& name,
 #endif
 }
 
-bool File::ChangeWorkingDirectory(const string& new_working_directory) {
-  return chdir(new_working_directory.c_str()) == 0;
-}
-
 }  // namespace protobuf
 }  // namespace google
