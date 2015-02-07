@@ -1,4 +1,0 @@
-language: cpp
-script: ./autogen.sh && ./configure && make distcheck
-notifications:
-  email: false
