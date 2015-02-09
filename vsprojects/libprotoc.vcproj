@@ -223,10 +223,6 @@
 				RelativePath="..\src\google\protobuf\compiler\cpp\cpp_string_field.h"
 				>
 			</File>
-      <File
-				RelativePath="..\src\google\protobuf\compiler\ruby\ruby_generator.h"
-				>
-			</File>
 			<File
 				RelativePath="..\src\google\protobuf\compiler\java\java_context.h"
 				>
@@ -377,10 +373,6 @@
 			</File>
 			<File
 				RelativePath="..\src\google\protobuf\compiler\cpp\cpp_string_field.cc"
-				>
-			</File>
-      <File
-				RelativePath="..\src\google\protobuf\compiler\ruby\ruby_generator.cc"
 				>
 			</File>
 			<File
