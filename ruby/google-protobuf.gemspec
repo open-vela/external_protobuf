@@ -18,7 +18,5 @@ Gem::Specification.new do |s|
   s.files       = ["lib/google/protobuf.rb"] +
                   # extension C source
                   find_c_source("ext/google/protobuf_c")
-  s.test_files = ["tests/basic.rb",
-		  "tests/stress.rb",
-		  "tests/generated_code_test.rb"]
+  s.test_files = `git ls-files -- tests`.split
 end
