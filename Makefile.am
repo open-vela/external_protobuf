@@ -195,7 +195,6 @@ python_EXTRA_DIST=                                                           \
   python/google/protobuf/internal/wire_format.py                             \
   python/google/protobuf/internal/wire_format_test.py                        \
   python/google/protobuf/internal/__init__.py                                \
-  python/google/protobuf/internal/import_test_package/BUILD                  \
   python/google/protobuf/internal/import_test_package/__init__.py            \
   python/google/protobuf/internal/import_test_package/inner.proto            \
   python/google/protobuf/internal/import_test_package/outer.proto            \
@@ -245,6 +244,7 @@ ruby_EXTRA_DIST=                                                             \
   ruby/ext/google/protobuf_c/defs.c                                          \
   ruby/ext/google/protobuf_c/encode_decode.c                                 \
   ruby/ext/google/protobuf_c/extconf.rb                                      \
+  ruby/ext/google/protobuf_c/map.c                                           \
   ruby/ext/google/protobuf_c/message.c                                       \
   ruby/ext/google/protobuf_c/protobuf.c                                      \
   ruby/ext/google/protobuf_c/protobuf.h                                      \
@@ -255,7 +255,10 @@ ruby_EXTRA_DIST=                                                             \
   ruby/google-protobuf.gemspec                                               \
   ruby/lib/google/protobuf.rb                                                \
   ruby/tests/basic.rb                                                        \
-  ruby/tests/stress.rb
+  ruby/tests/stress.rb                                                       \
+  ruby/tests/generated_code.proto                                            \
+  ruby/tests/generated_code.rb                                               \
+  ruby/tests/generated_code_test.rb
 
 all_EXTRA_DIST=$(java_EXTRA_DIST) $(python_EXTRA_DIST) $(ruby_EXTRA_DIST)
 

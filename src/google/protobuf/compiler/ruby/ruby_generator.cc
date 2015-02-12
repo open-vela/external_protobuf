@@ -47,7 +47,7 @@ namespace compiler {
 namespace ruby {
 
 // Forward decls.
-std::string IntToString(uint32_t value);
+std::string IntToString(uint32 value);
 std::string StripDotProto(const std::string& proto_file);
 std::string LabelForField(google::protobuf::FieldDescriptor* field);
 std::string TypeName(google::protobuf::FieldDescriptor* field);
@@ -64,7 +64,7 @@ void GenerateEnumAssignment(
     const google::protobuf::EnumDescriptor* en,
     google::protobuf::io::Printer* printer);
 
-std::string IntToString(uint32_t value) {
+std::string IntToString(uint32 value) {
   std::ostringstream os;
   os << value;
   return os.str();
@@ -100,6 +100,45 @@ std::string TypeName(const google::protobuf::FieldDescriptor* field) {
   }
 }
 
+void GenerateField(const google::protobuf::FieldDescriptor* field,
+                   google::protobuf::io::Printer* printer) {
+  printer->Print(
+    "$label$ :$name$, ",
+    "label", LabelForField(field),
+    "name", field->name());
+  printer->Print(
+    ":$type$, $number$",
+    "type", TypeName(field),
+    "number", IntToString(field->number()));
+  if (field->cpp_type() == FieldDescriptor::CPPTYPE_MESSAGE) {
+    printer->Print(
+      ", \"$subtype$\"\n",
+     "subtype", field->message_type()->full_name());
+  } else if (field->cpp_type() == FieldDescriptor::CPPTYPE_ENUM) {
+    printer->Print(
+      ", \"$subtype$\"\n",
+      "subtype", field->enum_type()->full_name());
+  } else {
+    printer->Print("\n");
+  }
+}
+
+void GenerateOneof(const google::protobuf::OneofDescriptor* oneof,
+                   google::protobuf::io::Printer* printer) {
+  printer->Print(
+      "oneof :$name$ do\n",
+      "name", oneof->name());
+  printer->Indent();
+
+  for (int i = 0; i < oneof->field_count(); i++) {
+    const FieldDescriptor* field = oneof->field(i);
+    GenerateField(field, printer);
+  }
+
+  printer->Outdent();
+  printer->Print("end\n");
+}
+
 void GenerateMessage(const google::protobuf::Descriptor* message,
                      google::protobuf::io::Printer* printer) {
   printer->Print(
@@ -109,25 +148,14 @@ void GenerateMessage(const google::protobuf::Descriptor* message,
 
   for (int i = 0; i < message->field_count(); i++) {
     const FieldDescriptor* field = message->field(i);
-    printer->Print(
-      "$label$ :$name$, ",
-      "label", LabelForField(field),
-      "name", field->name());
-    printer->Print(
-      ":$type$, $number$",
-      "type", TypeName(field),
-      "number", IntToString(field->number()));
-    if (field->cpp_type() == FieldDescriptor::CPPTYPE_MESSAGE) {
-      printer->Print(
-        ", \"$subtype$\"\n",
-       "subtype", field->message_type()->full_name());
-    } else if (field->cpp_type() == FieldDescriptor::CPPTYPE_ENUM) {
-      printer->Print(
-        ", \"$subtype$\"\n",
-        "subtype", field->enum_type()->full_name());
-    } else {
-      printer->Print("\n");
+    if (!field->containing_oneof()) {
+      GenerateField(field, printer);
     }
+  }
+
+  for (int i = 0; i < message->oneof_decl_count(); i++) {
+    const OneofDescriptor* oneof = message->oneof_decl(i);
+    GenerateOneof(oneof, printer);
   }
 
   printer->Outdent();
