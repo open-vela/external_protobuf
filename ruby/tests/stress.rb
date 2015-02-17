@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-require 'google/protobuf'
+require 'protobuf'
 require 'test/unit'
 
 module StressTest
