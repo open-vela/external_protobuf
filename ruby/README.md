@@ -59,7 +59,6 @@ To build this Ruby extension, you will need:
 * Bundler
 * Ruby development headers
 * a C compiler
-* the upb submodule
 
 First, install the required Ruby gems:
 
