@@ -41,6 +41,7 @@
 #include <google/protobuf/stubs/shared_ptr.h>
 #endif
 
+
 namespace google {
 namespace protobuf {
 
@@ -93,7 +94,7 @@ PyObject* len(ExtensionDict* self);
 // Returns 0 on success, -1 on failure.
 int ReleaseExtension(ExtensionDict* self,
                      PyObject* extension,
-                     const FieldDescriptor* descriptor);
+                     const google::protobuf::FieldDescriptor* descriptor);
 
 // Gets an extension from the dict for the given extension descriptor.
 //
