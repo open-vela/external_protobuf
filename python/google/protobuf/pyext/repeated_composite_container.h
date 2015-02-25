@@ -43,6 +43,7 @@
 #include <string>
 #include <vector>
 
+
 namespace google {
 namespace protobuf {
 
@@ -81,7 +82,7 @@ typedef struct RepeatedCompositeContainer {
 
   // A descriptor used to modify the underlying 'message'.
   // The pointer is owned by the global DescriptorPool.
-  const FieldDescriptor* parent_field_descriptor;
+  const google::protobuf::FieldDescriptor* parent_field_descriptor;
 
   // Pointer to the C++ Message that contains this container.  The
   // RepeatedCompositeContainer does not own this pointer.
@@ -105,7 +106,7 @@ namespace repeated_composite_container {
 // field descriptor.
 PyObject *NewContainer(
     CMessage* parent,
-    const FieldDescriptor* parent_field_descriptor,
+    const google::protobuf::FieldDescriptor* parent_field_descriptor,
     PyObject *concrete_class);
 
 // Returns the number of items in this repeated composite container.
@@ -149,7 +150,8 @@ int AssignSubscript(RepeatedCompositeContainer* self,
 // Releases the messages in the container to the given message.
 //
 // Returns 0 on success, -1 on failure.
-int ReleaseToMessage(RepeatedCompositeContainer* self, Message* new_message);
+int ReleaseToMessage(RepeatedCompositeContainer* self,
+                     google::protobuf::Message* new_message);
 
 // Releases the messages in the container to a new message.
 //
