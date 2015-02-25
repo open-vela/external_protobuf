@@ -31,23 +31,11 @@ nobase_dist_proto_DATA = google/protobuf/descriptor.proto \
 clean-local:
 	rm -f *.loT
 
-public_config = google/protobuf/stubs/pbconfig.h
-
-CLEANFILES = $(protoc_outputs) $(public_config) unittest_proto_middleman \
+CLEANFILES = $(protoc_outputs) unittest_proto_middleman \
              testzip.jar testzip.list testzip.proto testzip.zip
 
 MAINTAINERCLEANFILES =   \
   Makefile.in
-
-# Generate and distribute a minimum config.h file to make hash_map work.
-# The autoheader config has too much info, which might conflict with other
-# macros applications might include. Thus, we create a stubs/pbconfig.h, that
-# only #defines what we really need, and prefix it with GOOGLE_PROTOBUF_ to
-# avoid conflicts.
-$(public_config): $(top_builddir)/config.h $(top_srcdir)/config.h.include
-	echo "// Note: Google Protobuf internal only. Do NOT include." > $@
-	cat $(top_builddir)/config.h | grep -f $(top_srcdir)/config.h.include | \
-	sed 's,#define , #define GOOGLE_PROTOBUF_,' >> $@
 
 nobase_include_HEADERS =                                        \
   google/protobuf/stubs/atomic_sequence_num.h                   \
@@ -66,13 +54,11 @@ nobase_include_HEADERS =                                        \
   google/protobuf/stubs/atomicops_internals_x86_gcc.h           \
   google/protobuf/stubs/atomicops_internals_x86_msvc.h          \
   google/protobuf/stubs/casts.h                                 \
+  google/protobuf/stubs/singleton.h                             \
   google/protobuf/stubs/common.h                                \
   google/protobuf/stubs/fastmem.h                               \
-  google/protobuf/stubs/hash.h                                  \
   google/protobuf/stubs/once.h                                  \
   google/protobuf/stubs/platform_macros.h                       \
-  google/protobuf/stubs/shared_ptr.h                            \
-  google/protobuf/stubs/singleton.h                             \
   google/protobuf/stubs/stl_util.h                              \
   google/protobuf/stubs/template_util.h                         \
   google/protobuf/stubs/type_traits.h                           \
@@ -125,9 +111,6 @@ nobase_include_HEADERS =                                        \
   google/protobuf/compiler/python/python_generator.h            \
   google/protobuf/compiler/ruby/ruby_generator.h
 
-nobase_nodist_include_HEADERS =                                 \
-	$(public_config)
-
 lib_LTLIBRARIES = libprotobuf-lite.la libprotobuf.la libprotoc.la
 
 libprotobuf_lite_la_LIBADD = $(PTHREAD_LIBS)
@@ -152,8 +135,7 @@ libprotobuf_lite_la_SOURCES =                                  \
   google/protobuf/io/coded_stream.cc                           \
   google/protobuf/io/coded_stream_inl.h                        \
   google/protobuf/io/zero_copy_stream.cc                       \
-  google/protobuf/io/zero_copy_stream_impl_lite.cc             \
-	$(public_config)
+  google/protobuf/io/zero_copy_stream_impl_lite.cc
 
 libprotobuf_la_LIBADD = $(PTHREAD_LIBS)
 libprotobuf_la_LDFLAGS = -version-info 10:0:0 -export-dynamic -no-undefined
@@ -325,6 +307,7 @@ EXTRA_DIST =                                                   \
   google/protobuf/io/gzip_stream_unittest.sh                   \
   google/protobuf/testdata/golden_message                      \
   google/protobuf/testdata/golden_message_oneof_implemented    \
+  google/protobuf/testdata/golden_message_proto3               \
   google/protobuf/testdata/golden_packed_fields_message        \
   google/protobuf/testdata/bad_utf8_string                     \
   google/protobuf/testdata/text_format_unittest_data.txt       \
@@ -392,7 +375,7 @@ protoc_outputs =                                               \
   google/protobuf/compiler/cpp/cpp_test_bad_identifiers.pb.cc  \
   google/protobuf/compiler/cpp/cpp_test_bad_identifiers.pb.h
 
-BUILT_SOURCES = $(protoc_outputs) $(public_config)
+BUILT_SOURCES = $(protoc_outputs)
 
 if USE_EXTERNAL_PROTOC
 

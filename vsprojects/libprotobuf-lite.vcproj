@@ -164,10 +164,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\google\protobuf\stubs\pbconfig.h"
-				>
-			</File>
-			<File
 				RelativePath="..\src\google\protobuf\extension_set.h"
 				>
 			</File>
