@@ -352,7 +352,9 @@ string FilenameIdentifier(const string& filename) {
     } else {
       // Not alphanumeric.  To avoid any possibility of name conflicts we
       // use the hex code for the character.
-      StrAppend(&result, "_", ToHex(static_cast<uint8>(filename[i])));
+      result.push_back('_');
+      char buffer[kFastToBufferSize];
+      result.append(FastHexToBuffer(static_cast<uint8>(filename[i]), buffer));
     }
   }
   return result;
@@ -504,13 +506,6 @@ bool IsStringOrMessage(const FieldDescriptor* field) {
 
   GOOGLE_LOG(FATAL) << "Can't get here.";
   return false;
-}
-
-FieldOptions::CType EffectiveStringCType(const FieldDescriptor* field) {
-  GOOGLE_DCHECK(field->cpp_type() == FieldDescriptor::CPPTYPE_STRING);
-  // Open-source protobuf release only supports STRING ctype.
-  return FieldOptions::STRING;
-
 }
 
 }  // namespace cpp

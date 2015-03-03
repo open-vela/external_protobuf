@@ -2304,9 +2304,8 @@ int SetAttr(CMessage* self, PyObject* name, PyObject* value) {
 
 PyTypeObject CMessage_Type = {
   PyVarObject_HEAD_INIT(&PyType_Type, 0)
-  // Keep the fully qualified _message symbol in a line for opensource.
-  "google.protobuf.pyext._message."
-  "CMessage",                          // tp_name
+  "google.protobuf."
+  "pyext._message.CMessage",           // tp_name
   sizeof(CMessage),                    // tp_basicsize
   0,                                   //  tp_itemsize
   (destructor)cmessage::Dealloc,       //  tp_dealloc

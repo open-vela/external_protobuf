@@ -298,9 +298,8 @@ static PyGetSetDef Getters[] = {
 
 PyTypeObject PyBaseDescriptor_Type = {
   PyVarObject_HEAD_INIT(&PyType_Type, 0)
-  // Keep the fully qualified _message symbol in a line for opensource.
-  "google.protobuf.internal._message."
-  "DescriptorBase",                     // tp_name
+  "google.protobuf.internal."
+    "_message.DescriptorBase",          // tp_name
   sizeof(PyBaseDescriptor),             // tp_basicsize
   0,                                    // tp_itemsize
   (destructor)Dealloc,                  // tp_dealloc
@@ -552,9 +551,8 @@ static PyMethodDef Methods[] = {
 
 PyTypeObject PyMessageDescriptor_Type = {
   PyVarObject_HEAD_INIT(&PyType_Type, 0)
-  // Keep the fully qualified _message symbol in a line for opensource.
-  C("google.protobuf.internal._message."
-    "MessageDescriptor"),      // tp_name
+  C("google.protobuf.internal."
+    "_message.MessageDescriptor"),      // tp_name
   sizeof(PyBaseDescriptor),             // tp_basicsize
   0,                                    // tp_itemsize
   0,                                    // tp_dealloc
@@ -981,9 +979,8 @@ static PyGetSetDef Getters[] = {
 
 PyTypeObject PyEnumDescriptor_Type = {
   PyVarObject_HEAD_INIT(&PyType_Type, 0)
-  // Keep the fully qualified _message symbol in a line for opensource.
-  C("google.protobuf.internal._message."
-    "EnumDescriptor"),                  // tp_name
+  C("google.protobuf.internal."
+    "_message.EnumDescriptor"),         // tp_name
   sizeof(PyBaseDescriptor),             // tp_basicsize
   0,                                    // tp_itemsize
   0,                                    // tp_dealloc

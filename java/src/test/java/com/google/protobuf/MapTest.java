@@ -269,6 +269,7 @@ public class MapTest extends TestCase {
     assertFalse(m2.equals(m1));
   }
 
+
   public void testNestedBuilderOnChangeEventPropagation() {
     TestOnChangeEventPropagation.Builder parent =
         TestOnChangeEventPropagation.newBuilder();

@@ -136,11 +136,8 @@ void FileGenerator::GenerateHeader(io::Printer* printer) {
   printer->Print(
     "#include <google/protobuf/arena.h>\n"
     "#include <google/protobuf/arenastring.h>\n"
-    "#include <google/protobuf/generated_message_util.h>\n");
-  if (UseUnknownFieldSet(file_)) {
-    printer->Print(
-      "#include <google/protobuf/metadata.h>\n");
-  }
+    "#include <google/protobuf/generated_message_util.h>\n"
+    "#include <google/protobuf/metadata.h>\n");
   if (file_->message_type_count() > 0) {
     if (HasDescriptorMethods(file_)) {
       printer->Print(
@@ -155,24 +152,13 @@ void FileGenerator::GenerateHeader(io::Printer* printer) {
     "#include <google/protobuf/extension_set.h>\n");
   if (HasMapFields(file_)) {
     printer->Print(
-        "#include <google/protobuf/map.h>\n");
-    if (HasDescriptorMethods(file_)) {
-      printer->Print(
-          "#include <google/protobuf/map_field_inl.h>\n");
-    } else {
-      printer->Print(
-          "#include <google/protobuf/map_field_lite.h>\n");
-    }
+      "#include <google/protobuf/map.h>\n"
+      "#include <google/protobuf/map_field_inl.h>\n");
   }
 
-  if (HasEnumDefinitions(file_)) {
-    if (HasDescriptorMethods(file_)) {
-      printer->Print(
-          "#include <google/protobuf/generated_enum_reflection.h>\n");
-    } else {
-      printer->Print(
-          "#include <google/protobuf/generated_enum_util.h>\n");
-    }
+  if (HasDescriptorMethods(file_) && HasEnumDefinitions(file_)) {
+    printer->Print(
+      "#include <google/protobuf/generated_enum_reflection.h>\n");
   }
 
   if (HasGenericServices(file_)) {
@@ -286,17 +272,15 @@ void FileGenerator::GenerateHeader(io::Printer* printer) {
   printer->Print(kThickSeparator);
   printer->Print("\n");
 
-  printer->Print("#if !PROTOBUF_INLINE_NOT_IN_HEADERS\n");
+
   // Generate class inline methods.
   for (int i = 0; i < file_->message_type_count(); i++) {
     if (i > 0) {
       printer->Print(kThinSeparator);
       printer->Print("\n");
     }
-    message_generators_[i]->GenerateInlineMethods(printer,
-                                                  /* is_inline = */ true);
+    message_generators_[i]->GenerateInlineMethods(printer);
   }
-  printer->Print("#endif  // !PROTOBUF_INLINE_NOT_IN_HEADERS\n");
 
   printer->Print(
     "\n"
@@ -306,7 +290,7 @@ void FileGenerator::GenerateHeader(io::Printer* printer) {
   GenerateNamespaceClosers(printer);
 
   // Emit GetEnumDescriptor specializations into google::protobuf namespace:
-  if (HasEnumDefinitions(file_)) {
+  if (HasDescriptorMethods(file_)) {
     // The SWIG conditional is to avoid a null-pointer dereference
     // (bug 1984964) in swig-1.3.21 resulting from the following syntax:
     //   namespace X { void Y<Z::W>(); }
@@ -433,12 +417,6 @@ void FileGenerator::GenerateSource(io::Printer* printer) {
     printer->Print(kThickSeparator);
     printer->Print("\n");
     message_generators_[i]->GenerateClassMethods(printer);
-
-    printer->Print("#if PROTOBUF_INLINE_NOT_IN_HEADERS\n");
-    // Generate class inline methods.
-    message_generators_[i]->GenerateInlineMethods(printer,
-                                                  /* is_inline = */ false);
-    printer->Print("#endif  // PROTOBUF_INLINE_NOT_IN_HEADERS\n");
   }
 
   if (HasGenericServices(file_)) {

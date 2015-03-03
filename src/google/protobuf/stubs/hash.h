@@ -89,17 +89,15 @@ struct hash<const char*> {
 
 template <typename Key, typename Data,
           typename HashFcn = hash<Key>,
-          typename EqualKey = std::equal_to<Key>,
-          typename Alloc = std::allocator< std::pair<const Key, Data> > >
-class hash_map : public std::map<Key, Data, HashFcn, EqualKey, Alloc> {
+          typename EqualKey = int >
+class hash_map : public std::map<Key, Data, HashFcn> {
  public:
-  hash_map(int = 0, const HashFcn& = HashFcn(), const EqualKey& = EqualKey(),
-           const Alloc& = Alloc()) {}
+  hash_map(int = 0) {}
 };
 
 template <typename Key,
           typename HashFcn = hash<Key>,
-          typename EqualKey = std::equal_to<Key> >
+          typename EqualKey = int >
 class hash_set : public std::set<Key, HashFcn> {
  public:
   hash_set(int = 0) {}
@@ -127,21 +125,18 @@ struct hash<const char*>
 
 template <typename Key, typename Data,
           typename HashFcn = hash<Key>,
-          typename EqualKey = std::equal_to<Key>,
-          typename Alloc = std::allocator< std::pair<const Key, Data> > >
-class hash_map
-    : public GOOGLE_PROTOBUF_HASH_NAMESPACE::GOOGLE_PROTOBUF_HASH_MAP_CLASS<
-          Key, Data, HashFcn, EqualKey, Alloc> {
+          typename EqualKey = int >
+class hash_map : public GOOGLE_PROTOBUF_HASH_NAMESPACE::hash_map<
+    Key, Data, HashFcn> {
  public:
-  hash_map(int = 0, const HashFcn& = HashFcn(), const EqualKey& = EqualKey(),
-           const Alloc& = Alloc()) {}
+  hash_map(int = 0) {}
 };
 
-template <typename Key, typename HashFcn = hash<Key>,
-          typename EqualKey = std::equal_to<Key> >
-class hash_set
-    : public GOOGLE_PROTOBUF_HASH_NAMESPACE::GOOGLE_PROTOBUF_HASH_SET_CLASS<
-          Key, HashFcn, EqualKey> {
+template <typename Key,
+          typename HashFcn = hash<Key>,
+          typename EqualKey = int >
+class hash_set : public GOOGLE_PROTOBUF_HASH_NAMESPACE::hash_set<
+    Key, HashFcn> {
  public:
   hash_set(int = 0) {}
 };
@@ -172,16 +167,13 @@ struct hash<const char*> {
   }
 };
 
-template <typename Key, typename Data,
-          typename HashFcn = hash<Key>,
-          typename EqualKey = std::equal_to<Key>,
-          typename Alloc = std::allocator< std::pair<const Key, Data> > >
+template <typename Key, typename Data, typename HashFcn = hash<Key>,
+          typename EqualKey = std::equal_to<Key> >
 class hash_map
     : public GOOGLE_PROTOBUF_HASH_NAMESPACE::GOOGLE_PROTOBUF_HASH_MAP_CLASS<
-          Key, Data, HashFcn, EqualKey, Alloc> {
+          Key, Data, HashFcn, EqualKey> {
  public:
-  hash_map(int = 0, const HashFcn& = HashFcn(), const EqualKey& = EqualKey(),
-           const Alloc& = Alloc()) {}
+  hash_map(int = 0) {}
 };
 
 template <typename Key, typename HashFcn = hash<Key>,

@@ -35,16 +35,13 @@
 #endif
 
 #include <google/protobuf/stubs/common.h>
-#include <google/protobuf/arena.h>
 #include <google/protobuf/map.h>
-#include <google/protobuf/arena_test_util.h>
 #include <google/protobuf/map_unittest.pb.h>
 #include <google/protobuf/map_test_util.h>
 #include <google/protobuf/unittest.pb.h>
 #include <google/protobuf/map_field_inl.h>
 #include <google/protobuf/message.h>
 #include <google/protobuf/repeated_field.h>
-#include <google/protobuf/wire_format_lite_inl.h>
 #include <gtest/gtest.h>
 
 namespace google {
@@ -56,9 +53,6 @@ using unittest::TestAllTypes;
 
 class MapFieldBaseStub : public MapFieldBase {
  public:
-  typedef void DestructorSkippable_;
-  MapFieldBaseStub() {}
-  explicit MapFieldBaseStub(Arena* arena) : MapFieldBase(arena) {}
   void SyncRepeatedFieldWithMap() const {
     MapFieldBase::SyncRepeatedFieldWithMap();
   }
@@ -69,6 +63,16 @@ class MapFieldBaseStub : public MapFieldBase {
   RepeatedPtrField<Message>* InternalRepeatedField() {
     return repeated_field_;
   }
+  // Get underlined map without synchronizing repeated field.
+  template <typename MapType>
+  const MapType& GetMap() {
+    return *reinterpret_cast<MapType*>(base_map_);
+  }
+  // Get underlined map without synchronizing repeated field.
+  template <typename MapType>
+  MapType* MutableMap() {
+    return reinterpret_cast<MapType*>(base_map_);
+  }
   bool IsMapClean() { return state_ != 0; }
   bool IsRepeatedClean() { return state_ != 1; }
   void SetMapDirty() { state_ = 0; }
@@ -77,8 +81,8 @@ class MapFieldBaseStub : public MapFieldBase {
 
 class MapFieldBasePrimitiveTest : public ::testing::Test {
  protected:
-  typedef MapField<int32, int32, WireFormatLite::TYPE_INT32,
-                   WireFormatLite::TYPE_INT32, false> MapFieldType;
+  typedef MapField<int32, int32, FieldDescriptor::TYPE_INT32,
+                   FieldDescriptor::TYPE_INT32> MapFieldType;
 
   MapFieldBasePrimitiveTest() {
     // Get descriptors
@@ -140,38 +144,6 @@ TEST_F(MapFieldBasePrimitiveTest, MutableRepeatedField) {
   }
 }
 
-TEST_F(MapFieldBasePrimitiveTest, Arena) {
-  // Allocate a large initial block to avoid mallocs during hooked test.
-  std::vector<char> arena_block(128 * 1024);
-  ArenaOptions options;
-  options.initial_block = arena_block.data();
-  options.initial_block_size = arena_block.size();
-  Arena arena(options);
-
-  {
-    NoHeapChecker no_heap;
-
-    MapFieldType* map_field =
-        Arena::Create<MapFieldType>(&arena, &arena, default_entry_);
-
-    // Set content in map
-    (*map_field->MutableMap())[100] = 101;
-
-    // Trigger conversion to repeated field.
-    map_field->GetRepeatedField();
-  }
-
-  {
-    NoHeapChecker no_heap;
-
-    MapFieldBaseStub* map_field =
-        Arena::Create<MapFieldBaseStub>(&arena, &arena);
-
-    // Trigger conversion to repeated field.
-    EXPECT_TRUE(map_field->MutableRepeatedField() != NULL);
-  }
-}
-
 namespace {
 enum State { CLEAN, MAP_DIRTY, REPEATED_DIRTY };
 }  // anonymous namespace
@@ -180,10 +152,8 @@ class MapFieldStateTest
     : public testing::TestWithParam<State> {
  public:
  protected:
-  typedef MapField<int32, int32, WireFormatLite::TYPE_INT32,
-                   WireFormatLite::TYPE_INT32, false> MapFieldType;
-  typedef MapFieldLite<int32, int32, WireFormatLite::TYPE_INT32,
-                       WireFormatLite::TYPE_INT32, false> MapFieldLiteType;
+  typedef MapField<int32, int32, FieldDescriptor::TYPE_INT32,
+                FieldDescriptor::TYPE_INT32> MapFieldType;
   MapFieldStateTest() : state_(GetParam()) {
     // Build map field
     const Descriptor* map_descriptor =
@@ -229,8 +199,9 @@ class MapFieldStateTest
     MakeMapDirty(map_field);
     MapFieldBase* map_field_base = map_field;
     map_field_base->MutableRepeatedField();
-    Map<int32, int32>* map = implicit_cast<MapFieldLiteType*>(map_field)
-                                 ->MapFieldLiteType::MutableMap();
+    MapFieldBaseStub* stub =
+        reinterpret_cast<MapFieldBaseStub*>(map_field_base);
+    Map<int32, int32>* map = stub->MutableMap<Map<int32, int32> >();
     map->clear();
 
     Expect(map_field, REPEATED_DIRTY, 0, 1, false);
@@ -242,8 +213,7 @@ class MapFieldStateTest
     MapFieldBaseStub* stub =
         reinterpret_cast<MapFieldBaseStub*>(map_field_base);
 
-    Map<int32, int32>* map = implicit_cast<MapFieldLiteType*>(map_field)
-                                 ->MapFieldLiteType::MutableMap();
+    Map<int32, int32>* map = stub->MutableMap<Map<int32, int32> >();
     RepeatedPtrField<Message>* repeated_field = stub->InternalRepeatedField();
 
     switch (state) {
@@ -459,7 +429,6 @@ TEST_P(MapFieldStateTest, MutableMapField) {
     Expect(map_field_.get(), REPEATED_DIRTY, 0, 1, false);
   }
 }
-
 
 }  // namespace internal
 }  // namespace protobuf
