@@ -194,9 +194,6 @@
 				RelativePath="..\src\google\protobuf\test_util.h"
 				>
 			</File>
-			<File RelativePath="..\src\google\protobuf\map_test_util_impl.h"></File>
-			<File RelativePath="..\src\google\protobuf\map_test_util.h"></File>
-			<File RelativePath="..\src\google\protobuf\arena_test_util.h"></File>
 			<File
 				RelativePath="..\src\google\protobuf\compiler\mock_code_generator.h"
 				>
@@ -349,7 +346,6 @@
 				RelativePath="..\src\google\protobuf\map_test_util.cc"
 				>
 			</File>
-			<File RelativePath="..\src\google\protobuf\arena_test_util.cc"></File>
 			<File
 				RelativePath="..\src\google\protobuf\message_unittest.cc"
 				>
@@ -435,7 +431,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\google\protobuf\unittest_preserve_unknown_enum2.pb.cc"
+				RelativePath=".\google\protobuf\map_lite_unittest.pb.cc"
 				>
 			</File>
 			<File
@@ -528,16 +524,16 @@
 			</File>
 		</Filter>
 		<File
-			RelativePath="..\src\google\protobuf\unittest_preserve_unknown_enum2.proto"
+			RelativePath="..\src\google\protobuf\map_lite_unittest.proto"
 			>
 			<FileConfiguration
 				Name="Debug|Win32"
 				>
 				<Tool
 					Name="VCCustomBuildTool"
-					Description="Generating unittest_preserve_unknown_enum2.pb.{h,cc}..."
-					CommandLine="Debug\protoc -I../src --cpp_out=. ../src/google/protobuf/unittest_preserve_unknown_enum2.proto"
-					Outputs="google\protobuf\unittest_preserve_unknown_enum2.pb.h;google\protobuf\unittest_preserve_unknown_enum2.pb.cc"
+					Description="Generating map_lite_unittest.pb.{h,cc}..."
+					CommandLine="Debug\protoc -I../src --cpp_out=. ../src/google/protobuf/map_lite_unittest.proto"
+					Outputs="google\protobuf\map_lite_unittest.pb.h;google\protobuf\map_lite_unittest.pb.cc"
 				/>
 			</FileConfiguration>
 			<FileConfiguration
@@ -545,9 +541,9 @@
 				>
 				<Tool
 					Name="VCCustomBuildTool"
-					Description="Generating unittest_preserve_unknown_enum2.pb.{h,cc}..."
-					CommandLine="Release\protoc -I../src --cpp_out=. ../src/google/protobuf/unittest_preserve_unknown_enum2.proto"
-					Outputs="google\protobuf\unittest_preserve_unknown_enum2.pb.h;google\protobuf\unittest_preserve_unknown_enum2.pb.cc"
+					Description="Generating map_lite_unittest.pb.{h,cc}..."
+					CommandLine="Release\protoc -I../src --cpp_out=. ../src/google/protobuf/map_lite_unittest.proto"
+					Outputs="google\protobuf\map_lite_unittest.pb.h;google\protobuf\map_lite_unittest.pb.cc"
 				/>
 			</FileConfiguration>
 		</File>

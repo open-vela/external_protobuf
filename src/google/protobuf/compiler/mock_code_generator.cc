@@ -133,10 +133,10 @@ bool MockCodeGenerator::Generate(
         *error = "Saw message type MockCodeGenerator_Error.";
         return false;
       } else if (command == "Exit") {
-        std::cerr << "Saw message type MockCodeGenerator_Exit." << std::endl;
+        cerr << "Saw message type MockCodeGenerator_Exit." << endl;
         exit(123);
       } else if (command == "Abort") {
-        std::cerr << "Saw message type MockCodeGenerator_Abort." << std::endl;
+        cerr << "Saw message type MockCodeGenerator_Abort." << endl;
         abort();
       } else if (command == "HasSourceCodeInfo") {
         FileDescriptorProto file_descriptor_proto;
@@ -144,8 +144,8 @@ bool MockCodeGenerator::Generate(
         bool has_source_code_info =
             file_descriptor_proto.has_source_code_info() &&
             file_descriptor_proto.source_code_info().location_size() > 0;
-        std::cerr << "Saw message type MockCodeGenerator_HasSourceCodeInfo: "
-                  << has_source_code_info << "." << std::endl;
+        cerr << "Saw message type MockCodeGenerator_HasSourceCodeInfo: "
+             << has_source_code_info << "." << endl;
         abort();
       } else {
         GOOGLE_LOG(FATAL) << "Unknown MockCodeGenerator command: " << command;

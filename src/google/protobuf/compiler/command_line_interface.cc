@@ -152,7 +152,7 @@ bool VerifyDirectoryExists(const string& path) {
   if (path.empty()) return true;
 
   if (access(path.c_str(), F_OK) == -1) {
-    std::cerr << path << ": " << strerror(errno) << std::endl;
+    cerr << path << ": " << strerror(errno) << endl;
     return false;
   } else {
     return true;
@@ -171,8 +171,8 @@ bool TryCreateParentDirectory(const string& prefix, const string& filename) {
     path_so_far += parts[i];
     if (mkdir(path_so_far.c_str(), 0777) != 0) {
       if (errno != EEXIST) {
-        std::cerr << filename << ": while trying to create directory "
-                  << path_so_far << ": " << strerror(errno) << std::endl;
+        cerr << filename << ": while trying to create directory "
+             << path_so_far << ": " << strerror(errno) << endl;
         return false;
       }
     }
@@ -201,9 +201,9 @@ class CommandLineInterface::ErrorPrinter : public MultiFileErrorCollector,
     if (format_ == CommandLineInterface::ERROR_FORMAT_MSVS &&
         tree_ != NULL &&
         tree_->VirtualFileToDiskFile(filename, &dfile)) {
-      std::cerr << dfile;
+      cerr << dfile;
     } else {
-      std::cerr << filename;
+      cerr << filename;
     }
 
     // Users typically expect 1-based line/column numbers, so we add 1
@@ -212,16 +212,15 @@ class CommandLineInterface::ErrorPrinter : public MultiFileErrorCollector,
       // Allow for both GCC- and Visual-Studio-compatible output.
       switch (format_) {
         case CommandLineInterface::ERROR_FORMAT_GCC:
-          std::cerr << ":" << (line + 1) << ":" << (column + 1);
+          cerr << ":" << (line + 1) << ":" << (column + 1);
           break;
         case CommandLineInterface::ERROR_FORMAT_MSVS:
-          std::cerr << "(" << (line + 1)
-                    << ") : error in column=" << (column + 1);
+          cerr << "(" << (line + 1) << ") : error in column=" << (column + 1);
           break;
       }
     }
 
-    std::cerr << ": " << message << std::endl;
+    cerr << ": " << message << endl;
   }
 
   // implements io::ErrorCollector -----------------------------------
@@ -346,7 +345,7 @@ bool CommandLineInterface::GeneratorContextImpl::WriteAllToDisk(
 
     if (file_descriptor < 0) {
       int error = errno;
-      std::cerr << filename << ": " << strerror(error);
+      cerr << filename << ": " << strerror(error);
       return false;
     }
 
@@ -370,9 +369,9 @@ bool CommandLineInterface::GeneratorContextImpl::WriteAllToDisk(
 
         if (write_result < 0) {
           int error = errno;
-          std::cerr << filename << ": write: " << strerror(error);
+          cerr << filename << ": write: " << strerror(error);
         } else {
-          std::cerr << filename << ": write() returned zero?" << std::endl;
+          cerr << filename << ": write() returned zero?" << endl;
         }
         return false;
       }
@@ -383,7 +382,7 @@ bool CommandLineInterface::GeneratorContextImpl::WriteAllToDisk(
 
     if (close(file_descriptor) != 0) {
       int error = errno;
-      std::cerr << filename << ": close: " << strerror(error);
+      cerr << filename << ": close: " << strerror(error);
       return false;
     }
   }
@@ -406,7 +405,7 @@ bool CommandLineInterface::GeneratorContextImpl::WriteAllToZip(
 
   if (file_descriptor < 0) {
     int error = errno;
-    std::cerr << filename << ": " << strerror(error);
+    cerr << filename << ": " << strerror(error);
     return false;
   }
 
@@ -422,11 +421,11 @@ bool CommandLineInterface::GeneratorContextImpl::WriteAllToZip(
   zip_writer.WriteDirectory();
 
   if (stream.GetErrno() != 0) {
-    std::cerr << filename << ": " << strerror(stream.GetErrno()) << std::endl;
+    cerr << filename << ": " << strerror(stream.GetErrno()) << endl;
   }
 
   if (!stream.Close()) {
-    std::cerr << filename << ": " << strerror(stream.GetErrno()) << std::endl;
+    cerr << filename << ": " << strerror(stream.GetErrno()) << endl;
   }
 
   return true;
@@ -491,8 +490,7 @@ CommandLineInterface::MemoryOutputStream::~MemoryOutputStream() {
       if (append_mode_) {
         (*map_slot)->append(data_);
       } else {
-        std::cerr << filename_ << ": Tried to write the same file twice."
-                  << std::endl;
+        cerr << filename_ << ": Tried to write the same file twice." << endl;
         directory_->had_error_ = true;
       }
       return;
@@ -510,9 +508,8 @@ CommandLineInterface::MemoryOutputStream::~MemoryOutputStream() {
 
     // Find the file we are going to insert into.
     if (*map_slot == NULL) {
-      std::cerr << filename_
-                << ": Tried to insert into file that doesn't exist."
-                << std::endl;
+      cerr << filename_ << ": Tried to insert into file that doesn't exist."
+           << endl;
       directory_->had_error_ = true;
       return;
     }
@@ -524,8 +521,8 @@ CommandLineInterface::MemoryOutputStream::~MemoryOutputStream() {
     string::size_type pos = target->find(magic_string);
 
     if (pos == string::npos) {
-      std::cerr << filename_ << ": insertion point \"" << insertion_point_
-                << "\" not found." << std::endl;
+      cerr << filename_ << ": insertion point \"" << insertion_point_
+           << "\" not found." << endl;
       directory_->had_error_ = true;
       return;
     }
@@ -796,31 +793,27 @@ bool CommandLineInterface::MakeInputsBeProtoPathRelative(
         input_files_[i] = virtual_file;
         break;
       case DiskSourceTree::SHADOWED:
-        std::cerr << input_files_[i]
-                  << ": Input is shadowed in the --proto_path by \""
-                  << shadowing_disk_file
-                  << "\".  Either use the latter file as your input or reorder "
-                     "the --proto_path so that the former file's location "
-                     "comes first." << std::endl;
+        cerr << input_files_[i] << ": Input is shadowed in the --proto_path "
+                "by \"" << shadowing_disk_file << "\".  Either use the latter "
+                "file as your input or reorder the --proto_path so that the "
+                "former file's location comes first." << endl;
         return false;
       case DiskSourceTree::CANNOT_OPEN:
-        std::cerr << input_files_[i] << ": " << strerror(errno) << std::endl;
+        cerr << input_files_[i] << ": " << strerror(errno) << endl;
         return false;
       case DiskSourceTree::NO_MAPPING:
         // First check if the file exists at all.
         if (access(input_files_[i].c_str(), F_OK) < 0) {
           // File does not even exist.
-          std::cerr << input_files_[i] << ": " << strerror(ENOENT) << std::endl;
+          cerr << input_files_[i] << ": " << strerror(ENOENT) << endl;
         } else {
-          std::cerr
-              << input_files_[i]
-              << ": File does not reside within any path "
-                 "specified using --proto_path (or -I).  You must specify a "
-                 "--proto_path which encompasses this file.  Note that the "
-                 "proto_path must be an exact prefix of the .proto file "
-                 "names -- protoc is too dumb to figure out when two paths "
-                 "(e.g. absolute and relative) are equivalent (it's harder "
-                 "than you think)." << std::endl;
+          cerr << input_files_[i] << ": File does not reside within any path "
+                  "specified using --proto_path (or -I).  You must specify a "
+                  "--proto_path which encompasses this file.  Note that the "
+                  "proto_path must be an exact prefix of the .proto file "
+                  "names -- protoc is too dumb to figure out when two paths "
+                  "(e.g. absolute and relative) are equivalent (it's harder "
+                  "than you think)." << endl;
         }
         return false;
     }
@@ -840,10 +833,9 @@ CommandLineInterface::ParseArguments(int argc, const char* const argv[]) {
     if (ParseArgument(argv[i], &name, &value)) {
       // Returned true => Use the next argument as the flag value.
       if (i + 1 == argc || argv[i+1][0] == '-') {
-        std::cerr << "Missing value for flag: " << name << std::endl;
+        cerr << "Missing value for flag: " << name << endl;
         if (name == "--decode") {
-          std::cerr << "To decode an unknown message, use --decode_raw."
-                    << std::endl;
+          cerr << "To decode an unknown message, use --decode_raw." << endl;
         }
         return PARSE_ARGUMENT_FAIL;
       } else {
@@ -868,25 +860,24 @@ CommandLineInterface::ParseArguments(int argc, const char* const argv[]) {
   // Check some errror cases.
   bool decoding_raw = (mode_ == MODE_DECODE) && codec_type_.empty();
   if (decoding_raw && !input_files_.empty()) {
-    std::cerr << "When using --decode_raw, no input files should be given."
-              << std::endl;
+    cerr << "When using --decode_raw, no input files should be given." << endl;
     return PARSE_ARGUMENT_FAIL;
   } else if (!decoding_raw && input_files_.empty()) {
-    std::cerr << "Missing input file." << std::endl;
+    cerr << "Missing input file." << endl;
     return PARSE_ARGUMENT_FAIL;
   }
   if (mode_ == MODE_COMPILE && output_directives_.empty() &&
       descriptor_set_name_.empty()) {
-    std::cerr << "Missing output directives." << std::endl;
+    cerr << "Missing output directives." << endl;
     return PARSE_ARGUMENT_FAIL;
   }
   if (imports_in_descriptor_set_ && descriptor_set_name_.empty()) {
-    std::cerr << "--include_imports only makes sense when combined with "
-                 "--descriptor_set_out." << std::endl;
+    cerr << "--include_imports only makes sense when combined with "
+            "--descriptor_set_out." << endl;
   }
   if (source_info_in_descriptor_set_ && descriptor_set_name_.empty()) {
-    std::cerr << "--include_source_info only makes sense when combined with "
-                 "--descriptor_set_out." << std::endl;
+    cerr << "--include_source_info only makes sense when combined with "
+            "--descriptor_set_out." << endl;
   }
 
   return PARSE_ARGUMENT_DONE_AND_CONTINUE;
@@ -959,12 +950,10 @@ CommandLineInterface::InterpretArgument(const string& name,
   if (name.empty()) {
     // Not a flag.  Just a filename.
     if (value.empty()) {
-      std::cerr
-          << "You seem to have passed an empty string as one of the "
-             "arguments to " << executable_name_
-          << ".  This is actually "
-             "sort of hard to do.  Congrats.  Unfortunately it is not valid "
-             "input so the program is going to die now." << std::endl;
+      cerr << "You seem to have passed an empty string as one of the "
+              "arguments to " << executable_name_ << ".  This is actually "
+              "sort of hard to do.  Congrats.  Unfortunately it is not valid "
+              "input so the program is going to die now." << endl;
       return PARSE_ARGUMENT_FAIL;
     }
 
@@ -991,16 +980,14 @@ CommandLineInterface::InterpretArgument(const string& name,
       }
 
       if (disk_path.empty()) {
-        std::cerr
-            << "--proto_path passed empty directory name.  (Use \".\" for "
-               "current directory.)" << std::endl;
+        cerr << "--proto_path passed empty directory name.  (Use \".\" for "
+                "current directory.)" << endl;
         return PARSE_ARGUMENT_FAIL;
       }
 
       // Make sure disk path exists, warn otherwise.
       if (access(disk_path.c_str(), F_OK) < 0) {
-        std::cerr << disk_path << ": warning: directory does not exist."
-                  << std::endl;
+        cerr << disk_path << ": warning: directory does not exist." << endl;
       }
 
       // Don't use make_pair as the old/default standard library on Solaris
@@ -1011,31 +998,30 @@ CommandLineInterface::InterpretArgument(const string& name,
 
   } else if (name == "-o" || name == "--descriptor_set_out") {
     if (!descriptor_set_name_.empty()) {
-      std::cerr << name << " may only be passed once." << std::endl;
+      cerr << name << " may only be passed once." << endl;
       return PARSE_ARGUMENT_FAIL;
     }
     if (value.empty()) {
-      std::cerr << name << " requires a non-empty value." << std::endl;
+      cerr << name << " requires a non-empty value." << endl;
       return PARSE_ARGUMENT_FAIL;
     }
     if (mode_ != MODE_COMPILE) {
-      std::cerr
-          << "Cannot use --encode or --decode and generate descriptors at the "
-             "same time." << std::endl;
+      cerr << "Cannot use --encode or --decode and generate descriptors at the "
+              "same time." << endl;
       return PARSE_ARGUMENT_FAIL;
     }
     descriptor_set_name_ = value;
 
   } else if (name == "--include_imports") {
     if (imports_in_descriptor_set_) {
-      std::cerr << name << " may only be passed once." << std::endl;
+      cerr << name << " may only be passed once." << endl;
       return PARSE_ARGUMENT_FAIL;
     }
     imports_in_descriptor_set_ = true;
 
   } else if (name == "--include_source_info") {
     if (source_info_in_descriptor_set_) {
-      std::cerr << name << " may only be passed once." << std::endl;
+      cerr << name << " may only be passed once." << endl;
       return PARSE_ARGUMENT_FAIL;
     }
     source_info_in_descriptor_set_ = true;
@@ -1046,7 +1032,7 @@ CommandLineInterface::InterpretArgument(const string& name,
 
   } else if (name == "--version") {
     if (!version_info_.empty()) {
-      std::cout << version_info_ << std::endl;
+      cout << version_info_ << endl;
     }
     cout << "libprotoc "
          << protobuf::internal::VersionString(GOOGLE_PROTOBUF_VERSION)
@@ -1059,28 +1045,25 @@ CommandLineInterface::InterpretArgument(const string& name,
   } else if (name == "--encode" || name == "--decode" ||
              name == "--decode_raw") {
     if (mode_ != MODE_COMPILE) {
-      std::cerr << "Only one of --encode and --decode can be specified."
-                << std::endl;
+      cerr << "Only one of --encode and --decode can be specified." << endl;
       return PARSE_ARGUMENT_FAIL;
     }
     if (!output_directives_.empty() || !descriptor_set_name_.empty()) {
-      std::cerr << "Cannot use " << name
-                << " and generate code or descriptors at the same time."
-                << std::endl;
+      cerr << "Cannot use " << name
+           << " and generate code or descriptors at the same time." << endl;
       return PARSE_ARGUMENT_FAIL;
     }
 
     mode_ = (name == "--encode") ? MODE_ENCODE : MODE_DECODE;
 
     if (value.empty() && name != "--decode_raw") {
-      std::cerr << "Type name for " << name << " cannot be blank." << std::endl;
+      cerr << "Type name for " << name << " cannot be blank." << endl;
       if (name == "--decode") {
-        std::cerr << "To decode an unknown message, use --decode_raw."
-                  << std::endl;
+        cerr << "To decode an unknown message, use --decode_raw." << endl;
       }
       return PARSE_ARGUMENT_FAIL;
     } else if (!value.empty() && name == "--decode_raw") {
-      std::cerr << "--decode_raw does not take a parameter." << std::endl;
+      cerr << "--decode_raw does not take a parameter." << endl;
       return PARSE_ARGUMENT_FAIL;
     }
 
@@ -1092,13 +1075,13 @@ CommandLineInterface::InterpretArgument(const string& name,
     } else if (value == "msvs") {
       error_format_ = ERROR_FORMAT_MSVS;
     } else {
-      std::cerr << "Unknown error format: " << value << std::endl;
+      cerr << "Unknown error format: " << value << endl;
       return PARSE_ARGUMENT_FAIL;
     }
 
   } else if (name == "--plugin") {
     if (plugin_prefix_.empty()) {
-      std::cerr << "This compiler does not support plugins." << std::endl;
+      cerr << "This compiler does not support plugins." << endl;
       return PARSE_ARGUMENT_FAIL;
     }
 
@@ -1124,15 +1107,13 @@ CommandLineInterface::InterpretArgument(const string& name,
 
   } else if (name == "--print_free_field_numbers") {
     if (mode_ != MODE_COMPILE) {
-      std::cerr << "Cannot use " << name
-                << " and use --encode, --decode or print "
-                << "other info at the same time." << std::endl;
+      cerr << "Cannot use " << name << " and use --encode, --decode or print "
+           << "other info at the same time." << endl;
       return PARSE_ARGUMENT_FAIL;
     }
     if (!output_directives_.empty() || !descriptor_set_name_.empty()) {
-      std::cerr << "Cannot use " << name
-                << " and generate code or descriptors at the same time."
-                << std::endl;
+      cerr << "Cannot use " << name
+           << " and generate code or descriptors at the same time." << endl;
       return PARSE_ARGUMENT_FAIL;
     }
     mode_ = MODE_PRINT;
@@ -1146,7 +1127,7 @@ CommandLineInterface::InterpretArgument(const string& name,
       // Check if it's a generator option flag.
       generator_info = FindOrNull(generators_by_option_name_, name);
       if (generator_info == NULL) {
-        std::cerr << "Unknown flag: " << name << std::endl;
+        cerr << "Unknown flag: " << name << endl;
         return PARSE_ARGUMENT_FAIL;
       } else {
         string* parameters = &generator_parameters_[generator_info->flag_name];
@@ -1158,8 +1139,8 @@ CommandLineInterface::InterpretArgument(const string& name,
     } else {
       // It's an output flag.  Add it to the output directives.
       if (mode_ != MODE_COMPILE) {
-        std::cerr << "Cannot use --encode, --decode or print .proto info and "
-                     "generate code at the same time." << std::endl;
+        cerr << "Cannot use --encode, --decode or print .proto info and "
+                "generate code at the same time." << endl;
         return PARSE_ARGUMENT_FAIL;
       }
 
@@ -1191,7 +1172,7 @@ CommandLineInterface::InterpretArgument(const string& name,
 
 void CommandLineInterface::PrintHelpText() {
   // Sorry for indentation here; line wrapping would be uglier.
-  std::cerr <<
+  cerr <<
 "Usage: " << executable_name_ << " [OPTION] PROTO_FILES\n"
 "Parse PROTO_FILES and generate output based on the options given:\n"
 "  -IPATH, --proto_path=PATH   Specify the directory in which to search for\n"
@@ -1232,9 +1213,9 @@ void CommandLineInterface::PrintHelpText() {
 "                              defined in the given proto files. Groups share\n"
 "                              the same field number space with the parent \n"
 "                              message. Extension ranges are counted as \n"
-"                              occupied fields numbers."  << std::endl;
+"                              occupied fields numbers."  << endl;
   if (!plugin_prefix_.empty()) {
-    std::cerr <<
+    cerr <<
 "  --plugin=EXECUTABLE         Specifies a plugin executable to use.\n"
 "                              Normally, protoc searches the PATH for\n"
 "                              plugins, but you may specify additional\n"
@@ -1242,7 +1223,7 @@ void CommandLineInterface::PrintHelpText() {
 "                              Additionally, EXECUTABLE may be of the form\n"
 "                              NAME=PATH, in which case the given plugin name\n"
 "                              is mapped to the given executable even if\n"
-"                              the executable's own name differs." << std::endl;
+"                              the executable's own name differs." << endl;
   }
 
   for (GeneratorMap::iterator iter = generators_by_flag_name_.begin();
@@ -1250,9 +1231,9 @@ void CommandLineInterface::PrintHelpText() {
     // FIXME(kenton):  If the text is long enough it will wrap, which is ugly,
     //   but fixing this nicely (e.g. splitting on spaces) is probably more
     //   trouble than it's worth.
-    std::cerr << "  " << iter->first << "=OUT_DIR "
-              << string(19 - iter->first.size(), ' ')  // Spaces for alignment.
-              << iter->second.help_text << std::endl;
+    cerr << "  " << iter->first << "=OUT_DIR "
+         << string(19 - iter->first.size(), ' ')  // Spaces for alignment.
+         << iter->second.help_text << endl;
   }
 }
 
@@ -1275,7 +1256,7 @@ bool CommandLineInterface::GenerateOutput(
     if (!GeneratePluginOutput(parsed_files, plugin_name,
                               output_directive.parameter,
                               generator_context, &error)) {
-      std::cerr << output_directive.name << ": " << error << std::endl;
+      cerr << output_directive.name << ": " << error << endl;
       return false;
     }
   } else {
@@ -1291,8 +1272,8 @@ bool CommandLineInterface::GenerateOutput(
       if (!output_directive.generator->Generate(parsed_files[i], parameters,
                                                 generator_context, &error)) {
         // Generator returned an error.
-        std::cerr << output_directive.name << ": " << parsed_files[i]->name()
-                  << ": " << error << std::endl;
+        cerr << output_directive.name << ": " << parsed_files[i]->name() << ": "
+             << error << endl;
         return false;
       }
     }
@@ -1384,7 +1365,7 @@ bool CommandLineInterface::EncodeOrDecode(const DescriptorPool* pool) {
   // Look up the type.
   const Descriptor* type = pool->FindMessageTypeByName(codec_type_);
   if (type == NULL) {
-    std::cerr << "Type not defined: " << codec_type_ << std::endl;
+    cerr << "Type not defined: " << codec_type_ << endl;
     return false;
   }
 
@@ -1410,32 +1391,32 @@ bool CommandLineInterface::EncodeOrDecode(const DescriptorPool* pool) {
     parser.AllowPartialMessage(true);
 
     if (!parser.Parse(&in, message.get())) {
-      std::cerr << "Failed to parse input." << std::endl;
+      cerr << "Failed to parse input." << endl;
       return false;
     }
   } else {
     // Input is binary.
     if (!message->ParsePartialFromZeroCopyStream(&in)) {
-      std::cerr << "Failed to parse input." << std::endl;
+      cerr << "Failed to parse input." << endl;
       return false;
     }
   }
 
   if (!message->IsInitialized()) {
-    std::cerr << "warning:  Input message is missing required fields:  "
-              << message->InitializationErrorString() << std::endl;
+    cerr << "warning:  Input message is missing required fields:  "
+         << message->InitializationErrorString() << endl;
   }
 
   if (mode_ == MODE_ENCODE) {
     // Output is binary.
     if (!message->SerializePartialToZeroCopyStream(&out)) {
-      std::cerr << "output: I/O error." << std::endl;
+      cerr << "output: I/O error." << endl;
       return false;
     }
   } else {
     // Output is text.
     if (!TextFormat::Print(*message, &out)) {
-      std::cerr << "output: I/O error." << std::endl;
+      cerr << "output: I/O error." << endl;
       return false;
     }
   }
@@ -1477,14 +1458,12 @@ bool CommandLineInterface::WriteDescriptorSet(
 
   io::FileOutputStream out(fd);
   if (!file_set.SerializeToZeroCopyStream(&out)) {
-    std::cerr << descriptor_set_name_ << ": " << strerror(out.GetErrno())
-              << std::endl;
+    cerr << descriptor_set_name_ << ": " << strerror(out.GetErrno()) << endl;
     out.Close();
     return false;
   }
   if (!out.Close()) {
-    std::cerr << descriptor_set_name_ << ": " << strerror(out.GetErrno())
-              << std::endl;
+    cerr << descriptor_set_name_ << ": " << strerror(out.GetErrno()) << endl;
     return false;
   }
 
@@ -1603,7 +1582,7 @@ void FormatFreeFieldNumbers(const string& name,
   if (next_free_number <= FieldDescriptor::kMaxNumber) {
     StringAppendF(&output, " %d-INF", next_free_number);
   }
-  std::cout << output << std::endl;
+  cout << output << endl;
 }
 
 }  // namespace

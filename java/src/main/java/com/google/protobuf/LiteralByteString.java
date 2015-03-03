@@ -154,11 +154,7 @@ class LiteralByteString extends ByteString {
   @Override
   public String toString(String charsetName)
       throws UnsupportedEncodingException {
-    // Optimize for empty strings, but ensure we don't silently ignore invalid
-    // encodings.
-    return size() == 0 && UTF_8.equals(charsetName)
-        ? ""
-        : new String(bytes, getOffsetIntoBytes(), size(), charsetName);
+    return new String(bytes, getOffsetIntoBytes(), size(), charsetName);
   }
 
   // =================================================================

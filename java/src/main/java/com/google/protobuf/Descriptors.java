@@ -897,7 +897,7 @@ public final class Descriptors {
       return (type == Type.STRING) && (getFile().getOptions().getJavaStringCheckUtf8());
     }
 
-    public boolean isMapField() {
+    boolean isMapField() {
       return getType() == Type.MESSAGE && isRepeated()
           && getMessageType().getOptions().getMapEntry();
     }

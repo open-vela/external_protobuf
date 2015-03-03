@@ -291,20 +291,11 @@ class LIBPROTOBUF_EXPORT WireFormatLite {
   template <typename CType, enum FieldType DeclaredType>
   static bool ReadPackedPrimitiveNoInline(input, RepeatedField<CType>* value);
 
-  // Read a packed enum field. If the is_valid function is not NULL, values for
-  // which is_valid(value) returns false are silently dropped.
+  // Read a packed enum field. Values for which is_valid() returns false are
+  // dropped. If is_valid == NULL, no values are dropped.
   static bool ReadPackedEnumNoInline(input,
                                      bool (*is_valid)(int),
-                                     RepeatedField<int>* values);
-
-  // Read a packed enum field. If the is_valid function is not NULL, values for
-  // which is_valid(value) returns false are appended to unknown_fields_stream.
-  static bool ReadPackedEnumPreserveUnknowns(
-      input,
-      field_number,
-      bool (*is_valid)(int),
-      io::CodedOutputStream* unknown_fields_stream,
-      RepeatedField<int>* values);
+                                     RepeatedField<int>* value);
 
   // Read a string.  ReadString(..., string* value) requires an existing string.
   static inline bool ReadString(input, string* value);
@@ -656,7 +647,7 @@ inline double WireFormatLite::DecodeDouble(uint64 value) {
 
 inline uint32 WireFormatLite::ZigZagEncode32(int32 n) {
   // Note:  the right-shift must be arithmetic
-  return (static_cast<uint32>(n) << 1) ^ (n >> 31);
+  return (n << 1) ^ (n >> 31);
 }
 
 inline int32 WireFormatLite::ZigZagDecode32(uint32 n) {
@@ -665,7 +656,7 @@ inline int32 WireFormatLite::ZigZagDecode32(uint32 n) {
 
 inline uint64 WireFormatLite::ZigZagEncode64(int64 n) {
   // Note:  the right-shift must be arithmetic
-  return (static_cast<uint64>(n) << 1) ^ (n >> 63);
+  return (n << 1) ^ (n >> 63);
 }
 
 inline int64 WireFormatLite::ZigZagDecode64(uint64 n) {
