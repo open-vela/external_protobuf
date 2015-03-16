@@ -1,8 +1,4 @@
 Protocol Buffers - Google's data interchange format
-===================================================
-
-[![Build Status](https://travis-ci.org/google/protobuf.svg?branch=master)](https://travis-ci.org/google/protobuf)
-
 Copyright 2008 Google Inc.
 
 This directory contains the Python Protocol Buffers runtime library.
@@ -69,11 +65,9 @@ Installation
 
 5) Install:
 
-    $ python setup.py install
-
-  or:
-
-    $ python setup.py install --cpp_implementation
+     $ python setup.py install
+     or:
+     $ python setup.py install --cpp_implementation
 
    This step may require superuser privileges.
    NOTE: To use C++ implementation, you need to install C++ protobuf runtime
@@ -99,8 +93,8 @@ To use the C++ implementation, you need to:
    parent directory.
 2) Export an environment variable:
 
-    $ export PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=cpp
-    $ export PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION_VERSION=2
+  $ export PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=cpp
+  $ export PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION_VERSION=2
 
 You need to export this variable before running setup.py script to build and
 install the extension.  You must also set the variable at runtime, otherwise
@@ -109,3 +103,4 @@ change the default so that C++ implementation is used whenever it is available.
 It is strongly recommended to run `python setup.py test` after setting the
 variable to "cpp", so the tests will be against C++ implemented Python
 messages.
+
