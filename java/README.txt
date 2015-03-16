@@ -1,8 +1,4 @@
 Protocol Buffers - Google's data interchange format
-===================================================
-
-[![Build Status](https://travis-ci.org/google/protobuf.svg?branch=master)](https://travis-ci.org/google/protobuf)
-
 Copyright 2008 Google Inc.
 
 This directory contains the Java Protocol Buffers runtime library.
@@ -54,19 +50,17 @@ http://maven.apache.org/guides/introduction/introduction-to-profiles.html)
 
 E.g. to install the lite version of the jar, you would run:
 
-    $ mvn install -P lite
+  $ mvn install -P lite
 
 The resulting artifact has the 'lite' classifier.  To reference it
 for dependency resolution, you would specify it as:
 
-```
   <dependency>
     <groupId>com.google.protobuf</groupId>
     <artifactId>protobuf-java</artifactId>
     <version>${version}</version>
     <classifier>lite</classifier>
   </dependency>
-```
 
 Installation - Without Maven
 ============================
