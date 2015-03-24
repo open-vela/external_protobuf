@@ -1,6 +1,6 @@
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
-// http://code.google.com/p/protobuf/
+// https://developers.google.com/protocol-buffers/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -32,6 +32,8 @@ package com.google.protobuf;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InvalidObjectException;
+import java.io.ObjectInputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.io.ByteArrayInputStream;
@@ -402,9 +404,27 @@ class RopeByteString extends ByteString {
   }
 
   @Override
+  void writeToInternal(OutputStream out, int sourceOffset,
+      int numberToWrite) throws IOException {
+    if (sourceOffset + numberToWrite <= leftLength) {
+      left.writeToInternal(out, sourceOffset, numberToWrite);
+    } else if (sourceOffset >= leftLength) {
+      right.writeToInternal(out, sourceOffset - leftLength, numberToWrite);
+    } else {
+      int numberToWriteInLeft = leftLength - sourceOffset;
+      left.writeToInternal(out, sourceOffset, numberToWriteInLeft);
+      right.writeToInternal(out, 0, numberToWrite - numberToWriteInLeft);
+    }
+  }
+
+  @Override
   public String toString(String charsetName)
       throws UnsupportedEncodingException {
-    return new String(toByteArray(), charsetName);
+    // Optimize for empty strings, but ensure we don't silently ignore invalid
+    // encodings.
+    return size() == 0 && UTF_8.equals(charsetName)
+        ? ""
+        : new String(toByteArray(), charsetName);
   }
 
   // =================================================================
@@ -755,6 +775,20 @@ class RopeByteString extends ByteString {
     public void remove() {
       throw new UnsupportedOperationException();
     }
+  }
+
+  // =================================================================
+  // Serializable
+
+  private static final long serialVersionUID = 1L;
+
+  Object writeReplace() {
+    return new LiteralByteString(toByteArray());
+  }
+
+  private void readObject(ObjectInputStream in) throws IOException {
+    throw new InvalidObjectException(
+        "RopeByteStream instances are not to be serialized directly");
   }
 
   // =================================================================

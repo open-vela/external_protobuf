@@ -1,6 +1,6 @@
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
-// http://code.google.com/p/protobuf/
+// https://developers.google.com/protocol-buffers/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -34,6 +34,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -57,7 +58,7 @@ import java.util.NoSuchElementException;
  * @author carlanton@google.com Carl Haverl
  * @author martinrb@google.com Martin Buchholz
  */
-public abstract class ByteString implements Iterable<Byte> {
+public abstract class ByteString implements Iterable<Byte>, Serializable {
 
   /**
    * When two strings to be concatenated have a combined length shorter than
@@ -74,6 +75,9 @@ public abstract class ByteString implements Iterable<Byte> {
    */
   static final int MIN_READ_FROM_CHUNK_SIZE = 0x100;  // 256b
   static final int MAX_READ_FROM_CHUNK_SIZE = 0x2000;  // 8k
+
+  // Defined by java.nio.charset.Charset
+  protected static final String UTF_8 = "UTF-8";
 
   /**
    * Empty {@code ByteString}.
@@ -177,6 +181,20 @@ public abstract class ByteString implements Iterable<Byte> {
            substring(0, prefix.size()).equals(prefix);
   }
 
+  /**
+   * Tests if this bytestring ends with the specified suffix.
+   * Similar to {@link String#endsWith(String)}
+   *
+   * @param suffix the suffix.
+   * @return <code>true</code> if the byte sequence represented by the
+   *         argument is a suffix of the byte sequence represented by
+   *         this string; <code>false</code> otherwise.
+   */
+  public boolean endsWith(ByteString suffix) {
+    return size() >= suffix.size() &&
+        substring(size() - suffix.size()).equals(suffix);
+  }
+
   // =================================================================
   // byte[] -> ByteString
 
@@ -252,7 +270,7 @@ public abstract class ByteString implements Iterable<Byte> {
    */
   public static ByteString copyFromUtf8(String text) {
     try {
-      return new LiteralByteString(text.getBytes("UTF-8"));
+      return new LiteralByteString(text.getBytes(UTF_8));
     } catch (UnsupportedEncodingException e) {
       throw new RuntimeException("UTF-8 not supported?", e);
     }
@@ -488,9 +506,9 @@ public abstract class ByteString implements Iterable<Byte> {
 
   /**
    * Internal (package private) implementation of
-   * @link{#copyTo(byte[],int,int,int}.
+   * {@link #copyTo(byte[],int,int,int)}.
    * It assumes that all error checking has already been performed and that 
-   * @code{numberToCopy > 0}.
+   * {@code numberToCopy > 0}.
    */
   protected abstract void copyToInternal(byte[] target, int sourceOffset,
       int targetOffset, int numberToCopy);
@@ -512,6 +530,9 @@ public abstract class ByteString implements Iterable<Byte> {
    */
   public byte[] toByteArray() {
     int size = size();
+    if (size == 0) {
+      return Internal.EMPTY_BYTE_ARRAY;
+    }
     byte[] result = new byte[size];
     copyToInternal(result, 0, 0, size);
     return result;
@@ -525,6 +546,41 @@ public abstract class ByteString implements Iterable<Byte> {
    * @throws IOException  if an I/O error occurs.
    */
   public abstract void writeTo(OutputStream out) throws IOException;
+  
+  /**
+   * Writes a specified part of this byte string to an output stream.
+   *
+   * @param  out  the output stream to which to write the data.
+   * @param  sourceOffset offset within these bytes
+   * @param  numberToWrite number of bytes to write
+   * @throws IOException  if an I/O error occurs.
+   * @throws IndexOutOfBoundsException if an offset or size is negative or too
+   *     large
+   */
+  void writeTo(OutputStream out, int sourceOffset, int numberToWrite)
+      throws IOException {
+    if (sourceOffset < 0) {
+      throw new IndexOutOfBoundsException("Source offset < 0: " + sourceOffset);
+    }
+    if (numberToWrite < 0) {
+      throw new IndexOutOfBoundsException("Length < 0: " + numberToWrite);
+    }
+    if (sourceOffset + numberToWrite > size()) {
+      throw new IndexOutOfBoundsException(
+          "Source end offset exceeded: " + (sourceOffset + numberToWrite));
+    }
+    if (numberToWrite > 0) {
+      writeToInternal(out, sourceOffset, numberToWrite);
+    }
+    
+  }
+
+  /**
+   * Internal version of {@link #writeTo(OutputStream,int,int)} that assumes
+   * all error checking has already been done.
+   */
+  abstract void writeToInternal(OutputStream out, int sourceOffset,
+      int numberToWrite) throws IOException;
 
   /**
    * Constructs a read-only {@code java.nio.ByteBuffer} whose content
@@ -569,7 +625,7 @@ public abstract class ByteString implements Iterable<Byte> {
    */
   public String toStringUtf8() {
     try {
-      return toString("UTF-8");
+      return toString(UTF_8);
     } catch (UnsupportedEncodingException e) {
       throw new RuntimeException("UTF-8 not supported?", e);
     }
@@ -647,7 +703,7 @@ public abstract class ByteString implements Iterable<Byte> {
    * The {@link InputStream} returned by this method is guaranteed to be
    * completely non-blocking.  The method {@link InputStream#available()}
    * returns the number of bytes remaining in the stream. The methods
-   * {@link InputStream#read(byte[]), {@link InputStream#read(byte[],int,int)}
+   * {@link InputStream#read(byte[])}, {@link InputStream#read(byte[],int,int)}
    * and {@link InputStream#skip(long)} will read/skip as many bytes as are
    * available.
    * <p>
