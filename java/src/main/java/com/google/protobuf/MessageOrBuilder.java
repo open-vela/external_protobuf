@@ -1,6 +1,6 @@
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
-// http://code.google.com/p/protobuf/
+// https://developers.google.com/protocol-buffers/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -30,6 +30,7 @@
 
 package com.google.protobuf;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -45,6 +46,24 @@ public interface MessageOrBuilder extends MessageLiteOrBuilder {
   Message getDefaultInstanceForType();
 
   /**
+   * Returns a list of field paths (e.g. "foo.bar.baz") of required fields
+   * which are not set in this message.  You should call
+   * {@link MessageLiteOrBuilder#isInitialized()} first to check if there
+   * are any missing fields, as that method is likely to be much faster
+   * than this one even when the message is fully-initialized.
+   */
+  List<String> findInitializationErrors();
+
+  /**
+   * Returns a comma-delimited list of required fields which are not set
+   * in this message object.  You should call
+   * {@link MessageLiteOrBuilder#isInitialized()} first to check if there
+   * are any missing fields, as that method is likely to be much faster
+   * than this one even when the message is fully-initialized.
+   */
+  String getInitializationErrorString();
+
+  /**
    * Get the message's type's descriptor.  This differs from the
    * {@code getDescriptor()} method of generated message classes in that
    * this method is an abstract method of the {@code Message} interface
@@ -57,7 +76,7 @@ public interface MessageOrBuilder extends MessageLiteOrBuilder {
    * Returns a collection of all the fields in this message which are set
    * and their corresponding values.  A singular ("required" or "optional")
    * field is set iff hasField() returns true for that field.  A "repeated"
-   * field is set iff getRepeatedFieldSize() is greater than zero.  The
+   * field is set iff getRepeatedFieldCount() is greater than zero.  The
    * values are exactly what would be returned by calling
    * {@link #getField(Descriptors.FieldDescriptor)} for each field.  The map
    * is guaranteed to be a sorted map, so iterating over it will return fields
@@ -70,6 +89,20 @@ public interface MessageOrBuilder extends MessageLiteOrBuilder {
   Map<Descriptors.FieldDescriptor, Object> getAllFields();
 
   /**
+   * Returns true if the given oneof is set.
+   * @throws IllegalArgumentException if
+   *           {@code oneof.getContainingType() != getDescriptorForType()}.
+   */
+  boolean hasOneof(Descriptors.OneofDescriptor oneof);
+
+  /**
+   * Obtains the FieldDescriptor if the given oneof is set. Returns null
+   * if no field is set.
+   */
+  Descriptors.FieldDescriptor getOneofFieldDescriptor(
+      Descriptors.OneofDescriptor oneof);
+
+  /**
    * Returns true if the given field is set.  This is exactly equivalent to
    * calling the generated "has" accessor method corresponding to the field.
    * @throws IllegalArgumentException The field is a repeated field, or
@@ -80,7 +113,7 @@ public interface MessageOrBuilder extends MessageLiteOrBuilder {
   /**
    * Obtains the value of the given field, or the default value if it is
    * not set.  For primitive fields, the boxed primitive value is returned.
-   * For enum fields, the EnumValueDescriptor for the value is returend. For
+   * For enum fields, the EnumValueDescriptor for the value is returned. For
    * embedded message fields, the sub-message is returned.  For repeated
    * fields, a java.util.List is returned.
    */
@@ -98,7 +131,7 @@ public interface MessageOrBuilder extends MessageLiteOrBuilder {
   /**
    * Gets an element of a repeated field.  For primitive fields, the boxed
    * primitive value is returned.  For enum fields, the EnumValueDescriptor
-   * for the value is returend. For embedded message fields, the sub-message
+   * for the value is returned. For embedded message fields, the sub-message
    * is returned.
    * @throws IllegalArgumentException The field is not a repeated field, or
    *           {@code field.getContainingType() != getDescriptorForType()}.
