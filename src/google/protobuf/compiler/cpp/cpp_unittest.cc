@@ -153,6 +153,7 @@ TEST(GeneratedMessageTest, Defaults) {
             &message.optional_import_message());
 }
 
+#ifndef PROTOBUF_USE_DLLS
 TEST(GeneratedMessageTest, Int32StringConversion) {
   EXPECT_EQ("971", Int32ToString(971));
   EXPECT_EQ("(~0x7fffffff)", Int32ToString(kint32min));
@@ -165,6 +166,7 @@ TEST(GeneratedMessageTest, Int64StringConversion) {
   EXPECT_EQ("GOOGLE_LONGLONG(~0x7fffffffffffffff)", Int64ToString(kint64min));
   EXPECT_EQ("GOOGLE_LONGLONG(9223372036854775807)", Int64ToString(kint64max));
 }
+#endif  // !PROTOBUF_USE_DLLS
 
 TEST(GeneratedMessageTest, FloatingPointDefaults) {
   const unittest::TestExtremeDefaultValues& extreme_default =
@@ -790,6 +792,21 @@ TEST(GeneratedMessageTest, TestConflictingSymbolNames) {
   message.AddExtension(ExtensionMessage::repeated_int32_ext, 123);
   EXPECT_EQ(123,
             message.GetExtension(ExtensionMessage::repeated_int32_ext, 0));
+}
+
+TEST(GeneratedMessageTest, TestConflictingEnumNames) {
+  protobuf_unittest::TestConflictingEnumNames message;
+  message.set_conflicting_enum(protobuf_unittest::TestConflictingEnumNames_NestedConflictingEnum_and_);
+  EXPECT_EQ(1, message.conflicting_enum());
+  message.set_conflicting_enum(protobuf_unittest::TestConflictingEnumNames_NestedConflictingEnum_XOR);
+  EXPECT_EQ(5, message.conflicting_enum());
+
+
+  protobuf_unittest::ConflictingEnum conflicting_enum;
+  conflicting_enum = protobuf_unittest::NOT_EQ;
+  EXPECT_EQ(1, conflicting_enum);
+  conflicting_enum = protobuf_unittest::return_;
+  EXPECT_EQ(3, conflicting_enum);
 }
 
 #ifndef PROTOBUF_TEST_NO_DESCRIPTORS

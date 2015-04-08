@@ -5883,8 +5883,8 @@ class AbortingErrorCollector : public DescriptorPool::ErrorCollector {
       const Message *message,
       ErrorLocation location,
       const string &error_message) {
-    GOOGLE_LOG(FATAL) << "AddError() called unexpectedly: " << filename << ": "
-               << error_message;
+    GOOGLE_LOG(FATAL) << "AddError() called unexpectedly: " << filename << " ["
+               << element_name << "]: " << error_message;
   }
  private:
   GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(AbortingErrorCollector);
@@ -6104,9 +6104,9 @@ TEST_F(CopySourceCodeInfoToTest, CopySourceCodeInfoTo) {
 
   file_desc->CopySourceCodeInfoTo(&file_desc_proto);
   const SourceCodeInfo& info = file_desc_proto.source_code_info();
-  ASSERT_EQ(3, info.location_size());
+  ASSERT_EQ(4, info.location_size());
   // Get the Foo message location
-  const SourceCodeInfo_Location& foo_location = info.location(1);
+  const SourceCodeInfo_Location& foo_location = info.location(2);
   ASSERT_EQ(2, foo_location.path_size());
   EXPECT_EQ(FileDescriptorProto::kMessageTypeFieldNumber, foo_location.path(0));
   EXPECT_EQ(0, foo_location.path(1));      // Foo is the first message defined

@@ -1,6 +1,6 @@
 // Protocol Buffers - Google's data interchange format
 // Copyright 2013 Google Inc.  All rights reserved.
-// http://code.google.com/p/protobuf/
+// https://developers.google.com/protocol-buffers/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -35,6 +35,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.Map;
 
 /**
  * Static helper methods for printing nano protos.
@@ -170,6 +171,19 @@ public final class MessageNanoPrinter {
                 indentBuf.setLength(origIndentBufLength);
                 buf.append(indentBuf).append(">\n");
             }
+        } else if (object instanceof Map) {
+          Map<?,?> map = (Map<?,?>) object;
+          identifier = deCamelCaseify(identifier);
+
+          for (Map.Entry<?,?> entry : map.entrySet()) {
+            buf.append(indentBuf).append(identifier).append(" <\n");
+            int origIndentBufLength = indentBuf.length();
+            indentBuf.append(INDENT);
+            print("key", entry.getKey(), indentBuf, buf);
+            print("value", entry.getValue(), indentBuf, buf);
+            indentBuf.setLength(origIndentBufLength);
+            buf.append(indentBuf).append(">\n");
+          }
         } else {
             // Non-null primitive value
             identifier = deCamelCaseify(identifier);
