@@ -16,6 +16,7 @@ m4/ltoptions.m4
 m4/ltsugar.m4
 m4/ltversion.m4
 m4/lt~obsolete.m4
+autom4te.cache
 
 # downloaded files
 gtest
@@ -23,9 +24,10 @@ gtest
 # in-tree configure-generated files
 Makefile
 src/Makefile
-config.h
+/config.h
 config.log
 config.status
+pbconfig.h
 
 libtool
 protobuf-lite.pc
@@ -38,6 +40,7 @@ stamp-h1
 *.lo
 *.la
 src/.libs
+*.so
 
 .dirstamp
 
@@ -60,3 +63,14 @@ src/protobuf*-test
 src/test_plugin
 src/testzip.*
 src/zcg*zip
+ar-lib
+
+test-driver
+compile
+
+src/**/*.log
+src/**/*.trs
+
+# JavaBuild output.
+java/target
+javanano/target
