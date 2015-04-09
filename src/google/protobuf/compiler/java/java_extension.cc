@@ -181,9 +181,8 @@ void ImmutableExtensionGenerator::Generate(io::Printer* printer) {
   }
 }
 
-int ImmutableExtensionGenerator::GenerateNonNestedInitializationCode(
+void ImmutableExtensionGenerator::GenerateNonNestedInitializationCode(
     io::Printer* printer) {
-  int bytecode_estimate = 0;
   if (descriptor_->extension_scope() == NULL &&
       HasDescriptorMethods(descriptor_->file())) {
     // Only applies to non-nested, non-lite extensions.
@@ -191,18 +190,15 @@ int ImmutableExtensionGenerator::GenerateNonNestedInitializationCode(
         "$name$.internalInit(descriptor.getExtensions().get($index$));\n",
         "name", UnderscoresToCamelCase(descriptor_),
         "index", SimpleItoa(descriptor_->index()));
-    bytecode_estimate += 21;
   }
-  return bytecode_estimate;
 }
 
-int ImmutableExtensionGenerator::GenerateRegistrationCode(
+void ImmutableExtensionGenerator::GenerateRegistrationCode(
     io::Printer* printer) {
   printer->Print(
     "registry.add($scope$.$name$);\n",
     "scope", scope_,
     "name", UnderscoresToCamelCase(descriptor_));
-  return 7;
 }
 
 }  // namespace java
