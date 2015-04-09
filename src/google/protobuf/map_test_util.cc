@@ -29,60 +29,275 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <google/protobuf/map_test_util.h>
-#include <google/protobuf/map_test_util_impl.h>
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/message.h>
+
+#include <google/protobuf/stubs/common.h>
+#include <google/protobuf/testing/googletest.h>
+#include <gtest/gtest.h>
 
 namespace google {
 namespace protobuf {
 
 void MapTestUtil::SetMapFields(unittest::TestMap* message) {
-  MapTestUtilImpl::SetMapFields<unittest::MapEnum, unittest::MAP_ENUM_BAR,
-                                unittest::MAP_ENUM_BAZ>(message);
-}
+  // Add first element.
+  (*message->mutable_map_int32_int32())[0] = 0;
+  (*message->mutable_map_int64_int64())[0] = 0;
+  (*message->mutable_map_uint32_uint32())[0] = 0;
+  (*message->mutable_map_uint64_uint64())[0] = 0;
+  (*message->mutable_map_sint32_sint32())[0] = 0;
+  (*message->mutable_map_sint64_sint64())[0] = 0;
+  (*message->mutable_map_fixed32_fixed32())[0] = 0;
+  (*message->mutable_map_fixed64_fixed64())[0] = 0;
+  (*message->mutable_map_sfixed32_sfixed32())[0] = 0;
+  (*message->mutable_map_sfixed64_sfixed64())[0] = 0;
+  (*message->mutable_map_int32_float())[0] = 0.0;
+  (*message->mutable_map_int32_double())[0] = 0.0;
+  (*message->mutable_map_bool_bool())[0] = false;
+  (*message->mutable_map_string_string())["0"] = "0";
+  (*message->mutable_map_int32_bytes())[0] = "0";
+  (*message->mutable_map_int32_enum())[0] =
+      unittest::MAP_ENUM_BAR;
+  (*message->mutable_map_int32_foreign_message())[0].set_c(0);
 
-void MapTestUtil::SetArenaMapFields(unittest::TestArenaMap* message) {
-  MapTestUtilImpl::SetArenaMapFields<unittest::MapEnum, unittest::MAP_ENUM_BAR,
-                                     unittest::MAP_ENUM_BAZ>(message);
+  // Add second element
+  (*message->mutable_map_int32_int32())[1] = 1;
+  (*message->mutable_map_int64_int64())[1] = 1;
+  (*message->mutable_map_uint32_uint32())[1] = 1;
+  (*message->mutable_map_uint64_uint64())[1] = 1;
+  (*message->mutable_map_sint32_sint32())[1] = 1;
+  (*message->mutable_map_sint64_sint64())[1] = 1;
+  (*message->mutable_map_fixed32_fixed32())[1] = 1;
+  (*message->mutable_map_fixed64_fixed64())[1] = 1;
+  (*message->mutable_map_sfixed32_sfixed32())[1] = 1;
+  (*message->mutable_map_sfixed64_sfixed64())[1] = 1;
+  (*message->mutable_map_int32_float())[1] = 1.0;
+  (*message->mutable_map_int32_double())[1] = 1.0;
+  (*message->mutable_map_bool_bool())[1] = true;
+  (*message->mutable_map_string_string())["1"] = "1";
+  (*message->mutable_map_int32_bytes())[1] = "1";
+  (*message->mutable_map_int32_enum())[1] =
+      unittest::MAP_ENUM_BAZ;
+  (*message->mutable_map_int32_foreign_message())[1].set_c(1);
 }
 
 void MapTestUtil::SetMapFieldsInitialized(unittest::TestMap* message) {
-  MapTestUtilImpl::SetMapFieldsInitialized(message);
+  // Add first element using bracket operator, which should assign default
+  // value automatically.
+  (*message->mutable_map_int32_int32())[0];
+  (*message->mutable_map_int64_int64())[0];
+  (*message->mutable_map_uint32_uint32())[0];
+  (*message->mutable_map_uint64_uint64())[0];
+  (*message->mutable_map_sint32_sint32())[0];
+  (*message->mutable_map_sint64_sint64())[0];
+  (*message->mutable_map_fixed32_fixed32())[0];
+  (*message->mutable_map_fixed64_fixed64())[0];
+  (*message->mutable_map_sfixed32_sfixed32())[0];
+  (*message->mutable_map_sfixed64_sfixed64())[0];
+  (*message->mutable_map_int32_float())[0];
+  (*message->mutable_map_int32_double())[0];
+  (*message->mutable_map_bool_bool())[0];
+  (*message->mutable_map_string_string())["0"];
+  (*message->mutable_map_int32_bytes())[0];
+  (*message->mutable_map_int32_enum())[0];
+  (*message->mutable_map_int32_foreign_message())[0];
 }
 
 void MapTestUtil::ModifyMapFields(unittest::TestMap* message) {
-  MapTestUtilImpl::ModifyMapFields<unittest::MapEnum, unittest::MAP_ENUM_FOO>(
-      message);
+  (*message->mutable_map_int32_int32())[1] = 2;
+  (*message->mutable_map_int64_int64())[1] = 2;
+  (*message->mutable_map_uint32_uint32())[1] = 2;
+  (*message->mutable_map_uint64_uint64())[1] = 2;
+  (*message->mutable_map_sint32_sint32())[1] = 2;
+  (*message->mutable_map_sint64_sint64())[1] = 2;
+  (*message->mutable_map_fixed32_fixed32())[1] = 2;
+  (*message->mutable_map_fixed64_fixed64())[1] = 2;
+  (*message->mutable_map_sfixed32_sfixed32())[1] = 2;
+  (*message->mutable_map_sfixed64_sfixed64())[1] = 2;
+  (*message->mutable_map_int32_float())[1] = 2.0;
+  (*message->mutable_map_int32_double())[1] = 2.0;
+  (*message->mutable_map_bool_bool())[1] = false;
+  (*message->mutable_map_string_string())["1"] = "2";
+  (*message->mutable_map_int32_bytes())[1] = "2";
+  (*message->mutable_map_int32_enum())[1] =
+      unittest::MAP_ENUM_FOO;
+  (*message->mutable_map_int32_foreign_message())[1].set_c(2);
 }
 
 void MapTestUtil::ExpectClear(const unittest::TestMap& message) {
-  MapTestUtilImpl::ExpectClear(message);
+  EXPECT_EQ(0, message.map_int32_int32().size());
+  EXPECT_EQ(0, message.map_int64_int64().size());
+  EXPECT_EQ(0, message.map_uint32_uint32().size());
+  EXPECT_EQ(0, message.map_uint64_uint64().size());
+  EXPECT_EQ(0, message.map_sint32_sint32().size());
+  EXPECT_EQ(0, message.map_sint64_sint64().size());
+  EXPECT_EQ(0, message.map_fixed32_fixed32().size());
+  EXPECT_EQ(0, message.map_fixed64_fixed64().size());
+  EXPECT_EQ(0, message.map_sfixed32_sfixed32().size());
+  EXPECT_EQ(0, message.map_sfixed64_sfixed64().size());
+  EXPECT_EQ(0, message.map_int32_float().size());
+  EXPECT_EQ(0, message.map_int32_double().size());
+  EXPECT_EQ(0, message.map_bool_bool().size());
+  EXPECT_EQ(0, message.map_string_string().size());
+  EXPECT_EQ(0, message.map_int32_bytes().size());
+  EXPECT_EQ(0, message.map_int32_enum().size());
+  EXPECT_EQ(0, message.map_int32_foreign_message().size());
 }
 
 void MapTestUtil::ExpectMapFieldsSet(const unittest::TestMap& message) {
-  MapTestUtilImpl::ExpectMapFieldsSet<unittest::MapEnum, unittest::MAP_ENUM_BAR,
-                                      unittest::MAP_ENUM_BAZ>(message);
-}
+  EXPECT_EQ(2, message.map_int32_int32().size());
+  EXPECT_EQ(2, message.map_int64_int64().size());
+  EXPECT_EQ(2, message.map_uint32_uint32().size());
+  EXPECT_EQ(2, message.map_uint64_uint64().size());
+  EXPECT_EQ(2, message.map_sint32_sint32().size());
+  EXPECT_EQ(2, message.map_sint64_sint64().size());
+  EXPECT_EQ(2, message.map_fixed32_fixed32().size());
+  EXPECT_EQ(2, message.map_fixed64_fixed64().size());
+  EXPECT_EQ(2, message.map_sfixed32_sfixed32().size());
+  EXPECT_EQ(2, message.map_sfixed64_sfixed64().size());
+  EXPECT_EQ(2, message.map_int32_float().size());
+  EXPECT_EQ(2, message.map_int32_double().size());
+  EXPECT_EQ(2, message.map_bool_bool().size());
+  EXPECT_EQ(2, message.map_string_string().size());
+  EXPECT_EQ(2, message.map_int32_bytes().size());
+  EXPECT_EQ(2, message.map_int32_enum().size());
+  EXPECT_EQ(2, message.map_int32_foreign_message().size());
 
-void MapTestUtil::ExpectArenaMapFieldsSet(
-    const unittest::TestArenaMap& message) {
-  MapTestUtilImpl::ExpectArenaMapFieldsSet<
-      unittest::MapEnum, unittest::MAP_ENUM_BAR, unittest::MAP_ENUM_BAZ>(
-      message);
+  EXPECT_EQ(0, message.map_int32_int32().at(0));
+  EXPECT_EQ(0, message.map_int64_int64().at(0));
+  EXPECT_EQ(0, message.map_uint32_uint32().at(0));
+  EXPECT_EQ(0, message.map_uint64_uint64().at(0));
+  EXPECT_EQ(0, message.map_sint32_sint32().at(0));
+  EXPECT_EQ(0, message.map_sint64_sint64().at(0));
+  EXPECT_EQ(0, message.map_fixed32_fixed32().at(0));
+  EXPECT_EQ(0, message.map_fixed64_fixed64().at(0));
+  EXPECT_EQ(0, message.map_sfixed32_sfixed32().at(0));
+  EXPECT_EQ(0, message.map_sfixed64_sfixed64().at(0));
+  EXPECT_EQ(0, message.map_int32_float().at(0));
+  EXPECT_EQ(0, message.map_int32_double().at(0));
+  EXPECT_EQ(false, message.map_bool_bool().at(0));
+  EXPECT_EQ("0", message.map_string_string().at("0"));
+  EXPECT_EQ("0", message.map_int32_bytes().at(0));
+  EXPECT_EQ(unittest::MAP_ENUM_BAR, message.map_int32_enum().at(0));
+  EXPECT_EQ(0, message.map_int32_foreign_message().at(0).c());
+
+  EXPECT_EQ(1, message.map_int32_int32().at(1));
+  EXPECT_EQ(1, message.map_int64_int64().at(1));
+  EXPECT_EQ(1, message.map_uint32_uint32().at(1));
+  EXPECT_EQ(1, message.map_uint64_uint64().at(1));
+  EXPECT_EQ(1, message.map_sint32_sint32().at(1));
+  EXPECT_EQ(1, message.map_sint64_sint64().at(1));
+  EXPECT_EQ(1, message.map_fixed32_fixed32().at(1));
+  EXPECT_EQ(1, message.map_fixed64_fixed64().at(1));
+  EXPECT_EQ(1, message.map_sfixed32_sfixed32().at(1));
+  EXPECT_EQ(1, message.map_sfixed64_sfixed64().at(1));
+  EXPECT_EQ(1, message.map_int32_float().at(1));
+  EXPECT_EQ(1, message.map_int32_double().at(1));
+  EXPECT_EQ(true, message.map_bool_bool().at(1));
+  EXPECT_EQ("1", message.map_string_string().at("1"));
+  EXPECT_EQ("1", message.map_int32_bytes().at(1));
+  EXPECT_EQ(unittest::MAP_ENUM_BAZ, message.map_int32_enum().at(1));
+  EXPECT_EQ(1, message.map_int32_foreign_message().at(1).c());
 }
 
 void MapTestUtil::ExpectMapFieldsSetInitialized(
     const unittest::TestMap& message) {
-  MapTestUtilImpl::ExpectMapFieldsSetInitialized<unittest::MapEnum,
-                                                 unittest::MAP_ENUM_FOO>(
-      message);
+  EXPECT_EQ(1, message.map_int32_int32().size());
+  EXPECT_EQ(1, message.map_int64_int64().size());
+  EXPECT_EQ(1, message.map_uint32_uint32().size());
+  EXPECT_EQ(1, message.map_uint64_uint64().size());
+  EXPECT_EQ(1, message.map_sint32_sint32().size());
+  EXPECT_EQ(1, message.map_sint64_sint64().size());
+  EXPECT_EQ(1, message.map_fixed32_fixed32().size());
+  EXPECT_EQ(1, message.map_fixed64_fixed64().size());
+  EXPECT_EQ(1, message.map_sfixed32_sfixed32().size());
+  EXPECT_EQ(1, message.map_sfixed64_sfixed64().size());
+  EXPECT_EQ(1, message.map_int32_float().size());
+  EXPECT_EQ(1, message.map_int32_double().size());
+  EXPECT_EQ(1, message.map_bool_bool().size());
+  EXPECT_EQ(1, message.map_string_string().size());
+  EXPECT_EQ(1, message.map_int32_bytes().size());
+  EXPECT_EQ(1, message.map_int32_enum().size());
+  EXPECT_EQ(1, message.map_int32_foreign_message().size());
+
+  EXPECT_EQ(0, message.map_int32_int32().at(0));
+  EXPECT_EQ(0, message.map_int64_int64().at(0));
+  EXPECT_EQ(0, message.map_uint32_uint32().at(0));
+  EXPECT_EQ(0, message.map_uint64_uint64().at(0));
+  EXPECT_EQ(0, message.map_sint32_sint32().at(0));
+  EXPECT_EQ(0, message.map_sint64_sint64().at(0));
+  EXPECT_EQ(0, message.map_fixed32_fixed32().at(0));
+  EXPECT_EQ(0, message.map_fixed64_fixed64().at(0));
+  EXPECT_EQ(0, message.map_sfixed32_sfixed32().at(0));
+  EXPECT_EQ(0, message.map_sfixed64_sfixed64().at(0));
+  EXPECT_EQ(0, message.map_int32_float().at(0));
+  EXPECT_EQ(0, message.map_int32_double().at(0));
+  EXPECT_EQ(false, message.map_bool_bool().at(0));
+  EXPECT_EQ("", message.map_string_string().at("0"));
+  EXPECT_EQ("", message.map_int32_bytes().at(0));
+  EXPECT_EQ(unittest::MAP_ENUM_FOO, message.map_int32_enum().at(0));
+  EXPECT_EQ(0, message.map_int32_foreign_message().at(0).ByteSize());
 }
 
 void MapTestUtil::ExpectMapFieldsModified(
     const unittest::TestMap& message) {
-  MapTestUtilImpl::ExpectMapFieldsModified<
-      unittest::MapEnum, unittest::MAP_ENUM_BAR, unittest::MAP_ENUM_FOO>(
-      message);
+  // ModifyMapFields only sets the second element of each field.  In addition to
+  // verifying this, we also verify that the first element and size were *not*
+  // modified.
+  EXPECT_EQ(2, message.map_int32_int32().size());
+  EXPECT_EQ(2, message.map_int64_int64().size());
+  EXPECT_EQ(2, message.map_uint32_uint32().size());
+  EXPECT_EQ(2, message.map_uint64_uint64().size());
+  EXPECT_EQ(2, message.map_sint32_sint32().size());
+  EXPECT_EQ(2, message.map_sint64_sint64().size());
+  EXPECT_EQ(2, message.map_fixed32_fixed32().size());
+  EXPECT_EQ(2, message.map_fixed64_fixed64().size());
+  EXPECT_EQ(2, message.map_sfixed32_sfixed32().size());
+  EXPECT_EQ(2, message.map_sfixed64_sfixed64().size());
+  EXPECT_EQ(2, message.map_int32_float().size());
+  EXPECT_EQ(2, message.map_int32_double().size());
+  EXPECT_EQ(2, message.map_bool_bool().size());
+  EXPECT_EQ(2, message.map_string_string().size());
+  EXPECT_EQ(2, message.map_int32_bytes().size());
+  EXPECT_EQ(2, message.map_int32_enum().size());
+  EXPECT_EQ(2, message.map_int32_foreign_message().size());
+
+  EXPECT_EQ(0, message.map_int32_int32().at(0));
+  EXPECT_EQ(0, message.map_int64_int64().at(0));
+  EXPECT_EQ(0, message.map_uint32_uint32().at(0));
+  EXPECT_EQ(0, message.map_uint64_uint64().at(0));
+  EXPECT_EQ(0, message.map_sint32_sint32().at(0));
+  EXPECT_EQ(0, message.map_sint64_sint64().at(0));
+  EXPECT_EQ(0, message.map_fixed32_fixed32().at(0));
+  EXPECT_EQ(0, message.map_fixed64_fixed64().at(0));
+  EXPECT_EQ(0, message.map_sfixed32_sfixed32().at(0));
+  EXPECT_EQ(0, message.map_sfixed64_sfixed64().at(0));
+  EXPECT_EQ(0, message.map_int32_float().at(0));
+  EXPECT_EQ(0, message.map_int32_double().at(0));
+  EXPECT_EQ(false, message.map_bool_bool().at(0));
+  EXPECT_EQ("0", message.map_string_string().at("0"));
+  EXPECT_EQ("0", message.map_int32_bytes().at(0));
+  EXPECT_EQ(unittest::MAP_ENUM_BAR, message.map_int32_enum().at(0));
+  EXPECT_EQ(0, message.map_int32_foreign_message().at(0).c());
+
+  // Actually verify the second (modified) elements now.
+  EXPECT_EQ(2, message.map_int32_int32().at(1));
+  EXPECT_EQ(2, message.map_int64_int64().at(1));
+  EXPECT_EQ(2, message.map_uint32_uint32().at(1));
+  EXPECT_EQ(2, message.map_uint64_uint64().at(1));
+  EXPECT_EQ(2, message.map_sint32_sint32().at(1));
+  EXPECT_EQ(2, message.map_sint64_sint64().at(1));
+  EXPECT_EQ(2, message.map_fixed32_fixed32().at(1));
+  EXPECT_EQ(2, message.map_fixed64_fixed64().at(1));
+  EXPECT_EQ(2, message.map_sfixed32_sfixed32().at(1));
+  EXPECT_EQ(2, message.map_sfixed64_sfixed64().at(1));
+  EXPECT_EQ(2, message.map_int32_float().at(1));
+  EXPECT_EQ(2, message.map_int32_double().at(1));
+  EXPECT_EQ(false, message.map_bool_bool().at(1));
+  EXPECT_EQ("2", message.map_string_string().at("1"));
+  EXPECT_EQ("2", message.map_int32_bytes().at(1));
+  EXPECT_EQ(unittest::MAP_ENUM_FOO, message.map_int32_enum().at(1));
+  EXPECT_EQ(2, message.map_int32_foreign_message().at(1).c());
 }
 
 void MapTestUtil::ExpectMapsSize(
@@ -805,7 +1020,7 @@ void MapTestUtil::MapReflectionTester::ExpectMapFieldsSetViaReflection(
           *sub_message, map_int32_int32_key_);
       int32 val = sub_message->GetReflection()->GetInt32(
           *sub_message, map_int32_int32_val_);
-      EXPECT_EQ(map[key], val);
+      EXPECT_EQ(map.at(key), val);
     }
   }
   {
@@ -819,7 +1034,7 @@ void MapTestUtil::MapReflectionTester::ExpectMapFieldsSetViaReflection(
           *sub_message, map_int64_int64_key_);
       int64 val = sub_message->GetReflection()->GetInt64(
           *sub_message, map_int64_int64_val_);
-      EXPECT_EQ(map[key], val);
+      EXPECT_EQ(map.at(key), val);
     }
   }
   {
@@ -833,7 +1048,7 @@ void MapTestUtil::MapReflectionTester::ExpectMapFieldsSetViaReflection(
           *sub_message, map_uint32_uint32_key_);
       uint32 val = sub_message->GetReflection()->GetUInt32(
           *sub_message, map_uint32_uint32_val_);
-      EXPECT_EQ(map[key], val);
+      EXPECT_EQ(map.at(key), val);
     }
   }
   {
@@ -847,7 +1062,7 @@ void MapTestUtil::MapReflectionTester::ExpectMapFieldsSetViaReflection(
           *sub_message, map_uint64_uint64_key_);
       uint64 val = sub_message->GetReflection()->GetUInt64(
           *sub_message, map_uint64_uint64_val_);
-      EXPECT_EQ(map[key], val);
+      EXPECT_EQ(map.at(key), val);
     }
   }
   {
@@ -861,7 +1076,7 @@ void MapTestUtil::MapReflectionTester::ExpectMapFieldsSetViaReflection(
           *sub_message, map_sint32_sint32_key_);
       int32 val = sub_message->GetReflection()->GetInt32(
           *sub_message, map_sint32_sint32_val_);
-      EXPECT_EQ(map[key], val);
+      EXPECT_EQ(map.at(key), val);
     }
   }
   {
@@ -875,7 +1090,7 @@ void MapTestUtil::MapReflectionTester::ExpectMapFieldsSetViaReflection(
           *sub_message, map_sint64_sint64_key_);
       int64 val = sub_message->GetReflection()->GetInt64(
           *sub_message, map_sint64_sint64_val_);
-      EXPECT_EQ(map[key], val);
+      EXPECT_EQ(map.at(key), val);
     }
   }
   {
@@ -889,7 +1104,7 @@ void MapTestUtil::MapReflectionTester::ExpectMapFieldsSetViaReflection(
           *sub_message, map_fixed32_fixed32_key_);
       uint32 val = sub_message->GetReflection()->GetUInt32(
           *sub_message, map_fixed32_fixed32_val_);
-      EXPECT_EQ(map[key], val);
+      EXPECT_EQ(map.at(key), val);
     }
   }
   {
@@ -903,7 +1118,7 @@ void MapTestUtil::MapReflectionTester::ExpectMapFieldsSetViaReflection(
           *sub_message, map_fixed64_fixed64_key_);
       uint64 val = sub_message->GetReflection()->GetUInt64(
           *sub_message, map_fixed64_fixed64_val_);
-      EXPECT_EQ(map[key], val);
+      EXPECT_EQ(map.at(key), val);
     }
   }
   {
@@ -917,7 +1132,7 @@ void MapTestUtil::MapReflectionTester::ExpectMapFieldsSetViaReflection(
           *sub_message, map_sfixed32_sfixed32_key_);
       int32 val = sub_message->GetReflection()->GetInt32(
           *sub_message, map_sfixed32_sfixed32_val_);
-      EXPECT_EQ(map[key], val);
+      EXPECT_EQ(map.at(key), val);
     }
   }
   {
@@ -931,7 +1146,7 @@ void MapTestUtil::MapReflectionTester::ExpectMapFieldsSetViaReflection(
           *sub_message, map_sfixed64_sfixed64_key_);
       int64 val = sub_message->GetReflection()->GetInt64(
           *sub_message, map_sfixed64_sfixed64_val_);
-      EXPECT_EQ(map[key], val);
+      EXPECT_EQ(map.at(key), val);
     }
   }
   {
@@ -945,7 +1160,7 @@ void MapTestUtil::MapReflectionTester::ExpectMapFieldsSetViaReflection(
           *sub_message, map_int32_float_key_);
       float val = sub_message->GetReflection()->GetFloat(
           *sub_message, map_int32_float_val_);
-      EXPECT_EQ(map[key], val);
+      EXPECT_EQ(map.at(key), val);
     }
   }
   {
@@ -959,7 +1174,7 @@ void MapTestUtil::MapReflectionTester::ExpectMapFieldsSetViaReflection(
           *sub_message, map_int32_double_key_);
       double val = sub_message->GetReflection()->GetDouble(
           *sub_message, map_int32_double_val_);
-      EXPECT_EQ(map[key], val);
+      EXPECT_EQ(map.at(key), val);
     }
   }
   {
@@ -973,7 +1188,7 @@ void MapTestUtil::MapReflectionTester::ExpectMapFieldsSetViaReflection(
           *sub_message, map_bool_bool_key_);
       bool val = sub_message->GetReflection()->GetBool(
           *sub_message, map_bool_bool_val_);
-      EXPECT_EQ(map[key], val);
+      EXPECT_EQ(map.at(key), val);
     }
   }
   {
@@ -987,7 +1202,7 @@ void MapTestUtil::MapReflectionTester::ExpectMapFieldsSetViaReflection(
           *sub_message, map_string_string_key_);
       string val = sub_message->GetReflection()->GetString(
           *sub_message, map_string_string_val_);
-      EXPECT_EQ(map[key], val);
+      EXPECT_EQ(map.at(key), val);
     }
   }
   {
@@ -1001,7 +1216,7 @@ void MapTestUtil::MapReflectionTester::ExpectMapFieldsSetViaReflection(
           *sub_message, map_int32_bytes_key_);
       string val = sub_message->GetReflection()->GetString(
           *sub_message, map_int32_bytes_val_);
-      EXPECT_EQ(map[key], val);
+      EXPECT_EQ(map.at(key), val);
     }
   }
   {
@@ -1015,7 +1230,7 @@ void MapTestUtil::MapReflectionTester::ExpectMapFieldsSetViaReflection(
           *sub_message, map_int32_enum_key_);
       const EnumValueDescriptor* val = sub_message->GetReflection()->GetEnum(
           *sub_message, map_int32_enum_val_);
-      EXPECT_EQ(map[key], val);
+      EXPECT_EQ(map.at(key), val);
     }
   }
   {
@@ -1031,7 +1246,7 @@ void MapTestUtil::MapReflectionTester::ExpectMapFieldsSetViaReflection(
           *sub_message, map_int32_foreign_message_val_);
       int32 val = foreign_message.GetReflection()->GetInt32(
           foreign_message, foreign_c_);
-      EXPECT_EQ(map[key], val);
+      EXPECT_EQ(map.at(key), val);
     }
   }
 }
@@ -1253,9 +1468,8 @@ void MapTestUtil::MapReflectionTester::ExpectMapEntryClearViaReflection(
     sub_message = reflection->AddMessage(message, F("map_int32_enum"));
     EXPECT_EQ(0, sub_message->GetReflection()->GetInt32(*sub_message,
                                                         key_descriptor));
-    EXPECT_EQ(0, sub_message->GetReflection()
-                     ->GetEnum(*sub_message, value_descriptor)
-                     ->number());
+    EXPECT_EQ(0, sub_message->GetReflection()->GetEnum(*sub_message,
+                                                        value_descriptor));
   }
   // Map using message as value has been tested in other place. Thus, we don't
   // test it here.

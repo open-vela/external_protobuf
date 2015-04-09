@@ -38,7 +38,6 @@
 #include <google/protobuf/dynamic_message.h>
 #include <google/protobuf/message.h>
 #include <google/protobuf/pyext/descriptor.h>
-#include <google/protobuf/pyext/descriptor_pool.h>
 #include <google/protobuf/pyext/message.h>
 #include <google/protobuf/pyext/repeated_composite_container.h>
 #include <google/protobuf/pyext/repeated_scalar_container.h>
@@ -49,11 +48,13 @@ namespace google {
 namespace protobuf {
 namespace python {
 
+extern google::protobuf::DynamicMessageFactory* global_message_factory;
+
 namespace extension_dict {
 
 // TODO(tibell): Always use self->message for clarity, just like in
 // RepeatedCompositeContainer.
-static Message* GetMessage(ExtensionDict* self) {
+static google::protobuf::Message* GetMessage(ExtensionDict* self) {
   if (self->parent != NULL) {
     return self->parent->message;
   } else {
@@ -72,9 +73,10 @@ PyObject* len(ExtensionDict* self) {
 // TODO(tibell): Use VisitCompositeField.
 int ReleaseExtension(ExtensionDict* self,
                      PyObject* extension,
-                     const FieldDescriptor* descriptor) {
-  if (descriptor->label() == FieldDescriptor::LABEL_REPEATED) {
-    if (descriptor->cpp_type() == FieldDescriptor::CPPTYPE_MESSAGE) {
+                     const google::protobuf::FieldDescriptor* descriptor) {
+  if (descriptor->label() == google::protobuf::FieldDescriptor::LABEL_REPEATED) {
+    if (descriptor->cpp_type() ==
+        google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE) {
       if (repeated_composite_container::Release(
               reinterpret_cast<RepeatedCompositeContainer*>(
                   extension)) < 0) {
@@ -87,7 +89,8 @@ int ReleaseExtension(ExtensionDict* self,
         return -1;
       }
     }
-  } else if (descriptor->cpp_type() == FieldDescriptor::CPPTYPE_MESSAGE) {
+  } else if (descriptor->cpp_type() ==
+             google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE) {
     if (cmessage::ReleaseSubMessage(
             GetMessage(self), descriptor,
             reinterpret_cast<CMessage*>(extension)) < 0) {
@@ -99,7 +102,8 @@ int ReleaseExtension(ExtensionDict* self,
 }
 
 PyObject* subscript(ExtensionDict* self, PyObject* key) {
-  const FieldDescriptor* descriptor = cmessage::GetExtensionDescriptor(key);
+  const google::protobuf::FieldDescriptor* descriptor =
+      cmessage::GetExtensionDescriptor(key);
   if (descriptor == NULL) {
     return NULL;
   }
@@ -158,7 +162,8 @@ PyObject* subscript(ExtensionDict* self, PyObject* key) {
 }
 
 int ass_subscript(ExtensionDict* self, PyObject* key, PyObject* value) {
-  const FieldDescriptor* descriptor = cmessage::GetExtensionDescriptor(key);
+  const google::protobuf::FieldDescriptor* descriptor =
+      cmessage::GetExtensionDescriptor(key);
   if (descriptor == NULL) {
     return -1;
   }
@@ -182,7 +187,7 @@ int ass_subscript(ExtensionDict* self, PyObject* key, PyObject* value) {
 }
 
 PyObject* ClearExtension(ExtensionDict* self, PyObject* extension) {
-  const FieldDescriptor* descriptor =
+  const google::protobuf::FieldDescriptor* descriptor =
       cmessage::GetExtensionDescriptor(extension);
   if (descriptor == NULL) {
     return NULL;
@@ -203,7 +208,7 @@ PyObject* ClearExtension(ExtensionDict* self, PyObject* extension) {
 }
 
 PyObject* HasExtension(ExtensionDict* self, PyObject* extension) {
-  const FieldDescriptor* descriptor =
+  const google::protobuf::FieldDescriptor* descriptor =
       cmessage::GetExtensionDescriptor(extension);
   if (descriptor == NULL) {
     return NULL;

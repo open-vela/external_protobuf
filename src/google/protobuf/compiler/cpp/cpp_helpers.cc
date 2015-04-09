@@ -176,14 +176,6 @@ string FieldName(const FieldDescriptor* field) {
   return result;
 }
 
-string EnumValueName(const EnumValueDescriptor* enum_value) {
-  string result = enum_value->name();
-  if (kKeywords.count(result) > 0) {
-    result.append("_");
-  }
-  return result;
-}
-
 string FieldConstantName(const FieldDescriptor *field) {
   string field_name = UnderscoresToCamelCase(field->name(), true);
   string result = "k" + field_name + "FieldNumber";
@@ -360,7 +352,9 @@ string FilenameIdentifier(const string& filename) {
     } else {
       // Not alphanumeric.  To avoid any possibility of name conflicts we
       // use the hex code for the character.
-      StrAppend(&result, "_", ToHex(static_cast<uint8>(filename[i])));
+      result.push_back('_');
+      char buffer[kFastToBufferSize];
+      result.append(FastHexToBuffer(static_cast<uint8>(filename[i]), buffer));
     }
   }
   return result;
@@ -512,13 +506,6 @@ bool IsStringOrMessage(const FieldDescriptor* field) {
 
   GOOGLE_LOG(FATAL) << "Can't get here.";
   return false;
-}
-
-FieldOptions::CType EffectiveStringCType(const FieldDescriptor* field) {
-  GOOGLE_DCHECK(field->cpp_type() == FieldDescriptor::CPPTYPE_STRING);
-  // Open-source protobuf release only supports STRING ctype.
-  return FieldOptions::STRING;
-
 }
 
 }  // namespace cpp

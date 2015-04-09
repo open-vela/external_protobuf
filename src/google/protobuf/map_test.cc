@@ -39,7 +39,7 @@
 #include <google/protobuf/stubs/common.h>
 #include <google/protobuf/stubs/stringprintf.h>
 #include <google/protobuf/testing/file.h>
-#include <google/protobuf/arena_test_util.h>
+#include <google/protobuf/map_lite_unittest.pb.h>
 #include <google/protobuf/map_proto2_unittest.pb.h>
 #include <google/protobuf/map_unittest.pb.h>
 #include <google/protobuf/map_test_util.h>
@@ -190,8 +190,6 @@ TEST_F(MapImplTest, MutableAt) {
   ExpectSingleElement(key, value2);
 }
 
-#ifdef PROTOBUF_HAS_DEATH_TEST
-
 TEST_F(MapImplTest, MutableAtNonExistDeathTest) {
   EXPECT_DEATH(map_.at(0), "");
 }
@@ -199,8 +197,6 @@ TEST_F(MapImplTest, MutableAtNonExistDeathTest) {
 TEST_F(MapImplTest, ImmutableAtNonExistDeathTest) {
   EXPECT_DEATH(const_map_.at(0), "");
 }
-
-#endif  // PROTOBUF_HAS_DEATH_TEST
 
 TEST_F(MapImplTest, CountNonExist) {
   EXPECT_EQ(0, map_.count(0));
@@ -546,21 +542,6 @@ TEST_F(MapImplTest, EqualRange) {
   const_range = const_map_.equal_range(key_missing);
   EXPECT_TRUE(const_map_.end() == const_range.first);
   EXPECT_TRUE(const_map_.end() == const_range.second);
-}
-
-TEST_F(MapImplTest, ConvertToStdMap) {
-  map_[100] = 101;
-  std::map<int32, int32> std_map(map_.begin(), map_.end());
-  EXPECT_EQ(1, std_map.size());
-  EXPECT_EQ(101, std_map[100]);
-}
-
-TEST_F(MapImplTest, ConvertToStdVectorOfPairs) {
-  map_[100] = 101;
-  std::vector<std::pair<int32, int32> > std_vec(map_.begin(), map_.end());
-  EXPECT_EQ(1, std_vec.size());
-  EXPECT_EQ(100, std_vec[0].first);
-  EXPECT_EQ(101, std_vec[0].second);
 }
 
 // Map Field Reflection Test ========================================
@@ -1727,20 +1708,6 @@ TEST(GeneratedMapFieldTest, MissedValueWireFormat) {
   EXPECT_EQ(0, message.map_int32_int32().at(1));
 }
 
-TEST(GeneratedMapFieldTest, MissedValueTextFormat) {
-  unittest::TestMap message;
-
-  // No value field in text format
-  string text =
-      "map_int32_foreign_message {\n"
-      "  key: 1234567890\n"
-      "}";
-
-  EXPECT_TRUE(google::protobuf::TextFormat::ParseFromString(text, &message));
-  EXPECT_EQ(1, message.map_int32_foreign_message().size());
-  EXPECT_EQ(11, message.ByteSize());
-}
-
 TEST(GeneratedMapFieldTest, UnknownFieldWireFormat) {
   unittest::TestMap message;
 
@@ -1761,18 +1728,16 @@ TEST(GeneratedMapFieldTest, CorruptedWireFormat) {
   EXPECT_FALSE(message.ParseFromString(data));
 }
 
-TEST(GeneratedMapFieldTest, IsInitialized) {
-  unittest::TestRequiredMessageMap map_message;
+TEST(GeneratedMapFieldTest, MessageLiteMap) {
+  unittest::MapLite from, to;
+  (*from.mutable_map_field())[1] = 1;
 
-  // Add an uninitialized message.
-  (*map_message.mutable_map_field())[0];
-  EXPECT_FALSE(map_message.IsInitialized());
+  string data;
+  from.SerializeToString(&data);
+  to.ParseFromString(data);
 
-  // Initialize uninitialized message
-  (*map_message.mutable_map_field())[0].set_a(0);
-  (*map_message.mutable_map_field())[0].set_b(0);
-  (*map_message.mutable_map_field())[0].set_c(0);
-  EXPECT_TRUE(map_message.IsInitialized());
+  EXPECT_EQ(1, to.map_field().size());
+  EXPECT_EQ(1, to.map_field().at(1));
 }
 
 // Generated Message Reflection Test ================================
@@ -2258,52 +2223,6 @@ TEST(TextFormatMapTest, SerializeAndParse) {
   MapTestUtil::ExpectMapFieldsSet(dest);
 }
 
-
-// arena support =================================================
-TEST(ArenaTest, ParsingAndSerializingNoHeapAllocation) {
-  // Allocate a large initial block to avoid mallocs during hooked test.
-  std::vector<char> arena_block(128 * 1024);
-  ArenaOptions options;
-  options.initial_block = arena_block.data();
-  options.initial_block_size = arena_block.size();
-  Arena arena(options);
-  string data;
-  data.reserve(128 * 1024);
-
-  {
-    NoHeapChecker no_heap;
-
-    unittest::TestArenaMap* from =
-        Arena::CreateMessage<unittest::TestArenaMap>(&arena);
-    MapTestUtil::SetArenaMapFields(from);
-    from->SerializeToString(&data);
-
-    unittest::TestArenaMap* to =
-        Arena::CreateMessage<unittest::TestArenaMap>(&arena);
-    to->ParseFromString(data);
-    MapTestUtil::ExpectArenaMapFieldsSet(*to);
-  }
-}
-
-// Use text format parsing and serializing to test reflection api.
-TEST(ArenaTest, RelfectionInTextFormat) {
-  Arena arena;
-  string data;
-
-  TextFormat::Printer printer;
-  TextFormat::Parser parser;
-
-  unittest::TestArenaMap* from =
-      Arena::CreateMessage<unittest::TestArenaMap>(&arena);
-  unittest::TestArenaMap* to =
-      Arena::CreateMessage<unittest::TestArenaMap>(&arena);
-
-  MapTestUtil::SetArenaMapFields(from);
-  printer.PrintToString(*from, &data);
-
-  EXPECT_TRUE(parser.ParseFromString(data, to));
-  MapTestUtil::ExpectArenaMapFieldsSet(*to);
-}
 
 }  // namespace internal
 }  // namespace protobuf

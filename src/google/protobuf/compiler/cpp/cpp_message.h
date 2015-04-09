@@ -82,7 +82,7 @@ class MessageGenerator {
 
   // Generate definitions of inline methods (placed at the end of the header
   // file).
-  void GenerateInlineMethods(io::Printer* printer, bool is_inline);
+  void GenerateInlineMethods(io::Printer* printer);
 
   // Source file stuff.
 
@@ -116,7 +116,7 @@ class MessageGenerator {
  private:
   // Generate declarations and definitions of accessors for fields.
   void GenerateFieldAccessorDeclarations(io::Printer* printer);
-  void GenerateFieldAccessorDefinitions(io::Printer* printer, bool is_inline);
+  void GenerateFieldAccessorDefinitions(io::Printer* printer);
 
   // Generate the field offsets array.
   void GenerateOffsets(io::Printer* printer);

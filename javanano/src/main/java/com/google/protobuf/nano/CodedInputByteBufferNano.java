@@ -1,6 +1,6 @@
 // Protocol Buffers - Google's data interchange format
 // Copyright 2013 Google Inc.  All rights reserved.
-// https://developers.google.com/protocol-buffers/
+// http://code.google.com/p/protobuf/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -190,12 +190,12 @@ public final class CodedInputByteBufferNano {
     if (size <= (bufferSize - bufferPos) && size > 0) {
       // Fast path:  We already have the bytes in a contiguous buffer, so
       //   just copy directly from it.
-      final String result = new String(buffer, bufferPos, size, InternalNano.UTF_8);
+      final String result = new String(buffer, bufferPos, size, "UTF-8");
       bufferPos += size;
       return result;
     } else {
       // Slow path:  Build a byte array first then copy it.
-      return new String(readRawBytes(size), InternalNano.UTF_8);
+      return new String(readRawBytes(size), "UTF-8");
     }
   }
 
@@ -636,46 +636,6 @@ public final class CodedInputByteBufferNano {
       bufferPos += size;
     } else {
       throw InvalidProtocolBufferNanoException.truncatedMessage();
-    }
-  }
-
-  // Read a primitive type.
-  Object readPrimitiveField(int type) throws IOException {
-    switch (type) {
-      case InternalNano.TYPE_DOUBLE:
-          return readDouble();
-      case InternalNano.TYPE_FLOAT:
-          return readFloat();
-      case InternalNano.TYPE_INT64:
-          return readInt64();
-      case InternalNano.TYPE_UINT64:
-          return readUInt64();
-      case InternalNano.TYPE_INT32:
-          return readInt32();
-      case InternalNano.TYPE_FIXED64:
-          return readFixed64();
-      case InternalNano.TYPE_FIXED32:
-          return readFixed32();
-      case InternalNano.TYPE_BOOL:
-          return readBool();
-      case InternalNano.TYPE_STRING:
-          return readString();
-      case InternalNano.TYPE_BYTES:
-          return readBytes();
-      case InternalNano.TYPE_UINT32:
-          return readUInt32();
-      case InternalNano.TYPE_ENUM:
-          return readEnum();
-      case InternalNano.TYPE_SFIXED32:
-          return readSFixed32();
-      case InternalNano.TYPE_SFIXED64:
-          return readSFixed64();
-      case InternalNano.TYPE_SINT32:
-          return readSInt32();
-      case InternalNano.TYPE_SINT64:
-          return readSInt64();
-      default:
-          throw new IllegalArgumentException("Unknown type " + type);
     }
   }
 }

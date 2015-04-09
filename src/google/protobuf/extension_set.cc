@@ -71,8 +71,6 @@ inline bool is_packable(WireFormatLite::WireType type) {
     // Do not add a default statement. Let the compiler complain when someone
     // adds a new wire type.
   }
-  GOOGLE_LOG(FATAL) << "can't reach here.";
-  return false;
 }
 
 // Registry stuff.
@@ -97,7 +95,7 @@ void Register(const MessageLite* containing_type,
               int number, ExtensionInfo info) {
   ::google::protobuf::GoogleOnceInit(&registry_init_, &InitRegistry);
 
-  if (!InsertIfNotPresent(registry_, std::make_pair(containing_type, number),
+  if (!InsertIfNotPresent(registry_, make_pair(containing_type, number),
                           info)) {
     GOOGLE_LOG(FATAL) << "Multiple extension registrations for type \""
                << containing_type->GetTypeName()
@@ -107,9 +105,8 @@ void Register(const MessageLite* containing_type,
 
 const ExtensionInfo* FindRegisteredExtension(
     const MessageLite* containing_type, int number) {
-  return (registry_ == NULL)
-             ? NULL
-             : FindOrNull(*registry_, std::make_pair(containing_type, number));
+  return (registry_ == NULL) ? NULL :
+         FindOrNull(*registry_, make_pair(containing_type, number));
 }
 
 }  // namespace
@@ -1033,7 +1030,7 @@ void ExtensionSet::SwapExtension(ExtensionSet* other,
 
   if (this_iter == extensions_.end()) {
     if (GetArenaNoVirtual() == other->GetArenaNoVirtual()) {
-      extensions_.insert(std::make_pair(number, other_iter->second));
+      extensions_.insert(make_pair(number, other_iter->second));
     } else {
       InternalExtensionMergeFrom(number, other_iter->second);
     }
@@ -1043,7 +1040,7 @@ void ExtensionSet::SwapExtension(ExtensionSet* other,
 
   if (other_iter == other->extensions_.end()) {
     if (GetArenaNoVirtual() == other->GetArenaNoVirtual()) {
-      other->extensions_.insert(std::make_pair(number, this_iter->second));
+      other->extensions_.insert(make_pair(number, this_iter->second));
     } else {
       other->InternalExtensionMergeFrom(number, this_iter->second);
     }
@@ -1176,9 +1173,6 @@ bool ExtensionSet::ParseFieldWithExtensionInfo(
                   extension.enum_validity_check.arg, value)) {
             AddEnum(number, WireFormatLite::TYPE_ENUM, extension.is_packed,
                     value, extension.descriptor);
-          } else {
-            // Invalid value.  Treat as unknown.
-            field_skipper->SkipUnknownEnum(number, value);
           }
         }
         break;
@@ -1341,7 +1335,7 @@ bool ExtensionSet::MaybeNewExtension(int number,
                                      const FieldDescriptor* descriptor,
                                      Extension** result) {
   pair<map<int, Extension>::iterator, bool> insert_result =
-      extensions_.insert(std::make_pair(number, Extension()));
+    extensions_.insert(make_pair(number, Extension()));
   *result = &insert_result.first->second;
   (*result)->descriptor = descriptor;
   return insert_result.second;

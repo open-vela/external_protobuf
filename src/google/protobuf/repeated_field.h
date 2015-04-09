@@ -236,11 +236,10 @@ class RepeatedField {
     Arena* arena;
     Element  elements[1];
   };
-  // We can not use sizeof(Rep) - sizeof(Element) due to the trailing padding on
-  // the struct. We can not use sizeof(Arena*) as well because there might be
-  // a "gap" after the field arena and before the field elements (e.g., when
-  // Element is double and pointer is 32bit).
-  static const size_t kRepHeaderSize;
+  // Why not sizeof(Rep) - sizeof(Element)? Because this is not accurate w.r.t.
+  // trailing padding on the struct -- e.g. if Element is int, this would yield
+  // 12 on x86-64, not 8 as we want.
+  static const size_t kRepHeaderSize = sizeof(Arena*);
   // Contains arena ptr and the elements array. We also keep the invariant that
   // if rep_ is NULL, then arena is NULL.
   Rep* rep_;
@@ -263,10 +262,6 @@ class RepeatedField {
     return (rep_ == NULL) ? NULL : rep_->arena;
   }
 };
-
-template<typename Element>
-const size_t RepeatedField<Element>::kRepHeaderSize =
-    reinterpret_cast<size_t>(&reinterpret_cast<Rep*>(16)->elements[0]) - 16;
 
 namespace internal {
 template <typename It> class RepeatedPtrIterator;
@@ -2264,7 +2259,7 @@ RepeatedPtrField<Element>::pointer_end() const {
 
 // Iterators and helper functions that follow the spirit of the STL
 // std::back_insert_iterator and std::back_inserter but are tailor-made
-// for RepeatedField and RepeatedPtrField. Typical usage would be:
+// for RepeatedField and RepatedPtrField. Typical usage would be:
 //
 //   std::copy(some_sequence.begin(), some_sequence.end(),
 //             google::protobuf::RepeatedFieldBackInserter(proto.mutable_sequence()));
