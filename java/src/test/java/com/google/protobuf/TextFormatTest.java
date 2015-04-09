@@ -243,8 +243,8 @@ public class TextFormatTest extends TestCase {
    * characters.  The characters are converted directly to bytes, *not*
    * encoded using UTF-8.
    */
-  private ByteString bytes(String str) throws Exception {
-    return ByteString.copyFrom(str.getBytes("ISO-8859-1"));
+  private ByteString bytes(String str) {
+    return ByteString.copyFrom(str.getBytes(Internal.ISO_8859_1));
   }
 
   /**
@@ -863,16 +863,16 @@ public class TextFormatTest extends TestCase {
     TextFormat.merge(TextFormat.printToUnicodeString(message), builder);
     assertEquals(message.getOptionalString(), builder.getOptionalString());
   }
-  
-  public void testPrintToUnicodeStringWithNewlines() {
+
+  public void testPrintToUnicodeStringWithNewlines() throws Exception {
     // No newlines at start and end
-    assertEquals("optional_string: \"test newlines\n\nin\nstring\"\n",
+    assertEquals("optional_string: \"test newlines\\n\\nin\\nstring\"\n",
         TextFormat.printToUnicodeString(TestAllTypes.newBuilder()
             .setOptionalString("test newlines\n\nin\nstring")
             .build()));
 
     // Newlines at start and end
-    assertEquals("optional_string: \"\ntest\nnewlines\n\nin\nstring\n\"\n",
+    assertEquals("optional_string: \"\\ntest\\nnewlines\\n\\nin\\nstring\\n\"\n",
         TextFormat.printToUnicodeString(TestAllTypes.newBuilder()
             .setOptionalString("\ntest\nnewlines\n\nin\nstring\n")
             .build()));
@@ -882,14 +882,22 @@ public class TextFormatTest extends TestCase {
         TextFormat.printToUnicodeString(TestAllTypes.newBuilder()
             .setOptionalString("")
             .build()));
-    assertEquals("optional_string: \"\n\"\n",
+    assertEquals("optional_string: \"\\n\"\n",
         TextFormat.printToUnicodeString(TestAllTypes.newBuilder()
             .setOptionalString("\n")
             .build()));
-    assertEquals("optional_string: \"\n\n\"\n",
+    assertEquals("optional_string: \"\\n\\n\"\n",
         TextFormat.printToUnicodeString(TestAllTypes.newBuilder()
             .setOptionalString("\n\n")
             .build()));
+
+    // Test escaping roundtrip
+    TestAllTypes message = TestAllTypes.newBuilder()
+        .setOptionalString("\ntest\nnewlines\n\nin\nstring\n")
+        .build();
+    TestAllTypes.Builder builder = TestAllTypes.newBuilder();
+    TextFormat.merge(TextFormat.printToUnicodeString(message), builder);
+    assertEquals(message.getOptionalString(), builder.getOptionalString());
   }
 
   public void testPrintToUnicodeString_unknown() {

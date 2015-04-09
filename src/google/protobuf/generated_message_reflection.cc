@@ -193,7 +193,8 @@ GeneratedMessageReflection::GeneratedMessageReflection(
     const DescriptorPool* descriptor_pool,
     MessageFactory* factory,
     int object_size,
-    int arena_offset)
+    int arena_offset,
+    int is_default_instance_offset)
   : descriptor_       (descriptor),
     default_instance_ (default_instance),
     offsets_          (offsets),
@@ -201,6 +202,7 @@ GeneratedMessageReflection::GeneratedMessageReflection(
     unknown_fields_offset_(unknown_fields_offset),
     extensions_offset_(extensions_offset),
     arena_offset_     (arena_offset),
+    is_default_instance_offset_(is_default_instance_offset),
     object_size_      (object_size),
     descriptor_pool_  ((descriptor_pool == NULL) ?
                          DescriptorPool::generated_pool() :
@@ -220,7 +222,8 @@ GeneratedMessageReflection::GeneratedMessageReflection(
     const DescriptorPool* descriptor_pool,
     MessageFactory* factory,
     int object_size,
-    int arena_offset)
+    int arena_offset,
+    int is_default_instance_offset)
   : descriptor_       (descriptor),
     default_instance_ (default_instance),
     default_oneof_instance_ (default_oneof_instance),
@@ -230,6 +233,7 @@ GeneratedMessageReflection::GeneratedMessageReflection(
     unknown_fields_offset_(unknown_fields_offset),
     extensions_offset_(extensions_offset),
     arena_offset_     (arena_offset),
+    is_default_instance_offset_(is_default_instance_offset),
     object_size_      (object_size),
     descriptor_pool_  ((descriptor_pool == NULL) ?
                          DescriptorPool::generated_pool() :
@@ -243,8 +247,14 @@ namespace {
 UnknownFieldSet* empty_unknown_field_set_ = NULL;
 GOOGLE_PROTOBUF_DECLARE_ONCE(empty_unknown_field_set_once_);
 
+void DeleteEmptyUnknownFieldSet() {
+  delete empty_unknown_field_set_;
+  empty_unknown_field_set_ = NULL;
+}
+
 void InitEmptyUnknownFieldSet() {
   empty_unknown_field_set_ = new UnknownFieldSet;
+  internal::OnShutdown(&DeleteEmptyUnknownFieldSet);
 }
 
 const UnknownFieldSet& GetEmptyUnknownFieldSet() {
@@ -483,11 +493,11 @@ void GeneratedMessageReflection::SwapOneofField(
   double temp_double;
   bool temp_bool;
   int temp_int;
-  Message* temp_message;
+  Message* temp_message = NULL;
   string temp_string;
 
   // Stores message1's oneof field to a temp variable.
-  const FieldDescriptor* field1;
+  const FieldDescriptor* field1 = NULL;
   if (oneof_case1 > 0) {
     field1 = descriptor_->FindFieldByNumber(oneof_case1);
     //oneof_descriptor->field(oneof_case1);
@@ -985,6 +995,7 @@ void GeneratedMessageReflection::ListFields(
   // Optimization:  The default instance never has any fields set.
   if (&message == default_instance_) return;
 
+  output->reserve(descriptor_->field_count());
   for (int i = 0; i < descriptor_->field_count(); i++) {
     const FieldDescriptor* field = descriptor_->field(i);
     if (field->is_repeated()) {
@@ -1008,7 +1019,7 @@ void GeneratedMessageReflection::ListFields(
   }
 
   // ListFields() must sort output by field number.
-  sort(output->begin(), output->end(), FieldNumberSorter());
+  std::sort(output->begin(), output->end(), FieldNumberSorter());
 }
 
 // -------------------------------------------------------------------
@@ -1424,6 +1435,8 @@ const Message& GeneratedMessageReflection::GetMessage(
 Message* GeneratedMessageReflection::MutableMessage(
     Message* message, const FieldDescriptor* field,
     MessageFactory* factory) const {
+  USAGE_CHECK_ALL(MutableMessage, SINGULAR, MESSAGE);
+
   if (factory == NULL) factory = message_factory_;
 
   if (field->is_extension()) {
@@ -1829,6 +1842,17 @@ GeneratedMessageReflection::MutableInternalMetadataWithArena(
   return reinterpret_cast<InternalMetadataWithArena*>(ptr);
 }
 
+inline bool
+GeneratedMessageReflection::GetIsDefaultInstance(
+    const Message& message) const {
+  if (is_default_instance_offset_ == kHasNoDefaultInstanceField) {
+    return false;
+  }
+  const void* ptr = reinterpret_cast<const uint8*>(&message) +
+      is_default_instance_offset_;
+  return *reinterpret_cast<const bool*>(ptr);
+}
+
 // Simple accessors for manipulating has_bits_.
 inline bool GeneratedMessageReflection::HasBit(
     const Message& message, const FieldDescriptor* field) const {
@@ -1836,7 +1860,8 @@ inline bool GeneratedMessageReflection::HasBit(
     // proto3: no has-bits. All fields present except messages, which are
     // present only if their message-field pointer is non-NULL.
     if (field->cpp_type() == FieldDescriptor::CPPTYPE_MESSAGE) {
-      return GetRaw<const Message*>(message, field) != NULL;
+      return !GetIsDefaultInstance(message) &&
+          GetRaw<const Message*>(message, field) != NULL;
     } else {
       // Non-message field (and non-oneof, since that was handled in HasField()
       // before calling us), and singular (again, checked in HasField). So, this
@@ -1950,26 +1975,28 @@ inline void GeneratedMessageReflection::ClearOneof(
   uint32 oneof_case = GetOneofCase(*message, oneof_descriptor);
   if (oneof_case > 0) {
     const FieldDescriptor* field = descriptor_->FindFieldByNumber(oneof_case);
-    switch (field->cpp_type()) {
-      case FieldDescriptor::CPPTYPE_STRING: {
-        switch (field->options().ctype()) {
-          default:  // TODO(kenton):  Support other string reps.
-          case FieldOptions::STRING: {
-            const string* default_ptr =
-                &DefaultRaw<ArenaStringPtr>(field).Get(NULL);
-            MutableField<ArenaStringPtr>(message, field)->
-                Destroy(default_ptr, GetArena(message));
-            break;
+    if (GetArena(message) == NULL) {
+      switch (field->cpp_type()) {
+        case FieldDescriptor::CPPTYPE_STRING: {
+          switch (field->options().ctype()) {
+            default:  // TODO(kenton):  Support other string reps.
+            case FieldOptions::STRING: {
+              const string* default_ptr =
+                  &DefaultRaw<ArenaStringPtr>(field).Get(NULL);
+              MutableField<ArenaStringPtr>(message, field)->
+                  Destroy(default_ptr, GetArena(message));
+              break;
+            }
           }
+          break;
         }
-        break;
-      }
 
-      case FieldDescriptor::CPPTYPE_MESSAGE:
-        delete *MutableRaw<Message*>(message, field);
-        break;
-      default:
-        break;
+        case FieldDescriptor::CPPTYPE_MESSAGE:
+          delete *MutableRaw<Message*>(message, field);
+          break;
+        default:
+          break;
+      }
     }
 
     *MutableOneofCase(message, oneof_descriptor) = 0;
@@ -2082,7 +2109,8 @@ GeneratedMessageReflection::NewGeneratedMessageReflection(
     const void* default_oneof_instance,
     int oneof_case_offset,
     int object_size,
-    int arena_offset) {
+    int arena_offset,
+    int is_default_instance_offset) {
   return new GeneratedMessageReflection(descriptor,
                                         default_instance,
                                         offsets,
@@ -2094,7 +2122,8 @@ GeneratedMessageReflection::NewGeneratedMessageReflection(
                                         DescriptorPool::generated_pool(),
                                         MessageFactory::generated_factory(),
                                         object_size,
-                                        arena_offset);
+                                        arena_offset,
+                                        is_default_instance_offset);
 }
 
 GeneratedMessageReflection*
@@ -2106,7 +2135,8 @@ GeneratedMessageReflection::NewGeneratedMessageReflection(
     int unknown_fields_offset,
     int extensions_offset,
     int object_size,
-    int arena_offset) {
+    int arena_offset,
+    int is_default_instance_offset) {
   return new GeneratedMessageReflection(descriptor,
                                         default_instance,
                                         offsets,
@@ -2116,7 +2146,8 @@ GeneratedMessageReflection::NewGeneratedMessageReflection(
                                         DescriptorPool::generated_pool(),
                                         MessageFactory::generated_factory(),
                                         object_size,
-                                        arena_offset);
+                                        arena_offset,
+                                        is_default_instance_offset);
 }
 
 }  // namespace internal
