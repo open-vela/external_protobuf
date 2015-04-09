@@ -222,17 +222,15 @@ class LIBPROTOBUF_EXPORT UnknownField {
   // UnknownField is being created.
   inline void SetType(Type type);
 
-  union LengthDelimited {
-    string* string_value_;
-  };
-
   uint32 number_;
   uint32 type_;
   union {
     uint64 varint_;
     uint32 fixed32_;
     uint64 fixed64_;
-    mutable union LengthDelimited length_delimited_;
+    mutable union {
+      string* string_value_;
+    } length_delimited_;
     UnknownFieldSet* group_;
   };
 };

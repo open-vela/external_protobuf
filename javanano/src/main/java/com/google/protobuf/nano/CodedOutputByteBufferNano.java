@@ -1,6 +1,6 @@
 // Protocol Buffers - Google's data interchange format
 // Copyright 2013 Google Inc.  All rights reserved.
-// https://developers.google.com/protocol-buffers/
+// http://code.google.com/p/protobuf/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -31,6 +31,7 @@
 package com.google.protobuf.nano;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 /**
  * Encodes and writes protocol message fields.
@@ -290,7 +291,7 @@ public final class CodedOutputByteBufferNano {
     // Unfortunately there does not appear to be any way to tell Java to encode
     // UTF-8 directly into our buffer, so we have to let it create its own byte
     // array and then copy.
-    final byte[] bytes = value.getBytes(InternalNano.UTF_8);
+    final byte[] bytes = value.getBytes("UTF-8");
     writeRawVarint32(bytes.length);
     writeRawBytes(bytes);
   }
@@ -602,9 +603,13 @@ public final class CodedOutputByteBufferNano {
    * {@code string} field.
    */
   public static int computeStringSizeNoTag(final String value) {
-    final byte[] bytes = value.getBytes(InternalNano.UTF_8);
-    return computeRawVarint32Size(bytes.length) +
-           bytes.length;
+    try {
+      final byte[] bytes = value.getBytes("UTF-8");
+      return computeRawVarint32Size(bytes.length) +
+             bytes.length;
+    } catch (UnsupportedEncodingException e) {
+      throw new RuntimeException("UTF-8 not supported.");
+    }
   }
 
   /**
@@ -871,128 +876,4 @@ public final class CodedOutputByteBufferNano {
     // Note:  the right-shift must be arithmetic
     return (n << 1) ^ (n >> 63);
   }
-
-  static int computeFieldSize(int number, int type, Object object) {
-    switch (type) {
-      case InternalNano.TYPE_BOOL:
-        return computeBoolSize(number, (Boolean) object);
-      case InternalNano.TYPE_BYTES:
-        return computeBytesSize(number, (byte[]) object);
-      case InternalNano.TYPE_STRING:
-        return computeStringSize(number, (String) object);
-      case InternalNano.TYPE_FLOAT:
-        return computeFloatSize(number, (Float) object);
-      case InternalNano.TYPE_DOUBLE:
-        return computeDoubleSize(number, (Double) object);
-      case InternalNano.TYPE_ENUM:
-        return computeEnumSize(number, (Integer) object);
-      case InternalNano.TYPE_FIXED32:
-        return computeFixed32Size(number, (Integer) object);
-      case InternalNano.TYPE_INT32:
-        return computeInt32Size(number, (Integer) object);
-      case InternalNano.TYPE_UINT32:
-        return computeUInt32Size(number, (Integer) object);
-      case InternalNano.TYPE_SINT32:
-        return computeSInt32Size(number, (Integer) object);
-      case InternalNano.TYPE_SFIXED32:
-        return computeSFixed32Size(number, (Integer) object);
-      case InternalNano.TYPE_INT64:
-        return computeInt64Size(number, (Long) object);
-      case InternalNano.TYPE_UINT64:
-        return computeUInt64Size(number, (Long) object);
-      case InternalNano.TYPE_SINT64:
-        return computeSInt64Size(number, (Long) object);
-      case InternalNano.TYPE_FIXED64:
-        return computeFixed64Size(number, (Long) object);
-      case InternalNano.TYPE_SFIXED64:
-        return computeSFixed64Size(number, (Long) object);
-      case InternalNano.TYPE_MESSAGE:
-        return computeMessageSize(number, (MessageNano) object);
-      case InternalNano.TYPE_GROUP:
-        return computeGroupSize(number, (MessageNano) object);
-      default:
-        throw new IllegalArgumentException("Unknown type: " + type);
-    }
-  }
-
-  void writeField(int number, int type, Object value)
-      throws IOException {
-    switch (type) {
-      case InternalNano.TYPE_DOUBLE:
-        Double doubleValue = (Double) value;
-        writeDouble(number, doubleValue);
-        break;
-      case InternalNano.TYPE_FLOAT:
-        Float floatValue = (Float) value;
-        writeFloat(number, floatValue);
-        break;
-      case InternalNano.TYPE_INT64:
-        Long int64Value = (Long) value;
-        writeInt64(number, int64Value);
-        break;
-      case InternalNano.TYPE_UINT64:
-        Long uint64Value = (Long) value;
-        writeUInt64(number, uint64Value);
-        break;
-      case InternalNano.TYPE_INT32:
-        Integer int32Value = (Integer) value;
-        writeInt32(number, int32Value);
-        break;
-      case InternalNano.TYPE_FIXED64:
-        Long fixed64Value = (Long) value;
-        writeFixed64(number, fixed64Value);
-        break;
-      case InternalNano.TYPE_FIXED32:
-        Integer fixed32Value = (Integer) value;
-        writeFixed32(number, fixed32Value);
-        break;
-      case InternalNano.TYPE_BOOL:
-        Boolean boolValue = (Boolean) value;
-        writeBool(number, boolValue);
-        break;
-      case InternalNano.TYPE_STRING:
-        String stringValue = (String) value;
-        writeString(number, stringValue);
-        break;
-      case InternalNano.TYPE_BYTES:
-        byte[] bytesValue = (byte[]) value;
-        writeBytes(number, bytesValue);
-        break;
-      case InternalNano.TYPE_UINT32:
-        Integer uint32Value = (Integer) value;
-        writeUInt32(number, uint32Value);
-        break;
-      case InternalNano.TYPE_ENUM:
-        Integer enumValue = (Integer) value;
-        writeEnum(number, enumValue);
-        break;
-      case InternalNano.TYPE_SFIXED32:
-        Integer sfixed32Value = (Integer) value;
-        writeSFixed32(number, sfixed32Value);
-        break;
-      case InternalNano.TYPE_SFIXED64:
-        Long sfixed64Value = (Long) value;
-        writeSFixed64(number, sfixed64Value);
-        break;
-      case InternalNano.TYPE_SINT32:
-        Integer sint32Value = (Integer) value;
-        writeSInt32(number, sint32Value);
-        break;
-      case InternalNano.TYPE_SINT64:
-        Long sint64Value = (Long) value;
-        writeSInt64(number, sint64Value);
-        break;
-      case InternalNano.TYPE_MESSAGE:
-        MessageNano messageValue = (MessageNano) value;
-        writeMessage(number, messageValue);
-        break;
-      case InternalNano.TYPE_GROUP:
-        MessageNano groupValue = (MessageNano) value;
-        writeGroup(number, groupValue);
-        break;
-      default:
-        throw new IOException("Unknown type: " + type);
-    }
-  }
-
 }

@@ -1,6 +1,6 @@
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
-// https://developers.google.com/protocol-buffers/
+// http://code.google.com/p/protobuf/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -167,15 +167,6 @@ message TestAllTypesNano {
 
   // Try to fail with java reserved keywords
   optional int32 synchronized = 96;
-
-  oneof oneof_field {
-    uint32 oneof_uint32 = 111;
-    NestedMessage oneof_nested_message = 112;
-    string oneof_string = 123;
-    bytes oneof_bytes = 124;
-    fixed64 oneof_fixed64 = 115;
-    NestedEnum oneof_enum = 116;
-  }
 }
 
 message ForeignMessageNano {

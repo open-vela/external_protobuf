@@ -144,8 +144,6 @@ const char* FileDescriptor::SyntaxName(FileDescriptor::Syntax syntax) {
     case SYNTAX_UNKNOWN:
       return "unknown";
   }
-  GOOGLE_LOG(FATAL) << "can't reach here.";
-  return NULL;
 }
 
 static const char * const kNonLinkedWeakMessageReplacementName = "google.protobuf.Empty";
@@ -345,10 +343,6 @@ typedef hash_map<string, const SourceCodeInfo_Location*> LocationsByPathMap;
 set<string>* allowed_proto3_extendees_ = NULL;
 GOOGLE_PROTOBUF_DECLARE_ONCE(allowed_proto3_extendees_init_);
 
-void DeleteAllowedProto3Extendee() {
-  delete allowed_proto3_extendees_;
-}
-
 void InitAllowedProto3Extendee() {
   allowed_proto3_extendees_ = new set<string>;
   allowed_proto3_extendees_->insert("google.protobuf.FileOptions");
@@ -358,7 +352,6 @@ void InitAllowedProto3Extendee() {
   allowed_proto3_extendees_->insert("google.protobuf.EnumValueOptions");
   allowed_proto3_extendees_->insert("google.protobuf.ServiceOptions");
   allowed_proto3_extendees_->insert("google.protobuf.MethodOptions");
-  google::protobuf::internal::OnShutdown(&DeleteAllowedProto3Extendee);
 }
 
 // Checks whether the extendee type is allowed in proto3.
@@ -783,7 +776,7 @@ inline const FileDescriptor* DescriptorPool::Tables::FindFile(
 
 inline const FieldDescriptor* FileDescriptorTables::FindFieldByNumber(
     const Descriptor* parent, int number) const {
-  return FindPtrOrNull(fields_by_number_, std::make_pair(parent, number));
+  return FindPtrOrNull(fields_by_number_, make_pair(parent, number));
 }
 
 inline const FieldDescriptor* FileDescriptorTables::FindFieldByLowercaseName(
@@ -800,7 +793,7 @@ inline const FieldDescriptor* FileDescriptorTables::FindFieldByCamelcaseName(
 
 inline const EnumValueDescriptor* FileDescriptorTables::FindEnumValueByNumber(
     const EnumDescriptor* parent, int number) const {
-  return FindPtrOrNull(enum_values_by_number_, std::make_pair(parent, number));
+  return FindPtrOrNull(enum_values_by_number_, make_pair(parent, number));
 }
 
 inline const EnumValueDescriptor*
@@ -808,8 +801,8 @@ FileDescriptorTables::FindEnumValueByNumberCreatingIfUnknown(
     const EnumDescriptor* parent, int number) const {
   // First try, with map of compiled-in values.
   {
-    const EnumValueDescriptor* desc =
-        FindPtrOrNull(enum_values_by_number_, std::make_pair(parent, number));
+    const EnumValueDescriptor* desc = FindPtrOrNull(
+        enum_values_by_number_, make_pair(parent, number));
     if (desc != NULL) {
       return desc;
     }
@@ -818,7 +811,7 @@ FileDescriptorTables::FindEnumValueByNumberCreatingIfUnknown(
   {
     ReaderMutexLock l(&unknown_enum_values_mu_);
     const EnumValueDescriptor* desc = FindPtrOrNull(
-        unknown_enum_values_by_number_, std::make_pair(parent, number));
+        unknown_enum_values_by_number_, make_pair(parent, number));
     if (desc != NULL) {
       return desc;
     }
@@ -828,7 +821,7 @@ FileDescriptorTables::FindEnumValueByNumberCreatingIfUnknown(
   {
     WriterMutexLock l(&unknown_enum_values_mu_);
     const EnumValueDescriptor* desc = FindPtrOrNull(
-        unknown_enum_values_by_number_, std::make_pair(parent, number));
+        unknown_enum_values_by_number_, make_pair(parent, number));
     if (desc != NULL) {
       return desc;
     }
@@ -850,7 +843,8 @@ FileDescriptorTables::FindEnumValueByNumberCreatingIfUnknown(
     result->type_ = parent;
     result->options_ = &EnumValueOptions::default_instance();
     InsertIfNotPresent(&unknown_enum_values_by_number_,
-                       std::make_pair(parent, number), result);
+                       make_pair(parent, number),
+                       result);
     return result;
   }
 }
@@ -858,13 +852,13 @@ FileDescriptorTables::FindEnumValueByNumberCreatingIfUnknown(
 
 inline const FieldDescriptor* DescriptorPool::Tables::FindExtension(
     const Descriptor* extendee, int number) {
-  return FindPtrOrNull(extensions_, std::make_pair(extendee, number));
+  return FindPtrOrNull(extensions_, make_pair(extendee, number));
 }
 
 inline void DescriptorPool::Tables::FindAllExtensions(
     const Descriptor* extendee, vector<const FieldDescriptor*>* out) const {
   ExtensionsGroupedByDescriptorMap::const_iterator it =
-      extensions_.lower_bound(std::make_pair(extendee, 0));
+      extensions_.lower_bound(make_pair(extendee, 0));
   for (; it != extensions_.end() && it->first.first == extendee; ++it) {
     out->push_back(it->second);
   }
@@ -992,7 +986,7 @@ void FileDescriptorTables::BuildLocationsByPath(
 const SourceCodeInfo_Location* FileDescriptorTables::GetSourceLocation(
     const vector<int>& path, const SourceCodeInfo* info) const {
   pair<const FileDescriptorTables*, const SourceCodeInfo*> p(
-      std::make_pair(this, info));
+      make_pair(this, info));
   locations_by_path_once_.Init(&FileDescriptorTables::BuildLocationsByPath, &p);
   return FindPtrOrNull(locations_by_path_, Join(path, ","));
 }
@@ -1928,9 +1922,9 @@ bool FormatLineOptions(int depth, const Message &options, string *output) {
   return !all_options.empty();
 }
 
+template<typename DescType>
 class SourceLocationCommentPrinter {
  public:
-  template<typename DescType>
   SourceLocationCommentPrinter(const DescType* desc,
                                const string& prefix,
                                const DebugStringOptions& options)
@@ -1940,27 +1934,9 @@ class SourceLocationCommentPrinter {
     have_source_loc_ = options.include_comments &&
         desc->GetSourceLocation(&source_loc_);
   }
-  SourceLocationCommentPrinter(const FileDescriptor* file,
-                               const vector<int>& path,
-                               const string& prefix,
-                               const DebugStringOptions& options)
-      : options_(options), prefix_(prefix) {
-    // Perform the SourceLocation lookup only if we're including user comments,
-    // because the lookup is fairly expensive.
-    have_source_loc_ = options.include_comments &&
-        file->GetSourceLocation(path, &source_loc_);
-  }
   void AddPreComment(string* output) {
-    if (have_source_loc_) {
-      // Detached leading comments.
-      for (int i = 0 ; i < source_loc_.leading_detached_comments.size(); ++i) {
-        *output += FormatComment(source_loc_.leading_detached_comments[i]);
-        *output += "\n";
-      }
-      // Attached leading comments.
-      if (!source_loc_.leading_comments.empty()) {
-        *output += FormatComment(source_loc_.leading_comments);
-      }
+    if (have_source_loc_ && source_loc_.leading_comments.size() > 0) {
+      *output += FormatComment(source_loc_.leading_comments);
     }
   }
   void AddPostComment(string* output) {
@@ -1984,6 +1960,7 @@ class SourceLocationCommentPrinter {
   }
 
  private:
+  const DescType* desc_;
   bool have_source_loc_;
   SourceLocation source_loc_;
   DebugStringOptions options_;
@@ -2000,18 +1977,10 @@ string FileDescriptor::DebugString() const {
 string FileDescriptor::DebugStringWithOptions(
     const DebugStringOptions& debug_string_options) const {
   string contents;
-  {
-    vector<int> path;
-    path.push_back(FileDescriptorProto::kSyntaxFieldNumber);
-    SourceLocationCommentPrinter syntax_comment(
-        this, path, "", debug_string_options);
-    syntax_comment.AddPreComment(&contents);
-    strings::SubstituteAndAppend(&contents, "syntax = \"$0\";\n\n",
-                                 SyntaxName(syntax()));
-    syntax_comment.AddPostComment(&contents);
-  }
+  strings::SubstituteAndAppend(&contents, "syntax = \"$0\";\n\n",
+                               SyntaxName(syntax()));
 
-  SourceLocationCommentPrinter
+  SourceLocationCommentPrinter<FileDescriptor>
       comment_printer(this, "", debug_string_options);
   comment_printer.AddPreComment(&contents);
 
@@ -2036,13 +2005,7 @@ string FileDescriptor::DebugStringWithOptions(
   }
 
   if (!package().empty()) {
-    vector<int> path;
-    path.push_back(FileDescriptorProto::kPackageFieldNumber);
-    SourceLocationCommentPrinter package_comment(
-        this, path, "", debug_string_options);
-    package_comment.AddPreComment(&contents);
     strings::SubstituteAndAppend(&contents, "package $0;\n\n", package());
-    package_comment.AddPostComment(&contents);
   }
 
   if (FormatLineOptions(0, options(), &contents)) {
@@ -2117,7 +2080,7 @@ void Descriptor::DebugString(int depth, string *contents,
   string prefix(depth * 2, ' ');
   ++depth;
 
-  SourceLocationCommentPrinter
+  SourceLocationCommentPrinter<Descriptor>
       comment_printer(this, prefix, debug_string_options);
   comment_printer.AddPreComment(contents);
 
@@ -2247,7 +2210,7 @@ void FieldDescriptor::DebugString(int depth,
     label.push_back(' ');
   }
 
-  SourceLocationCommentPrinter
+  SourceLocationCommentPrinter<FieldDescriptor>
       comment_printer(this, prefix, debug_string_options);
   comment_printer.AddPreComment(contents);
 
@@ -2304,7 +2267,7 @@ void OneofDescriptor::DebugString(int depth, string* contents,
                                   debug_string_options) const {
   string prefix(depth * 2, ' ');
   ++depth;
-  SourceLocationCommentPrinter
+  SourceLocationCommentPrinter<OneofDescriptor>
       comment_printer(this, prefix, debug_string_options);
   comment_printer.AddPreComment(contents);
   strings::SubstituteAndAppend(
@@ -2335,7 +2298,7 @@ void EnumDescriptor::DebugString(int depth, string *contents,
   string prefix(depth * 2, ' ');
   ++depth;
 
-  SourceLocationCommentPrinter
+  SourceLocationCommentPrinter<EnumDescriptor>
       comment_printer(this, prefix, debug_string_options);
   comment_printer.AddPreComment(contents);
 
@@ -2369,7 +2332,7 @@ void EnumValueDescriptor::DebugString(int depth, string *contents,
                                       debug_string_options) const {
   string prefix(depth * 2, ' ');
 
-  SourceLocationCommentPrinter
+  SourceLocationCommentPrinter<EnumValueDescriptor>
       comment_printer(this, prefix, debug_string_options);
   comment_printer.AddPreComment(contents);
 
@@ -2400,7 +2363,7 @@ string ServiceDescriptor::DebugStringWithOptions(
 void ServiceDescriptor::DebugString(string *contents,
                                     const DebugStringOptions&
                                     debug_string_options) const {
-  SourceLocationCommentPrinter
+  SourceLocationCommentPrinter<ServiceDescriptor>
       comment_printer(this, /* prefix */ "", debug_string_options);
   comment_printer.AddPreComment(contents);
 
@@ -2435,7 +2398,7 @@ void MethodDescriptor::DebugString(int depth, string *contents,
   string prefix(depth * 2, ' ');
   ++depth;
 
-  SourceLocationCommentPrinter
+  SourceLocationCommentPrinter<MethodDescriptor>
       comment_printer(this, prefix, debug_string_options);
   comment_printer.AddPreComment(contents);
 
@@ -2475,9 +2438,6 @@ bool FileDescriptor::GetSourceLocation(const vector<int>& path,
 
         out_location->leading_comments = loc->leading_comments();
         out_location->trailing_comments = loc->trailing_comments();
-        out_location->leading_detached_comments.assign(
-            loc->leading_detached_comments().begin(),
-            loc->leading_detached_comments().end());
         return true;
       }
     }
@@ -3729,6 +3689,7 @@ const FileDescriptor* DescriptorBuilder::BuildFile(
     AddError(proto.name(), proto, DescriptorPool::ErrorCollector::OTHER,
              "Unrecognized syntax: " + proto.syntax());
   }
+
 
   result->name_ = tables_->AllocateString(proto.name());
   if (proto.has_package()) {
@@ -5142,7 +5103,7 @@ bool DescriptorBuilder::ValidateMapEntry(FieldDescriptor* field,
     case FieldDescriptor::TYPE_SFIXED64:
       // Legal cases
       break;
-    // Do not add a default, so that the compiler will complain when new types
+    // Do not add a default, so that the compiler will complian when new types
     // are added.
   }
 
@@ -5155,7 +5116,7 @@ void DescriptorBuilder::DetectMapConflicts(const Descriptor* message,
   for (int i = 0; i < message->nested_type_count(); ++i) {
     const Descriptor* nested = message->nested_type(i);
     pair<map<string, const Descriptor*>::iterator, bool> result =
-        seen_types.insert(std::make_pair(nested->name(), nested));
+        seen_types.insert(make_pair(nested->name(), nested));
     if (!result.second) {
       if (result.first->second->options().map_entry() ||
           nested->options().map_entry()) {

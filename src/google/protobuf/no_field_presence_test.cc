@@ -269,10 +269,6 @@ TEST(NoFieldPresenceTest, MessageFieldPresenceTest) {
   EXPECT_EQ(true, message.has_optional_lazy_message());
   message.clear_optional_lazy_message();
   EXPECT_EQ(false, message.has_optional_lazy_message());
-
-  // Test field presence of a message field on the default instance.
-  EXPECT_EQ(false, proto2_nofieldpresence_unittest::TestAllTypes::
-            default_instance().has_optional_nested_message());
 }
 
 TEST(NoFieldPresenceTest, ReflectionHasFieldTest) {
@@ -290,13 +286,6 @@ TEST(NoFieldPresenceTest, ReflectionHasFieldTest) {
     if (field->is_repeated()) continue;
     EXPECT_EQ(false, r->HasField(message, field));
   }
-
-  // Test field presence of a message field on the default instance.
-  const google::protobuf::FieldDescriptor* msg_field =
-      desc->FindFieldByName("optional_nested_message");
-  EXPECT_EQ(false, r->HasField(
-      proto2_nofieldpresence_unittest::TestAllTypes::
-      default_instance(), msg_field));
 
   // Fill all fields, expect everything to report true (check oneofs below).
   FillValues(&message);
