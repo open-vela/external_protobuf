@@ -991,7 +991,7 @@ TEST_F(CommandLineInterfaceTest, WriteDependencyManifestFile) {
     "  optional Foo foo = 1;\n"
     "}\n");
 
-  string current_working_directory = getcwd(NULL, 0);
+  string current_working_directory = get_current_dir_name();
   SwitchToTempDirectory();
 
   Run("protocol_compiler --dependency_out=manifest --test_out=. "
