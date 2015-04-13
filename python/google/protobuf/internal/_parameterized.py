@@ -152,6 +152,8 @@ import types
 import unittest
 import uuid
 
+from google.apputils import basetest
+
 ADDR_RE = re.compile(r'\<([a-zA-Z0-9_\-\.]+) object at 0x[a-fA-F0-9]+\>')
 _SEPARATOR = uuid.uuid1().hex
 _FIRST_ARG = object()
@@ -378,7 +380,7 @@ def _UpdateClassDictForParamTestCase(dct, id_suffix, name, iterator):
     id_suffix[new_name] = getattr(func, '__x_extra_id__', '')
 
 
-class ParameterizedTestCase(unittest.TestCase):
+class ParameterizedTestCase(basetest.TestCase):
   """Base class for test cases using the Parameters decorator."""
   __metaclass__ = TestGeneratorMetaclass
 
