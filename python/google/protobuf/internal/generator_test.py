@@ -41,8 +41,7 @@ further ensures that we can use Python protocol message objects as we expect.
 
 __author__ = 'robinson@google.com (Will Robinson)'
 
-import unittest
-
+from google.apputils import basetest
 from google.protobuf.internal import test_bad_identifiers_pb2
 from google.protobuf import unittest_custom_options_pb2
 from google.protobuf import unittest_import_pb2
@@ -56,7 +55,7 @@ from google.protobuf import symbol_database
 MAX_EXTENSION = 536870912
 
 
-class GeneratorTest(unittest.TestCase):
+class GeneratorTest(basetest.TestCase):
 
   def testNestedMessageDescriptor(self):
     field_name = 'optional_nested_message'
@@ -292,7 +291,7 @@ class GeneratorTest(unittest.TestCase):
     self.assertIs(desc.oneofs[0], desc.oneofs_by_name['oneof_field'])
     nested_names = set(['oneof_uint32', 'oneof_nested_message',
                         'oneof_string', 'oneof_bytes'])
-    self.assertItemsEqual(
+    self.assertSameElements(
         nested_names,
         [field.name for field in desc.oneofs[0].fields])
     for field_name, field_desc in desc.fields_by_name.iteritems():
@@ -302,7 +301,7 @@ class GeneratorTest(unittest.TestCase):
         self.assertIsNone(field_desc.containing_oneof)
 
 
-class SymbolDatabaseRegistrationTest(unittest.TestCase):
+class SymbolDatabaseRegistrationTest(basetest.TestCase):
   """Checks that messages, enums and files are correctly registered."""
 
   def testGetSymbol(self):
@@ -341,4 +340,4 @@ class SymbolDatabaseRegistrationTest(unittest.TestCase):
             'google/protobuf/unittest.proto').name)
 
 if __name__ == '__main__':
-  unittest.main()
+  basetest.main()

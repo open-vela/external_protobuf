@@ -31,6 +31,7 @@
 package com.google.protobuf.nano;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 /**
  * Encodes and writes protocol message fields.
@@ -290,7 +291,7 @@ public final class CodedOutputByteBufferNano {
     // Unfortunately there does not appear to be any way to tell Java to encode
     // UTF-8 directly into our buffer, so we have to let it create its own byte
     // array and then copy.
-    final byte[] bytes = value.getBytes(InternalNano.UTF_8);
+    final byte[] bytes = value.getBytes("UTF-8");
     writeRawVarint32(bytes.length);
     writeRawBytes(bytes);
   }
@@ -602,9 +603,13 @@ public final class CodedOutputByteBufferNano {
    * {@code string} field.
    */
   public static int computeStringSizeNoTag(final String value) {
-    final byte[] bytes = value.getBytes(InternalNano.UTF_8);
-    return computeRawVarint32Size(bytes.length) +
-           bytes.length;
+    try {
+      final byte[] bytes = value.getBytes("UTF-8");
+      return computeRawVarint32Size(bytes.length) +
+             bytes.length;
+    } catch (UnsupportedEncodingException e) {
+      throw new RuntimeException("UTF-8 not supported.");
+    }
   }
 
   /**
