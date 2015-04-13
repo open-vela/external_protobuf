@@ -33,7 +33,7 @@ package com.google.protobuf.nano;
 import com.google.protobuf.nano.MapFactories.MapFactory;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
+import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -67,8 +67,6 @@ public final class InternalNano {
   public static final int TYPE_SINT32   = 17;
   public static final int TYPE_SINT64   = 18;
 
-  protected static final Charset UTF_8 = Charset.forName("UTF-8");
-  protected static final Charset ISO_8859_1 = Charset.forName("ISO-8859-1");
 
   private InternalNano() {}
 
@@ -113,7 +111,14 @@ public final class InternalNano {
    * generated code calls this automatically.
    */
   public static String stringDefaultValue(String bytes) {
-    return new String(bytes.getBytes(ISO_8859_1), InternalNano.UTF_8);
+    try {
+      return new String(bytes.getBytes("ISO-8859-1"), "UTF-8");
+    } catch (UnsupportedEncodingException e) {
+      // This should never happen since all JVMs are required to implement
+      // both of the above character sets.
+      throw new IllegalStateException(
+          "Java VM does not support a standard character set.", e);
+    }
   }
 
   /**
@@ -125,7 +130,14 @@ public final class InternalNano {
    * embed raw bytes as a string literal with ISO-8859-1 encoding.
    */
   public static byte[] bytesDefaultValue(String bytes) {
-    return bytes.getBytes(ISO_8859_1);
+    try {
+      return bytes.getBytes("ISO-8859-1");
+    } catch (UnsupportedEncodingException e) {
+      // This should never happen since all JVMs are required to implement
+      // ISO-8859-1.
+      throw new IllegalStateException(
+          "Java VM does not support a standard character set.", e);
+    }
   }
 
   /**
@@ -133,7 +145,11 @@ public final class InternalNano {
    * UnsupportedEncodingException to a RuntimeException.
    */
   public static byte[] copyFromUtf8(final String text) {
-    return text.getBytes(InternalNano.UTF_8);
+    try {
+      return text.getBytes("UTF-8");
+    } catch (UnsupportedEncodingException e) {
+      throw new RuntimeException("UTF-8 not supported?");
+    }
   }
 
   /**
