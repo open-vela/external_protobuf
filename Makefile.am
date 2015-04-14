@@ -9,7 +9,7 @@ AUTOMAKE_OPTIONS = foreign
 SUBDIRS = . src
 
 # Always include gtest in distributions.
-DIST_SUBDIRS = $(subdirs) src
+DIST_SUBDIRS = $(subdirs) src conformance
 
 # Build gtest before we build protobuf tests.  We don't add gtest to SUBDIRS
 # because then "make check" would also build and run all of gtest's own tests,
@@ -30,6 +30,10 @@ clean-local:
 	@if test -e gtest/Makefile; then \
 	  echo "Making clean in gtest"; \
 	  cd gtest && $(MAKE) $(AM_MAKEFLAGS) clean; \
+	fi; \
+	if test -e conformance/Makefile; then \
+	  echo "Making clean in conformance"; \
+	  cd conformance && $(MAKE) $(AM_MAKEFLAGS) clean; \
 	fi
 
 pkgconfigdir = $(libdir)/pkgconfig
@@ -152,7 +156,7 @@ java_EXTRA_DIST=                                                             \
   java/src/test/java/com/google/protobuf/test_check_utf8_size.proto          \
   java/src/test/java/com/google/protobuf/test_custom_options.proto           \
   java/pom.xml                                                               \
-  java/README.txt
+  java/README.md
 
 javanano_EXTRA_DIST=                                                                      \
   javanano/src/main/java/com/google/protobuf/nano/CodedOutputByteBufferNano.java          \
@@ -190,7 +194,7 @@ javanano_EXTRA_DIST=                                                            
   javanano/src/test/java/com/google/protobuf/nano/unittest_multiple_nano.proto            \
   javanano/src/test/java/com/google/protobuf/nano/unittest_enum_class_multiple_nano.proto \
   javanano/src/test/java/com/google/protobuf/nano/map_test.proto                          \
-  javanano/README.txt                                                                     \
+  javanano/README.md                                                                      \
   javanano/pom.xml
 
 
@@ -198,23 +202,19 @@ python_EXTRA_DIST=                                                           \
   python/google/protobuf/internal/api_implementation.cc                      \
   python/google/protobuf/internal/api_implementation.py                      \
   python/google/protobuf/internal/containers.py                              \
-  python/google/protobuf/internal/cpp_message.py                             \
   python/google/protobuf/internal/decoder.py                                 \
   python/google/protobuf/internal/descriptor_database_test.py                \
   python/google/protobuf/internal/descriptor_pool_test.py                    \
   python/google/protobuf/internal/descriptor_pool_test1.proto                \
   python/google/protobuf/internal/descriptor_pool_test2.proto                \
-  python/google/protobuf/internal/descriptor_python_test.py                  \
   python/google/protobuf/internal/descriptor_test.py                         \
   python/google/protobuf/internal/encoder.py                                 \
   python/google/protobuf/internal/enum_type_wrapper.py                       \
   python/google/protobuf/internal/factory_test1.proto                        \
   python/google/protobuf/internal/factory_test2.proto                        \
   python/google/protobuf/internal/generator_test.py                          \
-  python/google/protobuf/internal/message_factory_python_test.py             \
   python/google/protobuf/internal/message_factory_test.py                    \
   python/google/protobuf/internal/message_listener.py                        \
-  python/google/protobuf/internal/message_python_test.py                     \
   python/google/protobuf/internal/message_test.py                            \
   python/google/protobuf/internal/missing_enum_values.proto                  \
   python/google/protobuf/internal/more_extensions.proto                      \
@@ -277,7 +277,7 @@ python_EXTRA_DIST=                                                           \
   python/setup.py                                                            \
   python/mox.py                                                              \
   python/stubout.py                                                          \
-  python/README.txt
+  python/README.md
 
 ruby_EXTRA_DIST=                                                             \
   ruby/README.md                                                             \
