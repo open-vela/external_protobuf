@@ -1,4 +1,8 @@
 Protocol Buffers - Google's data interchange format
+===================================================
+
+[![Build Status](https://travis-ci.org/google/protobuf.svg?branch=master)](https://travis-ci.org/google/protobuf)
+
 Copyright 2008 Google Inc.
 
 This directory contains the Python Protocol Buffers runtime library.
@@ -46,11 +50,39 @@ Installation
 4) Build and run the tests:
 
      $ python setup.py build
-     $ python setup.py google_test
+     $ python setup.py test
 
-     If you want to build/test c++ implementation, run:
+     To build, test, and use the C++ implementation, you must first compile
+     libprotobuf.so:
+
+     $ (cd .. && make)
+
+     On OS X:
+
+      If you are running a homebrew-provided python, you must make sure another
+      version of protobuf is not already installed, as homebrew's python will
+      search /usr/local/lib for libprotobuf.so before it searches ../src/.libs
+      You can either unlink homebrew's protobuf or install the libprotobuf you
+      built earlier:
+
+      $ brew unlink protobuf
+      or
+      $ (cd .. && make install)
+
+     On other *nix:
+
+      You must make libprotobuf.so dynamically available. You can either
+      install libprotobuf you built earlier, or set LD_LIBRARY_PATH:
+
+      $ export LD_LIBRARY_PATH=../src/.libs
+      or
+      $ (cd .. && make install)
+
+     To build the C++ implementation run:
      $ python setup.py build --cpp_implementation
-     $ python setup.py google_test --cpp_implementation
+
+     Then run the tests like so:
+     $ python setup.py test --cpp_implementation
 
    If some tests fail, this library may not work correctly on your
    system.  Continue at your own risk.
@@ -65,14 +97,17 @@ Installation
 
 5) Install:
 
-     $ python setup.py install
-     or:
-     $ python setup.py install --cpp_implementation
+    $ python setup.py install
+
+  or:
+
+    $ (cd .. && make install)
+    $ python setup.py install --cpp_implementation
 
    This step may require superuser privileges.
-   NOTE: To use C++ implementation, you need to install C++ protobuf runtime
-   library of the same version and export the environment variable before this
-   step. See the "C++ Implementation" section below for more details.
+   NOTE: To use C++ implementation, you need to export an environment
+   variable before running your program.  See the "C++ Implementation"
+   section below for more details.
 
 Usage
 =====
@@ -93,14 +128,8 @@ To use the C++ implementation, you need to:
    parent directory.
 2) Export an environment variable:
 
-  $ export PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=cpp
-  $ export PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION_VERSION=2
+    $ export PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=cpp
 
-You need to export this variable before running setup.py script to build and
-install the extension.  You must also set the variable at runtime, otherwise
+You must set this variable at runtime, before running your program, otherwise
 the pure-Python implementation will be used. In a future release, we will
 change the default so that C++ implementation is used whenever it is available.
-It is strongly recommended to run `python setup.py test` after setting the
-variable to "cpp", so the tests will be against C++ implemented Python
-messages.
-
