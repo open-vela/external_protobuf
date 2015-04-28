@@ -56,17 +56,13 @@ EnumFieldGenerator::~EnumFieldGenerator() {
 }
 
 void EnumFieldGenerator::GenerateMembers(Writer* writer) {
-  if (SupportFieldPresence(descriptor_->file())) {
-    writer->WriteLine("private bool has$0$;", property_name());
-  }
+  writer->WriteLine("private bool has$0$;", property_name());
   writer->WriteLine("private $0$ $1$_ = $2$;", type_name(), name(),
                     default_value());
   AddDeprecatedFlag(writer);
-  if (SupportFieldPresence(descriptor_->file())) {
-    writer->WriteLine("public bool Has$0$ {", property_name());
-    writer->WriteLine("  get { return has$0$; }", property_name());
-    writer->WriteLine("}");
-  }
+  writer->WriteLine("public bool Has$0$ {", property_name());
+  writer->WriteLine("  get { return has$0$; }", property_name());
+  writer->WriteLine("}");
   AddPublicMemberAttributes(writer);
   writer->WriteLine("public $0$ $1$ {", type_name(), property_name());
   writer->WriteLine("  get { return $0$_; }", name());
@@ -75,11 +71,9 @@ void EnumFieldGenerator::GenerateMembers(Writer* writer) {
 
 void EnumFieldGenerator::GenerateBuilderMembers(Writer* writer) {
   AddDeprecatedFlag(writer);
-  if (SupportFieldPresence(descriptor_->file())) {
-    writer->WriteLine("public bool Has$0$ {", property_name());
-    writer->WriteLine(" get { return result.has$0$; }", property_name());
-    writer->WriteLine("}");
-  }
+  writer->WriteLine("public bool Has$0$ {", property_name());
+  writer->WriteLine(" get { return result.has$0$; }", property_name());
+  writer->WriteLine("}");
   AddPublicMemberAttributes(writer);
   writer->WriteLine("public $0$ $1$ {", type_name(), property_name());
   writer->WriteLine("  get { return result.$0$; }", property_name());
@@ -89,29 +83,21 @@ void EnumFieldGenerator::GenerateBuilderMembers(Writer* writer) {
   writer->WriteLine("public Builder Set$0$($1$ value) {", property_name(),
                     type_name());
   writer->WriteLine("  PrepareBuilder();");
-  if (SupportFieldPresence(descriptor_->file())) {
-    writer->WriteLine("  result.has$0$ = true;", property_name());
-  }
+  writer->WriteLine("  result.has$0$ = true;", property_name());
   writer->WriteLine("  result.$0$_ = value;", name());
   writer->WriteLine("  return this;");
   writer->WriteLine("}");
   AddDeprecatedFlag(writer);
   writer->WriteLine("public Builder Clear$0$() {", property_name());
   writer->WriteLine("  PrepareBuilder();");
-  if (SupportFieldPresence(descriptor_->file())) {
-    writer->WriteLine("  result.has$0$ = false;", property_name());
-  }
+  writer->WriteLine("  result.has$0$ = false;", property_name());
   writer->WriteLine("  result.$0$_ = $1$;", name(), default_value());
   writer->WriteLine("  return this;");
   writer->WriteLine("}");
 }
 
 void EnumFieldGenerator::GenerateMergingCode(Writer* writer) {
-  if (SupportFieldPresence(descriptor_->file())) {
-    writer->WriteLine("if (other.Has$0$) {", property_name());
-  } else {
-    writer->WriteLine("if (other.$0$ != $1$) {", property_name(), default_value());
-  }
+  writer->WriteLine("if (other.Has$0$) {", property_name());
   writer->WriteLine("  $0$ = other.$0$;", property_name());
   writer->WriteLine("}");
 }
@@ -124,9 +110,7 @@ void EnumFieldGenerator::GenerateParsingCode(Writer* writer) {
   writer->WriteLine("object unknown;");
   writer->WriteLine("if(input.ReadEnum(ref result.$0$_, out unknown)) {",
                     name());
-  if (SupportFieldPresence(descriptor_->file())) {
-    writer->WriteLine("  result.has$0$ = true;", property_name());
-  }
+  writer->WriteLine("  result.has$0$ = true;", property_name());
   writer->WriteLine("} else if(unknown is int) {");
   if (!use_lite_runtime()) {
     writer->WriteLine("  if (unknownFields == null) {");  // First unknown field - create builder now
@@ -141,11 +125,7 @@ void EnumFieldGenerator::GenerateParsingCode(Writer* writer) {
 }
 
 void EnumFieldGenerator::GenerateSerializationCode(Writer* writer) {
-  if (SupportFieldPresence(descriptor_->file())) {
-    writer->WriteLine("if (has$0$) {", property_name());
-  } else {
-    writer->WriteLine("if ($0$ != $1$) {", property_name(), default_value());
-  }
+  writer->WriteLine("if (has$0$) {", property_name());
   writer->WriteLine(
       "  output.WriteEnum($0$, field_names[$2$], (int) $1$, $1$);", number(),
       property_name(), field_ordinal());
@@ -153,11 +133,7 @@ void EnumFieldGenerator::GenerateSerializationCode(Writer* writer) {
 }
 
 void EnumFieldGenerator::GenerateSerializedSizeCode(Writer* writer) {
-  if (SupportFieldPresence(descriptor_->file())) {
-    writer->WriteLine("if (has$0$) {", property_name());
-  } else {
-    writer->WriteLine("if ($0$ != $1$) {", property_name(), default_value());
-  }
+  writer->WriteLine("if (has$0$) {", property_name());
   writer->WriteLine(
       "  size += pb::CodedOutputStream.ComputeEnumSize($0$, (int) $1$);",
       number(), property_name());
@@ -165,32 +141,17 @@ void EnumFieldGenerator::GenerateSerializedSizeCode(Writer* writer) {
 }
 
 void EnumFieldGenerator::WriteHash(Writer* writer) {
-  if (SupportFieldPresence(descriptor_->file())) {
-    writer->WriteLine("if (has$0$) {", property_name());
-  } else {
-    writer->WriteLine("if ($0$ != $1$) {", property_name(), default_value());
-  }
-  writer->WriteLine("  hash ^= $0$_.GetHashCode();", name());
-  writer->WriteLine("}");
+  writer->WriteLine("if (has$0$) hash ^= $1$_.GetHashCode();", property_name(),
+                    name());
 }
 void EnumFieldGenerator::WriteEquals(Writer* writer) {
-  if (SupportFieldPresence(descriptor_->file())) {
-    writer->WriteLine(
-        "if (has$0$ != other.has$0$ || (has$0$ && !$1$_.Equals(other.$1$_))) return false;",
-        property_name(), name());
-  } else {
-    writer->WriteLine(
-        "if (!$0$_.Equals(other.$0$_)) return false;", name());
-  }
+  writer->WriteLine(
+      "if (has$0$ != other.has$0$ || (has$0$ && !$1$_.Equals(other.$1$_))) return false;",
+      property_name(), name());
 }
 void EnumFieldGenerator::WriteToString(Writer* writer) {
-  if (SupportFieldPresence(descriptor_->file())) {
-    writer->WriteLine("PrintField(\"$0$\", has$1$, $2$_, writer);",
-                      descriptor_->name(), property_name(), name());
-  } else {
-    writer->WriteLine("PrintField(\"$0$\", $1$_, writer);",
-                      descriptor_->name(), name());
-  }
+  writer->WriteLine("PrintField(\"$0$\", has$1$, $2$_, writer);",
+                    descriptor_->name(), property_name(), name());
 }
 
 }  // namespace csharp
