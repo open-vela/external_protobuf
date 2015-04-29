@@ -63,3 +63,5 @@ using System.Runtime.CompilerServices;
 #if !NOFILEVERSION
 [assembly: AssemblyFileVersion("2.4.1.555")]
 #endif
+
+[assembly: CLSCompliant(true)]

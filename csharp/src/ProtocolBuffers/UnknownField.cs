@@ -339,6 +339,7 @@ namespace Google.ProtocolBuffers
             /// <summary>
             /// Adds a varint value.
             /// </summary>
+            [CLSCompliant(false)]
             public Builder AddVarint(ulong value)
             {
                 varintList = Add(varintList, value);
@@ -348,6 +349,7 @@ namespace Google.ProtocolBuffers
             /// <summary>
             /// Adds a fixed32 value.
             /// </summary>
+            [CLSCompliant(false)]
             public Builder AddFixed32(uint value)
             {
                 fixed32List = Add(fixed32List, value);
@@ -357,6 +359,7 @@ namespace Google.ProtocolBuffers
             /// <summary>
             /// Adds a fixed64 value.
             /// </summary>
+            [CLSCompliant(false)]
             public Builder AddFixed64(ulong value)
             {
                 fixed64List = Add(fixed64List, value);

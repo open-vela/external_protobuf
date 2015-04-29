@@ -63,6 +63,7 @@ namespace Google.ProtocolBuffers.Serialization
         /// <summary>
         /// Returns true if it was able to read a UInt32 from the input
         /// </summary>
+        [CLSCompliant(false)]
         protected abstract bool Read(ref uint value);
 
         /// <summary>
@@ -73,6 +74,7 @@ namespace Google.ProtocolBuffers.Serialization
         /// <summary>
         /// Returns true if it was able to read a UInt64 from the input
         /// </summary>
+        [CLSCompliant(false)]
         protected abstract bool Read(ref ulong value);
 
         /// <summary>

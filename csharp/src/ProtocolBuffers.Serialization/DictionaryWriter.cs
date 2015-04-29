@@ -85,6 +85,7 @@ namespace Google.ProtocolBuffers.Serialization
         /// <summary>
         /// Writes a UInt32 value
         /// </summary>
+        [CLSCompliant(false)]
         protected override void Write(string field, uint value)
         {
             _output[field] = value;
@@ -101,6 +102,7 @@ namespace Google.ProtocolBuffers.Serialization
         /// <summary>
         /// Writes a UInt64 value
         /// </summary>
+        [CLSCompliant(false)]
         protected override void Write(string field, ulong value)
         {
             _output[field] = value;

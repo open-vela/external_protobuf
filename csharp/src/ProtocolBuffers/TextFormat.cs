@@ -300,6 +300,7 @@ namespace Google.ProtocolBuffers
             }
         }
 
+        [CLSCompliant(false)]
         public static ulong ParseUInt64(string text)
         {
             return (ulong) ParseInteger(text, false, true);
@@ -310,6 +311,7 @@ namespace Google.ProtocolBuffers
             return ParseInteger(text, true, true);
         }
 
+        [CLSCompliant(false)]
         public static uint ParseUInt32(string text)
         {
             return (uint) ParseInteger(text, false, false);
@@ -732,7 +734,11 @@ namespace Google.ProtocolBuffers
                 {
                     // Explicitly specify the invariant culture so that this code does not break when
                     // executing in Turkey.
+#if PORTABLE_LIBRARY
                     String lowerName = name.ToLowerInvariant();
+#else
+                    String lowerName = name.ToLower(FrameworkPortability.InvariantCulture);
+#endif
                     field = type.FindDescriptor<FieldDescriptor>(lowerName);
                     // If the case-insensitive match worked but the field is NOT a group,
                     // TODO(jonskeet): What? Java comment ends here!
