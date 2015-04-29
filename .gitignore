@@ -74,8 +74,3 @@ src/**/*.trs
 # JavaBuild output.
 java/target
 javanano/target
-
-# Windows native output.
-vsprojects/Debug
-vsprojects/Release
-
