@@ -63,6 +63,7 @@ namespace Google.ProtocolBuffers
 
         #endregion
 
+        [CLSCompliant(false)]
         public enum WireType : uint
         {
             Varint = 0,
@@ -94,11 +95,13 @@ namespace Google.ProtocolBuffers
         /// <summary>
         /// Given a tag value, determines the wire type (lower 3 bits).
         /// </summary>
+        [CLSCompliant(false)]
         public static WireType GetTagWireType(uint tag)
         {
             return (WireType) (tag & TagTypeMask);
         }
 
+        [CLSCompliant(false)]
         public static bool IsEndGroupTag(uint tag)
         {
             return (WireType) (tag & TagTypeMask) == WireType.EndGroup;
@@ -107,6 +110,7 @@ namespace Google.ProtocolBuffers
         /// <summary>
         /// Given a tag value, determines the field number (the upper 29 bits).
         /// </summary>
+        [CLSCompliant(false)]
         public static int GetTagFieldNumber(uint tag)
         {
             return (int) tag >> TagTypeBits;
@@ -116,12 +120,14 @@ namespace Google.ProtocolBuffers
         /// Makes a tag value given a field number and wire type.
         /// TODO(jonskeet): Should we just have a Tag structure?
         /// </summary>
+        [CLSCompliant(false)]
         public static uint MakeTag(int fieldNumber, WireType wireType)
         {
             return (uint) (fieldNumber << TagTypeBits) | (uint) wireType;
         }
 
 #if !LITE
+        [CLSCompliant(false)]
         public static uint MakeTag(FieldDescriptor field)
         {
             return MakeTag(field.FieldNumber, GetWireType(field));
@@ -142,6 +148,7 @@ namespace Google.ProtocolBuffers
         /// Converts a field type to its wire type. Done with a switch for the sake
         /// of speed - this is significantly faster than a dictionary lookup.
         /// </summary>
+        [CLSCompliant(false)]
         public static WireType GetWireType(FieldType fieldType)
         {
             switch (fieldType)

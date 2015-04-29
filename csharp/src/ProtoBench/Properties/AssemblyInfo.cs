@@ -15,6 +15,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCopyright("Copyright ©  2009")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
+[assembly: CLSCompliant(true)]
 
 // Version information for an assembly consists of the following four values:
 //

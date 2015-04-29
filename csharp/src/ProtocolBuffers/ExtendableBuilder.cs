@@ -129,6 +129,7 @@ namespace Google.ProtocolBuffers
         /// Called by subclasses to parse an unknown field or an extension.
         /// </summary>
         /// <returns>true unless the tag is an end-group tag</returns>
+        [CLSCompliant(false)]
         protected override bool ParseUnknownField(ICodedInputStream input, UnknownFieldSet.Builder unknownFields,
                                                   ExtensionRegistry extensionRegistry, uint tag, string fieldName)
         {
