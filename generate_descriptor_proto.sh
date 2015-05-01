@@ -27,7 +27,6 @@ __EOF__
 fi
 
 cd src
-make $@ google/protobuf/stubs/pbconfig.h
 CORE_PROTO_IS_CORRECT=0
 while [ $CORE_PROTO_IS_CORRECT -ne 1 ]
 do

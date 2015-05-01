@@ -74,3 +74,11 @@ src/**/*.trs
 # JavaBuild output.
 java/target
 javanano/target
+
+# Windows native output.
+vsprojects/Debug
+vsprojects/Release
+
+# NuGet packages: we want the repository configuration, but not the
+# packages themselves.
+/csharp/src/packages/*/
