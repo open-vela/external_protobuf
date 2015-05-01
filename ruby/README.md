@@ -76,7 +76,7 @@ Then install the required Ruby gems:
 Then build the Gem:
 
     $ rake gem
-    $ gem install `ls pkg/google-protobuf-*.gem`
+    $ gem install pkg/protobuf-$VERSION.gem
 
 To run the specs:
 
