@@ -127,14 +127,6 @@ GenerateSerializedSizeCode(io::Printer* printer) const {
 }
 
 void MessageFieldGenerator::
-GenerateFixClonedCode(io::Printer* printer) const {
-  printer->Print(variables_,
-    "if (this.$name$ != null) {\n"
-    "  cloned.$name$ = this.$name$.clone();\n"
-    "}\n");
-}
-
-void MessageFieldGenerator::
 GenerateEqualsCode(io::Printer* printer) const {
   printer->Print(variables_,
     "if (this.$name$ == null) { \n"
@@ -217,14 +209,6 @@ GenerateSerializedSizeCode(io::Printer* printer) const {
     "  size += com.google.protobuf.nano.CodedOutputByteBufferNano\n"
     "    .computeMessageSize($number$,\n"
     "        (com.google.protobuf.nano.MessageNano) this.$oneof_name$_);\n"
-    "}\n");
-}
-
-void MessageOneofFieldGenerator::
-GenerateFixClonedCode(io::Printer* printer) const {
-  printer->Print(variables_,
-    "if (this.$oneof_name$ != null) {\n"
-    "  cloned.$oneof_name$ = this.$oneof_name$.clone();\n"
     "}\n");
 }
 
@@ -323,19 +307,6 @@ GenerateSerializedSizeCode(io::Printer* printer) const {
     "    if (element != null) {\n"
     "      size += com.google.protobuf.nano.CodedOutputByteBufferNano\n"
     "        .compute$group_or_message$Size($number$, element);\n"
-    "    }\n"
-    "  }\n"
-    "}\n");
-}
-
-void RepeatedMessageFieldGenerator::
-GenerateFixClonedCode(io::Printer* printer) const {
-  printer->Print(variables_,
-    "if (this.$name$ != null && this.$name$.length > 0) {\n"
-    "  cloned.$name$ = new $type$[this.$name$.length];\n"
-    "  for (int i = 0; i < this.$name$.length; i++) {\n"
-    "    if (this.$name$[i] != null) {\n"
-    "      cloned.$name$[i] = this.$name$[i].clone();\n"
     "    }\n"
     "  }\n"
     "}\n");
