@@ -136,36 +136,20 @@ void MessageGenerator::Generate(io::Printer* printer) {
   }
   if (params_.store_unknown_fields() && params_.parcelable_messages()) {
     printer->Print(
-      "    com.google.protobuf.nano.android.ParcelableExtendableMessageNano<$classname$>",
+      "    com.google.protobuf.nano.android.ParcelableExtendableMessageNano<$classname$> {\n",
       "classname", descriptor_->name());
   } else if (params_.store_unknown_fields()) {
     printer->Print(
-      "    com.google.protobuf.nano.ExtendableMessageNano<$classname$>",
+      "    com.google.protobuf.nano.ExtendableMessageNano<$classname$> {\n",
       "classname", descriptor_->name());
   } else if (params_.parcelable_messages()) {
     printer->Print(
-      "    com.google.protobuf.nano.android.ParcelableMessageNano");
+      "    com.google.protobuf.nano.android.ParcelableMessageNano {\n");
   } else {
     printer->Print(
-      "    com.google.protobuf.nano.MessageNano");
-  }
-  if (params_.generate_clone()) {
-    printer->Print(" implements java.lang.Cloneable {\n");
-  } else {
-    printer->Print(" {\n");
+      "    com.google.protobuf.nano.MessageNano {\n");
   }
   printer->Indent();
-
-  if (params_.parcelable_messages()) {
-    printer->Print(
-      "\n"
-      "// Used by Parcelable\n"
-      "@SuppressWarnings({\"unused\"})\n"
-      "public static final android.os.Parcelable.Creator<$classname$> CREATOR =\n"
-      "    new com.google.protobuf.nano.android.ParcelableMessageNanoCreator<\n"
-      "        $classname$>($classname$.class);\n",
-      "classname", descriptor_->name());
-  }
 
   // Nested types and extensions
   for (int i = 0; i < descriptor_->extension_count(); i++) {
@@ -304,27 +288,19 @@ void MessageGenerator::Generate(io::Printer* printer) {
     }
     printer->Print("}\n");
   } else {
-    printer->Print(
-      "\n"
-      "public $classname$() {\n",
-      "classname", descriptor_->name());
     if (params_.generate_clear()) {
-      printer->Print("  clear();\n");
-    } else {
-      printer->Indent();
-      GenerateFieldInitializers(printer);
-      printer->Outdent();
+      printer->Print(
+        "\n"
+        "public $classname$() {\n"
+        "  clear();\n"
+        "}\n",
+        "classname", descriptor_->name());
     }
-    printer->Print("}\n");
   }
 
   // Other methods in this class
 
   GenerateClear(printer);
-
-  if (params_.generate_clone()) {
-    GenerateClone(printer);
-  }
 
   if (params_.generate_equals()) {
     GenerateEquals(printer);
@@ -519,15 +495,6 @@ void MessageGenerator::GenerateClear(io::Printer* printer) {
     "classname", descriptor_->name());
   printer->Indent();
 
-  GenerateFieldInitializers(printer);
-
-  printer->Outdent();
-  printer->Print(
-    "  return this;\n"
-    "}\n");
-}
-
-void MessageGenerator::GenerateFieldInitializers(io::Printer* printer) {
   // Clear bit fields.
   int totalInts = (field_generators_.total_bits() + 31) / 32;
   for (int i = 0; i < totalInts; i++) {
@@ -553,34 +520,12 @@ void MessageGenerator::GenerateFieldInitializers(io::Printer* printer) {
   if (params_.store_unknown_fields()) {
     printer->Print("unknownFieldData = null;\n");
   }
-  printer->Print("cachedSize = -1;\n");
-}
-
-void MessageGenerator::GenerateClone(io::Printer* printer) {
-  printer->Print(
-    "@Override\n"
-    "public $classname$ clone() {\n",
-    "classname", descriptor_->name());
-  printer->Indent();
-
-  printer->Print(
-    "$classname$ cloned;\n"
-    "try {\n"
-    "  cloned = ($classname$) super.clone();\n"
-    "} catch (java.lang.CloneNotSupportedException e) {\n"
-    "  throw new java.lang.AssertionError(e);\n"
-    "}\n",
-    "classname", descriptor_->name());
-
-  for (int i = 0; i < descriptor_->field_count(); i++) {
-    field_generators_.get(descriptor_->field(i)).GenerateFixClonedCode(printer);
-  }
 
   printer->Outdent();
   printer->Print(
-    "  return cloned;\n"
-    "}\n"
-    "\n");
+    "  cachedSize = -1;\n"
+    "  return this;\n"
+    "}\n");
 }
 
 void MessageGenerator::GenerateEquals(io::Printer* printer) {
@@ -623,11 +568,7 @@ void MessageGenerator::GenerateEquals(io::Printer* printer) {
 
   if (params_.store_unknown_fields()) {
     printer->Print(
-      "if (unknownFieldData == null || unknownFieldData.isEmpty()) {\n"
-      "  return other.unknownFieldData == null || other.unknownFieldData.isEmpty();\n"
-      "} else {\n"
-      "  return unknownFieldData.equals(other.unknownFieldData);\n"
-      "}");
+      "return unknownFieldDataEquals(other);\n");
   } else {
     printer->Print(
       "return true;\n");
@@ -657,9 +598,7 @@ void MessageGenerator::GenerateHashCode(io::Printer* printer) {
 
   if (params_.store_unknown_fields()) {
     printer->Print(
-      "result = 31 * result + \n"
-      "  (unknownFieldData == null || unknownFieldData.isEmpty() ? 0 : \n"
-      "  unknownFieldData.hashCode());\n");
+      "result = 31 * result + unknownFieldDataHashCode();\n");
   }
 
   printer->Print("return result;\n");

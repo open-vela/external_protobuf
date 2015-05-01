@@ -377,18 +377,6 @@ module BasicTest
       end
     end
 
-    def test_rptfield_array_ducktyping
-      l = Google::Protobuf::RepeatedField.new(:int32)
-      length_methods = %w(count length size)
-      length_methods.each do |lm|
-        assert l.send(lm)  == 0
-      end
-      l.push 4
-      length_methods.each do |lm|
-        assert l.send(lm)  == 1
-      end
-    end
-
     def test_map_basic
       # allowed key types:
       # :int32, :int64, :uint32, :uint64, :bool, :string, :bytes.
@@ -839,6 +827,7 @@ module BasicTest
       assert m['a.b'] == 4
     end
 
+
     def test_int_ranges
       m = TestMessage.new
 
@@ -944,6 +933,7 @@ module BasicTest
       assert_raise RangeError do
         m.optional_uint64 = 1.5
       end
+
     end
 
     def test_stress_test
