@@ -35,12 +35,9 @@ package com.google.protobuf.nano;
  * A custom version of {@link android.util.SparseArray} with the minimal API
  * for storing {@link FieldData} objects.
  *
- * <p>This class is an internal implementation detail of nano and should not
- * be called directly by clients.
- *
  * Based on {@link android.support.v4.util.SpareArrayCompat}.
  */
-public final class FieldArray implements Cloneable {
+class FieldArray {
     private static final FieldData DELETED = new FieldData();
     private boolean mGarbage = false;
 
@@ -51,7 +48,7 @@ public final class FieldArray implements Cloneable {
     /**
      * Creates a new FieldArray containing no fields.
      */
-    FieldArray() {
+    public FieldArray() {
         this(10);
     }
 
@@ -60,7 +57,7 @@ public final class FieldArray implements Cloneable {
      * require any additional memory allocation to store the specified
      * number of mappings.
      */
-    FieldArray(int initialCapacity) {
+    public FieldArray(int initialCapacity) {
         initialCapacity = idealIntArraySize(initialCapacity);
         mFieldNumbers = new int[initialCapacity];
         mData = new FieldData[initialCapacity];
@@ -71,7 +68,7 @@ public final class FieldArray implements Cloneable {
      * Gets the FieldData mapped from the specified fieldNumber, or <code>null</code>
      * if no such mapping has been made.
      */
-    FieldData get(int fieldNumber) {
+    public FieldData get(int fieldNumber) {
         int i = binarySearch(fieldNumber);
 
         if (i < 0 || mData[i] == DELETED) {
@@ -84,7 +81,7 @@ public final class FieldArray implements Cloneable {
     /**
      * Removes the data from the specified fieldNumber, if there was any.
      */
-    void remove(int fieldNumber) {
+    public void remove(int fieldNumber) {
         int i = binarySearch(fieldNumber);
 
         if (i >= 0 && mData[i] != DELETED) {
@@ -121,7 +118,7 @@ public final class FieldArray implements Cloneable {
      * Adds a mapping from the specified fieldNumber to the specified data,
      * replacing the previous mapping if there was one.
      */
-    void put(int fieldNumber, FieldData data) {
+    public void put(int fieldNumber, FieldData data) {
         int i = binarySearch(fieldNumber);
 
         if (i >= 0) {
@@ -170,7 +167,7 @@ public final class FieldArray implements Cloneable {
      * Returns the number of key-value mappings that this FieldArray
      * currently stores.
      */
-    int size() {
+    public int size() {
         if (mGarbage) {
             gc();
         }
@@ -187,7 +184,7 @@ public final class FieldArray implements Cloneable {
      * the value from the <code>index</code>th key-value mapping that this
      * FieldArray stores.
      */
-    FieldData dataAt(int index) {
+    public FieldData dataAt(int index) {
         if (mGarbage) {
             gc();
         }
@@ -272,20 +269,5 @@ public final class FieldArray implements Cloneable {
             }
         }
         return true;
-    }
-
-    @Override
-    public final FieldArray clone() {
-        // Trigger GC so we compact and don't copy DELETED elements.
-        int size = size();
-        FieldArray clone = new FieldArray(size);
-        System.arraycopy(mFieldNumbers, 0, clone.mFieldNumbers, 0, size);
-        for (int i = 0; i < size; i++) {
-            if (mData[i] != null) {
-                clone.mData[i] = mData[i].clone();
-            }
-        }
-        clone.mSize = size;
-        return clone;
     }
 }
