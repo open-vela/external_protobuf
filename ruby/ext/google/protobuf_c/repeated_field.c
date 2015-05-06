@@ -47,15 +47,6 @@ RepeatedField* ruby_to_RepeatedField(VALUE _self) {
   return self;
 }
 
-static int index_position(VALUE _index, RepeatedField* repeated_field) {
-  int index = NUM2INT(_index);
-  if (index < 0 && repeated_field->size > 0) {
-    index = repeated_field->size + index;
-  }
-  return index;
-}
-
-
 /*
  * call-seq:
  *     RepeatedField.each(&block)
@@ -83,7 +74,8 @@ VALUE RepeatedField_each(VALUE _self) {
  * call-seq:
  *     RepeatedField.[](index) => value
  *
- * Accesses the element at the given index. Returns nil on out-of-bounds
+ * Accesses the element at the given index. Throws an exception on out-of-bounds
+ * errors.
  */
 VALUE RepeatedField_index(VALUE _self, VALUE _index) {
   RepeatedField* self = ruby_to_RepeatedField(_self);
@@ -91,9 +83,9 @@ VALUE RepeatedField_index(VALUE _self, VALUE _index) {
   upb_fieldtype_t field_type = self->field_type;
   VALUE field_type_class = self->field_type_class;
 
-  int index = index_position(_index, self);
+  int index = NUM2INT(_index);
   if (index < 0 || index >= self->size) {
-    return Qnil;
+    rb_raise(rb_eRangeError, "Index out of range");
   }
 
   void* memory = (void *) (((uint8_t *)self->elements) + index * element_size);
@@ -113,9 +105,9 @@ VALUE RepeatedField_index_set(VALUE _self, VALUE _index, VALUE val) {
   VALUE field_type_class = self->field_type_class;
   int element_size = native_slot_size(field_type);
 
-  int index = index_position(_index, self);
+  int index = NUM2INT(_index);
   if (index < 0 || index >= (INT_MAX - 1)) {
-    return Qnil;
+    rb_raise(rb_eRangeError, "Index out of range");
   }
   if (index >= self->size) {
     RepeatedField_reserve(self, index + 1);
