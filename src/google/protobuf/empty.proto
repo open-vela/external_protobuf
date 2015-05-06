@@ -27,18 +27,23 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+syntax = "proto3";
 
-// Author: kenton@google.com (Kenton Varda)
+package google.protobuf;
+
+option java_multiple_files = true;
+option java_outer_classname = "EmptyProto";
+option java_package = "com.google.protobuf";
+
+
+// A generic empty message that you can re-use to avoid defining duplicated
+// empty messages in your APIs. A typical example is to use it as the request
+// or the response type of an API method. For instance:
 //
-// Tests that a "lite" message can import a regular message.
+//     service Foo {
+//       rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
+//     }
+//
+message Empty {
 
-syntax = "proto2";
-package protobuf_unittest;
-
-import "google/protobuf/unittest.proto";
-
-option optimize_for = LITE_RUNTIME;
-
-message TestLiteImportsNonlite {
-  optional TestAllTypes message = 1;
 }

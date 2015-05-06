@@ -1,10 +1,7 @@
-syntax = "proto2";
-
 package benchmarks;
 
 option java_outer_classname = "GoogleSpeed";
 option optimize_for = SPEED;
-option csharp_namespace = "Google.ProtocolBuffers.TestProtos";
 
 message SpeedMessage1 {
   required string field1 = 1;
