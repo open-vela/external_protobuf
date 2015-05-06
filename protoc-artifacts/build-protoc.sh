@@ -158,9 +158,6 @@ if [[ "$(uname)" == CYGWIN* ]]; then
 elif [[ "$(uname)" == MINGW32* ]]; then
   assertEq "$OS" windows $LINENO
   assertEq "$ARCH" x86_32 $LINENO
-elif [[ "$(uname)" == MINGW64* ]]; then
-  assertEq "$OS" windows $LINENO
-  assertEq "$ARCH" x86_64 $LINENO
 elif [[ "$(uname)" == Linux* ]]; then
   if [[ "$OS" == linux ]]; then
     if [[ "$ARCH" == x86_64 ]]; then
@@ -212,7 +209,7 @@ export CXXFLAGS LDFLAGS
 TARGET_FILE=target/protoc.exe
 
 cd "$WORKING_DIR"/.. && ./configure $CONFIGURE_ARGS &&
-  cd src && make clean && make google/protobuf/stubs/pbconfig.h $MAKE_TARGET &&
+  cd src && make clean && make $MAKE_TARGET &&
   cd "$WORKING_DIR" && mkdir -p target &&
   (cp ../src/protoc $TARGET_FILE || cp ../src/protoc.exe $TARGET_FILE) ||
   exit 1
