@@ -1,4 +1,4 @@
-#! /usr/bin/python
+#! /usr/bin/env python
 #
 # Protocol Buffers - Google's data interchange format
 # Copyright 2008 Google Inc.  All rights reserved.
@@ -32,11 +32,12 @@
 
 """Negative compilation unit tests for arena API."""
 
+import unittest
+
 from google3.testing.pybase import fake_target_util
-from google.apputils import basetest
 
 
-class ArenaNcTest(basetest.TestCase):
+class ArenaNcTest(unittest.TestCase):
 
   def testCompilerErrors(self):
     """Runs a list of tests to verify compiler error messages."""
@@ -56,4 +57,4 @@ class ArenaNcTest(basetest.TestCase):
         )
 
 if __name__ == '__main__':
-  basetest.main()
+  unittest.main()

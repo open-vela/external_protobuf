@@ -9,7 +9,7 @@ AUTOMAKE_OPTIONS = foreign
 SUBDIRS = . src
 
 # Always include gtest in distributions.
-DIST_SUBDIRS = $(subdirs) src
+DIST_SUBDIRS = $(subdirs) src conformance
 
 # Build gtest before we build protobuf tests.  We don't add gtest to SUBDIRS
 # because then "make check" would also build and run all of gtest's own tests,
@@ -30,6 +30,10 @@ clean-local:
 	@if test -e gtest/Makefile; then \
 	  echo "Making clean in gtest"; \
 	  cd gtest && $(MAKE) $(AM_MAKEFLAGS) clean; \
+	fi; \
+	if test -e conformance/Makefile; then \
+	  echo "Making clean in conformance"; \
+	  cd conformance && $(MAKE) $(AM_MAKEFLAGS) clean; \
 	fi
 
 pkgconfigdir = $(libdir)/pkgconfig
@@ -193,28 +197,146 @@ javanano_EXTRA_DIST=                                                            
   javanano/README.md                                                                      \
   javanano/pom.xml
 
+objectivec_EXTRA_DIST=                                                       \
+  objectivec/DevTools/generate_descriptors_proto.sh                          \
+  objectivec/DevTools/pddm.py                                                \
+  objectivec/DevTools/pddm_tests.py                                          \
+  objectivec/google/protobuf/Descriptor.pbobjc.h                             \
+  objectivec/google/protobuf/Descriptor.pbobjc.m                             \
+  objectivec/google/protobuf/Duration.pbobjc.h                               \
+  objectivec/google/protobuf/Duration.pbobjc.m                               \
+  objectivec/google/protobuf/Timestamp.pbobjc.h                              \
+  objectivec/google/protobuf/Timestamp.pbobjc.m                              \
+  objectivec/GPBArray.h                                                      \
+  objectivec/GPBArray.m                                                      \
+  objectivec/GPBArray_PackagePrivate.h                                       \
+  objectivec/GPBBootstrap.h                                                  \
+  objectivec/GPBCodedInputStream.h                                           \
+  objectivec/GPBCodedInputStream.m                                           \
+  objectivec/GPBCodedInputStream_PackagePrivate.h                            \
+  objectivec/GPBCodedOutputStream.h                                          \
+  objectivec/GPBCodedOutputStream.m                                          \
+  objectivec/GPBDescriptor.h                                                 \
+  objectivec/GPBDescriptor.m                                                 \
+  objectivec/GPBDescriptor_PackagePrivate.h                                  \
+  objectivec/GPBDictionary.h                                                 \
+  objectivec/GPBDictionary.m                                                 \
+  objectivec/GPBDictionary_PackagePrivate.h                                  \
+  objectivec/GPBExtensionField.h                                             \
+  objectivec/GPBExtensionField.m                                             \
+  objectivec/GPBExtensionField_PackagePrivate.h                              \
+  objectivec/GPBExtensionRegistry.h                                          \
+  objectivec/GPBExtensionRegistry.m                                          \
+  objectivec/GPBExtensionRegistry_PackagePrivate.h                           \
+  objectivec/GPBField.h                                                      \
+  objectivec/GPBField.m                                                      \
+  objectivec/GPBField_PackagePrivate.h                                       \
+  objectivec/GPBMessage.h                                                    \
+  objectivec/GPBMessage.m                                                    \
+  objectivec/GPBMessage_PackagePrivate.h                                     \
+  objectivec/GPBProtocolBuffers.h                                            \
+  objectivec/GPBProtocolBuffers.m                                            \
+  objectivec/GPBProtocolBuffers_RuntimeSupport.h                             \
+  objectivec/GPBRootObject.h                                                 \
+  objectivec/GPBRootObject.m                                                 \
+  objectivec/GPBRootObject_PackagePrivate.h                                  \
+  objectivec/GPBTypes.h                                                      \
+  objectivec/GPBUnknownFieldSet.h                                            \
+  objectivec/GPBUnknownFieldSet.m                                            \
+  objectivec/GPBUnknownFieldSet_PackagePrivate.h                             \
+  objectivec/GPBUtilities.h                                                  \
+  objectivec/GPBUtilities.m                                                  \
+  objectivec/GPBUtilities_PackagePrivate.h                                   \
+  objectivec/GPBWellKnownTypes.h                                             \
+  objectivec/GPBWellKnownTypes.m                                             \
+  objectivec/GPBWireFormat.h                                                 \
+  objectivec/GPBWireFormat.m                                                 \
+  objectivec/ProtocolBuffers_iOS.xcodeproj/project.pbxproj                   \
+  objectivec/ProtocolBuffers_iOS.xcodeproj/project.xcworkspace/contents.xcworkspacedata \
+  objectivec/ProtocolBuffers_iOS.xcodeproj/project.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings \
+  objectivec/ProtocolBuffers_iOS.xcodeproj/xcshareddata/xcbaselines/8BBEA4A5147C727100C4ADB7.xcbaseline/FFE465CA-0E74-40E8-9F09-500B66B7DCB2.plist \
+  objectivec/ProtocolBuffers_iOS.xcodeproj/xcshareddata/xcbaselines/8BBEA4A5147C727100C4ADB7.xcbaseline/Info.plist \
+  objectivec/ProtocolBuffers_iOS.xcodeproj/xcshareddata/xcschemes/PerformanceTests.xcscheme \
+  objectivec/ProtocolBuffers_iOS.xcodeproj/xcshareddata/xcschemes/ProtocolBuffers.xcscheme \
+  objectivec/ProtocolBuffers_OSX.xcodeproj/project.pbxproj                   \
+  objectivec/ProtocolBuffers_OSX.xcodeproj/project.xcworkspace/contents.xcworkspacedata \
+  objectivec/ProtocolBuffers_OSX.xcodeproj/project.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings \
+  objectivec/ProtocolBuffers_OSX.xcodeproj/xcshareddata/xcschemes/PerformanceTests.xcscheme \
+  objectivec/ProtocolBuffers_OSX.xcodeproj/xcshareddata/xcschemes/ProtocolBuffers.xcscheme \
+  objectivec/Tests/Filter1.txt                                               \
+  objectivec/Tests/Filter2.txt                                               \
+  objectivec/Tests/golden_message                                            \
+  objectivec/Tests/golden_packed_fields_message                              \
+  objectivec/Tests/GPBARCUnittestProtos.m                                    \
+  objectivec/Tests/GPBArrayTests.m                                           \
+  objectivec/Tests/GPBCodedInputStreamTests.m                                \
+  objectivec/Tests/GPBCodedOuputStreamTests.m                                \
+  objectivec/Tests/GPBConcurrencyTests.m                                     \
+  objectivec/Tests/GPBDescriptorTests.m                                      \
+  objectivec/Tests/GPBDictionaryTests+Bool.m                                 \
+  objectivec/Tests/GPBDictionaryTests+Int32.m                                \
+  objectivec/Tests/GPBDictionaryTests+Int64.m                                \
+  objectivec/Tests/GPBDictionaryTests+String.m                               \
+  objectivec/Tests/GPBDictionaryTests+UInt32.m                               \
+  objectivec/Tests/GPBDictionaryTests+UInt64.m                               \
+  objectivec/Tests/GPBDictionaryTests.pddm                                   \
+  objectivec/Tests/GPBFilteredMessageTests.m                                 \
+  objectivec/Tests/GPBMessageTests+Merge.m                                   \
+  objectivec/Tests/GPBMessageTests+Runtime.m                                 \
+  objectivec/Tests/GPBMessageTests+Serialization.m                           \
+  objectivec/Tests/GPBMessageTests.m                                         \
+  objectivec/Tests/GPBPerfTests.m                                            \
+  objectivec/Tests/GPBStringTests.m                                          \
+  objectivec/Tests/GPBSwiftTests.swift                                       \
+  objectivec/Tests/GPBTestUtilities.h                                        \
+  objectivec/Tests/GPBTestUtilities.m                                        \
+  objectivec/Tests/GPBUnittestProtos.m                                       \
+  objectivec/Tests/GPBUnknownFieldSetTest.m                                  \
+  objectivec/Tests/GPBUtilitiesTests.m                                       \
+  objectivec/Tests/GPBWellKnownTypesTest.m                                   \
+  objectivec/Tests/GPBWireFormatTests.m                                      \
+  objectivec/Tests/iOSTestHarness/AppDelegate.m                              \
+  objectivec/Tests/iOSTestHarness/en.lproj/InfoPlist.strings                 \
+  objectivec/Tests/iOSTestHarness/Images.xcassets/AppIcon.appiconset/Contents.json \
+  objectivec/Tests/iOSTestHarness/Images.xcassets/AppIcon.appiconset/iPad6.png \
+  objectivec/Tests/iOSTestHarness/Images.xcassets/AppIcon.appiconset/iPad6@2x.png \
+  objectivec/Tests/iOSTestHarness/Images.xcassets/AppIcon.appiconset/iPad7.png \
+  objectivec/Tests/iOSTestHarness/Images.xcassets/AppIcon.appiconset/iPad7@2x.png \
+  objectivec/Tests/iOSTestHarness/Images.xcassets/AppIcon.appiconset/iPhone6.png \
+  objectivec/Tests/iOSTestHarness/Images.xcassets/AppIcon.appiconset/iPhone6@2x.png \
+  objectivec/Tests/iOSTestHarness/Images.xcassets/AppIcon.appiconset/iPhone7@2x.png \
+  objectivec/Tests/iOSTestHarness/Images.xcassets/AppIcon.appiconset/iPhone7@3x.png \
+  objectivec/Tests/iOSTestHarness/Images.xcassets/LaunchImage.launchimage/Contents.json \
+  objectivec/Tests/iOSTestHarness/Info.plist                                  \
+  objectivec/Tests/iOSTestHarness/LaunchScreen.xib                            \
+  objectivec/Tests/text_format_map_unittest_data.txt                          \
+  objectivec/Tests/text_format_unittest_data.txt                              \
+  objectivec/Tests/unittest_cycle.proto                                       \
+  objectivec/Tests/unittest_filter.proto                                      \
+  objectivec/Tests/unittest_name_mangling.proto                               \
+  objectivec/Tests/unittest_objc.proto                                        \
+  objectivec/Tests/unittest_runtime_proto2.proto                              \
+  objectivec/Tests/unittest_runtime_proto3.proto                              \
+  objectivec/Tests/UnitTests-Bridging-Header.h                                \
+  objectivec/Tests/UnitTests-Info.plist
 
 python_EXTRA_DIST=                                                           \
   python/google/protobuf/internal/api_implementation.cc                      \
   python/google/protobuf/internal/api_implementation.py                      \
   python/google/protobuf/internal/containers.py                              \
-  python/google/protobuf/internal/cpp_message.py                             \
   python/google/protobuf/internal/decoder.py                                 \
   python/google/protobuf/internal/descriptor_database_test.py                \
   python/google/protobuf/internal/descriptor_pool_test.py                    \
   python/google/protobuf/internal/descriptor_pool_test1.proto                \
   python/google/protobuf/internal/descriptor_pool_test2.proto                \
-  python/google/protobuf/internal/descriptor_python_test.py                  \
   python/google/protobuf/internal/descriptor_test.py                         \
   python/google/protobuf/internal/encoder.py                                 \
   python/google/protobuf/internal/enum_type_wrapper.py                       \
   python/google/protobuf/internal/factory_test1.proto                        \
   python/google/protobuf/internal/factory_test2.proto                        \
   python/google/protobuf/internal/generator_test.py                          \
-  python/google/protobuf/internal/message_factory_python_test.py             \
   python/google/protobuf/internal/message_factory_test.py                    \
   python/google/protobuf/internal/message_listener.py                        \
-  python/google/protobuf/internal/message_python_test.py                     \
   python/google/protobuf/internal/message_test.py                            \
   python/google/protobuf/internal/missing_enum_values.proto                  \
   python/google/protobuf/internal/more_extensions.proto                      \
@@ -301,7 +423,7 @@ ruby_EXTRA_DIST=                                                             \
   ruby/tests/generated_code.rb                                               \
   ruby/tests/generated_code_test.rb
 
-all_EXTRA_DIST=$(java_EXTRA_DIST) $(javanano_EXTRA_DIST) $(python_EXTRA_DIST) $(ruby_EXTRA_DIST)
+all_EXTRA_DIST=$(java_EXTRA_DIST) $(javanano_EXTRA_DIST) $(objectivec_EXTRA_DIST) $(python_EXTRA_DIST) $(ruby_EXTRA_DIST)
 
 EXTRA_DIST = $(@DIST_LANG@_EXTRA_DIST)                                       \
   autogen.sh                                                                 \

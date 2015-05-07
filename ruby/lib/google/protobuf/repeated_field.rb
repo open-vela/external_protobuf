@@ -1,5 +1,3 @@
-#! /usr/bin/python
-#
 # Protocol Buffers - Google's data interchange format
 # Copyright 2008 Google Inc.  All rights reserved.
 # https://developers.google.com/protocol-buffers/
@@ -30,25 +28,13 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-"""Unittest for descriptor.py for the pure Python implementation."""
+# add syntatic sugar on top of the core library
+module Google
+  module Protobuf
+    class RepeatedField
 
-import os
-os.environ['PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION'] = 'python'
+      alias_method :size, :length
 
-# We must set the implementation version above before the google3 imports.
-# pylint: disable=g-import-not-at-top
-from google.apputils import basetest
-from google.protobuf.internal import api_implementation
-# Run all tests from the original module by putting them in our namespace.
-# pylint: disable=wildcard-import
-from google.protobuf.internal.descriptor_test import *
-
-
-class ConfirmPurePythonTest(basetest.TestCase):
-
-  def testImplementationSetting(self):
-    self.assertEqual('python', api_implementation.Type())
-
-
-if __name__ == '__main__':
-  basetest.main()
+    end
+  end
+end

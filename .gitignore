@@ -27,6 +27,7 @@ src/Makefile
 /config.h
 config.log
 config.status
+pbconfig.h
 
 libtool
 protobuf-lite.pc
@@ -50,6 +51,7 @@ cpp_test*.pb.*
 *.pyc
 *.egg-info
 *_pb2.py
+python/*.egg
 python/.eggs/
 python/build/
 python/google/protobuf/compiler/
@@ -73,3 +75,9 @@ src/**/*.trs
 # JavaBuild output.
 java/target
 javanano/target
+
+# Directories created by opening the Objective C Xcode projects.
+objectivec/ProtocolBuffers_OSX.xcodeproj/project.xcworkspace/xcuserdata/
+objectivec/ProtocolBuffers_OSX.xcodeproj/xcuserdata/
+objectivec/ProtocolBuffers_iOS.xcodeproj/project.xcworkspace/xcuserdata/
+objectivec/ProtocolBuffers_iOS.xcodeproj/xcuserdata/

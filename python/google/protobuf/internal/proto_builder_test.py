@@ -1,4 +1,4 @@
-#! /usr/bin/python
+#! /usr/bin/env python
 #
 # Protocol Buffers - Google's data interchange format
 # Copyright 2008 Google Inc.  All rights reserved.
@@ -32,7 +32,7 @@
 
 """Tests for google.protobuf.proto_builder."""
 
-from google.apputils import basetest
+import unittest
 
 from google.protobuf import descriptor_pb2
 from google.protobuf import descriptor_pool
@@ -40,7 +40,7 @@ from google.protobuf import proto_builder
 from google.protobuf import text_format
 
 
-class ProtoBuilderTest(basetest.TestCase):
+class ProtoBuilderTest(unittest.TestCase):
 
   def setUp(self):
     self._fields = {
@@ -74,4 +74,4 @@ class ProtoBuilderTest(basetest.TestCase):
 
 
 if __name__ == '__main__':
-  basetest.main()
+  unittest.main()
