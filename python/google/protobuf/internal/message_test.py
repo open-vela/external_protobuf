@@ -50,6 +50,7 @@ import pickle
 import sys
 import unittest
 
+from google.apputils import basetest
 from google.protobuf.internal import _parameterized
 from google.protobuf import unittest_pb2
 from google.protobuf import unittest_proto3_arena_pb2
@@ -74,7 +75,7 @@ def IsNegInf(val):
 @_parameterized.Parameters(
     (unittest_pb2),
     (unittest_proto3_arena_pb2))
-class MessageTest(unittest.TestCase):
+class MessageTest(basetest.TestCase):
 
   def testBadUtf8String(self, message_module):
     if api_implementation.Type() != 'python':
@@ -886,7 +887,7 @@ class MessageTest(unittest.TestCase):
 
 
 # Class to test proto2-only features (required, extensions, etc.)
-class Proto2Test(unittest.TestCase):
+class Proto2Test(basetest.TestCase):
 
   def testFieldPresence(self):
     message = unittest_pb2.TestAllTypes()
@@ -1036,7 +1037,7 @@ class Proto2Test(unittest.TestCase):
 
 
 # Class to test proto3-only features/behavior (updated field presence & enums)
-class Proto3Test(unittest.TestCase):
+class Proto3Test(basetest.TestCase):
 
   def testFieldPresence(self):
     message = unittest_proto3_arena_pb2.TestAllTypes()
@@ -1114,7 +1115,7 @@ class Proto3Test(unittest.TestCase):
     self.assertEqual(7654321, m2.repeated_nested_enum[0])
 
 
-class ValidTypeNamesTest(unittest.TestCase):
+class ValidTypeNamesTest(basetest.TestCase):
 
   def assertImportFromName(self, msg, base_name):
     # Parse <type 'module.class_name'> to extra 'some.name' as a string.
@@ -1137,4 +1138,4 @@ class ValidTypeNamesTest(unittest.TestCase):
 
 
 if __name__ == '__main__':
-  unittest.main()
+  basetest.main()
