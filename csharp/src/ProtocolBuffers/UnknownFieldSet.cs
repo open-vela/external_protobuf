@@ -125,13 +125,9 @@ namespace Google.ProtocolBuffers
         /// </summary>
         public void WriteTo(ICodedOutputStream output)
         {
-            // Avoid creating enumerator for the most common code path.
-            if (fields.Count > 0)
+            foreach (KeyValuePair<int, UnknownField> entry in fields)
             {
-                foreach (KeyValuePair<int, UnknownField> entry in fields)
-                {
-                    entry.Value.WriteTo(entry.Key, output);
-                }
+                entry.Value.WriteTo(entry.Key, output);
             }
         }
 
@@ -142,12 +138,6 @@ namespace Google.ProtocolBuffers
         {
             get
             {
-                // Avoid creating enumerator for the most common code path.
-                if (fields.Count == 0)
-                {
-                    return 0;
-                }
-
                 int result = 0;
                 foreach (KeyValuePair<int, UnknownField> entry in fields)
                 {
@@ -219,13 +209,9 @@ namespace Google.ProtocolBuffers
         /// </summary>
         public void WriteAsMessageSetTo(ICodedOutputStream output)
         {
-            // Avoid creating enumerator for the most common code path.
-            if (fields.Count > 0)
+            foreach (KeyValuePair<int, UnknownField> entry in fields)
             {
-                foreach (KeyValuePair<int, UnknownField> entry in fields)
-                {
-                    entry.Value.WriteAsMessageSetExtensionTo(entry.Key, output);
-                }
+                entry.Value.WriteAsMessageSetExtensionTo(entry.Key, output);
             }
         }
 
@@ -237,12 +223,6 @@ namespace Google.ProtocolBuffers
         {
             get
             {
-                // Avoid creating enumerator for the most common code path.
-                if (fields.Count == 0)
-                {
-                    return 0;
-                }
-
                 int result = 0;
                 foreach (KeyValuePair<int, UnknownField> entry in fields)
                 {
