@@ -30,30 +30,25 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-"""Negative compilation unit tests for arena API."""
+"""Tests for ..public.message_factory for the pure Python implementation."""
 
-from google3.testing.pybase import fake_target_util
+import os
+os.environ['PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION'] = 'python'
+
+# We must set the implementation version above before the google3 imports.
+# pylint: disable=g-import-not-at-top
 from google.apputils import basetest
+from google.protobuf.internal import api_implementation
+# Run all tests from the original module by putting them in our namespace.
+# pylint: disable=wildcard-import
+from google.protobuf.internal.message_factory_test import *
 
 
-class ArenaNcTest(basetest.TestCase):
+class ConfirmPurePythonTest(basetest.TestCase):
 
-  def testCompilerErrors(self):
-    """Runs a list of tests to verify compiler error messages."""
+  def testImplementationSetting(self):
+    self.assertEqual('python', api_implementation.Type())
 
-    # Defines a list of test specs, where each element is a tuple
-    # (test name, list of regexes for matching the compiler errors).
-    test_specs = [
-        ('ARENA_PRIVATE_CONSTRUCTOR',
-         [r'calling a protected constructor']),
-        ('SANITY', None)]
-
-    fake_target_util.AssertCcCompilerErrors(
-        self,                         # The current test case.
-        'google3/google/protobuf/arena_nc',  # The fake target file.
-        'arena_nc.o',                 # The sub-target to build.
-        test_specs                    # List of test specifications.
-        )
 
 if __name__ == '__main__':
   basetest.main()

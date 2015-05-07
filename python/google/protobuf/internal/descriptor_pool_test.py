@@ -37,6 +37,7 @@ __author__ = 'matthewtoia@google.com (Matt Toia)'
 import os
 import unittest
 
+from google.apputils import basetest
 from google.protobuf import unittest_pb2
 from google.protobuf import descriptor_pb2
 from google.protobuf.internal import api_implementation
@@ -50,7 +51,7 @@ from google.protobuf import descriptor_pool
 from google.protobuf import symbol_database
 
 
-class DescriptorPoolTest(unittest.TestCase):
+class DescriptorPoolTest(basetest.TestCase):
 
   def setUp(self):
     self.pool = descriptor_pool.DescriptorPool()
@@ -425,7 +426,7 @@ class ExtensionField(object):
     test.assertEqual(self.extended_type, field_desc.containing_type.name)
 
 
-class AddDescriptorTest(unittest.TestCase):
+class AddDescriptorTest(basetest.TestCase):
 
   def _TestMessage(self, prefix):
     pool = descriptor_pool.DescriptorPool()
@@ -587,4 +588,4 @@ TEST2_FILE = ProtoFile(
 
 
 if __name__ == '__main__':
-  unittest.main()
+  basetest.main()
