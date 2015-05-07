@@ -1,4 +1,4 @@
-#! /usr/bin/python
+#! /usr/bin/env python
 #
 # Protocol Buffers - Google's data interchange format
 # Copyright 2008 Google Inc.  All rights reserved.
@@ -34,13 +34,14 @@
 
 __author__ = 'petar@google.com (Petar Petrov)'
 
-from google.apputils import basetest
+import unittest
+
 from google.protobuf import unittest_pb2
 from google.protobuf import service_reflection
 from google.protobuf import service
 
 
-class FooUnitTest(basetest.TestCase):
+class FooUnitTest(unittest.TestCase):
 
   def testService(self):
     class MockRpcChannel(service.RpcChannel):
@@ -80,7 +81,7 @@ class FooUnitTest(basetest.TestCase):
     self.assertEqual('Method Bar not implemented.',
                      rpc_controller.failure_message)
     self.assertEqual(None, self.callback_response)
-    
+
     class MyServiceImpl(unittest_pb2.TestService):
       def Foo(self, rpc_controller, request, done):
         self.foo_called = True
@@ -133,4 +134,4 @@ class FooUnitTest(basetest.TestCase):
 
 
 if __name__ == '__main__':
-  basetest.main()
+  unittest.main()
