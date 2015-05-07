@@ -58,7 +58,6 @@ class MessageFieldGenerator : public FieldGenerator {
   void GenerateSerializedSizeCode(io::Printer* printer) const;
   void GenerateEqualsCode(io::Printer* printer) const;
   void GenerateHashCodeCode(io::Printer* printer) const;
-  void GenerateFixClonedCode(io::Printer* printer) const;
 
  private:
   const FieldDescriptor* descriptor_;
@@ -81,7 +80,6 @@ class MessageOneofFieldGenerator : public FieldGenerator {
   void GenerateSerializedSizeCode(io::Printer* printer) const;
   void GenerateEqualsCode(io::Printer* printer) const;
   void GenerateHashCodeCode(io::Printer* printer) const;
-  void GenerateFixClonedCode(io::Printer* printer) const;
 
  private:
   const FieldDescriptor* descriptor_;
@@ -104,7 +102,6 @@ class RepeatedMessageFieldGenerator : public FieldGenerator {
   void GenerateSerializedSizeCode(io::Printer* printer) const;
   void GenerateEqualsCode(io::Printer* printer) const;
   void GenerateHashCodeCode(io::Printer* printer) const;
-  void GenerateFixClonedCode(io::Printer* printer) const;
 
  private:
   const FieldDescriptor* descriptor_;
