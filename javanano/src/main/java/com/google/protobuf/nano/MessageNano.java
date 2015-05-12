@@ -187,12 +187,4 @@ public abstract class MessageNano {
     public String toString() {
         return MessageNanoPrinter.print(this);
     }
-
-    /**
-     * Provides support for cloning. This only works if you specify the generate_clone method.
-     */
-    @Override
-    public MessageNano clone() throws CloneNotSupportedException {
-        return (MessageNano) super.clone();
-    }
 }
