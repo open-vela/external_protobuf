@@ -626,7 +626,7 @@ DEFINE_SPECIALIZATIONS_FOR_BASE_PROTO_TYPES(inline, MessageLite);
 DECLARE_SPECIALIZATIONS_FOR_BASE_PROTO_TYPES(Message);
 
 
-#undef DECLARE_SPECIALIZATIONS_FOR_BASE_PROTO_TYPES
+#undef DECLARE_SPECIALIZATIONS_FOR_BASE_CLASSES
 
 template <>
 inline const MessageLite& GenericTypeHandler<MessageLite>::default_instance() {
