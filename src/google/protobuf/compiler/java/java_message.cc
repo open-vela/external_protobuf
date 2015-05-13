@@ -124,7 +124,7 @@ void ImmutableMessageGenerator::GenerateStaticVariables(io::Printer* printer) {
 
     // The descriptor for this type.
     printer->Print(vars,
-      "$private$static com.google.protobuf.Descriptors.Descriptor\n"
+      "$private$static final com.google.protobuf.Descriptors.Descriptor\n"
       "  internal_$identifier$_descriptor;\n");
 
     // And the FieldAccessorTable.
@@ -139,9 +139,8 @@ void ImmutableMessageGenerator::GenerateStaticVariables(io::Printer* printer) {
   }
 }
 
-int ImmutableMessageGenerator::GenerateStaticVariableInitializers(
+void ImmutableMessageGenerator::GenerateStaticVariableInitializers(
     io::Printer* printer) {
-  int bytecode_estimate = 0;
   if (HasDescriptorMethods(descriptor_)) {
     map<string, string> vars;
     vars["identifier"] = UniqueFileScopeIdentifier(descriptor_);
@@ -157,25 +156,22 @@ int ImmutableMessageGenerator::GenerateStaticVariableInitializers(
       printer->Print(vars,
         "internal_$identifier$_descriptor =\n"
         "  getDescriptor().getMessageTypes().get($index$);\n");
-      bytecode_estimate += 30;
     } else {
       printer->Print(vars,
         "internal_$identifier$_descriptor =\n"
         "  internal_$parent$_descriptor.getNestedTypes().get($index$);\n");
-      bytecode_estimate += 30;
     }
 
     // And the FieldAccessorTable.
-    bytecode_estimate += GenerateFieldAccessorTableInitializer(printer);
+    GenerateFieldAccessorTableInitializer(printer);
   }
 
   // Generate static member initializers for all nested types.
   for (int i = 0; i < descriptor_->nested_type_count(); i++) {
     // TODO(kenton):  Reuse MessageGenerator objects?
-    bytecode_estimate += ImmutableMessageGenerator(descriptor_->nested_type(i), context_)
+    ImmutableMessageGenerator(descriptor_->nested_type(i), context_)
       .GenerateStaticVariableInitializers(printer);
   }
-  return bytecode_estimate;
 }
 
 void ImmutableMessageGenerator::
@@ -195,9 +191,8 @@ GenerateFieldAccessorTable(io::Printer* printer) {
     "    internal_$identifier$_fieldAccessorTable;\n");
 }
 
-int ImmutableMessageGenerator::
+void ImmutableMessageGenerator::
 GenerateFieldAccessorTableInitializer(io::Printer* printer) {
-  int bytecode_estimate = 10;
   printer->Print(
     "internal_$identifier$_fieldAccessorTable = new\n"
     "  com.google.protobuf.GeneratedMessage.FieldAccessorTable(\n"
@@ -208,7 +203,6 @@ GenerateFieldAccessorTableInitializer(io::Printer* printer) {
   for (int i = 0; i < descriptor_->field_count(); i++) {
     const FieldDescriptor* field = descriptor_->field(i);
     const FieldGeneratorInfo* info = context_->GetFieldGeneratorInfo(field);
-    bytecode_estimate += 6;
     printer->Print(
       "\"$field_name$\", ",
       "field_name", info->capitalized_name);
@@ -216,13 +210,11 @@ GenerateFieldAccessorTableInitializer(io::Printer* printer) {
   for (int i = 0; i < descriptor_->oneof_decl_count(); i++) {
     const OneofDescriptor* oneof = descriptor_->oneof_decl(i);
     const OneofGeneratorInfo* info = context_->GetOneofGeneratorInfo(oneof);
-    bytecode_estimate += 6;
     printer->Print(
       "\"$oneof_name$\", ",
       "oneof_name", info->capitalized_name);
   }
   printer->Print("});\n");
-  return bytecode_estimate;
 }
 
 // ===================================================================

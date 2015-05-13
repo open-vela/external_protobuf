@@ -48,9 +48,9 @@
 // Every test consists of a ConformanceRequest/ConformanceResponse
 // request/reply pair.  The protocol on the pipe is simply:
 //
-//   1. tester sends 4-byte length N (little endian)
+//   1. tester sends 4-byte length N
 //   2. tester sends N bytes representing a ConformanceRequest proto
-//   3. testee sends 4-byte length M (little endian)
+//   3. testee sends 4-byte length M
 //   4. testee sends M bytes representing a ConformanceResponse proto
 
 #include <errno.h>
