@@ -1035,8 +1035,7 @@ module BasicTest
     end
 
     def test_json
-      # TODO: Fix JSON in JRuby version.
-      return if RUBY_PLATFORM == "java"
+      skip("Unimplemented") if RUBY_PLATFORM == "java"
       m = TestMessage.new(:optional_int32 => 1234,
                           :optional_int64 => -0x1_0000_0000,
                           :optional_uint32 => 0x8000_0000,
@@ -1067,8 +1066,7 @@ module BasicTest
     end
 
     def test_json_maps
-      # TODO: Fix JSON in JRuby version.
-      return if RUBY_PLATFORM == "java"
+      skip("Unimplemented") if RUBY_PLATFORM == "java"
       m = MapMessage.new(:map_string_int32 => {"a" => 1})
       expected = '{"map_string_int32":{"a":1},"map_string_msg":{}}'
       assert MapMessage.encode_json(m) == expected
