@@ -73,17 +73,6 @@ public class RubyFieldDescriptor extends RubyObject {
 
     /*
      * call-seq:
-     *     FieldDescriptor.label
-     *
-     * Return the label of this field.
-     */
-    @JRubyMethod(name = "label")
-    public IRubyObject getLabel(ThreadContext context) {
-        return this.label;
-    }
-
-    /*
-     * call-seq:
      *     FieldDescriptor.label = label
      *
      * Sets the label on this field. Cannot be called if field is part of a message
@@ -91,10 +80,8 @@ public class RubyFieldDescriptor extends RubyObject {
      */
     @JRubyMethod(name = "label=")
     public IRubyObject setLabel(ThreadContext context, IRubyObject value) {
-        String labelName = value.asJavaString();
-        this.label = context.runtime.newSymbol(labelName.toLowerCase());
         this.builder.setLabel(
-                DescriptorProtos.FieldDescriptorProto.Label.valueOf("LABEL_" + labelName.toUpperCase()));
+                DescriptorProtos.FieldDescriptorProto.Label.valueOf("LABEL_" + value.asJavaString().toUpperCase()));
         return context.runtime.getNil();
     }
 
@@ -102,11 +89,16 @@ public class RubyFieldDescriptor extends RubyObject {
      * call-seq:
      *     FieldDescriptor.name => name
      *
-     * Returns the name of this field as a Ruby String, or nil if it is not set.
+     * Returns the name of this field.
      */
     @JRubyMethod(name = "name")
     public IRubyObject getName(ThreadContext context) {
         return this.name;
+    }
+
+    @JRubyMethod(name = "subtype")
+    public IRubyObject getSubType(ThreadContext context) {
+        return subType;
     }
 
     /*
@@ -122,12 +114,6 @@ public class RubyFieldDescriptor extends RubyObject {
         this.name = context.runtime.newString(nameStr);
         this.builder.setName(Utils.escapeIdentifier(nameStr));
         return context.runtime.getNil();
-    }
-
-
-    @JRubyMethod(name = "subtype")
-    public IRubyObject getSubType(ThreadContext context) {
-        return subType;
     }
 
     /*
@@ -160,18 +146,6 @@ public class RubyFieldDescriptor extends RubyObject {
 
     /*
      * call-seq:
-     *     FieldDescriptor.number => number
-     *
-     * Returns this field's number, as a Ruby Integer, or nil if not yet set.
-     *
-     */
-    @JRubyMethod(name = "number")
-    public IRubyObject getnumber(ThreadContext context) {
-        return this.number;
-    }
-
-    /*
-     * call-seq:
      *     FieldDescriptor.number = number
      *
      * Sets the tag number for this field. Cannot be called if field is part of a
@@ -179,7 +153,6 @@ public class RubyFieldDescriptor extends RubyObject {
      */
     @JRubyMethod(name = "number=")
     public IRubyObject setNumber(ThreadContext context, IRubyObject value) {
-        this.number = value;
         this.builder.setNumber(RubyNumeric.num2int(value));
         return context.runtime.getNil();
     }
@@ -267,8 +240,6 @@ public class RubyFieldDescriptor extends RubyObject {
 
     private DescriptorProtos.FieldDescriptorProto.Builder builder;
     private IRubyObject name;
-    private IRubyObject label;
-    private IRubyObject number;
     private IRubyObject subType;
     private IRubyObject oneofName;
     private Descriptors.FieldDescriptor fieldDef;
