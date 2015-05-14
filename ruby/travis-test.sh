@@ -12,4 +12,8 @@ test_version() {
      rake test"
 }
 
-test_version $1
+test_version ruby-1.9
+test_version ruby-2.0
+test_version ruby-2.1
+test_version ruby-2.2
+test_version jruby
