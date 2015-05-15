@@ -318,8 +318,7 @@ objectivec_EXTRA_DIST=                                                       \
   objectivec/Tests/unittest_runtime_proto2.proto                              \
   objectivec/Tests/unittest_runtime_proto3.proto                              \
   objectivec/Tests/UnitTests-Bridging-Header.h                                \
-  objectivec/Tests/UnitTests-Info.plist                                       \
-  Protobuf.podspec
+  objectivec/Tests/UnitTests-Info.plist
 
 python_EXTRA_DIST=                                                           \
   python/google/protobuf/internal/api_implementation.cc                      \
