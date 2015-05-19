@@ -8,7 +8,6 @@ script:
 env:
   - CONFIG=cpp
   - CONFIG=cpp_distcheck
-  - CONFIG=csharp
   - CONFIG=java_jdk6
   - CONFIG=java_jdk7
   - CONFIG=java_oracle7
