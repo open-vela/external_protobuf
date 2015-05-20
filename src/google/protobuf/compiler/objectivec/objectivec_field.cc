@@ -39,6 +39,10 @@
 #include <google/protobuf/stubs/common.h>
 #include <google/protobuf/stubs/strutil.h>
 
+#ifndef htonl
+#include <netinet/in.h>
+#endif
+
 namespace google {
 namespace protobuf {
 namespace compiler {
@@ -103,7 +107,7 @@ void SetCommonFieldVariables(const FieldDescriptor* descriptor,
   string field_options = descriptor->options().SerializeAsString();
   // Must convert to a standard byte order for packing length into
   // a cstring.
-  uint32 length = ghtonl(field_options.length());
+  uint32_t length = htonl(field_options.length());
   if (length > 0) {
     string bytes((const char*)&length, sizeof(length));
     bytes.append(field_options);
