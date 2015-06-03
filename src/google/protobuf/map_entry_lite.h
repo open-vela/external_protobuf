@@ -60,7 +60,7 @@ template <typename Key, typename Value,
           WireFormatLite::FieldType kKeyFieldType,
           WireFormatLite::FieldType kValueFieldType,
           int default_enum_value>
-class MapEntryLite : public MessageLite {
+class LIBPROTOBUF_EXPORT MapEntryLite : public MessageLite {
   // Handlers for key/value wire type. Provide utilities to parse/serialize
   // key/value.
   typedef MapWireFieldTypeHandler<kKeyFieldType> KeyWireHandler;
@@ -302,7 +302,7 @@ class MapEntryLite : public MessageLite {
   // only takes references of given key and value.
   template <typename K, typename V, WireFormatLite::FieldType k_wire_type,
             WireFormatLite::FieldType v_wire_type, int default_enum>
-  class MapEntryWrapper
+  class LIBPROTOBUF_EXPORT MapEntryWrapper
       : public MapEntryLite<K, V, k_wire_type, v_wire_type, default_enum> {
     typedef MapEntryLite<K, V, k_wire_type, v_wire_type, default_enum> Base;
     typedef typename Base::KeyCppType KeyCppType;
@@ -336,7 +336,7 @@ class MapEntryLite : public MessageLite {
   // the temporary.
   template <typename K, typename V, WireFormatLite::FieldType k_wire_type,
             WireFormatLite::FieldType v_wire_type, int default_enum>
-  class MapEnumEntryWrapper
+  class LIBPROTOBUF_EXPORT MapEnumEntryWrapper
       : public MapEntryLite<K, V, k_wire_type, v_wire_type, default_enum> {
     typedef MapEntryLite<K, V, k_wire_type, v_wire_type, default_enum> Base;
     typedef typename Base::KeyCppType KeyCppType;
@@ -357,7 +357,7 @@ class MapEntryLite : public MessageLite {
     const KeyCppType& key_;
     const ValCppType value_;
 
-    friend class google::protobuf::Arena;
+    friend class LIBPROTOBUF_EXPORT google::protobuf::Arena;
     typedef void DestructorSkippable_;
   };
 
@@ -396,10 +396,10 @@ class MapEntryLite : public MessageLite {
   typedef void DestructorSkippable_;
   template <typename K, typename V, WireFormatLite::FieldType,
             WireFormatLite::FieldType, int>
-  friend class internal::MapEntry;
+  friend class LIBPROTOBUF_EXPORT internal::MapEntry;
   template <typename K, typename V, WireFormatLite::FieldType,
             WireFormatLite::FieldType, int>
-  friend class internal::MapFieldLite;
+  friend class LIBPROTOBUF_EXPORT internal::MapFieldLite;
 
   GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(MapEntryLite);
 };

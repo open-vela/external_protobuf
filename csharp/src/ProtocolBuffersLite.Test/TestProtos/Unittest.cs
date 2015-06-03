@@ -4997,7 +4997,7 @@ namespace Google.ProtocolBuffers.TestProtos {
       }
 
       public bool HasOptionalNestedEnum {
-       get { return result.hasOptionalNestedEnum; }
+        get { return result.hasOptionalNestedEnum; }
       }
       public global::Google.ProtocolBuffers.TestProtos.TestAllTypes.Types.NestedEnum OptionalNestedEnum {
         get { return result.OptionalNestedEnum; }
@@ -5017,7 +5017,7 @@ namespace Google.ProtocolBuffers.TestProtos {
       }
 
       public bool HasOptionalForeignEnum {
-       get { return result.hasOptionalForeignEnum; }
+        get { return result.hasOptionalForeignEnum; }
       }
       public global::Google.ProtocolBuffers.TestProtos.ForeignEnum OptionalForeignEnum {
         get { return result.OptionalForeignEnum; }
@@ -5037,7 +5037,7 @@ namespace Google.ProtocolBuffers.TestProtos {
       }
 
       public bool HasOptionalImportEnum {
-       get { return result.hasOptionalImportEnum; }
+        get { return result.hasOptionalImportEnum; }
       }
       public global::Google.ProtocolBuffers.TestProtos.ImportEnum OptionalImportEnum {
         get { return result.OptionalImportEnum; }
@@ -6309,7 +6309,7 @@ namespace Google.ProtocolBuffers.TestProtos {
       }
 
       public bool HasDefaultNestedEnum {
-       get { return result.hasDefaultNestedEnum; }
+        get { return result.hasDefaultNestedEnum; }
       }
       public global::Google.ProtocolBuffers.TestProtos.TestAllTypes.Types.NestedEnum DefaultNestedEnum {
         get { return result.DefaultNestedEnum; }
@@ -6329,7 +6329,7 @@ namespace Google.ProtocolBuffers.TestProtos {
       }
 
       public bool HasDefaultForeignEnum {
-       get { return result.hasDefaultForeignEnum; }
+        get { return result.hasDefaultForeignEnum; }
       }
       public global::Google.ProtocolBuffers.TestProtos.ForeignEnum DefaultForeignEnum {
         get { return result.DefaultForeignEnum; }
@@ -6349,7 +6349,7 @@ namespace Google.ProtocolBuffers.TestProtos {
       }
 
       public bool HasDefaultImportEnum {
-       get { return result.hasDefaultImportEnum; }
+        get { return result.hasDefaultImportEnum; }
       }
       public global::Google.ProtocolBuffers.TestProtos.ImportEnum DefaultImportEnum {
         get { return result.DefaultImportEnum; }
@@ -6432,7 +6432,7 @@ namespace Google.ProtocolBuffers.TestProtos {
       }
 
       public bool HasOneofNestedMessage {
-       get { return result.oneofFieldCase_ == OneofFieldOneofCase.OneofNestedMessage; }
+        get { return result.oneofFieldCase_ == OneofFieldOneofCase.OneofNestedMessage; }
       }
       public global::Google.ProtocolBuffers.TestProtos.TestAllTypes.Types.NestedMessage OneofNestedMessage {
         get { return result.oneofFieldCase_ == OneofFieldOneofCase.OneofNestedMessage ? (global::Google.ProtocolBuffers.TestProtos.TestAllTypes.Types.NestedMessage) result.oneofField_ : global::Google.ProtocolBuffers.TestProtos.TestAllTypes.Types.NestedMessage.DefaultInstance; }
@@ -16021,7 +16021,7 @@ namespace Google.ProtocolBuffers.TestProtos {
       }
 
       public bool HasEnumField {
-       get { return result.hasEnumField; }
+        get { return result.hasEnumField; }
       }
       public global::Google.ProtocolBuffers.TestProtos.ForeignEnum EnumField {
         get { return result.EnumField; }
@@ -18747,7 +18747,7 @@ namespace Google.ProtocolBuffers.TestProtos {
 
 
       public bool HasSparseEnum {
-       get { return result.hasSparseEnum; }
+        get { return result.hasSparseEnum; }
       }
       public global::Google.ProtocolBuffers.TestProtos.TestSparseEnum SparseEnum {
         get { return result.SparseEnum; }
@@ -22008,7 +22008,7 @@ namespace Google.ProtocolBuffers.TestProtos {
       }
 
       public bool HasFooMessage {
-       get { return result.fooCase_ == FooOneofCase.FooMessage; }
+        get { return result.fooCase_ == FooOneofCase.FooMessage; }
       }
       public global::Google.ProtocolBuffers.TestProtos.TestAllTypes FooMessage {
         get { return result.fooCase_ == FooOneofCase.FooMessage ? (global::Google.ProtocolBuffers.TestProtos.TestAllTypes) result.foo_ : global::Google.ProtocolBuffers.TestProtos.TestAllTypes.DefaultInstance; }
@@ -22050,7 +22050,7 @@ namespace Google.ProtocolBuffers.TestProtos {
       }
 
       public bool HasFooGroup {
-       get { return result.fooCase_ == FooOneofCase.FooGroup; }
+        get { return result.fooCase_ == FooOneofCase.FooGroup; }
       }
       public global::Google.ProtocolBuffers.TestProtos.TestOneof.Types.FooGroup FooGroup {
         get { return result.fooCase_ == FooOneofCase.FooGroup ? (global::Google.ProtocolBuffers.TestProtos.TestOneof.Types.FooGroup) result.foo_ : global::Google.ProtocolBuffers.TestProtos.TestOneof.Types.FooGroup.DefaultInstance; }
@@ -24384,7 +24384,7 @@ namespace Google.ProtocolBuffers.TestProtos {
       }
 
       public bool HasFooEnum {
-       get { return result.fooCase_ == FooOneofCase.FooEnum; }
+        get { return result.fooCase_ == FooOneofCase.FooEnum; }
       }
       public global::Google.ProtocolBuffers.TestProtos.TestOneof2.Types.NestedEnum FooEnum {
         get { return result.fooCase_ == FooOneofCase.FooEnum ? (global::Google.ProtocolBuffers.TestProtos.TestOneof2.Types.NestedEnum) result.foo_ : global::Google.ProtocolBuffers.TestProtos.TestOneof2.Types.NestedEnum.FOO; }
@@ -24405,7 +24405,7 @@ namespace Google.ProtocolBuffers.TestProtos {
       }
 
       public bool HasFooMessage {
-       get { return result.fooCase_ == FooOneofCase.FooMessage; }
+        get { return result.fooCase_ == FooOneofCase.FooMessage; }
       }
       public global::Google.ProtocolBuffers.TestProtos.TestOneof2.Types.NestedMessage FooMessage {
         get { return result.fooCase_ == FooOneofCase.FooMessage ? (global::Google.ProtocolBuffers.TestProtos.TestOneof2.Types.NestedMessage) result.foo_ : global::Google.ProtocolBuffers.TestProtos.TestOneof2.Types.NestedMessage.DefaultInstance; }
@@ -24447,7 +24447,7 @@ namespace Google.ProtocolBuffers.TestProtos {
       }
 
       public bool HasFooGroup {
-       get { return result.fooCase_ == FooOneofCase.FooGroup; }
+        get { return result.fooCase_ == FooOneofCase.FooGroup; }
       }
       public global::Google.ProtocolBuffers.TestProtos.TestOneof2.Types.FooGroup FooGroup {
         get { return result.fooCase_ == FooOneofCase.FooGroup ? (global::Google.ProtocolBuffers.TestProtos.TestOneof2.Types.FooGroup) result.foo_ : global::Google.ProtocolBuffers.TestProtos.TestOneof2.Types.FooGroup.DefaultInstance; }
@@ -24489,7 +24489,7 @@ namespace Google.ProtocolBuffers.TestProtos {
       }
 
       public bool HasFooLazyMessage {
-       get { return result.fooCase_ == FooOneofCase.FooLazyMessage; }
+        get { return result.fooCase_ == FooOneofCase.FooLazyMessage; }
       }
       public global::Google.ProtocolBuffers.TestProtos.TestOneof2.Types.NestedMessage FooLazyMessage {
         get { return result.fooCase_ == FooOneofCase.FooLazyMessage ? (global::Google.ProtocolBuffers.TestProtos.TestOneof2.Types.NestedMessage) result.foo_ : global::Google.ProtocolBuffers.TestProtos.TestOneof2.Types.NestedMessage.DefaultInstance; }
@@ -24640,7 +24640,7 @@ namespace Google.ProtocolBuffers.TestProtos {
       }
 
       public bool HasBarEnum {
-       get { return result.barCase_ == BarOneofCase.BarEnum; }
+        get { return result.barCase_ == BarOneofCase.BarEnum; }
       }
       public global::Google.ProtocolBuffers.TestProtos.TestOneof2.Types.NestedEnum BarEnum {
         get { return result.barCase_ == BarOneofCase.BarEnum ? (global::Google.ProtocolBuffers.TestProtos.TestOneof2.Types.NestedEnum) result.bar_ : global::Google.ProtocolBuffers.TestProtos.TestOneof2.Types.NestedEnum.BAR; }
@@ -25377,7 +25377,7 @@ namespace Google.ProtocolBuffers.TestProtos {
       }
 
       public bool HasFooMessage {
-       get { return result.fooCase_ == FooOneofCase.FooMessage; }
+        get { return result.fooCase_ == FooOneofCase.FooMessage; }
       }
       public global::Google.ProtocolBuffers.TestProtos.TestRequiredOneof.Types.NestedMessage FooMessage {
         get { return result.fooCase_ == FooOneofCase.FooMessage ? (global::Google.ProtocolBuffers.TestProtos.TestRequiredOneof.Types.NestedMessage) result.foo_ : global::Google.ProtocolBuffers.TestProtos.TestRequiredOneof.Types.NestedMessage.DefaultInstance; }
@@ -28899,7 +28899,7 @@ namespace Google.ProtocolBuffers.TestProtos {
       }
 
       public bool HasEnumExtension {
-       get { return result.hasEnumExtension; }
+        get { return result.hasEnumExtension; }
       }
       public global::Google.ProtocolBuffers.TestProtos.ForeignEnum EnumExtension {
         get { return result.EnumExtension; }
@@ -28919,7 +28919,7 @@ namespace Google.ProtocolBuffers.TestProtos {
       }
 
       public bool HasDynamicEnumExtension {
-       get { return result.hasDynamicEnumExtension; }
+        get { return result.hasDynamicEnumExtension; }
       }
       public global::Google.ProtocolBuffers.TestProtos.TestDynamicExtensions.Types.DynamicEnumType DynamicEnumExtension {
         get { return result.DynamicEnumExtension; }

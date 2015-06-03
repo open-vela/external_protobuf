@@ -150,7 +150,7 @@ bool FilterClass(const string& name);
 
 // Generate decode data needed for ObjC's GPBDecodeTextFormatName() to transform
 // the input into the the expected output.
-class LIBPROTOC_EXPORT TextFormatDecodeData {
+class TextFormatDecodeData {
  public:
   TextFormatDecodeData() {}
 

@@ -534,7 +534,7 @@ struct Hex {
   }
 };
 
-struct LIBPROTOBUF_EXPORT AlphaNum {
+struct AlphaNum {
   const char *piece_data_;  // move these to string_ref eventually
   size_t piece_size_;       // move these to string_ref eventually
 
@@ -610,30 +610,23 @@ using strings::AlphaNum;
 //    be a reference into str.
 // ----------------------------------------------------------------------
 
-LIBPROTOBUF_EXPORT string StrCat(const AlphaNum& a, const AlphaNum& b);
-LIBPROTOBUF_EXPORT string StrCat(const AlphaNum& a, const AlphaNum& b,
-                                 const AlphaNum& c);
-LIBPROTOBUF_EXPORT string StrCat(const AlphaNum& a, const AlphaNum& b,
-                                 const AlphaNum& c, const AlphaNum& d);
-LIBPROTOBUF_EXPORT string StrCat(const AlphaNum& a, const AlphaNum& b,
-                                 const AlphaNum& c, const AlphaNum& d,
-                                 const AlphaNum& e);
-LIBPROTOBUF_EXPORT string StrCat(const AlphaNum& a, const AlphaNum& b,
-                                 const AlphaNum& c, const AlphaNum& d,
-                                 const AlphaNum& e, const AlphaNum& f);
-LIBPROTOBUF_EXPORT string StrCat(const AlphaNum& a, const AlphaNum& b,
-                                 const AlphaNum& c, const AlphaNum& d,
-                                 const AlphaNum& e, const AlphaNum& f,
-                                 const AlphaNum& g);
-LIBPROTOBUF_EXPORT string StrCat(const AlphaNum& a, const AlphaNum& b,
-                                 const AlphaNum& c, const AlphaNum& d,
-                                 const AlphaNum& e, const AlphaNum& f,
-                                 const AlphaNum& g, const AlphaNum& h);
-LIBPROTOBUF_EXPORT string StrCat(const AlphaNum& a, const AlphaNum& b,
-                                 const AlphaNum& c, const AlphaNum& d,
-                                 const AlphaNum& e, const AlphaNum& f,
-                                 const AlphaNum& g, const AlphaNum& h,
-                                 const AlphaNum& i);
+string StrCat(const AlphaNum &a, const AlphaNum &b);
+string StrCat(const AlphaNum &a, const AlphaNum &b, const AlphaNum &c);
+string StrCat(const AlphaNum &a, const AlphaNum &b, const AlphaNum &c,
+              const AlphaNum &d);
+string StrCat(const AlphaNum &a, const AlphaNum &b, const AlphaNum &c,
+              const AlphaNum &d, const AlphaNum &e);
+string StrCat(const AlphaNum &a, const AlphaNum &b, const AlphaNum &c,
+              const AlphaNum &d, const AlphaNum &e, const AlphaNum &f);
+string StrCat(const AlphaNum &a, const AlphaNum &b, const AlphaNum &c,
+              const AlphaNum &d, const AlphaNum &e, const AlphaNum &f,
+              const AlphaNum &g);
+string StrCat(const AlphaNum &a, const AlphaNum &b, const AlphaNum &c,
+              const AlphaNum &d, const AlphaNum &e, const AlphaNum &f,
+              const AlphaNum &g, const AlphaNum &h);
+string StrCat(const AlphaNum &a, const AlphaNum &b, const AlphaNum &c,
+              const AlphaNum &d, const AlphaNum &e, const AlphaNum &f,
+              const AlphaNum &g, const AlphaNum &h, const AlphaNum &i);
 
 inline string StrCat(const AlphaNum& a) { return string(a.data(), a.size()); }
 
@@ -658,14 +651,12 @@ inline string StrCat(const AlphaNum& a) { return string(a.data(), a.size()); }
 //    worked around as consecutive calls to StrAppend are quite efficient.
 // ----------------------------------------------------------------------
 
-LIBPROTOBUF_EXPORT void StrAppend(string* dest, const AlphaNum& a);
-LIBPROTOBUF_EXPORT void StrAppend(string* dest, const AlphaNum& a,
-                                  const AlphaNum& b);
-LIBPROTOBUF_EXPORT void StrAppend(string* dest, const AlphaNum& a,
-                                  const AlphaNum& b, const AlphaNum& c);
-LIBPROTOBUF_EXPORT void StrAppend(string* dest, const AlphaNum& a,
-                                  const AlphaNum& b, const AlphaNum& c,
-                                  const AlphaNum& d);
+void StrAppend(string* dest, const AlphaNum& a);
+void StrAppend(string* dest, const AlphaNum& a, const AlphaNum& b);
+void StrAppend(string* dest, const AlphaNum& a, const AlphaNum& b,
+               const AlphaNum& c);
+void StrAppend(string* dest, const AlphaNum& a, const AlphaNum& b,
+               const AlphaNum& c, const AlphaNum& d);
 
 // ----------------------------------------------------------------------
 // Join()
