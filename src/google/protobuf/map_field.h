@@ -68,11 +68,7 @@ class LIBPROTOBUF_EXPORT MapFieldBase {
         repeated_field_(NULL),
         entry_descriptor_(NULL),
         assign_descriptor_callback_(NULL),
-        state_(STATE_MODIFIED_MAP) {
-    // Mutex's destructor needs to be called explicitly to release resources
-    // acquired in its constructor.
-    arena->OwnDestructor(&mutex_);
-  }
+        state_(STATE_MODIFIED_MAP) {}
   virtual ~MapFieldBase();
 
   // Returns reference to internal repeated field. Data written using
@@ -150,7 +146,7 @@ template <typename Key, typename T,
           WireFormatLite::FieldType kKeyFieldType,
           WireFormatLite::FieldType kValueFieldType,
           int default_enum_value = 0>
-class MapField : public MapFieldBase,
+class LIBPROTOBUF_EXPORT MapField : public MapFieldBase,
                  public MapFieldLite<Key, T, kKeyFieldType, kValueFieldType,
                                      default_enum_value> {
   // Handlers for key/value wire type. Provide utilities to parse/serialize
