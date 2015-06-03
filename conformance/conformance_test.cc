@@ -126,11 +126,12 @@ string submsg(uint32_t fn, const string& buf) {
 
 #define UNKNOWN_FIELD 666
 
-uint32_t GetFieldNumberForType(FieldDescriptor::Type type, bool repeated) {
+uint32_t GetFieldNumberForType(WireFormatLite::FieldType type, bool repeated) {
   const Descriptor* d = TestAllTypes().GetDescriptor();
   for (int i = 0; i < d->field_count(); i++) {
     const FieldDescriptor* f = d->field(i);
-    if (f->type() == type && f->is_repeated() == repeated) {
+    if (static_cast<WireFormatLite::FieldType>(f->type()) == type &&
+        f->is_repeated() == repeated) {
       return f->number();
     }
   }
@@ -138,37 +139,16 @@ uint32_t GetFieldNumberForType(FieldDescriptor::Type type, bool repeated) {
   return 0;
 }
 
-string UpperCase(string str) {
-  for (int i = 0; i < str.size(); i++) {
-    str[i] = toupper(str[i]);
-  }
-  return str;
-}
-
 }  // anonymous namespace
 
 namespace google {
 namespace protobuf {
 
-void ConformanceTestSuite::ReportSuccess(const string& test_name) {
-  if (expected_to_fail_.erase(test_name) != 0) {
-    StringAppendF(&output_,
-                  "ERROR: test %s is in the failure list, but test succeeded.  "
-                  "Remove it from the failure list.\n",
-                  test_name.c_str());
-    unexpected_succeeding_tests_.insert(test_name);
-  }
+void ConformanceTestSuite::ReportSuccess() {
   successes_++;
 }
 
-void ConformanceTestSuite::ReportFailure(const string& test_name,
-                                         const char* fmt, ...) {
-  if (expected_to_fail_.erase(test_name) == 1) {
-    StringAppendF(&output_, "FAILED AS EXPECTED: ");
-  } else {
-    StringAppendF(&output_, "ERROR: ");
-    unexpected_failing_tests_.insert(test_name);
-  }
+void ConformanceTestSuite::ReportFailure(const char *fmt, ...) {
   va_list args;
   va_start(args, fmt);
   StringAppendV(&output_, fmt, args);
@@ -178,10 +158,6 @@ void ConformanceTestSuite::ReportFailure(const string& test_name,
 
 void ConformanceTestSuite::RunTest(const ConformanceRequest& request,
                                    ConformanceResponse* response) {
-  if (test_names_.insert(request.test_name()).second == false) {
-    GOOGLE_LOG(FATAL) << "Duplicated test name: " << request.test_name();
-  }
-
   string serialized_request;
   string serialized_response;
   request.SerializeToString(&serialized_request);
@@ -200,12 +176,10 @@ void ConformanceTestSuite::RunTest(const ConformanceRequest& request,
   }
 }
 
-// Expect that this precise protobuf will cause a parse error.
-void ConformanceTestSuite::ExpectParseFailureForProto(
-    const string& proto, const string& test_name) {
+void ConformanceTestSuite::DoExpectParseFailureForProto(const string& proto,
+                                                        int line) {
   ConformanceRequest request;
   ConformanceResponse response;
-  request.set_test_name(test_name);
   request.set_protobuf_payload(proto);
 
   // We don't expect output, but if the program erroneously accepts the protobuf
@@ -214,27 +188,29 @@ void ConformanceTestSuite::ExpectParseFailureForProto(
 
   RunTest(request, &response);
   if (response.result_case() == ConformanceResponse::kParseError) {
-    ReportSuccess(test_name);
+    ReportSuccess();
   } else {
-    ReportFailure(test_name,
-                  "Should have failed to parse, but didn't. Request: %s, "
+    ReportFailure("Should have failed, but didn't. Line: %d, Request: %s, "
                   "response: %s\n",
+                  line,
                   request.ShortDebugString().c_str(),
                   response.ShortDebugString().c_str());
   }
 }
+
+// Expect that this precise protobuf will cause a parse error.
+#define ExpectParseFailureForProto(proto) DoExpectParseFailureForProto(proto, __LINE__)
 
 // Expect that this protobuf will cause a parse error, even if it is followed
 // by valid protobuf data.  We can try running this twice: once with this
 // data verbatim and once with this data followed by some valid data.
 //
 // TODO(haberman): implement the second of these.
-void ConformanceTestSuite::ExpectHardParseFailureForProto(
-    const string& proto, const string& test_name) {
-  return ExpectParseFailureForProto(proto, test_name);
-}
+#define ExpectHardParseFailureForProto(proto) DoExpectParseFailureForProto(proto, __LINE__)
 
-void ConformanceTestSuite::TestPrematureEOFForType(FieldDescriptor::Type type) {
+
+void ConformanceTestSuite::TestPrematureEOFForType(
+    WireFormatLite::FieldType type) {
   // Incomplete values for each wire type.
   static const string incompletes[6] = {
     string("\x80"),     // VARINT
@@ -247,51 +223,45 @@ void ConformanceTestSuite::TestPrematureEOFForType(FieldDescriptor::Type type) {
 
   uint32_t fieldnum = GetFieldNumberForType(type, false);
   uint32_t rep_fieldnum = GetFieldNumberForType(type, true);
-  WireFormatLite::WireType wire_type = WireFormatLite::WireTypeForFieldType(
-      static_cast<WireFormatLite::FieldType>(type));
+  WireFormatLite::WireType wire_type =
+      WireFormatLite::WireTypeForFieldType(type);
   const string& incomplete = incompletes[wire_type];
-  const string type_name =
-      UpperCase(string(".") + FieldDescriptor::TypeName(type));
 
-  ExpectParseFailureForProto(
-      tag(fieldnum, wire_type),
-      "PrematureEofBeforeKnownNonRepeatedValue" + type_name);
+  // EOF before a known non-repeated value.
+  ExpectParseFailureForProto(tag(fieldnum, wire_type));
 
-  ExpectParseFailureForProto(
-      tag(rep_fieldnum, wire_type),
-      "PrematureEofBeforeKnownRepeatedValue" + type_name);
+  // EOF before a known repeated value.
+  ExpectParseFailureForProto(tag(rep_fieldnum, wire_type));
 
-  ExpectParseFailureForProto(
-      tag(UNKNOWN_FIELD, wire_type),
-      "PrematureEofBeforeUnknownValue" + type_name);
+  // EOF before an unknown value.
+  ExpectParseFailureForProto(tag(UNKNOWN_FIELD, wire_type));
 
+  // EOF inside a known non-repeated value.
   ExpectParseFailureForProto(
-      cat( tag(fieldnum, wire_type), incomplete ),
-      "PrematureEofInsideKnownNonRepeatedValue" + type_name);
+      cat( tag(fieldnum, wire_type), incomplete ));
 
+  // EOF inside a known repeated value.
   ExpectParseFailureForProto(
-      cat( tag(rep_fieldnum, wire_type), incomplete ),
-      "PrematureEofInsideKnownRepeatedValue" + type_name);
+      cat( tag(rep_fieldnum, wire_type), incomplete ));
 
+  // EOF inside an unknown value.
   ExpectParseFailureForProto(
-      cat( tag(UNKNOWN_FIELD, wire_type), incomplete ),
-      "PrematureEofInsideUnknownValue" + type_name);
+      cat( tag(UNKNOWN_FIELD, wire_type), incomplete ));
 
   if (wire_type == WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+    // EOF in the middle of delimited data for known non-repeated value.
     ExpectParseFailureForProto(
-        cat( tag(fieldnum, wire_type), varint(1) ),
-        "PrematureEofInDelimitedDataForKnownNonRepeatedValue" + type_name);
+        cat( tag(fieldnum, wire_type), varint(1) ));
 
+    // EOF in the middle of delimited data for known repeated value.
     ExpectParseFailureForProto(
-        cat( tag(rep_fieldnum, wire_type), varint(1) ),
-        "PrematureEofInDelimitedDataForKnownRepeatedValue" + type_name);
+        cat( tag(rep_fieldnum, wire_type), varint(1) ));
 
     // EOF in the middle of delimited data for unknown value.
     ExpectParseFailureForProto(
-        cat( tag(UNKNOWN_FIELD, wire_type), varint(1) ),
-        "PrematureEofInDelimitedDataForUnknownValue" + type_name);
+        cat( tag(UNKNOWN_FIELD, wire_type), varint(1) ));
 
-    if (type == FieldDescriptor::TYPE_MESSAGE) {
+    if (type == WireFormatLite::TYPE_MESSAGE) {
       // Submessage ends in the middle of a value.
       string incomplete_submsg =
           cat( tag(WireFormatLite::TYPE_INT32, WireFormatLite::WIRETYPE_VARINT),
@@ -299,86 +269,42 @@ void ConformanceTestSuite::TestPrematureEOFForType(FieldDescriptor::Type type) {
       ExpectHardParseFailureForProto(
           cat( tag(fieldnum, WireFormatLite::WIRETYPE_LENGTH_DELIMITED),
                varint(incomplete_submsg.size()),
-               incomplete_submsg ),
-          "PrematureEofInSubmessageValue" + type_name);
+               incomplete_submsg ));
     }
-  } else if (type != FieldDescriptor::TYPE_GROUP) {
+  } else if (type != WireFormatLite::TYPE_GROUP) {
     // Non-delimited, non-group: eligible for packing.
 
     // Packed region ends in the middle of a value.
     ExpectHardParseFailureForProto(
         cat( tag(rep_fieldnum, WireFormatLite::WIRETYPE_LENGTH_DELIMITED),
              varint(incomplete.size()),
-             incomplete ),
-        "PrematureEofInPackedFieldValue" + type_name);
+             incomplete ));
 
     // EOF in the middle of packed region.
     ExpectParseFailureForProto(
         cat( tag(rep_fieldnum, WireFormatLite::WIRETYPE_LENGTH_DELIMITED),
-             varint(1) ),
-        "PrematureEofInPackedField" + type_name);
+             varint(1) ));
   }
 }
 
-void ConformanceTestSuite::SetFailureList(const vector<string>& failure_list) {
-  expected_to_fail_.clear();
-  std::copy(failure_list.begin(), failure_list.end(),
-            std::inserter(expected_to_fail_, expected_to_fail_.end()));
-}
-
-bool ConformanceTestSuite::CheckSetEmpty(const set<string>& set_to_check,
-                                         const char* msg) {
-  if (set_to_check.empty()) {
-    return true;
-  } else {
-    StringAppendF(&output_, "\n");
-    StringAppendF(&output_, "ERROR: %s:\n", msg);
-    for (set<string>::const_iterator iter = set_to_check.begin();
-         iter != set_to_check.end(); ++iter) {
-      StringAppendF(&output_, "%s\n", iter->c_str());
-    }
-    return false;
-  }
-}
-
-bool ConformanceTestSuite::RunSuite(ConformanceTestRunner* runner,
+void ConformanceTestSuite::RunSuite(ConformanceTestRunner* runner,
                                     std::string* output) {
   runner_ = runner;
   output_.clear();
   successes_ = 0;
   failures_ = 0;
-  test_names_.clear();
-  unexpected_failing_tests_.clear();
-  unexpected_succeeding_tests_.clear();
 
   for (int i = 1; i <= FieldDescriptor::MAX_TYPE; i++) {
     if (i == FieldDescriptor::TYPE_GROUP) continue;
-    TestPrematureEOFForType(static_cast<FieldDescriptor::Type>(i));
+    TestPrematureEOFForType(static_cast<WireFormatLite::FieldType>(i));
   }
 
-  StringAppendF(&output_, "\n");
   StringAppendF(&output_,
                 "CONFORMANCE SUITE FINISHED: completed %d tests, %d successes, "
                 "%d failures.\n",
                 successes_ + failures_, successes_, failures_);
 
-  bool ok =
-      CheckSetEmpty(expected_to_fail_,
-                    "These tests were listed in the failure list, but they "
-                    "don't exist.  Remove them from the failure list") &&
-
-      CheckSetEmpty(unexpected_failing_tests_,
-                    "These tests failed.  If they can't be fixed right now, "
-                    "you can add them to the failure list so the overall "
-                    "suite can succeed") &&
-
-      CheckSetEmpty(unexpected_succeeding_tests_,
-                    "These tests succeeded, even though they were listed in "
-                    "the failure list.  Remove them from the failure list");
-
   output->assign(output_);
-
-  return ok;
 }
 
 }  // namespace protobuf

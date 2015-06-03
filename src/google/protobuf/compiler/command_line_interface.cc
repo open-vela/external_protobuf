@@ -53,10 +53,6 @@
 #include <google/protobuf/stubs/shared_ptr.h>
 #endif
 
-#ifdef __APPLE__
-#include <mach-o/dyld.h>
-#endif
-
 #include <google/protobuf/stubs/common.h>
 #include <google/protobuf/stubs/stringprintf.h>
 #include <google/protobuf/compiler/importer.h>
@@ -190,16 +186,6 @@ bool GetProtocAbsolutePath(string* path) {
 #ifdef _WIN32
   char buffer[MAX_PATH];
   int len = GetModuleFileName(NULL, buffer, MAX_PATH);
-#elif __APPLE__
-  char buffer[PATH_MAX];
-  int len = 0;
-
-  char dirtybuffer[PATH_MAX];
-  uint32_t size = sizeof(dirtybuffer);
-  if (_NSGetExecutablePath(dirtybuffer, &size) == 0) {
-    realpath(dirtybuffer, buffer);
-    len = strlen(buffer);
-  }
 #else
   char buffer[PATH_MAX];
   int len = readlink("/proc/self/exe", buffer, PATH_MAX);
