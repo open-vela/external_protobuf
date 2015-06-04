@@ -40,6 +40,7 @@
 #include <google/protobuf/compiler/csharp/csharp_generator.h>
 #include <google/protobuf/compiler/csharp/csharp_umbrella_class.h>
 #include <google/protobuf/compiler/csharp/csharp_helpers.h>
+#include <google/protobuf/compiler/csharp/csharp_writer.h>
 
 using google::protobuf::internal::scoped_ptr;
 
@@ -54,9 +55,9 @@ std::string GetOutputFile(const google::protobuf::FileDescriptor* file, const st
 }
 
 void GenerateFile(const google::protobuf::FileDescriptor* file,
-                  io::Printer* printer) {
+                  Writer* writer) {
   UmbrellaClassGenerator umbrellaGenerator(file);
-  umbrellaGenerator.Generate(printer);
+  umbrellaGenerator.Generate(writer);
 }
 
 bool Generator::Generate(
@@ -82,8 +83,9 @@ bool Generator::Generate(
   scoped_ptr<io::ZeroCopyOutputStream> output(
       generator_context->Open(filename));
   io::Printer printer(output.get(), '$');
+  Writer writer(&printer);
 
-  GenerateFile(file, &printer);
+  GenerateFile(file, &writer);
 
   return true;
 }

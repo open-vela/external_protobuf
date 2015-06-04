@@ -39,6 +39,7 @@
 
 #include <google/protobuf/compiler/csharp/csharp_source_generator_base.h>
 #include <google/protobuf/compiler/csharp/csharp_helpers.h>
+#include <google/protobuf/compiler/csharp/csharp_writer.h>
 
 namespace google {
 namespace protobuf {
@@ -60,7 +61,7 @@ SourceGeneratorBase::SourceGeneratorBase(const FileDescriptor* descriptor)
 SourceGeneratorBase::~SourceGeneratorBase() {
 }
 
-void SourceGeneratorBase::WriteGeneratedCodeAttributes(io::Printer* printer) {
+void SourceGeneratorBase::WriteGeneratedCodeAttributes(Writer* writer) {
   // This hook can be used to reintroduce generated code attributes in the future.
 }
 

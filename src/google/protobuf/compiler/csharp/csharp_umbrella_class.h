@@ -48,7 +48,7 @@ class UmbrellaClassGenerator : public SourceGeneratorBase {
   UmbrellaClassGenerator(const FileDescriptor* file);
   ~UmbrellaClassGenerator();
 
-  void Generate(io::Printer* printer);
+  void Generate(Writer* write);
 
  private:
   const FileDescriptor* file_;
@@ -57,10 +57,10 @@ class UmbrellaClassGenerator : public SourceGeneratorBase {
   std::string umbrellaClassname_;
   std::string umbrellaNamespace_;
 
-  void WriteIntroduction(io::Printer* printer);
-  void WriteExtensionRegistration(io::Printer* printer);
-  void WriteDescriptor(io::Printer* printer);
-  void WriteLiteExtensions(io::Printer* printer);
+  void WriteIntroduction(Writer* writer);
+  void WriteExtensionRegistration(Writer* writer);
+  void WriteDescriptor(Writer* writer);
+  void WriteLiteExtensions(Writer* write);
 
   bool uses_extensions();
 

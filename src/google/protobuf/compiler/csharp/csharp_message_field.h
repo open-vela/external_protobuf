@@ -48,17 +48,20 @@ class MessageFieldGenerator : public FieldGeneratorBase {
   MessageFieldGenerator(const FieldDescriptor* descriptor, int fieldOrdinal);
   ~MessageFieldGenerator();
 
-  virtual void GenerateMembers(io::Printer* printer);
-  virtual void GenerateBuilderMembers(io::Printer* printer);
-  virtual void GenerateMergingCode(io::Printer* printer);
-  virtual void GenerateBuildingCode(io::Printer* printer);
-  virtual void GenerateParsingCode(io::Printer* printer);
-  virtual void GenerateSerializationCode(io::Printer* printer);
-  virtual void GenerateSerializedSizeCode(io::Printer* printer);
+  virtual void GenerateMembers(Writer* writer);
+  virtual void GenerateBuilderMembers(Writer* writer);
+  virtual void GenerateMergingCode(Writer* writer);
+  virtual void GenerateBuildingCode(Writer* writer);
+  virtual void GenerateParsingCode(Writer* writer);
+  virtual void GenerateSerializationCode(Writer* writer);
+  virtual void GenerateSerializedSizeCode(Writer* writer);
 
-  virtual void WriteHash(io::Printer* printer);
-  virtual void WriteEquals(io::Printer* printer);
-  virtual void WriteToString(io::Printer* printer);
+  virtual void WriteHash(Writer* writer);
+  virtual void WriteEquals(Writer* writer);
+  virtual void WriteToString(Writer* writer);
+
+ protected:
+  string has_property_check;
 
  private:
   GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(MessageFieldGenerator);
@@ -69,11 +72,11 @@ class MessageOneofFieldGenerator : public MessageFieldGenerator {
   MessageOneofFieldGenerator(const FieldDescriptor* descriptor, int fieldOrdinal);
   ~MessageOneofFieldGenerator();
 
-  virtual void GenerateMembers(io::Printer* printer);
-  virtual void GenerateBuilderMembers(io::Printer* printer);
-  virtual void WriteEquals(io::Printer* printer);
-  virtual void WriteToString(io::Printer* printer);
-  virtual void GenerateParsingCode(io::Printer* printer);
+  virtual void GenerateMembers(Writer* writer);
+  virtual void GenerateBuilderMembers(Writer* writer);
+  virtual void WriteEquals(Writer* writer);
+  virtual void WriteToString(Writer* writer);
+  virtual void GenerateParsingCode(Writer* writer);
 
  private:
   GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(MessageOneofFieldGenerator);

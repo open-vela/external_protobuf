@@ -40,6 +40,7 @@
 
 #include <google/protobuf/compiler/csharp/csharp_enum.h>
 #include <google/protobuf/compiler/csharp/csharp_helpers.h>
+#include <google/protobuf/compiler/csharp/csharp_writer.h>
 
 using google::protobuf::internal::scoped_ptr;
 
@@ -56,20 +57,20 @@ EnumGenerator::EnumGenerator(const EnumDescriptor* descriptor) :
 EnumGenerator::~EnumGenerator() {
 }
 
-void EnumGenerator::Generate(io::Printer* printer) {
-  WriteGeneratedCodeAttributes(printer);
-  printer->Print("$access_level$ enum $name$ {\n",
-                 "access_level", class_access_level(),
-                 "name", descriptor_->name());
-  printer->Indent();
+void EnumGenerator::Generate(Writer* writer) {
+  WriteGeneratedCodeAttributes(writer);
+  writer->WriteLine("$0$ enum $1$ {",
+                    class_access_level(),
+                    descriptor_->name());
+  writer->Indent();
   for (int i = 0; i < descriptor_->value_count(); i++) {
-    printer->Print("$name$ = $number$,\n",
-                   "name", descriptor_->value(i)->name(),
-                   "number", SimpleItoa(descriptor_->value(i)->number()));
+      writer->WriteLine("$0$ = $1$,",
+                       descriptor_->value(i)->name(),
+                       SimpleItoa(descriptor_->value(i)->number()));
   }
-  printer->Outdent();
-  printer->Print("}\n");
-  printer->Print("\n");
+  writer->Outdent();
+  writer->WriteLine("}");
+  writer->WriteLine();
 }
 
 }  // namespace csharp
