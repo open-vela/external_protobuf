@@ -41,12 +41,14 @@ namespace protobuf {
 namespace compiler {
 namespace csharp {
 
+class Writer;
+
 class EnumGenerator : public SourceGeneratorBase {
  public:
   EnumGenerator(const EnumDescriptor* descriptor);
   ~EnumGenerator();
 
-  void Generate(io::Printer* printer);
+  void Generate(Writer* writer);
 
  private:
   const EnumDescriptor* descriptor_;

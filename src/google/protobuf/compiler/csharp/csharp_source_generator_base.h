@@ -40,6 +40,8 @@ namespace protobuf {
 namespace compiler {
 namespace csharp {
 
+class Writer;
+
 class SourceGeneratorBase {
  protected:
   SourceGeneratorBase(const FileDescriptor* descriptor);
@@ -60,7 +62,7 @@ class SourceGeneratorBase {
     return runtimeSuffix_;
   }
 
-  void WriteGeneratedCodeAttributes(io::Printer* printer);
+  void WriteGeneratedCodeAttributes(Writer* writer);
 
  private:
   const FileDescriptor* descriptor_;
