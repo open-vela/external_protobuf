@@ -28,51 +28,66 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <sstream>
+// Author: kenton@google.com (Kenton Varda)
+//  Based on original Protocol Buffers design by
+//  Sanjay Ghemawat, Jeff Dean, and others.
 
-#include <google/protobuf/compiler/code_generator.h>
-#include <google/protobuf/compiler/plugin.h>
-#include <google/protobuf/descriptor.h>
+#ifndef GOOGLE_PROTOBUF_COMPILER_CSHARP_WRITER_H__
+#define GOOGLE_PROTOBUF_COMPILER_CSHARP_WRITER_H__
+
+#include <string>
 #include <google/protobuf/descriptor.pb.h>
+#include <google/protobuf/descriptor.h>
+#include <google/protobuf/compiler/code_generator.h>
 #include <google/protobuf/io/printer.h>
-#include <google/protobuf/io/zero_copy_stream.h>
-#include <google/protobuf/stubs/strutil.h>
-
-#include <google/protobuf/compiler/csharp/csharp_enum.h>
-#include <google/protobuf/compiler/csharp/csharp_helpers.h>
-
-using google::protobuf::internal::scoped_ptr;
 
 namespace google {
 namespace protobuf {
 namespace compiler {
 namespace csharp {
 
-EnumGenerator::EnumGenerator(const EnumDescriptor* descriptor) :
-    SourceGeneratorBase(descriptor->file()),
-    descriptor_(descriptor) {
-}
+// Simple wrapper around Printer that supports customizable line endings
+// and number-based variables (e.g. $0$).
+class Writer {
+ public:
+  Writer(io::Printer* printer);
+  ~Writer();
 
-EnumGenerator::~EnumGenerator() {
-}
+  void Indent();
+  void Outdent();
 
-void EnumGenerator::Generate(io::Printer* printer) {
-  WriteGeneratedCodeAttributes(printer);
-  printer->Print("$access_level$ enum $name$ {\n",
-                 "access_level", class_access_level(),
-                 "name", descriptor_->name());
-  printer->Indent();
-  for (int i = 0; i < descriptor_->value_count(); i++) {
-    printer->Print("$name$ = $number$,\n",
-                   "name", descriptor_->value(i)->name(),
-                   "number", SimpleItoa(descriptor_->value(i)->number()));
-  }
-  printer->Outdent();
-  printer->Print("}\n");
-  printer->Print("\n");
-}
+  void Write(const char* text);
+
+  void Write(const char* text, const string& value0);
+
+  void Write(const char* text, const string& value0, const string& value1);
+
+  void Write(const char* text, const string& value0, const string& value1,
+             const string& value2);
+
+  void Write(const char* text, const string& value0, const string& value1,
+             const string& value2, const string& value3);
+
+  void WriteLine();
+
+  void WriteLine(const char* text);
+
+  void WriteLine(const char* text, const string& value0);
+
+  void WriteLine(const char* text, const string& value0, const string& value1);
+
+  void WriteLine(const char* text, const string& value0, const string& value1,
+                 const string& value2);
+
+  void WriteLine(const char* text, const string& value0, const string& value1,
+                 const string& value2, const string& value3);
+ private:
+  io::Printer* printer_;
+  const char* newline_;
+};
 
 }  // namespace csharp
 }  // namespace compiler
 }  // namespace protobuf
 }  // namespace google
+#endif  // GOOGLE_PROTOBUF_COMPILER_CSHARP_WRITER_H__
