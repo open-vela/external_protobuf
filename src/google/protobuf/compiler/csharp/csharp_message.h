@@ -43,6 +43,7 @@ namespace protobuf {
 namespace compiler {
 namespace csharp {
 
+class Writer;
 class FieldGeneratorBase;
 
 class MessageGenerator : public SourceGeneratorBase {
@@ -52,6 +53,7 @@ class MessageGenerator : public SourceGeneratorBase {
 
   void GenerateStaticVariables(io::Printer* printer);
   void GenerateStaticVariableInitializers(io::Printer* printer);
+  void GenerateExtensionRegistrationCode(io::Printer* printer);
   void Generate(io::Printer* printer);
 
  private:
@@ -59,8 +61,17 @@ class MessageGenerator : public SourceGeneratorBase {
   std::vector<std::string> field_names_;
   std::vector<const FieldDescriptor*> fields_by_number_;
 
+  void GenerateLiteRuntimeMethods(io::Printer* printer);
   void GenerateMessageSerializationMethods(io::Printer* printer);
-  void GenerateMergingMethods(io::Printer* printer);
+  void GenerateSerializeOneField(io::Printer* printer,
+                                 const FieldDescriptor* fieldDescriptor);
+  void GenerateSerializeOneExtensionRange(
+      io::Printer* printer, const Descriptor::ExtensionRange* extendsionRange);
+  void GenerateParseFromMethods(io::Printer* printer);
+  void GenerateBuilder(io::Printer* printer);
+  void GenerateCommonBuilderMethods(io::Printer* printer);
+  void GenerateBuilderParsingMethods(io::Printer* printer);
+  void GenerateIsInitialized(io::Printer* printer);
 
   int GetFieldOrdinal(const FieldDescriptor* descriptor);
   FieldGeneratorBase* CreateFieldGeneratorInternal(
@@ -84,3 +95,4 @@ class MessageGenerator : public SourceGeneratorBase {
 }  // namespace google
 
 #endif  // GOOGLE_PROTOBUF_COMPILER_CSHARP_MESSAGE_H__
+

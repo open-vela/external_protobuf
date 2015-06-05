@@ -28,51 +28,51 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <sstream>
+#ifndef GOOGLE_PROTOBUF_COMPILER_CSHARP_EXTENSION_H__
+#define GOOGLE_PROTOBUF_COMPILER_CSHARP_EXTENSION_H__
+
+#include <string>
 
 #include <google/protobuf/compiler/code_generator.h>
-#include <google/protobuf/compiler/plugin.h>
-#include <google/protobuf/descriptor.h>
-#include <google/protobuf/descriptor.pb.h>
-#include <google/protobuf/io/printer.h>
-#include <google/protobuf/io/zero_copy_stream.h>
-#include <google/protobuf/stubs/strutil.h>
-
-#include <google/protobuf/compiler/csharp/csharp_enum.h>
-#include <google/protobuf/compiler/csharp/csharp_helpers.h>
-
-using google::protobuf::internal::scoped_ptr;
+#include <google/protobuf/compiler/csharp/csharp_field_base.h>
 
 namespace google {
 namespace protobuf {
 namespace compiler {
 namespace csharp {
 
-EnumGenerator::EnumGenerator(const EnumDescriptor* descriptor) :
-    SourceGeneratorBase(descriptor->file()),
-    descriptor_(descriptor) {
-}
+class ExtensionGenerator : public FieldGeneratorBase {
+ public:
+  ExtensionGenerator(const FieldDescriptor* descriptor);
+  ~ExtensionGenerator();
 
-EnumGenerator::~EnumGenerator() {
-}
+  void GenerateStaticVariableInitializers(io::Printer* printer);
+  void GenerateExtensionRegistrationCode(io::Printer* printer);
+  void Generate(io::Printer* printer);
 
-void EnumGenerator::Generate(io::Printer* printer) {
-  WriteGeneratedCodeAttributes(printer);
-  printer->Print("$access_level$ enum $name$ {\n",
-                 "access_level", class_access_level(),
-                 "name", descriptor_->name());
-  printer->Indent();
-  for (int i = 0; i < descriptor_->value_count(); i++) {
-    printer->Print("$name$ = $number$,\n",
-                   "name", descriptor_->value(i)->name(),
-                   "number", SimpleItoa(descriptor_->value(i)->number()));
-  }
-  printer->Outdent();
-  printer->Print("}\n");
-  printer->Print("\n");
-}
+  virtual void WriteHash(io::Printer* printer);
+  virtual void WriteEquals(io::Printer* printer);
+  virtual void WriteToString(io::Printer* printer);
+
+  virtual void GenerateMembers(io::Printer* printer) {};
+  virtual void GenerateBuilderMembers(io::Printer* printer) {};
+  virtual void GenerateMergingCode(io::Printer* printer) {};
+  virtual void GenerateBuildingCode(io::Printer* printer) {};
+  virtual void GenerateParsingCode(io::Printer* printer) {};
+  virtual void GenerateSerializationCode(io::Printer* printer) {};
+  virtual void GenerateSerializedSizeCode(io::Printer* printer) {};
+
+ private:
+  std::string scope_;
+  std::string extends_;
+
+  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(ExtensionGenerator);
+};
 
 }  // namespace csharp
 }  // namespace compiler
 }  // namespace protobuf
 }  // namespace google
+
+#endif  // GOOGLE_PROTOBUF_COMPILER_CSHARP_EXTENSION_H__
+
