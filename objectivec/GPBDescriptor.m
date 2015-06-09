@@ -369,26 +369,16 @@ uint32_t GPBFieldTag(GPBFieldDescriptor *self) {
   GPBWireFormat format;
   if ((description->flags & GPBFieldMapKeyMask) != 0) {
     // Maps are repeated messages on the wire.
-    format = GPBWireFormatForType(GPBDataTypeMessage, NO);
+    format = GPBWireFormatForType(GPBTypeMessage, NO);
   } else {
-    format = GPBWireFormatForType(description->dataType,
-                                  ((description->flags & GPBFieldPacked) != 0));
+    format = GPBWireFormatForType(description->type,
+                                  description->flags & GPBFieldPacked);
   }
   return GPBWireFormatMakeTag(description->number, format);
 }
 
-uint32_t GPBFieldAlternateTag(GPBFieldDescriptor *self) {
-  GPBMessageFieldDescription *description = self->description_;
-  NSCAssert((description->flags & GPBFieldRepeated) != 0,
-            @"Only valid on repeated fields");
-  GPBWireFormat format =
-      GPBWireFormatForType(description->dataType,
-                           ((description->flags & GPBFieldPacked) == 0));
-  return GPBWireFormatMakeTag(description->number, format);
-}
-
 @implementation GPBFieldDescriptor {
-  GPBGenericValue defaultValue_;
+  GPBValue defaultValue_;
   GPBFieldOptions *fieldOptions_;
 
   // Message ivars
@@ -426,66 +416,12 @@ uint32_t GPBFieldAlternateTag(GPBFieldDescriptor *self) {
     getSel_ = sel_getUid(description->name);
     setSel_ = SelFromStrings("set", description->name, NULL, YES);
 
-    GPBDataType dataType = description->dataType;
-    BOOL isMessage = GPBDataTypeIsMessage(dataType);
-    BOOL isMapOrArray = GPBFieldIsMapOrArray(self);
-
-    if (isMapOrArray) {
-      // map<>/repeated fields get a *Count property (inplace of a has*) to
-      // support checking if there are any entries without triggering
-      // autocreation.
-      hasOrCountSel_ = SelFromStrings(NULL, description->name, "_Count", NO);
-    } else {
-      // If there is a positive hasIndex, then:
-      //   - All fields types for proto2 messages get has* selectors.
-      //   - Only message fields for proto3 messages get has* selectors.
-      // Note: the positive check is to handle oneOfs, we can't check
-      // containingOneof_ because it isn't set until after initialization.
-      if ((description->hasIndex >= 0) &&
-          (description->hasIndex != GPBNoHasBit) &&
-          ((syntax != GPBFileSyntaxProto3) || isMessage)) {
-        hasOrCountSel_ = SelFromStrings("has", description->name, NULL, NO);
-        setHasSel_ = SelFromStrings("setHas", description->name, NULL, YES);
-      }
-    }
-
-    // Extra type specific data.
-    if (isMessage) {
-      const char *className = description->dataTypeSpecific.className;
-      msgClass_ = objc_getClass(className);
-      NSAssert(msgClass_, @"Class %s not defined", className);
-    } else if (dataType == GPBDataTypeEnum) {
-      if ((description_->flags & GPBFieldHasEnumDescriptor) != 0) {
-        enumHandling_.enumDescriptor_ =
-            description->dataTypeSpecific.enumDescFunc();
-      } else {
-        enumHandling_.enumVerifier_ =
-            description->dataTypeSpecific.enumVerifier;
-      }
-    }
-
-    // Non map<>/repeated fields can have defaults.
-    if (!isMapOrArray) {
-      defaultValue_ = description->defaultValue;
-      if (dataType == GPBDataTypeBytes) {
-        // Data stored as a length prefixed (network byte order) c-string in
-        // descriptor structure.
-        const uint8_t *bytes = (const uint8_t *)defaultValue_.valueData;
-        if (bytes) {
-          uint32_t length = *((uint32_t *)bytes);
-          length = ntohl(length);
-          bytes += sizeof(length);
-          defaultValue_.valueData =
-              [[NSData alloc] initWithBytes:bytes length:length];
-        }
-      }
-    }
-
-    // FieldOptions stored as a length prefixed (network byte order) c-escaped
-    // string in descriptor records.
     if (description->fieldOptions) {
+      // FieldOptions stored as a length prefixed c-escaped string in descriptor
+      // records.
       uint8_t *optionsBytes = (uint8_t *)description->fieldOptions;
       uint32_t optionsLength = *((uint32_t *)optionsBytes);
+      // The length is stored in network byte order.
       optionsLength = ntohl(optionsLength);
       if (optionsLength > 0) {
         optionsBytes += sizeof(optionsLength);
@@ -498,20 +434,69 @@ uint32_t GPBFieldAlternateTag(GPBFieldDescriptor *self) {
                                                   error:NULL] retain];
       }
     }
+
+    GPBType type = description->type;
+    BOOL isMessage = GPBTypeIsMessage(type);
+    if (isMessage) {
+      // No has* for repeated/map or something in a oneof (we can't check
+      // containingOneof_ because it isn't set until after initialization).
+      if ((description->hasIndex >= 0) &&
+          (description->hasIndex != GPBNoHasBit)) {
+        hasSel_ = SelFromStrings("has", description->name, NULL, NO);
+        setHasSel_ = SelFromStrings("setHas", description->name, NULL, YES);
+      }
+      const char *className = description->typeSpecific.className;
+      msgClass_ = objc_getClass(className);
+      NSAssert1(msgClass_, @"Class %s not defined", className);
+      // The defaultValue_ is fetched directly in -defaultValue to avoid
+      // initialization order issues.
+    } else {
+      if (!GPBFieldIsMapOrArray(self)) {
+        defaultValue_ = description->defaultValue;
+        if (type == GPBTypeData) {
+          // Data stored as a length prefixed c-string in descriptor records.
+          const uint8_t *bytes = (const uint8_t *)defaultValue_.valueData;
+          if (bytes) {
+            uint32_t length = *((uint32_t *)bytes);
+            // The length is stored in network byte order.
+            length = ntohl(length);
+            bytes += sizeof(length);
+            defaultValue_.valueData =
+                [[NSData alloc] initWithBytes:bytes length:length];
+          }
+        }
+        // No has* methods for proto3 or if our hasIndex is < 0 because it
+        // means the field is in a oneof (we can't check containingOneof_
+        // because it isn't set until after initialization).
+        if ((syntax != GPBFileSyntaxProto3) && (description->hasIndex >= 0) &&
+            (description->hasIndex != GPBNoHasBit)) {
+          hasSel_ = SelFromStrings("has", description->name, NULL, NO);
+          setHasSel_ = SelFromStrings("setHas", description->name, NULL, YES);
+        }
+      }
+      if (GPBTypeIsEnum(type)) {
+        if (description_->flags & GPBFieldHasEnumDescriptor) {
+          enumHandling_.enumDescriptor_ =
+              description->typeSpecific.enumDescFunc();
+        } else {
+          enumHandling_.enumVerifier_ = description->typeSpecific.enumVerifier;
+        }
+      }
+    }
   }
   return self;
 }
 
 - (void)dealloc {
-  if (description_->dataType == GPBDataTypeBytes &&
+  if (description_->type == GPBTypeData &&
       !(description_->flags & GPBFieldRepeated)) {
     [defaultValue_.valueData release];
   }
   [super dealloc];
 }
 
-- (GPBDataType)dataType {
-  return description_->dataType;
+- (GPBType)type {
+  return description_->type;
 }
 
 - (BOOL)hasDefaultValue {
@@ -545,36 +530,36 @@ uint32_t GPBFieldAlternateTag(GPBFieldDescriptor *self) {
   }
 }
 
-- (GPBDataType)mapKeyDataType {
+- (GPBType)mapKeyType {
   switch (description_->flags & GPBFieldMapKeyMask) {
     case GPBFieldMapKeyInt32:
-      return GPBDataTypeInt32;
+      return GPBTypeInt32;
     case GPBFieldMapKeyInt64:
-      return GPBDataTypeInt64;
+      return GPBTypeInt64;
     case GPBFieldMapKeyUInt32:
-      return GPBDataTypeUInt32;
+      return GPBTypeUInt32;
     case GPBFieldMapKeyUInt64:
-      return GPBDataTypeUInt64;
+      return GPBTypeUInt64;
     case GPBFieldMapKeySInt32:
-      return GPBDataTypeSInt32;
+      return GPBTypeSInt32;
     case GPBFieldMapKeySInt64:
-      return GPBDataTypeSInt64;
+      return GPBTypeSInt64;
     case GPBFieldMapKeyFixed32:
-      return GPBDataTypeFixed32;
+      return GPBTypeFixed32;
     case GPBFieldMapKeyFixed64:
-      return GPBDataTypeFixed64;
+      return GPBTypeFixed64;
     case GPBFieldMapKeySFixed32:
-      return GPBDataTypeSFixed32;
+      return GPBTypeSFixed32;
     case GPBFieldMapKeySFixed64:
-      return GPBDataTypeSFixed64;
+      return GPBTypeSFixed64;
     case GPBFieldMapKeyBool:
-      return GPBDataTypeBool;
+      return GPBTypeBool;
     case GPBFieldMapKeyString:
-      return GPBDataTypeString;
+      return GPBTypeString;
 
     default:
       NSAssert(0, @"Not a map type");
-      return GPBDataTypeInt32;  // For lack of anything better.
+      return GPBTypeInt32;  // For lack of anything better.
   }
 }
 
@@ -583,8 +568,8 @@ uint32_t GPBFieldAlternateTag(GPBFieldDescriptor *self) {
 }
 
 - (BOOL)isValidEnumValue:(int32_t)value {
-  NSAssert(description_->dataType == GPBDataTypeEnum,
-           @"Field Must be of type GPBDataTypeEnum");
+  NSAssert(description_->type == GPBTypeEnum,
+           @"Field Must be of type GPBTypeEnum");
   if (description_->flags & GPBFieldHasEnumDescriptor) {
     return enumHandling_.enumDescriptor_.enumVerifier(value);
   } else {
@@ -600,18 +585,18 @@ uint32_t GPBFieldAlternateTag(GPBFieldDescriptor *self) {
   }
 }
 
-- (GPBGenericValue)defaultValue {
+- (GPBValue)defaultValue {
   // Depends on the fact that defaultValue_ is initialized either to "0/nil" or
   // to an actual defaultValue in our initializer.
-  GPBGenericValue value = defaultValue_;
+  GPBValue value = defaultValue_;
 
   if (!(description_->flags & GPBFieldRepeated)) {
     // We special handle data and strings. If they are nil, we replace them
     // with empty string/empty data.
-    GPBDataType type = description_->dataType;
-    if (type == GPBDataTypeBytes && value.valueData == nil) {
+    GPBType type = description_->type;
+    if (type == GPBTypeData && value.valueData == nil) {
       value.valueData = GPBEmptyNSData();
-    } else if (type == GPBDataTypeString && value.valueString == nil) {
+    } else if (type == GPBTypeString && value.valueString == nil) {
       value.valueString = @"";
     }
   }
@@ -650,7 +635,7 @@ uint32_t GPBFieldAlternateTag(GPBFieldDescriptor *self) {
   }
 
   // Groups vs. other fields.
-  if (description_->dataType == GPBDataTypeGroup) {
+  if (description_->type == GPBTypeGroup) {
     // Just capitalize the first letter.
     unichar firstChar = [name characterAtIndex:0];
     if (firstChar >= 'a' && firstChar <= 'z') {
@@ -826,68 +811,14 @@ uint32_t GPBFieldAlternateTag(GPBFieldDescriptor *self) {
 
 @end
 
-@implementation GPBExtensionDescriptor {
-  GPBGenericValue defaultValue_;
-}
-
-@synthesize containingMessageClass = containingMessageClass_;
+@implementation GPBExtensionDescriptor
 
 - (instancetype)initWithExtensionDescription:
         (GPBExtensionDescription *)description {
   if ((self = [super init])) {
     description_ = description;
-
-#if DEBUG
-    const char *className = description->messageOrGroupClassName;
-    if (className) {
-      NSAssert(objc_lookUpClass(className) != Nil,
-               @"Class %s not defined", className);
-    }
-#endif
-
-    if (description->extendedClass) {
-      Class containingClass = objc_lookUpClass(description->extendedClass);
-      NSAssert(containingClass, @"Class %s not defined",
-               description->extendedClass);
-      containingMessageClass_ = containingClass;
-    }
-
-    GPBDataType type = description_->dataType;
-    if (type == GPBDataTypeBytes) {
-      // Data stored as a length prefixed c-string in descriptor records.
-      const uint8_t *bytes =
-          (const uint8_t *)description->defaultValue.valueData;
-      if (bytes) {
-        uint32_t length = *((uint32_t *)bytes);
-        // The length is stored in network byte order.
-        length = ntohl(length);
-        bytes += sizeof(length);
-        defaultValue_.valueData =
-            [[NSData alloc] initWithBytes:bytes length:length];
-      }
-    } else if (type == GPBDataTypeMessage || type == GPBDataTypeGroup) {
-      // The default is looked up in -defaultValue instead since extensions
-      // aren't common, we avoid the hit startup hit and it avoid initialization
-      // order issues.
-    } else {
-      defaultValue_ = description->defaultValue;
-    }
   }
   return self;
-}
-
-- (void)dealloc {
-  if ((description_->dataType == GPBDataTypeBytes) &&
-      !GPBExtensionIsRepeated(description_)) {
-    [defaultValue_.valueData release];
-  }
-  [super dealloc];
-}
-
-- (instancetype)copyWithZone:(NSZone *)zone {
-#pragma unused(zone)
-  // Immutable.
-  return [self retain];
 }
 
 - (NSString *)singletonName {
@@ -902,24 +833,12 @@ uint32_t GPBFieldAlternateTag(GPBFieldDescriptor *self) {
   return description_->fieldNumber;
 }
 
-- (GPBDataType)dataType {
-  return description_->dataType;
-}
-
-- (GPBWireFormat)wireType {
-  return GPBWireFormatForType(description_->dataType,
-                              GPBExtensionIsPacked(description_));
-}
-
-- (GPBWireFormat)alternateWireType {
-  NSAssert(GPBExtensionIsRepeated(description_),
-           @"Only valid on repeated extensions");
-  return GPBWireFormatForType(description_->dataType,
-                              !GPBExtensionIsPacked(description_));
+- (GPBType)type {
+  return description_->type;
 }
 
 - (BOOL)isRepeated {
-  return GPBExtensionIsRepeated(description_);
+  return (description_->options & GPBExtensionRepeated) != 0;
 }
 
 - (BOOL)isMap {
@@ -927,7 +846,7 @@ uint32_t GPBFieldAlternateTag(GPBFieldDescriptor *self) {
 }
 
 - (BOOL)isPackable {
-  return GPBExtensionIsPacked(description_);
+  return (description_->options & GPBExtensionPacked) != 0;
 }
 
 - (Class)msgClass {
@@ -935,63 +854,11 @@ uint32_t GPBFieldAlternateTag(GPBFieldDescriptor *self) {
 }
 
 - (GPBEnumDescriptor *)enumDescriptor {
-  if (description_->dataType == GPBDataTypeEnum) {
+  if (GPBTypeIsEnum(description_->type)) {
     GPBEnumDescriptor *enumDescriptor = description_->enumDescriptorFunc();
     return enumDescriptor;
   }
   return nil;
-}
-
-- (id)defaultValue {
-  if (GPBExtensionIsRepeated(description_)) {
-    return nil;
-  }
-
-  switch (description_->dataType) {
-    case GPBDataTypeBool:
-      return @(defaultValue_.valueBool);
-    case GPBDataTypeFloat:
-      return @(defaultValue_.valueFloat);
-    case GPBDataTypeDouble:
-      return @(defaultValue_.valueDouble);
-    case GPBDataTypeInt32:
-    case GPBDataTypeSInt32:
-    case GPBDataTypeEnum:
-    case GPBDataTypeSFixed32:
-      return @(defaultValue_.valueInt32);
-    case GPBDataTypeInt64:
-    case GPBDataTypeSInt64:
-    case GPBDataTypeSFixed64:
-      return @(defaultValue_.valueInt64);
-    case GPBDataTypeUInt32:
-    case GPBDataTypeFixed32:
-      return @(defaultValue_.valueUInt32);
-    case GPBDataTypeUInt64:
-    case GPBDataTypeFixed64:
-      return @(defaultValue_.valueUInt64);
-    case GPBDataTypeBytes:
-      // Like message fields, the default is zero length data.
-      return (defaultValue_.valueData ? defaultValue_.valueData
-                                      : GPBEmptyNSData());
-    case GPBDataTypeString:
-      // Like message fields, the default is zero length string.
-      return (defaultValue_.valueString ? defaultValue_.valueString : @"");
-    case GPBDataTypeGroup:
-    case GPBDataTypeMessage:
-      return nil;
-  }
-}
-
-- (NSComparisonResult)compareByFieldNumber:(GPBExtensionDescriptor *)other {
-  int32_t selfNumber = description_->fieldNumber;
-  int32_t otherNumber = other->description_->fieldNumber;
-  if (selfNumber < otherNumber) {
-    return NSOrderedAscending;
-  } else if (selfNumber == otherNumber) {
-    return NSOrderedSame;
-  } else {
-    return NSOrderedDescending;
-  }
 }
 
 @end

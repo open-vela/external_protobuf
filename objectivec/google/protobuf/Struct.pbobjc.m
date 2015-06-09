@@ -11,14 +11,11 @@
 
 @end
 
-#pragma mark - GPBStructRoot_FileDescriptor
-
 static GPBFileDescriptor *GPBStructRoot_FileDescriptor(void) {
   // This is called by +initialize so there is no need to worry
   // about thread safety of the singleton.
   static GPBFileDescriptor *descriptor = NULL;
   if (!descriptor) {
-    GPBDebugCheckRuntimeVersion();
     descriptor = [[GPBFileDescriptor alloc] initWithPackage:@"google.protobuf"
                                                      syntax:GPBFileSyntaxProto3];
   }
@@ -54,17 +51,17 @@ BOOL GPBNullValue_IsValidValue(int32_t value__) {
 
 @implementation GPBStruct
 
-@dynamic fields, fields_Count;
+@dynamic fields;
 
-typedef struct GPBStruct__storage_ {
+typedef struct GPBStruct_Storage {
   uint32_t _has_storage_[1];
   NSMutableDictionary *fields;
-} GPBStruct__storage_;
+} GPBStruct_Storage;
 
 // This method is threadsafe because it is initially called
 // in +initialize for each subclass.
 + (GPBDescriptor *)descriptor {
-  static GPBDescriptor *descriptor = nil;
+  static GPBDescriptor *descriptor = NULL;
   if (!descriptor) {
     static GPBMessageFieldDescription fields[] = {
       {
@@ -72,29 +69,26 @@ typedef struct GPBStruct__storage_ {
         .number = GPBStruct_FieldNumber_Fields,
         .hasIndex = GPBNoHasBit,
         .flags = GPBFieldMapKeyString,
-        .dataType = GPBDataTypeMessage,
-        .offset = offsetof(GPBStruct__storage_, fields),
+        .type = GPBTypeMessage,
+        .offset = offsetof(GPBStruct_Storage, fields),
         .defaultValue.valueMessage = nil,
-        .dataTypeSpecific.className = GPBStringifySymbol(GPBValue),
+        .typeSpecific.className = GPBStringifySymbol(GPBValue),
         .fieldOptions = NULL,
       },
     };
-    GPBDescriptor *localDescriptor =
-        [GPBDescriptor allocDescriptorForClass:[GPBStruct class]
-                                     rootClass:[GPBStructRoot class]
-                                          file:GPBStructRoot_FileDescriptor()
-                                        fields:fields
-                                    fieldCount:sizeof(fields) / sizeof(GPBMessageFieldDescription)
-                                        oneofs:NULL
-                                    oneofCount:0
-                                         enums:NULL
-                                     enumCount:0
-                                        ranges:NULL
-                                    rangeCount:0
-                                   storageSize:sizeof(GPBStruct__storage_)
-                                    wireFormat:NO];
-    NSAssert(descriptor == nil, @"Startup recursed!");
-    descriptor = localDescriptor;
+    descriptor = [GPBDescriptor allocDescriptorForClass:[GPBStruct class]
+                                              rootClass:[GPBStructRoot class]
+                                                   file:GPBStructRoot_FileDescriptor()
+                                                 fields:fields
+                                             fieldCount:sizeof(fields) / sizeof(GPBMessageFieldDescription)
+                                                 oneofs:NULL
+                                             oneofCount:0
+                                                  enums:NULL
+                                              enumCount:0
+                                                 ranges:NULL
+                                             rangeCount:0
+                                            storageSize:sizeof(GPBStruct_Storage)
+                                             wireFormat:NO];
   }
   return descriptor;
 }
@@ -113,7 +107,7 @@ typedef struct GPBStruct__storage_ {
 @dynamic structValue;
 @dynamic listValue;
 
-typedef struct GPBValue__storage_ {
+typedef struct GPBValue_Storage {
   uint32_t _has_storage_[2];
   BOOL boolValue;
   GPBNullValue nullValue;
@@ -121,12 +115,12 @@ typedef struct GPBValue__storage_ {
   GPBStruct *structValue;
   GPBListValue *listValue;
   double numberValue;
-} GPBValue__storage_;
+} GPBValue_Storage;
 
 // This method is threadsafe because it is initially called
 // in +initialize for each subclass.
 + (GPBDescriptor *)descriptor {
-  static GPBDescriptor *descriptor = nil;
+  static GPBDescriptor *descriptor = NULL;
   if (!descriptor) {
     static GPBMessageOneofDescription oneofs[] = {
       {
@@ -140,10 +134,10 @@ typedef struct GPBValue__storage_ {
         .number = GPBValue_FieldNumber_NullValue,
         .hasIndex = -1,
         .flags = GPBFieldOptional | GPBFieldHasEnumDescriptor,
-        .dataType = GPBDataTypeEnum,
-        .offset = offsetof(GPBValue__storage_, nullValue),
+        .type = GPBTypeEnum,
+        .offset = offsetof(GPBValue_Storage, nullValue),
         .defaultValue.valueEnum = GPBNullValue_NullValue,
-        .dataTypeSpecific.enumDescFunc = GPBNullValue_EnumDescriptor,
+        .typeSpecific.enumDescFunc = GPBNullValue_EnumDescriptor,
         .fieldOptions = NULL,
       },
       {
@@ -151,10 +145,10 @@ typedef struct GPBValue__storage_ {
         .number = GPBValue_FieldNumber_NumberValue,
         .hasIndex = -1,
         .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeDouble,
-        .offset = offsetof(GPBValue__storage_, numberValue),
+        .type = GPBTypeDouble,
+        .offset = offsetof(GPBValue_Storage, numberValue),
         .defaultValue.valueDouble = 0,
-        .dataTypeSpecific.className = NULL,
+        .typeSpecific.className = NULL,
         .fieldOptions = NULL,
       },
       {
@@ -162,10 +156,10 @@ typedef struct GPBValue__storage_ {
         .number = GPBValue_FieldNumber_StringValue,
         .hasIndex = -1,
         .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeString,
-        .offset = offsetof(GPBValue__storage_, stringValue),
+        .type = GPBTypeString,
+        .offset = offsetof(GPBValue_Storage, stringValue),
         .defaultValue.valueString = nil,
-        .dataTypeSpecific.className = NULL,
+        .typeSpecific.className = NULL,
         .fieldOptions = NULL,
       },
       {
@@ -173,10 +167,10 @@ typedef struct GPBValue__storage_ {
         .number = GPBValue_FieldNumber_BoolValue,
         .hasIndex = -1,
         .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeBool,
-        .offset = offsetof(GPBValue__storage_, boolValue),
+        .type = GPBTypeBool,
+        .offset = offsetof(GPBValue_Storage, boolValue),
         .defaultValue.valueBool = NO,
-        .dataTypeSpecific.className = NULL,
+        .typeSpecific.className = NULL,
         .fieldOptions = NULL,
       },
       {
@@ -184,10 +178,10 @@ typedef struct GPBValue__storage_ {
         .number = GPBValue_FieldNumber_StructValue,
         .hasIndex = -1,
         .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeMessage,
-        .offset = offsetof(GPBValue__storage_, structValue),
+        .type = GPBTypeMessage,
+        .offset = offsetof(GPBValue_Storage, structValue),
         .defaultValue.valueMessage = nil,
-        .dataTypeSpecific.className = GPBStringifySymbol(GPBStruct),
+        .typeSpecific.className = GPBStringifySymbol(GPBStruct),
         .fieldOptions = NULL,
       },
       {
@@ -195,29 +189,26 @@ typedef struct GPBValue__storage_ {
         .number = GPBValue_FieldNumber_ListValue,
         .hasIndex = -1,
         .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeMessage,
-        .offset = offsetof(GPBValue__storage_, listValue),
+        .type = GPBTypeMessage,
+        .offset = offsetof(GPBValue_Storage, listValue),
         .defaultValue.valueMessage = nil,
-        .dataTypeSpecific.className = GPBStringifySymbol(GPBListValue),
+        .typeSpecific.className = GPBStringifySymbol(GPBListValue),
         .fieldOptions = NULL,
       },
     };
-    GPBDescriptor *localDescriptor =
-        [GPBDescriptor allocDescriptorForClass:[GPBValue class]
-                                     rootClass:[GPBStructRoot class]
-                                          file:GPBStructRoot_FileDescriptor()
-                                        fields:fields
-                                    fieldCount:sizeof(fields) / sizeof(GPBMessageFieldDescription)
-                                        oneofs:oneofs
-                                    oneofCount:sizeof(oneofs) / sizeof(GPBMessageOneofDescription)
-                                         enums:NULL
-                                     enumCount:0
-                                        ranges:NULL
-                                    rangeCount:0
-                                   storageSize:sizeof(GPBValue__storage_)
-                                    wireFormat:NO];
-    NSAssert(descriptor == nil, @"Startup recursed!");
-    descriptor = localDescriptor;
+    descriptor = [GPBDescriptor allocDescriptorForClass:[GPBValue class]
+                                              rootClass:[GPBStructRoot class]
+                                                   file:GPBStructRoot_FileDescriptor()
+                                                 fields:fields
+                                             fieldCount:sizeof(fields) / sizeof(GPBMessageFieldDescription)
+                                                 oneofs:oneofs
+                                             oneofCount:sizeof(oneofs) / sizeof(GPBMessageOneofDescription)
+                                                  enums:NULL
+                                              enumCount:0
+                                                 ranges:NULL
+                                             rangeCount:0
+                                            storageSize:sizeof(GPBValue_Storage)
+                                             wireFormat:NO];
   }
   return descriptor;
 }
@@ -227,7 +218,7 @@ typedef struct GPBValue__storage_ {
 int32_t GPBValue_NullValue_RawValue(GPBValue *message) {
   GPBDescriptor *descriptor = [GPBValue descriptor];
   GPBFieldDescriptor *field = [descriptor fieldWithNumber:GPBValue_FieldNumber_NullValue];
-  return GPBGetMessageInt32Field(message, field);
+  return GPBGetInt32IvarWithField(message, field);
 }
 
 void SetGPBValue_NullValue_RawValue(GPBValue *message, int32_t value) {
@@ -245,17 +236,17 @@ void GPBValue_ClearKindOneOfCase(GPBValue *message) {
 
 @implementation GPBListValue
 
-@dynamic valuesArray, valuesArray_Count;
+@dynamic valuesArray;
 
-typedef struct GPBListValue__storage_ {
+typedef struct GPBListValue_Storage {
   uint32_t _has_storage_[1];
   NSMutableArray *valuesArray;
-} GPBListValue__storage_;
+} GPBListValue_Storage;
 
 // This method is threadsafe because it is initially called
 // in +initialize for each subclass.
 + (GPBDescriptor *)descriptor {
-  static GPBDescriptor *descriptor = nil;
+  static GPBDescriptor *descriptor = NULL;
   if (!descriptor) {
     static GPBMessageFieldDescription fields[] = {
       {
@@ -263,29 +254,26 @@ typedef struct GPBListValue__storage_ {
         .number = GPBListValue_FieldNumber_ValuesArray,
         .hasIndex = GPBNoHasBit,
         .flags = GPBFieldRepeated,
-        .dataType = GPBDataTypeMessage,
-        .offset = offsetof(GPBListValue__storage_, valuesArray),
+        .type = GPBTypeMessage,
+        .offset = offsetof(GPBListValue_Storage, valuesArray),
         .defaultValue.valueMessage = nil,
-        .dataTypeSpecific.className = GPBStringifySymbol(GPBValue),
+        .typeSpecific.className = GPBStringifySymbol(GPBValue),
         .fieldOptions = NULL,
       },
     };
-    GPBDescriptor *localDescriptor =
-        [GPBDescriptor allocDescriptorForClass:[GPBListValue class]
-                                     rootClass:[GPBStructRoot class]
-                                          file:GPBStructRoot_FileDescriptor()
-                                        fields:fields
-                                    fieldCount:sizeof(fields) / sizeof(GPBMessageFieldDescription)
-                                        oneofs:NULL
-                                    oneofCount:0
-                                         enums:NULL
-                                     enumCount:0
-                                        ranges:NULL
-                                    rangeCount:0
-                                   storageSize:sizeof(GPBListValue__storage_)
-                                    wireFormat:NO];
-    NSAssert(descriptor == nil, @"Startup recursed!");
-    descriptor = localDescriptor;
+    descriptor = [GPBDescriptor allocDescriptorForClass:[GPBListValue class]
+                                              rootClass:[GPBStructRoot class]
+                                                   file:GPBStructRoot_FileDescriptor()
+                                                 fields:fields
+                                             fieldCount:sizeof(fields) / sizeof(GPBMessageFieldDescription)
+                                                 oneofs:NULL
+                                             oneofCount:0
+                                                  enums:NULL
+                                              enumCount:0
+                                                 ranges:NULL
+                                             rangeCount:0
+                                            storageSize:sizeof(GPBListValue_Storage)
+                                             wireFormat:NO];
   }
   return descriptor;
 }

@@ -11,14 +11,11 @@
 
 @end
 
-#pragma mark - GPBDurationRoot_FileDescriptor
-
 static GPBFileDescriptor *GPBDurationRoot_FileDescriptor(void) {
   // This is called by +initialize so there is no need to worry
   // about thread safety of the singleton.
   static GPBFileDescriptor *descriptor = NULL;
   if (!descriptor) {
-    GPBDebugCheckRuntimeVersion();
     descriptor = [[GPBFileDescriptor alloc] initWithPackage:@"google.protobuf"
                                                      syntax:GPBFileSyntaxProto3];
   }
@@ -32,16 +29,16 @@ static GPBFileDescriptor *GPBDurationRoot_FileDescriptor(void) {
 @dynamic seconds;
 @dynamic nanos;
 
-typedef struct GPBDuration__storage_ {
+typedef struct GPBDuration_Storage {
   uint32_t _has_storage_[1];
   int32_t nanos;
   int64_t seconds;
-} GPBDuration__storage_;
+} GPBDuration_Storage;
 
 // This method is threadsafe because it is initially called
 // in +initialize for each subclass.
 + (GPBDescriptor *)descriptor {
-  static GPBDescriptor *descriptor = nil;
+  static GPBDescriptor *descriptor = NULL;
   if (!descriptor) {
     static GPBMessageFieldDescription fields[] = {
       {
@@ -49,10 +46,10 @@ typedef struct GPBDuration__storage_ {
         .number = GPBDuration_FieldNumber_Seconds,
         .hasIndex = 0,
         .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeInt64,
-        .offset = offsetof(GPBDuration__storage_, seconds),
+        .type = GPBTypeInt64,
+        .offset = offsetof(GPBDuration_Storage, seconds),
         .defaultValue.valueInt64 = 0LL,
-        .dataTypeSpecific.className = NULL,
+        .typeSpecific.className = NULL,
         .fieldOptions = NULL,
       },
       {
@@ -60,29 +57,26 @@ typedef struct GPBDuration__storage_ {
         .number = GPBDuration_FieldNumber_Nanos,
         .hasIndex = 1,
         .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeInt32,
-        .offset = offsetof(GPBDuration__storage_, nanos),
+        .type = GPBTypeInt32,
+        .offset = offsetof(GPBDuration_Storage, nanos),
         .defaultValue.valueInt32 = 0,
-        .dataTypeSpecific.className = NULL,
+        .typeSpecific.className = NULL,
         .fieldOptions = NULL,
       },
     };
-    GPBDescriptor *localDescriptor =
-        [GPBDescriptor allocDescriptorForClass:[GPBDuration class]
-                                     rootClass:[GPBDurationRoot class]
-                                          file:GPBDurationRoot_FileDescriptor()
-                                        fields:fields
-                                    fieldCount:sizeof(fields) / sizeof(GPBMessageFieldDescription)
-                                        oneofs:NULL
-                                    oneofCount:0
-                                         enums:NULL
-                                     enumCount:0
-                                        ranges:NULL
-                                    rangeCount:0
-                                   storageSize:sizeof(GPBDuration__storage_)
-                                    wireFormat:NO];
-    NSAssert(descriptor == nil, @"Startup recursed!");
-    descriptor = localDescriptor;
+    descriptor = [GPBDescriptor allocDescriptorForClass:[GPBDuration class]
+                                              rootClass:[GPBDurationRoot class]
+                                                   file:GPBDurationRoot_FileDescriptor()
+                                                 fields:fields
+                                             fieldCount:sizeof(fields) / sizeof(GPBMessageFieldDescription)
+                                                 oneofs:NULL
+                                             oneofCount:0
+                                                  enums:NULL
+                                              enumCount:0
+                                                 ranges:NULL
+                                             rangeCount:0
+                                            storageSize:sizeof(GPBDuration_Storage)
+                                             wireFormat:NO];
   }
   return descriptor;
 }

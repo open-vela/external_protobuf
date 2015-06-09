@@ -16,8 +16,10 @@
   // about thread safety and initialization of registry.
   static GPBExtensionRegistry* registry = nil;
   if (!registry) {
-    GPBDebugCheckRuntimeVersion();
     registry = [[GPBExtensionRegistry alloc] init];
+    static GPBExtensionDescription descriptions[] = {
+    };
+    #pragma unused (descriptions)
     [registry addExtensions:[GPBSourceContextRoot extensionRegistry]];
     [registry addExtensions:[GPBTypeRoot extensionRegistry]];
   }
@@ -26,14 +28,11 @@
 
 @end
 
-#pragma mark - GPBApiRoot_FileDescriptor
-
 static GPBFileDescriptor *GPBApiRoot_FileDescriptor(void) {
   // This is called by +initialize so there is no need to worry
   // about thread safety of the singleton.
   static GPBFileDescriptor *descriptor = NULL;
   if (!descriptor) {
-    GPBDebugCheckRuntimeVersion();
     descriptor = [[GPBFileDescriptor alloc] initWithPackage:@"google.protobuf"
                                                      syntax:GPBFileSyntaxProto3];
   }
@@ -45,24 +44,24 @@ static GPBFileDescriptor *GPBApiRoot_FileDescriptor(void) {
 @implementation GPBApi
 
 @dynamic name;
-@dynamic methodsArray, methodsArray_Count;
-@dynamic optionsArray, optionsArray_Count;
+@dynamic methodsArray;
+@dynamic optionsArray;
 @dynamic version;
 @dynamic hasSourceContext, sourceContext;
 
-typedef struct GPBApi__storage_ {
+typedef struct GPBApi_Storage {
   uint32_t _has_storage_[1];
   NSString *name;
   NSMutableArray *methodsArray;
   NSMutableArray *optionsArray;
   NSString *version;
   GPBSourceContext *sourceContext;
-} GPBApi__storage_;
+} GPBApi_Storage;
 
 // This method is threadsafe because it is initially called
 // in +initialize for each subclass.
 + (GPBDescriptor *)descriptor {
-  static GPBDescriptor *descriptor = nil;
+  static GPBDescriptor *descriptor = NULL;
   if (!descriptor) {
     static GPBMessageFieldDescription fields[] = {
       {
@@ -70,10 +69,10 @@ typedef struct GPBApi__storage_ {
         .number = GPBApi_FieldNumber_Name,
         .hasIndex = 0,
         .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeString,
-        .offset = offsetof(GPBApi__storage_, name),
+        .type = GPBTypeString,
+        .offset = offsetof(GPBApi_Storage, name),
         .defaultValue.valueString = nil,
-        .dataTypeSpecific.className = NULL,
+        .typeSpecific.className = NULL,
         .fieldOptions = NULL,
       },
       {
@@ -81,10 +80,10 @@ typedef struct GPBApi__storage_ {
         .number = GPBApi_FieldNumber_MethodsArray,
         .hasIndex = GPBNoHasBit,
         .flags = GPBFieldRepeated,
-        .dataType = GPBDataTypeMessage,
-        .offset = offsetof(GPBApi__storage_, methodsArray),
+        .type = GPBTypeMessage,
+        .offset = offsetof(GPBApi_Storage, methodsArray),
         .defaultValue.valueMessage = nil,
-        .dataTypeSpecific.className = GPBStringifySymbol(GPBMethod),
+        .typeSpecific.className = GPBStringifySymbol(GPBMethod),
         .fieldOptions = NULL,
       },
       {
@@ -92,10 +91,10 @@ typedef struct GPBApi__storage_ {
         .number = GPBApi_FieldNumber_OptionsArray,
         .hasIndex = GPBNoHasBit,
         .flags = GPBFieldRepeated,
-        .dataType = GPBDataTypeMessage,
-        .offset = offsetof(GPBApi__storage_, optionsArray),
+        .type = GPBTypeMessage,
+        .offset = offsetof(GPBApi_Storage, optionsArray),
         .defaultValue.valueMessage = nil,
-        .dataTypeSpecific.className = GPBStringifySymbol(GPBOption),
+        .typeSpecific.className = GPBStringifySymbol(GPBOption),
         .fieldOptions = NULL,
       },
       {
@@ -103,10 +102,10 @@ typedef struct GPBApi__storage_ {
         .number = GPBApi_FieldNumber_Version,
         .hasIndex = 3,
         .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeString,
-        .offset = offsetof(GPBApi__storage_, version),
+        .type = GPBTypeString,
+        .offset = offsetof(GPBApi_Storage, version),
         .defaultValue.valueString = nil,
-        .dataTypeSpecific.className = NULL,
+        .typeSpecific.className = NULL,
         .fieldOptions = NULL,
       },
       {
@@ -114,29 +113,26 @@ typedef struct GPBApi__storage_ {
         .number = GPBApi_FieldNumber_SourceContext,
         .hasIndex = 4,
         .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeMessage,
-        .offset = offsetof(GPBApi__storage_, sourceContext),
+        .type = GPBTypeMessage,
+        .offset = offsetof(GPBApi_Storage, sourceContext),
         .defaultValue.valueMessage = nil,
-        .dataTypeSpecific.className = GPBStringifySymbol(GPBSourceContext),
+        .typeSpecific.className = GPBStringifySymbol(GPBSourceContext),
         .fieldOptions = NULL,
       },
     };
-    GPBDescriptor *localDescriptor =
-        [GPBDescriptor allocDescriptorForClass:[GPBApi class]
-                                     rootClass:[GPBApiRoot class]
-                                          file:GPBApiRoot_FileDescriptor()
-                                        fields:fields
-                                    fieldCount:sizeof(fields) / sizeof(GPBMessageFieldDescription)
-                                        oneofs:NULL
-                                    oneofCount:0
-                                         enums:NULL
-                                     enumCount:0
-                                        ranges:NULL
-                                    rangeCount:0
-                                   storageSize:sizeof(GPBApi__storage_)
-                                    wireFormat:NO];
-    NSAssert(descriptor == nil, @"Startup recursed!");
-    descriptor = localDescriptor;
+    descriptor = [GPBDescriptor allocDescriptorForClass:[GPBApi class]
+                                              rootClass:[GPBApiRoot class]
+                                                   file:GPBApiRoot_FileDescriptor()
+                                                 fields:fields
+                                             fieldCount:sizeof(fields) / sizeof(GPBMessageFieldDescription)
+                                                 oneofs:NULL
+                                             oneofCount:0
+                                                  enums:NULL
+                                              enumCount:0
+                                                 ranges:NULL
+                                             rangeCount:0
+                                            storageSize:sizeof(GPBApi_Storage)
+                                             wireFormat:NO];
   }
   return descriptor;
 }
@@ -152,9 +148,9 @@ typedef struct GPBApi__storage_ {
 @dynamic requestStreaming;
 @dynamic responseTypeURL;
 @dynamic responseStreaming;
-@dynamic optionsArray, optionsArray_Count;
+@dynamic optionsArray;
 
-typedef struct GPBMethod__storage_ {
+typedef struct GPBMethod_Storage {
   uint32_t _has_storage_[1];
   BOOL requestStreaming;
   BOOL responseStreaming;
@@ -162,12 +158,12 @@ typedef struct GPBMethod__storage_ {
   NSString *requestTypeURL;
   NSString *responseTypeURL;
   NSMutableArray *optionsArray;
-} GPBMethod__storage_;
+} GPBMethod_Storage;
 
 // This method is threadsafe because it is initially called
 // in +initialize for each subclass.
 + (GPBDescriptor *)descriptor {
-  static GPBDescriptor *descriptor = nil;
+  static GPBDescriptor *descriptor = NULL;
   if (!descriptor) {
     static GPBMessageFieldDescription fields[] = {
       {
@@ -175,10 +171,10 @@ typedef struct GPBMethod__storage_ {
         .number = GPBMethod_FieldNumber_Name,
         .hasIndex = 0,
         .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeString,
-        .offset = offsetof(GPBMethod__storage_, name),
+        .type = GPBTypeString,
+        .offset = offsetof(GPBMethod_Storage, name),
         .defaultValue.valueString = nil,
-        .dataTypeSpecific.className = NULL,
+        .typeSpecific.className = NULL,
         .fieldOptions = NULL,
       },
       {
@@ -186,10 +182,10 @@ typedef struct GPBMethod__storage_ {
         .number = GPBMethod_FieldNumber_RequestTypeURL,
         .hasIndex = 1,
         .flags = GPBFieldOptional | GPBFieldTextFormatNameCustom,
-        .dataType = GPBDataTypeString,
-        .offset = offsetof(GPBMethod__storage_, requestTypeURL),
+        .type = GPBTypeString,
+        .offset = offsetof(GPBMethod_Storage, requestTypeURL),
         .defaultValue.valueString = nil,
-        .dataTypeSpecific.className = NULL,
+        .typeSpecific.className = NULL,
         .fieldOptions = NULL,
       },
       {
@@ -197,10 +193,10 @@ typedef struct GPBMethod__storage_ {
         .number = GPBMethod_FieldNumber_RequestStreaming,
         .hasIndex = 2,
         .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeBool,
-        .offset = offsetof(GPBMethod__storage_, requestStreaming),
+        .type = GPBTypeBool,
+        .offset = offsetof(GPBMethod_Storage, requestStreaming),
         .defaultValue.valueBool = NO,
-        .dataTypeSpecific.className = NULL,
+        .typeSpecific.className = NULL,
         .fieldOptions = NULL,
       },
       {
@@ -208,10 +204,10 @@ typedef struct GPBMethod__storage_ {
         .number = GPBMethod_FieldNumber_ResponseTypeURL,
         .hasIndex = 3,
         .flags = GPBFieldOptional | GPBFieldTextFormatNameCustom,
-        .dataType = GPBDataTypeString,
-        .offset = offsetof(GPBMethod__storage_, responseTypeURL),
+        .type = GPBTypeString,
+        .offset = offsetof(GPBMethod_Storage, responseTypeURL),
         .defaultValue.valueString = nil,
-        .dataTypeSpecific.className = NULL,
+        .typeSpecific.className = NULL,
         .fieldOptions = NULL,
       },
       {
@@ -219,10 +215,10 @@ typedef struct GPBMethod__storage_ {
         .number = GPBMethod_FieldNumber_ResponseStreaming,
         .hasIndex = 4,
         .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeBool,
-        .offset = offsetof(GPBMethod__storage_, responseStreaming),
+        .type = GPBTypeBool,
+        .offset = offsetof(GPBMethod_Storage, responseStreaming),
         .defaultValue.valueBool = NO,
-        .dataTypeSpecific.className = NULL,
+        .typeSpecific.className = NULL,
         .fieldOptions = NULL,
       },
       {
@@ -230,10 +226,10 @@ typedef struct GPBMethod__storage_ {
         .number = GPBMethod_FieldNumber_OptionsArray,
         .hasIndex = GPBNoHasBit,
         .flags = GPBFieldRepeated,
-        .dataType = GPBDataTypeMessage,
-        .offset = offsetof(GPBMethod__storage_, optionsArray),
+        .type = GPBTypeMessage,
+        .offset = offsetof(GPBMethod_Storage, optionsArray),
         .defaultValue.valueMessage = nil,
-        .dataTypeSpecific.className = GPBStringifySymbol(GPBOption),
+        .typeSpecific.className = GPBStringifySymbol(GPBOption),
         .fieldOptions = NULL,
       },
     };
@@ -242,23 +238,20 @@ typedef struct GPBMethod__storage_ {
 #else
     static const char *extraTextFormatInfo = "\002\002\007\244\241!!\000\004\010\244\241!!\000";
 #endif  // GPBOBJC_SKIP_MESSAGE_TEXTFORMAT_EXTRAS
-    GPBDescriptor *localDescriptor =
-        [GPBDescriptor allocDescriptorForClass:[GPBMethod class]
-                                     rootClass:[GPBApiRoot class]
-                                          file:GPBApiRoot_FileDescriptor()
-                                        fields:fields
-                                    fieldCount:sizeof(fields) / sizeof(GPBMessageFieldDescription)
-                                        oneofs:NULL
-                                    oneofCount:0
-                                         enums:NULL
-                                     enumCount:0
-                                        ranges:NULL
-                                    rangeCount:0
-                                   storageSize:sizeof(GPBMethod__storage_)
-                                    wireFormat:NO
-                           extraTextFormatInfo:extraTextFormatInfo];
-    NSAssert(descriptor == nil, @"Startup recursed!");
-    descriptor = localDescriptor;
+    descriptor = [GPBDescriptor allocDescriptorForClass:[GPBMethod class]
+                                              rootClass:[GPBApiRoot class]
+                                                   file:GPBApiRoot_FileDescriptor()
+                                                 fields:fields
+                                             fieldCount:sizeof(fields) / sizeof(GPBMessageFieldDescription)
+                                                 oneofs:NULL
+                                             oneofCount:0
+                                                  enums:NULL
+                                              enumCount:0
+                                                 ranges:NULL
+                                             rangeCount:0
+                                            storageSize:sizeof(GPBMethod_Storage)
+                                             wireFormat:NO
+                                    extraTextFormatInfo:extraTextFormatInfo];
   }
   return descriptor;
 }

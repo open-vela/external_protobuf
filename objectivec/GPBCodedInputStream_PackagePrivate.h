@@ -114,9 +114,9 @@ int64_t GPBCodedInputStreamReadSInt64(GPBCodedInputStreamState *state);
 BOOL GPBCodedInputStreamReadBool(GPBCodedInputStreamState *state);
 NSString *GPBCodedInputStreamReadRetainedString(GPBCodedInputStreamState *state)
     __attribute((ns_returns_retained));
-NSData *GPBCodedInputStreamReadRetainedBytes(GPBCodedInputStreamState *state)
+NSData *GPBCodedInputStreamReadRetainedData(GPBCodedInputStreamState *state)
     __attribute((ns_returns_retained));
-NSData *GPBCodedInputStreamReadRetainedBytesNoCopy(
+NSData *GPBCodedInputStreamReadRetainedDataNoCopy(
     GPBCodedInputStreamState *state) __attribute((ns_returns_retained));
 
 size_t GPBCodedInputStreamPushLimit(GPBCodedInputStreamState *state,
