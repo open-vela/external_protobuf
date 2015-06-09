@@ -196,8 +196,7 @@ static const int kNumMessages = 100;
   NSArray *threads = [self createThreadsWithSelector:sel object:messages];
   [self startThreads:threads];
   [self joinThreads:threads];
-  GPBExtensionDescriptor *extension =
-      [UnittestRoot optionalForeignMessageExtension];
+  GPBExtensionField *extension = [UnittestRoot optionalForeignMessageExtension];
   for (TestAllExtensions *message in messages) {
     XCTAssertFalse([message hasExtension:extension]);
   }

@@ -32,6 +32,7 @@
 
 #import "GPBBootstrap.h"
 #import "GPBDescriptor.h"
+#import "GPBExtensionField.h"
 
 @implementation GPBExtensionRegistry {
   // TODO(dmaclach): Reimplement with CFDictionaries that don't use
@@ -59,34 +60,31 @@
   return result;
 }
 
-- (NSMutableDictionary *)extensionMapForContainingMessageClass:
-        (Class)containingMessageClass {
+- (NSMutableDictionary *)extensionMapForContainingType:
+        (GPBDescriptor *)containingType {
   NSMutableDictionary *extensionMap =
-      [mutableClassMap_ objectForKey:containingMessageClass];
+      [mutableClassMap_ objectForKey:containingType];
   if (extensionMap == nil) {
     extensionMap = [NSMutableDictionary dictionary];
-    [mutableClassMap_ setObject:extensionMap
-                         forKey:(id<NSCopying>)containingMessageClass];
+    [mutableClassMap_ setObject:extensionMap forKey:containingType];
   }
   return extensionMap;
 }
 
-- (void)addExtension:(GPBExtensionDescriptor *)extension {
+- (void)addExtension:(GPBExtensionField *)extension {
   if (extension == nil) {
     return;
   }
 
-  Class containingMessageClass = extension.containingMessageClass;
+  GPBDescriptor *containingType = [extension containingType];
   NSMutableDictionary *extensionMap =
-      [self extensionMapForContainingMessageClass:containingMessageClass];
-  [extensionMap setObject:extension forKey:@(extension.fieldNumber)];
+      [self extensionMapForContainingType:containingType];
+  [extensionMap setObject:extension forKey:@([extension fieldNumber])];
 }
 
-- (GPBExtensionDescriptor *)extensionForDescriptor:(GPBDescriptor *)descriptor
-                                       fieldNumber:(NSInteger)fieldNumber {
-  Class messageClass = descriptor.messageClass;
-  NSDictionary *extensionMap =
-      [mutableClassMap_ objectForKey:messageClass];
+- (GPBExtensionField *)getExtension:(GPBDescriptor *)containingType
+                        fieldNumber:(NSInteger)fieldNumber {
+  NSDictionary *extensionMap = [mutableClassMap_ objectForKey:containingType];
   return [extensionMap objectForKey:@(fieldNumber)];
 }
 
@@ -96,11 +94,11 @@
     return;
   }
   NSMutableDictionary *otherClassMap = registry->mutableClassMap_;
-  for (Class containingMessageClass in otherClassMap) {
+  for (GPBDescriptor *containingType in otherClassMap) {
     NSMutableDictionary *extensionMap =
-        [self extensionMapForContainingMessageClass:containingMessageClass];
+        [self extensionMapForContainingType:containingType];
     NSMutableDictionary *otherExtensionMap =
-        [registry extensionMapForContainingMessageClass:containingMessageClass];
+        [registry extensionMapForContainingType:containingType];
     [extensionMap addEntriesFromDictionary:otherExtensionMap];
   }
 }

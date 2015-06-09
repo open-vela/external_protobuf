@@ -178,25 +178,49 @@ MessageGenerator::MessageGenerator(const string& root_classname,
     : root_classname_(root_classname),
       descriptor_(descriptor),
       field_generators_(descriptor),
-      class_name_(ClassName(descriptor_)) {
-  for (int i = 0; i < descriptor_->extension_count(); i++) {
-    extension_generators_.push_back(
-        new ExtensionGenerator(class_name_, descriptor_->extension(i)));
+      class_name_(ClassName(descriptor_)),
+      sub_content_filtered_(true) {
+  if (FilterClass(class_name_)) {
+    filter_reason_ =
+        string("Message |") + class_name_ + "| was not whitelisted.";
+  }
+  if (!IsFiltered()) {
+    // No need to generate extensions if this message is filtered
+    for (int i = 0; i < descriptor_->extension_count(); i++) {
+      extension_generators_.push_back(
+          new ExtensionGenerator(class_name_, descriptor_->extension(i)));
+    }
+    // No need to generate oneofs if this message is filtered.
+    for (int i = 0; i < descriptor_->oneof_decl_count(); i++) {
+      OneofGenerator* generator = new OneofGenerator(descriptor_->oneof_decl(i));
+      oneof_generators_.push_back(generator);
+    }
   }
 
-  for (int i = 0; i < descriptor_->oneof_decl_count(); i++) {
-    OneofGenerator* generator = new OneofGenerator(descriptor_->oneof_decl(i));
-    oneof_generators_.push_back(generator);
-  }
-
+  // We may have enums of this message that are used even if the message
+  // itself is filtered.
   for (int i = 0; i < descriptor_->enum_type_count(); i++) {
     EnumGenerator* generator = new EnumGenerator(descriptor_->enum_type(i));
+    // The enums are exposed via C functions, so they will dead strip if
+    // not used.
+    sub_content_filtered_ &= false;
     enum_generators_.push_back(generator);
   }
 
+  // We may have nested messages that are used even if the message itself
+  // is filtered.
   for (int i = 0; i < descriptor_->nested_type_count(); i++) {
+    const Descriptor* nested_descriptor = descriptor_->nested_type(i);
     MessageGenerator* generator =
-        new MessageGenerator(root_classname_, descriptor_->nested_type(i));
+        new MessageGenerator(root_classname_, nested_descriptor);
+    // Don't check map entries for being filtered, as they don't directly
+    // generate anything in Objective C.  In theory, they only should include
+    // references to other toplevel types, but we still make the generators
+    // to be safe.
+    if (!IsMapEntryMessage(nested_descriptor)) {
+      sub_content_filtered_ &= generator->IsFiltered();
+    }
+    sub_content_filtered_ &= generator->IsSubContentFiltered();
     nested_message_generators_.push_back(generator);
   }
 }
@@ -212,26 +236,31 @@ MessageGenerator::~MessageGenerator() {
 }
 
 void MessageGenerator::GenerateStaticVariablesInitialization(
-    io::Printer* printer) {
-  for (vector<ExtensionGenerator*>::iterator iter =
-           extension_generators_.begin();
-       iter != extension_generators_.end(); ++iter) {
-    (*iter)->GenerateStaticVariablesInitialization(printer);
+    io::Printer* printer, bool* out_generated) {
+  if (!IsFiltered()) {
+    // Skip extensions if we are filtered.
+    for (vector<ExtensionGenerator*>::iterator iter =
+             extension_generators_.begin();
+         iter != extension_generators_.end(); ++iter) {
+      (*iter)->GenerateStaticVariablesInitialization(printer, out_generated,
+                                                     false);
+    }
   }
 
+  // Generating sub messages is perfectly fine though.
   for (vector<MessageGenerator*>::iterator iter =
            nested_message_generators_.begin();
        iter != nested_message_generators_.end(); ++iter) {
-    (*iter)->GenerateStaticVariablesInitialization(printer);
+    (*iter)->GenerateStaticVariablesInitialization(printer, out_generated);
   }
 }
 
 void MessageGenerator::DetermineForwardDeclarations(set<string>* fwd_decls) {
-  if (!IsMapEntryMessage(descriptor_)) {
+  if (!IsFiltered() && !IsMapEntryMessage(descriptor_)) {
     for (int i = 0; i < descriptor_->field_count(); i++) {
       const FieldDescriptor* fieldDescriptor = descriptor_->field(i);
-      // If it is a the field is repeated, the type will be and *Array, and we
-      // don't need any forward decl.
+      // If it is a the field is repeated, the type will be and *Array,
+      // and we don't need any forward decl.
       if (fieldDescriptor->is_repeated()) {
         continue;
       }
@@ -262,10 +291,12 @@ void MessageGenerator::GenerateEnumHeader(io::Printer* printer) {
 
 void MessageGenerator::GenerateExtensionRegistrationSource(
     io::Printer* printer) {
-  for (vector<ExtensionGenerator*>::iterator iter =
-           extension_generators_.begin();
-       iter != extension_generators_.end(); ++iter) {
-    (*iter)->GenerateRegistrationSource(printer);
+  if (!IsFiltered()) {
+    for (vector<ExtensionGenerator*>::iterator iter =
+             extension_generators_.begin();
+         iter != extension_generators_.end(); ++iter) {
+      (*iter)->GenerateRegistrationSource(printer);
+    }
   }
 
   for (vector<MessageGenerator*>::iterator iter =
@@ -286,84 +317,101 @@ void MessageGenerator::GenerateMessageHeader(io::Printer* printer) {
     return;
   }
 
-  printer->Print(
-      "#pragma mark - $classname$\n"
-      "\n",
-      "classname", class_name_);
-
-  if (descriptor_->field_count()) {
-    scoped_array<const FieldDescriptor*> sorted_fields(
-        SortFieldsByNumber(descriptor_));
-
-    printer->Print("typedef GPB_ENUM($classname$_FieldNumber) {\n",
-                   "classname", class_name_);
-    printer->Indent();
-
-    for (int i = 0; i < descriptor_->field_count(); i++) {
-      field_generators_.get(sorted_fields[i])
-          .GenerateFieldNumberConstant(printer);
-    }
-
-    printer->Outdent();
-    printer->Print("};\n\n");
-  }
-
-  for (vector<OneofGenerator*>::iterator iter = oneof_generators_.begin();
-       iter != oneof_generators_.end(); ++iter) {
-    (*iter)->GenerateCaseEnum(printer);
-  }
-
-  string message_comments;
-  SourceLocation location;
-  if (descriptor_->GetSourceLocation(&location)) {
-    message_comments = BuildCommentsString(location);
+  if (IsFiltered()) {
+    printer->Print("// $filter_reason$\n\n",
+                   "filter_reason", filter_reason_);
   } else {
-    message_comments = "";
-  }
+    printer->Print(
+        "#pragma mark - $classname$\n"
+        "\n",
+        "classname", class_name_);
 
-  printer->Print(
-      "$comments$@interface $classname$ : GPBMessage\n\n",
-      "classname", class_name_,
-      "comments", message_comments);
+    if (descriptor_->field_count()) {
+      // Even if there are fields, they could be filtered away, so always use
+      // a buffer to confirm we have something.
+      ostringstream fieldnumber_stringstream;
+      {
+        scoped_array<const FieldDescriptor*> sorted_fields(
+            SortFieldsByNumber(descriptor_));
 
-  vector<char> seen_oneofs(descriptor_->oneof_decl_count(), 0);
-  for (int i = 0; i < descriptor_->field_count(); i++) {
-    const FieldDescriptor* field = descriptor_->field(i);
-    if (field->containing_oneof() != NULL) {
-      const int oneof_index = field->containing_oneof()->index();
-      if (!seen_oneofs[oneof_index]) {
-        seen_oneofs[oneof_index] = 1;
-        oneof_generators_[oneof_index]->GeneratePublicCasePropertyDeclaration(
-            printer);
+        io::OstreamOutputStream fieldnumber_outputstream(
+            &fieldnumber_stringstream);
+        io::Printer fieldnumber_printer(&fieldnumber_outputstream, '$');
+        for (int i = 0; i < descriptor_->field_count(); i++) {
+          field_generators_.get(sorted_fields[i])
+              .GenerateFieldNumberConstant(&fieldnumber_printer);
+        }
+        fieldnumber_stringstream.flush();
+      }
+      const string& fieldnumber_str = fieldnumber_stringstream.str();
+      if (fieldnumber_str.length()) {
+        printer->Print("typedef GPB_ENUM($classname$_FieldNumber) {\n",
+                       "classname", class_name_);
+        printer->Indent();
+        printer->Print(fieldnumber_str.c_str());
+        printer->Outdent();
+        printer->Print("};\n\n");
       }
     }
-    field_generators_.get(field).GeneratePropertyDeclaration(printer);
-  }
 
-  printer->Print("@end\n\n");
-
-  for (int i = 0; i < descriptor_->field_count(); i++) {
-    field_generators_.get(descriptor_->field(i))
-        .GenerateCFunctionDeclarations(printer);
-  }
-
-  if (!oneof_generators_.empty()) {
     for (vector<OneofGenerator*>::iterator iter = oneof_generators_.begin();
          iter != oneof_generators_.end(); ++iter) {
-      (*iter)->GenerateClearFunctionDeclaration(printer);
+      (*iter)->GenerateCaseEnum(printer);
     }
-    printer->Print("\n");
-  }
 
-  if (descriptor_->extension_count() > 0) {
-    printer->Print("@interface $classname$ (DynamicMethods)\n\n",
-                   "classname", class_name_);
-    for (vector<ExtensionGenerator*>::iterator iter =
-             extension_generators_.begin();
-         iter != extension_generators_.end(); ++iter) {
-      (*iter)->GenerateMembersHeader(printer);
+    string message_comments;
+    SourceLocation location;
+    if (descriptor_->GetSourceLocation(&location)) {
+      message_comments = BuildCommentsString(location);
+    } else {
+      message_comments = "";
     }
+
+    printer->Print(
+        "$comments$@interface $classname$ : GPBMessage\n\n",
+        "classname", class_name_,
+        "comments", message_comments);
+
+    vector<char> seen_oneofs(descriptor_->oneof_decl_count(), 0);
+    for (int i = 0; i < descriptor_->field_count(); i++) {
+      const FieldDescriptor* field = descriptor_->field(i);
+      if (field->containing_oneof() != NULL) {
+        const int oneof_index = field->containing_oneof()->index();
+        if (!seen_oneofs[oneof_index]) {
+          seen_oneofs[oneof_index] = 1;
+          oneof_generators_[oneof_index]->GeneratePublicCasePropertyDeclaration(
+              printer);
+        }
+      }
+      field_generators_.get(field)
+          .GeneratePropertyDeclaration(printer);
+    }
+
     printer->Print("@end\n\n");
+
+    for (int i = 0; i < descriptor_->field_count(); i++) {
+      field_generators_.get(descriptor_->field(i))
+          .GenerateCFunctionDeclarations(printer);
+    }
+
+    if (!oneof_generators_.empty()) {
+      for (vector<OneofGenerator*>::iterator iter = oneof_generators_.begin();
+           iter != oneof_generators_.end(); ++iter) {
+        (*iter)->GenerateClearFunctionDeclaration(printer);
+      }
+      printer->Print("\n");
+    }
+
+    if (descriptor_->extension_count() > 0) {
+      printer->Print("@interface $classname$ (DynamicMethods)\n\n",
+                     "classname", class_name_);
+      for (vector<ExtensionGenerator*>::iterator iter =
+               extension_generators_.begin();
+           iter != extension_generators_.end(); ++iter) {
+        (*iter)->GenerateMembersHeader(printer);
+      }
+      printer->Print("@end\n\n");
+    }
   }
 
   for (vector<MessageGenerator*>::iterator iter =
@@ -374,7 +422,7 @@ void MessageGenerator::GenerateMessageHeader(io::Printer* printer) {
 }
 
 void MessageGenerator::GenerateSource(io::Printer* printer) {
-  if (!IsMapEntryMessage(descriptor_)) {
+  if (!IsFiltered() && !IsMapEntryMessage(descriptor_)) {
     printer->Print(
         "#pragma mark - $classname$\n"
         "\n",
@@ -406,23 +454,6 @@ void MessageGenerator::GenerateSource(io::Printer* printer) {
     sort(sorted_extensions.begin(), sorted_extensions.end(),
          ExtensionRangeOrdering());
 
-    // TODO(thomasvl): Finish optimizing has bit. The current behavior is as
-    // follows:
-    // 1. objectivec_field.cc's SetCommonFieldVariables() defaults the has_index
-    //    to the field's index in the list of fields.
-    // 2. RepeatedFieldGenerator::RepeatedFieldGenerator() sets has_index to
-    //    GPBNoHasBit because repeated fields & map<> fields don't use the has
-    //    bit.
-    // 3. FieldGenerator::SetOneofIndexBase() overrides has_bit with a negative
-    //    index that groups all the elements on of the oneof.
-    // So in has_storage, we need enough bits for the single fields that aren't
-    // in any oneof, and then one int32 for each oneof (to store the field
-    // number).  So we could save a little space by not using the field's index
-    // and instead make a second pass only assigning indexes for the fields
-    // that would need it.  The only savings would come when messages have over
-    // a multiple of 32 fields with some number being repeated or in oneofs to
-    // drop the count below that 32 multiple; so it hasn't seemed worth doing
-    // at the moment.
     size_t num_has_bits = descriptor_->field_count();
     size_t sizeof_has_storage = (num_has_bits + 31) / 32;
     // Tell all the fields the oneof base.
@@ -436,7 +467,7 @@ void MessageGenerator::GenerateSource(io::Printer* printer) {
 
     printer->Print(
         "\n"
-        "typedef struct $classname$__storage_ {\n"
+        "typedef struct $classname$_Storage {\n"
         "  uint32_t _has_storage_[$sizeof_has_storage$];\n",
         "classname", class_name_,
         "sizeof_has_storage", SimpleItoa(sizeof_has_storage));
@@ -448,14 +479,14 @@ void MessageGenerator::GenerateSource(io::Printer* printer) {
     }
     printer->Outdent();
 
-    printer->Print("} $classname$__storage_;\n\n", "classname", class_name_);
+    printer->Print("} $classname$_Storage;\n\n", "classname", class_name_);
 
 
     printer->Print(
         "// This method is threadsafe because it is initially called\n"
         "// in +initialize for each subclass.\n"
         "+ (GPBDescriptor *)descriptor {\n"
-        "  static GPBDescriptor *descriptor = nil;\n"
+        "  static GPBDescriptor *descriptor = NULL;\n"
         "  if (!descriptor) {\n");
 
     bool has_oneofs = oneof_generators_.size();
@@ -476,45 +507,30 @@ void MessageGenerator::GenerateSource(io::Printer* printer) {
           "    };\n");
     }
 
+    printer->Print(
+        "    static GPBMessageFieldDescription fields[] = {\n");
+    printer->Indent();
+    printer->Indent();
+    printer->Indent();
     TextFormatDecodeData text_format_decode_data;
-    bool has_fields = descriptor_->field_count() > 0;
-    if (has_fields) {
-      // TODO(thomasvl): The plugin's FieldGenerator::GenerateFieldDescription()
-      // wraps the fieldOptions's value of this structure in an CPP gate so
-      // they can be compiled away; but that still results in a const char* in
-      // the structure for a NULL pointer for every message field.  If the
-      // fieldOptions are moved to a separate payload like the TextFormat extra
-      // data is, then it would shrink that static data shrinking the binaries
-      // a little more.
-      // TODO(thomasvl): proto3 syntax doens't need a defaultValue in the
-      // structure because primitive types are always zero.  If we add a second
-      // structure and a different initializer, we can avoid the wasted static
-      // storage for every field in a proto3 message.
-      printer->Print(
-          "    static GPBMessageFieldDescription fields[] = {\n");
-      printer->Indent();
-      printer->Indent();
-      printer->Indent();
-      for (int i = 0; i < descriptor_->field_count(); ++i) {
-        const FieldGenerator& field_generator =
-            field_generators_.get(sorted_fields[i]);
-        field_generator.GenerateFieldDescription(printer);
-        if (field_generator.needs_textformat_name_support()) {
-          text_format_decode_data.AddString(sorted_fields[i]->number(),
-                                            field_generator.generated_objc_name(),
-                                            field_generator.raw_field_name());
-        }
+    for (int i = 0; i < descriptor_->field_count(); ++i) {
+      const FieldGenerator& field_generator =
+          field_generators_.get(sorted_fields[i]);
+      field_generator.GenerateFieldDescription(printer);
+      if (field_generator.needs_textformat_name_support()) {
+        text_format_decode_data.AddString(sorted_fields[i]->number(),
+                                          field_generator.generated_objc_name(),
+                                          field_generator.raw_field_name());
       }
-      printer->Outdent();
-      printer->Outdent();
-      printer->Outdent();
-      printer->Print(
-          "    };\n");
     }
+    printer->Outdent();
+    printer->Outdent();
+    printer->Outdent();
 
     bool has_enums = enum_generators_.size();
     if (has_enums) {
       printer->Print(
+          "    };\n"
           "    static GPBMessageEnumDescription enums[] = {\n");
       printer->Indent();
       printer->Indent();
@@ -527,13 +543,12 @@ void MessageGenerator::GenerateSource(io::Printer* printer) {
       printer->Outdent();
       printer->Outdent();
       printer->Outdent();
-      printer->Print(
-          "    };\n");
     }
 
     bool has_extensions = sorted_extensions.size();
     if (has_extensions) {
       printer->Print(
+          "    };\n"
           "    static GPBExtensionRange ranges[] = {\n");
       printer->Indent();
       printer->Indent();
@@ -546,16 +561,11 @@ void MessageGenerator::GenerateSource(io::Printer* printer) {
       printer->Outdent();
       printer->Outdent();
       printer->Outdent();
-      printer->Print(
-          "    };\n");
     }
 
     map<string, string> vars;
     vars["classname"] = class_name_;
     vars["rootclassname"] = root_classname_;
-    vars["fields"] = has_fields ? "fields" : "NULL";
-    vars["fields_count"] =
-        has_fields ? "sizeof(fields) / sizeof(GPBMessageFieldDescription)" : "0";
     vars["oneofs"] = has_oneofs ? "oneofs" : "NULL";
     vars["oneof_count"] =
         has_oneofs ? "sizeof(oneofs) / sizeof(GPBMessageOneofDescription)" : "0";
@@ -568,23 +578,23 @@ void MessageGenerator::GenerateSource(io::Printer* printer) {
     vars["wireformat"] =
         descriptor_->options().message_set_wire_format() ? "YES" : "NO";
 
+    printer->Print("    };\n");
     if (text_format_decode_data.num_entries() == 0) {
       printer->Print(
           vars,
-          "    GPBDescriptor *localDescriptor =\n"
-          "        [GPBDescriptor allocDescriptorForClass:[$classname$ class]\n"
-          "                                     rootClass:[$rootclassname$ class]\n"
-          "                                          file:$rootclassname$_FileDescriptor()\n"
-          "                                        fields:$fields$\n"
-          "                                    fieldCount:$fields_count$\n"
-          "                                        oneofs:$oneofs$\n"
-          "                                    oneofCount:$oneof_count$\n"
-          "                                         enums:$enums$\n"
-          "                                     enumCount:$enum_count$\n"
-          "                                        ranges:$ranges$\n"
-          "                                    rangeCount:$range_count$\n"
-          "                                   storageSize:sizeof($classname$__storage_)\n"
-          "                                    wireFormat:$wireformat$];\n");
+          "    descriptor = [GPBDescriptor allocDescriptorForClass:[$classname$ class]\n"
+          "                                              rootClass:[$rootclassname$ class]\n"
+          "                                                   file:$rootclassname$_FileDescriptor()\n"
+          "                                                 fields:fields\n"
+          "                                             fieldCount:sizeof(fields) / sizeof(GPBMessageFieldDescription)\n"
+          "                                                 oneofs:$oneofs$\n"
+          "                                             oneofCount:$oneof_count$\n"
+          "                                                  enums:$enums$\n"
+          "                                              enumCount:$enum_count$\n"
+          "                                                 ranges:$ranges$\n"
+          "                                             rangeCount:$range_count$\n"
+          "                                            storageSize:sizeof($classname$_Storage)\n"
+          "                                             wireFormat:$wireformat$];\n");
     } else {
       vars["extraTextFormatInfo"] = CEscape(text_format_decode_data.Data());
       printer->Print(
@@ -594,29 +604,26 @@ void MessageGenerator::GenerateSource(io::Printer* printer) {
           "#else\n"
           "    static const char *extraTextFormatInfo = \"$extraTextFormatInfo$\";\n"
           "#endif  // GPBOBJC_SKIP_MESSAGE_TEXTFORMAT_EXTRAS\n"
-          "    GPBDescriptor *localDescriptor =\n"
-          "        [GPBDescriptor allocDescriptorForClass:[$classname$ class]\n"
-          "                                     rootClass:[$rootclassname$ class]\n"
-          "                                          file:$rootclassname$_FileDescriptor()\n"
-          "                                        fields:$fields$\n"
-          "                                    fieldCount:$fields_count$\n"
-          "                                        oneofs:$oneofs$\n"
-          "                                    oneofCount:$oneof_count$\n"
-          "                                         enums:$enums$\n"
-          "                                     enumCount:$enum_count$\n"
-          "                                        ranges:$ranges$\n"
-          "                                    rangeCount:$range_count$\n"
-          "                                   storageSize:sizeof($classname$__storage_)\n"
-          "                                    wireFormat:$wireformat$\n"
-          "                           extraTextFormatInfo:extraTextFormatInfo];\n");
+          "    descriptor = [GPBDescriptor allocDescriptorForClass:[$classname$ class]\n"
+          "                                              rootClass:[$rootclassname$ class]\n"
+          "                                                   file:$rootclassname$_FileDescriptor()\n"
+          "                                                 fields:fields\n"
+          "                                             fieldCount:sizeof(fields) / sizeof(GPBMessageFieldDescription)\n"
+          "                                                 oneofs:$oneofs$\n"
+          "                                             oneofCount:$oneof_count$\n"
+          "                                                  enums:$enums$\n"
+          "                                              enumCount:$enum_count$\n"
+          "                                                 ranges:$ranges$\n"
+          "                                             rangeCount:$range_count$\n"
+          "                                            storageSize:sizeof($classname$_Storage)\n"
+          "                                             wireFormat:$wireformat$\n"
+          "                                    extraTextFormatInfo:extraTextFormatInfo];\n");
       }
       printer->Print(
-          "    NSAssert(descriptor == nil, @\"Startup recursed!\");\n"
-          "    descriptor = localDescriptor;\n"
-          "  }\n"
-          "  return descriptor;\n"
-          "}\n\n"
-          "@end\n\n");
+        "  }\n"
+        "  return descriptor;\n"
+        "}\n\n"
+        "@end\n\n");
 
     for (int i = 0; i < descriptor_->field_count(); i++) {
       field_generators_.get(descriptor_->field(i))

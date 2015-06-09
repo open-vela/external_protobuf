@@ -55,6 +55,8 @@ void SetEnumVariables(const FieldDescriptor* descriptor,
       (descriptor->file() != descriptor->enum_type()->file())) {
     (*variables)["property_type"] = "enum " + type;
   }
+  // TODO(thomasvl): Make inclusion of descriptor compile time and output
+  // both of these. Note: Extensions currently have to have the EnumDescription.
   (*variables)["enum_verifier"] = type + "_IsValidValue";
   (*variables)["enum_desc_func"] = type + "_EnumDescriptor";
 
@@ -72,9 +74,11 @@ EnumFieldGenerator::~EnumFieldGenerator() {}
 
 void EnumFieldGenerator::GenerateFieldDescriptionTypeSpecific(
     io::Printer* printer) const {
+  // TODO(thomasvl): Output the CPP check to use descFunc or validator based
+  // on final compile.
   printer->Print(
       variables_,
-      "  .dataTypeSpecific.enumDescFunc = $enum_desc_func$,\n");
+      "  .typeSpecific.enumDescFunc = $enum_desc_func$,\n");
 }
 
 void EnumFieldGenerator::GenerateCFunctionDeclarations(
@@ -99,7 +103,7 @@ void EnumFieldGenerator::GenerateCFunctionImplementations(
       "int32_t $owning_message_class$_$capitalized_name$_RawValue($owning_message_class$ *message) {\n"
       "  GPBDescriptor *descriptor = [$owning_message_class$ descriptor];\n"
       "  GPBFieldDescriptor *field = [descriptor fieldWithNumber:$field_number_name$];\n"
-      "  return GPBGetMessageInt32Field(message, field);\n"
+      "  return GPBGetInt32IvarWithField(message, field);\n"
       "}\n"
       "\n"
       "void Set$owning_message_class$_$capitalized_name$_RawValue($owning_message_class$ *message, int32_t value) {\n"
@@ -133,9 +137,11 @@ RepeatedEnumFieldGenerator::~RepeatedEnumFieldGenerator() {}
 
 void RepeatedEnumFieldGenerator::GenerateFieldDescriptionTypeSpecific(
     io::Printer* printer) const {
+  // TODO(thomasvl): Output the CPP check to use descFunc or validator based
+  // on final compile.
   printer->Print(
       variables_,
-      "  .dataTypeSpecific.enumDescFunc = $enum_desc_func$,\n");
+      "  .typeSpecific.enumDescFunc = $enum_desc_func$,\n");
 }
 
 }  // namespace objectivec

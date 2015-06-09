@@ -30,7 +30,7 @@
 
 #import <Foundation/Foundation.h>
 
-#import "GPBRuntimeTypes.h"
+#import "GPBTypes.h"
 
 @class GPBEnumDescriptor;
 @class GPBFieldDescriptor;
@@ -89,14 +89,14 @@ typedef NS_ENUM(NSInteger, GPBFieldType) {
 
 @property(nonatomic, readonly, copy) NSString *name;
 @property(nonatomic, readonly) uint32_t number;
-@property(nonatomic, readonly) GPBDataType dataType;
+@property(nonatomic, readonly) GPBType type;
 @property(nonatomic, readonly) BOOL hasDefaultValue;
-@property(nonatomic, readonly) GPBGenericValue defaultValue;
+@property(nonatomic, readonly) GPBValue defaultValue;
 @property(nonatomic, readonly, getter=isRequired) BOOL required;
 @property(nonatomic, readonly, getter=isOptional) BOOL optional;
 @property(nonatomic, readonly) GPBFieldType fieldType;
 // If it is a map, the value type is in -type.
-@property(nonatomic, readonly) GPBDataType mapKeyDataType;
+@property(nonatomic, readonly) GPBType mapKeyType;
 @property(nonatomic, readonly, getter=isPackable) BOOL packable;
 
 @property(nonatomic, readonly, assign) GPBOneofDescriptor *containingOneof;
@@ -129,14 +129,12 @@ typedef NS_ENUM(NSInteger, GPBFieldType) {
 
 @end
 
-@interface GPBExtensionDescriptor : NSObject<NSCopying>
+@interface GPBExtensionDescriptor : NSObject
 @property(nonatomic, readonly) uint32_t fieldNumber;
-@property(nonatomic, readonly) Class containingMessageClass;
-@property(nonatomic, readonly) GPBDataType dataType;
+@property(nonatomic, readonly) GPBType type;
 @property(nonatomic, readonly, getter=isRepeated) BOOL repeated;
 @property(nonatomic, readonly, getter=isPackable) BOOL packable;
 @property(nonatomic, readonly, assign) Class msgClass;
 @property(nonatomic, readonly) NSString *singletonName;
 @property(nonatomic, readonly, strong) GPBEnumDescriptor *enumDescriptor;
-@property(nonatomic, readonly) id defaultValue;
 @end

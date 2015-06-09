@@ -39,8 +39,8 @@ set_variable_value() {
     /^set\\($VARNAME/ {
       start = 1;
       print \$0;
-      len = split(values, vlist, \" \");
-      for (i = 1; i <= len; ++i) {
+      split(values, vlist, \" \");
+      for (i = 1; i <= length(vlist); ++i) {
         printf(\"  %s%s\\n\", prefix, vlist[i]);
       }
       next;
@@ -58,12 +58,12 @@ set_variable_value() {
 sort_files() {
   for FILE in $@; do
     echo $FILE
-  done | LC_ALL=C sort | uniq
+  done | sort | uniq
 }
 
 MAKEFILE=../src/Makefile.am
 CMAKE_DIR=.
-EXTRACT_INCLUDES_BAT=extract_includes.bat.in
+EXTRACT_INCLUDES_BAT=../vsprojects/extract_includes.bat
 
 [ -f "$MAKEFILE" ] || {
   echo "Cannot find: $MAKEFILE"
@@ -105,17 +105,10 @@ set_variable_value $CMAKE_DIR/tests.cmake tests_files $COMMON_PREFIX $TEST_SOURC
 set_variable_value $CMAKE_DIR/tests.cmake lite_test_files $COMMON_PREFIX $LITE_TEST_SOURCES
 
 # Generate extract_includes.bat
-echo "mkdir include" > $EXTRACT_INCLUDES_BAT
-for HEADER in $PUBLIC_HEADERS; do
-  HEADER_DIR=$(dirname $HEADER)
-  while [ ! "$HEADER_DIR" = "." ]; do
-    echo $HEADER_DIR | sed "s/\\//\\\\/g"
-    HEADER_DIR=$(dirname $HEADER_DIR)
-  done
-done | sort | uniq | sed "s/^/mkdir include\\\\/" >> $EXTRACT_INCLUDES_BAT
-for HEADER in $PUBLIC_HEADERS; do
-  WINPATH=$(echo $HEADER | sed 's;/;\\;g')
-  echo "copy \${PROTOBUF_SOURCE_WIN32_PATH}\\..\\src\\$WINPATH include\\$WINPATH" >> $EXTRACT_INCLUDES_BAT
+for HEADER in $HEADERS; do
+  echo $(dirname $HEADER) | sed "s/\\//\\\\/g"
+done | sort | uniq | sed "s/^/mkdir include\\\\/" > $EXTRACT_INCLUDES_BAT
+for HEADER in $HEADERS; do
+  WINPATH=$(echo $HEADER | sed 's;/;\\\\;g')
+  echo "copy ..\\src\\$WINPATH include\\$WINPATH" >> $EXTRACT_INCLUDES_BAT
 done
-# Add pbconfig.h.
-echo "copy \${PROTOBUF_BINARY_WIN32_PATH}\\google\\protobuf\\stubs\\pbconfig.h include\\google\\protobuf\\stubs\\pbconfig.h" >> $EXTRACT_INCLUDES_BAT
