@@ -38,9 +38,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using Google.Protobuf.Descriptors;
+using Google.ProtocolBuffers.Descriptors;
 
-namespace Google.Protobuf
+namespace Google.ProtocolBuffers
 {
     /// <summary>
     /// Readings and decodes protocol message fields.
@@ -367,14 +367,32 @@ namespace Google.Protobuf
         /// <summary>
         /// Reads a group field value from the stream.
         /// </summary>    
-        public void ReadGroup(int fieldNumber, IMessage message)
+        public void ReadGroup(int fieldNumber, IBuilderLite builder,
+                              ExtensionRegistry extensionRegistry)
         {
             if (recursionDepth >= recursionLimit)
             {
                 throw InvalidProtocolBufferException.RecursionLimitExceeded();
             }
             ++recursionDepth;
-            message.MergeFrom(this);
+            builder.WeakMergeFrom(this, extensionRegistry);
+            CheckLastTagWas(WireFormat.MakeTag(fieldNumber, WireFormat.WireType.EndGroup));
+            --recursionDepth;
+        }
+
+        /// <summary>
+        /// Reads a group field value from the stream and merges it into the given
+        /// UnknownFieldSet.
+        /// </summary>   
+        [Obsolete]
+        public void ReadUnknownGroup(int fieldNumber, IBuilderLite builder)
+        {
+            if (recursionDepth >= recursionLimit)
+            {
+                throw InvalidProtocolBufferException.RecursionLimitExceeded();
+            }
+            ++recursionDepth;
+            builder.WeakMergeFrom(this);
             CheckLastTagWas(WireFormat.MakeTag(fieldNumber, WireFormat.WireType.EndGroup));
             --recursionDepth;
         }
@@ -382,7 +400,7 @@ namespace Google.Protobuf
         /// <summary>
         /// Reads an embedded message field value from the stream.
         /// </summary>   
-        public void ReadMessage(IMessage builder)
+        public void ReadMessage(IBuilderLite builder, ExtensionRegistry extensionRegistry)
         {
             int length = (int) ReadRawVarint32();
             if (recursionDepth >= recursionLimit)
@@ -391,7 +409,7 @@ namespace Google.Protobuf
             }
             int oldLimit = PushLimit(length);
             ++recursionDepth;
-            builder.MergeFrom(this);
+            builder.WeakMergeFrom(this, extensionRegistry);
             CheckLastTagWas(0);
             --recursionDepth;
             PopLimit(oldLimit);
@@ -430,16 +448,39 @@ namespace Google.Protobuf
         }
 
         /// <summary>
+        /// Reads an enum field value from the stream. The caller is responsible
+        /// for converting the numeric value to an actual enum.
+        /// </summary>   
+        public bool ReadEnum(ref IEnumLite value, out object unknown, IEnumLiteMap mapping)
+        {
+            int rawValue = (int) ReadRawVarint32();
+
+            value = mapping.FindValueByNumber(rawValue);
+            if (value != null)
+            {
+                unknown = null;
+                return true;
+            }
+            unknown = rawValue;
+            return false;
+        }
+
+        /// <summary>
         /// Reads an enum field value from the stream. If the enum is valid for type T,
         /// then the ref value is set and it returns true.  Otherwise the unknown output
         /// value is set and this method returns false.
         /// </summary>   
-        public bool ReadEnum<T>(ref T value)
+        public bool ReadEnum<T>(ref T value, out object unknown)
             where T : struct, IComparable, IFormattable
         {
             int number = (int) ReadRawVarint32();
-            value = EnumHelper<T>.FromInt32(number);
-            return true;
+            if (EnumParser<T>.TryConvert(number, ref value))
+            {
+                unknown = null;
+                return true;
+            }
+            unknown = number;
+            return false;
         }
 
         /// <summary>
@@ -614,7 +655,6 @@ namespace Google.Protobuf
 
         public void ReadInt32Array(uint fieldTag, string fieldName, ICollection<int> list)
         {
-            // TODO(jonskeet): Work out how this works for non-packed values. (It doesn't look like it does...)
             bool isPacked;
             int holdLimit;
             if (BeginArray(fieldTag, out isPacked, out holdLimit))
@@ -793,9 +833,62 @@ namespace Google.Protobuf
             }
         }
 
-        public void ReadEnumArray<T>(uint fieldTag, string fieldName, ICollection<T> list)
+        public void ReadEnumArray(uint fieldTag, string fieldName, ICollection<IEnumLite> list,
+                                  out ICollection<object> unknown, IEnumLiteMap mapping)
+        {
+            unknown = null;
+            object unkval;
+            IEnumLite value = null;
+            WireFormat.WireType wformat = WireFormat.GetTagWireType(fieldTag);
+
+            // 2.3 allows packed form even if the field is not declared packed.
+            if (wformat == WireFormat.WireType.LengthDelimited)
+            {
+                int length = (int) (ReadRawVarint32() & int.MaxValue);
+                int limit = PushLimit(length);
+                while (!ReachedLimit)
+                {
+                    if (ReadEnum(ref value, out unkval, mapping))
+                    {
+                        list.Add(value);
+                    }
+                    else
+                    {
+                        if (unknown == null)
+                        {
+                            unknown = new List<object>();
+                        }
+                        unknown.Add(unkval);
+                    }
+                }
+                PopLimit(limit);
+            }
+            else
+            {
+                do
+                {
+                    if (ReadEnum(ref value, out unkval, mapping))
+                    {
+                        list.Add(value);
+                    }
+                    else
+                    {
+                        if (unknown == null)
+                        {
+                            unknown = new List<object>();
+                        }
+                        unknown.Add(unkval);
+                    }
+                } while (ContinueArray(fieldTag));
+            }
+        }
+
+        public void ReadEnumArray<T>(uint fieldTag, string fieldName, ICollection<T> list,
+                                     out ICollection<object> unknown)
             where T : struct, IComparable, IFormattable
         {
+            unknown = null;
+            object unkval;
             T value = default(T);
             WireFormat.WireType wformat = WireFormat.GetTagWireType(fieldTag);
 
@@ -806,8 +899,18 @@ namespace Google.Protobuf
                 int limit = PushLimit(length);
                 while (!ReachedLimit)
                 {
-                    ReadEnum<T>(ref value);
-                    list.Add(value);
+                    if (ReadEnum<T>(ref value, out unkval))
+                    {
+                        list.Add(value);
+                    }
+                    else
+                    {
+                        if (unknown == null)
+                        {
+                            unknown = new List<object>();
+                        }
+                        unknown.Add(unkval);
+                    }
                 }
                 PopLimit(limit);
             }
@@ -815,31 +918,41 @@ namespace Google.Protobuf
             {
                 do
                 {
-                    ReadEnum(ref value);
-                    list.Add(value);
+                    if (ReadEnum(ref value, out unkval))
+                    {
+                        list.Add(value);
+                    }
+                    else
+                    {
+                        if (unknown == null)
+                        {
+                            unknown = new List<object>();
+                        }
+                        unknown.Add(unkval);
+                    }
                 } while (ContinueArray(fieldTag));
             }
         }
 
-        public void ReadMessageArray<T>(uint fieldTag, string fieldName, ICollection<T> list, MessageParser<T> messageParser)
-            where T : IMessage<T>
+        public void ReadMessageArray<T>(uint fieldTag, string fieldName, ICollection<T> list, T messageType,
+                                        ExtensionRegistry registry) where T : IMessageLite
         {
             do
             {
-                T message = messageParser.CreateTemplate();
-                ReadMessage(message);
-                list.Add(message);
+                IBuilderLite builder = messageType.WeakCreateBuilderForType();
+                ReadMessage(builder, registry);
+                list.Add((T) builder.WeakBuildPartial());
             } while (ContinueArray(fieldTag));
         }
 
-        public void ReadGroupArray<T>(uint fieldTag, string fieldName, ICollection<T> list, MessageParser<T> messageParser)
-            where T : IMessage<T>
+        public void ReadGroupArray<T>(uint fieldTag, string fieldName, ICollection<T> list, T messageType,
+                                      ExtensionRegistry registry) where T : IMessageLite
         {
             do
             {
-                T message = messageParser.CreateTemplate();
-                ReadGroup(WireFormat.GetTagFieldNumber(fieldTag), message);
-                list.Add(message);
+                IBuilderLite builder = messageType.WeakCreateBuilderForType();
+                ReadGroup(WireFormat.GetTagFieldNumber(fieldTag), builder, registry);
+                list.Add((T) builder.WeakBuildPartial());
             } while (ContinueArray(fieldTag));
         }
 

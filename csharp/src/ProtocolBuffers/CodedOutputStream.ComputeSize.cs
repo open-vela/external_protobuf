@@ -37,9 +37,9 @@
 using System;
 using System.Globalization;
 using System.Text;
-using Google.Protobuf.Descriptors;
+using Google.ProtocolBuffers.Descriptors;
 
-namespace Google.Protobuf
+namespace Google.ProtocolBuffers
 {
     // This part of CodedOutputStream provides all the static entry points that are used
     // by generated code and internally to compute the size of messages prior to being
@@ -145,9 +145,9 @@ namespace Google.Protobuf
         /// Compute the number of bytes that would be needed to encode a
         /// group field, including the tag.
         /// </summary>
-        public static int ComputeGroupSize(int fieldNumber, IMessage value)
+        public static int ComputeGroupSize(int fieldNumber, IMessageLite value)
         {
-            return ComputeTagSize(fieldNumber)*2 + value.CalculateSize();
+            return ComputeTagSize(fieldNumber)*2 + value.SerializedSize;
         }
 
         /// <summary>
@@ -156,18 +156,18 @@ namespace Google.Protobuf
         /// </summary>
         [Obsolete]
         public static int ComputeUnknownGroupSize(int fieldNumber,
-                                                  IMessage value)
+                                                  IMessageLite value)
         {
-            return ComputeTagSize(fieldNumber)*2 + value.CalculateSize();
+            return ComputeTagSize(fieldNumber)*2 + value.SerializedSize;
         }
 
         /// <summary>
         /// Compute the number of bytes that would be needed to encode an
         /// embedded message field, including the tag.
         /// </summary>
-        public static int ComputeMessageSize(int fieldNumber, IMessage value)
+        public static int ComputeMessageSize(int fieldNumber, IMessageLite value)
         {
-            int size = value.CalculateSize();
+            int size = value.SerializedSize;
             return ComputeTagSize(fieldNumber) + ComputeRawVarint32Size((uint) size) + size;
         }
 
@@ -196,7 +196,7 @@ namespace Google.Protobuf
         /// enum field, including the tag. The caller is responsible for
         /// converting the enum value to its numeric value.
         /// </summary>
-        public static int ComputeEnumSize<T>(int fieldNumber, T value) where T : struct, IComparable, IFormattable
+        public static int ComputeEnumSize(int fieldNumber, int value)
         {
             return ComputeTagSize(fieldNumber) + ComputeEnumSizeNoTag(value);
         }
@@ -332,18 +332,28 @@ namespace Google.Protobuf
         /// Compute the number of bytes that would be needed to encode a
         /// group field, including the tag.
         /// </summary>
-        public static int ComputeGroupSizeNoTag(IMessage value)
+        public static int ComputeGroupSizeNoTag(IMessageLite value)
         {
-            return value.CalculateSize();
+            return value.SerializedSize;
+        }
+
+        /// <summary>
+        /// Compute the number of bytes that would be needed to encode a
+        /// group field represented by an UnknownFieldSet, including the tag.
+        /// </summary>
+        [Obsolete]
+        public static int ComputeUnknownGroupSizeNoTag(IMessageLite value)
+        {
+            return value.SerializedSize;
         }
 
         /// <summary>
         /// Compute the number of bytes that would be needed to encode an
         /// embedded message field, including the tag.
         /// </summary>
-        public static int ComputeMessageSizeNoTag(IMessage value)
+        public static int ComputeMessageSizeNoTag(IMessageLite value)
         {
-            int size = value.CalculateSize();
+            int size = value.SerializedSize;
             return ComputeRawVarint32Size((uint) size) + size;
         }
 
@@ -371,10 +381,9 @@ namespace Google.Protobuf
         /// enum field, including the tag. The caller is responsible for
         /// converting the enum value to its numeric value.
         /// </summary>
-        public static int ComputeEnumSizeNoTag<T>(T value) where T : struct, IComparable, IFormattable
+        public static int ComputeEnumSizeNoTag(int value)
         {
-            int serializedValue = EnumHelper<T>.ToInt32(value);
-            return ComputeInt32SizeNoTag(serializedValue);
+            return ComputeInt32SizeNoTag(value);
         }
 
         /// <summary>
@@ -424,7 +433,7 @@ namespace Google.Protobuf
         /// MessageSet extension to the stream. For historical reasons,
         /// the wire format differs from normal fields.
         /// </summary>
-        public static int ComputeMessageSetExtensionSize(int fieldNumber, IMessage value)
+        public static int ComputeMessageSetExtensionSize(int fieldNumber, IMessageLite value)
         {
             return ComputeTagSize(WireFormat.MessageSetField.Item)*2 +
                    ComputeUInt32Size(WireFormat.MessageSetField.TypeID, (uint) fieldNumber) +
@@ -515,7 +524,6 @@ namespace Google.Protobuf
         /// Compute the number of bytes that would be needed to encode a
         /// field of arbitrary type, including the tag, to the stream.
         /// </summary>
-        // TODO(jonskeet): Why do we need this?
         public static int ComputeFieldSize(FieldType fieldType, int fieldNumber, Object value)
         {
             switch (fieldType)
@@ -539,9 +547,9 @@ namespace Google.Protobuf
                 case FieldType.String:
                     return ComputeStringSize(fieldNumber, (string) value);
                 case FieldType.Group:
-                    return ComputeGroupSize(fieldNumber, (IMessage) value);
+                    return ComputeGroupSize(fieldNumber, (IMessageLite) value);
                 case FieldType.Message:
-                    return ComputeMessageSize(fieldNumber, (IMessage) value);
+                    return ComputeMessageSize(fieldNumber, (IMessageLite) value);
                 case FieldType.Bytes:
                     return ComputeBytesSize(fieldNumber, (ByteString) value);
                 case FieldType.UInt32:
@@ -555,7 +563,14 @@ namespace Google.Protobuf
                 case FieldType.SInt64:
                     return ComputeSInt64Size(fieldNumber, (long) value);
                 case FieldType.Enum:
-                    return ComputeEnumSize(fieldNumber, Convert.ToInt64(value));
+                    if (value is Enum)
+                    {
+                        return ComputeEnumSize(fieldNumber, Convert.ToInt32(value));
+                    }
+                    else
+                    {
+                        return ComputeEnumSize(fieldNumber, ((IEnumLite) value).Number);
+                    }
                 default:
                     throw new ArgumentOutOfRangeException("Invalid field type " + fieldType);
             }
@@ -565,7 +580,6 @@ namespace Google.Protobuf
         /// Compute the number of bytes that would be needed to encode a
         /// field of arbitrary type, excluding the tag, to the stream.
         /// </summary>
-        // TODO(jonskeet): Why do we need this?
         public static int ComputeFieldSizeNoTag(FieldType fieldType, Object value)
         {
             switch (fieldType)
@@ -589,9 +603,9 @@ namespace Google.Protobuf
                 case FieldType.String:
                     return ComputeStringSizeNoTag((string) value);
                 case FieldType.Group:
-                    return ComputeGroupSizeNoTag((IMessage) value);
+                    return ComputeGroupSizeNoTag((IMessageLite) value);
                 case FieldType.Message:
-                    return ComputeMessageSizeNoTag((IMessage) value);
+                    return ComputeMessageSizeNoTag((IMessageLite) value);
                 case FieldType.Bytes:
                     return ComputeBytesSizeNoTag((ByteString) value);
                 case FieldType.UInt32:
@@ -605,7 +619,14 @@ namespace Google.Protobuf
                 case FieldType.SInt64:
                     return ComputeSInt64SizeNoTag((long) value);
                 case FieldType.Enum:
-                    return ComputeEnumSizeNoTag(Convert.ToInt64(value));
+                    if (value is Enum)
+                    {
+                        return ComputeEnumSizeNoTag(Convert.ToInt32(value));
+                    }
+                    else
+                    {
+                        return ComputeEnumSizeNoTag(((IEnumLite) value).Number);
+                    }
                 default:
                     throw new ArgumentOutOfRangeException("Invalid field type " + fieldType);
             }

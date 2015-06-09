@@ -35,9 +35,9 @@
 #endregion
 
 using System;
-using Google.Protobuf.Descriptors;
+using Google.ProtocolBuffers.Descriptors;
 
-namespace Google.Protobuf
+namespace Google.ProtocolBuffers
 {
     /// <summary>
     /// This class is used internally by the Protocol Buffer Library and generated
