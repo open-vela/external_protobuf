@@ -147,7 +147,7 @@ nobase_include_HEADERS =                                        \
   google/protobuf/compiler/java/java_names.h                    \
   google/protobuf/compiler/javanano/javanano_generator.h        \
   google/protobuf/compiler/objectivec/objectivec_generator.h    \
-  google/protobuf/compiler/objectivec/objectivec_helpers.h     \
+  google/protobuf/compiler/objectivec/objectivec_helpers.h      \
   google/protobuf/compiler/python/python_generator.h            \
   google/protobuf/compiler/ruby/ruby_generator.h                \
   google/protobuf/compiler/csharp/csharp_generator.h
@@ -369,6 +369,8 @@ libprotoc_la_SOURCES =                                         \
   google/protobuf/compiler/csharp/csharp_enum.h                \
   google/protobuf/compiler/csharp/csharp_enum_field.cc         \
   google/protobuf/compiler/csharp/csharp_enum_field.h          \
+  google/protobuf/compiler/csharp/csharp_extension.cc          \
+  google/protobuf/compiler/csharp/csharp_extension.h           \
   google/protobuf/compiler/csharp/csharp_field_base.cc         \
   google/protobuf/compiler/csharp/csharp_field_base.h          \
   google/protobuf/compiler/csharp/csharp_generator.cc          \
@@ -389,7 +391,9 @@ libprotoc_la_SOURCES =                                         \
   google/protobuf/compiler/csharp/csharp_source_generator_base.cc \
   google/protobuf/compiler/csharp/csharp_source_generator_base.h \
   google/protobuf/compiler/csharp/csharp_umbrella_class.cc     \
-  google/protobuf/compiler/csharp/csharp_umbrella_class.h
+  google/protobuf/compiler/csharp/csharp_umbrella_class.h      \
+  google/protobuf/compiler/csharp/csharp_writer.cc             \
+  google/protobuf/compiler/csharp/csharp_writer.h
 
 bin_PROGRAMS = protoc
 protoc_LDADD = $(PTHREAD_LIBS) libprotobuf.la libprotoc.la

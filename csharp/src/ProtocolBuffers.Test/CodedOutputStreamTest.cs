@@ -37,10 +37,10 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Google.Protobuf.Collections;
+using Google.ProtocolBuffers.TestProtos;
 using NUnit.Framework;
 
-namespace Google.Protobuf
+namespace Google.ProtocolBuffers
 {
     public class CodedOutputStreamTest
     {
@@ -195,7 +195,6 @@ namespace Google.Protobuf
                 0x9abcdef012345678UL);
         }
 
-        /*
         [Test]
         public void WriteWholeMessage()
         {
@@ -229,7 +228,6 @@ namespace Google.Protobuf
             TestUtil.AssertEqualBytes(TestUtil.GetGoldenPackedFieldsMessage().ToByteArray(),
                                       rawBytes);
         }
-        */
 
         [Test]
         public void EncodeZigZag32()
@@ -296,27 +294,25 @@ namespace Google.Protobuf
         public void TestNegativeEnumNoTag()
         {
             Assert.AreEqual(10, CodedOutputStream.ComputeInt32SizeNoTag(-2));
-            Assert.AreEqual(10, CodedOutputStream.ComputeEnumSizeNoTag(TestNegEnum.Value));
+            Assert.AreEqual(10, CodedOutputStream.ComputeEnumSizeNoTag(-2));
 
             byte[] bytes = new byte[10];
             CodedOutputStream output = CodedOutputStream.CreateInstance(bytes);
-            output.WriteEnumNoTag(TestNegEnum.Value);
+            output.WriteEnumNoTag(-2);
 
             Assert.AreEqual(0, output.SpaceLeft);
             Assert.AreEqual("FE-FF-FF-FF-FF-FF-FF-FF-FF-01", BitConverter.ToString(bytes));
         }
 
-        enum TestNegEnum : long { None = 0, Value = -2 }
-
         [Test]
         public void TestNegativeEnumWithTag()
         {
             Assert.AreEqual(11, CodedOutputStream.ComputeInt32Size(8, -2));
-            Assert.AreEqual(11, CodedOutputStream.ComputeEnumSize(8, TestNegEnum.Value));
+            Assert.AreEqual(11, CodedOutputStream.ComputeEnumSize(8, -2));
 
             byte[] bytes = new byte[11];
             CodedOutputStream output = CodedOutputStream.CreateInstance(bytes);
-            output.WriteEnum(8, "", TestNegEnum.Value);
+            output.WriteEnum(8, "", -2, -2);
 
             Assert.AreEqual(0, output.SpaceLeft);
             //fyi, 0x40 == 0x08 << 3 + 0, field num + wire format shift
@@ -330,8 +326,7 @@ namespace Google.Protobuf
             int msgSize = 1 + 1 + arraySize;
             byte[] bytes = new byte[msgSize];
             CodedOutputStream output = CodedOutputStream.CreateInstance(bytes);
-            output.WritePackedEnumArray(8, "", new RepeatedField<TestNegEnum> {
-                0, (TestNegEnum) (-1), TestNegEnum.Value, (TestNegEnum) (-3), (TestNegEnum) (-4), (TestNegEnum) (-5) });
+            output.WritePackedEnumArray(8, "", arraySize, new int[] { 0, -1, -2, -3, -4, -5 });
 
             Assert.AreEqual(0, output.SpaceLeft);
 
@@ -355,8 +350,8 @@ namespace Google.Protobuf
             int msgSize = arraySize;
             byte[] bytes = new byte[msgSize];
             CodedOutputStream output = CodedOutputStream.CreateInstance(bytes);
-            output.WriteEnumArray(8, "", new RepeatedField<TestNegEnum> {
-                0, (TestNegEnum) (-1), TestNegEnum.Value, (TestNegEnum) (-3), (TestNegEnum) (-4), (TestNegEnum) (-5) });
+            output.WriteEnumArray(8, "", new int[] { 0, -1, -2, -3, -4, -5 });
+
             Assert.AreEqual(0, output.SpaceLeft);
 
             CodedInputStream input = CodedInputStream.CreateInstance(bytes);
