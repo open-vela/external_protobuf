@@ -36,12 +36,12 @@
 
 using System;
 using System.Collections.Generic;
-using Google.ProtocolBuffers.Descriptors;
+using Google.Protobuf.Descriptors;
 
 //Disable warning CS3010: CLS-compliant interfaces must have only CLS-compliant members
 #pragma warning disable 3010
 
-namespace Google.ProtocolBuffers
+namespace Google.Protobuf
 {
     public interface ICodedInputStream
     {
@@ -128,20 +128,12 @@ namespace Google.ProtocolBuffers
         /// <summary>
         /// Reads a group field value from the stream.
         /// </summary>    
-        void ReadGroup(int fieldNumber, IBuilderLite builder,
-                       ExtensionRegistry extensionRegistry);
-
-        /// <summary>
-        /// Reads a group field value from the stream and merges it into the given
-        /// UnknownFieldSet.
-        /// </summary>   
-        [Obsolete]
-        void ReadUnknownGroup(int fieldNumber, IBuilderLite builder);
+        void ReadGroup(int fieldNumber, IMessage message);
 
         /// <summary>
         /// Reads an embedded message field value from the stream.
         /// </summary>   
-        void ReadMessage(IBuilderLite builder, ExtensionRegistry extensionRegistry);
+        void ReadMessage(IMessage message);
 
         /// <summary>
         /// Reads a bytes field value from the stream.
@@ -154,18 +146,11 @@ namespace Google.ProtocolBuffers
         bool ReadUInt32(ref uint value);
 
         /// <summary>
-        /// Reads an enum field value from the stream. The caller is responsible
-        /// for converting the numeric value to an actual enum.
+        /// Reads an enum field value from the stream. This performs no checking
+        /// as to whether the enum value is known to the enum type as it was present
+        /// when the code was generated.
         /// </summary>   
-        bool ReadEnum(ref IEnumLite value, out object unknown, IEnumLiteMap mapping);
-
-        /// <summary>
-        /// Reads an enum field value from the stream. If the enum is valid for type T,
-        /// then the ref value is set and it returns true.  Otherwise the unkown output
-        /// value is set and this method returns false.
-        /// </summary>   
-        bool ReadEnum<T>(ref T value, out object unknown)
-            where T : struct, IComparable, IFormattable;
+        bool ReadEnum(ref int value);
 
         /// <summary>
         /// Reads an sfixed32 field value from the stream.
@@ -197,28 +182,18 @@ namespace Google.ProtocolBuffers
         /// Reads an array of primitive values into the list, if the wire-type of fieldTag is length-prefixed, it will
         /// read a packed array.
         /// </summary>
-        void ReadEnumArray(uint fieldTag, string fieldName, ICollection<IEnumLite> list, out ICollection<object> unknown,
-                           IEnumLiteMap mapping);
-
-        /// <summary>
-        /// Reads an array of primitive values into the list, if the wire-type of fieldTag is length-prefixed, it will
-        /// read a packed array.
-        /// </summary>
-        void ReadEnumArray<T>(uint fieldTag, string fieldName, ICollection<T> list, out ICollection<object> unknown)
+        void ReadEnumArray<T>(uint fieldTag, string fieldName, ICollection<T> list)
             where T : struct, IComparable, IFormattable;
 
         /// <summary>
-        /// Reads a set of messages using the <paramref name="messageType"/> as a template.  T is not guaranteed to be 
-        /// the most derived type, it is only the type specifier for the collection.
+        /// Reads a set of messages using the <paramref name="parser"/> to read individual messages.
         /// </summary>
-        void ReadMessageArray<T>(uint fieldTag, string fieldName, ICollection<T> list, T messageType,
-                                 ExtensionRegistry registry) where T : IMessageLite;
+        void ReadMessageArray<T>(uint fieldTag, string fieldName, ICollection<T> list, MessageParser<T> parser) where T : IMessage<T>;
 
         /// <summary>
-        /// Reads a set of messages using the <paramref name="messageType"/> as a template.
+        /// Reads a set of messages using the <paramref name="parser"/> as a template.
         /// </summary>
-        void ReadGroupArray<T>(uint fieldTag, string fieldName, ICollection<T> list, T messageType,
-                               ExtensionRegistry registry) where T : IMessageLite;
+        void ReadGroupArray<T>(uint fieldTag, string fieldName, ICollection<T> list, MessageParser<T> parser) where T : IMessage<T>;
 
         /// <summary>
         /// Reads a field of any primitive type. Enums, groups and embedded

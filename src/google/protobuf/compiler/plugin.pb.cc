@@ -913,7 +913,7 @@ void CodeGeneratorResponse_File::SerializeWithCachedSizes(
 int CodeGeneratorResponse_File::ByteSize() const {
   int total_size = 0;
 
-  if (_has_bits_[0 / 32] & 7u) {
+  if (_has_bits_[0 / 32] & 7) {
     // optional string name = 1;
     if (has_name()) {
       total_size += 1 +

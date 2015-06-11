@@ -37,9 +37,9 @@
 using System;
 using System.Globalization;
 using System.Text;
-using Google.ProtocolBuffers.Descriptors;
+using Google.Protobuf.Descriptors;
 
-namespace Google.ProtocolBuffers
+namespace Google.Protobuf
 {
     // This part of CodedOutputStream provides all the static entry points that are used
     // by generated code and internally to compute the size of messages prior to being
@@ -145,9 +145,9 @@ namespace Google.ProtocolBuffers
         /// Compute the number of bytes that would be needed to encode a
         /// group field, including the tag.
         /// </summary>
-        public static int ComputeGroupSize(int fieldNumber, IMessageLite value)
+        public static int ComputeGroupSize(int fieldNumber, IMessage value)
         {
-            return ComputeTagSize(fieldNumber)*2 + value.SerializedSize;
+            return ComputeTagSize(fieldNumber)*2 + value.CalculateSize();
         }
 
         /// <summary>
@@ -156,18 +156,18 @@ namespace Google.ProtocolBuffers
         /// </summary>
         [Obsolete]
         public static int ComputeUnknownGroupSize(int fieldNumber,
-                                                  IMessageLite value)
+                                                  IMessage value)
         {
-            return ComputeTagSize(fieldNumber)*2 + value.SerializedSize;
+            return ComputeTagSize(fieldNumber)*2 + value.CalculateSize();
         }
 
         /// <summary>
         /// Compute the number of bytes that would be needed to encode an
         /// embedded message field, including the tag.
         /// </summary>
-        public static int ComputeMessageSize(int fieldNumber, IMessageLite value)
+        public static int ComputeMessageSize(int fieldNumber, IMessage value)
         {
-            int size = value.SerializedSize;
+            int size = value.CalculateSize();
             return ComputeTagSize(fieldNumber) + ComputeRawVarint32Size((uint) size) + size;
         }
 
@@ -332,28 +332,18 @@ namespace Google.ProtocolBuffers
         /// Compute the number of bytes that would be needed to encode a
         /// group field, including the tag.
         /// </summary>
-        public static int ComputeGroupSizeNoTag(IMessageLite value)
+        public static int ComputeGroupSizeNoTag(IMessage value)
         {
-            return value.SerializedSize;
-        }
-
-        /// <summary>
-        /// Compute the number of bytes that would be needed to encode a
-        /// group field represented by an UnknownFieldSet, including the tag.
-        /// </summary>
-        [Obsolete]
-        public static int ComputeUnknownGroupSizeNoTag(IMessageLite value)
-        {
-            return value.SerializedSize;
+            return value.CalculateSize();
         }
 
         /// <summary>
         /// Compute the number of bytes that would be needed to encode an
         /// embedded message field, including the tag.
         /// </summary>
-        public static int ComputeMessageSizeNoTag(IMessageLite value)
+        public static int ComputeMessageSizeNoTag(IMessage value)
         {
-            int size = value.SerializedSize;
+            int size = value.CalculateSize();
             return ComputeRawVarint32Size((uint) size) + size;
         }
 
@@ -383,6 +373,7 @@ namespace Google.ProtocolBuffers
         /// </summary>
         public static int ComputeEnumSizeNoTag(int value)
         {
+            // Currently just a pass-through, but it's nice to separate it logically.
             return ComputeInt32SizeNoTag(value);
         }
 
@@ -433,7 +424,7 @@ namespace Google.ProtocolBuffers
         /// MessageSet extension to the stream. For historical reasons,
         /// the wire format differs from normal fields.
         /// </summary>
-        public static int ComputeMessageSetExtensionSize(int fieldNumber, IMessageLite value)
+        public static int ComputeMessageSetExtensionSize(int fieldNumber, IMessage value)
         {
             return ComputeTagSize(WireFormat.MessageSetField.Item)*2 +
                    ComputeUInt32Size(WireFormat.MessageSetField.TypeID, (uint) fieldNumber) +
@@ -524,6 +515,7 @@ namespace Google.ProtocolBuffers
         /// Compute the number of bytes that would be needed to encode a
         /// field of arbitrary type, including the tag, to the stream.
         /// </summary>
+        // TODO(jonskeet): Why do we need this?
         public static int ComputeFieldSize(FieldType fieldType, int fieldNumber, Object value)
         {
             switch (fieldType)
@@ -547,9 +539,9 @@ namespace Google.ProtocolBuffers
                 case FieldType.String:
                     return ComputeStringSize(fieldNumber, (string) value);
                 case FieldType.Group:
-                    return ComputeGroupSize(fieldNumber, (IMessageLite) value);
+                    return ComputeGroupSize(fieldNumber, (IMessage) value);
                 case FieldType.Message:
-                    return ComputeMessageSize(fieldNumber, (IMessageLite) value);
+                    return ComputeMessageSize(fieldNumber, (IMessage) value);
                 case FieldType.Bytes:
                     return ComputeBytesSize(fieldNumber, (ByteString) value);
                 case FieldType.UInt32:
@@ -563,14 +555,7 @@ namespace Google.ProtocolBuffers
                 case FieldType.SInt64:
                     return ComputeSInt64Size(fieldNumber, (long) value);
                 case FieldType.Enum:
-                    if (value is Enum)
-                    {
-                        return ComputeEnumSize(fieldNumber, Convert.ToInt32(value));
-                    }
-                    else
-                    {
-                        return ComputeEnumSize(fieldNumber, ((IEnumLite) value).Number);
-                    }
+                    return ComputeEnumSize(fieldNumber, (int) value);
                 default:
                     throw new ArgumentOutOfRangeException("Invalid field type " + fieldType);
             }
@@ -580,6 +565,7 @@ namespace Google.ProtocolBuffers
         /// Compute the number of bytes that would be needed to encode a
         /// field of arbitrary type, excluding the tag, to the stream.
         /// </summary>
+        // TODO(jonskeet): Why do we need this?
         public static int ComputeFieldSizeNoTag(FieldType fieldType, Object value)
         {
             switch (fieldType)
@@ -603,9 +589,9 @@ namespace Google.ProtocolBuffers
                 case FieldType.String:
                     return ComputeStringSizeNoTag((string) value);
                 case FieldType.Group:
-                    return ComputeGroupSizeNoTag((IMessageLite) value);
+                    return ComputeGroupSizeNoTag((IMessage) value);
                 case FieldType.Message:
-                    return ComputeMessageSizeNoTag((IMessageLite) value);
+                    return ComputeMessageSizeNoTag((IMessage) value);
                 case FieldType.Bytes:
                     return ComputeBytesSizeNoTag((ByteString) value);
                 case FieldType.UInt32:
@@ -619,14 +605,7 @@ namespace Google.ProtocolBuffers
                 case FieldType.SInt64:
                     return ComputeSInt64SizeNoTag((long) value);
                 case FieldType.Enum:
-                    if (value is Enum)
-                    {
-                        return ComputeEnumSizeNoTag(Convert.ToInt32(value));
-                    }
-                    else
-                    {
-                        return ComputeEnumSizeNoTag(((IEnumLite) value).Number);
-                    }
+                    return ComputeEnumSizeNoTag((int) value);
                 default:
                     throw new ArgumentOutOfRangeException("Invalid field type " + fieldType);
             }
