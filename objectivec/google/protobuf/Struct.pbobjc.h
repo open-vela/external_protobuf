@@ -57,7 +57,6 @@ typedef GPB_ENUM(GPBStruct_FieldNumber) {
 // Map of dynamically typed values.
 // |fields| values are |GPBValue|
 @property(nonatomic, readwrite, strong) NSMutableDictionary *fields;
-@property(nonatomic, readonly) NSUInteger fields_Count;
 
 @end
 
@@ -127,7 +126,6 @@ typedef GPB_ENUM(GPBListValue_FieldNumber) {
 // Repeated field of dynamically typed values.
 // |valuesArray| contains |GPBValue|
 @property(nonatomic, readwrite, strong) NSMutableArray *valuesArray;
-@property(nonatomic, readonly) NSUInteger valuesArray_Count;
 
 @end
 

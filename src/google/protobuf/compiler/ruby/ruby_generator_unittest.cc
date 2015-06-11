@@ -47,7 +47,6 @@ namespace {
 
 string FindRubyTestDir(const string& file) {
   // Inspired by TestSourceDir() in src/google/protobuf/testing/googletest.cc.
-#ifndef GOOGLE_THIRD_PARTY_PROTOBUF
   string prefix = ".";
   while (!File::Exists(prefix + "/src/google/protobuf/compiler/ruby" + file)) {
     if (!File::Exists(prefix)) {
@@ -58,9 +57,6 @@ string FindRubyTestDir(const string& file) {
     prefix += "/..";
   }
   return prefix + "/src/google/protobuf/compiler/ruby";
-#else
-  return "third_party/protobuf/src/google/protobuf/compiler/ruby";
-#endif  // GOOGLE_THIRD_PARTY_PROTOBUF
 }
 
 // This test is a simple golden-file test over the output of the Ruby code
