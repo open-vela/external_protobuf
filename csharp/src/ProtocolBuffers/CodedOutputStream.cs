@@ -1083,6 +1083,13 @@ namespace Google.ProtocolBuffers
         /// </summary>
         public void WriteRawVarint32(uint value)
         {
+            // Optimize for the common case of a single byte value
+            if (value < 128 && position < limit)
+            {
+                buffer[position++] = (byte)value;
+                return;
+            }
+
             while (value > 127 && position < limit)
             {
                 buffer[position++] = (byte) ((value & 0x7F) | 0x80);
