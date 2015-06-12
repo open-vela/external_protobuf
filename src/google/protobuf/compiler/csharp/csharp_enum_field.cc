@@ -55,22 +55,36 @@ EnumFieldGenerator::~EnumFieldGenerator() {
 
 void EnumFieldGenerator::GenerateParsingCode(io::Printer* printer) {
   printer->Print(variables_,
-    "$name$_ = ($type_name$) input.ReadEnum();\n");
+                 "object unknown;\n"
+                 "if(input.ReadEnum(ref result.$name$_, out unknown)) {\n");
+  if (SupportFieldPresence(descriptor_->file())) {
+    printer->Print(variables_,
+                   "  result.has$property_name$ = true;\n");
+  }
+  printer->Print("} else if(unknown is int) {\n");
+  if (!use_lite_runtime()) {
+    printer->Print(variables_,
+                   "  if (unknownFields == null) {\n"  // First unknown field - create builder now
+                   "    unknownFields = pb::UnknownFieldSet.CreateBuilder(this.UnknownFields);\n"
+                   "  }\n"
+                   "  unknownFields.MergeVarintField($number$, (ulong)(int)unknown);\n");
+  }
+  printer->Print("}\n");
 }
 
 void EnumFieldGenerator::GenerateSerializationCode(io::Printer* printer) {
   printer->Print(variables_,
-    "if ($has_property_check$) {\n"
-    "  output.WriteEnum($number$, (int) $property_name$);\n"
-    "}\n");
+                 "if ($has_property_check$) {\n"
+                 "  output.WriteEnum($number$, field_names[$field_ordinal$], (int) $property_name$, $property_name$);\n"
+                 "}\n");
 }
 
 void EnumFieldGenerator::GenerateSerializedSizeCode(io::Printer* printer) {
   printer->Print(
-    variables_,
-    "if ($has_property_check$) {\n"
+      variables_,
+      "if ($has_property_check$) {\n"
       "  size += pb::CodedOutputStream.ComputeEnumSize($number$, (int) $property_name$);\n"
-    "}\n");
+      "}\n");
 }
 
 EnumOneofFieldGenerator::EnumOneofFieldGenerator(const FieldDescriptor* descriptor,
@@ -82,18 +96,30 @@ EnumOneofFieldGenerator::~EnumOneofFieldGenerator() {
 }
 
 void EnumOneofFieldGenerator::GenerateParsingCode(io::Printer* printer) {
-  // TODO(jonskeet): What about if we read the default value?
   printer->Print(
     variables_,
-    "$oneof_name$_ = input.ReadEnum();\n"
-    "$oneof_name$Case_ = $oneof_property_name$OneofCase.$property_name$;\n");
+    "object unknown;\n"
+    "$type_name$ enumValue = $default_value$;\n"
+    "if(input.ReadEnum(ref enumValue, out unknown)) {\n"
+    "  result.$oneof_name$_ = enumValue;\n"
+    "  result.$oneof_name$Case_ = $oneof_property_name$OneofCase.$property_name$;\n"
+    "} else if(unknown is int) {\n");
+  if (!use_lite_runtime()) {
+    printer->Print(
+      variables_,
+      "  if (unknownFields == null) {\n"  // First unknown field - create builder now
+      "    unknownFields = pb::UnknownFieldSet.CreateBuilder(this.UnknownFields);\n"
+      "  }\n"
+      "  unknownFields.MergeVarintField($number$, (ulong)(int)unknown);\n");
+  }
+  printer->Print("}\n");
 }
 
 void EnumOneofFieldGenerator::GenerateSerializationCode(io::Printer* printer) {
   printer->Print(
     variables_,
     "if ($has_property_check$) {\n"
-    "  output.WriteEnum($number$, (int) $property_name$);\n"
+    "  output.WriteEnum($number$, field_names[$field_ordinal$], (int) $property_name$, $property_name$);\n"
     "}\n");
 }
 

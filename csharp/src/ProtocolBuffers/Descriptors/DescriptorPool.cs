@@ -34,7 +34,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Google.Protobuf.Descriptors
+namespace Google.ProtocolBuffers.Descriptors
 {
     /// <summary>
     /// Contains lookup tables containing all the descriptors defined in a particular file.
@@ -85,7 +85,7 @@ namespace Google.Protobuf.Descriptors
         /// <param name="fullName">Fully-qualified name to look up</param>
         /// <returns>The symbol with the given name and type,
         /// or null if the symbol doesn't exist or has the wrong type</returns>
-        internal T FindSymbol<T>(string fullName) where T : class
+        internal T FindSymbol<T>(string fullName) where T : class, IDescriptor
         {
             IDescriptor result;
             descriptorsByName.TryGetValue(fullName, out result);
