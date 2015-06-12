@@ -147,7 +147,7 @@ nobase_include_HEADERS =                                        \
   google/protobuf/compiler/java/java_names.h                    \
   google/protobuf/compiler/javanano/javanano_generator.h        \
   google/protobuf/compiler/objectivec/objectivec_generator.h    \
-  google/protobuf/compiler/objectivec/objectivec_helpers.h     \
+  google/protobuf/compiler/objectivec/objectivec_helpers.h      \
   google/protobuf/compiler/python/python_generator.h            \
   google/protobuf/compiler/ruby/ruby_generator.h                \
   google/protobuf/compiler/csharp/csharp_generator.h
@@ -369,6 +369,8 @@ libprotoc_la_SOURCES =                                         \
   google/protobuf/compiler/csharp/csharp_enum.h                \
   google/protobuf/compiler/csharp/csharp_enum_field.cc         \
   google/protobuf/compiler/csharp/csharp_enum_field.h          \
+  google/protobuf/compiler/csharp/csharp_extension.cc          \
+  google/protobuf/compiler/csharp/csharp_extension.h           \
   google/protobuf/compiler/csharp/csharp_field_base.cc         \
   google/protobuf/compiler/csharp/csharp_field_base.h          \
   google/protobuf/compiler/csharp/csharp_generator.cc          \
@@ -389,7 +391,9 @@ libprotoc_la_SOURCES =                                         \
   google/protobuf/compiler/csharp/csharp_source_generator_base.cc \
   google/protobuf/compiler/csharp/csharp_source_generator_base.h \
   google/protobuf/compiler/csharp/csharp_umbrella_class.cc     \
-  google/protobuf/compiler/csharp/csharp_umbrella_class.h
+  google/protobuf/compiler/csharp/csharp_umbrella_class.h      \
+  google/protobuf/compiler/csharp/csharp_writer.cc             \
+  google/protobuf/compiler/csharp/csharp_writer.h
 
 bin_PROGRAMS = protoc
 protoc_LDADD = $(PTHREAD_LIBS) libprotobuf.la libprotoc.la
@@ -408,7 +412,6 @@ protoc_inputs =                                                \
   google/protobuf/unittest_drop_unknown_fields.proto           \
   google/protobuf/unittest_embed_optimize_for.proto            \
   google/protobuf/unittest_empty.proto                         \
-  google/protobuf/unittest_enormous_descriptor.proto           \
   google/protobuf/unittest_import_lite.proto                   \
   google/protobuf/unittest_import.proto                        \
   google/protobuf/unittest_import_public_lite.proto            \
@@ -450,7 +453,8 @@ EXTRA_DIST =                                                   \
   google/protobuf/compiler/ruby/ruby_generated_code.proto      \
   google/protobuf/compiler/ruby/ruby_generated_code.rb         \
   google/protobuf/compiler/package_info.h                      \
-  google/protobuf/compiler/zip_output_unittest.sh
+  google/protobuf/compiler/zip_output_unittest.sh              \
+  google/protobuf/unittest_enormous_descriptor.proto
 
 protoc_lite_outputs =                                          \
   google/protobuf/map_lite_unittest.pb.cc                      \
@@ -482,8 +486,6 @@ protoc_outputs =                                               \
   google/protobuf/unittest_embed_optimize_for.pb.h             \
   google/protobuf/unittest_empty.pb.cc                         \
   google/protobuf/unittest_empty.pb.h                          \
-  google/protobuf/unittest_enormous_descriptor.pb.cc           \
-  google/protobuf/unittest_enormous_descriptor.pb.h            \
   google/protobuf/unittest_import.pb.cc                        \
   google/protobuf/unittest_import.pb.h                         \
   google/protobuf/unittest_import_public.pb.cc                 \

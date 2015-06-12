@@ -37,7 +37,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Google.Protobuf
+namespace Google.ProtocolBuffers
 {
     /// <summary>
     /// Helper methods for throwing exceptions

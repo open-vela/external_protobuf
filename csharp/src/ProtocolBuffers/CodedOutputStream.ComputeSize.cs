@@ -37,9 +37,9 @@
 using System;
 using System.Globalization;
 using System.Text;
-using Google.Protobuf.Descriptors;
+using Google.ProtocolBuffers.Descriptors;
 
-namespace Google.Protobuf
+namespace Google.ProtocolBuffers
 {
     // This part of CodedOutputStream provides all the static entry points that are used
     // by generated code and internally to compute the size of messages prior to being
@@ -91,7 +91,15 @@ namespace Google.Protobuf
         /// </summary>
         public static int ComputeInt32Size(int fieldNumber, int value)
         {
-            return ComputeTagSize(fieldNumber) + ComputeInt32SizeNoTag(value);
+            if (value >= 0)
+            {
+                return ComputeTagSize(fieldNumber) + ComputeRawVarint32Size((uint) value);
+            }
+            else
+            {
+                // Must sign-extend.
+                return ComputeTagSize(fieldNumber) + 10;
+            }
         }
 
         /// <summary>
@@ -127,7 +135,7 @@ namespace Google.Protobuf
         /// </summary>
         public static int ComputeStringSize(int fieldNumber, String value)
         {
-            int byteArraySize = UTF8.GetByteCount(value);
+            int byteArraySize = Encoding.UTF8.GetByteCount(value);
             return ComputeTagSize(fieldNumber) +
                    ComputeRawVarint32Size((uint) byteArraySize) +
                    byteArraySize;
@@ -137,9 +145,9 @@ namespace Google.Protobuf
         /// Compute the number of bytes that would be needed to encode a
         /// group field, including the tag.
         /// </summary>
-        public static int ComputeGroupSize(int fieldNumber, IMessage value)
+        public static int ComputeGroupSize(int fieldNumber, IMessageLite value)
         {
-            return ComputeTagSize(fieldNumber)*2 + value.CalculateSize();
+            return ComputeTagSize(fieldNumber)*2 + value.SerializedSize;
         }
 
         /// <summary>
@@ -148,18 +156,18 @@ namespace Google.Protobuf
         /// </summary>
         [Obsolete]
         public static int ComputeUnknownGroupSize(int fieldNumber,
-                                                  IMessage value)
+                                                  IMessageLite value)
         {
-            return ComputeTagSize(fieldNumber)*2 + value.CalculateSize();
+            return ComputeTagSize(fieldNumber)*2 + value.SerializedSize;
         }
 
         /// <summary>
         /// Compute the number of bytes that would be needed to encode an
         /// embedded message field, including the tag.
         /// </summary>
-        public static int ComputeMessageSize(int fieldNumber, IMessage value)
+        public static int ComputeMessageSize(int fieldNumber, IMessageLite value)
         {
-            int size = value.CalculateSize();
+            int size = value.SerializedSize;
             return ComputeTagSize(fieldNumber) + ComputeRawVarint32Size((uint) size) + size;
         }
 
@@ -315,7 +323,7 @@ namespace Google.Protobuf
         /// </summary>
         public static int ComputeStringSizeNoTag(String value)
         {
-            int byteArraySize = UTF8.GetByteCount(value);
+            int byteArraySize = Encoding.UTF8.GetByteCount(value);
             return ComputeRawVarint32Size((uint) byteArraySize) +
                    byteArraySize;
         }
@@ -324,18 +332,28 @@ namespace Google.Protobuf
         /// Compute the number of bytes that would be needed to encode a
         /// group field, including the tag.
         /// </summary>
-        public static int ComputeGroupSizeNoTag(IMessage value)
+        public static int ComputeGroupSizeNoTag(IMessageLite value)
         {
-            return value.CalculateSize();
+            return value.SerializedSize;
+        }
+
+        /// <summary>
+        /// Compute the number of bytes that would be needed to encode a
+        /// group field represented by an UnknownFieldSet, including the tag.
+        /// </summary>
+        [Obsolete]
+        public static int ComputeUnknownGroupSizeNoTag(IMessageLite value)
+        {
+            return value.SerializedSize;
         }
 
         /// <summary>
         /// Compute the number of bytes that would be needed to encode an
         /// embedded message field, including the tag.
         /// </summary>
-        public static int ComputeMessageSizeNoTag(IMessage value)
+        public static int ComputeMessageSizeNoTag(IMessageLite value)
         {
-            int size = value.CalculateSize();
+            int size = value.SerializedSize;
             return ComputeRawVarint32Size((uint) size) + size;
         }
 
@@ -365,7 +383,6 @@ namespace Google.Protobuf
         /// </summary>
         public static int ComputeEnumSizeNoTag(int value)
         {
-            // Currently just a pass-through, but it's nice to separate it logically.
             return ComputeInt32SizeNoTag(value);
         }
 
@@ -403,6 +420,36 @@ namespace Google.Protobuf
         public static int ComputeSInt64SizeNoTag(long value)
         {
             return ComputeRawVarint64Size(EncodeZigZag64(value));
+        }
+
+        /*
+     * Compute the number of bytes that would be needed to encode a
+     * MessageSet extension to the stream.  For historical reasons,
+     * the wire format differs from normal fields.
+     */
+
+        /// <summary>
+        /// Compute the number of bytes that would be needed to encode a
+        /// MessageSet extension to the stream. For historical reasons,
+        /// the wire format differs from normal fields.
+        /// </summary>
+        public static int ComputeMessageSetExtensionSize(int fieldNumber, IMessageLite value)
+        {
+            return ComputeTagSize(WireFormat.MessageSetField.Item)*2 +
+                   ComputeUInt32Size(WireFormat.MessageSetField.TypeID, (uint) fieldNumber) +
+                   ComputeMessageSize(WireFormat.MessageSetField.Message, value);
+        }
+
+        /// <summary>
+        /// Compute the number of bytes that would be needed to encode an
+        /// unparsed MessageSet extension field to the stream. For
+        /// historical reasons, the wire format differs from normal fields.
+        /// </summary>
+        public static int ComputeRawMessageSetExtensionSize(int fieldNumber, ByteString value)
+        {
+            return ComputeTagSize(WireFormat.MessageSetField.Item)*2 +
+                   ComputeUInt32Size(WireFormat.MessageSetField.TypeID, (uint) fieldNumber) +
+                   ComputeBytesSize(WireFormat.MessageSetField.Message, value);
         }
 
         /// <summary>
@@ -471,6 +518,118 @@ namespace Google.Protobuf
                 return 9;
             }
             return 10;
+        }
+
+        /// <summary>
+        /// Compute the number of bytes that would be needed to encode a
+        /// field of arbitrary type, including the tag, to the stream.
+        /// </summary>
+        public static int ComputeFieldSize(FieldType fieldType, int fieldNumber, Object value)
+        {
+            switch (fieldType)
+            {
+                case FieldType.Double:
+                    return ComputeDoubleSize(fieldNumber, (double) value);
+                case FieldType.Float:
+                    return ComputeFloatSize(fieldNumber, (float) value);
+                case FieldType.Int64:
+                    return ComputeInt64Size(fieldNumber, (long) value);
+                case FieldType.UInt64:
+                    return ComputeUInt64Size(fieldNumber, (ulong) value);
+                case FieldType.Int32:
+                    return ComputeInt32Size(fieldNumber, (int) value);
+                case FieldType.Fixed64:
+                    return ComputeFixed64Size(fieldNumber, (ulong) value);
+                case FieldType.Fixed32:
+                    return ComputeFixed32Size(fieldNumber, (uint) value);
+                case FieldType.Bool:
+                    return ComputeBoolSize(fieldNumber, (bool) value);
+                case FieldType.String:
+                    return ComputeStringSize(fieldNumber, (string) value);
+                case FieldType.Group:
+                    return ComputeGroupSize(fieldNumber, (IMessageLite) value);
+                case FieldType.Message:
+                    return ComputeMessageSize(fieldNumber, (IMessageLite) value);
+                case FieldType.Bytes:
+                    return ComputeBytesSize(fieldNumber, (ByteString) value);
+                case FieldType.UInt32:
+                    return ComputeUInt32Size(fieldNumber, (uint) value);
+                case FieldType.SFixed32:
+                    return ComputeSFixed32Size(fieldNumber, (int) value);
+                case FieldType.SFixed64:
+                    return ComputeSFixed64Size(fieldNumber, (long) value);
+                case FieldType.SInt32:
+                    return ComputeSInt32Size(fieldNumber, (int) value);
+                case FieldType.SInt64:
+                    return ComputeSInt64Size(fieldNumber, (long) value);
+                case FieldType.Enum:
+                    if (value is Enum)
+                    {
+                        return ComputeEnumSize(fieldNumber, Convert.ToInt32(value));
+                    }
+                    else
+                    {
+                        return ComputeEnumSize(fieldNumber, ((IEnumLite) value).Number);
+                    }
+                default:
+                    throw new ArgumentOutOfRangeException("Invalid field type " + fieldType);
+            }
+        }
+
+        /// <summary>
+        /// Compute the number of bytes that would be needed to encode a
+        /// field of arbitrary type, excluding the tag, to the stream.
+        /// </summary>
+        public static int ComputeFieldSizeNoTag(FieldType fieldType, Object value)
+        {
+            switch (fieldType)
+            {
+                case FieldType.Double:
+                    return ComputeDoubleSizeNoTag((double) value);
+                case FieldType.Float:
+                    return ComputeFloatSizeNoTag((float) value);
+                case FieldType.Int64:
+                    return ComputeInt64SizeNoTag((long) value);
+                case FieldType.UInt64:
+                    return ComputeUInt64SizeNoTag((ulong) value);
+                case FieldType.Int32:
+                    return ComputeInt32SizeNoTag((int) value);
+                case FieldType.Fixed64:
+                    return ComputeFixed64SizeNoTag((ulong) value);
+                case FieldType.Fixed32:
+                    return ComputeFixed32SizeNoTag((uint) value);
+                case FieldType.Bool:
+                    return ComputeBoolSizeNoTag((bool) value);
+                case FieldType.String:
+                    return ComputeStringSizeNoTag((string) value);
+                case FieldType.Group:
+                    return ComputeGroupSizeNoTag((IMessageLite) value);
+                case FieldType.Message:
+                    return ComputeMessageSizeNoTag((IMessageLite) value);
+                case FieldType.Bytes:
+                    return ComputeBytesSizeNoTag((ByteString) value);
+                case FieldType.UInt32:
+                    return ComputeUInt32SizeNoTag((uint) value);
+                case FieldType.SFixed32:
+                    return ComputeSFixed32SizeNoTag((int) value);
+                case FieldType.SFixed64:
+                    return ComputeSFixed64SizeNoTag((long) value);
+                case FieldType.SInt32:
+                    return ComputeSInt32SizeNoTag((int) value);
+                case FieldType.SInt64:
+                    return ComputeSInt64SizeNoTag((long) value);
+                case FieldType.Enum:
+                    if (value is Enum)
+                    {
+                        return ComputeEnumSizeNoTag(Convert.ToInt32(value));
+                    }
+                    else
+                    {
+                        return ComputeEnumSizeNoTag(((IEnumLite) value).Number);
+                    }
+                default:
+                    throw new ArgumentOutOfRangeException("Invalid field type " + fieldType);
+            }
         }
 
         /// <summary>
