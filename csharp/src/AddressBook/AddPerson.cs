@@ -36,7 +36,6 @@
 
 using System;
 using System.IO;
-using Google.Protobuf;
 
 namespace Google.ProtocolBuffers.Examples.AddressBook
 {
@@ -47,7 +46,7 @@ namespace Google.ProtocolBuffers.Examples.AddressBook
         /// </summary>
         private static Person PromptForAddress(TextReader input, TextWriter output)
         {
-            Person person = new Person();
+            Person.Builder person = Person.CreateBuilder();
 
             output.Write("Enter person ID: ");
             person.Id = int.Parse(input.ReadLine());
@@ -71,7 +70,8 @@ namespace Google.ProtocolBuffers.Examples.AddressBook
                     break;
                 }
 
-                Person.Types.PhoneNumber phoneNumber = new Person.Types.PhoneNumber { Number = number };
+                Person.Types.PhoneNumber.Builder phoneNumber =
+                    Person.Types.PhoneNumber.CreateBuilder().SetNumber(number);
 
                 output.Write("Is this a mobile, home, or work phone? ");
                 String type = input.ReadLine();
@@ -91,9 +91,9 @@ namespace Google.ProtocolBuffers.Examples.AddressBook
                         break;
                 }
 
-                person.Phone.Add(phoneNumber);
+                person.AddPhone(phoneNumber);
             }
-            return person;
+            return person.Build();
         }
 
         /// <summary>
@@ -108,28 +108,27 @@ namespace Google.ProtocolBuffers.Examples.AddressBook
                 return -1;
             }
 
-            AddressBook addressBook;
+            AddressBook.Builder addressBook = AddressBook.CreateBuilder();
 
             if (File.Exists(args[0]))
             {
                 using (Stream file = File.OpenRead(args[0]))
                 {
-                    addressBook = AddressBook.Parser.ParseFrom(file);
+                    addressBook.MergeFrom(file);
                 }
             }
             else
             {
                 Console.WriteLine("{0}: File not found. Creating a new file.", args[0]);
-                addressBook = new AddressBook();
             }
 
             // Add an address.
-            addressBook.Person.Add(PromptForAddress(Console.In, Console.Out));
+            addressBook.AddPerson(PromptForAddress(Console.In, Console.Out));
 
             // Write the new address book back to disk.
             using (Stream output = File.OpenWrite(args[0]))
             {
-                addressBook.WriteTo(output);
+                addressBook.Build().WriteTo(output);
             }
             return 0;
         }
