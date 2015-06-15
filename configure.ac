@@ -17,9 +17,6 @@ AC_INIT([Protocol Buffers],[3.0.0-alpha-4-pre],[protobuf@googlegroups.com],[prot
 AM_MAINTAINER_MODE([enable])
 
 AC_CONFIG_SRCDIR(src/google/protobuf/message.cc)
-# The config file is generated but not used by the source code, since we only
-# need very few of them, e.g. HAVE_PTHREAD and HAVE_ZLIB. Those macros are
-# passed down in CXXFLAGS manually in src/Makefile.am
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -149,9 +146,6 @@ AS_IF([test "$with_protoc" != "no"], [
 AM_CONDITIONAL([USE_EXTERNAL_PROTOC], [test "$with_protoc" != "no"])
 
 ACX_PTHREAD
-AM_CONDITIONAL([HAVE_PTHREAD], [test "x$acx_pthread_ok" = "xyes"])
-
-# We still keep this for improving pbconfig.h for unsupported platforms.
 AC_CXX_STL_HASH
 
 case "$target_os" in
@@ -163,12 +157,12 @@ case "$target_os" in
     ;;
 esac
 
-# HACK:  Make gtest's configure script pick up our copy of CFLAGS and CXXFLAGS,
-#   since the flags added by ACX_CHECK_SUNCC must be used when compiling gtest
+# HACK:  Make gmock's configure script pick up our copy of CFLAGS and CXXFLAGS,
+#   since the flags added by ACX_CHECK_SUNCC must be used when compiling gmock
 #   too.
 export CFLAGS
 export CXXFLAGS
-AC_CONFIG_SUBDIRS([gtest])
+AC_CONFIG_SUBDIRS([gmock])
 
 AC_CONFIG_FILES([Makefile src/Makefile conformance/Makefile protobuf.pc protobuf-lite.pc])
 AC_OUTPUT

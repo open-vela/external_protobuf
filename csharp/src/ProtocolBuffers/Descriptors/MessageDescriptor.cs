@@ -31,9 +31,9 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using System;
 using System.Collections.Generic;
-using Google.Protobuf.DescriptorProtos;
+using Google.ProtocolBuffers.DescriptorProtos;
 
-namespace Google.Protobuf.Descriptors
+namespace Google.ProtocolBuffers.Descriptors
 {
     /// <summary>
     /// Describes a message type.
@@ -53,33 +53,33 @@ namespace Google.Protobuf.Descriptors
         {
             containingType = parent;
 
-            oneofs = DescriptorUtil.ConvertAndMakeReadOnly(proto.OneofDecl,
+            oneofs = DescriptorUtil.ConvertAndMakeReadOnly(proto.OneofDeclList,
                                                                (oneof, index) =>
                                                                new OneofDescriptor(oneof, file, this, index));
 
-            nestedTypes = DescriptorUtil.ConvertAndMakeReadOnly(proto.NestedType,
+            nestedTypes = DescriptorUtil.ConvertAndMakeReadOnly(proto.NestedTypeList,
                                                                 (type, index) =>
                                                                 new MessageDescriptor(type, file, this, index));
 
-            enumTypes = DescriptorUtil.ConvertAndMakeReadOnly(proto.EnumType,
+            enumTypes = DescriptorUtil.ConvertAndMakeReadOnly(proto.EnumTypeList,
                                                               (type, index) =>
                                                               new EnumDescriptor(type, file, this, index));
 
             // TODO(jonskeet): Sort fields first?
-            fields = DescriptorUtil.ConvertAndMakeReadOnly(proto.Field,
+            fields = DescriptorUtil.ConvertAndMakeReadOnly(proto.FieldList,
                                                            (field, index) =>
                                                            new FieldDescriptor(field, file, this, index, false));
 
-            extensions = DescriptorUtil.ConvertAndMakeReadOnly(proto.Extension,
+            extensions = DescriptorUtil.ConvertAndMakeReadOnly(proto.ExtensionList,
                                                                (field, index) =>
                                                                new FieldDescriptor(field, file, this, index, true));
 
-            for (int i = 0; i < proto.OneofDecl.Count; i++)
+            for (int i = 0; i < proto.OneofDeclCount; i++)
             {
                 oneofs[i].fields = new FieldDescriptor[oneofs[i].FieldCount];
                 oneofs[i].fieldCount = 0;
             }
-            for (int i = 0; i< proto.Field.Count; i++)
+            for (int i = 0; i< proto.FieldCount; i++)
             {
                 OneofDescriptor oneofDescriptor = fields[i].ContainingOneof;
                 if (oneofDescriptor != null)
@@ -151,7 +151,7 @@ namespace Google.Protobuf.Descriptors
         /// </summary>
         public bool IsExtensionNumber(int number)
         {
-            foreach (DescriptorProto.Types.ExtensionRange range in Proto.ExtensionRange)
+            foreach (DescriptorProto.Types.ExtensionRange range in Proto.ExtensionRangeList)
             {
                 if (range.Start <= number && number < range.End)
                 {
@@ -244,7 +244,7 @@ namespace Google.Protobuf.Descriptors
             // If the type allows extensions, an extension with message type could contain
             // required fields, so we have to be conservative and assume such an
             // extension exists.
-            if (Proto.ExtensionRange.Count != 0)
+            if (Proto.ExtensionRangeCount != 0)
             {
                 return true;
             }
@@ -275,22 +275,22 @@ namespace Google.Protobuf.Descriptors
 
             for (int i = 0; i < nestedTypes.Count; i++)
             {
-                nestedTypes[i].ReplaceProto(newProto.NestedType[i]);
+                nestedTypes[i].ReplaceProto(newProto.GetNestedType(i));
             }
 
             for (int i = 0; i < enumTypes.Count; i++)
             {
-                enumTypes[i].ReplaceProto(newProto.EnumType[i]);
+                enumTypes[i].ReplaceProto(newProto.GetEnumType(i));
             }
 
             for (int i = 0; i < fields.Count; i++)
             {
-                fields[i].ReplaceProto(newProto.Field[i]);
+                fields[i].ReplaceProto(newProto.GetField(i));
             }
 
             for (int i = 0; i < extensions.Count; i++)
             {
-                extensions[i].ReplaceProto(newProto.Extension[i]);
+                extensions[i].ReplaceProto(newProto.GetExtension(i));
             }
         }
     }

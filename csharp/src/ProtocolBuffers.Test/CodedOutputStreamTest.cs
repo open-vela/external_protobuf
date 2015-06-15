@@ -37,10 +37,10 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Google.Protobuf.Collections;
+using Google.ProtocolBuffers.TestProtos;
 using NUnit.Framework;
 
-namespace Google.Protobuf
+namespace Google.ProtocolBuffers
 {
     public class CodedOutputStreamTest
     {
@@ -195,7 +195,6 @@ namespace Google.Protobuf
                 0x9abcdef012345678UL);
         }
 
-        /*
         [Test]
         public void WriteWholeMessage()
         {
@@ -229,7 +228,6 @@ namespace Google.Protobuf
             TestUtil.AssertEqualBytes(TestUtil.GetGoldenPackedFieldsMessage().ToByteArray(),
                                       rawBytes);
         }
-        */
 
         [Test]
         public void EncodeZigZag32()
@@ -295,18 +293,31 @@ namespace Google.Protobuf
         [Test]
         public void TestNegativeEnumNoTag()
         {
-            Assert.AreEqual(10, CodedOutputStream.ComputeInt32Size(-2));
-            Assert.AreEqual(10, CodedOutputStream.ComputeEnumSize((int) TestNegEnum.Value));
+            Assert.AreEqual(10, CodedOutputStream.ComputeInt32SizeNoTag(-2));
+            Assert.AreEqual(10, CodedOutputStream.ComputeEnumSizeNoTag(-2));
 
             byte[] bytes = new byte[10];
             CodedOutputStream output = CodedOutputStream.CreateInstance(bytes);
-            output.WriteEnum((int) TestNegEnum.Value);
+            output.WriteEnumNoTag(-2);
 
             Assert.AreEqual(0, output.SpaceLeft);
             Assert.AreEqual("FE-FF-FF-FF-FF-FF-FF-FF-FF-01", BitConverter.ToString(bytes));
         }
 
-        enum TestNegEnum { None = 0, Value = -2 }
+        [Test]
+        public void TestNegativeEnumWithTag()
+        {
+            Assert.AreEqual(11, CodedOutputStream.ComputeInt32Size(8, -2));
+            Assert.AreEqual(11, CodedOutputStream.ComputeEnumSize(8, -2));
+
+            byte[] bytes = new byte[11];
+            CodedOutputStream output = CodedOutputStream.CreateInstance(bytes);
+            output.WriteEnum(8, "", -2, -2);
+
+            Assert.AreEqual(0, output.SpaceLeft);
+            //fyi, 0x40 == 0x08 << 3 + 0, field num + wire format shift
+            Assert.AreEqual("40-FE-FF-FF-FF-FF-FF-FF-FF-FF-01", BitConverter.ToString(bytes));
+        }
 
         [Test]
         public void TestNegativeEnumArrayPacked()
@@ -315,18 +326,17 @@ namespace Google.Protobuf
             int msgSize = 1 + 1 + arraySize;
             byte[] bytes = new byte[msgSize];
             CodedOutputStream output = CodedOutputStream.CreateInstance(bytes);
-            output.WriteTag(8, WireFormat.WireType.LengthDelimited);
-            output.WritePackedEnumArray(new RepeatedField<TestNegEnum> {
-                0, (TestNegEnum) (-1), TestNegEnum.Value, (TestNegEnum) (-3), (TestNegEnum) (-4), (TestNegEnum) (-5) });
+            output.WritePackedEnumArray(8, "", arraySize, new int[] { 0, -1, -2, -3, -4, -5 });
 
             Assert.AreEqual(0, output.SpaceLeft);
 
             CodedInputStream input = CodedInputStream.CreateInstance(bytes);
             uint tag;
-            Assert.IsTrue(input.ReadTag(out tag));
+            string name;
+            Assert.IsTrue(input.ReadTag(out tag, out name));
 
             List<int> values = new List<int>();
-            input.ReadInt32Array(tag, values);
+            input.ReadInt32Array(tag, name, values);
 
             Assert.AreEqual(6, values.Count);
             for (int i = 0; i > -6; i--)
@@ -340,16 +350,17 @@ namespace Google.Protobuf
             int msgSize = arraySize;
             byte[] bytes = new byte[msgSize];
             CodedOutputStream output = CodedOutputStream.CreateInstance(bytes);
-            output.WriteEnumArray(8, new RepeatedField<TestNegEnum> {
-                0, (TestNegEnum) (-1), TestNegEnum.Value, (TestNegEnum) (-3), (TestNegEnum) (-4), (TestNegEnum) (-5) });
+            output.WriteEnumArray(8, "", new int[] { 0, -1, -2, -3, -4, -5 });
+
             Assert.AreEqual(0, output.SpaceLeft);
 
             CodedInputStream input = CodedInputStream.CreateInstance(bytes);
             uint tag;
-            Assert.IsTrue(input.ReadTag(out tag));
+            string name;
+            Assert.IsTrue(input.ReadTag(out tag, out name));
 
             List<int> values = new List<int>();
-            input.ReadInt32Array(tag, values);
+            input.ReadInt32Array(tag, name, values);
 
             Assert.AreEqual(6, values.Count);
             for (int i = 0; i > -6; i--)
@@ -370,17 +381,17 @@ namespace Google.Protobuf
                 // Field 11: numeric value: 500
                 cout.WriteTag(11, WireFormat.WireType.Varint);
                 Assert.AreEqual(1, cout.Position);
-                cout.WriteInt32(500);
+                cout.WriteInt32NoTag(500);
                 Assert.AreEqual(3, cout.Position);
                 //Field 12: length delimited 120 bytes
                 cout.WriteTag(12, WireFormat.WireType.LengthDelimited);
                 Assert.AreEqual(4, cout.Position);
-                cout.WriteBytes(ByteString.CopyFrom(content));
+                cout.WriteBytesNoTag(ByteString.CopyFrom(content));
                 Assert.AreEqual(115, cout.Position);
                 // Field 13: fixed numeric value: 501
                 cout.WriteTag(13, WireFormat.WireType.Fixed32);
                 Assert.AreEqual(116, cout.Position);
-                cout.WriteSFixed32(501);
+                cout.WriteSFixed32NoTag(501);
                 Assert.AreEqual(120, cout.Position);
                 cout.Flush();
             }
@@ -391,17 +402,17 @@ namespace Google.Protobuf
                 // Field 1: numeric value: 500
                 cout.WriteTag(1, WireFormat.WireType.Varint);
                 Assert.AreEqual(1, cout.Position);
-                cout.WriteInt32(500);
+                cout.WriteInt32NoTag(500);
                 Assert.AreEqual(3, cout.Position);
                 //Field 2: length delimited 120 bytes
                 cout.WriteTag(2, WireFormat.WireType.LengthDelimited);
                 Assert.AreEqual(4, cout.Position);
-                cout.WriteBytes(ByteString.CopyFrom(child));
+                cout.WriteBytesNoTag(ByteString.CopyFrom(child));
                 Assert.AreEqual(125, cout.Position);
                 // Field 3: fixed numeric value: 500
                 cout.WriteTag(3, WireFormat.WireType.Fixed32);
                 Assert.AreEqual(126, cout.Position);
-                cout.WriteSFixed32(501);
+                cout.WriteSFixed32NoTag(501);
                 Assert.AreEqual(130, cout.Position);
                 cout.Flush();
             }
@@ -409,14 +420,16 @@ namespace Google.Protobuf
             {
                 CodedInputStream cin = CodedInputStream.CreateInstance(new MemoryStream(bytes), new byte[50]);
                 uint tag;
+                int intValue = 0;
+                string ignore;
                 Assert.AreEqual(0, cin.Position);
                 // Field 1:
-                Assert.IsTrue(cin.ReadTag(out tag) && tag >> 3 == 1);
+                Assert.IsTrue(cin.ReadTag(out tag, out ignore) && tag >> 3 == 1);
                 Assert.AreEqual(1, cin.Position);
-                Assert.AreEqual(500, cin.ReadInt32());
+                Assert.IsTrue(cin.ReadInt32(ref intValue) && intValue == 500);
                 Assert.AreEqual(3, cin.Position);
                 //Field 2:
-                Assert.IsTrue(cin.ReadTag(out tag) && tag >> 3 == 2);
+                Assert.IsTrue(cin.ReadTag(out tag, out ignore) && tag >> 3 == 2);
                 Assert.AreEqual(4, cin.Position);
                 uint childlen = cin.ReadRawVarint32();
                 Assert.AreEqual(120u, childlen);
@@ -426,31 +439,30 @@ namespace Google.Protobuf
                 // Now we are reading child message
                 {
                     // Field 11: numeric value: 500
-                    Assert.IsTrue(cin.ReadTag(out tag) && tag >> 3 == 11);
+                    Assert.IsTrue(cin.ReadTag(out tag, out ignore) && tag >> 3 == 11);
                     Assert.AreEqual(6, cin.Position);
-                    Assert.AreEqual(500, cin.ReadInt32());
+                    Assert.IsTrue(cin.ReadInt32(ref intValue) && intValue == 500);
                     Assert.AreEqual(8, cin.Position);
                     //Field 12: length delimited 120 bytes
-                    Assert.IsTrue(cin.ReadTag(out tag) && tag >> 3 == 12);
+                    Assert.IsTrue(cin.ReadTag(out tag, out ignore) && tag >> 3 == 12);
                     Assert.AreEqual(9, cin.Position);
-                    ByteString bstr = cin.ReadBytes();
-                    Assert.AreEqual(110, bstr.Length);
-                    Assert.AreEqual((byte) 109, bstr[109]);
+                    ByteString bstr = null;
+                    Assert.IsTrue(cin.ReadBytes(ref bstr) && bstr.Length == 110 && bstr.ToByteArray()[109] == 109);
                     Assert.AreEqual(120, cin.Position);
                     // Field 13: fixed numeric value: 501
-                    Assert.IsTrue(cin.ReadTag(out tag) && tag >> 3 == 13);
+                    Assert.IsTrue(cin.ReadTag(out tag, out ignore) && tag >> 3 == 13);
                     // ROK - Previously broken here, this returned 126 failing to account for bufferSizeAfterLimit
                     Assert.AreEqual(121, cin.Position);
-                    Assert.AreEqual(501, cin.ReadSFixed32());
+                    Assert.IsTrue(cin.ReadSFixed32(ref intValue) && intValue == 501);
                     Assert.AreEqual(125, cin.Position);
                     Assert.IsTrue(cin.IsAtEnd);
                 }
                 cin.PopLimit(oldlimit);
                 Assert.AreEqual(125, cin.Position);
                 // Field 3: fixed numeric value: 501
-                Assert.IsTrue(cin.ReadTag(out tag) && tag >> 3 == 3);
+                Assert.IsTrue(cin.ReadTag(out tag, out ignore) && tag >> 3 == 3);
                 Assert.AreEqual(126, cin.Position);
-                Assert.AreEqual(501, cin.ReadSFixed32());
+                Assert.IsTrue(cin.ReadSFixed32(ref intValue) && intValue == 501);
                 Assert.AreEqual(130, cin.Position);
                 Assert.IsTrue(cin.IsAtEnd);
             }
