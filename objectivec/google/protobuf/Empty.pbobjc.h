@@ -11,7 +11,6 @@
 
 CF_EXTERN_C_BEGIN
 
-NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark - GPBEmptyRoot
 
@@ -36,8 +35,6 @@ NS_ASSUME_NONNULL_BEGIN
 @interface GPBEmpty : GPBMessage
 
 @end
-
-NS_ASSUME_NONNULL_END
 
 CF_EXTERN_C_END
 

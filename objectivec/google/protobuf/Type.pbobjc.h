@@ -14,8 +14,6 @@ CF_EXTERN_C_BEGIN
 @class GPBAny;
 @class GPBSourceContext;
 
-NS_ASSUME_NONNULL_BEGIN
-
 #pragma mark - Enum GPBField_Kind
 
 // Kind represents a basic field type.
@@ -103,6 +101,7 @@ GPBEnumDescriptor *GPBField_Cardinality_EnumDescriptor(void);
 
 BOOL GPBField_Cardinality_IsValidValue(int32_t value);
 
+
 #pragma mark - GPBTypeRoot
 
 @interface GPBTypeRoot : GPBRootObject
@@ -128,27 +127,27 @@ typedef GPB_ENUM(GPBType_FieldNumber) {
 @interface GPBType : GPBMessage
 
 // The fully qualified message name.
-@property(nonatomic, readwrite, copy, null_resettable) NSString *name;
+@property(nonatomic, readwrite, copy) NSString *name;
 
 // The list of fields.
 // |fieldsArray| contains |GPBField|
-@property(nonatomic, readwrite, strong, null_resettable) NSMutableArray *fieldsArray;
+@property(nonatomic, readwrite, strong) NSMutableArray *fieldsArray;
 @property(nonatomic, readonly) NSUInteger fieldsArray_Count;
 
 // The list of oneof definitions.
 // The list of oneofs declared in this Type
 // |oneofsArray| contains |NSString|
-@property(nonatomic, readwrite, strong, null_resettable) NSMutableArray *oneofsArray;
+@property(nonatomic, readwrite, strong) NSMutableArray *oneofsArray;
 @property(nonatomic, readonly) NSUInteger oneofsArray_Count;
 
 // The proto options.
 // |optionsArray| contains |GPBOption|
-@property(nonatomic, readwrite, strong, null_resettable) NSMutableArray *optionsArray;
+@property(nonatomic, readwrite, strong) NSMutableArray *optionsArray;
 @property(nonatomic, readonly) NSUInteger optionsArray_Count;
 
 // The source context.
 @property(nonatomic, readwrite) BOOL hasSourceContext;
-@property(nonatomic, readwrite, strong, null_resettable) GPBSourceContext *sourceContext;
+@property(nonatomic, readwrite, strong) GPBSourceContext *sourceContext;
 
 @end
 
@@ -178,11 +177,11 @@ typedef GPB_ENUM(GPBField_FieldNumber) {
 @property(nonatomic, readwrite) int32_t number;
 
 // The field name.
-@property(nonatomic, readwrite, copy, null_resettable) NSString *name;
+@property(nonatomic, readwrite, copy) NSString *name;
 
 // The type URL (without the scheme) when the type is MESSAGE or ENUM,
 // such as `type.googleapis.com/google.protobuf.Empty`.
-@property(nonatomic, readwrite, copy, null_resettable) NSString *typeURL;
+@property(nonatomic, readwrite, copy) NSString *typeURL;
 
 // Index in Type.oneofs. Starts at 1. Zero means no oneof mapping.
 @property(nonatomic, readwrite) int32_t oneofIndex;
@@ -192,7 +191,7 @@ typedef GPB_ENUM(GPBField_FieldNumber) {
 
 // The proto options.
 // |optionsArray| contains |GPBOption|
-@property(nonatomic, readwrite, strong, null_resettable) NSMutableArray *optionsArray;
+@property(nonatomic, readwrite, strong) NSMutableArray *optionsArray;
 @property(nonatomic, readonly) NSUInteger optionsArray_Count;
 
 @end
@@ -216,21 +215,21 @@ typedef GPB_ENUM(GPBEnum_FieldNumber) {
 @interface GPBEnum : GPBMessage
 
 // Enum type name.
-@property(nonatomic, readwrite, copy, null_resettable) NSString *name;
+@property(nonatomic, readwrite, copy) NSString *name;
 
 // Enum value definitions.
 // |enumvalueArray| contains |GPBEnumValue|
-@property(nonatomic, readwrite, strong, null_resettable) NSMutableArray *enumvalueArray;
+@property(nonatomic, readwrite, strong) NSMutableArray *enumvalueArray;
 @property(nonatomic, readonly) NSUInteger enumvalueArray_Count;
 
 // Proto options for the enum type.
 // |optionsArray| contains |GPBOption|
-@property(nonatomic, readwrite, strong, null_resettable) NSMutableArray *optionsArray;
+@property(nonatomic, readwrite, strong) NSMutableArray *optionsArray;
 @property(nonatomic, readonly) NSUInteger optionsArray_Count;
 
 // The source context.
 @property(nonatomic, readwrite) BOOL hasSourceContext;
-@property(nonatomic, readwrite, strong, null_resettable) GPBSourceContext *sourceContext;
+@property(nonatomic, readwrite, strong) GPBSourceContext *sourceContext;
 
 @end
 
@@ -246,14 +245,14 @@ typedef GPB_ENUM(GPBEnumValue_FieldNumber) {
 @interface GPBEnumValue : GPBMessage
 
 // Enum value name.
-@property(nonatomic, readwrite, copy, null_resettable) NSString *name;
+@property(nonatomic, readwrite, copy) NSString *name;
 
 // Enum value number.
 @property(nonatomic, readwrite) int32_t number;
 
 // Proto options for the enum value.
 // |optionsArray| contains |GPBOption|
-@property(nonatomic, readwrite, strong, null_resettable) NSMutableArray *optionsArray;
+@property(nonatomic, readwrite, strong) NSMutableArray *optionsArray;
 @property(nonatomic, readonly) NSUInteger optionsArray_Count;
 
 @end
@@ -269,15 +268,13 @@ typedef GPB_ENUM(GPBOption_FieldNumber) {
 @interface GPBOption : GPBMessage
 
 // Proto option name.
-@property(nonatomic, readwrite, copy, null_resettable) NSString *name;
+@property(nonatomic, readwrite, copy) NSString *name;
 
 // Proto option value.
 @property(nonatomic, readwrite) BOOL hasValue;
-@property(nonatomic, readwrite, strong, null_resettable) GPBAny *value;
+@property(nonatomic, readwrite, strong) GPBAny *value;
 
 @end
-
-NS_ASSUME_NONNULL_END
 
 CF_EXTERN_C_END
 
