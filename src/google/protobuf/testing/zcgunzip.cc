@@ -38,6 +38,8 @@
 // Reads gzip stream on standard input and writes decompressed data to standard
 // output.
 
+#include "config.h"
+
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>

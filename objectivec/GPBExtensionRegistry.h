@@ -31,7 +31,7 @@
 #import <Foundation/Foundation.h>
 
 @class GPBDescriptor;
-@class GPBExtensionDescriptor;
+@class GPBExtensionField;
 
 // A table of known extensions, searchable by name or field number.  When
 // parsing a protocol message that might have extensions, you must provide an
@@ -54,10 +54,10 @@
 //
 @interface GPBExtensionRegistry : NSObject<NSCopying>
 
-- (void)addExtension:(GPBExtensionDescriptor *)extension;
+- (void)addExtension:(GPBExtensionField *)extension;
 - (void)addExtensions:(GPBExtensionRegistry *)registry;
 
-- (GPBExtensionDescriptor *)extensionForDescriptor:(GPBDescriptor *)descriptor
-                                       fieldNumber:(NSInteger)fieldNumber;
+- (GPBExtensionField *)getExtension:(GPBDescriptor *)containingType
+                        fieldNumber:(NSInteger)fieldNumber;
 
 @end
