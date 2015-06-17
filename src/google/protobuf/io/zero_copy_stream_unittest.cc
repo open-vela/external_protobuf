@@ -46,6 +46,8 @@
 //   "parametized tests" so that one set of tests can be used on all the
 //   implementations.
 
+#include "config.h"
+
 #ifdef _MSC_VER
 #include <io.h>
 #else

@@ -4,25 +4,17 @@ if HAVE_ZLIB
 GZCHECKPROGRAMS = zcgzip zcgunzip
 GZHEADERS = google/protobuf/io/gzip_stream.h
 GZTESTS = google/protobuf/io/gzip_stream_unittest.sh
-ZLIB_DEF = -DHAVE_ZLIB=1
 else
 GZCHECKPROGRAMS =
 GZHEADERS =
 GZTESTS =
-ZLIB_DEF =
-endif
-
-if HAVE_PTHREAD
-PTHREAD_DEF = -DHAVE_PTHREAD=1
-else
-PTHREAD_DEF =
 endif
 
 if GCC
 # These are good warnings to turn on by default
-NO_OPT_CXXFLAGS = $(PTHREAD_CFLAGS) $(PTHREAD_DEF) $(ZLIB_DEF) -Wall -Wwrite-strings -Woverloaded-virtual -Wno-sign-compare
+NO_OPT_CXXFLAGS = $(PTHREAD_CFLAGS) -Wall -Wwrite-strings -Woverloaded-virtual -Wno-sign-compare
 else
-NO_OPT_CXXFLAGS = $(PTHREAD_CFLAGS) $(PTHREAD_DEF) $(ZLIB_DEF)
+NO_OPT_CXXFLAGS = $(PTHREAD_CFLAGS)
 endif
 
 AM_CXXFLAGS = $(NO_OPT_CXXFLAGS) $(PROTOBUF_OPT_FLAG)
@@ -49,11 +41,23 @@ nobase_dist_proto_DATA = google/protobuf/descriptor.proto     \
 clean-local:
 	rm -f *.loT
 
-CLEANFILES = $(protoc_outputs) unittest_proto_middleman \
+public_config = google/protobuf/stubs/pbconfig.h
+
+CLEANFILES = $(protoc_outputs) $(public_config) unittest_proto_middleman \
              testzip.jar testzip.list testzip.proto testzip.zip
 
 MAINTAINERCLEANFILES =   \
   Makefile.in
+
+# Generate and distribute a minimum config.h file to make hash_map work.
+# The autoheader config has too much info, which might conflict with other
+# macros applications might include. Thus, we create a stubs/pbconfig.h, that
+# only #defines what we really need, and prefix it with GOOGLE_PROTOBUF_ to
+# avoid conflicts.
+$(public_config): $(top_builddir)/config.h $(top_srcdir)/config.h.include
+	echo "// Note: Google Protobuf internal only. Do NOT include." > $@
+	cat $(top_builddir)/config.h | grep -f $(top_srcdir)/config.h.include | \
+	sed 's,#define , #define GOOGLE_PROTOBUF_,' >> $@
 
 nobase_include_HEADERS =                                        \
   google/protobuf/stubs/atomic_sequence_num.h                   \
@@ -76,7 +80,6 @@ nobase_include_HEADERS =                                        \
   google/protobuf/stubs/fastmem.h                               \
   google/protobuf/stubs/hash.h                                  \
   google/protobuf/stubs/once.h                                  \
-  google/protobuf/stubs/pbconfig.h                              \
   google/protobuf/stubs/platform_macros.h                       \
   google/protobuf/stubs/shared_ptr.h                            \
   google/protobuf/stubs/singleton.h                             \
@@ -144,10 +147,13 @@ nobase_include_HEADERS =                                        \
   google/protobuf/compiler/java/java_names.h                    \
   google/protobuf/compiler/javanano/javanano_generator.h        \
   google/protobuf/compiler/objectivec/objectivec_generator.h    \
-  google/protobuf/compiler/objectivec/objectivec_helpers.h      \
+  google/protobuf/compiler/objectivec/objectivec_helpers.h     \
   google/protobuf/compiler/python/python_generator.h            \
   google/protobuf/compiler/ruby/ruby_generator.h                \
   google/protobuf/compiler/csharp/csharp_generator.h
+
+nobase_nodist_include_HEADERS =                                 \
+  $(public_config)
 
 lib_LTLIBRARIES = libprotobuf-lite.la libprotobuf.la libprotoc.la
 
@@ -174,6 +180,7 @@ libprotobuf_lite_la_SOURCES =                                  \
   google/protobuf/io/coded_stream_inl.h                        \
   google/protobuf/io/zero_copy_stream.cc                       \
   google/protobuf/io/zero_copy_stream_impl_lite.cc
+nodist_libprotobuf_lite_la_SOURCES = $(public_config)
 
 libprotobuf_la_LIBADD = $(PTHREAD_LIBS)
 libprotobuf_la_LDFLAGS = -version-info 10:0:0 -export-dynamic -no-undefined
@@ -362,8 +369,6 @@ libprotoc_la_SOURCES =                                         \
   google/protobuf/compiler/csharp/csharp_enum.h                \
   google/protobuf/compiler/csharp/csharp_enum_field.cc         \
   google/protobuf/compiler/csharp/csharp_enum_field.h          \
-  google/protobuf/compiler/csharp/csharp_extension.cc          \
-  google/protobuf/compiler/csharp/csharp_extension.h           \
   google/protobuf/compiler/csharp/csharp_field_base.cc         \
   google/protobuf/compiler/csharp/csharp_field_base.h          \
   google/protobuf/compiler/csharp/csharp_generator.cc          \
@@ -384,9 +389,7 @@ libprotoc_la_SOURCES =                                         \
   google/protobuf/compiler/csharp/csharp_source_generator_base.cc \
   google/protobuf/compiler/csharp/csharp_source_generator_base.h \
   google/protobuf/compiler/csharp/csharp_umbrella_class.cc     \
-  google/protobuf/compiler/csharp/csharp_umbrella_class.h      \
-  google/protobuf/compiler/csharp/csharp_writer.cc             \
-  google/protobuf/compiler/csharp/csharp_writer.h
+  google/protobuf/compiler/csharp/csharp_umbrella_class.h
 
 bin_PROGRAMS = protoc
 protoc_LDADD = $(PTHREAD_LIBS) libprotobuf.la libprotoc.la
@@ -405,7 +408,6 @@ protoc_inputs =                                                \
   google/protobuf/unittest_drop_unknown_fields.proto           \
   google/protobuf/unittest_embed_optimize_for.proto            \
   google/protobuf/unittest_empty.proto                         \
-  google/protobuf/unittest_enormous_descriptor.proto           \
   google/protobuf/unittest_import_lite.proto                   \
   google/protobuf/unittest_import.proto                        \
   google/protobuf/unittest_import_public_lite.proto            \
@@ -447,7 +449,8 @@ EXTRA_DIST =                                                   \
   google/protobuf/compiler/ruby/ruby_generated_code.proto      \
   google/protobuf/compiler/ruby/ruby_generated_code.rb         \
   google/protobuf/compiler/package_info.h                      \
-  google/protobuf/compiler/zip_output_unittest.sh
+  google/protobuf/compiler/zip_output_unittest.sh              \
+  google/protobuf/unittest_enormous_descriptor.proto
 
 protoc_lite_outputs =                                          \
   google/protobuf/map_lite_unittest.pb.cc                      \
@@ -479,8 +482,6 @@ protoc_outputs =                                               \
   google/protobuf/unittest_embed_optimize_for.pb.h             \
   google/protobuf/unittest_empty.pb.cc                         \
   google/protobuf/unittest_empty.pb.h                          \
-  google/protobuf/unittest_enormous_descriptor.pb.cc           \
-  google/protobuf/unittest_enormous_descriptor.pb.h            \
   google/protobuf/unittest_import.pb.cc                        \
   google/protobuf/unittest_import.pb.h                         \
   google/protobuf/unittest_import_public.pb.cc                 \
@@ -512,7 +513,7 @@ protoc_outputs =                                               \
   google/protobuf/compiler/cpp/cpp_test_bad_identifiers.pb.cc  \
   google/protobuf/compiler/cpp/cpp_test_bad_identifiers.pb.h
 
-BUILT_SOURCES = $(protoc_outputs)
+BUILT_SOURCES = $(public_config) $(protoc_outputs)
 
 if USE_EXTERNAL_PROTOC
 

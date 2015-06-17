@@ -132,18 +132,15 @@ typedef GPB_ENUM(GPBType_FieldNumber) {
 // The list of fields.
 // |fieldsArray| contains |GPBField|
 @property(nonatomic, readwrite, strong) NSMutableArray *fieldsArray;
-@property(nonatomic, readonly) NSUInteger fieldsArray_Count;
 
 // The list of oneof definitions.
 // The list of oneofs declared in this Type
 // |oneofsArray| contains |NSString|
 @property(nonatomic, readwrite, strong) NSMutableArray *oneofsArray;
-@property(nonatomic, readonly) NSUInteger oneofsArray_Count;
 
 // The proto options.
 // |optionsArray| contains |GPBOption|
 @property(nonatomic, readwrite, strong) NSMutableArray *optionsArray;
-@property(nonatomic, readonly) NSUInteger optionsArray_Count;
 
 // The source context.
 @property(nonatomic, readwrite) BOOL hasSourceContext;
@@ -192,7 +189,6 @@ typedef GPB_ENUM(GPBField_FieldNumber) {
 // The proto options.
 // |optionsArray| contains |GPBOption|
 @property(nonatomic, readwrite, strong) NSMutableArray *optionsArray;
-@property(nonatomic, readonly) NSUInteger optionsArray_Count;
 
 @end
 
@@ -220,12 +216,10 @@ typedef GPB_ENUM(GPBEnum_FieldNumber) {
 // Enum value definitions.
 // |enumvalueArray| contains |GPBEnumValue|
 @property(nonatomic, readwrite, strong) NSMutableArray *enumvalueArray;
-@property(nonatomic, readonly) NSUInteger enumvalueArray_Count;
 
 // Proto options for the enum type.
 // |optionsArray| contains |GPBOption|
 @property(nonatomic, readwrite, strong) NSMutableArray *optionsArray;
-@property(nonatomic, readonly) NSUInteger optionsArray_Count;
 
 // The source context.
 @property(nonatomic, readwrite) BOOL hasSourceContext;
@@ -253,7 +247,6 @@ typedef GPB_ENUM(GPBEnumValue_FieldNumber) {
 // Proto options for the enum value.
 // |optionsArray| contains |GPBOption|
 @property(nonatomic, readwrite, strong) NSMutableArray *optionsArray;
-@property(nonatomic, readonly) NSUInteger optionsArray_Count;
 
 @end
 

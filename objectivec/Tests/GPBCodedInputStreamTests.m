@@ -260,7 +260,7 @@
       [GPBCodedInputStream streamWithData:[NSMutableData dataWithData:data]];
   XCTAssertEqual(tag, [input readTag]);
 
-  XCTAssertThrows([input readBytes]);
+  XCTAssertThrows([input readData]);
 }
 
 // Verifies fix for b/10315336.
