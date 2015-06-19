@@ -38,8 +38,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using Google.Protobuf;
-using Google.Protobuf.Descriptors;
 using Google.ProtocolBuffers.Descriptors;
 
 namespace Google.ProtocolBuffers.ProtoMunge
