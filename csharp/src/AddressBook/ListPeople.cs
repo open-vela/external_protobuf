@@ -46,16 +46,16 @@ namespace Google.ProtocolBuffers.Examples.AddressBook
         /// </summary>
         private static void Print(AddressBook addressBook)
         {
-            foreach (Person person in addressBook.Person)
+            foreach (Person person in addressBook.PersonList)
             {
                 Console.WriteLine("Person ID: {0}", person.Id);
                 Console.WriteLine("  Name: {0}", person.Name);
-                if (person.Email != "")
+                if (person.HasEmail)
                 {
                     Console.WriteLine("  E-mail address: {0}", person.Email);
                 }
 
-                foreach (Person.Types.PhoneNumber phoneNumber in person.Phone)
+                foreach (Person.Types.PhoneNumber phoneNumber in person.PhoneList)
                 {
                     switch (phoneNumber.Type)
                     {
@@ -94,7 +94,7 @@ namespace Google.ProtocolBuffers.Examples.AddressBook
             // Read the existing address book.
             using (Stream stream = File.OpenRead(args[0]))
             {
-                AddressBook addressBook = AddressBook.Parser.ParseFrom(stream);
+                AddressBook addressBook = AddressBook.ParseFrom(stream);
                 Print(addressBook);
             }
             return 0;

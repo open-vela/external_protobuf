@@ -30,9 +30,9 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using System.Collections.Generic;
-using Google.Protobuf.Collections;
+using Google.ProtocolBuffers.Collections;
 
-namespace Google.Protobuf.Descriptors
+namespace Google.ProtocolBuffers.Descriptors
 {
     /// <summary>
     /// Internal class containing utility methods when working with descriptors.
