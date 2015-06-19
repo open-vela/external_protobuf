@@ -32,9 +32,6 @@
 
 #include <google/protobuf/stubs/common.h>
 #include <google/protobuf/stubs/once.h>
-#include <google/protobuf/stubs/status.h>
-#include <google/protobuf/stubs/stringpiece.h>
-#include <google/protobuf/stubs/strutil.h>
 #include <stdio.h>
 #include <errno.h>
 #include <vector>
@@ -149,27 +146,6 @@ LogMessage& LogMessage::operator<<(const char* value) {
   return *this;
 }
 
-LogMessage& LogMessage::operator<<(const StringPiece& value) {
-  message_ += value.ToString();
-  return *this;
-}
-
-LogMessage& LogMessage::operator<<(long long value) {
-  message_ += SimpleItoa(value);
-  return *this;
-}
-
-LogMessage& LogMessage::operator<<(unsigned long long value) {
-  message_ += SimpleItoa(value);
-  return *this;
-}
-
-LogMessage& LogMessage::operator<<(
-    const ::google::protobuf::util::Status& status) {
-  message_ += status.ToString();
-  return *this;
-}
-
 // Since this is just for logging, we don't care if the current locale changes
 // the results -- in fact, we probably prefer that.  So we use snprintf()
 // instead of Simple*toa().
@@ -189,7 +165,7 @@ LogMessage& LogMessage::operator<<(
 
 DECLARE_STREAM_OPERATOR(char         , "%c" )
 DECLARE_STREAM_OPERATOR(int          , "%d" )
-DECLARE_STREAM_OPERATOR(unsigned int , "%u" )
+DECLARE_STREAM_OPERATOR(uint         , "%u" )
 DECLARE_STREAM_OPERATOR(long         , "%ld")
 DECLARE_STREAM_OPERATOR(unsigned long, "%lu")
 DECLARE_STREAM_OPERATOR(double       , "%g" )
