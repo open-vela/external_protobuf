@@ -33,10 +33,10 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
-using Google.Protobuf.DescriptorProtos;
-using FileOptions = Google.Protobuf.DescriptorProtos.FileOptions;
+using Google.ProtocolBuffers.DescriptorProtos;
+using FileOptions = Google.ProtocolBuffers.DescriptorProtos.FileOptions;
 
-namespace Google.Protobuf.Descriptors
+namespace Google.ProtocolBuffers.Descriptors
 {
     /// <summary>
     /// Describes a .proto file, including everything defined within.
@@ -75,19 +75,19 @@ namespace Google.Protobuf.Descriptors
 
             pool.AddPackage(Package, this);
 
-            messageTypes = DescriptorUtil.ConvertAndMakeReadOnly(proto.MessageType,
+            messageTypes = DescriptorUtil.ConvertAndMakeReadOnly(proto.MessageTypeList,
                                                                  (message, index) =>
                                                                  new MessageDescriptor(message, this, null, index));
 
-            enumTypes = DescriptorUtil.ConvertAndMakeReadOnly(proto.EnumType,
+            enumTypes = DescriptorUtil.ConvertAndMakeReadOnly(proto.EnumTypeList,
                                                               (enumType, index) =>
                                                               new EnumDescriptor(enumType, this, null, index));
 
-            services = DescriptorUtil.ConvertAndMakeReadOnly(proto.Service,
+            services = DescriptorUtil.ConvertAndMakeReadOnly(proto.ServiceList,
                                                              (service, index) =>
                                                              new ServiceDescriptor(service, this, index));
 
-            extensions = DescriptorUtil.ConvertAndMakeReadOnly(proto.Extension,
+            extensions = DescriptorUtil.ConvertAndMakeReadOnly(proto.ExtensionList,
                                                                (field, index) =>
                                                                new FieldDescriptor(field, this, null, index, true));
         }
@@ -104,14 +104,14 @@ namespace Google.Protobuf.Descriptors
                 nameToFileMap[file.Name] = file;
             }
             var publicDependencies = new List<FileDescriptor>();
-            for (int i = 0; i < proto.PublicDependency.Count; i++)
+            for (int i = 0; i < proto.PublicDependencyCount; i++)
             {
-                int index = proto.PublicDependency[i];
-                if (index < 0 || index >= proto.Dependency.Count)
+                int index = proto.PublicDependencyList[i];
+                if (index < 0 || index >= proto.DependencyCount)
                 {
                     throw new DescriptorValidationException(@this, "Invalid public dependency index.");
                 }
-                string name = proto.Dependency[index];
+                string name = proto.DependencyList[index];
                 FileDescriptor file = nameToFileMap[name];
                 if (file == null)
                 {
@@ -371,7 +371,7 @@ namespace Google.Protobuf.Descriptors
         /// </summary>
         public static FileDescriptor InternalBuildGeneratedFileFrom(byte[] descriptorData, FileDescriptor[] dependencies)
         {
-            return InternalBuildGeneratedFileFrom(descriptorData, dependencies, x => { });
+            return InternalBuildGeneratedFileFrom(descriptorData, dependencies, x => null);
         }
 
         /// <summary>
@@ -384,7 +384,9 @@ namespace Google.Protobuf.Descriptors
         /// in descriptor.proto. The callback may also return null to indicate that
         /// no extensions are used in the descriptor.
         /// </summary>
-        public delegate void InternalDescriptorAssigner(FileDescriptor descriptor);
+        /// <param name="descriptor"></param>
+        /// <returns></returns>
+        public delegate ExtensionRegistry InternalDescriptorAssigner(FileDescriptor descriptor);
 
         public static FileDescriptor InternalBuildGeneratedFileFrom(byte[] descriptorData,
                                                                     FileDescriptor[] dependencies,
@@ -393,7 +395,7 @@ namespace Google.Protobuf.Descriptors
             FileDescriptorProto proto;
             try
             {
-                proto = FileDescriptorProto.Parser.ParseFrom(descriptorData);
+                proto = FileDescriptorProto.ParseFrom(descriptorData);
             }
             catch (InvalidProtocolBufferException e)
             {
@@ -412,7 +414,22 @@ namespace Google.Protobuf.Descriptors
                 throw new ArgumentException("Invalid embedded descriptor for \"" + proto.Name + "\".", e);
             }
 
-            descriptorAssigner(result);
+            ExtensionRegistry registry = descriptorAssigner(result);
+
+            if (registry != null)
+            {
+                // We must re-parse the proto using the registry.
+                try
+                {
+                    proto = FileDescriptorProto.ParseFrom(descriptorData, registry);
+                }
+                catch (InvalidProtocolBufferException e)
+                {
+                    throw new ArgumentException("Failed to parse protocol buffer descriptor for generated code.", e);
+                }
+
+                result.ReplaceProto(proto);
+            }
             return result;
         }
 
@@ -432,22 +449,22 @@ namespace Google.Protobuf.Descriptors
 
             for (int i = 0; i < messageTypes.Count; i++)
             {
-                messageTypes[i].ReplaceProto(proto.MessageType[i]);
+                messageTypes[i].ReplaceProto(proto.GetMessageType(i));
             }
 
             for (int i = 0; i < enumTypes.Count; i++)
             {
-                enumTypes[i].ReplaceProto(proto.EnumType[i]);
+                enumTypes[i].ReplaceProto(proto.GetEnumType(i));
             }
 
             for (int i = 0; i < services.Count; i++)
             {
-                services[i].ReplaceProto(proto.Service[i]);
+                services[i].ReplaceProto(proto.GetService(i));
             }
 
             for (int i = 0; i < extensions.Count; i++)
             {
-                extensions[i].ReplaceProto(proto.Extension[i]);
+                extensions[i].ReplaceProto(proto.GetExtension(i));
             }
         }
 
