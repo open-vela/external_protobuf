@@ -44,8 +44,6 @@
 @class GPBUInt64Array;
 @class GPBUnknownFieldSet;
 
-NS_ASSUME_NONNULL_BEGIN
-
 @interface GPBCodedOutputStream : NSObject
 
 // Creates a new stream to write into data.  Data must be sized to fit or it
@@ -55,10 +53,12 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)streamWithOutputStream:(NSOutputStream *)output
                             bufferSize:(size_t)bufferSize;
 
-- (instancetype)initWithData:(NSMutableData *)data;
 - (instancetype)initWithOutputStream:(NSOutputStream *)output;
+- (instancetype)initWithData:(NSMutableData *)data;
 - (instancetype)initWithOutputStream:(NSOutputStream *)output
                           bufferSize:(size_t)bufferSize;
+- (instancetype)initWithOutputStream:(NSOutputStream *)output
+                                data:(NSMutableData *)data;
 
 - (void)flush;
 
@@ -293,8 +293,6 @@ size_t GPBComputeEnumSize(int32_t fieldNumber, int32_t value)
     __attribute__((const));
 
 CF_EXTERN_C_END
-
-NS_ASSUME_NONNULL_END
 
 // Write methods for types that can be in packed arrays.
 //%PDDM-DEFINE _WRITE_PACKABLE_DECLS(NAME, ARRAY_TYPE, TYPE)
