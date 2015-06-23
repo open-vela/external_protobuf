@@ -11,7 +11,6 @@
 
 CF_EXTERN_C_BEGIN
 
-NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark - GPBWrappersRoot
 
@@ -132,7 +131,7 @@ typedef GPB_ENUM(GPBStringValue_FieldNumber) {
 @interface GPBStringValue : GPBMessage
 
 // The string value.
-@property(nonatomic, readwrite, copy, null_resettable) NSString *value;
+@property(nonatomic, readwrite, copy) NSString *value;
 
 @end
 
@@ -146,11 +145,9 @@ typedef GPB_ENUM(GPBBytesValue_FieldNumber) {
 @interface GPBBytesValue : GPBMessage
 
 // The bytes value.
-@property(nonatomic, readwrite, copy, null_resettable) NSData *value;
+@property(nonatomic, readwrite, copy) NSData *value;
 
 @end
-
-NS_ASSUME_NONNULL_END
 
 CF_EXTERN_C_END
 
