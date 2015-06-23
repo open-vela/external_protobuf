@@ -11,7 +11,6 @@
 
 CF_EXTERN_C_BEGIN
 
-NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark - GPBSourceContextRoot
 
@@ -36,11 +35,9 @@ typedef GPB_ENUM(GPBSourceContext_FieldNumber) {
 
 // The path-qualified name of the .proto file that contained the associated
 // protobuf element.  For example: `"google/protobuf/source.proto"`.
-@property(nonatomic, readwrite, copy, null_resettable) NSString *fileName;
+@property(nonatomic, readwrite, copy) NSString *fileName;
 
 @end
-
-NS_ASSUME_NONNULL_END
 
 CF_EXTERN_C_END
 

@@ -11,7 +11,6 @@
 
 CF_EXTERN_C_BEGIN
 
-NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark - GPBDurationRoot
 
@@ -86,8 +85,6 @@ typedef GPB_ENUM(GPBDuration_FieldNumber) {
 @property(nonatomic, readwrite) int32_t nanos;
 
 @end
-
-NS_ASSUME_NONNULL_END
 
 CF_EXTERN_C_END
 

@@ -33,8 +33,6 @@
 @class GPBDescriptor;
 @class GPBExtensionDescriptor;
 
-NS_ASSUME_NONNULL_BEGIN
-
 // A table of known extensions, searchable by name or field number.  When
 // parsing a protocol message that might have extensions, you must provide an
 // ExtensionRegistry in which you have registered any extensions that you want
@@ -59,9 +57,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)addExtension:(GPBExtensionDescriptor *)extension;
 - (void)addExtensions:(GPBExtensionRegistry *)registry;
 
-- (nullable GPBExtensionDescriptor *)extensionForDescriptor:(GPBDescriptor *)descriptor
-                                                fieldNumber:(NSInteger)fieldNumber;
+- (GPBExtensionDescriptor *)extensionForDescriptor:(GPBDescriptor *)descriptor
+                                       fieldNumber:(NSInteger)fieldNumber;
 
 @end
-
-NS_ASSUME_NONNULL_END

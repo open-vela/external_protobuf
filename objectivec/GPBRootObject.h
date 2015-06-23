@@ -32,8 +32,6 @@
 
 @class GPBExtensionRegistry;
 
-NS_ASSUME_NONNULL_BEGIN
-
 // All Root Objects derive from GPBRootObject. It supplies a registry
 // for derived classes to register their extensions to.
 @interface GPBRootObject : NSObject
@@ -42,5 +40,3 @@ NS_ASSUME_NONNULL_BEGIN
 + (GPBExtensionRegistry *)extensionRegistry;
 
 @end
-
-NS_ASSUME_NONNULL_END

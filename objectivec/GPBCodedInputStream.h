@@ -33,8 +33,6 @@
 @class GPBMessage;
 @class GPBExtensionRegistry;
 
-NS_ASSUME_NONNULL_BEGIN
-
 // Reads and decodes protocol message fields.
 // Subclassing of GPBCodedInputStream is NOT supported.
 @interface GPBCodedInputStream : NSObject
@@ -66,7 +64,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 // Read an embedded message field value from the stream.
 - (void)readMessage:(GPBMessage *)message
-    extensionRegistry:(nullable GPBExtensionRegistry *)extensionRegistry;
+    extensionRegistry:(GPBExtensionRegistry *)extensionRegistry;
 
 // Reads and discards a single field, given its tag value. Returns NO if the
 // tag is an endgroup tag, in which case nothing is skipped.  Otherwise,
@@ -83,5 +81,3 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)checkLastTagWas:(int32_t)value;
 
 @end
-
-NS_ASSUME_NONNULL_END

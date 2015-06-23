@@ -32,8 +32,6 @@
 
 CF_EXTERN_C_BEGIN
 
-NS_ASSUME_NONNULL_BEGIN
-
 typedef enum {
   GPBWireFormatVarint = 0,
   GPBWireFormatFixed64 = 1,
@@ -66,7 +64,5 @@ GPBWireFormat GPBWireFormatForType(GPBDataType dataType, BOOL isPacked)
 #define GPBWireFormatMessageSetMessageTag               \
   (GPBWireFormatMakeTag(GPBWireFormatMessageSetMessage, \
                         GPBWireFormatLengthDelimited))
-
-NS_ASSUME_NONNULL_END
 
 CF_EXTERN_C_END

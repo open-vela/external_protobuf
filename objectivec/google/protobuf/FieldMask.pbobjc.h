@@ -11,7 +11,6 @@
 
 CF_EXTERN_C_BEGIN
 
-NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark - GPBFieldMaskRoot
 
@@ -152,12 +151,10 @@ typedef GPB_ENUM(GPBFieldMask_FieldNumber) {
 
 // The set of field mask paths.
 // |pathsArray| contains |NSString|
-@property(nonatomic, readwrite, strong, null_resettable) NSMutableArray *pathsArray;
+@property(nonatomic, readwrite, strong) NSMutableArray *pathsArray;
 @property(nonatomic, readonly) NSUInteger pathsArray_Count;
 
 @end
-
-NS_ASSUME_NONNULL_END
 
 CF_EXTERN_C_END
 
