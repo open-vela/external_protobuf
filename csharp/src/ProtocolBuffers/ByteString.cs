@@ -40,7 +40,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace Google.Protobuf
+namespace Google.ProtocolBuffers
 {
     /// <summary>
     /// Immutable array of bytes.
@@ -139,7 +139,7 @@ namespace Google.Protobuf
         /// are copied, so further modifications to the array will not
         /// be reflected in the returned ByteString.
         /// </summary>
-        public static ByteString CopyFrom(params byte[] bytes)
+        public static ByteString CopyFrom(byte[] bytes)
         {
             return new ByteString((byte[]) bytes.Clone());
         }
@@ -206,24 +206,6 @@ namespace Google.Protobuf
         {
             // We trust CodedInputStream not to reveal the provided byte array or modify it
             return CodedInputStream.CreateInstance(bytes);
-        }
-
-        public static bool operator ==(ByteString lhs, ByteString rhs)
-        {
-            if (ReferenceEquals(lhs, rhs))
-            {
-                return true;
-            }
-            if (ReferenceEquals(lhs, null))
-            {
-                return false;
-            }
-            return lhs.Equals(rhs);
-        }
-
-        public static bool operator !=(ByteString lhs, ByteString rhs)
-        {
-            return !(lhs == rhs);
         }
 
         // TODO(jonskeet): CopyTo if it turns out to be required
