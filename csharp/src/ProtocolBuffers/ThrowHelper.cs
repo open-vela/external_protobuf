@@ -37,17 +37,17 @@
 using System;
 using System.Collections.Generic;
 
-namespace Google.Protobuf
+namespace Google.ProtocolBuffers
 {
     /// <summary>
     /// Helper methods for throwing exceptions
     /// </summary>
-    internal static class ThrowHelper
+    public static class ThrowHelper
     {
         /// <summary>
         /// Throws an ArgumentNullException if the given value is null.
         /// </summary>
-        internal static void ThrowIfNull(object value, string name)
+        public static void ThrowIfNull(object value, string name)
         {
             if (value == null)
             {
@@ -58,7 +58,7 @@ namespace Google.Protobuf
         /// <summary>
         /// Throws an ArgumentNullException if the given value is null.
         /// </summary>
-        internal static void ThrowIfNull(object value)
+        public static void ThrowIfNull(object value)
         {
             if (value == null)
             {
@@ -69,7 +69,7 @@ namespace Google.Protobuf
         /// <summary>
         /// Throws an ArgumentNullException if the given value or any element within it is null.
         /// </summary>
-        internal static void ThrowIfAnyNull<T>(IEnumerable<T> sequence)
+        public static void ThrowIfAnyNull<T>(IEnumerable<T> sequence)
         {
             foreach (T t in sequence)
             {
@@ -78,6 +78,15 @@ namespace Google.Protobuf
                     throw new ArgumentNullException();
                 }
             }
+        }
+
+        public static Exception CreateMissingMethod(Type type, string methodName)
+        {
+#if CLIENTPROFILE
+            return new System.MissingMethodException(type.FullName, methodName);
+#else
+            return new System.ArgumentException(String.Format("The method '{0}' was not found on type {1}.", methodName, type));
+#endif
         }
     }
 }
