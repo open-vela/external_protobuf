@@ -34,12 +34,13 @@
 
 #endregion
 
-using Google.Protobuf.Descriptors;
+
+using Google.ProtocolBuffers.Descriptors;
 using UnitTest.Issues.TestProtos;
 using NUnit.Framework;
 
 
-namespace Google.Protobuf
+namespace Google.ProtocolBuffers
 {
     /// <summary>
     /// Tests for issues which aren't easily compartmentalized into other unit tests.
@@ -50,11 +51,10 @@ namespace Google.Protobuf
         [Test]
         public void FieldCalledItem()
         {
-            ItemField message = new ItemField { Item = 3 };
+            ItemField message = new ItemField.Builder { Item = 3 }.Build();
             FieldDescriptor field = ItemField.Descriptor.FindFieldByName("item");
             Assert.NotNull(field);
-            // TODO(jonskeet): Reflection...
-            // Assert.AreEqual(3, (int)message[field]);
+            Assert.AreEqual(3, (int)message[field]);
         }
     }
 }
