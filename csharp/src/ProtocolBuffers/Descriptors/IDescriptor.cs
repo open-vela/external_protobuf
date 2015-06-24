@@ -30,7 +30,7 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-namespace Google.Protobuf.Descriptors
+namespace Google.ProtocolBuffers.Descriptors
 {
     /// <summary>
     /// The non-generic form of the IDescriptor interface. Useful for describing a general
@@ -48,7 +48,7 @@ namespace Google.Protobuf.Descriptors
     /// Strongly-typed form of the IDescriptor interface.
     /// </summary>
     /// <typeparam name="TProto">Protocol buffer type underlying this descriptor type</typeparam>
-    internal interface IDescriptor<TProto> : IDescriptor where TProto : IMessage
+    public interface IDescriptor<TProto> : IDescriptor where TProto : IMessage
     {
         new TProto Proto { get; }
     }

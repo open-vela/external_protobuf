@@ -32,7 +32,7 @@
 using System;
 using System.Collections;
 
-namespace Google.Protobuf.Collections
+namespace Google.ProtocolBuffers.Collections
 {
     /// <summary>
     /// Utility class for IEnumerable (and potentially the generic version in the future).
