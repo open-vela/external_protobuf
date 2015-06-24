@@ -46,6 +46,7 @@
 
 #include <google/protobuf/compiler/csharp/csharp_field_base.h>
 #include <google/protobuf/compiler/csharp/csharp_enum_field.h>
+#include <google/protobuf/compiler/csharp/csharp_map_field.h>
 #include <google/protobuf/compiler/csharp/csharp_message_field.h>
 #include <google/protobuf/compiler/csharp/csharp_primitive_field.h>
 #include <google/protobuf/compiler/csharp/csharp_repeated_enum_field.h>
@@ -338,13 +339,28 @@ std::string FileDescriptorToBase64(const FileDescriptor* descriptor) {
   return StringToBase64(fdp_bytes);
 }
 
+// TODO(jonskeet): Remove this when internal::WireFormat::MakeTag works
+// properly...
+// Workaround for issue #493
+uint FixedMakeTag(const FieldDescriptor* field) {
+  internal::WireFormatLite::WireType field_type = field->is_packed()
+      ? internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED
+      : internal::WireFormat::WireTypeForFieldType(field->type());
+
+  return internal::WireFormatLite::MakeTag(field->number(), field_type);
+}
+
 FieldGeneratorBase* CreateFieldGenerator(const FieldDescriptor* descriptor,
                                          int fieldOrdinal) {
   switch (descriptor->type()) {
     case FieldDescriptor::TYPE_GROUP:
     case FieldDescriptor::TYPE_MESSAGE:
       if (descriptor->is_repeated()) {
-        return new RepeatedMessageFieldGenerator(descriptor, fieldOrdinal);
+        if (descriptor->is_map()) {
+          return new MapFieldGenerator(descriptor, fieldOrdinal);
+        } else {
+          return new RepeatedMessageFieldGenerator(descriptor, fieldOrdinal);
+        }
       } else {
 	if (descriptor->containing_oneof()) {
 	  return new MessageOneofFieldGenerator(descriptor, fieldOrdinal);
