@@ -31,7 +31,7 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using System;
 
-namespace Google.Protobuf.Descriptors
+namespace Google.ProtocolBuffers.Descriptors
 {
     /// <summary>
     /// Thrown when building descriptors fails because the source DescriptorProtos
@@ -40,6 +40,7 @@ namespace Google.Protobuf.Descriptors
     public sealed class DescriptorValidationException : Exception
     {
         private readonly String name;
+        private readonly IMessage proto;
         private readonly string description;
 
         /// <value>
@@ -48,6 +49,14 @@ namespace Google.Protobuf.Descriptors
         public String ProblemSymbolName
         {
             get { return name; }
+        }
+
+        /// <value>
+        /// The protocol message representation of the invalid descriptor.
+        /// </value>
+        public IMessage ProblemProto
+        {
+            get { return proto; }
         }
 
         /// <value>
@@ -66,6 +75,7 @@ namespace Google.Protobuf.Descriptors
             // don't want to expose it directly to the user.  So, we only provide
             // the name and the original proto.
             name = problemDescriptor.FullName;
+            proto = problemDescriptor.Proto;
             this.description = description;
         }
 
@@ -73,6 +83,7 @@ namespace Google.Protobuf.Descriptors
             base(problemDescriptor.FullName + ": " + description, cause)
         {
             name = problemDescriptor.FullName;
+            proto = problemDescriptor.Proto;
             this.description = description;
         }
     }

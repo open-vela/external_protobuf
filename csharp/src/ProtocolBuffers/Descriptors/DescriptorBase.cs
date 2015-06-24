@@ -29,11 +29,10 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-using Google.Protobuf.DescriptorProtos;
+using Google.ProtocolBuffers.DescriptorProtos;
 
-namespace Google.Protobuf.Descriptors
+namespace Google.ProtocolBuffers.Descriptors
 {
-    // TODO(jonskeet): The descriptor type hierarchy needs changing so that we can hide the descriptor protos.
     /// <summary>
     /// Base class for nearly all descriptors, providing common functionality.
     /// </summary>
