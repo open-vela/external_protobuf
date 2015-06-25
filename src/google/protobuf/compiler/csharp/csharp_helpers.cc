@@ -46,7 +46,6 @@
 
 #include <google/protobuf/compiler/csharp/csharp_field_base.h>
 #include <google/protobuf/compiler/csharp/csharp_enum_field.h>
-#include <google/protobuf/compiler/csharp/csharp_map_field.h>
 #include <google/protobuf/compiler/csharp/csharp_message_field.h>
 #include <google/protobuf/compiler/csharp/csharp_primitive_field.h>
 #include <google/protobuf/compiler/csharp/csharp_repeated_enum_field.h>
@@ -356,11 +355,7 @@ FieldGeneratorBase* CreateFieldGenerator(const FieldDescriptor* descriptor,
     case FieldDescriptor::TYPE_GROUP:
     case FieldDescriptor::TYPE_MESSAGE:
       if (descriptor->is_repeated()) {
-        if (descriptor->is_map()) {
-          return new MapFieldGenerator(descriptor, fieldOrdinal);
-        } else {
-          return new RepeatedMessageFieldGenerator(descriptor, fieldOrdinal);
-        }
+        return new RepeatedMessageFieldGenerator(descriptor, fieldOrdinal);
       } else {
 	if (descriptor->containing_oneof()) {
 	  return new MessageOneofFieldGenerator(descriptor, fieldOrdinal);

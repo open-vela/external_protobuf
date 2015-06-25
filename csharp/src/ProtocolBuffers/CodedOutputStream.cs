@@ -476,14 +476,6 @@ namespace Google.Protobuf
         }
 
         /// <summary>
-        /// Writes an already-encoded tag.
-        /// </summary>
-        public void WriteTag(uint tag)
-        {
-            WriteRawVarint32(tag);
-        }
-
-        /// <summary>
         /// Writes the given single-byte tag directly to the stream.
         /// </summary>
         public void WriteRawTag(byte b1)
