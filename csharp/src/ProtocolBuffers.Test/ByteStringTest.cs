@@ -38,8 +38,9 @@ using System;
 using System.Text;
 using NUnit.Framework;
 
-namespace Google.ProtocolBuffers
+namespace Google.Protobuf
 {
+    [TestFixture]
     public class ByteStringTest
     {
         [Test]
