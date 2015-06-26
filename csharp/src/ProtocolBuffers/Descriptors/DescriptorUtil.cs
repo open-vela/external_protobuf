@@ -30,7 +30,7 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
+using Google.Protobuf.Collections;
 
 namespace Google.Protobuf.Descriptors
 {
@@ -58,7 +58,7 @@ namespace Google.Protobuf.Descriptors
             {
                 array[i] = converter(input[i], i);
             }
-            return new ReadOnlyCollection<TOutput>(array);
+            return Lists<TOutput>.AsReadOnly(array);
         }
     }
 }

@@ -37,7 +37,7 @@
 using System;
 using System.IO;
 
-namespace Google.Protobuf.Examples.AddressBook
+namespace Google.ProtocolBuffers.Examples.AddressBook
 {
     internal class ListPeople
     {
