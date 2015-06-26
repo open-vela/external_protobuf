@@ -1,7 +1,8 @@
-﻿using System;
+﻿using Google.Protobuf;
+using System;
 using System.IO;
 
-namespace Google.Protobuf.Examples.AddressBook
+namespace Google.ProtocolBuffers.Examples.AddressBook
 {
     internal class SampleUsage
     {
