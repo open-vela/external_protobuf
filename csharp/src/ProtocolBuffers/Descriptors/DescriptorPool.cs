@@ -1,7 +1,8 @@
-#region Copyright notice and license
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
-// https://developers.google.com/protocol-buffers/
+// http://github.com/jskeet/dotnet-protobufs/
+// Original C++/Java/Python code:
+// http://code.google.com/p/protobuf/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -28,14 +29,12 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#endregion
-
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Google.Protobuf.Descriptors
+namespace Google.ProtocolBuffers.Descriptors
 {
     /// <summary>
     /// Contains lookup tables containing all the descriptors defined in a particular file.
@@ -86,7 +85,7 @@ namespace Google.Protobuf.Descriptors
         /// <param name="fullName">Fully-qualified name to look up</param>
         /// <returns>The symbol with the given name and type,
         /// or null if the symbol doesn't exist or has the wrong type</returns>
-        internal T FindSymbol<T>(string fullName) where T : class
+        internal T FindSymbol<T>(string fullName) where T : class, IDescriptor
         {
             IDescriptor result;
             descriptorsByName.TryGetValue(fullName, out result);

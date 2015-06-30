@@ -1,7 +1,8 @@
-#region Copyright notice and license
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
-// https://developers.google.com/protocol-buffers/
+// http://github.com/jskeet/dotnet-protobufs/
+// Original C++/Java/Python code:
+// http://code.google.com/p/protobuf/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -28,9 +29,8 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#endregion
 
-namespace Google.Protobuf.Descriptors
+namespace Google.ProtocolBuffers.Descriptors
 {
     /// <summary>
     /// Enumeration of all the possible field types. The odd formatting is to make it very clear
@@ -38,23 +38,23 @@ namespace Google.Protobuf.Descriptors
     /// </summary>
     public enum FieldType
     {
-        Double,
-        Float,
-        Int64,
-        UInt64,
-        Int32,
-        Fixed64,
-        Fixed32,
-        Bool,
-        String,
-        Group,
-        Message,
-        Bytes,
-        UInt32,
-        SFixed32,
-        SFixed64,
-        SInt32,
-        SInt64,
-        Enum
+        [FieldMapping(MappedType.Double, WireFormat.WireType.Fixed64)] Double,
+        [FieldMapping(MappedType.Single, WireFormat.WireType.Fixed32)] Float,
+        [FieldMapping(MappedType.Int64, WireFormat.WireType.Varint)] Int64,
+        [FieldMapping(MappedType.UInt64, WireFormat.WireType.Varint)] UInt64,
+        [FieldMapping(MappedType.Int32, WireFormat.WireType.Varint)] Int32,
+        [FieldMapping(MappedType.UInt64, WireFormat.WireType.Fixed64)] Fixed64,
+        [FieldMapping(MappedType.UInt32, WireFormat.WireType.Fixed32)] Fixed32,
+        [FieldMapping(MappedType.Boolean, WireFormat.WireType.Varint)] Bool,
+        [FieldMapping(MappedType.String, WireFormat.WireType.LengthDelimited)] String,
+        [FieldMapping(MappedType.Message, WireFormat.WireType.StartGroup)] Group,
+        [FieldMapping(MappedType.Message, WireFormat.WireType.LengthDelimited)] Message,
+        [FieldMapping(MappedType.ByteString, WireFormat.WireType.LengthDelimited)] Bytes,
+        [FieldMapping(MappedType.UInt32, WireFormat.WireType.Varint)] UInt32,
+        [FieldMapping(MappedType.Int32, WireFormat.WireType.Fixed32)] SFixed32,
+        [FieldMapping(MappedType.Int64, WireFormat.WireType.Fixed64)] SFixed64,
+        [FieldMapping(MappedType.Int32, WireFormat.WireType.Varint)] SInt32,
+        [FieldMapping(MappedType.Int64, WireFormat.WireType.Varint)] SInt64,
+        [FieldMapping(MappedType.Enum, WireFormat.WireType.Varint)] Enum
     }
 }

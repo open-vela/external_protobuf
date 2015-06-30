@@ -46,7 +46,6 @@
 
 #include <google/protobuf/compiler/csharp/csharp_field_base.h>
 #include <google/protobuf/compiler/csharp/csharp_enum_field.h>
-#include <google/protobuf/compiler/csharp/csharp_map_field.h>
 #include <google/protobuf/compiler/csharp/csharp_message_field.h>
 #include <google/protobuf/compiler/csharp/csharp_primitive_field.h>
 #include <google/protobuf/compiler/csharp/csharp_repeated_enum_field.h>
@@ -206,7 +205,7 @@ std::string ToCSharpName(const std::string& name, const FileDescriptor* file) {
     // the C# namespace.
     classname = name.substr(file->package().size() + 1);
   }
-  result += StringReplace(classname, ".", ".Types.", true);
+  result += StringReplace(classname, ".", ".Types.", false);
   return "global::" + result;
 }
 
@@ -339,28 +338,13 @@ std::string FileDescriptorToBase64(const FileDescriptor* descriptor) {
   return StringToBase64(fdp_bytes);
 }
 
-// TODO(jonskeet): Remove this when internal::WireFormat::MakeTag works
-// properly...
-// Workaround for issue #493
-uint FixedMakeTag(const FieldDescriptor* field) {
-  internal::WireFormatLite::WireType field_type = field->is_packed()
-      ? internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED
-      : internal::WireFormat::WireTypeForFieldType(field->type());
-
-  return internal::WireFormatLite::MakeTag(field->number(), field_type);
-}
-
 FieldGeneratorBase* CreateFieldGenerator(const FieldDescriptor* descriptor,
                                          int fieldOrdinal) {
   switch (descriptor->type()) {
     case FieldDescriptor::TYPE_GROUP:
     case FieldDescriptor::TYPE_MESSAGE:
       if (descriptor->is_repeated()) {
-        if (descriptor->is_map()) {
-          return new MapFieldGenerator(descriptor, fieldOrdinal);
-        } else {
-          return new RepeatedMessageFieldGenerator(descriptor, fieldOrdinal);
-        }
+        return new RepeatedMessageFieldGenerator(descriptor, fieldOrdinal);
       } else {
 	if (descriptor->containing_oneof()) {
 	  return new MessageOneofFieldGenerator(descriptor, fieldOrdinal);
@@ -391,7 +375,47 @@ FieldGeneratorBase* CreateFieldGenerator(const FieldDescriptor* descriptor,
   }
 }
 
-}  // namespace csharp
+bool HasRequiredFields(const Descriptor* descriptor, std::set<const Descriptor*>* already_seen) {
+  if (already_seen->find(descriptor) != already_seen->end()) {
+    // The type is already in cache.  This means that either:
+    // a. The type has no required fields.
+    // b. We are in the midst of checking if the type has required fields,
+    //    somewhere up the stack.  In this case, we know that if the type
+    //    has any required fields, they'll be found when we return to it,
+    //    and the whole call to HasRequiredFields() will return true.
+    //    Therefore, we don't have to check if this type has required fields
+    //    here.
+    return false;
+  }
+  already_seen->insert(descriptor);
+
+  // If the type has extensions, an extension with message type could contain
+  // required fields, so we have to be conservative and assume such an
+  // extension exists.
+  if (descriptor->extension_count() > 0) {
+    return true;
+  }
+
+  for (int i = 0; i < descriptor->field_count(); i++) {
+    const FieldDescriptor* field = descriptor->field(i);
+    if (field->is_required()) {
+      return true;
+    }
+    if (GetCSharpType(field->type()) == CSHARPTYPE_MESSAGE) {
+      if (HasRequiredFields(field->message_type(), already_seen)) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+bool HasRequiredFields(const Descriptor* descriptor) {
+  std::set<const Descriptor*> already_seen;
+  return HasRequiredFields(descriptor, &already_seen);
+}
+
+}  // namespace java
 }  // namespace compiler
 }  // namespace protobuf
 }  // namespace google
