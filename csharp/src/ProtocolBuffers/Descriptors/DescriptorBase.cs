@@ -34,36 +34,61 @@ using Google.Protobuf.DescriptorProtos;
 
 namespace Google.Protobuf.Descriptors
 {
+    // TODO(jonskeet): The descriptor type hierarchy needs changing so that we can hide the descriptor protos.
     /// <summary>
     /// Base class for nearly all descriptors, providing common functionality.
     /// </summary>
-    public abstract class DescriptorBase : IDescriptor
+    /// <typeparam name="TProto">Type of the protocol buffer form of this descriptor</typeparam>
+    /// <typeparam name="TOptions">Type of the options protocol buffer for this descriptor</typeparam>
+    public abstract class DescriptorBase<TProto, TOptions> : IDescriptor<TProto>
+        where TProto : IMessage, IDescriptorProto<TOptions>
     {
+        private TProto proto;
         private readonly FileDescriptor file;
         private readonly string fullName;
-        private readonly int index;
 
-        internal DescriptorBase(FileDescriptor file, string fullName, int index)
+        protected DescriptorBase(TProto proto, FileDescriptor file, string fullName)
         {
+            this.proto = proto;
             this.file = file;
             this.fullName = fullName;
-            this.index = index;
         }
 
-        /// <value>
-        /// The index of this descriptor within its parent descriptor. 
-        /// </value>
-        /// <remarks>
-        /// This returns the index of this descriptor within its parent, for
-        /// this descriptor's type. (There can be duplicate values for different
-        /// types, e.g. one enum type with index 0 and one message type with index 0.)
-        /// </remarks>
-        public int Index
+        internal virtual void ReplaceProto(TProto newProto)
         {
-            get { return index; }
+            this.proto = newProto;
         }
 
-        public abstract string Name { get; }
+        protected static string ComputeFullName(FileDescriptor file, MessageDescriptor parent, string name)
+        {
+            if (parent != null)
+            {
+                return parent.FullName + "." + name;
+            }
+            if (file.Package.Length > 0)
+            {
+                return file.Package + "." + name;
+            }
+            return name;
+        }
+
+        IMessage IDescriptor.Proto
+        {
+            get { return proto; }
+        }
+
+        /// <summary>
+        /// Returns the protocol buffer form of this descriptor.
+        /// </summary>
+        public TProto Proto
+        {
+            get { return proto; }
+        }
+
+        public TOptions Options
+        {
+            get { return proto.Options; }
+        }
 
         /// <summary>
         /// The fully qualified name of the descriptor's target.
@@ -71,6 +96,14 @@ namespace Google.Protobuf.Descriptors
         public string FullName
         {
             get { return fullName; }
+        }
+
+        /// <summary>
+        /// The brief name of the descriptor's target.
+        /// </summary>
+        public string Name
+        {
+            get { return proto.Name; }
         }
 
         /// <value>

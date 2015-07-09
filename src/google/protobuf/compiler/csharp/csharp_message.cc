@@ -116,7 +116,8 @@ void MessageGenerator::GenerateStaticVariables(io::Printer* printer) {
 
   // The descriptor for this type.
   printer->Print(
-      "internal static pb::FieldAccess.FieldAccessorTable internal__$identifier$__FieldAccessorTable;\n",
+      "internal static pbd::MessageDescriptor internal__$identifier$__Descriptor;\n"
+      "internal static pb::FieldAccess.FieldAccessorTable<$full_class_name$> internal__$identifier$__FieldAccessorTable;\n",
       "identifier", GetUniqueFileScopeIdentifier(descriptor_),
       "full_class_name", full_class_name());
 
@@ -129,23 +130,24 @@ void MessageGenerator::GenerateStaticVariables(io::Printer* printer) {
 void MessageGenerator::GenerateStaticVariableInitializers(io::Printer* printer) {
   map<string, string> vars;
   vars["identifier"] = GetUniqueFileScopeIdentifier(descriptor_);
+  vars["index"] = SimpleItoa(descriptor_->index());
   vars["full_class_name"] = full_class_name();
-
-  // Work out how to get to the message descriptor (which may be multiply nested) from the file
-  // descriptor.
-  string descriptor_chain;
-  const Descriptor* current_descriptor = descriptor_;
-  while (current_descriptor->containing_type()) {
-    descriptor_chain = ".NestedTypes[" + SimpleItoa(current_descriptor->index()) + "]" + descriptor_chain;
-    current_descriptor = current_descriptor->containing_type();
+  if (descriptor_->containing_type() != NULL) {
+    vars["parent"] = GetUniqueFileScopeIdentifier(
+	descriptor_->containing_type());
   }
-  descriptor_chain = "descriptor.MessageTypes[" + SimpleItoa(current_descriptor->index()) + "]" + descriptor_chain;
-  vars["descriptor_chain"] = descriptor_chain;
+  printer->Print(vars, "internal__$identifier$__Descriptor = ");
+
+  if (!descriptor_->containing_type()) {
+    printer->Print(vars, "Descriptor.MessageTypes[$index$];\n");
+  } else {
+    printer->Print(vars, "internal__$parent$__Descriptor.NestedTypes[$index$];\n");
+  }
 
   printer->Print(
     vars,
     "internal__$identifier$__FieldAccessorTable = \n"
-    "    new pb::FieldAccess.FieldAccessorTable(typeof($full_class_name$), $descriptor_chain$,\n");
+    "    new pb::FieldAccess.FieldAccessorTable<$full_class_name$>(internal__$identifier$__Descriptor,\n");
   printer->Print("        new string[] { ");
   for (int i = 0; i < descriptor_->field_count(); i++) {
     printer->Print("\"$property_name$\", ",
@@ -199,35 +201,23 @@ void MessageGenerator::Generate(io::Printer* printer) {
     "private static readonly uint[] _fieldTags = new uint[] { $tags$ };\n",
     "tags", JoinStrings(tags, ", "));
 
-  // Access the message descriptor via the relevant file descriptor or containing message descriptor.
-  if (!descriptor_->containing_type()) {
-    vars["descriptor_accessor"] = GetFullUmbrellaClassName(descriptor_->file())
-        + ".Descriptor.MessageTypes[" + SimpleItoa(descriptor_->index()) + "]";
-  } else {
-    vars["descriptor_accessor"] = GetClassName(descriptor_->containing_type())
-        + ".Descriptor.NestedTypes[" + SimpleItoa(descriptor_->index()) + "]";
-  }
-
   printer->Print(
     vars,
     "public static pbd::MessageDescriptor Descriptor {\n"
-    "  get { return $descriptor_accessor$; }\n"
+    "  get { return $umbrella_class_name$.internal__$identifier$__Descriptor; }\n"
     "}\n"
     "\n"
-    "public pb::FieldAccess.FieldAccessorTable Fields {\n"
+    "public pb::FieldAccess.FieldAccessorTable<$class_name$> Fields {\n"
     "  get { return $umbrella_class_name$.internal__$identifier$__FieldAccessorTable; }\n"
     "}\n"
     "\n"
     "private bool _frozen = false;\n"
     "public bool IsFrozen { get { return _frozen; } }\n\n");
 
-  // Parameterless constructor and partial OnConstruction method.
+  // Parameterless constructor
   printer->Print(
     vars,
-    "public $class_name$() {\n"
-    "  OnConstruction();\n"
-    "}\n\n"
-    "partial void OnConstruction();\n\n");
+    "public $class_name$() { }\n\n");
 
   GenerateCloningCode(printer);
   GenerateFreezingCode(printer);
@@ -314,7 +304,7 @@ void MessageGenerator::GenerateCloningCode(io::Printer* printer) {
   vars["class_name"] = class_name();
     printer->Print(
     vars,
-    "public $class_name$($class_name$ other) : this() {\n");
+    "public $class_name$($class_name$ other) {\n");
   printer->Indent();
   // Clone non-oneof fields first
   for (int i = 0; i < descriptor_->field_count(); i++) {

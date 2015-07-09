@@ -32,37 +32,34 @@
 
 using System;
 using System.Reflection;
-using Google.Protobuf.Descriptors;
 
 namespace Google.Protobuf.FieldAccess
 {
     /// <summary>
     /// Base class for field accessors.
     /// </summary>
-    internal abstract class FieldAccessorBase : IFieldAccessor
+    /// <typeparam name="T">Type of message containing the field</typeparam>
+    internal abstract class FieldAccessorBase<T> : IFieldAccessor<T> where T : IMessage<T>
     {
-        private readonly Func<object, object> getValueDelegate;
-        private readonly FieldDescriptor descriptor;
+        private readonly Func<T, object> getValueDelegate;
 
-        internal FieldAccessorBase(Type type, string propertyName, FieldDescriptor descriptor)
+        internal FieldAccessorBase(string name)
         {
-            PropertyInfo property = type.GetProperty(propertyName);
+            PropertyInfo property = typeof(T).GetProperty(name);
             if (property == null || !property.CanRead)
             {
                 throw new ArgumentException("Not all required properties/methods available");
             }
-            this.descriptor = descriptor;
-            getValueDelegate = ReflectionUtil.CreateFuncObjectObject(property.GetGetMethod());
+            getValueDelegate = ReflectionUtil.CreateUpcastDelegate<T>(property.GetGetMethod());
         }
 
-        public FieldDescriptor Descriptor { get { return descriptor; } }
-
-        public object GetValue(object message)
+        public object GetValue(T message)
         {
             return getValueDelegate(message);
         }
 
-        public abstract void Clear(object message);
-        public abstract void SetValue(object message, object value);
+        public abstract bool HasValue(T message);
+        public abstract void Clear(T message);
+        public abstract void SetValue(T message, object value);
     }
 }

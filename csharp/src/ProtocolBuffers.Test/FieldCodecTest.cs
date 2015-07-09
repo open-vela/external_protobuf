@@ -86,22 +86,12 @@ namespace Google.Protobuf
             codec.TestDefaultValue();
         }
 
-        [Test, TestCaseSource("Codecs")]
-        public void FixedSize(ICodecTestData codec)
-        {
-            codec.TestFixedSize();
-        }
-
-        // This is ugly, but it means we can have a non-generic interface.
-        // It feels like NUnit should support this better, but I don't know
-        // of any better ways right now.
         public interface ICodecTestData
         {
             void TestRoundTripRaw();
             void TestRoundTripWithTag();
             void TestCalculateSizeWithTag();
             void TestDefaultValue();
-            void TestFixedSize();
         }
 
         public class FieldCodecTestData<T> : ICodecTestData
@@ -177,11 +167,6 @@ namespace Google.Protobuf
                     var codedInput = CodedInputStream.CreateInstance(stream);
                     Assert.AreEqual(codec.DefaultValue, codec.ValueReader(codedInput));
                 }
-            }
-
-            public void TestFixedSize()
-            {
-                Assert.AreEqual(name.Contains("Fixed"), codec.FixedSize != 0);
             }
 
             public override string ToString()
