@@ -65,7 +65,7 @@ void RepeatedEnumFieldGenerator::GenerateMembers(io::Printer* printer) {
   AddDeprecatedFlag(printer);
   printer->Print(
     variables_,
-    "$access_level$ pbc::RepeatedField<$type_name$> $property_name$ {\n"
+    "public pbc::RepeatedField<$type_name$> $property_name$ {\n"
     "  get { return $name$_; }\n"
     "}\n");
 }

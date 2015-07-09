@@ -65,7 +65,6 @@ void FieldGeneratorBase::SetCommonFieldVariables(
     tag_bytes += ", " + SimpleItoa(tag_array[i]);
   }
 
-  (*variables)["access_level"] = class_access_level();
   (*variables)["tag"] = SimpleItoa(tag);
   (*variables)["tag_size"] = SimpleItoa(tag_size);
   (*variables)["tag_bytes"] = tag_bytes;

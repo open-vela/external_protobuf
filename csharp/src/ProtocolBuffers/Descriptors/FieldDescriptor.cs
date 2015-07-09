@@ -38,20 +38,21 @@ namespace Google.Protobuf.Descriptors
     /// <summary>
     /// Descriptor for a field or extension within a message in a .proto file.
     /// </summary>
-    public sealed class FieldDescriptor : DescriptorBase, IComparable<FieldDescriptor>
+    public sealed class FieldDescriptor : IndexedDescriptorBase<FieldDescriptorProto, FieldOptions>,
+                                          IComparable<FieldDescriptor>
     {
-        private readonly FieldDescriptorProto proto;
         private EnumDescriptor enumType;
         private MessageDescriptor messageType;
-        private readonly MessageDescriptor containingType;
-        private readonly OneofDescriptor containingOneof;
+        private MessageDescriptor containingType;
+        private OneofDescriptor containingOneof;
         private FieldType fieldType;
+
+        private readonly object optionsLock = new object();
 
         internal FieldDescriptor(FieldDescriptorProto proto, FileDescriptor file,
                                  MessageDescriptor parent, int index)
-            : base(file, file.ComputeFullName(parent, proto.Name), index)
+            : base(proto, file, ComputeFullName(file, parent, proto.Name), index)
         {
-            this.proto = proto;
             if (proto.Type != 0)
             {
                 fieldType = GetFieldTypeFromProtoType(proto.Type);
@@ -63,8 +64,7 @@ namespace Google.Protobuf.Descriptors
                                                         "Field numbers must be positive integers.");
             }
             containingType = parent;
-            // OneofIndex "defaults" to -1 due to a hack in FieldDescriptor.OnConstruction.
-            if (proto.OneofIndex != -1)
+            if (proto.OneofIndex != 0)
             {
                 if (proto.OneofIndex < 0 || proto.OneofIndex >= parent.Proto.OneofDecl.Count)
                 {
@@ -72,18 +72,12 @@ namespace Google.Protobuf.Descriptors
                         "FieldDescriptorProto.oneof_index is out of range for type " + parent.Name);
                 }
                 containingOneof = parent.Oneofs[proto.OneofIndex];
+                containingOneof.fieldCount ++;
             }
 
             file.DescriptorPool.AddSymbol(this);
         }
 
-        /// <summary>
-        /// The brief name of the descriptor's target.
-        /// </summary>
-        public override string Name { get { return proto.Name; } }
-
-        internal FieldDescriptorProto Proto { get { return proto; } }
-        
         /// <summary>
         /// Maps a field type as included in the .proto file to a FieldType.
         /// </summary>
@@ -137,14 +131,9 @@ namespace Google.Protobuf.Descriptors
             get { return Proto.Label == FieldDescriptorProto.Types.Label.LABEL_REPEATED; }
         }
 
-        public bool IsMap
-        {
-            get { return fieldType == FieldType.Message && messageType.Proto.Options != null && messageType.Proto.Options.MapEntry; }
-        }
-
         public bool IsPacked
         {
-            get { return Proto.Options != null && Proto.Options.Packed; }
+            get { return Proto.Options.Packed; }
         }        
 
         /// <summary>
@@ -284,7 +273,7 @@ namespace Google.Protobuf.Descriptors
 
             File.DescriptorPool.AddFieldByNumber(this);
 
-            if (containingType != null && containingType.Proto.Options != null && containingType.Proto.Options.MessageSetWireFormat)
+            if (containingType != null && containingType.Options != null && containingType.Options.MessageSetWireFormat)
             {
                 throw new DescriptorValidationException(this, "MessageSet format is not supported.");
             }

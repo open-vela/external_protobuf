@@ -43,7 +43,7 @@ namespace Google.Protobuf.Descriptors
     /// IDescriptor is implemented such that the File property returns this descriptor,
     /// and the FullName is the same as the Name.
     /// </summary>
-    public sealed class FileDescriptor : IDescriptor
+    public sealed class FileDescriptor : IDescriptor<FileDescriptorProto>
     {
         private readonly FileDescriptorProto proto;
         private readonly IList<MessageDescriptor> messageTypes;
@@ -88,22 +88,6 @@ namespace Google.Protobuf.Descriptors
         }
 
         /// <summary>
-        /// Computes the full name of a descriptor within this file, with an optional parent message.
-        /// </summary>
-        internal string ComputeFullName(MessageDescriptor parent, string name)
-        {
-            if (parent != null)
-            {
-                return parent.FullName + "." + name;
-            }
-            if (Package.Length > 0)
-            {
-                return Package + "." + name;
-            }
-            return name;
-        }
-
-        /// <summary>
         /// Extracts public dependencies from direct dependencies. This is a static method despite its
         /// first parameter, as the value we're in the middle of constructing is only used for exceptions.
         /// </summary>
@@ -143,9 +127,17 @@ namespace Google.Protobuf.Descriptors
         /// <value>
         /// The descriptor in its protocol message representation.
         /// </value>
-        internal FileDescriptorProto Proto
+        public FileDescriptorProto Proto
         {
             get { return proto; }
+        }
+
+        /// <value>
+        /// The <see cref="DescriptorProtos.FileOptions" /> defined in <c>descriptor.proto</c>.
+        /// </value>
+        public FileOptions Options
+        {
+            get { return proto.Options; }
         }
 
         /// <value>
@@ -222,6 +214,14 @@ namespace Google.Protobuf.Descriptors
         }
 
         /// <value>
+        /// Protocol buffer describing this descriptor.
+        /// </value>
+        IMessage IDescriptor.Proto
+        {
+            get { return Proto; }
+        }
+
+        /// <value>
         /// Pool containing symbol descriptors.
         /// </value>
         internal DescriptorPool DescriptorPool
@@ -255,7 +255,22 @@ namespace Google.Protobuf.Descriptors
             }
             return null;
         }
-        
+
+        /// <summary>
+        /// Builds a FileDescriptor from its protocol buffer representation.
+        /// </summary>
+        /// <param name="proto">The protocol message form of the FileDescriptor.</param>
+        /// <param name="dependencies">FileDescriptors corresponding to all of the
+        /// file's dependencies, in the exact order listed in the .proto file. May be null,
+        /// in which case it is treated as an empty array.</param>
+        /// <exception cref="DescriptorValidationException">If <paramref name="proto"/> is not
+        /// a valid descriptor. This can occur for a number of reasons, such as a field
+        /// having an undefined type or because two messages were defined with the same name.</exception>
+        public static FileDescriptor BuildFrom(FileDescriptorProto proto, FileDescriptor[] dependencies)
+        {
+            return BuildFrom(proto, dependencies, false);
+        }
+
         /// <summary>
         /// Builds a FileDescriptor from its protocol buffer representation.
         /// </summary>
@@ -321,8 +336,33 @@ namespace Google.Protobuf.Descriptors
             }
         }
 
+        /// <summary>
+        /// This method is to be called by generated code only.  It is equivalent
+        /// to BuildFrom except that the FileDescriptorProto is encoded in
+        /// protocol buffer wire format. This overload is maintained for backward
+        /// compatibility with source code generated before the custom options were available
+        /// (and working).
+        /// </summary>
+        public static FileDescriptor InternalBuildGeneratedFileFrom(byte[] descriptorData, FileDescriptor[] dependencies)
+        {
+            return InternalBuildGeneratedFileFrom(descriptorData, dependencies, x => { });
+        }
+
+        /// <summary>
+        /// This delegate should be used by generated code only. When calling
+        /// FileDescriptor.InternalBuildGeneratedFileFrom, the caller can provide
+        /// a callback which assigns the global variables defined in the generated code
+        /// which point at parts of the FileDescriptor. The callback returns an
+        /// Extension Registry which contains any extensions which might be used in
+        /// the descriptor - that is, extensions of the various "Options" messages defined
+        /// in descriptor.proto. The callback may also return null to indicate that
+        /// no extensions are used in the descriptor.
+        /// </summary>
+        public delegate void InternalDescriptorAssigner(FileDescriptor descriptor);
+
         public static FileDescriptor InternalBuildGeneratedFileFrom(byte[] descriptorData,
-                                                                    FileDescriptor[] dependencies)
+                                                                    FileDescriptor[] dependencies,
+                                                                    InternalDescriptorAssigner descriptorAssigner)
         {
             FileDescriptorProto proto;
             try
@@ -334,16 +374,20 @@ namespace Google.Protobuf.Descriptors
                 throw new ArgumentException("Failed to parse protocol buffer descriptor for generated code.", e);
             }
 
+            FileDescriptor result;
             try
             {
                 // When building descriptors for generated code, we allow unknown
                 // dependencies by default.
-                return BuildFrom(proto, dependencies, true);
+                result = BuildFrom(proto, dependencies, true);
             }
             catch (DescriptorValidationException e)
             {
                 throw new ArgumentException("Invalid embedded descriptor for \"" + proto.Name + "\".", e);
             }
+
+            descriptorAssigner(result);
+            return result;
         }
         
         public override string ToString()
