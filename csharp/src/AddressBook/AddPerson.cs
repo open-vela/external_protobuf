@@ -1,7 +1,10 @@
 ﻿#region Copyright notice and license
+
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
-// https://developers.google.com/protocol-buffers/
+// http://github.com/jskeet/dotnet-protobufs/
+// Original C++/Java/Python code:
+// http://code.google.com/p/protobuf/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -28,12 +31,13 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
 #endregion
 
 using System;
 using System.IO;
 
-namespace Google.Protobuf.Examples.AddressBook
+namespace Google.ProtocolBuffers.Examples.AddressBook
 {
     internal class AddPerson
     {
@@ -42,7 +46,7 @@ namespace Google.Protobuf.Examples.AddressBook
         /// </summary>
         private static Person PromptForAddress(TextReader input, TextWriter output)
         {
-            Person person = new Person();
+            Person.Builder person = Person.CreateBuilder();
 
             output.Write("Enter person ID: ");
             person.Id = int.Parse(input.ReadLine());
@@ -66,7 +70,8 @@ namespace Google.Protobuf.Examples.AddressBook
                     break;
                 }
 
-                Person.Types.PhoneNumber phoneNumber = new Person.Types.PhoneNumber { Number = number };
+                Person.Types.PhoneNumber.Builder phoneNumber =
+                    Person.Types.PhoneNumber.CreateBuilder().SetNumber(number);
 
                 output.Write("Is this a mobile, home, or work phone? ");
                 String type = input.ReadLine();
@@ -86,9 +91,9 @@ namespace Google.Protobuf.Examples.AddressBook
                         break;
                 }
 
-                person.Phone.Add(phoneNumber);
+                person.AddPhone(phoneNumber);
             }
-            return person;
+            return person.Build();
         }
 
         /// <summary>
@@ -103,28 +108,27 @@ namespace Google.Protobuf.Examples.AddressBook
                 return -1;
             }
 
-            AddressBook addressBook;
+            AddressBook.Builder addressBook = AddressBook.CreateBuilder();
 
             if (File.Exists(args[0]))
             {
                 using (Stream file = File.OpenRead(args[0]))
                 {
-                    addressBook = AddressBook.Parser.ParseFrom(file);
+                    addressBook.MergeFrom(file);
                 }
             }
             else
             {
                 Console.WriteLine("{0}: File not found. Creating a new file.", args[0]);
-                addressBook = new AddressBook();
             }
 
             // Add an address.
-            addressBook.Person.Add(PromptForAddress(Console.In, Console.Out));
+            addressBook.AddPerson(PromptForAddress(Console.In, Console.Out));
 
             // Write the new address book back to disk.
             using (Stream output = File.OpenWrite(args[0]))
             {
-                addressBook.WriteTo(output);
+                addressBook.Build().WriteTo(output);
             }
             return 0;
         }

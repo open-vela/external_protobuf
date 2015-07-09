@@ -1,7 +1,10 @@
 #region Copyright notice and license
+
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
-// https://developers.google.com/protocol-buffers/
+// http://github.com/jskeet/dotnet-protobufs/
+// Original C++/Java/Python code:
+// http://code.google.com/p/protobuf/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -28,12 +31,13 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
 #endregion
 
 using System;
 using System.IO;
 
-namespace Google.Protobuf.ProtoDump
+namespace Google.ProtocolBuffers.ProtoDump
 {
     /// <summary>
     /// Small utility to load a binary message and dump it in text form
@@ -49,24 +53,36 @@ namespace Google.Protobuf.ProtoDump
                 Console.Error.WriteLine("including assembly e.g. ProjectNamespace.Message,Company.Project");
                 return 1;
             }
-            Type type = Type.GetType(args[0]);
-            if (type == null)
+            IMessage defaultMessage;
+            try
             {
-                Console.Error.WriteLine("Unable to load type {0}.", args[0]);
+                defaultMessage = MessageUtil.GetDefaultMessage(args[0]);
+            }
+            catch (ArgumentException e)
+            {
+                Console.Error.WriteLine(e.Message);
                 return 1;
             }
-            if (!typeof(IMessage).IsAssignableFrom(type))
+            try
             {
-                Console.Error.WriteLine("Type {0} doesn't implement IMessage.", args[0]);
+                IBuilder builder = defaultMessage.WeakCreateBuilderForType();
+                if (builder == null)
+                {
+                    Console.Error.WriteLine("Unable to create builder");
+                    return 1;
+                }
+                byte[] inputData = File.ReadAllBytes(args[1]);
+                builder.WeakMergeFrom(ByteString.CopyFrom(inputData));
+                Console.WriteLine(TextFormat.PrintToString(builder.WeakBuild()));
+                return 0;
+            }
+            catch (Exception e)
+            {
+                Console.Error.WriteLine("Error: {0}", e.Message);
+                Console.Error.WriteLine();
+                Console.Error.WriteLine("Detailed exception information: {0}", e);
                 return 1;
             }
-            IMessage message = (IMessage) Activator.CreateInstance(type);
-            using (var input = File.OpenRead(args[1]))
-            {
-                message.MergeFrom(input);
-            }
-            Console.WriteLine(message);
-            return 0;
         }
     }
 }

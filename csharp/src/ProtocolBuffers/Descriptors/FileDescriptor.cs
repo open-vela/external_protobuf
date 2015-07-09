@@ -1,7 +1,8 @@
-#region Copyright notice and license
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
-// https://developers.google.com/protocol-buffers/
+// http://github.com/jskeet/dotnet-protobufs/
+// Original C++/Java/Python code:
+// http://code.google.com/p/protobuf/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -28,15 +29,14 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#endregion
-
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using Google.Protobuf.DescriptorProtos;
-using FileOptions = Google.Protobuf.DescriptorProtos.FileOptions;
+using System.IO;
+using Google.ProtocolBuffers.DescriptorProtos;
+using FileOptions = Google.ProtocolBuffers.DescriptorProtos.FileOptions;
 
-namespace Google.Protobuf.Descriptors
+namespace Google.ProtocolBuffers.Descriptors
 {
     /// <summary>
     /// Describes a .proto file, including everything defined within.
@@ -45,10 +45,11 @@ namespace Google.Protobuf.Descriptors
     /// </summary>
     public sealed class FileDescriptor : IDescriptor<FileDescriptorProto>
     {
-        private readonly FileDescriptorProto proto;
+        private FileDescriptorProto proto;
         private readonly IList<MessageDescriptor> messageTypes;
         private readonly IList<EnumDescriptor> enumTypes;
         private readonly IList<ServiceDescriptor> services;
+        private readonly IList<FieldDescriptor> extensions;
         private readonly IList<FileDescriptor> dependencies;
         private readonly IList<FileDescriptor> publicDependencies;
         private readonly DescriptorPool pool;
@@ -74,17 +75,21 @@ namespace Google.Protobuf.Descriptors
 
             pool.AddPackage(Package, this);
 
-            messageTypes = DescriptorUtil.ConvertAndMakeReadOnly(proto.MessageType,
+            messageTypes = DescriptorUtil.ConvertAndMakeReadOnly(proto.MessageTypeList,
                                                                  (message, index) =>
                                                                  new MessageDescriptor(message, this, null, index));
 
-            enumTypes = DescriptorUtil.ConvertAndMakeReadOnly(proto.EnumType,
+            enumTypes = DescriptorUtil.ConvertAndMakeReadOnly(proto.EnumTypeList,
                                                               (enumType, index) =>
                                                               new EnumDescriptor(enumType, this, null, index));
 
-            services = DescriptorUtil.ConvertAndMakeReadOnly(proto.Service,
+            services = DescriptorUtil.ConvertAndMakeReadOnly(proto.ServiceList,
                                                              (service, index) =>
                                                              new ServiceDescriptor(service, this, index));
+
+            extensions = DescriptorUtil.ConvertAndMakeReadOnly(proto.ExtensionList,
+                                                               (field, index) =>
+                                                               new FieldDescriptor(field, this, null, index, true));
         }
 
         /// <summary>
@@ -99,14 +104,14 @@ namespace Google.Protobuf.Descriptors
                 nameToFileMap[file.Name] = file;
             }
             var publicDependencies = new List<FileDescriptor>();
-            for (int i = 0; i < proto.PublicDependency.Count; i++)
+            for (int i = 0; i < proto.PublicDependencyCount; i++)
             {
-                int index = proto.PublicDependency[i];
-                if (index < 0 || index >= proto.Dependency.Count)
+                int index = proto.PublicDependencyList[i];
+                if (index < 0 || index >= proto.DependencyCount)
                 {
                     throw new DescriptorValidationException(@this, "Invalid public dependency index.");
                 }
-                string name = proto.Dependency[index];
+                string name = proto.DependencyList[index];
                 FileDescriptor file = nameToFileMap[name];
                 if (file == null)
                 {
@@ -123,6 +128,9 @@ namespace Google.Protobuf.Descriptors
             }
             return new ReadOnlyCollection<FileDescriptor>(publicDependencies);
         }
+
+
+        static readonly char[] PathSeperators = new char[] { '/', '\\' };
 
         /// <value>
         /// The descriptor in its protocol message representation.
@@ -179,6 +187,14 @@ namespace Google.Protobuf.Descriptors
         public IList<ServiceDescriptor> Services
         {
             get { return services; }
+        }
+
+        /// <value>
+        /// Unmodifiable list of top-level extensions declared in this file.
+        /// </value>
+        public IList<FieldDescriptor> Extensions
+        {
+            get { return extensions; }
         }
 
         /// <value>
@@ -334,6 +350,16 @@ namespace Google.Protobuf.Descriptors
             {
                 service.CrossLink();
             }
+
+            foreach (FieldDescriptor extension in extensions)
+            {
+                extension.CrossLink();
+            }
+
+            foreach (MessageDescriptor message in messageTypes)
+            {
+                message.CheckRequiredFields();
+            }
         }
 
         /// <summary>
@@ -345,7 +371,7 @@ namespace Google.Protobuf.Descriptors
         /// </summary>
         public static FileDescriptor InternalBuildGeneratedFileFrom(byte[] descriptorData, FileDescriptor[] dependencies)
         {
-            return InternalBuildGeneratedFileFrom(descriptorData, dependencies, x => { });
+            return InternalBuildGeneratedFileFrom(descriptorData, dependencies, x => null);
         }
 
         /// <summary>
@@ -358,7 +384,9 @@ namespace Google.Protobuf.Descriptors
         /// in descriptor.proto. The callback may also return null to indicate that
         /// no extensions are used in the descriptor.
         /// </summary>
-        public delegate void InternalDescriptorAssigner(FileDescriptor descriptor);
+        /// <param name="descriptor"></param>
+        /// <returns></returns>
+        public delegate ExtensionRegistry InternalDescriptorAssigner(FileDescriptor descriptor);
 
         public static FileDescriptor InternalBuildGeneratedFileFrom(byte[] descriptorData,
                                                                     FileDescriptor[] dependencies,
@@ -367,7 +395,7 @@ namespace Google.Protobuf.Descriptors
             FileDescriptorProto proto;
             try
             {
-                proto = FileDescriptorProto.Parser.ParseFrom(descriptorData);
+                proto = FileDescriptorProto.ParseFrom(descriptorData);
             }
             catch (InvalidProtocolBufferException e)
             {
@@ -386,10 +414,60 @@ namespace Google.Protobuf.Descriptors
                 throw new ArgumentException("Invalid embedded descriptor for \"" + proto.Name + "\".", e);
             }
 
-            descriptorAssigner(result);
+            ExtensionRegistry registry = descriptorAssigner(result);
+
+            if (registry != null)
+            {
+                // We must re-parse the proto using the registry.
+                try
+                {
+                    proto = FileDescriptorProto.ParseFrom(descriptorData, registry);
+                }
+                catch (InvalidProtocolBufferException e)
+                {
+                    throw new ArgumentException("Failed to parse protocol buffer descriptor for generated code.", e);
+                }
+
+                result.ReplaceProto(proto);
+            }
             return result;
         }
-        
+
+        /// <summary>
+        /// Replace our FileDescriptorProto with the given one, which is
+        /// identical except that it might contain extensions that weren't present
+        /// in the original. This method is needed for bootstrapping when a file
+        /// defines custom options. The options may be defined in the file itself,
+        /// so we can't actually parse them until we've constructed the descriptors,
+        /// but to construct the decsriptors we have to have parsed the descriptor
+        /// protos. So, we have to parse the descriptor protos a second time after
+        /// constructing the descriptors.
+        /// </summary>
+        private void ReplaceProto(FileDescriptorProto newProto)
+        {
+            proto = newProto;
+
+            for (int i = 0; i < messageTypes.Count; i++)
+            {
+                messageTypes[i].ReplaceProto(proto.GetMessageType(i));
+            }
+
+            for (int i = 0; i < enumTypes.Count; i++)
+            {
+                enumTypes[i].ReplaceProto(proto.GetEnumType(i));
+            }
+
+            for (int i = 0; i < services.Count; i++)
+            {
+                services[i].ReplaceProto(proto.GetService(i));
+            }
+
+            for (int i = 0; i < extensions.Count; i++)
+            {
+                extensions[i].ReplaceProto(proto.GetExtension(i));
+            }
+        }
+
         public override string ToString()
         {
             return "FileDescriptor for " + proto.Name;
