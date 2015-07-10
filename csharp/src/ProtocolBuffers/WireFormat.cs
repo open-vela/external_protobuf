@@ -1,10 +1,7 @@
 #region Copyright notice and license
-
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
-// http://github.com/jskeet/dotnet-protobufs/
-// Original C++/Java/Python code:
-// http://code.google.com/p/protobuf/
+// https://developers.google.com/protocol-buffers/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -31,13 +28,12 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
 #endregion
 
 using System;
-using Google.ProtocolBuffers.Descriptors;
+using Google.Protobuf.Descriptors;
 
-namespace Google.ProtocolBuffers
+namespace Google.Protobuf
 {
     /// <summary>
     /// This class is used internally by the Protocol Buffer Library and generated
@@ -53,13 +49,13 @@ namespace Google.ProtocolBuffers
         #region Fixed sizes.
 
         // TODO(jonskeet): Move these somewhere else. They're messy. Consider making FieldType a smarter kind of enum
-        public const int Fixed32Size = 4;
-        public const int Fixed64Size = 8;
-        public const int SFixed32Size = 4;
-        public const int SFixed64Size = 8;
-        public const int FloatSize = 4;
-        public const int DoubleSize = 8;
-        public const int BoolSize = 1;
+        internal const int Fixed32Size = 4;
+        internal const int Fixed64Size = 8;
+        internal const int SFixed32Size = 4;
+        internal const int SFixed64Size = 8;
+        internal const int FloatSize = 4;
+        internal const int DoubleSize = 8;
+        internal const int BoolSize = 1;
 
         #endregion
 
@@ -72,22 +68,7 @@ namespace Google.ProtocolBuffers
             EndGroup = 4,
             Fixed32 = 5
         }
-
-        internal static class MessageSetField
-        {
-            internal const int Item = 1;
-            internal const int TypeID = 2;
-            internal const int Message = 3;
-        }
-
-        internal static class MessageSetTag
-        {
-            internal static readonly uint ItemStart = MakeTag(MessageSetField.Item, WireType.StartGroup);
-            internal static readonly uint ItemEnd = MakeTag(MessageSetField.Item, WireType.EndGroup);
-            internal static readonly uint TypeID = MakeTag(MessageSetField.TypeID, WireType.Varint);
-            internal static readonly uint Message = MakeTag(MessageSetField.Message, WireType.LengthDelimited);
-        }
-
+        
         private const int TagTypeBits = 3;
         private const uint TagTypeMask = (1 << TagTypeBits) - 1;
 
@@ -114,14 +95,12 @@ namespace Google.ProtocolBuffers
 
         /// <summary>
         /// Makes a tag value given a field number and wire type.
-        /// TODO(jonskeet): Should we just have a Tag structure?
         /// </summary>
         public static uint MakeTag(int fieldNumber, WireType wireType)
         {
             return (uint) (fieldNumber << TagTypeBits) | (uint) wireType;
         }
 
-#if !LITE
         public static uint MakeTag(FieldDescriptor field)
         {
             return MakeTag(field.FieldNumber, GetWireType(field));
@@ -135,8 +114,6 @@ namespace Google.ProtocolBuffers
         {
             return descriptor.IsPacked ? WireType.LengthDelimited : GetWireType(descriptor.FieldType);
         }
-
-#endif
 
         /// <summary>
         /// Converts a field type to its wire type. Done with a switch for the sake
@@ -178,7 +155,7 @@ namespace Google.ProtocolBuffers
                 case FieldType.Enum:
                     return WireType.Varint;
                 default:
-                    throw new ArgumentOutOfRangeException("No such field type");
+                    throw new ArgumentOutOfRangeException("fieldType", "No such field type");
             }
         }
     }

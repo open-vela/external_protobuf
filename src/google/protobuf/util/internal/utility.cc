@@ -41,7 +41,6 @@
 #include <google/protobuf/util/internal/constants.h>
 #include <google/protobuf/stubs/strutil.h>
 #include <google/protobuf/stubs/map_util.h>
-#include <google/protobuf/stubs/mathlimits.h>
 
 namespace google {
 namespace protobuf {
@@ -303,7 +302,7 @@ bool IsMap(const google::protobuf::Field& field,
 string DoubleAsString(double value) {
   if (value == std::numeric_limits<double>::infinity()) return "Infinity";
   if (value == -std::numeric_limits<double>::infinity()) return "-Infinity";
-  if (google::protobuf::MathLimits<double>::IsNaN(value)) return "NaN";
+  if (::isnan(value)) return "NaN";
 
   return SimpleDtoa(value);
 }

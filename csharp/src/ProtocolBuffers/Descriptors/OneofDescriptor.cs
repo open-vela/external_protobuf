@@ -1,6 +1,7 @@
-﻿// Protocol Buffers - Google's data interchange format
+﻿#region Copyright notice and license
+// Protocol Buffers - Google's data interchange format
 // Copyright 2015 Google Inc.  All rights reserved.
-// Author: jieluo@google.com (Jie Luo)
+// https://developers.google.com/protocol-buffers/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -27,52 +28,52 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-using System;
+#endregion
+
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Google.ProtocolBuffers.DescriptorProtos;
+using System.Collections.ObjectModel;
+using Google.Protobuf.DescriptorProtos;
 
-namespace Google.ProtocolBuffers.Descriptors
+namespace Google.Protobuf.Descriptors
 {
-    public sealed class OneofDescriptor
+    public sealed class OneofDescriptor : DescriptorBase
     {
-        private int index;
-        private OneofDescriptorProto proto;
-        private FileDescriptor file;
+        private readonly OneofDescriptorProto proto;
         private MessageDescriptor containingType;
-        internal int fieldCount;
-        internal IList<FieldDescriptor> fields;
+        private IList<FieldDescriptor> fields;
 
-        internal OneofDescriptor(OneofDescriptorProto proto, FileDescriptor file,
-                                 MessageDescriptor parent, int index)
+        internal OneofDescriptor(OneofDescriptorProto proto, FileDescriptor file, MessageDescriptor parent, int index)
+            : base(file, file.ComputeFullName(parent, proto.Name), index)
         {
             this.proto = proto;
-            this.file = file;
-            this.index = index;
-
             containingType = parent;
-            fieldCount = 0;
+
+            file.DescriptorPool.AddSymbol(this);
         }
 
-        public int Index
-        {
-            get { return index; }
-        }
+        /// <summary>
+        /// The brief name of the descriptor's target.
+        /// </summary>
+        public override string Name { get { return proto.Name; } }
 
         public MessageDescriptor ContainingType
         {
             get { return containingType; }
         }
 
-        public int FieldCount
-        {
-            get { return fieldCount; }
-        }
+        public IList<FieldDescriptor> Fields { get { return fields; } }
 
-        public FieldDescriptor Field(int index)
+        internal void CrossLink()
         {
-            return fields[index];
+            List<FieldDescriptor> fieldCollection = new List<FieldDescriptor>();
+            foreach (var field in ContainingType.Fields)
+            {
+                if (field.ContainingOneof == this)
+                {
+                    fieldCollection.Add(field);
+                }
+            }
+            fields = new ReadOnlyCollection<FieldDescriptor>(fieldCollection);
         }
     }
 }

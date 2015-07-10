@@ -1,10 +1,7 @@
 ﻿#region Copyright notice and license
-
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
-// http://github.com/jskeet/dotnet-protobufs/
-// Original C++/Java/Python code:
-// http://code.google.com/p/protobuf/
+// https://developers.google.com/protocol-buffers/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -31,62 +28,26 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
 #endregion
 
 using System;
-using System.Collections.Generic;
 
-namespace Google.ProtocolBuffers
+namespace Google.Protobuf
 {
     /// <summary>
     /// Helper methods for throwing exceptions
     /// </summary>
-    public static class ThrowHelper
+    internal static class ThrowHelper
     {
         /// <summary>
         /// Throws an ArgumentNullException if the given value is null.
         /// </summary>
-        public static void ThrowIfNull(object value, string name)
+        internal static void ThrowIfNull(object value, string name)
         {
             if (value == null)
             {
                 throw new ArgumentNullException(name);
             }
-        }
-
-        /// <summary>
-        /// Throws an ArgumentNullException if the given value is null.
-        /// </summary>
-        public static void ThrowIfNull(object value)
-        {
-            if (value == null)
-            {
-                throw new ArgumentNullException();
-            }
-        }
-
-        /// <summary>
-        /// Throws an ArgumentNullException if the given value or any element within it is null.
-        /// </summary>
-        public static void ThrowIfAnyNull<T>(IEnumerable<T> sequence)
-        {
-            foreach (T t in sequence)
-            {
-                if (t == null)
-                {
-                    throw new ArgumentNullException();
-                }
-            }
-        }
-
-        public static Exception CreateMissingMethod(Type type, string methodName)
-        {
-#if CLIENTPROFILE
-            return new System.MissingMethodException(type.FullName, methodName);
-#else
-            return new System.ArgumentException(String.Format("The method '{0}' was not found on type {1}.", methodName, type));
-#endif
         }
     }
 }
