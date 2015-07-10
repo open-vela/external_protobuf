@@ -1,8 +1,7 @@
+#region Copyright notice and license
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
-// http://github.com/jskeet/dotnet-protobufs/
-// Original C++/Java/Python code:
-// http://code.google.com/p/protobuf/
+// https://developers.google.com/protocol-buffers/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -29,64 +28,42 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-using Google.ProtocolBuffers.DescriptorProtos;
+#endregion
 
-namespace Google.ProtocolBuffers.Descriptors
+using Google.Protobuf.DescriptorProtos;
+
+namespace Google.Protobuf.Descriptors
 {
     /// <summary>
     /// Base class for nearly all descriptors, providing common functionality.
     /// </summary>
-    /// <typeparam name="TProto">Type of the protocol buffer form of this descriptor</typeparam>
-    /// <typeparam name="TOptions">Type of the options protocol buffer for this descriptor</typeparam>
-    public abstract class DescriptorBase<TProto, TOptions> : IDescriptor<TProto>
-        where TProto : IMessage, IDescriptorProto<TOptions>
+    public abstract class DescriptorBase : IDescriptor
     {
-        private TProto proto;
         private readonly FileDescriptor file;
         private readonly string fullName;
+        private readonly int index;
 
-        protected DescriptorBase(TProto proto, FileDescriptor file, string fullName)
+        internal DescriptorBase(FileDescriptor file, string fullName, int index)
         {
-            this.proto = proto;
             this.file = file;
             this.fullName = fullName;
+            this.index = index;
         }
 
-        internal virtual void ReplaceProto(TProto newProto)
+        /// <value>
+        /// The index of this descriptor within its parent descriptor. 
+        /// </value>
+        /// <remarks>
+        /// This returns the index of this descriptor within its parent, for
+        /// this descriptor's type. (There can be duplicate values for different
+        /// types, e.g. one enum type with index 0 and one message type with index 0.)
+        /// </remarks>
+        public int Index
         {
-            this.proto = newProto;
+            get { return index; }
         }
 
-        protected static string ComputeFullName(FileDescriptor file, MessageDescriptor parent, string name)
-        {
-            if (parent != null)
-            {
-                return parent.FullName + "." + name;
-            }
-            if (file.Package.Length > 0)
-            {
-                return file.Package + "." + name;
-            }
-            return name;
-        }
-
-        IMessage IDescriptor.Proto
-        {
-            get { return proto; }
-        }
-
-        /// <summary>
-        /// Returns the protocol buffer form of this descriptor.
-        /// </summary>
-        public TProto Proto
-        {
-            get { return proto; }
-        }
-
-        public TOptions Options
-        {
-            get { return proto.Options; }
-        }
+        public abstract string Name { get; }
 
         /// <summary>
         /// The fully qualified name of the descriptor's target.
@@ -94,14 +71,6 @@ namespace Google.ProtocolBuffers.Descriptors
         public string FullName
         {
             get { return fullName; }
-        }
-
-        /// <summary>
-        /// The brief name of the descriptor's target.
-        /// </summary>
-        public string Name
-        {
-            get { return proto.Name; }
         }
 
         /// <value>
