@@ -43,10 +43,9 @@
 #include <google/protobuf/wire_format_lite.h>
 
 #include <google/protobuf/compiler/csharp/csharp_enum.h>
-#include <google/protobuf/compiler/csharp/csharp_field_base.h>
-#include <google/protobuf/compiler/csharp/csharp_helpers.h>
 #include <google/protobuf/compiler/csharp/csharp_message.h>
-#include <google/protobuf/compiler/csharp/csharp_names.h>
+#include <google/protobuf/compiler/csharp/csharp_helpers.h>
+#include <google/protobuf/compiler/csharp/csharp_field_base.h>
 
 using google::protobuf::internal::scoped_ptr;
 
@@ -152,7 +151,6 @@ void MessageGenerator::GenerateStaticVariableInitializers(io::Printer* printer) 
     printer->Print("\"$property_name$\", ",
                    "property_name", GetPropertyName(descriptor_->field(i)));
   }
-  printer->Print("}, new string[] { ");
   for (int i = 0; i < descriptor_->oneof_decl_count(); i++) {
     printer->Print("\"$oneof_name$\", ",
                    "oneof_name",
@@ -431,10 +429,7 @@ void MessageGenerator::GenerateFrameworkMethods(io::Printer* printer) {
     printer->Outdent();
     printer->Print("}\n\n");
 
-    printer->Print(
-        "public override string ToString() {\n"
-        "  return pb::JsonFormatter.Default.Format(this);\n"
-        "}\n\n");
+    // TODO(jonskeet): ToString.
 }
 
 void MessageGenerator::GenerateMessageSerializationMethods(io::Printer* printer) {

@@ -38,7 +38,7 @@ namespace Google.Protobuf.TestProtos {
           });
       internal__static_protobuf_unittest_import_ImportMessage__FieldAccessorTable = 
           new pb::FieldAccess.FieldAccessorTable(typeof(global::Google.Protobuf.TestProtos.ImportMessage), descriptor.MessageTypes[0],
-              new string[] { "D", }, new string[] { });
+              new string[] { "D", });
     }
     #endregion
 
@@ -122,10 +122,6 @@ namespace Google.Protobuf.TestProtos {
       int hash = 1;
       if (D != 0) hash ^= D.GetHashCode();
       return hash;
-    }
-
-    public override string ToString() {
-      return pb::JsonFormatter.Default.Format(this);
     }
 
     public void WriteTo(pb::CodedOutputStream output) {
