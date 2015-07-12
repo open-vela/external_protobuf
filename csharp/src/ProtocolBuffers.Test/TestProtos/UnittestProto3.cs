@@ -191,109 +191,109 @@ namespace Google.Protobuf.TestProtos {
           });
       internal__static_protobuf_unittest_TestAllTypes__FieldAccessorTable = 
           new pb::FieldAccess.FieldAccessorTable(typeof(global::Google.Protobuf.TestProtos.TestAllTypes), descriptor.MessageTypes[0],
-              new string[] { "SingleInt32", "SingleInt64", "SingleUint32", "SingleUint64", "SingleSint32", "SingleSint64", "SingleFixed32", "SingleFixed64", "SingleSfixed32", "SingleSfixed64", "SingleFloat", "SingleDouble", "SingleBool", "SingleString", "SingleBytes", "SingleNestedMessage", "SingleForeignMessage", "SingleImportMessage", "SingleNestedEnum", "SingleForeignEnum", "SingleImportEnum", "SinglePublicImportMessage", "RepeatedInt32", "RepeatedInt64", "RepeatedUint32", "RepeatedUint64", "RepeatedSint32", "RepeatedSint64", "RepeatedFixed32", "RepeatedFixed64", "RepeatedSfixed32", "RepeatedSfixed64", "RepeatedFloat", "RepeatedDouble", "RepeatedBool", "RepeatedString", "RepeatedBytes", "RepeatedNestedMessage", "RepeatedForeignMessage", "RepeatedImportMessage", "RepeatedNestedEnum", "RepeatedForeignEnum", "RepeatedImportEnum", "RepeatedPublicImportMessage", "OneofUint32", "OneofNestedMessage", "OneofString", "OneofBytes", }, new string[] { "OneofField", });
+              new string[] { "SingleInt32", "SingleInt64", "SingleUint32", "SingleUint64", "SingleSint32", "SingleSint64", "SingleFixed32", "SingleFixed64", "SingleSfixed32", "SingleSfixed64", "SingleFloat", "SingleDouble", "SingleBool", "SingleString", "SingleBytes", "SingleNestedMessage", "SingleForeignMessage", "SingleImportMessage", "SingleNestedEnum", "SingleForeignEnum", "SingleImportEnum", "SinglePublicImportMessage", "RepeatedInt32", "RepeatedInt64", "RepeatedUint32", "RepeatedUint64", "RepeatedSint32", "RepeatedSint64", "RepeatedFixed32", "RepeatedFixed64", "RepeatedSfixed32", "RepeatedSfixed64", "RepeatedFloat", "RepeatedDouble", "RepeatedBool", "RepeatedString", "RepeatedBytes", "RepeatedNestedMessage", "RepeatedForeignMessage", "RepeatedImportMessage", "RepeatedNestedEnum", "RepeatedForeignEnum", "RepeatedImportEnum", "RepeatedPublicImportMessage", "OneofUint32", "OneofNestedMessage", "OneofString", "OneofBytes", "OneofField", });
       internal__static_protobuf_unittest_TestAllTypes_NestedMessage__FieldAccessorTable = 
           new pb::FieldAccess.FieldAccessorTable(typeof(global::Google.Protobuf.TestProtos.TestAllTypes.Types.NestedMessage), descriptor.MessageTypes[0].NestedTypes[0],
-              new string[] { "Bb", }, new string[] { });
+              new string[] { "Bb", });
       internal__static_protobuf_unittest_NestedTestAllTypes__FieldAccessorTable = 
           new pb::FieldAccess.FieldAccessorTable(typeof(global::Google.Protobuf.TestProtos.NestedTestAllTypes), descriptor.MessageTypes[1],
-              new string[] { "Child", "Payload", "RepeatedChild", }, new string[] { });
+              new string[] { "Child", "Payload", "RepeatedChild", });
       internal__static_protobuf_unittest_TestDeprecatedFields__FieldAccessorTable = 
           new pb::FieldAccess.FieldAccessorTable(typeof(global::Google.Protobuf.TestProtos.TestDeprecatedFields), descriptor.MessageTypes[2],
-              new string[] { "DeprecatedInt32", }, new string[] { });
+              new string[] { "DeprecatedInt32", });
       internal__static_protobuf_unittest_ForeignMessage__FieldAccessorTable = 
           new pb::FieldAccess.FieldAccessorTable(typeof(global::Google.Protobuf.TestProtos.ForeignMessage), descriptor.MessageTypes[3],
-              new string[] { "C", }, new string[] { });
+              new string[] { "C", });
       internal__static_protobuf_unittest_TestReservedFields__FieldAccessorTable = 
           new pb::FieldAccess.FieldAccessorTable(typeof(global::Google.Protobuf.TestProtos.TestReservedFields), descriptor.MessageTypes[4],
-              new string[] { }, new string[] { });
+              new string[] { });
       internal__static_protobuf_unittest_TestForeignNested__FieldAccessorTable = 
           new pb::FieldAccess.FieldAccessorTable(typeof(global::Google.Protobuf.TestProtos.TestForeignNested), descriptor.MessageTypes[5],
-              new string[] { "ForeignNested", }, new string[] { });
+              new string[] { "ForeignNested", });
       internal__static_protobuf_unittest_TestReallyLargeTagNumber__FieldAccessorTable = 
           new pb::FieldAccess.FieldAccessorTable(typeof(global::Google.Protobuf.TestProtos.TestReallyLargeTagNumber), descriptor.MessageTypes[6],
-              new string[] { "A", "Bb", }, new string[] { });
+              new string[] { "A", "Bb", });
       internal__static_protobuf_unittest_TestRecursiveMessage__FieldAccessorTable = 
           new pb::FieldAccess.FieldAccessorTable(typeof(global::Google.Protobuf.TestProtos.TestRecursiveMessage), descriptor.MessageTypes[7],
-              new string[] { "A", "I", }, new string[] { });
+              new string[] { "A", "I", });
       internal__static_protobuf_unittest_TestMutualRecursionA__FieldAccessorTable = 
           new pb::FieldAccess.FieldAccessorTable(typeof(global::Google.Protobuf.TestProtos.TestMutualRecursionA), descriptor.MessageTypes[8],
-              new string[] { "Bb", }, new string[] { });
+              new string[] { "Bb", });
       internal__static_protobuf_unittest_TestMutualRecursionB__FieldAccessorTable = 
           new pb::FieldAccess.FieldAccessorTable(typeof(global::Google.Protobuf.TestProtos.TestMutualRecursionB), descriptor.MessageTypes[9],
-              new string[] { "A", "OptionalInt32", }, new string[] { });
+              new string[] { "A", "OptionalInt32", });
       internal__static_protobuf_unittest_TestCamelCaseFieldNames__FieldAccessorTable = 
           new pb::FieldAccess.FieldAccessorTable(typeof(global::Google.Protobuf.TestProtos.TestCamelCaseFieldNames), descriptor.MessageTypes[10],
-              new string[] { "PrimitiveField", "StringField", "EnumField", "MessageField", "RepeatedPrimitiveField", "RepeatedStringField", "RepeatedEnumField", "RepeatedMessageField", }, new string[] { });
+              new string[] { "PrimitiveField", "StringField", "EnumField", "MessageField", "RepeatedPrimitiveField", "RepeatedStringField", "RepeatedEnumField", "RepeatedMessageField", });
       internal__static_protobuf_unittest_TestFieldOrderings__FieldAccessorTable = 
           new pb::FieldAccess.FieldAccessorTable(typeof(global::Google.Protobuf.TestProtos.TestFieldOrderings), descriptor.MessageTypes[11],
-              new string[] { "MyString", "MyInt", "MyFloat", "SingleNestedMessage", }, new string[] { });
+              new string[] { "MyString", "MyInt", "MyFloat", "SingleNestedMessage", });
       internal__static_protobuf_unittest_TestFieldOrderings_NestedMessage__FieldAccessorTable = 
           new pb::FieldAccess.FieldAccessorTable(typeof(global::Google.Protobuf.TestProtos.TestFieldOrderings.Types.NestedMessage), descriptor.MessageTypes[11].NestedTypes[0],
-              new string[] { "Oo", "Bb", }, new string[] { });
+              new string[] { "Oo", "Bb", });
       internal__static_protobuf_unittest_SparseEnumMessage__FieldAccessorTable = 
           new pb::FieldAccess.FieldAccessorTable(typeof(global::Google.Protobuf.TestProtos.SparseEnumMessage), descriptor.MessageTypes[12],
-              new string[] { "SparseEnum", }, new string[] { });
+              new string[] { "SparseEnum", });
       internal__static_protobuf_unittest_OneString__FieldAccessorTable = 
           new pb::FieldAccess.FieldAccessorTable(typeof(global::Google.Protobuf.TestProtos.OneString), descriptor.MessageTypes[13],
-              new string[] { "Data", }, new string[] { });
+              new string[] { "Data", });
       internal__static_protobuf_unittest_MoreString__FieldAccessorTable = 
           new pb::FieldAccess.FieldAccessorTable(typeof(global::Google.Protobuf.TestProtos.MoreString), descriptor.MessageTypes[14],
-              new string[] { "Data", }, new string[] { });
+              new string[] { "Data", });
       internal__static_protobuf_unittest_OneBytes__FieldAccessorTable = 
           new pb::FieldAccess.FieldAccessorTable(typeof(global::Google.Protobuf.TestProtos.OneBytes), descriptor.MessageTypes[15],
-              new string[] { "Data", }, new string[] { });
+              new string[] { "Data", });
       internal__static_protobuf_unittest_MoreBytes__FieldAccessorTable = 
           new pb::FieldAccess.FieldAccessorTable(typeof(global::Google.Protobuf.TestProtos.MoreBytes), descriptor.MessageTypes[16],
-              new string[] { "Data", }, new string[] { });
+              new string[] { "Data", });
       internal__static_protobuf_unittest_Int32Message__FieldAccessorTable = 
           new pb::FieldAccess.FieldAccessorTable(typeof(global::Google.Protobuf.TestProtos.Int32Message), descriptor.MessageTypes[17],
-              new string[] { "Data", }, new string[] { });
+              new string[] { "Data", });
       internal__static_protobuf_unittest_Uint32Message__FieldAccessorTable = 
           new pb::FieldAccess.FieldAccessorTable(typeof(global::Google.Protobuf.TestProtos.Uint32Message), descriptor.MessageTypes[18],
-              new string[] { "Data", }, new string[] { });
+              new string[] { "Data", });
       internal__static_protobuf_unittest_Int64Message__FieldAccessorTable = 
           new pb::FieldAccess.FieldAccessorTable(typeof(global::Google.Protobuf.TestProtos.Int64Message), descriptor.MessageTypes[19],
-              new string[] { "Data", }, new string[] { });
+              new string[] { "Data", });
       internal__static_protobuf_unittest_Uint64Message__FieldAccessorTable = 
           new pb::FieldAccess.FieldAccessorTable(typeof(global::Google.Protobuf.TestProtos.Uint64Message), descriptor.MessageTypes[20],
-              new string[] { "Data", }, new string[] { });
+              new string[] { "Data", });
       internal__static_protobuf_unittest_BoolMessage__FieldAccessorTable = 
           new pb::FieldAccess.FieldAccessorTable(typeof(global::Google.Protobuf.TestProtos.BoolMessage), descriptor.MessageTypes[21],
-              new string[] { "Data", }, new string[] { });
+              new string[] { "Data", });
       internal__static_protobuf_unittest_TestOneof__FieldAccessorTable = 
           new pb::FieldAccess.FieldAccessorTable(typeof(global::Google.Protobuf.TestProtos.TestOneof), descriptor.MessageTypes[22],
-              new string[] { "FooInt", "FooString", "FooMessage", }, new string[] { "Foo", });
+              new string[] { "FooInt", "FooString", "FooMessage", "Foo", });
       internal__static_protobuf_unittest_TestPackedTypes__FieldAccessorTable = 
           new pb::FieldAccess.FieldAccessorTable(typeof(global::Google.Protobuf.TestProtos.TestPackedTypes), descriptor.MessageTypes[23],
-              new string[] { "PackedInt32", "PackedInt64", "PackedUint32", "PackedUint64", "PackedSint32", "PackedSint64", "PackedFixed32", "PackedFixed64", "PackedSfixed32", "PackedSfixed64", "PackedFloat", "PackedDouble", "PackedBool", "PackedEnum", }, new string[] { });
+              new string[] { "PackedInt32", "PackedInt64", "PackedUint32", "PackedUint64", "PackedSint32", "PackedSint64", "PackedFixed32", "PackedFixed64", "PackedSfixed32", "PackedSfixed64", "PackedFloat", "PackedDouble", "PackedBool", "PackedEnum", });
       internal__static_protobuf_unittest_TestUnpackedTypes__FieldAccessorTable = 
           new pb::FieldAccess.FieldAccessorTable(typeof(global::Google.Protobuf.TestProtos.TestUnpackedTypes), descriptor.MessageTypes[24],
-              new string[] { "UnpackedInt32", "UnpackedInt64", "UnpackedUint32", "UnpackedUint64", "UnpackedSint32", "UnpackedSint64", "UnpackedFixed32", "UnpackedFixed64", "UnpackedSfixed32", "UnpackedSfixed64", "UnpackedFloat", "UnpackedDouble", "UnpackedBool", "UnpackedEnum", }, new string[] { });
+              new string[] { "UnpackedInt32", "UnpackedInt64", "UnpackedUint32", "UnpackedUint64", "UnpackedSint32", "UnpackedSint64", "UnpackedFixed32", "UnpackedFixed64", "UnpackedSfixed32", "UnpackedSfixed64", "UnpackedFloat", "UnpackedDouble", "UnpackedBool", "UnpackedEnum", });
       internal__static_protobuf_unittest_TestRepeatedScalarDifferentTagSizes__FieldAccessorTable = 
           new pb::FieldAccess.FieldAccessorTable(typeof(global::Google.Protobuf.TestProtos.TestRepeatedScalarDifferentTagSizes), descriptor.MessageTypes[25],
-              new string[] { "RepeatedFixed32", "RepeatedInt32", "RepeatedFixed64", "RepeatedInt64", "RepeatedFloat", "RepeatedUint64", }, new string[] { });
+              new string[] { "RepeatedFixed32", "RepeatedInt32", "RepeatedFixed64", "RepeatedInt64", "RepeatedFloat", "RepeatedUint64", });
       internal__static_protobuf_unittest_TestCommentInjectionMessage__FieldAccessorTable = 
           new pb::FieldAccess.FieldAccessorTable(typeof(global::Google.Protobuf.TestProtos.TestCommentInjectionMessage), descriptor.MessageTypes[26],
-              new string[] { "A", }, new string[] { });
+              new string[] { "A", });
       internal__static_protobuf_unittest_FooRequest__FieldAccessorTable = 
           new pb::FieldAccess.FieldAccessorTable(typeof(global::Google.Protobuf.TestProtos.FooRequest), descriptor.MessageTypes[27],
-              new string[] { }, new string[] { });
+              new string[] { });
       internal__static_protobuf_unittest_FooResponse__FieldAccessorTable = 
           new pb::FieldAccess.FieldAccessorTable(typeof(global::Google.Protobuf.TestProtos.FooResponse), descriptor.MessageTypes[28],
-              new string[] { }, new string[] { });
+              new string[] { });
       internal__static_protobuf_unittest_FooClientMessage__FieldAccessorTable = 
           new pb::FieldAccess.FieldAccessorTable(typeof(global::Google.Protobuf.TestProtos.FooClientMessage), descriptor.MessageTypes[29],
-              new string[] { }, new string[] { });
+              new string[] { });
       internal__static_protobuf_unittest_FooServerMessage__FieldAccessorTable = 
           new pb::FieldAccess.FieldAccessorTable(typeof(global::Google.Protobuf.TestProtos.FooServerMessage), descriptor.MessageTypes[30],
-              new string[] { }, new string[] { });
+              new string[] { });
       internal__static_protobuf_unittest_BarRequest__FieldAccessorTable = 
           new pb::FieldAccess.FieldAccessorTable(typeof(global::Google.Protobuf.TestProtos.BarRequest), descriptor.MessageTypes[31],
-              new string[] { }, new string[] { });
+              new string[] { });
       internal__static_protobuf_unittest_BarResponse__FieldAccessorTable = 
           new pb::FieldAccess.FieldAccessorTable(typeof(global::Google.Protobuf.TestProtos.BarResponse), descriptor.MessageTypes[32],
-              new string[] { }, new string[] { });
+              new string[] { });
     }
     #endregion
 
@@ -1019,10 +1019,6 @@ namespace Google.Protobuf.TestProtos {
       return hash;
     }
 
-    public override string ToString() {
-      return pb::JsonFormatter.Default.Format(this);
-    }
-
     public void WriteTo(pb::CodedOutputStream output) {
       if (SingleInt32 != 0) {
         output.WriteRawTag(8);
@@ -1699,10 +1695,6 @@ namespace Google.Protobuf.TestProtos {
           return hash;
         }
 
-        public override string ToString() {
-          return pb::JsonFormatter.Default.Format(this);
-        }
-
         public void WriteTo(pb::CodedOutputStream output) {
           if (Bb != 0) {
             output.WriteRawTag(8);
@@ -1848,10 +1840,6 @@ namespace Google.Protobuf.TestProtos {
       if (payload_ != null) hash ^= Payload.GetHashCode();
       hash ^= repeatedChild_.GetHashCode();
       return hash;
-    }
-
-    public override string ToString() {
-      return pb::JsonFormatter.Default.Format(this);
     }
 
     public void WriteTo(pb::CodedOutputStream output) {
@@ -2003,10 +1991,6 @@ namespace Google.Protobuf.TestProtos {
       return hash;
     }
 
-    public override string ToString() {
-      return pb::JsonFormatter.Default.Format(this);
-    }
-
     public void WriteTo(pb::CodedOutputStream output) {
       if (DeprecatedInt32 != 0) {
         output.WriteRawTag(8);
@@ -2122,10 +2106,6 @@ namespace Google.Protobuf.TestProtos {
       return hash;
     }
 
-    public override string ToString() {
-      return pb::JsonFormatter.Default.Format(this);
-    }
-
     public void WriteTo(pb::CodedOutputStream output) {
       if (C != 0) {
         output.WriteRawTag(8);
@@ -2228,10 +2208,6 @@ namespace Google.Protobuf.TestProtos {
       return hash;
     }
 
-    public override string ToString() {
-      return pb::JsonFormatter.Default.Format(this);
-    }
-
     public void WriteTo(pb::CodedOutputStream output) {
     }
 
@@ -2332,10 +2308,6 @@ namespace Google.Protobuf.TestProtos {
       int hash = 1;
       if (foreignNested_ != null) hash ^= ForeignNested.GetHashCode();
       return hash;
-    }
-
-    public override string ToString() {
-      return pb::JsonFormatter.Default.Format(this);
     }
 
     public void WriteTo(pb::CodedOutputStream output) {
@@ -2470,10 +2442,6 @@ namespace Google.Protobuf.TestProtos {
       if (A != 0) hash ^= A.GetHashCode();
       if (Bb != 0) hash ^= Bb.GetHashCode();
       return hash;
-    }
-
-    public override string ToString() {
-      return pb::JsonFormatter.Default.Format(this);
     }
 
     public void WriteTo(pb::CodedOutputStream output) {
@@ -2619,10 +2587,6 @@ namespace Google.Protobuf.TestProtos {
       return hash;
     }
 
-    public override string ToString() {
-      return pb::JsonFormatter.Default.Format(this);
-    }
-
     public void WriteTo(pb::CodedOutputStream output) {
       if (a_ != null) {
         output.WriteRawTag(10);
@@ -2759,10 +2723,6 @@ namespace Google.Protobuf.TestProtos {
       return hash;
     }
 
-    public override string ToString() {
-      return pb::JsonFormatter.Default.Format(this);
-    }
-
     public void WriteTo(pb::CodedOutputStream output) {
       if (bb_ != null) {
         output.WriteRawTag(10);
@@ -2896,10 +2856,6 @@ namespace Google.Protobuf.TestProtos {
       if (a_ != null) hash ^= A.GetHashCode();
       if (OptionalInt32 != 0) hash ^= OptionalInt32.GetHashCode();
       return hash;
-    }
-
-    public override string ToString() {
-      return pb::JsonFormatter.Default.Format(this);
     }
 
     public void WriteTo(pb::CodedOutputStream output) {
@@ -3122,10 +3078,6 @@ namespace Google.Protobuf.TestProtos {
       hash ^= repeatedEnumField_.GetHashCode();
       hash ^= repeatedMessageField_.GetHashCode();
       return hash;
-    }
-
-    public override string ToString() {
-      return pb::JsonFormatter.Default.Format(this);
     }
 
     public void WriteTo(pb::CodedOutputStream output) {
@@ -3361,10 +3313,6 @@ namespace Google.Protobuf.TestProtos {
       return hash;
     }
 
-    public override string ToString() {
-      return pb::JsonFormatter.Default.Format(this);
-    }
-
     public void WriteTo(pb::CodedOutputStream output) {
       if (MyInt != 0L) {
         output.WriteRawTag(8);
@@ -3542,10 +3490,6 @@ namespace Google.Protobuf.TestProtos {
           return hash;
         }
 
-        public override string ToString() {
-          return pb::JsonFormatter.Default.Format(this);
-        }
-
         public void WriteTo(pb::CodedOutputStream output) {
           if (Bb != 0) {
             output.WriteRawTag(8);
@@ -3680,10 +3624,6 @@ namespace Google.Protobuf.TestProtos {
       return hash;
     }
 
-    public override string ToString() {
-      return pb::JsonFormatter.Default.Format(this);
-    }
-
     public void WriteTo(pb::CodedOutputStream output) {
       if (SparseEnum != global::Google.Protobuf.TestProtos.TestSparseEnum.TEST_SPARSE_ENUM_UNSPECIFIED) {
         output.WriteRawTag(8);
@@ -3797,10 +3737,6 @@ namespace Google.Protobuf.TestProtos {
       int hash = 1;
       if (Data.Length != 0) hash ^= Data.GetHashCode();
       return hash;
-    }
-
-    public override string ToString() {
-      return pb::JsonFormatter.Default.Format(this);
     }
 
     public void WriteTo(pb::CodedOutputStream output) {
@@ -3917,10 +3853,6 @@ namespace Google.Protobuf.TestProtos {
       return hash;
     }
 
-    public override string ToString() {
-      return pb::JsonFormatter.Default.Format(this);
-    }
-
     public void WriteTo(pb::CodedOutputStream output) {
       data_.WriteTo(output, _repeated_data_codec);
     }
@@ -4027,10 +3959,6 @@ namespace Google.Protobuf.TestProtos {
       int hash = 1;
       if (Data.Length != 0) hash ^= Data.GetHashCode();
       return hash;
-    }
-
-    public override string ToString() {
-      return pb::JsonFormatter.Default.Format(this);
     }
 
     public void WriteTo(pb::CodedOutputStream output) {
@@ -4148,10 +4076,6 @@ namespace Google.Protobuf.TestProtos {
       return hash;
     }
 
-    public override string ToString() {
-      return pb::JsonFormatter.Default.Format(this);
-    }
-
     public void WriteTo(pb::CodedOutputStream output) {
       if (Data.Length != 0) {
         output.WriteRawTag(10);
@@ -4265,10 +4189,6 @@ namespace Google.Protobuf.TestProtos {
       int hash = 1;
       if (Data != 0) hash ^= Data.GetHashCode();
       return hash;
-    }
-
-    public override string ToString() {
-      return pb::JsonFormatter.Default.Format(this);
     }
 
     public void WriteTo(pb::CodedOutputStream output) {
@@ -4386,10 +4306,6 @@ namespace Google.Protobuf.TestProtos {
       return hash;
     }
 
-    public override string ToString() {
-      return pb::JsonFormatter.Default.Format(this);
-    }
-
     public void WriteTo(pb::CodedOutputStream output) {
       if (Data != 0) {
         output.WriteRawTag(8);
@@ -4503,10 +4419,6 @@ namespace Google.Protobuf.TestProtos {
       int hash = 1;
       if (Data != 0L) hash ^= Data.GetHashCode();
       return hash;
-    }
-
-    public override string ToString() {
-      return pb::JsonFormatter.Default.Format(this);
     }
 
     public void WriteTo(pb::CodedOutputStream output) {
@@ -4624,10 +4536,6 @@ namespace Google.Protobuf.TestProtos {
       return hash;
     }
 
-    public override string ToString() {
-      return pb::JsonFormatter.Default.Format(this);
-    }
-
     public void WriteTo(pb::CodedOutputStream output) {
       if (Data != 0UL) {
         output.WriteRawTag(8);
@@ -4741,10 +4649,6 @@ namespace Google.Protobuf.TestProtos {
       int hash = 1;
       if (Data != false) hash ^= Data.GetHashCode();
       return hash;
-    }
-
-    public override string ToString() {
-      return pb::JsonFormatter.Default.Format(this);
     }
 
     public void WriteTo(pb::CodedOutputStream output) {
@@ -4914,10 +4818,6 @@ namespace Google.Protobuf.TestProtos {
       if (fooCase_ == FooOneofCase.FooString) hash ^= FooString.GetHashCode();
       if (fooCase_ == FooOneofCase.FooMessage) hash ^= FooMessage.GetHashCode();
       return hash;
-    }
-
-    public override string ToString() {
-      return pb::JsonFormatter.Default.Format(this);
     }
 
     public void WriteTo(pb::CodedOutputStream output) {
@@ -5223,10 +5123,6 @@ namespace Google.Protobuf.TestProtos {
       hash ^= packedBool_.GetHashCode();
       hash ^= packedEnum_.GetHashCode();
       return hash;
-    }
-
-    public override string ToString() {
-      return pb::JsonFormatter.Default.Format(this);
     }
 
     public void WriteTo(pb::CodedOutputStream output) {
@@ -5596,10 +5492,6 @@ namespace Google.Protobuf.TestProtos {
       return hash;
     }
 
-    public override string ToString() {
-      return pb::JsonFormatter.Default.Format(this);
-    }
-
     public void WriteTo(pb::CodedOutputStream output) {
       unpackedInt32_.WriteTo(output, _repeated_unpackedInt32_codec);
       unpackedInt64_.WriteTo(output, _repeated_unpackedInt64_codec);
@@ -5872,10 +5764,6 @@ namespace Google.Protobuf.TestProtos {
       return hash;
     }
 
-    public override string ToString() {
-      return pb::JsonFormatter.Default.Format(this);
-    }
-
     public void WriteTo(pb::CodedOutputStream output) {
       repeatedFixed32_.WriteTo(output, _repeated_repeatedFixed32_codec);
       repeatedInt32_.WriteTo(output, _repeated_repeatedInt32_codec);
@@ -6025,10 +5913,6 @@ namespace Google.Protobuf.TestProtos {
       return hash;
     }
 
-    public override string ToString() {
-      return pb::JsonFormatter.Default.Format(this);
-    }
-
     public void WriteTo(pb::CodedOutputStream output) {
       if (A.Length != 0) {
         output.WriteRawTag(10);
@@ -6131,10 +6015,6 @@ namespace Google.Protobuf.TestProtos {
       return hash;
     }
 
-    public override string ToString() {
-      return pb::JsonFormatter.Default.Format(this);
-    }
-
     public void WriteTo(pb::CodedOutputStream output) {
     }
 
@@ -6221,10 +6101,6 @@ namespace Google.Protobuf.TestProtos {
     public override int GetHashCode() {
       int hash = 1;
       return hash;
-    }
-
-    public override string ToString() {
-      return pb::JsonFormatter.Default.Format(this);
     }
 
     public void WriteTo(pb::CodedOutputStream output) {
@@ -6315,10 +6191,6 @@ namespace Google.Protobuf.TestProtos {
       return hash;
     }
 
-    public override string ToString() {
-      return pb::JsonFormatter.Default.Format(this);
-    }
-
     public void WriteTo(pb::CodedOutputStream output) {
     }
 
@@ -6405,10 +6277,6 @@ namespace Google.Protobuf.TestProtos {
     public override int GetHashCode() {
       int hash = 1;
       return hash;
-    }
-
-    public override string ToString() {
-      return pb::JsonFormatter.Default.Format(this);
     }
 
     public void WriteTo(pb::CodedOutputStream output) {
@@ -6499,10 +6367,6 @@ namespace Google.Protobuf.TestProtos {
       return hash;
     }
 
-    public override string ToString() {
-      return pb::JsonFormatter.Default.Format(this);
-    }
-
     public void WriteTo(pb::CodedOutputStream output) {
     }
 
@@ -6589,10 +6453,6 @@ namespace Google.Protobuf.TestProtos {
     public override int GetHashCode() {
       int hash = 1;
       return hash;
-    }
-
-    public override string ToString() {
-      return pb::JsonFormatter.Default.Format(this);
     }
 
     public void WriteTo(pb::CodedOutputStream output) {
