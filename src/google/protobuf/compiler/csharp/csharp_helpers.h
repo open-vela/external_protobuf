@@ -97,17 +97,12 @@ std::string StringToBase64(const std::string& input);
 
 std::string FileDescriptorToBase64(const FileDescriptor* descriptor);
 
-uint FixedMakeTag(const FieldDescriptor* descriptor);
-
 FieldGeneratorBase* CreateFieldGenerator(const FieldDescriptor* descriptor, int fieldOrdinal);
 
-// Determines whether we're generating code for the proto representation of descriptors etc,
-// for use in the runtime. This is the only type which is allowed to use proto2 syntax,
-// and it generates internal classes.
-inline bool IsDescriptorProto(const FileDescriptor* descriptor) {
-  // TODO: Do this better! (Currently this depends on a hack in generate_protos.sh to rename
-  // the file...)
-  return descriptor->name() == "google/protobuf/descriptor_proto_file.proto";
+bool HasRequiredFields(const Descriptor* descriptor);
+
+inline bool SupportFieldPresence(const FileDescriptor* file) {
+  return file->syntax() != FileDescriptor::SYNTAX_PROTO3;
 }
 
 }  // namespace csharp

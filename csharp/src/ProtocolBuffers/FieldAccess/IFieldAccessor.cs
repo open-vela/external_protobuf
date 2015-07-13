@@ -1,7 +1,8 @@
-#region Copyright notice and license
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
-// https://developers.google.com/protocol-buffers/
+// http://github.com/jskeet/dotnet-protobufs/
+// Original C++/Java/Python code:
+// http://code.google.com/p/protobuf/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -28,43 +29,67 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#endregion
 
-using Google.Protobuf.Descriptors;
-
-namespace Google.Protobuf.FieldAccess
+namespace Google.ProtocolBuffers.FieldAccess
 {
     /// <summary>
-    /// Allows fields to be reflectively accessed.
+    /// Allows fields to be reflectively accessed in a smart manner.
+    /// The property descriptors for each field are created once and then cached.
+    /// In addition, this interface holds knowledge of repeated fields, builders etc.
     /// </summary>
-    public interface IFieldAccessor
+    internal interface IFieldAccessor<TMessage, TBuilder>
+        where TMessage : IMessage<TMessage, TBuilder>
+        where TBuilder : IBuilder<TMessage, TBuilder>
     {
         /// <summary>
-        /// Returns the descriptor associated with this field.
+        /// Indicates whether the specified message contains the field.
         /// </summary>
-        FieldDescriptor Descriptor { get; }
+        bool Has(TMessage message);
 
         /// <summary>
-        /// Clears the field in the specified message. (For repeated fields,
-        /// this clears the list.)
+        /// Gets the count of the repeated field in the specified message.
         /// </summary>
-        void Clear(object message);
+        int GetRepeatedCount(TMessage message);
 
         /// <summary>
-        /// Fetches the field value. For repeated values, this will be an
-        /// <see cref="IList"/> implementation. For map values, this will be an
-        /// <see cref="IDictionary"/> implementation.
+        /// Clears the field in the specified builder.
         /// </summary>
-        object GetValue(object message);
+        /// <param name="builder"></param>
+        void Clear(TBuilder builder);
 
         /// <summary>
-        /// Mutator for single "simple" fields only.
+        /// Creates a builder for the type of this field (which must be a message field).
         /// </summary>
-        /// <remarks>
-        /// Repeated fields are mutated by fetching the value and manipulating it as a list.
-        /// Map fields are mutated by fetching the value and manipulating it as a dictionary.
-        /// </remarks>
-        /// <exception cref="InvalidOperationException">The field is not a "simple" field, or the message is frozen.</exception>
-        void SetValue(object message, object value);
+        IBuilder CreateBuilder();
+
+        /// <summary>
+        /// Accessor for single fields
+        /// </summary>
+        object GetValue(TMessage message);
+
+        /// <summary>
+        /// Mutator for single fields
+        /// </summary>
+        void SetValue(TBuilder builder, object value);
+
+        /// <summary>
+        /// Accessor for repeated fields
+        /// </summary>
+        object GetRepeatedValue(TMessage message, int index);
+
+        /// <summary>
+        /// Mutator for repeated fields
+        /// </summary>
+        void SetRepeated(TBuilder builder, int index, object value);
+
+        /// <summary>
+        /// Adds the specified value to the field in the given builder.
+        /// </summary>
+        void AddRepeated(TBuilder builder, object value);
+
+        /// <summary>
+        /// Returns a read-only wrapper around the value of a repeated field.
+        /// </summary>
+        object GetRepeatedWrapper(TBuilder builder);
     }
 }

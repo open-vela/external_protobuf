@@ -1,7 +1,8 @@
-#region Copyright notice and license
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
-// https://developers.google.com/protocol-buffers/
+// http://github.com/jskeet/dotnet-protobufs/
+// Original C++/Java/Python code:
+// http://code.google.com/p/protobuf/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -28,36 +29,35 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#endregion
+using Google.ProtocolBuffers.DescriptorProtos;
 
-using Google.Protobuf.DescriptorProtos;
-
-namespace Google.Protobuf.Descriptors
+namespace Google.ProtocolBuffers.Descriptors
 {
     /// <summary>
     /// Descriptor for a single enum value within an enum in a .proto file.
     /// </summary>
-    public sealed class EnumValueDescriptor : DescriptorBase                                            
+    public sealed class EnumValueDescriptor : IndexedDescriptorBase<EnumValueDescriptorProto, EnumValueOptions>,
+                                              IEnumLite
     {
         private readonly EnumDescriptor enumDescriptor;
-        private readonly EnumValueDescriptorProto proto;
 
         internal EnumValueDescriptor(EnumValueDescriptorProto proto, FileDescriptor file,
                                      EnumDescriptor parent, int index)
-            : base(file, parent.FullName + "." + proto.Name, index)
+            : base(proto, file, parent.FullName + "." + proto.Name, index)
         {
-            this.proto = proto;
             enumDescriptor = parent;
             file.DescriptorPool.AddSymbol(this);
             file.DescriptorPool.AddEnumValueByNumber(this);
         }
 
-        internal EnumValueDescriptorProto Proto { get { return proto; } }
-        
-        public override string Name { get { return proto.Name; } }
+        public int Number
+        {
+            get { return Proto.Number; }
+        }
 
-        public int Number { get { return Proto.Number; } }
-
-        public EnumDescriptor EnumDescriptor { get { return enumDescriptor; } }
+        public EnumDescriptor EnumDescriptor
+        {
+            get { return enumDescriptor; }
+        }
     }
 }

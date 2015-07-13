@@ -1,7 +1,8 @@
-#region Copyright notice and license
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
-// https://developers.google.com/protocol-buffers/
+// http://github.com/jskeet/dotnet-protobufs/
+// Original C++/Java/Python code:
+// http://code.google.com/p/protobuf/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -28,12 +29,10 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#endregion
-
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
+using Google.ProtocolBuffers.Collections;
 
-namespace Google.Protobuf.Descriptors
+namespace Google.ProtocolBuffers.Descriptors
 {
     /// <summary>
     /// Internal class containing utility methods when working with descriptors.
@@ -59,7 +58,7 @@ namespace Google.Protobuf.Descriptors
             {
                 array[i] = converter(input[i], i);
             }
-            return new ReadOnlyCollection<TOutput>(array);
+            return Lists<TOutput>.AsReadOnly(array);
         }
     }
 }

@@ -1,7 +1,8 @@
-#region Copyright notice and license
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
-// https://developers.google.com/protocol-buffers/
+// http://github.com/jskeet/dotnet-protobufs/
+// Original C++/Java/Python code:
+// http://code.google.com/p/protobuf/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -28,57 +29,66 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#endregion
-
 using System;
 using System.Collections.Generic;
-using Google.Protobuf.DescriptorProtos;
+using Google.ProtocolBuffers.DescriptorProtos;
 
-namespace Google.Protobuf.Descriptors
+namespace Google.ProtocolBuffers.Descriptors
 {
     /// <summary>
     /// Describes a message type.
     /// </summary>
-    public sealed class MessageDescriptor : DescriptorBase
+    public sealed class MessageDescriptor : IndexedDescriptorBase<DescriptorProto, MessageOptions>
     {
-        private readonly DescriptorProto proto;
         private readonly MessageDescriptor containingType;
         private readonly IList<MessageDescriptor> nestedTypes;
         private readonly IList<EnumDescriptor> enumTypes;
         private readonly IList<FieldDescriptor> fields;
+        private readonly IList<FieldDescriptor> extensions;
         private readonly IList<OneofDescriptor> oneofs;
-        
+        private bool hasRequiredFields;
+
         internal MessageDescriptor(DescriptorProto proto, FileDescriptor file, MessageDescriptor parent, int typeIndex)
-            : base(file, file.ComputeFullName(parent, proto.Name), typeIndex)
+            : base(proto, file, ComputeFullName(file, parent, proto.Name), typeIndex)
         {
-            this.proto = proto;
             containingType = parent;
 
-            oneofs = DescriptorUtil.ConvertAndMakeReadOnly(proto.OneofDecl,
+            oneofs = DescriptorUtil.ConvertAndMakeReadOnly(proto.OneofDeclList,
                                                                (oneof, index) =>
                                                                new OneofDescriptor(oneof, file, this, index));
 
-            nestedTypes = DescriptorUtil.ConvertAndMakeReadOnly(proto.NestedType,
+            nestedTypes = DescriptorUtil.ConvertAndMakeReadOnly(proto.NestedTypeList,
                                                                 (type, index) =>
                                                                 new MessageDescriptor(type, file, this, index));
 
-            enumTypes = DescriptorUtil.ConvertAndMakeReadOnly(proto.EnumType,
+            enumTypes = DescriptorUtil.ConvertAndMakeReadOnly(proto.EnumTypeList,
                                                               (type, index) =>
                                                               new EnumDescriptor(type, file, this, index));
 
             // TODO(jonskeet): Sort fields first?
-            fields = DescriptorUtil.ConvertAndMakeReadOnly(proto.Field,
+            fields = DescriptorUtil.ConvertAndMakeReadOnly(proto.FieldList,
                                                            (field, index) =>
-                                                           new FieldDescriptor(field, file, this, index));
+                                                           new FieldDescriptor(field, file, this, index, false));
+
+            extensions = DescriptorUtil.ConvertAndMakeReadOnly(proto.ExtensionList,
+                                                               (field, index) =>
+                                                               new FieldDescriptor(field, file, this, index, true));
+
+            for (int i = 0; i < proto.OneofDeclCount; i++)
+            {
+                oneofs[i].fields = new FieldDescriptor[oneofs[i].FieldCount];
+                oneofs[i].fieldCount = 0;
+            }
+            for (int i = 0; i< proto.FieldCount; i++)
+            {
+                OneofDescriptor oneofDescriptor = fields[i].ContainingOneof;
+                if (oneofDescriptor != null)
+                {
+                    oneofDescriptor.fields[oneofDescriptor.fieldCount++] = fields[i];
+                }
+            }
             file.DescriptorPool.AddSymbol(this);
         }
-
-        /// <summary>
-        /// The brief name of the descriptor's target.
-        /// </summary>
-        public override string Name { get { return proto.Name; } }
-
-        internal DescriptorProto Proto { get { return proto; } }
 
         /// <value>
         /// If this is a nested type, get the outer descriptor, otherwise null.
@@ -94,6 +104,14 @@ namespace Google.Protobuf.Descriptors
         public IList<FieldDescriptor> Fields
         {
             get { return fields; }
+        }
+
+        /// <value>
+        /// An unmodifiable list of this message type's extensions.
+        /// </value>
+        public IList<FieldDescriptor> Extensions
+        {
+            get { return extensions; }
         }
 
         /// <value>
@@ -118,6 +136,32 @@ namespace Google.Protobuf.Descriptors
         }
 
         /// <summary>
+        /// Returns a pre-computed result as to whether this message
+        /// has required fields. This includes optional fields which are
+        /// message types which in turn have required fields, and any 
+        /// extension fields.
+        /// </summary>
+        internal bool HasRequiredFields
+        {
+            get { return hasRequiredFields; }
+        }
+
+        /// <summary>
+        /// Determines if the given field number is an extension.
+        /// </summary>
+        public bool IsExtensionNumber(int number)
+        {
+            foreach (DescriptorProto.Types.ExtensionRange range in Proto.ExtensionRangeList)
+            {
+                if (range.Start <= number && number < range.End)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
         /// Finds a field by field name.
         /// </summary>
         /// <param name="name">The unqualified name of the field (e.g. "foo").</param>
@@ -139,7 +183,7 @@ namespace Google.Protobuf.Descriptors
 
         /// <summary>
         /// Finds a nested descriptor by name. The is valid for fields, nested
-        /// message types, oneofs and enums.
+        /// message types and enums.
         /// </summary>
         /// <param name="name">The unqualified name of the descriptor, e.g. "Foo"</param>
         /// <returns>The descriptor, or null if not found.</returns>
@@ -150,7 +194,7 @@ namespace Google.Protobuf.Descriptors
         }
 
         /// <summary>
-        /// Looks up and cross-links all fields and nested types.
+        /// Looks up and cross-links all fields, nested types, and extensions.
         /// </summary>
         internal void CrossLink()
         {
@@ -164,10 +208,90 @@ namespace Google.Protobuf.Descriptors
                 field.CrossLink();
             }
 
+            foreach (FieldDescriptor extension in extensions)
+            {
+                extension.CrossLink();
+            }
+
             foreach (OneofDescriptor oneof in oneofs)
             {
-                oneof.CrossLink();
+               // oneof.C
             }
-        }        
+        }
+
+        internal void CheckRequiredFields()
+        {
+            IDictionary<MessageDescriptor, byte> alreadySeen = new Dictionary<MessageDescriptor, byte>();
+            hasRequiredFields = CheckRequiredFields(alreadySeen);
+        }
+
+        private bool CheckRequiredFields(IDictionary<MessageDescriptor, byte> alreadySeen)
+        {
+            if (alreadySeen.ContainsKey(this))
+            {
+                // The type is already in the cache. This means that either:
+                // a. The type has no required fields.
+                // b. We are in the midst of checking if the type has required fields,
+                //    somewhere up the stack.  In this case, we know that if the type
+                //    has any required fields, they'll be found when we return to it,
+                //    and the whole call to HasRequiredFields() will return true.
+                //    Therefore, we don't have to check if this type has required fields
+                //    here.
+                return false;
+            }
+            alreadySeen[this] = 0; // Value is irrelevant; we want set semantics
+
+            // If the type allows extensions, an extension with message type could contain
+            // required fields, so we have to be conservative and assume such an
+            // extension exists.
+            if (Proto.ExtensionRangeCount != 0)
+            {
+                return true;
+            }
+
+            foreach (FieldDescriptor field in Fields)
+            {
+                if (field.IsRequired)
+                {
+                    return true;
+                }
+                if (field.MappedType == MappedType.Message)
+                {
+                    if (field.MessageType.CheckRequiredFields(alreadySeen))
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// See FileDescriptor.ReplaceProto
+        /// </summary>
+        internal override void ReplaceProto(DescriptorProto newProto)
+        {
+            base.ReplaceProto(newProto);
+
+            for (int i = 0; i < nestedTypes.Count; i++)
+            {
+                nestedTypes[i].ReplaceProto(newProto.GetNestedType(i));
+            }
+
+            for (int i = 0; i < enumTypes.Count; i++)
+            {
+                enumTypes[i].ReplaceProto(newProto.GetEnumType(i));
+            }
+
+            for (int i = 0; i < fields.Count; i++)
+            {
+                fields[i].ReplaceProto(newProto.GetField(i));
+            }
+
+            for (int i = 0; i < extensions.Count; i++)
+            {
+                extensions[i].ReplaceProto(newProto.GetExtension(i));
+            }
+        }
     }
 }
