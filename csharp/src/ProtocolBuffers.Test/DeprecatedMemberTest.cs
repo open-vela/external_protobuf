@@ -1,41 +1,9 @@
-﻿#region Copyright notice and license
-// Protocol Buffers - Google's data interchange format
-// Copyright 2015 Google Inc.  All rights reserved.
-// https://developers.google.com/protocol-buffers/
-//
-// Redistribution and use in source and binary forms, with or without
-// modification, are permitted provided that the following conditions are
-// met:
-//
-//     * Redistributions of source code must retain the above copyright
-// notice, this list of conditions and the following disclaimer.
-//     * Redistributions in binary form must reproduce the above
-// copyright notice, this list of conditions and the following disclaimer
-// in the documentation and/or other materials provided with the
-// distribution.
-//     * Neither the name of Google Inc. nor the names of its
-// contributors may be used to endorse or promote products derived from
-// this software without specific prior written permission.
-//
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-// OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-// SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-// LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-// DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#endregion
-    
-using System;
+﻿using System;
 using System.Reflection;
-using Google.Protobuf.TestProtos;
+using UnitTest.Issues.TestProtos;
 using NUnit.Framework;
 
-namespace Google.Protobuf
+namespace Google.ProtocolBuffers
 {
     public class DeprecatedMemberTest
     {
@@ -48,8 +16,84 @@ namespace Google.Protobuf
         [Test]
         public void TestDepreatedPrimitiveValue()
         {
-            AssertIsDeprecated(typeof(TestDeprecatedFields).GetProperty("DeprecatedInt32"));
-        }
+            AssertIsDeprecated(typeof(DeprecatedFieldsMessage).GetProperty("HasPrimitiveValue"));
+            AssertIsDeprecated(typeof(DeprecatedFieldsMessage).GetProperty("PrimitiveValue"));
 
+            AssertIsDeprecated(typeof(DeprecatedFieldsMessage.Builder).GetProperty("HasPrimitiveValue"));
+            AssertIsDeprecated(typeof(DeprecatedFieldsMessage.Builder).GetProperty("PrimitiveValue"));
+            AssertIsDeprecated(typeof(DeprecatedFieldsMessage.Builder).GetMethod("ClearPrimitiveValue"));
+            AssertIsDeprecated(typeof(DeprecatedFieldsMessage.Builder).GetMethod("SetPrimitiveValue"));
+        }
+        [Test]
+        public void TestDepreatedPrimitiveArray()
+        {
+            AssertIsDeprecated(typeof(DeprecatedFieldsMessage).GetProperty("PrimitiveArrayList"));
+            AssertIsDeprecated(typeof(DeprecatedFieldsMessage).GetProperty("PrimitiveArrayCount"));
+            AssertIsDeprecated(typeof(DeprecatedFieldsMessage).GetMethod("GetPrimitiveArray"));
+
+            AssertIsDeprecated(typeof(DeprecatedFieldsMessage.Builder).GetProperty("PrimitiveArrayList"));
+            AssertIsDeprecated(typeof(DeprecatedFieldsMessage.Builder).GetProperty("PrimitiveArrayCount"));
+            AssertIsDeprecated(typeof(DeprecatedFieldsMessage.Builder).GetMethod("GetPrimitiveArray"));
+            AssertIsDeprecated(typeof(DeprecatedFieldsMessage.Builder).GetMethod("SetPrimitiveArray"));
+            AssertIsDeprecated(typeof(DeprecatedFieldsMessage.Builder).GetMethod("AddPrimitiveArray"));
+            AssertIsDeprecated(typeof(DeprecatedFieldsMessage.Builder).GetMethod("AddRangePrimitiveArray"));
+            AssertIsDeprecated(typeof(DeprecatedFieldsMessage.Builder).GetMethod("ClearPrimitiveArray"));
+        }
+        [Test]
+        public void TestDepreatedMessageValue()
+        {
+            AssertIsDeprecated(typeof(DeprecatedFieldsMessage).GetProperty("HasMessageValue"));
+            AssertIsDeprecated(typeof(DeprecatedFieldsMessage).GetProperty("MessageValue"));
+
+            AssertIsDeprecated(typeof(DeprecatedFieldsMessage.Builder).GetProperty("HasMessageValue"));
+            AssertIsDeprecated(typeof(DeprecatedFieldsMessage.Builder).GetProperty("MessageValue"));
+            AssertIsDeprecated(typeof(DeprecatedFieldsMessage.Builder).GetMethod("MergeMessageValue"));
+            AssertIsDeprecated(typeof(DeprecatedFieldsMessage.Builder).GetMethod("ClearMessageValue"));
+            AssertIsDeprecated(typeof(DeprecatedFieldsMessage.Builder).GetMethod("SetMessageValue", new[] { typeof(DeprecatedChild) }));
+            AssertIsDeprecated(typeof(DeprecatedFieldsMessage.Builder).GetMethod("SetMessageValue", new[] { typeof(DeprecatedChild.Builder) }));
+        }
+        [Test]
+        public void TestDepreatedMessageArray()
+        {
+            AssertIsDeprecated(typeof(DeprecatedFieldsMessage).GetProperty("MessageArrayList"));
+            AssertIsDeprecated(typeof(DeprecatedFieldsMessage).GetProperty("MessageArrayCount"));
+            AssertIsDeprecated(typeof(DeprecatedFieldsMessage).GetMethod("GetMessageArray"));
+
+            AssertIsDeprecated(typeof(DeprecatedFieldsMessage.Builder).GetProperty("MessageArrayList"));
+            AssertIsDeprecated(typeof(DeprecatedFieldsMessage.Builder).GetProperty("MessageArrayCount"));
+            AssertIsDeprecated(typeof(DeprecatedFieldsMessage.Builder).GetMethod("GetMessageArray"));
+            AssertIsDeprecated(typeof(DeprecatedFieldsMessage.Builder).GetMethod("SetMessageArray", new[] { typeof(int), typeof(DeprecatedChild) }));
+            AssertIsDeprecated(typeof(DeprecatedFieldsMessage.Builder).GetMethod("SetMessageArray", new[] { typeof(int), typeof(DeprecatedChild.Builder) }));
+            AssertIsDeprecated(typeof(DeprecatedFieldsMessage.Builder).GetMethod("AddMessageArray", new[] { typeof(DeprecatedChild) }));
+            AssertIsDeprecated(typeof(DeprecatedFieldsMessage.Builder).GetMethod("AddMessageArray", new[] { typeof(DeprecatedChild.Builder) }));
+            AssertIsDeprecated(typeof(DeprecatedFieldsMessage.Builder).GetMethod("AddRangeMessageArray"));
+            AssertIsDeprecated(typeof(DeprecatedFieldsMessage.Builder).GetMethod("ClearMessageArray"));
+        }
+        [Test]
+        public void TestDepreatedEnumValue()
+        {
+            AssertIsDeprecated(typeof(DeprecatedFieldsMessage).GetProperty("HasEnumValue"));
+            AssertIsDeprecated(typeof(DeprecatedFieldsMessage).GetProperty("EnumValue"));
+
+            AssertIsDeprecated(typeof(DeprecatedFieldsMessage.Builder).GetProperty("HasEnumValue"));
+            AssertIsDeprecated(typeof(DeprecatedFieldsMessage.Builder).GetProperty("EnumValue"));
+            AssertIsDeprecated(typeof(DeprecatedFieldsMessage.Builder).GetMethod("ClearEnumValue"));
+            AssertIsDeprecated(typeof(DeprecatedFieldsMessage.Builder).GetMethod("SetEnumValue"));
+        }
+        [Test]
+        public void TestDepreatedEnumArray()
+        {
+            AssertIsDeprecated(typeof(DeprecatedFieldsMessage).GetProperty("EnumArrayList"));
+            AssertIsDeprecated(typeof(DeprecatedFieldsMessage).GetProperty("EnumArrayCount"));
+            AssertIsDeprecated(typeof(DeprecatedFieldsMessage).GetMethod("GetEnumArray"));
+
+            AssertIsDeprecated(typeof(DeprecatedFieldsMessage.Builder).GetProperty("EnumArrayList"));
+            AssertIsDeprecated(typeof(DeprecatedFieldsMessage.Builder).GetProperty("EnumArrayCount"));
+            AssertIsDeprecated(typeof(DeprecatedFieldsMessage.Builder).GetMethod("GetEnumArray"));
+            AssertIsDeprecated(typeof(DeprecatedFieldsMessage.Builder).GetMethod("SetEnumArray"));
+            AssertIsDeprecated(typeof(DeprecatedFieldsMessage.Builder).GetMethod("AddEnumArray"));
+            AssertIsDeprecated(typeof(DeprecatedFieldsMessage.Builder).GetMethod("AddRangeEnumArray"));
+            AssertIsDeprecated(typeof(DeprecatedFieldsMessage.Builder).GetMethod("ClearEnumArray"));
+        }
     }
 }

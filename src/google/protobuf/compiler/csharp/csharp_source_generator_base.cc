@@ -47,6 +47,14 @@ namespace csharp {
 
 SourceGeneratorBase::SourceGeneratorBase(const FileDescriptor* descriptor)
     : descriptor_(descriptor) {
+  optimizeSize_ = (descriptor->options().optimize_for()
+      == FileOptions::CODE_SIZE);
+  optimizeSpeed_ = (descriptor->options().optimize_for() == FileOptions::SPEED);
+  useLiteRuntime_ = (descriptor->options().optimize_for()
+      == FileOptions::LITE_RUNTIME);
+
+  optimizeSpeed_ |= useLiteRuntime_;
+  runtimeSuffix_ = useLiteRuntime_ ? "Lite" : "";
 }
 
 SourceGeneratorBase::~SourceGeneratorBase() {
@@ -57,7 +65,7 @@ void SourceGeneratorBase::WriteGeneratedCodeAttributes(io::Printer* printer) {
 }
 
 std::string SourceGeneratorBase::class_access_level() {
-  return IsDescriptorProto(descriptor_) ? "internal" : "public";  // public_classes is always on.
+  return "public";  // public_classes is always on.
 }
 
 }  // namespace csharp

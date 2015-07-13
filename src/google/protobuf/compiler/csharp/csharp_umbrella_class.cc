@@ -39,6 +39,7 @@
 
 #include <google/protobuf/compiler/csharp/csharp_umbrella_class.h>
 #include <google/protobuf/compiler/csharp/csharp_enum.h>
+#include <google/protobuf/compiler/csharp/csharp_extension.h>
 #include <google/protobuf/compiler/csharp/csharp_helpers.h>
 #include <google/protobuf/compiler/csharp/csharp_message.h>
 
@@ -60,6 +61,18 @@ UmbrellaClassGenerator::~UmbrellaClassGenerator() {
 
 void UmbrellaClassGenerator::Generate(io::Printer* printer) {
   WriteIntroduction(printer);
+  WriteExtensionRegistration(printer);
+
+  // write children: Extensions
+  if (file_->extension_count() > 0) {
+    printer->Print("#region Extensions\n");
+    for (int i = 0; i < file_->extension_count(); i++) {
+      ExtensionGenerator extensionGenerator(file_->extension(i));
+      extensionGenerator.Generate(printer);
+    }
+    printer->Print("#endregion\n");
+    printer->Print("\n");
+  }
 
   printer->Print("#region Static variables\n");
   for (int i = 0; i < file_->message_type_count(); i++) {
@@ -67,7 +80,11 @@ void UmbrellaClassGenerator::Generate(io::Printer* printer) {
     messageGenerator.GenerateStaticVariables(printer);
   }
   printer->Print("#endregion\n");
-  WriteDescriptor(printer);
+  if (!use_lite_runtime()) {
+    WriteDescriptor(printer);
+  } else {
+    WriteLiteExtensions(printer);
+  }
   // Close the class declaration.
   printer->Outdent();
   printer->Print("}\n");
@@ -117,9 +134,9 @@ void UmbrellaClassGenerator::WriteIntroduction(io::Printer* printer) {
     "#pragma warning disable 1591, 0612, 3021\n"
     "#region Designer generated code\n"
     "\n"
-    "using pb = global::Google.Protobuf;\n"
-    "using pbc = global::Google.Protobuf.Collections;\n"
-    "using pbd = global::Google.Protobuf.Descriptors;\n"
+    "using pb = global::Google.ProtocolBuffers;\n"
+    "using pbc = global::Google.ProtocolBuffers.Collections;\n"
+    "using pbd = global::Google.ProtocolBuffers.Descriptors;\n"
     "using scg = global::System.Collections.Generic;\n",
     "file_name", file_->name());
 
@@ -146,6 +163,24 @@ void UmbrellaClassGenerator::WriteIntroduction(io::Printer* printer) {
     "access_level", class_access_level(),
     "umbrella_class_name", umbrellaClassname_);
   printer->Indent();
+}
+
+void UmbrellaClassGenerator::WriteExtensionRegistration(io::Printer* printer) {
+  printer->Print(
+    "#region Extension registration\n"
+    "public static void RegisterAllExtensions(pb::ExtensionRegistry registry) {\n");
+  printer->Indent();
+  for (int i = 0; i < file_->extension_count(); i++) {
+    ExtensionGenerator extensionGenerator(file_->extension(i));
+    extensionGenerator.GenerateExtensionRegistrationCode(printer);
+  }
+  for (int i = 0; i < file_->message_type_count(); i++) {
+    MessageGenerator messageGenerator(file_->message_type(i));
+    messageGenerator.GenerateExtensionRegistrationCode(printer);
+  }
+  printer->Outdent();
+  printer->Print("}\n");
+  printer->Print("#endregion\n");
 }
 
 void UmbrellaClassGenerator::WriteDescriptor(io::Printer* printer) {
@@ -176,11 +211,40 @@ void UmbrellaClassGenerator::WriteDescriptor(io::Printer* printer) {
   printer->Print("\"$base64$\"));\n", "base64", base64);
   printer->Outdent();
   printer->Outdent();
+  printer->Print(
+    "pbd::FileDescriptor.InternalDescriptorAssigner assigner = delegate(pbd::FileDescriptor root) {\n");
+  printer->Indent();
+  printer->Print("descriptor = root;\n");
+  for (int i = 0; i < file_->message_type_count(); i++) {
+    MessageGenerator messageGenerator(file_->message_type(i));
+    messageGenerator.GenerateStaticVariableInitializers(printer);
+  }
+  for (int i = 0; i < file_->extension_count(); i++) {
+    ExtensionGenerator extensionGenerator(file_->extension(i));
+    extensionGenerator.GenerateStaticVariableInitializers(printer);
+  }
+
+  if (uses_extensions()) {
+    // Must construct an ExtensionRegistry containing all possible extensions
+    // and return it.
+    printer->Print(
+        "pb::ExtensionRegistry registry = pb::ExtensionRegistry.CreateInstance();\n");
+    printer->Print("RegisterAllExtensions(registry);\n");
+    for (int i = 0; i < file_->dependency_count(); i++) {
+      printer->Print("$dependency$.RegisterAllExtensions(registry);\n",
+		     "dependency", GetFullUmbrellaClassName(file_->dependency(i)));
+    }
+    printer->Print("return registry;\n");
+  } else {
+    printer->Print("return null;\n");
+  }
+  printer->Outdent();
+  printer->Print("};\n");
 
   // -----------------------------------------------------------------
-  // Invoke InternalBuildGeneratedFileFrom() to build the file.
+  // Invoke internalBuildGeneratedFileFrom() to build the file.
   printer->Print(
-      "descriptor = pbd::FileDescriptor.InternalBuildGeneratedFileFrom(descriptorData,\n");
+      "pbd::FileDescriptor.InternalBuildGeneratedFileFrom(descriptorData,\n");
   printer->Print("    new pbd::FileDescriptor[] {\n");
   for (int i = 0; i < file_->dependency_count(); i++) {
     printer->Print(
@@ -188,15 +252,37 @@ void UmbrellaClassGenerator::WriteDescriptor(io::Printer* printer) {
       "full_umbrella_class_name",
       GetFullUmbrellaClassName(file_->dependency(i)));
   }
-  printer->Print("    });\n");
-  // Then invoke any other static variable initializers, e.g. field accessors.
+  printer->Print("    }, assigner);\n");
+  printer->Outdent();
+  printer->Print("}\n");
+  printer->Print("#endregion\n\n");
+}
+
+void UmbrellaClassGenerator::WriteLiteExtensions(io::Printer* printer) {
+  printer->Print(
+    "#region Extensions\n"
+    "internal static readonly object Descriptor;\n"
+    "static $umbrella_class_name$() {\n",
+    "umbrella_class_name", umbrellaClassname_);
+  printer->Indent();
+  printer->Print("Descriptor = null;\n");
   for (int i = 0; i < file_->message_type_count(); i++) {
-      MessageGenerator messageGenerator(file_->message_type(i));
-      messageGenerator.GenerateStaticVariableInitializers(printer);
+    MessageGenerator messageGenerator(file_->message_type(i));
+    messageGenerator.GenerateStaticVariableInitializers(printer);
+  }
+  for (int i = 0; i < file_->extension_count(); i++) {
+    ExtensionGenerator extensionGenerator(file_->extension(i));
+    extensionGenerator.GenerateStaticVariableInitializers(printer);
   }
   printer->Outdent();
   printer->Print("}\n");
   printer->Print("#endregion\n\n");
+}
+
+bool UmbrellaClassGenerator::uses_extensions() {
+  // TODO(jtattermusch): implement recursive descent that looks for extensions.
+  // For now, we conservatively assume that extensions are used.
+  return true;
 }
 
 }  // namespace csharp

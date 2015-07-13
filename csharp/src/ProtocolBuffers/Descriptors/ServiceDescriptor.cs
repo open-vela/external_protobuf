@@ -1,7 +1,8 @@
-#region Copyright notice and license
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
-// https://developers.google.com/protocol-buffers/
+// http://github.com/jskeet/dotnet-protobufs/
+// Original C++/Java/Python code:
+// http://code.google.com/p/protobuf/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -28,38 +29,27 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#endregion
-
 using System;
 using System.Collections.Generic;
-using Google.Protobuf.DescriptorProtos;
+using Google.ProtocolBuffers.DescriptorProtos;
 
-namespace Google.Protobuf.Descriptors
+namespace Google.ProtocolBuffers.Descriptors
 {
     /// <summary>
     /// Describes a service type.
     /// </summary>
-    public sealed class ServiceDescriptor : DescriptorBase
+    public sealed class ServiceDescriptor : IndexedDescriptorBase<ServiceDescriptorProto, ServiceOptions>
     {
-        private readonly ServiceDescriptorProto proto;
         private readonly IList<MethodDescriptor> methods;
 
-        internal ServiceDescriptor(ServiceDescriptorProto proto, FileDescriptor file, int index)
-            : base(file, file.ComputeFullName(null, proto.Name), index)
+        public ServiceDescriptor(ServiceDescriptorProto proto, FileDescriptor file, int index)
+            : base(proto, file, ComputeFullName(file, null, proto.Name), index)
         {
-            this.proto = proto;
-            methods = DescriptorUtil.ConvertAndMakeReadOnly(proto.Method,
+            methods = DescriptorUtil.ConvertAndMakeReadOnly(proto.MethodList,
                                                             (method, i) => new MethodDescriptor(method, file, this, i));
 
             file.DescriptorPool.AddSymbol(this);
         }
-
-        /// <summary>
-        /// The brief name of the descriptor's target.
-        /// </summary>
-        public override string Name { get { return proto.Name; } }
-
-        internal ServiceDescriptorProto Proto { get { return proto; } }
 
         /// <value>
         /// An unmodifiable list of methods in this service.
@@ -84,6 +74,15 @@ namespace Google.Protobuf.Descriptors
             foreach (MethodDescriptor method in methods)
             {
                 method.CrossLink();
+            }
+        }
+
+        internal override void ReplaceProto(ServiceDescriptorProto newProto)
+        {
+            base.ReplaceProto(newProto);
+            for (int i = 0; i < methods.Count; i++)
+            {
+                methods[i].ReplaceProto(newProto.GetMethod(i));
             }
         }
     }

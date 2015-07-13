@@ -3,38 +3,64 @@
 #pragma warning disable 1591, 0612, 3021
 #region Designer generated code
 
-using pb = global::Google.Protobuf;
-using pbc = global::Google.Protobuf.Collections;
-using pbd = global::Google.Protobuf.Descriptors;
+using pb = global::Google.ProtocolBuffers;
+using pbc = global::Google.ProtocolBuffers.Collections;
+using pbd = global::Google.ProtocolBuffers.Descriptors;
 using scg = global::System.Collections.Generic;
-namespace Google.Protobuf.DescriptorProtos {
+namespace Google.ProtocolBuffers.DescriptorProtos {
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-  internal static partial class DescriptorProtoFile {
+  public static partial class DescriptorProtoFile {
 
+    #region Extension registration
+    public static void RegisterAllExtensions(pb::ExtensionRegistry registry) {
+    }
+    #endregion
     #region Static variables
-    internal static pb::FieldAccess.FieldAccessorTable internal__static_google_protobuf_FileDescriptorSet__FieldAccessorTable;
-    internal static pb::FieldAccess.FieldAccessorTable internal__static_google_protobuf_FileDescriptorProto__FieldAccessorTable;
-    internal static pb::FieldAccess.FieldAccessorTable internal__static_google_protobuf_DescriptorProto__FieldAccessorTable;
-    internal static pb::FieldAccess.FieldAccessorTable internal__static_google_protobuf_DescriptorProto_ExtensionRange__FieldAccessorTable;
-    internal static pb::FieldAccess.FieldAccessorTable internal__static_google_protobuf_DescriptorProto_ReservedRange__FieldAccessorTable;
-    internal static pb::FieldAccess.FieldAccessorTable internal__static_google_protobuf_FieldDescriptorProto__FieldAccessorTable;
-    internal static pb::FieldAccess.FieldAccessorTable internal__static_google_protobuf_OneofDescriptorProto__FieldAccessorTable;
-    internal static pb::FieldAccess.FieldAccessorTable internal__static_google_protobuf_EnumDescriptorProto__FieldAccessorTable;
-    internal static pb::FieldAccess.FieldAccessorTable internal__static_google_protobuf_EnumValueDescriptorProto__FieldAccessorTable;
-    internal static pb::FieldAccess.FieldAccessorTable internal__static_google_protobuf_ServiceDescriptorProto__FieldAccessorTable;
-    internal static pb::FieldAccess.FieldAccessorTable internal__static_google_protobuf_MethodDescriptorProto__FieldAccessorTable;
-    internal static pb::FieldAccess.FieldAccessorTable internal__static_google_protobuf_FileOptions__FieldAccessorTable;
-    internal static pb::FieldAccess.FieldAccessorTable internal__static_google_protobuf_MessageOptions__FieldAccessorTable;
-    internal static pb::FieldAccess.FieldAccessorTable internal__static_google_protobuf_FieldOptions__FieldAccessorTable;
-    internal static pb::FieldAccess.FieldAccessorTable internal__static_google_protobuf_EnumOptions__FieldAccessorTable;
-    internal static pb::FieldAccess.FieldAccessorTable internal__static_google_protobuf_EnumValueOptions__FieldAccessorTable;
-    internal static pb::FieldAccess.FieldAccessorTable internal__static_google_protobuf_ServiceOptions__FieldAccessorTable;
-    internal static pb::FieldAccess.FieldAccessorTable internal__static_google_protobuf_MethodOptions__FieldAccessorTable;
-    internal static pb::FieldAccess.FieldAccessorTable internal__static_google_protobuf_UninterpretedOption__FieldAccessorTable;
-    internal static pb::FieldAccess.FieldAccessorTable internal__static_google_protobuf_UninterpretedOption_NamePart__FieldAccessorTable;
-    internal static pb::FieldAccess.FieldAccessorTable internal__static_google_protobuf_SourceCodeInfo__FieldAccessorTable;
-    internal static pb::FieldAccess.FieldAccessorTable internal__static_google_protobuf_SourceCodeInfo_Location__FieldAccessorTable;
+    internal static pbd::MessageDescriptor internal__static_google_protobuf_FileDescriptorSet__Descriptor;
+    internal static pb::FieldAccess.FieldAccessorTable<global::Google.ProtocolBuffers.DescriptorProtos.FileDescriptorSet, global::Google.ProtocolBuffers.DescriptorProtos.FileDescriptorSet.Builder> internal__static_google_protobuf_FileDescriptorSet__FieldAccessorTable;
+    internal static pbd::MessageDescriptor internal__static_google_protobuf_FileDescriptorProto__Descriptor;
+    internal static pb::FieldAccess.FieldAccessorTable<global::Google.ProtocolBuffers.DescriptorProtos.FileDescriptorProto, global::Google.ProtocolBuffers.DescriptorProtos.FileDescriptorProto.Builder> internal__static_google_protobuf_FileDescriptorProto__FieldAccessorTable;
+    internal static pbd::MessageDescriptor internal__static_google_protobuf_DescriptorProto__Descriptor;
+    internal static pb::FieldAccess.FieldAccessorTable<global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto, global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto.Builder> internal__static_google_protobuf_DescriptorProto__FieldAccessorTable;
+    internal static pbd::MessageDescriptor internal__static_google_protobuf_DescriptorProto_ExtensionRange__Descriptor;
+    internal static pb::FieldAccess.FieldAccessorTable<global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto.Types.ExtensionRange, global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto.Types.ExtensionRange.Builder> internal__static_google_protobuf_DescriptorProto_ExtensionRange__FieldAccessorTable;
+    internal static pbd::MessageDescriptor internal__static_google_protobuf_DescriptorProto_ReservedRange__Descriptor;
+    internal static pb::FieldAccess.FieldAccessorTable<global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto.Types.ReservedRange, global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto.Types.ReservedRange.Builder> internal__static_google_protobuf_DescriptorProto_ReservedRange__FieldAccessorTable;
+    internal static pbd::MessageDescriptor internal__static_google_protobuf_FieldDescriptorProto__Descriptor;
+    internal static pb::FieldAccess.FieldAccessorTable<global::Google.ProtocolBuffers.DescriptorProtos.FieldDescriptorProto, global::Google.ProtocolBuffers.DescriptorProtos.FieldDescriptorProto.Builder> internal__static_google_protobuf_FieldDescriptorProto__FieldAccessorTable;
+    internal static pbd::MessageDescriptor internal__static_google_protobuf_OneofDescriptorProto__Descriptor;
+    internal static pb::FieldAccess.FieldAccessorTable<global::Google.ProtocolBuffers.DescriptorProtos.OneofDescriptorProto, global::Google.ProtocolBuffers.DescriptorProtos.OneofDescriptorProto.Builder> internal__static_google_protobuf_OneofDescriptorProto__FieldAccessorTable;
+    internal static pbd::MessageDescriptor internal__static_google_protobuf_EnumDescriptorProto__Descriptor;
+    internal static pb::FieldAccess.FieldAccessorTable<global::Google.ProtocolBuffers.DescriptorProtos.EnumDescriptorProto, global::Google.ProtocolBuffers.DescriptorProtos.EnumDescriptorProto.Builder> internal__static_google_protobuf_EnumDescriptorProto__FieldAccessorTable;
+    internal static pbd::MessageDescriptor internal__static_google_protobuf_EnumValueDescriptorProto__Descriptor;
+    internal static pb::FieldAccess.FieldAccessorTable<global::Google.ProtocolBuffers.DescriptorProtos.EnumValueDescriptorProto, global::Google.ProtocolBuffers.DescriptorProtos.EnumValueDescriptorProto.Builder> internal__static_google_protobuf_EnumValueDescriptorProto__FieldAccessorTable;
+    internal static pbd::MessageDescriptor internal__static_google_protobuf_ServiceDescriptorProto__Descriptor;
+    internal static pb::FieldAccess.FieldAccessorTable<global::Google.ProtocolBuffers.DescriptorProtos.ServiceDescriptorProto, global::Google.ProtocolBuffers.DescriptorProtos.ServiceDescriptorProto.Builder> internal__static_google_protobuf_ServiceDescriptorProto__FieldAccessorTable;
+    internal static pbd::MessageDescriptor internal__static_google_protobuf_MethodDescriptorProto__Descriptor;
+    internal static pb::FieldAccess.FieldAccessorTable<global::Google.ProtocolBuffers.DescriptorProtos.MethodDescriptorProto, global::Google.ProtocolBuffers.DescriptorProtos.MethodDescriptorProto.Builder> internal__static_google_protobuf_MethodDescriptorProto__FieldAccessorTable;
+    internal static pbd::MessageDescriptor internal__static_google_protobuf_FileOptions__Descriptor;
+    internal static pb::FieldAccess.FieldAccessorTable<global::Google.ProtocolBuffers.DescriptorProtos.FileOptions, global::Google.ProtocolBuffers.DescriptorProtos.FileOptions.Builder> internal__static_google_protobuf_FileOptions__FieldAccessorTable;
+    internal static pbd::MessageDescriptor internal__static_google_protobuf_MessageOptions__Descriptor;
+    internal static pb::FieldAccess.FieldAccessorTable<global::Google.ProtocolBuffers.DescriptorProtos.MessageOptions, global::Google.ProtocolBuffers.DescriptorProtos.MessageOptions.Builder> internal__static_google_protobuf_MessageOptions__FieldAccessorTable;
+    internal static pbd::MessageDescriptor internal__static_google_protobuf_FieldOptions__Descriptor;
+    internal static pb::FieldAccess.FieldAccessorTable<global::Google.ProtocolBuffers.DescriptorProtos.FieldOptions, global::Google.ProtocolBuffers.DescriptorProtos.FieldOptions.Builder> internal__static_google_protobuf_FieldOptions__FieldAccessorTable;
+    internal static pbd::MessageDescriptor internal__static_google_protobuf_EnumOptions__Descriptor;
+    internal static pb::FieldAccess.FieldAccessorTable<global::Google.ProtocolBuffers.DescriptorProtos.EnumOptions, global::Google.ProtocolBuffers.DescriptorProtos.EnumOptions.Builder> internal__static_google_protobuf_EnumOptions__FieldAccessorTable;
+    internal static pbd::MessageDescriptor internal__static_google_protobuf_EnumValueOptions__Descriptor;
+    internal static pb::FieldAccess.FieldAccessorTable<global::Google.ProtocolBuffers.DescriptorProtos.EnumValueOptions, global::Google.ProtocolBuffers.DescriptorProtos.EnumValueOptions.Builder> internal__static_google_protobuf_EnumValueOptions__FieldAccessorTable;
+    internal static pbd::MessageDescriptor internal__static_google_protobuf_ServiceOptions__Descriptor;
+    internal static pb::FieldAccess.FieldAccessorTable<global::Google.ProtocolBuffers.DescriptorProtos.ServiceOptions, global::Google.ProtocolBuffers.DescriptorProtos.ServiceOptions.Builder> internal__static_google_protobuf_ServiceOptions__FieldAccessorTable;
+    internal static pbd::MessageDescriptor internal__static_google_protobuf_MethodOptions__Descriptor;
+    internal static pb::FieldAccess.FieldAccessorTable<global::Google.ProtocolBuffers.DescriptorProtos.MethodOptions, global::Google.ProtocolBuffers.DescriptorProtos.MethodOptions.Builder> internal__static_google_protobuf_MethodOptions__FieldAccessorTable;
+    internal static pbd::MessageDescriptor internal__static_google_protobuf_UninterpretedOption__Descriptor;
+    internal static pb::FieldAccess.FieldAccessorTable<global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption, global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption.Builder> internal__static_google_protobuf_UninterpretedOption__FieldAccessorTable;
+    internal static pbd::MessageDescriptor internal__static_google_protobuf_UninterpretedOption_NamePart__Descriptor;
+    internal static pb::FieldAccess.FieldAccessorTable<global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption.Types.NamePart, global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption.Types.NamePart.Builder> internal__static_google_protobuf_UninterpretedOption_NamePart__FieldAccessorTable;
+    internal static pbd::MessageDescriptor internal__static_google_protobuf_SourceCodeInfo__Descriptor;
+    internal static pb::FieldAccess.FieldAccessorTable<global::Google.ProtocolBuffers.DescriptorProtos.SourceCodeInfo, global::Google.ProtocolBuffers.DescriptorProtos.SourceCodeInfo.Builder> internal__static_google_protobuf_SourceCodeInfo__FieldAccessorTable;
+    internal static pbd::MessageDescriptor internal__static_google_protobuf_SourceCodeInfo_Location__Descriptor;
+    internal static pb::FieldAccess.FieldAccessorTable<global::Google.ProtocolBuffers.DescriptorProtos.SourceCodeInfo.Types.Location, global::Google.ProtocolBuffers.DescriptorProtos.SourceCodeInfo.Types.Location.Builder> internal__static_google_protobuf_SourceCodeInfo_Location__FieldAccessorTable;
     #endregion
     #region Descriptor
     public static pbd::FileDescriptor Descriptor {
@@ -153,1493 +179,2982 @@ namespace Google.Protobuf.DescriptorProtos {
             "LkxvY2F0aW9uGoYBCghMb2NhdGlvbhIQCgRwYXRoGAEgAygFQgIQARIQCgRz", 
             "cGFuGAIgAygFQgIQARIYChBsZWFkaW5nX2NvbW1lbnRzGAMgASgJEhkKEXRy", 
             "YWlsaW5nX2NvbW1lbnRzGAQgASgJEiEKGWxlYWRpbmdfZGV0YWNoZWRfY29t", 
-            "bWVudHMYBiADKAlCXgoTY29tLmdvb2dsZS5wcm90b2J1ZkIQRGVzY3JpcHRv", 
-            "clByb3Rvc0gBWgpkZXNjcmlwdG9yogIDR1BCqgIgR29vZ2xlLlByb3RvYnVm", 
-          "LkRlc2NyaXB0b3JQcm90b3M="));
-      descriptor = pbd::FileDescriptor.InternalBuildGeneratedFileFrom(descriptorData,
+            "bWVudHMYBiADKAlCWQoTY29tLmdvb2dsZS5wcm90b2J1ZkIQRGVzY3JpcHRv", 
+            "clByb3Rvc0gBogIDR1BCqgInR29vZ2xlLlByb3RvY29sQnVmZmVycy5EZXNj", 
+          "cmlwdG9yUHJvdG9z"));
+      pbd::FileDescriptor.InternalDescriptorAssigner assigner = delegate(pbd::FileDescriptor root) {
+        descriptor = root;
+        internal__static_google_protobuf_FileDescriptorSet__Descriptor = Descriptor.MessageTypes[0];
+        internal__static_google_protobuf_FileDescriptorSet__FieldAccessorTable = 
+            new pb::FieldAccess.FieldAccessorTable<global::Google.ProtocolBuffers.DescriptorProtos.FileDescriptorSet, global::Google.ProtocolBuffers.DescriptorProtos.FileDescriptorSet.Builder>(internal__static_google_protobuf_FileDescriptorSet__Descriptor,
+                new string[] { "File", });
+        internal__static_google_protobuf_FileDescriptorProto__Descriptor = Descriptor.MessageTypes[1];
+        internal__static_google_protobuf_FileDescriptorProto__FieldAccessorTable = 
+            new pb::FieldAccess.FieldAccessorTable<global::Google.ProtocolBuffers.DescriptorProtos.FileDescriptorProto, global::Google.ProtocolBuffers.DescriptorProtos.FileDescriptorProto.Builder>(internal__static_google_protobuf_FileDescriptorProto__Descriptor,
+                new string[] { "Name", "Package", "Dependency", "PublicDependency", "WeakDependency", "MessageType", "EnumType", "Service", "Extension", "Options", "SourceCodeInfo", "Syntax", });
+        internal__static_google_protobuf_DescriptorProto__Descriptor = Descriptor.MessageTypes[2];
+        internal__static_google_protobuf_DescriptorProto__FieldAccessorTable = 
+            new pb::FieldAccess.FieldAccessorTable<global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto, global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto.Builder>(internal__static_google_protobuf_DescriptorProto__Descriptor,
+                new string[] { "Name", "Field", "Extension", "NestedType", "EnumType", "ExtensionRange", "OneofDecl", "Options", "ReservedRange", "ReservedName", });
+        internal__static_google_protobuf_DescriptorProto_ExtensionRange__Descriptor = internal__static_google_protobuf_DescriptorProto__Descriptor.NestedTypes[0];
+        internal__static_google_protobuf_DescriptorProto_ExtensionRange__FieldAccessorTable = 
+            new pb::FieldAccess.FieldAccessorTable<global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto.Types.ExtensionRange, global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto.Types.ExtensionRange.Builder>(internal__static_google_protobuf_DescriptorProto_ExtensionRange__Descriptor,
+                new string[] { "Start", "End", });
+        internal__static_google_protobuf_DescriptorProto_ReservedRange__Descriptor = internal__static_google_protobuf_DescriptorProto__Descriptor.NestedTypes[1];
+        internal__static_google_protobuf_DescriptorProto_ReservedRange__FieldAccessorTable = 
+            new pb::FieldAccess.FieldAccessorTable<global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto.Types.ReservedRange, global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto.Types.ReservedRange.Builder>(internal__static_google_protobuf_DescriptorProto_ReservedRange__Descriptor,
+                new string[] { "Start", "End", });
+        internal__static_google_protobuf_FieldDescriptorProto__Descriptor = Descriptor.MessageTypes[3];
+        internal__static_google_protobuf_FieldDescriptorProto__FieldAccessorTable = 
+            new pb::FieldAccess.FieldAccessorTable<global::Google.ProtocolBuffers.DescriptorProtos.FieldDescriptorProto, global::Google.ProtocolBuffers.DescriptorProtos.FieldDescriptorProto.Builder>(internal__static_google_protobuf_FieldDescriptorProto__Descriptor,
+                new string[] { "Name", "Number", "Label", "Type", "TypeName", "Extendee", "DefaultValue", "OneofIndex", "Options", });
+        internal__static_google_protobuf_OneofDescriptorProto__Descriptor = Descriptor.MessageTypes[4];
+        internal__static_google_protobuf_OneofDescriptorProto__FieldAccessorTable = 
+            new pb::FieldAccess.FieldAccessorTable<global::Google.ProtocolBuffers.DescriptorProtos.OneofDescriptorProto, global::Google.ProtocolBuffers.DescriptorProtos.OneofDescriptorProto.Builder>(internal__static_google_protobuf_OneofDescriptorProto__Descriptor,
+                new string[] { "Name", });
+        internal__static_google_protobuf_EnumDescriptorProto__Descriptor = Descriptor.MessageTypes[5];
+        internal__static_google_protobuf_EnumDescriptorProto__FieldAccessorTable = 
+            new pb::FieldAccess.FieldAccessorTable<global::Google.ProtocolBuffers.DescriptorProtos.EnumDescriptorProto, global::Google.ProtocolBuffers.DescriptorProtos.EnumDescriptorProto.Builder>(internal__static_google_protobuf_EnumDescriptorProto__Descriptor,
+                new string[] { "Name", "Value", "Options", });
+        internal__static_google_protobuf_EnumValueDescriptorProto__Descriptor = Descriptor.MessageTypes[6];
+        internal__static_google_protobuf_EnumValueDescriptorProto__FieldAccessorTable = 
+            new pb::FieldAccess.FieldAccessorTable<global::Google.ProtocolBuffers.DescriptorProtos.EnumValueDescriptorProto, global::Google.ProtocolBuffers.DescriptorProtos.EnumValueDescriptorProto.Builder>(internal__static_google_protobuf_EnumValueDescriptorProto__Descriptor,
+                new string[] { "Name", "Number", "Options", });
+        internal__static_google_protobuf_ServiceDescriptorProto__Descriptor = Descriptor.MessageTypes[7];
+        internal__static_google_protobuf_ServiceDescriptorProto__FieldAccessorTable = 
+            new pb::FieldAccess.FieldAccessorTable<global::Google.ProtocolBuffers.DescriptorProtos.ServiceDescriptorProto, global::Google.ProtocolBuffers.DescriptorProtos.ServiceDescriptorProto.Builder>(internal__static_google_protobuf_ServiceDescriptorProto__Descriptor,
+                new string[] { "Name", "Method", "Options", });
+        internal__static_google_protobuf_MethodDescriptorProto__Descriptor = Descriptor.MessageTypes[8];
+        internal__static_google_protobuf_MethodDescriptorProto__FieldAccessorTable = 
+            new pb::FieldAccess.FieldAccessorTable<global::Google.ProtocolBuffers.DescriptorProtos.MethodDescriptorProto, global::Google.ProtocolBuffers.DescriptorProtos.MethodDescriptorProto.Builder>(internal__static_google_protobuf_MethodDescriptorProto__Descriptor,
+                new string[] { "Name", "InputType", "OutputType", "Options", "ClientStreaming", "ServerStreaming", });
+        internal__static_google_protobuf_FileOptions__Descriptor = Descriptor.MessageTypes[9];
+        internal__static_google_protobuf_FileOptions__FieldAccessorTable = 
+            new pb::FieldAccess.FieldAccessorTable<global::Google.ProtocolBuffers.DescriptorProtos.FileOptions, global::Google.ProtocolBuffers.DescriptorProtos.FileOptions.Builder>(internal__static_google_protobuf_FileOptions__Descriptor,
+                new string[] { "JavaPackage", "JavaOuterClassname", "JavaMultipleFiles", "JavaGenerateEqualsAndHash", "JavaStringCheckUtf8", "OptimizeFor", "GoPackage", "CcGenericServices", "JavaGenericServices", "PyGenericServices", "Deprecated", "CcEnableArenas", "ObjcClassPrefix", "CsharpNamespace", "UninterpretedOption", });
+        internal__static_google_protobuf_MessageOptions__Descriptor = Descriptor.MessageTypes[10];
+        internal__static_google_protobuf_MessageOptions__FieldAccessorTable = 
+            new pb::FieldAccess.FieldAccessorTable<global::Google.ProtocolBuffers.DescriptorProtos.MessageOptions, global::Google.ProtocolBuffers.DescriptorProtos.MessageOptions.Builder>(internal__static_google_protobuf_MessageOptions__Descriptor,
+                new string[] { "MessageSetWireFormat", "NoStandardDescriptorAccessor", "Deprecated", "MapEntry", "UninterpretedOption", });
+        internal__static_google_protobuf_FieldOptions__Descriptor = Descriptor.MessageTypes[11];
+        internal__static_google_protobuf_FieldOptions__FieldAccessorTable = 
+            new pb::FieldAccess.FieldAccessorTable<global::Google.ProtocolBuffers.DescriptorProtos.FieldOptions, global::Google.ProtocolBuffers.DescriptorProtos.FieldOptions.Builder>(internal__static_google_protobuf_FieldOptions__Descriptor,
+                new string[] { "Ctype", "Packed", "Jstype", "Lazy", "Deprecated", "Weak", "UninterpretedOption", });
+        internal__static_google_protobuf_EnumOptions__Descriptor = Descriptor.MessageTypes[12];
+        internal__static_google_protobuf_EnumOptions__FieldAccessorTable = 
+            new pb::FieldAccess.FieldAccessorTable<global::Google.ProtocolBuffers.DescriptorProtos.EnumOptions, global::Google.ProtocolBuffers.DescriptorProtos.EnumOptions.Builder>(internal__static_google_protobuf_EnumOptions__Descriptor,
+                new string[] { "AllowAlias", "Deprecated", "UninterpretedOption", });
+        internal__static_google_protobuf_EnumValueOptions__Descriptor = Descriptor.MessageTypes[13];
+        internal__static_google_protobuf_EnumValueOptions__FieldAccessorTable = 
+            new pb::FieldAccess.FieldAccessorTable<global::Google.ProtocolBuffers.DescriptorProtos.EnumValueOptions, global::Google.ProtocolBuffers.DescriptorProtos.EnumValueOptions.Builder>(internal__static_google_protobuf_EnumValueOptions__Descriptor,
+                new string[] { "Deprecated", "UninterpretedOption", });
+        internal__static_google_protobuf_ServiceOptions__Descriptor = Descriptor.MessageTypes[14];
+        internal__static_google_protobuf_ServiceOptions__FieldAccessorTable = 
+            new pb::FieldAccess.FieldAccessorTable<global::Google.ProtocolBuffers.DescriptorProtos.ServiceOptions, global::Google.ProtocolBuffers.DescriptorProtos.ServiceOptions.Builder>(internal__static_google_protobuf_ServiceOptions__Descriptor,
+                new string[] { "Deprecated", "UninterpretedOption", });
+        internal__static_google_protobuf_MethodOptions__Descriptor = Descriptor.MessageTypes[15];
+        internal__static_google_protobuf_MethodOptions__FieldAccessorTable = 
+            new pb::FieldAccess.FieldAccessorTable<global::Google.ProtocolBuffers.DescriptorProtos.MethodOptions, global::Google.ProtocolBuffers.DescriptorProtos.MethodOptions.Builder>(internal__static_google_protobuf_MethodOptions__Descriptor,
+                new string[] { "Deprecated", "UninterpretedOption", });
+        internal__static_google_protobuf_UninterpretedOption__Descriptor = Descriptor.MessageTypes[16];
+        internal__static_google_protobuf_UninterpretedOption__FieldAccessorTable = 
+            new pb::FieldAccess.FieldAccessorTable<global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption, global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption.Builder>(internal__static_google_protobuf_UninterpretedOption__Descriptor,
+                new string[] { "Name", "IdentifierValue", "PositiveIntValue", "NegativeIntValue", "DoubleValue", "StringValue", "AggregateValue", });
+        internal__static_google_protobuf_UninterpretedOption_NamePart__Descriptor = internal__static_google_protobuf_UninterpretedOption__Descriptor.NestedTypes[0];
+        internal__static_google_protobuf_UninterpretedOption_NamePart__FieldAccessorTable = 
+            new pb::FieldAccess.FieldAccessorTable<global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption.Types.NamePart, global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption.Types.NamePart.Builder>(internal__static_google_protobuf_UninterpretedOption_NamePart__Descriptor,
+                new string[] { "NamePart_", "IsExtension", });
+        internal__static_google_protobuf_SourceCodeInfo__Descriptor = Descriptor.MessageTypes[17];
+        internal__static_google_protobuf_SourceCodeInfo__FieldAccessorTable = 
+            new pb::FieldAccess.FieldAccessorTable<global::Google.ProtocolBuffers.DescriptorProtos.SourceCodeInfo, global::Google.ProtocolBuffers.DescriptorProtos.SourceCodeInfo.Builder>(internal__static_google_protobuf_SourceCodeInfo__Descriptor,
+                new string[] { "Location", });
+        internal__static_google_protobuf_SourceCodeInfo_Location__Descriptor = internal__static_google_protobuf_SourceCodeInfo__Descriptor.NestedTypes[0];
+        internal__static_google_protobuf_SourceCodeInfo_Location__FieldAccessorTable = 
+            new pb::FieldAccess.FieldAccessorTable<global::Google.ProtocolBuffers.DescriptorProtos.SourceCodeInfo.Types.Location, global::Google.ProtocolBuffers.DescriptorProtos.SourceCodeInfo.Types.Location.Builder>(internal__static_google_protobuf_SourceCodeInfo_Location__Descriptor,
+                new string[] { "Path", "Span", "LeadingComments", "TrailingComments", "LeadingDetachedComments", });
+        pb::ExtensionRegistry registry = pb::ExtensionRegistry.CreateInstance();
+        RegisterAllExtensions(registry);
+        return registry;
+      };
+      pbd::FileDescriptor.InternalBuildGeneratedFileFrom(descriptorData,
           new pbd::FileDescriptor[] {
-          });
-      internal__static_google_protobuf_FileDescriptorSet__FieldAccessorTable = 
-          new pb::FieldAccess.FieldAccessorTable(typeof(global::Google.Protobuf.DescriptorProtos.FileDescriptorSet), descriptor.MessageTypes[0],
-              new string[] { "File", });
-      internal__static_google_protobuf_FileDescriptorProto__FieldAccessorTable = 
-          new pb::FieldAccess.FieldAccessorTable(typeof(global::Google.Protobuf.DescriptorProtos.FileDescriptorProto), descriptor.MessageTypes[1],
-              new string[] { "Name", "Package", "Dependency", "PublicDependency", "WeakDependency", "MessageType", "EnumType", "Service", "Extension", "Options", "SourceCodeInfo", "Syntax", });
-      internal__static_google_protobuf_DescriptorProto__FieldAccessorTable = 
-          new pb::FieldAccess.FieldAccessorTable(typeof(global::Google.Protobuf.DescriptorProtos.DescriptorProto), descriptor.MessageTypes[2],
-              new string[] { "Name", "Field", "Extension", "NestedType", "EnumType", "ExtensionRange", "OneofDecl", "Options", "ReservedRange", "ReservedName", });
-      internal__static_google_protobuf_DescriptorProto_ExtensionRange__FieldAccessorTable = 
-          new pb::FieldAccess.FieldAccessorTable(typeof(global::Google.Protobuf.DescriptorProtos.DescriptorProto.Types.ExtensionRange), descriptor.MessageTypes[2].NestedTypes[0],
-              new string[] { "Start", "End", });
-      internal__static_google_protobuf_DescriptorProto_ReservedRange__FieldAccessorTable = 
-          new pb::FieldAccess.FieldAccessorTable(typeof(global::Google.Protobuf.DescriptorProtos.DescriptorProto.Types.ReservedRange), descriptor.MessageTypes[2].NestedTypes[1],
-              new string[] { "Start", "End", });
-      internal__static_google_protobuf_FieldDescriptorProto__FieldAccessorTable = 
-          new pb::FieldAccess.FieldAccessorTable(typeof(global::Google.Protobuf.DescriptorProtos.FieldDescriptorProto), descriptor.MessageTypes[3],
-              new string[] { "Name", "Number", "Label", "Type", "TypeName", "Extendee", "DefaultValue", "OneofIndex", "Options", });
-      internal__static_google_protobuf_OneofDescriptorProto__FieldAccessorTable = 
-          new pb::FieldAccess.FieldAccessorTable(typeof(global::Google.Protobuf.DescriptorProtos.OneofDescriptorProto), descriptor.MessageTypes[4],
-              new string[] { "Name", });
-      internal__static_google_protobuf_EnumDescriptorProto__FieldAccessorTable = 
-          new pb::FieldAccess.FieldAccessorTable(typeof(global::Google.Protobuf.DescriptorProtos.EnumDescriptorProto), descriptor.MessageTypes[5],
-              new string[] { "Name", "Value", "Options", });
-      internal__static_google_protobuf_EnumValueDescriptorProto__FieldAccessorTable = 
-          new pb::FieldAccess.FieldAccessorTable(typeof(global::Google.Protobuf.DescriptorProtos.EnumValueDescriptorProto), descriptor.MessageTypes[6],
-              new string[] { "Name", "Number", "Options", });
-      internal__static_google_protobuf_ServiceDescriptorProto__FieldAccessorTable = 
-          new pb::FieldAccess.FieldAccessorTable(typeof(global::Google.Protobuf.DescriptorProtos.ServiceDescriptorProto), descriptor.MessageTypes[7],
-              new string[] { "Name", "Method", "Options", });
-      internal__static_google_protobuf_MethodDescriptorProto__FieldAccessorTable = 
-          new pb::FieldAccess.FieldAccessorTable(typeof(global::Google.Protobuf.DescriptorProtos.MethodDescriptorProto), descriptor.MessageTypes[8],
-              new string[] { "Name", "InputType", "OutputType", "Options", "ClientStreaming", "ServerStreaming", });
-      internal__static_google_protobuf_FileOptions__FieldAccessorTable = 
-          new pb::FieldAccess.FieldAccessorTable(typeof(global::Google.Protobuf.DescriptorProtos.FileOptions), descriptor.MessageTypes[9],
-              new string[] { "JavaPackage", "JavaOuterClassname", "JavaMultipleFiles", "JavaGenerateEqualsAndHash", "JavaStringCheckUtf8", "OptimizeFor", "GoPackage", "CcGenericServices", "JavaGenericServices", "PyGenericServices", "Deprecated", "CcEnableArenas", "ObjcClassPrefix", "CsharpNamespace", "UninterpretedOption", });
-      internal__static_google_protobuf_MessageOptions__FieldAccessorTable = 
-          new pb::FieldAccess.FieldAccessorTable(typeof(global::Google.Protobuf.DescriptorProtos.MessageOptions), descriptor.MessageTypes[10],
-              new string[] { "MessageSetWireFormat", "NoStandardDescriptorAccessor", "Deprecated", "MapEntry", "UninterpretedOption", });
-      internal__static_google_protobuf_FieldOptions__FieldAccessorTable = 
-          new pb::FieldAccess.FieldAccessorTable(typeof(global::Google.Protobuf.DescriptorProtos.FieldOptions), descriptor.MessageTypes[11],
-              new string[] { "Ctype", "Packed", "Jstype", "Lazy", "Deprecated", "Weak", "UninterpretedOption", });
-      internal__static_google_protobuf_EnumOptions__FieldAccessorTable = 
-          new pb::FieldAccess.FieldAccessorTable(typeof(global::Google.Protobuf.DescriptorProtos.EnumOptions), descriptor.MessageTypes[12],
-              new string[] { "AllowAlias", "Deprecated", "UninterpretedOption", });
-      internal__static_google_protobuf_EnumValueOptions__FieldAccessorTable = 
-          new pb::FieldAccess.FieldAccessorTable(typeof(global::Google.Protobuf.DescriptorProtos.EnumValueOptions), descriptor.MessageTypes[13],
-              new string[] { "Deprecated", "UninterpretedOption", });
-      internal__static_google_protobuf_ServiceOptions__FieldAccessorTable = 
-          new pb::FieldAccess.FieldAccessorTable(typeof(global::Google.Protobuf.DescriptorProtos.ServiceOptions), descriptor.MessageTypes[14],
-              new string[] { "Deprecated", "UninterpretedOption", });
-      internal__static_google_protobuf_MethodOptions__FieldAccessorTable = 
-          new pb::FieldAccess.FieldAccessorTable(typeof(global::Google.Protobuf.DescriptorProtos.MethodOptions), descriptor.MessageTypes[15],
-              new string[] { "Deprecated", "UninterpretedOption", });
-      internal__static_google_protobuf_UninterpretedOption__FieldAccessorTable = 
-          new pb::FieldAccess.FieldAccessorTable(typeof(global::Google.Protobuf.DescriptorProtos.UninterpretedOption), descriptor.MessageTypes[16],
-              new string[] { "Name", "IdentifierValue", "PositiveIntValue", "NegativeIntValue", "DoubleValue", "StringValue", "AggregateValue", });
-      internal__static_google_protobuf_UninterpretedOption_NamePart__FieldAccessorTable = 
-          new pb::FieldAccess.FieldAccessorTable(typeof(global::Google.Protobuf.DescriptorProtos.UninterpretedOption.Types.NamePart), descriptor.MessageTypes[16].NestedTypes[0],
-              new string[] { "NamePart_", "IsExtension", });
-      internal__static_google_protobuf_SourceCodeInfo__FieldAccessorTable = 
-          new pb::FieldAccess.FieldAccessorTable(typeof(global::Google.Protobuf.DescriptorProtos.SourceCodeInfo), descriptor.MessageTypes[17],
-              new string[] { "Location", });
-      internal__static_google_protobuf_SourceCodeInfo_Location__FieldAccessorTable = 
-          new pb::FieldAccess.FieldAccessorTable(typeof(global::Google.Protobuf.DescriptorProtos.SourceCodeInfo.Types.Location), descriptor.MessageTypes[17].NestedTypes[0],
-              new string[] { "Path", "Span", "LeadingComments", "TrailingComments", "LeadingDetachedComments", });
+          }, assigner);
     }
     #endregion
 
   }
   #region Messages
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-  internal sealed partial class FileDescriptorSet : pb::IMessage<FileDescriptorSet> {
-    private static readonly pb::MessageParser<FileDescriptorSet> _parser = new pb::MessageParser<FileDescriptorSet>(() => new FileDescriptorSet());
-    public static pb::MessageParser<FileDescriptorSet> Parser { get { return _parser; } }
+  public sealed partial class FileDescriptorSet : pb::GeneratedMessage<FileDescriptorSet, FileDescriptorSet.Builder> {
+    private FileDescriptorSet() { }
+    private static readonly FileDescriptorSet defaultInstance = new FileDescriptorSet().MakeReadOnly();
+    private static readonly string[] _fileDescriptorSetFieldNames = new string[] { "file" };
+    private static readonly uint[] _fileDescriptorSetFieldTags = new uint[] { 10 };
+    public static FileDescriptorSet DefaultInstance {
+      get { return defaultInstance; }
+    }
 
-    private static readonly string[] _fieldNames = new string[] { "file" };
-    private static readonly uint[] _fieldTags = new uint[] { 10 };
+    public override FileDescriptorSet DefaultInstanceForType {
+      get { return DefaultInstance; }
+    }
+
+    protected override FileDescriptorSet ThisMessage {
+      get { return this; }
+    }
+
     public static pbd::MessageDescriptor Descriptor {
-      get { return global::Google.Protobuf.DescriptorProtos.DescriptorProtoFile.Descriptor.MessageTypes[0]; }
+      get { return global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_FileDescriptorSet__Descriptor; }
     }
 
-    public pb::FieldAccess.FieldAccessorTable Fields {
-      get { return global::Google.Protobuf.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_FileDescriptorSet__FieldAccessorTable; }
-    }
-
-    private bool _frozen = false;
-    public bool IsFrozen { get { return _frozen; } }
-
-    public FileDescriptorSet() {
-      OnConstruction();
-    }
-
-    partial void OnConstruction();
-
-    public FileDescriptorSet(FileDescriptorSet other) : this() {
-      file_ = other.file_.Clone();
-    }
-
-    public FileDescriptorSet Clone() {
-      return new FileDescriptorSet(this);
-    }
-
-    public void Freeze() {
-      if (IsFrozen) {
-        return;
-      }
-      _frozen = true;
-      file_.Freeze();
+    protected override pb::FieldAccess.FieldAccessorTable<FileDescriptorSet, FileDescriptorSet.Builder> InternalFieldAccessors {
+      get { return global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_FileDescriptorSet__FieldAccessorTable; }
     }
 
     public const int FileFieldNumber = 1;
-    private static readonly pb::FieldCodec<global::Google.Protobuf.DescriptorProtos.FileDescriptorProto> _repeated_file_codec
-        = pb::FieldCodec.ForMessage(10, global::Google.Protobuf.DescriptorProtos.FileDescriptorProto.Parser);
-    private readonly pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.FileDescriptorProto> file_ = new pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.FileDescriptorProto>();
-    internal pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.FileDescriptorProto> File {
+    private pbc::PopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.FileDescriptorProto> file_ = new pbc::PopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.FileDescriptorProto>();
+    public scg::IList<global::Google.ProtocolBuffers.DescriptorProtos.FileDescriptorProto> FileList {
       get { return file_; }
     }
-
-    public override bool Equals(object other) {
-      return Equals(other as FileDescriptorSet);
+    public int FileCount {
+      get { return file_.Count; }
+    }
+    public global::Google.ProtocolBuffers.DescriptorProtos.FileDescriptorProto GetFile(int index) {
+      return file_[index];
     }
 
-    public bool Equals(FileDescriptorSet other) {
-      if (ReferenceEquals(other, null)) {
-        return false;
-      }
-      if (ReferenceEquals(other, this)) {
+    public override bool IsInitialized {
+      get {
+        foreach (global::Google.ProtocolBuffers.DescriptorProtos.FileDescriptorProto element in FileList) {
+          if (!element.IsInitialized) return false;
+        }
         return true;
       }
-      if(!file_.Equals(other.file_)) return false;
-      return true;
     }
 
-    public override int GetHashCode() {
-      int hash = 1;
-      hash ^= file_.GetHashCode();
-      return hash;
+    public override void WriteTo(pb::ICodedOutputStream output) {
+      CalcSerializedSize();
+      string[] field_names = _fileDescriptorSetFieldNames;
+      if (file_.Count > 0) {
+        output.WriteMessageArray(1, field_names[0], file_);
+      }
+      UnknownFields.WriteTo(output);
     }
 
-    public void WriteTo(pb::CodedOutputStream output) {
-      file_.WriteTo(output, _repeated_file_codec);
+    private int memoizedSerializedSize = -1;
+    public override int SerializedSize {
+      get {
+        int size = memoizedSerializedSize;
+        if (size != -1) return size;
+        return CalcSerializedSize();
+      }
     }
 
-    public int CalculateSize() {
-      int size = 0;
-      size += file_.CalculateSize(_repeated_file_codec);
+    private int CalcSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      foreach (global::Google.ProtocolBuffers.DescriptorProtos.FileDescriptorProto element in FileList) {
+        size += pb::CodedOutputStream.ComputeMessageSize(1, element);
+      }
+      size += UnknownFields.SerializedSize;
+      memoizedSerializedSize = size;
       return size;
     }
-
-    public void MergeFrom(FileDescriptorSet other) {
-      if (other == null) {
-        return;
-      }
-      file_.Add(other.file_);
+    public static FileDescriptorSet ParseFrom(pb::ByteString data) {
+      return ((Builder) CreateBuilder().MergeFrom(data)).BuildParsed();
+    }
+    public static FileDescriptorSet ParseFrom(pb::ByteString data, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(data, extensionRegistry)).BuildParsed();
+    }
+    public static FileDescriptorSet ParseFrom(byte[] data) {
+      return ((Builder) CreateBuilder().MergeFrom(data)).BuildParsed();
+    }
+    public static FileDescriptorSet ParseFrom(byte[] data, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(data, extensionRegistry)).BuildParsed();
+    }
+    public static FileDescriptorSet ParseFrom(global::System.IO.Stream input) {
+      return ((Builder) CreateBuilder().MergeFrom(input)).BuildParsed();
+    }
+    public static FileDescriptorSet ParseFrom(global::System.IO.Stream input, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(input, extensionRegistry)).BuildParsed();
+    }
+    public static FileDescriptorSet ParseDelimitedFrom(global::System.IO.Stream input) {
+      return CreateBuilder().MergeDelimitedFrom(input).BuildParsed();
+    }
+    public static FileDescriptorSet ParseDelimitedFrom(global::System.IO.Stream input, pb::ExtensionRegistry extensionRegistry) {
+      return CreateBuilder().MergeDelimitedFrom(input, extensionRegistry).BuildParsed();
+    }
+    public static FileDescriptorSet ParseFrom(pb::ICodedInputStream input) {
+      return ((Builder) CreateBuilder().MergeFrom(input)).BuildParsed();
+    }
+    public static FileDescriptorSet ParseFrom(pb::ICodedInputStream input, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(input, extensionRegistry)).BuildParsed();
+    }
+    private FileDescriptorSet MakeReadOnly() {
+      file_.MakeReadOnly();
+      return this;
     }
 
-    public void MergeFrom(pb::CodedInputStream input) {
-      uint tag;
-      while (input.ReadTag(out tag)) {
-        switch(tag) {
-          case 0:
-            throw pb::InvalidProtocolBufferException.InvalidTag();
-          default:
-            if (pb::WireFormat.IsEndGroupTag(tag)) {
-              return;
-            }
-            break;
-          case 10: {
-            file_.AddEntriesFrom(input, _repeated_file_codec);
-            break;
-          }
+    public static Builder CreateBuilder() { return new Builder(); }
+    public override Builder ToBuilder() { return CreateBuilder(this); }
+    public override Builder CreateBuilderForType() { return new Builder(); }
+    public static Builder CreateBuilder(FileDescriptorSet prototype) {
+      return new Builder(prototype);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+    public sealed partial class Builder : pb::GeneratedBuilder<FileDescriptorSet, Builder> {
+      protected override Builder ThisBuilder {
+        get { return this; }
+      }
+      public Builder() {
+        result = DefaultInstance;
+        resultIsReadOnly = true;
+      }
+      internal Builder(FileDescriptorSet cloneFrom) {
+        result = cloneFrom;
+        resultIsReadOnly = true;
+      }
+
+      private bool resultIsReadOnly;
+      private FileDescriptorSet result;
+
+      private FileDescriptorSet PrepareBuilder() {
+        if (resultIsReadOnly) {
+          FileDescriptorSet original = result;
+          result = new FileDescriptorSet();
+          resultIsReadOnly = false;
+          MergeFrom(original);
+        }
+        return result;
+      }
+
+      public override bool IsInitialized {
+        get { return result.IsInitialized; }
+      }
+
+      protected override FileDescriptorSet MessageBeingBuilt {
+        get { return PrepareBuilder(); }
+      }
+
+      public override Builder Clear() {
+        result = DefaultInstance;
+        resultIsReadOnly = true;
+        return this;
+      }
+
+      public override Builder Clone() {
+        if (resultIsReadOnly) {
+          return new Builder(result);
+        } else {
+          return new Builder().MergeFrom(result);
         }
       }
-    }
 
+      public override pbd::MessageDescriptor DescriptorForType {
+        get { return global::Google.ProtocolBuffers.DescriptorProtos.FileDescriptorSet.Descriptor; }
+      }
+
+      public override FileDescriptorSet DefaultInstanceForType {
+        get { return global::Google.ProtocolBuffers.DescriptorProtos.FileDescriptorSet.DefaultInstance; }
+      }
+
+      public override FileDescriptorSet BuildPartial() {
+        if (resultIsReadOnly) {
+          return result;
+        }
+        resultIsReadOnly = true;
+        return result.MakeReadOnly();
+      }
+
+      public override Builder MergeFrom(pb::IMessage other) {
+        if (other is FileDescriptorSet) {
+          return MergeFrom((FileDescriptorSet) other);
+        } else {
+          base.MergeFrom(other);
+          return this;
+        }
+      }
+
+      public override Builder MergeFrom(FileDescriptorSet other) {
+        if (other == global::Google.ProtocolBuffers.DescriptorProtos.FileDescriptorSet.DefaultInstance) return this;
+        PrepareBuilder();
+        if (other.file_.Count != 0) {
+          result.file_.Add(other.file_);
+        }
+        this.MergeUnknownFields(other.UnknownFields);
+        return this;
+      }
+
+      public override Builder MergeFrom(pb::ICodedInputStream input) {
+        return MergeFrom(input, pb::ExtensionRegistry.Empty);
+      }
+
+      public override Builder MergeFrom(pb::ICodedInputStream input, pb::ExtensionRegistry extensionRegistry) {
+        PrepareBuilder();
+        pb::UnknownFieldSet.Builder unknownFields = null;
+        uint tag;
+        string field_name;
+        while (input.ReadTag(out tag, out field_name)) {
+          if(tag == 0 && field_name != null) {
+            int field_ordinal = global::System.Array.BinarySearch(_fileDescriptorSetFieldNames, field_name, global::System.StringComparer.Ordinal);
+            if(field_ordinal >= 0)
+              tag = _fileDescriptorSetFieldTags[field_ordinal];
+            else {
+              if (unknownFields == null) {
+                unknownFields = pb::UnknownFieldSet.CreateBuilder(this.UnknownFields);
+              }
+              ParseUnknownField(input, unknownFields, extensionRegistry, tag, field_name);
+              continue;
+            }
+          }
+          switch (tag) {
+            case 0: {
+              throw pb::InvalidProtocolBufferException.InvalidTag();
+            }
+            default: {
+              if (pb::WireFormat.IsEndGroupTag(tag)) {
+                if (unknownFields != null) {
+                  this.UnknownFields = unknownFields.Build();
+                }
+                return this;
+              }
+              if (unknownFields == null) {
+                unknownFields = pb::UnknownFieldSet.CreateBuilder(this.UnknownFields);
+              }
+              ParseUnknownField(input, unknownFields, extensionRegistry, tag, field_name);
+              break;
+            }
+            case 10: {
+              input.ReadMessageArray(tag, field_name, result.file_, global::Google.ProtocolBuffers.DescriptorProtos.FileDescriptorProto.DefaultInstance, extensionRegistry);
+              break;
+            }
+          }
+        }
+
+        if (unknownFields != null) {
+          this.UnknownFields = unknownFields.Build();
+        }
+        return this;
+      }
+
+
+      public pbc::IPopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.FileDescriptorProto> FileList {
+        get { return PrepareBuilder().file_; }
+      }
+      public int FileCount {
+        get { return result.FileCount; }
+      }
+      public global::Google.ProtocolBuffers.DescriptorProtos.FileDescriptorProto GetFile(int index) {
+        return result.GetFile(index);
+      }
+      public Builder SetFile(int index, global::Google.ProtocolBuffers.DescriptorProtos.FileDescriptorProto value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.file_[index] = value;
+        return this;
+      }
+      public Builder SetFile(int index, global::Google.ProtocolBuffers.DescriptorProtos.FileDescriptorProto.Builder builderForValue) {
+        pb::ThrowHelper.ThrowIfNull(builderForValue, "builderForValue");
+        PrepareBuilder();
+        result.file_[index] = builderForValue.Build();
+        return this;
+      }
+      public Builder AddFile(global::Google.ProtocolBuffers.DescriptorProtos.FileDescriptorProto value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.file_.Add(value);
+        return this;
+      }
+      public Builder AddFile(global::Google.ProtocolBuffers.DescriptorProtos.FileDescriptorProto.Builder builderForValue) {
+        pb::ThrowHelper.ThrowIfNull(builderForValue, "builderForValue");
+        PrepareBuilder();
+        result.file_.Add(builderForValue.Build());
+        return this;
+      }
+      public Builder AddRangeFile(scg::IEnumerable<global::Google.ProtocolBuffers.DescriptorProtos.FileDescriptorProto> values) {
+        PrepareBuilder();
+        result.file_.Add(values);
+        return this;
+      }
+      public Builder ClearFile() {
+        PrepareBuilder();
+        result.file_.Clear();
+        return this;
+      }
+    }
+    static FileDescriptorSet() {
+      object.ReferenceEquals(global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.Descriptor, null);
+    }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-  internal sealed partial class FileDescriptorProto : pb::IMessage<FileDescriptorProto> {
-    private static readonly pb::MessageParser<FileDescriptorProto> _parser = new pb::MessageParser<FileDescriptorProto>(() => new FileDescriptorProto());
-    public static pb::MessageParser<FileDescriptorProto> Parser { get { return _parser; } }
+  public sealed partial class FileDescriptorProto : pb::GeneratedMessage<FileDescriptorProto, FileDescriptorProto.Builder> {
+    private FileDescriptorProto() { }
+    private static readonly FileDescriptorProto defaultInstance = new FileDescriptorProto().MakeReadOnly();
+    private static readonly string[] _fileDescriptorProtoFieldNames = new string[] { "dependency", "enum_type", "extension", "message_type", "name", "options", "package", "public_dependency", "service", "source_code_info", "syntax", "weak_dependency" };
+    private static readonly uint[] _fileDescriptorProtoFieldTags = new uint[] { 26, 42, 58, 34, 10, 66, 18, 80, 50, 74, 98, 88 };
+    public static FileDescriptorProto DefaultInstance {
+      get { return defaultInstance; }
+    }
 
-    private static readonly string[] _fieldNames = new string[] { "dependency", "enum_type", "extension", "message_type", "name", "options", "package", "public_dependency", "service", "source_code_info", "syntax", "weak_dependency" };
-    private static readonly uint[] _fieldTags = new uint[] { 26, 42, 58, 34, 10, 66, 18, 80, 50, 74, 98, 88 };
+    public override FileDescriptorProto DefaultInstanceForType {
+      get { return DefaultInstance; }
+    }
+
+    protected override FileDescriptorProto ThisMessage {
+      get { return this; }
+    }
+
     public static pbd::MessageDescriptor Descriptor {
-      get { return global::Google.Protobuf.DescriptorProtos.DescriptorProtoFile.Descriptor.MessageTypes[1]; }
+      get { return global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_FileDescriptorProto__Descriptor; }
     }
 
-    public pb::FieldAccess.FieldAccessorTable Fields {
-      get { return global::Google.Protobuf.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_FileDescriptorProto__FieldAccessorTable; }
-    }
-
-    private bool _frozen = false;
-    public bool IsFrozen { get { return _frozen; } }
-
-    public FileDescriptorProto() {
-      OnConstruction();
-    }
-
-    partial void OnConstruction();
-
-    public FileDescriptorProto(FileDescriptorProto other) : this() {
-      name_ = other.name_;
-      package_ = other.package_;
-      dependency_ = other.dependency_.Clone();
-      publicDependency_ = other.publicDependency_.Clone();
-      weakDependency_ = other.weakDependency_.Clone();
-      messageType_ = other.messageType_.Clone();
-      enumType_ = other.enumType_.Clone();
-      service_ = other.service_.Clone();
-      extension_ = other.extension_.Clone();
-      Options = other.options_ != null ? other.Options.Clone() : null;
-      SourceCodeInfo = other.sourceCodeInfo_ != null ? other.SourceCodeInfo.Clone() : null;
-      syntax_ = other.syntax_;
-    }
-
-    public FileDescriptorProto Clone() {
-      return new FileDescriptorProto(this);
-    }
-
-    public void Freeze() {
-      if (IsFrozen) {
-        return;
-      }
-      _frozen = true;
-      dependency_.Freeze();
-      publicDependency_.Freeze();
-      weakDependency_.Freeze();
-      messageType_.Freeze();
-      enumType_.Freeze();
-      service_.Freeze();
-      extension_.Freeze();
-      if (options_ != null) Options.Freeze();
-      if (sourceCodeInfo_ != null) SourceCodeInfo.Freeze();
+    protected override pb::FieldAccess.FieldAccessorTable<FileDescriptorProto, FileDescriptorProto.Builder> InternalFieldAccessors {
+      get { return global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_FileDescriptorProto__FieldAccessorTable; }
     }
 
     public const int NameFieldNumber = 1;
+    private bool hasName;
     private string name_ = "";
-    internal string Name {
+    public bool HasName {
+      get { return hasName; }
+    }
+    public string Name {
       get { return name_; }
-      set {
-        pb::Freezable.CheckMutable(this);
-        name_ = value ?? "";
-      }
     }
 
     public const int PackageFieldNumber = 2;
+    private bool hasPackage;
     private string package_ = "";
-    internal string Package {
+    public bool HasPackage {
+      get { return hasPackage; }
+    }
+    public string Package {
       get { return package_; }
-      set {
-        pb::Freezable.CheckMutable(this);
-        package_ = value ?? "";
-      }
     }
 
     public const int DependencyFieldNumber = 3;
-    private static readonly pb::FieldCodec<string> _repeated_dependency_codec
-        = pb::FieldCodec.ForString(26);
-    private readonly pbc::RepeatedField<string> dependency_ = new pbc::RepeatedField<string>();
-    internal pbc::RepeatedField<string> Dependency {
-      get { return dependency_; }
+    private pbc::PopsicleList<string> dependency_ = new pbc::PopsicleList<string>();
+    public scg::IList<string> DependencyList {
+      get { return pbc::Lists.AsReadOnly(dependency_); }
+    }
+    public int DependencyCount {
+      get { return dependency_.Count; }
+    }
+    public string GetDependency(int index) {
+      return dependency_[index];
     }
 
     public const int PublicDependencyFieldNumber = 10;
-    private static readonly pb::FieldCodec<int> _repeated_publicDependency_codec
-        = pb::FieldCodec.ForInt32(80);
-    private readonly pbc::RepeatedField<int> publicDependency_ = new pbc::RepeatedField<int>();
-    internal pbc::RepeatedField<int> PublicDependency {
-      get { return publicDependency_; }
+    private pbc::PopsicleList<int> publicDependency_ = new pbc::PopsicleList<int>();
+    public scg::IList<int> PublicDependencyList {
+      get { return pbc::Lists.AsReadOnly(publicDependency_); }
+    }
+    public int PublicDependencyCount {
+      get { return publicDependency_.Count; }
+    }
+    public int GetPublicDependency(int index) {
+      return publicDependency_[index];
     }
 
     public const int WeakDependencyFieldNumber = 11;
-    private static readonly pb::FieldCodec<int> _repeated_weakDependency_codec
-        = pb::FieldCodec.ForInt32(88);
-    private readonly pbc::RepeatedField<int> weakDependency_ = new pbc::RepeatedField<int>();
-    internal pbc::RepeatedField<int> WeakDependency {
-      get { return weakDependency_; }
+    private pbc::PopsicleList<int> weakDependency_ = new pbc::PopsicleList<int>();
+    public scg::IList<int> WeakDependencyList {
+      get { return pbc::Lists.AsReadOnly(weakDependency_); }
+    }
+    public int WeakDependencyCount {
+      get { return weakDependency_.Count; }
+    }
+    public int GetWeakDependency(int index) {
+      return weakDependency_[index];
     }
 
     public const int MessageTypeFieldNumber = 4;
-    private static readonly pb::FieldCodec<global::Google.Protobuf.DescriptorProtos.DescriptorProto> _repeated_messageType_codec
-        = pb::FieldCodec.ForMessage(34, global::Google.Protobuf.DescriptorProtos.DescriptorProto.Parser);
-    private readonly pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.DescriptorProto> messageType_ = new pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.DescriptorProto>();
-    internal pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.DescriptorProto> MessageType {
+    private pbc::PopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto> messageType_ = new pbc::PopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto>();
+    public scg::IList<global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto> MessageTypeList {
       get { return messageType_; }
+    }
+    public int MessageTypeCount {
+      get { return messageType_.Count; }
+    }
+    public global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto GetMessageType(int index) {
+      return messageType_[index];
     }
 
     public const int EnumTypeFieldNumber = 5;
-    private static readonly pb::FieldCodec<global::Google.Protobuf.DescriptorProtos.EnumDescriptorProto> _repeated_enumType_codec
-        = pb::FieldCodec.ForMessage(42, global::Google.Protobuf.DescriptorProtos.EnumDescriptorProto.Parser);
-    private readonly pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.EnumDescriptorProto> enumType_ = new pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.EnumDescriptorProto>();
-    internal pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.EnumDescriptorProto> EnumType {
+    private pbc::PopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.EnumDescriptorProto> enumType_ = new pbc::PopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.EnumDescriptorProto>();
+    public scg::IList<global::Google.ProtocolBuffers.DescriptorProtos.EnumDescriptorProto> EnumTypeList {
       get { return enumType_; }
+    }
+    public int EnumTypeCount {
+      get { return enumType_.Count; }
+    }
+    public global::Google.ProtocolBuffers.DescriptorProtos.EnumDescriptorProto GetEnumType(int index) {
+      return enumType_[index];
     }
 
     public const int ServiceFieldNumber = 6;
-    private static readonly pb::FieldCodec<global::Google.Protobuf.DescriptorProtos.ServiceDescriptorProto> _repeated_service_codec
-        = pb::FieldCodec.ForMessage(50, global::Google.Protobuf.DescriptorProtos.ServiceDescriptorProto.Parser);
-    private readonly pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.ServiceDescriptorProto> service_ = new pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.ServiceDescriptorProto>();
-    internal pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.ServiceDescriptorProto> Service {
+    private pbc::PopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.ServiceDescriptorProto> service_ = new pbc::PopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.ServiceDescriptorProto>();
+    public scg::IList<global::Google.ProtocolBuffers.DescriptorProtos.ServiceDescriptorProto> ServiceList {
       get { return service_; }
+    }
+    public int ServiceCount {
+      get { return service_.Count; }
+    }
+    public global::Google.ProtocolBuffers.DescriptorProtos.ServiceDescriptorProto GetService(int index) {
+      return service_[index];
     }
 
     public const int ExtensionFieldNumber = 7;
-    private static readonly pb::FieldCodec<global::Google.Protobuf.DescriptorProtos.FieldDescriptorProto> _repeated_extension_codec
-        = pb::FieldCodec.ForMessage(58, global::Google.Protobuf.DescriptorProtos.FieldDescriptorProto.Parser);
-    private readonly pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.FieldDescriptorProto> extension_ = new pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.FieldDescriptorProto>();
-    internal pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.FieldDescriptorProto> Extension {
+    private pbc::PopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.FieldDescriptorProto> extension_ = new pbc::PopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.FieldDescriptorProto>();
+    public scg::IList<global::Google.ProtocolBuffers.DescriptorProtos.FieldDescriptorProto> ExtensionList {
       get { return extension_; }
+    }
+    public int ExtensionCount {
+      get { return extension_.Count; }
+    }
+    public global::Google.ProtocolBuffers.DescriptorProtos.FieldDescriptorProto GetExtension(int index) {
+      return extension_[index];
     }
 
     public const int OptionsFieldNumber = 8;
-    private global::Google.Protobuf.DescriptorProtos.FileOptions options_;
-    internal global::Google.Protobuf.DescriptorProtos.FileOptions Options {
-      get { return options_; }
-      set {
-        pb::Freezable.CheckMutable(this);
-        options_ = value;
-      }
+    private bool hasOptions;
+    private global::Google.ProtocolBuffers.DescriptorProtos.FileOptions options_;
+    public bool HasOptions {
+      get { return hasOptions; }
+    }
+    public global::Google.ProtocolBuffers.DescriptorProtos.FileOptions Options {
+      get { return options_ ?? global::Google.ProtocolBuffers.DescriptorProtos.FileOptions.DefaultInstance; }
     }
 
     public const int SourceCodeInfoFieldNumber = 9;
-    private global::Google.Protobuf.DescriptorProtos.SourceCodeInfo sourceCodeInfo_;
-    internal global::Google.Protobuf.DescriptorProtos.SourceCodeInfo SourceCodeInfo {
-      get { return sourceCodeInfo_; }
-      set {
-        pb::Freezable.CheckMutable(this);
-        sourceCodeInfo_ = value;
-      }
+    private bool hasSourceCodeInfo;
+    private global::Google.ProtocolBuffers.DescriptorProtos.SourceCodeInfo sourceCodeInfo_;
+    public bool HasSourceCodeInfo {
+      get { return hasSourceCodeInfo; }
+    }
+    public global::Google.ProtocolBuffers.DescriptorProtos.SourceCodeInfo SourceCodeInfo {
+      get { return sourceCodeInfo_ ?? global::Google.ProtocolBuffers.DescriptorProtos.SourceCodeInfo.DefaultInstance; }
     }
 
     public const int SyntaxFieldNumber = 12;
+    private bool hasSyntax;
     private string syntax_ = "";
-    internal string Syntax {
+    public bool HasSyntax {
+      get { return hasSyntax; }
+    }
+    public string Syntax {
       get { return syntax_; }
-      set {
-        pb::Freezable.CheckMutable(this);
-        syntax_ = value ?? "";
-      }
     }
 
-    public override bool Equals(object other) {
-      return Equals(other as FileDescriptorProto);
-    }
-
-    public bool Equals(FileDescriptorProto other) {
-      if (ReferenceEquals(other, null)) {
-        return false;
-      }
-      if (ReferenceEquals(other, this)) {
+    public override bool IsInitialized {
+      get {
+        foreach (global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto element in MessageTypeList) {
+          if (!element.IsInitialized) return false;
+        }
+        foreach (global::Google.ProtocolBuffers.DescriptorProtos.EnumDescriptorProto element in EnumTypeList) {
+          if (!element.IsInitialized) return false;
+        }
+        foreach (global::Google.ProtocolBuffers.DescriptorProtos.ServiceDescriptorProto element in ServiceList) {
+          if (!element.IsInitialized) return false;
+        }
+        foreach (global::Google.ProtocolBuffers.DescriptorProtos.FieldDescriptorProto element in ExtensionList) {
+          if (!element.IsInitialized) return false;
+        }
+        if (HasOptions) {
+          if (!Options.IsInitialized) return false;
+        }
         return true;
       }
-      if (Name != other.Name) return false;
-      if (Package != other.Package) return false;
-      if(!dependency_.Equals(other.dependency_)) return false;
-      if(!publicDependency_.Equals(other.publicDependency_)) return false;
-      if(!weakDependency_.Equals(other.weakDependency_)) return false;
-      if(!messageType_.Equals(other.messageType_)) return false;
-      if(!enumType_.Equals(other.enumType_)) return false;
-      if(!service_.Equals(other.service_)) return false;
-      if(!extension_.Equals(other.extension_)) return false;
-      if (!object.Equals(Options, other.Options)) return false;
-      if (!object.Equals(SourceCodeInfo, other.SourceCodeInfo)) return false;
-      if (Syntax != other.Syntax) return false;
-      return true;
     }
 
-    public override int GetHashCode() {
-      int hash = 1;
-      if (Name.Length != 0) hash ^= Name.GetHashCode();
-      if (Package.Length != 0) hash ^= Package.GetHashCode();
-      hash ^= dependency_.GetHashCode();
-      hash ^= publicDependency_.GetHashCode();
-      hash ^= weakDependency_.GetHashCode();
-      hash ^= messageType_.GetHashCode();
-      hash ^= enumType_.GetHashCode();
-      hash ^= service_.GetHashCode();
-      hash ^= extension_.GetHashCode();
-      if (options_ != null) hash ^= Options.GetHashCode();
-      if (sourceCodeInfo_ != null) hash ^= SourceCodeInfo.GetHashCode();
-      if (Syntax.Length != 0) hash ^= Syntax.GetHashCode();
-      return hash;
+    public override void WriteTo(pb::ICodedOutputStream output) {
+      CalcSerializedSize();
+      string[] field_names = _fileDescriptorProtoFieldNames;
+      if (hasName) {
+        output.WriteString(1, field_names[4], Name);
+      }
+      if (hasPackage) {
+        output.WriteString(2, field_names[6], Package);
+      }
+      if (dependency_.Count > 0) {
+        output.WriteStringArray(3, field_names[0], dependency_);
+      }
+      if (messageType_.Count > 0) {
+        output.WriteMessageArray(4, field_names[3], messageType_);
+      }
+      if (enumType_.Count > 0) {
+        output.WriteMessageArray(5, field_names[1], enumType_);
+      }
+      if (service_.Count > 0) {
+        output.WriteMessageArray(6, field_names[8], service_);
+      }
+      if (extension_.Count > 0) {
+        output.WriteMessageArray(7, field_names[2], extension_);
+      }
+      if (hasOptions) {
+        output.WriteMessage(8, field_names[5], Options);
+      }
+      if (hasSourceCodeInfo) {
+        output.WriteMessage(9, field_names[9], SourceCodeInfo);
+      }
+      if (publicDependency_.Count > 0) {
+        output.WriteInt32Array(10, field_names[7], publicDependency_);
+      }
+      if (weakDependency_.Count > 0) {
+        output.WriteInt32Array(11, field_names[11], weakDependency_);
+      }
+      if (hasSyntax) {
+        output.WriteString(12, field_names[10], Syntax);
+      }
+      UnknownFields.WriteTo(output);
     }
 
-    public void WriteTo(pb::CodedOutputStream output) {
-      if (Name.Length != 0) {
-        output.WriteRawTag(10);
-        output.WriteString(Name);
-      }
-      if (Package.Length != 0) {
-        output.WriteRawTag(18);
-        output.WriteString(Package);
-      }
-      dependency_.WriteTo(output, _repeated_dependency_codec);
-      messageType_.WriteTo(output, _repeated_messageType_codec);
-      enumType_.WriteTo(output, _repeated_enumType_codec);
-      service_.WriteTo(output, _repeated_service_codec);
-      extension_.WriteTo(output, _repeated_extension_codec);
-      if (options_ != null) {
-        output.WriteRawTag(66);
-        output.WriteMessage(Options);
-      }
-      if (sourceCodeInfo_ != null) {
-        output.WriteRawTag(74);
-        output.WriteMessage(SourceCodeInfo);
-      }
-      publicDependency_.WriteTo(output, _repeated_publicDependency_codec);
-      weakDependency_.WriteTo(output, _repeated_weakDependency_codec);
-      if (Syntax.Length != 0) {
-        output.WriteRawTag(98);
-        output.WriteString(Syntax);
+    private int memoizedSerializedSize = -1;
+    public override int SerializedSize {
+      get {
+        int size = memoizedSerializedSize;
+        if (size != -1) return size;
+        return CalcSerializedSize();
       }
     }
 
-    public int CalculateSize() {
-      int size = 0;
-      if (Name.Length != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeStringSize(Name);
+    private int CalcSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (hasName) {
+        size += pb::CodedOutputStream.ComputeStringSize(1, Name);
       }
-      if (Package.Length != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeStringSize(Package);
+      if (hasPackage) {
+        size += pb::CodedOutputStream.ComputeStringSize(2, Package);
       }
-      size += dependency_.CalculateSize(_repeated_dependency_codec);
-      size += publicDependency_.CalculateSize(_repeated_publicDependency_codec);
-      size += weakDependency_.CalculateSize(_repeated_weakDependency_codec);
-      size += messageType_.CalculateSize(_repeated_messageType_codec);
-      size += enumType_.CalculateSize(_repeated_enumType_codec);
-      size += service_.CalculateSize(_repeated_service_codec);
-      size += extension_.CalculateSize(_repeated_extension_codec);
-      if (options_ != null) {
-        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Options);
+      {
+        int dataSize = 0;
+        foreach (string element in DependencyList) {
+          dataSize += pb::CodedOutputStream.ComputeStringSizeNoTag(element);
+        }
+        size += dataSize;
+        size += 1 * dependency_.Count;
       }
-      if (sourceCodeInfo_ != null) {
-        size += 1 + pb::CodedOutputStream.ComputeMessageSize(SourceCodeInfo);
+      {
+        int dataSize = 0;
+        foreach (int element in PublicDependencyList) {
+          dataSize += pb::CodedOutputStream.ComputeInt32SizeNoTag(element);
+        }
+        size += dataSize;
+        size += 1 * publicDependency_.Count;
       }
-      if (Syntax.Length != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeStringSize(Syntax);
+      {
+        int dataSize = 0;
+        foreach (int element in WeakDependencyList) {
+          dataSize += pb::CodedOutputStream.ComputeInt32SizeNoTag(element);
+        }
+        size += dataSize;
+        size += 1 * weakDependency_.Count;
       }
+      foreach (global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto element in MessageTypeList) {
+        size += pb::CodedOutputStream.ComputeMessageSize(4, element);
+      }
+      foreach (global::Google.ProtocolBuffers.DescriptorProtos.EnumDescriptorProto element in EnumTypeList) {
+        size += pb::CodedOutputStream.ComputeMessageSize(5, element);
+      }
+      foreach (global::Google.ProtocolBuffers.DescriptorProtos.ServiceDescriptorProto element in ServiceList) {
+        size += pb::CodedOutputStream.ComputeMessageSize(6, element);
+      }
+      foreach (global::Google.ProtocolBuffers.DescriptorProtos.FieldDescriptorProto element in ExtensionList) {
+        size += pb::CodedOutputStream.ComputeMessageSize(7, element);
+      }
+      if (hasOptions) {
+        size += pb::CodedOutputStream.ComputeMessageSize(8, Options);
+      }
+      if (hasSourceCodeInfo) {
+        size += pb::CodedOutputStream.ComputeMessageSize(9, SourceCodeInfo);
+      }
+      if (hasSyntax) {
+        size += pb::CodedOutputStream.ComputeStringSize(12, Syntax);
+      }
+      size += UnknownFields.SerializedSize;
+      memoizedSerializedSize = size;
       return size;
     }
-
-    public void MergeFrom(FileDescriptorProto other) {
-      if (other == null) {
-        return;
-      }
-      if (other.Name.Length != 0) {
-        Name = other.Name;
-      }
-      if (other.Package.Length != 0) {
-        Package = other.Package;
-      }
-      dependency_.Add(other.dependency_);
-      publicDependency_.Add(other.publicDependency_);
-      weakDependency_.Add(other.weakDependency_);
-      messageType_.Add(other.messageType_);
-      enumType_.Add(other.enumType_);
-      service_.Add(other.service_);
-      extension_.Add(other.extension_);
-      if (other.options_ != null) {
-        if (options_ == null) {
-          options_ = new global::Google.Protobuf.DescriptorProtos.FileOptions();
-        }
-        Options.MergeFrom(other.Options);
-      }
-      if (other.sourceCodeInfo_ != null) {
-        if (sourceCodeInfo_ == null) {
-          sourceCodeInfo_ = new global::Google.Protobuf.DescriptorProtos.SourceCodeInfo();
-        }
-        SourceCodeInfo.MergeFrom(other.SourceCodeInfo);
-      }
-      if (other.Syntax.Length != 0) {
-        Syntax = other.Syntax;
-      }
+    public static FileDescriptorProto ParseFrom(pb::ByteString data) {
+      return ((Builder) CreateBuilder().MergeFrom(data)).BuildParsed();
+    }
+    public static FileDescriptorProto ParseFrom(pb::ByteString data, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(data, extensionRegistry)).BuildParsed();
+    }
+    public static FileDescriptorProto ParseFrom(byte[] data) {
+      return ((Builder) CreateBuilder().MergeFrom(data)).BuildParsed();
+    }
+    public static FileDescriptorProto ParseFrom(byte[] data, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(data, extensionRegistry)).BuildParsed();
+    }
+    public static FileDescriptorProto ParseFrom(global::System.IO.Stream input) {
+      return ((Builder) CreateBuilder().MergeFrom(input)).BuildParsed();
+    }
+    public static FileDescriptorProto ParseFrom(global::System.IO.Stream input, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(input, extensionRegistry)).BuildParsed();
+    }
+    public static FileDescriptorProto ParseDelimitedFrom(global::System.IO.Stream input) {
+      return CreateBuilder().MergeDelimitedFrom(input).BuildParsed();
+    }
+    public static FileDescriptorProto ParseDelimitedFrom(global::System.IO.Stream input, pb::ExtensionRegistry extensionRegistry) {
+      return CreateBuilder().MergeDelimitedFrom(input, extensionRegistry).BuildParsed();
+    }
+    public static FileDescriptorProto ParseFrom(pb::ICodedInputStream input) {
+      return ((Builder) CreateBuilder().MergeFrom(input)).BuildParsed();
+    }
+    public static FileDescriptorProto ParseFrom(pb::ICodedInputStream input, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(input, extensionRegistry)).BuildParsed();
+    }
+    private FileDescriptorProto MakeReadOnly() {
+      dependency_.MakeReadOnly();
+      publicDependency_.MakeReadOnly();
+      weakDependency_.MakeReadOnly();
+      messageType_.MakeReadOnly();
+      enumType_.MakeReadOnly();
+      service_.MakeReadOnly();
+      extension_.MakeReadOnly();
+      return this;
     }
 
-    public void MergeFrom(pb::CodedInputStream input) {
-      uint tag;
-      while (input.ReadTag(out tag)) {
-        switch(tag) {
-          case 0:
-            throw pb::InvalidProtocolBufferException.InvalidTag();
-          default:
-            if (pb::WireFormat.IsEndGroupTag(tag)) {
-              return;
-            }
-            break;
-          case 10: {
-            Name = input.ReadString();
-            break;
-          }
-          case 18: {
-            Package = input.ReadString();
-            break;
-          }
-          case 26: {
-            dependency_.AddEntriesFrom(input, _repeated_dependency_codec);
-            break;
-          }
-          case 34: {
-            messageType_.AddEntriesFrom(input, _repeated_messageType_codec);
-            break;
-          }
-          case 42: {
-            enumType_.AddEntriesFrom(input, _repeated_enumType_codec);
-            break;
-          }
-          case 50: {
-            service_.AddEntriesFrom(input, _repeated_service_codec);
-            break;
-          }
-          case 58: {
-            extension_.AddEntriesFrom(input, _repeated_extension_codec);
-            break;
-          }
-          case 66: {
-            if (options_ == null) {
-              options_ = new global::Google.Protobuf.DescriptorProtos.FileOptions();
-            }
-            input.ReadMessage(options_);
-            break;
-          }
-          case 74: {
-            if (sourceCodeInfo_ == null) {
-              sourceCodeInfo_ = new global::Google.Protobuf.DescriptorProtos.SourceCodeInfo();
-            }
-            input.ReadMessage(sourceCodeInfo_);
-            break;
-          }
-          case 82:
-          case 80: {
-            publicDependency_.AddEntriesFrom(input, _repeated_publicDependency_codec);
-            break;
-          }
-          case 90:
-          case 88: {
-            weakDependency_.AddEntriesFrom(input, _repeated_weakDependency_codec);
-            break;
-          }
-          case 98: {
-            Syntax = input.ReadString();
-            break;
-          }
-        }
-      }
+    public static Builder CreateBuilder() { return new Builder(); }
+    public override Builder ToBuilder() { return CreateBuilder(this); }
+    public override Builder CreateBuilderForType() { return new Builder(); }
+    public static Builder CreateBuilder(FileDescriptorProto prototype) {
+      return new Builder(prototype);
     }
 
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+    public sealed partial class Builder : pb::GeneratedBuilder<FileDescriptorProto, Builder> {
+      protected override Builder ThisBuilder {
+        get { return this; }
+      }
+      public Builder() {
+        result = DefaultInstance;
+        resultIsReadOnly = true;
+      }
+      internal Builder(FileDescriptorProto cloneFrom) {
+        result = cloneFrom;
+        resultIsReadOnly = true;
+      }
+
+      private bool resultIsReadOnly;
+      private FileDescriptorProto result;
+
+      private FileDescriptorProto PrepareBuilder() {
+        if (resultIsReadOnly) {
+          FileDescriptorProto original = result;
+          result = new FileDescriptorProto();
+          resultIsReadOnly = false;
+          MergeFrom(original);
+        }
+        return result;
+      }
+
+      public override bool IsInitialized {
+        get { return result.IsInitialized; }
+      }
+
+      protected override FileDescriptorProto MessageBeingBuilt {
+        get { return PrepareBuilder(); }
+      }
+
+      public override Builder Clear() {
+        result = DefaultInstance;
+        resultIsReadOnly = true;
+        return this;
+      }
+
+      public override Builder Clone() {
+        if (resultIsReadOnly) {
+          return new Builder(result);
+        } else {
+          return new Builder().MergeFrom(result);
+        }
+      }
+
+      public override pbd::MessageDescriptor DescriptorForType {
+        get { return global::Google.ProtocolBuffers.DescriptorProtos.FileDescriptorProto.Descriptor; }
+      }
+
+      public override FileDescriptorProto DefaultInstanceForType {
+        get { return global::Google.ProtocolBuffers.DescriptorProtos.FileDescriptorProto.DefaultInstance; }
+      }
+
+      public override FileDescriptorProto BuildPartial() {
+        if (resultIsReadOnly) {
+          return result;
+        }
+        resultIsReadOnly = true;
+        return result.MakeReadOnly();
+      }
+
+      public override Builder MergeFrom(pb::IMessage other) {
+        if (other is FileDescriptorProto) {
+          return MergeFrom((FileDescriptorProto) other);
+        } else {
+          base.MergeFrom(other);
+          return this;
+        }
+      }
+
+      public override Builder MergeFrom(FileDescriptorProto other) {
+        if (other == global::Google.ProtocolBuffers.DescriptorProtos.FileDescriptorProto.DefaultInstance) return this;
+        PrepareBuilder();
+        if (other.HasName) {
+          Name = other.Name;
+        }
+        if (other.HasPackage) {
+          Package = other.Package;
+        }
+        if (other.dependency_.Count != 0) {
+          result.dependency_.Add(other.dependency_);
+        }
+        if (other.publicDependency_.Count != 0) {
+          result.publicDependency_.Add(other.publicDependency_);
+        }
+        if (other.weakDependency_.Count != 0) {
+          result.weakDependency_.Add(other.weakDependency_);
+        }
+        if (other.messageType_.Count != 0) {
+          result.messageType_.Add(other.messageType_);
+        }
+        if (other.enumType_.Count != 0) {
+          result.enumType_.Add(other.enumType_);
+        }
+        if (other.service_.Count != 0) {
+          result.service_.Add(other.service_);
+        }
+        if (other.extension_.Count != 0) {
+          result.extension_.Add(other.extension_);
+        }
+        if (other.HasOptions) {
+          MergeOptions(other.Options);
+        }
+        if (other.HasSourceCodeInfo) {
+          MergeSourceCodeInfo(other.SourceCodeInfo);
+        }
+        if (other.HasSyntax) {
+          Syntax = other.Syntax;
+        }
+        this.MergeUnknownFields(other.UnknownFields);
+        return this;
+      }
+
+      public override Builder MergeFrom(pb::ICodedInputStream input) {
+        return MergeFrom(input, pb::ExtensionRegistry.Empty);
+      }
+
+      public override Builder MergeFrom(pb::ICodedInputStream input, pb::ExtensionRegistry extensionRegistry) {
+        PrepareBuilder();
+        pb::UnknownFieldSet.Builder unknownFields = null;
+        uint tag;
+        string field_name;
+        while (input.ReadTag(out tag, out field_name)) {
+          if(tag == 0 && field_name != null) {
+            int field_ordinal = global::System.Array.BinarySearch(_fileDescriptorProtoFieldNames, field_name, global::System.StringComparer.Ordinal);
+            if(field_ordinal >= 0)
+              tag = _fileDescriptorProtoFieldTags[field_ordinal];
+            else {
+              if (unknownFields == null) {
+                unknownFields = pb::UnknownFieldSet.CreateBuilder(this.UnknownFields);
+              }
+              ParseUnknownField(input, unknownFields, extensionRegistry, tag, field_name);
+              continue;
+            }
+          }
+          switch (tag) {
+            case 0: {
+              throw pb::InvalidProtocolBufferException.InvalidTag();
+            }
+            default: {
+              if (pb::WireFormat.IsEndGroupTag(tag)) {
+                if (unknownFields != null) {
+                  this.UnknownFields = unknownFields.Build();
+                }
+                return this;
+              }
+              if (unknownFields == null) {
+                unknownFields = pb::UnknownFieldSet.CreateBuilder(this.UnknownFields);
+              }
+              ParseUnknownField(input, unknownFields, extensionRegistry, tag, field_name);
+              break;
+            }
+            case 10: {
+              result.hasName = input.ReadString(ref result.name_);
+              break;
+            }
+            case 18: {
+              result.hasPackage = input.ReadString(ref result.package_);
+              break;
+            }
+            case 26: {
+              input.ReadStringArray(tag, field_name, result.dependency_);
+              break;
+            }
+            case 34: {
+              input.ReadMessageArray(tag, field_name, result.messageType_, global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto.DefaultInstance, extensionRegistry);
+              break;
+            }
+            case 42: {
+              input.ReadMessageArray(tag, field_name, result.enumType_, global::Google.ProtocolBuffers.DescriptorProtos.EnumDescriptorProto.DefaultInstance, extensionRegistry);
+              break;
+            }
+            case 50: {
+              input.ReadMessageArray(tag, field_name, result.service_, global::Google.ProtocolBuffers.DescriptorProtos.ServiceDescriptorProto.DefaultInstance, extensionRegistry);
+              break;
+            }
+            case 58: {
+              input.ReadMessageArray(tag, field_name, result.extension_, global::Google.ProtocolBuffers.DescriptorProtos.FieldDescriptorProto.DefaultInstance, extensionRegistry);
+              break;
+            }
+            case 66: {
+              global::Google.ProtocolBuffers.DescriptorProtos.FileOptions.Builder subBuilder = global::Google.ProtocolBuffers.DescriptorProtos.FileOptions.CreateBuilder();
+              if (result.hasOptions) {
+                subBuilder.MergeFrom(Options);
+              }
+              input.ReadMessage(subBuilder, extensionRegistry);
+              Options = subBuilder.BuildPartial();
+              break;
+            }
+            case 74: {
+              global::Google.ProtocolBuffers.DescriptorProtos.SourceCodeInfo.Builder subBuilder = global::Google.ProtocolBuffers.DescriptorProtos.SourceCodeInfo.CreateBuilder();
+              if (result.hasSourceCodeInfo) {
+                subBuilder.MergeFrom(SourceCodeInfo);
+              }
+              input.ReadMessage(subBuilder, extensionRegistry);
+              SourceCodeInfo = subBuilder.BuildPartial();
+              break;
+            }
+            case 82:
+            case 80: {
+              input.ReadInt32Array(tag, field_name, result.publicDependency_);
+              break;
+            }
+            case 90:
+            case 88: {
+              input.ReadInt32Array(tag, field_name, result.weakDependency_);
+              break;
+            }
+            case 98: {
+              result.hasSyntax = input.ReadString(ref result.syntax_);
+              break;
+            }
+          }
+        }
+
+        if (unknownFields != null) {
+          this.UnknownFields = unknownFields.Build();
+        }
+        return this;
+      }
+
+
+      public bool HasName {
+        get { return result.hasName; }
+      }
+      public string Name {
+        get { return result.Name; }
+        set { SetName(value); }
+      }
+      public Builder SetName(string value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.hasName = true;
+        result.name_ = value;
+        return this;
+      }
+      public Builder ClearName() {
+        PrepareBuilder();
+        result.hasName = false;
+        result.name_ = "";
+        return this;
+      }
+
+      public bool HasPackage {
+        get { return result.hasPackage; }
+      }
+      public string Package {
+        get { return result.Package; }
+        set { SetPackage(value); }
+      }
+      public Builder SetPackage(string value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.hasPackage = true;
+        result.package_ = value;
+        return this;
+      }
+      public Builder ClearPackage() {
+        PrepareBuilder();
+        result.hasPackage = false;
+        result.package_ = "";
+        return this;
+      }
+
+      public pbc::IPopsicleList<string> DependencyList {
+        get { return PrepareBuilder().dependency_; }
+      }
+      public int DependencyCount {
+        get { return result.DependencyCount; }
+      }
+      public string GetDependency(int index) {
+        return result.GetDependency(index);
+      }
+      public Builder SetDependency(int index, string value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.dependency_[index] = value;
+        return this;
+      }
+      public Builder AddDependency(string value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.dependency_.Add(value);
+        return this;
+      }
+      public Builder AddRangeDependency(scg::IEnumerable<string> values) {
+        PrepareBuilder();
+        result.dependency_.Add(values);
+        return this;
+      }
+      public Builder ClearDependency() {
+        PrepareBuilder();
+        result.dependency_.Clear();
+        return this;
+      }
+
+      public pbc::IPopsicleList<int> PublicDependencyList {
+        get { return PrepareBuilder().publicDependency_; }
+      }
+      public int PublicDependencyCount {
+        get { return result.PublicDependencyCount; }
+      }
+      public int GetPublicDependency(int index) {
+        return result.GetPublicDependency(index);
+      }
+      public Builder SetPublicDependency(int index, int value) {
+        PrepareBuilder();
+        result.publicDependency_[index] = value;
+        return this;
+      }
+      public Builder AddPublicDependency(int value) {
+        PrepareBuilder();
+        result.publicDependency_.Add(value);
+        return this;
+      }
+      public Builder AddRangePublicDependency(scg::IEnumerable<int> values) {
+        PrepareBuilder();
+        result.publicDependency_.Add(values);
+        return this;
+      }
+      public Builder ClearPublicDependency() {
+        PrepareBuilder();
+        result.publicDependency_.Clear();
+        return this;
+      }
+
+      public pbc::IPopsicleList<int> WeakDependencyList {
+        get { return PrepareBuilder().weakDependency_; }
+      }
+      public int WeakDependencyCount {
+        get { return result.WeakDependencyCount; }
+      }
+      public int GetWeakDependency(int index) {
+        return result.GetWeakDependency(index);
+      }
+      public Builder SetWeakDependency(int index, int value) {
+        PrepareBuilder();
+        result.weakDependency_[index] = value;
+        return this;
+      }
+      public Builder AddWeakDependency(int value) {
+        PrepareBuilder();
+        result.weakDependency_.Add(value);
+        return this;
+      }
+      public Builder AddRangeWeakDependency(scg::IEnumerable<int> values) {
+        PrepareBuilder();
+        result.weakDependency_.Add(values);
+        return this;
+      }
+      public Builder ClearWeakDependency() {
+        PrepareBuilder();
+        result.weakDependency_.Clear();
+        return this;
+      }
+
+      public pbc::IPopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto> MessageTypeList {
+        get { return PrepareBuilder().messageType_; }
+      }
+      public int MessageTypeCount {
+        get { return result.MessageTypeCount; }
+      }
+      public global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto GetMessageType(int index) {
+        return result.GetMessageType(index);
+      }
+      public Builder SetMessageType(int index, global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.messageType_[index] = value;
+        return this;
+      }
+      public Builder SetMessageType(int index, global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto.Builder builderForValue) {
+        pb::ThrowHelper.ThrowIfNull(builderForValue, "builderForValue");
+        PrepareBuilder();
+        result.messageType_[index] = builderForValue.Build();
+        return this;
+      }
+      public Builder AddMessageType(global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.messageType_.Add(value);
+        return this;
+      }
+      public Builder AddMessageType(global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto.Builder builderForValue) {
+        pb::ThrowHelper.ThrowIfNull(builderForValue, "builderForValue");
+        PrepareBuilder();
+        result.messageType_.Add(builderForValue.Build());
+        return this;
+      }
+      public Builder AddRangeMessageType(scg::IEnumerable<global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto> values) {
+        PrepareBuilder();
+        result.messageType_.Add(values);
+        return this;
+      }
+      public Builder ClearMessageType() {
+        PrepareBuilder();
+        result.messageType_.Clear();
+        return this;
+      }
+
+      public pbc::IPopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.EnumDescriptorProto> EnumTypeList {
+        get { return PrepareBuilder().enumType_; }
+      }
+      public int EnumTypeCount {
+        get { return result.EnumTypeCount; }
+      }
+      public global::Google.ProtocolBuffers.DescriptorProtos.EnumDescriptorProto GetEnumType(int index) {
+        return result.GetEnumType(index);
+      }
+      public Builder SetEnumType(int index, global::Google.ProtocolBuffers.DescriptorProtos.EnumDescriptorProto value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.enumType_[index] = value;
+        return this;
+      }
+      public Builder SetEnumType(int index, global::Google.ProtocolBuffers.DescriptorProtos.EnumDescriptorProto.Builder builderForValue) {
+        pb::ThrowHelper.ThrowIfNull(builderForValue, "builderForValue");
+        PrepareBuilder();
+        result.enumType_[index] = builderForValue.Build();
+        return this;
+      }
+      public Builder AddEnumType(global::Google.ProtocolBuffers.DescriptorProtos.EnumDescriptorProto value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.enumType_.Add(value);
+        return this;
+      }
+      public Builder AddEnumType(global::Google.ProtocolBuffers.DescriptorProtos.EnumDescriptorProto.Builder builderForValue) {
+        pb::ThrowHelper.ThrowIfNull(builderForValue, "builderForValue");
+        PrepareBuilder();
+        result.enumType_.Add(builderForValue.Build());
+        return this;
+      }
+      public Builder AddRangeEnumType(scg::IEnumerable<global::Google.ProtocolBuffers.DescriptorProtos.EnumDescriptorProto> values) {
+        PrepareBuilder();
+        result.enumType_.Add(values);
+        return this;
+      }
+      public Builder ClearEnumType() {
+        PrepareBuilder();
+        result.enumType_.Clear();
+        return this;
+      }
+
+      public pbc::IPopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.ServiceDescriptorProto> ServiceList {
+        get { return PrepareBuilder().service_; }
+      }
+      public int ServiceCount {
+        get { return result.ServiceCount; }
+      }
+      public global::Google.ProtocolBuffers.DescriptorProtos.ServiceDescriptorProto GetService(int index) {
+        return result.GetService(index);
+      }
+      public Builder SetService(int index, global::Google.ProtocolBuffers.DescriptorProtos.ServiceDescriptorProto value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.service_[index] = value;
+        return this;
+      }
+      public Builder SetService(int index, global::Google.ProtocolBuffers.DescriptorProtos.ServiceDescriptorProto.Builder builderForValue) {
+        pb::ThrowHelper.ThrowIfNull(builderForValue, "builderForValue");
+        PrepareBuilder();
+        result.service_[index] = builderForValue.Build();
+        return this;
+      }
+      public Builder AddService(global::Google.ProtocolBuffers.DescriptorProtos.ServiceDescriptorProto value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.service_.Add(value);
+        return this;
+      }
+      public Builder AddService(global::Google.ProtocolBuffers.DescriptorProtos.ServiceDescriptorProto.Builder builderForValue) {
+        pb::ThrowHelper.ThrowIfNull(builderForValue, "builderForValue");
+        PrepareBuilder();
+        result.service_.Add(builderForValue.Build());
+        return this;
+      }
+      public Builder AddRangeService(scg::IEnumerable<global::Google.ProtocolBuffers.DescriptorProtos.ServiceDescriptorProto> values) {
+        PrepareBuilder();
+        result.service_.Add(values);
+        return this;
+      }
+      public Builder ClearService() {
+        PrepareBuilder();
+        result.service_.Clear();
+        return this;
+      }
+
+      public pbc::IPopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.FieldDescriptorProto> ExtensionList {
+        get { return PrepareBuilder().extension_; }
+      }
+      public int ExtensionCount {
+        get { return result.ExtensionCount; }
+      }
+      public global::Google.ProtocolBuffers.DescriptorProtos.FieldDescriptorProto GetExtension(int index) {
+        return result.GetExtension(index);
+      }
+      public Builder SetExtension(int index, global::Google.ProtocolBuffers.DescriptorProtos.FieldDescriptorProto value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.extension_[index] = value;
+        return this;
+      }
+      public Builder SetExtension(int index, global::Google.ProtocolBuffers.DescriptorProtos.FieldDescriptorProto.Builder builderForValue) {
+        pb::ThrowHelper.ThrowIfNull(builderForValue, "builderForValue");
+        PrepareBuilder();
+        result.extension_[index] = builderForValue.Build();
+        return this;
+      }
+      public Builder AddExtension(global::Google.ProtocolBuffers.DescriptorProtos.FieldDescriptorProto value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.extension_.Add(value);
+        return this;
+      }
+      public Builder AddExtension(global::Google.ProtocolBuffers.DescriptorProtos.FieldDescriptorProto.Builder builderForValue) {
+        pb::ThrowHelper.ThrowIfNull(builderForValue, "builderForValue");
+        PrepareBuilder();
+        result.extension_.Add(builderForValue.Build());
+        return this;
+      }
+      public Builder AddRangeExtension(scg::IEnumerable<global::Google.ProtocolBuffers.DescriptorProtos.FieldDescriptorProto> values) {
+        PrepareBuilder();
+        result.extension_.Add(values);
+        return this;
+      }
+      public Builder ClearExtension() {
+        PrepareBuilder();
+        result.extension_.Clear();
+        return this;
+      }
+
+      public bool HasOptions {
+       get { return result.hasOptions; }
+      }
+      public global::Google.ProtocolBuffers.DescriptorProtos.FileOptions Options {
+        get { return result.Options; }
+        set { SetOptions(value); }
+      }
+      public Builder SetOptions(global::Google.ProtocolBuffers.DescriptorProtos.FileOptions value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.hasOptions = true;
+        result.options_ = value;
+        return this;
+      }
+      public Builder SetOptions(global::Google.ProtocolBuffers.DescriptorProtos.FileOptions.Builder builderForValue) {
+        pb::ThrowHelper.ThrowIfNull(builderForValue, "builderForValue");
+        PrepareBuilder();
+        result.hasOptions = true;
+        result.options_ = builderForValue.Build();
+        return this;
+      }
+      public Builder MergeOptions(global::Google.ProtocolBuffers.DescriptorProtos.FileOptions value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        if (result.hasOptions &&
+            result.options_ != global::Google.ProtocolBuffers.DescriptorProtos.FileOptions.DefaultInstance) {
+            result.options_ = global::Google.ProtocolBuffers.DescriptorProtos.FileOptions.CreateBuilder(result.options_).MergeFrom(value).BuildPartial();
+        } else {
+          result.options_ = value;
+        }
+        result.hasOptions = true;
+        return this;
+      }
+      public Builder ClearOptions() {
+        PrepareBuilder();
+        result.hasOptions = false;
+        result.options_ = null;
+        return this;
+      }
+
+      public bool HasSourceCodeInfo {
+       get { return result.hasSourceCodeInfo; }
+      }
+      public global::Google.ProtocolBuffers.DescriptorProtos.SourceCodeInfo SourceCodeInfo {
+        get { return result.SourceCodeInfo; }
+        set { SetSourceCodeInfo(value); }
+      }
+      public Builder SetSourceCodeInfo(global::Google.ProtocolBuffers.DescriptorProtos.SourceCodeInfo value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.hasSourceCodeInfo = true;
+        result.sourceCodeInfo_ = value;
+        return this;
+      }
+      public Builder SetSourceCodeInfo(global::Google.ProtocolBuffers.DescriptorProtos.SourceCodeInfo.Builder builderForValue) {
+        pb::ThrowHelper.ThrowIfNull(builderForValue, "builderForValue");
+        PrepareBuilder();
+        result.hasSourceCodeInfo = true;
+        result.sourceCodeInfo_ = builderForValue.Build();
+        return this;
+      }
+      public Builder MergeSourceCodeInfo(global::Google.ProtocolBuffers.DescriptorProtos.SourceCodeInfo value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        if (result.hasSourceCodeInfo &&
+            result.sourceCodeInfo_ != global::Google.ProtocolBuffers.DescriptorProtos.SourceCodeInfo.DefaultInstance) {
+            result.sourceCodeInfo_ = global::Google.ProtocolBuffers.DescriptorProtos.SourceCodeInfo.CreateBuilder(result.sourceCodeInfo_).MergeFrom(value).BuildPartial();
+        } else {
+          result.sourceCodeInfo_ = value;
+        }
+        result.hasSourceCodeInfo = true;
+        return this;
+      }
+      public Builder ClearSourceCodeInfo() {
+        PrepareBuilder();
+        result.hasSourceCodeInfo = false;
+        result.sourceCodeInfo_ = null;
+        return this;
+      }
+
+      public bool HasSyntax {
+        get { return result.hasSyntax; }
+      }
+      public string Syntax {
+        get { return result.Syntax; }
+        set { SetSyntax(value); }
+      }
+      public Builder SetSyntax(string value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.hasSyntax = true;
+        result.syntax_ = value;
+        return this;
+      }
+      public Builder ClearSyntax() {
+        PrepareBuilder();
+        result.hasSyntax = false;
+        result.syntax_ = "";
+        return this;
+      }
+    }
+    static FileDescriptorProto() {
+      object.ReferenceEquals(global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.Descriptor, null);
+    }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-  internal sealed partial class DescriptorProto : pb::IMessage<DescriptorProto> {
-    private static readonly pb::MessageParser<DescriptorProto> _parser = new pb::MessageParser<DescriptorProto>(() => new DescriptorProto());
-    public static pb::MessageParser<DescriptorProto> Parser { get { return _parser; } }
+  public sealed partial class DescriptorProto : pb::GeneratedMessage<DescriptorProto, DescriptorProto.Builder> {
+    private DescriptorProto() { }
+    private static readonly DescriptorProto defaultInstance = new DescriptorProto().MakeReadOnly();
+    private static readonly string[] _descriptorProtoFieldNames = new string[] { "enum_type", "extension", "extension_range", "field", "name", "nested_type", "oneof_decl", "options", "reserved_name", "reserved_range" };
+    private static readonly uint[] _descriptorProtoFieldTags = new uint[] { 34, 50, 42, 18, 10, 26, 66, 58, 82, 74 };
+    public static DescriptorProto DefaultInstance {
+      get { return defaultInstance; }
+    }
 
-    private static readonly string[] _fieldNames = new string[] { "enum_type", "extension", "extension_range", "field", "name", "nested_type", "oneof_decl", "options", "reserved_name", "reserved_range" };
-    private static readonly uint[] _fieldTags = new uint[] { 34, 50, 42, 18, 10, 26, 66, 58, 82, 74 };
+    public override DescriptorProto DefaultInstanceForType {
+      get { return DefaultInstance; }
+    }
+
+    protected override DescriptorProto ThisMessage {
+      get { return this; }
+    }
+
     public static pbd::MessageDescriptor Descriptor {
-      get { return global::Google.Protobuf.DescriptorProtos.DescriptorProtoFile.Descriptor.MessageTypes[2]; }
+      get { return global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_DescriptorProto__Descriptor; }
     }
 
-    public pb::FieldAccess.FieldAccessorTable Fields {
-      get { return global::Google.Protobuf.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_DescriptorProto__FieldAccessorTable; }
-    }
-
-    private bool _frozen = false;
-    public bool IsFrozen { get { return _frozen; } }
-
-    public DescriptorProto() {
-      OnConstruction();
-    }
-
-    partial void OnConstruction();
-
-    public DescriptorProto(DescriptorProto other) : this() {
-      name_ = other.name_;
-      field_ = other.field_.Clone();
-      extension_ = other.extension_.Clone();
-      nestedType_ = other.nestedType_.Clone();
-      enumType_ = other.enumType_.Clone();
-      extensionRange_ = other.extensionRange_.Clone();
-      oneofDecl_ = other.oneofDecl_.Clone();
-      Options = other.options_ != null ? other.Options.Clone() : null;
-      reservedRange_ = other.reservedRange_.Clone();
-      reservedName_ = other.reservedName_.Clone();
-    }
-
-    public DescriptorProto Clone() {
-      return new DescriptorProto(this);
-    }
-
-    public void Freeze() {
-      if (IsFrozen) {
-        return;
-      }
-      _frozen = true;
-      field_.Freeze();
-      extension_.Freeze();
-      nestedType_.Freeze();
-      enumType_.Freeze();
-      extensionRange_.Freeze();
-      oneofDecl_.Freeze();
-      if (options_ != null) Options.Freeze();
-      reservedRange_.Freeze();
-      reservedName_.Freeze();
-    }
-
-    public const int NameFieldNumber = 1;
-    private string name_ = "";
-    internal string Name {
-      get { return name_; }
-      set {
-        pb::Freezable.CheckMutable(this);
-        name_ = value ?? "";
-      }
-    }
-
-    public const int FieldFieldNumber = 2;
-    private static readonly pb::FieldCodec<global::Google.Protobuf.DescriptorProtos.FieldDescriptorProto> _repeated_field_codec
-        = pb::FieldCodec.ForMessage(18, global::Google.Protobuf.DescriptorProtos.FieldDescriptorProto.Parser);
-    private readonly pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.FieldDescriptorProto> field_ = new pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.FieldDescriptorProto>();
-    internal pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.FieldDescriptorProto> Field {
-      get { return field_; }
-    }
-
-    public const int ExtensionFieldNumber = 6;
-    private static readonly pb::FieldCodec<global::Google.Protobuf.DescriptorProtos.FieldDescriptorProto> _repeated_extension_codec
-        = pb::FieldCodec.ForMessage(50, global::Google.Protobuf.DescriptorProtos.FieldDescriptorProto.Parser);
-    private readonly pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.FieldDescriptorProto> extension_ = new pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.FieldDescriptorProto>();
-    internal pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.FieldDescriptorProto> Extension {
-      get { return extension_; }
-    }
-
-    public const int NestedTypeFieldNumber = 3;
-    private static readonly pb::FieldCodec<global::Google.Protobuf.DescriptorProtos.DescriptorProto> _repeated_nestedType_codec
-        = pb::FieldCodec.ForMessage(26, global::Google.Protobuf.DescriptorProtos.DescriptorProto.Parser);
-    private readonly pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.DescriptorProto> nestedType_ = new pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.DescriptorProto>();
-    internal pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.DescriptorProto> NestedType {
-      get { return nestedType_; }
-    }
-
-    public const int EnumTypeFieldNumber = 4;
-    private static readonly pb::FieldCodec<global::Google.Protobuf.DescriptorProtos.EnumDescriptorProto> _repeated_enumType_codec
-        = pb::FieldCodec.ForMessage(34, global::Google.Protobuf.DescriptorProtos.EnumDescriptorProto.Parser);
-    private readonly pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.EnumDescriptorProto> enumType_ = new pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.EnumDescriptorProto>();
-    internal pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.EnumDescriptorProto> EnumType {
-      get { return enumType_; }
-    }
-
-    public const int ExtensionRangeFieldNumber = 5;
-    private static readonly pb::FieldCodec<global::Google.Protobuf.DescriptorProtos.DescriptorProto.Types.ExtensionRange> _repeated_extensionRange_codec
-        = pb::FieldCodec.ForMessage(42, global::Google.Protobuf.DescriptorProtos.DescriptorProto.Types.ExtensionRange.Parser);
-    private readonly pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.DescriptorProto.Types.ExtensionRange> extensionRange_ = new pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.DescriptorProto.Types.ExtensionRange>();
-    internal pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.DescriptorProto.Types.ExtensionRange> ExtensionRange {
-      get { return extensionRange_; }
-    }
-
-    public const int OneofDeclFieldNumber = 8;
-    private static readonly pb::FieldCodec<global::Google.Protobuf.DescriptorProtos.OneofDescriptorProto> _repeated_oneofDecl_codec
-        = pb::FieldCodec.ForMessage(66, global::Google.Protobuf.DescriptorProtos.OneofDescriptorProto.Parser);
-    private readonly pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.OneofDescriptorProto> oneofDecl_ = new pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.OneofDescriptorProto>();
-    internal pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.OneofDescriptorProto> OneofDecl {
-      get { return oneofDecl_; }
-    }
-
-    public const int OptionsFieldNumber = 7;
-    private global::Google.Protobuf.DescriptorProtos.MessageOptions options_;
-    internal global::Google.Protobuf.DescriptorProtos.MessageOptions Options {
-      get { return options_; }
-      set {
-        pb::Freezable.CheckMutable(this);
-        options_ = value;
-      }
-    }
-
-    public const int ReservedRangeFieldNumber = 9;
-    private static readonly pb::FieldCodec<global::Google.Protobuf.DescriptorProtos.DescriptorProto.Types.ReservedRange> _repeated_reservedRange_codec
-        = pb::FieldCodec.ForMessage(74, global::Google.Protobuf.DescriptorProtos.DescriptorProto.Types.ReservedRange.Parser);
-    private readonly pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.DescriptorProto.Types.ReservedRange> reservedRange_ = new pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.DescriptorProto.Types.ReservedRange>();
-    internal pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.DescriptorProto.Types.ReservedRange> ReservedRange {
-      get { return reservedRange_; }
-    }
-
-    public const int ReservedNameFieldNumber = 10;
-    private static readonly pb::FieldCodec<string> _repeated_reservedName_codec
-        = pb::FieldCodec.ForString(82);
-    private readonly pbc::RepeatedField<string> reservedName_ = new pbc::RepeatedField<string>();
-    internal pbc::RepeatedField<string> ReservedName {
-      get { return reservedName_; }
-    }
-
-    public override bool Equals(object other) {
-      return Equals(other as DescriptorProto);
-    }
-
-    public bool Equals(DescriptorProto other) {
-      if (ReferenceEquals(other, null)) {
-        return false;
-      }
-      if (ReferenceEquals(other, this)) {
-        return true;
-      }
-      if (Name != other.Name) return false;
-      if(!field_.Equals(other.field_)) return false;
-      if(!extension_.Equals(other.extension_)) return false;
-      if(!nestedType_.Equals(other.nestedType_)) return false;
-      if(!enumType_.Equals(other.enumType_)) return false;
-      if(!extensionRange_.Equals(other.extensionRange_)) return false;
-      if(!oneofDecl_.Equals(other.oneofDecl_)) return false;
-      if (!object.Equals(Options, other.Options)) return false;
-      if(!reservedRange_.Equals(other.reservedRange_)) return false;
-      if(!reservedName_.Equals(other.reservedName_)) return false;
-      return true;
-    }
-
-    public override int GetHashCode() {
-      int hash = 1;
-      if (Name.Length != 0) hash ^= Name.GetHashCode();
-      hash ^= field_.GetHashCode();
-      hash ^= extension_.GetHashCode();
-      hash ^= nestedType_.GetHashCode();
-      hash ^= enumType_.GetHashCode();
-      hash ^= extensionRange_.GetHashCode();
-      hash ^= oneofDecl_.GetHashCode();
-      if (options_ != null) hash ^= Options.GetHashCode();
-      hash ^= reservedRange_.GetHashCode();
-      hash ^= reservedName_.GetHashCode();
-      return hash;
-    }
-
-    public void WriteTo(pb::CodedOutputStream output) {
-      if (Name.Length != 0) {
-        output.WriteRawTag(10);
-        output.WriteString(Name);
-      }
-      field_.WriteTo(output, _repeated_field_codec);
-      nestedType_.WriteTo(output, _repeated_nestedType_codec);
-      enumType_.WriteTo(output, _repeated_enumType_codec);
-      extensionRange_.WriteTo(output, _repeated_extensionRange_codec);
-      extension_.WriteTo(output, _repeated_extension_codec);
-      if (options_ != null) {
-        output.WriteRawTag(58);
-        output.WriteMessage(Options);
-      }
-      oneofDecl_.WriteTo(output, _repeated_oneofDecl_codec);
-      reservedRange_.WriteTo(output, _repeated_reservedRange_codec);
-      reservedName_.WriteTo(output, _repeated_reservedName_codec);
-    }
-
-    public int CalculateSize() {
-      int size = 0;
-      if (Name.Length != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeStringSize(Name);
-      }
-      size += field_.CalculateSize(_repeated_field_codec);
-      size += extension_.CalculateSize(_repeated_extension_codec);
-      size += nestedType_.CalculateSize(_repeated_nestedType_codec);
-      size += enumType_.CalculateSize(_repeated_enumType_codec);
-      size += extensionRange_.CalculateSize(_repeated_extensionRange_codec);
-      size += oneofDecl_.CalculateSize(_repeated_oneofDecl_codec);
-      if (options_ != null) {
-        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Options);
-      }
-      size += reservedRange_.CalculateSize(_repeated_reservedRange_codec);
-      size += reservedName_.CalculateSize(_repeated_reservedName_codec);
-      return size;
-    }
-
-    public void MergeFrom(DescriptorProto other) {
-      if (other == null) {
-        return;
-      }
-      if (other.Name.Length != 0) {
-        Name = other.Name;
-      }
-      field_.Add(other.field_);
-      extension_.Add(other.extension_);
-      nestedType_.Add(other.nestedType_);
-      enumType_.Add(other.enumType_);
-      extensionRange_.Add(other.extensionRange_);
-      oneofDecl_.Add(other.oneofDecl_);
-      if (other.options_ != null) {
-        if (options_ == null) {
-          options_ = new global::Google.Protobuf.DescriptorProtos.MessageOptions();
-        }
-        Options.MergeFrom(other.Options);
-      }
-      reservedRange_.Add(other.reservedRange_);
-      reservedName_.Add(other.reservedName_);
-    }
-
-    public void MergeFrom(pb::CodedInputStream input) {
-      uint tag;
-      while (input.ReadTag(out tag)) {
-        switch(tag) {
-          case 0:
-            throw pb::InvalidProtocolBufferException.InvalidTag();
-          default:
-            if (pb::WireFormat.IsEndGroupTag(tag)) {
-              return;
-            }
-            break;
-          case 10: {
-            Name = input.ReadString();
-            break;
-          }
-          case 18: {
-            field_.AddEntriesFrom(input, _repeated_field_codec);
-            break;
-          }
-          case 26: {
-            nestedType_.AddEntriesFrom(input, _repeated_nestedType_codec);
-            break;
-          }
-          case 34: {
-            enumType_.AddEntriesFrom(input, _repeated_enumType_codec);
-            break;
-          }
-          case 42: {
-            extensionRange_.AddEntriesFrom(input, _repeated_extensionRange_codec);
-            break;
-          }
-          case 50: {
-            extension_.AddEntriesFrom(input, _repeated_extension_codec);
-            break;
-          }
-          case 58: {
-            if (options_ == null) {
-              options_ = new global::Google.Protobuf.DescriptorProtos.MessageOptions();
-            }
-            input.ReadMessage(options_);
-            break;
-          }
-          case 66: {
-            oneofDecl_.AddEntriesFrom(input, _repeated_oneofDecl_codec);
-            break;
-          }
-          case 74: {
-            reservedRange_.AddEntriesFrom(input, _repeated_reservedRange_codec);
-            break;
-          }
-          case 82: {
-            reservedName_.AddEntriesFrom(input, _repeated_reservedName_codec);
-            break;
-          }
-        }
-      }
+    protected override pb::FieldAccess.FieldAccessorTable<DescriptorProto, DescriptorProto.Builder> InternalFieldAccessors {
+      get { return global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_DescriptorProto__FieldAccessorTable; }
     }
 
     #region Nested types
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     public static partial class Types {
       [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-      internal sealed partial class ExtensionRange : pb::IMessage<ExtensionRange> {
-        private static readonly pb::MessageParser<ExtensionRange> _parser = new pb::MessageParser<ExtensionRange>(() => new ExtensionRange());
-        public static pb::MessageParser<ExtensionRange> Parser { get { return _parser; } }
+      public sealed partial class ExtensionRange : pb::GeneratedMessage<ExtensionRange, ExtensionRange.Builder> {
+        private ExtensionRange() { }
+        private static readonly ExtensionRange defaultInstance = new ExtensionRange().MakeReadOnly();
+        private static readonly string[] _extensionRangeFieldNames = new string[] { "end", "start" };
+        private static readonly uint[] _extensionRangeFieldTags = new uint[] { 16, 8 };
+        public static ExtensionRange DefaultInstance {
+          get { return defaultInstance; }
+        }
 
-        private static readonly string[] _fieldNames = new string[] { "end", "start" };
-        private static readonly uint[] _fieldTags = new uint[] { 16, 8 };
+        public override ExtensionRange DefaultInstanceForType {
+          get { return DefaultInstance; }
+        }
+
+        protected override ExtensionRange ThisMessage {
+          get { return this; }
+        }
+
         public static pbd::MessageDescriptor Descriptor {
-          get { return global::Google.Protobuf.DescriptorProtos.DescriptorProto.Descriptor.NestedTypes[0]; }
+          get { return global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_DescriptorProto_ExtensionRange__Descriptor; }
         }
 
-        public pb::FieldAccess.FieldAccessorTable Fields {
-          get { return global::Google.Protobuf.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_DescriptorProto_ExtensionRange__FieldAccessorTable; }
-        }
-
-        private bool _frozen = false;
-        public bool IsFrozen { get { return _frozen; } }
-
-        public ExtensionRange() {
-          OnConstruction();
-        }
-
-        partial void OnConstruction();
-
-        public ExtensionRange(ExtensionRange other) : this() {
-          start_ = other.start_;
-          end_ = other.end_;
-        }
-
-        public ExtensionRange Clone() {
-          return new ExtensionRange(this);
-        }
-
-        public void Freeze() {
-          if (IsFrozen) {
-            return;
-          }
-          _frozen = true;
+        protected override pb::FieldAccess.FieldAccessorTable<ExtensionRange, ExtensionRange.Builder> InternalFieldAccessors {
+          get { return global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_DescriptorProto_ExtensionRange__FieldAccessorTable; }
         }
 
         public const int StartFieldNumber = 1;
+        private bool hasStart;
         private int start_;
-        internal int Start {
+        public bool HasStart {
+          get { return hasStart; }
+        }
+        public int Start {
           get { return start_; }
-          set {
-            pb::Freezable.CheckMutable(this);
-            start_ = value;
-          }
         }
 
         public const int EndFieldNumber = 2;
+        private bool hasEnd;
         private int end_;
-        internal int End {
+        public bool HasEnd {
+          get { return hasEnd; }
+        }
+        public int End {
           get { return end_; }
-          set {
-            pb::Freezable.CheckMutable(this);
-            end_ = value;
-          }
         }
 
-        public override bool Equals(object other) {
-          return Equals(other as ExtensionRange);
-        }
-
-        public bool Equals(ExtensionRange other) {
-          if (ReferenceEquals(other, null)) {
-            return false;
-          }
-          if (ReferenceEquals(other, this)) {
+        public override bool IsInitialized {
+          get {
             return true;
           }
-          if (Start != other.Start) return false;
-          if (End != other.End) return false;
-          return true;
         }
 
-        public override int GetHashCode() {
-          int hash = 1;
-          if (Start != 0) hash ^= Start.GetHashCode();
-          if (End != 0) hash ^= End.GetHashCode();
-          return hash;
+        public override void WriteTo(pb::ICodedOutputStream output) {
+          CalcSerializedSize();
+          string[] field_names = _extensionRangeFieldNames;
+          if (hasStart) {
+            output.WriteInt32(1, field_names[1], Start);
+          }
+          if (hasEnd) {
+            output.WriteInt32(2, field_names[0], End);
+          }
+          UnknownFields.WriteTo(output);
         }
 
-        public void WriteTo(pb::CodedOutputStream output) {
-          if (Start != 0) {
-            output.WriteRawTag(8);
-            output.WriteInt32(Start);
-          }
-          if (End != 0) {
-            output.WriteRawTag(16);
-            output.WriteInt32(End);
+        private int memoizedSerializedSize = -1;
+        public override int SerializedSize {
+          get {
+            int size = memoizedSerializedSize;
+            if (size != -1) return size;
+            return CalcSerializedSize();
           }
         }
 
-        public int CalculateSize() {
-          int size = 0;
-          if (Start != 0) {
-            size += 1 + pb::CodedOutputStream.ComputeInt32Size(Start);
+        private int CalcSerializedSize() {
+          int size = memoizedSerializedSize;
+          if (size != -1) return size;
+
+          size = 0;
+          if (hasStart) {
+            size += pb::CodedOutputStream.ComputeInt32Size(1, Start);
           }
-          if (End != 0) {
-            size += 1 + pb::CodedOutputStream.ComputeInt32Size(End);
+          if (hasEnd) {
+            size += pb::CodedOutputStream.ComputeInt32Size(2, End);
           }
+          size += UnknownFields.SerializedSize;
+          memoizedSerializedSize = size;
           return size;
         }
-
-        public void MergeFrom(ExtensionRange other) {
-          if (other == null) {
-            return;
-          }
-          if (other.Start != 0) {
-            Start = other.Start;
-          }
-          if (other.End != 0) {
-            End = other.End;
-          }
+        public static ExtensionRange ParseFrom(pb::ByteString data) {
+          return ((Builder) CreateBuilder().MergeFrom(data)).BuildParsed();
+        }
+        public static ExtensionRange ParseFrom(pb::ByteString data, pb::ExtensionRegistry extensionRegistry) {
+          return ((Builder) CreateBuilder().MergeFrom(data, extensionRegistry)).BuildParsed();
+        }
+        public static ExtensionRange ParseFrom(byte[] data) {
+          return ((Builder) CreateBuilder().MergeFrom(data)).BuildParsed();
+        }
+        public static ExtensionRange ParseFrom(byte[] data, pb::ExtensionRegistry extensionRegistry) {
+          return ((Builder) CreateBuilder().MergeFrom(data, extensionRegistry)).BuildParsed();
+        }
+        public static ExtensionRange ParseFrom(global::System.IO.Stream input) {
+          return ((Builder) CreateBuilder().MergeFrom(input)).BuildParsed();
+        }
+        public static ExtensionRange ParseFrom(global::System.IO.Stream input, pb::ExtensionRegistry extensionRegistry) {
+          return ((Builder) CreateBuilder().MergeFrom(input, extensionRegistry)).BuildParsed();
+        }
+        public static ExtensionRange ParseDelimitedFrom(global::System.IO.Stream input) {
+          return CreateBuilder().MergeDelimitedFrom(input).BuildParsed();
+        }
+        public static ExtensionRange ParseDelimitedFrom(global::System.IO.Stream input, pb::ExtensionRegistry extensionRegistry) {
+          return CreateBuilder().MergeDelimitedFrom(input, extensionRegistry).BuildParsed();
+        }
+        public static ExtensionRange ParseFrom(pb::ICodedInputStream input) {
+          return ((Builder) CreateBuilder().MergeFrom(input)).BuildParsed();
+        }
+        public static ExtensionRange ParseFrom(pb::ICodedInputStream input, pb::ExtensionRegistry extensionRegistry) {
+          return ((Builder) CreateBuilder().MergeFrom(input, extensionRegistry)).BuildParsed();
+        }
+        private ExtensionRange MakeReadOnly() {
+          return this;
         }
 
-        public void MergeFrom(pb::CodedInputStream input) {
-          uint tag;
-          while (input.ReadTag(out tag)) {
-            switch(tag) {
-              case 0:
-                throw pb::InvalidProtocolBufferException.InvalidTag();
-              default:
-                if (pb::WireFormat.IsEndGroupTag(tag)) {
-                  return;
-                }
-                break;
-              case 8: {
-                Start = input.ReadInt32();
-                break;
-              }
-              case 16: {
-                End = input.ReadInt32();
-                break;
-              }
+        public static Builder CreateBuilder() { return new Builder(); }
+        public override Builder ToBuilder() { return CreateBuilder(this); }
+        public override Builder CreateBuilderForType() { return new Builder(); }
+        public static Builder CreateBuilder(ExtensionRange prototype) {
+          return new Builder(prototype);
+        }
+
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public sealed partial class Builder : pb::GeneratedBuilder<ExtensionRange, Builder> {
+          protected override Builder ThisBuilder {
+            get { return this; }
+          }
+          public Builder() {
+            result = DefaultInstance;
+            resultIsReadOnly = true;
+          }
+          internal Builder(ExtensionRange cloneFrom) {
+            result = cloneFrom;
+            resultIsReadOnly = true;
+          }
+
+          private bool resultIsReadOnly;
+          private ExtensionRange result;
+
+          private ExtensionRange PrepareBuilder() {
+            if (resultIsReadOnly) {
+              ExtensionRange original = result;
+              result = new ExtensionRange();
+              resultIsReadOnly = false;
+              MergeFrom(original);
+            }
+            return result;
+          }
+
+          public override bool IsInitialized {
+            get { return result.IsInitialized; }
+          }
+
+          protected override ExtensionRange MessageBeingBuilt {
+            get { return PrepareBuilder(); }
+          }
+
+          public override Builder Clear() {
+            result = DefaultInstance;
+            resultIsReadOnly = true;
+            return this;
+          }
+
+          public override Builder Clone() {
+            if (resultIsReadOnly) {
+              return new Builder(result);
+            } else {
+              return new Builder().MergeFrom(result);
             }
           }
-        }
 
+          public override pbd::MessageDescriptor DescriptorForType {
+            get { return global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto.Types.ExtensionRange.Descriptor; }
+          }
+
+          public override ExtensionRange DefaultInstanceForType {
+            get { return global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto.Types.ExtensionRange.DefaultInstance; }
+          }
+
+          public override ExtensionRange BuildPartial() {
+            if (resultIsReadOnly) {
+              return result;
+            }
+            resultIsReadOnly = true;
+            return result.MakeReadOnly();
+          }
+
+          public override Builder MergeFrom(pb::IMessage other) {
+            if (other is ExtensionRange) {
+              return MergeFrom((ExtensionRange) other);
+            } else {
+              base.MergeFrom(other);
+              return this;
+            }
+          }
+
+          public override Builder MergeFrom(ExtensionRange other) {
+            if (other == global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto.Types.ExtensionRange.DefaultInstance) return this;
+            PrepareBuilder();
+            if (other.HasStart) {
+              Start = other.Start;
+            }
+            if (other.HasEnd) {
+              End = other.End;
+            }
+            this.MergeUnknownFields(other.UnknownFields);
+            return this;
+          }
+
+          public override Builder MergeFrom(pb::ICodedInputStream input) {
+            return MergeFrom(input, pb::ExtensionRegistry.Empty);
+          }
+
+          public override Builder MergeFrom(pb::ICodedInputStream input, pb::ExtensionRegistry extensionRegistry) {
+            PrepareBuilder();
+            pb::UnknownFieldSet.Builder unknownFields = null;
+            uint tag;
+            string field_name;
+            while (input.ReadTag(out tag, out field_name)) {
+              if(tag == 0 && field_name != null) {
+                int field_ordinal = global::System.Array.BinarySearch(_extensionRangeFieldNames, field_name, global::System.StringComparer.Ordinal);
+                if(field_ordinal >= 0)
+                  tag = _extensionRangeFieldTags[field_ordinal];
+                else {
+                  if (unknownFields == null) {
+                    unknownFields = pb::UnknownFieldSet.CreateBuilder(this.UnknownFields);
+                  }
+                  ParseUnknownField(input, unknownFields, extensionRegistry, tag, field_name);
+                  continue;
+                }
+              }
+              switch (tag) {
+                case 0: {
+                  throw pb::InvalidProtocolBufferException.InvalidTag();
+                }
+                default: {
+                  if (pb::WireFormat.IsEndGroupTag(tag)) {
+                    if (unknownFields != null) {
+                      this.UnknownFields = unknownFields.Build();
+                    }
+                    return this;
+                  }
+                  if (unknownFields == null) {
+                    unknownFields = pb::UnknownFieldSet.CreateBuilder(this.UnknownFields);
+                  }
+                  ParseUnknownField(input, unknownFields, extensionRegistry, tag, field_name);
+                  break;
+                }
+                case 8: {
+                  result.hasStart = input.ReadInt32(ref result.start_);
+                  break;
+                }
+                case 16: {
+                  result.hasEnd = input.ReadInt32(ref result.end_);
+                  break;
+                }
+              }
+            }
+
+            if (unknownFields != null) {
+              this.UnknownFields = unknownFields.Build();
+            }
+            return this;
+          }
+
+
+          public bool HasStart {
+            get { return result.hasStart; }
+          }
+          public int Start {
+            get { return result.Start; }
+            set { SetStart(value); }
+          }
+          public Builder SetStart(int value) {
+            PrepareBuilder();
+            result.hasStart = true;
+            result.start_ = value;
+            return this;
+          }
+          public Builder ClearStart() {
+            PrepareBuilder();
+            result.hasStart = false;
+            result.start_ = 0;
+            return this;
+          }
+
+          public bool HasEnd {
+            get { return result.hasEnd; }
+          }
+          public int End {
+            get { return result.End; }
+            set { SetEnd(value); }
+          }
+          public Builder SetEnd(int value) {
+            PrepareBuilder();
+            result.hasEnd = true;
+            result.end_ = value;
+            return this;
+          }
+          public Builder ClearEnd() {
+            PrepareBuilder();
+            result.hasEnd = false;
+            result.end_ = 0;
+            return this;
+          }
+        }
+        static ExtensionRange() {
+          object.ReferenceEquals(global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.Descriptor, null);
+        }
       }
 
       [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-      internal sealed partial class ReservedRange : pb::IMessage<ReservedRange> {
-        private static readonly pb::MessageParser<ReservedRange> _parser = new pb::MessageParser<ReservedRange>(() => new ReservedRange());
-        public static pb::MessageParser<ReservedRange> Parser { get { return _parser; } }
+      public sealed partial class ReservedRange : pb::GeneratedMessage<ReservedRange, ReservedRange.Builder> {
+        private ReservedRange() { }
+        private static readonly ReservedRange defaultInstance = new ReservedRange().MakeReadOnly();
+        private static readonly string[] _reservedRangeFieldNames = new string[] { "end", "start" };
+        private static readonly uint[] _reservedRangeFieldTags = new uint[] { 16, 8 };
+        public static ReservedRange DefaultInstance {
+          get { return defaultInstance; }
+        }
 
-        private static readonly string[] _fieldNames = new string[] { "end", "start" };
-        private static readonly uint[] _fieldTags = new uint[] { 16, 8 };
+        public override ReservedRange DefaultInstanceForType {
+          get { return DefaultInstance; }
+        }
+
+        protected override ReservedRange ThisMessage {
+          get { return this; }
+        }
+
         public static pbd::MessageDescriptor Descriptor {
-          get { return global::Google.Protobuf.DescriptorProtos.DescriptorProto.Descriptor.NestedTypes[1]; }
+          get { return global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_DescriptorProto_ReservedRange__Descriptor; }
         }
 
-        public pb::FieldAccess.FieldAccessorTable Fields {
-          get { return global::Google.Protobuf.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_DescriptorProto_ReservedRange__FieldAccessorTable; }
-        }
-
-        private bool _frozen = false;
-        public bool IsFrozen { get { return _frozen; } }
-
-        public ReservedRange() {
-          OnConstruction();
-        }
-
-        partial void OnConstruction();
-
-        public ReservedRange(ReservedRange other) : this() {
-          start_ = other.start_;
-          end_ = other.end_;
-        }
-
-        public ReservedRange Clone() {
-          return new ReservedRange(this);
-        }
-
-        public void Freeze() {
-          if (IsFrozen) {
-            return;
-          }
-          _frozen = true;
+        protected override pb::FieldAccess.FieldAccessorTable<ReservedRange, ReservedRange.Builder> InternalFieldAccessors {
+          get { return global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_DescriptorProto_ReservedRange__FieldAccessorTable; }
         }
 
         public const int StartFieldNumber = 1;
+        private bool hasStart;
         private int start_;
-        internal int Start {
+        public bool HasStart {
+          get { return hasStart; }
+        }
+        public int Start {
           get { return start_; }
-          set {
-            pb::Freezable.CheckMutable(this);
-            start_ = value;
-          }
         }
 
         public const int EndFieldNumber = 2;
+        private bool hasEnd;
         private int end_;
-        internal int End {
+        public bool HasEnd {
+          get { return hasEnd; }
+        }
+        public int End {
           get { return end_; }
-          set {
-            pb::Freezable.CheckMutable(this);
-            end_ = value;
-          }
         }
 
-        public override bool Equals(object other) {
-          return Equals(other as ReservedRange);
-        }
-
-        public bool Equals(ReservedRange other) {
-          if (ReferenceEquals(other, null)) {
-            return false;
-          }
-          if (ReferenceEquals(other, this)) {
+        public override bool IsInitialized {
+          get {
             return true;
           }
-          if (Start != other.Start) return false;
-          if (End != other.End) return false;
-          return true;
         }
 
-        public override int GetHashCode() {
-          int hash = 1;
-          if (Start != 0) hash ^= Start.GetHashCode();
-          if (End != 0) hash ^= End.GetHashCode();
-          return hash;
+        public override void WriteTo(pb::ICodedOutputStream output) {
+          CalcSerializedSize();
+          string[] field_names = _reservedRangeFieldNames;
+          if (hasStart) {
+            output.WriteInt32(1, field_names[1], Start);
+          }
+          if (hasEnd) {
+            output.WriteInt32(2, field_names[0], End);
+          }
+          UnknownFields.WriteTo(output);
         }
 
-        public void WriteTo(pb::CodedOutputStream output) {
-          if (Start != 0) {
-            output.WriteRawTag(8);
-            output.WriteInt32(Start);
-          }
-          if (End != 0) {
-            output.WriteRawTag(16);
-            output.WriteInt32(End);
+        private int memoizedSerializedSize = -1;
+        public override int SerializedSize {
+          get {
+            int size = memoizedSerializedSize;
+            if (size != -1) return size;
+            return CalcSerializedSize();
           }
         }
 
-        public int CalculateSize() {
-          int size = 0;
-          if (Start != 0) {
-            size += 1 + pb::CodedOutputStream.ComputeInt32Size(Start);
+        private int CalcSerializedSize() {
+          int size = memoizedSerializedSize;
+          if (size != -1) return size;
+
+          size = 0;
+          if (hasStart) {
+            size += pb::CodedOutputStream.ComputeInt32Size(1, Start);
           }
-          if (End != 0) {
-            size += 1 + pb::CodedOutputStream.ComputeInt32Size(End);
+          if (hasEnd) {
+            size += pb::CodedOutputStream.ComputeInt32Size(2, End);
           }
+          size += UnknownFields.SerializedSize;
+          memoizedSerializedSize = size;
           return size;
         }
-
-        public void MergeFrom(ReservedRange other) {
-          if (other == null) {
-            return;
-          }
-          if (other.Start != 0) {
-            Start = other.Start;
-          }
-          if (other.End != 0) {
-            End = other.End;
-          }
+        public static ReservedRange ParseFrom(pb::ByteString data) {
+          return ((Builder) CreateBuilder().MergeFrom(data)).BuildParsed();
+        }
+        public static ReservedRange ParseFrom(pb::ByteString data, pb::ExtensionRegistry extensionRegistry) {
+          return ((Builder) CreateBuilder().MergeFrom(data, extensionRegistry)).BuildParsed();
+        }
+        public static ReservedRange ParseFrom(byte[] data) {
+          return ((Builder) CreateBuilder().MergeFrom(data)).BuildParsed();
+        }
+        public static ReservedRange ParseFrom(byte[] data, pb::ExtensionRegistry extensionRegistry) {
+          return ((Builder) CreateBuilder().MergeFrom(data, extensionRegistry)).BuildParsed();
+        }
+        public static ReservedRange ParseFrom(global::System.IO.Stream input) {
+          return ((Builder) CreateBuilder().MergeFrom(input)).BuildParsed();
+        }
+        public static ReservedRange ParseFrom(global::System.IO.Stream input, pb::ExtensionRegistry extensionRegistry) {
+          return ((Builder) CreateBuilder().MergeFrom(input, extensionRegistry)).BuildParsed();
+        }
+        public static ReservedRange ParseDelimitedFrom(global::System.IO.Stream input) {
+          return CreateBuilder().MergeDelimitedFrom(input).BuildParsed();
+        }
+        public static ReservedRange ParseDelimitedFrom(global::System.IO.Stream input, pb::ExtensionRegistry extensionRegistry) {
+          return CreateBuilder().MergeDelimitedFrom(input, extensionRegistry).BuildParsed();
+        }
+        public static ReservedRange ParseFrom(pb::ICodedInputStream input) {
+          return ((Builder) CreateBuilder().MergeFrom(input)).BuildParsed();
+        }
+        public static ReservedRange ParseFrom(pb::ICodedInputStream input, pb::ExtensionRegistry extensionRegistry) {
+          return ((Builder) CreateBuilder().MergeFrom(input, extensionRegistry)).BuildParsed();
+        }
+        private ReservedRange MakeReadOnly() {
+          return this;
         }
 
-        public void MergeFrom(pb::CodedInputStream input) {
-          uint tag;
-          while (input.ReadTag(out tag)) {
-            switch(tag) {
-              case 0:
-                throw pb::InvalidProtocolBufferException.InvalidTag();
-              default:
-                if (pb::WireFormat.IsEndGroupTag(tag)) {
-                  return;
-                }
-                break;
-              case 8: {
-                Start = input.ReadInt32();
-                break;
-              }
-              case 16: {
-                End = input.ReadInt32();
-                break;
-              }
+        public static Builder CreateBuilder() { return new Builder(); }
+        public override Builder ToBuilder() { return CreateBuilder(this); }
+        public override Builder CreateBuilderForType() { return new Builder(); }
+        public static Builder CreateBuilder(ReservedRange prototype) {
+          return new Builder(prototype);
+        }
+
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public sealed partial class Builder : pb::GeneratedBuilder<ReservedRange, Builder> {
+          protected override Builder ThisBuilder {
+            get { return this; }
+          }
+          public Builder() {
+            result = DefaultInstance;
+            resultIsReadOnly = true;
+          }
+          internal Builder(ReservedRange cloneFrom) {
+            result = cloneFrom;
+            resultIsReadOnly = true;
+          }
+
+          private bool resultIsReadOnly;
+          private ReservedRange result;
+
+          private ReservedRange PrepareBuilder() {
+            if (resultIsReadOnly) {
+              ReservedRange original = result;
+              result = new ReservedRange();
+              resultIsReadOnly = false;
+              MergeFrom(original);
+            }
+            return result;
+          }
+
+          public override bool IsInitialized {
+            get { return result.IsInitialized; }
+          }
+
+          protected override ReservedRange MessageBeingBuilt {
+            get { return PrepareBuilder(); }
+          }
+
+          public override Builder Clear() {
+            result = DefaultInstance;
+            resultIsReadOnly = true;
+            return this;
+          }
+
+          public override Builder Clone() {
+            if (resultIsReadOnly) {
+              return new Builder(result);
+            } else {
+              return new Builder().MergeFrom(result);
             }
           }
-        }
 
+          public override pbd::MessageDescriptor DescriptorForType {
+            get { return global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto.Types.ReservedRange.Descriptor; }
+          }
+
+          public override ReservedRange DefaultInstanceForType {
+            get { return global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto.Types.ReservedRange.DefaultInstance; }
+          }
+
+          public override ReservedRange BuildPartial() {
+            if (resultIsReadOnly) {
+              return result;
+            }
+            resultIsReadOnly = true;
+            return result.MakeReadOnly();
+          }
+
+          public override Builder MergeFrom(pb::IMessage other) {
+            if (other is ReservedRange) {
+              return MergeFrom((ReservedRange) other);
+            } else {
+              base.MergeFrom(other);
+              return this;
+            }
+          }
+
+          public override Builder MergeFrom(ReservedRange other) {
+            if (other == global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto.Types.ReservedRange.DefaultInstance) return this;
+            PrepareBuilder();
+            if (other.HasStart) {
+              Start = other.Start;
+            }
+            if (other.HasEnd) {
+              End = other.End;
+            }
+            this.MergeUnknownFields(other.UnknownFields);
+            return this;
+          }
+
+          public override Builder MergeFrom(pb::ICodedInputStream input) {
+            return MergeFrom(input, pb::ExtensionRegistry.Empty);
+          }
+
+          public override Builder MergeFrom(pb::ICodedInputStream input, pb::ExtensionRegistry extensionRegistry) {
+            PrepareBuilder();
+            pb::UnknownFieldSet.Builder unknownFields = null;
+            uint tag;
+            string field_name;
+            while (input.ReadTag(out tag, out field_name)) {
+              if(tag == 0 && field_name != null) {
+                int field_ordinal = global::System.Array.BinarySearch(_reservedRangeFieldNames, field_name, global::System.StringComparer.Ordinal);
+                if(field_ordinal >= 0)
+                  tag = _reservedRangeFieldTags[field_ordinal];
+                else {
+                  if (unknownFields == null) {
+                    unknownFields = pb::UnknownFieldSet.CreateBuilder(this.UnknownFields);
+                  }
+                  ParseUnknownField(input, unknownFields, extensionRegistry, tag, field_name);
+                  continue;
+                }
+              }
+              switch (tag) {
+                case 0: {
+                  throw pb::InvalidProtocolBufferException.InvalidTag();
+                }
+                default: {
+                  if (pb::WireFormat.IsEndGroupTag(tag)) {
+                    if (unknownFields != null) {
+                      this.UnknownFields = unknownFields.Build();
+                    }
+                    return this;
+                  }
+                  if (unknownFields == null) {
+                    unknownFields = pb::UnknownFieldSet.CreateBuilder(this.UnknownFields);
+                  }
+                  ParseUnknownField(input, unknownFields, extensionRegistry, tag, field_name);
+                  break;
+                }
+                case 8: {
+                  result.hasStart = input.ReadInt32(ref result.start_);
+                  break;
+                }
+                case 16: {
+                  result.hasEnd = input.ReadInt32(ref result.end_);
+                  break;
+                }
+              }
+            }
+
+            if (unknownFields != null) {
+              this.UnknownFields = unknownFields.Build();
+            }
+            return this;
+          }
+
+
+          public bool HasStart {
+            get { return result.hasStart; }
+          }
+          public int Start {
+            get { return result.Start; }
+            set { SetStart(value); }
+          }
+          public Builder SetStart(int value) {
+            PrepareBuilder();
+            result.hasStart = true;
+            result.start_ = value;
+            return this;
+          }
+          public Builder ClearStart() {
+            PrepareBuilder();
+            result.hasStart = false;
+            result.start_ = 0;
+            return this;
+          }
+
+          public bool HasEnd {
+            get { return result.hasEnd; }
+          }
+          public int End {
+            get { return result.End; }
+            set { SetEnd(value); }
+          }
+          public Builder SetEnd(int value) {
+            PrepareBuilder();
+            result.hasEnd = true;
+            result.end_ = value;
+            return this;
+          }
+          public Builder ClearEnd() {
+            PrepareBuilder();
+            result.hasEnd = false;
+            result.end_ = 0;
+            return this;
+          }
+        }
+        static ReservedRange() {
+          object.ReferenceEquals(global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.Descriptor, null);
+        }
       }
 
     }
     #endregion
 
+    public const int NameFieldNumber = 1;
+    private bool hasName;
+    private string name_ = "";
+    public bool HasName {
+      get { return hasName; }
+    }
+    public string Name {
+      get { return name_; }
+    }
+
+    public const int FieldFieldNumber = 2;
+    private pbc::PopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.FieldDescriptorProto> field_ = new pbc::PopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.FieldDescriptorProto>();
+    public scg::IList<global::Google.ProtocolBuffers.DescriptorProtos.FieldDescriptorProto> FieldList {
+      get { return field_; }
+    }
+    public int FieldCount {
+      get { return field_.Count; }
+    }
+    public global::Google.ProtocolBuffers.DescriptorProtos.FieldDescriptorProto GetField(int index) {
+      return field_[index];
+    }
+
+    public const int ExtensionFieldNumber = 6;
+    private pbc::PopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.FieldDescriptorProto> extension_ = new pbc::PopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.FieldDescriptorProto>();
+    public scg::IList<global::Google.ProtocolBuffers.DescriptorProtos.FieldDescriptorProto> ExtensionList {
+      get { return extension_; }
+    }
+    public int ExtensionCount {
+      get { return extension_.Count; }
+    }
+    public global::Google.ProtocolBuffers.DescriptorProtos.FieldDescriptorProto GetExtension(int index) {
+      return extension_[index];
+    }
+
+    public const int NestedTypeFieldNumber = 3;
+    private pbc::PopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto> nestedType_ = new pbc::PopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto>();
+    public scg::IList<global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto> NestedTypeList {
+      get { return nestedType_; }
+    }
+    public int NestedTypeCount {
+      get { return nestedType_.Count; }
+    }
+    public global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto GetNestedType(int index) {
+      return nestedType_[index];
+    }
+
+    public const int EnumTypeFieldNumber = 4;
+    private pbc::PopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.EnumDescriptorProto> enumType_ = new pbc::PopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.EnumDescriptorProto>();
+    public scg::IList<global::Google.ProtocolBuffers.DescriptorProtos.EnumDescriptorProto> EnumTypeList {
+      get { return enumType_; }
+    }
+    public int EnumTypeCount {
+      get { return enumType_.Count; }
+    }
+    public global::Google.ProtocolBuffers.DescriptorProtos.EnumDescriptorProto GetEnumType(int index) {
+      return enumType_[index];
+    }
+
+    public const int ExtensionRangeFieldNumber = 5;
+    private pbc::PopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto.Types.ExtensionRange> extensionRange_ = new pbc::PopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto.Types.ExtensionRange>();
+    public scg::IList<global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto.Types.ExtensionRange> ExtensionRangeList {
+      get { return extensionRange_; }
+    }
+    public int ExtensionRangeCount {
+      get { return extensionRange_.Count; }
+    }
+    public global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto.Types.ExtensionRange GetExtensionRange(int index) {
+      return extensionRange_[index];
+    }
+
+    public const int OneofDeclFieldNumber = 8;
+    private pbc::PopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.OneofDescriptorProto> oneofDecl_ = new pbc::PopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.OneofDescriptorProto>();
+    public scg::IList<global::Google.ProtocolBuffers.DescriptorProtos.OneofDescriptorProto> OneofDeclList {
+      get { return oneofDecl_; }
+    }
+    public int OneofDeclCount {
+      get { return oneofDecl_.Count; }
+    }
+    public global::Google.ProtocolBuffers.DescriptorProtos.OneofDescriptorProto GetOneofDecl(int index) {
+      return oneofDecl_[index];
+    }
+
+    public const int OptionsFieldNumber = 7;
+    private bool hasOptions;
+    private global::Google.ProtocolBuffers.DescriptorProtos.MessageOptions options_;
+    public bool HasOptions {
+      get { return hasOptions; }
+    }
+    public global::Google.ProtocolBuffers.DescriptorProtos.MessageOptions Options {
+      get { return options_ ?? global::Google.ProtocolBuffers.DescriptorProtos.MessageOptions.DefaultInstance; }
+    }
+
+    public const int ReservedRangeFieldNumber = 9;
+    private pbc::PopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto.Types.ReservedRange> reservedRange_ = new pbc::PopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto.Types.ReservedRange>();
+    public scg::IList<global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto.Types.ReservedRange> ReservedRangeList {
+      get { return reservedRange_; }
+    }
+    public int ReservedRangeCount {
+      get { return reservedRange_.Count; }
+    }
+    public global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto.Types.ReservedRange GetReservedRange(int index) {
+      return reservedRange_[index];
+    }
+
+    public const int ReservedNameFieldNumber = 10;
+    private pbc::PopsicleList<string> reservedName_ = new pbc::PopsicleList<string>();
+    public scg::IList<string> ReservedNameList {
+      get { return pbc::Lists.AsReadOnly(reservedName_); }
+    }
+    public int ReservedNameCount {
+      get { return reservedName_.Count; }
+    }
+    public string GetReservedName(int index) {
+      return reservedName_[index];
+    }
+
+    public override bool IsInitialized {
+      get {
+        foreach (global::Google.ProtocolBuffers.DescriptorProtos.FieldDescriptorProto element in FieldList) {
+          if (!element.IsInitialized) return false;
+        }
+        foreach (global::Google.ProtocolBuffers.DescriptorProtos.FieldDescriptorProto element in ExtensionList) {
+          if (!element.IsInitialized) return false;
+        }
+        foreach (global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto element in NestedTypeList) {
+          if (!element.IsInitialized) return false;
+        }
+        foreach (global::Google.ProtocolBuffers.DescriptorProtos.EnumDescriptorProto element in EnumTypeList) {
+          if (!element.IsInitialized) return false;
+        }
+        if (HasOptions) {
+          if (!Options.IsInitialized) return false;
+        }
+        return true;
+      }
+    }
+
+    public override void WriteTo(pb::ICodedOutputStream output) {
+      CalcSerializedSize();
+      string[] field_names = _descriptorProtoFieldNames;
+      if (hasName) {
+        output.WriteString(1, field_names[4], Name);
+      }
+      if (field_.Count > 0) {
+        output.WriteMessageArray(2, field_names[3], field_);
+      }
+      if (nestedType_.Count > 0) {
+        output.WriteMessageArray(3, field_names[5], nestedType_);
+      }
+      if (enumType_.Count > 0) {
+        output.WriteMessageArray(4, field_names[0], enumType_);
+      }
+      if (extensionRange_.Count > 0) {
+        output.WriteMessageArray(5, field_names[2], extensionRange_);
+      }
+      if (extension_.Count > 0) {
+        output.WriteMessageArray(6, field_names[1], extension_);
+      }
+      if (hasOptions) {
+        output.WriteMessage(7, field_names[7], Options);
+      }
+      if (oneofDecl_.Count > 0) {
+        output.WriteMessageArray(8, field_names[6], oneofDecl_);
+      }
+      if (reservedRange_.Count > 0) {
+        output.WriteMessageArray(9, field_names[9], reservedRange_);
+      }
+      if (reservedName_.Count > 0) {
+        output.WriteStringArray(10, field_names[8], reservedName_);
+      }
+      UnknownFields.WriteTo(output);
+    }
+
+    private int memoizedSerializedSize = -1;
+    public override int SerializedSize {
+      get {
+        int size = memoizedSerializedSize;
+        if (size != -1) return size;
+        return CalcSerializedSize();
+      }
+    }
+
+    private int CalcSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (hasName) {
+        size += pb::CodedOutputStream.ComputeStringSize(1, Name);
+      }
+      foreach (global::Google.ProtocolBuffers.DescriptorProtos.FieldDescriptorProto element in FieldList) {
+        size += pb::CodedOutputStream.ComputeMessageSize(2, element);
+      }
+      foreach (global::Google.ProtocolBuffers.DescriptorProtos.FieldDescriptorProto element in ExtensionList) {
+        size += pb::CodedOutputStream.ComputeMessageSize(6, element);
+      }
+      foreach (global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto element in NestedTypeList) {
+        size += pb::CodedOutputStream.ComputeMessageSize(3, element);
+      }
+      foreach (global::Google.ProtocolBuffers.DescriptorProtos.EnumDescriptorProto element in EnumTypeList) {
+        size += pb::CodedOutputStream.ComputeMessageSize(4, element);
+      }
+      foreach (global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto.Types.ExtensionRange element in ExtensionRangeList) {
+        size += pb::CodedOutputStream.ComputeMessageSize(5, element);
+      }
+      foreach (global::Google.ProtocolBuffers.DescriptorProtos.OneofDescriptorProto element in OneofDeclList) {
+        size += pb::CodedOutputStream.ComputeMessageSize(8, element);
+      }
+      if (hasOptions) {
+        size += pb::CodedOutputStream.ComputeMessageSize(7, Options);
+      }
+      foreach (global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto.Types.ReservedRange element in ReservedRangeList) {
+        size += pb::CodedOutputStream.ComputeMessageSize(9, element);
+      }
+      {
+        int dataSize = 0;
+        foreach (string element in ReservedNameList) {
+          dataSize += pb::CodedOutputStream.ComputeStringSizeNoTag(element);
+        }
+        size += dataSize;
+        size += 1 * reservedName_.Count;
+      }
+      size += UnknownFields.SerializedSize;
+      memoizedSerializedSize = size;
+      return size;
+    }
+    public static DescriptorProto ParseFrom(pb::ByteString data) {
+      return ((Builder) CreateBuilder().MergeFrom(data)).BuildParsed();
+    }
+    public static DescriptorProto ParseFrom(pb::ByteString data, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(data, extensionRegistry)).BuildParsed();
+    }
+    public static DescriptorProto ParseFrom(byte[] data) {
+      return ((Builder) CreateBuilder().MergeFrom(data)).BuildParsed();
+    }
+    public static DescriptorProto ParseFrom(byte[] data, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(data, extensionRegistry)).BuildParsed();
+    }
+    public static DescriptorProto ParseFrom(global::System.IO.Stream input) {
+      return ((Builder) CreateBuilder().MergeFrom(input)).BuildParsed();
+    }
+    public static DescriptorProto ParseFrom(global::System.IO.Stream input, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(input, extensionRegistry)).BuildParsed();
+    }
+    public static DescriptorProto ParseDelimitedFrom(global::System.IO.Stream input) {
+      return CreateBuilder().MergeDelimitedFrom(input).BuildParsed();
+    }
+    public static DescriptorProto ParseDelimitedFrom(global::System.IO.Stream input, pb::ExtensionRegistry extensionRegistry) {
+      return CreateBuilder().MergeDelimitedFrom(input, extensionRegistry).BuildParsed();
+    }
+    public static DescriptorProto ParseFrom(pb::ICodedInputStream input) {
+      return ((Builder) CreateBuilder().MergeFrom(input)).BuildParsed();
+    }
+    public static DescriptorProto ParseFrom(pb::ICodedInputStream input, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(input, extensionRegistry)).BuildParsed();
+    }
+    private DescriptorProto MakeReadOnly() {
+      field_.MakeReadOnly();
+      extension_.MakeReadOnly();
+      nestedType_.MakeReadOnly();
+      enumType_.MakeReadOnly();
+      extensionRange_.MakeReadOnly();
+      oneofDecl_.MakeReadOnly();
+      reservedRange_.MakeReadOnly();
+      reservedName_.MakeReadOnly();
+      return this;
+    }
+
+    public static Builder CreateBuilder() { return new Builder(); }
+    public override Builder ToBuilder() { return CreateBuilder(this); }
+    public override Builder CreateBuilderForType() { return new Builder(); }
+    public static Builder CreateBuilder(DescriptorProto prototype) {
+      return new Builder(prototype);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+    public sealed partial class Builder : pb::GeneratedBuilder<DescriptorProto, Builder> {
+      protected override Builder ThisBuilder {
+        get { return this; }
+      }
+      public Builder() {
+        result = DefaultInstance;
+        resultIsReadOnly = true;
+      }
+      internal Builder(DescriptorProto cloneFrom) {
+        result = cloneFrom;
+        resultIsReadOnly = true;
+      }
+
+      private bool resultIsReadOnly;
+      private DescriptorProto result;
+
+      private DescriptorProto PrepareBuilder() {
+        if (resultIsReadOnly) {
+          DescriptorProto original = result;
+          result = new DescriptorProto();
+          resultIsReadOnly = false;
+          MergeFrom(original);
+        }
+        return result;
+      }
+
+      public override bool IsInitialized {
+        get { return result.IsInitialized; }
+      }
+
+      protected override DescriptorProto MessageBeingBuilt {
+        get { return PrepareBuilder(); }
+      }
+
+      public override Builder Clear() {
+        result = DefaultInstance;
+        resultIsReadOnly = true;
+        return this;
+      }
+
+      public override Builder Clone() {
+        if (resultIsReadOnly) {
+          return new Builder(result);
+        } else {
+          return new Builder().MergeFrom(result);
+        }
+      }
+
+      public override pbd::MessageDescriptor DescriptorForType {
+        get { return global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto.Descriptor; }
+      }
+
+      public override DescriptorProto DefaultInstanceForType {
+        get { return global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto.DefaultInstance; }
+      }
+
+      public override DescriptorProto BuildPartial() {
+        if (resultIsReadOnly) {
+          return result;
+        }
+        resultIsReadOnly = true;
+        return result.MakeReadOnly();
+      }
+
+      public override Builder MergeFrom(pb::IMessage other) {
+        if (other is DescriptorProto) {
+          return MergeFrom((DescriptorProto) other);
+        } else {
+          base.MergeFrom(other);
+          return this;
+        }
+      }
+
+      public override Builder MergeFrom(DescriptorProto other) {
+        if (other == global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto.DefaultInstance) return this;
+        PrepareBuilder();
+        if (other.HasName) {
+          Name = other.Name;
+        }
+        if (other.field_.Count != 0) {
+          result.field_.Add(other.field_);
+        }
+        if (other.extension_.Count != 0) {
+          result.extension_.Add(other.extension_);
+        }
+        if (other.nestedType_.Count != 0) {
+          result.nestedType_.Add(other.nestedType_);
+        }
+        if (other.enumType_.Count != 0) {
+          result.enumType_.Add(other.enumType_);
+        }
+        if (other.extensionRange_.Count != 0) {
+          result.extensionRange_.Add(other.extensionRange_);
+        }
+        if (other.oneofDecl_.Count != 0) {
+          result.oneofDecl_.Add(other.oneofDecl_);
+        }
+        if (other.HasOptions) {
+          MergeOptions(other.Options);
+        }
+        if (other.reservedRange_.Count != 0) {
+          result.reservedRange_.Add(other.reservedRange_);
+        }
+        if (other.reservedName_.Count != 0) {
+          result.reservedName_.Add(other.reservedName_);
+        }
+        this.MergeUnknownFields(other.UnknownFields);
+        return this;
+      }
+
+      public override Builder MergeFrom(pb::ICodedInputStream input) {
+        return MergeFrom(input, pb::ExtensionRegistry.Empty);
+      }
+
+      public override Builder MergeFrom(pb::ICodedInputStream input, pb::ExtensionRegistry extensionRegistry) {
+        PrepareBuilder();
+        pb::UnknownFieldSet.Builder unknownFields = null;
+        uint tag;
+        string field_name;
+        while (input.ReadTag(out tag, out field_name)) {
+          if(tag == 0 && field_name != null) {
+            int field_ordinal = global::System.Array.BinarySearch(_descriptorProtoFieldNames, field_name, global::System.StringComparer.Ordinal);
+            if(field_ordinal >= 0)
+              tag = _descriptorProtoFieldTags[field_ordinal];
+            else {
+              if (unknownFields == null) {
+                unknownFields = pb::UnknownFieldSet.CreateBuilder(this.UnknownFields);
+              }
+              ParseUnknownField(input, unknownFields, extensionRegistry, tag, field_name);
+              continue;
+            }
+          }
+          switch (tag) {
+            case 0: {
+              throw pb::InvalidProtocolBufferException.InvalidTag();
+            }
+            default: {
+              if (pb::WireFormat.IsEndGroupTag(tag)) {
+                if (unknownFields != null) {
+                  this.UnknownFields = unknownFields.Build();
+                }
+                return this;
+              }
+              if (unknownFields == null) {
+                unknownFields = pb::UnknownFieldSet.CreateBuilder(this.UnknownFields);
+              }
+              ParseUnknownField(input, unknownFields, extensionRegistry, tag, field_name);
+              break;
+            }
+            case 10: {
+              result.hasName = input.ReadString(ref result.name_);
+              break;
+            }
+            case 18: {
+              input.ReadMessageArray(tag, field_name, result.field_, global::Google.ProtocolBuffers.DescriptorProtos.FieldDescriptorProto.DefaultInstance, extensionRegistry);
+              break;
+            }
+            case 26: {
+              input.ReadMessageArray(tag, field_name, result.nestedType_, global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto.DefaultInstance, extensionRegistry);
+              break;
+            }
+            case 34: {
+              input.ReadMessageArray(tag, field_name, result.enumType_, global::Google.ProtocolBuffers.DescriptorProtos.EnumDescriptorProto.DefaultInstance, extensionRegistry);
+              break;
+            }
+            case 42: {
+              input.ReadMessageArray(tag, field_name, result.extensionRange_, global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto.Types.ExtensionRange.DefaultInstance, extensionRegistry);
+              break;
+            }
+            case 50: {
+              input.ReadMessageArray(tag, field_name, result.extension_, global::Google.ProtocolBuffers.DescriptorProtos.FieldDescriptorProto.DefaultInstance, extensionRegistry);
+              break;
+            }
+            case 58: {
+              global::Google.ProtocolBuffers.DescriptorProtos.MessageOptions.Builder subBuilder = global::Google.ProtocolBuffers.DescriptorProtos.MessageOptions.CreateBuilder();
+              if (result.hasOptions) {
+                subBuilder.MergeFrom(Options);
+              }
+              input.ReadMessage(subBuilder, extensionRegistry);
+              Options = subBuilder.BuildPartial();
+              break;
+            }
+            case 66: {
+              input.ReadMessageArray(tag, field_name, result.oneofDecl_, global::Google.ProtocolBuffers.DescriptorProtos.OneofDescriptorProto.DefaultInstance, extensionRegistry);
+              break;
+            }
+            case 74: {
+              input.ReadMessageArray(tag, field_name, result.reservedRange_, global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto.Types.ReservedRange.DefaultInstance, extensionRegistry);
+              break;
+            }
+            case 82: {
+              input.ReadStringArray(tag, field_name, result.reservedName_);
+              break;
+            }
+          }
+        }
+
+        if (unknownFields != null) {
+          this.UnknownFields = unknownFields.Build();
+        }
+        return this;
+      }
+
+
+      public bool HasName {
+        get { return result.hasName; }
+      }
+      public string Name {
+        get { return result.Name; }
+        set { SetName(value); }
+      }
+      public Builder SetName(string value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.hasName = true;
+        result.name_ = value;
+        return this;
+      }
+      public Builder ClearName() {
+        PrepareBuilder();
+        result.hasName = false;
+        result.name_ = "";
+        return this;
+      }
+
+      public pbc::IPopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.FieldDescriptorProto> FieldList {
+        get { return PrepareBuilder().field_; }
+      }
+      public int FieldCount {
+        get { return result.FieldCount; }
+      }
+      public global::Google.ProtocolBuffers.DescriptorProtos.FieldDescriptorProto GetField(int index) {
+        return result.GetField(index);
+      }
+      public Builder SetField(int index, global::Google.ProtocolBuffers.DescriptorProtos.FieldDescriptorProto value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.field_[index] = value;
+        return this;
+      }
+      public Builder SetField(int index, global::Google.ProtocolBuffers.DescriptorProtos.FieldDescriptorProto.Builder builderForValue) {
+        pb::ThrowHelper.ThrowIfNull(builderForValue, "builderForValue");
+        PrepareBuilder();
+        result.field_[index] = builderForValue.Build();
+        return this;
+      }
+      public Builder AddField(global::Google.ProtocolBuffers.DescriptorProtos.FieldDescriptorProto value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.field_.Add(value);
+        return this;
+      }
+      public Builder AddField(global::Google.ProtocolBuffers.DescriptorProtos.FieldDescriptorProto.Builder builderForValue) {
+        pb::ThrowHelper.ThrowIfNull(builderForValue, "builderForValue");
+        PrepareBuilder();
+        result.field_.Add(builderForValue.Build());
+        return this;
+      }
+      public Builder AddRangeField(scg::IEnumerable<global::Google.ProtocolBuffers.DescriptorProtos.FieldDescriptorProto> values) {
+        PrepareBuilder();
+        result.field_.Add(values);
+        return this;
+      }
+      public Builder ClearField() {
+        PrepareBuilder();
+        result.field_.Clear();
+        return this;
+      }
+
+      public pbc::IPopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.FieldDescriptorProto> ExtensionList {
+        get { return PrepareBuilder().extension_; }
+      }
+      public int ExtensionCount {
+        get { return result.ExtensionCount; }
+      }
+      public global::Google.ProtocolBuffers.DescriptorProtos.FieldDescriptorProto GetExtension(int index) {
+        return result.GetExtension(index);
+      }
+      public Builder SetExtension(int index, global::Google.ProtocolBuffers.DescriptorProtos.FieldDescriptorProto value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.extension_[index] = value;
+        return this;
+      }
+      public Builder SetExtension(int index, global::Google.ProtocolBuffers.DescriptorProtos.FieldDescriptorProto.Builder builderForValue) {
+        pb::ThrowHelper.ThrowIfNull(builderForValue, "builderForValue");
+        PrepareBuilder();
+        result.extension_[index] = builderForValue.Build();
+        return this;
+      }
+      public Builder AddExtension(global::Google.ProtocolBuffers.DescriptorProtos.FieldDescriptorProto value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.extension_.Add(value);
+        return this;
+      }
+      public Builder AddExtension(global::Google.ProtocolBuffers.DescriptorProtos.FieldDescriptorProto.Builder builderForValue) {
+        pb::ThrowHelper.ThrowIfNull(builderForValue, "builderForValue");
+        PrepareBuilder();
+        result.extension_.Add(builderForValue.Build());
+        return this;
+      }
+      public Builder AddRangeExtension(scg::IEnumerable<global::Google.ProtocolBuffers.DescriptorProtos.FieldDescriptorProto> values) {
+        PrepareBuilder();
+        result.extension_.Add(values);
+        return this;
+      }
+      public Builder ClearExtension() {
+        PrepareBuilder();
+        result.extension_.Clear();
+        return this;
+      }
+
+      public pbc::IPopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto> NestedTypeList {
+        get { return PrepareBuilder().nestedType_; }
+      }
+      public int NestedTypeCount {
+        get { return result.NestedTypeCount; }
+      }
+      public global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto GetNestedType(int index) {
+        return result.GetNestedType(index);
+      }
+      public Builder SetNestedType(int index, global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.nestedType_[index] = value;
+        return this;
+      }
+      public Builder SetNestedType(int index, global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto.Builder builderForValue) {
+        pb::ThrowHelper.ThrowIfNull(builderForValue, "builderForValue");
+        PrepareBuilder();
+        result.nestedType_[index] = builderForValue.Build();
+        return this;
+      }
+      public Builder AddNestedType(global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.nestedType_.Add(value);
+        return this;
+      }
+      public Builder AddNestedType(global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto.Builder builderForValue) {
+        pb::ThrowHelper.ThrowIfNull(builderForValue, "builderForValue");
+        PrepareBuilder();
+        result.nestedType_.Add(builderForValue.Build());
+        return this;
+      }
+      public Builder AddRangeNestedType(scg::IEnumerable<global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto> values) {
+        PrepareBuilder();
+        result.nestedType_.Add(values);
+        return this;
+      }
+      public Builder ClearNestedType() {
+        PrepareBuilder();
+        result.nestedType_.Clear();
+        return this;
+      }
+
+      public pbc::IPopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.EnumDescriptorProto> EnumTypeList {
+        get { return PrepareBuilder().enumType_; }
+      }
+      public int EnumTypeCount {
+        get { return result.EnumTypeCount; }
+      }
+      public global::Google.ProtocolBuffers.DescriptorProtos.EnumDescriptorProto GetEnumType(int index) {
+        return result.GetEnumType(index);
+      }
+      public Builder SetEnumType(int index, global::Google.ProtocolBuffers.DescriptorProtos.EnumDescriptorProto value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.enumType_[index] = value;
+        return this;
+      }
+      public Builder SetEnumType(int index, global::Google.ProtocolBuffers.DescriptorProtos.EnumDescriptorProto.Builder builderForValue) {
+        pb::ThrowHelper.ThrowIfNull(builderForValue, "builderForValue");
+        PrepareBuilder();
+        result.enumType_[index] = builderForValue.Build();
+        return this;
+      }
+      public Builder AddEnumType(global::Google.ProtocolBuffers.DescriptorProtos.EnumDescriptorProto value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.enumType_.Add(value);
+        return this;
+      }
+      public Builder AddEnumType(global::Google.ProtocolBuffers.DescriptorProtos.EnumDescriptorProto.Builder builderForValue) {
+        pb::ThrowHelper.ThrowIfNull(builderForValue, "builderForValue");
+        PrepareBuilder();
+        result.enumType_.Add(builderForValue.Build());
+        return this;
+      }
+      public Builder AddRangeEnumType(scg::IEnumerable<global::Google.ProtocolBuffers.DescriptorProtos.EnumDescriptorProto> values) {
+        PrepareBuilder();
+        result.enumType_.Add(values);
+        return this;
+      }
+      public Builder ClearEnumType() {
+        PrepareBuilder();
+        result.enumType_.Clear();
+        return this;
+      }
+
+      public pbc::IPopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto.Types.ExtensionRange> ExtensionRangeList {
+        get { return PrepareBuilder().extensionRange_; }
+      }
+      public int ExtensionRangeCount {
+        get { return result.ExtensionRangeCount; }
+      }
+      public global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto.Types.ExtensionRange GetExtensionRange(int index) {
+        return result.GetExtensionRange(index);
+      }
+      public Builder SetExtensionRange(int index, global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto.Types.ExtensionRange value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.extensionRange_[index] = value;
+        return this;
+      }
+      public Builder SetExtensionRange(int index, global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto.Types.ExtensionRange.Builder builderForValue) {
+        pb::ThrowHelper.ThrowIfNull(builderForValue, "builderForValue");
+        PrepareBuilder();
+        result.extensionRange_[index] = builderForValue.Build();
+        return this;
+      }
+      public Builder AddExtensionRange(global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto.Types.ExtensionRange value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.extensionRange_.Add(value);
+        return this;
+      }
+      public Builder AddExtensionRange(global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto.Types.ExtensionRange.Builder builderForValue) {
+        pb::ThrowHelper.ThrowIfNull(builderForValue, "builderForValue");
+        PrepareBuilder();
+        result.extensionRange_.Add(builderForValue.Build());
+        return this;
+      }
+      public Builder AddRangeExtensionRange(scg::IEnumerable<global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto.Types.ExtensionRange> values) {
+        PrepareBuilder();
+        result.extensionRange_.Add(values);
+        return this;
+      }
+      public Builder ClearExtensionRange() {
+        PrepareBuilder();
+        result.extensionRange_.Clear();
+        return this;
+      }
+
+      public pbc::IPopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.OneofDescriptorProto> OneofDeclList {
+        get { return PrepareBuilder().oneofDecl_; }
+      }
+      public int OneofDeclCount {
+        get { return result.OneofDeclCount; }
+      }
+      public global::Google.ProtocolBuffers.DescriptorProtos.OneofDescriptorProto GetOneofDecl(int index) {
+        return result.GetOneofDecl(index);
+      }
+      public Builder SetOneofDecl(int index, global::Google.ProtocolBuffers.DescriptorProtos.OneofDescriptorProto value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.oneofDecl_[index] = value;
+        return this;
+      }
+      public Builder SetOneofDecl(int index, global::Google.ProtocolBuffers.DescriptorProtos.OneofDescriptorProto.Builder builderForValue) {
+        pb::ThrowHelper.ThrowIfNull(builderForValue, "builderForValue");
+        PrepareBuilder();
+        result.oneofDecl_[index] = builderForValue.Build();
+        return this;
+      }
+      public Builder AddOneofDecl(global::Google.ProtocolBuffers.DescriptorProtos.OneofDescriptorProto value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.oneofDecl_.Add(value);
+        return this;
+      }
+      public Builder AddOneofDecl(global::Google.ProtocolBuffers.DescriptorProtos.OneofDescriptorProto.Builder builderForValue) {
+        pb::ThrowHelper.ThrowIfNull(builderForValue, "builderForValue");
+        PrepareBuilder();
+        result.oneofDecl_.Add(builderForValue.Build());
+        return this;
+      }
+      public Builder AddRangeOneofDecl(scg::IEnumerable<global::Google.ProtocolBuffers.DescriptorProtos.OneofDescriptorProto> values) {
+        PrepareBuilder();
+        result.oneofDecl_.Add(values);
+        return this;
+      }
+      public Builder ClearOneofDecl() {
+        PrepareBuilder();
+        result.oneofDecl_.Clear();
+        return this;
+      }
+
+      public bool HasOptions {
+       get { return result.hasOptions; }
+      }
+      public global::Google.ProtocolBuffers.DescriptorProtos.MessageOptions Options {
+        get { return result.Options; }
+        set { SetOptions(value); }
+      }
+      public Builder SetOptions(global::Google.ProtocolBuffers.DescriptorProtos.MessageOptions value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.hasOptions = true;
+        result.options_ = value;
+        return this;
+      }
+      public Builder SetOptions(global::Google.ProtocolBuffers.DescriptorProtos.MessageOptions.Builder builderForValue) {
+        pb::ThrowHelper.ThrowIfNull(builderForValue, "builderForValue");
+        PrepareBuilder();
+        result.hasOptions = true;
+        result.options_ = builderForValue.Build();
+        return this;
+      }
+      public Builder MergeOptions(global::Google.ProtocolBuffers.DescriptorProtos.MessageOptions value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        if (result.hasOptions &&
+            result.options_ != global::Google.ProtocolBuffers.DescriptorProtos.MessageOptions.DefaultInstance) {
+            result.options_ = global::Google.ProtocolBuffers.DescriptorProtos.MessageOptions.CreateBuilder(result.options_).MergeFrom(value).BuildPartial();
+        } else {
+          result.options_ = value;
+        }
+        result.hasOptions = true;
+        return this;
+      }
+      public Builder ClearOptions() {
+        PrepareBuilder();
+        result.hasOptions = false;
+        result.options_ = null;
+        return this;
+      }
+
+      public pbc::IPopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto.Types.ReservedRange> ReservedRangeList {
+        get { return PrepareBuilder().reservedRange_; }
+      }
+      public int ReservedRangeCount {
+        get { return result.ReservedRangeCount; }
+      }
+      public global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto.Types.ReservedRange GetReservedRange(int index) {
+        return result.GetReservedRange(index);
+      }
+      public Builder SetReservedRange(int index, global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto.Types.ReservedRange value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.reservedRange_[index] = value;
+        return this;
+      }
+      public Builder SetReservedRange(int index, global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto.Types.ReservedRange.Builder builderForValue) {
+        pb::ThrowHelper.ThrowIfNull(builderForValue, "builderForValue");
+        PrepareBuilder();
+        result.reservedRange_[index] = builderForValue.Build();
+        return this;
+      }
+      public Builder AddReservedRange(global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto.Types.ReservedRange value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.reservedRange_.Add(value);
+        return this;
+      }
+      public Builder AddReservedRange(global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto.Types.ReservedRange.Builder builderForValue) {
+        pb::ThrowHelper.ThrowIfNull(builderForValue, "builderForValue");
+        PrepareBuilder();
+        result.reservedRange_.Add(builderForValue.Build());
+        return this;
+      }
+      public Builder AddRangeReservedRange(scg::IEnumerable<global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProto.Types.ReservedRange> values) {
+        PrepareBuilder();
+        result.reservedRange_.Add(values);
+        return this;
+      }
+      public Builder ClearReservedRange() {
+        PrepareBuilder();
+        result.reservedRange_.Clear();
+        return this;
+      }
+
+      public pbc::IPopsicleList<string> ReservedNameList {
+        get { return PrepareBuilder().reservedName_; }
+      }
+      public int ReservedNameCount {
+        get { return result.ReservedNameCount; }
+      }
+      public string GetReservedName(int index) {
+        return result.GetReservedName(index);
+      }
+      public Builder SetReservedName(int index, string value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.reservedName_[index] = value;
+        return this;
+      }
+      public Builder AddReservedName(string value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.reservedName_.Add(value);
+        return this;
+      }
+      public Builder AddRangeReservedName(scg::IEnumerable<string> values) {
+        PrepareBuilder();
+        result.reservedName_.Add(values);
+        return this;
+      }
+      public Builder ClearReservedName() {
+        PrepareBuilder();
+        result.reservedName_.Clear();
+        return this;
+      }
+    }
+    static DescriptorProto() {
+      object.ReferenceEquals(global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.Descriptor, null);
+    }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-  internal sealed partial class FieldDescriptorProto : pb::IMessage<FieldDescriptorProto> {
-    private static readonly pb::MessageParser<FieldDescriptorProto> _parser = new pb::MessageParser<FieldDescriptorProto>(() => new FieldDescriptorProto());
-    public static pb::MessageParser<FieldDescriptorProto> Parser { get { return _parser; } }
+  public sealed partial class FieldDescriptorProto : pb::GeneratedMessage<FieldDescriptorProto, FieldDescriptorProto.Builder> {
+    private FieldDescriptorProto() { }
+    private static readonly FieldDescriptorProto defaultInstance = new FieldDescriptorProto().MakeReadOnly();
+    private static readonly string[] _fieldDescriptorProtoFieldNames = new string[] { "default_value", "extendee", "label", "name", "number", "oneof_index", "options", "type", "type_name" };
+    private static readonly uint[] _fieldDescriptorProtoFieldTags = new uint[] { 58, 18, 32, 10, 24, 72, 66, 40, 50 };
+    public static FieldDescriptorProto DefaultInstance {
+      get { return defaultInstance; }
+    }
 
-    private static readonly string[] _fieldNames = new string[] { "default_value", "extendee", "label", "name", "number", "oneof_index", "options", "type", "type_name" };
-    private static readonly uint[] _fieldTags = new uint[] { 58, 18, 32, 10, 24, 72, 66, 40, 50 };
+    public override FieldDescriptorProto DefaultInstanceForType {
+      get { return DefaultInstance; }
+    }
+
+    protected override FieldDescriptorProto ThisMessage {
+      get { return this; }
+    }
+
     public static pbd::MessageDescriptor Descriptor {
-      get { return global::Google.Protobuf.DescriptorProtos.DescriptorProtoFile.Descriptor.MessageTypes[3]; }
+      get { return global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_FieldDescriptorProto__Descriptor; }
     }
 
-    public pb::FieldAccess.FieldAccessorTable Fields {
-      get { return global::Google.Protobuf.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_FieldDescriptorProto__FieldAccessorTable; }
-    }
-
-    private bool _frozen = false;
-    public bool IsFrozen { get { return _frozen; } }
-
-    public FieldDescriptorProto() {
-      OnConstruction();
-    }
-
-    partial void OnConstruction();
-
-    public FieldDescriptorProto(FieldDescriptorProto other) : this() {
-      name_ = other.name_;
-      number_ = other.number_;
-      label_ = other.label_;
-      type_ = other.type_;
-      typeName_ = other.typeName_;
-      extendee_ = other.extendee_;
-      defaultValue_ = other.defaultValue_;
-      oneofIndex_ = other.oneofIndex_;
-      Options = other.options_ != null ? other.Options.Clone() : null;
-    }
-
-    public FieldDescriptorProto Clone() {
-      return new FieldDescriptorProto(this);
-    }
-
-    public void Freeze() {
-      if (IsFrozen) {
-        return;
-      }
-      _frozen = true;
-      if (options_ != null) Options.Freeze();
-    }
-
-    public const int NameFieldNumber = 1;
-    private string name_ = "";
-    internal string Name {
-      get { return name_; }
-      set {
-        pb::Freezable.CheckMutable(this);
-        name_ = value ?? "";
-      }
-    }
-
-    public const int NumberFieldNumber = 3;
-    private int number_;
-    internal int Number {
-      get { return number_; }
-      set {
-        pb::Freezable.CheckMutable(this);
-        number_ = value;
-      }
-    }
-
-    public const int LabelFieldNumber = 4;
-    private global::Google.Protobuf.DescriptorProtos.FieldDescriptorProto.Types.Label label_ = global::Google.Protobuf.DescriptorProtos.FieldDescriptorProto.Types.Label.LABEL_OPTIONAL;
-    internal global::Google.Protobuf.DescriptorProtos.FieldDescriptorProto.Types.Label Label {
-      get { return label_; }
-      set {
-        pb::Freezable.CheckMutable(this);
-        label_ = value;
-      }
-    }
-
-    public const int TypeFieldNumber = 5;
-    private global::Google.Protobuf.DescriptorProtos.FieldDescriptorProto.Types.Type type_ = global::Google.Protobuf.DescriptorProtos.FieldDescriptorProto.Types.Type.TYPE_DOUBLE;
-    internal global::Google.Protobuf.DescriptorProtos.FieldDescriptorProto.Types.Type Type {
-      get { return type_; }
-      set {
-        pb::Freezable.CheckMutable(this);
-        type_ = value;
-      }
-    }
-
-    public const int TypeNameFieldNumber = 6;
-    private string typeName_ = "";
-    internal string TypeName {
-      get { return typeName_; }
-      set {
-        pb::Freezable.CheckMutable(this);
-        typeName_ = value ?? "";
-      }
-    }
-
-    public const int ExtendeeFieldNumber = 2;
-    private string extendee_ = "";
-    internal string Extendee {
-      get { return extendee_; }
-      set {
-        pb::Freezable.CheckMutable(this);
-        extendee_ = value ?? "";
-      }
-    }
-
-    public const int DefaultValueFieldNumber = 7;
-    private string defaultValue_ = "";
-    internal string DefaultValue {
-      get { return defaultValue_; }
-      set {
-        pb::Freezable.CheckMutable(this);
-        defaultValue_ = value ?? "";
-      }
-    }
-
-    public const int OneofIndexFieldNumber = 9;
-    private int oneofIndex_;
-    internal int OneofIndex {
-      get { return oneofIndex_; }
-      set {
-        pb::Freezable.CheckMutable(this);
-        oneofIndex_ = value;
-      }
-    }
-
-    public const int OptionsFieldNumber = 8;
-    private global::Google.Protobuf.DescriptorProtos.FieldOptions options_;
-    internal global::Google.Protobuf.DescriptorProtos.FieldOptions Options {
-      get { return options_; }
-      set {
-        pb::Freezable.CheckMutable(this);
-        options_ = value;
-      }
-    }
-
-    public override bool Equals(object other) {
-      return Equals(other as FieldDescriptorProto);
-    }
-
-    public bool Equals(FieldDescriptorProto other) {
-      if (ReferenceEquals(other, null)) {
-        return false;
-      }
-      if (ReferenceEquals(other, this)) {
-        return true;
-      }
-      if (Name != other.Name) return false;
-      if (Number != other.Number) return false;
-      if (Label != other.Label) return false;
-      if (Type != other.Type) return false;
-      if (TypeName != other.TypeName) return false;
-      if (Extendee != other.Extendee) return false;
-      if (DefaultValue != other.DefaultValue) return false;
-      if (OneofIndex != other.OneofIndex) return false;
-      if (!object.Equals(Options, other.Options)) return false;
-      return true;
-    }
-
-    public override int GetHashCode() {
-      int hash = 1;
-      if (Name.Length != 0) hash ^= Name.GetHashCode();
-      if (Number != 0) hash ^= Number.GetHashCode();
-      if (Label != global::Google.Protobuf.DescriptorProtos.FieldDescriptorProto.Types.Label.LABEL_OPTIONAL) hash ^= Label.GetHashCode();
-      if (Type != global::Google.Protobuf.DescriptorProtos.FieldDescriptorProto.Types.Type.TYPE_DOUBLE) hash ^= Type.GetHashCode();
-      if (TypeName.Length != 0) hash ^= TypeName.GetHashCode();
-      if (Extendee.Length != 0) hash ^= Extendee.GetHashCode();
-      if (DefaultValue.Length != 0) hash ^= DefaultValue.GetHashCode();
-      if (OneofIndex != 0) hash ^= OneofIndex.GetHashCode();
-      if (options_ != null) hash ^= Options.GetHashCode();
-      return hash;
-    }
-
-    public void WriteTo(pb::CodedOutputStream output) {
-      if (Name.Length != 0) {
-        output.WriteRawTag(10);
-        output.WriteString(Name);
-      }
-      if (Extendee.Length != 0) {
-        output.WriteRawTag(18);
-        output.WriteString(Extendee);
-      }
-      if (Number != 0) {
-        output.WriteRawTag(24);
-        output.WriteInt32(Number);
-      }
-      if (Label != global::Google.Protobuf.DescriptorProtos.FieldDescriptorProto.Types.Label.LABEL_OPTIONAL) {
-        output.WriteRawTag(32);
-        output.WriteEnum((int) Label);
-      }
-      if (Type != global::Google.Protobuf.DescriptorProtos.FieldDescriptorProto.Types.Type.TYPE_DOUBLE) {
-        output.WriteRawTag(40);
-        output.WriteEnum((int) Type);
-      }
-      if (TypeName.Length != 0) {
-        output.WriteRawTag(50);
-        output.WriteString(TypeName);
-      }
-      if (DefaultValue.Length != 0) {
-        output.WriteRawTag(58);
-        output.WriteString(DefaultValue);
-      }
-      if (options_ != null) {
-        output.WriteRawTag(66);
-        output.WriteMessage(Options);
-      }
-      if (OneofIndex != 0) {
-        output.WriteRawTag(72);
-        output.WriteInt32(OneofIndex);
-      }
-    }
-
-    public int CalculateSize() {
-      int size = 0;
-      if (Name.Length != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeStringSize(Name);
-      }
-      if (Number != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeInt32Size(Number);
-      }
-      if (Label != global::Google.Protobuf.DescriptorProtos.FieldDescriptorProto.Types.Label.LABEL_OPTIONAL) {
-        size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) Label);
-      }
-      if (Type != global::Google.Protobuf.DescriptorProtos.FieldDescriptorProto.Types.Type.TYPE_DOUBLE) {
-        size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) Type);
-      }
-      if (TypeName.Length != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeStringSize(TypeName);
-      }
-      if (Extendee.Length != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeStringSize(Extendee);
-      }
-      if (DefaultValue.Length != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeStringSize(DefaultValue);
-      }
-      if (OneofIndex != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeInt32Size(OneofIndex);
-      }
-      if (options_ != null) {
-        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Options);
-      }
-      return size;
-    }
-
-    public void MergeFrom(FieldDescriptorProto other) {
-      if (other == null) {
-        return;
-      }
-      if (other.Name.Length != 0) {
-        Name = other.Name;
-      }
-      if (other.Number != 0) {
-        Number = other.Number;
-      }
-      if (other.Label != global::Google.Protobuf.DescriptorProtos.FieldDescriptorProto.Types.Label.LABEL_OPTIONAL) {
-        Label = other.Label;
-      }
-      if (other.Type != global::Google.Protobuf.DescriptorProtos.FieldDescriptorProto.Types.Type.TYPE_DOUBLE) {
-        Type = other.Type;
-      }
-      if (other.TypeName.Length != 0) {
-        TypeName = other.TypeName;
-      }
-      if (other.Extendee.Length != 0) {
-        Extendee = other.Extendee;
-      }
-      if (other.DefaultValue.Length != 0) {
-        DefaultValue = other.DefaultValue;
-      }
-      if (other.OneofIndex != 0) {
-        OneofIndex = other.OneofIndex;
-      }
-      if (other.options_ != null) {
-        if (options_ == null) {
-          options_ = new global::Google.Protobuf.DescriptorProtos.FieldOptions();
-        }
-        Options.MergeFrom(other.Options);
-      }
-    }
-
-    public void MergeFrom(pb::CodedInputStream input) {
-      uint tag;
-      while (input.ReadTag(out tag)) {
-        switch(tag) {
-          case 0:
-            throw pb::InvalidProtocolBufferException.InvalidTag();
-          default:
-            if (pb::WireFormat.IsEndGroupTag(tag)) {
-              return;
-            }
-            break;
-          case 10: {
-            Name = input.ReadString();
-            break;
-          }
-          case 18: {
-            Extendee = input.ReadString();
-            break;
-          }
-          case 24: {
-            Number = input.ReadInt32();
-            break;
-          }
-          case 32: {
-            label_ = (global::Google.Protobuf.DescriptorProtos.FieldDescriptorProto.Types.Label) input.ReadEnum();
-            break;
-          }
-          case 40: {
-            type_ = (global::Google.Protobuf.DescriptorProtos.FieldDescriptorProto.Types.Type) input.ReadEnum();
-            break;
-          }
-          case 50: {
-            TypeName = input.ReadString();
-            break;
-          }
-          case 58: {
-            DefaultValue = input.ReadString();
-            break;
-          }
-          case 66: {
-            if (options_ == null) {
-              options_ = new global::Google.Protobuf.DescriptorProtos.FieldOptions();
-            }
-            input.ReadMessage(options_);
-            break;
-          }
-          case 72: {
-            OneofIndex = input.ReadInt32();
-            break;
-          }
-        }
-      }
+    protected override pb::FieldAccess.FieldAccessorTable<FieldDescriptorProto, FieldDescriptorProto.Builder> InternalFieldAccessors {
+      get { return global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_FieldDescriptorProto__FieldAccessorTable; }
     }
 
     #region Nested types
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     public static partial class Types {
-      internal enum Type {
+      public enum Type {
         TYPE_DOUBLE = 1,
         TYPE_FLOAT = 2,
         TYPE_INT64 = 3,
@@ -1660,7 +3175,7 @@ namespace Google.Protobuf.DescriptorProtos {
         TYPE_SINT64 = 18,
       }
 
-      internal enum Label {
+      public enum Label {
         LABEL_OPTIONAL = 1,
         LABEL_REQUIRED = 2,
         LABEL_REPEATED = 3,
@@ -1669,1379 +3184,2704 @@ namespace Google.Protobuf.DescriptorProtos {
     }
     #endregion
 
-  }
-
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-  internal sealed partial class OneofDescriptorProto : pb::IMessage<OneofDescriptorProto> {
-    private static readonly pb::MessageParser<OneofDescriptorProto> _parser = new pb::MessageParser<OneofDescriptorProto>(() => new OneofDescriptorProto());
-    public static pb::MessageParser<OneofDescriptorProto> Parser { get { return _parser; } }
-
-    private static readonly string[] _fieldNames = new string[] { "name" };
-    private static readonly uint[] _fieldTags = new uint[] { 10 };
-    public static pbd::MessageDescriptor Descriptor {
-      get { return global::Google.Protobuf.DescriptorProtos.DescriptorProtoFile.Descriptor.MessageTypes[4]; }
-    }
-
-    public pb::FieldAccess.FieldAccessorTable Fields {
-      get { return global::Google.Protobuf.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_OneofDescriptorProto__FieldAccessorTable; }
-    }
-
-    private bool _frozen = false;
-    public bool IsFrozen { get { return _frozen; } }
-
-    public OneofDescriptorProto() {
-      OnConstruction();
-    }
-
-    partial void OnConstruction();
-
-    public OneofDescriptorProto(OneofDescriptorProto other) : this() {
-      name_ = other.name_;
-    }
-
-    public OneofDescriptorProto Clone() {
-      return new OneofDescriptorProto(this);
-    }
-
-    public void Freeze() {
-      if (IsFrozen) {
-        return;
-      }
-      _frozen = true;
-    }
-
     public const int NameFieldNumber = 1;
+    private bool hasName;
     private string name_ = "";
-    internal string Name {
+    public bool HasName {
+      get { return hasName; }
+    }
+    public string Name {
       get { return name_; }
-      set {
-        pb::Freezable.CheckMutable(this);
-        name_ = value ?? "";
-      }
     }
 
-    public override bool Equals(object other) {
-      return Equals(other as OneofDescriptorProto);
+    public const int NumberFieldNumber = 3;
+    private bool hasNumber;
+    private int number_;
+    public bool HasNumber {
+      get { return hasNumber; }
+    }
+    public int Number {
+      get { return number_; }
     }
 
-    public bool Equals(OneofDescriptorProto other) {
-      if (ReferenceEquals(other, null)) {
-        return false;
-      }
-      if (ReferenceEquals(other, this)) {
+    public const int LabelFieldNumber = 4;
+    private bool hasLabel;
+    private global::Google.ProtocolBuffers.DescriptorProtos.FieldDescriptorProto.Types.Label label_ = global::Google.ProtocolBuffers.DescriptorProtos.FieldDescriptorProto.Types.Label.LABEL_OPTIONAL;
+    public bool HasLabel {
+      get { return hasLabel; }
+    }
+    public global::Google.ProtocolBuffers.DescriptorProtos.FieldDescriptorProto.Types.Label Label {
+      get { return label_; }
+    }
+
+    public const int TypeFieldNumber = 5;
+    private bool hasType;
+    private global::Google.ProtocolBuffers.DescriptorProtos.FieldDescriptorProto.Types.Type type_ = global::Google.ProtocolBuffers.DescriptorProtos.FieldDescriptorProto.Types.Type.TYPE_DOUBLE;
+    public bool HasType {
+      get { return hasType; }
+    }
+    public global::Google.ProtocolBuffers.DescriptorProtos.FieldDescriptorProto.Types.Type Type {
+      get { return type_; }
+    }
+
+    public const int TypeNameFieldNumber = 6;
+    private bool hasTypeName;
+    private string typeName_ = "";
+    public bool HasTypeName {
+      get { return hasTypeName; }
+    }
+    public string TypeName {
+      get { return typeName_; }
+    }
+
+    public const int ExtendeeFieldNumber = 2;
+    private bool hasExtendee;
+    private string extendee_ = "";
+    public bool HasExtendee {
+      get { return hasExtendee; }
+    }
+    public string Extendee {
+      get { return extendee_; }
+    }
+
+    public const int DefaultValueFieldNumber = 7;
+    private bool hasDefaultValue;
+    private string defaultValue_ = "";
+    public bool HasDefaultValue {
+      get { return hasDefaultValue; }
+    }
+    public string DefaultValue {
+      get { return defaultValue_; }
+    }
+
+    public const int OneofIndexFieldNumber = 9;
+    private bool hasOneofIndex;
+    private int oneofIndex_;
+    public bool HasOneofIndex {
+      get { return hasOneofIndex; }
+    }
+    public int OneofIndex {
+      get { return oneofIndex_; }
+    }
+
+    public const int OptionsFieldNumber = 8;
+    private bool hasOptions;
+    private global::Google.ProtocolBuffers.DescriptorProtos.FieldOptions options_;
+    public bool HasOptions {
+      get { return hasOptions; }
+    }
+    public global::Google.ProtocolBuffers.DescriptorProtos.FieldOptions Options {
+      get { return options_ ?? global::Google.ProtocolBuffers.DescriptorProtos.FieldOptions.DefaultInstance; }
+    }
+
+    public override bool IsInitialized {
+      get {
+        if (HasOptions) {
+          if (!Options.IsInitialized) return false;
+        }
         return true;
       }
-      if (Name != other.Name) return false;
-      return true;
     }
 
-    public override int GetHashCode() {
-      int hash = 1;
-      if (Name.Length != 0) hash ^= Name.GetHashCode();
-      return hash;
+    public override void WriteTo(pb::ICodedOutputStream output) {
+      CalcSerializedSize();
+      string[] field_names = _fieldDescriptorProtoFieldNames;
+      if (hasName) {
+        output.WriteString(1, field_names[3], Name);
+      }
+      if (hasExtendee) {
+        output.WriteString(2, field_names[1], Extendee);
+      }
+      if (hasNumber) {
+        output.WriteInt32(3, field_names[4], Number);
+      }
+      if (hasLabel) {
+        output.WriteEnum(4, field_names[2], (int) Label, Label);
+      }
+      if (hasType) {
+        output.WriteEnum(5, field_names[7], (int) Type, Type);
+      }
+      if (hasTypeName) {
+        output.WriteString(6, field_names[8], TypeName);
+      }
+      if (hasDefaultValue) {
+        output.WriteString(7, field_names[0], DefaultValue);
+      }
+      if (hasOptions) {
+        output.WriteMessage(8, field_names[6], Options);
+      }
+      if (hasOneofIndex) {
+        output.WriteInt32(9, field_names[5], OneofIndex);
+      }
+      UnknownFields.WriteTo(output);
     }
 
-    public void WriteTo(pb::CodedOutputStream output) {
-      if (Name.Length != 0) {
-        output.WriteRawTag(10);
-        output.WriteString(Name);
+    private int memoizedSerializedSize = -1;
+    public override int SerializedSize {
+      get {
+        int size = memoizedSerializedSize;
+        if (size != -1) return size;
+        return CalcSerializedSize();
       }
     }
 
-    public int CalculateSize() {
-      int size = 0;
-      if (Name.Length != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeStringSize(Name);
+    private int CalcSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (hasName) {
+        size += pb::CodedOutputStream.ComputeStringSize(1, Name);
       }
+      if (hasNumber) {
+        size += pb::CodedOutputStream.ComputeInt32Size(3, Number);
+      }
+      if (hasLabel) {
+        size += pb::CodedOutputStream.ComputeEnumSize(4, (int) Label);
+      }
+      if (hasType) {
+        size += pb::CodedOutputStream.ComputeEnumSize(5, (int) Type);
+      }
+      if (hasTypeName) {
+        size += pb::CodedOutputStream.ComputeStringSize(6, TypeName);
+      }
+      if (hasExtendee) {
+        size += pb::CodedOutputStream.ComputeStringSize(2, Extendee);
+      }
+      if (hasDefaultValue) {
+        size += pb::CodedOutputStream.ComputeStringSize(7, DefaultValue);
+      }
+      if (hasOneofIndex) {
+        size += pb::CodedOutputStream.ComputeInt32Size(9, OneofIndex);
+      }
+      if (hasOptions) {
+        size += pb::CodedOutputStream.ComputeMessageSize(8, Options);
+      }
+      size += UnknownFields.SerializedSize;
+      memoizedSerializedSize = size;
       return size;
     }
-
-    public void MergeFrom(OneofDescriptorProto other) {
-      if (other == null) {
-        return;
-      }
-      if (other.Name.Length != 0) {
-        Name = other.Name;
-      }
+    public static FieldDescriptorProto ParseFrom(pb::ByteString data) {
+      return ((Builder) CreateBuilder().MergeFrom(data)).BuildParsed();
+    }
+    public static FieldDescriptorProto ParseFrom(pb::ByteString data, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(data, extensionRegistry)).BuildParsed();
+    }
+    public static FieldDescriptorProto ParseFrom(byte[] data) {
+      return ((Builder) CreateBuilder().MergeFrom(data)).BuildParsed();
+    }
+    public static FieldDescriptorProto ParseFrom(byte[] data, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(data, extensionRegistry)).BuildParsed();
+    }
+    public static FieldDescriptorProto ParseFrom(global::System.IO.Stream input) {
+      return ((Builder) CreateBuilder().MergeFrom(input)).BuildParsed();
+    }
+    public static FieldDescriptorProto ParseFrom(global::System.IO.Stream input, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(input, extensionRegistry)).BuildParsed();
+    }
+    public static FieldDescriptorProto ParseDelimitedFrom(global::System.IO.Stream input) {
+      return CreateBuilder().MergeDelimitedFrom(input).BuildParsed();
+    }
+    public static FieldDescriptorProto ParseDelimitedFrom(global::System.IO.Stream input, pb::ExtensionRegistry extensionRegistry) {
+      return CreateBuilder().MergeDelimitedFrom(input, extensionRegistry).BuildParsed();
+    }
+    public static FieldDescriptorProto ParseFrom(pb::ICodedInputStream input) {
+      return ((Builder) CreateBuilder().MergeFrom(input)).BuildParsed();
+    }
+    public static FieldDescriptorProto ParseFrom(pb::ICodedInputStream input, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(input, extensionRegistry)).BuildParsed();
+    }
+    private FieldDescriptorProto MakeReadOnly() {
+      return this;
     }
 
-    public void MergeFrom(pb::CodedInputStream input) {
-      uint tag;
-      while (input.ReadTag(out tag)) {
-        switch(tag) {
-          case 0:
-            throw pb::InvalidProtocolBufferException.InvalidTag();
-          default:
-            if (pb::WireFormat.IsEndGroupTag(tag)) {
-              return;
-            }
-            break;
-          case 10: {
-            Name = input.ReadString();
-            break;
-          }
+    public static Builder CreateBuilder() { return new Builder(); }
+    public override Builder ToBuilder() { return CreateBuilder(this); }
+    public override Builder CreateBuilderForType() { return new Builder(); }
+    public static Builder CreateBuilder(FieldDescriptorProto prototype) {
+      return new Builder(prototype);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+    public sealed partial class Builder : pb::GeneratedBuilder<FieldDescriptorProto, Builder> {
+      protected override Builder ThisBuilder {
+        get { return this; }
+      }
+      public Builder() {
+        result = DefaultInstance;
+        resultIsReadOnly = true;
+      }
+      internal Builder(FieldDescriptorProto cloneFrom) {
+        result = cloneFrom;
+        resultIsReadOnly = true;
+      }
+
+      private bool resultIsReadOnly;
+      private FieldDescriptorProto result;
+
+      private FieldDescriptorProto PrepareBuilder() {
+        if (resultIsReadOnly) {
+          FieldDescriptorProto original = result;
+          result = new FieldDescriptorProto();
+          resultIsReadOnly = false;
+          MergeFrom(original);
+        }
+        return result;
+      }
+
+      public override bool IsInitialized {
+        get { return result.IsInitialized; }
+      }
+
+      protected override FieldDescriptorProto MessageBeingBuilt {
+        get { return PrepareBuilder(); }
+      }
+
+      public override Builder Clear() {
+        result = DefaultInstance;
+        resultIsReadOnly = true;
+        return this;
+      }
+
+      public override Builder Clone() {
+        if (resultIsReadOnly) {
+          return new Builder(result);
+        } else {
+          return new Builder().MergeFrom(result);
         }
       }
-    }
 
+      public override pbd::MessageDescriptor DescriptorForType {
+        get { return global::Google.ProtocolBuffers.DescriptorProtos.FieldDescriptorProto.Descriptor; }
+      }
+
+      public override FieldDescriptorProto DefaultInstanceForType {
+        get { return global::Google.ProtocolBuffers.DescriptorProtos.FieldDescriptorProto.DefaultInstance; }
+      }
+
+      public override FieldDescriptorProto BuildPartial() {
+        if (resultIsReadOnly) {
+          return result;
+        }
+        resultIsReadOnly = true;
+        return result.MakeReadOnly();
+      }
+
+      public override Builder MergeFrom(pb::IMessage other) {
+        if (other is FieldDescriptorProto) {
+          return MergeFrom((FieldDescriptorProto) other);
+        } else {
+          base.MergeFrom(other);
+          return this;
+        }
+      }
+
+      public override Builder MergeFrom(FieldDescriptorProto other) {
+        if (other == global::Google.ProtocolBuffers.DescriptorProtos.FieldDescriptorProto.DefaultInstance) return this;
+        PrepareBuilder();
+        if (other.HasName) {
+          Name = other.Name;
+        }
+        if (other.HasNumber) {
+          Number = other.Number;
+        }
+        if (other.HasLabel) {
+          Label = other.Label;
+        }
+        if (other.HasType) {
+          Type = other.Type;
+        }
+        if (other.HasTypeName) {
+          TypeName = other.TypeName;
+        }
+        if (other.HasExtendee) {
+          Extendee = other.Extendee;
+        }
+        if (other.HasDefaultValue) {
+          DefaultValue = other.DefaultValue;
+        }
+        if (other.HasOneofIndex) {
+          OneofIndex = other.OneofIndex;
+        }
+        if (other.HasOptions) {
+          MergeOptions(other.Options);
+        }
+        this.MergeUnknownFields(other.UnknownFields);
+        return this;
+      }
+
+      public override Builder MergeFrom(pb::ICodedInputStream input) {
+        return MergeFrom(input, pb::ExtensionRegistry.Empty);
+      }
+
+      public override Builder MergeFrom(pb::ICodedInputStream input, pb::ExtensionRegistry extensionRegistry) {
+        PrepareBuilder();
+        pb::UnknownFieldSet.Builder unknownFields = null;
+        uint tag;
+        string field_name;
+        while (input.ReadTag(out tag, out field_name)) {
+          if(tag == 0 && field_name != null) {
+            int field_ordinal = global::System.Array.BinarySearch(_fieldDescriptorProtoFieldNames, field_name, global::System.StringComparer.Ordinal);
+            if(field_ordinal >= 0)
+              tag = _fieldDescriptorProtoFieldTags[field_ordinal];
+            else {
+              if (unknownFields == null) {
+                unknownFields = pb::UnknownFieldSet.CreateBuilder(this.UnknownFields);
+              }
+              ParseUnknownField(input, unknownFields, extensionRegistry, tag, field_name);
+              continue;
+            }
+          }
+          switch (tag) {
+            case 0: {
+              throw pb::InvalidProtocolBufferException.InvalidTag();
+            }
+            default: {
+              if (pb::WireFormat.IsEndGroupTag(tag)) {
+                if (unknownFields != null) {
+                  this.UnknownFields = unknownFields.Build();
+                }
+                return this;
+              }
+              if (unknownFields == null) {
+                unknownFields = pb::UnknownFieldSet.CreateBuilder(this.UnknownFields);
+              }
+              ParseUnknownField(input, unknownFields, extensionRegistry, tag, field_name);
+              break;
+            }
+            case 10: {
+              result.hasName = input.ReadString(ref result.name_);
+              break;
+            }
+            case 18: {
+              result.hasExtendee = input.ReadString(ref result.extendee_);
+              break;
+            }
+            case 24: {
+              result.hasNumber = input.ReadInt32(ref result.number_);
+              break;
+            }
+            case 32: {
+              object unknown;
+              if(input.ReadEnum(ref result.label_, out unknown)) {
+                result.hasLabel = true;
+              } else if(unknown is int) {
+                if (unknownFields == null) {
+                  unknownFields = pb::UnknownFieldSet.CreateBuilder(this.UnknownFields);
+                }
+                unknownFields.MergeVarintField(4, (ulong)(int)unknown);
+              }
+              break;
+            }
+            case 40: {
+              object unknown;
+              if(input.ReadEnum(ref result.type_, out unknown)) {
+                result.hasType = true;
+              } else if(unknown is int) {
+                if (unknownFields == null) {
+                  unknownFields = pb::UnknownFieldSet.CreateBuilder(this.UnknownFields);
+                }
+                unknownFields.MergeVarintField(5, (ulong)(int)unknown);
+              }
+              break;
+            }
+            case 50: {
+              result.hasTypeName = input.ReadString(ref result.typeName_);
+              break;
+            }
+            case 58: {
+              result.hasDefaultValue = input.ReadString(ref result.defaultValue_);
+              break;
+            }
+            case 66: {
+              global::Google.ProtocolBuffers.DescriptorProtos.FieldOptions.Builder subBuilder = global::Google.ProtocolBuffers.DescriptorProtos.FieldOptions.CreateBuilder();
+              if (result.hasOptions) {
+                subBuilder.MergeFrom(Options);
+              }
+              input.ReadMessage(subBuilder, extensionRegistry);
+              Options = subBuilder.BuildPartial();
+              break;
+            }
+            case 72: {
+              result.hasOneofIndex = input.ReadInt32(ref result.oneofIndex_);
+              break;
+            }
+          }
+        }
+
+        if (unknownFields != null) {
+          this.UnknownFields = unknownFields.Build();
+        }
+        return this;
+      }
+
+
+      public bool HasName {
+        get { return result.hasName; }
+      }
+      public string Name {
+        get { return result.Name; }
+        set { SetName(value); }
+      }
+      public Builder SetName(string value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.hasName = true;
+        result.name_ = value;
+        return this;
+      }
+      public Builder ClearName() {
+        PrepareBuilder();
+        result.hasName = false;
+        result.name_ = "";
+        return this;
+      }
+
+      public bool HasNumber {
+        get { return result.hasNumber; }
+      }
+      public int Number {
+        get { return result.Number; }
+        set { SetNumber(value); }
+      }
+      public Builder SetNumber(int value) {
+        PrepareBuilder();
+        result.hasNumber = true;
+        result.number_ = value;
+        return this;
+      }
+      public Builder ClearNumber() {
+        PrepareBuilder();
+        result.hasNumber = false;
+        result.number_ = 0;
+        return this;
+      }
+
+      public bool HasLabel {
+        get { return result.hasLabel; }
+      }
+      public global::Google.ProtocolBuffers.DescriptorProtos.FieldDescriptorProto.Types.Label Label {
+        get { return result.Label; }
+        set { SetLabel(value); }
+      }
+      public Builder SetLabel(global::Google.ProtocolBuffers.DescriptorProtos.FieldDescriptorProto.Types.Label value) {
+        PrepareBuilder();
+        result.hasLabel = true;
+        result.label_ = value;
+        return this;
+      }
+      public Builder ClearLabel() {
+        PrepareBuilder();
+        result.hasLabel = false;
+        result.label_ = global::Google.ProtocolBuffers.DescriptorProtos.FieldDescriptorProto.Types.Label.LABEL_OPTIONAL;
+        return this;
+      }
+
+      public bool HasType {
+        get { return result.hasType; }
+      }
+      public global::Google.ProtocolBuffers.DescriptorProtos.FieldDescriptorProto.Types.Type Type {
+        get { return result.Type; }
+        set { SetType(value); }
+      }
+      public Builder SetType(global::Google.ProtocolBuffers.DescriptorProtos.FieldDescriptorProto.Types.Type value) {
+        PrepareBuilder();
+        result.hasType = true;
+        result.type_ = value;
+        return this;
+      }
+      public Builder ClearType() {
+        PrepareBuilder();
+        result.hasType = false;
+        result.type_ = global::Google.ProtocolBuffers.DescriptorProtos.FieldDescriptorProto.Types.Type.TYPE_DOUBLE;
+        return this;
+      }
+
+      public bool HasTypeName {
+        get { return result.hasTypeName; }
+      }
+      public string TypeName {
+        get { return result.TypeName; }
+        set { SetTypeName(value); }
+      }
+      public Builder SetTypeName(string value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.hasTypeName = true;
+        result.typeName_ = value;
+        return this;
+      }
+      public Builder ClearTypeName() {
+        PrepareBuilder();
+        result.hasTypeName = false;
+        result.typeName_ = "";
+        return this;
+      }
+
+      public bool HasExtendee {
+        get { return result.hasExtendee; }
+      }
+      public string Extendee {
+        get { return result.Extendee; }
+        set { SetExtendee(value); }
+      }
+      public Builder SetExtendee(string value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.hasExtendee = true;
+        result.extendee_ = value;
+        return this;
+      }
+      public Builder ClearExtendee() {
+        PrepareBuilder();
+        result.hasExtendee = false;
+        result.extendee_ = "";
+        return this;
+      }
+
+      public bool HasDefaultValue {
+        get { return result.hasDefaultValue; }
+      }
+      public string DefaultValue {
+        get { return result.DefaultValue; }
+        set { SetDefaultValue(value); }
+      }
+      public Builder SetDefaultValue(string value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.hasDefaultValue = true;
+        result.defaultValue_ = value;
+        return this;
+      }
+      public Builder ClearDefaultValue() {
+        PrepareBuilder();
+        result.hasDefaultValue = false;
+        result.defaultValue_ = "";
+        return this;
+      }
+
+      public bool HasOneofIndex {
+        get { return result.hasOneofIndex; }
+      }
+      public int OneofIndex {
+        get { return result.OneofIndex; }
+        set { SetOneofIndex(value); }
+      }
+      public Builder SetOneofIndex(int value) {
+        PrepareBuilder();
+        result.hasOneofIndex = true;
+        result.oneofIndex_ = value;
+        return this;
+      }
+      public Builder ClearOneofIndex() {
+        PrepareBuilder();
+        result.hasOneofIndex = false;
+        result.oneofIndex_ = 0;
+        return this;
+      }
+
+      public bool HasOptions {
+       get { return result.hasOptions; }
+      }
+      public global::Google.ProtocolBuffers.DescriptorProtos.FieldOptions Options {
+        get { return result.Options; }
+        set { SetOptions(value); }
+      }
+      public Builder SetOptions(global::Google.ProtocolBuffers.DescriptorProtos.FieldOptions value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.hasOptions = true;
+        result.options_ = value;
+        return this;
+      }
+      public Builder SetOptions(global::Google.ProtocolBuffers.DescriptorProtos.FieldOptions.Builder builderForValue) {
+        pb::ThrowHelper.ThrowIfNull(builderForValue, "builderForValue");
+        PrepareBuilder();
+        result.hasOptions = true;
+        result.options_ = builderForValue.Build();
+        return this;
+      }
+      public Builder MergeOptions(global::Google.ProtocolBuffers.DescriptorProtos.FieldOptions value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        if (result.hasOptions &&
+            result.options_ != global::Google.ProtocolBuffers.DescriptorProtos.FieldOptions.DefaultInstance) {
+            result.options_ = global::Google.ProtocolBuffers.DescriptorProtos.FieldOptions.CreateBuilder(result.options_).MergeFrom(value).BuildPartial();
+        } else {
+          result.options_ = value;
+        }
+        result.hasOptions = true;
+        return this;
+      }
+      public Builder ClearOptions() {
+        PrepareBuilder();
+        result.hasOptions = false;
+        result.options_ = null;
+        return this;
+      }
+    }
+    static FieldDescriptorProto() {
+      object.ReferenceEquals(global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.Descriptor, null);
+    }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-  internal sealed partial class EnumDescriptorProto : pb::IMessage<EnumDescriptorProto> {
-    private static readonly pb::MessageParser<EnumDescriptorProto> _parser = new pb::MessageParser<EnumDescriptorProto>(() => new EnumDescriptorProto());
-    public static pb::MessageParser<EnumDescriptorProto> Parser { get { return _parser; } }
+  public sealed partial class OneofDescriptorProto : pb::GeneratedMessage<OneofDescriptorProto, OneofDescriptorProto.Builder> {
+    private OneofDescriptorProto() { }
+    private static readonly OneofDescriptorProto defaultInstance = new OneofDescriptorProto().MakeReadOnly();
+    private static readonly string[] _oneofDescriptorProtoFieldNames = new string[] { "name" };
+    private static readonly uint[] _oneofDescriptorProtoFieldTags = new uint[] { 10 };
+    public static OneofDescriptorProto DefaultInstance {
+      get { return defaultInstance; }
+    }
 
-    private static readonly string[] _fieldNames = new string[] { "name", "options", "value" };
-    private static readonly uint[] _fieldTags = new uint[] { 10, 26, 18 };
+    public override OneofDescriptorProto DefaultInstanceForType {
+      get { return DefaultInstance; }
+    }
+
+    protected override OneofDescriptorProto ThisMessage {
+      get { return this; }
+    }
+
     public static pbd::MessageDescriptor Descriptor {
-      get { return global::Google.Protobuf.DescriptorProtos.DescriptorProtoFile.Descriptor.MessageTypes[5]; }
+      get { return global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_OneofDescriptorProto__Descriptor; }
     }
 
-    public pb::FieldAccess.FieldAccessorTable Fields {
-      get { return global::Google.Protobuf.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_EnumDescriptorProto__FieldAccessorTable; }
-    }
-
-    private bool _frozen = false;
-    public bool IsFrozen { get { return _frozen; } }
-
-    public EnumDescriptorProto() {
-      OnConstruction();
-    }
-
-    partial void OnConstruction();
-
-    public EnumDescriptorProto(EnumDescriptorProto other) : this() {
-      name_ = other.name_;
-      value_ = other.value_.Clone();
-      Options = other.options_ != null ? other.Options.Clone() : null;
-    }
-
-    public EnumDescriptorProto Clone() {
-      return new EnumDescriptorProto(this);
-    }
-
-    public void Freeze() {
-      if (IsFrozen) {
-        return;
-      }
-      _frozen = true;
-      value_.Freeze();
-      if (options_ != null) Options.Freeze();
+    protected override pb::FieldAccess.FieldAccessorTable<OneofDescriptorProto, OneofDescriptorProto.Builder> InternalFieldAccessors {
+      get { return global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_OneofDescriptorProto__FieldAccessorTable; }
     }
 
     public const int NameFieldNumber = 1;
+    private bool hasName;
     private string name_ = "";
-    internal string Name {
+    public bool HasName {
+      get { return hasName; }
+    }
+    public string Name {
       get { return name_; }
-      set {
-        pb::Freezable.CheckMutable(this);
-        name_ = value ?? "";
+    }
+
+    public override bool IsInitialized {
+      get {
+        return true;
       }
+    }
+
+    public override void WriteTo(pb::ICodedOutputStream output) {
+      CalcSerializedSize();
+      string[] field_names = _oneofDescriptorProtoFieldNames;
+      if (hasName) {
+        output.WriteString(1, field_names[0], Name);
+      }
+      UnknownFields.WriteTo(output);
+    }
+
+    private int memoizedSerializedSize = -1;
+    public override int SerializedSize {
+      get {
+        int size = memoizedSerializedSize;
+        if (size != -1) return size;
+        return CalcSerializedSize();
+      }
+    }
+
+    private int CalcSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (hasName) {
+        size += pb::CodedOutputStream.ComputeStringSize(1, Name);
+      }
+      size += UnknownFields.SerializedSize;
+      memoizedSerializedSize = size;
+      return size;
+    }
+    public static OneofDescriptorProto ParseFrom(pb::ByteString data) {
+      return ((Builder) CreateBuilder().MergeFrom(data)).BuildParsed();
+    }
+    public static OneofDescriptorProto ParseFrom(pb::ByteString data, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(data, extensionRegistry)).BuildParsed();
+    }
+    public static OneofDescriptorProto ParseFrom(byte[] data) {
+      return ((Builder) CreateBuilder().MergeFrom(data)).BuildParsed();
+    }
+    public static OneofDescriptorProto ParseFrom(byte[] data, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(data, extensionRegistry)).BuildParsed();
+    }
+    public static OneofDescriptorProto ParseFrom(global::System.IO.Stream input) {
+      return ((Builder) CreateBuilder().MergeFrom(input)).BuildParsed();
+    }
+    public static OneofDescriptorProto ParseFrom(global::System.IO.Stream input, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(input, extensionRegistry)).BuildParsed();
+    }
+    public static OneofDescriptorProto ParseDelimitedFrom(global::System.IO.Stream input) {
+      return CreateBuilder().MergeDelimitedFrom(input).BuildParsed();
+    }
+    public static OneofDescriptorProto ParseDelimitedFrom(global::System.IO.Stream input, pb::ExtensionRegistry extensionRegistry) {
+      return CreateBuilder().MergeDelimitedFrom(input, extensionRegistry).BuildParsed();
+    }
+    public static OneofDescriptorProto ParseFrom(pb::ICodedInputStream input) {
+      return ((Builder) CreateBuilder().MergeFrom(input)).BuildParsed();
+    }
+    public static OneofDescriptorProto ParseFrom(pb::ICodedInputStream input, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(input, extensionRegistry)).BuildParsed();
+    }
+    private OneofDescriptorProto MakeReadOnly() {
+      return this;
+    }
+
+    public static Builder CreateBuilder() { return new Builder(); }
+    public override Builder ToBuilder() { return CreateBuilder(this); }
+    public override Builder CreateBuilderForType() { return new Builder(); }
+    public static Builder CreateBuilder(OneofDescriptorProto prototype) {
+      return new Builder(prototype);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+    public sealed partial class Builder : pb::GeneratedBuilder<OneofDescriptorProto, Builder> {
+      protected override Builder ThisBuilder {
+        get { return this; }
+      }
+      public Builder() {
+        result = DefaultInstance;
+        resultIsReadOnly = true;
+      }
+      internal Builder(OneofDescriptorProto cloneFrom) {
+        result = cloneFrom;
+        resultIsReadOnly = true;
+      }
+
+      private bool resultIsReadOnly;
+      private OneofDescriptorProto result;
+
+      private OneofDescriptorProto PrepareBuilder() {
+        if (resultIsReadOnly) {
+          OneofDescriptorProto original = result;
+          result = new OneofDescriptorProto();
+          resultIsReadOnly = false;
+          MergeFrom(original);
+        }
+        return result;
+      }
+
+      public override bool IsInitialized {
+        get { return result.IsInitialized; }
+      }
+
+      protected override OneofDescriptorProto MessageBeingBuilt {
+        get { return PrepareBuilder(); }
+      }
+
+      public override Builder Clear() {
+        result = DefaultInstance;
+        resultIsReadOnly = true;
+        return this;
+      }
+
+      public override Builder Clone() {
+        if (resultIsReadOnly) {
+          return new Builder(result);
+        } else {
+          return new Builder().MergeFrom(result);
+        }
+      }
+
+      public override pbd::MessageDescriptor DescriptorForType {
+        get { return global::Google.ProtocolBuffers.DescriptorProtos.OneofDescriptorProto.Descriptor; }
+      }
+
+      public override OneofDescriptorProto DefaultInstanceForType {
+        get { return global::Google.ProtocolBuffers.DescriptorProtos.OneofDescriptorProto.DefaultInstance; }
+      }
+
+      public override OneofDescriptorProto BuildPartial() {
+        if (resultIsReadOnly) {
+          return result;
+        }
+        resultIsReadOnly = true;
+        return result.MakeReadOnly();
+      }
+
+      public override Builder MergeFrom(pb::IMessage other) {
+        if (other is OneofDescriptorProto) {
+          return MergeFrom((OneofDescriptorProto) other);
+        } else {
+          base.MergeFrom(other);
+          return this;
+        }
+      }
+
+      public override Builder MergeFrom(OneofDescriptorProto other) {
+        if (other == global::Google.ProtocolBuffers.DescriptorProtos.OneofDescriptorProto.DefaultInstance) return this;
+        PrepareBuilder();
+        if (other.HasName) {
+          Name = other.Name;
+        }
+        this.MergeUnknownFields(other.UnknownFields);
+        return this;
+      }
+
+      public override Builder MergeFrom(pb::ICodedInputStream input) {
+        return MergeFrom(input, pb::ExtensionRegistry.Empty);
+      }
+
+      public override Builder MergeFrom(pb::ICodedInputStream input, pb::ExtensionRegistry extensionRegistry) {
+        PrepareBuilder();
+        pb::UnknownFieldSet.Builder unknownFields = null;
+        uint tag;
+        string field_name;
+        while (input.ReadTag(out tag, out field_name)) {
+          if(tag == 0 && field_name != null) {
+            int field_ordinal = global::System.Array.BinarySearch(_oneofDescriptorProtoFieldNames, field_name, global::System.StringComparer.Ordinal);
+            if(field_ordinal >= 0)
+              tag = _oneofDescriptorProtoFieldTags[field_ordinal];
+            else {
+              if (unknownFields == null) {
+                unknownFields = pb::UnknownFieldSet.CreateBuilder(this.UnknownFields);
+              }
+              ParseUnknownField(input, unknownFields, extensionRegistry, tag, field_name);
+              continue;
+            }
+          }
+          switch (tag) {
+            case 0: {
+              throw pb::InvalidProtocolBufferException.InvalidTag();
+            }
+            default: {
+              if (pb::WireFormat.IsEndGroupTag(tag)) {
+                if (unknownFields != null) {
+                  this.UnknownFields = unknownFields.Build();
+                }
+                return this;
+              }
+              if (unknownFields == null) {
+                unknownFields = pb::UnknownFieldSet.CreateBuilder(this.UnknownFields);
+              }
+              ParseUnknownField(input, unknownFields, extensionRegistry, tag, field_name);
+              break;
+            }
+            case 10: {
+              result.hasName = input.ReadString(ref result.name_);
+              break;
+            }
+          }
+        }
+
+        if (unknownFields != null) {
+          this.UnknownFields = unknownFields.Build();
+        }
+        return this;
+      }
+
+
+      public bool HasName {
+        get { return result.hasName; }
+      }
+      public string Name {
+        get { return result.Name; }
+        set { SetName(value); }
+      }
+      public Builder SetName(string value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.hasName = true;
+        result.name_ = value;
+        return this;
+      }
+      public Builder ClearName() {
+        PrepareBuilder();
+        result.hasName = false;
+        result.name_ = "";
+        return this;
+      }
+    }
+    static OneofDescriptorProto() {
+      object.ReferenceEquals(global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.Descriptor, null);
+    }
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+  public sealed partial class EnumDescriptorProto : pb::GeneratedMessage<EnumDescriptorProto, EnumDescriptorProto.Builder> {
+    private EnumDescriptorProto() { }
+    private static readonly EnumDescriptorProto defaultInstance = new EnumDescriptorProto().MakeReadOnly();
+    private static readonly string[] _enumDescriptorProtoFieldNames = new string[] { "name", "options", "value" };
+    private static readonly uint[] _enumDescriptorProtoFieldTags = new uint[] { 10, 26, 18 };
+    public static EnumDescriptorProto DefaultInstance {
+      get { return defaultInstance; }
+    }
+
+    public override EnumDescriptorProto DefaultInstanceForType {
+      get { return DefaultInstance; }
+    }
+
+    protected override EnumDescriptorProto ThisMessage {
+      get { return this; }
+    }
+
+    public static pbd::MessageDescriptor Descriptor {
+      get { return global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_EnumDescriptorProto__Descriptor; }
+    }
+
+    protected override pb::FieldAccess.FieldAccessorTable<EnumDescriptorProto, EnumDescriptorProto.Builder> InternalFieldAccessors {
+      get { return global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_EnumDescriptorProto__FieldAccessorTable; }
+    }
+
+    public const int NameFieldNumber = 1;
+    private bool hasName;
+    private string name_ = "";
+    public bool HasName {
+      get { return hasName; }
+    }
+    public string Name {
+      get { return name_; }
     }
 
     public const int ValueFieldNumber = 2;
-    private static readonly pb::FieldCodec<global::Google.Protobuf.DescriptorProtos.EnumValueDescriptorProto> _repeated_value_codec
-        = pb::FieldCodec.ForMessage(18, global::Google.Protobuf.DescriptorProtos.EnumValueDescriptorProto.Parser);
-    private readonly pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.EnumValueDescriptorProto> value_ = new pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.EnumValueDescriptorProto>();
-    internal pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.EnumValueDescriptorProto> Value {
+    private pbc::PopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.EnumValueDescriptorProto> value_ = new pbc::PopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.EnumValueDescriptorProto>();
+    public scg::IList<global::Google.ProtocolBuffers.DescriptorProtos.EnumValueDescriptorProto> ValueList {
       get { return value_; }
+    }
+    public int ValueCount {
+      get { return value_.Count; }
+    }
+    public global::Google.ProtocolBuffers.DescriptorProtos.EnumValueDescriptorProto GetValue(int index) {
+      return value_[index];
     }
 
     public const int OptionsFieldNumber = 3;
-    private global::Google.Protobuf.DescriptorProtos.EnumOptions options_;
-    internal global::Google.Protobuf.DescriptorProtos.EnumOptions Options {
-      get { return options_; }
-      set {
-        pb::Freezable.CheckMutable(this);
-        options_ = value;
-      }
+    private bool hasOptions;
+    private global::Google.ProtocolBuffers.DescriptorProtos.EnumOptions options_;
+    public bool HasOptions {
+      get { return hasOptions; }
+    }
+    public global::Google.ProtocolBuffers.DescriptorProtos.EnumOptions Options {
+      get { return options_ ?? global::Google.ProtocolBuffers.DescriptorProtos.EnumOptions.DefaultInstance; }
     }
 
-    public override bool Equals(object other) {
-      return Equals(other as EnumDescriptorProto);
-    }
-
-    public bool Equals(EnumDescriptorProto other) {
-      if (ReferenceEquals(other, null)) {
-        return false;
-      }
-      if (ReferenceEquals(other, this)) {
+    public override bool IsInitialized {
+      get {
+        foreach (global::Google.ProtocolBuffers.DescriptorProtos.EnumValueDescriptorProto element in ValueList) {
+          if (!element.IsInitialized) return false;
+        }
+        if (HasOptions) {
+          if (!Options.IsInitialized) return false;
+        }
         return true;
       }
-      if (Name != other.Name) return false;
-      if(!value_.Equals(other.value_)) return false;
-      if (!object.Equals(Options, other.Options)) return false;
-      return true;
     }
 
-    public override int GetHashCode() {
-      int hash = 1;
-      if (Name.Length != 0) hash ^= Name.GetHashCode();
-      hash ^= value_.GetHashCode();
-      if (options_ != null) hash ^= Options.GetHashCode();
-      return hash;
+    public override void WriteTo(pb::ICodedOutputStream output) {
+      CalcSerializedSize();
+      string[] field_names = _enumDescriptorProtoFieldNames;
+      if (hasName) {
+        output.WriteString(1, field_names[0], Name);
+      }
+      if (value_.Count > 0) {
+        output.WriteMessageArray(2, field_names[2], value_);
+      }
+      if (hasOptions) {
+        output.WriteMessage(3, field_names[1], Options);
+      }
+      UnknownFields.WriteTo(output);
     }
 
-    public void WriteTo(pb::CodedOutputStream output) {
-      if (Name.Length != 0) {
-        output.WriteRawTag(10);
-        output.WriteString(Name);
-      }
-      value_.WriteTo(output, _repeated_value_codec);
-      if (options_ != null) {
-        output.WriteRawTag(26);
-        output.WriteMessage(Options);
+    private int memoizedSerializedSize = -1;
+    public override int SerializedSize {
+      get {
+        int size = memoizedSerializedSize;
+        if (size != -1) return size;
+        return CalcSerializedSize();
       }
     }
 
-    public int CalculateSize() {
-      int size = 0;
-      if (Name.Length != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeStringSize(Name);
+    private int CalcSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (hasName) {
+        size += pb::CodedOutputStream.ComputeStringSize(1, Name);
       }
-      size += value_.CalculateSize(_repeated_value_codec);
-      if (options_ != null) {
-        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Options);
+      foreach (global::Google.ProtocolBuffers.DescriptorProtos.EnumValueDescriptorProto element in ValueList) {
+        size += pb::CodedOutputStream.ComputeMessageSize(2, element);
       }
+      if (hasOptions) {
+        size += pb::CodedOutputStream.ComputeMessageSize(3, Options);
+      }
+      size += UnknownFields.SerializedSize;
+      memoizedSerializedSize = size;
       return size;
     }
-
-    public void MergeFrom(EnumDescriptorProto other) {
-      if (other == null) {
-        return;
-      }
-      if (other.Name.Length != 0) {
-        Name = other.Name;
-      }
-      value_.Add(other.value_);
-      if (other.options_ != null) {
-        if (options_ == null) {
-          options_ = new global::Google.Protobuf.DescriptorProtos.EnumOptions();
-        }
-        Options.MergeFrom(other.Options);
-      }
+    public static EnumDescriptorProto ParseFrom(pb::ByteString data) {
+      return ((Builder) CreateBuilder().MergeFrom(data)).BuildParsed();
+    }
+    public static EnumDescriptorProto ParseFrom(pb::ByteString data, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(data, extensionRegistry)).BuildParsed();
+    }
+    public static EnumDescriptorProto ParseFrom(byte[] data) {
+      return ((Builder) CreateBuilder().MergeFrom(data)).BuildParsed();
+    }
+    public static EnumDescriptorProto ParseFrom(byte[] data, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(data, extensionRegistry)).BuildParsed();
+    }
+    public static EnumDescriptorProto ParseFrom(global::System.IO.Stream input) {
+      return ((Builder) CreateBuilder().MergeFrom(input)).BuildParsed();
+    }
+    public static EnumDescriptorProto ParseFrom(global::System.IO.Stream input, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(input, extensionRegistry)).BuildParsed();
+    }
+    public static EnumDescriptorProto ParseDelimitedFrom(global::System.IO.Stream input) {
+      return CreateBuilder().MergeDelimitedFrom(input).BuildParsed();
+    }
+    public static EnumDescriptorProto ParseDelimitedFrom(global::System.IO.Stream input, pb::ExtensionRegistry extensionRegistry) {
+      return CreateBuilder().MergeDelimitedFrom(input, extensionRegistry).BuildParsed();
+    }
+    public static EnumDescriptorProto ParseFrom(pb::ICodedInputStream input) {
+      return ((Builder) CreateBuilder().MergeFrom(input)).BuildParsed();
+    }
+    public static EnumDescriptorProto ParseFrom(pb::ICodedInputStream input, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(input, extensionRegistry)).BuildParsed();
+    }
+    private EnumDescriptorProto MakeReadOnly() {
+      value_.MakeReadOnly();
+      return this;
     }
 
-    public void MergeFrom(pb::CodedInputStream input) {
-      uint tag;
-      while (input.ReadTag(out tag)) {
-        switch(tag) {
-          case 0:
-            throw pb::InvalidProtocolBufferException.InvalidTag();
-          default:
-            if (pb::WireFormat.IsEndGroupTag(tag)) {
-              return;
-            }
-            break;
-          case 10: {
-            Name = input.ReadString();
-            break;
-          }
-          case 18: {
-            value_.AddEntriesFrom(input, _repeated_value_codec);
-            break;
-          }
-          case 26: {
-            if (options_ == null) {
-              options_ = new global::Google.Protobuf.DescriptorProtos.EnumOptions();
-            }
-            input.ReadMessage(options_);
-            break;
-          }
-        }
-      }
+    public static Builder CreateBuilder() { return new Builder(); }
+    public override Builder ToBuilder() { return CreateBuilder(this); }
+    public override Builder CreateBuilderForType() { return new Builder(); }
+    public static Builder CreateBuilder(EnumDescriptorProto prototype) {
+      return new Builder(prototype);
     }
 
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+    public sealed partial class Builder : pb::GeneratedBuilder<EnumDescriptorProto, Builder> {
+      protected override Builder ThisBuilder {
+        get { return this; }
+      }
+      public Builder() {
+        result = DefaultInstance;
+        resultIsReadOnly = true;
+      }
+      internal Builder(EnumDescriptorProto cloneFrom) {
+        result = cloneFrom;
+        resultIsReadOnly = true;
+      }
+
+      private bool resultIsReadOnly;
+      private EnumDescriptorProto result;
+
+      private EnumDescriptorProto PrepareBuilder() {
+        if (resultIsReadOnly) {
+          EnumDescriptorProto original = result;
+          result = new EnumDescriptorProto();
+          resultIsReadOnly = false;
+          MergeFrom(original);
+        }
+        return result;
+      }
+
+      public override bool IsInitialized {
+        get { return result.IsInitialized; }
+      }
+
+      protected override EnumDescriptorProto MessageBeingBuilt {
+        get { return PrepareBuilder(); }
+      }
+
+      public override Builder Clear() {
+        result = DefaultInstance;
+        resultIsReadOnly = true;
+        return this;
+      }
+
+      public override Builder Clone() {
+        if (resultIsReadOnly) {
+          return new Builder(result);
+        } else {
+          return new Builder().MergeFrom(result);
+        }
+      }
+
+      public override pbd::MessageDescriptor DescriptorForType {
+        get { return global::Google.ProtocolBuffers.DescriptorProtos.EnumDescriptorProto.Descriptor; }
+      }
+
+      public override EnumDescriptorProto DefaultInstanceForType {
+        get { return global::Google.ProtocolBuffers.DescriptorProtos.EnumDescriptorProto.DefaultInstance; }
+      }
+
+      public override EnumDescriptorProto BuildPartial() {
+        if (resultIsReadOnly) {
+          return result;
+        }
+        resultIsReadOnly = true;
+        return result.MakeReadOnly();
+      }
+
+      public override Builder MergeFrom(pb::IMessage other) {
+        if (other is EnumDescriptorProto) {
+          return MergeFrom((EnumDescriptorProto) other);
+        } else {
+          base.MergeFrom(other);
+          return this;
+        }
+      }
+
+      public override Builder MergeFrom(EnumDescriptorProto other) {
+        if (other == global::Google.ProtocolBuffers.DescriptorProtos.EnumDescriptorProto.DefaultInstance) return this;
+        PrepareBuilder();
+        if (other.HasName) {
+          Name = other.Name;
+        }
+        if (other.value_.Count != 0) {
+          result.value_.Add(other.value_);
+        }
+        if (other.HasOptions) {
+          MergeOptions(other.Options);
+        }
+        this.MergeUnknownFields(other.UnknownFields);
+        return this;
+      }
+
+      public override Builder MergeFrom(pb::ICodedInputStream input) {
+        return MergeFrom(input, pb::ExtensionRegistry.Empty);
+      }
+
+      public override Builder MergeFrom(pb::ICodedInputStream input, pb::ExtensionRegistry extensionRegistry) {
+        PrepareBuilder();
+        pb::UnknownFieldSet.Builder unknownFields = null;
+        uint tag;
+        string field_name;
+        while (input.ReadTag(out tag, out field_name)) {
+          if(tag == 0 && field_name != null) {
+            int field_ordinal = global::System.Array.BinarySearch(_enumDescriptorProtoFieldNames, field_name, global::System.StringComparer.Ordinal);
+            if(field_ordinal >= 0)
+              tag = _enumDescriptorProtoFieldTags[field_ordinal];
+            else {
+              if (unknownFields == null) {
+                unknownFields = pb::UnknownFieldSet.CreateBuilder(this.UnknownFields);
+              }
+              ParseUnknownField(input, unknownFields, extensionRegistry, tag, field_name);
+              continue;
+            }
+          }
+          switch (tag) {
+            case 0: {
+              throw pb::InvalidProtocolBufferException.InvalidTag();
+            }
+            default: {
+              if (pb::WireFormat.IsEndGroupTag(tag)) {
+                if (unknownFields != null) {
+                  this.UnknownFields = unknownFields.Build();
+                }
+                return this;
+              }
+              if (unknownFields == null) {
+                unknownFields = pb::UnknownFieldSet.CreateBuilder(this.UnknownFields);
+              }
+              ParseUnknownField(input, unknownFields, extensionRegistry, tag, field_name);
+              break;
+            }
+            case 10: {
+              result.hasName = input.ReadString(ref result.name_);
+              break;
+            }
+            case 18: {
+              input.ReadMessageArray(tag, field_name, result.value_, global::Google.ProtocolBuffers.DescriptorProtos.EnumValueDescriptorProto.DefaultInstance, extensionRegistry);
+              break;
+            }
+            case 26: {
+              global::Google.ProtocolBuffers.DescriptorProtos.EnumOptions.Builder subBuilder = global::Google.ProtocolBuffers.DescriptorProtos.EnumOptions.CreateBuilder();
+              if (result.hasOptions) {
+                subBuilder.MergeFrom(Options);
+              }
+              input.ReadMessage(subBuilder, extensionRegistry);
+              Options = subBuilder.BuildPartial();
+              break;
+            }
+          }
+        }
+
+        if (unknownFields != null) {
+          this.UnknownFields = unknownFields.Build();
+        }
+        return this;
+      }
+
+
+      public bool HasName {
+        get { return result.hasName; }
+      }
+      public string Name {
+        get { return result.Name; }
+        set { SetName(value); }
+      }
+      public Builder SetName(string value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.hasName = true;
+        result.name_ = value;
+        return this;
+      }
+      public Builder ClearName() {
+        PrepareBuilder();
+        result.hasName = false;
+        result.name_ = "";
+        return this;
+      }
+
+      public pbc::IPopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.EnumValueDescriptorProto> ValueList {
+        get { return PrepareBuilder().value_; }
+      }
+      public int ValueCount {
+        get { return result.ValueCount; }
+      }
+      public global::Google.ProtocolBuffers.DescriptorProtos.EnumValueDescriptorProto GetValue(int index) {
+        return result.GetValue(index);
+      }
+      public Builder SetValue(int index, global::Google.ProtocolBuffers.DescriptorProtos.EnumValueDescriptorProto value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.value_[index] = value;
+        return this;
+      }
+      public Builder SetValue(int index, global::Google.ProtocolBuffers.DescriptorProtos.EnumValueDescriptorProto.Builder builderForValue) {
+        pb::ThrowHelper.ThrowIfNull(builderForValue, "builderForValue");
+        PrepareBuilder();
+        result.value_[index] = builderForValue.Build();
+        return this;
+      }
+      public Builder AddValue(global::Google.ProtocolBuffers.DescriptorProtos.EnumValueDescriptorProto value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.value_.Add(value);
+        return this;
+      }
+      public Builder AddValue(global::Google.ProtocolBuffers.DescriptorProtos.EnumValueDescriptorProto.Builder builderForValue) {
+        pb::ThrowHelper.ThrowIfNull(builderForValue, "builderForValue");
+        PrepareBuilder();
+        result.value_.Add(builderForValue.Build());
+        return this;
+      }
+      public Builder AddRangeValue(scg::IEnumerable<global::Google.ProtocolBuffers.DescriptorProtos.EnumValueDescriptorProto> values) {
+        PrepareBuilder();
+        result.value_.Add(values);
+        return this;
+      }
+      public Builder ClearValue() {
+        PrepareBuilder();
+        result.value_.Clear();
+        return this;
+      }
+
+      public bool HasOptions {
+       get { return result.hasOptions; }
+      }
+      public global::Google.ProtocolBuffers.DescriptorProtos.EnumOptions Options {
+        get { return result.Options; }
+        set { SetOptions(value); }
+      }
+      public Builder SetOptions(global::Google.ProtocolBuffers.DescriptorProtos.EnumOptions value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.hasOptions = true;
+        result.options_ = value;
+        return this;
+      }
+      public Builder SetOptions(global::Google.ProtocolBuffers.DescriptorProtos.EnumOptions.Builder builderForValue) {
+        pb::ThrowHelper.ThrowIfNull(builderForValue, "builderForValue");
+        PrepareBuilder();
+        result.hasOptions = true;
+        result.options_ = builderForValue.Build();
+        return this;
+      }
+      public Builder MergeOptions(global::Google.ProtocolBuffers.DescriptorProtos.EnumOptions value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        if (result.hasOptions &&
+            result.options_ != global::Google.ProtocolBuffers.DescriptorProtos.EnumOptions.DefaultInstance) {
+            result.options_ = global::Google.ProtocolBuffers.DescriptorProtos.EnumOptions.CreateBuilder(result.options_).MergeFrom(value).BuildPartial();
+        } else {
+          result.options_ = value;
+        }
+        result.hasOptions = true;
+        return this;
+      }
+      public Builder ClearOptions() {
+        PrepareBuilder();
+        result.hasOptions = false;
+        result.options_ = null;
+        return this;
+      }
+    }
+    static EnumDescriptorProto() {
+      object.ReferenceEquals(global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.Descriptor, null);
+    }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-  internal sealed partial class EnumValueDescriptorProto : pb::IMessage<EnumValueDescriptorProto> {
-    private static readonly pb::MessageParser<EnumValueDescriptorProto> _parser = new pb::MessageParser<EnumValueDescriptorProto>(() => new EnumValueDescriptorProto());
-    public static pb::MessageParser<EnumValueDescriptorProto> Parser { get { return _parser; } }
+  public sealed partial class EnumValueDescriptorProto : pb::GeneratedMessage<EnumValueDescriptorProto, EnumValueDescriptorProto.Builder> {
+    private EnumValueDescriptorProto() { }
+    private static readonly EnumValueDescriptorProto defaultInstance = new EnumValueDescriptorProto().MakeReadOnly();
+    private static readonly string[] _enumValueDescriptorProtoFieldNames = new string[] { "name", "number", "options" };
+    private static readonly uint[] _enumValueDescriptorProtoFieldTags = new uint[] { 10, 16, 26 };
+    public static EnumValueDescriptorProto DefaultInstance {
+      get { return defaultInstance; }
+    }
 
-    private static readonly string[] _fieldNames = new string[] { "name", "number", "options" };
-    private static readonly uint[] _fieldTags = new uint[] { 10, 16, 26 };
+    public override EnumValueDescriptorProto DefaultInstanceForType {
+      get { return DefaultInstance; }
+    }
+
+    protected override EnumValueDescriptorProto ThisMessage {
+      get { return this; }
+    }
+
     public static pbd::MessageDescriptor Descriptor {
-      get { return global::Google.Protobuf.DescriptorProtos.DescriptorProtoFile.Descriptor.MessageTypes[6]; }
+      get { return global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_EnumValueDescriptorProto__Descriptor; }
     }
 
-    public pb::FieldAccess.FieldAccessorTable Fields {
-      get { return global::Google.Protobuf.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_EnumValueDescriptorProto__FieldAccessorTable; }
-    }
-
-    private bool _frozen = false;
-    public bool IsFrozen { get { return _frozen; } }
-
-    public EnumValueDescriptorProto() {
-      OnConstruction();
-    }
-
-    partial void OnConstruction();
-
-    public EnumValueDescriptorProto(EnumValueDescriptorProto other) : this() {
-      name_ = other.name_;
-      number_ = other.number_;
-      Options = other.options_ != null ? other.Options.Clone() : null;
-    }
-
-    public EnumValueDescriptorProto Clone() {
-      return new EnumValueDescriptorProto(this);
-    }
-
-    public void Freeze() {
-      if (IsFrozen) {
-        return;
-      }
-      _frozen = true;
-      if (options_ != null) Options.Freeze();
+    protected override pb::FieldAccess.FieldAccessorTable<EnumValueDescriptorProto, EnumValueDescriptorProto.Builder> InternalFieldAccessors {
+      get { return global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_EnumValueDescriptorProto__FieldAccessorTable; }
     }
 
     public const int NameFieldNumber = 1;
+    private bool hasName;
     private string name_ = "";
-    internal string Name {
+    public bool HasName {
+      get { return hasName; }
+    }
+    public string Name {
       get { return name_; }
-      set {
-        pb::Freezable.CheckMutable(this);
-        name_ = value ?? "";
-      }
     }
 
     public const int NumberFieldNumber = 2;
+    private bool hasNumber;
     private int number_;
-    internal int Number {
+    public bool HasNumber {
+      get { return hasNumber; }
+    }
+    public int Number {
       get { return number_; }
-      set {
-        pb::Freezable.CheckMutable(this);
-        number_ = value;
-      }
     }
 
     public const int OptionsFieldNumber = 3;
-    private global::Google.Protobuf.DescriptorProtos.EnumValueOptions options_;
-    internal global::Google.Protobuf.DescriptorProtos.EnumValueOptions Options {
-      get { return options_; }
-      set {
-        pb::Freezable.CheckMutable(this);
-        options_ = value;
-      }
+    private bool hasOptions;
+    private global::Google.ProtocolBuffers.DescriptorProtos.EnumValueOptions options_;
+    public bool HasOptions {
+      get { return hasOptions; }
+    }
+    public global::Google.ProtocolBuffers.DescriptorProtos.EnumValueOptions Options {
+      get { return options_ ?? global::Google.ProtocolBuffers.DescriptorProtos.EnumValueOptions.DefaultInstance; }
     }
 
-    public override bool Equals(object other) {
-      return Equals(other as EnumValueDescriptorProto);
-    }
-
-    public bool Equals(EnumValueDescriptorProto other) {
-      if (ReferenceEquals(other, null)) {
-        return false;
-      }
-      if (ReferenceEquals(other, this)) {
+    public override bool IsInitialized {
+      get {
+        if (HasOptions) {
+          if (!Options.IsInitialized) return false;
+        }
         return true;
       }
-      if (Name != other.Name) return false;
-      if (Number != other.Number) return false;
-      if (!object.Equals(Options, other.Options)) return false;
-      return true;
     }
 
-    public override int GetHashCode() {
-      int hash = 1;
-      if (Name.Length != 0) hash ^= Name.GetHashCode();
-      if (Number != 0) hash ^= Number.GetHashCode();
-      if (options_ != null) hash ^= Options.GetHashCode();
-      return hash;
+    public override void WriteTo(pb::ICodedOutputStream output) {
+      CalcSerializedSize();
+      string[] field_names = _enumValueDescriptorProtoFieldNames;
+      if (hasName) {
+        output.WriteString(1, field_names[0], Name);
+      }
+      if (hasNumber) {
+        output.WriteInt32(2, field_names[1], Number);
+      }
+      if (hasOptions) {
+        output.WriteMessage(3, field_names[2], Options);
+      }
+      UnknownFields.WriteTo(output);
     }
 
-    public void WriteTo(pb::CodedOutputStream output) {
-      if (Name.Length != 0) {
-        output.WriteRawTag(10);
-        output.WriteString(Name);
-      }
-      if (Number != 0) {
-        output.WriteRawTag(16);
-        output.WriteInt32(Number);
-      }
-      if (options_ != null) {
-        output.WriteRawTag(26);
-        output.WriteMessage(Options);
+    private int memoizedSerializedSize = -1;
+    public override int SerializedSize {
+      get {
+        int size = memoizedSerializedSize;
+        if (size != -1) return size;
+        return CalcSerializedSize();
       }
     }
 
-    public int CalculateSize() {
-      int size = 0;
-      if (Name.Length != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeStringSize(Name);
+    private int CalcSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (hasName) {
+        size += pb::CodedOutputStream.ComputeStringSize(1, Name);
       }
-      if (Number != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeInt32Size(Number);
+      if (hasNumber) {
+        size += pb::CodedOutputStream.ComputeInt32Size(2, Number);
       }
-      if (options_ != null) {
-        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Options);
+      if (hasOptions) {
+        size += pb::CodedOutputStream.ComputeMessageSize(3, Options);
       }
+      size += UnknownFields.SerializedSize;
+      memoizedSerializedSize = size;
       return size;
     }
-
-    public void MergeFrom(EnumValueDescriptorProto other) {
-      if (other == null) {
-        return;
-      }
-      if (other.Name.Length != 0) {
-        Name = other.Name;
-      }
-      if (other.Number != 0) {
-        Number = other.Number;
-      }
-      if (other.options_ != null) {
-        if (options_ == null) {
-          options_ = new global::Google.Protobuf.DescriptorProtos.EnumValueOptions();
-        }
-        Options.MergeFrom(other.Options);
-      }
+    public static EnumValueDescriptorProto ParseFrom(pb::ByteString data) {
+      return ((Builder) CreateBuilder().MergeFrom(data)).BuildParsed();
+    }
+    public static EnumValueDescriptorProto ParseFrom(pb::ByteString data, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(data, extensionRegistry)).BuildParsed();
+    }
+    public static EnumValueDescriptorProto ParseFrom(byte[] data) {
+      return ((Builder) CreateBuilder().MergeFrom(data)).BuildParsed();
+    }
+    public static EnumValueDescriptorProto ParseFrom(byte[] data, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(data, extensionRegistry)).BuildParsed();
+    }
+    public static EnumValueDescriptorProto ParseFrom(global::System.IO.Stream input) {
+      return ((Builder) CreateBuilder().MergeFrom(input)).BuildParsed();
+    }
+    public static EnumValueDescriptorProto ParseFrom(global::System.IO.Stream input, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(input, extensionRegistry)).BuildParsed();
+    }
+    public static EnumValueDescriptorProto ParseDelimitedFrom(global::System.IO.Stream input) {
+      return CreateBuilder().MergeDelimitedFrom(input).BuildParsed();
+    }
+    public static EnumValueDescriptorProto ParseDelimitedFrom(global::System.IO.Stream input, pb::ExtensionRegistry extensionRegistry) {
+      return CreateBuilder().MergeDelimitedFrom(input, extensionRegistry).BuildParsed();
+    }
+    public static EnumValueDescriptorProto ParseFrom(pb::ICodedInputStream input) {
+      return ((Builder) CreateBuilder().MergeFrom(input)).BuildParsed();
+    }
+    public static EnumValueDescriptorProto ParseFrom(pb::ICodedInputStream input, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(input, extensionRegistry)).BuildParsed();
+    }
+    private EnumValueDescriptorProto MakeReadOnly() {
+      return this;
     }
 
-    public void MergeFrom(pb::CodedInputStream input) {
-      uint tag;
-      while (input.ReadTag(out tag)) {
-        switch(tag) {
-          case 0:
-            throw pb::InvalidProtocolBufferException.InvalidTag();
-          default:
-            if (pb::WireFormat.IsEndGroupTag(tag)) {
-              return;
-            }
-            break;
-          case 10: {
-            Name = input.ReadString();
-            break;
-          }
-          case 16: {
-            Number = input.ReadInt32();
-            break;
-          }
-          case 26: {
-            if (options_ == null) {
-              options_ = new global::Google.Protobuf.DescriptorProtos.EnumValueOptions();
-            }
-            input.ReadMessage(options_);
-            break;
-          }
-        }
-      }
+    public static Builder CreateBuilder() { return new Builder(); }
+    public override Builder ToBuilder() { return CreateBuilder(this); }
+    public override Builder CreateBuilderForType() { return new Builder(); }
+    public static Builder CreateBuilder(EnumValueDescriptorProto prototype) {
+      return new Builder(prototype);
     }
 
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+    public sealed partial class Builder : pb::GeneratedBuilder<EnumValueDescriptorProto, Builder> {
+      protected override Builder ThisBuilder {
+        get { return this; }
+      }
+      public Builder() {
+        result = DefaultInstance;
+        resultIsReadOnly = true;
+      }
+      internal Builder(EnumValueDescriptorProto cloneFrom) {
+        result = cloneFrom;
+        resultIsReadOnly = true;
+      }
+
+      private bool resultIsReadOnly;
+      private EnumValueDescriptorProto result;
+
+      private EnumValueDescriptorProto PrepareBuilder() {
+        if (resultIsReadOnly) {
+          EnumValueDescriptorProto original = result;
+          result = new EnumValueDescriptorProto();
+          resultIsReadOnly = false;
+          MergeFrom(original);
+        }
+        return result;
+      }
+
+      public override bool IsInitialized {
+        get { return result.IsInitialized; }
+      }
+
+      protected override EnumValueDescriptorProto MessageBeingBuilt {
+        get { return PrepareBuilder(); }
+      }
+
+      public override Builder Clear() {
+        result = DefaultInstance;
+        resultIsReadOnly = true;
+        return this;
+      }
+
+      public override Builder Clone() {
+        if (resultIsReadOnly) {
+          return new Builder(result);
+        } else {
+          return new Builder().MergeFrom(result);
+        }
+      }
+
+      public override pbd::MessageDescriptor DescriptorForType {
+        get { return global::Google.ProtocolBuffers.DescriptorProtos.EnumValueDescriptorProto.Descriptor; }
+      }
+
+      public override EnumValueDescriptorProto DefaultInstanceForType {
+        get { return global::Google.ProtocolBuffers.DescriptorProtos.EnumValueDescriptorProto.DefaultInstance; }
+      }
+
+      public override EnumValueDescriptorProto BuildPartial() {
+        if (resultIsReadOnly) {
+          return result;
+        }
+        resultIsReadOnly = true;
+        return result.MakeReadOnly();
+      }
+
+      public override Builder MergeFrom(pb::IMessage other) {
+        if (other is EnumValueDescriptorProto) {
+          return MergeFrom((EnumValueDescriptorProto) other);
+        } else {
+          base.MergeFrom(other);
+          return this;
+        }
+      }
+
+      public override Builder MergeFrom(EnumValueDescriptorProto other) {
+        if (other == global::Google.ProtocolBuffers.DescriptorProtos.EnumValueDescriptorProto.DefaultInstance) return this;
+        PrepareBuilder();
+        if (other.HasName) {
+          Name = other.Name;
+        }
+        if (other.HasNumber) {
+          Number = other.Number;
+        }
+        if (other.HasOptions) {
+          MergeOptions(other.Options);
+        }
+        this.MergeUnknownFields(other.UnknownFields);
+        return this;
+      }
+
+      public override Builder MergeFrom(pb::ICodedInputStream input) {
+        return MergeFrom(input, pb::ExtensionRegistry.Empty);
+      }
+
+      public override Builder MergeFrom(pb::ICodedInputStream input, pb::ExtensionRegistry extensionRegistry) {
+        PrepareBuilder();
+        pb::UnknownFieldSet.Builder unknownFields = null;
+        uint tag;
+        string field_name;
+        while (input.ReadTag(out tag, out field_name)) {
+          if(tag == 0 && field_name != null) {
+            int field_ordinal = global::System.Array.BinarySearch(_enumValueDescriptorProtoFieldNames, field_name, global::System.StringComparer.Ordinal);
+            if(field_ordinal >= 0)
+              tag = _enumValueDescriptorProtoFieldTags[field_ordinal];
+            else {
+              if (unknownFields == null) {
+                unknownFields = pb::UnknownFieldSet.CreateBuilder(this.UnknownFields);
+              }
+              ParseUnknownField(input, unknownFields, extensionRegistry, tag, field_name);
+              continue;
+            }
+          }
+          switch (tag) {
+            case 0: {
+              throw pb::InvalidProtocolBufferException.InvalidTag();
+            }
+            default: {
+              if (pb::WireFormat.IsEndGroupTag(tag)) {
+                if (unknownFields != null) {
+                  this.UnknownFields = unknownFields.Build();
+                }
+                return this;
+              }
+              if (unknownFields == null) {
+                unknownFields = pb::UnknownFieldSet.CreateBuilder(this.UnknownFields);
+              }
+              ParseUnknownField(input, unknownFields, extensionRegistry, tag, field_name);
+              break;
+            }
+            case 10: {
+              result.hasName = input.ReadString(ref result.name_);
+              break;
+            }
+            case 16: {
+              result.hasNumber = input.ReadInt32(ref result.number_);
+              break;
+            }
+            case 26: {
+              global::Google.ProtocolBuffers.DescriptorProtos.EnumValueOptions.Builder subBuilder = global::Google.ProtocolBuffers.DescriptorProtos.EnumValueOptions.CreateBuilder();
+              if (result.hasOptions) {
+                subBuilder.MergeFrom(Options);
+              }
+              input.ReadMessage(subBuilder, extensionRegistry);
+              Options = subBuilder.BuildPartial();
+              break;
+            }
+          }
+        }
+
+        if (unknownFields != null) {
+          this.UnknownFields = unknownFields.Build();
+        }
+        return this;
+      }
+
+
+      public bool HasName {
+        get { return result.hasName; }
+      }
+      public string Name {
+        get { return result.Name; }
+        set { SetName(value); }
+      }
+      public Builder SetName(string value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.hasName = true;
+        result.name_ = value;
+        return this;
+      }
+      public Builder ClearName() {
+        PrepareBuilder();
+        result.hasName = false;
+        result.name_ = "";
+        return this;
+      }
+
+      public bool HasNumber {
+        get { return result.hasNumber; }
+      }
+      public int Number {
+        get { return result.Number; }
+        set { SetNumber(value); }
+      }
+      public Builder SetNumber(int value) {
+        PrepareBuilder();
+        result.hasNumber = true;
+        result.number_ = value;
+        return this;
+      }
+      public Builder ClearNumber() {
+        PrepareBuilder();
+        result.hasNumber = false;
+        result.number_ = 0;
+        return this;
+      }
+
+      public bool HasOptions {
+       get { return result.hasOptions; }
+      }
+      public global::Google.ProtocolBuffers.DescriptorProtos.EnumValueOptions Options {
+        get { return result.Options; }
+        set { SetOptions(value); }
+      }
+      public Builder SetOptions(global::Google.ProtocolBuffers.DescriptorProtos.EnumValueOptions value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.hasOptions = true;
+        result.options_ = value;
+        return this;
+      }
+      public Builder SetOptions(global::Google.ProtocolBuffers.DescriptorProtos.EnumValueOptions.Builder builderForValue) {
+        pb::ThrowHelper.ThrowIfNull(builderForValue, "builderForValue");
+        PrepareBuilder();
+        result.hasOptions = true;
+        result.options_ = builderForValue.Build();
+        return this;
+      }
+      public Builder MergeOptions(global::Google.ProtocolBuffers.DescriptorProtos.EnumValueOptions value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        if (result.hasOptions &&
+            result.options_ != global::Google.ProtocolBuffers.DescriptorProtos.EnumValueOptions.DefaultInstance) {
+            result.options_ = global::Google.ProtocolBuffers.DescriptorProtos.EnumValueOptions.CreateBuilder(result.options_).MergeFrom(value).BuildPartial();
+        } else {
+          result.options_ = value;
+        }
+        result.hasOptions = true;
+        return this;
+      }
+      public Builder ClearOptions() {
+        PrepareBuilder();
+        result.hasOptions = false;
+        result.options_ = null;
+        return this;
+      }
+    }
+    static EnumValueDescriptorProto() {
+      object.ReferenceEquals(global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.Descriptor, null);
+    }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-  internal sealed partial class ServiceDescriptorProto : pb::IMessage<ServiceDescriptorProto> {
-    private static readonly pb::MessageParser<ServiceDescriptorProto> _parser = new pb::MessageParser<ServiceDescriptorProto>(() => new ServiceDescriptorProto());
-    public static pb::MessageParser<ServiceDescriptorProto> Parser { get { return _parser; } }
+  public sealed partial class ServiceDescriptorProto : pb::GeneratedMessage<ServiceDescriptorProto, ServiceDescriptorProto.Builder> {
+    private ServiceDescriptorProto() { }
+    private static readonly ServiceDescriptorProto defaultInstance = new ServiceDescriptorProto().MakeReadOnly();
+    private static readonly string[] _serviceDescriptorProtoFieldNames = new string[] { "method", "name", "options" };
+    private static readonly uint[] _serviceDescriptorProtoFieldTags = new uint[] { 18, 10, 26 };
+    public static ServiceDescriptorProto DefaultInstance {
+      get { return defaultInstance; }
+    }
 
-    private static readonly string[] _fieldNames = new string[] { "method", "name", "options" };
-    private static readonly uint[] _fieldTags = new uint[] { 18, 10, 26 };
+    public override ServiceDescriptorProto DefaultInstanceForType {
+      get { return DefaultInstance; }
+    }
+
+    protected override ServiceDescriptorProto ThisMessage {
+      get { return this; }
+    }
+
     public static pbd::MessageDescriptor Descriptor {
-      get { return global::Google.Protobuf.DescriptorProtos.DescriptorProtoFile.Descriptor.MessageTypes[7]; }
+      get { return global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_ServiceDescriptorProto__Descriptor; }
     }
 
-    public pb::FieldAccess.FieldAccessorTable Fields {
-      get { return global::Google.Protobuf.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_ServiceDescriptorProto__FieldAccessorTable; }
-    }
-
-    private bool _frozen = false;
-    public bool IsFrozen { get { return _frozen; } }
-
-    public ServiceDescriptorProto() {
-      OnConstruction();
-    }
-
-    partial void OnConstruction();
-
-    public ServiceDescriptorProto(ServiceDescriptorProto other) : this() {
-      name_ = other.name_;
-      method_ = other.method_.Clone();
-      Options = other.options_ != null ? other.Options.Clone() : null;
-    }
-
-    public ServiceDescriptorProto Clone() {
-      return new ServiceDescriptorProto(this);
-    }
-
-    public void Freeze() {
-      if (IsFrozen) {
-        return;
-      }
-      _frozen = true;
-      method_.Freeze();
-      if (options_ != null) Options.Freeze();
+    protected override pb::FieldAccess.FieldAccessorTable<ServiceDescriptorProto, ServiceDescriptorProto.Builder> InternalFieldAccessors {
+      get { return global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_ServiceDescriptorProto__FieldAccessorTable; }
     }
 
     public const int NameFieldNumber = 1;
+    private bool hasName;
     private string name_ = "";
-    internal string Name {
+    public bool HasName {
+      get { return hasName; }
+    }
+    public string Name {
       get { return name_; }
-      set {
-        pb::Freezable.CheckMutable(this);
-        name_ = value ?? "";
-      }
     }
 
     public const int MethodFieldNumber = 2;
-    private static readonly pb::FieldCodec<global::Google.Protobuf.DescriptorProtos.MethodDescriptorProto> _repeated_method_codec
-        = pb::FieldCodec.ForMessage(18, global::Google.Protobuf.DescriptorProtos.MethodDescriptorProto.Parser);
-    private readonly pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.MethodDescriptorProto> method_ = new pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.MethodDescriptorProto>();
-    internal pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.MethodDescriptorProto> Method {
+    private pbc::PopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.MethodDescriptorProto> method_ = new pbc::PopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.MethodDescriptorProto>();
+    public scg::IList<global::Google.ProtocolBuffers.DescriptorProtos.MethodDescriptorProto> MethodList {
       get { return method_; }
+    }
+    public int MethodCount {
+      get { return method_.Count; }
+    }
+    public global::Google.ProtocolBuffers.DescriptorProtos.MethodDescriptorProto GetMethod(int index) {
+      return method_[index];
     }
 
     public const int OptionsFieldNumber = 3;
-    private global::Google.Protobuf.DescriptorProtos.ServiceOptions options_;
-    internal global::Google.Protobuf.DescriptorProtos.ServiceOptions Options {
-      get { return options_; }
-      set {
-        pb::Freezable.CheckMutable(this);
-        options_ = value;
-      }
+    private bool hasOptions;
+    private global::Google.ProtocolBuffers.DescriptorProtos.ServiceOptions options_;
+    public bool HasOptions {
+      get { return hasOptions; }
+    }
+    public global::Google.ProtocolBuffers.DescriptorProtos.ServiceOptions Options {
+      get { return options_ ?? global::Google.ProtocolBuffers.DescriptorProtos.ServiceOptions.DefaultInstance; }
     }
 
-    public override bool Equals(object other) {
-      return Equals(other as ServiceDescriptorProto);
-    }
-
-    public bool Equals(ServiceDescriptorProto other) {
-      if (ReferenceEquals(other, null)) {
-        return false;
-      }
-      if (ReferenceEquals(other, this)) {
+    public override bool IsInitialized {
+      get {
+        foreach (global::Google.ProtocolBuffers.DescriptorProtos.MethodDescriptorProto element in MethodList) {
+          if (!element.IsInitialized) return false;
+        }
+        if (HasOptions) {
+          if (!Options.IsInitialized) return false;
+        }
         return true;
       }
-      if (Name != other.Name) return false;
-      if(!method_.Equals(other.method_)) return false;
-      if (!object.Equals(Options, other.Options)) return false;
-      return true;
     }
 
-    public override int GetHashCode() {
-      int hash = 1;
-      if (Name.Length != 0) hash ^= Name.GetHashCode();
-      hash ^= method_.GetHashCode();
-      if (options_ != null) hash ^= Options.GetHashCode();
-      return hash;
+    public override void WriteTo(pb::ICodedOutputStream output) {
+      CalcSerializedSize();
+      string[] field_names = _serviceDescriptorProtoFieldNames;
+      if (hasName) {
+        output.WriteString(1, field_names[1], Name);
+      }
+      if (method_.Count > 0) {
+        output.WriteMessageArray(2, field_names[0], method_);
+      }
+      if (hasOptions) {
+        output.WriteMessage(3, field_names[2], Options);
+      }
+      UnknownFields.WriteTo(output);
     }
 
-    public void WriteTo(pb::CodedOutputStream output) {
-      if (Name.Length != 0) {
-        output.WriteRawTag(10);
-        output.WriteString(Name);
-      }
-      method_.WriteTo(output, _repeated_method_codec);
-      if (options_ != null) {
-        output.WriteRawTag(26);
-        output.WriteMessage(Options);
+    private int memoizedSerializedSize = -1;
+    public override int SerializedSize {
+      get {
+        int size = memoizedSerializedSize;
+        if (size != -1) return size;
+        return CalcSerializedSize();
       }
     }
 
-    public int CalculateSize() {
-      int size = 0;
-      if (Name.Length != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeStringSize(Name);
+    private int CalcSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (hasName) {
+        size += pb::CodedOutputStream.ComputeStringSize(1, Name);
       }
-      size += method_.CalculateSize(_repeated_method_codec);
-      if (options_ != null) {
-        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Options);
+      foreach (global::Google.ProtocolBuffers.DescriptorProtos.MethodDescriptorProto element in MethodList) {
+        size += pb::CodedOutputStream.ComputeMessageSize(2, element);
       }
+      if (hasOptions) {
+        size += pb::CodedOutputStream.ComputeMessageSize(3, Options);
+      }
+      size += UnknownFields.SerializedSize;
+      memoizedSerializedSize = size;
       return size;
     }
-
-    public void MergeFrom(ServiceDescriptorProto other) {
-      if (other == null) {
-        return;
-      }
-      if (other.Name.Length != 0) {
-        Name = other.Name;
-      }
-      method_.Add(other.method_);
-      if (other.options_ != null) {
-        if (options_ == null) {
-          options_ = new global::Google.Protobuf.DescriptorProtos.ServiceOptions();
-        }
-        Options.MergeFrom(other.Options);
-      }
+    public static ServiceDescriptorProto ParseFrom(pb::ByteString data) {
+      return ((Builder) CreateBuilder().MergeFrom(data)).BuildParsed();
+    }
+    public static ServiceDescriptorProto ParseFrom(pb::ByteString data, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(data, extensionRegistry)).BuildParsed();
+    }
+    public static ServiceDescriptorProto ParseFrom(byte[] data) {
+      return ((Builder) CreateBuilder().MergeFrom(data)).BuildParsed();
+    }
+    public static ServiceDescriptorProto ParseFrom(byte[] data, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(data, extensionRegistry)).BuildParsed();
+    }
+    public static ServiceDescriptorProto ParseFrom(global::System.IO.Stream input) {
+      return ((Builder) CreateBuilder().MergeFrom(input)).BuildParsed();
+    }
+    public static ServiceDescriptorProto ParseFrom(global::System.IO.Stream input, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(input, extensionRegistry)).BuildParsed();
+    }
+    public static ServiceDescriptorProto ParseDelimitedFrom(global::System.IO.Stream input) {
+      return CreateBuilder().MergeDelimitedFrom(input).BuildParsed();
+    }
+    public static ServiceDescriptorProto ParseDelimitedFrom(global::System.IO.Stream input, pb::ExtensionRegistry extensionRegistry) {
+      return CreateBuilder().MergeDelimitedFrom(input, extensionRegistry).BuildParsed();
+    }
+    public static ServiceDescriptorProto ParseFrom(pb::ICodedInputStream input) {
+      return ((Builder) CreateBuilder().MergeFrom(input)).BuildParsed();
+    }
+    public static ServiceDescriptorProto ParseFrom(pb::ICodedInputStream input, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(input, extensionRegistry)).BuildParsed();
+    }
+    private ServiceDescriptorProto MakeReadOnly() {
+      method_.MakeReadOnly();
+      return this;
     }
 
-    public void MergeFrom(pb::CodedInputStream input) {
-      uint tag;
-      while (input.ReadTag(out tag)) {
-        switch(tag) {
-          case 0:
-            throw pb::InvalidProtocolBufferException.InvalidTag();
-          default:
-            if (pb::WireFormat.IsEndGroupTag(tag)) {
-              return;
-            }
-            break;
-          case 10: {
-            Name = input.ReadString();
-            break;
-          }
-          case 18: {
-            method_.AddEntriesFrom(input, _repeated_method_codec);
-            break;
-          }
-          case 26: {
-            if (options_ == null) {
-              options_ = new global::Google.Protobuf.DescriptorProtos.ServiceOptions();
-            }
-            input.ReadMessage(options_);
-            break;
-          }
-        }
-      }
+    public static Builder CreateBuilder() { return new Builder(); }
+    public override Builder ToBuilder() { return CreateBuilder(this); }
+    public override Builder CreateBuilderForType() { return new Builder(); }
+    public static Builder CreateBuilder(ServiceDescriptorProto prototype) {
+      return new Builder(prototype);
     }
 
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+    public sealed partial class Builder : pb::GeneratedBuilder<ServiceDescriptorProto, Builder> {
+      protected override Builder ThisBuilder {
+        get { return this; }
+      }
+      public Builder() {
+        result = DefaultInstance;
+        resultIsReadOnly = true;
+      }
+      internal Builder(ServiceDescriptorProto cloneFrom) {
+        result = cloneFrom;
+        resultIsReadOnly = true;
+      }
+
+      private bool resultIsReadOnly;
+      private ServiceDescriptorProto result;
+
+      private ServiceDescriptorProto PrepareBuilder() {
+        if (resultIsReadOnly) {
+          ServiceDescriptorProto original = result;
+          result = new ServiceDescriptorProto();
+          resultIsReadOnly = false;
+          MergeFrom(original);
+        }
+        return result;
+      }
+
+      public override bool IsInitialized {
+        get { return result.IsInitialized; }
+      }
+
+      protected override ServiceDescriptorProto MessageBeingBuilt {
+        get { return PrepareBuilder(); }
+      }
+
+      public override Builder Clear() {
+        result = DefaultInstance;
+        resultIsReadOnly = true;
+        return this;
+      }
+
+      public override Builder Clone() {
+        if (resultIsReadOnly) {
+          return new Builder(result);
+        } else {
+          return new Builder().MergeFrom(result);
+        }
+      }
+
+      public override pbd::MessageDescriptor DescriptorForType {
+        get { return global::Google.ProtocolBuffers.DescriptorProtos.ServiceDescriptorProto.Descriptor; }
+      }
+
+      public override ServiceDescriptorProto DefaultInstanceForType {
+        get { return global::Google.ProtocolBuffers.DescriptorProtos.ServiceDescriptorProto.DefaultInstance; }
+      }
+
+      public override ServiceDescriptorProto BuildPartial() {
+        if (resultIsReadOnly) {
+          return result;
+        }
+        resultIsReadOnly = true;
+        return result.MakeReadOnly();
+      }
+
+      public override Builder MergeFrom(pb::IMessage other) {
+        if (other is ServiceDescriptorProto) {
+          return MergeFrom((ServiceDescriptorProto) other);
+        } else {
+          base.MergeFrom(other);
+          return this;
+        }
+      }
+
+      public override Builder MergeFrom(ServiceDescriptorProto other) {
+        if (other == global::Google.ProtocolBuffers.DescriptorProtos.ServiceDescriptorProto.DefaultInstance) return this;
+        PrepareBuilder();
+        if (other.HasName) {
+          Name = other.Name;
+        }
+        if (other.method_.Count != 0) {
+          result.method_.Add(other.method_);
+        }
+        if (other.HasOptions) {
+          MergeOptions(other.Options);
+        }
+        this.MergeUnknownFields(other.UnknownFields);
+        return this;
+      }
+
+      public override Builder MergeFrom(pb::ICodedInputStream input) {
+        return MergeFrom(input, pb::ExtensionRegistry.Empty);
+      }
+
+      public override Builder MergeFrom(pb::ICodedInputStream input, pb::ExtensionRegistry extensionRegistry) {
+        PrepareBuilder();
+        pb::UnknownFieldSet.Builder unknownFields = null;
+        uint tag;
+        string field_name;
+        while (input.ReadTag(out tag, out field_name)) {
+          if(tag == 0 && field_name != null) {
+            int field_ordinal = global::System.Array.BinarySearch(_serviceDescriptorProtoFieldNames, field_name, global::System.StringComparer.Ordinal);
+            if(field_ordinal >= 0)
+              tag = _serviceDescriptorProtoFieldTags[field_ordinal];
+            else {
+              if (unknownFields == null) {
+                unknownFields = pb::UnknownFieldSet.CreateBuilder(this.UnknownFields);
+              }
+              ParseUnknownField(input, unknownFields, extensionRegistry, tag, field_name);
+              continue;
+            }
+          }
+          switch (tag) {
+            case 0: {
+              throw pb::InvalidProtocolBufferException.InvalidTag();
+            }
+            default: {
+              if (pb::WireFormat.IsEndGroupTag(tag)) {
+                if (unknownFields != null) {
+                  this.UnknownFields = unknownFields.Build();
+                }
+                return this;
+              }
+              if (unknownFields == null) {
+                unknownFields = pb::UnknownFieldSet.CreateBuilder(this.UnknownFields);
+              }
+              ParseUnknownField(input, unknownFields, extensionRegistry, tag, field_name);
+              break;
+            }
+            case 10: {
+              result.hasName = input.ReadString(ref result.name_);
+              break;
+            }
+            case 18: {
+              input.ReadMessageArray(tag, field_name, result.method_, global::Google.ProtocolBuffers.DescriptorProtos.MethodDescriptorProto.DefaultInstance, extensionRegistry);
+              break;
+            }
+            case 26: {
+              global::Google.ProtocolBuffers.DescriptorProtos.ServiceOptions.Builder subBuilder = global::Google.ProtocolBuffers.DescriptorProtos.ServiceOptions.CreateBuilder();
+              if (result.hasOptions) {
+                subBuilder.MergeFrom(Options);
+              }
+              input.ReadMessage(subBuilder, extensionRegistry);
+              Options = subBuilder.BuildPartial();
+              break;
+            }
+          }
+        }
+
+        if (unknownFields != null) {
+          this.UnknownFields = unknownFields.Build();
+        }
+        return this;
+      }
+
+
+      public bool HasName {
+        get { return result.hasName; }
+      }
+      public string Name {
+        get { return result.Name; }
+        set { SetName(value); }
+      }
+      public Builder SetName(string value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.hasName = true;
+        result.name_ = value;
+        return this;
+      }
+      public Builder ClearName() {
+        PrepareBuilder();
+        result.hasName = false;
+        result.name_ = "";
+        return this;
+      }
+
+      public pbc::IPopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.MethodDescriptorProto> MethodList {
+        get { return PrepareBuilder().method_; }
+      }
+      public int MethodCount {
+        get { return result.MethodCount; }
+      }
+      public global::Google.ProtocolBuffers.DescriptorProtos.MethodDescriptorProto GetMethod(int index) {
+        return result.GetMethod(index);
+      }
+      public Builder SetMethod(int index, global::Google.ProtocolBuffers.DescriptorProtos.MethodDescriptorProto value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.method_[index] = value;
+        return this;
+      }
+      public Builder SetMethod(int index, global::Google.ProtocolBuffers.DescriptorProtos.MethodDescriptorProto.Builder builderForValue) {
+        pb::ThrowHelper.ThrowIfNull(builderForValue, "builderForValue");
+        PrepareBuilder();
+        result.method_[index] = builderForValue.Build();
+        return this;
+      }
+      public Builder AddMethod(global::Google.ProtocolBuffers.DescriptorProtos.MethodDescriptorProto value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.method_.Add(value);
+        return this;
+      }
+      public Builder AddMethod(global::Google.ProtocolBuffers.DescriptorProtos.MethodDescriptorProto.Builder builderForValue) {
+        pb::ThrowHelper.ThrowIfNull(builderForValue, "builderForValue");
+        PrepareBuilder();
+        result.method_.Add(builderForValue.Build());
+        return this;
+      }
+      public Builder AddRangeMethod(scg::IEnumerable<global::Google.ProtocolBuffers.DescriptorProtos.MethodDescriptorProto> values) {
+        PrepareBuilder();
+        result.method_.Add(values);
+        return this;
+      }
+      public Builder ClearMethod() {
+        PrepareBuilder();
+        result.method_.Clear();
+        return this;
+      }
+
+      public bool HasOptions {
+       get { return result.hasOptions; }
+      }
+      public global::Google.ProtocolBuffers.DescriptorProtos.ServiceOptions Options {
+        get { return result.Options; }
+        set { SetOptions(value); }
+      }
+      public Builder SetOptions(global::Google.ProtocolBuffers.DescriptorProtos.ServiceOptions value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.hasOptions = true;
+        result.options_ = value;
+        return this;
+      }
+      public Builder SetOptions(global::Google.ProtocolBuffers.DescriptorProtos.ServiceOptions.Builder builderForValue) {
+        pb::ThrowHelper.ThrowIfNull(builderForValue, "builderForValue");
+        PrepareBuilder();
+        result.hasOptions = true;
+        result.options_ = builderForValue.Build();
+        return this;
+      }
+      public Builder MergeOptions(global::Google.ProtocolBuffers.DescriptorProtos.ServiceOptions value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        if (result.hasOptions &&
+            result.options_ != global::Google.ProtocolBuffers.DescriptorProtos.ServiceOptions.DefaultInstance) {
+            result.options_ = global::Google.ProtocolBuffers.DescriptorProtos.ServiceOptions.CreateBuilder(result.options_).MergeFrom(value).BuildPartial();
+        } else {
+          result.options_ = value;
+        }
+        result.hasOptions = true;
+        return this;
+      }
+      public Builder ClearOptions() {
+        PrepareBuilder();
+        result.hasOptions = false;
+        result.options_ = null;
+        return this;
+      }
+    }
+    static ServiceDescriptorProto() {
+      object.ReferenceEquals(global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.Descriptor, null);
+    }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-  internal sealed partial class MethodDescriptorProto : pb::IMessage<MethodDescriptorProto> {
-    private static readonly pb::MessageParser<MethodDescriptorProto> _parser = new pb::MessageParser<MethodDescriptorProto>(() => new MethodDescriptorProto());
-    public static pb::MessageParser<MethodDescriptorProto> Parser { get { return _parser; } }
+  public sealed partial class MethodDescriptorProto : pb::GeneratedMessage<MethodDescriptorProto, MethodDescriptorProto.Builder> {
+    private MethodDescriptorProto() { }
+    private static readonly MethodDescriptorProto defaultInstance = new MethodDescriptorProto().MakeReadOnly();
+    private static readonly string[] _methodDescriptorProtoFieldNames = new string[] { "client_streaming", "input_type", "name", "options", "output_type", "server_streaming" };
+    private static readonly uint[] _methodDescriptorProtoFieldTags = new uint[] { 40, 18, 10, 34, 26, 48 };
+    public static MethodDescriptorProto DefaultInstance {
+      get { return defaultInstance; }
+    }
 
-    private static readonly string[] _fieldNames = new string[] { "client_streaming", "input_type", "name", "options", "output_type", "server_streaming" };
-    private static readonly uint[] _fieldTags = new uint[] { 40, 18, 10, 34, 26, 48 };
+    public override MethodDescriptorProto DefaultInstanceForType {
+      get { return DefaultInstance; }
+    }
+
+    protected override MethodDescriptorProto ThisMessage {
+      get { return this; }
+    }
+
     public static pbd::MessageDescriptor Descriptor {
-      get { return global::Google.Protobuf.DescriptorProtos.DescriptorProtoFile.Descriptor.MessageTypes[8]; }
+      get { return global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_MethodDescriptorProto__Descriptor; }
     }
 
-    public pb::FieldAccess.FieldAccessorTable Fields {
-      get { return global::Google.Protobuf.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_MethodDescriptorProto__FieldAccessorTable; }
-    }
-
-    private bool _frozen = false;
-    public bool IsFrozen { get { return _frozen; } }
-
-    public MethodDescriptorProto() {
-      OnConstruction();
-    }
-
-    partial void OnConstruction();
-
-    public MethodDescriptorProto(MethodDescriptorProto other) : this() {
-      name_ = other.name_;
-      inputType_ = other.inputType_;
-      outputType_ = other.outputType_;
-      Options = other.options_ != null ? other.Options.Clone() : null;
-      clientStreaming_ = other.clientStreaming_;
-      serverStreaming_ = other.serverStreaming_;
-    }
-
-    public MethodDescriptorProto Clone() {
-      return new MethodDescriptorProto(this);
-    }
-
-    public void Freeze() {
-      if (IsFrozen) {
-        return;
-      }
-      _frozen = true;
-      if (options_ != null) Options.Freeze();
+    protected override pb::FieldAccess.FieldAccessorTable<MethodDescriptorProto, MethodDescriptorProto.Builder> InternalFieldAccessors {
+      get { return global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_MethodDescriptorProto__FieldAccessorTable; }
     }
 
     public const int NameFieldNumber = 1;
+    private bool hasName;
     private string name_ = "";
-    internal string Name {
+    public bool HasName {
+      get { return hasName; }
+    }
+    public string Name {
       get { return name_; }
-      set {
-        pb::Freezable.CheckMutable(this);
-        name_ = value ?? "";
-      }
     }
 
     public const int InputTypeFieldNumber = 2;
+    private bool hasInputType;
     private string inputType_ = "";
-    internal string InputType {
+    public bool HasInputType {
+      get { return hasInputType; }
+    }
+    public string InputType {
       get { return inputType_; }
-      set {
-        pb::Freezable.CheckMutable(this);
-        inputType_ = value ?? "";
-      }
     }
 
     public const int OutputTypeFieldNumber = 3;
+    private bool hasOutputType;
     private string outputType_ = "";
-    internal string OutputType {
+    public bool HasOutputType {
+      get { return hasOutputType; }
+    }
+    public string OutputType {
       get { return outputType_; }
-      set {
-        pb::Freezable.CheckMutable(this);
-        outputType_ = value ?? "";
-      }
     }
 
     public const int OptionsFieldNumber = 4;
-    private global::Google.Protobuf.DescriptorProtos.MethodOptions options_;
-    internal global::Google.Protobuf.DescriptorProtos.MethodOptions Options {
-      get { return options_; }
-      set {
-        pb::Freezable.CheckMutable(this);
-        options_ = value;
-      }
+    private bool hasOptions;
+    private global::Google.ProtocolBuffers.DescriptorProtos.MethodOptions options_;
+    public bool HasOptions {
+      get { return hasOptions; }
+    }
+    public global::Google.ProtocolBuffers.DescriptorProtos.MethodOptions Options {
+      get { return options_ ?? global::Google.ProtocolBuffers.DescriptorProtos.MethodOptions.DefaultInstance; }
     }
 
     public const int ClientStreamingFieldNumber = 5;
+    private bool hasClientStreaming;
     private bool clientStreaming_;
-    internal bool ClientStreaming {
+    public bool HasClientStreaming {
+      get { return hasClientStreaming; }
+    }
+    public bool ClientStreaming {
       get { return clientStreaming_; }
-      set {
-        pb::Freezable.CheckMutable(this);
-        clientStreaming_ = value;
-      }
     }
 
     public const int ServerStreamingFieldNumber = 6;
+    private bool hasServerStreaming;
     private bool serverStreaming_;
-    internal bool ServerStreaming {
+    public bool HasServerStreaming {
+      get { return hasServerStreaming; }
+    }
+    public bool ServerStreaming {
       get { return serverStreaming_; }
-      set {
-        pb::Freezable.CheckMutable(this);
-        serverStreaming_ = value;
-      }
     }
 
-    public override bool Equals(object other) {
-      return Equals(other as MethodDescriptorProto);
-    }
-
-    public bool Equals(MethodDescriptorProto other) {
-      if (ReferenceEquals(other, null)) {
-        return false;
-      }
-      if (ReferenceEquals(other, this)) {
+    public override bool IsInitialized {
+      get {
+        if (HasOptions) {
+          if (!Options.IsInitialized) return false;
+        }
         return true;
       }
-      if (Name != other.Name) return false;
-      if (InputType != other.InputType) return false;
-      if (OutputType != other.OutputType) return false;
-      if (!object.Equals(Options, other.Options)) return false;
-      if (ClientStreaming != other.ClientStreaming) return false;
-      if (ServerStreaming != other.ServerStreaming) return false;
-      return true;
     }
 
-    public override int GetHashCode() {
-      int hash = 1;
-      if (Name.Length != 0) hash ^= Name.GetHashCode();
-      if (InputType.Length != 0) hash ^= InputType.GetHashCode();
-      if (OutputType.Length != 0) hash ^= OutputType.GetHashCode();
-      if (options_ != null) hash ^= Options.GetHashCode();
-      if (ClientStreaming != false) hash ^= ClientStreaming.GetHashCode();
-      if (ServerStreaming != false) hash ^= ServerStreaming.GetHashCode();
-      return hash;
+    public override void WriteTo(pb::ICodedOutputStream output) {
+      CalcSerializedSize();
+      string[] field_names = _methodDescriptorProtoFieldNames;
+      if (hasName) {
+        output.WriteString(1, field_names[2], Name);
+      }
+      if (hasInputType) {
+        output.WriteString(2, field_names[1], InputType);
+      }
+      if (hasOutputType) {
+        output.WriteString(3, field_names[4], OutputType);
+      }
+      if (hasOptions) {
+        output.WriteMessage(4, field_names[3], Options);
+      }
+      if (hasClientStreaming) {
+        output.WriteBool(5, field_names[0], ClientStreaming);
+      }
+      if (hasServerStreaming) {
+        output.WriteBool(6, field_names[5], ServerStreaming);
+      }
+      UnknownFields.WriteTo(output);
     }
 
-    public void WriteTo(pb::CodedOutputStream output) {
-      if (Name.Length != 0) {
-        output.WriteRawTag(10);
-        output.WriteString(Name);
-      }
-      if (InputType.Length != 0) {
-        output.WriteRawTag(18);
-        output.WriteString(InputType);
-      }
-      if (OutputType.Length != 0) {
-        output.WriteRawTag(26);
-        output.WriteString(OutputType);
-      }
-      if (options_ != null) {
-        output.WriteRawTag(34);
-        output.WriteMessage(Options);
-      }
-      if (ClientStreaming != false) {
-        output.WriteRawTag(40);
-        output.WriteBool(ClientStreaming);
-      }
-      if (ServerStreaming != false) {
-        output.WriteRawTag(48);
-        output.WriteBool(ServerStreaming);
+    private int memoizedSerializedSize = -1;
+    public override int SerializedSize {
+      get {
+        int size = memoizedSerializedSize;
+        if (size != -1) return size;
+        return CalcSerializedSize();
       }
     }
 
-    public int CalculateSize() {
-      int size = 0;
-      if (Name.Length != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeStringSize(Name);
+    private int CalcSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (hasName) {
+        size += pb::CodedOutputStream.ComputeStringSize(1, Name);
       }
-      if (InputType.Length != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeStringSize(InputType);
+      if (hasInputType) {
+        size += pb::CodedOutputStream.ComputeStringSize(2, InputType);
       }
-      if (OutputType.Length != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeStringSize(OutputType);
+      if (hasOutputType) {
+        size += pb::CodedOutputStream.ComputeStringSize(3, OutputType);
       }
-      if (options_ != null) {
-        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Options);
+      if (hasOptions) {
+        size += pb::CodedOutputStream.ComputeMessageSize(4, Options);
       }
-      if (ClientStreaming != false) {
-        size += 1 + 1;
+      if (hasClientStreaming) {
+        size += pb::CodedOutputStream.ComputeBoolSize(5, ClientStreaming);
       }
-      if (ServerStreaming != false) {
-        size += 1 + 1;
+      if (hasServerStreaming) {
+        size += pb::CodedOutputStream.ComputeBoolSize(6, ServerStreaming);
       }
+      size += UnknownFields.SerializedSize;
+      memoizedSerializedSize = size;
       return size;
     }
-
-    public void MergeFrom(MethodDescriptorProto other) {
-      if (other == null) {
-        return;
-      }
-      if (other.Name.Length != 0) {
-        Name = other.Name;
-      }
-      if (other.InputType.Length != 0) {
-        InputType = other.InputType;
-      }
-      if (other.OutputType.Length != 0) {
-        OutputType = other.OutputType;
-      }
-      if (other.options_ != null) {
-        if (options_ == null) {
-          options_ = new global::Google.Protobuf.DescriptorProtos.MethodOptions();
-        }
-        Options.MergeFrom(other.Options);
-      }
-      if (other.ClientStreaming != false) {
-        ClientStreaming = other.ClientStreaming;
-      }
-      if (other.ServerStreaming != false) {
-        ServerStreaming = other.ServerStreaming;
-      }
+    public static MethodDescriptorProto ParseFrom(pb::ByteString data) {
+      return ((Builder) CreateBuilder().MergeFrom(data)).BuildParsed();
+    }
+    public static MethodDescriptorProto ParseFrom(pb::ByteString data, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(data, extensionRegistry)).BuildParsed();
+    }
+    public static MethodDescriptorProto ParseFrom(byte[] data) {
+      return ((Builder) CreateBuilder().MergeFrom(data)).BuildParsed();
+    }
+    public static MethodDescriptorProto ParseFrom(byte[] data, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(data, extensionRegistry)).BuildParsed();
+    }
+    public static MethodDescriptorProto ParseFrom(global::System.IO.Stream input) {
+      return ((Builder) CreateBuilder().MergeFrom(input)).BuildParsed();
+    }
+    public static MethodDescriptorProto ParseFrom(global::System.IO.Stream input, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(input, extensionRegistry)).BuildParsed();
+    }
+    public static MethodDescriptorProto ParseDelimitedFrom(global::System.IO.Stream input) {
+      return CreateBuilder().MergeDelimitedFrom(input).BuildParsed();
+    }
+    public static MethodDescriptorProto ParseDelimitedFrom(global::System.IO.Stream input, pb::ExtensionRegistry extensionRegistry) {
+      return CreateBuilder().MergeDelimitedFrom(input, extensionRegistry).BuildParsed();
+    }
+    public static MethodDescriptorProto ParseFrom(pb::ICodedInputStream input) {
+      return ((Builder) CreateBuilder().MergeFrom(input)).BuildParsed();
+    }
+    public static MethodDescriptorProto ParseFrom(pb::ICodedInputStream input, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(input, extensionRegistry)).BuildParsed();
+    }
+    private MethodDescriptorProto MakeReadOnly() {
+      return this;
     }
 
-    public void MergeFrom(pb::CodedInputStream input) {
-      uint tag;
-      while (input.ReadTag(out tag)) {
-        switch(tag) {
-          case 0:
-            throw pb::InvalidProtocolBufferException.InvalidTag();
-          default:
-            if (pb::WireFormat.IsEndGroupTag(tag)) {
-              return;
-            }
-            break;
-          case 10: {
-            Name = input.ReadString();
-            break;
-          }
-          case 18: {
-            InputType = input.ReadString();
-            break;
-          }
-          case 26: {
-            OutputType = input.ReadString();
-            break;
-          }
-          case 34: {
-            if (options_ == null) {
-              options_ = new global::Google.Protobuf.DescriptorProtos.MethodOptions();
-            }
-            input.ReadMessage(options_);
-            break;
-          }
-          case 40: {
-            ClientStreaming = input.ReadBool();
-            break;
-          }
-          case 48: {
-            ServerStreaming = input.ReadBool();
-            break;
-          }
-        }
-      }
+    public static Builder CreateBuilder() { return new Builder(); }
+    public override Builder ToBuilder() { return CreateBuilder(this); }
+    public override Builder CreateBuilderForType() { return new Builder(); }
+    public static Builder CreateBuilder(MethodDescriptorProto prototype) {
+      return new Builder(prototype);
     }
 
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+    public sealed partial class Builder : pb::GeneratedBuilder<MethodDescriptorProto, Builder> {
+      protected override Builder ThisBuilder {
+        get { return this; }
+      }
+      public Builder() {
+        result = DefaultInstance;
+        resultIsReadOnly = true;
+      }
+      internal Builder(MethodDescriptorProto cloneFrom) {
+        result = cloneFrom;
+        resultIsReadOnly = true;
+      }
+
+      private bool resultIsReadOnly;
+      private MethodDescriptorProto result;
+
+      private MethodDescriptorProto PrepareBuilder() {
+        if (resultIsReadOnly) {
+          MethodDescriptorProto original = result;
+          result = new MethodDescriptorProto();
+          resultIsReadOnly = false;
+          MergeFrom(original);
+        }
+        return result;
+      }
+
+      public override bool IsInitialized {
+        get { return result.IsInitialized; }
+      }
+
+      protected override MethodDescriptorProto MessageBeingBuilt {
+        get { return PrepareBuilder(); }
+      }
+
+      public override Builder Clear() {
+        result = DefaultInstance;
+        resultIsReadOnly = true;
+        return this;
+      }
+
+      public override Builder Clone() {
+        if (resultIsReadOnly) {
+          return new Builder(result);
+        } else {
+          return new Builder().MergeFrom(result);
+        }
+      }
+
+      public override pbd::MessageDescriptor DescriptorForType {
+        get { return global::Google.ProtocolBuffers.DescriptorProtos.MethodDescriptorProto.Descriptor; }
+      }
+
+      public override MethodDescriptorProto DefaultInstanceForType {
+        get { return global::Google.ProtocolBuffers.DescriptorProtos.MethodDescriptorProto.DefaultInstance; }
+      }
+
+      public override MethodDescriptorProto BuildPartial() {
+        if (resultIsReadOnly) {
+          return result;
+        }
+        resultIsReadOnly = true;
+        return result.MakeReadOnly();
+      }
+
+      public override Builder MergeFrom(pb::IMessage other) {
+        if (other is MethodDescriptorProto) {
+          return MergeFrom((MethodDescriptorProto) other);
+        } else {
+          base.MergeFrom(other);
+          return this;
+        }
+      }
+
+      public override Builder MergeFrom(MethodDescriptorProto other) {
+        if (other == global::Google.ProtocolBuffers.DescriptorProtos.MethodDescriptorProto.DefaultInstance) return this;
+        PrepareBuilder();
+        if (other.HasName) {
+          Name = other.Name;
+        }
+        if (other.HasInputType) {
+          InputType = other.InputType;
+        }
+        if (other.HasOutputType) {
+          OutputType = other.OutputType;
+        }
+        if (other.HasOptions) {
+          MergeOptions(other.Options);
+        }
+        if (other.HasClientStreaming) {
+          ClientStreaming = other.ClientStreaming;
+        }
+        if (other.HasServerStreaming) {
+          ServerStreaming = other.ServerStreaming;
+        }
+        this.MergeUnknownFields(other.UnknownFields);
+        return this;
+      }
+
+      public override Builder MergeFrom(pb::ICodedInputStream input) {
+        return MergeFrom(input, pb::ExtensionRegistry.Empty);
+      }
+
+      public override Builder MergeFrom(pb::ICodedInputStream input, pb::ExtensionRegistry extensionRegistry) {
+        PrepareBuilder();
+        pb::UnknownFieldSet.Builder unknownFields = null;
+        uint tag;
+        string field_name;
+        while (input.ReadTag(out tag, out field_name)) {
+          if(tag == 0 && field_name != null) {
+            int field_ordinal = global::System.Array.BinarySearch(_methodDescriptorProtoFieldNames, field_name, global::System.StringComparer.Ordinal);
+            if(field_ordinal >= 0)
+              tag = _methodDescriptorProtoFieldTags[field_ordinal];
+            else {
+              if (unknownFields == null) {
+                unknownFields = pb::UnknownFieldSet.CreateBuilder(this.UnknownFields);
+              }
+              ParseUnknownField(input, unknownFields, extensionRegistry, tag, field_name);
+              continue;
+            }
+          }
+          switch (tag) {
+            case 0: {
+              throw pb::InvalidProtocolBufferException.InvalidTag();
+            }
+            default: {
+              if (pb::WireFormat.IsEndGroupTag(tag)) {
+                if (unknownFields != null) {
+                  this.UnknownFields = unknownFields.Build();
+                }
+                return this;
+              }
+              if (unknownFields == null) {
+                unknownFields = pb::UnknownFieldSet.CreateBuilder(this.UnknownFields);
+              }
+              ParseUnknownField(input, unknownFields, extensionRegistry, tag, field_name);
+              break;
+            }
+            case 10: {
+              result.hasName = input.ReadString(ref result.name_);
+              break;
+            }
+            case 18: {
+              result.hasInputType = input.ReadString(ref result.inputType_);
+              break;
+            }
+            case 26: {
+              result.hasOutputType = input.ReadString(ref result.outputType_);
+              break;
+            }
+            case 34: {
+              global::Google.ProtocolBuffers.DescriptorProtos.MethodOptions.Builder subBuilder = global::Google.ProtocolBuffers.DescriptorProtos.MethodOptions.CreateBuilder();
+              if (result.hasOptions) {
+                subBuilder.MergeFrom(Options);
+              }
+              input.ReadMessage(subBuilder, extensionRegistry);
+              Options = subBuilder.BuildPartial();
+              break;
+            }
+            case 40: {
+              result.hasClientStreaming = input.ReadBool(ref result.clientStreaming_);
+              break;
+            }
+            case 48: {
+              result.hasServerStreaming = input.ReadBool(ref result.serverStreaming_);
+              break;
+            }
+          }
+        }
+
+        if (unknownFields != null) {
+          this.UnknownFields = unknownFields.Build();
+        }
+        return this;
+      }
+
+
+      public bool HasName {
+        get { return result.hasName; }
+      }
+      public string Name {
+        get { return result.Name; }
+        set { SetName(value); }
+      }
+      public Builder SetName(string value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.hasName = true;
+        result.name_ = value;
+        return this;
+      }
+      public Builder ClearName() {
+        PrepareBuilder();
+        result.hasName = false;
+        result.name_ = "";
+        return this;
+      }
+
+      public bool HasInputType {
+        get { return result.hasInputType; }
+      }
+      public string InputType {
+        get { return result.InputType; }
+        set { SetInputType(value); }
+      }
+      public Builder SetInputType(string value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.hasInputType = true;
+        result.inputType_ = value;
+        return this;
+      }
+      public Builder ClearInputType() {
+        PrepareBuilder();
+        result.hasInputType = false;
+        result.inputType_ = "";
+        return this;
+      }
+
+      public bool HasOutputType {
+        get { return result.hasOutputType; }
+      }
+      public string OutputType {
+        get { return result.OutputType; }
+        set { SetOutputType(value); }
+      }
+      public Builder SetOutputType(string value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.hasOutputType = true;
+        result.outputType_ = value;
+        return this;
+      }
+      public Builder ClearOutputType() {
+        PrepareBuilder();
+        result.hasOutputType = false;
+        result.outputType_ = "";
+        return this;
+      }
+
+      public bool HasOptions {
+       get { return result.hasOptions; }
+      }
+      public global::Google.ProtocolBuffers.DescriptorProtos.MethodOptions Options {
+        get { return result.Options; }
+        set { SetOptions(value); }
+      }
+      public Builder SetOptions(global::Google.ProtocolBuffers.DescriptorProtos.MethodOptions value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.hasOptions = true;
+        result.options_ = value;
+        return this;
+      }
+      public Builder SetOptions(global::Google.ProtocolBuffers.DescriptorProtos.MethodOptions.Builder builderForValue) {
+        pb::ThrowHelper.ThrowIfNull(builderForValue, "builderForValue");
+        PrepareBuilder();
+        result.hasOptions = true;
+        result.options_ = builderForValue.Build();
+        return this;
+      }
+      public Builder MergeOptions(global::Google.ProtocolBuffers.DescriptorProtos.MethodOptions value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        if (result.hasOptions &&
+            result.options_ != global::Google.ProtocolBuffers.DescriptorProtos.MethodOptions.DefaultInstance) {
+            result.options_ = global::Google.ProtocolBuffers.DescriptorProtos.MethodOptions.CreateBuilder(result.options_).MergeFrom(value).BuildPartial();
+        } else {
+          result.options_ = value;
+        }
+        result.hasOptions = true;
+        return this;
+      }
+      public Builder ClearOptions() {
+        PrepareBuilder();
+        result.hasOptions = false;
+        result.options_ = null;
+        return this;
+      }
+
+      public bool HasClientStreaming {
+        get { return result.hasClientStreaming; }
+      }
+      public bool ClientStreaming {
+        get { return result.ClientStreaming; }
+        set { SetClientStreaming(value); }
+      }
+      public Builder SetClientStreaming(bool value) {
+        PrepareBuilder();
+        result.hasClientStreaming = true;
+        result.clientStreaming_ = value;
+        return this;
+      }
+      public Builder ClearClientStreaming() {
+        PrepareBuilder();
+        result.hasClientStreaming = false;
+        result.clientStreaming_ = false;
+        return this;
+      }
+
+      public bool HasServerStreaming {
+        get { return result.hasServerStreaming; }
+      }
+      public bool ServerStreaming {
+        get { return result.ServerStreaming; }
+        set { SetServerStreaming(value); }
+      }
+      public Builder SetServerStreaming(bool value) {
+        PrepareBuilder();
+        result.hasServerStreaming = true;
+        result.serverStreaming_ = value;
+        return this;
+      }
+      public Builder ClearServerStreaming() {
+        PrepareBuilder();
+        result.hasServerStreaming = false;
+        result.serverStreaming_ = false;
+        return this;
+      }
+    }
+    static MethodDescriptorProto() {
+      object.ReferenceEquals(global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.Descriptor, null);
+    }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-  internal sealed partial class FileOptions : pb::IMessage<FileOptions> {
-    private static readonly pb::MessageParser<FileOptions> _parser = new pb::MessageParser<FileOptions>(() => new FileOptions());
-    public static pb::MessageParser<FileOptions> Parser { get { return _parser; } }
+  public sealed partial class FileOptions : pb::ExtendableMessage<FileOptions, FileOptions.Builder> {
+    private FileOptions() { }
+    private static readonly FileOptions defaultInstance = new FileOptions().MakeReadOnly();
+    private static readonly string[] _fileOptionsFieldNames = new string[] { "cc_enable_arenas", "cc_generic_services", "csharp_namespace", "deprecated", "go_package", "java_generate_equals_and_hash", "java_generic_services", "java_multiple_files", "java_outer_classname", "java_package", "java_string_check_utf8", "objc_class_prefix", "optimize_for", "py_generic_services", "uninterpreted_option" };
+    private static readonly uint[] _fileOptionsFieldTags = new uint[] { 248, 128, 298, 184, 90, 160, 136, 80, 66, 10, 216, 290, 72, 144, 7994 };
+    public static FileOptions DefaultInstance {
+      get { return defaultInstance; }
+    }
 
-    private static readonly string[] _fieldNames = new string[] { "cc_enable_arenas", "cc_generic_services", "csharp_namespace", "deprecated", "go_package", "java_generate_equals_and_hash", "java_generic_services", "java_multiple_files", "java_outer_classname", "java_package", "java_string_check_utf8", "objc_class_prefix", "optimize_for", "py_generic_services", "uninterpreted_option" };
-    private static readonly uint[] _fieldTags = new uint[] { 248, 128, 298, 184, 90, 160, 136, 80, 66, 10, 216, 290, 72, 144, 7994 };
+    public override FileOptions DefaultInstanceForType {
+      get { return DefaultInstance; }
+    }
+
+    protected override FileOptions ThisMessage {
+      get { return this; }
+    }
+
     public static pbd::MessageDescriptor Descriptor {
-      get { return global::Google.Protobuf.DescriptorProtos.DescriptorProtoFile.Descriptor.MessageTypes[9]; }
+      get { return global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_FileOptions__Descriptor; }
     }
 
-    public pb::FieldAccess.FieldAccessorTable Fields {
-      get { return global::Google.Protobuf.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_FileOptions__FieldAccessorTable; }
-    }
-
-    private bool _frozen = false;
-    public bool IsFrozen { get { return _frozen; } }
-
-    public FileOptions() {
-      OnConstruction();
-    }
-
-    partial void OnConstruction();
-
-    public FileOptions(FileOptions other) : this() {
-      javaPackage_ = other.javaPackage_;
-      javaOuterClassname_ = other.javaOuterClassname_;
-      javaMultipleFiles_ = other.javaMultipleFiles_;
-      javaGenerateEqualsAndHash_ = other.javaGenerateEqualsAndHash_;
-      javaStringCheckUtf8_ = other.javaStringCheckUtf8_;
-      optimizeFor_ = other.optimizeFor_;
-      goPackage_ = other.goPackage_;
-      ccGenericServices_ = other.ccGenericServices_;
-      javaGenericServices_ = other.javaGenericServices_;
-      pyGenericServices_ = other.pyGenericServices_;
-      deprecated_ = other.deprecated_;
-      ccEnableArenas_ = other.ccEnableArenas_;
-      objcClassPrefix_ = other.objcClassPrefix_;
-      csharpNamespace_ = other.csharpNamespace_;
-      uninterpretedOption_ = other.uninterpretedOption_.Clone();
-    }
-
-    public FileOptions Clone() {
-      return new FileOptions(this);
-    }
-
-    public void Freeze() {
-      if (IsFrozen) {
-        return;
-      }
-      _frozen = true;
-      uninterpretedOption_.Freeze();
-    }
-
-    public const int JavaPackageFieldNumber = 1;
-    private string javaPackage_ = "";
-    internal string JavaPackage {
-      get { return javaPackage_; }
-      set {
-        pb::Freezable.CheckMutable(this);
-        javaPackage_ = value ?? "";
-      }
-    }
-
-    public const int JavaOuterClassnameFieldNumber = 8;
-    private string javaOuterClassname_ = "";
-    internal string JavaOuterClassname {
-      get { return javaOuterClassname_; }
-      set {
-        pb::Freezable.CheckMutable(this);
-        javaOuterClassname_ = value ?? "";
-      }
-    }
-
-    public const int JavaMultipleFilesFieldNumber = 10;
-    private bool javaMultipleFiles_;
-    internal bool JavaMultipleFiles {
-      get { return javaMultipleFiles_; }
-      set {
-        pb::Freezable.CheckMutable(this);
-        javaMultipleFiles_ = value;
-      }
-    }
-
-    public const int JavaGenerateEqualsAndHashFieldNumber = 20;
-    private bool javaGenerateEqualsAndHash_;
-    internal bool JavaGenerateEqualsAndHash {
-      get { return javaGenerateEqualsAndHash_; }
-      set {
-        pb::Freezable.CheckMutable(this);
-        javaGenerateEqualsAndHash_ = value;
-      }
-    }
-
-    public const int JavaStringCheckUtf8FieldNumber = 27;
-    private bool javaStringCheckUtf8_;
-    internal bool JavaStringCheckUtf8 {
-      get { return javaStringCheckUtf8_; }
-      set {
-        pb::Freezable.CheckMutable(this);
-        javaStringCheckUtf8_ = value;
-      }
-    }
-
-    public const int OptimizeForFieldNumber = 9;
-    private global::Google.Protobuf.DescriptorProtos.FileOptions.Types.OptimizeMode optimizeFor_ = global::Google.Protobuf.DescriptorProtos.FileOptions.Types.OptimizeMode.SPEED;
-    internal global::Google.Protobuf.DescriptorProtos.FileOptions.Types.OptimizeMode OptimizeFor {
-      get { return optimizeFor_; }
-      set {
-        pb::Freezable.CheckMutable(this);
-        optimizeFor_ = value;
-      }
-    }
-
-    public const int GoPackageFieldNumber = 11;
-    private string goPackage_ = "";
-    internal string GoPackage {
-      get { return goPackage_; }
-      set {
-        pb::Freezable.CheckMutable(this);
-        goPackage_ = value ?? "";
-      }
-    }
-
-    public const int CcGenericServicesFieldNumber = 16;
-    private bool ccGenericServices_;
-    internal bool CcGenericServices {
-      get { return ccGenericServices_; }
-      set {
-        pb::Freezable.CheckMutable(this);
-        ccGenericServices_ = value;
-      }
-    }
-
-    public const int JavaGenericServicesFieldNumber = 17;
-    private bool javaGenericServices_;
-    internal bool JavaGenericServices {
-      get { return javaGenericServices_; }
-      set {
-        pb::Freezable.CheckMutable(this);
-        javaGenericServices_ = value;
-      }
-    }
-
-    public const int PyGenericServicesFieldNumber = 18;
-    private bool pyGenericServices_;
-    internal bool PyGenericServices {
-      get { return pyGenericServices_; }
-      set {
-        pb::Freezable.CheckMutable(this);
-        pyGenericServices_ = value;
-      }
-    }
-
-    public const int DeprecatedFieldNumber = 23;
-    private bool deprecated_;
-    internal bool Deprecated {
-      get { return deprecated_; }
-      set {
-        pb::Freezable.CheckMutable(this);
-        deprecated_ = value;
-      }
-    }
-
-    public const int CcEnableArenasFieldNumber = 31;
-    private bool ccEnableArenas_;
-    internal bool CcEnableArenas {
-      get { return ccEnableArenas_; }
-      set {
-        pb::Freezable.CheckMutable(this);
-        ccEnableArenas_ = value;
-      }
-    }
-
-    public const int ObjcClassPrefixFieldNumber = 36;
-    private string objcClassPrefix_ = "";
-    internal string ObjcClassPrefix {
-      get { return objcClassPrefix_; }
-      set {
-        pb::Freezable.CheckMutable(this);
-        objcClassPrefix_ = value ?? "";
-      }
-    }
-
-    public const int CsharpNamespaceFieldNumber = 37;
-    private string csharpNamespace_ = "";
-    internal string CsharpNamespace {
-      get { return csharpNamespace_; }
-      set {
-        pb::Freezable.CheckMutable(this);
-        csharpNamespace_ = value ?? "";
-      }
-    }
-
-    public const int UninterpretedOptionFieldNumber = 999;
-    private static readonly pb::FieldCodec<global::Google.Protobuf.DescriptorProtos.UninterpretedOption> _repeated_uninterpretedOption_codec
-        = pb::FieldCodec.ForMessage(7994, global::Google.Protobuf.DescriptorProtos.UninterpretedOption.Parser);
-    private readonly pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.UninterpretedOption> uninterpretedOption_ = new pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.UninterpretedOption>();
-    internal pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.UninterpretedOption> UninterpretedOption {
-      get { return uninterpretedOption_; }
-    }
-
-    public override bool Equals(object other) {
-      return Equals(other as FileOptions);
-    }
-
-    public bool Equals(FileOptions other) {
-      if (ReferenceEquals(other, null)) {
-        return false;
-      }
-      if (ReferenceEquals(other, this)) {
-        return true;
-      }
-      if (JavaPackage != other.JavaPackage) return false;
-      if (JavaOuterClassname != other.JavaOuterClassname) return false;
-      if (JavaMultipleFiles != other.JavaMultipleFiles) return false;
-      if (JavaGenerateEqualsAndHash != other.JavaGenerateEqualsAndHash) return false;
-      if (JavaStringCheckUtf8 != other.JavaStringCheckUtf8) return false;
-      if (OptimizeFor != other.OptimizeFor) return false;
-      if (GoPackage != other.GoPackage) return false;
-      if (CcGenericServices != other.CcGenericServices) return false;
-      if (JavaGenericServices != other.JavaGenericServices) return false;
-      if (PyGenericServices != other.PyGenericServices) return false;
-      if (Deprecated != other.Deprecated) return false;
-      if (CcEnableArenas != other.CcEnableArenas) return false;
-      if (ObjcClassPrefix != other.ObjcClassPrefix) return false;
-      if (CsharpNamespace != other.CsharpNamespace) return false;
-      if(!uninterpretedOption_.Equals(other.uninterpretedOption_)) return false;
-      return true;
-    }
-
-    public override int GetHashCode() {
-      int hash = 1;
-      if (JavaPackage.Length != 0) hash ^= JavaPackage.GetHashCode();
-      if (JavaOuterClassname.Length != 0) hash ^= JavaOuterClassname.GetHashCode();
-      if (JavaMultipleFiles != false) hash ^= JavaMultipleFiles.GetHashCode();
-      if (JavaGenerateEqualsAndHash != false) hash ^= JavaGenerateEqualsAndHash.GetHashCode();
-      if (JavaStringCheckUtf8 != false) hash ^= JavaStringCheckUtf8.GetHashCode();
-      if (OptimizeFor != global::Google.Protobuf.DescriptorProtos.FileOptions.Types.OptimizeMode.SPEED) hash ^= OptimizeFor.GetHashCode();
-      if (GoPackage.Length != 0) hash ^= GoPackage.GetHashCode();
-      if (CcGenericServices != false) hash ^= CcGenericServices.GetHashCode();
-      if (JavaGenericServices != false) hash ^= JavaGenericServices.GetHashCode();
-      if (PyGenericServices != false) hash ^= PyGenericServices.GetHashCode();
-      if (Deprecated != false) hash ^= Deprecated.GetHashCode();
-      if (CcEnableArenas != false) hash ^= CcEnableArenas.GetHashCode();
-      if (ObjcClassPrefix.Length != 0) hash ^= ObjcClassPrefix.GetHashCode();
-      if (CsharpNamespace.Length != 0) hash ^= CsharpNamespace.GetHashCode();
-      hash ^= uninterpretedOption_.GetHashCode();
-      return hash;
-    }
-
-    public void WriteTo(pb::CodedOutputStream output) {
-      if (JavaPackage.Length != 0) {
-        output.WriteRawTag(10);
-        output.WriteString(JavaPackage);
-      }
-      if (JavaOuterClassname.Length != 0) {
-        output.WriteRawTag(66);
-        output.WriteString(JavaOuterClassname);
-      }
-      if (OptimizeFor != global::Google.Protobuf.DescriptorProtos.FileOptions.Types.OptimizeMode.SPEED) {
-        output.WriteRawTag(72);
-        output.WriteEnum((int) OptimizeFor);
-      }
-      if (JavaMultipleFiles != false) {
-        output.WriteRawTag(80);
-        output.WriteBool(JavaMultipleFiles);
-      }
-      if (GoPackage.Length != 0) {
-        output.WriteRawTag(90);
-        output.WriteString(GoPackage);
-      }
-      if (CcGenericServices != false) {
-        output.WriteRawTag(128, 1);
-        output.WriteBool(CcGenericServices);
-      }
-      if (JavaGenericServices != false) {
-        output.WriteRawTag(136, 1);
-        output.WriteBool(JavaGenericServices);
-      }
-      if (PyGenericServices != false) {
-        output.WriteRawTag(144, 1);
-        output.WriteBool(PyGenericServices);
-      }
-      if (JavaGenerateEqualsAndHash != false) {
-        output.WriteRawTag(160, 1);
-        output.WriteBool(JavaGenerateEqualsAndHash);
-      }
-      if (Deprecated != false) {
-        output.WriteRawTag(184, 1);
-        output.WriteBool(Deprecated);
-      }
-      if (JavaStringCheckUtf8 != false) {
-        output.WriteRawTag(216, 1);
-        output.WriteBool(JavaStringCheckUtf8);
-      }
-      if (CcEnableArenas != false) {
-        output.WriteRawTag(248, 1);
-        output.WriteBool(CcEnableArenas);
-      }
-      if (ObjcClassPrefix.Length != 0) {
-        output.WriteRawTag(162, 2);
-        output.WriteString(ObjcClassPrefix);
-      }
-      if (CsharpNamespace.Length != 0) {
-        output.WriteRawTag(170, 2);
-        output.WriteString(CsharpNamespace);
-      }
-      uninterpretedOption_.WriteTo(output, _repeated_uninterpretedOption_codec);
-    }
-
-    public int CalculateSize() {
-      int size = 0;
-      if (JavaPackage.Length != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeStringSize(JavaPackage);
-      }
-      if (JavaOuterClassname.Length != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeStringSize(JavaOuterClassname);
-      }
-      if (JavaMultipleFiles != false) {
-        size += 1 + 1;
-      }
-      if (JavaGenerateEqualsAndHash != false) {
-        size += 2 + 1;
-      }
-      if (JavaStringCheckUtf8 != false) {
-        size += 2 + 1;
-      }
-      if (OptimizeFor != global::Google.Protobuf.DescriptorProtos.FileOptions.Types.OptimizeMode.SPEED) {
-        size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) OptimizeFor);
-      }
-      if (GoPackage.Length != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeStringSize(GoPackage);
-      }
-      if (CcGenericServices != false) {
-        size += 2 + 1;
-      }
-      if (JavaGenericServices != false) {
-        size += 2 + 1;
-      }
-      if (PyGenericServices != false) {
-        size += 2 + 1;
-      }
-      if (Deprecated != false) {
-        size += 2 + 1;
-      }
-      if (CcEnableArenas != false) {
-        size += 2 + 1;
-      }
-      if (ObjcClassPrefix.Length != 0) {
-        size += 2 + pb::CodedOutputStream.ComputeStringSize(ObjcClassPrefix);
-      }
-      if (CsharpNamespace.Length != 0) {
-        size += 2 + pb::CodedOutputStream.ComputeStringSize(CsharpNamespace);
-      }
-      size += uninterpretedOption_.CalculateSize(_repeated_uninterpretedOption_codec);
-      return size;
-    }
-
-    public void MergeFrom(FileOptions other) {
-      if (other == null) {
-        return;
-      }
-      if (other.JavaPackage.Length != 0) {
-        JavaPackage = other.JavaPackage;
-      }
-      if (other.JavaOuterClassname.Length != 0) {
-        JavaOuterClassname = other.JavaOuterClassname;
-      }
-      if (other.JavaMultipleFiles != false) {
-        JavaMultipleFiles = other.JavaMultipleFiles;
-      }
-      if (other.JavaGenerateEqualsAndHash != false) {
-        JavaGenerateEqualsAndHash = other.JavaGenerateEqualsAndHash;
-      }
-      if (other.JavaStringCheckUtf8 != false) {
-        JavaStringCheckUtf8 = other.JavaStringCheckUtf8;
-      }
-      if (other.OptimizeFor != global::Google.Protobuf.DescriptorProtos.FileOptions.Types.OptimizeMode.SPEED) {
-        OptimizeFor = other.OptimizeFor;
-      }
-      if (other.GoPackage.Length != 0) {
-        GoPackage = other.GoPackage;
-      }
-      if (other.CcGenericServices != false) {
-        CcGenericServices = other.CcGenericServices;
-      }
-      if (other.JavaGenericServices != false) {
-        JavaGenericServices = other.JavaGenericServices;
-      }
-      if (other.PyGenericServices != false) {
-        PyGenericServices = other.PyGenericServices;
-      }
-      if (other.Deprecated != false) {
-        Deprecated = other.Deprecated;
-      }
-      if (other.CcEnableArenas != false) {
-        CcEnableArenas = other.CcEnableArenas;
-      }
-      if (other.ObjcClassPrefix.Length != 0) {
-        ObjcClassPrefix = other.ObjcClassPrefix;
-      }
-      if (other.CsharpNamespace.Length != 0) {
-        CsharpNamespace = other.CsharpNamespace;
-      }
-      uninterpretedOption_.Add(other.uninterpretedOption_);
-    }
-
-    public void MergeFrom(pb::CodedInputStream input) {
-      uint tag;
-      while (input.ReadTag(out tag)) {
-        switch(tag) {
-          case 0:
-            throw pb::InvalidProtocolBufferException.InvalidTag();
-          default:
-            if (pb::WireFormat.IsEndGroupTag(tag)) {
-              return;
-            }
-            break;
-          case 10: {
-            JavaPackage = input.ReadString();
-            break;
-          }
-          case 66: {
-            JavaOuterClassname = input.ReadString();
-            break;
-          }
-          case 72: {
-            optimizeFor_ = (global::Google.Protobuf.DescriptorProtos.FileOptions.Types.OptimizeMode) input.ReadEnum();
-            break;
-          }
-          case 80: {
-            JavaMultipleFiles = input.ReadBool();
-            break;
-          }
-          case 90: {
-            GoPackage = input.ReadString();
-            break;
-          }
-          case 128: {
-            CcGenericServices = input.ReadBool();
-            break;
-          }
-          case 136: {
-            JavaGenericServices = input.ReadBool();
-            break;
-          }
-          case 144: {
-            PyGenericServices = input.ReadBool();
-            break;
-          }
-          case 160: {
-            JavaGenerateEqualsAndHash = input.ReadBool();
-            break;
-          }
-          case 184: {
-            Deprecated = input.ReadBool();
-            break;
-          }
-          case 216: {
-            JavaStringCheckUtf8 = input.ReadBool();
-            break;
-          }
-          case 248: {
-            CcEnableArenas = input.ReadBool();
-            break;
-          }
-          case 290: {
-            ObjcClassPrefix = input.ReadString();
-            break;
-          }
-          case 298: {
-            CsharpNamespace = input.ReadString();
-            break;
-          }
-          case 7994: {
-            uninterpretedOption_.AddEntriesFrom(input, _repeated_uninterpretedOption_codec);
-            break;
-          }
-        }
-      }
+    protected override pb::FieldAccess.FieldAccessorTable<FileOptions, FileOptions.Builder> InternalFieldAccessors {
+      get { return global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_FileOptions__FieldAccessorTable; }
     }
 
     #region Nested types
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     public static partial class Types {
-      internal enum OptimizeMode {
+      public enum OptimizeMode {
         SPEED = 1,
         CODE_SIZE = 2,
         LITE_RUNTIME = 3,
@@ -3050,500 +5890,1423 @@ namespace Google.Protobuf.DescriptorProtos {
     }
     #endregion
 
+    public const int JavaPackageFieldNumber = 1;
+    private bool hasJavaPackage;
+    private string javaPackage_ = "";
+    public bool HasJavaPackage {
+      get { return hasJavaPackage; }
+    }
+    public string JavaPackage {
+      get { return javaPackage_; }
+    }
+
+    public const int JavaOuterClassnameFieldNumber = 8;
+    private bool hasJavaOuterClassname;
+    private string javaOuterClassname_ = "";
+    public bool HasJavaOuterClassname {
+      get { return hasJavaOuterClassname; }
+    }
+    public string JavaOuterClassname {
+      get { return javaOuterClassname_; }
+    }
+
+    public const int JavaMultipleFilesFieldNumber = 10;
+    private bool hasJavaMultipleFiles;
+    private bool javaMultipleFiles_;
+    public bool HasJavaMultipleFiles {
+      get { return hasJavaMultipleFiles; }
+    }
+    public bool JavaMultipleFiles {
+      get { return javaMultipleFiles_; }
+    }
+
+    public const int JavaGenerateEqualsAndHashFieldNumber = 20;
+    private bool hasJavaGenerateEqualsAndHash;
+    private bool javaGenerateEqualsAndHash_;
+    public bool HasJavaGenerateEqualsAndHash {
+      get { return hasJavaGenerateEqualsAndHash; }
+    }
+    public bool JavaGenerateEqualsAndHash {
+      get { return javaGenerateEqualsAndHash_; }
+    }
+
+    public const int JavaStringCheckUtf8FieldNumber = 27;
+    private bool hasJavaStringCheckUtf8;
+    private bool javaStringCheckUtf8_;
+    public bool HasJavaStringCheckUtf8 {
+      get { return hasJavaStringCheckUtf8; }
+    }
+    public bool JavaStringCheckUtf8 {
+      get { return javaStringCheckUtf8_; }
+    }
+
+    public const int OptimizeForFieldNumber = 9;
+    private bool hasOptimizeFor;
+    private global::Google.ProtocolBuffers.DescriptorProtos.FileOptions.Types.OptimizeMode optimizeFor_ = global::Google.ProtocolBuffers.DescriptorProtos.FileOptions.Types.OptimizeMode.SPEED;
+    public bool HasOptimizeFor {
+      get { return hasOptimizeFor; }
+    }
+    public global::Google.ProtocolBuffers.DescriptorProtos.FileOptions.Types.OptimizeMode OptimizeFor {
+      get { return optimizeFor_; }
+    }
+
+    public const int GoPackageFieldNumber = 11;
+    private bool hasGoPackage;
+    private string goPackage_ = "";
+    public bool HasGoPackage {
+      get { return hasGoPackage; }
+    }
+    public string GoPackage {
+      get { return goPackage_; }
+    }
+
+    public const int CcGenericServicesFieldNumber = 16;
+    private bool hasCcGenericServices;
+    private bool ccGenericServices_;
+    public bool HasCcGenericServices {
+      get { return hasCcGenericServices; }
+    }
+    public bool CcGenericServices {
+      get { return ccGenericServices_; }
+    }
+
+    public const int JavaGenericServicesFieldNumber = 17;
+    private bool hasJavaGenericServices;
+    private bool javaGenericServices_;
+    public bool HasJavaGenericServices {
+      get { return hasJavaGenericServices; }
+    }
+    public bool JavaGenericServices {
+      get { return javaGenericServices_; }
+    }
+
+    public const int PyGenericServicesFieldNumber = 18;
+    private bool hasPyGenericServices;
+    private bool pyGenericServices_;
+    public bool HasPyGenericServices {
+      get { return hasPyGenericServices; }
+    }
+    public bool PyGenericServices {
+      get { return pyGenericServices_; }
+    }
+
+    public const int DeprecatedFieldNumber = 23;
+    private bool hasDeprecated;
+    private bool deprecated_;
+    public bool HasDeprecated {
+      get { return hasDeprecated; }
+    }
+    public bool Deprecated {
+      get { return deprecated_; }
+    }
+
+    public const int CcEnableArenasFieldNumber = 31;
+    private bool hasCcEnableArenas;
+    private bool ccEnableArenas_;
+    public bool HasCcEnableArenas {
+      get { return hasCcEnableArenas; }
+    }
+    public bool CcEnableArenas {
+      get { return ccEnableArenas_; }
+    }
+
+    public const int ObjcClassPrefixFieldNumber = 36;
+    private bool hasObjcClassPrefix;
+    private string objcClassPrefix_ = "";
+    public bool HasObjcClassPrefix {
+      get { return hasObjcClassPrefix; }
+    }
+    public string ObjcClassPrefix {
+      get { return objcClassPrefix_; }
+    }
+
+    public const int CsharpNamespaceFieldNumber = 37;
+    private bool hasCsharpNamespace;
+    private string csharpNamespace_ = "";
+    public bool HasCsharpNamespace {
+      get { return hasCsharpNamespace; }
+    }
+    public string CsharpNamespace {
+      get { return csharpNamespace_; }
+    }
+
+    public const int UninterpretedOptionFieldNumber = 999;
+    private pbc::PopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption> uninterpretedOption_ = new pbc::PopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption>();
+    public scg::IList<global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption> UninterpretedOptionList {
+      get { return uninterpretedOption_; }
+    }
+    public int UninterpretedOptionCount {
+      get { return uninterpretedOption_.Count; }
+    }
+    public global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption GetUninterpretedOption(int index) {
+      return uninterpretedOption_[index];
+    }
+
+    public override bool IsInitialized {
+      get {
+        foreach (global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption element in UninterpretedOptionList) {
+          if (!element.IsInitialized) return false;
+        }
+        if (!ExtensionsAreInitialized) return false;
+        return true;
+      }
+    }
+
+    public override void WriteTo(pb::ICodedOutputStream output) {
+      CalcSerializedSize();
+      string[] field_names = _fileOptionsFieldNames;
+      pb::ExtendableMessage<FileOptions, FileOptions.Builder>.ExtensionWriter extensionWriter = CreateExtensionWriter(this);
+      if (hasJavaPackage) {
+        output.WriteString(1, field_names[9], JavaPackage);
+      }
+      if (hasJavaOuterClassname) {
+        output.WriteString(8, field_names[8], JavaOuterClassname);
+      }
+      if (hasOptimizeFor) {
+        output.WriteEnum(9, field_names[12], (int) OptimizeFor, OptimizeFor);
+      }
+      if (hasJavaMultipleFiles) {
+        output.WriteBool(10, field_names[7], JavaMultipleFiles);
+      }
+      if (hasGoPackage) {
+        output.WriteString(11, field_names[4], GoPackage);
+      }
+      if (hasCcGenericServices) {
+        output.WriteBool(16, field_names[1], CcGenericServices);
+      }
+      if (hasJavaGenericServices) {
+        output.WriteBool(17, field_names[6], JavaGenericServices);
+      }
+      if (hasPyGenericServices) {
+        output.WriteBool(18, field_names[13], PyGenericServices);
+      }
+      if (hasJavaGenerateEqualsAndHash) {
+        output.WriteBool(20, field_names[5], JavaGenerateEqualsAndHash);
+      }
+      if (hasDeprecated) {
+        output.WriteBool(23, field_names[3], Deprecated);
+      }
+      if (hasJavaStringCheckUtf8) {
+        output.WriteBool(27, field_names[10], JavaStringCheckUtf8);
+      }
+      if (hasCcEnableArenas) {
+        output.WriteBool(31, field_names[0], CcEnableArenas);
+      }
+      if (hasObjcClassPrefix) {
+        output.WriteString(36, field_names[11], ObjcClassPrefix);
+      }
+      if (hasCsharpNamespace) {
+        output.WriteString(37, field_names[2], CsharpNamespace);
+      }
+      if (uninterpretedOption_.Count > 0) {
+        output.WriteMessageArray(999, field_names[14], uninterpretedOption_);
+      }
+      extensionWriter.WriteUntil(536870912, output);
+      UnknownFields.WriteTo(output);
+    }
+
+    private int memoizedSerializedSize = -1;
+    public override int SerializedSize {
+      get {
+        int size = memoizedSerializedSize;
+        if (size != -1) return size;
+        return CalcSerializedSize();
+      }
+    }
+
+    private int CalcSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (hasJavaPackage) {
+        size += pb::CodedOutputStream.ComputeStringSize(1, JavaPackage);
+      }
+      if (hasJavaOuterClassname) {
+        size += pb::CodedOutputStream.ComputeStringSize(8, JavaOuterClassname);
+      }
+      if (hasJavaMultipleFiles) {
+        size += pb::CodedOutputStream.ComputeBoolSize(10, JavaMultipleFiles);
+      }
+      if (hasJavaGenerateEqualsAndHash) {
+        size += pb::CodedOutputStream.ComputeBoolSize(20, JavaGenerateEqualsAndHash);
+      }
+      if (hasJavaStringCheckUtf8) {
+        size += pb::CodedOutputStream.ComputeBoolSize(27, JavaStringCheckUtf8);
+      }
+      if (hasOptimizeFor) {
+        size += pb::CodedOutputStream.ComputeEnumSize(9, (int) OptimizeFor);
+      }
+      if (hasGoPackage) {
+        size += pb::CodedOutputStream.ComputeStringSize(11, GoPackage);
+      }
+      if (hasCcGenericServices) {
+        size += pb::CodedOutputStream.ComputeBoolSize(16, CcGenericServices);
+      }
+      if (hasJavaGenericServices) {
+        size += pb::CodedOutputStream.ComputeBoolSize(17, JavaGenericServices);
+      }
+      if (hasPyGenericServices) {
+        size += pb::CodedOutputStream.ComputeBoolSize(18, PyGenericServices);
+      }
+      if (hasDeprecated) {
+        size += pb::CodedOutputStream.ComputeBoolSize(23, Deprecated);
+      }
+      if (hasCcEnableArenas) {
+        size += pb::CodedOutputStream.ComputeBoolSize(31, CcEnableArenas);
+      }
+      if (hasObjcClassPrefix) {
+        size += pb::CodedOutputStream.ComputeStringSize(36, ObjcClassPrefix);
+      }
+      if (hasCsharpNamespace) {
+        size += pb::CodedOutputStream.ComputeStringSize(37, CsharpNamespace);
+      }
+      foreach (global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption element in UninterpretedOptionList) {
+        size += pb::CodedOutputStream.ComputeMessageSize(999, element);
+      }
+      size += ExtensionsSerializedSize;
+      size += UnknownFields.SerializedSize;
+      memoizedSerializedSize = size;
+      return size;
+    }
+    public static FileOptions ParseFrom(pb::ByteString data) {
+      return ((Builder) CreateBuilder().MergeFrom(data)).BuildParsed();
+    }
+    public static FileOptions ParseFrom(pb::ByteString data, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(data, extensionRegistry)).BuildParsed();
+    }
+    public static FileOptions ParseFrom(byte[] data) {
+      return ((Builder) CreateBuilder().MergeFrom(data)).BuildParsed();
+    }
+    public static FileOptions ParseFrom(byte[] data, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(data, extensionRegistry)).BuildParsed();
+    }
+    public static FileOptions ParseFrom(global::System.IO.Stream input) {
+      return ((Builder) CreateBuilder().MergeFrom(input)).BuildParsed();
+    }
+    public static FileOptions ParseFrom(global::System.IO.Stream input, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(input, extensionRegistry)).BuildParsed();
+    }
+    public static FileOptions ParseDelimitedFrom(global::System.IO.Stream input) {
+      return CreateBuilder().MergeDelimitedFrom(input).BuildParsed();
+    }
+    public static FileOptions ParseDelimitedFrom(global::System.IO.Stream input, pb::ExtensionRegistry extensionRegistry) {
+      return CreateBuilder().MergeDelimitedFrom(input, extensionRegistry).BuildParsed();
+    }
+    public static FileOptions ParseFrom(pb::ICodedInputStream input) {
+      return ((Builder) CreateBuilder().MergeFrom(input)).BuildParsed();
+    }
+    public static FileOptions ParseFrom(pb::ICodedInputStream input, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(input, extensionRegistry)).BuildParsed();
+    }
+    private FileOptions MakeReadOnly() {
+      uninterpretedOption_.MakeReadOnly();
+      return this;
+    }
+
+    public static Builder CreateBuilder() { return new Builder(); }
+    public override Builder ToBuilder() { return CreateBuilder(this); }
+    public override Builder CreateBuilderForType() { return new Builder(); }
+    public static Builder CreateBuilder(FileOptions prototype) {
+      return new Builder(prototype);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+    public sealed partial class Builder : pb::ExtendableBuilder<FileOptions, Builder> {
+      protected override Builder ThisBuilder {
+        get { return this; }
+      }
+      public Builder() {
+        result = DefaultInstance;
+        resultIsReadOnly = true;
+      }
+      internal Builder(FileOptions cloneFrom) {
+        result = cloneFrom;
+        resultIsReadOnly = true;
+      }
+
+      private bool resultIsReadOnly;
+      private FileOptions result;
+
+      private FileOptions PrepareBuilder() {
+        if (resultIsReadOnly) {
+          FileOptions original = result;
+          result = new FileOptions();
+          resultIsReadOnly = false;
+          MergeFrom(original);
+        }
+        return result;
+      }
+
+      public override bool IsInitialized {
+        get { return result.IsInitialized; }
+      }
+
+      protected override FileOptions MessageBeingBuilt {
+        get { return PrepareBuilder(); }
+      }
+
+      public override Builder Clear() {
+        result = DefaultInstance;
+        resultIsReadOnly = true;
+        return this;
+      }
+
+      public override Builder Clone() {
+        if (resultIsReadOnly) {
+          return new Builder(result);
+        } else {
+          return new Builder().MergeFrom(result);
+        }
+      }
+
+      public override pbd::MessageDescriptor DescriptorForType {
+        get { return global::Google.ProtocolBuffers.DescriptorProtos.FileOptions.Descriptor; }
+      }
+
+      public override FileOptions DefaultInstanceForType {
+        get { return global::Google.ProtocolBuffers.DescriptorProtos.FileOptions.DefaultInstance; }
+      }
+
+      public override FileOptions BuildPartial() {
+        if (resultIsReadOnly) {
+          return result;
+        }
+        resultIsReadOnly = true;
+        return result.MakeReadOnly();
+      }
+
+      public override Builder MergeFrom(pb::IMessage other) {
+        if (other is FileOptions) {
+          return MergeFrom((FileOptions) other);
+        } else {
+          base.MergeFrom(other);
+          return this;
+        }
+      }
+
+      public override Builder MergeFrom(FileOptions other) {
+        if (other == global::Google.ProtocolBuffers.DescriptorProtos.FileOptions.DefaultInstance) return this;
+        PrepareBuilder();
+        if (other.HasJavaPackage) {
+          JavaPackage = other.JavaPackage;
+        }
+        if (other.HasJavaOuterClassname) {
+          JavaOuterClassname = other.JavaOuterClassname;
+        }
+        if (other.HasJavaMultipleFiles) {
+          JavaMultipleFiles = other.JavaMultipleFiles;
+        }
+        if (other.HasJavaGenerateEqualsAndHash) {
+          JavaGenerateEqualsAndHash = other.JavaGenerateEqualsAndHash;
+        }
+        if (other.HasJavaStringCheckUtf8) {
+          JavaStringCheckUtf8 = other.JavaStringCheckUtf8;
+        }
+        if (other.HasOptimizeFor) {
+          OptimizeFor = other.OptimizeFor;
+        }
+        if (other.HasGoPackage) {
+          GoPackage = other.GoPackage;
+        }
+        if (other.HasCcGenericServices) {
+          CcGenericServices = other.CcGenericServices;
+        }
+        if (other.HasJavaGenericServices) {
+          JavaGenericServices = other.JavaGenericServices;
+        }
+        if (other.HasPyGenericServices) {
+          PyGenericServices = other.PyGenericServices;
+        }
+        if (other.HasDeprecated) {
+          Deprecated = other.Deprecated;
+        }
+        if (other.HasCcEnableArenas) {
+          CcEnableArenas = other.CcEnableArenas;
+        }
+        if (other.HasObjcClassPrefix) {
+          ObjcClassPrefix = other.ObjcClassPrefix;
+        }
+        if (other.HasCsharpNamespace) {
+          CsharpNamespace = other.CsharpNamespace;
+        }
+        if (other.uninterpretedOption_.Count != 0) {
+          result.uninterpretedOption_.Add(other.uninterpretedOption_);
+        }
+          this.MergeExtensionFields(other);
+        this.MergeUnknownFields(other.UnknownFields);
+        return this;
+      }
+
+      public override Builder MergeFrom(pb::ICodedInputStream input) {
+        return MergeFrom(input, pb::ExtensionRegistry.Empty);
+      }
+
+      public override Builder MergeFrom(pb::ICodedInputStream input, pb::ExtensionRegistry extensionRegistry) {
+        PrepareBuilder();
+        pb::UnknownFieldSet.Builder unknownFields = null;
+        uint tag;
+        string field_name;
+        while (input.ReadTag(out tag, out field_name)) {
+          if(tag == 0 && field_name != null) {
+            int field_ordinal = global::System.Array.BinarySearch(_fileOptionsFieldNames, field_name, global::System.StringComparer.Ordinal);
+            if(field_ordinal >= 0)
+              tag = _fileOptionsFieldTags[field_ordinal];
+            else {
+              if (unknownFields == null) {
+                unknownFields = pb::UnknownFieldSet.CreateBuilder(this.UnknownFields);
+              }
+              ParseUnknownField(input, unknownFields, extensionRegistry, tag, field_name);
+              continue;
+            }
+          }
+          switch (tag) {
+            case 0: {
+              throw pb::InvalidProtocolBufferException.InvalidTag();
+            }
+            default: {
+              if (pb::WireFormat.IsEndGroupTag(tag)) {
+                if (unknownFields != null) {
+                  this.UnknownFields = unknownFields.Build();
+                }
+                return this;
+              }
+              if (unknownFields == null) {
+                unknownFields = pb::UnknownFieldSet.CreateBuilder(this.UnknownFields);
+              }
+              ParseUnknownField(input, unknownFields, extensionRegistry, tag, field_name);
+              break;
+            }
+            case 10: {
+              result.hasJavaPackage = input.ReadString(ref result.javaPackage_);
+              break;
+            }
+            case 66: {
+              result.hasJavaOuterClassname = input.ReadString(ref result.javaOuterClassname_);
+              break;
+            }
+            case 72: {
+              object unknown;
+              if(input.ReadEnum(ref result.optimizeFor_, out unknown)) {
+                result.hasOptimizeFor = true;
+              } else if(unknown is int) {
+                if (unknownFields == null) {
+                  unknownFields = pb::UnknownFieldSet.CreateBuilder(this.UnknownFields);
+                }
+                unknownFields.MergeVarintField(9, (ulong)(int)unknown);
+              }
+              break;
+            }
+            case 80: {
+              result.hasJavaMultipleFiles = input.ReadBool(ref result.javaMultipleFiles_);
+              break;
+            }
+            case 90: {
+              result.hasGoPackage = input.ReadString(ref result.goPackage_);
+              break;
+            }
+            case 128: {
+              result.hasCcGenericServices = input.ReadBool(ref result.ccGenericServices_);
+              break;
+            }
+            case 136: {
+              result.hasJavaGenericServices = input.ReadBool(ref result.javaGenericServices_);
+              break;
+            }
+            case 144: {
+              result.hasPyGenericServices = input.ReadBool(ref result.pyGenericServices_);
+              break;
+            }
+            case 160: {
+              result.hasJavaGenerateEqualsAndHash = input.ReadBool(ref result.javaGenerateEqualsAndHash_);
+              break;
+            }
+            case 184: {
+              result.hasDeprecated = input.ReadBool(ref result.deprecated_);
+              break;
+            }
+            case 216: {
+              result.hasJavaStringCheckUtf8 = input.ReadBool(ref result.javaStringCheckUtf8_);
+              break;
+            }
+            case 248: {
+              result.hasCcEnableArenas = input.ReadBool(ref result.ccEnableArenas_);
+              break;
+            }
+            case 290: {
+              result.hasObjcClassPrefix = input.ReadString(ref result.objcClassPrefix_);
+              break;
+            }
+            case 298: {
+              result.hasCsharpNamespace = input.ReadString(ref result.csharpNamespace_);
+              break;
+            }
+            case 7994: {
+              input.ReadMessageArray(tag, field_name, result.uninterpretedOption_, global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption.DefaultInstance, extensionRegistry);
+              break;
+            }
+          }
+        }
+
+        if (unknownFields != null) {
+          this.UnknownFields = unknownFields.Build();
+        }
+        return this;
+      }
+
+
+      public bool HasJavaPackage {
+        get { return result.hasJavaPackage; }
+      }
+      public string JavaPackage {
+        get { return result.JavaPackage; }
+        set { SetJavaPackage(value); }
+      }
+      public Builder SetJavaPackage(string value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.hasJavaPackage = true;
+        result.javaPackage_ = value;
+        return this;
+      }
+      public Builder ClearJavaPackage() {
+        PrepareBuilder();
+        result.hasJavaPackage = false;
+        result.javaPackage_ = "";
+        return this;
+      }
+
+      public bool HasJavaOuterClassname {
+        get { return result.hasJavaOuterClassname; }
+      }
+      public string JavaOuterClassname {
+        get { return result.JavaOuterClassname; }
+        set { SetJavaOuterClassname(value); }
+      }
+      public Builder SetJavaOuterClassname(string value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.hasJavaOuterClassname = true;
+        result.javaOuterClassname_ = value;
+        return this;
+      }
+      public Builder ClearJavaOuterClassname() {
+        PrepareBuilder();
+        result.hasJavaOuterClassname = false;
+        result.javaOuterClassname_ = "";
+        return this;
+      }
+
+      public bool HasJavaMultipleFiles {
+        get { return result.hasJavaMultipleFiles; }
+      }
+      public bool JavaMultipleFiles {
+        get { return result.JavaMultipleFiles; }
+        set { SetJavaMultipleFiles(value); }
+      }
+      public Builder SetJavaMultipleFiles(bool value) {
+        PrepareBuilder();
+        result.hasJavaMultipleFiles = true;
+        result.javaMultipleFiles_ = value;
+        return this;
+      }
+      public Builder ClearJavaMultipleFiles() {
+        PrepareBuilder();
+        result.hasJavaMultipleFiles = false;
+        result.javaMultipleFiles_ = false;
+        return this;
+      }
+
+      public bool HasJavaGenerateEqualsAndHash {
+        get { return result.hasJavaGenerateEqualsAndHash; }
+      }
+      public bool JavaGenerateEqualsAndHash {
+        get { return result.JavaGenerateEqualsAndHash; }
+        set { SetJavaGenerateEqualsAndHash(value); }
+      }
+      public Builder SetJavaGenerateEqualsAndHash(bool value) {
+        PrepareBuilder();
+        result.hasJavaGenerateEqualsAndHash = true;
+        result.javaGenerateEqualsAndHash_ = value;
+        return this;
+      }
+      public Builder ClearJavaGenerateEqualsAndHash() {
+        PrepareBuilder();
+        result.hasJavaGenerateEqualsAndHash = false;
+        result.javaGenerateEqualsAndHash_ = false;
+        return this;
+      }
+
+      public bool HasJavaStringCheckUtf8 {
+        get { return result.hasJavaStringCheckUtf8; }
+      }
+      public bool JavaStringCheckUtf8 {
+        get { return result.JavaStringCheckUtf8; }
+        set { SetJavaStringCheckUtf8(value); }
+      }
+      public Builder SetJavaStringCheckUtf8(bool value) {
+        PrepareBuilder();
+        result.hasJavaStringCheckUtf8 = true;
+        result.javaStringCheckUtf8_ = value;
+        return this;
+      }
+      public Builder ClearJavaStringCheckUtf8() {
+        PrepareBuilder();
+        result.hasJavaStringCheckUtf8 = false;
+        result.javaStringCheckUtf8_ = false;
+        return this;
+      }
+
+      public bool HasOptimizeFor {
+        get { return result.hasOptimizeFor; }
+      }
+      public global::Google.ProtocolBuffers.DescriptorProtos.FileOptions.Types.OptimizeMode OptimizeFor {
+        get { return result.OptimizeFor; }
+        set { SetOptimizeFor(value); }
+      }
+      public Builder SetOptimizeFor(global::Google.ProtocolBuffers.DescriptorProtos.FileOptions.Types.OptimizeMode value) {
+        PrepareBuilder();
+        result.hasOptimizeFor = true;
+        result.optimizeFor_ = value;
+        return this;
+      }
+      public Builder ClearOptimizeFor() {
+        PrepareBuilder();
+        result.hasOptimizeFor = false;
+        result.optimizeFor_ = global::Google.ProtocolBuffers.DescriptorProtos.FileOptions.Types.OptimizeMode.SPEED;
+        return this;
+      }
+
+      public bool HasGoPackage {
+        get { return result.hasGoPackage; }
+      }
+      public string GoPackage {
+        get { return result.GoPackage; }
+        set { SetGoPackage(value); }
+      }
+      public Builder SetGoPackage(string value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.hasGoPackage = true;
+        result.goPackage_ = value;
+        return this;
+      }
+      public Builder ClearGoPackage() {
+        PrepareBuilder();
+        result.hasGoPackage = false;
+        result.goPackage_ = "";
+        return this;
+      }
+
+      public bool HasCcGenericServices {
+        get { return result.hasCcGenericServices; }
+      }
+      public bool CcGenericServices {
+        get { return result.CcGenericServices; }
+        set { SetCcGenericServices(value); }
+      }
+      public Builder SetCcGenericServices(bool value) {
+        PrepareBuilder();
+        result.hasCcGenericServices = true;
+        result.ccGenericServices_ = value;
+        return this;
+      }
+      public Builder ClearCcGenericServices() {
+        PrepareBuilder();
+        result.hasCcGenericServices = false;
+        result.ccGenericServices_ = false;
+        return this;
+      }
+
+      public bool HasJavaGenericServices {
+        get { return result.hasJavaGenericServices; }
+      }
+      public bool JavaGenericServices {
+        get { return result.JavaGenericServices; }
+        set { SetJavaGenericServices(value); }
+      }
+      public Builder SetJavaGenericServices(bool value) {
+        PrepareBuilder();
+        result.hasJavaGenericServices = true;
+        result.javaGenericServices_ = value;
+        return this;
+      }
+      public Builder ClearJavaGenericServices() {
+        PrepareBuilder();
+        result.hasJavaGenericServices = false;
+        result.javaGenericServices_ = false;
+        return this;
+      }
+
+      public bool HasPyGenericServices {
+        get { return result.hasPyGenericServices; }
+      }
+      public bool PyGenericServices {
+        get { return result.PyGenericServices; }
+        set { SetPyGenericServices(value); }
+      }
+      public Builder SetPyGenericServices(bool value) {
+        PrepareBuilder();
+        result.hasPyGenericServices = true;
+        result.pyGenericServices_ = value;
+        return this;
+      }
+      public Builder ClearPyGenericServices() {
+        PrepareBuilder();
+        result.hasPyGenericServices = false;
+        result.pyGenericServices_ = false;
+        return this;
+      }
+
+      public bool HasDeprecated {
+        get { return result.hasDeprecated; }
+      }
+      public bool Deprecated {
+        get { return result.Deprecated; }
+        set { SetDeprecated(value); }
+      }
+      public Builder SetDeprecated(bool value) {
+        PrepareBuilder();
+        result.hasDeprecated = true;
+        result.deprecated_ = value;
+        return this;
+      }
+      public Builder ClearDeprecated() {
+        PrepareBuilder();
+        result.hasDeprecated = false;
+        result.deprecated_ = false;
+        return this;
+      }
+
+      public bool HasCcEnableArenas {
+        get { return result.hasCcEnableArenas; }
+      }
+      public bool CcEnableArenas {
+        get { return result.CcEnableArenas; }
+        set { SetCcEnableArenas(value); }
+      }
+      public Builder SetCcEnableArenas(bool value) {
+        PrepareBuilder();
+        result.hasCcEnableArenas = true;
+        result.ccEnableArenas_ = value;
+        return this;
+      }
+      public Builder ClearCcEnableArenas() {
+        PrepareBuilder();
+        result.hasCcEnableArenas = false;
+        result.ccEnableArenas_ = false;
+        return this;
+      }
+
+      public bool HasObjcClassPrefix {
+        get { return result.hasObjcClassPrefix; }
+      }
+      public string ObjcClassPrefix {
+        get { return result.ObjcClassPrefix; }
+        set { SetObjcClassPrefix(value); }
+      }
+      public Builder SetObjcClassPrefix(string value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.hasObjcClassPrefix = true;
+        result.objcClassPrefix_ = value;
+        return this;
+      }
+      public Builder ClearObjcClassPrefix() {
+        PrepareBuilder();
+        result.hasObjcClassPrefix = false;
+        result.objcClassPrefix_ = "";
+        return this;
+      }
+
+      public bool HasCsharpNamespace {
+        get { return result.hasCsharpNamespace; }
+      }
+      public string CsharpNamespace {
+        get { return result.CsharpNamespace; }
+        set { SetCsharpNamespace(value); }
+      }
+      public Builder SetCsharpNamespace(string value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.hasCsharpNamespace = true;
+        result.csharpNamespace_ = value;
+        return this;
+      }
+      public Builder ClearCsharpNamespace() {
+        PrepareBuilder();
+        result.hasCsharpNamespace = false;
+        result.csharpNamespace_ = "";
+        return this;
+      }
+
+      public pbc::IPopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption> UninterpretedOptionList {
+        get { return PrepareBuilder().uninterpretedOption_; }
+      }
+      public int UninterpretedOptionCount {
+        get { return result.UninterpretedOptionCount; }
+      }
+      public global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption GetUninterpretedOption(int index) {
+        return result.GetUninterpretedOption(index);
+      }
+      public Builder SetUninterpretedOption(int index, global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.uninterpretedOption_[index] = value;
+        return this;
+      }
+      public Builder SetUninterpretedOption(int index, global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption.Builder builderForValue) {
+        pb::ThrowHelper.ThrowIfNull(builderForValue, "builderForValue");
+        PrepareBuilder();
+        result.uninterpretedOption_[index] = builderForValue.Build();
+        return this;
+      }
+      public Builder AddUninterpretedOption(global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.uninterpretedOption_.Add(value);
+        return this;
+      }
+      public Builder AddUninterpretedOption(global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption.Builder builderForValue) {
+        pb::ThrowHelper.ThrowIfNull(builderForValue, "builderForValue");
+        PrepareBuilder();
+        result.uninterpretedOption_.Add(builderForValue.Build());
+        return this;
+      }
+      public Builder AddRangeUninterpretedOption(scg::IEnumerable<global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption> values) {
+        PrepareBuilder();
+        result.uninterpretedOption_.Add(values);
+        return this;
+      }
+      public Builder ClearUninterpretedOption() {
+        PrepareBuilder();
+        result.uninterpretedOption_.Clear();
+        return this;
+      }
+    }
+    static FileOptions() {
+      object.ReferenceEquals(global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.Descriptor, null);
+    }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-  internal sealed partial class MessageOptions : pb::IMessage<MessageOptions> {
-    private static readonly pb::MessageParser<MessageOptions> _parser = new pb::MessageParser<MessageOptions>(() => new MessageOptions());
-    public static pb::MessageParser<MessageOptions> Parser { get { return _parser; } }
+  public sealed partial class MessageOptions : pb::ExtendableMessage<MessageOptions, MessageOptions.Builder> {
+    private MessageOptions() { }
+    private static readonly MessageOptions defaultInstance = new MessageOptions().MakeReadOnly();
+    private static readonly string[] _messageOptionsFieldNames = new string[] { "deprecated", "map_entry", "message_set_wire_format", "no_standard_descriptor_accessor", "uninterpreted_option" };
+    private static readonly uint[] _messageOptionsFieldTags = new uint[] { 24, 56, 8, 16, 7994 };
+    public static MessageOptions DefaultInstance {
+      get { return defaultInstance; }
+    }
 
-    private static readonly string[] _fieldNames = new string[] { "deprecated", "map_entry", "message_set_wire_format", "no_standard_descriptor_accessor", "uninterpreted_option" };
-    private static readonly uint[] _fieldTags = new uint[] { 24, 56, 8, 16, 7994 };
+    public override MessageOptions DefaultInstanceForType {
+      get { return DefaultInstance; }
+    }
+
+    protected override MessageOptions ThisMessage {
+      get { return this; }
+    }
+
     public static pbd::MessageDescriptor Descriptor {
-      get { return global::Google.Protobuf.DescriptorProtos.DescriptorProtoFile.Descriptor.MessageTypes[10]; }
+      get { return global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_MessageOptions__Descriptor; }
     }
 
-    public pb::FieldAccess.FieldAccessorTable Fields {
-      get { return global::Google.Protobuf.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_MessageOptions__FieldAccessorTable; }
-    }
-
-    private bool _frozen = false;
-    public bool IsFrozen { get { return _frozen; } }
-
-    public MessageOptions() {
-      OnConstruction();
-    }
-
-    partial void OnConstruction();
-
-    public MessageOptions(MessageOptions other) : this() {
-      messageSetWireFormat_ = other.messageSetWireFormat_;
-      noStandardDescriptorAccessor_ = other.noStandardDescriptorAccessor_;
-      deprecated_ = other.deprecated_;
-      mapEntry_ = other.mapEntry_;
-      uninterpretedOption_ = other.uninterpretedOption_.Clone();
-    }
-
-    public MessageOptions Clone() {
-      return new MessageOptions(this);
-    }
-
-    public void Freeze() {
-      if (IsFrozen) {
-        return;
-      }
-      _frozen = true;
-      uninterpretedOption_.Freeze();
+    protected override pb::FieldAccess.FieldAccessorTable<MessageOptions, MessageOptions.Builder> InternalFieldAccessors {
+      get { return global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_MessageOptions__FieldAccessorTable; }
     }
 
     public const int MessageSetWireFormatFieldNumber = 1;
+    private bool hasMessageSetWireFormat;
     private bool messageSetWireFormat_;
-    internal bool MessageSetWireFormat {
+    public bool HasMessageSetWireFormat {
+      get { return hasMessageSetWireFormat; }
+    }
+    public bool MessageSetWireFormat {
       get { return messageSetWireFormat_; }
-      set {
-        pb::Freezable.CheckMutable(this);
-        messageSetWireFormat_ = value;
-      }
     }
 
     public const int NoStandardDescriptorAccessorFieldNumber = 2;
+    private bool hasNoStandardDescriptorAccessor;
     private bool noStandardDescriptorAccessor_;
-    internal bool NoStandardDescriptorAccessor {
+    public bool HasNoStandardDescriptorAccessor {
+      get { return hasNoStandardDescriptorAccessor; }
+    }
+    public bool NoStandardDescriptorAccessor {
       get { return noStandardDescriptorAccessor_; }
-      set {
-        pb::Freezable.CheckMutable(this);
-        noStandardDescriptorAccessor_ = value;
-      }
     }
 
     public const int DeprecatedFieldNumber = 3;
+    private bool hasDeprecated;
     private bool deprecated_;
-    internal bool Deprecated {
+    public bool HasDeprecated {
+      get { return hasDeprecated; }
+    }
+    public bool Deprecated {
       get { return deprecated_; }
-      set {
-        pb::Freezable.CheckMutable(this);
-        deprecated_ = value;
-      }
     }
 
     public const int MapEntryFieldNumber = 7;
+    private bool hasMapEntry;
     private bool mapEntry_;
-    internal bool MapEntry {
+    public bool HasMapEntry {
+      get { return hasMapEntry; }
+    }
+    public bool MapEntry {
       get { return mapEntry_; }
-      set {
-        pb::Freezable.CheckMutable(this);
-        mapEntry_ = value;
-      }
     }
 
     public const int UninterpretedOptionFieldNumber = 999;
-    private static readonly pb::FieldCodec<global::Google.Protobuf.DescriptorProtos.UninterpretedOption> _repeated_uninterpretedOption_codec
-        = pb::FieldCodec.ForMessage(7994, global::Google.Protobuf.DescriptorProtos.UninterpretedOption.Parser);
-    private readonly pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.UninterpretedOption> uninterpretedOption_ = new pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.UninterpretedOption>();
-    internal pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.UninterpretedOption> UninterpretedOption {
+    private pbc::PopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption> uninterpretedOption_ = new pbc::PopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption>();
+    public scg::IList<global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption> UninterpretedOptionList {
       get { return uninterpretedOption_; }
     }
-
-    public override bool Equals(object other) {
-      return Equals(other as MessageOptions);
+    public int UninterpretedOptionCount {
+      get { return uninterpretedOption_.Count; }
+    }
+    public global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption GetUninterpretedOption(int index) {
+      return uninterpretedOption_[index];
     }
 
-    public bool Equals(MessageOptions other) {
-      if (ReferenceEquals(other, null)) {
-        return false;
-      }
-      if (ReferenceEquals(other, this)) {
+    public override bool IsInitialized {
+      get {
+        foreach (global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption element in UninterpretedOptionList) {
+          if (!element.IsInitialized) return false;
+        }
+        if (!ExtensionsAreInitialized) return false;
         return true;
       }
-      if (MessageSetWireFormat != other.MessageSetWireFormat) return false;
-      if (NoStandardDescriptorAccessor != other.NoStandardDescriptorAccessor) return false;
-      if (Deprecated != other.Deprecated) return false;
-      if (MapEntry != other.MapEntry) return false;
-      if(!uninterpretedOption_.Equals(other.uninterpretedOption_)) return false;
-      return true;
     }
 
-    public override int GetHashCode() {
-      int hash = 1;
-      if (MessageSetWireFormat != false) hash ^= MessageSetWireFormat.GetHashCode();
-      if (NoStandardDescriptorAccessor != false) hash ^= NoStandardDescriptorAccessor.GetHashCode();
-      if (Deprecated != false) hash ^= Deprecated.GetHashCode();
-      if (MapEntry != false) hash ^= MapEntry.GetHashCode();
-      hash ^= uninterpretedOption_.GetHashCode();
-      return hash;
+    public override void WriteTo(pb::ICodedOutputStream output) {
+      CalcSerializedSize();
+      string[] field_names = _messageOptionsFieldNames;
+      pb::ExtendableMessage<MessageOptions, MessageOptions.Builder>.ExtensionWriter extensionWriter = CreateExtensionWriter(this);
+      if (hasMessageSetWireFormat) {
+        output.WriteBool(1, field_names[2], MessageSetWireFormat);
+      }
+      if (hasNoStandardDescriptorAccessor) {
+        output.WriteBool(2, field_names[3], NoStandardDescriptorAccessor);
+      }
+      if (hasDeprecated) {
+        output.WriteBool(3, field_names[0], Deprecated);
+      }
+      if (hasMapEntry) {
+        output.WriteBool(7, field_names[1], MapEntry);
+      }
+      if (uninterpretedOption_.Count > 0) {
+        output.WriteMessageArray(999, field_names[4], uninterpretedOption_);
+      }
+      extensionWriter.WriteUntil(536870912, output);
+      UnknownFields.WriteTo(output);
     }
 
-    public void WriteTo(pb::CodedOutputStream output) {
-      if (MessageSetWireFormat != false) {
-        output.WriteRawTag(8);
-        output.WriteBool(MessageSetWireFormat);
+    private int memoizedSerializedSize = -1;
+    public override int SerializedSize {
+      get {
+        int size = memoizedSerializedSize;
+        if (size != -1) return size;
+        return CalcSerializedSize();
       }
-      if (NoStandardDescriptorAccessor != false) {
-        output.WriteRawTag(16);
-        output.WriteBool(NoStandardDescriptorAccessor);
-      }
-      if (Deprecated != false) {
-        output.WriteRawTag(24);
-        output.WriteBool(Deprecated);
-      }
-      if (MapEntry != false) {
-        output.WriteRawTag(56);
-        output.WriteBool(MapEntry);
-      }
-      uninterpretedOption_.WriteTo(output, _repeated_uninterpretedOption_codec);
     }
 
-    public int CalculateSize() {
-      int size = 0;
-      if (MessageSetWireFormat != false) {
-        size += 1 + 1;
+    private int CalcSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (hasMessageSetWireFormat) {
+        size += pb::CodedOutputStream.ComputeBoolSize(1, MessageSetWireFormat);
       }
-      if (NoStandardDescriptorAccessor != false) {
-        size += 1 + 1;
+      if (hasNoStandardDescriptorAccessor) {
+        size += pb::CodedOutputStream.ComputeBoolSize(2, NoStandardDescriptorAccessor);
       }
-      if (Deprecated != false) {
-        size += 1 + 1;
+      if (hasDeprecated) {
+        size += pb::CodedOutputStream.ComputeBoolSize(3, Deprecated);
       }
-      if (MapEntry != false) {
-        size += 1 + 1;
+      if (hasMapEntry) {
+        size += pb::CodedOutputStream.ComputeBoolSize(7, MapEntry);
       }
-      size += uninterpretedOption_.CalculateSize(_repeated_uninterpretedOption_codec);
+      foreach (global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption element in UninterpretedOptionList) {
+        size += pb::CodedOutputStream.ComputeMessageSize(999, element);
+      }
+      size += ExtensionsSerializedSize;
+      size += UnknownFields.SerializedSize;
+      memoizedSerializedSize = size;
       return size;
     }
-
-    public void MergeFrom(MessageOptions other) {
-      if (other == null) {
-        return;
-      }
-      if (other.MessageSetWireFormat != false) {
-        MessageSetWireFormat = other.MessageSetWireFormat;
-      }
-      if (other.NoStandardDescriptorAccessor != false) {
-        NoStandardDescriptorAccessor = other.NoStandardDescriptorAccessor;
-      }
-      if (other.Deprecated != false) {
-        Deprecated = other.Deprecated;
-      }
-      if (other.MapEntry != false) {
-        MapEntry = other.MapEntry;
-      }
-      uninterpretedOption_.Add(other.uninterpretedOption_);
+    public static MessageOptions ParseFrom(pb::ByteString data) {
+      return ((Builder) CreateBuilder().MergeFrom(data)).BuildParsed();
+    }
+    public static MessageOptions ParseFrom(pb::ByteString data, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(data, extensionRegistry)).BuildParsed();
+    }
+    public static MessageOptions ParseFrom(byte[] data) {
+      return ((Builder) CreateBuilder().MergeFrom(data)).BuildParsed();
+    }
+    public static MessageOptions ParseFrom(byte[] data, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(data, extensionRegistry)).BuildParsed();
+    }
+    public static MessageOptions ParseFrom(global::System.IO.Stream input) {
+      return ((Builder) CreateBuilder().MergeFrom(input)).BuildParsed();
+    }
+    public static MessageOptions ParseFrom(global::System.IO.Stream input, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(input, extensionRegistry)).BuildParsed();
+    }
+    public static MessageOptions ParseDelimitedFrom(global::System.IO.Stream input) {
+      return CreateBuilder().MergeDelimitedFrom(input).BuildParsed();
+    }
+    public static MessageOptions ParseDelimitedFrom(global::System.IO.Stream input, pb::ExtensionRegistry extensionRegistry) {
+      return CreateBuilder().MergeDelimitedFrom(input, extensionRegistry).BuildParsed();
+    }
+    public static MessageOptions ParseFrom(pb::ICodedInputStream input) {
+      return ((Builder) CreateBuilder().MergeFrom(input)).BuildParsed();
+    }
+    public static MessageOptions ParseFrom(pb::ICodedInputStream input, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(input, extensionRegistry)).BuildParsed();
+    }
+    private MessageOptions MakeReadOnly() {
+      uninterpretedOption_.MakeReadOnly();
+      return this;
     }
 
-    public void MergeFrom(pb::CodedInputStream input) {
-      uint tag;
-      while (input.ReadTag(out tag)) {
-        switch(tag) {
-          case 0:
-            throw pb::InvalidProtocolBufferException.InvalidTag();
-          default:
-            if (pb::WireFormat.IsEndGroupTag(tag)) {
-              return;
-            }
-            break;
-          case 8: {
-            MessageSetWireFormat = input.ReadBool();
-            break;
-          }
-          case 16: {
-            NoStandardDescriptorAccessor = input.ReadBool();
-            break;
-          }
-          case 24: {
-            Deprecated = input.ReadBool();
-            break;
-          }
-          case 56: {
-            MapEntry = input.ReadBool();
-            break;
-          }
-          case 7994: {
-            uninterpretedOption_.AddEntriesFrom(input, _repeated_uninterpretedOption_codec);
-            break;
-          }
+    public static Builder CreateBuilder() { return new Builder(); }
+    public override Builder ToBuilder() { return CreateBuilder(this); }
+    public override Builder CreateBuilderForType() { return new Builder(); }
+    public static Builder CreateBuilder(MessageOptions prototype) {
+      return new Builder(prototype);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+    public sealed partial class Builder : pb::ExtendableBuilder<MessageOptions, Builder> {
+      protected override Builder ThisBuilder {
+        get { return this; }
+      }
+      public Builder() {
+        result = DefaultInstance;
+        resultIsReadOnly = true;
+      }
+      internal Builder(MessageOptions cloneFrom) {
+        result = cloneFrom;
+        resultIsReadOnly = true;
+      }
+
+      private bool resultIsReadOnly;
+      private MessageOptions result;
+
+      private MessageOptions PrepareBuilder() {
+        if (resultIsReadOnly) {
+          MessageOptions original = result;
+          result = new MessageOptions();
+          resultIsReadOnly = false;
+          MergeFrom(original);
+        }
+        return result;
+      }
+
+      public override bool IsInitialized {
+        get { return result.IsInitialized; }
+      }
+
+      protected override MessageOptions MessageBeingBuilt {
+        get { return PrepareBuilder(); }
+      }
+
+      public override Builder Clear() {
+        result = DefaultInstance;
+        resultIsReadOnly = true;
+        return this;
+      }
+
+      public override Builder Clone() {
+        if (resultIsReadOnly) {
+          return new Builder(result);
+        } else {
+          return new Builder().MergeFrom(result);
         }
       }
-    }
 
+      public override pbd::MessageDescriptor DescriptorForType {
+        get { return global::Google.ProtocolBuffers.DescriptorProtos.MessageOptions.Descriptor; }
+      }
+
+      public override MessageOptions DefaultInstanceForType {
+        get { return global::Google.ProtocolBuffers.DescriptorProtos.MessageOptions.DefaultInstance; }
+      }
+
+      public override MessageOptions BuildPartial() {
+        if (resultIsReadOnly) {
+          return result;
+        }
+        resultIsReadOnly = true;
+        return result.MakeReadOnly();
+      }
+
+      public override Builder MergeFrom(pb::IMessage other) {
+        if (other is MessageOptions) {
+          return MergeFrom((MessageOptions) other);
+        } else {
+          base.MergeFrom(other);
+          return this;
+        }
+      }
+
+      public override Builder MergeFrom(MessageOptions other) {
+        if (other == global::Google.ProtocolBuffers.DescriptorProtos.MessageOptions.DefaultInstance) return this;
+        PrepareBuilder();
+        if (other.HasMessageSetWireFormat) {
+          MessageSetWireFormat = other.MessageSetWireFormat;
+        }
+        if (other.HasNoStandardDescriptorAccessor) {
+          NoStandardDescriptorAccessor = other.NoStandardDescriptorAccessor;
+        }
+        if (other.HasDeprecated) {
+          Deprecated = other.Deprecated;
+        }
+        if (other.HasMapEntry) {
+          MapEntry = other.MapEntry;
+        }
+        if (other.uninterpretedOption_.Count != 0) {
+          result.uninterpretedOption_.Add(other.uninterpretedOption_);
+        }
+          this.MergeExtensionFields(other);
+        this.MergeUnknownFields(other.UnknownFields);
+        return this;
+      }
+
+      public override Builder MergeFrom(pb::ICodedInputStream input) {
+        return MergeFrom(input, pb::ExtensionRegistry.Empty);
+      }
+
+      public override Builder MergeFrom(pb::ICodedInputStream input, pb::ExtensionRegistry extensionRegistry) {
+        PrepareBuilder();
+        pb::UnknownFieldSet.Builder unknownFields = null;
+        uint tag;
+        string field_name;
+        while (input.ReadTag(out tag, out field_name)) {
+          if(tag == 0 && field_name != null) {
+            int field_ordinal = global::System.Array.BinarySearch(_messageOptionsFieldNames, field_name, global::System.StringComparer.Ordinal);
+            if(field_ordinal >= 0)
+              tag = _messageOptionsFieldTags[field_ordinal];
+            else {
+              if (unknownFields == null) {
+                unknownFields = pb::UnknownFieldSet.CreateBuilder(this.UnknownFields);
+              }
+              ParseUnknownField(input, unknownFields, extensionRegistry, tag, field_name);
+              continue;
+            }
+          }
+          switch (tag) {
+            case 0: {
+              throw pb::InvalidProtocolBufferException.InvalidTag();
+            }
+            default: {
+              if (pb::WireFormat.IsEndGroupTag(tag)) {
+                if (unknownFields != null) {
+                  this.UnknownFields = unknownFields.Build();
+                }
+                return this;
+              }
+              if (unknownFields == null) {
+                unknownFields = pb::UnknownFieldSet.CreateBuilder(this.UnknownFields);
+              }
+              ParseUnknownField(input, unknownFields, extensionRegistry, tag, field_name);
+              break;
+            }
+            case 8: {
+              result.hasMessageSetWireFormat = input.ReadBool(ref result.messageSetWireFormat_);
+              break;
+            }
+            case 16: {
+              result.hasNoStandardDescriptorAccessor = input.ReadBool(ref result.noStandardDescriptorAccessor_);
+              break;
+            }
+            case 24: {
+              result.hasDeprecated = input.ReadBool(ref result.deprecated_);
+              break;
+            }
+            case 56: {
+              result.hasMapEntry = input.ReadBool(ref result.mapEntry_);
+              break;
+            }
+            case 7994: {
+              input.ReadMessageArray(tag, field_name, result.uninterpretedOption_, global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption.DefaultInstance, extensionRegistry);
+              break;
+            }
+          }
+        }
+
+        if (unknownFields != null) {
+          this.UnknownFields = unknownFields.Build();
+        }
+        return this;
+      }
+
+
+      public bool HasMessageSetWireFormat {
+        get { return result.hasMessageSetWireFormat; }
+      }
+      public bool MessageSetWireFormat {
+        get { return result.MessageSetWireFormat; }
+        set { SetMessageSetWireFormat(value); }
+      }
+      public Builder SetMessageSetWireFormat(bool value) {
+        PrepareBuilder();
+        result.hasMessageSetWireFormat = true;
+        result.messageSetWireFormat_ = value;
+        return this;
+      }
+      public Builder ClearMessageSetWireFormat() {
+        PrepareBuilder();
+        result.hasMessageSetWireFormat = false;
+        result.messageSetWireFormat_ = false;
+        return this;
+      }
+
+      public bool HasNoStandardDescriptorAccessor {
+        get { return result.hasNoStandardDescriptorAccessor; }
+      }
+      public bool NoStandardDescriptorAccessor {
+        get { return result.NoStandardDescriptorAccessor; }
+        set { SetNoStandardDescriptorAccessor(value); }
+      }
+      public Builder SetNoStandardDescriptorAccessor(bool value) {
+        PrepareBuilder();
+        result.hasNoStandardDescriptorAccessor = true;
+        result.noStandardDescriptorAccessor_ = value;
+        return this;
+      }
+      public Builder ClearNoStandardDescriptorAccessor() {
+        PrepareBuilder();
+        result.hasNoStandardDescriptorAccessor = false;
+        result.noStandardDescriptorAccessor_ = false;
+        return this;
+      }
+
+      public bool HasDeprecated {
+        get { return result.hasDeprecated; }
+      }
+      public bool Deprecated {
+        get { return result.Deprecated; }
+        set { SetDeprecated(value); }
+      }
+      public Builder SetDeprecated(bool value) {
+        PrepareBuilder();
+        result.hasDeprecated = true;
+        result.deprecated_ = value;
+        return this;
+      }
+      public Builder ClearDeprecated() {
+        PrepareBuilder();
+        result.hasDeprecated = false;
+        result.deprecated_ = false;
+        return this;
+      }
+
+      public bool HasMapEntry {
+        get { return result.hasMapEntry; }
+      }
+      public bool MapEntry {
+        get { return result.MapEntry; }
+        set { SetMapEntry(value); }
+      }
+      public Builder SetMapEntry(bool value) {
+        PrepareBuilder();
+        result.hasMapEntry = true;
+        result.mapEntry_ = value;
+        return this;
+      }
+      public Builder ClearMapEntry() {
+        PrepareBuilder();
+        result.hasMapEntry = false;
+        result.mapEntry_ = false;
+        return this;
+      }
+
+      public pbc::IPopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption> UninterpretedOptionList {
+        get { return PrepareBuilder().uninterpretedOption_; }
+      }
+      public int UninterpretedOptionCount {
+        get { return result.UninterpretedOptionCount; }
+      }
+      public global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption GetUninterpretedOption(int index) {
+        return result.GetUninterpretedOption(index);
+      }
+      public Builder SetUninterpretedOption(int index, global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.uninterpretedOption_[index] = value;
+        return this;
+      }
+      public Builder SetUninterpretedOption(int index, global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption.Builder builderForValue) {
+        pb::ThrowHelper.ThrowIfNull(builderForValue, "builderForValue");
+        PrepareBuilder();
+        result.uninterpretedOption_[index] = builderForValue.Build();
+        return this;
+      }
+      public Builder AddUninterpretedOption(global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.uninterpretedOption_.Add(value);
+        return this;
+      }
+      public Builder AddUninterpretedOption(global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption.Builder builderForValue) {
+        pb::ThrowHelper.ThrowIfNull(builderForValue, "builderForValue");
+        PrepareBuilder();
+        result.uninterpretedOption_.Add(builderForValue.Build());
+        return this;
+      }
+      public Builder AddRangeUninterpretedOption(scg::IEnumerable<global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption> values) {
+        PrepareBuilder();
+        result.uninterpretedOption_.Add(values);
+        return this;
+      }
+      public Builder ClearUninterpretedOption() {
+        PrepareBuilder();
+        result.uninterpretedOption_.Clear();
+        return this;
+      }
+    }
+    static MessageOptions() {
+      object.ReferenceEquals(global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.Descriptor, null);
+    }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-  internal sealed partial class FieldOptions : pb::IMessage<FieldOptions> {
-    private static readonly pb::MessageParser<FieldOptions> _parser = new pb::MessageParser<FieldOptions>(() => new FieldOptions());
-    public static pb::MessageParser<FieldOptions> Parser { get { return _parser; } }
+  public sealed partial class FieldOptions : pb::ExtendableMessage<FieldOptions, FieldOptions.Builder> {
+    private FieldOptions() { }
+    private static readonly FieldOptions defaultInstance = new FieldOptions().MakeReadOnly();
+    private static readonly string[] _fieldOptionsFieldNames = new string[] { "ctype", "deprecated", "jstype", "lazy", "packed", "uninterpreted_option", "weak" };
+    private static readonly uint[] _fieldOptionsFieldTags = new uint[] { 8, 24, 48, 40, 16, 7994, 80 };
+    public static FieldOptions DefaultInstance {
+      get { return defaultInstance; }
+    }
 
-    private static readonly string[] _fieldNames = new string[] { "ctype", "deprecated", "jstype", "lazy", "packed", "uninterpreted_option", "weak" };
-    private static readonly uint[] _fieldTags = new uint[] { 8, 24, 48, 40, 16, 7994, 80 };
+    public override FieldOptions DefaultInstanceForType {
+      get { return DefaultInstance; }
+    }
+
+    protected override FieldOptions ThisMessage {
+      get { return this; }
+    }
+
     public static pbd::MessageDescriptor Descriptor {
-      get { return global::Google.Protobuf.DescriptorProtos.DescriptorProtoFile.Descriptor.MessageTypes[11]; }
+      get { return global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_FieldOptions__Descriptor; }
     }
 
-    public pb::FieldAccess.FieldAccessorTable Fields {
-      get { return global::Google.Protobuf.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_FieldOptions__FieldAccessorTable; }
-    }
-
-    private bool _frozen = false;
-    public bool IsFrozen { get { return _frozen; } }
-
-    public FieldOptions() {
-      OnConstruction();
-    }
-
-    partial void OnConstruction();
-
-    public FieldOptions(FieldOptions other) : this() {
-      ctype_ = other.ctype_;
-      packed_ = other.packed_;
-      jstype_ = other.jstype_;
-      lazy_ = other.lazy_;
-      deprecated_ = other.deprecated_;
-      weak_ = other.weak_;
-      uninterpretedOption_ = other.uninterpretedOption_.Clone();
-    }
-
-    public FieldOptions Clone() {
-      return new FieldOptions(this);
-    }
-
-    public void Freeze() {
-      if (IsFrozen) {
-        return;
-      }
-      _frozen = true;
-      uninterpretedOption_.Freeze();
-    }
-
-    public const int CtypeFieldNumber = 1;
-    private global::Google.Protobuf.DescriptorProtos.FieldOptions.Types.CType ctype_ = global::Google.Protobuf.DescriptorProtos.FieldOptions.Types.CType.STRING;
-    internal global::Google.Protobuf.DescriptorProtos.FieldOptions.Types.CType Ctype {
-      get { return ctype_; }
-      set {
-        pb::Freezable.CheckMutable(this);
-        ctype_ = value;
-      }
-    }
-
-    public const int PackedFieldNumber = 2;
-    private bool packed_;
-    internal bool Packed {
-      get { return packed_; }
-      set {
-        pb::Freezable.CheckMutable(this);
-        packed_ = value;
-      }
-    }
-
-    public const int JstypeFieldNumber = 6;
-    private global::Google.Protobuf.DescriptorProtos.FieldOptions.Types.JSType jstype_ = global::Google.Protobuf.DescriptorProtos.FieldOptions.Types.JSType.JS_NORMAL;
-    internal global::Google.Protobuf.DescriptorProtos.FieldOptions.Types.JSType Jstype {
-      get { return jstype_; }
-      set {
-        pb::Freezable.CheckMutable(this);
-        jstype_ = value;
-      }
-    }
-
-    public const int LazyFieldNumber = 5;
-    private bool lazy_;
-    internal bool Lazy {
-      get { return lazy_; }
-      set {
-        pb::Freezable.CheckMutable(this);
-        lazy_ = value;
-      }
-    }
-
-    public const int DeprecatedFieldNumber = 3;
-    private bool deprecated_;
-    internal bool Deprecated {
-      get { return deprecated_; }
-      set {
-        pb::Freezable.CheckMutable(this);
-        deprecated_ = value;
-      }
-    }
-
-    public const int WeakFieldNumber = 10;
-    private bool weak_;
-    internal bool Weak {
-      get { return weak_; }
-      set {
-        pb::Freezable.CheckMutable(this);
-        weak_ = value;
-      }
-    }
-
-    public const int UninterpretedOptionFieldNumber = 999;
-    private static readonly pb::FieldCodec<global::Google.Protobuf.DescriptorProtos.UninterpretedOption> _repeated_uninterpretedOption_codec
-        = pb::FieldCodec.ForMessage(7994, global::Google.Protobuf.DescriptorProtos.UninterpretedOption.Parser);
-    private readonly pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.UninterpretedOption> uninterpretedOption_ = new pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.UninterpretedOption>();
-    internal pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.UninterpretedOption> UninterpretedOption {
-      get { return uninterpretedOption_; }
-    }
-
-    public override bool Equals(object other) {
-      return Equals(other as FieldOptions);
-    }
-
-    public bool Equals(FieldOptions other) {
-      if (ReferenceEquals(other, null)) {
-        return false;
-      }
-      if (ReferenceEquals(other, this)) {
-        return true;
-      }
-      if (Ctype != other.Ctype) return false;
-      if (Packed != other.Packed) return false;
-      if (Jstype != other.Jstype) return false;
-      if (Lazy != other.Lazy) return false;
-      if (Deprecated != other.Deprecated) return false;
-      if (Weak != other.Weak) return false;
-      if(!uninterpretedOption_.Equals(other.uninterpretedOption_)) return false;
-      return true;
-    }
-
-    public override int GetHashCode() {
-      int hash = 1;
-      if (Ctype != global::Google.Protobuf.DescriptorProtos.FieldOptions.Types.CType.STRING) hash ^= Ctype.GetHashCode();
-      if (Packed != false) hash ^= Packed.GetHashCode();
-      if (Jstype != global::Google.Protobuf.DescriptorProtos.FieldOptions.Types.JSType.JS_NORMAL) hash ^= Jstype.GetHashCode();
-      if (Lazy != false) hash ^= Lazy.GetHashCode();
-      if (Deprecated != false) hash ^= Deprecated.GetHashCode();
-      if (Weak != false) hash ^= Weak.GetHashCode();
-      hash ^= uninterpretedOption_.GetHashCode();
-      return hash;
-    }
-
-    public void WriteTo(pb::CodedOutputStream output) {
-      if (Ctype != global::Google.Protobuf.DescriptorProtos.FieldOptions.Types.CType.STRING) {
-        output.WriteRawTag(8);
-        output.WriteEnum((int) Ctype);
-      }
-      if (Packed != false) {
-        output.WriteRawTag(16);
-        output.WriteBool(Packed);
-      }
-      if (Deprecated != false) {
-        output.WriteRawTag(24);
-        output.WriteBool(Deprecated);
-      }
-      if (Lazy != false) {
-        output.WriteRawTag(40);
-        output.WriteBool(Lazy);
-      }
-      if (Jstype != global::Google.Protobuf.DescriptorProtos.FieldOptions.Types.JSType.JS_NORMAL) {
-        output.WriteRawTag(48);
-        output.WriteEnum((int) Jstype);
-      }
-      if (Weak != false) {
-        output.WriteRawTag(80);
-        output.WriteBool(Weak);
-      }
-      uninterpretedOption_.WriteTo(output, _repeated_uninterpretedOption_codec);
-    }
-
-    public int CalculateSize() {
-      int size = 0;
-      if (Ctype != global::Google.Protobuf.DescriptorProtos.FieldOptions.Types.CType.STRING) {
-        size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) Ctype);
-      }
-      if (Packed != false) {
-        size += 1 + 1;
-      }
-      if (Jstype != global::Google.Protobuf.DescriptorProtos.FieldOptions.Types.JSType.JS_NORMAL) {
-        size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) Jstype);
-      }
-      if (Lazy != false) {
-        size += 1 + 1;
-      }
-      if (Deprecated != false) {
-        size += 1 + 1;
-      }
-      if (Weak != false) {
-        size += 1 + 1;
-      }
-      size += uninterpretedOption_.CalculateSize(_repeated_uninterpretedOption_codec);
-      return size;
-    }
-
-    public void MergeFrom(FieldOptions other) {
-      if (other == null) {
-        return;
-      }
-      if (other.Ctype != global::Google.Protobuf.DescriptorProtos.FieldOptions.Types.CType.STRING) {
-        Ctype = other.Ctype;
-      }
-      if (other.Packed != false) {
-        Packed = other.Packed;
-      }
-      if (other.Jstype != global::Google.Protobuf.DescriptorProtos.FieldOptions.Types.JSType.JS_NORMAL) {
-        Jstype = other.Jstype;
-      }
-      if (other.Lazy != false) {
-        Lazy = other.Lazy;
-      }
-      if (other.Deprecated != false) {
-        Deprecated = other.Deprecated;
-      }
-      if (other.Weak != false) {
-        Weak = other.Weak;
-      }
-      uninterpretedOption_.Add(other.uninterpretedOption_);
-    }
-
-    public void MergeFrom(pb::CodedInputStream input) {
-      uint tag;
-      while (input.ReadTag(out tag)) {
-        switch(tag) {
-          case 0:
-            throw pb::InvalidProtocolBufferException.InvalidTag();
-          default:
-            if (pb::WireFormat.IsEndGroupTag(tag)) {
-              return;
-            }
-            break;
-          case 8: {
-            ctype_ = (global::Google.Protobuf.DescriptorProtos.FieldOptions.Types.CType) input.ReadEnum();
-            break;
-          }
-          case 16: {
-            Packed = input.ReadBool();
-            break;
-          }
-          case 24: {
-            Deprecated = input.ReadBool();
-            break;
-          }
-          case 40: {
-            Lazy = input.ReadBool();
-            break;
-          }
-          case 48: {
-            jstype_ = (global::Google.Protobuf.DescriptorProtos.FieldOptions.Types.JSType) input.ReadEnum();
-            break;
-          }
-          case 80: {
-            Weak = input.ReadBool();
-            break;
-          }
-          case 7994: {
-            uninterpretedOption_.AddEntriesFrom(input, _repeated_uninterpretedOption_codec);
-            break;
-          }
-        }
-      }
+    protected override pb::FieldAccess.FieldAccessorTable<FieldOptions, FieldOptions.Builder> InternalFieldAccessors {
+      get { return global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_FieldOptions__FieldAccessorTable; }
     }
 
     #region Nested types
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     public static partial class Types {
-      internal enum CType {
+      public enum CType {
         STRING = 0,
         CORD = 1,
         STRING_PIECE = 2,
       }
 
-      internal enum JSType {
+      public enum JSType {
         JS_NORMAL = 0,
         JS_STRING = 1,
         JS_NUMBER = 2,
@@ -3552,1300 +7315,3733 @@ namespace Google.Protobuf.DescriptorProtos {
     }
     #endregion
 
-  }
-
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-  internal sealed partial class EnumOptions : pb::IMessage<EnumOptions> {
-    private static readonly pb::MessageParser<EnumOptions> _parser = new pb::MessageParser<EnumOptions>(() => new EnumOptions());
-    public static pb::MessageParser<EnumOptions> Parser { get { return _parser; } }
-
-    private static readonly string[] _fieldNames = new string[] { "allow_alias", "deprecated", "uninterpreted_option" };
-    private static readonly uint[] _fieldTags = new uint[] { 16, 24, 7994 };
-    public static pbd::MessageDescriptor Descriptor {
-      get { return global::Google.Protobuf.DescriptorProtos.DescriptorProtoFile.Descriptor.MessageTypes[12]; }
+    public const int CtypeFieldNumber = 1;
+    private bool hasCtype;
+    private global::Google.ProtocolBuffers.DescriptorProtos.FieldOptions.Types.CType ctype_ = global::Google.ProtocolBuffers.DescriptorProtos.FieldOptions.Types.CType.STRING;
+    public bool HasCtype {
+      get { return hasCtype; }
+    }
+    public global::Google.ProtocolBuffers.DescriptorProtos.FieldOptions.Types.CType Ctype {
+      get { return ctype_; }
     }
 
-    public pb::FieldAccess.FieldAccessorTable Fields {
-      get { return global::Google.Protobuf.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_EnumOptions__FieldAccessorTable; }
+    public const int PackedFieldNumber = 2;
+    private bool hasPacked;
+    private bool packed_;
+    public bool HasPacked {
+      get { return hasPacked; }
+    }
+    public bool Packed {
+      get { return packed_; }
     }
 
-    private bool _frozen = false;
-    public bool IsFrozen { get { return _frozen; } }
-
-    public EnumOptions() {
-      OnConstruction();
+    public const int JstypeFieldNumber = 6;
+    private bool hasJstype;
+    private global::Google.ProtocolBuffers.DescriptorProtos.FieldOptions.Types.JSType jstype_ = global::Google.ProtocolBuffers.DescriptorProtos.FieldOptions.Types.JSType.JS_NORMAL;
+    public bool HasJstype {
+      get { return hasJstype; }
+    }
+    public global::Google.ProtocolBuffers.DescriptorProtos.FieldOptions.Types.JSType Jstype {
+      get { return jstype_; }
     }
 
-    partial void OnConstruction();
-
-    public EnumOptions(EnumOptions other) : this() {
-      allowAlias_ = other.allowAlias_;
-      deprecated_ = other.deprecated_;
-      uninterpretedOption_ = other.uninterpretedOption_.Clone();
+    public const int LazyFieldNumber = 5;
+    private bool hasLazy;
+    private bool lazy_;
+    public bool HasLazy {
+      get { return hasLazy; }
     }
-
-    public EnumOptions Clone() {
-      return new EnumOptions(this);
-    }
-
-    public void Freeze() {
-      if (IsFrozen) {
-        return;
-      }
-      _frozen = true;
-      uninterpretedOption_.Freeze();
-    }
-
-    public const int AllowAliasFieldNumber = 2;
-    private bool allowAlias_;
-    internal bool AllowAlias {
-      get { return allowAlias_; }
-      set {
-        pb::Freezable.CheckMutable(this);
-        allowAlias_ = value;
-      }
+    public bool Lazy {
+      get { return lazy_; }
     }
 
     public const int DeprecatedFieldNumber = 3;
+    private bool hasDeprecated;
     private bool deprecated_;
-    internal bool Deprecated {
+    public bool HasDeprecated {
+      get { return hasDeprecated; }
+    }
+    public bool Deprecated {
       get { return deprecated_; }
-      set {
-        pb::Freezable.CheckMutable(this);
-        deprecated_ = value;
-      }
+    }
+
+    public const int WeakFieldNumber = 10;
+    private bool hasWeak;
+    private bool weak_;
+    public bool HasWeak {
+      get { return hasWeak; }
+    }
+    public bool Weak {
+      get { return weak_; }
     }
 
     public const int UninterpretedOptionFieldNumber = 999;
-    private static readonly pb::FieldCodec<global::Google.Protobuf.DescriptorProtos.UninterpretedOption> _repeated_uninterpretedOption_codec
-        = pb::FieldCodec.ForMessage(7994, global::Google.Protobuf.DescriptorProtos.UninterpretedOption.Parser);
-    private readonly pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.UninterpretedOption> uninterpretedOption_ = new pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.UninterpretedOption>();
-    internal pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.UninterpretedOption> UninterpretedOption {
+    private pbc::PopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption> uninterpretedOption_ = new pbc::PopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption>();
+    public scg::IList<global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption> UninterpretedOptionList {
       get { return uninterpretedOption_; }
     }
-
-    public override bool Equals(object other) {
-      return Equals(other as EnumOptions);
+    public int UninterpretedOptionCount {
+      get { return uninterpretedOption_.Count; }
+    }
+    public global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption GetUninterpretedOption(int index) {
+      return uninterpretedOption_[index];
     }
 
-    public bool Equals(EnumOptions other) {
-      if (ReferenceEquals(other, null)) {
-        return false;
-      }
-      if (ReferenceEquals(other, this)) {
+    public override bool IsInitialized {
+      get {
+        foreach (global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption element in UninterpretedOptionList) {
+          if (!element.IsInitialized) return false;
+        }
+        if (!ExtensionsAreInitialized) return false;
         return true;
       }
-      if (AllowAlias != other.AllowAlias) return false;
-      if (Deprecated != other.Deprecated) return false;
-      if(!uninterpretedOption_.Equals(other.uninterpretedOption_)) return false;
-      return true;
     }
 
-    public override int GetHashCode() {
-      int hash = 1;
-      if (AllowAlias != false) hash ^= AllowAlias.GetHashCode();
-      if (Deprecated != false) hash ^= Deprecated.GetHashCode();
-      hash ^= uninterpretedOption_.GetHashCode();
-      return hash;
+    public override void WriteTo(pb::ICodedOutputStream output) {
+      CalcSerializedSize();
+      string[] field_names = _fieldOptionsFieldNames;
+      pb::ExtendableMessage<FieldOptions, FieldOptions.Builder>.ExtensionWriter extensionWriter = CreateExtensionWriter(this);
+      if (hasCtype) {
+        output.WriteEnum(1, field_names[0], (int) Ctype, Ctype);
+      }
+      if (hasPacked) {
+        output.WriteBool(2, field_names[4], Packed);
+      }
+      if (hasDeprecated) {
+        output.WriteBool(3, field_names[1], Deprecated);
+      }
+      if (hasLazy) {
+        output.WriteBool(5, field_names[3], Lazy);
+      }
+      if (hasJstype) {
+        output.WriteEnum(6, field_names[2], (int) Jstype, Jstype);
+      }
+      if (hasWeak) {
+        output.WriteBool(10, field_names[6], Weak);
+      }
+      if (uninterpretedOption_.Count > 0) {
+        output.WriteMessageArray(999, field_names[5], uninterpretedOption_);
+      }
+      extensionWriter.WriteUntil(536870912, output);
+      UnknownFields.WriteTo(output);
     }
 
-    public void WriteTo(pb::CodedOutputStream output) {
-      if (AllowAlias != false) {
-        output.WriteRawTag(16);
-        output.WriteBool(AllowAlias);
+    private int memoizedSerializedSize = -1;
+    public override int SerializedSize {
+      get {
+        int size = memoizedSerializedSize;
+        if (size != -1) return size;
+        return CalcSerializedSize();
       }
-      if (Deprecated != false) {
-        output.WriteRawTag(24);
-        output.WriteBool(Deprecated);
-      }
-      uninterpretedOption_.WriteTo(output, _repeated_uninterpretedOption_codec);
     }
 
-    public int CalculateSize() {
-      int size = 0;
-      if (AllowAlias != false) {
-        size += 1 + 1;
+    private int CalcSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (hasCtype) {
+        size += pb::CodedOutputStream.ComputeEnumSize(1, (int) Ctype);
       }
-      if (Deprecated != false) {
-        size += 1 + 1;
+      if (hasPacked) {
+        size += pb::CodedOutputStream.ComputeBoolSize(2, Packed);
       }
-      size += uninterpretedOption_.CalculateSize(_repeated_uninterpretedOption_codec);
+      if (hasJstype) {
+        size += pb::CodedOutputStream.ComputeEnumSize(6, (int) Jstype);
+      }
+      if (hasLazy) {
+        size += pb::CodedOutputStream.ComputeBoolSize(5, Lazy);
+      }
+      if (hasDeprecated) {
+        size += pb::CodedOutputStream.ComputeBoolSize(3, Deprecated);
+      }
+      if (hasWeak) {
+        size += pb::CodedOutputStream.ComputeBoolSize(10, Weak);
+      }
+      foreach (global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption element in UninterpretedOptionList) {
+        size += pb::CodedOutputStream.ComputeMessageSize(999, element);
+      }
+      size += ExtensionsSerializedSize;
+      size += UnknownFields.SerializedSize;
+      memoizedSerializedSize = size;
       return size;
     }
-
-    public void MergeFrom(EnumOptions other) {
-      if (other == null) {
-        return;
-      }
-      if (other.AllowAlias != false) {
-        AllowAlias = other.AllowAlias;
-      }
-      if (other.Deprecated != false) {
-        Deprecated = other.Deprecated;
-      }
-      uninterpretedOption_.Add(other.uninterpretedOption_);
+    public static FieldOptions ParseFrom(pb::ByteString data) {
+      return ((Builder) CreateBuilder().MergeFrom(data)).BuildParsed();
+    }
+    public static FieldOptions ParseFrom(pb::ByteString data, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(data, extensionRegistry)).BuildParsed();
+    }
+    public static FieldOptions ParseFrom(byte[] data) {
+      return ((Builder) CreateBuilder().MergeFrom(data)).BuildParsed();
+    }
+    public static FieldOptions ParseFrom(byte[] data, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(data, extensionRegistry)).BuildParsed();
+    }
+    public static FieldOptions ParseFrom(global::System.IO.Stream input) {
+      return ((Builder) CreateBuilder().MergeFrom(input)).BuildParsed();
+    }
+    public static FieldOptions ParseFrom(global::System.IO.Stream input, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(input, extensionRegistry)).BuildParsed();
+    }
+    public static FieldOptions ParseDelimitedFrom(global::System.IO.Stream input) {
+      return CreateBuilder().MergeDelimitedFrom(input).BuildParsed();
+    }
+    public static FieldOptions ParseDelimitedFrom(global::System.IO.Stream input, pb::ExtensionRegistry extensionRegistry) {
+      return CreateBuilder().MergeDelimitedFrom(input, extensionRegistry).BuildParsed();
+    }
+    public static FieldOptions ParseFrom(pb::ICodedInputStream input) {
+      return ((Builder) CreateBuilder().MergeFrom(input)).BuildParsed();
+    }
+    public static FieldOptions ParseFrom(pb::ICodedInputStream input, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(input, extensionRegistry)).BuildParsed();
+    }
+    private FieldOptions MakeReadOnly() {
+      uninterpretedOption_.MakeReadOnly();
+      return this;
     }
 
-    public void MergeFrom(pb::CodedInputStream input) {
-      uint tag;
-      while (input.ReadTag(out tag)) {
-        switch(tag) {
-          case 0:
-            throw pb::InvalidProtocolBufferException.InvalidTag();
-          default:
-            if (pb::WireFormat.IsEndGroupTag(tag)) {
-              return;
-            }
-            break;
-          case 16: {
-            AllowAlias = input.ReadBool();
-            break;
-          }
-          case 24: {
-            Deprecated = input.ReadBool();
-            break;
-          }
-          case 7994: {
-            uninterpretedOption_.AddEntriesFrom(input, _repeated_uninterpretedOption_codec);
-            break;
-          }
+    public static Builder CreateBuilder() { return new Builder(); }
+    public override Builder ToBuilder() { return CreateBuilder(this); }
+    public override Builder CreateBuilderForType() { return new Builder(); }
+    public static Builder CreateBuilder(FieldOptions prototype) {
+      return new Builder(prototype);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+    public sealed partial class Builder : pb::ExtendableBuilder<FieldOptions, Builder> {
+      protected override Builder ThisBuilder {
+        get { return this; }
+      }
+      public Builder() {
+        result = DefaultInstance;
+        resultIsReadOnly = true;
+      }
+      internal Builder(FieldOptions cloneFrom) {
+        result = cloneFrom;
+        resultIsReadOnly = true;
+      }
+
+      private bool resultIsReadOnly;
+      private FieldOptions result;
+
+      private FieldOptions PrepareBuilder() {
+        if (resultIsReadOnly) {
+          FieldOptions original = result;
+          result = new FieldOptions();
+          resultIsReadOnly = false;
+          MergeFrom(original);
+        }
+        return result;
+      }
+
+      public override bool IsInitialized {
+        get { return result.IsInitialized; }
+      }
+
+      protected override FieldOptions MessageBeingBuilt {
+        get { return PrepareBuilder(); }
+      }
+
+      public override Builder Clear() {
+        result = DefaultInstance;
+        resultIsReadOnly = true;
+        return this;
+      }
+
+      public override Builder Clone() {
+        if (resultIsReadOnly) {
+          return new Builder(result);
+        } else {
+          return new Builder().MergeFrom(result);
         }
       }
-    }
 
+      public override pbd::MessageDescriptor DescriptorForType {
+        get { return global::Google.ProtocolBuffers.DescriptorProtos.FieldOptions.Descriptor; }
+      }
+
+      public override FieldOptions DefaultInstanceForType {
+        get { return global::Google.ProtocolBuffers.DescriptorProtos.FieldOptions.DefaultInstance; }
+      }
+
+      public override FieldOptions BuildPartial() {
+        if (resultIsReadOnly) {
+          return result;
+        }
+        resultIsReadOnly = true;
+        return result.MakeReadOnly();
+      }
+
+      public override Builder MergeFrom(pb::IMessage other) {
+        if (other is FieldOptions) {
+          return MergeFrom((FieldOptions) other);
+        } else {
+          base.MergeFrom(other);
+          return this;
+        }
+      }
+
+      public override Builder MergeFrom(FieldOptions other) {
+        if (other == global::Google.ProtocolBuffers.DescriptorProtos.FieldOptions.DefaultInstance) return this;
+        PrepareBuilder();
+        if (other.HasCtype) {
+          Ctype = other.Ctype;
+        }
+        if (other.HasPacked) {
+          Packed = other.Packed;
+        }
+        if (other.HasJstype) {
+          Jstype = other.Jstype;
+        }
+        if (other.HasLazy) {
+          Lazy = other.Lazy;
+        }
+        if (other.HasDeprecated) {
+          Deprecated = other.Deprecated;
+        }
+        if (other.HasWeak) {
+          Weak = other.Weak;
+        }
+        if (other.uninterpretedOption_.Count != 0) {
+          result.uninterpretedOption_.Add(other.uninterpretedOption_);
+        }
+          this.MergeExtensionFields(other);
+        this.MergeUnknownFields(other.UnknownFields);
+        return this;
+      }
+
+      public override Builder MergeFrom(pb::ICodedInputStream input) {
+        return MergeFrom(input, pb::ExtensionRegistry.Empty);
+      }
+
+      public override Builder MergeFrom(pb::ICodedInputStream input, pb::ExtensionRegistry extensionRegistry) {
+        PrepareBuilder();
+        pb::UnknownFieldSet.Builder unknownFields = null;
+        uint tag;
+        string field_name;
+        while (input.ReadTag(out tag, out field_name)) {
+          if(tag == 0 && field_name != null) {
+            int field_ordinal = global::System.Array.BinarySearch(_fieldOptionsFieldNames, field_name, global::System.StringComparer.Ordinal);
+            if(field_ordinal >= 0)
+              tag = _fieldOptionsFieldTags[field_ordinal];
+            else {
+              if (unknownFields == null) {
+                unknownFields = pb::UnknownFieldSet.CreateBuilder(this.UnknownFields);
+              }
+              ParseUnknownField(input, unknownFields, extensionRegistry, tag, field_name);
+              continue;
+            }
+          }
+          switch (tag) {
+            case 0: {
+              throw pb::InvalidProtocolBufferException.InvalidTag();
+            }
+            default: {
+              if (pb::WireFormat.IsEndGroupTag(tag)) {
+                if (unknownFields != null) {
+                  this.UnknownFields = unknownFields.Build();
+                }
+                return this;
+              }
+              if (unknownFields == null) {
+                unknownFields = pb::UnknownFieldSet.CreateBuilder(this.UnknownFields);
+              }
+              ParseUnknownField(input, unknownFields, extensionRegistry, tag, field_name);
+              break;
+            }
+            case 8: {
+              object unknown;
+              if(input.ReadEnum(ref result.ctype_, out unknown)) {
+                result.hasCtype = true;
+              } else if(unknown is int) {
+                if (unknownFields == null) {
+                  unknownFields = pb::UnknownFieldSet.CreateBuilder(this.UnknownFields);
+                }
+                unknownFields.MergeVarintField(1, (ulong)(int)unknown);
+              }
+              break;
+            }
+            case 16: {
+              result.hasPacked = input.ReadBool(ref result.packed_);
+              break;
+            }
+            case 24: {
+              result.hasDeprecated = input.ReadBool(ref result.deprecated_);
+              break;
+            }
+            case 40: {
+              result.hasLazy = input.ReadBool(ref result.lazy_);
+              break;
+            }
+            case 48: {
+              object unknown;
+              if(input.ReadEnum(ref result.jstype_, out unknown)) {
+                result.hasJstype = true;
+              } else if(unknown is int) {
+                if (unknownFields == null) {
+                  unknownFields = pb::UnknownFieldSet.CreateBuilder(this.UnknownFields);
+                }
+                unknownFields.MergeVarintField(6, (ulong)(int)unknown);
+              }
+              break;
+            }
+            case 80: {
+              result.hasWeak = input.ReadBool(ref result.weak_);
+              break;
+            }
+            case 7994: {
+              input.ReadMessageArray(tag, field_name, result.uninterpretedOption_, global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption.DefaultInstance, extensionRegistry);
+              break;
+            }
+          }
+        }
+
+        if (unknownFields != null) {
+          this.UnknownFields = unknownFields.Build();
+        }
+        return this;
+      }
+
+
+      public bool HasCtype {
+        get { return result.hasCtype; }
+      }
+      public global::Google.ProtocolBuffers.DescriptorProtos.FieldOptions.Types.CType Ctype {
+        get { return result.Ctype; }
+        set { SetCtype(value); }
+      }
+      public Builder SetCtype(global::Google.ProtocolBuffers.DescriptorProtos.FieldOptions.Types.CType value) {
+        PrepareBuilder();
+        result.hasCtype = true;
+        result.ctype_ = value;
+        return this;
+      }
+      public Builder ClearCtype() {
+        PrepareBuilder();
+        result.hasCtype = false;
+        result.ctype_ = global::Google.ProtocolBuffers.DescriptorProtos.FieldOptions.Types.CType.STRING;
+        return this;
+      }
+
+      public bool HasPacked {
+        get { return result.hasPacked; }
+      }
+      public bool Packed {
+        get { return result.Packed; }
+        set { SetPacked(value); }
+      }
+      public Builder SetPacked(bool value) {
+        PrepareBuilder();
+        result.hasPacked = true;
+        result.packed_ = value;
+        return this;
+      }
+      public Builder ClearPacked() {
+        PrepareBuilder();
+        result.hasPacked = false;
+        result.packed_ = false;
+        return this;
+      }
+
+      public bool HasJstype {
+        get { return result.hasJstype; }
+      }
+      public global::Google.ProtocolBuffers.DescriptorProtos.FieldOptions.Types.JSType Jstype {
+        get { return result.Jstype; }
+        set { SetJstype(value); }
+      }
+      public Builder SetJstype(global::Google.ProtocolBuffers.DescriptorProtos.FieldOptions.Types.JSType value) {
+        PrepareBuilder();
+        result.hasJstype = true;
+        result.jstype_ = value;
+        return this;
+      }
+      public Builder ClearJstype() {
+        PrepareBuilder();
+        result.hasJstype = false;
+        result.jstype_ = global::Google.ProtocolBuffers.DescriptorProtos.FieldOptions.Types.JSType.JS_NORMAL;
+        return this;
+      }
+
+      public bool HasLazy {
+        get { return result.hasLazy; }
+      }
+      public bool Lazy {
+        get { return result.Lazy; }
+        set { SetLazy(value); }
+      }
+      public Builder SetLazy(bool value) {
+        PrepareBuilder();
+        result.hasLazy = true;
+        result.lazy_ = value;
+        return this;
+      }
+      public Builder ClearLazy() {
+        PrepareBuilder();
+        result.hasLazy = false;
+        result.lazy_ = false;
+        return this;
+      }
+
+      public bool HasDeprecated {
+        get { return result.hasDeprecated; }
+      }
+      public bool Deprecated {
+        get { return result.Deprecated; }
+        set { SetDeprecated(value); }
+      }
+      public Builder SetDeprecated(bool value) {
+        PrepareBuilder();
+        result.hasDeprecated = true;
+        result.deprecated_ = value;
+        return this;
+      }
+      public Builder ClearDeprecated() {
+        PrepareBuilder();
+        result.hasDeprecated = false;
+        result.deprecated_ = false;
+        return this;
+      }
+
+      public bool HasWeak {
+        get { return result.hasWeak; }
+      }
+      public bool Weak {
+        get { return result.Weak; }
+        set { SetWeak(value); }
+      }
+      public Builder SetWeak(bool value) {
+        PrepareBuilder();
+        result.hasWeak = true;
+        result.weak_ = value;
+        return this;
+      }
+      public Builder ClearWeak() {
+        PrepareBuilder();
+        result.hasWeak = false;
+        result.weak_ = false;
+        return this;
+      }
+
+      public pbc::IPopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption> UninterpretedOptionList {
+        get { return PrepareBuilder().uninterpretedOption_; }
+      }
+      public int UninterpretedOptionCount {
+        get { return result.UninterpretedOptionCount; }
+      }
+      public global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption GetUninterpretedOption(int index) {
+        return result.GetUninterpretedOption(index);
+      }
+      public Builder SetUninterpretedOption(int index, global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.uninterpretedOption_[index] = value;
+        return this;
+      }
+      public Builder SetUninterpretedOption(int index, global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption.Builder builderForValue) {
+        pb::ThrowHelper.ThrowIfNull(builderForValue, "builderForValue");
+        PrepareBuilder();
+        result.uninterpretedOption_[index] = builderForValue.Build();
+        return this;
+      }
+      public Builder AddUninterpretedOption(global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.uninterpretedOption_.Add(value);
+        return this;
+      }
+      public Builder AddUninterpretedOption(global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption.Builder builderForValue) {
+        pb::ThrowHelper.ThrowIfNull(builderForValue, "builderForValue");
+        PrepareBuilder();
+        result.uninterpretedOption_.Add(builderForValue.Build());
+        return this;
+      }
+      public Builder AddRangeUninterpretedOption(scg::IEnumerable<global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption> values) {
+        PrepareBuilder();
+        result.uninterpretedOption_.Add(values);
+        return this;
+      }
+      public Builder ClearUninterpretedOption() {
+        PrepareBuilder();
+        result.uninterpretedOption_.Clear();
+        return this;
+      }
+    }
+    static FieldOptions() {
+      object.ReferenceEquals(global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.Descriptor, null);
+    }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-  internal sealed partial class EnumValueOptions : pb::IMessage<EnumValueOptions> {
-    private static readonly pb::MessageParser<EnumValueOptions> _parser = new pb::MessageParser<EnumValueOptions>(() => new EnumValueOptions());
-    public static pb::MessageParser<EnumValueOptions> Parser { get { return _parser; } }
+  public sealed partial class EnumOptions : pb::ExtendableMessage<EnumOptions, EnumOptions.Builder> {
+    private EnumOptions() { }
+    private static readonly EnumOptions defaultInstance = new EnumOptions().MakeReadOnly();
+    private static readonly string[] _enumOptionsFieldNames = new string[] { "allow_alias", "deprecated", "uninterpreted_option" };
+    private static readonly uint[] _enumOptionsFieldTags = new uint[] { 16, 24, 7994 };
+    public static EnumOptions DefaultInstance {
+      get { return defaultInstance; }
+    }
 
-    private static readonly string[] _fieldNames = new string[] { "deprecated", "uninterpreted_option" };
-    private static readonly uint[] _fieldTags = new uint[] { 8, 7994 };
+    public override EnumOptions DefaultInstanceForType {
+      get { return DefaultInstance; }
+    }
+
+    protected override EnumOptions ThisMessage {
+      get { return this; }
+    }
+
     public static pbd::MessageDescriptor Descriptor {
-      get { return global::Google.Protobuf.DescriptorProtos.DescriptorProtoFile.Descriptor.MessageTypes[13]; }
+      get { return global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_EnumOptions__Descriptor; }
     }
 
-    public pb::FieldAccess.FieldAccessorTable Fields {
-      get { return global::Google.Protobuf.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_EnumValueOptions__FieldAccessorTable; }
+    protected override pb::FieldAccess.FieldAccessorTable<EnumOptions, EnumOptions.Builder> InternalFieldAccessors {
+      get { return global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_EnumOptions__FieldAccessorTable; }
     }
 
-    private bool _frozen = false;
-    public bool IsFrozen { get { return _frozen; } }
-
-    public EnumValueOptions() {
-      OnConstruction();
+    public const int AllowAliasFieldNumber = 2;
+    private bool hasAllowAlias;
+    private bool allowAlias_;
+    public bool HasAllowAlias {
+      get { return hasAllowAlias; }
+    }
+    public bool AllowAlias {
+      get { return allowAlias_; }
     }
 
-    partial void OnConstruction();
-
-    public EnumValueOptions(EnumValueOptions other) : this() {
-      deprecated_ = other.deprecated_;
-      uninterpretedOption_ = other.uninterpretedOption_.Clone();
+    public const int DeprecatedFieldNumber = 3;
+    private bool hasDeprecated;
+    private bool deprecated_;
+    public bool HasDeprecated {
+      get { return hasDeprecated; }
+    }
+    public bool Deprecated {
+      get { return deprecated_; }
     }
 
-    public EnumValueOptions Clone() {
-      return new EnumValueOptions(this);
+    public const int UninterpretedOptionFieldNumber = 999;
+    private pbc::PopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption> uninterpretedOption_ = new pbc::PopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption>();
+    public scg::IList<global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption> UninterpretedOptionList {
+      get { return uninterpretedOption_; }
+    }
+    public int UninterpretedOptionCount {
+      get { return uninterpretedOption_.Count; }
+    }
+    public global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption GetUninterpretedOption(int index) {
+      return uninterpretedOption_[index];
     }
 
-    public void Freeze() {
-      if (IsFrozen) {
-        return;
+    public override bool IsInitialized {
+      get {
+        foreach (global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption element in UninterpretedOptionList) {
+          if (!element.IsInitialized) return false;
+        }
+        if (!ExtensionsAreInitialized) return false;
+        return true;
       }
-      _frozen = true;
-      uninterpretedOption_.Freeze();
+    }
+
+    public override void WriteTo(pb::ICodedOutputStream output) {
+      CalcSerializedSize();
+      string[] field_names = _enumOptionsFieldNames;
+      pb::ExtendableMessage<EnumOptions, EnumOptions.Builder>.ExtensionWriter extensionWriter = CreateExtensionWriter(this);
+      if (hasAllowAlias) {
+        output.WriteBool(2, field_names[0], AllowAlias);
+      }
+      if (hasDeprecated) {
+        output.WriteBool(3, field_names[1], Deprecated);
+      }
+      if (uninterpretedOption_.Count > 0) {
+        output.WriteMessageArray(999, field_names[2], uninterpretedOption_);
+      }
+      extensionWriter.WriteUntil(536870912, output);
+      UnknownFields.WriteTo(output);
+    }
+
+    private int memoizedSerializedSize = -1;
+    public override int SerializedSize {
+      get {
+        int size = memoizedSerializedSize;
+        if (size != -1) return size;
+        return CalcSerializedSize();
+      }
+    }
+
+    private int CalcSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (hasAllowAlias) {
+        size += pb::CodedOutputStream.ComputeBoolSize(2, AllowAlias);
+      }
+      if (hasDeprecated) {
+        size += pb::CodedOutputStream.ComputeBoolSize(3, Deprecated);
+      }
+      foreach (global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption element in UninterpretedOptionList) {
+        size += pb::CodedOutputStream.ComputeMessageSize(999, element);
+      }
+      size += ExtensionsSerializedSize;
+      size += UnknownFields.SerializedSize;
+      memoizedSerializedSize = size;
+      return size;
+    }
+    public static EnumOptions ParseFrom(pb::ByteString data) {
+      return ((Builder) CreateBuilder().MergeFrom(data)).BuildParsed();
+    }
+    public static EnumOptions ParseFrom(pb::ByteString data, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(data, extensionRegistry)).BuildParsed();
+    }
+    public static EnumOptions ParseFrom(byte[] data) {
+      return ((Builder) CreateBuilder().MergeFrom(data)).BuildParsed();
+    }
+    public static EnumOptions ParseFrom(byte[] data, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(data, extensionRegistry)).BuildParsed();
+    }
+    public static EnumOptions ParseFrom(global::System.IO.Stream input) {
+      return ((Builder) CreateBuilder().MergeFrom(input)).BuildParsed();
+    }
+    public static EnumOptions ParseFrom(global::System.IO.Stream input, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(input, extensionRegistry)).BuildParsed();
+    }
+    public static EnumOptions ParseDelimitedFrom(global::System.IO.Stream input) {
+      return CreateBuilder().MergeDelimitedFrom(input).BuildParsed();
+    }
+    public static EnumOptions ParseDelimitedFrom(global::System.IO.Stream input, pb::ExtensionRegistry extensionRegistry) {
+      return CreateBuilder().MergeDelimitedFrom(input, extensionRegistry).BuildParsed();
+    }
+    public static EnumOptions ParseFrom(pb::ICodedInputStream input) {
+      return ((Builder) CreateBuilder().MergeFrom(input)).BuildParsed();
+    }
+    public static EnumOptions ParseFrom(pb::ICodedInputStream input, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(input, extensionRegistry)).BuildParsed();
+    }
+    private EnumOptions MakeReadOnly() {
+      uninterpretedOption_.MakeReadOnly();
+      return this;
+    }
+
+    public static Builder CreateBuilder() { return new Builder(); }
+    public override Builder ToBuilder() { return CreateBuilder(this); }
+    public override Builder CreateBuilderForType() { return new Builder(); }
+    public static Builder CreateBuilder(EnumOptions prototype) {
+      return new Builder(prototype);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+    public sealed partial class Builder : pb::ExtendableBuilder<EnumOptions, Builder> {
+      protected override Builder ThisBuilder {
+        get { return this; }
+      }
+      public Builder() {
+        result = DefaultInstance;
+        resultIsReadOnly = true;
+      }
+      internal Builder(EnumOptions cloneFrom) {
+        result = cloneFrom;
+        resultIsReadOnly = true;
+      }
+
+      private bool resultIsReadOnly;
+      private EnumOptions result;
+
+      private EnumOptions PrepareBuilder() {
+        if (resultIsReadOnly) {
+          EnumOptions original = result;
+          result = new EnumOptions();
+          resultIsReadOnly = false;
+          MergeFrom(original);
+        }
+        return result;
+      }
+
+      public override bool IsInitialized {
+        get { return result.IsInitialized; }
+      }
+
+      protected override EnumOptions MessageBeingBuilt {
+        get { return PrepareBuilder(); }
+      }
+
+      public override Builder Clear() {
+        result = DefaultInstance;
+        resultIsReadOnly = true;
+        return this;
+      }
+
+      public override Builder Clone() {
+        if (resultIsReadOnly) {
+          return new Builder(result);
+        } else {
+          return new Builder().MergeFrom(result);
+        }
+      }
+
+      public override pbd::MessageDescriptor DescriptorForType {
+        get { return global::Google.ProtocolBuffers.DescriptorProtos.EnumOptions.Descriptor; }
+      }
+
+      public override EnumOptions DefaultInstanceForType {
+        get { return global::Google.ProtocolBuffers.DescriptorProtos.EnumOptions.DefaultInstance; }
+      }
+
+      public override EnumOptions BuildPartial() {
+        if (resultIsReadOnly) {
+          return result;
+        }
+        resultIsReadOnly = true;
+        return result.MakeReadOnly();
+      }
+
+      public override Builder MergeFrom(pb::IMessage other) {
+        if (other is EnumOptions) {
+          return MergeFrom((EnumOptions) other);
+        } else {
+          base.MergeFrom(other);
+          return this;
+        }
+      }
+
+      public override Builder MergeFrom(EnumOptions other) {
+        if (other == global::Google.ProtocolBuffers.DescriptorProtos.EnumOptions.DefaultInstance) return this;
+        PrepareBuilder();
+        if (other.HasAllowAlias) {
+          AllowAlias = other.AllowAlias;
+        }
+        if (other.HasDeprecated) {
+          Deprecated = other.Deprecated;
+        }
+        if (other.uninterpretedOption_.Count != 0) {
+          result.uninterpretedOption_.Add(other.uninterpretedOption_);
+        }
+          this.MergeExtensionFields(other);
+        this.MergeUnknownFields(other.UnknownFields);
+        return this;
+      }
+
+      public override Builder MergeFrom(pb::ICodedInputStream input) {
+        return MergeFrom(input, pb::ExtensionRegistry.Empty);
+      }
+
+      public override Builder MergeFrom(pb::ICodedInputStream input, pb::ExtensionRegistry extensionRegistry) {
+        PrepareBuilder();
+        pb::UnknownFieldSet.Builder unknownFields = null;
+        uint tag;
+        string field_name;
+        while (input.ReadTag(out tag, out field_name)) {
+          if(tag == 0 && field_name != null) {
+            int field_ordinal = global::System.Array.BinarySearch(_enumOptionsFieldNames, field_name, global::System.StringComparer.Ordinal);
+            if(field_ordinal >= 0)
+              tag = _enumOptionsFieldTags[field_ordinal];
+            else {
+              if (unknownFields == null) {
+                unknownFields = pb::UnknownFieldSet.CreateBuilder(this.UnknownFields);
+              }
+              ParseUnknownField(input, unknownFields, extensionRegistry, tag, field_name);
+              continue;
+            }
+          }
+          switch (tag) {
+            case 0: {
+              throw pb::InvalidProtocolBufferException.InvalidTag();
+            }
+            default: {
+              if (pb::WireFormat.IsEndGroupTag(tag)) {
+                if (unknownFields != null) {
+                  this.UnknownFields = unknownFields.Build();
+                }
+                return this;
+              }
+              if (unknownFields == null) {
+                unknownFields = pb::UnknownFieldSet.CreateBuilder(this.UnknownFields);
+              }
+              ParseUnknownField(input, unknownFields, extensionRegistry, tag, field_name);
+              break;
+            }
+            case 16: {
+              result.hasAllowAlias = input.ReadBool(ref result.allowAlias_);
+              break;
+            }
+            case 24: {
+              result.hasDeprecated = input.ReadBool(ref result.deprecated_);
+              break;
+            }
+            case 7994: {
+              input.ReadMessageArray(tag, field_name, result.uninterpretedOption_, global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption.DefaultInstance, extensionRegistry);
+              break;
+            }
+          }
+        }
+
+        if (unknownFields != null) {
+          this.UnknownFields = unknownFields.Build();
+        }
+        return this;
+      }
+
+
+      public bool HasAllowAlias {
+        get { return result.hasAllowAlias; }
+      }
+      public bool AllowAlias {
+        get { return result.AllowAlias; }
+        set { SetAllowAlias(value); }
+      }
+      public Builder SetAllowAlias(bool value) {
+        PrepareBuilder();
+        result.hasAllowAlias = true;
+        result.allowAlias_ = value;
+        return this;
+      }
+      public Builder ClearAllowAlias() {
+        PrepareBuilder();
+        result.hasAllowAlias = false;
+        result.allowAlias_ = false;
+        return this;
+      }
+
+      public bool HasDeprecated {
+        get { return result.hasDeprecated; }
+      }
+      public bool Deprecated {
+        get { return result.Deprecated; }
+        set { SetDeprecated(value); }
+      }
+      public Builder SetDeprecated(bool value) {
+        PrepareBuilder();
+        result.hasDeprecated = true;
+        result.deprecated_ = value;
+        return this;
+      }
+      public Builder ClearDeprecated() {
+        PrepareBuilder();
+        result.hasDeprecated = false;
+        result.deprecated_ = false;
+        return this;
+      }
+
+      public pbc::IPopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption> UninterpretedOptionList {
+        get { return PrepareBuilder().uninterpretedOption_; }
+      }
+      public int UninterpretedOptionCount {
+        get { return result.UninterpretedOptionCount; }
+      }
+      public global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption GetUninterpretedOption(int index) {
+        return result.GetUninterpretedOption(index);
+      }
+      public Builder SetUninterpretedOption(int index, global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.uninterpretedOption_[index] = value;
+        return this;
+      }
+      public Builder SetUninterpretedOption(int index, global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption.Builder builderForValue) {
+        pb::ThrowHelper.ThrowIfNull(builderForValue, "builderForValue");
+        PrepareBuilder();
+        result.uninterpretedOption_[index] = builderForValue.Build();
+        return this;
+      }
+      public Builder AddUninterpretedOption(global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.uninterpretedOption_.Add(value);
+        return this;
+      }
+      public Builder AddUninterpretedOption(global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption.Builder builderForValue) {
+        pb::ThrowHelper.ThrowIfNull(builderForValue, "builderForValue");
+        PrepareBuilder();
+        result.uninterpretedOption_.Add(builderForValue.Build());
+        return this;
+      }
+      public Builder AddRangeUninterpretedOption(scg::IEnumerable<global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption> values) {
+        PrepareBuilder();
+        result.uninterpretedOption_.Add(values);
+        return this;
+      }
+      public Builder ClearUninterpretedOption() {
+        PrepareBuilder();
+        result.uninterpretedOption_.Clear();
+        return this;
+      }
+    }
+    static EnumOptions() {
+      object.ReferenceEquals(global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.Descriptor, null);
+    }
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+  public sealed partial class EnumValueOptions : pb::ExtendableMessage<EnumValueOptions, EnumValueOptions.Builder> {
+    private EnumValueOptions() { }
+    private static readonly EnumValueOptions defaultInstance = new EnumValueOptions().MakeReadOnly();
+    private static readonly string[] _enumValueOptionsFieldNames = new string[] { "deprecated", "uninterpreted_option" };
+    private static readonly uint[] _enumValueOptionsFieldTags = new uint[] { 8, 7994 };
+    public static EnumValueOptions DefaultInstance {
+      get { return defaultInstance; }
+    }
+
+    public override EnumValueOptions DefaultInstanceForType {
+      get { return DefaultInstance; }
+    }
+
+    protected override EnumValueOptions ThisMessage {
+      get { return this; }
+    }
+
+    public static pbd::MessageDescriptor Descriptor {
+      get { return global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_EnumValueOptions__Descriptor; }
+    }
+
+    protected override pb::FieldAccess.FieldAccessorTable<EnumValueOptions, EnumValueOptions.Builder> InternalFieldAccessors {
+      get { return global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_EnumValueOptions__FieldAccessorTable; }
     }
 
     public const int DeprecatedFieldNumber = 1;
+    private bool hasDeprecated;
     private bool deprecated_;
-    internal bool Deprecated {
+    public bool HasDeprecated {
+      get { return hasDeprecated; }
+    }
+    public bool Deprecated {
       get { return deprecated_; }
-      set {
-        pb::Freezable.CheckMutable(this);
-        deprecated_ = value;
-      }
     }
 
     public const int UninterpretedOptionFieldNumber = 999;
-    private static readonly pb::FieldCodec<global::Google.Protobuf.DescriptorProtos.UninterpretedOption> _repeated_uninterpretedOption_codec
-        = pb::FieldCodec.ForMessage(7994, global::Google.Protobuf.DescriptorProtos.UninterpretedOption.Parser);
-    private readonly pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.UninterpretedOption> uninterpretedOption_ = new pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.UninterpretedOption>();
-    internal pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.UninterpretedOption> UninterpretedOption {
+    private pbc::PopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption> uninterpretedOption_ = new pbc::PopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption>();
+    public scg::IList<global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption> UninterpretedOptionList {
       get { return uninterpretedOption_; }
     }
-
-    public override bool Equals(object other) {
-      return Equals(other as EnumValueOptions);
+    public int UninterpretedOptionCount {
+      get { return uninterpretedOption_.Count; }
+    }
+    public global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption GetUninterpretedOption(int index) {
+      return uninterpretedOption_[index];
     }
 
-    public bool Equals(EnumValueOptions other) {
-      if (ReferenceEquals(other, null)) {
-        return false;
-      }
-      if (ReferenceEquals(other, this)) {
+    public override bool IsInitialized {
+      get {
+        foreach (global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption element in UninterpretedOptionList) {
+          if (!element.IsInitialized) return false;
+        }
+        if (!ExtensionsAreInitialized) return false;
         return true;
       }
-      if (Deprecated != other.Deprecated) return false;
-      if(!uninterpretedOption_.Equals(other.uninterpretedOption_)) return false;
-      return true;
     }
 
-    public override int GetHashCode() {
-      int hash = 1;
-      if (Deprecated != false) hash ^= Deprecated.GetHashCode();
-      hash ^= uninterpretedOption_.GetHashCode();
-      return hash;
-    }
-
-    public void WriteTo(pb::CodedOutputStream output) {
-      if (Deprecated != false) {
-        output.WriteRawTag(8);
-        output.WriteBool(Deprecated);
+    public override void WriteTo(pb::ICodedOutputStream output) {
+      CalcSerializedSize();
+      string[] field_names = _enumValueOptionsFieldNames;
+      pb::ExtendableMessage<EnumValueOptions, EnumValueOptions.Builder>.ExtensionWriter extensionWriter = CreateExtensionWriter(this);
+      if (hasDeprecated) {
+        output.WriteBool(1, field_names[0], Deprecated);
       }
-      uninterpretedOption_.WriteTo(output, _repeated_uninterpretedOption_codec);
+      if (uninterpretedOption_.Count > 0) {
+        output.WriteMessageArray(999, field_names[1], uninterpretedOption_);
+      }
+      extensionWriter.WriteUntil(536870912, output);
+      UnknownFields.WriteTo(output);
     }
 
-    public int CalculateSize() {
-      int size = 0;
-      if (Deprecated != false) {
-        size += 1 + 1;
+    private int memoizedSerializedSize = -1;
+    public override int SerializedSize {
+      get {
+        int size = memoizedSerializedSize;
+        if (size != -1) return size;
+        return CalcSerializedSize();
       }
-      size += uninterpretedOption_.CalculateSize(_repeated_uninterpretedOption_codec);
+    }
+
+    private int CalcSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (hasDeprecated) {
+        size += pb::CodedOutputStream.ComputeBoolSize(1, Deprecated);
+      }
+      foreach (global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption element in UninterpretedOptionList) {
+        size += pb::CodedOutputStream.ComputeMessageSize(999, element);
+      }
+      size += ExtensionsSerializedSize;
+      size += UnknownFields.SerializedSize;
+      memoizedSerializedSize = size;
       return size;
     }
-
-    public void MergeFrom(EnumValueOptions other) {
-      if (other == null) {
-        return;
-      }
-      if (other.Deprecated != false) {
-        Deprecated = other.Deprecated;
-      }
-      uninterpretedOption_.Add(other.uninterpretedOption_);
+    public static EnumValueOptions ParseFrom(pb::ByteString data) {
+      return ((Builder) CreateBuilder().MergeFrom(data)).BuildParsed();
+    }
+    public static EnumValueOptions ParseFrom(pb::ByteString data, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(data, extensionRegistry)).BuildParsed();
+    }
+    public static EnumValueOptions ParseFrom(byte[] data) {
+      return ((Builder) CreateBuilder().MergeFrom(data)).BuildParsed();
+    }
+    public static EnumValueOptions ParseFrom(byte[] data, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(data, extensionRegistry)).BuildParsed();
+    }
+    public static EnumValueOptions ParseFrom(global::System.IO.Stream input) {
+      return ((Builder) CreateBuilder().MergeFrom(input)).BuildParsed();
+    }
+    public static EnumValueOptions ParseFrom(global::System.IO.Stream input, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(input, extensionRegistry)).BuildParsed();
+    }
+    public static EnumValueOptions ParseDelimitedFrom(global::System.IO.Stream input) {
+      return CreateBuilder().MergeDelimitedFrom(input).BuildParsed();
+    }
+    public static EnumValueOptions ParseDelimitedFrom(global::System.IO.Stream input, pb::ExtensionRegistry extensionRegistry) {
+      return CreateBuilder().MergeDelimitedFrom(input, extensionRegistry).BuildParsed();
+    }
+    public static EnumValueOptions ParseFrom(pb::ICodedInputStream input) {
+      return ((Builder) CreateBuilder().MergeFrom(input)).BuildParsed();
+    }
+    public static EnumValueOptions ParseFrom(pb::ICodedInputStream input, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(input, extensionRegistry)).BuildParsed();
+    }
+    private EnumValueOptions MakeReadOnly() {
+      uninterpretedOption_.MakeReadOnly();
+      return this;
     }
 
-    public void MergeFrom(pb::CodedInputStream input) {
-      uint tag;
-      while (input.ReadTag(out tag)) {
-        switch(tag) {
-          case 0:
-            throw pb::InvalidProtocolBufferException.InvalidTag();
-          default:
-            if (pb::WireFormat.IsEndGroupTag(tag)) {
-              return;
-            }
-            break;
-          case 8: {
-            Deprecated = input.ReadBool();
-            break;
-          }
-          case 7994: {
-            uninterpretedOption_.AddEntriesFrom(input, _repeated_uninterpretedOption_codec);
-            break;
-          }
+    public static Builder CreateBuilder() { return new Builder(); }
+    public override Builder ToBuilder() { return CreateBuilder(this); }
+    public override Builder CreateBuilderForType() { return new Builder(); }
+    public static Builder CreateBuilder(EnumValueOptions prototype) {
+      return new Builder(prototype);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+    public sealed partial class Builder : pb::ExtendableBuilder<EnumValueOptions, Builder> {
+      protected override Builder ThisBuilder {
+        get { return this; }
+      }
+      public Builder() {
+        result = DefaultInstance;
+        resultIsReadOnly = true;
+      }
+      internal Builder(EnumValueOptions cloneFrom) {
+        result = cloneFrom;
+        resultIsReadOnly = true;
+      }
+
+      private bool resultIsReadOnly;
+      private EnumValueOptions result;
+
+      private EnumValueOptions PrepareBuilder() {
+        if (resultIsReadOnly) {
+          EnumValueOptions original = result;
+          result = new EnumValueOptions();
+          resultIsReadOnly = false;
+          MergeFrom(original);
+        }
+        return result;
+      }
+
+      public override bool IsInitialized {
+        get { return result.IsInitialized; }
+      }
+
+      protected override EnumValueOptions MessageBeingBuilt {
+        get { return PrepareBuilder(); }
+      }
+
+      public override Builder Clear() {
+        result = DefaultInstance;
+        resultIsReadOnly = true;
+        return this;
+      }
+
+      public override Builder Clone() {
+        if (resultIsReadOnly) {
+          return new Builder(result);
+        } else {
+          return new Builder().MergeFrom(result);
         }
       }
-    }
 
+      public override pbd::MessageDescriptor DescriptorForType {
+        get { return global::Google.ProtocolBuffers.DescriptorProtos.EnumValueOptions.Descriptor; }
+      }
+
+      public override EnumValueOptions DefaultInstanceForType {
+        get { return global::Google.ProtocolBuffers.DescriptorProtos.EnumValueOptions.DefaultInstance; }
+      }
+
+      public override EnumValueOptions BuildPartial() {
+        if (resultIsReadOnly) {
+          return result;
+        }
+        resultIsReadOnly = true;
+        return result.MakeReadOnly();
+      }
+
+      public override Builder MergeFrom(pb::IMessage other) {
+        if (other is EnumValueOptions) {
+          return MergeFrom((EnumValueOptions) other);
+        } else {
+          base.MergeFrom(other);
+          return this;
+        }
+      }
+
+      public override Builder MergeFrom(EnumValueOptions other) {
+        if (other == global::Google.ProtocolBuffers.DescriptorProtos.EnumValueOptions.DefaultInstance) return this;
+        PrepareBuilder();
+        if (other.HasDeprecated) {
+          Deprecated = other.Deprecated;
+        }
+        if (other.uninterpretedOption_.Count != 0) {
+          result.uninterpretedOption_.Add(other.uninterpretedOption_);
+        }
+          this.MergeExtensionFields(other);
+        this.MergeUnknownFields(other.UnknownFields);
+        return this;
+      }
+
+      public override Builder MergeFrom(pb::ICodedInputStream input) {
+        return MergeFrom(input, pb::ExtensionRegistry.Empty);
+      }
+
+      public override Builder MergeFrom(pb::ICodedInputStream input, pb::ExtensionRegistry extensionRegistry) {
+        PrepareBuilder();
+        pb::UnknownFieldSet.Builder unknownFields = null;
+        uint tag;
+        string field_name;
+        while (input.ReadTag(out tag, out field_name)) {
+          if(tag == 0 && field_name != null) {
+            int field_ordinal = global::System.Array.BinarySearch(_enumValueOptionsFieldNames, field_name, global::System.StringComparer.Ordinal);
+            if(field_ordinal >= 0)
+              tag = _enumValueOptionsFieldTags[field_ordinal];
+            else {
+              if (unknownFields == null) {
+                unknownFields = pb::UnknownFieldSet.CreateBuilder(this.UnknownFields);
+              }
+              ParseUnknownField(input, unknownFields, extensionRegistry, tag, field_name);
+              continue;
+            }
+          }
+          switch (tag) {
+            case 0: {
+              throw pb::InvalidProtocolBufferException.InvalidTag();
+            }
+            default: {
+              if (pb::WireFormat.IsEndGroupTag(tag)) {
+                if (unknownFields != null) {
+                  this.UnknownFields = unknownFields.Build();
+                }
+                return this;
+              }
+              if (unknownFields == null) {
+                unknownFields = pb::UnknownFieldSet.CreateBuilder(this.UnknownFields);
+              }
+              ParseUnknownField(input, unknownFields, extensionRegistry, tag, field_name);
+              break;
+            }
+            case 8: {
+              result.hasDeprecated = input.ReadBool(ref result.deprecated_);
+              break;
+            }
+            case 7994: {
+              input.ReadMessageArray(tag, field_name, result.uninterpretedOption_, global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption.DefaultInstance, extensionRegistry);
+              break;
+            }
+          }
+        }
+
+        if (unknownFields != null) {
+          this.UnknownFields = unknownFields.Build();
+        }
+        return this;
+      }
+
+
+      public bool HasDeprecated {
+        get { return result.hasDeprecated; }
+      }
+      public bool Deprecated {
+        get { return result.Deprecated; }
+        set { SetDeprecated(value); }
+      }
+      public Builder SetDeprecated(bool value) {
+        PrepareBuilder();
+        result.hasDeprecated = true;
+        result.deprecated_ = value;
+        return this;
+      }
+      public Builder ClearDeprecated() {
+        PrepareBuilder();
+        result.hasDeprecated = false;
+        result.deprecated_ = false;
+        return this;
+      }
+
+      public pbc::IPopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption> UninterpretedOptionList {
+        get { return PrepareBuilder().uninterpretedOption_; }
+      }
+      public int UninterpretedOptionCount {
+        get { return result.UninterpretedOptionCount; }
+      }
+      public global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption GetUninterpretedOption(int index) {
+        return result.GetUninterpretedOption(index);
+      }
+      public Builder SetUninterpretedOption(int index, global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.uninterpretedOption_[index] = value;
+        return this;
+      }
+      public Builder SetUninterpretedOption(int index, global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption.Builder builderForValue) {
+        pb::ThrowHelper.ThrowIfNull(builderForValue, "builderForValue");
+        PrepareBuilder();
+        result.uninterpretedOption_[index] = builderForValue.Build();
+        return this;
+      }
+      public Builder AddUninterpretedOption(global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.uninterpretedOption_.Add(value);
+        return this;
+      }
+      public Builder AddUninterpretedOption(global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption.Builder builderForValue) {
+        pb::ThrowHelper.ThrowIfNull(builderForValue, "builderForValue");
+        PrepareBuilder();
+        result.uninterpretedOption_.Add(builderForValue.Build());
+        return this;
+      }
+      public Builder AddRangeUninterpretedOption(scg::IEnumerable<global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption> values) {
+        PrepareBuilder();
+        result.uninterpretedOption_.Add(values);
+        return this;
+      }
+      public Builder ClearUninterpretedOption() {
+        PrepareBuilder();
+        result.uninterpretedOption_.Clear();
+        return this;
+      }
+    }
+    static EnumValueOptions() {
+      object.ReferenceEquals(global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.Descriptor, null);
+    }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-  internal sealed partial class ServiceOptions : pb::IMessage<ServiceOptions> {
-    private static readonly pb::MessageParser<ServiceOptions> _parser = new pb::MessageParser<ServiceOptions>(() => new ServiceOptions());
-    public static pb::MessageParser<ServiceOptions> Parser { get { return _parser; } }
+  public sealed partial class ServiceOptions : pb::ExtendableMessage<ServiceOptions, ServiceOptions.Builder> {
+    private ServiceOptions() { }
+    private static readonly ServiceOptions defaultInstance = new ServiceOptions().MakeReadOnly();
+    private static readonly string[] _serviceOptionsFieldNames = new string[] { "deprecated", "uninterpreted_option" };
+    private static readonly uint[] _serviceOptionsFieldTags = new uint[] { 264, 7994 };
+    public static ServiceOptions DefaultInstance {
+      get { return defaultInstance; }
+    }
 
-    private static readonly string[] _fieldNames = new string[] { "deprecated", "uninterpreted_option" };
-    private static readonly uint[] _fieldTags = new uint[] { 264, 7994 };
+    public override ServiceOptions DefaultInstanceForType {
+      get { return DefaultInstance; }
+    }
+
+    protected override ServiceOptions ThisMessage {
+      get { return this; }
+    }
+
     public static pbd::MessageDescriptor Descriptor {
-      get { return global::Google.Protobuf.DescriptorProtos.DescriptorProtoFile.Descriptor.MessageTypes[14]; }
+      get { return global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_ServiceOptions__Descriptor; }
     }
 
-    public pb::FieldAccess.FieldAccessorTable Fields {
-      get { return global::Google.Protobuf.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_ServiceOptions__FieldAccessorTable; }
-    }
-
-    private bool _frozen = false;
-    public bool IsFrozen { get { return _frozen; } }
-
-    public ServiceOptions() {
-      OnConstruction();
-    }
-
-    partial void OnConstruction();
-
-    public ServiceOptions(ServiceOptions other) : this() {
-      deprecated_ = other.deprecated_;
-      uninterpretedOption_ = other.uninterpretedOption_.Clone();
-    }
-
-    public ServiceOptions Clone() {
-      return new ServiceOptions(this);
-    }
-
-    public void Freeze() {
-      if (IsFrozen) {
-        return;
-      }
-      _frozen = true;
-      uninterpretedOption_.Freeze();
+    protected override pb::FieldAccess.FieldAccessorTable<ServiceOptions, ServiceOptions.Builder> InternalFieldAccessors {
+      get { return global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_ServiceOptions__FieldAccessorTable; }
     }
 
     public const int DeprecatedFieldNumber = 33;
+    private bool hasDeprecated;
     private bool deprecated_;
-    internal bool Deprecated {
+    public bool HasDeprecated {
+      get { return hasDeprecated; }
+    }
+    public bool Deprecated {
       get { return deprecated_; }
-      set {
-        pb::Freezable.CheckMutable(this);
-        deprecated_ = value;
-      }
     }
 
     public const int UninterpretedOptionFieldNumber = 999;
-    private static readonly pb::FieldCodec<global::Google.Protobuf.DescriptorProtos.UninterpretedOption> _repeated_uninterpretedOption_codec
-        = pb::FieldCodec.ForMessage(7994, global::Google.Protobuf.DescriptorProtos.UninterpretedOption.Parser);
-    private readonly pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.UninterpretedOption> uninterpretedOption_ = new pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.UninterpretedOption>();
-    internal pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.UninterpretedOption> UninterpretedOption {
+    private pbc::PopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption> uninterpretedOption_ = new pbc::PopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption>();
+    public scg::IList<global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption> UninterpretedOptionList {
       get { return uninterpretedOption_; }
     }
-
-    public override bool Equals(object other) {
-      return Equals(other as ServiceOptions);
+    public int UninterpretedOptionCount {
+      get { return uninterpretedOption_.Count; }
+    }
+    public global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption GetUninterpretedOption(int index) {
+      return uninterpretedOption_[index];
     }
 
-    public bool Equals(ServiceOptions other) {
-      if (ReferenceEquals(other, null)) {
-        return false;
-      }
-      if (ReferenceEquals(other, this)) {
+    public override bool IsInitialized {
+      get {
+        foreach (global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption element in UninterpretedOptionList) {
+          if (!element.IsInitialized) return false;
+        }
+        if (!ExtensionsAreInitialized) return false;
         return true;
       }
-      if (Deprecated != other.Deprecated) return false;
-      if(!uninterpretedOption_.Equals(other.uninterpretedOption_)) return false;
-      return true;
     }
 
-    public override int GetHashCode() {
-      int hash = 1;
-      if (Deprecated != false) hash ^= Deprecated.GetHashCode();
-      hash ^= uninterpretedOption_.GetHashCode();
-      return hash;
-    }
-
-    public void WriteTo(pb::CodedOutputStream output) {
-      if (Deprecated != false) {
-        output.WriteRawTag(136, 2);
-        output.WriteBool(Deprecated);
+    public override void WriteTo(pb::ICodedOutputStream output) {
+      CalcSerializedSize();
+      string[] field_names = _serviceOptionsFieldNames;
+      pb::ExtendableMessage<ServiceOptions, ServiceOptions.Builder>.ExtensionWriter extensionWriter = CreateExtensionWriter(this);
+      if (hasDeprecated) {
+        output.WriteBool(33, field_names[0], Deprecated);
       }
-      uninterpretedOption_.WriteTo(output, _repeated_uninterpretedOption_codec);
+      if (uninterpretedOption_.Count > 0) {
+        output.WriteMessageArray(999, field_names[1], uninterpretedOption_);
+      }
+      extensionWriter.WriteUntil(536870912, output);
+      UnknownFields.WriteTo(output);
     }
 
-    public int CalculateSize() {
-      int size = 0;
-      if (Deprecated != false) {
-        size += 2 + 1;
+    private int memoizedSerializedSize = -1;
+    public override int SerializedSize {
+      get {
+        int size = memoizedSerializedSize;
+        if (size != -1) return size;
+        return CalcSerializedSize();
       }
-      size += uninterpretedOption_.CalculateSize(_repeated_uninterpretedOption_codec);
+    }
+
+    private int CalcSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (hasDeprecated) {
+        size += pb::CodedOutputStream.ComputeBoolSize(33, Deprecated);
+      }
+      foreach (global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption element in UninterpretedOptionList) {
+        size += pb::CodedOutputStream.ComputeMessageSize(999, element);
+      }
+      size += ExtensionsSerializedSize;
+      size += UnknownFields.SerializedSize;
+      memoizedSerializedSize = size;
       return size;
     }
-
-    public void MergeFrom(ServiceOptions other) {
-      if (other == null) {
-        return;
-      }
-      if (other.Deprecated != false) {
-        Deprecated = other.Deprecated;
-      }
-      uninterpretedOption_.Add(other.uninterpretedOption_);
+    public static ServiceOptions ParseFrom(pb::ByteString data) {
+      return ((Builder) CreateBuilder().MergeFrom(data)).BuildParsed();
+    }
+    public static ServiceOptions ParseFrom(pb::ByteString data, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(data, extensionRegistry)).BuildParsed();
+    }
+    public static ServiceOptions ParseFrom(byte[] data) {
+      return ((Builder) CreateBuilder().MergeFrom(data)).BuildParsed();
+    }
+    public static ServiceOptions ParseFrom(byte[] data, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(data, extensionRegistry)).BuildParsed();
+    }
+    public static ServiceOptions ParseFrom(global::System.IO.Stream input) {
+      return ((Builder) CreateBuilder().MergeFrom(input)).BuildParsed();
+    }
+    public static ServiceOptions ParseFrom(global::System.IO.Stream input, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(input, extensionRegistry)).BuildParsed();
+    }
+    public static ServiceOptions ParseDelimitedFrom(global::System.IO.Stream input) {
+      return CreateBuilder().MergeDelimitedFrom(input).BuildParsed();
+    }
+    public static ServiceOptions ParseDelimitedFrom(global::System.IO.Stream input, pb::ExtensionRegistry extensionRegistry) {
+      return CreateBuilder().MergeDelimitedFrom(input, extensionRegistry).BuildParsed();
+    }
+    public static ServiceOptions ParseFrom(pb::ICodedInputStream input) {
+      return ((Builder) CreateBuilder().MergeFrom(input)).BuildParsed();
+    }
+    public static ServiceOptions ParseFrom(pb::ICodedInputStream input, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(input, extensionRegistry)).BuildParsed();
+    }
+    private ServiceOptions MakeReadOnly() {
+      uninterpretedOption_.MakeReadOnly();
+      return this;
     }
 
-    public void MergeFrom(pb::CodedInputStream input) {
-      uint tag;
-      while (input.ReadTag(out tag)) {
-        switch(tag) {
-          case 0:
-            throw pb::InvalidProtocolBufferException.InvalidTag();
-          default:
-            if (pb::WireFormat.IsEndGroupTag(tag)) {
-              return;
-            }
-            break;
-          case 264: {
-            Deprecated = input.ReadBool();
-            break;
-          }
-          case 7994: {
-            uninterpretedOption_.AddEntriesFrom(input, _repeated_uninterpretedOption_codec);
-            break;
-          }
+    public static Builder CreateBuilder() { return new Builder(); }
+    public override Builder ToBuilder() { return CreateBuilder(this); }
+    public override Builder CreateBuilderForType() { return new Builder(); }
+    public static Builder CreateBuilder(ServiceOptions prototype) {
+      return new Builder(prototype);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+    public sealed partial class Builder : pb::ExtendableBuilder<ServiceOptions, Builder> {
+      protected override Builder ThisBuilder {
+        get { return this; }
+      }
+      public Builder() {
+        result = DefaultInstance;
+        resultIsReadOnly = true;
+      }
+      internal Builder(ServiceOptions cloneFrom) {
+        result = cloneFrom;
+        resultIsReadOnly = true;
+      }
+
+      private bool resultIsReadOnly;
+      private ServiceOptions result;
+
+      private ServiceOptions PrepareBuilder() {
+        if (resultIsReadOnly) {
+          ServiceOptions original = result;
+          result = new ServiceOptions();
+          resultIsReadOnly = false;
+          MergeFrom(original);
+        }
+        return result;
+      }
+
+      public override bool IsInitialized {
+        get { return result.IsInitialized; }
+      }
+
+      protected override ServiceOptions MessageBeingBuilt {
+        get { return PrepareBuilder(); }
+      }
+
+      public override Builder Clear() {
+        result = DefaultInstance;
+        resultIsReadOnly = true;
+        return this;
+      }
+
+      public override Builder Clone() {
+        if (resultIsReadOnly) {
+          return new Builder(result);
+        } else {
+          return new Builder().MergeFrom(result);
         }
       }
-    }
 
+      public override pbd::MessageDescriptor DescriptorForType {
+        get { return global::Google.ProtocolBuffers.DescriptorProtos.ServiceOptions.Descriptor; }
+      }
+
+      public override ServiceOptions DefaultInstanceForType {
+        get { return global::Google.ProtocolBuffers.DescriptorProtos.ServiceOptions.DefaultInstance; }
+      }
+
+      public override ServiceOptions BuildPartial() {
+        if (resultIsReadOnly) {
+          return result;
+        }
+        resultIsReadOnly = true;
+        return result.MakeReadOnly();
+      }
+
+      public override Builder MergeFrom(pb::IMessage other) {
+        if (other is ServiceOptions) {
+          return MergeFrom((ServiceOptions) other);
+        } else {
+          base.MergeFrom(other);
+          return this;
+        }
+      }
+
+      public override Builder MergeFrom(ServiceOptions other) {
+        if (other == global::Google.ProtocolBuffers.DescriptorProtos.ServiceOptions.DefaultInstance) return this;
+        PrepareBuilder();
+        if (other.HasDeprecated) {
+          Deprecated = other.Deprecated;
+        }
+        if (other.uninterpretedOption_.Count != 0) {
+          result.uninterpretedOption_.Add(other.uninterpretedOption_);
+        }
+          this.MergeExtensionFields(other);
+        this.MergeUnknownFields(other.UnknownFields);
+        return this;
+      }
+
+      public override Builder MergeFrom(pb::ICodedInputStream input) {
+        return MergeFrom(input, pb::ExtensionRegistry.Empty);
+      }
+
+      public override Builder MergeFrom(pb::ICodedInputStream input, pb::ExtensionRegistry extensionRegistry) {
+        PrepareBuilder();
+        pb::UnknownFieldSet.Builder unknownFields = null;
+        uint tag;
+        string field_name;
+        while (input.ReadTag(out tag, out field_name)) {
+          if(tag == 0 && field_name != null) {
+            int field_ordinal = global::System.Array.BinarySearch(_serviceOptionsFieldNames, field_name, global::System.StringComparer.Ordinal);
+            if(field_ordinal >= 0)
+              tag = _serviceOptionsFieldTags[field_ordinal];
+            else {
+              if (unknownFields == null) {
+                unknownFields = pb::UnknownFieldSet.CreateBuilder(this.UnknownFields);
+              }
+              ParseUnknownField(input, unknownFields, extensionRegistry, tag, field_name);
+              continue;
+            }
+          }
+          switch (tag) {
+            case 0: {
+              throw pb::InvalidProtocolBufferException.InvalidTag();
+            }
+            default: {
+              if (pb::WireFormat.IsEndGroupTag(tag)) {
+                if (unknownFields != null) {
+                  this.UnknownFields = unknownFields.Build();
+                }
+                return this;
+              }
+              if (unknownFields == null) {
+                unknownFields = pb::UnknownFieldSet.CreateBuilder(this.UnknownFields);
+              }
+              ParseUnknownField(input, unknownFields, extensionRegistry, tag, field_name);
+              break;
+            }
+            case 264: {
+              result.hasDeprecated = input.ReadBool(ref result.deprecated_);
+              break;
+            }
+            case 7994: {
+              input.ReadMessageArray(tag, field_name, result.uninterpretedOption_, global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption.DefaultInstance, extensionRegistry);
+              break;
+            }
+          }
+        }
+
+        if (unknownFields != null) {
+          this.UnknownFields = unknownFields.Build();
+        }
+        return this;
+      }
+
+
+      public bool HasDeprecated {
+        get { return result.hasDeprecated; }
+      }
+      public bool Deprecated {
+        get { return result.Deprecated; }
+        set { SetDeprecated(value); }
+      }
+      public Builder SetDeprecated(bool value) {
+        PrepareBuilder();
+        result.hasDeprecated = true;
+        result.deprecated_ = value;
+        return this;
+      }
+      public Builder ClearDeprecated() {
+        PrepareBuilder();
+        result.hasDeprecated = false;
+        result.deprecated_ = false;
+        return this;
+      }
+
+      public pbc::IPopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption> UninterpretedOptionList {
+        get { return PrepareBuilder().uninterpretedOption_; }
+      }
+      public int UninterpretedOptionCount {
+        get { return result.UninterpretedOptionCount; }
+      }
+      public global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption GetUninterpretedOption(int index) {
+        return result.GetUninterpretedOption(index);
+      }
+      public Builder SetUninterpretedOption(int index, global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.uninterpretedOption_[index] = value;
+        return this;
+      }
+      public Builder SetUninterpretedOption(int index, global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption.Builder builderForValue) {
+        pb::ThrowHelper.ThrowIfNull(builderForValue, "builderForValue");
+        PrepareBuilder();
+        result.uninterpretedOption_[index] = builderForValue.Build();
+        return this;
+      }
+      public Builder AddUninterpretedOption(global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.uninterpretedOption_.Add(value);
+        return this;
+      }
+      public Builder AddUninterpretedOption(global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption.Builder builderForValue) {
+        pb::ThrowHelper.ThrowIfNull(builderForValue, "builderForValue");
+        PrepareBuilder();
+        result.uninterpretedOption_.Add(builderForValue.Build());
+        return this;
+      }
+      public Builder AddRangeUninterpretedOption(scg::IEnumerable<global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption> values) {
+        PrepareBuilder();
+        result.uninterpretedOption_.Add(values);
+        return this;
+      }
+      public Builder ClearUninterpretedOption() {
+        PrepareBuilder();
+        result.uninterpretedOption_.Clear();
+        return this;
+      }
+    }
+    static ServiceOptions() {
+      object.ReferenceEquals(global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.Descriptor, null);
+    }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-  internal sealed partial class MethodOptions : pb::IMessage<MethodOptions> {
-    private static readonly pb::MessageParser<MethodOptions> _parser = new pb::MessageParser<MethodOptions>(() => new MethodOptions());
-    public static pb::MessageParser<MethodOptions> Parser { get { return _parser; } }
+  public sealed partial class MethodOptions : pb::ExtendableMessage<MethodOptions, MethodOptions.Builder> {
+    private MethodOptions() { }
+    private static readonly MethodOptions defaultInstance = new MethodOptions().MakeReadOnly();
+    private static readonly string[] _methodOptionsFieldNames = new string[] { "deprecated", "uninterpreted_option" };
+    private static readonly uint[] _methodOptionsFieldTags = new uint[] { 264, 7994 };
+    public static MethodOptions DefaultInstance {
+      get { return defaultInstance; }
+    }
 
-    private static readonly string[] _fieldNames = new string[] { "deprecated", "uninterpreted_option" };
-    private static readonly uint[] _fieldTags = new uint[] { 264, 7994 };
+    public override MethodOptions DefaultInstanceForType {
+      get { return DefaultInstance; }
+    }
+
+    protected override MethodOptions ThisMessage {
+      get { return this; }
+    }
+
     public static pbd::MessageDescriptor Descriptor {
-      get { return global::Google.Protobuf.DescriptorProtos.DescriptorProtoFile.Descriptor.MessageTypes[15]; }
+      get { return global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_MethodOptions__Descriptor; }
     }
 
-    public pb::FieldAccess.FieldAccessorTable Fields {
-      get { return global::Google.Protobuf.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_MethodOptions__FieldAccessorTable; }
-    }
-
-    private bool _frozen = false;
-    public bool IsFrozen { get { return _frozen; } }
-
-    public MethodOptions() {
-      OnConstruction();
-    }
-
-    partial void OnConstruction();
-
-    public MethodOptions(MethodOptions other) : this() {
-      deprecated_ = other.deprecated_;
-      uninterpretedOption_ = other.uninterpretedOption_.Clone();
-    }
-
-    public MethodOptions Clone() {
-      return new MethodOptions(this);
-    }
-
-    public void Freeze() {
-      if (IsFrozen) {
-        return;
-      }
-      _frozen = true;
-      uninterpretedOption_.Freeze();
+    protected override pb::FieldAccess.FieldAccessorTable<MethodOptions, MethodOptions.Builder> InternalFieldAccessors {
+      get { return global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_MethodOptions__FieldAccessorTable; }
     }
 
     public const int DeprecatedFieldNumber = 33;
+    private bool hasDeprecated;
     private bool deprecated_;
-    internal bool Deprecated {
+    public bool HasDeprecated {
+      get { return hasDeprecated; }
+    }
+    public bool Deprecated {
       get { return deprecated_; }
-      set {
-        pb::Freezable.CheckMutable(this);
-        deprecated_ = value;
-      }
     }
 
     public const int UninterpretedOptionFieldNumber = 999;
-    private static readonly pb::FieldCodec<global::Google.Protobuf.DescriptorProtos.UninterpretedOption> _repeated_uninterpretedOption_codec
-        = pb::FieldCodec.ForMessage(7994, global::Google.Protobuf.DescriptorProtos.UninterpretedOption.Parser);
-    private readonly pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.UninterpretedOption> uninterpretedOption_ = new pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.UninterpretedOption>();
-    internal pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.UninterpretedOption> UninterpretedOption {
+    private pbc::PopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption> uninterpretedOption_ = new pbc::PopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption>();
+    public scg::IList<global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption> UninterpretedOptionList {
       get { return uninterpretedOption_; }
     }
-
-    public override bool Equals(object other) {
-      return Equals(other as MethodOptions);
+    public int UninterpretedOptionCount {
+      get { return uninterpretedOption_.Count; }
+    }
+    public global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption GetUninterpretedOption(int index) {
+      return uninterpretedOption_[index];
     }
 
-    public bool Equals(MethodOptions other) {
-      if (ReferenceEquals(other, null)) {
-        return false;
-      }
-      if (ReferenceEquals(other, this)) {
+    public override bool IsInitialized {
+      get {
+        foreach (global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption element in UninterpretedOptionList) {
+          if (!element.IsInitialized) return false;
+        }
+        if (!ExtensionsAreInitialized) return false;
         return true;
       }
-      if (Deprecated != other.Deprecated) return false;
-      if(!uninterpretedOption_.Equals(other.uninterpretedOption_)) return false;
-      return true;
     }
 
-    public override int GetHashCode() {
-      int hash = 1;
-      if (Deprecated != false) hash ^= Deprecated.GetHashCode();
-      hash ^= uninterpretedOption_.GetHashCode();
-      return hash;
-    }
-
-    public void WriteTo(pb::CodedOutputStream output) {
-      if (Deprecated != false) {
-        output.WriteRawTag(136, 2);
-        output.WriteBool(Deprecated);
+    public override void WriteTo(pb::ICodedOutputStream output) {
+      CalcSerializedSize();
+      string[] field_names = _methodOptionsFieldNames;
+      pb::ExtendableMessage<MethodOptions, MethodOptions.Builder>.ExtensionWriter extensionWriter = CreateExtensionWriter(this);
+      if (hasDeprecated) {
+        output.WriteBool(33, field_names[0], Deprecated);
       }
-      uninterpretedOption_.WriteTo(output, _repeated_uninterpretedOption_codec);
+      if (uninterpretedOption_.Count > 0) {
+        output.WriteMessageArray(999, field_names[1], uninterpretedOption_);
+      }
+      extensionWriter.WriteUntil(536870912, output);
+      UnknownFields.WriteTo(output);
     }
 
-    public int CalculateSize() {
-      int size = 0;
-      if (Deprecated != false) {
-        size += 2 + 1;
+    private int memoizedSerializedSize = -1;
+    public override int SerializedSize {
+      get {
+        int size = memoizedSerializedSize;
+        if (size != -1) return size;
+        return CalcSerializedSize();
       }
-      size += uninterpretedOption_.CalculateSize(_repeated_uninterpretedOption_codec);
+    }
+
+    private int CalcSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (hasDeprecated) {
+        size += pb::CodedOutputStream.ComputeBoolSize(33, Deprecated);
+      }
+      foreach (global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption element in UninterpretedOptionList) {
+        size += pb::CodedOutputStream.ComputeMessageSize(999, element);
+      }
+      size += ExtensionsSerializedSize;
+      size += UnknownFields.SerializedSize;
+      memoizedSerializedSize = size;
       return size;
     }
-
-    public void MergeFrom(MethodOptions other) {
-      if (other == null) {
-        return;
-      }
-      if (other.Deprecated != false) {
-        Deprecated = other.Deprecated;
-      }
-      uninterpretedOption_.Add(other.uninterpretedOption_);
+    public static MethodOptions ParseFrom(pb::ByteString data) {
+      return ((Builder) CreateBuilder().MergeFrom(data)).BuildParsed();
+    }
+    public static MethodOptions ParseFrom(pb::ByteString data, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(data, extensionRegistry)).BuildParsed();
+    }
+    public static MethodOptions ParseFrom(byte[] data) {
+      return ((Builder) CreateBuilder().MergeFrom(data)).BuildParsed();
+    }
+    public static MethodOptions ParseFrom(byte[] data, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(data, extensionRegistry)).BuildParsed();
+    }
+    public static MethodOptions ParseFrom(global::System.IO.Stream input) {
+      return ((Builder) CreateBuilder().MergeFrom(input)).BuildParsed();
+    }
+    public static MethodOptions ParseFrom(global::System.IO.Stream input, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(input, extensionRegistry)).BuildParsed();
+    }
+    public static MethodOptions ParseDelimitedFrom(global::System.IO.Stream input) {
+      return CreateBuilder().MergeDelimitedFrom(input).BuildParsed();
+    }
+    public static MethodOptions ParseDelimitedFrom(global::System.IO.Stream input, pb::ExtensionRegistry extensionRegistry) {
+      return CreateBuilder().MergeDelimitedFrom(input, extensionRegistry).BuildParsed();
+    }
+    public static MethodOptions ParseFrom(pb::ICodedInputStream input) {
+      return ((Builder) CreateBuilder().MergeFrom(input)).BuildParsed();
+    }
+    public static MethodOptions ParseFrom(pb::ICodedInputStream input, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(input, extensionRegistry)).BuildParsed();
+    }
+    private MethodOptions MakeReadOnly() {
+      uninterpretedOption_.MakeReadOnly();
+      return this;
     }
 
-    public void MergeFrom(pb::CodedInputStream input) {
-      uint tag;
-      while (input.ReadTag(out tag)) {
-        switch(tag) {
-          case 0:
-            throw pb::InvalidProtocolBufferException.InvalidTag();
-          default:
-            if (pb::WireFormat.IsEndGroupTag(tag)) {
-              return;
-            }
-            break;
-          case 264: {
-            Deprecated = input.ReadBool();
-            break;
-          }
-          case 7994: {
-            uninterpretedOption_.AddEntriesFrom(input, _repeated_uninterpretedOption_codec);
-            break;
-          }
+    public static Builder CreateBuilder() { return new Builder(); }
+    public override Builder ToBuilder() { return CreateBuilder(this); }
+    public override Builder CreateBuilderForType() { return new Builder(); }
+    public static Builder CreateBuilder(MethodOptions prototype) {
+      return new Builder(prototype);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+    public sealed partial class Builder : pb::ExtendableBuilder<MethodOptions, Builder> {
+      protected override Builder ThisBuilder {
+        get { return this; }
+      }
+      public Builder() {
+        result = DefaultInstance;
+        resultIsReadOnly = true;
+      }
+      internal Builder(MethodOptions cloneFrom) {
+        result = cloneFrom;
+        resultIsReadOnly = true;
+      }
+
+      private bool resultIsReadOnly;
+      private MethodOptions result;
+
+      private MethodOptions PrepareBuilder() {
+        if (resultIsReadOnly) {
+          MethodOptions original = result;
+          result = new MethodOptions();
+          resultIsReadOnly = false;
+          MergeFrom(original);
+        }
+        return result;
+      }
+
+      public override bool IsInitialized {
+        get { return result.IsInitialized; }
+      }
+
+      protected override MethodOptions MessageBeingBuilt {
+        get { return PrepareBuilder(); }
+      }
+
+      public override Builder Clear() {
+        result = DefaultInstance;
+        resultIsReadOnly = true;
+        return this;
+      }
+
+      public override Builder Clone() {
+        if (resultIsReadOnly) {
+          return new Builder(result);
+        } else {
+          return new Builder().MergeFrom(result);
         }
       }
-    }
 
+      public override pbd::MessageDescriptor DescriptorForType {
+        get { return global::Google.ProtocolBuffers.DescriptorProtos.MethodOptions.Descriptor; }
+      }
+
+      public override MethodOptions DefaultInstanceForType {
+        get { return global::Google.ProtocolBuffers.DescriptorProtos.MethodOptions.DefaultInstance; }
+      }
+
+      public override MethodOptions BuildPartial() {
+        if (resultIsReadOnly) {
+          return result;
+        }
+        resultIsReadOnly = true;
+        return result.MakeReadOnly();
+      }
+
+      public override Builder MergeFrom(pb::IMessage other) {
+        if (other is MethodOptions) {
+          return MergeFrom((MethodOptions) other);
+        } else {
+          base.MergeFrom(other);
+          return this;
+        }
+      }
+
+      public override Builder MergeFrom(MethodOptions other) {
+        if (other == global::Google.ProtocolBuffers.DescriptorProtos.MethodOptions.DefaultInstance) return this;
+        PrepareBuilder();
+        if (other.HasDeprecated) {
+          Deprecated = other.Deprecated;
+        }
+        if (other.uninterpretedOption_.Count != 0) {
+          result.uninterpretedOption_.Add(other.uninterpretedOption_);
+        }
+          this.MergeExtensionFields(other);
+        this.MergeUnknownFields(other.UnknownFields);
+        return this;
+      }
+
+      public override Builder MergeFrom(pb::ICodedInputStream input) {
+        return MergeFrom(input, pb::ExtensionRegistry.Empty);
+      }
+
+      public override Builder MergeFrom(pb::ICodedInputStream input, pb::ExtensionRegistry extensionRegistry) {
+        PrepareBuilder();
+        pb::UnknownFieldSet.Builder unknownFields = null;
+        uint tag;
+        string field_name;
+        while (input.ReadTag(out tag, out field_name)) {
+          if(tag == 0 && field_name != null) {
+            int field_ordinal = global::System.Array.BinarySearch(_methodOptionsFieldNames, field_name, global::System.StringComparer.Ordinal);
+            if(field_ordinal >= 0)
+              tag = _methodOptionsFieldTags[field_ordinal];
+            else {
+              if (unknownFields == null) {
+                unknownFields = pb::UnknownFieldSet.CreateBuilder(this.UnknownFields);
+              }
+              ParseUnknownField(input, unknownFields, extensionRegistry, tag, field_name);
+              continue;
+            }
+          }
+          switch (tag) {
+            case 0: {
+              throw pb::InvalidProtocolBufferException.InvalidTag();
+            }
+            default: {
+              if (pb::WireFormat.IsEndGroupTag(tag)) {
+                if (unknownFields != null) {
+                  this.UnknownFields = unknownFields.Build();
+                }
+                return this;
+              }
+              if (unknownFields == null) {
+                unknownFields = pb::UnknownFieldSet.CreateBuilder(this.UnknownFields);
+              }
+              ParseUnknownField(input, unknownFields, extensionRegistry, tag, field_name);
+              break;
+            }
+            case 264: {
+              result.hasDeprecated = input.ReadBool(ref result.deprecated_);
+              break;
+            }
+            case 7994: {
+              input.ReadMessageArray(tag, field_name, result.uninterpretedOption_, global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption.DefaultInstance, extensionRegistry);
+              break;
+            }
+          }
+        }
+
+        if (unknownFields != null) {
+          this.UnknownFields = unknownFields.Build();
+        }
+        return this;
+      }
+
+
+      public bool HasDeprecated {
+        get { return result.hasDeprecated; }
+      }
+      public bool Deprecated {
+        get { return result.Deprecated; }
+        set { SetDeprecated(value); }
+      }
+      public Builder SetDeprecated(bool value) {
+        PrepareBuilder();
+        result.hasDeprecated = true;
+        result.deprecated_ = value;
+        return this;
+      }
+      public Builder ClearDeprecated() {
+        PrepareBuilder();
+        result.hasDeprecated = false;
+        result.deprecated_ = false;
+        return this;
+      }
+
+      public pbc::IPopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption> UninterpretedOptionList {
+        get { return PrepareBuilder().uninterpretedOption_; }
+      }
+      public int UninterpretedOptionCount {
+        get { return result.UninterpretedOptionCount; }
+      }
+      public global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption GetUninterpretedOption(int index) {
+        return result.GetUninterpretedOption(index);
+      }
+      public Builder SetUninterpretedOption(int index, global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.uninterpretedOption_[index] = value;
+        return this;
+      }
+      public Builder SetUninterpretedOption(int index, global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption.Builder builderForValue) {
+        pb::ThrowHelper.ThrowIfNull(builderForValue, "builderForValue");
+        PrepareBuilder();
+        result.uninterpretedOption_[index] = builderForValue.Build();
+        return this;
+      }
+      public Builder AddUninterpretedOption(global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.uninterpretedOption_.Add(value);
+        return this;
+      }
+      public Builder AddUninterpretedOption(global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption.Builder builderForValue) {
+        pb::ThrowHelper.ThrowIfNull(builderForValue, "builderForValue");
+        PrepareBuilder();
+        result.uninterpretedOption_.Add(builderForValue.Build());
+        return this;
+      }
+      public Builder AddRangeUninterpretedOption(scg::IEnumerable<global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption> values) {
+        PrepareBuilder();
+        result.uninterpretedOption_.Add(values);
+        return this;
+      }
+      public Builder ClearUninterpretedOption() {
+        PrepareBuilder();
+        result.uninterpretedOption_.Clear();
+        return this;
+      }
+    }
+    static MethodOptions() {
+      object.ReferenceEquals(global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.Descriptor, null);
+    }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-  internal sealed partial class UninterpretedOption : pb::IMessage<UninterpretedOption> {
-    private static readonly pb::MessageParser<UninterpretedOption> _parser = new pb::MessageParser<UninterpretedOption>(() => new UninterpretedOption());
-    public static pb::MessageParser<UninterpretedOption> Parser { get { return _parser; } }
+  public sealed partial class UninterpretedOption : pb::GeneratedMessage<UninterpretedOption, UninterpretedOption.Builder> {
+    private UninterpretedOption() { }
+    private static readonly UninterpretedOption defaultInstance = new UninterpretedOption().MakeReadOnly();
+    private static readonly string[] _uninterpretedOptionFieldNames = new string[] { "aggregate_value", "double_value", "identifier_value", "name", "negative_int_value", "positive_int_value", "string_value" };
+    private static readonly uint[] _uninterpretedOptionFieldTags = new uint[] { 66, 49, 26, 18, 40, 32, 58 };
+    public static UninterpretedOption DefaultInstance {
+      get { return defaultInstance; }
+    }
 
-    private static readonly string[] _fieldNames = new string[] { "aggregate_value", "double_value", "identifier_value", "name", "negative_int_value", "positive_int_value", "string_value" };
-    private static readonly uint[] _fieldTags = new uint[] { 66, 49, 26, 18, 40, 32, 58 };
+    public override UninterpretedOption DefaultInstanceForType {
+      get { return DefaultInstance; }
+    }
+
+    protected override UninterpretedOption ThisMessage {
+      get { return this; }
+    }
+
     public static pbd::MessageDescriptor Descriptor {
-      get { return global::Google.Protobuf.DescriptorProtos.DescriptorProtoFile.Descriptor.MessageTypes[16]; }
+      get { return global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_UninterpretedOption__Descriptor; }
     }
 
-    public pb::FieldAccess.FieldAccessorTable Fields {
-      get { return global::Google.Protobuf.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_UninterpretedOption__FieldAccessorTable; }
-    }
-
-    private bool _frozen = false;
-    public bool IsFrozen { get { return _frozen; } }
-
-    public UninterpretedOption() {
-      OnConstruction();
-    }
-
-    partial void OnConstruction();
-
-    public UninterpretedOption(UninterpretedOption other) : this() {
-      name_ = other.name_.Clone();
-      identifierValue_ = other.identifierValue_;
-      positiveIntValue_ = other.positiveIntValue_;
-      negativeIntValue_ = other.negativeIntValue_;
-      doubleValue_ = other.doubleValue_;
-      stringValue_ = other.stringValue_;
-      aggregateValue_ = other.aggregateValue_;
-    }
-
-    public UninterpretedOption Clone() {
-      return new UninterpretedOption(this);
-    }
-
-    public void Freeze() {
-      if (IsFrozen) {
-        return;
-      }
-      _frozen = true;
-      name_.Freeze();
-    }
-
-    public const int NameFieldNumber = 2;
-    private static readonly pb::FieldCodec<global::Google.Protobuf.DescriptorProtos.UninterpretedOption.Types.NamePart> _repeated_name_codec
-        = pb::FieldCodec.ForMessage(18, global::Google.Protobuf.DescriptorProtos.UninterpretedOption.Types.NamePart.Parser);
-    private readonly pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.UninterpretedOption.Types.NamePart> name_ = new pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.UninterpretedOption.Types.NamePart>();
-    internal pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.UninterpretedOption.Types.NamePart> Name {
-      get { return name_; }
-    }
-
-    public const int IdentifierValueFieldNumber = 3;
-    private string identifierValue_ = "";
-    internal string IdentifierValue {
-      get { return identifierValue_; }
-      set {
-        pb::Freezable.CheckMutable(this);
-        identifierValue_ = value ?? "";
-      }
-    }
-
-    public const int PositiveIntValueFieldNumber = 4;
-    private ulong positiveIntValue_;
-    internal ulong PositiveIntValue {
-      get { return positiveIntValue_; }
-      set {
-        pb::Freezable.CheckMutable(this);
-        positiveIntValue_ = value;
-      }
-    }
-
-    public const int NegativeIntValueFieldNumber = 5;
-    private long negativeIntValue_;
-    internal long NegativeIntValue {
-      get { return negativeIntValue_; }
-      set {
-        pb::Freezable.CheckMutable(this);
-        negativeIntValue_ = value;
-      }
-    }
-
-    public const int DoubleValueFieldNumber = 6;
-    private double doubleValue_;
-    internal double DoubleValue {
-      get { return doubleValue_; }
-      set {
-        pb::Freezable.CheckMutable(this);
-        doubleValue_ = value;
-      }
-    }
-
-    public const int StringValueFieldNumber = 7;
-    private pb::ByteString stringValue_ = pb::ByteString.Empty;
-    internal pb::ByteString StringValue {
-      get { return stringValue_; }
-      set {
-        pb::Freezable.CheckMutable(this);
-        stringValue_ = value ?? pb::ByteString.Empty;
-      }
-    }
-
-    public const int AggregateValueFieldNumber = 8;
-    private string aggregateValue_ = "";
-    internal string AggregateValue {
-      get { return aggregateValue_; }
-      set {
-        pb::Freezable.CheckMutable(this);
-        aggregateValue_ = value ?? "";
-      }
-    }
-
-    public override bool Equals(object other) {
-      return Equals(other as UninterpretedOption);
-    }
-
-    public bool Equals(UninterpretedOption other) {
-      if (ReferenceEquals(other, null)) {
-        return false;
-      }
-      if (ReferenceEquals(other, this)) {
-        return true;
-      }
-      if(!name_.Equals(other.name_)) return false;
-      if (IdentifierValue != other.IdentifierValue) return false;
-      if (PositiveIntValue != other.PositiveIntValue) return false;
-      if (NegativeIntValue != other.NegativeIntValue) return false;
-      if (DoubleValue != other.DoubleValue) return false;
-      if (StringValue != other.StringValue) return false;
-      if (AggregateValue != other.AggregateValue) return false;
-      return true;
-    }
-
-    public override int GetHashCode() {
-      int hash = 1;
-      hash ^= name_.GetHashCode();
-      if (IdentifierValue.Length != 0) hash ^= IdentifierValue.GetHashCode();
-      if (PositiveIntValue != 0UL) hash ^= PositiveIntValue.GetHashCode();
-      if (NegativeIntValue != 0L) hash ^= NegativeIntValue.GetHashCode();
-      if (DoubleValue != 0D) hash ^= DoubleValue.GetHashCode();
-      if (StringValue.Length != 0) hash ^= StringValue.GetHashCode();
-      if (AggregateValue.Length != 0) hash ^= AggregateValue.GetHashCode();
-      return hash;
-    }
-
-    public void WriteTo(pb::CodedOutputStream output) {
-      name_.WriteTo(output, _repeated_name_codec);
-      if (IdentifierValue.Length != 0) {
-        output.WriteRawTag(26);
-        output.WriteString(IdentifierValue);
-      }
-      if (PositiveIntValue != 0UL) {
-        output.WriteRawTag(32);
-        output.WriteUInt64(PositiveIntValue);
-      }
-      if (NegativeIntValue != 0L) {
-        output.WriteRawTag(40);
-        output.WriteInt64(NegativeIntValue);
-      }
-      if (DoubleValue != 0D) {
-        output.WriteRawTag(49);
-        output.WriteDouble(DoubleValue);
-      }
-      if (StringValue.Length != 0) {
-        output.WriteRawTag(58);
-        output.WriteBytes(StringValue);
-      }
-      if (AggregateValue.Length != 0) {
-        output.WriteRawTag(66);
-        output.WriteString(AggregateValue);
-      }
-    }
-
-    public int CalculateSize() {
-      int size = 0;
-      size += name_.CalculateSize(_repeated_name_codec);
-      if (IdentifierValue.Length != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeStringSize(IdentifierValue);
-      }
-      if (PositiveIntValue != 0UL) {
-        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(PositiveIntValue);
-      }
-      if (NegativeIntValue != 0L) {
-        size += 1 + pb::CodedOutputStream.ComputeInt64Size(NegativeIntValue);
-      }
-      if (DoubleValue != 0D) {
-        size += 1 + 8;
-      }
-      if (StringValue.Length != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeBytesSize(StringValue);
-      }
-      if (AggregateValue.Length != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeStringSize(AggregateValue);
-      }
-      return size;
-    }
-
-    public void MergeFrom(UninterpretedOption other) {
-      if (other == null) {
-        return;
-      }
-      name_.Add(other.name_);
-      if (other.IdentifierValue.Length != 0) {
-        IdentifierValue = other.IdentifierValue;
-      }
-      if (other.PositiveIntValue != 0UL) {
-        PositiveIntValue = other.PositiveIntValue;
-      }
-      if (other.NegativeIntValue != 0L) {
-        NegativeIntValue = other.NegativeIntValue;
-      }
-      if (other.DoubleValue != 0D) {
-        DoubleValue = other.DoubleValue;
-      }
-      if (other.StringValue.Length != 0) {
-        StringValue = other.StringValue;
-      }
-      if (other.AggregateValue.Length != 0) {
-        AggregateValue = other.AggregateValue;
-      }
-    }
-
-    public void MergeFrom(pb::CodedInputStream input) {
-      uint tag;
-      while (input.ReadTag(out tag)) {
-        switch(tag) {
-          case 0:
-            throw pb::InvalidProtocolBufferException.InvalidTag();
-          default:
-            if (pb::WireFormat.IsEndGroupTag(tag)) {
-              return;
-            }
-            break;
-          case 18: {
-            name_.AddEntriesFrom(input, _repeated_name_codec);
-            break;
-          }
-          case 26: {
-            IdentifierValue = input.ReadString();
-            break;
-          }
-          case 32: {
-            PositiveIntValue = input.ReadUInt64();
-            break;
-          }
-          case 40: {
-            NegativeIntValue = input.ReadInt64();
-            break;
-          }
-          case 49: {
-            DoubleValue = input.ReadDouble();
-            break;
-          }
-          case 58: {
-            StringValue = input.ReadBytes();
-            break;
-          }
-          case 66: {
-            AggregateValue = input.ReadString();
-            break;
-          }
-        }
-      }
+    protected override pb::FieldAccess.FieldAccessorTable<UninterpretedOption, UninterpretedOption.Builder> InternalFieldAccessors {
+      get { return global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_UninterpretedOption__FieldAccessorTable; }
     }
 
     #region Nested types
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     public static partial class Types {
       [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-      internal sealed partial class NamePart : pb::IMessage<NamePart> {
-        private static readonly pb::MessageParser<NamePart> _parser = new pb::MessageParser<NamePart>(() => new NamePart());
-        public static pb::MessageParser<NamePart> Parser { get { return _parser; } }
+      public sealed partial class NamePart : pb::GeneratedMessage<NamePart, NamePart.Builder> {
+        private NamePart() { }
+        private static readonly NamePart defaultInstance = new NamePart().MakeReadOnly();
+        private static readonly string[] _namePartFieldNames = new string[] { "is_extension", "name_part" };
+        private static readonly uint[] _namePartFieldTags = new uint[] { 16, 10 };
+        public static NamePart DefaultInstance {
+          get { return defaultInstance; }
+        }
 
-        private static readonly string[] _fieldNames = new string[] { "is_extension", "name_part" };
-        private static readonly uint[] _fieldTags = new uint[] { 16, 10 };
+        public override NamePart DefaultInstanceForType {
+          get { return DefaultInstance; }
+        }
+
+        protected override NamePart ThisMessage {
+          get { return this; }
+        }
+
         public static pbd::MessageDescriptor Descriptor {
-          get { return global::Google.Protobuf.DescriptorProtos.UninterpretedOption.Descriptor.NestedTypes[0]; }
+          get { return global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_UninterpretedOption_NamePart__Descriptor; }
         }
 
-        public pb::FieldAccess.FieldAccessorTable Fields {
-          get { return global::Google.Protobuf.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_UninterpretedOption_NamePart__FieldAccessorTable; }
-        }
-
-        private bool _frozen = false;
-        public bool IsFrozen { get { return _frozen; } }
-
-        public NamePart() {
-          OnConstruction();
-        }
-
-        partial void OnConstruction();
-
-        public NamePart(NamePart other) : this() {
-          namePart_ = other.namePart_;
-          isExtension_ = other.isExtension_;
-        }
-
-        public NamePart Clone() {
-          return new NamePart(this);
-        }
-
-        public void Freeze() {
-          if (IsFrozen) {
-            return;
-          }
-          _frozen = true;
+        protected override pb::FieldAccess.FieldAccessorTable<NamePart, NamePart.Builder> InternalFieldAccessors {
+          get { return global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_UninterpretedOption_NamePart__FieldAccessorTable; }
         }
 
         public const int NamePart_FieldNumber = 1;
+        private bool hasNamePart_;
         private string namePart_ = "";
-        internal string NamePart_ {
+        public bool HasNamePart_ {
+          get { return hasNamePart_; }
+        }
+        public string NamePart_ {
           get { return namePart_; }
-          set {
-            pb::Freezable.CheckMutable(this);
-            namePart_ = value ?? "";
-          }
         }
 
         public const int IsExtensionFieldNumber = 2;
+        private bool hasIsExtension;
         private bool isExtension_;
-        internal bool IsExtension {
+        public bool HasIsExtension {
+          get { return hasIsExtension; }
+        }
+        public bool IsExtension {
           get { return isExtension_; }
-          set {
-            pb::Freezable.CheckMutable(this);
-            isExtension_ = value;
-          }
         }
 
-        public override bool Equals(object other) {
-          return Equals(other as NamePart);
-        }
-
-        public bool Equals(NamePart other) {
-          if (ReferenceEquals(other, null)) {
-            return false;
-          }
-          if (ReferenceEquals(other, this)) {
+        public override bool IsInitialized {
+          get {
+            if (!hasNamePart_) return false;
+            if (!hasIsExtension) return false;
             return true;
           }
-          if (NamePart_ != other.NamePart_) return false;
-          if (IsExtension != other.IsExtension) return false;
-          return true;
         }
 
-        public override int GetHashCode() {
-          int hash = 1;
-          if (NamePart_.Length != 0) hash ^= NamePart_.GetHashCode();
-          if (IsExtension != false) hash ^= IsExtension.GetHashCode();
-          return hash;
+        public override void WriteTo(pb::ICodedOutputStream output) {
+          CalcSerializedSize();
+          string[] field_names = _namePartFieldNames;
+          if (hasNamePart_) {
+            output.WriteString(1, field_names[1], NamePart_);
+          }
+          if (hasIsExtension) {
+            output.WriteBool(2, field_names[0], IsExtension);
+          }
+          UnknownFields.WriteTo(output);
         }
 
-        public void WriteTo(pb::CodedOutputStream output) {
-          if (NamePart_.Length != 0) {
-            output.WriteRawTag(10);
-            output.WriteString(NamePart_);
-          }
-          if (IsExtension != false) {
-            output.WriteRawTag(16);
-            output.WriteBool(IsExtension);
+        private int memoizedSerializedSize = -1;
+        public override int SerializedSize {
+          get {
+            int size = memoizedSerializedSize;
+            if (size != -1) return size;
+            return CalcSerializedSize();
           }
         }
 
-        public int CalculateSize() {
-          int size = 0;
-          if (NamePart_.Length != 0) {
-            size += 1 + pb::CodedOutputStream.ComputeStringSize(NamePart_);
+        private int CalcSerializedSize() {
+          int size = memoizedSerializedSize;
+          if (size != -1) return size;
+
+          size = 0;
+          if (hasNamePart_) {
+            size += pb::CodedOutputStream.ComputeStringSize(1, NamePart_);
           }
-          if (IsExtension != false) {
-            size += 1 + 1;
+          if (hasIsExtension) {
+            size += pb::CodedOutputStream.ComputeBoolSize(2, IsExtension);
           }
+          size += UnknownFields.SerializedSize;
+          memoizedSerializedSize = size;
           return size;
         }
-
-        public void MergeFrom(NamePart other) {
-          if (other == null) {
-            return;
-          }
-          if (other.NamePart_.Length != 0) {
-            NamePart_ = other.NamePart_;
-          }
-          if (other.IsExtension != false) {
-            IsExtension = other.IsExtension;
-          }
+        public static NamePart ParseFrom(pb::ByteString data) {
+          return ((Builder) CreateBuilder().MergeFrom(data)).BuildParsed();
+        }
+        public static NamePart ParseFrom(pb::ByteString data, pb::ExtensionRegistry extensionRegistry) {
+          return ((Builder) CreateBuilder().MergeFrom(data, extensionRegistry)).BuildParsed();
+        }
+        public static NamePart ParseFrom(byte[] data) {
+          return ((Builder) CreateBuilder().MergeFrom(data)).BuildParsed();
+        }
+        public static NamePart ParseFrom(byte[] data, pb::ExtensionRegistry extensionRegistry) {
+          return ((Builder) CreateBuilder().MergeFrom(data, extensionRegistry)).BuildParsed();
+        }
+        public static NamePart ParseFrom(global::System.IO.Stream input) {
+          return ((Builder) CreateBuilder().MergeFrom(input)).BuildParsed();
+        }
+        public static NamePart ParseFrom(global::System.IO.Stream input, pb::ExtensionRegistry extensionRegistry) {
+          return ((Builder) CreateBuilder().MergeFrom(input, extensionRegistry)).BuildParsed();
+        }
+        public static NamePart ParseDelimitedFrom(global::System.IO.Stream input) {
+          return CreateBuilder().MergeDelimitedFrom(input).BuildParsed();
+        }
+        public static NamePart ParseDelimitedFrom(global::System.IO.Stream input, pb::ExtensionRegistry extensionRegistry) {
+          return CreateBuilder().MergeDelimitedFrom(input, extensionRegistry).BuildParsed();
+        }
+        public static NamePart ParseFrom(pb::ICodedInputStream input) {
+          return ((Builder) CreateBuilder().MergeFrom(input)).BuildParsed();
+        }
+        public static NamePart ParseFrom(pb::ICodedInputStream input, pb::ExtensionRegistry extensionRegistry) {
+          return ((Builder) CreateBuilder().MergeFrom(input, extensionRegistry)).BuildParsed();
+        }
+        private NamePart MakeReadOnly() {
+          return this;
         }
 
-        public void MergeFrom(pb::CodedInputStream input) {
-          uint tag;
-          while (input.ReadTag(out tag)) {
-            switch(tag) {
-              case 0:
-                throw pb::InvalidProtocolBufferException.InvalidTag();
-              default:
-                if (pb::WireFormat.IsEndGroupTag(tag)) {
-                  return;
-                }
-                break;
-              case 10: {
-                NamePart_ = input.ReadString();
-                break;
-              }
-              case 16: {
-                IsExtension = input.ReadBool();
-                break;
-              }
+        public static Builder CreateBuilder() { return new Builder(); }
+        public override Builder ToBuilder() { return CreateBuilder(this); }
+        public override Builder CreateBuilderForType() { return new Builder(); }
+        public static Builder CreateBuilder(NamePart prototype) {
+          return new Builder(prototype);
+        }
+
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public sealed partial class Builder : pb::GeneratedBuilder<NamePart, Builder> {
+          protected override Builder ThisBuilder {
+            get { return this; }
+          }
+          public Builder() {
+            result = DefaultInstance;
+            resultIsReadOnly = true;
+          }
+          internal Builder(NamePart cloneFrom) {
+            result = cloneFrom;
+            resultIsReadOnly = true;
+          }
+
+          private bool resultIsReadOnly;
+          private NamePart result;
+
+          private NamePart PrepareBuilder() {
+            if (resultIsReadOnly) {
+              NamePart original = result;
+              result = new NamePart();
+              resultIsReadOnly = false;
+              MergeFrom(original);
+            }
+            return result;
+          }
+
+          public override bool IsInitialized {
+            get { return result.IsInitialized; }
+          }
+
+          protected override NamePart MessageBeingBuilt {
+            get { return PrepareBuilder(); }
+          }
+
+          public override Builder Clear() {
+            result = DefaultInstance;
+            resultIsReadOnly = true;
+            return this;
+          }
+
+          public override Builder Clone() {
+            if (resultIsReadOnly) {
+              return new Builder(result);
+            } else {
+              return new Builder().MergeFrom(result);
             }
           }
-        }
 
+          public override pbd::MessageDescriptor DescriptorForType {
+            get { return global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption.Types.NamePart.Descriptor; }
+          }
+
+          public override NamePart DefaultInstanceForType {
+            get { return global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption.Types.NamePart.DefaultInstance; }
+          }
+
+          public override NamePart BuildPartial() {
+            if (resultIsReadOnly) {
+              return result;
+            }
+            resultIsReadOnly = true;
+            return result.MakeReadOnly();
+          }
+
+          public override Builder MergeFrom(pb::IMessage other) {
+            if (other is NamePart) {
+              return MergeFrom((NamePart) other);
+            } else {
+              base.MergeFrom(other);
+              return this;
+            }
+          }
+
+          public override Builder MergeFrom(NamePart other) {
+            if (other == global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption.Types.NamePart.DefaultInstance) return this;
+            PrepareBuilder();
+            if (other.HasNamePart_) {
+              NamePart_ = other.NamePart_;
+            }
+            if (other.HasIsExtension) {
+              IsExtension = other.IsExtension;
+            }
+            this.MergeUnknownFields(other.UnknownFields);
+            return this;
+          }
+
+          public override Builder MergeFrom(pb::ICodedInputStream input) {
+            return MergeFrom(input, pb::ExtensionRegistry.Empty);
+          }
+
+          public override Builder MergeFrom(pb::ICodedInputStream input, pb::ExtensionRegistry extensionRegistry) {
+            PrepareBuilder();
+            pb::UnknownFieldSet.Builder unknownFields = null;
+            uint tag;
+            string field_name;
+            while (input.ReadTag(out tag, out field_name)) {
+              if(tag == 0 && field_name != null) {
+                int field_ordinal = global::System.Array.BinarySearch(_namePartFieldNames, field_name, global::System.StringComparer.Ordinal);
+                if(field_ordinal >= 0)
+                  tag = _namePartFieldTags[field_ordinal];
+                else {
+                  if (unknownFields == null) {
+                    unknownFields = pb::UnknownFieldSet.CreateBuilder(this.UnknownFields);
+                  }
+                  ParseUnknownField(input, unknownFields, extensionRegistry, tag, field_name);
+                  continue;
+                }
+              }
+              switch (tag) {
+                case 0: {
+                  throw pb::InvalidProtocolBufferException.InvalidTag();
+                }
+                default: {
+                  if (pb::WireFormat.IsEndGroupTag(tag)) {
+                    if (unknownFields != null) {
+                      this.UnknownFields = unknownFields.Build();
+                    }
+                    return this;
+                  }
+                  if (unknownFields == null) {
+                    unknownFields = pb::UnknownFieldSet.CreateBuilder(this.UnknownFields);
+                  }
+                  ParseUnknownField(input, unknownFields, extensionRegistry, tag, field_name);
+                  break;
+                }
+                case 10: {
+                  result.hasNamePart_ = input.ReadString(ref result.namePart_);
+                  break;
+                }
+                case 16: {
+                  result.hasIsExtension = input.ReadBool(ref result.isExtension_);
+                  break;
+                }
+              }
+            }
+
+            if (unknownFields != null) {
+              this.UnknownFields = unknownFields.Build();
+            }
+            return this;
+          }
+
+
+          public bool HasNamePart_ {
+            get { return result.hasNamePart_; }
+          }
+          public string NamePart_ {
+            get { return result.NamePart_; }
+            set { SetNamePart_(value); }
+          }
+          public Builder SetNamePart_(string value) {
+            pb::ThrowHelper.ThrowIfNull(value, "value");
+            PrepareBuilder();
+            result.hasNamePart_ = true;
+            result.namePart_ = value;
+            return this;
+          }
+          public Builder ClearNamePart_() {
+            PrepareBuilder();
+            result.hasNamePart_ = false;
+            result.namePart_ = "";
+            return this;
+          }
+
+          public bool HasIsExtension {
+            get { return result.hasIsExtension; }
+          }
+          public bool IsExtension {
+            get { return result.IsExtension; }
+            set { SetIsExtension(value); }
+          }
+          public Builder SetIsExtension(bool value) {
+            PrepareBuilder();
+            result.hasIsExtension = true;
+            result.isExtension_ = value;
+            return this;
+          }
+          public Builder ClearIsExtension() {
+            PrepareBuilder();
+            result.hasIsExtension = false;
+            result.isExtension_ = false;
+            return this;
+          }
+        }
+        static NamePart() {
+          object.ReferenceEquals(global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.Descriptor, null);
+        }
       }
 
     }
     #endregion
 
+    public const int NameFieldNumber = 2;
+    private pbc::PopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption.Types.NamePart> name_ = new pbc::PopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption.Types.NamePart>();
+    public scg::IList<global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption.Types.NamePart> NameList {
+      get { return name_; }
+    }
+    public int NameCount {
+      get { return name_.Count; }
+    }
+    public global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption.Types.NamePart GetName(int index) {
+      return name_[index];
+    }
+
+    public const int IdentifierValueFieldNumber = 3;
+    private bool hasIdentifierValue;
+    private string identifierValue_ = "";
+    public bool HasIdentifierValue {
+      get { return hasIdentifierValue; }
+    }
+    public string IdentifierValue {
+      get { return identifierValue_; }
+    }
+
+    public const int PositiveIntValueFieldNumber = 4;
+    private bool hasPositiveIntValue;
+    private ulong positiveIntValue_;
+    public bool HasPositiveIntValue {
+      get { return hasPositiveIntValue; }
+    }
+    public ulong PositiveIntValue {
+      get { return positiveIntValue_; }
+    }
+
+    public const int NegativeIntValueFieldNumber = 5;
+    private bool hasNegativeIntValue;
+    private long negativeIntValue_;
+    public bool HasNegativeIntValue {
+      get { return hasNegativeIntValue; }
+    }
+    public long NegativeIntValue {
+      get { return negativeIntValue_; }
+    }
+
+    public const int DoubleValueFieldNumber = 6;
+    private bool hasDoubleValue;
+    private double doubleValue_;
+    public bool HasDoubleValue {
+      get { return hasDoubleValue; }
+    }
+    public double DoubleValue {
+      get { return doubleValue_; }
+    }
+
+    public const int StringValueFieldNumber = 7;
+    private bool hasStringValue;
+    private pb::ByteString stringValue_ = pb::ByteString.Empty;
+    public bool HasStringValue {
+      get { return hasStringValue; }
+    }
+    public pb::ByteString StringValue {
+      get { return stringValue_; }
+    }
+
+    public const int AggregateValueFieldNumber = 8;
+    private bool hasAggregateValue;
+    private string aggregateValue_ = "";
+    public bool HasAggregateValue {
+      get { return hasAggregateValue; }
+    }
+    public string AggregateValue {
+      get { return aggregateValue_; }
+    }
+
+    public override bool IsInitialized {
+      get {
+        foreach (global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption.Types.NamePart element in NameList) {
+          if (!element.IsInitialized) return false;
+        }
+        return true;
+      }
+    }
+
+    public override void WriteTo(pb::ICodedOutputStream output) {
+      CalcSerializedSize();
+      string[] field_names = _uninterpretedOptionFieldNames;
+      if (name_.Count > 0) {
+        output.WriteMessageArray(2, field_names[3], name_);
+      }
+      if (hasIdentifierValue) {
+        output.WriteString(3, field_names[2], IdentifierValue);
+      }
+      if (hasPositiveIntValue) {
+        output.WriteUInt64(4, field_names[5], PositiveIntValue);
+      }
+      if (hasNegativeIntValue) {
+        output.WriteInt64(5, field_names[4], NegativeIntValue);
+      }
+      if (hasDoubleValue) {
+        output.WriteDouble(6, field_names[1], DoubleValue);
+      }
+      if (hasStringValue) {
+        output.WriteBytes(7, field_names[6], StringValue);
+      }
+      if (hasAggregateValue) {
+        output.WriteString(8, field_names[0], AggregateValue);
+      }
+      UnknownFields.WriteTo(output);
+    }
+
+    private int memoizedSerializedSize = -1;
+    public override int SerializedSize {
+      get {
+        int size = memoizedSerializedSize;
+        if (size != -1) return size;
+        return CalcSerializedSize();
+      }
+    }
+
+    private int CalcSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      foreach (global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption.Types.NamePart element in NameList) {
+        size += pb::CodedOutputStream.ComputeMessageSize(2, element);
+      }
+      if (hasIdentifierValue) {
+        size += pb::CodedOutputStream.ComputeStringSize(3, IdentifierValue);
+      }
+      if (hasPositiveIntValue) {
+        size += pb::CodedOutputStream.ComputeUInt64Size(4, PositiveIntValue);
+      }
+      if (hasNegativeIntValue) {
+        size += pb::CodedOutputStream.ComputeInt64Size(5, NegativeIntValue);
+      }
+      if (hasDoubleValue) {
+        size += pb::CodedOutputStream.ComputeDoubleSize(6, DoubleValue);
+      }
+      if (hasStringValue) {
+        size += pb::CodedOutputStream.ComputeBytesSize(7, StringValue);
+      }
+      if (hasAggregateValue) {
+        size += pb::CodedOutputStream.ComputeStringSize(8, AggregateValue);
+      }
+      size += UnknownFields.SerializedSize;
+      memoizedSerializedSize = size;
+      return size;
+    }
+    public static UninterpretedOption ParseFrom(pb::ByteString data) {
+      return ((Builder) CreateBuilder().MergeFrom(data)).BuildParsed();
+    }
+    public static UninterpretedOption ParseFrom(pb::ByteString data, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(data, extensionRegistry)).BuildParsed();
+    }
+    public static UninterpretedOption ParseFrom(byte[] data) {
+      return ((Builder) CreateBuilder().MergeFrom(data)).BuildParsed();
+    }
+    public static UninterpretedOption ParseFrom(byte[] data, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(data, extensionRegistry)).BuildParsed();
+    }
+    public static UninterpretedOption ParseFrom(global::System.IO.Stream input) {
+      return ((Builder) CreateBuilder().MergeFrom(input)).BuildParsed();
+    }
+    public static UninterpretedOption ParseFrom(global::System.IO.Stream input, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(input, extensionRegistry)).BuildParsed();
+    }
+    public static UninterpretedOption ParseDelimitedFrom(global::System.IO.Stream input) {
+      return CreateBuilder().MergeDelimitedFrom(input).BuildParsed();
+    }
+    public static UninterpretedOption ParseDelimitedFrom(global::System.IO.Stream input, pb::ExtensionRegistry extensionRegistry) {
+      return CreateBuilder().MergeDelimitedFrom(input, extensionRegistry).BuildParsed();
+    }
+    public static UninterpretedOption ParseFrom(pb::ICodedInputStream input) {
+      return ((Builder) CreateBuilder().MergeFrom(input)).BuildParsed();
+    }
+    public static UninterpretedOption ParseFrom(pb::ICodedInputStream input, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(input, extensionRegistry)).BuildParsed();
+    }
+    private UninterpretedOption MakeReadOnly() {
+      name_.MakeReadOnly();
+      return this;
+    }
+
+    public static Builder CreateBuilder() { return new Builder(); }
+    public override Builder ToBuilder() { return CreateBuilder(this); }
+    public override Builder CreateBuilderForType() { return new Builder(); }
+    public static Builder CreateBuilder(UninterpretedOption prototype) {
+      return new Builder(prototype);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+    public sealed partial class Builder : pb::GeneratedBuilder<UninterpretedOption, Builder> {
+      protected override Builder ThisBuilder {
+        get { return this; }
+      }
+      public Builder() {
+        result = DefaultInstance;
+        resultIsReadOnly = true;
+      }
+      internal Builder(UninterpretedOption cloneFrom) {
+        result = cloneFrom;
+        resultIsReadOnly = true;
+      }
+
+      private bool resultIsReadOnly;
+      private UninterpretedOption result;
+
+      private UninterpretedOption PrepareBuilder() {
+        if (resultIsReadOnly) {
+          UninterpretedOption original = result;
+          result = new UninterpretedOption();
+          resultIsReadOnly = false;
+          MergeFrom(original);
+        }
+        return result;
+      }
+
+      public override bool IsInitialized {
+        get { return result.IsInitialized; }
+      }
+
+      protected override UninterpretedOption MessageBeingBuilt {
+        get { return PrepareBuilder(); }
+      }
+
+      public override Builder Clear() {
+        result = DefaultInstance;
+        resultIsReadOnly = true;
+        return this;
+      }
+
+      public override Builder Clone() {
+        if (resultIsReadOnly) {
+          return new Builder(result);
+        } else {
+          return new Builder().MergeFrom(result);
+        }
+      }
+
+      public override pbd::MessageDescriptor DescriptorForType {
+        get { return global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption.Descriptor; }
+      }
+
+      public override UninterpretedOption DefaultInstanceForType {
+        get { return global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption.DefaultInstance; }
+      }
+
+      public override UninterpretedOption BuildPartial() {
+        if (resultIsReadOnly) {
+          return result;
+        }
+        resultIsReadOnly = true;
+        return result.MakeReadOnly();
+      }
+
+      public override Builder MergeFrom(pb::IMessage other) {
+        if (other is UninterpretedOption) {
+          return MergeFrom((UninterpretedOption) other);
+        } else {
+          base.MergeFrom(other);
+          return this;
+        }
+      }
+
+      public override Builder MergeFrom(UninterpretedOption other) {
+        if (other == global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption.DefaultInstance) return this;
+        PrepareBuilder();
+        if (other.name_.Count != 0) {
+          result.name_.Add(other.name_);
+        }
+        if (other.HasIdentifierValue) {
+          IdentifierValue = other.IdentifierValue;
+        }
+        if (other.HasPositiveIntValue) {
+          PositiveIntValue = other.PositiveIntValue;
+        }
+        if (other.HasNegativeIntValue) {
+          NegativeIntValue = other.NegativeIntValue;
+        }
+        if (other.HasDoubleValue) {
+          DoubleValue = other.DoubleValue;
+        }
+        if (other.HasStringValue) {
+          StringValue = other.StringValue;
+        }
+        if (other.HasAggregateValue) {
+          AggregateValue = other.AggregateValue;
+        }
+        this.MergeUnknownFields(other.UnknownFields);
+        return this;
+      }
+
+      public override Builder MergeFrom(pb::ICodedInputStream input) {
+        return MergeFrom(input, pb::ExtensionRegistry.Empty);
+      }
+
+      public override Builder MergeFrom(pb::ICodedInputStream input, pb::ExtensionRegistry extensionRegistry) {
+        PrepareBuilder();
+        pb::UnknownFieldSet.Builder unknownFields = null;
+        uint tag;
+        string field_name;
+        while (input.ReadTag(out tag, out field_name)) {
+          if(tag == 0 && field_name != null) {
+            int field_ordinal = global::System.Array.BinarySearch(_uninterpretedOptionFieldNames, field_name, global::System.StringComparer.Ordinal);
+            if(field_ordinal >= 0)
+              tag = _uninterpretedOptionFieldTags[field_ordinal];
+            else {
+              if (unknownFields == null) {
+                unknownFields = pb::UnknownFieldSet.CreateBuilder(this.UnknownFields);
+              }
+              ParseUnknownField(input, unknownFields, extensionRegistry, tag, field_name);
+              continue;
+            }
+          }
+          switch (tag) {
+            case 0: {
+              throw pb::InvalidProtocolBufferException.InvalidTag();
+            }
+            default: {
+              if (pb::WireFormat.IsEndGroupTag(tag)) {
+                if (unknownFields != null) {
+                  this.UnknownFields = unknownFields.Build();
+                }
+                return this;
+              }
+              if (unknownFields == null) {
+                unknownFields = pb::UnknownFieldSet.CreateBuilder(this.UnknownFields);
+              }
+              ParseUnknownField(input, unknownFields, extensionRegistry, tag, field_name);
+              break;
+            }
+            case 18: {
+              input.ReadMessageArray(tag, field_name, result.name_, global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption.Types.NamePart.DefaultInstance, extensionRegistry);
+              break;
+            }
+            case 26: {
+              result.hasIdentifierValue = input.ReadString(ref result.identifierValue_);
+              break;
+            }
+            case 32: {
+              result.hasPositiveIntValue = input.ReadUInt64(ref result.positiveIntValue_);
+              break;
+            }
+            case 40: {
+              result.hasNegativeIntValue = input.ReadInt64(ref result.negativeIntValue_);
+              break;
+            }
+            case 49: {
+              result.hasDoubleValue = input.ReadDouble(ref result.doubleValue_);
+              break;
+            }
+            case 58: {
+              result.hasStringValue = input.ReadBytes(ref result.stringValue_);
+              break;
+            }
+            case 66: {
+              result.hasAggregateValue = input.ReadString(ref result.aggregateValue_);
+              break;
+            }
+          }
+        }
+
+        if (unknownFields != null) {
+          this.UnknownFields = unknownFields.Build();
+        }
+        return this;
+      }
+
+
+      public pbc::IPopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption.Types.NamePart> NameList {
+        get { return PrepareBuilder().name_; }
+      }
+      public int NameCount {
+        get { return result.NameCount; }
+      }
+      public global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption.Types.NamePart GetName(int index) {
+        return result.GetName(index);
+      }
+      public Builder SetName(int index, global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption.Types.NamePart value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.name_[index] = value;
+        return this;
+      }
+      public Builder SetName(int index, global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption.Types.NamePart.Builder builderForValue) {
+        pb::ThrowHelper.ThrowIfNull(builderForValue, "builderForValue");
+        PrepareBuilder();
+        result.name_[index] = builderForValue.Build();
+        return this;
+      }
+      public Builder AddName(global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption.Types.NamePart value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.name_.Add(value);
+        return this;
+      }
+      public Builder AddName(global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption.Types.NamePart.Builder builderForValue) {
+        pb::ThrowHelper.ThrowIfNull(builderForValue, "builderForValue");
+        PrepareBuilder();
+        result.name_.Add(builderForValue.Build());
+        return this;
+      }
+      public Builder AddRangeName(scg::IEnumerable<global::Google.ProtocolBuffers.DescriptorProtos.UninterpretedOption.Types.NamePart> values) {
+        PrepareBuilder();
+        result.name_.Add(values);
+        return this;
+      }
+      public Builder ClearName() {
+        PrepareBuilder();
+        result.name_.Clear();
+        return this;
+      }
+
+      public bool HasIdentifierValue {
+        get { return result.hasIdentifierValue; }
+      }
+      public string IdentifierValue {
+        get { return result.IdentifierValue; }
+        set { SetIdentifierValue(value); }
+      }
+      public Builder SetIdentifierValue(string value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.hasIdentifierValue = true;
+        result.identifierValue_ = value;
+        return this;
+      }
+      public Builder ClearIdentifierValue() {
+        PrepareBuilder();
+        result.hasIdentifierValue = false;
+        result.identifierValue_ = "";
+        return this;
+      }
+
+      public bool HasPositiveIntValue {
+        get { return result.hasPositiveIntValue; }
+      }
+      public ulong PositiveIntValue {
+        get { return result.PositiveIntValue; }
+        set { SetPositiveIntValue(value); }
+      }
+      public Builder SetPositiveIntValue(ulong value) {
+        PrepareBuilder();
+        result.hasPositiveIntValue = true;
+        result.positiveIntValue_ = value;
+        return this;
+      }
+      public Builder ClearPositiveIntValue() {
+        PrepareBuilder();
+        result.hasPositiveIntValue = false;
+        result.positiveIntValue_ = 0UL;
+        return this;
+      }
+
+      public bool HasNegativeIntValue {
+        get { return result.hasNegativeIntValue; }
+      }
+      public long NegativeIntValue {
+        get { return result.NegativeIntValue; }
+        set { SetNegativeIntValue(value); }
+      }
+      public Builder SetNegativeIntValue(long value) {
+        PrepareBuilder();
+        result.hasNegativeIntValue = true;
+        result.negativeIntValue_ = value;
+        return this;
+      }
+      public Builder ClearNegativeIntValue() {
+        PrepareBuilder();
+        result.hasNegativeIntValue = false;
+        result.negativeIntValue_ = 0L;
+        return this;
+      }
+
+      public bool HasDoubleValue {
+        get { return result.hasDoubleValue; }
+      }
+      public double DoubleValue {
+        get { return result.DoubleValue; }
+        set { SetDoubleValue(value); }
+      }
+      public Builder SetDoubleValue(double value) {
+        PrepareBuilder();
+        result.hasDoubleValue = true;
+        result.doubleValue_ = value;
+        return this;
+      }
+      public Builder ClearDoubleValue() {
+        PrepareBuilder();
+        result.hasDoubleValue = false;
+        result.doubleValue_ = 0D;
+        return this;
+      }
+
+      public bool HasStringValue {
+        get { return result.hasStringValue; }
+      }
+      public pb::ByteString StringValue {
+        get { return result.StringValue; }
+        set { SetStringValue(value); }
+      }
+      public Builder SetStringValue(pb::ByteString value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.hasStringValue = true;
+        result.stringValue_ = value;
+        return this;
+      }
+      public Builder ClearStringValue() {
+        PrepareBuilder();
+        result.hasStringValue = false;
+        result.stringValue_ = pb::ByteString.Empty;
+        return this;
+      }
+
+      public bool HasAggregateValue {
+        get { return result.hasAggregateValue; }
+      }
+      public string AggregateValue {
+        get { return result.AggregateValue; }
+        set { SetAggregateValue(value); }
+      }
+      public Builder SetAggregateValue(string value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.hasAggregateValue = true;
+        result.aggregateValue_ = value;
+        return this;
+      }
+      public Builder ClearAggregateValue() {
+        PrepareBuilder();
+        result.hasAggregateValue = false;
+        result.aggregateValue_ = "";
+        return this;
+      }
+    }
+    static UninterpretedOption() {
+      object.ReferenceEquals(global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.Descriptor, null);
+    }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-  internal sealed partial class SourceCodeInfo : pb::IMessage<SourceCodeInfo> {
-    private static readonly pb::MessageParser<SourceCodeInfo> _parser = new pb::MessageParser<SourceCodeInfo>(() => new SourceCodeInfo());
-    public static pb::MessageParser<SourceCodeInfo> Parser { get { return _parser; } }
+  public sealed partial class SourceCodeInfo : pb::GeneratedMessage<SourceCodeInfo, SourceCodeInfo.Builder> {
+    private SourceCodeInfo() { }
+    private static readonly SourceCodeInfo defaultInstance = new SourceCodeInfo().MakeReadOnly();
+    private static readonly string[] _sourceCodeInfoFieldNames = new string[] { "location" };
+    private static readonly uint[] _sourceCodeInfoFieldTags = new uint[] { 10 };
+    public static SourceCodeInfo DefaultInstance {
+      get { return defaultInstance; }
+    }
 
-    private static readonly string[] _fieldNames = new string[] { "location" };
-    private static readonly uint[] _fieldTags = new uint[] { 10 };
+    public override SourceCodeInfo DefaultInstanceForType {
+      get { return DefaultInstance; }
+    }
+
+    protected override SourceCodeInfo ThisMessage {
+      get { return this; }
+    }
+
     public static pbd::MessageDescriptor Descriptor {
-      get { return global::Google.Protobuf.DescriptorProtos.DescriptorProtoFile.Descriptor.MessageTypes[17]; }
+      get { return global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_SourceCodeInfo__Descriptor; }
     }
 
-    public pb::FieldAccess.FieldAccessorTable Fields {
-      get { return global::Google.Protobuf.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_SourceCodeInfo__FieldAccessorTable; }
-    }
-
-    private bool _frozen = false;
-    public bool IsFrozen { get { return _frozen; } }
-
-    public SourceCodeInfo() {
-      OnConstruction();
-    }
-
-    partial void OnConstruction();
-
-    public SourceCodeInfo(SourceCodeInfo other) : this() {
-      location_ = other.location_.Clone();
-    }
-
-    public SourceCodeInfo Clone() {
-      return new SourceCodeInfo(this);
-    }
-
-    public void Freeze() {
-      if (IsFrozen) {
-        return;
-      }
-      _frozen = true;
-      location_.Freeze();
-    }
-
-    public const int LocationFieldNumber = 1;
-    private static readonly pb::FieldCodec<global::Google.Protobuf.DescriptorProtos.SourceCodeInfo.Types.Location> _repeated_location_codec
-        = pb::FieldCodec.ForMessage(10, global::Google.Protobuf.DescriptorProtos.SourceCodeInfo.Types.Location.Parser);
-    private readonly pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.SourceCodeInfo.Types.Location> location_ = new pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.SourceCodeInfo.Types.Location>();
-    internal pbc::RepeatedField<global::Google.Protobuf.DescriptorProtos.SourceCodeInfo.Types.Location> Location {
-      get { return location_; }
-    }
-
-    public override bool Equals(object other) {
-      return Equals(other as SourceCodeInfo);
-    }
-
-    public bool Equals(SourceCodeInfo other) {
-      if (ReferenceEquals(other, null)) {
-        return false;
-      }
-      if (ReferenceEquals(other, this)) {
-        return true;
-      }
-      if(!location_.Equals(other.location_)) return false;
-      return true;
-    }
-
-    public override int GetHashCode() {
-      int hash = 1;
-      hash ^= location_.GetHashCode();
-      return hash;
-    }
-
-    public void WriteTo(pb::CodedOutputStream output) {
-      location_.WriteTo(output, _repeated_location_codec);
-    }
-
-    public int CalculateSize() {
-      int size = 0;
-      size += location_.CalculateSize(_repeated_location_codec);
-      return size;
-    }
-
-    public void MergeFrom(SourceCodeInfo other) {
-      if (other == null) {
-        return;
-      }
-      location_.Add(other.location_);
-    }
-
-    public void MergeFrom(pb::CodedInputStream input) {
-      uint tag;
-      while (input.ReadTag(out tag)) {
-        switch(tag) {
-          case 0:
-            throw pb::InvalidProtocolBufferException.InvalidTag();
-          default:
-            if (pb::WireFormat.IsEndGroupTag(tag)) {
-              return;
-            }
-            break;
-          case 10: {
-            location_.AddEntriesFrom(input, _repeated_location_codec);
-            break;
-          }
-        }
-      }
+    protected override pb::FieldAccess.FieldAccessorTable<SourceCodeInfo, SourceCodeInfo.Builder> InternalFieldAccessors {
+      get { return global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_SourceCodeInfo__FieldAccessorTable; }
     }
 
     #region Nested types
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     public static partial class Types {
       [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-      internal sealed partial class Location : pb::IMessage<Location> {
-        private static readonly pb::MessageParser<Location> _parser = new pb::MessageParser<Location>(() => new Location());
-        public static pb::MessageParser<Location> Parser { get { return _parser; } }
+      public sealed partial class Location : pb::GeneratedMessage<Location, Location.Builder> {
+        private Location() { }
+        private static readonly Location defaultInstance = new Location().MakeReadOnly();
+        private static readonly string[] _locationFieldNames = new string[] { "leading_comments", "leading_detached_comments", "path", "span", "trailing_comments" };
+        private static readonly uint[] _locationFieldTags = new uint[] { 26, 50, 10, 18, 34 };
+        public static Location DefaultInstance {
+          get { return defaultInstance; }
+        }
 
-        private static readonly string[] _fieldNames = new string[] { "leading_comments", "leading_detached_comments", "path", "span", "trailing_comments" };
-        private static readonly uint[] _fieldTags = new uint[] { 26, 50, 10, 18, 34 };
+        public override Location DefaultInstanceForType {
+          get { return DefaultInstance; }
+        }
+
+        protected override Location ThisMessage {
+          get { return this; }
+        }
+
         public static pbd::MessageDescriptor Descriptor {
-          get { return global::Google.Protobuf.DescriptorProtos.SourceCodeInfo.Descriptor.NestedTypes[0]; }
+          get { return global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_SourceCodeInfo_Location__Descriptor; }
         }
 
-        public pb::FieldAccess.FieldAccessorTable Fields {
-          get { return global::Google.Protobuf.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_SourceCodeInfo_Location__FieldAccessorTable; }
-        }
-
-        private bool _frozen = false;
-        public bool IsFrozen { get { return _frozen; } }
-
-        public Location() {
-          OnConstruction();
-        }
-
-        partial void OnConstruction();
-
-        public Location(Location other) : this() {
-          path_ = other.path_.Clone();
-          span_ = other.span_.Clone();
-          leadingComments_ = other.leadingComments_;
-          trailingComments_ = other.trailingComments_;
-          leadingDetachedComments_ = other.leadingDetachedComments_.Clone();
-        }
-
-        public Location Clone() {
-          return new Location(this);
-        }
-
-        public void Freeze() {
-          if (IsFrozen) {
-            return;
-          }
-          _frozen = true;
-          path_.Freeze();
-          span_.Freeze();
-          leadingDetachedComments_.Freeze();
+        protected override pb::FieldAccess.FieldAccessorTable<Location, Location.Builder> InternalFieldAccessors {
+          get { return global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.internal__static_google_protobuf_SourceCodeInfo_Location__FieldAccessorTable; }
         }
 
         public const int PathFieldNumber = 1;
-        private static readonly pb::FieldCodec<int> _repeated_path_codec
-            = pb::FieldCodec.ForInt32(10);
-        private readonly pbc::RepeatedField<int> path_ = new pbc::RepeatedField<int>();
-        internal pbc::RepeatedField<int> Path {
-          get { return path_; }
+        private int pathMemoizedSerializedSize;
+        private pbc::PopsicleList<int> path_ = new pbc::PopsicleList<int>();
+        public scg::IList<int> PathList {
+          get { return pbc::Lists.AsReadOnly(path_); }
+        }
+        public int PathCount {
+          get { return path_.Count; }
+        }
+        public int GetPath(int index) {
+          return path_[index];
         }
 
         public const int SpanFieldNumber = 2;
-        private static readonly pb::FieldCodec<int> _repeated_span_codec
-            = pb::FieldCodec.ForInt32(18);
-        private readonly pbc::RepeatedField<int> span_ = new pbc::RepeatedField<int>();
-        internal pbc::RepeatedField<int> Span {
-          get { return span_; }
+        private int spanMemoizedSerializedSize;
+        private pbc::PopsicleList<int> span_ = new pbc::PopsicleList<int>();
+        public scg::IList<int> SpanList {
+          get { return pbc::Lists.AsReadOnly(span_); }
+        }
+        public int SpanCount {
+          get { return span_.Count; }
+        }
+        public int GetSpan(int index) {
+          return span_[index];
         }
 
         public const int LeadingCommentsFieldNumber = 3;
+        private bool hasLeadingComments;
         private string leadingComments_ = "";
-        internal string LeadingComments {
+        public bool HasLeadingComments {
+          get { return hasLeadingComments; }
+        }
+        public string LeadingComments {
           get { return leadingComments_; }
-          set {
-            pb::Freezable.CheckMutable(this);
-            leadingComments_ = value ?? "";
-          }
         }
 
         public const int TrailingCommentsFieldNumber = 4;
+        private bool hasTrailingComments;
         private string trailingComments_ = "";
-        internal string TrailingComments {
+        public bool HasTrailingComments {
+          get { return hasTrailingComments; }
+        }
+        public string TrailingComments {
           get { return trailingComments_; }
-          set {
-            pb::Freezable.CheckMutable(this);
-            trailingComments_ = value ?? "";
-          }
         }
 
         public const int LeadingDetachedCommentsFieldNumber = 6;
-        private static readonly pb::FieldCodec<string> _repeated_leadingDetachedComments_codec
-            = pb::FieldCodec.ForString(50);
-        private readonly pbc::RepeatedField<string> leadingDetachedComments_ = new pbc::RepeatedField<string>();
-        internal pbc::RepeatedField<string> LeadingDetachedComments {
-          get { return leadingDetachedComments_; }
+        private pbc::PopsicleList<string> leadingDetachedComments_ = new pbc::PopsicleList<string>();
+        public scg::IList<string> LeadingDetachedCommentsList {
+          get { return pbc::Lists.AsReadOnly(leadingDetachedComments_); }
+        }
+        public int LeadingDetachedCommentsCount {
+          get { return leadingDetachedComments_.Count; }
+        }
+        public string GetLeadingDetachedComments(int index) {
+          return leadingDetachedComments_[index];
         }
 
-        public override bool Equals(object other) {
-          return Equals(other as Location);
-        }
-
-        public bool Equals(Location other) {
-          if (ReferenceEquals(other, null)) {
-            return false;
-          }
-          if (ReferenceEquals(other, this)) {
+        public override bool IsInitialized {
+          get {
             return true;
           }
-          if(!path_.Equals(other.path_)) return false;
-          if(!span_.Equals(other.span_)) return false;
-          if (LeadingComments != other.LeadingComments) return false;
-          if (TrailingComments != other.TrailingComments) return false;
-          if(!leadingDetachedComments_.Equals(other.leadingDetachedComments_)) return false;
-          return true;
         }
 
-        public override int GetHashCode() {
-          int hash = 1;
-          hash ^= path_.GetHashCode();
-          hash ^= span_.GetHashCode();
-          if (LeadingComments.Length != 0) hash ^= LeadingComments.GetHashCode();
-          if (TrailingComments.Length != 0) hash ^= TrailingComments.GetHashCode();
-          hash ^= leadingDetachedComments_.GetHashCode();
-          return hash;
+        public override void WriteTo(pb::ICodedOutputStream output) {
+          CalcSerializedSize();
+          string[] field_names = _locationFieldNames;
+          if (path_.Count > 0) {
+            output.WritePackedInt32Array(1, field_names[2], pathMemoizedSerializedSize, path_);
+          }
+          if (span_.Count > 0) {
+            output.WritePackedInt32Array(2, field_names[3], spanMemoizedSerializedSize, span_);
+          }
+          if (hasLeadingComments) {
+            output.WriteString(3, field_names[0], LeadingComments);
+          }
+          if (hasTrailingComments) {
+            output.WriteString(4, field_names[4], TrailingComments);
+          }
+          if (leadingDetachedComments_.Count > 0) {
+            output.WriteStringArray(6, field_names[1], leadingDetachedComments_);
+          }
+          UnknownFields.WriteTo(output);
         }
 
-        public void WriteTo(pb::CodedOutputStream output) {
-          path_.WriteTo(output, _repeated_path_codec);
-          span_.WriteTo(output, _repeated_span_codec);
-          if (LeadingComments.Length != 0) {
-            output.WriteRawTag(26);
-            output.WriteString(LeadingComments);
+        private int memoizedSerializedSize = -1;
+        public override int SerializedSize {
+          get {
+            int size = memoizedSerializedSize;
+            if (size != -1) return size;
+            return CalcSerializedSize();
           }
-          if (TrailingComments.Length != 0) {
-            output.WriteRawTag(34);
-            output.WriteString(TrailingComments);
-          }
-          leadingDetachedComments_.WriteTo(output, _repeated_leadingDetachedComments_codec);
         }
 
-        public int CalculateSize() {
-          int size = 0;
-          size += path_.CalculateSize(_repeated_path_codec);
-          size += span_.CalculateSize(_repeated_span_codec);
-          if (LeadingComments.Length != 0) {
-            size += 1 + pb::CodedOutputStream.ComputeStringSize(LeadingComments);
+        private int CalcSerializedSize() {
+          int size = memoizedSerializedSize;
+          if (size != -1) return size;
+
+          size = 0;
+          {
+            int dataSize = 0;
+            foreach (int element in PathList) {
+              dataSize += pb::CodedOutputStream.ComputeInt32SizeNoTag(element);
+            }
+            size += dataSize;
+            if (path_.Count != 0) {
+              size += 1 + pb::CodedOutputStream.ComputeInt32SizeNoTag(dataSize);
+            }
+            pathMemoizedSerializedSize = dataSize;
           }
-          if (TrailingComments.Length != 0) {
-            size += 1 + pb::CodedOutputStream.ComputeStringSize(TrailingComments);
+          {
+            int dataSize = 0;
+            foreach (int element in SpanList) {
+              dataSize += pb::CodedOutputStream.ComputeInt32SizeNoTag(element);
+            }
+            size += dataSize;
+            if (span_.Count != 0) {
+              size += 1 + pb::CodedOutputStream.ComputeInt32SizeNoTag(dataSize);
+            }
+            spanMemoizedSerializedSize = dataSize;
           }
-          size += leadingDetachedComments_.CalculateSize(_repeated_leadingDetachedComments_codec);
+          if (hasLeadingComments) {
+            size += pb::CodedOutputStream.ComputeStringSize(3, LeadingComments);
+          }
+          if (hasTrailingComments) {
+            size += pb::CodedOutputStream.ComputeStringSize(4, TrailingComments);
+          }
+          {
+            int dataSize = 0;
+            foreach (string element in LeadingDetachedCommentsList) {
+              dataSize += pb::CodedOutputStream.ComputeStringSizeNoTag(element);
+            }
+            size += dataSize;
+            size += 1 * leadingDetachedComments_.Count;
+          }
+          size += UnknownFields.SerializedSize;
+          memoizedSerializedSize = size;
           return size;
         }
-
-        public void MergeFrom(Location other) {
-          if (other == null) {
-            return;
-          }
-          path_.Add(other.path_);
-          span_.Add(other.span_);
-          if (other.LeadingComments.Length != 0) {
-            LeadingComments = other.LeadingComments;
-          }
-          if (other.TrailingComments.Length != 0) {
-            TrailingComments = other.TrailingComments;
-          }
-          leadingDetachedComments_.Add(other.leadingDetachedComments_);
+        public static Location ParseFrom(pb::ByteString data) {
+          return ((Builder) CreateBuilder().MergeFrom(data)).BuildParsed();
+        }
+        public static Location ParseFrom(pb::ByteString data, pb::ExtensionRegistry extensionRegistry) {
+          return ((Builder) CreateBuilder().MergeFrom(data, extensionRegistry)).BuildParsed();
+        }
+        public static Location ParseFrom(byte[] data) {
+          return ((Builder) CreateBuilder().MergeFrom(data)).BuildParsed();
+        }
+        public static Location ParseFrom(byte[] data, pb::ExtensionRegistry extensionRegistry) {
+          return ((Builder) CreateBuilder().MergeFrom(data, extensionRegistry)).BuildParsed();
+        }
+        public static Location ParseFrom(global::System.IO.Stream input) {
+          return ((Builder) CreateBuilder().MergeFrom(input)).BuildParsed();
+        }
+        public static Location ParseFrom(global::System.IO.Stream input, pb::ExtensionRegistry extensionRegistry) {
+          return ((Builder) CreateBuilder().MergeFrom(input, extensionRegistry)).BuildParsed();
+        }
+        public static Location ParseDelimitedFrom(global::System.IO.Stream input) {
+          return CreateBuilder().MergeDelimitedFrom(input).BuildParsed();
+        }
+        public static Location ParseDelimitedFrom(global::System.IO.Stream input, pb::ExtensionRegistry extensionRegistry) {
+          return CreateBuilder().MergeDelimitedFrom(input, extensionRegistry).BuildParsed();
+        }
+        public static Location ParseFrom(pb::ICodedInputStream input) {
+          return ((Builder) CreateBuilder().MergeFrom(input)).BuildParsed();
+        }
+        public static Location ParseFrom(pb::ICodedInputStream input, pb::ExtensionRegistry extensionRegistry) {
+          return ((Builder) CreateBuilder().MergeFrom(input, extensionRegistry)).BuildParsed();
+        }
+        private Location MakeReadOnly() {
+          path_.MakeReadOnly();
+          span_.MakeReadOnly();
+          leadingDetachedComments_.MakeReadOnly();
+          return this;
         }
 
-        public void MergeFrom(pb::CodedInputStream input) {
-          uint tag;
-          while (input.ReadTag(out tag)) {
-            switch(tag) {
-              case 0:
-                throw pb::InvalidProtocolBufferException.InvalidTag();
-              default:
-                if (pb::WireFormat.IsEndGroupTag(tag)) {
-                  return;
-                }
-                break;
-              case 10:
-              case 8: {
-                path_.AddEntriesFrom(input, _repeated_path_codec);
-                break;
-              }
-              case 18:
-              case 16: {
-                span_.AddEntriesFrom(input, _repeated_span_codec);
-                break;
-              }
-              case 26: {
-                LeadingComments = input.ReadString();
-                break;
-              }
-              case 34: {
-                TrailingComments = input.ReadString();
-                break;
-              }
-              case 50: {
-                leadingDetachedComments_.AddEntriesFrom(input, _repeated_leadingDetachedComments_codec);
-                break;
-              }
+        public static Builder CreateBuilder() { return new Builder(); }
+        public override Builder ToBuilder() { return CreateBuilder(this); }
+        public override Builder CreateBuilderForType() { return new Builder(); }
+        public static Builder CreateBuilder(Location prototype) {
+          return new Builder(prototype);
+        }
+
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public sealed partial class Builder : pb::GeneratedBuilder<Location, Builder> {
+          protected override Builder ThisBuilder {
+            get { return this; }
+          }
+          public Builder() {
+            result = DefaultInstance;
+            resultIsReadOnly = true;
+          }
+          internal Builder(Location cloneFrom) {
+            result = cloneFrom;
+            resultIsReadOnly = true;
+          }
+
+          private bool resultIsReadOnly;
+          private Location result;
+
+          private Location PrepareBuilder() {
+            if (resultIsReadOnly) {
+              Location original = result;
+              result = new Location();
+              resultIsReadOnly = false;
+              MergeFrom(original);
+            }
+            return result;
+          }
+
+          public override bool IsInitialized {
+            get { return result.IsInitialized; }
+          }
+
+          protected override Location MessageBeingBuilt {
+            get { return PrepareBuilder(); }
+          }
+
+          public override Builder Clear() {
+            result = DefaultInstance;
+            resultIsReadOnly = true;
+            return this;
+          }
+
+          public override Builder Clone() {
+            if (resultIsReadOnly) {
+              return new Builder(result);
+            } else {
+              return new Builder().MergeFrom(result);
             }
           }
-        }
 
+          public override pbd::MessageDescriptor DescriptorForType {
+            get { return global::Google.ProtocolBuffers.DescriptorProtos.SourceCodeInfo.Types.Location.Descriptor; }
+          }
+
+          public override Location DefaultInstanceForType {
+            get { return global::Google.ProtocolBuffers.DescriptorProtos.SourceCodeInfo.Types.Location.DefaultInstance; }
+          }
+
+          public override Location BuildPartial() {
+            if (resultIsReadOnly) {
+              return result;
+            }
+            resultIsReadOnly = true;
+            return result.MakeReadOnly();
+          }
+
+          public override Builder MergeFrom(pb::IMessage other) {
+            if (other is Location) {
+              return MergeFrom((Location) other);
+            } else {
+              base.MergeFrom(other);
+              return this;
+            }
+          }
+
+          public override Builder MergeFrom(Location other) {
+            if (other == global::Google.ProtocolBuffers.DescriptorProtos.SourceCodeInfo.Types.Location.DefaultInstance) return this;
+            PrepareBuilder();
+            if (other.path_.Count != 0) {
+              result.path_.Add(other.path_);
+            }
+            if (other.span_.Count != 0) {
+              result.span_.Add(other.span_);
+            }
+            if (other.HasLeadingComments) {
+              LeadingComments = other.LeadingComments;
+            }
+            if (other.HasTrailingComments) {
+              TrailingComments = other.TrailingComments;
+            }
+            if (other.leadingDetachedComments_.Count != 0) {
+              result.leadingDetachedComments_.Add(other.leadingDetachedComments_);
+            }
+            this.MergeUnknownFields(other.UnknownFields);
+            return this;
+          }
+
+          public override Builder MergeFrom(pb::ICodedInputStream input) {
+            return MergeFrom(input, pb::ExtensionRegistry.Empty);
+          }
+
+          public override Builder MergeFrom(pb::ICodedInputStream input, pb::ExtensionRegistry extensionRegistry) {
+            PrepareBuilder();
+            pb::UnknownFieldSet.Builder unknownFields = null;
+            uint tag;
+            string field_name;
+            while (input.ReadTag(out tag, out field_name)) {
+              if(tag == 0 && field_name != null) {
+                int field_ordinal = global::System.Array.BinarySearch(_locationFieldNames, field_name, global::System.StringComparer.Ordinal);
+                if(field_ordinal >= 0)
+                  tag = _locationFieldTags[field_ordinal];
+                else {
+                  if (unknownFields == null) {
+                    unknownFields = pb::UnknownFieldSet.CreateBuilder(this.UnknownFields);
+                  }
+                  ParseUnknownField(input, unknownFields, extensionRegistry, tag, field_name);
+                  continue;
+                }
+              }
+              switch (tag) {
+                case 0: {
+                  throw pb::InvalidProtocolBufferException.InvalidTag();
+                }
+                default: {
+                  if (pb::WireFormat.IsEndGroupTag(tag)) {
+                    if (unknownFields != null) {
+                      this.UnknownFields = unknownFields.Build();
+                    }
+                    return this;
+                  }
+                  if (unknownFields == null) {
+                    unknownFields = pb::UnknownFieldSet.CreateBuilder(this.UnknownFields);
+                  }
+                  ParseUnknownField(input, unknownFields, extensionRegistry, tag, field_name);
+                  break;
+                }
+                case 10:
+                case 8: {
+                  input.ReadInt32Array(tag, field_name, result.path_);
+                  break;
+                }
+                case 18:
+                case 16: {
+                  input.ReadInt32Array(tag, field_name, result.span_);
+                  break;
+                }
+                case 26: {
+                  result.hasLeadingComments = input.ReadString(ref result.leadingComments_);
+                  break;
+                }
+                case 34: {
+                  result.hasTrailingComments = input.ReadString(ref result.trailingComments_);
+                  break;
+                }
+                case 50: {
+                  input.ReadStringArray(tag, field_name, result.leadingDetachedComments_);
+                  break;
+                }
+              }
+            }
+
+            if (unknownFields != null) {
+              this.UnknownFields = unknownFields.Build();
+            }
+            return this;
+          }
+
+
+          public pbc::IPopsicleList<int> PathList {
+            get { return PrepareBuilder().path_; }
+          }
+          public int PathCount {
+            get { return result.PathCount; }
+          }
+          public int GetPath(int index) {
+            return result.GetPath(index);
+          }
+          public Builder SetPath(int index, int value) {
+            PrepareBuilder();
+            result.path_[index] = value;
+            return this;
+          }
+          public Builder AddPath(int value) {
+            PrepareBuilder();
+            result.path_.Add(value);
+            return this;
+          }
+          public Builder AddRangePath(scg::IEnumerable<int> values) {
+            PrepareBuilder();
+            result.path_.Add(values);
+            return this;
+          }
+          public Builder ClearPath() {
+            PrepareBuilder();
+            result.path_.Clear();
+            return this;
+          }
+
+          public pbc::IPopsicleList<int> SpanList {
+            get { return PrepareBuilder().span_; }
+          }
+          public int SpanCount {
+            get { return result.SpanCount; }
+          }
+          public int GetSpan(int index) {
+            return result.GetSpan(index);
+          }
+          public Builder SetSpan(int index, int value) {
+            PrepareBuilder();
+            result.span_[index] = value;
+            return this;
+          }
+          public Builder AddSpan(int value) {
+            PrepareBuilder();
+            result.span_.Add(value);
+            return this;
+          }
+          public Builder AddRangeSpan(scg::IEnumerable<int> values) {
+            PrepareBuilder();
+            result.span_.Add(values);
+            return this;
+          }
+          public Builder ClearSpan() {
+            PrepareBuilder();
+            result.span_.Clear();
+            return this;
+          }
+
+          public bool HasLeadingComments {
+            get { return result.hasLeadingComments; }
+          }
+          public string LeadingComments {
+            get { return result.LeadingComments; }
+            set { SetLeadingComments(value); }
+          }
+          public Builder SetLeadingComments(string value) {
+            pb::ThrowHelper.ThrowIfNull(value, "value");
+            PrepareBuilder();
+            result.hasLeadingComments = true;
+            result.leadingComments_ = value;
+            return this;
+          }
+          public Builder ClearLeadingComments() {
+            PrepareBuilder();
+            result.hasLeadingComments = false;
+            result.leadingComments_ = "";
+            return this;
+          }
+
+          public bool HasTrailingComments {
+            get { return result.hasTrailingComments; }
+          }
+          public string TrailingComments {
+            get { return result.TrailingComments; }
+            set { SetTrailingComments(value); }
+          }
+          public Builder SetTrailingComments(string value) {
+            pb::ThrowHelper.ThrowIfNull(value, "value");
+            PrepareBuilder();
+            result.hasTrailingComments = true;
+            result.trailingComments_ = value;
+            return this;
+          }
+          public Builder ClearTrailingComments() {
+            PrepareBuilder();
+            result.hasTrailingComments = false;
+            result.trailingComments_ = "";
+            return this;
+          }
+
+          public pbc::IPopsicleList<string> LeadingDetachedCommentsList {
+            get { return PrepareBuilder().leadingDetachedComments_; }
+          }
+          public int LeadingDetachedCommentsCount {
+            get { return result.LeadingDetachedCommentsCount; }
+          }
+          public string GetLeadingDetachedComments(int index) {
+            return result.GetLeadingDetachedComments(index);
+          }
+          public Builder SetLeadingDetachedComments(int index, string value) {
+            pb::ThrowHelper.ThrowIfNull(value, "value");
+            PrepareBuilder();
+            result.leadingDetachedComments_[index] = value;
+            return this;
+          }
+          public Builder AddLeadingDetachedComments(string value) {
+            pb::ThrowHelper.ThrowIfNull(value, "value");
+            PrepareBuilder();
+            result.leadingDetachedComments_.Add(value);
+            return this;
+          }
+          public Builder AddRangeLeadingDetachedComments(scg::IEnumerable<string> values) {
+            PrepareBuilder();
+            result.leadingDetachedComments_.Add(values);
+            return this;
+          }
+          public Builder ClearLeadingDetachedComments() {
+            PrepareBuilder();
+            result.leadingDetachedComments_.Clear();
+            return this;
+          }
+        }
+        static Location() {
+          object.ReferenceEquals(global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.Descriptor, null);
+        }
       }
 
     }
     #endregion
 
+    public const int LocationFieldNumber = 1;
+    private pbc::PopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.SourceCodeInfo.Types.Location> location_ = new pbc::PopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.SourceCodeInfo.Types.Location>();
+    public scg::IList<global::Google.ProtocolBuffers.DescriptorProtos.SourceCodeInfo.Types.Location> LocationList {
+      get { return location_; }
+    }
+    public int LocationCount {
+      get { return location_.Count; }
+    }
+    public global::Google.ProtocolBuffers.DescriptorProtos.SourceCodeInfo.Types.Location GetLocation(int index) {
+      return location_[index];
+    }
+
+    public override bool IsInitialized {
+      get {
+        return true;
+      }
+    }
+
+    public override void WriteTo(pb::ICodedOutputStream output) {
+      CalcSerializedSize();
+      string[] field_names = _sourceCodeInfoFieldNames;
+      if (location_.Count > 0) {
+        output.WriteMessageArray(1, field_names[0], location_);
+      }
+      UnknownFields.WriteTo(output);
+    }
+
+    private int memoizedSerializedSize = -1;
+    public override int SerializedSize {
+      get {
+        int size = memoizedSerializedSize;
+        if (size != -1) return size;
+        return CalcSerializedSize();
+      }
+    }
+
+    private int CalcSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      foreach (global::Google.ProtocolBuffers.DescriptorProtos.SourceCodeInfo.Types.Location element in LocationList) {
+        size += pb::CodedOutputStream.ComputeMessageSize(1, element);
+      }
+      size += UnknownFields.SerializedSize;
+      memoizedSerializedSize = size;
+      return size;
+    }
+    public static SourceCodeInfo ParseFrom(pb::ByteString data) {
+      return ((Builder) CreateBuilder().MergeFrom(data)).BuildParsed();
+    }
+    public static SourceCodeInfo ParseFrom(pb::ByteString data, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(data, extensionRegistry)).BuildParsed();
+    }
+    public static SourceCodeInfo ParseFrom(byte[] data) {
+      return ((Builder) CreateBuilder().MergeFrom(data)).BuildParsed();
+    }
+    public static SourceCodeInfo ParseFrom(byte[] data, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(data, extensionRegistry)).BuildParsed();
+    }
+    public static SourceCodeInfo ParseFrom(global::System.IO.Stream input) {
+      return ((Builder) CreateBuilder().MergeFrom(input)).BuildParsed();
+    }
+    public static SourceCodeInfo ParseFrom(global::System.IO.Stream input, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(input, extensionRegistry)).BuildParsed();
+    }
+    public static SourceCodeInfo ParseDelimitedFrom(global::System.IO.Stream input) {
+      return CreateBuilder().MergeDelimitedFrom(input).BuildParsed();
+    }
+    public static SourceCodeInfo ParseDelimitedFrom(global::System.IO.Stream input, pb::ExtensionRegistry extensionRegistry) {
+      return CreateBuilder().MergeDelimitedFrom(input, extensionRegistry).BuildParsed();
+    }
+    public static SourceCodeInfo ParseFrom(pb::ICodedInputStream input) {
+      return ((Builder) CreateBuilder().MergeFrom(input)).BuildParsed();
+    }
+    public static SourceCodeInfo ParseFrom(pb::ICodedInputStream input, pb::ExtensionRegistry extensionRegistry) {
+      return ((Builder) CreateBuilder().MergeFrom(input, extensionRegistry)).BuildParsed();
+    }
+    private SourceCodeInfo MakeReadOnly() {
+      location_.MakeReadOnly();
+      return this;
+    }
+
+    public static Builder CreateBuilder() { return new Builder(); }
+    public override Builder ToBuilder() { return CreateBuilder(this); }
+    public override Builder CreateBuilderForType() { return new Builder(); }
+    public static Builder CreateBuilder(SourceCodeInfo prototype) {
+      return new Builder(prototype);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+    public sealed partial class Builder : pb::GeneratedBuilder<SourceCodeInfo, Builder> {
+      protected override Builder ThisBuilder {
+        get { return this; }
+      }
+      public Builder() {
+        result = DefaultInstance;
+        resultIsReadOnly = true;
+      }
+      internal Builder(SourceCodeInfo cloneFrom) {
+        result = cloneFrom;
+        resultIsReadOnly = true;
+      }
+
+      private bool resultIsReadOnly;
+      private SourceCodeInfo result;
+
+      private SourceCodeInfo PrepareBuilder() {
+        if (resultIsReadOnly) {
+          SourceCodeInfo original = result;
+          result = new SourceCodeInfo();
+          resultIsReadOnly = false;
+          MergeFrom(original);
+        }
+        return result;
+      }
+
+      public override bool IsInitialized {
+        get { return result.IsInitialized; }
+      }
+
+      protected override SourceCodeInfo MessageBeingBuilt {
+        get { return PrepareBuilder(); }
+      }
+
+      public override Builder Clear() {
+        result = DefaultInstance;
+        resultIsReadOnly = true;
+        return this;
+      }
+
+      public override Builder Clone() {
+        if (resultIsReadOnly) {
+          return new Builder(result);
+        } else {
+          return new Builder().MergeFrom(result);
+        }
+      }
+
+      public override pbd::MessageDescriptor DescriptorForType {
+        get { return global::Google.ProtocolBuffers.DescriptorProtos.SourceCodeInfo.Descriptor; }
+      }
+
+      public override SourceCodeInfo DefaultInstanceForType {
+        get { return global::Google.ProtocolBuffers.DescriptorProtos.SourceCodeInfo.DefaultInstance; }
+      }
+
+      public override SourceCodeInfo BuildPartial() {
+        if (resultIsReadOnly) {
+          return result;
+        }
+        resultIsReadOnly = true;
+        return result.MakeReadOnly();
+      }
+
+      public override Builder MergeFrom(pb::IMessage other) {
+        if (other is SourceCodeInfo) {
+          return MergeFrom((SourceCodeInfo) other);
+        } else {
+          base.MergeFrom(other);
+          return this;
+        }
+      }
+
+      public override Builder MergeFrom(SourceCodeInfo other) {
+        if (other == global::Google.ProtocolBuffers.DescriptorProtos.SourceCodeInfo.DefaultInstance) return this;
+        PrepareBuilder();
+        if (other.location_.Count != 0) {
+          result.location_.Add(other.location_);
+        }
+        this.MergeUnknownFields(other.UnknownFields);
+        return this;
+      }
+
+      public override Builder MergeFrom(pb::ICodedInputStream input) {
+        return MergeFrom(input, pb::ExtensionRegistry.Empty);
+      }
+
+      public override Builder MergeFrom(pb::ICodedInputStream input, pb::ExtensionRegistry extensionRegistry) {
+        PrepareBuilder();
+        pb::UnknownFieldSet.Builder unknownFields = null;
+        uint tag;
+        string field_name;
+        while (input.ReadTag(out tag, out field_name)) {
+          if(tag == 0 && field_name != null) {
+            int field_ordinal = global::System.Array.BinarySearch(_sourceCodeInfoFieldNames, field_name, global::System.StringComparer.Ordinal);
+            if(field_ordinal >= 0)
+              tag = _sourceCodeInfoFieldTags[field_ordinal];
+            else {
+              if (unknownFields == null) {
+                unknownFields = pb::UnknownFieldSet.CreateBuilder(this.UnknownFields);
+              }
+              ParseUnknownField(input, unknownFields, extensionRegistry, tag, field_name);
+              continue;
+            }
+          }
+          switch (tag) {
+            case 0: {
+              throw pb::InvalidProtocolBufferException.InvalidTag();
+            }
+            default: {
+              if (pb::WireFormat.IsEndGroupTag(tag)) {
+                if (unknownFields != null) {
+                  this.UnknownFields = unknownFields.Build();
+                }
+                return this;
+              }
+              if (unknownFields == null) {
+                unknownFields = pb::UnknownFieldSet.CreateBuilder(this.UnknownFields);
+              }
+              ParseUnknownField(input, unknownFields, extensionRegistry, tag, field_name);
+              break;
+            }
+            case 10: {
+              input.ReadMessageArray(tag, field_name, result.location_, global::Google.ProtocolBuffers.DescriptorProtos.SourceCodeInfo.Types.Location.DefaultInstance, extensionRegistry);
+              break;
+            }
+          }
+        }
+
+        if (unknownFields != null) {
+          this.UnknownFields = unknownFields.Build();
+        }
+        return this;
+      }
+
+
+      public pbc::IPopsicleList<global::Google.ProtocolBuffers.DescriptorProtos.SourceCodeInfo.Types.Location> LocationList {
+        get { return PrepareBuilder().location_; }
+      }
+      public int LocationCount {
+        get { return result.LocationCount; }
+      }
+      public global::Google.ProtocolBuffers.DescriptorProtos.SourceCodeInfo.Types.Location GetLocation(int index) {
+        return result.GetLocation(index);
+      }
+      public Builder SetLocation(int index, global::Google.ProtocolBuffers.DescriptorProtos.SourceCodeInfo.Types.Location value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.location_[index] = value;
+        return this;
+      }
+      public Builder SetLocation(int index, global::Google.ProtocolBuffers.DescriptorProtos.SourceCodeInfo.Types.Location.Builder builderForValue) {
+        pb::ThrowHelper.ThrowIfNull(builderForValue, "builderForValue");
+        PrepareBuilder();
+        result.location_[index] = builderForValue.Build();
+        return this;
+      }
+      public Builder AddLocation(global::Google.ProtocolBuffers.DescriptorProtos.SourceCodeInfo.Types.Location value) {
+        pb::ThrowHelper.ThrowIfNull(value, "value");
+        PrepareBuilder();
+        result.location_.Add(value);
+        return this;
+      }
+      public Builder AddLocation(global::Google.ProtocolBuffers.DescriptorProtos.SourceCodeInfo.Types.Location.Builder builderForValue) {
+        pb::ThrowHelper.ThrowIfNull(builderForValue, "builderForValue");
+        PrepareBuilder();
+        result.location_.Add(builderForValue.Build());
+        return this;
+      }
+      public Builder AddRangeLocation(scg::IEnumerable<global::Google.ProtocolBuffers.DescriptorProtos.SourceCodeInfo.Types.Location> values) {
+        PrepareBuilder();
+        result.location_.Add(values);
+        return this;
+      }
+      public Builder ClearLocation() {
+        PrepareBuilder();
+        result.location_.Clear();
+        return this;
+      }
+    }
+    static SourceCodeInfo() {
+      object.ReferenceEquals(global::Google.ProtocolBuffers.DescriptorProtos.DescriptorProtoFile.Descriptor, null);
+    }
   }
 
   #endregion

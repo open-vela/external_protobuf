@@ -1,7 +1,8 @@
-#region Copyright notice and license
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
-// https://developers.google.com/protocol-buffers/
+// http://github.com/jskeet/dotnet-protobufs/
+// Original C++/Java/Python code:
+// http://code.google.com/p/protobuf/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -28,13 +29,10 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#endregion
-
 using System;
-using System.Linq.Expressions;
 using System.Reflection;
 
-namespace Google.Protobuf.FieldAccess
+namespace Google.ProtocolBuffers.FieldAccess
 {
     /// <summary>
     /// The methods in this class are somewhat evil, and should not be tampered with lightly.
@@ -52,42 +50,140 @@ namespace Google.Protobuf.FieldAccess
         internal static readonly Type[] EmptyTypes = new Type[0];
 
         /// <summary>
-        /// Creates a delegate which will cast the argument to the appropriate method target type,
-        /// call the method on it, then convert the result to object.
+        /// Creates a delegate which will execute the given method and then return
+        /// the result as an object.
         /// </summary>
-        internal static Func<object, object> CreateFuncObjectObject(MethodInfo method)
+        public static Func<T, object> CreateUpcastDelegate<T>(MethodInfo method)
         {
-            ParameterExpression parameter = Expression.Parameter(typeof(object), "p");
-            Expression downcast = Expression.Convert(parameter, method.DeclaringType);
-            Expression call = Expression.Call(downcast, method);
-            Expression upcast = Expression.Convert(call, typeof(object));
-            return Expression.Lambda<Func<object, object>>(upcast, parameter).Compile();
-        }
-        
-        /// <summary>
-        /// Creates a delegate which will execute the given method after casting the first argument to
-        /// the target type of the method, and the second argument to the first parameter type of the method.
-        /// </summary>
-        internal static Action<object, object> CreateActionObjectObject(MethodInfo method)
-        {
-            ParameterExpression targetParameter = Expression.Parameter(typeof(object), "target");
-            ParameterExpression argParameter = Expression.Parameter(typeof(object), "arg");
-            Expression castTarget = Expression.Convert(targetParameter, method.DeclaringType);
-            Expression castArgument = Expression.Convert(argParameter, method.GetParameters()[0].ParameterType);
-            Expression call = Expression.Call(castTarget, method, castArgument);
-            return Expression.Lambda<Action<object, object>>(call, targetParameter, argParameter).Compile();
+            // The tricky bit is invoking CreateCreateUpcastDelegateImpl with the right type parameters
+            MethodInfo openImpl = typeof(ReflectionUtil).GetMethod("CreateUpcastDelegateImpl");
+            MethodInfo closedImpl = openImpl.MakeGenericMethod(typeof(T), method.ReturnType);
+            return (Func<T, object>) closedImpl.Invoke(null, new object[] {method});
         }
 
         /// <summary>
-        /// Creates a delegate which will execute the given method after casting the first argument to
-        /// the target type of the method.
+        /// Method used solely for implementing CreateUpcastDelegate. Public to avoid trust issues
+        /// in low-trust scenarios.
         /// </summary>
-        internal static Action<object> CreateActionObject(MethodInfo method)
+        public static Func<TSource, object> CreateUpcastDelegateImpl<TSource, TResult>(MethodInfo method)
         {
-            ParameterExpression targetParameter = Expression.Parameter(typeof(object), "target");
-            Expression castTarget = Expression.Convert(targetParameter, method.DeclaringType);
-            Expression call = Expression.Call(castTarget, method);
-            return Expression.Lambda<Action<object>>(call, targetParameter).Compile();
+            // Convert the reflection call into an open delegate, i.e. instead of calling x.Method()
+            // we'll call getter(x).
+            Func<TSource, TResult> getter = ReflectionUtil.CreateDelegateFunc<TSource, TResult>(method);
+
+            // Implicit upcast to object (within the delegate)
+            return delegate(TSource source) { return getter(source); };
+        }
+
+        /// <summary>
+        /// Creates a delegate which will execute the given method after casting the parameter
+        /// down from object to the required parameter type.
+        /// </summary>
+        public static Action<T, object> CreateDowncastDelegate<T>(MethodInfo method)
+        {
+            MethodInfo openImpl = typeof(ReflectionUtil).GetMethod("CreateDowncastDelegateImpl");
+            MethodInfo closedImpl = openImpl.MakeGenericMethod(typeof(T), method.GetParameters()[0].ParameterType);
+            return (Action<T, object>) closedImpl.Invoke(null, new object[] {method});
+        }
+
+        public static Action<TSource, object> CreateDowncastDelegateImpl<TSource, TParam>(MethodInfo method)
+        {
+            // Convert the reflection call into an open delegate, i.e. instead of calling x.Method(y) we'll
+            // call Method(x, y)
+            Action<TSource, TParam> call = ReflectionUtil.CreateDelegateAction<TSource, TParam>(method);
+
+            return delegate(TSource source, object parameter) { call(source, (TParam) parameter); };
+        }
+
+        /// <summary>
+        /// Creates a delegate which will execute the given method after casting the parameter
+        /// down from object to the required parameter type.
+        /// </summary>
+        public static Action<T, object> CreateDowncastDelegateIgnoringReturn<T>(MethodInfo method)
+        {
+            MethodInfo openImpl = typeof(ReflectionUtil).GetMethod("CreateDowncastDelegateIgnoringReturnImpl");
+            MethodInfo closedImpl = openImpl.MakeGenericMethod(typeof(T), method.GetParameters()[0].ParameterType,
+                                                               method.ReturnType);
+            return (Action<T, object>) closedImpl.Invoke(null, new object[] {method});
+        }
+
+        public static Action<TSource, object> CreateDowncastDelegateIgnoringReturnImpl<TSource, TParam, TReturn>(
+            MethodInfo method)
+        {
+            // Convert the reflection call into an open delegate, i.e. instead of calling x.Method(y) we'll
+            // call Method(x, y)
+            Func<TSource, TParam, TReturn> call = ReflectionUtil.CreateDelegateFunc<TSource, TParam, TReturn>(method);
+
+            return delegate(TSource source, object parameter) { call(source, (TParam) parameter); };
+        }
+
+        /// <summary>
+        /// Creates a delegate which will execute the given static method and cast the result up to IBuilder.
+        /// </summary>
+        public static Func<IBuilder> CreateStaticUpcastDelegate(MethodInfo method)
+        {
+            MethodInfo openImpl = typeof(ReflectionUtil).GetMethod("CreateStaticUpcastDelegateImpl");
+            MethodInfo closedImpl = openImpl.MakeGenericMethod(method.ReturnType);
+            return (Func<IBuilder>) closedImpl.Invoke(null, new object[] {method});
+        }
+
+        public static Func<IBuilder> CreateStaticUpcastDelegateImpl<T>(MethodInfo method)
+        {
+            Func<T> call = ReflectionUtil.CreateDelegateFunc<T>(method);
+            return delegate { return (IBuilder) call(); };
+        }
+
+
+        internal static Func<TResult> CreateDelegateFunc<TResult>(MethodInfo method)
+        {
+#if !CF20
+            object tdelegate = Delegate.CreateDelegate(typeof(Func<TResult>), null, method);
+            return (Func<TResult>)tdelegate;
+#else
+            return delegate() { return (TResult)method.Invoke(null, null); };
+#endif
+        }
+
+        internal static Func<T, TResult> CreateDelegateFunc<T, TResult>(MethodInfo method)
+        {
+#if !CF20
+            object tdelegate = Delegate.CreateDelegate(typeof(Func<T, TResult>), null, method);
+            return (Func<T, TResult>)tdelegate;
+#else
+            if (method.IsStatic)
+            {
+                return delegate(T arg1) { return (TResult) method.Invoke(null, new object[] {arg1}); };
+            }
+            return delegate(T arg1) { return (TResult)method.Invoke(arg1, null); };
+#endif
+        }
+
+        internal static Func<T1, T2, TResult> CreateDelegateFunc<T1, T2, TResult>(MethodInfo method)
+        {
+#if !CF20
+            object tdelegate = Delegate.CreateDelegate(typeof(Func<T1, T2, TResult>), null, method);
+            return (Func<T1, T2, TResult>)tdelegate;
+#else
+            if (method.IsStatic)
+            {
+                return delegate(T1 arg1, T2 arg2) { return (TResult) method.Invoke(null, new object[] {arg1, arg2}); };
+            }
+            return delegate(T1 arg1, T2 arg2) { return (TResult)method.Invoke(arg1, new object[] { arg2 }); };
+#endif
+        }
+
+        internal static Action<T1, T2> CreateDelegateAction<T1, T2>(MethodInfo method)
+        {
+#if !CF20
+            object tdelegate = Delegate.CreateDelegate(typeof(Action<T1, T2>), null, method);
+            return (Action<T1, T2>)tdelegate;
+#else
+            if (method.IsStatic)
+            {
+                return delegate(T1 arg1, T2 arg2) { method.Invoke(null, new object[] {arg1, arg2}); };
+            }
+            return delegate(T1 arg1, T2 arg2) { method.Invoke(arg1, new object[] { arg2 }); };
+#endif
         }
     }
 }
