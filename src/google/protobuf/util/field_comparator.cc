@@ -106,7 +106,6 @@ FieldComparator::ComparisonResult DefaultFieldComparator::Compare(
     default:
       GOOGLE_LOG(FATAL) << "No comparison code for field " << field->full_name()
                  << " of CppType = " << field->cpp_type();
-      return DIFFERENT;
   }
 }
 

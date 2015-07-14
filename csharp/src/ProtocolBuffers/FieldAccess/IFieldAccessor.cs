@@ -1,8 +1,7 @@
+#region Copyright notice and license
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
-// http://github.com/jskeet/dotnet-protobufs/
-// Original C++/Java/Python code:
-// http://code.google.com/p/protobuf/
+// https://developers.google.com/protocol-buffers/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -29,67 +28,45 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#endregion
 
-namespace Google.ProtocolBuffers.FieldAccess
+using Google.Protobuf.Descriptors;
+
+namespace Google.Protobuf.FieldAccess
 {
     /// <summary>
-    /// Allows fields to be reflectively accessed in a smart manner.
-    /// The property descriptors for each field are created once and then cached.
-    /// In addition, this interface holds knowledge of repeated fields, builders etc.
+    /// Allows fields to be reflectively accessed.
     /// </summary>
-    internal interface IFieldAccessor<TMessage, TBuilder>
-        where TMessage : IMessage<TMessage, TBuilder>
-        where TBuilder : IBuilder<TMessage, TBuilder>
+    public interface IFieldAccessor
     {
         /// <summary>
-        /// Indicates whether the specified message contains the field.
+        /// Returns the descriptor associated with this field.
         /// </summary>
-        bool Has(TMessage message);
+        FieldDescriptor Descriptor { get; }
+
+        // TODO: Should the argument type for these messages by IReflectedMessage?
 
         /// <summary>
-        /// Gets the count of the repeated field in the specified message.
+        /// Clears the field in the specified message. (For repeated fields,
+        /// this clears the list.)
         /// </summary>
-        int GetRepeatedCount(TMessage message);
+        void Clear(object message);
 
         /// <summary>
-        /// Clears the field in the specified builder.
+        /// Fetches the field value. For repeated values, this will be an
+        /// <see cref="IList"/> implementation. For map values, this will be an
+        /// <see cref="IDictionary"/> implementation.
         /// </summary>
-        /// <param name="builder"></param>
-        void Clear(TBuilder builder);
+        object GetValue(object message);
 
         /// <summary>
-        /// Creates a builder for the type of this field (which must be a message field).
+        /// Mutator for single "simple" fields only.
         /// </summary>
-        IBuilder CreateBuilder();
-
-        /// <summary>
-        /// Accessor for single fields
-        /// </summary>
-        object GetValue(TMessage message);
-
-        /// <summary>
-        /// Mutator for single fields
-        /// </summary>
-        void SetValue(TBuilder builder, object value);
-
-        /// <summary>
-        /// Accessor for repeated fields
-        /// </summary>
-        object GetRepeatedValue(TMessage message, int index);
-
-        /// <summary>
-        /// Mutator for repeated fields
-        /// </summary>
-        void SetRepeated(TBuilder builder, int index, object value);
-
-        /// <summary>
-        /// Adds the specified value to the field in the given builder.
-        /// </summary>
-        void AddRepeated(TBuilder builder, object value);
-
-        /// <summary>
-        /// Returns a read-only wrapper around the value of a repeated field.
-        /// </summary>
-        object GetRepeatedWrapper(TBuilder builder);
+        /// <remarks>
+        /// Repeated fields are mutated by fetching the value and manipulating it as a list.
+        /// Map fields are mutated by fetching the value and manipulating it as a dictionary.
+        /// </remarks>
+        /// <exception cref="InvalidOperationException">The field is not a "simple" field, or the message is frozen.</exception>
+        void SetValue(object message, object value);
     }
 }

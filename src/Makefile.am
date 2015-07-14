@@ -76,6 +76,7 @@ nobase_include_HEADERS =                                        \
   google/protobuf/stubs/fastmem.h                               \
   google/protobuf/stubs/hash.h                                  \
   google/protobuf/stubs/once.h                                  \
+  google/protobuf/stubs/pbconfig.h                              \
   google/protobuf/stubs/platform_macros.h                       \
   google/protobuf/stubs/shared_ptr.h                            \
   google/protobuf/stubs/singleton.h                             \
@@ -419,13 +420,13 @@ libprotoc_la_SOURCES =                                         \
   google/protobuf/compiler/csharp/csharp_enum.h                \
   google/protobuf/compiler/csharp/csharp_enum_field.cc         \
   google/protobuf/compiler/csharp/csharp_enum_field.h          \
-  google/protobuf/compiler/csharp/csharp_extension.cc          \
-  google/protobuf/compiler/csharp/csharp_extension.h           \
   google/protobuf/compiler/csharp/csharp_field_base.cc         \
   google/protobuf/compiler/csharp/csharp_field_base.h          \
   google/protobuf/compiler/csharp/csharp_generator.cc          \
   google/protobuf/compiler/csharp/csharp_helpers.cc            \
   google/protobuf/compiler/csharp/csharp_helpers.h             \
+  google/protobuf/compiler/csharp/csharp_map_field.cc          \
+  google/protobuf/compiler/csharp/csharp_map_field.h           \
   google/protobuf/compiler/csharp/csharp_message.cc            \
   google/protobuf/compiler/csharp/csharp_message.h             \
   google/protobuf/compiler/csharp/csharp_message_field.cc      \
@@ -441,9 +442,7 @@ libprotoc_la_SOURCES =                                         \
   google/protobuf/compiler/csharp/csharp_source_generator_base.cc \
   google/protobuf/compiler/csharp/csharp_source_generator_base.h \
   google/protobuf/compiler/csharp/csharp_umbrella_class.cc     \
-  google/protobuf/compiler/csharp/csharp_umbrella_class.h      \
-  google/protobuf/compiler/csharp/csharp_writer.cc             \
-  google/protobuf/compiler/csharp/csharp_writer.h
+  google/protobuf/compiler/csharp/csharp_umbrella_class.h
 
 bin_PROGRAMS = protoc
 protoc_LDADD = $(PTHREAD_LIBS) libprotobuf.la libprotoc.la

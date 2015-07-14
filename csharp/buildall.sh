@@ -15,8 +15,4 @@ echo Building the solution.
 xbuild /p:Configuration=$CONFIG $SRC/ProtocolBuffers.sln
 
 echo Running tests.
-$NUNIT_CONSOLE $SRC/ProtocolBuffers.Test/bin/$CONFIG/Google.ProtocolBuffers.Test.dll
-
-$NUNIT_CONSOLE $SRC/ProtocolBuffersLite.Test/bin/$CONFIG/Google.ProtocolBuffersLite.Test.dll
-
-$NUNIT_CONSOLE $SRC/ProtocolBuffersLite.Test/bin/$CONFIG/Google.ProtocolBuffersMixedLite.Test.dll
+$NUNIT_CONSOLE $SRC/ProtocolBuffers.Test/bin/$CONFIG/Google.Protobuf.Test.dll

@@ -1,8 +1,7 @@
+#region Copyright notice and license
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
-// http://github.com/jskeet/dotnet-protobufs/
-// Original C++/Java/Python code:
-// http://code.google.com/p/protobuf/
+// https://developers.google.com/protocol-buffers/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -29,12 +28,14 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Google.ProtocolBuffers.Descriptors
+namespace Google.Protobuf.Descriptors
 {
     /// <summary>
     /// Contains lookup tables containing all the descriptors defined in a particular file.
@@ -85,7 +86,7 @@ namespace Google.ProtocolBuffers.Descriptors
         /// <param name="fullName">Fully-qualified name to look up</param>
         /// <returns>The symbol with the given name and type,
         /// or null if the symbol doesn't exist or has the wrong type</returns>
-        internal T FindSymbol<T>(string fullName) where T : class, IDescriptor
+        internal T FindSymbol<T>(string fullName) where T : class
         {
             IDescriptor result;
             descriptorsByName.TryGetValue(fullName, out result);
@@ -256,7 +257,7 @@ namespace Google.ProtocolBuffers.Descriptors
         /// or unqualified. C++-like name lookup semantics are used to search for the
         /// matching descriptor.
         /// </summary>
-        public IDescriptor LookupSymbol(string name, IDescriptor relativeTo)
+        internal IDescriptor LookupSymbol(string name, IDescriptor relativeTo)
         {
             // TODO(jonskeet):  This could be optimized in a number of ways.
 

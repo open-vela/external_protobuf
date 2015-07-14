@@ -1,8 +1,7 @@
+#region Copyright notice and license
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
-// http://github.com/jskeet/dotnet-protobufs/
-// Original C++/Java/Python code:
-// http://code.google.com/p/protobuf/
+// https://developers.google.com/protocol-buffers/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -29,15 +28,18 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-using Google.ProtocolBuffers.DescriptorProtos;
+#endregion
 
-namespace Google.ProtocolBuffers.Descriptors
+using Google.Protobuf.DescriptorProtos;
+
+namespace Google.Protobuf.Descriptors
 {
     /// <summary>
     /// Describes a single method in a service.
     /// </summary>
-    public sealed class MethodDescriptor : IndexedDescriptorBase<MethodDescriptorProto, MethodOptions>
+    public sealed class MethodDescriptor : DescriptorBase
     {
+        private readonly MethodDescriptorProto proto;
         private readonly ServiceDescriptor service;
         private MessageDescriptor inputType;
         private MessageDescriptor outputType;
@@ -45,34 +47,33 @@ namespace Google.ProtocolBuffers.Descriptors
         /// <value>
         /// The service this method belongs to.
         /// </value>
-        public ServiceDescriptor Service
-        {
-            get { return service; }
-        }
+        public ServiceDescriptor Service { get { return service; } }
 
         /// <value>
         /// The method's input type.
         /// </value>
-        public MessageDescriptor InputType
-        {
-            get { return inputType; }
-        }
+        public MessageDescriptor InputType { get { return inputType; } }
 
         /// <value>
         /// The method's input type.
         /// </value>
-        public MessageDescriptor OutputType
-        {
-            get { return outputType; }
-        }
+        public MessageDescriptor OutputType { get { return outputType; } }
 
         internal MethodDescriptor(MethodDescriptorProto proto, FileDescriptor file,
                                   ServiceDescriptor parent, int index)
-            : base(proto, file, parent.FullName + "." + proto.Name, index)
+            : base(file, parent.FullName + "." + proto.Name, index)
         {
+            this.proto = proto;
             service = parent;
             file.DescriptorPool.AddSymbol(this);
         }
+
+        internal MethodDescriptorProto Proto { get { return proto; } }
+
+        /// <summary>
+        /// The brief name of the descriptor's target.
+        /// </summary>
+        public override string Name { get { return proto.Name; } }
 
         internal void CrossLink()
         {
