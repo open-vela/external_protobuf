@@ -1,8 +1,7 @@
+#region Copyright notice and license
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
-// http://github.com/jskeet/dotnet-protobufs/
-// Original C++/Java/Python code:
-// http://code.google.com/p/protobuf/
+// https://developers.google.com/protocol-buffers/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -29,9 +28,11 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#endregion
+
 using System;
 
-namespace Google.ProtocolBuffers.Descriptors
+namespace Google.Protobuf.Descriptors
 {
     /// <summary>
     /// Thrown when building descriptors fails because the source DescriptorProtos
@@ -40,7 +41,6 @@ namespace Google.ProtocolBuffers.Descriptors
     public sealed class DescriptorValidationException : Exception
     {
         private readonly String name;
-        private readonly IMessage proto;
         private readonly string description;
 
         /// <value>
@@ -49,14 +49,6 @@ namespace Google.ProtocolBuffers.Descriptors
         public String ProblemSymbolName
         {
             get { return name; }
-        }
-
-        /// <value>
-        /// The protocol message representation of the invalid descriptor.
-        /// </value>
-        public IMessage ProblemProto
-        {
-            get { return proto; }
         }
 
         /// <value>
@@ -75,7 +67,6 @@ namespace Google.ProtocolBuffers.Descriptors
             // don't want to expose it directly to the user.  So, we only provide
             // the name and the original proto.
             name = problemDescriptor.FullName;
-            proto = problemDescriptor.Proto;
             this.description = description;
         }
 
@@ -83,7 +74,6 @@ namespace Google.ProtocolBuffers.Descriptors
             base(problemDescriptor.FullName + ": " + description, cause)
         {
             name = problemDescriptor.FullName;
-            proto = problemDescriptor.Proto;
             this.description = description;
         }
     }

@@ -1,8 +1,7 @@
+#region Copyright notice and license
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
-// http://github.com/jskeet/dotnet-protobufs/
-// Original C++/Java/Python code:
-// http://code.google.com/p/protobuf/
+// https://developers.google.com/protocol-buffers/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -29,133 +28,71 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-using System;
-using Google.ProtocolBuffers.Descriptors;
+#endregion
 
-namespace Google.ProtocolBuffers.FieldAccess
+using System;
+using System.Collections.ObjectModel;
+using Google.Protobuf.Descriptors;
+
+namespace Google.Protobuf.FieldAccess
 {
     /// <summary>
     /// Provides access to fields in generated messages via reflection.
-    /// This type is public to allow it to be used by generated messages, which
-    /// create appropriate instances in the .proto file description class.
-    /// TODO(jonskeet): See if we can hide it somewhere...
     /// </summary>
-    public sealed class FieldAccessorTable<TMessage, TBuilder>
-        where TMessage : IMessage<TMessage, TBuilder>
-        where TBuilder : IBuilder<TMessage, TBuilder>
+    public sealed class FieldAccessorTable
     {
-        private readonly IFieldAccessor<TMessage, TBuilder>[] accessors;
-        private readonly OneofAccessor<TMessage, TBuilder>[] oneofs;
-
+        private readonly ReadOnlyCollection<IFieldAccessor> accessors;
+        private readonly ReadOnlyCollection<OneofAccessor> oneofs;
         private readonly MessageDescriptor descriptor;
-
-        public MessageDescriptor Descriptor
-        {
-            get { return descriptor; }
-        }
 
         /// <summary>
         /// Constructs a FieldAccessorTable for a particular message class.
         /// Only one FieldAccessorTable should be constructed per class.
-        /// The property names should all actually correspond with the field descriptor's
-        /// CSharpOptions.PropertyName property, but bootstrapping issues currently
-        /// prevent us from using that. This may be addressed at a future time, in which case
-        /// we can keep this constructor for backwards compatibility, just ignoring the parameter.
-        /// TODO(jonskeet): Make it so.
         /// </summary>
+        /// <param name="type">The CLR type for the message.</param>
         /// <param name="descriptor">The type's descriptor</param>
         /// <param name="propertyNames">The Pascal-case names of all the field-based properties in the message.</param>
-        public FieldAccessorTable(MessageDescriptor descriptor, String[] propertyNames)
+        public FieldAccessorTable(Type type, MessageDescriptor descriptor, string[] propertyNames, string[] oneofPropertyNames)
         {
             this.descriptor = descriptor;
-            accessors = new IFieldAccessor<TMessage, TBuilder>[descriptor.Fields.Count];
-            oneofs = new OneofAccessor<TMessage, TBuilder>[descriptor.Oneofs.Count];
-            bool supportFieldPresence = descriptor.File.Syntax == FileDescriptor.ProtoSyntax.Proto2;
-            int fieldSize = accessors.Length;
-            for (int i = 0; i < fieldSize; i++)
+            var accessorsArray = new IFieldAccessor[descriptor.Fields.Count];
+            for (int i = 0; i < accessorsArray.Length; i++)
             {
-                FieldDescriptor field = descriptor.Fields[i];
-                string containingOneofName = (field.ContainingOneof != null) ? 
-                    propertyNames[fieldSize +field.ContainingOneof.Index] : null;
-                accessors[i] = CreateAccessor(
-                    field, propertyNames[i], containingOneofName, supportFieldPresence);
+                var field = descriptor.Fields[i];
+                var name = propertyNames[i];
+                accessorsArray[i] =
+                    field.IsMap ? new MapFieldAccessor(type, name, field)
+                    : field.IsRepeated ? new RepeatedFieldAccessor(type, name, field)
+                    : (IFieldAccessor) new SingleFieldAccessor(type, name, field);
             }
-            for (int i = 0; i < oneofs.Length; i++)
+            accessors = new ReadOnlyCollection<IFieldAccessor>(accessorsArray);
+            var oneofsArray = new OneofAccessor[descriptor.Oneofs.Count];
+            for (int i = 0; i < oneofsArray.Length; i++)
             {
-                oneofs[i] = new OneofAccessor<TMessage, TBuilder>(descriptor, propertyNames[i + accessors.Length]);
+                var oneof = descriptor.Oneofs[i];
+                oneofsArray[i] = new OneofAccessor(type, oneofPropertyNames[i], oneof);
             }
+            oneofs = new ReadOnlyCollection<OneofAccessor>(oneofsArray);
         }
 
+        // TODO: Validate the name here... should possibly make this type a more "general reflection access" type,
+        // bearing in mind the oneof parts to come as well.
         /// <summary>
-        /// Creates an accessor for a single field
-        /// </summary>   
-        private static IFieldAccessor<TMessage, TBuilder> CreateAccessor(
-            FieldDescriptor field, string name, string containingOneofName, bool supportFieldPresence)
-        {
-            if (field.IsRepeated)
-            {
-                switch (field.MappedType)
-                {
-                    case MappedType.Message:
-                        return new RepeatedMessageAccessor<TMessage, TBuilder>(name);
-                    case MappedType.Enum:
-                        return new RepeatedEnumAccessor<TMessage, TBuilder>(field, name);
-                    default:
-                        return new RepeatedPrimitiveAccessor<TMessage, TBuilder>(name);
-                }
-            }
-            else
-            {
-                switch (field.MappedType)
-                {
-                    case MappedType.Message:
-                        {
-                            if (field.ContainingOneof != null)
-                            {
-                                return new SingleMessageAccessor<TMessage, TBuilder>(
-                                    field, name, containingOneofName, supportFieldPresence);
-                            }
-                            else
-                            {
-                                return new SingleMessageAccessor<TMessage, TBuilder>(
-                                    field, name, containingOneofName, true);
-                            }
-                        }
-                    case MappedType.Enum:
-                        return new SingleEnumAccessor<TMessage, TBuilder>(
-                            field, name, containingOneofName, supportFieldPresence);
-                    default:
-                        return new SinglePrimitiveAccessor<TMessage, TBuilder>(
-                            field, name, containingOneofName, supportFieldPresence);
-                }
-            }
-        }
+        /// Returns all of the field accessors for the message type.
+        /// </summary>
+        public ReadOnlyCollection<IFieldAccessor> Accessors { get { return accessors; } }
 
-        internal IFieldAccessor<TMessage, TBuilder> this[FieldDescriptor field]
+        public ReadOnlyCollection<OneofAccessor> Oneofs { get { return oneofs; } }
+
+        // TODO: Review this, as it's easy to get confused between FieldNumber and Index.
+        // Currently only used to get an accessor related to a oneof... maybe just make that simpler?
+        public IFieldAccessor this[int fieldNumber]
         {
             get
             {
-                if (field.ContainingType != descriptor)
-                {
-                    throw new ArgumentException("FieldDescriptor does not match message type.");
-                }
-                else if (field.IsExtension)
-                {
-                    // If this type had extensions, it would subclass ExtendableMessage,
-                    // which overrides the reflection interface to handle extensions.
-                    throw new ArgumentException("This type does not have extensions.");
-                }
+                FieldDescriptor field = descriptor.FindFieldByNumber(fieldNumber);
                 return accessors[field.Index];
             }
-        }
-
-        internal OneofAccessor<TMessage, TBuilder> Oneof(OneofDescriptor oneof)
-        {
-            if (oneof.ContainingType != descriptor)
-            {
-                throw new ArgumentException("OneofDescriptor does not match message type");
-            }
-            return oneofs[oneof.Index];
         }
     }
 }

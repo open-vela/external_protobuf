@@ -1,10 +1,7 @@
 #region Copyright notice and license
-
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
-// http://github.com/jskeet/dotnet-protobufs/
-// Original C++/Java/Python code:
-// http://code.google.com/p/protobuf/
+// https://developers.google.com/protocol-buffers/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -31,7 +28,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
 #endregion
 
 using System;
@@ -40,7 +36,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace Google.ProtocolBuffers
+namespace Google.Protobuf
 {
     /// <summary>
     /// Immutable array of bytes.
@@ -139,7 +135,7 @@ namespace Google.ProtocolBuffers
         /// are copied, so further modifications to the array will not
         /// be reflected in the returned ByteString.
         /// </summary>
-        public static ByteString CopyFrom(byte[] bytes)
+        public static ByteString CopyFrom(params byte[] bytes)
         {
             return new ByteString((byte[]) bytes.Clone());
         }
@@ -208,6 +204,24 @@ namespace Google.ProtocolBuffers
             return CodedInputStream.CreateInstance(bytes);
         }
 
+        public static bool operator ==(ByteString lhs, ByteString rhs)
+        {
+            if (ReferenceEquals(lhs, rhs))
+            {
+                return true;
+            }
+            if (ReferenceEquals(lhs, null))
+            {
+                return false;
+            }
+            return lhs.Equals(rhs);
+        }
+
+        public static bool operator !=(ByteString lhs, ByteString rhs)
+        {
+            return !(lhs == rhs);
+        }
+
         // TODO(jonskeet): CopyTo if it turns out to be required
 
         public override bool Equals(object obj)
@@ -244,38 +258,6 @@ namespace Google.ProtocolBuffers
                 }
             }
             return true;
-        }
-
-        /// <summary>
-        /// Builder for ByteStrings which allows them to be created without extra
-        /// copying being involved. This has to be a nested type in order to have access
-        /// to the private ByteString constructor.
-        /// </summary>
-        internal sealed class CodedBuilder
-        {
-            private readonly CodedOutputStream output;
-            private readonly byte[] buffer;
-
-            internal CodedBuilder(int size)
-            {
-                buffer = new byte[size];
-                output = CodedOutputStream.CreateInstance(buffer);
-            }
-
-            internal ByteString Build()
-            {
-                output.CheckNoSpaceLeft();
-
-                // We can be confident that the CodedOutputStream will not modify the
-                // underlying bytes anymore because it already wrote all of them.  So,
-                // no need to make a copy.
-                return new ByteString(buffer);
-            }
-
-            internal CodedOutputStream CodedOutput
-            {
-                get { return output; }
-            }
         }
 
         /// <summary>

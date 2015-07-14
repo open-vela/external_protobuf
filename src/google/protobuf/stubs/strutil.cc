@@ -31,7 +31,6 @@
 // from google3/strings/strutil.cc
 
 #include <google/protobuf/stubs/strutil.h>
-#include <google/protobuf/stubs/mathlimits.h>
 
 #include <errno.h>
 #include <float.h>    // FLT_DIG and DBL_DIG
@@ -58,6 +57,11 @@
 
 namespace google {
 namespace protobuf {
+
+inline bool IsNaN(double value) {
+  // NaN is never equal to anything, even itself.
+  return value != value;
+}
 
 // These are defined as macros on some platforms.  #undef them so that we can
 // redefine them.
@@ -1206,7 +1210,7 @@ char* DoubleToBuffer(double value, char* buffer) {
   } else if (value == -numeric_limits<double>::infinity()) {
     strcpy(buffer, "-inf");
     return buffer;
-  } else if (MathLimits<double>::IsNaN(value)) {
+  } else if (IsNaN(value)) {
     strcpy(buffer, "nan");
     return buffer;
   }
@@ -1324,7 +1328,7 @@ char* FloatToBuffer(float value, char* buffer) {
   } else if (value == -numeric_limits<double>::infinity()) {
     strcpy(buffer, "-inf");
     return buffer;
-  } else if (MathLimits<float>::IsNaN(value)) {
+  } else if (IsNaN(value)) {
     strcpy(buffer, "nan");
     return buffer;
   }

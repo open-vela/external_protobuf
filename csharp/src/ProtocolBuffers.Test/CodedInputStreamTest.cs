@@ -1,10 +1,7 @@
 #region Copyright notice and license
-
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
-// http://github.com/jskeet/dotnet-protobufs/
-// Original C++/Java/Python code:
-// http://code.google.com/p/protobuf/
+// https://developers.google.com/protocol-buffers/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -31,17 +28,14 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
 #endregion
 
 using System;
-using System.Collections.Generic;
 using System.IO;
-using Google.ProtocolBuffers.Descriptors;
-using Google.ProtocolBuffers.TestProtos;
+using Google.Protobuf.TestProtos;
 using NUnit.Framework;
 
-namespace Google.ProtocolBuffers
+namespace Google.Protobuf
 {
     public class CodedInputStreamTest
     {
@@ -61,7 +55,7 @@ namespace Google.ProtocolBuffers
         }
 
         /// <summary>
-        /// Parses the given bytes using ReadRawVarint32() and ReadRawVarint64() and
+        /// Parses the given bytes using ReadRawVarint32() and ReadRawVarint64()
         /// </summary>
         private static void AssertReadVarint(byte[] data, ulong value)
         {
@@ -231,66 +225,26 @@ namespace Google.ProtocolBuffers
             Assert.AreEqual(0x7FFFFFFFFFFFFFFFL, CodedInputStream.DecodeZigZag64(0xFFFFFFFFFFFFFFFEL));
             Assert.AreEqual(unchecked((long) 0x8000000000000000L), CodedInputStream.DecodeZigZag64(0xFFFFFFFFFFFFFFFFL));
         }
-
+        
         [Test]
-        public void ReadWholeMessage()
+        public void ReadWholeMessage_VaryingBlockSizes()
         {
-            TestAllTypes message = TestUtil.GetAllSet();
+            TestAllTypes message = SampleMessages.CreateFullTestAllTypes();
 
             byte[] rawBytes = message.ToByteArray();
-            Assert.AreEqual(rawBytes.Length, message.SerializedSize);
-            TestAllTypes message2 = TestAllTypes.ParseFrom(rawBytes);
-            TestUtil.AssertAllFieldsSet(message2);
+            Assert.AreEqual(rawBytes.Length, message.CalculateSize());
+            TestAllTypes message2 = TestAllTypes.Parser.ParseFrom(rawBytes);
+            Assert.AreEqual(message, message2);
 
             // Try different block sizes.
             for (int blockSize = 1; blockSize < 256; blockSize *= 2)
             {
-                message2 = TestAllTypes.ParseFrom(new SmallBlockInputStream(rawBytes, blockSize));
-                TestUtil.AssertAllFieldsSet(message2);
+                message2 = TestAllTypes.Parser.ParseFrom(new SmallBlockInputStream(rawBytes, blockSize));
+                Assert.AreEqual(message, message2);
             }
         }
-
+                
         [Test]
-        public void SkipWholeMessage()
-        {
-            TestAllTypes message = TestUtil.GetAllSet();
-            byte[] rawBytes = message.ToByteArray();
-
-            // Create two parallel inputs.  Parse one as unknown fields while using
-            // skipField() to skip each field on the other.  Expect the same tags.
-            CodedInputStream input1 = CodedInputStream.CreateInstance(rawBytes);
-            CodedInputStream input2 = CodedInputStream.CreateInstance(rawBytes);
-            UnknownFieldSet.Builder unknownFields = UnknownFieldSet.CreateBuilder();
-
-            uint tag;
-            string name;
-            while (input1.ReadTag(out tag, out name))
-            {
-                uint tag2;
-                Assert.IsTrue(input2.ReadTag(out tag2, out name));
-                Assert.AreEqual(tag, tag2);
-
-                unknownFields.MergeFieldFrom(tag, input1);
-                input2.SkipField();
-            }
-        }
-
-        /// <summary>
-        /// Test that a bug in SkipRawBytes has been fixed: if the skip
-        /// skips exactly up to a limit, this should bnot break things
-        /// </summary>
-        [Test]
-        public void SkipRawBytesBug()
-        {
-            byte[] rawBytes = new byte[] {1, 2};
-            CodedInputStream input = CodedInputStream.CreateInstance(rawBytes);
-
-            int limit = input.PushLimit(1);
-            input.SkipRawBytes(1);
-            input.PopLimit(limit);
-            Assert.AreEqual(2, input.ReadRawByte());
-        }
-
         public void ReadHugeBlob()
         {
             // Allocate and initialize a 1MB blob.
@@ -301,23 +255,14 @@ namespace Google.ProtocolBuffers
             }
 
             // Make a message containing it.
-            TestAllTypes.Builder builder = TestAllTypes.CreateBuilder();
-            TestUtil.SetAllFields(builder);
-            builder.SetOptionalBytes(ByteString.CopyFrom(blob));
-            TestAllTypes message = builder.Build();
+            var message = new TestAllTypes { SingleBytes = ByteString.CopyFrom(blob) };
 
             // Serialize and parse it.  Make sure to parse from an InputStream, not
             // directly from a ByteString, so that CodedInputStream uses buffered
             // reading.
-            TestAllTypes message2 = TestAllTypes.ParseFrom(message.ToByteString().CreateCodedInput());
+            TestAllTypes message2 = TestAllTypes.Parser.ParseFrom(message.ToByteString());
 
-            Assert.AreEqual(message.OptionalBytes, message2.OptionalBytes);
-
-            // Make sure all the other fields were parsed correctly.
-            TestAllTypes message3 = TestAllTypes.CreateBuilder(message2)
-                .SetOptionalBytes(TestUtil.GetAllSet().OptionalBytes)
-                .Build();
-            TestUtil.AssertAllFieldsSet(message3);
+            Assert.AreEqual(message, message2);
         }
 
         [Test]
@@ -335,25 +280,22 @@ namespace Google.ProtocolBuffers
 
             CodedInputStream input = CodedInputStream.CreateInstance(ms);
             uint testtag;
-            string ignore;
-            Assert.IsTrue(input.ReadTag(out testtag, out ignore));
+            Assert.IsTrue(input.ReadTag(out testtag));
             Assert.AreEqual(tag, testtag);
 
-            ByteString bytes = null;
             // TODO(jonskeet): Should this be ArgumentNullException instead?
-            Assert.Throws<InvalidProtocolBufferException>(() => input.ReadBytes(ref bytes));
+            Assert.Throws<InvalidProtocolBufferException>(() => input.ReadBytes());
         }
 
         private static TestRecursiveMessage MakeRecursiveMessage(int depth)
         {
             if (depth == 0)
             {
-                return TestRecursiveMessage.CreateBuilder().SetI(5).Build();
+                return new TestRecursiveMessage { I = 5 };
             }
             else
             {
-                return TestRecursiveMessage.CreateBuilder()
-                    .SetA(MakeRecursiveMessage(depth - 1)).Build();
+                return new TestRecursiveMessage { A = MakeRecursiveMessage(depth - 1) };
             }
         }
 
@@ -361,12 +303,12 @@ namespace Google.ProtocolBuffers
         {
             if (depth == 0)
             {
-                Assert.IsFalse(message.HasA);
+                Assert.IsNull(message.A);
                 Assert.AreEqual(5, message.I);
             }
             else
             {
-                Assert.IsTrue(message.HasA);
+                Assert.IsNotNull(message.A);
                 AssertMessageDepth(message.A, depth - 1);
             }
         }
@@ -377,15 +319,16 @@ namespace Google.ProtocolBuffers
             ByteString data64 = MakeRecursiveMessage(64).ToByteString();
             ByteString data65 = MakeRecursiveMessage(65).ToByteString();
 
-            AssertMessageDepth(TestRecursiveMessage.ParseFrom(data64), 64);
+            AssertMessageDepth(TestRecursiveMessage.Parser.ParseFrom(data64), 64);
 
-            Assert.Throws<InvalidProtocolBufferException>(() => TestRecursiveMessage.ParseFrom(data65));
+            Assert.Throws<InvalidProtocolBufferException>(() => TestRecursiveMessage.Parser.ParseFrom(data65));
 
             CodedInputStream input = data64.CreateCodedInput();
             input.SetRecursionLimit(8);
-            Assert.Throws<InvalidProtocolBufferException>(() => TestRecursiveMessage.ParseFrom(input));
+            Assert.Throws<InvalidProtocolBufferException>(() => TestRecursiveMessage.Parser.ParseFrom(input));
         }
 
+        /*
         [Test]
         public void SizeLimit()
         {
@@ -396,7 +339,7 @@ namespace Google.ProtocolBuffers
             input.SetSizeLimit(16);
 
             Assert.Throws<InvalidProtocolBufferException>(() => TestAllTypes.ParseFrom(input));
-        }
+        }*/
 
         [Test]
         public void ResetSizeCounter()
@@ -434,13 +377,10 @@ namespace Google.ProtocolBuffers
 
             CodedInputStream input = CodedInputStream.CreateInstance(ms);
 
-            uint testtag;
-            string ignored;
-
-            Assert.IsTrue(input.ReadTag(out testtag, out ignored));
-            Assert.AreEqual(tag, testtag);
-            string text = null;
-            input.ReadString(ref text);
+            uint actualTag;
+            Assert.IsTrue(input.ReadTag(out actualTag));
+            Assert.AreEqual(tag, actualTag);
+            string text = input.ReadString();
             Assert.AreEqual('\ufffd', text[0]);
         }
 
@@ -465,75 +405,13 @@ namespace Google.ProtocolBuffers
             }
         }
 
-        enum TestNegEnum { None = 0, Value = -2 }
-
         [Test]
         public void TestNegativeEnum()
         {
-            byte[] bytes = new byte[10] { 0xFE, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x01 };
+            byte[] bytes = { 0xFE, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x01 };
             CodedInputStream input = CodedInputStream.CreateInstance(bytes);
-            object unk;
-            TestNegEnum val = TestNegEnum.None;
-
-            Assert.IsTrue(input.ReadEnum(ref val, out unk));
+            Assert.AreEqual((int)SampleEnum.NegativeValue, input.ReadEnum());
             Assert.IsTrue(input.IsAtEnd);
-            Assert.AreEqual(TestNegEnum.Value, val);
-        }
-
-        [Test]
-        public void TestNegativeEnumPackedArray()
-        {
-            int arraySize = 1 + (10 * 5);
-            int msgSize = 1 + 1 + arraySize;
-            byte[] bytes = new byte[msgSize];
-            CodedOutputStream output = CodedOutputStream.CreateInstance(bytes);
-            output.WritePackedInt32Array(8, "", arraySize, new int[] { 0, -1, -2, -3, -4, -5 });
-
-            Assert.AreEqual(0, output.SpaceLeft);
-
-            CodedInputStream input = CodedInputStream.CreateInstance(bytes);
-            uint tag;
-            string name;
-            Assert.IsTrue(input.ReadTag(out tag, out name));
-
-            List<TestNegEnum> values = new List<TestNegEnum>();
-            ICollection<object> unk;
-            input.ReadEnumArray(tag, name, values, out unk);
-
-            Assert.AreEqual(2, values.Count);
-            Assert.AreEqual(TestNegEnum.None, values[0]);
-            Assert.AreEqual(TestNegEnum.Value, values[1]);
-
-            Assert.NotNull(unk);
-            Assert.AreEqual(4, unk.Count);
-        }
-
-        [Test]
-        public void TestNegativeEnumArray()
-        {
-            int arraySize = 1 + 1 + (11 * 5);
-            int msgSize = arraySize;
-            byte[] bytes = new byte[msgSize];
-            CodedOutputStream output = CodedOutputStream.CreateInstance(bytes);
-            output.WriteInt32Array(8, "", new int[] { 0, -1, -2, -3, -4, -5 });
-
-            Assert.AreEqual(0, output.SpaceLeft);
-
-            CodedInputStream input = CodedInputStream.CreateInstance(bytes);
-            uint tag;
-            string name;
-            Assert.IsTrue(input.ReadTag(out tag, out name));
-
-            List<TestNegEnum> values = new List<TestNegEnum>();
-            ICollection<object> unk;
-            input.ReadEnumArray(tag, name, values, out unk);
-
-            Assert.AreEqual(2, values.Count);
-            Assert.AreEqual(TestNegEnum.None, values[0]);
-            Assert.AreEqual(TestNegEnum.Value, values[1]);
-
-            Assert.NotNull(unk);
-            Assert.AreEqual(4, unk.Count);
         }
 
         //Issue 71:	CodedInputStream.ReadBytes go to slow path unnecessarily
@@ -543,26 +421,23 @@ namespace Google.ProtocolBuffers
             using (var ms = new MemoryStream())
             {
                 CodedOutputStream output = CodedOutputStream.CreateInstance(ms);
-                output.WriteField(FieldType.Bytes, 1, "bytes", ByteString.CopyFrom(new byte[100]));
-                output.WriteField(FieldType.Bytes, 2, "bytes", ByteString.CopyFrom(new byte[100]));
+                output.WriteTag(1, WireFormat.WireType.LengthDelimited);
+                output.WriteBytes(ByteString.CopyFrom(new byte[100]));
+                output.WriteTag(2, WireFormat.WireType.LengthDelimited);
+                output.WriteBytes(ByteString.CopyFrom(new byte[100]));
                 output.Flush();
 
                 ms.Position = 0;
                 CodedInputStream input = CodedInputStream.CreateInstance(ms, new byte[ms.Length / 2]);
 
                 uint tag;
-                string ignore;
-                ByteString value;
-
-                Assert.IsTrue(input.ReadTag(out tag, out ignore));
+                Assert.IsTrue(input.ReadTag(out tag));
                 Assert.AreEqual(1, WireFormat.GetTagFieldNumber(tag));
-                value = ByteString.Empty;
-                Assert.IsTrue(input.ReadBytes(ref value) && value.Length == 100);
+                Assert.AreEqual(100, input.ReadBytes().Length);
 
-                Assert.IsTrue(input.ReadTag(out tag, out ignore));
+                Assert.IsTrue(input.ReadTag(out tag));
                 Assert.AreEqual(2, WireFormat.GetTagFieldNumber(tag));
-                value = ByteString.Empty;
-                Assert.IsTrue(input.ReadBytes(ref value) && value.Length == 100);
+                Assert.AreEqual(100, input.ReadBytes().Length);
             }
         }
     }
