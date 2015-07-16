@@ -58,8 +58,7 @@ $PROTOC -Isrc --csharp_out=csharp/src/ProtocolBuffers.Test/TestProtos \
     src/google/protobuf/map_unittest_proto3.proto \
     src/google/protobuf/unittest_proto3.proto \
     src/google/protobuf/unittest_import_proto3.proto \
-    src/google/protobuf/unittest_import_public_proto3.proto \
-    src/google/protobuf/unittest_well_known_types.proto
+    src/google/protobuf/unittest_import_public_proto3.proto
 
 
 $PROTOC -Icsharp/protos/extest --csharp_out=csharp/src/ProtocolBuffers.Test/TestProtos \
