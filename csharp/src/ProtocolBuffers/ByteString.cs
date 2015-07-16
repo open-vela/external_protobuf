@@ -212,22 +212,11 @@ namespace Google.Protobuf
             {
                 return true;
             }
-            if (ReferenceEquals(lhs, null) || ReferenceEquals(rhs, null))
+            if (ReferenceEquals(lhs, null))
             {
                 return false;
             }
-            if (lhs.bytes.Length != rhs.bytes.Length)
-            {
-                return false;
-            }
-            for (int i = 0; i < lhs.Length; i++)
-            {
-                if (rhs.bytes[i] != lhs.bytes[i])
-                {
-                    return false;
-                }
-            }
-            return true;
+            return lhs.Equals(rhs);
         }
 
         public static bool operator !=(ByteString lhs, ByteString rhs)
@@ -239,7 +228,12 @@ namespace Google.Protobuf
 
         public override bool Equals(object obj)
         {
-            return this == (obj as ByteString);
+            ByteString other = obj as ByteString;
+            if (obj == null)
+            {
+                return false;
+            }
+            return Equals(other);
         }
 
         public override int GetHashCode()
@@ -254,7 +248,18 @@ namespace Google.Protobuf
 
         public bool Equals(ByteString other)
         {
-            return this == other;
+            if (other.bytes.Length != bytes.Length)
+            {
+                return false;
+            }
+            for (int i = 0; i < bytes.Length; i++)
+            {
+                if (other.bytes[i] != bytes[i])
+                {
+                    return false;
+                }
+            }
+            return true;
         }
 
         /// <summary>

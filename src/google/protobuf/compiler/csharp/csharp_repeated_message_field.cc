@@ -39,8 +39,6 @@
 
 #include <google/protobuf/compiler/csharp/csharp_helpers.h>
 #include <google/protobuf/compiler/csharp/csharp_repeated_message_field.h>
-#include <google/protobuf/compiler/csharp/csharp_message_field.h>
-#include <google/protobuf/compiler/csharp/csharp_wrapper_field.h>
 
 namespace google {
 namespace protobuf {
@@ -60,18 +58,7 @@ void RepeatedMessageFieldGenerator::GenerateMembers(io::Printer* printer) {
   printer->Print(
     variables_,
     "private static readonly pb::FieldCodec<$type_name$> _repeated_$name$_codec\n"
-    "    = ");
-  // Don't want to duplicate the codec code here... maybe we should have a
-  // "create single field generator for this repeated field"
-  // function, but it doesn't seem worth it for just this.
-  if (IsWrapperType(descriptor_)) {
-    scoped_ptr<FieldGeneratorBase> single_generator(new WrapperFieldGenerator(descriptor_, fieldOrdinal_));
-    single_generator->GenerateCodecCode(printer);
-  } else {
-    scoped_ptr<FieldGeneratorBase> single_generator(new MessageFieldGenerator(descriptor_, fieldOrdinal_));
-    single_generator->GenerateCodecCode(printer);
-  }
-  printer->Print(";\n");
+    "    = pb::FieldCodec.ForMessage($tag$, $type_name$.Parser);\n");
   printer->Print(
     variables_,
     "private readonly pbc::RepeatedField<$type_name$> $name$_ = new pbc::RepeatedField<$type_name$>();\n");
