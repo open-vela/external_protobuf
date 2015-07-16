@@ -129,7 +129,8 @@ namespace Google.Protobuf
         public static int ComputeStringSize(String value)
         {
             int byteArraySize = Utf8Encoding.GetByteCount(value);
-            return ComputeLengthSize(byteArraySize) + byteArraySize;
+            return ComputeRawVarint32Size((uint) byteArraySize) +
+                   byteArraySize;
         }
 
         /// <summary>
@@ -148,7 +149,7 @@ namespace Google.Protobuf
         public static int ComputeMessageSize(IMessage value)
         {
             int size = value.CalculateSize();
-            return ComputeLengthSize(size) + size;
+            return ComputeRawVarint32Size((uint) size) + size;
         }
 
         /// <summary>
@@ -157,7 +158,8 @@ namespace Google.Protobuf
         /// </summary>
         public static int ComputeBytesSize(ByteString value)
         {
-            return ComputeLengthSize(value.Length) + value.Length;
+            return ComputeRawVarint32Size((uint) value.Length) +
+                   value.Length;
         }
 
         /// <summary>
