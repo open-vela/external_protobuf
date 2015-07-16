@@ -29,7 +29,7 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
-
+    
 using System;
 using System.Collections.Generic;
 
@@ -43,7 +43,7 @@ namespace Google.Protobuf
         // TODO: Avoid the "dual hit" of lambda expressions: create open delegates instead. (At least test...)
         public static FieldCodec<string> ForString(uint tag)
         {
-            return new FieldCodec<string>(input => input.ReadString(), (output, value) => output.WriteString(value), CodedOutputStream.ComputeStringSize, tag);
+            return new FieldCodec<string>(input => input.ReadString(), (output, value) => output.WriteString(value), CodedOutputStream.ComputeStringSize, tag); 
         }
 
         public static FieldCodec<ByteString> ForBytes(uint tag)
@@ -131,106 +131,6 @@ namespace Google.Protobuf
             return new FieldCodec<T>(input => { T message = parser.CreateTemplate(); input.ReadMessage(message); return message; },
                 (output, value) => output.WriteMessage(value), message => CodedOutputStream.ComputeMessageSize(message), tag);
         }
-
-        /// <summary>
-        /// Creates a codec for a wrapper type of a class - which must be string or ByteString.
-        /// </summary>
-        public static FieldCodec<T> ForClassWrapper<T>(uint tag) where T : class
-        {
-            var nestedCodec = WrapperCodecs.GetCodec<T>();
-            return new FieldCodec<T>(
-                input => WrapperCodecs.Read<T>(input, nestedCodec),
-                (output, value) => WrapperCodecs.Write<T>(output, value, nestedCodec),
-                value => WrapperCodecs.CalculateSize<T>(value, nestedCodec),
-                tag,
-                null); // Default value for the wrapper
-        }
-
-        /// <summary>
-        /// Creates a codec for a wrapper type of a struct - which must be Int32, Int64, UInt32, UInt64,
-        /// Bool, Single or Double.
-        /// </summary>
-        public static FieldCodec<T?> ForStructWrapper<T>(uint tag) where T : struct
-        {
-            var nestedCodec = WrapperCodecs.GetCodec<T>();
-            return new FieldCodec<T?>(
-                input => WrapperCodecs.Read<T>(input, nestedCodec),
-                (output, value) => WrapperCodecs.Write<T>(output, value.Value, nestedCodec),
-                value => value == null ? 0 : WrapperCodecs.CalculateSize<T>(value.Value, nestedCodec),
-                tag,
-                null); // Default value for the wrapper
-        }
-
-        // Helper code to create codecs for wrapper types. Somewhat ugly with all the 
-        private static class WrapperCodecs
-        {
-            private static readonly Dictionary<Type, object> Codecs = new Dictionary<Type, object>
-            {
-                { typeof(bool), ForBool(WireFormat.MakeTag(1, WireFormat.WireType.Varint)) },
-                { typeof(int), ForInt32(WireFormat.MakeTag(1, WireFormat.WireType.Varint)) },
-                { typeof(long), ForInt64(WireFormat.MakeTag(1, WireFormat.WireType.Varint)) },
-                { typeof(uint), ForUInt32(WireFormat.MakeTag(1, WireFormat.WireType.Varint)) },
-                { typeof(ulong), ForUInt64(WireFormat.MakeTag(1, WireFormat.WireType.Varint)) },
-                { typeof(float), ForFloat(WireFormat.MakeTag(1, WireFormat.WireType.Fixed32)) },
-                { typeof(double), ForDouble(WireFormat.MakeTag(1, WireFormat.WireType.Fixed64)) },
-                { typeof(string), ForString(WireFormat.MakeTag(1, WireFormat.WireType.LengthDelimited)) },
-                { typeof(ByteString), ForBytes(WireFormat.MakeTag(1, WireFormat.WireType.LengthDelimited)) }
-            };
-
-            /// <summary>
-            /// Returns a field codec which effectively wraps a value of type T in a message.
-            /// 
-            /// </summary>
-            internal static FieldCodec<T> GetCodec<T>()
-            {
-                object value;
-                if (!Codecs.TryGetValue(typeof(T), out value))
-                {
-                    throw new InvalidOperationException("Invalid type argument requested for wrapper codec: " + typeof(T));
-                }
-                return (FieldCodec<T>) value;
-            }
-
-            internal static T Read<T>(CodedInputStream input, FieldCodec<T> codec)
-            {
-                int length = input.ReadLength();
-                int oldLimit = input.PushLimit(length);
-
-                uint tag;
-                T value = codec.DefaultValue;
-                while (input.ReadTag(out tag))
-                {
-                    if (tag == 0)
-                    {
-                        throw InvalidProtocolBufferException.InvalidTag();
-                    }
-                    if (tag == codec.Tag)
-                    {
-                        value = codec.Read(input);
-                    }
-                    if (WireFormat.IsEndGroupTag(tag))
-                    {
-                        break;
-                    }
-                }
-                input.CheckLastTagWas(0);
-                input.PopLimit(oldLimit);
-
-                return value;
-            }
-
-            internal static void Write<T>(CodedOutputStream output, T value, FieldCodec<T> codec)
-            {
-                output.WriteLength(codec.CalculateSizeWithTag(value));
-                codec.WriteTagAndValue(output, value);
-            }
-
-            internal  static int CalculateSize<T>(T value, FieldCodec<T> codec)
-            {
-                int fieldLength = codec.CalculateSizeWithTag(value);
-                return CodedOutputStream.ComputeLengthSize(fieldLength) + fieldLength;
-            }
-        }
     }
 
     /// <summary>
@@ -244,19 +144,31 @@ namespace Google.Protobuf
     /// </remarks>
     public sealed class FieldCodec<T>
     {
-        private static readonly T DefaultDefault;
+        private static readonly Func<T, bool> IsDefault;
+        private static readonly T Default;
 
         static FieldCodec()
         {
             if (typeof(T) == typeof(string))
             {
-                DefaultDefault = (T)(object)"";
+                Default = (T)(object)"";
+                IsDefault = CreateDefaultValueCheck<string>(x => x.Length == 0);
             }
             else if (typeof(T) == typeof(ByteString))
             {
-                DefaultDefault = (T)(object)ByteString.Empty;
+                Default = (T)(object)ByteString.Empty;
+                IsDefault = CreateDefaultValueCheck<ByteString>(x => x.Length == 0);
             }
-            // Otherwise it's the default value of the CLR type
+            else if (!typeof(T).IsValueType)
+            {
+                // Default default
+                IsDefault = CreateDefaultValueCheck<T>(x => x == null);
+            }
+            else
+            {
+                // Default default
+                IsDefault = CreateDefaultValueCheck<T>(x => EqualityComparer<T>.Default.Equals(x, default(T)));
+            }
         }
 
         private static Func<T, bool> CreateDefaultValueCheck<TTmp>(Func<TTmp, bool> check)
@@ -270,32 +182,18 @@ namespace Google.Protobuf
         private readonly uint tag;
         private readonly int tagSize;
         private readonly int fixedSize;
-        // Default value for this codec. Usually the same for every instance of the same type, but
-        // for string/ByteString wrapper fields the codec's default value is null, whereas for
-        // other string/ByteString fields it's "" or ByteString.Empty.
-        private readonly T defaultValue;
 
         internal FieldCodec(
             Func<CodedInputStream, T> reader,
             Action<CodedOutputStream, T> writer,
             Func<T, int> sizeCalculator,
-            uint tag) : this(reader, writer, sizeCalculator, tag, DefaultDefault)
-        {
-        }
-
-        internal FieldCodec(
-            Func<CodedInputStream, T> reader,
-            Action<CodedOutputStream, T> writer,
-            Func<T, int> sizeCalculator,
-            uint tag,
-            T defaultValue)
+            uint tag)
         {
             this.reader = reader;
             this.writer = writer;
             this.sizeCalculator = sizeCalculator;
             this.fixedSize = 0;
             this.tag = tag;
-            this.defaultValue = defaultValue;
             tagSize = CodedOutputStream.ComputeRawVarint32Size(tag);
         }
 
@@ -336,7 +234,7 @@ namespace Google.Protobuf
 
         public uint Tag { get { return tag; } }
 
-        public T DefaultValue { get { return defaultValue; } }
+        public T DefaultValue { get { return Default; } }
 
         /// <summary>
         /// Write a tag and the given value, *if* the value is not the default.
@@ -362,11 +260,6 @@ namespace Google.Protobuf
         public int CalculateSizeWithTag(T value)
         {
             return IsDefault(value) ? 0 : sizeCalculator(value) + tagSize;
-        }
-
-        private bool IsDefault(T value)
-        {
-            return EqualityComparer<T>.Default.Equals(value, defaultValue);
-        }
+        }        
     }
 }
