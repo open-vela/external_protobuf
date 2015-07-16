@@ -69,14 +69,15 @@ CSharpType GetCSharpType(FieldDescriptor::Type type);
 
 std::string StripDotProto(const std::string& proto_file);
 
+std::string GetFileNamespace(const FileDescriptor* descriptor);
 std::string GetFileUmbrellaClassname(const FileDescriptor* descriptor);
-
 std::string GetFileUmbrellaNamespace(const FileDescriptor* descriptor);
 
 std::string GetFullUmbrellaClassName(const FileDescriptor* descriptor);
 
 std::string GetQualifiedUmbrellaClassName(const FileDescriptor* descriptor);
 
+std::string GetClassName(const Descriptor* descriptor);
 std::string GetClassName(const EnumDescriptor* descriptor);
 
 std::string GetFieldName(const FieldDescriptor* descriptor);
@@ -117,6 +118,15 @@ inline bool IsDescriptorProto(const FileDescriptor* descriptor) {
   // TODO: Do this better! (Currently this depends on a hack in generate_protos.sh to rename
   // the file...)
   return descriptor->name() == "google/protobuf/descriptor_proto_file.proto";
+}
+
+inline bool IsMapEntry(const Descriptor* descriptor) {
+    return descriptor->options().map_entry();
+}
+
+inline bool IsWrapperType(const FieldDescriptor* descriptor) {
+  return descriptor->type() == FieldDescriptor::TYPE_MESSAGE &&
+      descriptor->message_type()->file()->name() == "google/protobuf/wrappers.proto";
 }
 
 }  // namespace csharp
