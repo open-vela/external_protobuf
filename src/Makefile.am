@@ -71,6 +71,7 @@ nobase_include_HEADERS =                                        \
   google/protobuf/stubs/atomicops_internals_tsan.h              \
   google/protobuf/stubs/atomicops_internals_x86_gcc.h           \
   google/protobuf/stubs/atomicops_internals_x86_msvc.h          \
+  google/protobuf/stubs/bytestream.h                            \
   google/protobuf/stubs/casts.h                                 \
   google/protobuf/stubs/common.h                                \
   google/protobuf/stubs/fastmem.h                               \
@@ -79,7 +80,9 @@ nobase_include_HEADERS =                                        \
   google/protobuf/stubs/platform_macros.h                       \
   google/protobuf/stubs/shared_ptr.h                            \
   google/protobuf/stubs/singleton.h                             \
+  google/protobuf/stubs/status.h                                \
   google/protobuf/stubs/stl_util.h                              \
+  google/protobuf/stubs/stringpiece.h                           \
   google/protobuf/stubs/template_util.h                         \
   google/protobuf/stubs/type_traits.h                           \
   google/protobuf/any.pb.h                                      \
@@ -147,7 +150,6 @@ nobase_include_HEADERS =                                        \
   google/protobuf/compiler/python/python_generator.h            \
   google/protobuf/compiler/ruby/ruby_generator.h                \
   google/protobuf/compiler/csharp/csharp_generator.h            \
-  google/protobuf/compiler/csharp/csharp_names.h                \
   google/protobuf/util/type_resolver.h                          \
   google/protobuf/util/type_resolver_util.h                     \
   google/protobuf/util/json_util.h                              \
@@ -420,13 +422,13 @@ libprotoc_la_SOURCES =                                         \
   google/protobuf/compiler/csharp/csharp_enum.h                \
   google/protobuf/compiler/csharp/csharp_enum_field.cc         \
   google/protobuf/compiler/csharp/csharp_enum_field.h          \
+  google/protobuf/compiler/csharp/csharp_extension.cc          \
+  google/protobuf/compiler/csharp/csharp_extension.h           \
   google/protobuf/compiler/csharp/csharp_field_base.cc         \
   google/protobuf/compiler/csharp/csharp_field_base.h          \
   google/protobuf/compiler/csharp/csharp_generator.cc          \
   google/protobuf/compiler/csharp/csharp_helpers.cc            \
   google/protobuf/compiler/csharp/csharp_helpers.h             \
-  google/protobuf/compiler/csharp/csharp_map_field.cc          \
-  google/protobuf/compiler/csharp/csharp_map_field.h           \
   google/protobuf/compiler/csharp/csharp_message.cc            \
   google/protobuf/compiler/csharp/csharp_message.h             \
   google/protobuf/compiler/csharp/csharp_message_field.cc      \
@@ -443,8 +445,8 @@ libprotoc_la_SOURCES =                                         \
   google/protobuf/compiler/csharp/csharp_source_generator_base.h \
   google/protobuf/compiler/csharp/csharp_umbrella_class.cc     \
   google/protobuf/compiler/csharp/csharp_umbrella_class.h      \
-  google/protobuf/compiler/csharp/csharp_wrapper_field.cc      \
-  google/protobuf/compiler/csharp/csharp_wrapper_field.h
+  google/protobuf/compiler/csharp/csharp_writer.cc             \
+  google/protobuf/compiler/csharp/csharp_writer.h
 
 bin_PROGRAMS = protoc
 protoc_LDADD = $(PTHREAD_LIBS) libprotobuf.la libprotoc.la
