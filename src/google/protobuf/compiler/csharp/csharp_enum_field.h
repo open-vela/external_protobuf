@@ -46,7 +46,6 @@ class EnumFieldGenerator : public PrimitiveFieldGenerator {
   EnumFieldGenerator(const FieldDescriptor* descriptor, int fieldOrdinal);
   ~EnumFieldGenerator();
 
-  virtual void GenerateCodecCode(io::Printer* printer);
   virtual void GenerateParsingCode(io::Printer* printer);
   virtual void GenerateSerializationCode(io::Printer* printer);
   virtual void GenerateSerializedSizeCode(io::Printer* printer);
