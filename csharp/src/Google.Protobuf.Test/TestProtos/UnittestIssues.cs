@@ -96,6 +96,13 @@ namespace UnitTest.Issues.TestProtos {
       return new Issue307(this);
     }
 
+    public void Freeze() {
+      if (IsFrozen) {
+        return;
+      }
+      _frozen = true;
+    }
+
     public override bool Equals(object other) {
       return Equals(other as Issue307);
     }
@@ -180,6 +187,13 @@ namespace UnitTest.Issues.TestProtos {
           return new NestedOnce(this);
         }
 
+        public void Freeze() {
+          if (IsFrozen) {
+            return;
+          }
+          _frozen = true;
+        }
+
         public override bool Equals(object other) {
           return Equals(other as NestedOnce);
         }
@@ -262,6 +276,13 @@ namespace UnitTest.Issues.TestProtos {
 
             public NestedTwice Clone() {
               return new NestedTwice(this);
+            }
+
+            public void Freeze() {
+              if (IsFrozen) {
+                return;
+              }
+              _frozen = true;
             }
 
             public override bool Equals(object other) {
@@ -360,11 +381,21 @@ namespace UnitTest.Issues.TestProtos {
       return new NegativeEnumMessage(this);
     }
 
+    public void Freeze() {
+      if (IsFrozen) {
+        return;
+      }
+      _frozen = true;
+      values_.Freeze();
+      packedValues_.Freeze();
+    }
+
     public const int ValueFieldNumber = 1;
     private global::UnitTest.Issues.TestProtos.NegativeEnum value_ = global::UnitTest.Issues.TestProtos.NegativeEnum.NEGATIVE_ENUM_ZERO;
     public global::UnitTest.Issues.TestProtos.NegativeEnum Value {
       get { return value_; }
       set {
+        pb::Freezable.CheckMutable(this);
         value_ = value;
       }
     }
@@ -504,6 +535,13 @@ namespace UnitTest.Issues.TestProtos {
       return new DeprecatedChild(this);
     }
 
+    public void Freeze() {
+      if (IsFrozen) {
+        return;
+      }
+      _frozen = true;
+    }
+
     public override bool Equals(object other) {
       return Equals(other as DeprecatedChild);
     }
@@ -593,12 +631,24 @@ namespace UnitTest.Issues.TestProtos {
       return new DeprecatedFieldsMessage(this);
     }
 
+    public void Freeze() {
+      if (IsFrozen) {
+        return;
+      }
+      _frozen = true;
+      primitiveArray_.Freeze();
+      if (messageValue_ != null) MessageValue.Freeze();
+      messageArray_.Freeze();
+      enumArray_.Freeze();
+    }
+
     public const int PrimitiveValueFieldNumber = 1;
     private int primitiveValue_;
     [global::System.ObsoleteAttribute()]
     public int PrimitiveValue {
       get { return primitiveValue_; }
       set {
+        pb::Freezable.CheckMutable(this);
         primitiveValue_ = value;
       }
     }
@@ -618,6 +668,7 @@ namespace UnitTest.Issues.TestProtos {
     public global::UnitTest.Issues.TestProtos.DeprecatedChild MessageValue {
       get { return messageValue_; }
       set {
+        pb::Freezable.CheckMutable(this);
         messageValue_ = value;
       }
     }
@@ -637,6 +688,7 @@ namespace UnitTest.Issues.TestProtos {
     public global::UnitTest.Issues.TestProtos.DeprecatedEnum EnumValue {
       get { return enumValue_; }
       set {
+        pb::Freezable.CheckMutable(this);
         enumValue_ = value;
       }
     }
@@ -817,11 +869,19 @@ namespace UnitTest.Issues.TestProtos {
       return new ItemField(this);
     }
 
+    public void Freeze() {
+      if (IsFrozen) {
+        return;
+      }
+      _frozen = true;
+    }
+
     public const int ItemFieldNumber = 1;
     private int item_;
     public int Item {
       get { return item_; }
       set {
+        pb::Freezable.CheckMutable(this);
         item_ = value;
       }
     }

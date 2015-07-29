@@ -87,6 +87,14 @@ namespace Google.Protobuf.WellKnownTypes {
       return new Struct(this);
     }
 
+    public void Freeze() {
+      if (IsFrozen) {
+        return;
+      }
+      _frozen = true;
+      fields_.Freeze();
+    }
+
     public const int FieldsFieldNumber = 1;
     private static readonly pbc::MapField<string, global::Google.Protobuf.WellKnownTypes.Value>.Codec _map_fields_codec
         = new pbc::MapField<string, global::Google.Protobuf.WellKnownTypes.Value>.Codec(pb::FieldCodec.ForString(10), pb::FieldCodec.ForMessage(18, global::Google.Protobuf.WellKnownTypes.Value.Parser), 10);
@@ -208,10 +216,19 @@ namespace Google.Protobuf.WellKnownTypes {
       return new Value(this);
     }
 
+    public void Freeze() {
+      if (IsFrozen) {
+        return;
+      }
+      _frozen = true;
+      if (kind_ is IFreezable) ((IFreezable) kind_).Freeze();
+    }
+
     public const int NullValueFieldNumber = 1;
     public global::Google.Protobuf.WellKnownTypes.NullValue NullValue {
       get { return kindCase_ == KindOneofCase.NullValue ? (global::Google.Protobuf.WellKnownTypes.NullValue) kind_ : global::Google.Protobuf.WellKnownTypes.NullValue.NULL_VALUE; }
       set {
+        pb::Freezable.CheckMutable(this);
         kind_ = value;
         kindCase_ = KindOneofCase.NullValue;
       }
@@ -221,6 +238,7 @@ namespace Google.Protobuf.WellKnownTypes {
     public double NumberValue {
       get { return kindCase_ == KindOneofCase.NumberValue ? (double) kind_ : 0D; }
       set {
+        pb::Freezable.CheckMutable(this);
         kind_ = value;
         kindCase_ = KindOneofCase.NumberValue;
       }
@@ -230,6 +248,7 @@ namespace Google.Protobuf.WellKnownTypes {
     public string StringValue {
       get { return kindCase_ == KindOneofCase.StringValue ? (string) kind_ : ""; }
       set {
+        pb::Freezable.CheckMutable(this);
         kind_ = value ?? "";
         kindCase_ = KindOneofCase.StringValue;
       }
@@ -239,6 +258,7 @@ namespace Google.Protobuf.WellKnownTypes {
     public bool BoolValue {
       get { return kindCase_ == KindOneofCase.BoolValue ? (bool) kind_ : false; }
       set {
+        pb::Freezable.CheckMutable(this);
         kind_ = value;
         kindCase_ = KindOneofCase.BoolValue;
       }
@@ -248,6 +268,7 @@ namespace Google.Protobuf.WellKnownTypes {
     public global::Google.Protobuf.WellKnownTypes.Struct StructValue {
       get { return kindCase_ == KindOneofCase.StructValue ? (global::Google.Protobuf.WellKnownTypes.Struct) kind_ : null; }
       set {
+        pb::Freezable.CheckMutable(this);
         kind_ = value;
         kindCase_ = value == null ? KindOneofCase.None : KindOneofCase.StructValue;
       }
@@ -257,6 +278,7 @@ namespace Google.Protobuf.WellKnownTypes {
     public global::Google.Protobuf.WellKnownTypes.ListValue ListValue {
       get { return kindCase_ == KindOneofCase.ListValue ? (global::Google.Protobuf.WellKnownTypes.ListValue) kind_ : null; }
       set {
+        pb::Freezable.CheckMutable(this);
         kind_ = value;
         kindCase_ = value == null ? KindOneofCase.None : KindOneofCase.ListValue;
       }
@@ -278,6 +300,7 @@ namespace Google.Protobuf.WellKnownTypes {
     }
 
     public void ClearKind() {
+      pb::Freezable.CheckMutable(this);
       kindCase_ = KindOneofCase.None;
       kind_ = null;
     }
@@ -474,6 +497,14 @@ namespace Google.Protobuf.WellKnownTypes {
 
     public ListValue Clone() {
       return new ListValue(this);
+    }
+
+    public void Freeze() {
+      if (IsFrozen) {
+        return;
+      }
+      _frozen = true;
+      values_.Freeze();
     }
 
     public const int ValuesFieldNumber = 1;

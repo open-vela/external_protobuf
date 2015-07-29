@@ -74,11 +74,20 @@ namespace Google.Protobuf.Examples.AddressBook {
       return new Person(this);
     }
 
+    public void Freeze() {
+      if (IsFrozen) {
+        return;
+      }
+      _frozen = true;
+      phones_.Freeze();
+    }
+
     public const int NameFieldNumber = 1;
     private string name_ = "";
     public string Name {
       get { return name_; }
       set {
+        pb::Freezable.CheckMutable(this);
         name_ = value ?? "";
       }
     }
@@ -88,6 +97,7 @@ namespace Google.Protobuf.Examples.AddressBook {
     public int Id {
       get { return id_; }
       set {
+        pb::Freezable.CheckMutable(this);
         id_ = value;
       }
     }
@@ -97,6 +107,7 @@ namespace Google.Protobuf.Examples.AddressBook {
     public string Email {
       get { return email_; }
       set {
+        pb::Freezable.CheckMutable(this);
         email_ = value ?? "";
       }
     }
@@ -258,11 +269,19 @@ namespace Google.Protobuf.Examples.AddressBook {
           return new PhoneNumber(this);
         }
 
+        public void Freeze() {
+          if (IsFrozen) {
+            return;
+          }
+          _frozen = true;
+        }
+
         public const int NumberFieldNumber = 1;
         private string number_ = "";
         public string Number {
           get { return number_; }
           set {
+            pb::Freezable.CheckMutable(this);
             number_ = value ?? "";
           }
         }
@@ -272,6 +291,7 @@ namespace Google.Protobuf.Examples.AddressBook {
         public global::Google.Protobuf.Examples.AddressBook.Person.Types.PhoneType Type {
           get { return type_; }
           set {
+            pb::Freezable.CheckMutable(this);
             type_ = value;
           }
         }
@@ -395,6 +415,14 @@ namespace Google.Protobuf.Examples.AddressBook {
 
     public AddressBook Clone() {
       return new AddressBook(this);
+    }
+
+    public void Freeze() {
+      if (IsFrozen) {
+        return;
+      }
+      _frozen = true;
+      people_.Freeze();
     }
 
     public const int PeopleFieldNumber = 1;

@@ -129,6 +129,8 @@ void MapFieldGenerator::GenerateCloningCode(io::Printer* printer) {
 }
 
 void MapFieldGenerator::GenerateFreezingCode(io::Printer* printer) {
+  printer->Print(variables_,
+    "$name$_.Freeze();\n");
 }
 
 }  // namespace csharp

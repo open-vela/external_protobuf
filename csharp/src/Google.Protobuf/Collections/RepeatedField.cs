@@ -43,7 +43,7 @@ namespace Google.Protobuf.Collections
     /// restrictions (no null values) and capabilities (deep cloning and freezing).
     /// </summary>
     /// <typeparam name="T">The element type of the repeated field.</typeparam>
-    public sealed class RepeatedField<T> : IList<T>, IList, IDeepCloneable<RepeatedField<T>>, IEquatable<RepeatedField<T>>
+    public sealed class RepeatedField<T> : IList<T>, IList, IDeepCloneable<RepeatedField<T>>, IEquatable<RepeatedField<T>>, IFreezable
     {
         private static readonly T[] EmptyArray = new T[0];
         private const int MinArraySize = 8;
@@ -190,6 +190,21 @@ namespace Google.Protobuf.Collections
             }
         }
 
+        public bool IsFrozen { get { return frozen; } }
+
+        public void Freeze()
+        {
+            frozen = true;
+            IFreezable[] freezableArray = array as IFreezable[];
+            if (freezableArray != null)
+            {
+                for (int i = 0; i < count; i++)
+                {
+                    freezableArray[i].Freeze();
+                }
+            }
+        }
+
         private void EnsureSize(int size)
         {
             if (array.Length < size)
@@ -208,12 +223,14 @@ namespace Google.Protobuf.Collections
             {
                 throw new ArgumentNullException("item");
             }
+            this.CheckMutable();
             EnsureSize(count + 1);
             array[count++] = item;
         }
 
         public void Clear()
         {
+            this.CheckMutable();
             array = EmptyArray;
             count = 0;
         }
@@ -230,6 +247,7 @@ namespace Google.Protobuf.Collections
 
         public bool Remove(T item)
         {
+            this.CheckMutable();
             int index = IndexOf(item);
             if (index == -1)
             {
@@ -243,7 +261,7 @@ namespace Google.Protobuf.Collections
 
         public int Count { get { return count; } }
 
-        public bool IsReadOnly { get { return false; } }
+        public bool IsReadOnly { get { return IsFrozen; } }
 
         public void Add(RepeatedField<T> values)
         {
@@ -251,6 +269,7 @@ namespace Google.Protobuf.Collections
             {
                 throw new ArgumentNullException("values");
             }
+            this.CheckMutable();
             EnsureSize(count + values.count);
             // We know that all the values will be valid, because it's a RepeatedField.
             Array.Copy(values.array, 0, array, count, values.count);
@@ -263,6 +282,7 @@ namespace Google.Protobuf.Collections
             {
                 throw new ArgumentNullException("values");
             }
+            this.CheckMutable();
             // TODO: Check for ICollection and get the Count?
             foreach (T item in values)
             {
@@ -352,6 +372,7 @@ namespace Google.Protobuf.Collections
             {
                 throw new ArgumentOutOfRangeException("index");
             }
+            this.CheckMutable();
             EnsureSize(count + 1);
             Array.Copy(array, index, array, index + 1, count - index);
             array[index] = item;
@@ -364,6 +385,7 @@ namespace Google.Protobuf.Collections
             {
                 throw new ArgumentOutOfRangeException("index");
             }
+            this.CheckMutable();
             Array.Copy(array, index + 1, array, index, count - index - 1);
             count--;
             array[count] = default(T);
@@ -385,6 +407,7 @@ namespace Google.Protobuf.Collections
                 {
                     throw new ArgumentOutOfRangeException("index");
                 }
+                this.CheckMutable();
                 if (value == null)
                 {
                     throw new ArgumentNullException("value");
@@ -394,7 +417,7 @@ namespace Google.Protobuf.Collections
         }
 
         #region Explicit interface implementation for IList and ICollection.
-        bool IList.IsFixedSize { get { return false; } }
+        bool IList.IsFixedSize { get { return IsFrozen; } }
 
         void ICollection.CopyTo(Array array, int index)
         {

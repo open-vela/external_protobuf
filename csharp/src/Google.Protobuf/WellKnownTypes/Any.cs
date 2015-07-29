@@ -69,11 +69,19 @@ namespace Google.Protobuf.WellKnownTypes {
       return new Any(this);
     }
 
+    public void Freeze() {
+      if (IsFrozen) {
+        return;
+      }
+      _frozen = true;
+    }
+
     public const int TypeUrlFieldNumber = 1;
     private string typeUrl_ = "";
     public string TypeUrl {
       get { return typeUrl_; }
       set {
+        pb::Freezable.CheckMutable(this);
         typeUrl_ = value ?? "";
       }
     }
@@ -83,6 +91,7 @@ namespace Google.Protobuf.WellKnownTypes {
     public pb::ByteString Value {
       get { return value_; }
       set {
+        pb::Freezable.CheckMutable(this);
         value_ = value ?? pb::ByteString.Empty;
       }
     }
