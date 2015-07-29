@@ -82,11 +82,22 @@ namespace Google.Protobuf.WellKnownTypes {
       return new Api(this);
     }
 
+    public void Freeze() {
+      if (IsFrozen) {
+        return;
+      }
+      _frozen = true;
+      methods_.Freeze();
+      options_.Freeze();
+      if (sourceContext_ != null) SourceContext.Freeze();
+    }
+
     public const int NameFieldNumber = 1;
     private string name_ = "";
     public string Name {
       get { return name_; }
       set {
+        pb::Freezable.CheckMutable(this);
         name_ = value ?? "";
       }
     }
@@ -112,6 +123,7 @@ namespace Google.Protobuf.WellKnownTypes {
     public string Version {
       get { return version_; }
       set {
+        pb::Freezable.CheckMutable(this);
         version_ = value ?? "";
       }
     }
@@ -121,6 +133,7 @@ namespace Google.Protobuf.WellKnownTypes {
     public global::Google.Protobuf.WellKnownTypes.SourceContext SourceContext {
       get { return sourceContext_; }
       set {
+        pb::Freezable.CheckMutable(this);
         sourceContext_ = value;
       }
     }
@@ -286,11 +299,20 @@ namespace Google.Protobuf.WellKnownTypes {
       return new Method(this);
     }
 
+    public void Freeze() {
+      if (IsFrozen) {
+        return;
+      }
+      _frozen = true;
+      options_.Freeze();
+    }
+
     public const int NameFieldNumber = 1;
     private string name_ = "";
     public string Name {
       get { return name_; }
       set {
+        pb::Freezable.CheckMutable(this);
         name_ = value ?? "";
       }
     }
@@ -300,6 +322,7 @@ namespace Google.Protobuf.WellKnownTypes {
     public string RequestTypeUrl {
       get { return requestTypeUrl_; }
       set {
+        pb::Freezable.CheckMutable(this);
         requestTypeUrl_ = value ?? "";
       }
     }
@@ -309,6 +332,7 @@ namespace Google.Protobuf.WellKnownTypes {
     public bool RequestStreaming {
       get { return requestStreaming_; }
       set {
+        pb::Freezable.CheckMutable(this);
         requestStreaming_ = value;
       }
     }
@@ -318,6 +342,7 @@ namespace Google.Protobuf.WellKnownTypes {
     public string ResponseTypeUrl {
       get { return responseTypeUrl_; }
       set {
+        pb::Freezable.CheckMutable(this);
         responseTypeUrl_ = value ?? "";
       }
     }
@@ -327,6 +352,7 @@ namespace Google.Protobuf.WellKnownTypes {
     public bool ResponseStreaming {
       get { return responseStreaming_; }
       set {
+        pb::Freezable.CheckMutable(this);
         responseStreaming_ = value;
       }
     }
