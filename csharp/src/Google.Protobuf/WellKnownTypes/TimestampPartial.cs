@@ -147,7 +147,7 @@ namespace Google.Protobuf.WellKnownTypes
             return FromDateTime(dateTimeOffset.UtcDateTime);
         }
 
-        internal static Timestamp Normalize(long seconds, int nanoseconds)
+        private static Timestamp Normalize(long seconds, int nanoseconds)
         {
             int extraSeconds = nanoseconds / Duration.NanosecondsPerSecond;
             seconds += extraSeconds;
