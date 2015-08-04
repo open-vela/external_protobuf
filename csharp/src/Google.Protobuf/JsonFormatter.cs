@@ -36,7 +36,6 @@ using System.Globalization;
 using System.Text;
 using Google.Protobuf.Reflection;
 using Google.Protobuf.WellKnownTypes;
-using System.Linq;
 
 namespace Google.Protobuf
 {
@@ -123,14 +122,10 @@ namespace Google.Protobuf
         {
             Preconditions.CheckNotNull(message, "message");
             StringBuilder builder = new StringBuilder();
-            if (message.Descriptor.IsWellKnownType)
-            {
-                WriteWellKnownTypeValue(builder, message.Descriptor, message, false);
-            }
-            else
-            {
-                WriteMessage(builder, message);
-            }
+            // TODO(jonskeet): Handle well-known types here.
+            // Our reflection support needs improving so that we can get at the descriptor
+            // to find out whether *this* message is a well-known type.
+            WriteMessage(builder, message);
             return builder.ToString();
         }
 
@@ -150,14 +145,13 @@ namespace Google.Protobuf
                 var accessor = field.Accessor;
                 // Oneofs are written later
                 // TODO: Change to write out fields in order, interleaving oneofs appropriately (as per binary format)
-                if (field.ContainingOneof != null && field.ContainingOneof.Accessor.GetCaseFieldDescriptor(message) != field)
+                if (field.ContainingOneof != null)
                 {
                     continue;
                 }
-                // Omit default values unless we're asked to format them, or they're oneofs (where the default
-                // value is still formatted regardless, because that's how we preserve the oneof case).
+                // Omit default values unless we're asked to format them
                 object value = accessor.GetValue(message);
-                if (field.ContainingOneof == null && !settings.FormatDefaultValues && IsDefaultValue(accessor, value))
+                if (!settings.FormatDefaultValues && IsDefaultValue(accessor, value))
                 {
                     continue;
                 }
@@ -176,7 +170,33 @@ namespace Google.Protobuf
                 builder.Append(": ");
                 WriteValue(builder, accessor, value);
                 first = false;
-            }            
+            }
+
+            // Now oneofs
+            foreach (var oneof in message.Descriptor.Oneofs)
+            {
+                var accessor = oneof.Accessor;
+                var fieldDescriptor = accessor.GetCaseFieldDescriptor(message);
+                if (fieldDescriptor == null)
+                {
+                    continue;
+                }
+                object value = fieldDescriptor.Accessor.GetValue(message);
+                // Omit awkward (single) values such as unknown enum values
+                if (!fieldDescriptor.IsRepeated && !fieldDescriptor.IsMap && !CanWriteSingleValue(fieldDescriptor, value))
+                {
+                    continue;
+                }
+
+                if (!first)
+                {
+                    builder.Append(", ");
+                }
+                WriteString(builder, ToCamelCase(fieldDescriptor.Name));
+                builder.Append(": ");
+                WriteValue(builder, fieldDescriptor.Accessor, value);
+                first = false;
+            }
             builder.Append(first ? "}" : " }");
         }
 
@@ -361,7 +381,7 @@ namespace Google.Protobuf
                 case FieldType.Group: // Never expect to get this, but...
                     if (descriptor.MessageType.IsWellKnownType)
                     {
-                        WriteWellKnownTypeValue(builder, descriptor.MessageType, value, true);
+                        WriteWellKnownTypeValue(builder, descriptor, value);
                     }
                     else
                     {
@@ -375,202 +395,18 @@ namespace Google.Protobuf
 
         /// <summary>
         /// Central interception point for well-known type formatting. Any well-known types which
-        /// don't need special handling can fall back to WriteMessage. We avoid assuming that the
-        /// values are using the embedded well-known types, in order to allow for dynamic messages
-        /// in the future.
+        /// don't need special handling can fall back to WriteMessage.
         /// </summary>
-        private void WriteWellKnownTypeValue(StringBuilder builder, MessageDescriptor descriptor, object value, bool inField)
+        private void WriteWellKnownTypeValue(StringBuilder builder, FieldDescriptor descriptor, object value)
         {
-            if (value == null)
-            {
-                WriteNull(builder);
-                return;
-            }
             // For wrapper types, the value will be the (possibly boxed) "native" value,
             // so we can write it as if we were unconditionally writing the Value field for the wrapper type.
-            if (descriptor.File == Int32Value.Descriptor.File)
+            if (descriptor.MessageType.File == Int32Value.Descriptor.File && value != null)
             {
-                WriteSingleValue(builder, descriptor.FindFieldByNumber(1), value);
-                return;
-            }
-            if (descriptor.FullName == Timestamp.Descriptor.FullName)
-            {
-                MaybeWrapInString(builder, value, WriteTimestamp, inField);
-                return;
-            }
-            if (descriptor.FullName == Duration.Descriptor.FullName)
-            {
-                MaybeWrapInString(builder, value, WriteDuration, inField);
-                return;
-            }
-            if (descriptor.FullName == FieldMask.Descriptor.FullName)
-            {
-                MaybeWrapInString(builder, value, WriteFieldMask, inField);
-                return;
-            }
-            if (descriptor.FullName == Struct.Descriptor.FullName)
-            {
-                WriteStruct(builder, (IMessage) value);
-                return;
-            }
-            if (descriptor.FullName == ListValue.Descriptor.FullName)
-            {
-                var fieldAccessor = descriptor.Fields[ListValue.ValuesFieldNumber].Accessor;
-                WriteList(builder, fieldAccessor, (IList) fieldAccessor.GetValue(value));
-                return;
-            }
-            if (descriptor.FullName == Value.Descriptor.FullName)
-            {
-                WriteStructFieldValue(builder, (IMessage) value);
+                WriteSingleValue(builder, descriptor.MessageType.FindFieldByNumber(1), value);
                 return;
             }
             WriteMessage(builder, (IMessage) value);
-        }
-
-        /// <summary>
-        /// Some well-known types end up as string values... so they need wrapping in quotes, but only
-        /// when they're being used as fields within another message.
-        /// </summary>
-        private void MaybeWrapInString(StringBuilder builder, object value, Action<StringBuilder, IMessage> action, bool inField)
-        {
-            if (inField)
-            {
-                builder.Append('"');
-                action(builder, (IMessage) value);
-                builder.Append('"');
-            }
-            else
-            {
-                action(builder, (IMessage) value);
-            }
-        }
-
-        private void WriteTimestamp(StringBuilder builder, IMessage value)
-        {
-            // TODO: In the common case where this *is* using the built-in Timestamp type, we could
-            // avoid all the reflection at this point, by casting to Timestamp. In the interests of
-            // avoiding subtle bugs, don't do that until we've implemented DynamicMessage so that we can prove
-            // it still works in that case.
-            int nanos = (int) value.Descriptor.Fields[Timestamp.NanosFieldNumber].Accessor.GetValue(value);
-            long seconds = (long) value.Descriptor.Fields[Timestamp.SecondsFieldNumber].Accessor.GetValue(value);
-
-            // Even if the original message isn't using the built-in classes, we can still build one... and then
-            // rely on it being normalized.
-            Timestamp normalized = Timestamp.Normalize(seconds, nanos);
-            // Use .NET's formatting for the value down to the second, including an opening double quote (as it's a string value)
-            DateTime dateTime = normalized.ToDateTime();
-            builder.Append(dateTime.ToString("yyyy'-'MM'-'dd'T'HH:mm:ss", CultureInfo.InvariantCulture));
-            AppendNanoseconds(builder, Math.Abs(normalized.Nanos));
-            builder.Append('Z');
-        }
-
-        private void WriteDuration(StringBuilder builder, IMessage value)
-        {
-            // TODO: Same as for WriteTimestamp
-            int nanos = (int) value.Descriptor.Fields[Duration.NanosFieldNumber].Accessor.GetValue(value);
-            long seconds = (long) value.Descriptor.Fields[Duration.SecondsFieldNumber].Accessor.GetValue(value);
-
-            // Even if the original message isn't using the built-in classes, we can still build one... and then
-            // rely on it being normalized.
-            Duration normalized = Duration.Normalize(seconds, nanos);
-
-            // The seconds part will normally provide the minus sign if we need it, but not if it's 0...
-            if (normalized.Seconds == 0 && normalized.Nanos < 0)
-            {
-                builder.Append('-');
-            }
-
-            builder.Append(normalized.Seconds.ToString("d", CultureInfo.InvariantCulture));
-            AppendNanoseconds(builder, Math.Abs(normalized.Nanos));
-            builder.Append('s');
-        }
-
-        private void WriteFieldMask(StringBuilder builder, IMessage value)
-        {
-            IList paths = (IList) value.Descriptor.Fields[FieldMask.PathsFieldNumber].Accessor.GetValue(value);
-            AppendEscapedString(builder, string.Join(",", paths.Cast<string>().Select(ToCamelCase)));
-        }
-
-        /// <summary>
-        /// Appends a number of nanoseconds to a StringBuilder. Either 0 digits are added (in which
-        /// case no "." is appended), or 3 6 or 9 digits.
-        /// </summary>
-        private static void AppendNanoseconds(StringBuilder builder, int nanos)
-        {
-            if (nanos != 0)
-            {
-                builder.Append('.');
-                // Output to 3, 6 or 9 digits.
-                if (nanos % 1000000 == 0)
-                {
-                    builder.Append((nanos / 1000000).ToString("d", CultureInfo.InvariantCulture));
-                }
-                else if (nanos % 1000 == 0)
-                {
-                    builder.Append((nanos / 1000).ToString("d", CultureInfo.InvariantCulture));
-                }
-                else
-                {
-                    builder.Append(nanos.ToString("d", CultureInfo.InvariantCulture));
-                }
-            }
-        }
-
-        private void WriteStruct(StringBuilder builder, IMessage message)
-        {
-            builder.Append("{ ");
-            IDictionary fields = (IDictionary) message.Descriptor.Fields[Struct.FieldsFieldNumber].Accessor.GetValue(message);
-            bool first = true;
-            foreach (DictionaryEntry entry in fields)
-            {
-                string key = (string) entry.Key;
-                IMessage value = (IMessage) entry.Value;
-                if (string.IsNullOrEmpty(key) || value == null)
-                {
-                    throw new InvalidOperationException("Struct fields cannot have an empty key or a null value.");
-                }
-
-                if (!first)
-                {
-                    builder.Append(", ");
-                }
-                WriteString(builder, key);
-                builder.Append(": ");
-                WriteStructFieldValue(builder, value);
-                first = false;
-            }
-            builder.Append(first ? "}" : " }");
-        }
-
-        private void WriteStructFieldValue(StringBuilder builder, IMessage message)
-        {
-            var specifiedField = message.Descriptor.Oneofs[0].Accessor.GetCaseFieldDescriptor(message);
-            if (specifiedField == null)
-            {
-                throw new InvalidOperationException("Value message must contain a value for the oneof.");
-            }
-
-            object value = specifiedField.Accessor.GetValue(message);
-            
-            switch (specifiedField.FieldNumber)
-            {
-                case Value.BoolValueFieldNumber:
-                case Value.StringValueFieldNumber:
-                case Value.NumberValueFieldNumber:
-                    WriteSingleValue(builder, specifiedField, value);
-                    return;
-                case Value.StructValueFieldNumber:
-                case Value.ListValueFieldNumber:
-                    // Structs and ListValues are nested messages, and already well-known types.
-                    var nestedMessage = (IMessage) specifiedField.Accessor.GetValue(message);
-                    WriteWellKnownTypeValue(builder, nestedMessage.Descriptor, nestedMessage, true);
-                    return;
-                case Value.NullValueFieldNumber:
-                    WriteNull(builder);
-                    return;
-                default:
-                    throw new InvalidOperationException("Unexpected case in struct field: " + specifiedField.FieldNumber);
-            }
         }
 
         private void WriteList(StringBuilder builder, IFieldAccessor accessor, IList list)
@@ -666,15 +502,6 @@ namespace Google.Protobuf
         private void WriteString(StringBuilder builder, string text)
         {
             builder.Append('"');
-            AppendEscapedString(builder, text);
-            builder.Append('"');
-        }
-
-        /// <summary>
-        /// Appends the given text to the string builder, escaping as required.
-        /// </summary>
-        private void AppendEscapedString(StringBuilder builder, string text)
-        {
             for (int i = 0; i < text.Length; i++)
             {
                 char c = text[i];
@@ -734,11 +561,13 @@ namespace Google.Protobuf
                         break;
                 }
             }
+            builder.Append('"');
         }
 
         private const string Hex = "0123456789abcdef";
         private static void HexEncodeUtf16CodeUnit(StringBuilder builder, char c)
         {
+            uint utf16 = c;
             builder.Append("\\u");
             builder.Append(Hex[(c >> 12) & 0xf]);
             builder.Append(Hex[(c >> 8) & 0xf]);
