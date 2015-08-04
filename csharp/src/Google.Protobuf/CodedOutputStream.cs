@@ -65,7 +65,20 @@ namespace Google.Protobuf
         private readonly Stream output;
 
         #region Construction
+        /// <summary>
+        /// Creates a new CodedOutputStream that writes directly to the given
+        /// byte array. If more bytes are written than fit in the array,
+        /// OutOfSpaceException will be thrown.
+        /// </summary>
+        public CodedOutputStream(byte[] flatArray) : this(flatArray, 0, flatArray.Length)
+        {
+        }
 
+        /// <summary>
+        /// Creates a new CodedOutputStream that writes directly to the given
+        /// byte array slice. If more bytes are written than fit in the array,
+        /// OutOfSpaceException will be thrown.
+        /// </summary>
         private CodedOutputStream(byte[] buffer, int offset, int length)
         {
             this.output = null;
@@ -85,40 +98,17 @@ namespace Google.Protobuf
         /// <summary>
         /// Creates a new CodedOutputStream which write to the given stream.
         /// </summary>
-        public static CodedOutputStream CreateInstance(Stream output)
+        public CodedOutputStream(Stream output) : this(output, DefaultBufferSize)
         {
-            return CreateInstance(output, DefaultBufferSize);
         }
 
         /// <summary>
         /// Creates a new CodedOutputStream which write to the given stream and uses
         /// the specified buffer size.
         /// </summary>
-        public static CodedOutputStream CreateInstance(Stream output, int bufferSize)
+        public CodedOutputStream(Stream output, int bufferSize) : this(output, new byte[bufferSize])
         {
-            return new CodedOutputStream(output, new byte[bufferSize]);
-        }
-
-        /// <summary>
-        /// Creates a new CodedOutputStream that writes directly to the given
-        /// byte array. If more bytes are written than fit in the array,
-        /// OutOfSpaceException will be thrown.
-        /// </summary>
-        public static CodedOutputStream CreateInstance(byte[] flatArray)
-        {
-            return CreateInstance(flatArray, 0, flatArray.Length);
-        }
-
-        /// <summary>
-        /// Creates a new CodedOutputStream that writes directly to the given
-        /// byte array slice. If more bytes are written than fit in the array,
-        /// OutOfSpaceException will be thrown.
-        /// </summary>
-        public static CodedOutputStream CreateInstance(byte[] flatArray, int offset, int length)
-        {
-            return new CodedOutputStream(flatArray, offset, length);
-        }
-
+        }    
         #endregion
 
         /// <summary>
@@ -307,6 +297,10 @@ namespace Google.Protobuf
             WriteInt32(value);
         }
 
+        /// <summary>
+        /// Writes an sfixed32 value, without a tag, to the stream.
+        /// </summary>
+        /// <param name="value">The value to write.</param>
         public void WriteSFixed32(int value)
         {
             WriteRawLittleEndian32((uint) value);
@@ -659,6 +653,9 @@ namespace Google.Protobuf
             }
         }
 
+        /// <summary>
+        /// Flushes any buffered data to the underlying stream (if there is one).
+        /// </summary>
         public void Flush()
         {
             if (output != null)

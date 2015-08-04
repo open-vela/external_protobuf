@@ -46,9 +46,9 @@ csharp_EXTRA_DIST=                                                           \
   csharp/build_packages.bat                                                  \
   csharp/buildall.sh                                                         \
   csharp/generate_protos.sh                                                  \
-  csharp/keys/Google.Protobuf.snk                                            \
-  csharp/keys/generate_new_key.bat                                           \
-  csharp/protos/extest/unittest_issues.proto                                 \
+  csharp/keys/Google.Protobuf.public.snk                                     \
+  csharp/keys/README.md                                                      \
+  csharp/protos/unittest_issues.proto                                        \
   csharp/src/AddressBook/AddPerson.cs                                        \
   csharp/src/AddressBook/AddressBook.csproj                                  \
   csharp/src/AddressBook/Addressbook.cs                                      \
