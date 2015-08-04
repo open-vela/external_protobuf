@@ -39,7 +39,6 @@ namespace Google.Protobuf
 {
     public class FieldCodecTest
     {
-#pragma warning disable 0414 // Used by tests via reflection - do not remove!
         private static readonly List<ICodecTestData> Codecs = new List<ICodecTestData>
         {
             new FieldCodecTestData<bool>(FieldCodec.ForBool(100), true, "Bool"),
@@ -62,7 +61,6 @@ namespace Google.Protobuf
             new FieldCodecTestData<ForeignMessage>(
                 FieldCodec.ForMessage(100, ForeignMessage.Parser), new ForeignMessage { C = 10 }, "Message"),
         };
-#pragma warning restore 0414
 
         [Test, TestCaseSource("Codecs")]
         public void RoundTripWithTag(ICodecTestData codec)
@@ -122,11 +120,11 @@ namespace Google.Protobuf
             public void TestRoundTripRaw()
             {
                 var stream = new MemoryStream();
-                var codedOutput = new CodedOutputStream(stream);
+                var codedOutput = CodedOutputStream.CreateInstance(stream);
                 codec.ValueWriter(codedOutput, sampleValue);
                 codedOutput.Flush();
                 stream.Position = 0;
-                var codedInput = new CodedInputStream(stream);
+                var codedInput = CodedInputStream.CreateInstance(stream);
                 Assert.AreEqual(sampleValue, codec.ValueReader(codedInput));
                 Assert.IsTrue(codedInput.IsAtEnd);
             }
@@ -134,11 +132,11 @@ namespace Google.Protobuf
             public void TestRoundTripWithTag()
             {
                 var stream = new MemoryStream();
-                var codedOutput = new CodedOutputStream(stream);
+                var codedOutput = CodedOutputStream.CreateInstance(stream);
                 codec.WriteTagAndValue(codedOutput, sampleValue);
                 codedOutput.Flush();
                 stream.Position = 0;
-                var codedInput = new CodedInputStream(stream);
+                var codedInput = CodedInputStream.CreateInstance(stream);
                 codedInput.AssertNextTag(codec.Tag);
                 Assert.AreEqual(sampleValue, codec.Read(codedInput));
                 Assert.IsTrue(codedInput.IsAtEnd);
@@ -147,7 +145,7 @@ namespace Google.Protobuf
             public void TestCalculateSizeWithTag()
             {
                 var stream = new MemoryStream();
-                var codedOutput = new CodedOutputStream(stream);
+                var codedOutput = CodedOutputStream.CreateInstance(stream);
                 codec.WriteTagAndValue(codedOutput, sampleValue);
                 codedOutput.Flush();
                 Assert.AreEqual(stream.Position, codec.CalculateSizeWithTag(sampleValue));
@@ -157,7 +155,7 @@ namespace Google.Protobuf
             {
                 // WriteTagAndValue ignores default values
                 var stream = new MemoryStream();
-                var codedOutput = new CodedOutputStream(stream);
+                var codedOutput = CodedOutputStream.CreateInstance(stream);
                 codec.WriteTagAndValue(codedOutput, codec.DefaultValue);
                 codedOutput.Flush();
                 Assert.AreEqual(0, stream.Position);
@@ -170,13 +168,13 @@ namespace Google.Protobuf
                 // The plain ValueWriter/ValueReader delegates don't.
                 if (codec.DefaultValue != null) // This part isn't appropriate for message types.
                 {
-                    codedOutput = new CodedOutputStream(stream);
+                    codedOutput = CodedOutputStream.CreateInstance(stream);
                     codec.ValueWriter(codedOutput, codec.DefaultValue);
                     codedOutput.Flush();
                     Assert.AreNotEqual(0, stream.Position);
                     Assert.AreEqual(stream.Position, codec.ValueSizeCalculator(codec.DefaultValue));
                     stream.Position = 0;
-                    var codedInput = new CodedInputStream(stream);
+                    var codedInput = CodedInputStream.CreateInstance(stream);
                     Assert.AreEqual(codec.DefaultValue, codec.ValueReader(codedInput));
                 }
             }

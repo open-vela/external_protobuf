@@ -50,7 +50,7 @@ namespace Google.Protobuf
             Assert.AreEqual(58, msg.CalculateSize());
 
             byte[] bytes = new byte[58];
-            CodedOutputStream output = new CodedOutputStream(bytes);
+            CodedOutputStream output = CodedOutputStream.CreateInstance(bytes);
 
             msg.WriteTo(output);
             Assert.AreEqual(0, output.SpaceLeft);

@@ -203,7 +203,7 @@ namespace Google.Protobuf
         public CodedInputStream CreateCodedInput()
         {
             // We trust CodedInputStream not to reveal the provided byte array or modify it
-            return new CodedInputStream(bytes);
+            return CodedInputStream.CreateInstance(bytes);
         }
 
         public static bool operator ==(ByteString lhs, ByteString rhs)
