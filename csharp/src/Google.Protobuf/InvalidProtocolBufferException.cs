@@ -45,12 +45,6 @@ namespace Google.Protobuf
         {
         }
 
-        internal static InvalidProtocolBufferException MoreDataAvailable()
-        {
-            return new InvalidProtocolBufferException(
-                "Completed reading a message while more data was available in the stream.");
-        }
-
         internal static InvalidProtocolBufferException TruncatedMessage()
         {
             return new InvalidProtocolBufferException(

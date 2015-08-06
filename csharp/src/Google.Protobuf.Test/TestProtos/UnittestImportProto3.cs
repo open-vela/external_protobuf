@@ -139,7 +139,10 @@ namespace Google.Protobuf.TestProtos {
       while ((tag = input.ReadTag()) != 0) {
         switch(tag) {
           default:
-            input.SkipLastField();
+            if (pb::WireFormat.IsEndGroupTag(tag)) {
+              return;
+            }
+            input.ConsumeLastField();
             break;
           case 8: {
             D = input.ReadInt32();

@@ -106,7 +106,10 @@ namespace Google.Protobuf.WellKnownTypes {
       while ((tag = input.ReadTag()) != 0) {
         switch(tag) {
           default:
-            input.SkipLastField();
+            if (pb::WireFormat.IsEndGroupTag(tag)) {
+              return;
+            }
+            input.ConsumeLastField();
             break;
         }
       }
