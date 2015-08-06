@@ -236,16 +236,17 @@ namespace Google.Protobuf
 
         #region Validation
         /// <summary>
-        /// Verifies that the last call to ReadTag() returned tag 0 - in other words,
-        /// we've reached the end of the stream when we expected to.
+        /// Verifies that the last call to ReadTag() returned the given tag value.
+        /// This is used to verify that a nested group ended with the correct
+        /// end tag.
         /// </summary>
-        /// <exception cref="InvalidProtocolBufferException">The 
+        /// <exception cref="InvalidProtocolBufferException">The last
         /// tag read was not the one specified</exception>
-        internal void CheckReadEndOfStreamTag()
+        internal void CheckLastTagWas(uint value)
         {
-            if (lastTag != 0)
+            if (lastTag != value)
             {
-                throw InvalidProtocolBufferException.MoreDataAvailable();
+                throw InvalidProtocolBufferException.InvalidEndTag();
             }
         }
         #endregion
@@ -274,11 +275,6 @@ namespace Google.Protobuf
         /// <summary>
         /// Reads a field tag, returning the tag of 0 for "end of stream".
         /// </summary>
-        /// <remarks>
-        /// If this method returns 0, it doesn't necessarily mean the end of all
-        /// the data in this CodedInputStream; it may be the end of the logical stream
-        /// for an embedded message, for example.
-        /// </remarks>
         /// <returns>The next field tag, or 0 for end of stream. (0 is never a valid tag.)</returns>
         public uint ReadTag()
         {
@@ -333,24 +329,22 @@ namespace Google.Protobuf
         }
 
         /// <summary>
-        /// Skips the data for the field with the tag we've just read.
+        /// Consumes the data for the field with the tag we've just read.
         /// This should be called directly after <see cref="ReadTag"/>, when
         /// the caller wishes to skip an unknown field.
         /// </summary>
-        public void SkipLastField()
+        public void ConsumeLastField()
         {
             if (lastTag == 0)
             {
-                throw new InvalidOperationException("SkipLastField cannot be called at the end of a stream");
+                throw new InvalidOperationException("ConsumeLastField cannot be called at the end of a stream");
             }
             switch (WireFormat.GetTagWireType(lastTag))
             {
                 case WireFormat.WireType.StartGroup:
-                    ConsumeGroup();
-                    break;
                 case WireFormat.WireType.EndGroup:
-                    // Just ignore; there's no data following the tag.
-                    break;
+                    // TODO: Work out how to skip them instead? See issue 688.
+                    throw new InvalidProtocolBufferException("Group tags not supported by proto3 C# implementation");
                 case WireFormat.WireType.Fixed32:
                     ReadFixed32();
                     break;
@@ -365,29 +359,6 @@ namespace Google.Protobuf
                     ReadRawVarint32();
                     break;
             }
-        }
-
-        private void ConsumeGroup()
-        {
-            // Note: Currently we expect this to be the way that groups are read. We could put the recursion
-            // depth changes into the ReadTag method instead, potentially...
-            recursionDepth++;
-            if (recursionDepth >= recursionLimit)
-            {
-                throw InvalidProtocolBufferException.RecursionLimitExceeded();
-            }
-            uint tag;
-            do
-            {
-                tag = ReadTag();
-                if (tag == 0)
-                {
-                    throw InvalidProtocolBufferException.TruncatedMessage();
-                }
-                // This recursion will allow us to handle nested groups.
-                SkipLastField();
-            } while (WireFormat.GetTagWireType(tag) != WireFormat.WireType.EndGroup);
-            recursionDepth--;
         }
 
         /// <summary>
@@ -504,7 +475,7 @@ namespace Google.Protobuf
             int oldLimit = PushLimit(length);
             ++recursionDepth;
             builder.MergeFrom(this);
-            CheckReadEndOfStreamTag();
+            CheckLastTagWas(0);
             // Check that we've read exactly as much data as expected.
             if (!ReachedLimit)
             {

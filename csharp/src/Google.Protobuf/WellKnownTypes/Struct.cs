@@ -139,7 +139,10 @@ namespace Google.Protobuf.WellKnownTypes {
       while ((tag = input.ReadTag()) != 0) {
         switch(tag) {
           default:
-            input.SkipLastField();
+            if (pb::WireFormat.IsEndGroupTag(tag)) {
+              return;
+            }
+            input.ConsumeLastField();
             break;
           case 10: {
             fields_.AddEntriesFrom(input, _map_fields_codec);
@@ -389,7 +392,10 @@ namespace Google.Protobuf.WellKnownTypes {
       while ((tag = input.ReadTag()) != 0) {
         switch(tag) {
           default:
-            input.SkipLastField();
+            if (pb::WireFormat.IsEndGroupTag(tag)) {
+              return;
+            }
+            input.ConsumeLastField();
             break;
           case 8: {
             kind_ = input.ReadEnum();
@@ -514,7 +520,10 @@ namespace Google.Protobuf.WellKnownTypes {
       while ((tag = input.ReadTag()) != 0) {
         switch(tag) {
           default:
-            input.SkipLastField();
+            if (pb::WireFormat.IsEndGroupTag(tag)) {
+              return;
+            }
+            input.ConsumeLastField();
             break;
           case 10: {
             values_.AddEntriesFrom(input, _repeated_values_codec);

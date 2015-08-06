@@ -321,7 +321,10 @@ namespace Conformance {
       while ((tag = input.ReadTag()) != 0) {
         switch(tag) {
           default:
-            input.SkipLastField();
+            if (pb::WireFormat.IsEndGroupTag(tag)) {
+              return;
+            }
+            input.ConsumeLastField();
             break;
           case 10: {
             ProtobufPayload = input.ReadBytes();
@@ -554,7 +557,10 @@ namespace Conformance {
       while ((tag = input.ReadTag()) != 0) {
         switch(tag) {
           default:
-            input.SkipLastField();
+            if (pb::WireFormat.IsEndGroupTag(tag)) {
+              return;
+            }
+            input.ConsumeLastField();
             break;
           case 10: {
             ParseError = input.ReadString();
@@ -1823,7 +1829,10 @@ namespace Conformance {
       while ((tag = input.ReadTag()) != 0) {
         switch(tag) {
           default:
-            input.SkipLastField();
+            if (pb::WireFormat.IsEndGroupTag(tag)) {
+              return;
+            }
+            input.ConsumeLastField();
             break;
           case 8: {
             OptionalInt32 = input.ReadInt32();
@@ -2247,7 +2256,10 @@ namespace Conformance {
           while ((tag = input.ReadTag()) != 0) {
             switch(tag) {
               default:
-                input.SkipLastField();
+                if (pb::WireFormat.IsEndGroupTag(tag)) {
+                  return;
+                }
+                input.ConsumeLastField();
                 break;
               case 8: {
                 A = input.ReadInt32();
@@ -2361,7 +2373,10 @@ namespace Conformance {
       while ((tag = input.ReadTag()) != 0) {
         switch(tag) {
           default:
-            input.SkipLastField();
+            if (pb::WireFormat.IsEndGroupTag(tag)) {
+              return;
+            }
+            input.ConsumeLastField();
             break;
           case 8: {
             C = input.ReadInt32();

@@ -50,7 +50,7 @@ namespace Google.Protobuf
             Preconditions.CheckNotNull(data, "data");
             CodedInputStream input = new CodedInputStream(data);
             message.MergeFrom(input);
-            input.CheckReadEndOfStreamTag();
+            input.CheckLastTagWas(0);
         }
 
         /// <summary>
@@ -64,7 +64,7 @@ namespace Google.Protobuf
             Preconditions.CheckNotNull(data, "data");
             CodedInputStream input = data.CreateCodedInput();
             message.MergeFrom(input);
-            input.CheckReadEndOfStreamTag();
+            input.CheckLastTagWas(0);
         }
 
         /// <summary>
@@ -78,7 +78,7 @@ namespace Google.Protobuf
             Preconditions.CheckNotNull(input, "input");
             CodedInputStream codedInput = new CodedInputStream(input);
             message.MergeFrom(codedInput);
-            codedInput.CheckReadEndOfStreamTag();
+            codedInput.CheckLastTagWas(0);
         }
 
         /// <summary>
