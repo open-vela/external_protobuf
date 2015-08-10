@@ -168,16 +168,14 @@ namespace Google.Protobuf.Reflection
             get { return fieldType == FieldType.Message && messageType.Proto.Options != null && messageType.Proto.Options.MapEntry; }
         }
 
+        // TODO(jonskeet): Check whether this is correct with proto3, where we default to packed...
+
         /// <summary>
         /// Returns <c>true</c> if this field is a packed, repeated field; <c>false</c> otherwise.
         /// </summary>
         public bool IsPacked
         {
-            // Note the || rather than && here - we're effectively defaulting to packed, because that *is*
-            // the default in proto3, which is all we support. We may give the wrong result for the protos
-            // within descriptor.proto, but that's okay, as they're never exposed and we don't use IsPacked
-            // within the runtime.
-            get { return Proto.Options == null || Proto.Options.Packed; }
+            get { return Proto.Options != null && Proto.Options.Packed; }
         }        
 
         /// <summary>
