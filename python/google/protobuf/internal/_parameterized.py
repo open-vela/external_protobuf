@@ -152,8 +152,6 @@ import types
 import unittest
 import uuid
 
-import six
-
 ADDR_RE = re.compile(r'\<([a-zA-Z0-9_\-\.]+) object at 0x[a-fA-F0-9]+\>')
 _SEPARATOR = uuid.uuid1().hex
 _FIRST_ARG = object()
@@ -172,13 +170,13 @@ def _StrClass(cls):
 
 def _NonStringIterable(obj):
   return (isinstance(obj, collections.Iterable) and not
-          isinstance(obj, six.string_types))
+          isinstance(obj, basestring))
 
 
 def _FormatParameterList(testcase_params):
   if isinstance(testcase_params, collections.Mapping):
     return ', '.join('%s=%s' % (argname, _CleanRepr(value))
-                     for argname, value in testcase_params.items())
+                     for argname, value in testcase_params.iteritems())
   elif _NonStringIterable(testcase_params):
     return ', '.join(map(_CleanRepr, testcase_params))
   else:
@@ -260,7 +258,7 @@ def _ModifyClass(class_object, testcases, naming_type):
       'Cannot add parameters to %s,'
       ' which already has parameterized methods.' % (class_object,))
   class_object._id_suffix = id_suffix = {}
-  for name, obj in class_object.__dict__.copy().items():
+  for name, obj in class_object.__dict__.items():
     if (name.startswith(unittest.TestLoader.testMethodPrefix)
         and isinstance(obj, types.FunctionType)):
       delattr(class_object, name)
@@ -268,7 +266,7 @@ def _ModifyClass(class_object, testcases, naming_type):
       _UpdateClassDictForParamTestCase(
           methods, id_suffix, name,
           _ParameterizedTestIter(obj, testcases, naming_type))
-      for name, meth in methods.items():
+      for name, meth in methods.iteritems():
         setattr(class_object, name, meth)
 
 
