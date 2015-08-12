@@ -1,3 +1,4 @@
+﻿#region Copyright notice and license
 // Protocol Buffers - Google's data interchange format
 // Copyright 2015 Google Inc.  All rights reserved.
 // https://developers.google.com/protocol-buffers/
@@ -27,26 +28,27 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#endregion
 
-#import <Foundation/Foundation.h>
-
-#import "google/protobuf/Duration.pbobjc.h"
-#import "google/protobuf/Timestamp.pbobjc.h"
-
-NS_ASSUME_NONNULL_BEGIN
-
-// Extension to GPBTimestamp to work with standard Foundation time/date types.
-@interface GPBTimestamp (GBPWellKnownTypes)
-@property(nonatomic, readwrite, strong) NSDate *date;
-@property(nonatomic, readwrite) NSTimeInterval timeIntervalSince1970;
-- (instancetype)initWithDate:(NSDate *)date;
-- (instancetype)initWithTimeIntervalSince1970:(NSTimeInterval)timeIntervalSince1970;
-@end
-
-// Extension to GPBDuration to work with standard Foundation time type.
-@interface GPBDuration (GBPWellKnownTypes)
-@property(nonatomic, readwrite) NSTimeInterval timeIntervalSince1970;
-- (instancetype)initWithTimeIntervalSince1970:(NSTimeInterval)timeIntervalSince1970;
-@end
-
-NS_ASSUME_NONNULL_END
+namespace Google.Protobuf
+{
+    /// <summary>
+    /// Generic interface for a deeply cloneable type.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// All generated messages implement this interface, but so do some non-message types.
+    /// Additionally, due to the type constraint on <c>T</c> in <see cref="IMessage{T}"/>,
+    /// it is simpler to keep this as a separate interface.
+    /// </para>
+    /// </remarks>
+    /// <typeparam name="T">The type itself, returned by the <see cref="Clone"/> method.</typeparam>
+    public interface IDeepCloneable<T>
+    {
+        /// <summary>
+        /// Creates a deep clone of this object.
+        /// </summary>
+        /// <returns>A deep clone of this object.</returns>
+        T Clone();
+    }
+}
