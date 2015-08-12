@@ -257,12 +257,10 @@ namespace Google.Protobuf.Reflection
         /// or unqualified. C++-like name lookup semantics are used to search for the
         /// matching descriptor.
         /// </summary>
-        /// <remarks>
-        /// This isn't heavily optimized, but it's only used during cross linking anyway.
-        /// If it starts being used more widely, we should look at performance more carefully.
-        /// </remarks>
         internal IDescriptor LookupSymbol(string name, IDescriptor relativeTo)
         {
+            // TODO(jonskeet):  This could be optimized in a number of ways.
+
             IDescriptor result;
             if (name.StartsWith("."))
             {
@@ -284,6 +282,7 @@ namespace Google.Protobuf.Reflection
                 {
                     // Chop off the last component of the scope.
 
+                    // TODO(jonskeet): Make this more efficient. May not be worth using StringBuilder at all
                     int dotpos = scopeToTry.ToString().LastIndexOf(".");
                     if (dotpos == -1)
                     {
