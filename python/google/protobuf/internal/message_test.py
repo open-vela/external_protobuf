@@ -48,6 +48,7 @@ import math
 import operator
 import pickle
 import sys
+import unittest
 
 import unittest
 from google.protobuf.internal import _parameterized

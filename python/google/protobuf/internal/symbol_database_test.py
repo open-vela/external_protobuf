@@ -64,53 +64,53 @@ class SymbolDatabaseTest(unittest.TestCase):
         messages['protobuf_unittest.TestAllTypes'])
 
   def testGetSymbol(self):
-    self.assertEqual(
+    self.assertEquals(
         unittest_pb2.TestAllTypes, self._Database().GetSymbol(
             'protobuf_unittest.TestAllTypes'))
-    self.assertEqual(
+    self.assertEquals(
         unittest_pb2.TestAllTypes.NestedMessage, self._Database().GetSymbol(
             'protobuf_unittest.TestAllTypes.NestedMessage'))
-    self.assertEqual(
+    self.assertEquals(
         unittest_pb2.TestAllTypes.OptionalGroup, self._Database().GetSymbol(
             'protobuf_unittest.TestAllTypes.OptionalGroup'))
-    self.assertEqual(
+    self.assertEquals(
         unittest_pb2.TestAllTypes.RepeatedGroup, self._Database().GetSymbol(
             'protobuf_unittest.TestAllTypes.RepeatedGroup'))
 
   def testEnums(self):
     # Check registration of types in the pool.
-    self.assertEqual(
+    self.assertEquals(
         'protobuf_unittest.ForeignEnum',
         self._Database().pool.FindEnumTypeByName(
             'protobuf_unittest.ForeignEnum').full_name)
-    self.assertEqual(
+    self.assertEquals(
         'protobuf_unittest.TestAllTypes.NestedEnum',
         self._Database().pool.FindEnumTypeByName(
             'protobuf_unittest.TestAllTypes.NestedEnum').full_name)
 
   def testFindMessageTypeByName(self):
-    self.assertEqual(
+    self.assertEquals(
         'protobuf_unittest.TestAllTypes',
         self._Database().pool.FindMessageTypeByName(
             'protobuf_unittest.TestAllTypes').full_name)
-    self.assertEqual(
+    self.assertEquals(
         'protobuf_unittest.TestAllTypes.NestedMessage',
         self._Database().pool.FindMessageTypeByName(
             'protobuf_unittest.TestAllTypes.NestedMessage').full_name)
 
   def testFindFindContainingSymbol(self):
     # Lookup based on either enum or message.
-    self.assertEqual(
+    self.assertEquals(
         'google/protobuf/unittest.proto',
         self._Database().pool.FindFileContainingSymbol(
             'protobuf_unittest.TestAllTypes.NestedEnum').name)
-    self.assertEqual(
+    self.assertEquals(
         'google/protobuf/unittest.proto',
         self._Database().pool.FindFileContainingSymbol(
             'protobuf_unittest.TestAllTypes').name)
 
   def testFindFileByName(self):
-    self.assertEqual(
+    self.assertEquals(
         'google/protobuf/unittest.proto',
         self._Database().pool.FindFileByName(
             'google/protobuf/unittest.proto').name)
