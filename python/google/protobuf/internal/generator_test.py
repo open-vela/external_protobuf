@@ -291,10 +291,10 @@ class GeneratorTest(unittest.TestCase):
     self.assertIs(desc.oneofs[0], desc.oneofs_by_name['oneof_field'])
     nested_names = set(['oneof_uint32', 'oneof_nested_message',
                         'oneof_string', 'oneof_bytes'])
-    self.assertEqual(
+    self.assertItemsEqual(
         nested_names,
-        set([field.name for field in desc.oneofs[0].fields]))
-    for field_name, field_desc in desc.fields_by_name.items():
+        [field.name for field in desc.oneofs[0].fields])
+    for field_name, field_desc in desc.fields_by_name.iteritems():
       if field_name in nested_names:
         self.assertIs(desc.oneofs[0], field_desc.containing_oneof)
       else:
@@ -305,36 +305,36 @@ class SymbolDatabaseRegistrationTest(unittest.TestCase):
   """Checks that messages, enums and files are correctly registered."""
 
   def testGetSymbol(self):
-    self.assertEqual(
+    self.assertEquals(
         unittest_pb2.TestAllTypes, symbol_database.Default().GetSymbol(
             'protobuf_unittest.TestAllTypes'))
-    self.assertEqual(
+    self.assertEquals(
         unittest_pb2.TestAllTypes.NestedMessage,
         symbol_database.Default().GetSymbol(
             'protobuf_unittest.TestAllTypes.NestedMessage'))
     with self.assertRaises(KeyError):
       symbol_database.Default().GetSymbol('protobuf_unittest.NestedMessage')
-    self.assertEqual(
+    self.assertEquals(
         unittest_pb2.TestAllTypes.OptionalGroup,
         symbol_database.Default().GetSymbol(
             'protobuf_unittest.TestAllTypes.OptionalGroup'))
-    self.assertEqual(
+    self.assertEquals(
         unittest_pb2.TestAllTypes.RepeatedGroup,
         symbol_database.Default().GetSymbol(
             'protobuf_unittest.TestAllTypes.RepeatedGroup'))
 
   def testEnums(self):
-    self.assertEqual(
+    self.assertEquals(
         'protobuf_unittest.ForeignEnum',
         symbol_database.Default().pool.FindEnumTypeByName(
             'protobuf_unittest.ForeignEnum').full_name)
-    self.assertEqual(
+    self.assertEquals(
         'protobuf_unittest.TestAllTypes.NestedEnum',
         symbol_database.Default().pool.FindEnumTypeByName(
             'protobuf_unittest.TestAllTypes.NestedEnum').full_name)
 
   def testFindFileByName(self):
-    self.assertEqual(
+    self.assertEquals(
         'google/protobuf/unittest.proto',
         symbol_database.Default().pool.FindFileByName(
             'google/protobuf/unittest.proto').name)
