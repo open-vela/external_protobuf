@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/python
 #
 # Protocol Buffers - Google's data interchange format
 # Copyright 2008 Google Inc.  All rights reserved.
@@ -772,7 +772,7 @@ class MakeDescriptorTest(unittest.TestCase):
     reformed_descriptor = descriptor.MakeDescriptor(descriptor_proto)
 
     options = reformed_descriptor.GetOptions()
-    self.assertEquals(101,
+    self.assertEqual(101,
                       options.Extensions[unittest_custom_options_pb2.msgopt].i)
 
 if __name__ == '__main__':
