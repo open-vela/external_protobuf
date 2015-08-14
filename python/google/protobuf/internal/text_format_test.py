@@ -35,7 +35,8 @@
 __author__ = 'kenton@google.com (Kenton Varda)'
 
 import re
-import unittest
+
+import six
 
 import unittest
 from google.protobuf.internal import _parameterized
@@ -100,7 +101,7 @@ class TextFormatTest(TextFormatBase):
         'repeated_string: "\\303\\274\\352\\234\\237"\n')
 
   def testPrintExoticUnicodeSubclass(self, message_module):
-    class UnicodeSub(unicode):
+    class UnicodeSub(six.text_type):
       pass
     message = message_module.TestAllTypes()
     message.repeated_string.append(UnicodeSub(u'\u00fc\ua71f'))
@@ -172,7 +173,7 @@ class TextFormatTest(TextFormatBase):
     parsed_message = message_module.TestAllTypes()
     r = text_format.Parse(wire_text, parsed_message)
     self.assertIs(r, parsed_message)
-    self.assertEquals(message, parsed_message)
+    self.assertEqual(message, parsed_message)
 
     # Test as_utf8 = True.
     wire_text = text_format.MessageToString(
@@ -180,7 +181,7 @@ class TextFormatTest(TextFormatBase):
     parsed_message = message_module.TestAllTypes()
     r = text_format.Parse(wire_text, parsed_message)
     self.assertIs(r, parsed_message)
-    self.assertEquals(message, parsed_message,
+    self.assertEqual(message, parsed_message,
                       '\n%s != %s' % (message, parsed_message))
 
   def testPrintRawUtf8String(self, message_module):
@@ -190,7 +191,7 @@ class TextFormatTest(TextFormatBase):
     self.CompareToGoldenText(text, 'repeated_string: "\303\274\352\234\237"\n')
     parsed_message = message_module.TestAllTypes()
     text_format.Parse(text, parsed_message)
-    self.assertEquals(message, parsed_message,
+    self.assertEqual(message, parsed_message,
                       '\n%s != %s' % (message, parsed_message))
 
   def testPrintFloatFormat(self, message_module):
@@ -286,7 +287,7 @@ class TextFormatTest(TextFormatBase):
     message = message_module.TestAllTypes()
     text = ''
     text_format.Parse(text, message)
-    self.assertEquals(message_module.TestAllTypes(), message)
+    self.assertEqual(message_module.TestAllTypes(), message)
 
   def testParseInvalidUtf8(self, message_module):
     message = message_module.TestAllTypes()
@@ -401,7 +402,7 @@ class OnlyWorksWithProto2RightNowTests(TextFormatBase):
 
     message = unittest_pb2.TestAllTypes()
     test_util.SetAllFields(message)
-    self.assertEquals(message, parsed_message)
+    self.assertEqual(message, parsed_message)
 
   def testPrintAllFields(self):
     message = unittest_pb2.TestAllTypes()
@@ -454,7 +455,7 @@ class OnlyWorksWithProto2RightNowTests(TextFormatBase):
 
     message = unittest_pb2.TestAllTypes()
     test_util.SetAllFields(message)
-    self.assertEquals(message, parsed_message)
+    self.assertEqual(message, parsed_message)
 
   def testPrintMap(self):
     message = map_unittest_pb2.TestMap()
@@ -555,8 +556,8 @@ class Proto2Tests(TextFormatBase):
     text_format.Parse(text, message)
     ext1 = unittest_mset_pb2.TestMessageSetExtension1.message_set_extension
     ext2 = unittest_mset_pb2.TestMessageSetExtension2.message_set_extension
-    self.assertEquals(23, message.message_set.Extensions[ext1].i)
-    self.assertEquals('foo', message.message_set.Extensions[ext2].str)
+    self.assertEqual(23, message.message_set.Extensions[ext1].i)
+    self.assertEqual('foo', message.message_set.Extensions[ext2].str)
 
   def testPrintAllExtensions(self):
     message = unittest_pb2.TestAllExtensions()
@@ -581,7 +582,7 @@ class Proto2Tests(TextFormatBase):
 
     message = unittest_pb2.TestAllExtensions()
     test_util.SetAllExtensions(message)
-    self.assertEquals(message, parsed_message)
+    self.assertEqual(message, parsed_message)
 
   def testParseAllExtensions(self):
     message = unittest_pb2.TestAllExtensions()
