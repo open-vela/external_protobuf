@@ -48,11 +48,7 @@ import math
 import operator
 import pickle
 import sys
-
-import six
-
-if six.PY3:
-  long = int
+import unittest
 
 import unittest
 from google.protobuf.internal import _parameterized
@@ -680,7 +676,7 @@ class MessageTest(unittest.TestCase):
     in the value being converted to a Unicode string."""
     m = message_module.TestAllTypes()
     m.optional_string = str('')
-    self.assertTrue(isinstance(m.optional_string, six.text_type))
+    self.assertTrue(isinstance(m.optional_string, unicode))
 
 # TODO(haberman): why are these tests Google-internal only?
 
@@ -1233,7 +1229,7 @@ class Proto3Test(unittest.TestCase):
     self.assertTrue('abc' in msg.map_string_string)
     self.assertTrue(888 in msg.map_int32_enum)
 
-    self.assertTrue(isinstance(msg.map_string_string['abc'], six.text_type))
+    self.assertTrue(isinstance(msg.map_string_string['abc'], unicode))
 
     # Accessing an unset key still throws TypeError of the type of the key
     # is incorrect.
@@ -1316,13 +1312,13 @@ class Proto3Test(unittest.TestCase):
 
     msg.map_string_string[bytes_obj] = bytes_obj
 
-    (key, value) = list(msg.map_string_string.items())[0]
+    (key, value) = msg.map_string_string.items()[0]
 
     self.assertEqual(key, unicode_obj)
     self.assertEqual(value, unicode_obj)
 
-    self.assertTrue(isinstance(key, six.text_type))
-    self.assertTrue(isinstance(value, six.text_type))
+    self.assertTrue(isinstance(key, unicode))
+    self.assertTrue(isinstance(value, unicode))
 
   def testMessageMap(self):
     msg = map_unittest_pb2.TestMap()
@@ -1507,7 +1503,7 @@ class Proto3Test(unittest.TestCase):
   def testMapIteration(self):
     msg = map_unittest_pb2.TestMap()
 
-    for k, v in msg.map_int32_int32.items():
+    for k, v in msg.map_int32_int32.iteritems():
       # Should not be reached.
       self.assertTrue(False)
 
@@ -1517,7 +1513,7 @@ class Proto3Test(unittest.TestCase):
     self.assertEqual(3, len(msg.map_int32_int32))
 
     matching_dict = {2: 4, 3: 6, 4: 8}
-    self.assertMapIterEquals(msg.map_int32_int32.items(), matching_dict)
+    self.assertMapIterEquals(msg.map_int32_int32.iteritems(), matching_dict)
 
   def testMapIterationClearMessage(self):
     # Iterator needs to work even if message and map are deleted.
@@ -1527,7 +1523,7 @@ class Proto3Test(unittest.TestCase):
     msg.map_int32_int32[3] = 6
     msg.map_int32_int32[4] = 8
 
-    it = msg.map_int32_int32.items()
+    it = msg.map_int32_int32.iteritems()
     del msg
 
     matching_dict = {2: 4, 3: 6, 4: 8}
@@ -1555,7 +1551,7 @@ class Proto3Test(unittest.TestCase):
 
     msg.ClearField('map_int32_int32')
     matching_dict = {2: 4, 3: 6, 4: 8}
-    self.assertMapIterEquals(map.items(), matching_dict)
+    self.assertMapIterEquals(map.iteritems(), matching_dict)
 
   def testMapIterValidAfterFieldCleared(self):
     # Map iterator needs to work even if field is cleared.
@@ -1567,7 +1563,7 @@ class Proto3Test(unittest.TestCase):
     msg.map_int32_int32[3] = 6
     msg.map_int32_int32[4] = 8
 
-    it = msg.map_int32_int32.items()
+    it = msg.map_int32_int32.iteritems()
 
     msg.ClearField('map_int32_int32')
     matching_dict = {2: 4, 3: 6, 4: 8}

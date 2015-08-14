@@ -53,15 +53,15 @@ TEST_VALUES = [
 class TextEncodingTestCase(unittest.TestCase):
   def testCEscape(self):
     for escaped, escaped_utf8, unescaped in TEST_VALUES:
-      self.assertEqual(escaped,
+      self.assertEquals(escaped,
                         text_encoding.CEscape(unescaped, as_utf8=False))
-      self.assertEqual(escaped_utf8,
+      self.assertEquals(escaped_utf8,
                         text_encoding.CEscape(unescaped, as_utf8=True))
 
   def testCUnescape(self):
     for escaped, escaped_utf8, unescaped in TEST_VALUES:
-      self.assertEqual(unescaped, text_encoding.CUnescape(escaped))
-      self.assertEqual(unescaped, text_encoding.CUnescape(escaped_utf8))
+      self.assertEquals(unescaped, text_encoding.CUnescape(escaped))
+      self.assertEquals(unescaped, text_encoding.CUnescape(escaped_utf8))
 
 
 if __name__ == "__main__":
