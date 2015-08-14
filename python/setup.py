@@ -79,13 +79,15 @@ def generate_proto(source, require = True):
 
     if protoc is None:
       sys.stderr.write(
-          "protoc is not installed nor found in ../src.  Please compile it "
-          "or install the binary package.\n")
+          "protoc is not installed nor found in ../src. "
+          "Please compile it or install the binary package.\n"
+      )
       sys.exit(-1)
 
-    protoc_command = [ protoc, "-I../src", "-I.", "--python_out=.", source ]
+    protoc_command = [protoc, "-I../src", "-I.", "--python_out=.", source]
     if subprocess.call(protoc_command) != 0:
       sys.exit(-1)
+
 
 def GenerateUnittestProtos():
   generate_proto("../src/google/protobuf/map_unittest.proto", False)
@@ -117,11 +119,12 @@ class clean(_clean):
       for filename in filenames:
         filepath = os.path.join(dirpath, filename)
         if filepath.endswith("_pb2.py") or filepath.endswith(".pyc") or \
-          filepath.endswith(".so") or filepath.endswith(".o") or \
-          filepath.endswith('google/protobuf/compiler/__init__.py'):
+           filepath.endswith(".so") or filepath.endswith(".o") or \
+           filepath.endswith('google/protobuf/compiler/__init__.py'):
           os.remove(filepath)
     # _clean is an old-style class, so super() doesn't work.
     _clean.run(self)
+
 
 class build_py(_build_py):
   def run(self):
@@ -138,7 +141,13 @@ class build_py(_build_py):
         pass
     # _build_py is an old-style class, so super() doesn't work.
     _build_py.run(self)
-
+  # TODO(mrovner): Subclass to run 2to3 on some files only.
+  # Tracing what https://wiki.python.org/moin/PortingPythonToPy3k's
+  # "Approach 2" section on how to get 2to3 to run on source files during
+  # install under Python 3.  This class seems like a good place to put logic
+  # that calls python3's distutils.util.run_2to3 on the subset of the files we
+  # have in our release that are subject to conversion.
+  # See code reference in previous code review.
 
 if __name__ == '__main__':
   ext_module_list = []
@@ -168,14 +177,8 @@ if __name__ == '__main__':
       maintainer_email='protobuf@googlegroups.com',
       license='New BSD License',
       classifiers=[
-        "Programming Language :: Python",
-        "Programming Language :: Python :: 2",
-        "Programming Language :: Python :: 2.6",
-        "Programming Language :: Python :: 2.7",
-        "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.3",
-        "Programming Language :: Python :: 3.4",
-        ],
+          'Programming Language :: Python :: 2.7',
+      ],
       namespace_packages=['google'],
       packages=find_packages(
           exclude=[
@@ -187,6 +190,6 @@ if __name__ == '__main__':
           'clean': clean,
           'build_py': build_py,
       },
-      install_requires=['setuptools', 'six'],
+      install_requires=['setuptools'],
       ext_modules=ext_module_list,
   )
