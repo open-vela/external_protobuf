@@ -55,7 +55,6 @@ src/google/protobuf/util/**/*.pb.h
 *_pb2.py
 python/*.egg
 python/.eggs/
-python/.tox
 python/build/
 python/google/protobuf/compiler/
 
@@ -80,7 +79,8 @@ java/target
 javanano/target
 
 # Windows native output.
-cmake/build
+vsprojects/Debug
+vsprojects/Release
 
 # NuGet packages: we want the repository configuration, but not the
 # packages themselves.

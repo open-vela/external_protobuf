@@ -54,6 +54,15 @@ namespace google {
 namespace protobuf {
 namespace internal {
 
+namespace {
+
+// This function turns out to be convenient when using some macros later.
+inline int GetEnumNumber(const EnumValueDescriptor* descriptor) {
+  return descriptor->number();
+}
+
+}  // anonymous namespace
+
 // ===================================================================
 
 bool UnknownFieldSetFieldSkipper::SkipField(
