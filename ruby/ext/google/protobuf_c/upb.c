@@ -1,11 +1,5 @@
 // Amalgamated source file
 #include "upb.h"
-/*
- * upb - a minimalist implementation of protocol buffers.
- *
- * Copyright (c) 2008-2012 Google Inc.  See LICENSE for details.
- * Author: Josh Haberman <jhaberman@gmail.com>
- */
 
 
 #include <stdlib.h>
@@ -1701,12 +1695,6 @@ upb_fielddef *upb_oneof_iter_field(const upb_oneof_iter *iter) {
 void upb_oneof_iter_setdone(upb_oneof_iter *iter) {
   upb_inttable_iter_setdone(iter);
 }
-/*
- * upb - a minimalist implementation of protocol buffers.
- *
- * Copyright (c) 2014 Google Inc.  See LICENSE for details.
- * Author: Josh Haberman <jhaberman@gmail.com>
- */
 
 
 #include <stdlib.h>
@@ -1980,14 +1968,9 @@ upb_alloc_func *upb_seededalloc_getallocfunc(upb_seededalloc *a) {
   return seeded_alloc;
 }
 /*
- * upb - a minimalist implementation of protocol buffers.
- *
- * Copyright (c) 2011-2012 Google Inc.  See LICENSE for details.
- * Author: Josh Haberman <jhaberman@gmail.com>
- *
- * TODO(haberman): it's unclear whether a lot of the consistency checks should
- * assert() or return false.
- */
+** TODO(haberman): it's unclear whether a lot of the consistency checks should
+** assert() or return false.
+*/
 
 
 #include <stdlib.h>
@@ -2668,24 +2651,21 @@ bool upb_byteshandler_setendstr(upb_byteshandler *h,
   return true;
 }
 /*
- * upb - a minimalist implementation of protocol buffers.
- *
- * Copyright (c) 2012 Google Inc.  See LICENSE for details.
- * Author: Josh Haberman <jhaberman@gmail.com>
- *
- * Our key invariants are:
- * 1. reference cycles never span groups
- * 2. for ref2(to, from), we increment to's count iff group(from) != group(to)
- *
- * The previous two are how we avoid leaking cycles.  Other important
- * invariants are:
- * 3. for mutable objects "from" and "to", if there exists a ref2(to, from)
- *    this implies group(from) == group(to).  (In practice, what we implement
- *    is even stronger; "from" and "to" will share a group if there has *ever*
- *    been a ref2(to, from), but all that is necessary for correctness is the
- *    weaker one).
- * 4. mutable and immutable objects are never in the same group.
- */
+** upb::RefCounted Implementation
+**
+** Our key invariants are:
+** 1. reference cycles never span groups
+** 2. for ref2(to, from), we increment to's count iff group(from) != group(to)
+**
+** The previous two are how we avoid leaking cycles.  Other important
+** invariants are:
+** 3. for mutable objects "from" and "to", if there exists a ref2(to, from)
+**    this implies group(from) == group(to).  (In practice, what we implement
+**    is even stronger; "from" and "to" will share a group if there has *ever*
+**    been a ref2(to, from), but all that is necessary for correctness is the
+**    weaker one).
+** 4. mutable and immutable objects are never in the same group.
+*/
 
 
 #include <setjmp.h>
@@ -3514,12 +3494,6 @@ bool upb_refcounted_freeze(upb_refcounted *const*roots, int n, upb_status *s,
   }
   return freeze(roots, n, s, maxdepth);
 }
-/*
- * upb - a minimalist implementation of protocol buffers.
- *
- * Copyright (c) 2013 Google Inc.  See LICENSE for details.
- * Author: Josh Haberman <jhaberman@gmail.com>
- */
 
 
 #include <stdlib.h>
@@ -3605,12 +3579,6 @@ const upb_shim_data *upb_shim_getdata(const upb_handlers *h, upb_selector_t s,
 
   return (const upb_shim_data*)upb_handlers_gethandlerdata(h, s);
 }
-/*
- * upb - a minimalist implementation of protocol buffers.
- *
- * Copyright (c) 2008-2012 Google Inc.  See LICENSE for details.
- * Author: Josh Haberman <jhaberman@gmail.com>
- */
 
 
 #include <stdlib.h>
@@ -4041,13 +4009,10 @@ const upb_def *upb_symtab_iter_def(const upb_symtab_iter *iter) {
   return upb_value_getptr(upb_strtable_iter_value(&iter->iter));
 }
 /*
- * upb - a minimalist implementation of protocol buffers.
- *
- * Copyright (c) 2009 Google Inc.  See LICENSE for details.
- * Author: Josh Haberman <jhaberman@gmail.com>
- *
- * Implementation is heavily inspired by Lua's ltable.c.
- */
+** upb_table Implementation
+**
+** Implementation is heavily inspired by Lua's ltable.c.
+*/
 
 
 #include <stdlib.h>
@@ -4931,12 +4896,6 @@ uint32_t MurmurHash2(const void * key, size_t len, uint32_t seed) {
 #undef MIX
 
 #endif /* UPB_UNALIGNED_READS_OK */
-/*
- * upb - a minimalist implementation of protocol buffers.
- *
- * Copyright (c) 2009-2012 Google Inc.  See LICENSE for details.
- * Author: Josh Haberman <jhaberman@gmail.com>
- */
 
 #include <errno.h>
 #include <stdarg.h>
@@ -5860,17 +5819,12 @@ static upb_inttable reftables[212] = {
 #endif
 
 /*
- * upb - a minimalist implementation of protocol buffers.
- *
- * Copyright (c) 2008-2009 Google Inc.  See LICENSE for details.
- * Author: Josh Haberman <jhaberman@gmail.com>
- *
- * XXX: The routines in this file that consume a string do not currently
- * support having the string span buffers.  In the future, as upb_sink and
- * its buffering/sharing functionality evolve there should be an easy and
- * idiomatic way of correctly handling this case.  For now, we accept this
- * limitation since we currently only parse descriptors from single strings.
- */
+** XXX: The routines in this file that consume a string do not currently
+** support having the string span buffers.  In the future, as upb_sink and
+** its buffering/sharing functionality evolve there should be an easy and
+** idiomatic way of correctly handling this case.  For now, we accept this
+** limitation since we currently only parse descriptors from single strings.
+*/
 
 
 #include <errno.h>
@@ -6518,21 +6472,18 @@ const upb_handlers *upb_descreader_newhandlers(const void *owner) {
   return h;
 }
 /*
- * upb - a minimalist implementation of protocol buffers.
- *
- * Copyright (c) 2013 Google Inc.  See LICENSE for details.
- * Author: Josh Haberman <jhaberman@gmail.com>
- *
- * Code to compile a upb::Handlers into bytecode for decoding a protobuf
- * according to that specific schema and destination handlers.
- *
- * Compiling to bytecode is always the first step.  If we are using the
- * interpreted decoder we leave it as bytecode and interpret that.  If we are
- * using a JIT decoder we use a code generator to turn the bytecode into native
- * code, LLVM IR, etc.
- *
- * Bytecode definition is in decoder.int.h.
- */
+** protobuf decoder bytecode compiler
+**
+** Code to compile a upb::Handlers into bytecode for decoding a protobuf
+** according to that specific schema and destination handlers.
+**
+** Compiling to bytecode is always the first step.  If we are using the
+** interpreted decoder we leave it as bytecode and interpret that.  If we are
+** using a JIT decoder we use a code generator to turn the bytecode into native
+** code, LLVM IR, etc.
+**
+** Bytecode definition is in decoder.int.h.
+*/
 
 #include <stdarg.h>
 
@@ -7502,24 +7453,19 @@ void upb_pbdecodermethodopts_setlazy(upb_pbdecodermethodopts *opts, bool lazy) {
   opts->lazy = lazy;
 }
 /*
- * upb - a minimalist implementation of protocol buffers.
- *
- * Copyright (c) 2008-2013 Google Inc.  See LICENSE for details.
- * Author: Josh Haberman <jhaberman@gmail.com>
- *
- * This file implements a VM for the interpreted (bytecode) decoder.
- *
- * Bytecode must previously have been generated using the bytecode compiler in
- * compile_decoder.c.  This decoder then walks through the bytecode op-by-op to
- * parse the input.
- *
- * Decoding is fully resumable; we just keep a pointer to the current bytecode
- * instruction and resume from there.  A fair amount of the logic here is to
- * handle the fact that values can span buffer seams and we have to be able to
- * be capable of suspending/resuming from any byte in the stream.  This
- * sometimes requires keeping a few trailing bytes from the last buffer around
- * in the "residual" buffer.
- */
+** upb::Decoder (Bytecode Decoder VM)
+**
+** Bytecode must previously have been generated using the bytecode compiler in
+** compile_decoder.c.  This decoder then walks through the bytecode op-by-op to
+** parse the input.
+**
+** Decoding is fully resumable; we just keep a pointer to the current bytecode
+** instruction and resume from there.  A fair amount of the logic here is to
+** handle the fact that values can span buffer seams and we have to be able to
+** be capable of suspending/resuming from any byte in the stream.  This
+** sometimes requires keeping a few trailing bytes from the last buffer around
+** in the "residual" buffer.
+*/
 
 #include <inttypes.h>
 #include <stddef.h>
@@ -7532,6 +7478,8 @@ void upb_pbdecodermethodopts_setlazy(upb_pbdecodermethodopts *opts, bool lazy) {
 
 /* Error messages that are shared between the bytecode and JIT decoders. */
 const char *kPbDecoderStackOverflow = "Nesting too deep.";
+const char *kPbDecoderSubmessageTooLong =
+    "Submessage end extends past enclosing submessage.";
 
 /* Error messages shared within this file. */
 static const char *kUnterminatedVarint = "Unterminated varint.";
@@ -7566,6 +7514,28 @@ static bool consumes_input(opcode op) {
   }
 }
 
+static size_t stacksize(upb_pbdecoder *d, size_t entries) {
+  UPB_UNUSED(d);
+  return entries * sizeof(upb_pbdecoder_frame);
+}
+
+static size_t callstacksize(upb_pbdecoder *d, size_t entries) {
+  UPB_UNUSED(d);
+
+#ifdef UPB_USE_JIT_X64
+  if (d->method_->is_native_) {
+    /* Each native stack frame needs two pointers, plus we need a few frames for
+     * the enter/exit trampolines. */
+    size_t ret = entries * sizeof(void*) * 2;
+    ret += sizeof(void*) * 10;
+    return ret;
+  }
+#endif
+
+  return entries * sizeof(uint32_t*);
+}
+
+
 static bool in_residual_buf(const upb_pbdecoder *d, const char *p);
 
 /* It's unfortunate that we have to micro-manage the compiler with
@@ -7598,9 +7568,19 @@ static size_t curbufleft(const upb_pbdecoder *d) {
   return d->data_end - d->ptr;
 }
 
+/* How many bytes are available before end-of-buffer. */
+static size_t bufleft(const upb_pbdecoder *d) {
+  return d->end - d->ptr;
+}
+
 /* Overall stream offset of d->ptr. */
 uint64_t offset(const upb_pbdecoder *d) {
   return d->bufstart_ofs + (d->ptr - d->buf);
+}
+
+/* How many bytes are available before the end of this delimited region. */
+size_t delim_remaining(const upb_pbdecoder *d) {
+  return d->top->end_ofs - offset(d);
 }
 
 /* Advances d->ptr. */
@@ -7651,24 +7631,72 @@ static void checkpoint(upb_pbdecoder *d) {
   d->checkpoint = d->ptr;
 }
 
+/* Skips "bytes" bytes in the stream, which may be more than available.  If we
+ * skip more bytes than are available, we return a long read count to the caller
+ * indicating how many bytes can be skipped over before passing actual data
+ * again.  Skipped bytes can pass a NULL buffer and the decoder guarantees they
+ * won't actually be read.
+ */
+static int32_t skip(upb_pbdecoder *d, size_t bytes) {
+  assert(!in_residual_buf(d, d->ptr) || d->size_param == 0);
+  assert(d->skip == 0);
+  if (bytes > delim_remaining(d)) {
+    seterr(d, "Skipped value extended beyond enclosing submessage.");
+    return upb_pbdecoder_suspend(d);
+  } else if (bufleft(d) > bytes) {
+    /* Skipped data is all in current buffer, and more is still available. */
+    advance(d, bytes);
+    d->skip = 0;
+    return DECODE_OK;
+  } else {
+    /* Skipped data extends beyond currently available buffers. */
+    d->pc = d->last;
+    d->skip = bytes - curbufleft(d);
+    d->bufstart_ofs += (d->end - d->buf);
+    d->residual_end = d->residual;
+    switchtobuf(d, d->residual, d->residual_end);
+    return d->size_param + d->skip;
+  }
+}
+
+
 /* Resumes the decoder from an initial state or from a previous suspend. */
 int32_t upb_pbdecoder_resume(upb_pbdecoder *d, void *p, const char *buf,
                              size_t size, const upb_bufhandle *handle) {
   UPB_UNUSED(p);  /* Useless; just for the benefit of the JIT. */
+
   d->buf_param = buf;
   d->size_param = size;
   d->handle = handle;
+
   if (d->residual_end > d->residual) {
     /* We have residual bytes from the last buffer. */
     assert(d->ptr == d->residual);
   } else {
     switchtobuf(d, buf, buf + size);
   }
+
   d->checkpoint = d->ptr;
+
+  if (d->skip) {
+    size_t skip_bytes = d->skip;
+    d->skip = 0;
+    CHECK_RETURN(skip(d, skip_bytes));
+    d->checkpoint = d->ptr;
+  }
+
+  if (!buf) {
+    /* NULL buf is ok if its entire span is covered by the "skip" above, but
+     * by this point we know that "skip" doesn't cover the buffer. */
+    seterr(d, "Passed NULL buffer over non-skippable region.");
+    return upb_pbdecoder_suspend(d);
+  }
+
   if (d->top->groupnum < 0) {
     CHECK_RETURN(upb_pbdecoder_skipunknown(d, -1, 0));
     d->checkpoint = d->ptr;
   }
+
   return DECODE_OK;
 }
 
@@ -7726,28 +7754,6 @@ static size_t suspend_save(upb_pbdecoder *d) {
 
   switchtobuf(d, d->residual, d->residual_end);
   return d->size_param;
-}
-
-/* Skips "bytes" bytes in the stream, which may be more than available.  If we
- * skip more bytes than are available, we return a long read count to the caller
- * indicating how many bytes the caller should skip before passing a new buffer.
- */
-static int32_t skip(upb_pbdecoder *d, size_t bytes) {
-  assert(!in_residual_buf(d, d->ptr) || d->size_param == 0);
-  if (curbufleft(d) >= bytes) {
-    /* Skipped data is all in current buffer. */
-    advance(d, bytes);
-    return DECODE_OK;
-  } else {
-    /* Skipped data extends beyond currently available buffers. */
-    size_t skip;
-    d->pc = d->last;
-    skip = bytes - curbufleft(d);
-    d->bufstart_ofs += (d->end - d->buf) + skip;
-    d->residual_end = d->residual;
-    switchtobuf(d, d->residual, d->residual_end);
-    return d->size_param + skip;
-  }
 }
 
 /* Copies the next "bytes" bytes into "buf" and advances the stream.
@@ -7914,7 +7920,7 @@ static bool decoder_push(upb_pbdecoder *d, uint64_t end) {
   upb_pbdecoder_frame *fr = d->top;
 
   if (end > fr->end_ofs) {
-    seterr(d, "Submessage end extends past enclosing submessage.");
+    seterr(d, kPbDecoderSubmessageTooLong);
     return false;
   } else if (fr == d->limit) {
     seterr(d, kPbDecoderStackOverflow);
@@ -8018,34 +8024,7 @@ have_tag:
       return DECODE_OK;
     }
 
-    if (d->ptr == d->delim_end) {
-      seterr(d, "Enclosing submessage ended in the middle of value or group");
-      /* Unlike most errors we notice during parsing, right now we have consumed
-       * all of the user's input.
-       *
-       * There are three different options for how to handle this case:
-       *
-       *   1. decode() = short count, error = set
-       *   2. decode() = full count, error = set
-       *   3. decode() = full count, error NOT set, short count and error will
-       *      be reported on next call to decode() (or end())
-       *
-       * (1) and (3) have the advantage that they preserve the invariant that an
-       * error occurs iff decode() returns a short count.
-       *
-       * (2) and (3) have the advantage of reflecting the fact that all of the
-       * bytes were in fact parsed (and possibly delivered to the unknown field
-       * handler, in the future when that is supported).
-       *
-       * (3) requires extra state in the decode (a place to store the "permanent
-       * error" that we should return for all subsequent attempts to decode).
-       * But we likely want this anyway.
-       *
-       * Right now we do (1), thanks to the fact that we checkpoint *after* this
-       * check.  (3) may be a better choice long term; unclear at the moment. */
-      return upb_pbdecoder_suspend(d);
-    }
-
+    /* Unknown group -- continue looping over unknown fields. */
     checkpoint(d);
   }
 }
@@ -8069,7 +8048,7 @@ static int32_t dispatch(upb_pbdecoder *d) {
   uint8_t wire_type;
   uint32_t fieldnum;
   upb_value val;
-  int32_t ret;
+  int32_t retval;
 
   /* Decode tag. */
   CHECK_RETURN(decode_v32(d, &tag));
@@ -8093,23 +8072,25 @@ static int32_t dispatch(upb_pbdecoder *d) {
     }
   }
 
-  /* Unknown field or ENDGROUP. */
-  ret = upb_pbdecoder_skipunknown(d, fieldnum, wire_type);
+  /* We have some unknown fields (or ENDGROUP) to parse.  The DISPATCH or TAG
+   * bytecode that triggered this is preceded by a CHECKDELIM bytecode which
+   * we need to back up to, so that when we're done skipping unknown data we
+   * can re-check the delimited end. */
+  d->last--;  /* Necessary if we get suspended */
+  d->pc = d->last;
+  assert(getop(*d->last) == OP_CHECKDELIM);
 
-  if (ret == DECODE_ENDGROUP) {
+  /* Unknown field or ENDGROUP. */
+  retval = upb_pbdecoder_skipunknown(d, fieldnum, wire_type);
+
+  CHECK_RETURN(retval);
+
+  if (retval == DECODE_ENDGROUP) {
     goto_endmsg(d);
-    return DECODE_OK;
-  } else if (ret == DECODE_OK) {
-    /* We just consumed some input, so we might now have consumed all the data
-     * in the delmited region.  Since every opcode that can trigger dispatch is
-     * directly preceded by OP_CHECKDELIM, rewind to it now to re-check the
-     * delimited end. */
-    d->pc = d->last - 1;
-    assert(getop(*d->pc) == OP_CHECKDELIM);
     return DECODE_OK;
   }
 
-  return ret;
+  return DECODE_OK;
 }
 
 /* Callers know that the stack is more than one deep because the opcodes that
@@ -8124,18 +8105,8 @@ upb_pbdecoder_frame *outer_frame(upb_pbdecoder *d) {
 
 /* The main decoder VM function.  Uses traditional bytecode dispatch loop with a
  * switch() statement. */
-size_t upb_pbdecoder_decode(void *closure, const void *hd, const char *buf,
-                            size_t size, const upb_bufhandle *handle) {
-  upb_pbdecoder *d = closure;
-  const mgroup *group = hd;
-  int32_t result;
-  assert(buf);
-  result = upb_pbdecoder_resume(d, NULL, buf, size, handle);
-  if (result == DECODE_ENDGROUP) {
-    goto_endmsg(d);
-  }
-  CHECK_RETURN(result);
-  UPB_UNUSED(group);
+size_t run_decoder_vm(upb_pbdecoder *d, const mgroup *group,
+                      const upb_bufhandle* handle) {
 
 #define VMCASE(op, code) \
   case op: { code; if (consumes_input(op)) checkpoint(d); break; }
@@ -8158,6 +8129,7 @@ size_t upb_pbdecoder_decode(void *closure, const void *hd, const char *buf,
     arg = instruction >> 8;
     longofs = arg;
     assert(d->ptr != d->residual_end);
+    UPB_UNUSED(group);
 #ifdef UPB_DUMP_BYTECODE
     fprintf(stderr, "s_ofs=%d buf_ofs=%d data_rem=%d buf_rem=%d delim_rem=%d "
                     "%x %s (%d)\n",
@@ -8214,7 +8186,7 @@ size_t upb_pbdecoder_decode(void *closure, const void *hd, const char *buf,
         CHECK_SUSPEND(upb_sink_endsubmsg(&d->top->sink, arg));
       )
       VMCASE(OP_STARTSTR,
-        uint32_t len = d->top->end_ofs - offset(d);
+        uint32_t len = delim_remaining(d);
         upb_pbdecoder_frame *outer = outer_frame(d);
         CHECK_SUSPEND(upb_sink_startstr(&outer->sink, arg, len, &d->top->sink));
         if (len == 0) {
@@ -8225,7 +8197,7 @@ size_t upb_pbdecoder_decode(void *closure, const void *hd, const char *buf,
         uint32_t len = curbufleft(d);
         size_t n = upb_sink_putstring(&d->top->sink, arg, d->ptr, len, handle);
         if (n > len) {
-          if (n > d->top->end_ofs - offset(d)) {
+          if (n > delim_remaining(d)) {
             seterr(d, "Tried to skip past end of string.");
             return upb_pbdecoder_suspend(d);
           } else {
@@ -8333,11 +8305,14 @@ size_t upb_pbdecoder_decode(void *closure, const void *hd, const char *buf,
         CHECK_RETURN(dispatch(d));
       })
       VMCASE(OP_HALT, {
-        return size;
+        return d->size_param;
       })
     }
   }
 }
+
+
+/* BytesHandler handlers ******************************************************/
 
 void *upb_pbdecoder_startbc(void *closure, const void *pc, size_t size_hint) {
   upb_pbdecoder *d = closure;
@@ -8347,6 +8322,7 @@ void *upb_pbdecoder_startbc(void *closure, const void *pc, size_t size_hint) {
   d->call_len = 1;
   d->callstack[0] = &halt;
   d->pc = pc;
+  d->skip = 0;
   return d;
 }
 
@@ -8357,6 +8333,7 @@ void *upb_pbdecoder_startjit(void *closure, const void *hd, size_t size_hint) {
   d->top->end_ofs = UINT64_MAX;
   d->bufstart_ofs = 0;
   d->call_len = 0;
+  d->skip = 0;
   return d;
 }
 
@@ -8365,12 +8342,14 @@ bool upb_pbdecoder_end(void *closure, const void *handler_data) {
   const upb_pbdecodermethod *method = handler_data;
   uint64_t end;
   char dummy;
-#ifdef UPB_USE_JIT_X64
-  const mgroup *group = (const mgroup*)method->group;
-#endif
 
   if (d->residual_end > d->residual) {
-    seterr(d, "Unexpected EOF");
+    seterr(d, "Unexpected EOF: decoder still has buffered unparsed data");
+    return false;
+  }
+
+  if (d->skip) {
+    seterr(d, "Unexpected EOF inside skipped data");
     return false;
   }
 
@@ -8379,12 +8358,13 @@ bool upb_pbdecoder_end(void *closure, const void *handler_data) {
     return false;
   }
 
-  /* Message ends here. */
+  /* The user's end() call indicates that the message ends here. */
   end = offset(d);
   d->top->end_ofs = end;
 
 #ifdef UPB_USE_JIT_X64
-  if (group->jit_code) {
+  if (method->is_native_) {
+    const mgroup *group = (const mgroup*)method->group;
     if (d->top != d->stack)
       d->stack->end_ofs = 0;
     group->jit_code(closure, method->code_base.ptr, &dummy, 0, NULL);
@@ -8407,12 +8387,25 @@ bool upb_pbdecoder_end(void *closure, const void *handler_data) {
   }
 
   if (d->call_len != 0) {
-    seterr(d, "Unexpected EOF");
+    seterr(d, "Unexpected EOF inside submessage or group");
     return false;
   }
 
   return true;
 }
+
+size_t upb_pbdecoder_decode(void *decoder, const void *group, const char *buf,
+                            size_t size, const upb_bufhandle *handle) {
+  int32_t result = upb_pbdecoder_resume(decoder, NULL, buf, size, handle);
+
+  if (result == DECODE_ENDGROUP) goto_endmsg(decoder);
+  CHECK_RETURN(result);
+
+  return run_decoder_vm(decoder, group, handle);
+}
+
+
+/* Public API *****************************************************************/
 
 void upb_pbdecoder_reset(upb_pbdecoder *d) {
   d->top = d->stack;
@@ -8421,27 +8414,6 @@ void upb_pbdecoder_reset(upb_pbdecoder *d) {
   d->buf = d->residual;
   d->end = d->residual;
   d->residual_end = d->residual;
-}
-
-static size_t stacksize(upb_pbdecoder *d, size_t entries) {
-  UPB_UNUSED(d);
-  return entries * sizeof(upb_pbdecoder_frame);
-}
-
-static size_t callstacksize(upb_pbdecoder *d, size_t entries) {
-  UPB_UNUSED(d);
-
-#ifdef UPB_USE_JIT_X64
-  if (d->method_->is_native_) {
-    /* Each native stack frame needs two pointers, plus we need a few frames for
-     * the enter/exit trampolines. */
-    size_t ret = entries * sizeof(void*) * 2;
-    ret += sizeof(void*) * 10;
-    return ret;
-  }
-#endif
-
-  return entries * sizeof(uint32_t*);
 }
 
 upb_pbdecoder *upb_pbdecoder_create(upb_env *e, const upb_pbdecodermethod *m,
@@ -8529,63 +8501,60 @@ bool upb_pbdecoder_setmaxnesting(upb_pbdecoder *d, size_t max) {
   return true;
 }
 /*
- * upb - a minimalist implementation of protocol buffers.
- *
- * Copyright (c) 2014 Google Inc.  See LICENSE for details.
- * Author: Josh Haberman <jhaberman@gmail.com>
- *
- * Since we are implementing pure handlers (ie. without any out-of-band access
- * to pre-computed lengths), we have to buffer all submessages before we can
- * emit even their first byte.
- *
- * Not knowing the size of submessages also means we can't write a perfect
- * zero-copy implementation, even with buffering.  Lengths are stored as
- * varints, which means that we don't know how many bytes to reserve for the
- * length until we know what the length is.
- *
- * This leaves us with three main choices:
- *
- * 1. buffer all submessage data in a temporary buffer, then copy it exactly
- *    once into the output buffer.
- *
- * 2. attempt to buffer data directly into the output buffer, estimating how
- *    many bytes each length will take.  When our guesses are wrong, use
- *    memmove() to grow or shrink the allotted space.
- *
- * 3. buffer directly into the output buffer, allocating a max length
- *    ahead-of-time for each submessage length.  If we overallocated, we waste
- *    space, but no memcpy() or memmove() is required.  This approach requires
- *    defining a maximum size for submessages and rejecting submessages that
- *    exceed that size.
- *
- * (2) and (3) have the potential to have better performance, but they are more
- * complicated and subtle to implement:
- *
- *   (3) requires making an arbitrary choice of the maximum message size; it
- *       wastes space when submessages are shorter than this and fails
- *       completely when they are longer.  This makes it more finicky and
- *       requires configuration based on the input.  It also makes it impossible
- *       to perfectly match the output of reference encoders that always use the
- *       optimal amount of space for each length.
- *
- *   (2) requires guessing the the size upfront, and if multiple lengths are
- *       guessed wrong the minimum required number of memmove() operations may
- *       be complicated to compute correctly.  Implemented properly, it may have
- *       a useful amortized or average cost, but more investigation is required
- *       to determine this and what the optimal algorithm is to achieve it.
- *
- *   (1) makes you always pay for exactly one copy, but its implementation is
- *       the simplest and its performance is predictable.
- *
- * So for now, we implement (1) only.  If we wish to optimize later, we should
- * be able to do it without affecting users.
- *
- * The strategy is to buffer the segments of data that do *not* depend on
- * unknown lengths in one buffer, and keep a separate buffer of segment pointers
- * and lengths.  When the top-level submessage ends, we can go beginning to end,
- * alternating the writing of lengths with memcpy() of the rest of the data.
- * At the top level though, no buffering is required.
- */
+** upb::Encoder
+**
+** Since we are implementing pure handlers (ie. without any out-of-band access
+** to pre-computed lengths), we have to buffer all submessages before we can
+** emit even their first byte.
+**
+** Not knowing the size of submessages also means we can't write a perfect
+** zero-copy implementation, even with buffering.  Lengths are stored as
+** varints, which means that we don't know how many bytes to reserve for the
+** length until we know what the length is.
+**
+** This leaves us with three main choices:
+**
+** 1. buffer all submessage data in a temporary buffer, then copy it exactly
+**    once into the output buffer.
+**
+** 2. attempt to buffer data directly into the output buffer, estimating how
+**    many bytes each length will take.  When our guesses are wrong, use
+**    memmove() to grow or shrink the allotted space.
+**
+** 3. buffer directly into the output buffer, allocating a max length
+**    ahead-of-time for each submessage length.  If we overallocated, we waste
+**    space, but no memcpy() or memmove() is required.  This approach requires
+**    defining a maximum size for submessages and rejecting submessages that
+**    exceed that size.
+**
+** (2) and (3) have the potential to have better performance, but they are more
+** complicated and subtle to implement:
+**
+**   (3) requires making an arbitrary choice of the maximum message size; it
+**       wastes space when submessages are shorter than this and fails
+**       completely when they are longer.  This makes it more finicky and
+**       requires configuration based on the input.  It also makes it impossible
+**       to perfectly match the output of reference encoders that always use the
+**       optimal amount of space for each length.
+**
+**   (2) requires guessing the the size upfront, and if multiple lengths are
+**       guessed wrong the minimum required number of memmove() operations may
+**       be complicated to compute correctly.  Implemented properly, it may have
+**       a useful amortized or average cost, but more investigation is required
+**       to determine this and what the optimal algorithm is to achieve it.
+**
+**   (1) makes you always pay for exactly one copy, but its implementation is
+**       the simplest and its performance is predictable.
+**
+** So for now, we implement (1) only.  If we wish to optimize later, we should
+** be able to do it without affecting users.
+**
+** The strategy is to buffer the segments of data that do *not* depend on
+** unknown lengths in one buffer, and keep a separate buffer of segment pointers
+** and lengths.  When the top-level submessage ends, we can go beginning to end,
+** alternating the writing of lengths with memcpy() of the rest of the data.
+** At the top level though, no buffering is required.
+*/
 
 
 #include <stdlib.h>
@@ -9095,12 +9064,6 @@ upb_pb_encoder *upb_pb_encoder_create(upb_env *env, const upb_handlers *h,
 }
 
 upb_sink *upb_pb_encoder_input(upb_pb_encoder *e) { return &e->input_; }
-/*
- * upb - a minimalist implementation of protocol buffers.
- *
- * Copyright (c) 2010-2012 Google Inc.  See LICENSE for details.
- * Author: Josh Haberman <jhaberman@gmail.com>
- */
 
 
 #include <stdio.h>
@@ -9189,10 +9152,7 @@ bool upb_load_descriptor_file_into_symtab(upb_symtab *symtab, const char *fname,
   return success;
 }
 /*
- * upb - a minimalist implementation of protocol buffers.
- *
- * Copyright (c) 2009 Google Inc.  See LICENSE for details.
- * Author: Josh Haberman <jhaberman@gmail.com>
+ * upb::pb::TextPrinter
  *
  * OPT: This is not optimized at all.  It uses printf() which parses the format
  * string every time, and it allocates memory for every put.
@@ -9529,12 +9489,6 @@ upb_sink *upb_textprinter_input(upb_textprinter *p) { return &p->input_; }
 void upb_textprinter_setsingleline(upb_textprinter *p, bool single_line) {
   p->single_line_ = single_line;
 }
-/*
- * upb - a minimalist implementation of protocol buffers.
- *
- * Copyright (c) 2011 Google Inc.  See LICENSE for details.
- * Author: Josh Haberman <jhaberman@gmail.com>
- */
 
 
 /* Index is descriptor type. */
@@ -9662,28 +9616,25 @@ upb_decoderet upb_vdecode_max8_wright(upb_decoderet r) {
 
 #line 1 "upb/json/parser.rl"
 /*
- * upb - a minimalist implementation of protocol buffers.
- *
- * Copyright (c) 2014 Google Inc.  See LICENSE for details.
- * Author: Josh Haberman <jhaberman@gmail.com>
- *
- * A parser that uses the Ragel State Machine Compiler to generate
- * the finite automata.
- *
- * Ragel only natively handles regular languages, but we can manually
- * program it a bit to handle context-free languages like JSON, by using
- * the "fcall" and "fret" constructs.
- *
- * This parser can handle the basics, but needs several things to be fleshed
- * out:
- *
- * - handling of unicode escape sequences (including high surrogate pairs).
- * - properly check and report errors for unknown fields, stack overflow,
- *   improper array nesting (or lack of nesting).
- * - handling of base64 sequences with padding characters.
- * - handling of push-back (non-success returns from sink functions).
- * - handling of keys/escape-sequences/etc that span input buffers.
- */
+** upb::json::Parser (upb_json_parser)
+**
+** A parser that uses the Ragel State Machine Compiler to generate
+** the finite automata.
+**
+** Ragel only natively handles regular languages, but we can manually
+** program it a bit to handle context-free languages like JSON, by using
+** the "fcall" and "fret" constructs.
+**
+** This parser can handle the basics, but needs several things to be fleshed
+** out:
+**
+** - handling of unicode escape sequences (including high surrogate pairs).
+** - properly check and report errors for unknown fields, stack overflow,
+**   improper array nesting (or lack of nesting).
+** - handling of base64 sequences with padding characters.
+** - handling of push-back (non-success returns from sink functions).
+** - handling of keys/escape-sequences/etc that span input buffers.
+*/
 
 #include <stdio.h>
 #include <stdint.h>
@@ -9731,7 +9682,7 @@ struct upb_json_parser {
   upb_jsonparser_frame *top;
   upb_jsonparser_frame *limit;
 
-  upb_status *status;
+  upb_status status;
 
   /* Ragel's internal parsing stack for the parsing state machine. */
   int current_state;
@@ -9778,7 +9729,8 @@ static upb_selector_t parser_getsel(upb_json_parser *p) {
 
 static bool check_stack(upb_json_parser *p) {
   if ((p->top + 1) == p->limit) {
-    upb_status_seterrmsg(p->status, "Nesting too deep");
+    upb_status_seterrmsg(&p->status, "Nesting too deep");
+    upb_env_reporterror(p->env, &p->status);
     return false;
   }
 
@@ -9860,9 +9812,10 @@ static bool base64_push(upb_json_parser *p, upb_selector_t sel, const char *ptr,
     char output[3];
 
     if (limit - ptr < 4) {
-      upb_status_seterrf(p->status,
+      upb_status_seterrf(&p->status,
                          "Base64 input for bytes field not a multiple of 4: %s",
                          upb_fielddef_name(p->top->f));
+      upb_env_reporterror(p->env, &p->status);
       return false;
     }
 
@@ -9886,9 +9839,10 @@ static bool base64_push(upb_json_parser *p, upb_selector_t sel, const char *ptr,
 otherchar:
   if (nonbase64(ptr[0]) || nonbase64(ptr[1]) || nonbase64(ptr[2]) ||
       nonbase64(ptr[3]) ) {
-    upb_status_seterrf(p->status,
+    upb_status_seterrf(&p->status,
                        "Non-base64 characters in bytes field: %s",
                        upb_fielddef_name(p->top->f));
+    upb_env_reporterror(p->env, &p->status);
     return false;
   } if (ptr[2] == '=') {
     uint32_t val;
@@ -9926,10 +9880,11 @@ otherchar:
   }
 
 badpadding:
-  upb_status_seterrf(p->status,
+  upb_status_seterrf(&p->status,
                      "Incorrect base64 padding for field: %s (%.*s)",
                      upb_fielddef_name(p->top->f),
                      4, ptr);
+  upb_env_reporterror(p->env, &p->status);
   return false;
 }
 
@@ -9976,7 +9931,8 @@ static bool accumulate_realloc(upb_json_parser *p, size_t need) {
 
   mem = upb_env_realloc(p->env, p->accumulate_buf, old_size, new_size);
   if (!mem) {
-    upb_status_seterrmsg(p->status, "Out of memory allocating buffer.");
+    upb_status_seterrmsg(&p->status, "Out of memory allocating buffer.");
+    upb_env_reporterror(p->env, &p->status);
     return false;
   }
 
@@ -9999,7 +9955,8 @@ static bool accumulate_append(upb_json_parser *p, const char *buf, size_t len,
   }
 
   if (!checked_add(p->accumulated_len, len, &need)) {
-    upb_status_seterrmsg(p->status, "Integer overflow.");
+    upb_status_seterrmsg(&p->status, "Integer overflow.");
+    upb_env_reporterror(p->env, &p->status);
     return false;
   }
 
@@ -10077,7 +10034,8 @@ static bool multipart_text(upb_json_parser *p, const char *buf, size_t len,
   switch (p->multipart_state) {
     case MULTIPART_INACTIVE:
       upb_status_seterrmsg(
-          p->status, "Internal error: unexpected state MULTIPART_INACTIVE");
+          &p->status, "Internal error: unexpected state MULTIPART_INACTIVE");
+      upb_env_reporterror(p->env, &p->status);
       return false;
 
     case MULTIPART_ACCUMULATE:
@@ -10336,7 +10294,8 @@ static bool parse_number(upb_json_parser *p) {
   return true;
 
 err:
-  upb_status_seterrf(p->status, "error parsing number: %s", buf);
+  upb_status_seterrf(&p->status, "error parsing number: %s", buf);
+  upb_env_reporterror(p->env, &p->status);
   multipart_end(p);
   return false;
 }
@@ -10345,9 +10304,10 @@ static bool parser_putbool(upb_json_parser *p, bool val) {
   bool ok;
 
   if (upb_fielddef_type(p->top->f) != UPB_TYPE_BOOL) {
-    upb_status_seterrf(p->status,
+    upb_status_seterrf(&p->status,
                        "Boolean value specified for non-bool field: %s",
                        upb_fielddef_name(p->top->f));
+    upb_env_reporterror(p->env, &p->status);
     return false;
   }
 
@@ -10398,9 +10358,10 @@ static bool start_stringval(upb_json_parser *p) {
     multipart_startaccum(p);
     return true;
   } else {
-    upb_status_seterrf(p->status,
+    upb_status_seterrf(&p->status,
                        "String specified for non-string/non-enum field: %s",
                        upb_fielddef_name(p->top->f));
+    upb_env_reporterror(p->env, &p->status);
     return false;
   }
 }
@@ -10438,7 +10399,8 @@ static bool end_stringval(upb_json_parser *p) {
         upb_selector_t sel = parser_getsel(p);
         upb_sink_putint32(&p->top->sink, sel, int_val);
       } else {
-        upb_status_seterrf(p->status, "Enum value unknown: '%.*s'", len, buf);
+        upb_status_seterrf(&p->status, "Enum value unknown: '%.*s'", len, buf);
+        upb_env_reporterror(p->env, &p->status);
       }
 
       break;
@@ -10446,7 +10408,8 @@ static bool end_stringval(upb_json_parser *p) {
 
     default:
       assert(false);
-      upb_status_seterrmsg(p->status, "Internal error in JSON decoder");
+      upb_status_seterrmsg(&p->status, "Internal error in JSON decoder");
+      upb_env_reporterror(p->env, &p->status);
       ok = false;
       break;
   }
@@ -10476,7 +10439,8 @@ static bool parse_mapentry_key(upb_json_parser *p) {
 
   p->top->f = upb_msgdef_itof(p->top->m, UPB_MAPENTRY_KEY);
   if (p->top->f == NULL) {
-    upb_status_seterrmsg(p->status, "mapentry message has no key");
+    upb_status_seterrmsg(&p->status, "mapentry message has no key");
+    upb_env_reporterror(p->env, &p->status);
     return false;
   }
   switch (upb_fielddef_type(p->top->f)) {
@@ -10499,8 +10463,9 @@ static bool parse_mapentry_key(upb_json_parser *p) {
           return false;
         }
       } else {
-        upb_status_seterrmsg(p->status,
+        upb_status_seterrmsg(&p->status,
                              "Map bool key not 'true' or 'false'");
+        upb_env_reporterror(p->env, &p->status);
         return false;
       }
       multipart_end(p);
@@ -10518,7 +10483,8 @@ static bool parse_mapentry_key(upb_json_parser *p) {
       break;
     }
     default:
-      upb_status_seterrmsg(p->status, "Invalid field type for map key");
+      upb_status_seterrmsg(&p->status, "Invalid field type for map key");
+      upb_env_reporterror(p->env, &p->status);
       return false;
   }
 
@@ -10573,7 +10539,8 @@ static bool handle_mapentry(upb_json_parser *p) {
   p->top->is_mapentry = true;  /* set up to pop frame after value is parsed. */
   p->top->mapfield = mapfield;
   if (p->top->f == NULL) {
-    upb_status_seterrmsg(p->status, "mapentry message has no value");
+    upb_status_seterrmsg(&p->status, "mapentry message has no value");
+    upb_env_reporterror(p->env, &p->status);
     return false;
   }
 
@@ -10593,7 +10560,8 @@ static bool end_membername(upb_json_parser *p) {
     if (!f) {
       /* TODO(haberman): Ignore unknown fields if requested/configured to do
        * so. */
-      upb_status_seterrf(p->status, "No such field: %.*s\n", (int)len, buf);
+      upb_status_seterrf(&p->status, "No such field: %.*s\n", (int)len, buf);
+      upb_env_reporterror(p->env, &p->status);
       return false;
     }
 
@@ -10669,9 +10637,10 @@ static bool start_subobject(upb_json_parser *p) {
 
     return true;
   } else {
-    upb_status_seterrf(p->status,
+    upb_status_seterrf(&p->status,
                        "Object specified for non-message/group field: %s",
                        upb_fielddef_name(p->top->f));
+    upb_env_reporterror(p->env, &p->status);
     return false;
   }
 }
@@ -10697,9 +10666,10 @@ static bool start_array(upb_json_parser *p) {
   assert(p->top->f);
 
   if (!upb_fielddef_isseq(p->top->f)) {
-    upb_status_seterrf(p->status,
+    upb_status_seterrf(&p->status,
                        "Array specified for non-repeated field: %s",
                        upb_fielddef_name(p->top->f));
+    upb_env_reporterror(p->env, &p->status);
     return false;
   }
 
@@ -10736,7 +10706,11 @@ static void start_object(upb_json_parser *p) {
 static void end_object(upb_json_parser *p) {
   if (!p->top->is_map) {
     upb_status status;
+    upb_status_clear(&status);
     upb_sink_endmsg(&p->top->sink, &status);
+    if (!upb_ok(&status)) {
+      upb_env_reporterror(p->env, &status);
+    }
   }
 }
 
@@ -10762,11 +10736,11 @@ static void end_object(upb_json_parser *p) {
  * final state once, when the closing '"' is seen. */
 
 
-#line 1198 "upb/json/parser.rl"
+#line 1218 "upb/json/parser.rl"
 
 
 
-#line 1110 "upb/json/parser.c"
+#line 1130 "upb/json/parser.c"
 static const char _json_actions[] = {
 	0, 1, 0, 1, 2, 1, 3, 1, 
 	5, 1, 6, 1, 7, 1, 8, 1, 
@@ -10915,7 +10889,7 @@ static const int json_en_value_machine = 27;
 static const int json_en_main = 1;
 
 
-#line 1201 "upb/json/parser.rl"
+#line 1221 "upb/json/parser.rl"
 
 size_t parse(void *closure, const void *hd, const char *buf, size_t size,
              const upb_bufhandle *handle) {
@@ -10937,7 +10911,7 @@ size_t parse(void *closure, const void *hd, const char *buf, size_t size,
   capture_resume(parser, buf);
 
   
-#line 1281 "upb/json/parser.c"
+#line 1301 "upb/json/parser.c"
 	{
 	int _klen;
 	unsigned int _trans;
@@ -11012,118 +10986,118 @@ _match:
 		switch ( *_acts++ )
 		{
 	case 0:
-#line 1113 "upb/json/parser.rl"
+#line 1133 "upb/json/parser.rl"
 	{ p--; {cs = stack[--top]; goto _again;} }
 	break;
 	case 1:
-#line 1114 "upb/json/parser.rl"
+#line 1134 "upb/json/parser.rl"
 	{ p--; {stack[top++] = cs; cs = 10; goto _again;} }
 	break;
 	case 2:
-#line 1118 "upb/json/parser.rl"
+#line 1138 "upb/json/parser.rl"
 	{ start_text(parser, p); }
 	break;
 	case 3:
-#line 1119 "upb/json/parser.rl"
+#line 1139 "upb/json/parser.rl"
 	{ CHECK_RETURN_TOP(end_text(parser, p)); }
 	break;
 	case 4:
-#line 1125 "upb/json/parser.rl"
+#line 1145 "upb/json/parser.rl"
 	{ start_hex(parser); }
 	break;
 	case 5:
-#line 1126 "upb/json/parser.rl"
+#line 1146 "upb/json/parser.rl"
 	{ hexdigit(parser, p); }
 	break;
 	case 6:
-#line 1127 "upb/json/parser.rl"
+#line 1147 "upb/json/parser.rl"
 	{ CHECK_RETURN_TOP(end_hex(parser)); }
 	break;
 	case 7:
-#line 1133 "upb/json/parser.rl"
+#line 1153 "upb/json/parser.rl"
 	{ CHECK_RETURN_TOP(escape(parser, p)); }
 	break;
 	case 8:
-#line 1139 "upb/json/parser.rl"
+#line 1159 "upb/json/parser.rl"
 	{ p--; {cs = stack[--top]; goto _again;} }
 	break;
 	case 9:
-#line 1142 "upb/json/parser.rl"
+#line 1162 "upb/json/parser.rl"
 	{ {stack[top++] = cs; cs = 19; goto _again;} }
 	break;
 	case 10:
-#line 1144 "upb/json/parser.rl"
+#line 1164 "upb/json/parser.rl"
 	{ p--; {stack[top++] = cs; cs = 27; goto _again;} }
 	break;
 	case 11:
-#line 1149 "upb/json/parser.rl"
+#line 1169 "upb/json/parser.rl"
 	{ start_member(parser); }
 	break;
 	case 12:
-#line 1150 "upb/json/parser.rl"
+#line 1170 "upb/json/parser.rl"
 	{ CHECK_RETURN_TOP(end_membername(parser)); }
 	break;
 	case 13:
-#line 1153 "upb/json/parser.rl"
+#line 1173 "upb/json/parser.rl"
 	{ end_member(parser); }
 	break;
 	case 14:
-#line 1159 "upb/json/parser.rl"
+#line 1179 "upb/json/parser.rl"
 	{ start_object(parser); }
 	break;
 	case 15:
-#line 1162 "upb/json/parser.rl"
+#line 1182 "upb/json/parser.rl"
 	{ end_object(parser); }
 	break;
 	case 16:
-#line 1168 "upb/json/parser.rl"
+#line 1188 "upb/json/parser.rl"
 	{ CHECK_RETURN_TOP(start_array(parser)); }
 	break;
 	case 17:
-#line 1172 "upb/json/parser.rl"
+#line 1192 "upb/json/parser.rl"
 	{ end_array(parser); }
 	break;
 	case 18:
-#line 1177 "upb/json/parser.rl"
+#line 1197 "upb/json/parser.rl"
 	{ start_number(parser, p); }
 	break;
 	case 19:
-#line 1178 "upb/json/parser.rl"
+#line 1198 "upb/json/parser.rl"
 	{ CHECK_RETURN_TOP(end_number(parser, p)); }
 	break;
 	case 20:
-#line 1180 "upb/json/parser.rl"
+#line 1200 "upb/json/parser.rl"
 	{ CHECK_RETURN_TOP(start_stringval(parser)); }
 	break;
 	case 21:
-#line 1181 "upb/json/parser.rl"
+#line 1201 "upb/json/parser.rl"
 	{ CHECK_RETURN_TOP(end_stringval(parser)); }
 	break;
 	case 22:
-#line 1183 "upb/json/parser.rl"
+#line 1203 "upb/json/parser.rl"
 	{ CHECK_RETURN_TOP(parser_putbool(parser, true)); }
 	break;
 	case 23:
-#line 1185 "upb/json/parser.rl"
+#line 1205 "upb/json/parser.rl"
 	{ CHECK_RETURN_TOP(parser_putbool(parser, false)); }
 	break;
 	case 24:
-#line 1187 "upb/json/parser.rl"
+#line 1207 "upb/json/parser.rl"
 	{ /* null value */ }
 	break;
 	case 25:
-#line 1189 "upb/json/parser.rl"
+#line 1209 "upb/json/parser.rl"
 	{ CHECK_RETURN_TOP(start_subobject(parser)); }
 	break;
 	case 26:
-#line 1190 "upb/json/parser.rl"
+#line 1210 "upb/json/parser.rl"
 	{ end_subobject(parser); }
 	break;
 	case 27:
-#line 1195 "upb/json/parser.rl"
+#line 1215 "upb/json/parser.rl"
 	{ p--; {cs = stack[--top]; goto _again;} }
 	break;
-#line 1467 "upb/json/parser.c"
+#line 1487 "upb/json/parser.c"
 		}
 	}
 
@@ -11136,10 +11110,11 @@ _again:
 	_out: {}
 	}
 
-#line 1222 "upb/json/parser.rl"
+#line 1242 "upb/json/parser.rl"
 
   if (p != pe) {
-    upb_status_seterrf(parser->status, "Parse error at %s\n", p);
+    upb_status_seterrf(&parser->status, "Parse error at %s\n", p);
+    upb_env_reporterror(parser->env, &parser->status);
   } else {
     capture_suspend(parser, &p);
   }
@@ -11176,19 +11151,20 @@ static void json_parser_reset(upb_json_parser *p) {
 
   /* Emit Ragel initialization of the parser. */
   
-#line 1520 "upb/json/parser.c"
+#line 1541 "upb/json/parser.c"
 	{
 	cs = json_start;
 	top = 0;
 	}
 
-#line 1261 "upb/json/parser.rl"
+#line 1282 "upb/json/parser.rl"
   p->current_state = cs;
   p->parser_top = top;
   accumulate_clear(p);
   p->multipart_state = MULTIPART_INACTIVE;
   p->capture = NULL;
   p->accumulated = NULL;
+  upb_status_clear(&p->status);
 }
 
 
@@ -11214,8 +11190,8 @@ upb_json_parser *upb_json_parser_create(upb_env *env, upb_sink *output) {
   upb_sink_reset(&p->top->sink, output->handlers, output->closure);
   p->top->m = upb_handlers_msgdef(output->handlers);
 
-  /* If this fails, uncomment and increase the value in parser.h.
-   * fprintf(stderr, "%zd\n", upb_env_bytesallocated(env) - size_before); */
+  /* If this fails, uncomment and increase the value in parser.h. */
+  /* fprintf(stderr, "%zd\n", upb_env_bytesallocated(env) - size_before); */
   assert(upb_env_bytesallocated(env) - size_before <= UPB_JSON_PARSER_SIZE);
   return p;
 }
@@ -11224,14 +11200,9 @@ upb_bytessink *upb_json_parser_input(upb_json_parser *p) {
   return &p->input_;
 }
 /*
- * upb - a minimalist implementation of protocol buffers.
- *
- * Copyright (c) 2014 Google Inc.  See LICENSE for details.
- * Author: Josh Haberman <jhaberman@gmail.com>
- *
- * This currently uses snprintf() to format primitives, and could be optimized
- * further.
- */
+** This currently uses snprintf() to format primitives, and could be optimized
+** further.
+*/
 
 
 #include <stdlib.h>
