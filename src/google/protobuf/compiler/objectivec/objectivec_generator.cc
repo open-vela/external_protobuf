@@ -34,6 +34,7 @@
 #include <google/protobuf/compiler/objectivec/objectivec_helpers.h>
 #include <google/protobuf/io/printer.h>
 #include <google/protobuf/io/zero_copy_stream.h>
+#include <google/protobuf/descriptor.pb.h>
 #include <google/protobuf/stubs/strutil.h>
 
 namespace google {
@@ -57,13 +58,8 @@ bool ObjectiveCGenerator::Generate(const FileDescriptor* file,
     return false;
   }
 
-  // Validate the objc prefix/package pairing.
-  if (!ValidateObjCClassPrefix(file, error)) {
-    // *error will have been filled in.
-    return false;
-  }
-
   FileGenerator file_generator(file);
+
   string filepath = FilePath(file);
 
   // Generate header.

@@ -53,7 +53,6 @@ class LIBPROTOC_EXPORT ObjectiveCGenerator : public CodeGenerator {
  private:
   GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(ObjectiveCGenerator);
 };
-
 }  // namespace objectivec
 }  // namespace compiler
 }  // namespace protobuf
