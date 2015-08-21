@@ -1,4 +1,4 @@
-#! /usr/bin/python
+#! /usr/bin/env python
 #
 # Protocol Buffers - Google's data interchange format
 # Copyright 2008 Google Inc.  All rights reserved.
@@ -36,6 +36,7 @@ __author__ = 'robinson@google.com (Will Robinson)'
 
 import sys
 
+import unittest
 from google.protobuf import unittest_custom_options_pb2
 from google.protobuf import unittest_import_pb2
 from google.protobuf import unittest_pb2
@@ -44,11 +45,6 @@ from google.protobuf.internal import api_implementation
 from google.protobuf import descriptor
 from google.protobuf import symbol_database
 from google.protobuf import text_format
-
-try:
-  import unittest2 as unittest
-except ImportError:
-  import unittest
 
 
 TEST_EMPTY_MESSAGE_DESCRIPTOR_ASCII = """
@@ -459,7 +455,7 @@ class GeneratedDescriptorTest(unittest.TestCase):
     # properties of an immutable abc.Mapping.
     self.assertGreater(len(mapping), 0)  # Sized
     self.assertEqual(len(mapping), len(list(mapping)))  # Iterable
-    if sys.version_info >= (3,):
+    if sys.version_info.major >= 3:
       key, item = next(iter(mapping.items()))
     else:
       key, item = mapping.items()[0]
@@ -468,7 +464,7 @@ class GeneratedDescriptorTest(unittest.TestCase):
     # keys(), iterkeys() &co
     item = (next(iter(mapping.keys())), next(iter(mapping.values())))
     self.assertEqual(item, next(iter(mapping.items())))
-    if sys.version_info < (3,):
+    if sys.version_info.major < 3:
       def CheckItems(seq, iterator):
         self.assertEqual(next(iterator), seq[0])
         self.assertEqual(list(iterator), seq[1:])
@@ -776,7 +772,7 @@ class MakeDescriptorTest(unittest.TestCase):
     reformed_descriptor = descriptor.MakeDescriptor(descriptor_proto)
 
     options = reformed_descriptor.GetOptions()
-    self.assertEqual(101,
+    self.assertEquals(101,
                       options.Extensions[unittest_custom_options_pb2.msgopt].i)
 
 if __name__ == '__main__':

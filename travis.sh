@@ -111,30 +111,25 @@ build_javanano_oracle7() {
   build_javanano
 }
 
-internal_install_python_deps() {
-  sudo pip install tox
-  sudo apt-get install -y python-software-properties # for apt-add-repository
-  sudo apt-add-repository -y ppa:fkrull/deadsnakes
-  sudo apt-get update -qq
-  sudo apt-get install -y python2.6 python2.6-dev
-}
-
-
 build_python() {
   internal_build_cpp
-  internal_install_python_deps
   cd python
-  tox -e py26-python,py27-python
+  python setup.py build
+  python setup.py test
+  python setup.py sdist
+  sudo pip install virtualenv && virtualenv /tmp/protoenv && /tmp/protoenv/bin/pip install dist/*
   cd ..
 }
 
 build_python_cpp() {
   internal_build_cpp
-  internal_install_python_deps
-  export LD_LIBRARY_PATH=../src/.libs # for Linux
+  export   LD_LIBRARY_PATH=../src/.libs # for Linux
   export DYLD_LIBRARY_PATH=../src/.libs # for OS X
   cd python
-  tox -e py26-cpp,py27-cpp
+  python setup.py build --cpp_implementation
+  python setup.py test --cpp_implementation
+  python setup.py sdist --cpp_implementation
+  sudo pip install virtualenv && virtualenv /tmp/protoenv && /tmp/protoenv/bin/pip install dist/*
   cd ..
 }
 
