@@ -100,20 +100,12 @@ typedef unsigned __int64 uint64;
 typedef signed char  int8;
 typedef short int16;
 typedef int int32;
-// NOTE: This should be "long long" for consistency with upstream, but
-// something is stacked against this particular type for 64bit hashing.
-// Switching it causes an obvious missing hash function (with an unobvious
-// cause) when building the tests.
-typedef int64_t int64;
+typedef long long int64;
 
 typedef unsigned char  uint8;
 typedef unsigned short uint16;
 typedef unsigned int uint32;
-// NOTE: This should be "unsigned long long" for consistency with upstream, but
-// something is stacked against this particular type for 64bit hashing.
-// Switching it causes an obvious missing hash function (with an unobvious
-// cause) when building the tests.
-typedef uint64_t uint64;
+typedef unsigned long long uint64;
 #endif
 
 // long long macros to be used because gcc and vc++ use different suffixes,
@@ -161,9 +153,6 @@ static const uint64 kuint64max = GOOGLE_ULONGLONG(0xFFFFFFFFFFFFFFFF);
 // For functions we want to force not inline.
 // Introduced in gcc 3.1.
 #define GOOGLE_ATTRIBUTE_NOINLINE __attribute__ ((noinline))
-#elif defined(_MSC_VER) && (_MSC_VER >= 1400)
-// Seems to have been around since at least Visual Studio 2005
-#define GOOGLE_ATTRIBUTE_NOINLINE __declspec(noinline)
 #else
 // Other compilers will have to figure it out for themselves.
 #define GOOGLE_ATTRIBUTE_NOINLINE
@@ -207,19 +196,8 @@ static const uint64 kuint64max = GOOGLE_ULONGLONG(0xFFFFFFFFFFFFFFFF);
 #define GOOGLE_SAFE_CONCURRENT_WRITES_END()
 #endif
 
-#if defined(__clang__) && defined(__has_cpp_attribute) \
-    && !defined(GOOGLE_PROTOBUF_OS_APPLE)
-# if defined(GOOGLE_PROTOBUF_OS_NACL) || defined(EMSCRIPTEN) || \
-     __has_cpp_attribute(clang::fallthrough)
-#  define GOOGLE_FALLTHROUGH_INTENDED [[clang::fallthrough]]
-# endif
-#endif
-
-#ifndef GOOGLE_FALLTHROUGH_INTENDED
-# define GOOGLE_FALLTHROUGH_INTENDED
-#endif
-
 #define GOOGLE_GUARDED_BY(x)
+#define GOOGLE_FALLTHROUGH_INTENDED
 #define GOOGLE_ATTRIBUTE_COLD
 
 // x86 and x86-64 can perform unaligned loads/stores directly.

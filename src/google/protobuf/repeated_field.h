@@ -458,21 +458,22 @@ class LIBPROTOBUF_EXPORT RepeatedPtrFieldBase {
   void AddAllocatedInternal(typename TypeHandler::Type* value,
                             google::protobuf::internal::false_type);
 
-  template <typename TypeHandler> GOOGLE_ATTRIBUTE_NOINLINE
+  template <typename TypeHandler>
   void AddAllocatedSlowWithCopy(typename TypeHandler::Type* value,
                                 Arena* value_arena,
                                 Arena* my_arena)
-;
-  template <typename TypeHandler> GOOGLE_ATTRIBUTE_NOINLINE
-  void AddAllocatedSlowWithoutCopy(typename TypeHandler::Type* value);
+      GOOGLE_ATTRIBUTE_NOINLINE;
+  template <typename TypeHandler>
+  void AddAllocatedSlowWithoutCopy(typename TypeHandler::Type* value)
+      GOOGLE_ATTRIBUTE_NOINLINE;
 
   template <typename TypeHandler>
   typename TypeHandler::Type* ReleaseLastInternal(google::protobuf::internal::true_type);
   template <typename TypeHandler>
   typename TypeHandler::Type* ReleaseLastInternal(google::protobuf::internal::false_type);
 
-  template<typename TypeHandler> GOOGLE_ATTRIBUTE_NOINLINE
-  inline void SwapFallback(RepeatedPtrFieldBase* other);
+  template<typename TypeHandler>
+  inline void SwapFallback(RepeatedPtrFieldBase* other) GOOGLE_ATTRIBUTE_NOINLINE;
 
   inline Arena* GetArenaNoVirtual() const {
     return arena_;
@@ -544,13 +545,13 @@ class GenericTypeHandler {
   // constructors and destructors. Note that the GOOGLE_ATTRIBUTE_NOINLINE macro
   // requires the 'inline' storage class here, which is somewhat confusing, but
   // the compiler does the right thing.
-  GOOGLE_ATTRIBUTE_NOINLINE
   static inline GenericType* NewFromPrototype(const GenericType* prototype,
-                                              ::google::protobuf::Arena* arena = NULL) {
+                                              ::google::protobuf::Arena* arena = NULL)
+    GOOGLE_ATTRIBUTE_NOINLINE {
     return New(arena);
   }
-  GOOGLE_ATTRIBUTE_NOINLINE
-  static inline void Delete(GenericType* value, Arena* arena) {
+  static inline void Delete(GenericType* value, Arena* arena)
+    GOOGLE_ATTRIBUTE_NOINLINE {
     if (arena == NULL) {
       delete value;
     }
@@ -563,9 +564,8 @@ class GenericTypeHandler {
   }
 
   static inline void Clear(GenericType* value) { value->Clear(); }
-
-  GOOGLE_ATTRIBUTE_NOINLINE
-  static inline void Merge(const GenericType& from, GenericType* to) {
+  static inline void Merge(const GenericType& from, GenericType* to)
+      GOOGLE_ATTRIBUTE_NOINLINE {
     to->MergeFrom(from);
   }
   static inline int SpaceUsed(const GenericType& value) {

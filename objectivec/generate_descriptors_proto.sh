@@ -11,6 +11,7 @@ set -eu
 
 readonly ScriptDir=$(dirname "$(echo $0 | sed -e "s,^\([^/]\),$(pwd)/\1,")")
 readonly ProtoRootDir="${ScriptDir}/.."
+readonly ProtoC="${ProtoRootDir}/src/protoc"
 
 pushd "${ProtoRootDir}" > /dev/null
 
@@ -32,9 +33,10 @@ fi
 
 # Make sure the compiler is current.
 cd src
+make $@ google/protobuf/stubs/pbconfig.h
 make $@ protoc
 
-declare -a RUNTIME_PROTO_FILES=( \
+declare -a RUNTIME_PROTO_FILES=(\
   google/protobuf/any.proto \
   google/protobuf/api.proto \
   google/protobuf/descriptor.proto \
@@ -48,3 +50,5 @@ declare -a RUNTIME_PROTO_FILES=( \
   google/protobuf/wrappers.proto)
 
 ./protoc --objc_out="${ProtoRootDir}/objectivec" ${RUNTIME_PROTO_FILES[@]}
+
+popd > /dev/null

@@ -425,16 +425,16 @@ class LIBPROTOBUF_EXPORT Arena {
   // of the underlying blocks. The total space used may not include the new
   // blocks that are allocated by this arena from other threads concurrently
   // with the call to this method.
-  GOOGLE_ATTRIBUTE_NOINLINE uint64 SpaceAllocated() const;
+  uint64 SpaceAllocated() const GOOGLE_ATTRIBUTE_NOINLINE;
   // As above, but does not include any free space in underlying blocks.
-  GOOGLE_ATTRIBUTE_NOINLINE uint64 SpaceUsed() const;
+  uint64 SpaceUsed() const GOOGLE_ATTRIBUTE_NOINLINE;
 
   // Frees all storage allocated by this arena after calling destructors
   // registered with OwnDestructor() and freeing objects registered with Own().
   // Any objects allocated on this arena are unusable after this call. It also
   // returns the total space used by the arena which is the sums of the sizes
   // of the allocated blocks. This method is not thread-safe.
-  GOOGLE_ATTRIBUTE_NOINLINE uint64 Reset();
+  uint64 Reset() GOOGLE_ATTRIBUTE_NOINLINE;
 
   // Adds |object| to a list of heap-allocated objects to be freed with |delete|
   // when the arena is destroyed or reset.
@@ -459,7 +459,8 @@ class LIBPROTOBUF_EXPORT Arena {
   // will be manually called when the arena is destroyed or reset. This differs
   // from OwnDestructor() in that any member function may be specified, not only
   // the class destructor.
-  GOOGLE_ATTRIBUTE_NOINLINE void OwnCustomDestructor(void* object, void (*destruct)(void*)) {
+  void OwnCustomDestructor(void* object, void (*destruct)(void*))
+      GOOGLE_ATTRIBUTE_NOINLINE {
     AddListNode(object, destruct);
   }
 
