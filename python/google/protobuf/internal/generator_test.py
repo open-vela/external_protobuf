@@ -41,15 +41,13 @@ further ensures that we can use Python protocol message objects as we expect.
 
 __author__ = 'robinson@google.com (Will Robinson)'
 
-try:
-  import unittest2 as unittest
-except ImportError:
-  import unittest
+import unittest
 from google.protobuf.internal import test_bad_identifiers_pb2
 from google.protobuf import unittest_custom_options_pb2
 from google.protobuf import unittest_import_pb2
 from google.protobuf import unittest_import_public_pb2
 from google.protobuf import unittest_mset_pb2
+from google.protobuf import unittest_mset_wire_format_pb2
 from google.protobuf import unittest_no_generic_services_pb2
 from google.protobuf import unittest_pb2
 from google.protobuf import service
@@ -145,7 +143,7 @@ class GeneratorTest(unittest.TestCase):
     self.assertTrue(not non_extension_descriptor.is_extension)
 
   def testOptions(self):
-    proto = unittest_mset_pb2.TestMessageSet()
+    proto = unittest_mset_wire_format_pb2.TestMessageSet()
     self.assertTrue(proto.DESCRIPTOR.GetOptions().message_set_wire_format)
 
   def testMessageWithCustomOptions(self):
@@ -156,7 +154,7 @@ class GeneratorTest(unittest.TestCase):
     # extension and for its value to be set to -789.
 
   def testNestedTypes(self):
-    self.assertEqual(
+    self.assertEquals(
         set(unittest_pb2.TestAllTypes.DESCRIPTOR.nested_types),
         set([
             unittest_pb2.TestAllTypes.NestedMessage.DESCRIPTOR,
@@ -294,10 +292,10 @@ class GeneratorTest(unittest.TestCase):
     self.assertIs(desc.oneofs[0], desc.oneofs_by_name['oneof_field'])
     nested_names = set(['oneof_uint32', 'oneof_nested_message',
                         'oneof_string', 'oneof_bytes'])
-    self.assertEqual(
+    self.assertItemsEqual(
         nested_names,
-        set([field.name for field in desc.oneofs[0].fields]))
-    for field_name, field_desc in desc.fields_by_name.items():
+        [field.name for field in desc.oneofs[0].fields])
+    for field_name, field_desc in desc.fields_by_name.iteritems():
       if field_name in nested_names:
         self.assertIs(desc.oneofs[0], field_desc.containing_oneof)
       else:
@@ -308,36 +306,36 @@ class SymbolDatabaseRegistrationTest(unittest.TestCase):
   """Checks that messages, enums and files are correctly registered."""
 
   def testGetSymbol(self):
-    self.assertEqual(
+    self.assertEquals(
         unittest_pb2.TestAllTypes, symbol_database.Default().GetSymbol(
             'protobuf_unittest.TestAllTypes'))
-    self.assertEqual(
+    self.assertEquals(
         unittest_pb2.TestAllTypes.NestedMessage,
         symbol_database.Default().GetSymbol(
             'protobuf_unittest.TestAllTypes.NestedMessage'))
     with self.assertRaises(KeyError):
       symbol_database.Default().GetSymbol('protobuf_unittest.NestedMessage')
-    self.assertEqual(
+    self.assertEquals(
         unittest_pb2.TestAllTypes.OptionalGroup,
         symbol_database.Default().GetSymbol(
             'protobuf_unittest.TestAllTypes.OptionalGroup'))
-    self.assertEqual(
+    self.assertEquals(
         unittest_pb2.TestAllTypes.RepeatedGroup,
         symbol_database.Default().GetSymbol(
             'protobuf_unittest.TestAllTypes.RepeatedGroup'))
 
   def testEnums(self):
-    self.assertEqual(
+    self.assertEquals(
         'protobuf_unittest.ForeignEnum',
         symbol_database.Default().pool.FindEnumTypeByName(
             'protobuf_unittest.ForeignEnum').full_name)
-    self.assertEqual(
+    self.assertEquals(
         'protobuf_unittest.TestAllTypes.NestedEnum',
         symbol_database.Default().pool.FindEnumTypeByName(
             'protobuf_unittest.TestAllTypes.NestedEnum').full_name)
 
   def testFindFileByName(self):
-    self.assertEqual(
+    self.assertEquals(
         'google/protobuf/unittest.proto',
         symbol_database.Default().pool.FindFileByName(
             'google/protobuf/unittest.proto').name)
