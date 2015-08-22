@@ -34,10 +34,7 @@
 
 __author__ = 'petar@google.com (Petar Petrov)'
 
-try:
-  import unittest2 as unittest
-except ImportError:
-  import unittest
+import unittest
 from google.protobuf import unittest_pb2
 from google.protobuf import service_reflection
 from google.protobuf import service
@@ -83,7 +80,7 @@ class FooUnitTest(unittest.TestCase):
     self.assertEqual('Method Bar not implemented.',
                      rpc_controller.failure_message)
     self.assertEqual(None, self.callback_response)
-
+    
     class MyServiceImpl(unittest_pb2.TestService):
       def Foo(self, rpc_controller, request, done):
         self.foo_called = True
@@ -128,7 +125,8 @@ class FooUnitTest(unittest.TestCase):
     # Invoke method.
     stub.Foo(rpc_controller, request, MyCallback)
 
-    self.assertIsInstance(self.callback_response, unittest_pb2.FooResponse)
+    self.assertTrue(isinstance(self.callback_response,
+                               unittest_pb2.FooResponse))
     self.assertEqual(request, channel.request)
     self.assertEqual(rpc_controller, channel.controller)
     self.assertEqual(stub.GetDescriptor().methods[0], channel.method)
