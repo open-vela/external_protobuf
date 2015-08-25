@@ -44,7 +44,6 @@
 
 #include <google/protobuf/stubs/common.h>
 #include <google/protobuf/descriptor.h>
-#include <google/protobuf/stubs/logging.h>
 
 namespace google {
 namespace protobuf {
