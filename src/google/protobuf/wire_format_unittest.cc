@@ -40,10 +40,8 @@
 #include <google/protobuf/unittest.pb.h>
 #include <google/protobuf/unittest_proto3_arena.pb.h>
 #include <google/protobuf/unittest_mset.pb.h>
-#include <google/protobuf/unittest_mset_wire_format.pb.h>
 #include <google/protobuf/test_util.h>
 
-#include <google/protobuf/stubs/logging.h>
 #include <google/protobuf/stubs/common.h>
 #include <google/protobuf/testing/googletest.h>
 #include <gtest/gtest.h>
@@ -421,7 +419,7 @@ const int kUnknownTypeId = 1550055;
 
 TEST(WireFormatTest, SerializeMessageSet) {
   // Set up a TestMessageSet with two known messages and an unknown one.
-  proto2_wireformat_unittest::TestMessageSet message_set;
+  unittest::TestMessageSet message_set;
   message_set.MutableExtension(
     unittest::TestMessageSetExtension1::message_set_extension)->set_i(123);
   message_set.MutableExtension(
@@ -464,7 +462,7 @@ TEST(WireFormatTest, SerializeMessageSetVariousWaysAreEqual) {
   // Set up a TestMessageSet with two known messages and an unknown one, as
   // above.
 
-  proto2_wireformat_unittest::TestMessageSet message_set;
+  unittest::TestMessageSet message_set;
   message_set.MutableExtension(
     unittest::TestMessageSetExtension1::message_set_extension)->set_i(123);
   message_set.MutableExtension(
@@ -541,7 +539,7 @@ TEST(WireFormatTest, ParseMessageSet) {
   ASSERT_TRUE(raw.SerializeToString(&data));
 
   // Parse as a TestMessageSet and check the contents.
-  proto2_wireformat_unittest::TestMessageSet message_set;
+  unittest::TestMessageSet message_set;
   ASSERT_TRUE(message_set.ParseFromString(data));
 
   EXPECT_EQ(123, message_set.GetExtension(
@@ -555,7 +553,7 @@ TEST(WireFormatTest, ParseMessageSet) {
   EXPECT_EQ("bar", message_set.unknown_fields().field(0).length_delimited());
 
   // Also parse using WireFormat.
-  proto2_wireformat_unittest::TestMessageSet dynamic_message_set;
+  unittest::TestMessageSet dynamic_message_set;
   io::CodedInputStream input(reinterpret_cast<const uint8*>(data.data()),
                              data.size());
   ASSERT_TRUE(WireFormat::ParseAndMergePartial(&input, &dynamic_message_set));
@@ -585,7 +583,7 @@ TEST(WireFormatTest, ParseMessageSetWithReverseTagOrder) {
     coded_output.WriteTag(WireFormatLite::kMessageSetItemEndTag);
   }
   {
-    proto2_wireformat_unittest::TestMessageSet message_set;
+    unittest::TestMessageSet message_set;
     ASSERT_TRUE(message_set.ParseFromString(data));
 
     EXPECT_EQ(123, message_set.GetExtension(
@@ -593,7 +591,7 @@ TEST(WireFormatTest, ParseMessageSetWithReverseTagOrder) {
   }
   {
     // Test parse the message via Reflection.
-    proto2_wireformat_unittest::TestMessageSet message_set;
+    unittest::TestMessageSet message_set;
     io::CodedInputStream input(
         reinterpret_cast<const uint8*>(data.data()), data.size());
     EXPECT_TRUE(WireFormat::ParseAndMergePartial(&input, &message_set));
@@ -605,7 +603,7 @@ TEST(WireFormatTest, ParseMessageSetWithReverseTagOrder) {
 }
 
 TEST(WireFormatTest, ParseBrokenMessageSet) {
-  proto2_wireformat_unittest::TestMessageSet message_set;
+  unittest::TestMessageSet message_set;
   string input("goodbye");  // Invalid wire format data.
   EXPECT_FALSE(message_set.ParseFromString(input));
 }

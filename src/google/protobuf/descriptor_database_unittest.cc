@@ -42,9 +42,7 @@
 #include <google/protobuf/text_format.h>
 #include <google/protobuf/stubs/strutil.h>
 
-#include <google/protobuf/stubs/logging.h>
 #include <google/protobuf/stubs/common.h>
-#include <google/protobuf/stubs/scoped_ptr.h>
 #include <google/protobuf/testing/googletest.h>
 #include <gtest/gtest.h>
 
