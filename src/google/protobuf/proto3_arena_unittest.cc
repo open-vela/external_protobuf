@@ -119,7 +119,7 @@ void ExpectAllFieldsSet(const TestAllTypes& m) {
 // proto3 and expect the arena support to be fully tested in proto2 unittests
 // because proto3 shares most code with proto2.
 
-TEST(Proto3ArenaTest, Parsing) {
+TEST(ArenaTest, Parsing) {
   TestAllTypes original;
   SetAllFields(&original);
 
@@ -129,7 +129,7 @@ TEST(Proto3ArenaTest, Parsing) {
   ExpectAllFieldsSet(*arena_message);
 }
 
-TEST(Proto3ArenaTest, UnknownFields) {
+TEST(ArenaTest, UnknownFields) {
   TestAllTypes original;
   SetAllFields(&original);
 
@@ -150,7 +150,7 @@ TEST(Proto3ArenaTest, UnknownFields) {
       arena_message->GetReflection()->GetUnknownFields(*arena_message).empty());
 }
 
-TEST(Proto3ArenaTest, Swap) {
+TEST(ArenaTest, Swap) {
   Arena arena1;
   Arena arena2;
 
@@ -162,7 +162,7 @@ TEST(Proto3ArenaTest, Swap) {
   EXPECT_EQ(&arena2, arena2_message->GetArena());
 }
 
-TEST(Proto3ArenaTest, SetAllocatedMessage) {
+TEST(ArenaTest, SetAllocatedMessage) {
   Arena arena;
   TestAllTypes *arena_message = Arena::CreateMessage<TestAllTypes>(&arena);
   TestAllTypes::NestedMessage* nested = new TestAllTypes::NestedMessage;
@@ -171,7 +171,7 @@ TEST(Proto3ArenaTest, SetAllocatedMessage) {
   EXPECT_EQ(118, arena_message->optional_nested_message().bb());
 }
 
-TEST(Proto3ArenaTest, ReleaseMessage) {
+TEST(ArenaTest, ReleaseMessage) {
   Arena arena;
   TestAllTypes* arena_message = Arena::CreateMessage<TestAllTypes>(&arena);
   arena_message->mutable_optional_nested_message()->set_bb(118);
@@ -180,7 +180,7 @@ TEST(Proto3ArenaTest, ReleaseMessage) {
   EXPECT_EQ(118, nested->bb());
 }
 
-TEST(Proto3ArenaTest, MessageFieldClear) {
+TEST(ArenaTest, MessageFieldClear) {
   // GitHub issue #310: https://github.com/google/protobuf/issues/310
   Arena arena;
   TestAllTypes* arena_message = Arena::CreateMessage<TestAllTypes>(&arena);
@@ -188,20 +188,6 @@ TEST(Proto3ArenaTest, MessageFieldClear) {
   // This should not crash, but prior to the bugfix, it tried to use `operator
   // delete` the nested message (which is on the arena):
   arena_message->Clear();
-}
-
-TEST(Proto3ArenaTest, MessageFieldClearViaReflection) {
-  Arena arena;
-  TestAllTypes* message = Arena::CreateMessage<TestAllTypes>(&arena);
-  const Reflection* r = message->GetReflection();
-  const Descriptor* d = message->GetDescriptor();
-  const FieldDescriptor* msg_field = d->FindFieldByName(
-      "optional_nested_message");
-
-  message->mutable_optional_nested_message()->set_bb(1);
-  r->ClearField(message, msg_field);
-  EXPECT_FALSE(message->has_optional_nested_message());
-  EXPECT_EQ(0, message->optional_nested_message().bb());
 }
 
 }  // namespace

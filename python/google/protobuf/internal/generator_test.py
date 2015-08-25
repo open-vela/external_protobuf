@@ -47,7 +47,6 @@ from google.protobuf import unittest_custom_options_pb2
 from google.protobuf import unittest_import_pb2
 from google.protobuf import unittest_import_public_pb2
 from google.protobuf import unittest_mset_pb2
-from google.protobuf import unittest_mset_wire_format_pb2
 from google.protobuf import unittest_no_generic_services_pb2
 from google.protobuf import unittest_pb2
 from google.protobuf import service
@@ -143,7 +142,7 @@ class GeneratorTest(unittest.TestCase):
     self.assertTrue(not non_extension_descriptor.is_extension)
 
   def testOptions(self):
-    proto = unittest_mset_wire_format_pb2.TestMessageSet()
+    proto = unittest_mset_pb2.TestMessageSet()
     self.assertTrue(proto.DESCRIPTOR.GetOptions().message_set_wire_format)
 
   def testMessageWithCustomOptions(self):
