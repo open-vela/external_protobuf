@@ -115,7 +115,12 @@ inline bool IsMapEntryMessage(const Descriptor* descriptor) {
 // for use in the runtime. This is the only type which is allowed to use proto2 syntax,
 // and it generates internal classes.
 inline bool IsDescriptorProto(const FileDescriptor* descriptor) {
-  return descriptor->name() == "google/protobuf/descriptor.proto";
+  // TODO: Do this better! (Currently this depends on a hack in generate_protos.sh to rename
+  // the file...)
+  // We need to be able to detect the "normal" name as well, for times that we're just
+  // depending on descriptor.proto instead of generating it.
+  return descriptor->name() == "google/protobuf/descriptor_proto_file.proto"
+      || descriptor->name() == "google/protobuf/descriptor.proto";
 }
 
 inline bool IsWrapperType(const FieldDescriptor* descriptor) {
