@@ -30,9 +30,11 @@
 
 #include <google/protobuf/util/internal/utility.h>
 
-#include <google/protobuf/stubs/callback.h>
+#include <cmath>
+#include <algorithm>
+#include <utility>
+
 #include <google/protobuf/stubs/common.h>
-#include <google/protobuf/stubs/logging.h>
 #include <google/protobuf/wrappers.pb.h>
 #include <google/protobuf/descriptor.pb.h>
 #include <google/protobuf/descriptor.h>
@@ -299,15 +301,15 @@ bool IsMap(const google::protobuf::Field& field,
 }
 
 string DoubleAsString(double value) {
-  if (google::protobuf::MathLimits<double>::IsPosInf(value)) return "Infinity";
-  if (google::protobuf::MathLimits<double>::IsNegInf(value)) return "-Infinity";
+  if (value == std::numeric_limits<double>::infinity()) return "Infinity";
+  if (value == -std::numeric_limits<double>::infinity()) return "-Infinity";
   if (google::protobuf::MathLimits<double>::IsNaN(value)) return "NaN";
 
   return SimpleDtoa(value);
 }
 
 string FloatAsString(float value) {
-  if (google::protobuf::MathLimits<float>::IsFinite(value)) return SimpleFtoa(value);
+  if (isfinite(value)) return SimpleFtoa(value);
   return DoubleAsString(value);
 }
 
@@ -318,7 +320,8 @@ bool SafeStrToFloat(StringPiece str, float *value) {
   }
   *value = static_cast<float>(double_value);
 
-  if (google::protobuf::MathLimits<float>::IsInf(*value)) {
+  if ((*value ==  numeric_limits<float>::infinity()) ||
+      (*value == -numeric_limits<float>::infinity())) {
     return false;
   }
   return true;

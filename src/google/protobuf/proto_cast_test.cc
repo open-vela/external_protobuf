@@ -32,7 +32,7 @@
 
 #include <google/protobuf/util/unknown_enum_test.pb.h>
 #include <gtest/gtest.h>
-#include <gmock/gmock.h>
+#include <google/protobuf/testing/gmock.h>
 
 namespace google {
 using google::protobuf::util::UpRevision;
