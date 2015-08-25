@@ -62,14 +62,6 @@ namespace google {
 namespace protobuf {
 namespace python {
 
-// Store interned descriptors, so that the same C++ descriptor yields the same
-// Python object. Objects are not immortal: this map does not own the
-// references, and items are deleted when the last reference to the object is
-// released.
-// This is enough to support the "is" operator on live objects.
-// All descriptors are stored here.
-hash_map<const void*, PyObject*> interned_descriptors;
-
 PyObject* PyString_FromCppString(const string& str) {
   return PyString_FromStringAndSize(str.c_str(), str.size());
 }
@@ -155,24 +147,6 @@ static int CheckCalledFromGeneratedFile(const char* attr_name) {
 
 // Helper functions for descriptor objects.
 
-// A set of templates to retrieve the C++ FileDescriptor of any descriptor.
-template<class DescriptorClass>
-const FileDescriptor* GetFileDescriptor(const DescriptorClass* descriptor) {
-  return descriptor->file();
-}
-template<>
-const FileDescriptor* GetFileDescriptor(const FileDescriptor* descriptor) {
-  return descriptor;
-}
-template<>
-const FileDescriptor* GetFileDescriptor(const EnumValueDescriptor* descriptor) {
-  return descriptor->type()->file();
-}
-template<>
-const FileDescriptor* GetFileDescriptor(const OneofDescriptor* descriptor) {
-  return descriptor->containing_type()->file();
-}
-
 // Converts options into a Python protobuf, and cache the result.
 //
 // This is a bit tricky because options can contain extension fields defined in
@@ -182,13 +156,8 @@ const FileDescriptor* GetFileDescriptor(const OneofDescriptor* descriptor) {
 // Always returns a new reference.
 template<class DescriptorClass>
 static PyObject* GetOrBuildOptions(const DescriptorClass *descriptor) {
-  // Options (and their extensions) are completely resolved in the proto file
-  // containing the descriptor.
-  PyDescriptorPool* pool = GetDescriptorPool_FromPool(
-      GetFileDescriptor(descriptor)->pool());
-
   hash_map<const void*, PyObject*>* descriptor_options =
-      pool->descriptor_options;
+      GetDescriptorPool()->descriptor_options;
   // First search in the cache.
   if (descriptor_options->find(descriptor) != descriptor_options->end()) {
     PyObject *value = (*descriptor_options)[descriptor];
@@ -201,7 +170,7 @@ static PyObject* GetOrBuildOptions(const DescriptorClass *descriptor) {
   const Message& options(descriptor->options());
   const Descriptor *message_type = options.GetDescriptor();
   PyObject* message_class(cdescriptor_pool::GetMessageClass(
-      pool, message_type));
+      GetDescriptorPool(), message_type));
   if (message_class == NULL) {
     PyErr_Format(PyExc_TypeError, "Could not retrieve class for Options: %s",
                  message_type->full_name().c_str());
@@ -223,8 +192,8 @@ static PyObject* GetOrBuildOptions(const DescriptorClass *descriptor) {
     options.SerializeToString(&serialized);
     io::CodedInputStream input(
         reinterpret_cast<const uint8*>(serialized.c_str()), serialized.size());
-    input.SetExtensionRegistry(pool->pool,
-                               GetDescriptorPool()->message_factory);
+    input.SetExtensionRegistry(GetDescriptorPool()->pool,
+                               cmessage::GetMessageFactory());
     bool success = cmsg->message->MergePartialFromCodedStream(&input);
     if (!success) {
       PyErr_Format(PyExc_ValueError, "Error parsing Options message");
@@ -234,7 +203,7 @@ static PyObject* GetOrBuildOptions(const DescriptorClass *descriptor) {
 
   // Cache the result.
   Py_INCREF(value);
-  (*pool->descriptor_options)[descriptor] = value.get();
+  (*GetDescriptorPool()->descriptor_options)[descriptor] = value.get();
 
   return value.release();
 }
@@ -268,9 +237,6 @@ typedef struct PyBaseDescriptor {
   // Pointer to the C++ proto2 descriptor.
   // Like all descriptors, it is owned by the global DescriptorPool.
   const void* descriptor;
-
-  // Owned reference to the DescriptorPool, to ensure it is kept alive.
-  PyDescriptorPool* pool;
 } PyBaseDescriptor;
 
 
@@ -292,9 +258,7 @@ namespace descriptor {
 // 'was_created' is an optional pointer to a bool, and is set to true if a new
 // object was allocated.
 // Always return a new reference.
-template<class DescriptorClass>
-PyObject* NewInternedDescriptor(PyTypeObject* type,
-                                const DescriptorClass* descriptor,
+PyObject* NewInternedDescriptor(PyTypeObject* type, const void* descriptor,
                                 bool* was_created) {
   if (was_created) {
     *was_created = false;
@@ -306,8 +270,8 @@ PyObject* NewInternedDescriptor(PyTypeObject* type,
 
   // See if the object is in the map of interned descriptors
   hash_map<const void*, PyObject*>::iterator it =
-      interned_descriptors.find(descriptor);
-  if (it != interned_descriptors.end()) {
+      GetDescriptorPool()->interned_descriptors->find(descriptor);
+  if (it != GetDescriptorPool()->interned_descriptors->end()) {
     GOOGLE_DCHECK(Py_TYPE(it->second) == type);
     Py_INCREF(it->second);
     return it->second;
@@ -319,20 +283,9 @@ PyObject* NewInternedDescriptor(PyTypeObject* type,
     return NULL;
   }
   py_descriptor->descriptor = descriptor;
-
   // and cache it.
-  interned_descriptors.insert(
+  GetDescriptorPool()->interned_descriptors->insert(
       std::make_pair(descriptor, reinterpret_cast<PyObject*>(py_descriptor)));
-
-  // Ensures that the DescriptorPool stays alive.
-  PyDescriptorPool* pool = GetDescriptorPool_FromPool(
-      GetFileDescriptor(descriptor)->pool());
-  if (pool == NULL) {
-    Py_DECREF(py_descriptor);
-    return NULL;
-  }
-  Py_INCREF(pool);
-  py_descriptor->pool = pool;
 
   if (was_created) {
     *was_created = true;
@@ -342,8 +295,7 @@ PyObject* NewInternedDescriptor(PyTypeObject* type,
 
 static void Dealloc(PyBaseDescriptor* self) {
   // Remove from interned dictionary
-  interned_descriptors.erase(self->descriptor);
-  Py_CLEAR(self->pool);
+  GetDescriptorPool()->interned_descriptors->erase(self->descriptor);
   Py_TYPE(self)->tp_free(reinterpret_cast<PyObject*>(self));
 }
 

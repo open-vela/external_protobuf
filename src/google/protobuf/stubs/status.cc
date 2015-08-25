@@ -30,6 +30,7 @@
 #include <google/protobuf/stubs/status.h>
 
 #include <ostream>
+#include <stdint.h>
 #include <stdio.h>
 #include <string>
 #include <utility>

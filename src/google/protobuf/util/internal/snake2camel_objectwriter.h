@@ -58,7 +58,9 @@ class Snake2CamelObjectWriter : public ObjectWriter {
 
   // ObjectWriter methods.
   virtual Snake2CamelObjectWriter* StartObject(StringPiece name) {
-    ow_->StartObject(name);
+    ow_->StartObject(ShouldNormalizeCase(name)
+                         ? StringPiece(StringPiece(ToCamelCase(name)))
+                         : name);
     return this;
   }
 
@@ -68,7 +70,8 @@ class Snake2CamelObjectWriter : public ObjectWriter {
   }
 
   virtual Snake2CamelObjectWriter* StartList(StringPiece name) {
-    ow_->StartList(name);
+    ow_->StartList(ShouldNormalizeCase(name) ? StringPiece(ToCamelCase(name))
+                                             : name);
     return this;
   }
 
@@ -78,57 +81,76 @@ class Snake2CamelObjectWriter : public ObjectWriter {
   }
 
   virtual Snake2CamelObjectWriter* RenderBool(StringPiece name, bool value) {
-    ow_->RenderBool(name, value);
+    ow_->RenderBool(
+        ShouldNormalizeCase(name) ? StringPiece(ToCamelCase(name)) : name,
+        value);
     return this;
   }
 
   virtual Snake2CamelObjectWriter* RenderInt32(StringPiece name, int32 value) {
-    ow_->RenderInt32(name, value);
+    ow_->RenderInt32(
+        ShouldNormalizeCase(name) ? StringPiece(ToCamelCase(name)) : name,
+        value);
     return this;
   }
 
   virtual Snake2CamelObjectWriter* RenderUint32(StringPiece name,
                                                 uint32 value) {
-    ow_->RenderUint32(name, value);
+    ow_->RenderUint32(
+        ShouldNormalizeCase(name) ? StringPiece(ToCamelCase(name)) : name,
+        value);
     return this;
   }
 
   virtual Snake2CamelObjectWriter* RenderInt64(StringPiece name, int64 value) {
-    ow_->RenderInt64(name, value);
+    ow_->RenderInt64(
+        ShouldNormalizeCase(name) ? StringPiece(ToCamelCase(name)) : name,
+        value);
     return this;
   }
 
   virtual Snake2CamelObjectWriter* RenderUint64(StringPiece name,
                                                 uint64 value) {
-    ow_->RenderUint64(name, value);
+    ow_->RenderUint64(
+        ShouldNormalizeCase(name) ? StringPiece(ToCamelCase(name)) : name,
+        value);
     return this;
   }
 
   virtual Snake2CamelObjectWriter* RenderDouble(StringPiece name,
                                                 double value) {
-    ow_->RenderDouble(name, value);
+    ow_->RenderDouble(
+        ShouldNormalizeCase(name) ? StringPiece(ToCamelCase(name)) : name,
+        value);
     return this;
   }
 
   virtual Snake2CamelObjectWriter* RenderFloat(StringPiece name, float value) {
-    ow_->RenderFloat(name, value);
+    ow_->RenderFloat(
+        ShouldNormalizeCase(name) ? StringPiece(ToCamelCase(name)) : name,
+        value);
     return this;
   }
 
   virtual Snake2CamelObjectWriter* RenderString(StringPiece name,
                                                 StringPiece value) {
-    ow_->RenderString(name, value);
+    ow_->RenderString(
+        ShouldNormalizeCase(name) ? StringPiece(ToCamelCase(name)) : name,
+        value);
     return this;
   }
 
   virtual Snake2CamelObjectWriter* RenderBytes(StringPiece name,
                                                StringPiece value) {
-    ow_->RenderBytes(name, value);
+    ow_->RenderBytes(
+        ShouldNormalizeCase(name) ? StringPiece(ToCamelCase(name)) : name,
+        value);
     return this;
   }
 
   virtual Snake2CamelObjectWriter* RenderNull(StringPiece name) {
-    ow_->RenderNull(name);
+    ow_->RenderNull(ShouldNormalizeCase(name) ? StringPiece(ToCamelCase(name))
+                                              : name);
     return this;
   }
 

@@ -301,10 +301,6 @@ bool Struct::MergePartialFromCodedStream(
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
               input, entry.get()));
           (*mutable_fields())[entry->key()].Swap(entry->mutable_value());
-          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-            entry->key().data(), entry->key().length(),
-            ::google::protobuf::internal::WireFormatLite::PARSE,
-            "google.protobuf.Struct.FieldsEntry.key"));
         } else {
           goto handle_unusual;
         }
@@ -347,10 +343,6 @@ void Struct::SerializeWithCachedSizes(
       entry.reset(fields_.NewEntryWrapper(it->first, it->second));
       ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
           1, *entry, output);
-      ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-        it->first.data(), it->first.length(),
-        ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-        "google.protobuf.Struct.FieldsEntry.key");
     }
   }
 
@@ -370,10 +362,6 @@ void Struct::SerializeWithCachedSizes(
       target = ::google::protobuf::internal::WireFormatLite::
           WriteMessageNoVirtualToArray(
               1, *entry, target);
-      ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-        it->first.data(), it->first.length(),
-        ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-        "google.protobuf.Struct.FieldsEntry.key");
     }
   }
 
@@ -559,7 +547,6 @@ Value* Value::New(::google::protobuf::Arena* arena) const {
 }
 
 void Value::clear_kind() {
-  typedef Value T;
   switch(kind_case()) {
     case kNullValue: {
       // No need to clear
@@ -644,10 +631,10 @@ bool Value::MergePartialFromCodedStream(
          parse_string_value:
           DO_(::google::protobuf::internal::WireFormatLite::ReadString(
                 input, this->mutable_string_value()));
-          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+          ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
             this->string_value().data(), this->string_value().length(),
-            ::google::protobuf::internal::WireFormatLite::PARSE,
-            "google.protobuf.Value.string_value"));
+            ::google::protobuf::internal::WireFormat::PARSE,
+            "google.protobuf.Value.string_value");
         } else {
           goto handle_unusual;
         }
@@ -734,9 +721,9 @@ void Value::SerializeWithCachedSizes(
 
   // optional string string_value = 3;
   if (has_string_value()) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+    ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
       this->string_value().data(), this->string_value().length(),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      ::google::protobuf::internal::WireFormat::SERIALIZE,
       "google.protobuf.Value.string_value");
     ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
       3, this->string_value(), output);
@@ -778,9 +765,9 @@ void Value::SerializeWithCachedSizes(
 
   // optional string string_value = 3;
   if (has_string_value()) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+    ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
       this->string_value().data(), this->string_value().length(),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      ::google::protobuf::internal::WireFormat::SERIALIZE,
       "google.protobuf.Value.string_value");
     target =
       ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
@@ -1127,11 +1114,10 @@ void Value::clear_struct_value() {
 }
  const ::google::protobuf::Struct& Value::struct_value() const {
   // @@protoc_insertion_point(field_get:google.protobuf.Value.struct_value)
-  return has_struct_value()
-      ? *kind_.struct_value_
-      : ::google::protobuf::Struct::default_instance();
+  return has_struct_value() ? *kind_.struct_value_
+                      : ::google::protobuf::Struct::default_instance();
 }
-::google::protobuf::Struct* Value::mutable_struct_value() {
+ ::google::protobuf::Struct* Value::mutable_struct_value() {
   if (!has_struct_value()) {
     clear_kind();
     set_has_struct_value();
@@ -1140,7 +1126,7 @@ void Value::clear_struct_value() {
   // @@protoc_insertion_point(field_mutable:google.protobuf.Value.struct_value)
   return kind_.struct_value_;
 }
-::google::protobuf::Struct* Value::release_struct_value() {
+ ::google::protobuf::Struct* Value::release_struct_value() {
   if (has_struct_value()) {
     clear_has_kind();
     ::google::protobuf::Struct* temp = kind_.struct_value_;
@@ -1150,7 +1136,7 @@ void Value::clear_struct_value() {
     return NULL;
   }
 }
-void Value::set_allocated_struct_value(::google::protobuf::Struct* struct_value) {
+ void Value::set_allocated_struct_value(::google::protobuf::Struct* struct_value) {
   clear_kind();
   if (struct_value) {
     set_has_struct_value();
@@ -1174,11 +1160,10 @@ void Value::clear_list_value() {
 }
  const ::google::protobuf::ListValue& Value::list_value() const {
   // @@protoc_insertion_point(field_get:google.protobuf.Value.list_value)
-  return has_list_value()
-      ? *kind_.list_value_
-      : ::google::protobuf::ListValue::default_instance();
+  return has_list_value() ? *kind_.list_value_
+                      : ::google::protobuf::ListValue::default_instance();
 }
-::google::protobuf::ListValue* Value::mutable_list_value() {
+ ::google::protobuf::ListValue* Value::mutable_list_value() {
   if (!has_list_value()) {
     clear_kind();
     set_has_list_value();
@@ -1187,7 +1172,7 @@ void Value::clear_list_value() {
   // @@protoc_insertion_point(field_mutable:google.protobuf.Value.list_value)
   return kind_.list_value_;
 }
-::google::protobuf::ListValue* Value::release_list_value() {
+ ::google::protobuf::ListValue* Value::release_list_value() {
   if (has_list_value()) {
     clear_has_kind();
     ::google::protobuf::ListValue* temp = kind_.list_value_;
@@ -1197,7 +1182,7 @@ void Value::clear_list_value() {
     return NULL;
   }
 }
-void Value::set_allocated_list_value(::google::protobuf::ListValue* list_value) {
+ void Value::set_allocated_list_value(::google::protobuf::ListValue* list_value) {
   clear_kind();
   if (list_value) {
     set_has_list_value();
@@ -1437,27 +1422,27 @@ int ListValue::values_size() const {
 void ListValue::clear_values() {
   values_.Clear();
 }
-const ::google::protobuf::Value& ListValue::values(int index) const {
+ const ::google::protobuf::Value& ListValue::values(int index) const {
   // @@protoc_insertion_point(field_get:google.protobuf.ListValue.values)
   return values_.Get(index);
 }
-::google::protobuf::Value* ListValue::mutable_values(int index) {
+ ::google::protobuf::Value* ListValue::mutable_values(int index) {
   // @@protoc_insertion_point(field_mutable:google.protobuf.ListValue.values)
   return values_.Mutable(index);
 }
-::google::protobuf::Value* ListValue::add_values() {
+ ::google::protobuf::Value* ListValue::add_values() {
   // @@protoc_insertion_point(field_add:google.protobuf.ListValue.values)
   return values_.Add();
 }
-::google::protobuf::RepeatedPtrField< ::google::protobuf::Value >*
-ListValue::mutable_values() {
-  // @@protoc_insertion_point(field_mutable_list:google.protobuf.ListValue.values)
-  return &values_;
-}
-const ::google::protobuf::RepeatedPtrField< ::google::protobuf::Value >&
+ const ::google::protobuf::RepeatedPtrField< ::google::protobuf::Value >&
 ListValue::values() const {
   // @@protoc_insertion_point(field_list:google.protobuf.ListValue.values)
   return values_;
+}
+ ::google::protobuf::RepeatedPtrField< ::google::protobuf::Value >*
+ListValue::mutable_values() {
+  // @@protoc_insertion_point(field_mutable_list:google.protobuf.ListValue.values)
+  return &values_;
 }
 
 #endif  // PROTOBUF_INLINE_NOT_IN_HEADERS

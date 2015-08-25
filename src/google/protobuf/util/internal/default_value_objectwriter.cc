@@ -46,7 +46,6 @@ DefaultValueObjectWriter::DefaultValueObjectWriter(
     TypeResolver* type_resolver, const google::protobuf::Type& type,
     ObjectWriter* ow)
     : typeinfo_(TypeInfo::NewTypeInfo(type_resolver)),
-      own_typeinfo_(true),
       type_(type),
       disable_normalize_(false),
       current_(NULL),
@@ -56,9 +55,6 @@ DefaultValueObjectWriter::DefaultValueObjectWriter(
 DefaultValueObjectWriter::~DefaultValueObjectWriter() {
   for (int i = 0; i < string_values_.size(); ++i) {
     delete string_values_[i];
-  }
-  if (own_typeinfo_) {
-    delete typeinfo_;
   }
 }
 
@@ -201,47 +197,33 @@ void DefaultValueObjectWriter::Node::WriteTo(ObjectWriter* ow) {
   if (disable_normalize_) {
     ow->DisableCaseNormalizationForNextKey();
   }
-
   if (kind_ == PRIMITIVE) {
     ObjectWriter::RenderDataPieceTo(data_, name_, ow);
     return;
   }
-
-  // Render maps. Empty maps are rendered as "{}".
-  if (kind_ == MAP) {
-    ow->StartObject(name_);
-    WriteChildren(ow);
-    ow->EndObject();
+  if (is_placeholder_) {
+    // If is_placeholder_ = true, we didn't see this node in the response, so
+    // skip output.
     return;
   }
-
-  // Write out lists. If we didn't have any list in response, write out empty
-  // list.
   if (kind_ == LIST) {
     ow->StartList(name_);
-    WriteChildren(ow);
-    ow->EndList();
-    return;
+  } else {
+    ow->StartObject(name_);
   }
-
-  // If is_placeholder_ = true, we didn't see this node in the response, so
-  // skip output.
-  if (is_placeholder_) return;
-
-  ow->StartObject(name_);
-  WriteChildren(ow);
-  ow->EndObject();
-}
-
-void DefaultValueObjectWriter::Node::WriteChildren(ObjectWriter* ow) {
   for (int i = 0; i < children_.size(); ++i) {
     Node* child = children_[i];
     child->WriteTo(ow);
   }
+  if (kind_ == LIST) {
+    ow->EndList();
+  } else {
+    ow->EndObject();
+  }
 }
 
 const google::protobuf::Type* DefaultValueObjectWriter::Node::GetMapValueType(
-    const google::protobuf::Type& found_type, const TypeInfo* typeinfo) {
+    const google::protobuf::Type& found_type, TypeInfo* typeinfo) {
   // If this field is a map, we should use the type of its "Value" as
   // the type of the child node.
   for (int i = 0; i < found_type.fields_size(); ++i) {
@@ -266,8 +248,7 @@ const google::protobuf::Type* DefaultValueObjectWriter::Node::GetMapValueType(
   return NULL;
 }
 
-void DefaultValueObjectWriter::Node::PopulateChildren(
-    const TypeInfo* typeinfo) {
+void DefaultValueObjectWriter::Node::PopulateChildren(TypeInfo* typeinfo) {
   // Ignores well known types that don't require automatically populating their
   // primitive children. For type "Any", we only populate its children when the
   // "@type" field is set.
@@ -329,17 +310,15 @@ void DefaultValueObjectWriter::Node::PopulateChildren(
             google::protobuf::Field_Cardinality_CARDINALITY_REPEATED) {
       kind = LIST;
     }
-
-    // If oneof_index() != 0, the child field is part of a "oneof", which means
-    // the child field is optional and we shouldn't populate its default value.
-    if (field.oneof_index() != 0) continue;
-
     // If the child field is of primitive type, sets its data to the default
     // value of its type.
+    // If oneof_index() != 0, the child field is part of a "oneof", which means
+    // the child field is optional and we shouldn't populate its default value.
     google::protobuf::scoped_ptr<Node> child(
-        new Node(field.json_name(), field_type, kind,
-                 kind == PRIMITIVE ? CreateDefaultDataPieceForField(field)
-                                   : DataPiece::NullData(),
+        new Node(field.name(), field_type, kind,
+                 ((kind == PRIMITIVE && field.oneof_index() == 0)
+                      ? CreateDefaultDataPieceForField(field)
+                      : DataPiece::NullData()),
                  true));
     new_children.push_back(child.release());
   }
@@ -359,7 +338,7 @@ void DefaultValueObjectWriter::MaybePopulateChildrenOfAny(Node* node) {
   // have been added, populates its children.
   if (node != NULL && node->is_any() && node->type() != NULL &&
       node->type()->name() != kAnyType && node->number_of_children() == 1) {
-    node->PopulateChildren(typeinfo_);
+    node->PopulateChildren(typeinfo_.get());
   }
 }
 
@@ -409,7 +388,7 @@ DefaultValueObjectWriter* DefaultValueObjectWriter::StartObject(
     root_.reset(new Node(name.ToString(), &type_, OBJECT, DataPiece::NullData(),
                          false));
     root_->set_disable_normalize(GetAndResetDisableNormalize());
-    root_->PopulateChildren(typeinfo_);
+    root_->PopulateChildren(typeinfo_.get());
     current_ = root_.get();
     return this;
   }
@@ -430,7 +409,7 @@ DefaultValueObjectWriter* DefaultValueObjectWriter::StartObject(
   child->set_is_placeholder(false);
   child->set_disable_normalize(GetAndResetDisableNormalize());
   if (child->kind() == OBJECT && child->number_of_children() == 0) {
-    child->PopulateChildren(typeinfo_);
+    child->PopulateChildren(typeinfo_.get());
   }
 
   stack_.push(current_);
@@ -513,11 +492,12 @@ void DefaultValueObjectWriter::RenderDataPiece(StringPiece name,
     // first value field is rendered before we populate the children, because
     // the "value" field of a Any message could be omitted.
     if (current_->number_of_children() > 1 && current_->type() != NULL) {
-      current_->PopulateChildren(typeinfo_);
+      current_->PopulateChildren(typeinfo_.get());
     }
   }
   Node* child = current_->FindChild(name);
   if (child == NULL || child->kind() != PRIMITIVE) {
+    GOOGLE_LOG(WARNING) << "Cannot find primitive field '" << name << "'.";
     // No children are found, creates a new child.
     google::protobuf::scoped_ptr<Node> node(
         new Node(name.ToString(), NULL, PRIMITIVE, data, false));

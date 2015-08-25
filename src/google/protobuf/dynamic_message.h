@@ -45,7 +45,6 @@
 
 #include <google/protobuf/message.h>
 #include <google/protobuf/stubs/common.h>
-#include <google/protobuf/stubs/mutex.h>
 
 namespace google {
 namespace protobuf {

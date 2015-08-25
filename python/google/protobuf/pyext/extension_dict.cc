@@ -33,7 +33,6 @@
 
 #include <google/protobuf/pyext/extension_dict.h>
 
-#include <google/protobuf/stubs/logging.h>
 #include <google/protobuf/stubs/common.h>
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/dynamic_message.h>
@@ -184,8 +183,7 @@ PyObject* ClearExtension(ExtensionDict* self, PyObject* extension) {
       return NULL;
     }
   }
-  if (ScopedPyObjectPtr(cmessage::ClearFieldByDescriptor(
-          self->parent, descriptor)) == NULL) {
+  if (cmessage::ClearFieldByDescriptor(self->parent, descriptor) == NULL) {
     return NULL;
   }
   if (PyDict_DelItem(self->values, extension) < 0) {
@@ -270,7 +268,7 @@ PyTypeObject ExtensionDict_Type = {
   0,                                   //  tp_as_number
   0,                                   //  tp_as_sequence
   &extension_dict::MpMethods,          //  tp_as_mapping
-  PyObject_HashNotImplemented,         //  tp_hash
+  0,                                   //  tp_hash
   0,                                   //  tp_call
   0,                                   //  tp_str
   0,                                   //  tp_getattro
