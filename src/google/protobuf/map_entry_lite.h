@@ -61,21 +61,38 @@ template <typename Key, typename Value,
           WireFormatLite::FieldType kValueFieldType,
           int default_enum_value>
 class MapEntryLite : public MessageLite {
-  // Provide utilities to parse/serialize key/value.  Provide utilities to
-  // manipulate internal stored type.
-  typedef MapTypeHandler<kKeyFieldType, Key> KeyTypeHandler;
-  typedef MapTypeHandler<kValueFieldType, Value> ValueTypeHandler;
+  // Handlers for key/value wire type. Provide utilities to parse/serialize
+  // key/value.
+  typedef MapWireFieldTypeHandler<kKeyFieldType> KeyWireHandler;
+  typedef MapWireFieldTypeHandler<kValueFieldType> ValueWireHandler;
+
+  // Define key/value's internal stored type. Message is the only one whose
+  // internal stored type cannot be inferred from its proto type
+  static const bool kIsKeyMessage = KeyWireHandler::kIsMessage;
+  static const bool kIsValueMessage = ValueWireHandler::kIsMessage;
+  typedef typename KeyWireHandler::CppType KeyInternalType;
+  typedef typename ValueWireHandler::CppType ValueInternalType;
+  typedef typename MapIf<kIsKeyMessage, Key, KeyInternalType>::type
+      KeyCppType;
+  typedef typename MapIf<kIsValueMessage, Value, ValueInternalType>::type
+      ValCppType;
+
+  // Handlers for key/value's internal stored type. Provide utilities to
+  // manipulate internal stored type. We need it because some types are stored
+  // as values and others are stored as pointers (Message and string), but we
+  // need to keep the code in MapEntry unified instead of providing different
+  // codes for each type.
+  typedef MapCppTypeHandler<KeyCppType> KeyCppHandler;
+  typedef MapCppTypeHandler<ValCppType> ValueCppHandler;
 
   // Define internal memory layout. Strings and messages are stored as
   // pointers, while other types are stored as values.
-  typedef typename KeyTypeHandler::TypeOnMemory KeyOnMemory;
-  typedef typename ValueTypeHandler::TypeOnMemory ValueOnMemory;
-
-  // Enum type cannot be used for MapTypeHandler::Read. Define a type
-  // which will replace Enum with int.
-  typedef typename KeyTypeHandler::MapEntryAccessorType KeyMapEntryAccessorType;
-  typedef typename ValueTypeHandler::MapEntryAccessorType
-      ValueMapEntryAccessorType;
+  static const bool kKeyIsStringOrMessage = KeyCppHandler::kIsStringOrMessage;
+  static const bool kValIsStringOrMessage = ValueCppHandler::kIsStringOrMessage;
+  typedef typename MapIf<kKeyIsStringOrMessage, KeyCppType*, KeyCppType>::type
+      KeyBase;
+  typedef typename MapIf<kValIsStringOrMessage, ValCppType*, ValCppType>::type
+      ValueBase;
 
   // Constants for field number.
   static const int kKeyFieldNumber = 1;
@@ -83,37 +100,38 @@ class MapEntryLite : public MessageLite {
 
   // Constants for field tag.
   static const uint8 kKeyTag = GOOGLE_PROTOBUF_WIRE_FORMAT_MAKE_TAG(
-      kKeyFieldNumber, KeyTypeHandler::kWireType);
+      kKeyFieldNumber, KeyWireHandler::kWireType);
   static const uint8 kValueTag = GOOGLE_PROTOBUF_WIRE_FORMAT_MAKE_TAG(
-      kValueFieldNumber, ValueTypeHandler::kWireType);
+      kValueFieldNumber, ValueWireHandler::kWireType);
   static const int kTagSize = 1;
 
  public:
   ~MapEntryLite() {
     if (this != default_instance_) {
-      if (GetArenaNoVirtual() != NULL) return;
-      KeyTypeHandler::DeleteNoArena(key_);
-      ValueTypeHandler::DeleteNoArena(value_);
+      KeyCppHandler::Delete(key_);
+      ValueCppHandler::Delete(value_);
     }
   }
 
   // accessors ======================================================
 
-  virtual inline const KeyMapEntryAccessorType& key() const {
-    return KeyTypeHandler::GetExternalReference(key_);
+  virtual inline const KeyCppType& key() const {
+    return KeyCppHandler::Reference(key_);
   }
-  virtual inline const ValueMapEntryAccessorType& value() const {
+  inline KeyCppType* mutable_key() {
+    set_has_key();
+    KeyCppHandler::EnsureMutable(&key_, GetArenaNoVirtual());
+    return KeyCppHandler::Pointer(key_);
+  }
+  virtual inline const ValCppType& value() const {
     GOOGLE_CHECK(default_instance_ != NULL);
-    return ValueTypeHandler::DefaultIfNotInitialized(value_,
+    return ValueCppHandler::DefaultIfNotInitialized(value_,
                                                     default_instance_->value_);
   }
-  inline KeyMapEntryAccessorType* mutable_key() {
-    set_has_key();
-    return KeyTypeHandler::EnsureMutable(&key_, GetArenaNoVirtual());
-  }
-  inline ValueMapEntryAccessorType* mutable_value() {
+  inline ValCppType* mutable_value() {
     set_has_value();
-    return ValueTypeHandler::EnsureMutable(&value_, GetArenaNoVirtual());
+    ValueCppHandler::EnsureMutable(&value_, GetArenaNoVirtual());
+    return ValueCppHandler::Pointer(value_);
   }
 
   // implements MessageLite =========================================
@@ -141,17 +159,13 @@ class MapEntryLite : public MessageLite {
       tag = input->ReadTag();
       switch (tag) {
         case kKeyTag:
-          if (!KeyTypeHandler::Read(input, mutable_key())) {
-            return false;
-          }
+          if (!KeyWireHandler::Read(input, mutable_key())) return false;
           set_has_key();
           if (!input->ExpectTag(kValueTag)) break;
           GOOGLE_FALLTHROUGH_INTENDED;
 
         case kValueTag:
-          if (!ValueTypeHandler::Read(input, mutable_value())) {
-            return false;
-          }
+          if (!ValueWireHandler::Read(input, mutable_value())) return false;
           set_has_value();
           if (input->ExpectAtEnd()) return true;
           break;
@@ -170,35 +184,32 @@ class MapEntryLite : public MessageLite {
 
   int ByteSize() const {
     int size = 0;
-    size += has_key() ? kTagSize + KeyTypeHandler::ByteSize(key()) : 0;
-    size += has_value() ? kTagSize + ValueTypeHandler::ByteSize(value()) : 0;
+    size += has_key() ? kTagSize + KeyWireHandler::ByteSize(key()) : 0;
+    size += has_value() ? kTagSize + ValueWireHandler::ByteSize(value()) : 0;
     return size;
   }
 
   void SerializeWithCachedSizes(::google::protobuf::io::CodedOutputStream* output) const {
-    KeyTypeHandler::Write(kKeyFieldNumber, key(), output);
-    ValueTypeHandler::Write(kValueFieldNumber, value(), output);
+    KeyWireHandler::Write(kKeyFieldNumber, key(), output);
+    ValueWireHandler::Write(kValueFieldNumber, value(), output);
   }
 
   ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const {
-    output = KeyTypeHandler::WriteToArray(kKeyFieldNumber, key(), output);
-    output = ValueTypeHandler::WriteToArray(kValueFieldNumber, value(), output);
+    output = KeyWireHandler::WriteToArray(kKeyFieldNumber, key(), output);
+    output =
+        ValueWireHandler::WriteToArray(kValueFieldNumber, value(), output);
     return output;
   }
 
   int GetCachedSize() const {
     int size = 0;
-    size += has_key()
-        ? kTagSize + KeyTypeHandler::GetCachedSize(key())
-        : 0;
-    size += has_value()
-        ? kTagSize + ValueTypeHandler::GetCachedSize(
-            value())
-        : 0;
+    size += has_key() ? kTagSize + KeyWireHandler::GetCachedSize(key()) : 0;
+    size +=
+        has_value() ? kTagSize + ValueWireHandler::GetCachedSize(value()) : 0;
     return size;
   }
 
-  bool IsInitialized() const { return ValueTypeHandler::IsInitialized(value_); }
+  bool IsInitialized() const { return ValueCppHandler::IsInitialized(value_); }
 
   MessageLite* New() const {
     MapEntryLite* entry = new MapEntryLite;
@@ -214,37 +225,36 @@ class MapEntryLite : public MessageLite {
 
   int SpaceUsed() const {
     int size = sizeof(MapEntryLite);
-    size += KeyTypeHandler::SpaceUsedInMapEntry(key_);
-    size += ValueTypeHandler::SpaceUsedInMapEntry(value_);
+    size += KeyCppHandler::SpaceUsedInMapEntry(key_);
+    size += ValueCppHandler::SpaceUsedInMapEntry(value_);
     return size;
   }
 
   void MergeFrom(const MapEntryLite& from) {
     if (from._has_bits_[0]) {
       if (from.has_key()) {
-        KeyTypeHandler::EnsureMutable(&key_, GetArenaNoVirtual());
-        KeyTypeHandler::Merge(from.key(), &key_, GetArenaNoVirtual());
+        KeyCppHandler::EnsureMutable(&key_, GetArenaNoVirtual());
+        KeyCppHandler::Merge(from.key(), &key_);
         set_has_key();
       }
       if (from.has_value()) {
-        ValueTypeHandler::EnsureMutable(&value_, GetArenaNoVirtual());
-        ValueTypeHandler::Merge(from.value(), &value_, GetArenaNoVirtual());
+        ValueCppHandler::EnsureMutable(&value_, GetArenaNoVirtual());
+        ValueCppHandler::Merge(from.value(), &value_);
         set_has_value();
       }
     }
   }
 
   void Clear() {
-    KeyTypeHandler::Clear(&key_, GetArenaNoVirtual());
-    ValueTypeHandler::ClearMaybeByDefaultEnum(
-        &value_, GetArenaNoVirtual(), default_enum_value);
+    KeyCppHandler::Clear(&key_);
+    ValueCppHandler::ClearMaybeByDefaultEnum(&value_, default_enum_value);
     clear_has_key();
     clear_has_value();
   }
 
   void InitAsDefaultInstance() {
-    KeyTypeHandler::AssignDefaultValue(&key_);
-    ValueTypeHandler::AssignDefaultValue(&value_);
+    KeyCppHandler::AssignDefaultValue(&key_);
+    ValueCppHandler::AssignDefaultValue(&value_);
   }
 
   Arena* GetArena() const {
@@ -292,11 +302,11 @@ class MapEntryLite : public MessageLite {
   // only takes references of given key and value.
   template <typename K, typename V, WireFormatLite::FieldType k_wire_type,
             WireFormatLite::FieldType v_wire_type, int default_enum>
-  class LIBPROTOBUF_EXPORT MapEntryWrapper
+  class MapEntryWrapper
       : public MapEntryLite<K, V, k_wire_type, v_wire_type, default_enum> {
     typedef MapEntryLite<K, V, k_wire_type, v_wire_type, default_enum> Base;
-    typedef typename Base::KeyMapEntryAccessorType KeyMapEntryAccessorType;
-    typedef typename Base::ValueMapEntryAccessorType ValueMapEntryAccessorType;
+    typedef typename Base::KeyCppType KeyCppType;
+    typedef typename Base::ValCppType ValCppType;
 
    public:
     MapEntryWrapper(Arena* arena, const K& key, const V& value)
@@ -306,8 +316,8 @@ class MapEntryLite : public MessageLite {
       Base::set_has_key();
       Base::set_has_value();
     }
-    inline const KeyMapEntryAccessorType& key() const { return key_; }
-    inline const ValueMapEntryAccessorType& value() const { return value_; }
+    inline const KeyCppType& key() const { return key_; }
+    inline const ValCppType& value() const { return value_; }
 
    private:
     const Key& key_;
@@ -326,11 +336,11 @@ class MapEntryLite : public MessageLite {
   // the temporary.
   template <typename K, typename V, WireFormatLite::FieldType k_wire_type,
             WireFormatLite::FieldType v_wire_type, int default_enum>
-  class LIBPROTOBUF_EXPORT MapEnumEntryWrapper
+  class MapEnumEntryWrapper
       : public MapEntryLite<K, V, k_wire_type, v_wire_type, default_enum> {
     typedef MapEntryLite<K, V, k_wire_type, v_wire_type, default_enum> Base;
-    typedef typename Base::KeyMapEntryAccessorType KeyMapEntryAccessorType;
-    typedef typename Base::ValueMapEntryAccessorType ValueMapEntryAccessorType;
+    typedef typename Base::KeyCppType KeyCppType;
+    typedef typename Base::ValCppType ValCppType;
 
    public:
     MapEnumEntryWrapper(Arena* arena, const K& key, const V& value)
@@ -340,28 +350,28 @@ class MapEntryLite : public MessageLite {
       Base::set_has_key();
       Base::set_has_value();
     }
-    inline const KeyMapEntryAccessorType& key() const { return key_; }
-    inline const ValueMapEntryAccessorType& value() const { return value_; }
+    inline const KeyCppType& key() const { return key_; }
+    inline const ValCppType& value() const { return value_; }
 
    private:
-    const KeyMapEntryAccessorType& key_;
-    const ValueMapEntryAccessorType value_;
+    const KeyCppType& key_;
+    const ValCppType value_;
 
     friend class google::protobuf::Arena;
     typedef void DestructorSkippable_;
   };
 
   MapEntryLite() : default_instance_(NULL), arena_(NULL) {
-    KeyTypeHandler::Initialize(&key_, NULL);
-    ValueTypeHandler::InitializeMaybeByDefaultEnum(
+    KeyCppHandler::Initialize(&key_, NULL);
+    ValueCppHandler::InitializeMaybeByDefaultEnum(
         &value_, default_enum_value, NULL);
     _has_bits_[0] = 0;
   }
 
   explicit MapEntryLite(Arena* arena)
       : default_instance_(NULL), arena_(arena) {
-    KeyTypeHandler::Initialize(&key_, arena);
-    ValueTypeHandler::InitializeMaybeByDefaultEnum(
+    KeyCppHandler::Initialize(&key_, arena);
+    ValueCppHandler::InitializeMaybeByDefaultEnum(
         &value_, default_enum_value, arena);
     _has_bits_[0] = 0;
   }
@@ -376,8 +386,8 @@ class MapEntryLite : public MessageLite {
 
   MapEntryLite* default_instance_;
 
-  KeyOnMemory key_;
-  ValueOnMemory value_;
+  KeyBase key_;
+  ValueBase value_;
   Arena* arena_;
   uint32 _has_bits_[1];
 

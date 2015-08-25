@@ -42,7 +42,6 @@
 #endif
 #include <cstdlib>
 
-#include <google/protobuf/stubs/logging.h>
 #include <google/protobuf/stubs/common.h>
 #include <gtest/gtest.h>
 
