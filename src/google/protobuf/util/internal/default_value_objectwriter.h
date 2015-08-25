@@ -129,7 +129,7 @@ class LIBPROTOBUF_EXPORT DefaultValueObjectWriter : public ObjectWriter {
     // Populates children of this Node based on its type. If there are already
     // children created, they will be merged to the result. Caller should pass
     // in TypeInfo for looking up types of the children.
-    void PopulateChildren(TypeInfo* typeinfo);
+    void PopulateChildren(const TypeInfo* typeinfo);
 
     // If this node is a leaf (has data), writes the current node to the
     // ObjectWriter; if not, then recursively writes the children to the
@@ -165,7 +165,10 @@ class LIBPROTOBUF_EXPORT DefaultValueObjectWriter : public ObjectWriter {
     // Returns the Value Type of a map given the Type of the map entry and a
     // TypeInfo instance.
     const google::protobuf::Type* GetMapValueType(
-        const google::protobuf::Type& entry_type, TypeInfo* typeinfo);
+        const google::protobuf::Type& entry_type, const TypeInfo* typeinfo);
+
+    // Calls WriteTo() on every child in children_.
+    void WriteChildren(ObjectWriter* ow);
 
     // The name of this node.
     string name_;
@@ -210,7 +213,9 @@ class LIBPROTOBUF_EXPORT DefaultValueObjectWriter : public ObjectWriter {
 
   // Type information for all the types used in the descriptor. Used to find
   // google::protobuf::Type of nested messages/enums.
-  google::protobuf::scoped_ptr<TypeInfo> typeinfo_;
+  const TypeInfo* typeinfo_;
+  // Whether the TypeInfo object is owned by this class.
+  bool own_typeinfo_;
   // google::protobuf::Type of the root message type.
   const google::protobuf::Type& type_;
   // Holds copies of strings passed to RenderString.
