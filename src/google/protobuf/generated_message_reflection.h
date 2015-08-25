@@ -58,9 +58,7 @@ class GMR_Handlers;
 }  // namespace upb
 
 namespace protobuf {
-class DescriptorPool;
-class MapKey;
-class MapValueRef;
+  class DescriptorPool;
 }
 
 namespace protobuf {
@@ -263,25 +261,6 @@ class LIBPROTOBUF_EXPORT GeneratedMessageReflection : public Reflection {
       const Message& message,
       const OneofDescriptor* oneof_descriptor) const;
 
- private:
-  bool ContainsMapKey(const Message& message,
-                      const FieldDescriptor* field,
-                      const MapKey& key) const;
-  bool InsertOrLookupMapValue(Message* message,
-                              const FieldDescriptor* field,
-                              const MapKey& key,
-                              MapValueRef* val) const;
-  bool DeleteMapValue(Message* message,
-                      const FieldDescriptor* field,
-                      const MapKey& key) const;
-  MapIterator MapBegin(
-      Message* message,
-      const FieldDescriptor* field) const;
-  MapIterator MapEnd(
-      Message* message,
-      const FieldDescriptor* field) const;
-  int MapSize(const Message& message, const FieldDescriptor* field) const;
-
  public:
   void SetInt32 (Message* message,
                  const FieldDescriptor* field, int32  value) const;
@@ -392,9 +371,6 @@ class LIBPROTOBUF_EXPORT GeneratedMessageReflection : public Reflection {
                     int value) const;
   Message* AddMessage(Message* message, const FieldDescriptor* field,
                       MessageFactory* factory = NULL) const;
-  void AddAllocatedMessage(
-      Message* message, const FieldDescriptor* field,
-      Message* new_entry) const;
 
   const FieldDescriptor* FindKnownExtensionByName(const string& name) const;
   const FieldDescriptor* FindKnownExtensionByNumber(int number) const;
@@ -415,14 +391,9 @@ class LIBPROTOBUF_EXPORT GeneratedMessageReflection : public Reflection {
   static const int kUnknownFieldSetInMetadata = -1;
 
  protected:
-  void* MutableRawRepeatedField(
+  virtual void* MutableRawRepeatedField(
       Message* message, const FieldDescriptor* field, FieldDescriptor::CppType,
-      int ctype, const Descriptor* desc) const override;
-
-  const void* GetRawRepeatedField(
-      const Message& message, const FieldDescriptor* field,
-      FieldDescriptor::CppType, int ctype,
-      const Descriptor* desc) const override;
+      int ctype, const Descriptor* desc) const;
 
   virtual MessageFactory* GetMessageFactory() const;
 
@@ -436,7 +407,7 @@ class LIBPROTOBUF_EXPORT GeneratedMessageReflection : public Reflection {
 
   // To parse directly into a proto2 generated class, the class GMR_Handlers
   // needs access to member offsets and hasbits.
-  friend class upb::google_opensource::GMR_Handlers;
+  friend class LIBPROTOBUF_EXPORT upb::google_opensource::GMR_Handlers;
 
   const Descriptor* descriptor_;
   const Message* default_instance_;
@@ -567,9 +538,6 @@ class LIBPROTOBUF_EXPORT GeneratedMessageReflection : public Reflection {
   void UnsafeArenaSetAllocatedMessage(Message* message,
                                       Message* sub_message,
                                       const FieldDescriptor* field) const;
-
-  internal::MapFieldBase* MapData(
-      Message* message, const FieldDescriptor* field) const;
 
   GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(GeneratedMessageReflection);
 };

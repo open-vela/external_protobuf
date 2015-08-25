@@ -34,9 +34,7 @@
 #include <algorithm>
 #include <utility>
 
-#include <google/protobuf/stubs/callback.h>
 #include <google/protobuf/stubs/common.h>
-#include <google/protobuf/stubs/logging.h>
 #include <google/protobuf/wrappers.pb.h>
 #include <google/protobuf/descriptor.pb.h>
 #include <google/protobuf/descriptor.h>
@@ -305,7 +303,7 @@ bool IsMap(const google::protobuf::Field& field,
 string DoubleAsString(double value) {
   if (value == std::numeric_limits<double>::infinity()) return "Infinity";
   if (value == -std::numeric_limits<double>::infinity()) return "-Infinity";
-  if (MathLimits<double>::IsNaN(value)) return "NaN";
+  if (google::protobuf::MathLimits<double>::IsNaN(value)) return "NaN";
 
   return SimpleDtoa(value);
 }

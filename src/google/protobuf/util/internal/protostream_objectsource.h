@@ -46,6 +46,7 @@
 #include <google/protobuf/stubs/statusor.h>
 
 
+
 namespace google {
 namespace protobuf {
 class Field;
@@ -60,10 +61,7 @@ namespace converter {
 class TypeInfo;
 
 // An ObjectSource that can parse a stream of bytes as a protocol buffer.
-// Its WriteTo() method can be given an ObjectWriter.
-// This implementation uses a google.protobuf.Type for tag and name lookup.
-// The field names are converted into lower camel-case when writing to the
-// ObjectWriter.
+// This implementation uses a tech Type for tag lookup.
 //
 // Sample usage: (suppose input is: string proto)
 //   ArrayInputStream arr_stream(proto.data(), proto.size());
@@ -95,7 +93,7 @@ class LIBPROTOBUF_EXPORT ProtoStreamObjectSource : public ObjectSource {
 
  private:
   ProtoStreamObjectSource(google::protobuf::io::CodedInputStream* stream,
-                          const TypeInfo* typeinfo,
+                          TypeInfo* typeinfo,
                           const google::protobuf::Type& type);
   // Function that renders a well known type with a modified behavior.
   typedef util::Status (*TypeRenderer)(const ProtoStreamObjectSource*,
@@ -228,7 +226,7 @@ class LIBPROTOBUF_EXPORT ProtoStreamObjectSource : public ObjectSource {
 
   // Type information for all the types used in the descriptor. Used to find
   // google::protobuf::Type of nested messages/enums.
-  const TypeInfo* typeinfo_;
+  TypeInfo* typeinfo_;
   // Whether this class owns the typeinfo_ object. If true the typeinfo_ object
   // should be deleted in the destructor.
   bool own_typeinfo_;
