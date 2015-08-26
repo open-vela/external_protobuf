@@ -171,8 +171,8 @@ java_EXTRA_DIST=                                                             \
   java/src/main/java/com/google/protobuf/AbstractProtobufList.java           \
   java/src/main/java/com/google/protobuf/BlockingRpcChannel.java             \
   java/src/main/java/com/google/protobuf/BlockingService.java                \
-  java/src/main/java/com/google/protobuf/BoundedByteString.java              \
   java/src/main/java/com/google/protobuf/BooleanArrayList.java               \
+  java/src/main/java/com/google/protobuf/BoundedByteString.java              \
   java/src/main/java/com/google/protobuf/ByteString.java                     \
   java/src/main/java/com/google/protobuf/CodedInputStream.java               \
   java/src/main/java/com/google/protobuf/CodedOutputStream.java              \
@@ -187,8 +187,8 @@ java_EXTRA_DIST=                                                             \
   java/src/main/java/com/google/protobuf/FloatArrayList.java                 \
   java/src/main/java/com/google/protobuf/GeneratedMessage.java               \
   java/src/main/java/com/google/protobuf/GeneratedMessageLite.java           \
-  java/src/main/java/com/google/protobuf/Internal.java                       \
   java/src/main/java/com/google/protobuf/IntArrayList.java                   \
+  java/src/main/java/com/google/protobuf/Internal.java                       \
   java/src/main/java/com/google/protobuf/InvalidProtocolBufferException.java \
   java/src/main/java/com/google/protobuf/LazyField.java                      \
   java/src/main/java/com/google/protobuf/LazyFieldLite.java                  \
@@ -216,8 +216,8 @@ java_EXTRA_DIST=                                                             \
   java/src/main/java/com/google/protobuf/RpcChannel.java                     \
   java/src/main/java/com/google/protobuf/RpcController.java                  \
   java/src/main/java/com/google/protobuf/RpcUtil.java                        \
-  java/src/main/java/com/google/protobuf/ServiceException.java               \
   java/src/main/java/com/google/protobuf/Service.java                        \
+  java/src/main/java/com/google/protobuf/ServiceException.java               \
   java/src/main/java/com/google/protobuf/SingleFieldBuilder.java             \
   java/src/main/java/com/google/protobuf/SmallSortedMap.java                 \
   java/src/main/java/com/google/protobuf/TextFormat.java                     \
@@ -226,11 +226,11 @@ java_EXTRA_DIST=                                                             \
   java/src/main/java/com/google/protobuf/UnknownFieldSetLite.java            \
   java/src/main/java/com/google/protobuf/UnmodifiableLazyStringList.java     \
   java/src/main/java/com/google/protobuf/Utf8.java                           \
-  java/src/test/java/com/google/protobuf/WellKnownTypesTest.java             \
   java/src/main/java/com/google/protobuf/WireFormat.java                     \
   java/src/test/java/com/google/protobuf/AbstractMessageTest.java            \
-  java/src/test/java/com/google/protobuf/BoundedByteStringTest.java          \
+  java/src/test/java/com/google/protobuf/AnyTest.java                        \
   java/src/test/java/com/google/protobuf/BooleanArrayListTest.java           \
+  java/src/test/java/com/google/protobuf/BoundedByteStringTest.java          \
   java/src/test/java/com/google/protobuf/ByteStringTest.java                 \
   java/src/test/java/com/google/protobuf/CheckUtf8Test.java                  \
   java/src/test/java/com/google/protobuf/CodedInputStreamTest.java           \
@@ -252,8 +252,8 @@ java_EXTRA_DIST=                                                             \
   java/src/test/java/com/google/protobuf/LazyStringArrayListTest.java        \
   java/src/test/java/com/google/protobuf/LazyStringEndToEndTest.java         \
   java/src/test/java/com/google/protobuf/LiteEqualsAndHashTest.java          \
-  java/src/test/java/com/google/protobuf/LiteralByteStringTest.java          \
   java/src/test/java/com/google/protobuf/LiteTest.java                       \
+  java/src/test/java/com/google/protobuf/LiteralByteStringTest.java          \
   java/src/test/java/com/google/protobuf/LongArrayListTest.java              \
   java/src/test/java/com/google/protobuf/MapForProto2LiteTest.java           \
   java/src/test/java/com/google/protobuf/MapForProto2Test.java               \
@@ -275,7 +275,9 @@ java_EXTRA_DIST=                                                             \
   java/src/test/java/com/google/protobuf/UnknownFieldSetLiteTest.java        \
   java/src/test/java/com/google/protobuf/UnknownFieldSetTest.java            \
   java/src/test/java/com/google/protobuf/UnmodifiableLazyStringListTest.java \
+  java/src/test/java/com/google/protobuf/WellKnownTypesTest.java             \
   java/src/test/java/com/google/protobuf/WireFormatTest.java                 \
+  java/src/test/java/com/google/protobuf/any_test.proto                      \
   java/src/test/java/com/google/protobuf/field_presence_test.proto           \
   java/src/test/java/com/google/protobuf/lazy_fields_lite.proto              \
   java/src/test/java/com/google/protobuf/lite_equals_and_hash.proto          \
@@ -285,18 +287,28 @@ java_EXTRA_DIST=                                                             \
   java/src/test/java/com/google/protobuf/map_test.proto                      \
   java/src/test/java/com/google/protobuf/multiple_files_test.proto           \
   java/src/test/java/com/google/protobuf/nested_builders_test.proto          \
-  java/src/test/java/com/google/protobuf/nested_extension_lite.proto         \
   java/src/test/java/com/google/protobuf/nested_extension.proto              \
-  java/src/test/java/com/google/protobuf/non_nested_extension_lite.proto     \
+  java/src/test/java/com/google/protobuf/nested_extension_lite.proto         \
   java/src/test/java/com/google/protobuf/non_nested_extension.proto          \
+  java/src/test/java/com/google/protobuf/non_nested_extension_lite.proto     \
+  java/src/test/java/com/google/protobuf/outer_class_name_test.proto         \
   java/src/test/java/com/google/protobuf/outer_class_name_test2.proto        \
   java/src/test/java/com/google/protobuf/outer_class_name_test3.proto        \
-  java/src/test/java/com/google/protobuf/outer_class_name_test.proto         \
   java/src/test/java/com/google/protobuf/test_bad_identifiers.proto          \
   java/src/test/java/com/google/protobuf/test_check_utf8.proto               \
   java/src/test/java/com/google/protobuf/test_check_utf8_size.proto          \
   java/src/test/java/com/google/protobuf/test_custom_options.proto           \
   java/src/test/java/com/google/protobuf/test_extra_interfaces.proto         \
+  java/util/pom.xml                                                          \
+  java/util/src/main/java/com/google/protobuf/util/FieldMaskTree.java        \
+  java/util/src/main/java/com/google/protobuf/util/FieldMaskUtil.java        \
+  java/util/src/main/java/com/google/protobuf/util/JsonFormat.java           \
+  java/util/src/main/java/com/google/protobuf/util/TimeUtil.java             \
+  java/util/src/test/java/com/google/protobuf/util/FieldMaskTreeTest.java    \
+  java/util/src/test/java/com/google/protobuf/util/FieldMaskUtilTest.java    \
+  java/util/src/test/java/com/google/protobuf/util/JsonFormatTest.java       \
+  java/util/src/test/java/com/google/protobuf/util/TimeUtilTest.java         \
+  java/util/src/test/java/com/google/protobuf/util/json_test.proto           \
   java/pom.xml                                                               \
   java/README.md
 
@@ -471,7 +483,6 @@ objectivec_EXTRA_DIST=                                                       \
   objectivec/Tests/unittest_cycle.proto                                       \
   objectivec/Tests/unittest_objc_startup.proto                                \
   objectivec/Tests/unittest_objc.proto                                        \
-  objectivec/Tests/unittest_objc_startup.proto                                \
   objectivec/Tests/unittest_runtime_proto2.proto                              \
   objectivec/Tests/unittest_runtime_proto3.proto                              \
   objectivec/Tests/UnitTests-Bridging-Header.h                                \
@@ -496,11 +507,13 @@ python_EXTRA_DIST=                                                           \
   python/google/protobuf/internal/generator_test.py                          \
   python/google/protobuf/internal/message_factory_test.py                    \
   python/google/protobuf/internal/message_listener.py                        \
+  python/google/protobuf/internal/message_set_extensions.proto               \
   python/google/protobuf/internal/message_test.py                            \
   python/google/protobuf/internal/missing_enum_values.proto                  \
-  python/google/protobuf/internal/more_extensions.proto                      \
   python/google/protobuf/internal/more_extensions_dynamic.proto              \
+  python/google/protobuf/internal/more_extensions.proto                      \
   python/google/protobuf/internal/more_messages.proto                        \
+  python/google/protobuf/internal/packed_field_test.proto                    \
   python/google/protobuf/internal/_parameterized.py                          \
   python/google/protobuf/internal/proto_builder_test.py                      \
   python/google/protobuf/internal/python_message.py                          \
