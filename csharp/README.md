@@ -1,7 +1,7 @@
 This directory contains the C# Protocol Buffers runtime library.
 
-Status: Alpha - ready for early adopters
-========================================
+Warning: experimental!
+======================
 
 This code is still under significant churn. Unlike the original port,
 it only supports proto3 (but not *all* of proto3 yet) - there are no
@@ -12,20 +12,15 @@ reflection. (It's currently exposed publicly, but won't be
 eventually.)
 
 Also unlike the original port, the new version embraces mutability -
-there are no builder types.
+there are no builder types. We plan to add "freezing" operations as
+well as cloning, however.
 
 Usage
 =====
 
-The easiest way how to use C# protobufs is via the `Google.Protobuf`
-NuGet package. Just add the NuGet package to your VS project.
-
-Besides C# runtime library, the NuGet package also contains 
-precompiled version of `protoc.exe` and a copy of well known `.proto`
-files under the package's `tools` directory.
-
-To generate C# files from your `.proto` files, invoke `protoc` with the 
-`--csharp_out` option.
+Use `protoc` with the `--csharp_out` option to generate C# files in the specified directory.
+Include these in your C# project, and add a reference to the `Google.Protobuf` project. Currently
+there is no NuGet package for this, but we will be building one as soon as the API is stable.
 
 Supported platforms
 ===================

@@ -66,12 +66,8 @@ void Arena::Init() {
     first_block->size = options_.initial_block_size;
     first_block->pos = kHeaderSize;
     first_block->next = NULL;
-    // Thread which calls Init() owns the first block. This allows the
-    // single-threaded case to allocate on the first block without taking any
-    // locks.
-    first_block->owner = &thread_cache();
-    SetThreadCacheBlock(first_block);
-    AddBlockInternal(first_block);
+    first_block->owner = &first_block->owner;
+    AddBlock(first_block);
     owns_first_block_ = false;
   }
 
@@ -84,7 +80,7 @@ void Arena::Init() {
 }
 
 Arena::~Arena() {
-  uint64 space_allocated = ResetInternal();
+  uint64 space_allocated = Reset();
 
   // Call the destruction hook
   if (options_.on_arena_destruction != NULL) {
@@ -93,14 +89,10 @@ Arena::~Arena() {
 }
 
 uint64 Arena::Reset() {
-  // Invalidate any ThreadCaches pointing to any blocks we just destroyed.
-  lifecycle_id_ = lifecycle_id_generator_.GetNext();
-  return ResetInternal();
-}
-
-uint64 Arena::ResetInternal() {
   CleanupList();
   uint64 space_allocated = FreeBlocks();
+  // Invalidate any ThreadCaches pointing to any blocks we just destroyed.
+  lifecycle_id_ = lifecycle_id_generator_.GetNext();
 
   // Call the reset hook
   if (options_.on_arena_reset != NULL) {
@@ -145,10 +137,6 @@ Arena::Block* Arena::NewBlock(void* me, Block* my_last_block, size_t n,
 
 void Arena::AddBlock(Block* b) {
   MutexLock l(&blocks_lock_);
-  AddBlockInternal(b);
-}
-
-void Arena::AddBlockInternal(Block* b) {
   b->next = reinterpret_cast<Block*>(google::protobuf::internal::NoBarrier_Load(&blocks_));
   google::protobuf::internal::Release_Store(&blocks_, reinterpret_cast<google::protobuf::internal::AtomicWord>(b));
   if (b->avail() != 0) {
@@ -193,6 +181,16 @@ void* Arena::AllocateAligned(const std::type_info* allocated, size_t n) {
   void* me = &thread_cache();
   Block* b = reinterpret_cast<Block*>(google::protobuf::internal::Acquire_Load(&hint_));
   if (!b || b->owner != me || b->avail() < n) {
+    // If the next block to allocate from is the first block, try to claim it
+    // for this thread.
+    if (!owns_first_block_ && b->next == NULL) {
+      MutexLock l(&blocks_lock_);
+      if (b->owner == &b->owner && b->avail() >= n) {
+        b->owner = me;
+        SetThreadCacheBlock(b);
+        return AllocFromBlock(b, n);
+      }
+    }
     return SlowAlloc(n);
   }
   return AllocFromBlock(b, n);
@@ -269,12 +267,8 @@ uint64 Arena::FreeBlocks() {
     // Make the first block that was passed in through ArenaOptions
     // available for reuse.
     first_block->pos = kHeaderSize;
-    // Thread which calls Reset() owns the first block. This allows the
-    // single-threaded case to allocate on the first block without taking any
-    // locks.
-    first_block->owner = &thread_cache();
-    SetThreadCacheBlock(first_block);
-    AddBlockInternal(first_block);
+    first_block->owner = &first_block->owner;
+    AddBlock(first_block);
   }
   return space_allocated;
 }
