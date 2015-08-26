@@ -52,7 +52,6 @@
 #include <google/protobuf/map_test_util.h>
 #include <google/protobuf/test_util.h>
 
-#include <google/protobuf/stubs/logging.h>
 #include <google/protobuf/stubs/common.h>
 #include <google/protobuf/stubs/strutil.h>
 #include <google/protobuf/testing/googletest.h>
@@ -132,7 +131,7 @@ TEST(MessageDifferencerTest, MapFieldEqualityTest) {
   unittest::TestMap msg1;
   unittest::TestMap msg2;
 
-  MapReflectionTester tester(unittest::TestMap::descriptor());
+  MapTestUtil::MapReflectionTester tester(unittest::TestMap::descriptor());
   tester.SetMapFieldsViaReflection(&msg1);
   tester.SetMapFieldsViaReflection(&msg2);
   tester.SwapMapsViaReflection(&msg1);
