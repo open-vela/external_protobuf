@@ -33,7 +33,6 @@
 #include <utility>
 
 #include <google/protobuf/stubs/casts.h>
-#include <google/protobuf/stubs/logging.h>
 #include <google/protobuf/stubs/common.h>
 #include <google/protobuf/stubs/stringprintf.h>
 #include <google/protobuf/stubs/time.h>
@@ -47,7 +46,6 @@
 #include <google/protobuf/util/internal/utility.h>
 #include <google/protobuf/stubs/strutil.h>
 #include <google/protobuf/stubs/map_util.h>
-#include <google/protobuf/stubs/once.h>
 #include <google/protobuf/stubs/status_macros.h>
 
 
@@ -98,7 +96,7 @@ ProtoStreamObjectSource::ProtoStreamObjectSource(
 }
 
 ProtoStreamObjectSource::ProtoStreamObjectSource(
-    google::protobuf::io::CodedInputStream* stream, const TypeInfo* typeinfo,
+    google::protobuf::io::CodedInputStream* stream, TypeInfo* typeinfo,
     const google::protobuf::Type& type)
     : stream_(stream), typeinfo_(typeinfo), own_typeinfo_(false), type_(type) {
   GOOGLE_LOG_IF(DFATAL, stream == NULL) << "Input stream is NULL.";
@@ -158,7 +156,7 @@ Status ProtoStreamObjectSource::WriteMessage(const google::protobuf::Type& type,
       last_tag = tag;
       field = FindAndVerifyField(type, tag);
       if (field != NULL) {
-        field_name = field->json_name();
+        field_name = field->name();
       }
     }
     if (field == NULL) {
@@ -216,7 +214,7 @@ StatusOr<uint32> ProtoStreamObjectSource::RenderMap(
     const google::protobuf::Field* field, StringPiece name, uint32 list_tag,
     ObjectWriter* ow) const {
   const google::protobuf::Type* field_type =
-      typeinfo_->GetTypeByTypeUrl(field->type_url());
+      typeinfo_->GetType(field->type_url());
   uint32 tag_to_return = 0;
   if (IsPackable(*field) &&
       list_tag ==
@@ -649,53 +647,46 @@ Status ProtoStreamObjectSource::RenderFieldMask(
 }
 
 hash_map<string, ProtoStreamObjectSource::TypeRenderer>*
-    ProtoStreamObjectSource::renderers_ = NULL;
-GOOGLE_PROTOBUF_DECLARE_ONCE(source_renderers_init_);
-
-void ProtoStreamObjectSource::InitRendererMap() {
-  renderers_ = new hash_map<string, ProtoStreamObjectSource::TypeRenderer>();
-  (*renderers_)["google.protobuf.Timestamp"] =
+ProtoStreamObjectSource::CreateRendererMap() {
+  hash_map<string, ProtoStreamObjectSource::TypeRenderer>* result =
+      new hash_map<string, ProtoStreamObjectSource::TypeRenderer>();
+  (*result)["google.protobuf.Timestamp"] =
       &ProtoStreamObjectSource::RenderTimestamp;
-  (*renderers_)["google.protobuf.Duration"] =
+  (*result)["google.protobuf.Duration"] =
       &ProtoStreamObjectSource::RenderDuration;
-  (*renderers_)["google.protobuf.DoubleValue"] =
+  (*result)["google.protobuf.DoubleValue"] =
       &ProtoStreamObjectSource::RenderDouble;
-  (*renderers_)["google.protobuf.FloatValue"] =
+  (*result)["google.protobuf.FloatValue"] =
       &ProtoStreamObjectSource::RenderFloat;
-  (*renderers_)["google.protobuf.Int64Value"] =
+  (*result)["google.protobuf.Int64Value"] =
       &ProtoStreamObjectSource::RenderInt64;
-  (*renderers_)["google.protobuf.UInt64Value"] =
+  (*result)["google.protobuf.UInt64Value"] =
       &ProtoStreamObjectSource::RenderUInt64;
-  (*renderers_)["google.protobuf.Int32Value"] =
+  (*result)["google.protobuf.Int32Value"] =
       &ProtoStreamObjectSource::RenderInt32;
-  (*renderers_)["google.protobuf.UInt32Value"] =
+  (*result)["google.protobuf.UInt32Value"] =
       &ProtoStreamObjectSource::RenderUInt32;
-  (*renderers_)["google.protobuf.BoolValue"] = &ProtoStreamObjectSource::RenderBool;
-  (*renderers_)["google.protobuf.StringValue"] =
+  (*result)["google.protobuf.BoolValue"] = &ProtoStreamObjectSource::RenderBool;
+  (*result)["google.protobuf.StringValue"] =
       &ProtoStreamObjectSource::RenderString;
-  (*renderers_)["google.protobuf.BytesValue"] =
+  (*result)["google.protobuf.BytesValue"] =
       &ProtoStreamObjectSource::RenderBytes;
-  (*renderers_)["google.protobuf.Any"] = &ProtoStreamObjectSource::RenderAny;
-  (*renderers_)["google.protobuf.Struct"] = &ProtoStreamObjectSource::RenderStruct;
-  (*renderers_)["google.protobuf.Value"] =
+  (*result)["google.protobuf.Any"] = &ProtoStreamObjectSource::RenderAny;
+  (*result)["google.protobuf.Struct"] = &ProtoStreamObjectSource::RenderStruct;
+  (*result)["google.protobuf.Value"] =
       &ProtoStreamObjectSource::RenderStructValue;
-  (*renderers_)["google.protobuf.ListValue"] =
+  (*result)["google.protobuf.ListValue"] =
       &ProtoStreamObjectSource::RenderStructListValue;
-  (*renderers_)["google.protobuf.FieldMask"] =
+  (*result)["google.protobuf.FieldMask"] =
       &ProtoStreamObjectSource::RenderFieldMask;
-  ::google::protobuf::internal::OnShutdown(&DeleteRendererMap);
-}
-
-void ProtoStreamObjectSource::DeleteRendererMap() {
-  delete ProtoStreamObjectSource::renderers_;
-  renderers_ = NULL;
+  return result;
 }
 
 // static
 ProtoStreamObjectSource::TypeRenderer*
 ProtoStreamObjectSource::FindTypeRenderer(const string& type_url) {
-  ::google::protobuf::GoogleOnceInit(&source_renderers_init_, &InitRendererMap);
-  return FindOrNull(*renderers_, type_url);
+  static hash_map<string, TypeRenderer>* renderers = CreateRendererMap();
+  return FindOrNull(*renderers, type_url);
 }
 
 Status ProtoStreamObjectSource::RenderField(
@@ -793,8 +784,7 @@ Status ProtoStreamObjectSource::RenderField(
       // Get the nested enum type for this field.
       // TODO(skarvaje): Avoid string manipulation. Find ways to speed this
       // up.
-      const google::protobuf::Enum* en =
-          typeinfo_->GetEnumByTypeUrl(field->type_url());
+      const google::protobuf::Enum* en = typeinfo_->GetEnum(field->type_url());
       // Lookup the name of the enum, and render that. Skips unknown enums.
       if (en != NULL) {
         const google::protobuf::EnumValue* enum_value =
@@ -829,7 +819,7 @@ Status ProtoStreamObjectSource::RenderField(
       int old_limit = stream_->PushLimit(buffer32);
       // Get the nested message type for this field.
       const google::protobuf::Type* type =
-          typeinfo_->GetTypeByTypeUrl(field->type_url());
+          typeinfo_->GetType(field->type_url());
       if (type == NULL) {
         return Status(util::error::INTERNAL,
                       StrCat("Invalid configuration. Could not find the type: ",
@@ -938,8 +928,7 @@ const string ProtoStreamObjectSource::ReadFieldValueAsString(
       // Get the nested enum type for this field.
       // TODO(skarvaje): Avoid string manipulation. Find ways to speed this
       // up.
-      const google::protobuf::Enum* en =
-          typeinfo_->GetEnumByTypeUrl(field.type_url());
+      const google::protobuf::Enum* en = typeinfo_->GetEnum(field.type_url());
       // Lookup the name of the enum, and render that. Skips unknown enums.
       if (en != NULL) {
         const google::protobuf::EnumValue* enum_value =
@@ -973,7 +962,7 @@ const string ProtoStreamObjectSource::ReadFieldValueAsString(
 bool ProtoStreamObjectSource::IsMap(
     const google::protobuf::Field& field) const {
   const google::protobuf::Type* field_type =
-      typeinfo_->GetTypeByTypeUrl(field.type_url());
+      typeinfo_->GetType(field.type_url());
 
   // TODO(xiaofeng): Unify option names.
   return field.kind() == google::protobuf::Field_Kind_TYPE_MESSAGE &&

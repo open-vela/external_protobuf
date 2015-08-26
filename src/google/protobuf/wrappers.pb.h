@@ -37,15 +37,15 @@ void LIBPROTOBUF_EXPORT protobuf_AddDesc_google_2fprotobuf_2fwrappers_2eproto();
 void protobuf_AssignDesc_google_2fprotobuf_2fwrappers_2eproto();
 void protobuf_ShutdownFile_google_2fprotobuf_2fwrappers_2eproto();
 
-class BoolValue;
-class BytesValue;
 class DoubleValue;
 class FloatValue;
-class Int32Value;
 class Int64Value;
-class StringValue;
-class UInt32Value;
 class UInt64Value;
+class Int32Value;
+class UInt32Value;
+class BoolValue;
+class StringValue;
+class BytesValue;
 
 // ===================================================================
 
