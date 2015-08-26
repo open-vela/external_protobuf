@@ -45,12 +45,15 @@
 #endif
 
 #undef PROTOBUF_LITTLE_ENDIAN
-#ifdef _MSC_VER
+#ifdef _WIN32
   // Assuming windows is always little-endian.
+  // TODO(xiaofeng): The PROTOBUF_LITTLE_ENDIAN is not only used for
+  // optimization but also for correctness. We should define an
+  // different macro to test the big-endian code path in coded_stream.
   #if !defined(PROTOBUF_DISABLE_LITTLE_ENDIAN_OPT_FOR_TEST)
     #define PROTOBUF_LITTLE_ENDIAN 1
   #endif
-  #if _MSC_VER >= 1300
+  #if defined(_MSC_VER) && _MSC_VER >= 1300
     // If MSVC has "/RTCc" set, it will complain about truncating casts at
     // runtime.  This file contains some intentional truncating casts.
     #pragma runtime_checks("c", off)
@@ -100,20 +103,12 @@ typedef unsigned __int64 uint64;
 typedef signed char  int8;
 typedef short int16;
 typedef int int32;
-// NOTE: This should be "long long" for consistency with upstream, but
-// something is stacked against this particular type for 64bit hashing.
-// Switching it causes an obvious missing hash function (with an unobvious
-// cause) when building the tests.
-typedef int64_t int64;
+typedef long long int64;
 
 typedef unsigned char  uint8;
 typedef unsigned short uint16;
 typedef unsigned int uint32;
-// NOTE: This should be "unsigned long long" for consistency with upstream, but
-// something is stacked against this particular type for 64bit hashing.
-// Switching it causes an obvious missing hash function (with an unobvious
-// cause) when building the tests.
-typedef uint64_t uint64;
+typedef unsigned long long uint64;
 #endif
 
 // long long macros to be used because gcc and vc++ use different suffixes,
