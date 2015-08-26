@@ -58,7 +58,8 @@ import java.io.InputStream;
 public class ParserTest extends TestCase {
   public void testGeneratedMessageParserSingleton() throws Exception {
     for (int i = 0; i < 10; i++) {
-      assertEquals(TestAllTypes.parser(), TestUtil.getAllSet().getParserForType());
+      assertEquals(TestAllTypes.PARSER,
+                   TestUtil.getAllSet().getParserForType());
     }
   }
 
@@ -124,7 +125,8 @@ public class ParserTest extends TestCase {
 
 
   public void testParsePartial() throws Exception {
-    assertParsePartial(TestRequired.parser(), TestRequired.newBuilder().setA(1).buildPartial());
+    assertParsePartial(TestRequired.PARSER,
+        TestRequired.newBuilder().setA(1).buildPartial());
   }
 
   private <T extends MessageLite> void assertParsePartial(
@@ -214,8 +216,8 @@ public class ParserTest extends TestCase {
 
   public void testParseUnknownFields() throws Exception {
     // All fields will be treated as unknown fields in emptyMessage.
-    TestEmptyMessage emptyMessage =
-        TestEmptyMessage.parser().parseFrom(TestUtil.getAllSet().toByteString());
+    TestEmptyMessage emptyMessage = TestEmptyMessage.PARSER.parseFrom(
+        TestUtil.getAllSet().toByteString());
     assertEquals(
         TestUtil.getAllSet().toByteString(),
         emptyMessage.toByteString());
@@ -296,7 +298,8 @@ public class ParserTest extends TestCase {
     // Parse TestParsingMerge.
     ExtensionRegistry registry = ExtensionRegistry.newInstance();
     UnittestProto.registerAllExtensions(registry);
-    TestParsingMerge parsingMerge = TestParsingMerge.parser().parseFrom(data, registry);
+    TestParsingMerge parsingMerge =
+        TestParsingMerge.PARSER.parseFrom(data, registry);
 
     // Required and optional fields should be merged.
     assertMessageMerged(parsingMerge.getRequiredAllTypes());
@@ -358,7 +361,8 @@ public class ParserTest extends TestCase {
     // Parse TestParsingMergeLite.
     ExtensionRegistry registry = ExtensionRegistry.newInstance();
     UnittestLite.registerAllExtensions(registry);
-    TestParsingMergeLite parsingMerge = TestParsingMergeLite.parser().parseFrom(data, registry);
+    TestParsingMergeLite parsingMerge =
+        TestParsingMergeLite.PARSER.parseFrom(data, registry);
 
     // Required and optional fields should be merged.
     assertMessageMerged(parsingMerge.getRequiredAllTypes());

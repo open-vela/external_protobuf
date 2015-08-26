@@ -79,9 +79,7 @@ StatusOr<To> NumberConvertAndCheck(From before) {
 // For conversion between double and float only.
 template <typename To, typename From>
 StatusOr<To> FloatingPointConvertAndCheck(From before) {
-  if (MathLimits<From>::IsNaN(before)) {
-    return std::numeric_limits<To>::quiet_NaN();
-  }
+  if (MathLimits<From>::IsNaN(before)) return std::numeric_limits<To>::quiet_NaN();
 
   To after = static_cast<To>(before);
   if (MathUtil::AlmostEquals<To>(after, before)) {
@@ -169,7 +167,7 @@ StatusOr<string> DataPiece::ToString() const {
       return str_.ToString();
     case TYPE_BYTES: {
       string base64;
-      Base64Escape(str_, &base64);
+      WebSafeBase64Escape(str_, &base64);
       return base64;
     }
     default:
