@@ -35,9 +35,7 @@
 
 #include <google/protobuf/message_lite.h>
 #include <google/protobuf/arena.h>
-#include <google/protobuf/repeated_field.h>
 #include <string>
-#include <google/protobuf/stubs/logging.h>
 #include <google/protobuf/stubs/common.h>
 #include <google/protobuf/io/coded_stream.h>
 #include <google/protobuf/io/zero_copy_stream_impl_lite.h>
@@ -100,19 +98,27 @@ string InitializationErrorMessage(const char* action,
 // call MergePartialFromCodedStream().  However, when parsing very small
 // messages, every function call introduces significant overhead.  To avoid
 // this without reproducing code, we use these forced-inline helpers.
-GOOGLE_ATTRIBUTE_ALWAYS_INLINE bool InlineMergeFromCodedStream(
-    io::CodedInputStream* input, MessageLite* message);
-GOOGLE_ATTRIBUTE_ALWAYS_INLINE bool InlineParseFromCodedStream(
-    io::CodedInputStream* input, MessageLite* message);
-GOOGLE_ATTRIBUTE_ALWAYS_INLINE bool InlineParsePartialFromCodedStream(
-    io::CodedInputStream* input, MessageLite* message);
-GOOGLE_ATTRIBUTE_ALWAYS_INLINE bool InlineParseFromArray(
-    const void* data, int size, MessageLite* message);
-GOOGLE_ATTRIBUTE_ALWAYS_INLINE bool InlineParsePartialFromArray(
-    const void* data, int size, MessageLite* message);
-
+//
+// Note:  GCC only allows GOOGLE_ATTRIBUTE_ALWAYS_INLINE on declarations, not
+//   definitions.
 inline bool InlineMergeFromCodedStream(io::CodedInputStream* input,
-                                       MessageLite* message) {
+                                       MessageLite* message)
+                                       GOOGLE_ATTRIBUTE_ALWAYS_INLINE;
+inline bool InlineParseFromCodedStream(io::CodedInputStream* input,
+                                       MessageLite* message)
+                                       GOOGLE_ATTRIBUTE_ALWAYS_INLINE;
+inline bool InlineParsePartialFromCodedStream(io::CodedInputStream* input,
+                                              MessageLite* message)
+                                              GOOGLE_ATTRIBUTE_ALWAYS_INLINE;
+inline bool InlineParseFromArray(const void* data, int size,
+                                 MessageLite* message)
+                                 GOOGLE_ATTRIBUTE_ALWAYS_INLINE;
+inline bool InlineParsePartialFromArray(const void* data, int size,
+                                        MessageLite* message)
+                                        GOOGLE_ATTRIBUTE_ALWAYS_INLINE;
+
+bool InlineMergeFromCodedStream(io::CodedInputStream* input,
+                                MessageLite* message) {
   if (!message->MergePartialFromCodedStream(input)) return false;
   if (!message->IsInitialized()) {
     GOOGLE_LOG(ERROR) << InitializationErrorMessage("parse", *message);
@@ -121,27 +127,26 @@ inline bool InlineMergeFromCodedStream(io::CodedInputStream* input,
   return true;
 }
 
-inline bool InlineParseFromCodedStream(io::CodedInputStream* input,
-                                       MessageLite* message) {
+bool InlineParseFromCodedStream(io::CodedInputStream* input,
+                                MessageLite* message) {
   message->Clear();
   return InlineMergeFromCodedStream(input, message);
 }
 
-inline bool InlineParsePartialFromCodedStream(io::CodedInputStream* input,
-                                              MessageLite* message) {
+bool InlineParsePartialFromCodedStream(io::CodedInputStream* input,
+                                       MessageLite* message) {
   message->Clear();
   return message->MergePartialFromCodedStream(input);
 }
 
-inline bool InlineParseFromArray(
-    const void* data, int size, MessageLite* message) {
+bool InlineParseFromArray(const void* data, int size, MessageLite* message) {
   io::CodedInputStream input(reinterpret_cast<const uint8*>(data), size);
   return InlineParseFromCodedStream(&input, message) &&
          input.ConsumedEntireMessage();
 }
 
-inline bool InlineParsePartialFromArray(
-    const void* data, int size, MessageLite* message) {
+bool InlineParsePartialFromArray(const void* data, int size,
+                                 MessageLite* message) {
   io::CodedInputStream input(reinterpret_cast<const uint8*>(data), size);
   return InlineParsePartialFromCodedStream(&input, message) &&
          input.ConsumedEntireMessage();
@@ -347,19 +352,6 @@ string MessageLite::SerializePartialAsString() const {
     output.clear();
   return output;
 }
-
-namespace internal {
-template<>
-MessageLite* GenericTypeHandler<MessageLite>::NewFromPrototype(
-    const MessageLite* prototype, google::protobuf::Arena* arena) {
-  return prototype->New(arena);
-}
-template <>
-void GenericTypeHandler<MessageLite>::Merge(const MessageLite& from,
-                                            MessageLite* to) {
-  to->CheckTypeAndMergeFrom(from);
-}
-}  // namespace internal
 
 }  // namespace protobuf
 }  // namespace google

@@ -35,7 +35,6 @@
 #include <algorithm>
 #include <set>
 
-#include <google/protobuf/stubs/logging.h>
 #include <google/protobuf/stubs/common.h>
 #include <google/protobuf/descriptor.pb.h>
 #include <google/protobuf/descriptor.h>
@@ -57,6 +56,18 @@ bool IsMapFieldInApi(const FieldDescriptor* field) {
   return field->is_map();
 }
 }  // anonymous namespace
+
+int StringSpaceUsedExcludingSelf(const string& str) {
+  const void* start = &str;
+  const void* end = &str + 1;
+
+  if (start <= str.data() && str.data() < end) {
+    // The string's data is stored inside the string object itself.
+    return 0;
+  } else {
+    return str.capacity();
+  }
+}
 
 bool ParseNamedEnum(const EnumDescriptor* descriptor,
                     const string& name,
@@ -807,16 +818,7 @@ void GeneratedMessageReflection::ClearField(
         }
 
         case FieldDescriptor::CPPTYPE_MESSAGE:
-          if (has_bits_offset_ == -1) {
-            // Proto3 does not have has-bits and we need to set a message field
-            // to NULL in order to indicate its un-presence.
-            if (GetArena(message) == NULL) {
-              delete *MutableRaw<Message*>(message, field);
-            }
-            *MutableRaw<Message*>(message, field) = NULL;
-          } else {
-            (*MutableRaw<Message*>(message, field))->Clear();
-          }
+          (*MutableRaw<Message*>(message, field))->Clear();
           break;
       }
     }
@@ -1647,25 +1649,6 @@ Message* GeneratedMessageReflection::AddMessage(
   }
 }
 
-void GeneratedMessageReflection::AddAllocatedMessage(
-    Message* message, const FieldDescriptor* field,
-    Message* new_entry) const {
-  USAGE_CHECK_ALL(AddAllocatedMessage, REPEATED, MESSAGE);
-
-  if (field->is_extension()) {
-    MutableExtensionSet(message)->AddAllocatedMessage(field, new_entry);
-  } else {
-    RepeatedPtrFieldBase* repeated = NULL;
-    if (IsMapFieldInApi(field)) {
-      repeated =
-          MutableRaw<MapFieldBase>(message, field)->MutableRepeatedField();
-    } else {
-      repeated = MutableRaw<RepeatedPtrFieldBase>(message, field);
-    }
-    repeated->AddAllocated<GenericTypeHandler<Message> >(new_entry);
-  }
-}
-
 void* GeneratedMessageReflection::MutableRawRepeatedField(
     Message* message, const FieldDescriptor* field,
     FieldDescriptor::CppType cpptype,
@@ -1692,37 +1675,6 @@ void* GeneratedMessageReflection::MutableRawRepeatedField(
   }
 }
 
-const void* GeneratedMessageReflection::GetRawRepeatedField(
-    const Message& message, const FieldDescriptor* field,
-    FieldDescriptor::CppType cpptype,
-    int ctype, const Descriptor* desc) const {
-  USAGE_CHECK_REPEATED("GetRawRepeatedField");
-  if (field->cpp_type() != cpptype)
-    ReportReflectionUsageTypeError(descriptor_,
-        field, "GetRawRepeatedField", cpptype);
-  if (ctype >= 0)
-    GOOGLE_CHECK_EQ(field->options().ctype(), ctype) << "subtype mismatch";
-  if (desc != NULL)
-    GOOGLE_CHECK_EQ(field->message_type(), desc) << "wrong submessage type";
-  if (field->is_extension()) {
-    // Should use extension_set::GetRawRepeatedField. However, the required
-    // parameter "default repeated value" is not very easy to get here.
-    // Map is not supported in extensions, it is acceptable to use
-    // extension_set::MutableRawRepeatedField which does not change the message.
-    return MutableExtensionSet(const_cast<Message*>(&message))
-        ->MutableRawRepeatedField(
-        field->number(), field->type(), field->is_packed(), field);
-  } else {
-    // Trigger transform for MapField
-    if (IsMapFieldInApi(field)) {
-      return &(reinterpret_cast<const MapFieldBase*>(
-          reinterpret_cast<const uint8*>(&message) +
-          offsets_[field->index()])->GetRepeatedField());
-    }
-    return reinterpret_cast<const uint8*>(&message) + offsets_[field->index()];
-  }
-}
-
 const FieldDescriptor* GeneratedMessageReflection::GetOneofFieldDescriptor(
     const Message& message,
     const OneofDescriptor* oneof_descriptor) const {
@@ -1731,69 +1683,6 @@ const FieldDescriptor* GeneratedMessageReflection::GetOneofFieldDescriptor(
     return NULL;
   }
   return descriptor_->FindFieldByNumber(field_number);
-}
-
-bool GeneratedMessageReflection::ContainsMapKey(
-    const Message& message,
-    const FieldDescriptor* field,
-    const MapKey& key) const {
-  USAGE_CHECK(IsMapFieldInApi(field),
-              "LookupMapValue",
-              "Field is not a map field.");
-  return GetRaw<MapFieldBase>(message, field).ContainsMapKey(key);
-}
-
-bool GeneratedMessageReflection::InsertOrLookupMapValue(
-    Message* message,
-    const FieldDescriptor* field,
-    const MapKey& key,
-    MapValueRef* val) const {
-  USAGE_CHECK(IsMapFieldInApi(field),
-              "InsertOrLookupMapValue",
-              "Field is not a map field.");
-  val->SetType(field->message_type()->FindFieldByName("value")->cpp_type());
-  return MutableRaw<MapFieldBase>(message, field)->InsertMapValue(key, val);
-}
-
-bool GeneratedMessageReflection::DeleteMapValue(
-    Message* message,
-    const FieldDescriptor* field,
-    const MapKey& key) const {
-  USAGE_CHECK(IsMapFieldInApi(field),
-              "DeleteMapValue",
-              "Field is not a map field.");
-  return MutableRaw<MapFieldBase>(message, field)->DeleteMapValue(key);
-}
-
-MapIterator GeneratedMessageReflection::MapBegin(
-    Message* message,
-    const FieldDescriptor* field) const {
-  USAGE_CHECK(IsMapFieldInApi(field),
-              "MapBegin",
-              "Field is not a map field.");
-  MapIterator iter(message, field);
-  GetRaw<MapFieldBase>(*message, field).MapBegin(&iter);
-  return iter;
-}
-
-MapIterator GeneratedMessageReflection::MapEnd(
-    Message* message,
-    const FieldDescriptor* field) const {
-  USAGE_CHECK(IsMapFieldInApi(field),
-              "MapEnd",
-              "Field is not a map field.");
-  MapIterator iter(message, field);
-  GetRaw<MapFieldBase>(*message, field).MapEnd(&iter);
-  return iter;
-}
-
-int GeneratedMessageReflection::MapSize(
-    const Message& message,
-    const FieldDescriptor* field) const {
-  USAGE_CHECK(IsMapFieldInApi(field),
-              "MapSize",
-              "Field is not a map field.");
-  return GetRaw<MapFieldBase>(message, field).size();
 }
 
 // -----------------------------------------------------------------------------
@@ -2207,14 +2096,6 @@ void* GeneratedMessageReflection::RepeatedFieldData(
   } else {
     return reinterpret_cast<uint8*>(message) + offsets_[field->index()];
   }
-}
-
-MapFieldBase* GeneratedMessageReflection::MapData(
-    Message* message, const FieldDescriptor* field) const {
-  USAGE_CHECK(IsMapFieldInApi(field),
-              "GetMapData",
-              "Field is not a map field.");
-  return MutableRaw<MapFieldBase>(message, field);
 }
 
 GeneratedMessageReflection*
