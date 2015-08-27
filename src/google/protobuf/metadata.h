@@ -59,7 +59,8 @@ namespace internal {
 class LIBPROTOBUF_EXPORT InternalMetadataWithArena {
  public:
   InternalMetadataWithArena() : ptr_(NULL) {}
-  explicit InternalMetadataWithArena(Arena* arena);
+  explicit InternalMetadataWithArena(Arena* arena)
+      : ptr_ (arena) {}
 
   ~InternalMetadataWithArena() {
     if (have_unknown_fields() && arena() == NULL) {
