@@ -46,7 +46,6 @@
 //   "parametized tests" so that one set of tests can be used on all the
 //   implementations.
 
-
 #ifdef _MSC_VER
 #include <io.h>
 #else
@@ -67,8 +66,6 @@
 #endif
 
 #include <google/protobuf/stubs/common.h>
-#include <google/protobuf/stubs/logging.h>
-#include <google/protobuf/stubs/scoped_ptr.h>
 #include <google/protobuf/testing/googletest.h>
 #include <google/protobuf/testing/file.h>
 #include <gtest/gtest.h>

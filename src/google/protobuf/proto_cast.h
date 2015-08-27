@@ -33,7 +33,6 @@
 
 #include <string>
 
-#include <google/protobuf/stubs/logging.h>
 #include <google/protobuf/stubs/common.h>
 
 // proto_cast<> is used to simulate over-the-wire conversion of one

@@ -39,7 +39,6 @@
 #include <google/protobuf/stubs/shared_ptr.h>
 #endif
 
-#include <google/protobuf/stubs/logging.h>
 #include <google/protobuf/stubs/common.h>
 #include <google/protobuf/compiler/java/java_context.h>
 #include <google/protobuf/compiler/java/java_enum_field.h>
