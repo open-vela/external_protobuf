@@ -94,7 +94,7 @@ public abstract class ByteString implements Iterable<Byte>, Serializable {
    *
    * @param index index of byte
    * @return the value
-   * @throws ArrayIndexOutOfBoundsException {@code index} is < 0 or >= size
+   * @throws ArrayIndexOutOfBoundsException {@code index < 0 or index >= size}
    */
   public abstract byte byteAt(int index);
 
@@ -294,10 +294,10 @@ public abstract class ByteString implements Iterable<Byte>, Serializable {
    * <b>Performance notes:</b> The returned {@code ByteString} is an
    * immutable tree of byte arrays ("chunks") of the stream data.  The
    * first chunk is small, with subsequent chunks each being double
-   * the size, up to 8K.  If the caller knows the precise length of
-   * the stream and wishes to avoid all unnecessary copies and
-   * allocations, consider using the two-argument version of this
-   * method, below.
+   * the size, up to 8K.
+   * 
+   * <p>Each byte read from the input stream will be copied twice to ensure
+   * that the resulting ByteString is truly immutable.
    *
    * @param streamToDrain The source stream, which is read completely
    *     but not closed.
@@ -320,12 +320,10 @@ public abstract class ByteString implements Iterable<Byte>, Serializable {
    *
    * <b>Performance notes:</b> The returned {@code ByteString} is an
    * immutable tree of byte arrays ("chunks") of the stream data.  The
-   * chunkSize parameter sets the size of these byte arrays. In
-   * particular, if the chunkSize is precisely the same as the length
-   * of the stream, unnecessary allocations and copies will be
-   * avoided. Otherwise, the chunks will be of the given size, except
-   * for the last chunk, which will be resized (via a reallocation and
-   * copy) to contain the remainder of the stream.
+   * chunkSize parameter sets the size of these byte arrays.
+   *
+   * <p>Each byte read from the input stream will be copied twice to ensure
+   * that the resulting ByteString is truly immutable.
    *
    * @param streamToDrain The source stream, which is read completely
    *     but not closed.
@@ -386,6 +384,7 @@ public abstract class ByteString implements Iterable<Byte>, Serializable {
       if (bytesRead == 0) {
         return null;
       } else {
+        // Always make a copy since InputStream could steal a reference to buf.
         return ByteString.copyFrom(buf, 0, bytesRead);
       }
   }
@@ -680,8 +679,8 @@ public abstract class ByteString implements Iterable<Byte>, Serializable {
    * sequences, but (as of 2011) still accepts 3-byte surrogate
    * character byte sequences.
    *
-   * <p>See the Unicode Standard,</br>
-   * Table 3-6. <em>UTF-8 Bit Distribution</em>,</br>
+   * <p>See the Unicode Standard,<br>
+   * Table 3-6. <em>UTF-8 Bit Distribution</em>,<br>
    * Table 3-7. <em>Well Formed UTF-8 Byte Sequences</em>.
    *
    * @return whether the bytes in this {@code ByteString} are a
@@ -736,7 +735,8 @@ public abstract class ByteString implements Iterable<Byte>, Serializable {
    * returns the number of bytes remaining in the stream. The methods
    * {@link InputStream#read(byte[])}, {@link InputStream#read(byte[],int,int)}
    * and {@link InputStream#skip(long)} will read/skip as many bytes as are
-   * available.
+   * available.  The method {@link InputStream#markSupported()} returns
+   * {@code true}.
    * <p>
    * The methods in the returned {@link InputStream} might <b>not</b> be
    * thread safe.
