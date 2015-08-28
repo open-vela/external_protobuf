@@ -45,12 +45,15 @@
 #endif
 
 #undef PROTOBUF_LITTLE_ENDIAN
-#ifdef _MSC_VER
+#ifdef _WIN32
   // Assuming windows is always little-endian.
+  // TODO(xiaofeng): The PROTOBUF_LITTLE_ENDIAN is not only used for
+  // optimization but also for correctness. We should define an
+  // different macro to test the big-endian code path in coded_stream.
   #if !defined(PROTOBUF_DISABLE_LITTLE_ENDIAN_OPT_FOR_TEST)
     #define PROTOBUF_LITTLE_ENDIAN 1
   #endif
-  #if _MSC_VER >= 1300
+  #if defined(_MSC_VER) && _MSC_VER >= 1300
     // If MSVC has "/RTCc" set, it will complain about truncating casts at
     // runtime.  This file contains some intentional truncating casts.
     #pragma runtime_checks("c", off)
@@ -79,15 +82,6 @@
   #define LIBPROTOC_EXPORT
 #endif
 
-// These #includes are for the byte swap functions declared later on.
-#ifdef _MSC_VER
-#include <stdlib.h>  // NOLINT(build/include)
-#elif defined(__APPLE__)
-#include <libkern/OSByteOrder.h>
-#elif defined(__GLIBC__) || defined(__CYGWIN__)
-#include <byteswap.h>  // IWYU pragma: export
-#endif
-
 // ===================================================================
 // from google3/base/port.h
 namespace google {
@@ -109,20 +103,12 @@ typedef unsigned __int64 uint64;
 typedef signed char  int8;
 typedef short int16;
 typedef int int32;
-// NOTE: This should be "long long" for consistency with upstream, but
-// something is stacked against this particular type for 64bit hashing.
-// Switching it causes an obvious missing hash function (with an unobvious
-// cause) when building the tests.
-typedef int64_t int64;
+typedef long long int64;
 
 typedef unsigned char  uint8;
 typedef unsigned short uint16;
 typedef unsigned int uint32;
-// NOTE: This should be "unsigned long long" for consistency with upstream, but
-// something is stacked against this particular type for 64bit hashing.
-// Switching it causes an obvious missing hash function (with an unobvious
-// cause) when building the tests.
-typedef uint64_t uint64;
+typedef unsigned long long uint64;
 #endif
 
 // long long macros to be used because gcc and vc++ use different suffixes,
@@ -193,7 +179,7 @@ static const uint64 kuint64max = GOOGLE_ULONGLONG(0xFFFFFFFFFFFFFFFF);
 // Provided at least since GCC 3.0.
 #define GOOGLE_PREDICT_TRUE(x) (__builtin_expect(!!(x), 1))
 #else
-#define GOOGLE_PREDICT_TRUE(x) (x)
+#define GOOGLE_PREDICT_TRUE
 #endif
 #endif
 
@@ -202,7 +188,7 @@ static const uint64 kuint64max = GOOGLE_ULONGLONG(0xFFFFFFFFFFFFFFFF);
 // Provided at least since GCC 3.0.
 #define GOOGLE_PREDICT_FALSE(x) (__builtin_expect(x, 0))
 #else
-#define GOOGLE_PREDICT_FALSE(x) (x)
+#define GOOGLE_PREDICT_FALSE
 #endif
 #endif
 
@@ -284,6 +270,7 @@ inline void GOOGLE_UNALIGNED_STORE64(void *p, uint64 v) {
 // The following guarantees declaration of the byte swap functions, and
 // defines __BYTE_ORDER for MSVC
 #ifdef _MSC_VER
+#include <stdlib.h>  // NOLINT(build/include)
 #define __BYTE_ORDER __LITTLE_ENDIAN
 #define bswap_16(x) _byteswap_ushort(x)
 #define bswap_32(x) _byteswap_ulong(x)
@@ -291,11 +278,15 @@ inline void GOOGLE_UNALIGNED_STORE64(void *p, uint64 v) {
 
 #elif defined(__APPLE__)
 // Mac OS X / Darwin features
+#include <libkern/OSByteOrder.h>
 #define bswap_16(x) OSSwapInt16(x)
 #define bswap_32(x) OSSwapInt32(x)
 #define bswap_64(x) OSSwapInt64(x)
 
-#elif !defined(__GLIBC__) && !defined(__CYGWIN__)
+#elif defined(__GLIBC__) || defined(__CYGWIN__)
+#include <byteswap.h>  // IWYU pragma: export
+
+#else
 
 static inline uint16 bswap_16(uint16 x) {
   return static_cast<uint16>(((x & 0xFF) << 8) | ((x & 0xFF00) >> 8));
