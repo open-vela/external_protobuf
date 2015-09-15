@@ -89,12 +89,7 @@ struct MessageMapContainer {
   uint64 version;
 };
 
-#if PY_MAJOR_VERSION >= 3
-  extern PyObject *MessageMapContainer_Type;
-  extern PyType_Spec MessageMapContainer_Type_spec;
-#else
-  extern PyTypeObject MessageMapContainer_Type;
-#endif
+extern PyTypeObject MessageMapContainer_Type;
 extern PyTypeObject MessageMapIterator_Type;
 
 namespace message_map_container {
