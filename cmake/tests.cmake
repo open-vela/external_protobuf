@@ -96,8 +96,6 @@ set(common_test_files
   ${protobuf_source_dir}/src/google/protobuf/test_util.cc
   ${protobuf_source_dir}/src/google/protobuf/testing/file.cc
   ${protobuf_source_dir}/src/google/protobuf/testing/googletest.cc
-  ${protobuf_source_dir}/src/google/protobuf/compiler/mock_code_generator.cc
-  ${protobuf_source_dir}/src/google/protobuf/util/internal/type_info_test_helper.cc
 )
 
 set(common_lite_test_files
@@ -118,6 +116,7 @@ set(tests_files
   ${protobuf_source_dir}/src/google/protobuf/compiler/importer_unittest.cc
   ${protobuf_source_dir}/src/google/protobuf/compiler/java/java_doc_comment_unittest.cc
   ${protobuf_source_dir}/src/google/protobuf/compiler/java/java_plugin_unittest.cc
+  ${protobuf_source_dir}/src/google/protobuf/compiler/mock_code_generator.cc
   ${protobuf_source_dir}/src/google/protobuf/compiler/objectivec/objectivec_helpers_unittest.cc
   ${protobuf_source_dir}/src/google/protobuf/compiler/parser_unittest.cc
   ${protobuf_source_dir}/src/google/protobuf/compiler/python/python_plugin_unittest.cc
@@ -163,6 +162,7 @@ set(tests_files
   ${protobuf_source_dir}/src/google/protobuf/util/internal/json_stream_parser_test.cc
   ${protobuf_source_dir}/src/google/protobuf/util/internal/protostream_objectsource_test.cc
   ${protobuf_source_dir}/src/google/protobuf/util/internal/protostream_objectwriter_test.cc
+  ${protobuf_source_dir}/src/google/protobuf/util/internal/type_info_test_helper.cc
   ${protobuf_source_dir}/src/google/protobuf/util/json_util_test.cc
   ${protobuf_source_dir}/src/google/protobuf/util/time_util_test.cc
   ${protobuf_source_dir}/src/google/protobuf/util/type_resolver_util_test.cc
@@ -170,7 +170,8 @@ set(tests_files
   ${protobuf_source_dir}/src/google/protobuf/wire_format_unittest.cc
 )
 
-enable_testing()
+add_executable(tests ${tests_files} ${common_test_files} ${tests_proto_files} ${lite_test_proto_files})
+target_link_libraries(tests libprotoc libprotobuf gmock_main)
 
 set(test_plugin_files
   ${protobuf_source_dir}/src/google/protobuf/compiler/mock_code_generator.cc
@@ -178,36 +179,18 @@ set(test_plugin_files
   ${protobuf_source_dir}/src/google/protobuf/testing/file.h
   ${protobuf_source_dir}/src/google/protobuf/compiler/test_plugin.cc
 )
+
 add_executable(test_plugin ${test_plugin_files})
 target_link_libraries(test_plugin libprotoc libprotobuf gmock)
-
-add_compile_options(-DGOOGLE_PROTOBUF_TEST_PLUGIN_PATH="$<TARGET_FILE:test_plugin>")
 
 set(lite_test_files
   ${protobuf_source_dir}/src/google/protobuf/lite_unittest.cc
 )
 add_executable(lite-test ${lite_test_files} ${common_lite_test_files} ${lite_test_proto_files})
 target_link_libraries(lite-test libprotobuf-lite)
-add_test(NAME lite-test COMMAND lite-test
-  WORKING_DIRECTORY ${protobuf_source_dir})
 
 set(lite_arena_test_files
   ${protobuf_source_dir}/src/google/protobuf/lite_arena_unittest.cc
 )
 add_executable(lite-arena-test ${lite_arena_test_files} ${common_lite_test_files} ${lite_test_proto_files})
 target_link_libraries(lite-arena-test libprotobuf-lite gmock_main)
-
-add_library(libtests STATIC ${common_test_files} ${tests_proto_files} ${lite_test_proto_files})
-
-# Native single tests
-add_executable(tests ${tests_files})
-target_link_libraries(tests libtests libprotoc libprotobuf gmock_main)
-
-# Sparated tests for CTest
-foreach(file ${tests_files})
-  get_filename_component(name ${file} NAME_WE)
-  add_executable(${name} ${file})
-  target_link_libraries(${name} libtests libprotoc libprotobuf gmock_main)
-  add_test(NAME ${name} COMMAND ${name}
-    WORKING_DIRECTORY ${protobuf_source_dir})
-endforeach()
