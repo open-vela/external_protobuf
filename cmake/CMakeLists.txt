@@ -4,57 +4,38 @@ cmake_minimum_required(VERSION 2.8)
 # Project
 project(protobuf C CXX)
 
-# CMake policies
-cmake_policy(SET CMP0022 NEW)
-
 # Options
-option(protobuf_VERBOSE "Enable for verbose output" OFF)
-option(protobuf_BUILD_TESTS "Build tests" ON)
-option(protobuf_BUILD_SHARED_LIBS "Build Shared Libraries" OFF)
-option(protobuf_MSVC_STATIC_RUNTIME "Link static runtime libraries" ON)
+option(BUILD_TESTING "Build tests" ON)
+option(BUILD_SHARED_LIBS "Build Shared Libraries" OFF)
 if (MSVC)
-  set(protobuf_WITH_ZLIB_DEFAULT OFF)
-else (MSVC)
-  set(protobuf_WITH_ZLIB_DEFAULT ON)
+  option(ZLIB "Build with zlib support" OFF)
 endif (MSVC)
-option(protobuf_WITH_ZLIB "Build with zlib support" ${protobuf_WITH_ZLIB_DEFAULT})
 
 # Path to main configure script
 set(protobuf_CONFIGURE_SCRIPT "../configure.ac")
 
-# Parse configure script
-set(protobuf_AC_INIT_REGEX
-  "^AC_INIT\\(\\[([^]]+)\\],\\[([^]]+)\\],\\[([^]]+)\\],\\[([^]]+)\\]\\)$")
-file(STRINGS "${protobuf_CONFIGURE_SCRIPT}" protobuf_AC_INIT_LINE
-  LIMIT_COUNT 1 REGEX "^AC_INIT")
-# Description
-string(REGEX REPLACE        "${protobuf_AC_INIT_REGEX}" "\\1"
-    protobuf_DESCRIPTION    "${protobuf_AC_INIT_LINE}")
-# Version
-string(REGEX REPLACE        "${protobuf_AC_INIT_REGEX}" "\\2"
-    protobuf_VERSION_STRING "${protobuf_AC_INIT_LINE}")
-# Contact
-string(REGEX REPLACE        "${protobuf_AC_INIT_REGEX}" "\\3"
-    protobuf_CONTACT        "${protobuf_AC_INIT_LINE}")
+# Parse version from configure script
+file(STRINGS "${protobuf_CONFIGURE_SCRIPT}" protobuf_VERSION_LINE
+  LIMIT_COUNT 1
+  REGEX "^AC_INIT")
+# Replace special characters
+string(REPLACE "(" "_" protobuf_VERSION_LINE ${protobuf_VERSION_LINE})
+string(REPLACE ")" "_" protobuf_VERSION_LINE ${protobuf_VERSION_LINE})
+string(REPLACE "[" "_" protobuf_VERSION_LINE ${protobuf_VERSION_LINE})
+string(REPLACE "]" "_" protobuf_VERSION_LINE ${protobuf_VERSION_LINE})
+# Parse version string
+string(REGEX REPLACE "^AC_INIT__Protocol Buffers_,_([^_]+).*$" "\\1"
+    protobuf_VERSION_STRING "${protobuf_VERSION_LINE}")
 # Parse version tweaks
-set(protobuf_VERSION_REGEX "^([0-9]+)\\.([0-9]+)\\.([0-9]+).*$")
-string(REGEX REPLACE     "${protobuf_VERSION_REGEX}" "\\1"
+string(REGEX REPLACE "^([0-9]+)\\.([0-9]+)\\.([0-9]+).*$" "\\1"
   protobuf_VERSION_MAJOR "${protobuf_VERSION_STRING}")
-string(REGEX REPLACE     "${protobuf_VERSION_REGEX}" "\\2"
+string(REGEX REPLACE "^([0-9]+)\\.([0-9]+)\\.([0-9]+).*$" "\\2"
   protobuf_VERSION_MINOR "${protobuf_VERSION_STRING}")
-string(REGEX REPLACE     "${protobuf_VERSION_REGEX}" "\\3"
+string(REGEX REPLACE "^([0-9]+)\\.([0-9]+)\\.([0-9]+).*$" "\\3"
   protobuf_VERSION_PATCH "${protobuf_VERSION_STRING}")
 # Package version
 set(protobuf_VERSION
   "${protobuf_VERSION_MAJOR}.${protobuf_VERSION_MINOR}.${protobuf_VERSION_PATCH}")
-
-if(protobuf_VERBOSE)
-  message(STATUS "Configuration script parsing status [")
-  message(STATUS "  Description : ${protobuf_DESCRIPTION}")
-  message(STATUS "  Version     : ${protobuf_VERSION} (${protobuf_VERSION_STRING})")
-  message(STATUS "  Contact     : ${protobuf_CONTACT}")
-  message(STATUS "]")
-endif()
 
 add_definitions(-DGOOGLE_PROTOBUF_CMAKE_BUILD)
 
@@ -63,17 +44,18 @@ if (CMAKE_USE_PTHREADS_INIT)
   add_definitions(-DHAVE_PTHREAD)
 endif (CMAKE_USE_PTHREADS_INIT)
 
-if (protobuf_WITH_ZLIB)
+if (MSVC)
+  if (ZLIB)
+    set(HAVE_ZLIB 1)
+    find_path(ZLIB_INCLUDE_DIRECTORIES zlib.h ${protobuf_SOURCE_DIR})
+    find_library(ZLIB_LIBRARIES zdll ${protobuf_SOURCE_DIR})
+  else (ZLIB)
+    set(HAVE_ZLIB 0)
+  endif (ZLIB)
+else (MSVC)
   find_package(ZLIB)
   if (ZLIB_FOUND)
     set(HAVE_ZLIB 1)
-    # FindZLIB module define ZLIB_INCLUDE_DIRS variable
-    # Set ZLIB_INCLUDE_DIRECTORIES for compatible
-    set(ZLIB_INCLUDE_DIRECTORIES ${ZLIB_INCLUDE_DIRECTORIES} ${ZLIB_INCLUDE_DIRS})
-    # Using imported target if exists
-    if (TARGET ZLIB::ZLIB)
-      set(ZLIB_LIBRARIES ZLIB::ZLIB)
-    endif (TARGET ZLIB::ZLIB)
   else (ZLIB_FOUND)
     set(HAVE_ZLIB 0)
     # Explicitly set these to empty (override NOT_FOUND) so cmake doesn't
@@ -81,31 +63,29 @@ if (protobuf_WITH_ZLIB)
     set(ZLIB_INCLUDE_DIRECTORIES)
     set(ZLIB_LIBRARIES)
   endif (ZLIB_FOUND)
-endif (protobuf_WITH_ZLIB)
+endif (MSVC)
 
 if (HAVE_ZLIB)
   add_definitions(-DHAVE_ZLIB)
 endif (HAVE_ZLIB)
 
 if (MSVC)
-  if (protobuf_BUILD_SHARED_LIBS)
+  if (BUILD_SHARED_LIBS)
     add_definitions(-DPROTOBUF_USE_DLLS)
-  else (protobuf_BUILD_SHARED_LIBS)
+  else (BUILD_SHARED_LIBS)
     # In case we are building static libraries, link also the runtime library statically
-    # so that MSVCR*.DLL is not required at runtime.
+	# so that MSVCR*.DLL is not required at runtime.
     # https://msdn.microsoft.com/en-us/library/2kzt1wy3.aspx
     # This is achieved by replacing msvc option /MD with /MT and /MDd with /MTd
     # http://www.cmake.org/Wiki/CMake_FAQ#How_can_I_build_my_MSVC_application_with_a_static_runtime.3F
-    if (protobuf_MSVC_STATIC_RUNTIME)
-      foreach(flag_var
-          CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
-          CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO)
-        if(${flag_var} MATCHES "/MD")
-          string(REGEX REPLACE "/MD" "/MT" ${flag_var} "${${flag_var}}")
-        endif(${flag_var} MATCHES "/MD")
-      endforeach(flag_var)
-    endif (protobuf_MSVC_STATIC_RUNTIME)
-  endif (protobuf_BUILD_SHARED_LIBS)
+    foreach(flag_var
+        CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
+        CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO)
+      if(${flag_var} MATCHES "/MD")
+        string(REGEX REPLACE "/MD" "/MT" ${flag_var} "${${flag_var}}")
+      endif(${flag_var} MATCHES "/MD")
+    endforeach(flag_var)
+  endif (BUILD_SHARED_LIBS)
   add_definitions(/wd4244 /wd4267 /wd4018 /wd4355 /wd4800 /wd4251 /wd4996 /wd4146 /wd4305)
 endif (MSVC)
 
@@ -136,8 +116,8 @@ include(libprotobuf.cmake)
 include(libprotoc.cmake)
 include(protoc.cmake)
 
-if (protobuf_BUILD_TESTS)
+if (BUILD_TESTING)
   include(tests.cmake)
-endif (protobuf_BUILD_TESTS)
+endif (BUILD_TESTING)
 
 include(install.cmake)
