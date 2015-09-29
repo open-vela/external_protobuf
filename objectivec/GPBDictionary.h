@@ -360,30 +360,30 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, readonly) NSUInteger count;
 
 + (instancetype)dictionary;
-+ (instancetype)dictionaryWithObject:(id)object
-                              forKey:(uint32_t)key;
-+ (instancetype)dictionaryWithObjects:(const id GPB_UNSAFE_UNRETAINED [])objects
-                              forKeys:(const uint32_t [])keys
-                                count:(NSUInteger)count;
++ (instancetype)dictionaryWithValue:(id)value
+                             forKey:(uint32_t)key;
++ (instancetype)dictionaryWithValues:(const id GPB_UNSAFE_UNRETAINED [])values
+                             forKeys:(const uint32_t [])keys
+                               count:(NSUInteger)count;
 + (instancetype)dictionaryWithDictionary:(GPBUInt32ObjectDictionary *)dictionary;
 + (instancetype)dictionaryWithCapacity:(NSUInteger)numItems;
 
-- (instancetype)initWithObjects:(const id GPB_UNSAFE_UNRETAINED [])objects
-                        forKeys:(const uint32_t [])keys
-                          count:(NSUInteger)count NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithValues:(const id GPB_UNSAFE_UNRETAINED [])values
+                       forKeys:(const uint32_t [])keys
+                         count:(NSUInteger)count NS_DESIGNATED_INITIALIZER;
 - (instancetype)initWithDictionary:(GPBUInt32ObjectDictionary *)dictionary;
 - (instancetype)initWithCapacity:(NSUInteger)numItems;
 
-- (id)objectForKey:(uint32_t)key;
+- (id)valueForKey:(uint32_t)key;
 
-- (void)enumerateKeysAndObjectsUsingBlock:
-    (void (^)(uint32_t key, id object, BOOL *stop))block;
+- (void)enumerateKeysAndValuesUsingBlock:
+    (void (^)(uint32_t key, id value, BOOL *stop))block;
 
 - (void)addEntriesFromDictionary:(GPBUInt32ObjectDictionary *)otherDictionary;
 
-- (void)setObject:(id)object forKey:(uint32_t)key;
+- (void)setValue:(id)value forKey:(uint32_t)key;
 
-- (void)removeObjectForKey:(uint32_t)aKey;
+- (void)removeValueForKey:(uint32_t)aKey;
 - (void)removeAll;
 
 @end
@@ -706,30 +706,30 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, readonly) NSUInteger count;
 
 + (instancetype)dictionary;
-+ (instancetype)dictionaryWithObject:(id)object
-                              forKey:(int32_t)key;
-+ (instancetype)dictionaryWithObjects:(const id GPB_UNSAFE_UNRETAINED [])objects
-                              forKeys:(const int32_t [])keys
-                                count:(NSUInteger)count;
++ (instancetype)dictionaryWithValue:(id)value
+                             forKey:(int32_t)key;
++ (instancetype)dictionaryWithValues:(const id GPB_UNSAFE_UNRETAINED [])values
+                             forKeys:(const int32_t [])keys
+                               count:(NSUInteger)count;
 + (instancetype)dictionaryWithDictionary:(GPBInt32ObjectDictionary *)dictionary;
 + (instancetype)dictionaryWithCapacity:(NSUInteger)numItems;
 
-- (instancetype)initWithObjects:(const id GPB_UNSAFE_UNRETAINED [])objects
-                        forKeys:(const int32_t [])keys
-                          count:(NSUInteger)count NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithValues:(const id GPB_UNSAFE_UNRETAINED [])values
+                       forKeys:(const int32_t [])keys
+                         count:(NSUInteger)count NS_DESIGNATED_INITIALIZER;
 - (instancetype)initWithDictionary:(GPBInt32ObjectDictionary *)dictionary;
 - (instancetype)initWithCapacity:(NSUInteger)numItems;
 
-- (id)objectForKey:(int32_t)key;
+- (id)valueForKey:(int32_t)key;
 
-- (void)enumerateKeysAndObjectsUsingBlock:
-    (void (^)(int32_t key, id object, BOOL *stop))block;
+- (void)enumerateKeysAndValuesUsingBlock:
+    (void (^)(int32_t key, id value, BOOL *stop))block;
 
 - (void)addEntriesFromDictionary:(GPBInt32ObjectDictionary *)otherDictionary;
 
-- (void)setObject:(id)object forKey:(int32_t)key;
+- (void)setValue:(id)value forKey:(int32_t)key;
 
-- (void)removeObjectForKey:(int32_t)aKey;
+- (void)removeValueForKey:(int32_t)aKey;
 - (void)removeAll;
 
 @end
@@ -1052,30 +1052,30 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, readonly) NSUInteger count;
 
 + (instancetype)dictionary;
-+ (instancetype)dictionaryWithObject:(id)object
-                              forKey:(uint64_t)key;
-+ (instancetype)dictionaryWithObjects:(const id GPB_UNSAFE_UNRETAINED [])objects
-                              forKeys:(const uint64_t [])keys
-                                count:(NSUInteger)count;
++ (instancetype)dictionaryWithValue:(id)value
+                             forKey:(uint64_t)key;
++ (instancetype)dictionaryWithValues:(const id GPB_UNSAFE_UNRETAINED [])values
+                             forKeys:(const uint64_t [])keys
+                               count:(NSUInteger)count;
 + (instancetype)dictionaryWithDictionary:(GPBUInt64ObjectDictionary *)dictionary;
 + (instancetype)dictionaryWithCapacity:(NSUInteger)numItems;
 
-- (instancetype)initWithObjects:(const id GPB_UNSAFE_UNRETAINED [])objects
-                        forKeys:(const uint64_t [])keys
-                          count:(NSUInteger)count NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithValues:(const id GPB_UNSAFE_UNRETAINED [])values
+                       forKeys:(const uint64_t [])keys
+                         count:(NSUInteger)count NS_DESIGNATED_INITIALIZER;
 - (instancetype)initWithDictionary:(GPBUInt64ObjectDictionary *)dictionary;
 - (instancetype)initWithCapacity:(NSUInteger)numItems;
 
-- (id)objectForKey:(uint64_t)key;
+- (id)valueForKey:(uint64_t)key;
 
-- (void)enumerateKeysAndObjectsUsingBlock:
-    (void (^)(uint64_t key, id object, BOOL *stop))block;
+- (void)enumerateKeysAndValuesUsingBlock:
+    (void (^)(uint64_t key, id value, BOOL *stop))block;
 
 - (void)addEntriesFromDictionary:(GPBUInt64ObjectDictionary *)otherDictionary;
 
-- (void)setObject:(id)object forKey:(uint64_t)key;
+- (void)setValue:(id)value forKey:(uint64_t)key;
 
-- (void)removeObjectForKey:(uint64_t)aKey;
+- (void)removeValueForKey:(uint64_t)aKey;
 - (void)removeAll;
 
 @end
@@ -1398,30 +1398,30 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, readonly) NSUInteger count;
 
 + (instancetype)dictionary;
-+ (instancetype)dictionaryWithObject:(id)object
-                              forKey:(int64_t)key;
-+ (instancetype)dictionaryWithObjects:(const id GPB_UNSAFE_UNRETAINED [])objects
-                              forKeys:(const int64_t [])keys
-                                count:(NSUInteger)count;
++ (instancetype)dictionaryWithValue:(id)value
+                             forKey:(int64_t)key;
++ (instancetype)dictionaryWithValues:(const id GPB_UNSAFE_UNRETAINED [])values
+                             forKeys:(const int64_t [])keys
+                               count:(NSUInteger)count;
 + (instancetype)dictionaryWithDictionary:(GPBInt64ObjectDictionary *)dictionary;
 + (instancetype)dictionaryWithCapacity:(NSUInteger)numItems;
 
-- (instancetype)initWithObjects:(const id GPB_UNSAFE_UNRETAINED [])objects
-                        forKeys:(const int64_t [])keys
-                          count:(NSUInteger)count NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithValues:(const id GPB_UNSAFE_UNRETAINED [])values
+                       forKeys:(const int64_t [])keys
+                         count:(NSUInteger)count NS_DESIGNATED_INITIALIZER;
 - (instancetype)initWithDictionary:(GPBInt64ObjectDictionary *)dictionary;
 - (instancetype)initWithCapacity:(NSUInteger)numItems;
 
-- (id)objectForKey:(int64_t)key;
+- (id)valueForKey:(int64_t)key;
 
-- (void)enumerateKeysAndObjectsUsingBlock:
-    (void (^)(int64_t key, id object, BOOL *stop))block;
+- (void)enumerateKeysAndValuesUsingBlock:
+    (void (^)(int64_t key, id value, BOOL *stop))block;
 
 - (void)addEntriesFromDictionary:(GPBInt64ObjectDictionary *)otherDictionary;
 
-- (void)setObject:(id)object forKey:(int64_t)key;
+- (void)setValue:(id)value forKey:(int64_t)key;
 
-- (void)removeObjectForKey:(int64_t)aKey;
+- (void)removeValueForKey:(int64_t)aKey;
 - (void)removeAll;
 
 @end
@@ -1744,30 +1744,30 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, readonly) NSUInteger count;
 
 + (instancetype)dictionary;
-+ (instancetype)dictionaryWithObject:(id)object
-                              forKey:(BOOL)key;
-+ (instancetype)dictionaryWithObjects:(const id GPB_UNSAFE_UNRETAINED [])objects
-                              forKeys:(const BOOL [])keys
-                                count:(NSUInteger)count;
++ (instancetype)dictionaryWithValue:(id)value
+                             forKey:(BOOL)key;
++ (instancetype)dictionaryWithValues:(const id GPB_UNSAFE_UNRETAINED [])values
+                             forKeys:(const BOOL [])keys
+                               count:(NSUInteger)count;
 + (instancetype)dictionaryWithDictionary:(GPBBoolObjectDictionary *)dictionary;
 + (instancetype)dictionaryWithCapacity:(NSUInteger)numItems;
 
-- (instancetype)initWithObjects:(const id GPB_UNSAFE_UNRETAINED [])objects
-                        forKeys:(const BOOL [])keys
-                          count:(NSUInteger)count NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithValues:(const id GPB_UNSAFE_UNRETAINED [])values
+                       forKeys:(const BOOL [])keys
+                         count:(NSUInteger)count NS_DESIGNATED_INITIALIZER;
 - (instancetype)initWithDictionary:(GPBBoolObjectDictionary *)dictionary;
 - (instancetype)initWithCapacity:(NSUInteger)numItems;
 
-- (id)objectForKey:(BOOL)key;
+- (id)valueForKey:(BOOL)key;
 
-- (void)enumerateKeysAndObjectsUsingBlock:
-    (void (^)(BOOL key, id object, BOOL *stop))block;
+- (void)enumerateKeysAndValuesUsingBlock:
+    (void (^)(BOOL key, id value, BOOL *stop))block;
 
 - (void)addEntriesFromDictionary:(GPBBoolObjectDictionary *)otherDictionary;
 
-- (void)setObject:(id)object forKey:(BOOL)key;
+- (void)setValue:(id)value forKey:(BOOL)key;
 
-- (void)removeObjectForKey:(BOOL)aKey;
+- (void)removeValueForKey:(BOOL)aKey;
 - (void)removeAll;
 
 @end
@@ -2107,13 +2107,13 @@ NS_ASSUME_NONNULL_END
 //%DICTIONARY_KEY_TO_POD_INTERFACE(KEY_NAME, KEY_TYPE, KisP, KHELPER, Double, double)
 //%DICTIONARY_KEY_TO_ENUM_INTERFACE(KEY_NAME, KEY_TYPE, KisP, KHELPER, Enum, int32_t)
 //%PDDM-DEFINE DICTIONARY_KEY_TO_POD_INTERFACE(KEY_NAME, KEY_TYPE, KisP, KHELPER, VALUE_NAME, VALUE_TYPE)
-//%DICTIONARY_COMMON_INTERFACE(KEY_NAME, KEY_TYPE, KisP, KHELPER, VALUE_NAME, VALUE_TYPE, POD, value)
+//%DICTIONARY_COMMON_INTERFACE(KEY_NAME, KEY_TYPE, KisP, KHELPER, VALUE_NAME, VALUE_TYPE, POD)
 //%PDDM-DEFINE DICTIONARY_POD_KEY_TO_OBJECT_INTERFACE(KEY_NAME, KEY_TYPE, VALUE_NAME, VALUE_TYPE)
-//%DICTIONARY_COMMON_INTERFACE(KEY_NAME, KEY_TYPE, , POD, VALUE_NAME, VALUE_TYPE, OBJECT, object)
+//%DICTIONARY_COMMON_INTERFACE(KEY_NAME, KEY_TYPE, , POD, VALUE_NAME, VALUE_TYPE, OBJECT)
 //%PDDM-DEFINE VALUE_FOR_KEY_POD(KEY_TYPE, VALUE_TYPE)
 //%- (BOOL)valueForKey:(KEY_TYPE)key value:(nullable VALUE_TYPE *)value;
 //%PDDM-DEFINE VALUE_FOR_KEY_OBJECT(KEY_TYPE, VALUE_TYPE)
-//%- (VALUE_TYPE)objectForKey:(KEY_TYPE)key;
+//%- (VALUE_TYPE)valueForKey:(KEY_TYPE)key;
 //%PDDM-DEFINE VALUE_FOR_KEY_Enum(KEY_TYPE, VALUE_TYPE)
 //%VALUE_FOR_KEY_POD(KEY_TYPE, VALUE_TYPE)
 //%PDDM-DEFINE ARRAY_ARG_MODIFIERPOD()
@@ -2122,7 +2122,7 @@ NS_ASSUME_NONNULL_END
 // Nothing
 //%PDDM-DEFINE ARRAY_ARG_MODIFIEROBJECT()
 //%GPB_UNSAFE_UNRETAINED ##
-//%PDDM-DEFINE DICTIONARY_COMMON_INTERFACE(KEY_NAME, KEY_TYPE, KisP, KHELPER, VALUE_NAME, VALUE_TYPE, VHELPER, VNAME)
+//%PDDM-DEFINE DICTIONARY_COMMON_INTERFACE(KEY_NAME, KEY_TYPE, KisP, KHELPER, VALUE_NAME, VALUE_TYPE, VHELPER)
 //%#pragma mark - KEY_NAME -> VALUE_NAME
 //%
 //%@interface GPB##KEY_NAME##VALUE_NAME##Dictionary : NSObject <NSCopying>
@@ -2130,25 +2130,25 @@ NS_ASSUME_NONNULL_END
 //%@property(nonatomic, readonly) NSUInteger count;
 //%
 //%+ (instancetype)dictionary;
-//%+ (instancetype)dictionaryWith##VNAME$u##:(VALUE_TYPE)##VNAME
-//%                       ##VNAME$S## forKey:(KEY_TYPE##KisP$S##KisP)key;
-//%+ (instancetype)dictionaryWith##VNAME$u##s:(const VALUE_TYPE ARRAY_ARG_MODIFIER##VHELPER()[])##VNAME##s
-//%                      ##VNAME$S##  forKeys:(const KEY_TYPE##KisP$S##KisP ARRAY_ARG_MODIFIER##KHELPER()[])keys
-//%                      ##VNAME$S##    count:(NSUInteger)count;
+//%+ (instancetype)dictionaryWithValue:(VALUE_TYPE)value
+//%                             forKey:(KEY_TYPE##KisP$S##KisP)key;
+//%+ (instancetype)dictionaryWithValues:(const VALUE_TYPE ARRAY_ARG_MODIFIER##VHELPER()[])values
+//%                             forKeys:(const KEY_TYPE##KisP$S##KisP ARRAY_ARG_MODIFIER##KHELPER()[])keys
+//%                               count:(NSUInteger)count;
 //%+ (instancetype)dictionaryWithDictionary:(GPB##KEY_NAME##VALUE_NAME##Dictionary *)dictionary;
 //%+ (instancetype)dictionaryWithCapacity:(NSUInteger)numItems;
 //%
-//%- (instancetype)initWith##VNAME$u##s:(const VALUE_TYPE ARRAY_ARG_MODIFIER##VHELPER()[])##VNAME##s
-//%                ##VNAME$S##  forKeys:(const KEY_TYPE##KisP$S##KisP ARRAY_ARG_MODIFIER##KHELPER()[])keys
-//%                ##VNAME$S##    count:(NSUInteger)count NS_DESIGNATED_INITIALIZER;
+//%- (instancetype)initWithValues:(const VALUE_TYPE ARRAY_ARG_MODIFIER##VHELPER()[])values
+//%                       forKeys:(const KEY_TYPE##KisP$S##KisP ARRAY_ARG_MODIFIER##KHELPER()[])keys
+//%                         count:(NSUInteger)count NS_DESIGNATED_INITIALIZER;
 //%- (instancetype)initWithDictionary:(GPB##KEY_NAME##VALUE_NAME##Dictionary *)dictionary;
 //%- (instancetype)initWithCapacity:(NSUInteger)numItems;
 //%
-//%DICTIONARY_IMMUTABLE_INTERFACE(KEY_NAME, KEY_TYPE, KisP, VALUE_NAME, VALUE_TYPE, VHELPER, VNAME)
+//%DICTIONARY_IMMUTABLE_INTERFACE(KEY_NAME, KEY_TYPE, KisP, VALUE_NAME, VALUE_TYPE, VHELPER)
 //%
 //%- (void)addEntriesFromDictionary:(GPB##KEY_NAME##VALUE_NAME##Dictionary *)otherDictionary;
 //%
-//%DICTIONARY_MUTABLE_INTERFACE(KEY_NAME, KEY_TYPE, KisP, VALUE_NAME, VALUE_TYPE, VHELPER, VNAME)
+//%DICTIONARY_MUTABLE_INTERFACE(KEY_NAME, KEY_TYPE, KisP, VALUE_NAME, VALUE_TYPE, VHELPER)
 //%
 //%@end
 //%
@@ -2189,7 +2189,7 @@ NS_ASSUME_NONNULL_END
 //%// is not a valid enumerator as defined by validationFunc. If the actual value is
 //%// desired, use "raw" version of the method.
 //%
-//%DICTIONARY_IMMUTABLE_INTERFACE(KEY_NAME, KEY_TYPE, KisP, VALUE_NAME, VALUE_TYPE, VHELPER, value)
+//%DICTIONARY_IMMUTABLE_INTERFACE(KEY_NAME, KEY_TYPE, KisP, VALUE_NAME, VALUE_TYPE, VHELPER)
 //%
 //%// These methods bypass the validationFunc to provide access to values that were not
 //%// known at the time the binary was compiled.
@@ -2206,21 +2206,21 @@ NS_ASSUME_NONNULL_END
 //%// to the default value. Use the rawValue methods below to assign non enumerator
 //%// values.
 //%
-//%DICTIONARY_MUTABLE_INTERFACE(KEY_NAME, KEY_TYPE, KisP, VALUE_NAME, VALUE_TYPE, VHELPER, value)
+//%DICTIONARY_MUTABLE_INTERFACE(KEY_NAME, KEY_TYPE, KisP, VALUE_NAME, VALUE_TYPE, VHELPER)
 //%
 //%@end
 //%
 
-//%PDDM-DEFINE DICTIONARY_IMMUTABLE_INTERFACE(KEY_NAME, KEY_TYPE, KisP, VALUE_NAME, VALUE_TYPE, VHELPER, VNAME)
+//%PDDM-DEFINE DICTIONARY_IMMUTABLE_INTERFACE(KEY_NAME, KEY_TYPE, KisP, VALUE_NAME, VALUE_TYPE, VHELPER)
 //%VALUE_FOR_KEY_##VHELPER(KEY_TYPE##KisP$S##KisP, VALUE_TYPE)
 //%
-//%- (void)enumerateKeysAnd##VNAME$u##sUsingBlock:
-//%    (void (^)(KEY_TYPE KisP##key, VALUE_TYPE VNAME, BOOL *stop))block;
+//%- (void)enumerateKeysAndValuesUsingBlock:
+//%    (void (^)(KEY_TYPE KisP##key, VALUE_TYPE value, BOOL *stop))block;
 
-//%PDDM-DEFINE DICTIONARY_MUTABLE_INTERFACE(KEY_NAME, KEY_TYPE, KisP, VALUE_NAME, VALUE_TYPE, VHELPER, VNAME)
-//%- (void)set##VNAME$u##:(VALUE_TYPE)##VNAME forKey:(KEY_TYPE##KisP$S##KisP)key;
+//%PDDM-DEFINE DICTIONARY_MUTABLE_INTERFACE(KEY_NAME, KEY_TYPE, KisP, VALUE_NAME, VALUE_TYPE, VHELPER)
+//%- (void)setValue:(VALUE_TYPE)value forKey:(KEY_TYPE##KisP$S##KisP)key;
 //%DICTIONARY_EXTRA_MUTABLE_METHODS_##VHELPER(KEY_NAME, KEY_TYPE, KisP, VALUE_NAME, VALUE_TYPE)
-//%- (void)remove##VNAME$u##ForKey:(KEY_TYPE##KisP$S##KisP)aKey;
+//%- (void)removeValueForKey:(KEY_TYPE##KisP$S##KisP)aKey;
 //%- (void)removeAll;
 
 //%PDDM-DEFINE DICTIONARY_EXTRA_MUTABLE_METHODS_POD(KEY_NAME, KEY_TYPE, KisP, VALUE_NAME, VALUE_TYPE)
