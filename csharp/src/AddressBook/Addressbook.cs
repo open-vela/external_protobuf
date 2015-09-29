@@ -9,12 +9,10 @@ using pbr = global::Google.Protobuf.Reflection;
 using scg = global::System.Collections.Generic;
 namespace Google.Protobuf.Examples.AddressBook {
 
-  /// <summary>Holder for reflection information generated from addressbook.proto</summary>
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
   public static partial class Addressbook {
 
     #region Descriptor
-    /// <summary>File descriptor for addressbook.proto</summary>
     public static pbr::FileDescriptor Descriptor {
       get { return descriptor; }
     }
@@ -214,7 +212,6 @@ namespace Google.Protobuf.Examples.AddressBook {
     }
 
     #region Nested types
-    /// <summary>Container for nested types declared in the Person message type.</summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     public static partial class Types {
       public enum PhoneType {
