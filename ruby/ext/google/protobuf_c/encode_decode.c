@@ -35,13 +35,11 @@
 // For more information, see:
 //   https://bugs.ruby-lang.org/issues/11328
 VALUE noleak_rb_str_cat(VALUE rb_str, const char *str, long len) {
-  char *p;
   size_t oldlen = RSTRING_LEN(rb_str);
   rb_str_modify_expand(rb_str, len);
-  p = RSTRING_PTR(rb_str);
+  char *p = RSTRING_PTR(rb_str);
   memcpy(p + oldlen, str, len);
   rb_str_set_len(rb_str, oldlen + len);
-  return rb_str;
 }
 
 // -----------------------------------------------------------------------------
