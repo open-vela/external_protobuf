@@ -172,9 +172,6 @@ namespace Google.Protobuf.TestProtos {
   #endregion
 
   #region Messages
-  /// <summary>
-  ///  Tests maps.
-  /// </summary>
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
   public sealed partial class TestMap : pb::IMessage<TestMap> {
     private static readonly pb::MessageParser<TestMap> _parser = new pb::MessageParser<TestMap>(() => new TestMap());
@@ -218,7 +215,6 @@ namespace Google.Protobuf.TestProtos {
       return new TestMap(this);
     }
 
-    /// <summary>Field number for the "map_int32_int32" field.</summary>
     public const int MapInt32Int32FieldNumber = 1;
     private static readonly pbc::MapField<int, int>.Codec _map_mapInt32Int32_codec
         = new pbc::MapField<int, int>.Codec(pb::FieldCodec.ForInt32(8), pb::FieldCodec.ForInt32(16), 10);
@@ -227,7 +223,6 @@ namespace Google.Protobuf.TestProtos {
       get { return mapInt32Int32_; }
     }
 
-    /// <summary>Field number for the "map_int64_int64" field.</summary>
     public const int MapInt64Int64FieldNumber = 2;
     private static readonly pbc::MapField<long, long>.Codec _map_mapInt64Int64_codec
         = new pbc::MapField<long, long>.Codec(pb::FieldCodec.ForInt64(8), pb::FieldCodec.ForInt64(16), 18);
@@ -236,7 +231,6 @@ namespace Google.Protobuf.TestProtos {
       get { return mapInt64Int64_; }
     }
 
-    /// <summary>Field number for the "map_uint32_uint32" field.</summary>
     public const int MapUint32Uint32FieldNumber = 3;
     private static readonly pbc::MapField<uint, uint>.Codec _map_mapUint32Uint32_codec
         = new pbc::MapField<uint, uint>.Codec(pb::FieldCodec.ForUInt32(8), pb::FieldCodec.ForUInt32(16), 26);
@@ -245,7 +239,6 @@ namespace Google.Protobuf.TestProtos {
       get { return mapUint32Uint32_; }
     }
 
-    /// <summary>Field number for the "map_uint64_uint64" field.</summary>
     public const int MapUint64Uint64FieldNumber = 4;
     private static readonly pbc::MapField<ulong, ulong>.Codec _map_mapUint64Uint64_codec
         = new pbc::MapField<ulong, ulong>.Codec(pb::FieldCodec.ForUInt64(8), pb::FieldCodec.ForUInt64(16), 34);
@@ -254,7 +247,6 @@ namespace Google.Protobuf.TestProtos {
       get { return mapUint64Uint64_; }
     }
 
-    /// <summary>Field number for the "map_sint32_sint32" field.</summary>
     public const int MapSint32Sint32FieldNumber = 5;
     private static readonly pbc::MapField<int, int>.Codec _map_mapSint32Sint32_codec
         = new pbc::MapField<int, int>.Codec(pb::FieldCodec.ForSInt32(8), pb::FieldCodec.ForSInt32(16), 42);
@@ -263,7 +255,6 @@ namespace Google.Protobuf.TestProtos {
       get { return mapSint32Sint32_; }
     }
 
-    /// <summary>Field number for the "map_sint64_sint64" field.</summary>
     public const int MapSint64Sint64FieldNumber = 6;
     private static readonly pbc::MapField<long, long>.Codec _map_mapSint64Sint64_codec
         = new pbc::MapField<long, long>.Codec(pb::FieldCodec.ForSInt64(8), pb::FieldCodec.ForSInt64(16), 50);
@@ -272,7 +263,6 @@ namespace Google.Protobuf.TestProtos {
       get { return mapSint64Sint64_; }
     }
 
-    /// <summary>Field number for the "map_fixed32_fixed32" field.</summary>
     public const int MapFixed32Fixed32FieldNumber = 7;
     private static readonly pbc::MapField<uint, uint>.Codec _map_mapFixed32Fixed32_codec
         = new pbc::MapField<uint, uint>.Codec(pb::FieldCodec.ForFixed32(13), pb::FieldCodec.ForFixed32(21), 58);
@@ -281,7 +271,6 @@ namespace Google.Protobuf.TestProtos {
       get { return mapFixed32Fixed32_; }
     }
 
-    /// <summary>Field number for the "map_fixed64_fixed64" field.</summary>
     public const int MapFixed64Fixed64FieldNumber = 8;
     private static readonly pbc::MapField<ulong, ulong>.Codec _map_mapFixed64Fixed64_codec
         = new pbc::MapField<ulong, ulong>.Codec(pb::FieldCodec.ForFixed64(9), pb::FieldCodec.ForFixed64(17), 66);
@@ -290,7 +279,6 @@ namespace Google.Protobuf.TestProtos {
       get { return mapFixed64Fixed64_; }
     }
 
-    /// <summary>Field number for the "map_sfixed32_sfixed32" field.</summary>
     public const int MapSfixed32Sfixed32FieldNumber = 9;
     private static readonly pbc::MapField<int, int>.Codec _map_mapSfixed32Sfixed32_codec
         = new pbc::MapField<int, int>.Codec(pb::FieldCodec.ForSFixed32(13), pb::FieldCodec.ForSFixed32(21), 74);
@@ -299,7 +287,6 @@ namespace Google.Protobuf.TestProtos {
       get { return mapSfixed32Sfixed32_; }
     }
 
-    /// <summary>Field number for the "map_sfixed64_sfixed64" field.</summary>
     public const int MapSfixed64Sfixed64FieldNumber = 10;
     private static readonly pbc::MapField<long, long>.Codec _map_mapSfixed64Sfixed64_codec
         = new pbc::MapField<long, long>.Codec(pb::FieldCodec.ForSFixed64(9), pb::FieldCodec.ForSFixed64(17), 82);
@@ -308,7 +295,6 @@ namespace Google.Protobuf.TestProtos {
       get { return mapSfixed64Sfixed64_; }
     }
 
-    /// <summary>Field number for the "map_int32_float" field.</summary>
     public const int MapInt32FloatFieldNumber = 11;
     private static readonly pbc::MapField<int, float>.Codec _map_mapInt32Float_codec
         = new pbc::MapField<int, float>.Codec(pb::FieldCodec.ForInt32(8), pb::FieldCodec.ForFloat(21), 90);
@@ -317,7 +303,6 @@ namespace Google.Protobuf.TestProtos {
       get { return mapInt32Float_; }
     }
 
-    /// <summary>Field number for the "map_int32_double" field.</summary>
     public const int MapInt32DoubleFieldNumber = 12;
     private static readonly pbc::MapField<int, double>.Codec _map_mapInt32Double_codec
         = new pbc::MapField<int, double>.Codec(pb::FieldCodec.ForInt32(8), pb::FieldCodec.ForDouble(17), 98);
@@ -326,7 +311,6 @@ namespace Google.Protobuf.TestProtos {
       get { return mapInt32Double_; }
     }
 
-    /// <summary>Field number for the "map_bool_bool" field.</summary>
     public const int MapBoolBoolFieldNumber = 13;
     private static readonly pbc::MapField<bool, bool>.Codec _map_mapBoolBool_codec
         = new pbc::MapField<bool, bool>.Codec(pb::FieldCodec.ForBool(8), pb::FieldCodec.ForBool(16), 106);
@@ -335,7 +319,6 @@ namespace Google.Protobuf.TestProtos {
       get { return mapBoolBool_; }
     }
 
-    /// <summary>Field number for the "map_string_string" field.</summary>
     public const int MapStringStringFieldNumber = 14;
     private static readonly pbc::MapField<string, string>.Codec _map_mapStringString_codec
         = new pbc::MapField<string, string>.Codec(pb::FieldCodec.ForString(10), pb::FieldCodec.ForString(18), 114);
@@ -344,7 +327,6 @@ namespace Google.Protobuf.TestProtos {
       get { return mapStringString_; }
     }
 
-    /// <summary>Field number for the "map_int32_bytes" field.</summary>
     public const int MapInt32BytesFieldNumber = 15;
     private static readonly pbc::MapField<int, pb::ByteString>.Codec _map_mapInt32Bytes_codec
         = new pbc::MapField<int, pb::ByteString>.Codec(pb::FieldCodec.ForInt32(8), pb::FieldCodec.ForBytes(18), 122);
@@ -353,7 +335,6 @@ namespace Google.Protobuf.TestProtos {
       get { return mapInt32Bytes_; }
     }
 
-    /// <summary>Field number for the "map_int32_enum" field.</summary>
     public const int MapInt32EnumFieldNumber = 16;
     private static readonly pbc::MapField<int, global::Google.Protobuf.TestProtos.MapEnum>.Codec _map_mapInt32Enum_codec
         = new pbc::MapField<int, global::Google.Protobuf.TestProtos.MapEnum>.Codec(pb::FieldCodec.ForInt32(8), pb::FieldCodec.ForEnum(16, x => (int) x, x => (global::Google.Protobuf.TestProtos.MapEnum) x), 130);
@@ -362,7 +343,6 @@ namespace Google.Protobuf.TestProtos {
       get { return mapInt32Enum_; }
     }
 
-    /// <summary>Field number for the "map_int32_foreign_message" field.</summary>
     public const int MapInt32ForeignMessageFieldNumber = 17;
     private static readonly pbc::MapField<int, global::Google.Protobuf.TestProtos.ForeignMessage>.Codec _map_mapInt32ForeignMessage_codec
         = new pbc::MapField<int, global::Google.Protobuf.TestProtos.ForeignMessage>.Codec(pb::FieldCodec.ForInt32(8), pb::FieldCodec.ForMessage(18, global::Google.Protobuf.TestProtos.ForeignMessage.Parser), 138);
@@ -601,7 +581,6 @@ namespace Google.Protobuf.TestProtos {
       return new TestMapSubmessage(this);
     }
 
-    /// <summary>Field number for the "test_map" field.</summary>
     public const int TestMapFieldNumber = 1;
     private global::Google.Protobuf.TestProtos.TestMap testMap_;
     public global::Google.Protobuf.TestProtos.TestMap TestMap {
@@ -710,7 +689,6 @@ namespace Google.Protobuf.TestProtos {
       return new TestMessageMap(this);
     }
 
-    /// <summary>Field number for the "map_int32_message" field.</summary>
     public const int MapInt32MessageFieldNumber = 1;
     private static readonly pbc::MapField<int, global::Google.Protobuf.TestProtos.TestAllTypes>.Codec _map_mapInt32Message_codec
         = new pbc::MapField<int, global::Google.Protobuf.TestProtos.TestAllTypes>.Codec(pb::FieldCodec.ForInt32(8), pb::FieldCodec.ForMessage(18, global::Google.Protobuf.TestProtos.TestAllTypes.Parser), 10);
@@ -778,9 +756,6 @@ namespace Google.Protobuf.TestProtos {
 
   }
 
-  /// <summary>
-  ///  Two map fields share the same entry default instance.
-  /// </summary>
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
   public sealed partial class TestSameTypeMap : pb::IMessage<TestSameTypeMap> {
     private static readonly pb::MessageParser<TestSameTypeMap> _parser = new pb::MessageParser<TestSameTypeMap>(() => new TestSameTypeMap());
@@ -809,7 +784,6 @@ namespace Google.Protobuf.TestProtos {
       return new TestSameTypeMap(this);
     }
 
-    /// <summary>Field number for the "map1" field.</summary>
     public const int Map1FieldNumber = 1;
     private static readonly pbc::MapField<int, int>.Codec _map_map1_codec
         = new pbc::MapField<int, int>.Codec(pb::FieldCodec.ForInt32(8), pb::FieldCodec.ForInt32(16), 10);
@@ -818,7 +792,6 @@ namespace Google.Protobuf.TestProtos {
       get { return map1_; }
     }
 
-    /// <summary>Field number for the "map2" field.</summary>
     public const int Map2FieldNumber = 2;
     private static readonly pbc::MapField<int, int>.Codec _map_map2_codec
         = new pbc::MapField<int, int>.Codec(pb::FieldCodec.ForInt32(8), pb::FieldCodec.ForInt32(16), 18);
@@ -936,7 +909,6 @@ namespace Google.Protobuf.TestProtos {
       return new TestArenaMap(this);
     }
 
-    /// <summary>Field number for the "map_int32_int32" field.</summary>
     public const int MapInt32Int32FieldNumber = 1;
     private static readonly pbc::MapField<int, int>.Codec _map_mapInt32Int32_codec
         = new pbc::MapField<int, int>.Codec(pb::FieldCodec.ForInt32(8), pb::FieldCodec.ForInt32(16), 10);
@@ -945,7 +917,6 @@ namespace Google.Protobuf.TestProtos {
       get { return mapInt32Int32_; }
     }
 
-    /// <summary>Field number for the "map_int64_int64" field.</summary>
     public const int MapInt64Int64FieldNumber = 2;
     private static readonly pbc::MapField<long, long>.Codec _map_mapInt64Int64_codec
         = new pbc::MapField<long, long>.Codec(pb::FieldCodec.ForInt64(8), pb::FieldCodec.ForInt64(16), 18);
@@ -954,7 +925,6 @@ namespace Google.Protobuf.TestProtos {
       get { return mapInt64Int64_; }
     }
 
-    /// <summary>Field number for the "map_uint32_uint32" field.</summary>
     public const int MapUint32Uint32FieldNumber = 3;
     private static readonly pbc::MapField<uint, uint>.Codec _map_mapUint32Uint32_codec
         = new pbc::MapField<uint, uint>.Codec(pb::FieldCodec.ForUInt32(8), pb::FieldCodec.ForUInt32(16), 26);
@@ -963,7 +933,6 @@ namespace Google.Protobuf.TestProtos {
       get { return mapUint32Uint32_; }
     }
 
-    /// <summary>Field number for the "map_uint64_uint64" field.</summary>
     public const int MapUint64Uint64FieldNumber = 4;
     private static readonly pbc::MapField<ulong, ulong>.Codec _map_mapUint64Uint64_codec
         = new pbc::MapField<ulong, ulong>.Codec(pb::FieldCodec.ForUInt64(8), pb::FieldCodec.ForUInt64(16), 34);
@@ -972,7 +941,6 @@ namespace Google.Protobuf.TestProtos {
       get { return mapUint64Uint64_; }
     }
 
-    /// <summary>Field number for the "map_sint32_sint32" field.</summary>
     public const int MapSint32Sint32FieldNumber = 5;
     private static readonly pbc::MapField<int, int>.Codec _map_mapSint32Sint32_codec
         = new pbc::MapField<int, int>.Codec(pb::FieldCodec.ForSInt32(8), pb::FieldCodec.ForSInt32(16), 42);
@@ -981,7 +949,6 @@ namespace Google.Protobuf.TestProtos {
       get { return mapSint32Sint32_; }
     }
 
-    /// <summary>Field number for the "map_sint64_sint64" field.</summary>
     public const int MapSint64Sint64FieldNumber = 6;
     private static readonly pbc::MapField<long, long>.Codec _map_mapSint64Sint64_codec
         = new pbc::MapField<long, long>.Codec(pb::FieldCodec.ForSInt64(8), pb::FieldCodec.ForSInt64(16), 50);
@@ -990,7 +957,6 @@ namespace Google.Protobuf.TestProtos {
       get { return mapSint64Sint64_; }
     }
 
-    /// <summary>Field number for the "map_fixed32_fixed32" field.</summary>
     public const int MapFixed32Fixed32FieldNumber = 7;
     private static readonly pbc::MapField<uint, uint>.Codec _map_mapFixed32Fixed32_codec
         = new pbc::MapField<uint, uint>.Codec(pb::FieldCodec.ForFixed32(13), pb::FieldCodec.ForFixed32(21), 58);
@@ -999,7 +965,6 @@ namespace Google.Protobuf.TestProtos {
       get { return mapFixed32Fixed32_; }
     }
 
-    /// <summary>Field number for the "map_fixed64_fixed64" field.</summary>
     public const int MapFixed64Fixed64FieldNumber = 8;
     private static readonly pbc::MapField<ulong, ulong>.Codec _map_mapFixed64Fixed64_codec
         = new pbc::MapField<ulong, ulong>.Codec(pb::FieldCodec.ForFixed64(9), pb::FieldCodec.ForFixed64(17), 66);
@@ -1008,7 +973,6 @@ namespace Google.Protobuf.TestProtos {
       get { return mapFixed64Fixed64_; }
     }
 
-    /// <summary>Field number for the "map_sfixed32_sfixed32" field.</summary>
     public const int MapSfixed32Sfixed32FieldNumber = 9;
     private static readonly pbc::MapField<int, int>.Codec _map_mapSfixed32Sfixed32_codec
         = new pbc::MapField<int, int>.Codec(pb::FieldCodec.ForSFixed32(13), pb::FieldCodec.ForSFixed32(21), 74);
@@ -1017,7 +981,6 @@ namespace Google.Protobuf.TestProtos {
       get { return mapSfixed32Sfixed32_; }
     }
 
-    /// <summary>Field number for the "map_sfixed64_sfixed64" field.</summary>
     public const int MapSfixed64Sfixed64FieldNumber = 10;
     private static readonly pbc::MapField<long, long>.Codec _map_mapSfixed64Sfixed64_codec
         = new pbc::MapField<long, long>.Codec(pb::FieldCodec.ForSFixed64(9), pb::FieldCodec.ForSFixed64(17), 82);
@@ -1026,7 +989,6 @@ namespace Google.Protobuf.TestProtos {
       get { return mapSfixed64Sfixed64_; }
     }
 
-    /// <summary>Field number for the "map_int32_float" field.</summary>
     public const int MapInt32FloatFieldNumber = 11;
     private static readonly pbc::MapField<int, float>.Codec _map_mapInt32Float_codec
         = new pbc::MapField<int, float>.Codec(pb::FieldCodec.ForInt32(8), pb::FieldCodec.ForFloat(21), 90);
@@ -1035,7 +997,6 @@ namespace Google.Protobuf.TestProtos {
       get { return mapInt32Float_; }
     }
 
-    /// <summary>Field number for the "map_int32_double" field.</summary>
     public const int MapInt32DoubleFieldNumber = 12;
     private static readonly pbc::MapField<int, double>.Codec _map_mapInt32Double_codec
         = new pbc::MapField<int, double>.Codec(pb::FieldCodec.ForInt32(8), pb::FieldCodec.ForDouble(17), 98);
@@ -1044,7 +1005,6 @@ namespace Google.Protobuf.TestProtos {
       get { return mapInt32Double_; }
     }
 
-    /// <summary>Field number for the "map_bool_bool" field.</summary>
     public const int MapBoolBoolFieldNumber = 13;
     private static readonly pbc::MapField<bool, bool>.Codec _map_mapBoolBool_codec
         = new pbc::MapField<bool, bool>.Codec(pb::FieldCodec.ForBool(8), pb::FieldCodec.ForBool(16), 106);
@@ -1053,7 +1013,6 @@ namespace Google.Protobuf.TestProtos {
       get { return mapBoolBool_; }
     }
 
-    /// <summary>Field number for the "map_int32_enum" field.</summary>
     public const int MapInt32EnumFieldNumber = 14;
     private static readonly pbc::MapField<int, global::Google.Protobuf.TestProtos.MapEnum>.Codec _map_mapInt32Enum_codec
         = new pbc::MapField<int, global::Google.Protobuf.TestProtos.MapEnum>.Codec(pb::FieldCodec.ForInt32(8), pb::FieldCodec.ForEnum(16, x => (int) x, x => (global::Google.Protobuf.TestProtos.MapEnum) x), 114);
@@ -1062,7 +1021,6 @@ namespace Google.Protobuf.TestProtos {
       get { return mapInt32Enum_; }
     }
 
-    /// <summary>Field number for the "map_int32_foreign_message" field.</summary>
     public const int MapInt32ForeignMessageFieldNumber = 15;
     private static readonly pbc::MapField<int, global::Google.Protobuf.TestProtos.ForeignMessage>.Codec _map_mapInt32ForeignMessage_codec
         = new pbc::MapField<int, global::Google.Protobuf.TestProtos.ForeignMessage>.Codec(pb::FieldCodec.ForInt32(8), pb::FieldCodec.ForMessage(18, global::Google.Protobuf.TestProtos.ForeignMessage.Parser), 122);
@@ -1256,10 +1214,6 @@ namespace Google.Protobuf.TestProtos {
 
   }
 
-  /// <summary>
-  ///  Previously, message containing enum called Type cannot be used as value of
-  ///  map field.
-  /// </summary>
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
   public sealed partial class MessageContainingEnumCalledType : pb::IMessage<MessageContainingEnumCalledType> {
     private static readonly pb::MessageParser<MessageContainingEnumCalledType> _parser = new pb::MessageParser<MessageContainingEnumCalledType>(() => new MessageContainingEnumCalledType());
@@ -1287,7 +1241,6 @@ namespace Google.Protobuf.TestProtos {
       return new MessageContainingEnumCalledType(this);
     }
 
-    /// <summary>Field number for the "type" field.</summary>
     public const int TypeFieldNumber = 1;
     private static readonly pbc::MapField<int, global::Google.Protobuf.TestProtos.MessageContainingEnumCalledType>.Codec _map_type_codec
         = new pbc::MapField<int, global::Google.Protobuf.TestProtos.MessageContainingEnumCalledType>.Codec(pb::FieldCodec.ForInt32(8), pb::FieldCodec.ForMessage(18, global::Google.Protobuf.TestProtos.MessageContainingEnumCalledType.Parser), 10);
@@ -1366,9 +1319,6 @@ namespace Google.Protobuf.TestProtos {
 
   }
 
-  /// <summary>
-  ///  Previously, message cannot contain map field called "entry".
-  /// </summary>
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
   public sealed partial class MessageContainingMapCalledEntry : pb::IMessage<MessageContainingMapCalledEntry> {
     private static readonly pb::MessageParser<MessageContainingMapCalledEntry> _parser = new pb::MessageParser<MessageContainingMapCalledEntry>(() => new MessageContainingMapCalledEntry());
@@ -1396,7 +1346,6 @@ namespace Google.Protobuf.TestProtos {
       return new MessageContainingMapCalledEntry(this);
     }
 
-    /// <summary>Field number for the "entry" field.</summary>
     public const int EntryFieldNumber = 1;
     private static readonly pbc::MapField<int, int>.Codec _map_entry_codec
         = new pbc::MapField<int, int>.Codec(pb::FieldCodec.ForInt32(8), pb::FieldCodec.ForInt32(16), 10);
