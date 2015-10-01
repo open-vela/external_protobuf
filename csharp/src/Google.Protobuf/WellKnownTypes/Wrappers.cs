@@ -50,10 +50,6 @@ namespace Google.Protobuf.WellKnownTypes {
 
   }
   #region Messages
-  /// <summary>
-  ///  Wrapper message for `double`.
-  ///  The JSON representation for `DoubleValue` is JSON number.
-  /// </summary>
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
   public sealed partial class DoubleValue : pb::IMessage<DoubleValue> {
     private static readonly pb::MessageParser<DoubleValue> _parser = new pb::MessageParser<DoubleValue>(() => new DoubleValue());
@@ -81,12 +77,8 @@ namespace Google.Protobuf.WellKnownTypes {
       return new DoubleValue(this);
     }
 
-    /// <summary>Field number for the "value" field.</summary>
     public const int ValueFieldNumber = 1;
     private double value_;
-    /// <summary>
-    ///  The double value.
-    /// </summary>
     public double Value {
       get { return value_; }
       set {
@@ -160,10 +152,6 @@ namespace Google.Protobuf.WellKnownTypes {
 
   }
 
-  /// <summary>
-  ///  Wrapper message for `float`.
-  ///  The JSON representation for `FloatValue` is JSON number.
-  /// </summary>
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
   public sealed partial class FloatValue : pb::IMessage<FloatValue> {
     private static readonly pb::MessageParser<FloatValue> _parser = new pb::MessageParser<FloatValue>(() => new FloatValue());
@@ -191,12 +179,8 @@ namespace Google.Protobuf.WellKnownTypes {
       return new FloatValue(this);
     }
 
-    /// <summary>Field number for the "value" field.</summary>
     public const int ValueFieldNumber = 1;
     private float value_;
-    /// <summary>
-    ///  The float value.
-    /// </summary>
     public float Value {
       get { return value_; }
       set {
@@ -270,10 +254,6 @@ namespace Google.Protobuf.WellKnownTypes {
 
   }
 
-  /// <summary>
-  ///  Wrapper message for `int64`.
-  ///  The JSON representation for `Int64Value` is JSON string.
-  /// </summary>
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
   public sealed partial class Int64Value : pb::IMessage<Int64Value> {
     private static readonly pb::MessageParser<Int64Value> _parser = new pb::MessageParser<Int64Value>(() => new Int64Value());
@@ -301,12 +281,8 @@ namespace Google.Protobuf.WellKnownTypes {
       return new Int64Value(this);
     }
 
-    /// <summary>Field number for the "value" field.</summary>
     public const int ValueFieldNumber = 1;
     private long value_;
-    /// <summary>
-    ///  The int64 value.
-    /// </summary>
     public long Value {
       get { return value_; }
       set {
@@ -380,10 +356,6 @@ namespace Google.Protobuf.WellKnownTypes {
 
   }
 
-  /// <summary>
-  ///  Wrapper message for `uint64`.
-  ///  The JSON representation for `UInt64Value` is JSON string.
-  /// </summary>
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
   public sealed partial class UInt64Value : pb::IMessage<UInt64Value> {
     private static readonly pb::MessageParser<UInt64Value> _parser = new pb::MessageParser<UInt64Value>(() => new UInt64Value());
@@ -411,12 +383,8 @@ namespace Google.Protobuf.WellKnownTypes {
       return new UInt64Value(this);
     }
 
-    /// <summary>Field number for the "value" field.</summary>
     public const int ValueFieldNumber = 1;
     private ulong value_;
-    /// <summary>
-    ///  The uint64 value.
-    /// </summary>
     public ulong Value {
       get { return value_; }
       set {
@@ -490,10 +458,6 @@ namespace Google.Protobuf.WellKnownTypes {
 
   }
 
-  /// <summary>
-  ///  Wrapper message for `int32`.
-  ///  The JSON representation for `Int32Value` is JSON number.
-  /// </summary>
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
   public sealed partial class Int32Value : pb::IMessage<Int32Value> {
     private static readonly pb::MessageParser<Int32Value> _parser = new pb::MessageParser<Int32Value>(() => new Int32Value());
@@ -521,12 +485,8 @@ namespace Google.Protobuf.WellKnownTypes {
       return new Int32Value(this);
     }
 
-    /// <summary>Field number for the "value" field.</summary>
     public const int ValueFieldNumber = 1;
     private int value_;
-    /// <summary>
-    ///  The int32 value.
-    /// </summary>
     public int Value {
       get { return value_; }
       set {
@@ -600,10 +560,6 @@ namespace Google.Protobuf.WellKnownTypes {
 
   }
 
-  /// <summary>
-  ///  Wrapper message for `uint32`.
-  ///  The JSON representation for `UInt32Value` is JSON number.
-  /// </summary>
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
   public sealed partial class UInt32Value : pb::IMessage<UInt32Value> {
     private static readonly pb::MessageParser<UInt32Value> _parser = new pb::MessageParser<UInt32Value>(() => new UInt32Value());
@@ -631,12 +587,8 @@ namespace Google.Protobuf.WellKnownTypes {
       return new UInt32Value(this);
     }
 
-    /// <summary>Field number for the "value" field.</summary>
     public const int ValueFieldNumber = 1;
     private uint value_;
-    /// <summary>
-    ///  The uint32 value.
-    /// </summary>
     public uint Value {
       get { return value_; }
       set {
@@ -710,10 +662,6 @@ namespace Google.Protobuf.WellKnownTypes {
 
   }
 
-  /// <summary>
-  ///  Wrapper message for `bool`.
-  ///  The JSON representation for `BoolValue` is JSON `true` and `false`.
-  /// </summary>
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
   public sealed partial class BoolValue : pb::IMessage<BoolValue> {
     private static readonly pb::MessageParser<BoolValue> _parser = new pb::MessageParser<BoolValue>(() => new BoolValue());
@@ -741,12 +689,8 @@ namespace Google.Protobuf.WellKnownTypes {
       return new BoolValue(this);
     }
 
-    /// <summary>Field number for the "value" field.</summary>
     public const int ValueFieldNumber = 1;
     private bool value_;
-    /// <summary>
-    ///  The bool value.
-    /// </summary>
     public bool Value {
       get { return value_; }
       set {
@@ -820,10 +764,6 @@ namespace Google.Protobuf.WellKnownTypes {
 
   }
 
-  /// <summary>
-  ///  Wrapper message for `string`.
-  ///  The JSON representation for `StringValue` is JSON string.
-  /// </summary>
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
   public sealed partial class StringValue : pb::IMessage<StringValue> {
     private static readonly pb::MessageParser<StringValue> _parser = new pb::MessageParser<StringValue>(() => new StringValue());
@@ -851,12 +791,8 @@ namespace Google.Protobuf.WellKnownTypes {
       return new StringValue(this);
     }
 
-    /// <summary>Field number for the "value" field.</summary>
     public const int ValueFieldNumber = 1;
     private string value_ = "";
-    /// <summary>
-    ///  The string value.
-    /// </summary>
     public string Value {
       get { return value_; }
       set {
@@ -930,10 +866,6 @@ namespace Google.Protobuf.WellKnownTypes {
 
   }
 
-  /// <summary>
-  ///  Wrapper message for `bytes`.
-  ///  The JSON representation for `BytesValue` is JSON string.
-  /// </summary>
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
   public sealed partial class BytesValue : pb::IMessage<BytesValue> {
     private static readonly pb::MessageParser<BytesValue> _parser = new pb::MessageParser<BytesValue>(() => new BytesValue());
@@ -961,12 +893,8 @@ namespace Google.Protobuf.WellKnownTypes {
       return new BytesValue(this);
     }
 
-    /// <summary>Field number for the "value" field.</summary>
     public const int ValueFieldNumber = 1;
     private pb::ByteString value_ = pb::ByteString.Empty;
-    /// <summary>
-    ///  The bytes value.
-    /// </summary>
     public pb::ByteString Value {
       get { return value_; }
       set {
