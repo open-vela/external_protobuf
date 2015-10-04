@@ -28,54 +28,33 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <sstream>
+#include <google/protobuf/util/proto_cast.h>
 
-#include <google/protobuf/compiler/code_generator.h>
-#include <google/protobuf/compiler/plugin.h>
-#include <google/protobuf/descriptor.h>
-#include <google/protobuf/descriptor.pb.h>
-#include <google/protobuf/io/printer.h>
-#include <google/protobuf/io/zero_copy_stream.h>
-#include <google/protobuf/stubs/strutil.h>
-
-#include <google/protobuf/compiler/csharp/csharp_doc_comment.h>
-#include <google/protobuf/compiler/csharp/csharp_enum.h>
-#include <google/protobuf/compiler/csharp/csharp_helpers.h>
-
-using google::protobuf::internal::scoped_ptr;
+#include <google/protobuf/util/unknown_enum_test.pb.h>
+#include <gtest/gtest.h>
+#include <gmock/gmock.h>
 
 namespace google {
-namespace protobuf {
-namespace compiler {
-namespace csharp {
+using google::protobuf::util::UpRevision;
+using google::protobuf::util::DownRevision;
 
-EnumGenerator::EnumGenerator(const EnumDescriptor* descriptor) :
-    SourceGeneratorBase(descriptor->file()),
-    descriptor_(descriptor) {
+namespace {
+
+TEST(ProtoCastTest, V2KnownValue) {
+  UpRevision sender;
+  sender.set_value(UpRevision::NONDEFAULT_VALUE);
+
+  DownRevision receiver = proto_cast<DownRevision>(sender);
+  ASSERT_EQ(DownRevision::NONDEFAULT_VALUE, receiver.value());
 }
 
-EnumGenerator::~EnumGenerator() {
+TEST(ProtoCastTest, V2UnknownValue) {
+  UpRevision sender;
+  sender.set_value(UpRevision::NEW_VALUE);
+
+  DownRevision receiver = proto_cast<DownRevision>(sender);
+  ASSERT_EQ(DownRevision::DEFAULT_VALUE, receiver.value());
 }
 
-void EnumGenerator::Generate(io::Printer* printer) {
-  WriteEnumDocComment(printer, descriptor_);
-  WriteGeneratedCodeAttributes(printer);
-  printer->Print("$access_level$ enum $name$ {\n",
-                 "access_level", class_access_level(),
-                 "name", descriptor_->name());
-  printer->Indent();
-  for (int i = 0; i < descriptor_->value_count(); i++) {
-      WriteEnumValueDocComment(printer, descriptor_->value(i));
-      printer->Print("$name$ = $number$,\n",
-                   "name", descriptor_->value(i)->name(),
-                   "number", SimpleItoa(descriptor_->value(i)->number()));
-  }
-  printer->Outdent();
-  printer->Print("}\n");
-  printer->Print("\n");
-}
-
-}  // namespace csharp
-}  // namespace compiler
-}  // namespace protobuf
+}  // namespace
 }  // namespace google
