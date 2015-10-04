@@ -28,54 +28,32 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <sstream>
+#ifndef GOOGLE_PROTOBUF_UTIL_PROTO_CAST_H__
+#define GOOGLE_PROTOBUF_UTIL_PROTO_CAST_H__
 
-#include <google/protobuf/compiler/code_generator.h>
-#include <google/protobuf/compiler/plugin.h>
-#include <google/protobuf/descriptor.h>
-#include <google/protobuf/descriptor.pb.h>
-#include <google/protobuf/io/printer.h>
-#include <google/protobuf/io/zero_copy_stream.h>
-#include <google/protobuf/stubs/strutil.h>
+#include <string>
 
-#include <google/protobuf/compiler/csharp/csharp_doc_comment.h>
-#include <google/protobuf/compiler/csharp/csharp_enum.h>
-#include <google/protobuf/compiler/csharp/csharp_helpers.h>
+#include <google/protobuf/stubs/logging.h>
+#include <google/protobuf/stubs/common.h>
 
-using google::protobuf::internal::scoped_ptr;
-
+// proto_cast<> is used to simulate over-the-wire conversion of one
+// proto message into another.  This is primarily useful for unit tests
+// which validate the version-compatibility semantics of protobufs.
+// Usage is similar to C++-style typecasts:
+//
+// OldMessage old_message = /*...*/;
+// NewMessage new_message = proto_cast<NewMessage>(old_message);
 namespace google {
-namespace protobuf {
-namespace compiler {
-namespace csharp {
+template<typename NewProto,
+         typename OldProto>
+NewProto proto_cast(const OldProto& old_proto) {
+  string wire_format;
+  GOOGLE_CHECK(old_proto.SerializeToString(&wire_format));
 
-EnumGenerator::EnumGenerator(const EnumDescriptor* descriptor) :
-    SourceGeneratorBase(descriptor->file()),
-    descriptor_(descriptor) {
+  NewProto new_proto;
+  GOOGLE_CHECK(new_proto.ParseFromString(wire_format));
+  return new_proto;
 }
 
-EnumGenerator::~EnumGenerator() {
-}
-
-void EnumGenerator::Generate(io::Printer* printer) {
-  WriteEnumDocComment(printer, descriptor_);
-  WriteGeneratedCodeAttributes(printer);
-  printer->Print("$access_level$ enum $name$ {\n",
-                 "access_level", class_access_level(),
-                 "name", descriptor_->name());
-  printer->Indent();
-  for (int i = 0; i < descriptor_->value_count(); i++) {
-      WriteEnumValueDocComment(printer, descriptor_->value(i));
-      printer->Print("$name$ = $number$,\n",
-                   "name", descriptor_->value(i)->name(),
-                   "number", SimpleItoa(descriptor_->value(i)->number()));
-  }
-  printer->Outdent();
-  printer->Print("}\n");
-  printer->Print("\n");
-}
-
-}  // namespace csharp
-}  // namespace compiler
-}  // namespace protobuf
 }  // namespace google
+#endif  // GOOGLE_PROTOBUF_UTIL_PROTO_CAST_H__

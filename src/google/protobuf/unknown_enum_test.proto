@@ -28,54 +28,35 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <sstream>
+// Definitions of protos for testing cross-version compatibility.  The
+// UpRevision message acts as if it were a newer version of the DownRevision
+// message.  That is, UpRevision shares all the same fields as DownRevision,
+// but UpRevision can add fields and add enum values.
+syntax = "proto2";
 
-#include <google/protobuf/compiler/code_generator.h>
-#include <google/protobuf/compiler/plugin.h>
-#include <google/protobuf/descriptor.h>
-#include <google/protobuf/descriptor.pb.h>
-#include <google/protobuf/io/printer.h>
-#include <google/protobuf/io/zero_copy_stream.h>
-#include <google/protobuf/stubs/strutil.h>
+package google.protobuf.util;
 
-#include <google/protobuf/compiler/csharp/csharp_doc_comment.h>
-#include <google/protobuf/compiler/csharp/csharp_enum.h>
-#include <google/protobuf/compiler/csharp/csharp_helpers.h>
+option csharp_namespace = "Google.ProtocolBuffers.TestProtos";
 
-using google::protobuf::internal::scoped_ptr;
-
-namespace google {
-namespace protobuf {
-namespace compiler {
-namespace csharp {
-
-EnumGenerator::EnumGenerator(const EnumDescriptor* descriptor) :
-    SourceGeneratorBase(descriptor->file()),
-    descriptor_(descriptor) {
-}
-
-EnumGenerator::~EnumGenerator() {
-}
-
-void EnumGenerator::Generate(io::Printer* printer) {
-  WriteEnumDocComment(printer, descriptor_);
-  WriteGeneratedCodeAttributes(printer);
-  printer->Print("$access_level$ enum $name$ {\n",
-                 "access_level", class_access_level(),
-                 "name", descriptor_->name());
-  printer->Indent();
-  for (int i = 0; i < descriptor_->value_count(); i++) {
-      WriteEnumValueDocComment(printer, descriptor_->value(i));
-      printer->Print("$name$ = $number$,\n",
-                   "name", descriptor_->value(i)->name(),
-                   "number", SimpleItoa(descriptor_->value(i)->number()));
+message DownRevision {
+  enum Enum {
+    DEFAULT_VALUE = 2;
+    NONDEFAULT_VALUE = 3;
   }
-  printer->Outdent();
-  printer->Print("}\n");
-  printer->Print("\n");
+
+  optional Enum value = 1 [default = DEFAULT_VALUE];
+  repeated Enum values = 2;
 }
 
-}  // namespace csharp
-}  // namespace compiler
-}  // namespace protobuf
-}  // namespace google
+message UpRevision {
+  enum Enum {
+    DEFAULT_VALUE = 2;
+    NONDEFAULT_VALUE = 3;
+    NEW_VALUE = 4;
+    NEW_VALUE_2 = 5;
+    NEW_VALUE_3 = 6;
+  }
+
+  optional Enum value = 1 [default = DEFAULT_VALUE];
+  repeated Enum values = 2;
+}

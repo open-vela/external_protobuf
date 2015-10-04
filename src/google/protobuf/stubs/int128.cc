@@ -188,8 +188,7 @@ std::ostream& operator<<(std::ostream& o, const uint128& b) {
     if ((flags & std::ios::adjustfield) == std::ios::left) {
       rep.append(width - rep.size(), o.fill());
     } else {
-      rep.insert(static_cast<std::string::size_type>(0),
-                 width - rep.size(), o.fill());
+      rep.insert(0, width - rep.size(), o.fill());
     }
   }
 
