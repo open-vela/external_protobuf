@@ -35,7 +35,6 @@
 
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/field_mask.pb.h>
-#include <google/protobuf/stubs/stringpiece.h>
 
 namespace google {
 namespace protobuf {
@@ -48,11 +47,11 @@ class LIBPROTOBUF_EXPORT FieldMaskUtil {
   // Converts FieldMask to/from string, formatted according to proto3 JSON
   // spec for FieldMask (e.g., "foo,bar,baz.quz").
   static string ToString(const FieldMask& mask);
-  static void FromString(StringPiece str, FieldMask* out);
+  static void FromString(const string& str, FieldMask* out);
 
   // Checks whether the given path is valid for type T.
   template <typename T>
-  static bool IsValidPath(StringPiece path) {
+  static bool IsValidPath(const string& path) {
     return InternalIsValidPath(T::descriptor(), path);
   }
 
@@ -68,7 +67,7 @@ class LIBPROTOBUF_EXPORT FieldMaskUtil {
   // Adds a path to FieldMask after checking whether the given path is valid.
   // This method check-fails if the path is not a valid path for type T.
   template <typename T>
-  static void AddPathToFieldMask(StringPiece path, FieldMask* mask) {
+  static void AddPathToFieldMask(const string& path, FieldMask* mask) {
     GOOGLE_CHECK(IsValidPath<T>(path));
     mask->add_paths(path);
   }
@@ -97,7 +96,7 @@ class LIBPROTOBUF_EXPORT FieldMaskUtil {
 
   // Returns true if path is covered by the given FieldMask. Note that path
   // "foo.bar" covers all paths like "foo.bar.baz", "foo.bar.quz.x", etc.
-  static bool IsPathInFieldMask(StringPiece path, const FieldMask& mask);
+  static bool IsPathInFieldMask(const string& path, const FieldMask& mask);
 
   class MergeOptions;
   // Merges fields specified in a FieldMask into another message.
@@ -106,7 +105,7 @@ class LIBPROTOBUF_EXPORT FieldMaskUtil {
 
  private:
   static bool InternalIsValidPath(const Descriptor* descriptor,
-                                  StringPiece path);
+                                  const string& path);
 
   static void InternalGetFieldMaskForAllFields(const Descriptor* descriptor,
                                                FieldMask* out);

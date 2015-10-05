@@ -34,10 +34,14 @@
 
 try:
     from collections import OrderedDict
-except ImportError:
+except ImportError: 
     from ordereddict import OrderedDict  #PY26
-import collections
-import unittest
+
+try:
+  import unittest2 as unittest  #PY26
+except ImportError:
+  import unittest
+
 from google.protobuf import descriptor_pb2
 from google.protobuf import descriptor_pool
 from google.protobuf import proto_builder
