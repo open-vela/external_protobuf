@@ -83,12 +83,7 @@ struct ScalarMapContainer {
   uint64 version;
 };
 
-#if PY_MAJOR_VERSION >= 3
-  extern PyObject *ScalarMapContainer_Type;
-  extern PyType_Spec ScalarMapContainer_Type_spec;
-#else
-  extern PyTypeObject ScalarMapContainer_Type;
-#endif
+extern PyTypeObject ScalarMapContainer_Type;
 extern PyTypeObject ScalarMapIterator_Type;
 
 namespace scalar_map_container {

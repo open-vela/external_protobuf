@@ -95,7 +95,6 @@ csharp_EXTRA_DIST=                                                           \
   csharp/src/Google.Protobuf.Test/TestProtos/UnittestIssues.cs               \
   csharp/src/Google.Protobuf.Test/TestProtos/UnittestProto3.cs               \
   csharp/src/Google.Protobuf.Test/TestProtos/UnittestWellKnownTypes.cs       \
-  csharp/src/Google.Protobuf.Test/WellKnownTypes/AnyTest.cs                  \
   csharp/src/Google.Protobuf.Test/WellKnownTypes/DurationTest.cs             \
   csharp/src/Google.Protobuf.Test/WellKnownTypes/TimestampTest.cs            \
   csharp/src/Google.Protobuf.Test/WellKnownTypes/WrappersTest.cs             \
@@ -150,7 +149,6 @@ csharp_EXTRA_DIST=                                                           \
   csharp/src/Google.Protobuf/Reflection/ServiceDescriptor.cs                 \
   csharp/src/Google.Protobuf/Reflection/SingleFieldAccessor.cs               \
   csharp/src/Google.Protobuf/WellKnownTypes/Any.cs                           \
-  csharp/src/Google.Protobuf/WellKnownTypes/AnyPartial.cs                    \
   csharp/src/Google.Protobuf/WellKnownTypes/Api.cs                           \
   csharp/src/Google.Protobuf/WellKnownTypes/Duration.cs                      \
   csharp/src/Google.Protobuf/WellKnownTypes/DurationPartial.cs               \
@@ -456,7 +454,6 @@ objectivec_EXTRA_DIST=                                                       \
   objectivec/Tests/GPBMessageTests+Runtime.m                                 \
   objectivec/Tests/GPBMessageTests+Serialization.m                           \
   objectivec/Tests/GPBMessageTests.m                                         \
-  objectivec/Tests/GPBObjectiveCPlusPlusTest.mm                              \
   objectivec/Tests/GPBPerfTests.m                                            \
   objectivec/Tests/GPBStringTests.m                                          \
   objectivec/Tests/GPBSwiftTests.swift                                       \
@@ -508,6 +505,7 @@ python_EXTRA_DIST=                                                           \
   python/google/protobuf/internal/factory_test1.proto                        \
   python/google/protobuf/internal/factory_test2.proto                        \
   python/google/protobuf/internal/generator_test.py                          \
+  python/google/protobuf/internal/json_format_test.py                        \
   python/google/protobuf/internal/message_factory_test.py                    \
   python/google/protobuf/internal/message_listener.py                        \
   python/google/protobuf/internal/message_set_extensions.proto               \
@@ -563,6 +561,7 @@ python_EXTRA_DIST=                                                           \
   python/google/protobuf/descriptor.py                                       \
   python/google/protobuf/descriptor_database.py                              \
   python/google/protobuf/descriptor_pool.py                                  \
+  python/google/protobuf/json_format.py                                      \
   python/google/protobuf/message.py                                          \
   python/google/protobuf/message_factory.py                                  \
   python/google/protobuf/proto_builder.py                                    \
