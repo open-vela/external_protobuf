@@ -34,12 +34,14 @@
 
 __author__ = 'kenton@google.com (Kenton Varda)'
 
-
 import re
 import six
 import string
 
-import unittest
+try:
+  import unittest2 as unittest
+except ImportError:
+  import unittest
 from google.protobuf.internal import _parameterized
 
 from google.protobuf import map_unittest_pb2
@@ -387,7 +389,7 @@ class TextFormatTest(TextFormatBase):
 # Ideally the schemas would be made more similar so these tests could pass.
 class OnlyWorksWithProto2RightNowTests(TextFormatBase):
 
-  def testPrintAllFieldsPointy(self):
+  def testPrintAllFieldsPointy(self, message_module):
     message = unittest_pb2.TestAllTypes()
     test_util.SetAllFields(message)
     self.CompareToGoldenFile(

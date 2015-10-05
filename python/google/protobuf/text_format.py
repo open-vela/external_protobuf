@@ -28,17 +28,9 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-"""Contains routines for printing protocol messages in text format.
+# Copyright 2007 Google Inc. All Rights Reserved.
 
-Simple usage example:
-
-  # Create a proto object and serialize it to a text proto string.
-  message = my_proto_pb2.MyMessage(foo='bar')
-  text_proto = text_format.MessageToString(message)
-
-  # Parse a text proto string.
-  message = text_format.Parse(text_proto, my_proto_pb2.MyMessage())
-"""
+"""Contains routines for printing protocol messages in text format."""
 
 __author__ = 'kenton@google.com (Kenton Varda)'
 

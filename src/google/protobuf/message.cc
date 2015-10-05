@@ -55,6 +55,7 @@
 #include <google/protobuf/stubs/map_util.h>
 #include <google/protobuf/stubs/singleton.h>
 #include <google/protobuf/stubs/stl_util.h>
+#include <google/protobuf/stubs/port.h>
 
 namespace google {
 namespace protobuf {
