@@ -38,7 +38,7 @@ using System.IO;
 namespace Google.Protobuf
 {
     /// <summary>
-    /// Reads and decodes protocol message fields.
+    /// Readings and decodes protocol message fields.
     /// </summary>
     /// <remarks>
     /// <para>
