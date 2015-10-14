@@ -155,7 +155,7 @@ class LIBPROTOBUF_EXPORT MapKey {
                "MapKey::GetUInt32Value");
     return val_.uint32_value_;
   }
-  bool GetBoolValue() const {
+  int32 GetBoolValue() const {
     TYPE_CHECK(FieldDescriptor::CPPTYPE_BOOL,
                "MapKey::GetBoolValue");
     return val_.bool_value_;
@@ -190,8 +190,6 @@ class LIBPROTOBUF_EXPORT MapKey {
         GOOGLE_LOG(FATAL) << "Can't get here.";
         return false;
     }
-    GOOGLE_LOG(FATAL) << "Can't get here.";
-    return false;
   }
 
   void CopyFrom(const MapKey& other) {
@@ -275,7 +273,7 @@ class LIBPROTOBUF_EXPORT MapValueRef {
                "MapValueRef::SetInt32Value");
     *reinterpret_cast<int32*>(data_) = value;
   }
-  void SetUInt32Value(uint32 value) {
+  void SetUInt32Value(uint64 value) {
     TYPE_CHECK(FieldDescriptor::CPPTYPE_UINT32,
                "MapValueRef::SetUInt32Value");
     *reinterpret_cast<uint32*>(data_) = value;
@@ -854,8 +852,6 @@ struct hash<google::protobuf::MapKey> {
         GOOGLE_LOG(FATAL) << "Can't get here.";
         return 0;
     }
-    GOOGLE_LOG(FATAL) << "Can't get here.";
-    return 0;
   }
   bool
   operator()(const google::protobuf::MapKey& map_key1,
@@ -879,8 +875,6 @@ struct hash<google::protobuf::MapKey> {
         GOOGLE_LOG(FATAL) << "Can't get here.";
         return true;
     }
-    GOOGLE_LOG(FATAL) << "Can't get here.";
-    return true;
   }
 };
 GOOGLE_PROTOBUF_HASH_NAMESPACE_DECLARATION_END

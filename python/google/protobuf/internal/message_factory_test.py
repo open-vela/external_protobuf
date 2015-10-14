@@ -45,6 +45,7 @@ from google.protobuf import descriptor_database
 from google.protobuf import descriptor_pool
 from google.protobuf import message_factory
 
+
 class MessageFactoryTest(unittest.TestCase):
 
   def setUp(self):

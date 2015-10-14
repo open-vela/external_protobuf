@@ -9,12 +9,10 @@ using pbr = global::Google.Protobuf.Reflection;
 using scg = global::System.Collections.Generic;
 namespace Google.Protobuf.TestProtos {
 
-  /// <summary>Holder for reflection information generated from google/protobuf/unittest_proto3.proto</summary>
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
   public static partial class UnittestProto3 {
 
     #region Descriptor
-    /// <summary>File descriptor for google/protobuf/unittest_proto3.proto</summary>
     public static pbr::FileDescriptor Descriptor {
       get { return descriptor; }
     }
@@ -23,132 +21,132 @@ namespace Google.Protobuf.TestProtos {
     static UnittestProto3() {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
-            "CiVnb29nbGUvcHJvdG9idWYvdW5pdHRlc3RfcHJvdG8zLnByb3RvEhFwcm90",
-            "b2J1Zl91bml0dGVzdBosZ29vZ2xlL3Byb3RvYnVmL3VuaXR0ZXN0X2ltcG9y",
-            "dF9wcm90bzMucHJvdG8i8A8KDFRlc3RBbGxUeXBlcxIUCgxzaW5nbGVfaW50",
-            "MzIYASABKAUSFAoMc2luZ2xlX2ludDY0GAIgASgDEhUKDXNpbmdsZV91aW50",
-            "MzIYAyABKA0SFQoNc2luZ2xlX3VpbnQ2NBgEIAEoBBIVCg1zaW5nbGVfc2lu",
-            "dDMyGAUgASgREhUKDXNpbmdsZV9zaW50NjQYBiABKBISFgoOc2luZ2xlX2Zp",
-            "eGVkMzIYByABKAcSFgoOc2luZ2xlX2ZpeGVkNjQYCCABKAYSFwoPc2luZ2xl",
-            "X3NmaXhlZDMyGAkgASgPEhcKD3NpbmdsZV9zZml4ZWQ2NBgKIAEoEBIUCgxz",
-            "aW5nbGVfZmxvYXQYCyABKAISFQoNc2luZ2xlX2RvdWJsZRgMIAEoARITCgtz",
-            "aW5nbGVfYm9vbBgNIAEoCBIVCg1zaW5nbGVfc3RyaW5nGA4gASgJEhQKDHNp",
-            "bmdsZV9ieXRlcxgPIAEoDBJMChVzaW5nbGVfbmVzdGVkX21lc3NhZ2UYEiAB",
-            "KAsyLS5wcm90b2J1Zl91bml0dGVzdC5UZXN0QWxsVHlwZXMuTmVzdGVkTWVz",
-            "c2FnZRJBChZzaW5nbGVfZm9yZWlnbl9tZXNzYWdlGBMgASgLMiEucHJvdG9i",
-            "dWZfdW5pdHRlc3QuRm9yZWlnbk1lc3NhZ2USRgoVc2luZ2xlX2ltcG9ydF9t",
-            "ZXNzYWdlGBQgASgLMicucHJvdG9idWZfdW5pdHRlc3RfaW1wb3J0LkltcG9y",
-            "dE1lc3NhZ2USRgoSc2luZ2xlX25lc3RlZF9lbnVtGBUgASgOMioucHJvdG9i",
-            "dWZfdW5pdHRlc3QuVGVzdEFsbFR5cGVzLk5lc3RlZEVudW0SOwoTc2luZ2xl",
-            "X2ZvcmVpZ25fZW51bRgWIAEoDjIeLnByb3RvYnVmX3VuaXR0ZXN0LkZvcmVp",
-            "Z25FbnVtEkAKEnNpbmdsZV9pbXBvcnRfZW51bRgXIAEoDjIkLnByb3RvYnVm",
-            "X3VuaXR0ZXN0X2ltcG9ydC5JbXBvcnRFbnVtElMKHHNpbmdsZV9wdWJsaWNf",
-            "aW1wb3J0X21lc3NhZ2UYGiABKAsyLS5wcm90b2J1Zl91bml0dGVzdF9pbXBv",
-            "cnQuUHVibGljSW1wb3J0TWVzc2FnZRIWCg5yZXBlYXRlZF9pbnQzMhgfIAMo",
-            "BRIWCg5yZXBlYXRlZF9pbnQ2NBggIAMoAxIXCg9yZXBlYXRlZF91aW50MzIY",
-            "ISADKA0SFwoPcmVwZWF0ZWRfdWludDY0GCIgAygEEhcKD3JlcGVhdGVkX3Np",
-            "bnQzMhgjIAMoERIXCg9yZXBlYXRlZF9zaW50NjQYJCADKBISGAoQcmVwZWF0",
-            "ZWRfZml4ZWQzMhglIAMoBxIYChByZXBlYXRlZF9maXhlZDY0GCYgAygGEhkK",
-            "EXJlcGVhdGVkX3NmaXhlZDMyGCcgAygPEhkKEXJlcGVhdGVkX3NmaXhlZDY0",
-            "GCggAygQEhYKDnJlcGVhdGVkX2Zsb2F0GCkgAygCEhcKD3JlcGVhdGVkX2Rv",
-            "dWJsZRgqIAMoARIVCg1yZXBlYXRlZF9ib29sGCsgAygIEhcKD3JlcGVhdGVk",
-            "X3N0cmluZxgsIAMoCRIWCg5yZXBlYXRlZF9ieXRlcxgtIAMoDBJOChdyZXBl",
-            "YXRlZF9uZXN0ZWRfbWVzc2FnZRgwIAMoCzItLnByb3RvYnVmX3VuaXR0ZXN0",
-            "LlRlc3RBbGxUeXBlcy5OZXN0ZWRNZXNzYWdlEkMKGHJlcGVhdGVkX2ZvcmVp",
-            "Z25fbWVzc2FnZRgxIAMoCzIhLnByb3RvYnVmX3VuaXR0ZXN0LkZvcmVpZ25N",
-            "ZXNzYWdlEkgKF3JlcGVhdGVkX2ltcG9ydF9tZXNzYWdlGDIgAygLMicucHJv",
-            "dG9idWZfdW5pdHRlc3RfaW1wb3J0LkltcG9ydE1lc3NhZ2USSAoUcmVwZWF0",
-            "ZWRfbmVzdGVkX2VudW0YMyADKA4yKi5wcm90b2J1Zl91bml0dGVzdC5UZXN0",
-            "QWxsVHlwZXMuTmVzdGVkRW51bRI9ChVyZXBlYXRlZF9mb3JlaWduX2VudW0Y",
-            "NCADKA4yHi5wcm90b2J1Zl91bml0dGVzdC5Gb3JlaWduRW51bRJCChRyZXBl",
-            "YXRlZF9pbXBvcnRfZW51bRg1IAMoDjIkLnByb3RvYnVmX3VuaXR0ZXN0X2lt",
-            "cG9ydC5JbXBvcnRFbnVtElUKHnJlcGVhdGVkX3B1YmxpY19pbXBvcnRfbWVz",
-            "c2FnZRg2IAMoCzItLnByb3RvYnVmX3VuaXR0ZXN0X2ltcG9ydC5QdWJsaWNJ",
-            "bXBvcnRNZXNzYWdlEhYKDG9uZW9mX3VpbnQzMhhvIAEoDUgAEk0KFG9uZW9m",
-            "X25lc3RlZF9tZXNzYWdlGHAgASgLMi0ucHJvdG9idWZfdW5pdHRlc3QuVGVz",
-            "dEFsbFR5cGVzLk5lc3RlZE1lc3NhZ2VIABIWCgxvbmVvZl9zdHJpbmcYcSAB",
-            "KAlIABIVCgtvbmVvZl9ieXRlcxhyIAEoDEgAGhsKDU5lc3RlZE1lc3NhZ2US",
-            "CgoCYmIYASABKAUiVgoKTmVzdGVkRW51bRIbChdORVNURURfRU5VTV9VTlNQ",
-            "RUNJRklFRBAAEgcKA0ZPTxABEgcKA0JBUhACEgcKA0JBWhADEhAKA05FRxD/",
-            "//////////8BQg0KC29uZW9mX2ZpZWxkIrsBChJOZXN0ZWRUZXN0QWxsVHlw",
-            "ZXMSNAoFY2hpbGQYASABKAsyJS5wcm90b2J1Zl91bml0dGVzdC5OZXN0ZWRU",
-            "ZXN0QWxsVHlwZXMSMAoHcGF5bG9hZBgCIAEoCzIfLnByb3RvYnVmX3VuaXR0",
-            "ZXN0LlRlc3RBbGxUeXBlcxI9Cg5yZXBlYXRlZF9jaGlsZBgDIAMoCzIlLnBy",
-            "b3RvYnVmX3VuaXR0ZXN0Lk5lc3RlZFRlc3RBbGxUeXBlcyI0ChRUZXN0RGVw",
-            "cmVjYXRlZEZpZWxkcxIcChBkZXByZWNhdGVkX2ludDMyGAEgASgFQgIYASIb",
-            "Cg5Gb3JlaWduTWVzc2FnZRIJCgFjGAEgASgFIjAKElRlc3RSZXNlcnZlZEZp",
-            "ZWxkc0oECAIQA0oECA8QEEoECAkQDFIDYmFyUgNiYXoiWgoRVGVzdEZvcmVp",
-            "Z25OZXN0ZWQSRQoOZm9yZWlnbl9uZXN0ZWQYASABKAsyLS5wcm90b2J1Zl91",
-            "bml0dGVzdC5UZXN0QWxsVHlwZXMuTmVzdGVkTWVzc2FnZSI0ChhUZXN0UmVh",
-            "bGx5TGFyZ2VUYWdOdW1iZXISCQoBYRgBIAEoBRINCgJiYhj///9/IAEoBSJV",
-            "ChRUZXN0UmVjdXJzaXZlTWVzc2FnZRIyCgFhGAEgASgLMicucHJvdG9idWZf",
-            "dW5pdHRlc3QuVGVzdFJlY3Vyc2l2ZU1lc3NhZ2USCQoBaRgCIAEoBSJLChRU",
-            "ZXN0TXV0dWFsUmVjdXJzaW9uQRIzCgJiYhgBIAEoCzInLnByb3RvYnVmX3Vu",
-            "aXR0ZXN0LlRlc3RNdXR1YWxSZWN1cnNpb25CImIKFFRlc3RNdXR1YWxSZWN1",
-            "cnNpb25CEjIKAWEYASABKAsyJy5wcm90b2J1Zl91bml0dGVzdC5UZXN0TXV0",
-            "dWFsUmVjdXJzaW9uQRIWCg5vcHRpb25hbF9pbnQzMhgCIAEoBSLrAgoXVGVz",
-            "dENhbWVsQ2FzZUZpZWxkTmFtZXMSFgoOUHJpbWl0aXZlRmllbGQYASABKAUS",
-            "EwoLU3RyaW5nRmllbGQYAiABKAkSMQoJRW51bUZpZWxkGAMgASgOMh4ucHJv",
-            "dG9idWZfdW5pdHRlc3QuRm9yZWlnbkVudW0SNwoMTWVzc2FnZUZpZWxkGAQg",
-            "ASgLMiEucHJvdG9idWZfdW5pdHRlc3QuRm9yZWlnbk1lc3NhZ2USHgoWUmVw",
-            "ZWF0ZWRQcmltaXRpdmVGaWVsZBgHIAMoBRIbChNSZXBlYXRlZFN0cmluZ0Zp",
-            "ZWxkGAggAygJEjkKEVJlcGVhdGVkRW51bUZpZWxkGAkgAygOMh4ucHJvdG9i",
-            "dWZfdW5pdHRlc3QuRm9yZWlnbkVudW0SPwoUUmVwZWF0ZWRNZXNzYWdlRmll",
-            "bGQYCiADKAsyIS5wcm90b2J1Zl91bml0dGVzdC5Gb3JlaWduTWVzc2FnZSLH",
-            "AQoSVGVzdEZpZWxkT3JkZXJpbmdzEhEKCW15X3N0cmluZxgLIAEoCRIOCgZt",
-            "eV9pbnQYASABKAMSEAoIbXlfZmxvYXQYZSABKAISUwoVc2luZ2xlX25lc3Rl",
-            "ZF9tZXNzYWdlGMgBIAEoCzIzLnByb3RvYnVmX3VuaXR0ZXN0LlRlc3RGaWVs",
-            "ZE9yZGVyaW5ncy5OZXN0ZWRNZXNzYWdlGicKDU5lc3RlZE1lc3NhZ2USCgoC",
-            "b28YAiABKAMSCgoCYmIYASABKAUiSwoRU3BhcnNlRW51bU1lc3NhZ2USNgoL",
-            "c3BhcnNlX2VudW0YASABKA4yIS5wcm90b2J1Zl91bml0dGVzdC5UZXN0U3Bh",
-            "cnNlRW51bSIZCglPbmVTdHJpbmcSDAoEZGF0YRgBIAEoCSIaCgpNb3JlU3Ry",
-            "aW5nEgwKBGRhdGEYASADKAkiGAoIT25lQnl0ZXMSDAoEZGF0YRgBIAEoDCIZ",
-            "CglNb3JlQnl0ZXMSDAoEZGF0YRgBIAEoDCIcCgxJbnQzMk1lc3NhZ2USDAoE",
-            "ZGF0YRgBIAEoBSIdCg1VaW50MzJNZXNzYWdlEgwKBGRhdGEYASABKA0iHAoM",
-            "SW50NjRNZXNzYWdlEgwKBGRhdGEYASABKAMiHQoNVWludDY0TWVzc2FnZRIM",
-            "CgRkYXRhGAEgASgEIhsKC0Jvb2xNZXNzYWdlEgwKBGRhdGEYASABKAgicwoJ",
-            "VGVzdE9uZW9mEhEKB2Zvb19pbnQYASABKAVIABIUCgpmb29fc3RyaW5nGAIg",
-            "ASgJSAASNgoLZm9vX21lc3NhZ2UYAyABKAsyHy5wcm90b2J1Zl91bml0dGVz",
-            "dC5UZXN0QWxsVHlwZXNIAEIFCgNmb28iqgMKD1Rlc3RQYWNrZWRUeXBlcxIY",
-            "CgxwYWNrZWRfaW50MzIYWiADKAVCAhABEhgKDHBhY2tlZF9pbnQ2NBhbIAMo",
-            "A0ICEAESGQoNcGFja2VkX3VpbnQzMhhcIAMoDUICEAESGQoNcGFja2VkX3Vp",
-            "bnQ2NBhdIAMoBEICEAESGQoNcGFja2VkX3NpbnQzMhheIAMoEUICEAESGQoN",
-            "cGFja2VkX3NpbnQ2NBhfIAMoEkICEAESGgoOcGFja2VkX2ZpeGVkMzIYYCAD",
-            "KAdCAhABEhoKDnBhY2tlZF9maXhlZDY0GGEgAygGQgIQARIbCg9wYWNrZWRf",
-            "c2ZpeGVkMzIYYiADKA9CAhABEhsKD3BhY2tlZF9zZml4ZWQ2NBhjIAMoEEIC",
-            "EAESGAoMcGFja2VkX2Zsb2F0GGQgAygCQgIQARIZCg1wYWNrZWRfZG91Ymxl",
-            "GGUgAygBQgIQARIXCgtwYWNrZWRfYm9vbBhmIAMoCEICEAESNwoLcGFja2Vk",
-            "X2VudW0YZyADKA4yHi5wcm90b2J1Zl91bml0dGVzdC5Gb3JlaWduRW51bUIC",
-            "EAEiyAMKEVRlc3RVbnBhY2tlZFR5cGVzEhoKDnVucGFja2VkX2ludDMyGFog",
-            "AygFQgIQABIaCg51bnBhY2tlZF9pbnQ2NBhbIAMoA0ICEAASGwoPdW5wYWNr",
-            "ZWRfdWludDMyGFwgAygNQgIQABIbCg91bnBhY2tlZF91aW50NjQYXSADKARC",
-            "AhAAEhsKD3VucGFja2VkX3NpbnQzMhheIAMoEUICEAASGwoPdW5wYWNrZWRf",
-            "c2ludDY0GF8gAygSQgIQABIcChB1bnBhY2tlZF9maXhlZDMyGGAgAygHQgIQ",
-            "ABIcChB1bnBhY2tlZF9maXhlZDY0GGEgAygGQgIQABIdChF1bnBhY2tlZF9z",
-            "Zml4ZWQzMhhiIAMoD0ICEAASHQoRdW5wYWNrZWRfc2ZpeGVkNjQYYyADKBBC",
-            "AhAAEhoKDnVucGFja2VkX2Zsb2F0GGQgAygCQgIQABIbCg91bnBhY2tlZF9k",
-            "b3VibGUYZSADKAFCAhAAEhkKDXVucGFja2VkX2Jvb2wYZiADKAhCAhAAEjkK",
-            "DXVucGFja2VkX2VudW0YZyADKA4yHi5wcm90b2J1Zl91bml0dGVzdC5Gb3Jl",
-            "aWduRW51bUICEAAiwAEKI1Rlc3RSZXBlYXRlZFNjYWxhckRpZmZlcmVudFRh",
-            "Z1NpemVzEhgKEHJlcGVhdGVkX2ZpeGVkMzIYDCADKAcSFgoOcmVwZWF0ZWRf",
-            "aW50MzIYDSADKAUSGQoQcmVwZWF0ZWRfZml4ZWQ2NBj+DyADKAYSFwoOcmVw",
-            "ZWF0ZWRfaW50NjQY/w8gAygDEhgKDnJlcGVhdGVkX2Zsb2F0GP7/DyADKAIS",
-            "GQoPcmVwZWF0ZWRfdWludDY0GP//DyADKAQiKAobVGVzdENvbW1lbnRJbmpl",
-            "Y3Rpb25NZXNzYWdlEgkKAWEYASABKAkiDAoKRm9vUmVxdWVzdCINCgtGb29S",
-            "ZXNwb25zZSISChBGb29DbGllbnRNZXNzYWdlIhIKEEZvb1NlcnZlck1lc3Nh",
-            "Z2UiDAoKQmFyUmVxdWVzdCINCgtCYXJSZXNwb25zZSpZCgtGb3JlaWduRW51",
-            "bRIXChNGT1JFSUdOX1VOU1BFQ0lGSUVEEAASDwoLRk9SRUlHTl9GT08QBBIP",
-            "CgtGT1JFSUdOX0JBUhAFEg8KC0ZPUkVJR05fQkFaEAYqdQoUVGVzdEVudW1X",
-            "aXRoRHVwVmFsdWUSKAokVEVTVF9FTlVNX1dJVEhfRFVQX1ZBTFVFX1VOU1BF",
-            "Q0lGSUVEEAASCAoERk9PMRABEggKBEJBUjEQAhIHCgNCQVoQAxIICgRGT08y",
-            "EAESCAoEQkFSMhACGgIQASqdAQoOVGVzdFNwYXJzZUVudW0SIAocVEVTVF9T",
-            "UEFSU0VfRU5VTV9VTlNQRUNJRklFRBAAEgwKCFNQQVJTRV9BEHsSDgoIU1BB",
-            "UlNFX0IQpucDEg8KCFNQQVJTRV9DELKxgAYSFQoIU1BBUlNFX0QQ8f//////",
-            "////ARIVCghTUEFSU0VfRRC03vz///////8BEgwKCFNQQVJTRV9HEAIymQEK",
-            "C1Rlc3RTZXJ2aWNlEkQKA0ZvbxIdLnByb3RvYnVmX3VuaXR0ZXN0LkZvb1Jl",
-            "cXVlc3QaHi5wcm90b2J1Zl91bml0dGVzdC5Gb29SZXNwb25zZRJECgNCYXIS",
-            "HS5wcm90b2J1Zl91bml0dGVzdC5CYXJSZXF1ZXN0Gh4ucHJvdG9idWZfdW5p",
-            "dHRlc3QuQmFyUmVzcG9uc2VCOkINVW5pdHRlc3RQcm90b0gBgAEBiAEBkAEB",
+            "CiVnb29nbGUvcHJvdG9idWYvdW5pdHRlc3RfcHJvdG8zLnByb3RvEhFwcm90", 
+            "b2J1Zl91bml0dGVzdBosZ29vZ2xlL3Byb3RvYnVmL3VuaXR0ZXN0X2ltcG9y", 
+            "dF9wcm90bzMucHJvdG8i8A8KDFRlc3RBbGxUeXBlcxIUCgxzaW5nbGVfaW50", 
+            "MzIYASABKAUSFAoMc2luZ2xlX2ludDY0GAIgASgDEhUKDXNpbmdsZV91aW50", 
+            "MzIYAyABKA0SFQoNc2luZ2xlX3VpbnQ2NBgEIAEoBBIVCg1zaW5nbGVfc2lu", 
+            "dDMyGAUgASgREhUKDXNpbmdsZV9zaW50NjQYBiABKBISFgoOc2luZ2xlX2Zp", 
+            "eGVkMzIYByABKAcSFgoOc2luZ2xlX2ZpeGVkNjQYCCABKAYSFwoPc2luZ2xl", 
+            "X3NmaXhlZDMyGAkgASgPEhcKD3NpbmdsZV9zZml4ZWQ2NBgKIAEoEBIUCgxz", 
+            "aW5nbGVfZmxvYXQYCyABKAISFQoNc2luZ2xlX2RvdWJsZRgMIAEoARITCgtz", 
+            "aW5nbGVfYm9vbBgNIAEoCBIVCg1zaW5nbGVfc3RyaW5nGA4gASgJEhQKDHNp", 
+            "bmdsZV9ieXRlcxgPIAEoDBJMChVzaW5nbGVfbmVzdGVkX21lc3NhZ2UYEiAB", 
+            "KAsyLS5wcm90b2J1Zl91bml0dGVzdC5UZXN0QWxsVHlwZXMuTmVzdGVkTWVz", 
+            "c2FnZRJBChZzaW5nbGVfZm9yZWlnbl9tZXNzYWdlGBMgASgLMiEucHJvdG9i", 
+            "dWZfdW5pdHRlc3QuRm9yZWlnbk1lc3NhZ2USRgoVc2luZ2xlX2ltcG9ydF9t", 
+            "ZXNzYWdlGBQgASgLMicucHJvdG9idWZfdW5pdHRlc3RfaW1wb3J0LkltcG9y", 
+            "dE1lc3NhZ2USRgoSc2luZ2xlX25lc3RlZF9lbnVtGBUgASgOMioucHJvdG9i", 
+            "dWZfdW5pdHRlc3QuVGVzdEFsbFR5cGVzLk5lc3RlZEVudW0SOwoTc2luZ2xl", 
+            "X2ZvcmVpZ25fZW51bRgWIAEoDjIeLnByb3RvYnVmX3VuaXR0ZXN0LkZvcmVp", 
+            "Z25FbnVtEkAKEnNpbmdsZV9pbXBvcnRfZW51bRgXIAEoDjIkLnByb3RvYnVm", 
+            "X3VuaXR0ZXN0X2ltcG9ydC5JbXBvcnRFbnVtElMKHHNpbmdsZV9wdWJsaWNf", 
+            "aW1wb3J0X21lc3NhZ2UYGiABKAsyLS5wcm90b2J1Zl91bml0dGVzdF9pbXBv", 
+            "cnQuUHVibGljSW1wb3J0TWVzc2FnZRIWCg5yZXBlYXRlZF9pbnQzMhgfIAMo", 
+            "BRIWCg5yZXBlYXRlZF9pbnQ2NBggIAMoAxIXCg9yZXBlYXRlZF91aW50MzIY", 
+            "ISADKA0SFwoPcmVwZWF0ZWRfdWludDY0GCIgAygEEhcKD3JlcGVhdGVkX3Np", 
+            "bnQzMhgjIAMoERIXCg9yZXBlYXRlZF9zaW50NjQYJCADKBISGAoQcmVwZWF0", 
+            "ZWRfZml4ZWQzMhglIAMoBxIYChByZXBlYXRlZF9maXhlZDY0GCYgAygGEhkK", 
+            "EXJlcGVhdGVkX3NmaXhlZDMyGCcgAygPEhkKEXJlcGVhdGVkX3NmaXhlZDY0", 
+            "GCggAygQEhYKDnJlcGVhdGVkX2Zsb2F0GCkgAygCEhcKD3JlcGVhdGVkX2Rv", 
+            "dWJsZRgqIAMoARIVCg1yZXBlYXRlZF9ib29sGCsgAygIEhcKD3JlcGVhdGVk", 
+            "X3N0cmluZxgsIAMoCRIWCg5yZXBlYXRlZF9ieXRlcxgtIAMoDBJOChdyZXBl", 
+            "YXRlZF9uZXN0ZWRfbWVzc2FnZRgwIAMoCzItLnByb3RvYnVmX3VuaXR0ZXN0", 
+            "LlRlc3RBbGxUeXBlcy5OZXN0ZWRNZXNzYWdlEkMKGHJlcGVhdGVkX2ZvcmVp", 
+            "Z25fbWVzc2FnZRgxIAMoCzIhLnByb3RvYnVmX3VuaXR0ZXN0LkZvcmVpZ25N", 
+            "ZXNzYWdlEkgKF3JlcGVhdGVkX2ltcG9ydF9tZXNzYWdlGDIgAygLMicucHJv", 
+            "dG9idWZfdW5pdHRlc3RfaW1wb3J0LkltcG9ydE1lc3NhZ2USSAoUcmVwZWF0", 
+            "ZWRfbmVzdGVkX2VudW0YMyADKA4yKi5wcm90b2J1Zl91bml0dGVzdC5UZXN0", 
+            "QWxsVHlwZXMuTmVzdGVkRW51bRI9ChVyZXBlYXRlZF9mb3JlaWduX2VudW0Y", 
+            "NCADKA4yHi5wcm90b2J1Zl91bml0dGVzdC5Gb3JlaWduRW51bRJCChRyZXBl", 
+            "YXRlZF9pbXBvcnRfZW51bRg1IAMoDjIkLnByb3RvYnVmX3VuaXR0ZXN0X2lt", 
+            "cG9ydC5JbXBvcnRFbnVtElUKHnJlcGVhdGVkX3B1YmxpY19pbXBvcnRfbWVz", 
+            "c2FnZRg2IAMoCzItLnByb3RvYnVmX3VuaXR0ZXN0X2ltcG9ydC5QdWJsaWNJ", 
+            "bXBvcnRNZXNzYWdlEhYKDG9uZW9mX3VpbnQzMhhvIAEoDUgAEk0KFG9uZW9m", 
+            "X25lc3RlZF9tZXNzYWdlGHAgASgLMi0ucHJvdG9idWZfdW5pdHRlc3QuVGVz", 
+            "dEFsbFR5cGVzLk5lc3RlZE1lc3NhZ2VIABIWCgxvbmVvZl9zdHJpbmcYcSAB", 
+            "KAlIABIVCgtvbmVvZl9ieXRlcxhyIAEoDEgAGhsKDU5lc3RlZE1lc3NhZ2US", 
+            "CgoCYmIYASABKAUiVgoKTmVzdGVkRW51bRIbChdORVNURURfRU5VTV9VTlNQ", 
+            "RUNJRklFRBAAEgcKA0ZPTxABEgcKA0JBUhACEgcKA0JBWhADEhAKA05FRxD/", 
+            "//////////8BQg0KC29uZW9mX2ZpZWxkIrsBChJOZXN0ZWRUZXN0QWxsVHlw", 
+            "ZXMSNAoFY2hpbGQYASABKAsyJS5wcm90b2J1Zl91bml0dGVzdC5OZXN0ZWRU", 
+            "ZXN0QWxsVHlwZXMSMAoHcGF5bG9hZBgCIAEoCzIfLnByb3RvYnVmX3VuaXR0", 
+            "ZXN0LlRlc3RBbGxUeXBlcxI9Cg5yZXBlYXRlZF9jaGlsZBgDIAMoCzIlLnBy", 
+            "b3RvYnVmX3VuaXR0ZXN0Lk5lc3RlZFRlc3RBbGxUeXBlcyI0ChRUZXN0RGVw", 
+            "cmVjYXRlZEZpZWxkcxIcChBkZXByZWNhdGVkX2ludDMyGAEgASgFQgIYASIb", 
+            "Cg5Gb3JlaWduTWVzc2FnZRIJCgFjGAEgASgFIjAKElRlc3RSZXNlcnZlZEZp", 
+            "ZWxkc0oECAIQA0oECA8QEEoECAkQDFIDYmFyUgNiYXoiWgoRVGVzdEZvcmVp", 
+            "Z25OZXN0ZWQSRQoOZm9yZWlnbl9uZXN0ZWQYASABKAsyLS5wcm90b2J1Zl91", 
+            "bml0dGVzdC5UZXN0QWxsVHlwZXMuTmVzdGVkTWVzc2FnZSI0ChhUZXN0UmVh", 
+            "bGx5TGFyZ2VUYWdOdW1iZXISCQoBYRgBIAEoBRINCgJiYhj///9/IAEoBSJV", 
+            "ChRUZXN0UmVjdXJzaXZlTWVzc2FnZRIyCgFhGAEgASgLMicucHJvdG9idWZf", 
+            "dW5pdHRlc3QuVGVzdFJlY3Vyc2l2ZU1lc3NhZ2USCQoBaRgCIAEoBSJLChRU", 
+            "ZXN0TXV0dWFsUmVjdXJzaW9uQRIzCgJiYhgBIAEoCzInLnByb3RvYnVmX3Vu", 
+            "aXR0ZXN0LlRlc3RNdXR1YWxSZWN1cnNpb25CImIKFFRlc3RNdXR1YWxSZWN1", 
+            "cnNpb25CEjIKAWEYASABKAsyJy5wcm90b2J1Zl91bml0dGVzdC5UZXN0TXV0", 
+            "dWFsUmVjdXJzaW9uQRIWCg5vcHRpb25hbF9pbnQzMhgCIAEoBSLrAgoXVGVz", 
+            "dENhbWVsQ2FzZUZpZWxkTmFtZXMSFgoOUHJpbWl0aXZlRmllbGQYASABKAUS", 
+            "EwoLU3RyaW5nRmllbGQYAiABKAkSMQoJRW51bUZpZWxkGAMgASgOMh4ucHJv", 
+            "dG9idWZfdW5pdHRlc3QuRm9yZWlnbkVudW0SNwoMTWVzc2FnZUZpZWxkGAQg", 
+            "ASgLMiEucHJvdG9idWZfdW5pdHRlc3QuRm9yZWlnbk1lc3NhZ2USHgoWUmVw", 
+            "ZWF0ZWRQcmltaXRpdmVGaWVsZBgHIAMoBRIbChNSZXBlYXRlZFN0cmluZ0Zp", 
+            "ZWxkGAggAygJEjkKEVJlcGVhdGVkRW51bUZpZWxkGAkgAygOMh4ucHJvdG9i", 
+            "dWZfdW5pdHRlc3QuRm9yZWlnbkVudW0SPwoUUmVwZWF0ZWRNZXNzYWdlRmll", 
+            "bGQYCiADKAsyIS5wcm90b2J1Zl91bml0dGVzdC5Gb3JlaWduTWVzc2FnZSLH", 
+            "AQoSVGVzdEZpZWxkT3JkZXJpbmdzEhEKCW15X3N0cmluZxgLIAEoCRIOCgZt", 
+            "eV9pbnQYASABKAMSEAoIbXlfZmxvYXQYZSABKAISUwoVc2luZ2xlX25lc3Rl", 
+            "ZF9tZXNzYWdlGMgBIAEoCzIzLnByb3RvYnVmX3VuaXR0ZXN0LlRlc3RGaWVs", 
+            "ZE9yZGVyaW5ncy5OZXN0ZWRNZXNzYWdlGicKDU5lc3RlZE1lc3NhZ2USCgoC", 
+            "b28YAiABKAMSCgoCYmIYASABKAUiSwoRU3BhcnNlRW51bU1lc3NhZ2USNgoL", 
+            "c3BhcnNlX2VudW0YASABKA4yIS5wcm90b2J1Zl91bml0dGVzdC5UZXN0U3Bh", 
+            "cnNlRW51bSIZCglPbmVTdHJpbmcSDAoEZGF0YRgBIAEoCSIaCgpNb3JlU3Ry", 
+            "aW5nEgwKBGRhdGEYASADKAkiGAoIT25lQnl0ZXMSDAoEZGF0YRgBIAEoDCIZ", 
+            "CglNb3JlQnl0ZXMSDAoEZGF0YRgBIAEoDCIcCgxJbnQzMk1lc3NhZ2USDAoE", 
+            "ZGF0YRgBIAEoBSIdCg1VaW50MzJNZXNzYWdlEgwKBGRhdGEYASABKA0iHAoM", 
+            "SW50NjRNZXNzYWdlEgwKBGRhdGEYASABKAMiHQoNVWludDY0TWVzc2FnZRIM", 
+            "CgRkYXRhGAEgASgEIhsKC0Jvb2xNZXNzYWdlEgwKBGRhdGEYASABKAgicwoJ", 
+            "VGVzdE9uZW9mEhEKB2Zvb19pbnQYASABKAVIABIUCgpmb29fc3RyaW5nGAIg", 
+            "ASgJSAASNgoLZm9vX21lc3NhZ2UYAyABKAsyHy5wcm90b2J1Zl91bml0dGVz", 
+            "dC5UZXN0QWxsVHlwZXNIAEIFCgNmb28iqgMKD1Rlc3RQYWNrZWRUeXBlcxIY", 
+            "CgxwYWNrZWRfaW50MzIYWiADKAVCAhABEhgKDHBhY2tlZF9pbnQ2NBhbIAMo", 
+            "A0ICEAESGQoNcGFja2VkX3VpbnQzMhhcIAMoDUICEAESGQoNcGFja2VkX3Vp", 
+            "bnQ2NBhdIAMoBEICEAESGQoNcGFja2VkX3NpbnQzMhheIAMoEUICEAESGQoN", 
+            "cGFja2VkX3NpbnQ2NBhfIAMoEkICEAESGgoOcGFja2VkX2ZpeGVkMzIYYCAD", 
+            "KAdCAhABEhoKDnBhY2tlZF9maXhlZDY0GGEgAygGQgIQARIbCg9wYWNrZWRf", 
+            "c2ZpeGVkMzIYYiADKA9CAhABEhsKD3BhY2tlZF9zZml4ZWQ2NBhjIAMoEEIC", 
+            "EAESGAoMcGFja2VkX2Zsb2F0GGQgAygCQgIQARIZCg1wYWNrZWRfZG91Ymxl", 
+            "GGUgAygBQgIQARIXCgtwYWNrZWRfYm9vbBhmIAMoCEICEAESNwoLcGFja2Vk", 
+            "X2VudW0YZyADKA4yHi5wcm90b2J1Zl91bml0dGVzdC5Gb3JlaWduRW51bUIC", 
+            "EAEiyAMKEVRlc3RVbnBhY2tlZFR5cGVzEhoKDnVucGFja2VkX2ludDMyGFog", 
+            "AygFQgIQABIaCg51bnBhY2tlZF9pbnQ2NBhbIAMoA0ICEAASGwoPdW5wYWNr", 
+            "ZWRfdWludDMyGFwgAygNQgIQABIbCg91bnBhY2tlZF91aW50NjQYXSADKARC", 
+            "AhAAEhsKD3VucGFja2VkX3NpbnQzMhheIAMoEUICEAASGwoPdW5wYWNrZWRf", 
+            "c2ludDY0GF8gAygSQgIQABIcChB1bnBhY2tlZF9maXhlZDMyGGAgAygHQgIQ", 
+            "ABIcChB1bnBhY2tlZF9maXhlZDY0GGEgAygGQgIQABIdChF1bnBhY2tlZF9z", 
+            "Zml4ZWQzMhhiIAMoD0ICEAASHQoRdW5wYWNrZWRfc2ZpeGVkNjQYYyADKBBC", 
+            "AhAAEhoKDnVucGFja2VkX2Zsb2F0GGQgAygCQgIQABIbCg91bnBhY2tlZF9k", 
+            "b3VibGUYZSADKAFCAhAAEhkKDXVucGFja2VkX2Jvb2wYZiADKAhCAhAAEjkK", 
+            "DXVucGFja2VkX2VudW0YZyADKA4yHi5wcm90b2J1Zl91bml0dGVzdC5Gb3Jl", 
+            "aWduRW51bUICEAAiwAEKI1Rlc3RSZXBlYXRlZFNjYWxhckRpZmZlcmVudFRh", 
+            "Z1NpemVzEhgKEHJlcGVhdGVkX2ZpeGVkMzIYDCADKAcSFgoOcmVwZWF0ZWRf", 
+            "aW50MzIYDSADKAUSGQoQcmVwZWF0ZWRfZml4ZWQ2NBj+DyADKAYSFwoOcmVw", 
+            "ZWF0ZWRfaW50NjQY/w8gAygDEhgKDnJlcGVhdGVkX2Zsb2F0GP7/DyADKAIS", 
+            "GQoPcmVwZWF0ZWRfdWludDY0GP//DyADKAQiKAobVGVzdENvbW1lbnRJbmpl", 
+            "Y3Rpb25NZXNzYWdlEgkKAWEYASABKAkiDAoKRm9vUmVxdWVzdCINCgtGb29S", 
+            "ZXNwb25zZSISChBGb29DbGllbnRNZXNzYWdlIhIKEEZvb1NlcnZlck1lc3Nh", 
+            "Z2UiDAoKQmFyUmVxdWVzdCINCgtCYXJSZXNwb25zZSpZCgtGb3JlaWduRW51", 
+            "bRIXChNGT1JFSUdOX1VOU1BFQ0lGSUVEEAASDwoLRk9SRUlHTl9GT08QBBIP", 
+            "CgtGT1JFSUdOX0JBUhAFEg8KC0ZPUkVJR05fQkFaEAYqdQoUVGVzdEVudW1X", 
+            "aXRoRHVwVmFsdWUSKAokVEVTVF9FTlVNX1dJVEhfRFVQX1ZBTFVFX1VOU1BF", 
+            "Q0lGSUVEEAASCAoERk9PMRABEggKBEJBUjEQAhIHCgNCQVoQAxIICgRGT08y", 
+            "EAESCAoEQkFSMhACGgIQASqdAQoOVGVzdFNwYXJzZUVudW0SIAocVEVTVF9T", 
+            "UEFSU0VfRU5VTV9VTlNQRUNJRklFRBAAEgwKCFNQQVJTRV9BEHsSDgoIU1BB", 
+            "UlNFX0IQpucDEg8KCFNQQVJTRV9DELKxgAYSFQoIU1BBUlNFX0QQ8f//////", 
+            "////ARIVCghTUEFSU0VfRRC03vz///////8BEgwKCFNQQVJTRV9HEAIymQEK", 
+            "C1Rlc3RTZXJ2aWNlEkQKA0ZvbxIdLnByb3RvYnVmX3VuaXR0ZXN0LkZvb1Jl", 
+            "cXVlc3QaHi5wcm90b2J1Zl91bml0dGVzdC5Gb29SZXNwb25zZRJECgNCYXIS", 
+            "HS5wcm90b2J1Zl91bml0dGVzdC5CYXJSZXF1ZXN0Gh4ucHJvdG9idWZfdW5p", 
+            "dHRlc3QuQmFyUmVzcG9uc2VCOkINVW5pdHRlc3RQcm90b0gBgAEBiAEBkAEB", 
             "+AEBqgIaR29vZ2xlLlByb3RvYnVmLlRlc3RQcm90b3NiBnByb3RvMw=="));
       descriptor = pbr::FileDescriptor.InternalBuildGeneratedFileFrom(descriptorData,
           new pbr::FileDescriptor[] { global::Google.Protobuf.TestProtos.UnittestImportProto3.Descriptor, },
@@ -199,9 +197,6 @@ namespace Google.Protobuf.TestProtos {
     FOREIGN_BAZ = 6,
   }
 
-  /// <summary>
-  ///  Test an enum that has multiple values with the same number.
-  /// </summary>
   public enum TestEnumWithDupValue {
     TEST_ENUM_WITH_DUP_VALUE_UNSPECIFIED = 0,
     FOO1 = 1,
@@ -211,9 +206,6 @@ namespace Google.Protobuf.TestProtos {
     BAR2 = 2,
   }
 
-  /// <summary>
-  ///  Test an enum with large, unordered values.
-  /// </summary>
   public enum TestSparseEnum {
     TEST_SPARSE_ENUM_UNSPECIFIED = 0,
     SPARSE_A = 123,
@@ -221,20 +213,12 @@ namespace Google.Protobuf.TestProtos {
     SPARSE_C = 12589234,
     SPARSE_D = -15,
     SPARSE_E = -53452,
-    /// <summary>
-    ///  In proto3, value 0 must be the first one specified
-    ///  SPARSE_F = 0;
-    /// </summary>
     SPARSE_G = 2,
   }
 
   #endregion
 
   #region Messages
-  /// <summary>
-  ///  This proto includes every type of field in both singular and repeated
-  ///  forms.
-  /// </summary>
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
   public sealed partial class TestAllTypes : pb::IMessage<TestAllTypes> {
     private static readonly pb::MessageParser<TestAllTypes> _parser = new pb::MessageParser<TestAllTypes>(() => new TestAllTypes());
@@ -320,12 +304,8 @@ namespace Google.Protobuf.TestProtos {
       return new TestAllTypes(this);
     }
 
-    /// <summary>Field number for the "single_int32" field.</summary>
     public const int SingleInt32FieldNumber = 1;
     private int singleInt32_;
-    /// <summary>
-    ///  Singular
-    /// </summary>
     public int SingleInt32 {
       get { return singleInt32_; }
       set {
@@ -333,7 +313,6 @@ namespace Google.Protobuf.TestProtos {
       }
     }
 
-    /// <summary>Field number for the "single_int64" field.</summary>
     public const int SingleInt64FieldNumber = 2;
     private long singleInt64_;
     public long SingleInt64 {
@@ -343,7 +322,6 @@ namespace Google.Protobuf.TestProtos {
       }
     }
 
-    /// <summary>Field number for the "single_uint32" field.</summary>
     public const int SingleUint32FieldNumber = 3;
     private uint singleUint32_;
     public uint SingleUint32 {
@@ -353,7 +331,6 @@ namespace Google.Protobuf.TestProtos {
       }
     }
 
-    /// <summary>Field number for the "single_uint64" field.</summary>
     public const int SingleUint64FieldNumber = 4;
     private ulong singleUint64_;
     public ulong SingleUint64 {
@@ -363,7 +340,6 @@ namespace Google.Protobuf.TestProtos {
       }
     }
 
-    /// <summary>Field number for the "single_sint32" field.</summary>
     public const int SingleSint32FieldNumber = 5;
     private int singleSint32_;
     public int SingleSint32 {
@@ -373,7 +349,6 @@ namespace Google.Protobuf.TestProtos {
       }
     }
 
-    /// <summary>Field number for the "single_sint64" field.</summary>
     public const int SingleSint64FieldNumber = 6;
     private long singleSint64_;
     public long SingleSint64 {
@@ -383,7 +358,6 @@ namespace Google.Protobuf.TestProtos {
       }
     }
 
-    /// <summary>Field number for the "single_fixed32" field.</summary>
     public const int SingleFixed32FieldNumber = 7;
     private uint singleFixed32_;
     public uint SingleFixed32 {
@@ -393,7 +367,6 @@ namespace Google.Protobuf.TestProtos {
       }
     }
 
-    /// <summary>Field number for the "single_fixed64" field.</summary>
     public const int SingleFixed64FieldNumber = 8;
     private ulong singleFixed64_;
     public ulong SingleFixed64 {
@@ -403,7 +376,6 @@ namespace Google.Protobuf.TestProtos {
       }
     }
 
-    /// <summary>Field number for the "single_sfixed32" field.</summary>
     public const int SingleSfixed32FieldNumber = 9;
     private int singleSfixed32_;
     public int SingleSfixed32 {
@@ -413,7 +385,6 @@ namespace Google.Protobuf.TestProtos {
       }
     }
 
-    /// <summary>Field number for the "single_sfixed64" field.</summary>
     public const int SingleSfixed64FieldNumber = 10;
     private long singleSfixed64_;
     public long SingleSfixed64 {
@@ -423,7 +394,6 @@ namespace Google.Protobuf.TestProtos {
       }
     }
 
-    /// <summary>Field number for the "single_float" field.</summary>
     public const int SingleFloatFieldNumber = 11;
     private float singleFloat_;
     public float SingleFloat {
@@ -433,7 +403,6 @@ namespace Google.Protobuf.TestProtos {
       }
     }
 
-    /// <summary>Field number for the "single_double" field.</summary>
     public const int SingleDoubleFieldNumber = 12;
     private double singleDouble_;
     public double SingleDouble {
@@ -443,7 +412,6 @@ namespace Google.Protobuf.TestProtos {
       }
     }
 
-    /// <summary>Field number for the "single_bool" field.</summary>
     public const int SingleBoolFieldNumber = 13;
     private bool singleBool_;
     public bool SingleBool {
@@ -453,7 +421,6 @@ namespace Google.Protobuf.TestProtos {
       }
     }
 
-    /// <summary>Field number for the "single_string" field.</summary>
     public const int SingleStringFieldNumber = 14;
     private string singleString_ = "";
     public string SingleString {
@@ -463,7 +430,6 @@ namespace Google.Protobuf.TestProtos {
       }
     }
 
-    /// <summary>Field number for the "single_bytes" field.</summary>
     public const int SingleBytesFieldNumber = 15;
     private pb::ByteString singleBytes_ = pb::ByteString.Empty;
     public pb::ByteString SingleBytes {
@@ -473,7 +439,6 @@ namespace Google.Protobuf.TestProtos {
       }
     }
 
-    /// <summary>Field number for the "single_nested_message" field.</summary>
     public const int SingleNestedMessageFieldNumber = 18;
     private global::Google.Protobuf.TestProtos.TestAllTypes.Types.NestedMessage singleNestedMessage_;
     public global::Google.Protobuf.TestProtos.TestAllTypes.Types.NestedMessage SingleNestedMessage {
@@ -483,7 +448,6 @@ namespace Google.Protobuf.TestProtos {
       }
     }
 
-    /// <summary>Field number for the "single_foreign_message" field.</summary>
     public const int SingleForeignMessageFieldNumber = 19;
     private global::Google.Protobuf.TestProtos.ForeignMessage singleForeignMessage_;
     public global::Google.Protobuf.TestProtos.ForeignMessage SingleForeignMessage {
@@ -493,7 +457,6 @@ namespace Google.Protobuf.TestProtos {
       }
     }
 
-    /// <summary>Field number for the "single_import_message" field.</summary>
     public const int SingleImportMessageFieldNumber = 20;
     private global::Google.Protobuf.TestProtos.ImportMessage singleImportMessage_;
     public global::Google.Protobuf.TestProtos.ImportMessage SingleImportMessage {
@@ -503,7 +466,6 @@ namespace Google.Protobuf.TestProtos {
       }
     }
 
-    /// <summary>Field number for the "single_nested_enum" field.</summary>
     public const int SingleNestedEnumFieldNumber = 21;
     private global::Google.Protobuf.TestProtos.TestAllTypes.Types.NestedEnum singleNestedEnum_ = global::Google.Protobuf.TestProtos.TestAllTypes.Types.NestedEnum.NESTED_ENUM_UNSPECIFIED;
     public global::Google.Protobuf.TestProtos.TestAllTypes.Types.NestedEnum SingleNestedEnum {
@@ -513,7 +475,6 @@ namespace Google.Protobuf.TestProtos {
       }
     }
 
-    /// <summary>Field number for the "single_foreign_enum" field.</summary>
     public const int SingleForeignEnumFieldNumber = 22;
     private global::Google.Protobuf.TestProtos.ForeignEnum singleForeignEnum_ = global::Google.Protobuf.TestProtos.ForeignEnum.FOREIGN_UNSPECIFIED;
     public global::Google.Protobuf.TestProtos.ForeignEnum SingleForeignEnum {
@@ -523,7 +484,6 @@ namespace Google.Protobuf.TestProtos {
       }
     }
 
-    /// <summary>Field number for the "single_import_enum" field.</summary>
     public const int SingleImportEnumFieldNumber = 23;
     private global::Google.Protobuf.TestProtos.ImportEnum singleImportEnum_ = global::Google.Protobuf.TestProtos.ImportEnum.IMPORT_ENUM_UNSPECIFIED;
     public global::Google.Protobuf.TestProtos.ImportEnum SingleImportEnum {
@@ -533,12 +493,8 @@ namespace Google.Protobuf.TestProtos {
       }
     }
 
-    /// <summary>Field number for the "single_public_import_message" field.</summary>
     public const int SinglePublicImportMessageFieldNumber = 26;
     private global::Google.Protobuf.TestProtos.PublicImportMessage singlePublicImportMessage_;
-    /// <summary>
-    ///  Defined in unittest_import_public.proto
-    /// </summary>
     public global::Google.Protobuf.TestProtos.PublicImportMessage SinglePublicImportMessage {
       get { return singlePublicImportMessage_; }
       set {
@@ -546,19 +502,14 @@ namespace Google.Protobuf.TestProtos {
       }
     }
 
-    /// <summary>Field number for the "repeated_int32" field.</summary>
     public const int RepeatedInt32FieldNumber = 31;
     private static readonly pb::FieldCodec<int> _repeated_repeatedInt32_codec
         = pb::FieldCodec.ForInt32(250);
     private readonly pbc::RepeatedField<int> repeatedInt32_ = new pbc::RepeatedField<int>();
-    /// <summary>
-    ///  Repeated
-    /// </summary>
     public pbc::RepeatedField<int> RepeatedInt32 {
       get { return repeatedInt32_; }
     }
 
-    /// <summary>Field number for the "repeated_int64" field.</summary>
     public const int RepeatedInt64FieldNumber = 32;
     private static readonly pb::FieldCodec<long> _repeated_repeatedInt64_codec
         = pb::FieldCodec.ForInt64(258);
@@ -567,7 +518,6 @@ namespace Google.Protobuf.TestProtos {
       get { return repeatedInt64_; }
     }
 
-    /// <summary>Field number for the "repeated_uint32" field.</summary>
     public const int RepeatedUint32FieldNumber = 33;
     private static readonly pb::FieldCodec<uint> _repeated_repeatedUint32_codec
         = pb::FieldCodec.ForUInt32(266);
@@ -576,7 +526,6 @@ namespace Google.Protobuf.TestProtos {
       get { return repeatedUint32_; }
     }
 
-    /// <summary>Field number for the "repeated_uint64" field.</summary>
     public const int RepeatedUint64FieldNumber = 34;
     private static readonly pb::FieldCodec<ulong> _repeated_repeatedUint64_codec
         = pb::FieldCodec.ForUInt64(274);
@@ -585,7 +534,6 @@ namespace Google.Protobuf.TestProtos {
       get { return repeatedUint64_; }
     }
 
-    /// <summary>Field number for the "repeated_sint32" field.</summary>
     public const int RepeatedSint32FieldNumber = 35;
     private static readonly pb::FieldCodec<int> _repeated_repeatedSint32_codec
         = pb::FieldCodec.ForSInt32(282);
@@ -594,7 +542,6 @@ namespace Google.Protobuf.TestProtos {
       get { return repeatedSint32_; }
     }
 
-    /// <summary>Field number for the "repeated_sint64" field.</summary>
     public const int RepeatedSint64FieldNumber = 36;
     private static readonly pb::FieldCodec<long> _repeated_repeatedSint64_codec
         = pb::FieldCodec.ForSInt64(290);
@@ -603,7 +550,6 @@ namespace Google.Protobuf.TestProtos {
       get { return repeatedSint64_; }
     }
 
-    /// <summary>Field number for the "repeated_fixed32" field.</summary>
     public const int RepeatedFixed32FieldNumber = 37;
     private static readonly pb::FieldCodec<uint> _repeated_repeatedFixed32_codec
         = pb::FieldCodec.ForFixed32(298);
@@ -612,7 +558,6 @@ namespace Google.Protobuf.TestProtos {
       get { return repeatedFixed32_; }
     }
 
-    /// <summary>Field number for the "repeated_fixed64" field.</summary>
     public const int RepeatedFixed64FieldNumber = 38;
     private static readonly pb::FieldCodec<ulong> _repeated_repeatedFixed64_codec
         = pb::FieldCodec.ForFixed64(306);
@@ -621,7 +566,6 @@ namespace Google.Protobuf.TestProtos {
       get { return repeatedFixed64_; }
     }
 
-    /// <summary>Field number for the "repeated_sfixed32" field.</summary>
     public const int RepeatedSfixed32FieldNumber = 39;
     private static readonly pb::FieldCodec<int> _repeated_repeatedSfixed32_codec
         = pb::FieldCodec.ForSFixed32(314);
@@ -630,7 +574,6 @@ namespace Google.Protobuf.TestProtos {
       get { return repeatedSfixed32_; }
     }
 
-    /// <summary>Field number for the "repeated_sfixed64" field.</summary>
     public const int RepeatedSfixed64FieldNumber = 40;
     private static readonly pb::FieldCodec<long> _repeated_repeatedSfixed64_codec
         = pb::FieldCodec.ForSFixed64(322);
@@ -639,7 +582,6 @@ namespace Google.Protobuf.TestProtos {
       get { return repeatedSfixed64_; }
     }
 
-    /// <summary>Field number for the "repeated_float" field.</summary>
     public const int RepeatedFloatFieldNumber = 41;
     private static readonly pb::FieldCodec<float> _repeated_repeatedFloat_codec
         = pb::FieldCodec.ForFloat(330);
@@ -648,7 +590,6 @@ namespace Google.Protobuf.TestProtos {
       get { return repeatedFloat_; }
     }
 
-    /// <summary>Field number for the "repeated_double" field.</summary>
     public const int RepeatedDoubleFieldNumber = 42;
     private static readonly pb::FieldCodec<double> _repeated_repeatedDouble_codec
         = pb::FieldCodec.ForDouble(338);
@@ -657,7 +598,6 @@ namespace Google.Protobuf.TestProtos {
       get { return repeatedDouble_; }
     }
 
-    /// <summary>Field number for the "repeated_bool" field.</summary>
     public const int RepeatedBoolFieldNumber = 43;
     private static readonly pb::FieldCodec<bool> _repeated_repeatedBool_codec
         = pb::FieldCodec.ForBool(346);
@@ -666,7 +606,6 @@ namespace Google.Protobuf.TestProtos {
       get { return repeatedBool_; }
     }
 
-    /// <summary>Field number for the "repeated_string" field.</summary>
     public const int RepeatedStringFieldNumber = 44;
     private static readonly pb::FieldCodec<string> _repeated_repeatedString_codec
         = pb::FieldCodec.ForString(354);
@@ -675,7 +614,6 @@ namespace Google.Protobuf.TestProtos {
       get { return repeatedString_; }
     }
 
-    /// <summary>Field number for the "repeated_bytes" field.</summary>
     public const int RepeatedBytesFieldNumber = 45;
     private static readonly pb::FieldCodec<pb::ByteString> _repeated_repeatedBytes_codec
         = pb::FieldCodec.ForBytes(362);
@@ -684,7 +622,6 @@ namespace Google.Protobuf.TestProtos {
       get { return repeatedBytes_; }
     }
 
-    /// <summary>Field number for the "repeated_nested_message" field.</summary>
     public const int RepeatedNestedMessageFieldNumber = 48;
     private static readonly pb::FieldCodec<global::Google.Protobuf.TestProtos.TestAllTypes.Types.NestedMessage> _repeated_repeatedNestedMessage_codec
         = pb::FieldCodec.ForMessage(386, global::Google.Protobuf.TestProtos.TestAllTypes.Types.NestedMessage.Parser);
@@ -693,7 +630,6 @@ namespace Google.Protobuf.TestProtos {
       get { return repeatedNestedMessage_; }
     }
 
-    /// <summary>Field number for the "repeated_foreign_message" field.</summary>
     public const int RepeatedForeignMessageFieldNumber = 49;
     private static readonly pb::FieldCodec<global::Google.Protobuf.TestProtos.ForeignMessage> _repeated_repeatedForeignMessage_codec
         = pb::FieldCodec.ForMessage(394, global::Google.Protobuf.TestProtos.ForeignMessage.Parser);
@@ -702,7 +638,6 @@ namespace Google.Protobuf.TestProtos {
       get { return repeatedForeignMessage_; }
     }
 
-    /// <summary>Field number for the "repeated_import_message" field.</summary>
     public const int RepeatedImportMessageFieldNumber = 50;
     private static readonly pb::FieldCodec<global::Google.Protobuf.TestProtos.ImportMessage> _repeated_repeatedImportMessage_codec
         = pb::FieldCodec.ForMessage(402, global::Google.Protobuf.TestProtos.ImportMessage.Parser);
@@ -711,7 +646,6 @@ namespace Google.Protobuf.TestProtos {
       get { return repeatedImportMessage_; }
     }
 
-    /// <summary>Field number for the "repeated_nested_enum" field.</summary>
     public const int RepeatedNestedEnumFieldNumber = 51;
     private static readonly pb::FieldCodec<global::Google.Protobuf.TestProtos.TestAllTypes.Types.NestedEnum> _repeated_repeatedNestedEnum_codec
         = pb::FieldCodec.ForEnum(410, x => (int) x, x => (global::Google.Protobuf.TestProtos.TestAllTypes.Types.NestedEnum) x);
@@ -720,7 +654,6 @@ namespace Google.Protobuf.TestProtos {
       get { return repeatedNestedEnum_; }
     }
 
-    /// <summary>Field number for the "repeated_foreign_enum" field.</summary>
     public const int RepeatedForeignEnumFieldNumber = 52;
     private static readonly pb::FieldCodec<global::Google.Protobuf.TestProtos.ForeignEnum> _repeated_repeatedForeignEnum_codec
         = pb::FieldCodec.ForEnum(418, x => (int) x, x => (global::Google.Protobuf.TestProtos.ForeignEnum) x);
@@ -729,7 +662,6 @@ namespace Google.Protobuf.TestProtos {
       get { return repeatedForeignEnum_; }
     }
 
-    /// <summary>Field number for the "repeated_import_enum" field.</summary>
     public const int RepeatedImportEnumFieldNumber = 53;
     private static readonly pb::FieldCodec<global::Google.Protobuf.TestProtos.ImportEnum> _repeated_repeatedImportEnum_codec
         = pb::FieldCodec.ForEnum(426, x => (int) x, x => (global::Google.Protobuf.TestProtos.ImportEnum) x);
@@ -738,19 +670,14 @@ namespace Google.Protobuf.TestProtos {
       get { return repeatedImportEnum_; }
     }
 
-    /// <summary>Field number for the "repeated_public_import_message" field.</summary>
     public const int RepeatedPublicImportMessageFieldNumber = 54;
     private static readonly pb::FieldCodec<global::Google.Protobuf.TestProtos.PublicImportMessage> _repeated_repeatedPublicImportMessage_codec
         = pb::FieldCodec.ForMessage(434, global::Google.Protobuf.TestProtos.PublicImportMessage.Parser);
     private readonly pbc::RepeatedField<global::Google.Protobuf.TestProtos.PublicImportMessage> repeatedPublicImportMessage_ = new pbc::RepeatedField<global::Google.Protobuf.TestProtos.PublicImportMessage>();
-    /// <summary>
-    ///  Defined in unittest_import_public.proto
-    /// </summary>
     public pbc::RepeatedField<global::Google.Protobuf.TestProtos.PublicImportMessage> RepeatedPublicImportMessage {
       get { return repeatedPublicImportMessage_; }
     }
 
-    /// <summary>Field number for the "oneof_uint32" field.</summary>
     public const int OneofUint32FieldNumber = 111;
     public uint OneofUint32 {
       get { return oneofFieldCase_ == OneofFieldOneofCase.OneofUint32 ? (uint) oneofField_ : 0; }
@@ -760,7 +687,6 @@ namespace Google.Protobuf.TestProtos {
       }
     }
 
-    /// <summary>Field number for the "oneof_nested_message" field.</summary>
     public const int OneofNestedMessageFieldNumber = 112;
     public global::Google.Protobuf.TestProtos.TestAllTypes.Types.NestedMessage OneofNestedMessage {
       get { return oneofFieldCase_ == OneofFieldOneofCase.OneofNestedMessage ? (global::Google.Protobuf.TestProtos.TestAllTypes.Types.NestedMessage) oneofField_ : null; }
@@ -770,7 +696,6 @@ namespace Google.Protobuf.TestProtos {
       }
     }
 
-    /// <summary>Field number for the "oneof_string" field.</summary>
     public const int OneofStringFieldNumber = 113;
     public string OneofString {
       get { return oneofFieldCase_ == OneofFieldOneofCase.OneofString ? (string) oneofField_ : ""; }
@@ -780,7 +705,6 @@ namespace Google.Protobuf.TestProtos {
       }
     }
 
-    /// <summary>Field number for the "oneof_bytes" field.</summary>
     public const int OneofBytesFieldNumber = 114;
     public pb::ByteString OneofBytes {
       get { return oneofFieldCase_ == OneofFieldOneofCase.OneofBytes ? (pb::ByteString) oneofField_ : pb::ByteString.Empty; }
@@ -791,7 +715,6 @@ namespace Google.Protobuf.TestProtos {
     }
 
     private object oneofField_;
-    /// <summary>Enum of possible cases for the "oneof_field" oneof.</summary>
     public enum OneofFieldOneofCase {
       None = 0,
       OneofUint32 = 111,
@@ -1520,7 +1443,6 @@ namespace Google.Protobuf.TestProtos {
     }
 
     #region Nested types
-    /// <summary>Container for nested types declared in the TestAllTypes message type.</summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     public static partial class Types {
       public enum NestedEnum {
@@ -1528,9 +1450,6 @@ namespace Google.Protobuf.TestProtos {
         FOO = 1,
         BAR = 2,
         BAZ = 3,
-        /// <summary>
-        ///  Intentionally negative.
-        /// </summary>
         NEG = -1,
       }
 
@@ -1561,14 +1480,8 @@ namespace Google.Protobuf.TestProtos {
           return new NestedMessage(this);
         }
 
-        /// <summary>Field number for the "bb" field.</summary>
         public const int BbFieldNumber = 1;
         private int bb_;
-        /// <summary>
-        ///  The field name "b" fails to compile in proto1 because it conflicts with
-        ///  a local variable named "b" in one of the generated methods.  Doh.
-        ///  This file needs to compile in proto1 to test backwards-compatibility.
-        /// </summary>
         public int Bb {
           get { return bb_; }
           set {
@@ -1647,9 +1560,6 @@ namespace Google.Protobuf.TestProtos {
 
   }
 
-  /// <summary>
-  ///  This proto includes a recusively nested message.
-  /// </summary>
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
   public sealed partial class NestedTestAllTypes : pb::IMessage<NestedTestAllTypes> {
     private static readonly pb::MessageParser<NestedTestAllTypes> _parser = new pb::MessageParser<NestedTestAllTypes>(() => new NestedTestAllTypes());
@@ -1679,7 +1589,6 @@ namespace Google.Protobuf.TestProtos {
       return new NestedTestAllTypes(this);
     }
 
-    /// <summary>Field number for the "child" field.</summary>
     public const int ChildFieldNumber = 1;
     private global::Google.Protobuf.TestProtos.NestedTestAllTypes child_;
     public global::Google.Protobuf.TestProtos.NestedTestAllTypes Child {
@@ -1689,7 +1598,6 @@ namespace Google.Protobuf.TestProtos {
       }
     }
 
-    /// <summary>Field number for the "payload" field.</summary>
     public const int PayloadFieldNumber = 2;
     private global::Google.Protobuf.TestProtos.TestAllTypes payload_;
     public global::Google.Protobuf.TestProtos.TestAllTypes Payload {
@@ -1699,7 +1607,6 @@ namespace Google.Protobuf.TestProtos {
       }
     }
 
-    /// <summary>Field number for the "repeated_child" field.</summary>
     public const int RepeatedChildFieldNumber = 3;
     private static readonly pb::FieldCodec<global::Google.Protobuf.TestProtos.NestedTestAllTypes> _repeated_repeatedChild_codec
         = pb::FieldCodec.ForMessage(26, global::Google.Protobuf.TestProtos.NestedTestAllTypes.Parser);
@@ -1838,7 +1745,6 @@ namespace Google.Protobuf.TestProtos {
       return new TestDeprecatedFields(this);
     }
 
-    /// <summary>Field number for the "deprecated_int32" field.</summary>
     public const int DeprecatedInt32FieldNumber = 1;
     private int deprecatedInt32_;
     [global::System.ObsoleteAttribute()]
@@ -1915,10 +1821,6 @@ namespace Google.Protobuf.TestProtos {
 
   }
 
-  /// <summary>
-  ///  Define these after TestAllTypes to make sure the compiler can handle
-  ///  that.
-  /// </summary>
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
   public sealed partial class ForeignMessage : pb::IMessage<ForeignMessage> {
     private static readonly pb::MessageParser<ForeignMessage> _parser = new pb::MessageParser<ForeignMessage>(() => new ForeignMessage());
@@ -1946,7 +1848,6 @@ namespace Google.Protobuf.TestProtos {
       return new ForeignMessage(this);
     }
 
-    /// <summary>Field number for the "c" field.</summary>
     public const int CFieldNumber = 1;
     private int c_;
     public int C {
@@ -2098,9 +1999,6 @@ namespace Google.Protobuf.TestProtos {
 
   }
 
-  /// <summary>
-  ///  Test that we can use NestedMessage from outside TestAllTypes.
-  /// </summary>
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
   public sealed partial class TestForeignNested : pb::IMessage<TestForeignNested> {
     private static readonly pb::MessageParser<TestForeignNested> _parser = new pb::MessageParser<TestForeignNested>(() => new TestForeignNested());
@@ -2128,7 +2026,6 @@ namespace Google.Protobuf.TestProtos {
       return new TestForeignNested(this);
     }
 
-    /// <summary>Field number for the "foreign_nested" field.</summary>
     public const int ForeignNestedFieldNumber = 1;
     private global::Google.Protobuf.TestProtos.TestAllTypes.Types.NestedMessage foreignNested_;
     public global::Google.Protobuf.TestProtos.TestAllTypes.Types.NestedMessage ForeignNested {
@@ -2210,9 +2107,6 @@ namespace Google.Protobuf.TestProtos {
 
   }
 
-  /// <summary>
-  ///  Test that really large tag numbers don't break anything.
-  /// </summary>
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
   public sealed partial class TestReallyLargeTagNumber : pb::IMessage<TestReallyLargeTagNumber> {
     private static readonly pb::MessageParser<TestReallyLargeTagNumber> _parser = new pb::MessageParser<TestReallyLargeTagNumber>(() => new TestReallyLargeTagNumber());
@@ -2241,13 +2135,8 @@ namespace Google.Protobuf.TestProtos {
       return new TestReallyLargeTagNumber(this);
     }
 
-    /// <summary>Field number for the "a" field.</summary>
     public const int AFieldNumber = 1;
     private int a_;
-    /// <summary>
-    ///  The largest possible tag number is 2^28 - 1, since the wire format uses
-    ///  three bits to communicate wire type.
-    /// </summary>
     public int A {
       get { return a_; }
       set {
@@ -2255,7 +2144,6 @@ namespace Google.Protobuf.TestProtos {
       }
     }
 
-    /// <summary>Field number for the "bb" field.</summary>
     public const int BbFieldNumber = 268435455;
     private int bb_;
     public int Bb {
@@ -2375,7 +2263,6 @@ namespace Google.Protobuf.TestProtos {
       return new TestRecursiveMessage(this);
     }
 
-    /// <summary>Field number for the "a" field.</summary>
     public const int AFieldNumber = 1;
     private global::Google.Protobuf.TestProtos.TestRecursiveMessage a_;
     public global::Google.Protobuf.TestProtos.TestRecursiveMessage A {
@@ -2385,7 +2272,6 @@ namespace Google.Protobuf.TestProtos {
       }
     }
 
-    /// <summary>Field number for the "i" field.</summary>
     public const int IFieldNumber = 2;
     private int i_;
     public int I {
@@ -2483,9 +2369,6 @@ namespace Google.Protobuf.TestProtos {
 
   }
 
-  /// <summary>
-  ///  Test that mutual recursion works.
-  /// </summary>
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
   public sealed partial class TestMutualRecursionA : pb::IMessage<TestMutualRecursionA> {
     private static readonly pb::MessageParser<TestMutualRecursionA> _parser = new pb::MessageParser<TestMutualRecursionA>(() => new TestMutualRecursionA());
@@ -2513,7 +2396,6 @@ namespace Google.Protobuf.TestProtos {
       return new TestMutualRecursionA(this);
     }
 
-    /// <summary>Field number for the "bb" field.</summary>
     public const int BbFieldNumber = 1;
     private global::Google.Protobuf.TestProtos.TestMutualRecursionB bb_;
     public global::Google.Protobuf.TestProtos.TestMutualRecursionB Bb {
@@ -2623,7 +2505,6 @@ namespace Google.Protobuf.TestProtos {
       return new TestMutualRecursionB(this);
     }
 
-    /// <summary>Field number for the "a" field.</summary>
     public const int AFieldNumber = 1;
     private global::Google.Protobuf.TestProtos.TestMutualRecursionA a_;
     public global::Google.Protobuf.TestProtos.TestMutualRecursionA A {
@@ -2633,7 +2514,6 @@ namespace Google.Protobuf.TestProtos {
       }
     }
 
-    /// <summary>Field number for the "optional_int32" field.</summary>
     public const int OptionalInt32FieldNumber = 2;
     private int optionalInt32_;
     public int OptionalInt32 {
@@ -2731,10 +2611,6 @@ namespace Google.Protobuf.TestProtos {
 
   }
 
-  /// <summary>
-  ///  Test message with CamelCase field names.  This violates Protocol Buffer
-  ///  standard style.
-  /// </summary>
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
   public sealed partial class TestCamelCaseFieldNames : pb::IMessage<TestCamelCaseFieldNames> {
     private static readonly pb::MessageParser<TestCamelCaseFieldNames> _parser = new pb::MessageParser<TestCamelCaseFieldNames>(() => new TestCamelCaseFieldNames());
@@ -2769,7 +2645,6 @@ namespace Google.Protobuf.TestProtos {
       return new TestCamelCaseFieldNames(this);
     }
 
-    /// <summary>Field number for the "PrimitiveField" field.</summary>
     public const int PrimitiveFieldFieldNumber = 1;
     private int primitiveField_;
     public int PrimitiveField {
@@ -2779,7 +2654,6 @@ namespace Google.Protobuf.TestProtos {
       }
     }
 
-    /// <summary>Field number for the "StringField" field.</summary>
     public const int StringFieldFieldNumber = 2;
     private string stringField_ = "";
     public string StringField {
@@ -2789,7 +2663,6 @@ namespace Google.Protobuf.TestProtos {
       }
     }
 
-    /// <summary>Field number for the "EnumField" field.</summary>
     public const int EnumFieldFieldNumber = 3;
     private global::Google.Protobuf.TestProtos.ForeignEnum enumField_ = global::Google.Protobuf.TestProtos.ForeignEnum.FOREIGN_UNSPECIFIED;
     public global::Google.Protobuf.TestProtos.ForeignEnum EnumField {
@@ -2799,7 +2672,6 @@ namespace Google.Protobuf.TestProtos {
       }
     }
 
-    /// <summary>Field number for the "MessageField" field.</summary>
     public const int MessageFieldFieldNumber = 4;
     private global::Google.Protobuf.TestProtos.ForeignMessage messageField_;
     public global::Google.Protobuf.TestProtos.ForeignMessage MessageField {
@@ -2809,7 +2681,6 @@ namespace Google.Protobuf.TestProtos {
       }
     }
 
-    /// <summary>Field number for the "RepeatedPrimitiveField" field.</summary>
     public const int RepeatedPrimitiveFieldFieldNumber = 7;
     private static readonly pb::FieldCodec<int> _repeated_repeatedPrimitiveField_codec
         = pb::FieldCodec.ForInt32(58);
@@ -2818,7 +2689,6 @@ namespace Google.Protobuf.TestProtos {
       get { return repeatedPrimitiveField_; }
     }
 
-    /// <summary>Field number for the "RepeatedStringField" field.</summary>
     public const int RepeatedStringFieldFieldNumber = 8;
     private static readonly pb::FieldCodec<string> _repeated_repeatedStringField_codec
         = pb::FieldCodec.ForString(66);
@@ -2827,7 +2697,6 @@ namespace Google.Protobuf.TestProtos {
       get { return repeatedStringField_; }
     }
 
-    /// <summary>Field number for the "RepeatedEnumField" field.</summary>
     public const int RepeatedEnumFieldFieldNumber = 9;
     private static readonly pb::FieldCodec<global::Google.Protobuf.TestProtos.ForeignEnum> _repeated_repeatedEnumField_codec
         = pb::FieldCodec.ForEnum(74, x => (int) x, x => (global::Google.Protobuf.TestProtos.ForeignEnum) x);
@@ -2836,7 +2705,6 @@ namespace Google.Protobuf.TestProtos {
       get { return repeatedEnumField_; }
     }
 
-    /// <summary>Field number for the "RepeatedMessageField" field.</summary>
     public const int RepeatedMessageFieldFieldNumber = 10;
     private static readonly pb::FieldCodec<global::Google.Protobuf.TestProtos.ForeignMessage> _repeated_repeatedMessageField_codec
         = pb::FieldCodec.ForMessage(82, global::Google.Protobuf.TestProtos.ForeignMessage.Parser);
@@ -3003,10 +2871,6 @@ namespace Google.Protobuf.TestProtos {
 
   }
 
-  /// <summary>
-  ///  We list fields out of order, to ensure that we're using field number and not
-  ///  field index to determine serialization order.
-  /// </summary>
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
   public sealed partial class TestFieldOrderings : pb::IMessage<TestFieldOrderings> {
     private static readonly pb::MessageParser<TestFieldOrderings> _parser = new pb::MessageParser<TestFieldOrderings>(() => new TestFieldOrderings());
@@ -3037,7 +2901,6 @@ namespace Google.Protobuf.TestProtos {
       return new TestFieldOrderings(this);
     }
 
-    /// <summary>Field number for the "my_string" field.</summary>
     public const int MyStringFieldNumber = 11;
     private string myString_ = "";
     public string MyString {
@@ -3047,7 +2910,6 @@ namespace Google.Protobuf.TestProtos {
       }
     }
 
-    /// <summary>Field number for the "my_int" field.</summary>
     public const int MyIntFieldNumber = 1;
     private long myInt_;
     public long MyInt {
@@ -3057,7 +2919,6 @@ namespace Google.Protobuf.TestProtos {
       }
     }
 
-    /// <summary>Field number for the "my_float" field.</summary>
     public const int MyFloatFieldNumber = 101;
     private float myFloat_;
     public float MyFloat {
@@ -3067,7 +2928,6 @@ namespace Google.Protobuf.TestProtos {
       }
     }
 
-    /// <summary>Field number for the "single_nested_message" field.</summary>
     public const int SingleNestedMessageFieldNumber = 200;
     private global::Google.Protobuf.TestProtos.TestFieldOrderings.Types.NestedMessage singleNestedMessage_;
     public global::Google.Protobuf.TestProtos.TestFieldOrderings.Types.NestedMessage SingleNestedMessage {
@@ -3196,7 +3056,6 @@ namespace Google.Protobuf.TestProtos {
     }
 
     #region Nested types
-    /// <summary>Container for nested types declared in the TestFieldOrderings message type.</summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     public static partial class Types {
       [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -3227,7 +3086,6 @@ namespace Google.Protobuf.TestProtos {
           return new NestedMessage(this);
         }
 
-        /// <summary>Field number for the "oo" field.</summary>
         public const int OoFieldNumber = 2;
         private long oo_;
         public long Oo {
@@ -3237,14 +3095,8 @@ namespace Google.Protobuf.TestProtos {
           }
         }
 
-        /// <summary>Field number for the "bb" field.</summary>
         public const int BbFieldNumber = 1;
         private int bb_;
-        /// <summary>
-        ///  The field name "b" fails to compile in proto1 because it conflicts with
-        ///  a local variable named "b" in one of the generated methods.  Doh.
-        ///  This file needs to compile in proto1 to test backwards-compatibility.
-        /// </summary>
         public int Bb {
           get { return bb_; }
           set {
@@ -3366,7 +3218,6 @@ namespace Google.Protobuf.TestProtos {
       return new SparseEnumMessage(this);
     }
 
-    /// <summary>Field number for the "sparse_enum" field.</summary>
     public const int SparseEnumFieldNumber = 1;
     private global::Google.Protobuf.TestProtos.TestSparseEnum sparseEnum_ = global::Google.Protobuf.TestProtos.TestSparseEnum.TEST_SPARSE_ENUM_UNSPECIFIED;
     public global::Google.Protobuf.TestProtos.TestSparseEnum SparseEnum {
@@ -3442,9 +3293,6 @@ namespace Google.Protobuf.TestProtos {
 
   }
 
-  /// <summary>
-  ///  Test String and Bytes: string is for valid UTF-8 strings
-  /// </summary>
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
   public sealed partial class OneString : pb::IMessage<OneString> {
     private static readonly pb::MessageParser<OneString> _parser = new pb::MessageParser<OneString>(() => new OneString());
@@ -3472,7 +3320,6 @@ namespace Google.Protobuf.TestProtos {
       return new OneString(this);
     }
 
-    /// <summary>Field number for the "data" field.</summary>
     public const int DataFieldNumber = 1;
     private string data_ = "";
     public string Data {
@@ -3575,7 +3422,6 @@ namespace Google.Protobuf.TestProtos {
       return new MoreString(this);
     }
 
-    /// <summary>Field number for the "data" field.</summary>
     public const int DataFieldNumber = 1;
     private static readonly pb::FieldCodec<string> _repeated_data_codec
         = pb::FieldCodec.ForString(10);
@@ -3670,7 +3516,6 @@ namespace Google.Protobuf.TestProtos {
       return new OneBytes(this);
     }
 
-    /// <summary>Field number for the "data" field.</summary>
     public const int DataFieldNumber = 1;
     private pb::ByteString data_ = pb::ByteString.Empty;
     public pb::ByteString Data {
@@ -3773,7 +3618,6 @@ namespace Google.Protobuf.TestProtos {
       return new MoreBytes(this);
     }
 
-    /// <summary>Field number for the "data" field.</summary>
     public const int DataFieldNumber = 1;
     private pb::ByteString data_ = pb::ByteString.Empty;
     public pb::ByteString Data {
@@ -3849,9 +3693,6 @@ namespace Google.Protobuf.TestProtos {
 
   }
 
-  /// <summary>
-  ///  Test int32, uint32, int64, uint64, and bool are all compatible
-  /// </summary>
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
   public sealed partial class Int32Message : pb::IMessage<Int32Message> {
     private static readonly pb::MessageParser<Int32Message> _parser = new pb::MessageParser<Int32Message>(() => new Int32Message());
@@ -3879,7 +3720,6 @@ namespace Google.Protobuf.TestProtos {
       return new Int32Message(this);
     }
 
-    /// <summary>Field number for the "data" field.</summary>
     public const int DataFieldNumber = 1;
     private int data_;
     public int Data {
@@ -3982,7 +3822,6 @@ namespace Google.Protobuf.TestProtos {
       return new Uint32Message(this);
     }
 
-    /// <summary>Field number for the "data" field.</summary>
     public const int DataFieldNumber = 1;
     private uint data_;
     public uint Data {
@@ -4085,7 +3924,6 @@ namespace Google.Protobuf.TestProtos {
       return new Int64Message(this);
     }
 
-    /// <summary>Field number for the "data" field.</summary>
     public const int DataFieldNumber = 1;
     private long data_;
     public long Data {
@@ -4188,7 +4026,6 @@ namespace Google.Protobuf.TestProtos {
       return new Uint64Message(this);
     }
 
-    /// <summary>Field number for the "data" field.</summary>
     public const int DataFieldNumber = 1;
     private ulong data_;
     public ulong Data {
@@ -4291,7 +4128,6 @@ namespace Google.Protobuf.TestProtos {
       return new BoolMessage(this);
     }
 
-    /// <summary>Field number for the "data" field.</summary>
     public const int DataFieldNumber = 1;
     private bool data_;
     public bool Data {
@@ -4367,9 +4203,6 @@ namespace Google.Protobuf.TestProtos {
 
   }
 
-  /// <summary>
-  ///  Test oneofs.
-  /// </summary>
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
   public sealed partial class TestOneof : pb::IMessage<TestOneof> {
     private static readonly pb::MessageParser<TestOneof> _parser = new pb::MessageParser<TestOneof>(() => new TestOneof());
@@ -4408,7 +4241,6 @@ namespace Google.Protobuf.TestProtos {
       return new TestOneof(this);
     }
 
-    /// <summary>Field number for the "foo_int" field.</summary>
     public const int FooIntFieldNumber = 1;
     public int FooInt {
       get { return fooCase_ == FooOneofCase.FooInt ? (int) foo_ : 0; }
@@ -4418,7 +4250,6 @@ namespace Google.Protobuf.TestProtos {
       }
     }
 
-    /// <summary>Field number for the "foo_string" field.</summary>
     public const int FooStringFieldNumber = 2;
     public string FooString {
       get { return fooCase_ == FooOneofCase.FooString ? (string) foo_ : ""; }
@@ -4428,7 +4259,6 @@ namespace Google.Protobuf.TestProtos {
       }
     }
 
-    /// <summary>Field number for the "foo_message" field.</summary>
     public const int FooMessageFieldNumber = 3;
     public global::Google.Protobuf.TestProtos.TestAllTypes FooMessage {
       get { return fooCase_ == FooOneofCase.FooMessage ? (global::Google.Protobuf.TestProtos.TestAllTypes) foo_ : null; }
@@ -4439,7 +4269,6 @@ namespace Google.Protobuf.TestProtos {
     }
 
     private object foo_;
-    /// <summary>Enum of possible cases for the "foo" oneof.</summary>
     public enum FooOneofCase {
       None = 0,
       FooInt = 1,
@@ -4602,7 +4431,6 @@ namespace Google.Protobuf.TestProtos {
       return new TestPackedTypes(this);
     }
 
-    /// <summary>Field number for the "packed_int32" field.</summary>
     public const int PackedInt32FieldNumber = 90;
     private static readonly pb::FieldCodec<int> _repeated_packedInt32_codec
         = pb::FieldCodec.ForInt32(722);
@@ -4611,7 +4439,6 @@ namespace Google.Protobuf.TestProtos {
       get { return packedInt32_; }
     }
 
-    /// <summary>Field number for the "packed_int64" field.</summary>
     public const int PackedInt64FieldNumber = 91;
     private static readonly pb::FieldCodec<long> _repeated_packedInt64_codec
         = pb::FieldCodec.ForInt64(730);
@@ -4620,7 +4447,6 @@ namespace Google.Protobuf.TestProtos {
       get { return packedInt64_; }
     }
 
-    /// <summary>Field number for the "packed_uint32" field.</summary>
     public const int PackedUint32FieldNumber = 92;
     private static readonly pb::FieldCodec<uint> _repeated_packedUint32_codec
         = pb::FieldCodec.ForUInt32(738);
@@ -4629,7 +4455,6 @@ namespace Google.Protobuf.TestProtos {
       get { return packedUint32_; }
     }
 
-    /// <summary>Field number for the "packed_uint64" field.</summary>
     public const int PackedUint64FieldNumber = 93;
     private static readonly pb::FieldCodec<ulong> _repeated_packedUint64_codec
         = pb::FieldCodec.ForUInt64(746);
@@ -4638,7 +4463,6 @@ namespace Google.Protobuf.TestProtos {
       get { return packedUint64_; }
     }
 
-    /// <summary>Field number for the "packed_sint32" field.</summary>
     public const int PackedSint32FieldNumber = 94;
     private static readonly pb::FieldCodec<int> _repeated_packedSint32_codec
         = pb::FieldCodec.ForSInt32(754);
@@ -4647,7 +4471,6 @@ namespace Google.Protobuf.TestProtos {
       get { return packedSint32_; }
     }
 
-    /// <summary>Field number for the "packed_sint64" field.</summary>
     public const int PackedSint64FieldNumber = 95;
     private static readonly pb::FieldCodec<long> _repeated_packedSint64_codec
         = pb::FieldCodec.ForSInt64(762);
@@ -4656,7 +4479,6 @@ namespace Google.Protobuf.TestProtos {
       get { return packedSint64_; }
     }
 
-    /// <summary>Field number for the "packed_fixed32" field.</summary>
     public const int PackedFixed32FieldNumber = 96;
     private static readonly pb::FieldCodec<uint> _repeated_packedFixed32_codec
         = pb::FieldCodec.ForFixed32(770);
@@ -4665,7 +4487,6 @@ namespace Google.Protobuf.TestProtos {
       get { return packedFixed32_; }
     }
 
-    /// <summary>Field number for the "packed_fixed64" field.</summary>
     public const int PackedFixed64FieldNumber = 97;
     private static readonly pb::FieldCodec<ulong> _repeated_packedFixed64_codec
         = pb::FieldCodec.ForFixed64(778);
@@ -4674,7 +4495,6 @@ namespace Google.Protobuf.TestProtos {
       get { return packedFixed64_; }
     }
 
-    /// <summary>Field number for the "packed_sfixed32" field.</summary>
     public const int PackedSfixed32FieldNumber = 98;
     private static readonly pb::FieldCodec<int> _repeated_packedSfixed32_codec
         = pb::FieldCodec.ForSFixed32(786);
@@ -4683,7 +4503,6 @@ namespace Google.Protobuf.TestProtos {
       get { return packedSfixed32_; }
     }
 
-    /// <summary>Field number for the "packed_sfixed64" field.</summary>
     public const int PackedSfixed64FieldNumber = 99;
     private static readonly pb::FieldCodec<long> _repeated_packedSfixed64_codec
         = pb::FieldCodec.ForSFixed64(794);
@@ -4692,7 +4511,6 @@ namespace Google.Protobuf.TestProtos {
       get { return packedSfixed64_; }
     }
 
-    /// <summary>Field number for the "packed_float" field.</summary>
     public const int PackedFloatFieldNumber = 100;
     private static readonly pb::FieldCodec<float> _repeated_packedFloat_codec
         = pb::FieldCodec.ForFloat(802);
@@ -4701,7 +4519,6 @@ namespace Google.Protobuf.TestProtos {
       get { return packedFloat_; }
     }
 
-    /// <summary>Field number for the "packed_double" field.</summary>
     public const int PackedDoubleFieldNumber = 101;
     private static readonly pb::FieldCodec<double> _repeated_packedDouble_codec
         = pb::FieldCodec.ForDouble(810);
@@ -4710,7 +4527,6 @@ namespace Google.Protobuf.TestProtos {
       get { return packedDouble_; }
     }
 
-    /// <summary>Field number for the "packed_bool" field.</summary>
     public const int PackedBoolFieldNumber = 102;
     private static readonly pb::FieldCodec<bool> _repeated_packedBool_codec
         = pb::FieldCodec.ForBool(818);
@@ -4719,7 +4535,6 @@ namespace Google.Protobuf.TestProtos {
       get { return packedBool_; }
     }
 
-    /// <summary>Field number for the "packed_enum" field.</summary>
     public const int PackedEnumFieldNumber = 103;
     private static readonly pb::FieldCodec<global::Google.Protobuf.TestProtos.ForeignEnum> _repeated_packedEnum_codec
         = pb::FieldCodec.ForEnum(826, x => (int) x, x => (global::Google.Protobuf.TestProtos.ForeignEnum) x);
@@ -4918,10 +4733,6 @@ namespace Google.Protobuf.TestProtos {
 
   }
 
-  /// <summary>
-  ///  A message with the same fields as TestPackedTypes, but without packing. Used
-  ///  to test packed &lt;-> unpacked wire compatibility.
-  /// </summary>
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
   public sealed partial class TestUnpackedTypes : pb::IMessage<TestUnpackedTypes> {
     private static readonly pb::MessageParser<TestUnpackedTypes> _parser = new pb::MessageParser<TestUnpackedTypes>(() => new TestUnpackedTypes());
@@ -4962,7 +4773,6 @@ namespace Google.Protobuf.TestProtos {
       return new TestUnpackedTypes(this);
     }
 
-    /// <summary>Field number for the "unpacked_int32" field.</summary>
     public const int UnpackedInt32FieldNumber = 90;
     private static readonly pb::FieldCodec<int> _repeated_unpackedInt32_codec
         = pb::FieldCodec.ForInt32(720);
@@ -4971,7 +4781,6 @@ namespace Google.Protobuf.TestProtos {
       get { return unpackedInt32_; }
     }
 
-    /// <summary>Field number for the "unpacked_int64" field.</summary>
     public const int UnpackedInt64FieldNumber = 91;
     private static readonly pb::FieldCodec<long> _repeated_unpackedInt64_codec
         = pb::FieldCodec.ForInt64(728);
@@ -4980,7 +4789,6 @@ namespace Google.Protobuf.TestProtos {
       get { return unpackedInt64_; }
     }
 
-    /// <summary>Field number for the "unpacked_uint32" field.</summary>
     public const int UnpackedUint32FieldNumber = 92;
     private static readonly pb::FieldCodec<uint> _repeated_unpackedUint32_codec
         = pb::FieldCodec.ForUInt32(736);
@@ -4989,7 +4797,6 @@ namespace Google.Protobuf.TestProtos {
       get { return unpackedUint32_; }
     }
 
-    /// <summary>Field number for the "unpacked_uint64" field.</summary>
     public const int UnpackedUint64FieldNumber = 93;
     private static readonly pb::FieldCodec<ulong> _repeated_unpackedUint64_codec
         = pb::FieldCodec.ForUInt64(744);
@@ -4998,7 +4805,6 @@ namespace Google.Protobuf.TestProtos {
       get { return unpackedUint64_; }
     }
 
-    /// <summary>Field number for the "unpacked_sint32" field.</summary>
     public const int UnpackedSint32FieldNumber = 94;
     private static readonly pb::FieldCodec<int> _repeated_unpackedSint32_codec
         = pb::FieldCodec.ForSInt32(752);
@@ -5007,7 +4813,6 @@ namespace Google.Protobuf.TestProtos {
       get { return unpackedSint32_; }
     }
 
-    /// <summary>Field number for the "unpacked_sint64" field.</summary>
     public const int UnpackedSint64FieldNumber = 95;
     private static readonly pb::FieldCodec<long> _repeated_unpackedSint64_codec
         = pb::FieldCodec.ForSInt64(760);
@@ -5016,7 +4821,6 @@ namespace Google.Protobuf.TestProtos {
       get { return unpackedSint64_; }
     }
 
-    /// <summary>Field number for the "unpacked_fixed32" field.</summary>
     public const int UnpackedFixed32FieldNumber = 96;
     private static readonly pb::FieldCodec<uint> _repeated_unpackedFixed32_codec
         = pb::FieldCodec.ForFixed32(773);
@@ -5025,7 +4829,6 @@ namespace Google.Protobuf.TestProtos {
       get { return unpackedFixed32_; }
     }
 
-    /// <summary>Field number for the "unpacked_fixed64" field.</summary>
     public const int UnpackedFixed64FieldNumber = 97;
     private static readonly pb::FieldCodec<ulong> _repeated_unpackedFixed64_codec
         = pb::FieldCodec.ForFixed64(777);
@@ -5034,7 +4837,6 @@ namespace Google.Protobuf.TestProtos {
       get { return unpackedFixed64_; }
     }
 
-    /// <summary>Field number for the "unpacked_sfixed32" field.</summary>
     public const int UnpackedSfixed32FieldNumber = 98;
     private static readonly pb::FieldCodec<int> _repeated_unpackedSfixed32_codec
         = pb::FieldCodec.ForSFixed32(789);
@@ -5043,7 +4845,6 @@ namespace Google.Protobuf.TestProtos {
       get { return unpackedSfixed32_; }
     }
 
-    /// <summary>Field number for the "unpacked_sfixed64" field.</summary>
     public const int UnpackedSfixed64FieldNumber = 99;
     private static readonly pb::FieldCodec<long> _repeated_unpackedSfixed64_codec
         = pb::FieldCodec.ForSFixed64(793);
@@ -5052,7 +4853,6 @@ namespace Google.Protobuf.TestProtos {
       get { return unpackedSfixed64_; }
     }
 
-    /// <summary>Field number for the "unpacked_float" field.</summary>
     public const int UnpackedFloatFieldNumber = 100;
     private static readonly pb::FieldCodec<float> _repeated_unpackedFloat_codec
         = pb::FieldCodec.ForFloat(805);
@@ -5061,7 +4861,6 @@ namespace Google.Protobuf.TestProtos {
       get { return unpackedFloat_; }
     }
 
-    /// <summary>Field number for the "unpacked_double" field.</summary>
     public const int UnpackedDoubleFieldNumber = 101;
     private static readonly pb::FieldCodec<double> _repeated_unpackedDouble_codec
         = pb::FieldCodec.ForDouble(809);
@@ -5070,7 +4869,6 @@ namespace Google.Protobuf.TestProtos {
       get { return unpackedDouble_; }
     }
 
-    /// <summary>Field number for the "unpacked_bool" field.</summary>
     public const int UnpackedBoolFieldNumber = 102;
     private static readonly pb::FieldCodec<bool> _repeated_unpackedBool_codec
         = pb::FieldCodec.ForBool(816);
@@ -5079,7 +4877,6 @@ namespace Google.Protobuf.TestProtos {
       get { return unpackedBool_; }
     }
 
-    /// <summary>Field number for the "unpacked_enum" field.</summary>
     public const int UnpackedEnumFieldNumber = 103;
     private static readonly pb::FieldCodec<global::Google.Protobuf.TestProtos.ForeignEnum> _repeated_unpackedEnum_codec
         = pb::FieldCodec.ForEnum(824, x => (int) x, x => (global::Google.Protobuf.TestProtos.ForeignEnum) x);
@@ -5310,45 +5107,30 @@ namespace Google.Protobuf.TestProtos {
       return new TestRepeatedScalarDifferentTagSizes(this);
     }
 
-    /// <summary>Field number for the "repeated_fixed32" field.</summary>
     public const int RepeatedFixed32FieldNumber = 12;
     private static readonly pb::FieldCodec<uint> _repeated_repeatedFixed32_codec
         = pb::FieldCodec.ForFixed32(98);
     private readonly pbc::RepeatedField<uint> repeatedFixed32_ = new pbc::RepeatedField<uint>();
-    /// <summary>
-    ///  Parsing repeated fixed size values used to fail. This message needs to be
-    ///  used in order to get a tag of the right size; all of the repeated fields
-    ///  in TestAllTypes didn't trigger the check.
-    /// </summary>
     public pbc::RepeatedField<uint> RepeatedFixed32 {
       get { return repeatedFixed32_; }
     }
 
-    /// <summary>Field number for the "repeated_int32" field.</summary>
     public const int RepeatedInt32FieldNumber = 13;
     private static readonly pb::FieldCodec<int> _repeated_repeatedInt32_codec
         = pb::FieldCodec.ForInt32(106);
     private readonly pbc::RepeatedField<int> repeatedInt32_ = new pbc::RepeatedField<int>();
-    /// <summary>
-    ///  Check for a varint type, just for good measure.
-    /// </summary>
     public pbc::RepeatedField<int> RepeatedInt32 {
       get { return repeatedInt32_; }
     }
 
-    /// <summary>Field number for the "repeated_fixed64" field.</summary>
     public const int RepeatedFixed64FieldNumber = 2046;
     private static readonly pb::FieldCodec<ulong> _repeated_repeatedFixed64_codec
         = pb::FieldCodec.ForFixed64(16370);
     private readonly pbc::RepeatedField<ulong> repeatedFixed64_ = new pbc::RepeatedField<ulong>();
-    /// <summary>
-    ///  These have two-byte tags.
-    /// </summary>
     public pbc::RepeatedField<ulong> RepeatedFixed64 {
       get { return repeatedFixed64_; }
     }
 
-    /// <summary>Field number for the "repeated_int64" field.</summary>
     public const int RepeatedInt64FieldNumber = 2047;
     private static readonly pb::FieldCodec<long> _repeated_repeatedInt64_codec
         = pb::FieldCodec.ForInt64(16378);
@@ -5357,19 +5139,14 @@ namespace Google.Protobuf.TestProtos {
       get { return repeatedInt64_; }
     }
 
-    /// <summary>Field number for the "repeated_float" field.</summary>
     public const int RepeatedFloatFieldNumber = 262142;
     private static readonly pb::FieldCodec<float> _repeated_repeatedFloat_codec
         = pb::FieldCodec.ForFloat(2097138);
     private readonly pbc::RepeatedField<float> repeatedFloat_ = new pbc::RepeatedField<float>();
-    /// <summary>
-    ///  Three byte tags.
-    /// </summary>
     public pbc::RepeatedField<float> RepeatedFloat {
       get { return repeatedFloat_; }
     }
 
-    /// <summary>Field number for the "repeated_uint64" field.</summary>
     public const int RepeatedUint64FieldNumber = 262143;
     private static readonly pb::FieldCodec<ulong> _repeated_repeatedUint64_codec
         = pb::FieldCodec.ForUInt64(2097146);
@@ -5515,12 +5292,8 @@ namespace Google.Protobuf.TestProtos {
       return new TestCommentInjectionMessage(this);
     }
 
-    /// <summary>Field number for the "a" field.</summary>
     public const int AFieldNumber = 1;
     private string a_ = "";
-    /// <summary>
-    ///  */ &lt;- This should not close the generated doc comment
-    /// </summary>
     public string A {
       get { return a_; }
       set {
@@ -5594,9 +5367,6 @@ namespace Google.Protobuf.TestProtos {
 
   }
 
-  /// <summary>
-  ///  Test that RPC services work.
-  /// </summary>
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
   public sealed partial class FooRequest : pb::IMessage<FooRequest> {
     private static readonly pb::MessageParser<FooRequest> _parser = new pb::MessageParser<FooRequest>(() => new FooRequest());

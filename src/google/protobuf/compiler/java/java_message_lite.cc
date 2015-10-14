@@ -1029,6 +1029,12 @@ GenerateParsingConstructor(io::Printer* printer) {
       "bit_field_name", GetBitFieldName(i));
   }
 
+  if (PreserveUnknownFields(descriptor_)) {
+    printer->Print(
+      "com.google.protobuf.UnknownFieldSetLite.Builder unknownFields =\n"
+      "    com.google.protobuf.UnknownFieldSetLite.newBuilder();\n");
+  }
+
   printer->Print(
       "try {\n");
   printer->Indent();
@@ -1050,10 +1056,13 @@ GenerateParsingConstructor(io::Printer* printer) {
 
   if (PreserveUnknownFields(descriptor_)) {
     if (descriptor_->extension_range_count() > 0) {
+      // Lite runtime directly invokes parseUnknownField to reduce method
+      // counts.
       printer->Print(
         "default: {\n"
-        "  if (!parseUnknownField(getDefaultInstanceForType(),\n"
-        "                         input, extensionRegistry, tag)) {\n"
+        "  if (!parseUnknownField(extensions, getDefaultInstanceForType(),\n"
+        "                         input, unknownFields,\n"
+        "                         extensionRegistry, tag)) {\n"
         "    done = true;\n"  // it's an endgroup tag
         "  }\n"
         "  break;\n"
@@ -1061,7 +1070,8 @@ GenerateParsingConstructor(io::Printer* printer) {
     } else {
       printer->Print(
         "default: {\n"
-        "  if (!parseUnknownField(tag, input)) {\n"
+        "  if (!parseUnknownField(input, unknownFields,\n"
+        "                         extensionRegistry, tag)) {\n"
         "    done = true;\n"  // it's an endgroup tag
         "  }\n"
         "  break;\n"
@@ -1136,8 +1146,16 @@ GenerateParsingConstructor(io::Printer* printer) {
     field_generators_.get(field).GenerateParsingDoneCode(printer);
   }
 
-  printer->Print(
-      "doneParsing();\n");
+  if (PreserveUnknownFields(descriptor_)) {
+    // Make unknown fields immutable.
+    printer->Print("this.unknownFields = unknownFields.build();\n");
+  }
+
+  if (descriptor_->extension_range_count() > 0) {
+    // Make extensions immutable.
+    printer->Print(
+        "makeExtensionsImmutable(extensions);\n");
+  }
 
   printer->Outdent();
   printer->Outdent();

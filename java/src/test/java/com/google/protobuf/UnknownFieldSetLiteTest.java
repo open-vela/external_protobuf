@@ -30,8 +30,6 @@
 
 package com.google.protobuf;
 
-import com.google.protobuf.UnittestLite.TestAllExtensionsLite;
-import com.google.protobuf.UnittestLite.TestAllTypesLite;
 import protobuf_unittest.lite_equals_and_hash.LiteEqualsAndHash;
 import protobuf_unittest.lite_equals_and_hash.LiteEqualsAndHash.Bar;
 import protobuf_unittest.lite_equals_and_hash.LiteEqualsAndHash.Foo;
@@ -54,40 +52,7 @@ public class UnknownFieldSetLiteTest extends TestCase {
         UnknownFieldSetLite.newBuilder()
             .build());
   }
-  
-  public void testBuilderReuse() throws IOException {
-    UnknownFieldSetLite.Builder builder = UnknownFieldSetLite.newBuilder();
-    builder.mergeVarintField(10, 2);
-    builder.build();
 
-    try {
-      builder.build();
-      fail();
-    } catch (UnsupportedOperationException e) {
-      // Expected.
-    }
-
-    try {
-      builder.mergeFieldFrom(0, CodedInputStream.newInstance(new byte[0]));
-      fail();
-    } catch (UnsupportedOperationException e) {
-      // Expected.
-    }
-
-    try {
-      builder.mergeVarintField(5, 1);
-      fail();
-    } catch (UnsupportedOperationException e) {
-      // Expected.
-    }
-  }
-
-  public void testBuilderReuse_empty() {
-    UnknownFieldSetLite.Builder builder = UnknownFieldSetLite.newBuilder();
-    builder.build();
-    builder.build();
-  }
-  
   public void testDefaultInstance() {
     UnknownFieldSetLite unknownFields = UnknownFieldSetLite.getDefaultInstance();
 
@@ -102,10 +67,10 @@ public class UnknownFieldSetLiteTest extends TestCase {
 
     CodedInputStream input = CodedInputStream.newInstance(foo.toByteArray());
 
-    UnknownFieldSetLite instance = UnknownFieldSetLite.newInstance();
-    instance.mergeFieldFrom(input.readTag(), input);
+    UnknownFieldSetLite.Builder builder = UnknownFieldSetLite.newBuilder();
+    builder.mergeFieldFrom(input.readTag(), input);
 
-    assertEquals(foo.toByteString(), toByteString(instance));
+    assertEquals(foo.toByteString(), toByteString(builder.build()));
   }
 
   public void testSerializedSize() throws IOException {
@@ -115,18 +80,18 @@ public class UnknownFieldSetLiteTest extends TestCase {
 
     CodedInputStream input = CodedInputStream.newInstance(foo.toByteArray());
 
-    UnknownFieldSetLite instance = UnknownFieldSetLite.newInstance();
-    instance.mergeFieldFrom(input.readTag(), input);
+    UnknownFieldSetLite.Builder builder = UnknownFieldSetLite.newBuilder();
+    builder.mergeFieldFrom(input.readTag(), input);
 
-    assertEquals(foo.toByteString().size(), instance.getSerializedSize());
+    assertEquals(foo.toByteString().size(), builder.build().getSerializedSize());
   }
 
   public void testMergeVarintField() throws IOException {
-    UnknownFieldSetLite unknownFields = UnknownFieldSetLite.newInstance();
-    unknownFields.mergeVarintField(10, 2);
+    UnknownFieldSetLite.Builder builder = UnknownFieldSetLite.newBuilder();
+    builder.mergeVarintField(10, 2);
 
     CodedInputStream input =
-        CodedInputStream.newInstance(toByteString(unknownFields).toByteArray());
+        CodedInputStream.newInstance(toByteString(builder.build()).toByteArray());
 
     int tag = input.readTag();
     assertEquals(10, WireFormat.getTagFieldNumber(tag));
@@ -136,11 +101,11 @@ public class UnknownFieldSetLiteTest extends TestCase {
   }
 
   public void testMergeVarintField_negative() throws IOException {
-    UnknownFieldSetLite builder = UnknownFieldSetLite.newInstance();
+    UnknownFieldSetLite.Builder builder = UnknownFieldSetLite.newBuilder();
     builder.mergeVarintField(10, -6);
 
     CodedInputStream input =
-        CodedInputStream.newInstance(toByteString(builder).toByteArray());
+        CodedInputStream.newInstance(toByteString(builder.build()).toByteArray());
 
     int tag = input.readTag();
     assertEquals(10, WireFormat.getTagFieldNumber(tag));
@@ -150,11 +115,13 @@ public class UnknownFieldSetLiteTest extends TestCase {
   }
 
   public void testEqualsAndHashCode() {
-    UnknownFieldSetLite unknownFields1 = UnknownFieldSetLite.newInstance();
-    unknownFields1.mergeVarintField(10, 2);
+    UnknownFieldSetLite.Builder builder1 = UnknownFieldSetLite.newBuilder();
+    builder1.mergeVarintField(10, 2);
+    UnknownFieldSetLite unknownFields1 = builder1.build();
 
-    UnknownFieldSetLite unknownFields2 = UnknownFieldSetLite.newInstance();
-    unknownFields2.mergeVarintField(10, 2);
+    UnknownFieldSetLite.Builder builder2 = UnknownFieldSetLite.newBuilder();
+    builder2.mergeVarintField(10, 2);
+    UnknownFieldSetLite unknownFields2 = builder2.build();
 
     assertEquals(unknownFields1, unknownFields2);
     assertEquals(unknownFields1.hashCode(), unknownFields2.hashCode());
@@ -162,11 +129,12 @@ public class UnknownFieldSetLiteTest extends TestCase {
     assertFalse(unknownFields1.hashCode() == UnknownFieldSetLite.getDefaultInstance().hashCode());
   }
 
-  public void testMutableCopyOf() throws IOException {
-    UnknownFieldSetLite unknownFields = UnknownFieldSetLite.newInstance();
-    unknownFields.mergeVarintField(10, 2);
-    unknownFields = UnknownFieldSetLite.mutableCopyOf(unknownFields, unknownFields);
-    unknownFields.checkMutable();
+  public void testConcat() throws IOException {
+    UnknownFieldSetLite.Builder builder = UnknownFieldSetLite.newBuilder();
+    builder.mergeVarintField(10, 2);
+    UnknownFieldSetLite unknownFields = builder.build();
+
+    unknownFields = UnknownFieldSetLite.concat(unknownFields, unknownFields);
 
     CodedInputStream input =
         CodedInputStream.newInstance(toByteString(unknownFields).toByteArray());
@@ -183,13 +151,51 @@ public class UnknownFieldSetLiteTest extends TestCase {
     assertTrue(input.isAtEnd());
   }
 
-  public void testMutableCopyOf_empty() {
-    UnknownFieldSetLite unknownFields = UnknownFieldSetLite.mutableCopyOf(
+  public void testConcat_empty() {
+    UnknownFieldSetLite unknownFields = UnknownFieldSetLite.concat(
         UnknownFieldSetLite.getDefaultInstance(), UnknownFieldSetLite.getDefaultInstance());
-    unknownFields.checkMutable();
 
     assertEquals(0, unknownFields.getSerializedSize());
     assertEquals(ByteString.EMPTY, toByteString(unknownFields));
+  }
+
+  public void testBuilderReuse() throws IOException {
+    UnknownFieldSetLite.Builder builder = UnknownFieldSetLite.newBuilder();
+    builder.mergeVarintField(10, 2);
+    builder.build();
+
+    try {
+      builder.build();
+      fail();
+    } catch (IllegalStateException e) {
+      // Expected.
+    }
+
+    try {
+      builder.mergeFieldFrom(0, CodedInputStream.newInstance(new byte[0]));
+      fail();
+    } catch (IllegalStateException e) {
+      // Expected.
+    }
+
+    try {
+      builder.mergeVarintField(5, 1);
+      fail();
+    } catch (IllegalStateException e) {
+      // Expected.
+    }
+  }
+
+  public void testBuilderReuse_empty() {
+    UnknownFieldSetLite.Builder builder = UnknownFieldSetLite.newBuilder();
+    builder.build();
+
+    try {
+      builder.build();
+      fail();
+    } catch (IllegalStateException e) {
+      // Expected.
+    }
   }
 
   public void testRoundTrips() throws InvalidProtocolBufferException {
@@ -294,64 +300,6 @@ public class UnknownFieldSetLiteTest extends TestCase {
     } catch (InvalidProtocolBufferException e) {
       // Expected.
     }
-  }
-  
-  public void testMakeImmutable() throws Exception {
-    UnknownFieldSetLite unknownFields = UnknownFieldSetLite.newInstance();
-    unknownFields.makeImmutable();
-    
-    try {
-      unknownFields.mergeVarintField(1, 1);
-      fail();
-    } catch (UnsupportedOperationException expected) {}
-    
-    try {
-      unknownFields.mergeLengthDelimitedField(2, ByteString.copyFromUtf8("hello"));
-      fail();
-    } catch (UnsupportedOperationException expected) {}
-    
-    try {
-      unknownFields.mergeFieldFrom(1, CodedInputStream.newInstance(new byte[0]));
-      fail();
-    } catch (UnsupportedOperationException expected) {}
-  }
-  
-  public void testEndToEnd() throws Exception {
-    TestAllTypesLite testAllTypes = TestAllTypesLite.getDefaultInstance();
-    try {
-      testAllTypes.unknownFields.checkMutable();
-      fail();
-    } catch (UnsupportedOperationException expected) {}
-    
-    testAllTypes = TestAllTypesLite.parseFrom(new byte[0]);
-    try {
-      testAllTypes.unknownFields.checkMutable();
-      fail();
-    } catch (UnsupportedOperationException expected) {}
-    
-    testAllTypes = TestAllTypesLite.newBuilder().build();
-    try {
-      testAllTypes.unknownFields.checkMutable();
-      fail();
-    } catch (UnsupportedOperationException expected) {}
-    
-    testAllTypes = TestAllTypesLite.newBuilder()
-        .setDefaultBool(true)
-        .build();
-    try {
-      testAllTypes.unknownFields.checkMutable();
-      fail();
-    } catch (UnsupportedOperationException expected) {}
-    
-    TestAllExtensionsLite testAllExtensions = TestAllExtensionsLite.newBuilder()
-        .mergeFrom(TestAllExtensionsLite.newBuilder()
-            .setExtension(UnittestLite.optionalInt32ExtensionLite, 2)
-            .build().toByteArray())
-        .build();
-    try {
-      testAllExtensions.unknownFields.checkMutable();
-      fail();
-    } catch (UnsupportedOperationException expected) {}
   }
 
   private ByteString toByteString(UnknownFieldSetLite unknownFields) {

@@ -38,13 +38,14 @@ pure-Python protocol compiler.
 import copy
 import gc
 import operator
-import six
 import struct
-
 try:
   import unittest2 as unittest
 except ImportError:
   import unittest
+
+import six
+
 from google.protobuf import unittest_import_pb2
 from google.protobuf import unittest_mset_pb2
 from google.protobuf import unittest_pb2
@@ -1797,6 +1798,7 @@ class ReflectionTest(unittest.TestCase):
     msg = import_test_package.myproto.Outer()
     # Just check the default value.
     self.assertEqual(57, msg.inner.value)
+
 
 #  Since we had so many tests for protocol buffer equality, we broke these out
 #  into separate TestCase classes.

@@ -1,6 +1,5 @@
-﻿#region Copyright notice and license
 // Protocol Buffers - Google's data interchange format
-// Copyright 2015 Google Inc.  All rights reserved.
+// Copyright 2008 Google Inc.  All rights reserved.
 // https://developers.google.com/protocol-buffers/
 //
 // Redistribution and use in source and binary forms, with or without
@@ -28,39 +27,36 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#endregion
 
-using Google.Protobuf.TestProtos;
-using NUnit.Framework;
+// Definitions of protos for testing cross-version compatibility.  The
+// UpRevision message acts as if it were a newer version of the DownRevision
+// message.  That is, UpRevision shares all the same fields as DownRevision,
+// but UpRevision can add fields and add enum values.
+syntax = "proto2";
 
-namespace Google.Protobuf.WellKnownTypes
-{
-    public class AnyTest
-    {
-        [Test]
-        public void Pack()
-        {
-            var message = SampleMessages.CreateFullTestAllTypes();
-            var any = Any.Pack(message);
-            Assert.AreEqual("type.googleapis.com/protobuf_unittest.TestAllTypes", any.TypeUrl);
-            Assert.AreEqual(message.CalculateSize(), any.Value.Length);
-        }
+package google.protobuf.util;
 
-        [Test]
-        public void Unpack_WrongType()
-        {
-            var message = SampleMessages.CreateFullTestAllTypes();
-            var any = Any.Pack(message);
-            Assert.Throws<InvalidProtocolBufferException>(() => any.Unpack<TestOneof>());
-        }
+option csharp_namespace = "Google.ProtocolBuffers.TestProtos";
 
-        [Test]
-        public void Unpack_Success()
-        {
-            var message = SampleMessages.CreateFullTestAllTypes();
-            var any = Any.Pack(message);
-            var unpacked = any.Unpack<TestAllTypes>();
-            Assert.AreEqual(message, unpacked);
-        }
-    }
+message DownRevision {
+  enum Enum {
+    DEFAULT_VALUE = 2;
+    NONDEFAULT_VALUE = 3;
+  }
+
+  optional Enum value = 1 [default = DEFAULT_VALUE];
+  repeated Enum values = 2;
+}
+
+message UpRevision {
+  enum Enum {
+    DEFAULT_VALUE = 2;
+    NONDEFAULT_VALUE = 3;
+    NEW_VALUE = 4;
+    NEW_VALUE_2 = 5;
+    NEW_VALUE_3 = 6;
+  }
+
+  optional Enum value = 1 [default = DEFAULT_VALUE];
+  repeated Enum values = 2;
 }

@@ -82,7 +82,6 @@
 
 namespace google {
 namespace protobuf {
-using internal::NewPermanentCallback;
 namespace compiler {
 namespace cpp {
 

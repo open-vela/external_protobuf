@@ -35,10 +35,11 @@ if [ -z "$PROTOC" ]; then
   fi
 fi
 
-# descriptor.proto and well-known types
-$PROTOC -Isrc --csharp_out=csharp/src/Google.Protobuf \
-    --csharp_opt=base_namespace=Google.Protobuf \
-    src/google/protobuf/descriptor.proto \
+# Descriptor proto
+$PROTOC -Isrc --csharp_out=csharp/src/Google.Protobuf/Reflection \
+    src/google/protobuf/descriptor.proto
+
+$PROTOC -Isrc --csharp_out=csharp/src/Google.Protobuf/WellKnownTypes \
     src/google/protobuf/any.proto \
     src/google/protobuf/api.proto \
     src/google/protobuf/duration.proto \
@@ -50,18 +51,15 @@ $PROTOC -Isrc --csharp_out=csharp/src/Google.Protobuf \
     src/google/protobuf/type.proto \
     src/google/protobuf/wrappers.proto
 
-# Test protos where the namespace matches the target location
-$PROTOC -Isrc --csharp_out=csharp/src/Google.Protobuf.Test \
-    --csharp_opt=base_namespace=Google.Protobuf \
+$PROTOC -Isrc --csharp_out=csharp/src/Google.Protobuf.Test/TestProtos \
     src/google/protobuf/map_unittest_proto3.proto \
     src/google/protobuf/unittest_proto3.proto \
     src/google/protobuf/unittest_import_proto3.proto \
     src/google/protobuf/unittest_import_public_proto3.proto \
     src/google/protobuf/unittest_well_known_types.proto
 
-# Different base namespace to the protos above
-$PROTOC -Icsharp/protos --csharp_out=csharp/src/Google.Protobuf.Test \
-    --csharp_opt=base_namespace=UnitTest.Issues \
+
+$PROTOC -Icsharp/protos --csharp_out=csharp/src/Google.Protobuf.Test/TestProtos \
     csharp/protos/unittest_issues.proto
 
 # AddressBook sample protos

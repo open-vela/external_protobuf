@@ -170,7 +170,7 @@ namespace Google.Protobuf
                     continue;
                 }
                 // Omit awkward (single) values such as unknown enum values
-                if (!field.IsRepeated && !field.IsMap && !CanWriteSingleValue(value))
+                if (!field.IsRepeated && !field.IsMap && !CanWriteSingleValue(accessor.Descriptor, value))
                 {
                     continue;
                 }
@@ -182,7 +182,7 @@ namespace Google.Protobuf
                 }
                 WriteString(builder, ToCamelCase(accessor.Descriptor.Name));
                 builder.Append(": ");
-                WriteValue(builder, value);
+                WriteValue(builder, accessor, value);
                 first = false;
             }            
             builder.Append(first ? "}" : " }");
@@ -291,81 +291,93 @@ namespace Google.Protobuf
                     throw new ArgumentException("Invalid field type");
             }
         }
-        
-        private void WriteValue(StringBuilder builder, object value)
+
+        private void WriteValue(StringBuilder builder, IFieldAccessor accessor, object value)
         {
-            if (value == null)
+            if (accessor.Descriptor.IsMap)
             {
-                WriteNull(builder);
+                WriteDictionary(builder, accessor, (IDictionary) value);
             }
-            else if (value is bool)
+            else if (accessor.Descriptor.IsRepeated)
             {
-                builder.Append((bool) value ? "true" : "false");
-            }
-            else if (value is ByteString)
-            {
-                // Nothing in Base64 needs escaping
-                builder.Append('"');
-                builder.Append(((ByteString) value).ToBase64());
-                builder.Append('"');
-            }
-            else if (value is string)
-            {
-                WriteString(builder, (string) value);
-            }
-            else if (value is IDictionary)
-            {
-                WriteDictionary(builder, (IDictionary) value);
-            }
-            else if (value is IList)
-            {
-                WriteList(builder, (IList) value);
-            }
-            else if (value is int || value is uint)
-            {
-                IFormattable formattable = (IFormattable) value;
-                builder.Append(formattable.ToString("d", CultureInfo.InvariantCulture));
-            }
-            else if (value is long || value is ulong)
-            {
-                builder.Append('"');
-                IFormattable formattable = (IFormattable) value;
-                builder.Append(formattable.ToString("d", CultureInfo.InvariantCulture));
-                builder.Append('"');
-            }
-            else if (value is System.Enum)
-            {
-                WriteString(builder, value.ToString());
-            }
-            else if (value is float || value is double)
-            {
-                string text = ((IFormattable) value).ToString("r", CultureInfo.InvariantCulture);
-                if (text == "NaN" || text == "Infinity" || text == "-Infinity")
-                {
-                    builder.Append('"');
-                    builder.Append(text);
-                    builder.Append('"');
-                }
-                else
-                {
-                    builder.Append(text);
-                }
-            }
-            else if (value is IMessage)
-            {
-                IMessage message = (IMessage) value;
-                if (message.Descriptor.IsWellKnownType)
-                {
-                    WriteWellKnownTypeValue(builder, message.Descriptor, value, true);
-                }
-                else
-                {
-                    WriteMessage(builder, (IMessage) value);
-                }
+                WriteList(builder, accessor, (IList) value);
             }
             else
             {
-                throw new ArgumentException("Unable to format value of type " + value.GetType());
+                WriteSingleValue(builder, accessor.Descriptor, value);
+            }
+        }
+
+        private void WriteSingleValue(StringBuilder builder, FieldDescriptor descriptor, object value)
+        {
+            switch (descriptor.FieldType)
+            {
+                case FieldType.Bool:
+                    builder.Append((bool) value ? "true" : "false");
+                    break;
+                case FieldType.Bytes:
+                    // Nothing in Base64 needs escaping
+                    builder.Append('"');
+                    builder.Append(((ByteString) value).ToBase64());
+                    builder.Append('"');
+                    break;
+                case FieldType.String:
+                    WriteString(builder, (string) value);
+                    break;
+                case FieldType.Fixed32:
+                case FieldType.UInt32:
+                case FieldType.SInt32:
+                case FieldType.Int32:
+                case FieldType.SFixed32:
+                    {
+                        IFormattable formattable = (IFormattable) value;
+                        builder.Append(formattable.ToString("d", CultureInfo.InvariantCulture));
+                        break;
+                    }
+                case FieldType.Enum:
+                    EnumValueDescriptor enumValue = descriptor.EnumType.FindValueByNumber((int) value);
+                    // We will already have validated that this is a known value.
+                    WriteString(builder, enumValue.Name);
+                    break;
+                case FieldType.Fixed64:
+                case FieldType.UInt64:
+                case FieldType.SFixed64:
+                case FieldType.Int64:
+                case FieldType.SInt64:
+                    {
+                        builder.Append('"');
+                        IFormattable formattable = (IFormattable) value;
+                        builder.Append(formattable.ToString("d", CultureInfo.InvariantCulture));
+                        builder.Append('"');
+                        break;
+                    }
+                case FieldType.Double:
+                case FieldType.Float:
+                    string text = ((IFormattable) value).ToString("r", CultureInfo.InvariantCulture);
+                    if (text == "NaN" || text == "Infinity" || text == "-Infinity")
+                    {
+                        builder.Append('"');
+                        builder.Append(text);
+                        builder.Append('"');
+                    }
+                    else
+                    {
+                        builder.Append(text);
+                    }
+                    break;
+                case FieldType.Message:
+                case FieldType.Group: // Never expect to get this, but...
+                    if (descriptor.MessageType.IsWellKnownType)
+                    {
+                        WriteWellKnownTypeValue(builder, descriptor.MessageType, value, true);
+                    }
+                    else
+                    {
+                        WriteMessage(builder, (IMessage) value);
+                    }
+                    break;
+                default:
+                    throw new ArgumentException("Invalid field type: " + descriptor.FieldType);
             }
         }
 
@@ -386,7 +398,7 @@ namespace Google.Protobuf
             // so we can write it as if we were unconditionally writing the Value field for the wrapper type.
             if (descriptor.File == Int32Value.Descriptor.File)
             {
-                WriteValue(builder, value);
+                WriteSingleValue(builder, descriptor.FindFieldByNumber(1), value);
                 return;
             }
             if (descriptor.FullName == Timestamp.Descriptor.FullName)
@@ -412,7 +424,7 @@ namespace Google.Protobuf
             if (descriptor.FullName == ListValue.Descriptor.FullName)
             {
                 var fieldAccessor = descriptor.Fields[ListValue.ValuesFieldNumber].Accessor;
-                WriteList(builder, (IList) fieldAccessor.GetValue((IMessage) value));
+                WriteList(builder, fieldAccessor, (IList) fieldAccessor.GetValue((IMessage) value));
                 return;
             }
             if (descriptor.FullName == Value.Descriptor.FullName)
@@ -553,7 +565,7 @@ namespace Google.Protobuf
                 case Value.BoolValueFieldNumber:
                 case Value.StringValueFieldNumber:
                 case Value.NumberValueFieldNumber:
-                    WriteValue(builder, value);
+                    WriteSingleValue(builder, specifiedField, value);
                     return;
                 case Value.StructValueFieldNumber:
                 case Value.ListValueFieldNumber:
@@ -569,13 +581,13 @@ namespace Google.Protobuf
             }
         }
 
-        internal void WriteList(StringBuilder builder, IList list)
+        private void WriteList(StringBuilder builder, IFieldAccessor accessor, IList list)
         {
             builder.Append("[ ");
             bool first = true;
             foreach (var value in list)
             {
-                if (!CanWriteSingleValue(value))
+                if (!CanWriteSingleValue(accessor.Descriptor, value))
                 {
                     continue;
                 }
@@ -583,20 +595,22 @@ namespace Google.Protobuf
                 {
                     builder.Append(", ");
                 }
-                WriteValue(builder, value);
+                WriteSingleValue(builder, accessor.Descriptor, value);
                 first = false;
             }
             builder.Append(first ? "]" : " ]");
         }
 
-        internal void WriteDictionary(StringBuilder builder, IDictionary dictionary)
+        private void WriteDictionary(StringBuilder builder, IFieldAccessor accessor, IDictionary dictionary)
         {
             builder.Append("{ ");
             bool first = true;
+            FieldDescriptor keyType = accessor.Descriptor.MessageType.FindFieldByNumber(1);
+            FieldDescriptor valueType = accessor.Descriptor.MessageType.FindFieldByNumber(2);
             // This will box each pair. Could use IDictionaryEnumerator, but that's ugly in terms of disposal.
             foreach (DictionaryEntry pair in dictionary)
             {
-                if (!CanWriteSingleValue(pair.Value))
+                if (!CanWriteSingleValue(valueType, pair.Value))
                 {
                     continue;
                 }
@@ -605,29 +619,32 @@ namespace Google.Protobuf
                     builder.Append(", ");
                 }
                 string keyText;
-                if (pair.Key is string)
+                switch (keyType.FieldType)
                 {
-                    keyText = (string) pair.Key;
-                }
-                else if (pair.Key is bool)
-                {
-                    keyText = (bool) pair.Key ? "true" : "false";
-                }
-                else if (pair.Key is int || pair.Key is uint | pair.Key is long || pair.Key is ulong)
-                {
-                    keyText = ((IFormattable) pair.Key).ToString("d", CultureInfo.InvariantCulture);
-                }
-                else
-                {
-                    if (pair.Key == null)
-                    {
-                        throw new ArgumentException("Dictionary has entry with null key");
-                    }
-                    throw new ArgumentException("Unhandled dictionary key type: " + pair.Key.GetType());
+                    case FieldType.String:
+                        keyText = (string) pair.Key;
+                        break;
+                    case FieldType.Bool:
+                        keyText = (bool) pair.Key ? "true" : "false";
+                        break;
+                    case FieldType.Fixed32:
+                    case FieldType.Fixed64:
+                    case FieldType.SFixed32:
+                    case FieldType.SFixed64:
+                    case FieldType.Int32:
+                    case FieldType.Int64:
+                    case FieldType.SInt32:
+                    case FieldType.SInt64:
+                    case FieldType.UInt32:
+                    case FieldType.UInt64:
+                        keyText = ((IFormattable) pair.Key).ToString("d", CultureInfo.InvariantCulture);
+                        break;
+                    default:
+                        throw new ArgumentException("Invalid key type: " + keyType.FieldType);
                 }
                 WriteString(builder, keyText);
                 builder.Append(": ");
-                WriteValue(builder, pair.Value);
+                WriteSingleValue(builder, valueType, pair.Value);
                 first = false;
             }
             builder.Append(first ? "}" : " }");
@@ -638,11 +655,12 @@ namespace Google.Protobuf
         /// Currently only relevant for enums, where unknown values can't be represented.
         /// For repeated/map fields, this always returns true.
         /// </summary>
-        private bool CanWriteSingleValue(object value)
+        private bool CanWriteSingleValue(FieldDescriptor descriptor, object value)
         {
-            if (value is System.Enum)
+            if (descriptor.FieldType == FieldType.Enum)
             {
-                return System.Enum.IsDefined(value.GetType(), value);
+                EnumValueDescriptor enumValue = descriptor.EnumType.FindValueByNumber((int) value);
+                return enumValue != null;
             }
             return true;
         }
