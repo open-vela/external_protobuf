@@ -18,6 +18,8 @@ COPTS = [
 # Bazel should provide portable link_opts for pthread.
 LINK_OPTS = ["-lpthread"]
 
+load("protobuf", "cc_proto_library")
+
 cc_library(
     name = "protobuf_lite",
     srcs = [
@@ -140,6 +142,14 @@ WELL_KNOWN_PROTOS = [
     "google/protobuf/wrappers.proto",
 ]
 
+cc_proto_library(
+    name = "cc_wkt_protos",
+    srcs = ["src/" + s for s in WELL_KNOWN_PROTOS],
+    internal_bootstrap_hack = 1,
+    prefix = "src",
+    deps = ":protobuf",
+)
+
 ################################################################################
 # Protocol Buffers Compiler
 ################################################################################
@@ -163,6 +173,7 @@ cc_library(
         "src/google/protobuf/compiler/cpp/cpp_primitive_field.cc",
         "src/google/protobuf/compiler/cpp/cpp_service.cc",
         "src/google/protobuf/compiler/cpp/cpp_string_field.cc",
+        "src/google/protobuf/compiler/csharp/csharp_doc_comment.cc",
         "src/google/protobuf/compiler/csharp/csharp_enum.cc",
         "src/google/protobuf/compiler/csharp/csharp_enum_field.cc",
         "src/google/protobuf/compiler/csharp/csharp_field_base.cc",
@@ -253,6 +264,27 @@ cc_binary(
 )
 
 ################################################################################
+# Java support
+################################################################################
+genrule(
+    name = "generate_java_descriptor_proto",
+    srcs = ["src/google/protobuf/descriptor.proto"],
+    outs = ["com/google/protobuf/DescriptorProtos.java"],
+    cmd = "$(location :protoc) --java_out=$(@D)/../../.. $<",
+    tools = [":protoc"],
+)
+
+java_library(
+    name = "java_proto",
+    srcs = glob([
+        "java/src/main/java/com/google/protobuf/*.java",
+    ]) + [
+        ":generate_java_descriptor_proto",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+################################################################################
 # Tests
 ################################################################################
 
@@ -305,22 +337,11 @@ TEST_PROTOS = [
     "google/protobuf/util/json_format_proto3.proto",
 ]
 
-PROTOS = LITE_TEST_PROTOS + TEST_PROTOS
-
-INPUTS = PROTOS + WELL_KNOWN_PROTOS
-
-OUTPUTS = ["src/" + x[:-5] + "pb.h" for x in PROTOS] + \
-          ["src/" + x[:-5] + "pb.cc" for x in PROTOS]
-
-genrule(
-    name = "gen_test_protos",
-    srcs = ["src/" + x for x in INPUTS],
-    outs = OUTPUTS,
-    cmd =
-        "$(location :protoc) --cpp_out=$(@D)/src" +
-        "".join([" -I" + x + "=$(location src/" + x + ")" for x in INPUTS]) +
-        "".join([" $(location src/" + x + ")" for x in PROTOS]),
-    tools = [":protoc"],
+cc_proto_library(
+    name = "cc_test_protos",
+    srcs = ["src/" + s for s in (LITE_TEST_PROTOS + TEST_PROTOS)],
+    prefix = "src",
+    proto_deps = [":cc_wkt_protos"],
 )
 
 COMMON_TEST_SRCS = [
@@ -349,7 +370,7 @@ cc_binary(
 
 cc_test(
     name = "protobuf_test",
-    srcs = OUTPUTS + COMMON_TEST_SRCS + [
+    srcs = COMMON_TEST_SRCS + [
         # AUTOGEN(test_srcs)
         "src/google/protobuf/any_test.cc",
         "src/google/protobuf/arena_unittest.cc",
@@ -426,7 +447,7 @@ cc_test(
     deps = [
         ":protobuf",
         ":protoc_lib",
+        ":cc_test_protos",
         "//external:gtest_main",
     ],
 )
-

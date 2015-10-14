@@ -28,33 +28,24 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <google/protobuf/util/proto_cast.h>
 
-#include <google/protobuf/util/unknown_enum_test.pb.h>
-#include <gtest/gtest.h>
-#include <gmock/gmock.h>
+#ifndef GOOGLE_PROTOBUF_COMPILER_CSHARP_DOC_COMMENT_H__
+#define GOOGLE_PROTOBUF_COMPILER_CSHARP_DOC_COMMENT_H__
+
+#include <google/protobuf/io/printer.h>
+#include <google/protobuf/descriptor.h>
 
 namespace google {
-using google::protobuf::util::UpRevision;
-using google::protobuf::util::DownRevision;
-
-namespace {
-
-TEST(ProtoCastTest, V2KnownValue) {
-  UpRevision sender;
-  sender.set_value(UpRevision::NONDEFAULT_VALUE);
-
-  DownRevision receiver = proto_cast<DownRevision>(sender);
-  ASSERT_EQ(DownRevision::NONDEFAULT_VALUE, receiver.value());
-}
-
-TEST(ProtoCastTest, V2UnknownValue) {
-  UpRevision sender;
-  sender.set_value(UpRevision::NEW_VALUE);
-
-  DownRevision receiver = proto_cast<DownRevision>(sender);
-  ASSERT_EQ(DownRevision::DEFAULT_VALUE, receiver.value());
-}
-
-}  // namespace
+namespace protobuf {
+namespace compiler {
+namespace csharp {
+    void WriteMessageDocComment(io::Printer* printer, const Descriptor* message);
+    void WritePropertyDocComment(io::Printer* printer, const FieldDescriptor* field);
+    void WriteEnumDocComment(io::Printer* printer, const EnumDescriptor* enumDescriptor);
+    void WriteEnumValueDocComment(io::Printer* printer, const EnumValueDescriptor* value);
+    void WriteMethodDocComment(io::Printer* printer, const MethodDescriptor* method);
+}  // namespace csharp
+}  // namespace compiler
+}  // namespace protobuf
 }  // namespace google
+#endif  // GOOGLE_PROTOBUF_COMPILER_CSHARP_DOC_COMMENT_H__
