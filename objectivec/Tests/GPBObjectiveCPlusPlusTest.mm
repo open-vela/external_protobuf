@@ -1,5 +1,5 @@
 // Protocol Buffers - Google's data interchange format
-// Copyright 2008 Google Inc.  All rights reserved.
+// Copyright 2013 Google Inc.  All rights reserved.
 // https://developers.google.com/protocol-buffers/
 //
 // Redistribution and use in source and binary forms, with or without
@@ -28,32 +28,42 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef GOOGLE_PROTOBUF_UTIL_PROTO_CAST_H__
-#define GOOGLE_PROTOBUF_UTIL_PROTO_CAST_H__
 
-#include <string>
+#import "GPBTestUtilities.h"
 
-#include <google/protobuf/stubs/logging.h>
-#include <google/protobuf/stubs/common.h>
 
-// proto_cast<> is used to simulate over-the-wire conversion of one
-// proto message into another.  This is primarily useful for unit tests
-// which validate the version-compatibility semantics of protobufs.
-// Usage is similar to C++-style typecasts:
 //
-// OldMessage old_message = /*...*/;
-// NewMessage new_message = proto_cast<NewMessage>(old_message);
-namespace google {
-template<typename NewProto,
-         typename OldProto>
-NewProto proto_cast(const OldProto& old_proto) {
-  string wire_format;
-  GOOGLE_CHECK(old_proto.SerializeToString(&wire_format));
+// This is just a compile test (here to make sure things never regress).
+//
+// Objective C++ can run into issues with how the NS_ENUM/CF_ENUM declartion
+// works because of the C++ spec being used for that compilation unit. So
+// the fact that these imports all work without errors/warning means things
+// are still good.
+//
+// The "well know types" should have cross file enums needing imports.
+#import "GPBProtocolBuffers.h"
+// Some of the tests explicitly use cross file enums also.
+#import "google/protobuf/Unittest.pbobjc.h"
+#import "google/protobuf/UnittestImport.pbobjc.h"
 
-  NewProto new_proto;
-  GOOGLE_CHECK(new_proto.ParseFromString(wire_format));
-  return new_proto;
+// Sanity check the conditions of the test within the Xcode project.
+#if !__cplusplus
+  #error This isn't compiled as Objective C++?
+#elif __cplusplus >= 201103L
+  // If this trips, it means the Xcode default might have change (or someone
+  // edited the testing project) and it might be time to revisit the GPB_ENUM
+  // define in GPBBootstrap.h.
+  #warning Did the Xcode default for C++ spec change?
+#endif
+
+
+// Dummy XCTest.
+@interface GPBObjectiveCPlusPlusTests : GPBTestCase
+@end
+
+@implementation GPBObjectiveCPlusPlusTests
+- (void)testCPlusPlus {
+  // Nothing, This was a compile test.
+  XCTAssertTrue(YES);
 }
-
-}  // namespace google
-#endif  // GOOGLE_PROTOBUF_UTIL_PROTO_CAST_H__
+@end

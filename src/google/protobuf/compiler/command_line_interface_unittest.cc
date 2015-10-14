@@ -63,13 +63,13 @@
 #include <google/protobuf/testing/googletest.h>
 #include <gtest/gtest.h>
 
-namespace google {
-namespace protobuf {
-namespace compiler {
 
 // Disable the whole test when we use tcmalloc for "draconian" heap checks, in
 // which case tcmalloc will print warnings that fail the plugin tests.
 #if !GOOGLE_PROTOBUF_HEAP_CHECK_DRACONIAN
+namespace google {
+namespace protobuf {
+namespace compiler {
 
 #if defined(_WIN32)
 #ifndef STDIN_FILENO
@@ -294,10 +294,6 @@ void CommandLineInterfaceTest::Run(const string& command) {
   if (!disallow_plugins_) {
     cli_.AllowPlugins("prefix-");
 #ifndef GOOGLE_THIRD_PARTY_PROTOBUF
-    string plugin_path;
-#ifdef GOOGLE_PROTOBUF_TEST_PLUGIN_PATH
-    plugin_path = GOOGLE_PROTOBUF_TEST_PLUGIN_PATH;
-#else
     const char* possible_paths[] = {
       // When building with shared libraries, libtool hides the real executable
       // in .libs and puts a fake wrapper in the current directory.
@@ -315,13 +311,15 @@ void CommandLineInterfaceTest::Run(const string& command) {
       "test_plugin.exe",        // Other Win32 (MSVC)
       "test_plugin",            // Unix
     };
+
+    string plugin_path;
+
     for (int i = 0; i < GOOGLE_ARRAYSIZE(possible_paths); i++) {
       if (access(possible_paths[i], F_OK) == 0) {
         plugin_path = possible_paths[i];
         break;
       }
     }
-#endif
 
     if (plugin_path.empty()) {
 #else
@@ -1802,8 +1800,8 @@ TEST_F(EncodeDecodeTest, ProtoParseError) {
 
 }  // anonymous namespace
 
-#endif  // !GOOGLE_PROTOBUF_HEAP_CHECK_DRACONIAN
-
 }  // namespace compiler
 }  // namespace protobuf
+
+#endif  // !GOOGLE_PROTOBUF_HEAP_CHECK_DRACONIAN
 }  // namespace google
