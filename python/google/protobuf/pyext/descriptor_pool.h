@@ -89,10 +89,12 @@ const Descriptor* FindMessageTypeByName(PyDescriptorPool* self,
                                         const string& name);
 
 // Registers a new Python class for the given message descriptor.
-// On error, returns -1 with a Python exception set.
-int RegisterMessageClass(PyDescriptorPool* self,
-                         const Descriptor* message_descriptor,
-                         PyObject* message_class);
+// Returns the message Descriptor.
+// On error, returns NULL with a Python exception set.
+const Descriptor* RegisterMessageClass(
+    PyDescriptorPool* self, PyObject* message_class, PyObject* descriptor);
+
+// The function below are also exposed as methods of the DescriptorPool type.
 
 // Retrieves the Python class registered with the given message descriptor.
 //
@@ -100,8 +102,6 @@ int RegisterMessageClass(PyDescriptorPool* self,
 // exception set.
 PyObject* GetMessageClass(PyDescriptorPool* self,
                           const Descriptor* message_descriptor);
-
-// The functions below are also exposed as methods of the DescriptorPool type.
 
 // Looks up a message by name. Returns a PyMessageDescriptor corresponding to
 // the field on success, or NULL on failure.
@@ -136,9 +136,8 @@ PyObject* FindOneofByName(PyDescriptorPool* self, PyObject* arg);
 }  // namespace cdescriptor_pool
 
 // Retrieve the global descriptor pool owned by the _message module.
-// This is the one used by pb2.py generated modules.
 // Returns a *borrowed* reference.
-PyDescriptorPool* GetDefaultDescriptorPool();
+PyDescriptorPool* GetDescriptorPool();
 
 // Retrieve the python descriptor pool owning a C++ descriptor pool.
 // Returns a *borrowed* reference.

@@ -223,7 +223,8 @@ static PyObject* GetOrBuildOptions(const DescriptorClass *descriptor) {
     options.SerializeToString(&serialized);
     io::CodedInputStream input(
         reinterpret_cast<const uint8*>(serialized.c_str()), serialized.size());
-    input.SetExtensionRegistry(pool->pool, pool->message_factory);
+    input.SetExtensionRegistry(pool->pool,
+                               GetDescriptorPool()->message_factory);
     bool success = cmsg->message->MergePartialFromCodedStream(&input);
     if (!success) {
       PyErr_Format(PyExc_ValueError, "Error parsing Options message");
@@ -413,25 +414,14 @@ static PyObject* GetFile(PyBaseDescriptor *self, void *closure) {
 }
 
 static PyObject* GetConcreteClass(PyBaseDescriptor* self, void *closure) {
-  // Retuns the canonical class for the given descriptor.
-  // This is the class that was registered with the primary descriptor pool
-  // which contains this descriptor.
-  // This might not be the one you expect! For example the returned object does
-  // not know about extensions defined in a custom pool.
   PyObject* concrete_class(cdescriptor_pool::GetMessageClass(
-      GetDescriptorPool_FromPool(_GetDescriptor(self)->file()->pool()),
-      _GetDescriptor(self)));
+      GetDescriptorPool(), _GetDescriptor(self)));
   Py_XINCREF(concrete_class);
   return concrete_class;
 }
 
 static PyObject* GetFieldsByName(PyBaseDescriptor* self, void *closure) {
   return NewMessageFieldsByName(_GetDescriptor(self));
-}
-
-static PyObject* GetFieldsByCamelcaseName(PyBaseDescriptor* self,
-                                          void *closure) {
-  return NewMessageFieldsByCamelcaseName(_GetDescriptor(self));
 }
 
 static PyObject* GetFieldsByNumber(PyBaseDescriptor* self, void *closure) {
@@ -574,8 +564,6 @@ static PyGetSetDef Getters[] = {
 
   { "fields", (getter)GetFieldsSeq, NULL, "Fields sequence"},
   { "fields_by_name", (getter)GetFieldsByName, NULL, "Fields by name"},
-  { "fields_by_camelcase_name", (getter)GetFieldsByCamelcaseName, NULL,
-    "Fields by camelCase name"},
   { "fields_by_number", (getter)GetFieldsByNumber, NULL, "Fields by number"},
   { "nested_types", (getter)GetNestedTypesSeq, NULL, "Nested types sequence"},
   { "nested_types_by_name", (getter)GetNestedTypesByName, NULL,
@@ -672,10 +660,6 @@ static PyObject* GetFullName(PyBaseDescriptor* self, void *closure) {
 
 static PyObject* GetName(PyBaseDescriptor *self, void *closure) {
   return PyString_FromCppString(_GetDescriptor(self)->name());
-}
-
-static PyObject* GetCamelcaseName(PyBaseDescriptor* self, void *closure) {
-  return PyString_FromCppString(_GetDescriptor(self)->camelcase_name());
 }
 
 static PyObject* GetType(PyBaseDescriptor *self, void *closure) {
@@ -866,7 +850,6 @@ static int SetOptions(PyBaseDescriptor *self, PyObject *value,
 static PyGetSetDef Getters[] = {
   { "full_name", (getter)GetFullName, NULL, "Full name"},
   { "name", (getter)GetName, NULL, "Unqualified name"},
-  { "camelcase_name", (getter)GetCamelcaseName, NULL, "Camelcase name"},
   { "type", (getter)GetType, NULL, "C++ Type"},
   { "cpp_type", (getter)GetCppType, NULL, "C++ Type"},
   { "label", (getter)GetLabel, NULL, "Label"},
@@ -1085,15 +1068,6 @@ PyObject* PyEnumDescriptor_FromDescriptor(
     const EnumDescriptor* enum_descriptor) {
   return descriptor::NewInternedDescriptor(
       &PyEnumDescriptor_Type, enum_descriptor, NULL);
-}
-
-const EnumDescriptor* PyEnumDescriptor_AsDescriptor(PyObject* obj) {
-  if (!PyObject_TypeCheck(obj, &PyEnumDescriptor_Type)) {
-    PyErr_SetString(PyExc_TypeError, "Not an EnumDescriptor");
-    return NULL;
-  }
-  return reinterpret_cast<const EnumDescriptor*>(
-      reinterpret_cast<PyBaseDescriptor*>(obj)->descriptor);
 }
 
 namespace enumvalue_descriptor {
@@ -1383,15 +1357,6 @@ PyObject* PyFileDescriptor_FromDescriptorWithSerializedPb(
   // is the same as before.
 
   return py_descriptor;
-}
-
-const FileDescriptor* PyFileDescriptor_AsDescriptor(PyObject* obj) {
-  if (!PyObject_TypeCheck(obj, &PyFileDescriptor_Type)) {
-    PyErr_SetString(PyExc_TypeError, "Not a FileDescriptor");
-    return NULL;
-  }
-  return reinterpret_cast<const FileDescriptor*>(
-      reinterpret_cast<PyBaseDescriptor*>(obj)->descriptor);
 }
 
 namespace oneof_descriptor {

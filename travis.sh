@@ -113,14 +113,12 @@ build_javanano_oracle7() {
 
 internal_install_python_deps() {
   sudo pip install tox
-  # Only install Python2.6/3.x on Linux.
+  # Only install Python2.6 on Linux.
   if [ $(uname -s) == "Linux" ]; then
     sudo apt-get install -y python-software-properties # for apt-add-repository
     sudo apt-add-repository -y ppa:fkrull/deadsnakes
     sudo apt-get update -qq
     sudo apt-get install -y python2.6 python2.6-dev
-    sudo apt-get install -y python3.3 python3.3-dev
-    sudo apt-get install -y python3.4 python3.4-dev
   fi
 }
 
@@ -129,10 +127,9 @@ build_python() {
   internal_build_cpp
   internal_install_python_deps
   cd python
-  # Only test Python 2.6/3.x on Linux
+  # Only test Python 2.6 on Linux
   if [ $(uname -s) == "Linux" ]; then
-    # py26 is currently disabled due to json_format
-    envlist=py\{27,33,34\}-python
+    envlist=py26-python,py27-python
   else
     envlist=py27-python
   fi
@@ -146,10 +143,9 @@ build_python_cpp() {
   export LD_LIBRARY_PATH=../src/.libs # for Linux
   export DYLD_LIBRARY_PATH=../src/.libs # for OS X
   cd python
-  # Only test Python 2.6/3.x on Linux
+  # Only test Python 2.6 on Linux
   if [ $(uname -s) == "Linux" ]; then
-    # py26 is currently disabled due to json_format
-    envlist=py\{27,33,34\}-cpp
+    envlist=py26-cpp,py27-cpp
   else
     envlist=py27-cpp
   fi
