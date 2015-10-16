@@ -18,8 +18,6 @@ COPTS = [
 # Bazel should provide portable link_opts for pthread.
 LINK_OPTS = ["-lpthread"]
 
-load("protobuf", "cc_proto_library")
-
 cc_library(
     name = "protobuf_lite",
     srcs = [
@@ -142,14 +140,6 @@ WELL_KNOWN_PROTOS = [
     "google/protobuf/wrappers.proto",
 ]
 
-cc_proto_library(
-    name = "cc_wkt_protos",
-    srcs = ["src/" + s for s in WELL_KNOWN_PROTOS],
-    internal_bootstrap_hack = 1,
-    include = "src",
-    cc_libs = [":protobuf"],
-)
-
 ################################################################################
 # Protocol Buffers Compiler
 ################################################################################
@@ -268,21 +258,22 @@ cc_binary(
 ################################################################################
 genrule(
     name = "generate_java_descriptor_proto",
-    srcs = ["src/google/protobuf/descriptor.proto"],
-    outs = ["com/google/protobuf/DescriptorProtos.java"],
-    cmd = "$(location :protoc) --java_out=$(@D)/../../.. $<",
     tools = [":protoc"],
+    srcs = [ "src/google/protobuf/descriptor.proto", ],
+    outs = [ "com/google/protobuf/DescriptorProtos.java" ],
+    cmd = "$(location :protoc) --java_out=$(@D)/../../.. $<",
 )
 
 java_library(
     name = "java_proto",
-    srcs = glob([
-        "java/src/main/java/com/google/protobuf/*.java",
-    ]) + [
-        ":generate_java_descriptor_proto",
-    ],
     visibility = ["//visibility:public"],
+    srcs = glob([
+        "java/src/main/java/com/google/protobuf/*.java"
+    ]) + [
+      ":generate_java_descriptor_proto",
+    ]
 )
+
 
 ################################################################################
 # Tests
@@ -337,11 +328,22 @@ TEST_PROTOS = [
     "google/protobuf/util/json_format_proto3.proto",
 ]
 
-cc_proto_library(
-    name = "cc_test_protos",
-    srcs = ["src/" + s for s in (LITE_TEST_PROTOS + TEST_PROTOS)],
-    include = "src",
-    deps = [":cc_wkt_protos"],
+PROTOS = LITE_TEST_PROTOS + TEST_PROTOS
+
+INPUTS = PROTOS + WELL_KNOWN_PROTOS
+
+OUTPUTS = ["src/" + x[:-5] + "pb.h" for x in PROTOS] + \
+          ["src/" + x[:-5] + "pb.cc" for x in PROTOS]
+
+genrule(
+    name = "gen_test_protos",
+    srcs = ["src/" + x for x in INPUTS],
+    outs = OUTPUTS,
+    cmd =
+        "$(location :protoc) --cpp_out=$(@D)/src" +
+        "".join([" -I" + x + "=$(location src/" + x + ")" for x in INPUTS]) +
+        "".join([" $(location src/" + x + ")" for x in PROTOS]),
+    tools = [":protoc"],
 )
 
 COMMON_TEST_SRCS = [
@@ -370,7 +372,7 @@ cc_binary(
 
 cc_test(
     name = "protobuf_test",
-    srcs = COMMON_TEST_SRCS + [
+    srcs = OUTPUTS + COMMON_TEST_SRCS + [
         # AUTOGEN(test_srcs)
         "src/google/protobuf/any_test.cc",
         "src/google/protobuf/arena_unittest.cc",
@@ -447,7 +449,6 @@ cc_test(
     deps = [
         ":protobuf",
         ":protoc_lib",
-        ":cc_test_protos",
         "//external:gtest_main",
     ],
 )
