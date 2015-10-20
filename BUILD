@@ -18,8 +18,7 @@ COPTS = [
 # Bazel should provide portable link_opts for pthread.
 LINK_OPTS = ["-lpthread"]
 
-load("protobuf", "cc_proto_library", "py_proto_library", "copied_srcs",
-     "internal_protobuf_py_tests")
+load("protobuf", "cc_proto_library")
 
 cc_library(
     name = "protobuf_lite",
@@ -127,7 +126,7 @@ objc_library(
     visibility = ["//visibility:public"],
 )
 
-RELATIVE_WELL_KNOWN_PROTOS = [
+WELL_KNOWN_PROTOS = [
     # AUTOGEN(well_known_protos)
     "google/protobuf/any.proto",
     "google/protobuf/api.proto",
@@ -143,14 +142,12 @@ RELATIVE_WELL_KNOWN_PROTOS = [
     "google/protobuf/wrappers.proto",
 ]
 
-WELL_KNOWN_PROTOS = ["src/" + s for s in RELATIVE_WELL_KNOWN_PROTOS]
-
 cc_proto_library(
     name = "cc_wkt_protos",
-    srcs = WELL_KNOWN_PROTOS,
+    srcs = ["src/" + s for s in WELL_KNOWN_PROTOS],
+    internal_bootstrap_hack = 1,
     include = "src",
     cc_libs = [":protobuf"],
-    internal_bootstrap_hack = 1,
 )
 
 ################################################################################
@@ -267,10 +264,31 @@ cc_binary(
 )
 
 ################################################################################
+# Java support
+################################################################################
+genrule(
+    name = "generate_java_descriptor_proto",
+    srcs = ["src/google/protobuf/descriptor.proto"],
+    outs = ["com/google/protobuf/DescriptorProtos.java"],
+    cmd = "$(location :protoc) --java_out=$(@D)/../../.. $<",
+    tools = [":protoc"],
+)
+
+java_library(
+    name = "java_proto",
+    srcs = glob([
+        "java/src/main/java/com/google/protobuf/*.java",
+    ]) + [
+        ":generate_java_descriptor_proto",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+################################################################################
 # Tests
 ################################################################################
 
-RELATIVE_LITE_TEST_PROTOS = [
+LITE_TEST_PROTOS = [
     # AUTOGEN(lite_test_protos)
     "google/protobuf/map_lite_unittest.proto",
     "google/protobuf/unittest_import_lite.proto",
@@ -279,9 +297,7 @@ RELATIVE_LITE_TEST_PROTOS = [
     "google/protobuf/unittest_no_arena_lite.proto",
 ]
 
-LITE_TEST_PROTOS = ["src/" + s for s in RELATIVE_LITE_TEST_PROTOS]
-
-RELATIVE_TEST_PROTOS = [
+TEST_PROTOS = [
     # AUTOGEN(test_protos)
     "google/protobuf/any_test.proto",
     "google/protobuf/compiler/cpp/cpp_test_bad_identifiers.proto",
@@ -321,11 +337,9 @@ RELATIVE_TEST_PROTOS = [
     "google/protobuf/util/json_format_proto3.proto",
 ]
 
-TEST_PROTOS = ["src/" + s for s in RELATIVE_TEST_PROTOS]
-
 cc_proto_library(
     name = "cc_test_protos",
-    srcs = LITE_TEST_PROTOS + TEST_PROTOS,
+    srcs = ["src/" + s for s in (LITE_TEST_PROTOS + TEST_PROTOS)],
     include = "src",
     deps = [":cc_wkt_protos"],
 )
@@ -431,129 +445,9 @@ cc_test(
     ],
     linkopts = LINK_OPTS,
     deps = [
-        ":cc_test_protos",
         ":protobuf",
         ":protoc_lib",
+        ":cc_test_protos",
         "//external:gtest_main",
     ],
-)
-
-################################################################################
-# Java support
-################################################################################
-genrule(
-    name = "generate_java_descriptor_proto",
-    srcs = ["src/google/protobuf/descriptor.proto"],
-    outs = ["com/google/protobuf/DescriptorProtos.java"],
-    cmd = "$(location :protoc) --java_out=$(@D)/../../.. $<",
-    tools = [":protoc"],
-)
-
-java_library(
-    name = "java_proto",
-    srcs = glob([
-        "java/src/main/java/com/google/protobuf/*.java",
-    ]) + [
-        ":generate_java_descriptor_proto",
-    ],
-    visibility = ["//visibility:public"],
-)
-
-################################################################################
-# Python support
-################################################################################
-
-# Hack:
-# protoc generated files contain imports like:
-#   "from google.protobuf.xxx import yyy"
-# However, the sources files of the python runtime are not directly under
-# "google/protobuf" (they are under python/google/protobuf).  We workaround
-# this by copying runtime source files into the desired location to workaround
-# the import issue. Ideally py_library should support something similiar to the
-# "include" attribute in cc_library to inject the PYTHON_PATH for all libraries
-# that depend on the target.
-#
-# If you use python protobuf as a third_party library in your bazel managed
-# project, please import the whole package to //google/protobuf in your
-# project. Otherwise, bazel disallows generated files out of the current
-# package, thus we won't be able to copy protobuf runtime files into
-# //google/protobuf/.
-copied_srcs(
-    name = "python_srcs",
-    srcs = glob(
-        [
-            "python/google/protobuf/*.py",
-            "python/google/protobuf/**/*.py",
-        ],
-        exclude = [
-            "python/google/protobuf/internal/*_test.py",
-            "python/google/protobuf/internal/test_util.py",
-        ],
-    ),
-    include = "python",
-)
-
-py_proto_library(
-    name = "python_proto",
-    srcs = WELL_KNOWN_PROTOS,
-    include = "src",
-    py_extra_srcs = [":python_srcs"],
-    visibility = ["//visibility:public"],
-)
-
-copied_srcs(
-    name = "python_test_srcs",
-    srcs = glob(
-        [
-            "python/google/protobuf/internal/*_test.py",
-            "python/google/protobuf/internal/test_util.py",
-        ],
-    ),
-    include = "python",
-)
-
-py_proto_library(
-    name = "python_common_test_protos",
-    srcs = LITE_TEST_PROTOS + TEST_PROTOS,
-    include = "src",
-    deps = [":python_proto"],
-)
-
-py_proto_library(
-    name = "python_specific_test_protos",
-    srcs = glob(["python/google/protobuf/internal/*.proto"]),
-    include = "python",
-    deps = [":python_common_test_protos"],
-)
-
-py_library(
-    name = "python_tests",
-    srcs = [":python_test_srcs"],
-    deps = [
-        ":python_common_test_protos",
-        ":python_proto",
-        ":python_specific_test_protos",
-    ],
-)
-
-internal_protobuf_py_tests(
-    name = "python_tests",
-    modules = [
-        "descriptor_database_test",
-        "descriptor_pool_test",
-        "descriptor_test",
-        "generator_test",
-        "json_format_test",
-        "message_factory_test",
-        # "message_test",      # failed due to testdata path
-        "proto_builder_test",
-        # "reflection_test",   # failed due to testdata path
-        "service_reflection_test",
-        "symbol_database_test",
-        "text_encoding_test",
-        # "text_format_test",  # failed due to testdata path
-        "unknown_fields_test",
-        "wire_format_test",
-    ],
-    deps = [":python_tests"],
 )
