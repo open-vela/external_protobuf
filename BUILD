@@ -457,7 +457,7 @@ genrule(
 )
 
 java_library(
-    name = "protobuf_java",
+    name = "java_proto",
     srcs = glob([
         "java/src/main/java/com/google/protobuf/*.java",
     ]) + [
@@ -503,7 +503,7 @@ internal_copied_filegroup(
 )
 
 py_proto_library(
-    name = "protobuf_python",
+    name = "python_proto",
     srcs = WELL_KNOWN_PROTOS,
     include = "src",
     protoc = ":protoc",
@@ -527,7 +527,7 @@ py_proto_library(
     srcs = LITE_TEST_PROTOS + TEST_PROTOS,
     include = "src",
     protoc = ":protoc",
-    deps = [":protobuf_python"],
+    deps = [":python_proto"],
 )
 
 py_proto_library(
@@ -543,7 +543,7 @@ py_library(
     srcs = [":python_test_srcs"],
     deps = [
         ":python_common_test_protos",
-        ":protobuf_python",
+        ":python_proto",
         ":python_specific_test_protos",
     ],
 )
