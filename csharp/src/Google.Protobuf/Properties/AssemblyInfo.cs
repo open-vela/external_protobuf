@@ -46,10 +46,7 @@ using System.Security;
 [assembly: AssemblyCopyright("Copyright ©  2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
-
-#if !NCRUNCH
 [assembly: AllowPartiallyTrustedCallers]
-#endif
 
 #if SIGNED
 [assembly: InternalsVisibleTo("Google.Protobuf.Test, PublicKey=" +
