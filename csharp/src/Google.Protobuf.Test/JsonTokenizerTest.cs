@@ -223,7 +223,7 @@ namespace Google.Protobuf
             {
                 Assert.IsNotNull(tokenizer.Next());
             }
-            Assert.Throws<InvalidJsonException>(() => tokenizer.Next());
+            Assert.Throws<InvalidProtocolBufferException>(() => tokenizer.Next());
         }
 
         [Test]
@@ -346,7 +346,7 @@ namespace Google.Protobuf
                 }
                 Assert.AreEqual(expectedTokens[i], actualToken);
             }
-            Assert.Throws<InvalidJsonException>(() => tokenizer.Next());
+            Assert.Throws<InvalidProtocolBufferException>(() => tokenizer.Next());
         }
     }
 }
