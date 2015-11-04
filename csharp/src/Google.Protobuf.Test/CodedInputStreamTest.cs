@@ -284,7 +284,7 @@ namespace Google.Protobuf
             Assert.Throws<InvalidProtocolBufferException>(() => input.ReadBytes());
         }
 
-        internal static TestRecursiveMessage MakeRecursiveMessage(int depth)
+        private static TestRecursiveMessage MakeRecursiveMessage(int depth)
         {
             if (depth == 0)
             {
@@ -296,7 +296,7 @@ namespace Google.Protobuf
             }
         }
 
-        internal static void AssertMessageDepth(TestRecursiveMessage message, int depth)
+        private static void AssertMessageDepth(TestRecursiveMessage message, int depth)
         {
             if (depth == 0)
             {
