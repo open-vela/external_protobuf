@@ -95,13 +95,6 @@ namespace Google.Protobuf
                 "Use CodedInputStream.SetRecursionLimit() to increase the depth limit.");
         }
 
-        internal static InvalidProtocolBufferException JsonRecursionLimitExceeded()
-        {
-            return new InvalidProtocolBufferException(
-                "Protocol message had too many levels of nesting.  May be malicious.  " +
-                "Use JsonParser.Settings to increase the depth limit.");
-        }
-
         internal static InvalidProtocolBufferException SizeLimitExceeded()
         {
             return new InvalidProtocolBufferException(

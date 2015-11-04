@@ -370,19 +370,19 @@ namespace Google.Protobuf
         }
 
         [Test]
-        [TestCase("+0")]
-        [TestCase("00")]
-        [TestCase("-00")]
-        [TestCase("--1")]
-        [TestCase("+1")]
-        [TestCase("1.5", Ignore = true, Reason = "Desired behaviour unclear")]
-        [TestCase("1e10")]
-        [TestCase("2147483648")]
-        [TestCase("-2147483649")]
-        public void NumberToInt32_Invalid(string jsonValue)
+        [TestCase("+0", typeof(InvalidJsonException))]
+        [TestCase("00", typeof(InvalidJsonException))]
+        [TestCase("-00", typeof(InvalidJsonException))]
+        [TestCase("--1", typeof(InvalidJsonException))]
+        [TestCase("+1", typeof(InvalidJsonException))]
+        [TestCase("1.5", typeof(InvalidProtocolBufferException), Ignore = true, Reason = "Desired behaviour unclear")]
+        [TestCase("1e10", typeof(InvalidProtocolBufferException))]
+        [TestCase("2147483648", typeof(InvalidProtocolBufferException))]
+        [TestCase("-2147483649", typeof(InvalidProtocolBufferException))]
+        public void NumberToInt32_Invalid(string jsonValue, System.Type expectedExceptionType)
         {
             string json = "{ \"singleInt32\": " + jsonValue + "}";
-            Assert.Throws<InvalidProtocolBufferException>(() => TestAllTypes.Parser.ParseJson(json));
+            Assert.Throws(expectedExceptionType, () => TestAllTypes.Parser.ParseJson(json));
         }
 
         [Test]
@@ -486,7 +486,7 @@ namespace Google.Protobuf
         public void NumberToDouble_Invalid(string jsonValue)
         {
             string json = "{ \"singleDouble\": " + jsonValue + "}";
-            Assert.Throws<InvalidProtocolBufferException>(() => TestAllTypes.Parser.ParseJson(json));
+            Assert.Throws<InvalidJsonException>(() => TestAllTypes.Parser.ParseJson(json));
         }
 
         [Test]
@@ -506,17 +506,17 @@ namespace Google.Protobuf
         }
 
         [Test]
-        [TestCase("3.402824e38")]
-        [TestCase("-3.402824e38")]
-        [TestCase("1,0")]
-        [TestCase("1.0.0")]
-        [TestCase("+1")]
-        [TestCase("00")]
-        [TestCase("--1")]
-        public void NumberToFloat_Invalid(string jsonValue)
+        [TestCase("3.402824e38", typeof(InvalidProtocolBufferException))]
+        [TestCase("-3.402824e38", typeof(InvalidProtocolBufferException))]
+        [TestCase("1,0", typeof(InvalidJsonException))]
+        [TestCase("1.0.0", typeof(InvalidJsonException))]
+        [TestCase("+1", typeof(InvalidJsonException))]
+        [TestCase("00", typeof(InvalidJsonException))]
+        [TestCase("--1", typeof(InvalidJsonException))]
+        public void NumberToFloat_Invalid(string jsonValue, System.Type expectedExceptionType)
         {
             string json = "{ \"singleFloat\": " + jsonValue + "}";
-            Assert.Throws<InvalidProtocolBufferException>(() => TestAllTypes.Parser.ParseJson(json));
+            Assert.Throws(expectedExceptionType, () => TestAllTypes.Parser.ParseJson(json));
         }
 
         // The simplest way of testing that the value has parsed correctly is to reformat it,
@@ -721,25 +721,7 @@ namespace Google.Protobuf
         public void DataAfterObject()
         {
             string json = "{} 10";
-            Assert.Throws<InvalidProtocolBufferException>(() => TestAllTypes.Parser.ParseJson(json));
-        }
-
-        /// <summary>
-        /// JSON equivalent to <see cref="CodedInputStreamTest.MaliciousRecursion"/>
-        /// </summary>
-        [Test]
-        public void MaliciousRecursion()
-        {
-            string data64 = CodedInputStreamTest.MakeRecursiveMessage(64).ToString();
-            string data65 = CodedInputStreamTest.MakeRecursiveMessage(65).ToString();
-
-            var parser64 = new JsonParser(new JsonParser.Settings(64));
-            CodedInputStreamTest.AssertMessageDepth(parser64.Parse<TestRecursiveMessage>(data64), 64);
-            Assert.Throws<InvalidProtocolBufferException>(() => parser64.Parse<TestRecursiveMessage>(data65));
-
-            var parser63 = new JsonParser(new JsonParser.Settings(63));
-            Assert.Throws<InvalidProtocolBufferException>(() => parser63.Parse<TestRecursiveMessage>(data64));
-
+            Assert.Throws<InvalidJsonException>(() => TestAllTypes.Parser.ParseJson(json));
         }
     }
 }
