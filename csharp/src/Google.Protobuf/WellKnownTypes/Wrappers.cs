@@ -52,7 +52,6 @@ namespace Google.Protobuf.WellKnownTypes {
   #region Messages
   /// <summary>
   ///  Wrapper message for `double`.
-  ///
   ///  The JSON representation for `DoubleValue` is JSON number.
   /// </summary>
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -163,7 +162,6 @@ namespace Google.Protobuf.WellKnownTypes {
 
   /// <summary>
   ///  Wrapper message for `float`.
-  ///
   ///  The JSON representation for `FloatValue` is JSON number.
   /// </summary>
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -274,7 +272,6 @@ namespace Google.Protobuf.WellKnownTypes {
 
   /// <summary>
   ///  Wrapper message for `int64`.
-  ///
   ///  The JSON representation for `Int64Value` is JSON string.
   /// </summary>
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -385,7 +382,6 @@ namespace Google.Protobuf.WellKnownTypes {
 
   /// <summary>
   ///  Wrapper message for `uint64`.
-  ///
   ///  The JSON representation for `UInt64Value` is JSON string.
   /// </summary>
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -496,7 +492,6 @@ namespace Google.Protobuf.WellKnownTypes {
 
   /// <summary>
   ///  Wrapper message for `int32`.
-  ///
   ///  The JSON representation for `Int32Value` is JSON number.
   /// </summary>
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -607,7 +602,6 @@ namespace Google.Protobuf.WellKnownTypes {
 
   /// <summary>
   ///  Wrapper message for `uint32`.
-  ///
   ///  The JSON representation for `UInt32Value` is JSON number.
   /// </summary>
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -718,7 +712,6 @@ namespace Google.Protobuf.WellKnownTypes {
 
   /// <summary>
   ///  Wrapper message for `bool`.
-  ///
   ///  The JSON representation for `BoolValue` is JSON `true` and `false`.
   /// </summary>
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -829,7 +822,6 @@ namespace Google.Protobuf.WellKnownTypes {
 
   /// <summary>
   ///  Wrapper message for `string`.
-  ///
   ///  The JSON representation for `StringValue` is JSON string.
   /// </summary>
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -940,7 +932,6 @@ namespace Google.Protobuf.WellKnownTypes {
 
   /// <summary>
   ///  Wrapper message for `bytes`.
-  ///
   ///  The JSON representation for `BytesValue` is JSON string.
   /// </summary>
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
