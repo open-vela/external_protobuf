@@ -32,7 +32,7 @@
 
 namespace Google.Protobuf.WellKnownTypes
 {
-    public static partial class WrappersReflection
+    public static partial class Wrappers
     {
         /// <summary>
         /// Field number for the single "value" field in all wrapper types.
