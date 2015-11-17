@@ -56,7 +56,6 @@ cc_library(
     ],
     copts = COPTS,
     includes = ["src/"],
-    hdrs = glob(["src/google/protobuf/**/*.h"]),
     linkopts = LINK_OPTS,
     visibility = ["//visibility:public"],
 )
@@ -118,7 +117,6 @@ cc_library(
         "src/google/protobuf/wire_format.cc",
         "src/google/protobuf/wrappers.pb.cc",
     ],
-    hdrs = glob(["src/**/*.h"]),
     copts = COPTS,
     includes = ["src/"],
     linkopts = LINK_OPTS,
