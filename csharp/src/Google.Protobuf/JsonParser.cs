@@ -92,7 +92,7 @@ namespace Google.Protobuf
         // dictionary initialization.
         private static void MergeWrapperField(JsonParser parser, IMessage message, JsonTokenizer tokenizer)
         {
-            parser.MergeField(message, message.Descriptor.Fields[WrappersReflection.WrapperValueFieldNumber], tokenizer);
+            parser.MergeField(message, message.Descriptor.Fields[Wrappers.WrapperValueFieldNumber], tokenizer);
         }
 
         /// <summary>
@@ -294,7 +294,7 @@ namespace Google.Protobuf
                 // TODO: Detect this differently when we have dynamic messages, and put it in one place...
                 if (field.MessageType.IsWellKnownType && field.MessageType.File == Int32Value.Descriptor.File)
                 {
-                    field = field.MessageType.Fields[WrappersReflection.WrapperValueFieldNumber];
+                    field = field.MessageType.Fields[Wrappers.WrapperValueFieldNumber];
                     fieldType = field.FieldType;
                 }
                 else
@@ -555,10 +555,14 @@ namespace Google.Protobuf
 
         /// <summary>
         /// Creates a new instance of the message type for the given field.
+        /// This method is mostly extracted so we can replace it in one go when we work out
+        /// what we want to do instead of Activator.CreateInstance.
         /// </summary>
         private static IMessage NewMessageForField(FieldDescriptor field)
         {
-            return field.MessageType.Parser.CreateTemplate();
+            // TODO: Create an instance in a better way ?
+            // (We could potentially add a Parser property to MessageDescriptor... see issue 806.)
+            return (IMessage) Activator.CreateInstance(field.MessageType.GeneratedType);
         }
 
         private static T ParseNumericString<T>(string text, Func<string, NumberStyles, IFormatProvider, T> parser, bool floatingPoint)
