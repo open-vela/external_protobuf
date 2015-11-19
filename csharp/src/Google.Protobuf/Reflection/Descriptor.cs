@@ -11,7 +11,7 @@ namespace Google.Protobuf.Reflection {
 
   /// <summary>Holder for reflection information generated from google/protobuf/descriptor.proto</summary>
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-  internal static partial class DescriptorProtoFile {
+  internal static partial class DescriptorReflection {
 
     #region Descriptor
     /// <summary>File descriptor for google/protobuf/descriptor.proto</summary>
@@ -20,7 +20,7 @@ namespace Google.Protobuf.Reflection {
     }
     private static pbr::FileDescriptor descriptor;
 
-    static DescriptorProtoFile() {
+    static DescriptorReflection() {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
             "CiBnb29nbGUvcHJvdG9idWYvZGVzY3JpcHRvci5wcm90bxIPZ29vZ2xlLnBy",
@@ -138,25 +138,25 @@ namespace Google.Protobuf.Reflection {
       descriptor = pbr::FileDescriptor.InternalBuildGeneratedFileFrom(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedCodeInfo(null, new pbr::GeneratedCodeInfo[] {
-            new pbr::GeneratedCodeInfo(typeof(global::Google.Protobuf.Reflection.FileDescriptorSet), new[]{ "File" }, null, null, null),
-            new pbr::GeneratedCodeInfo(typeof(global::Google.Protobuf.Reflection.FileDescriptorProto), new[]{ "Name", "Package", "Dependency", "PublicDependency", "WeakDependency", "MessageType", "EnumType", "Service", "Extension", "Options", "SourceCodeInfo", "Syntax" }, null, null, null),
-            new pbr::GeneratedCodeInfo(typeof(global::Google.Protobuf.Reflection.DescriptorProto), new[]{ "Name", "Field", "Extension", "NestedType", "EnumType", "ExtensionRange", "OneofDecl", "Options", "ReservedRange", "ReservedName" }, null, null, new pbr::GeneratedCodeInfo[] { new pbr::GeneratedCodeInfo(typeof(global::Google.Protobuf.Reflection.DescriptorProto.Types.ExtensionRange), new[]{ "Start", "End" }, null, null, null),
-            new pbr::GeneratedCodeInfo(typeof(global::Google.Protobuf.Reflection.DescriptorProto.Types.ReservedRange), new[]{ "Start", "End" }, null, null, null)}),
-            new pbr::GeneratedCodeInfo(typeof(global::Google.Protobuf.Reflection.FieldDescriptorProto), new[]{ "Name", "Number", "Label", "Type", "TypeName", "Extendee", "DefaultValue", "OneofIndex", "JsonName", "Options" }, null, new[]{ typeof(global::Google.Protobuf.Reflection.FieldDescriptorProto.Types.Type), typeof(global::Google.Protobuf.Reflection.FieldDescriptorProto.Types.Label) }, null),
-            new pbr::GeneratedCodeInfo(typeof(global::Google.Protobuf.Reflection.OneofDescriptorProto), new[]{ "Name" }, null, null, null),
-            new pbr::GeneratedCodeInfo(typeof(global::Google.Protobuf.Reflection.EnumDescriptorProto), new[]{ "Name", "Value", "Options" }, null, null, null),
-            new pbr::GeneratedCodeInfo(typeof(global::Google.Protobuf.Reflection.EnumValueDescriptorProto), new[]{ "Name", "Number", "Options" }, null, null, null),
-            new pbr::GeneratedCodeInfo(typeof(global::Google.Protobuf.Reflection.ServiceDescriptorProto), new[]{ "Name", "Method", "Options" }, null, null, null),
-            new pbr::GeneratedCodeInfo(typeof(global::Google.Protobuf.Reflection.MethodDescriptorProto), new[]{ "Name", "InputType", "OutputType", "Options", "ClientStreaming", "ServerStreaming" }, null, null, null),
-            new pbr::GeneratedCodeInfo(typeof(global::Google.Protobuf.Reflection.FileOptions), new[]{ "JavaPackage", "JavaOuterClassname", "JavaMultipleFiles", "JavaGenerateEqualsAndHash", "JavaStringCheckUtf8", "OptimizeFor", "GoPackage", "CcGenericServices", "JavaGenericServices", "PyGenericServices", "Deprecated", "CcEnableArenas", "ObjcClassPrefix", "CsharpNamespace", "JavananoUseDeprecatedPackage", "UninterpretedOption" }, null, new[]{ typeof(global::Google.Protobuf.Reflection.FileOptions.Types.OptimizeMode) }, null),
-            new pbr::GeneratedCodeInfo(typeof(global::Google.Protobuf.Reflection.MessageOptions), new[]{ "MessageSetWireFormat", "NoStandardDescriptorAccessor", "Deprecated", "MapEntry", "UninterpretedOption" }, null, null, null),
-            new pbr::GeneratedCodeInfo(typeof(global::Google.Protobuf.Reflection.FieldOptions), new[]{ "Ctype", "Packed", "Jstype", "Lazy", "Deprecated", "Weak", "UninterpretedOption" }, null, new[]{ typeof(global::Google.Protobuf.Reflection.FieldOptions.Types.CType), typeof(global::Google.Protobuf.Reflection.FieldOptions.Types.JSType) }, null),
-            new pbr::GeneratedCodeInfo(typeof(global::Google.Protobuf.Reflection.EnumOptions), new[]{ "AllowAlias", "Deprecated", "UninterpretedOption" }, null, null, null),
-            new pbr::GeneratedCodeInfo(typeof(global::Google.Protobuf.Reflection.EnumValueOptions), new[]{ "Deprecated", "UninterpretedOption" }, null, null, null),
-            new pbr::GeneratedCodeInfo(typeof(global::Google.Protobuf.Reflection.ServiceOptions), new[]{ "Deprecated", "UninterpretedOption" }, null, null, null),
-            new pbr::GeneratedCodeInfo(typeof(global::Google.Protobuf.Reflection.MethodOptions), new[]{ "Deprecated", "UninterpretedOption" }, null, null, null),
-            new pbr::GeneratedCodeInfo(typeof(global::Google.Protobuf.Reflection.UninterpretedOption), new[]{ "Name", "IdentifierValue", "PositiveIntValue", "NegativeIntValue", "DoubleValue", "StringValue", "AggregateValue" }, null, null, new pbr::GeneratedCodeInfo[] { new pbr::GeneratedCodeInfo(typeof(global::Google.Protobuf.Reflection.UninterpretedOption.Types.NamePart), new[]{ "NamePart_", "IsExtension" }, null, null, null)}),
-            new pbr::GeneratedCodeInfo(typeof(global::Google.Protobuf.Reflection.SourceCodeInfo), new[]{ "Location" }, null, null, new pbr::GeneratedCodeInfo[] { new pbr::GeneratedCodeInfo(typeof(global::Google.Protobuf.Reflection.SourceCodeInfo.Types.Location), new[]{ "Path", "Span", "LeadingComments", "TrailingComments", "LeadingDetachedComments" }, null, null, null)})
+            new pbr::GeneratedCodeInfo(typeof(global::Google.Protobuf.Reflection.FileDescriptorSet), global::Google.Protobuf.Reflection.FileDescriptorSet.Parser, new[]{ "File" }, null, null, null),
+            new pbr::GeneratedCodeInfo(typeof(global::Google.Protobuf.Reflection.FileDescriptorProto), global::Google.Protobuf.Reflection.FileDescriptorProto.Parser, new[]{ "Name", "Package", "Dependency", "PublicDependency", "WeakDependency", "MessageType", "EnumType", "Service", "Extension", "Options", "SourceCodeInfo", "Syntax" }, null, null, null),
+            new pbr::GeneratedCodeInfo(typeof(global::Google.Protobuf.Reflection.DescriptorProto), global::Google.Protobuf.Reflection.DescriptorProto.Parser, new[]{ "Name", "Field", "Extension", "NestedType", "EnumType", "ExtensionRange", "OneofDecl", "Options", "ReservedRange", "ReservedName" }, null, null, new pbr::GeneratedCodeInfo[] { new pbr::GeneratedCodeInfo(typeof(global::Google.Protobuf.Reflection.DescriptorProto.Types.ExtensionRange), global::Google.Protobuf.Reflection.DescriptorProto.Types.ExtensionRange.Parser, new[]{ "Start", "End" }, null, null, null),
+            new pbr::GeneratedCodeInfo(typeof(global::Google.Protobuf.Reflection.DescriptorProto.Types.ReservedRange), global::Google.Protobuf.Reflection.DescriptorProto.Types.ReservedRange.Parser, new[]{ "Start", "End" }, null, null, null)}),
+            new pbr::GeneratedCodeInfo(typeof(global::Google.Protobuf.Reflection.FieldDescriptorProto), global::Google.Protobuf.Reflection.FieldDescriptorProto.Parser, new[]{ "Name", "Number", "Label", "Type", "TypeName", "Extendee", "DefaultValue", "OneofIndex", "JsonName", "Options" }, null, new[]{ typeof(global::Google.Protobuf.Reflection.FieldDescriptorProto.Types.Type), typeof(global::Google.Protobuf.Reflection.FieldDescriptorProto.Types.Label) }, null),
+            new pbr::GeneratedCodeInfo(typeof(global::Google.Protobuf.Reflection.OneofDescriptorProto), global::Google.Protobuf.Reflection.OneofDescriptorProto.Parser, new[]{ "Name" }, null, null, null),
+            new pbr::GeneratedCodeInfo(typeof(global::Google.Protobuf.Reflection.EnumDescriptorProto), global::Google.Protobuf.Reflection.EnumDescriptorProto.Parser, new[]{ "Name", "Value", "Options" }, null, null, null),
+            new pbr::GeneratedCodeInfo(typeof(global::Google.Protobuf.Reflection.EnumValueDescriptorProto), global::Google.Protobuf.Reflection.EnumValueDescriptorProto.Parser, new[]{ "Name", "Number", "Options" }, null, null, null),
+            new pbr::GeneratedCodeInfo(typeof(global::Google.Protobuf.Reflection.ServiceDescriptorProto), global::Google.Protobuf.Reflection.ServiceDescriptorProto.Parser, new[]{ "Name", "Method", "Options" }, null, null, null),
+            new pbr::GeneratedCodeInfo(typeof(global::Google.Protobuf.Reflection.MethodDescriptorProto), global::Google.Protobuf.Reflection.MethodDescriptorProto.Parser, new[]{ "Name", "InputType", "OutputType", "Options", "ClientStreaming", "ServerStreaming" }, null, null, null),
+            new pbr::GeneratedCodeInfo(typeof(global::Google.Protobuf.Reflection.FileOptions), global::Google.Protobuf.Reflection.FileOptions.Parser, new[]{ "JavaPackage", "JavaOuterClassname", "JavaMultipleFiles", "JavaGenerateEqualsAndHash", "JavaStringCheckUtf8", "OptimizeFor", "GoPackage", "CcGenericServices", "JavaGenericServices", "PyGenericServices", "Deprecated", "CcEnableArenas", "ObjcClassPrefix", "CsharpNamespace", "JavananoUseDeprecatedPackage", "UninterpretedOption" }, null, new[]{ typeof(global::Google.Protobuf.Reflection.FileOptions.Types.OptimizeMode) }, null),
+            new pbr::GeneratedCodeInfo(typeof(global::Google.Protobuf.Reflection.MessageOptions), global::Google.Protobuf.Reflection.MessageOptions.Parser, new[]{ "MessageSetWireFormat", "NoStandardDescriptorAccessor", "Deprecated", "MapEntry", "UninterpretedOption" }, null, null, null),
+            new pbr::GeneratedCodeInfo(typeof(global::Google.Protobuf.Reflection.FieldOptions), global::Google.Protobuf.Reflection.FieldOptions.Parser, new[]{ "Ctype", "Packed", "Jstype", "Lazy", "Deprecated", "Weak", "UninterpretedOption" }, null, new[]{ typeof(global::Google.Protobuf.Reflection.FieldOptions.Types.CType), typeof(global::Google.Protobuf.Reflection.FieldOptions.Types.JSType) }, null),
+            new pbr::GeneratedCodeInfo(typeof(global::Google.Protobuf.Reflection.EnumOptions), global::Google.Protobuf.Reflection.EnumOptions.Parser, new[]{ "AllowAlias", "Deprecated", "UninterpretedOption" }, null, null, null),
+            new pbr::GeneratedCodeInfo(typeof(global::Google.Protobuf.Reflection.EnumValueOptions), global::Google.Protobuf.Reflection.EnumValueOptions.Parser, new[]{ "Deprecated", "UninterpretedOption" }, null, null, null),
+            new pbr::GeneratedCodeInfo(typeof(global::Google.Protobuf.Reflection.ServiceOptions), global::Google.Protobuf.Reflection.ServiceOptions.Parser, new[]{ "Deprecated", "UninterpretedOption" }, null, null, null),
+            new pbr::GeneratedCodeInfo(typeof(global::Google.Protobuf.Reflection.MethodOptions), global::Google.Protobuf.Reflection.MethodOptions.Parser, new[]{ "Deprecated", "UninterpretedOption" }, null, null, null),
+            new pbr::GeneratedCodeInfo(typeof(global::Google.Protobuf.Reflection.UninterpretedOption), global::Google.Protobuf.Reflection.UninterpretedOption.Parser, new[]{ "Name", "IdentifierValue", "PositiveIntValue", "NegativeIntValue", "DoubleValue", "StringValue", "AggregateValue" }, null, null, new pbr::GeneratedCodeInfo[] { new pbr::GeneratedCodeInfo(typeof(global::Google.Protobuf.Reflection.UninterpretedOption.Types.NamePart), global::Google.Protobuf.Reflection.UninterpretedOption.Types.NamePart.Parser, new[]{ "NamePart_", "IsExtension" }, null, null, null)}),
+            new pbr::GeneratedCodeInfo(typeof(global::Google.Protobuf.Reflection.SourceCodeInfo), global::Google.Protobuf.Reflection.SourceCodeInfo.Parser, new[]{ "Location" }, null, null, new pbr::GeneratedCodeInfo[] { new pbr::GeneratedCodeInfo(typeof(global::Google.Protobuf.Reflection.SourceCodeInfo.Types.Location), global::Google.Protobuf.Reflection.SourceCodeInfo.Types.Location.Parser, new[]{ "Path", "Span", "LeadingComments", "TrailingComments", "LeadingDetachedComments" }, null, null, null)})
           }));
     }
     #endregion
@@ -173,7 +173,7 @@ namespace Google.Protobuf.Reflection {
     public static pb::MessageParser<FileDescriptorSet> Parser { get { return _parser; } }
 
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Google.Protobuf.Reflection.DescriptorProtoFile.Descriptor.MessageTypes[0]; }
+      get { return global::Google.Protobuf.Reflection.DescriptorReflection.Descriptor.MessageTypes[0]; }
     }
 
     pbr::MessageDescriptor pb::IMessage.Descriptor {
@@ -271,7 +271,7 @@ namespace Google.Protobuf.Reflection {
     public static pb::MessageParser<FileDescriptorProto> Parser { get { return _parser; } }
 
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Google.Protobuf.Reflection.DescriptorProtoFile.Descriptor.MessageTypes[1]; }
+      get { return global::Google.Protobuf.Reflection.DescriptorReflection.Descriptor.MessageTypes[1]; }
     }
 
     pbr::MessageDescriptor pb::IMessage.Descriptor {
@@ -661,7 +661,7 @@ namespace Google.Protobuf.Reflection {
     public static pb::MessageParser<DescriptorProto> Parser { get { return _parser; } }
 
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Google.Protobuf.Reflection.DescriptorProtoFile.Descriptor.MessageTypes[2]; }
+      get { return global::Google.Protobuf.Reflection.DescriptorReflection.Descriptor.MessageTypes[2]; }
     }
 
     pbr::MessageDescriptor pb::IMessage.Descriptor {
@@ -1234,7 +1234,7 @@ namespace Google.Protobuf.Reflection {
     public static pb::MessageParser<FieldDescriptorProto> Parser { get { return _parser; } }
 
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Google.Protobuf.Reflection.DescriptorProtoFile.Descriptor.MessageTypes[3]; }
+      get { return global::Google.Protobuf.Reflection.DescriptorReflection.Descriptor.MessageTypes[3]; }
     }
 
     pbr::MessageDescriptor pb::IMessage.Descriptor {
@@ -1688,7 +1688,7 @@ namespace Google.Protobuf.Reflection {
     public static pb::MessageParser<OneofDescriptorProto> Parser { get { return _parser; } }
 
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Google.Protobuf.Reflection.DescriptorProtoFile.Descriptor.MessageTypes[4]; }
+      get { return global::Google.Protobuf.Reflection.DescriptorReflection.Descriptor.MessageTypes[4]; }
     }
 
     pbr::MessageDescriptor pb::IMessage.Descriptor {
@@ -1794,7 +1794,7 @@ namespace Google.Protobuf.Reflection {
     public static pb::MessageParser<EnumDescriptorProto> Parser { get { return _parser; } }
 
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Google.Protobuf.Reflection.DescriptorProtoFile.Descriptor.MessageTypes[5]; }
+      get { return global::Google.Protobuf.Reflection.DescriptorReflection.Descriptor.MessageTypes[5]; }
     }
 
     pbr::MessageDescriptor pb::IMessage.Descriptor {
@@ -1952,7 +1952,7 @@ namespace Google.Protobuf.Reflection {
     public static pb::MessageParser<EnumValueDescriptorProto> Parser { get { return _parser; } }
 
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Google.Protobuf.Reflection.DescriptorProtoFile.Descriptor.MessageTypes[6]; }
+      get { return global::Google.Protobuf.Reflection.DescriptorReflection.Descriptor.MessageTypes[6]; }
     }
 
     pbr::MessageDescriptor pb::IMessage.Descriptor {
@@ -2118,7 +2118,7 @@ namespace Google.Protobuf.Reflection {
     public static pb::MessageParser<ServiceDescriptorProto> Parser { get { return _parser; } }
 
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Google.Protobuf.Reflection.DescriptorProtoFile.Descriptor.MessageTypes[7]; }
+      get { return global::Google.Protobuf.Reflection.DescriptorReflection.Descriptor.MessageTypes[7]; }
     }
 
     pbr::MessageDescriptor pb::IMessage.Descriptor {
@@ -2276,7 +2276,7 @@ namespace Google.Protobuf.Reflection {
     public static pb::MessageParser<MethodDescriptorProto> Parser { get { return _parser; } }
 
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Google.Protobuf.Reflection.DescriptorProtoFile.Descriptor.MessageTypes[8]; }
+      get { return global::Google.Protobuf.Reflection.DescriptorReflection.Descriptor.MessageTypes[8]; }
     }
 
     pbr::MessageDescriptor pb::IMessage.Descriptor {
@@ -2530,7 +2530,7 @@ namespace Google.Protobuf.Reflection {
     public static pb::MessageParser<FileOptions> Parser { get { return _parser; } }
 
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Google.Protobuf.Reflection.DescriptorProtoFile.Descriptor.MessageTypes[9]; }
+      get { return global::Google.Protobuf.Reflection.DescriptorReflection.Descriptor.MessageTypes[9]; }
     }
 
     pbr::MessageDescriptor pb::IMessage.Descriptor {
@@ -3141,7 +3141,7 @@ namespace Google.Protobuf.Reflection {
     public static pb::MessageParser<MessageOptions> Parser { get { return _parser; } }
 
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Google.Protobuf.Reflection.DescriptorProtoFile.Descriptor.MessageTypes[10]; }
+      get { return global::Google.Protobuf.Reflection.DescriptorReflection.Descriptor.MessageTypes[10]; }
     }
 
     pbr::MessageDescriptor pb::IMessage.Descriptor {
@@ -3401,7 +3401,7 @@ namespace Google.Protobuf.Reflection {
     public static pb::MessageParser<FieldOptions> Parser { get { return _parser; } }
 
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Google.Protobuf.Reflection.DescriptorProtoFile.Descriptor.MessageTypes[11]; }
+      get { return global::Google.Protobuf.Reflection.DescriptorReflection.Descriptor.MessageTypes[11]; }
     }
 
     pbr::MessageDescriptor pb::IMessage.Descriptor {
@@ -3754,7 +3754,7 @@ namespace Google.Protobuf.Reflection {
     public static pb::MessageParser<EnumOptions> Parser { get { return _parser; } }
 
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Google.Protobuf.Reflection.DescriptorProtoFile.Descriptor.MessageTypes[12]; }
+      get { return global::Google.Protobuf.Reflection.DescriptorReflection.Descriptor.MessageTypes[12]; }
     }
 
     pbr::MessageDescriptor pb::IMessage.Descriptor {
@@ -3916,7 +3916,7 @@ namespace Google.Protobuf.Reflection {
     public static pb::MessageParser<EnumValueOptions> Parser { get { return _parser; } }
 
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Google.Protobuf.Reflection.DescriptorProtoFile.Descriptor.MessageTypes[13]; }
+      get { return global::Google.Protobuf.Reflection.DescriptorReflection.Descriptor.MessageTypes[13]; }
     }
 
     pbr::MessageDescriptor pb::IMessage.Descriptor {
@@ -4047,7 +4047,7 @@ namespace Google.Protobuf.Reflection {
     public static pb::MessageParser<ServiceOptions> Parser { get { return _parser; } }
 
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Google.Protobuf.Reflection.DescriptorProtoFile.Descriptor.MessageTypes[14]; }
+      get { return global::Google.Protobuf.Reflection.DescriptorReflection.Descriptor.MessageTypes[14]; }
     }
 
     pbr::MessageDescriptor pb::IMessage.Descriptor {
@@ -4178,7 +4178,7 @@ namespace Google.Protobuf.Reflection {
     public static pb::MessageParser<MethodOptions> Parser { get { return _parser; } }
 
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Google.Protobuf.Reflection.DescriptorProtoFile.Descriptor.MessageTypes[15]; }
+      get { return global::Google.Protobuf.Reflection.DescriptorReflection.Descriptor.MessageTypes[15]; }
     }
 
     pbr::MessageDescriptor pb::IMessage.Descriptor {
@@ -4317,7 +4317,7 @@ namespace Google.Protobuf.Reflection {
     public static pb::MessageParser<UninterpretedOption> Parser { get { return _parser; } }
 
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Google.Protobuf.Reflection.DescriptorProtoFile.Descriptor.MessageTypes[16]; }
+      get { return global::Google.Protobuf.Reflection.DescriptorReflection.Descriptor.MessageTypes[16]; }
     }
 
     pbr::MessageDescriptor pb::IMessage.Descriptor {
@@ -4726,7 +4726,7 @@ namespace Google.Protobuf.Reflection {
     public static pb::MessageParser<SourceCodeInfo> Parser { get { return _parser; } }
 
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Google.Protobuf.Reflection.DescriptorProtoFile.Descriptor.MessageTypes[17]; }
+      get { return global::Google.Protobuf.Reflection.DescriptorReflection.Descriptor.MessageTypes[17]; }
     }
 
     pbr::MessageDescriptor pb::IMessage.Descriptor {

@@ -11,7 +11,7 @@ namespace Google.Protobuf.TestProtos {
 
   /// <summary>Holder for reflection information generated from google/protobuf/map_unittest_proto3.proto</summary>
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-  public static partial class MapUnittestProto3 {
+  public static partial class MapUnittestProto3Reflection {
 
     #region Descriptor
     /// <summary>File descriptor for google/protobuf/map_unittest_proto3.proto</summary>
@@ -20,7 +20,7 @@ namespace Google.Protobuf.TestProtos {
     }
     private static pbr::FileDescriptor descriptor;
 
-    static MapUnittestProto3() {
+    static MapUnittestProto3Reflection() {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
             "Cilnb29nbGUvcHJvdG9idWYvbWFwX3VuaXR0ZXN0X3Byb3RvMy5wcm90bxIR",
@@ -148,15 +148,15 @@ namespace Google.Protobuf.TestProtos {
             "EAoMTUFQX0VOVU1fQkFSEAESEAoMTUFQX0VOVU1fQkFaEAJCIPgBAaoCGkdv",
             "b2dsZS5Qcm90b2J1Zi5UZXN0UHJvdG9zYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.InternalBuildGeneratedFileFrom(descriptorData,
-          new pbr::FileDescriptor[] { global::Google.Protobuf.TestProtos.UnittestProto3.Descriptor, },
+          new pbr::FileDescriptor[] { global::Google.Protobuf.TestProtos.UnittestProto3Reflection.Descriptor, },
           new pbr::GeneratedCodeInfo(new[] {typeof(global::Google.Protobuf.TestProtos.MapEnum), }, new pbr::GeneratedCodeInfo[] {
-            new pbr::GeneratedCodeInfo(typeof(global::Google.Protobuf.TestProtos.TestMap), new[]{ "MapInt32Int32", "MapInt64Int64", "MapUint32Uint32", "MapUint64Uint64", "MapSint32Sint32", "MapSint64Sint64", "MapFixed32Fixed32", "MapFixed64Fixed64", "MapSfixed32Sfixed32", "MapSfixed64Sfixed64", "MapInt32Float", "MapInt32Double", "MapBoolBool", "MapStringString", "MapInt32Bytes", "MapInt32Enum", "MapInt32ForeignMessage" }, null, null, new pbr::GeneratedCodeInfo[] { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, }),
-            new pbr::GeneratedCodeInfo(typeof(global::Google.Protobuf.TestProtos.TestMapSubmessage), new[]{ "TestMap" }, null, null, null),
-            new pbr::GeneratedCodeInfo(typeof(global::Google.Protobuf.TestProtos.TestMessageMap), new[]{ "MapInt32Message" }, null, null, new pbr::GeneratedCodeInfo[] { null, }),
-            new pbr::GeneratedCodeInfo(typeof(global::Google.Protobuf.TestProtos.TestSameTypeMap), new[]{ "Map1", "Map2" }, null, null, new pbr::GeneratedCodeInfo[] { null, null, }),
-            new pbr::GeneratedCodeInfo(typeof(global::Google.Protobuf.TestProtos.TestArenaMap), new[]{ "MapInt32Int32", "MapInt64Int64", "MapUint32Uint32", "MapUint64Uint64", "MapSint32Sint32", "MapSint64Sint64", "MapFixed32Fixed32", "MapFixed64Fixed64", "MapSfixed32Sfixed32", "MapSfixed64Sfixed64", "MapInt32Float", "MapInt32Double", "MapBoolBool", "MapInt32Enum", "MapInt32ForeignMessage" }, null, null, new pbr::GeneratedCodeInfo[] { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, }),
-            new pbr::GeneratedCodeInfo(typeof(global::Google.Protobuf.TestProtos.MessageContainingEnumCalledType), new[]{ "Type" }, null, new[]{ typeof(global::Google.Protobuf.TestProtos.MessageContainingEnumCalledType.Types.Type) }, new pbr::GeneratedCodeInfo[] { null, }),
-            new pbr::GeneratedCodeInfo(typeof(global::Google.Protobuf.TestProtos.MessageContainingMapCalledEntry), new[]{ "Entry" }, null, null, new pbr::GeneratedCodeInfo[] { null, })
+            new pbr::GeneratedCodeInfo(typeof(global::Google.Protobuf.TestProtos.TestMap), global::Google.Protobuf.TestProtos.TestMap.Parser, new[]{ "MapInt32Int32", "MapInt64Int64", "MapUint32Uint32", "MapUint64Uint64", "MapSint32Sint32", "MapSint64Sint64", "MapFixed32Fixed32", "MapFixed64Fixed64", "MapSfixed32Sfixed32", "MapSfixed64Sfixed64", "MapInt32Float", "MapInt32Double", "MapBoolBool", "MapStringString", "MapInt32Bytes", "MapInt32Enum", "MapInt32ForeignMessage" }, null, null, new pbr::GeneratedCodeInfo[] { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, }),
+            new pbr::GeneratedCodeInfo(typeof(global::Google.Protobuf.TestProtos.TestMapSubmessage), global::Google.Protobuf.TestProtos.TestMapSubmessage.Parser, new[]{ "TestMap" }, null, null, null),
+            new pbr::GeneratedCodeInfo(typeof(global::Google.Protobuf.TestProtos.TestMessageMap), global::Google.Protobuf.TestProtos.TestMessageMap.Parser, new[]{ "MapInt32Message" }, null, null, new pbr::GeneratedCodeInfo[] { null, }),
+            new pbr::GeneratedCodeInfo(typeof(global::Google.Protobuf.TestProtos.TestSameTypeMap), global::Google.Protobuf.TestProtos.TestSameTypeMap.Parser, new[]{ "Map1", "Map2" }, null, null, new pbr::GeneratedCodeInfo[] { null, null, }),
+            new pbr::GeneratedCodeInfo(typeof(global::Google.Protobuf.TestProtos.TestArenaMap), global::Google.Protobuf.TestProtos.TestArenaMap.Parser, new[]{ "MapInt32Int32", "MapInt64Int64", "MapUint32Uint32", "MapUint64Uint64", "MapSint32Sint32", "MapSint64Sint64", "MapFixed32Fixed32", "MapFixed64Fixed64", "MapSfixed32Sfixed32", "MapSfixed64Sfixed64", "MapInt32Float", "MapInt32Double", "MapBoolBool", "MapInt32Enum", "MapInt32ForeignMessage" }, null, null, new pbr::GeneratedCodeInfo[] { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, }),
+            new pbr::GeneratedCodeInfo(typeof(global::Google.Protobuf.TestProtos.MessageContainingEnumCalledType), global::Google.Protobuf.TestProtos.MessageContainingEnumCalledType.Parser, new[]{ "Type" }, null, new[]{ typeof(global::Google.Protobuf.TestProtos.MessageContainingEnumCalledType.Types.Type) }, new pbr::GeneratedCodeInfo[] { null, }),
+            new pbr::GeneratedCodeInfo(typeof(global::Google.Protobuf.TestProtos.MessageContainingMapCalledEntry), global::Google.Protobuf.TestProtos.MessageContainingMapCalledEntry.Parser, new[]{ "Entry" }, null, null, new pbr::GeneratedCodeInfo[] { null, })
           }));
     }
     #endregion
@@ -181,7 +181,7 @@ namespace Google.Protobuf.TestProtos {
     public static pb::MessageParser<TestMap> Parser { get { return _parser; } }
 
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Google.Protobuf.TestProtos.MapUnittestProto3.Descriptor.MessageTypes[0]; }
+      get { return global::Google.Protobuf.TestProtos.MapUnittestProto3Reflection.Descriptor.MessageTypes[0]; }
     }
 
     pbr::MessageDescriptor pb::IMessage.Descriptor {
@@ -580,7 +580,7 @@ namespace Google.Protobuf.TestProtos {
     public static pb::MessageParser<TestMapSubmessage> Parser { get { return _parser; } }
 
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Google.Protobuf.TestProtos.MapUnittestProto3.Descriptor.MessageTypes[1]; }
+      get { return global::Google.Protobuf.TestProtos.MapUnittestProto3Reflection.Descriptor.MessageTypes[1]; }
     }
 
     pbr::MessageDescriptor pb::IMessage.Descriptor {
@@ -689,7 +689,7 @@ namespace Google.Protobuf.TestProtos {
     public static pb::MessageParser<TestMessageMap> Parser { get { return _parser; } }
 
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Google.Protobuf.TestProtos.MapUnittestProto3.Descriptor.MessageTypes[2]; }
+      get { return global::Google.Protobuf.TestProtos.MapUnittestProto3Reflection.Descriptor.MessageTypes[2]; }
     }
 
     pbr::MessageDescriptor pb::IMessage.Descriptor {
@@ -787,7 +787,7 @@ namespace Google.Protobuf.TestProtos {
     public static pb::MessageParser<TestSameTypeMap> Parser { get { return _parser; } }
 
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Google.Protobuf.TestProtos.MapUnittestProto3.Descriptor.MessageTypes[3]; }
+      get { return global::Google.Protobuf.TestProtos.MapUnittestProto3Reflection.Descriptor.MessageTypes[3]; }
     }
 
     pbr::MessageDescriptor pb::IMessage.Descriptor {
@@ -901,7 +901,7 @@ namespace Google.Protobuf.TestProtos {
     public static pb::MessageParser<TestArenaMap> Parser { get { return _parser; } }
 
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Google.Protobuf.TestProtos.MapUnittestProto3.Descriptor.MessageTypes[4]; }
+      get { return global::Google.Protobuf.TestProtos.MapUnittestProto3Reflection.Descriptor.MessageTypes[4]; }
     }
 
     pbr::MessageDescriptor pb::IMessage.Descriptor {
@@ -1266,7 +1266,7 @@ namespace Google.Protobuf.TestProtos {
     public static pb::MessageParser<MessageContainingEnumCalledType> Parser { get { return _parser; } }
 
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Google.Protobuf.TestProtos.MapUnittestProto3.Descriptor.MessageTypes[5]; }
+      get { return global::Google.Protobuf.TestProtos.MapUnittestProto3Reflection.Descriptor.MessageTypes[5]; }
     }
 
     pbr::MessageDescriptor pb::IMessage.Descriptor {
@@ -1375,7 +1375,7 @@ namespace Google.Protobuf.TestProtos {
     public static pb::MessageParser<MessageContainingMapCalledEntry> Parser { get { return _parser; } }
 
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Google.Protobuf.TestProtos.MapUnittestProto3.Descriptor.MessageTypes[6]; }
+      get { return global::Google.Protobuf.TestProtos.MapUnittestProto3Reflection.Descriptor.MessageTypes[6]; }
     }
 
     pbr::MessageDescriptor pb::IMessage.Descriptor {
