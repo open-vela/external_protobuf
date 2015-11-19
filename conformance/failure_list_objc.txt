@@ -1,2 +1,0 @@
-ProtobufInput.PrematureEofInDelimitedDataForKnownNonRepeatedValue.MESSAGE
-ProtobufInput.PrematureEofInDelimitedDataForKnownRepeatedValue.MESSAGE
