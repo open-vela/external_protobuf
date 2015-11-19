@@ -11,7 +11,7 @@ namespace Conformance {
 
   /// <summary>Holder for reflection information generated from conformance.proto</summary>
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-  public static partial class ConformanceReflection {
+  public static partial class Conformance {
 
     #region Descriptor
     /// <summary>File descriptor for conformance.proto</summary>
@@ -20,7 +20,7 @@ namespace Conformance {
     }
     private static pbr::FileDescriptor descriptor;
 
-    static ConformanceReflection() {
+    static Conformance() {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
             "ChFjb25mb3JtYW5jZS5wcm90bxILY29uZm9ybWFuY2UijQEKEkNvbmZvcm1h",
@@ -137,11 +137,11 @@ namespace Conformance {
       descriptor = pbr::FileDescriptor.InternalBuildGeneratedFileFrom(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedCodeInfo(new[] {typeof(global::Conformance.WireFormat), typeof(global::Conformance.ForeignEnum), }, new pbr::GeneratedCodeInfo[] {
-            new pbr::GeneratedCodeInfo(typeof(global::Conformance.ConformanceRequest), global::Conformance.ConformanceRequest.Parser, new[]{ "ProtobufPayload", "JsonPayload", "RequestedOutputFormat" }, new[]{ "Payload" }, null, null),
-            new pbr::GeneratedCodeInfo(typeof(global::Conformance.ConformanceResponse), global::Conformance.ConformanceResponse.Parser, new[]{ "ParseError", "RuntimeError", "ProtobufPayload", "JsonPayload", "Skipped" }, new[]{ "Result" }, null, null),
-            new pbr::GeneratedCodeInfo(typeof(global::Conformance.TestAllTypes), global::Conformance.TestAllTypes.Parser, new[]{ "OptionalInt32", "OptionalInt64", "OptionalUint32", "OptionalUint64", "OptionalSint32", "OptionalSint64", "OptionalFixed32", "OptionalFixed64", "OptionalSfixed32", "OptionalSfixed64", "OptionalFloat", "OptionalDouble", "OptionalBool", "OptionalString", "OptionalBytes", "OptionalNestedMessage", "OptionalForeignMessage", "OptionalNestedEnum", "OptionalForeignEnum", "OptionalStringPiece", "OptionalCord", "RecursiveMessage", "RepeatedInt32", "RepeatedInt64", "RepeatedUint32", "RepeatedUint64", "RepeatedSint32", "RepeatedSint64", "RepeatedFixed32", "RepeatedFixed64", "RepeatedSfixed32", "RepeatedSfixed64", "RepeatedFloat", "RepeatedDouble", "RepeatedBool", "RepeatedString", "RepeatedBytes", "RepeatedNestedMessage", "RepeatedForeignMessage", "RepeatedNestedEnum", "RepeatedForeignEnum", "RepeatedStringPiece", "RepeatedCord", "MapInt32Int32", "MapInt64Int64", "MapUint32Uint32", "MapUint64Uint64", "MapSint32Sint32", "MapSint64Sint64", "MapFixed32Fixed32", "MapFixed64Fixed64", "MapSfixed32Sfixed32", "MapSfixed64Sfixed64", "MapInt32Float", "MapInt32Double", "MapBoolBool", "MapStringString", "MapStringBytes", "MapStringNestedMessage", "MapStringForeignMessage", "MapStringNestedEnum", "MapStringForeignEnum", "OneofUint32", "OneofNestedMessage", "OneofString", "OneofBytes" }, new[]{ "OneofField" }, new[]{ typeof(global::Conformance.TestAllTypes.Types.NestedEnum) }, new pbr::GeneratedCodeInfo[] { new pbr::GeneratedCodeInfo(typeof(global::Conformance.TestAllTypes.Types.NestedMessage), global::Conformance.TestAllTypes.Types.NestedMessage.Parser, new[]{ "A", "Corecursive" }, null, null, null),
+            new pbr::GeneratedCodeInfo(typeof(global::Conformance.ConformanceRequest), new[]{ "ProtobufPayload", "JsonPayload", "RequestedOutputFormat" }, new[]{ "Payload" }, null, null),
+            new pbr::GeneratedCodeInfo(typeof(global::Conformance.ConformanceResponse), new[]{ "ParseError", "RuntimeError", "ProtobufPayload", "JsonPayload", "Skipped" }, new[]{ "Result" }, null, null),
+            new pbr::GeneratedCodeInfo(typeof(global::Conformance.TestAllTypes), new[]{ "OptionalInt32", "OptionalInt64", "OptionalUint32", "OptionalUint64", "OptionalSint32", "OptionalSint64", "OptionalFixed32", "OptionalFixed64", "OptionalSfixed32", "OptionalSfixed64", "OptionalFloat", "OptionalDouble", "OptionalBool", "OptionalString", "OptionalBytes", "OptionalNestedMessage", "OptionalForeignMessage", "OptionalNestedEnum", "OptionalForeignEnum", "OptionalStringPiece", "OptionalCord", "RecursiveMessage", "RepeatedInt32", "RepeatedInt64", "RepeatedUint32", "RepeatedUint64", "RepeatedSint32", "RepeatedSint64", "RepeatedFixed32", "RepeatedFixed64", "RepeatedSfixed32", "RepeatedSfixed64", "RepeatedFloat", "RepeatedDouble", "RepeatedBool", "RepeatedString", "RepeatedBytes", "RepeatedNestedMessage", "RepeatedForeignMessage", "RepeatedNestedEnum", "RepeatedForeignEnum", "RepeatedStringPiece", "RepeatedCord", "MapInt32Int32", "MapInt64Int64", "MapUint32Uint32", "MapUint64Uint64", "MapSint32Sint32", "MapSint64Sint64", "MapFixed32Fixed32", "MapFixed64Fixed64", "MapSfixed32Sfixed32", "MapSfixed64Sfixed64", "MapInt32Float", "MapInt32Double", "MapBoolBool", "MapStringString", "MapStringBytes", "MapStringNestedMessage", "MapStringForeignMessage", "MapStringNestedEnum", "MapStringForeignEnum", "OneofUint32", "OneofNestedMessage", "OneofString", "OneofBytes" }, new[]{ "OneofField" }, new[]{ typeof(global::Conformance.TestAllTypes.Types.NestedEnum) }, new pbr::GeneratedCodeInfo[] { new pbr::GeneratedCodeInfo(typeof(global::Conformance.TestAllTypes.Types.NestedMessage), new[]{ "A", "Corecursive" }, null, null, null),
             null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, }),
-            new pbr::GeneratedCodeInfo(typeof(global::Conformance.ForeignMessage), global::Conformance.ForeignMessage.Parser, new[]{ "C" }, null, null, null)
+            new pbr::GeneratedCodeInfo(typeof(global::Conformance.ForeignMessage), new[]{ "C" }, null, null, null)
           }));
     }
     #endregion
@@ -176,7 +176,7 @@ namespace Conformance {
     public static pb::MessageParser<ConformanceRequest> Parser { get { return _parser; } }
 
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Conformance.ConformanceReflection.Descriptor.MessageTypes[0]; }
+      get { return global::Conformance.Conformance.Descriptor.MessageTypes[0]; }
     }
 
     pbr::MessageDescriptor pb::IMessage.Descriptor {
@@ -368,7 +368,7 @@ namespace Conformance {
     public static pb::MessageParser<ConformanceResponse> Parser { get { return _parser; } }
 
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Conformance.ConformanceReflection.Descriptor.MessageTypes[1]; }
+      get { return global::Conformance.Conformance.Descriptor.MessageTypes[1]; }
     }
 
     pbr::MessageDescriptor pb::IMessage.Descriptor {
@@ -645,7 +645,7 @@ namespace Conformance {
     public static pb::MessageParser<TestAllTypes> Parser { get { return _parser; } }
 
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Conformance.ConformanceReflection.Descriptor.MessageTypes[2]; }
+      get { return global::Conformance.Conformance.Descriptor.MessageTypes[2]; }
     }
 
     pbr::MessageDescriptor pb::IMessage.Descriptor {
@@ -2418,7 +2418,7 @@ namespace Conformance {
     public static pb::MessageParser<ForeignMessage> Parser { get { return _parser; } }
 
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Conformance.ConformanceReflection.Descriptor.MessageTypes[3]; }
+      get { return global::Conformance.Conformance.Descriptor.MessageTypes[3]; }
     }
 
     pbr::MessageDescriptor pb::IMessage.Descriptor {

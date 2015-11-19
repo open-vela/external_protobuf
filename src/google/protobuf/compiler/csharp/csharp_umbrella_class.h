@@ -28,8 +28,8 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef GOOGLE_PROTOBUF_COMPILER_CSHARP_REFLECTION_CLASS_H__
-#define GOOGLE_PROTOBUF_COMPILER_CSHARP_REFLECTION_CLASS_H__
+#ifndef GOOGLE_PROTOBUF_COMPILER_CSHARP_UMBRELLA_CLASS_H__
+#define GOOGLE_PROTOBUF_COMPILER_CSHARP_UMBRELLA_CLASS_H__
 
 #include <string>
 
@@ -41,10 +41,10 @@ namespace protobuf {
 namespace compiler {
 namespace csharp {
 
-class ReflectionClassGenerator : public SourceGeneratorBase {
+class UmbrellaClassGenerator : public SourceGeneratorBase {
  public:
-  ReflectionClassGenerator(const FileDescriptor* file);
-  ~ReflectionClassGenerator();
+  UmbrellaClassGenerator(const FileDescriptor* file);
+  ~UmbrellaClassGenerator();
 
   void Generate(io::Printer* printer);
 
@@ -52,13 +52,14 @@ class ReflectionClassGenerator : public SourceGeneratorBase {
   const FileDescriptor* file_;
 
   std::string namespace_;
-  std::string reflectionClassname_;
+  std::string umbrellaClassname_;
+  std::string umbrellaNamespace_;
 
   void WriteIntroduction(io::Printer* printer);
   void WriteDescriptor(io::Printer* printer);
   void WriteGeneratedCodeInfo(const Descriptor* descriptor, io::Printer* printer, bool last);
 
-  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(ReflectionClassGenerator);
+  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(UmbrellaClassGenerator);
 };
 
 }  // namespace csharp
@@ -66,4 +67,4 @@ class ReflectionClassGenerator : public SourceGeneratorBase {
 }  // namespace protobuf
 }  // namespace google
 
-#endif  // GOOGLE_PROTOBUF_COMPILER_CSHARP_REFLECTION_CLASS_H__
+#endif  // GOOGLE_PROTOBUF_COMPILER_CSHARP_UMBRELLA_CLASS_H__
