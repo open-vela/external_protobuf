@@ -43,13 +43,13 @@ namespace Google.Protobuf.Reflection
         private readonly EnumDescriptorProto proto;
         private readonly MessageDescriptor containingType;
         private readonly IList<EnumValueDescriptor> values;
-        private readonly Type clrType;
+        private readonly Type generatedType;
 
-        internal EnumDescriptor(EnumDescriptorProto proto, FileDescriptor file, MessageDescriptor parent, int index, Type clrType)
+        internal EnumDescriptor(EnumDescriptorProto proto, FileDescriptor file, MessageDescriptor parent, int index, Type generatedType)
             : base(file, file.ComputeFullName(parent, proto.Name), index)
         {
             this.proto = proto;
-            this.clrType = clrType;
+            this.generatedType = generatedType;
             containingType = parent;
 
             if (proto.Value.Count == 0)
@@ -73,9 +73,9 @@ namespace Google.Protobuf.Reflection
         public override string Name { get { return proto.Name; } }
 
         /// <summary>
-        /// The CLR type for this enum. For generated code, this will be a CLR enum type.
+        /// The generated type for this enum, or <c>null</c> if the descriptor does not represent a generated type.
         /// </summary>
-        public Type ClrType { get { return clrType; } }
+        public Type GeneratedType { get { return generatedType; } }
 
         /// <value>
         /// If this is a nested type, get the outer descriptor, otherwise null.
