@@ -291,7 +291,8 @@ namespace Google.Protobuf
             {
                 // Parse wrapper types as their constituent types.
                 // TODO: What does this mean for null?
-                if (field.MessageType.IsWrapperType)
+                // TODO: Detect this differently when we have dynamic messages, and put it in one place...
+                if (field.MessageType.IsWellKnownType && field.MessageType.File == Int32Value.Descriptor.File)
                 {
                     field = field.MessageType.Fields[WrappersReflection.WrapperValueFieldNumber];
                     fieldType = field.FieldType;

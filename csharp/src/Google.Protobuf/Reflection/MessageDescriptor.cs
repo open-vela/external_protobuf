@@ -56,145 +56,153 @@ namespace Google.Protobuf.Reflection
             "google/protobuf/type.proto",
         };
 
+        private readonly DescriptorProto proto;
+        private readonly MessageDescriptor containingType;
+        private readonly IList<MessageDescriptor> nestedTypes;
+        private readonly IList<EnumDescriptor> enumTypes;
         private readonly IList<FieldDescriptor> fieldsInDeclarationOrder;
         private readonly IList<FieldDescriptor> fieldsInNumberOrder;
         private readonly IDictionary<string, FieldDescriptor> jsonFieldMap;
+        private readonly FieldCollection fields;
+        private readonly IList<OneofDescriptor> oneofs;
+        // CLR representation of the type described by this descriptor, if any.
+        private readonly Type generatedType;
+        private readonly MessageParser parser;
         
         internal MessageDescriptor(DescriptorProto proto, FileDescriptor file, MessageDescriptor parent, int typeIndex, GeneratedCodeInfo generatedCodeInfo)
             : base(file, file.ComputeFullName(parent, proto.Name), typeIndex)
         {
-            Proto = proto;
-            Parser = generatedCodeInfo?.Parser;
-            ClrType = generatedCodeInfo?.ClrType;
-            ContainingType = parent;
+            this.proto = proto;
+            parser = generatedCodeInfo == null ? null : generatedCodeInfo.Parser;
+            generatedType = generatedCodeInfo == null ? null : generatedCodeInfo.ClrType;
 
-            // Note use of generatedCodeInfo. rather than generatedCodeInfo?. here... we don't expect
-            // to see any nested oneofs, types or enums in "not actually generated" code... we do
-            // expect fields though (for map entry messages).
-            Oneofs = DescriptorUtil.ConvertAndMakeReadOnly(
+            containingType = parent;
+
+            oneofs = DescriptorUtil.ConvertAndMakeReadOnly(
                 proto.OneofDecl,
                 (oneof, index) =>
-                new OneofDescriptor(oneof, file, this, index, generatedCodeInfo.OneofNames[index]));
+                new OneofDescriptor(oneof, file, this, index, generatedCodeInfo == null ? null : generatedCodeInfo.OneofNames[index]));
 
-            NestedTypes = DescriptorUtil.ConvertAndMakeReadOnly(
+            nestedTypes = DescriptorUtil.ConvertAndMakeReadOnly(
                 proto.NestedType,
                 (type, index) =>
-                new MessageDescriptor(type, file, this, index, generatedCodeInfo.NestedTypes[index]));
+                new MessageDescriptor(type, file, this, index, generatedCodeInfo == null ? null : generatedCodeInfo.NestedTypes[index]));
 
-            EnumTypes = DescriptorUtil.ConvertAndMakeReadOnly(
+            enumTypes = DescriptorUtil.ConvertAndMakeReadOnly(
                 proto.EnumType,
                 (type, index) =>
-                new EnumDescriptor(type, file, this, index, generatedCodeInfo.NestedEnums[index]));
+                new EnumDescriptor(type, file, this, index, generatedCodeInfo == null ? null : generatedCodeInfo.NestedEnums[index]));
 
             fieldsInDeclarationOrder = DescriptorUtil.ConvertAndMakeReadOnly(
                 proto.Field,
                 (field, index) =>
-                new FieldDescriptor(field, file, this, index, generatedCodeInfo?.PropertyNames[index]));
+                new FieldDescriptor(field, file, this, index, generatedCodeInfo == null ? null : generatedCodeInfo.PropertyNames[index]));
             fieldsInNumberOrder = new ReadOnlyCollection<FieldDescriptor>(fieldsInDeclarationOrder.OrderBy(field => field.FieldNumber).ToArray());
             // TODO: Use field => field.Proto.JsonName when we're confident it's appropriate. (And then use it in the formatter, too.)
             jsonFieldMap = new ReadOnlyDictionary<string, FieldDescriptor>(fieldsInNumberOrder.ToDictionary(field => JsonFormatter.ToCamelCase(field.Name)));
             file.DescriptorPool.AddSymbol(this);
-            Fields = new FieldCollection(this);
+            fields = new FieldCollection(this);
+        }
+                
+        /// <summary>
+        /// Returns the total number of nested types and enums, recursively.
+        /// </summary>
+        private int CountTotalGeneratedTypes()
+        {
+            return nestedTypes.Sum(nested => nested.CountTotalGeneratedTypes()) + enumTypes.Count;
         }
 
         /// <summary>
         /// The brief name of the descriptor's target.
         /// </summary>
-        public override string Name => Proto.Name;
+        public override string Name { get { return proto.Name; } }
 
-        internal DescriptorProto Proto { get; }
+        internal DescriptorProto Proto { get { return proto; } }
 
         /// <summary>
-        /// The CLR type used to represent message instances from this descriptor.
+        /// The generated type for this message, or <c>null</c> if the descriptor does not represent a generated type.
         /// </summary>
-        /// <remarks>
-        /// <para>
-        /// The value returned by this property will be non-null for all regular fields. However,
-        /// if a message containing a map field is introspected, the list of nested messages will include
-        /// an auto-generated nested key/value pair message for the field. This is not represented in any
-        /// generated type, so this property will return null in such cases.
-        /// </para>
-        /// <para>
-        /// For wrapper types (<see cref="Google.Protobuf.WellKnownTypes.StringValue"/> and the like), the type returned here
-        /// will be the generated message type, not the native type used by reflection for fields of those types. Code
-        /// using reflection should call <see cref="IsWrapperType"/> to determine whether a message descriptor represents
-        /// a wrapper type, and handle the result appropriately.
-        /// </para>
-        /// </remarks>
-        public Type ClrType { get; }
+        public Type GeneratedType { get { return generatedType; } }
 
         /// <summary>
         /// A parser for this message type.
         /// </summary>
         /// <remarks>
-        /// <para>
         /// As <see cref="MessageDescriptor"/> is not generic, this cannot be statically
-        /// typed to the relevant type, but it should produce objects of a type compatible with <see cref="ClrType"/>.
-        /// </para>
-        /// <para>
-        /// The value returned by this property will be non-null for all regular fields. However,
-        /// if a message containing a map field is introspected, the list of nested messages will include
-        /// an auto-generated nested key/value pair message for the field. No message parser object is created for
-        /// such messages, so this property will return null in such cases.
-        /// </para>
-        /// <para>
-        /// For wrapper types (<see cref="Google.Protobuf.WellKnownTypes.StringValue"/> and the like), the parser returned here
-        /// will be the generated message type, not the native type used by reflection for fields of those types. Code
-        /// using reflection should call <see cref="IsWrapperType"/> to determine whether a message descriptor represents
-        /// a wrapper type, and handle the result appropriately.
-        /// </para>
+        /// typed to the relevant type, but if <see cref="GeneratedType"/> returns a non-null value, the parser returned
         /// </remarks>
-        public MessageParser Parser { get; }
+        public MessageParser Parser { get { return parser; } }
 
         /// <summary>
         /// Returns whether this message is one of the "well known types" which may have runtime/protoc support.
         /// </summary>
-        internal bool IsWellKnownType => File.Package == "google.protobuf" && WellKnownTypeNames.Contains(File.Name);
-
-        /// <summary>
-        /// Returns whether this message is one of the "wrapper types" used for fields which represent primitive values
-        /// with the addition of presence.
-        /// </summary>
-        internal bool IsWrapperType => File.Package == "google.protobuf" && File.Name == "google/protobuf/wrappers.proto";
+        internal bool IsWellKnownType
+        {
+            get
+            {
+                return File.Package == "google.protobuf" && WellKnownTypeNames.Contains(File.Name);
+            }
+        }
 
         /// <value>
         /// If this is a nested type, get the outer descriptor, otherwise null.
         /// </value>
-        public MessageDescriptor ContainingType { get; }
+        public MessageDescriptor ContainingType
+        {
+            get { return containingType; }
+        }
 
         /// <value>
         /// A collection of fields, which can be retrieved by name or field number.
         /// </value>
-        public FieldCollection Fields { get; }
+        public FieldCollection Fields
+        {
+            get { return fields; }
+        }
 
         /// <value>
         /// An unmodifiable list of this message type's nested types.
         /// </value>
-        public IList<MessageDescriptor> NestedTypes { get; }
+        public IList<MessageDescriptor> NestedTypes
+        {
+            get { return nestedTypes; }
+        }
 
         /// <value>
         /// An unmodifiable list of this message type's enum types.
         /// </value>
-        public IList<EnumDescriptor> EnumTypes { get; }
+        public IList<EnumDescriptor> EnumTypes
+        {
+            get { return enumTypes; }
+        }
 
         /// <value>
         /// An unmodifiable list of the "oneof" field collections in this message type.
         /// </value>
-        public IList<OneofDescriptor> Oneofs { get; }
+        public IList<OneofDescriptor> Oneofs
+        {
+            get { return oneofs; }
+        }
 
         /// <summary>
         /// Finds a field by field name.
         /// </summary>
         /// <param name="name">The unqualified name of the field (e.g. "foo").</param>
         /// <returns>The field's descriptor, or null if not found.</returns>
-        public FieldDescriptor FindFieldByName(String name) => File.DescriptorPool.FindSymbol<FieldDescriptor>(FullName + "." + name);
+        public FieldDescriptor FindFieldByName(String name)
+        {
+            return File.DescriptorPool.FindSymbol<FieldDescriptor>(FullName + "." + name);
+        }
 
         /// <summary>
         /// Finds a field by field number.
         /// </summary>
         /// <param name="number">The field number within this message type.</param>
         /// <returns>The field's descriptor, or null if not found.</returns>
-        public FieldDescriptor FindFieldByNumber(int number) => File.DescriptorPool.FindFieldByNumber(this, number);
+        public FieldDescriptor FindFieldByNumber(int number)
+        {
+            return File.DescriptorPool.FindFieldByNumber(this, number);
+        }
 
         /// <summary>
         /// Finds a nested descriptor by name. The is valid for fields, nested
@@ -202,15 +210,18 @@ namespace Google.Protobuf.Reflection
         /// </summary>
         /// <param name="name">The unqualified name of the descriptor, e.g. "Foo"</param>
         /// <returns>The descriptor, or null if not found.</returns>
-        public T FindDescriptor<T>(string name)  where T : class, IDescriptor =>
-            File.DescriptorPool.FindSymbol<T>(FullName + "." + name);
+        public T FindDescriptor<T>(string name)
+            where T : class, IDescriptor
+        {
+            return File.DescriptorPool.FindSymbol<T>(FullName + "." + name);
+        }
 
         /// <summary>
         /// Looks up and cross-links all fields and nested types.
         /// </summary>
         internal void CrossLink()
         {
-            foreach (MessageDescriptor message in NestedTypes)
+            foreach (MessageDescriptor message in nestedTypes)
             {
                 message.CrossLink();
             }
@@ -220,7 +231,7 @@ namespace Google.Protobuf.Reflection
                 field.CrossLink();
             }
 
-            foreach (OneofDescriptor oneof in Oneofs)
+            foreach (OneofDescriptor oneof in oneofs)
             {
                 oneof.CrossLink();
             }
@@ -242,7 +253,10 @@ namespace Google.Protobuf.Reflection
             /// Returns the fields in the message as an immutable list, in the order in which they
             /// are declared in the source .proto file.
             /// </value>
-            public IList<FieldDescriptor> InDeclarationOrder() => messageDescriptor.fieldsInDeclarationOrder;
+            public IList<FieldDescriptor> InDeclarationOrder()
+            {
+                return messageDescriptor.fieldsInDeclarationOrder;
+            }
 
             /// <value>
             /// Returns the fields in the message as an immutable list, in ascending field number
@@ -250,7 +264,10 @@ namespace Google.Protobuf.Reflection
             /// index in the list to the field number; to retrieve a field by field number, it is better
             /// to use the <see cref="FieldCollection"/> indexer.
             /// </value>
-            public IList<FieldDescriptor> InFieldNumberOrder() => messageDescriptor.fieldsInNumberOrder;
+            public IList<FieldDescriptor> InFieldNumberOrder()
+            {
+                return messageDescriptor.fieldsInNumberOrder;
+            }
 
             // TODO: consider making this public in the future. (Being conservative for now...)
 
@@ -259,7 +276,10 @@ namespace Google.Protobuf.Reflection
             /// in the JSON representation to the field descriptors. For example, a field <c>foo_bar</c>
             /// in the message would result in an entry with a key <c>fooBar</c>.
             /// </value>
-            internal IDictionary<string, FieldDescriptor> ByJsonName() => messageDescriptor.jsonFieldMap;
+            internal IDictionary<string, FieldDescriptor> ByJsonName()
+            {
+                return messageDescriptor.jsonFieldMap;
+            }
 
             /// <summary>
             /// Retrieves the descriptor for the field with the given number.
