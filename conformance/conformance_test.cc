@@ -514,11 +514,9 @@ bool ConformanceTestSuite::RunSuite(ConformanceTestRunner* runner,
                     "These tests succeeded, even though they were listed in "
                     "the failure list.  Remove them from the failure list");
 
-  if (verbose_) {
-    CheckSetEmpty(skipped_,
-                  "These tests were skipped (probably because support for some "
-                  "features is not implemented)");
-  }
+  CheckSetEmpty(skipped_,
+                "These tests were skipped (probably because support for some "
+                "features is not implemented)");
 
   StringAppendF(&output_,
                 "CONFORMANCE SUITE %s: %d successes, %d skipped, "
