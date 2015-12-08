@@ -2,7 +2,7 @@
 // source: google/protobuf/field_mask.proto
 
 #define INTERNAL_SUPPRESS_PROTOBUF_FIELD_DEPRECATION
-#include <google/protobuf/field_mask.pb.h>
+#include "google/protobuf/field_mask.pb.h"
 
 #include <algorithm>
 
@@ -110,9 +110,9 @@ static void MergeFromFail(int line) {
 
 // ===================================================================
 
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
+#ifndef _MSC_VER
 const int FieldMask::kPathsFieldNumber;
-#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+#endif  // !_MSC_VER
 
 FieldMask::FieldMask()
   : ::google::protobuf::Message(), _internal_metadata_(NULL) {

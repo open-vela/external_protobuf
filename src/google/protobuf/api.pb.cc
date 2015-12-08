@@ -2,7 +2,7 @@
 // source: google/protobuf/api.proto
 
 #define INTERNAL_SUPPRESS_PROTOBUF_FIELD_DEPRECATION
-#include <google/protobuf/api.pb.h>
+#include "google/protobuf/api.pb.h"
 
 #include <algorithm>
 
@@ -186,7 +186,7 @@ static void MergeFromFail(int line) {
 
 // ===================================================================
 
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
+#ifndef _MSC_VER
 const int Api::kNameFieldNumber;
 const int Api::kMethodsFieldNumber;
 const int Api::kOptionsFieldNumber;
@@ -194,7 +194,7 @@ const int Api::kVersionFieldNumber;
 const int Api::kSourceContextFieldNumber;
 const int Api::kMixinsFieldNumber;
 const int Api::kSyntaxFieldNumber;
-#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+#endif  // !_MSC_VER
 
 Api::Api()
   : ::google::protobuf::Message(), _internal_metadata_(NULL) {
@@ -904,7 +904,7 @@ void Api::clear_syntax() {
 
 // ===================================================================
 
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
+#ifndef _MSC_VER
 const int Method::kNameFieldNumber;
 const int Method::kRequestTypeUrlFieldNumber;
 const int Method::kRequestStreamingFieldNumber;
@@ -912,7 +912,7 @@ const int Method::kResponseTypeUrlFieldNumber;
 const int Method::kResponseStreamingFieldNumber;
 const int Method::kOptionsFieldNumber;
 const int Method::kSyntaxFieldNumber;
-#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+#endif  // !_MSC_VER
 
 Method::Method()
   : ::google::protobuf::Message(), _internal_metadata_(NULL) {
@@ -1608,10 +1608,10 @@ void Method::clear_syntax() {
 
 // ===================================================================
 
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
+#ifndef _MSC_VER
 const int Mixin::kNameFieldNumber;
 const int Mixin::kRootFieldNumber;
-#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+#endif  // !_MSC_VER
 
 Mixin::Mixin()
   : ::google::protobuf::Message(), _internal_metadata_(NULL) {
