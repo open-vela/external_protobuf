@@ -55,15 +55,10 @@ NSString *const GPBExceptionMessageKey =
 static NSString *const kGPBDataCoderKey = @"GPBData";
 
 #ifndef _GPBCompileAssert
-  #if __has_feature(c_static_assert) || __has_extension(c_static_assert)
-    #define _GPBCompileAssert(test, msg) _Static_assert((test), #msg)
-  #else
-    // Pre-Xcode 7 support.
-    #define _GPBCompileAssertSymbolInner(line, msg) _GPBCompileAssert ## line ## __ ## msg
-    #define _GPBCompileAssertSymbol(line, msg) _GPBCompileAssertSymbolInner(line, msg)
-    #define _GPBCompileAssert(test, msg) \
-        typedef char _GPBCompileAssertSymbol(__LINE__, msg) [ ((test) ? 1 : -1) ]
-  #endif  // __has_feature(c_static_assert) || __has_extension(c_static_assert)
+#define _GPBCompileAssertSymbolInner(line, msg) _GPBCompileAssert ## line ## __ ## msg
+#define _GPBCompileAssertSymbol(line, msg) _GPBCompileAssertSymbolInner(line, msg)
+#define _GPBCompileAssert(test, msg) \
+    typedef char _GPBCompileAssertSymbol(__LINE__, msg) [ ((test) ? 1 : -1) ]
 #endif // _GPBCompileAssert
 
 //
@@ -1217,8 +1212,7 @@ static GPBUnknownFieldSet *GetOrMakeUnknownFields(GPBMessage *self) {
     NSLog(@"%@: Internal exception while building message delimitedData: %@",
           [self class], exception);
 #endif
-    // If it happens, truncate.
-    data.length = 0;
+    data = nil;
   }
   [stream release];
   return data;
@@ -1797,12 +1791,7 @@ static GPBUnknownFieldSet *GetOrMakeUnknownFields(GPBMessage *self) {
     extensionMap_ = [[NSMutableDictionary alloc] init];
   }
 
-  // This pointless cast is for CLANG_WARN_NULLABLE_TO_NONNULL_CONVERSION.
-  // Without it, the compiler complains we're passing an id nullable when
-  // setObject:forKey: requires a id nonnull for the value. The check for
-  // !value at the start of the method ensures it isn't nil, but the check
-  // isn't smart enough to realize that.
-  [extensionMap_ setObject:(id)value forKey:extension];
+  [extensionMap_ setObject:value forKey:extension];
 
   GPBExtensionDescriptor *descriptor = extension;
 

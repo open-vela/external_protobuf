@@ -265,8 +265,6 @@ inline bool SupportsArenas(const FieldDescriptor* field) {
 bool IsAnyMessage(const FileDescriptor* descriptor);
 bool IsAnyMessage(const Descriptor* descriptor);
 
-bool IsWellKnownMessage(const FileDescriptor* descriptor);
-
 void GenerateUtf8CheckCodeForString(
     const FieldDescriptor* field,
     bool for_parse,

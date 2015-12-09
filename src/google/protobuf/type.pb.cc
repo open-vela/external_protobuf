@@ -2,7 +2,7 @@
 // source: google/protobuf/type.proto
 
 #define INTERNAL_SUPPRESS_PROTOBUF_FIELD_DEPRECATION
-#include <google/protobuf/type.pb.h>
+#include "google/protobuf/type.pb.h"
 
 #include <algorithm>
 
@@ -282,14 +282,14 @@ static void MergeFromFail(int line) {
 
 // ===================================================================
 
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
+#ifndef _MSC_VER
 const int Type::kNameFieldNumber;
 const int Type::kFieldsFieldNumber;
 const int Type::kOneofsFieldNumber;
 const int Type::kOptionsFieldNumber;
 const int Type::kSourceContextFieldNumber;
 const int Type::kSyntaxFieldNumber;
-#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+#endif  // !_MSC_VER
 
 Type::Type()
   : ::google::protobuf::Message(), _internal_metadata_(NULL) {
@@ -967,7 +967,7 @@ bool Field_Kind_IsValid(int value) {
   }
 }
 
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
+#ifndef _MSC_VER
 const Field_Kind Field::TYPE_UNKNOWN;
 const Field_Kind Field::TYPE_DOUBLE;
 const Field_Kind Field::TYPE_FLOAT;
@@ -990,7 +990,7 @@ const Field_Kind Field::TYPE_SINT64;
 const Field_Kind Field::Kind_MIN;
 const Field_Kind Field::Kind_MAX;
 const int Field::Kind_ARRAYSIZE;
-#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+#endif  // _MSC_VER
 const ::google::protobuf::EnumDescriptor* Field_Cardinality_descriptor() {
   protobuf_AssignDescriptorsOnce();
   return Field_Cardinality_descriptor_;
@@ -1007,7 +1007,7 @@ bool Field_Cardinality_IsValid(int value) {
   }
 }
 
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
+#ifndef _MSC_VER
 const Field_Cardinality Field::CARDINALITY_UNKNOWN;
 const Field_Cardinality Field::CARDINALITY_OPTIONAL;
 const Field_Cardinality Field::CARDINALITY_REQUIRED;
@@ -1015,8 +1015,8 @@ const Field_Cardinality Field::CARDINALITY_REPEATED;
 const Field_Cardinality Field::Cardinality_MIN;
 const Field_Cardinality Field::Cardinality_MAX;
 const int Field::Cardinality_ARRAYSIZE;
-#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
+#endif  // _MSC_VER
+#ifndef _MSC_VER
 const int Field::kKindFieldNumber;
 const int Field::kCardinalityFieldNumber;
 const int Field::kNumberFieldNumber;
@@ -1026,7 +1026,7 @@ const int Field::kOneofIndexFieldNumber;
 const int Field::kPackedFieldNumber;
 const int Field::kOptionsFieldNumber;
 const int Field::kJsonNameFieldNumber;
-#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+#endif  // !_MSC_VER
 
 Field::Field()
   : ::google::protobuf::Message(), _internal_metadata_(NULL) {
@@ -1830,13 +1830,13 @@ void Field::clear_json_name() {
 
 // ===================================================================
 
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
+#ifndef _MSC_VER
 const int Enum::kNameFieldNumber;
 const int Enum::kEnumvalueFieldNumber;
 const int Enum::kOptionsFieldNumber;
 const int Enum::kSourceContextFieldNumber;
 const int Enum::kSyntaxFieldNumber;
-#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+#endif  // !_MSC_VER
 
 Enum::Enum()
   : ::google::protobuf::Message(), _internal_metadata_(NULL) {
@@ -2379,11 +2379,11 @@ void Enum::clear_syntax() {
 
 // ===================================================================
 
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
+#ifndef _MSC_VER
 const int EnumValue::kNameFieldNumber;
 const int EnumValue::kNumberFieldNumber;
 const int EnumValue::kOptionsFieldNumber;
-#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+#endif  // !_MSC_VER
 
 EnumValue::EnumValue()
   : ::google::protobuf::Message(), _internal_metadata_(NULL) {
@@ -2775,10 +2775,10 @@ EnumValue::options() const {
 
 // ===================================================================
 
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
+#ifndef _MSC_VER
 const int Option::kNameFieldNumber;
 const int Option::kValueFieldNumber;
-#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+#endif  // !_MSC_VER
 
 Option::Option()
   : ::google::protobuf::Message(), _internal_metadata_(NULL) {
