@@ -127,7 +127,7 @@ CF_EXTERN_C_END
 
 // Same as -[data], except a delimiter is added to the start of the data
 // indicating the size of the message data that follows.
-- (NSData *)delimitedData;
+- (nullable NSData *)delimitedData;
 
 // Returns the size of the object if it were serialized.
 // This is not a cached value. If you are following a pattern like this:

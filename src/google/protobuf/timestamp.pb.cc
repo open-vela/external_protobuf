@@ -2,7 +2,7 @@
 // source: google/protobuf/timestamp.proto
 
 #define INTERNAL_SUPPRESS_PROTOBUF_FIELD_DEPRECATION
-#include <google/protobuf/timestamp.pb.h>
+#include "google/protobuf/timestamp.pb.h"
 
 #include <algorithm>
 
@@ -111,10 +111,10 @@ static void MergeFromFail(int line) {
 
 // ===================================================================
 
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
+#ifndef _MSC_VER
 const int Timestamp::kSecondsFieldNumber;
 const int Timestamp::kNanosFieldNumber;
-#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+#endif  // !_MSC_VER
 
 Timestamp::Timestamp()
   : ::google::protobuf::Message(), _internal_metadata_(NULL) {
