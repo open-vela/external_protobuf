@@ -60,10 +60,6 @@ class ProtobufArrayList<E> extends AbstractProtobufList<E> {
     list = new ArrayList<E>(toCopy);
   }
   
-  ProtobufArrayList(int capacity) {
-    list = new ArrayList<E>(capacity);
-  }
-  
   @Override
   public void add(int index, E element) {
     ensureIsMutable();
