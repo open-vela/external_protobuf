@@ -69,7 +69,7 @@ import java.util.Stack;
  *
  * @author carlanton@google.com (Carl Haverl)
  */
-final class RopeByteString extends ByteString {
+class RopeByteString extends ByteString {
 
   /**
    * BAP95. Let Fn be the nth Fibonacci number. A {@link RopeByteString} of
@@ -151,24 +151,21 @@ final class RopeByteString extends ByteString {
    * @return concatenation representing the same sequence as the given strings
    */
   static ByteString concatenate(ByteString left, ByteString right) {
+    ByteString result;
+    RopeByteString leftRope =
+        (left instanceof RopeByteString) ? (RopeByteString) left : null;
     if (right.size() == 0) {
-      return left;
-    }
-
-    if (left.size() == 0) {
-      return right;
-    }
-
-    final int newLength = left.size() + right.size();
-    if (newLength < ByteString.CONCATENATE_BY_COPY_SIZE) {
-      // Optimization from BAP95: For short (leaves in paper, but just short
-      // here) total length, do a copy of data to a new leaf.
-      return concatenateBytes(left, right);
-    }
-
-    if (left instanceof RopeByteString) {
-      final RopeByteString leftRope = (RopeByteString) left;
-      if (leftRope.right.size() + right.size() < CONCATENATE_BY_COPY_SIZE) {
+      result = left;
+    } else if (left.size() == 0) {
+      result = right;
+    } else {
+      int newLength = left.size() + right.size();
+      if (newLength < ByteString.CONCATENATE_BY_COPY_SIZE) {
+        // Optimization from BAP95: For short (leaves in paper, but just short
+        // here) total length, do a copy of data to a new leaf.
+        result = concatenateBytes(left, right);
+      } else if (leftRope != null
+          && leftRope.right.size() + right.size() < CONCATENATE_BY_COPY_SIZE) {
         // Optimization from BAP95: As an optimization of the case where the
         // ByteString is constructed by repeated concatenate, recognize the case
         // where a short string is concatenated to a left-hand node whose
@@ -180,10 +177,9 @@ final class RopeByteString extends ByteString {
         // new parent node so that the depth of the result is the same as the
         // given left tree.
         ByteString newRight = concatenateBytes(leftRope.right, right);
-        return new RopeByteString(leftRope.left, newRight);
-      }
-
-      if (leftRope.left.getTreeDepth() > leftRope.right.getTreeDepth()
+        result = new RopeByteString(leftRope.left, newRight);
+      } else if (leftRope != null
+          && leftRope.left.getTreeDepth() > leftRope.right.getTreeDepth()
           && leftRope.getTreeDepth() > right.getTreeDepth()) {
         // Typically for concatenate-built strings the left-side is deeper than
         // the right.  This is our final attempt to concatenate without
@@ -191,18 +187,20 @@ final class RopeByteString extends ByteString {
         // is yet another optimization for building the string by repeatedly
         // concatenating on the right.
         ByteString newRight = new RopeByteString(leftRope.right, right);
-        return new RopeByteString(leftRope.left, newRight);
+        result = new RopeByteString(leftRope.left, newRight);
+      } else {
+        // Fine, we'll add a node and increase the tree depth--unless we
+        // rebalance ;^)
+        int newDepth = Math.max(left.getTreeDepth(), right.getTreeDepth()) + 1;
+        if (newLength >= minLengthByDepth[newDepth]) {
+          // The tree is shallow enough, so don't rebalance
+          result = new RopeByteString(left, right);
+        } else {
+          result = new Balancer().balance(left, right);
+        }
       }
     }
-
-    // Fine, we'll add a node and increase the tree depth--unless we rebalance ;^)
-    int newDepth = Math.max(left.getTreeDepth(), right.getTreeDepth()) + 1;
-    if (newLength >= minLengthByDepth[newDepth]) {
-      // The tree is shallow enough, so don't rebalance
-      return new RopeByteString(left, right);
-    }
-
-    return new Balancer().balance(left, right);
+    return result;
   }
 
   /**
@@ -250,14 +248,22 @@ final class RopeByteString extends ByteString {
    */
   @Override
   public byte byteAt(int index) {
-    checkIndex(index, totalLength);
-
-    // Find the relevant piece by recursive descent
-    if (index < leftLength) {
-      return left.byteAt(index);
+    if (index < 0) {
+      throw new ArrayIndexOutOfBoundsException("Index < 0: " + index);
+    }
+    if (index > totalLength) {
+      throw new ArrayIndexOutOfBoundsException(
+          "Index > length: " + index + ", " + totalLength);
     }
 
-    return right.byteAt(index - leftLength);
+    byte result;
+    // Find the relevant piece by recursive descent
+    if (index < leftLength) {
+      result = left.byteAt(index);
+    } else {
+      result = right.byteAt(index - leftLength);
+    }
+    return result;
   }
 
   @Override
@@ -303,36 +309,48 @@ final class RopeByteString extends ByteString {
    */
   @Override
   public ByteString substring(int beginIndex, int endIndex) {
-    final int length = checkRange(beginIndex, endIndex, totalLength);
+    if (beginIndex < 0) {
+      throw new IndexOutOfBoundsException(
+          "Beginning index: " + beginIndex + " < 0");
+    }
+    if (endIndex > totalLength) {
+      throw new IndexOutOfBoundsException(
+          "End index: " + endIndex + " > " + totalLength);
+    }
+    int substringLength = endIndex - beginIndex;
+    if (substringLength < 0) {
+      throw new IndexOutOfBoundsException(
+          "Beginning index larger than ending index: " + beginIndex + ", "
+              + endIndex);
+    }
 
-    if (length == 0) {
+    ByteString result;
+    if (substringLength == 0) {
       // Empty substring
-      return ByteString.EMPTY;
-    }
-
-    if (length == totalLength) {
+      result = ByteString.EMPTY;
+    } else if (substringLength == totalLength) {
       // The whole string
-      return this;
+      result = this;
+    } else {
+      // Proper substring
+      if (endIndex <= leftLength) {
+        // Substring on the left
+        result = left.substring(beginIndex, endIndex);
+      } else if (beginIndex >= leftLength) {
+        // Substring on the right
+        result = right
+            .substring(beginIndex - leftLength, endIndex - leftLength);
+      } else {
+        // Split substring
+        ByteString leftSub = left.substring(beginIndex);
+        ByteString rightSub = right.substring(0, endIndex - leftLength);
+        // Intentionally not rebalancing, since in many cases these two
+        // substrings will already be less deep than the top-level
+        // RopeByteString we're taking a substring of.
+        result = new RopeByteString(leftSub, rightSub);
+      }
     }
-
-    // Proper substring
-    if (endIndex <= leftLength) {
-      // Substring on the left
-      return left.substring(beginIndex, endIndex);
-    }
-
-    if (beginIndex >= leftLength) {
-      // Substring on the right
-      return right.substring(beginIndex - leftLength, endIndex - leftLength);
-    }
-
-    // Split substring
-    ByteString leftSub = left.substring(beginIndex);
-    ByteString rightSub = right.substring(0, endIndex - leftLength);
-    // Intentionally not rebalancing, since in many cases these two
-    // substrings will already be less deep than the top-level
-    // RopeByteString we're taking a substring of.
-    return new RopeByteString(leftSub, rightSub);
+    return result;
   }
 
   // =================================================================
@@ -373,7 +391,7 @@ final class RopeByteString extends ByteString {
     List<ByteBuffer> result = new ArrayList<ByteBuffer>();
     PieceIterator pieces = new PieceIterator(this);
     while (pieces.hasNext()) {
-      LeafByteString byteString = pieces.next();
+      LiteralByteString byteString = pieces.next();
       result.add(byteString.asReadOnlyByteBuffer());
     }
     return result;
@@ -453,10 +471,11 @@ final class RopeByteString extends ByteString {
     // hashCode if it's already computed.  It's arguable we should compute the
     // hashCode here, and if we're going to be testing a bunch of byteStrings,
     // it might even make sense.
-    int thisHash = peekCachedHashCode();
-    int thatHash = otherByteString.peekCachedHashCode();
-    if (thisHash != 0 && thatHash != 0 && thisHash != thatHash) {
-      return false;
+    if (hash != 0) {
+      int cachedOtherHash = otherByteString.peekCachedHashCode();
+      if (cachedOtherHash != 0 && hash != cachedOtherHash) {
+        return false;
+      }
     }
 
     return equalsFragments(otherByteString);
@@ -473,12 +492,12 @@ final class RopeByteString extends ByteString {
    */
   private boolean equalsFragments(ByteString other) {
     int thisOffset = 0;
-    Iterator<LeafByteString> thisIter = new PieceIterator(this);
-    LeafByteString thisString = thisIter.next();
+    Iterator<LiteralByteString> thisIter = new PieceIterator(this);
+    LiteralByteString thisString = thisIter.next();
 
     int thatOffset = 0;
-    Iterator<LeafByteString> thatIter = new PieceIterator(other);
-    LeafByteString thatString = thatIter.next();
+    Iterator<LiteralByteString> thatIter = new PieceIterator(other);
+    LiteralByteString thatString = thatIter.next();
 
     int pos = 0;
     while (true) {
@@ -515,6 +534,33 @@ final class RopeByteString extends ByteString {
         thatOffset += bytesToCompare;
       }
     }
+  }
+
+  /**
+   * Cached hash value.  Intentionally accessed via a data race, which is safe
+   * because of the Java Memory Model's "no out-of-thin-air values" guarantees
+   * for ints.
+   */
+  private int hash = 0;
+
+  @Override
+  public int hashCode() {
+    int h = hash;
+
+    if (h == 0) {
+      h = totalLength;
+      h = partialHash(h, 0, totalLength);
+      if (h == 0) {
+        h = 1;
+      }
+      hash = h;
+    }
+    return h;
+  }
+
+  @Override
+  protected int peekCachedHashCode() {
+    return hash;
   }
 
   @Override
@@ -668,34 +714,34 @@ final class RopeByteString extends ByteString {
    * <p>This iterator is used to implement
    * {@link RopeByteString#equalsFragments(ByteString)}.
    */
-  private static class PieceIterator implements Iterator<LeafByteString> {
+  private static class PieceIterator implements Iterator<LiteralByteString> {
 
     private final Stack<RopeByteString> breadCrumbs =
         new Stack<RopeByteString>();
-    private LeafByteString next;
+    private LiteralByteString next;
 
     private PieceIterator(ByteString root) {
       next = getLeafByLeft(root);
     }
 
-    private LeafByteString getLeafByLeft(ByteString root) {
+    private LiteralByteString getLeafByLeft(ByteString root) {
       ByteString pos = root;
       while (pos instanceof RopeByteString) {
         RopeByteString rbs = (RopeByteString) pos;
         breadCrumbs.push(rbs);
         pos = rbs.left;
       }
-      return (LeafByteString) pos;
+      return (LiteralByteString) pos;
     }
 
-    private LeafByteString getNextNonEmptyLeaf() {
+    private LiteralByteString getNextNonEmptyLeaf() {
       while (true) {
         // Almost always, we go through this loop exactly once.  However, if
         // we discover an empty string in the rope, we toss it and try again.
         if (breadCrumbs.isEmpty()) {
           return null;
         } else {
-          LeafByteString result = getLeafByLeft(breadCrumbs.pop().right);
+          LiteralByteString result = getLeafByLeft(breadCrumbs.pop().right);
           if (!result.isEmpty()) {
             return result;
           }
@@ -703,7 +749,6 @@ final class RopeByteString extends ByteString {
       }
     }
 
-    @Override
     public boolean hasNext() {
       return next != null;
     }
@@ -713,17 +758,15 @@ final class RopeByteString extends ByteString {
      *
      * @return next non-empty LiteralByteString or {@code null}
      */
-    @Override
-    public LeafByteString next() {
+    public LiteralByteString next() {
       if (next == null) {
         throw new NoSuchElementException();
       }
-      LeafByteString result = next;
+      LiteralByteString result = next;
       next = getNextNonEmptyLeaf();
       return result;
     }
 
-    @Override
     public void remove() {
       throw new UnsupportedOperationException();
     }
@@ -738,9 +781,50 @@ final class RopeByteString extends ByteString {
     return new LiteralByteString(toByteArray());
   }
 
-  private void readObject(@SuppressWarnings("unused") ObjectInputStream in) throws IOException {
+  private void readObject(ObjectInputStream in) throws IOException {
     throw new InvalidObjectException(
         "RopeByteStream instances are not to be serialized directly");
+  }
+
+  // =================================================================
+  // ByteIterator
+
+  @Override
+  public ByteIterator iterator() {
+    return new RopeByteIterator();
+  }
+
+  private class RopeByteIterator implements ByteString.ByteIterator {
+
+    private final PieceIterator pieces;
+    private ByteIterator bytes;
+    int bytesRemaining;
+
+    private RopeByteIterator() {
+      pieces = new PieceIterator(RopeByteString.this);
+      bytes = pieces.next().iterator();
+      bytesRemaining = size();
+    }
+
+    public boolean hasNext() {
+      return (bytesRemaining > 0);
+    }
+
+    public Byte next() {
+      return nextByte(); // Does not instantiate a Byte
+    }
+
+    public byte nextByte() {
+      if (!bytes.hasNext()) {
+        bytes = pieces.next().iterator();
+      }
+      --bytesRemaining;
+      return bytes.nextByte();
+    }
+
+    public void remove() {
+      throw new UnsupportedOperationException();
+    }
   }
 
   /**
@@ -751,7 +835,7 @@ final class RopeByteString extends ByteString {
     // Iterates through the pieces of the rope
     private PieceIterator pieceIterator;
     // The current piece
-    private LeafByteString currentPiece;
+    private LiteralByteString currentPiece;
     // The size of the current piece
     private int currentPieceSize;
     // The index of the next byte to read in the current piece
@@ -788,7 +872,7 @@ final class RopeByteString extends ByteString {
     /**
      * Internal implementation of read and skip.  If b != null, then read the
      * next {@code length} bytes into the buffer {@code b} at
-     * offset {@code offset}.  If b == null, then skip the next {@code length}
+     * offset {@code offset}.  If b == null, then skip the next {@code length)
      * bytes.
      * <p>
      * This method assumes that all error checking has already happened.

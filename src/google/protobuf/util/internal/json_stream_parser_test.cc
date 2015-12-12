@@ -348,7 +348,6 @@ TEST_F(JsonStreamParserTest, RejectNonUtf8WhenNotCoerced) {
   for (int i = 0; i <= json.length(); ++i) {
     DoErrorTest(json, i, "Encountered non UTF-8 code points.");
   }
-  DoErrorTest("\xFF{}", 0, "Encountered non UTF-8 code points.");
 }
 
 #ifndef _MSC_VER

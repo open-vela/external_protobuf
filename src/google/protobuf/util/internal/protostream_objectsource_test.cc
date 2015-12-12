@@ -327,16 +327,9 @@ TEST_P(ProtostreamObjectSourceTest, RepeatingPrimitives) {
   DoTest(primitive, Primitive::descriptor());
 }
 
-TEST_P(ProtostreamObjectSourceTest, CustomJsonName) {
-  Author author;
-  author.set_id(12345);
-
-  ow_.StartObject("")->RenderUint64("@id", 12345)->EndObject();
-  DoTest(author, Author::descriptor());
-}
-
 TEST_P(ProtostreamObjectSourceTest, NestedMessage) {
   Author* author = new Author();
+  author->set_id(101L);
   author->set_name("Tolstoy");
   Book book;
   book.set_title("My Book");
@@ -345,6 +338,7 @@ TEST_P(ProtostreamObjectSourceTest, NestedMessage) {
   ow_.StartObject("")
       ->RenderString("title", "My Book")
       ->StartObject("author")
+      ->RenderUint64("id", bit_cast<uint64>(101LL))
       ->RenderString("name", "Tolstoy")
       ->EndObject()
       ->EndObject();

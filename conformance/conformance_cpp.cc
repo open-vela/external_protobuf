@@ -108,11 +108,7 @@ void DoTest(const ConformanceRequest& request, ConformanceResponse* response) {
         return;
       }
 
-      if (!test_message.ParseFromString(proto_binary)) {
-        response->set_runtime_error(
-            "Parsing JSON generates invalid proto output.");
-        return;
-      }
+      GOOGLE_CHECK(test_message.ParseFromString(proto_binary));
       break;
     }
 
@@ -136,18 +132,9 @@ void DoTest(const ConformanceRequest& request, ConformanceResponse* response) {
       GOOGLE_CHECK(test_message.SerializeToString(&proto_binary));
       Status status = BinaryToJsonString(type_resolver, *type_url, proto_binary,
                                          response->mutable_json_payload());
-      if (!status.ok()) {
-        response->set_serialize_error(
-            string("Failed to serialize JSON output: ") +
-            status.error_message().as_string());
-        return;
-      }
+      GOOGLE_CHECK(status.ok());
       break;
     }
-
-    default:
-      GOOGLE_LOG(FATAL) << "Unknown output format: "
-                        << request.requested_output_format();
   }
 }
 

@@ -498,8 +498,6 @@ class LIBPROTOBUF_EXPORT Parser {
   }
 
 
-  bool ValidateEnum(const EnumDescriptorProto* proto);
-
   // =================================================================
 
   io::Tokenizer* input_;

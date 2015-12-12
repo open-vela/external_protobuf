@@ -875,8 +875,6 @@ ErrorCase kErrorCases[] = {
   // String errors.
   { "'\\l' foo", true,
     "0:2: Invalid escape sequence in string literal.\n" },
-  { "'\\X' foo", true,
-    "0:2: Invalid escape sequence in string literal.\n" },
   { "'\\x' foo", true,
     "0:3: Expected hex digits for escape sequence.\n" },
   { "'foo", false,
