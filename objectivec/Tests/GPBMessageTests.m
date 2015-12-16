@@ -195,9 +195,7 @@
 
   // Test merging from data.
   result = [self mergeExtensionsDestination];
-  NSData *data = [[self mergeExtensionsSource] data];
-  XCTAssertNotNil(data);
-  [result mergeFromData:data
+  [result mergeFromData:[[self mergeExtensionsSource] data]
       extensionRegistry:[UnittestRoot extensionRegistry]];
   resultData = [result data];
   XCTAssertEqualObjects(resultData, mergeResultData);
@@ -1886,9 +1884,7 @@
   XCTAssertEqual(msg.bar, EnumTestMsg_MyEnum_One);
   XCTAssertEqual(msg.baz, EnumTestMsg_MyEnum_NegOne);
   // Bounce to wire and back.
-  NSData *data = [msg data];
-  XCTAssertNotNil(data);
-  EnumTestMsg *msgPrime = [EnumTestMsg parseFromData:data error:NULL];
+  EnumTestMsg *msgPrime = [EnumTestMsg parseFromData:[msg data] error:NULL];
   XCTAssertEqualObjects(msgPrime, msg);
   XCTAssertEqual(msgPrime.foo, EnumTestMsg_MyEnum_Zero);
   XCTAssertEqual(msgPrime.bar, EnumTestMsg_MyEnum_One);
@@ -1900,9 +1896,7 @@
   XCTAssertEqual(msg.bar, EnumTestMsg_MyEnum_Two);
   XCTAssertEqual(msg.baz, EnumTestMsg_MyEnum_NegTwo);
   // Bounce to wire and back.
-  data = [msg data];
-  XCTAssertNotNil(data);
-  msgPrime = [EnumTestMsg parseFromData:data error:NULL];
+  msgPrime = [EnumTestMsg parseFromData:[msg data] error:NULL];
   XCTAssertEqualObjects(msgPrime, msg);
   XCTAssertEqual(msgPrime.foo, EnumTestMsg_MyEnum_Zero);
   XCTAssertEqual(msgPrime.bar, EnumTestMsg_MyEnum_Two);
@@ -1923,9 +1917,7 @@
   XCTAssertEqual([msg.mumbleArray valueAtIndex:3], EnumTestMsg_MyEnum_NegOne);
   XCTAssertEqual([msg.mumbleArray valueAtIndex:4], EnumTestMsg_MyEnum_NegTwo);
   // Bounce to wire and back.
-  data = [msg data];
-  XCTAssertNotNil(data);
-  msgPrime = [EnumTestMsg parseFromData:data error:NULL];
+  msgPrime = [EnumTestMsg parseFromData:[msg data] error:NULL];
   XCTAssertEqualObjects(msgPrime, msg);
   XCTAssertEqual([msgPrime.mumbleArray valueAtIndex:0],
                  EnumTestMsg_MyEnum_Zero);

@@ -89,7 +89,6 @@ def GenerateUnittestProtos():
   generate_proto("../src/google/protobuf/unittest_no_generic_services.proto", False)
   generate_proto("../src/google/protobuf/unittest_proto3_arena.proto", False)
   generate_proto("../src/google/protobuf/util/json_format_proto3.proto", False)
-  generate_proto("google/protobuf/internal/any_test.proto", False)
   generate_proto("google/protobuf/internal/descriptor_pool_test1.proto", False)
   generate_proto("google/protobuf/internal/descriptor_pool_test2.proto", False)
   generate_proto("google/protobuf/internal/factory_test1.proto", False)
@@ -145,12 +144,6 @@ class build_py(_build_py):
     # _build_py is an old-style class, so super() doesn't work.
     _build_py.run(self)
 
-class test_conformance(_build_py):
-  target = 'test_python'
-  def run(self):
-    cmd = 'cd ../conformance && make %s' % (test_conformance.target)
-    status = subprocess.check_call(cmd, shell=True)
-
 
 if __name__ == '__main__':
   ext_module_list = []
@@ -159,7 +152,6 @@ if __name__ == '__main__':
   if cpp_impl in sys.argv:
     sys.argv.remove(cpp_impl)
     extra_compile_args = ['-Wno-write-strings', '-Wno-invalid-offsetof']
-    test_conformance.target = 'test_python_cpp'
 
     if "clang" in os.popen('$CC --version').read():
       extra_compile_args.append('-Wno-shorten-64-to-32')
@@ -215,7 +207,6 @@ if __name__ == '__main__':
       cmdclass={
           'clean': clean,
           'build_py': build_py,
-          'test_conformance': test_conformance,
       },
       install_requires=install_requires,
       ext_modules=ext_module_list,

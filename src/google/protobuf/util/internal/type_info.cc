@@ -136,7 +136,8 @@ class TypeInfoForTypeResolver : public TypeInfo {
     for (int i = 0; i < type->fields_size(); ++i) {
       const google::protobuf::Field& field = type->fields(i);
       StringPiece name = field.name();
-      StringPiece camel_case_name = field.json_name();
+      StringPiece camel_case_name =
+          *string_storage_.insert(ToCamelCase(name)).first;
       const StringPiece* existing = InsertOrReturnExisting(
           &camel_case_name_table_, camel_case_name, name);
       if (existing && *existing != name) {

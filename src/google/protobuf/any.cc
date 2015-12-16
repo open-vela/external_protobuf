@@ -65,16 +65,9 @@ bool AnyMetadata::UnpackTo(Message* message) const {
 }
 
 bool AnyMetadata::InternalIs(const Descriptor* descriptor) const {
-  const string type_url = type_url_->GetNoArena(
-             &::google::protobuf::internal::GetEmptyString());
-  const string full_name = descriptor->full_name();
-  if (type_url.length() < full_name.length()) {
-      return false;
-  }
-  return (0 == type_url.compare(
-    type_url.length() - full_name.length(),
-    full_name.length(),
-    full_name));
+  return type_url_->GetNoArena(
+             &::google::protobuf::internal::GetEmptyString()) ==
+         GetTypeUrl(descriptor);
 }
 
 bool ParseAnyTypeUrl(const string& type_url, string* full_type_name) {
