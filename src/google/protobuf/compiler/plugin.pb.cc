@@ -2,12 +2,11 @@
 // source: google/protobuf/compiler/plugin.proto
 
 #define INTERNAL_SUPPRESS_PROTOBUF_FIELD_DEPRECATION
-#include <google/protobuf/compiler/plugin.pb.h>
+#include "google/protobuf/compiler/plugin.pb.h"
 
 #include <algorithm>
 
 #include <google/protobuf/stubs/common.h>
-#include <google/protobuf/stubs/port.h>
 #include <google/protobuf/stubs/once.h>
 #include <google/protobuf/io/coded_stream.h>
 #include <google/protobuf/wire_format_lite_inl.h>

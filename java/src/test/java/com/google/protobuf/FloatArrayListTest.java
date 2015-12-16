@@ -310,7 +310,7 @@ public class FloatArrayListTest extends TestCase {
   }
   
   private void assertImmutable(FloatArrayList list) {
-    if (list.contains(1F)) {
+    if (list.contains(1)) {
       throw new RuntimeException("Cannot test the immutability of lists that contain 1.");
     }
     
@@ -413,7 +413,7 @@ public class FloatArrayListTest extends TestCase {
     }
     
     try {
-      list.removeAll(Collections.singleton(1F));
+      list.removeAll(Collections.singleton(1));
       fail();
     } catch (UnsupportedOperationException e) {
       // expected
@@ -434,7 +434,7 @@ public class FloatArrayListTest extends TestCase {
     }
     
     try {
-      list.retainAll(Collections.singleton(1F));
+      list.retainAll(Collections.singleton(1));
       fail();
     } catch (UnsupportedOperationException e) {
       // expected

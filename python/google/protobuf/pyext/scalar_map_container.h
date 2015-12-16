@@ -28,11 +28,8 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-// Author: anuraag@google.com (Anuraag Agrawal)
-// Author: tibell@google.com (Johan Tibell)
-
-#ifndef GOOGLE_PROTOBUF_PYTHON_CPP_REPEATED_SCALAR_CONTAINER_H__
-#define GOOGLE_PROTOBUF_PYTHON_CPP_REPEATED_SCALAR_CONTAINER_H__
+#ifndef GOOGLE_PROTOBUF_PYTHON_CPP_SCALAR_MAP_CONTAINER_H__
+#define GOOGLE_PROTOBUF_PYTHON_CPP_SCALAR_MAP_CONTAINER_H__
 
 #include <Python.h>
 
@@ -54,17 +51,17 @@ namespace python {
 
 struct CMessage;
 
-typedef struct RepeatedScalarContainer {
+struct ScalarMapContainer {
   PyObject_HEAD;
 
   // This is the top-level C++ Message object that owns the whole
-  // proto tree.  Every Python RepeatedScalarContainer holds a
+  // proto tree.  Every Python ScalarMapContainer holds a
   // reference to it in order to keep it alive as long as there's a
   // Python object that references any part of the tree.
   shared_ptr<Message> owner;
 
   // Pointer to the C++ Message that contains this container.  The
-  // RepeatedScalarContainer does not own this pointer.
+  // ScalarMapContainer does not own this pointer.
   Message* message;
 
   // Weak reference to a parent CMessage object (i.e. may be NULL.)
@@ -78,41 +75,41 @@ typedef struct RepeatedScalarContainer {
   // default message instance mutable.
   // The pointer is owned by the global DescriptorPool.
   const FieldDescriptor* parent_field_descriptor;
-} RepeatedScalarContainer;
+  const FieldDescriptor* key_field_descriptor;
+  const FieldDescriptor* value_field_descriptor;
 
-extern PyTypeObject RepeatedScalarContainer_Type;
+  // We bump this whenever we perform a mutation, to invalidate existing
+  // iterators.
+  uint64 version;
+};
 
-namespace repeated_scalar_container {
+#if PY_MAJOR_VERSION >= 3
+  extern PyObject *ScalarMapContainer_Type;
+  extern PyType_Spec ScalarMapContainer_Type_spec;
+#else
+  extern PyTypeObject ScalarMapContainer_Type;
+#endif
+extern PyTypeObject ScalarMapIterator_Type;
 
-// Builds a RepeatedScalarContainer object, from a parent message and a
+namespace scalar_map_container {
+
+// Builds a ScalarMapContainer object, from a parent message and a
 // field descriptor.
 extern PyObject *NewContainer(
     CMessage* parent, const FieldDescriptor* parent_field_descriptor);
 
-// Appends the scalar 'item' to the end of the container 'self'.
-//
-// Returns None if successful; returns NULL and sets an exception if
-// unsuccessful.
-PyObject* Append(RepeatedScalarContainer* self, PyObject* item);
-
 // Releases the messages in the container to a new message.
 //
 // Returns 0 on success, -1 on failure.
-int Release(RepeatedScalarContainer* self);
-
-// Appends all the elements in the input iterator to the container.
-//
-// Returns None if successful; returns NULL and sets an exception if
-// unsuccessful.
-PyObject* Extend(RepeatedScalarContainer* self, PyObject* value);
+int Release(ScalarMapContainer* self);
 
 // Set the owner field of self and any children of self.
-void SetOwner(RepeatedScalarContainer* self,
+void SetOwner(ScalarMapContainer* self,
               const shared_ptr<Message>& new_owner);
 
-}  // namespace repeated_scalar_container
+}  // namespace scalar_map_container
 }  // namespace python
 }  // namespace protobuf
 
 }  // namespace google
-#endif  // GOOGLE_PROTOBUF_PYTHON_CPP_REPEATED_SCALAR_CONTAINER_H__
+#endif  // GOOGLE_PROTOBUF_PYTHON_CPP_SCALAR_MAP_CONTAINER_H__

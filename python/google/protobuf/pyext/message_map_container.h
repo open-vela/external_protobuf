@@ -28,8 +28,8 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef GOOGLE_PROTOBUF_PYTHON_CPP_MAP_CONTAINER_H__
-#define GOOGLE_PROTOBUF_PYTHON_CPP_MAP_CONTAINER_H__
+#ifndef GOOGLE_PROTOBUF_PYTHON_CPP_MESSAGE_MAP_CONTAINER_H__
+#define GOOGLE_PROTOBUF_PYTHON_CPP_MESSAGE_MAP_CONTAINER_H__
 
 #include <Python.h>
 
@@ -39,40 +39,30 @@
 #endif
 
 #include <google/protobuf/descriptor.h>
-#include <google/protobuf/message.h>
 
 namespace google {
 namespace protobuf {
 
 class Message;
 
-#ifdef _SHARED_PTR_H
-using std::shared_ptr;
-#else
 using internal::shared_ptr;
-#endif
 
 namespace python {
 
 struct CMessage;
 
-// This struct is used directly for ScalarMap, and is the base class of
-// MessageMapContainer, which is used for MessageMap.
-struct MapContainer {
+struct MessageMapContainer {
   PyObject_HEAD;
 
   // This is the top-level C++ Message object that owns the whole
-  // proto tree.  Every Python MapContainer holds a
+  // proto tree.  Every Python MessageMapContainer holds a
   // reference to it in order to keep it alive as long as there's a
   // Python object that references any part of the tree.
   shared_ptr<Message> owner;
 
   // Pointer to the C++ Message that contains this container.  The
-  // MapContainer does not own this pointer.
-  const Message* message;
-
-  // Use to get a mutable message when necessary.
-  Message* GetMutableMessage();
+  // MessageMapContainer does not own this pointer.
+  Message* message;
 
   // Weak reference to a parent CMessage object (i.e. may be NULL.)
   //
@@ -88,46 +78,45 @@ struct MapContainer {
   const FieldDescriptor* key_field_descriptor;
   const FieldDescriptor* value_field_descriptor;
 
-  // We bump this whenever we perform a mutation, to invalidate existing
-  // iterators.
-  uint64 version;
-
-  // Releases the messages in the container to a new message.
-  //
-  // Returns 0 on success, -1 on failure.
-  int Release();
-
-  // Set the owner field of self and any children of self.
-  void SetOwner(const shared_ptr<Message>& new_owner) {
-    owner = new_owner;
-  }
-};
-
-struct MessageMapContainer : public MapContainer {
   // A callable that is used to create new child messages.
   PyObject* subclass_init;
 
   // A dict mapping Message* -> CMessage.
   PyObject* message_dict;
+
+  // We bump this whenever we perform a mutation, to invalidate existing
+  // iterators.
+  uint64 version;
 };
 
-extern PyTypeObject ScalarMapContainer_Type;
-extern PyTypeObject MessageMapContainer_Type;
-extern PyTypeObject MapIterator_Type;  // Both map types use the same iterator.
+#if PY_MAJOR_VERSION >= 3
+  extern PyObject *MessageMapContainer_Type;
+  extern PyType_Spec MessageMapContainer_Type_spec;
+#else
+  extern PyTypeObject MessageMapContainer_Type;
+#endif
+extern PyTypeObject MessageMapIterator_Type;
 
-// Builds a MapContainer object, from a parent message and a
+namespace message_map_container {
+
+// Builds a MessageMapContainer object, from a parent message and a
 // field descriptor.
-extern PyObject* NewScalarMapContainer(
-    CMessage* parent, const FieldDescriptor* parent_field_descriptor);
+extern PyObject* NewContainer(CMessage* parent,
+                              const FieldDescriptor* parent_field_descriptor,
+                              PyObject* concrete_class);
 
-// Builds a MessageMap object, from a parent message and a
-// field descriptor.
-extern PyObject* NewMessageMapContainer(
-    CMessage* parent, const FieldDescriptor* parent_field_descriptor,
-    PyObject* concrete_class);
+// Releases the messages in the container to a new message.
+//
+// Returns 0 on success, -1 on failure.
+int Release(MessageMapContainer* self);
 
+// Set the owner field of self and any children of self.
+void SetOwner(MessageMapContainer* self,
+              const shared_ptr<Message>& new_owner);
+
+}  // namespace message_map_container
 }  // namespace python
 }  // namespace protobuf
 
 }  // namespace google
-#endif  // GOOGLE_PROTOBUF_PYTHON_CPP_MAP_CONTAINER_H__
+#endif  // GOOGLE_PROTOBUF_PYTHON_CPP_MESSAGE_MAP_CONTAINER_H__

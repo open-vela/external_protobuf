@@ -38,7 +38,6 @@
 #include <google/protobuf/compiler/ruby/ruby_generator.h>
 #include <google/protobuf/compiler/csharp/csharp_generator.h>
 #include <google/protobuf/compiler/objectivec/objectivec_generator.h>
-#include <google/protobuf/compiler/js/js_generator.h>
 
 int main(int argc, char* argv[]) {
 
@@ -80,11 +79,6 @@ int main(int argc, char* argv[]) {
   google::protobuf::compiler::objectivec::ObjectiveCGenerator objc_generator;
   cli.RegisterGenerator("--objc_out", &objc_generator,
                         "Generate Objective C header and source.");
-
-  // JavaScript
-  google::protobuf::compiler::js::Generator js_generator;
-  cli.RegisterGenerator("--js_out", &js_generator,
-                        "Generate JavaScript source.");
 
   return cli.Run(argc, argv);
 }

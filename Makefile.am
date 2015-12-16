@@ -215,12 +215,9 @@ java_EXTRA_DIST=                                                             \
   java/src/main/java/com/google/protobuf/Message.java                        \
   java/src/main/java/com/google/protobuf/MessageLite.java                    \
   java/src/main/java/com/google/protobuf/MessageLiteOrBuilder.java           \
-  java/src/main/java/com/google/protobuf/MessageLiteToString.java            \
-  java/src/main/java/com/google/protobuf/MessageLiteToString.java            \
   java/src/main/java/com/google/protobuf/MessageOrBuilder.java               \
   java/src/main/java/com/google/protobuf/MessageReflection.java              \
   java/src/main/java/com/google/protobuf/MutabilityOracle.java               \
-  java/src/main/java/com/google/protobuf/NioByteString.java                  \
   java/src/main/java/com/google/protobuf/Parser.java                         \
   java/src/main/java/com/google/protobuf/ProtobufArrayList.java              \
   java/src/main/java/com/google/protobuf/ProtocolMessageEnum.java            \
@@ -236,13 +233,10 @@ java_EXTRA_DIST=                                                             \
   java/src/main/java/com/google/protobuf/SingleFieldBuilder.java             \
   java/src/main/java/com/google/protobuf/SmallSortedMap.java                 \
   java/src/main/java/com/google/protobuf/TextFormat.java                     \
-  java/src/main/java/com/google/protobuf/TextFormatEscaper.java              \
-  java/src/main/java/com/google/protobuf/TextFormatEscaper.java              \
   java/src/main/java/com/google/protobuf/UninitializedMessageException.java  \
   java/src/main/java/com/google/protobuf/UnknownFieldSet.java                \
   java/src/main/java/com/google/protobuf/UnknownFieldSetLite.java            \
   java/src/main/java/com/google/protobuf/UnmodifiableLazyStringList.java     \
-  java/src/main/java/com/google/protobuf/UnsafeByteStrings.java              \
   java/src/main/java/com/google/protobuf/Utf8.java                           \
   java/src/main/java/com/google/protobuf/WireFormat.java                     \
   java/src/test/java/com/google/protobuf/AbstractMessageTest.java            \
@@ -278,7 +272,6 @@ java_EXTRA_DIST=                                                             \
   java/src/test/java/com/google/protobuf/MapTest.java                        \
   java/src/test/java/com/google/protobuf/MessageTest.java                    \
   java/src/test/java/com/google/protobuf/NestedBuildersTest.java             \
-  java/src/test/java/com/google/protobuf/NioByteStringTest.java              \
   java/src/test/java/com/google/protobuf/ParserTest.java                     \
   java/src/test/java/com/google/protobuf/ProtobufArrayListTest.java          \
   java/src/test/java/com/google/protobuf/RepeatedFieldBuilderTest.java       \
@@ -511,15 +504,6 @@ objectivec_EXTRA_DIST=                                                       \
 
 python_EXTRA_DIST=                                                           \
   python/MANIFEST.in                                                         \
-  python/google/__init__.py                                                  \
-  python/google/protobuf/__init__.py                                         \
-  python/google/protobuf/descriptor.py                                       \
-  python/google/protobuf/descriptor_database.py                              \
-  python/google/protobuf/descriptor_pool.py                                  \
-  python/google/protobuf/internal/__init__.py                                \
-  python/google/protobuf/internal/_parameterized.py                          \
-  python/google/protobuf/internal/any_test.proto                             \
-  python/google/protobuf/internal/any_test.proto                             \
   python/google/protobuf/internal/api_implementation.cc                      \
   python/google/protobuf/internal/api_implementation.py                      \
   python/google/protobuf/internal/containers.py                              \
@@ -534,19 +518,17 @@ python_EXTRA_DIST=                                                           \
   python/google/protobuf/internal/factory_test1.proto                        \
   python/google/protobuf/internal/factory_test2.proto                        \
   python/google/protobuf/internal/generator_test.py                          \
-  python/google/protobuf/internal/import_test_package/__init__.py            \
-  python/google/protobuf/internal/import_test_package/inner.proto            \
-  python/google/protobuf/internal/import_test_package/outer.proto            \
   python/google/protobuf/internal/json_format_test.py                        \
   python/google/protobuf/internal/message_factory_test.py                    \
   python/google/protobuf/internal/message_listener.py                        \
   python/google/protobuf/internal/message_set_extensions.proto               \
   python/google/protobuf/internal/message_test.py                            \
   python/google/protobuf/internal/missing_enum_values.proto                  \
-  python/google/protobuf/internal/more_extensions.proto                      \
   python/google/protobuf/internal/more_extensions_dynamic.proto              \
+  python/google/protobuf/internal/more_extensions.proto                      \
   python/google/protobuf/internal/more_messages.proto                        \
   python/google/protobuf/internal/packed_field_test.proto                    \
+  python/google/protobuf/internal/_parameterized.py                          \
   python/google/protobuf/internal/proto_builder_test.py                      \
   python/google/protobuf/internal/python_message.py                          \
   python/google/protobuf/internal/reflection_test.py                         \
@@ -558,47 +540,52 @@ python_EXTRA_DIST=                                                           \
   python/google/protobuf/internal/text_format_test.py                        \
   python/google/protobuf/internal/type_checkers.py                           \
   python/google/protobuf/internal/unknown_fields_test.py                     \
-  python/google/protobuf/internal/well_known_types.py                        \
-  python/google/protobuf/internal/well_known_types.py                        \
-  python/google/protobuf/internal/well_known_types_test.py                   \
-  python/google/protobuf/internal/well_known_types_test.py                   \
   python/google/protobuf/internal/wire_format.py                             \
   python/google/protobuf/internal/wire_format_test.py                        \
+  python/google/protobuf/internal/__init__.py                                \
+  python/google/protobuf/internal/import_test_package/__init__.py            \
+  python/google/protobuf/internal/import_test_package/inner.proto            \
+  python/google/protobuf/internal/import_test_package/outer.proto            \
+  python/google/protobuf/pyext/README                                        \
+  python/google/protobuf/pyext/cpp_message.py                                \
+  python/google/protobuf/pyext/descriptor.h                                  \
+  python/google/protobuf/pyext/descriptor.cc                                 \
+  python/google/protobuf/pyext/descriptor_pool.h                             \
+  python/google/protobuf/pyext/descriptor_pool.cc                            \
+  python/google/protobuf/pyext/descriptor_containers.h                       \
+  python/google/protobuf/pyext/descriptor_containers.cc                      \
+  python/google/protobuf/pyext/extension_dict.h                              \
+  python/google/protobuf/pyext/extension_dict.cc                             \
+  python/google/protobuf/pyext/message.h                                     \
+  python/google/protobuf/pyext/message.cc                                    \
+  python/google/protobuf/pyext/message_map_container.cc                      \
+  python/google/protobuf/pyext/message_map_container.h                       \
+  python/google/protobuf/pyext/proto2_api_test.proto                         \
+  python/google/protobuf/pyext/python.proto                                  \
+  python/google/protobuf/pyext/python_protobuf.h                             \
+  python/google/protobuf/pyext/repeated_composite_container.h                \
+  python/google/protobuf/pyext/repeated_composite_container.cc               \
+  python/google/protobuf/pyext/repeated_scalar_container.h                   \
+  python/google/protobuf/pyext/repeated_scalar_container.cc                  \
+  python/google/protobuf/pyext/scalar_map_container.cc                       \
+  python/google/protobuf/pyext/scalar_map_container.h                        \
+  python/google/protobuf/pyext/scoped_pyobject_ptr.h                         \
+  python/google/protobuf/pyext/__init__.py                                   \
+  python/google/protobuf/descriptor.py                                       \
+  python/google/protobuf/descriptor_database.py                              \
+  python/google/protobuf/descriptor_pool.py                                  \
   python/google/protobuf/json_format.py                                      \
   python/google/protobuf/message.py                                          \
   python/google/protobuf/message_factory.py                                  \
   python/google/protobuf/proto_builder.py                                    \
-  python/google/protobuf/pyext/README                                        \
-  python/google/protobuf/pyext/__init__.py                                   \
-  python/google/protobuf/pyext/cpp_message.py                                \
-  python/google/protobuf/pyext/descriptor.cc                                 \
-  python/google/protobuf/pyext/descriptor.h                                  \
-  python/google/protobuf/pyext/descriptor_containers.cc                      \
-  python/google/protobuf/pyext/descriptor_containers.h                       \
-  python/google/protobuf/pyext/descriptor_database.cc                        \
-  python/google/protobuf/pyext/descriptor_database.h                         \
-  python/google/protobuf/pyext/descriptor_pool.cc                            \
-  python/google/protobuf/pyext/descriptor_pool.h                             \
-  python/google/protobuf/pyext/extension_dict.cc                             \
-  python/google/protobuf/pyext/extension_dict.h                              \
-  python/google/protobuf/pyext/map_container.cc                              \
-  python/google/protobuf/pyext/map_container.h                               \
-  python/google/protobuf/pyext/message.cc                                    \
-  python/google/protobuf/pyext/message.h                                     \
-  python/google/protobuf/pyext/proto2_api_test.proto                         \
-  python/google/protobuf/pyext/python.proto                                  \
-  python/google/protobuf/pyext/python_protobuf.h                             \
-  python/google/protobuf/pyext/repeated_composite_container.cc               \
-  python/google/protobuf/pyext/repeated_composite_container.h                \
-  python/google/protobuf/pyext/repeated_scalar_container.cc                  \
-  python/google/protobuf/pyext/repeated_scalar_container.h                   \
-  python/google/protobuf/pyext/scoped_pyobject_ptr.h                         \
   python/google/protobuf/reflection.py                                       \
   python/google/protobuf/service.py                                          \
   python/google/protobuf/service_reflection.py                               \
   python/google/protobuf/symbol_database.py                                  \
   python/google/protobuf/text_encoding.py                                    \
   python/google/protobuf/text_format.py                                      \
+  python/google/protobuf/__init__.py                                         \
+  python/google/__init__.py                                                  \
   python/mox.py                                                              \
   python/setup.py                                                            \
   python/stubout.py                                                          \
@@ -695,7 +682,6 @@ EXTRA_DIST = $(@DIST_LANG@_EXTRA_DIST)   \
 # Deletes all the files generated by autogen.sh.
 MAINTAINERCLEANFILES =   \
   aclocal.m4             \
-  ar-lib                 \
   config.guess           \
   config.sub             \
   configure              \
