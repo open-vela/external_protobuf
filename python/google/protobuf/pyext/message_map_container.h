@@ -28,11 +28,8 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-// Author: anuraag@google.com (Anuraag Agrawal)
-// Author: tibell@google.com (Johan Tibell)
-
-#ifndef GOOGLE_PROTOBUF_PYTHON_CPP_EXTENSION_DICT_H__
-#define GOOGLE_PROTOBUF_PYTHON_CPP_EXTENSION_DICT_H__
+#ifndef GOOGLE_PROTOBUF_PYTHON_CPP_MESSAGE_MAP_CONTAINER_H__
+#define GOOGLE_PROTOBUF_PYTHON_CPP_MESSAGE_MAP_CONTAINER_H__
 
 #include <Python.h>
 
@@ -41,11 +38,12 @@
 #include <google/protobuf/stubs/shared_ptr.h>
 #endif
 
+#include <google/protobuf/descriptor.h>
+
 namespace google {
 namespace protobuf {
 
 class Message;
-class FieldDescriptor;
 
 #ifdef _SHARED_PTR_H
 using std::shared_ptr;
@@ -57,80 +55,72 @@ namespace python {
 
 struct CMessage;
 
-typedef struct ExtensionDict {
+struct MessageMapContainer {
   PyObject_HEAD;
 
   // This is the top-level C++ Message object that owns the whole
-  // proto tree.  Every Python container class holds a
+  // proto tree.  Every Python MessageMapContainer holds a
   // reference to it in order to keep it alive as long as there's a
   // Python object that references any part of the tree.
   shared_ptr<Message> owner;
 
-  // Weak reference to parent message. Used to make sure
-  // the parent is writable when an extension field is modified.
-  CMessage* parent;
-
-  // Pointer to the C++ Message that this ExtensionDict extends.
-  // Not owned by us.
+  // Pointer to the C++ Message that contains this container.  The
+  // MessageMapContainer does not own this pointer.
   Message* message;
 
-  // A dict of child messages, indexed by Extension descriptors.
-  // Similar to CMessage::composite_fields.
-  PyObject* values;
-} ExtensionDict;
+  // Weak reference to a parent CMessage object (i.e. may be NULL.)
+  //
+  // Used to make sure all ancestors are also mutable when first
+  // modifying the container.
+  CMessage* parent;
 
-extern PyTypeObject ExtensionDict_Type;
+  // Pointer to the parent's descriptor that describes this
+  // field.  Used together with the parent's message when making a
+  // default message instance mutable.
+  // The pointer is owned by the global DescriptorPool.
+  const FieldDescriptor* parent_field_descriptor;
+  const FieldDescriptor* key_field_descriptor;
+  const FieldDescriptor* value_field_descriptor;
 
-namespace extension_dict {
+  // A callable that is used to create new child messages.
+  PyObject* subclass_init;
 
-// Builds an Extensions dict for a specific message.
-ExtensionDict* NewExtensionDict(CMessage *parent);
+  // A dict mapping Message* -> CMessage.
+  PyObject* message_dict;
 
-// Gets the number of extension values in this ExtensionDict as a python object.
-//
-// Returns a new reference.
-PyObject* len(ExtensionDict* self);
+  // We bump this whenever we perform a mutation, to invalidate existing
+  // iterators.
+  uint64 version;
+};
 
-// Releases extensions referenced outside this dictionary to keep outside
-// references alive.
+#if PY_MAJOR_VERSION >= 3
+  extern PyObject *MessageMapContainer_Type;
+  extern PyType_Spec MessageMapContainer_Type_spec;
+#else
+  extern PyTypeObject MessageMapContainer_Type;
+#endif
+extern PyTypeObject MessageMapIterator_Type;
+
+namespace message_map_container {
+
+// Builds a MessageMapContainer object, from a parent message and a
+// field descriptor.
+extern PyObject* NewContainer(CMessage* parent,
+                              const FieldDescriptor* parent_field_descriptor,
+                              PyObject* concrete_class);
+
+// Releases the messages in the container to a new message.
 //
 // Returns 0 on success, -1 on failure.
-int ReleaseExtension(ExtensionDict* self,
-                     PyObject* extension,
-                     const FieldDescriptor* descriptor);
+int Release(MessageMapContainer* self);
 
-// Gets an extension from the dict for the given extension descriptor.
-//
-// Returns a new reference.
-PyObject* subscript(ExtensionDict* self, PyObject* key);
+// Set the owner field of self and any children of self.
+void SetOwner(MessageMapContainer* self,
+              const shared_ptr<Message>& new_owner);
 
-// Assigns a value to an extension in the dict. Can only be used for singular
-// simple types.
-//
-// Returns 0 on success, -1 on failure.
-int ass_subscript(ExtensionDict* self, PyObject* key, PyObject* value);
-
-// Clears an extension from the dict. Will release the extension if there
-// is still an external reference left to it.
-//
-// Returns None on success.
-PyObject* ClearExtension(ExtensionDict* self,
-                                       PyObject* extension);
-
-// Checks if the dict has an extension.
-//
-// Returns a new python boolean reference.
-PyObject* HasExtension(ExtensionDict* self, PyObject* extension);
-
-// Gets an extension from the dict given the extension name as opposed to
-// descriptor.
-//
-// Returns a new reference.
-PyObject* _FindExtensionByName(ExtensionDict* self, PyObject* name);
-
-}  // namespace extension_dict
+}  // namespace message_map_container
 }  // namespace python
 }  // namespace protobuf
 
 }  // namespace google
-#endif  // GOOGLE_PROTOBUF_PYTHON_CPP_EXTENSION_DICT_H__
+#endif  // GOOGLE_PROTOBUF_PYTHON_CPP_MESSAGE_MAP_CONTAINER_H__

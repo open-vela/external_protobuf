@@ -53,7 +53,6 @@
 //   3. testee sends 4-byte length M (little endian)
 //   4. testee sends M bytes representing a ConformanceResponse proto
 
-#include <algorithm>
 #include <errno.h>
 #include <unistd.h>
 #include <fstream>
@@ -81,18 +80,12 @@ using std::vector;
 class ForkPipeRunner : public google::protobuf::ConformanceTestRunner {
  public:
   ForkPipeRunner(const std::string &executable)
-      : running_(false), executable_(executable) {}
+      : executable_(executable), running_(false) {}
 
-  virtual ~ForkPipeRunner() {}
-
-  void RunTest(const std::string& test_name,
-               const std::string& request,
-               std::string* response) {
+  void RunTest(const std::string& request, std::string* response) {
     if (!running_) {
       SpawnTestProgram();
     }
-
-    current_test_name_ = test_name;
 
     uint32_t len = request.size();
     CheckedWrite(write_fd_, &len, sizeof(uint32_t));
@@ -165,9 +158,7 @@ class ForkPipeRunner : public google::protobuf::ConformanceTestRunner {
 
   void CheckedWrite(int fd, const void *buf, size_t len) {
     if (write(fd, buf, len) != len) {
-      GOOGLE_LOG(FATAL) << current_test_name_
-                        << ": error writing to test program: "
-                        << strerror(errno);
+      GOOGLE_LOG(FATAL) << "Error writing to test program: " << strerror(errno);
     }
   }
 
@@ -177,12 +168,9 @@ class ForkPipeRunner : public google::protobuf::ConformanceTestRunner {
       ssize_t bytes_read = read(fd, (char*)buf + ofs, len);
 
       if (bytes_read == 0) {
-        GOOGLE_LOG(FATAL) << current_test_name_
-                          << ": unexpected EOF from test program";
+        GOOGLE_LOG(FATAL) << "Unexpected EOF from test program";
       } else if (bytes_read < 0) {
-        GOOGLE_LOG(FATAL) << current_test_name_
-                          << ": error reading from test program: "
-                          << strerror(errno);
+        GOOGLE_LOG(FATAL) << "Error reading from test program: " << strerror(errno);
       }
 
       len -= bytes_read;
@@ -194,7 +182,6 @@ class ForkPipeRunner : public google::protobuf::ConformanceTestRunner {
   int read_fd_;
   bool running_;
   std::string executable_;
-  std::string current_test_name_;
 };
 
 void UsageError() {
@@ -236,6 +223,7 @@ void ParseFailureList(const char *filename, vector<string>* failure_list) {
 }
 
 int main(int argc, char *argv[]) {
+  int arg = 1;
   char *program;
   google::protobuf::ConformanceTestSuite suite;
 

@@ -46,7 +46,6 @@
 #include <google/protobuf/dynamic_message.h>
 #include <google/protobuf/repeated_field.h>
 #include <google/protobuf/wire_format_lite.h>
-#include <google/protobuf/io/strtod.h>
 #include <google/protobuf/io/coded_stream.h>
 #include <google/protobuf/io/zero_copy_stream.h>
 #include <google/protobuf/io/zero_copy_stream_impl.h>
@@ -381,7 +380,6 @@ class TextFormat::Parser::ParserImpl {
       string full_type_name, prefix;
       DO(ConsumeAnyTypeUrl(&full_type_name, &prefix));
       DO(Consume("]"));
-      TryConsume(":");  // ':' is optional between message labels and values.
       string serialized_value;
       DO(ConsumeAnyValue(full_type_name,
                          message->GetDescriptor()->file()->pool(),
@@ -391,6 +389,7 @@ class TextFormat::Parser::ParserImpl {
           string(prefix + full_type_name));
       reflection->SetString(message, any_value_field, serialized_value);
       return true;
+      // Fall through.
     }
     if (TryConsume("[")) {
       // Extension.
@@ -657,7 +656,7 @@ class TextFormat::Parser::ParserImpl {
       case FieldDescriptor::CPPTYPE_FLOAT: {
         double value;
         DO(ConsumeDouble(&value));
-        SET_FIELD(Float, io::SafeDoubleToFloat(value));
+        SET_FIELD(Float, static_cast<float>(value));
         break;
       }
 
@@ -1358,10 +1357,7 @@ string TextFormat::FieldValuePrinter::PrintDouble(double val) const {
   return SimpleDtoa(val);
 }
 string TextFormat::FieldValuePrinter::PrintString(const string& val) const {
-  string printed("\"");
-  CEscapeAndAppend(val, &printed);
-  printed.push_back('\"');
-  return printed;
+  return StrCat("\"", CEscape(val), "\"");
 }
 string TextFormat::FieldValuePrinter::PrintBytes(const string& val) const {
   return PrintString(val);
@@ -1427,8 +1423,7 @@ TextFormat::Printer::Printer()
     use_short_repeated_primitives_(false),
     hide_unknown_fields_(false),
     print_message_fields_in_index_order_(false),
-    expand_any_(false),
-    truncate_string_field_longer_than_(0LL) {
+    expand_any_(false) {
   SetUseUtf8StringEscaping(false);
 }
 
@@ -1780,21 +1775,11 @@ void TextFormat::Printer::PrintFieldValue(
           ? reflection->GetRepeatedStringReference(
               message, field, index, &scratch)
           : reflection->GetStringReference(message, field, &scratch);
-      int64 size = value.size();
-      if (truncate_string_field_longer_than_ > 0) {
-        size = std::min(truncate_string_field_longer_than_,
-                        static_cast<int64>(value.size()));
-      }
-      string truncated_value(value.substr(0, size) + "...<truncated>...");
-      const string* value_to_print = &value;
-      if (size < value.size()) {
-        value_to_print = &truncated_value;
-      }
       if (field->type() == FieldDescriptor::TYPE_STRING) {
-        generator.Print(printer->PrintString(*value_to_print));
+        generator.Print(printer->PrintString(value));
       } else {
         GOOGLE_DCHECK_EQ(field->type(), FieldDescriptor::TYPE_BYTES);
-        generator.Print(printer->PrintBytes(*value_to_print));
+        generator.Print(printer->PrintBytes(value));
       }
       break;
     }
@@ -1941,10 +1926,14 @@ void TextFormat::Printer::PrintUnknownFields(
         } else {
           // This field is not parseable as a Message.
           // So it is probably just a plain string.
-          string printed(": \"");
-          CEscapeAndAppend(value, &printed);
-          printed.append(single_line_mode_ ? "\" " : "\"\n");
-          generator.Print(printed);
+          generator.Print(": \"");
+          generator.Print(CEscape(value));
+          generator.Print("\"");
+          if (single_line_mode_) {
+            generator.Print(" ");
+          } else {
+            generator.Print("\n");
+          }
         }
         break;
       }

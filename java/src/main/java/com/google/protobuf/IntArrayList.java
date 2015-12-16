@@ -67,17 +67,10 @@ final class IntArrayList extends AbstractProtobufList<Integer> implements IntLis
   private int size;
 
   /**
-   * Constructs a new mutable {@code IntArrayList} with default capacity.
+   * Constructs a new mutable {@code IntArrayList}.
    */
   IntArrayList() {
-    this(DEFAULT_CAPACITY);
-  }
-
-  /**
-   * Constructs a new mutable {@code IntArrayList} with the provided capacity.
-   */
-  IntArrayList(int capacity) {
-    array = new int[capacity];
+    array = new int[DEFAULT_CAPACITY];
     size = 0;
   }
 
