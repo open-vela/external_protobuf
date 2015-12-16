@@ -307,7 +307,6 @@ bool CheckAndGetInteger(
 bool CheckAndGetDouble(PyObject* arg, double* value);
 bool CheckAndGetFloat(PyObject* arg, float* value);
 bool CheckAndGetBool(PyObject* arg, bool* value);
-PyObject* CheckString(PyObject* arg, const FieldDescriptor* descriptor);
 bool CheckAndSetString(
     PyObject* arg, Message* message,
     const FieldDescriptor* descriptor,

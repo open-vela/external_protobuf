@@ -243,7 +243,7 @@ public class ProtobufArrayListTest extends TestCase {
     }
     
     try {
-      list.removeAll(Collections.emptyList());
+      list.removeAll(Collections.<Double>emptyList());
       fail();
     } catch (UnsupportedOperationException e) {
       // expected
@@ -264,7 +264,7 @@ public class ProtobufArrayListTest extends TestCase {
     }
     
     try {
-      list.retainAll(Collections.emptyList());
+      list.retainAll(Collections.<Double>emptyList());
       fail();
     } catch (UnsupportedOperationException e) {
       // expected

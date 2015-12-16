@@ -49,8 +49,7 @@ namespace converter {
 namespace {
 const StringPiece SkipWhiteSpace(StringPiece str) {
   StringPiece::size_type i;
-  for (i = 0; i < str.size() && isspace(str[i]); ++i) {
-  }
+  for (i = 0; i < str.size() && isspace(str[i]); ++i) {}
   GOOGLE_DCHECK(i == str.size() || !isspace(str[i]));
   return StringPiece(str, i);
 }
@@ -154,19 +153,6 @@ const google::protobuf::Field* FindFieldInTypeOrNull(
     for (int i = 0; i < type->fields_size(); ++i) {
       const google::protobuf::Field& field = type->fields(i);
       if (field.name() == field_name) {
-        return &field;
-      }
-    }
-  }
-  return NULL;
-}
-
-const google::protobuf::Field* FindJsonFieldInTypeOrNull(
-    const google::protobuf::Type* type, StringPiece json_name) {
-  if (type != NULL) {
-    for (int i = 0; i < type->fields_size(); ++i) {
-      const google::protobuf::Field& field = type->fields(i);
-      if (field.json_name() == json_name) {
         return &field;
       }
     }
@@ -330,23 +316,16 @@ string FloatAsString(float value) {
   return DoubleAsString(value);
 }
 
-bool SafeStrToFloat(StringPiece str, float* value) {
+bool SafeStrToFloat(StringPiece str, float *value) {
   double double_value;
   if (!safe_strtod(str, &double_value)) {
     return false;
   }
+  *value = static_cast<float>(double_value);
 
-  if (MathLimits<double>::IsInf(double_value) ||
-      MathLimits<double>::IsNaN(double_value))
-    return false;
-
-  // Fail if the value is not representable in float.
-  if (double_value > std::numeric_limits<float>::max() ||
-      double_value < -std::numeric_limits<float>::max()) {
+  if (MathLimits<float>::IsInf(*value)) {
     return false;
   }
-
-  *value = static_cast<float>(double_value);
   return true;
 }
 

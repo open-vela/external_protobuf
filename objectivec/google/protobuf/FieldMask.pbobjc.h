@@ -61,7 +61,7 @@ typedef GPB_ENUM(GPBFieldMask_FieldNumber) {
 //     z: 8
 //
 // The result will not contain specific values for fields x,y and z
-// (their value will be set to the default, and omitted in proto text
+// (there value will be set to the default, and omitted in proto text
 // output):
 //
 //
