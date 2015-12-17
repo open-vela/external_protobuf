@@ -136,7 +136,9 @@ fi
 if [[ "${DO_AUTOGEN}" == "yes" ]] ; then
   header "Running autogen & configure"
   ./autogen.sh
-  ./configure CXXFLAGS="-mmacosx-version-min=10.9 -Wnon-virtual-dtor -Woverloaded-virtual -Wunused-const-variable -Wunused-function"
+  ./configure \
+    CPPFLAGS="-mmacosx-version-min=10.9 -Wunused-const-variable -Wunused-function" \
+    CXXFLAGS="-Wnon-virtual-dtor -Woverloaded-virtual"
 fi
 
 if [[ "${DO_CLEAN}" == "yes" ]] ; then
@@ -229,13 +231,8 @@ if [[ "${DO_XCODE_IOS_TESTS}" == "yes" ]] ; then
   IOS_SIMULATOR_NAME="Simulator"
   case "${XCODE_VERSION}" in
     6.* )
-      XCODEBUILD_TEST_BASE_IOS+=(
-          -destination "platform=iOS Simulator,name=iPhone 4s,OS=7.1" # 32bit
-          -destination "platform=iOS Simulator,name=iPhone 6,OS=8.4" # 64bit
-          -destination "platform=iOS Simulator,name=iPad 2,OS=7.1" # 32bit
-          -destination "platform=iOS Simulator,name=iPad Air,OS=8.4" # 64bit
-      )
-      IOS_SIMULATOR_NAME="iOS Simulator"
+      echo "ERROR: Xcode 6.3/6.4 no longer supported for building, please use 7.0 or higher." 1>&2
+      exit 10
       ;;
     7.* )
       XCODEBUILD_TEST_BASE_IOS+=(

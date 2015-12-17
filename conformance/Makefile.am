@@ -10,6 +10,7 @@ protoc_outputs =                                               \
 other_language_protoc_outputs =                                \
   conformance.rb                                               \
   com/google/protobuf/conformance/Conformance.java             \
+  conformance_pb2.py                                           \
   Conformance.pbobjc.h                                         \
   Conformance.pbobjc.m
 
@@ -38,7 +39,11 @@ bin_PROGRAMS += conformance-objc
 
 conformance_objc_SOURCES = conformance_objc.m ../objectivec/GPBProtocolBuffers.m
 nodist_conformance_objc_SOURCES = Conformance.pbobjc.m
-conformance_objc_CPPFLAGS = -I$(top_srcdir)/objectivec
+# On travis, the build fails without the isysroot because whatever system
+# headers are being found don't include generics support for
+# NSArray/NSDictionary, the only guess is their image at one time had an odd
+# setup for Xcode and old frameworks are being found.
+conformance_objc_CPPFLAGS = -I$(top_srcdir)/objectivec -isysroot `xcrun --sdk macosx --show-sdk-path`
 conformance_objc_LDFLAGS = -framework Foundation
 # Explicit dep beacuse BUILT_SOURCES are only done before a "make all/check"
 # so a direct "make test_objc" could fail if parallel enough.
@@ -49,7 +54,7 @@ endif
 if USE_EXTERNAL_PROTOC
 
 protoc_middleman: $(protoc_inputs)
-	$(PROTOC) -I$(srcdir) --cpp_out=. --java_out=. --ruby_out=. --objc_out=. $^
+	$(PROTOC) -I$(srcdir) --cpp_out=. --java_out=. --ruby_out=. --objc_out=. --python_out=.$^
 	touch protoc_middleman
 
 else
@@ -58,7 +63,7 @@ else
 # relative to srcdir, which may not be the same as the current directory when
 # building out-of-tree.
 protoc_middleman: $(top_srcdir)/src/protoc$(EXEEXT) $(protoc_inputs)
-	oldpwd=`pwd` && ( cd $(srcdir) && $$oldpwd/../src/protoc$(EXEEXT) -I. --cpp_out=$$oldpwd --java_out=$$oldpwd --ruby_out=$$oldpwd --objc_out=$$oldpwd $(protoc_inputs) )
+	oldpwd=`pwd` && ( cd $(srcdir) && $$oldpwd/../src/protoc$(EXEEXT) -I. --cpp_out=$$oldpwd --java_out=$$oldpwd --ruby_out=$$oldpwd --objc_out=$$oldpwd --python_out=$$oldpwd $(protoc_inputs) )
 	touch protoc_middleman
 
 endif
@@ -105,6 +110,14 @@ test_csharp: protoc_middleman conformance-test-runner conformance-csharp
 
 test_ruby: protoc_middleman conformance-test-runner $(other_language_protoc_outputs)
 	RUBYLIB=../ruby/lib:. ./conformance-test-runner --failure_list failure_list_ruby.txt ./conformance_ruby.rb
+
+# These depend on library paths being properly set up.  The easiest way to
+# run them is to just use "tox" from the python dir.
+test_python: protoc_middleman conformance-test-runner
+	./conformance-test-runner --failure_list failure_list_python.txt ./conformance_python.py
+
+test_python_cpp: protoc_middleman conformance-test-runner
+	./conformance-test-runner --failure_list failure_list_python_cpp.txt ./conformance_python.py
 
 if OBJC_CONFORMANCE_TEST
 
