@@ -62,12 +62,7 @@ typedef struct GPBMessage_Storage *GPBMessage_StoragePtr;
   // by *read* operations such as getters (autocreation of message fields and
   // message extensions, not setting of values). Used to guarantee thread safety
   // for concurrent reads on the message.
-  // NOTE: OSSpinLock may seem like a good fit here but Apple engineers have
-  // pointed out that they are vulnerable to live locking on iOS in cases of
-  // priority inversion:
-  //   http://mjtsai.com/blog/2015/12/16/osspinlock-is-unsafe/
-  //   https://lists.swift.org/pipermail/swift-dev/Week-of-Mon-20151214/000372.html
-  dispatch_semaphore_t readOnlySemaphore_;
+  OSSpinLock readOnlyMutex_;
 }
 
 // Gets an extension value without autocreating the result if not found. (i.e.
