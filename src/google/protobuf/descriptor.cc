@@ -560,7 +560,7 @@ class FileDescriptorTables {
   ~FileDescriptorTables();
 
   // Empty table, used with placeholder files.
-  inline static const FileDescriptorTables& GetEmptyInstance();
+  static const FileDescriptorTables kEmpty;
 
   // -----------------------------------------------------------------
   // Finding items.
@@ -665,32 +665,7 @@ FileDescriptorTables::FileDescriptorTables()
 
 FileDescriptorTables::~FileDescriptorTables() {}
 
-namespace {
-
-FileDescriptorTables* file_descriptor_tables_ = NULL;
-GOOGLE_PROTOBUF_DECLARE_ONCE(file_descriptor_tables_once_init_);
-
-void DeleteFileDescriptorTables() {
-  delete file_descriptor_tables_;
-  file_descriptor_tables_ = NULL;
-}
-
-void InitFileDescriptorTables() {
-  file_descriptor_tables_ = new FileDescriptorTables();
-  internal::OnShutdown(&DeleteFileDescriptorTables);
-}
-
-inline void InitFileDescriptorTablesOnce() {
-  ::google::protobuf::GoogleOnceInit(
-      &file_descriptor_tables_once_init_, &InitFileDescriptorTables);
-}
-
-}  // anonymous namespace
-
-inline const FileDescriptorTables& FileDescriptorTables::GetEmptyInstance() {
-  InitFileDescriptorTablesOnce();
-  return *file_descriptor_tables_;
-}
+const FileDescriptorTables FileDescriptorTables::kEmpty;
 
 void DescriptorPool::Tables::AddCheckpoint() {
   checkpoints_.push_back(CheckPoint(this));
@@ -2075,6 +2050,7 @@ class SourceLocationCommentPrinter {
   }
 
  private:
+
   bool have_source_loc_;
   SourceLocation source_loc_;
   DebugStringOptions options_;
@@ -2976,7 +2952,8 @@ class DescriptorBuilder {
                    const ServiceDescriptor* parent,
                    MethodDescriptor* result);
 
-  void LogUnusedDependency(const FileDescriptor* result);
+  void LogUnusedDependency(const FileDescriptorProto& proto,
+                           const FileDescriptor* result);
 
   // Must be run only after building.
   //
@@ -3560,7 +3537,7 @@ FileDescriptor* DescriptorBuilder::NewPlaceholderFile(
   placeholder->package_ = &internal::GetEmptyString();
   placeholder->pool_ = pool_;
   placeholder->options_ = &FileOptions::default_instance();
-  placeholder->tables_ = &FileDescriptorTables::GetEmptyInstance();
+  placeholder->tables_ = &FileDescriptorTables::kEmpty;
   placeholder->source_code_info_ = &SourceCodeInfo::default_instance();
   placeholder->is_placeholder_ = true;
   placeholder->syntax_ = FileDescriptor::SYNTAX_PROTO2;
@@ -4021,7 +3998,7 @@ const FileDescriptor* DescriptorBuilder::BuildFile(
 
 
   if (!unused_dependency_.empty()) {
-    LogUnusedDependency(result);
+    LogUnusedDependency(proto, result);
   }
 
   if (had_errors_) {
@@ -4168,6 +4145,7 @@ void DescriptorBuilder::BuildMessage(const DescriptorProto& proto,
   }
 }
 
+
 void DescriptorBuilder::BuildFieldOrExtension(const FieldDescriptorProto& proto,
                                               const Descriptor* parent,
                                               FieldDescriptor* result,
@@ -4273,8 +4251,8 @@ void DescriptorBuilder::BuildFieldOrExtension(const FieldDescriptorProto& proto,
           } else if (proto.default_value() == "nan") {
             result->default_value_float_ = numeric_limits<float>::quiet_NaN();
           } else  {
-            result->default_value_float_ =
-              io::NoLocaleStrtod(proto.default_value().c_str(), &end_pos);
+            result->default_value_float_ = io::SafeDoubleToFloat(
+                io::NoLocaleStrtod(proto.default_value().c_str(), &end_pos));
           }
           break;
         case FieldDescriptor::CPPTYPE_DOUBLE:
@@ -4445,6 +4423,7 @@ void DescriptorBuilder::BuildFieldOrExtension(const FieldDescriptorProto& proto,
   } else {
     AllocateOptions(proto.options(), result);
   }
+
 
   AddSymbol(result->full_name(), parent, result->name(),
             proto, Symbol(result));
@@ -5558,11 +5537,19 @@ bool DescriptorBuilder::OptionInterpreter::InterpretOptions(
     // UnknownFieldSet and wait there until the message is parsed by something
     // that does know about the options.
     string buf;
-    options->AppendToString(&buf);
-    GOOGLE_CHECK(options->ParseFromString(buf))
+    GOOGLE_CHECK(options->AppendPartialToString(&buf))
+        << "Protocol message could not be serialized.";
+    GOOGLE_CHECK(options->ParsePartialFromString(buf))
         << "Protocol message serialized itself in invalid fashion.";
+    if (!options->IsInitialized()) {
+      builder_->AddWarning(
+          options_to_interpret->element_name, *original_options,
+          DescriptorPool::ErrorCollector::OTHER,
+          "Options could not be fully parsed using the proto descriptors "
+          "compiled into this binary. Missing required fields: " +
+          options->InitializationErrorString());
+    }
   }
-
   return !failed;
 }
 
@@ -6216,7 +6203,8 @@ void DescriptorBuilder::OptionInterpreter::SetUInt64(int number, uint64 value,
   }
 }
 
-void DescriptorBuilder::LogUnusedDependency(const FileDescriptor* result) {
+void DescriptorBuilder::LogUnusedDependency(const FileDescriptorProto& proto,
+                                            const FileDescriptor* result) {
 
   if (!unused_dependency_.empty()) {
     std::set<string> annotation_extensions;
@@ -6242,9 +6230,9 @@ void DescriptorBuilder::LogUnusedDependency(const FileDescriptor* result) {
       }
       // Log warnings for unused imported files.
       if (i == (*it)->extension_count()) {
-        GOOGLE_LOG(WARNING) << "Warning: Unused import: \"" << result->name()
-                     << "\" imports \"" << (*it)->name()
-                     << "\" which is not used.";
+        string error_message = "Import " + (*it)->name() + " but not used.";
+        AddWarning((*it)->name(), proto, DescriptorPool::ErrorCollector::OTHER,
+                   error_message);
       }
     }
   }

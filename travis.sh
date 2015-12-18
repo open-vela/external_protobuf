@@ -11,6 +11,13 @@
 # For when some other test needs the C++ main build, including protoc and
 # libprotobuf.
 internal_build_cpp() {
+  # Install GCC 4.8 to replace the default GCC 4.6. We need 4.8 for more
+  # decent C++ 11 support in order to compile conformance tests.
+  sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+  sudo apt-get update -qq
+  sudo apt-get install -qq g++-4.8
+  export CXX="g++-4.8" CC="gcc-4.8"
+
   ./autogen.sh
   ./configure
   make -j2
@@ -93,7 +100,7 @@ use_java() {
 build_java() {
   # Java build needs `protoc`.
   internal_build_cpp
-  cd java && mvn test && cd ..
+  cd java && mvn test && cd util && mvn test && mvn assembly:single && cd ../..
   cd conformance && make test_java && cd ..
 }
 

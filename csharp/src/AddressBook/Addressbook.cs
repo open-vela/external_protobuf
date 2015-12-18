@@ -43,9 +43,6 @@ namespace Google.Protobuf.Examples.AddressBook {
 
   }
   #region Messages
-  /// <summary>
-  ///  [START messages]
-  /// </summary>
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
   public sealed partial class Person : pb::IMessage<Person> {
     private static readonly pb::MessageParser<Person> _parser = new pb::MessageParser<Person>(() => new Person());
@@ -146,7 +143,7 @@ namespace Google.Protobuf.Examples.AddressBook {
     }
 
     public override string ToString() {
-      return pb::JsonFormatter.ToDiagnosticString(this);
+      return pb::JsonFormatter.Default.Format(this);
     }
 
     public void WriteTo(pb::CodedOutputStream output) {
@@ -305,7 +302,7 @@ namespace Google.Protobuf.Examples.AddressBook {
         }
 
         public override string ToString() {
-          return pb::JsonFormatter.ToDiagnosticString(this);
+          return pb::JsonFormatter.Default.Format(this);
         }
 
         public void WriteTo(pb::CodedOutputStream output) {
@@ -429,7 +426,7 @@ namespace Google.Protobuf.Examples.AddressBook {
     }
 
     public override string ToString() {
-      return pb::JsonFormatter.ToDiagnosticString(this);
+      return pb::JsonFormatter.Default.Format(this);
     }
 
     public void WriteTo(pb::CodedOutputStream output) {
