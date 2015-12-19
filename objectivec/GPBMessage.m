@@ -568,13 +568,13 @@ static id GetArrayIvarWithField(GPBMessage *self, GPBFieldDescriptor *field) {
   id array = GPBGetObjectIvarWithFieldNoAutocreate(self, field);
   if (!array) {
     // Check again after getting the lock.
-    dispatch_semaphore_wait(self->readOnlySemaphore_, DISPATCH_TIME_FOREVER);
+    OSSpinLockLock(&self->readOnlyMutex_);
     array = GPBGetObjectIvarWithFieldNoAutocreate(self, field);
     if (!array) {
       array = CreateArrayForField(field, self);
       GPBSetAutocreatedRetainedObjectIvarWithField(self, field, array);
     }
-    dispatch_semaphore_signal(self->readOnlySemaphore_);
+    OSSpinLockUnlock(&self->readOnlyMutex_);
   }
   return array;
 }
@@ -598,13 +598,13 @@ static id GetMapIvarWithField(GPBMessage *self, GPBFieldDescriptor *field) {
   id dict = GPBGetObjectIvarWithFieldNoAutocreate(self, field);
   if (!dict) {
     // Check again after getting the lock.
-    dispatch_semaphore_wait(self->readOnlySemaphore_, DISPATCH_TIME_FOREVER);
+    OSSpinLockLock(&self->readOnlyMutex_);
     dict = GPBGetObjectIvarWithFieldNoAutocreate(self, field);
     if (!dict) {
       dict = CreateMapForField(field, self);
       GPBSetAutocreatedRetainedObjectIvarWithField(self, field, dict);
     }
-    dispatch_semaphore_signal(self->readOnlySemaphore_);
+    OSSpinLockUnlock(&self->readOnlyMutex_);
   }
   return dict;
 }
@@ -810,7 +810,7 @@ static GPBUnknownFieldSet *GetOrMakeUnknownFields(GPBMessage *self) {
     messageStorage_ = (GPBMessage_StoragePtr)(
         ((uint8_t *)self) + class_getInstanceSize([self class]));
 
-    readOnlySemaphore_ = dispatch_semaphore_create(1);
+    readOnlyMutex_ = OS_SPINLOCK_INIT;
   }
 
   return self;
@@ -1723,7 +1723,7 @@ static GPBUnknownFieldSet *GetOrMakeUnknownFields(GPBMessage *self) {
   }
 
   // Check for an autocreated value.
-  dispatch_semaphore_wait(readOnlySemaphore_, DISPATCH_TIME_FOREVER);
+  OSSpinLockLock(&readOnlyMutex_);
   value = [autocreatedExtensionMap_ objectForKey:extension];
   if (!value) {
     // Auto create the message extensions to match normal fields.
@@ -1740,7 +1740,7 @@ static GPBUnknownFieldSet *GetOrMakeUnknownFields(GPBMessage *self) {
     [value release];
   }
 
-  dispatch_semaphore_signal(readOnlySemaphore_);
+  OSSpinLockUnlock(&readOnlyMutex_);
   return value;
 }
 

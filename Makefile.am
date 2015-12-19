@@ -468,6 +468,7 @@ objectivec_EXTRA_DIST=                                                       \
   objectivec/Tests/GPBMessageTests.m                                         \
   objectivec/Tests/GPBObjectiveCPlusPlusTest.mm                              \
   objectivec/Tests/GPBPerfTests.m                                            \
+  objectivec/Tests/GPBStringTests.m                                          \
   objectivec/Tests/GPBSwiftTests.swift                                       \
   objectivec/Tests/GPBTestUtilities.h                                        \
   objectivec/Tests/GPBTestUtilities.m                                        \
