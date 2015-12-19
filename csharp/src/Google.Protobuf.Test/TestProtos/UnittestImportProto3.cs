@@ -110,7 +110,7 @@ namespace Google.Protobuf.TestProtos {
     }
 
     public override string ToString() {
-      return pb::JsonFormatter.ToDiagnosticString(this);
+      return pb::JsonFormatter.Default.Format(this);
     }
 
     public void WriteTo(pb::CodedOutputStream output) {

@@ -31,6 +31,7 @@
 #import "GPBRootObject_PackagePrivate.h"
 
 #import <objc/runtime.h>
+#import <libkern/OSAtomic.h>
 
 #import <CoreFoundation/CoreFoundation.h>
 
@@ -95,19 +96,13 @@ static CFHashCode GPBRootExtensionKeyHash(const void *value) {
   return jenkins_one_at_a_time_hash(key);
 }
 
-// NOTE: OSSpinLock may seem like a good fit here but Apple engineers have
-// pointed out that they are vulnerable to live locking on iOS in cases of
-// priority inversion:
-//   http://mjtsai.com/blog/2015/12/16/osspinlock-is-unsafe/
-//   https://lists.swift.org/pipermail/swift-dev/Week-of-Mon-20151214/000372.html
-static dispatch_semaphore_t gExtensionSingletonDictionarySemaphore;
+static OSSpinLock gExtensionSingletonDictionaryLock_ = OS_SPINLOCK_INIT;
 static CFMutableDictionaryRef gExtensionSingletonDictionary = NULL;
 static GPBExtensionRegistry *gDefaultExtensionRegistry = NULL;
 
 + (void)initialize {
   // Ensure the global is started up.
   if (!gExtensionSingletonDictionary) {
-    gExtensionSingletonDictionarySemaphore = dispatch_semaphore_create(1);
     CFDictionaryKeyCallBacks keyCallBacks = {
       // See description above for reason for using custom dictionary.
       0,
@@ -139,10 +134,9 @@ static GPBExtensionRegistry *gDefaultExtensionRegistry = NULL;
 
 + (void)globallyRegisterExtension:(GPBExtensionDescriptor *)field {
   const char *key = [field singletonNameC];
-  dispatch_semaphore_wait(gExtensionSingletonDictionarySemaphore,
-                          DISPATCH_TIME_FOREVER);
+  OSSpinLockLock(&gExtensionSingletonDictionaryLock_);
   CFDictionarySetValue(gExtensionSingletonDictionary, key, field);
-  dispatch_semaphore_signal(gExtensionSingletonDictionarySemaphore);
+  OSSpinLockUnlock(&gExtensionSingletonDictionaryLock_);
 }
 
 static id ExtensionForName(id self, SEL _cmd) {
@@ -172,24 +166,14 @@ static id ExtensionForName(id self, SEL _cmd) {
   key[classNameLen] = '_';
   memcpy(&key[classNameLen + 1], selName, selNameLen);
   key[classNameLen + 1 + selNameLen] = '\0';
-
-  // NOTE: Even though this method is called from another C function,
-  // gExtensionSingletonDictionarySemaphore and gExtensionSingletonDictionary
-  // will always be initialized. This is because this call flow is just to
-  // lookup the Extension, meaning the code is calling an Extension class
-  // message on a Message or Root class. This guarantees that the class was
-  // initialized and Message classes ensure their Root was also initialized.
-  NSAssert(gExtensionSingletonDictionary, @"Startup order broken!");
-
-  dispatch_semaphore_wait(gExtensionSingletonDictionarySemaphore,
-                          DISPATCH_TIME_FOREVER);
+  OSSpinLockLock(&gExtensionSingletonDictionaryLock_);
   id extension = (id)CFDictionaryGetValue(gExtensionSingletonDictionary, key);
   if (extension) {
     // The method is getting wired in to the class, so no need to keep it in
     // the dictionary.
     CFDictionaryRemoveValue(gExtensionSingletonDictionary, key);
   }
-  dispatch_semaphore_signal(gExtensionSingletonDictionarySemaphore);
+  OSSpinLockUnlock(&gExtensionSingletonDictionaryLock_);
   return extension;
 }
 
