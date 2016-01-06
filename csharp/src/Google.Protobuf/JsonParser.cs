@@ -540,17 +540,17 @@ namespace Google.Protobuf
                 case FieldType.Int32:
                 case FieldType.SInt32:
                 case FieldType.SFixed32:
-                    return ParseNumericString(keyText, int.Parse);
+                    return ParseNumericString(keyText, int.Parse, false);
                 case FieldType.UInt32:
                 case FieldType.Fixed32:
-                    return ParseNumericString(keyText, uint.Parse);
+                    return ParseNumericString(keyText, uint.Parse, false);
                 case FieldType.Int64:
                 case FieldType.SInt64:
                 case FieldType.SFixed64:
-                    return ParseNumericString(keyText, long.Parse);
+                    return ParseNumericString(keyText, long.Parse, false);
                 case FieldType.UInt64:
                 case FieldType.Fixed64:
-                    return ParseNumericString(keyText, ulong.Parse);
+                    return ParseNumericString(keyText, ulong.Parse, false);
                 default:
                     throw new InvalidProtocolBufferException("Invalid field type for map: " + field.FieldType);
             }
@@ -561,6 +561,7 @@ namespace Google.Protobuf
             double value = token.NumberValue;
             checked
             {
+                // TODO: Validate that it's actually an integer, possibly in terms of the textual representation?                
                 try
                 {
                     switch (field.FieldType)
@@ -568,20 +569,16 @@ namespace Google.Protobuf
                         case FieldType.Int32:
                         case FieldType.SInt32:
                         case FieldType.SFixed32:
-                            CheckInteger(value);
                             return (int) value;
                         case FieldType.UInt32:
                         case FieldType.Fixed32:
-                            CheckInteger(value);
                             return (uint) value;
                         case FieldType.Int64:
                         case FieldType.SInt64:
                         case FieldType.SFixed64:
-                            CheckInteger(value);
                             return (long) value;
                         case FieldType.UInt64:
                         case FieldType.Fixed64:
-                            CheckInteger(value);
                             return (ulong) value;
                         case FieldType.Double:
                             return value;
@@ -600,30 +597,18 @@ namespace Google.Protobuf
                                 {
                                     return float.NegativeInfinity;
                                 }
-                                throw new InvalidProtocolBufferException($"Value out of range: {value}");
+                                throw new InvalidProtocolBufferException("Value out of range: " + value);
                             }
                             return (float) value;
                         default:
-                            throw new InvalidProtocolBufferException($"Unsupported conversion from JSON number for field type {field.FieldType}");
+                            throw new InvalidProtocolBufferException("Unsupported conversion from JSON number for field type " + field.FieldType);
                     }
                 }
                 catch (OverflowException)
                 {
-                    throw new InvalidProtocolBufferException($"Value out of range: {value}");
+                    throw new InvalidProtocolBufferException("Value out of range: " + value);
                 }
             }
-        }
-
-        private static void CheckInteger(double value)
-        {
-            if (double.IsInfinity(value) || double.IsNaN(value))
-            {
-                throw new InvalidProtocolBufferException($"Value not an integer: {value}");
-            }
-            if (value != Math.Floor(value))
-            {
-                throw new InvalidProtocolBufferException($"Value not an integer: {value}");
-            }            
         }
 
         private static object ParseSingleStringValue(FieldDescriptor field, string text)
@@ -637,35 +622,43 @@ namespace Google.Protobuf
                 case FieldType.Int32:
                 case FieldType.SInt32:
                 case FieldType.SFixed32:
-                    return ParseNumericString(text, int.Parse);
+                    return ParseNumericString(text, int.Parse, false);
                 case FieldType.UInt32:
                 case FieldType.Fixed32:
-                    return ParseNumericString(text, uint.Parse);
+                    return ParseNumericString(text, uint.Parse, false);
                 case FieldType.Int64:
                 case FieldType.SInt64:
                 case FieldType.SFixed64:
-                    return ParseNumericString(text, long.Parse);
+                    return ParseNumericString(text, long.Parse, false);
                 case FieldType.UInt64:
                 case FieldType.Fixed64:
-                    return ParseNumericString(text, ulong.Parse);
+                    return ParseNumericString(text, ulong.Parse, false);
                 case FieldType.Double:
-                    double d = ParseNumericString(text, double.Parse);
-                    ValidateInfinityAndNan(text, double.IsPositiveInfinity(d), double.IsNegativeInfinity(d), double.IsNaN(d));
+                    double d = ParseNumericString(text, double.Parse, true);
+                    // double.Parse can return +/- infinity on Mono for non-infinite values which are out of range for double.
+                    if (double.IsInfinity(d) && !text.Contains("Infinity"))
+                    {
+                        throw new InvalidProtocolBufferException("Invalid numeric value: " + text);
+                    }
                     return d;
                 case FieldType.Float:
-                    float f = ParseNumericString(text, float.Parse);
-                    ValidateInfinityAndNan(text, float.IsPositiveInfinity(f), float.IsNegativeInfinity(f), float.IsNaN(f));
+                    float f = ParseNumericString(text, float.Parse, true);
+                    // float.Parse can return +/- infinity on Mono for non-infinite values which are out of range for float.
+                    if (float.IsInfinity(f) && !text.Contains("Infinity"))
+                    {
+                        throw new InvalidProtocolBufferException("Invalid numeric value: " + text);
+                    }
                     return f;
                 case FieldType.Enum:
                     var enumValue = field.EnumType.FindValueByName(text);
                     if (enumValue == null)
                     {
-                        throw new InvalidProtocolBufferException($"Invalid enum value: {text} for enum type: {field.EnumType.FullName}");
+                        throw new InvalidProtocolBufferException("Invalid enum value: " + text + " for enum type: " + field.EnumType.FullName);
                     }
                     // Just return it as an int, and let the CLR convert it.
                     return enumValue.Number;
                 default:
-                    throw new InvalidProtocolBufferException($"Unsupported conversion from JSON string for field type {field.FieldType}");
+                    throw new InvalidProtocolBufferException("Unsupported conversion from JSON string for field type " + field.FieldType);
             }
         }
 
@@ -677,53 +670,43 @@ namespace Google.Protobuf
             return field.MessageType.Parser.CreateTemplate();
         }
 
-        private static T ParseNumericString<T>(string text, Func<string, NumberStyles, IFormatProvider, T> parser)
+        private static T ParseNumericString<T>(string text, Func<string, NumberStyles, IFormatProvider, T> parser, bool floatingPoint)
         {
+            // TODO: Prohibit leading zeroes (but allow 0!)
+            // TODO: Validate handling of "Infinity" etc. (Should be case sensitive, no leading whitespace etc)
             // Can't prohibit this with NumberStyles.
             if (text.StartsWith("+"))
             {
-                throw new InvalidProtocolBufferException($"Invalid numeric value: {text}");
+                throw new InvalidProtocolBufferException("Invalid numeric value: " + text);
             }
             if (text.StartsWith("0") && text.Length > 1)
             {
                 if (text[1] >= '0' && text[1] <= '9')
                 {
-                    throw new InvalidProtocolBufferException($"Invalid numeric value: {text}");
+                    throw new InvalidProtocolBufferException("Invalid numeric value: " + text);
                 }
             }
             else if (text.StartsWith("-0") && text.Length > 2)
             {
                 if (text[2] >= '0' && text[2] <= '9')
                 {
-                    throw new InvalidProtocolBufferException($"Invalid numeric value: {text}");
+                    throw new InvalidProtocolBufferException("Invalid numeric value: " + text);
                 }
             }
             try
             {
-                return parser(text, NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent, CultureInfo.InvariantCulture);
+                var styles = floatingPoint
+                    ? NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent
+                    : NumberStyles.AllowLeadingSign;
+                return parser(text, styles, CultureInfo.InvariantCulture);
             }
             catch (FormatException)
             {
-                throw new InvalidProtocolBufferException($"Invalid numeric value for type: {text}");
+                throw new InvalidProtocolBufferException("Invalid numeric value for type: " + text);
             }
             catch (OverflowException)
             {
-                throw new InvalidProtocolBufferException($"Value out of range: {text}");
-            }
-        }
-
-        /// <summary>
-        /// Checks that any infinite/NaN values originated from the correct text.
-        /// This corrects the lenient whitespace handling of double.Parse/float.Parse, as well as the
-        /// way that Mono parses out-of-range values as infinity.
-        /// </summary>
-        private static void ValidateInfinityAndNan(string text, bool isPositiveInfinity, bool isNegativeInfinity, bool isNaN)
-        {
-            if ((isPositiveInfinity && text != "Infinity") ||
-                (isNegativeInfinity && text != "-Infinity") ||
-                (isNaN && text != "NaN"))
-            {
-                throw new InvalidProtocolBufferException($"Invalid numeric value: {text}");
+                throw new InvalidProtocolBufferException("Value out of range: " + text);
             }
         }
 
@@ -736,7 +719,7 @@ namespace Google.Protobuf
             var match = TimestampRegex.Match(token.StringValue);
             if (!match.Success)
             {
-                throw new InvalidProtocolBufferException($"Invalid Timestamp value: {token.StringValue}");
+                throw new InvalidProtocolBufferException("Invalid Timestamp value: " + token.StringValue);
             }
             var dateTime = match.Groups["datetime"].Value;
             var subseconds = match.Groups["subseconds"].Value;

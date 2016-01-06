@@ -39,7 +39,9 @@ using System;
 namespace Google.Protobuf
 {
     /// <summary>
-    /// Unit tests for JSON parsing.
+    /// Unit tests for JSON parsing. Some tests are ignored at the moment as the desired behaviour
+    /// isn't fully known, either in terms of which exceptions should be thrown or whether they should
+    /// count as valid values.
     /// </summary>
     public class JsonParserTest
     {
@@ -147,7 +149,7 @@ namespace Google.Protobuf
         {
             ByteString data = ByteString.CopyFrom(1, 2, 3);
             // Can't do this with attributes...
-            var parsed = JsonParser.Default.Parse<BytesValue>(WrapInQuotes(data.ToBase64()));
+            var parsed = JsonParser.Default.Parse<BytesValue>("\"" + data.ToBase64() + "\"");
             var expected = new BytesValue { Value = data };
             Assert.AreEqual(expected, parsed);
         }
@@ -203,8 +205,6 @@ namespace Google.Protobuf
 
         [Test]
         [TestCase("+0")]
-        [TestCase(" 1")]
-        [TestCase("1 ")]
         [TestCase("00")]
         [TestCase("-00")]
         [TestCase("--1")]
@@ -318,18 +318,7 @@ namespace Google.Protobuf
         [TestCase("1.0.0")]
         [TestCase("+1")]
         [TestCase("00")]
-        [TestCase("01")]
-        [TestCase("-00")]
-        [TestCase("-01")]
         [TestCase("--1")]
-        [TestCase(" Infinity")]
-        [TestCase(" -Infinity")]
-        [TestCase("NaN ")]
-        [TestCase("Infinity ")]
-        [TestCase("-Infinity ")]
-        [TestCase(" NaN")]
-        [TestCase("INFINITY")]
-        [TestCase("nan")]
         [TestCase("\u00BD")] // 1/2 as a single Unicode character. Just sanity checking...
         public void StringToDouble_Invalid(string jsonValue)
         {
@@ -374,10 +363,6 @@ namespace Google.Protobuf
         [TestCase("-1", -1)]
         [TestCase("2147483647", 2147483647)]
         [TestCase("-2147483648", -2147483648)]
-        [TestCase("1e1", 10)]
-        [TestCase("-1e1", -10)]
-        [TestCase("10.00", 10)]
-        [TestCase("-10.00", -10)]
         public void NumberToInt32_Valid(string jsonValue, int expectedParsedValue)
         {
             string json = "{ \"singleInt32\": " + jsonValue + "}";
@@ -391,8 +376,7 @@ namespace Google.Protobuf
         [TestCase("-00", typeof(InvalidJsonException))]
         [TestCase("--1", typeof(InvalidJsonException))]
         [TestCase("+1", typeof(InvalidJsonException))]
-        [TestCase("1.5", typeof(InvalidProtocolBufferException))]
-        // Value is out of range
+        [TestCase("1.5", typeof(InvalidProtocolBufferException), Ignore = true, Reason = "Desired behaviour unclear")]
         [TestCase("1e10", typeof(InvalidProtocolBufferException))]
         [TestCase("2147483648", typeof(InvalidProtocolBufferException))]
         [TestCase("-2147483649", typeof(InvalidProtocolBufferException))]
@@ -427,10 +411,8 @@ namespace Google.Protobuf
         [TestCase("0", 0L)]
         [TestCase("1", 1L)]
         [TestCase("-1", -1L)]
-        // long.MaxValue isn't actually representable as a double. This string value is the highest
-        // representable value which isn't greater than long.MaxValue.
-        [TestCase("9223372036854769664", 9223372036854769664)]
-        [TestCase("-9223372036854775808", -9223372036854775808)]
+        [TestCase("9223372036854775807", 9223372036854775807, Ignore = true, Reason = "Desired behaviour unclear")]
+        [TestCase("-9223372036854775808", -9223372036854775808, Ignore = true, Reason = "Desired behaviour unclear")]
         public void NumberToInt64_Valid(string jsonValue, long expectedParsedValue)
         {
             string json = "{ \"singleInt64\": " + jsonValue + "}";
@@ -440,11 +422,8 @@ namespace Google.Protobuf
 
         // Assume that anything non-bounds-related is covered in the Int32 case
         [Test]
-        [TestCase("9223372036854775808")]
-        // Theoretical bound would be -9223372036854775809, but when that is parsed to a double
-        // we end up with the exact value of long.MinValue due to lack of precision. The value here
-        // is the "next double down".
-        [TestCase("-9223372036854780000")]
+        [TestCase("-9223372036854775809", Ignore = true, Reason = "Desired behaviour unclear")]
+        [TestCase("9223372036854775808", Ignore = true, Reason = "Desired behaviour unclear")]
         public void NumberToInt64_Invalid(string jsonValue)
         {
             string json = "{ \"singleInt64\": " + jsonValue + "}";
@@ -454,9 +433,7 @@ namespace Google.Protobuf
         [Test]
         [TestCase("0", 0UL)]
         [TestCase("1", 1UL)]
-        // ulong.MaxValue isn't representable as a double. This value is the largest double within
-        // the range of ulong.
-        [TestCase("18446744073709500416", 18446744073709500416UL)]
+        [TestCase("18446744073709551615", 18446744073709551615, Ignore = true, Reason = "Desired behaviour unclear")]
         public void NumberToUInt64_Valid(string jsonValue, ulong expectedParsedValue)
         {
             string json = "{ \"singleUint64\": " + jsonValue + "}";
@@ -498,9 +475,9 @@ namespace Google.Protobuf
         }
 
         [Test]
-        [TestCase("1.7977e308")]
-        [TestCase("-1.7977e308")]
-        [TestCase("1e309")]
+        [TestCase("1.7977e308", Ignore = true, Reason = "Desired behaviour unclear")]
+        [TestCase("-1.7977e308", Ignore = true, Reason = "Desired behaviour unclear")]
+        [TestCase("1e309", Ignore = true, Reason = "Desired behaviour unclear")]
         [TestCase("1,0")]
         [TestCase("1.0.0")]
         [TestCase("+1")]
@@ -588,9 +565,9 @@ namespace Google.Protobuf
         public void Timestamp_Valid(string jsonValue, string expectedFormatted)
         {
             expectedFormatted = expectedFormatted ?? jsonValue;
-            string json = WrapInQuotes(jsonValue);
+            string json = "\"" + jsonValue + "\"";
             var parsed = Timestamp.Parser.ParseJson(json);
-            Assert.AreEqual(WrapInQuotes(expectedFormatted), parsed.ToString());
+            Assert.AreEqual(expectedFormatted, parsed.ToString());
         }
         
         [Test]
@@ -615,7 +592,7 @@ namespace Google.Protobuf
         [TestCase("2100-02-29T14:46:23.123456789Z", Description = "Feb 29th on a non-leap-year")]
         public void Timestamp_Invalid(string jsonValue)
         {
-            string json = WrapInQuotes(jsonValue);
+            string json = "\"" + jsonValue + "\"";
             Assert.Throws<InvalidProtocolBufferException>(() => Timestamp.Parser.ParseJson(json));
         }
 
@@ -689,9 +666,9 @@ namespace Google.Protobuf
         public void Duration_Valid(string jsonValue, string expectedFormatted)
         {
             expectedFormatted = expectedFormatted ?? jsonValue;
-            string json = WrapInQuotes(jsonValue);
+            string json = "\"" + jsonValue + "\"";
             var parsed = Duration.Parser.ParseJson(json);
-            Assert.AreEqual(WrapInQuotes(expectedFormatted), parsed.ToString());
+            Assert.AreEqual(expectedFormatted, parsed.ToString());
         }
 
         // The simplest way of testing that the value has parsed correctly is to reformat it,
@@ -720,7 +697,7 @@ namespace Google.Protobuf
         [TestCase("-3155760000000s", Description = "Integer part too long (negative)")]
         public void Duration_Invalid(string jsonValue)
         {
-            string json = WrapInQuotes(jsonValue);
+            string json = "\"" + jsonValue + "\"";
             Assert.Throws<InvalidProtocolBufferException>(() => Duration.Parser.ParseJson(json));
         }
 
@@ -736,7 +713,7 @@ namespace Google.Protobuf
         [TestCase("fooBar.bazQux", "foo_bar.baz_qux")]
         public void FieldMask_Valid(string jsonValue, params string[] expectedPaths)
         {
-            string json = WrapInQuotes(jsonValue);
+            string json = "\"" + jsonValue + "\"";
             var parsed = FieldMask.Parser.ParseJson(json);
             CollectionAssert.AreEqual(expectedPaths, parsed.Paths);
         }
@@ -812,16 +789,7 @@ namespace Google.Protobuf
 
             var parser63 = new JsonParser(new JsonParser.Settings(63));
             Assert.Throws<InvalidProtocolBufferException>(() => parser63.Parse<TestRecursiveMessage>(data64));
-        }
 
-        /// <summary>
-        /// Various tests use strings which have quotes round them for parsing or as the result
-        /// of formatting, but without those quotes being specified in the tests (for the sake of readability).
-        /// This method simply returns the input, wrapped in double quotes.
-        /// </summary>
-        internal static string WrapInQuotes(string text)
-        {
-            return '"' + text + '"';
         }
     }
 }
