@@ -697,6 +697,7 @@ EXTRA_DIST = $(@DIST_LANG@_EXTRA_DIST)   \
   autogen.sh                             \
   generate_descriptor_proto.sh           \
   README.md                              \
+  INSTALL.txt                            \
   LICENSE                                \
   CONTRIBUTORS.txt                       \
   CHANGES.txt                            \
