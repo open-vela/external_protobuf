@@ -151,8 +151,6 @@ namespace Google.Protobuf.WellKnownTypes
         [Test]
         public void MapWrappersSerializeDeserialize()
         {
-            // Note: no null values here, as they are prohibited in map fields
-            // (despite being representable).
             var message = new MapWellKnownTypes
             {
                 BoolField = { { 10, false }, { 20, true } },
@@ -160,12 +158,13 @@ namespace Google.Protobuf.WellKnownTypes
                     { -1, ByteString.CopyFrom(1, 2, 3) },
                     { 10, ByteString.CopyFrom(4, 5, 6) },
                     { 1000, ByteString.Empty },
+                    { 10000, null }
                 },
                 DoubleField = { { 1, 12.5 }, { 10, -1.5 }, { 20, 0d } },
                 FloatField = { { 2, 123.25f }, { 3, -20f }, { 4, 0f } },
                 Int32Field = { { 5, int.MaxValue }, { 6, int.MinValue }, { 7, 0 } },
                 Int64Field = { { 8, long.MaxValue }, { 9, long.MinValue }, { 10, 0L } },
-                StringField = { { 11, "First" }, { 12, "Second" }, { 13, "" } },
+                StringField = { { 11, "First" }, { 12, "Second" }, { 13, "" }, { 14, null } },
                 Uint32Field = { { 15, uint.MaxValue }, { 16, uint.MinValue }, { 17, 0U } },
                 Uint64Field = { { 18, ulong.MaxValue }, { 19, ulong.MinValue }, { 20, 0UL } },
             };
@@ -225,11 +224,13 @@ namespace Google.Protobuf.WellKnownTypes
         [Test]
         public void Reflection_MapFields()
         {
-            // Just a single example... note that we can't have a null value here despite the value type being int?
-            var message = new MapWellKnownTypes { Int32Field = { { 1, 2 } } };
+            // Just a single example... note that we can't have a null value here
+            var message = new MapWellKnownTypes { Int32Field = { { 1, 2 }, { 3, null } } };
             var fields = MapWellKnownTypes.Descriptor.Fields;
             var dictionary = (IDictionary) fields[MapWellKnownTypes.Int32FieldFieldNumber].Accessor.GetValue(message);
             Assert.AreEqual(2, dictionary[1]);
+            Assert.IsNull(dictionary[3]);
+            Assert.IsTrue(dictionary.Contains(3));
         }
 
         [Test]
