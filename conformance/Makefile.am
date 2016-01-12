@@ -1,14 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
 protoc_inputs =                                                \
-  conformance.proto                                            \
-  $(top_srcdir)/src/google/protobuf/any.proto                  \
-  $(top_srcdir)/src/google/protobuf/duration.proto             \
-  $(top_srcdir)/src/google/protobuf/field_mask.proto           \
-  $(top_srcdir)/src/google/protobuf/struct.proto               \
-  $(top_srcdir)/src/google/protobuf/timestamp.proto            \
-  $(top_srcdir)/src/google/protobuf/wrappers.proto
-
+  conformance.proto
 
 protoc_outputs =                                               \
   conformance.pb.cc                                            \
@@ -38,7 +31,6 @@ EXTRA_DIST =                  \
   failure_list_objc.txt       \
   failure_list_python.txt     \
   failure_list_python_cpp.txt \
-  failure_list_python-post26.txt \
   failure_list_ruby.txt
 
 conformance_test_runner_LDADD = $(top_srcdir)/src/libprotobuf.la
@@ -83,7 +75,7 @@ endif
 if USE_EXTERNAL_PROTOC
 
 protoc_middleman: $(protoc_inputs)
-	$(PROTOC) -I$(srcdir) -I$(top_srcdir) --cpp_out=. --java_out=. --ruby_out=. --objc_out=. --python_out=.$^
+	$(PROTOC) -I$(srcdir) --cpp_out=. --java_out=. --ruby_out=. --objc_out=. --python_out=.$^
 	touch protoc_middleman
 
 else
@@ -143,10 +135,10 @@ test_ruby: protoc_middleman conformance-test-runner $(other_language_protoc_outp
 # These depend on library paths being properly set up.  The easiest way to
 # run them is to just use "tox" from the python dir.
 test_python: protoc_middleman conformance-test-runner
-	./conformance-test-runner --failure_list failure_list_python.txt $(CONFORMANCE_PYTHON_EXTRA_FAILURES) ./conformance_python.py
+	./conformance-test-runner --failure_list failure_list_python.txt ./conformance_python.py
 
 test_python_cpp: protoc_middleman conformance-test-runner
-	./conformance-test-runner --failure_list failure_list_python_cpp.txt $(CONFORMANCE_PYTHON_EXTRA_FAILURES) ./conformance_python.py
+	./conformance-test-runner --failure_list failure_list_python_cpp.txt ./conformance_python.py
 
 if OBJC_CONFORMANCE_TEST
 
