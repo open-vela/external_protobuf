@@ -101,10 +101,6 @@ namespace Google.Protobuf.Conformance
             {
                 return new ConformanceResponse { ParseError = e.Message };
             }
-            catch (InvalidJsonException e)
-            {
-                return new ConformanceResponse { ParseError = e.Message };
-            }
             switch (request.RequestedOutputFormat)
             {
                 case global::Conformance.WireFormat.JSON:
