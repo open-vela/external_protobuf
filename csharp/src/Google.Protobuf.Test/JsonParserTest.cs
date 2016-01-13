@@ -182,7 +182,7 @@ namespace Google.Protobuf
         private static void AssertRoundtrip<T>(T message) where T : IMessage<T>, new()
         {
             var clone = message.Clone();
-            var json = JsonFormatter.Default.Format(message);
+            var json = message.ToString();
             var parsed = JsonParser.Default.Parse<T>(json);
             Assert.AreEqual(clone, parsed);
         }
@@ -760,13 +760,6 @@ namespace Google.Protobuf
         {
             string json = "{ \"@type\": \"type.googleapis.com/bogus\" }";
             Assert.Throws<InvalidOperationException>(() => Any.Parser.ParseJson(json));
-        }
-
-        [Test]
-        public void Any_NoTypeUrl()
-        {
-            string json = "{ \"foo\": \"bar\" }";
-            Assert.Throws<InvalidProtocolBufferException>(() => Any.Parser.ParseJson(json));
         }
 
         [Test]
