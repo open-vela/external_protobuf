@@ -34,6 +34,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using Google.Protobuf.Compatibility;
 
 namespace Google.Protobuf.Collections
 {
@@ -95,8 +96,8 @@ namespace Google.Protobuf.Collections
             // iteration.
             uint tag = input.LastTag;
             var reader = codec.ValueReader;
-            // Non-nullable value types can be packed or not.
-            if (FieldCodec<T>.IsPackedRepeatedField(tag))
+            // Value types can be packed or not.
+            if (typeof(T).IsValueType() && WireFormat.GetTagWireType(tag) == WireFormat.WireType.LengthDelimited)
             {
                 int length = input.ReadLength();
                 if (length > 0)
@@ -133,7 +134,7 @@ namespace Google.Protobuf.Collections
                 return 0;
             }
             uint tag = codec.Tag;
-            if (codec.PackedRepeatedField)
+            if (typeof(T).IsValueType() && WireFormat.GetTagWireType(tag) == WireFormat.WireType.LengthDelimited)
             {
                 int dataSize = CalculatePackedDataSize(codec);
                 return CodedOutputStream.ComputeRawVarint32Size(tag) +
@@ -185,7 +186,7 @@ namespace Google.Protobuf.Collections
             }
             var writer = codec.ValueWriter;
             var tag = codec.Tag;
-            if (codec.PackedRepeatedField)
+            if (typeof(T).IsValueType() && WireFormat.GetTagWireType(tag) == WireFormat.WireType.LengthDelimited)
             {
                 // Packed primitive type
                 uint size = (uint)CalculatePackedDataSize(codec);

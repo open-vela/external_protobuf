@@ -92,20 +92,9 @@ namespace Google.Protobuf.Reflection
                 new FieldDescriptor(field, file, this, index, generatedCodeInfo?.PropertyNames[index]));
             fieldsInNumberOrder = new ReadOnlyCollection<FieldDescriptor>(fieldsInDeclarationOrder.OrderBy(field => field.FieldNumber).ToArray());
             // TODO: Use field => field.Proto.JsonName when we're confident it's appropriate. (And then use it in the formatter, too.)
-            jsonFieldMap = CreateJsonFieldMap(fieldsInNumberOrder);
+            jsonFieldMap = new ReadOnlyDictionary<string, FieldDescriptor>(fieldsInNumberOrder.ToDictionary(field => JsonFormatter.ToCamelCase(field.Name)));
             file.DescriptorPool.AddSymbol(this);
             Fields = new FieldCollection(this);
-        }
-
-        private static ReadOnlyDictionary<string, FieldDescriptor> CreateJsonFieldMap(IList<FieldDescriptor> fields)
-        {
-            var map = new Dictionary<string, FieldDescriptor>();
-            foreach (var field in fields)
-            {
-                map[JsonFormatter.ToCamelCase(field.Name)] = field;
-                map[field.Name] = field;
-            }
-            return new ReadOnlyDictionary<string, FieldDescriptor>(map);
         }
 
         /// <summary>
@@ -266,10 +255,9 @@ namespace Google.Protobuf.Reflection
             // TODO: consider making this public in the future. (Being conservative for now...)
 
             /// <value>
-            /// Returns a read-only dictionary mapping the field names in this message as they're available
+            /// Returns a read-only dictionary mapping the field names in this message as they're used
             /// in the JSON representation to the field descriptors. For example, a field <c>foo_bar</c>
-            /// in the message would result two entries, one with a key <c>fooBar</c> and one with a key
-            /// <c>foo_bar</c>, both referring to the same field.
+            /// in the message would result in an entry with a key <c>fooBar</c>.
             /// </value>
             internal IDictionary<string, FieldDescriptor> ByJsonName() => messageDescriptor.jsonFieldMap;
 

@@ -72,14 +72,6 @@ namespace Google.Protobuf
         }
 
         [Test]
-        public void OriginalFieldNameAccepted()
-        {
-            var json = "{ \"single_int32\": 10 }";
-            var expected = new TestAllTypes { SingleInt32 = 10 };
-            Assert.AreEqual(expected, TestAllTypes.Parser.ParseJson(json));
-        }
-
-        [Test]
         public void SourceContextRoundtrip()
         {
             AssertRoundtrip(new SourceContext { FileName = "foo.proto" });
@@ -124,9 +116,7 @@ namespace Google.Protobuf
         [Test]
         public void SingularWrappers_ExplicitNulls()
         {
-            // When we parse the "valueField": null part, we remember it... basically, it's one case
-            // where explicit default values don't fully roundtrip.
-            var message = new TestWellKnownTypes { ValueField = Value.ForNull() };
+            var message = new TestWellKnownTypes();
             var json = new JsonFormatter(new JsonFormatter.Settings(true)).Format(message);
             var parsed = JsonParser.Default.Parse<TestWellKnownTypes>(json);
             Assert.AreEqual(message, parsed);
@@ -150,14 +140,6 @@ namespace Google.Protobuf
             JsonParser.Default.Merge(parsed, json);
             expected.Descriptor.Fields[WrappersReflection.WrapperValueFieldNumber].Accessor.SetValue(expected, expectedValue);
             Assert.AreEqual(expected, parsed);
-        }
-
-        [Test]
-        public void ExplicitNullValue()
-        {
-            string json = "{\"valueField\": null}";
-            var message = JsonParser.Default.Parse<TestWellKnownTypes>(json);
-            Assert.AreEqual(new TestWellKnownTypes { ValueField = Value.ForNull() }, message);
         }
 
         [Test]
@@ -186,36 +168,6 @@ namespace Google.Protobuf
                 Uint64Field = { ulong.MaxValue, ulong.MinValue, 0UL },
             };
             AssertRoundtrip(message);
-        }
-
-        [Test]
-        public void RepeatedField_NullElementProhibited()
-        {
-            string json = "{ \"repeated_foreign_message\": [null] }";
-            Assert.Throws<InvalidProtocolBufferException>(() => TestAllTypes.Parser.ParseJson(json));
-        }
-
-        [Test]
-        public void RepeatedField_NullOverallValueAllowed()
-        {
-            string json = "{ \"repeated_foreign_message\": null }";
-            Assert.AreEqual(new TestAllTypes(), TestAllTypes.Parser.ParseJson(json));
-        }
-
-        [Test]
-        [TestCase("{ \"mapInt32Int32\": { \"10\": null }")]
-        [TestCase("{ \"mapStringString\": { \"abc\": null }")]
-        [TestCase("{ \"mapInt32ForeignMessage\": { \"10\": null }")]
-        public void MapField_NullValueProhibited(string json)
-        {
-            Assert.Throws<InvalidProtocolBufferException>(() => TestMap.Parser.ParseJson(json));
-        }
-
-        [Test]
-        public void MapField_NullOverallValueAllowed()
-        {
-            string json = "{ \"mapInt32Int32\": null }";
-            Assert.AreEqual(new TestMap(), TestMap.Parser.ParseJson(json));
         }
 
         [Test]
@@ -763,6 +715,7 @@ namespace Google.Protobuf
         [TestCase("--0.123456789s", Description = "Double minus sign")]
         // Violate upper/lower bounds in various ways
         [TestCase("315576000001s", Description = "Integer part too large")]
+        [TestCase("315576000000.000000001s", Description = "Integer part is upper bound; non-zero fraction")]
         [TestCase("3155760000000s", Description = "Integer part too long (positive)")]
         [TestCase("-3155760000000s", Description = "Integer part too long (negative)")]
         public void Duration_Invalid(string jsonValue)
@@ -789,14 +742,6 @@ namespace Google.Protobuf
         }
 
         [Test]
-        [TestCase("foo_bar")]
-        public void FieldMask_Invalid(string jsonValue)
-        {
-            string json = WrapInQuotes(jsonValue);
-            Assert.Throws<InvalidProtocolBufferException>(() => FieldMask.Parser.ParseJson(json));
-        }
-
-        [Test]
         public void Any_RegularMessage()
         {
             var registry = TypeRegistry.FromMessages(TestAllTypes.Descriptor);
@@ -815,13 +760,6 @@ namespace Google.Protobuf
         {
             string json = "{ \"@type\": \"type.googleapis.com/bogus\" }";
             Assert.Throws<InvalidOperationException>(() => Any.Parser.ParseJson(json));
-        }
-
-        [Test]
-        public void Any_NoTypeUrl()
-        {
-            string json = "{ \"foo\": \"bar\" }";
-            Assert.Throws<InvalidProtocolBufferException>(() => Any.Parser.ParseJson(json));
         }
 
         [Test]
@@ -874,42 +812,6 @@ namespace Google.Protobuf
 
             var parser63 = new JsonParser(new JsonParser.Settings(63));
             Assert.Throws<InvalidProtocolBufferException>(() => parser63.Parse<TestRecursiveMessage>(data64));
-        }
-
-        [Test]
-        [TestCase("AQI")]
-        [TestCase("_-==")]
-        public void Bytes_InvalidBase64(string badBase64)
-        {
-            string json = "{ \"singleBytes\": \"" + badBase64 + "\" }";
-            Assert.Throws<InvalidProtocolBufferException>(() => TestAllTypes.Parser.ParseJson(json));
-        }
-
-        [Test]
-        [TestCase("\"FOREIGN_BAR\"", ForeignEnum.FOREIGN_BAR)]
-        [TestCase("5", ForeignEnum.FOREIGN_BAR)]
-        [TestCase("100", (ForeignEnum) 100)]
-        public void EnumValid(string value, ForeignEnum expectedValue)
-        {
-            string json = "{ \"singleForeignEnum\": " + value + " }";
-            var parsed = TestAllTypes.Parser.ParseJson(json);
-            Assert.AreEqual(new TestAllTypes { SingleForeignEnum = expectedValue }, parsed);
-        }
-
-        [Test]
-        [TestCase("\"NOT_A_VALID_VALUE\"")]
-        [TestCase("5.5")]
-        public void Enum_Invalid(string value)
-        {
-            string json = "{ \"singleForeignEnum\": " + value + " }";
-            Assert.Throws<InvalidProtocolBufferException>(() => TestAllTypes.Parser.ParseJson(json));
-        }
-
-        [Test]
-        public void OneofDuplicate_Invalid()
-        {
-            string json = "{ \"oneofString\": \"x\", \"oneofUint32\": 10 }";
-            Assert.Throws<InvalidProtocolBufferException>(() => TestAllTypes.Parser.ParseJson(json));
         }
 
         /// <summary>
