@@ -30,7 +30,6 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
-using System;
 using System.IO;
 
 namespace Google.Protobuf
@@ -43,11 +42,6 @@ namespace Google.Protobuf
     {
         internal InvalidProtocolBufferException(string message)
             : base(message)
-        {
-        }
-
-        internal InvalidProtocolBufferException(string message, Exception innerException)
-            : base(message, innerException)
         {
         }
 
@@ -86,11 +80,6 @@ namespace Google.Protobuf
         {
             return new InvalidProtocolBufferException(
                 "Protocol message contained an invalid tag (zero).");
-        }
-
-        internal static InvalidProtocolBufferException InvalidBase64(Exception innerException)
-        {
-            return new InvalidProtocolBufferException("Invalid base64 data", innerException);
         }
 
         internal static InvalidProtocolBufferException InvalidEndTag()
