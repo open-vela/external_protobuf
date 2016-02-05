@@ -21,11 +21,6 @@ else
     ext.ext_dir = "ext/google/protobuf_c"
     ext.lib_dir = "lib/google"
   end
-
-  task 'gem:windows' do
-    require 'rake_compiler_dock'
-    RakeCompilerDock.sh "bundle && rake cross native gem"
-  end
 end
 
 Gem::PackageTask.new(spec) do |pkg|
