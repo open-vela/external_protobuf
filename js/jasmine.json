@@ -1,8 +1,7 @@
 {
     "spec_dir": "",
     "spec_files": [
-        "*_test.js",
-        "binary/*_test.js"
+        "*_test.js"
     ],
     "helpers": [
         "node_modules/google-closure-library/closure/goog/bootstrap/nodejs.js",
