@@ -133,7 +133,7 @@ csharp_EXTRA_DIST=                                                           \
   csharp/src/Google.Protobuf/LimitedInputStream.cs                           \
   csharp/src/Google.Protobuf/MessageExtensions.cs                            \
   csharp/src/Google.Protobuf/MessageParser.cs                                \
-  csharp/src/Google.Protobuf/ProtoPreconditions.cs                           \
+  csharp/src/Google.Protobuf/Preconditions.cs                                \
   csharp/src/Google.Protobuf/Properties/AssemblyInfo.cs                      \
   csharp/src/Google.Protobuf/Reflection/Descriptor.cs                        \
   csharp/src/Google.Protobuf/Reflection/DescriptorBase.cs                    \
@@ -146,7 +146,7 @@ csharp_EXTRA_DIST=                                                           \
   csharp/src/Google.Protobuf/Reflection/FieldDescriptor.cs                   \
   csharp/src/Google.Protobuf/Reflection/FieldType.cs                         \
   csharp/src/Google.Protobuf/Reflection/FileDescriptor.cs                    \
-  csharp/src/Google.Protobuf/Reflection/GeneratedClrTypeInfo.cs              \
+  csharp/src/Google.Protobuf/Reflection/GeneratedCodeInfo.cs                 \
   csharp/src/Google.Protobuf/Reflection/IDescriptor.cs                       \
   csharp/src/Google.Protobuf/Reflection/IFieldAccessor.cs                    \
   csharp/src/Google.Protobuf/Reflection/MapFieldAccessor.cs                  \

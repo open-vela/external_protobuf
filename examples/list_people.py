@@ -31,7 +31,8 @@ if len(sys.argv) != 2:
 address_book = addressbook_pb2.AddressBook()
 
 # Read the existing address book.
-with open(sys.argv[1], "rb") as f:
-  address_book.ParseFromString(f.read())
+f = open(sys.argv[1], "rb")
+address_book.ParseFromString(f.read())
+f.close()
 
 ListPeople(address_book)
