@@ -86,14 +86,14 @@ public class RubyMessage extends RubyObject {
 
                     if (Utils.isMapEntry(fieldDescriptor)) {
                         if (!(value instanceof RubyHash))
-                            throw runtime.newArgumentError("Expected Hash object as initializer value for map field '" +  key.asJavaString() + "'.");
+                            throw runtime.newArgumentError("Expected Hash object as initializer value for map field.");
 
                         final RubyMap map = newMapForField(context, fieldDescriptor);
                         map.mergeIntoSelf(context, value);
                         maps.put(fieldDescriptor, map);
                     } else if (fieldDescriptor.isRepeated()) {
                         if (!(value instanceof RubyArray))
-                            throw runtime.newArgumentError("Expected array as initializer value for repeated field '" +  key.asJavaString() + "'.");
+                            throw runtime.newTypeError("Expected array as initializer var for repeated field.");
                         RubyRepeatedField repeatedField = rubyToRepeatedField(context, fieldDescriptor, value);
                         addRepeatedField(fieldDescriptor, repeatedField);
                     } else {
@@ -217,9 +217,6 @@ public class RubyMessage extends RubyObject {
             RubyDescriptor rubyDescriptor = (RubyDescriptor) getDescriptor(context, metaClass);
             IRubyObject oneofDescriptor = rubyDescriptor.lookupOneof(context, args[0]);
             if (oneofDescriptor.isNil()) {
-                if (!hasField(args[0])) {
-                    return Helpers.invokeSuper(context, this, metaClass, "method_missing", args, Block.NULL_BLOCK);
-                }
                 return index(context, args[0]);
             }
             RubyOneofDescriptor rubyOneofDescriptor = (RubyOneofDescriptor) oneofDescriptor;
@@ -235,10 +232,6 @@ public class RubyMessage extends RubyObject {
             RubyString equalSign = context.runtime.newString(Utils.EQUAL_SIGN);
             if (field.end_with_p(context, equalSign).isTrue()) {
                 field.chomp_bang(context, equalSign);
-            }
-
-            if (!hasField(field)) {
-                return Helpers.invokeSuper(context, this, metaClass, "method_missing", args, Block.NULL_BLOCK);
             }
             return indexSet(context, field, args[1]);
         }
@@ -440,11 +433,6 @@ public class RubyMessage extends RubyObject {
         if (ret == null)
             throw context.runtime.newArgumentError("field " + fieldName.asJavaString() + " is not found");
         return ret;
-    }
-
-    private boolean hasField(IRubyObject fieldName) {
-        String nameStr = fieldName.asJavaString();
-        return this.descriptor.findFieldByName(Utils.escapeIdentifier(nameStr)) != null;
     }
 
     private void checkRepeatedFieldType(ThreadContext context, IRubyObject value,

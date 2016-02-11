@@ -166,7 +166,7 @@ VALUE Message_method_missing(int argc, VALUE* argv, VALUE _self) {
                                           name, name_len);
 
   if (f == NULL) {
-    return rb_call_super(argc, argv);
+    rb_raise(rb_eArgError, "Unknown field");
   }
 
   if (setter) {
@@ -197,7 +197,7 @@ int Message_initialize_kwarg(VALUE key, VALUE val, VALUE _self) {
   f = upb_msgdef_ntofz(self->descriptor->msgdef, name);
   if (f == NULL) {
     rb_raise(rb_eArgError,
-             "Unknown field name '%s' in initialization map entry.", name);
+             "Unknown field name in initialization map entry.");
   }
 
   if (is_map_field(f)) {
@@ -205,7 +205,7 @@ int Message_initialize_kwarg(VALUE key, VALUE val, VALUE _self) {
 
     if (TYPE(val) != T_HASH) {
       rb_raise(rb_eArgError,
-               "Expected Hash object as initializer value for map field '%s'.", name);
+               "Expected Hash object as initializer value for map field.");
     }
     map = layout_get(self->descriptor->layout, Message_data(self), f);
     Map_merge_into_self(map, val);
@@ -214,7 +214,7 @@ int Message_initialize_kwarg(VALUE key, VALUE val, VALUE _self) {
 
     if (TYPE(val) != T_ARRAY) {
       rb_raise(rb_eArgError,
-               "Expected array as initializer value for repeated field '%s'.", name);
+               "Expected array as initializer value for repeated field.");
     }
     ary = layout_get(self->descriptor->layout, Message_data(self), f);
     for (int i = 0; i < RARRAY_LEN(val); i++) {

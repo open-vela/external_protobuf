@@ -374,7 +374,7 @@ namespace Google.Protobuf
         /// <exception cref="InvalidProtocolBufferException">The JSON does not represent a Protocol Buffers message correctly</exception>
         public T Parse<T>(string json) where T : IMessage, new()
         {
-            ProtoPreconditions.CheckNotNull(json, nameof(json));
+            Preconditions.CheckNotNull(json, nameof(json));
             return Parse<T>(new StringReader(json));
         }
 
@@ -387,7 +387,7 @@ namespace Google.Protobuf
         /// <exception cref="InvalidProtocolBufferException">The JSON does not represent a Protocol Buffers message correctly</exception>
         public T Parse<T>(TextReader jsonReader) where T : IMessage, new()
         {
-            ProtoPreconditions.CheckNotNull(jsonReader, nameof(jsonReader));
+            Preconditions.CheckNotNull(jsonReader, nameof(jsonReader));
             T message = new T();
             Merge(message, jsonReader);
             return message;
@@ -402,8 +402,8 @@ namespace Google.Protobuf
         /// <exception cref="InvalidProtocolBufferException">The JSON does not represent a Protocol Buffers message correctly</exception>
         public IMessage Parse(string json, MessageDescriptor descriptor)
         {
-            ProtoPreconditions.CheckNotNull(json, nameof(json));
-            ProtoPreconditions.CheckNotNull(descriptor, nameof(descriptor));
+            Preconditions.CheckNotNull(json, nameof(json));
+            Preconditions.CheckNotNull(descriptor, nameof(descriptor));
             return Parse(new StringReader(json), descriptor);
         }
 
@@ -416,8 +416,8 @@ namespace Google.Protobuf
         /// <exception cref="InvalidProtocolBufferException">The JSON does not represent a Protocol Buffers message correctly</exception>
         public IMessage Parse(TextReader jsonReader, MessageDescriptor descriptor)
         {
-            ProtoPreconditions.CheckNotNull(jsonReader, nameof(jsonReader));
-            ProtoPreconditions.CheckNotNull(descriptor, nameof(descriptor));
+            Preconditions.CheckNotNull(jsonReader, nameof(jsonReader));
+            Preconditions.CheckNotNull(descriptor, nameof(descriptor));
             IMessage message = descriptor.Parser.CreateTemplate();
             Merge(message, jsonReader);
             return message;
@@ -1011,7 +1011,7 @@ namespace Google.Protobuf
             public Settings(int recursionLimit, TypeRegistry typeRegistry)
             {
                 RecursionLimit = recursionLimit;
-                TypeRegistry = ProtoPreconditions.CheckNotNull(typeRegistry, nameof(typeRegistry));
+                TypeRegistry = Preconditions.CheckNotNull(typeRegistry, nameof(typeRegistry));
             }
         }
     }

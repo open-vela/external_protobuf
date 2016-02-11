@@ -35,14 +35,9 @@ using System;
 namespace Google.Protobuf
 {
     /// <summary>
-    /// Helper methods for throwing exceptions when preconditions are not met.
+    /// Helper methods for throwing exceptions
     /// </summary>
-    /// <remarks>
-    /// This class is used internally and by generated code; it is not particularly
-    /// expected to be used from application code, although nothing prevents it
-    /// from being used that way.
-    /// </remarks>
-    public static class ProtoPreconditions
+    public static class Preconditions
     {
         /// <summary>
         /// Throws an ArgumentNullException if the given value is null, otherwise
