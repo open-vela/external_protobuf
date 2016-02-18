@@ -11,9 +11,6 @@
 
 CF_EXTERN_C_BEGIN
 
-@class GPBMethod;
-@class GPBMixin;
-@class GPBOption;
 @class GPBSourceContext;
 GPB_ENUM_FWD_DECLARE(GPBSyntax);
 
@@ -50,11 +47,13 @@ typedef GPB_ENUM(GPBApi_FieldNumber) {
 @property(nonatomic, readwrite, copy, null_resettable) NSString *name;
 
 // The methods of this api, in unspecified order.
-@property(nonatomic, readwrite, strong, null_resettable) NSMutableArray<GPBMethod*> *methodsArray;
+// |methodsArray| contains |GPBMethod|
+@property(nonatomic, readwrite, strong, null_resettable) NSMutableArray *methodsArray;
 @property(nonatomic, readonly) NSUInteger methodsArray_Count;
 
 // Any metadata attached to the API.
-@property(nonatomic, readwrite, strong, null_resettable) NSMutableArray<GPBOption*> *optionsArray;
+// |optionsArray| contains |GPBOption|
+@property(nonatomic, readwrite, strong, null_resettable) NSMutableArray *optionsArray;
 @property(nonatomic, readonly) NSUInteger optionsArray_Count;
 
 // A version string for this api. If specified, must have the form
@@ -85,7 +84,8 @@ typedef GPB_ENUM(GPBApi_FieldNumber) {
 @property(nonatomic, readwrite, strong, null_resettable) GPBSourceContext *sourceContext;
 
 // Included APIs. See [Mixin][].
-@property(nonatomic, readwrite, strong, null_resettable) NSMutableArray<GPBMixin*> *mixinsArray;
+// |mixinsArray| contains |GPBMixin|
+@property(nonatomic, readwrite, strong, null_resettable) NSMutableArray *mixinsArray;
 @property(nonatomic, readonly) NSUInteger mixinsArray_Count;
 
 // The source syntax of the service.
@@ -127,7 +127,8 @@ typedef GPB_ENUM(GPBMethod_FieldNumber) {
 @property(nonatomic, readwrite) BOOL responseStreaming;
 
 // Any metadata attached to the method.
-@property(nonatomic, readwrite, strong, null_resettable) NSMutableArray<GPBOption*> *optionsArray;
+// |optionsArray| contains |GPBOption|
+@property(nonatomic, readwrite, strong, null_resettable) NSMutableArray *optionsArray;
 @property(nonatomic, readonly) NSUInteger optionsArray_Count;
 
 // The source syntax of this method.
