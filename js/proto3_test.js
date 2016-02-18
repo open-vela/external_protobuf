@@ -29,11 +29,7 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 goog.require('goog.testing.asserts');
-
-// CommonJS-LoadFromFile: testbinary_pb proto.jspb.test
 goog.require('proto.jspb.test.ForeignMessage');
-
-// CommonJS-LoadFromFile: proto3_test_pb proto.jspb.test
 goog.require('proto.jspb.test.Proto3Enum');
 goog.require('proto.jspb.test.TestProto3');
 
