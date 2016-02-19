@@ -39,8 +39,8 @@
   GPBUInt64Array *mutableVarintList_;
   GPBUInt32Array *mutableFixed32List_;
   GPBUInt64Array *mutableFixed64List_;
-  NSMutableArray<NSData*> *mutableLengthDelimitedList_;
-  NSMutableArray<GPBUnknownFieldSet*> *mutableGroupList_;
+  NSMutableArray *mutableLengthDelimitedList_;
+  NSMutableArray *mutableGroupList_;
 }
 
 @synthesize number = number_;

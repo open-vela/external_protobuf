@@ -49,30 +49,23 @@ namespace objectivec {
 
 class FieldGenerator {
  public:
-  static FieldGenerator* Make(const FieldDescriptor* field,
-                              const Options& options);
+  static FieldGenerator* Make(const FieldDescriptor* field);
 
   virtual ~FieldGenerator();
 
-  // Exposed for subclasses to fill in.
   virtual void GenerateFieldStorageDeclaration(io::Printer* printer) const = 0;
   virtual void GeneratePropertyDeclaration(io::Printer* printer) const = 0;
+
   virtual void GeneratePropertyImplementation(io::Printer* printer) const = 0;
 
-  // Called by GenerateFieldDescription, exposed for classes that need custom
-  // generation.
+  virtual void GenerateFieldDescription(io::Printer* printer) const;
   virtual void GenerateFieldDescriptionTypeSpecific(io::Printer* printer) const;
+  virtual void GenerateFieldNumberConstant(io::Printer* printer) const;
 
-  // Exposed for subclasses to extend, base does nothing.
   virtual void GenerateCFunctionDeclarations(io::Printer* printer) const;
   virtual void GenerateCFunctionImplementations(io::Printer* printer) const;
 
-  // Exposed for subclasses, should always call it on the parent class also.
   virtual void DetermineForwardDeclarations(set<string>* fwd_decls) const;
-
-  // Used during generation, not intended to be extended by subclasses.
-  void GenerateFieldDescription(io::Printer* printer) const;
-  void GenerateFieldNumberConstant(io::Printer* printer) const;
 
   void SetOneofIndexBase(int index_base);
 
@@ -88,7 +81,7 @@ class FieldGenerator {
   string raw_field_name() const { return variable("raw_field_name"); }
 
  protected:
-  FieldGenerator(const FieldDescriptor* descriptor, const Options& options);
+  explicit FieldGenerator(const FieldDescriptor* descriptor);
 
   virtual void FinishInitialization(void);
   virtual bool WantsHasProperty(void) const = 0;
@@ -110,8 +103,7 @@ class SingleFieldGenerator : public FieldGenerator {
   virtual void GeneratePropertyImplementation(io::Printer* printer) const;
 
  protected:
-  SingleFieldGenerator(const FieldDescriptor* descriptor,
-                       const Options& options);
+  explicit SingleFieldGenerator(const FieldDescriptor* descriptor);
   virtual bool WantsHasProperty(void) const;
 
  private:
@@ -127,8 +119,7 @@ class ObjCObjFieldGenerator : public SingleFieldGenerator {
   virtual void GeneratePropertyDeclaration(io::Printer* printer) const;
 
  protected:
-  ObjCObjFieldGenerator(const FieldDescriptor* descriptor,
-                        const Options& options);
+  explicit ObjCObjFieldGenerator(const FieldDescriptor* descriptor);
 
  private:
   GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(ObjCObjFieldGenerator);
@@ -144,8 +135,7 @@ class RepeatedFieldGenerator : public ObjCObjFieldGenerator {
   virtual void GeneratePropertyImplementation(io::Printer* printer) const;
 
  protected:
-  RepeatedFieldGenerator(const FieldDescriptor* descriptor,
-                         const Options& options);
+  explicit RepeatedFieldGenerator(const FieldDescriptor* descriptor);
   virtual void FinishInitialization(void);
   virtual bool WantsHasProperty(void) const;
 
@@ -156,7 +146,7 @@ class RepeatedFieldGenerator : public ObjCObjFieldGenerator {
 // Convenience class which constructs FieldGenerators for a Descriptor.
 class FieldGeneratorMap {
  public:
-  FieldGeneratorMap(const Descriptor* descriptor, const Options& options);
+  explicit FieldGeneratorMap(const Descriptor* descriptor);
   ~FieldGeneratorMap();
 
   const FieldGenerator& get(const FieldDescriptor* field) const;
