@@ -67,8 +67,9 @@ matrix:
       env: CONFIG=ruby22
     - os: osx
       env: CONFIG=jruby
-    # Currently showing flake randomly, doesn't trace back to a single commit.
+    # https://github.com/google/protobuf/issues/1253 - Started failing when
+    # we moved to an OS X image that is 10.11.
     - os: osx
-      env: CONFIG=objectivec_ios
+      env: CONFIG=python_cpp
 notifications:
   email: false
