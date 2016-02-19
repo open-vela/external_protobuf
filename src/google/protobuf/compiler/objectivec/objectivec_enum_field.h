@@ -41,8 +41,7 @@ namespace compiler {
 namespace objectivec {
 
 class EnumFieldGenerator : public SingleFieldGenerator {
-  friend FieldGenerator* FieldGenerator::Make(const FieldDescriptor* field,
-                                              const Options& options);
+  friend FieldGenerator* FieldGenerator::Make(const FieldDescriptor* field);
 
  public:
   virtual void GenerateFieldDescriptionTypeSpecific(io::Printer* printer) const;
@@ -51,7 +50,7 @@ class EnumFieldGenerator : public SingleFieldGenerator {
   virtual void DetermineForwardDeclarations(set<string>* fwd_decls) const;
 
  protected:
-  EnumFieldGenerator(const FieldDescriptor* descriptor, const Options& options);
+  explicit EnumFieldGenerator(const FieldDescriptor* descriptor);
   virtual ~EnumFieldGenerator();
 
  private:
@@ -59,16 +58,13 @@ class EnumFieldGenerator : public SingleFieldGenerator {
 };
 
 class RepeatedEnumFieldGenerator : public RepeatedFieldGenerator {
-  friend FieldGenerator* FieldGenerator::Make(const FieldDescriptor* field,
-                                              const Options& options);
+  friend FieldGenerator* FieldGenerator::Make(const FieldDescriptor* field);
 
  public:
-  virtual void FinishInitialization();
   virtual void GenerateFieldDescriptionTypeSpecific(io::Printer* printer) const;
 
  protected:
-  RepeatedEnumFieldGenerator(const FieldDescriptor* descriptor,
-                             const Options& options);
+  RepeatedEnumFieldGenerator(const FieldDescriptor* descriptor);
   virtual ~RepeatedEnumFieldGenerator();
 
  private:

@@ -6,7 +6,7 @@
 set -ex
 
 # cd to repository root
-pushd $(dirname $0)/..
+cd $(dirname $0)/..
 
 # Protocol buffer compiler to use. If the PROTOC variable is set,
 # use that. Otherwise, probe for expected locations under both

@@ -45,7 +45,6 @@ namespace compiler {
 namespace objectivec {
 
 namespace {
-
 void SetCommonFieldVariables(const FieldDescriptor* descriptor,
                              map<string, string>* variables) {
   string camel_case_name = FieldName(descriptor);
@@ -118,40 +117,39 @@ void SetCommonFieldVariables(const FieldDescriptor* descriptor,
 
 }  // namespace
 
-FieldGenerator* FieldGenerator::Make(const FieldDescriptor* field,
-                                     const Options& options) {
+FieldGenerator* FieldGenerator::Make(const FieldDescriptor* field) {
   FieldGenerator* result = NULL;
   if (field->is_repeated()) {
     switch (GetObjectiveCType(field)) {
       case OBJECTIVECTYPE_MESSAGE: {
         if (field->is_map()) {
-          result = new MapFieldGenerator(field, options);
+          result = new MapFieldGenerator(field);
         } else {
-          result = new RepeatedMessageFieldGenerator(field, options);
+          result = new RepeatedMessageFieldGenerator(field);
         }
         break;
       }
       case OBJECTIVECTYPE_ENUM:
-        result = new RepeatedEnumFieldGenerator(field, options);
+        result = new RepeatedEnumFieldGenerator(field);
         break;
       default:
-        result = new RepeatedPrimitiveFieldGenerator(field, options);
+        result = new RepeatedPrimitiveFieldGenerator(field);
         break;
     }
   } else {
     switch (GetObjectiveCType(field)) {
       case OBJECTIVECTYPE_MESSAGE: {
-        result = new MessageFieldGenerator(field, options);
+        result = new MessageFieldGenerator(field);
         break;
       }
       case OBJECTIVECTYPE_ENUM:
-        result = new EnumFieldGenerator(field, options);
+        result = new EnumFieldGenerator(field);
         break;
       default:
         if (IsReferenceType(field)) {
-          result = new PrimitiveObjFieldGenerator(field, options);
+          result = new PrimitiveObjFieldGenerator(field);
         } else {
-          result = new PrimitiveFieldGenerator(field, options);
+          result = new PrimitiveFieldGenerator(field);
         }
         break;
     }
@@ -160,8 +158,8 @@ FieldGenerator* FieldGenerator::Make(const FieldDescriptor* field,
   return result;
 }
 
-FieldGenerator::FieldGenerator(const FieldDescriptor* descriptor,
-                               const Options& options)
+
+FieldGenerator::FieldGenerator(const FieldDescriptor* descriptor)
     : descriptor_(descriptor) {
   SetCommonFieldVariables(descriptor, &variables_);
 }
@@ -254,9 +252,9 @@ void FieldGenerator::FinishInitialization(void) {
   }
 }
 
-SingleFieldGenerator::SingleFieldGenerator(const FieldDescriptor* descriptor,
-                                           const Options& options)
-    : FieldGenerator(descriptor, options) {
+SingleFieldGenerator::SingleFieldGenerator(
+    const FieldDescriptor* descriptor)
+    : FieldGenerator(descriptor) {
   // Nothing
 }
 
@@ -302,9 +300,9 @@ bool SingleFieldGenerator::WantsHasProperty(void) const {
   return false;
 }
 
-ObjCObjFieldGenerator::ObjCObjFieldGenerator(const FieldDescriptor* descriptor,
-                                             const Options& options)
-    : SingleFieldGenerator(descriptor, options) {
+ObjCObjFieldGenerator::ObjCObjFieldGenerator(
+    const FieldDescriptor* descriptor)
+    : SingleFieldGenerator(descriptor) {
   variables_["property_storage_attribute"] = "strong";
   if (IsRetainedName(variables_["name"])) {
     variables_["storage_attribute"] = " NS_RETURNS_NOT_RETAINED";
@@ -344,21 +342,18 @@ void ObjCObjFieldGenerator::GeneratePropertyDeclaration(
 }
 
 RepeatedFieldGenerator::RepeatedFieldGenerator(
-    const FieldDescriptor* descriptor, const Options& options)
-    : ObjCObjFieldGenerator(descriptor, options) {
+    const FieldDescriptor* descriptor)
+    : ObjCObjFieldGenerator(descriptor) {
   // Repeated fields don't use the has index.
   variables_["has_index"] = "GPBNoHasBit";
-  // Default to no comment and let the cases needing it fill it in.
-  variables_["array_comment"] = "";
 }
 
 RepeatedFieldGenerator::~RepeatedFieldGenerator() {}
 
 void RepeatedFieldGenerator::FinishInitialization(void) {
   FieldGenerator::FinishInitialization();
-  if (variables_.find("array_property_type") == variables_.end()) {
-    variables_["array_property_type"] = variable("array_storage_type");
-  }
+  variables_["array_comment"] =
+      "// |" + variables_["name"] + "| contains |" + variables_["storage_type"] + "|\n";
 }
 
 void RepeatedFieldGenerator::GenerateFieldStorageDeclaration(
@@ -384,13 +379,13 @@ void RepeatedFieldGenerator::GeneratePropertyDeclaration(
       variables_,
       "$comments$"
       "$array_comment$"
-      "@property(nonatomic, readwrite, strong, null_resettable) $array_property_type$ *$name$$storage_attribute$;\n"
+      "@property(nonatomic, readwrite, strong, null_resettable) $array_storage_type$ *$name$$storage_attribute$;\n"
       "@property(nonatomic, readonly) NSUInteger $name$_Count;\n");
   if (IsInitName(variables_.find("name")->second)) {
     // If property name starts with init we need to annotate it to get past ARC.
     // http://stackoverflow.com/questions/18723226/how-do-i-annotate-an-objective-c-property-with-an-objc-method-family/18723227#18723227
     printer->Print(variables_,
-                   "- ($array_property_type$ *)$name$ GPB_METHOD_FAMILY_NONE;\n");
+                   "- ($array_storage_type$ *)$name$ GPB_METHOD_FAMILY_NONE;\n");
   }
   printer->Print("\n");
 }
@@ -400,8 +395,7 @@ bool RepeatedFieldGenerator::WantsHasProperty(void) const {
   return false;
 }
 
-FieldGeneratorMap::FieldGeneratorMap(const Descriptor* descriptor,
-                                     const Options& options)
+FieldGeneratorMap::FieldGeneratorMap(const Descriptor* descriptor)
     : descriptor_(descriptor),
       field_generators_(
           new scoped_ptr<FieldGenerator>[descriptor->field_count()]),
@@ -409,12 +403,10 @@ FieldGeneratorMap::FieldGeneratorMap(const Descriptor* descriptor,
           new scoped_ptr<FieldGenerator>[descriptor->extension_count()]) {
   // Construct all the FieldGenerators.
   for (int i = 0; i < descriptor->field_count(); i++) {
-    field_generators_[i].reset(
-        FieldGenerator::Make(descriptor->field(i), options));
+    field_generators_[i].reset(FieldGenerator::Make(descriptor->field(i)));
   }
   for (int i = 0; i < descriptor->extension_count(); i++) {
-    extension_generators_[i].reset(
-        FieldGenerator::Make(descriptor->extension(i), options));
+    extension_generators_[i].reset(FieldGenerator::Make(descriptor->extension(i)));
   }
 }
 
