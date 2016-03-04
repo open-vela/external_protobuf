@@ -968,8 +968,7 @@ bool ValidateObjCClassPrefix(const FileDescriptor* file,
     } else {
       // ...it didn't match!
       *out_error = "error: Expected 'option objc_class_prefix = \"" +
-                   package_match->second + "\";' for package '" + package +
-                   "' in '" + file->name() + "'";
+                   package_match->second + "\";' in '" + file->name() + "'";
       if (prefix.length()) {
         *out_error += "; but found '" + prefix + "' instead";
       }
