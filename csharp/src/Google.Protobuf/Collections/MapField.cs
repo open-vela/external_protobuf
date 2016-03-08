@@ -34,7 +34,6 @@ using Google.Protobuf.Reflection;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
 using Google.Protobuf.Compatibility;
@@ -475,9 +474,9 @@ namespace Google.Protobuf.Collections
         /// </summary>
         public override string ToString()
         {
-            var writer = new StringWriter();
-            JsonFormatter.Default.WriteDictionary(writer, this);
-            return writer.ToString();
+            var builder = new StringBuilder();
+            JsonFormatter.Default.WriteDictionary(builder, this);
+            return builder.ToString();
         }
 
         #region IDictionary explicit interface implementation

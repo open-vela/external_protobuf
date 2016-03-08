@@ -37,51 +37,22 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-/// Store an unknown field. These are used in conjunction with @c GPBUnknownFieldSet
 @interface GPBUnknownField : NSObject<NSCopying>
 
-/// The field number the data is stored under.
 @property(nonatomic, readonly, assign) int32_t number;
 
-/// An array of varint values for this field.
+// Only one of these will be set.
 @property(nonatomic, readonly, strong) GPBUInt64Array *varintList;
-
-/// An array of fixed32 values for this field.
 @property(nonatomic, readonly, strong) GPBUInt32Array *fixed32List;
-
-/// An array of fixed64 values for this field.
 @property(nonatomic, readonly, strong) GPBUInt64Array *fixed64List;
-
-/// An array of data values for this field.
 @property(nonatomic, readonly, strong) NSArray<NSData*> *lengthDelimitedList;
-
-/// An array of groups of values for this field.
 @property(nonatomic, readonly, strong) NSArray<GPBUnknownFieldSet*> *groupList;
 
-
-/// Add a value to the varintList.
-///
-/// @param value The value to add.
+// Only one of these should be used per Field.
 - (void)addVarint:(uint64_t)value;
-
-/// Add a value to the fixed32List.
-///
-/// @param value The value to add.
 - (void)addFixed32:(uint32_t)value;
-
-/// Add a value to the fixed64List.
-///
-/// @param value The value to add.
 - (void)addFixed64:(uint64_t)value;
-
-/// Add a value to the lengthDelimitedList.
-///
-/// @param value The value to add.
 - (void)addLengthDelimited:(NSData *)value;
-
-/// Add a value to the groupList.
-///
-/// @param value The value to add.
 - (void)addGroup:(GPBUnknownFieldSet *)value;
 
 @end
