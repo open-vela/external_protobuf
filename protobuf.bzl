@@ -15,13 +15,9 @@ def _GenDir(ctx):
     return _GetPath(ctx, ctx.attr.includes[0])
   return _GetPath(ctx, ctx.label.package + '/' + ctx.attr.includes[0])
 
-def _CcOuts(srcs, use_grpc_plugin=False):
-  ret = [s[:-len(".proto")] + ".pb.h" for s in srcs] + \
-        [s[:-len(".proto")] + ".pb.cc" for s in srcs]
-  if use_grpc_plugin:
-    ret += [s[:-len(".proto")] + ".grpc.pb.h" for s in srcs] + \
-           [s[:-len(".proto")] + ".grpc.pb.cc" for s in srcs]
-  return ret
+def _CcOuts(srcs):
+  return [s[:-len(".proto")] +  ".pb.h" for s in srcs] + \
+         [s[:-len(".proto")] + ".pb.cc" for s in srcs]
 
 def _PyOuts(srcs):
   return [s[:-len(".proto")] + "_pb2.py" for s in srcs]
@@ -67,10 +63,6 @@ def _proto_gen_impl(ctx):
   if ctx.attr.gen_py:
     args += ["--python_out=" + ctx.var["GENDIR"] + "/" + gen_dir]
 
-  if ctx.executable.grpc_cpp_plugin:
-    args += ["--plugin=protoc-gen-grpc=" + ctx.executable.grpc_cpp_plugin.path]
-    args += ["--grpc_out=" + ctx.var["GENDIR"] + "/" + gen_dir]
-
   if args:
     ctx.action(
         inputs=srcs + deps,
@@ -98,11 +90,6 @@ _proto_gen = rule(
             single_file = True,
             mandatory = True,
         ),
-        "grpc_cpp_plugin": attr.label(
-            cfg = HOST_CFG,
-            executable = True,
-            single_file = True,
-        ),
         "gen_cc": attr.bool(),
         "gen_py": attr.bool(),
         "outs": attr.output_list(),
@@ -117,10 +104,9 @@ def cc_proto_library(
         deps=[],
         cc_libs=[],
         include=None,
-        protoc="//:protoc",
+        protoc="//google/protobuf:protoc",
         internal_bootstrap_hack=False,
-        use_grpc_plugin=False,
-        default_runtime="//:protobuf",
+        default_runtime="//google/protobuf:protobuf",
         **kargs):
   """Bazel rule to create a C++ protobuf library from proto source files
 
@@ -140,8 +126,6 @@ def cc_proto_library(
         for bootstraping. When it is set to True, no files will be generated.
         The rule will simply be a provider for .proto files, so that other
         cc_proto_library can depend on it.
-    use_grpc_plugin: a flag to indicate whether to call the grpc C++ plugin
-        when processing the proto files.
     default_runtime: the implicitly default runtime which will be depended on by
         the generated cc_library target.
     **kargs: other keyword arguments that are passed to cc_library.
@@ -169,19 +153,13 @@ def cc_proto_library(
         **kargs)
     return
 
-  grpc_cpp_plugin = None
-  if use_grpc_plugin:
-    grpc_cpp_plugin = "//external:grpc_cpp_plugin"
-
-  outs = _CcOuts(srcs, use_grpc_plugin)
-
+  outs = _CcOuts(srcs)
   _proto_gen(
       name=name + "_genproto",
       srcs=srcs,
       deps=[s + "_genproto" for s in deps],
       includes=includes,
       protoc=protoc,
-      grpc_cpp_plugin=grpc_cpp_plugin,
       gen_cc=1,
       outs=outs,
       visibility=["//visibility:public"],
@@ -189,8 +167,6 @@ def cc_proto_library(
 
   if default_runtime and not default_runtime in cc_libs:
     cc_libs += [default_runtime]
-  if use_grpc_plugin:
-    cc_libs += ["//external:grpc_lib"]
 
   native.cc_library(
       name=name,
@@ -199,6 +175,37 @@ def cc_proto_library(
       includes=includes,
       **kargs)
 
+
+def internal_copied_filegroup(
+        name,
+        srcs,
+        include,
+        **kargs):
+  """Bazel rule to fix sources file to workaround with python path issues.
+
+  Args:
+    name: the name of the internal_copied_filegroup rule, which will be the
+        name of the generated filegroup.
+    srcs: the source files to be copied.
+    include: the expected import root of the source.
+    **kargs: extra arguments that will be passed into the filegroup.
+  """
+  outs = [_RelativeOutputPath(s, include) for s in srcs]
+
+  native.genrule(
+      name=name+"_genrule",
+      srcs=srcs,
+      outs=outs,
+      cmd=" && ".join(["cp $(location %s) $(location %s)" %
+                       (s, _RelativeOutputPath(s, include))
+                       for s in srcs]))
+
+  native.filegroup(
+      name=name,
+      srcs=outs,
+      **kargs)
+
+
 def py_proto_library(
         name,
         srcs=[],
@@ -206,8 +213,8 @@ def py_proto_library(
         py_libs=[],
         py_extra_srcs=[],
         include=None,
-        default_runtime="//:protobuf_python",
-        protoc="//:protoc",
+        default_runtime="//google/protobuf:protobuf_python",
+        protoc="//google/protobuf:protoc",
         **kargs):
   """Bazel rule to create a Python protobuf library from proto source files
 
@@ -247,6 +254,15 @@ def py_proto_library(
       visibility=["//visibility:public"],
   )
 
+  if include != None:
+    # Copy the output files to the desired location to make the import work.
+    internal_copied_filegroup_name=name + "_internal_copied_filegroup"
+    internal_copied_filegroup(
+        name=internal_copied_filegroup_name,
+        srcs=outs,
+        include=include)
+    outs=[internal_copied_filegroup_name]
+
   if default_runtime and not default_runtime in py_libs + deps:
     py_libs += [default_runtime]
 
@@ -254,7 +270,6 @@ def py_proto_library(
       name=name,
       srcs=outs+py_extra_srcs,
       deps=py_libs+deps,
-      imports=includes,
       **kargs)
 
 def internal_protobuf_py_tests(
@@ -271,7 +286,8 @@ def internal_protobuf_py_tests(
 
   """
   for m in modules:
-    s = "python/google/protobuf/internal/%s.py" % m
+    s = _RelativeOutputPath(
+        "python/google/protobuf/internal/%s.py" % m, "python")
     native.py_test(
         name="py_%s" % m,
         srcs=[s],

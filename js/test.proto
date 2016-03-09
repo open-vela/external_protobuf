@@ -216,3 +216,4 @@ message TestMessageWithOneof {
     int32 btwo = 13 [default = 1234];
   }
 }
+
