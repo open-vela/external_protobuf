@@ -37,6 +37,7 @@ import com.google.protobuf.Descriptors.FieldDescriptor;
 import map_test.MapTestProto.TestMap;
 import map_test.MapTestProto.TestMap.MessageValue;
 import map_test.MapTestProto.TestOnChangeEventPropagation;
+
 import junit.framework.TestCase;
 
 import java.util.ArrayList;

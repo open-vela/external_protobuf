@@ -41,15 +41,10 @@ goog.provide('jspb.BinaryMessage');
 goog.provide('jspb.BuilderFunction');
 goog.provide('jspb.ByteSource');
 goog.provide('jspb.ClonerFunction');
-goog.provide('jspb.ComparerFunction');
 goog.provide('jspb.ConstBinaryMessage');
-goog.provide('jspb.PrunerFunction');
 goog.provide('jspb.ReaderFunction');
 goog.provide('jspb.RecyclerFunction');
-goog.provide('jspb.RepeatedFieldType');
-goog.provide('jspb.ScalarFieldType');
 goog.provide('jspb.WriterFunction');
-
 
 goog.forwardDeclare('jspb.Message');
 goog.forwardDeclare('jsproto.BinaryExtension');
@@ -84,29 +79,11 @@ jspb.ByteSource;
 
 
 /**
- * A scalar field in jspb can be a boolean, number, or string.
- * @typedef {boolean|number|string}
- */
-jspb.ScalarFieldType;
-
-
-/**
- * A repeated field in jspb is an array of scalars, blobs, or messages.
- * @typedef {!Array<jspb.ScalarFieldType>|
-             !Array<!Uint8Array>|
-             !Array<!jspb.BinaryMessage>}
- */
-jspb.RepeatedFieldType;
-
-
-/**
  * A field in jspb can be a scalar, a block of bytes, another proto, or an
  * array of any of the above.
- * @typedef {jspb.ScalarFieldType|
-             jspb.RepeatedFieldType|
-             !Uint8Array|
-             !jspb.BinaryMessage|
-             !jsproto.BinaryExtension}
+ * @typedef {boolean|number|string|Uint8Array|
+             jspb.BinaryMessage|jsproto.BinaryExtension|
+             Array<jspb.AnyFieldType>}
  */
 jspb.AnyFieldType;
 
@@ -145,23 +122,6 @@ jspb.ReaderFunction;
  *           !function(!jspb.ConstBinaryMessage, !jspb.BinaryWriter):void}
  */
 jspb.WriterFunction;
-
-
-/**
- * A pruner function removes default-valued fields and empty submessages from a
- * message and returns either the pruned message or null if the entire message
- * was pruned away.
- * @typedef {function(?jspb.BinaryMessage):?jspb.BinaryMessage}
- */
-jspb.PrunerFunction;
-
-
-/**
- * A comparer function returns true if two protos are equal.
- * @typedef {!function(?jspb.ConstBinaryMessage,
- *                     ?jspb.ConstBinaryMessage):boolean}
- */
-jspb.ComparerFunction;
 
 
 /**

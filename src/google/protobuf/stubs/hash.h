@@ -214,8 +214,6 @@ class hash_map : public std::map<Key, Data, HashFcn, Alloc> {
   hash_map(int a = 0, const HashFcn& b = HashFcn(),
            const EqualKey& c = EqualKey(),
            const Alloc& d = Alloc()) : BaseClass(b, d) {}
-
-  HashFcn hash_function() const { return HashFcn(); }
 };
 
 template <typename Key,
@@ -224,8 +222,6 @@ template <typename Key,
 class hash_set : public std::set<Key, HashFcn> {
  public:
   hash_set(int = 0) {}
-
-  HashFcn hash_function() const { return HashFcn(); }
 };
 
 #elif defined(_MSC_VER) && !defined(_STLPORT_VERSION)
@@ -261,8 +257,6 @@ class hash_map
   hash_map(int a = 0, const HashFcn& b = HashFcn(),
            const EqualKey& c = EqualKey(),
            const Alloc& d = Alloc()) : BaseClass(a, b, c, d) {}
-
-  HashFcn hash_function() const { return HashFcn(); }
 };
 
 template <typename Key, typename HashFcn = hash<Key>,
@@ -272,8 +266,6 @@ class hash_set
           Key, HashFcn, EqualKey> {
  public:
   hash_set(int = 0) {}
-
-  HashFcn hash_function() const { return HashFcn(); }
 };
 
 #else
@@ -323,8 +315,6 @@ class hash_map
   hash_map(int a = 0, const HashFcn& b = HashFcn(),
            const EqualKey& c = EqualKey(),
            const Alloc& d = Alloc()) : BaseClass(a, b, c, d) {}
-
-  HashFcn hash_function() const { return HashFcn(); }
 };
 
 template <typename Key, typename HashFcn = hash<Key>,
@@ -334,8 +324,6 @@ class hash_set
           Key, HashFcn, EqualKey> {
  public:
   hash_set(int = 0) {}
-
-  HashFcn hash_function() const { return HashFcn(); }
 };
 
 #endif  // !GOOGLE_PROTOBUF_MISSING_HASH

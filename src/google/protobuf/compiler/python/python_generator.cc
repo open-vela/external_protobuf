@@ -235,7 +235,7 @@ string StringifyDefaultValue(const FieldDescriptor& field) {
         // infinity * 0 = nan
         return "(1e10000 * 0)";
       } else {
-        return "float(" + SimpleDtoa(value) + ")";
+        return SimpleDtoa(value);
       }
     }
     case FieldDescriptor::CPPTYPE_FLOAT: {
@@ -251,7 +251,7 @@ string StringifyDefaultValue(const FieldDescriptor& field) {
         // infinity - infinity = nan
         return "(1e10000 * 0)";
       } else {
-        return "float(" + SimpleFtoa(value) + ")";
+        return SimpleFtoa(value);
       }
     }
     case FieldDescriptor::CPPTYPE_BOOL:
