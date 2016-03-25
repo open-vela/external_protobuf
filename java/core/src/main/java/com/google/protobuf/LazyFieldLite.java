@@ -30,26 +30,14 @@
 
 package com.google.protobuf;
 
-import java.io.IOException;
-
 /**
  * LazyFieldLite encapsulates the logic of lazily parsing message fields. It stores
- * the message in a ByteString initially and then parses it on-demand.
+ * the message in a ByteString initially and then parse it on-demand.
  *
- * LazyFieldLite is thread-compatible: concurrent reads are safe once the proto that this
- * LazyFieldLite is a part of is no longer being mutated by its Builder. However, explicit
- * synchronization is needed under read/write situations.
+ * LazyField is thread-compatible e.g. concurrent read are safe, however,
+ * synchronizations are needed under read/write situations.
  *
- * When a LazyFieldLite is used in the context of a MessageLite object, its behavior is considered
- * to be immutable and none of the setter methods in its API are expected to be invoked. All of the
- * getters are expected to be thread-safe. When used in the context of a MessageLite.Builder,
- * setters can be invoked, but there is no guarantee of thread safety.
- * 
- * TODO(yatin,dweis): Consider splitting this class's functionality and put the mutable methods
- * into a separate builder class to allow us to give stronger compile-time guarantees.
- *
- * This class is internal implementation detail of the protobuf library, so you don't need to use it
- * directly.
+ * This class is internal implementation detail, so you don't need to use it directly.
  *
  * @author xiangl@google.com (Xiang Li)
  */
@@ -58,34 +46,8 @@ public class LazyFieldLite {
       ExtensionRegistryLite.getEmptyRegistry();
 
   /**
-   * The value associated with the LazyFieldLite object is stored in one or more of the following
-   * three fields (delayedBytes, value, memoizedBytes). They should together be interpreted as
-   * follows.
-   * 1) delayedBytes can be non-null, while value and memoizedBytes is null. The object will be in
-   *    this state while the value for the object has not yet been parsed.
-   * 2) Both delayedBytes and value are non-null. The object transitions to this state as soon as
-   *    some caller needs to access the value (by invoking getValue()).
-   * 3) memoizedBytes is merely an optimization for calls to LazyFieldLite.toByteString() to avoid
-   *    recomputing the ByteString representation on each call. Instead, when the value is parsed
-   *    from delayedBytes, we will also assign the contents of delayedBytes to memoizedBytes (since
-   *    that is the ByteString representation of value).
-   * 4) Finally, if the LazyFieldLite was created directly with a parsed MessageLite value, then
-   *    delayedBytes will be null, and memoizedBytes will be initialized only upon the first call to
-   *    LazyFieldLite.toByteString().
-   *
-   * Given the above conditions, any caller that needs a serialized representation of this object
-   * must first check if the memoizedBytes or delayedBytes ByteString is non-null and use it
-   * directly; if both of those are null, it can look at the parsed value field. Similarly, any
-   * caller that needs a parsed value must first check if the value field is already non-null, if
-   * not it must parse the value from delayedBytes.
-   */
-
-  /**
-   * A delayed-parsed version of the contents of this field. When this field is non-null, then the
-   * "value" field is allowed to be null until the time that the value needs to be read.
-   *
-   * When delayedBytes is non-null then {@code extensionRegistry} is required to also be non-null.
-   * {@code value} and {@code memoizedBytes} will be initialized lazily.
+   * A delayed-parsed version of the bytes. When this is non-null then {@code extensionRegistry } is
+   * also non-null and {@code value} and {@code memoizedBytes} are null.
    */
   private ByteString delayedBytes;
 
@@ -98,15 +60,12 @@ public class LazyFieldLite {
   private ExtensionRegistryLite extensionRegistry;
 
   /**
-   * The parsed value. When this is null and a caller needs access to the MessageLite value, then
-   * {@code delayedBytes} will be parsed lazily at that time.
+   * The parsed value. When this is non-null then {@code delayedBytes} will be null.
    */
   protected volatile MessageLite value;
 
   /**
-   * The memoized bytes for {@code value}. This is an optimization for the toByteString() method to
-   * not have to recompute its return-value on each invocation.
-   * TODO(yatin): Figure out whether this optimization is actually necessary.
+   * The memoized bytes for {@code value}. Will be null when {@code value} is null.
    */
   private volatile ByteString memoizedBytes;
 
@@ -271,46 +230,6 @@ public class LazyFieldLite {
       return;
     }
   }
-  
-  /**
-   * Merges another instance's contents from a stream.
-   *
-   * <p>LazyField is not thread-safe for write access. Synchronizations are needed
-   * under read/write situations.
-   */
-  public void mergeFrom(CodedInputStream input, ExtensionRegistryLite extensionRegistry)
-      throws IOException {
-    if (this.containsDefaultInstance()) {
-      setByteString(input.readBytes(), extensionRegistry);
-      return;
-    }
-
-    // If the other field has an extension registry but this does not, copy over the other extension
-    // registry.
-    if (this.extensionRegistry == null) {
-      this.extensionRegistry = extensionRegistry;
-    }
-
-    // In the case that both of them are not parsed we simply concatenate the bytes to save time. In
-    // the (probably rare) case that they have different extension registries there is a chance that
-    // some of the extensions may be dropped, but the tradeoff of making this operation fast seems
-    // to outway the benefits of combining the extension registries, which is not normally done for
-    // lite protos anyways.
-    if (this.delayedBytes != null) {
-      setByteString(this.delayedBytes.concat(input.readBytes()), this.extensionRegistry);
-      return;
-    }
-
-    // We are parsed and both contain data. We won't drop any extensions here directly, but in the
-    // case that the extension registries are not the same then we might in the future if we
-    // need to serialize and parse a message again.
-    try {
-      setValue(value.toBuilder().mergeFrom(input, extensionRegistry).build());
-    } catch (InvalidProtocolBufferException e) {
-      // Nothing is logged and no exceptions are thrown. Clients will be unaware that a proto
-      // was invalid.
-    }
-  }
 
   private static MessageLite mergeValueAndBytes(
       MessageLite value, ByteString otherBytes, ExtensionRegistryLite extensionRegistry) {
@@ -340,10 +259,10 @@ public class LazyFieldLite {
    * parsed. Be careful when using this method.
    */
   public int getSerializedSize() {
-    if (memoizedBytes != null) {
-      return memoizedBytes.size();
-    } else if (delayedBytes != null) {
+    if (delayedBytes != null) {
       return delayedBytes.size();
+    } else if (memoizedBytes != null) {
+      return memoizedBytes.size();
     } else if (value != null) {
       return value.getSerializedSize();
     } else {
@@ -355,11 +274,11 @@ public class LazyFieldLite {
    * Returns a BytesString for this field in a thread-safe way.
    */
   public ByteString toByteString() {
-    if (memoizedBytes != null) {
-      return memoizedBytes;
-    }
     if (delayedBytes != null) {
       return delayedBytes;
+    }
+    if (memoizedBytes != null) {
+      return memoizedBytes;
     }
     synchronized (this) {
       if (memoizedBytes != null) {
@@ -392,15 +311,18 @@ public class LazyFieldLite {
               .parseFrom(delayedBytes, extensionRegistry);
           this.value = parsedValue;
           this.memoizedBytes = delayedBytes;
+          this.delayedBytes = null;
         } else {
           this.value = defaultInstance;
           this.memoizedBytes = ByteString.EMPTY;
+          this.delayedBytes = null;
         }
       } catch (InvalidProtocolBufferException e) {
         // Nothing is logged and no exceptions are thrown. Clients will be unaware that this proto
         // was invalid.
         this.value = defaultInstance;
         this.memoizedBytes = ByteString.EMPTY;
+        this.delayedBytes = null;
       }
     }
   }

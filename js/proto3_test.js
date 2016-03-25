@@ -28,7 +28,6 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-goog.require('goog.crypt.base64');
 goog.require('goog.testing.asserts');
 
 // CommonJS-LoadFromFile: testbinary_pb proto.jspb.test
@@ -38,30 +37,31 @@ goog.require('proto.jspb.test.ForeignMessage');
 goog.require('proto.jspb.test.Proto3Enum');
 goog.require('proto.jspb.test.TestProto3');
 
-
-var BYTES = new Uint8Array([1, 2, 8, 9]);
-var BYTES_B64 = goog.crypt.base64.encodeByteArray(BYTES);
-
-
 /**
- * Helper: compare a bytes field to an expected value
+ * Helper: compare a bytes field to a string with codepoints 0--255.
  * @param {Uint8Array|string} arr
- * @param {Uint8Array} expected
+ * @param {string} str
  * @return {boolean}
  */
-function bytesCompare(arr, expected) {
-  if (goog.isString(arr)) {
-    arr = goog.crypt.base64.decodeStringToUint8Array(arr);
-  }
-  if (arr.length != expected.length) {
+function bytesCompare(arr, str) {
+  if (arr.length != str.length) {
     return false;
   }
-  for (var i = 0; i < arr.length; i++) {
-    if (arr[i] != expected[i]) {
-      return false;
+  if (typeof arr == 'string') {
+    for (var i = 0; i < arr.length; i++) {
+      if (arr.charCodeAt(i) != str.charCodeAt(i)) {
+        return false;
+      }
     }
+    return true;
+  } else {
+    for (var i = 0; i < arr.length; i++) {
+      if (arr[i] != str.charCodeAt(i)) {
+        return false;
+      }
+    }
+    return true;
   }
-  return true;
 }
 
 
@@ -86,17 +86,13 @@ describe('proto3Test', function() {
     assertEquals(msg.getOptionalDouble(), 0);
     assertEquals(msg.getOptionalString(), '');
 
-    // TODO(b/26173701): when we change bytes fields default getter to return
-    // Uint8Array, we'll want to switch this assertion to match the u8 case.
+    // If/when we change bytes fields to return Uint8Array, we'll want to switch
+    // to this assertion instead:
+    //assertEquals(msg.getOptionalBytes() instanceof Uint8Array, true);
     assertEquals(typeof msg.getOptionalBytes(), 'string');
-    assertEquals(msg.getOptionalBytes_asU8() instanceof Uint8Array, true);
-    assertEquals(typeof msg.getOptionalBytes_asB64(), 'string');
-    assertEquals(msg.getOptionalBytes().length, 0);
-    assertEquals(msg.getOptionalBytes_asU8().length, 0);
-    assertEquals(msg.getOptionalBytes_asB64(), '');
 
-    assertEquals(msg.getOptionalForeignEnum(),
-                 proto.jspb.test.Proto3Enum.PROTO3_FOO);
+    assertEquals(msg.getOptionalBytes().length, 0);
+    assertEquals(msg.getOptionalForeignEnum(), proto.jspb.test.Proto3Enum.PROTO3_FOO);
     assertEquals(msg.getOptionalForeignMessage(), undefined);
     assertEquals(msg.getOptionalForeignMessage(), undefined);
 
@@ -140,7 +136,7 @@ describe('proto3Test', function() {
     msg.setOptionalDouble(-1.5);
     msg.setOptionalBool(true);
     msg.setOptionalString('hello world');
-    msg.setOptionalBytes(BYTES);
+    msg.setOptionalBytes('bytes');
     var submsg = new proto.jspb.test.ForeignMessage();
     submsg.setC(16);
     msg.setOptionalForeignMessage(submsg);
@@ -160,7 +156,7 @@ describe('proto3Test', function() {
     msg.setRepeatedDoubleList([-1.5]);
     msg.setRepeatedBoolList([true]);
     msg.setRepeatedStringList(['hello world']);
-    msg.setRepeatedBytesList([BYTES]);
+    msg.setRepeatedBytesList(['bytes']);
     submsg = new proto.jspb.test.ForeignMessage();
     submsg.setC(1000);
     msg.setRepeatedForeignMessageList([submsg]);
@@ -185,7 +181,7 @@ describe('proto3Test', function() {
     assertEquals(msg.getOptionalDouble(), -1.5);
     assertEquals(msg.getOptionalBool(), true);
     assertEquals(msg.getOptionalString(), 'hello world');
-    assertEquals(true, bytesCompare(msg.getOptionalBytes(), BYTES));
+    assertEquals(true, bytesCompare(msg.getOptionalBytes(), 'bytes'));
     assertEquals(msg.getOptionalForeignMessage().getC(), 16);
     assertEquals(msg.getOptionalForeignEnum(),
         proto.jspb.test.Proto3Enum.PROTO3_BAR);
@@ -205,7 +201,7 @@ describe('proto3Test', function() {
     assertElementsEquals(msg.getRepeatedBoolList(), [true]);
     assertElementsEquals(msg.getRepeatedStringList(), ['hello world']);
     assertEquals(msg.getRepeatedBytesList().length, 1);
-    assertEquals(true, bytesCompare(msg.getRepeatedBytesList()[0], BYTES));
+    assertEquals(true, bytesCompare(msg.getRepeatedBytesList()[0], 'bytes'));
     assertEquals(msg.getRepeatedForeignMessageList().length, 1);
     assertEquals(msg.getRepeatedForeignMessageList()[0].getC(), 1000);
     assertElementsEquals(msg.getRepeatedForeignEnumList(),
@@ -246,12 +242,11 @@ describe('proto3Test', function() {
     assertEquals(msg.getOneofString(), 'hello');
     assertEquals(msg.getOneofBytes(), undefined);
 
-    msg.setOneofBytes(goog.crypt.base64.encodeString('\u00FF\u00FF'));
+    msg.setOneofBytes('\u00FF\u00FF');
     assertEquals(msg.getOneofUint32(), undefined);
     assertEquals(msg.getOneofForeignMessage(), undefined);
     assertEquals(msg.getOneofString(), undefined);
-    assertEquals(msg.getOneofBytes_asB64(),
-        goog.crypt.base64.encodeString('\u00FF\u00FF'));
+    assertEquals(msg.getOneofBytes(), '\u00FF\u00FF');
   });
 
 
@@ -272,7 +267,7 @@ describe('proto3Test', function() {
     msg.setOptionalBool(false);
     msg.setOptionalString('hello world');
     msg.setOptionalString('');
-    msg.setOptionalBytes(goog.crypt.base64.encodeString('\u00FF\u00FF'));
+    msg.setOptionalBytes('\u00FF\u00FF');
     msg.setOptionalBytes('');
     msg.setOptionalForeignMessage(new proto.jspb.test.ForeignMessage());
     msg.setOptionalForeignMessage(null);
@@ -284,31 +279,5 @@ describe('proto3Test', function() {
 
     var serialized = msg.serializeBinary();
     assertEquals(0, serialized.length);
-  });
-
-  /**
-   * Test that base64 string and Uint8Array are interchangeable in bytes fields.
-   */
-  it('testBytesFieldsInterop', function() {
-    var msg = new proto.jspb.test.TestProto3();
-    // Set as a base64 string and check all the getters work.
-    msg.setOptionalBytes(BYTES_B64);
-    assertTrue(bytesCompare(msg.getOptionalBytes_asU8(), BYTES));
-    assertTrue(bytesCompare(msg.getOptionalBytes_asB64(), BYTES));
-    assertTrue(bytesCompare(msg.getOptionalBytes(), BYTES));
-
-    // Test binary serialize round trip doesn't break it.
-    msg = proto.jspb.test.TestProto3.deserializeBinary(msg.serializeBinary());
-    assertTrue(bytesCompare(msg.getOptionalBytes_asU8(), BYTES));
-    assertTrue(bytesCompare(msg.getOptionalBytes_asB64(), BYTES));
-    assertTrue(bytesCompare(msg.getOptionalBytes(), BYTES));
-
-    msg = new proto.jspb.test.TestProto3();
-    // Set as a Uint8Array and check all the getters work.
-    msg.setOptionalBytes(BYTES);
-    assertTrue(bytesCompare(msg.getOptionalBytes_asU8(), BYTES));
-    assertTrue(bytesCompare(msg.getOptionalBytes_asB64(), BYTES));
-    assertTrue(bytesCompare(msg.getOptionalBytes(), BYTES));
-
   });
 });

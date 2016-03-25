@@ -696,7 +696,6 @@ message TestRequiredOneof {
   }
 }
 
-
 // Test messages for packed fields
 
 message TestPackedTypes {
