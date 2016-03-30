@@ -31,7 +31,7 @@ static GPBFileDescriptor *GPBEmptyRoot_FileDescriptor(void) {
 
 
 typedef struct GPBEmpty__storage_ {
-  uint32_t _has_storage_[1];
+  uint32_t _has_storage_[0];
 } GPBEmpty__storage_;
 
 // This method is threadsafe because it is initially called
@@ -45,8 +45,14 @@ typedef struct GPBEmpty__storage_ {
                                           file:GPBEmptyRoot_FileDescriptor()
                                         fields:NULL
                                     fieldCount:0
+                                        oneofs:NULL
+                                    oneofCount:0
+                                         enums:NULL
+                                     enumCount:0
+                                        ranges:NULL
+                                    rangeCount:0
                                    storageSize:sizeof(GPBEmpty__storage_)
-                                         flags:0];
+                                    wireFormat:NO];
     NSAssert(descriptor == nil, @"Startup recursed!");
     descriptor = localDescriptor;
   }

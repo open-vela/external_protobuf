@@ -35,7 +35,7 @@
 
 #import "GPBArray_PackagePrivate.h"
 #import "GPBCodedInputStream_PackagePrivate.h"
-#import "GPBCodedOutputStream_PackagePrivate.h"
+#import "GPBCodedOutputStream.h"
 #import "GPBDescriptor_PackagePrivate.h"
 #import "GPBDictionary_PackagePrivate.h"
 #import "GPBExtensionInternals.h"
@@ -53,6 +53,18 @@ NSString *const GPBExceptionMessageKey =
 #endif  // DEBUG
 
 static NSString *const kGPBDataCoderKey = @"GPBData";
+
+#ifndef _GPBCompileAssert
+  #if __has_feature(c_static_assert) || __has_extension(c_static_assert)
+    #define _GPBCompileAssert(test, msg) _Static_assert((test), #msg)
+  #else
+    // Pre-Xcode 7 support.
+    #define _GPBCompileAssertSymbolInner(line, msg) _GPBCompileAssert ## line ## __ ## msg
+    #define _GPBCompileAssertSymbol(line, msg) _GPBCompileAssertSymbolInner(line, msg)
+    #define _GPBCompileAssert(test, msg) \
+        typedef char _GPBCompileAssertSymbol(__LINE__, msg) [ ((test) ? 1 : -1) ]
+  #endif  // __has_feature(c_static_assert) || __has_extension(c_static_assert)
+#endif // _GPBCompileAssert
 
 //
 // PLEASE REMEMBER:
@@ -556,7 +568,6 @@ static id GetArrayIvarWithField(GPBMessage *self, GPBFieldDescriptor *field) {
   id array = GPBGetObjectIvarWithFieldNoAutocreate(self, field);
   if (!array) {
     // Check again after getting the lock.
-    GPBPrepareReadOnlySemaphore(self);
     dispatch_semaphore_wait(self->readOnlySemaphore_, DISPATCH_TIME_FOREVER);
     array = GPBGetObjectIvarWithFieldNoAutocreate(self, field);
     if (!array) {
@@ -587,7 +598,6 @@ static id GetMapIvarWithField(GPBMessage *self, GPBFieldDescriptor *field) {
   id dict = GPBGetObjectIvarWithFieldNoAutocreate(self, field);
   if (!dict) {
     // Check again after getting the lock.
-    GPBPrepareReadOnlySemaphore(self);
     dispatch_semaphore_wait(self->readOnlySemaphore_, DISPATCH_TIME_FOREVER);
     dict = GPBGetObjectIvarWithFieldNoAutocreate(self, field);
     if (!dict) {
@@ -779,8 +789,14 @@ static GPBUnknownFieldSet *GetOrMakeUnknownFields(GPBMessage *self) {
                                                    file:fileDescriptor
                                                  fields:NULL
                                              fieldCount:0
+                                                 oneofs:NULL
+                                             oneofCount:0
+                                                  enums:NULL
+                                              enumCount:0
+                                                 ranges:NULL
+                                             rangeCount:0
                                             storageSize:0
-                                                  flags:0];
+                                             wireFormat:NO];
   }
   return descriptor;
 }
@@ -793,6 +809,8 @@ static GPBUnknownFieldSet *GetOrMakeUnknownFields(GPBMessage *self) {
   if ((self = [super init])) {
     messageStorage_ = (GPBMessage_StoragePtr)(
         ((uint8_t *)self) + class_getInstanceSize([self class]));
+
+    readOnlySemaphore_ = dispatch_semaphore_create(1);
   }
 
   return self;
@@ -868,9 +886,7 @@ static GPBUnknownFieldSet *GetOrMakeUnknownFields(GPBMessage *self) {
 - (void)dealloc {
   [self internalClear:NO];
   NSCAssert(!autocreator_, @"Autocreator was not cleared before dealloc.");
-  if (readOnlySemaphore_) {
-    dispatch_release(readOnlySemaphore_);
-  }
+  dispatch_release(readOnlySemaphore_);
   [super dealloc];
 }
 
@@ -1708,7 +1724,6 @@ static GPBUnknownFieldSet *GetOrMakeUnknownFields(GPBMessage *self) {
   }
 
   // Check for an autocreated value.
-  GPBPrepareReadOnlySemaphore(self);
   dispatch_semaphore_wait(readOnlySemaphore_, DISPATCH_TIME_FOREVER);
   value = [autocreatedExtensionMap_ objectForKey:extension];
   if (!value) {
@@ -1920,6 +1935,7 @@ static GPBUnknownFieldSet *GetOrMakeUnknownFields(GPBMessage *self) {
     }
   }
   @catch (NSException *exception) {
+    [message release];
     message = nil;
     if (errorPtr) {
       *errorPtr = MessageErrorWithReason(GPBMessageErrorCodeMalformedData,
@@ -1928,6 +1944,7 @@ static GPBUnknownFieldSet *GetOrMakeUnknownFields(GPBMessage *self) {
   }
 #ifdef DEBUG
   if (message && !message.initialized) {
+    [message release];
     message = nil;
     if (errorPtr) {
       *errorPtr = MessageError(GPBMessageErrorCodeMissingRequiredField, nil);
@@ -3079,7 +3096,7 @@ static void ResolveIvarSet(GPBFieldDescriptor *field,
       } else {
         GPBOneofDescriptor *oneof = field->containingOneof_;
         if (oneof && (sel == oneof->caseSel_)) {
-          int32_t index = GPBFieldHasIndex(field);
+          int32_t index = oneof->oneofDescription_->index;
           result.impToAdd = imp_implementationWithBlock(^(id obj) {
             return GPBGetHasOneof(obj, index);
           });

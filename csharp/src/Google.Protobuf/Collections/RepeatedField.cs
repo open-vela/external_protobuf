@@ -33,7 +33,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Text;
 
 namespace Google.Protobuf.Collections
@@ -475,9 +474,9 @@ namespace Google.Protobuf.Collections
         /// </summary>
         public override string ToString()
         {
-            var writer = new StringWriter();
-            JsonFormatter.Default.WriteList(writer, this);
-            return writer.ToString();
+            var builder = new StringBuilder();
+            JsonFormatter.Default.WriteList(builder, this);
+            return builder.ToString();
         }
 
         /// <summary>

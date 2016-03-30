@@ -61,6 +61,7 @@ class FieldGenerator {
 
   // Called by GenerateFieldDescription, exposed for classes that need custom
   // generation.
+  virtual void GenerateFieldDescriptionTypeSpecific(io::Printer* printer) const;
 
   // Exposed for subclasses to extend, base does nothing.
   virtual void GenerateCFunctionDeclarations(io::Printer* printer) const;
@@ -70,16 +71,9 @@ class FieldGenerator {
   virtual void DetermineForwardDeclarations(set<string>* fwd_decls) const;
 
   // Used during generation, not intended to be extended by subclasses.
-  void GenerateFieldDescription(
-      io::Printer* printer, bool include_default) const;
+  void GenerateFieldDescription(io::Printer* printer) const;
   void GenerateFieldNumberConstant(io::Printer* printer) const;
 
-  // Exposed to get and set the has bits information.
-  virtual bool RuntimeUsesHasBit(void) const = 0;
-  void SetRuntimeHasBit(int has_index);
-  void SetNoHasBit(void);
-  virtual int ExtraRuntimeHasBitsNeeded(void) const;
-  virtual void SetExtraRuntimeHasBitsBase(int index_base);
   void SetOneofIndexBase(int index_base);
 
   string variable(const char* key) const {
@@ -115,8 +109,6 @@ class SingleFieldGenerator : public FieldGenerator {
 
   virtual void GeneratePropertyImplementation(io::Printer* printer) const;
 
-  virtual bool RuntimeUsesHasBit(void) const;
-
  protected:
   SingleFieldGenerator(const FieldDescriptor* descriptor,
                        const Options& options);
@@ -151,8 +143,6 @@ class RepeatedFieldGenerator : public ObjCObjFieldGenerator {
 
   virtual void GeneratePropertyImplementation(io::Printer* printer) const;
 
-  virtual bool RuntimeUsesHasBit(void) const;
-
  protected:
   RepeatedFieldGenerator(const FieldDescriptor* descriptor,
                          const Options& options);
@@ -172,13 +162,7 @@ class FieldGeneratorMap {
   const FieldGenerator& get(const FieldDescriptor* field) const;
   const FieldGenerator& get_extension(int index) const;
 
-  // Assigns the has bits and returns the number of bits needed.
-  int CalculateHasBits(void);
-
   void SetOneofIndexBase(int index_base);
-
-  // Check if any field of this message has a non zero default.
-  bool DoesAnyFieldHaveNonZeroDefault(void) const;
 
  private:
   const Descriptor* descriptor_;

@@ -46,21 +46,25 @@ typedef struct GPBTimestamp__storage_ {
     static GPBMessageFieldDescription fields[] = {
       {
         .name = "seconds",
-        .dataTypeSpecific.className = NULL,
         .number = GPBTimestamp_FieldNumber_Seconds,
         .hasIndex = 0,
-        .offset = (uint32_t)offsetof(GPBTimestamp__storage_, seconds),
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeInt64,
+        .offset = offsetof(GPBTimestamp__storage_, seconds),
+        .defaultValue.valueInt64 = 0LL,
+        .dataTypeSpecific.className = NULL,
+        .fieldOptions = NULL,
       },
       {
         .name = "nanos",
-        .dataTypeSpecific.className = NULL,
         .number = GPBTimestamp_FieldNumber_Nanos,
         .hasIndex = 1,
-        .offset = (uint32_t)offsetof(GPBTimestamp__storage_, nanos),
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeInt32,
+        .offset = offsetof(GPBTimestamp__storage_, nanos),
+        .defaultValue.valueInt32 = 0,
+        .dataTypeSpecific.className = NULL,
+        .fieldOptions = NULL,
       },
     };
     GPBDescriptor *localDescriptor =
@@ -68,9 +72,15 @@ typedef struct GPBTimestamp__storage_ {
                                      rootClass:[GPBTimestampRoot class]
                                           file:GPBTimestampRoot_FileDescriptor()
                                         fields:fields
-                                    fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
+                                    fieldCount:sizeof(fields) / sizeof(GPBMessageFieldDescription)
+                                        oneofs:NULL
+                                    oneofCount:0
+                                         enums:NULL
+                                     enumCount:0
+                                        ranges:NULL
+                                    rangeCount:0
                                    storageSize:sizeof(GPBTimestamp__storage_)
-                                         flags:0];
+                                    wireFormat:NO];
     NSAssert(descriptor == nil, @"Startup recursed!");
     descriptor = localDescriptor;
   }
