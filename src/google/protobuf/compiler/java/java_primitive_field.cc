@@ -75,7 +75,12 @@ void SetPrimitiveVariables(const FieldDescriptor* descriptor,
       "" : ("= " + ImmutableDefaultValue(descriptor, name_resolver));
   (*variables)["capitalized_type"] =
       GetCapitalizedType(descriptor, /* immutable = */ true);
-  (*variables)["tag"] = SimpleItoa(WireFormat::MakeTag(descriptor));
+  if (descriptor->is_packed()) {
+    (*variables)["tag"] = SimpleItoa(WireFormatLite::MakeTag(
+        descriptor->number(), WireFormatLite::WIRETYPE_LENGTH_DELIMITED));
+  } else {
+    (*variables)["tag"] = SimpleItoa(WireFormat::MakeTag(descriptor));
+  }
   (*variables)["tag_size"] = SimpleItoa(
       WireFormat::TagSize(descriptor->number(), GetType(descriptor)));
   if (IsReferenceType(GetJavaType(descriptor))) {
@@ -94,7 +99,8 @@ void SetPrimitiveVariables(const FieldDescriptor* descriptor,
   if (fixed_size != -1) {
     (*variables)["fixed_size"] = SimpleItoa(fixed_size);
   }
-  (*variables)["on_changed"] = "onChanged();";
+  (*variables)["on_changed"] =
+      HasDescriptorMethods(descriptor->containing_type()) ? "onChanged();" : "";
 
   if (SupportFieldPresence(descriptor->file())) {
     // For singular messages and builders, one bit is used for the hasField bit.
@@ -600,7 +606,7 @@ GenerateMembers(io::Printer* printer) const {
     "}\n");
 
   if (descriptor_->is_packed() &&
-      context_->HasGeneratedMethods(descriptor_->containing_type())) {
+      HasGeneratedMethods(descriptor_->containing_type())) {
     printer->Print(variables_,
       "private int $name$MemoizedSerializedSize = -1;\n");
   }
