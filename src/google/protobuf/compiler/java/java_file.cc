@@ -177,7 +177,7 @@ void MaybeRestartJavaMethod(io::Printer* printer,
   // since otherwise we hit a hardcoded limit in the jvm and javac will
   // then fail with the error "code too large". This limit lets our
   // estimates be off by a factor of two and still we're okay.
-  static const int bytesPerMethod = kMaxStaticSize;
+  static const int bytesPerMethod = 1<<15;  // aka 32K
 
   if ((*bytecode_estimate) > bytesPerMethod) {
     ++(*method_num);
@@ -193,8 +193,7 @@ void MaybeRestartJavaMethod(io::Printer* printer,
 
 }  // namespace
 
-FileGenerator::FileGenerator(const FileDescriptor* file, bool immutable_api,
-                             bool enforce_lite)
+FileGenerator::FileGenerator(const FileDescriptor* file, bool immutable_api)
     : file_(file),
       java_package_(FileJavaPackage(file, immutable_api)),
       message_generators_(
@@ -205,7 +204,6 @@ FileGenerator::FileGenerator(const FileDescriptor* file, bool immutable_api,
       name_resolver_(context_->GetNameResolver()),
       immutable_api_(immutable_api) {
   classname_ = name_resolver_->GetFileClassName(file, immutable_api);
-  context_->SetEnforceLite(enforce_lite);
   generator_factory_.reset(
       new ImmutableGeneratorFactory(context_.get()));
   for (int i = 0; i < file_->message_type_count(); ++i) {
@@ -264,8 +262,7 @@ void FileGenerator::Generate(io::Printer* printer) {
   printer->Print(
     "public static void registerAllExtensions(\n"
     "    com.google.protobuf.ExtensionRegistry$lite$ registry) {\n",
-    "lite",
-    HasDescriptorMethods(file_, context_->EnforceLite()) ? "" : "Lite");
+    "lite", HasDescriptorMethods(file_) ? "" : "Lite");
 
   printer->Indent();
 
@@ -285,7 +282,7 @@ void FileGenerator::Generate(io::Printer* printer) {
 
   if (!MultipleJavaFiles(file_, immutable_api_)) {
     for (int i = 0; i < file_->enum_type_count(); i++) {
-      if (HasDescriptorMethods(file_, context_->EnforceLite())) {
+      if (HasDescriptorMethods(file_)) {
         EnumGenerator(file_->enum_type(i), immutable_api_, context_.get())
             .Generate(printer);
       } else {
@@ -297,7 +294,7 @@ void FileGenerator::Generate(io::Printer* printer) {
       message_generators_[i]->GenerateInterface(printer);
       message_generators_[i]->Generate(printer);
     }
-    if (HasGenericServices(file_, context_->EnforceLite())) {
+    if (HasGenericServices(file_)) {
       for (int i = 0; i < file_->service_count(); i++) {
         google::protobuf::scoped_ptr<ServiceGenerator> generator(
             generator_factory_->NewServiceGenerator(file_->service(i)));
@@ -312,18 +309,14 @@ void FileGenerator::Generate(io::Printer* printer) {
     extension_generators_[i]->Generate(printer);
   }
 
-  // Static variables. We'd like them to be final if possible, but due to
-  // the JVM's 64k size limit on static blocks, we have to initialize some
-  // of them in methods; thus they cannot be final.
-  int static_block_bytecode_estimate = 0;
+  // Static variables.
   for (int i = 0; i < file_->message_type_count(); i++) {
-    message_generators_[i]->GenerateStaticVariables(
-        printer, &static_block_bytecode_estimate);
+    message_generators_[i]->GenerateStaticVariables(printer);
   }
 
   printer->Print("\n");
 
-  if (HasDescriptorMethods(file_, context_->EnforceLite())) {
+  if (HasDescriptorMethods(file_)) {
     if (immutable_api_) {
       GenerateDescriptorInitializationCodeForImmutable(printer);
     } else {
@@ -365,11 +358,9 @@ void FileGenerator::GenerateDescriptorInitializationCodeForImmutable(
     "    getDescriptor() {\n"
     "  return descriptor;\n"
     "}\n"
-    "private static $final$ com.google.protobuf.Descriptors.FileDescriptor\n"
+    "private static com.google.protobuf.Descriptors.FileDescriptor\n"
     "    descriptor;\n"
-    "static {\n",
-    // TODO(dweis): Mark this as final.
-    "final", "");
+    "static {\n");
   printer->Indent();
 
   SharedCodeGenerator shared_code_generator(file_);
@@ -462,7 +453,7 @@ void FileGenerator::GenerateDescriptorInitializationCodeForMutable(io::Printer* 
     "    getDescriptor() {\n"
     "  return descriptor;\n"
     "}\n"
-    "private static final com.google.protobuf.Descriptors.FileDescriptor\n"
+    "private static com.google.protobuf.Descriptors.FileDescriptor\n"
     "    descriptor;\n"
     "static {\n");
   printer->Indent();
@@ -558,7 +549,7 @@ void FileGenerator::GenerateSiblings(const string& package_dir,
                                      vector<string>* file_list) {
   if (MultipleJavaFiles(file_, immutable_api_)) {
     for (int i = 0; i < file_->enum_type_count(); i++) {
-      if (HasDescriptorMethods(file_, context_->EnforceLite())) {
+      if (HasDescriptorMethods(file_)) {
         EnumGenerator generator(file_->enum_type(i), immutable_api_,
                                 context_.get());
         GenerateSibling<EnumGenerator>(package_dir, java_package_,
@@ -591,7 +582,7 @@ void FileGenerator::GenerateSiblings(const string& package_dir,
                                         message_generators_[i].get(),
                                         &MessageGenerator::Generate);
     }
-    if (HasGenericServices(file_, context_->EnforceLite())) {
+    if (HasGenericServices(file_)) {
       for (int i = 0; i < file_->service_count(); i++) {
         google::protobuf::scoped_ptr<ServiceGenerator> generator(
             generator_factory_->NewServiceGenerator(file_->service(i)));

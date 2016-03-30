@@ -37,7 +37,7 @@ __author__ = 'jieluo@google.com (Jie Luo)'
 from datetime import datetime
 
 try:
-  import unittest2 as unittest  #PY26
+  import unittest2 as unittest
 except ImportError:
   import unittest
 
