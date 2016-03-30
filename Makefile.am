@@ -193,6 +193,8 @@ java_EXTRA_DIST=                                                                
   java/core/src/main/java/com/google/protobuf/BlockingRpcChannel.java              \
   java/core/src/main/java/com/google/protobuf/BlockingService.java                 \
   java/core/src/main/java/com/google/protobuf/BooleanArrayList.java                \
+  java/core/src/main/java/com/google/protobuf/ByteBufferWriter.java                \
+  java/core/src/main/java/com/google/protobuf/ByteOutput.java                      \
   java/core/src/main/java/com/google/protobuf/ByteString.java                      \
   java/core/src/main/java/com/google/protobuf/CodedInputStream.java                \
   java/core/src/main/java/com/google/protobuf/CodedOutputStream.java               \
@@ -243,6 +245,8 @@ java_EXTRA_DIST=                                                                
   java/core/src/main/java/com/google/protobuf/SmallSortedMap.java                  \
   java/core/src/main/java/com/google/protobuf/TextFormat.java                      \
   java/core/src/main/java/com/google/protobuf/TextFormatEscaper.java               \
+  java/core/src/main/java/com/google/protobuf/TextFormatParseInfoTree.java         \
+  java/core/src/main/java/com/google/protobuf/TextFormatParseLocation.java         \
   java/core/src/main/java/com/google/protobuf/UninitializedMessageException.java   \
   java/core/src/main/java/com/google/protobuf/UnknownFieldSet.java                 \
   java/core/src/main/java/com/google/protobuf/UnknownFieldSetLite.java             \
@@ -254,6 +258,7 @@ java_EXTRA_DIST=                                                                
   java/core/src/test/java/com/google/protobuf/AnyTest.java                         \
   java/core/src/test/java/com/google/protobuf/BooleanArrayListTest.java            \
   java/core/src/test/java/com/google/protobuf/BoundedByteStringTest.java           \
+  java/core/src/test/java/com/google/protobuf/ByteBufferWriterTest.java            \
   java/core/src/test/java/com/google/protobuf/ByteStringTest.java                  \
   java/core/src/test/java/com/google/protobuf/CheckUtf8Test.java                   \
   java/core/src/test/java/com/google/protobuf/CodedInputStreamTest.java            \
@@ -262,6 +267,7 @@ java_EXTRA_DIST=                                                                
   java/core/src/test/java/com/google/protobuf/DescriptorsTest.java                 \
   java/core/src/test/java/com/google/protobuf/DoubleArrayListTest.java             \
   java/core/src/test/java/com/google/protobuf/DynamicMessageTest.java              \
+  java/core/src/test/java/com/google/protobuf/EnumTest.java                        \
   java/core/src/test/java/com/google/protobuf/FieldPresenceTest.java               \
   java/core/src/test/java/com/google/protobuf/FloatArrayListTest.java              \
   java/core/src/test/java/com/google/protobuf/ForceFieldBuildersPreRun.java        \
@@ -294,6 +300,8 @@ java_EXTRA_DIST=                                                                
   java/core/src/test/java/com/google/protobuf/SmallSortedMapTest.java              \
   java/core/src/test/java/com/google/protobuf/TestBadIdentifiers.java              \
   java/core/src/test/java/com/google/protobuf/TestUtil.java                        \
+  java/core/src/test/java/com/google/protobuf/TextFormatParseInfoTreeTest.java     \
+  java/core/src/test/java/com/google/protobuf/TextFormatParseLocationTest.java     \
   java/core/src/test/java/com/google/protobuf/TextFormatTest.java                  \
   java/core/src/test/java/com/google/protobuf/UnknownEnumValueTest.java            \
   java/core/src/test/java/com/google/protobuf/UnknownFieldSetLiteTest.java         \
@@ -381,11 +389,13 @@ objectivec_EXTRA_DIST=                                                       \
   objectivec/DevTools/full_mac_build.sh                                      \
   objectivec/DevTools/pddm.py                                                \
   objectivec/DevTools/pddm_tests.py                                          \
-  objectivec/generate_well_known_types.sh                                    \
+  objectivec/generate_descriptors_proto.sh                                   \
   objectivec/google/protobuf/Any.pbobjc.h                                    \
   objectivec/google/protobuf/Any.pbobjc.m                                    \
   objectivec/google/protobuf/Api.pbobjc.h                                    \
   objectivec/google/protobuf/Api.pbobjc.m                                    \
+  objectivec/google/protobuf/Descriptor.pbobjc.h                             \
+  objectivec/google/protobuf/Descriptor.pbobjc.m                             \
   objectivec/google/protobuf/Duration.pbobjc.h                               \
   objectivec/google/protobuf/Duration.pbobjc.m                               \
   objectivec/google/protobuf/Empty.pbobjc.h                                  \
@@ -411,7 +421,6 @@ objectivec_EXTRA_DIST=                                                       \
   objectivec/GPBCodedInputStream_PackagePrivate.h                            \
   objectivec/GPBCodedOutputStream.h                                          \
   objectivec/GPBCodedOutputStream.m                                          \
-  objectivec/GPBCodedOutputStream_PackagePrivate.h                           \
   objectivec/GPBDescriptor.h                                                 \
   objectivec/GPBDescriptor.m                                                 \
   objectivec/GPBDescriptor_PackagePrivate.h                                  \
@@ -652,6 +661,7 @@ ruby_EXTRA_DIST=                                                             \
   ruby/tests/repeated_field_test.rb                                          \
   ruby/tests/stress.rb                                                       \
   ruby/tests/generated_code.proto                                            \
+  ruby/tests/generated_code.rb                                               \
   ruby/tests/generated_code_test.rb                                          \
   ruby/travis-test.sh
 

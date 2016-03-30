@@ -35,6 +35,7 @@
 #import "GPBUtilities_PackagePrivate.h"
 #import "GPBWireFormat.h"
 #import "GPBMessage_PackagePrivate.h"
+#import "google/protobuf/Descriptor.pbobjc.h"
 
 // The address of this variable is used as a key for obj_getAssociatedObject.
 static const char kTextFormatExtraValueKey = 0;
@@ -91,6 +92,7 @@ static NSArray *NewFieldsArrayForHasIndex(int hasIndex,
 
 @implementation GPBDescriptor {
   Class messageClass_;
+  NSArray *enums_;
   GPBFileDescriptor *file_;
   BOOL wireFormat_;
 }
@@ -98,6 +100,7 @@ static NSArray *NewFieldsArrayForHasIndex(int hasIndex,
 @synthesize messageClass = messageClass_;
 @synthesize fields = fields_;
 @synthesize oneofs = oneofs_;
+@synthesize enums = enums_;
 @synthesize extensionRanges = extensionRanges_;
 @synthesize extensionRangesCount = extensionRangesCount_;
 @synthesize file = file_;
@@ -107,58 +110,130 @@ static NSArray *NewFieldsArrayForHasIndex(int hasIndex,
     allocDescriptorForClass:(Class)messageClass
                   rootClass:(Class)rootClass
                        file:(GPBFileDescriptor *)file
-                     fields:(void *)fieldDescriptions
-                 fieldCount:(uint32_t)fieldCount
-                storageSize:(uint32_t)storageSize
-                      flags:(GPBDescriptorInitializationFlags)flags {
-  // The rootClass is no longer used, but it is passed in to ensure it
-  // was started up during initialization also.
-  (void)rootClass;
+                     fields:(GPBMessageFieldDescription *)fieldDescriptions
+                 fieldCount:(NSUInteger)fieldCount
+                     oneofs:(GPBMessageOneofDescription *)oneofDescriptions
+                 oneofCount:(NSUInteger)oneofCount
+                      enums:(GPBMessageEnumDescription *)enumDescriptions
+                  enumCount:(NSUInteger)enumCount
+                     ranges:(const GPBExtensionRange *)ranges
+                 rangeCount:(NSUInteger)rangeCount
+                storageSize:(size_t)storageSize
+                 wireFormat:(BOOL)wireFormat {
   NSMutableArray *fields = nil;
+  NSMutableArray *oneofs = nil;
+  NSMutableArray *enums = nil;
+  NSMutableArray *extensionRanges = nil;
   GPBFileSyntax syntax = file.syntax;
-  BOOL fieldsIncludeDefault =
-      (flags & GPBDescriptorInitializationFlag_FieldsWithDefault) != 0;
-
-  void *desc;
-  for (uint32_t i = 0; i < fieldCount; ++i) {
+  for (NSUInteger i = 0; i < fieldCount; ++i) {
     if (fields == nil) {
       fields = [[NSMutableArray alloc] initWithCapacity:fieldCount];
     }
-    // Need correctly typed pointer for array indexing below to work.
-    if (fieldsIncludeDefault) {
-      GPBMessageFieldDescriptionWithDefault *fieldDescWithDefault = fieldDescriptions;
-      desc = &(fieldDescWithDefault[i]);
-    } else {
-      GPBMessageFieldDescription *fieldDesc = fieldDescriptions;
-      desc = &(fieldDesc[i]);
-    }
-    GPBFieldDescriptor *fieldDescriptor =
-        [[GPBFieldDescriptor alloc] initWithFieldDescription:desc
-                                             includesDefault:fieldsIncludeDefault
-                                                      syntax:syntax];
+    GPBFieldDescriptor *fieldDescriptor = [[GPBFieldDescriptor alloc]
+        initWithFieldDescription:&fieldDescriptions[i]
+                       rootClass:rootClass
+                          syntax:syntax];
     [fields addObject:fieldDescriptor];
     [fieldDescriptor release];
   }
+  for (NSUInteger i = 0; i < oneofCount; ++i) {
+    if (oneofs == nil) {
+      oneofs = [[NSMutableArray alloc] initWithCapacity:oneofCount];
+    }
+    GPBMessageOneofDescription *oneofDescription = &oneofDescriptions[i];
+    NSArray *fieldsForOneof =
+        NewFieldsArrayForHasIndex(oneofDescription->index, fields);
+    GPBOneofDescriptor *oneofDescriptor =
+        [[GPBOneofDescriptor alloc] initWithOneofDescription:oneofDescription
+                                                      fields:fieldsForOneof];
+    [oneofs addObject:oneofDescriptor];
+    [oneofDescriptor release];
+    [fieldsForOneof release];
+  }
+  for (NSUInteger i = 0; i < enumCount; ++i) {
+    if (enums == nil) {
+      enums = [[NSMutableArray alloc] initWithCapacity:enumCount];
+    }
+    GPBEnumDescriptor *enumDescriptor =
+        enumDescriptions[i].enumDescriptorFunc();
+    [enums addObject:enumDescriptor];
+  }
 
-  BOOL wireFormat = (flags & GPBDescriptorInitializationFlag_WireFormat) != 0;
   GPBDescriptor *descriptor = [[self alloc] initWithClass:messageClass
                                                      file:file
                                                    fields:fields
+                                                   oneofs:oneofs
+                                                    enums:enums
+                                          extensionRanges:ranges
+                                     extensionRangesCount:rangeCount
                                               storageSize:storageSize
                                                wireFormat:wireFormat];
   [fields release];
+  [oneofs release];
+  [enums release];
+  [extensionRanges release];
+  return descriptor;
+}
+
++ (instancetype)
+    allocDescriptorForClass:(Class)messageClass
+                  rootClass:(Class)rootClass
+                       file:(GPBFileDescriptor *)file
+                     fields:(GPBMessageFieldDescription *)fieldDescriptions
+                 fieldCount:(NSUInteger)fieldCount
+                     oneofs:(GPBMessageOneofDescription *)oneofDescriptions
+                 oneofCount:(NSUInteger)oneofCount
+                      enums:(GPBMessageEnumDescription *)enumDescriptions
+                  enumCount:(NSUInteger)enumCount
+                     ranges:(const GPBExtensionRange *)ranges
+                 rangeCount:(NSUInteger)rangeCount
+                storageSize:(size_t)storageSize
+                 wireFormat:(BOOL)wireFormat
+        extraTextFormatInfo:(const char *)extraTextFormatInfo {
+  GPBDescriptor *descriptor = [self allocDescriptorForClass:messageClass
+                                                  rootClass:rootClass
+                                                       file:file
+                                                     fields:fieldDescriptions
+                                                 fieldCount:fieldCount
+                                                     oneofs:oneofDescriptions
+                                                 oneofCount:oneofCount
+                                                      enums:enumDescriptions
+                                                  enumCount:enumCount
+                                                     ranges:ranges
+                                                 rangeCount:rangeCount
+                                                storageSize:storageSize
+                                                 wireFormat:wireFormat];
+  // Extra info is a compile time option, so skip the work if not needed.
+  if (extraTextFormatInfo) {
+    NSValue *extraInfoValue = [NSValue valueWithPointer:extraTextFormatInfo];
+    for (GPBFieldDescriptor *fieldDescriptor in descriptor->fields_) {
+      if (fieldDescriptor->description_->flags & GPBFieldTextFormatNameCustom) {
+        objc_setAssociatedObject(fieldDescriptor, &kTextFormatExtraValueKey,
+                                 extraInfoValue,
+                                 OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+      }
+    }
+  }
   return descriptor;
 }
 
 - (instancetype)initWithClass:(Class)messageClass
                          file:(GPBFileDescriptor *)file
                        fields:(NSArray *)fields
-                  storageSize:(uint32_t)storageSize
+                       oneofs:(NSArray *)oneofs
+                        enums:(NSArray *)enums
+              extensionRanges:(const GPBExtensionRange *)extensionRanges
+         extensionRangesCount:(NSUInteger)extensionRangesCount
+                  storageSize:(size_t)storageSize
                    wireFormat:(BOOL)wireFormat {
   if ((self = [super init])) {
     messageClass_ = messageClass;
     file_ = file;
     fields_ = [fields retain];
+    oneofs_ = [oneofs retain];
+    enums_ = [enums retain];
+    extensionRanges_ = extensionRanges;
+    extensionRangesCount_ = extensionRangesCount;
     storageSize_ = storageSize;
     wireFormat_ = wireFormat;
   }
@@ -168,45 +243,8 @@ static NSArray *NewFieldsArrayForHasIndex(int hasIndex,
 - (void)dealloc {
   [fields_ release];
   [oneofs_ release];
+  [enums_ release];
   [super dealloc];
-}
-
-- (void)setupOneofs:(const char **)oneofNames
-              count:(uint32_t)count
-      firstHasIndex:(int32_t)firstHasIndex {
-  NSCAssert(firstHasIndex < 0, @"Should always be <0");
-  NSMutableArray *oneofs = [[NSMutableArray alloc] initWithCapacity:count];
-  for (uint32_t i = 0, hasIndex = firstHasIndex; i < count; ++i, --hasIndex) {
-    const char *name = oneofNames[i];
-    NSArray *fieldsForOneof = NewFieldsArrayForHasIndex(hasIndex, fields_);
-    NSCAssert(fieldsForOneof.count > 0,
-              @"No fields for this oneof? (%s:%d)", name, hasIndex);
-    GPBOneofDescriptor *oneofDescriptor =
-        [[GPBOneofDescriptor alloc] initWithName:name fields:fieldsForOneof];
-    [oneofs addObject:oneofDescriptor];
-    [oneofDescriptor release];
-    [fieldsForOneof release];
-  }
-  oneofs_ = oneofs;
-}
-
-- (void)setupExtraTextInfo:(const char *)extraTextFormatInfo {
-  // Extra info is a compile time option, so skip the work if not needed.
-  if (extraTextFormatInfo) {
-    NSValue *extraInfoValue = [NSValue valueWithPointer:extraTextFormatInfo];
-    for (GPBFieldDescriptor *fieldDescriptor in fields_) {
-      if (fieldDescriptor->description_->flags & GPBFieldTextFormatNameCustom) {
-        objc_setAssociatedObject(fieldDescriptor, &kTextFormatExtraValueKey,
-                                 extraInfoValue,
-                                 OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-      }
-    }
-  }
-}
-
-- (void)setupExtensionRanges:(const GPBExtensionRange *)ranges count:(int32_t)count {
-  extensionRanges_ = ranges;
-  extensionRangesCount_ = count;
 }
 
 - (NSString *)name {
@@ -245,6 +283,15 @@ static NSArray *NewFieldsArrayForHasIndex(int hasIndex,
   return nil;
 }
 
+- (GPBEnumDescriptor *)enumWithName:(NSString *)name {
+  for (GPBEnumDescriptor *descriptor in enums_) {
+    if ([descriptor.name isEqual:name]) {
+      return descriptor;
+    }
+  }
+  return nil;
+}
+
 @end
 
 @implementation GPBFileDescriptor {
@@ -271,16 +318,19 @@ static NSArray *NewFieldsArrayForHasIndex(int hasIndex,
 
 @synthesize fields = fields_;
 
-- (instancetype)initWithName:(const char *)name fields:(NSArray *)fields {
+- (instancetype)initWithOneofDescription:
+                    (GPBMessageOneofDescription *)oneofDescription
+                                  fields:(NSArray *)fields {
   self = [super init];
   if (self) {
-    name_ = name;
+    NSAssert(oneofDescription->index < 0, @"Should always be <0");
+    oneofDescription_ = oneofDescription;
     fields_ = [fields retain];
     for (GPBFieldDescriptor *fieldDesc in fields) {
       fieldDesc->containingOneof_ = self;
     }
 
-    caseSel_ = SelFromStrings(NULL, name, "OneOfCase", NO);
+    caseSel_ = SelFromStrings(NULL, oneofDescription->name, "OneOfCase", NO);
   }
   return self;
 }
@@ -291,7 +341,7 @@ static NSArray *NewFieldsArrayForHasIndex(int hasIndex,
 }
 
 - (NSString *)name {
-  return @(name_);
+  return @(oneofDescription_->name);
 }
 
 - (GPBFieldDescriptor *)fieldWithNumber:(uint32_t)fieldNumber {
@@ -339,6 +389,7 @@ uint32_t GPBFieldAlternateTag(GPBFieldDescriptor *self) {
 
 @implementation GPBFieldDescriptor {
   GPBGenericValue defaultValue_;
+  GPBFieldOptions *fieldOptions_;
 
   // Message ivars
   Class msgClass_;
@@ -352,6 +403,7 @@ uint32_t GPBFieldAlternateTag(GPBFieldDescriptor *self) {
   } enumHandling_;
 }
 
+@synthesize fieldOptions = fieldOptions_;
 @synthesize msgClass = msgClass_;
 @synthesize containingOneof = containingOneof_;
 
@@ -365,21 +417,16 @@ uint32_t GPBFieldAlternateTag(GPBFieldDescriptor *self) {
   return self;
 }
 
-- (instancetype)initWithFieldDescription:(void *)description
-                         includesDefault:(BOOL)includesDefault
+- (instancetype)initWithFieldDescription:
+                    (GPBMessageFieldDescription *)description
+                               rootClass:(Class)rootClass
                                   syntax:(GPBFileSyntax)syntax {
   if ((self = [super init])) {
-    GPBMessageFieldDescription *coreDesc;
-    if (includesDefault) {
-      coreDesc = &(((GPBMessageFieldDescriptionWithDefault *)description)->core);
-    } else {
-      coreDesc = description;
-    }
-    description_ = coreDesc;
-    getSel_ = sel_getUid(coreDesc->name);
-    setSel_ = SelFromStrings("set", coreDesc->name, NULL, YES);
+    description_ = description;
+    getSel_ = sel_getUid(description->name);
+    setSel_ = SelFromStrings("set", description->name, NULL, YES);
 
-    GPBDataType dataType = coreDesc->dataType;
+    GPBDataType dataType = description->dataType;
     BOOL isMessage = GPBDataTypeIsMessage(dataType);
     BOOL isMapOrArray = GPBFieldIsMapOrArray(self);
 
@@ -387,39 +434,39 @@ uint32_t GPBFieldAlternateTag(GPBFieldDescriptor *self) {
       // map<>/repeated fields get a *Count property (inplace of a has*) to
       // support checking if there are any entries without triggering
       // autocreation.
-      hasOrCountSel_ = SelFromStrings(NULL, coreDesc->name, "_Count", NO);
+      hasOrCountSel_ = SelFromStrings(NULL, description->name, "_Count", NO);
     } else {
       // If there is a positive hasIndex, then:
       //   - All fields types for proto2 messages get has* selectors.
       //   - Only message fields for proto3 messages get has* selectors.
       // Note: the positive check is to handle oneOfs, we can't check
       // containingOneof_ because it isn't set until after initialization.
-      if ((coreDesc->hasIndex >= 0) &&
-          (coreDesc->hasIndex != GPBNoHasBit) &&
+      if ((description->hasIndex >= 0) &&
+          (description->hasIndex != GPBNoHasBit) &&
           ((syntax != GPBFileSyntaxProto3) || isMessage)) {
-        hasOrCountSel_ = SelFromStrings("has", coreDesc->name, NULL, NO);
-        setHasSel_ = SelFromStrings("setHas", coreDesc->name, NULL, YES);
+        hasOrCountSel_ = SelFromStrings("has", description->name, NULL, NO);
+        setHasSel_ = SelFromStrings("setHas", description->name, NULL, YES);
       }
     }
 
     // Extra type specific data.
     if (isMessage) {
-      const char *className = coreDesc->dataTypeSpecific.className;
+      const char *className = description->dataTypeSpecific.className;
       msgClass_ = objc_getClass(className);
       NSAssert(msgClass_, @"Class %s not defined", className);
     } else if (dataType == GPBDataTypeEnum) {
-      if ((coreDesc->flags & GPBFieldHasEnumDescriptor) != 0) {
+      if ((description_->flags & GPBFieldHasEnumDescriptor) != 0) {
         enumHandling_.enumDescriptor_ =
-            coreDesc->dataTypeSpecific.enumDescFunc();
+            description->dataTypeSpecific.enumDescFunc();
       } else {
         enumHandling_.enumVerifier_ =
-            coreDesc->dataTypeSpecific.enumVerifier;
+            description->dataTypeSpecific.enumVerifier;
       }
     }
 
-    // Non map<>/repeated fields can have defaults in proto2 syntax.
-    if (!isMapOrArray && includesDefault) {
-      defaultValue_ = ((GPBMessageFieldDescriptionWithDefault *)description)->defaultValue;
+    // Non map<>/repeated fields can have defaults.
+    if (!isMapOrArray) {
+      defaultValue_ = description->defaultValue;
       if (dataType == GPBDataTypeBytes) {
         // Data stored as a length prefixed (network byte order) c-string in
         // descriptor structure.
@@ -431,6 +478,24 @@ uint32_t GPBFieldAlternateTag(GPBFieldDescriptor *self) {
           defaultValue_.valueData =
               [[NSData alloc] initWithBytes:bytes length:length];
         }
+      }
+    }
+
+    // FieldOptions stored as a length prefixed (network byte order) c-escaped
+    // string in descriptor records.
+    if (description->fieldOptions) {
+      uint8_t *optionsBytes = (uint8_t *)description->fieldOptions;
+      uint32_t optionsLength = *((uint32_t *)optionsBytes);
+      optionsLength = ntohl(optionsLength);
+      if (optionsLength > 0) {
+        optionsBytes += sizeof(optionsLength);
+        NSData *optionsData = [NSData dataWithBytesNoCopy:optionsBytes
+                                                   length:optionsLength
+                                             freeWhenDone:NO];
+        GPBExtensionRegistry *registry = [rootClass extensionRegistry];
+        fieldOptions_ = [[GPBFieldOptions parseFromData:optionsData
+                                      extensionRegistry:registry
+                                                  error:NULL] retain];
       }
     }
   }
@@ -601,7 +666,7 @@ uint32_t GPBFieldAlternateTag(GPBFieldDescriptor *self) {
   } else {
     // Undo the CamelCase.
     NSMutableString *result = [NSMutableString stringWithCapacity:len];
-    for (uint32_t i = 0; i < len; i++) {
+    for (NSUInteger i = 0; i < len; i++) {
       unichar c = [name characterAtIndex:i];
       if (c >= 'A' && c <= 'Z') {
         if (i > 0) {
@@ -621,16 +686,10 @@ uint32_t GPBFieldAlternateTag(GPBFieldDescriptor *self) {
 
 @implementation GPBEnumDescriptor {
   NSString *name_;
-  // valueNames_ is a single c string with all of the value names appended
-  // together, each null terminated.  -calcValueNameOffsets fills in
-  // nameOffsets_ with the offsets to allow quicker access to the individual
-  // names.
-  const char *valueNames_;
-  const int32_t *values_;
+  GPBMessageEnumValueDescription *valueDescriptions_;
+  NSUInteger valueDescriptionsCount_;
   GPBEnumValidationFunc enumVerifier_;
   const uint8_t *extraTextFormatInfo_;
-  uint32_t *nameOffsets_;
-  uint32_t valueCount_;
 }
 
 @synthesize name = name_;
@@ -638,30 +697,26 @@ uint32_t GPBFieldAlternateTag(GPBFieldDescriptor *self) {
 
 + (instancetype)
     allocDescriptorForName:(NSString *)name
-                valueNames:(const char *)valueNames
-                    values:(const int32_t *)values
-                     count:(uint32_t)valueCount
+                    values:(GPBMessageEnumValueDescription *)valueDescriptions
+                valueCount:(NSUInteger)valueCount
               enumVerifier:(GPBEnumValidationFunc)enumVerifier {
   GPBEnumDescriptor *descriptor = [[self alloc] initWithName:name
-                                                  valueNames:valueNames
-                                                      values:values
-                                                       count:valueCount
+                                                      values:valueDescriptions
+                                                  valueCount:valueCount
                                                 enumVerifier:enumVerifier];
   return descriptor;
 }
 
 + (instancetype)
     allocDescriptorForName:(NSString *)name
-                valueNames:(const char *)valueNames
-                    values:(const int32_t *)values
-                     count:(uint32_t)valueCount
+                    values:(GPBMessageEnumValueDescription *)valueDescriptions
+                valueCount:(NSUInteger)valueCount
               enumVerifier:(GPBEnumValidationFunc)enumVerifier
        extraTextFormatInfo:(const char *)extraTextFormatInfo {
   // Call the common case.
   GPBEnumDescriptor *descriptor = [self allocDescriptorForName:name
-                                                    valueNames:valueNames
-                                                        values:values
-                                                         count:valueCount
+                                                        values:valueDescriptions
+                                                    valueCount:valueCount
                                                   enumVerifier:enumVerifier];
   // Set the extra info.
   descriptor->extraTextFormatInfo_ = (const uint8_t *)extraTextFormatInfo;
@@ -669,49 +724,24 @@ uint32_t GPBFieldAlternateTag(GPBFieldDescriptor *self) {
 }
 
 - (instancetype)initWithName:(NSString *)name
-                  valueNames:(const char *)valueNames
-                      values:(const int32_t *)values
-                       count:(uint32_t)valueCount
+                      values:(GPBMessageEnumValueDescription *)valueDescriptions
+                  valueCount:(NSUInteger)valueCount
                 enumVerifier:(GPBEnumValidationFunc)enumVerifier {
   if ((self = [super init])) {
     name_ = [name copy];
-    valueNames_ = valueNames;
-    values_ = values;
-    valueCount_ = valueCount;
+    valueDescriptions_ = valueDescriptions;
+    valueDescriptionsCount_ = valueCount;
     enumVerifier_ = enumVerifier;
   }
   return self;
 }
 
-- (void)dealloc {
-  [name_ release];
-  if (nameOffsets_) free(nameOffsets_);
-  [super dealloc];
-}
-
-- (void)calcValueNameOffsets {
-  @synchronized(self) {
-    if (nameOffsets_ != NULL) {
-      return;
-    }
-    uint32_t *offsets = malloc(valueCount_ * sizeof(uint32_t));
-    const char *scan = valueNames_;
-    for (uint32_t i = 0; i < valueCount_; ++i) {
-      offsets[i] = (uint32_t)(scan - valueNames_);
-      while (*scan != '\0') ++scan;
-      ++scan;  // Step over the null.
-    }
-    nameOffsets_ = offsets;
-  }
-}
-
 - (NSString *)enumNameForValue:(int32_t)number {
-  if (nameOffsets_ == NULL) [self calcValueNameOffsets];
-
-  for (uint32_t i = 0; i < valueCount_; ++i) {
-    if (values_[i] == number) {
-      const char *valueName = valueNames_ + nameOffsets_[i];
-      NSString *fullName = [NSString stringWithFormat:@"%@_%s", name_, valueName];
+  for (NSUInteger i = 0; i < valueDescriptionsCount_; ++i) {
+    GPBMessageEnumValueDescription *scan = &valueDescriptions_[i];
+    if ((scan->number == number) && (scan->name != NULL)) {
+      NSString *fullName =
+          [NSString stringWithFormat:@"%@_%s", name_, scan->name];
       return fullName;
     }
   }
@@ -730,14 +760,12 @@ uint32_t GPBFieldAlternateTag(GPBFieldDescriptor *self) {
   const char *nameAsCStr = [name UTF8String];
   nameAsCStr += prefixLen;
 
-  if (nameOffsets_ == NULL) [self calcValueNameOffsets];
-
   // Find it.
-  for (uint32_t i = 0; i < valueCount_; ++i) {
-    const char *valueName = valueNames_ + nameOffsets_[i];
-    if (strcmp(nameAsCStr, valueName) == 0) {
+  for (NSUInteger i = 0; i < valueDescriptionsCount_; ++i) {
+    GPBMessageEnumValueDescription *scan = &valueDescriptions_[i];
+    if ((scan->name != NULL) && (strcmp(nameAsCStr, scan->name) == 0)) {
       if (outValue) {
-        *outValue = values_[i];
+        *outValue = scan->number;
       }
       return YES;
     }
@@ -745,28 +773,34 @@ uint32_t GPBFieldAlternateTag(GPBFieldDescriptor *self) {
   return NO;
 }
 
-- (NSString *)textFormatNameForValue:(int32_t)number {
-  if (nameOffsets_ == NULL) [self calcValueNameOffsets];
+- (void)dealloc {
+  [name_ release];
+  [super dealloc];
+}
 
+- (NSString *)textFormatNameForValue:(int32_t)number {
   // Find the EnumValue descriptor and its index.
-  BOOL foundIt = NO;
-  uint32_t valueDescriptorIndex;
-  for (valueDescriptorIndex = 0; valueDescriptorIndex < valueCount_;
+  GPBMessageEnumValueDescription *valueDescriptor = NULL;
+  NSUInteger valueDescriptorIndex;
+  for (valueDescriptorIndex = 0; valueDescriptorIndex < valueDescriptionsCount_;
        ++valueDescriptorIndex) {
-    if (values_[valueDescriptorIndex] == number) {
-      foundIt = YES;
+    GPBMessageEnumValueDescription *scan =
+        &valueDescriptions_[valueDescriptorIndex];
+    if (scan->number == number) {
+      valueDescriptor = scan;
       break;
     }
   }
 
-  if (!foundIt) {
+  // If we didn't find it, or names were disable at proto compile time, nothing
+  // we can do.
+  if (!valueDescriptor || !valueDescriptor->name) {
     return nil;
   }
 
   NSString *result = nil;
   // Naming adds an underscore between enum name and value name, skip that also.
-  const char *valueName = valueNames_ + nameOffsets_[valueDescriptorIndex];
-  NSString *shortName = @(valueName);
+  NSString *shortName = @(valueDescriptor->name);
 
   // See if it is in the map of special format handling.
   if (extraTextFormatInfo_) {

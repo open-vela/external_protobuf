@@ -44,12 +44,14 @@ typedef struct GPBFieldMask__storage_ {
     static GPBMessageFieldDescription fields[] = {
       {
         .name = "pathsArray",
-        .dataTypeSpecific.className = NULL,
         .number = GPBFieldMask_FieldNumber_PathsArray,
         .hasIndex = GPBNoHasBit,
-        .offset = (uint32_t)offsetof(GPBFieldMask__storage_, pathsArray),
         .flags = GPBFieldRepeated,
         .dataType = GPBDataTypeString,
+        .offset = offsetof(GPBFieldMask__storage_, pathsArray),
+        .defaultValue.valueMessage = nil,
+        .dataTypeSpecific.className = NULL,
+        .fieldOptions = NULL,
       },
     };
     GPBDescriptor *localDescriptor =
@@ -57,9 +59,15 @@ typedef struct GPBFieldMask__storage_ {
                                      rootClass:[GPBFieldMaskRoot class]
                                           file:GPBFieldMaskRoot_FileDescriptor()
                                         fields:fields
-                                    fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
+                                    fieldCount:sizeof(fields) / sizeof(GPBMessageFieldDescription)
+                                        oneofs:NULL
+                                    oneofCount:0
+                                         enums:NULL
+                                     enumCount:0
+                                        ranges:NULL
+                                    rangeCount:0
                                    storageSize:sizeof(GPBFieldMask__storage_)
-                                         flags:0];
+                                    wireFormat:NO];
     NSAssert(descriptor == nil, @"Startup recursed!");
     descriptor = localDescriptor;
   }

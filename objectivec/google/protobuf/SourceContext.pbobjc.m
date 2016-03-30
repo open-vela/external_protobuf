@@ -44,12 +44,14 @@ typedef struct GPBSourceContext__storage_ {
     static GPBMessageFieldDescription fields[] = {
       {
         .name = "fileName",
-        .dataTypeSpecific.className = NULL,
         .number = GPBSourceContext_FieldNumber_FileName,
         .hasIndex = 0,
-        .offset = (uint32_t)offsetof(GPBSourceContext__storage_, fileName),
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeString,
+        .offset = offsetof(GPBSourceContext__storage_, fileName),
+        .defaultValue.valueString = nil,
+        .dataTypeSpecific.className = NULL,
+        .fieldOptions = NULL,
       },
     };
     GPBDescriptor *localDescriptor =
@@ -57,9 +59,15 @@ typedef struct GPBSourceContext__storage_ {
                                      rootClass:[GPBSourceContextRoot class]
                                           file:GPBSourceContextRoot_FileDescriptor()
                                         fields:fields
-                                    fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
+                                    fieldCount:sizeof(fields) / sizeof(GPBMessageFieldDescription)
+                                        oneofs:NULL
+                                    oneofCount:0
+                                         enums:NULL
+                                     enumCount:0
+                                        ranges:NULL
+                                    rangeCount:0
                                    storageSize:sizeof(GPBSourceContext__storage_)
-                                         flags:0];
+                                    wireFormat:NO];
     NSAssert(descriptor == nil, @"Startup recursed!");
     descriptor = localDescriptor;
   }

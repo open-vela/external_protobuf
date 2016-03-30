@@ -28,7 +28,7 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#import "GPBCodedOutputStream_PackagePrivate.h"
+#import "GPBCodedOutputStream.h"
 
 #import <mach/vm_param.h>
 
@@ -178,6 +178,12 @@ static void GPBWriteRawLittleEndian64(GPBOutputBufferState *state,
   return [self initWithOutputStream:nil data:data];
 }
 
+- (instancetype)initWithOutputStream:(NSOutputStream *)output
+                          bufferSize:(size_t)bufferSize {
+  NSMutableData *data = [NSMutableData dataWithLength:bufferSize];
+  return [self initWithOutputStream:output data:data];
+}
+
 // This initializer isn't exposed, but it is the designated initializer.
 // Setting OutputStream and NSData is to control the buffering behavior/size
 // of the work, but that is more obvious via the bufferSize: version.
@@ -193,10 +199,15 @@ static void GPBWriteRawLittleEndian64(GPBOutputBufferState *state,
   return self;
 }
 
-+ (instancetype)streamWithOutputStream:(NSOutputStream *)output {
-  NSMutableData *data = [NSMutableData dataWithLength:PAGE_SIZE];
++ (instancetype)streamWithOutputStream:(NSOutputStream *)output
+                            bufferSize:(size_t)bufferSize {
   return [[[self alloc] initWithOutputStream:output
-                                        data:data] autorelease];
+                                  bufferSize:bufferSize] autorelease];
+}
+
++ (instancetype)streamWithOutputStream:(NSOutputStream *)output {
+  return [[[self alloc] initWithOutputStream:output
+                                  bufferSize:PAGE_SIZE] autorelease];
 }
 
 + (instancetype)streamWithData:(NSMutableData *)data {

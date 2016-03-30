@@ -46,36 +46,47 @@ typedef struct GPBAny__storage_ {
     static GPBMessageFieldDescription fields[] = {
       {
         .name = "typeURL",
-        .dataTypeSpecific.className = NULL,
         .number = GPBAny_FieldNumber_TypeURL,
         .hasIndex = 0,
-        .offset = (uint32_t)offsetof(GPBAny__storage_, typeURL),
         .flags = GPBFieldOptional | GPBFieldTextFormatNameCustom,
         .dataType = GPBDataTypeString,
+        .offset = offsetof(GPBAny__storage_, typeURL),
+        .defaultValue.valueString = nil,
+        .dataTypeSpecific.className = NULL,
+        .fieldOptions = NULL,
       },
       {
         .name = "value",
-        .dataTypeSpecific.className = NULL,
         .number = GPBAny_FieldNumber_Value,
         .hasIndex = 1,
-        .offset = (uint32_t)offsetof(GPBAny__storage_, value),
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeBytes,
+        .offset = offsetof(GPBAny__storage_, value),
+        .defaultValue.valueData = nil,
+        .dataTypeSpecific.className = NULL,
+        .fieldOptions = NULL,
       },
     };
+#if GPBOBJC_SKIP_MESSAGE_TEXTFORMAT_EXTRAS
+    const char *extraTextFormatInfo = NULL;
+#else
+    static const char *extraTextFormatInfo = "\001\001\004\241!!\000";
+#endif  // GPBOBJC_SKIP_MESSAGE_TEXTFORMAT_EXTRAS
     GPBDescriptor *localDescriptor =
         [GPBDescriptor allocDescriptorForClass:[GPBAny class]
                                      rootClass:[GPBAnyRoot class]
                                           file:GPBAnyRoot_FileDescriptor()
                                         fields:fields
-                                    fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
+                                    fieldCount:sizeof(fields) / sizeof(GPBMessageFieldDescription)
+                                        oneofs:NULL
+                                    oneofCount:0
+                                         enums:NULL
+                                     enumCount:0
+                                        ranges:NULL
+                                    rangeCount:0
                                    storageSize:sizeof(GPBAny__storage_)
-                                         flags:0];
-#if !GPBOBJC_SKIP_MESSAGE_TEXTFORMAT_EXTRAS
-    static const char *extraTextFormatInfo =
-        "\001\001\004\241!!\000";
-    [localDescriptor setupExtraTextInfo:extraTextFormatInfo];
-#endif  // !GPBOBJC_SKIP_MESSAGE_TEXTFORMAT_EXTRAS
+                                    wireFormat:NO
+                           extraTextFormatInfo:extraTextFormatInfo];
     NSAssert(descriptor == nil, @"Startup recursed!");
     descriptor = localDescriptor;
   }
