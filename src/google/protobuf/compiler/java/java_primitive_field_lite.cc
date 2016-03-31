@@ -129,6 +129,8 @@ void SetPrimitiveVariables(const FieldDescriptor* descriptor,
   if (fixed_size != -1) {
     (*variables)["fixed_size"] = SimpleItoa(fixed_size);
   }
+  (*variables)["on_changed"] =
+      HasDescriptorMethods(descriptor->containing_type()) ? "onChanged();" : "";
 
   if (SupportFieldPresence(descriptor->file())) {
     // For singular messages and builders, one bit is used for the hasField bit.
@@ -633,7 +635,7 @@ GenerateMembers(io::Printer* printer) const {
     "}\n");
 
   if (descriptor_->options().packed() &&
-      context_->HasGeneratedMethods(descriptor_->containing_type())) {
+      HasGeneratedMethods(descriptor_->containing_type())) {
     printer->Print(variables_,
       "private int $name$MemoizedSerializedSize = -1;\n");
   }
@@ -756,6 +758,7 @@ GenerateMergingCode(io::Printer* printer) const {
     "    ensure$capitalized_name$IsMutable();\n"
     "    $name$_.addAll(other.$name$_);\n"
     "  }\n"
+    "  $on_changed$\n"
     "}\n");
 }
 

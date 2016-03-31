@@ -102,42 +102,6 @@ util::Status BinaryToJsonString(TypeResolver* resolver,
                             options);
 }
 
-namespace {
-class StatusErrorListener : public converter::ErrorListener {
- public:
-  StatusErrorListener() : status_(util::Status::OK) {}
-  virtual ~StatusErrorListener() {}
-
-  util::Status GetStatus() { return status_; }
-
-  virtual void InvalidName(const converter::LocationTrackerInterface& loc,
-                           StringPiece unknown_name, StringPiece message) {
-    status_ = util::Status(util::error::INVALID_ARGUMENT,
-                             loc.ToString() + ": " + message.ToString());
-  }
-
-  virtual void InvalidValue(const converter::LocationTrackerInterface& loc,
-                            StringPiece type_name, StringPiece value) {
-    status_ =
-        util::Status(util::error::INVALID_ARGUMENT,
-                       loc.ToString() + ": invalid value " + value.ToString() +
-                           " for type " + type_name.ToString());
-  }
-
-  virtual void MissingField(const converter::LocationTrackerInterface& loc,
-                            StringPiece missing_name) {
-    status_ = util::Status(
-        util::error::INVALID_ARGUMENT,
-        loc.ToString() + ": missing field " + missing_name.ToString());
-  }
-
- private:
-  util::Status status_;
-
-  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(StatusErrorListener);
-};
-}  // namespace
-
 util::Status JsonToBinaryStream(TypeResolver* resolver,
                                   const string& type_url,
                                   io::ZeroCopyInputStream* json_input,
@@ -145,7 +109,7 @@ util::Status JsonToBinaryStream(TypeResolver* resolver,
   google::protobuf::Type type;
   RETURN_IF_ERROR(resolver->ResolveMessageType(type_url, &type));
   internal::ZeroCopyStreamByteSink sink(binary_output);
-  StatusErrorListener listener;
+  converter::NoopErrorListener listener;
   converter::ProtoStreamObjectWriter proto_writer(resolver, type, &sink,
                                                   &listener);
 
@@ -159,7 +123,7 @@ util::Status JsonToBinaryStream(TypeResolver* resolver,
   }
   RETURN_IF_ERROR(parser.FinishParse());
 
-  return listener.GetStatus();
+  return util::Status::OK;
 }
 
 util::Status JsonToBinaryString(TypeResolver* resolver,

@@ -41,7 +41,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
@@ -57,12 +56,11 @@ public class NioByteStringTest extends TestCase {
   private static final String CLASSNAME = NioByteString.class.getSimpleName();
   private static final byte[] BYTES = ByteStringTest.getTestBytes(1234, 11337766L);
   private static final int EXPECTED_HASH = ByteString.wrap(BYTES).hashCode();
-
-  private final ByteBuffer backingBuffer = ByteBuffer.wrap(BYTES.clone());
-  private final ByteString testString = new NioByteString(backingBuffer);
+  private static final ByteBuffer BUFFER = ByteBuffer.wrap(BYTES.clone());
+  private static final ByteString TEST_STRING = new NioByteString(BUFFER);
 
   public void testExpectedType() {
-    String actualClassName = getActualClassName(testString);
+    String actualClassName = getActualClassName(TEST_STRING);
     assertEquals(CLASSNAME + " should match type exactly", CLASSNAME, actualClassName);
   }
 
@@ -75,14 +73,14 @@ public class NioByteStringTest extends TestCase {
   public void testByteAt() {
     boolean stillEqual = true;
     for (int i = 0; stillEqual && i < BYTES.length; ++i) {
-      stillEqual = (BYTES[i] == testString.byteAt(i));
+      stillEqual = (BYTES[i] == TEST_STRING.byteAt(i));
     }
     assertTrue(CLASSNAME + " must capture the right bytes", stillEqual);
   }
 
   public void testByteIterator() {
     boolean stillEqual = true;
-    ByteString.ByteIterator iter = testString.iterator();
+    ByteString.ByteIterator iter = TEST_STRING.iterator();
     for (int i = 0; stillEqual && i < BYTES.length; ++i) {
       stillEqual = (iter.hasNext() && BYTES[i] == iter.nextByte());
     }
@@ -100,7 +98,7 @@ public class NioByteStringTest extends TestCase {
   public void testByteIterable() {
     boolean stillEqual = true;
     int j = 0;
-    for (byte quantum : testString) {
+    for (byte quantum : TEST_STRING) {
       stillEqual = (BYTES[j] == quantum);
       ++j;
     }
@@ -110,15 +108,15 @@ public class NioByteStringTest extends TestCase {
 
   public void testSize() {
     assertEquals(CLASSNAME + " must have the expected size", BYTES.length,
-        testString.size());
+        TEST_STRING.size());
   }
 
   public void testGetTreeDepth() {
-    assertEquals(CLASSNAME + " must have depth 0", 0, testString.getTreeDepth());
+    assertEquals(CLASSNAME + " must have depth 0", 0, TEST_STRING.getTreeDepth());
   }
 
   public void testIsBalanced() {
-    assertTrue(CLASSNAME + " is technically balanced", testString.isBalanced());
+    assertTrue(CLASSNAME + " is technically balanced", TEST_STRING.isBalanced());
   }
 
   public void testCopyTo_ByteArrayOffsetLength() {
@@ -126,7 +124,7 @@ public class NioByteStringTest extends TestCase {
     int length = 100;
     byte[] destination = new byte[destinationOffset + length];
     int sourceOffset = 213;
-    testString.copyTo(destination, sourceOffset, destinationOffset, length);
+    TEST_STRING.copyTo(destination, sourceOffset, destinationOffset, length);
     boolean stillEqual = true;
     for (int i = 0; stillEqual && i < length; ++i) {
       stillEqual = BYTES[i + sourceOffset] == destination[i + destinationOffset];
@@ -141,7 +139,7 @@ public class NioByteStringTest extends TestCase {
 
     try {
       // Copy one too many bytes
-      testString.copyTo(destination, testString.size() + 1 - length,
+      TEST_STRING.copyTo(destination, TEST_STRING.size() + 1 - length,
           destinationOffset, length);
       fail("Should have thrown an exception when copying too many bytes of a "
           + CLASSNAME);
@@ -151,7 +149,7 @@ public class NioByteStringTest extends TestCase {
 
     try {
       // Copy with illegal negative sourceOffset
-      testString.copyTo(destination, -1, destinationOffset, length);
+      TEST_STRING.copyTo(destination, -1, destinationOffset, length);
       fail("Should have thrown an exception when given a negative sourceOffset in "
           + CLASSNAME);
     } catch (IndexOutOfBoundsException expected) {
@@ -160,7 +158,7 @@ public class NioByteStringTest extends TestCase {
 
     try {
       // Copy with illegal negative destinationOffset
-      testString.copyTo(destination, 0, -1, length);
+      TEST_STRING.copyTo(destination, 0, -1, length);
       fail("Should have thrown an exception when given a negative destinationOffset in "
           + CLASSNAME);
     } catch (IndexOutOfBoundsException expected) {
@@ -169,7 +167,7 @@ public class NioByteStringTest extends TestCase {
 
     try {
       // Copy with illegal negative size
-      testString.copyTo(destination, 0, 0, -1);
+      TEST_STRING.copyTo(destination, 0, 0, -1);
       fail("Should have thrown an exception when given a negative size in "
           + CLASSNAME);
     } catch (IndexOutOfBoundsException expected) {
@@ -178,7 +176,7 @@ public class NioByteStringTest extends TestCase {
 
     try {
       // Copy with illegal too-large sourceOffset
-      testString.copyTo(destination, 2 * testString.size(), 0, length);
+      TEST_STRING.copyTo(destination, 2 * TEST_STRING.size(), 0, length);
       fail("Should have thrown an exception when the destinationOffset is too large in "
           + CLASSNAME);
     } catch (IndexOutOfBoundsException expected) {
@@ -187,7 +185,7 @@ public class NioByteStringTest extends TestCase {
 
     try {
       // Copy with illegal too-large destinationOffset
-      testString.copyTo(destination, 0, 2 * destination.length, length);
+      TEST_STRING.copyTo(destination, 0, 2 * destination.length, length);
       fail("Should have thrown an exception when the destinationOffset is too large in "
           + CLASSNAME);
     } catch (IndexOutOfBoundsException expected) {
@@ -198,21 +196,21 @@ public class NioByteStringTest extends TestCase {
   public void testCopyTo_ByteBuffer() {
     // Same length.
     ByteBuffer myBuffer = ByteBuffer.allocate(BYTES.length);
-    testString.copyTo(myBuffer);
+    TEST_STRING.copyTo(myBuffer);
     myBuffer.flip();
     assertEquals(CLASSNAME + ".copyTo(ByteBuffer) must give back the same bytes",
-        backingBuffer, myBuffer);
+        BUFFER, myBuffer);
 
     // Target buffer bigger than required.
-    myBuffer = ByteBuffer.allocate(testString.size() + 1);
-    testString.copyTo(myBuffer);
+    myBuffer = ByteBuffer.allocate(TEST_STRING.size() + 1);
+    TEST_STRING.copyTo(myBuffer);
     myBuffer.flip();
-    assertEquals(backingBuffer, myBuffer);
+    assertEquals(BUFFER, myBuffer);
 
     // Target buffer has no space.
     myBuffer = ByteBuffer.allocate(0);
     try {
-      testString.copyTo(myBuffer);
+      TEST_STRING.copyTo(myBuffer);
       fail("Should have thrown an exception when target ByteBuffer has insufficient capacity");
     } catch (BufferOverflowException e) {
       // Expected.
@@ -221,7 +219,7 @@ public class NioByteStringTest extends TestCase {
     // Target buffer too small.
     myBuffer = ByteBuffer.allocate(1);
     try {
-      testString.copyTo(myBuffer);
+      TEST_STRING.copyTo(myBuffer);
       fail("Should have thrown an exception when target ByteBuffer has insufficient capacity");
     } catch (BufferOverflowException e) {
       // Expected.
@@ -229,26 +227,26 @@ public class NioByteStringTest extends TestCase {
   }
 
   public void testMarkSupported() {
-    InputStream stream = testString.newInput();
+    InputStream stream = TEST_STRING.newInput();
     assertTrue(CLASSNAME + ".newInput() must support marking", stream.markSupported());
   }
 
   public void testMarkAndReset() throws IOException {
-    int fraction = testString.size() / 3;
+    int fraction = TEST_STRING.size() / 3;
 
-    InputStream stream = testString.newInput();
-    stream.mark(testString.size()); // First, mark() the end.
+    InputStream stream = TEST_STRING.newInput();
+    stream.mark(TEST_STRING.size()); // First, mark() the end.
 
     skipFully(stream, fraction); // Skip a large fraction, but not all.
     assertEquals(
         CLASSNAME + ": after skipping to the 'middle', half the bytes are available",
-        (testString.size() - fraction), stream.available());
+        (TEST_STRING.size() - fraction), stream.available());
     stream.reset();
     assertEquals(
         CLASSNAME + ": after resetting, all bytes are available",
-        testString.size(), stream.available());
+        TEST_STRING.size(), stream.available());
 
-    skipFully(stream, testString.size()); // Skip to the end.
+    skipFully(stream, TEST_STRING.size()); // Skip to the end.
     assertEquals(
         CLASSNAME + ": after skipping to the end, no more bytes are available",
         0, stream.available());
@@ -286,7 +284,7 @@ public class NioByteStringTest extends TestCase {
   }
 
   public void testAsReadOnlyByteBuffer() {
-    ByteBuffer byteBuffer = testString.asReadOnlyByteBuffer();
+    ByteBuffer byteBuffer = TEST_STRING.asReadOnlyByteBuffer();
     byte[] roundTripBytes = new byte[BYTES.length];
     assertTrue(byteBuffer.remaining() == BYTES.length);
     assertTrue(byteBuffer.isReadOnly());
@@ -296,7 +294,7 @@ public class NioByteStringTest extends TestCase {
   }
 
   public void testAsReadOnlyByteBufferList() {
-    List<ByteBuffer> byteBuffers = testString.asReadOnlyByteBufferList();
+    List<ByteBuffer> byteBuffers = TEST_STRING.asReadOnlyByteBufferList();
     int bytesSeen = 0;
     byte[] roundTripBytes = new byte[BYTES.length];
     for (ByteBuffer byteBuffer : byteBuffers) {
@@ -312,98 +310,25 @@ public class NioByteStringTest extends TestCase {
   }
 
   public void testToByteArray() {
-    byte[] roundTripBytes = testString.toByteArray();
+    byte[] roundTripBytes = TEST_STRING.toByteArray();
     assertTrue(CLASSNAME + ".toByteArray() must give back the same bytes",
         Arrays.equals(BYTES, roundTripBytes));
   }
 
   public void testWriteTo() throws IOException {
     ByteArrayOutputStream bos = new ByteArrayOutputStream();
-    testString.writeTo(bos);
+    TEST_STRING.writeTo(bos);
     byte[] roundTripBytes = bos.toByteArray();
     assertTrue(CLASSNAME + ".writeTo() must give back the same bytes",
         Arrays.equals(BYTES, roundTripBytes));
   }
 
-  public void testWriteToShouldNotExposeInternalBufferToOutputStream() throws IOException {
-    OutputStream os = new OutputStream() {
-      @Override
-      public void write(byte[] b, int off, int len) {
-        Arrays.fill(b, off, off + len, (byte) 0);
-      }
-
-      @Override
-      public void write(int b) {
-        throw new UnsupportedOperationException();
-      }
-    };
-
-    byte[] original = Arrays.copyOf(BYTES, BYTES.length);
-    testString.writeTo(os);
-    assertTrue(CLASSNAME + ".writeTo() must NOT grant access to underlying buffer",
-        Arrays.equals(original, BYTES));
-  }
-
-  public void testWriteToInternalShouldExposeInternalBufferToOutputStream() throws IOException {
-    OutputStream os = new OutputStream() {
-      @Override
-      public void write(byte[] b, int off, int len) {
-        Arrays.fill(b, off, off + len, (byte) 0);
-      }
-
-      @Override
-      public void write(int b) {
-        throw new UnsupportedOperationException();
-      }
-    };
-
-    testString.writeToInternal(os, 0, testString.size());
-    byte[] allZeros = new byte[testString.size()];
-    assertTrue(CLASSNAME + ".writeToInternal() must grant access to underlying buffer",
-        Arrays.equals(allZeros, backingBuffer.array()));
-  }
-
-  public void testWriteToShouldExposeInternalBufferToByteOutput() throws IOException {
-    ByteOutput out = new ByteOutput() {
-      @Override
-      public void write(byte value) throws IOException {
-        throw new UnsupportedOperationException();
-      }
-
-      @Override
-      public void write(byte[] value, int offset, int length) throws IOException {
-        throw new UnsupportedOperationException();
-      }
-
-      @Override
-      public void writeLazy(byte[] value, int offset, int length) throws IOException {
-        throw new UnsupportedOperationException();
-      }
-
-      @Override
-      public void write(ByteBuffer value) throws IOException {
-        throw new UnsupportedOperationException();
-      }
-
-      @Override
-      public void writeLazy(ByteBuffer value) throws IOException {
-        Arrays.fill(value.array(), value.arrayOffset(), value.arrayOffset() + value.limit(),
-            (byte) 0);
-      }
-    };
-
-    testString.writeTo(out);
-    byte[] allZeros = new byte[testString.size()];
-    assertTrue(CLASSNAME + ".writeTo() must grant access to underlying buffer",
-        Arrays.equals(allZeros, backingBuffer.array()));
-  }
-
   public void testNewOutput() throws IOException {
     ByteArrayOutputStream bos = new ByteArrayOutputStream();
     ByteString.Output output = ByteString.newOutput();
-    testString.writeTo(output);
+    TEST_STRING.writeTo(output);
     assertEquals("Output Size returns correct result",
-        output.size(), testString.size());
+        output.size(), TEST_STRING.size());
     output.writeTo(bos);
     assertTrue("Output.writeTo() must give back the same bytes",
         Arrays.equals(BYTES, bos.toByteArray()));
@@ -411,7 +336,7 @@ public class NioByteStringTest extends TestCase {
     // write the output stream to itself! This should cause it to double
     output.writeTo(output);
     assertEquals("Writing an output stream to itself is successful",
-        testString.concat(testString), output.toByteString());
+        TEST_STRING.concat(TEST_STRING), output.toByteString());
 
     output.reset();
     assertEquals("Output.reset() resets the output", 0, output.size());
@@ -448,7 +373,7 @@ public class NioByteStringTest extends TestCase {
     }
 
     try {
-      testString.toString("invalid");
+      TEST_STRING.toString("invalid");
       fail("Should have thrown an exception.");
     } catch (UnsupportedEncodingException expected) {
       // This is success
@@ -456,36 +381,36 @@ public class NioByteStringTest extends TestCase {
   }
 
   public void testEquals() {
-    assertEquals(CLASSNAME + " must not equal null", false, testString.equals(null));
-    assertEquals(CLASSNAME + " must equal self", testString, testString);
+    assertEquals(CLASSNAME + " must not equal null", false, TEST_STRING.equals(null));
+    assertEquals(CLASSNAME + " must equal self", TEST_STRING, TEST_STRING);
     assertFalse(CLASSNAME + " must not equal the empty string",
-        testString.equals(EMPTY));
+        TEST_STRING.equals(EMPTY));
     assertEquals(CLASSNAME + " empty strings must be equal",
-        EMPTY, testString.substring(55, 55));
+        EMPTY, TEST_STRING.substring(55, 55));
     assertEquals(CLASSNAME + " must equal another string with the same value",
-        testString, new NioByteString(backingBuffer));
+        TEST_STRING, new NioByteString(BUFFER));
 
     byte[] mungedBytes = mungedBytes();
     assertFalse(CLASSNAME + " must not equal every string with the same length",
-        testString.equals(new NioByteString(ByteBuffer.wrap(mungedBytes))));
+        TEST_STRING.equals(new NioByteString(ByteBuffer.wrap(mungedBytes))));
   }
 
   public void testEqualsLiteralByteString() {
     ByteString literal = ByteString.copyFrom(BYTES);
     assertEquals(CLASSNAME + " must equal LiteralByteString with same value", literal,
-        testString);
-    assertEquals(CLASSNAME + " must equal LiteralByteString with same value", testString,
+        TEST_STRING);
+    assertEquals(CLASSNAME + " must equal LiteralByteString with same value", TEST_STRING,
         literal);
     assertFalse(CLASSNAME + " must not equal the empty string",
-        testString.equals(ByteString.EMPTY));
+        TEST_STRING.equals(ByteString.EMPTY));
     assertEquals(CLASSNAME + " empty strings must be equal",
-        ByteString.EMPTY, testString.substring(55, 55));
+        ByteString.EMPTY, TEST_STRING.substring(55, 55));
 
     literal = ByteString.copyFrom(mungedBytes());
     assertFalse(CLASSNAME + " must not equal every LiteralByteString with the same length",
-        testString.equals(literal));
+        TEST_STRING.equals(literal));
     assertFalse(CLASSNAME + " must not equal every LiteralByteString with the same length",
-        literal.equals(testString));
+        literal.equals(TEST_STRING));
   }
 
   public void testEqualsRopeByteString() {
@@ -494,22 +419,22 @@ public class NioByteStringTest extends TestCase {
     ByteString rope = p1.concat(p2);
 
     assertEquals(CLASSNAME + " must equal RopeByteString with same value", rope,
-        testString);
-    assertEquals(CLASSNAME + " must equal RopeByteString with same value", testString,
+        TEST_STRING);
+    assertEquals(CLASSNAME + " must equal RopeByteString with same value", TEST_STRING,
         rope);
     assertFalse(CLASSNAME + " must not equal the empty string",
-        testString.equals(ByteString.EMPTY.concat(ByteString.EMPTY)));
+        TEST_STRING.equals(ByteString.EMPTY.concat(ByteString.EMPTY)));
     assertEquals(CLASSNAME + " empty strings must be equal",
-        ByteString.EMPTY.concat(ByteString.EMPTY), testString.substring(55, 55));
+        ByteString.EMPTY.concat(ByteString.EMPTY), TEST_STRING.substring(55, 55));
 
     byte[] mungedBytes = mungedBytes();
     p1 = ByteString.copyFrom(mungedBytes, 0, 5);
     p2 = ByteString.copyFrom(mungedBytes, 5, mungedBytes.length - 5);
     rope = p1.concat(p2);
     assertFalse(CLASSNAME + " must not equal every RopeByteString with the same length",
-        testString.equals(rope));
+        TEST_STRING.equals(rope));
     assertFalse(CLASSNAME + " must not equal every RopeByteString with the same length",
-        rope.equals(testString));
+        rope.equals(TEST_STRING));
   }
 
   private byte[] mungedBytes() {
@@ -520,12 +445,12 @@ public class NioByteStringTest extends TestCase {
   }
 
   public void testHashCode() {
-    int hash = testString.hashCode();
+    int hash = TEST_STRING.hashCode();
     assertEquals(CLASSNAME + " must have expected hashCode", EXPECTED_HASH, hash);
   }
 
   public void testPeekCachedHashCode() {
-    ByteString newString = new NioByteString(backingBuffer);
+    ByteString newString = new NioByteString(BUFFER);
     assertEquals(CLASSNAME + ".peekCachedHashCode() should return zero at first", 0,
         newString.peekCachedHashCode());
     newString.hashCode();
@@ -536,15 +461,15 @@ public class NioByteStringTest extends TestCase {
   public void testPartialHash() {
     // partialHash() is more strenuously tested elsewhere by testing hashes of substrings.
     // This test would fail if the expected hash were 1.  It's not.
-    int hash = testString.partialHash(testString.size(), 0, testString.size());
+    int hash = TEST_STRING.partialHash(TEST_STRING.size(), 0, TEST_STRING.size());
     assertEquals(CLASSNAME + ".partialHash() must yield expected hashCode",
         EXPECTED_HASH, hash);
   }
 
   public void testNewInput() throws IOException {
-    InputStream input = testString.newInput();
+    InputStream input = TEST_STRING.newInput();
     assertEquals("InputStream.available() returns correct value",
-        testString.size(), input.available());
+        TEST_STRING.size(), input.available());
     boolean stillEqual = true;
     for (byte referenceByte : BYTES) {
       int expectedInt = (referenceByte & 0xFF);
@@ -557,8 +482,8 @@ public class NioByteStringTest extends TestCase {
   }
 
   public void testNewInput_skip() throws IOException {
-    InputStream input = testString.newInput();
-    int stringSize = testString.size();
+    InputStream input = TEST_STRING.newInput();
+    int stringSize = TEST_STRING.size();
     int nearEndIndex = stringSize * 2 / 3;
     long skipped1 = input.skip(nearEndIndex);
     assertEquals("InputStream.skip()", skipped1, nearEndIndex);
@@ -567,7 +492,7 @@ public class NioByteStringTest extends TestCase {
     assertTrue("InputStream.mark() is available", input.markSupported());
     input.mark(0);
     assertEquals("InputStream.skip(), read()",
-        testString.byteAt(nearEndIndex) & 0xFF, input.read());
+        TEST_STRING.byteAt(nearEndIndex) & 0xFF, input.read());
     assertEquals("InputStream.available()",
         stringSize - skipped1 - 1, input.available());
     long skipped2 = input.skip(stringSize);
@@ -579,11 +504,11 @@ public class NioByteStringTest extends TestCase {
     assertEquals("InputStream.reset() succeded",
         stringSize - skipped1, input.available());
     assertEquals("InputStream.reset(), read()",
-        testString.byteAt(nearEndIndex) & 0xFF, input.read());
+        TEST_STRING.byteAt(nearEndIndex) & 0xFF, input.read());
   }
 
   public void testNewCodedInput() throws IOException {
-    CodedInputStream cis = testString.newCodedInput();
+    CodedInputStream cis = TEST_STRING.newCodedInput();
     byte[] roundTripBytes = cis.readRawBytes(BYTES.length);
     assertTrue(CLASSNAME + " must give the same bytes back from the CodedInputStream",
         Arrays.equals(BYTES, roundTripBytes));
@@ -596,22 +521,22 @@ public class NioByteStringTest extends TestCase {
    */
   public void testConcat_empty() {
     assertSame(CLASSNAME + " concatenated with empty must give " + CLASSNAME,
-        testString.concat(EMPTY), testString);
+        TEST_STRING.concat(EMPTY), TEST_STRING);
     assertSame("empty concatenated with " + CLASSNAME + " must give " + CLASSNAME,
-        EMPTY.concat(testString), testString);
+        EMPTY.concat(TEST_STRING), TEST_STRING);
   }
 
   public void testJavaSerialization() throws Exception {
     ByteArrayOutputStream out = new ByteArrayOutputStream();
     ObjectOutputStream oos = new ObjectOutputStream(out);
-    oos.writeObject(testString);
+    oos.writeObject(TEST_STRING);
     oos.close();
     byte[] pickled = out.toByteArray();
     InputStream in = new ByteArrayInputStream(pickled);
     ObjectInputStream ois = new ObjectInputStream(in);
     Object o = ois.readObject();
     assertTrue("Didn't get a ByteString back", o instanceof ByteString);
-    assertEquals("Should get an equal ByteString back", testString, o);
+    assertEquals("Should get an equal ByteString back", TEST_STRING, o);
   }
 
   private static ByteString forString(String str) {
