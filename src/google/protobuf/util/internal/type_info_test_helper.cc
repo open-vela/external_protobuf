@@ -102,13 +102,13 @@ ProtoStreamObjectSource* TypeInfoTestHelper::NewProtoSource(
 }
 
 ProtoStreamObjectWriter* TypeInfoTestHelper::NewProtoWriter(
-    const string& type_url, strings::ByteSink* output, ErrorListener* listener,
-    const ProtoStreamObjectWriter::Options& options) {
+    const string& type_url, strings::ByteSink* output,
+    ErrorListener* listener) {
   const google::protobuf::Type* type = typeinfo_->GetTypeByTypeUrl(type_url);
   switch (type_) {
     case USE_TYPE_RESOLVER: {
       return new ProtoStreamObjectWriter(type_resolver_.get(), *type, output,
-                                         listener, options);
+                                         listener);
     }
   }
   GOOGLE_LOG(FATAL) << "Can not reach here.";

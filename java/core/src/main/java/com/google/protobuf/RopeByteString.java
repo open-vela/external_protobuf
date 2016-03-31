@@ -48,11 +48,10 @@ import java.util.Stack;
 /**
  * Class to represent {@code ByteStrings} formed by concatenation of other
  * ByteStrings, without copying the data in the pieces. The concatenation is
- * represented as a tree whose leaf nodes are each a
- * {@link com.google.protobuf.ByteString.LeafByteString}.
+ * represented as a tree whose leaf nodes are each a {@link LiteralByteString}.
  *
  * <p>Most of the operation here is inspired by the now-famous paper <a
- * href="https://web.archive.org/web/20060202015456/http://www.cs.ubc.ca/local/reading/proceedings/spe91-95/spe/vol25/issue12/spe986.pdf">
+ * href="http://www.cs.ubc.ca/local/reading/proceedings/spe91-95/spe/vol25/issue12/spe986.pdf">
  * BAP95 </a> Ropes: an Alternative to Strings hans-j. boehm, russ atkinson and
  * michael plass
  *
@@ -140,9 +139,8 @@ final class RopeByteString extends ByteString {
   /**
    * Concatenate the given strings while performing various optimizations to
    * slow the growth rate of tree depth and tree node count. The result is
-   * either a {@link com.google.protobuf.ByteString.LeafByteString} or a
-   * {@link RopeByteString} depending on which optimizations, if any, were
-   * applied.
+   * either a {@link LiteralByteString} or a {@link RopeByteString}
+   * depending on which optimizations, if any, were applied.
    *
    * <p>Small pieces of length less than {@link
    * ByteString#CONCATENATE_BY_COPY_SIZE} may be copied by value here, as in
@@ -296,7 +294,8 @@ final class RopeByteString extends ByteString {
    *
    * <p>Substrings of {@code length < 2} should result in at most a single
    * recursive call chain, terminating at a leaf node. Thus the result will be a
-   * {@link com.google.protobuf.ByteString.LeafByteString}.
+   * {@link LiteralByteString}. {@link #RopeByteString(ByteString,
+   * ByteString)}.
    *
    * @param beginIndex start at this index
    * @param endIndex   the last character is the one before this index
@@ -369,7 +368,7 @@ final class RopeByteString extends ByteString {
 
   @Override
   public List<ByteBuffer> asReadOnlyByteBufferList() {
-    // Walk through the list of LeafByteString's that make up this
+    // Walk through the list of LiteralByteString's that make up this
     // rope, and add each one as a read-only ByteBuffer.
     List<ByteBuffer> result = new ArrayList<ByteBuffer>();
     PieceIterator pieces = new PieceIterator(this);
@@ -398,12 +397,6 @@ final class RopeByteString extends ByteString {
       left.writeToInternal(out, sourceOffset, numberToWriteInLeft);
       right.writeToInternal(out, 0, numberToWrite - numberToWriteInLeft);
     }
-  }
-
-  @Override
-  void writeTo(ByteOutput output) throws IOException {
-    left.writeTo(output);
-    right.writeTo(output);
   }
 
   @Override
@@ -716,10 +709,9 @@ final class RopeByteString extends ByteString {
     }
 
     /**
-     * Returns the next item and advances one
-     * {@link com.google.protobuf.ByteString.LeafByteString}.
+     * Returns the next item and advances one {@code LiteralByteString}.
      *
-     * @return next non-empty LeafByteString or {@code null}
+     * @return next non-empty LiteralByteString or {@code null}
      */
     @Override
     public LeafByteString next() {

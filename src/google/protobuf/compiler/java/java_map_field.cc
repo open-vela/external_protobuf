@@ -79,10 +79,9 @@ void SetMessageVariables(const FieldDescriptor* descriptor,
                          int messageBitIndex,
                          int builderBitIndex,
                          const FieldGeneratorInfo* info,
-                         Context* context,
+                         ClassNameResolver* name_resolver,
                          map<string, string>* variables) {
   SetCommonFieldVariables(descriptor, info, variables);
-  ClassNameResolver* name_resolver = context->GetNameResolver();
 
   (*variables)["type"] =
       name_resolver->GetImmutableClassName(descriptor->message_type());
@@ -124,7 +123,8 @@ void SetMessageVariables(const FieldDescriptor* descriptor,
   // by the proto compiler
   (*variables)["deprecation"] = descriptor->options().deprecated()
       ? "@java.lang.Deprecated " : "";
-  (*variables)["on_changed"] = "onChanged();";
+  (*variables)["on_changed"] =
+      HasDescriptorMethods(descriptor->containing_type()) ? "onChanged();" : "";
 
   // For repeated fields, one bit is used for whether the array is immutable
   // in the parsing constructor.
@@ -135,12 +135,18 @@ void SetMessageVariables(const FieldDescriptor* descriptor,
 
   (*variables)["default_entry"] = (*variables)["capitalized_name"] +
       "DefaultEntryHolder.defaultEntry";
-  (*variables)["lite"] = "";
-  (*variables)["map_field_parameter"] = (*variables)["default_entry"];
-  (*variables)["descriptor"] =
-      name_resolver->GetImmutableClassName(descriptor->file()) +
-      ".internal_" + UniqueFileScopeIdentifier(descriptor->message_type()) +
-      "_descriptor, ";
+  if (HasDescriptorMethods(descriptor->file())) {
+    (*variables)["lite"] = "";
+    (*variables)["map_field_parameter"] = (*variables)["default_entry"];
+    (*variables)["descriptor"] =
+        name_resolver->GetImmutableClassName(descriptor->file()) +
+        ".internal_" + UniqueFileScopeIdentifier(descriptor->message_type()) +
+        "_descriptor, ";
+  } else {
+    (*variables)["lite"] = "Lite";
+    (*variables)["map_field_parameter"] = "";
+    (*variables)["descriptor"] = "";
+  }
 }
 
 }  // namespace
@@ -153,7 +159,7 @@ ImmutableMapFieldGenerator(const FieldDescriptor* descriptor,
   : descriptor_(descriptor), name_resolver_(context->GetNameResolver())  {
   SetMessageVariables(descriptor, messageBitIndex, builderBitIndex,
                       context->GetFieldGeneratorInfo(descriptor),
-                      context, &variables_);
+                      name_resolver_, &variables_);
 }
 
 ImmutableMapFieldGenerator::
@@ -418,7 +424,7 @@ GenerateParsingCode(io::Printer* printer) const {
         "$name$ = $default_entry$.getParserForType().parseFrom(bytes);\n");
     printer->Print(
         variables_,
-        "if ($value_enum_type$.forNumber($name$.getValue()) == null) {\n"
+        "if ($value_enum_type$.valueOf($name$.getValue()) == null) {\n"
         "  unknownFields.mergeLengthDelimitedField($number$, bytes);\n"
         "} else {\n"
         "  $name$_.getMutableMap().put($name$.getKey(), $name$.getValue());\n"

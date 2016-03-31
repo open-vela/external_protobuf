@@ -67,8 +67,7 @@ namespace java {
 
 class FileGenerator {
  public:
-  FileGenerator(const FileDescriptor* file, bool immutable_api = true,
-                bool enforce_lite = false);
+  FileGenerator(const FileDescriptor* file, bool immutable_api = true);
   ~FileGenerator();
 
   // Checks for problems that would otherwise lead to cryptic compile errors.

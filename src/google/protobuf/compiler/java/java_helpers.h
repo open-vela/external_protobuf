@@ -170,41 +170,44 @@ inline string ImmutableDefaultValue(const FieldDescriptor* field,
 }
 bool IsDefaultValueJavaDefault(const FieldDescriptor* field);
 
+// Does this message class have generated parsing, serialization, and other
+// standard methods for which reflection-based fallback implementations exist?
+inline bool HasGeneratedMethods(const Descriptor* descriptor) {
+  return descriptor->file()->options().optimize_for() !=
+           FileOptions::CODE_SIZE;
+}
+
 // Does this message have specialized equals() and hashCode() methods?
 inline bool HasEqualsAndHashCode(const Descriptor* descriptor) {
   return descriptor->file()->options().java_generate_equals_and_hash();
 }
 
 // Does this message class have descriptor and reflection methods?
-inline bool HasDescriptorMethods(const Descriptor* descriptor,
-                                 bool enforce_lite) {
-  return !enforce_lite &&
-         descriptor->file()->options().optimize_for() !=
-             FileOptions::LITE_RUNTIME;
+inline bool HasDescriptorMethods(const Descriptor* descriptor) {
+  return descriptor->file()->options().optimize_for() !=
+           FileOptions::LITE_RUNTIME;
 }
-inline bool HasDescriptorMethods(const EnumDescriptor* descriptor,
-                                 bool enforce_lite) {
-  return !enforce_lite &&
-         descriptor->file()->options().optimize_for() !=
-             FileOptions::LITE_RUNTIME;
+inline bool HasDescriptorMethods(const EnumDescriptor* descriptor) {
+  return descriptor->file()->options().optimize_for() !=
+           FileOptions::LITE_RUNTIME;
 }
-inline bool HasDescriptorMethods(const FileDescriptor* descriptor,
-                                 bool enforce_lite) {
-  return !enforce_lite &&
-         descriptor->options().optimize_for() != FileOptions::LITE_RUNTIME;
+inline bool HasDescriptorMethods(const FileDescriptor* descriptor) {
+  return descriptor->options().optimize_for() !=
+           FileOptions::LITE_RUNTIME;
 }
 
 // Should we generate generic services for this file?
-inline bool HasGenericServices(const FileDescriptor *file, bool enforce_lite) {
+inline bool HasGenericServices(const FileDescriptor *file) {
   return file->service_count() > 0 &&
-         HasDescriptorMethods(file, enforce_lite) &&
+         file->options().optimize_for() != FileOptions::LITE_RUNTIME &&
          file->options().java_generic_services();
 }
 
-inline bool IsLazy(const FieldDescriptor* descriptor, bool enforce_lite) {
+inline bool IsLazy(const FieldDescriptor* descriptor) {
   // Currently, the proto-lite version suports lazy field.
   // TODO(niwasaki): Support lazy fields also for other proto runtimes.
-  if (HasDescriptorMethods(descriptor->file(), enforce_lite)) {
+  if (descriptor->file()->options().optimize_for() !=
+      FileOptions::LITE_RUNTIME) {
     return false;
   }
   return descriptor->options().lazy();
