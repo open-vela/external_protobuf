@@ -44,9 +44,9 @@ import junit.framework.TestCase;
  * non-message fields.
  */
 public class FieldPresenceTest extends TestCase {
-  private static boolean hasMethod(Class<?> clazz, String name) {
+  private static boolean hasMethod(Class clazz, String name) {
     try {
-      if (clazz.getMethod(name) != null) {
+      if (clazz.getMethod(name, new Class[]{}) != null) {
         return true;
       } else {
         return false;
@@ -56,90 +56,90 @@ public class FieldPresenceTest extends TestCase {
     }
   }
 
-  private static void assertHasMethodRemoved(
-      Class<?> classWithFieldPresence,
-      Class<?> classWithoutFieldPresence,
+  private static boolean isHasMethodRemoved(
+      Class classWithFieldPresence,
+      Class classWithoutFieldPresence,
       String camelName) {
-    assertTrue(hasMethod(classWithFieldPresence, "get" + camelName));
-    assertTrue(hasMethod(classWithFieldPresence, "has" + camelName));
-    assertTrue(hasMethod(classWithoutFieldPresence, "get" + camelName));
-    assertFalse(hasMethod(classWithoutFieldPresence, "has" + camelName));
+    return hasMethod(classWithFieldPresence, "get" + camelName)
+        && hasMethod(classWithFieldPresence, "has" + camelName)
+        && hasMethod(classWithoutFieldPresence, "get" + camelName)
+        && !hasMethod(classWithoutFieldPresence, "has" + camelName);
   }
 
   public void testHasMethod() {
     // Optional non-message fields don't have a hasFoo() method generated.
-    assertHasMethodRemoved(
+    assertTrue(isHasMethodRemoved(
         UnittestProto.TestAllTypes.class,
         TestAllTypes.class,
-        "OptionalInt32");
-    assertHasMethodRemoved(
+        "OptionalInt32"));
+    assertTrue(isHasMethodRemoved(
         UnittestProto.TestAllTypes.class,
         TestAllTypes.class,
-        "OptionalString");
-    assertHasMethodRemoved(
+        "OptionalString"));
+    assertTrue(isHasMethodRemoved(
         UnittestProto.TestAllTypes.class,
         TestAllTypes.class,
-        "OptionalBytes");
-    assertHasMethodRemoved(
+        "OptionalBytes"));
+    assertTrue(isHasMethodRemoved(
         UnittestProto.TestAllTypes.class,
         TestAllTypes.class,
-        "OptionalNestedEnum");
+        "OptionalNestedEnum"));
 
-    assertHasMethodRemoved(
+    assertTrue(isHasMethodRemoved(
         UnittestProto.TestAllTypes.Builder.class,
         TestAllTypes.Builder.class,
-        "OptionalInt32");
-    assertHasMethodRemoved(
+        "OptionalInt32"));
+    assertTrue(isHasMethodRemoved(
         UnittestProto.TestAllTypes.Builder.class,
         TestAllTypes.Builder.class,
-        "OptionalString");
-    assertHasMethodRemoved(
+        "OptionalString"));
+    assertTrue(isHasMethodRemoved(
         UnittestProto.TestAllTypes.Builder.class,
         TestAllTypes.Builder.class,
-        "OptionalBytes");
-    assertHasMethodRemoved(
+        "OptionalBytes"));
+    assertTrue(isHasMethodRemoved(
         UnittestProto.TestAllTypes.Builder.class,
         TestAllTypes.Builder.class,
-        "OptionalNestedEnum");
+        "OptionalNestedEnum"));
 
     // message fields still have the hasFoo() method generated.
     assertFalse(TestAllTypes.newBuilder().build().hasOptionalNestedMessage());
     assertFalse(TestAllTypes.newBuilder().hasOptionalNestedMessage());
 
     // oneof fields don't have hasFoo() methods (even for message types).
-    assertHasMethodRemoved(
+    assertTrue(isHasMethodRemoved(
         UnittestProto.TestAllTypes.class,
         TestAllTypes.class,
-        "OneofUint32");
-    assertHasMethodRemoved(
+        "OneofUint32"));
+    assertTrue(isHasMethodRemoved(
         UnittestProto.TestAllTypes.class,
         TestAllTypes.class,
-        "OneofString");
-    assertHasMethodRemoved(
+        "OneofString"));
+    assertTrue(isHasMethodRemoved(
         UnittestProto.TestAllTypes.class,
         TestAllTypes.class,
-        "OneofBytes");
-    assertHasMethodRemoved(
+        "OneofBytes"));
+    assertTrue(isHasMethodRemoved(
         UnittestProto.TestAllTypes.class,
         TestAllTypes.class,
-        "OneofNestedMessage");
+        "OneofNestedMessage"));
 
-    assertHasMethodRemoved(
+    assertTrue(isHasMethodRemoved(
         UnittestProto.TestAllTypes.Builder.class,
         TestAllTypes.Builder.class,
-        "OneofUint32");
-    assertHasMethodRemoved(
+        "OneofUint32"));
+    assertTrue(isHasMethodRemoved(
         UnittestProto.TestAllTypes.Builder.class,
         TestAllTypes.Builder.class,
-        "OneofString");
-    assertHasMethodRemoved(
+        "OneofString"));
+    assertTrue(isHasMethodRemoved(
         UnittestProto.TestAllTypes.Builder.class,
         TestAllTypes.Builder.class,
-        "OneofBytes");
-    assertHasMethodRemoved(
+        "OneofBytes"));
+    assertTrue(isHasMethodRemoved(
         UnittestProto.TestAllTypes.Builder.class,
         TestAllTypes.Builder.class,
-        "OneofNestedMessage");
+        "OneofNestedMessage"));
   }
 
   public void testOneofEquals() throws Exception {
@@ -232,24 +232,24 @@ public class FieldPresenceTest extends TestCase {
     assertTrue(message.hasField(optionalNestedEnumField));
     assertEquals(4, message.getAllFields().size());
   }
-
+  
   public void testMessageField() {
     TestAllTypes.Builder builder = TestAllTypes.newBuilder();
     assertFalse(builder.hasOptionalNestedMessage());
     assertFalse(builder.build().hasOptionalNestedMessage());
-
+    
     TestAllTypes.NestedMessage.Builder nestedBuilder =
         builder.getOptionalNestedMessageBuilder();
     assertTrue(builder.hasOptionalNestedMessage());
     assertTrue(builder.build().hasOptionalNestedMessage());
-
+    
     nestedBuilder.setValue(1);
     assertEquals(1, builder.build().getOptionalNestedMessage().getValue());
-
+    
     builder.clearOptionalNestedMessage();
     assertFalse(builder.hasOptionalNestedMessage());
     assertFalse(builder.build().hasOptionalNestedMessage());
-
+    
     // Unlike non-message fields, if we set a message field to its default value (i.e.,
     // default instance), the field should be seen as present.
     builder.setOptionalNestedMessage(TestAllTypes.NestedMessage.getDefaultInstance());
@@ -340,7 +340,7 @@ public class FieldPresenceTest extends TestCase {
     assertTrue(builder.buildPartial().isInitialized());
   }
 
-
+  
   // Test that unknown fields are dropped.
   public void testUnknownFields() throws Exception {
     TestAllTypes.Builder builder = TestAllTypes.newBuilder();
@@ -348,7 +348,7 @@ public class FieldPresenceTest extends TestCase {
     builder.addRepeatedInt32(5678);
     TestAllTypes message = builder.build();
     ByteString data = message.toByteString();
-
+    
     TestOptionalFieldsOnly optionalOnlyMessage =
         TestOptionalFieldsOnly.parseFrom(data);
     // UnknownFieldSet should be empty.
@@ -360,7 +360,7 @@ public class FieldPresenceTest extends TestCase {
     // The repeated field is discarded because it's unknown to the optional-only
     // message.
     assertEquals(0, message.getRepeatedInt32Count());
-
+    
     DynamicMessage dynamicOptionalOnlyMessage =
         DynamicMessage.getDefaultInstance(
             TestOptionalFieldsOnly.getDescriptor())

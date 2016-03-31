@@ -90,12 +90,6 @@ string GetTypeUrl(const Descriptor* descriptor) {
 }
 }  // namespace
 
-#if __cplusplus >= 201103L
-  using std::get;
-#else
-  using std::tr1::get;
-#endif
-
 class BaseProtoStreamObjectWriterTest
     : public ::testing::TestWithParam<testing::TypeInfoSource> {
  protected:
@@ -128,13 +122,7 @@ class BaseProtoStreamObjectWriterTest
     GOOGLE_CHECK(!descriptors.empty()) << "Must have at least one descriptor!";
     helper_.ResetTypeInfo(descriptors);
     ow_.reset(helper_.NewProtoWriter(GetTypeUrl(descriptors[0]), output_.get(),
-                                     &listener_, options_));
-  }
-
-  void ResetTypeInfo(const Descriptor* descriptor) {
-    vector<const Descriptor*> descriptors;
-    descriptors.push_back(descriptor);
-    ResetTypeInfo(descriptors);
+                                     &listener_));
   }
 
   virtual ~BaseProtoStreamObjectWriterTest() {}
@@ -167,12 +155,16 @@ class BaseProtoStreamObjectWriterTest
   MockErrorListener listener_;
   google::protobuf::scoped_ptr<GrowingArrayByteSink> output_;
   google::protobuf::scoped_ptr<ProtoStreamObjectWriter> ow_;
-  ProtoStreamObjectWriter::Options options_;
 };
 
 MATCHER_P(HasObjectLocation, expected,
           "Verifies the expected object location") {
-  string actual = get<0>(arg).ToString();
+  string actual;
+#if __cplusplus >= 201103L
+  actual = std::get<0>(arg).ToString();
+#else
+  actual = std::tr1::get<0>(arg).ToString();
+#endif
   if (actual.compare(expected) == 0) return true;
   *result_listener << "actual location is: " << actual;
   return false;
@@ -297,7 +289,8 @@ TEST_P(ProtoStreamObjectWriterTest, PrimitiveFromStringConversion) {
   full.add_rep_double(-8.05L);
   full.add_rep_bool(false);
 
-  ResetTypeInfo(Primitive::descriptor());
+  ow_.reset(helper_.NewProtoWriter(GetTypeUrl(Primitive::descriptor()),
+                                   output_.get(), &listener_));
 
   ow_->StartObject("")
       ->RenderString("fix32", "101")
@@ -370,7 +363,8 @@ TEST_P(ProtoStreamObjectWriterTest, InfinityInputTest) {
   full.set_float_(std::numeric_limits<float>::infinity());
   full.set_str("-Infinity");
 
-  ResetTypeInfo(Primitive::descriptor());
+  ow_.reset(helper_.NewProtoWriter(GetTypeUrl(Primitive::descriptor()),
+                                   output_.get(), &listener_));
 
   EXPECT_CALL(listener_, InvalidValue(_, StringPiece("TYPE_INT32"),
                                       StringPiece("\"Infinity\"")))
@@ -403,7 +397,8 @@ TEST_P(ProtoStreamObjectWriterTest, NaNInputTest) {
   full.set_float_(std::numeric_limits<float>::quiet_NaN());
   full.set_str("NaN");
 
-  ResetTypeInfo(Primitive::descriptor());
+  ow_.reset(helper_.NewProtoWriter(GetTypeUrl(Primitive::descriptor()),
+                                   output_.get(), &listener_));
 
   EXPECT_CALL(listener_, InvalidValue(_, StringPiece("TYPE_INT32"),
                                       StringPiece("\"NaN\"")))
@@ -892,124 +887,6 @@ TEST_P(ProtoStreamObjectWriterTimestampDurationTest, ParseTimestamp) {
   CheckOutput(timestamp);
 }
 
-TEST_P(ProtoStreamObjectWriterTimestampDurationTest,
-       ParseTimestampYearNotZeroPadded) {
-  TimestampDuration timestamp;
-  google::protobuf::Timestamp* ts = timestamp.mutable_ts();
-  ts->set_seconds(-61665654145);
-  ts->set_nanos(33155000);
-
-  ow_->StartObject("")
-      ->RenderString("ts", "15-11-23T03:37:35.033155Z")
-      ->EndObject();
-  CheckOutput(timestamp);
-}
-
-TEST_P(ProtoStreamObjectWriterTimestampDurationTest,
-       ParseTimestampYearZeroPadded) {
-  TimestampDuration timestamp;
-  google::protobuf::Timestamp* ts = timestamp.mutable_ts();
-  ts->set_seconds(-61665654145);
-  ts->set_nanos(33155000);
-
-  ow_->StartObject("")
-      ->RenderString("ts", "0015-11-23T03:37:35.033155Z")
-      ->EndObject();
-  CheckOutput(timestamp);
-}
-
-TEST_P(ProtoStreamObjectWriterTimestampDurationTest,
-       ParseTimestampWithPositiveOffset) {
-  TimestampDuration timestamp;
-  google::protobuf::Timestamp* ts = timestamp.mutable_ts();
-  ts->set_seconds(1448249855);
-  ts->set_nanos(33155000);
-
-  ow_->StartObject("")
-      ->RenderString("ts", "2015-11-23T11:47:35.033155+08:10")
-      ->EndObject();
-  CheckOutput(timestamp);
-}
-
-TEST_P(ProtoStreamObjectWriterTimestampDurationTest,
-       ParseTimestampWithNegativeOffset) {
-  TimestampDuration timestamp;
-  google::protobuf::Timestamp* ts = timestamp.mutable_ts();
-  ts->set_seconds(1448249855);
-  ts->set_nanos(33155000);
-
-  ow_->StartObject("")
-      ->RenderString("ts", "2015-11-22T19:47:35.033155-07:50")
-      ->EndObject();
-  CheckOutput(timestamp);
-}
-
-TEST_P(ProtoStreamObjectWriterTimestampDurationTest,
-       TimestampWithInvalidOffset1) {
-  TimestampDuration timestamp;
-
-  EXPECT_CALL(
-      listener_,
-      InvalidValue(_,
-                   StringPiece("type.googleapis.com/google.protobuf.Timestamp"),
-                   StringPiece("Field 'ts', Invalid time format: "
-                               "2016-03-07T15:14:23+")));
-
-  ow_->StartObject("")->RenderString("ts", "2016-03-07T15:14:23+")->EndObject();
-  CheckOutput(timestamp);
-}
-
-TEST_P(ProtoStreamObjectWriterTimestampDurationTest,
-       TimestampWithInvalidOffset2) {
-  TimestampDuration timestamp;
-
-  EXPECT_CALL(
-      listener_,
-      InvalidValue(_,
-                   StringPiece("type.googleapis.com/google.protobuf.Timestamp"),
-                   StringPiece("Field 'ts', Invalid time format: "
-                               "2016-03-07T15:14:23+08-10")));
-
-  ow_->StartObject("")
-      ->RenderString("ts", "2016-03-07T15:14:23+08-10")
-      ->EndObject();
-  CheckOutput(timestamp);
-}
-
-TEST_P(ProtoStreamObjectWriterTimestampDurationTest,
-       TimestampWithInvalidOffset3) {
-  TimestampDuration timestamp;
-
-  EXPECT_CALL(
-      listener_,
-      InvalidValue(_,
-                   StringPiece("type.googleapis.com/google.protobuf.Timestamp"),
-                   StringPiece("Field 'ts', Invalid time format: "
-                               "2016-03-07T15:14:23+24:10")));
-
-  ow_->StartObject("")
-      ->RenderString("ts", "2016-03-07T15:14:23+24:10")
-      ->EndObject();
-  CheckOutput(timestamp);
-}
-
-TEST_P(ProtoStreamObjectWriterTimestampDurationTest,
-       TimestampWithInvalidOffset4) {
-  TimestampDuration timestamp;
-
-  EXPECT_CALL(
-      listener_,
-      InvalidValue(_,
-                   StringPiece("type.googleapis.com/google.protobuf.Timestamp"),
-                   StringPiece("Field 'ts', Invalid time format: "
-                               "2016-03-07T15:14:23+04:60")));
-
-  ow_->StartObject("")
-      ->RenderString("ts", "2016-03-07T15:14:23+04:60")
-      ->EndObject();
-  CheckOutput(timestamp);
-}
-
 TEST_P(ProtoStreamObjectWriterTimestampDurationTest, InvalidTimestampError1) {
   TimestampDuration timestamp;
 
@@ -1060,10 +937,10 @@ TEST_P(ProtoStreamObjectWriterTimestampDurationTest, InvalidTimestampError4) {
       InvalidValue(_,
                    StringPiece("type.googleapis.com/google.protobuf.Timestamp"),
                    StringPiece("Field 'ts', Invalid time format: "
-                               "-8031-10-18T00:00:00.000Z")));
+                               "-8032-10-18T00:00:00.000Z")));
 
   ow_->StartObject("")
-      ->RenderString("ts", "-8031-10-18T00:00:00.000Z")
+      ->RenderString("ts", "-8032-10-18T00:00:00.000Z")
       ->EndObject();
   CheckOutput(timestamp);
 }
@@ -1115,22 +992,6 @@ TEST_P(ProtoStreamObjectWriterTimestampDurationTest, InvalidTimestampError7) {
   ow_->StartObject("")
       // Non-numeric characters in the Timestamp nanos is not allowed.
       ->RenderString("ts", "2015-11-23T03:37:35.033abc155Z")
-      ->EndObject();
-  CheckOutput(timestamp);
-}
-
-TEST_P(ProtoStreamObjectWriterTimestampDurationTest, InvalidTimestampError8) {
-  TimestampDuration timestamp;
-
-  EXPECT_CALL(
-      listener_,
-      InvalidValue(_,
-                   StringPiece("type.googleapis.com/google.protobuf.Timestamp"),
-                   StringPiece("Field 'ts', Invalid time format: "
-                               "0-12-31T23:59:59.000Z")));
-
-  ow_->StartObject("")
-      ->RenderString("ts", "0-12-31T23:59:59.000Z")
       ->EndObject();
   CheckOutput(timestamp);
 }
@@ -1244,10 +1105,7 @@ TEST_P(ProtoStreamObjectWriterTimestampDurationTest,
 class ProtoStreamObjectWriterStructTest
     : public BaseProtoStreamObjectWriterTest {
  protected:
-  ProtoStreamObjectWriterStructTest() { ResetProtoWriter(); }
-
-  // Resets ProtoWriter with current set of options and other state.
-  void ResetProtoWriter() {
+  ProtoStreamObjectWriterStructTest() {
     vector<const Descriptor*> descriptors;
     descriptors.push_back(StructType::descriptor());
     descriptors.push_back(google::protobuf::Struct::descriptor());
@@ -1341,28 +1199,6 @@ TEST_P(ProtoStreamObjectWriterStructTest, RepeatedStructMapObjectKeyTest) {
       ->EndObject()
       ->EndObject()
       ->EndObject();
-}
-
-TEST_P(ProtoStreamObjectWriterStructTest, OptionStructIntAsStringsTest) {
-  StructType struct_type;
-  google::protobuf::Struct* s = struct_type.mutable_object();
-  s->mutable_fields()->operator[]("k1").set_number_value(123);
-  s->mutable_fields()->operator[]("k2").set_bool_value(true);
-  s->mutable_fields()->operator[]("k3").set_string_value("-222222222");
-  s->mutable_fields()->operator[]("k4").set_string_value("33333333");
-
-  options_.struct_integers_as_strings = true;
-  ResetProtoWriter();
-
-  ow_->StartObject("")
-      ->StartObject("object")
-      ->RenderDouble("k1", 123)
-      ->RenderBool("k2", true)
-      ->RenderInt64("k3", -222222222)
-      ->RenderUint64("k4", 33333333)
-      ->EndObject()
-      ->EndObject();
-  CheckOutput(struct_type);
 }
 
 class ProtoStreamObjectWriterMapTest : public BaseProtoStreamObjectWriterTest {

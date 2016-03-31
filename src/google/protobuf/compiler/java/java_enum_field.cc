@@ -68,14 +68,21 @@ void SetEnumVariables(const FieldDescriptor* descriptor,
   (*variables)["default"] = ImmutableDefaultValue(descriptor, name_resolver);
   (*variables)["default_number"] = SimpleItoa(
       descriptor->default_value_enum()->number());
-  (*variables)["tag"] = SimpleItoa(internal::WireFormat::MakeTag(descriptor));
+  if (descriptor->is_packed()) {
+    (*variables)["tag"] = SimpleItoa(internal::WireFormatLite::MakeTag(
+        descriptor->number(),
+        internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED));
+  } else {
+    (*variables)["tag"] = SimpleItoa(internal::WireFormat::MakeTag(descriptor));
+  }
   (*variables)["tag_size"] = SimpleItoa(
       internal::WireFormat::TagSize(descriptor->number(), GetType(descriptor)));
   // TODO(birdo): Add @deprecated javadoc when generating javadoc is supported
   // by the proto compiler
   (*variables)["deprecation"] = descriptor->options().deprecated()
       ? "@java.lang.Deprecated " : "";
-  (*variables)["on_changed"] = "onChanged();";
+  (*variables)["on_changed"] =
+      HasDescriptorMethods(descriptor->containing_type()) ? "onChanged();" : "";
 
   if (SupportFieldPresence(descriptor->file())) {
     // For singular messages and builders, one bit is used for the hasField bit.
@@ -191,7 +198,7 @@ GenerateMembers(io::Printer* printer) const {
   WriteFieldDocComment(printer, descriptor_);
   printer->Print(variables_,
     "$deprecation$public $type$ get$capitalized_name$() {\n"
-    "  $type$ result = $type$.forNumber($name$_);\n"
+    "  $type$ result = $type$.valueOf($name$_);\n"
     "  return result == null ? $unknown$ : result;\n"
     "}\n");
 }
@@ -224,7 +231,7 @@ GenerateBuilderMembers(io::Printer* printer) const {
   WriteFieldDocComment(printer, descriptor_);
   printer->Print(variables_,
     "$deprecation$public $type$ get$capitalized_name$() {\n"
-    "  $type$ result = $type$.forNumber($name$_);\n"
+    "  $type$ result = $type$.valueOf($name$_);\n"
     "  return result == null ? $unknown$ : result;\n"
     "}\n");
   WriteFieldDocComment(printer, descriptor_);
@@ -304,7 +311,7 @@ GenerateParsingCode(io::Printer* printer) const {
   } else {
     printer->Print(variables_,
       "int rawValue = input.readEnum();\n"
-      "$type$ value = $type$.forNumber(rawValue);\n"
+      "$type$ value = $type$.valueOf(rawValue);\n"
       "if (value == null) {\n");
     if (PreserveUnknownFields(descriptor_->containing_type())) {
       printer->Print(variables_,
@@ -398,7 +405,7 @@ GenerateMembers(io::Printer* printer) const {
   printer->Print(variables_,
     "$deprecation$public $type$ get$capitalized_name$() {\n"
     "  if ($has_oneof_case_message$) {\n"
-    "    $type$ result = $type$.forNumber((java.lang.Integer) $oneof_name$_);\n"
+    "    $type$ result =  $type$.valueOf((java.lang.Integer) $oneof_name$_);\n"
     "    return result == null ? $unknown$ : result;\n"
     "  }\n"
     "  return $default$;\n"
@@ -436,7 +443,7 @@ GenerateBuilderMembers(io::Printer* printer) const {
   printer->Print(variables_,
     "$deprecation$public $type$ get$capitalized_name$() {\n"
     "  if ($has_oneof_case_message$) {\n"
-    "    $type$ result = $type$.forNumber((java.lang.Integer) $oneof_name$_);\n"
+    "    $type$ result =  $type$.valueOf((java.lang.Integer) $oneof_name$_);\n"
     "    return result == null ? $unknown$ : result;\n"
     "  }\n"
     "  return $default$;\n"
@@ -493,7 +500,7 @@ GenerateParsingCode(io::Printer* printer) const {
   } else {
     printer->Print(variables_,
       "int rawValue = input.readEnum();\n"
-      "$type$ value = $type$.forNumber(rawValue);\n"
+      "$type$ value = $type$.valueOf(rawValue);\n"
       "if (value == null) {\n");
     if (PreserveUnknownFields(descriptor_->containing_type())) {
       printer->Print(variables_,
@@ -606,7 +613,7 @@ GenerateMembers(io::Printer* printer) const {
     "        new com.google.protobuf.Internal.ListAdapter.Converter<\n"
     "            java.lang.Integer, $type$>() {\n"
     "          public $type$ convert(java.lang.Integer from) {\n"
-    "            $type$ result = $type$.forNumber(from);\n"
+    "            $type$ result = $type$.valueOf(from);\n"
     "            return result == null ? $unknown$ : result;\n"
     "          }\n"
     "        };\n");
@@ -642,7 +649,7 @@ GenerateMembers(io::Printer* printer) const {
   }
 
   if (descriptor_->is_packed() &&
-      context_->HasGeneratedMethods(descriptor_->containing_type())) {
+      HasGeneratedMethods(descriptor_->containing_type())) {
     printer->Print(variables_,
       "private int $name$MemoizedSerializedSize;\n");
   }
@@ -839,7 +846,7 @@ GenerateParsingCode(io::Printer* printer) const {
   } else {
     printer->Print(variables_,
       "int rawValue = input.readEnum();\n"
-      "$type$ value = $type$.forNumber(rawValue);\n"
+      "$type$ value = $type$.valueOf(rawValue);\n"
         "if (value == null) {\n");
     if (PreserveUnknownFields(descriptor_->containing_type())) {
       printer->Print(variables_,
