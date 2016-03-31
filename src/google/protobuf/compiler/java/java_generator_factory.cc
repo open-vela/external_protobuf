@@ -35,7 +35,6 @@
 #include <google/protobuf/compiler/java/java_context.h>
 #include <google/protobuf/compiler/java/java_enum_field.h>
 #include <google/protobuf/compiler/java/java_extension.h>
-#include <google/protobuf/compiler/java/java_extension_lite.h>
 #include <google/protobuf/compiler/java/java_field.h>
 #include <google/protobuf/compiler/java/java_helpers.h>
 #include <google/protobuf/compiler/java/java_message.h>
@@ -59,20 +58,17 @@ ImmutableGeneratorFactory::~ImmutableGeneratorFactory() {}
 
 MessageGenerator* ImmutableGeneratorFactory::NewMessageGenerator(
     const Descriptor* descriptor) const {
-  if (HasDescriptorMethods(descriptor, context_->EnforceLite())) {
-    return new ImmutableMessageGenerator(descriptor, context_);
-  } else {
+  if (descriptor->file()->options().optimize_for() ==
+      FileOptions::LITE_RUNTIME) {
     return new ImmutableMessageLiteGenerator(descriptor, context_);
+  } else {
+    return new ImmutableMessageGenerator(descriptor, context_);
   }
 }
 
 ExtensionGenerator* ImmutableGeneratorFactory::NewExtensionGenerator(
     const FieldDescriptor* descriptor) const {
-  if (HasDescriptorMethods(descriptor->file(), context_->EnforceLite())) {
-    return new ImmutableExtensionGenerator(descriptor, context_);
-  } else {
-    return new ImmutableExtensionLiteGenerator(descriptor, context_);
-  }
+  return new ImmutableExtensionGenerator(descriptor, context_);
 }
 
 ServiceGenerator* ImmutableGeneratorFactory::NewServiceGenerator(

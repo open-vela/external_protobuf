@@ -81,9 +81,8 @@ MessageBuilderGenerator::MessageBuilderGenerator(
   : descriptor_(descriptor), context_(context),
     name_resolver_(context->GetNameResolver()),
     field_generators_(descriptor, context_) {
-  GOOGLE_CHECK(HasDescriptorMethods(descriptor->file(), context->EnforceLite()))
-      << "Generator factory error: A non-lite message generator is used to "
-         "generate lite messages.";
+  GOOGLE_CHECK_NE(
+      FileOptions::LITE_RUNTIME, descriptor->file()->options().optimize_for());
 }
 
 MessageBuilderGenerator::~MessageBuilderGenerator() {}
@@ -114,7 +113,7 @@ Generate(io::Printer* printer) {
   GenerateDescriptorMethods(printer);
   GenerateCommonBuilderMethods(printer);
 
-  if (context_->HasGeneratedMethods(descriptor_)) {
+  if (HasGeneratedMethods(descriptor_)) {
     GenerateIsInitialized(printer);
     GenerateBuilderParsingMethods(printer);
   }
@@ -135,7 +134,7 @@ Generate(io::Printer* printer) {
     printer->Print(vars,
       "public $oneof_capitalized_name$Case\n"
       "    get$oneof_capitalized_name$Case() {\n"
-      "  return $oneof_capitalized_name$Case.forNumber(\n"
+      "  return $oneof_capitalized_name$Case.valueOf(\n"
       "      $oneof_name$Case_);\n"
       "}\n"
       "\n"
@@ -440,7 +439,7 @@ GenerateCommonBuilderMethods(io::Printer* printer) {
 
   // -----------------------------------------------------------------
 
-  if (context_->HasGeneratedMethods(descriptor_)) {
+  if (HasGeneratedMethods(descriptor_)) {
     printer->Print(
       "public Builder mergeFrom(com.google.protobuf.Message other) {\n"
       "  if (other instanceof $classname$) {\n"
