@@ -58,20 +58,17 @@ using util::StatusOr;
 
 ProtoStreamObjectWriter::ProtoStreamObjectWriter(
     TypeResolver* type_resolver, const google::protobuf::Type& type,
-    strings::ByteSink* output, ErrorListener* listener,
-    const ProtoStreamObjectWriter::Options& options)
+    strings::ByteSink* output, ErrorListener* listener)
     : ProtoWriter(type_resolver, type, output, listener),
       master_type_(type),
-      current_(NULL),
-      options_(options) {}
+      current_(NULL) {}
 
 ProtoStreamObjectWriter::ProtoStreamObjectWriter(
     const TypeInfo* typeinfo, const google::protobuf::Type& type,
     strings::ByteSink* output, ErrorListener* listener)
     : ProtoWriter(typeinfo, type, output, listener),
       master_type_(type),
-      current_(NULL),
-      options_(ProtoStreamObjectWriter::Options::Defaults()) {}
+      current_(NULL) {}
 
 ProtoStreamObjectWriter::~ProtoStreamObjectWriter() {
   if (current_ == NULL) return;
@@ -442,8 +439,7 @@ ProtoStreamObjectWriter* ProtoStreamObjectWriter::StartObject(
     // name):
     // { "key": "<name>", "value": {
     Push("", Item::MESSAGE, false, false);
-    ProtoWriter::RenderDataPiece("key",
-                                 DataPiece(name, use_strict_base64_decoding()));
+    ProtoWriter::RenderDataPiece("key", DataPiece(name));
     Push("value", Item::MESSAGE, true, false);
 
     // Make sure we are valid so far after starting map fields.
@@ -608,8 +604,7 @@ ProtoStreamObjectWriter* ProtoStreamObjectWriter::StartList(StringPiece name) {
     // Render
     // { "key": "<name>", "value": {
     Push("", Item::MESSAGE, false, false);
-    ProtoWriter::RenderDataPiece("key",
-                                 DataPiece(name, use_strict_base64_decoding()));
+    ProtoWriter::RenderDataPiece("key", DataPiece(name));
     Push("value", Item::MESSAGE, true, false);
 
     // Make sure we are valid after pushing all above items.
@@ -763,36 +758,8 @@ Status ProtoStreamObjectWriter::RenderStructValue(ProtoStreamObjectWriter* ow,
   string struct_field_name;
   switch (data.type()) {
     // Our JSON parser parses numbers as either int64, uint64, or double.
-    case DataPiece::TYPE_INT64: {
-      // If the option to treat integers as strings is set, then render them as
-      // strings. Otherwise, fallback to rendering them as double.
-      if (ow->options_.struct_integers_as_strings) {
-        StatusOr<int64> int_value = data.ToInt64();
-        if (int_value.ok()) {
-          ow->ProtoWriter::RenderDataPiece(
-              "string_value",
-              DataPiece(SimpleItoa(int_value.ValueOrDie()), true));
-          return Status::OK;
-        }
-      }
-      struct_field_name = "number_value";
-      break;
-    }
-    case DataPiece::TYPE_UINT64: {
-      // If the option to treat integers as strings is set, then render them as
-      // strings. Otherwise, fallback to rendering them as double.
-      if (ow->options_.struct_integers_as_strings) {
-        StatusOr<uint64> int_value = data.ToUint64();
-        if (int_value.ok()) {
-          ow->ProtoWriter::RenderDataPiece(
-              "string_value",
-              DataPiece(SimpleItoa(int_value.ValueOrDie()), true));
-          return Status::OK;
-        }
-      }
-      struct_field_name = "number_value";
-      break;
-    }
+    case DataPiece::TYPE_INT64:
+    case DataPiece::TYPE_UINT64:
     case DataPiece::TYPE_DOUBLE: {
       struct_field_name = "number_value";
       break;
@@ -845,7 +812,7 @@ Status ProtoStreamObjectWriter::RenderTimestamp(ProtoStreamObjectWriter* ow,
 static inline util::Status RenderOneFieldPath(ProtoStreamObjectWriter* ow,
                                                 StringPiece path) {
   ow->ProtoWriter::RenderDataPiece(
-      "paths", DataPiece(ConvertFieldMaskPath(path, &ToSnakeCase), true));
+      "paths", DataPiece(ConvertFieldMaskPath(path, &ToSnakeCase)));
   return Status::OK;
 }
 
@@ -904,7 +871,7 @@ Status ProtoStreamObjectWriter::RenderDuration(ProtoStreamObjectWriter* ow,
   nanos = sign * nanos;
 
   int64 seconds = sign * unsigned_seconds;
-  if (seconds > kDurationMaxSeconds || seconds < kDurationMinSeconds ||
+  if (seconds > kMaxSeconds || seconds < kMinSeconds ||
       nanos <= -kNanosPerSecond || nanos >= kNanosPerSecond) {
     return Status(INVALID_ARGUMENT, "Duration value exceeds limits");
   }
@@ -958,8 +925,7 @@ ProtoStreamObjectWriter* ProtoStreamObjectWriter::RenderDataPiece(
     // Render an item in repeated map list.
     // { "key": "<name>", "value":
     Push("", Item::MESSAGE, false, false);
-    ProtoWriter::RenderDataPiece("key",
-                                 DataPiece(name, use_strict_base64_decoding()));
+    ProtoWriter::RenderDataPiece("key", DataPiece(name));
     field = Lookup("value");
     if (field == NULL) {
       GOOGLE_LOG(DFATAL) << "Map does not have a value field.";

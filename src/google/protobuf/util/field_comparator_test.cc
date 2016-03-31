@@ -42,6 +42,7 @@
 // and the opensource version gtest.h header includes cmath transitively
 // somehow.
 #include <gtest/gtest.h>
+
 namespace google {
 namespace protobuf {
 namespace util {
