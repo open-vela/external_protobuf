@@ -36,6 +36,7 @@ import map_test.MapForProto2TestProto.TestMap.MessageValue;
 import map_test.MapForProto2TestProto.TestMap.MessageWithRequiredFields;
 import map_test.MapForProto2TestProto.TestRecursiveMap;
 import map_test.MapForProto2TestProto.TestUnknownEnumValue;
+
 import junit.framework.TestCase;
 
 import java.util.ArrayList;
