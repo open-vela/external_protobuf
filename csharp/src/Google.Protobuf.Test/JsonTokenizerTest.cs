@@ -249,6 +249,7 @@ namespace Google.Protobuf
         [TestCase("[,", 1)]
         [TestCase("{", 1)]
         [TestCase("{,", 1)]
+        [TestCase("{", 1)]
         [TestCase("{[", 1)]
         [TestCase("{{", 1)]
         [TestCase("{0", 1)]
