@@ -33,10 +33,9 @@
 """Tests for google.protobuf.text_encoding."""
 
 try:
-  import unittest2 as unittest  #PY26
+  import unittest2 as unittest
 except ImportError:
   import unittest
-
 from google.protobuf import text_encoding
 
 TEST_VALUES = [

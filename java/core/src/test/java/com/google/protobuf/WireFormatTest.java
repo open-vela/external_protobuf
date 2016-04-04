@@ -30,11 +30,12 @@
 
 package com.google.protobuf;
 
-import com.google.protobuf.UnittestLite.TestAllExtensionsLite;
-import com.google.protobuf.UnittestLite.TestPackedExtensionsLite;
-import protobuf_unittest.UnittestMset.RawMessageSet;
-import protobuf_unittest.UnittestMset.TestMessageSetExtension1;
-import protobuf_unittest.UnittestMset.TestMessageSetExtension2;
+import junit.framework.TestCase;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.util.List;
+
 import protobuf_unittest.UnittestProto;
 import protobuf_unittest.UnittestProto.TestAllExtensions;
 import protobuf_unittest.UnittestProto.TestAllTypes;
@@ -43,13 +44,12 @@ import protobuf_unittest.UnittestProto.TestOneof2;
 import protobuf_unittest.UnittestProto.TestOneofBackwardsCompatible;
 import protobuf_unittest.UnittestProto.TestPackedExtensions;
 import protobuf_unittest.UnittestProto.TestPackedTypes;
+import protobuf_unittest.UnittestMset.RawMessageSet;
+import protobuf_unittest.UnittestMset.TestMessageSetExtension1;
+import protobuf_unittest.UnittestMset.TestMessageSetExtension2;
 import proto2_wireformat_unittest.UnittestMsetWireFormat.TestMessageSet;
-
-import junit.framework.TestCase;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.util.List;
+import com.google.protobuf.UnittestLite.TestAllExtensionsLite;
+import com.google.protobuf.UnittestLite.TestPackedExtensionsLite;
 
 /**
  * Tests related to parsing and serialization.

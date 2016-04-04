@@ -54,8 +54,7 @@ class ImmutableMessageLiteGenerator : public MessageGenerator {
   virtual void Generate(io::Printer* printer);
   virtual void GenerateInterface(io::Printer* printer);
   virtual void GenerateExtensionRegistrationCode(io::Printer* printer);
-  virtual void GenerateStaticVariables(
-      io::Printer* printer, int* bytecode_estimate);
+  virtual void GenerateStaticVariables(io::Printer* printer);
   virtual int GenerateStaticVariableInitializers(io::Printer* printer);
 
  private:

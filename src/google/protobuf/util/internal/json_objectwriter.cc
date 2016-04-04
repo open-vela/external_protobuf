@@ -46,7 +46,6 @@ namespace util {
 namespace converter {
 
 using strings::ArrayByteSource;
-;
 
 JsonObjectWriter::~JsonObjectWriter() {
   if (!element_->is_root()) {
@@ -82,11 +81,13 @@ JsonObjectWriter* JsonObjectWriter::EndList() {
   return this;
 }
 
-JsonObjectWriter* JsonObjectWriter::RenderBool(StringPiece name, bool value) {
+JsonObjectWriter* JsonObjectWriter::RenderBool(StringPiece name,
+                                               bool value) {
   return RenderSimple(name, value ? "true" : "false");
 }
 
-JsonObjectWriter* JsonObjectWriter::RenderInt32(StringPiece name, int32 value) {
+JsonObjectWriter* JsonObjectWriter::RenderInt32(StringPiece name,
+                                                int32 value) {
   return RenderSimple(name, SimpleItoa(value));
 }
 
@@ -95,7 +96,8 @@ JsonObjectWriter* JsonObjectWriter::RenderUint32(StringPiece name,
   return RenderSimple(name, SimpleItoa(value));
 }
 
-JsonObjectWriter* JsonObjectWriter::RenderInt64(StringPiece name, int64 value) {
+JsonObjectWriter* JsonObjectWriter::RenderInt64(StringPiece name,
+                                                int64 value) {
   WritePrefix(name);
   WriteChar('"');
   stream_->WriteString(SimpleItoa(value));
@@ -122,7 +124,8 @@ JsonObjectWriter* JsonObjectWriter::RenderDouble(StringPiece name,
   return RenderString(name, DoubleAsString(value));
 }
 
-JsonObjectWriter* JsonObjectWriter::RenderFloat(StringPiece name, float value) {
+JsonObjectWriter* JsonObjectWriter::RenderFloat(StringPiece name,
+                                                float value) {
   if (MathLimits<float>::IsFinite(value)) {
     return RenderSimple(name, SimpleFtoa(value));
   }
@@ -145,12 +148,7 @@ JsonObjectWriter* JsonObjectWriter::RenderBytes(StringPiece name,
                                                 StringPiece value) {
   WritePrefix(name);
   string base64;
-
-  if (use_websafe_base64_for_bytes_)
-    WebSafeBase64Escape(value.ToString(), &base64);
-  else
-    Base64Escape(value, &base64);
-
+  Base64Escape(value, &base64);
   WriteChar('"');
   // TODO(wpoon): Consider a ByteSink solution that writes the base64 bytes
   //              directly to the stream, rather than first putting them
