@@ -100,8 +100,8 @@ void FieldGeneratorBase::SetCommonOneofFieldVariables(
 }
 
 FieldGeneratorBase::FieldGeneratorBase(const FieldDescriptor* descriptor,
-                                       int fieldOrdinal, const Options* options)
-    : SourceGeneratorBase(descriptor->file(), options),
+                                       int fieldOrdinal)
+    : SourceGeneratorBase(descriptor->file()),
       descriptor_(descriptor),
       fieldOrdinal_(fieldOrdinal) {
   SetCommonFieldVariables(&variables_);

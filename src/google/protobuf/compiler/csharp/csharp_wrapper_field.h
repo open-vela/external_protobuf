@@ -41,11 +41,9 @@ namespace protobuf {
 namespace compiler {
 namespace csharp {
 
-struct Options;
-
 class WrapperFieldGenerator : public FieldGeneratorBase {
  public:
-  WrapperFieldGenerator(const FieldDescriptor* descriptor, int fieldOrdinal, const Options *options);
+  WrapperFieldGenerator(const FieldDescriptor* descriptor, int fieldOrdinal);
   ~WrapperFieldGenerator();
 
   virtual void GenerateCodecCode(io::Printer* printer);
@@ -67,7 +65,7 @@ class WrapperFieldGenerator : public FieldGeneratorBase {
 
 class WrapperOneofFieldGenerator : public WrapperFieldGenerator {
  public:
-  WrapperOneofFieldGenerator(const FieldDescriptor* descriptor, int fieldOrdinal, const Options *options);
+  WrapperOneofFieldGenerator(const FieldDescriptor* descriptor, int fieldOrdinal);
   ~WrapperOneofFieldGenerator();
 
   virtual void GenerateMembers(io::Printer* printer);

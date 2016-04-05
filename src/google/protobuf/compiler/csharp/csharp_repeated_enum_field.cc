@@ -48,8 +48,8 @@ namespace compiler {
 namespace csharp {
 
 RepeatedEnumFieldGenerator::RepeatedEnumFieldGenerator(
-    const FieldDescriptor* descriptor, int fieldOrdinal, const Options *options)
-    : FieldGeneratorBase(descriptor, fieldOrdinal, options) {
+    const FieldDescriptor* descriptor, int fieldOrdinal)
+    : FieldGeneratorBase(descriptor, fieldOrdinal) {
 }
 
 RepeatedEnumFieldGenerator::~RepeatedEnumFieldGenerator() {

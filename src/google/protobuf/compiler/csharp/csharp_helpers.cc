@@ -48,7 +48,6 @@
 #include <google/protobuf/compiler/csharp/csharp_enum_field.h>
 #include <google/protobuf/compiler/csharp/csharp_map_field.h>
 #include <google/protobuf/compiler/csharp/csharp_message_field.h>
-#include <google/protobuf/compiler/csharp/csharp_options.h>
 #include <google/protobuf/compiler/csharp/csharp_primitive_field.h>
 #include <google/protobuf/compiler/csharp/csharp_repeated_enum_field.h>
 #include <google/protobuf/compiler/csharp/csharp_repeated_message_field.h>
@@ -352,49 +351,49 @@ std::string FileDescriptorToBase64(const FileDescriptor* descriptor) {
 }
 
 FieldGeneratorBase* CreateFieldGenerator(const FieldDescriptor* descriptor,
-                                         int fieldOrdinal, const Options* options) {
+                                         int fieldOrdinal) {
   switch (descriptor->type()) {
     case FieldDescriptor::TYPE_GROUP:
     case FieldDescriptor::TYPE_MESSAGE:
       if (descriptor->is_repeated()) {
         if (descriptor->is_map()) {
-          return new MapFieldGenerator(descriptor, fieldOrdinal, options);
+          return new MapFieldGenerator(descriptor, fieldOrdinal);
         } else {
-          return new RepeatedMessageFieldGenerator(descriptor, fieldOrdinal, options);
+          return new RepeatedMessageFieldGenerator(descriptor, fieldOrdinal);
         }
       } else {
         if (IsWrapperType(descriptor)) {
           if (descriptor->containing_oneof()) {
-            return new WrapperOneofFieldGenerator(descriptor, fieldOrdinal, options);
+            return new WrapperOneofFieldGenerator(descriptor, fieldOrdinal);
           } else {
-            return new WrapperFieldGenerator(descriptor, fieldOrdinal, options);
+            return new WrapperFieldGenerator(descriptor, fieldOrdinal);
           }
         } else {
           if (descriptor->containing_oneof()) {
-            return new MessageOneofFieldGenerator(descriptor, fieldOrdinal, options);
+            return new MessageOneofFieldGenerator(descriptor, fieldOrdinal);
           } else {
-            return new MessageFieldGenerator(descriptor, fieldOrdinal, options);
+            return new MessageFieldGenerator(descriptor, fieldOrdinal);
           }
         }
       }
     case FieldDescriptor::TYPE_ENUM:
       if (descriptor->is_repeated()) {
-        return new RepeatedEnumFieldGenerator(descriptor, fieldOrdinal, options);
+        return new RepeatedEnumFieldGenerator(descriptor, fieldOrdinal);
       } else {
         if (descriptor->containing_oneof()) {
-          return new EnumOneofFieldGenerator(descriptor, fieldOrdinal, options);
+          return new EnumOneofFieldGenerator(descriptor, fieldOrdinal);
         } else {
-          return new EnumFieldGenerator(descriptor, fieldOrdinal, options);
+          return new EnumFieldGenerator(descriptor, fieldOrdinal);
         }
       }
     default:
       if (descriptor->is_repeated()) {
-        return new RepeatedPrimitiveFieldGenerator(descriptor, fieldOrdinal, options);
+        return new RepeatedPrimitiveFieldGenerator(descriptor, fieldOrdinal);
       } else {
         if (descriptor->containing_oneof()) {
-          return new PrimitiveOneofFieldGenerator(descriptor, fieldOrdinal, options);
+          return new PrimitiveOneofFieldGenerator(descriptor, fieldOrdinal);
         } else {
-          return new PrimitiveFieldGenerator(descriptor, fieldOrdinal, options);
+          return new PrimitiveFieldGenerator(descriptor, fieldOrdinal);
         }
       }
   }

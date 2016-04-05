@@ -43,7 +43,7 @@ namespace csharp {
 
 class ReflectionClassGenerator : public SourceGeneratorBase {
  public:
-  ReflectionClassGenerator(const FileDescriptor* file, const Options* options);
+  ReflectionClassGenerator(const FileDescriptor* file);
   ~ReflectionClassGenerator();
 
   void Generate(io::Printer* printer);

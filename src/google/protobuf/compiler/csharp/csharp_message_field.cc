@@ -41,7 +41,6 @@
 #include <google/protobuf/compiler/csharp/csharp_doc_comment.h>
 #include <google/protobuf/compiler/csharp/csharp_helpers.h>
 #include <google/protobuf/compiler/csharp/csharp_message_field.h>
-#include <google/protobuf/compiler/csharp/csharp_options.h>
 
 namespace google {
 namespace protobuf {
@@ -49,8 +48,8 @@ namespace compiler {
 namespace csharp {
 
 MessageFieldGenerator::MessageFieldGenerator(const FieldDescriptor* descriptor,
-                                             int fieldOrdinal, const Options *options)
-    : FieldGeneratorBase(descriptor, fieldOrdinal, options) {
+                                             int fieldOrdinal)
+    : FieldGeneratorBase(descriptor, fieldOrdinal) {
   variables_["has_property_check"] = name() + "_ != null";
   variables_["has_not_property_check"] = name() + "_ == null";
 }
@@ -145,8 +144,8 @@ void MessageFieldGenerator::GenerateCodecCode(io::Printer* printer) {
 }
 
 MessageOneofFieldGenerator::MessageOneofFieldGenerator(const FieldDescriptor* descriptor,
-						       int fieldOrdinal, const Options *options)
-    : MessageFieldGenerator(descriptor, fieldOrdinal, options) {
+						       int fieldOrdinal)
+    : MessageFieldGenerator(descriptor, fieldOrdinal) {
   SetCommonOneofFieldVariables(&variables_);
 }
 

@@ -40,7 +40,6 @@
 
 #include <google/protobuf/compiler/csharp/csharp_doc_comment.h>
 #include <google/protobuf/compiler/csharp/csharp_helpers.h>
-#include <google/protobuf/compiler/csharp/csharp_options.h>
 #include <google/protobuf/compiler/csharp/csharp_primitive_field.h>
 
 namespace google {
@@ -49,8 +48,8 @@ namespace compiler {
 namespace csharp {
 
 PrimitiveFieldGenerator::PrimitiveFieldGenerator(
-    const FieldDescriptor* descriptor, int fieldOrdinal, const Options *options)
-    : FieldGeneratorBase(descriptor, fieldOrdinal, options) {
+    const FieldDescriptor* descriptor, int fieldOrdinal)
+    : FieldGeneratorBase(descriptor, fieldOrdinal) {
   // TODO(jonskeet): Make this cleaner...
   is_value_type = descriptor->type() != FieldDescriptor::TYPE_STRING
       && descriptor->type() != FieldDescriptor::TYPE_BYTES;
@@ -164,8 +163,8 @@ void PrimitiveFieldGenerator::GenerateCodecCode(io::Printer* printer) {
 }
 
 PrimitiveOneofFieldGenerator::PrimitiveOneofFieldGenerator(
-    const FieldDescriptor* descriptor, int fieldOrdinal, const Options *options)
-    : PrimitiveFieldGenerator(descriptor, fieldOrdinal, options) {
+    const FieldDescriptor* descriptor, int fieldOrdinal)
+    : PrimitiveFieldGenerator(descriptor, fieldOrdinal) {
   SetCommonOneofFieldVariables(&variables_);
 }
 
