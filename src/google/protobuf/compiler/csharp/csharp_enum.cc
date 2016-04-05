@@ -49,8 +49,8 @@ namespace protobuf {
 namespace compiler {
 namespace csharp {
 
-EnumGenerator::EnumGenerator(const EnumDescriptor* descriptor, const Options* options) :
-    SourceGeneratorBase(descriptor->file(), options),
+EnumGenerator::EnumGenerator(const EnumDescriptor* descriptor) :
+    SourceGeneratorBase(descriptor->file()),
     descriptor_(descriptor) {
 }
 

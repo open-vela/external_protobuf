@@ -40,21 +40,17 @@ namespace protobuf {
 namespace compiler {
 namespace csharp {
 
-struct Options;
-
 class SourceGeneratorBase {
  protected:
-  SourceGeneratorBase(const FileDescriptor* descriptor, const Options* options);
+  SourceGeneratorBase(const FileDescriptor* descriptor);
   virtual ~SourceGeneratorBase();
 
   std::string class_access_level();
-  const Options* options();
 
   void WriteGeneratedCodeAttributes(io::Printer* printer);
 
  private:
   const FileDescriptor* descriptor_;
-  const Options *options_;
 
   GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(SourceGeneratorBase);
 };

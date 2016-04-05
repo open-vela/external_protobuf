@@ -41,11 +41,9 @@ namespace protobuf {
 namespace compiler {
 namespace csharp {
 
-struct Options;
-
 class RepeatedMessageFieldGenerator : public FieldGeneratorBase {
  public:
-  RepeatedMessageFieldGenerator(const FieldDescriptor* descriptor, int fieldOrdinal, const Options *options);
+  RepeatedMessageFieldGenerator(const FieldDescriptor* descriptor, int fieldOrdinal);
   ~RepeatedMessageFieldGenerator();
 
   virtual void GenerateCloningCode(io::Printer* printer);
