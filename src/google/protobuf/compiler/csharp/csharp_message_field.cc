@@ -49,8 +49,7 @@ namespace compiler {
 namespace csharp {
 
 MessageFieldGenerator::MessageFieldGenerator(const FieldDescriptor* descriptor,
-                                             int fieldOrdinal,
-                                             const Options *options)
+                                             int fieldOrdinal, const Options *options)
     : FieldGeneratorBase(descriptor, fieldOrdinal, options) {
   variables_["has_property_check"] = name() + "_ != null";
   variables_["has_not_property_check"] = name() + "_ == null";
@@ -145,10 +144,8 @@ void MessageFieldGenerator::GenerateCodecCode(io::Printer* printer) {
     "pb::FieldCodec.ForMessage($tag$, $type_name$.Parser)");
 }
 
-MessageOneofFieldGenerator::MessageOneofFieldGenerator(
-    const FieldDescriptor* descriptor,
-	  int fieldOrdinal,
-    const Options *options)
+MessageOneofFieldGenerator::MessageOneofFieldGenerator(const FieldDescriptor* descriptor,
+						       int fieldOrdinal, const Options *options)
     : MessageFieldGenerator(descriptor, fieldOrdinal, options) {
   SetCommonOneofFieldVariables(&variables_);
 }

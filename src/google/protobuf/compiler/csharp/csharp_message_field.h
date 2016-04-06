@@ -43,9 +43,7 @@ namespace csharp {
 
 class MessageFieldGenerator : public FieldGeneratorBase {
  public:
-  MessageFieldGenerator(const FieldDescriptor* descriptor,
-                        int fieldOrdinal,
-                        const Options *options);
+  MessageFieldGenerator(const FieldDescriptor* descriptor, int fieldOrdinal, const Options *options);
   ~MessageFieldGenerator();
 
   virtual void GenerateCodecCode(io::Printer* printer);
@@ -67,9 +65,7 @@ class MessageFieldGenerator : public FieldGeneratorBase {
 
 class MessageOneofFieldGenerator : public MessageFieldGenerator {
  public:
-  MessageOneofFieldGenerator(const FieldDescriptor* descriptor,
-                             int fieldOrdinal,
-                             const Options *options);
+  MessageOneofFieldGenerator(const FieldDescriptor* descriptor, int fieldOrdinal, const Options *options);
   ~MessageOneofFieldGenerator();
 
   virtual void GenerateCloningCode(io::Printer* printer);
