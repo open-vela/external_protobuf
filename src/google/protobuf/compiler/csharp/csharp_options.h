@@ -64,9 +64,6 @@ struct Options {
   // string, meaning "create a full directory hierarchy, starting from the first
   // segment of the namespace."
   bool base_namespace_specified;
-  // Whether the generated classes should have accessibility level of "internal".
-  // Defaults to false that generates "public" classes.
-  bool internal_access;
 };
 
 }  // namespace csharp
