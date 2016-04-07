@@ -142,10 +142,6 @@ void EnumLiteGenerator::Generate(io::Printer* printer) {
     "}\n"
     "\n"
     "public static $classname$ valueOf(int value) {\n"
-    "  return forNumber(value);\n"
-    "}\n"
-    "\n"
-    "public static $classname$ forNumber(int value) {\n"
     "  switch (value) {\n",
     "classname", descriptor_->name());
   printer->Indent();
@@ -173,7 +169,7 @@ void EnumLiteGenerator::Generate(io::Printer* printer) {
     "    $classname$> internalValueMap =\n"
     "      new com.google.protobuf.Internal.EnumLiteMap<$classname$>() {\n"
     "        public $classname$ findValueByNumber(int number) {\n"
-    "          return $classname$.forNumber(number);\n"
+    "          return $classname$.valueOf(number);\n"
     "        }\n"
     "      };\n"
     "\n",
