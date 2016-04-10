@@ -535,9 +535,9 @@ java_library(
         "java/util/src/main/java/com/google/protobuf/util/*.java",
     ]),
     deps = [
-        "protobuf_java",
-        "//external:gson",
-        "//external:guava",
+      "protobuf_java",
+      "//external:gson",
+      "//external:guava",
     ],
     visibility = ["//visibility:public"],
 )
@@ -558,7 +558,6 @@ py_library(
             "python/google/protobuf/internal/test_util.py",
         ],
     ),
-    srcs_version = "PY2AND3",
     imports = ["python"],
 )
 
@@ -643,7 +642,6 @@ py_proto_library(
     include = "src",
     default_runtime = "",
     protoc = ":protoc",
-    srcs_version = "PY2AND3",
     deps = [":protobuf_python"],
 )
 
@@ -656,7 +654,6 @@ py_proto_library(
     include = "python",
     default_runtime = ":protobuf_python",
     protoc = ":protoc",
-    srcs_version = "PY2AND3",
     deps = [":python_common_test_protos"],
 )
 

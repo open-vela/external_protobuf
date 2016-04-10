@@ -43,10 +43,8 @@ option java_package = "com.google.protobuf";
 
 // Same as TestAllTypes but with the lite runtime.
 message TestAllTypesLite {
-
   message NestedMessage {
     optional int32 bb = 1;
-    optional int64 cc = 2;
   }
 
   enum NestedEnum {
@@ -161,7 +159,6 @@ message TestAllTypesLite {
     NestedMessage oneof_nested_message = 112;
     string oneof_string = 113;
     bytes oneof_bytes = 114;
-    NestedMessage oneof_lazy_nested_message = 115 [lazy = true];
   }
 }
 
