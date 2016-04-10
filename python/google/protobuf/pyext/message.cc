@@ -1851,12 +1851,8 @@ static PyObject* ToStr(CMessage* self) {
 
 PyObject* MergeFrom(CMessage* self, PyObject* arg) {
   CMessage* other_message;
-  if (!PyObject_TypeCheck(arg, &CMessage_Type)) {
-    PyErr_Format(PyExc_TypeError,
-                 "Parameter to MergeFrom() must be instance of same class: "
-                 "expected %s got %s.",
-                 self->message->GetDescriptor()->full_name().c_str(),
-                 Py_TYPE(arg)->tp_name);
+  if (!PyObject_TypeCheck(reinterpret_cast<PyObject *>(arg), &CMessage_Type)) {
+    PyErr_SetString(PyExc_TypeError, "Must be a message");
     return NULL;
   }
 
@@ -1864,8 +1860,8 @@ PyObject* MergeFrom(CMessage* self, PyObject* arg) {
   if (other_message->message->GetDescriptor() !=
       self->message->GetDescriptor()) {
     PyErr_Format(PyExc_TypeError,
-                 "Parameter to MergeFrom() must be instance of same class: "
-                 "expected %s got %s.",
+                 "Tried to merge from a message with a different type. "
+                 "to: %s, from: %s",
                  self->message->GetDescriptor()->full_name().c_str(),
                  other_message->message->GetDescriptor()->full_name().c_str());
     return NULL;
@@ -1883,12 +1879,8 @@ PyObject* MergeFrom(CMessage* self, PyObject* arg) {
 
 static PyObject* CopyFrom(CMessage* self, PyObject* arg) {
   CMessage* other_message;
-  if (!PyObject_TypeCheck(arg, &CMessage_Type)) {
-    PyErr_Format(PyExc_TypeError,
-                 "Parameter to CopyFrom() must be instance of same class: "
-                 "expected %s got %s.",
-                 self->message->GetDescriptor()->full_name().c_str(),
-                 Py_TYPE(arg)->tp_name);
+  if (!PyObject_TypeCheck(reinterpret_cast<PyObject *>(arg), &CMessage_Type)) {
+    PyErr_SetString(PyExc_TypeError, "Must be a message");
     return NULL;
   }
 
@@ -1901,8 +1893,8 @@ static PyObject* CopyFrom(CMessage* self, PyObject* arg) {
   if (other_message->message->GetDescriptor() !=
       self->message->GetDescriptor()) {
     PyErr_Format(PyExc_TypeError,
-                 "Parameter to CopyFrom() must be instance of same class: "
-                 "expected %s got %s.",
+                 "Tried to copy from a message with a different type. "
+                 "to: %s, from: %s",
                  self->message->GetDescriptor()->full_name().c_str(),
                  other_message->message->GetDescriptor()->full_name().c_str());
     return NULL;
@@ -2158,11 +2150,7 @@ static PyObject* ListFields(CMessage* self) {
     PyList_SET_ITEM(all_fields.get(), actual_size, t.release());
     ++actual_size;
   }
-  if (static_cast<size_t>(actual_size) != fields.size() &&
-      (PyList_SetSlice(all_fields.get(), actual_size, fields.size(), NULL) <
-       0)) {
-    return NULL;
-  }
+  Py_SIZE(all_fields.get()) = actual_size;
   return all_fields.release();
 }
 
@@ -2741,7 +2729,7 @@ int SetAttr(CMessage* self, PyObject* name, PyObject* value) {
 
   PyErr_Format(PyExc_AttributeError,
                "Assignment not allowed "
-               "(no field \"%s\" in protocol message object).",
+               "(no field \"%s\"in protocol message object).",
                PyString_AsString(name));
   return -1;
 }
@@ -2758,7 +2746,7 @@ PyTypeObject CMessage_Type = {
   0,                                   //  tp_getattr
   0,                                   //  tp_setattr
   0,                                   //  tp_compare
-  (reprfunc)cmessage::ToStr,           //  tp_repr
+  0,                                   //  tp_repr
   0,                                   //  tp_as_number
   0,                                   //  tp_as_sequence
   0,                                   //  tp_as_mapping

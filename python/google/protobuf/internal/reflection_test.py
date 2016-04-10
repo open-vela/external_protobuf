@@ -42,10 +42,9 @@ import six
 import struct
 
 try:
-  import unittest2 as unittest  #PY26
+  import unittest2 as unittest
 except ImportError:
   import unittest
-
 from google.protobuf import unittest_import_pb2
 from google.protobuf import unittest_mset_pb2
 from google.protobuf import unittest_pb2
