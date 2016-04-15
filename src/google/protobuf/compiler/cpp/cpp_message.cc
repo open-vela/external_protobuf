@@ -1777,8 +1777,7 @@ void MessageGenerator::
 GenerateClassMethods(io::Printer* printer) {
   // mutable_unknown_fields wrapper function for LazyStringOutputStream
   // callback.
-  if (PreserveUnknownFields(descriptor_) &&
-      !UseUnknownFieldSet(descriptor_->file())) {
+  if (!UseUnknownFieldSet(descriptor_->file())) {
     printer->Print(
         "static ::std::string* MutableUnknownFieldsFor$classname$(\n"
         "    $classname$* ptr) {\n"
@@ -2657,13 +2656,18 @@ GenerateSwap(io::Printer* printer) {
       }
     }
 
-    // Ignore PreserveUnknownFields here - always swap internal_metadata as it
-    // may contain more than just unknown fields.
-    if (UseUnknownFieldSet(descriptor_->file())) {
-      printer->Print(
+    if (PreserveUnknownFields(descriptor_)) {
+      if (UseUnknownFieldSet(descriptor_->file())) {
+        printer->Print(
           "_internal_metadata_.Swap(&other->_internal_metadata_);\n");
+      } else {
+        printer->Print("_unknown_fields_.Swap(&other->_unknown_fields_);\n");
+      }
     } else {
-      printer->Print("_unknown_fields_.Swap(&other->_unknown_fields_);\n");
+      // Still swap internal_metadata as it may contain more than just
+      // unknown fields.
+      printer->Print(
+        "_internal_metadata_.Swap(&other->_internal_metadata_);\n");
     }
     printer->Print("std::swap(_cached_size_, other->_cached_size_);\n");
     if (descriptor_->extension_range_count() > 0) {
@@ -2904,8 +2908,7 @@ GenerateMergeFromCodedStream(io::Printer* printer) {
     "  ::google::protobuf::uint32 tag;\n",
     "classname", classname_);
 
-  if (PreserveUnknownFields(descriptor_) &&
-      !UseUnknownFieldSet(descriptor_->file())) {
+  if (!UseUnknownFieldSet(descriptor_->file())) {
     // Use LazyStringOutputString to avoid initializing unknown fields string
     // unless it is actually needed. For the same reason, disable eager refresh
     // on the CodedOutputStream.
