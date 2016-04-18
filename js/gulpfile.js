@@ -1,10 +1,6 @@
 var gulp = require('gulp');
-var execFile = require('child_process').execFile;
+var exec = require('child_process').exec;
 var glob = require('glob');
-
-function exec(command, cb) {
-  execFile('sh', ['-c', command], cb);
-}
 
 var protoc = process.env.PROTOC || '../src/protoc';
 
