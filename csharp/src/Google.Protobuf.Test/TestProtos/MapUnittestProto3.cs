@@ -164,9 +164,9 @@ namespace Google.Protobuf.TestProtos {
   }
   #region Enums
   public enum MapEnum {
-    [pbr::OriginalName("MAP_ENUM_FOO")] Foo = 0,
-    [pbr::OriginalName("MAP_ENUM_BAR")] Bar = 1,
-    [pbr::OriginalName("MAP_ENUM_BAZ")] Baz = 2,
+    MAP_ENUM_FOO = 0,
+    MAP_ENUM_BAR = 1,
+    MAP_ENUM_BAZ = 2,
   }
 
   #endregion
@@ -1358,7 +1358,7 @@ namespace Google.Protobuf.TestProtos {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     public static partial class Types {
       public enum Type {
-        [pbr::OriginalName("TYPE_FOO")] Foo = 0,
+        TYPE_FOO = 0,
       }
 
     }

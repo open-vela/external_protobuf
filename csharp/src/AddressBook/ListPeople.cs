@@ -55,13 +55,13 @@ namespace Google.Protobuf.Examples.AddressBook
                 {
                     switch (phoneNumber.Type)
                     {
-                        case Person.Types.PhoneType.Mobile:
+                        case Person.Types.PhoneType.MOBILE:
                             Console.Write("  Mobile phone #: ");
                             break;
-                        case Person.Types.PhoneType.Home:
+                        case Person.Types.PhoneType.HOME:
                             Console.Write("  Home phone #: ");
                             break;
-                        case Person.Types.PhoneType.Work:
+                        case Person.Types.PhoneType.WORK:
                             Console.Write("  Work phone #: ");
                             break;
                     }

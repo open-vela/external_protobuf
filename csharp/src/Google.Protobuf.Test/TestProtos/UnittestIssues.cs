@@ -66,14 +66,14 @@ namespace UnitTest.Issues.TestProtos {
   }
   #region Enums
   public enum NegativeEnum {
-    [pbr::OriginalName("NEGATIVE_ENUM_ZERO")] Zero = 0,
-    [pbr::OriginalName("FiveBelow")] FiveBelow = -5,
-    [pbr::OriginalName("MinusOne")] MinusOne = -1,
+    NEGATIVE_ENUM_ZERO = 0,
+    FiveBelow = -5,
+    MinusOne = -1,
   }
 
   public enum DeprecatedEnum {
-    [pbr::OriginalName("DEPRECATED_ZERO")] DeprecatedZero = 0,
-    [pbr::OriginalName("one")] One = 1,
+    DEPRECATED_ZERO = 0,
+    one = 1,
   }
 
   #endregion
@@ -356,7 +356,7 @@ namespace UnitTest.Issues.TestProtos {
 
     /// <summary>Field number for the "value" field.</summary>
     public const int ValueFieldNumber = 1;
-    private global::UnitTest.Issues.TestProtos.NegativeEnum value_ = 0;
+    private global::UnitTest.Issues.TestProtos.NegativeEnum value_ = global::UnitTest.Issues.TestProtos.NegativeEnum.NEGATIVE_ENUM_ZERO;
     public global::UnitTest.Issues.TestProtos.NegativeEnum Value {
       get { return value_; }
       set {
@@ -401,7 +401,7 @@ namespace UnitTest.Issues.TestProtos {
 
     public override int GetHashCode() {
       int hash = 1;
-      if (Value != 0) hash ^= Value.GetHashCode();
+      if (Value != global::UnitTest.Issues.TestProtos.NegativeEnum.NEGATIVE_ENUM_ZERO) hash ^= Value.GetHashCode();
       hash ^= values_.GetHashCode();
       hash ^= packedValues_.GetHashCode();
       return hash;
@@ -412,7 +412,7 @@ namespace UnitTest.Issues.TestProtos {
     }
 
     public void WriteTo(pb::CodedOutputStream output) {
-      if (Value != 0) {
+      if (Value != global::UnitTest.Issues.TestProtos.NegativeEnum.NEGATIVE_ENUM_ZERO) {
         output.WriteRawTag(8);
         output.WriteEnum((int) Value);
       }
@@ -422,7 +422,7 @@ namespace UnitTest.Issues.TestProtos {
 
     public int CalculateSize() {
       int size = 0;
-      if (Value != 0) {
+      if (Value != global::UnitTest.Issues.TestProtos.NegativeEnum.NEGATIVE_ENUM_ZERO) {
         size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) Value);
       }
       size += values_.CalculateSize(_repeated_values_codec);
@@ -434,7 +434,7 @@ namespace UnitTest.Issues.TestProtos {
       if (other == null) {
         return;
       }
-      if (other.Value != 0) {
+      if (other.Value != global::UnitTest.Issues.TestProtos.NegativeEnum.NEGATIVE_ENUM_ZERO) {
         Value = other.Value;
       }
       values_.Add(other.values_);
@@ -620,7 +620,7 @@ namespace UnitTest.Issues.TestProtos {
 
     /// <summary>Field number for the "EnumValue" field.</summary>
     public const int EnumValueFieldNumber = 5;
-    private global::UnitTest.Issues.TestProtos.DeprecatedEnum enumValue_ = 0;
+    private global::UnitTest.Issues.TestProtos.DeprecatedEnum enumValue_ = global::UnitTest.Issues.TestProtos.DeprecatedEnum.DEPRECATED_ZERO;
     [global::System.ObsoleteAttribute()]
     public global::UnitTest.Issues.TestProtos.DeprecatedEnum EnumValue {
       get { return enumValue_; }
@@ -665,7 +665,7 @@ namespace UnitTest.Issues.TestProtos {
       hash ^= primitiveArray_.GetHashCode();
       if (messageValue_ != null) hash ^= MessageValue.GetHashCode();
       hash ^= messageArray_.GetHashCode();
-      if (EnumValue != 0) hash ^= EnumValue.GetHashCode();
+      if (EnumValue != global::UnitTest.Issues.TestProtos.DeprecatedEnum.DEPRECATED_ZERO) hash ^= EnumValue.GetHashCode();
       hash ^= enumArray_.GetHashCode();
       return hash;
     }
@@ -685,7 +685,7 @@ namespace UnitTest.Issues.TestProtos {
         output.WriteMessage(MessageValue);
       }
       messageArray_.WriteTo(output, _repeated_messageArray_codec);
-      if (EnumValue != 0) {
+      if (EnumValue != global::UnitTest.Issues.TestProtos.DeprecatedEnum.DEPRECATED_ZERO) {
         output.WriteRawTag(40);
         output.WriteEnum((int) EnumValue);
       }
@@ -702,7 +702,7 @@ namespace UnitTest.Issues.TestProtos {
         size += 1 + pb::CodedOutputStream.ComputeMessageSize(MessageValue);
       }
       size += messageArray_.CalculateSize(_repeated_messageArray_codec);
-      if (EnumValue != 0) {
+      if (EnumValue != global::UnitTest.Issues.TestProtos.DeprecatedEnum.DEPRECATED_ZERO) {
         size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) EnumValue);
       }
       size += enumArray_.CalculateSize(_repeated_enumArray_codec);
@@ -724,7 +724,7 @@ namespace UnitTest.Issues.TestProtos {
         MessageValue.MergeFrom(other.MessageValue);
       }
       messageArray_.Add(other.messageArray_);
-      if (other.EnumValue != 0) {
+      if (other.EnumValue != global::UnitTest.Issues.TestProtos.DeprecatedEnum.DEPRECATED_ZERO) {
         EnumValue = other.EnumValue;
       }
       enumArray_.Add(other.enumArray_);
@@ -1435,7 +1435,7 @@ namespace UnitTest.Issues.TestProtos {
     public const int NameFieldNumber = 1;
     private string name_ = "";
     /// <summary>
-    ///  Message for testing the effects for of the json_name option
+    ///  json_name field options are not properly handled during deserialization
     /// </summary>
     public string Name {
       get { return name_; }
