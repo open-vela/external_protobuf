@@ -1291,7 +1291,7 @@ namespace Google.Protobuf.Reflection {
 
     /// <summary>Field number for the "label" field.</summary>
     public const int LabelFieldNumber = 4;
-    private global::Google.Protobuf.Reflection.FieldDescriptorProto.Types.Label label_ = 0;
+    private global::Google.Protobuf.Reflection.FieldDescriptorProto.Types.Label label_ = global::Google.Protobuf.Reflection.FieldDescriptorProto.Types.Label.LABEL_OPTIONAL;
     public global::Google.Protobuf.Reflection.FieldDescriptorProto.Types.Label Label {
       get { return label_; }
       set {
@@ -1301,7 +1301,7 @@ namespace Google.Protobuf.Reflection {
 
     /// <summary>Field number for the "type" field.</summary>
     public const int TypeFieldNumber = 5;
-    private global::Google.Protobuf.Reflection.FieldDescriptorProto.Types.Type type_ = 0;
+    private global::Google.Protobuf.Reflection.FieldDescriptorProto.Types.Type type_ = global::Google.Protobuf.Reflection.FieldDescriptorProto.Types.Type.TYPE_DOUBLE;
     /// <summary>
     ///  If type_name is set, this need not be set.  If both this and type_name
     ///  are set, this must be one of TYPE_ENUM, TYPE_MESSAGE or TYPE_GROUP.
@@ -1429,8 +1429,8 @@ namespace Google.Protobuf.Reflection {
       int hash = 1;
       if (Name.Length != 0) hash ^= Name.GetHashCode();
       if (Number != 0) hash ^= Number.GetHashCode();
-      if (Label != 0) hash ^= Label.GetHashCode();
-      if (Type != 0) hash ^= Type.GetHashCode();
+      if (Label != global::Google.Protobuf.Reflection.FieldDescriptorProto.Types.Label.LABEL_OPTIONAL) hash ^= Label.GetHashCode();
+      if (Type != global::Google.Protobuf.Reflection.FieldDescriptorProto.Types.Type.TYPE_DOUBLE) hash ^= Type.GetHashCode();
       if (TypeName.Length != 0) hash ^= TypeName.GetHashCode();
       if (Extendee.Length != 0) hash ^= Extendee.GetHashCode();
       if (DefaultValue.Length != 0) hash ^= DefaultValue.GetHashCode();
@@ -1457,11 +1457,11 @@ namespace Google.Protobuf.Reflection {
         output.WriteRawTag(24);
         output.WriteInt32(Number);
       }
-      if (Label != 0) {
+      if (Label != global::Google.Protobuf.Reflection.FieldDescriptorProto.Types.Label.LABEL_OPTIONAL) {
         output.WriteRawTag(32);
         output.WriteEnum((int) Label);
       }
-      if (Type != 0) {
+      if (Type != global::Google.Protobuf.Reflection.FieldDescriptorProto.Types.Type.TYPE_DOUBLE) {
         output.WriteRawTag(40);
         output.WriteEnum((int) Type);
       }
@@ -1495,10 +1495,10 @@ namespace Google.Protobuf.Reflection {
       if (Number != 0) {
         size += 1 + pb::CodedOutputStream.ComputeInt32Size(Number);
       }
-      if (Label != 0) {
+      if (Label != global::Google.Protobuf.Reflection.FieldDescriptorProto.Types.Label.LABEL_OPTIONAL) {
         size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) Label);
       }
-      if (Type != 0) {
+      if (Type != global::Google.Protobuf.Reflection.FieldDescriptorProto.Types.Type.TYPE_DOUBLE) {
         size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) Type);
       }
       if (TypeName.Length != 0) {
@@ -1532,10 +1532,10 @@ namespace Google.Protobuf.Reflection {
       if (other.Number != 0) {
         Number = other.Number;
       }
-      if (other.Label != 0) {
+      if (other.Label != global::Google.Protobuf.Reflection.FieldDescriptorProto.Types.Label.LABEL_OPTIONAL) {
         Label = other.Label;
       }
-      if (other.Type != 0) {
+      if (other.Type != global::Google.Protobuf.Reflection.FieldDescriptorProto.Types.Type.TYPE_DOUBLE) {
         Type = other.Type;
       }
       if (other.TypeName.Length != 0) {
@@ -1624,59 +1624,59 @@ namespace Google.Protobuf.Reflection {
         ///  0 is reserved for errors.
         ///  Order is weird for historical reasons.
         /// </summary>
-        [pbr::OriginalName("TYPE_DOUBLE")] Double = 1,
-        [pbr::OriginalName("TYPE_FLOAT")] Float = 2,
+        TYPE_DOUBLE = 1,
+        TYPE_FLOAT = 2,
         /// <summary>
         ///  Not ZigZag encoded.  Negative numbers take 10 bytes.  Use TYPE_SINT64 if
         ///  negative values are likely.
         /// </summary>
-        [pbr::OriginalName("TYPE_INT64")] Int64 = 3,
-        [pbr::OriginalName("TYPE_UINT64")] Uint64 = 4,
+        TYPE_INT64 = 3,
+        TYPE_UINT64 = 4,
         /// <summary>
         ///  Not ZigZag encoded.  Negative numbers take 10 bytes.  Use TYPE_SINT32 if
         ///  negative values are likely.
         /// </summary>
-        [pbr::OriginalName("TYPE_INT32")] Int32 = 5,
-        [pbr::OriginalName("TYPE_FIXED64")] Fixed64 = 6,
-        [pbr::OriginalName("TYPE_FIXED32")] Fixed32 = 7,
-        [pbr::OriginalName("TYPE_BOOL")] Bool = 8,
-        [pbr::OriginalName("TYPE_STRING")] String = 9,
+        TYPE_INT32 = 5,
+        TYPE_FIXED64 = 6,
+        TYPE_FIXED32 = 7,
+        TYPE_BOOL = 8,
+        TYPE_STRING = 9,
         /// <summary>
         ///  Tag-delimited aggregate.
         /// </summary>
-        [pbr::OriginalName("TYPE_GROUP")] Group = 10,
+        TYPE_GROUP = 10,
         /// <summary>
         ///  Length-delimited aggregate.
         /// </summary>
-        [pbr::OriginalName("TYPE_MESSAGE")] Message = 11,
+        TYPE_MESSAGE = 11,
         /// <summary>
         ///  New in version 2.
         /// </summary>
-        [pbr::OriginalName("TYPE_BYTES")] Bytes = 12,
-        [pbr::OriginalName("TYPE_UINT32")] Uint32 = 13,
-        [pbr::OriginalName("TYPE_ENUM")] Enum = 14,
-        [pbr::OriginalName("TYPE_SFIXED32")] Sfixed32 = 15,
-        [pbr::OriginalName("TYPE_SFIXED64")] Sfixed64 = 16,
+        TYPE_BYTES = 12,
+        TYPE_UINT32 = 13,
+        TYPE_ENUM = 14,
+        TYPE_SFIXED32 = 15,
+        TYPE_SFIXED64 = 16,
         /// <summary>
         ///  Uses ZigZag encoding.
         /// </summary>
-        [pbr::OriginalName("TYPE_SINT32")] Sint32 = 17,
+        TYPE_SINT32 = 17,
         /// <summary>
         ///  Uses ZigZag encoding.
         /// </summary>
-        [pbr::OriginalName("TYPE_SINT64")] Sint64 = 18,
+        TYPE_SINT64 = 18,
       }
 
       internal enum Label {
         /// <summary>
         ///  0 is reserved for errors
         /// </summary>
-        [pbr::OriginalName("LABEL_OPTIONAL")] Optional = 1,
-        [pbr::OriginalName("LABEL_REQUIRED")] Required = 2,
+        LABEL_OPTIONAL = 1,
+        LABEL_REQUIRED = 2,
         /// <summary>
         ///  TODO(sanjay): Should we add LABEL_MAP?
         /// </summary>
-        [pbr::OriginalName("LABEL_REPEATED")] Repeated = 3,
+        LABEL_REPEATED = 3,
       }
 
     }
@@ -2666,7 +2666,7 @@ namespace Google.Protobuf.Reflection {
 
     /// <summary>Field number for the "optimize_for" field.</summary>
     public const int OptimizeForFieldNumber = 9;
-    private global::Google.Protobuf.Reflection.FileOptions.Types.OptimizeMode optimizeFor_ = 0;
+    private global::Google.Protobuf.Reflection.FileOptions.Types.OptimizeMode optimizeFor_ = global::Google.Protobuf.Reflection.FileOptions.Types.OptimizeMode.SPEED;
     public global::Google.Protobuf.Reflection.FileOptions.Types.OptimizeMode OptimizeFor {
       get { return optimizeFor_; }
       set {
@@ -2854,7 +2854,7 @@ namespace Google.Protobuf.Reflection {
       if (JavaMultipleFiles != false) hash ^= JavaMultipleFiles.GetHashCode();
       if (JavaGenerateEqualsAndHash != false) hash ^= JavaGenerateEqualsAndHash.GetHashCode();
       if (JavaStringCheckUtf8 != false) hash ^= JavaStringCheckUtf8.GetHashCode();
-      if (OptimizeFor != 0) hash ^= OptimizeFor.GetHashCode();
+      if (OptimizeFor != global::Google.Protobuf.Reflection.FileOptions.Types.OptimizeMode.SPEED) hash ^= OptimizeFor.GetHashCode();
       if (GoPackage.Length != 0) hash ^= GoPackage.GetHashCode();
       if (CcGenericServices != false) hash ^= CcGenericServices.GetHashCode();
       if (JavaGenericServices != false) hash ^= JavaGenericServices.GetHashCode();
@@ -2881,7 +2881,7 @@ namespace Google.Protobuf.Reflection {
         output.WriteRawTag(66);
         output.WriteString(JavaOuterClassname);
       }
-      if (OptimizeFor != 0) {
+      if (OptimizeFor != global::Google.Protobuf.Reflection.FileOptions.Types.OptimizeMode.SPEED) {
         output.WriteRawTag(72);
         output.WriteEnum((int) OptimizeFor);
       }
@@ -2953,7 +2953,7 @@ namespace Google.Protobuf.Reflection {
       if (JavaStringCheckUtf8 != false) {
         size += 2 + 1;
       }
-      if (OptimizeFor != 0) {
+      if (OptimizeFor != global::Google.Protobuf.Reflection.FileOptions.Types.OptimizeMode.SPEED) {
         size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) OptimizeFor);
       }
       if (GoPackage.Length != 0) {
@@ -3006,7 +3006,7 @@ namespace Google.Protobuf.Reflection {
       if (other.JavaStringCheckUtf8 != false) {
         JavaStringCheckUtf8 = other.JavaStringCheckUtf8;
       }
-      if (other.OptimizeFor != 0) {
+      if (other.OptimizeFor != global::Google.Protobuf.Reflection.FileOptions.Types.OptimizeMode.SPEED) {
         OptimizeFor = other.OptimizeFor;
       }
       if (other.GoPackage.Length != 0) {
@@ -3125,15 +3125,15 @@ namespace Google.Protobuf.Reflection {
         /// <summary>
         ///  Generate complete code for parsing, serialization,
         /// </summary>
-        [pbr::OriginalName("SPEED")] Speed = 1,
+        SPEED = 1,
         /// <summary>
         ///  etc.
         /// </summary>
-        [pbr::OriginalName("CODE_SIZE")] CodeSize = 2,
+        CODE_SIZE = 2,
         /// <summary>
         ///  Generate code using MessageLite and the lite runtime.
         /// </summary>
-        [pbr::OriginalName("LITE_RUNTIME")] LiteRuntime = 3,
+        LITE_RUNTIME = 3,
       }
 
     }
@@ -3436,7 +3436,7 @@ namespace Google.Protobuf.Reflection {
 
     /// <summary>Field number for the "ctype" field.</summary>
     public const int CtypeFieldNumber = 1;
-    private global::Google.Protobuf.Reflection.FieldOptions.Types.CType ctype_ = 0;
+    private global::Google.Protobuf.Reflection.FieldOptions.Types.CType ctype_ = global::Google.Protobuf.Reflection.FieldOptions.Types.CType.STRING;
     /// <summary>
     ///  The ctype option instructs the C++ code generator to use a different
     ///  representation of the field than it normally would.  See the specific
@@ -3469,7 +3469,7 @@ namespace Google.Protobuf.Reflection {
 
     /// <summary>Field number for the "jstype" field.</summary>
     public const int JstypeFieldNumber = 6;
-    private global::Google.Protobuf.Reflection.FieldOptions.Types.JSType jstype_ = 0;
+    private global::Google.Protobuf.Reflection.FieldOptions.Types.JSType jstype_ = global::Google.Protobuf.Reflection.FieldOptions.Types.JSType.JS_NORMAL;
     /// <summary>
     ///  The jstype option determines the JavaScript type used for values of the
     ///  field.  The option is permitted only for 64 bit integral and fixed types
@@ -3591,9 +3591,9 @@ namespace Google.Protobuf.Reflection {
 
     public override int GetHashCode() {
       int hash = 1;
-      if (Ctype != 0) hash ^= Ctype.GetHashCode();
+      if (Ctype != global::Google.Protobuf.Reflection.FieldOptions.Types.CType.STRING) hash ^= Ctype.GetHashCode();
       if (Packed != false) hash ^= Packed.GetHashCode();
-      if (Jstype != 0) hash ^= Jstype.GetHashCode();
+      if (Jstype != global::Google.Protobuf.Reflection.FieldOptions.Types.JSType.JS_NORMAL) hash ^= Jstype.GetHashCode();
       if (Lazy != false) hash ^= Lazy.GetHashCode();
       if (Deprecated != false) hash ^= Deprecated.GetHashCode();
       if (Weak != false) hash ^= Weak.GetHashCode();
@@ -3606,7 +3606,7 @@ namespace Google.Protobuf.Reflection {
     }
 
     public void WriteTo(pb::CodedOutputStream output) {
-      if (Ctype != 0) {
+      if (Ctype != global::Google.Protobuf.Reflection.FieldOptions.Types.CType.STRING) {
         output.WriteRawTag(8);
         output.WriteEnum((int) Ctype);
       }
@@ -3622,7 +3622,7 @@ namespace Google.Protobuf.Reflection {
         output.WriteRawTag(40);
         output.WriteBool(Lazy);
       }
-      if (Jstype != 0) {
+      if (Jstype != global::Google.Protobuf.Reflection.FieldOptions.Types.JSType.JS_NORMAL) {
         output.WriteRawTag(48);
         output.WriteEnum((int) Jstype);
       }
@@ -3635,13 +3635,13 @@ namespace Google.Protobuf.Reflection {
 
     public int CalculateSize() {
       int size = 0;
-      if (Ctype != 0) {
+      if (Ctype != global::Google.Protobuf.Reflection.FieldOptions.Types.CType.STRING) {
         size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) Ctype);
       }
       if (Packed != false) {
         size += 1 + 1;
       }
-      if (Jstype != 0) {
+      if (Jstype != global::Google.Protobuf.Reflection.FieldOptions.Types.JSType.JS_NORMAL) {
         size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) Jstype);
       }
       if (Lazy != false) {
@@ -3661,13 +3661,13 @@ namespace Google.Protobuf.Reflection {
       if (other == null) {
         return;
       }
-      if (other.Ctype != 0) {
+      if (other.Ctype != global::Google.Protobuf.Reflection.FieldOptions.Types.CType.STRING) {
         Ctype = other.Ctype;
       }
       if (other.Packed != false) {
         Packed = other.Packed;
       }
-      if (other.Jstype != 0) {
+      if (other.Jstype != global::Google.Protobuf.Reflection.FieldOptions.Types.JSType.JS_NORMAL) {
         Jstype = other.Jstype;
       }
       if (other.Lazy != false) {
@@ -3729,24 +3729,24 @@ namespace Google.Protobuf.Reflection {
         /// <summary>
         ///  Default mode.
         /// </summary>
-        [pbr::OriginalName("STRING")] String = 0,
-        [pbr::OriginalName("CORD")] Cord = 1,
-        [pbr::OriginalName("STRING_PIECE")] StringPiece = 2,
+        STRING = 0,
+        CORD = 1,
+        STRING_PIECE = 2,
       }
 
       internal enum JSType {
         /// <summary>
         ///  Use the default type.
         /// </summary>
-        [pbr::OriginalName("JS_NORMAL")] JsNormal = 0,
+        JS_NORMAL = 0,
         /// <summary>
         ///  Use JavaScript strings.
         /// </summary>
-        [pbr::OriginalName("JS_STRING")] JsString = 1,
+        JS_STRING = 1,
         /// <summary>
         ///  Use JavaScript numbers.
         /// </summary>
-        [pbr::OriginalName("JS_NUMBER")] JsNumber = 2,
+        JS_NUMBER = 2,
       }
 
     }

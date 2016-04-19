@@ -59,7 +59,7 @@ namespace Google.Protobuf.WellKnownTypes {
     /// <summary>
     ///  Null value.
     /// </summary>
-    [pbr::OriginalName("NULL_VALUE")] NullValue = 0,
+    NULL_VALUE = 0,
   }
 
   #endregion
@@ -234,7 +234,7 @@ namespace Google.Protobuf.WellKnownTypes {
     ///  Represents a null value.
     /// </summary>
     public global::Google.Protobuf.WellKnownTypes.NullValue NullValue {
-      get { return kindCase_ == KindOneofCase.NullValue ? (global::Google.Protobuf.WellKnownTypes.NullValue) kind_ : 0; }
+      get { return kindCase_ == KindOneofCase.NullValue ? (global::Google.Protobuf.WellKnownTypes.NullValue) kind_ : global::Google.Protobuf.WellKnownTypes.NullValue.NULL_VALUE; }
       set {
         kind_ = value;
         kindCase_ = KindOneofCase.NullValue;
