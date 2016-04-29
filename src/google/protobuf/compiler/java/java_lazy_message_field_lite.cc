@@ -182,11 +182,12 @@ GenerateInitializationCode(io::Printer* printer) const {
 }
 
 void ImmutableLazyMessageFieldLiteGenerator::
-GenerateVisitCode(io::Printer* printer) const {
+GenerateMergingCode(io::Printer* printer) const {
   printer->Print(variables_,
-    "$name$_ = visitor.visitLazyMessage(\n"
-    "    has$capitalized_name$(), $name$_,\n"
-    "    other.has$capitalized_name$(), other.$name$_);\n");
+    "if (other.has$capitalized_name$()) {\n"
+    "  $name$_.merge(other.$name$_);\n"
+    "  $set_has_field_bit_message$;\n"
+    "}\n");
 }
 
 void ImmutableLazyMessageFieldLiteGenerator::
@@ -361,12 +362,14 @@ GenerateBuilderMembers(io::Printer* printer) const {
 }
 
 void ImmutableLazyMessageOneofFieldLiteGenerator::
-GenerateVisitCode(io::Printer* printer) const {
+GenerateMergingCode(io::Printer* printer) const {
   printer->Print(variables_,
-    "$oneof_name$_ = visitor.visitOneofLazyMessage(\n"
-    "    $has_oneof_case_message$,\n"
-    "    ($lazy_type$) $oneof_name$_,\n"
-    "    ($lazy_type$) other.$oneof_name$_);\n");
+    "if (!($has_oneof_case_message$)) {\n"
+    "  $oneof_name$_ = new $lazy_type$();\n"
+    "}\n"
+    "(($lazy_type$) $oneof_name$_).merge(\n"
+    "    ($lazy_type$) other.$oneof_name$_);\n"
+    "$set_oneof_case_message$;\n");
 }
 
 void ImmutableLazyMessageOneofFieldLiteGenerator::
@@ -460,8 +463,7 @@ GenerateMembers(io::Printer* printer) const {
   printer->Print(variables_,
     "private void ensure$capitalized_name$IsMutable() {\n"
     "  if (!$is_mutable$) {\n"
-    "    $name$_ =\n"
-    "        com.google.protobuf.GeneratedMessageLite.mutableCopy($name$_);\n"
+    "    $name$_ = newProtobufList($name$_);\n"
     "   }\n"
     "}\n"
     "\n");
@@ -676,8 +678,7 @@ void RepeatedImmutableLazyMessageFieldLiteGenerator::
 GenerateParsingCode(io::Printer* printer) const {
   printer->Print(variables_,
     "if (!$is_mutable$) {\n"
-    "  $name$_ =\n"
-    "      com.google.protobuf.GeneratedMessageLite.mutableCopy($name$_);\n"
+    "  $name$_ = newProtobufList();\n"
     "}\n"
     "$name$_.add(new com.google.protobuf.LazyFieldLite(\n"
     "    extensionRegistry, input.readBytes()));\n");

@@ -282,13 +282,12 @@ Struct* Struct::New(::google::protobuf::Arena* arena) const {
 }
 
 void Struct::Clear() {
-// @@protoc_insertion_point(message_clear_start:google.protobuf.Struct)
   fields_.Clear();
 }
 
 bool Struct::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
+#define DO_(EXPRESSION) if (!(EXPRESSION)) goto failure
   ::google::protobuf::uint32 tag;
   // @@protoc_insertion_point(parse_start:google.protobuf.Struct)
   for (;;) {
@@ -386,7 +385,6 @@ void Struct::SerializeWithCachedSizes(
 }
 
 int Struct::ByteSize() const {
-// @@protoc_insertion_point(message_byte_size_start:google.protobuf.Struct)
   int total_size = 0;
 
   // map<string, .google.protobuf.Value> fields = 1;
@@ -409,35 +407,29 @@ int Struct::ByteSize() const {
 }
 
 void Struct::MergeFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:google.protobuf.Struct)
   if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
   const Struct* source = 
       ::google::protobuf::internal::DynamicCastToGenerated<const Struct>(
           &from);
   if (source == NULL) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:google.protobuf.Struct)
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:google.protobuf.Struct)
     MergeFrom(*source);
   }
 }
 
 void Struct::MergeFrom(const Struct& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:google.protobuf.Struct)
   if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
   fields_.MergeFrom(from.fields_);
 }
 
 void Struct::CopyFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:google.protobuf.Struct)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
 void Struct::CopyFrom(const Struct& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:google.protobuf.Struct)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
@@ -570,7 +562,6 @@ Value* Value::New(::google::protobuf::Arena* arena) const {
 }
 
 void Value::clear_kind() {
-// @@protoc_insertion_point(one_of_clear_start:google.protobuf.Value)
   switch(kind_case()) {
     case kNullValue: {
       // No need to clear
@@ -605,13 +596,12 @@ void Value::clear_kind() {
 
 
 void Value::Clear() {
-// @@protoc_insertion_point(message_clear_start:google.protobuf.Value)
   clear_kind();
 }
 
 bool Value::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
+#define DO_(EXPRESSION) if (!(EXPRESSION)) goto failure
   ::google::protobuf::uint32 tag;
   // @@protoc_insertion_point(parse_start:google.protobuf.Value)
   for (;;) {
@@ -823,7 +813,6 @@ void Value::SerializeWithCachedSizes(
 }
 
 int Value::ByteSize() const {
-// @@protoc_insertion_point(message_byte_size_start:google.protobuf.Value)
   int total_size = 0;
 
   switch (kind_case()) {
@@ -875,22 +864,18 @@ int Value::ByteSize() const {
 }
 
 void Value::MergeFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:google.protobuf.Value)
   if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
   const Value* source = 
       ::google::protobuf::internal::DynamicCastToGenerated<const Value>(
           &from);
   if (source == NULL) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:google.protobuf.Value)
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:google.protobuf.Value)
     MergeFrom(*source);
   }
 }
 
 void Value::MergeFrom(const Value& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:google.protobuf.Value)
   if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
   switch (from.kind_case()) {
     case kNullValue: {
@@ -924,14 +909,12 @@ void Value::MergeFrom(const Value& from) {
 }
 
 void Value::CopyFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:google.protobuf.Value)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
 void Value::CopyFrom(const Value& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:google.protobuf.Value)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
@@ -1082,7 +1065,6 @@ void Value::clear_string_value() {
   return kind_.string_value_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
  ::std::string* Value::release_string_value() {
-  // @@protoc_insertion_point(field_release:google.protobuf.Value.string_value)
   if (has_string_value()) {
     clear_has_kind();
     return kind_.string_value_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
@@ -1161,7 +1143,6 @@ void Value::clear_struct_value() {
   return kind_.struct_value_;
 }
 ::google::protobuf::Struct* Value::release_struct_value() {
-  // @@protoc_insertion_point(field_release:google.protobuf.Value.struct_value)
   if (has_struct_value()) {
     clear_has_kind();
     ::google::protobuf::Struct* temp = kind_.struct_value_;
@@ -1209,7 +1190,6 @@ void Value::clear_list_value() {
   return kind_.list_value_;
 }
 ::google::protobuf::ListValue* Value::release_list_value() {
-  // @@protoc_insertion_point(field_release:google.protobuf.Value.list_value)
   if (has_list_value()) {
     clear_has_kind();
     ::google::protobuf::ListValue* temp = kind_.list_value_;
@@ -1304,13 +1284,12 @@ ListValue* ListValue::New(::google::protobuf::Arena* arena) const {
 }
 
 void ListValue::Clear() {
-// @@protoc_insertion_point(message_clear_start:google.protobuf.ListValue)
   values_.Clear();
 }
 
 bool ListValue::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
+#define DO_(EXPRESSION) if (!(EXPRESSION)) goto failure
   ::google::protobuf::uint32 tag;
   // @@protoc_insertion_point(parse_start:google.protobuf.ListValue)
   for (;;) {
@@ -1382,7 +1361,6 @@ void ListValue::SerializeWithCachedSizes(
 }
 
 int ListValue::ByteSize() const {
-// @@protoc_insertion_point(message_byte_size_start:google.protobuf.ListValue)
   int total_size = 0;
 
   // repeated .google.protobuf.Value values = 1;
@@ -1400,35 +1378,29 @@ int ListValue::ByteSize() const {
 }
 
 void ListValue::MergeFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:google.protobuf.ListValue)
   if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
   const ListValue* source = 
       ::google::protobuf::internal::DynamicCastToGenerated<const ListValue>(
           &from);
   if (source == NULL) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:google.protobuf.ListValue)
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:google.protobuf.ListValue)
     MergeFrom(*source);
   }
 }
 
 void ListValue::MergeFrom(const ListValue& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:google.protobuf.ListValue)
   if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
   values_.MergeFrom(from.values_);
 }
 
 void ListValue::CopyFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:google.protobuf.ListValue)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
 void ListValue::CopyFrom(const ListValue& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:google.protobuf.ListValue)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
