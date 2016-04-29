@@ -299,16 +299,20 @@ GenerateInitializationCode(io::Printer* printer) const {
 }
 
 void ImmutableStringFieldLiteGenerator::
-GenerateVisitCode(io::Printer* printer) const {
+GenerateMergingCode(io::Printer* printer) const {
   if (SupportFieldPresence(descriptor_->file())) {
+    // Allow a slight breach of abstraction here in order to avoid forcing
+    // all string fields to Strings when copying fields from a Message.
     printer->Print(variables_,
-      "$name$_ = visitor.visitString(\n"
-      "    has$capitalized_name$(), $name$_,\n"
-      "    other.has$capitalized_name$(), other.$name$_);\n");
+      "if (other.has$capitalized_name$()) {\n"
+      "  $set_has_field_bit_message$\n"
+      "  $name$_ = other.$name$_;\n"
+      "}\n");
   } else {
     printer->Print(variables_,
-      "$name$_ = visitor.visitString(!$name$_.isEmpty(), $name$_,\n"
-      "    !other.$name$_.isEmpty(), other.$name$_);\n");
+      "if (!other.get$capitalized_name$().isEmpty()) {\n"
+      "  $name$_ = other.$name$_;\n"
+      "}\n");
   }
 }
 
@@ -515,10 +519,12 @@ GenerateBuilderMembers(io::Printer* printer) const {
 }
 
 void ImmutableStringOneofFieldLiteGenerator::
-GenerateVisitCode(io::Printer* printer) const {
+GenerateMergingCode(io::Printer* printer) const {
+  // Allow a slight breach of abstraction here in order to avoid forcing
+  // all string fields to Strings when copying fields from a Message.
   printer->Print(variables_,
-    "$oneof_name$_ = visitor.visitOneofString(\n"
-    "   $has_oneof_case_message$, $oneof_name$_, other.$oneof_name$_);\n");
+    "$set_oneof_case_message$;\n"
+    "$oneof_name$_ = other.$oneof_name$_;\n");
 }
 
 void ImmutableStringOneofFieldLiteGenerator::
@@ -639,8 +645,8 @@ GenerateMembers(io::Printer* printer) const {
   printer->Print(variables_,
     "private void ensure$capitalized_name$IsMutable() {\n"
     "  if (!$is_mutable$) {\n"
-    "    $name$_ =\n"
-    "        com.google.protobuf.GeneratedMessageLite.mutableCopy($name$_);\n"
+    "    $name$_ = com.google.protobuf.GeneratedMessageLite.newProtobufList(\n"
+    "        $name$_);\n"
     "   }\n"
     "}\n");
 
@@ -767,9 +773,21 @@ GenerateInitializationCode(io::Printer* printer) const {
 }
 
 void RepeatedImmutableStringFieldLiteGenerator::
-GenerateVisitCode(io::Printer* printer) const {
+GenerateMergingCode(io::Printer* printer) const {
+  // The code below does two optimizations:
+  //   1. If the other list is empty, there's nothing to do. This ensures we
+  //      don't allocate a new array if we already have an immutable one.
+  //   2. If the other list is non-empty and our current list is empty, we can
+  //      reuse the other list which is guaranteed to be immutable.
   printer->Print(variables_,
-      "$name$_= visitor.visitList($name$_, other.$name$_);\n");
+    "if (!other.$name$_.isEmpty()) {\n"
+    "  if ($name$_.isEmpty()) {\n"
+    "    $name$_ = other.$name$_;\n"
+    "  } else {\n"
+    "    ensure$capitalized_name$IsMutable();\n"
+    "    $name$_.addAll(other.$name$_);\n"
+    "  }\n"
+    "}\n");
 }
 
 void RepeatedImmutableStringFieldLiteGenerator::
@@ -793,8 +811,7 @@ GenerateParsingCode(io::Printer* printer) const {
   }
   printer->Print(variables_,
     "if (!$is_mutable$) {\n"
-    "  $name$_ =\n"
-    "      com.google.protobuf.GeneratedMessageLite.mutableCopy($name$_);\n"
+    "  $name$_ = com.google.protobuf.GeneratedMessageLite.newProtobufList();\n"
     "}\n");
   printer->Print(variables_,
     "$name$_.add(s);\n");

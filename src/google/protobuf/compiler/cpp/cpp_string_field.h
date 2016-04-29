@@ -46,8 +46,8 @@ namespace cpp {
 
 class StringFieldGenerator : public FieldGenerator {
  public:
-  StringFieldGenerator(const FieldDescriptor* descriptor,
-                       const Options& options);
+  explicit StringFieldGenerator(const FieldDescriptor* descriptor,
+                                const Options& options);
   ~StringFieldGenerator();
 
   // implements FieldGenerator ---------------------------------------
@@ -79,8 +79,8 @@ class StringFieldGenerator : public FieldGenerator {
 
 class StringOneofFieldGenerator : public StringFieldGenerator {
  public:
-  StringOneofFieldGenerator(const FieldDescriptor* descriptor,
-                            const Options& options);
+  explicit StringOneofFieldGenerator(const FieldDescriptor* descriptor,
+                                     const Options& options);
   ~StringOneofFieldGenerator();
 
   // implements FieldGenerator ---------------------------------------
@@ -99,8 +99,8 @@ class StringOneofFieldGenerator : public StringFieldGenerator {
 
 class RepeatedStringFieldGenerator : public FieldGenerator {
  public:
-  RepeatedStringFieldGenerator(const FieldDescriptor* descriptor,
-                               const Options& options);
+  explicit RepeatedStringFieldGenerator(const FieldDescriptor* descriptor,
+                                        const Options& options);
   ~RepeatedStringFieldGenerator();
 
   // implements FieldGenerator ---------------------------------------

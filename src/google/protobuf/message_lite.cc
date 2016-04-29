@@ -361,11 +361,6 @@ void GenericTypeHandler<MessageLite>::Merge(const MessageLite& from,
                                             MessageLite* to) {
   to->CheckTypeAndMergeFrom(from);
 }
-template<>
-void GenericTypeHandler<string>::Merge(const string& from,
-                                              string* to) {
-  *to = from;
-}
 }  // namespace internal
 
 }  // namespace protobuf

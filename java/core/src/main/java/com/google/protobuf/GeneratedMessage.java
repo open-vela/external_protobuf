@@ -80,7 +80,6 @@ public abstract class GeneratedMessage extends AbstractMessage
     unknownFields = builder.getUnknownFields();
   }
 
-  @Override
   public Parser<? extends GeneratedMessage> getParserForType() {
     throw new UnsupportedOperationException(
         "This is supposed to be overridden by subclasses.");
@@ -103,7 +102,7 @@ public abstract class GeneratedMessage extends AbstractMessage
    */
   protected abstract FieldAccessorTable internalGetFieldAccessorTable();
 
-  @Override
+  //@Override (Java 1.6 override semantics, but we must support 1.5)
   public Descriptor getDescriptorForType() {
     return internalGetFieldAccessorTable().descriptor;
   }
@@ -192,7 +191,7 @@ public abstract class GeneratedMessage extends AbstractMessage
     return true;
   }
 
-  @Override
+  //@Override (Java 1.6 override semantics, but we must support 1.5)
   public Map<FieldDescriptor, Object> getAllFields() {
     return Collections.unmodifiableMap(
         getAllFieldsMutable(/* getBytesForString = */ false));
@@ -213,22 +212,22 @@ public abstract class GeneratedMessage extends AbstractMessage
         getAllFieldsMutable(/* getBytesForString = */ true));
   }
 
-  @Override
+  //@Override (Java 1.6 override semantics, but we must support 1.5)
   public boolean hasOneof(final OneofDescriptor oneof) {
     return internalGetFieldAccessorTable().getOneof(oneof).has(this);
   }
 
-  @Override
+  //@Override (Java 1.6 override semantics, but we must support 1.5)
   public FieldDescriptor getOneofFieldDescriptor(final OneofDescriptor oneof) {
     return internalGetFieldAccessorTable().getOneof(oneof).get(this);
   }
 
-  @Override
+  //@Override (Java 1.6 override semantics, but we must support 1.5)
   public boolean hasField(final FieldDescriptor field) {
     return internalGetFieldAccessorTable().getField(field).has(this);
   }
 
-  @Override
+  //@Override (Java 1.6 override semantics, but we must support 1.5)
   public Object getField(final FieldDescriptor field) {
     return internalGetFieldAccessorTable().getField(field).get(this);
   }
@@ -245,19 +244,19 @@ public abstract class GeneratedMessage extends AbstractMessage
     return internalGetFieldAccessorTable().getField(field).getRaw(this);
   }
 
-  @Override
+  //@Override (Java 1.6 override semantics, but we must support 1.5)
   public int getRepeatedFieldCount(final FieldDescriptor field) {
     return internalGetFieldAccessorTable().getField(field)
       .getRepeatedCount(this);
   }
 
-  @Override
+  //@Override (Java 1.6 override semantics, but we must support 1.5)
   public Object getRepeatedField(final FieldDescriptor field, final int index) {
     return internalGetFieldAccessorTable().getField(field)
       .getRepeated(this, index);
   }
 
-  @Override
+  //@Override (Java 1.6 override semantics, but we must support 1.5)
   public UnknownFieldSet getUnknownFields() {
     throw new UnsupportedOperationException(
         "This is supposed to be overridden by subclasses.");
@@ -381,7 +380,7 @@ public abstract class GeneratedMessage extends AbstractMessage
   }
 
   @SuppressWarnings("unchecked")
-  public abstract static class Builder <BuilderType extends Builder<BuilderType>>
+  public abstract static class Builder <BuilderType extends Builder>
       extends AbstractMessage.Builder<BuilderType> {
 
     private BuilderParent builderParent;
@@ -445,7 +444,6 @@ public abstract class GeneratedMessage extends AbstractMessage
      * Called by the initialization and clear code paths to allow subclasses to
      * reset any of their builtin fields back to the initial values.
      */
-    @Override
     public BuilderType clear() {
       unknownFields = UnknownFieldSet.getDefaultInstance();
       onChanged();
@@ -459,12 +457,12 @@ public abstract class GeneratedMessage extends AbstractMessage
      */
     protected abstract FieldAccessorTable internalGetFieldAccessorTable();
 
-    @Override
+    //@Override (Java 1.6 override semantics, but we must support 1.5)
     public Descriptor getDescriptorForType() {
       return internalGetFieldAccessorTable().descriptor;
     }
 
-    @Override
+    //@Override (Java 1.6 override semantics, but we must support 1.5)
     public Map<FieldDescriptor, Object> getAllFields() {
       return Collections.unmodifiableMap(getAllFieldsMutable());
     }
@@ -512,38 +510,39 @@ public abstract class GeneratedMessage extends AbstractMessage
       return result;
     }
 
-    @Override
-    public Message.Builder newBuilderForField(final FieldDescriptor field) {
+    public Message.Builder newBuilderForField(
+        final FieldDescriptor field) {
       return internalGetFieldAccessorTable().getField(field).newBuilder();
     }
 
-    @Override
+    //@Override (Java 1.6 override semantics, but we must support 1.5)
     public Message.Builder getFieldBuilder(final FieldDescriptor field) {
       return internalGetFieldAccessorTable().getField(field).getBuilder(this);
     }
 
-    @Override
-    public Message.Builder getRepeatedFieldBuilder(final FieldDescriptor field, int index) {
+    //@Override (Java 1.6 override semantics, but we must support 1.5)
+    public Message.Builder getRepeatedFieldBuilder(final FieldDescriptor field,
+        int index) {
       return internalGetFieldAccessorTable().getField(field).getRepeatedBuilder(
           this, index);
     }
 
-    @Override
+    //@Override (Java 1.6 override semantics, but we must support 1.5)
     public boolean hasOneof(final OneofDescriptor oneof) {
       return internalGetFieldAccessorTable().getOneof(oneof).has(this);
     }
 
-    @Override
+    //@Override (Java 1.6 override semantics, but we must support 1.5)
     public FieldDescriptor getOneofFieldDescriptor(final OneofDescriptor oneof) {
       return internalGetFieldAccessorTable().getOneof(oneof).get(this);
     }
 
-    @Override
+    //@Override (Java 1.6 override semantics, but we must support 1.5)
     public boolean hasField(final FieldDescriptor field) {
       return internalGetFieldAccessorTable().getField(field).has(this);
     }
 
-    @Override
+    //@Override (Java 1.6 override semantics, but we must support 1.5)
     public Object getField(final FieldDescriptor field) {
       Object object = internalGetFieldAccessorTable().getField(field).get(this);
       if (field.isRepeated()) {
@@ -555,52 +554,52 @@ public abstract class GeneratedMessage extends AbstractMessage
       }
     }
 
-    @Override
-    public BuilderType setField(final FieldDescriptor field, final Object value) {
+    public BuilderType setField(final FieldDescriptor field,
+                                final Object value) {
       internalGetFieldAccessorTable().getField(field).set(this, value);
       return (BuilderType) this;
     }
 
-    @Override
+    //@Override (Java 1.6 override semantics, but we must support 1.5)
     public BuilderType clearField(final FieldDescriptor field) {
       internalGetFieldAccessorTable().getField(field).clear(this);
       return (BuilderType) this;
     }
 
-    @Override
+    //@Override (Java 1.6 override semantics, but we must support 1.5)
     public BuilderType clearOneof(final OneofDescriptor oneof) {
       internalGetFieldAccessorTable().getOneof(oneof).clear(this);
       return (BuilderType) this;
     }
 
-    @Override
+    //@Override (Java 1.6 override semantics, but we must support 1.5)
     public int getRepeatedFieldCount(final FieldDescriptor field) {
       return internalGetFieldAccessorTable().getField(field)
           .getRepeatedCount(this);
     }
 
-    @Override
-    public Object getRepeatedField(final FieldDescriptor field, final int index) {
+    //@Override (Java 1.6 override semantics, but we must support 1.5)
+    public Object getRepeatedField(final FieldDescriptor field,
+                                   final int index) {
       return internalGetFieldAccessorTable().getField(field)
           .getRepeated(this, index);
     }
 
-    @Override
-    public BuilderType setRepeatedField(
-        final FieldDescriptor field, final int index, final Object value) {
+    public BuilderType setRepeatedField(final FieldDescriptor field,
+                                        final int index, final Object value) {
       internalGetFieldAccessorTable().getField(field)
         .setRepeated(this, index, value);
       return (BuilderType) this;
     }
 
-    @Override
-    public BuilderType addRepeatedField(final FieldDescriptor field, final Object value) {
+    public BuilderType addRepeatedField(final FieldDescriptor field,
+                                        final Object value) {
       internalGetFieldAccessorTable().getField(field).addRepeated(this, value);
       return (BuilderType) this;
     }
 
-    @Override
-    public BuilderType setUnknownFields(final UnknownFieldSet unknownFields) {
+    public BuilderType setUnknownFields(
+        final UnknownFieldSet unknownFields) {
       this.unknownFields = unknownFields;
       onChanged();
       return (BuilderType) this;
@@ -617,7 +616,7 @@ public abstract class GeneratedMessage extends AbstractMessage
       return (BuilderType) this;
     }
 
-    @Override
+    //@Override (Java 1.6 override semantics, but we must support 1.5)
     public boolean isInitialized() {
       for (final FieldDescriptor field : getDescriptorForType().getFields()) {
         // Check that all required fields are present.
@@ -647,7 +646,7 @@ public abstract class GeneratedMessage extends AbstractMessage
       return true;
     }
 
-    @Override
+    //@Override (Java 1.6 override semantics, but we must support 1.5)
     public final UnknownFieldSet getUnknownFields() {
       return unknownFields;
     }
@@ -671,7 +670,7 @@ public abstract class GeneratedMessage extends AbstractMessage
      */
     private class BuilderParentImpl implements BuilderParent {
 
-      @Override
+      //@Override (Java 1.6 override semantics, but we must support 1.5)
       public void markDirty() {
         onChanged();
       }
@@ -736,7 +735,6 @@ public abstract class GeneratedMessage extends AbstractMessage
   public interface ExtendableMessageOrBuilder<
       MessageType extends ExtendableMessage> extends MessageOrBuilder {
     // Re-define for return type covariance.
-    @Override
     Message getDefaultInstanceForType();
 
     /** Check if a singular extension is present. */
@@ -825,8 +823,9 @@ public abstract class GeneratedMessage extends AbstractMessage
     }
 
     /** Check if a singular extension is present. */
-    @Override
-    public final <Type> boolean hasExtension(final ExtensionLite<MessageType, Type> extensionLite) {
+    //@Override (Java 1.6 override semantics, but we must support 1.5)
+    public final <Type> boolean hasExtension(
+        final ExtensionLite<MessageType, Type> extensionLite) {
       Extension<MessageType, Type> extension = checkNotLite(extensionLite);
 
       verifyExtensionContainingType(extension);
@@ -834,7 +833,7 @@ public abstract class GeneratedMessage extends AbstractMessage
     }
 
     /** Get the number of elements in a repeated extension. */
-    @Override
+    //@Override (Java 1.6 override semantics, but we must support 1.5)
     public final <Type> int getExtensionCount(
         final ExtensionLite<MessageType, List<Type>> extensionLite) {
       Extension<MessageType, List<Type>> extension = checkNotLite(extensionLite);
@@ -845,9 +844,10 @@ public abstract class GeneratedMessage extends AbstractMessage
     }
 
     /** Get the value of an extension. */
-    @Override
+    //@Override (Java 1.6 override semantics, but we must support 1.5)
     @SuppressWarnings("unchecked")
-    public final <Type> Type getExtension(final ExtensionLite<MessageType, Type> extensionLite) {
+    public final <Type> Type getExtension(
+        final ExtensionLite<MessageType, Type> extensionLite) {
       Extension<MessageType, Type> extension = checkNotLite(extensionLite);
 
       verifyExtensionContainingType(extension);
@@ -869,10 +869,11 @@ public abstract class GeneratedMessage extends AbstractMessage
     }
 
     /** Get one element of a repeated extension. */
-    @Override
+    //@Override (Java 1.6 override semantics, but we must support 1.5)
     @SuppressWarnings("unchecked")
     public final <Type> Type getExtension(
-        final ExtensionLite<MessageType, List<Type>> extensionLite, final int index) {
+        final ExtensionLite<MessageType, List<Type>> extensionLite,
+        final int index) {
       Extension<MessageType, List<Type>> extension = checkNotLite(extensionLite);
 
       verifyExtensionContainingType(extension);
@@ -1106,7 +1107,7 @@ public abstract class GeneratedMessage extends AbstractMessage
   @SuppressWarnings("unchecked")
   public abstract static class ExtendableBuilder<
         MessageType extends ExtendableMessage,
-        BuilderType extends ExtendableBuilder<MessageType, BuilderType>>
+        BuilderType extends ExtendableBuilder>
       extends Builder<BuilderType>
       implements ExtendableMessageOrBuilder<MessageType> {
 
@@ -1158,8 +1159,9 @@ public abstract class GeneratedMessage extends AbstractMessage
     }
 
     /** Check if a singular extension is present. */
-    @Override
-    public final <Type> boolean hasExtension(final ExtensionLite<MessageType, Type> extensionLite) {
+    //@Override (Java 1.6 override semantics, but we must support 1.5)
+    public final <Type> boolean hasExtension(
+        final ExtensionLite<MessageType, Type> extensionLite) {
       Extension<MessageType, Type> extension = checkNotLite(extensionLite);
 
       verifyExtensionContainingType(extension);
@@ -1167,7 +1169,7 @@ public abstract class GeneratedMessage extends AbstractMessage
     }
 
     /** Get the number of elements in a repeated extension. */
-    @Override
+    //@Override (Java 1.6 override semantics, but we must support 1.5)
     public final <Type> int getExtensionCount(
         final ExtensionLite<MessageType, List<Type>> extensionLite) {
       Extension<MessageType, List<Type>> extension = checkNotLite(extensionLite);
@@ -1178,8 +1180,9 @@ public abstract class GeneratedMessage extends AbstractMessage
     }
 
     /** Get the value of an extension. */
-    @Override
-    public final <Type> Type getExtension(final ExtensionLite<MessageType, Type> extensionLite) {
+    //@Override (Java 1.6 override semantics, but we must support 1.5)
+    public final <Type> Type getExtension(
+        final ExtensionLite<MessageType, Type> extensionLite) {
       Extension<MessageType, Type> extension = checkNotLite(extensionLite);
 
       verifyExtensionContainingType(extension);
@@ -1201,9 +1204,10 @@ public abstract class GeneratedMessage extends AbstractMessage
     }
 
     /** Get one element of a repeated extension. */
-    @Override
+    //@Override (Java 1.6 override semantics, but we must support 1.5)
     public final <Type> Type getExtension(
-        final ExtensionLite<MessageType, List<Type>> extensionLite, final int index) {
+        final ExtensionLite<MessageType, List<Type>> extensionLite,
+        final int index) {
       Extension<MessageType, List<Type>> extension = checkNotLite(extensionLite);
 
       verifyExtensionContainingType(extension);
@@ -1456,9 +1460,10 @@ public abstract class GeneratedMessage extends AbstractMessage
     // obtained.
     return new GeneratedExtension<ContainingType, Type>(
         new CachedDescriptorRetriever() {
-          @Override
+          //@Override (Java 1.6 override semantics, but we must support 1.5)
           public FieldDescriptor loadDescriptor() {
-            return scope.getDescriptorForType().getExtensions().get(descriptorIndex);
+            return scope.getDescriptorForType().getExtensions()
+                .get(descriptorIndex);
           }
         },
         singularType,
@@ -1486,7 +1491,6 @@ public abstract class GeneratedMessage extends AbstractMessage
     private volatile FieldDescriptor descriptor;
     protected abstract FieldDescriptor loadDescriptor();
 
-    @Override
     public FieldDescriptor getDescriptor() {
       if (descriptor == null) {
         synchronized (this) {
@@ -1516,7 +1520,6 @@ public abstract class GeneratedMessage extends AbstractMessage
     // obtained.
     return new GeneratedExtension<ContainingType, Type>(
         new CachedDescriptorRetriever() {
-          @Override
           protected FieldDescriptor loadDescriptor() {
             return scope.getDescriptorForType().findFieldByName(name);
           }
@@ -1543,18 +1546,17 @@ public abstract class GeneratedMessage extends AbstractMessage
     // used to obtain the extension's FieldDescriptor.
     return new GeneratedExtension<ContainingType, Type>(
         new CachedDescriptorRetriever() {
-          @Override
           protected FieldDescriptor loadDescriptor() {
             try {
-              Class clazz = singularType.getClassLoader().loadClass(descriptorOuterClass);
-              FileDescriptor file = (FileDescriptor) clazz.getField("descriptor").get(null);
+              Class clazz =
+                  singularType.getClassLoader().loadClass(descriptorOuterClass);
+              FileDescriptor file =
+                  (FileDescriptor) clazz.getField("descriptor").get(null);
               return file.findExtensionByName(extensionName);
             } catch (Exception e) {
               throw new RuntimeException(
-                  "Cannot load descriptors: "
-                      + descriptorOuterClass
-                      + " is not a valid descriptor class name",
-                  e);
+                  "Cannot load descriptors: " + descriptorOuterClass +
+                  " is not a valid descriptor class name", e);
             }
           }
         },
@@ -1636,13 +1638,12 @@ public abstract class GeneratedMessage extends AbstractMessage
       if (descriptorRetriever != null) {
         throw new IllegalStateException("Already initialized.");
       }
-      descriptorRetriever =
-          new ExtensionDescriptorRetriever() {
-            @Override
-            public FieldDescriptor getDescriptor() {
-              return descriptor;
-            }
-          };
+      descriptorRetriever = new ExtensionDescriptorRetriever() {
+          //@Override (Java 1.6 override semantics, but we must support 1.5)
+          public FieldDescriptor getDescriptor() {
+            return descriptor;
+          }
+        };
     }
 
     private ExtensionDescriptorRetriever descriptorRetriever;
@@ -1652,7 +1653,6 @@ public abstract class GeneratedMessage extends AbstractMessage
     private final Method enumGetValueDescriptor;
     private final ExtensionType extensionType;
 
-    @Override
     public FieldDescriptor getDescriptor() {
       if (descriptorRetriever == null) {
         throw new IllegalStateException(
@@ -1665,12 +1665,10 @@ public abstract class GeneratedMessage extends AbstractMessage
      * If the extension is an embedded message or group, returns the default
      * instance of the message.
      */
-    @Override
     public Message getMessageDefaultInstance() {
       return messageDefaultInstance;
     }
 
-    @Override
     protected ExtensionType getExtensionType() {
       return extensionType;
     }
@@ -1681,7 +1679,7 @@ public abstract class GeneratedMessage extends AbstractMessage
      * EnumValueDescriptors but the native accessors use the generated enum
      * type.
      */
-    @Override
+    // @Override
     @SuppressWarnings("unchecked")
     protected Object fromReflectionType(final Object value) {
       FieldDescriptor descriptor = getDescriptor();
@@ -1706,7 +1704,7 @@ public abstract class GeneratedMessage extends AbstractMessage
      * Like {@link #fromReflectionType(Object)}, but if the type is a repeated
      * type, this converts a single element.
      */
-    @Override
+    // @Override
     protected Object singularFromReflectionType(final Object value) {
       FieldDescriptor descriptor = getDescriptor();
       switch (descriptor.getJavaType()) {
@@ -1730,7 +1728,7 @@ public abstract class GeneratedMessage extends AbstractMessage
      * EnumValueDescriptors but the native accessors use the generated enum
      * type.
      */
-    @Override
+    // @Override
     @SuppressWarnings("unchecked")
     protected Object toReflectionType(final Object value) {
       FieldDescriptor descriptor = getDescriptor();
@@ -1754,7 +1752,7 @@ public abstract class GeneratedMessage extends AbstractMessage
      * Like {@link #toReflectionType(Object)}, but if the type is a repeated
      * type, this converts a single element.
      */
-    @Override
+    // @Override
     protected Object singularToReflectionType(final Object value) {
       FieldDescriptor descriptor = getDescriptor();
       switch (descriptor.getJavaType()) {
@@ -1765,22 +1763,22 @@ public abstract class GeneratedMessage extends AbstractMessage
       }
     }
 
-    @Override
+    // @Override
     public int getNumber() {
       return getDescriptor().getNumber();
     }
 
-    @Override
+    // @Override
     public WireFormat.FieldType getLiteType() {
       return getDescriptor().getLiteType();
     }
 
-    @Override
+    // @Override
     public boolean isRepeated() {
       return getDescriptor().isRepeated();
     }
 
-    @Override
+    // @Override
     @SuppressWarnings("unchecked")
     public Type getDefaultValue() {
       if (isRepeated()) {
@@ -2130,57 +2128,49 @@ public abstract class GeneratedMessage extends AbstractMessage
         return ((Internal.EnumLite) invokeOrDie(caseMethodBuilder, builder)).getNumber();
       }
 
-      @Override
       public Object get(final GeneratedMessage message) {
         return invokeOrDie(getMethod, message);
       }
-      @Override
       public Object get(GeneratedMessage.Builder builder) {
         return invokeOrDie(getMethodBuilder, builder);
       }
-      @Override
       public Object getRaw(final GeneratedMessage message) {
         return get(message);
       }
-      @Override
       public Object getRaw(GeneratedMessage.Builder builder) {
         return get(builder);
       }
-      @Override
       public void set(final Builder builder, final Object value) {
         invokeOrDie(setMethod, builder, value);
       }
-      @Override
-      public Object getRepeated(final GeneratedMessage message, final int index) {
+      public Object getRepeated(final GeneratedMessage message,
+                                final int index) {
         throw new UnsupportedOperationException(
           "getRepeatedField() called on a singular field.");
       }
-      @Override
-      public Object getRepeatedRaw(final GeneratedMessage message, final int index) {
+      public Object getRepeatedRaw(final GeneratedMessage message,
+                                final int index) {
         throw new UnsupportedOperationException(
           "getRepeatedFieldRaw() called on a singular field.");
       }
-      @Override
       public Object getRepeated(GeneratedMessage.Builder builder, int index) {
         throw new UnsupportedOperationException(
           "getRepeatedField() called on a singular field.");
       }
-      @Override
-      public Object getRepeatedRaw(GeneratedMessage.Builder builder, int index) {
+      public Object getRepeatedRaw(GeneratedMessage.Builder builder,
+          int index) {
         throw new UnsupportedOperationException(
           "getRepeatedFieldRaw() called on a singular field.");
       }
-      @Override
-      public void setRepeated(final Builder builder, final int index, final Object value) {
+      public void setRepeated(final Builder builder, final int index,
+          final Object value) {
         throw new UnsupportedOperationException(
           "setRepeatedField() called on a singular field.");
       }
-      @Override
       public void addRepeated(final Builder builder, final Object value) {
         throw new UnsupportedOperationException(
           "addRepeatedField() called on a singular field.");
       }
-      @Override
       public boolean has(final GeneratedMessage message) {
         if (!hasHasMethod) {
           if (isOneofField) {
@@ -2190,7 +2180,6 @@ public abstract class GeneratedMessage extends AbstractMessage
         }
         return (Boolean) invokeOrDie(hasMethod, message);
       }
-      @Override
       public boolean has(GeneratedMessage.Builder builder) {
         if (!hasHasMethod) {
           if (isOneofField) {
@@ -2200,32 +2189,27 @@ public abstract class GeneratedMessage extends AbstractMessage
         }
         return (Boolean) invokeOrDie(hasMethodBuilder, builder);
       }
-      @Override
       public int getRepeatedCount(final GeneratedMessage message) {
         throw new UnsupportedOperationException(
           "getRepeatedFieldSize() called on a singular field.");
       }
-      @Override
       public int getRepeatedCount(GeneratedMessage.Builder builder) {
         throw new UnsupportedOperationException(
           "getRepeatedFieldSize() called on a singular field.");
       }
-      @Override
       public void clear(final Builder builder) {
         invokeOrDie(clearMethod, builder);
       }
-      @Override
       public Message.Builder newBuilder() {
         throw new UnsupportedOperationException(
           "newBuilderForField() called on a non-Message type.");
       }
-      @Override
       public Message.Builder getBuilder(GeneratedMessage.Builder builder) {
         throw new UnsupportedOperationException(
           "getFieldBuilder() called on a non-Message type.");
       }
-      @Override
-      public Message.Builder getRepeatedBuilder(GeneratedMessage.Builder builder, int index) {
+      public Message.Builder getRepeatedBuilder(GeneratedMessage.Builder builder,
+          int index) {
         throw new UnsupportedOperationException(
           "getRepeatedFieldBuilder() called on a non-Message type.");
       }
@@ -2269,23 +2253,18 @@ public abstract class GeneratedMessage extends AbstractMessage
         clearMethod = getMethodOrDie(builderClass, "clear" + camelCaseName);
       }
 
-      @Override
       public Object get(final GeneratedMessage message) {
         return invokeOrDie(getMethod, message);
       }
-      @Override
       public Object get(GeneratedMessage.Builder builder) {
         return invokeOrDie(getMethodBuilder, builder);
       }
-      @Override
       public Object getRaw(final GeneratedMessage message) {
         return get(message);
       }
-      @Override
       public Object getRaw(GeneratedMessage.Builder builder) {
         return get(builder);
       }
-      @Override
       public void set(final Builder builder, final Object value) {
         // Add all the elements individually.  This serves two purposes:
         // 1) Verifies that each element has the correct type.
@@ -2296,64 +2275,54 @@ public abstract class GeneratedMessage extends AbstractMessage
           addRepeated(builder, element);
         }
       }
-      @Override
-      public Object getRepeated(final GeneratedMessage message, final int index) {
+      public Object getRepeated(final GeneratedMessage message,
+                                final int index) {
         return invokeOrDie(getRepeatedMethod, message, index);
       }
-      @Override
       public Object getRepeated(GeneratedMessage.Builder builder, int index) {
         return invokeOrDie(getRepeatedMethodBuilder, builder, index);
       }
-      @Override
       public Object getRepeatedRaw(GeneratedMessage message, int index) {
         return getRepeated(message, index);
       }
-      @Override
-      public Object getRepeatedRaw(GeneratedMessage.Builder builder, int index) {
+      public Object getRepeatedRaw(GeneratedMessage.Builder builder,
+          int index) {
         return getRepeated(builder, index);
       }
-      @Override
-      public void setRepeated(final Builder builder, final int index, final Object value) {
+      public void setRepeated(final Builder builder,
+                              final int index, final Object value) {
         invokeOrDie(setRepeatedMethod, builder, index, value);
       }
-      @Override
       public void addRepeated(final Builder builder, final Object value) {
         invokeOrDie(addRepeatedMethod, builder, value);
       }
-      @Override
       public boolean has(final GeneratedMessage message) {
         throw new UnsupportedOperationException(
           "hasField() called on a repeated field.");
       }
-      @Override
       public boolean has(GeneratedMessage.Builder builder) {
         throw new UnsupportedOperationException(
           "hasField() called on a repeated field.");
       }
-      @Override
       public int getRepeatedCount(final GeneratedMessage message) {
         return (Integer) invokeOrDie(getCountMethod, message);
       }
-      @Override
       public int getRepeatedCount(GeneratedMessage.Builder builder) {
         return (Integer) invokeOrDie(getCountMethodBuilder, builder);
       }
-      @Override
       public void clear(final Builder builder) {
         invokeOrDie(clearMethod, builder);
       }
-      @Override
       public Message.Builder newBuilder() {
         throw new UnsupportedOperationException(
           "newBuilderForField() called on a non-Message type.");
       }
-      @Override
       public Message.Builder getBuilder(GeneratedMessage.Builder builder) {
         throw new UnsupportedOperationException(
           "getFieldBuilder() called on a non-Message type.");
       }
-      @Override
-      public Message.Builder getRepeatedBuilder(GeneratedMessage.Builder builder, int index) {
+      public Message.Builder getRepeatedBuilder(GeneratedMessage.Builder builder,
+          int index) {
         throw new UnsupportedOperationException(
           "getRepeatedFieldBuilder() called on a non-Message type.");
       }
@@ -2390,7 +2359,6 @@ public abstract class GeneratedMessage extends AbstractMessage
             field.getNumber());
       }
 
-      @Override
       public Object get(GeneratedMessage message) {
         List result = new ArrayList();
         for (int i = 0; i < getRepeatedCount(message); i++) {
@@ -2399,7 +2367,6 @@ public abstract class GeneratedMessage extends AbstractMessage
         return Collections.unmodifiableList(result);
       }
 
-      @Override
       public Object get(Builder builder) {
         List result = new ArrayList();
         for (int i = 0; i < getRepeatedCount(builder); i++) {
@@ -2408,17 +2375,14 @@ public abstract class GeneratedMessage extends AbstractMessage
         return Collections.unmodifiableList(result);
       }
 
-      @Override
       public Object getRaw(GeneratedMessage message) {
         return get(message);
       }
 
-      @Override
       public Object getRaw(GeneratedMessage.Builder builder) {
         return get(builder);
       }
 
-      @Override
       public void set(Builder builder, Object value) {
         clear(builder);
         for (Object entry : (List) value) {
@@ -2426,76 +2390,63 @@ public abstract class GeneratedMessage extends AbstractMessage
         }
       }
 
-      @Override
       public Object getRepeated(GeneratedMessage message, int index) {
         return getMapField(message).getList().get(index);
       }
 
-      @Override
       public Object getRepeated(Builder builder, int index) {
         return getMapField(builder).getList().get(index);
       }
 
-      @Override
       public Object getRepeatedRaw(GeneratedMessage message, int index) {
         return getRepeated(message, index);
       }
 
-      @Override
       public Object getRepeatedRaw(Builder builder, int index) {
         return getRepeated(builder, index);
       }
 
-      @Override
       public void setRepeated(Builder builder, int index, Object value) {
         getMutableMapField(builder).getMutableList().set(index, (Message) value);
       }
 
-      @Override
       public void addRepeated(Builder builder, Object value) {
         getMutableMapField(builder).getMutableList().add((Message) value);
       }
 
-      @Override
       public boolean has(GeneratedMessage message) {
         throw new UnsupportedOperationException(
             "hasField() is not supported for repeated fields.");
       }
 
-      @Override
       public boolean has(Builder builder) {
         throw new UnsupportedOperationException(
             "hasField() is not supported for repeated fields.");
       }
 
-      @Override
       public int getRepeatedCount(GeneratedMessage message) {
         return getMapField(message).getList().size();
       }
 
-      @Override
       public int getRepeatedCount(Builder builder) {
         return getMapField(builder).getList().size();
       }
 
-      @Override
       public void clear(Builder builder) {
         getMutableMapField(builder).getMutableList().clear();
       }
 
-      @Override
       public com.google.protobuf.Message.Builder newBuilder() {
         return mapEntryMessageDefaultInstance.newBuilderForType();
       }
 
-      @Override
       public com.google.protobuf.Message.Builder getBuilder(Builder builder) {
         throw new UnsupportedOperationException(
             "Nested builder not supported for map fields.");
       }
 
-      @Override
-      public com.google.protobuf.Message.Builder getRepeatedBuilder(Builder builder, int index) {
+      public com.google.protobuf.Message.Builder getRepeatedBuilder(
+          Builder builder, int index) {
         throw new UnsupportedOperationException(
             "Nested builder not supported for map fields.");
       }
