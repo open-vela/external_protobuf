@@ -107,7 +107,8 @@ static int UpdateChildMessages(RepeatedCompositeContainer* self) {
   for (Py_ssize_t i = child_length; i < message_length; ++i) {
     const Message& sub_message = reflection->GetRepeatedMessage(
         *(self->message), self->parent_field_descriptor, i);
-    CMessage* cmsg = cmessage::NewEmptyMessage(self->child_message_class);
+    CMessage* cmsg = cmessage::NewEmptyMessage(self->subclass_init,
+                                               sub_message.GetDescriptor());
     ScopedPyObjectPtr py_cmsg(reinterpret_cast<PyObject*>(cmsg));
     if (cmsg == NULL) {
       return -1;
@@ -139,7 +140,8 @@ static PyObject* AddToAttached(RepeatedCompositeContainer* self,
   Message* sub_message =
       message->GetReflection()->AddMessage(message,
                                            self->parent_field_descriptor);
-  CMessage* cmsg = cmessage::NewEmptyMessage(self->child_message_class);
+  CMessage* cmsg = cmessage::NewEmptyMessage(self->subclass_init,
+                                             sub_message->GetDescriptor());
   if (cmsg == NULL)
     return NULL;
 
@@ -166,7 +168,7 @@ static PyObject* AddToReleased(RepeatedCompositeContainer* self,
 
   // Create a new Message detached from the rest.
   PyObject* py_cmsg = PyEval_CallObjectWithKeywords(
-      self->child_message_class->AsPyObject(), NULL, kwargs);
+      self->subclass_init, NULL, kwargs);
   if (py_cmsg == NULL)
     return NULL;
 
@@ -504,7 +506,7 @@ int SetOwner(RepeatedCompositeContainer* self,
 PyObject *NewContainer(
     CMessage* parent,
     const FieldDescriptor* parent_field_descriptor,
-    CMessageClass* concrete_class) {
+    PyObject *concrete_class) {
   if (!CheckFieldBelongsToMessage(parent_field_descriptor, parent->message)) {
     return NULL;
   }
@@ -521,7 +523,7 @@ PyObject *NewContainer(
   self->parent_field_descriptor = parent_field_descriptor;
   self->owner = parent->owner;
   Py_INCREF(concrete_class);
-  self->child_message_class = concrete_class;
+  self->subclass_init = concrete_class;
   self->child_messages = PyList_New(0);
 
   return reinterpret_cast<PyObject*>(self);
@@ -529,7 +531,7 @@ PyObject *NewContainer(
 
 static void Dealloc(RepeatedCompositeContainer* self) {
   Py_CLEAR(self->child_messages);
-  Py_CLEAR(self->child_message_class);
+  Py_CLEAR(self->subclass_init);
   // TODO(tibell): Do we need to call delete on these objects to make
   // sure their destructors are called?
   self->owner.reset();

@@ -33,25 +33,17 @@ package com.google.protobuf;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 
-import com.google.protobuf.UnittestImportLite.ImportEnumLite;
-import com.google.protobuf.UnittestImportPublicLite.PublicImportMessageLite;
 import com.google.protobuf.UnittestLite;
 import com.google.protobuf.UnittestLite.ForeignEnumLite;
 import com.google.protobuf.UnittestLite.ForeignMessageLite;
 import com.google.protobuf.UnittestLite.TestAllExtensionsLite;
 import com.google.protobuf.UnittestLite.TestAllTypesLite;
-import com.google.protobuf.UnittestLite.TestAllTypesLite.NestedEnum;
 import com.google.protobuf.UnittestLite.TestAllTypesLite.NestedMessage;
 import com.google.protobuf.UnittestLite.TestAllTypesLite.OneofFieldCase;
 import com.google.protobuf.UnittestLite.TestAllTypesLite.OptionalGroup;
 import com.google.protobuf.UnittestLite.TestAllTypesLite.RepeatedGroup;
 import com.google.protobuf.UnittestLite.TestAllTypesLiteOrBuilder;
 import com.google.protobuf.UnittestLite.TestNestedExtensionLite;
-import protobuf_unittest.lite_equals_and_hash.LiteEqualsAndHash.Bar;
-import protobuf_unittest.lite_equals_and_hash.LiteEqualsAndHash.BarPrime;
-import protobuf_unittest.lite_equals_and_hash.LiteEqualsAndHash.Foo;
-import protobuf_unittest.lite_equals_and_hash.LiteEqualsAndHash.TestOneofEquals;
-import protobuf_unittest.lite_equals_and_hash.LiteEqualsAndHash.TestRecursiveOneof;
 
 import junit.framework.TestCase;
 
@@ -67,7 +59,6 @@ import java.io.ObjectOutputStream;
  * @author kenton@google.com Kenton Varda
  */
 public class LiteTest extends TestCase {
-  @Override
   public void setUp() throws Exception {
     // Test that nested extensions are initialized correctly even if the outer
     // class has not been accessed directly.  This was once a bug with lite
@@ -311,9 +302,11 @@ public class LiteTest extends TestCase {
     assertEquals(
         ForeignMessageLite.getDefaultInstance(),
         message.getOptionalForeignMessage());
-    assertEquals(foreignMessageBuilder.build(), builder.getOptionalForeignMessage());
+    // LITE_RUNTIME doesn't implement equals so we compare on a property and
+    // ensure the property isn't set on foreignMessage.
+    assertEquals(3, builder.getOptionalForeignMessage().getC());
     messageAfterBuild = builder.build();
-    assertEquals(foreignMessageBuilder.build(), messageAfterBuild.getOptionalForeignMessage());
+    assertEquals(3, messageAfterBuild.getOptionalForeignMessage().getC());
     assertEquals(
         ForeignMessageLite.getDefaultInstance(),
         message.getOptionalForeignMessage());
@@ -321,7 +314,7 @@ public class LiteTest extends TestCase {
     assertEquals(
         ForeignMessageLite.getDefaultInstance(),
         builder.getOptionalForeignMessage());
-    assertEquals(foreignMessageBuilder.build(), messageAfterBuild.getOptionalForeignMessage());
+    assertEquals(3, messageAfterBuild.getOptionalForeignMessage().getC());
 
     message = builder.build();
     OptionalGroup optionalGroup = OptionalGroup.newBuilder()
@@ -346,15 +339,17 @@ public class LiteTest extends TestCase {
     builder.setOptionalGroup(optionalGroupBuilder);
     assertEquals(
         OptionalGroup.getDefaultInstance(), message.getOptionalGroup());
-    assertEquals(optionalGroupBuilder.build(), builder.getOptionalGroup());
+    // LITE_RUNTIME doesn't implement equals so we compare on a property and
+    // ensure the property isn't set on optionalGroup.
+    assertEquals(3, builder.getOptionalGroup().getA());
     messageAfterBuild = builder.build();
-    assertEquals(optionalGroupBuilder.build(), messageAfterBuild.getOptionalGroup());
+    assertEquals(3, messageAfterBuild.getOptionalGroup().getA());
     assertEquals(
         OptionalGroup.getDefaultInstance(), message.getOptionalGroup());
     builder.clearOptionalGroup();
     assertEquals(
         OptionalGroup.getDefaultInstance(), builder.getOptionalGroup());
-    assertEquals(optionalGroupBuilder.build(), messageAfterBuild.getOptionalGroup());
+    assertEquals(3, messageAfterBuild.getOptionalGroup().getA());
 
     message = builder.build();
     builder.setOptionalInt32(1);
@@ -405,16 +400,17 @@ public class LiteTest extends TestCase {
     assertEquals(
         NestedMessage.getDefaultInstance(),
         message.getOptionalLazyMessage());
-    assertEquals(nestedMessageBuilder.build(), builder.getOptionalLazyMessage());
+    // LITE_RUNTIME doesn't implement equals so we compare on a property.
+    assertEquals(3, builder.getOptionalLazyMessage().getBb());
     messageAfterBuild = builder.build();
-    assertEquals(nestedMessageBuilder.build(), messageAfterBuild.getOptionalLazyMessage());
+    assertEquals(3, messageAfterBuild.getOptionalLazyMessage().getBb());
     assertEquals(
         NestedMessage.getDefaultInstance(),
         message.getOptionalLazyMessage());
     builder.clearOptionalLazyMessage();
     assertEquals(
         NestedMessage.getDefaultInstance(), builder.getOptionalLazyMessage());
-    assertEquals(nestedMessageBuilder.build(), messageAfterBuild.getOptionalLazyMessage());
+    assertEquals(3, messageAfterBuild.getOptionalLazyMessage().getBb());
 
     message = builder.build();
     builder.setOptionalSfixed32(1);
@@ -1104,7 +1100,8 @@ public class LiteTest extends TestCase {
     assertEquals(0, message.getRepeatedForeignMessageCount());
     builder.setRepeatedForeignMessage(
         0, ForeignMessageLite.getDefaultInstance());
-    assertEquals(foreignMessageBuilder.build(), messageAfterBuild.getRepeatedForeignMessage(0));
+    // LITE_RUNTIME doesn't implement equals so we compare on a property.
+    assertEquals(3, messageAfterBuild.getRepeatedForeignMessage(0).getC());
     assertEquals(
         ForeignMessageLite.getDefaultInstance(),
         builder.getRepeatedForeignMessage(0));
@@ -1117,7 +1114,8 @@ public class LiteTest extends TestCase {
     builder.setRepeatedForeignMessage(0, foreignMessageBuilder);
     assertEquals(
         foreignMessage, messageAfterBuild.getRepeatedForeignMessage(0));
-    assertEquals(foreignMessageBuilder.build(), builder.getRepeatedForeignMessage(0));
+    // LITE_RUNTIME doesn't implement equals so we compare on a property.
+    assertEquals(3, builder.getRepeatedForeignMessage(0).getC());
     builder.clearRepeatedForeignMessage();
 
     message = builder.build();
@@ -1150,7 +1148,9 @@ public class LiteTest extends TestCase {
     messageAfterBuild = builder.build();
     assertEquals(0, message.getRepeatedGroupCount());
     builder.setRepeatedGroup(0, RepeatedGroup.getDefaultInstance());
-    assertEquals(repeatedGroupBuilder.build(), messageAfterBuild.getRepeatedGroup(0));
+    // LITE_RUNTIME doesn't implement equals so we compare on a property and
+    // ensure the property isn't set on repeatedGroup.
+    assertEquals(3, messageAfterBuild.getRepeatedGroup(0).getA());
     assertEquals(
         RepeatedGroup.getDefaultInstance(), builder.getRepeatedGroup(0));
     builder.clearRepeatedGroup();
@@ -1160,7 +1160,9 @@ public class LiteTest extends TestCase {
     messageAfterBuild = builder.build();
     assertEquals(0, message.getRepeatedGroupCount());
     builder.setRepeatedGroup(0, RepeatedGroup.getDefaultInstance());
-    assertEquals(repeatedGroupBuilder.build(), messageAfterBuild.getRepeatedGroup(0));
+    // LITE_RUNTIME doesn't implement equals so we compare on a property and
+    // ensure the property isn't set on repeatedGroup.
+    assertEquals(3, messageAfterBuild.getRepeatedGroup(0).getA());
     assertEquals(
         RepeatedGroup.getDefaultInstance(), builder.getRepeatedGroup(0));
     builder.clearRepeatedGroup();
@@ -1208,7 +1210,9 @@ public class LiteTest extends TestCase {
     messageAfterBuild = builder.build();
     assertEquals(0, message.getRepeatedLazyMessageCount());
     builder.setRepeatedLazyMessage(0, NestedMessage.getDefaultInstance());
-    assertEquals(nestedMessageBuilder.build(), messageAfterBuild.getRepeatedLazyMessage(0));
+    // LITE_RUNTIME doesn't implement equals so we compare on a property and
+    // ensure the property isn't set on repeatedGroup.
+    assertEquals(3, messageAfterBuild.getRepeatedLazyMessage(0).getBb());
     assertEquals(
         NestedMessage.getDefaultInstance(), builder.getRepeatedLazyMessage(0));
     builder.clearRepeatedLazyMessage();
@@ -1218,7 +1222,9 @@ public class LiteTest extends TestCase {
     messageAfterBuild = builder.build();
     assertEquals(0, message.getRepeatedLazyMessageCount());
     builder.setRepeatedLazyMessage(0, NestedMessage.getDefaultInstance());
-    assertEquals(nestedMessageBuilder.build(), messageAfterBuild.getRepeatedLazyMessage(0));
+    // LITE_RUNTIME doesn't implement equals so we compare on a property and
+    // ensure the property isn't set on repeatedGroup.
+    assertEquals(3, messageAfterBuild.getRepeatedLazyMessage(0).getBb());
     assertEquals(
         NestedMessage.getDefaultInstance(), builder.getRepeatedLazyMessage(0));
     builder.clearRepeatedLazyMessage();
@@ -1450,7 +1456,7 @@ public class LiteTest extends TestCase {
         .setOptionalFloat(2.72f)
         .setOptionalDouble(3.14)
         .build();
-    assertToStringEquals("optional_double: 3.14\noptional_float: 2.72", proto);
+    assertToStringEquals("optional_float: 2.72\noptional_double: 3.14", proto);
   }
 
   public void testToStringStringFields() throws Exception {
@@ -1505,7 +1511,7 @@ public class LiteTest extends TestCase {
             .setC(3))
         .build();
     assertToStringEquals(
-        "optional_foreign_enum: FOREIGN_LITE_BAR\noptional_foreign_message {\n  c: 3\n}",
+        "optional_foreign_message {\n  c: 3\n}\noptional_foreign_enum: FOREIGN_LITE_BAR",
         proto);
   }
 
@@ -1539,27 +1545,6 @@ public class LiteTest extends TestCase {
     assertToStringEquals(
         "1: 123\n18: \"\\b\\a\"\n21: 3\n44: \"spam\"\n44: \"eggs\"",
         messageWithUnknownFields);
-  }
-  
-  public void testToStringLazyMessage() throws Exception {
-    TestAllTypesLite message = TestAllTypesLite.newBuilder()
-        .setOptionalLazyMessage(NestedMessage.newBuilder().setBb(1).build())
-        .build();
-    assertToStringEquals("optional_lazy_message {\n  bb: 1\n}", message);
-  }
-  
-  public void testToStringGroup() throws Exception {
-    TestAllTypesLite message = TestAllTypesLite.newBuilder()
-        .setOptionalGroup(OptionalGroup.newBuilder().setA(1).build())
-        .build();
-    assertToStringEquals("optional_group {\n  a: 1\n}", message);
-  }
-  
-  public void testToStringOneof() throws Exception {
-    TestAllTypesLite message = TestAllTypesLite.newBuilder()
-        .setOneofString("hello")
-        .build();
-    assertToStringEquals("oneof_string: \"hello\"", message);
   }
 
   // Asserts that the toString() representation of the message matches the expected. This verifies
@@ -1612,618 +1597,5 @@ public class LiteTest extends TestCase {
 
     assertEquals(11, message.getOneofLazyNestedMessage().getBb());
     assertEquals(22L, message.getOneofLazyNestedMessage().getCc());
-  }
-
-  public void testMergeFromStream_repeatedField() throws Exception {
-    TestAllTypesLite.Builder builder = TestAllTypesLite.newBuilder()
-        .addRepeatedString("hello");
-    builder.mergeFrom(CodedInputStream.newInstance(builder.build().toByteArray()));
-
-    assertEquals(2, builder.getRepeatedStringCount());
-  }
-
-  public void testMergeFromStream_invalidBytes() throws Exception {
-    TestAllTypesLite.Builder builder = TestAllTypesLite.newBuilder()
-        .setDefaultBool(true);
-    try {
-      builder.mergeFrom(CodedInputStream.newInstance("Invalid bytes".getBytes(Internal.UTF_8)));
-      fail();
-    } catch (InvalidProtocolBufferException expected) {}
-  }
-  
-  public void testMergeFrom_sanity() throws Exception {
-    TestAllTypesLite one = TestUtilLite.getAllLiteSetBuilder().build();
-    byte[] bytes = one.toByteArray();
-    TestAllTypesLite two = TestAllTypesLite.parseFrom(bytes);
-    
-    one = one.toBuilder().mergeFrom(one).build();
-    two = two.toBuilder().mergeFrom(bytes).build();
-    assertEquals(one, two);
-    assertEquals(two, one);
-    assertEquals(one.hashCode(), two.hashCode());
-  }
-  
-  public void testEquals_notEqual() throws Exception {
-    TestAllTypesLite one = TestUtilLite.getAllLiteSetBuilder().build();
-    byte[] bytes = one.toByteArray();
-    TestAllTypesLite two = one.toBuilder().mergeFrom(one).mergeFrom(bytes).build();
-    
-    assertFalse(one.equals(two));
-    assertFalse(two.equals(one));
-    
-    assertFalse(one.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(one));
-    
-    TestAllTypesLite oneFieldSet = TestAllTypesLite.newBuilder()
-        .setDefaultBool(true)
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .setDefaultBytes(ByteString.EMPTY)
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .setDefaultCord("")
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .setDefaultCordBytes(ByteString.EMPTY)
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .setDefaultDouble(0)
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .setDefaultFixed32(0)
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .setDefaultFixed64(0)
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .setDefaultFloat(0)
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .setDefaultForeignEnum(ForeignEnumLite.FOREIGN_LITE_BAR)
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .setDefaultImportEnum(ImportEnumLite.IMPORT_LITE_BAR)
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .setDefaultInt32(0)
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .setDefaultInt64(0)
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .setDefaultNestedEnum(NestedEnum.BAR)
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .setDefaultSfixed32(0)
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .setDefaultSfixed64(0)
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .setDefaultSint32(0)
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .setDefaultSint64(0)
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .setDefaultString("")
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .setDefaultStringBytes(ByteString.EMPTY)
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .setDefaultStringPiece("")
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .setDefaultStringPieceBytes(ByteString.EMPTY)
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .setDefaultUint32(0)
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .setDefaultUint64(0)
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .addRepeatedBool(true)
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .addRepeatedBytes(ByteString.EMPTY)
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .addRepeatedCord("")
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .addRepeatedCordBytes(ByteString.EMPTY)
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .addRepeatedDouble(0)
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .addRepeatedFixed32(0)
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .addRepeatedFixed64(0)
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .addRepeatedFloat(0)
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .addRepeatedForeignEnum(ForeignEnumLite.FOREIGN_LITE_BAR)
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .addRepeatedImportEnum(ImportEnumLite.IMPORT_LITE_BAR)
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .addRepeatedInt32(0)
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .addRepeatedInt64(0)
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .addRepeatedNestedEnum(NestedEnum.BAR)
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .addRepeatedSfixed32(0)
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .addRepeatedSfixed64(0)
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .addRepeatedSint32(0)
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .addRepeatedSint64(0)
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .addRepeatedString("")
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .addRepeatedStringBytes(ByteString.EMPTY)
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .addRepeatedStringPiece("")
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .addRepeatedStringPieceBytes(ByteString.EMPTY)
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .addRepeatedUint32(0)
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .addRepeatedUint64(0)
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .setOptionalBool(true)
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .setOptionalBytes(ByteString.EMPTY)
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .setOptionalCord("")
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .setOptionalCordBytes(ByteString.EMPTY)
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .setOptionalDouble(0)
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .setOptionalFixed32(0)
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .setOptionalFixed64(0)
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .setOptionalFloat(0)
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .setOptionalForeignEnum(ForeignEnumLite.FOREIGN_LITE_BAR)
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .setOptionalImportEnum(ImportEnumLite.IMPORT_LITE_BAR)
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .setOptionalInt32(0)
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .setOptionalInt64(0)
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .setOptionalNestedEnum(NestedEnum.BAR)
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .setOptionalSfixed32(0)
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .setOptionalSfixed64(0)
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .setOptionalSint32(0)
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .setOptionalSint64(0)
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .setOptionalString("")
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .setOptionalStringBytes(ByteString.EMPTY)
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .setOptionalStringPiece("")
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .setOptionalStringPieceBytes(ByteString.EMPTY)
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .setOptionalUint32(0)
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .setOptionalUint64(0)
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .setOneofBytes(ByteString.EMPTY)
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .setOneofLazyNestedMessage(NestedMessage.getDefaultInstance())
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .setOneofNestedMessage(NestedMessage.getDefaultInstance())
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .setOneofString("")
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .setOneofStringBytes(ByteString.EMPTY)
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .setOneofUint32(0)
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .setOptionalForeignMessage(ForeignMessageLite.getDefaultInstance())
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .setOptionalGroup(OptionalGroup.getDefaultInstance())
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .setOptionalPublicImportMessage(PublicImportMessageLite.getDefaultInstance())
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .setOptionalLazyMessage(NestedMessage.getDefaultInstance())
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-    oneFieldSet = TestAllTypesLite.newBuilder()
-        .addRepeatedLazyMessage(NestedMessage.getDefaultInstance())
-        .build();
-    assertFalse(oneFieldSet.equals(TestAllTypesLite.getDefaultInstance()));
-    assertFalse(TestAllTypesLite.getDefaultInstance().equals(oneFieldSet));
-  }
-
-  public void testEquals() throws Exception {
-    // Check that two identical objs are equal.
-    Foo foo1a = Foo.newBuilder()
-        .setValue(1)
-        .addBar(Bar.newBuilder().setName("foo1"))
-        .build();
-    Foo foo1b = Foo.newBuilder()
-        .setValue(1)
-        .addBar(Bar.newBuilder().setName("foo1"))
-        .build();
-    Foo foo2 = Foo.newBuilder()
-        .setValue(1)
-        .addBar(Bar.newBuilder().setName("foo2"))
-        .build();
-
-    // Check that equals is doing value rather than object equality.
-    assertEquals(foo1a, foo1b);
-    assertEquals(foo1a.hashCode(), foo1b.hashCode());
-
-    // Check that a diffeent object is not equal.
-    assertFalse(foo1a.equals(foo2));
-
-    // Check that two objects which have different types but the same field values are not
-    // considered to be equal.
-    Bar bar = Bar.newBuilder().setName("bar").build();
-    BarPrime barPrime = BarPrime.newBuilder().setName("bar").build();
-    assertFalse(bar.equals(barPrime));
-  }
-
-  public void testOneofEquals() throws Exception {
-    TestOneofEquals.Builder builder = TestOneofEquals.newBuilder();
-    TestOneofEquals message1 = builder.build();
-    // Set message2's name field to default value. The two messages should be different when we
-    // check with the oneof case.
-    builder.setName("");
-    TestOneofEquals message2 = builder.build();
-    assertFalse(message1.equals(message2));
-  }
-  
-  public void testEquals_sanity() throws Exception {
-    TestAllTypesLite one = TestUtilLite.getAllLiteSetBuilder().build();
-    TestAllTypesLite two = TestAllTypesLite.parseFrom(one.toByteArray());
-    assertEquals(one, two);
-    assertEquals(one.hashCode(), two.hashCode());
-    
-    assertEquals(
-        one.toBuilder().mergeFrom(two).build(),
-        two.toBuilder().mergeFrom(two.toByteArray()).build());
-  }
-
-  public void testEqualsAndHashCodeWithUnknownFields() throws InvalidProtocolBufferException {
-    Foo fooWithOnlyValue = Foo.newBuilder()
-        .setValue(1)
-        .build();
-
-    Foo fooWithValueAndExtension = fooWithOnlyValue.toBuilder()
-        .setValue(1)
-        .setExtension(Bar.fooExt, Bar.newBuilder()
-            .setName("name")
-            .build())
-        .build();
-
-    Foo fooWithValueAndUnknownFields = Foo.parseFrom(fooWithValueAndExtension.toByteArray());
-
-    assertEqualsAndHashCodeAreFalse(fooWithOnlyValue, fooWithValueAndUnknownFields);
-    assertEqualsAndHashCodeAreFalse(fooWithValueAndExtension, fooWithValueAndUnknownFields);
-  }
-  
-  // Test to ensure we avoid a class cast exception with oneofs.
-  public void testEquals_oneOfMessages() {
-    TestAllTypesLite mine = TestAllTypesLite.newBuilder()
-        .setOneofString("Hello")
-        .build();
-    
-    TestAllTypesLite other = TestAllTypesLite.newBuilder()
-        .setOneofNestedMessage(NestedMessage.getDefaultInstance())
-        .build();
-    
-    assertFalse(mine.equals(other));
-    assertFalse(other.equals(mine));
-  }
-
-  private void assertEqualsAndHashCodeAreFalse(Object o1, Object o2) {
-    assertFalse(o1.equals(o2));
-    assertFalse(o1.hashCode() == o2.hashCode());
-  }
-
-  public void testRecursiveHashcode() {
-    // This tests that we don't infinite loop.
-    TestRecursiveOneof.getDefaultInstance().hashCode();
   }
 }

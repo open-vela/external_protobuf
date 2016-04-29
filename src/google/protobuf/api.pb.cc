@@ -265,7 +265,6 @@ Api* Api::New(::google::protobuf::Arena* arena) const {
 }
 
 void Api::Clear() {
-// @@protoc_insertion_point(message_clear_start:google.protobuf.Api)
   name_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   version_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (GetArenaNoVirtual() == NULL && source_context_ != NULL) delete source_context_;
@@ -278,7 +277,7 @@ void Api::Clear() {
 
 bool Api::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
+#define DO_(EXPRESSION) if (!(EXPRESSION)) goto failure
   ::google::protobuf::uint32 tag;
   // @@protoc_insertion_point(parse_start:google.protobuf.Api)
   for (;;) {
@@ -539,7 +538,6 @@ void Api::SerializeWithCachedSizes(
 }
 
 int Api::ByteSize() const {
-// @@protoc_insertion_point(message_byte_size_start:google.protobuf.Api)
   int total_size = 0;
 
   // optional string name = 1;
@@ -600,22 +598,18 @@ int Api::ByteSize() const {
 }
 
 void Api::MergeFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:google.protobuf.Api)
   if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
   const Api* source = 
       ::google::protobuf::internal::DynamicCastToGenerated<const Api>(
           &from);
   if (source == NULL) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:google.protobuf.Api)
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:google.protobuf.Api)
     MergeFrom(*source);
   }
 }
 
 void Api::MergeFrom(const Api& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:google.protobuf.Api)
   if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
   methods_.MergeFrom(from.methods_);
   options_.MergeFrom(from.options_);
@@ -637,14 +631,12 @@ void Api::MergeFrom(const Api& from) {
 }
 
 void Api::CopyFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:google.protobuf.Api)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
 void Api::CopyFrom(const Api& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:google.protobuf.Api)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
@@ -712,7 +704,6 @@ void Api::clear_name() {
   return name_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
  ::std::string* Api::release_name() {
-  // @@protoc_insertion_point(field_release:google.protobuf.Api.name)
   
   return name_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -816,7 +807,6 @@ void Api::clear_version() {
   return version_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
  ::std::string* Api::release_version() {
-  // @@protoc_insertion_point(field_release:google.protobuf.Api.version)
   
   return version_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -851,7 +841,6 @@ const ::google::protobuf::SourceContext& Api::source_context() const {
   return source_context_;
 }
 ::google::protobuf::SourceContext* Api::release_source_context() {
-  // @@protoc_insertion_point(field_release:google.protobuf.Api.source_context)
   
   ::google::protobuf::SourceContext* temp = source_context_;
   source_context_ = NULL;
@@ -995,17 +984,8 @@ Method* Method::New(::google::protobuf::Arena* arena) const {
 }
 
 void Method::Clear() {
-// @@protoc_insertion_point(message_clear_start:google.protobuf.Method)
-#if defined(__clang__)
-#define ZR_HELPER_(f) \
-  _Pragma("clang diagnostic push") \
-  _Pragma("clang diagnostic ignored \"-Winvalid-offsetof\"") \
-  __builtin_offsetof(Method, f) \
-  _Pragma("clang diagnostic pop")
-#else
 #define ZR_HELPER_(f) reinterpret_cast<char*>(\
   &reinterpret_cast<Method*>(16)->f)
-#endif
 
 #define ZR_(first, last) do {\
   ::memset(&first, 0,\
@@ -1025,7 +1005,7 @@ void Method::Clear() {
 
 bool Method::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
+#define DO_(EXPRESSION) if (!(EXPRESSION)) goto failure
   ::google::protobuf::uint32 tag;
   // @@protoc_insertion_point(parse_start:google.protobuf.Method)
   for (;;) {
@@ -1289,7 +1269,6 @@ void Method::SerializeWithCachedSizes(
 }
 
 int Method::ByteSize() const {
-// @@protoc_insertion_point(message_byte_size_start:google.protobuf.Method)
   int total_size = 0;
 
   // optional string name = 1;
@@ -1344,22 +1323,18 @@ int Method::ByteSize() const {
 }
 
 void Method::MergeFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:google.protobuf.Method)
   if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
   const Method* source = 
       ::google::protobuf::internal::DynamicCastToGenerated<const Method>(
           &from);
   if (source == NULL) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:google.protobuf.Method)
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:google.protobuf.Method)
     MergeFrom(*source);
   }
 }
 
 void Method::MergeFrom(const Method& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:google.protobuf.Method)
   if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
   options_.MergeFrom(from.options_);
   if (from.name().size() > 0) {
@@ -1386,14 +1361,12 @@ void Method::MergeFrom(const Method& from) {
 }
 
 void Method::CopyFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:google.protobuf.Method)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
 void Method::CopyFrom(const Method& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:google.protobuf.Method)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
@@ -1461,7 +1434,6 @@ void Method::clear_name() {
   return name_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
  ::std::string* Method::release_name() {
-  // @@protoc_insertion_point(field_release:google.protobuf.Method.name)
   
   return name_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -1505,7 +1477,6 @@ void Method::clear_request_type_url() {
   return request_type_url_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
  ::std::string* Method::release_request_type_url() {
-  // @@protoc_insertion_point(field_release:google.protobuf.Method.request_type_url)
   
   return request_type_url_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -1563,7 +1534,6 @@ void Method::clear_response_type_url() {
   return response_type_url_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
  ::std::string* Method::release_response_type_url() {
-  // @@protoc_insertion_point(field_release:google.protobuf.Method.response_type_url)
   
   return response_type_url_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -1708,14 +1678,13 @@ Mixin* Mixin::New(::google::protobuf::Arena* arena) const {
 }
 
 void Mixin::Clear() {
-// @@protoc_insertion_point(message_clear_start:google.protobuf.Mixin)
   name_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   root_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 
 bool Mixin::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
+#define DO_(EXPRESSION) if (!(EXPRESSION)) goto failure
   ::google::protobuf::uint32 tag;
   // @@protoc_insertion_point(parse_start:google.protobuf.Mixin)
   for (;;) {
@@ -1833,7 +1802,6 @@ void Mixin::SerializeWithCachedSizes(
 }
 
 int Mixin::ByteSize() const {
-// @@protoc_insertion_point(message_byte_size_start:google.protobuf.Mixin)
   int total_size = 0;
 
   // optional string name = 1;
@@ -1857,22 +1825,18 @@ int Mixin::ByteSize() const {
 }
 
 void Mixin::MergeFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:google.protobuf.Mixin)
   if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
   const Mixin* source = 
       ::google::protobuf::internal::DynamicCastToGenerated<const Mixin>(
           &from);
   if (source == NULL) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:google.protobuf.Mixin)
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:google.protobuf.Mixin)
     MergeFrom(*source);
   }
 }
 
 void Mixin::MergeFrom(const Mixin& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:google.protobuf.Mixin)
   if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
   if (from.name().size() > 0) {
 
@@ -1885,14 +1849,12 @@ void Mixin::MergeFrom(const Mixin& from) {
 }
 
 void Mixin::CopyFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:google.protobuf.Mixin)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
 void Mixin::CopyFrom(const Mixin& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:google.protobuf.Mixin)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
@@ -1955,7 +1917,6 @@ void Mixin::clear_name() {
   return name_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
  ::std::string* Mixin::release_name() {
-  // @@protoc_insertion_point(field_release:google.protobuf.Mixin.name)
   
   return name_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -1999,7 +1960,6 @@ void Mixin::clear_root() {
   return root_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
  ::std::string* Mixin::release_root() {
-  // @@protoc_insertion_point(field_release:google.protobuf.Mixin.root)
   
   return root_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }

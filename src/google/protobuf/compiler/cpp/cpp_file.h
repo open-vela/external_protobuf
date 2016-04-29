@@ -65,7 +65,8 @@ class ExtensionGenerator;      // extension.h
 class FileGenerator {
  public:
   // See generator.cc for the meaning of dllexport_decl.
-  FileGenerator(const FileDescriptor* file, const Options& options);
+  explicit FileGenerator(const FileDescriptor* file,
+                         const Options& options);
   ~FileGenerator();
 
   // info_path, if non-empty, should be the path (relative to printer's output)
@@ -143,7 +144,6 @@ class FileGenerator {
   void GenerateProto2NamespaceEnumSpecializations(io::Printer* printer);
 
   const FileDescriptor* file_;
-  const Options options_;
 
   google::protobuf::scoped_array<google::protobuf::scoped_ptr<MessageGenerator> > message_generators_;
   google::protobuf::scoped_array<google::protobuf::scoped_ptr<EnumGenerator> > enum_generators_;
@@ -152,6 +152,7 @@ class FileGenerator {
 
   // E.g. if the package is foo.bar, package_parts_ is {"foo", "bar"}.
   vector<string> package_parts_;
+  const Options options_;
 
   GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(FileGenerator);
 };

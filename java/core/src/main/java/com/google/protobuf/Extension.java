@@ -42,7 +42,6 @@ public abstract class Extension<ContainingType extends MessageLite, Type>
   public abstract Descriptors.FieldDescriptor getDescriptor();
 
   /** Returns whether or not this extension is a Lite Extension. */
-  @Override
   final boolean isLite() {
     return false;
   }
