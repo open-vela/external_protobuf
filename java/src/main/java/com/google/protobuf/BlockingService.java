@@ -28,36 +28,37 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-syntax = "proto3";
-package benchmarks;
-option java_package = "com.google.protobuf.benchmarks";
+package com.google.protobuf;
 
-message BenchmarkDataset {
-  // Name of the benchmark dataset.  This should be unique across all datasets.
-  // Should only contain word characters: [a-zA-Z0-9_]
-  string name = 1;
+/**
+ * Blocking equivalent to {@link Service}.
+ *
+ * @author kenton@google.com Kenton Varda
+ * @author cpovirk@google.com Chris Povirk
+ */
+public interface BlockingService {
+  /**
+   * Equivalent to {@link Service#getDescriptorForType}.
+   */
+  Descriptors.ServiceDescriptor getDescriptorForType();
 
-  // Fully-qualified name of the protobuf message for this dataset.
-  // It will be one of the messages defined benchmark_messages_proto2.proto
-  // or benchmark_messages_proto3.proto.
-  //
-  // Implementations that do not support reflection can implement this with
-  // an explicit "if/else" chain that lists every known message defined
-  // in those files.
-  string message_name = 2;
+  /**
+   * Equivalent to {@link Service#callMethod}, except that
+   * {@code callBlockingMethod()} returns the result of the RPC or throws a
+   * {@link ServiceException} if there is a failure, rather than passing the
+   * information to a callback.
+   */
+  Message callBlockingMethod(Descriptors.MethodDescriptor method,
+                             RpcController controller,
+                             Message request) throws ServiceException;
 
-  // The payload(s) for this dataset.  They should be parsed or serialized
-  // in sequence, in a loop, ie.
-  //
-  //  while (!benchmarkDone) {  // Benchmark runner decides when to exit.
-  //    for (i = 0; i < benchmark.payload.length; i++) {
-  //      parse(benchmark.payload[i])
-  //    }
-  //  }
-  //
-  // This is intended to let datasets include a variety of data to provide
-  // potentially more realistic results than just parsing the same message
-  // over and over.  A single message parsed repeatedly could yield unusually
-  // good branch prediction performance.
-  repeated bytes payload = 3;
+  /**
+   * Equivalent to {@link Service#getRequestPrototype}.
+   */
+  Message getRequestPrototype(Descriptors.MethodDescriptor method);
+
+  /**
+   * Equivalent to {@link Service#getResponsePrototype}.
+   */
+  Message getResponsePrototype(Descriptors.MethodDescriptor method);
 }
