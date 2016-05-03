@@ -723,7 +723,7 @@ public class GeneratedMessageTest extends TestCase {
 
   public void testLiteExtensionMessageOrBuilder() throws Exception {
     TestAllExtensionsLite.Builder builder = TestAllExtensionsLite.newBuilder();
-    TestUtilLite.setAllExtensions(builder);
+    TestUtil.setAllExtensions(builder);
     TestUtil.assertAllExtensionsSet(builder);
 
     TestAllExtensionsLite message = builder.build();
@@ -732,8 +732,8 @@ public class GeneratedMessageTest extends TestCase {
 
   public void testLiteExtensionRepeatedSetters() throws Exception {
     TestAllExtensionsLite.Builder builder = TestAllExtensionsLite.newBuilder();
-    TestUtilLite.setAllExtensions(builder);
-    TestUtilLite.modifyRepeatedExtensions(builder);
+    TestUtil.setAllExtensions(builder);
+    TestUtil.modifyRepeatedExtensions(builder);
     TestUtil.assertRepeatedExtensionsModified(builder);
 
     TestAllExtensionsLite message = builder.build();
@@ -760,7 +760,7 @@ public class GeneratedMessageTest extends TestCase {
   }
 
   public void testLiteExtensionCopy() throws Exception {
-    TestAllExtensionsLite original = TestUtilLite.getAllLiteExtensionsSet();
+    TestAllExtensionsLite original = TestUtil.getAllLiteExtensionsSet();
     TestAllExtensionsLite copy =
         TestAllExtensionsLite.newBuilder(original).build();
     TestUtil.assertAllExtensionsSet(copy);

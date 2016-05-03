@@ -55,7 +55,6 @@ using internal::shared_ptr;
 namespace python {
 
 struct CMessage;
-struct CMessageClass;
 
 // This struct is used directly for ScalarMap, and is the base class of
 // MessageMapContainer, which is used for MessageMap.
@@ -105,8 +104,8 @@ struct MapContainer {
 };
 
 struct MessageMapContainer : public MapContainer {
-  // The type used to create new child messages.
-  CMessageClass* message_class;
+  // A callable that is used to create new child messages.
+  PyObject* subclass_init;
 
   // A dict mapping Message* -> CMessage.
   PyObject* message_dict;
@@ -133,7 +132,7 @@ extern PyObject* NewScalarMapContainer(
 // field descriptor.
 extern PyObject* NewMessageMapContainer(
     CMessage* parent, const FieldDescriptor* parent_field_descriptor,
-    CMessageClass* message_class);
+    PyObject* concrete_class);
 
 }  // namespace python
 }  // namespace protobuf

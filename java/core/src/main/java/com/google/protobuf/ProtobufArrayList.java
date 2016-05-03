@@ -38,7 +38,7 @@ import java.util.List;
 /**
  * Implements {@link ProtobufList} for non-primitive and {@link String} types.
  */
-final class ProtobufArrayList<E> extends AbstractProtobufList<E> {
+class ProtobufArrayList<E> extends AbstractProtobufList<E> {
 
   private static final ProtobufArrayList<Object> EMPTY_LIST = new ProtobufArrayList<Object>();
   static {
@@ -51,23 +51,17 @@ final class ProtobufArrayList<E> extends AbstractProtobufList<E> {
   }
   
   private final List<E> list;
-
+  
   ProtobufArrayList() {
-    this(new ArrayList<E>(DEFAULT_CAPACITY));
+    list = new ArrayList<E>();
   }
   
-  private ProtobufArrayList(List<E> list) {
-    this.list = list;
+  ProtobufArrayList(List<E> toCopy) {
+    list = new ArrayList<E>(toCopy);
   }
-
-  @Override
-  public ProtobufArrayList<E> mutableCopyWithCapacity(int capacity) {
-    if (capacity < size()) {
-      throw new IllegalArgumentException();
-    }
-    List<E> newList = new ArrayList<E>(capacity);
-    newList.addAll(list);
-    return new ProtobufArrayList<E>(newList);
+  
+  ProtobufArrayList(int capacity) {
+    list = new ArrayList<E>(capacity);
   }
   
   @Override

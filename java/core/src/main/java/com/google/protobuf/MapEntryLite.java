@@ -41,8 +41,7 @@ import java.io.IOException;
  * 
  * Protobuf internal. Users shouldn't use.
  */
-public class MapEntryLite<K, V>
-    extends AbstractMessageLite<MapEntryLite<K, V>, MapEntryLite.Builder<K, V>> {
+public class MapEntryLite<K, V> extends AbstractMessageLite {
   private static class Metadata<K, V> {
     public final MapEntryLite<K, V> defaultInstance;
     public final WireFormat.FieldType keyType;
@@ -234,7 +233,7 @@ public class MapEntryLite<K, V>
    * Builder used to create {@link MapEntryLite} messages.
    */
   public static class Builder<K, V>
-      extends AbstractMessageLite.Builder<MapEntryLite<K, V>, Builder<K, V>> {
+      extends AbstractMessageLite.Builder<Builder<K, V>> {
     private final Metadata<K, V> metadata;
     private K key;
     private V value;
@@ -327,11 +326,6 @@ public class MapEntryLite<K, V>
       this.key = entry.key;
       this.value = entry.value;
       return this;
-    }
-
-    @Override
-    protected Builder<K, V> internalMergeFrom(MapEntryLite<K, V> message) {
-      throw new UnsupportedOperationException();
     }
   }
 }

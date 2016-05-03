@@ -264,11 +264,7 @@ class FieldMaskTree {
             }
           }
         } else {
-          if (source.hasField(field) || !options.replacePrimitiveFields()) {
-            destination.setField(field, source.getField(field));
-          } else {
-            destination.clearField(field);
-          }
+          destination.setField(field, source.getField(field));
         }
       }
     }
