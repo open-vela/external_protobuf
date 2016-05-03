@@ -374,10 +374,10 @@ GenerateInitializationCode(io::Printer* printer) const {
 }
 
 void ImmutableMapFieldLiteGenerator::
-GenerateVisitCode(io::Printer* printer) const {
+GenerateMergingCode(io::Printer* printer) const {
   printer->Print(
       variables_,
-      "$name$_ = visitor.visitMap(internalGetMutable$capitalized_name$(),\n"
+      "internalGetMutable$capitalized_name$().mergeFrom(\n"
       "    other.internalGet$capitalized_name$());\n");
 }
 

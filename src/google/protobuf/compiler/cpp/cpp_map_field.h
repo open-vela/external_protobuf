@@ -43,7 +43,8 @@ namespace cpp {
 
 class MapFieldGenerator : public FieldGenerator {
  public:
-  MapFieldGenerator(const FieldDescriptor* descriptor, const Options& options);
+  explicit MapFieldGenerator(const FieldDescriptor* descriptor,
+                             const Options& options);
   ~MapFieldGenerator();
 
   // implements FieldGenerator ---------------------------------------

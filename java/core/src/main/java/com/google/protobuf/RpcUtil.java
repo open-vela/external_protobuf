@@ -71,7 +71,6 @@ public final class RpcUtil {
       final Class<Type> originalClass,
       final Type defaultInstance) {
     return new RpcCallback<Message>() {
-      @Override
       public void run(final Message parameter) {
         Type typedParameter;
         try {
@@ -108,9 +107,8 @@ public final class RpcUtil {
     return new RpcCallback<ParameterType>() {
       private boolean alreadyCalled = false;
 
-      @Override
       public void run(final ParameterType parameter) {
-        synchronized (this) {
+        synchronized(this) {
           if (alreadyCalled) {
             throw new AlreadyCalledException();
           }

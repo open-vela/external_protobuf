@@ -58,7 +58,6 @@ using internal::shared_ptr;
 namespace python {
 
 struct CMessage;
-struct CMessageClass;
 
 // A RepeatedCompositeContainer can be in one of two states: attached
 // or released.
@@ -95,8 +94,8 @@ typedef struct RepeatedCompositeContainer {
   // calling Clear() or ClearField() on the parent.
   Message* message;
 
-  // The type used to create new child messages.
-  CMessageClass* child_message_class;
+  // A callable that is used to create new child messages.
+  PyObject* subclass_init;
 
   // A list of child messages.
   PyObject* child_messages;
@@ -111,7 +110,7 @@ namespace repeated_composite_container {
 PyObject *NewContainer(
     CMessage* parent,
     const FieldDescriptor* parent_field_descriptor,
-    CMessageClass *child_message_class);
+    PyObject *concrete_class);
 
 // Appends a new CMessage to the container and returns it.  The
 // CMessage is initialized using the content of kwargs.

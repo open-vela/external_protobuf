@@ -89,6 +89,7 @@ MessageGenerator::MessageGenerator(const Descriptor* descriptor)
 MessageGenerator::~MessageGenerator() {}
 
 // ===================================================================
+// TODO(api): Move this class to a separate immutable_message.cc file.
 ImmutableMessageGenerator::ImmutableMessageGenerator(
     const Descriptor* descriptor, Context* context)
   : MessageGenerator(descriptor), context_(context),
@@ -1225,8 +1226,7 @@ GenerateParsingConstructor(io::Printer* printer) {
       "default: {\n"
       "  if (!input.skipField(tag)) {\n"
       "    done = true;\n"  // it's an endgroup tag
-      "  }\n");
-    printer->Print(
+      "  }\n"
       "  break;\n"
       "}\n");
   }

@@ -35,11 +35,11 @@
 #ifndef GOOGLE_PROTOBUF_COMPILER_CPP_ENUM_H__
 #define GOOGLE_PROTOBUF_COMPILER_CPP_ENUM_H__
 
-#include <map>
 #include <set>
 #include <string>
 #include <google/protobuf/compiler/cpp/cpp_options.h>
 #include <google/protobuf/descriptor.h>
+
 
 namespace google {
 namespace protobuf {
@@ -55,7 +55,8 @@ namespace cpp {
 class EnumGenerator {
  public:
   // See generator.cc for the meaning of dllexport_decl.
-  EnumGenerator(const EnumDescriptor* descriptor, const Options& options);
+  explicit EnumGenerator(const EnumDescriptor* descriptor,
+                         const Options& options);
   ~EnumGenerator();
 
   // Header stuff.
@@ -95,10 +96,10 @@ class EnumGenerator {
 
  private:
   const EnumDescriptor* descriptor_;
-  const string classname_;
-  const Options& options_;
+  string classname_;
+  Options options_;
   // whether to generate the *_ARRAYSIZE constant.
-  const bool generate_array_size_;
+  bool generate_array_size_;
 
   GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(EnumGenerator);
 };

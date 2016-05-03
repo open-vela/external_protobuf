@@ -200,8 +200,8 @@ static PyObject* GetOrBuildOptions(const DescriptorClass *descriptor) {
   // read-only instance.
   const Message& options(descriptor->options());
   const Descriptor *message_type = options.GetDescriptor();
-  CMessageClass* message_class(
-      cdescriptor_pool::GetMessageClass(pool, message_type));
+  PyObject* message_class(cdescriptor_pool::GetMessageClass(
+      pool, message_type));
   if (message_class == NULL) {
     // The Options message was not found in the current DescriptorPool.
     // In this case, there cannot be extensions to these options, and we can
@@ -215,8 +215,7 @@ static PyObject* GetOrBuildOptions(const DescriptorClass *descriptor) {
                  message_type->full_name().c_str());
     return NULL;
   }
-  ScopedPyObjectPtr value(
-      PyEval_CallObject(message_class->AsPyObject(), NULL));
+  ScopedPyObjectPtr value(PyEval_CallObject(message_class, NULL));
   if (value == NULL) {
     return NULL;
   }
@@ -434,11 +433,11 @@ static PyObject* GetConcreteClass(PyBaseDescriptor* self, void *closure) {
   // which contains this descriptor.
   // This might not be the one you expect! For example the returned object does
   // not know about extensions defined in a custom pool.
-  CMessageClass* concrete_class(cdescriptor_pool::GetMessageClass(
+  PyObject* concrete_class(cdescriptor_pool::GetMessageClass(
       GetDescriptorPool_FromPool(_GetDescriptor(self)->file()->pool()),
       _GetDescriptor(self)));
   Py_XINCREF(concrete_class);
-  return concrete_class->AsPyObject();
+  return concrete_class;
 }
 
 static PyObject* GetFieldsByName(PyBaseDescriptor* self, void *closure) {

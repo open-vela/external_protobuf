@@ -178,19 +178,18 @@ bool DynamicMapField::ContainsMapKey(
   return iter != map.end();
 }
 
-bool DynamicMapField::InsertOrLookupMapValue(
+bool DynamicMapField::InsertMapValue(
     const MapKey& map_key, MapValueRef* val) {
-  // Always use mutable map because users may change the map value by
-  // MapValueRef.
-  Map<MapKey, MapValueRef>* map = MutableMap();
-  Map<MapKey, MapValueRef>::iterator iter = map->find(map_key);
-  if (iter == map->end()) {
-    // Insert
-    MapValueRef& map_val = (*map)[map_key];
+  bool result = false;
+
+  MapValueRef& map_val = (*MutableMap())[map_key];
+  // If map_val.data_ is not set, it is newly inserted by map_[map_key].
+  if (map_val.data_ == NULL) {
+    result = true;
     const FieldDescriptor* val_des =
         default_entry_->GetDescriptor()->FindFieldByName("value");
     map_val.SetType(val_des->cpp_type());
-    // Allocate memory for the inserted MapValueRef, and initialize to
+    // Allocate momery for the inserted MapValueRef, and initialize to
     // default value.
     switch (val_des->cpp_type()) {
 #define HANDLE_TYPE(CPPTYPE, TYPE)                              \
@@ -217,13 +216,9 @@ bool DynamicMapField::InsertOrLookupMapValue(
         break;
       }
     }
-    val->CopyFrom(map_val);
-    return true;
   }
-  // map_key is already in the map. Make sure (*map)[map_key] is not called.
-  // [] may reorder the map and iterators.
-  val->CopyFrom(iter->second);
-  return false;
+  val->CopyFrom(map_val);
+  return result;
 }
 
 bool DynamicMapField::DeleteMapValue(const MapKey& map_key) {

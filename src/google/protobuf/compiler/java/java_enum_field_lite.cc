@@ -262,15 +262,17 @@ GenerateInitializationCode(io::Printer* printer) const {
 }
 
 void ImmutableEnumFieldLiteGenerator::
-GenerateVisitCode(io::Printer* printer) const {
+GenerateMergingCode(io::Printer* printer) const {
   if (SupportFieldPresence(descriptor_->file())) {
     printer->Print(variables_,
-      "$name$_ = visitor.visitInt(has$capitalized_name$(), $name$_,\n"
-      "    other.has$capitalized_name$(), other.$name$_);\n");
+      "if (other.has$capitalized_name$()) {\n"
+      "  set$capitalized_name$(other.get$capitalized_name$());\n"
+      "}\n");
   } else if (SupportUnknownEnumValue(descriptor_->file())) {
     printer->Print(variables_,
-      "$name$_ = visitor.visitInt($name$_ != $default_number$, $name$_,"
-      "    other.$name$_ != $default_number$, other.$name$_);\n");
+      "if (other.$name$_ != $default_number$) {\n"
+      "  set$capitalized_name$Value(other.get$capitalized_name$Value());\n"
+      "}\n");
   } else {
     GOOGLE_LOG(FATAL) << "Can't reach here.";
   }
@@ -464,10 +466,14 @@ GenerateBuilderMembers(io::Printer* printer) const {
 }
 
 void ImmutableEnumOneofFieldLiteGenerator::
-GenerateVisitCode(io::Printer* printer) const {
-  printer->Print(variables_,
-    "$oneof_name$_ = visitor.visitOneofInt(\n"
-    "   $has_oneof_case_message$, $oneof_name$_, other.$oneof_name$_);\n");
+GenerateMergingCode(io::Printer* printer) const {
+  if (SupportUnknownEnumValue(descriptor_->file())) {
+    printer->Print(variables_,
+      "set$capitalized_name$Value(other.get$capitalized_name$Value());\n");
+  } else {
+    printer->Print(variables_,
+      "set$capitalized_name$(other.get$capitalized_name$());\n");
+  }
 }
 
 void ImmutableEnumOneofFieldLiteGenerator::
@@ -639,8 +645,7 @@ GenerateMembers(io::Printer* printer) const {
   printer->Print(variables_,
     "private void ensure$capitalized_name$IsMutable() {\n"
     "  if (!$is_mutable$) {\n"
-    "    $name$_ =\n"
-    "        com.google.protobuf.GeneratedMessageLite.mutableCopy($name$_);\n"
+    "    $name$_ = newIntList($name$_);\n"
     "  }\n"
     "}\n");
   WriteFieldDocComment(printer, descriptor_);
@@ -800,9 +805,21 @@ GenerateInitializationCode(io::Printer* printer) const {
 }
 
 void RepeatedImmutableEnumFieldLiteGenerator::
-GenerateVisitCode(io::Printer* printer) const {
+GenerateMergingCode(io::Printer* printer) const {
+  // The code below does two optimizations:
+  //   1. If the other list is empty, there's nothing to do. This ensures we
+  //      don't allocate a new array if we already have an immutable one.
+  //   2. If the other list is non-empty and our current list is empty, we can
+  //      reuse the other list which is guaranteed to be immutable.
   printer->Print(variables_,
-    "$name$_= visitor.visitIntList($name$_, other.$name$_);\n");
+    "if (!other.$name$_.isEmpty()) {\n"
+    "  if ($name$_.isEmpty()) {\n"
+    "    $name$_ = other.$name$_;\n"
+    "  } else {\n"
+    "    ensure$capitalized_name$IsMutable();\n"
+    "    $name$_.addAll(other.$name$_);\n"
+    "  }\n"
+    "}\n");
 }
 
 void RepeatedImmutableEnumFieldLiteGenerator::
@@ -814,23 +831,27 @@ GenerateDynamicMethodMakeImmutableCode(io::Printer* printer) const {
 void RepeatedImmutableEnumFieldLiteGenerator::
 GenerateParsingCode(io::Printer* printer) const {
   // Read and store the enum
-  printer->Print(variables_,
-    "if (!$is_mutable$) {\n"
-    "  $name$_ =\n"
-    "      com.google.protobuf.GeneratedMessageLite.mutableCopy($name$_);\n"
-    "}\n");
-
   if (SupportUnknownEnumValue(descriptor_->file())) {
     printer->Print(variables_,
-      "$name$_.addInt(input.readEnum());\n");
+      "int rawValue = input.readEnum();\n"
+      "if (!$is_mutable$) {\n"
+      "  $name$_ = newIntList();\n"
+      "}\n"
+      "$name$_.addInt(rawValue);\n");
   } else {
     printer->Print(variables_,
       "int rawValue = input.readEnum();\n"
       "$type$ value = $type$.forNumber(rawValue);\n"
-      "if (value == null) {\n"
-      // We store the unknown value in unknown fields.
-      "  super.mergeVarintField($number$, rawValue);\n"
+        "if (value == null) {\n");
+    if (PreserveUnknownFields(descriptor_->containing_type())) {
+      printer->Print(variables_,
+        "  super.mergeVarintField($number$, rawValue);\n");
+    }
+    printer->Print(variables_,
       "} else {\n"
+      "  if (!$is_mutable$) {\n"
+      "    $name$_ = newIntList();\n"
+      "  }\n"
       "  $name$_.addInt(rawValue);\n"
       "}\n");
   }
@@ -838,11 +859,7 @@ GenerateParsingCode(io::Printer* printer) const {
 
 void RepeatedImmutableEnumFieldLiteGenerator::
 GenerateParsingCodeFromPacked(io::Printer* printer) const {
-  printer->Print(variables_,
-    "if (!$is_mutable$) {\n"
-    "  $name$_ =\n"
-    "      com.google.protobuf.GeneratedMessageLite.mutableCopy($name$_);\n"
-    "}\n");
+  // Wrap GenerateParsingCode's contents with a while loop.
 
   printer->Print(variables_,
     "int length = input.readRawVarint32();\n"
@@ -850,21 +867,7 @@ GenerateParsingCodeFromPacked(io::Printer* printer) const {
     "while(input.getBytesUntilLimit() > 0) {\n");
   printer->Indent();
 
-  // Read and store the enum
-  if (SupportUnknownEnumValue(descriptor_->file())) {
-    printer->Print(variables_,
-      "$name$_.addInt(input.readEnum());\n");
-  } else {
-    printer->Print(variables_,
-      "int rawValue = input.readEnum();\n"
-      "$type$ value = $type$.forNumber(rawValue);\n"
-      "if (value == null) {\n"
-      // We store the unknown value in unknown fields.
-      "  super.mergeVarintField($number$, rawValue);\n"
-      "} else {\n"
-      "  $name$_.addInt(rawValue);\n"
-      "}\n");
-  }
+  GenerateParsingCode(printer);
 
   printer->Outdent();
   printer->Print(variables_,

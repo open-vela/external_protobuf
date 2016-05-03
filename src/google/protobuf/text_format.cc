@@ -1785,12 +1785,14 @@ void TextFormat::Printer::PrintFieldValue(
           ? reflection->GetRepeatedStringReference(
               message, field, index, &scratch)
           : reflection->GetStringReference(message, field, &scratch);
+      int64 size = value.size();
+      if (truncate_string_field_longer_than_ > 0) {
+        size = std::min(truncate_string_field_longer_than_,
+                        static_cast<int64>(value.size()));
+      }
+      string truncated_value(value.substr(0, size) + "...<truncated>...");
       const string* value_to_print = &value;
-      string truncated_value;
-      if (truncate_string_field_longer_than_ > 0 &&
-          truncate_string_field_longer_than_ < value.size()) {
-        truncated_value = value.substr(0, truncate_string_field_longer_than_) +
-                          "...<truncated>...";
+      if (size < value.size()) {
         value_to_print = &truncated_value;
       }
       if (field->type() == FieldDescriptor::TYPE_STRING) {
