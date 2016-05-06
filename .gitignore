@@ -111,7 +111,5 @@ conformance/conformance.pb.h
 conformance/Conformance.pbobjc.h
 conformance/Conformance.pbobjc.m
 conformance/conformance.rb
-conformance/google/
 conformance/javac_middleman
-conformance/lite/
 conformance/protoc_middleman

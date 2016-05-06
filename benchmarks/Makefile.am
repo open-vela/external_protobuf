@@ -40,9 +40,6 @@ CLEANFILES =                                                   \
   protoc_middleman2                                            \
   dataset.*
 
-MAINTAINERCLEANFILES =   \
-  Makefile.in
-
 if USE_EXTERNAL_PROTOC
 
 protoc_middleman: $(benchmarks_protoc_inputs)
