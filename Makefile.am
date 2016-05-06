@@ -9,7 +9,7 @@ AUTOMAKE_OPTIONS = foreign
 SUBDIRS = . src
 
 # Always include gmock in distributions.
-DIST_SUBDIRS = $(subdirs) src conformance benchmarks
+DIST_SUBDIRS = $(subdirs) src conformance
 
 # Build gmock before we build protobuf tests.  We don't add gmock to SUBDIRS
 # because then "make check" would also build and run all of gmock's own tests,
@@ -35,10 +35,6 @@ clean-local:
 	if test -e conformance/Makefile; then \
 	  echo "Making clean in conformance"; \
 	  cd conformance && $(MAKE) $(AM_MAKEFLAGS) clean; \
-	fi; \
-	if test -e benchmarks/Makefile; then \
-	  echo "Making clean in benchmarks"; \
-	  cd benchmarks && $(MAKE) $(AM_MAKEFLAGS) clean; \
 	fi; \
 	if test -e objectivec/DevTools; then \
 	  echo "Cleaning any ObjC pyc files"; \

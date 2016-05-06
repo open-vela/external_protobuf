@@ -36,7 +36,6 @@
 #include <google/protobuf/compiler/cpp/cpp_helpers.h>
 #include <google/protobuf/io/printer.h>
 #include <google/protobuf/stubs/strutil.h>
-#include <google/protobuf/wire_format.h>
 
 namespace google {
 namespace protobuf {
@@ -142,9 +141,8 @@ GenerateMergeFromCodedStream(io::Printer* printer) const {
     } else {
       printer->Print(
         "} else {\n"
-        "  unknown_fields_stream.WriteVarint32($tag$);\n"
-        "  unknown_fields_stream.WriteVarint32(value);\n",
-        "tag", SimpleItoa(internal::WireFormat::MakeTag(descriptor_)));
+        "  unknown_fields_stream.WriteVarint32(tag);\n"
+        "  unknown_fields_stream.WriteVarint32(value);\n");
     }
     printer->Print(variables_,
       "}\n");
