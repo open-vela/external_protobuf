@@ -113,7 +113,7 @@ stored:
 <settings>
   <servers>
     <server>
-      <id>ossrh</id>
+      <id>sonatype-nexus-staging</id>
       <username>[username]</username>
       <password>[password]</password>
     </server>
