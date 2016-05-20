@@ -42,10 +42,6 @@ Simple usage example:
 
 __author__ = 'jieluo@google.com (Jie Luo)'
 
-try:
-    from collections import OrderedDict
-except ImportError:
-    from ordereddict import OrderedDict  #PY26
 import base64
 import json
 import math
@@ -212,8 +208,7 @@ def _AnyMessageToJsonObject(message, including_default):
   """Converts Any message according to Proto3 JSON Specification."""
   if not message.ListFields():
     return {}
-  # Must print @type first, use OrderedDict instead of {}
-  js = OrderedDict()
+  js = {}
   type_url = message.type_url
   js['@type'] = type_url
   sub_message = _CreateMessageFromTypeUrl(type_url)
