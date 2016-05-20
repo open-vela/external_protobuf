@@ -592,17 +592,13 @@ public class RubyMessage extends RubyObject {
     protected IRubyObject getField(ThreadContext context, Descriptors.FieldDescriptor fieldDescriptor) {
         Descriptors.OneofDescriptor oneofDescriptor = fieldDescriptor.getContainingOneof();
         if (oneofDescriptor != null) {
-            if (oneofCases.get(oneofDescriptor) == fieldDescriptor) {
+            if (oneofCases.containsKey(oneofDescriptor)) {
+                if (oneofCases.get(oneofDescriptor) != fieldDescriptor)
+                    return context.runtime.getNil();
                 return fields.get(fieldDescriptor);
             } else {
                 Descriptors.FieldDescriptor oneofCase = builder.getOneofFieldDescriptor(oneofDescriptor);
-                if (oneofCase != fieldDescriptor) {
-                  if (fieldDescriptor.getType() == Descriptors.FieldDescriptor.Type.MESSAGE) {
-                    return context.runtime.getNil();
-                  } else {
-                    return wrapField(context, fieldDescriptor, fieldDescriptor.getDefaultValue());
-                  }
-                }
+                if (oneofCase != fieldDescriptor) return context.runtime.getNil();
                 IRubyObject value = wrapField(context, oneofCase, builder.getField(oneofCase));
                 fields.put(fieldDescriptor, value);
                 return value;
