@@ -51,12 +51,6 @@
   [super dealloc];
 }
 
-// Direct access is use for speed, to avoid even internally declaring things
-// read/write, etc. The warning is enabled in the project to ensure code calling
-// protos can turn on -Wdirect-ivar-access without issues.
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdirect-ivar-access"
-
 - (instancetype)copyWithZone:(NSZone *)zone {
   GPBExtensionRegistry *result = [[[self class] allocWithZone:zone] init];
   if (result && mutableClassMap_.count) {
@@ -110,7 +104,5 @@
     [extensionMap addEntriesFromDictionary:otherExtensionMap];
   }
 }
-
-#pragma clang diagnostic pop
 
 @end
