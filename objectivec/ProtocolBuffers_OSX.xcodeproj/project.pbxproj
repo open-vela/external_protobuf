@@ -836,7 +836,6 @@
 					"-Wreserved-id-macro",
 					"-Wswitch-enum",
 					"-Wdirect-ivar-access",
-					"-Woverriding-method-mismatch",
 				);
 			};
 			name = Debug;
@@ -893,7 +892,6 @@
 					"-Wreserved-id-macro",
 					"-Wswitch-enum",
 					"-Wdirect-ivar-access",
-					"-Woverriding-method-mismatch",
 				);
 			};
 			name = Release;

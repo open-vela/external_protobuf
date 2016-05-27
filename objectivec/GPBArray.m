@@ -164,16 +164,15 @@ static BOOL ArrayDefault_IsValidValue(int32_t value) {
 //%  [super dealloc];
 //%}
 //%
-//%- (BOOL)isEqual:(id)other {
+//%- (BOOL)isEqual:(GPB##NAME##Array *)other {
 //%  if (self == other) {
 //%    return YES;
 //%  }
 //%  if (![other isKindOfClass:[GPB##NAME##Array class]]) {
 //%    return NO;
 //%  }
-//%  GPB##NAME##Array *otherArray = other;
-//%  return (_count == otherArray->_count
-//%          && memcmp(_values, otherArray->_values, (_count * sizeof(TYPE))) == 0);
+//%  return (_count == other->_count
+//%          && memcmp(_values, other->_values, (_count * sizeof(TYPE))) == 0);
 //%}
 //%
 //%- (NSUInteger)hash {
@@ -375,16 +374,15 @@ static BOOL ArrayDefault_IsValidValue(int32_t value) {
   [super dealloc];
 }
 
-- (BOOL)isEqual:(id)other {
+- (BOOL)isEqual:(GPBInt32Array *)other {
   if (self == other) {
     return YES;
   }
   if (![other isKindOfClass:[GPBInt32Array class]]) {
     return NO;
   }
-  GPBInt32Array *otherArray = other;
-  return (_count == otherArray->_count
-          && memcmp(_values, otherArray->_values, (_count * sizeof(int32_t))) == 0);
+  return (_count == other->_count
+          && memcmp(_values, other->_values, (_count * sizeof(int32_t))) == 0);
 }
 
 - (NSUInteger)hash {
@@ -623,16 +621,15 @@ static BOOL ArrayDefault_IsValidValue(int32_t value) {
   [super dealloc];
 }
 
-- (BOOL)isEqual:(id)other {
+- (BOOL)isEqual:(GPBUInt32Array *)other {
   if (self == other) {
     return YES;
   }
   if (![other isKindOfClass:[GPBUInt32Array class]]) {
     return NO;
   }
-  GPBUInt32Array *otherArray = other;
-  return (_count == otherArray->_count
-          && memcmp(_values, otherArray->_values, (_count * sizeof(uint32_t))) == 0);
+  return (_count == other->_count
+          && memcmp(_values, other->_values, (_count * sizeof(uint32_t))) == 0);
 }
 
 - (NSUInteger)hash {
@@ -871,16 +868,15 @@ static BOOL ArrayDefault_IsValidValue(int32_t value) {
   [super dealloc];
 }
 
-- (BOOL)isEqual:(id)other {
+- (BOOL)isEqual:(GPBInt64Array *)other {
   if (self == other) {
     return YES;
   }
   if (![other isKindOfClass:[GPBInt64Array class]]) {
     return NO;
   }
-  GPBInt64Array *otherArray = other;
-  return (_count == otherArray->_count
-          && memcmp(_values, otherArray->_values, (_count * sizeof(int64_t))) == 0);
+  return (_count == other->_count
+          && memcmp(_values, other->_values, (_count * sizeof(int64_t))) == 0);
 }
 
 - (NSUInteger)hash {
@@ -1119,16 +1115,15 @@ static BOOL ArrayDefault_IsValidValue(int32_t value) {
   [super dealloc];
 }
 
-- (BOOL)isEqual:(id)other {
+- (BOOL)isEqual:(GPBUInt64Array *)other {
   if (self == other) {
     return YES;
   }
   if (![other isKindOfClass:[GPBUInt64Array class]]) {
     return NO;
   }
-  GPBUInt64Array *otherArray = other;
-  return (_count == otherArray->_count
-          && memcmp(_values, otherArray->_values, (_count * sizeof(uint64_t))) == 0);
+  return (_count == other->_count
+          && memcmp(_values, other->_values, (_count * sizeof(uint64_t))) == 0);
 }
 
 - (NSUInteger)hash {
@@ -1367,16 +1362,15 @@ static BOOL ArrayDefault_IsValidValue(int32_t value) {
   [super dealloc];
 }
 
-- (BOOL)isEqual:(id)other {
+- (BOOL)isEqual:(GPBFloatArray *)other {
   if (self == other) {
     return YES;
   }
   if (![other isKindOfClass:[GPBFloatArray class]]) {
     return NO;
   }
-  GPBFloatArray *otherArray = other;
-  return (_count == otherArray->_count
-          && memcmp(_values, otherArray->_values, (_count * sizeof(float))) == 0);
+  return (_count == other->_count
+          && memcmp(_values, other->_values, (_count * sizeof(float))) == 0);
 }
 
 - (NSUInteger)hash {
@@ -1615,16 +1609,15 @@ static BOOL ArrayDefault_IsValidValue(int32_t value) {
   [super dealloc];
 }
 
-- (BOOL)isEqual:(id)other {
+- (BOOL)isEqual:(GPBDoubleArray *)other {
   if (self == other) {
     return YES;
   }
   if (![other isKindOfClass:[GPBDoubleArray class]]) {
     return NO;
   }
-  GPBDoubleArray *otherArray = other;
-  return (_count == otherArray->_count
-          && memcmp(_values, otherArray->_values, (_count * sizeof(double))) == 0);
+  return (_count == other->_count
+          && memcmp(_values, other->_values, (_count * sizeof(double))) == 0);
 }
 
 - (NSUInteger)hash {
@@ -1863,16 +1856,15 @@ static BOOL ArrayDefault_IsValidValue(int32_t value) {
   [super dealloc];
 }
 
-- (BOOL)isEqual:(id)other {
+- (BOOL)isEqual:(GPBBoolArray *)other {
   if (self == other) {
     return YES;
   }
   if (![other isKindOfClass:[GPBBoolArray class]]) {
     return NO;
   }
-  GPBBoolArray *otherArray = other;
-  return (_count == otherArray->_count
-          && memcmp(_values, otherArray->_values, (_count * sizeof(BOOL))) == 0);
+  return (_count == other->_count
+          && memcmp(_values, other->_values, (_count * sizeof(BOOL))) == 0);
 }
 
 - (NSUInteger)hash {
@@ -2135,16 +2127,15 @@ static BOOL ArrayDefault_IsValidValue(int32_t value) {
   [super dealloc];
 }
 
-- (BOOL)isEqual:(id)other {
+- (BOOL)isEqual:(GPBEnumArray *)other {
   if (self == other) {
     return YES;
   }
   if (![other isKindOfClass:[GPBEnumArray class]]) {
     return NO;
   }
-  GPBEnumArray *otherArray = other;
-  return (_count == otherArray->_count
-          && memcmp(_values, otherArray->_values, (_count * sizeof(int32_t))) == 0);
+  return (_count == other->_count
+          && memcmp(_values, other->_values, (_count * sizeof(int32_t))) == 0);
 }
 
 - (NSUInteger)hash {

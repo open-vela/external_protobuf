@@ -2563,7 +2563,7 @@ static void MergeRepeatedNotPackedFieldFromCodedInputStream(
 
 #pragma mark - isEqual: & hash Support
 
-- (BOOL)isEqual:(id)other {
+- (BOOL)isEqual:(GPBMessage *)other {
   if (other == self) {
     return YES;
   }
@@ -2572,10 +2572,9 @@ static void MergeRepeatedNotPackedFieldFromCodedInputStream(
     return NO;
   }
 
-  GPBMessage *otherMsg = other;
   GPBDescriptor *descriptor = [[self class] descriptor];
   uint8_t *selfStorage = (uint8_t *)messageStorage_;
-  uint8_t *otherStorage = (uint8_t *)otherMsg->messageStorage_;
+  uint8_t *otherStorage = (uint8_t *)other->messageStorage_;
 
   for (GPBFieldDescriptor *field in descriptor->fields_) {
     if (GPBFieldIsMapOrArray(field)) {
@@ -2669,14 +2668,14 @@ static void MergeRepeatedNotPackedFieldFromCodedInputStream(
   }  // for(fields)
 
   // nil and empty are equal
-  if (extensionMap_.count != 0 || otherMsg->extensionMap_.count != 0) {
-    if (![extensionMap_ isEqual:otherMsg->extensionMap_]) {
+  if (extensionMap_.count != 0 || other->extensionMap_.count != 0) {
+    if (![extensionMap_ isEqual:other->extensionMap_]) {
       return NO;
     }
   }
 
   // nil and empty are equal
-  GPBUnknownFieldSet *otherUnknowns = otherMsg->unknownFields_;
+  GPBUnknownFieldSet *otherUnknowns = other->unknownFields_;
   if ([unknownFields_ countOfFields] != 0 ||
       [otherUnknowns countOfFields] != 0) {
     if (![unknownFields_ isEqual:otherUnknowns]) {

@@ -838,15 +838,14 @@ void GPBDictionaryReadEntry(id mapDictionary,
 //%  return [[GPB##KEY_NAME##VALUE_NAME##Dictionary allocWithZone:zone] initWithDictionary:self];
 //%}
 //%
-//%- (BOOL)isEqual:(id)other {
+//%- (BOOL)isEqual:(GPB##KEY_NAME##VALUE_NAME##Dictionary *)other {
 //%  if (self == other) {
 //%    return YES;
 //%  }
 //%  if (![other isKindOfClass:[GPB##KEY_NAME##VALUE_NAME##Dictionary class]]) {
 //%    return NO;
 //%  }
-//%  GPB##KEY_NAME##VALUE_NAME##Dictionary *otherDictionary = other;
-//%  return [_dictionary isEqual:otherDictionary->_dictionary];
+//%  return [_dictionary isEqual:other->_dictionary];
 //%}
 //%
 //%- (NSUInteger)hash {
@@ -1016,20 +1015,19 @@ void GPBDictionaryReadEntry(id mapDictionary,
 //%  return [[GPBBool##VALUE_NAME##Dictionary allocWithZone:zone] initWithDictionary:self];
 //%}
 //%
-//%- (BOOL)isEqual:(id)other {
+//%- (BOOL)isEqual:(GPBBool##VALUE_NAME##Dictionary *)other {
 //%  if (self == other) {
 //%    return YES;
 //%  }
 //%  if (![other isKindOfClass:[GPBBool##VALUE_NAME##Dictionary class]]) {
 //%    return NO;
 //%  }
-//%  GPBBool##VALUE_NAME##Dictionary *otherDictionary = other;
-//%  if ((BOOL_DICT_W_HAS##HELPER(0, ) != BOOL_DICT_W_HAS##HELPER(0, otherDictionary->)) ||
-//%      (BOOL_DICT_W_HAS##HELPER(1, ) != BOOL_DICT_W_HAS##HELPER(1, otherDictionary->))) {
+//%  if ((BOOL_DICT_W_HAS##HELPER(0, ) != BOOL_DICT_W_HAS##HELPER(0, other->)) ||
+//%      (BOOL_DICT_W_HAS##HELPER(1, ) != BOOL_DICT_W_HAS##HELPER(1, other->))) {
 //%    return NO;
 //%  }
-//%  if ((BOOL_DICT_W_HAS##HELPER(0, ) && (NEQ_##HELPER(_values[0], otherDictionary->_values[0]))) ||
-//%      (BOOL_DICT_W_HAS##HELPER(1, ) && (NEQ_##HELPER(_values[1], otherDictionary->_values[1])))) {
+//%  if ((BOOL_DICT_W_HAS##HELPER(0, ) && (NEQ_##HELPER(_values[0], other->_values[0]))) ||
+//%      (BOOL_DICT_W_HAS##HELPER(1, ) && (NEQ_##HELPER(_values[1], other->_values[1])))) {
 //%    return NO;
 //%  }
 //%  return YES;
@@ -1605,15 +1603,14 @@ void GPBDictionaryReadEntry(id mapDictionary,
   return [[GPBUInt32UInt32Dictionary allocWithZone:zone] initWithDictionary:self];
 }
 
-- (BOOL)isEqual:(id)other {
+- (BOOL)isEqual:(GPBUInt32UInt32Dictionary *)other {
   if (self == other) {
     return YES;
   }
   if (![other isKindOfClass:[GPBUInt32UInt32Dictionary class]]) {
     return NO;
   }
-  GPBUInt32UInt32Dictionary *otherDictionary = other;
-  return [_dictionary isEqual:otherDictionary->_dictionary];
+  return [_dictionary isEqual:other->_dictionary];
 }
 
 - (NSUInteger)hash {
@@ -1812,15 +1809,14 @@ void GPBDictionaryReadEntry(id mapDictionary,
   return [[GPBUInt32Int32Dictionary allocWithZone:zone] initWithDictionary:self];
 }
 
-- (BOOL)isEqual:(id)other {
+- (BOOL)isEqual:(GPBUInt32Int32Dictionary *)other {
   if (self == other) {
     return YES;
   }
   if (![other isKindOfClass:[GPBUInt32Int32Dictionary class]]) {
     return NO;
   }
-  GPBUInt32Int32Dictionary *otherDictionary = other;
-  return [_dictionary isEqual:otherDictionary->_dictionary];
+  return [_dictionary isEqual:other->_dictionary];
 }
 
 - (NSUInteger)hash {
@@ -2019,15 +2015,14 @@ void GPBDictionaryReadEntry(id mapDictionary,
   return [[GPBUInt32UInt64Dictionary allocWithZone:zone] initWithDictionary:self];
 }
 
-- (BOOL)isEqual:(id)other {
+- (BOOL)isEqual:(GPBUInt32UInt64Dictionary *)other {
   if (self == other) {
     return YES;
   }
   if (![other isKindOfClass:[GPBUInt32UInt64Dictionary class]]) {
     return NO;
   }
-  GPBUInt32UInt64Dictionary *otherDictionary = other;
-  return [_dictionary isEqual:otherDictionary->_dictionary];
+  return [_dictionary isEqual:other->_dictionary];
 }
 
 - (NSUInteger)hash {
@@ -2226,15 +2221,14 @@ void GPBDictionaryReadEntry(id mapDictionary,
   return [[GPBUInt32Int64Dictionary allocWithZone:zone] initWithDictionary:self];
 }
 
-- (BOOL)isEqual:(id)other {
+- (BOOL)isEqual:(GPBUInt32Int64Dictionary *)other {
   if (self == other) {
     return YES;
   }
   if (![other isKindOfClass:[GPBUInt32Int64Dictionary class]]) {
     return NO;
   }
-  GPBUInt32Int64Dictionary *otherDictionary = other;
-  return [_dictionary isEqual:otherDictionary->_dictionary];
+  return [_dictionary isEqual:other->_dictionary];
 }
 
 - (NSUInteger)hash {
@@ -2433,15 +2427,14 @@ void GPBDictionaryReadEntry(id mapDictionary,
   return [[GPBUInt32BoolDictionary allocWithZone:zone] initWithDictionary:self];
 }
 
-- (BOOL)isEqual:(id)other {
+- (BOOL)isEqual:(GPBUInt32BoolDictionary *)other {
   if (self == other) {
     return YES;
   }
   if (![other isKindOfClass:[GPBUInt32BoolDictionary class]]) {
     return NO;
   }
-  GPBUInt32BoolDictionary *otherDictionary = other;
-  return [_dictionary isEqual:otherDictionary->_dictionary];
+  return [_dictionary isEqual:other->_dictionary];
 }
 
 - (NSUInteger)hash {
@@ -2640,15 +2633,14 @@ void GPBDictionaryReadEntry(id mapDictionary,
   return [[GPBUInt32FloatDictionary allocWithZone:zone] initWithDictionary:self];
 }
 
-- (BOOL)isEqual:(id)other {
+- (BOOL)isEqual:(GPBUInt32FloatDictionary *)other {
   if (self == other) {
     return YES;
   }
   if (![other isKindOfClass:[GPBUInt32FloatDictionary class]]) {
     return NO;
   }
-  GPBUInt32FloatDictionary *otherDictionary = other;
-  return [_dictionary isEqual:otherDictionary->_dictionary];
+  return [_dictionary isEqual:other->_dictionary];
 }
 
 - (NSUInteger)hash {
@@ -2847,15 +2839,14 @@ void GPBDictionaryReadEntry(id mapDictionary,
   return [[GPBUInt32DoubleDictionary allocWithZone:zone] initWithDictionary:self];
 }
 
-- (BOOL)isEqual:(id)other {
+- (BOOL)isEqual:(GPBUInt32DoubleDictionary *)other {
   if (self == other) {
     return YES;
   }
   if (![other isKindOfClass:[GPBUInt32DoubleDictionary class]]) {
     return NO;
   }
-  GPBUInt32DoubleDictionary *otherDictionary = other;
-  return [_dictionary isEqual:otherDictionary->_dictionary];
+  return [_dictionary isEqual:other->_dictionary];
 }
 
 - (NSUInteger)hash {
@@ -3082,15 +3073,14 @@ void GPBDictionaryReadEntry(id mapDictionary,
   return [[GPBUInt32EnumDictionary allocWithZone:zone] initWithDictionary:self];
 }
 
-- (BOOL)isEqual:(id)other {
+- (BOOL)isEqual:(GPBUInt32EnumDictionary *)other {
   if (self == other) {
     return YES;
   }
   if (![other isKindOfClass:[GPBUInt32EnumDictionary class]]) {
     return NO;
   }
-  GPBUInt32EnumDictionary *otherDictionary = other;
-  return [_dictionary isEqual:otherDictionary->_dictionary];
+  return [_dictionary isEqual:other->_dictionary];
 }
 
 - (NSUInteger)hash {
@@ -3344,15 +3334,14 @@ void GPBDictionaryReadEntry(id mapDictionary,
   return [[GPBUInt32ObjectDictionary allocWithZone:zone] initWithDictionary:self];
 }
 
-- (BOOL)isEqual:(id)other {
+- (BOOL)isEqual:(GPBUInt32ObjectDictionary *)other {
   if (self == other) {
     return YES;
   }
   if (![other isKindOfClass:[GPBUInt32ObjectDictionary class]]) {
     return NO;
   }
-  GPBUInt32ObjectDictionary *otherDictionary = other;
-  return [_dictionary isEqual:otherDictionary->_dictionary];
+  return [_dictionary isEqual:other->_dictionary];
 }
 
 - (NSUInteger)hash {
@@ -3578,15 +3567,14 @@ void GPBDictionaryReadEntry(id mapDictionary,
   return [[GPBInt32UInt32Dictionary allocWithZone:zone] initWithDictionary:self];
 }
 
-- (BOOL)isEqual:(id)other {
+- (BOOL)isEqual:(GPBInt32UInt32Dictionary *)other {
   if (self == other) {
     return YES;
   }
   if (![other isKindOfClass:[GPBInt32UInt32Dictionary class]]) {
     return NO;
   }
-  GPBInt32UInt32Dictionary *otherDictionary = other;
-  return [_dictionary isEqual:otherDictionary->_dictionary];
+  return [_dictionary isEqual:other->_dictionary];
 }
 
 - (NSUInteger)hash {
@@ -3785,15 +3773,14 @@ void GPBDictionaryReadEntry(id mapDictionary,
   return [[GPBInt32Int32Dictionary allocWithZone:zone] initWithDictionary:self];
 }
 
-- (BOOL)isEqual:(id)other {
+- (BOOL)isEqual:(GPBInt32Int32Dictionary *)other {
   if (self == other) {
     return YES;
   }
   if (![other isKindOfClass:[GPBInt32Int32Dictionary class]]) {
     return NO;
   }
-  GPBInt32Int32Dictionary *otherDictionary = other;
-  return [_dictionary isEqual:otherDictionary->_dictionary];
+  return [_dictionary isEqual:other->_dictionary];
 }
 
 - (NSUInteger)hash {
@@ -3992,15 +3979,14 @@ void GPBDictionaryReadEntry(id mapDictionary,
   return [[GPBInt32UInt64Dictionary allocWithZone:zone] initWithDictionary:self];
 }
 
-- (BOOL)isEqual:(id)other {
+- (BOOL)isEqual:(GPBInt32UInt64Dictionary *)other {
   if (self == other) {
     return YES;
   }
   if (![other isKindOfClass:[GPBInt32UInt64Dictionary class]]) {
     return NO;
   }
-  GPBInt32UInt64Dictionary *otherDictionary = other;
-  return [_dictionary isEqual:otherDictionary->_dictionary];
+  return [_dictionary isEqual:other->_dictionary];
 }
 
 - (NSUInteger)hash {
@@ -4199,15 +4185,14 @@ void GPBDictionaryReadEntry(id mapDictionary,
   return [[GPBInt32Int64Dictionary allocWithZone:zone] initWithDictionary:self];
 }
 
-- (BOOL)isEqual:(id)other {
+- (BOOL)isEqual:(GPBInt32Int64Dictionary *)other {
   if (self == other) {
     return YES;
   }
   if (![other isKindOfClass:[GPBInt32Int64Dictionary class]]) {
     return NO;
   }
-  GPBInt32Int64Dictionary *otherDictionary = other;
-  return [_dictionary isEqual:otherDictionary->_dictionary];
+  return [_dictionary isEqual:other->_dictionary];
 }
 
 - (NSUInteger)hash {
@@ -4406,15 +4391,14 @@ void GPBDictionaryReadEntry(id mapDictionary,
   return [[GPBInt32BoolDictionary allocWithZone:zone] initWithDictionary:self];
 }
 
-- (BOOL)isEqual:(id)other {
+- (BOOL)isEqual:(GPBInt32BoolDictionary *)other {
   if (self == other) {
     return YES;
   }
   if (![other isKindOfClass:[GPBInt32BoolDictionary class]]) {
     return NO;
   }
-  GPBInt32BoolDictionary *otherDictionary = other;
-  return [_dictionary isEqual:otherDictionary->_dictionary];
+  return [_dictionary isEqual:other->_dictionary];
 }
 
 - (NSUInteger)hash {
@@ -4613,15 +4597,14 @@ void GPBDictionaryReadEntry(id mapDictionary,
   return [[GPBInt32FloatDictionary allocWithZone:zone] initWithDictionary:self];
 }
 
-- (BOOL)isEqual:(id)other {
+- (BOOL)isEqual:(GPBInt32FloatDictionary *)other {
   if (self == other) {
     return YES;
   }
   if (![other isKindOfClass:[GPBInt32FloatDictionary class]]) {
     return NO;
   }
-  GPBInt32FloatDictionary *otherDictionary = other;
-  return [_dictionary isEqual:otherDictionary->_dictionary];
+  return [_dictionary isEqual:other->_dictionary];
 }
 
 - (NSUInteger)hash {
@@ -4820,15 +4803,14 @@ void GPBDictionaryReadEntry(id mapDictionary,
   return [[GPBInt32DoubleDictionary allocWithZone:zone] initWithDictionary:self];
 }
 
-- (BOOL)isEqual:(id)other {
+- (BOOL)isEqual:(GPBInt32DoubleDictionary *)other {
   if (self == other) {
     return YES;
   }
   if (![other isKindOfClass:[GPBInt32DoubleDictionary class]]) {
     return NO;
   }
-  GPBInt32DoubleDictionary *otherDictionary = other;
-  return [_dictionary isEqual:otherDictionary->_dictionary];
+  return [_dictionary isEqual:other->_dictionary];
 }
 
 - (NSUInteger)hash {
@@ -5055,15 +5037,14 @@ void GPBDictionaryReadEntry(id mapDictionary,
   return [[GPBInt32EnumDictionary allocWithZone:zone] initWithDictionary:self];
 }
 
-- (BOOL)isEqual:(id)other {
+- (BOOL)isEqual:(GPBInt32EnumDictionary *)other {
   if (self == other) {
     return YES;
   }
   if (![other isKindOfClass:[GPBInt32EnumDictionary class]]) {
     return NO;
   }
-  GPBInt32EnumDictionary *otherDictionary = other;
-  return [_dictionary isEqual:otherDictionary->_dictionary];
+  return [_dictionary isEqual:other->_dictionary];
 }
 
 - (NSUInteger)hash {
@@ -5317,15 +5298,14 @@ void GPBDictionaryReadEntry(id mapDictionary,
   return [[GPBInt32ObjectDictionary allocWithZone:zone] initWithDictionary:self];
 }
 
-- (BOOL)isEqual:(id)other {
+- (BOOL)isEqual:(GPBInt32ObjectDictionary *)other {
   if (self == other) {
     return YES;
   }
   if (![other isKindOfClass:[GPBInt32ObjectDictionary class]]) {
     return NO;
   }
-  GPBInt32ObjectDictionary *otherDictionary = other;
-  return [_dictionary isEqual:otherDictionary->_dictionary];
+  return [_dictionary isEqual:other->_dictionary];
 }
 
 - (NSUInteger)hash {
@@ -5551,15 +5531,14 @@ void GPBDictionaryReadEntry(id mapDictionary,
   return [[GPBUInt64UInt32Dictionary allocWithZone:zone] initWithDictionary:self];
 }
 
-- (BOOL)isEqual:(id)other {
+- (BOOL)isEqual:(GPBUInt64UInt32Dictionary *)other {
   if (self == other) {
     return YES;
   }
   if (![other isKindOfClass:[GPBUInt64UInt32Dictionary class]]) {
     return NO;
   }
-  GPBUInt64UInt32Dictionary *otherDictionary = other;
-  return [_dictionary isEqual:otherDictionary->_dictionary];
+  return [_dictionary isEqual:other->_dictionary];
 }
 
 - (NSUInteger)hash {
@@ -5758,15 +5737,14 @@ void GPBDictionaryReadEntry(id mapDictionary,
   return [[GPBUInt64Int32Dictionary allocWithZone:zone] initWithDictionary:self];
 }
 
-- (BOOL)isEqual:(id)other {
+- (BOOL)isEqual:(GPBUInt64Int32Dictionary *)other {
   if (self == other) {
     return YES;
   }
   if (![other isKindOfClass:[GPBUInt64Int32Dictionary class]]) {
     return NO;
   }
-  GPBUInt64Int32Dictionary *otherDictionary = other;
-  return [_dictionary isEqual:otherDictionary->_dictionary];
+  return [_dictionary isEqual:other->_dictionary];
 }
 
 - (NSUInteger)hash {
@@ -5965,15 +5943,14 @@ void GPBDictionaryReadEntry(id mapDictionary,
   return [[GPBUInt64UInt64Dictionary allocWithZone:zone] initWithDictionary:self];
 }
 
-- (BOOL)isEqual:(id)other {
+- (BOOL)isEqual:(GPBUInt64UInt64Dictionary *)other {
   if (self == other) {
     return YES;
   }
   if (![other isKindOfClass:[GPBUInt64UInt64Dictionary class]]) {
     return NO;
   }
-  GPBUInt64UInt64Dictionary *otherDictionary = other;
-  return [_dictionary isEqual:otherDictionary->_dictionary];
+  return [_dictionary isEqual:other->_dictionary];
 }
 
 - (NSUInteger)hash {
@@ -6172,15 +6149,14 @@ void GPBDictionaryReadEntry(id mapDictionary,
   return [[GPBUInt64Int64Dictionary allocWithZone:zone] initWithDictionary:self];
 }
 
-- (BOOL)isEqual:(id)other {
+- (BOOL)isEqual:(GPBUInt64Int64Dictionary *)other {
   if (self == other) {
     return YES;
   }
   if (![other isKindOfClass:[GPBUInt64Int64Dictionary class]]) {
     return NO;
   }
-  GPBUInt64Int64Dictionary *otherDictionary = other;
-  return [_dictionary isEqual:otherDictionary->_dictionary];
+  return [_dictionary isEqual:other->_dictionary];
 }
 
 - (NSUInteger)hash {
@@ -6379,15 +6355,14 @@ void GPBDictionaryReadEntry(id mapDictionary,
   return [[GPBUInt64BoolDictionary allocWithZone:zone] initWithDictionary:self];
 }
 
-- (BOOL)isEqual:(id)other {
+- (BOOL)isEqual:(GPBUInt64BoolDictionary *)other {
   if (self == other) {
     return YES;
   }
   if (![other isKindOfClass:[GPBUInt64BoolDictionary class]]) {
     return NO;
   }
-  GPBUInt64BoolDictionary *otherDictionary = other;
-  return [_dictionary isEqual:otherDictionary->_dictionary];
+  return [_dictionary isEqual:other->_dictionary];
 }
 
 - (NSUInteger)hash {
@@ -6586,15 +6561,14 @@ void GPBDictionaryReadEntry(id mapDictionary,
   return [[GPBUInt64FloatDictionary allocWithZone:zone] initWithDictionary:self];
 }
 
-- (BOOL)isEqual:(id)other {
+- (BOOL)isEqual:(GPBUInt64FloatDictionary *)other {
   if (self == other) {
     return YES;
   }
   if (![other isKindOfClass:[GPBUInt64FloatDictionary class]]) {
     return NO;
   }
-  GPBUInt64FloatDictionary *otherDictionary = other;
-  return [_dictionary isEqual:otherDictionary->_dictionary];
+  return [_dictionary isEqual:other->_dictionary];
 }
 
 - (NSUInteger)hash {
@@ -6793,15 +6767,14 @@ void GPBDictionaryReadEntry(id mapDictionary,
   return [[GPBUInt64DoubleDictionary allocWithZone:zone] initWithDictionary:self];
 }
 
-- (BOOL)isEqual:(id)other {
+- (BOOL)isEqual:(GPBUInt64DoubleDictionary *)other {
   if (self == other) {
     return YES;
   }
   if (![other isKindOfClass:[GPBUInt64DoubleDictionary class]]) {
     return NO;
   }
-  GPBUInt64DoubleDictionary *otherDictionary = other;
-  return [_dictionary isEqual:otherDictionary->_dictionary];
+  return [_dictionary isEqual:other->_dictionary];
 }
 
 - (NSUInteger)hash {
@@ -7028,15 +7001,14 @@ void GPBDictionaryReadEntry(id mapDictionary,
   return [[GPBUInt64EnumDictionary allocWithZone:zone] initWithDictionary:self];
 }
 
-- (BOOL)isEqual:(id)other {
+- (BOOL)isEqual:(GPBUInt64EnumDictionary *)other {
   if (self == other) {
     return YES;
   }
   if (![other isKindOfClass:[GPBUInt64EnumDictionary class]]) {
     return NO;
   }
-  GPBUInt64EnumDictionary *otherDictionary = other;
-  return [_dictionary isEqual:otherDictionary->_dictionary];
+  return [_dictionary isEqual:other->_dictionary];
 }
 
 - (NSUInteger)hash {
@@ -7290,15 +7262,14 @@ void GPBDictionaryReadEntry(id mapDictionary,
   return [[GPBUInt64ObjectDictionary allocWithZone:zone] initWithDictionary:self];
 }
 
-- (BOOL)isEqual:(id)other {
+- (BOOL)isEqual:(GPBUInt64ObjectDictionary *)other {
   if (self == other) {
     return YES;
   }
   if (![other isKindOfClass:[GPBUInt64ObjectDictionary class]]) {
     return NO;
   }
-  GPBUInt64ObjectDictionary *otherDictionary = other;
-  return [_dictionary isEqual:otherDictionary->_dictionary];
+  return [_dictionary isEqual:other->_dictionary];
 }
 
 - (NSUInteger)hash {
@@ -7524,15 +7495,14 @@ void GPBDictionaryReadEntry(id mapDictionary,
   return [[GPBInt64UInt32Dictionary allocWithZone:zone] initWithDictionary:self];
 }
 
-- (BOOL)isEqual:(id)other {
+- (BOOL)isEqual:(GPBInt64UInt32Dictionary *)other {
   if (self == other) {
     return YES;
   }
   if (![other isKindOfClass:[GPBInt64UInt32Dictionary class]]) {
     return NO;
   }
-  GPBInt64UInt32Dictionary *otherDictionary = other;
-  return [_dictionary isEqual:otherDictionary->_dictionary];
+  return [_dictionary isEqual:other->_dictionary];
 }
 
 - (NSUInteger)hash {
@@ -7731,15 +7701,14 @@ void GPBDictionaryReadEntry(id mapDictionary,
   return [[GPBInt64Int32Dictionary allocWithZone:zone] initWithDictionary:self];
 }
 
-- (BOOL)isEqual:(id)other {
+- (BOOL)isEqual:(GPBInt64Int32Dictionary *)other {
   if (self == other) {
     return YES;
   }
   if (![other isKindOfClass:[GPBInt64Int32Dictionary class]]) {
     return NO;
   }
-  GPBInt64Int32Dictionary *otherDictionary = other;
-  return [_dictionary isEqual:otherDictionary->_dictionary];
+  return [_dictionary isEqual:other->_dictionary];
 }
 
 - (NSUInteger)hash {
@@ -7938,15 +7907,14 @@ void GPBDictionaryReadEntry(id mapDictionary,
   return [[GPBInt64UInt64Dictionary allocWithZone:zone] initWithDictionary:self];
 }
 
-- (BOOL)isEqual:(id)other {
+- (BOOL)isEqual:(GPBInt64UInt64Dictionary *)other {
   if (self == other) {
     return YES;
   }
   if (![other isKindOfClass:[GPBInt64UInt64Dictionary class]]) {
     return NO;
   }
-  GPBInt64UInt64Dictionary *otherDictionary = other;
-  return [_dictionary isEqual:otherDictionary->_dictionary];
+  return [_dictionary isEqual:other->_dictionary];
 }
 
 - (NSUInteger)hash {
@@ -8145,15 +8113,14 @@ void GPBDictionaryReadEntry(id mapDictionary,
   return [[GPBInt64Int64Dictionary allocWithZone:zone] initWithDictionary:self];
 }
 
-- (BOOL)isEqual:(id)other {
+- (BOOL)isEqual:(GPBInt64Int64Dictionary *)other {
   if (self == other) {
     return YES;
   }
   if (![other isKindOfClass:[GPBInt64Int64Dictionary class]]) {
     return NO;
   }
-  GPBInt64Int64Dictionary *otherDictionary = other;
-  return [_dictionary isEqual:otherDictionary->_dictionary];
+  return [_dictionary isEqual:other->_dictionary];
 }
 
 - (NSUInteger)hash {
@@ -8352,15 +8319,14 @@ void GPBDictionaryReadEntry(id mapDictionary,
   return [[GPBInt64BoolDictionary allocWithZone:zone] initWithDictionary:self];
 }
 
-- (BOOL)isEqual:(id)other {
+- (BOOL)isEqual:(GPBInt64BoolDictionary *)other {
   if (self == other) {
     return YES;
   }
   if (![other isKindOfClass:[GPBInt64BoolDictionary class]]) {
     return NO;
   }
-  GPBInt64BoolDictionary *otherDictionary = other;
-  return [_dictionary isEqual:otherDictionary->_dictionary];
+  return [_dictionary isEqual:other->_dictionary];
 }
 
 - (NSUInteger)hash {
@@ -8559,15 +8525,14 @@ void GPBDictionaryReadEntry(id mapDictionary,
   return [[GPBInt64FloatDictionary allocWithZone:zone] initWithDictionary:self];
 }
 
-- (BOOL)isEqual:(id)other {
+- (BOOL)isEqual:(GPBInt64FloatDictionary *)other {
   if (self == other) {
     return YES;
   }
   if (![other isKindOfClass:[GPBInt64FloatDictionary class]]) {
     return NO;
   }
-  GPBInt64FloatDictionary *otherDictionary = other;
-  return [_dictionary isEqual:otherDictionary->_dictionary];
+  return [_dictionary isEqual:other->_dictionary];
 }
 
 - (NSUInteger)hash {
@@ -8766,15 +8731,14 @@ void GPBDictionaryReadEntry(id mapDictionary,
   return [[GPBInt64DoubleDictionary allocWithZone:zone] initWithDictionary:self];
 }
 
-- (BOOL)isEqual:(id)other {
+- (BOOL)isEqual:(GPBInt64DoubleDictionary *)other {
   if (self == other) {
     return YES;
   }
   if (![other isKindOfClass:[GPBInt64DoubleDictionary class]]) {
     return NO;
   }
-  GPBInt64DoubleDictionary *otherDictionary = other;
-  return [_dictionary isEqual:otherDictionary->_dictionary];
+  return [_dictionary isEqual:other->_dictionary];
 }
 
 - (NSUInteger)hash {
@@ -9001,15 +8965,14 @@ void GPBDictionaryReadEntry(id mapDictionary,
   return [[GPBInt64EnumDictionary allocWithZone:zone] initWithDictionary:self];
 }
 
-- (BOOL)isEqual:(id)other {
+- (BOOL)isEqual:(GPBInt64EnumDictionary *)other {
   if (self == other) {
     return YES;
   }
   if (![other isKindOfClass:[GPBInt64EnumDictionary class]]) {
     return NO;
   }
-  GPBInt64EnumDictionary *otherDictionary = other;
-  return [_dictionary isEqual:otherDictionary->_dictionary];
+  return [_dictionary isEqual:other->_dictionary];
 }
 
 - (NSUInteger)hash {
@@ -9263,15 +9226,14 @@ void GPBDictionaryReadEntry(id mapDictionary,
   return [[GPBInt64ObjectDictionary allocWithZone:zone] initWithDictionary:self];
 }
 
-- (BOOL)isEqual:(id)other {
+- (BOOL)isEqual:(GPBInt64ObjectDictionary *)other {
   if (self == other) {
     return YES;
   }
   if (![other isKindOfClass:[GPBInt64ObjectDictionary class]]) {
     return NO;
   }
-  GPBInt64ObjectDictionary *otherDictionary = other;
-  return [_dictionary isEqual:otherDictionary->_dictionary];
+  return [_dictionary isEqual:other->_dictionary];
 }
 
 - (NSUInteger)hash {
@@ -9501,15 +9463,14 @@ void GPBDictionaryReadEntry(id mapDictionary,
   return [[GPBStringUInt32Dictionary allocWithZone:zone] initWithDictionary:self];
 }
 
-- (BOOL)isEqual:(id)other {
+- (BOOL)isEqual:(GPBStringUInt32Dictionary *)other {
   if (self == other) {
     return YES;
   }
   if (![other isKindOfClass:[GPBStringUInt32Dictionary class]]) {
     return NO;
   }
-  GPBStringUInt32Dictionary *otherDictionary = other;
-  return [_dictionary isEqual:otherDictionary->_dictionary];
+  return [_dictionary isEqual:other->_dictionary];
 }
 
 - (NSUInteger)hash {
@@ -9716,15 +9677,14 @@ void GPBDictionaryReadEntry(id mapDictionary,
   return [[GPBStringInt32Dictionary allocWithZone:zone] initWithDictionary:self];
 }
 
-- (BOOL)isEqual:(id)other {
+- (BOOL)isEqual:(GPBStringInt32Dictionary *)other {
   if (self == other) {
     return YES;
   }
   if (![other isKindOfClass:[GPBStringInt32Dictionary class]]) {
     return NO;
   }
-  GPBStringInt32Dictionary *otherDictionary = other;
-  return [_dictionary isEqual:otherDictionary->_dictionary];
+  return [_dictionary isEqual:other->_dictionary];
 }
 
 - (NSUInteger)hash {
@@ -9931,15 +9891,14 @@ void GPBDictionaryReadEntry(id mapDictionary,
   return [[GPBStringUInt64Dictionary allocWithZone:zone] initWithDictionary:self];
 }
 
-- (BOOL)isEqual:(id)other {
+- (BOOL)isEqual:(GPBStringUInt64Dictionary *)other {
   if (self == other) {
     return YES;
   }
   if (![other isKindOfClass:[GPBStringUInt64Dictionary class]]) {
     return NO;
   }
-  GPBStringUInt64Dictionary *otherDictionary = other;
-  return [_dictionary isEqual:otherDictionary->_dictionary];
+  return [_dictionary isEqual:other->_dictionary];
 }
 
 - (NSUInteger)hash {
@@ -10146,15 +10105,14 @@ void GPBDictionaryReadEntry(id mapDictionary,
   return [[GPBStringInt64Dictionary allocWithZone:zone] initWithDictionary:self];
 }
 
-- (BOOL)isEqual:(id)other {
+- (BOOL)isEqual:(GPBStringInt64Dictionary *)other {
   if (self == other) {
     return YES;
   }
   if (![other isKindOfClass:[GPBStringInt64Dictionary class]]) {
     return NO;
   }
-  GPBStringInt64Dictionary *otherDictionary = other;
-  return [_dictionary isEqual:otherDictionary->_dictionary];
+  return [_dictionary isEqual:other->_dictionary];
 }
 
 - (NSUInteger)hash {
@@ -10361,15 +10319,14 @@ void GPBDictionaryReadEntry(id mapDictionary,
   return [[GPBStringBoolDictionary allocWithZone:zone] initWithDictionary:self];
 }
 
-- (BOOL)isEqual:(id)other {
+- (BOOL)isEqual:(GPBStringBoolDictionary *)other {
   if (self == other) {
     return YES;
   }
   if (![other isKindOfClass:[GPBStringBoolDictionary class]]) {
     return NO;
   }
-  GPBStringBoolDictionary *otherDictionary = other;
-  return [_dictionary isEqual:otherDictionary->_dictionary];
+  return [_dictionary isEqual:other->_dictionary];
 }
 
 - (NSUInteger)hash {
@@ -10576,15 +10533,14 @@ void GPBDictionaryReadEntry(id mapDictionary,
   return [[GPBStringFloatDictionary allocWithZone:zone] initWithDictionary:self];
 }
 
-- (BOOL)isEqual:(id)other {
+- (BOOL)isEqual:(GPBStringFloatDictionary *)other {
   if (self == other) {
     return YES;
   }
   if (![other isKindOfClass:[GPBStringFloatDictionary class]]) {
     return NO;
   }
-  GPBStringFloatDictionary *otherDictionary = other;
-  return [_dictionary isEqual:otherDictionary->_dictionary];
+  return [_dictionary isEqual:other->_dictionary];
 }
 
 - (NSUInteger)hash {
@@ -10791,15 +10747,14 @@ void GPBDictionaryReadEntry(id mapDictionary,
   return [[GPBStringDoubleDictionary allocWithZone:zone] initWithDictionary:self];
 }
 
-- (BOOL)isEqual:(id)other {
+- (BOOL)isEqual:(GPBStringDoubleDictionary *)other {
   if (self == other) {
     return YES;
   }
   if (![other isKindOfClass:[GPBStringDoubleDictionary class]]) {
     return NO;
   }
-  GPBStringDoubleDictionary *otherDictionary = other;
-  return [_dictionary isEqual:otherDictionary->_dictionary];
+  return [_dictionary isEqual:other->_dictionary];
 }
 
 - (NSUInteger)hash {
@@ -11034,15 +10989,14 @@ void GPBDictionaryReadEntry(id mapDictionary,
   return [[GPBStringEnumDictionary allocWithZone:zone] initWithDictionary:self];
 }
 
-- (BOOL)isEqual:(id)other {
+- (BOOL)isEqual:(GPBStringEnumDictionary *)other {
   if (self == other) {
     return YES;
   }
   if (![other isKindOfClass:[GPBStringEnumDictionary class]]) {
     return NO;
   }
-  GPBStringEnumDictionary *otherDictionary = other;
-  return [_dictionary isEqual:otherDictionary->_dictionary];
+  return [_dictionary isEqual:other->_dictionary];
 }
 
 - (NSUInteger)hash {
@@ -11312,20 +11266,19 @@ void GPBDictionaryReadEntry(id mapDictionary,
   return [[GPBBoolUInt32Dictionary allocWithZone:zone] initWithDictionary:self];
 }
 
-- (BOOL)isEqual:(id)other {
+- (BOOL)isEqual:(GPBBoolUInt32Dictionary *)other {
   if (self == other) {
     return YES;
   }
   if (![other isKindOfClass:[GPBBoolUInt32Dictionary class]]) {
     return NO;
   }
-  GPBBoolUInt32Dictionary *otherDictionary = other;
-  if ((_valueSet[0] != otherDictionary->_valueSet[0]) ||
-      (_valueSet[1] != otherDictionary->_valueSet[1])) {
+  if ((_valueSet[0] != other->_valueSet[0]) ||
+      (_valueSet[1] != other->_valueSet[1])) {
     return NO;
   }
-  if ((_valueSet[0] && (_values[0] != otherDictionary->_values[0])) ||
-      (_valueSet[1] && (_values[1] != otherDictionary->_values[1]))) {
+  if ((_valueSet[0] && (_values[0] != other->_values[0])) ||
+      (_valueSet[1] && (_values[1] != other->_values[1]))) {
     return NO;
   }
   return YES;
@@ -11554,20 +11507,19 @@ void GPBDictionaryReadEntry(id mapDictionary,
   return [[GPBBoolInt32Dictionary allocWithZone:zone] initWithDictionary:self];
 }
 
-- (BOOL)isEqual:(id)other {
+- (BOOL)isEqual:(GPBBoolInt32Dictionary *)other {
   if (self == other) {
     return YES;
   }
   if (![other isKindOfClass:[GPBBoolInt32Dictionary class]]) {
     return NO;
   }
-  GPBBoolInt32Dictionary *otherDictionary = other;
-  if ((_valueSet[0] != otherDictionary->_valueSet[0]) ||
-      (_valueSet[1] != otherDictionary->_valueSet[1])) {
+  if ((_valueSet[0] != other->_valueSet[0]) ||
+      (_valueSet[1] != other->_valueSet[1])) {
     return NO;
   }
-  if ((_valueSet[0] && (_values[0] != otherDictionary->_values[0])) ||
-      (_valueSet[1] && (_values[1] != otherDictionary->_values[1]))) {
+  if ((_valueSet[0] && (_values[0] != other->_values[0])) ||
+      (_valueSet[1] && (_values[1] != other->_values[1]))) {
     return NO;
   }
   return YES;
@@ -11796,20 +11748,19 @@ void GPBDictionaryReadEntry(id mapDictionary,
   return [[GPBBoolUInt64Dictionary allocWithZone:zone] initWithDictionary:self];
 }
 
-- (BOOL)isEqual:(id)other {
+- (BOOL)isEqual:(GPBBoolUInt64Dictionary *)other {
   if (self == other) {
     return YES;
   }
   if (![other isKindOfClass:[GPBBoolUInt64Dictionary class]]) {
     return NO;
   }
-  GPBBoolUInt64Dictionary *otherDictionary = other;
-  if ((_valueSet[0] != otherDictionary->_valueSet[0]) ||
-      (_valueSet[1] != otherDictionary->_valueSet[1])) {
+  if ((_valueSet[0] != other->_valueSet[0]) ||
+      (_valueSet[1] != other->_valueSet[1])) {
     return NO;
   }
-  if ((_valueSet[0] && (_values[0] != otherDictionary->_values[0])) ||
-      (_valueSet[1] && (_values[1] != otherDictionary->_values[1]))) {
+  if ((_valueSet[0] && (_values[0] != other->_values[0])) ||
+      (_valueSet[1] && (_values[1] != other->_values[1]))) {
     return NO;
   }
   return YES;
@@ -12038,20 +11989,19 @@ void GPBDictionaryReadEntry(id mapDictionary,
   return [[GPBBoolInt64Dictionary allocWithZone:zone] initWithDictionary:self];
 }
 
-- (BOOL)isEqual:(id)other {
+- (BOOL)isEqual:(GPBBoolInt64Dictionary *)other {
   if (self == other) {
     return YES;
   }
   if (![other isKindOfClass:[GPBBoolInt64Dictionary class]]) {
     return NO;
   }
-  GPBBoolInt64Dictionary *otherDictionary = other;
-  if ((_valueSet[0] != otherDictionary->_valueSet[0]) ||
-      (_valueSet[1] != otherDictionary->_valueSet[1])) {
+  if ((_valueSet[0] != other->_valueSet[0]) ||
+      (_valueSet[1] != other->_valueSet[1])) {
     return NO;
   }
-  if ((_valueSet[0] && (_values[0] != otherDictionary->_values[0])) ||
-      (_valueSet[1] && (_values[1] != otherDictionary->_values[1]))) {
+  if ((_valueSet[0] && (_values[0] != other->_values[0])) ||
+      (_valueSet[1] && (_values[1] != other->_values[1]))) {
     return NO;
   }
   return YES;
@@ -12280,20 +12230,19 @@ void GPBDictionaryReadEntry(id mapDictionary,
   return [[GPBBoolBoolDictionary allocWithZone:zone] initWithDictionary:self];
 }
 
-- (BOOL)isEqual:(id)other {
+- (BOOL)isEqual:(GPBBoolBoolDictionary *)other {
   if (self == other) {
     return YES;
   }
   if (![other isKindOfClass:[GPBBoolBoolDictionary class]]) {
     return NO;
   }
-  GPBBoolBoolDictionary *otherDictionary = other;
-  if ((_valueSet[0] != otherDictionary->_valueSet[0]) ||
-      (_valueSet[1] != otherDictionary->_valueSet[1])) {
+  if ((_valueSet[0] != other->_valueSet[0]) ||
+      (_valueSet[1] != other->_valueSet[1])) {
     return NO;
   }
-  if ((_valueSet[0] && (_values[0] != otherDictionary->_values[0])) ||
-      (_valueSet[1] && (_values[1] != otherDictionary->_values[1]))) {
+  if ((_valueSet[0] && (_values[0] != other->_values[0])) ||
+      (_valueSet[1] && (_values[1] != other->_values[1]))) {
     return NO;
   }
   return YES;
@@ -12522,20 +12471,19 @@ void GPBDictionaryReadEntry(id mapDictionary,
   return [[GPBBoolFloatDictionary allocWithZone:zone] initWithDictionary:self];
 }
 
-- (BOOL)isEqual:(id)other {
+- (BOOL)isEqual:(GPBBoolFloatDictionary *)other {
   if (self == other) {
     return YES;
   }
   if (![other isKindOfClass:[GPBBoolFloatDictionary class]]) {
     return NO;
   }
-  GPBBoolFloatDictionary *otherDictionary = other;
-  if ((_valueSet[0] != otherDictionary->_valueSet[0]) ||
-      (_valueSet[1] != otherDictionary->_valueSet[1])) {
+  if ((_valueSet[0] != other->_valueSet[0]) ||
+      (_valueSet[1] != other->_valueSet[1])) {
     return NO;
   }
-  if ((_valueSet[0] && (_values[0] != otherDictionary->_values[0])) ||
-      (_valueSet[1] && (_values[1] != otherDictionary->_values[1]))) {
+  if ((_valueSet[0] && (_values[0] != other->_values[0])) ||
+      (_valueSet[1] && (_values[1] != other->_values[1]))) {
     return NO;
   }
   return YES;
@@ -12764,20 +12712,19 @@ void GPBDictionaryReadEntry(id mapDictionary,
   return [[GPBBoolDoubleDictionary allocWithZone:zone] initWithDictionary:self];
 }
 
-- (BOOL)isEqual:(id)other {
+- (BOOL)isEqual:(GPBBoolDoubleDictionary *)other {
   if (self == other) {
     return YES;
   }
   if (![other isKindOfClass:[GPBBoolDoubleDictionary class]]) {
     return NO;
   }
-  GPBBoolDoubleDictionary *otherDictionary = other;
-  if ((_valueSet[0] != otherDictionary->_valueSet[0]) ||
-      (_valueSet[1] != otherDictionary->_valueSet[1])) {
+  if ((_valueSet[0] != other->_valueSet[0]) ||
+      (_valueSet[1] != other->_valueSet[1])) {
     return NO;
   }
-  if ((_valueSet[0] && (_values[0] != otherDictionary->_values[0])) ||
-      (_valueSet[1] && (_values[1] != otherDictionary->_values[1]))) {
+  if ((_valueSet[0] && (_values[0] != other->_values[0])) ||
+      (_valueSet[1] && (_values[1] != other->_values[1]))) {
     return NO;
   }
   return YES;
@@ -13005,20 +12952,19 @@ void GPBDictionaryReadEntry(id mapDictionary,
   return [[GPBBoolObjectDictionary allocWithZone:zone] initWithDictionary:self];
 }
 
-- (BOOL)isEqual:(id)other {
+- (BOOL)isEqual:(GPBBoolObjectDictionary *)other {
   if (self == other) {
     return YES;
   }
   if (![other isKindOfClass:[GPBBoolObjectDictionary class]]) {
     return NO;
   }
-  GPBBoolObjectDictionary *otherDictionary = other;
-  if (((_values[0] != nil) != (otherDictionary->_values[0] != nil)) ||
-      ((_values[1] != nil) != (otherDictionary->_values[1] != nil))) {
+  if (((_values[0] != nil) != (other->_values[0] != nil)) ||
+      ((_values[1] != nil) != (other->_values[1] != nil))) {
     return NO;
   }
-  if (((_values[0] != nil) && (![_values[0] isEqual:otherDictionary->_values[0]])) ||
-      ((_values[1] != nil) && (![_values[1] isEqual:otherDictionary->_values[1]]))) {
+  if (((_values[0] != nil) && (![_values[0] isEqual:other->_values[0]])) ||
+      ((_values[1] != nil) && (![_values[1] isEqual:other->_values[1]]))) {
     return NO;
   }
   return YES;
@@ -13296,20 +13242,19 @@ void GPBDictionaryReadEntry(id mapDictionary,
   return [[GPBBoolEnumDictionary allocWithZone:zone] initWithDictionary:self];
 }
 
-- (BOOL)isEqual:(id)other {
+- (BOOL)isEqual:(GPBBoolEnumDictionary *)other {
   if (self == other) {
     return YES;
   }
   if (![other isKindOfClass:[GPBBoolEnumDictionary class]]) {
     return NO;
   }
-  GPBBoolEnumDictionary *otherDictionary = other;
-  if ((_valueSet[0] != otherDictionary->_valueSet[0]) ||
-      (_valueSet[1] != otherDictionary->_valueSet[1])) {
+  if ((_valueSet[0] != other->_valueSet[0]) ||
+      (_valueSet[1] != other->_valueSet[1])) {
     return NO;
   }
-  if ((_valueSet[0] && (_values[0] != otherDictionary->_values[0])) ||
-      (_valueSet[1] && (_values[1] != otherDictionary->_values[1]))) {
+  if ((_valueSet[0] && (_values[0] != other->_values[0])) ||
+      (_valueSet[1] && (_values[1] != other->_values[1]))) {
     return NO;
   }
   return YES;

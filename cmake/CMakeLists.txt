@@ -1,5 +1,5 @@
 # Minimum CMake required
-cmake_minimum_required(VERSION 2.8.12)
+cmake_minimum_required(VERSION 2.8)
 
 # Project
 project(protobuf C CXX)
