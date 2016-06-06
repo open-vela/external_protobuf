@@ -4,7 +4,6 @@ endif()
 
 option(protobuf_ABSOLUTE_TEST_PLUGIN_PATH
   "Using absolute test_plugin path in tests" ON)
-mark_as_advanced(protobuf_ABSOLUTE_TEST_PLUGIN_PATH)
 
 include_directories(
   ${protobuf_source_dir}/gmock
