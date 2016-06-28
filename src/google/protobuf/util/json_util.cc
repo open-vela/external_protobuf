@@ -74,7 +74,7 @@ util::Status BinaryToJsonStream(TypeResolver* resolver,
                                   const string& type_url,
                                   io::ZeroCopyInputStream* binary_input,
                                   io::ZeroCopyOutputStream* json_output,
-                                  const JsonPrintOptions& options) {
+                                  const JsonOptions& options) {
   io::CodedInputStream in_stream(binary_input);
   google::protobuf::Type type;
   RETURN_IF_ERROR(resolver->ResolveMessageType(type_url, &type));
@@ -95,7 +95,7 @@ util::Status BinaryToJsonString(TypeResolver* resolver,
                                   const string& type_url,
                                   const string& binary_input,
                                   string* json_output,
-                                  const JsonPrintOptions& options) {
+                                  const JsonOptions& options) {
   io::ArrayInputStream input_stream(binary_input.data(), binary_input.size());
   io::StringOutputStream output_stream(json_output);
   return BinaryToJsonStream(resolver, type_url, &input_stream, &output_stream,
@@ -141,17 +141,13 @@ class StatusErrorListener : public converter::ErrorListener {
 util::Status JsonToBinaryStream(TypeResolver* resolver,
                                   const string& type_url,
                                   io::ZeroCopyInputStream* json_input,
-                                  io::ZeroCopyOutputStream* binary_output,
-                                  const JsonParseOptions& options) {
+                                  io::ZeroCopyOutputStream* binary_output) {
   google::protobuf::Type type;
   RETURN_IF_ERROR(resolver->ResolveMessageType(type_url, &type));
   internal::ZeroCopyStreamByteSink sink(binary_output);
   StatusErrorListener listener;
-  converter::ProtoStreamObjectWriter::Options proto_writer_options;
-  proto_writer_options.ignore_unknown_fields = options.ignore_unknown_fields;
   converter::ProtoStreamObjectWriter proto_writer(resolver, type, &sink,
-                                                  &listener,
-                                                  proto_writer_options);
+                                                  &listener);
 
   converter::JsonStreamParser parser(&proto_writer);
   const void* buffer;
@@ -169,12 +165,10 @@ util::Status JsonToBinaryStream(TypeResolver* resolver,
 util::Status JsonToBinaryString(TypeResolver* resolver,
                                   const string& type_url,
                                   const string& json_input,
-                                  string* binary_output,
-                                  const JsonParseOptions& options) {
+                                  string* binary_output) {
   io::ArrayInputStream input_stream(json_input.data(), json_input.size());
   io::StringOutputStream output_stream(binary_output);
-  return JsonToBinaryStream(
-      resolver, type_url, &input_stream, &output_stream, options);
+  return JsonToBinaryStream(resolver, type_url, &input_stream, &output_stream);
 }
 
 }  // namespace util

@@ -83,12 +83,7 @@ class LIBPROTOBUF_EXPORT ProtoStreamObjectWriter : public ProtoWriter {
     // preserve integer precision.
     bool struct_integers_as_strings;
 
-    // Not treat unknown fields as an error. If there is an unknown fields,
-    // just ignore it and continue to process the rest.
-    bool ignore_unknown_fields;
-
-    Options()
-        : struct_integers_as_strings(false), ignore_unknown_fields(false) {}
+    Options() : struct_integers_as_strings(false) {}
 
     // Default instance of Options with all options set to defaults.
     static const Options& Defaults() {

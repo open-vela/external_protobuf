@@ -63,9 +63,7 @@ ProtoStreamObjectWriter::ProtoStreamObjectWriter(
     : ProtoWriter(type_resolver, type, output, listener),
       master_type_(type),
       current_(NULL),
-      options_(options) {
-  set_ignore_unknown_fields(options_.ignore_unknown_fields);
-}
+      options_(options) {}
 
 ProtoStreamObjectWriter::ProtoStreamObjectWriter(
     const TypeInfo* typeinfo, const google::protobuf::Type& type,

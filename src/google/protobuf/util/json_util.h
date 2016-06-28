@@ -44,14 +44,7 @@ class ZeroCopyOutputStream;
 }  // namespace io
 namespace util {
 
-struct JsonParseOptions {
-  // Whether to ignore unknown JSON fields during parsing
-  bool ignore_unknown_fields;
-
-  JsonParseOptions() : ignore_unknown_fields(false) {}
-};
-
-struct JsonPrintOptions {
+struct JsonOptions {
   // Whether to add spaces, line breaks and indentation to make the JSON output
   // easy to read.
   bool add_whitespace;
@@ -61,13 +54,10 @@ struct JsonPrintOptions {
   // behavior and print primitive fields regardless of their values.
   bool always_print_primitive_fields;
 
-  JsonPrintOptions() : add_whitespace(false),
-                       always_print_primitive_fields(false) {
+  JsonOptions() : add_whitespace(false),
+                  always_print_primitive_fields(false) {
   }
 };
-
-// DEPRECATED. Use JsonPrintOptions instead.
-typedef JsonPrintOptions JsonOptions;
 
 // Converts protobuf binary data to JSON.
 // The conversion will fail if:
@@ -80,14 +70,14 @@ util::Status BinaryToJsonStream(
     const string& type_url,
     io::ZeroCopyInputStream* binary_input,
     io::ZeroCopyOutputStream* json_output,
-    const JsonPrintOptions& options);
+    const JsonOptions& options);
 
 inline util::Status BinaryToJsonStream(
     TypeResolver* resolver, const string& type_url,
     io::ZeroCopyInputStream* binary_input,
     io::ZeroCopyOutputStream* json_output) {
   return BinaryToJsonStream(resolver, type_url, binary_input, json_output,
-                            JsonPrintOptions());
+                            JsonOptions());
 }
 
 LIBPROTOBUF_EXPORT util::Status BinaryToJsonString(
@@ -95,14 +85,14 @@ LIBPROTOBUF_EXPORT util::Status BinaryToJsonString(
     const string& type_url,
     const string& binary_input,
     string* json_output,
-    const JsonPrintOptions& options);
+    const JsonOptions& options);
 
 inline util::Status BinaryToJsonString(TypeResolver* resolver,
                                          const string& type_url,
                                          const string& binary_input,
                                          string* json_output) {
   return BinaryToJsonString(resolver, type_url, binary_input, json_output,
-                            JsonPrintOptions());
+                            JsonOptions());
 }
 
 // Converts JSON data to protobuf binary format.
@@ -110,37 +100,18 @@ inline util::Status BinaryToJsonString(TypeResolver* resolver,
 //   1. TypeResolver fails to resolve a type.
 //   2. input is not valid JSON format, or conflicts with the type
 //      information returned by TypeResolver.
+//   3. input has unknown fields.
 util::Status JsonToBinaryStream(
     TypeResolver* resolver,
     const string& type_url,
     io::ZeroCopyInputStream* json_input,
-    io::ZeroCopyOutputStream* binary_output,
-    const JsonParseOptions& options);
-
-inline util::Status JsonToBinaryStream(
-    TypeResolver* resolver,
-    const string& type_url,
-    io::ZeroCopyInputStream* json_input,
-    io::ZeroCopyOutputStream* binary_output) {
-  return JsonToBinaryStream(resolver, type_url, json_input, binary_output,
-                            JsonParseOptions());
-}
+    io::ZeroCopyOutputStream* binary_output);
 
 LIBPROTOBUF_EXPORT util::Status JsonToBinaryString(
     TypeResolver* resolver,
     const string& type_url,
     const string& json_input,
-    string* binary_output,
-    const JsonParseOptions& options);
-
-inline util::Status JsonToBinaryString(
-    TypeResolver* resolver,
-    const string& type_url,
-    const string& json_input,
-    string* binary_output) {
-  return JsonToBinaryString(resolver, type_url, json_input, binary_output,
-                            JsonParseOptions());
-}
+    string* binary_output);
 
 namespace internal {
 // Internal helper class. Put in the header so we can write unit-tests for it.
