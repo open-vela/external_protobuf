@@ -71,7 +71,6 @@ ProtoWriter::ProtoWriter(TypeResolver* type_resolver,
       adapter_(&buffer_),
       stream_(new CodedOutputStream(&adapter_)),
       listener_(listener),
-      ignore_unknown_fields_(false),
       invalid_depth_(0),
       tracker_(new ObjectLocationTracker()) {}
 
@@ -89,7 +88,6 @@ ProtoWriter::ProtoWriter(const TypeInfo* typeinfo,
       adapter_(&buffer_),
       stream_(new CodedOutputStream(&adapter_)),
       listener_(listener),
-      ignore_unknown_fields_(false),
       invalid_depth_(0),
       tracker_(new ObjectLocationTracker()) {}
 
@@ -694,9 +692,7 @@ const google::protobuf::Field* ProtoWriter::Lookup(
   }
   const google::protobuf::Field* field =
       typeinfo_->FindField(&e->type(), unnormalized_name);
-  if (field == NULL && !ignore_unknown_fields_) {
-    InvalidName(unnormalized_name, "Cannot find field.");
-  }
+  if (field == NULL) InvalidName(unnormalized_name, "Cannot find field.");
   return field;
 }
 

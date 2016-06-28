@@ -67,7 +67,7 @@ class JsonUtilTest : public testing::Test {
         kTypeUrlPrefix, DescriptorPool::generated_pool()));
   }
 
-  string ToJson(const Message& message, const JsonPrintOptions& options) {
+  string ToJson(const Message& message, const JsonOptions& options) {
     string result;
     GOOGLE_CHECK_OK(BinaryToJsonString(resolver_.get(),
                                 GetTypeUrl(message.GetDescriptor()),
@@ -75,12 +75,10 @@ class JsonUtilTest : public testing::Test {
     return result;
   }
 
-  bool FromJson(const string& json, Message* message,
-                const JsonParseOptions& options) {
+  bool FromJson(const string& json, Message* message) {
     string binary;
     if (!JsonToBinaryString(resolver_.get(),
-                            GetTypeUrl(message->GetDescriptor()), json, &binary,
-                            options)
+                            GetTypeUrl(message->GetDescriptor()), json, &binary)
              .ok()) {
       return false;
     }
@@ -94,7 +92,7 @@ TEST_F(JsonUtilTest, TestWhitespaces) {
   TestMessage m;
   m.mutable_message_value();
 
-  JsonPrintOptions options;
+  JsonOptions options;
   EXPECT_EQ("{\"messageValue\":{}}", ToJson(m, options));
   options.add_whitespace = true;
   EXPECT_EQ(
@@ -106,7 +104,7 @@ TEST_F(JsonUtilTest, TestWhitespaces) {
 
 TEST_F(JsonUtilTest, TestDefaultValues) {
   TestMessage m;
-  JsonPrintOptions options;
+  JsonOptions options;
   EXPECT_EQ("{}", ToJson(m, options));
   options.always_print_primitive_fields = true;
   EXPECT_EQ(
@@ -149,9 +147,8 @@ TEST_F(JsonUtilTest, ParseMessage) {
       "    {\"value\": 40}, {\"value\": 96}\n"
       "  ]\n"
       "}\n";
-  JsonParseOptions options;
   TestMessage m;
-  ASSERT_TRUE(FromJson(input, &m, options));
+  ASSERT_TRUE(FromJson(input, &m));
   EXPECT_EQ(1024, m.int32_value());
   ASSERT_EQ(2, m.repeated_int32_value_size());
   EXPECT_EQ(1, m.repeated_int32_value(0));
@@ -165,28 +162,20 @@ TEST_F(JsonUtilTest, ParseMessage) {
 TEST_F(JsonUtilTest, ParseMap) {
   TestMap message;
   (*message.mutable_string_map())["hello"] = 1234;
-  JsonPrintOptions print_options;
-  JsonParseOptions parse_options;
-  EXPECT_EQ("{\"stringMap\":{\"hello\":1234}}", ToJson(message, print_options));
+  JsonOptions options;
+  EXPECT_EQ("{\"stringMap\":{\"hello\":1234}}", ToJson(message, options));
   TestMap other;
-  ASSERT_TRUE(FromJson(ToJson(message, print_options), &other, parse_options));
+  ASSERT_TRUE(FromJson(ToJson(message, options), &other));
   EXPECT_EQ(message.DebugString(), other.DebugString());
-}
-
-TEST_F(JsonUtilTest, TestParseIgnoreUnknownFields) {
-  TestMessage m;
-  JsonParseOptions options;
-  options.ignore_unknown_fields = true;
-  EXPECT_TRUE(FromJson("{\"unknownName\":0}", &m, options));
 }
 
 TEST_F(JsonUtilTest, TestParseErrors) {
   TestMessage m;
-  JsonParseOptions options;
+  JsonOptions options;
   // Parsing should fail if the field name can not be recognized.
-  EXPECT_FALSE(FromJson("{\"unknownName\":0}", &m, options));
+  EXPECT_FALSE(FromJson("{\"unknownName\":0}", &m));
   // Parsing should fail if the value is invalid.
-  EXPECT_FALSE(FromJson("{\"int32Value\":2147483648}", &m, options));
+  EXPECT_FALSE(FromJson("{\"int32Value\":2147483648}", &m));
 }
 
 typedef pair<char*, int> Segment;
