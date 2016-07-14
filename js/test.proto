@@ -233,4 +233,3 @@ message TestEndsWithBytes {
   optional int32 value = 1;
   optional bytes data = 2;
 }
-

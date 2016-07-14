@@ -29,7 +29,6 @@ const ::google::protobuf::internal::GeneratedMessageReflection*
 }  // namespace
 
 
-void protobuf_AssignDesc_google_2fprotobuf_2fempty_2eproto() GOOGLE_ATTRIBUTE_COLD;
 void protobuf_AssignDesc_google_2fprotobuf_2fempty_2eproto() {
   protobuf_AddDesc_google_2fprotobuf_2fempty_2eproto();
   const ::google::protobuf::FileDescriptor* file =
@@ -60,7 +59,6 @@ inline void protobuf_AssignDescriptorsOnce() {
                  &protobuf_AssignDesc_google_2fprotobuf_2fempty_2eproto);
 }
 
-void protobuf_RegisterTypes(const ::std::string&) GOOGLE_ATTRIBUTE_COLD;
 void protobuf_RegisterTypes(const ::std::string&) {
   protobuf_AssignDescriptorsOnce();
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
@@ -74,7 +72,6 @@ void protobuf_ShutdownFile_google_2fprotobuf_2fempty_2eproto() {
   delete Empty_reflection_;
 }
 
-void protobuf_AddDesc_google_2fprotobuf_2fempty_2eproto() GOOGLE_ATTRIBUTE_COLD;
 void protobuf_AddDesc_google_2fprotobuf_2fempty_2eproto() {
   static bool already_here = false;
   if (already_here) return;
@@ -100,6 +97,16 @@ struct StaticDescriptorInitializer_google_2fprotobuf_2fempty_2eproto {
     protobuf_AddDesc_google_2fprotobuf_2fempty_2eproto();
   }
 } static_descriptor_initializer_google_2fprotobuf_2fempty_2eproto_;
+
+namespace {
+
+static void MergeFromFail(int line) GOOGLE_ATTRIBUTE_COLD;
+static void MergeFromFail(int line) {
+  GOOGLE_CHECK(false) << __FILE__ << ":" << line;
+}
+
+}  // namespace
+
 
 // ===================================================================
 
@@ -233,9 +240,7 @@ int Empty::ByteSize() const {
 
 void Empty::MergeFrom(const ::google::protobuf::Message& from) {
 // @@protoc_insertion_point(generalized_merge_from_start:google.protobuf.Empty)
-  if (GOOGLE_PREDICT_FALSE(&from == this)) {
-    ::google::protobuf::internal::MergeFromFail(__FILE__, __LINE__);
-  }
+  if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
   const Empty* source = 
       ::google::protobuf::internal::DynamicCastToGenerated<const Empty>(
           &from);
@@ -250,9 +255,7 @@ void Empty::MergeFrom(const ::google::protobuf::Message& from) {
 
 void Empty::MergeFrom(const Empty& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:google.protobuf.Empty)
-  if (GOOGLE_PREDICT_FALSE(&from == this)) {
-    ::google::protobuf::internal::MergeFromFail(__FILE__, __LINE__);
-  }
+  if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
 }
 
 void Empty::CopyFrom(const ::google::protobuf::Message& from) {

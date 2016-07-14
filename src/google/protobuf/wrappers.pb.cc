@@ -53,7 +53,6 @@ const ::google::protobuf::internal::GeneratedMessageReflection*
 }  // namespace
 
 
-void protobuf_AssignDesc_google_2fprotobuf_2fwrappers_2eproto() GOOGLE_ATTRIBUTE_COLD;
 void protobuf_AssignDesc_google_2fprotobuf_2fwrappers_2eproto() {
   protobuf_AddDesc_google_2fprotobuf_2fwrappers_2eproto();
   const ::google::protobuf::FileDescriptor* file =
@@ -205,7 +204,6 @@ inline void protobuf_AssignDescriptorsOnce() {
                  &protobuf_AssignDesc_google_2fprotobuf_2fwrappers_2eproto);
 }
 
-void protobuf_RegisterTypes(const ::std::string&) GOOGLE_ATTRIBUTE_COLD;
 void protobuf_RegisterTypes(const ::std::string&) {
   protobuf_AssignDescriptorsOnce();
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
@@ -251,7 +249,6 @@ void protobuf_ShutdownFile_google_2fprotobuf_2fwrappers_2eproto() {
   delete BytesValue_reflection_;
 }
 
-void protobuf_AddDesc_google_2fprotobuf_2fwrappers_2eproto() GOOGLE_ATTRIBUTE_COLD;
 void protobuf_AddDesc_google_2fprotobuf_2fwrappers_2eproto() {
   static bool already_here = false;
   if (already_here) return;
@@ -300,6 +297,16 @@ struct StaticDescriptorInitializer_google_2fprotobuf_2fwrappers_2eproto {
     protobuf_AddDesc_google_2fprotobuf_2fwrappers_2eproto();
   }
 } static_descriptor_initializer_google_2fprotobuf_2fwrappers_2eproto_;
+
+namespace {
+
+static void MergeFromFail(int line) GOOGLE_ATTRIBUTE_COLD;
+static void MergeFromFail(int line) {
+  GOOGLE_CHECK(false) << __FILE__ << ":" << line;
+}
+
+}  // namespace
+
 
 // ===================================================================
 
@@ -470,9 +477,7 @@ int DoubleValue::ByteSize() const {
 
 void DoubleValue::MergeFrom(const ::google::protobuf::Message& from) {
 // @@protoc_insertion_point(generalized_merge_from_start:google.protobuf.DoubleValue)
-  if (GOOGLE_PREDICT_FALSE(&from == this)) {
-    ::google::protobuf::internal::MergeFromFail(__FILE__, __LINE__);
-  }
+  if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
   const DoubleValue* source = 
       ::google::protobuf::internal::DynamicCastToGenerated<const DoubleValue>(
           &from);
@@ -487,9 +492,7 @@ void DoubleValue::MergeFrom(const ::google::protobuf::Message& from) {
 
 void DoubleValue::MergeFrom(const DoubleValue& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:google.protobuf.DoubleValue)
-  if (GOOGLE_PREDICT_FALSE(&from == this)) {
-    ::google::protobuf::internal::MergeFromFail(__FILE__, __LINE__);
-  }
+  if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
   if (from.value() != 0) {
     set_value(from.value());
   }
@@ -732,9 +735,7 @@ int FloatValue::ByteSize() const {
 
 void FloatValue::MergeFrom(const ::google::protobuf::Message& from) {
 // @@protoc_insertion_point(generalized_merge_from_start:google.protobuf.FloatValue)
-  if (GOOGLE_PREDICT_FALSE(&from == this)) {
-    ::google::protobuf::internal::MergeFromFail(__FILE__, __LINE__);
-  }
+  if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
   const FloatValue* source = 
       ::google::protobuf::internal::DynamicCastToGenerated<const FloatValue>(
           &from);
@@ -749,9 +750,7 @@ void FloatValue::MergeFrom(const ::google::protobuf::Message& from) {
 
 void FloatValue::MergeFrom(const FloatValue& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:google.protobuf.FloatValue)
-  if (GOOGLE_PREDICT_FALSE(&from == this)) {
-    ::google::protobuf::internal::MergeFromFail(__FILE__, __LINE__);
-  }
+  if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
   if (from.value() != 0) {
     set_value(from.value());
   }
@@ -996,9 +995,7 @@ int Int64Value::ByteSize() const {
 
 void Int64Value::MergeFrom(const ::google::protobuf::Message& from) {
 // @@protoc_insertion_point(generalized_merge_from_start:google.protobuf.Int64Value)
-  if (GOOGLE_PREDICT_FALSE(&from == this)) {
-    ::google::protobuf::internal::MergeFromFail(__FILE__, __LINE__);
-  }
+  if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
   const Int64Value* source = 
       ::google::protobuf::internal::DynamicCastToGenerated<const Int64Value>(
           &from);
@@ -1013,9 +1010,7 @@ void Int64Value::MergeFrom(const ::google::protobuf::Message& from) {
 
 void Int64Value::MergeFrom(const Int64Value& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:google.protobuf.Int64Value)
-  if (GOOGLE_PREDICT_FALSE(&from == this)) {
-    ::google::protobuf::internal::MergeFromFail(__FILE__, __LINE__);
-  }
+  if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
   if (from.value() != 0) {
     set_value(from.value());
   }
@@ -1260,9 +1255,7 @@ int UInt64Value::ByteSize() const {
 
 void UInt64Value::MergeFrom(const ::google::protobuf::Message& from) {
 // @@protoc_insertion_point(generalized_merge_from_start:google.protobuf.UInt64Value)
-  if (GOOGLE_PREDICT_FALSE(&from == this)) {
-    ::google::protobuf::internal::MergeFromFail(__FILE__, __LINE__);
-  }
+  if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
   const UInt64Value* source = 
       ::google::protobuf::internal::DynamicCastToGenerated<const UInt64Value>(
           &from);
@@ -1277,9 +1270,7 @@ void UInt64Value::MergeFrom(const ::google::protobuf::Message& from) {
 
 void UInt64Value::MergeFrom(const UInt64Value& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:google.protobuf.UInt64Value)
-  if (GOOGLE_PREDICT_FALSE(&from == this)) {
-    ::google::protobuf::internal::MergeFromFail(__FILE__, __LINE__);
-  }
+  if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
   if (from.value() != 0) {
     set_value(from.value());
   }
@@ -1524,9 +1515,7 @@ int Int32Value::ByteSize() const {
 
 void Int32Value::MergeFrom(const ::google::protobuf::Message& from) {
 // @@protoc_insertion_point(generalized_merge_from_start:google.protobuf.Int32Value)
-  if (GOOGLE_PREDICT_FALSE(&from == this)) {
-    ::google::protobuf::internal::MergeFromFail(__FILE__, __LINE__);
-  }
+  if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
   const Int32Value* source = 
       ::google::protobuf::internal::DynamicCastToGenerated<const Int32Value>(
           &from);
@@ -1541,9 +1530,7 @@ void Int32Value::MergeFrom(const ::google::protobuf::Message& from) {
 
 void Int32Value::MergeFrom(const Int32Value& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:google.protobuf.Int32Value)
-  if (GOOGLE_PREDICT_FALSE(&from == this)) {
-    ::google::protobuf::internal::MergeFromFail(__FILE__, __LINE__);
-  }
+  if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
   if (from.value() != 0) {
     set_value(from.value());
   }
@@ -1788,9 +1775,7 @@ int UInt32Value::ByteSize() const {
 
 void UInt32Value::MergeFrom(const ::google::protobuf::Message& from) {
 // @@protoc_insertion_point(generalized_merge_from_start:google.protobuf.UInt32Value)
-  if (GOOGLE_PREDICT_FALSE(&from == this)) {
-    ::google::protobuf::internal::MergeFromFail(__FILE__, __LINE__);
-  }
+  if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
   const UInt32Value* source = 
       ::google::protobuf::internal::DynamicCastToGenerated<const UInt32Value>(
           &from);
@@ -1805,9 +1790,7 @@ void UInt32Value::MergeFrom(const ::google::protobuf::Message& from) {
 
 void UInt32Value::MergeFrom(const UInt32Value& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:google.protobuf.UInt32Value)
-  if (GOOGLE_PREDICT_FALSE(&from == this)) {
-    ::google::protobuf::internal::MergeFromFail(__FILE__, __LINE__);
-  }
+  if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
   if (from.value() != 0) {
     set_value(from.value());
   }
@@ -2050,9 +2033,7 @@ int BoolValue::ByteSize() const {
 
 void BoolValue::MergeFrom(const ::google::protobuf::Message& from) {
 // @@protoc_insertion_point(generalized_merge_from_start:google.protobuf.BoolValue)
-  if (GOOGLE_PREDICT_FALSE(&from == this)) {
-    ::google::protobuf::internal::MergeFromFail(__FILE__, __LINE__);
-  }
+  if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
   const BoolValue* source = 
       ::google::protobuf::internal::DynamicCastToGenerated<const BoolValue>(
           &from);
@@ -2067,9 +2048,7 @@ void BoolValue::MergeFrom(const ::google::protobuf::Message& from) {
 
 void BoolValue::MergeFrom(const BoolValue& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:google.protobuf.BoolValue)
-  if (GOOGLE_PREDICT_FALSE(&from == this)) {
-    ::google::protobuf::internal::MergeFromFail(__FILE__, __LINE__);
-  }
+  if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
   if (from.value() != 0) {
     set_value(from.value());
   }
@@ -2329,9 +2308,7 @@ int StringValue::ByteSize() const {
 
 void StringValue::MergeFrom(const ::google::protobuf::Message& from) {
 // @@protoc_insertion_point(generalized_merge_from_start:google.protobuf.StringValue)
-  if (GOOGLE_PREDICT_FALSE(&from == this)) {
-    ::google::protobuf::internal::MergeFromFail(__FILE__, __LINE__);
-  }
+  if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
   const StringValue* source = 
       ::google::protobuf::internal::DynamicCastToGenerated<const StringValue>(
           &from);
@@ -2346,9 +2323,7 @@ void StringValue::MergeFrom(const ::google::protobuf::Message& from) {
 
 void StringValue::MergeFrom(const StringValue& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:google.protobuf.StringValue)
-  if (GOOGLE_PREDICT_FALSE(&from == this)) {
-    ::google::protobuf::internal::MergeFromFail(__FILE__, __LINE__);
-  }
+  if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
   if (from.value().size() > 0) {
     set_value(from.value());
   }
@@ -2648,9 +2623,7 @@ int BytesValue::ByteSize() const {
 
 void BytesValue::MergeFrom(const ::google::protobuf::Message& from) {
 // @@protoc_insertion_point(generalized_merge_from_start:google.protobuf.BytesValue)
-  if (GOOGLE_PREDICT_FALSE(&from == this)) {
-    ::google::protobuf::internal::MergeFromFail(__FILE__, __LINE__);
-  }
+  if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
   const BytesValue* source = 
       ::google::protobuf::internal::DynamicCastToGenerated<const BytesValue>(
           &from);
@@ -2665,9 +2638,7 @@ void BytesValue::MergeFrom(const ::google::protobuf::Message& from) {
 
 void BytesValue::MergeFrom(const BytesValue& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:google.protobuf.BytesValue)
-  if (GOOGLE_PREDICT_FALSE(&from == this)) {
-    ::google::protobuf::internal::MergeFromFail(__FILE__, __LINE__);
-  }
+  if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
   if (from.value().size() > 0) {
     set_value(from.value());
   }
