@@ -29,7 +29,6 @@ const ::google::protobuf::internal::GeneratedMessageReflection*
 }  // namespace
 
 
-void protobuf_AssignDesc_google_2fprotobuf_2ffield_5fmask_2eproto() GOOGLE_ATTRIBUTE_COLD;
 void protobuf_AssignDesc_google_2fprotobuf_2ffield_5fmask_2eproto() {
   protobuf_AddDesc_google_2fprotobuf_2ffield_5fmask_2eproto();
   const ::google::protobuf::FileDescriptor* file =
@@ -61,7 +60,6 @@ inline void protobuf_AssignDescriptorsOnce() {
                  &protobuf_AssignDesc_google_2fprotobuf_2ffield_5fmask_2eproto);
 }
 
-void protobuf_RegisterTypes(const ::std::string&) GOOGLE_ATTRIBUTE_COLD;
 void protobuf_RegisterTypes(const ::std::string&) {
   protobuf_AssignDescriptorsOnce();
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
@@ -75,7 +73,6 @@ void protobuf_ShutdownFile_google_2fprotobuf_2ffield_5fmask_2eproto() {
   delete FieldMask_reflection_;
 }
 
-void protobuf_AddDesc_google_2fprotobuf_2ffield_5fmask_2eproto() GOOGLE_ATTRIBUTE_COLD;
 void protobuf_AddDesc_google_2fprotobuf_2ffield_5fmask_2eproto() {
   static bool already_here = false;
   if (already_here) return;
@@ -101,6 +98,16 @@ struct StaticDescriptorInitializer_google_2fprotobuf_2ffield_5fmask_2eproto {
     protobuf_AddDesc_google_2fprotobuf_2ffield_5fmask_2eproto();
   }
 } static_descriptor_initializer_google_2fprotobuf_2ffield_5fmask_2eproto_;
+
+namespace {
+
+static void MergeFromFail(int line) GOOGLE_ATTRIBUTE_COLD;
+static void MergeFromFail(int line) {
+  GOOGLE_CHECK(false) << __FILE__ << ":" << line;
+}
+
+}  // namespace
+
 
 // ===================================================================
 
@@ -274,9 +281,7 @@ int FieldMask::ByteSize() const {
 
 void FieldMask::MergeFrom(const ::google::protobuf::Message& from) {
 // @@protoc_insertion_point(generalized_merge_from_start:google.protobuf.FieldMask)
-  if (GOOGLE_PREDICT_FALSE(&from == this)) {
-    ::google::protobuf::internal::MergeFromFail(__FILE__, __LINE__);
-  }
+  if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
   const FieldMask* source = 
       ::google::protobuf::internal::DynamicCastToGenerated<const FieldMask>(
           &from);
@@ -291,9 +296,7 @@ void FieldMask::MergeFrom(const ::google::protobuf::Message& from) {
 
 void FieldMask::MergeFrom(const FieldMask& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:google.protobuf.FieldMask)
-  if (GOOGLE_PREDICT_FALSE(&from == this)) {
-    ::google::protobuf::internal::MergeFromFail(__FILE__, __LINE__);
-  }
+  if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
   paths_.MergeFrom(from.paths_);
 }
 

@@ -64,7 +64,6 @@ DefaultValueObjectWriter::DefaultValueObjectWriter(
       type_(type),
       current_(NULL),
       root_(NULL),
-      suppress_empty_list_(false),
       field_scrub_callback_(NULL),
       ow_(ow) {}
 
@@ -185,10 +184,12 @@ void DefaultValueObjectWriter::RegisterFieldScrubCallBack(
   field_scrub_callback_.reset(field_scrub_callback.release());
 }
 
-DefaultValueObjectWriter::Node::Node(
-    const string& name, const google::protobuf::Type* type, NodeKind kind,
-    const DataPiece& data, bool is_placeholder, const vector<string>& path,
-    bool suppress_empty_list, FieldScrubCallBack* field_scrub_callback)
+DefaultValueObjectWriter::Node::Node(const string& name,
+                                     const google::protobuf::Type* type,
+                                     NodeKind kind, const DataPiece& data,
+                                     bool is_placeholder,
+                                     const vector<string>& path,
+                                     FieldScrubCallBack* field_scrub_callback)
     : name_(name),
       type_(type),
       kind_(kind),
@@ -196,7 +197,6 @@ DefaultValueObjectWriter::Node::Node(
       data_(data),
       is_placeholder_(is_placeholder),
       path_(path),
-      suppress_empty_list_(suppress_empty_list),
       field_scrub_callback_(field_scrub_callback) {}
 
 DefaultValueObjectWriter::Node* DefaultValueObjectWriter::Node::FindChild(
@@ -230,9 +230,6 @@ void DefaultValueObjectWriter::Node::WriteTo(ObjectWriter* ow) {
   // Write out lists. If we didn't have any list in response, write out empty
   // list.
   if (kind_ == LIST) {
-    // Suppress empty lists if requested.
-    if (suppress_empty_list_ && is_placeholder_) return;
-
     ow->StartList(name_);
     WriteChildren(ow);
     ow->EndList();
@@ -369,7 +366,7 @@ void DefaultValueObjectWriter::Node::PopulateChildren(
         field.json_name(), field_type, kind,
         kind == PRIMITIVE ? CreateDefaultDataPieceForField(field, typeinfo)
                           : DataPiece::NullData(),
-        true, path, suppress_empty_list_, field_scrub_callback_));
+        true, path, field_scrub_callback_));
     new_children.push_back(child.release());
   }
   // Adds all leftover nodes in children_ to the beginning of new_child.
@@ -465,8 +462,7 @@ DefaultValueObjectWriter* DefaultValueObjectWriter::StartObject(
   if (current_ == NULL) {
     vector<string> path;
     root_.reset(new Node(name.ToString(), &type_, OBJECT, DataPiece::NullData(),
-                         false, path, suppress_empty_list_,
-                         field_scrub_callback_.get()));
+                         false, path, field_scrub_callback_.get()));
     root_->PopulateChildren(typeinfo_);
     current_ = root_.get();
     return this;
@@ -482,7 +478,7 @@ DefaultValueObjectWriter* DefaultValueObjectWriter::StartObject(
                               : NULL),
         OBJECT, DataPiece::NullData(), false,
         child == NULL ? current_->path() : child->path(),
-        suppress_empty_list_, field_scrub_callback_.get()));
+        field_scrub_callback_.get()));
     child = node.get();
     current_->AddChild(node.release());
   }
@@ -513,8 +509,7 @@ DefaultValueObjectWriter* DefaultValueObjectWriter::StartList(
   if (current_ == NULL) {
     vector<string> path;
     root_.reset(new Node(name.ToString(), &type_, LIST, DataPiece::NullData(),
-                         false, path, suppress_empty_list_,
-                         field_scrub_callback_.get()));
+                         false, path, field_scrub_callback_.get()));
     current_ = root_.get();
     return this;
   }
@@ -524,7 +519,7 @@ DefaultValueObjectWriter* DefaultValueObjectWriter::StartList(
     google::protobuf::scoped_ptr<Node> node(
         new Node(name.ToString(), NULL, LIST, DataPiece::NullData(), false,
                  child == NULL ? current_->path() : child->path(),
-                 suppress_empty_list_, field_scrub_callback_.get()));
+                 field_scrub_callback_.get()));
     child = node.get();
     current_->AddChild(node.release());
   }
@@ -582,7 +577,7 @@ void DefaultValueObjectWriter::RenderDataPiece(StringPiece name,
     google::protobuf::scoped_ptr<Node> node(
         new Node(name.ToString(), NULL, PRIMITIVE, data, false,
                  child == NULL ? current_->path() : child->path(),
-                 suppress_empty_list_, field_scrub_callback_.get()));
+                 field_scrub_callback_.get()));
     child = node.get();
     current_->AddChild(node.release());
   } else {

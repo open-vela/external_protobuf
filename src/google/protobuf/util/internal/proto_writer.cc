@@ -298,9 +298,7 @@ ProtoWriter::ProtoElement::ProtoElement(const TypeInfo* typeinfo,
       proto3_(type.syntax() == google::protobuf::SYNTAX_PROTO3),
       type_(type),
       size_index_(-1),
-      array_index_(-1),
-      // oneof_indices_ values are 1-indexed (0 means not present).
-      oneof_indices_(type.oneofs_size() + 1) {
+      array_index_(-1) {
   if (!proto3_) {
     required_fields_ = GetRequiredFields(type_);
   }
@@ -314,15 +312,13 @@ ProtoWriter::ProtoElement::ProtoElement(ProtoWriter::ProtoElement* parent,
       ow_(this->parent()->ow_),
       parent_field_(field),
       typeinfo_(this->parent()->typeinfo_),
-      proto3_(type.syntax() == google::protobuf::SYNTAX_PROTO3),
+      proto3_(this->parent()->proto3_),
       type_(type),
       size_index_(
           !is_list && field->kind() == google::protobuf::Field_Kind_TYPE_MESSAGE
               ? ow_->size_insert_.size()
               : -1),
-      array_index_(is_list ? 0 : -1),
-      // oneof_indices_ values are 1-indexed (0 means not present).
-      oneof_indices_(type_.oneofs_size() + 1) {
+      array_index_(is_list ? 0 : -1) {
   if (!is_list) {
     if (ow_->IsRepeated(*field)) {
       // Update array_index_ if it is an explicit list.
@@ -415,11 +411,11 @@ string ProtoWriter::ProtoElement::ToString() const {
 }
 
 bool ProtoWriter::ProtoElement::IsOneofIndexTaken(int32 index) {
-  return oneof_indices_[index];
+  return ContainsKey(oneof_indices_, index);
 }
 
 void ProtoWriter::ProtoElement::TakeOneofIndex(int32 index) {
-  oneof_indices_[index] = true;
+  InsertIfNotPresent(&oneof_indices_, index);
 }
 
 void ProtoWriter::InvalidName(StringPiece unknown_name, StringPiece message) {
@@ -577,19 +573,10 @@ ProtoWriter* ProtoWriter::RenderPrimitiveField(
 
   // Pushing a ProtoElement and then pop it off at the end for 2 purposes:
   // error location reporting and required field accounting.
-  //
-  // For proto3, since there is no required field tracking, we only need to push
-  // ProtoElement for error cases.
-  if (!element_->proto3()) {
-    element_.reset(new ProtoElement(element_.release(), &field, type, false));
-  }
+  element_.reset(new ProtoElement(element_.release(), &field, type, false));
 
   if (field.kind() == google::protobuf::Field_Kind_TYPE_UNKNOWN ||
       field.kind() == google::protobuf::Field_Kind_TYPE_MESSAGE) {
-    // Push a ProtoElement for location reporting purposes.
-    if (element_->proto3()) {
-      element_.reset(new ProtoElement(element_.release(), &field, type, false));
-    }
     InvalidValue(field.type_url().empty()
                      ? google::protobuf::Field_Kind_Name(field.kind())
                      : field.type_url(),
@@ -670,18 +657,11 @@ ProtoWriter* ProtoWriter::RenderPrimitiveField(
   }
 
   if (!status.ok()) {
-    // Push a ProtoElement for location reporting purposes.
-    if (element_->proto3()) {
-      element_.reset(new ProtoElement(element_.release(), &field, type, false));
-    }
     InvalidValue(google::protobuf::Field_Kind_Name(field.kind()),
                  status.error_message());
-    element_.reset(element()->pop());
-    return this;
   }
 
-  if (!element_->proto3()) element_.reset(element()->pop());
-
+  element_.reset(element()->pop());
   return this;
 }
 
