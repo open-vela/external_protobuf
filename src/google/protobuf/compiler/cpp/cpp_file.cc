@@ -336,6 +336,19 @@ void FileGenerator::GenerateSource(io::Printer* printer) {
 
   // Generate classes.
   for (int i = 0; i < file_->message_type_count(); i++) {
+    if (i == 0 && HasGeneratedMethods(file_, options_)) {
+      printer->Print(
+          "\n"
+          "namespace {\n"
+          "\n"
+          "static void MergeFromFail(int line) GOOGLE_ATTRIBUTE_COLD;\n"
+          "static void MergeFromFail(int line) {\n"
+          "  GOOGLE_CHECK(false) << __FILE__ << \":\" << line;\n"
+          "}\n"
+          "\n"
+          "}  // namespace\n"
+          "\n");
+    }
     printer->Print("\n");
     printer->Print(kThickSeparator);
     printer->Print("\n");
@@ -451,10 +464,9 @@ void FileGenerator::GenerateBuildDescriptors(io::Printer* printer) {
   // and we only use AddDescriptors() to allocate default instances.
   if (HasDescriptorMethods(file_, options_)) {
     printer->Print(
-        "\n"
-        "void $assigndescriptorsname$() GOOGLE_ATTRIBUTE_COLD;\n"
-        "void $assigndescriptorsname$() {\n",
-        "assigndescriptorsname", GlobalAssignDescriptorsName(file_->name()));
+      "\n"
+      "void $assigndescriptorsname$() {\n",
+      "assigndescriptorsname", GlobalAssignDescriptorsName(file_->name()));
     printer->Indent();
 
     // Make sure the file has found its way into the pool.  If a descriptor
@@ -513,9 +525,8 @@ void FileGenerator::GenerateBuildDescriptors(io::Printer* printer) {
     // protobuf_RegisterTypes():  Calls
     // MessageFactory::InternalRegisterGeneratedType() for each message type.
     printer->Print(
-        "void protobuf_RegisterTypes(const ::std::string&) GOOGLE_ATTRIBUTE_COLD;\n"
-        "void protobuf_RegisterTypes(const ::std::string&) {\n"
-        "  protobuf_AssignDescriptorsOnce();\n");
+      "void protobuf_RegisterTypes(const ::std::string&) {\n"
+      "  protobuf_AssignDescriptorsOnce();\n");
     printer->Indent();
 
     for (int i = 0; i < file_->message_type_count(); i++) {
@@ -555,7 +566,6 @@ void FileGenerator::GenerateBuildDescriptors(io::Printer* printer) {
       // Note that we don't need any special synchronization in the following
       // code
       // because it is called at static init time before any threads exist.
-      "void $adddescriptorsname$() GOOGLE_ATTRIBUTE_COLD;\n"
       "void $adddescriptorsname$() {\n"
       "  static bool already_here = false;\n"
       "  if (already_here) return;\n"

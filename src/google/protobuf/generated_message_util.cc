@@ -73,12 +73,6 @@ int StringSpaceUsedExcludingSelf(const string& str) {
 
 
 
-void MergeFromFail(const char* file, int line) {
-  GOOGLE_CHECK(false) << file << ":" << line;
-  // Open-source GOOGLE_CHECK(false) is not NORETURN.
-  exit(1);
-}
-
 }  // namespace internal
 }  // namespace protobuf
 }  // namespace google

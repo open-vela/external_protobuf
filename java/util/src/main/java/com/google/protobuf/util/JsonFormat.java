@@ -116,8 +116,7 @@ public class JsonFormat {
     private Printer(
         TypeRegistry registry,
         boolean includingDefaultValueFields,
-        boolean preservingProtoFieldNames,
-        boolean omittingInsignificantWhitespace) {
+        boolean preservingProtoFieldNames, boolean omittingInsignificantWhitespace) {
       this.registry = registry;
       this.includingDefaultValueFields = includingDefaultValueFields;
       this.preservingProtoFieldNames = preservingProtoFieldNames;
@@ -134,11 +133,7 @@ public class JsonFormat {
       if (this.registry != TypeRegistry.getEmptyTypeRegistry()) {
         throw new IllegalArgumentException("Only one registry is allowed.");
       }
-      return new Printer(
-          registry,
-          includingDefaultValueFields,
-          preservingProtoFieldNames,
-          omittingInsignificantWhitespace);
+      return new Printer(registry, includingDefaultValueFields, preservingProtoFieldNames, omittingInsignificantWhitespace);
     }
 
     /**
@@ -148,8 +143,7 @@ public class JsonFormat {
      * {@link Printer}.
      */
     public Printer includingDefaultValueFields() {
-      return new Printer(
-          registry, true, preservingProtoFieldNames, omittingInsignificantWhitespace);
+      return new Printer(registry, true, preservingProtoFieldNames, omittingInsignificantWhitespace);
     }
 
     /**
@@ -159,8 +153,7 @@ public class JsonFormat {
      * current {@link Printer}.
      */
     public Printer preservingProtoFieldNames() {
-      return new Printer(
-          registry, includingDefaultValueFields, true, omittingInsignificantWhitespace);
+      return new Printer(registry, includingDefaultValueFields, true, omittingInsignificantWhitespace);
     }
 
 
@@ -179,7 +172,7 @@ public class JsonFormat {
      * See <a href="https://tools.ietf.org/html/rfc7159">https://tools.ietf.org/html/rfc7159</a>
      * current {@link Printer}.
      */
-    public Printer omittingInsignificantWhitespace() {
+    public Printer omittingInsignificantWhitespace(){
       return new Printer(registry, includingDefaultValueFields, preservingProtoFieldNames, true);
     }
 
@@ -193,12 +186,7 @@ public class JsonFormat {
     public void appendTo(MessageOrBuilder message, Appendable output) throws IOException {
       // TODO(xiaofeng): Investigate the allocation overhead and optimize for
       // mobile.
-      new PrinterImpl(
-              registry,
-              includingDefaultValueFields,
-              preservingProtoFieldNames,
-              output,
-              omittingInsignificantWhitespace)
+      new PrinterImpl(registry, includingDefaultValueFields, preservingProtoFieldNames, output, omittingInsignificantWhitespace)
           .print(message);
     }
 
@@ -391,17 +379,17 @@ public class JsonFormat {
    */
   interface TextGenerator {
     void indent();
-
     void outdent();
-
     void print(final CharSequence text) throws IOException;
   }
+
 
   /**
    * Format the json without indentation
    */
-  private static final class CompactTextGenerator implements TextGenerator {
+  private static final class CompactTextGenerator implements TextGenerator{
     private final Appendable output;
+
 
     private CompactTextGenerator(final Appendable output) {
       this.output = output;
@@ -423,11 +411,12 @@ public class JsonFormat {
     public void print(final CharSequence text) throws IOException {
       output.append(text);
     }
+
   }
   /**
    * A TextGenerator adds indentation when writing formatted text.
    */
-  private static final class PrettyTextGenerator implements TextGenerator {
+  private static final class PrettyTextGenerator implements TextGenerator{
     private final Appendable output;
     private final StringBuilder indent = new StringBuilder();
     private boolean atStartOfLine = true;
@@ -507,8 +496,7 @@ public class JsonFormat {
         TypeRegistry registry,
         boolean includingDefaultValueFields,
         boolean preservingProtoFieldNames,
-        Appendable jsonOutput,
-        boolean omittingInsignificantWhitespace) {
+        Appendable jsonOutput, boolean omittingInsignificantWhitespace) {
       this.registry = registry;
       this.includingDefaultValueFields = includingDefaultValueFields;
       this.preservingProtoFieldNames = preservingProtoFieldNames;
@@ -746,7 +734,9 @@ public class JsonFormat {
     }
 
     /** Prints a regular message with an optional type URL. */
-    private void print(MessageOrBuilder message, String typeUrl) throws IOException {
+
+    private void print(MessageOrBuilder message, String typeUrl)
+        throws IOException {
       generator.print("{" + blankOrNewLine);
       generator.indent();
 
