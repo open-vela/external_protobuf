@@ -35,7 +35,6 @@
  */
 
 goog.provide('jspb.ExtensionFieldInfo');
-goog.provide('jspb.ExtensionFieldBinaryInfo');
 goog.provide('jspb.Message');
 
 goog.require('goog.array');
@@ -85,12 +84,19 @@ goog.forwardDeclare('xid.String');
  * @param {?function(new: jspb.Message, Array=)} ctor
  * @param {?function((boolean|undefined),!jspb.Message):!Object} toObjectFn
  * @param {number} isRepeated
+ * @param {?function(number,?)=} opt_binaryReaderFn
+ * @param {?function(number,?)|function(number,?,?,?,?,?)=} opt_binaryWriterFn
+ * @param {?function(?,?)=} opt_binaryMessageSerializeFn
+ * @param {?function(?,?)=} opt_binaryMessageDeserializeFn
+ * @param {?boolean=} opt_isPacked
  * @constructor
  * @struct
  * @template T
  */
 jspb.ExtensionFieldInfo = function(fieldNumber, fieldName, ctor, toObjectFn,
-    isRepeated) {
+    isRepeated, opt_binaryReaderFn, opt_binaryWriterFn,
+    opt_binaryMessageSerializeFn, opt_binaryMessageDeserializeFn,
+    opt_isPacked) {
   /** @const */
   this.fieldIndex = fieldNumber;
   /** @const */
@@ -100,36 +106,19 @@ jspb.ExtensionFieldInfo = function(fieldNumber, fieldName, ctor, toObjectFn,
   /** @const */
   this.toObjectFn = toObjectFn;
   /** @const */
+  this.binaryReaderFn = opt_binaryReaderFn;
+  /** @const */
+  this.binaryWriterFn = opt_binaryWriterFn;
+  /** @const */
+  this.binaryMessageSerializeFn = opt_binaryMessageSerializeFn;
+  /** @const */
+  this.binaryMessageDeserializeFn = opt_binaryMessageDeserializeFn;
+  /** @const */
   this.isRepeated = isRepeated;
+  /** @const */
+  this.isPacked = opt_isPacked;
 };
 
-/**
- * Stores binary-related information for a single extension field.
- * @param {!jspb.ExtensionFieldInfo<T>} fieldInfo
- * @param {?function(number,?)=} binaryReaderFn
- * @param {?function(number,?)|function(number,?,?,?,?,?)=} binaryWriterFn
- * @param {?function(?,?)=} opt_binaryMessageSerializeFn
- * @param {?function(?,?)=} opt_binaryMessageDeserializeFn
- * @param {?boolean=} opt_isPacked
- * @constructor
- * @struct
- * @template T
- */
-jspb.ExtensionFieldBinaryInfo = function(fieldInfo, binaryReaderFn, binaryWriterFn,
-    binaryMessageSerializeFn, binaryMessageDeserializeFn, isPacked) {
-  /** @const */
-  this.fieldInfo = fieldInfo;
-  /** @const */
-  this.binaryReaderFn = binaryReaderFn;
-  /** @const */
-  this.binaryWriterFn = binaryWriterFn;
-  /** @const */
-  this.binaryMessageSerializeFn = binaryMessageSerializeFn;
-  /** @const */
-  this.binaryMessageDeserializeFn = binaryMessageDeserializeFn;
-  /** @const */
-  this.isPacked = isPacked;
-};
 
 /**
  * @return {boolean} Does this field represent a sub Message?
@@ -502,13 +491,11 @@ jspb.Message.toObjectExtension = function(proto, obj, extensions,
 jspb.Message.serializeBinaryExtensions = function(proto, writer, extensions,
     getExtensionFn) {
   for (var fieldNumber in extensions) {
-    var binaryFieldInfo = extensions[fieldNumber];
-    var fieldInfo = binaryFieldInfo.fieldInfo;
-
+    var fieldInfo = extensions[fieldNumber];
     // The old codegen doesn't add the extra fields to ExtensionFieldInfo, so we
     // need to gracefully error-out here rather than produce a null dereference
     // below.
-    if (!binaryFieldInfo.binaryWriterFn) {
+    if (!fieldInfo.binaryWriterFn) {
       throw new Error('Message extension present that was generated ' +
                       'without binary serialization support');
     }
@@ -521,17 +508,16 @@ jspb.Message.serializeBinaryExtensions = function(proto, writer, extensions,
         // message may require binary support, so we can *only* catch this error
         // here, at runtime (and this decoupled codegen is the whole point of
         // extensions!).
-        if (binaryFieldInfo.binaryMessageSerializeFn) {
-          binaryFieldInfo.binaryWriterFn.call(writer, fieldInfo.fieldIndex,
-              value, binaryFieldInfo.binaryMessageSerializeFn);
+        if (fieldInfo.binaryMessageSerializeFn) {
+          fieldInfo.binaryWriterFn.call(writer, fieldInfo.fieldIndex,
+              value, fieldInfo.binaryMessageSerializeFn);
         } else {
           throw new Error('Message extension present holding submessage ' +
                           'without binary support enabled, and message is ' +
                           'being serialized to binary format');
         }
       } else {
-        binaryFieldInfo.binaryWriterFn.call(
-            writer, fieldInfo.fieldIndex, value);
+        fieldInfo.binaryWriterFn.call(writer, fieldInfo.fieldIndex, value);
       }
     }
   }
@@ -549,13 +535,12 @@ jspb.Message.serializeBinaryExtensions = function(proto, writer, extensions,
  */
 jspb.Message.readBinaryExtension = function(msg, reader, extensions,
     getExtensionFn, setExtensionFn) {
-  var binaryFieldInfo = extensions[reader.getFieldNumber()];
-  var fieldInfo = binaryFieldInfo.fieldInfo;
-  if (!binaryFieldInfo) {
+  var fieldInfo = extensions[reader.getFieldNumber()];
+  if (!fieldInfo) {
     reader.skipField();
     return;
   }
-  if (!binaryFieldInfo.binaryReaderFn) {
+  if (!fieldInfo.binaryReaderFn) {
     throw new Error('Deserializing extension whose generated code does not ' +
                     'support binary format');
   }
@@ -563,14 +548,14 @@ jspb.Message.readBinaryExtension = function(msg, reader, extensions,
   var value;
   if (fieldInfo.isMessageType()) {
     value = new fieldInfo.ctor();
-    binaryFieldInfo.binaryReaderFn.call(
-        reader, value, binaryFieldInfo.binaryMessageDeserializeFn);
+    fieldInfo.binaryReaderFn.call(
+        reader, value, fieldInfo.binaryMessageDeserializeFn);
   } else {
     // All other types.
-    value = binaryFieldInfo.binaryReaderFn.call(reader);
+    value = fieldInfo.binaryReaderFn.call(reader);
   }
 
-  if (fieldInfo.isRepeated && !binaryFieldInfo.isPacked) {
+  if (fieldInfo.isRepeated && !fieldInfo.isPacked) {
     var currentList = getExtensionFn.call(msg, fieldInfo);
     if (!currentList) {
       setExtensionFn.call(msg, fieldInfo, [value]);
