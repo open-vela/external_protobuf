@@ -237,9 +237,7 @@ PyObject* HasFieldByDescriptor(
 PyObject* HasField(CMessage* self, PyObject* arg);
 
 // Initializes values of fields on a newly constructed message.
-// Note that positional arguments are disallowed: 'args' must be NULL or the
-// empty tuple.
-int InitAttributes(CMessage* self, PyObject* args, PyObject* kwargs);
+int InitAttributes(CMessage* self, PyObject* kwargs);
 
 PyObject* MergeFrom(CMessage* self, PyObject* arg);
 
