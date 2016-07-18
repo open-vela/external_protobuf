@@ -69,14 +69,28 @@ const UnknownFieldSet* UnknownFieldSet::default_instance() {
   return default_unknown_field_set_instance_;
 }
 
-void UnknownFieldSet::ClearFallback() {
-  GOOGLE_DCHECK(fields_ != NULL && fields_->size() > 0);
-  int n = fields_->size();
-  do {
-    (*fields_)[--n].Delete();
-  } while (n > 0);
+UnknownFieldSet::UnknownFieldSet()
+    : fields_(NULL) {}
+
+UnknownFieldSet::~UnknownFieldSet() {
+  Clear();
   delete fields_;
-  fields_ = NULL;
+}
+
+void UnknownFieldSet::ClearFallback() {
+  if (fields_ != NULL) {
+    for (int i = 0; i < fields_->size(); i++) {
+      (*fields_)[i].Delete();
+    }
+    delete fields_;
+    fields_ = NULL;
+  }
+}
+
+void UnknownFieldSet::ClearAndFreeMemory() {
+  if (fields_ != NULL) {
+    Clear();
+  }
 }
 
 void UnknownFieldSet::InternalMergeFrom(const UnknownFieldSet& other) {

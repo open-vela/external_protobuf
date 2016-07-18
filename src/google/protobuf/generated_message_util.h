@@ -41,8 +41,8 @@
 #include <assert.h>
 #include <string>
 
-#include <google/protobuf/stubs/common.h>
 #include <google/protobuf/stubs/once.h>
+#include <google/protobuf/stubs/common.h>
 
 namespace google {
 
@@ -112,13 +112,8 @@ class ArenaString;
 // pointer to a copy of the string that resides in *arena.  Requires both
 // args to be non-NULL.  If something goes wrong while reading the data
 // then NULL is returned (e.g., input does not start with a valid varint).
-LIBPROTOBUF_EXPORT ArenaString* ReadArenaString(
-    ::google::protobuf::io::CodedInputStream* input,
-    ::google::protobuf::Arena* arena);
-
-// Helper function to crash on merge failure.
-// Moved out of generated code to reduce binary size.
-LIBPROTOBUF_EXPORT void MergeFromFail(const char* file, int line) GOOGLE_ATTRIBUTE_NORETURN;
+ArenaString* ReadArenaString(::google::protobuf::io::CodedInputStream* input,
+                             ::google::protobuf::Arena* arena);
 
 }  // namespace internal
 }  // namespace protobuf

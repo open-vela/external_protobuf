@@ -266,7 +266,9 @@ void FileGenerator::Generate(io::Printer* printer) {
 
   printer->Print(
     "public static void registerAllExtensions(\n"
-    "    com.google.protobuf.ExtensionRegistryLite registry) {\n");
+    "    com.google.protobuf.ExtensionRegistry$lite$ registry) {\n",
+    "lite",
+    HasDescriptorMethods(file_, context_->EnforceLite()) ? "" : "Lite");
 
   printer->Indent();
 
@@ -281,20 +283,6 @@ void FileGenerator::Generate(io::Printer* printer) {
   printer->Outdent();
   printer->Print(
     "}\n");
-  if (HasDescriptorMethods(file_, context_->EnforceLite())) {
-    // Overload registerAllExtensions for the non-lite usage to
-    // redundantly maintain the original signature (this is
-    // redundant because ExtensionRegistryLite now invokes
-    // ExtensionRegistry in the non-lite usage). Intent is
-    // to remove this in the future.
-    printer->Print(
-      "\n"
-      "public static void registerAllExtensions(\n"
-      "    com.google.protobuf.ExtensionRegistry registry) {\n"
-      "  registerAllExtensions(\n"
-      "      (com.google.protobuf.ExtensionRegistryLite) registry);\n"
-      "}\n");
-  }
 
   // -----------------------------------------------------------------
 
