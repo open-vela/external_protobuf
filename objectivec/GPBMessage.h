@@ -275,9 +275,6 @@ CF_EXTERN_C_END
 /// Return the descriptor for the message.
 - (GPBDescriptor *)descriptor;
 
-/// Returns an array with the currently set GPBExtensionDescriptors.
-- (NSArray *)extensionsCurrentlySet;
-
 /// Test to see if the given extension is set on the message.
 - (BOOL)hasExtension:(GPBExtensionDescriptor *)extension;
 

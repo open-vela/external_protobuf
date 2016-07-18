@@ -1777,6 +1777,11 @@ static GPBUnknownFieldSet *GetOrMakeUnknownFields(GPBMessage *self) {
   }
 }
 
+- (NSArray *)sortedExtensionsInUse {
+  return [[extensionMap_ allKeys]
+      sortedArrayUsingSelector:@selector(compareByFieldNumber:)];
+}
+
 - (void)setExtension:(GPBExtensionDescriptor *)extension value:(id)value {
   if (!value) {
     [self clearExtension:extension];

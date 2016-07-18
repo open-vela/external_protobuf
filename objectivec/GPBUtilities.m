@@ -1472,8 +1472,7 @@ static void AppendTextFormatForMessage(GPBMessage *message,
   NSUInteger fieldCount = fieldsArray.count;
   const GPBExtensionRange *extensionRanges = descriptor.extensionRanges;
   NSUInteger extensionRangesCount = descriptor.extensionRangesCount;
-  NSArray *activeExtensions = [[message extensionsCurrentlySet]
-      sortedArrayUsingSelector:@selector(compareByFieldNumber:)];
+  NSArray *activeExtensions = [message sortedExtensionsInUse];
   for (NSUInteger i = 0, j = 0; i < fieldCount || j < extensionRangesCount;) {
     if (i == fieldCount) {
       AppendTextFormatForMessageExtensionRange(
