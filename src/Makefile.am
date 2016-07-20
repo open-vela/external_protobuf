@@ -59,7 +59,6 @@ nobase_include_HEADERS =                                        \
   google/protobuf/stubs/atomic_sequence_num.h                   \
   google/protobuf/stubs/atomicops.h                             \
   google/protobuf/stubs/atomicops_internals_power.h             \
-  google/protobuf/stubs/atomicops_internals_ppc_gcc.h           \
   google/protobuf/stubs/atomicops_internals_arm64_gcc.h         \
   google/protobuf/stubs/atomicops_internals_arm_gcc.h           \
   google/protobuf/stubs/atomicops_internals_arm_qnx.h           \
@@ -548,8 +547,7 @@ EXTRA_DIST =                                                   \
   google/protobuf/compiler/ruby/ruby_generated_code.proto      \
   google/protobuf/compiler/ruby/ruby_generated_code.rb         \
   google/protobuf/compiler/package_info.h                      \
-  google/protobuf/compiler/zip_output_unittest.sh              \
-  README.md
+  google/protobuf/compiler/zip_output_unittest.sh
 
 protoc_lite_outputs =                                          \
   google/protobuf/map_lite_unittest.pb.cc                      \

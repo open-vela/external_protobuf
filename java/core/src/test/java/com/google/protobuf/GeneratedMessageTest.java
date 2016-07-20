@@ -972,7 +972,7 @@ public class GeneratedMessageTest extends TestCase {
     TestUtil.MockBuilderParent mockParent = new TestUtil.MockBuilderParent();
 
     TestAllTypes.Builder builder = (TestAllTypes.Builder)
-        ((AbstractMessage) TestAllTypes.getDefaultInstance()).
+        ((GeneratedMessage) TestAllTypes.getDefaultInstance()).
             newBuilderForType(mockParent);
     builder.setOptionalInt32(1);
     builder.setOptionalNestedEnum(TestAllTypes.NestedEnum.BAR);
@@ -1027,7 +1027,7 @@ public class GeneratedMessageTest extends TestCase {
     TestUtil.MockBuilderParent mockParent = new TestUtil.MockBuilderParent();
 
     TestAllExtensions.Builder builder = (TestAllExtensions.Builder)
-        ((AbstractMessage) TestAllExtensions.getDefaultInstance()).
+        ((GeneratedMessage) TestAllExtensions.getDefaultInstance()).
             newBuilderForType(mockParent);
 
     builder.addExtension(UnittestProto.repeatedInt32Extension, 1);
