@@ -113,12 +113,10 @@ build_golang() {
   export PATH="`pwd`/src:$PATH"
 
   # Install Go and the Go protobuf compiler plugin.
-  on_travis sudo apt-get update -qq
-  on_travis sudo apt-get install -qq golang
-
+  sudo apt-get update -qq
+  sudo apt-get install -qq golang
   export GOPATH="$HOME/gocode"
   mkdir -p "$GOPATH/src/github.com/google"
-  rm -f "$GOPATH/src/github.com/google/protobuf"
   ln -s "`pwd`" "$GOPATH/src/github.com/google/protobuf"
   export PATH="$GOPATH/bin:$PATH"
   go get github.com/golang/protobuf/protoc-gen-go
@@ -298,6 +296,14 @@ build_python_cpp() {
   cd ..
 }
 
+build_ruby19() {
+  internal_build_cpp  # For conformance tests.
+  cd ruby && bash travis-test.sh ruby-1.9 && cd ..
+}
+build_ruby20() {
+  internal_build_cpp  # For conformance tests.
+  cd ruby && bash travis-test.sh ruby-2.0 && cd ..
+}
 build_ruby21() {
   internal_build_cpp  # For conformance tests.
   cd ruby && bash travis-test.sh ruby-2.1 && cd ..
@@ -308,14 +314,7 @@ build_ruby22() {
 }
 build_jruby() {
   internal_build_cpp  # For conformance tests.
-  # TODO(xiaofeng): Upgrade to jruby-9.x. There are some broken jests to be
-  # fixed.
-  cd ruby && bash travis-test.sh jruby-1.7 && cd ..
-}
-build_ruby_all() {
-  build_ruby21
-  build_ruby22
-  build_jruby
+  cd ruby && bash travis-test.sh jruby && cd ..
 }
 
 build_javascript() {
@@ -349,10 +348,11 @@ Usage: $0 { cpp |
             objectivec_cocoapods_integration |
             python |
             python_cpp |
+            ruby19 |
+            ruby20 |
             ruby21 |
             ruby22 |
-            jruby |
-            ruby_all)
+            jruby }
 "
   exit 1
 fi
