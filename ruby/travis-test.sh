@@ -5,7 +5,7 @@ set -e
 
 test_version() {
   version=$1
-  if [ "$version" == "jruby-1.7" ] ; then
+  if [ "$version" == "jruby" ] ; then
     # No conformance tests yet -- JRuby is too broken to run them.
     bash --login -c \
       "rvm install $version && rvm use $version && \
