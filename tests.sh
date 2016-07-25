@@ -113,10 +113,12 @@ build_golang() {
   export PATH="`pwd`/src:$PATH"
 
   # Install Go and the Go protobuf compiler plugin.
-  sudo apt-get update -qq
-  sudo apt-get install -qq golang
+  on_travis sudo apt-get update -qq
+  on_travis sudo apt-get install -qq golang
+
   export GOPATH="$HOME/gocode"
   mkdir -p "$GOPATH/src/github.com/google"
+  rm -f "$GOPATH/src/github.com/google/protobuf"
   ln -s "`pwd`" "$GOPATH/src/github.com/google/protobuf"
   export PATH="$GOPATH/bin:$PATH"
   go get github.com/golang/protobuf/protoc-gen-go
@@ -127,13 +129,10 @@ build_golang() {
 use_java() {
   version=$1
   case "$version" in
-    jdk6)
-      on_travis sudo apt-get install openjdk-6-jdk
-      export PATH=/usr/lib/jvm/java-6-openjdk-amd64/bin:$PATH
-      ;;
     jdk7)
       on_travis sudo apt-get install openjdk-7-jdk
       export PATH=/usr/lib/jvm/java-7-openjdk-amd64/bin:$PATH
+      export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64
       ;;
     oracle7)
       if [ "$TRAVIS" == "true" ]; then
@@ -144,6 +143,7 @@ use_java() {
         yes | sudo apt-get install oracle-java7-installer
       fi;
       export PATH=/usr/lib/jvm/java-7-oracle/bin:$PATH
+      export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64
       ;;
   esac
 
@@ -154,6 +154,7 @@ use_java() {
 
   which java
   java -version
+  $MVN -version
 }
 
 # --batch-mode supresses download progress output that spams the logs.
@@ -186,10 +187,6 @@ build_javanano() {
   cd javanano && $MVN test && cd ..
 }
 
-build_java_jdk6() {
-  use_java jdk6
-  build_java jdk6
-}
 build_java_jdk7() {
   use_java jdk7
   build_java_with_conformance_tests
@@ -199,10 +196,6 @@ build_java_oracle7() {
   build_java oracle7
 }
 
-build_javanano_jdk6() {
-  use_java jdk6
-  build_javanano
-}
 build_javanano_jdk7() {
   use_java jdk7
   build_javanano
@@ -305,14 +298,6 @@ build_python_cpp() {
   cd ..
 }
 
-build_ruby19() {
-  internal_build_cpp  # For conformance tests.
-  cd ruby && bash travis-test.sh ruby-1.9 && cd ..
-}
-build_ruby20() {
-  internal_build_cpp  # For conformance tests.
-  cd ruby && bash travis-test.sh ruby-2.0 && cd ..
-}
 build_ruby21() {
   internal_build_cpp  # For conformance tests.
   cd ruby && bash travis-test.sh ruby-2.1 && cd ..
@@ -323,7 +308,14 @@ build_ruby22() {
 }
 build_jruby() {
   internal_build_cpp  # For conformance tests.
-  cd ruby && bash travis-test.sh jruby && cd ..
+  # TODO(xiaofeng): Upgrade to jruby-9.x. There are some broken jests to be
+  # fixed.
+  cd ruby && bash travis-test.sh jruby-1.7 && cd ..
+}
+build_ruby_all() {
+  build_ruby21
+  build_ruby22
+  build_jruby
 }
 
 build_javascript() {
@@ -346,10 +338,8 @@ if [ "$#" -ne 1 ]; then
 Usage: $0 { cpp |
             cpp_distcheck |
             csharp |
-            java_jdk6 |
             java_jdk7 |
             java_oracle7 |
-            javanano_jdk6 |
             javanano_jdk7 |
             javanano_oracle7 |
             objectivec_ios |
@@ -359,11 +349,10 @@ Usage: $0 { cpp |
             objectivec_cocoapods_integration |
             python |
             python_cpp |
-            ruby19 |
-            ruby20 |
             ruby21 |
             ruby22 |
-            jruby }
+            jruby |
+            ruby_all)
 "
   exit 1
 fi
