@@ -707,7 +707,6 @@ ruby_EXTRA_DIST=                                                             \
   ruby/tests/generated_code.proto                                            \
   ruby/tests/test_import.proto                                               \
   ruby/tests/generated_code_test.rb                                          \
-  ruby/tests/well_known_types_test.rb                                        \
   ruby/travis-test.sh
 
 js_EXTRA_DIST=                              \
