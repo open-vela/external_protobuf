@@ -656,7 +656,6 @@ python_EXTRA_DIST=                                                           \
   python/google/protobuf/text_encoding.py                                    \
   python/google/protobuf/text_format.py                                      \
   python/mox.py                                                              \
-  python/setup.cfg                                                           \
   python/setup.py                                                            \
   python/stubout.py                                                          \
   python/tox.ini                                                             \
@@ -682,6 +681,7 @@ ruby_EXTRA_DIST=                                                             \
   ruby/google-protobuf.gemspec                                               \
   ruby/lib/google/protobuf/message_exts.rb                                   \
   ruby/lib/google/protobuf/repeated_field.rb                                 \
+  ruby/lib/google/protobuf/well_known_types.rb                               \
   ruby/lib/google/protobuf.rb                                                \
   ruby/pom.xml                                                               \
   ruby/src/main/java/com/google/protobuf/jruby/RubyBuilder.java              \
@@ -708,6 +708,7 @@ ruby_EXTRA_DIST=                                                             \
   ruby/tests/generated_code.proto                                            \
   ruby/tests/test_import.proto                                               \
   ruby/tests/generated_code_test.rb                                          \
+  ruby/tests/well_known_types_test.rb                                        \
   ruby/travis-test.sh
 
 js_EXTRA_DIST=                              \
