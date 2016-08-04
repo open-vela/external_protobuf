@@ -11,9 +11,7 @@ goog.require('jspb.BinaryWriter');
 goog.require('jspb.ExtensionFieldBinaryInfo');
 goog.require('jspb.ExtensionFieldInfo');
 goog.require('jspb.Message');
-goog.require('jspb.Map');
 
-exports.Map = jspb.Map;
 exports.Message = jspb.Message;
 exports.BinaryReader = jspb.BinaryReader;
 exports.BinaryWriter = jspb.BinaryWriter;
