@@ -91,7 +91,6 @@ bool File::WriteStringToFile(const string& contents, const string& name) {
 
   if (fwrite(contents.data(), 1, contents.size(), file) != contents.size()) {
     GOOGLE_LOG(ERROR) << "fwrite(" << name << "): " << strerror(errno);
-    fclose(file);
     return false;
   }
 

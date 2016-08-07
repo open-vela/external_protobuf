@@ -28,6 +28,8 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+// Helper functions for generating ObjectiveC code.
+
 #ifndef GOOGLE_PROTOBUF_COMPILER_OBJECTIVEC_HELPERS_H__
 #define GOOGLE_PROTOBUF_COMPILER_OBJECTIVEC_HELPERS_H__
 
@@ -170,10 +172,8 @@ bool HasNonZeroDefaultValue(const FieldDescriptor* field);
 
 string BuildFlagsString(const vector<string>& strings);
 
-// Builds HeaderDoc/appledoc style comments out of the comments in the .proto
-// file.
-string BuildCommentsString(const SourceLocation& location,
-                           bool prefer_single_line);
+// Builds a HeaderDoc style comment out of the comments in the .proto file.
+string BuildCommentsString(const SourceLocation& location);
 
 // The name the commonly used by the library when built as a framework.
 // This lines up to the name used in the CocoaPod.

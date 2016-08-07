@@ -272,16 +272,11 @@ void ConformanceTestSuite::RunValidInputTest(
   TestAllTypes test_message;
 
   switch (response.result_case()) {
-    case ConformanceResponse::RESULT_NOT_SET:
-      ReportFailure(test_name, request, response,
-                    "Response didn't have any field in the Response.");
-      return;
-
     case ConformanceResponse::kParseError:
     case ConformanceResponse::kRuntimeError:
     case ConformanceResponse::kSerializeError:
       ReportFailure(test_name, request, response,
-                    "Failed to parse input or produce output.");
+                    "Failed to parse JSON input or produce JSON output.");
       return;
 
     case ConformanceResponse::kSkipped:
@@ -400,17 +395,6 @@ void ConformanceTestSuite::RunValidJsonTest(
 void ConformanceTestSuite::RunValidJsonTestWithProtobufInput(
     const string& test_name, const TestAllTypes& input,
     const string& equivalent_text_format) {
-  RunValidInputTest("ProtobufInput." + test_name + ".JsonOutput",
-                    input.SerializeAsString(), conformance::PROTOBUF,
-                    equivalent_text_format, conformance::JSON);
-}
-
-void ConformanceTestSuite::RunValidProtobufTest(
-    const string& test_name, const TestAllTypes& input,
-    const string& equivalent_text_format) {
-  RunValidInputTest("ProtobufInput." + test_name + ".ProtobufOutput",
-                    input.SerializeAsString(), conformance::PROTOBUF,
-                    equivalent_text_format, conformance::PROTOBUF);
   RunValidInputTest("ProtobufInput." + test_name + ".JsonOutput",
                     input.SerializeAsString(), conformance::PROTOBUF,
                     equivalent_text_format, conformance::JSON);
@@ -660,14 +644,12 @@ bool ConformanceTestSuite::RunSuite(ConformanceTestRunner* runner,
       R"({
         "fieldname1": 1,
         "fieldName2": 2,
-        "FieldName3": 3,
-        "FieldName4": 4
+        "FieldName3": 3
       })",
       R"(
         fieldname1: 1
         field_name2: 2
         _field_name3: 3
-        field__name4_: 4
       )");
   RunValidJsonTest(
       "FieldNameWithNumbers",
@@ -697,24 +679,6 @@ bool ConformanceTestSuite::RunSuite(ConformanceTestRunner* runner,
         FIELD_NAME11: 11
         FIELD_name12: 12
       )");
-  RunValidJsonTest(
-      "FieldNameWithDoubleUnderscores",
-      R"({
-        "fieldName13": 13,
-        "fieldName14": 14,
-        "fieldName15": 15,
-        "fieldName16": 16,
-        "fieldName17": 17,
-        "fieldName18": 18
-      })",
-      R"(
-        __field_name13: 13
-        __Field_name14: 14
-        field__name15: 15
-        field__Name16: 16
-        field_name17__: 17
-        Field_name18__: 18
-      )");
   // Using the original proto field name in JSON is also allowed.
   RunValidJsonTest(
       "OriginalProtoFieldName",
@@ -722,7 +686,6 @@ bool ConformanceTestSuite::RunSuite(ConformanceTestRunner* runner,
         "fieldname1": 1,
         "field_name2": 2,
         "_field_name3": 3,
-        "field__name4_": 4,
         "field0name5": 5,
         "field_0_name6": 6,
         "fieldName7": 7,
@@ -730,19 +693,12 @@ bool ConformanceTestSuite::RunSuite(ConformanceTestRunner* runner,
         "field_Name9": 9,
         "Field_Name10": 10,
         "FIELD_NAME11": 11,
-        "FIELD_name12": 12,
-        "__field_name13": 13,
-        "__Field_name14": 14,
-        "field__name15": 15,
-        "field__Name16": 16,
-        "field_name17__": 17,
-        "Field_name18__": 18
+        "FIELD_name12": 12
       })",
       R"(
         fieldname1: 1
         field_name2: 2
         _field_name3: 3
-        field__name4_: 4
         field0name5: 5
         field_0_name6: 6
         fieldName7: 7
@@ -751,12 +707,6 @@ bool ConformanceTestSuite::RunSuite(ConformanceTestRunner* runner,
         Field_Name10: 10
         FIELD_NAME11: 11
         FIELD_name12: 12
-        __field_name13: 13
-        __Field_name14: 14
-        field__name15: 15
-        field__Name16: 16
-        field_name17__: 17
-        Field_name18__: 18
       )");
   // Field names can be escaped.
   RunValidJsonTest(
@@ -864,26 +814,18 @@ bool ConformanceTestSuite::RunSuite(ConformanceTestRunner* runner,
       "Uint64FieldMaxValue",
       R"({"optionalUint64": "18446744073709551615"})",
       "optional_uint64: 18446744073709551615");
-  // While not the largest Int64, this is the largest
-  // Int64 which can be exactly represented within an
-  // IEEE-754 64-bit float, which is the expected level
-  // of interoperability guarantee. Larger values may
-  // work in some implementations, but should not be
-  // relied upon.
   RunValidJsonTest(
       "Int64FieldMaxValueNotQuoted",
-      R"({"optionalInt64": 9223372036854774784})",
-      "optional_int64: 9223372036854774784");
+      R"({"optionalInt64": 9223372036854775807})",
+      "optional_int64: 9223372036854775807");
   RunValidJsonTest(
       "Int64FieldMinValueNotQuoted",
       R"({"optionalInt64": -9223372036854775808})",
       "optional_int64: -9223372036854775808");
-  // Largest interoperable Uint64; see comment above
-  // for Int64FieldMaxValueNotQuoted.
   RunValidJsonTest(
       "Uint64FieldMaxValueNotQuoted",
-      R"({"optionalUint64": 18446744073709549568})",
-      "optional_uint64: 18446744073709549568");
+      R"({"optionalUint64": 18446744073709551615})",
+      "optional_uint64: 18446744073709551615");
   // Values can be represented as JSON strings.
   RunValidJsonTest(
       "Int32FieldStringValue",
@@ -1275,64 +1217,6 @@ bool ConformanceTestSuite::RunSuite(ConformanceTestRunner* runner,
   ExpectParseFailureForJson(
       "OneofFieldDuplicate",
       R"({"oneofUint32": 1, "oneofString": "test"})");
-  // Ensure zero values for oneof make it out/backs.
-  {
-    TestAllTypes message;
-    message.set_oneof_uint32(0);
-    RunValidProtobufTest(
-        "OneofZeroUint32", message, "oneof_uint32: 0");
-    message.mutable_oneof_nested_message()->set_a(0);
-    RunValidProtobufTest(
-        "OneofZeroMessage", message, "oneof_nested_message: {}");
-    message.set_oneof_string("");
-    RunValidProtobufTest(
-        "OneofZeroString", message, "oneof_string: \"\"");
-    message.set_oneof_bytes("");
-    RunValidProtobufTest(
-        "OneofZeroBytes", message, "oneof_bytes: \"\"");
-    message.set_oneof_bool(false);
-    RunValidProtobufTest(
-        "OneofZeroBool", message, "oneof_bool: false");
-    message.set_oneof_uint64(0);
-    RunValidProtobufTest(
-        "OneofZeroUint64", message, "oneof_uint64: 0");
-    message.set_oneof_float(0.0f);
-    RunValidProtobufTest(
-        "OneofZeroFloat", message, "oneof_float: 0");
-    message.set_oneof_double(0.0);
-    RunValidProtobufTest(
-        "OneofZeroDouble", message, "oneof_double: 0");
-    message.set_oneof_enum(TestAllTypes::FOO);
-    RunValidProtobufTest(
-        "OneofZeroEnum", message, "oneof_enum: FOO");
-  }
-  RunValidJsonTest(
-      "OneofZeroUint32",
-      R"({"oneofUint32": 0})", "oneof_uint32: 0");
-  RunValidJsonTest(
-      "OneofZeroMessage",
-      R"({"oneofNestedMessage": {}})", "oneof_nested_message: {}");
-  RunValidJsonTest(
-      "OneofZeroString",
-      R"({"oneofString": ""})", "oneof_string: \"\"");
-  RunValidJsonTest(
-      "OneofZeroBytes",
-      R"({"oneofBytes": ""})", "oneof_bytes: \"\"");
-  RunValidJsonTest(
-      "OneofZeroBool",
-      R"({"oneofBool": false})", "oneof_bool: false");
-  RunValidJsonTest(
-      "OneofZeroUint64",
-      R"({"oneofUint64": 0})", "oneof_uint64: 0");
-  RunValidJsonTest(
-      "OneofZeroFloat",
-      R"({"oneofFloat": 0.0})", "oneof_float: 0");
-  RunValidJsonTest(
-      "OneofZeroDouble",
-      R"({"oneofDouble": 0.0})", "oneof_double: 0");
-  RunValidJsonTest(
-      "OneofZeroEnum",
-      R"({"oneofEnum":"FOO"})", "oneof_enum: FOO");
 
   // Repeated fields.
   RunValidJsonTest(
