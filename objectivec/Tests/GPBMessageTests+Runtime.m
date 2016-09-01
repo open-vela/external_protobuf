@@ -36,7 +36,6 @@
 
 #import "google/protobuf/MapUnittest.pbobjc.h"
 #import "google/protobuf/Unittest.pbobjc.h"
-#import "google/protobuf/UnittestCycle.pbobjc.h"
 #import "google/protobuf/UnittestObjcStartup.pbobjc.h"
 #import "google/protobuf/UnittestRuntimeProto2.pbobjc.h"
 #import "google/protobuf/UnittestRuntimeProto3.pbobjc.h"
@@ -50,24 +49,11 @@
 // specific.
 
 - (void)testStartupOrdering {
-  // Message class/Root class initialization is a little tricky, so these just
-  // create some possible patterns that can be a problem. The messages don't
-  // have to be exercised, just creating them is enough to test.  If there
-  // is a problem, the runtime should assert or hang.
-  //
-  // Note: the messages from these proto files should not be used in any other
-  // tests, that way when they are referenced here it will be the first use and
-  // initialization will take place now.
-
+  // Just have to create a message.  Nothing else uses the classes from
+  // this file, so the first selector invoked on the class will initialize
+  // it, which also initializes the root.
   TestObjCStartupMessage *message = [TestObjCStartupMessage message];
   XCTAssertNotNil(message);
-
-  CycleBaz *baz = [CycleBaz message];
-  CycleBar *bar = [CycleBar message];
-  CycleFoo *foo = [CycleFoo message];
-  XCTAssertNotNil(baz);
-  XCTAssertNotNil(bar);
-  XCTAssertNotNil(foo);
 }
 
 - (void)testProto2HasMethodSupport {
