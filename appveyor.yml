@@ -11,7 +11,6 @@ environment:
   matrix:
     - language: cpp
       BUILD_DLL: ON
-      UNICODE: ON
 
     - language: csharp
 
