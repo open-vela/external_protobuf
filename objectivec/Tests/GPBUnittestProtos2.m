@@ -1,5 +1,5 @@
 // Protocol Buffers - Google's data interchange format
-// Copyright 2008 Google Inc.  All rights reserved.
+// Copyright 2016 Google Inc.  All rights reserved.
 // https://developers.google.com/protocol-buffers/
 //
 // Redistribution and use in source and binary forms, with or without
@@ -28,31 +28,7 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef GOOGLE_PROTOBUF_COMPILER_RUBY_GENERATOR_H__
-#define GOOGLE_PROTOBUF_COMPILER_RUBY_GENERATOR_H__
-
-#include <string>
-
-#include <google/protobuf/compiler/code_generator.h>
-
-namespace google {
-namespace protobuf {
-namespace compiler {
-namespace ruby {
-
-class LIBPROTOC_EXPORT Generator
-    : public google::protobuf::compiler::CodeGenerator {
-  virtual bool Generate(
-      const FileDescriptor* file,
-      const string& parameter,
-      GeneratorContext* generator_context,
-      string* error) const;
-};
-
-}  // namespace ruby
-}  // namespace compiler
-}  // namespace protobuf
-}  // namespace google
-
-#endif  // GOOGLE_PROTOBUF_COMPILER_RUBY_GENERATOR_H__
-
+// This one file in the chain tests is compiled by itself to ensure if was
+// generated with the extra #imports needed to pull in the indirect Root class
+// used in its Root registry.
+#import "google/protobuf/UnittestExtensionChainF.pbobjc.m"

@@ -1,6 +1,5 @@
 // Protocol Buffers - Google's data interchange format
-// Copyright 2008 Google Inc.  All rights reserved.
-// https://developers.google.com/protocol-buffers/
+// Copyright 2016 Google Inc.  All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -28,31 +27,18 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef GOOGLE_PROTOBUF_COMPILER_RUBY_GENERATOR_H__
-#define GOOGLE_PROTOBUF_COMPILER_RUBY_GENERATOR_H__
+syntax = "proto2";
 
-#include <string>
+package protobuf_unittest;
 
-#include <google/protobuf/compiler/code_generator.h>
+import "unittest_extension_chain_g.proto";
 
-namespace google {
-namespace protobuf {
-namespace compiler {
-namespace ruby {
+// The Root for this file should just be merging in the extensions from C's
+// Root (because G doens't define anything itself).
 
-class LIBPROTOC_EXPORT Generator
-    : public google::protobuf::compiler::CodeGenerator {
-  virtual bool Generate(
-      const FileDescriptor* file,
-      const string& parameter,
-      GeneratorContext* generator_context,
-      string* error) const;
-};
+// The generated source will also have to directly import C's .h file so it can
+// compile the reference to C's Root class.
 
-}  // namespace ruby
-}  // namespace compiler
-}  // namespace protobuf
-}  // namespace google
-
-#endif  // GOOGLE_PROTOBUF_COMPILER_RUBY_GENERATOR_H__
-
+message ChainFMessage {
+  optional ChainGMessage g = 1;
+}
