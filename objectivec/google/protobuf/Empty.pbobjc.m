@@ -27,9 +27,6 @@
 
 @implementation GPBEmptyRoot
 
-// No extensions in the file and no imports, so no need to generate
-// +extensionRegistry.
-
 @end
 
 #pragma mark - GPBEmptyRoot_FileDescriptor
