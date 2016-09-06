@@ -2419,7 +2419,7 @@ GenerateClear(io::Printer* printer) {
       "  &reinterpret_cast<$classname$*>(16)->f)\n"
       "#endif\n\n"
       "#define ZR_(first, last) do {\\\n"
-      "  ::memset(&(first), 0,\\\n"
+      "  ::memset(&first, 0,\\\n"
       "           ZR_HELPER_(last) - ZR_HELPER_(first) + sizeof(last));\\\n"
       "} while (0)\n\n";
   for (int i = 0; i < runs_of_fields_.size(); i++) {
@@ -2956,7 +2956,7 @@ GenerateMergeFromCodedStream(io::Printer* printer) {
     // on the CodedOutputStream.
     printer->Print(
       "  ::google::protobuf::io::LazyStringOutputStream unknown_fields_string(\n"
-      "      ::google::protobuf::NewPermanentCallback(\n"
+      "      ::google::protobuf::internal::NewPermanentCallback(\n"
       "          &MutableUnknownFieldsFor$classname$, this));\n"
       "  ::google::protobuf::io::CodedOutputStream unknown_fields_stream(\n"
       "      &unknown_fields_string, false);\n",

@@ -1,5 +1,6 @@
 // Protocol Buffers - Google's data interchange format
-// Copyright 2016 Google Inc.  All rights reserved.
+// Copyright 2008 Google Inc.  All rights reserved.
+// https://developers.google.com/protocol-buffers/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -27,21 +28,19 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-syntax = "proto2";
+// This file exists solely to document the google::protobuf::util namespace.
+// It is not compiled into anything, but it may be read by an automated
+// documentation generator.
 
-package protobuf_unittest;
+namespace google {
 
-import "google/protobuf/unittest.proto";
+namespace protobuf {
 
-import "unittest_extension_chain_c.proto";
+// Utility classes.
+//
+// This package contains various utilities for message comprasion, JSON
+// conversion, well known types, etc.
+namespace util {}
 
-// The Root for this file should end up adding the local extension and merging
-// in the extensions from C's Root (unittest will come via C's).
-
-message ChainBMessage {
-  optional ChainCMessage c = 1;
-}
-
-extend TestAllExtensions {
-  optional int32 chain_b_extension = 10002;
-}
+}  // namespace protobuf
+}  // namespace google
