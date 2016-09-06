@@ -27,9 +27,6 @@
 
 @implementation GPBSourceContextRoot
 
-// No extensions in the file and no imports, so no need to generate
-// +extensionRegistry.
-
 @end
 
 #pragma mark - GPBSourceContextRoot_FileDescriptor
