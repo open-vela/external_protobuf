@@ -44,10 +44,9 @@
 
 #include <google/protobuf/stubs/hash.h>
 #include <google/protobuf/compiler/objectivec/objectivec_helpers.h>
-#include <google/protobuf/descriptor.pb.h>
 #include <google/protobuf/io/coded_stream.h>
-#include <google/protobuf/io/printer.h>
 #include <google/protobuf/io/zero_copy_stream_impl.h>
+#include <google/protobuf/descriptor.pb.h>
 #include <google/protobuf/stubs/common.h>
 #include <google/protobuf/stubs/strutil.h>
 
@@ -210,14 +209,10 @@ const char* const kReservedWordList[] = {
 hash_set<string> kReservedWords =
     MakeWordsMap(kReservedWordList, GOOGLE_ARRAYSIZE(kReservedWordList));
 
-string SanitizeNameForObjC(const string& input,
-                           const string& extension,
-                           string* out_suffix_added) {
+string SanitizeNameForObjC(const string& input, const string& extension) {
   if (kReservedWords.count(input) > 0) {
-    if (out_suffix_added) *out_suffix_added = extension;
     return input + extension;
   }
-  if (out_suffix_added) out_suffix_added->clear();
   return input;
 }
 
@@ -312,12 +307,6 @@ string BaseFileName(const FileDescriptor* file) {
   return basename;
 }
 
-string FileClassPrefix(const FileDescriptor* file) {
-  // Default is empty string, no need to check has_objc_class_prefix.
-  string result = file->options().objc_class_prefix();
-  return result;
-}
-
 string FilePath(const FileDescriptor* file) {
   string output;
   string basename;
@@ -348,13 +337,19 @@ string FilePathBasename(const FileDescriptor* file) {
   return output;
 }
 
+string FileClassPrefix(const FileDescriptor* file) {
+  // Default is empty string, no need to check has_objc_class_prefix.
+  string result = file->options().objc_class_prefix();
+  return result;
+}
+
 string FileClassName(const FileDescriptor* file) {
   string name = FileClassPrefix(file);
   name += UnderscoresToCamelCase(StripProto(BaseFileName(file)), true);
   name += "Root";
   // There aren't really any reserved words that end in "Root", but playing
   // it safe and checking.
-  return SanitizeNameForObjC(name, "_RootClass", NULL);
+  return SanitizeNameForObjC(name, "_RootClass");
 }
 
 string ClassNameWorker(const Descriptor* descriptor) {
@@ -376,15 +371,11 @@ string ClassNameWorker(const EnumDescriptor* descriptor) {
 }
 
 string ClassName(const Descriptor* descriptor) {
-  return ClassName(descriptor, NULL);
-}
-
-string ClassName(const Descriptor* descriptor, string* out_suffix_added) {
   // 1. Message names are used as is (style calls for CamelCase, trust it).
   // 2. Check for reserved word at the very end and then suffix things.
   string prefix = FileClassPrefix(descriptor->file());
   string name = ClassNameWorker(descriptor);
-  return SanitizeNameForObjC(prefix + name, "_Class", out_suffix_added);
+  return SanitizeNameForObjC(prefix + name, "_Class");
 }
 
 string EnumName(const EnumDescriptor* descriptor) {
@@ -398,7 +389,7 @@ string EnumName(const EnumDescriptor* descriptor) {
   //    yields Fixed_Class, Fixed_Size.
   string name = FileClassPrefix(descriptor->file());
   name += ClassNameWorker(descriptor);
-  return SanitizeNameForObjC(name, "_Enum", NULL);
+  return SanitizeNameForObjC(name, "_Enum");
 }
 
 string EnumValueName(const EnumValueDescriptor* descriptor) {
@@ -413,7 +404,7 @@ string EnumValueName(const EnumValueDescriptor* descriptor) {
   const string& name = class_name + "_" + value_str;
   // There aren't really any reserved words with an underscore and a leading
   // capital letter, but playing it safe and checking.
-  return SanitizeNameForObjC(name, "_Value", NULL);
+  return SanitizeNameForObjC(name, "_Value");
 }
 
 string EnumValueShortName(const EnumValueDescriptor* descriptor) {
@@ -450,7 +441,7 @@ string UnCamelCaseEnumShortName(const string& name) {
 string ExtensionMethodName(const FieldDescriptor* descriptor) {
   const string& name = NameFromFieldDescriptor(descriptor);
   const string& result = UnderscoresToCamelCase(name, false);
-  return SanitizeNameForObjC(result, "_Extension", NULL);
+  return SanitizeNameForObjC(result, "_Extension");
 }
 
 string FieldName(const FieldDescriptor* field) {
@@ -465,7 +456,7 @@ string FieldName(const FieldDescriptor* field) {
       result += "_p";
     }
   }
-  return SanitizeNameForObjC(result, "_p", NULL);
+  return SanitizeNameForObjC(result, "_p");
 }
 
 string FieldNameCapitalized(const FieldDescriptor* field) {
@@ -988,20 +979,28 @@ bool LoadExpectedPackagePrefixes(const Options &generation_options,
       generation_options.expected_prefixes_path, &collector, out_error);
 }
 
-bool ValidateObjCClassPrefix(
-    const FileDescriptor* file,
-    const string& expected_prefixes_path,
-    const map<string, string>& expected_package_prefixes,
-    string* out_error) {
+}  // namespace
+
+bool ValidateObjCClassPrefix(const FileDescriptor* file,
+                             const Options& generation_options,
+                             string* out_error) {
   const string prefix = file->options().objc_class_prefix();
   const string package = file->package();
 
   // NOTE: src/google/protobuf/compiler/plugin.cc makes use of cerr for some
   // error cases, so it seems to be ok to use as a back door for warnings.
 
+  // Load any expected package prefixes to validate against those.
+  map<string, string> expected_package_prefixes;
+  if (!LoadExpectedPackagePrefixes(generation_options,
+                                   &expected_package_prefixes,
+                                   out_error)) {
+    return false;
+  }
+
   // Check: Error - See if there was an expected prefix for the package and
   // report if it doesn't match (wrong or missing).
-  map<string, string>::const_iterator package_match =
+  map<string, string>::iterator package_match =
       expected_package_prefixes.find(package);
   if (package_match != expected_package_prefixes.end()) {
     // There was an entry, and...
@@ -1022,9 +1021,25 @@ bool ValidateObjCClassPrefix(
   }
 
   // If there was no prefix option, we're done at this point.
-  if (prefix.empty()) {
+  if (prefix.length() == 0) {
     // No prefix, nothing left to check.
     return true;
+  }
+
+  // Check: Error - Make sure the prefix wasn't expected for a different
+  // package (overlap is allowed, but it has to be listed as an expected
+  // overlap).
+  for (map<string, string>::iterator i = expected_package_prefixes.begin();
+       i != expected_package_prefixes.end(); ++i) {
+    if (i->second == prefix) {
+      *out_error =
+          "error: Found 'option objc_class_prefix = \"" + prefix +
+          "\";' in '" + file->name() +
+          "'; that prefix is already used for 'package " + i->first +
+          ";'. It can only be reused by listing it in the expected file (" +
+          generation_options.expected_prefixes_path + ").";
+      return false;  // Only report first usage of the prefix.
+    }
   }
 
   // Check: Warning - Make sure the prefix is is a reasonable value according
@@ -1048,56 +1063,6 @@ bool ValidateObjCClassPrefix(
     cerr.flush();
   }
 
-  // Look for any other package that uses the same prefix.
-  string other_package_for_prefix;
-  for (map<string, string>::const_iterator i = expected_package_prefixes.begin();
-       i != expected_package_prefixes.end(); ++i) {
-    if (i->second == prefix) {
-      other_package_for_prefix = i->first;
-      break;
-    }
-  }
-
-  // Check: Warning - If the file does not have a package, check whether
-  // the prefix declared is being used by another package or not.
-  if (package.empty()) {
-    // The file does not have a package and ...
-    if (other_package_for_prefix.empty()) {
-      // ... no other package has declared that prefix.
-      cerr << endl
-           << "protoc:0: warning: File '" << file->name() << "' has no "
-           << "package. Consider adding a new package to the proto and adding '"
-           << "new.package = " << prefix << "' to the expected prefixes file ("
-           << expected_prefixes_path << ")." << endl;
-      cerr.flush();
-    } else {
-      // ... another package has declared the same prefix.
-      cerr << endl
-           << "protoc:0: warning: File '" << file->name() << "' has no package "
-           << "and package '" << other_package_for_prefix << "' already uses '"
-           << prefix << "' as its prefix. Consider either adding a new package "
-           << "to the proto, or reusing one of the packages already using this "
-           << "prefix in the expected prefixes file ("
-           << expected_prefixes_path << ")." << endl;
-      cerr.flush();
-    }
-    return true;
-  }
-
-  // Check: Error - Make sure the prefix wasn't expected for a different
-  // package (overlap is allowed, but it has to be listed as an expected
-  // overlap).
-  if (!other_package_for_prefix.empty()) {
-    *out_error =
-        "error: Found 'option objc_class_prefix = \"" + prefix +
-        "\";' in '" + file->name() +
-        "'; that prefix is already used for 'package " +
-        other_package_for_prefix + ";'. It can only be reused by listing " +
-        "it in the expected file (" +
-        expected_prefixes_path + ").";
-    return false;  // Only report first usage of the prefix.
-  }
-
   // Check: Warning - If the given package/prefix pair wasn't expected, issue a
   // warning issue a warning suggesting it gets added to the file.
   if (!expected_package_prefixes.empty()) {
@@ -1105,36 +1070,10 @@ bool ValidateObjCClassPrefix(
          << "protoc:0: warning: Found unexpected 'option objc_class_prefix = \""
          << prefix << "\";' in '" << file->name() << "';"
          << " consider adding it to the expected prefixes file ("
-         << expected_prefixes_path << ")." << endl;
+         << generation_options.expected_prefixes_path << ")." << endl;
     cerr.flush();
   }
 
-  return true;
-}
-
-}  // namespace
-
-bool ValidateObjCClassPrefixes(const vector<const FileDescriptor*>& files,
-                               const Options& generation_options,
-                               string* out_error) {
-  // Load the expected package prefixes, if available, to validate against.
-  map<string, string> expected_package_prefixes;
-  if (!LoadExpectedPackagePrefixes(generation_options,
-                                   &expected_package_prefixes,
-                                   out_error)) {
-    return false;
-  }
-
-  for (int i = 0; i < files.size(); i++) {
-    bool is_valid =
-        ValidateObjCClassPrefix(files[i],
-                                generation_options.expected_prefixes_path,
-                                expected_package_prefixes,
-                                out_error);
-    if (!is_valid) {
-      return false;
-    }
-  }
   return true;
 }
 
@@ -1458,178 +1397,6 @@ bool ParseSimpleFile(
     }
   }
   return parser.Finish();
-}
-
-ImportWriter::ImportWriter(
-  const string& generate_for_named_framework,
-  const string& named_framework_to_proto_path_mappings_path)
-    : generate_for_named_framework_(generate_for_named_framework),
-      named_framework_to_proto_path_mappings_path_(
-          named_framework_to_proto_path_mappings_path),
-      need_to_parse_mapping_file_(true) {
-}
-
-ImportWriter::~ImportWriter() {}
-
-void ImportWriter::AddFile(const FileDescriptor* file,
-                           const string& header_extension) {
-  const string file_path(FilePath(file));
-
-  if (IsProtobufLibraryBundledProtoFile(file)) {
-    protobuf_framework_imports_.push_back(
-        FilePathBasename(file) + header_extension);
-    protobuf_non_framework_imports_.push_back(file_path + header_extension);
-    return;
-  }
-
-  // Lazy parse any mappings.
-  if (need_to_parse_mapping_file_) {
-    ParseFrameworkMappings();
-  }
-
-  map<string, string>::iterator proto_lookup =
-      proto_file_to_framework_name_.find(file->name());
-  if (proto_lookup != proto_file_to_framework_name_.end()) {
-    other_framework_imports_.push_back(
-        proto_lookup->second + "/" +
-        FilePathBasename(file) + header_extension);
-    return;
-  }
-
-  if (!generate_for_named_framework_.empty()) {
-    other_framework_imports_.push_back(
-        generate_for_named_framework_ + "/" +
-        FilePathBasename(file) + header_extension);
-    return;
-  }
-
-  other_imports_.push_back(file_path + header_extension);
-}
-
-void ImportWriter::Print(io::Printer* printer) const {
-  assert(protobuf_non_framework_imports_.size() ==
-         protobuf_framework_imports_.size());
-
-  bool add_blank_line = false;
-
-  if (protobuf_framework_imports_.size() > 0) {
-    const string framework_name(ProtobufLibraryFrameworkName);
-    const string cpp_symbol(ProtobufFrameworkImportSymbol(framework_name));
-
-    printer->Print(
-        "#if $cpp_symbol$\n",
-        "cpp_symbol", cpp_symbol);
-    for (vector<string>::const_iterator iter = protobuf_framework_imports_.begin();
-         iter != protobuf_framework_imports_.end(); ++iter) {
-      printer->Print(
-          " #import <$framework_name$/$header$>\n",
-          "framework_name", framework_name,
-          "header", *iter);
-    }
-    printer->Print(
-        "#else\n");
-    for (vector<string>::const_iterator iter = protobuf_non_framework_imports_.begin();
-         iter != protobuf_non_framework_imports_.end(); ++iter) {
-      printer->Print(
-          " #import \"$header$\"\n",
-          "header", *iter);
-    }
-    printer->Print(
-        "#endif\n");
-
-    add_blank_line = true;
-  }
-
-  if (other_framework_imports_.size() > 0) {
-    if (add_blank_line) {
-      printer->Print("\n");
-    }
-
-    for (vector<string>::const_iterator iter = other_framework_imports_.begin();
-         iter != other_framework_imports_.end(); ++iter) {
-      printer->Print(
-          " #import <$header$>\n",
-          "header", *iter);
-    }
-
-    add_blank_line = true;
-  }
-
-  if (other_imports_.size() > 0) {
-    if (add_blank_line) {
-      printer->Print("\n");
-    }
-
-    for (vector<string>::const_iterator iter = other_imports_.begin();
-         iter != other_imports_.end(); ++iter) {
-      printer->Print(
-          " #import \"$header$\"\n",
-          "header", *iter);
-    }
-  }
-}
-
-void ImportWriter::ParseFrameworkMappings() {
-  need_to_parse_mapping_file_ = false;
-  if (named_framework_to_proto_path_mappings_path_.empty()) {
-    return;  // Nothing to do.
-  }
-
-  ProtoFrameworkCollector collector(&proto_file_to_framework_name_);
-  string parse_error;
-  if (!ParseSimpleFile(named_framework_to_proto_path_mappings_path_,
-                       &collector, &parse_error)) {
-    cerr << "error parsing " << named_framework_to_proto_path_mappings_path_
-         << " : " << parse_error << endl;
-    cerr.flush();
-  }
-}
-
-bool ImportWriter::ProtoFrameworkCollector::ConsumeLine(
-    const StringPiece& line, string* out_error) {
-  int offset = line.find(':');
-  if (offset == StringPiece::npos) {
-    *out_error =
-        string("Framework/proto file mapping line without colon sign: '") +
-        line.ToString() + "'.";
-    return false;
-  }
-  StringPiece framework_name(line, 0, offset);
-  StringPiece proto_file_list(line, offset + 1, line.length() - offset - 1);
-  StringPieceTrimWhitespace(&framework_name);
-
-  int start = 0;
-  while (start < proto_file_list.length()) {
-    offset = proto_file_list.find(',', start);
-    if (offset == StringPiece::npos) {
-      offset = proto_file_list.length();
-    }
-
-    StringPiece proto_file(proto_file_list, start, offset - start);
-    StringPieceTrimWhitespace(&proto_file);
-    if (proto_file.size() != 0) {
-      map<string, string>::iterator existing_entry =
-          map_->find(proto_file.ToString());
-      if (existing_entry != map_->end()) {
-        cerr << "warning: duplicate proto file reference, replacing framework entry for '"
-             << proto_file.ToString() << "' with '" << framework_name.ToString()
-             << "' (was '" << existing_entry->second << "')." << endl;
-        cerr.flush();
-      }
-
-      if (proto_file.find(' ') != StringPiece::npos) {
-        cerr << "note: framework mapping file had a proto file with a space in, hopefully that isn't a missing comma: '"
-             << proto_file.ToString() << "'" << endl;
-        cerr.flush();
-      }
-
-      (*map_)[proto_file.ToString()] = framework_name.ToString();
-    }
-
-    start = offset + 1;
-  }
-
-  return true;
 }
 
 

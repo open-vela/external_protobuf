@@ -31,8 +31,18 @@
 
 @implementation GPBApiRoot
 
-// No extensions in the file and none of the imports (direct or indirect)
-// defined extensions, so no need to generate +extensionRegistry.
++ (GPBExtensionRegistry*)extensionRegistry {
+  // This is called by +initialize so there is no need to worry
+  // about thread safety and initialization of registry.
+  static GPBExtensionRegistry* registry = nil;
+  if (!registry) {
+    GPBDebugCheckRuntimeVersion();
+    registry = [[GPBExtensionRegistry alloc] init];
+    [registry addExtensions:[GPBSourceContextRoot extensionRegistry]];
+    [registry addExtensions:[GPBTypeRoot extensionRegistry]];
+  }
+  return registry;
+}
 
 @end
 
@@ -45,7 +55,6 @@ static GPBFileDescriptor *GPBApiRoot_FileDescriptor(void) {
   if (!descriptor) {
     GPBDebugCheckRuntimeVersion();
     descriptor = [[GPBFileDescriptor alloc] initWithPackage:@"google.protobuf"
-                                                 objcPrefix:@"GPB"
                                                      syntax:GPBFileSyntaxProto3];
   }
   return descriptor;
