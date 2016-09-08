@@ -54,12 +54,7 @@ NS_ASSUME_NONNULL_BEGIN
 /** The NSDate representation of this GPBTimestamp. */
 @property(nonatomic, readwrite, strong) NSDate *date;
 
-/**
- * The NSTimeInterval representation of this GPBTimestamp.
- *
- * @note: Not all second/nanos combinations can be represented in a
- * NSTimeInterval, so getting this could be a lossy transform.
- **/
+/** The NSTimeInterval representation of this GPBTimestamp. */
 @property(nonatomic, readwrite) NSTimeInterval timeIntervalSince1970;
 
 /**
@@ -87,12 +82,7 @@ NS_ASSUME_NONNULL_BEGIN
  **/
 @interface GPBDuration (GBPWellKnownTypes)
 
-/**
- * The NSTimeInterval representation of this GPBDuration.
- *
- * @note: Not all second/nanos combinations can be represented in a
- * NSTimeInterval, so getting this could be a lossy transform.
- **/
+/** The NSTimeInterval representation of this GPBTimestamp. */
 @property(nonatomic, readwrite) NSTimeInterval timeIntervalSince1970;
 
 /**
@@ -100,7 +90,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @param timeIntervalSince1970 Time interval to configure the GPBDuration with.
  *
- * @return A newly initialized GPBDuration.
+ * @return A newly initialized GPBTimestamp.
  **/
 - (instancetype)initWithTimeIntervalSince1970:(NSTimeInterval)timeIntervalSince1970;
 
