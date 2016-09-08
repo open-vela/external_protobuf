@@ -27,9 +27,6 @@
 
 @implementation GPBDurationRoot
 
-// No extensions in the file and no imports, so no need to generate
-// +extensionRegistry.
-
 @end
 
 #pragma mark - GPBDurationRoot_FileDescriptor
@@ -41,7 +38,6 @@ static GPBFileDescriptor *GPBDurationRoot_FileDescriptor(void) {
   if (!descriptor) {
     GPBDebugCheckRuntimeVersion();
     descriptor = [[GPBFileDescriptor alloc] initWithPackage:@"google.protobuf"
-                                                 objcPrefix:@"GPB"
                                                      syntax:GPBFileSyntaxProto3];
   }
   return descriptor;
