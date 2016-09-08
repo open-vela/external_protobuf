@@ -27,6 +27,9 @@
 
 @implementation GPBSourceContextRoot
 
+// No extensions in the file and no imports, so no need to generate
+// +extensionRegistry.
+
 @end
 
 #pragma mark - GPBSourceContextRoot_FileDescriptor
@@ -77,7 +80,7 @@ typedef struct GPBSourceContext__storage_ {
                                         fields:fields
                                     fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
                                    storageSize:sizeof(GPBSourceContext__storage_)
-                                         flags:0];
+                                         flags:GPBDescriptorInitializationFlag_None];
     NSAssert(descriptor == nil, @"Startup recursed!");
     descriptor = localDescriptor;
   }

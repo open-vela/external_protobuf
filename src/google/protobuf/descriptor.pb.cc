@@ -1040,7 +1040,6 @@ void FileDescriptorSet::SerializeWithCachedSizes(
 
 ::google::protobuf::uint8* FileDescriptorSet::InternalSerializeWithCachedSizesToArray(
     bool deterministic, ::google::protobuf::uint8* target) const {
-  (void)deterministic; // Unused
   // @@protoc_insertion_point(serialize_to_array_start:google.protobuf.FileDescriptorSet)
   // repeated .google.protobuf.FileDescriptorProto file = 1;
   for (unsigned int i = 0, n = this->file_size(); i < n; i++) {
@@ -1633,7 +1632,6 @@ void FileDescriptorProto::SerializeWithCachedSizes(
 
 ::google::protobuf::uint8* FileDescriptorProto::InternalSerializeWithCachedSizesToArray(
     bool deterministic, ::google::protobuf::uint8* target) const {
-  (void)deterministic; // Unused
   // @@protoc_insertion_point(serialize_to_array_start:google.protobuf.FileDescriptorProto)
   // optional string name = 1;
   if (has_name()) {
@@ -2535,7 +2533,7 @@ void DescriptorProto_ExtensionRange::Clear() {
 #endif
 
 #define ZR_(first, last) do {\
-  ::memset(&first, 0,\
+  ::memset(&(first), 0,\
            ZR_HELPER_(last) - ZR_HELPER_(first) + sizeof(last));\
 } while (0)
 
@@ -2633,7 +2631,6 @@ void DescriptorProto_ExtensionRange::SerializeWithCachedSizes(
 
 ::google::protobuf::uint8* DescriptorProto_ExtensionRange::InternalSerializeWithCachedSizesToArray(
     bool deterministic, ::google::protobuf::uint8* target) const {
-  (void)deterministic; // Unused
   // @@protoc_insertion_point(serialize_to_array_start:google.protobuf.DescriptorProto.ExtensionRange)
   // optional int32 start = 1;
   if (has_start()) {
@@ -2839,7 +2836,7 @@ void DescriptorProto_ReservedRange::Clear() {
 #endif
 
 #define ZR_(first, last) do {\
-  ::memset(&first, 0,\
+  ::memset(&(first), 0,\
            ZR_HELPER_(last) - ZR_HELPER_(first) + sizeof(last));\
 } while (0)
 
@@ -2937,7 +2934,6 @@ void DescriptorProto_ReservedRange::SerializeWithCachedSizes(
 
 ::google::protobuf::uint8* DescriptorProto_ReservedRange::InternalSerializeWithCachedSizesToArray(
     bool deterministic, ::google::protobuf::uint8* target) const {
-  (void)deterministic; // Unused
   // @@protoc_insertion_point(serialize_to_array_start:google.protobuf.DescriptorProto.ReservedRange)
   // optional int32 start = 1;
   if (has_start()) {
@@ -3439,7 +3435,6 @@ void DescriptorProto::SerializeWithCachedSizes(
 
 ::google::protobuf::uint8* DescriptorProto::InternalSerializeWithCachedSizesToArray(
     bool deterministic, ::google::protobuf::uint8* target) const {
-  (void)deterministic; // Unused
   // @@protoc_insertion_point(serialize_to_array_start:google.protobuf.DescriptorProto)
   // optional string name = 1;
   if (has_name()) {
@@ -4680,7 +4675,6 @@ void FieldDescriptorProto::SerializeWithCachedSizes(
 
 ::google::protobuf::uint8* FieldDescriptorProto::InternalSerializeWithCachedSizesToArray(
     bool deterministic, ::google::protobuf::uint8* target) const {
-  (void)deterministic; // Unused
   // @@protoc_insertion_point(serialize_to_array_start:google.protobuf.FieldDescriptorProto)
   // optional string name = 1;
   if (has_name()) {
@@ -5569,7 +5563,6 @@ void OneofDescriptorProto::SerializeWithCachedSizes(
 
 ::google::protobuf::uint8* OneofDescriptorProto::InternalSerializeWithCachedSizesToArray(
     bool deterministic, ::google::protobuf::uint8* target) const {
-  (void)deterministic; // Unused
   // @@protoc_insertion_point(serialize_to_array_start:google.protobuf.OneofDescriptorProto)
   // optional string name = 1;
   if (has_name()) {
@@ -6009,7 +6002,6 @@ void EnumDescriptorProto::SerializeWithCachedSizes(
 
 ::google::protobuf::uint8* EnumDescriptorProto::InternalSerializeWithCachedSizesToArray(
     bool deterministic, ::google::protobuf::uint8* target) const {
-  (void)deterministic; // Unused
   // @@protoc_insertion_point(serialize_to_array_start:google.protobuf.EnumDescriptorProto)
   // optional string name = 1;
   if (has_name()) {
@@ -6495,7 +6487,6 @@ void EnumValueDescriptorProto::SerializeWithCachedSizes(
 
 ::google::protobuf::uint8* EnumValueDescriptorProto::InternalSerializeWithCachedSizesToArray(
     bool deterministic, ::google::protobuf::uint8* target) const {
-  (void)deterministic; // Unused
   // @@protoc_insertion_point(serialize_to_array_start:google.protobuf.EnumValueDescriptorProto)
   // optional string name = 1;
   if (has_name()) {
@@ -6975,7 +6966,6 @@ void ServiceDescriptorProto::SerializeWithCachedSizes(
 
 ::google::protobuf::uint8* ServiceDescriptorProto::InternalSerializeWithCachedSizesToArray(
     bool deterministic, ::google::protobuf::uint8* target) const {
-  (void)deterministic; // Unused
   // @@protoc_insertion_point(serialize_to_array_start:google.protobuf.ServiceDescriptorProto)
   // optional string name = 1;
   if (has_name()) {
@@ -7357,7 +7347,7 @@ void MethodDescriptorProto::Clear() {
 #endif
 
 #define ZR_(first, last) do {\
-  ::memset(&first, 0,\
+  ::memset(&(first), 0,\
            ZR_HELPER_(last) - ZR_HELPER_(first) + sizeof(last));\
 } while (0)
 
@@ -7569,7 +7559,6 @@ void MethodDescriptorProto::SerializeWithCachedSizes(
 
 ::google::protobuf::uint8* MethodDescriptorProto::InternalSerializeWithCachedSizesToArray(
     bool deterministic, ::google::protobuf::uint8* target) const {
-  (void)deterministic; // Unused
   // @@protoc_insertion_point(serialize_to_array_start:google.protobuf.MethodDescriptorProto)
   // optional string name = 1;
   if (has_name()) {
@@ -8174,7 +8163,7 @@ void FileOptions::Clear() {
 #endif
 
 #define ZR_(first, last) do {\
-  ::memset(&first, 0,\
+  ::memset(&(first), 0,\
            ZR_HELPER_(last) - ZR_HELPER_(first) + sizeof(last));\
 } while (0)
 
@@ -8607,7 +8596,6 @@ void FileOptions::SerializeWithCachedSizes(
 
 ::google::protobuf::uint8* FileOptions::InternalSerializeWithCachedSizesToArray(
     bool deterministic, ::google::protobuf::uint8* target) const {
-  (void)deterministic; // Unused
   // @@protoc_insertion_point(serialize_to_array_start:google.protobuf.FileOptions)
   // optional string java_package = 1;
   if (has_java_package()) {
@@ -9582,7 +9570,7 @@ void MessageOptions::Clear() {
 #endif
 
 #define ZR_(first, last) do {\
-  ::memset(&first, 0,\
+  ::memset(&(first), 0,\
            ZR_HELPER_(last) - ZR_HELPER_(first) + sizeof(last));\
 } while (0)
 
@@ -9753,7 +9741,6 @@ void MessageOptions::SerializeWithCachedSizes(
 
 ::google::protobuf::uint8* MessageOptions::InternalSerializeWithCachedSizesToArray(
     bool deterministic, ::google::protobuf::uint8* target) const {
-  (void)deterministic; // Unused
   // @@protoc_insertion_point(serialize_to_array_start:google.protobuf.MessageOptions)
   // optional bool message_set_wire_format = 1 [default = false];
   if (has_message_set_wire_format()) {
@@ -10196,7 +10183,7 @@ void FieldOptions::Clear() {
 #endif
 
 #define ZR_(first, last) do {\
-  ::memset(&first, 0,\
+  ::memset(&(first), 0,\
            ZR_HELPER_(last) - ZR_HELPER_(first) + sizeof(last));\
 } while (0)
 
@@ -10422,7 +10409,6 @@ void FieldOptions::SerializeWithCachedSizes(
 
 ::google::protobuf::uint8* FieldOptions::InternalSerializeWithCachedSizesToArray(
     bool deterministic, ::google::protobuf::uint8* target) const {
-  (void)deterministic; // Unused
   // @@protoc_insertion_point(serialize_to_array_start:google.protobuf.FieldOptions)
   // optional .google.protobuf.FieldOptions.CType ctype = 1 [default = STRING];
   if (has_ctype()) {
@@ -10959,7 +10945,6 @@ void OneofOptions::SerializeWithCachedSizes(
 
 ::google::protobuf::uint8* OneofOptions::InternalSerializeWithCachedSizesToArray(
     bool deterministic, ::google::protobuf::uint8* target) const {
-  (void)deterministic; // Unused
   // @@protoc_insertion_point(serialize_to_array_start:google.protobuf.OneofOptions)
   // repeated .google.protobuf.UninterpretedOption uninterpreted_option = 999;
   for (unsigned int i = 0, n = this->uninterpreted_option_size(); i < n; i++) {
@@ -11192,7 +11177,7 @@ void EnumOptions::Clear() {
 #endif
 
 #define ZR_(first, last) do {\
-  ::memset(&first, 0,\
+  ::memset(&(first), 0,\
            ZR_HELPER_(last) - ZR_HELPER_(first) + sizeof(last));\
 } while (0)
 
@@ -11323,7 +11308,6 @@ void EnumOptions::SerializeWithCachedSizes(
 
 ::google::protobuf::uint8* EnumOptions::InternalSerializeWithCachedSizesToArray(
     bool deterministic, ::google::protobuf::uint8* target) const {
-  (void)deterministic; // Unused
   // @@protoc_insertion_point(serialize_to_array_start:google.protobuf.EnumOptions)
   // optional bool allow_alias = 2;
   if (has_allow_alias()) {
@@ -11725,7 +11709,6 @@ void EnumValueOptions::SerializeWithCachedSizes(
 
 ::google::protobuf::uint8* EnumValueOptions::InternalSerializeWithCachedSizesToArray(
     bool deterministic, ::google::protobuf::uint8* target) const {
-  (void)deterministic; // Unused
   // @@protoc_insertion_point(serialize_to_array_start:google.protobuf.EnumValueOptions)
   // optional bool deprecated = 1 [default = false];
   if (has_deprecated()) {
@@ -12087,7 +12070,6 @@ void ServiceOptions::SerializeWithCachedSizes(
 
 ::google::protobuf::uint8* ServiceOptions::InternalSerializeWithCachedSizesToArray(
     bool deterministic, ::google::protobuf::uint8* target) const {
-  (void)deterministic; // Unused
   // @@protoc_insertion_point(serialize_to_array_start:google.protobuf.ServiceOptions)
   // optional bool deprecated = 33 [default = false];
   if (has_deprecated()) {
@@ -12449,7 +12431,6 @@ void MethodOptions::SerializeWithCachedSizes(
 
 ::google::protobuf::uint8* MethodOptions::InternalSerializeWithCachedSizesToArray(
     bool deterministic, ::google::protobuf::uint8* target) const {
-  (void)deterministic; // Unused
   // @@protoc_insertion_point(serialize_to_array_start:google.protobuf.MethodOptions)
   // optional bool deprecated = 33 [default = false];
   if (has_deprecated()) {
@@ -12812,7 +12793,6 @@ void UninterpretedOption_NamePart::SerializeWithCachedSizes(
 
 ::google::protobuf::uint8* UninterpretedOption_NamePart::InternalSerializeWithCachedSizesToArray(
     bool deterministic, ::google::protobuf::uint8* target) const {
-  (void)deterministic; // Unused
   // @@protoc_insertion_point(serialize_to_array_start:google.protobuf.UninterpretedOption.NamePart)
   // required string name_part = 1;
   if (has_name_part()) {
@@ -13053,7 +13033,7 @@ void UninterpretedOption::Clear() {
 #endif
 
 #define ZR_(first, last) do {\
-  ::memset(&first, 0,\
+  ::memset(&(first), 0,\
            ZR_HELPER_(last) - ZR_HELPER_(first) + sizeof(last));\
 } while (0)
 
@@ -13279,7 +13259,6 @@ void UninterpretedOption::SerializeWithCachedSizes(
 
 ::google::protobuf::uint8* UninterpretedOption::InternalSerializeWithCachedSizesToArray(
     bool deterministic, ::google::protobuf::uint8* target) const {
-  (void)deterministic; // Unused
   // @@protoc_insertion_point(serialize_to_array_start:google.protobuf.UninterpretedOption)
   // repeated .google.protobuf.UninterpretedOption.NamePart name = 2;
   for (unsigned int i = 0, n = this->name_size(); i < n; i++) {
@@ -14125,7 +14104,6 @@ void SourceCodeInfo_Location::SerializeWithCachedSizes(
 
 ::google::protobuf::uint8* SourceCodeInfo_Location::InternalSerializeWithCachedSizesToArray(
     bool deterministic, ::google::protobuf::uint8* target) const {
-  (void)deterministic; // Unused
   // @@protoc_insertion_point(serialize_to_array_start:google.protobuf.SourceCodeInfo.Location)
   // repeated int32 path = 1 [packed = true];
   if (this->path_size() > 0) {
@@ -14488,7 +14466,6 @@ void SourceCodeInfo::SerializeWithCachedSizes(
 
 ::google::protobuf::uint8* SourceCodeInfo::InternalSerializeWithCachedSizesToArray(
     bool deterministic, ::google::protobuf::uint8* target) const {
-  (void)deterministic; // Unused
   // @@protoc_insertion_point(serialize_to_array_start:google.protobuf.SourceCodeInfo)
   // repeated .google.protobuf.SourceCodeInfo.Location location = 1;
   for (unsigned int i = 0, n = this->location_size(); i < n; i++) {
@@ -14941,7 +14918,7 @@ void GeneratedCodeInfo_Annotation::Clear() {
 #endif
 
 #define ZR_(first, last) do {\
-  ::memset(&first, 0,\
+  ::memset(&(first), 0,\
            ZR_HELPER_(last) - ZR_HELPER_(first) + sizeof(last));\
 } while (0)
 
@@ -15100,7 +15077,6 @@ void GeneratedCodeInfo_Annotation::SerializeWithCachedSizes(
 
 ::google::protobuf::uint8* GeneratedCodeInfo_Annotation::InternalSerializeWithCachedSizesToArray(
     bool deterministic, ::google::protobuf::uint8* target) const {
-  (void)deterministic; // Unused
   // @@protoc_insertion_point(serialize_to_array_start:google.protobuf.GeneratedCodeInfo.Annotation)
   // repeated int32 path = 1 [packed = true];
   if (this->path_size() > 0) {
@@ -15420,7 +15396,6 @@ void GeneratedCodeInfo::SerializeWithCachedSizes(
 
 ::google::protobuf::uint8* GeneratedCodeInfo::InternalSerializeWithCachedSizesToArray(
     bool deterministic, ::google::protobuf::uint8* target) const {
-  (void)deterministic; // Unused
   // @@protoc_insertion_point(serialize_to_array_start:google.protobuf.GeneratedCodeInfo)
   // repeated .google.protobuf.GeneratedCodeInfo.Annotation annotation = 1;
   for (unsigned int i = 0, n = this->annotation_size(); i < n; i++) {
