@@ -77,7 +77,7 @@ typedef struct GPBFieldMask__storage_ {
                                         fields:fields
                                     fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
                                    storageSize:sizeof(GPBFieldMask__storage_)
-                                         flags:GPBDescriptorInitializationFlag_None];
+                                         flags:0];
     NSAssert(descriptor == nil, @"Startup recursed!");
     descriptor = localDescriptor;
   }
