@@ -172,7 +172,7 @@ typedef struct GPBType__storage_ {
         .number = GPBType_FieldNumber_Syntax,
         .hasIndex = 2,
         .offset = (uint32_t)offsetof(GPBType__storage_, syntax),
-        .flags = GPBFieldOptional | GPBFieldHasEnumDescriptor,
+        .flags = (GPBFieldFlags)(GPBFieldOptional | GPBFieldHasEnumDescriptor),
         .dataType = GPBDataTypeEnum,
       },
     };
@@ -183,7 +183,7 @@ typedef struct GPBType__storage_ {
                                         fields:fields
                                     fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
                                    storageSize:sizeof(GPBType__storage_)
-                                         flags:0];
+                                         flags:GPBDescriptorInitializationFlag_None];
     NSAssert(descriptor == nil, @"Startup recursed!");
     descriptor = localDescriptor;
   }
@@ -244,7 +244,7 @@ typedef struct GPBField__storage_ {
         .number = GPBField_FieldNumber_Kind,
         .hasIndex = 0,
         .offset = (uint32_t)offsetof(GPBField__storage_, kind),
-        .flags = GPBFieldOptional | GPBFieldHasEnumDescriptor,
+        .flags = (GPBFieldFlags)(GPBFieldOptional | GPBFieldHasEnumDescriptor),
         .dataType = GPBDataTypeEnum,
       },
       {
@@ -253,7 +253,7 @@ typedef struct GPBField__storage_ {
         .number = GPBField_FieldNumber_Cardinality,
         .hasIndex = 1,
         .offset = (uint32_t)offsetof(GPBField__storage_, cardinality),
-        .flags = GPBFieldOptional | GPBFieldHasEnumDescriptor,
+        .flags = (GPBFieldFlags)(GPBFieldOptional | GPBFieldHasEnumDescriptor),
         .dataType = GPBDataTypeEnum,
       },
       {
@@ -280,7 +280,7 @@ typedef struct GPBField__storage_ {
         .number = GPBField_FieldNumber_TypeURL,
         .hasIndex = 4,
         .offset = (uint32_t)offsetof(GPBField__storage_, typeURL),
-        .flags = GPBFieldOptional | GPBFieldTextFormatNameCustom,
+        .flags = (GPBFieldFlags)(GPBFieldOptional | GPBFieldTextFormatNameCustom),
         .dataType = GPBDataTypeString,
       },
       {
@@ -336,7 +336,7 @@ typedef struct GPBField__storage_ {
                                         fields:fields
                                     fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
                                    storageSize:sizeof(GPBField__storage_)
-                                         flags:0];
+                                         flags:GPBDescriptorInitializationFlag_None];
 #if !GPBOBJC_SKIP_MESSAGE_TEXTFORMAT_EXTRAS
     static const char *extraTextFormatInfo =
         "\001\006\004\241!!\000";
@@ -553,7 +553,7 @@ typedef struct GPBEnum__storage_ {
         .number = GPBEnum_FieldNumber_Syntax,
         .hasIndex = 2,
         .offset = (uint32_t)offsetof(GPBEnum__storage_, syntax),
-        .flags = GPBFieldOptional | GPBFieldHasEnumDescriptor,
+        .flags = (GPBFieldFlags)(GPBFieldOptional | GPBFieldHasEnumDescriptor),
         .dataType = GPBDataTypeEnum,
       },
     };
@@ -564,7 +564,7 @@ typedef struct GPBEnum__storage_ {
                                         fields:fields
                                     fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
                                    storageSize:sizeof(GPBEnum__storage_)
-                                         flags:0];
+                                         flags:GPBDescriptorInitializationFlag_None];
     NSAssert(descriptor == nil, @"Startup recursed!");
     descriptor = localDescriptor;
   }
@@ -641,7 +641,7 @@ typedef struct GPBEnumValue__storage_ {
                                         fields:fields
                                     fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
                                    storageSize:sizeof(GPBEnumValue__storage_)
-                                         flags:0];
+                                         flags:GPBDescriptorInitializationFlag_None];
     NSAssert(descriptor == nil, @"Startup recursed!");
     descriptor = localDescriptor;
   }
@@ -695,7 +695,7 @@ typedef struct GPBOption__storage_ {
                                         fields:fields
                                     fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
                                    storageSize:sizeof(GPBOption__storage_)
-                                         flags:0];
+                                         flags:GPBDescriptorInitializationFlag_None];
     NSAssert(descriptor == nil, @"Startup recursed!");
     descriptor = localDescriptor;
   }
