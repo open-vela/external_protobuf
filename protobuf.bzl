@@ -99,13 +99,13 @@ proto_gen = rule(
         "deps": attr.label_list(providers = ["proto"]),
         "includes": attr.string_list(),
         "protoc": attr.label(
-            cfg = "host",
+            cfg = HOST_CFG,
             executable = True,
             single_file = True,
             mandatory = True,
         ),
         "plugin": attr.label(
-            cfg = "host",
+            cfg = HOST_CFG,
             allow_files = True,
             executable = True,
         ),
