@@ -20,7 +20,7 @@ other_language_protoc_outputs =                                \
   conformance_pb2.py                                           \
   Conformance.pbobjc.h                                         \
   Conformance.pbobjc.m                                         \
-  conformance_pb.rb                                            \
+  conformance.rb                                               \
   com/google/protobuf/Any.java                                 \
   com/google/protobuf/AnyOrBuilder.java                        \
   com/google/protobuf/AnyProto.java                            \
