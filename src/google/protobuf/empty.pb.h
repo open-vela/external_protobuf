@@ -34,7 +34,6 @@ namespace protobuf {
 
 // Internal implementation detail -- do not call these.
 void LIBPROTOBUF_EXPORT protobuf_AddDesc_google_2fprotobuf_2fempty_2eproto();
-void LIBPROTOBUF_EXPORT protobuf_InitDefaults_google_2fprotobuf_2fempty_2eproto();
 void protobuf_AssignDesc_google_2fprotobuf_2fempty_2eproto();
 void protobuf_ShutdownFile_google_2fprotobuf_2fempty_2eproto();
 
@@ -61,10 +60,6 @@ class LIBPROTOBUF_EXPORT Empty : public ::google::protobuf::Message /* @@protoc_
   static const ::google::protobuf::Descriptor* descriptor();
   static const Empty& default_instance();
 
-  static inline const Empty* internal_default_instance() {
-    return &default_instance_.get();
-  }
-
   void UnsafeArenaSwap(Empty* other);
   void Swap(Empty* other);
 
@@ -80,7 +75,7 @@ class LIBPROTOBUF_EXPORT Empty : public ::google::protobuf::Message /* @@protoc_
   void Clear();
   bool IsInitialized() const;
 
-  size_t ByteSizeLong() const;
+  int ByteSize() const;
   bool MergePartialFromCodedStream(
       ::google::protobuf::io::CodedInputStream* input);
   void SerializeWithCachedSizes(
@@ -96,7 +91,6 @@ class LIBPROTOBUF_EXPORT Empty : public ::google::protobuf::Message /* @@protoc_
   void SharedDtor();
   void SetCachedSize(int size) const;
   void InternalSwap(Empty* other);
-  void UnsafeMergeFrom(const Empty& from);
   protected:
   explicit Empty(::google::protobuf::Arena* arena);
   private:
@@ -124,14 +118,14 @@ class LIBPROTOBUF_EXPORT Empty : public ::google::protobuf::Message /* @@protoc_
   friend class ::google::protobuf::Arena;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
+  bool _is_default_instance_;
   mutable int _cached_size_;
-  friend void LIBPROTOBUF_EXPORT protobuf_InitDefaults_google_2fprotobuf_2fempty_2eproto_impl();
-  friend void LIBPROTOBUF_EXPORT protobuf_AddDesc_google_2fprotobuf_2fempty_2eproto_impl();
+  friend void LIBPROTOBUF_EXPORT protobuf_AddDesc_google_2fprotobuf_2fempty_2eproto();
   friend void protobuf_AssignDesc_google_2fprotobuf_2fempty_2eproto();
   friend void protobuf_ShutdownFile_google_2fprotobuf_2fempty_2eproto();
 
   void InitAsDefaultInstance();
-  static ::google::protobuf::internal::ExplicitlyConstructed<Empty> default_instance_;
+  static Empty* default_instance_;
 };
 // ===================================================================
 

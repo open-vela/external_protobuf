@@ -35,7 +35,6 @@ namespace protobuf {
 
 // Internal implementation detail -- do not call these.
 void LIBPROTOBUF_EXPORT protobuf_AddDesc_google_2fprotobuf_2fany_2eproto();
-void LIBPROTOBUF_EXPORT protobuf_InitDefaults_google_2fprotobuf_2fany_2eproto();
 void protobuf_AssignDesc_google_2fprotobuf_2fany_2eproto();
 void protobuf_ShutdownFile_google_2fprotobuf_2fany_2eproto();
 
@@ -57,10 +56,6 @@ class LIBPROTOBUF_EXPORT Any : public ::google::protobuf::Message /* @@protoc_in
 
   static const ::google::protobuf::Descriptor* descriptor();
   static const Any& default_instance();
-
-  static inline const Any* internal_default_instance() {
-    return &default_instance_.get();
-  }
 
   // implements Any -----------------------------------------------
 
@@ -86,7 +81,7 @@ class LIBPROTOBUF_EXPORT Any : public ::google::protobuf::Message /* @@protoc_in
   void Clear();
   bool IsInitialized() const;
 
-  size_t ByteSizeLong() const;
+  int ByteSize() const;
   bool MergePartialFromCodedStream(
       ::google::protobuf::io::CodedInputStream* input);
   void SerializeWithCachedSizes(
@@ -102,7 +97,6 @@ class LIBPROTOBUF_EXPORT Any : public ::google::protobuf::Message /* @@protoc_in
   void SharedDtor();
   void SetCachedSize(int size) const;
   void InternalSwap(Any* other);
-  void UnsafeMergeFrom(const Any& from);
   private:
   inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
     return _internal_metadata_.arena();
@@ -144,17 +138,17 @@ class LIBPROTOBUF_EXPORT Any : public ::google::protobuf::Message /* @@protoc_in
  private:
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  bool _is_default_instance_;
   ::google::protobuf::internal::ArenaStringPtr type_url_;
   ::google::protobuf::internal::ArenaStringPtr value_;
   mutable int _cached_size_;
   ::google::protobuf::internal::AnyMetadata _any_metadata_;
-  friend void LIBPROTOBUF_EXPORT protobuf_InitDefaults_google_2fprotobuf_2fany_2eproto_impl();
-  friend void LIBPROTOBUF_EXPORT protobuf_AddDesc_google_2fprotobuf_2fany_2eproto_impl();
+  friend void LIBPROTOBUF_EXPORT protobuf_AddDesc_google_2fprotobuf_2fany_2eproto();
   friend void protobuf_AssignDesc_google_2fprotobuf_2fany_2eproto();
   friend void protobuf_ShutdownFile_google_2fprotobuf_2fany_2eproto();
 
   void InitAsDefaultInstance();
-  static ::google::protobuf::internal::ExplicitlyConstructed<Any> default_instance_;
+  static Any* default_instance_;
 };
 // ===================================================================
 
