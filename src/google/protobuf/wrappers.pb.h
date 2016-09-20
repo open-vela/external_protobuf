@@ -34,7 +34,6 @@ namespace protobuf {
 
 // Internal implementation detail -- do not call these.
 void LIBPROTOBUF_EXPORT protobuf_AddDesc_google_2fprotobuf_2fwrappers_2eproto();
-void LIBPROTOBUF_EXPORT protobuf_InitDefaults_google_2fprotobuf_2fwrappers_2eproto();
 void protobuf_AssignDesc_google_2fprotobuf_2fwrappers_2eproto();
 void protobuf_ShutdownFile_google_2fprotobuf_2fwrappers_2eproto();
 
@@ -69,10 +68,6 @@ class LIBPROTOBUF_EXPORT DoubleValue : public ::google::protobuf::Message /* @@p
   static const ::google::protobuf::Descriptor* descriptor();
   static const DoubleValue& default_instance();
 
-  static inline const DoubleValue* internal_default_instance() {
-    return &default_instance_.get();
-  }
-
   void UnsafeArenaSwap(DoubleValue* other);
   void Swap(DoubleValue* other);
 
@@ -88,7 +83,7 @@ class LIBPROTOBUF_EXPORT DoubleValue : public ::google::protobuf::Message /* @@p
   void Clear();
   bool IsInitialized() const;
 
-  size_t ByteSizeLong() const;
+  int ByteSize() const;
   bool MergePartialFromCodedStream(
       ::google::protobuf::io::CodedInputStream* input);
   void SerializeWithCachedSizes(
@@ -104,7 +99,6 @@ class LIBPROTOBUF_EXPORT DoubleValue : public ::google::protobuf::Message /* @@p
   void SharedDtor();
   void SetCachedSize(int size) const;
   void InternalSwap(DoubleValue* other);
-  void UnsafeMergeFrom(const DoubleValue& from);
   protected:
   explicit DoubleValue(::google::protobuf::Arena* arena);
   private:
@@ -138,15 +132,15 @@ class LIBPROTOBUF_EXPORT DoubleValue : public ::google::protobuf::Message /* @@p
   friend class ::google::protobuf::Arena;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
+  bool _is_default_instance_;
   double value_;
   mutable int _cached_size_;
-  friend void LIBPROTOBUF_EXPORT protobuf_InitDefaults_google_2fprotobuf_2fwrappers_2eproto_impl();
-  friend void LIBPROTOBUF_EXPORT protobuf_AddDesc_google_2fprotobuf_2fwrappers_2eproto_impl();
+  friend void LIBPROTOBUF_EXPORT protobuf_AddDesc_google_2fprotobuf_2fwrappers_2eproto();
   friend void protobuf_AssignDesc_google_2fprotobuf_2fwrappers_2eproto();
   friend void protobuf_ShutdownFile_google_2fprotobuf_2fwrappers_2eproto();
 
   void InitAsDefaultInstance();
-  static ::google::protobuf::internal::ExplicitlyConstructed<DoubleValue> default_instance_;
+  static DoubleValue* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -169,10 +163,6 @@ class LIBPROTOBUF_EXPORT FloatValue : public ::google::protobuf::Message /* @@pr
   static const ::google::protobuf::Descriptor* descriptor();
   static const FloatValue& default_instance();
 
-  static inline const FloatValue* internal_default_instance() {
-    return &default_instance_.get();
-  }
-
   void UnsafeArenaSwap(FloatValue* other);
   void Swap(FloatValue* other);
 
@@ -188,7 +178,7 @@ class LIBPROTOBUF_EXPORT FloatValue : public ::google::protobuf::Message /* @@pr
   void Clear();
   bool IsInitialized() const;
 
-  size_t ByteSizeLong() const;
+  int ByteSize() const;
   bool MergePartialFromCodedStream(
       ::google::protobuf::io::CodedInputStream* input);
   void SerializeWithCachedSizes(
@@ -204,7 +194,6 @@ class LIBPROTOBUF_EXPORT FloatValue : public ::google::protobuf::Message /* @@pr
   void SharedDtor();
   void SetCachedSize(int size) const;
   void InternalSwap(FloatValue* other);
-  void UnsafeMergeFrom(const FloatValue& from);
   protected:
   explicit FloatValue(::google::protobuf::Arena* arena);
   private:
@@ -238,15 +227,15 @@ class LIBPROTOBUF_EXPORT FloatValue : public ::google::protobuf::Message /* @@pr
   friend class ::google::protobuf::Arena;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
+  bool _is_default_instance_;
   float value_;
   mutable int _cached_size_;
-  friend void LIBPROTOBUF_EXPORT protobuf_InitDefaults_google_2fprotobuf_2fwrappers_2eproto_impl();
-  friend void LIBPROTOBUF_EXPORT protobuf_AddDesc_google_2fprotobuf_2fwrappers_2eproto_impl();
+  friend void LIBPROTOBUF_EXPORT protobuf_AddDesc_google_2fprotobuf_2fwrappers_2eproto();
   friend void protobuf_AssignDesc_google_2fprotobuf_2fwrappers_2eproto();
   friend void protobuf_ShutdownFile_google_2fprotobuf_2fwrappers_2eproto();
 
   void InitAsDefaultInstance();
-  static ::google::protobuf::internal::ExplicitlyConstructed<FloatValue> default_instance_;
+  static FloatValue* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -269,10 +258,6 @@ class LIBPROTOBUF_EXPORT Int64Value : public ::google::protobuf::Message /* @@pr
   static const ::google::protobuf::Descriptor* descriptor();
   static const Int64Value& default_instance();
 
-  static inline const Int64Value* internal_default_instance() {
-    return &default_instance_.get();
-  }
-
   void UnsafeArenaSwap(Int64Value* other);
   void Swap(Int64Value* other);
 
@@ -288,7 +273,7 @@ class LIBPROTOBUF_EXPORT Int64Value : public ::google::protobuf::Message /* @@pr
   void Clear();
   bool IsInitialized() const;
 
-  size_t ByteSizeLong() const;
+  int ByteSize() const;
   bool MergePartialFromCodedStream(
       ::google::protobuf::io::CodedInputStream* input);
   void SerializeWithCachedSizes(
@@ -304,7 +289,6 @@ class LIBPROTOBUF_EXPORT Int64Value : public ::google::protobuf::Message /* @@pr
   void SharedDtor();
   void SetCachedSize(int size) const;
   void InternalSwap(Int64Value* other);
-  void UnsafeMergeFrom(const Int64Value& from);
   protected:
   explicit Int64Value(::google::protobuf::Arena* arena);
   private:
@@ -338,15 +322,15 @@ class LIBPROTOBUF_EXPORT Int64Value : public ::google::protobuf::Message /* @@pr
   friend class ::google::protobuf::Arena;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
+  bool _is_default_instance_;
   ::google::protobuf::int64 value_;
   mutable int _cached_size_;
-  friend void LIBPROTOBUF_EXPORT protobuf_InitDefaults_google_2fprotobuf_2fwrappers_2eproto_impl();
-  friend void LIBPROTOBUF_EXPORT protobuf_AddDesc_google_2fprotobuf_2fwrappers_2eproto_impl();
+  friend void LIBPROTOBUF_EXPORT protobuf_AddDesc_google_2fprotobuf_2fwrappers_2eproto();
   friend void protobuf_AssignDesc_google_2fprotobuf_2fwrappers_2eproto();
   friend void protobuf_ShutdownFile_google_2fprotobuf_2fwrappers_2eproto();
 
   void InitAsDefaultInstance();
-  static ::google::protobuf::internal::ExplicitlyConstructed<Int64Value> default_instance_;
+  static Int64Value* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -369,10 +353,6 @@ class LIBPROTOBUF_EXPORT UInt64Value : public ::google::protobuf::Message /* @@p
   static const ::google::protobuf::Descriptor* descriptor();
   static const UInt64Value& default_instance();
 
-  static inline const UInt64Value* internal_default_instance() {
-    return &default_instance_.get();
-  }
-
   void UnsafeArenaSwap(UInt64Value* other);
   void Swap(UInt64Value* other);
 
@@ -388,7 +368,7 @@ class LIBPROTOBUF_EXPORT UInt64Value : public ::google::protobuf::Message /* @@p
   void Clear();
   bool IsInitialized() const;
 
-  size_t ByteSizeLong() const;
+  int ByteSize() const;
   bool MergePartialFromCodedStream(
       ::google::protobuf::io::CodedInputStream* input);
   void SerializeWithCachedSizes(
@@ -404,7 +384,6 @@ class LIBPROTOBUF_EXPORT UInt64Value : public ::google::protobuf::Message /* @@p
   void SharedDtor();
   void SetCachedSize(int size) const;
   void InternalSwap(UInt64Value* other);
-  void UnsafeMergeFrom(const UInt64Value& from);
   protected:
   explicit UInt64Value(::google::protobuf::Arena* arena);
   private:
@@ -438,15 +417,15 @@ class LIBPROTOBUF_EXPORT UInt64Value : public ::google::protobuf::Message /* @@p
   friend class ::google::protobuf::Arena;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
+  bool _is_default_instance_;
   ::google::protobuf::uint64 value_;
   mutable int _cached_size_;
-  friend void LIBPROTOBUF_EXPORT protobuf_InitDefaults_google_2fprotobuf_2fwrappers_2eproto_impl();
-  friend void LIBPROTOBUF_EXPORT protobuf_AddDesc_google_2fprotobuf_2fwrappers_2eproto_impl();
+  friend void LIBPROTOBUF_EXPORT protobuf_AddDesc_google_2fprotobuf_2fwrappers_2eproto();
   friend void protobuf_AssignDesc_google_2fprotobuf_2fwrappers_2eproto();
   friend void protobuf_ShutdownFile_google_2fprotobuf_2fwrappers_2eproto();
 
   void InitAsDefaultInstance();
-  static ::google::protobuf::internal::ExplicitlyConstructed<UInt64Value> default_instance_;
+  static UInt64Value* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -469,10 +448,6 @@ class LIBPROTOBUF_EXPORT Int32Value : public ::google::protobuf::Message /* @@pr
   static const ::google::protobuf::Descriptor* descriptor();
   static const Int32Value& default_instance();
 
-  static inline const Int32Value* internal_default_instance() {
-    return &default_instance_.get();
-  }
-
   void UnsafeArenaSwap(Int32Value* other);
   void Swap(Int32Value* other);
 
@@ -488,7 +463,7 @@ class LIBPROTOBUF_EXPORT Int32Value : public ::google::protobuf::Message /* @@pr
   void Clear();
   bool IsInitialized() const;
 
-  size_t ByteSizeLong() const;
+  int ByteSize() const;
   bool MergePartialFromCodedStream(
       ::google::protobuf::io::CodedInputStream* input);
   void SerializeWithCachedSizes(
@@ -504,7 +479,6 @@ class LIBPROTOBUF_EXPORT Int32Value : public ::google::protobuf::Message /* @@pr
   void SharedDtor();
   void SetCachedSize(int size) const;
   void InternalSwap(Int32Value* other);
-  void UnsafeMergeFrom(const Int32Value& from);
   protected:
   explicit Int32Value(::google::protobuf::Arena* arena);
   private:
@@ -538,15 +512,15 @@ class LIBPROTOBUF_EXPORT Int32Value : public ::google::protobuf::Message /* @@pr
   friend class ::google::protobuf::Arena;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
+  bool _is_default_instance_;
   ::google::protobuf::int32 value_;
   mutable int _cached_size_;
-  friend void LIBPROTOBUF_EXPORT protobuf_InitDefaults_google_2fprotobuf_2fwrappers_2eproto_impl();
-  friend void LIBPROTOBUF_EXPORT protobuf_AddDesc_google_2fprotobuf_2fwrappers_2eproto_impl();
+  friend void LIBPROTOBUF_EXPORT protobuf_AddDesc_google_2fprotobuf_2fwrappers_2eproto();
   friend void protobuf_AssignDesc_google_2fprotobuf_2fwrappers_2eproto();
   friend void protobuf_ShutdownFile_google_2fprotobuf_2fwrappers_2eproto();
 
   void InitAsDefaultInstance();
-  static ::google::protobuf::internal::ExplicitlyConstructed<Int32Value> default_instance_;
+  static Int32Value* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -569,10 +543,6 @@ class LIBPROTOBUF_EXPORT UInt32Value : public ::google::protobuf::Message /* @@p
   static const ::google::protobuf::Descriptor* descriptor();
   static const UInt32Value& default_instance();
 
-  static inline const UInt32Value* internal_default_instance() {
-    return &default_instance_.get();
-  }
-
   void UnsafeArenaSwap(UInt32Value* other);
   void Swap(UInt32Value* other);
 
@@ -588,7 +558,7 @@ class LIBPROTOBUF_EXPORT UInt32Value : public ::google::protobuf::Message /* @@p
   void Clear();
   bool IsInitialized() const;
 
-  size_t ByteSizeLong() const;
+  int ByteSize() const;
   bool MergePartialFromCodedStream(
       ::google::protobuf::io::CodedInputStream* input);
   void SerializeWithCachedSizes(
@@ -604,7 +574,6 @@ class LIBPROTOBUF_EXPORT UInt32Value : public ::google::protobuf::Message /* @@p
   void SharedDtor();
   void SetCachedSize(int size) const;
   void InternalSwap(UInt32Value* other);
-  void UnsafeMergeFrom(const UInt32Value& from);
   protected:
   explicit UInt32Value(::google::protobuf::Arena* arena);
   private:
@@ -638,15 +607,15 @@ class LIBPROTOBUF_EXPORT UInt32Value : public ::google::protobuf::Message /* @@p
   friend class ::google::protobuf::Arena;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
+  bool _is_default_instance_;
   ::google::protobuf::uint32 value_;
   mutable int _cached_size_;
-  friend void LIBPROTOBUF_EXPORT protobuf_InitDefaults_google_2fprotobuf_2fwrappers_2eproto_impl();
-  friend void LIBPROTOBUF_EXPORT protobuf_AddDesc_google_2fprotobuf_2fwrappers_2eproto_impl();
+  friend void LIBPROTOBUF_EXPORT protobuf_AddDesc_google_2fprotobuf_2fwrappers_2eproto();
   friend void protobuf_AssignDesc_google_2fprotobuf_2fwrappers_2eproto();
   friend void protobuf_ShutdownFile_google_2fprotobuf_2fwrappers_2eproto();
 
   void InitAsDefaultInstance();
-  static ::google::protobuf::internal::ExplicitlyConstructed<UInt32Value> default_instance_;
+  static UInt32Value* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -669,10 +638,6 @@ class LIBPROTOBUF_EXPORT BoolValue : public ::google::protobuf::Message /* @@pro
   static const ::google::protobuf::Descriptor* descriptor();
   static const BoolValue& default_instance();
 
-  static inline const BoolValue* internal_default_instance() {
-    return &default_instance_.get();
-  }
-
   void UnsafeArenaSwap(BoolValue* other);
   void Swap(BoolValue* other);
 
@@ -688,7 +653,7 @@ class LIBPROTOBUF_EXPORT BoolValue : public ::google::protobuf::Message /* @@pro
   void Clear();
   bool IsInitialized() const;
 
-  size_t ByteSizeLong() const;
+  int ByteSize() const;
   bool MergePartialFromCodedStream(
       ::google::protobuf::io::CodedInputStream* input);
   void SerializeWithCachedSizes(
@@ -704,7 +669,6 @@ class LIBPROTOBUF_EXPORT BoolValue : public ::google::protobuf::Message /* @@pro
   void SharedDtor();
   void SetCachedSize(int size) const;
   void InternalSwap(BoolValue* other);
-  void UnsafeMergeFrom(const BoolValue& from);
   protected:
   explicit BoolValue(::google::protobuf::Arena* arena);
   private:
@@ -738,15 +702,15 @@ class LIBPROTOBUF_EXPORT BoolValue : public ::google::protobuf::Message /* @@pro
   friend class ::google::protobuf::Arena;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
+  bool _is_default_instance_;
   bool value_;
   mutable int _cached_size_;
-  friend void LIBPROTOBUF_EXPORT protobuf_InitDefaults_google_2fprotobuf_2fwrappers_2eproto_impl();
-  friend void LIBPROTOBUF_EXPORT protobuf_AddDesc_google_2fprotobuf_2fwrappers_2eproto_impl();
+  friend void LIBPROTOBUF_EXPORT protobuf_AddDesc_google_2fprotobuf_2fwrappers_2eproto();
   friend void protobuf_AssignDesc_google_2fprotobuf_2fwrappers_2eproto();
   friend void protobuf_ShutdownFile_google_2fprotobuf_2fwrappers_2eproto();
 
   void InitAsDefaultInstance();
-  static ::google::protobuf::internal::ExplicitlyConstructed<BoolValue> default_instance_;
+  static BoolValue* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -769,10 +733,6 @@ class LIBPROTOBUF_EXPORT StringValue : public ::google::protobuf::Message /* @@p
   static const ::google::protobuf::Descriptor* descriptor();
   static const StringValue& default_instance();
 
-  static inline const StringValue* internal_default_instance() {
-    return &default_instance_.get();
-  }
-
   void UnsafeArenaSwap(StringValue* other);
   void Swap(StringValue* other);
 
@@ -788,7 +748,7 @@ class LIBPROTOBUF_EXPORT StringValue : public ::google::protobuf::Message /* @@p
   void Clear();
   bool IsInitialized() const;
 
-  size_t ByteSizeLong() const;
+  int ByteSize() const;
   bool MergePartialFromCodedStream(
       ::google::protobuf::io::CodedInputStream* input);
   void SerializeWithCachedSizes(
@@ -804,7 +764,6 @@ class LIBPROTOBUF_EXPORT StringValue : public ::google::protobuf::Message /* @@p
   void SharedDtor();
   void SetCachedSize(int size) const;
   void InternalSwap(StringValue* other);
-  void UnsafeMergeFrom(const StringValue& from);
   protected:
   explicit StringValue(::google::protobuf::Arena* arena);
   private:
@@ -846,15 +805,15 @@ class LIBPROTOBUF_EXPORT StringValue : public ::google::protobuf::Message /* @@p
   friend class ::google::protobuf::Arena;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
+  bool _is_default_instance_;
   ::google::protobuf::internal::ArenaStringPtr value_;
   mutable int _cached_size_;
-  friend void LIBPROTOBUF_EXPORT protobuf_InitDefaults_google_2fprotobuf_2fwrappers_2eproto_impl();
-  friend void LIBPROTOBUF_EXPORT protobuf_AddDesc_google_2fprotobuf_2fwrappers_2eproto_impl();
+  friend void LIBPROTOBUF_EXPORT protobuf_AddDesc_google_2fprotobuf_2fwrappers_2eproto();
   friend void protobuf_AssignDesc_google_2fprotobuf_2fwrappers_2eproto();
   friend void protobuf_ShutdownFile_google_2fprotobuf_2fwrappers_2eproto();
 
   void InitAsDefaultInstance();
-  static ::google::protobuf::internal::ExplicitlyConstructed<StringValue> default_instance_;
+  static StringValue* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -877,10 +836,6 @@ class LIBPROTOBUF_EXPORT BytesValue : public ::google::protobuf::Message /* @@pr
   static const ::google::protobuf::Descriptor* descriptor();
   static const BytesValue& default_instance();
 
-  static inline const BytesValue* internal_default_instance() {
-    return &default_instance_.get();
-  }
-
   void UnsafeArenaSwap(BytesValue* other);
   void Swap(BytesValue* other);
 
@@ -896,7 +851,7 @@ class LIBPROTOBUF_EXPORT BytesValue : public ::google::protobuf::Message /* @@pr
   void Clear();
   bool IsInitialized() const;
 
-  size_t ByteSizeLong() const;
+  int ByteSize() const;
   bool MergePartialFromCodedStream(
       ::google::protobuf::io::CodedInputStream* input);
   void SerializeWithCachedSizes(
@@ -912,7 +867,6 @@ class LIBPROTOBUF_EXPORT BytesValue : public ::google::protobuf::Message /* @@pr
   void SharedDtor();
   void SetCachedSize(int size) const;
   void InternalSwap(BytesValue* other);
-  void UnsafeMergeFrom(const BytesValue& from);
   protected:
   explicit BytesValue(::google::protobuf::Arena* arena);
   private:
@@ -954,15 +908,15 @@ class LIBPROTOBUF_EXPORT BytesValue : public ::google::protobuf::Message /* @@pr
   friend class ::google::protobuf::Arena;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
+  bool _is_default_instance_;
   ::google::protobuf::internal::ArenaStringPtr value_;
   mutable int _cached_size_;
-  friend void LIBPROTOBUF_EXPORT protobuf_InitDefaults_google_2fprotobuf_2fwrappers_2eproto_impl();
-  friend void LIBPROTOBUF_EXPORT protobuf_AddDesc_google_2fprotobuf_2fwrappers_2eproto_impl();
+  friend void LIBPROTOBUF_EXPORT protobuf_AddDesc_google_2fprotobuf_2fwrappers_2eproto();
   friend void protobuf_AssignDesc_google_2fprotobuf_2fwrappers_2eproto();
   friend void protobuf_ShutdownFile_google_2fprotobuf_2fwrappers_2eproto();
 
   void InitAsDefaultInstance();
-  static ::google::protobuf::internal::ExplicitlyConstructed<BytesValue> default_instance_;
+  static BytesValue* default_instance_;
 };
 // ===================================================================
 
