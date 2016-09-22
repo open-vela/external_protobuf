@@ -32,8 +32,6 @@
 #include <protobuf.h>
 #include <Zend/zend.h>
 
-#include "utf8.h"
-
 // -----------------------------------------------------------------------------
 // Native slot storage.
 // -----------------------------------------------------------------------------
@@ -58,7 +56,7 @@ size_t native_slot_size(upb_fieldtype_t type) {
 }
 
 bool native_slot_set(upb_fieldtype_t type, const zend_class_entry* klass,
-                     void* memory, zval* value TSRMLS_DC) {
+                     void* memory, zval* value) {
   switch (type) {
     case UPB_TYPE_STRING:
     case UPB_TYPE_BYTES: {
@@ -212,7 +210,7 @@ CASE(ENUM,   LONG,   uint32_t)
       return;
     }
     default:
-      return;
+      return EG(uninitialized_zval_ptr);
   }
 }
 
@@ -247,7 +245,7 @@ void native_slot_get_default(upb_fieldtype_t type, zval** cache TSRMLS_DC) {
       return;
     }
     default:
-      return;
+      return EG(uninitialized_zval_ptr);
   }
 }
 
@@ -297,7 +295,7 @@ const upb_fielddef* map_entry_value(const upb_msgdef* msgdef) {
   return value_field;
 }
 
-const zend_class_entry* field_type_class(const upb_fielddef* field TSRMLS_DC) {
+const zend_class_entry* field_type_class(const upb_fielddef* field) {
   if (upb_fielddef_type(field) == UPB_TYPE_MESSAGE) {
     zval* desc_php = get_def_obj(upb_fielddef_subdef(field));
     Descriptor* desc = zend_object_store_get_object(desc_php TSRMLS_CC);
@@ -307,7 +305,6 @@ const zend_class_entry* field_type_class(const upb_fielddef* field TSRMLS_DC) {
     EnumDescriptor* desc = zend_object_store_get_object(desc_php TSRMLS_CC);
     return desc->klass;
   }
-  return NULL;
 }
 
 // -----------------------------------------------------------------------------
@@ -438,8 +435,7 @@ void free_layout(MessageLayout* layout) {
   FREE(layout);
 }
 
-void layout_init(MessageLayout* layout, void* storage, zval** properties_table
-		 TSRMLS_DC) {
+void layout_init(MessageLayout* layout, void* storage, zval** properties_table) {
   int i;
   upb_msg_field_iter it;
   for (upb_msg_field_begin(&it, layout->msgdef), i = 0; !upb_msg_field_done(&it);
@@ -455,12 +451,11 @@ void layout_init(MessageLayout* layout, void* storage, zval** properties_table
       *oneof_case = ONEOF_CASE_NONE;
     } else if (is_map_field(field)) {
       zval_ptr_dtor(property_ptr);
-      map_field_create_with_type(map_field_type, field, property_ptr TSRMLS_CC);
+      map_field_create_with_type(map_field_type, field, property_ptr);
       DEREF(memory, zval**) = property_ptr;
     } else if (upb_fielddef_label(field) == UPB_LABEL_REPEATED) {
       zval_ptr_dtor(property_ptr);
-      repeated_field_create_with_type(repeated_field_type, field, property_ptr
-				      TSRMLS_CC);
+      repeated_field_create_with_type(repeated_field_type, field, property_ptr);
       DEREF(memory, zval**) = property_ptr;
     } else {
       native_slot_init(upb_fielddef_type(field), memory, property_ptr);
@@ -506,8 +501,8 @@ zval* layout_get(MessageLayout* layout, const void* storage,
   }
 }
 
-void layout_set(MessageLayout* layout, MessageHeader* header,
-		const upb_fielddef* field, zval* val TSRMLS_DC) {
+void layout_set(MessageLayout* layout, MessageHeader* header, const upb_fielddef* field,
+                zval* val) {
   void* storage = message_data(header);
   void* memory = slot_memory(layout, storage, field);
   uint32_t* oneof_case = slot_oneof_case(layout, storage, field);
@@ -520,7 +515,7 @@ void layout_set(MessageLayout* layout, MessageHeader* header,
     // zval in properties table first.
     switch (type) {
       case UPB_TYPE_MESSAGE: {
-        const upb_msgdef* msg = upb_fielddef_msgsubdef(field);
+        upb_msgdef* msg = upb_fielddef_msgsubdef(field);
         zval* desc_php = get_def_obj(msg);
         Descriptor* desc = zend_object_store_get_object(desc_php TSRMLS_CC);
         ce = desc->klass;
@@ -540,7 +535,7 @@ void layout_set(MessageLayout* layout, MessageHeader* header,
         break;
     }
 
-    native_slot_set(type, ce, memory, val TSRMLS_CC);
+    native_slot_set(type, ce, memory, val);
     *oneof_case = upb_fielddef_number(field);
   } else if (upb_fielddef_label(field) == UPB_LABEL_REPEATED) {
     // Works for both repeated and map fields
@@ -554,11 +549,11 @@ void layout_set(MessageLayout* layout, MessageHeader* header,
     upb_fieldtype_t type = upb_fielddef_type(field);
     zend_class_entry *ce = NULL;
     if (type == UPB_TYPE_MESSAGE) {
-      const upb_msgdef* msg = upb_fielddef_msgsubdef(field);
+      upb_msgdef* msg = upb_fielddef_msgsubdef(field);
       zval* desc_php = get_def_obj(msg);
       Descriptor* desc = zend_object_store_get_object(desc_php TSRMLS_CC);
       ce = desc->klass;
     }
-    native_slot_set(type, ce, value_memory(field, memory), val TSRMLS_CC);
+    native_slot_set(type, ce, value_memory(field, memory), val);
   }
 }
