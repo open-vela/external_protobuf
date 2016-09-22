@@ -27,9 +27,6 @@
 
 @implementation GPBSourceContextRoot
 
-// No extensions in the file and no imports, so no need to generate
-// +extensionRegistry.
-
 @end
 
 #pragma mark - GPBSourceContextRoot_FileDescriptor
@@ -39,9 +36,8 @@ static GPBFileDescriptor *GPBSourceContextRoot_FileDescriptor(void) {
   // about thread safety of the singleton.
   static GPBFileDescriptor *descriptor = NULL;
   if (!descriptor) {
-    GPB_DEBUG_CHECK_RUNTIME_VERSIONS();
+    GPBDebugCheckRuntimeVersion();
     descriptor = [[GPBFileDescriptor alloc] initWithPackage:@"google.protobuf"
-                                                 objcPrefix:@"GPB"
                                                      syntax:GPBFileSyntaxProto3];
   }
   return descriptor;
@@ -81,7 +77,7 @@ typedef struct GPBSourceContext__storage_ {
                                         fields:fields
                                     fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
                                    storageSize:sizeof(GPBSourceContext__storage_)
-                                         flags:GPBDescriptorInitializationFlag_None];
+                                         flags:0];
     NSAssert(descriptor == nil, @"Startup recursed!");
     descriptor = localDescriptor;
   }
