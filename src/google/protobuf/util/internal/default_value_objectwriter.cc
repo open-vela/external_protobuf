@@ -165,7 +165,10 @@ DefaultValueObjectWriter* DefaultValueObjectWriter::RenderBytes(
   if (current_ == NULL) {
     ow_->RenderBytes(name, value);
   } else {
-    RenderDataPiece(name, DataPiece(value, false, true));
+    // Since StringPiece is essentially a pointer, takes a copy of "value" to
+    // avoid ownership issues.
+    string_values_.push_back(new string(value.ToString()));
+    RenderDataPiece(name, DataPiece(*string_values_.back(), false, true));
   }
   return this;
 }
@@ -583,7 +586,6 @@ void DefaultValueObjectWriter::RenderDataPiece(StringPiece name,
         new Node(name.ToString(), NULL, PRIMITIVE, data, false,
                  child == NULL ? current_->path() : child->path(),
                  suppress_empty_list_, field_scrub_callback_.get()));
-    child = node.get();
     current_->AddChild(node.release());
   } else {
     child->set_data(data);
