@@ -35,14 +35,10 @@ internal_build_cpp() {
 build_cpp() {
   internal_build_cpp
   make check -j2
-  pushd conformance
-  make test_cpp
-  popd
+  cd conformance && make test_cpp && cd ..
 
   # Verify benchmarking code can build successfully.
-  pushd benchmarks
-  make && ./generate-datasets
-  popd
+  cd benchmarks && make && ./generate-datasets && cd ..
 }
 
 build_cpp_distcheck() {
