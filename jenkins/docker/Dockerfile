@@ -71,8 +71,6 @@ RUN apt-get update && apt-get install -y \
   python3.4-dev \
   # -- For Ruby --
   ruby \
-  # -- For C++ benchmarks --
-  cmake \
   && apt-get clean
 
 ##################
@@ -117,7 +115,7 @@ RUN cd /tmp && \
   cd protobuf && \
   ./autogen.sh && \
   ./configure && \
-  make -j6 && \
+  make -j7 && \
   cd java && \
   $MVN install dependency:go-offline -Dmaven.repo.local=$MAVEN_REPO && \
   cd ../javanano && \
