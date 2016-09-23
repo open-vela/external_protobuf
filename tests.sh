@@ -35,13 +35,14 @@ internal_build_cpp() {
 build_cpp() {
   internal_build_cpp
   make check -j2
-  cd conformance && make test_cpp && cd ..
+  pushd conformance
+  make test_cpp
+  popd
 
   # Verify benchmarking code can build successfully.
-  git submodule init
-  git submodule update
-  cd third_party/benchmark && cmake -DCMAKE_BUILD_TYPE=Release && make && cd ../..
-  cd benchmarks && make && ./generate-datasets && cd ..
+  pushd benchmarks
+  make && ./generate-datasets
+  popd
 }
 
 build_cpp_distcheck() {
