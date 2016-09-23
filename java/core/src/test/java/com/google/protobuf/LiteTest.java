@@ -35,6 +35,7 @@ import static java.util.Collections.singletonList;
 
 import com.google.protobuf.UnittestImportLite.ImportEnumLite;
 import com.google.protobuf.UnittestImportPublicLite.PublicImportMessageLite;
+import com.google.protobuf.UnittestLite;
 import com.google.protobuf.UnittestLite.ForeignEnumLite;
 import com.google.protobuf.UnittestLite.ForeignMessageLite;
 import com.google.protobuf.UnittestLite.TestAllExtensionsLite;
@@ -51,7 +52,14 @@ import protobuf_unittest.lite_equals_and_hash.LiteEqualsAndHash.BarPrime;
 import protobuf_unittest.lite_equals_and_hash.LiteEqualsAndHash.Foo;
 import protobuf_unittest.lite_equals_and_hash.LiteEqualsAndHash.TestOneofEquals;
 import protobuf_unittest.lite_equals_and_hash.LiteEqualsAndHash.TestRecursiveOneof;
+
 import junit.framework.TestCase;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
 /**
  * Test lite runtime.
@@ -130,6 +138,7 @@ public class LiteTest extends TestCase {
     assertEquals(7, message2.getExtension(
         UnittestLite.optionalNestedMessageExtensionLite).getBb());
   }
+  
   
   public void testClone() {
     TestAllTypesLite.Builder expected = TestAllTypesLite.newBuilder()
