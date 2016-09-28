@@ -35,13 +35,14 @@ internal_build_cpp() {
 build_cpp() {
   internal_build_cpp
   make check -j2
-  cd conformance && make test_cpp && cd ..
+  pushd conformance
+  make test_cpp
+  popd
 
   # Verify benchmarking code can build successfully.
-  git submodule init
-  git submodule update
-  cd third_party/benchmark && cmake -DCMAKE_BUILD_TYPE=Release && make && cd ../..
-  cd benchmarks && make && ./generate-datasets && cd ..
+  pushd benchmarks
+  make && ./generate-datasets
+  popd
 }
 
 build_cpp_distcheck() {
@@ -50,7 +51,7 @@ build_cpp_distcheck() {
   make dist
 
   # List all files that should be included in the distribution package.
-  git ls-files | grep "^\(java\|python\|objectivec\|csharp\|js\|ruby\|cmake\|examples\)" |\
+  git ls-files | grep "^\(java\|python\|objectivec\|csharp\|js\|ruby\|php\|cmake\|examples\)" |\
       grep -v ".gitignore" | grep -v "java/compatibility_tests" > dist.lst
   # Unzip the dist tar file.
   DIST=`ls *.tar.gz`
@@ -295,8 +296,6 @@ build_python() {
 build_python_cpp() {
   internal_build_cpp
   internal_install_python_deps
-  export LD_LIBRARY_PATH=../src/.libs # for Linux
-  export DYLD_LIBRARY_PATH=../src/.libs # for OS X
   cd python
   # Only test Python 2.6/3.x on Linux
   if [ $(uname -s) == "Linux" ]; then
