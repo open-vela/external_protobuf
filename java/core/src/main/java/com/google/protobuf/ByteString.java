@@ -311,18 +311,6 @@ public abstract class ByteString implements Iterable<Byte>, Serializable {
   }
 
   /**
-   * Wraps the given bytes into a {@code ByteString}. Intended for internal only usage.
-   */
-  static ByteString wrap(ByteBuffer buffer) {
-    if (buffer.hasArray()) {
-      final int offset = buffer.arrayOffset();
-      return ByteString.wrap(buffer.array(), offset + buffer.position(), buffer.remaining());
-    } else {
-      return new NioByteString(buffer);
-    }
-  }
-
-  /**
    * Wraps the given bytes into a {@code ByteString}. Intended for internal only
    * usage to force a classload of ByteString before LiteralByteString.
    */
@@ -691,7 +679,6 @@ public abstract class ByteString implements Iterable<Byte>, Serializable {
    */
   abstract void writeTo(ByteOutput byteOutput) throws IOException;
 
-
   /**
    * Constructs a read-only {@code java.nio.ByteBuffer} whose content
    * is equal to the contents of this byte string.
@@ -832,7 +819,6 @@ public abstract class ByteString implements Iterable<Byte>, Serializable {
     protected final boolean isBalanced() {
       return true;
     }
-
 
     /**
      * Check equality of the substring of given length of this object starting at
