@@ -334,54 +334,6 @@ build_javascript() {
   cd js && npm install && npm test && cd ..
 }
 
-build_php5.5_c() {
-  ln -sfn /usr/bin/php5.5 /usr/bin/php
-  ln -sfn /usr/bin/php-config5.5 /usr/bin/php-config
-  ln -sfn /usr/bin/phpize5.5 /usr/bin/phpize
-  cd php/tests && /bin/bash ./test.sh && cd ../..
-}
-
-build_php5.5() {
-  ln -sfn /usr/bin/php5.5 /usr/bin/php
-  ln -sfn /usr/bin/php-config5.5 /usr/bin/php-config
-  ln -sfn /usr/bin/phpize5.5 /usr/bin/phpize
-  rm -rf vendor
-  cp -r /usr/local/vendor-5.5 vendor
-  ./vendor/bin/phpunit
-}
-
-build_php5.6_c() {
-  ln -sfn /usr/bin/php5.6 /usr/bin/php
-  ln -sfn /usr/bin/php-config5.6 /usr/bin/php-config
-  ln -sfn /usr/bin/phpize5.6 /usr/bin/phpize
-  cd php/tests && /bin/bash ./test.sh && cd ../..
-}
-
-build_php5.6() {
-  ln -sfn /usr/bin/php5.6 /usr/bin/php
-  ln -sfn /usr/bin/php-config5.6 /usr/bin/php-config
-  ln -sfn /usr/bin/phpize5.6 /usr/bin/phpize
-  rm -rf vendor
-  cp -r /usr/local/vendor-5.6 vendor
-  ./vendor/bin/phpunit
-}
-
-build_php7.0_c() {
-  ln -sfn /usr/bin/php7.0 /usr/bin/php
-  ln -sfn /usr/bin/php-config7.0 /usr/bin/php-config
-  ln -sfn /usr/bin/phpize7.0 /usr/bin/phpize
-  cd php/tests && /bin/bash ./test.sh && cd ../..
-}
-
-build_php7.0() {
-  ln -sfn /usr/bin/php7.0 /usr/bin/php
-  ln -sfn /usr/bin/php-config7.0 /usr/bin/php-config
-  ln -sfn /usr/bin/phpize7.0 /usr/bin/phpize
-  rm -rf vendor
-  cp -r /usr/local/vendor-7.0 vendor
-  ./vendor/bin/phpunit
-}
-
 # Note: travis currently does not support testing more than one language so the
 # .travis.yml cheats and claims to only be cpp.  If they add multiple language
 # support, this should probably get updated to install steps and/or
@@ -412,13 +364,7 @@ Usage: $0 { cpp |
             ruby21 |
             ruby22 |
             jruby |
-            ruby_all |
-            php5.5   |
-            php5.5_c |
-            php5.6   |
-            php5.6_c |
-            php7.0   |
-            php7.0_c)
+            ruby_all)
 "
   exit 1
 fi
