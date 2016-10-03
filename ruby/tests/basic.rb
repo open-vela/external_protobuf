@@ -183,15 +183,12 @@ module BasicTest
 
     def test_hash
       m1 = TestMessage.new(:optional_int32 => 42)
-      m2 = TestMessage.new(:optional_int32 => 102, repeated_string: ['please', 'work', 'ok?'])
-      m3 = TestMessage.new(:optional_int32 => 102, repeated_string: ['please', 'work', 'ok?'])
+      m2 = TestMessage.new(:optional_int32 => 102)
       assert m1.hash != 0
       assert m2.hash != 0
-      assert m3.hash != 0
       # relying on the randomness here -- if hash function changes and we are
       # unlucky enough to get a collision, then change the values above.
       assert m1.hash != m2.hash
-      assert_equal m2.hash, m3.hash
     end
 
     def test_unknown_field_errors
