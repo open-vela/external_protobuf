@@ -46,6 +46,7 @@ These are projects we know about implementing Protocol Buffers for other program
 * Java/Android: https://github.com/square/wire
 * Java ME: http://code.google.com/p/protobuf-javame/
 * Java ME: http://swingme.sourceforge.net/encode.shtml
+* Java ME: http://github.com/ponderingpanda/protobuf-j2me
 * Java ME: http://code.google.com/p/protobuf-j2me/
 * Javascript: http://code.google.com/p/protobuf-js/
 * Javascript: http://github.com/sirikata/protojs
