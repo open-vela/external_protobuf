@@ -1,6 +1,7 @@
-Recommended.JsonInput.FieldNameWithDoubleUnderscores.JsonOutput
-Required.JsonInput.FieldNameInSnakeCase.JsonOutput
-Required.JsonInput.FieldNameWithMixedCases.JsonOutput
-Required.JsonInput.FieldNameWithMixedCases.ProtobufOutput
-Required.JsonInput.FieldNameWithMixedCases.Validator
-Required.JsonInput.OriginalProtoFieldName.JsonOutput
+JsonInput.FieldNameInLowerCamelCase.Validator
+JsonInput.FieldNameInSnakeCase.JsonOutput
+JsonInput.FieldNameInSnakeCase.ProtobufOutput
+JsonInput.FieldNameWithMixedCases.JsonOutput
+JsonInput.FieldNameWithMixedCases.ProtobufOutput
+JsonInput.FieldNameWithMixedCases.Validator
+JsonInput.OriginalProtoFieldName.JsonOutput
