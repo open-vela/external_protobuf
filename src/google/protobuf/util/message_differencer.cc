@@ -626,7 +626,6 @@ bool MessageDifferencer::CompareWithFieldsInternal(
       }
 
       if (reporter_ != NULL) {
-        assert(field1 != NULL);
         int count = field1->is_repeated() ?
             reflection1->FieldSize(message1, field1) : 1;
 
@@ -707,7 +706,6 @@ bool MessageDifferencer::CompareWithFieldsInternal(
     }
 
     bool fieldDifferent = false;
-    assert(field1 != NULL);
     if (field1->is_repeated()) {
       fieldDifferent = !CompareRepeatedField(message1, message2, field1,
                                              parent_fields);
@@ -877,7 +875,6 @@ bool MessageDifferencer::CompareRepeatedField(
 
   for (int i = 0; i < count1; ++i) {
     if (match_list1[i] != -1) continue;
-    assert(reporter_ != NULL);
     specific_field.index = i;
     parent_fields->push_back(specific_field);
     reporter_->ReportDeleted(message1, message2, *parent_fields);
