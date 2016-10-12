@@ -75,6 +75,8 @@ RUN apt-get clean && apt-get update && apt-get install -y --force-yes \
   python3.4-dev \
   # -- For Ruby --
   ruby \
+  # -- For C++ benchmarks --
+  cmake \
   # -- For PHP --
   php5.5     \
   php5.5-dev \
