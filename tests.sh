@@ -393,12 +393,6 @@ build_php5.5_32() {
   ./vendor/bin/phpunit
 }
 
-build_php5.5_c_32() {
-  use_php_bc 5.5
-  wget https://phar.phpunit.de/phpunit-old.phar -O /usr/bin/phpunit
-  cd php/tests && /bin/bash ./test.sh && cd ../..
-}
-
 build_php5.6() {
   use_php 5.6
   rm -rf vendor
@@ -414,8 +408,7 @@ build_php5.6_c() {
 build_php5.6_mac() {
   # Install PHP
   curl -s https://php-osx.liip.ch/install.sh | bash -s 5.6
-  PHP_FOLDER=`find /usr/local -type d -name "php5-5.6*"`  # The folder name may change upon time
-  export PATH="$PHP_FOLDER/bin:$PATH"
+  export PATH="/usr/local/php5-5.6.25-20160831-101628/bin:$PATH"
 
   # Install phpunit
   curl https://phar.phpunit.de/phpunit.phar -L -o phpunit.phar
@@ -455,7 +448,6 @@ build_php_all() {
 
 build_php_all_32() {
   build_php5.5_32
-  build_php5.5_c_32
 }
 
 # Note: travis currently does not support testing more than one language so the
