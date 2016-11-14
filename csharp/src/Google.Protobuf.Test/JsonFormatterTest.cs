@@ -229,16 +229,16 @@ namespace Google.Protobuf
         [Test]
         [TestCase("foo_bar", "fooBar")]
         [TestCase("bananaBanana", "bananaBanana")]
-        [TestCase("BANANABanana", "BANANABanana")]
+        [TestCase("BANANABanana", "bananaBanana")]
         [TestCase("simple", "simple")]
-        [TestCase("ACTION_AND_ADVENTURE", "ACTIONANDADVENTURE")]
+        [TestCase("ACTION_AND_ADVENTURE", "actionAndAdventure")]
         [TestCase("action_and_adventure", "actionAndAdventure")]
         [TestCase("kFoo", "kFoo")]
-        [TestCase("HTTPServer", "HTTPServer")]
-        [TestCase("CLIENT", "CLIENT")]
-        public void ToJsonName(string original, string expected)
+        [TestCase("HTTPServer", "httpServer")]
+        [TestCase("CLIENT", "client")]
+        public void ToCamelCase(string original, string expected)
         {
-            Assert.AreEqual(expected, JsonFormatter.ToJsonName(original));
+            Assert.AreEqual(expected, JsonFormatter.ToCamelCase(original));
         }
 
         [Test]
