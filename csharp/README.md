@@ -1,5 +1,8 @@
 This directory contains the C# Protocol Buffers runtime library.
 
+Status: Beta - ready for external testing
+=========================================
+
 Usage
 =====
 

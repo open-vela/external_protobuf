@@ -45,22 +45,10 @@ ObjectiveCGenerator::ObjectiveCGenerator() {}
 
 ObjectiveCGenerator::~ObjectiveCGenerator() {}
 
-bool ObjectiveCGenerator::HasGenerateAll() const {
-  return true;
-}
-
 bool ObjectiveCGenerator::Generate(const FileDescriptor* file,
                                    const string& parameter,
-                                   GeneratorContext* context,
+                                   OutputDirectory* output_directory,
                                    string* error) const {
-  *error = "Unimplemented Generate() method. Call GenerateAll() instead.";
-  return false;
-}
-
-bool ObjectiveCGenerator::GenerateAll(const vector<const FileDescriptor*>& files,
-                                      const string& parameter,
-                                      GeneratorContext* context,
-                                      string* error) const {
   // -----------------------------------------------------------------
   // Parse generator options. These options are passed to the compiler using the
   // --objc_opt flag. The options are passed as a comma separated list of
@@ -129,32 +117,29 @@ bool ObjectiveCGenerator::GenerateAll(const vector<const FileDescriptor*>& files
 
   // -----------------------------------------------------------------
 
-  // Validate the objc prefix/package pairings.
-  if (!ValidateObjCClassPrefixes(files, generation_options, error)) {
+  // Validate the objc prefix/package pairing.
+  if (!ValidateObjCClassPrefix(file, generation_options, error)) {
     // *error will have been filled in.
     return false;
   }
 
-  for (int i = 0; i < files.size(); i++) {
-    const FileDescriptor* file = files[i];
-    FileGenerator file_generator(file, generation_options);
-    string filepath = FilePath(file);
+  FileGenerator file_generator(file, generation_options);
+  string filepath = FilePath(file);
 
-    // Generate header.
-    {
-      scoped_ptr<io::ZeroCopyOutputStream> output(
-          context->Open(filepath + ".pbobjc.h"));
-      io::Printer printer(output.get(), '$');
-      file_generator.GenerateHeader(&printer);
-    }
+  // Generate header.
+  {
+    scoped_ptr<io::ZeroCopyOutputStream> output(
+        output_directory->Open(filepath + ".pbobjc.h"));
+    io::Printer printer(output.get(), '$');
+    file_generator.GenerateHeader(&printer);
+  }
 
-    // Generate m file.
-    {
-      scoped_ptr<io::ZeroCopyOutputStream> output(
-          context->Open(filepath + ".pbobjc.m"));
-      io::Printer printer(output.get(), '$');
-      file_generator.GenerateSource(&printer);
-    }
+  // Generate m file.
+  {
+    scoped_ptr<io::ZeroCopyOutputStream> output(
+        output_directory->Open(filepath + ".pbobjc.m"));
+    io::Printer printer(output.get(), '$');
+    file_generator.GenerateSource(&printer);
   }
 
   return true;
