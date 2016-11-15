@@ -36,6 +36,7 @@ These are projects we know about implementing Protocol Buffers for other program
 * Erlang: http://piqi.org/
 * Erlang: https://code.google.com/p/protoc-gen-erl/
 * Erlang: https://github.com/basho/erlang_protobuffs
+* Erlang: https://github.com/tomas-abrahamsson/gpb
 * Go: https://github.com/golang/protobuf (Google-official implementation)
 * Go: http://code.google.com/p/goprotobuf/
 * Go: https://github.com/akunspy/gopbuf
@@ -45,7 +46,6 @@ These are projects we know about implementing Protocol Buffers for other program
 * Java/Android: https://github.com/square/wire
 * Java ME: http://code.google.com/p/protobuf-javame/
 * Java ME: http://swingme.sourceforge.net/encode.shtml
-* Java ME: http://github.com/ponderingpanda/protobuf-j2me
 * Java ME: http://code.google.com/p/protobuf-j2me/
 * Javascript: http://code.google.com/p/protobuf-js/
 * Javascript: http://github.com/sirikata/protojs
@@ -63,6 +63,7 @@ These are projects we know about implementing Protocol Buffers for other program
 * OCaml: http://piqi.org/
 * Perl: http://groups.google.com/group/protobuf-perl
 * Perl: http://search.cpan.org/perldoc?Google::ProtocolBuffers
+* Perl: https://metacpan.org/pod/Google::ProtocolBuffers::Dynamic
 * Perl/XS: http://code.google.com/p/protobuf-perlxs/
 * PHP: http://code.google.com/p/pb4php/
 * PHP: https://github.com/allegro/php-protobuf/
@@ -82,6 +83,7 @@ These are projects we know about implementing Protocol Buffers for other program
 * Scala: https://github.com/SandroGrzicic/ScalaBuff
 * Scala: http://trueaccord.github.io/ScalaPB/
 * Swift: https://github.com/alexeyxo/protobuf-swift
+* Swift: https://github.com/apple/swift-protobuf/
 * Vala: https://launchpad.net/protobuf-vala
 * Visual Basic: http://code.google.com/p/protobuf-net/
 

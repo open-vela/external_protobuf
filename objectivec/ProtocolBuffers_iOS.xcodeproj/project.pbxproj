@@ -73,6 +73,7 @@
 		F4E675D51B21D1620054530B /* Struct.pbobjc.m in Sources */ = {isa = PBXBuildFile; fileRef = F4E675C21B21D1440054530B /* Struct.pbobjc.m */; };
 		F4E675D61B21D1620054530B /* Type.pbobjc.m in Sources */ = {isa = PBXBuildFile; fileRef = F4E675C51B21D1440054530B /* Type.pbobjc.m */; };
 		F4E675D71B21D1620054530B /* Wrappers.pbobjc.m in Sources */ = {isa = PBXBuildFile; fileRef = F4E675C71B21D1440054530B /* Wrappers.pbobjc.m */; };
+		F4F8D8861D78A193002CE128 /* GPBUnittestProtos2.m in Sources */ = {isa = PBXBuildFile; fileRef = F4F8D8841D78A186002CE128 /* GPBUnittestProtos2.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -234,6 +235,7 @@
 		F4E675DD1B21D1DE0054530B /* struct.proto */ = {isa = PBXFileReference; lastKnownFileType = text; name = struct.proto; path = ../src/google/protobuf/struct.proto; sourceTree = "<group>"; };
 		F4E675DE1B21D1DE0054530B /* type.proto */ = {isa = PBXFileReference; lastKnownFileType = text; name = type.proto; path = ../src/google/protobuf/type.proto; sourceTree = "<group>"; };
 		F4E675DF1B21D1DE0054530B /* wrappers.proto */ = {isa = PBXFileReference; lastKnownFileType = text; name = wrappers.proto; path = ../src/google/protobuf/wrappers.proto; sourceTree = "<group>"; };
+		F4F8D8841D78A186002CE128 /* GPBUnittestProtos2.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GPBUnittestProtos2.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -446,6 +448,7 @@
 				7461B6AB0F94FDF800A0C422 /* GPBTestUtilities.h */,
 				7461B6AC0F94FDF800A0C422 /* GPBTestUtilities.m */,
 				8BD3981E14BE59D70081D629 /* GPBUnittestProtos.m */,
+				F4F8D8841D78A186002CE128 /* GPBUnittestProtos2.m */,
 				7461B6B80F94FDF900A0C422 /* GPBUnknownFieldSetTest.m */,
 				7461B6BA0F94FDF900A0C422 /* GPBUtilitiesTests.m */,
 				8B4248E51A929C9900BC1EC6 /* GPBWellKnownTypesTest.m */,
@@ -630,9 +633,10 @@
 			attributes = {
 				LastSwiftUpdateCheck = 0710;
 				LastTestingUpgradeCheck = 0600;
-				LastUpgradeCheck = 0710;
+				LastUpgradeCheck = 0800;
 				TargetAttributes = {
 					8BBEA4A5147C727100C4ADB7 = {
+						LastSwiftMigration = 0800;
 						TestTargetID = 8B9A5EA41831993600A9D33B;
 					};
 					F45BBC0E1B0CDB50002D064D = {
@@ -755,6 +759,7 @@
 				F4487C811AAF62FC00531423 /* GPBMessageTests+Serialization.m in Sources */,
 				8B4248E61A929C9900BC1EC6 /* GPBWellKnownTypesTest.m in Sources */,
 				F4353D1F1AB88243005A6198 /* GPBDescriptorTests.m in Sources */,
+				F4F8D8861D78A193002CE128 /* GPBUnittestProtos2.m in Sources */,
 				F4B51B1C1BBC5C7100744318 /* GPBObjectiveCPlusPlusTest.mm in Sources */,
 				8B4248B41A8BD96E00BC1EC6 /* GPBSwiftTests.swift in Sources */,
 				5102DABC1891A073002037B6 /* GPBConcurrencyTests.m in Sources */,
@@ -839,7 +844,7 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				INFOPLIST_FILE = "$(SRCROOT)/Tests/iOSTestHarness/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.google.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -854,7 +859,7 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				INFOPLIST_FILE = "$(SRCROOT)/Tests/iOSTestHarness/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.google.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -876,7 +881,7 @@
 					"$(SRCROOT)",
 				);
 				INFOPLIST_FILE = "Tests/UnitTests-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -886,6 +891,7 @@
 				PRODUCT_NAME = UnitTests;
 				SWIFT_OBJC_BRIDGING_HEADER = "Tests/UnitTests-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 3.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/iOSTestHarness.app/iOSTestHarness";
 				WARNING_CFLAGS = (
@@ -911,7 +917,7 @@
 					"$(SRCROOT)",
 				);
 				INFOPLIST_FILE = "Tests/UnitTests-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -920,6 +926,7 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = UnitTests;
 				SWIFT_OBJC_BRIDGING_HEADER = "Tests/UnitTests-Bridging-Header.h";
+				SWIFT_VERSION = 3.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/iOSTestHarness.app/iOSTestHarness";
 				WARNING_CFLAGS = (
@@ -940,19 +947,25 @@
 				CLANG_ANALYZER_SECURITY_INSECUREAPI_RAND = YES;
 				CLANG_ANALYZER_SECURITY_INSECUREAPI_STRCPY = YES;
 				CLANG_STATIC_ANALYZER_MODE = deep;
+				CLANG_WARN_ASSIGN_ENUM = YES;
 				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_NULLABLE_TO_NONNULL_CONVERSION = YES;
 				CLANG_WARN_OBJC_EXPLICIT_OWNERSHIP_TYPE = YES;
 				CLANG_WARN_OBJC_IMPLICIT_ATOMIC_PROPERTIES = YES;
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_MISSING_PROPERTY_SYNTHESIS = YES;
 				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES_AGGRESSIVE;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = "DEBUG=1";
 				GCC_TREAT_IMPLICIT_FUNCTION_DECLARATIONS_AS_ERRORS = YES;
@@ -977,7 +990,7 @@
 				GCC_WARN_UNUSED_PARAMETER = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				GENERATE_PROFILING_CODE = NO;
-				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				ONLY_ACTIVE_ARCH = YES;
 				RUN_CLANG_STATIC_ANALYZER = YES;
 				SDKROOT = iphoneos;
@@ -1001,19 +1014,25 @@
 				CLANG_ANALYZER_SECURITY_INSECUREAPI_RAND = YES;
 				CLANG_ANALYZER_SECURITY_INSECUREAPI_STRCPY = YES;
 				CLANG_STATIC_ANALYZER_MODE = deep;
+				CLANG_WARN_ASSIGN_ENUM = YES;
 				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_NULLABLE_TO_NONNULL_CONVERSION = YES;
 				CLANG_WARN_OBJC_EXPLICIT_OWNERSHIP_TYPE = YES;
 				CLANG_WARN_OBJC_IMPLICIT_ATOMIC_PROPERTIES = YES;
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_MISSING_PROPERTY_SYNTHESIS = YES;
 				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES_AGGRESSIVE;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_TREAT_IMPLICIT_FUNCTION_DECLARATIONS_AS_ERRORS = YES;
 				GCC_TREAT_INCOMPATIBLE_POINTER_TYPE_WARNINGS_AS_ERRORS = YES;
 				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
@@ -1036,9 +1055,10 @@
 				GCC_WARN_UNUSED_PARAMETER = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				GENERATE_PROFILING_CODE = NO;
-				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				RUN_CLANG_STATIC_ANALYZER = YES;
 				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				WARNING_CFLAGS = (
 					"-Wdocumentation-unknown-command",
 					"-Wundef",
