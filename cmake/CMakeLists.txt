@@ -86,7 +86,6 @@ if (CMAKE_USE_PTHREADS_INIT)
   add_definitions(-DHAVE_PTHREAD)
 endif (CMAKE_USE_PTHREADS_INIT)
 
-set(_protobuf_FIND_ZLIB)
 if (protobuf_WITH_ZLIB)
   find_package(ZLIB)
   if (ZLIB_FOUND)
@@ -97,7 +96,6 @@ if (protobuf_WITH_ZLIB)
     # Using imported target if exists
     if (TARGET ZLIB::ZLIB)
       set(ZLIB_LIBRARIES ZLIB::ZLIB)
-      set(_protobuf_FIND_ZLIB "if(NOT ZLIB_FOUND)\n  find_package(ZLIB)\nendif()")
     endif (TARGET ZLIB::ZLIB)
   else (ZLIB_FOUND)
     set(HAVE_ZLIB 0)
@@ -158,10 +156,6 @@ else (MSVC)
   # the build tool.
   set(LIB_PREFIX)
 endif (MSVC)
-
-if (protobuf_UNICODE)
-  add_definitions(-DUNICODE -D_UNICODE)
-endif (protobuf_UNICODE)
 
 include(libprotobuf-lite.cmake)
 include(libprotobuf.cmake)

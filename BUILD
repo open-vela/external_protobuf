@@ -2,8 +2,6 @@
 
 licenses(["notice"])
 
-exports_files(["LICENSE"])
-
 ################################################################################
 # Protobuf Runtime Library
 ################################################################################
@@ -14,7 +12,7 @@ COPTS = [
     "-Wwrite-strings",
     "-Woverloaded-virtual",
     "-Wno-sign-compare",
-    "-Wno-unused-function",
+    "-Wno-error=unused-function",
 ]
 
 config_setting(
@@ -316,7 +314,6 @@ cc_library(
         "src/google/protobuf/compiler/objectivec/objectivec_message_field.cc",
         "src/google/protobuf/compiler/objectivec/objectivec_oneof.cc",
         "src/google/protobuf/compiler/objectivec/objectivec_primitive_field.cc",
-        "src/google/protobuf/compiler/php/php_generator.cc",
         "src/google/protobuf/compiler/plugin.cc",
         "src/google/protobuf/compiler/plugin.pb.cc",
         "src/google/protobuf/compiler/python/python_generator.cc",
@@ -391,10 +388,8 @@ RELATIVE_TEST_PROTOS = [
     "google/protobuf/util/internal/testdata/field_mask.proto",
     "google/protobuf/util/internal/testdata/maps.proto",
     "google/protobuf/util/internal/testdata/oneofs.proto",
-    "google/protobuf/util/internal/testdata/proto3.proto",
     "google/protobuf/util/internal/testdata/struct.proto",
     "google/protobuf/util/internal/testdata/timestamp_duration.proto",
-    "google/protobuf/util/internal/testdata/wrappers.proto",
     "google/protobuf/util/json_format_proto3.proto",
     "google/protobuf/util/message_differencer_unittest.proto",
 ]
@@ -577,7 +572,7 @@ py_library(
 )
 
 cc_binary(
-    name = "python/google/protobuf/internal/_api_implementation.so",
+    name = "internal/_api_implementation.so",
     srcs = ["python/google/protobuf/internal/api_implementation.cc"],
     copts = COPTS + [
         "-DPYTHON_PROTO2_CPP_IMPL_V2",
@@ -591,7 +586,7 @@ cc_binary(
 )
 
 cc_binary(
-    name = "python/google/protobuf/pyext/_message.so",
+    name = "pyext/_message.so",
     srcs = glob([
         "python/google/protobuf/pyext/*.cc",
         "python/google/protobuf/pyext/*.h",
@@ -653,8 +648,8 @@ py_proto_library(
     data = select({
         "//conditions:default": [],
         ":use_fast_cpp_protos": [
-            ":python/google/protobuf/internal/_api_implementation.so",
-            ":python/google/protobuf/pyext/_message.so",
+            ":internal/_api_implementation.so",
+            ":pyext/_message.so",
         ],
     }),
     default_runtime = "",

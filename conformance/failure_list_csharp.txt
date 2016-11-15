@@ -1,2 +1,7 @@
-Recommended.JsonInput.FieldNameWithDoubleUnderscores.JsonOutput
-Required.JsonInput.FieldNameInSnakeCase.JsonOutput
+JsonInput.FieldNameInLowerCamelCase.Validator
+JsonInput.FieldNameInSnakeCase.JsonOutput
+JsonInput.FieldNameInSnakeCase.ProtobufOutput
+JsonInput.FieldNameWithMixedCases.JsonOutput
+JsonInput.FieldNameWithMixedCases.ProtobufOutput
+JsonInput.FieldNameWithMixedCases.Validator
+JsonInput.OriginalProtoFieldName.JsonOutput

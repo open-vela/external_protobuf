@@ -288,8 +288,6 @@ StatusOr<uint32> ProtoStreamObjectSource::RenderMap(
             return Status(util::error::INTERNAL, "Invalid map entry.");
           }
           ASSIGN_OR_RETURN(map_key, MapKeyDefaultValueAsString(*key_field));
-          // Key is empty, force it to render as empty (for string values).
-          ow->empty_name_ok_for_next_key();
         }
         RETURN_IF_ERROR(RenderField(field, map_key, ow));
       } else {
@@ -859,8 +857,7 @@ Status ProtoStreamObjectSource::RenderNonMessageField(
       // up.
       const google::protobuf::Enum* en =
           typeinfo_->GetEnumByTypeUrl(field->type_url());
-      // Lookup the name of the enum, and render that. Unknown enum values
-      // are printed as integers.
+      // Lookup the name of the enum, and render that. Skips unknown enums.
       if (en != NULL) {
         const google::protobuf::EnumValue* enum_value =
             FindEnumValueByNumber(*en, buffer32);
@@ -869,11 +866,9 @@ Status ProtoStreamObjectSource::RenderNonMessageField(
             ow->RenderString(field_name, ToCamelCase(enum_value->name()));
           else
             ow->RenderString(field_name, enum_value->name());
-        } else {
-          ow->RenderInt32(field_name, buffer32);
         }
       } else {
-        ow->RenderInt32(field_name, buffer32);
+        GOOGLE_LOG(INFO) << "Unknown enum skipped: " << field->type_url();
       }
       break;
     }
@@ -1024,11 +1019,8 @@ bool ProtoStreamObjectSource::IsMap(
   // TODO(xiaofeng): Unify option names.
   return field.kind() == google::protobuf::Field_Kind_TYPE_MESSAGE &&
          (GetBoolOptionOrDefault(field_type->options(),
-                                 "google.protobuf.MessageOptions.map_entry",
-                                 false) ||
-          GetBoolOptionOrDefault(field_type->options(), "map_entry", false) ||
-          GetBoolOptionOrDefault(field_type->options(),
-                                 "proto2.MessageOptions.map_entry", false));
+                                 "google.protobuf.MessageOptions.map_entry", false) ||
+          GetBoolOptionOrDefault(field_type->options(), "map_entry", false));
 }
 
 std::pair<int64, int32> ProtoStreamObjectSource::ReadSecondsAndNanos(
@@ -1107,8 +1099,6 @@ const google::protobuf::EnumValue* FindEnumValueByNumber(
 // TODO(skarvaje): Look into optimizing this by not doing computation on
 // double.
 const string FormatNanos(uint32 nanos) {
-  if (nanos == 0) return "";
-
   const char* format =
       (nanos % 1000 != 0) ? "%.9f" : (nanos % 1000000 != 0) ? "%.6f" : "%.3f";
   string formatted =
@@ -1122,4 +1112,3 @@ const string FormatNanos(uint32 nanos) {
 }  // namespace util
 }  // namespace protobuf
 }  // namespace google
-

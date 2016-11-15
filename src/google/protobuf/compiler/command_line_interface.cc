@@ -262,12 +262,6 @@ void AddDefaultProtoPaths(vector<pair<string, string> >* paths) {
     return;
   }
 }
-
-string PluginName(const string& plugin_prefix, const string& directive) {
-  // Assuming the directive starts with "--" and ends with "_out" or "_opt",
-  // strip the "--" and "_out/_opt" and add the plugin prefix.
-  return plugin_prefix + "gen-" + directive.substr(2, directive.size() - 6);
-}
 }  // namespace
 
 // A MultiFileErrorCollector that prints errors to stderr.
@@ -710,7 +704,6 @@ CommandLineInterface::CommandLineInterface()
   : mode_(MODE_COMPILE),
     print_mode_(PRINT_NONE),
     error_format_(ERROR_FORMAT_GCC),
-    direct_dependencies_explicitly_set_(false),
     imports_in_descriptor_set_(false),
     source_info_in_descriptor_set_(false),
     disallow_services_(false),
@@ -790,24 +783,6 @@ int CommandLineInterface::Run(int argc, const char* const argv[]) {
       cerr << parsed_file->name() << ": This file contains services, but "
               "--disallow_services was used." << endl;
       return 1;
-    }
-
-    // Enforce --direct_dependencies
-    if (direct_dependencies_explicitly_set_) {
-      bool indirect_imports = false;
-      for (int i = 0; i < parsed_file->dependency_count(); i++) {
-        if (direct_dependencies_.find(parsed_file->dependency(i)->name()) ==
-            direct_dependencies_.end()) {
-          indirect_imports = true;
-          cerr << parsed_file->name()
-               << ": File is imported but not declared in "
-               << "--direct_dependencies: "
-               << parsed_file->dependency(i)->name() << std::endl;
-        }
-      }
-      if (indirect_imports) {
-        return 1;
-      }
     }
   }
 
@@ -922,7 +897,6 @@ void CommandLineInterface::Clear() {
   executable_name_.clear();
   proto_path_.clear();
   input_files_.clear();
-  direct_dependencies_.clear();
   output_directives_.clear();
   codec_type_.clear();
   descriptor_set_name_.clear();
@@ -933,7 +907,6 @@ void CommandLineInterface::Clear() {
   imports_in_descriptor_set_ = false;
   source_info_in_descriptor_set_ = false;
   disallow_services_ = false;
-  direct_dependencies_explicitly_set_ = false;
 }
 
 bool CommandLineInterface::MakeInputsBeProtoPathRelative(
@@ -1011,18 +984,6 @@ CommandLineInterface::ParseArguments(int argc, const char* const argv[]) {
     ParseArgumentStatus status = InterpretArgument(name, value);
     if (status != PARSE_ARGUMENT_DONE_AND_CONTINUE)
       return status;
-  }
-
-  // Make sure each plugin option has a matching plugin output.
-  for (map<string, string>::const_iterator i = plugin_parameters_.begin();
-       i != plugin_parameters_.end(); ++i) {
-    if (plugins_.find(i->first) == plugins_.end()) {
-      std::cerr << "Unknown flag: "
-                // strip prefix + "gen-" and add back "_opt"
-                << "--" + i->first.substr(plugin_prefix_.size() + 4) + "_opt"
-                << std::endl;
-      return PARSE_ARGUMENT_FAIL;
-    }
   }
 
   // If no --proto_path was given, use the current working directory.
@@ -1193,19 +1154,6 @@ CommandLineInterface::InterpretArgument(const string& name,
       proto_path_.push_back(pair<string, string>(virtual_path, disk_path));
     }
 
-  } else if (name == "--direct_dependencies") {
-    if (direct_dependencies_explicitly_set_) {
-      std::cerr << name << " may only be passed once. To specify multiple "
-                           "direct dependencies, pass them all as a single "
-                           "parameter separated by ':'." << std::endl;
-      return PARSE_ARGUMENT_FAIL;
-    }
-
-    direct_dependencies_explicitly_set_ = true;
-    vector<string> direct = Split(value, ":", true);
-    GOOGLE_DCHECK(direct_dependencies_.empty());
-    direct_dependencies_.insert(direct.begin(), direct.end());
-
   } else if (name == "-o" || name == "--descriptor_set_out") {
     if (!descriptor_set_name_.empty()) {
       std::cerr << name << " may only be passed once." << std::endl;
@@ -1353,22 +1301,15 @@ CommandLineInterface::InterpretArgument(const string& name,
         (plugin_prefix_.empty() || !HasSuffixString(name, "_out"))) {
       // Check if it's a generator option flag.
       generator_info = FindOrNull(generators_by_option_name_, name);
-      if (generator_info != NULL) {
+      if (generator_info == NULL) {
+        std::cerr << "Unknown flag: " << name << std::endl;
+        return PARSE_ARGUMENT_FAIL;
+      } else {
         string* parameters = &generator_parameters_[generator_info->flag_name];
         if (!parameters->empty()) {
           parameters->append(",");
         }
         parameters->append(value);
-      } else if (HasPrefixString(name, "--") && HasSuffixString(name, "_opt")) {
-        string* parameters =
-            &plugin_parameters_[PluginName(plugin_prefix_, name)];
-        if (!parameters->empty()) {
-          parameters->append(",");
-        }
-        parameters->append(value);
-      } else {
-        std::cerr << "Unknown flag: " << name << std::endl;
-        return PARSE_ARGUMENT_FAIL;
       }
     } else {
       // It's an output flag.  Add it to the output directives.
@@ -1487,16 +1428,12 @@ bool CommandLineInterface::GenerateOutput(
           HasSuffixString(output_directive.name, "_out"))
         << "Bad name for plugin generator: " << output_directive.name;
 
-    string plugin_name = PluginName(plugin_prefix_ , output_directive.name);
-    string parameters = output_directive.parameter;
-    if (!plugin_parameters_[plugin_name].empty()) {
-      if (!parameters.empty()) {
-        parameters.append(",");
-      }
-      parameters.append(plugin_parameters_[plugin_name]);
-    }
+    // Strip the "--" and "_out" and add the plugin prefix.
+    string plugin_name = plugin_prefix_ + "gen-" +
+        output_directive.name.substr(2, output_directive.name.size() - 6);
+
     if (!GeneratePluginOutput(parsed_files, plugin_name,
-                              parameters,
+                              output_directive.parameter,
                               generator_context, &error)) {
       std::cerr << output_directive.name << ": " << error << std::endl;
       return false;
@@ -1510,11 +1447,24 @@ bool CommandLineInterface::GenerateOutput(
       }
       parameters.append(generator_parameters_[output_directive.name]);
     }
-    if (!output_directive.generator->GenerateAll(
-        parsed_files, parameters, generator_context, &error)) {
-      // Generator returned an error.
-      std::cerr << output_directive.name << ": " << error << std::endl;
-      return false;
+    if (output_directive.generator->HasGenerateAll()) {
+      if (!output_directive.generator->GenerateAll(
+          parsed_files, parameters, generator_context, &error)) {
+          // Generator returned an error.
+          std::cerr << output_directive.name << ": "
+                    << ": " << error << std::endl;
+          return false;
+      }
+    } else {
+      for (int i = 0; i < parsed_files.size(); i++) {
+        if (!output_directive.generator->Generate(parsed_files[i], parameters,
+                                                  generator_context, &error)) {
+          // Generator returned an error.
+          std::cerr << output_directive.name << ": " << parsed_files[i]->name()
+                    << ": " << error << std::endl;
+          return false;
+        }
+      }
     }
   }
 
