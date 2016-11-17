@@ -17,7 +17,8 @@
     },
     "files": [
       "php/src/Google/Protobuf/descriptor.php",
-      "php/src/Google/Protobuf/descriptor_internal.pb.php"
+      "php/src/Google/Protobuf/descriptor_internal.pb.php",
+      "php/src/Google/Protobuf/Internal/Type.php"
     ]
   }
 }
