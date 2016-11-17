@@ -7,11 +7,10 @@
 pushd ../ext/google/protobuf/
 make clean
 set -e
-# Add following in configure for debug: --enable-debug CFLAGS='-g -O0'
-phpize && ./configure && make
+phpize && ./configure --enable-debug CFLAGS='-g -O0' && make
 popd
 
-tests=( array_test.php encode_decode_test.php generated_class_test.php map_field_test.php well_known_test.php )
+tests=( array_test.php encode_decode_test.php generated_class_test.php map_field_test.php )
 
 for t in "${tests[@]}"
 do

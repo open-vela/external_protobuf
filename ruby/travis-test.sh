@@ -10,14 +10,12 @@ test_version() {
     bash --login -c \
       "rvm install $version && rvm use $version && rvm get head && \
        which ruby && \
-       git clean -f && \
        gem install bundler && bundle && \
        rake test"
   else
     bash --login -c \
       "rvm install $version && rvm use $version && \
        which ruby && \
-       git clean -f && \
        gem install bundler && bundle && \
        rake test &&
        cd ../conformance && make test_ruby"

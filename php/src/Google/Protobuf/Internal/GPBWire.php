@@ -32,6 +32,10 @@
 
 namespace Google\Protobuf\Internal;
 
+use Google\Protobuf\Internal\GPBUtil;
+use Google\Protobuf\Internal\Int64;
+use Google\Protobuf\Internal\Uint64;
+
 class GPBWire
 {
 
@@ -146,28 +150,20 @@ class GPBWire
 
     public static function zigZagEncode64($int64)
     {
-        if (PHP_INT_SIZE == 4) {
-            if (bccomp($int64, 0) >= 0) {
-                return bcmul($int64, 2);
-            } else {
-                return bcsub(bcmul(bcsub(0, $int64), 2), 1);
-            }
-        } else {
-            return ($int64 << 1) ^ ($int64 >> 63);
-        }
+        $a = $int64->copy()->leftShift(1);
+        $b = $int64->copy()->rightShift(63);
+        $result = $a->bitXor($b);
+        $uint64 = Uint64::newValue($result->high, $result->low);
+        return $uint64;
     }
 
     public static function zigZagDecode64($uint64)
     {
-        if (PHP_INT_SIZE == 4) {
-            if (bcmod($uint64, 2) == 0) {
-                return bcdiv($uint64, 2, 0);
-            } else {
-                return bcsub(0, bcdiv(bcadd($uint64, 1), 2, 0));
-            }
-        } else {
-            return (($uint64 >> 1) & 0x7FFFFFFFFFFFFFFF) ^ (-($uint64 & 1));
-        }
+        $a = $uint64->copy()->rightShift(1);
+        $b = $uint64->oddMask();
+        $result = $a->bitXor($b);
+        $int64 = Int64::newValue($result->high, $result->low);
+        return $int64;
     }
 
     public static function readInt32(&$input, &$value)
@@ -231,7 +227,11 @@ class GPBWire
 
     public static function readSfixed64(&$input, &$value)
     {
-        return $input->readLittleEndian64($value);
+        if (!self::readFixed64($input, $value)) {
+            return false;
+        }
+        $value = Int64::newValue($value->high, $value->low);
+        return true;
     }
 
     public static function readFloat(&$input, &$value)
@@ -259,7 +259,7 @@ class GPBWire
         if (!$input->readVarint64($value)) {
             return false;
         }
-        if ($value == 0) {
+        if ($value->high === 0 && $value->low === 0) {
             $value = false;
         } else {
             $value = true;
@@ -324,8 +324,8 @@ class GPBWire
 
     public static function writeSint64(&$output, $value)
     {
-        $value = GPBWire::zigZagEncode64($value);
-        return $output->writeVarint64($value);
+        $value = GPBWire::zigZagEncode64(GPBUtil::Int64($value));
+        return $output->writeVarint64($value->toInteger());
     }
 
     public static function writeFixed32(&$output, $value)
@@ -431,8 +431,9 @@ class GPBWire
 
     public static function sint64Size($value)
     {
+        $value = GPBUtil::Int64($value);
         $value = self::zigZagEncode64($value);
-        return self::varint64Size($value);
+        return self::varint64Size($value->toInteger());
     }
 
     public static function varint64Size($value)
