@@ -262,7 +262,6 @@ function makeTests(msgInfo, submessageCtor, suffix) {
     });
   }
 
-
   /**
    * Exercises the lazy map<->underlying array sync.
    */
@@ -291,16 +290,12 @@ function makeTests(msgInfo, submessageCtor, suffix) {
 }
 
 describe('mapsTest', function() {
-  makeTests(
-      {
-        constructor: proto.jspb.test.TestMapFields,
-        deserializeBinary: proto.jspb.test.TestMapFields.deserializeBinary
-      },
-      proto.jspb.test.MapValueMessage, '_Binary');
-  makeTests(
-      {
-        constructor: proto.jspb.test.TestMapFieldsNoBinary,
-        deserializeBinary: null
-      },
-      proto.jspb.test.MapValueMessageNoBinary, '_NoBinary');
+  makeTests({
+    constructor: proto.jspb.test.TestMapFields,
+    deserializeBinary: proto.jspb.test.TestMapFields.deserializeBinary
+  }, proto.jspb.test.MapValueMessage, "_Binary");
+  makeTests({
+    constructor: proto.jspb.test.TestMapFieldsNoBinary,
+    deserializeBinary: null
+  }, proto.jspb.test.MapValueMessageNoBinary, "_NoBinary");
 });

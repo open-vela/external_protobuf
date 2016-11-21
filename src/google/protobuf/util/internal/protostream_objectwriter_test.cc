@@ -113,13 +113,13 @@ class BaseProtoStreamObjectWriterTest
         listener_(),
         output_(new GrowingArrayByteSink(1000)),
         ow_() {
-    std::vector<const Descriptor*> descriptors;
+    vector<const Descriptor*> descriptors;
     descriptors.push_back(descriptor);
     ResetTypeInfo(descriptors);
   }
 
   explicit BaseProtoStreamObjectWriterTest(
-      std::vector<const Descriptor*> descriptors)
+      vector<const Descriptor*> descriptors)
       : helper_(GetParam()),
         listener_(),
         output_(new GrowingArrayByteSink(1000)),
@@ -127,7 +127,7 @@ class BaseProtoStreamObjectWriterTest
     ResetTypeInfo(descriptors);
   }
 
-  void ResetTypeInfo(std::vector<const Descriptor*> descriptors) {
+  void ResetTypeInfo(vector<const Descriptor*> descriptors) {
     GOOGLE_CHECK(!descriptors.empty()) << "Must have at least one descriptor!";
     helper_.ResetTypeInfo(descriptors);
     ow_.reset(helper_.NewProtoWriter(GetTypeUrl(descriptors[0]), output_.get(),
@@ -135,7 +135,7 @@ class BaseProtoStreamObjectWriterTest
   }
 
   void ResetTypeInfo(const Descriptor* descriptor) {
-    std::vector<const Descriptor*> descriptors;
+    vector<const Descriptor*> descriptors;
     descriptors.push_back(descriptor);
     ResetTypeInfo(descriptors);
   }
@@ -1078,7 +1078,7 @@ class ProtoStreamObjectWriterTimestampDurationTest
     : public BaseProtoStreamObjectWriterTest {
  protected:
   ProtoStreamObjectWriterTimestampDurationTest() {
-    std::vector<const Descriptor*> descriptors;
+    vector<const Descriptor*> descriptors;
     descriptors.push_back(TimestampDuration::descriptor());
     descriptors.push_back(google::protobuf::Timestamp::descriptor());
     descriptors.push_back(google::protobuf::Duration::descriptor());
@@ -1473,7 +1473,7 @@ class ProtoStreamObjectWriterStructTest
 
   // Resets ProtoWriter with current set of options and other state.
   void ResetProtoWriter() {
-    std::vector<const Descriptor*> descriptors;
+    vector<const Descriptor*> descriptors;
     descriptors.push_back(StructType::descriptor());
     descriptors.push_back(google::protobuf::Struct::descriptor());
     ResetTypeInfo(descriptors);
@@ -1664,7 +1664,7 @@ TEST_P(ProtoStreamObjectWriterMapTest, RepeatedMapKeyTest) {
 class ProtoStreamObjectWriterAnyTest : public BaseProtoStreamObjectWriterTest {
  protected:
   ProtoStreamObjectWriterAnyTest() {
-    std::vector<const Descriptor*> descriptors;
+    vector<const Descriptor*> descriptors;
     descriptors.push_back(AnyOut::descriptor());
     descriptors.push_back(Book::descriptor());
     descriptors.push_back(google::protobuf::Any::descriptor());
@@ -2308,7 +2308,7 @@ class ProtoStreamObjectWriterFieldMaskTest
     : public BaseProtoStreamObjectWriterTest {
  protected:
   ProtoStreamObjectWriterFieldMaskTest() {
-    std::vector<const Descriptor*> descriptors;
+    vector<const Descriptor*> descriptors;
     descriptors.push_back(FieldMaskTest::descriptor());
     descriptors.push_back(google::protobuf::FieldMask::descriptor());
     ResetTypeInfo(descriptors);
@@ -2560,7 +2560,7 @@ class ProtoStreamObjectWriterWrappersTest
     : public BaseProtoStreamObjectWriterTest {
  protected:
   ProtoStreamObjectWriterWrappersTest() {
-    std::vector<const Descriptor*> descriptors;
+    vector<const Descriptor*> descriptors;
     descriptors.push_back(Int32Wrapper::descriptor());
     descriptors.push_back(google::protobuf::Int32Value::descriptor());
     ResetTypeInfo(descriptors);
@@ -2583,7 +2583,7 @@ class ProtoStreamObjectWriterOneOfsTest
     : public BaseProtoStreamObjectWriterTest {
  protected:
   ProtoStreamObjectWriterOneOfsTest() {
-    std::vector<const Descriptor*> descriptors;
+    vector<const Descriptor*> descriptors;
     descriptors.push_back(OneOfsRequest::descriptor());
     descriptors.push_back(google::protobuf::Struct::descriptor());
     ResetTypeInfo(descriptors);

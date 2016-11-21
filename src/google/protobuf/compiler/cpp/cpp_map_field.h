@@ -55,7 +55,6 @@ class MapFieldGenerator : public FieldGenerator {
   void GenerateMergingCode(io::Printer* printer) const;
   void GenerateSwappingCode(io::Printer* printer) const;
   void GenerateConstructorCode(io::Printer* printer) const;
-  void GenerateCopyConstructorCode(io::Printer* printer) const;
   void GenerateMergeFromCodedStream(io::Printer* printer) const;
   void GenerateSerializeWithCachedSizes(io::Printer* printer) const;
   void GenerateSerializeWithCachedSizesToArray(io::Printer* printer) const;
@@ -64,11 +63,11 @@ class MapFieldGenerator : public FieldGenerator {
  private:
   // A helper for GenerateSerializeWithCachedSizes{,ToArray}.
   void GenerateSerializeWithCachedSizes(
-      io::Printer* printer, const std::map<string, string>& variables) const;
+      io::Printer* printer, const map<string, string>& variables) const;
 
   const FieldDescriptor* descriptor_;
   const bool dependent_field_;
-  std::map<string, string> variables_;
+  map<string, string> variables_;
 
   GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(MapFieldGenerator);
 };
