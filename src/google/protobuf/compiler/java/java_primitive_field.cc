@@ -61,7 +61,7 @@ void SetPrimitiveVariables(const FieldDescriptor* descriptor,
                            int builderBitIndex,
                            const FieldGeneratorInfo* info,
                            ClassNameResolver* name_resolver,
-                           std::map<string, string>* variables) {
+                           map<string, string>* variables) {
   SetCommonFieldVariables(descriptor, info, variables);
 
   (*variables)["type"] = PrimitiveTypeName(GetJavaType(descriptor));
@@ -75,8 +75,7 @@ void SetPrimitiveVariables(const FieldDescriptor* descriptor,
       "" : ("= " + ImmutableDefaultValue(descriptor, name_resolver));
   (*variables)["capitalized_type"] =
       GetCapitalizedType(descriptor, /* immutable = */ true);
-  (*variables)["tag"] =
-      SimpleItoa(static_cast<int32>(WireFormat::MakeTag(descriptor)));
+  (*variables)["tag"] = SimpleItoa(WireFormat::MakeTag(descriptor));
   (*variables)["tag_size"] = SimpleItoa(
       WireFormat::TagSize(descriptor->number(), GetType(descriptor)));
   if (IsReferenceType(GetJavaType(descriptor))) {
