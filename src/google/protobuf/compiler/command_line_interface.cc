@@ -173,8 +173,7 @@ bool VerifyDirectoryExists(const string& path) {
 // directories listed in |filename|.
 bool TryCreateParentDirectory(const string& prefix, const string& filename) {
   // Recursively create parent directories to the output file.
-  std::vector<string> parts =
-      Split(filename, "/", true);
+  vector<string> parts = Split(filename, "/", true);
   string path_so_far = prefix;
   for (int i = 0; i < parts.size() - 1; i++) {
     path_so_far += parts[i];
@@ -345,7 +344,7 @@ class CommandLineInterface::ErrorPrinter : public MultiFileErrorCollector,
 // them all to disk on demand.
 class CommandLineInterface::GeneratorContextImpl : public GeneratorContext {
  public:
-  GeneratorContextImpl(const std::vector<const FileDescriptor*>& parsed_files);
+  GeneratorContextImpl(const vector<const FileDescriptor*>& parsed_files);
   ~GeneratorContextImpl();
 
   // Write all files in the directory to disk at the given output location,
@@ -361,14 +360,14 @@ class CommandLineInterface::GeneratorContextImpl : public GeneratorContext {
   void AddJarManifest();
 
   // Get name of all output files.
-  void GetOutputFilenames(std::vector<string>* output_filenames);
+  void GetOutputFilenames(vector<string>* output_filenames);
 
   // implements GeneratorContext --------------------------------------
   io::ZeroCopyOutputStream* Open(const string& filename);
   io::ZeroCopyOutputStream* OpenForAppend(const string& filename);
   io::ZeroCopyOutputStream* OpenForInsert(
       const string& filename, const string& insertion_point);
-  void ListParsedFiles(std::vector<const FileDescriptor*>* output) {
+  void ListParsedFiles(vector<const FileDescriptor*>* output) {
     *output = parsed_files_;
   }
 
@@ -377,8 +376,8 @@ class CommandLineInterface::GeneratorContextImpl : public GeneratorContext {
 
   // map instead of hash_map so that files are written in order (good when
   // writing zips).
-  std::map<string, string*> files_;
-  const std::vector<const FileDescriptor*>& parsed_files_;
+  map<string, string*> files_;
+  const vector<const FileDescriptor*>& parsed_files_;
   bool had_error_;
 };
 
@@ -415,7 +414,7 @@ class CommandLineInterface::MemoryOutputStream
 // -------------------------------------------------------------------
 
 CommandLineInterface::GeneratorContextImpl::GeneratorContextImpl(
-    const std::vector<const FileDescriptor*>& parsed_files)
+    const vector<const FileDescriptor*>& parsed_files)
     : parsed_files_(parsed_files),
       had_error_(false) {
 }
@@ -434,7 +433,7 @@ bool CommandLineInterface::GeneratorContextImpl::WriteAllToDisk(
     return false;
   }
 
-  for (std::map<string, string*>::const_iterator iter = files_.begin();
+  for (map<string, string*>::const_iterator iter = files_.begin();
        iter != files_.end(); ++iter) {
     const string& relative_filename = iter->first;
     const char* data = iter->second->data();
@@ -522,7 +521,7 @@ bool CommandLineInterface::GeneratorContextImpl::WriteAllToZip(
   io::FileOutputStream stream(file_descriptor);
   ZipWriter zip_writer(&stream);
 
-  for (std::map<string, string*>::const_iterator iter = files_.begin();
+  for (map<string, string*>::const_iterator iter = files_.begin();
        iter != files_.end(); ++iter) {
     zip_writer.Write(iter->first, *iter->second);
   }
@@ -551,8 +550,8 @@ void CommandLineInterface::GeneratorContextImpl::AddJarManifest() {
 }
 
 void CommandLineInterface::GeneratorContextImpl::GetOutputFilenames(
-    std::vector<string>* output_filenames) {
-  for (std::map<string, string*>::iterator iter = files_.begin();
+    vector<string>* output_filenames) {
+  for (map<string, string*>::iterator iter = files_.begin();
        iter != files_.end(); ++iter) {
     output_filenames->push_back(iter->first);
   }
@@ -775,7 +774,7 @@ int CommandLineInterface::Run(int argc, const char* const argv[]) {
   ErrorPrinter error_collector(error_format_, &source_tree);
   Importer importer(&source_tree, &error_collector);
 
-  std::vector<const FileDescriptor*> parsed_files;
+  vector<const FileDescriptor*> parsed_files;
 
   // Parse each file.
   for (int i = 0; i < input_files_.size(); i++) {
@@ -985,7 +984,7 @@ CommandLineInterface::ParseArgumentStatus
 CommandLineInterface::ParseArguments(int argc, const char* const argv[]) {
   executable_name_ = argv[0];
 
-  std::vector<string> arguments;
+  vector<string> arguments;
   for (int i = 1; i < argc; ++i) {
     arguments.push_back(argv[i]);
   }
@@ -1031,7 +1030,7 @@ CommandLineInterface::ParseArguments(int argc, const char* const argv[]) {
     // Don't use make_pair as the old/default standard library on Solaris
     // doesn't support it without explicit template parameters, which are
     // incompatible with C++0x's make_pair.
-    proto_path_.push_back(std::pair<string, string>("", "."));
+    proto_path_.push_back(pair<string, string>("", "."));
   }
 
   // Check some errror cases.
@@ -1154,7 +1153,7 @@ CommandLineInterface::InterpretArgument(const string& name,
     // Java's -classpath (and some other languages) delimits path components
     // with colons.  Let's accept that syntax too just to make things more
     // intuitive.
-    std::vector<string> parts = Split(
+    vector<string> parts = Split(
         value, kPathSeparator, true);
 
     for (int i = 0; i < parts.size(); i++) {
@@ -1191,21 +1190,19 @@ CommandLineInterface::InterpretArgument(const string& name,
       // Don't use make_pair as the old/default standard library on Solaris
       // doesn't support it without explicit template parameters, which are
       // incompatible with C++0x's make_pair.
-      proto_path_.push_back(std::pair<string, string>(virtual_path, disk_path));
+      proto_path_.push_back(pair<string, string>(virtual_path, disk_path));
     }
 
   } else if (name == "--direct_dependencies") {
     if (direct_dependencies_explicitly_set_) {
       std::cerr << name << " may only be passed once. To specify multiple "
                            "direct dependencies, pass them all as a single "
-                           "parameter separated by ':'."
-                << std::endl;
+                           "parameter separated by ':'." << std::endl;
       return PARSE_ARGUMENT_FAIL;
     }
 
     direct_dependencies_explicitly_set_ = true;
-    std::vector<string> direct = Split(
-        value, ":", true);
+    vector<string> direct = Split(value, ":", true);
     GOOGLE_DCHECK(direct_dependencies_.empty());
     direct_dependencies_.insert(direct.begin(), direct.end());
 
@@ -1479,7 +1476,7 @@ void CommandLineInterface::PrintHelpText() {
 }
 
 bool CommandLineInterface::GenerateOutput(
-    const std::vector<const FileDescriptor*>& parsed_files,
+    const vector<const FileDescriptor*>& parsed_files,
     const OutputDirective& output_directive,
     GeneratorContext* generator_context) {
   // Call the generator.
@@ -1525,12 +1522,12 @@ bool CommandLineInterface::GenerateOutput(
 }
 
 bool CommandLineInterface::GenerateDependencyManifestFile(
-    const std::vector<const FileDescriptor*>& parsed_files,
+    const vector<const FileDescriptor*>& parsed_files,
     const GeneratorContextMap& output_directories,
     DiskSourceTree* source_tree) {
   FileDescriptorSet file_set;
 
-  std::set<const FileDescriptor*> already_seen;
+  set<const FileDescriptor*> already_seen;
   for (int i = 0; i < parsed_files.size(); i++) {
     GetTransitiveDependencies(parsed_files[i],
                               false,
@@ -1539,12 +1536,12 @@ bool CommandLineInterface::GenerateDependencyManifestFile(
                               file_set.mutable_file());
   }
 
-  std::vector<string> output_filenames;
+  vector<string> output_filenames;
   for (GeneratorContextMap::const_iterator iter = output_directories.begin();
        iter != output_directories.end(); ++iter) {
     const string& location = iter->first;
     GeneratorContextImpl* directory = iter->second;
-    std::vector<string> relative_output_filenames;
+    vector<string> relative_output_filenames;
     directory->GetOutputFilenames(&relative_output_filenames);
     for (int i = 0; i < relative_output_filenames.size(); i++) {
       string output_filename = location + relative_output_filenames[i];
@@ -1597,7 +1594,7 @@ bool CommandLineInterface::GenerateDependencyManifestFile(
 }
 
 bool CommandLineInterface::GeneratePluginOutput(
-    const std::vector<const FileDescriptor*>& parsed_files,
+    const vector<const FileDescriptor*>& parsed_files,
     const string& plugin_name,
     const string& parameter,
     GeneratorContext* generator_context,
@@ -1610,7 +1607,7 @@ bool CommandLineInterface::GeneratePluginOutput(
     request.set_parameter(parameter);
   }
 
-  std::set<const FileDescriptor*> already_seen;
+  set<const FileDescriptor*> already_seen;
   for (int i = 0; i < parsed_files.size(); i++) {
     request.add_file_to_generate(parsed_files[i]->name());
     GetTransitiveDependencies(parsed_files[i],
@@ -1740,11 +1737,11 @@ bool CommandLineInterface::EncodeOrDecode(const DescriptorPool* pool) {
 }
 
 bool CommandLineInterface::WriteDescriptorSet(
-    const std::vector<const FileDescriptor*> parsed_files) {
+    const vector<const FileDescriptor*> parsed_files) {
   FileDescriptorSet file_set;
 
   if (imports_in_descriptor_set_) {
-    std::set<const FileDescriptor*> already_seen;
+    set<const FileDescriptor*> already_seen;
     for (int i = 0; i < parsed_files.size(); i++) {
       GetTransitiveDependencies(parsed_files[i],
                                 true,  // Include json_name
@@ -1752,7 +1749,7 @@ bool CommandLineInterface::WriteDescriptorSet(
                                 &already_seen, file_set.mutable_file());
     }
   } else {
-    std::set<const FileDescriptor*> already_seen;
+    set<const FileDescriptor*> already_seen;
     for (int i = 0; i < parsed_files.size(); i++) {
       if (!already_seen.insert(parsed_files[i]).second) {
         continue;
@@ -1797,7 +1794,7 @@ void CommandLineInterface::GetTransitiveDependencies(
     const FileDescriptor* file,
     bool include_json_name,
     bool include_source_code_info,
-    std::set<const FileDescriptor*>* already_seen,
+    set<const FileDescriptor*>* already_seen,
     RepeatedPtrField<FileDescriptorProto>* output) {
   if (!already_seen->insert(file).second) {
     // Already saw this file.  Skip.
@@ -1856,11 +1853,11 @@ namespace {
 // parameter will contain the direct children (when groups are ignored in the
 // tree) of the given descriptor for the caller to traverse. The declaration
 // order of the nested messages is also preserved.
-typedef std::pair<int, int> FieldRange;
-void GatherOccupiedFieldRanges(
-    const Descriptor* descriptor, std::set<FieldRange>* ranges,
-    std::vector<const Descriptor*>* nested_messages) {
-  std::set<const Descriptor*> groups;
+typedef pair<int, int> FieldRange;
+void GatherOccupiedFieldRanges(const Descriptor* descriptor,
+                               set<FieldRange>* ranges,
+                               vector<const Descriptor*>* nested_messages) {
+  set<const Descriptor*> groups;
   for (int i = 0; i < descriptor->field_count(); ++i) {
     const FieldDescriptor* fd = descriptor->field(i);
     ranges->insert(FieldRange(fd->number(), fd->number() + 1));
@@ -1892,11 +1889,11 @@ void GatherOccupiedFieldRanges(
 // Actually prints the formatted free field numbers for given message name and
 // occupied ranges.
 void FormatFreeFieldNumbers(const string& name,
-                            const std::set<FieldRange>& ranges) {
+                            const set<FieldRange>& ranges) {
   string output;
   StringAppendF(&output, "%-35s free:", name.c_str());
   int next_free_number = 1;
-  for (std::set<FieldRange>::const_iterator i = ranges.begin();
+  for (set<FieldRange>::const_iterator i = ranges.begin();
        i != ranges.end(); ++i) {
     // This happens when groups re-use parent field numbers, in which
     // case we skip the FieldRange entirely.
@@ -1923,8 +1920,8 @@ void FormatFreeFieldNumbers(const string& name,
 
 void CommandLineInterface::PrintFreeFieldNumbers(
     const Descriptor* descriptor) {
-  std::set<FieldRange> ranges;
-  std::vector<const Descriptor*> nested_messages;
+  set<FieldRange> ranges;
+  vector<const Descriptor*> nested_messages;
   GatherOccupiedFieldRanges(descriptor, &ranges, &nested_messages);
 
   for (int i = 0; i < nested_messages.size(); ++i) {

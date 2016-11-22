@@ -37,6 +37,7 @@ import static com.google.common.math.LongMath.checkedAdd;
 import static com.google.common.math.LongMath.checkedMultiply;
 import static com.google.common.math.LongMath.checkedSubtract;
 
+import com.google.common.collect.ComparisonChain;
 import com.google.protobuf.Duration;
 import com.google.protobuf.Timestamp;
 import java.text.ParseException;
@@ -100,8 +101,11 @@ public final class Timestamps {
         public int compare(Timestamp t1, Timestamp t2) {
           checkValid(t1);
           checkValid(t2);
-          int secDiff = Long.compare(t1.getSeconds(), t2.getSeconds());
-          return (secDiff != 0) ? secDiff : Integer.compare(t1.getNanos(), t2.getNanos());
+
+          return ComparisonChain.start()
+              .compare(t1.getSeconds(), t2.getSeconds())
+              .compare(t1.getNanos(), t2.getNanos())
+              .result();
         }
       };
 

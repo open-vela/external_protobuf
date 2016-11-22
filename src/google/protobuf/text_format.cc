@@ -154,7 +154,7 @@ TextFormat::ParseInfoTree* TextFormat::ParseInfoTree::CreateNested(
     const FieldDescriptor* field) {
   // Owned by us in the map.
   TextFormat::ParseInfoTree* instance = new TextFormat::ParseInfoTree();
-  std::vector<TextFormat::ParseInfoTree*>* trees = &nested_[field];
+  vector<TextFormat::ParseInfoTree*>* trees = &nested_[field];
   GOOGLE_CHECK(trees);
   trees->push_back(instance);
   return instance;
@@ -177,7 +177,7 @@ TextFormat::ParseLocation TextFormat::ParseInfoTree::GetLocation(
   CheckFieldIndex(field, index);
   if (index == -1) { index = 0; }
 
-  const std::vector<TextFormat::ParseLocation>* locations =
+  const vector<TextFormat::ParseLocation>* locations =
       FindOrNull(locations_, field);
   if (locations == NULL || index >= locations->size()) {
     return TextFormat::ParseLocation();
@@ -191,8 +191,7 @@ TextFormat::ParseInfoTree* TextFormat::ParseInfoTree::GetTreeForNested(
   CheckFieldIndex(field, index);
   if (index == -1) { index = 0; }
 
-  const std::vector<TextFormat::ParseInfoTree*>* trees =
-      FindOrNull(nested_, field);
+  const vector<TextFormat::ParseInfoTree*>* trees = FindOrNull(nested_, field);
   if (trees == NULL || index >= trees->size()) {
     return NULL;
   }
@@ -519,14 +518,7 @@ class TextFormat::Parser::ParserImpl {
     // Perform special handling for embedded message types.
     if (field->cpp_type() == FieldDescriptor::CPPTYPE_MESSAGE) {
       // ':' is optional here.
-      bool consumed_semicolon = TryConsume(":");
-      if (consumed_semicolon && field->options().weak() && LookingAtType(io::Tokenizer::TYPE_STRING)) {
-        // we are getting a bytes string for a weak field.
-        string tmp;
-        DO(ConsumeString(&tmp));
-        reflection->MutableMessage(message, field)->ParseFromString(tmp);
-        goto label_skip_parsing;
-      }
+      TryConsume(":");
     } else {
       // ':' is required here.
       DO(Consume(":"));
@@ -554,7 +546,7 @@ class TextFormat::Parser::ParserImpl {
     } else {
       DO(ConsumeFieldValue(message, reflection, field));
     }
-label_skip_parsing:
+
     // For historical reasons, fields may optionally be separated by commas or
     // semicolons.
     TryConsume(";") || TryConsume(",");
@@ -1344,7 +1336,7 @@ bool TextFormat::Parser::MergeUsingImpl(io::ZeroCopyInputStream* /* input */,
                                         ParserImpl* parser_impl) {
   if (!parser_impl->Parse(output)) return false;
   if (!allow_partial_ && !output->IsInitialized()) {
-    std::vector<string> missing_fields;
+    vector<string> missing_fields;
     output->FindInitializationErrors(&missing_fields);
     parser_impl->ReportError(-1, 0, "Message missing required fields: " +
                                         Join(missing_fields, ", "));
@@ -1618,7 +1610,7 @@ void TextFormat::Printer::Print(const Message& message,
       PrintAny(message, generator)) {
     return;
   }
-  std::vector<const FieldDescriptor*> fields;
+  vector<const FieldDescriptor*> fields;
   reflection->ListFields(message, &fields);
   if (print_message_fields_in_index_order_) {
     std::sort(fields.begin(), fields.end(), FieldIndexSorter());

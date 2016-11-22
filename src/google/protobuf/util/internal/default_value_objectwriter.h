@@ -139,9 +139,8 @@ class LIBPROTOBUF_EXPORT DefaultValueObjectWriter : public ObjectWriter {
   class LIBPROTOBUF_EXPORT Node {
    public:
     Node(const string& name, const google::protobuf::Type* type, NodeKind kind,
-         const DataPiece& data, bool is_placeholder,
-         const std::vector<string>& path, bool suppress_empty_list,
-         FieldScrubCallBack* field_scrub_callback);
+         const DataPiece& data, bool is_placeholder, const vector<string>& path,
+         bool suppress_empty_list, FieldScrubCallBack* field_scrub_callback);
     virtual ~Node() {
       for (int i = 0; i < children_.size(); ++i) {
         delete children_[i];
@@ -167,7 +166,7 @@ class LIBPROTOBUF_EXPORT DefaultValueObjectWriter : public ObjectWriter {
     // Accessors
     const string& name() const { return name_; }
 
-    const std::vector<string>& path() const { return path_; }
+    const vector<string>& path() const { return path_; }
 
     const google::protobuf::Type* type() const { return type_; }
 
@@ -256,7 +255,7 @@ class LIBPROTOBUF_EXPORT DefaultValueObjectWriter : public ObjectWriter {
   // google::protobuf::Type of the root message type.
   const google::protobuf::Type& type_;
   // Holds copies of strings passed to RenderString.
-  std::vector<string*> string_values_;
+  vector<string*> string_values_;
 
   // The current Node. Owned by its parents.
   Node* current_;
