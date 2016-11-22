@@ -114,7 +114,7 @@ class MockGeneratorContext : public GeneratorContext {
   }
 
  private:
-  std::map<string, string*> files_;
+  map<string, string*> files_;
 };
 
 TEST(BootstrapTest, GeneratedDescriptorMatches) {

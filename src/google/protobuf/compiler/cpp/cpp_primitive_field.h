@@ -59,7 +59,6 @@ class PrimitiveFieldGenerator : public FieldGenerator {
   void GenerateMergingCode(io::Printer* printer) const;
   void GenerateSwappingCode(io::Printer* printer) const;
   void GenerateConstructorCode(io::Printer* printer) const;
-  void GenerateCopyConstructorCode(io::Printer* printer) const;
   void GenerateMergeFromCodedStream(io::Printer* printer) const;
   void GenerateSerializeWithCachedSizes(io::Printer* printer) const;
   void GenerateSerializeWithCachedSizesToArray(io::Printer* printer) const;
@@ -67,7 +66,7 @@ class PrimitiveFieldGenerator : public FieldGenerator {
 
  protected:
   const FieldDescriptor* descriptor_;
-  std::map<string, string> variables_;
+  map<string, string> variables_;
 
  private:
   GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(PrimitiveFieldGenerator);
@@ -104,9 +103,9 @@ class RepeatedPrimitiveFieldGenerator : public FieldGenerator {
                                          bool is_inline) const;
   void GenerateClearingCode(io::Printer* printer) const;
   void GenerateMergingCode(io::Printer* printer) const;
+  virtual void GenerateUnsafeMergingCode(io::Printer* printer) const;
   void GenerateSwappingCode(io::Printer* printer) const;
   void GenerateConstructorCode(io::Printer* printer) const;
-  void GenerateCopyConstructorCode(io::Printer* printer) const;
   void GenerateMergeFromCodedStream(io::Printer* printer) const;
   void GenerateMergeFromCodedStreamWithPacking(io::Printer* printer) const;
   void GenerateSerializeWithCachedSizes(io::Printer* printer) const;
@@ -115,7 +114,7 @@ class RepeatedPrimitiveFieldGenerator : public FieldGenerator {
 
  private:
   const FieldDescriptor* descriptor_;
-  std::map<string, string> variables_;
+  map<string, string> variables_;
 
   GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(RepeatedPrimitiveFieldGenerator);
 };

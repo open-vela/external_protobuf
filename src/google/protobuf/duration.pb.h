@@ -24,17 +24,10 @@
 #include <google/protobuf/generated_message_util.h>
 #include <google/protobuf/metadata.h>
 #include <google/protobuf/message.h>
-#include <google/protobuf/repeated_field.h>  // IWYU pragma: export
-#include <google/protobuf/extension_set.h>  // IWYU pragma: export
+#include <google/protobuf/repeated_field.h>
+#include <google/protobuf/extension_set.h>
 #include <google/protobuf/unknown_field_set.h>
 // @@protoc_insertion_point(includes)
-namespace google {
-namespace protobuf {
-class Duration;
-class DurationDefaultTypeInternal;
-extern DurationDefaultTypeInternal _Duration_default_instance_;
-}  // namespace protobuf
-}  // namespace google
 
 namespace google {
 namespace protobuf {
@@ -42,6 +35,10 @@ namespace protobuf {
 // Internal implementation detail -- do not call these.
 void LIBPROTOBUF_EXPORT protobuf_AddDesc_google_2fprotobuf_2fduration_2eproto();
 void LIBPROTOBUF_EXPORT protobuf_InitDefaults_google_2fprotobuf_2fduration_2eproto();
+void protobuf_AssignDesc_google_2fprotobuf_2fduration_2eproto();
+void protobuf_ShutdownFile_google_2fprotobuf_2fduration_2eproto();
+
+class Duration;
 
 // ===================================================================
 
@@ -57,52 +54,47 @@ class LIBPROTOBUF_EXPORT Duration : public ::google::protobuf::Message /* @@prot
     return *this;
   }
 
-  inline ::google::protobuf::Arena* GetArena() const PROTOBUF_FINAL {
-    return GetArenaNoVirtual();
-  }
-  inline void* GetMaybeArenaPointer() const PROTOBUF_FINAL {
+  inline ::google::protobuf::Arena* GetArena() const { return GetArenaNoVirtual(); }
+  inline void* GetMaybeArenaPointer() const {
     return MaybeArenaPtr();
   }
   static const ::google::protobuf::Descriptor* descriptor();
   static const Duration& default_instance();
 
-  static inline const Duration* internal_default_instance() {
-    return reinterpret_cast<const Duration*>(
-               &_Duration_default_instance_);
-  }
+  static const Duration* internal_default_instance();
 
   void UnsafeArenaSwap(Duration* other);
   void Swap(Duration* other);
 
   // implements Message ----------------------------------------------
 
-  inline Duration* New() const PROTOBUF_FINAL { return New(NULL); }
+  inline Duration* New() const { return New(NULL); }
 
-  Duration* New(::google::protobuf::Arena* arena) const PROTOBUF_FINAL;
-  void CopyFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
-  void MergeFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
+  Duration* New(::google::protobuf::Arena* arena) const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
   void CopyFrom(const Duration& from);
   void MergeFrom(const Duration& from);
-  void Clear() PROTOBUF_FINAL;
-  bool IsInitialized() const PROTOBUF_FINAL;
+  void Clear();
+  bool IsInitialized() const;
 
-  size_t ByteSizeLong() const PROTOBUF_FINAL;
+  size_t ByteSizeLong() const;
   bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input) PROTOBUF_FINAL;
+      ::google::protobuf::io::CodedInputStream* input);
   void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const PROTOBUF_FINAL;
+      ::google::protobuf::io::CodedOutputStream* output) const;
   ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
-      bool deterministic, ::google::protobuf::uint8* target) const PROTOBUF_FINAL;
-  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output)
-      const PROTOBUF_FINAL {
+      bool deterministic, ::google::protobuf::uint8* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const {
     return InternalSerializeWithCachedSizesToArray(false, output);
   }
-  int GetCachedSize() const PROTOBUF_FINAL { return _cached_size_; }
+  int GetCachedSize() const { return _cached_size_; }
   private:
   void SharedCtor();
   void SharedDtor();
-  void SetCachedSize(int size) const PROTOBUF_FINAL;
+  void SetCachedSize(int size) const;
   void InternalSwap(Duration* other);
+  void UnsafeMergeFrom(const Duration& from);
   protected:
   explicit Duration(::google::protobuf::Arena* arena);
   private:
@@ -117,19 +109,19 @@ class LIBPROTOBUF_EXPORT Duration : public ::google::protobuf::Message /* @@prot
   }
   public:
 
-  ::google::protobuf::Metadata GetMetadata() const PROTOBUF_FINAL;
+  ::google::protobuf::Metadata GetMetadata() const;
 
   // nested types ----------------------------------------------------
 
   // accessors -------------------------------------------------------
 
-  // int64 seconds = 1;
+  // optional int64 seconds = 1;
   void clear_seconds();
   static const int kSecondsFieldNumber = 1;
   ::google::protobuf::int64 seconds() const;
   void set_seconds(::google::protobuf::int64 value);
 
-  // int32 nanos = 2;
+  // optional int32 nanos = 2;
   void clear_nanos();
   static const int kNanosFieldNumber = 2;
   ::google::protobuf::int32 nanos() const;
@@ -147,10 +139,13 @@ class LIBPROTOBUF_EXPORT Duration : public ::google::protobuf::Message /* @@prot
   mutable int _cached_size_;
   friend void LIBPROTOBUF_EXPORT protobuf_InitDefaults_google_2fprotobuf_2fduration_2eproto_impl();
   friend void LIBPROTOBUF_EXPORT protobuf_AddDesc_google_2fprotobuf_2fduration_2eproto_impl();
-  friend const ::google::protobuf::uint32* protobuf_Offsets_google_2fprotobuf_2fduration_2eproto();
+  friend void protobuf_AssignDesc_google_2fprotobuf_2fduration_2eproto();
   friend void protobuf_ShutdownFile_google_2fprotobuf_2fduration_2eproto();
 
+  void InitAsDefaultInstance();
 };
+extern ::google::protobuf::internal::ExplicitlyConstructed<Duration> Duration_default_instance_;
+
 // ===================================================================
 
 
@@ -159,7 +154,7 @@ class LIBPROTOBUF_EXPORT Duration : public ::google::protobuf::Message /* @@prot
 #if !PROTOBUF_INLINE_NOT_IN_HEADERS
 // Duration
 
-// int64 seconds = 1;
+// optional int64 seconds = 1;
 inline void Duration::clear_seconds() {
   seconds_ = GOOGLE_LONGLONG(0);
 }
@@ -173,7 +168,7 @@ inline void Duration::set_seconds(::google::protobuf::int64 value) {
   // @@protoc_insertion_point(field_set:google.protobuf.Duration.seconds)
 }
 
-// int32 nanos = 2;
+// optional int32 nanos = 2;
 inline void Duration::clear_nanos() {
   nanos_ = 0;
 }
@@ -187,10 +182,12 @@ inline void Duration::set_nanos(::google::protobuf::int32 value) {
   // @@protoc_insertion_point(field_set:google.protobuf.Duration.nanos)
 }
 
+inline const Duration* Duration::internal_default_instance() {
+  return &Duration_default_instance_.get();
+}
 #endif  // !PROTOBUF_INLINE_NOT_IN_HEADERS
 
 // @@protoc_insertion_point(namespace_scope)
-
 
 }  // namespace protobuf
 }  // namespace google

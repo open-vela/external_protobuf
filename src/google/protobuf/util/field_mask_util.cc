@@ -45,7 +45,7 @@ string FieldMaskUtil::ToString(const FieldMask& mask) {
 
 void FieldMaskUtil::FromString(StringPiece str, FieldMask* out) {
   out->Clear();
-  std::vector<string> paths = Split(str, ",");
+  vector<string> paths = Split(str, ",");
   for (int i = 0; i < paths.size(); ++i) {
     if (paths[i].empty()) continue;
     out->add_paths(paths[i]);
@@ -116,7 +116,7 @@ bool FieldMaskUtil::ToJsonString(const FieldMask& mask, string* out) {
 
 bool FieldMaskUtil::FromJsonString(StringPiece str, FieldMask* out) {
   out->Clear();
-  std::vector<string> paths = Split(str, ",");
+  vector<string> paths = Split(str, ",");
   for (int i = 0; i < paths.size(); ++i) {
     if (paths[i].empty()) continue;
     string snakecase_path;
@@ -128,13 +128,9 @@ bool FieldMaskUtil::FromJsonString(StringPiece str, FieldMask* out) {
   return true;
 }
 
-bool FieldMaskUtil::GetFieldDescriptors(
-    const Descriptor* descriptor, StringPiece path,
-    std::vector<const FieldDescriptor*>* field_descriptors) {
-  if (field_descriptors != NULL) {
-    field_descriptors->clear();
-  }
-  std::vector<string> parts = Split(path, ".");
+bool FieldMaskUtil::InternalIsValidPath(const Descriptor* descriptor,
+                                        StringPiece path) {
+  vector<string> parts = Split(path, ".");
   for (int i = 0; i < parts.size(); ++i) {
     const string& field_name = parts[i];
     if (descriptor == NULL) {
@@ -143,9 +139,6 @@ bool FieldMaskUtil::GetFieldDescriptors(
     const FieldDescriptor* field = descriptor->FindFieldByName(field_name);
     if (field == NULL) {
       return false;
-    }
-    if (field_descriptors != NULL) {
-      field_descriptors->push_back(field);
     }
     if (!field->is_repeated() &&
         field->cpp_type() == FieldDescriptor::CPPTYPE_MESSAGE) {
@@ -223,14 +216,14 @@ class FieldMaskTree {
     ~Node() { ClearChildren(); }
 
     void ClearChildren() {
-      for (std::map<string, Node*>::iterator it = children.begin();
+      for (map<string, Node*>::iterator it = children.begin();
            it != children.end(); ++it) {
         delete it->second;
       }
       children.clear();
     }
 
-    std::map<string, Node*> children;
+    map<string, Node*> children;
 
    private:
     GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(Node);
@@ -281,7 +274,7 @@ void FieldMaskTree::MergeToFieldMask(const string& prefix, const Node* node,
     out->add_paths(prefix);
     return;
   }
-  for (std::map<string, Node*>::const_iterator it = node->children.begin();
+  for (map<string, Node*>::const_iterator it = node->children.begin();
        it != node->children.end(); ++it) {
     string current_path = prefix.empty() ? it->first : prefix + "." + it->first;
     MergeToFieldMask(current_path, it->second, out);
@@ -289,7 +282,7 @@ void FieldMaskTree::MergeToFieldMask(const string& prefix, const Node* node,
 }
 
 void FieldMaskTree::AddPath(const string& path) {
-  std::vector<string> parts = Split(path, ".");
+  vector<string> parts = Split(path, ".");
   if (parts.empty()) {
     return;
   }
@@ -316,7 +309,7 @@ void FieldMaskTree::AddPath(const string& path) {
 }
 
 void FieldMaskTree::IntersectPath(const string& path, FieldMaskTree* out) {
-  std::vector<string> parts = Split(path, ".");
+  vector<string> parts = Split(path, ".");
   if (parts.empty()) {
     return;
   }
@@ -346,7 +339,7 @@ void FieldMaskTree::MergeLeafNodesToTree(const string& prefix, const Node* node,
   if (node->children.empty()) {
     out->AddPath(prefix);
   }
-  for (std::map<string, Node*>::const_iterator it = node->children.begin();
+  for (map<string, Node*>::const_iterator it = node->children.begin();
        it != node->children.end(); ++it) {
     string current_path = prefix.empty() ? it->first : prefix + "." + it->first;
     MergeLeafNodesToTree(current_path, it->second, out);
@@ -360,7 +353,7 @@ void FieldMaskTree::MergeMessage(const Node* node, const Message& source,
   const Reflection* source_reflection = source.GetReflection();
   const Reflection* destination_reflection = destination->GetReflection();
   const Descriptor* descriptor = source.GetDescriptor();
-  for (std::map<string, Node*>::const_iterator it = node->children.begin();
+  for (map<string, Node*>::const_iterator it = node->children.begin();
        it != node->children.end(); ++it) {
     const string& field_name = it->first;
     const Node* child = it->second;

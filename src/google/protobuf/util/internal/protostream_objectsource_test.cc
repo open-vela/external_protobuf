@@ -101,8 +101,7 @@ class ProtostreamObjectSourceTest
       : helper_(GetParam()),
         mock_(),
         ow_(&mock_),
-        use_lower_camel_for_enums_(false),
-        add_trailing_zeros_(false) {
+        use_lower_camel_for_enums_(false) {
     helper_.ResetTypeInfo(Book::descriptor(), Proto3Message::descriptor());
   }
 
@@ -270,14 +269,11 @@ class ProtostreamObjectSourceTest
 
   void UseLowerCamelForEnums() { use_lower_camel_for_enums_ = true; }
 
-  void AddTrailingZeros() { add_trailing_zeros_ = true; }
-
   testing::TypeInfoTestHelper helper_;
 
   ::testing::NiceMock<MockObjectWriter> mock_;
   ExpectingObjectWriter ow_;
   bool use_lower_camel_for_enums_;
-  bool add_trailing_zeros_;
 };
 
 INSTANTIATE_TEST_CASE_P(DifferentTypeInfoSourceTest,
@@ -1026,7 +1022,6 @@ TEST_P(ProtostreamObjectSourceTimestampTest, TimestampDurationDefaultValue) {
 
   DoTest(out, TimestampDuration::descriptor());
 }
-
 
 }  // namespace converter
 }  // namespace util
