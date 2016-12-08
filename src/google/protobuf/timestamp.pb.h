@@ -32,7 +32,7 @@ namespace google {
 namespace protobuf {
 class Timestamp;
 class TimestampDefaultTypeInternal;
-LIBPROTOBUF_EXPORT extern TimestampDefaultTypeInternal _Timestamp_default_instance_;
+extern TimestampDefaultTypeInternal _Timestamp_default_instance_;
 }  // namespace protobuf
 }  // namespace google
 

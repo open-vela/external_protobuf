@@ -67,12 +67,9 @@ void ExtensionGenerator::GenerateMembersHeader(io::Printer* printer) {
   } else {
     vars["comments"] = "";
   }
-  // Unlike normal message fields, check if the file for the extension was
-  // deprecated.
-  vars["deprecated_attribute"] = GetOptionalDeprecatedAttribute(descriptor_, descriptor_->file());
   printer->Print(vars,
                  "$comments$"
-                 "+ (GPBExtensionDescriptor *)$method_name$$deprecated_attribute$;\n");
+                 "+ (GPBExtensionDescriptor *)$method_name$;\n");
 }
 
 void ExtensionGenerator::GenerateStaticVariablesInitialization(

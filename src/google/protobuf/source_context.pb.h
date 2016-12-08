@@ -32,7 +32,7 @@ namespace google {
 namespace protobuf {
 class SourceContext;
 class SourceContextDefaultTypeInternal;
-LIBPROTOBUF_EXPORT extern SourceContextDefaultTypeInternal _SourceContext_default_instance_;
+extern SourceContextDefaultTypeInternal _SourceContext_default_instance_;
 }  // namespace protobuf
 }  // namespace google
 
