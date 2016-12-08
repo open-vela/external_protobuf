@@ -32,7 +32,7 @@ namespace google {
 namespace protobuf {
 class Duration;
 class DurationDefaultTypeInternal;
-LIBPROTOBUF_EXPORT extern DurationDefaultTypeInternal _Duration_default_instance_;
+extern DurationDefaultTypeInternal _Duration_default_instance_;
 }  // namespace protobuf
 }  // namespace google
 

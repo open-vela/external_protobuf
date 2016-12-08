@@ -180,10 +180,7 @@ MessageGenerator::MessageGenerator(const string& root_classname,
     : root_classname_(root_classname),
       descriptor_(descriptor),
       field_generators_(descriptor, options),
-      class_name_(ClassName(descriptor_)),
-      deprecated_attribute_(
-          GetOptionalDeprecatedAttribute(descriptor, descriptor->file(), false, true)) {
-
+      class_name_(ClassName(descriptor_)) {
   for (int i = 0; i < descriptor_->extension_count(); i++) {
     extension_generators_.push_back(
         new ExtensionGenerator(class_name_, descriptor_->extension(i)));
@@ -342,7 +339,7 @@ void MessageGenerator::GenerateMessageHeader(io::Printer* printer) {
   printer->Print(
       "$comments$$deprecated_attribute$@interface $classname$ : GPBMessage\n\n",
       "classname", class_name_,
-      "deprecated_attribute", deprecated_attribute_,
+      "deprecated_attribute", GetOptionalDeprecatedAttribute(descriptor_, false, true),
       "comments", message_comments);
 
   vector<char> seen_oneofs(descriptor_->oneof_decl_count(), 0);
@@ -398,14 +395,6 @@ void MessageGenerator::GenerateSource(io::Printer* printer) {
         "#pragma mark - $classname$\n"
         "\n",
         "classname", class_name_);
-
-    if (!deprecated_attribute_.empty()) {
-      // No warnings when compiling the impl of this deprecated class.
-      printer->Print(
-          "#pragma clang diagnostic push\n"
-          "#pragma clang diagnostic ignored \"-Wdeprecated-implementations\"\n"
-          "\n");
-    }
 
     printer->Print("@implementation $classname$\n\n",
                    "classname", class_name_);
@@ -611,12 +600,6 @@ void MessageGenerator::GenerateSource(io::Printer* printer) {
         "  return descriptor;\n"
         "}\n\n"
         "@end\n\n");
-
-    if (!deprecated_attribute_.empty()) {
-      printer->Print(
-          "#pragma clang diagnostic pop\n"
-          "\n");
-    }
 
     for (int i = 0; i < descriptor_->field_count(); i++) {
       field_generators_.get(descriptor_->field(i))

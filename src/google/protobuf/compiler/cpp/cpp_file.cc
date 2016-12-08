@@ -403,7 +403,7 @@ class FileGenerator::ForwardDeclarations {
   std::map<string, const Descriptor*>& classes() { return classes_; }
   std::map<string, const EnumDescriptor*>& enums() { return enums_; }
 
-  void Print(io::Printer* printer, const Options& options) const {
+  void Print(io::Printer* printer) const {
     for (std::map<string, const EnumDescriptor *>::const_iterator
              it = enums_.begin(),
              end = enums_.end();
@@ -422,11 +422,8 @@ class FileGenerator::ForwardDeclarations {
 
       printer->Print(
           "class $classname$DefaultTypeInternal;\n"
-          "$dllexport_decl$"
           "extern $classname$DefaultTypeInternal "
           "_$classname$_default_instance_;\n",  // NOLINT
-          "dllexport_decl",
-          options.dllexport_decl.empty() ? "" : options.dllexport_decl + " ",
           "classname",
           it->first);
     }
@@ -436,7 +433,7 @@ class FileGenerator::ForwardDeclarations {
          it != end; ++it) {
       printer->Print("namespace $nsname$ {\n",
                      "nsname", it->first);
-      it->second->Print(printer, options);
+      it->second->Print(printer);
       printer->Print("}  // namespace $nsname$\n",
                      "nsname", it->first);
     }
@@ -811,7 +808,7 @@ void FileGenerator::GenerateForwardDeclarations(io::Printer* printer) {
     dependency.FillForwardDeclarations(&decls);
   }
   FillForwardDeclarations(&decls);
-  decls.Print(printer, options_);
+  decls.Print(printer);
 }
 
 void FileGenerator::FillForwardDeclarations(ForwardDeclarations* decls) {
