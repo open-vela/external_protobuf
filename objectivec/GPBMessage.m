@@ -1023,11 +1023,9 @@ static GPBUnknownFieldSet *GetOrMakeUnknownFields(GPBMessage *self) {
       if (arrayOrMap) {
         if (field.fieldType == GPBFieldTypeRepeated) {
           if (GPBFieldDataTypeIsObject(field)) {
-            if ([arrayOrMap isKindOfClass:[GPBAutocreatedArray class]]) {
-              GPBAutocreatedArray *autoArray = arrayOrMap;
-              if (autoArray->_autocreator == self) {
-                autoArray->_autocreator = nil;
-              }
+            GPBAutocreatedArray *autoArray = arrayOrMap;
+            if (autoArray->_autocreator == self) {
+              autoArray->_autocreator = nil;
             }
           } else {
             // Type doesn't matter, it is a GPB*Array.
@@ -1039,11 +1037,9 @@ static GPBUnknownFieldSet *GetOrMakeUnknownFields(GPBMessage *self) {
         } else {
           if ((field.mapKeyDataType == GPBDataTypeString) &&
               GPBFieldDataTypeIsObject(field)) {
-            if ([arrayOrMap isKindOfClass:[GPBAutocreatedDictionary class]]) {
-              GPBAutocreatedDictionary *autoDict = arrayOrMap;
-              if (autoDict->_autocreator == self) {
-                autoDict->_autocreator = nil;
-              }
+            GPBAutocreatedDictionary *autoDict = arrayOrMap;
+            if (autoDict->_autocreator == self) {
+              autoDict->_autocreator = nil;
             }
           } else {
             // Type doesn't matter, it is a GPB*Dictionary.

@@ -28,23 +28,18 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-syntax = "proto2";
+// Negative compilation test for arena usage.
 
-option java_package = "com.google.apps.jspb.proto";
-option java_multiple_files = true;
+#include <google/protobuf/arena.h>
+#include <google/protobuf/unittest.pb.h>
 
-package jspb.exttest.nested;
+#ifdef TEST_ARENA_PRIVATE_CONSTRUCTOR
 
-message TestNestedExtensionsMessage {
-  optional int32 intfield = 1;
-  extensions 100 to max;
+namespace google {
+void ArenaPrivateConstructor() {
+  google::protobuf::Arena arena;
+  protobuf_unittest::TestAllTypes message(&arena);
 }
 
-message TestOuterMessage {
-  message NestedExtensionMessage {
-    optional string ext1 = 1;
-  }
-  extend TestNestedExtensionsMessage {
-    optional NestedExtensionMessage inner_extension = 100;
-  }
-}
+#endif
+}  // namespace google
