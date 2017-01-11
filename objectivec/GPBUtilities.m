@@ -408,11 +408,9 @@ void GPBSetRetainedObjectIvarWithFieldInternal(GPBMessage *self,
       if (field.fieldType == GPBFieldTypeRepeated) {
         // If the old array was autocreated by us, then clear it.
         if (GPBDataTypeIsObject(fieldType)) {
-          if ([oldValue isKindOfClass:[GPBAutocreatedArray class]]) {
-            GPBAutocreatedArray *autoArray = oldValue;
-            if (autoArray->_autocreator == self) {
-              autoArray->_autocreator = nil;
-            }
+          GPBAutocreatedArray *autoArray = oldValue;
+          if (autoArray->_autocreator == self) {
+            autoArray->_autocreator = nil;
           }
         } else {
           // Type doesn't matter, it is a GPB*Array.
@@ -425,11 +423,9 @@ void GPBSetRetainedObjectIvarWithFieldInternal(GPBMessage *self,
         // If the old map was autocreated by us, then clear it.
         if ((field.mapKeyDataType == GPBDataTypeString) &&
             GPBDataTypeIsObject(fieldType)) {
-          if ([oldValue isKindOfClass:[GPBAutocreatedDictionary class]]) {
-            GPBAutocreatedDictionary *autoDict = oldValue;
-            if (autoDict->_autocreator == self) {
-              autoDict->_autocreator = nil;
-            }
+          GPBAutocreatedDictionary *autoDict = oldValue;
+          if (autoDict->_autocreator == self) {
+            autoDict->_autocreator = nil;
           }
         } else {
           // Type doesn't matter, it is a GPB*Dictionary.
