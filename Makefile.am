@@ -186,6 +186,7 @@ csharp_EXTRA_DIST=                                                           \
   csharp/src/Google.Protobuf/WellKnownTypes/WrappersPartial.cs               \
   csharp/src/Google.Protobuf/WireFormat.cs                                   \
   csharp/src/Google.Protobuf/project.json                                    \
+  csharp/src/global.json                                                     \
   csharp/src/packages/repositories.config
 
 java_EXTRA_DIST=                                                                   \
@@ -525,6 +526,7 @@ objectivec_EXTRA_DIST=                                                       \
   objectivec/Tests/GPBDictionaryTests+String.m                               \
   objectivec/Tests/GPBDictionaryTests+UInt32.m                               \
   objectivec/Tests/GPBDictionaryTests+UInt64.m                               \
+  objectivec/Tests/GPBDictionaryTests.m                                      \
   objectivec/Tests/GPBDictionaryTests.pddm                                   \
   objectivec/Tests/GPBMessageTests+Merge.m                                   \
   objectivec/Tests/GPBMessageTests+Runtime.m                                 \
@@ -852,6 +854,7 @@ js_EXTRA_DIST=                              \
   js/test3.proto                            \
   js/test4.proto                            \
   js/test5.proto                            \
+  js/test8.proto                            \
   js/test_bootstrap.js                      \
   js/testbinary.proto                       \
   js/testempty.proto
