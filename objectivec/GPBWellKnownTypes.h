@@ -112,27 +112,16 @@ typedef NS_ENUM(NSInteger, GPBWellKnownTypesErrorCode) {
  * @note: Not all second/nanos combinations can be represented in a
  * NSTimeInterval, so getting this could be a lossy transform.
  **/
-@property(nonatomic, readwrite) NSTimeInterval timeInterval;
+@property(nonatomic, readwrite) NSTimeInterval timeIntervalSince1970;
 
 /**
  * Initializes a GPBDuration with the given NSTimeInterval.
  *
- * @param timeInterval Time interval to configure the GPBDuration with.
+ * @param timeIntervalSince1970 Time interval to configure the GPBDuration with.
  *
  * @return A newly initialized GPBDuration.
  **/
-- (instancetype)initWithTimeInterval:(NSTimeInterval)timeInterval;
-
-// These next two methods are deprecated because GBPDuration has no need of a
-// "base" time. The older methods were about symmetry with GBPTimestamp, but
-// the unix epoch usage is too confusing.
-
-/** Deprecated, use timeInterval instead. */
-@property(nonatomic, readwrite) NSTimeInterval timeIntervalSince1970
-    __attribute__((deprecated("Use timeInterval")));
-/** Deprecated, use initWithTimeInterval: instead. */
-- (instancetype)initWithTimeIntervalSince1970:(NSTimeInterval)timeIntervalSince1970
-    __attribute__((deprecated("Use initWithTimeInterval:")));
+- (instancetype)initWithTimeIntervalSince1970:(NSTimeInterval)timeIntervalSince1970;
 
 @end
 

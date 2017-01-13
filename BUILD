@@ -771,14 +771,7 @@ internal_protobuf_py_tests(
 
 proto_lang_toolchain(
   name = "cc_toolchain",
-  command_line = "--cpp_out=$(OUT)",
   runtime = ":protobuf",
+  command_line = "--cpp_out=$(OUT)",
   visibility = ["//visibility:public"],
-)
-
-proto_lang_toolchain(
-    name = "java_toolchain",
-    command_line = "--java_out=$(OUT)",
-    runtime = ":protobuf_java",
-    visibility = ["//visibility:public"],
 )
