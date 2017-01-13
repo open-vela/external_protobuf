@@ -41,25 +41,15 @@ NSString *const GPBWellKnownTypesErrorDomain =
 
 static NSString *kTypePrefixGoogleApisCom = @"type.googleapis.com/";
 
-static NSTimeInterval TimeIntervalFromSecondsAndNanos(int64_t seconds,
-                                                      int32_t nanos) {
+static NSTimeInterval TimeIntervalSince1970FromSecondsAndNanos(int64_t seconds,
+                                                               int32_t nanos) {
   return seconds + (NSTimeInterval)nanos / 1e9;
 }
 
-static int32_t SecondsAndNanosFromTimeInterval(NSTimeInterval time,
-                                               int64_t *outSeconds,
-                                               BOOL nanosMustBePositive) {
+static int32_t SecondsAndNanosFromTimeIntervalSince1970(NSTimeInterval time,
+                                                        int64_t *outSeconds) {
   NSTimeInterval seconds;
   NSTimeInterval nanos = modf(time, &seconds);
-
-  if (nanosMustBePositive && (nanos < 0)) {
-    // Per Timestamp.proto, nanos is non-negative and "Negative second values with
-    // fractions must still have non-negative nanos values that count forward in
-    // time. Must be from 0 to 999,999,999 inclusive."
-    --seconds;
-    nanos = 1.0 + nanos;
-  }
-
   nanos *= 1e9;
   *outSeconds = (int64_t)seconds;
   return (int32_t)nanos;
@@ -98,8 +88,8 @@ static NSString *ParseTypeFromURL(NSString *typeURLString) {
 - (instancetype)initWithTimeIntervalSince1970:(NSTimeInterval)timeIntervalSince1970 {
   if ((self = [super init])) {
     int64_t seconds;
-    int32_t nanos = SecondsAndNanosFromTimeInterval(
-        timeIntervalSince1970, &seconds, YES);
+    int32_t nanos = SecondsAndNanosFromTimeIntervalSince1970(
+        timeIntervalSince1970, &seconds);
     self.seconds = seconds;
     self.nanos = nanos;
   }
@@ -115,13 +105,13 @@ static NSString *ParseTypeFromURL(NSString *typeURLString) {
 }
 
 - (NSTimeInterval)timeIntervalSince1970 {
-  return TimeIntervalFromSecondsAndNanos(self.seconds, self.nanos);
+  return TimeIntervalSince1970FromSecondsAndNanos(self.seconds, self.nanos);
 }
 
 - (void)setTimeIntervalSince1970:(NSTimeInterval)timeIntervalSince1970 {
   int64_t seconds;
   int32_t nanos =
-      SecondsAndNanosFromTimeInterval(timeIntervalSince1970, &seconds, YES);
+      SecondsAndNanosFromTimeIntervalSince1970(timeIntervalSince1970, &seconds);
   self.seconds = seconds;
   self.nanos = nanos;
 }
@@ -132,39 +122,27 @@ static NSString *ParseTypeFromURL(NSString *typeURLString) {
 
 @implementation GPBDuration (GBPWellKnownTypes)
 
-- (instancetype)initWithTimeInterval:(NSTimeInterval)timeInterval {
+- (instancetype)initWithTimeIntervalSince1970:(NSTimeInterval)timeIntervalSince1970 {
   if ((self = [super init])) {
     int64_t seconds;
-    int32_t nanos = SecondsAndNanosFromTimeInterval(
-        timeInterval, &seconds, NO);
+    int32_t nanos = SecondsAndNanosFromTimeIntervalSince1970(
+        timeIntervalSince1970, &seconds);
     self.seconds = seconds;
     self.nanos = nanos;
   }
   return self;
 }
 
-- (instancetype)initWithTimeIntervalSince1970:(NSTimeInterval)timeIntervalSince1970 {
-  return [self initWithTimeInterval:timeIntervalSince1970];
-}
-
-- (NSTimeInterval)timeInterval {
-  return TimeIntervalFromSecondsAndNanos(self.seconds, self.nanos);
-}
-
-- (void)setTimeInterval:(NSTimeInterval)timeInterval {
-  int64_t seconds;
-  int32_t nanos =
-      SecondsAndNanosFromTimeInterval(timeInterval, &seconds, NO);
-  self.seconds = seconds;
-  self.nanos = nanos;
-}
-
 - (NSTimeInterval)timeIntervalSince1970 {
-  return self.timeInterval;
+  return TimeIntervalSince1970FromSecondsAndNanos(self.seconds, self.nanos);
 }
 
 - (void)setTimeIntervalSince1970:(NSTimeInterval)timeIntervalSince1970 {
-  self.timeInterval = timeIntervalSince1970;
+  int64_t seconds;
+  int32_t nanos =
+      SecondsAndNanosFromTimeIntervalSince1970(timeIntervalSince1970, &seconds);
+  self.seconds = seconds;
+  self.nanos = nanos;
 }
 
 @end
