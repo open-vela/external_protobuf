@@ -1,7 +1,6 @@
-#region Copyright notice and license
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
-// https://developers.google.com/protocol-buffers/
+// http://code.google.com/p/protobuf/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -28,43 +27,29 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#endregion
 
-namespace Google.Protobuf.Reflection
-{
-    /// <summary>
-    /// Descriptor for a single enum value within an enum in a .proto file.
-    /// </summary>
-    public sealed class EnumValueDescriptor : DescriptorBase                                            
-    {
-        private readonly EnumDescriptor enumDescriptor;
-        private readonly EnumValueDescriptorProto proto;
+// Author: matthewtoia@google.com (Matt Toia)
 
-        internal EnumValueDescriptor(EnumValueDescriptorProto proto, FileDescriptor file,
-                                     EnumDescriptor parent, int index)
-            : base(file, parent.FullName + "." + proto.Name, index)
-        {
-            this.proto = proto;
-            enumDescriptor = parent;
-            file.DescriptorPool.AddSymbol(this);
-            file.DescriptorPool.AddEnumValueByNumber(this);
-        }
 
-        internal EnumValueDescriptorProto Proto { get { return proto; } }
+package google.protobuf.python.internal;
 
-        /// <summary>
-        /// Returns the name of the enum value described by this object.
-        /// </summary>
-        public override string Name { get { return proto.Name; } }
 
-        /// <summary>
-        /// Returns the number associated with this enum value.
-        /// </summary>
-        public int Number { get { return Proto.Number; } }
+enum Factory1Enum {
+  FACTORY_1_VALUE_0 = 0;
+  FACTORY_1_VALUE_1 = 1;
+}
 
-        /// <summary>
-        /// Returns the enum descriptor that this value is part of.
-        /// </summary>
-        public EnumDescriptor EnumDescriptor { get { return enumDescriptor; } }
-    }
+message Factory1Message {
+  optional Factory1Enum factory_1_enum = 1;
+  enum NestedFactory1Enum {
+    NESTED_FACTORY_1_VALUE_0 = 0;
+    NESTED_FACTORY_1_VALUE_1 = 1;
+  }
+  optional NestedFactory1Enum nested_factory_1_enum = 2;
+  message NestedFactory1Message {
+    optional string value = 1;
+  }
+  optional NestedFactory1Message nested_factory_1_message = 3;
+  optional int32 scalar_value = 4;
+  repeated string list_value = 5;
 }

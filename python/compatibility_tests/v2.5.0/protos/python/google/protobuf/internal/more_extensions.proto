@@ -1,7 +1,6 @@
-#region Copyright notice and license
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
-// https://developers.google.com/protocol-buffers/
+// http://code.google.com/p/protobuf/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -28,43 +27,32 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#endregion
 
-namespace Google.Protobuf.Reflection
-{
-    /// <summary>
-    /// Descriptor for a single enum value within an enum in a .proto file.
-    /// </summary>
-    public sealed class EnumValueDescriptor : DescriptorBase                                            
-    {
-        private readonly EnumDescriptor enumDescriptor;
-        private readonly EnumValueDescriptorProto proto;
+// Author: robinson@google.com (Will Robinson)
 
-        internal EnumValueDescriptor(EnumValueDescriptorProto proto, FileDescriptor file,
-                                     EnumDescriptor parent, int index)
-            : base(file, parent.FullName + "." + proto.Name, index)
-        {
-            this.proto = proto;
-            enumDescriptor = parent;
-            file.DescriptorPool.AddSymbol(this);
-            file.DescriptorPool.AddEnumValueByNumber(this);
-        }
 
-        internal EnumValueDescriptorProto Proto { get { return proto; } }
+package google.protobuf.internal;
 
-        /// <summary>
-        /// Returns the name of the enum value described by this object.
-        /// </summary>
-        public override string Name { get { return proto.Name; } }
 
-        /// <summary>
-        /// Returns the number associated with this enum value.
-        /// </summary>
-        public int Number { get { return Proto.Number; } }
+message TopLevelMessage {
+  optional ExtendedMessage submessage = 1;
+}
 
-        /// <summary>
-        /// Returns the enum descriptor that this value is part of.
-        /// </summary>
-        public EnumDescriptor EnumDescriptor { get { return enumDescriptor; } }
-    }
+
+message ExtendedMessage {
+  extensions 1 to max;
+}
+
+
+message ForeignMessage {
+  optional int32 foreign_message_int = 1;
+}
+
+
+extend ExtendedMessage {
+  optional int32 optional_int_extension = 1;
+  optional ForeignMessage optional_message_extension = 2;
+
+  repeated int32 repeated_int_extension = 3;
+  repeated ForeignMessage repeated_message_extension = 4;
 }

@@ -1,7 +1,6 @@
-#region Copyright notice and license
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
-// https://developers.google.com/protocol-buffers/
+// http://code.google.com/p/protobuf/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -28,43 +27,46 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#endregion
 
-namespace Google.Protobuf.Reflection
-{
-    /// <summary>
-    /// Descriptor for a single enum value within an enum in a .proto file.
-    /// </summary>
-    public sealed class EnumValueDescriptor : DescriptorBase                                            
-    {
-        private readonly EnumDescriptor enumDescriptor;
-        private readonly EnumValueDescriptorProto proto;
+// Author: kenton@google.com (Kenton Varda)
+//  Based on original Protocol Buffers design by
+//  Sanjay Ghemawat, Jeff Dean, and others.
+//
+// This file contains messages for testing message_set_wire_format.
 
-        internal EnumValueDescriptor(EnumValueDescriptorProto proto, FileDescriptor file,
-                                     EnumDescriptor parent, int index)
-            : base(file, parent.FullName + "." + proto.Name, index)
-        {
-            this.proto = proto;
-            enumDescriptor = parent;
-            file.DescriptorPool.AddSymbol(this);
-            file.DescriptorPool.AddEnumValueByNumber(this);
-        }
+package protobuf_unittest;
 
-        internal EnumValueDescriptorProto Proto { get { return proto; } }
+option optimize_for = SPEED;
 
-        /// <summary>
-        /// Returns the name of the enum value described by this object.
-        /// </summary>
-        public override string Name { get { return proto.Name; } }
-
-        /// <summary>
-        /// Returns the number associated with this enum value.
-        /// </summary>
-        public int Number { get { return Proto.Number; } }
-
-        /// <summary>
-        /// Returns the enum descriptor that this value is part of.
-        /// </summary>
-        public EnumDescriptor EnumDescriptor { get { return enumDescriptor; } }
-    }
+// A message with message_set_wire_format.
+message TestMessageSet {
+  option message_set_wire_format = true;
+  extensions 4 to max;
 }
+
+message TestMessageSetContainer {
+  optional TestMessageSet message_set = 1;
+}
+
+message TestMessageSetExtension1 {
+  extend TestMessageSet {
+    optional TestMessageSetExtension1 message_set_extension = 1545008;
+  }
+  optional int32 i = 15;
+}
+
+message TestMessageSetExtension2 {
+  extend TestMessageSet {
+    optional TestMessageSetExtension2 message_set_extension = 1547769;
+  }
+  optional string str = 25;
+}
+
+// MessageSet wire format is equivalent to this.
+message RawMessageSet {
+  repeated group Item = 1 {
+    required int32 type_id = 2;
+    required bytes message = 3;
+  }
+}
+
