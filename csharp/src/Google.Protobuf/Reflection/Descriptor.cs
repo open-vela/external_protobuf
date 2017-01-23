@@ -2779,8 +2779,6 @@ namespace Google.Protobuf.Reflection {
       get { return Descriptor; }
     }
 
-    internal CustomOptions CustomOptions{ get; private set; } = CustomOptions.Empty;
-
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public FileOptions() {
       OnConstruction();
@@ -3301,7 +3299,7 @@ namespace Google.Protobuf.Reflection {
       while ((tag = input.ReadTag()) != 0) {
         switch(tag) {
           default:
-            CustomOptions = CustomOptions.ReadOrSkipUnknownField(input);
+            input.SkipLastField();
             break;
           case 10: {
             JavaPackage = input.ReadString();
@@ -3412,8 +3410,6 @@ namespace Google.Protobuf.Reflection {
     pbr::MessageDescriptor pb::IMessage.Descriptor {
       get { return Descriptor; }
     }
-
-    internal CustomOptions CustomOptions{ get; private set; } = CustomOptions.Empty;
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public MessageOptions() {
@@ -3650,7 +3646,7 @@ namespace Google.Protobuf.Reflection {
       while ((tag = input.ReadTag()) != 0) {
         switch(tag) {
           default:
-            CustomOptions = CustomOptions.ReadOrSkipUnknownField(input);
+            input.SkipLastField();
             break;
           case 8: {
             MessageSetWireFormat = input.ReadBool();
@@ -3692,8 +3688,6 @@ namespace Google.Protobuf.Reflection {
     pbr::MessageDescriptor pb::IMessage.Descriptor {
       get { return Descriptor; }
     }
-
-    internal CustomOptions CustomOptions{ get; private set; } = CustomOptions.Empty;
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public FieldOptions() {
@@ -3986,7 +3980,7 @@ namespace Google.Protobuf.Reflection {
       while ((tag = input.ReadTag()) != 0) {
         switch(tag) {
           default:
-            CustomOptions = CustomOptions.ReadOrSkipUnknownField(input);
+            input.SkipLastField();
             break;
           case 8: {
             ctype_ = (global::Google.Protobuf.Reflection.FieldOptions.Types.CType) input.ReadEnum();
@@ -4067,8 +4061,6 @@ namespace Google.Protobuf.Reflection {
     pbr::MessageDescriptor pb::IMessage.Descriptor {
       get { return Descriptor; }
     }
-
-    internal CustomOptions CustomOptions{ get; private set; } = CustomOptions.Empty;
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public OneofOptions() {
@@ -4155,7 +4147,7 @@ namespace Google.Protobuf.Reflection {
       while ((tag = input.ReadTag()) != 0) {
         switch(tag) {
           default:
-            CustomOptions = CustomOptions.ReadOrSkipUnknownField(input);
+            input.SkipLastField();
             break;
           case 7994: {
             uninterpretedOption_.AddEntriesFrom(input, _repeated_uninterpretedOption_codec);
@@ -4181,8 +4173,6 @@ namespace Google.Protobuf.Reflection {
     pbr::MessageDescriptor pb::IMessage.Descriptor {
       get { return Descriptor; }
     }
-
-    internal CustomOptions CustomOptions{ get; private set; } = CustomOptions.Empty;
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public EnumOptions() {
@@ -4327,7 +4317,7 @@ namespace Google.Protobuf.Reflection {
       while ((tag = input.ReadTag()) != 0) {
         switch(tag) {
           default:
-            CustomOptions = CustomOptions.ReadOrSkipUnknownField(input);
+            input.SkipLastField();
             break;
           case 16: {
             AllowAlias = input.ReadBool();
@@ -4361,8 +4351,6 @@ namespace Google.Protobuf.Reflection {
     pbr::MessageDescriptor pb::IMessage.Descriptor {
       get { return Descriptor; }
     }
-
-    internal CustomOptions CustomOptions{ get; private set; } = CustomOptions.Empty;
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public EnumValueOptions() {
@@ -4479,7 +4467,7 @@ namespace Google.Protobuf.Reflection {
       while ((tag = input.ReadTag()) != 0) {
         switch(tag) {
           default:
-            CustomOptions = CustomOptions.ReadOrSkipUnknownField(input);
+            input.SkipLastField();
             break;
           case 8: {
             Deprecated = input.ReadBool();
@@ -4509,8 +4497,6 @@ namespace Google.Protobuf.Reflection {
     pbr::MessageDescriptor pb::IMessage.Descriptor {
       get { return Descriptor; }
     }
-
-    internal CustomOptions CustomOptions{ get; private set; } = CustomOptions.Empty;
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public ServiceOptions() {
@@ -4627,7 +4613,7 @@ namespace Google.Protobuf.Reflection {
       while ((tag = input.ReadTag()) != 0) {
         switch(tag) {
           default:
-            CustomOptions = CustomOptions.ReadOrSkipUnknownField(input);
+            input.SkipLastField();
             break;
           case 264: {
             Deprecated = input.ReadBool();
@@ -4657,8 +4643,6 @@ namespace Google.Protobuf.Reflection {
     pbr::MessageDescriptor pb::IMessage.Descriptor {
       get { return Descriptor; }
     }
-
-    internal CustomOptions CustomOptions{ get; private set; } = CustomOptions.Empty;
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public MethodOptions() {
@@ -4799,7 +4783,7 @@ namespace Google.Protobuf.Reflection {
       while ((tag = input.ReadTag()) != 0) {
         switch(tag) {
           default:
-            CustomOptions = CustomOptions.ReadOrSkipUnknownField(input);
+            input.SkipLastField();
             break;
           case 264: {
             Deprecated = input.ReadBool();

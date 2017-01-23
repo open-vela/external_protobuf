@@ -1,7 +1,6 @@
-#region Copyright notice and license
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
-// https://developers.google.com/protocol-buffers/
+// http://code.google.com/p/protobuf/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -28,43 +27,38 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#endregion
 
-namespace Google.Protobuf.Reflection
-{
-    /// <summary>
-    /// Descriptor for a single enum value within an enum in a .proto file.
-    /// </summary>
-    public sealed class EnumValueDescriptor : DescriptorBase                                            
-    {
-        private readonly EnumDescriptor enumDescriptor;
-        private readonly EnumValueDescriptorProto proto;
+// Author: kenton@google.com (Kenton Varda)
+//  Based on original Protocol Buffers design by
+//  Sanjay Ghemawat, Jeff Dean, and others.
+//
+// A proto file which is imported by unittest.proto to test importing.
 
-        internal EnumValueDescriptor(EnumValueDescriptorProto proto, FileDescriptor file,
-                                     EnumDescriptor parent, int index)
-            : base(file, parent.FullName + "." + proto.Name, index)
-        {
-            this.proto = proto;
-            enumDescriptor = parent;
-            file.DescriptorPool.AddSymbol(this);
-            file.DescriptorPool.AddEnumValueByNumber(this);
-        }
 
-        internal EnumValueDescriptorProto Proto { get { return proto; } }
+// We don't put this in a package within proto2 because we need to make sure
+// that the generated code doesn't depend on being in the proto2 namespace.
+// In test_util.h we do
+// "using namespace unittest_import = protobuf_unittest_import".
+package protobuf_unittest_import;
 
-        /// <summary>
-        /// Returns the name of the enum value described by this object.
-        /// </summary>
-        public override string Name { get { return proto.Name; } }
+option optimize_for = SPEED;
 
-        /// <summary>
-        /// Returns the number associated with this enum value.
-        /// </summary>
-        public int Number { get { return Proto.Number; } }
+// Excercise the java_package option.
+option java_package = "com.google.protobuf.test";
 
-        /// <summary>
-        /// Returns the enum descriptor that this value is part of.
-        /// </summary>
-        public EnumDescriptor EnumDescriptor { get { return enumDescriptor; } }
-    }
+// Do not set a java_outer_classname here to verify that Proto2 works without
+// one.
+
+// Test public import
+import public "google/protobuf/unittest_import_public.proto";
+
+message ImportMessage {
+  optional int32 d = 1;
 }
+
+enum ImportEnum {
+  IMPORT_FOO = 7;
+  IMPORT_BAR = 8;
+  IMPORT_BAZ = 9;
+}
+
