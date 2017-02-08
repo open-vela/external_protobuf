@@ -996,7 +996,8 @@ inline const uint8* CodedInputStream::ReadLittleEndian64FromArray(
 inline bool CodedInputStream::ReadLittleEndian32(uint32* value) {
 #if defined(PROTOBUF_LITTLE_ENDIAN)
   if (GOOGLE_PREDICT_TRUE(BufferSize() >= static_cast<int>(sizeof(*value)))) {
-    buffer_ = ReadLittleEndian32FromArray(buffer_, value);
+    memcpy(value, buffer_, sizeof(*value));
+    Advance(sizeof(*value));
     return true;
   } else {
     return ReadLittleEndian32Fallback(value);
@@ -1009,7 +1010,8 @@ inline bool CodedInputStream::ReadLittleEndian32(uint32* value) {
 inline bool CodedInputStream::ReadLittleEndian64(uint64* value) {
 #if defined(PROTOBUF_LITTLE_ENDIAN)
   if (GOOGLE_PREDICT_TRUE(BufferSize() >= static_cast<int>(sizeof(*value)))) {
-    buffer_ = ReadLittleEndian64FromArray(buffer_, value);
+    memcpy(value, buffer_, sizeof(*value));
+    Advance(sizeof(*value));
     return true;
   } else {
     return ReadLittleEndian64Fallback(value);
