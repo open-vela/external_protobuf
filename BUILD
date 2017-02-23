@@ -181,13 +181,6 @@ cc_library(
     deps = [":protobuf_lite"],
 )
 
-cc_library(
-    name = "protobuf_headers",
-    hdrs = glob(["src/**/*.h"]),
-    includes = ["src/"],
-    visibility = ["//visibility:public"],
-)
-
 objc_library(
     name = "protobuf_objc",
     hdrs = ["objectivec/GPBProtocolBuffers.h"],
@@ -572,12 +565,12 @@ java_library(
     srcs = glob([
         "java/util/src/main/java/com/google/protobuf/util/*.java",
     ]),
-    visibility = ["//visibility:public"],
     deps = [
         "protobuf_java",
         "//external:gson",
         "//external:guava",
     ],
+    visibility = ["//visibility:public"],
 )
 
 ################################################################################
@@ -598,8 +591,8 @@ py_library(
             "python/google/protobuf/internal/test_util.py",
         ],
     ),
-    imports = ["python"],
     srcs_version = "PY2AND3",
+    imports = ["python"],
 )
 
 cc_binary(
@@ -664,8 +657,8 @@ config_setting(
 internal_copied_filegroup(
     name = "protos_python",
     srcs = WELL_KNOWN_PROTOS,
-    dest = "python",
     strip_prefix = "src",
+    dest = "python",
 )
 
 # TODO(dzc): Remove this once py_proto_library can have labels in srcs, in
@@ -687,7 +680,7 @@ py_proto_library(
     protoc = ":protoc",
     py_libs = [
         ":python_srcs",
-        "//external:six",
+        "//external:six"
     ],
     srcs_version = "PY2AND3",
     visibility = ["//visibility:public"],
@@ -701,14 +694,13 @@ py_proto_library(
 internal_copied_filegroup(
     name = "protos_python_test",
     srcs = LITE_TEST_PROTOS + TEST_PROTOS,
-    dest = "python",
     strip_prefix = "src",
+    dest = "python",
 )
 
 # TODO(dzc): Remove this once py_proto_library can have labels in srcs, in
 # which case we can simply add :protos_python_test in srcs.
 COPIED_LITE_TEST_PROTOS = ["python/" + s for s in RELATIVE_LITE_TEST_PROTOS]
-
 COPIED_TEST_PROTOS = ["python/" + s for s in RELATIVE_TEST_PROTOS]
 
 py_proto_library(
@@ -778,10 +770,10 @@ internal_protobuf_py_tests(
 )
 
 proto_lang_toolchain(
-    name = "cc_toolchain",
-    command_line = "--cpp_out=$(OUT)",
-    runtime = ":protobuf",
-    visibility = ["//visibility:public"],
+  name = "cc_toolchain",
+  command_line = "--cpp_out=$(OUT)",
+  runtime = ":protobuf",
+  visibility = ["//visibility:public"],
 )
 
 proto_lang_toolchain(
