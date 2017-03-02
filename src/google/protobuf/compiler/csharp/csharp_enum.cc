@@ -65,7 +65,6 @@ void EnumGenerator::Generate(io::Printer* printer) {
                  "name", descriptor_->name());
   printer->Indent();
   std::set<string> used_names;
-  std::set<int> used_number;
   for (int i = 0; i < descriptor_->value_count(); i++) {
       WriteEnumValueDocComment(printer, descriptor_->value(i));
       string original_name = descriptor_->value(i)->name();
@@ -77,18 +76,10 @@ void EnumGenerator::Generate(io::Printer* printer) {
           << ") in " << descriptor_->name() << "; adding underscore to distinguish";
         name += "_";
       }
-      int number = descriptor_->value(i)->number();
-      if (!used_number.insert(number).second) {
-          printer->Print("[pbr::OriginalName(\"$original_name$\", PreferredAlias = false)] $name$ = $number$,\n",
-             "original_name", original_name,
-             "name", name,
-             "number", SimpleItoa(number));
-      } else {
-          printer->Print("[pbr::OriginalName(\"$original_name$\")] $name$ = $number$,\n",
-             "original_name", original_name,
-             "name", name,
-             "number", SimpleItoa(number));
-      }
+      printer->Print("[pbr::OriginalName(\"$original_name$\")] $name$ = $number$,\n",
+         "original_name", original_name,
+         "name", name,
+         "number", SimpleItoa(descriptor_->value(i)->number()));         
   }
   printer->Outdent();
   printer->Print("}\n");
