@@ -65,7 +65,7 @@ namespace java {
 namespace {
 
 struct FieldDescriptorCompare {
-  bool operator ()(const FieldDescriptor* f1, const FieldDescriptor* f2) const {
+  bool operator ()(const FieldDescriptor* f1, const FieldDescriptor* f2) {
     if(f1 == NULL) {
       return false;
     }

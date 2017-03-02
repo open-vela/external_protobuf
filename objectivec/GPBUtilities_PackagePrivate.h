@@ -345,6 +345,4 @@ GPB_MESSAGE_SIGNATURE_ENTRY(int32_t, Enum)
 + (id)getClassValue;
 @end
 
-BOOL GPBClassHasSel(Class aClass, SEL sel);
-
 CF_EXTERN_C_END
