@@ -363,9 +363,8 @@ void DefaultValueObjectWriter::Node::PopulateChildren(
     }
 
     // If oneof_index() != 0, the child field is part of a "oneof", which means
-    // the child field is optional and we shouldn't populate its default
-    // primitive value.
-    if (field.oneof_index() != 0 && kind == PRIMITIVE) continue;
+    // the child field is optional and we shouldn't populate its default value.
+    if (field.oneof_index() != 0) continue;
 
     // If the child field is of primitive type, sets its data to the default
     // value of its type.
