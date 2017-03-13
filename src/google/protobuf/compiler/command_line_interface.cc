@@ -37,12 +37,6 @@
 
 #include <stdio.h>
 #include <sys/types.h>
-#ifdef major
-#undef major
-#endif
-#ifdef minor
-#undef minor
-#endif
 #include <sys/stat.h>
 #include <fcntl.h>
 #ifdef _MSC_VER

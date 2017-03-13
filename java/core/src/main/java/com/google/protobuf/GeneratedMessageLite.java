@@ -220,7 +220,6 @@ public abstract class GeneratedMessageLite<
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public final BuilderType toBuilder() {
     BuilderType builder = (BuilderType) dynamicMethod(MethodToInvoke.NEW_BUILDER);
     builder.mergeFrom((MessageType) this);
@@ -454,7 +453,6 @@ public abstract class GeneratedMessageLite<
      */
     protected FieldSet<ExtensionDescriptor> extensions = FieldSet.newFieldSet();
 
-    @SuppressWarnings("unchecked")
     protected final void mergeExtensionFields(final MessageType other) {
       if (extensions.isImmutable()) {
         extensions = extensions.clone();

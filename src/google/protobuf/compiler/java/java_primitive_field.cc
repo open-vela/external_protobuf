@@ -523,17 +523,8 @@ void ImmutablePrimitiveOneofFieldGenerator::
 GenerateSerializationCode(io::Printer* printer) const {
   printer->Print(variables_,
     "if ($has_oneof_case_message$) {\n"
-    "  output.write$capitalized_type$(\n");
-  // $type$ and $boxed_type$ is the same for bytes fields so we don't need to
-  // do redundant casts.
-  if (GetJavaType(descriptor_) == JAVATYPE_BYTES) {
-    printer->Print(variables_,
-      "      $number$, ($type$) $oneof_name$_);\n");
-  } else {
-    printer->Print(variables_,
-      "      $number$, ($type$)(($boxed_type$) $oneof_name$_));\n");
-  }
-  printer->Print(
+    "  output.write$capitalized_type$(\n"
+    "      $number$, ($type$)(($boxed_type$) $oneof_name$_));\n"
     "}\n");
 }
 
@@ -542,17 +533,8 @@ GenerateSerializedSizeCode(io::Printer* printer) const {
   printer->Print(variables_,
     "if ($has_oneof_case_message$) {\n"
     "  size += com.google.protobuf.CodedOutputStream\n"
-    "    .compute$capitalized_type$Size(\n");
-  // $type$ and $boxed_type$ is the same for bytes fields so we don't need to
-  // do redundant casts.
-  if (GetJavaType(descriptor_) == JAVATYPE_BYTES) {
-    printer->Print(variables_,
-      "        $number$, ($type$) $oneof_name$_);\n");
-  } else {
-    printer->Print(variables_,
-      "        $number$, ($type$)(($boxed_type$) $oneof_name$_));\n");
-  }
-  printer->Print(
+    "    .compute$capitalized_type$Size(\n"
+    "        $number$, ($type$)(($boxed_type$) $oneof_name$_));\n"
     "}\n");
 }
 
