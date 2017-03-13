@@ -281,7 +281,6 @@ public class LazyStringArrayListTest extends TestCase {
     assertGenericListImmutable(byteArrayList, byteArrayList.get(0));
   }
   
-  @SuppressWarnings("unchecked")
   private static <T> void assertGenericListImmutable(List<T> list, T value) {
     try {
       list.add(value);
