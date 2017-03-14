@@ -44,7 +44,6 @@ import java.text.SimpleDateFormat;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.Locale;
 import java.util.TimeZone;
 
 /**
@@ -84,7 +83,7 @@ public final class Timestamps {
       };
 
   private static SimpleDateFormat createTimestampFormat() {
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ENGLISH);
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
     GregorianCalendar calendar = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
     // We use Proleptic Gregorian Calendar (i.e., Gregorian calendar extends
     // backwards to year one) for timestamp formating.
@@ -387,11 +386,11 @@ public final class Timestamps {
   static String formatNanos(int nanos) {
     // Determine whether to use 3, 6, or 9 digits for the nano part.
     if (nanos % NANOS_PER_MILLISECOND == 0) {
-      return String.format(Locale.ENGLISH, "%1$03d", nanos / NANOS_PER_MILLISECOND);
+      return String.format("%1$03d", nanos / NANOS_PER_MILLISECOND);
     } else if (nanos % NANOS_PER_MICROSECOND == 0) {
-      return String.format(Locale.ENGLISH, "%1$06d", nanos / NANOS_PER_MICROSECOND);
+      return String.format("%1$06d", nanos / NANOS_PER_MICROSECOND);
     } else {
-      return String.format(Locale.ENGLISH, "%1$09d", nanos);
+      return String.format("%1$09d", nanos);
     }
   }
 }
