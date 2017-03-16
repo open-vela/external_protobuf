@@ -124,23 +124,19 @@ void ImmutableMessageLiteGenerator::GenerateInterface(io::Printer* printer) {
                                 /* immutable = */ true, "OrBuilder");
   if (descriptor_->extension_range_count() > 0) {
     printer->Print(
-        "$deprecation$public interface $classname$OrBuilder$idend$ extends \n"
+        "public interface $classname$OrBuilder$idend$ extends \n"
         "    $extra_interfaces$\n"
         "     com.google.protobuf.GeneratedMessageLite.\n"
         "          ExtendableMessageOrBuilder<\n"
         "              $classname$, $classname$.Builder> {\n",
-        "deprecation", descriptor_->options().deprecated() ?
-            "@java.lang.Deprecated " : "",
         "extra_interfaces", ExtraMessageOrBuilderInterfaces(descriptor_),
         "classname", descriptor_->name(),
         "idend", "");
   } else {
     printer->Print(
-        "$deprecation$public interface $classname$OrBuilder$idend$ extends\n"
+        "public interface $classname$OrBuilder$idend$ extends\n"
         "    $extra_interfaces$\n"
         "    com.google.protobuf.MessageLiteOrBuilder {\n",
-        "deprecation", descriptor_->options().deprecated() ?
-            "@java.lang.Deprecated " : "",
         "extra_interfaces", ExtraMessageOrBuilderInterfaces(descriptor_),
         "classname", descriptor_->name(),
         "idend", "");
@@ -178,8 +174,6 @@ void ImmutableMessageLiteGenerator::Generate(io::Printer* printer) {
   variables["static"] = is_own_file ? " " : " static ";
   variables["classname"] = descriptor_->name();
   variables["extra_interfaces"] = ExtraMessageInterfaces(descriptor_);
-  variables["deprecation"] = descriptor_->options().deprecated()
-      ? "@java.lang.Deprecated " : "";
 
   WriteMessageDocComment(printer, descriptor_);
   MaybePrintGeneratedAnnotation(context_, printer, descriptor_,
@@ -190,7 +184,7 @@ void ImmutableMessageLiteGenerator::Generate(io::Printer* printer) {
   string builder_type;
   if (descriptor_->extension_range_count() > 0) {
     printer->Print(variables,
-      "$deprecation$public $static$final class $classname$ extends\n"
+      "public $static$final class $classname$ extends\n"
       "    com.google.protobuf.GeneratedMessageLite.ExtendableMessage<\n"
       "      $classname$, $classname$.Builder> implements\n"
       "    $extra_interfaces$\n"
@@ -200,7 +194,7 @@ void ImmutableMessageLiteGenerator::Generate(io::Printer* printer) {
         name_resolver_->GetImmutableClassName(descriptor_));
   } else {
     printer->Print(variables,
-        "$deprecation$public $static$final class $classname$ extends\n"
+        "public $static$final class $classname$ extends\n"
         "    com.google.protobuf.GeneratedMessageLite<\n"
         "        $classname$, $classname$.Builder> implements\n"
         "    $extra_interfaces$\n"
@@ -345,7 +339,6 @@ void ImmutableMessageLiteGenerator::Generate(io::Printer* printer) {
   }
 
   printer->Print(
-    "@java.lang.SuppressWarnings({\"unchecked\", \"fallthrough\"})\n"
     "protected final Object dynamicMethod(\n"
     "    com.google.protobuf.GeneratedMessageLite.MethodToInvoke method,\n"
     "    Object arg0, Object arg1) {\n"
