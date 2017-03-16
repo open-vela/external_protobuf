@@ -169,7 +169,6 @@ nobase_include_HEADERS =                                         \
   google/protobuf/compiler/python/python_generator.h             \
   google/protobuf/compiler/ruby/ruby_generator.h                 \
   google/protobuf/util/type_resolver.h                           \
-  google/protobuf/util/delimited_message_util.h                  \
   google/protobuf/util/field_comparator.h                        \
   google/protobuf/util/field_mask_util.h                         \
   google/protobuf/util/json_util.h                               \
@@ -268,7 +267,6 @@ libprotobuf_la_SOURCES =                                       \
   google/protobuf/io/zero_copy_stream_impl.cc                  \
   google/protobuf/compiler/importer.cc                         \
   google/protobuf/compiler/parser.cc                           \
-  google/protobuf/util/delimited_message_util.cc               \
   google/protobuf/util/field_comparator.cc                     \
   google/protobuf/util/field_mask_util.cc                      \
   google/protobuf/util/internal/constants.h                    \
@@ -802,7 +800,6 @@ protobuf_test_SOURCES =                                        \
   google/protobuf/compiler/ruby/ruby_generator_unittest.cc     \
   google/protobuf/compiler/csharp/csharp_bootstrap_unittest.cc \
   google/protobuf/compiler/csharp/csharp_generator_unittest.cc \
-  google/protobuf/util/delimited_message_util_test.cc          \
   google/protobuf/util/field_comparator_test.cc                \
   google/protobuf/util/field_mask_util_test.cc                 \
   google/protobuf/util/internal/default_value_objectwriter_test.cc \
