@@ -562,14 +562,12 @@ class Message
      * Parses a protocol buffer contained in a string.
      *
      * This function takes a string in the (non-human-readable) binary wire
-     * format, matching the encoding output by serializeToString().
-     * See mergeFrom() for merging behavior, if the field is already set in the
-     * specified message.
+     * format, matching the encoding output by encode().
      *
      * @param string $data Binary protobuf data.
      * @return bool Return true on success.
      */
-    public function mergeFromString($data)
+    public function decode($data)
     {
         $input = new InputStream($data);
         $this->parseFromStream($input);
@@ -716,7 +714,7 @@ class Message
      * Serialize the message to string.
      * @return string Serialized binary protobuf data.
      */
-    public function serializeToString()
+    public function encode()
     {
         $output = new OutputStream($this->byteSize());
         $this->serializeToStream($output);
@@ -772,11 +770,9 @@ class Message
             case GPBType::SFIXED64:
                 $size += 8;
                 break;
+            case GPBType::UINT32:
             case GPBType::INT32:
             case GPBType::ENUM:
-                $size += GPBWire::varint32Size($value, true);
-                break;
-            case GPBType::UINT32:
                 $size += GPBWire::varint32Size($value);
                 break;
             case GPBType::UINT64:

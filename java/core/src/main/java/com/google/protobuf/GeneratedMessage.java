@@ -854,7 +854,6 @@ public abstract class GeneratedMessage extends AbstractMessage
 
     /** Check if a singular extension is present. */
     @Override
-    @SuppressWarnings("unchecked")
     public final <Type> boolean hasExtension(final ExtensionLite<MessageType, Type> extensionLite) {
       Extension<MessageType, Type> extension = checkNotLite(extensionLite);
 
@@ -864,7 +863,6 @@ public abstract class GeneratedMessage extends AbstractMessage
 
     /** Get the number of elements in a repeated extension. */
     @Override
-    @SuppressWarnings("unchecked")
     public final <Type> int getExtensionCount(
         final ExtensionLite<MessageType, List<Type>> extensionLite) {
       Extension<MessageType, List<Type>> extension = checkNotLite(extensionLite);
@@ -2557,7 +2555,6 @@ public abstract class GeneratedMessage extends AbstractMessage
       }
 
       @Override
-      @SuppressWarnings("unchecked")
       public Object get(GeneratedMessage message) {
         List result = new ArrayList();
         for (int i = 0; i < getRepeatedCount(message); i++) {
@@ -2567,7 +2564,6 @@ public abstract class GeneratedMessage extends AbstractMessage
       }
 
       @Override
-      @SuppressWarnings("unchecked")
       public Object get(Builder builder) {
         List result = new ArrayList();
         for (int i = 0; i < getRepeatedCount(builder); i++) {

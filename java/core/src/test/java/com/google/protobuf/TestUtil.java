@@ -2602,9 +2602,6 @@ public final class TestUtil {
       case FOO_CORD:
         Assert.assertTrue(message.hasFooCord());
         break;
-      case FOO_STRING_PIECE:
-        Assert.assertTrue(message.hasFooStringPiece());
-        break;
       case FOO_BYTES:
         Assert.assertTrue(message.hasFooBytes());
         break;
