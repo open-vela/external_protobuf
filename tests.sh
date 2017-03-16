@@ -350,7 +350,6 @@ build_ruby_all() {
 build_javascript() {
   internal_build_cpp
   cd js && npm install && npm test && cd ..
-  cd conformance && make test_nodejs && cd ..
 }
 
 generate_php_test_proto() {
@@ -403,7 +402,14 @@ use_php_bc() {
 }
 
 build_php5.5() {
-  use_php 5.5
+  PHP=`which php`
+  PHP_CONFIG=`which php-config`
+  PHPIZE=`which phpize`
+  ln -sfn "/usr/local/php-5.5/bin/php" $PHP
+  ln -sfn "/usr/local/php-5.5/bin/php-config" $PHP_CONFIG
+  ln -sfn "/usr/local/php-5.5/bin/phpize" $PHPIZE
+  generate_php_test_proto
+
   pushd php
   rm -rf vendor
   cp -r /usr/local/vendor-5.5 vendor
@@ -416,7 +422,15 @@ build_php5.5() {
 }
 
 build_php5.5_c() {
-  use_php 5.5
+  PHP=`which php`
+  PHP_CONFIG=`which php-config`
+  PHPIZE=`which phpize`
+  ln -sfn "/usr/local/php-5.5/bin/php" $PHP
+  ln -sfn "/usr/local/php-5.5/bin/php-config" $PHP_CONFIG
+  ln -sfn "/usr/local/php-5.5/bin/phpize" $PHPIZE
+  generate_php_test_proto
+  wget https://phar.phpunit.de/phpunit-old.phar -O /usr/bin/phpunit
+
   cd php/tests && /bin/bash ./test.sh && cd ../..
   pushd conformance
   make test_php_c
