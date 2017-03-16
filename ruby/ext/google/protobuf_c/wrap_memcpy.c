@@ -1,5 +1,5 @@
 // Protocol Buffers - Google's data interchange format
-// Copyright 2008 Google Inc.  All rights reserved.
+// Copyright 2017 Google Inc.  All rights reserved.
 // https://developers.google.com/protocol-buffers/
 //
 // Redistribution and use in source and binary forms, with or without
@@ -28,37 +28,24 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-// Generates C# code for a given .proto file.
+#include <string.h>
 
-#ifndef GOOGLE_PROTOBUF_COMPILER_CSHARP_GENERATOR_H__
-#define GOOGLE_PROTOBUF_COMPILER_CSHARP_GENERATOR_H__
-
-#include <string>
-
-#include <google/protobuf/compiler/code_generator.h>
-
-namespace google {
-namespace protobuf {
-namespace compiler {
-namespace csharp {
-
-// CodeGenerator implementation which generates a C# source file and
-// header.  If you create your own protocol compiler binary and you want
-// it to support C# output, you can do so by registering an instance of this
-// CodeGenerator with the CommandLineInterface in your main() function.
-class LIBPROTOC_EXPORT Generator
-    : public google::protobuf::compiler::CodeGenerator {
-public:
-  virtual bool Generate(
-      const FileDescriptor* file,
-      const string& parameter,
-      GeneratorContext* generator_context,
-      string* error) const;
-};
-
-}  // namespace csharp
-}  // namespace compiler
-}  // namespace protobuf
-}  // namespace google
-
-#endif  // GOOGLE_PROTOBUF_COMPILER_CSHARP_GENERATOR_H__
+// On x86-64 Linux, we link against the 2.2.5 version of memcpy so that we
+// avoid depending on the 2.14 version of the symbol. This way, distributions
+// that are using pre-2.14 versions of glibc can successfully use the gem we
+// distribute (https://github.com/google/protobuf/issues/2783).
+//
+// This wrapper is enabled by passing the linker flags -Wl,-wrap,memcpy in
+// extconf.rb.
+#ifdef __linux__
+#ifdef __x86_64__
+__asm__(".symver memcpy,memcpy@GLIBC_2.2.5");
+void *__wrap_memcpy(void *dest, const void *src, size_t n) {
+    return memcpy(dest, src, n);
+}
+#else
+void *__wrap_memcpy(void *dest, const void *src, size_t n) {
+    return memmove(dest, src, n);
+}
+#endif
+#endif
