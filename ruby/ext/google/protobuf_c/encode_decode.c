@@ -914,9 +914,13 @@ void stringsink_uninit(stringsink *sink) {
 // semantics, which means that we have true field presence, we will want to
 // modify msgvisitor so that it emits all present fields rather than all
 // non-default-value fields.
+//
+// Likewise, when implementing JSON serialization, we may need to have a
+// 'verbose' mode that outputs all fields and a 'concise' mode that outputs only
+// those with non-default values.
 
 static void putmsg(VALUE msg, const Descriptor* desc,
-                   upb_sink *sink, int depth, bool emit_defaults);
+                   upb_sink *sink, int depth);
 
 static upb_selector_t getsel(const upb_fielddef *f, upb_handlertype_t type) {
   upb_selector_t ret;
@@ -948,7 +952,7 @@ static void putstr(VALUE str, const upb_fielddef *f, upb_sink *sink) {
 }
 
 static void putsubmsg(VALUE submsg, const upb_fielddef *f, upb_sink *sink,
-                      int depth, bool emit_defaults) {
+                      int depth) {
   upb_sink subsink;
   VALUE descriptor;
   Descriptor* subdesc;
@@ -959,12 +963,12 @@ static void putsubmsg(VALUE submsg, const upb_fielddef *f, upb_sink *sink,
   subdesc = ruby_to_Descriptor(descriptor);
 
   upb_sink_startsubmsg(sink, getsel(f, UPB_HANDLER_STARTSUBMSG), &subsink);
-  putmsg(submsg, subdesc, &subsink, depth + 1, emit_defaults);
+  putmsg(submsg, subdesc, &subsink, depth + 1);
   upb_sink_endsubmsg(sink, getsel(f, UPB_HANDLER_ENDSUBMSG));
 }
 
 static void putary(VALUE ary, const upb_fielddef *f, upb_sink *sink,
-                   int depth, bool emit_defaults) {
+                   int depth) {
   upb_sink subsink;
   upb_fieldtype_t type = upb_fielddef_type(f);
   upb_selector_t sel = 0;
@@ -1001,7 +1005,7 @@ static void putary(VALUE ary, const upb_fielddef *f, upb_sink *sink,
         putstr(*((VALUE *)memory), f, &subsink);
         break;
       case UPB_TYPE_MESSAGE:
-        putsubmsg(*((VALUE *)memory), f, &subsink, depth, emit_defaults);
+        putsubmsg(*((VALUE *)memory), f, &subsink, depth);
         break;
 
 #undef T
@@ -1015,8 +1019,7 @@ static void put_ruby_value(VALUE value,
                            const upb_fielddef *f,
                            VALUE type_class,
                            int depth,
-                           upb_sink *sink,
-                           bool emit_defaults) {
+                           upb_sink *sink) {
   upb_selector_t sel = 0;
   if (upb_fielddef_isprimitive(f)) {
     sel = getsel(f, upb_handlers_getprimitivehandlertype(f));
@@ -1056,12 +1059,12 @@ static void put_ruby_value(VALUE value,
       putstr(value, f, sink);
       break;
     case UPB_TYPE_MESSAGE:
-      putsubmsg(value, f, sink, depth, emit_defaults);
+      putsubmsg(value, f, sink, depth);
   }
 }
 
 static void putmap(VALUE map, const upb_fielddef *f, upb_sink *sink,
-                   int depth, bool emit_defaults) {
+                   int depth) {
   Map* self;
   upb_sink subsink;
   const upb_fielddef* key_field;
@@ -1087,9 +1090,9 @@ static void putmap(VALUE map, const upb_fielddef *f, upb_sink *sink,
                          &entry_sink);
     upb_sink_startmsg(&entry_sink);
 
-    put_ruby_value(key, key_field, Qnil, depth + 1, &entry_sink, emit_defaults);
+    put_ruby_value(key, key_field, Qnil, depth + 1, &entry_sink);
     put_ruby_value(value, value_field, self->value_type_class, depth + 1,
-                   &entry_sink, emit_defaults);
+                   &entry_sink);
 
     upb_sink_endmsg(&entry_sink, &status);
     upb_sink_endsubmsg(&subsink, getsel(f, UPB_HANDLER_ENDSUBMSG));
@@ -1099,7 +1102,7 @@ static void putmap(VALUE map, const upb_fielddef *f, upb_sink *sink,
 }
 
 static void putmsg(VALUE msg_rb, const Descriptor* desc,
-                   upb_sink *sink, int depth, bool emit_defaults) {
+                   upb_sink *sink, int depth) {
   MessageHeader* msg;
   upb_msg_field_iter i;
   upb_status status;
@@ -1141,31 +1144,31 @@ static void putmsg(VALUE msg_rb, const Descriptor* desc,
 
     if (is_map_field(f)) {
       VALUE map = DEREF(msg, offset, VALUE);
-      if (map != Qnil || emit_defaults) {
-        putmap(map, f, sink, depth, emit_defaults);
+      if (map != Qnil) {
+        putmap(map, f, sink, depth);
       }
     } else if (upb_fielddef_isseq(f)) {
       VALUE ary = DEREF(msg, offset, VALUE);
       if (ary != Qnil) {
-        putary(ary, f, sink, depth, emit_defaults);
+        putary(ary, f, sink, depth);
       }
     } else if (upb_fielddef_isstring(f)) {
       VALUE str = DEREF(msg, offset, VALUE);
-      if (is_matching_oneof || emit_defaults || RSTRING_LEN(str) > 0) {
+      if (is_matching_oneof || RSTRING_LEN(str) > 0) {
         putstr(str, f, sink);
       }
     } else if (upb_fielddef_issubmsg(f)) {
-      putsubmsg(DEREF(msg, offset, VALUE), f, sink, depth, emit_defaults);
+      putsubmsg(DEREF(msg, offset, VALUE), f, sink, depth);
     } else {
       upb_selector_t sel = getsel(f, upb_handlers_getprimitivehandlertype(f));
 
-#define T(upbtypeconst, upbtype, ctype, default_value)                    \
-  case upbtypeconst: {                                                    \
-      ctype value = DEREF(msg, offset, ctype);                            \
-      if (is_matching_oneof || emit_defaults || value != default_value) { \
-        upb_sink_put##upbtype(sink, sel, value);                          \
-      }                                                                   \
-    }                                                                     \
+#define T(upbtypeconst, upbtype, ctype, default_value)                \
+  case upbtypeconst: {                                                \
+      ctype value = DEREF(msg, offset, ctype);                        \
+      if (is_matching_oneof || value != default_value) {              \
+        upb_sink_put##upbtype(sink, sel, value);                      \
+      }                                                               \
+    }                                                                 \
     break;
 
       switch (upb_fielddef_type(f)) {
@@ -1243,7 +1246,7 @@ VALUE Message_encode(VALUE klass, VALUE msg_rb) {
     stackenv_init(&se, "Error occurred during encoding: %s");
     encoder = upb_pb_encoder_create(&se.env, serialize_handlers, &sink.sink);
 
-    putmsg(msg_rb, desc, upb_pb_encoder_input(encoder), 0, false);
+    putmsg(msg_rb, desc, upb_pb_encoder_input(encoder), 0);
 
     ret = rb_str_new(sink.ptr, sink.len);
 
@@ -1265,7 +1268,6 @@ VALUE Message_encode_json(int argc, VALUE* argv, VALUE klass) {
   Descriptor* desc = ruby_to_Descriptor(descriptor);
   VALUE msg_rb;
   VALUE preserve_proto_fieldnames = Qfalse;
-  VALUE emit_defaults = Qfalse;
   stringsink sink;
 
   if (argc < 1 || argc > 2) {
@@ -1281,9 +1283,6 @@ VALUE Message_encode_json(int argc, VALUE* argv, VALUE klass) {
     }
     preserve_proto_fieldnames = rb_hash_lookup2(
         hash_args, ID2SYM(rb_intern("preserve_proto_fieldnames")), Qfalse);
-
-    emit_defaults = rb_hash_lookup2(
-        hash_args, ID2SYM(rb_intern("emit_defaults")), Qfalse);
   }
 
   stringsink_init(&sink);
@@ -1298,7 +1297,7 @@ VALUE Message_encode_json(int argc, VALUE* argv, VALUE klass) {
     stackenv_init(&se, "Error occurred during encoding: %s");
     printer = upb_json_printer_create(&se.env, serialize_handlers, &sink.sink);
 
-    putmsg(msg_rb, desc, upb_json_printer_input(printer), 0, RTEST(emit_defaults));
+    putmsg(msg_rb, desc, upb_json_printer_input(printer), 0);
 
     ret = rb_enc_str_new(sink.ptr, sink.len, rb_utf8_encoding());
 
