@@ -39,6 +39,7 @@ class OutputStream
     private $buffer_size;
     private $current;
 
+    const MAX_VARINT32_BYTES = 5;
     const MAX_VARINT64_BYTES = 10;
 
     public function __construct($size)
@@ -55,8 +56,8 @@ class OutputStream
 
     public function writeVarint32($value)
     {
-        $bytes = str_repeat(chr(0), self::MAX_VARINT64_BYTES);
-        $size = self::writeVarintToArray($value, $bytes);
+        $bytes = str_repeat(chr(0), self::MAX_VARINT32_BYTES);
+        $size = self::writeVarintToArray($value, $bytes, true);
         return $this->writeRaw($bytes, $size);
     }
 
@@ -101,16 +102,20 @@ class OutputStream
         return true;
     }
 
-    private static function writeVarintToArray($value, &$buffer)
+    private static function writeVarintToArray($value, &$buffer, $trim = false)
     {
         $current = 0;
 
         $high = 0;
         $low = 0;
         if (PHP_INT_SIZE == 4) {
-            GPBUtil::divideInt64ToInt32($value, $high, $low);
+            GPBUtil::divideInt64ToInt32($value, $high, $low, $trim);
         } else {
-            $low = $value;
+            if ($trim) {
+                $low = $value & 0xFFFFFFFF;
+            } else {
+                $low = $value;
+            }
         }
 
         while ($low >= 0x80 || $low < 0) {

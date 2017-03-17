@@ -321,7 +321,7 @@ class TestUtil
     public static function getGoldenTestMessage()
     {
         return hex2bin(
-            "08D6FFFFFFFFFFFFFFFF01" .
+            "08D6FFFFFF0F" .
             "10D5FFFFFFFFFFFFFFFF01" .
             "182A" .
             "202B" .
@@ -339,8 +339,8 @@ class TestUtil
             "800101" .
             "8A01020821" .
 
-            "F801D6FFFFFFFFFFFFFFFF01" .
-            "F801CCFFFFFFFFFFFFFFFF01" .
+            "F801D6FFFFFF0F" .
+            "F801CCFFFFFF0F" .
             "8002D5FFFFFFFFFFFFFFFF01" .
             "8002CBFFFFFFFFFFFFFFFF01" .
             "88022A" .
@@ -374,7 +374,7 @@ class TestUtil
             "FA02020822" .
             "FA02020823" .
 
-            "BA041608C2FFFFFFFFFFFFFFFF0110C2FFFFFFFFFFFFFFFF01" .
+            "BA040C08C2FFFFFF0F10C2FFFFFF0F" .
             "C2041608C1FFFFFFFFFFFFFFFF0110C1FFFFFFFFFFFFFFFF01" .
             "CA0404083E103E" .
             "D20404083F103F" .
@@ -489,7 +489,7 @@ class TestUtil
     public static function getGoldenTestPackedMessage()
     {
         return hex2bin(
-            "D20514D6FFFFFFFFFFFFFFFF01CCFFFFFFFFFFFFFFFF01" .
+            "D2050AD6FFFFFF0FCCFFFFFF0F" .
             "DA0514D5FFFFFFFFFFFFFFFF01CBFFFFFFFFFFFFFFFF01" .
             "E205022A34" .
             "EA05022B35" .
@@ -509,7 +509,7 @@ class TestUtil
     public static function getGoldenTestUnpackedMessage()
     {
         return hex2bin(
-            "D005D6FFFFFFFFFFFFFFFF01D005CCFFFFFFFFFFFFFFFF01" .
+            "D005D6FFFFFF0FD005CCFFFFFF0F" .
             "D805D5FFFFFFFFFFFFFFFF01D805CBFFFFFFFFFFFFFFFF01" .
             "E0052AE00534" .
             "E8052BE80535" .
