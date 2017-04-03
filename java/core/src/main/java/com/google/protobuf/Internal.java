@@ -62,16 +62,6 @@ public final class Internal {
   /**
    * Throws an appropriate {@link NullPointerException} if the given objects is {@code null}.
    */
-  static <T> T checkNotNull(T obj) {
-    if (obj == null) {
-      throw new NullPointerException();
-    }
-    return obj;
-  }
-
-  /**
-   * Throws an appropriate {@link NullPointerException} if the given objects is {@code null}.
-   */
   static <T> T checkNotNull(T obj, String message) {
     if (obj == null) {
       throw new NullPointerException(message);
@@ -429,11 +419,6 @@ public final class Internal {
   public static final CodedInputStream EMPTY_CODED_INPUT_STREAM =
       CodedInputStream.newInstance(EMPTY_BYTE_ARRAY);
 
-
-  /** Helper method to merge two MessageLite instances. */
-  static Object mergeMessage(Object destination, Object source) {
-    return ((MessageLite) destination).toBuilder().mergeFrom((MessageLite) source).buildPartial();
-  }
 
   /**
    * Provides an immutable view of {@code List<T>} around a {@code List<F>}.

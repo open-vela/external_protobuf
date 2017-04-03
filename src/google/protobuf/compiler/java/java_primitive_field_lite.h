@@ -80,7 +80,6 @@ class ImmutablePrimitiveFieldLiteGenerator
   void GenerateEqualsCode(io::Printer* printer) const;
   void GenerateHashCode(io::Printer* printer) const;
 
-
   string GetBoxedType() const;
 
  protected:
@@ -110,7 +109,6 @@ class ImmutablePrimitiveOneofFieldLiteGenerator
   void GenerateParsingCode(io::Printer* printer) const;
   void GenerateSerializationCode(io::Printer* printer) const;
   void GenerateSerializedSizeCode(io::Printer* printer) const;
-
 
  private:
   GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(ImmutablePrimitiveOneofFieldLiteGenerator);
@@ -143,7 +141,6 @@ class RepeatedImmutablePrimitiveFieldLiteGenerator
   void GenerateFieldBuilderInitializationCode(io::Printer* printer) const;
   void GenerateEqualsCode(io::Printer* printer) const;
   void GenerateHashCode(io::Printer* printer) const;
-
 
   string GetBoxedType() const;
 

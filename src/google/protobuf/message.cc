@@ -158,8 +158,8 @@ void Message::SetCachedSize(int /* size */) const {
                 "Must implement one or the other.";
 }
 
-size_t Message::SpaceUsedLong() const {
-  return GetReflection()->SpaceUsedLong(*this);
+int Message::SpaceUsed() const {
+  return GetReflection()->SpaceUsed(*this);
 }
 
 bool Message::SerializeToFileDescriptor(int file_descriptor) const {

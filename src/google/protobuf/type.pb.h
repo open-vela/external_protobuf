@@ -22,7 +22,6 @@
 #include <google/protobuf/io/coded_stream.h>
 #include <google/protobuf/arena.h>
 #include <google/protobuf/arenastring.h>
-#include <google/protobuf/generated_message_table_driven.h>
 #include <google/protobuf/generated_message_util.h>
 #include <google/protobuf/metadata.h>
 #include <google/protobuf/message.h>
@@ -65,9 +64,6 @@ namespace protobuf {
 namespace protobuf_google_2fprotobuf_2ftype_2eproto {
 // Internal implementation detail -- do not call these.
 struct LIBPROTOBUF_EXPORT TableStruct {
-  static const ::google::protobuf::internal::ParseTableField entries[];
-  static const ::google::protobuf::internal::AuxillaryParseTableField aux[];
-  static const ::google::protobuf::internal::ParseTable schema[];
   static const ::google::protobuf::uint32 offsets[];
   static void InitDefaultsImpl();
   static void Shutdown();
@@ -185,8 +181,6 @@ class LIBPROTOBUF_EXPORT Type : public ::google::protobuf::Message /* @@protoc_i
     return reinterpret_cast<const Type*>(
                &_Type_default_instance_);
   }
-  static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
-    0;
 
   void UnsafeArenaSwap(Type* other);
   void Swap(Type* other);
@@ -210,6 +204,11 @@ class LIBPROTOBUF_EXPORT Type : public ::google::protobuf::Message /* @@protoc_i
       ::google::protobuf::io::CodedOutputStream* output) const PROTOBUF_FINAL;
   ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
       bool deterministic, ::google::protobuf::uint8* target) const PROTOBUF_FINAL;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output)
+      const PROTOBUF_FINAL {
+    return InternalSerializeWithCachedSizesToArray(
+        ::google::protobuf::io::CodedOutputStream::IsDefaultSerializationDeterministic(), output);
+  }
   int GetCachedSize() const PROTOBUF_FINAL { return _cached_size_; }
   private:
   void SharedCtor();
@@ -332,7 +331,7 @@ class LIBPROTOBUF_EXPORT Type : public ::google::protobuf::Message /* @@protoc_i
   ::google::protobuf::SourceContext* source_context_;
   int syntax_;
   mutable int _cached_size_;
-  friend struct protobuf_google_2fprotobuf_2ftype_2eproto::TableStruct;
+  friend struct LIBPROTOBUF_EXPORT protobuf_google_2fprotobuf_2ftype_2eproto::TableStruct;
 };
 // -------------------------------------------------------------------
 
@@ -361,8 +360,6 @@ class LIBPROTOBUF_EXPORT Field : public ::google::protobuf::Message /* @@protoc_
     return reinterpret_cast<const Field*>(
                &_Field_default_instance_);
   }
-  static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
-    1;
 
   void UnsafeArenaSwap(Field* other);
   void Swap(Field* other);
@@ -386,6 +383,11 @@ class LIBPROTOBUF_EXPORT Field : public ::google::protobuf::Message /* @@protoc_
       ::google::protobuf::io::CodedOutputStream* output) const PROTOBUF_FINAL;
   ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
       bool deterministic, ::google::protobuf::uint8* target) const PROTOBUF_FINAL;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output)
+      const PROTOBUF_FINAL {
+    return InternalSerializeWithCachedSizesToArray(
+        ::google::protobuf::io::CodedOutputStream::IsDefaultSerializationDeterministic(), output);
+  }
   int GetCachedSize() const PROTOBUF_FINAL { return _cached_size_; }
   private:
   void SharedCtor();
@@ -618,7 +620,7 @@ class LIBPROTOBUF_EXPORT Field : public ::google::protobuf::Message /* @@protoc_
   ::google::protobuf::int32 oneof_index_;
   bool packed_;
   mutable int _cached_size_;
-  friend struct protobuf_google_2fprotobuf_2ftype_2eproto::TableStruct;
+  friend struct LIBPROTOBUF_EXPORT protobuf_google_2fprotobuf_2ftype_2eproto::TableStruct;
 };
 // -------------------------------------------------------------------
 
@@ -647,8 +649,6 @@ class LIBPROTOBUF_EXPORT Enum : public ::google::protobuf::Message /* @@protoc_i
     return reinterpret_cast<const Enum*>(
                &_Enum_default_instance_);
   }
-  static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
-    2;
 
   void UnsafeArenaSwap(Enum* other);
   void Swap(Enum* other);
@@ -672,6 +672,11 @@ class LIBPROTOBUF_EXPORT Enum : public ::google::protobuf::Message /* @@protoc_i
       ::google::protobuf::io::CodedOutputStream* output) const PROTOBUF_FINAL;
   ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
       bool deterministic, ::google::protobuf::uint8* target) const PROTOBUF_FINAL;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output)
+      const PROTOBUF_FINAL {
+    return InternalSerializeWithCachedSizesToArray(
+        ::google::protobuf::io::CodedOutputStream::IsDefaultSerializationDeterministic(), output);
+  }
   int GetCachedSize() const PROTOBUF_FINAL { return _cached_size_; }
   private:
   void SharedCtor();
@@ -771,7 +776,7 @@ class LIBPROTOBUF_EXPORT Enum : public ::google::protobuf::Message /* @@protoc_i
   ::google::protobuf::SourceContext* source_context_;
   int syntax_;
   mutable int _cached_size_;
-  friend struct protobuf_google_2fprotobuf_2ftype_2eproto::TableStruct;
+  friend struct LIBPROTOBUF_EXPORT protobuf_google_2fprotobuf_2ftype_2eproto::TableStruct;
 };
 // -------------------------------------------------------------------
 
@@ -800,8 +805,6 @@ class LIBPROTOBUF_EXPORT EnumValue : public ::google::protobuf::Message /* @@pro
     return reinterpret_cast<const EnumValue*>(
                &_EnumValue_default_instance_);
   }
-  static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
-    3;
 
   void UnsafeArenaSwap(EnumValue* other);
   void Swap(EnumValue* other);
@@ -825,6 +828,11 @@ class LIBPROTOBUF_EXPORT EnumValue : public ::google::protobuf::Message /* @@pro
       ::google::protobuf::io::CodedOutputStream* output) const PROTOBUF_FINAL;
   ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
       bool deterministic, ::google::protobuf::uint8* target) const PROTOBUF_FINAL;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output)
+      const PROTOBUF_FINAL {
+    return InternalSerializeWithCachedSizesToArray(
+        ::google::protobuf::io::CodedOutputStream::IsDefaultSerializationDeterministic(), output);
+  }
   int GetCachedSize() const PROTOBUF_FINAL { return _cached_size_; }
   private:
   void SharedCtor();
@@ -894,7 +902,7 @@ class LIBPROTOBUF_EXPORT EnumValue : public ::google::protobuf::Message /* @@pro
   ::google::protobuf::internal::ArenaStringPtr name_;
   ::google::protobuf::int32 number_;
   mutable int _cached_size_;
-  friend struct protobuf_google_2fprotobuf_2ftype_2eproto::TableStruct;
+  friend struct LIBPROTOBUF_EXPORT protobuf_google_2fprotobuf_2ftype_2eproto::TableStruct;
 };
 // -------------------------------------------------------------------
 
@@ -923,8 +931,6 @@ class LIBPROTOBUF_EXPORT Option : public ::google::protobuf::Message /* @@protoc
     return reinterpret_cast<const Option*>(
                &_Option_default_instance_);
   }
-  static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
-    4;
 
   void UnsafeArenaSwap(Option* other);
   void Swap(Option* other);
@@ -948,6 +954,11 @@ class LIBPROTOBUF_EXPORT Option : public ::google::protobuf::Message /* @@protoc
       ::google::protobuf::io::CodedOutputStream* output) const PROTOBUF_FINAL;
   ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
       bool deterministic, ::google::protobuf::uint8* target) const PROTOBUF_FINAL;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output)
+      const PROTOBUF_FINAL {
+    return InternalSerializeWithCachedSizesToArray(
+        ::google::protobuf::io::CodedOutputStream::IsDefaultSerializationDeterministic(), output);
+  }
   int GetCachedSize() const PROTOBUF_FINAL { return _cached_size_; }
   private:
   void SharedCtor();
@@ -1014,7 +1025,7 @@ class LIBPROTOBUF_EXPORT Option : public ::google::protobuf::Message /* @@protoc
   ::google::protobuf::internal::ArenaStringPtr name_;
   ::google::protobuf::Any* value_;
   mutable int _cached_size_;
-  friend struct protobuf_google_2fprotobuf_2ftype_2eproto::TableStruct;
+  friend struct LIBPROTOBUF_EXPORT protobuf_google_2fprotobuf_2ftype_2eproto::TableStruct;
 };
 // ===================================================================
 
@@ -1038,7 +1049,6 @@ inline void Type::set_name(const ::std::string& value) {
   // @@protoc_insertion_point(field_set:google.protobuf.Type.name)
 }
 inline void Type::set_name(const char* value) {
-  GOOGLE_DCHECK(value != NULL);
   
   name_.Set(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
               GetArenaNoVirtual());
@@ -1147,7 +1157,6 @@ inline void Type::set_oneofs(int index, ::std::string&& value) {
 }
 #endif
 inline void Type::set_oneofs(int index, const char* value) {
-  GOOGLE_DCHECK(value != NULL);
   oneofs_.Mutable(index)->assign(value);
   // @@protoc_insertion_point(field_set_char:google.protobuf.Type.oneofs)
 }
@@ -1166,12 +1175,11 @@ inline void Type::add_oneofs(const ::std::string& value) {
 }
 #if LANG_CXX11
 inline void Type::add_oneofs(::std::string&& value) {
-  oneofs_.Add(std::move(value));
+  oneofs_.Add()->assign(std::move(value));
   // @@protoc_insertion_point(field_add:google.protobuf.Type.oneofs)
 }
 #endif
 inline void Type::add_oneofs(const char* value) {
-  GOOGLE_DCHECK(value != NULL);
   oneofs_.Add()->assign(value);
   // @@protoc_insertion_point(field_add_char:google.protobuf.Type.oneofs)
 }
@@ -1345,7 +1353,6 @@ inline void Field::set_name(const ::std::string& value) {
   // @@protoc_insertion_point(field_set:google.protobuf.Field.name)
 }
 inline void Field::set_name(const char* value) {
-  GOOGLE_DCHECK(value != NULL);
   
   name_.Set(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
               GetArenaNoVirtual());
@@ -1412,7 +1419,6 @@ inline void Field::set_type_url(const ::std::string& value) {
   // @@protoc_insertion_point(field_set:google.protobuf.Field.type_url)
 }
 inline void Field::set_type_url(const char* value) {
-  GOOGLE_DCHECK(value != NULL);
   
   type_url_.Set(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
               GetArenaNoVirtual());
@@ -1537,7 +1543,6 @@ inline void Field::set_json_name(const ::std::string& value) {
   // @@protoc_insertion_point(field_set:google.protobuf.Field.json_name)
 }
 inline void Field::set_json_name(const char* value) {
-  GOOGLE_DCHECK(value != NULL);
   
   json_name_.Set(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
               GetArenaNoVirtual());
@@ -1604,7 +1609,6 @@ inline void Field::set_default_value(const ::std::string& value) {
   // @@protoc_insertion_point(field_set:google.protobuf.Field.default_value)
 }
 inline void Field::set_default_value(const char* value) {
-  GOOGLE_DCHECK(value != NULL);
   
   default_value_.Set(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
               GetArenaNoVirtual());
@@ -1675,7 +1679,6 @@ inline void Enum::set_name(const ::std::string& value) {
   // @@protoc_insertion_point(field_set:google.protobuf.Enum.name)
 }
 inline void Enum::set_name(const char* value) {
-  GOOGLE_DCHECK(value != NULL);
   
   name_.Set(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
               GetArenaNoVirtual());
@@ -1871,7 +1874,6 @@ inline void EnumValue::set_name(const ::std::string& value) {
   // @@protoc_insertion_point(field_set:google.protobuf.EnumValue.name)
 }
 inline void EnumValue::set_name(const char* value) {
-  GOOGLE_DCHECK(value != NULL);
   
   name_.Set(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
               GetArenaNoVirtual());
@@ -1986,7 +1988,6 @@ inline void Option::set_name(const ::std::string& value) {
   // @@protoc_insertion_point(field_set:google.protobuf.Option.name)
 }
 inline void Option::set_name(const char* value) {
-  GOOGLE_DCHECK(value != NULL);
   
   name_.Set(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
               GetArenaNoVirtual());

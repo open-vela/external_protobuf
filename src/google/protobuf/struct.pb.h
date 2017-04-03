@@ -22,13 +22,12 @@
 #include <google/protobuf/io/coded_stream.h>
 #include <google/protobuf/arena.h>
 #include <google/protobuf/arenastring.h>
-#include <google/protobuf/generated_message_table_driven.h>
 #include <google/protobuf/generated_message_util.h>
 #include <google/protobuf/metadata.h>
 #include <google/protobuf/message.h>
 #include <google/protobuf/repeated_field.h>  // IWYU pragma: export
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
-#include <google/protobuf/map.h>  // IWYU pragma: export
+#include <google/protobuf/map.h>
 #include <google/protobuf/map_field_inl.h>
 #include <google/protobuf/generated_enum_reflection.h>
 #include <google/protobuf/unknown_field_set.h>
@@ -41,9 +40,6 @@ LIBPROTOBUF_EXPORT extern ListValueDefaultTypeInternal _ListValue_default_instan
 class Struct;
 class StructDefaultTypeInternal;
 LIBPROTOBUF_EXPORT extern StructDefaultTypeInternal _Struct_default_instance_;
-class Struct_FieldsEntry;
-class Struct_FieldsEntryDefaultTypeInternal;
-LIBPROTOBUF_EXPORT extern Struct_FieldsEntryDefaultTypeInternal _Struct_FieldsEntry_default_instance_;
 class Value;
 class ValueDefaultTypeInternal;
 LIBPROTOBUF_EXPORT extern ValueDefaultTypeInternal _Value_default_instance_;
@@ -56,9 +52,6 @@ namespace protobuf {
 namespace protobuf_google_2fprotobuf_2fstruct_2eproto {
 // Internal implementation detail -- do not call these.
 struct LIBPROTOBUF_EXPORT TableStruct {
-  static const ::google::protobuf::internal::ParseTableField entries[];
-  static const ::google::protobuf::internal::AuxillaryParseTableField aux[];
-  static const ::google::protobuf::internal::ParseTable schema[];
   static const ::google::protobuf::uint32 offsets[];
   static void InitDefaultsImpl();
   static void Shutdown();
@@ -117,8 +110,6 @@ class LIBPROTOBUF_EXPORT Struct : public ::google::protobuf::Message /* @@protoc
     return reinterpret_cast<const Struct*>(
                &_Struct_default_instance_);
   }
-  static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
-    1;
 
   void UnsafeArenaSwap(Struct* other);
   void Swap(Struct* other);
@@ -142,6 +133,11 @@ class LIBPROTOBUF_EXPORT Struct : public ::google::protobuf::Message /* @@protoc
       ::google::protobuf::io::CodedOutputStream* output) const PROTOBUF_FINAL;
   ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
       bool deterministic, ::google::protobuf::uint8* target) const PROTOBUF_FINAL;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output)
+      const PROTOBUF_FINAL {
+    return InternalSerializeWithCachedSizesToArray(
+        ::google::protobuf::io::CodedOutputStream::IsDefaultSerializationDeterministic(), output);
+  }
   int GetCachedSize() const PROTOBUF_FINAL { return _cached_size_; }
   private:
   void SharedCtor();
@@ -185,34 +181,19 @@ class LIBPROTOBUF_EXPORT Struct : public ::google::protobuf::Message /* @@protoc
   friend class ::google::protobuf::Arena;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
-  public:
-  class Struct_FieldsEntry : public ::google::protobuf::internal::MapEntry<Struct_FieldsEntry, 
+  typedef ::google::protobuf::internal::MapEntryLite<
       ::std::string, ::google::protobuf::Value,
       ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
       ::google::protobuf::internal::WireFormatLite::TYPE_MESSAGE,
-      0 > {
-  public:
-    typedef ::google::protobuf::internal::MapEntry<Struct_FieldsEntry, 
-      ::std::string, ::google::protobuf::Value,
-      ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
-      ::google::protobuf::internal::WireFormatLite::TYPE_MESSAGE,
-      0 > SuperType;
-    Struct_FieldsEntry();
-    Struct_FieldsEntry(::google::protobuf::Arena* arena);
-    void MergeFrom(const ::google::protobuf::Message& other) PROTOBUF_FINAL;
-    void MergeFrom(const Struct_FieldsEntry& other);
-    static const Message* internal_default_instance() { return reinterpret_cast<const Message*>(&_Struct_FieldsEntry_default_instance_); }
-    ::google::protobuf::Metadata GetMetadata() const;
-  };
+      0 >
+      Struct_FieldsEntry;
   ::google::protobuf::internal::MapField<
-      Struct_FieldsEntry,
       ::std::string, ::google::protobuf::Value,
       ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
       ::google::protobuf::internal::WireFormatLite::TYPE_MESSAGE,
       0 > fields_;
-  private:
   mutable int _cached_size_;
-  friend struct protobuf_google_2fprotobuf_2fstruct_2eproto::TableStruct;
+  friend struct LIBPROTOBUF_EXPORT protobuf_google_2fprotobuf_2fstruct_2eproto::TableStruct;
 };
 // -------------------------------------------------------------------
 
@@ -251,8 +232,6 @@ class LIBPROTOBUF_EXPORT Value : public ::google::protobuf::Message /* @@protoc_
     return reinterpret_cast<const Value*>(
                &_Value_default_instance_);
   }
-  static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
-    2;
 
   void UnsafeArenaSwap(Value* other);
   void Swap(Value* other);
@@ -276,6 +255,11 @@ class LIBPROTOBUF_EXPORT Value : public ::google::protobuf::Message /* @@protoc_
       ::google::protobuf::io::CodedOutputStream* output) const PROTOBUF_FINAL;
   ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
       bool deterministic, ::google::protobuf::uint8* target) const PROTOBUF_FINAL;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output)
+      const PROTOBUF_FINAL {
+    return InternalSerializeWithCachedSizesToArray(
+        ::google::protobuf::io::CodedOutputStream::IsDefaultSerializationDeterministic(), output);
+  }
   int GetCachedSize() const PROTOBUF_FINAL { return _cached_size_; }
   private:
   void SharedCtor();
@@ -412,7 +396,7 @@ class LIBPROTOBUF_EXPORT Value : public ::google::protobuf::Message /* @@protoc_
   mutable int _cached_size_;
   ::google::protobuf::uint32 _oneof_case_[1];
 
-  friend struct protobuf_google_2fprotobuf_2fstruct_2eproto::TableStruct;
+  friend struct LIBPROTOBUF_EXPORT protobuf_google_2fprotobuf_2fstruct_2eproto::TableStruct;
 };
 // -------------------------------------------------------------------
 
@@ -441,8 +425,6 @@ class LIBPROTOBUF_EXPORT ListValue : public ::google::protobuf::Message /* @@pro
     return reinterpret_cast<const ListValue*>(
                &_ListValue_default_instance_);
   }
-  static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
-    3;
 
   void UnsafeArenaSwap(ListValue* other);
   void Swap(ListValue* other);
@@ -466,6 +448,11 @@ class LIBPROTOBUF_EXPORT ListValue : public ::google::protobuf::Message /* @@pro
       ::google::protobuf::io::CodedOutputStream* output) const PROTOBUF_FINAL;
   ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
       bool deterministic, ::google::protobuf::uint8* target) const PROTOBUF_FINAL;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output)
+      const PROTOBUF_FINAL {
+    return InternalSerializeWithCachedSizesToArray(
+        ::google::protobuf::io::CodedOutputStream::IsDefaultSerializationDeterministic(), output);
+  }
   int GetCachedSize() const PROTOBUF_FINAL { return _cached_size_; }
   private:
   void SharedCtor();
@@ -513,7 +500,7 @@ class LIBPROTOBUF_EXPORT ListValue : public ::google::protobuf::Message /* @@pro
   typedef void DestructorSkippable_;
   ::google::protobuf::RepeatedPtrField< ::google::protobuf::Value > values_;
   mutable int _cached_size_;
-  friend struct protobuf_google_2fprotobuf_2fstruct_2eproto::TableStruct;
+  friend struct LIBPROTOBUF_EXPORT protobuf_google_2fprotobuf_2fstruct_2eproto::TableStruct;
 };
 // ===================================================================
 
@@ -637,7 +624,6 @@ inline void Value::set_string_value(const ::std::string& value) {
   // @@protoc_insertion_point(field_set:google.protobuf.Value.string_value)
 }
 inline void Value::set_string_value(const char* value) {
-  GOOGLE_DCHECK(value != NULL);
   if (!has_string_value()) {
     clear_kind();
     set_has_string_value();
