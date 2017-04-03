@@ -129,7 +129,7 @@ ENV MVN mvn --batch-mode
 RUN cd /tmp && \
   git clone https://github.com/google/protobuf.git && \
   cd protobuf && \
-  git reset --hard c2b3b3e04e7a023efe06f2107705b45428847800 && \
+  git reset 6b27c1f981a9a93918e4039f236ead27165a8e91 && \
   ./autogen.sh && \
   ./configure && \
   make -j4 && \
@@ -157,7 +157,7 @@ RUN cd /tmp && \
   rm -rf protobuf && \
   git clone https://github.com/google/protobuf.git && \
   cd protobuf && \
-  git reset --hard 46ae90dc5e145b12fffa7e053a908a9f3e066286 && \
+  git reset 46ae90dc5e145b12fffa7e053a908a9f3e066286 && \
   cd php && \
   ln -sfn /usr/local/php-5.5/bin/php /usr/bin/php && \
   ln -sfn /usr/local/php-5.5/bin/php-config /usr/bin/php-config && \

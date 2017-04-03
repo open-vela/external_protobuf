@@ -34,7 +34,6 @@ import com.google.protobuf.AbstractMessageLite.Builder.LimitedInputStream;
 import com.google.protobuf.GeneratedMessageLite.EqualsVisitor.NotEqualsException;
 import com.google.protobuf.Internal.BooleanList;
 import com.google.protobuf.Internal.DoubleList;
-import com.google.protobuf.Internal.EnumLiteMap;
 import com.google.protobuf.Internal.FloatList;
 import com.google.protobuf.Internal.IntList;
 import com.google.protobuf.Internal.LongList;
@@ -46,7 +45,6 @@ import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -137,7 +135,6 @@ public abstract class GeneratedMessageLite<
     if (!getDefaultInstanceForType().getClass().isInstance(other)) {
       return false;
     }
-
 
     try {
       visit(EqualsVisitor.INSTANCE, (MessageType) other);
@@ -1157,7 +1154,6 @@ public abstract class GeneratedMessageLite<
     }
   }
 
-
   /**
    * Lite equivalent to {@link GeneratedMessage.GeneratedExtension}.
    *
@@ -1529,20 +1525,6 @@ public abstract class GeneratedMessageLite<
           .setUnfinishedMessage(message);
     }
     return message;
-  }
-
-  // Validates last tag.
-  protected static <T extends GeneratedMessageLite<T, ?>> T parseFrom(
-      T defaultInstance, ByteBuffer data, ExtensionRegistryLite extensionRegistry)
-      throws InvalidProtocolBufferException {
-    return checkMessageInitialized(
-        parseFrom(defaultInstance, CodedInputStream.newInstance(data), extensionRegistry));
-  }
-
-  // Validates last tag.
-  protected static <T extends GeneratedMessageLite<T, ?>> T parseFrom(
-      T defaultInstance, ByteBuffer data) throws InvalidProtocolBufferException {
-    return parseFrom(defaultInstance, data, ExtensionRegistryLite.getEmptyRegistry());
   }
 
   // Validates last tag.
@@ -1997,13 +1979,13 @@ public abstract class GeneratedMessageLite<
   /**
    * Implements hashCode by accumulating state.
    */
-  static class HashCodeVisitor implements Visitor {
+  private static class HashCodeVisitor implements Visitor {
 
     // The caller must ensure that the visitor is invoked parameterized with this and this such that
     // other is this. This is required due to how oneof cases are handled. See the class comment
     // on Visitor for more information.
 
-    int hashCode = 0;
+    private int hashCode = 0;
 
     @Override
     public boolean visitBoolean(

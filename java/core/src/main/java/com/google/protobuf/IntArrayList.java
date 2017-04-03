@@ -30,9 +30,8 @@
 
 package com.google.protobuf;
 
-import static com.google.protobuf.Internal.checkNotNull;
-
 import com.google.protobuf.Internal.IntList;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.RandomAccess;
@@ -42,8 +41,9 @@ import java.util.RandomAccess;
  *
  * @author dweis@google.com (Daniel Weis)
  */
-final class IntArrayList extends AbstractProtobufList<Integer>
-    implements IntList, RandomAccess, PrimitiveNonBoxingCollection {
+final class IntArrayList
+    extends AbstractProtobufList<Integer>
+    implements IntList, RandomAccess {
 
   private static final IntArrayList EMPTY_LIST = new IntArrayList();
   static {
@@ -198,7 +198,9 @@ final class IntArrayList extends AbstractProtobufList<Integer>
   public boolean addAll(Collection<? extends Integer> collection) {
     ensureIsMutable();
 
-    checkNotNull(collection);
+    if (collection == null) {
+      throw new NullPointerException();
+    }
 
     // We specialize when adding another IntArrayList to avoid boxing elements.
     if (!(collection instanceof IntArrayList)) {

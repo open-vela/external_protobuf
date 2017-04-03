@@ -43,7 +43,6 @@
 #include <vector>
 #include <google/protobuf/stubs/common.h>
 #include <google/protobuf/compiler/cpp/cpp_field.h>
-#include <google/protobuf/compiler/cpp/cpp_helpers.h>
 #include <google/protobuf/compiler/cpp/cpp_options.h>
 
 namespace google {
@@ -145,8 +144,6 @@ class FileGenerator {
 
   const FileDescriptor* file_;
   const Options options_;
-
-  SCCAnalyzer scc_analyzer_;
 
   // Contains the post-order walk of all the messages (and child messages) in
   // this file. If you need a pre-order walk just reverse iterate.

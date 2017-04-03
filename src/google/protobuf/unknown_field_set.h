@@ -43,7 +43,6 @@
 #include <vector>
 #include <google/protobuf/stubs/common.h>
 #include <google/protobuf/stubs/logging.h>
-#include <google/protobuf/generated_message_util.h>
 
 namespace google {
 namespace protobuf {
@@ -107,18 +106,10 @@ class LIBPROTOBUF_EXPORT UnknownFieldSet {
   // Computes (an estimate of) the total number of bytes currently used for
   // storing the unknown fields in memory. Does NOT include
   // sizeof(*this) in the calculation.
-  size_t SpaceUsedExcludingSelfLong() const;
-
-  int SpaceUsedExcludingSelf() const {
-    return internal::ToIntSize(SpaceUsedExcludingSelfLong());
-  }
+  int SpaceUsedExcludingSelf() const;
 
   // Version of SpaceUsed() including sizeof(*this).
-  size_t SpaceUsedLong() const;
-
-  int SpaceUsed() const {
-    return internal::ToIntSize(SpaceUsedLong());
-  }
+  int SpaceUsed() const;
 
   // Returns the number of fields present in the UnknownFieldSet.
   inline int field_count() const;
@@ -223,6 +214,8 @@ class LIBPROTOBUF_EXPORT UnknownField {
 
   inline size_t GetLengthDelimitedSize() const;
 
+ private:
+  friend class UnknownFieldSet;
 
   // If this UnknownField contains a pointer, delete it.
   void Delete();
@@ -250,7 +243,7 @@ class LIBPROTOBUF_EXPORT UnknownField {
     uint64 fixed64_;
     mutable union LengthDelimited length_delimited_;
     UnknownFieldSet* group_;
-  } data_;
+  };
 };
 
 // ===================================================================
@@ -294,8 +287,6 @@ inline void UnknownFieldSet::AddLengthDelimited(
 }
 
 
-
-
 inline int UnknownField::number() const { return number_; }
 inline UnknownField::Type UnknownField::type() const {
   return static_cast<Type>(type_);
@@ -303,53 +294,53 @@ inline UnknownField::Type UnknownField::type() const {
 
 inline uint64 UnknownField::varint() const {
   assert(type() == TYPE_VARINT);
-  return data_.varint_;
+  return varint_;
 }
 inline uint32 UnknownField::fixed32() const {
   assert(type() == TYPE_FIXED32);
-  return data_.fixed32_;
+  return fixed32_;
 }
 inline uint64 UnknownField::fixed64() const {
   assert(type() == TYPE_FIXED64);
-  return data_.fixed64_;
+  return fixed64_;
 }
 inline const string& UnknownField::length_delimited() const {
   assert(type() == TYPE_LENGTH_DELIMITED);
-  return *data_.length_delimited_.string_value_;
+  return *length_delimited_.string_value_;
 }
 inline const UnknownFieldSet& UnknownField::group() const {
   assert(type() == TYPE_GROUP);
-  return *data_.group_;
+  return *group_;
 }
 
 inline void UnknownField::set_varint(uint64 value) {
   assert(type() == TYPE_VARINT);
-  data_.varint_ = value;
+  varint_ = value;
 }
 inline void UnknownField::set_fixed32(uint32 value) {
   assert(type() == TYPE_FIXED32);
-  data_.fixed32_ = value;
+  fixed32_ = value;
 }
 inline void UnknownField::set_fixed64(uint64 value) {
   assert(type() == TYPE_FIXED64);
-  data_.fixed64_ = value;
+  fixed64_ = value;
 }
 inline void UnknownField::set_length_delimited(const string& value) {
   assert(type() == TYPE_LENGTH_DELIMITED);
-  data_.length_delimited_.string_value_->assign(value);
+  length_delimited_.string_value_->assign(value);
 }
 inline string* UnknownField::mutable_length_delimited() {
   assert(type() == TYPE_LENGTH_DELIMITED);
-  return data_.length_delimited_.string_value_;
+  return length_delimited_.string_value_;
 }
 inline UnknownFieldSet* UnknownField::mutable_group() {
   assert(type() == TYPE_GROUP);
-  return data_.group_;
+  return group_;
 }
 
 inline size_t UnknownField::GetLengthDelimitedSize() const {
   GOOGLE_DCHECK_EQ(TYPE_LENGTH_DELIMITED, type());
-  return data_.length_delimited_.string_value_->size();
+  return length_delimited_.string_value_->size();
 }
 
 inline void UnknownField::SetType(Type type) {

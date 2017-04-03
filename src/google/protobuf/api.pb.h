@@ -22,7 +22,6 @@
 #include <google/protobuf/io/coded_stream.h>
 #include <google/protobuf/arena.h>
 #include <google/protobuf/arenastring.h>
-#include <google/protobuf/generated_message_table_driven.h>
 #include <google/protobuf/generated_message_util.h>
 #include <google/protobuf/metadata.h>
 #include <google/protobuf/message.h>
@@ -70,9 +69,6 @@ namespace protobuf {
 namespace protobuf_google_2fprotobuf_2fapi_2eproto {
 // Internal implementation detail -- do not call these.
 struct LIBPROTOBUF_EXPORT TableStruct {
-  static const ::google::protobuf::internal::ParseTableField entries[];
-  static const ::google::protobuf::internal::AuxillaryParseTableField aux[];
-  static const ::google::protobuf::internal::ParseTable schema[];
   static const ::google::protobuf::uint32 offsets[];
   static void InitDefaultsImpl();
   static void Shutdown();
@@ -102,8 +98,6 @@ class LIBPROTOBUF_EXPORT Api : public ::google::protobuf::Message /* @@protoc_in
     return reinterpret_cast<const Api*>(
                &_Api_default_instance_);
   }
-  static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
-    0;
 
   void Swap(Api* other);
 
@@ -126,6 +120,11 @@ class LIBPROTOBUF_EXPORT Api : public ::google::protobuf::Message /* @@protoc_in
       ::google::protobuf::io::CodedOutputStream* output) const PROTOBUF_FINAL;
   ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
       bool deterministic, ::google::protobuf::uint8* target) const PROTOBUF_FINAL;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output)
+      const PROTOBUF_FINAL {
+    return InternalSerializeWithCachedSizesToArray(
+        ::google::protobuf::io::CodedOutputStream::IsDefaultSerializationDeterministic(), output);
+  }
   int GetCachedSize() const PROTOBUF_FINAL { return _cached_size_; }
   private:
   void SharedCtor();
@@ -238,7 +237,7 @@ class LIBPROTOBUF_EXPORT Api : public ::google::protobuf::Message /* @@protoc_in
   ::google::protobuf::SourceContext* source_context_;
   int syntax_;
   mutable int _cached_size_;
-  friend struct protobuf_google_2fprotobuf_2fapi_2eproto::TableStruct;
+  friend struct LIBPROTOBUF_EXPORT protobuf_google_2fprotobuf_2fapi_2eproto::TableStruct;
 };
 // -------------------------------------------------------------------
 
@@ -261,8 +260,6 @@ class LIBPROTOBUF_EXPORT Method : public ::google::protobuf::Message /* @@protoc
     return reinterpret_cast<const Method*>(
                &_Method_default_instance_);
   }
-  static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
-    1;
 
   void Swap(Method* other);
 
@@ -285,6 +282,11 @@ class LIBPROTOBUF_EXPORT Method : public ::google::protobuf::Message /* @@protoc
       ::google::protobuf::io::CodedOutputStream* output) const PROTOBUF_FINAL;
   ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
       bool deterministic, ::google::protobuf::uint8* target) const PROTOBUF_FINAL;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output)
+      const PROTOBUF_FINAL {
+    return InternalSerializeWithCachedSizesToArray(
+        ::google::protobuf::io::CodedOutputStream::IsDefaultSerializationDeterministic(), output);
+  }
   int GetCachedSize() const PROTOBUF_FINAL { return _cached_size_; }
   private:
   void SharedCtor();
@@ -390,7 +392,7 @@ class LIBPROTOBUF_EXPORT Method : public ::google::protobuf::Message /* @@protoc
   bool response_streaming_;
   int syntax_;
   mutable int _cached_size_;
-  friend struct protobuf_google_2fprotobuf_2fapi_2eproto::TableStruct;
+  friend struct LIBPROTOBUF_EXPORT protobuf_google_2fprotobuf_2fapi_2eproto::TableStruct;
 };
 // -------------------------------------------------------------------
 
@@ -413,8 +415,6 @@ class LIBPROTOBUF_EXPORT Mixin : public ::google::protobuf::Message /* @@protoc_
     return reinterpret_cast<const Mixin*>(
                &_Mixin_default_instance_);
   }
-  static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
-    2;
 
   void Swap(Mixin* other);
 
@@ -437,6 +437,11 @@ class LIBPROTOBUF_EXPORT Mixin : public ::google::protobuf::Message /* @@protoc_
       ::google::protobuf::io::CodedOutputStream* output) const PROTOBUF_FINAL;
   ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
       bool deterministic, ::google::protobuf::uint8* target) const PROTOBUF_FINAL;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output)
+      const PROTOBUF_FINAL {
+    return InternalSerializeWithCachedSizesToArray(
+        ::google::protobuf::io::CodedOutputStream::IsDefaultSerializationDeterministic(), output);
+  }
   int GetCachedSize() const PROTOBUF_FINAL { return _cached_size_; }
   private:
   void SharedCtor();
@@ -493,7 +498,7 @@ class LIBPROTOBUF_EXPORT Mixin : public ::google::protobuf::Message /* @@protoc_
   ::google::protobuf::internal::ArenaStringPtr name_;
   ::google::protobuf::internal::ArenaStringPtr root_;
   mutable int _cached_size_;
-  friend struct protobuf_google_2fprotobuf_2fapi_2eproto::TableStruct;
+  friend struct LIBPROTOBUF_EXPORT protobuf_google_2fprotobuf_2fapi_2eproto::TableStruct;
 };
 // ===================================================================
 
@@ -525,7 +530,6 @@ inline void Api::set_name(::std::string&& value) {
 }
 #endif
 inline void Api::set_name(const char* value) {
-  GOOGLE_DCHECK(value != NULL);
   
   name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
   // @@protoc_insertion_point(field_set_char:google.protobuf.Api.name)
@@ -638,7 +642,6 @@ inline void Api::set_version(::std::string&& value) {
 }
 #endif
 inline void Api::set_version(const char* value) {
-  GOOGLE_DCHECK(value != NULL);
   
   version_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
   // @@protoc_insertion_point(field_set_char:google.protobuf.Api.version)
@@ -778,7 +781,6 @@ inline void Method::set_name(::std::string&& value) {
 }
 #endif
 inline void Method::set_name(const char* value) {
-  GOOGLE_DCHECK(value != NULL);
   
   name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
   // @@protoc_insertion_point(field_set_char:google.protobuf.Method.name)
@@ -831,7 +833,6 @@ inline void Method::set_request_type_url(::std::string&& value) {
 }
 #endif
 inline void Method::set_request_type_url(const char* value) {
-  GOOGLE_DCHECK(value != NULL);
   
   request_type_url_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
   // @@protoc_insertion_point(field_set_char:google.protobuf.Method.request_type_url)
@@ -898,7 +899,6 @@ inline void Method::set_response_type_url(::std::string&& value) {
 }
 #endif
 inline void Method::set_response_type_url(const char* value) {
-  GOOGLE_DCHECK(value != NULL);
   
   response_type_url_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
   // @@protoc_insertion_point(field_set_char:google.protobuf.Method.response_type_url)
@@ -1013,7 +1013,6 @@ inline void Mixin::set_name(::std::string&& value) {
 }
 #endif
 inline void Mixin::set_name(const char* value) {
-  GOOGLE_DCHECK(value != NULL);
   
   name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
   // @@protoc_insertion_point(field_set_char:google.protobuf.Mixin.name)
@@ -1066,7 +1065,6 @@ inline void Mixin::set_root(::std::string&& value) {
 }
 #endif
 inline void Mixin::set_root(const char* value) {
-  GOOGLE_DCHECK(value != NULL);
   
   root_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
   // @@protoc_insertion_point(field_set_char:google.protobuf.Mixin.root)
