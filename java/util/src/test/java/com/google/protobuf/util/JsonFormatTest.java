@@ -264,7 +264,7 @@ public class JsonFormatTest extends TestCase {
     assertRoundTripEquals(message);
   }
 
-  public void testParserAcceptStringForNumericField() throws Exception {
+  public void testParserAcceptStringForNumbericField() throws Exception {
     TestAllTypes.Builder builder = TestAllTypes.newBuilder();
     mergeFromJson(
         "{\n"
@@ -479,8 +479,8 @@ public class JsonFormatTest extends TestCase {
       TestAllTypes.Builder builder = TestAllTypes.newBuilder();
       mergeFromJson(
           "{\n"
-              + "  \"repeatedInt32\": [1, 2],\n"
-              + "  \"repeated_int32\": [5, 6]\n"
+              + "  \"repeatedNestedMessage\": [null, null],\n"
+              + "  \"repeated_nested_message\": [null, null]\n"
               + "}",
           builder);
       fail();
@@ -488,20 +488,10 @@ public class JsonFormatTest extends TestCase {
       // Exception expected.
     }
 
-    // Duplicated oneof fields, same name.
+    // Duplicated oneof fields.
     try {
       TestOneof.Builder builder = TestOneof.newBuilder();
       mergeFromJson("{\n" + "  \"oneofInt32\": 1,\n" + "  \"oneof_int32\": 2\n" + "}", builder);
-      fail();
-    } catch (InvalidProtocolBufferException e) {
-      // Exception expected.
-    }
-
-    // Duplicated oneof fields, different name.
-    try {
-      TestOneof.Builder builder = TestOneof.newBuilder();
-      mergeFromJson(
-          "{\n" + "  \"oneofInt32\": 1,\n" + "  \"oneofNullValue\": null\n" + "}", builder);
       fail();
     } catch (InvalidProtocolBufferException e) {
       // Exception expected.
