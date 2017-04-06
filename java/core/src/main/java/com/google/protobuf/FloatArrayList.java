@@ -30,9 +30,8 @@
 
 package com.google.protobuf;
 
-import static com.google.protobuf.Internal.checkNotNull;
-
 import com.google.protobuf.Internal.FloatList;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.RandomAccess;
@@ -42,8 +41,9 @@ import java.util.RandomAccess;
  *
  * @author dweis@google.com (Daniel Weis)
  */
-final class FloatArrayList extends AbstractProtobufList<Float>
-    implements FloatList, RandomAccess, PrimitiveNonBoxingCollection {
+final class FloatArrayList
+    extends AbstractProtobufList<Float>
+    implements FloatList, RandomAccess {
 
   private static final FloatArrayList EMPTY_LIST = new FloatArrayList();
   static {
@@ -198,7 +198,9 @@ final class FloatArrayList extends AbstractProtobufList<Float>
   public boolean addAll(Collection<? extends Float> collection) {
     ensureIsMutable();
 
-    checkNotNull(collection);
+    if (collection == null) {
+      throw new NullPointerException();
+    }
 
     // We specialize when adding another FloatArrayList to avoid boxing elements.
     if (!(collection instanceof FloatArrayList)) {
