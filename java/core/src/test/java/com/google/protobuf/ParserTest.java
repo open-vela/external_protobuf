@@ -79,8 +79,6 @@ public class ParserTest extends TestCase {
         new ByteArrayInputStream(data), registry));
     assertMessageEquals(message, parser.parseFrom(
         CodedInputStream.newInstance(data), registry));
-    assertMessageEquals(
-        message, parser.parseFrom(message.toByteString().asReadOnlyByteBuffer(), registry));
   }
 
   @SuppressWarnings("unchecked")
@@ -101,7 +99,6 @@ public class ParserTest extends TestCase {
         new ByteArrayInputStream(data)));
     assertMessageEquals(message, parser.parseFrom(
         CodedInputStream.newInstance(data)));
-    assertMessageEquals(message, parser.parseFrom(message.toByteString().asReadOnlyByteBuffer()));
   }
 
   private void assertMessageEquals(
@@ -181,9 +178,6 @@ public class ParserTest extends TestCase {
   public void testParseExtensions() throws Exception {
     assertRoundTripEquals(TestUtil.getAllExtensionsSet(),
                           TestUtil.getExtensionRegistry());
-  }
-
-  public void testParseExtensionsLite() throws Exception {
     assertRoundTripEquals(
         TestUtilLite.getAllLiteExtensionsSet(), TestUtilLite.getExtensionRegistryLite());
   }
@@ -192,9 +186,6 @@ public class ParserTest extends TestCase {
     assertRoundTripEquals(TestUtil.getPackedSet());
     assertRoundTripEquals(TestUtil.getPackedExtensionsSet(),
                           TestUtil.getExtensionRegistry());
-  }
-
-  public void testParsePackedLite() throws Exception {
     assertRoundTripEquals(
         TestUtilLite.getLitePackedExtensionsSet(), TestUtilLite.getExtensionRegistryLite());
   }
@@ -204,26 +195,15 @@ public class ParserTest extends TestCase {
     TestAllTypes normalMessage = TestUtil.getAllSet();
     ByteArrayOutputStream output = new ByteArrayOutputStream();
     normalMessage.writeDelimitedTo(output);
-    normalMessage.writeDelimitedTo(output);
 
-    InputStream input = new ByteArrayInputStream(output.toByteArray());
-    assertMessageEquals(normalMessage, normalMessage.getParserForType().parseDelimitedFrom(input));
-    assertMessageEquals(normalMessage, normalMessage.getParserForType().parseDelimitedFrom(input));
-  }
-
-  public void testParseDelimitedToLite() throws Exception {
     // Write MessageLite with packed extension fields.
     TestPackedExtensionsLite packedMessage = TestUtilLite.getLitePackedExtensionsSet();
-    ByteArrayOutputStream output = new ByteArrayOutputStream();
-    packedMessage.writeDelimitedTo(output);
     packedMessage.writeDelimitedTo(output);
 
     InputStream input = new ByteArrayInputStream(output.toByteArray());
     assertMessageEquals(
-        packedMessage,
-        packedMessage
-            .getParserForType()
-            .parseDelimitedFrom(input, TestUtilLite.getExtensionRegistryLite()));
+        normalMessage,
+        normalMessage.getParserForType().parseDelimitedFrom(input));
     assertMessageEquals(
         packedMessage,
         packedMessage
@@ -334,7 +314,8 @@ public class ParserTest extends TestCase {
 
   public void testParsingMergeLite() throws Exception {
     // Build messages.
-    TestAllTypesLite.Builder builder = TestAllTypesLite.newBuilder();
+    TestAllTypesLite.Builder builder =
+        TestAllTypesLite.newBuilder();
     TestAllTypesLite msg1 = builder.setOptionalInt32(1).build();
     builder.clear();
     TestAllTypesLite msg2 = builder.setOptionalInt64(2).build();

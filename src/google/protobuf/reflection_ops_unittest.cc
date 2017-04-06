@@ -41,7 +41,6 @@
 #include <google/protobuf/stubs/common.h>
 #include <google/protobuf/testing/googletest.h>
 #include <gtest/gtest.h>
-
 #include <google/protobuf/stubs/strutil.h>
 
 namespace google {

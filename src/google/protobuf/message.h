@@ -245,9 +245,7 @@ class LIBPROTOBUF_EXPORT Message : public MessageLite {
   // using reflection (rather than the generated code implementation for
   // ByteSize()). Like ByteSize(), its CPU time is linear in the number of
   // fields defined for the proto.
-  virtual size_t SpaceUsedLong() const;
-
-  int SpaceUsed() const { return internal::ToIntSize(SpaceUsedLong()); }
+  virtual int SpaceUsed() const;
 
   // Debugging & Testing----------------------------------------------
 
@@ -419,11 +417,7 @@ class LIBPROTOBUF_EXPORT Reflection {
   virtual UnknownFieldSet* MutableUnknownFields(Message* message) const = 0;
 
   // Estimate the amount of memory used by the message object.
-  virtual size_t SpaceUsedLong(const Message& message) const = 0;
-
-  int SpaceUsed(const Message& message) const {
-    return internal::ToIntSize(SpaceUsedLong(message));
-  }
+  virtual int SpaceUsed(const Message& message) const = 0;
 
   // Check if the given non-repeated field is set.
   virtual bool HasField(const Message& message,
