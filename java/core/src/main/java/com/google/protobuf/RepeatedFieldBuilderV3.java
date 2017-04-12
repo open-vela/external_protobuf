@@ -30,8 +30,6 @@
 
 package com.google.protobuf;
 
-import static com.google.protobuf.Internal.checkNotNull;
-
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -292,7 +290,9 @@ public class RepeatedFieldBuilderV3
    */
   public RepeatedFieldBuilderV3<MType, BType, IType> setMessage(
       int index, MType message) {
-    checkNotNull(message);
+    if (message == null) {
+      throw new NullPointerException();
+    }
     ensureMutableMessageList();
     messages.set(index, message);
     if (builders != null) {
@@ -315,7 +315,9 @@ public class RepeatedFieldBuilderV3
    */
   public RepeatedFieldBuilderV3<MType, BType, IType> addMessage(
       MType message) {
-    checkNotNull(message);
+    if (message == null) {
+      throw new NullPointerException();
+    }
     ensureMutableMessageList();
     messages.add(message);
     if (builders != null) {
@@ -337,7 +339,9 @@ public class RepeatedFieldBuilderV3
    */
   public RepeatedFieldBuilderV3<MType, BType, IType> addMessage(
       int index, MType message) {
-    checkNotNull(message);
+    if (message == null) {
+      throw new NullPointerException();
+    }
     ensureMutableMessageList();
     messages.add(index, message);
     if (builders != null) {
@@ -359,7 +363,9 @@ public class RepeatedFieldBuilderV3
   public RepeatedFieldBuilderV3<MType, BType, IType> addAllMessages(
       Iterable<? extends MType> values) {
     for (final MType value : values) {
-      checkNotNull(value);
+      if (value == null) {
+        throw new NullPointerException();
+      }
     }
 
     // If we can inspect the size, we can more efficiently add messages.

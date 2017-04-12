@@ -184,7 +184,7 @@ public abstract class CodedOutputStream extends ByteOutput {
    *     maps are sorted on the lexicographical order of the UTF8 encoded keys.
    * </ul>
    */
-  public void useDeterministicSerialization() {
+  void useDeterministicSerialization() {
     serializationDeterministic = true;
   }
 
@@ -1854,7 +1854,7 @@ public abstract class CodedOutputStream extends ByteOutput {
     }
 
     static boolean isSupported() {
-      return UnsafeUtil.hasUnsafeByteBufferOperations() && UnsafeUtil.hasUnsafeCopyMemory();
+      return UnsafeUtil.hasUnsafeByteBufferOperations();
     }
 
     @Override

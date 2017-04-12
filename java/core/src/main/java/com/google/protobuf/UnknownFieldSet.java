@@ -91,7 +91,7 @@ public final class UnknownFieldSet implements MessageLite {
    * Construct an {@code UnknownFieldSet} around the given map.  The map is
    * expected to be immutable.
    */
-  UnknownFieldSet(final Map<Integer, Field> fields,
+  private UnknownFieldSet(final Map<Integer, Field> fields,
       final Map<Integer, Field> fieldsDescending) {
     this.fields = fields;
   }
@@ -715,7 +715,7 @@ public final class UnknownFieldSet implements MessageLite {
    * @see UnknownFieldSet
    */
   public static final class Field {
-    Field() {}
+    private Field() {}
 
     /** Construct a new {@link Builder}. */
     public static Builder newBuilder() {

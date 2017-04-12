@@ -30,12 +30,11 @@
 
 package com.google.protobuf;
 
-import static com.google.protobuf.Internal.checkNotNull;
-
 import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Descriptors.EnumValueDescriptor;
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import com.google.protobuf.Descriptors.OneofDescriptor;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
@@ -632,7 +631,9 @@ public final class DynamicMessage extends AbstractMessage {
     /** Verifies that the value is EnumValueDescriptor and matches Enum Type. */
     private void ensureSingularEnumValueDescriptor(
         FieldDescriptor field, Object value) {
-      checkNotNull(value);
+      if (value == null) {
+        throw new NullPointerException();
+      }
       if (!(value instanceof EnumValueDescriptor)) {
         throw new IllegalArgumentException(
           "DynamicMessage should use EnumValueDescriptor to set Enum Value.");
