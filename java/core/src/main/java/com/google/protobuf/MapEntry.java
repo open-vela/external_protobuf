@@ -33,6 +33,7 @@ package com.google.protobuf;
 import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Descriptors.EnumValueDescriptor;
 import com.google.protobuf.Descriptors.FieldDescriptor;
+
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
@@ -170,7 +171,7 @@ public final class MapEntry<K, V> extends AbstractMessage {
 
   @Override
   public Builder<K, V> toBuilder() {
-    return new Builder<K, V>(metadata, key, value, true, true);
+    return new Builder<K, V>(metadata, key, value);
   }
 
   @Override
@@ -246,19 +247,15 @@ public final class MapEntry<K, V> extends AbstractMessage {
     private final Metadata<K, V> metadata;
     private K key;
     private V value;
-    private boolean hasKey;
-    private boolean hasValue;
 
     private Builder(Metadata<K, V> metadata) {
-      this(metadata, metadata.defaultKey, metadata.defaultValue, false, false);
+      this(metadata, metadata.defaultKey, metadata.defaultValue);
     }
 
-    private Builder(Metadata<K, V> metadata, K key, V value, boolean hasKey, boolean hasValue) {
+    private Builder(Metadata<K, V> metadata, K key, V value) {
       this.metadata = metadata;
       this.key = key;
       this.value = value;
-      this.hasKey = hasKey;
-      this.hasValue = hasValue;
     }
 
     public K getKey() {
@@ -271,25 +268,21 @@ public final class MapEntry<K, V> extends AbstractMessage {
 
     public Builder<K, V> setKey(K key) {
       this.key = key;
-      this.hasKey = true;
       return this;
     }
 
     public Builder<K, V> clearKey() {
       this.key = metadata.defaultKey;
-      this.hasKey = false;
       return this;
     }
 
     public Builder<K, V> setValue(V value) {
       this.value = value;
-      this.hasValue = true;
       return this;
     }
 
     public Builder<K, V> clearValue() {
       this.value = metadata.defaultValue;
-      this.hasValue = false;
       return this;
     }
 
@@ -411,7 +404,7 @@ public final class MapEntry<K, V> extends AbstractMessage {
     @Override
     public boolean hasField(FieldDescriptor field) {
       checkFieldDescriptor(field);
-      return field.getNumber() == 1 ? hasKey : hasValue;
+      return true;
     }
 
     @Override
@@ -445,7 +438,7 @@ public final class MapEntry<K, V> extends AbstractMessage {
     @Override
     @SuppressWarnings("unchecked")
     public Builder<K, V> clone() {
-      return new Builder(metadata, key, value, hasKey, hasValue);
+      return new Builder(metadata, key, value);
     }
   }
 
@@ -454,10 +447,5 @@ public final class MapEntry<K, V> extends AbstractMessage {
       return ((MessageLite) value).isInitialized();
     }
     return true;
-  }
-  
-  /** Returns the metadata only for experimental runtime. */
-  final Metadata<K, V> getMetadata() {
-    return metadata;
   }
 }
