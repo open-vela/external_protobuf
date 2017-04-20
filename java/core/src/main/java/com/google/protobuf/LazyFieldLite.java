@@ -394,7 +394,6 @@ public class LazyFieldLite {
     }
   }
 
-
   /**
    * Might lazily parse the bytes that were previously passed in. Is thread-safe.
    */

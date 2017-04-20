@@ -422,8 +422,7 @@ class _Printer(object):
 def Parse(text,
           message,
           allow_unknown_extension=False,
-          allow_field_number=False,
-          descriptor_pool=None):
+          allow_field_number=False):
   """Parses a text representation of a protocol message into a message.
 
   Args:
@@ -432,7 +431,6 @@ def Parse(text,
     allow_unknown_extension: if True, skip over missing extensions and keep
       parsing
     allow_field_number: if True, both field number and field name are allowed.
-    descriptor_pool: A DescriptorPool used to resolve Any types.
 
   Returns:
     The same message passed as argument.
@@ -442,11 +440,8 @@ def Parse(text,
   """
   if not isinstance(text, str):
     text = text.decode('utf-8')
-  return ParseLines(text.split('\n'),
-                    message,
-                    allow_unknown_extension,
-                    allow_field_number,
-                    descriptor_pool=descriptor_pool)
+  return ParseLines(
+      text.split('\n'), message, allow_unknown_extension, allow_field_number)
 
 
 def Merge(text,
@@ -484,8 +479,7 @@ def Merge(text,
 def ParseLines(lines,
                message,
                allow_unknown_extension=False,
-               allow_field_number=False,
-               descriptor_pool=None):
+               allow_field_number=False):
   """Parses a text representation of a protocol message into a message.
 
   Args:
@@ -502,9 +496,7 @@ def ParseLines(lines,
   Raises:
     ParseError: On text parsing problems.
   """
-  parser = _Parser(allow_unknown_extension,
-                   allow_field_number,
-                   descriptor_pool=descriptor_pool)
+  parser = _Parser(allow_unknown_extension, allow_field_number)
   return parser.ParseLines(lines, message)
 
 
@@ -521,7 +513,6 @@ def MergeLines(lines,
     allow_unknown_extension: if True, skip over missing extensions and keep
       parsing
     allow_field_number: if True, both field number and field name are allowed.
-    descriptor_pool: A DescriptorPool used to resolve Any types.
 
   Returns:
     The same message passed as argument.
@@ -1031,22 +1022,6 @@ class Tokenizer(object):
       raise self.ParseError('Expected comment.')
     self.NextToken()
     return result
-
-  def ConsumeCommentOrTrailingComment(self):
-    """Consumes a comment, returns a 2-tuple (trailing bool, comment str)."""
-
-    # Tokenizer initializes _previous_line and _previous_column to 0. As the
-    # tokenizer starts, it looks like there is a previous token on the line.
-    just_started = self._line == 0 and self._column == 0
-
-    before_parsing = self._previous_line
-    comment = self.ConsumeComment()
-
-    # A trailing comment is a comment on the same line than the previous token.
-    trailing = (self._previous_line == before_parsing
-                and not just_started)
-
-    return trailing, comment
 
   def TryConsumeIdentifier(self):
     try:

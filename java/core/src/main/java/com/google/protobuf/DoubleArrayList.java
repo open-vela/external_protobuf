@@ -30,9 +30,8 @@
 
 package com.google.protobuf;
 
-import static com.google.protobuf.Internal.checkNotNull;
-
 import com.google.protobuf.Internal.DoubleList;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.RandomAccess;
@@ -42,8 +41,9 @@ import java.util.RandomAccess;
  *
  * @author dweis@google.com (Daniel Weis)
  */
-final class DoubleArrayList extends AbstractProtobufList<Double>
-    implements DoubleList, RandomAccess, PrimitiveNonBoxingCollection {
+final class DoubleArrayList
+    extends AbstractProtobufList<Double>
+    implements DoubleList, RandomAccess {
 
   private static final DoubleArrayList EMPTY_LIST = new DoubleArrayList();
   static {
@@ -199,7 +199,9 @@ final class DoubleArrayList extends AbstractProtobufList<Double>
   public boolean addAll(Collection<? extends Double> collection) {
     ensureIsMutable();
 
-    checkNotNull(collection);
+    if (collection == null) {
+      throw new NullPointerException();
+    }
 
     // We specialize when adding another DoubleArrayList to avoid boxing elements.
     if (!(collection instanceof DoubleArrayList)) {
