@@ -108,7 +108,6 @@ def _proto_gen_impl(ctx):
         arguments=args + import_flags + [s.path for s in srcs],
         executable=ctx.executable.protoc,
         mnemonic="ProtoCompile",
-        use_default_shell_env=True,
     )
 
   return struct(
