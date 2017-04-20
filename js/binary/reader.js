@@ -971,7 +971,7 @@ jspb.BinaryReader.prototype.readFixedHash64 = function() {
 
 /**
  * Reads a packed scalar field using the supplied raw reader function.
- * @param {function(this:jspb.BinaryDecoder)} decodeMethod
+ * @param {function()} decodeMethod
  * @return {!Array}
  * @private
  */

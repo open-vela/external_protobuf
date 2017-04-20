@@ -49,8 +49,6 @@ const std::string kDescriptorMetadataFile =
     "GPBMetadata/Google/Protobuf/Internal/Descriptor.php";
 const std::string kDescriptorDirName = "Google/Protobuf/Internal";
 const std::string kDescriptorPackageName = "Google\\Protobuf\\Internal";
-const char* const kReservedNames[] = {"Empty"};
-const int kReservedNamesSize = 1;
 
 namespace google {
 namespace protobuf {
@@ -86,6 +84,33 @@ std::string RenameEmpty(const std::string& name) {
   }
 }
 
+std::string MessagePrefix(const Descriptor* message) {
+  // Empty cannot be php class name.
+  if (message->name() == "Empty" &&
+      message->file()->package() == "google.protobuf") {
+    return "GPB";
+  } else {
+    return (message->file()->options()).php_class_prefix();
+  }
+}
+
+std::string MessageName(const Descriptor* message, bool is_descriptor) {
+  string message_name = message->name();
+  const Descriptor* descriptor = message->containing_type();
+  while (descriptor != NULL) {
+    message_name = descriptor->name() + '_' + message_name;
+    descriptor = descriptor->containing_type();
+  }
+  message_name = MessagePrefix(message) + message_name;
+
+  if (message->file()->package() == "") {
+    return message_name;
+  } else {
+    return PhpName(message->file()->package(), is_descriptor) + '\\' +
+           message_name;
+  }
+}
+
 std::string MessageFullName(const Descriptor* message, bool is_descriptor) {
   if (is_descriptor) {
     return StringReplace(message->full_name(),
@@ -106,51 +131,19 @@ std::string EnumFullName(const EnumDescriptor* envm, bool is_descriptor) {
   }
 }
 
-template <typename DescriptorType>
-std::string ClassNamePrefix(const string& classname,
-                            const DescriptorType* desc) {
-  const string& prefix = (desc->file()->options()).php_class_prefix();
-  if (prefix != "") {
-    return prefix;
+std::string EnumClassName(const EnumDescriptor* envm) {
+  string enum_class_name = envm->name();
+  const Descriptor* descriptor = envm->containing_type();
+  while (descriptor != NULL) {
+    enum_class_name = descriptor->name() + '_' + enum_class_name;
+    descriptor = descriptor->containing_type();
   }
-
-  bool is_reserved = false;
-
-  for (int i = 0; i < kReservedNamesSize; i++) {
-    if (classname == kReservedNames[i]) {
-      is_reserved = true;
-      break;
-    }
-  }
-
-  if (is_reserved) {
-    if (desc->file()->package() == "google.protobuf") {
-      return "GPB";
-    } else {
-      return "PB";
-    }
-  }
-
-  return "";
+  return enum_class_name;
 }
 
-
-template <typename DescriptorType>
-std::string FullClassName(const DescriptorType* desc, bool is_descriptor) {
-  string classname = desc->name();
-  const Descriptor* containing = desc->containing_type();
-  while (containing != NULL) {
-    classname = containing->name() + '_' + classname;
-    containing = containing->containing_type();
-  }
-  classname = ClassNamePrefix(classname, desc) + classname;
-
-  if (desc->file()->package() == "") {
-    return classname;
-  } else {
-    return PhpName(desc->file()->package(), is_descriptor) + '\\' +
-           classname;
-  }
+std::string EnumName(const EnumDescriptor* envm, bool is_descriptor) {
+  string enum_name = EnumClassName(envm);
+  return PhpName(envm->file()->package(), is_descriptor) + '\\' + enum_name;
 }
 
 std::string PhpName(const std::string& full_name, bool is_descriptor) {
@@ -238,7 +231,7 @@ std::string GeneratedMetadataFileName(const std::string& proto_file,
 
 std::string GeneratedMessageFileName(const Descriptor* message,
                                      bool is_descriptor) {
-  std::string result = FullClassName(message, is_descriptor);
+  std::string result = MessageName(message, is_descriptor);
   for (int i = 0; i < result.size(); i++) {
     if (result[i] == '\\') {
       result[i] = '/';
@@ -249,7 +242,7 @@ std::string GeneratedMessageFileName(const Descriptor* message,
 
 std::string GeneratedEnumFileName(const EnumDescriptor* en,
                                   bool is_descriptor) {
-  std::string result = FullClassName(en, is_descriptor);
+  std::string result = EnumName(en, is_descriptor);
   for (int i = 0; i < result.size(); i++) {
     if (result[i] == '\\') {
       result[i] = '/';
@@ -463,12 +456,12 @@ void GenerateFieldAccessor(const FieldDescriptor* field, bool is_descriptor,
       printer->Print(
           ", \\^class_name^);\n",
           "class_name",
-          FullClassName(value->message_type(), is_descriptor) + "::class");
+          MessageName(value->message_type(), is_descriptor) + "::class");
     } else if (value->cpp_type() == FieldDescriptor::CPPTYPE_ENUM) {
       printer->Print(
-          ", \\^class_name^);\n",
+          ", ^class_name^);\n",
           "class_name",
-          FullClassName(value->enum_type(), is_descriptor) + "::class");
+          EnumName(value->enum_type(), is_descriptor) + "::class");
     } else {
       printer->Print(");\n");
     }
@@ -481,23 +474,23 @@ void GenerateFieldAccessor(const FieldDescriptor* field, bool is_descriptor,
       printer->Print(
           ", \\^class_name^);\n",
           "class_name",
-          FullClassName(field->message_type(), is_descriptor) + "::class");
+          MessageName(field->message_type(), is_descriptor) + "::class");
     } else if (field->cpp_type() == FieldDescriptor::CPPTYPE_ENUM) {
       printer->Print(
-          ", \\^class_name^);\n",
+          ", ^class_name^);\n",
           "class_name",
-          FullClassName(field->enum_type(), is_descriptor) + "::class");
+          EnumName(field->enum_type(), is_descriptor) + "::class");
     } else {
       printer->Print(");\n");
     }
   } else if (field->cpp_type() == FieldDescriptor::CPPTYPE_MESSAGE) {
     printer->Print(
         "GPBUtil::checkMessage($var, \\^class_name^::class);\n",
-        "class_name", FullClassName(field->message_type(), is_descriptor));
+        "class_name", MessageName(field->message_type(), is_descriptor));
   } else if (field->cpp_type() == FieldDescriptor::CPPTYPE_ENUM) {
     printer->Print(
         "GPBUtil::checkEnum($var, \\^class_name^::class);\n",
-        "class_name", FullClassName(field->enum_type(), is_descriptor));
+        "class_name", EnumName(field->enum_type(), is_descriptor));
   } else if (field->cpp_type() == FieldDescriptor::CPPTYPE_STRING) {
     printer->Print(
         "GPBUtil::checkString($var, ^utf8^);\n",

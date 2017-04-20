@@ -1,7 +1,7 @@
 <?php
 
-require_once('generated/NoNamespaceEnum.php');
-require_once('generated/NoNamespaceMessage.php');
+require_once('generated/NoNameSpaceEnum.php');
+require_once('generated/NoNameSpaceMessage.php');
 require_once('test_base.php');
 require_once('test_util.php');
 
@@ -293,12 +293,6 @@ class GeneratedClassTest extends TestBase
         // Set string.
         $m->setOptionalEnum("1");
         $this->assertEquals(TestEnum::ONE, $m->getOptionalEnum());
-    }
-
-    public function testNestedEnum()
-    {
-        $m = new TestMessage();
-        $m->setOptionalNestedEnum(\Foo\TestMessage_NestedEnum::ZERO);
     }
 
     #########################################################
@@ -838,19 +832,12 @@ class GeneratedClassTest extends TestBase
 
     public function testMessageWithoutNamespace()
     {
-        $m = new TestMessage();
-        $m->setOptionalNoNamespaceMessage(new NoNameSpaceMessage());
-        $m->getRepeatedNoNamespaceMessage()[] = new NoNameSpaceMessage();
-
-        $n = new NoNamespaceMessage();
-        $n->setB(NoNamespaceMessage_NestedEnum::ZERO);
+        $m = new NoNameSpaceMessage();
     }
 
     public function testEnumWithoutNamespace()
     {
-        $m = new TestMessage();
-        $m->setOptionalNoNamespaceEnum(NoNameSpaceEnum::VALUE_A);
-        $m->getRepeatedNoNamespaceEnum()[] = NoNameSpaceEnum::VALUE_A;
+        $m = new NoNameSpaceEnum();
     }
 
     #########################################################
@@ -864,16 +851,5 @@ class GeneratedClassTest extends TestBase
         $n->setA(1);
         $m->setPrefixMessage($n);
         $this->assertSame(1, $m->getPrefixMessage()->getA());
-    }
-
-    #########################################################
-    # Test prefix for reserved words.
-    #########################################################
-
-    public function testPrefixForReservedWords()
-    {
-        $m = new \Foo\TestMessage_Empty();
-        $m = new \Foo\PBEmpty();
-        $m = new \PrefixEmpty();
     }
 }

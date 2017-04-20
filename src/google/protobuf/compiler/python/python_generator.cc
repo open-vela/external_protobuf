@@ -445,6 +445,8 @@ void Generator::PrintFileDescriptor() const {
 
   printer_->Outdent();
   printer_->Print(")\n");
+  printer_->Print("_sym_db.RegisterFileDescriptor($name$)\n", "name",
+                  kDescriptorKey);
   printer_->Print("\n");
 }
 
@@ -997,10 +999,6 @@ void Generator::FixForeignFieldsInDescriptors() const {
   for (int i = 0; i < file_->extension_count(); ++i) {
     AddExtensionToFileDescriptor(*file_->extension(i));
   }
-  // TODO(jieluo): Move this register to PrintFileDescriptor() when
-  // FieldDescriptor.file is added in generated file.
-  printer_->Print("_sym_db.RegisterFileDescriptor($name$)\n", "name",
-                  kDescriptorKey);
   printer_->Print("\n");
 }
 
