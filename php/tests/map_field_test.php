@@ -616,7 +616,11 @@ class MapFieldTest extends PHPUnit_Framework_TestCase {
         $arr[0] = $sub_m;
         $this->assertSame(1, $arr[0]->getA());
 
-        $this->assertEquals(1, count($arr));
+        $null = NULL;
+        $arr[1] = $null;
+        $this->assertNull($arr[1]);
+
+        $this->assertEquals(2, count($arr));
     }
 
     /**
@@ -647,17 +651,6 @@ class MapFieldTest extends PHPUnit_Framework_TestCase {
        $arr =
            new MapField(GPBType::INT32, GPBType::MESSAGE, TestMessage::class);
        $arr[0] = new TestMessage_Sub();
-    }
-
-    /**
-     * @expectedException PHPUnit_Framework_Error
-     */
-    public function testMessageSetNullFail()
-    {
-       $arr =
-           new MapField(GPBType::INT32, GPBType::MESSAGE, TestMessage::class);
-       $null = NULL;
-       $arr[0] = $null;
     }
 
     #########################################################

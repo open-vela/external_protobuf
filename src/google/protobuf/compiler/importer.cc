@@ -222,7 +222,6 @@ void Importer::ClearUnusedImportTrackFiles() {
   pool_.ClearUnusedImportTrackFiles();
 }
 
-
 // ===================================================================
 
 SourceTree::~SourceTree() {}

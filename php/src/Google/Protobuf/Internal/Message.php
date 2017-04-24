@@ -224,57 +224,48 @@ class Message
         switch ($field->getType()) {
             case GPBType::DOUBLE:
                 if (!GPBWire::readDouble($input, $value)) {
-                    throw new GPBDecodeException(
-                        "Unexpected EOF inside double field.");
+                    return false;
                 }
                 break;
             case GPBType::FLOAT:
                 if (!GPBWire::readFloat($input, $value)) {
-                    throw new GPBDecodeException(
-                        "Unexpected EOF inside float field.");
+                    return false;
                 }
                 break;
             case GPBType::INT64:
                 if (!GPBWire::readInt64($input, $value)) {
-                    throw new GPBDecodeException(
-                        "Unexpected EOF inside int64 field.");
+                    return false;
                 }
                 break;
             case GPBType::UINT64:
                 if (!GPBWire::readUint64($input, $value)) {
-                    throw new GPBDecodeException(
-                        "Unexpected EOF inside uint64 field.");
+                    return false;
                 }
                 break;
             case GPBType::INT32:
                 if (!GPBWire::readInt32($input, $value)) {
-                    throw new GPBDecodeException(
-                        "Unexpected EOF inside int32 field.");
+                    return false;
                 }
                 break;
             case GPBType::FIXED64:
                 if (!GPBWire::readFixed64($input, $value)) {
-                    throw new GPBDecodeException(
-                        "Unexpected EOF inside fixed64 field.");
+                    return false;
                 }
                 break;
             case GPBType::FIXED32:
                 if (!GPBWire::readFixed32($input, $value)) {
-                    throw new GPBDecodeException(
-                        "Unexpected EOF inside fixed32 field.");
+                    return false;
                 }
                 break;
             case GPBType::BOOL:
                 if (!GPBWire::readBool($input, $value)) {
-                    throw new GPBDecodeException(
-                        "Unexpected EOF inside bool field.");
+                    return false;
                 }
                 break;
             case GPBType::STRING:
                 // TODO(teboring): Add utf-8 check.
                 if (!GPBWire::readString($input, $value)) {
-                    throw new GPBDecodeException(
-                        "Unexpected EOF inside string field.");
+                    return false;
                 }
                 break;
             case GPBType::GROUP:
@@ -289,51 +280,43 @@ class Message
                     $value = new $klass;
                 }
                 if (!GPBWire::readMessage($input, $value)) {
-                    throw new GPBDecodeException(
-                        "Unexpected EOF inside message.");
+                    return false;
                 }
                 break;
             case GPBType::BYTES:
                 if (!GPBWire::readString($input, $value)) {
-                    throw new GPBDecodeException(
-                        "Unexpected EOF inside bytes field.");
+                    return false;
                 }
                 break;
             case GPBType::UINT32:
                 if (!GPBWire::readUint32($input, $value)) {
-                    throw new GPBDecodeException(
-                        "Unexpected EOF inside uint32 field.");
+                    return false;
                 }
                 break;
             case GPBType::ENUM:
                 // TODO(teboring): Check unknown enum value.
                 if (!GPBWire::readInt32($input, $value)) {
-                    throw new GPBDecodeException(
-                        "Unexpected EOF inside enum field.");
+                    return false;
                 }
                 break;
             case GPBType::SFIXED32:
                 if (!GPBWire::readSfixed32($input, $value)) {
-                    throw new GPBDecodeException(
-                        "Unexpected EOF inside sfixed32 field.");
+                    return false;
                 }
                 break;
             case GPBType::SFIXED64:
                 if (!GPBWire::readSfixed64($input, $value)) {
-                    throw new GPBDecodeException(
-                        "Unexpected EOF inside sfixed64 field.");
+                    return false;
                 }
                 break;
             case GPBType::SINT32:
                 if (!GPBWire::readSint32($input, $value)) {
-                    throw new GPBDecodeException(
-                        "Unexpected EOF inside sint32 field.");
+                    return false;
                 }
                 break;
             case GPBType::SINT64:
                 if (!GPBWire::readSint64($input, $value)) {
-                    throw new GPBDecodeException(
-                        "Unexpected EOF inside sint64 field.");
+                    return false;
                 }
                 break;
             default:
@@ -362,21 +345,24 @@ class Message
         }
 
         if ($value_format === GPBWire::NORMAL_FORMAT) {
-            self::parseFieldFromStreamNoTag($input, $field, $value);
+            if (!self::parseFieldFromStreamNoTag($input, $field, $value)) {
+                return false;
+            }
         } elseif ($value_format === GPBWire::PACKED_FORMAT) {
             $length = 0;
             if (!GPBWire::readInt32($input, $length)) {
-                throw new GPBDecodeException(
-                    "Unexpected EOF inside packed length.");
+                return false;
             }
             $limit = $input->pushLimit($length);
             $getter = $field->getGetter();
             while ($input->bytesUntilLimit() > 0) {
-                self::parseFieldFromStreamNoTag($input, $field, $value);
+                if (!self::parseFieldFromStreamNoTag($input, $field, $value)) {
+                    return false;
+                }
                 $this->$getter()[] = $value;
             }
             $input->popLimit($limit);
-            return;
+            return true;
         } else {
             return false;
         }
@@ -391,6 +377,8 @@ class Message
             $setter = $field->getSetter();
             $this->$setter($value);
         }
+
+        return true;
     }
 
     /**
@@ -579,8 +567,7 @@ class Message
      * specified message.
      *
      * @param string $data Binary protobuf data.
-     * @return null.
-     * @throws Exception Invalid data.
+     * @return bool Return true on success.
      */
     public function mergeFromString($data)
     {
@@ -608,7 +595,9 @@ class Message
               continue;
             }
 
-            $this->parseFieldFromStream($tag, $input, $field);
+            if (!$this->parseFieldFromStream($tag, $input, $field)) {
+                return false;
+            }
         }
     }
 
