@@ -51,6 +51,8 @@ class TestUtil
 
     public static function setTestMessage(TestMessage $m)
     {
+        $sub = new TestMessage_Sub();
+
         $m->setOptionalInt32(-42);
         $m->setOptionalInt64(-43);
         $m->setOptionalUint32(42);
@@ -67,7 +69,6 @@ class TestUtil
         $m->setOptionalString('a');
         $m->setOptionalBytes('b');
         $m->setOptionalEnum(TestEnum::ONE);
-        $sub = new TestMessage_Sub();
         $m->setOptionalMessage($sub);
         $m->getOptionalMessage()->SetA(33);
 
