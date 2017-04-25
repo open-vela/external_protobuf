@@ -28,7 +28,7 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-syntax = "proto2";
+package com.google.protobuf;
 
-package javatests.com.google.apps.jspb;
-
+/** A marker interface indicating that the collection supports primitives and is non-boxing. */
+interface PrimitiveNonBoxingCollection {}
