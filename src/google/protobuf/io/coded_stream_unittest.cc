@@ -63,7 +63,6 @@ namespace protobuf {
 namespace io {
 namespace {
 
-
 // ===================================================================
 // Data-Driven Test Infrastructure
 
@@ -1297,6 +1296,35 @@ void CodedStreamTest::SetupTotalBytesLimitWarningTest(
   *out_warnings = scoped_log.GetMessages(WARNING);
 }
 
+TEST_F(CodedStreamTest, TotalBytesLimitWarning) {
+  std::vector<string> errors;
+  std::vector<string> warnings;
+  SetupTotalBytesLimitWarningTest(10240, 1024, &errors, &warnings);
+
+  EXPECT_EQ(0, errors.size());
+
+  EXPECT_EQ(1, warnings.size());
+  EXPECT_PRED_FORMAT2(testing::IsSubstring,
+    "The total number of bytes read was 2048",
+    warnings[0]);
+}
+
+TEST_F(CodedStreamTest, TotalBytesLimitWarningDisabled) {
+  std::vector<string> errors;
+  std::vector<string> warnings;
+
+  // Test with -1
+  SetupTotalBytesLimitWarningTest(10240, -1, &errors, &warnings);
+  EXPECT_EQ(0, errors.size());
+  EXPECT_EQ(0, warnings.size());
+
+  // Test again with -2, expecting the same result
+  SetupTotalBytesLimitWarningTest(10240, -2, &errors, &warnings);
+  EXPECT_EQ(0, errors.size());
+  EXPECT_EQ(0, warnings.size());
+}
+
+
 TEST_F(CodedStreamTest, RecursionLimit) {
   ArrayInputStream input(buffer_, sizeof(buffer_));
   CodedInputStream coded_input(&input);
@@ -1396,6 +1424,9 @@ TEST_F(CodedStreamTest, InputOver2G) {
   EXPECT_EQ(INT_MAX - 512, input.backup_amount_);
   EXPECT_EQ(0, errors.size());
 }
+
+// ===================================================================
+
 
 }  // namespace
 }  // namespace io

@@ -430,7 +430,7 @@ jspb.utils.joinHash64 = function(bitsLow, bitsHigh) {
 
 /**
  * Individual digits for number->string conversion.
- * @const {!Array.<string>}
+ * @const {!Array.<number>}
  */
 jspb.utils.DIGITS = [
   '0', '1', '2', '3', '4', '5', '6', '7',
