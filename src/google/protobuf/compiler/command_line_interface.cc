@@ -804,8 +804,8 @@ int CommandLineInterface::Run(int argc, const char* const argv[]) {
 
     // Enforce --disallow_services.
     if (disallow_services_ && parsed_file->service_count() > 0) {
-      std::cerr << parsed_file->name() << ": This file contains services, but "
-              "--disallow_services was used." << std::endl;
+      cerr << parsed_file->name() << ": This file contains services, but "
+              "--disallow_services was used." << endl;
       return 1;
     }
 
@@ -816,7 +816,7 @@ int CommandLineInterface::Run(int argc, const char* const argv[]) {
         if (direct_dependencies_.find(parsed_file->dependency(i)->name()) ==
             direct_dependencies_.end()) {
           indirect_imports = true;
-          std::cerr << parsed_file->name() << ": "
+          cerr << parsed_file->name() << ": "
                << StringReplace(direct_dependencies_violation_msg_, "%s",
                                 parsed_file->dependency(i)->name(),
                                 true /* replace_all */)
@@ -1221,7 +1221,7 @@ CommandLineInterface::InterpretArgument(const string& name,
       if (access(disk_path.c_str(), F_OK) < 0) {
         // Try the original path; it may have just happed to have a '=' in it.
         if (access(parts[i].c_str(), F_OK) < 0) {
-          std::cerr << disk_path << ": warning: directory does not exist." << std::endl;
+          cerr << disk_path << ": warning: directory does not exist." << endl;
         } else {
           virtual_path = "";
           disk_path = parts[i];
@@ -1302,9 +1302,9 @@ CommandLineInterface::InterpretArgument(const string& name,
     if (!version_info_.empty()) {
       std::cout << version_info_ << std::endl;
     }
-    std::cout << "libprotoc "
+    cout << "libprotoc "
          << protobuf::internal::VersionString(GOOGLE_PROTOBUF_VERSION)
-         << std::endl;
+         << endl;
     return PARSE_ARGUMENT_DONE_AND_EXIT;  // Exit without running compiler.
 
   } else if (name == "--disallow_services") {
