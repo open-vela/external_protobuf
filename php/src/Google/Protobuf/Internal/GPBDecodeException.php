@@ -1,3 +1,5 @@
+<?php
+
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
 // https://developers.google.com/protocol-buffers/
@@ -28,26 +30,18 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-syntax = "proto2";
+namespace Google\Protobuf\Internal;
 
-option java_package = "com.google.apps.jspb.proto";
-option java_multiple_files = true;
-
-package jspb.exttest;
-
-message TestExtensionsMessage {
-  optional int32 intfield = 1;
-  extensions 100 to max;
-}
-
-message ExtensionMessage {
-  extend TestExtensionsMessage {
-    optional ExtensionMessage ext_field = 100;
-  }
-  optional string ext1 = 1;
-}
-
-extend TestExtensionsMessage {
-  optional ExtensionMessage floating_msg_field = 101;
-  optional string floating_str_field = 102;
+class GPBDecodeException extends \Exception
+{
+    public function __construct(
+        $message,
+        $code = 0,
+        \Exception $previous = null)
+    {
+        parent::__construct(
+            "Error occurred during parsing: " . $message,
+            $code,
+            $previous);
+    }
 }

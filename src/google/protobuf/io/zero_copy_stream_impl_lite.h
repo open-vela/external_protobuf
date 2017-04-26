@@ -399,7 +399,7 @@ inline std::pair<char*, bool> as_string_data(string* s) {
 #ifdef LANG_CXX11
   return std::make_pair(p, true);
 #else
-  return std::make_pair(p, p != NULL);
+  return make_pair(p, p != NULL);
 #endif
 }
 
