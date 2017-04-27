@@ -58,7 +58,7 @@ void InitEmptyString() {
   OnShutdown(&DeleteEmptyString);
 }
 
-size_t StringSpaceUsedExcludingSelfLong(const string& str) {
+int StringSpaceUsedExcludingSelf(const string& str) {
   const void* start = &str;
   const void* end = &str + 1;
   if (start <= str.data() && str.data() < end) {

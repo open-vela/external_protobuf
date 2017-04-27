@@ -751,13 +751,23 @@ class RepeatedFieldTest extends PHPUnit_Framework_TestCase
         $arr []= $sub_m;
         $this->assertSame(1, $arr[0]->getA());
 
-        $this->assertEquals(1, count($arr));
+        $null = null;
+        $arr []= $null;
+        $this->assertNull($arr[1]);
+
+        $this->assertEquals(2, count($arr));
+
+        for ($i = 0; $i < count($arr); $i++) {
+            $arr[$i] = $null;
+            $this->assertNull($arr[$i]);
+        }
 
         // Test set.
-        $sub_m = new TestMessage_Sub();
-        $sub_m->setA(2);
         $arr [0]= $sub_m;
-        $this->assertSame(2, $arr[0]->getA());
+        $this->assertSame(1, $arr[0]->getA());
+
+        $arr [1]= $null;
+        $this->assertNull($arr[1]);
     }
 
     /**
@@ -805,27 +815,6 @@ class RepeatedFieldTest extends PHPUnit_Framework_TestCase
     {
         $arr = new RepeatedField(GPBType::MESSAGE, TestMessage_Sub::class);
         $arr []= new TestMessage;
-    }
-
-    /**
-     * @expectedException PHPUnit_Framework_Error
-     */
-    public function testMessageAppendNullFail()
-    {
-        $arr = new RepeatedField(GPBType::MESSAGE, TestMessage_Sub::class);
-        $null = null;
-        $arr []= $null;
-    }
-
-    /**
-     * @expectedException PHPUnit_Framework_Error
-     */
-    public function testMessageSetNullFail()
-    {
-        $arr = new RepeatedField(GPBType::MESSAGE, TestMessage_Sub::class);
-        $arr []= new TestMessage_Sub();
-        $null = null;
-        $arr[0] = $null;
     }
 
     #########################################################

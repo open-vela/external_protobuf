@@ -314,7 +314,6 @@ GenerateParsingDoneCode(io::Printer* printer) const {
   // noop for enums
 }
 
-
 void ImmutableEnumFieldLiteGenerator::
 GenerateSerializationCode(io::Printer* printer) const {
   printer->Print(variables_,
@@ -423,7 +422,6 @@ GenerateMembers(io::Printer* printer) const {
     "  }\n"
     "}\n");
 }
-
 
 void ImmutableEnumOneofFieldLiteGenerator::
 GenerateBuilderMembers(io::Printer* printer) const {
@@ -708,7 +706,6 @@ GenerateMembers(io::Printer* printer) const {
       "}\n");
   }
 }
-
 
 void RepeatedImmutableEnumFieldLiteGenerator::
 GenerateBuilderMembers(io::Printer* printer) const {
