@@ -95,9 +95,6 @@ class DescriptorPool
         foreach ($descriptor->getNestedType() as $nested_type) {
             $this->addDescriptor($nested_type);
         }
-        foreach ($descriptor->getEnumType() as $enum_type) {
-            $this->addEnumDescriptor($enum_type);
-        }
     }
 
     public function addEnumDescriptor($descriptor)
