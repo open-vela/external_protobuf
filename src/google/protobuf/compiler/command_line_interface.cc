@@ -804,8 +804,8 @@ int CommandLineInterface::Run(int argc, const char* const argv[]) {
 
     // Enforce --disallow_services.
     if (disallow_services_ && parsed_file->service_count() > 0) {
-      std::cerr << parsed_file->name() << ": This file contains services, but "
-              "--disallow_services was used." << std::endl;
+      cerr << parsed_file->name() << ": This file contains services, but "
+              "--disallow_services was used." << endl;
       return 1;
     }
 
@@ -1303,9 +1303,9 @@ CommandLineInterface::InterpretArgument(const string& name,
     if (!version_info_.empty()) {
       std::cout << version_info_ << std::endl;
     }
-    std::cout << "libprotoc "
+    cout << "libprotoc "
          << protobuf::internal::VersionString(GOOGLE_PROTOBUF_VERSION)
-         << std::endl;
+         << endl;
     return PARSE_ARGUMENT_DONE_AND_EXIT;  // Exit without running compiler.
 
   } else if (name == "--disallow_services") {
