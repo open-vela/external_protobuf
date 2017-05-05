@@ -35,12 +35,7 @@
 #ifndef GOOGLE_PROTOBUF_COMMON_H__
 #define GOOGLE_PROTOBUF_COMMON_H__
 
-#include <algorithm>
-#include <iostream>
-#include <map>
-#include <set>
 #include <string>
-#include <vector>
 
 #include <google/protobuf/stubs/port.h>
 #include <google/protobuf/stubs/macros.h>
@@ -225,14 +220,7 @@ class FatalException : public std::exception {
 
 // This is at the end of the file instead of the beginning to work around a bug
 // in some versions of MSVC.
-// TODO(acozzette): remove these using statements
-using std::istream;
-using std::map;
-using std::ostream;
-using std::pair;
-using std::set;
-using std::string;
-using std::vector;
+using namespace std;  // Don't do this at home, kids.
 
 }  // namespace protobuf
 }  // namespace google
