@@ -49,9 +49,9 @@ ExtensionGenerator::ExtensionGenerator(const string& root_class_name,
   if (descriptor->is_map()) {
     // NOTE: src/google/protobuf/compiler/plugin.cc makes use of cerr for some
     // error cases, so it seems to be ok to use as a back door for errors.
-    std::cerr << "error: Extension is a map<>!"
-         << " That used to be blocked by the compiler." << std::endl;
-    std::cerr.flush();
+    cerr << "error: Extension is a map<>!"
+         << " That used to be blocked by the compiler." << endl;
+    cerr.flush();
     abort();
   }
 }

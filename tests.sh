@@ -545,12 +545,7 @@ build_php7.0_mac() {
   popd
 }
 
-build_php_compatibility() {
-  internal_build_cpp
-  php/tests/compatibility_test.sh
-}
-
-build_php_all_32() {
+build_php_all() {
   build_php5.5
   build_php5.6
   build_php7.0
@@ -560,11 +555,6 @@ build_php_all_32() {
   build_php5.5_zts_c
   build_php5.6_zts_c
   build_php7.0_zts_c
-}
-
-build_php_all() {
-  build_php_all_32
-  build_php_compatibility
 }
 
 # Note: travis currently does not support testing more than one language so the
@@ -605,7 +595,6 @@ Usage: $0 { cpp |
             php5.6_c |
             php7.0   |
             php7.0_c |
-            php_compatibility |
             php_all)
 "
   exit 1
