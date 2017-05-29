@@ -1167,7 +1167,6 @@ static void putrawmsg(MessageHeader* msg, const Descriptor* desc,
        upb_msg_field_next(&i)) {
     upb_fielddef* f = upb_msg_iter_field(&i);
     uint32_t offset = desc->layout->fields[upb_fielddef_index(f)].offset;
-    bool containing_oneof = false;
 
     if (upb_fielddef_containingoneof(f)) {
       uint32_t oneof_case_offset =
@@ -1180,7 +1179,6 @@ static void putrawmsg(MessageHeader* msg, const Descriptor* desc,
       }
       // Otherwise, fall through to the appropriate singular-field handler
       // below.
-      containing_oneof = true;
     }
 
     if (is_map_field(f)) {
@@ -1211,7 +1209,7 @@ static void putrawmsg(MessageHeader* msg, const Descriptor* desc,
 #define T(upbtypeconst, upbtype, ctype, default_value)     \
   case upbtypeconst: {                                     \
     ctype value = DEREF(message_data(msg), offset, ctype); \
-    if (containing_oneof || value != default_value) {      \
+    if (value != default_value) {                          \
       upb_sink_put##upbtype(sink, sel, value);             \
     }                                                      \
   } break;

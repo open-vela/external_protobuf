@@ -88,8 +88,6 @@ class GeneratedCodeInfo_Annotation extends \Google\Protobuf\Internal\Message
         $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::INT32);
         $this->path = $arr;
         $this->has_path = true;
-
-        return $this;
     }
 
     public function hasPath()
@@ -121,8 +119,6 @@ class GeneratedCodeInfo_Annotation extends \Google\Protobuf\Internal\Message
         GPBUtil::checkString($var, True);
         $this->source_file = $var;
         $this->has_source_file = true;
-
-        return $this;
     }
 
     public function hasSourceFile()
@@ -156,8 +152,6 @@ class GeneratedCodeInfo_Annotation extends \Google\Protobuf\Internal\Message
         GPBUtil::checkInt32($var);
         $this->begin = $var;
         $this->has_begin = true;
-
-        return $this;
     }
 
     public function hasBegin()
@@ -193,8 +187,6 @@ class GeneratedCodeInfo_Annotation extends \Google\Protobuf\Internal\Message
         GPBUtil::checkInt32($var);
         $this->end = $var;
         $this->has_end = true;
-
-        return $this;
     }
 
     public function hasEnd()

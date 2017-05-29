@@ -145,15 +145,6 @@ std::string FullClassName(const DescriptorType* desc, bool is_descriptor) {
   }
   classname = ClassNamePrefix(classname, desc) + classname;
 
-  if (desc->file()->options().has_php_namespace()) {
-    const string& php_namespace = desc->file()->options().php_namespace();
-    if (php_namespace != "") {
-      return php_namespace + '\\' + classname;
-    } else {
-      return classname;
-    }
-  }
-
   if (desc->file()->package() == "") {
     return classname;
   } else {
@@ -539,8 +530,6 @@ void GenerateFieldAccessor(const FieldDescriptor* field, bool is_descriptor,
         "field_name", field->name());
   }
 
-  printer->Print("\nreturn $this;\n");
-
   Outdent(printer);
 
   printer->Print(
@@ -831,14 +820,7 @@ void GenerateEnumFile(const FileDescriptor* file, const EnumDescriptor* en,
   std::string fullname = FilenameToClassname(filename);
   int lastindex = fullname.find_last_of("\\");
 
-  if (file->options().has_php_namespace()) {
-    const string& php_namespace = file->options().php_namespace();
-    if (!php_namespace.empty()) {
-      printer.Print(
-          "namespace ^name^;\n\n",
-          "name", php_namespace);
-    }
-  } else if (!file->package().empty()) {
+  if (!file->package().empty()) {
     printer.Print(
         "namespace ^name^;\n\n",
         "name", fullname.substr(0, lastindex));
@@ -890,14 +872,7 @@ void GenerateMessageFile(const FileDescriptor* file, const Descriptor* message,
   std::string fullname = FilenameToClassname(filename);
   int lastindex = fullname.find_last_of("\\");
 
-  if (file->options().has_php_namespace()) {
-    const string& php_namespace = file->options().php_namespace();
-    if (!php_namespace.empty()) {
-      printer.Print(
-          "namespace ^name^;\n\n",
-          "name", php_namespace);
-    }
-  } else if (!file->package().empty()) {
+  if (!file->package().empty()) {
     printer.Print(
         "namespace ^name^;\n\n",
         "name", fullname.substr(0, lastindex));

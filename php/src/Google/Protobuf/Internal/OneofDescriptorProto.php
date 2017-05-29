@@ -52,8 +52,6 @@ class OneofDescriptorProto extends \Google\Protobuf\Internal\Message
         GPBUtil::checkString($var, True);
         $this->name = $var;
         $this->has_name = true;
-
-        return $this;
     }
 
     public function hasName()
@@ -77,8 +75,6 @@ class OneofDescriptorProto extends \Google\Protobuf\Internal\Message
         GPBUtil::checkMessage($var, \Google\Protobuf\Internal\OneofOptions::class);
         $this->options = $var;
         $this->has_options = true;
-
-        return $this;
     }
 
     public function hasOptions()

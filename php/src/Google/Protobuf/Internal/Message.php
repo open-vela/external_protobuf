@@ -373,7 +373,7 @@ class Message
             $getter = $field->getGetter();
             while ($input->bytesUntilLimit() > 0) {
                 self::parseFieldFromStreamNoTag($input, $field, $value);
-                $this->appendHelper($field, $value);
+                $this->$getter()[] = $value;
             }
             $input->popLimit($limit);
             return;
@@ -382,9 +382,11 @@ class Message
         }
 
         if ($field->isMap()) {
-            $this->kvUpdateHelper($field, $value->getKey(), $value->getValue());
+            $getter = $field->getGetter();
+            $this->$getter()[$value->getKey()] = $value->getValue();
         } else if ($field->isRepeated()) {
-            $this->appendHelper($field, $value);
+            $getter = $field->getGetter();
+            $this->$getter()[] = $value;
         } else {
             $setter = $field->getSetter();
             $this->$setter($value);
@@ -531,10 +533,9 @@ class Message
                           $klass = $value_field->getMessageType()->getClass();
                           $copy = new $klass;
                           $copy->mergeFrom($value);
-
-                          $this->kvUpdateHelper($field, $key, $copy);
+                          $this->$getter()[$key] = $copy;
                       } else {
-                          $this->kvUpdateHelper($field, $key, $value);
+                          $this->$getter()[$key] = $value;
                       }
                   }
               }
@@ -545,9 +546,9 @@ class Message
                           $klass = $field->getMessageType()->getClass();
                           $copy = new $klass;
                           $copy->mergeFrom($tmp);
-                          $this->appendHelper($field, $copy);
+                          $this->$getter()[] = $copy;
                       } else {
-                          $this->appendHelper($field, $tmp);
+                          $this->$getter()[] = $tmp;
                       }
                   }
               }
@@ -738,13 +739,6 @@ class Message
      */
     private function existField($field)
     {
-        $oneof_index = $field->getOneofIndex();
-        if ($oneof_index !== -1) {
-            $oneof = $this->desc->getOneofDecl()[$oneof_index];
-            $oneof_name = $oneof->getName();
-            return $this->$oneof_name->getNumber() === $field->getNumber();
-        }
-
         $getter = $field->getGetter();
         $value = $this->$getter();
         return $value !== $this->defaultValue($field);
@@ -894,31 +888,5 @@ class Message
             $size += $this->fieldByteSize($field);
         }
         return $size;
-    }
-
-    private function appendHelper($field, $append_value)
-    {
-        $getter = $field->getGetter();
-        $setter = $field->getSetter();
-
-        $field_arr_value = $this->$getter();
-        $field_arr_value[] = $append_value;
-
-        if (!is_object($field_arr_value)) {
-            $this->$setter($field_arr_value);
-        }
-    }
-
-    private function kvUpdateHelper($field, $update_key, $update_value)
-    {
-        $getter = $field->getGetter();
-        $setter = $field->getSetter();
-
-        $field_arr_value = $this->$getter();
-        $field_arr_value[$update_key] = $update_value;
-
-        if (!is_object($field_arr_value)) {
-            $this->$setter($field_arr_value);
-        }
     }
 }

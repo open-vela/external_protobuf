@@ -100,7 +100,7 @@ namespace internal {
 // choose 16 rather than some other number just in case the compiler would
 // be confused by an unaligned pointer.
 #define GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TYPE, FIELD)  \
-  static_cast<int>(                                                  \
+  static_cast< ::google::protobuf::uint32>(                           \
       reinterpret_cast<const char*>(                                 \
           &reinterpret_cast<const TYPE*>(16)->FIELD) -               \
       reinterpret_cast<const char*>(16))
@@ -164,7 +164,7 @@ class ExplicitlyConstructed {
 
 // Default empty string object. Don't use this directly. Instead, call
 // GetEmptyString() to get the reference.
-LIBPROTOBUF_EXPORT extern ExplicitlyConstructed< ::std::string> fixed_address_empty_string;
+extern ExplicitlyConstructed< ::std::string> fixed_address_empty_string;
 LIBPROTOBUF_EXPORT extern ProtobufOnceType empty_string_once_init_;
 LIBPROTOBUF_EXPORT void InitEmptyString();
 
