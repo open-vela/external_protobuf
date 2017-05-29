@@ -57,8 +57,6 @@ class ServiceDescriptorProto extends \Google\Protobuf\Internal\Message
         GPBUtil::checkString($var, True);
         $this->name = $var;
         $this->has_name = true;
-
-        return $this;
     }
 
     public function hasName()
@@ -82,8 +80,6 @@ class ServiceDescriptorProto extends \Google\Protobuf\Internal\Message
         $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Google\Protobuf\Internal\MethodDescriptorProto::class);
         $this->method = $arr;
         $this->has_method = true;
-
-        return $this;
     }
 
     public function hasMethod()
@@ -107,8 +103,6 @@ class ServiceDescriptorProto extends \Google\Protobuf\Internal\Message
         GPBUtil::checkMessage($var, \Google\Protobuf\Internal\ServiceOptions::class);
         $this->options = $var;
         $this->has_options = true;
-
-        return $this;
     }
 
     public function hasOptions()

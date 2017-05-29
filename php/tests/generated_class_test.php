@@ -9,11 +9,9 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\MapField;
 use Google\Protobuf\Internal\GPBType;
 use Foo\TestEnum;
-use Foo\TestIncludeNamespaceMessage;
 use Foo\TestIncludePrefixMessage;
 use Foo\TestMessage;
 use Foo\TestMessage_Sub;
-use Php\Test\TestNamespace;
 
 class GeneratedClassTest extends TestBase
 {
@@ -743,44 +741,24 @@ class GeneratedClassTest extends TestBase
         $n->setOptionalInt32(100);
         $sub1 = new TestMessage_Sub();
         $sub1->setA(101);
-
-        $b = $sub1->getB();
-        $b[] = 102;
-        $sub1->setB($b);
-
+        $sub1->getB()[] = 102;
         $n->setOptionalMessage($sub1);
 
         // Repeated
-        $repeatedInt32 = $n->getRepeatedInt32();
-        $repeatedInt32[] = 200;
-        $n->setRepeatedInt32($repeatedInt32);
-
-        $repeatedString = $n->getRepeatedString();
-        $repeatedString[] = 'abc';
-        $n->setRepeatedString($repeatedString);
-
+        $n->getRepeatedInt32()[] = 200;
+        $n->getRepeatedString()[] = 'abc';
         $sub2 = new TestMessage_Sub();
         $sub2->setA(201);
-        $repeatedMessage = $n->getRepeatedMessage();
-        $repeatedMessage[] = $sub2;
-        $n->setRepeatedMessage($repeatedMessage);
+        $n->getRepeatedMessage()[] = $sub2;
 
         // Map
-        $mapInt32Int32 = $n->getMapInt32Int32();
-        $mapInt32Int32[1] = 300;
-        $mapInt32Int32[-62] = 301;
-        $n->setMapInt32Int32($mapInt32Int32);
-
-        $mapStringString = $n->getMapStringString();
-        $mapStringString['def'] = 'def';
-        $n->setMapStringString($mapStringString);
-
-        $mapInt32Message = $n->getMapInt32Message();
-        $mapInt32Message[1] = new TestMessage_Sub();
-        $mapInt32Message[1]->setA(302);
-        $mapInt32Message[2] = new TestMessage_Sub();
-        $mapInt32Message[2]->setA(303);
-        $n->setMapInt32Message($mapInt32Message);
+        $n->getMapInt32Int32()[1] = 300;
+        $n->getMapInt32Int32()[-62] = 301;
+        $n->getMapStringString()['def'] = 'def';
+        $n->getMapInt32Message()[1] = new TestMessage_Sub();
+        $n->getMapInt32Message()[1]->setA(302);
+        $n->getMapInt32Message()[2] = new TestMessage_Sub();
+        $n->getMapInt32Message()[2]->setA(303);
 
         $m->mergeFrom($n);
 
@@ -815,16 +793,9 @@ class GeneratedClassTest extends TestBase
         // Check sub-messages are copied by value.
         $n->getOptionalMessage()->setA(-101);
         $this->assertSame(101, $m->getOptionalMessage()->getA());
-
-        $repeatedMessage = $n->getRepeatedMessage();
-        $repeatedMessage[0]->setA(-201);
-        $n->setRepeatedMessage($repeatedMessage);
+        $n->getRepeatedMessage()[0]->setA(-201);
         $this->assertSame(201, $m->getRepeatedMessage()[2]->getA());
-
-        $mapInt32Message = $n->getMapInt32Message();
-        $mapInt32Message[1]->setA(-302);
-        $n->setMapInt32Message($mapInt32Message);
-
+        $n->getMapInt32Message()[1]->setA(-302);
         $this->assertSame(302, $m->getMapInt32Message()[1]->getA());
 
         // Test merge oneof.
@@ -870,9 +841,7 @@ class GeneratedClassTest extends TestBase
         $m = new TestMessage();
         $sub = new NoNameSpaceMessage();
         $m->setOptionalNoNamespaceMessage($sub);
-        $repeatedNoNamespaceMessage = $m->getRepeatedNoNamespaceMessage();
-        $repeatedNoNamespaceMessage[] = new NoNameSpaceMessage();
-        $m->setRepeatedNoNamespaceMessage($repeatedNoNamespaceMessage);
+        $m->getRepeatedNoNamespaceMessage()[] = new NoNameSpaceMessage();
 
         $n = new NoNamespaceMessage();
         $n->setB(NoNamespaceMessage_NestedEnum::ZERO);
@@ -882,9 +851,7 @@ class GeneratedClassTest extends TestBase
     {
         $m = new TestMessage();
         $m->setOptionalNoNamespaceEnum(NoNameSpaceEnum::VALUE_A);
-        $repeatedNoNamespaceEnum = $m->getRepeatedNoNamespaceEnum();
-        $repeatedNoNamespaceEnum[] = NoNameSpaceEnum::VALUE_A;
-        $m->setRepeatedNoNamespaceEnum($repeatedNoNamespaceEnum);
+        $m->getRepeatedNoNamespaceEnum()[] = NoNameSpaceEnum::VALUE_A;
     }
 
     #########################################################
@@ -901,25 +868,6 @@ class GeneratedClassTest extends TestBase
     }
 
     #########################################################
-    # Test message with given namespace.
-    #########################################################
-
-    public function testNamespaceMessage()
-    {
-        $m = new TestIncludeNamespaceMessage();
-
-        $n = new TestNamespace();
-        $n->setA(1);
-        $m->setNamespaceMessage($n);
-        $this->assertSame(1, $m->getNamespaceMessage()->getA());
-
-        $n = new TestEmptyNamespace();
-        $n->setA(1);
-        $m->setEmptyNamespaceMessage($n);
-        $this->assertSame(1, $m->getEmptyNamespaceMessage()->getA());
-    }
-
-    #########################################################
     # Test prefix for reserved words.
     #########################################################
 
@@ -929,18 +877,5 @@ class GeneratedClassTest extends TestBase
         $m = new \Foo\PBEmpty();
         $m = new \PrefixEmpty();
         $m = new \Foo\PBARRAY();
-    }
-
-    #########################################################
-    # Test fluent setters.
-    #########################################################
-
-    public function testFluentSetters()
-    {
-        $m = (new TestMessage())
-            ->setOptionalInt32(1)
-            ->setOptionalUInt32(2);
-        $this->assertSame(1, $m->getOptionalInt32());
-        $this->assertSame(2, $m->getOptionalUInt32());
     }
 }

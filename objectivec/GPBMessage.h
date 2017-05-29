@@ -292,9 +292,6 @@ CF_EXTERN_C_END
  * Writes out the message to the given coded output stream.
  *
  * @param output The coded output stream into which to write the message.
- *
- * @note This can raise the GPBCodedOutputStreamException_* exceptions.
- *
  **/
 - (void)writeToCodedOutputStream:(GPBCodedOutputStream *)output;
 
@@ -302,8 +299,6 @@ CF_EXTERN_C_END
  * Writes out the message to the given output stream.
  *
  * @param output The output stream into which to write the message.
- *
- * @note This can raise the GPBCodedOutputStreamException_* exceptions.
  **/
 - (void)writeToOutputStream:(NSOutputStream *)output;
 
@@ -312,8 +307,6 @@ CF_EXTERN_C_END
  * the given output stream.
  *
  * @param output The coded output stream into which to write the message.
- *
- * @note This can raise the GPBCodedOutputStreamException_* exceptions.
  **/
 - (void)writeDelimitedToCodedOutputStream:(GPBCodedOutputStream *)output;
 
@@ -322,8 +315,6 @@ CF_EXTERN_C_END
  * the given output stream.
  *
  * @param output The output stream into which to write the message.
- *
- * @note This can raise the GPBCodedOutputStreamException_* exceptions.
  **/
 - (void)writeDelimitedToOutputStream:(NSOutputStream *)output;
 

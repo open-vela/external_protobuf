@@ -88,13 +88,6 @@ class EncodeDecodeTest extends TestBase
         $n = new TestMessage();
         $n->mergeFromString($data);
         $this->assertSame(1, $n->getOneofMessage()->getA());
-
-        // Encode default value
-        $m->setOneofEnum(TestEnum::ZERO);
-        $data = $m->serializeToString();
-        $n = new TestMessage();
-        $n->mergeFromString($data);
-        $this->assertSame("oneof_enum", $n->getMyOneof());
     }
 
     public function testPackedEncode()

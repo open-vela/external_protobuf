@@ -15,7 +15,7 @@ namespace protobuf {
 namespace util {
 
 TEST(DelimitedMessageUtilTest, DelimitedMessages) {
-  std::stringstream stream;
+  stringstream stream;
 
   {
     protobuf_unittest::TestAllTypes message1;

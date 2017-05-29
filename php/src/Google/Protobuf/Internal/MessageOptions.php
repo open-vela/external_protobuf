@@ -155,8 +155,6 @@ class MessageOptions extends \Google\Protobuf\Internal\Message
         GPBUtil::checkBool($var);
         $this->message_set_wire_format = $var;
         $this->has_message_set_wire_format = true;
-
-        return $this;
     }
 
     public function hasMessageSetWireFormat()
@@ -192,8 +190,6 @@ class MessageOptions extends \Google\Protobuf\Internal\Message
         GPBUtil::checkBool($var);
         $this->no_standard_descriptor_accessor = $var;
         $this->has_no_standard_descriptor_accessor = true;
-
-        return $this;
     }
 
     public function hasNoStandardDescriptorAccessor()
@@ -231,8 +227,6 @@ class MessageOptions extends \Google\Protobuf\Internal\Message
         GPBUtil::checkBool($var);
         $this->deprecated = $var;
         $this->has_deprecated = true;
-
-        return $this;
     }
 
     public function hasDeprecated()
@@ -298,8 +292,6 @@ class MessageOptions extends \Google\Protobuf\Internal\Message
         GPBUtil::checkBool($var);
         $this->map_entry = $var;
         $this->has_map_entry = true;
-
-        return $this;
     }
 
     public function hasMapEntry()
@@ -331,8 +323,6 @@ class MessageOptions extends \Google\Protobuf\Internal\Message
         $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Google\Protobuf\Internal\UninterpretedOption::class);
         $this->uninterpreted_option = $arr;
         $this->has_uninterpreted_option = true;
-
-        return $this;
     }
 
     public function hasUninterpretedOption()

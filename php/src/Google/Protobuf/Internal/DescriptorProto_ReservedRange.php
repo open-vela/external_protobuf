@@ -70,8 +70,6 @@ class DescriptorProto_ReservedRange extends \Google\Protobuf\Internal\Message
         GPBUtil::checkInt32($var);
         $this->start = $var;
         $this->has_start = true;
-
-        return $this;
     }
 
     public function hasStart()
@@ -103,8 +101,6 @@ class DescriptorProto_ReservedRange extends \Google\Protobuf\Internal\Message
         GPBUtil::checkInt32($var);
         $this->end = $var;
         $this->has_end = true;
-
-        return $this;
     }
 
     public function hasEnd()
