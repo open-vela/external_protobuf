@@ -759,6 +759,7 @@ bool ConformanceTestSuite::RunSuite(ConformanceTestRunner* runner,
   });
   TestValidDataForType(FieldDescriptor::TYPE_FLOAT, {
     {flt(0.1), "0.1"},
+    {flt(1.00000075e-36), "1.00000075e-36"},
     {flt(3.402823e+38), "3.402823e+38"},  // 3.40282347e+38
     {flt(1.17549435e-38f), "1.17549435e-38"}
   });
@@ -1232,7 +1233,7 @@ bool ConformanceTestSuite::RunSuite(ConformanceTestRunner* runner,
       "Int32FieldNegativeWithLeadingZero", REQUIRED,
       R"({"optionalInt32": -01})");
   // String values must follow the same syntax rule. Specifically leading
-  // or traling spaces are not allowed.
+  // or trailing spaces are not allowed.
   ExpectParseFailureForJson(
       "Int32FieldLeadingSpace", REQUIRED,
       R"({"optionalInt32": " 1"})");
