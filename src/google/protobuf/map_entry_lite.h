@@ -250,11 +250,11 @@ class MapEntryImpl : public Base {
   int GetCachedSize() const {
     int size = 0;
     size += has_key()
-        ? static_cast<int>(kTagSize + KeyTypeHandler::GetCachedSize(key()))
+        ? kTagSize + KeyTypeHandler::GetCachedSize(key())
         : 0;
     size += has_value()
-        ? static_cast<int>(kTagSize + ValueTypeHandler::GetCachedSize(
-            value()))
+        ? kTagSize + ValueTypeHandler::GetCachedSize(
+            value())
         : 0;
     return size;
   }
