@@ -239,17 +239,16 @@ Version::Version(const Version& from)
     suffix_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.suffix_);
   }
   ::memcpy(&major_, &from.major_,
-    static_cast<size_t>(reinterpret_cast<char*>(&patch_) -
-    reinterpret_cast<char*>(&major_)) + sizeof(patch_));
+    reinterpret_cast<char*>(&patch_) -
+    reinterpret_cast<char*>(&major_) + sizeof(patch_));
   // @@protoc_insertion_point(copy_constructor:google.protobuf.compiler.Version)
 }
 
 void Version::SharedCtor() {
   _cached_size_ = 0;
   suffix_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  ::memset(&major_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&patch_) -
-      reinterpret_cast<char*>(&major_)) + sizeof(patch_));
+  ::memset(&major_, 0, reinterpret_cast<char*>(&patch_) -
+    reinterpret_cast<char*>(&major_) + sizeof(patch_));
 }
 
 Version::~Version() {
@@ -291,9 +290,8 @@ void Version::Clear() {
     (*suffix_.UnsafeRawStringPointer())->clear();
   }
   if (_has_bits_[0 / 32] & 14u) {
-    ::memset(&major_, 0, static_cast<size_t>(
-        reinterpret_cast<char*>(&patch_) -
-        reinterpret_cast<char*>(&major_)) + sizeof(patch_));
+    ::memset(&major_, 0, reinterpret_cast<char*>(&patch_) -
+      reinterpret_cast<char*>(&major_) + sizeof(patch_));
   }
   _has_bits_.Clear();
   _internal_metadata_.Clear();
@@ -358,7 +356,7 @@ bool Version::MergePartialFromCodedStream(
           DO_(::google::protobuf::internal::WireFormatLite::ReadString(
                 input, this->mutable_suffix()));
           ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
-            this->suffix().data(), static_cast<int>(this->suffix().length()),
+            this->suffix().data(), this->suffix().length(),
             ::google::protobuf::internal::WireFormat::PARSE,
             "google.protobuf.compiler.Version.suffix");
         } else {
@@ -414,7 +412,7 @@ void Version::SerializeWithCachedSizes(
   // optional string suffix = 4;
   if (cached_has_bits & 0x00000001u) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
-      this->suffix().data(), static_cast<int>(this->suffix().length()),
+      this->suffix().data(), this->suffix().length(),
       ::google::protobuf::internal::WireFormat::SERIALIZE,
       "google.protobuf.compiler.Version.suffix");
     ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
@@ -453,7 +451,7 @@ void Version::SerializeWithCachedSizes(
   // optional string suffix = 4;
   if (cached_has_bits & 0x00000001u) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
-      this->suffix().data(), static_cast<int>(this->suffix().length()),
+      this->suffix().data(), this->suffix().length(),
       ::google::protobuf::internal::WireFormat::SERIALIZE,
       "google.protobuf.compiler.Version.suffix");
     target =
@@ -847,7 +845,7 @@ bool CodeGeneratorRequest::MergePartialFromCodedStream(
                 input, this->add_file_to_generate()));
           ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
             this->file_to_generate(this->file_to_generate_size() - 1).data(),
-            static_cast<int>(this->file_to_generate(this->file_to_generate_size() - 1).length()),
+            this->file_to_generate(this->file_to_generate_size() - 1).length(),
             ::google::protobuf::internal::WireFormat::PARSE,
             "google.protobuf.compiler.CodeGeneratorRequest.file_to_generate");
         } else {
@@ -863,7 +861,7 @@ bool CodeGeneratorRequest::MergePartialFromCodedStream(
           DO_(::google::protobuf::internal::WireFormatLite::ReadString(
                 input, this->mutable_parameter()));
           ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
-            this->parameter().data(), static_cast<int>(this->parameter().length()),
+            this->parameter().data(), this->parameter().length(),
             ::google::protobuf::internal::WireFormat::PARSE,
             "google.protobuf.compiler.CodeGeneratorRequest.parameter");
         } else {
@@ -927,7 +925,7 @@ void CodeGeneratorRequest::SerializeWithCachedSizes(
   // repeated string file_to_generate = 1;
   for (int i = 0, n = this->file_to_generate_size(); i < n; i++) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
-      this->file_to_generate(i).data(), static_cast<int>(this->file_to_generate(i).length()),
+      this->file_to_generate(i).data(), this->file_to_generate(i).length(),
       ::google::protobuf::internal::WireFormat::SERIALIZE,
       "google.protobuf.compiler.CodeGeneratorRequest.file_to_generate");
     ::google::protobuf::internal::WireFormatLite::WriteString(
@@ -938,7 +936,7 @@ void CodeGeneratorRequest::SerializeWithCachedSizes(
   // optional string parameter = 2;
   if (cached_has_bits & 0x00000001u) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
-      this->parameter().data(), static_cast<int>(this->parameter().length()),
+      this->parameter().data(), this->parameter().length(),
       ::google::protobuf::internal::WireFormat::SERIALIZE,
       "google.protobuf.compiler.CodeGeneratorRequest.parameter");
     ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
@@ -952,10 +950,9 @@ void CodeGeneratorRequest::SerializeWithCachedSizes(
   }
 
   // repeated .google.protobuf.FileDescriptorProto proto_file = 15;
-  for (unsigned int i = 0,
-      n = static_cast<unsigned int>(this->proto_file_size()); i < n; i++) {
+  for (unsigned int i = 0, n = this->proto_file_size(); i < n; i++) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      15, this->proto_file(static_cast<int>(i)), output);
+      15, this->proto_file(i), output);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -974,7 +971,7 @@ void CodeGeneratorRequest::SerializeWithCachedSizes(
   // repeated string file_to_generate = 1;
   for (int i = 0, n = this->file_to_generate_size(); i < n; i++) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
-      this->file_to_generate(i).data(), static_cast<int>(this->file_to_generate(i).length()),
+      this->file_to_generate(i).data(), this->file_to_generate(i).length(),
       ::google::protobuf::internal::WireFormat::SERIALIZE,
       "google.protobuf.compiler.CodeGeneratorRequest.file_to_generate");
     target = ::google::protobuf::internal::WireFormatLite::
@@ -985,7 +982,7 @@ void CodeGeneratorRequest::SerializeWithCachedSizes(
   // optional string parameter = 2;
   if (cached_has_bits & 0x00000001u) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
-      this->parameter().data(), static_cast<int>(this->parameter().length()),
+      this->parameter().data(), this->parameter().length(),
       ::google::protobuf::internal::WireFormat::SERIALIZE,
       "google.protobuf.compiler.CodeGeneratorRequest.parameter");
     target =
@@ -1001,11 +998,10 @@ void CodeGeneratorRequest::SerializeWithCachedSizes(
   }
 
   // repeated .google.protobuf.FileDescriptorProto proto_file = 15;
-  for (unsigned int i = 0,
-      n = static_cast<unsigned int>(this->proto_file_size()); i < n; i++) {
+  for (unsigned int i = 0, n = this->proto_file_size(); i < n; i++) {
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageNoVirtualToArray(
-        15, this->proto_file(static_cast<int>(i)), deterministic, target);
+        15, this->proto_file(i), deterministic, target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -1035,12 +1031,12 @@ size_t CodeGeneratorRequest::ByteSizeLong() const {
 
   // repeated .google.protobuf.FileDescriptorProto proto_file = 15;
   {
-    unsigned int count = static_cast<unsigned int>(this->proto_file_size());
+    unsigned int count = this->proto_file_size();
     total_size += 1UL * count;
     for (unsigned int i = 0; i < count; i++) {
       total_size +=
         ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
-          this->proto_file(static_cast<int>(i)));
+          this->proto_file(i));
     }
   }
 
@@ -1468,7 +1464,7 @@ bool CodeGeneratorResponse_File::MergePartialFromCodedStream(
           DO_(::google::protobuf::internal::WireFormatLite::ReadString(
                 input, this->mutable_name()));
           ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
-            this->name().data(), static_cast<int>(this->name().length()),
+            this->name().data(), this->name().length(),
             ::google::protobuf::internal::WireFormat::PARSE,
             "google.protobuf.compiler.CodeGeneratorResponse.File.name");
         } else {
@@ -1484,7 +1480,7 @@ bool CodeGeneratorResponse_File::MergePartialFromCodedStream(
           DO_(::google::protobuf::internal::WireFormatLite::ReadString(
                 input, this->mutable_insertion_point()));
           ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
-            this->insertion_point().data(), static_cast<int>(this->insertion_point().length()),
+            this->insertion_point().data(), this->insertion_point().length(),
             ::google::protobuf::internal::WireFormat::PARSE,
             "google.protobuf.compiler.CodeGeneratorResponse.File.insertion_point");
         } else {
@@ -1500,7 +1496,7 @@ bool CodeGeneratorResponse_File::MergePartialFromCodedStream(
           DO_(::google::protobuf::internal::WireFormatLite::ReadString(
                 input, this->mutable_content()));
           ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
-            this->content().data(), static_cast<int>(this->content().length()),
+            this->content().data(), this->content().length(),
             ::google::protobuf::internal::WireFormat::PARSE,
             "google.protobuf.compiler.CodeGeneratorResponse.File.content");
         } else {
@@ -1541,7 +1537,7 @@ void CodeGeneratorResponse_File::SerializeWithCachedSizes(
   // optional string name = 1;
   if (cached_has_bits & 0x00000001u) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
-      this->name().data(), static_cast<int>(this->name().length()),
+      this->name().data(), this->name().length(),
       ::google::protobuf::internal::WireFormat::SERIALIZE,
       "google.protobuf.compiler.CodeGeneratorResponse.File.name");
     ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
@@ -1551,7 +1547,7 @@ void CodeGeneratorResponse_File::SerializeWithCachedSizes(
   // optional string insertion_point = 2;
   if (cached_has_bits & 0x00000002u) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
-      this->insertion_point().data(), static_cast<int>(this->insertion_point().length()),
+      this->insertion_point().data(), this->insertion_point().length(),
       ::google::protobuf::internal::WireFormat::SERIALIZE,
       "google.protobuf.compiler.CodeGeneratorResponse.File.insertion_point");
     ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
@@ -1561,7 +1557,7 @@ void CodeGeneratorResponse_File::SerializeWithCachedSizes(
   // optional string content = 15;
   if (cached_has_bits & 0x00000004u) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
-      this->content().data(), static_cast<int>(this->content().length()),
+      this->content().data(), this->content().length(),
       ::google::protobuf::internal::WireFormat::SERIALIZE,
       "google.protobuf.compiler.CodeGeneratorResponse.File.content");
     ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
@@ -1585,7 +1581,7 @@ void CodeGeneratorResponse_File::SerializeWithCachedSizes(
   // optional string name = 1;
   if (cached_has_bits & 0x00000001u) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
-      this->name().data(), static_cast<int>(this->name().length()),
+      this->name().data(), this->name().length(),
       ::google::protobuf::internal::WireFormat::SERIALIZE,
       "google.protobuf.compiler.CodeGeneratorResponse.File.name");
     target =
@@ -1596,7 +1592,7 @@ void CodeGeneratorResponse_File::SerializeWithCachedSizes(
   // optional string insertion_point = 2;
   if (cached_has_bits & 0x00000002u) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
-      this->insertion_point().data(), static_cast<int>(this->insertion_point().length()),
+      this->insertion_point().data(), this->insertion_point().length(),
       ::google::protobuf::internal::WireFormat::SERIALIZE,
       "google.protobuf.compiler.CodeGeneratorResponse.File.insertion_point");
     target =
@@ -1607,7 +1603,7 @@ void CodeGeneratorResponse_File::SerializeWithCachedSizes(
   // optional string content = 15;
   if (cached_has_bits & 0x00000004u) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
-      this->content().data(), static_cast<int>(this->content().length()),
+      this->content().data(), this->content().length(),
       ::google::protobuf::internal::WireFormat::SERIALIZE,
       "google.protobuf.compiler.CodeGeneratorResponse.File.content");
     target =
@@ -2025,7 +2021,7 @@ bool CodeGeneratorResponse::MergePartialFromCodedStream(
           DO_(::google::protobuf::internal::WireFormatLite::ReadString(
                 input, this->mutable_error()));
           ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
-            this->error().data(), static_cast<int>(this->error().length()),
+            this->error().data(), this->error().length(),
             ::google::protobuf::internal::WireFormat::PARSE,
             "google.protobuf.compiler.CodeGeneratorResponse.error");
         } else {
@@ -2078,7 +2074,7 @@ void CodeGeneratorResponse::SerializeWithCachedSizes(
   // optional string error = 1;
   if (cached_has_bits & 0x00000001u) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
-      this->error().data(), static_cast<int>(this->error().length()),
+      this->error().data(), this->error().length(),
       ::google::protobuf::internal::WireFormat::SERIALIZE,
       "google.protobuf.compiler.CodeGeneratorResponse.error");
     ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
@@ -2086,10 +2082,9 @@ void CodeGeneratorResponse::SerializeWithCachedSizes(
   }
 
   // repeated .google.protobuf.compiler.CodeGeneratorResponse.File file = 15;
-  for (unsigned int i = 0,
-      n = static_cast<unsigned int>(this->file_size()); i < n; i++) {
+  for (unsigned int i = 0, n = this->file_size(); i < n; i++) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      15, this->file(static_cast<int>(i)), output);
+      15, this->file(i), output);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -2109,7 +2104,7 @@ void CodeGeneratorResponse::SerializeWithCachedSizes(
   // optional string error = 1;
   if (cached_has_bits & 0x00000001u) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
-      this->error().data(), static_cast<int>(this->error().length()),
+      this->error().data(), this->error().length(),
       ::google::protobuf::internal::WireFormat::SERIALIZE,
       "google.protobuf.compiler.CodeGeneratorResponse.error");
     target =
@@ -2118,11 +2113,10 @@ void CodeGeneratorResponse::SerializeWithCachedSizes(
   }
 
   // repeated .google.protobuf.compiler.CodeGeneratorResponse.File file = 15;
-  for (unsigned int i = 0,
-      n = static_cast<unsigned int>(this->file_size()); i < n; i++) {
+  for (unsigned int i = 0, n = this->file_size(); i < n; i++) {
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageNoVirtualToArray(
-        15, this->file(static_cast<int>(i)), deterministic, target);
+        15, this->file(i), deterministic, target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -2144,12 +2138,12 @@ size_t CodeGeneratorResponse::ByteSizeLong() const {
   }
   // repeated .google.protobuf.compiler.CodeGeneratorResponse.File file = 15;
   {
-    unsigned int count = static_cast<unsigned int>(this->file_size());
+    unsigned int count = this->file_size();
     total_size += 1UL * count;
     for (unsigned int i = 0; i < count; i++) {
       total_size +=
         ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
-          this->file(static_cast<int>(i)));
+          this->file(i));
     }
   }
 
