@@ -43,19 +43,12 @@ def do_test(request)
   begin
     case request.payload
     when :protobuf_payload
-      if request.message_type.eql?('proto3')
-        begin
-          test_message = ProtobufTestMessages::Proto3::TestAllTypes.decode(
-              request.protobuf_payload)
-        rescue Google::Protobuf::ParseError => err
-          response.parse_error = err.message.encode('utf-8')
-          return response
-        end
-      elsif request.message_type.eql?('proto2')
-        response.skipped = "Ruby doesn't support proto2"
+      begin
+        test_message = ProtobufTestMessages::Proto3::TestAllTypes.decode(
+            request.protobuf_payload)
+      rescue Google::Protobuf::ParseError => err
+        response.parse_error = err.message.encode('utf-8')
         return response
-      else 
-        fail "Protobuf request doesn't have specific payload type"
       end
 
     when :json_payload

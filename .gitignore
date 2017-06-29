@@ -134,7 +134,6 @@ conformance/Google/
 conformance/Protobuf_test_messages/
 conformance/conformance-php
 conformance/conformance-php-c
-conformance/*.class
 
 # php test output
 composer.lock
