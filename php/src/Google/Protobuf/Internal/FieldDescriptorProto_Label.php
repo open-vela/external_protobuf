@@ -5,22 +5,24 @@
 namespace Google\Protobuf\Internal;
 
 /**
- * Protobuf enum <code>Google\Protobuf\Internal</code>
+ * Protobuf enum <code>google.protobuf.FieldDescriptorProto.Label</code>
  */
 class FieldDescriptorProto_Label
 {
     /**
+     * <pre>
      * 0 is reserved for errors
+     * </pre>
      *
-     * Generated from protobuf enum <code>LABEL_OPTIONAL = 1;</code>
+     * <code>LABEL_OPTIONAL = 1;</code>
      */
     const LABEL_OPTIONAL = 1;
     /**
-     * Generated from protobuf enum <code>LABEL_REQUIRED = 2;</code>
+     * <code>LABEL_REQUIRED = 2;</code>
      */
     const LABEL_REQUIRED = 2;
     /**
-     * Generated from protobuf enum <code>LABEL_REPEATED = 3;</code>
+     * <code>LABEL_REPEATED = 3;</code>
      */
     const LABEL_REPEATED = 3;
 }
