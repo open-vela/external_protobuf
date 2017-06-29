@@ -90,23 +90,9 @@ namespace Google.Protobuf.Conformance
                         var parser = new JsonParser(new JsonParser.Settings(20, typeRegistry));
                         message = parser.Parse<ProtobufTestMessages.Proto3.TestAllTypes>(request.JsonPayload);
                         break;
-                    case ConformanceRequest.PayloadOneofCase.ProtobufPayload: 
-					{
-						if (request.MessageType.Equals("proto3"))
-						{
-							message = ProtobufTestMessages.Proto3.TestAllTypes.Parser.ParseFrom(request.ProtobufPayload);
-						}							
-						else if (request.MessageType.Equals("proto2")) 
-						{
-
-							return new ConformanceResponse { Skipped = "CSharp doesn't support proto2" };
-						}
-						else 
-						{
-							throw new Exception(" Protobuf request doesn't have specific payload type");
-						}
-						break;
-					}
+                    case ConformanceRequest.PayloadOneofCase.ProtobufPayload:
+                        message = ProtobufTestMessages.Proto3.TestAllTypes.Parser.ParseFrom(request.ProtobufPayload);
+                        break;
                     default:
                         throw new Exception("Unsupported request payload: " + request.PayloadCase);
                 }
