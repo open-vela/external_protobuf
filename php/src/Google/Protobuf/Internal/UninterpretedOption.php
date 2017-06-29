@@ -12,52 +12,56 @@ use Google\Protobuf\Internal\InputStream;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
+ * <pre>
  * A message representing a option the parser does not recognize. This only
  * appears in options protos created by the compiler::Parser class.
  * DescriptorPool resolves these when building Descriptor objects. Therefore,
  * options protos in descriptor objects (e.g. returned by Descriptor::options(),
  * or produced by Descriptor::CopyTo()) will never have UninterpretedOptions
  * in them.
+ * </pre>
  *
- * Generated from protobuf message <code>google.protobuf.UninterpretedOption</code>
+ * Protobuf type <code>google.protobuf.UninterpretedOption</code>
  */
 class UninterpretedOption extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Generated from protobuf field <code>repeated .google.protobuf.UninterpretedOption.NamePart name = 2;</code>
+     * <code>repeated .google.protobuf.UninterpretedOption.NamePart name = 2;</code>
      */
     private $name;
     private $has_name = false;
     /**
+     * <pre>
      * The value of the uninterpreted option, in whatever type the tokenizer
      * identified it as during parsing. Exactly one of these should be set.
+     * </pre>
      *
-     * Generated from protobuf field <code>optional string identifier_value = 3;</code>
+     * <code>optional string identifier_value = 3;</code>
      */
     private $identifier_value = '';
     private $has_identifier_value = false;
     /**
-     * Generated from protobuf field <code>optional uint64 positive_int_value = 4;</code>
+     * <code>optional uint64 positive_int_value = 4;</code>
      */
     private $positive_int_value = 0;
     private $has_positive_int_value = false;
     /**
-     * Generated from protobuf field <code>optional int64 negative_int_value = 5;</code>
+     * <code>optional int64 negative_int_value = 5;</code>
      */
     private $negative_int_value = 0;
     private $has_negative_int_value = false;
     /**
-     * Generated from protobuf field <code>optional double double_value = 6;</code>
+     * <code>optional double double_value = 6;</code>
      */
     private $double_value = 0.0;
     private $has_double_value = false;
     /**
-     * Generated from protobuf field <code>optional bytes string_value = 7;</code>
+     * <code>optional bytes string_value = 7;</code>
      */
     private $string_value = '';
     private $has_string_value = false;
     /**
-     * Generated from protobuf field <code>optional string aggregate_value = 8;</code>
+     * <code>optional string aggregate_value = 8;</code>
      */
     private $aggregate_value = '';
     private $has_aggregate_value = false;
@@ -68,8 +72,7 @@ class UninterpretedOption extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>repeated .google.protobuf.UninterpretedOption.NamePart name = 2;</code>
-     * @return \Google\Protobuf\Internal\RepeatedField
+     * <code>repeated .google.protobuf.UninterpretedOption.NamePart name = 2;</code>
      */
     public function getName()
     {
@@ -77,9 +80,7 @@ class UninterpretedOption extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>repeated .google.protobuf.UninterpretedOption.NamePart name = 2;</code>
-     * @param \Google\Protobuf\Internal\UninterpretedOption_NamePart[]|\Google\Protobuf\Internal\RepeatedField $var
-     * @return $this
+     * <code>repeated .google.protobuf.UninterpretedOption.NamePart name = 2;</code>
      */
     public function setName(&$var)
     {
@@ -96,11 +97,12 @@ class UninterpretedOption extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * <pre>
      * The value of the uninterpreted option, in whatever type the tokenizer
      * identified it as during parsing. Exactly one of these should be set.
+     * </pre>
      *
-     * Generated from protobuf field <code>optional string identifier_value = 3;</code>
-     * @return string
+     * <code>optional string identifier_value = 3;</code>
      */
     public function getIdentifierValue()
     {
@@ -108,12 +110,12 @@ class UninterpretedOption extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * <pre>
      * The value of the uninterpreted option, in whatever type the tokenizer
      * identified it as during parsing. Exactly one of these should be set.
+     * </pre>
      *
-     * Generated from protobuf field <code>optional string identifier_value = 3;</code>
-     * @param string $var
-     * @return $this
+     * <code>optional string identifier_value = 3;</code>
      */
     public function setIdentifierValue($var)
     {
@@ -130,8 +132,7 @@ class UninterpretedOption extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>optional uint64 positive_int_value = 4;</code>
-     * @return int|string
+     * <code>optional uint64 positive_int_value = 4;</code>
      */
     public function getPositiveIntValue()
     {
@@ -139,9 +140,7 @@ class UninterpretedOption extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>optional uint64 positive_int_value = 4;</code>
-     * @param int|string $var
-     * @return $this
+     * <code>optional uint64 positive_int_value = 4;</code>
      */
     public function setPositiveIntValue($var)
     {
@@ -158,8 +157,7 @@ class UninterpretedOption extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>optional int64 negative_int_value = 5;</code>
-     * @return int|string
+     * <code>optional int64 negative_int_value = 5;</code>
      */
     public function getNegativeIntValue()
     {
@@ -167,9 +165,7 @@ class UninterpretedOption extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>optional int64 negative_int_value = 5;</code>
-     * @param int|string $var
-     * @return $this
+     * <code>optional int64 negative_int_value = 5;</code>
      */
     public function setNegativeIntValue($var)
     {
@@ -186,8 +182,7 @@ class UninterpretedOption extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>optional double double_value = 6;</code>
-     * @return float
+     * <code>optional double double_value = 6;</code>
      */
     public function getDoubleValue()
     {
@@ -195,9 +190,7 @@ class UninterpretedOption extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>optional double double_value = 6;</code>
-     * @param float $var
-     * @return $this
+     * <code>optional double double_value = 6;</code>
      */
     public function setDoubleValue($var)
     {
@@ -214,8 +207,7 @@ class UninterpretedOption extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>optional bytes string_value = 7;</code>
-     * @return string
+     * <code>optional bytes string_value = 7;</code>
      */
     public function getStringValue()
     {
@@ -223,9 +215,7 @@ class UninterpretedOption extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>optional bytes string_value = 7;</code>
-     * @param string $var
-     * @return $this
+     * <code>optional bytes string_value = 7;</code>
      */
     public function setStringValue($var)
     {
@@ -242,8 +232,7 @@ class UninterpretedOption extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>optional string aggregate_value = 8;</code>
-     * @return string
+     * <code>optional string aggregate_value = 8;</code>
      */
     public function getAggregateValue()
     {
@@ -251,9 +240,7 @@ class UninterpretedOption extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>optional string aggregate_value = 8;</code>
-     * @param string $var
-     * @return $this
+     * <code>optional string aggregate_value = 8;</code>
      */
     public function setAggregateValue($var)
     {

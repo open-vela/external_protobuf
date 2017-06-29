@@ -45,11 +45,18 @@ function doTest($request)
     $test_message = new \Protobuf_test_messages\Proto3\TestAllTypes();
     $response = new \Conformance\ConformanceResponse();
     if ($request->getPayload() == "protobuf_payload") {
-      try {
+      if ($request->getMessageType() == "proto3") {
+        try {
           $test_message->mergeFromString($request->getProtobufPayload());
-      } catch (Exception $e) {
+        } catch (Exception $e) {
           $response->setParseError($e->getMessage());
           return $response;
+        }
+      } elseif ($request->getMessageType() == "proto2") {
+	$response->setSkipped("PHP doesn't support proto2");
+	return $response;
+      } else {
+	trigger_error("Protobuf request doesn't have specific payload type", E_USER_ERROR);
       }
     } elseif ($request->getPayload() == "json_payload") {
       try {
