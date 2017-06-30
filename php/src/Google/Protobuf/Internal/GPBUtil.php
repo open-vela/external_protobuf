@@ -45,13 +45,8 @@ class GPBUtil
             $value = bcsub(0, $value);
         }
 
-        $high = bcdiv($value, 4294967296);
+        $high = (int) bcdiv(bcadd($value, 1), 4294967296);
         $low = bcmod($value, 4294967296);
-        if (bccomp($high, 2147483647) > 0) {
-            $high = (int) bcsub($high, 4294967296);
-        } else {
-            $high = (int) $high;
-        }
         if (bccomp($low, 2147483647) > 0) {
             $low = (int) bcsub($low, 4294967296);
         } else {
@@ -63,7 +58,7 @@ class GPBUtil
             $low = ~$low;
             $low++;
             if (!$low) {
-                $high = (int)($high + 1);
+                $high++;
             }
         }
 
@@ -75,13 +70,15 @@ class GPBUtil
     public static function checkString(&$var, $check_utf8)
     {
         if (is_array($var) || is_object($var)) {
-            throw new \InvalidArgumentException("Expect string.");
+            trigger_error("Expect string.", E_USER_ERROR);
+            return;
         }
         if (!is_string($var)) {
             $var = strval($var);
         }
         if ($check_utf8 && !preg_match('//u', $var)) {
-            throw new \Exception("Expect utf-8 encoding.");
+            trigger_error("Expect utf-8 encoding.", E_USER_ERROR);
+            return;
         }
     }
 
@@ -95,7 +92,7 @@ class GPBUtil
         if (is_numeric($var)) {
             $var = intval($var);
         } else {
-            throw new \Exception("Expect integer.");
+            trigger_error("Expect integer.", E_USER_ERROR);
         }
     }
 
@@ -112,7 +109,7 @@ class GPBUtil
                 $var = (int) $var;
             }
         } else {
-            throw new \Exception("Expect integer.");
+            trigger_error("Expect integer.", E_USER_ERROR);
         }
     }
 
@@ -122,15 +119,10 @@ class GPBUtil
             if (PHP_INT_SIZE == 8) {
                 $var = intval($var);
             } else {
-                if (is_float($var) ||
-                    is_integer($var) ||
-                    (is_string($var) &&
-                         bccomp($var, "9223372036854774784") < 0)) {
-                    $var = number_format($var, 0, ".", "");
-                }
+                $var = bcdiv($var, 1, 0);
             }
         } else {
-            throw new \Exception("Expect integer.");
+            trigger_error("Expect integer.", E_USER_ERROR);
         }
     }
 
@@ -140,10 +132,10 @@ class GPBUtil
             if (PHP_INT_SIZE == 8) {
                 $var = intval($var);
             } else {
-                $var = number_format($var, 0, ".", "");
+                $var = bcdiv($var, 1, 0);
             }
         } else {
-            throw new \Exception("Expect integer.");
+            trigger_error("Expect integer.", E_USER_ERROR);
         }
     }
 
@@ -152,7 +144,7 @@ class GPBUtil
         if (is_float($var) || is_numeric($var)) {
             $var = floatval($var);
         } else {
-            throw new \Exception("Expect float.");
+            trigger_error("Expect float.", E_USER_ERROR);
         }
     }
 
@@ -161,14 +153,15 @@ class GPBUtil
         if (is_float($var) || is_numeric($var)) {
             $var = floatval($var);
         } else {
-            throw new \Exception("Expect float.");
+            trigger_error("Expect float.", E_USER_ERROR);
         }
     }
 
     public static function checkBool(&$var)
     {
         if (is_array($var) || is_object($var)) {
-            throw new \Exception("Expect boolean.");
+            trigger_error("Expect boolean.", E_USER_ERROR);
+            return;
         }
         $var = boolval($var);
     }
@@ -176,14 +169,14 @@ class GPBUtil
     public static function checkMessage(&$var, $klass)
     {
         if (!$var instanceof $klass && !is_null($var)) {
-            throw new \Exception("Expect message.");
+            trigger_error("Expect message.", E_USER_ERROR);
         }
     }
 
     public static function checkRepeatedField(&$var, $type, $klass = null)
     {
         if (!$var instanceof RepeatedField && !is_array($var)) {
-            throw new \Exception("Expect array.");
+            trigger_error("Expect array.", E_USER_ERROR);
         }
         if (is_array($var)) {
             $tmp = new RepeatedField($type, $klass);
@@ -193,13 +186,15 @@ class GPBUtil
             return $tmp;
         } else {
             if ($var->getType() != $type) {
-                throw new \Exception(
-                    "Expect repeated field of different type.");
+                trigger_error(
+                    "Expect repeated field of different type.",
+                    E_USER_ERROR);
             }
             if ($var->getType() === GPBType::MESSAGE &&
                 $var->getClass() !== $klass) {
-                throw new \Exception(
-                    "Expect repeated field of different message.");
+                trigger_error(
+                    "Expect repeated field of different message.",
+                    E_USER_ERROR);
             }
             return $var;
         }
@@ -208,7 +203,7 @@ class GPBUtil
     public static function checkMapField(&$var, $key_type, $value_type, $klass = null)
     {
         if (!$var instanceof MapField && !is_array($var)) {
-            throw new \Exception("Expect dict.");
+            trigger_error("Expect dict.", E_USER_ERROR);
         }
         if (is_array($var)) {
             $tmp = new MapField($key_type, $value_type, $klass);
@@ -218,15 +213,20 @@ class GPBUtil
             return $tmp;
         } else {
             if ($var->getKeyType() != $key_type) {
-                throw new \Exception("Expect map field of key type.");
+                trigger_error(
+                    "Expect map field of key type.",
+                    E_USER_ERROR);
             }
             if ($var->getValueType() != $value_type) {
-                throw new \Exception("Expect map field of value type.");
+                trigger_error(
+                    "Expect map field of value type.",
+                    E_USER_ERROR);
             }
             if ($var->getValueType() === GPBType::MESSAGE &&
                 $var->getValueClass() !== $klass) {
-                throw new \Exception(
-                    "Expect map field of different value message.");
+                trigger_error(
+                    "Expect map field of different value message.",
+                    E_USER_ERROR);
             }
             return $var;
         }
@@ -328,7 +328,7 @@ class GPBUtil
             $low = ~$low;
             $low++;
             if (!$low) {
-                $high = (int) ($high + 1);
+                $high++;
             }
         }
         $result = bcadd(bcmul($high, 4294967296), $low);

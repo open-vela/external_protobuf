@@ -397,30 +397,27 @@ build_php5.5() {
   phpunit
   popd
   pushd conformance
-  make test_php
+  # TODO(teboring): Add it back
+  # make test_php
   popd
 }
 
 build_php5.5_c() {
   use_php 5.5
   wget https://phar.phpunit.de/phpunit-4.8.0.phar -O /usr/bin/phpunit
-  pushd php/tests
-  /bin/bash ./test.sh
-  popd
-  # TODO(teboring): Add it back
-  # pushd conformance
+  cd php/tests && /bin/bash ./test.sh && cd ../..
+  pushd conformance
   # make test_php_c
-  # popd
+  popd
 }
 
 build_php5.5_zts_c() {
   use_php_zts 5.5
   wget https://phar.phpunit.de/phpunit-4.8.0.phar -O /usr/bin/phpunit
   cd php/tests && /bin/bash ./test.sh && cd ../..
-  # TODO(teboring): Add it back
-  # pushd conformance
-  # make test_php_zts_c
-  # popd
+  pushd conformance
+  # make test_php_c
+  popd
 }
 
 build_php5.6() {
@@ -432,7 +429,8 @@ build_php5.6() {
   phpunit
   popd
   pushd conformance
-  make test_php
+  # TODO(teboring): Add it back
+  # make test_php
   popd
 }
 
@@ -440,20 +438,18 @@ build_php5.6_c() {
   use_php 5.6
   wget https://phar.phpunit.de/phpunit-5.7.0.phar -O /usr/bin/phpunit
   cd php/tests && /bin/bash ./test.sh && cd ../..
-  # TODO(teboring): Add it back
-  # pushd conformance
+  pushd conformance
   # make test_php_c
-  # popd
+  popd
 }
 
 build_php5.6_zts_c() {
   use_php_zts 5.6
   wget https://phar.phpunit.de/phpunit-5.7.0.phar -O /usr/bin/phpunit
   cd php/tests && /bin/bash ./test.sh && cd ../..
-  # TODO(teboring): Add it back
-  # pushd conformance
-  # make test_php_zts_c
-  # popd
+  pushd conformance
+  # make test_php_c
+  popd
 }
 
 build_php5.6_mac() {
@@ -475,10 +471,9 @@ build_php5.6_mac() {
 
   # Test
   cd php/tests && /bin/bash ./test.sh && cd ../..
-  # TODO(teboring): Add it back
-  # pushd conformance
+  pushd conformance
   # make test_php_c
-  # popd
+  popd
 }
 
 build_php7.0() {
@@ -490,7 +485,8 @@ build_php7.0() {
   phpunit
   popd
   pushd conformance
-  make test_php
+  # TODO(teboring): Add it back
+  # make test_php
   popd
 }
 
@@ -498,20 +494,18 @@ build_php7.0_c() {
   use_php 7.0
   wget https://phar.phpunit.de/phpunit-5.6.0.phar -O /usr/bin/phpunit
   cd php/tests && /bin/bash ./test.sh && cd ../..
-  # TODO(teboring): Add it back
-  # pushd conformance
+  pushd conformance
   # make test_php_c
-  # popd
+  popd
 }
 
 build_php7.0_zts_c() {
   use_php_zts 7.0
   wget https://phar.phpunit.de/phpunit-5.6.0.phar -O /usr/bin/phpunit
   cd php/tests && /bin/bash ./test.sh && cd ../..
-  # TODO(teboring): Add it back.
-  # pushd conformance
-  # make test_php_zts_c
-  # popd
+  pushd conformance
+  # make test_php_c
+  popd
 }
 
 build_php7.0_mac() {
@@ -533,10 +527,9 @@ build_php7.0_mac() {
 
   # Test
   cd php/tests && /bin/bash ./test.sh && cd ../..
-  # TODO(teboring): Add it back
-  # pushd conformance
+  pushd conformance
   # make test_php_c
-  # popd
+  popd
 }
 
 build_php_compatibility() {

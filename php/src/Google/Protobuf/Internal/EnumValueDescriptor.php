@@ -34,26 +34,4 @@ namespace Google\Protobuf\Internal;
 
 class EnumValueDescriptor
 {
-    private $name;
-    private $number;
-
-    public function setName($name)
-    {
-        $this->name = $name;
-    }
-
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    public function setNumber($number)
-    {
-        $this->number = $number;
-    }
-
-    public function getNumber()
-    {
-        return $this->number;
-    }
 }
