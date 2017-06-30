@@ -34,7 +34,7 @@ namespace Google\Protobuf\Internal;
 
 use Google\Protobuf\Internal\Uint64;
 
-class CodedInputStream
+class InputStream
 {
 
     private $buffer;
@@ -73,7 +73,7 @@ class CodedInputStream
         $this->current += $amount;
     }
 
-    public function bufferSize()
+    private function bufferSize()
     {
         return $this->buffer_end - $this->current;
     }
@@ -172,9 +172,6 @@ class CodedInputStream
             } while ($b & 0x80);
 
             $var = GPBUtil::combineInt32ToInt64($high, $low);
-            if (bccomp($var, 0) < 0) {
-                $var = bcadd($var, "18446744073709551616");
-            }
         } else {
             $result = 0;
             $shift = 0;

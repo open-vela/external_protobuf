@@ -164,21 +164,18 @@ typedef struct {
   int property_ofs;        // properties table cache
   uint32_t oneof_case_num; // oneof-case number to place in oneof_case field
   const upb_msgdef *md;    // msgdef, for oneof submessage handler
-  const upb_msgdef *parent_md;  // msgdef, for parent submessage
 } oneof_handlerdata_t;
 
 static const void *newoneofhandlerdata(upb_handlers *h,
                                        uint32_t ofs,
                                        uint32_t case_ofs,
                                        int property_ofs,
-                                       const upb_msgdef *m,
                                        const upb_fielddef *f) {
   oneof_handlerdata_t* hd =
       (oneof_handlerdata_t*)malloc(sizeof(oneof_handlerdata_t));
   hd->ofs = ofs;
   hd->case_ofs = case_ofs;
   hd->property_ofs = property_ofs;
-  hd->parent_md = m;
   // We reuse the field tag number as a oneof union discriminant tag. Note that
   // we don't expose these numbers to the user, so the only requirement is that
   // we have some unique ID for each union case/possibility. The field tag
@@ -287,19 +284,10 @@ DEFINE_SINGULAR_HANDLER(double, double)
 #if PHP_MAJOR_VERSION < 7
 static void *empty_php_string(zval** value_ptr) {
   SEPARATE_ZVAL_IF_NOT_REF(value_ptr);
-  if (Z_TYPE_PP(value_ptr) == IS_STRING &&
-      !IS_INTERNED(Z_STRVAL_PP(value_ptr))) {
-    FREE(Z_STRVAL_PP(value_ptr));
-  }
-  ZVAL_EMPTY_STRING(*value_ptr);
   return (void*)(*value_ptr);
 }
 #else
 static void *empty_php_string(zval* value_ptr) {
-  if (Z_TYPE_P(value_ptr) == IS_STRING) {
-    zend_string_release(Z_STR_P(value_ptr));
-  }
-  ZVAL_EMPTY_STRING(value_ptr);
   return value_ptr;
 }
 #endif
@@ -474,7 +462,7 @@ static void map_slot_init(void* memory, upb_fieldtype_t type, zval* cache) {
       *(zval***)memory = holder;
 #else
       *(zval**)memory = cache;
-      // PHP_PROTO_ZVAL_STRINGL(*(zval**)memory, "", 0, 1);
+      PHP_PROTO_ZVAL_STRINGL(*(zval**)memory, "", 0, 1);
 #endif
       break;
     }
@@ -666,52 +654,12 @@ DEFINE_ONEOF_HANDLER(double, double)
 
 #undef DEFINE_ONEOF_HANDLER
 
-static void oneof_cleanup(MessageHeader* msg,
-                          const oneof_handlerdata_t* oneofdata) {
-  uint32_t old_case_num =
-      DEREF(message_data(msg), oneofdata->case_ofs, uint32_t);
-  if (old_case_num == 0) {
-    return;
-  }
-
-  const upb_fielddef* old_field =
-      upb_msgdef_itof(oneofdata->parent_md, old_case_num);
-  bool need_clean = false;
-
-  switch (upb_fielddef_type(old_field)) {
-    case UPB_TYPE_STRING:
-    case UPB_TYPE_BYTES:
-      need_clean = true;
-      break;
-    case UPB_TYPE_MESSAGE:
-      if (oneofdata->oneof_case_num != old_case_num) {
-        need_clean = true;
-      }
-      break;
-    default:
-      break;
-  }
-
-  if (need_clean) {
-#if PHP_MAJOR_VERSION < 7
-    SEPARATE_ZVAL_IF_NOT_REF(
-        DEREF(message_data(msg), oneofdata->ofs, CACHED_VALUE*));
-    php_proto_zval_ptr_dtor(
-        *DEREF(message_data(msg), oneofdata->ofs, CACHED_VALUE*));
-    MAKE_STD_ZVAL(*DEREF(message_data(msg), oneofdata->ofs, CACHED_VALUE*));
-    ZVAL_NULL(*DEREF(message_data(msg), oneofdata->ofs, CACHED_VALUE*));
-#endif
-  }
-}
-
 // Handlers for string/bytes in a oneof.
 static void *oneofbytes_handler(void *closure,
                                 const void *hd,
                                 size_t size_hint) {
   MessageHeader* msg = closure;
   const oneof_handlerdata_t *oneofdata = hd;
-
-  oneof_cleanup(msg, oneofdata);
 
   DEREF(message_data(msg), oneofdata->case_ofs, uint32_t) =
       oneofdata->oneof_case_num;
@@ -743,11 +691,22 @@ static void* oneofsubmsg_handler(void* closure, const void* hd) {
   MessageHeader* submsg;
 
   if (oldcase != oneofdata->oneof_case_num) {
-    oneof_cleanup(msg, oneofdata);
-
-    // Create new message.
+    // Ideally, we should clean up the old data. However, we don't even know the
+    // type of the old data. So, we will defer the desctruction of the old data
+    // to the time that containing message's destroyed or the same oneof field
+    // is accessed again and find that the old data hasn't been cleaned.
     DEREF(message_data(msg), oneofdata->ofs, CACHED_VALUE*) =
         &(msg->std.properties_table)[oneofdata->property_ofs];
+
+    // Old data was't cleaned when the oneof was accessed from another field.
+    if (Z_TYPE_P(CACHED_PTR_TO_ZVAL_PTR(DEREF(
+        message_data(msg), oneofdata->ofs, CACHED_VALUE*))) != IS_NULL) {
+          php_proto_zval_ptr_dtor(
+              CACHED_PTR_TO_ZVAL_PTR(
+                  DEREF(message_data(msg), oneofdata->ofs, CACHED_VALUE*)));
+    }
+
+    // Create new message.
     ZVAL_OBJ(CACHED_PTR_TO_ZVAL_PTR(
         DEREF(message_data(msg), oneofdata->ofs, CACHED_VALUE*)),
         subklass->create_object(subklass TSRMLS_CC));
@@ -897,7 +856,6 @@ static void add_handlers_for_mapentry(const upb_msgdef* msgdef, upb_handlers* h,
 
 // Set up handlers for a oneof field.
 static void add_handlers_for_oneof_field(upb_handlers *h,
-                                         const upb_msgdef *m,
                                          const upb_fielddef *f,
                                          size_t offset,
                                          size_t oneof_case_offset,
@@ -906,7 +864,7 @@ static void add_handlers_for_oneof_field(upb_handlers *h,
   upb_handlerattr attr = UPB_HANDLERATTR_INITIALIZER;
   upb_handlerattr_sethandlerdata(
       &attr, newoneofhandlerdata(h, offset, oneof_case_offset,
-                                 property_cache_offset, m, f));
+                                 property_cache_offset, f));
 
   switch (upb_fielddef_type(f)) {
 
@@ -978,8 +936,8 @@ static void add_handlers_for_message(const void* closure,
           desc->layout->fields[upb_fielddef_index(f)].case_offset;
       int property_cache_index =
           desc->layout->fields[upb_fielddef_index(f)].cache_index;
-      add_handlers_for_oneof_field(h, desc->msgdef, f, offset,
-                                   oneof_case_offset, property_cache_index);
+      add_handlers_for_oneof_field(h, f, offset, oneof_case_offset,
+                                   property_cache_index);
     } else if (is_map_field(f)) {
       add_handlers_for_mapfield(h, f, offset, desc);
     } else if (upb_fielddef_isseq(f)) {
@@ -1240,7 +1198,7 @@ static void putrawmsg(MessageHeader* msg, const Descriptor* desc,
     } else if (upb_fielddef_isstring(f)) {
       zval* str = CACHED_PTR_TO_ZVAL_PTR(
           DEREF(message_data(msg), offset, CACHED_VALUE*));
-      if (containing_oneof || Z_STRLEN_P(str) > 0) {
+      if (Z_STRLEN_P(str) > 0) {
         putstr(str, f, sink);
       }
     } else if (upb_fielddef_issubmsg(f)) {
@@ -1263,10 +1221,10 @@ static void putrawmsg(MessageHeader* msg, const Descriptor* desc,
         T(UPB_TYPE_DOUBLE, double, double, 0.0)
         T(UPB_TYPE_BOOL, bool, uint8_t, 0)
         case UPB_TYPE_ENUM:
-        T(UPB_TYPE_INT32, int32, int32_t, 0)
-        T(UPB_TYPE_UINT32, uint32, uint32_t, 0)
-        T(UPB_TYPE_INT64, int64, int64_t, 0)
-        T(UPB_TYPE_UINT64, uint64, uint64_t, 0)
+          T(UPB_TYPE_INT32, int32, int32_t, 0)
+          T(UPB_TYPE_UINT32, uint32, uint32_t, 0)
+          T(UPB_TYPE_INT64, int64, int64_t, 0)
+          T(UPB_TYPE_UINT64, uint64, uint64_t, 0)
 
         case UPB_TYPE_STRING:
         case UPB_TYPE_BYTES:
@@ -1288,23 +1246,18 @@ static void putstr(zval* str, const upb_fielddef *f, upb_sink *sink) {
 
   assert(Z_TYPE_P(str) == IS_STRING);
 
-  upb_sink_startstr(sink, getsel(f, UPB_HANDLER_STARTSTR), Z_STRLEN_P(str),
-                    &subsink);
-
-  // For oneof string field, we may get here with string length is zero.
-  if (Z_STRLEN_P(str) > 0) {
-    // Ensure that the string has the correct encoding. We also check at
-    // field-set time, but the user may have mutated the string object since
-    // then.
-    if (upb_fielddef_type(f) == UPB_TYPE_STRING &&
-        !is_structurally_valid_utf8(Z_STRVAL_P(str), Z_STRLEN_P(str))) {
-      zend_error(E_USER_ERROR, "Given string is not UTF8 encoded.");
-      return;
-    }
-    upb_sink_putstring(&subsink, getsel(f, UPB_HANDLER_STRING), Z_STRVAL_P(str),
-                       Z_STRLEN_P(str), NULL);
+  // Ensure that the string has the correct encoding. We also check at field-set
+  // time, but the user may have mutated the string object since then.
+  if (upb_fielddef_type(f) == UPB_TYPE_STRING &&
+      !is_structurally_valid_utf8(Z_STRVAL_P(str), Z_STRLEN_P(str))) {
+    zend_error(E_USER_ERROR, "Given string is not UTF8 encoded.");
+    return;
   }
 
+  upb_sink_startstr(sink, getsel(f, UPB_HANDLER_STARTSTR), Z_STRLEN_P(str),
+                    &subsink);
+  upb_sink_putstring(&subsink, getsel(f, UPB_HANDLER_STRING), Z_STRVAL_P(str),
+                     Z_STRLEN_P(str), NULL);
   upb_sink_endstr(sink, getsel(f, UPB_HANDLER_ENDSTR));
 }
 
@@ -1499,7 +1452,7 @@ PHP_METHOD(Message, mergeFromString) {
   }
 }
 
-PHP_METHOD(Message, serializeToJsonString) {
+PHP_METHOD(Message, jsonEncode) {
   Descriptor* desc =
       UNBOX_HASHTABLE_VALUE(Descriptor, get_ce_obj(Z_OBJCE_P(getThis())));
 
@@ -1530,14 +1483,13 @@ PHP_METHOD(Message, serializeToJsonString) {
   }
 }
 
-PHP_METHOD(Message, mergeFromJsonString) {
+PHP_METHOD(Message, jsonDecode) {
   Descriptor* desc =
       UNBOX_HASHTABLE_VALUE(Descriptor, get_ce_obj(Z_OBJCE_P(getThis())));
   MessageHeader* msg = UNBOX(MessageHeader, getThis());
 
   char *data = NULL;
-  PHP_PROTO_SIZE data_len;
-
+  int data_len;
   if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &data, &data_len) ==
       FAILURE) {
     return;
