@@ -5,28 +5,36 @@
 namespace Google\Protobuf\Internal;
 
 /**
+ * <pre>
  * Generated classes can be optimized for speed or code size.
+ * </pre>
  *
- * Protobuf enum <code>Google\Protobuf\Internal</code>
+ * Protobuf enum <code>google.protobuf.FileOptions.OptimizeMode</code>
  */
 class FileOptions_OptimizeMode
 {
     /**
+     * <pre>
      * Generate complete code for parsing, serialization,
+     * </pre>
      *
-     * Generated from protobuf enum <code>SPEED = 1;</code>
+     * <code>SPEED = 1;</code>
      */
     const SPEED = 1;
     /**
+     * <pre>
      * etc.
+     * </pre>
      *
-     * Generated from protobuf enum <code>CODE_SIZE = 2;</code>
+     * <code>CODE_SIZE = 2;</code>
      */
     const CODE_SIZE = 2;
     /**
+     * <pre>
      * Generate code using MessageLite and the lite runtime.
+     * </pre>
      *
-     * Generated from protobuf enum <code>LITE_RUNTIME = 3;</code>
+     * <code>LITE_RUNTIME = 3;</code>
      */
     const LITE_RUNTIME = 3;
 }

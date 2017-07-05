@@ -12,62 +12,66 @@ use Google\Protobuf\Internal\InputStream;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
+ * <pre>
  * Describes a message type.
+ * </pre>
  *
- * Generated from protobuf message <code>google.protobuf.DescriptorProto</code>
+ * Protobuf type <code>google.protobuf.DescriptorProto</code>
  */
 class DescriptorProto extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Generated from protobuf field <code>optional string name = 1;</code>
+     * <code>optional string name = 1;</code>
      */
     private $name = '';
     private $has_name = false;
     /**
-     * Generated from protobuf field <code>repeated .google.protobuf.FieldDescriptorProto field = 2;</code>
+     * <code>repeated .google.protobuf.FieldDescriptorProto field = 2;</code>
      */
     private $field;
     private $has_field = false;
     /**
-     * Generated from protobuf field <code>repeated .google.protobuf.FieldDescriptorProto extension = 6;</code>
+     * <code>repeated .google.protobuf.FieldDescriptorProto extension = 6;</code>
      */
     private $extension;
     private $has_extension = false;
     /**
-     * Generated from protobuf field <code>repeated .google.protobuf.DescriptorProto nested_type = 3;</code>
+     * <code>repeated .google.protobuf.DescriptorProto nested_type = 3;</code>
      */
     private $nested_type;
     private $has_nested_type = false;
     /**
-     * Generated from protobuf field <code>repeated .google.protobuf.EnumDescriptorProto enum_type = 4;</code>
+     * <code>repeated .google.protobuf.EnumDescriptorProto enum_type = 4;</code>
      */
     private $enum_type;
     private $has_enum_type = false;
     /**
-     * Generated from protobuf field <code>repeated .google.protobuf.DescriptorProto.ExtensionRange extension_range = 5;</code>
+     * <code>repeated .google.protobuf.DescriptorProto.ExtensionRange extension_range = 5;</code>
      */
     private $extension_range;
     private $has_extension_range = false;
     /**
-     * Generated from protobuf field <code>repeated .google.protobuf.OneofDescriptorProto oneof_decl = 8;</code>
+     * <code>repeated .google.protobuf.OneofDescriptorProto oneof_decl = 8;</code>
      */
     private $oneof_decl;
     private $has_oneof_decl = false;
     /**
-     * Generated from protobuf field <code>optional .google.protobuf.MessageOptions options = 7;</code>
+     * <code>optional .google.protobuf.MessageOptions options = 7;</code>
      */
     private $options = null;
     private $has_options = false;
     /**
-     * Generated from protobuf field <code>repeated .google.protobuf.DescriptorProto.ReservedRange reserved_range = 9;</code>
+     * <code>repeated .google.protobuf.DescriptorProto.ReservedRange reserved_range = 9;</code>
      */
     private $reserved_range;
     private $has_reserved_range = false;
     /**
+     * <pre>
      * Reserved field names, which may not be used by fields in the same message.
      * A given name may only be reserved once.
+     * </pre>
      *
-     * Generated from protobuf field <code>repeated string reserved_name = 10;</code>
+     * <code>repeated string reserved_name = 10;</code>
      */
     private $reserved_name;
     private $has_reserved_name = false;
@@ -78,8 +82,7 @@ class DescriptorProto extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>optional string name = 1;</code>
-     * @return string
+     * <code>optional string name = 1;</code>
      */
     public function getName()
     {
@@ -87,9 +90,7 @@ class DescriptorProto extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>optional string name = 1;</code>
-     * @param string $var
-     * @return $this
+     * <code>optional string name = 1;</code>
      */
     public function setName($var)
     {
@@ -106,8 +107,7 @@ class DescriptorProto extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>repeated .google.protobuf.FieldDescriptorProto field = 2;</code>
-     * @return \Google\Protobuf\Internal\RepeatedField
+     * <code>repeated .google.protobuf.FieldDescriptorProto field = 2;</code>
      */
     public function getField()
     {
@@ -115,9 +115,7 @@ class DescriptorProto extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>repeated .google.protobuf.FieldDescriptorProto field = 2;</code>
-     * @param \Google\Protobuf\Internal\FieldDescriptorProto[]|\Google\Protobuf\Internal\RepeatedField $var
-     * @return $this
+     * <code>repeated .google.protobuf.FieldDescriptorProto field = 2;</code>
      */
     public function setField(&$var)
     {
@@ -134,8 +132,7 @@ class DescriptorProto extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>repeated .google.protobuf.FieldDescriptorProto extension = 6;</code>
-     * @return \Google\Protobuf\Internal\RepeatedField
+     * <code>repeated .google.protobuf.FieldDescriptorProto extension = 6;</code>
      */
     public function getExtension()
     {
@@ -143,9 +140,7 @@ class DescriptorProto extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>repeated .google.protobuf.FieldDescriptorProto extension = 6;</code>
-     * @param \Google\Protobuf\Internal\FieldDescriptorProto[]|\Google\Protobuf\Internal\RepeatedField $var
-     * @return $this
+     * <code>repeated .google.protobuf.FieldDescriptorProto extension = 6;</code>
      */
     public function setExtension(&$var)
     {
@@ -162,8 +157,7 @@ class DescriptorProto extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>repeated .google.protobuf.DescriptorProto nested_type = 3;</code>
-     * @return \Google\Protobuf\Internal\RepeatedField
+     * <code>repeated .google.protobuf.DescriptorProto nested_type = 3;</code>
      */
     public function getNestedType()
     {
@@ -171,9 +165,7 @@ class DescriptorProto extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>repeated .google.protobuf.DescriptorProto nested_type = 3;</code>
-     * @param \Google\Protobuf\Internal\DescriptorProto[]|\Google\Protobuf\Internal\RepeatedField $var
-     * @return $this
+     * <code>repeated .google.protobuf.DescriptorProto nested_type = 3;</code>
      */
     public function setNestedType(&$var)
     {
@@ -190,8 +182,7 @@ class DescriptorProto extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>repeated .google.protobuf.EnumDescriptorProto enum_type = 4;</code>
-     * @return \Google\Protobuf\Internal\RepeatedField
+     * <code>repeated .google.protobuf.EnumDescriptorProto enum_type = 4;</code>
      */
     public function getEnumType()
     {
@@ -199,9 +190,7 @@ class DescriptorProto extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>repeated .google.protobuf.EnumDescriptorProto enum_type = 4;</code>
-     * @param \Google\Protobuf\Internal\EnumDescriptorProto[]|\Google\Protobuf\Internal\RepeatedField $var
-     * @return $this
+     * <code>repeated .google.protobuf.EnumDescriptorProto enum_type = 4;</code>
      */
     public function setEnumType(&$var)
     {
@@ -218,8 +207,7 @@ class DescriptorProto extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>repeated .google.protobuf.DescriptorProto.ExtensionRange extension_range = 5;</code>
-     * @return \Google\Protobuf\Internal\RepeatedField
+     * <code>repeated .google.protobuf.DescriptorProto.ExtensionRange extension_range = 5;</code>
      */
     public function getExtensionRange()
     {
@@ -227,9 +215,7 @@ class DescriptorProto extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>repeated .google.protobuf.DescriptorProto.ExtensionRange extension_range = 5;</code>
-     * @param \Google\Protobuf\Internal\DescriptorProto_ExtensionRange[]|\Google\Protobuf\Internal\RepeatedField $var
-     * @return $this
+     * <code>repeated .google.protobuf.DescriptorProto.ExtensionRange extension_range = 5;</code>
      */
     public function setExtensionRange(&$var)
     {
@@ -246,8 +232,7 @@ class DescriptorProto extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>repeated .google.protobuf.OneofDescriptorProto oneof_decl = 8;</code>
-     * @return \Google\Protobuf\Internal\RepeatedField
+     * <code>repeated .google.protobuf.OneofDescriptorProto oneof_decl = 8;</code>
      */
     public function getOneofDecl()
     {
@@ -255,9 +240,7 @@ class DescriptorProto extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>repeated .google.protobuf.OneofDescriptorProto oneof_decl = 8;</code>
-     * @param \Google\Protobuf\Internal\OneofDescriptorProto[]|\Google\Protobuf\Internal\RepeatedField $var
-     * @return $this
+     * <code>repeated .google.protobuf.OneofDescriptorProto oneof_decl = 8;</code>
      */
     public function setOneofDecl(&$var)
     {
@@ -274,8 +257,7 @@ class DescriptorProto extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>optional .google.protobuf.MessageOptions options = 7;</code>
-     * @return \Google\Protobuf\Internal\MessageOptions
+     * <code>optional .google.protobuf.MessageOptions options = 7;</code>
      */
     public function getOptions()
     {
@@ -283,9 +265,7 @@ class DescriptorProto extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>optional .google.protobuf.MessageOptions options = 7;</code>
-     * @param \Google\Protobuf\Internal\MessageOptions $var
-     * @return $this
+     * <code>optional .google.protobuf.MessageOptions options = 7;</code>
      */
     public function setOptions(&$var)
     {
@@ -302,8 +282,7 @@ class DescriptorProto extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>repeated .google.protobuf.DescriptorProto.ReservedRange reserved_range = 9;</code>
-     * @return \Google\Protobuf\Internal\RepeatedField
+     * <code>repeated .google.protobuf.DescriptorProto.ReservedRange reserved_range = 9;</code>
      */
     public function getReservedRange()
     {
@@ -311,9 +290,7 @@ class DescriptorProto extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>repeated .google.protobuf.DescriptorProto.ReservedRange reserved_range = 9;</code>
-     * @param \Google\Protobuf\Internal\DescriptorProto_ReservedRange[]|\Google\Protobuf\Internal\RepeatedField $var
-     * @return $this
+     * <code>repeated .google.protobuf.DescriptorProto.ReservedRange reserved_range = 9;</code>
      */
     public function setReservedRange(&$var)
     {
@@ -330,11 +307,12 @@ class DescriptorProto extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * <pre>
      * Reserved field names, which may not be used by fields in the same message.
      * A given name may only be reserved once.
+     * </pre>
      *
-     * Generated from protobuf field <code>repeated string reserved_name = 10;</code>
-     * @return \Google\Protobuf\Internal\RepeatedField
+     * <code>repeated string reserved_name = 10;</code>
      */
     public function getReservedName()
     {
@@ -342,12 +320,12 @@ class DescriptorProto extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * <pre>
      * Reserved field names, which may not be used by fields in the same message.
      * A given name may only be reserved once.
+     * </pre>
      *
-     * Generated from protobuf field <code>repeated string reserved_name = 10;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
-     * @return $this
+     * <code>repeated string reserved_name = 10;</code>
      */
     public function setReservedName(&$var)
     {
