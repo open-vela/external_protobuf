@@ -54,13 +54,11 @@ class MapFieldIter implements \Iterator
      *
      * @param MapField The MapField instance for which this iterator is
      * created.
-     * @param GPBType Map key type.
      * @ignore
      */
-    public function __construct($container, $key_type)
+    public function __construct($container)
     {
         $this->container = $container;
-        $this->key_type = $key_type;
     }
 
     /**
@@ -90,13 +88,7 @@ class MapFieldIter implements \Iterator
      */
     public function key()
     {
-        $key = key($this->container);
-        // PHP associative array stores bool as integer for key.
-        if ($this->key_type === GPBType::BOOL) {
-            return boolval($key);
-        } else {
-            return $key;
-        }
+        return key($this->container);
     }
 
     /**

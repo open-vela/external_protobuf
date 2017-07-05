@@ -12,24 +12,28 @@ use Google\Protobuf\Internal\InputStream;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Generated from protobuf message <code>google.protobuf.EnumValueOptions</code>
+ * Protobuf type <code>google.protobuf.EnumValueOptions</code>
  */
 class EnumValueOptions extends \Google\Protobuf\Internal\Message
 {
     /**
+     * <pre>
      * Is this enum value deprecated?
      * Depending on the target platform, this can emit Deprecated annotations
      * for the enum value, or it will be completely ignored; in the very least,
      * this is a formalization for deprecating enum values.
+     * </pre>
      *
-     * Generated from protobuf field <code>optional bool deprecated = 1 [default = false];</code>
+     * <code>optional bool deprecated = 1 [default = false];</code>
      */
     private $deprecated = false;
     private $has_deprecated = false;
     /**
+     * <pre>
      * The parser stores options it doesn't recognize here. See above.
+     * </pre>
      *
-     * Generated from protobuf field <code>repeated .google.protobuf.UninterpretedOption uninterpreted_option = 999;</code>
+     * <code>repeated .google.protobuf.UninterpretedOption uninterpreted_option = 999;</code>
      */
     private $uninterpreted_option;
     private $has_uninterpreted_option = false;
@@ -40,13 +44,14 @@ class EnumValueOptions extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * <pre>
      * Is this enum value deprecated?
      * Depending on the target platform, this can emit Deprecated annotations
      * for the enum value, or it will be completely ignored; in the very least,
      * this is a formalization for deprecating enum values.
+     * </pre>
      *
-     * Generated from protobuf field <code>optional bool deprecated = 1 [default = false];</code>
-     * @return bool
+     * <code>optional bool deprecated = 1 [default = false];</code>
      */
     public function getDeprecated()
     {
@@ -54,14 +59,14 @@ class EnumValueOptions extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * <pre>
      * Is this enum value deprecated?
      * Depending on the target platform, this can emit Deprecated annotations
      * for the enum value, or it will be completely ignored; in the very least,
      * this is a formalization for deprecating enum values.
+     * </pre>
      *
-     * Generated from protobuf field <code>optional bool deprecated = 1 [default = false];</code>
-     * @param bool $var
-     * @return $this
+     * <code>optional bool deprecated = 1 [default = false];</code>
      */
     public function setDeprecated($var)
     {
@@ -78,10 +83,11 @@ class EnumValueOptions extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * <pre>
      * The parser stores options it doesn't recognize here. See above.
+     * </pre>
      *
-     * Generated from protobuf field <code>repeated .google.protobuf.UninterpretedOption uninterpreted_option = 999;</code>
-     * @return \Google\Protobuf\Internal\RepeatedField
+     * <code>repeated .google.protobuf.UninterpretedOption uninterpreted_option = 999;</code>
      */
     public function getUninterpretedOption()
     {
@@ -89,11 +95,11 @@ class EnumValueOptions extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * <pre>
      * The parser stores options it doesn't recognize here. See above.
+     * </pre>
      *
-     * Generated from protobuf field <code>repeated .google.protobuf.UninterpretedOption uninterpreted_option = 999;</code>
-     * @param \Google\Protobuf\Internal\UninterpretedOption[]|\Google\Protobuf\Internal\RepeatedField $var
-     * @return $this
+     * <code>repeated .google.protobuf.UninterpretedOption uninterpreted_option = 999;</code>
      */
     public function setUninterpretedOption(&$var)
     {

@@ -477,8 +477,7 @@ GenerateMergeFromCodedStream(io::Printer* printer) const {
   if (descriptor_->type() == FieldDescriptor::TYPE_STRING) {
     GenerateUtf8CheckCodeForString(
         descriptor_, options_, true, variables_,
-        "this->$name$().data(), static_cast<int>(this->$name$().length()),\n",
-        printer);
+        "this->$name$().data(), this->$name$().length(),\n", printer);
   }
 }
 
@@ -487,8 +486,7 @@ GenerateSerializeWithCachedSizes(io::Printer* printer) const {
   if (descriptor_->type() == FieldDescriptor::TYPE_STRING) {
     GenerateUtf8CheckCodeForString(
         descriptor_, options_, false, variables_,
-        "this->$name$().data(), static_cast<int>(this->$name$().length()),\n",
-        printer);
+        "this->$name$().data(), this->$name$().length(),\n", printer);
   }
   printer->Print(variables_,
     "::google::protobuf::internal::WireFormatLite::Write$declared_type$MaybeAliased(\n"
@@ -500,8 +498,7 @@ GenerateSerializeWithCachedSizesToArray(io::Printer* printer) const {
   if (descriptor_->type() == FieldDescriptor::TYPE_STRING) {
     GenerateUtf8CheckCodeForString(
         descriptor_, options_, false, variables_,
-        "this->$name$().data(), static_cast<int>(this->$name$().length()),\n",
-        printer);
+        "this->$name$().data(), this->$name$().length(),\n", printer);
   }
   printer->Print(variables_,
     "target =\n"
@@ -800,8 +797,7 @@ GenerateMergeFromCodedStream(io::Printer* printer) const {
   if (descriptor_->type() == FieldDescriptor::TYPE_STRING) {
     GenerateUtf8CheckCodeForString(
         descriptor_, options_, true, variables_,
-        "this->$name$().data(), static_cast<int>(this->$name$().length()),\n",
-        printer);
+        "this->$name$().data(), this->$name$().length(),\n", printer);
   }
 }
 
@@ -973,7 +969,7 @@ GenerateMergeFromCodedStream(io::Printer* printer) const {
     GenerateUtf8CheckCodeForString(
         descriptor_, options_, true, variables_,
         "this->$name$(this->$name$_size() - 1).data(),\n"
-        "static_cast<int>(this->$name$(this->$name$_size() - 1).length()),\n",
+        "this->$name$(this->$name$_size() - 1).length(),\n",
         printer);
   }
 }
@@ -986,8 +982,7 @@ GenerateSerializeWithCachedSizes(io::Printer* printer) const {
   if (descriptor_->type() == FieldDescriptor::TYPE_STRING) {
     GenerateUtf8CheckCodeForString(
         descriptor_, options_, false, variables_,
-        "this->$name$(i).data(), static_cast<int>(this->$name$(i).length()),\n",
-        printer);
+        "this->$name$(i).data(), this->$name$(i).length(),\n", printer);
   }
   printer->Outdent();
   printer->Print(variables_,
@@ -1004,8 +999,7 @@ GenerateSerializeWithCachedSizesToArray(io::Printer* printer) const {
   if (descriptor_->type() == FieldDescriptor::TYPE_STRING) {
     GenerateUtf8CheckCodeForString(
         descriptor_, options_, false, variables_,
-        "this->$name$(i).data(), static_cast<int>(this->$name$(i).length()),\n",
-        printer);
+        "this->$name$(i).data(), this->$name$(i).length(),\n", printer);
   }
   printer->Outdent();
   printer->Print(variables_,

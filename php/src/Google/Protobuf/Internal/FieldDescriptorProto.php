@@ -12,85 +12,99 @@ use Google\Protobuf\Internal\InputStream;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
+ * <pre>
  * Describes a field within a message.
+ * </pre>
  *
- * Generated from protobuf message <code>google.protobuf.FieldDescriptorProto</code>
+ * Protobuf type <code>google.protobuf.FieldDescriptorProto</code>
  */
 class FieldDescriptorProto extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Generated from protobuf field <code>optional string name = 1;</code>
+     * <code>optional string name = 1;</code>
      */
     private $name = '';
     private $has_name = false;
     /**
-     * Generated from protobuf field <code>optional int32 number = 3;</code>
+     * <code>optional int32 number = 3;</code>
      */
     private $number = 0;
     private $has_number = false;
     /**
-     * Generated from protobuf field <code>optional .google.protobuf.FieldDescriptorProto.Label label = 4;</code>
+     * <code>optional .google.protobuf.FieldDescriptorProto.Label label = 4;</code>
      */
     private $label = 0;
     private $has_label = false;
     /**
+     * <pre>
      * If type_name is set, this need not be set.  If both this and type_name
      * are set, this must be one of TYPE_ENUM, TYPE_MESSAGE or TYPE_GROUP.
+     * </pre>
      *
-     * Generated from protobuf field <code>optional .google.protobuf.FieldDescriptorProto.Type type = 5;</code>
+     * <code>optional .google.protobuf.FieldDescriptorProto.Type type = 5;</code>
      */
     private $type = 0;
     private $has_type = false;
     /**
+     * <pre>
      * For message and enum types, this is the name of the type.  If the name
      * starts with a '.', it is fully-qualified.  Otherwise, C++-like scoping
      * rules are used to find the type (i.e. first the nested types within this
      * message are searched, then within the parent, on up to the root
      * namespace).
+     * </pre>
      *
-     * Generated from protobuf field <code>optional string type_name = 6;</code>
+     * <code>optional string type_name = 6;</code>
      */
     private $type_name = '';
     private $has_type_name = false;
     /**
+     * <pre>
      * For extensions, this is the name of the type being extended.  It is
      * resolved in the same manner as type_name.
+     * </pre>
      *
-     * Generated from protobuf field <code>optional string extendee = 2;</code>
+     * <code>optional string extendee = 2;</code>
      */
     private $extendee = '';
     private $has_extendee = false;
     /**
+     * <pre>
      * For numeric types, contains the original text representation of the value.
      * For booleans, "true" or "false".
      * For strings, contains the default text contents (not escaped in any way).
-     * For bytes, contains the C escaped value.  All bytes >= 128 are escaped.
+     * For bytes, contains the C escaped value.  All bytes &gt;= 128 are escaped.
      * TODO(kenton):  Base-64 encode?
+     * </pre>
      *
-     * Generated from protobuf field <code>optional string default_value = 7;</code>
+     * <code>optional string default_value = 7;</code>
      */
     private $default_value = '';
     private $has_default_value = false;
     /**
+     * <pre>
      * If set, gives the index of a oneof in the containing type's oneof_decl
      * list.  This field is a member of that oneof.
+     * </pre>
      *
-     * Generated from protobuf field <code>optional int32 oneof_index = 9;</code>
+     * <code>optional int32 oneof_index = 9;</code>
      */
     private $oneof_index = 0;
     private $has_oneof_index = false;
     /**
+     * <pre>
      * JSON name of this field. The value is set by protocol compiler. If the
      * user has set a "json_name" option on this field, that option's value
      * will be used. Otherwise, it's deduced from the field's name by converting
      * it to camelCase.
+     * </pre>
      *
-     * Generated from protobuf field <code>optional string json_name = 10;</code>
+     * <code>optional string json_name = 10;</code>
      */
     private $json_name = '';
     private $has_json_name = false;
     /**
-     * Generated from protobuf field <code>optional .google.protobuf.FieldOptions options = 8;</code>
+     * <code>optional .google.protobuf.FieldOptions options = 8;</code>
      */
     private $options = null;
     private $has_options = false;
@@ -101,8 +115,7 @@ class FieldDescriptorProto extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>optional string name = 1;</code>
-     * @return string
+     * <code>optional string name = 1;</code>
      */
     public function getName()
     {
@@ -110,9 +123,7 @@ class FieldDescriptorProto extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>optional string name = 1;</code>
-     * @param string $var
-     * @return $this
+     * <code>optional string name = 1;</code>
      */
     public function setName($var)
     {
@@ -129,8 +140,7 @@ class FieldDescriptorProto extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>optional int32 number = 3;</code>
-     * @return int
+     * <code>optional int32 number = 3;</code>
      */
     public function getNumber()
     {
@@ -138,9 +148,7 @@ class FieldDescriptorProto extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>optional int32 number = 3;</code>
-     * @param int $var
-     * @return $this
+     * <code>optional int32 number = 3;</code>
      */
     public function setNumber($var)
     {
@@ -157,8 +165,7 @@ class FieldDescriptorProto extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>optional .google.protobuf.FieldDescriptorProto.Label label = 4;</code>
-     * @return int
+     * <code>optional .google.protobuf.FieldDescriptorProto.Label label = 4;</code>
      */
     public function getLabel()
     {
@@ -166,9 +173,7 @@ class FieldDescriptorProto extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>optional .google.protobuf.FieldDescriptorProto.Label label = 4;</code>
-     * @param int $var
-     * @return $this
+     * <code>optional .google.protobuf.FieldDescriptorProto.Label label = 4;</code>
      */
     public function setLabel($var)
     {
@@ -185,11 +190,12 @@ class FieldDescriptorProto extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * <pre>
      * If type_name is set, this need not be set.  If both this and type_name
      * are set, this must be one of TYPE_ENUM, TYPE_MESSAGE or TYPE_GROUP.
+     * </pre>
      *
-     * Generated from protobuf field <code>optional .google.protobuf.FieldDescriptorProto.Type type = 5;</code>
-     * @return int
+     * <code>optional .google.protobuf.FieldDescriptorProto.Type type = 5;</code>
      */
     public function getType()
     {
@@ -197,12 +203,12 @@ class FieldDescriptorProto extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * <pre>
      * If type_name is set, this need not be set.  If both this and type_name
      * are set, this must be one of TYPE_ENUM, TYPE_MESSAGE or TYPE_GROUP.
+     * </pre>
      *
-     * Generated from protobuf field <code>optional .google.protobuf.FieldDescriptorProto.Type type = 5;</code>
-     * @param int $var
-     * @return $this
+     * <code>optional .google.protobuf.FieldDescriptorProto.Type type = 5;</code>
      */
     public function setType($var)
     {
@@ -219,14 +225,15 @@ class FieldDescriptorProto extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * <pre>
      * For message and enum types, this is the name of the type.  If the name
      * starts with a '.', it is fully-qualified.  Otherwise, C++-like scoping
      * rules are used to find the type (i.e. first the nested types within this
      * message are searched, then within the parent, on up to the root
      * namespace).
+     * </pre>
      *
-     * Generated from protobuf field <code>optional string type_name = 6;</code>
-     * @return string
+     * <code>optional string type_name = 6;</code>
      */
     public function getTypeName()
     {
@@ -234,15 +241,15 @@ class FieldDescriptorProto extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * <pre>
      * For message and enum types, this is the name of the type.  If the name
      * starts with a '.', it is fully-qualified.  Otherwise, C++-like scoping
      * rules are used to find the type (i.e. first the nested types within this
      * message are searched, then within the parent, on up to the root
      * namespace).
+     * </pre>
      *
-     * Generated from protobuf field <code>optional string type_name = 6;</code>
-     * @param string $var
-     * @return $this
+     * <code>optional string type_name = 6;</code>
      */
     public function setTypeName($var)
     {
@@ -259,11 +266,12 @@ class FieldDescriptorProto extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * <pre>
      * For extensions, this is the name of the type being extended.  It is
      * resolved in the same manner as type_name.
+     * </pre>
      *
-     * Generated from protobuf field <code>optional string extendee = 2;</code>
-     * @return string
+     * <code>optional string extendee = 2;</code>
      */
     public function getExtendee()
     {
@@ -271,12 +279,12 @@ class FieldDescriptorProto extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * <pre>
      * For extensions, this is the name of the type being extended.  It is
      * resolved in the same manner as type_name.
+     * </pre>
      *
-     * Generated from protobuf field <code>optional string extendee = 2;</code>
-     * @param string $var
-     * @return $this
+     * <code>optional string extendee = 2;</code>
      */
     public function setExtendee($var)
     {
@@ -293,14 +301,15 @@ class FieldDescriptorProto extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * <pre>
      * For numeric types, contains the original text representation of the value.
      * For booleans, "true" or "false".
      * For strings, contains the default text contents (not escaped in any way).
-     * For bytes, contains the C escaped value.  All bytes >= 128 are escaped.
+     * For bytes, contains the C escaped value.  All bytes &gt;= 128 are escaped.
      * TODO(kenton):  Base-64 encode?
+     * </pre>
      *
-     * Generated from protobuf field <code>optional string default_value = 7;</code>
-     * @return string
+     * <code>optional string default_value = 7;</code>
      */
     public function getDefaultValue()
     {
@@ -308,15 +317,15 @@ class FieldDescriptorProto extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * <pre>
      * For numeric types, contains the original text representation of the value.
      * For booleans, "true" or "false".
      * For strings, contains the default text contents (not escaped in any way).
-     * For bytes, contains the C escaped value.  All bytes >= 128 are escaped.
+     * For bytes, contains the C escaped value.  All bytes &gt;= 128 are escaped.
      * TODO(kenton):  Base-64 encode?
+     * </pre>
      *
-     * Generated from protobuf field <code>optional string default_value = 7;</code>
-     * @param string $var
-     * @return $this
+     * <code>optional string default_value = 7;</code>
      */
     public function setDefaultValue($var)
     {
@@ -333,11 +342,12 @@ class FieldDescriptorProto extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * <pre>
      * If set, gives the index of a oneof in the containing type's oneof_decl
      * list.  This field is a member of that oneof.
+     * </pre>
      *
-     * Generated from protobuf field <code>optional int32 oneof_index = 9;</code>
-     * @return int
+     * <code>optional int32 oneof_index = 9;</code>
      */
     public function getOneofIndex()
     {
@@ -345,12 +355,12 @@ class FieldDescriptorProto extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * <pre>
      * If set, gives the index of a oneof in the containing type's oneof_decl
      * list.  This field is a member of that oneof.
+     * </pre>
      *
-     * Generated from protobuf field <code>optional int32 oneof_index = 9;</code>
-     * @param int $var
-     * @return $this
+     * <code>optional int32 oneof_index = 9;</code>
      */
     public function setOneofIndex($var)
     {
@@ -367,13 +377,14 @@ class FieldDescriptorProto extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * <pre>
      * JSON name of this field. The value is set by protocol compiler. If the
      * user has set a "json_name" option on this field, that option's value
      * will be used. Otherwise, it's deduced from the field's name by converting
      * it to camelCase.
+     * </pre>
      *
-     * Generated from protobuf field <code>optional string json_name = 10;</code>
-     * @return string
+     * <code>optional string json_name = 10;</code>
      */
     public function getJsonName()
     {
@@ -381,14 +392,14 @@ class FieldDescriptorProto extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * <pre>
      * JSON name of this field. The value is set by protocol compiler. If the
      * user has set a "json_name" option on this field, that option's value
      * will be used. Otherwise, it's deduced from the field's name by converting
      * it to camelCase.
+     * </pre>
      *
-     * Generated from protobuf field <code>optional string json_name = 10;</code>
-     * @param string $var
-     * @return $this
+     * <code>optional string json_name = 10;</code>
      */
     public function setJsonName($var)
     {
@@ -405,8 +416,7 @@ class FieldDescriptorProto extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>optional .google.protobuf.FieldOptions options = 8;</code>
-     * @return \Google\Protobuf\Internal\FieldOptions
+     * <code>optional .google.protobuf.FieldOptions options = 8;</code>
      */
     public function getOptions()
     {
@@ -414,9 +424,7 @@ class FieldDescriptorProto extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>optional .google.protobuf.FieldOptions options = 8;</code>
-     * @param \Google\Protobuf\Internal\FieldOptions $var
-     * @return $this
+     * <code>optional .google.protobuf.FieldOptions options = 8;</code>
      */
     public function setOptions(&$var)
     {

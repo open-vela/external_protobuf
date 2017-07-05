@@ -12,46 +12,54 @@ use Google\Protobuf\Internal\InputStream;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
+ * <pre>
  * Describes a method of a service.
+ * </pre>
  *
- * Generated from protobuf message <code>google.protobuf.MethodDescriptorProto</code>
+ * Protobuf type <code>google.protobuf.MethodDescriptorProto</code>
  */
 class MethodDescriptorProto extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Generated from protobuf field <code>optional string name = 1;</code>
+     * <code>optional string name = 1;</code>
      */
     private $name = '';
     private $has_name = false;
     /**
+     * <pre>
      * Input and output type names.  These are resolved in the same way as
      * FieldDescriptorProto.type_name, but must refer to a message type.
+     * </pre>
      *
-     * Generated from protobuf field <code>optional string input_type = 2;</code>
+     * <code>optional string input_type = 2;</code>
      */
     private $input_type = '';
     private $has_input_type = false;
     /**
-     * Generated from protobuf field <code>optional string output_type = 3;</code>
+     * <code>optional string output_type = 3;</code>
      */
     private $output_type = '';
     private $has_output_type = false;
     /**
-     * Generated from protobuf field <code>optional .google.protobuf.MethodOptions options = 4;</code>
+     * <code>optional .google.protobuf.MethodOptions options = 4;</code>
      */
     private $options = null;
     private $has_options = false;
     /**
+     * <pre>
      * Identifies if client streams multiple client messages
+     * </pre>
      *
-     * Generated from protobuf field <code>optional bool client_streaming = 5 [default = false];</code>
+     * <code>optional bool client_streaming = 5 [default = false];</code>
      */
     private $client_streaming = false;
     private $has_client_streaming = false;
     /**
+     * <pre>
      * Identifies if server streams multiple server messages
+     * </pre>
      *
-     * Generated from protobuf field <code>optional bool server_streaming = 6 [default = false];</code>
+     * <code>optional bool server_streaming = 6 [default = false];</code>
      */
     private $server_streaming = false;
     private $has_server_streaming = false;
@@ -62,8 +70,7 @@ class MethodDescriptorProto extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>optional string name = 1;</code>
-     * @return string
+     * <code>optional string name = 1;</code>
      */
     public function getName()
     {
@@ -71,9 +78,7 @@ class MethodDescriptorProto extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>optional string name = 1;</code>
-     * @param string $var
-     * @return $this
+     * <code>optional string name = 1;</code>
      */
     public function setName($var)
     {
@@ -90,11 +95,12 @@ class MethodDescriptorProto extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * <pre>
      * Input and output type names.  These are resolved in the same way as
      * FieldDescriptorProto.type_name, but must refer to a message type.
+     * </pre>
      *
-     * Generated from protobuf field <code>optional string input_type = 2;</code>
-     * @return string
+     * <code>optional string input_type = 2;</code>
      */
     public function getInputType()
     {
@@ -102,12 +108,12 @@ class MethodDescriptorProto extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * <pre>
      * Input and output type names.  These are resolved in the same way as
      * FieldDescriptorProto.type_name, but must refer to a message type.
+     * </pre>
      *
-     * Generated from protobuf field <code>optional string input_type = 2;</code>
-     * @param string $var
-     * @return $this
+     * <code>optional string input_type = 2;</code>
      */
     public function setInputType($var)
     {
@@ -124,8 +130,7 @@ class MethodDescriptorProto extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>optional string output_type = 3;</code>
-     * @return string
+     * <code>optional string output_type = 3;</code>
      */
     public function getOutputType()
     {
@@ -133,9 +138,7 @@ class MethodDescriptorProto extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>optional string output_type = 3;</code>
-     * @param string $var
-     * @return $this
+     * <code>optional string output_type = 3;</code>
      */
     public function setOutputType($var)
     {
@@ -152,8 +155,7 @@ class MethodDescriptorProto extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>optional .google.protobuf.MethodOptions options = 4;</code>
-     * @return \Google\Protobuf\Internal\MethodOptions
+     * <code>optional .google.protobuf.MethodOptions options = 4;</code>
      */
     public function getOptions()
     {
@@ -161,9 +163,7 @@ class MethodDescriptorProto extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>optional .google.protobuf.MethodOptions options = 4;</code>
-     * @param \Google\Protobuf\Internal\MethodOptions $var
-     * @return $this
+     * <code>optional .google.protobuf.MethodOptions options = 4;</code>
      */
     public function setOptions(&$var)
     {
@@ -180,10 +180,11 @@ class MethodDescriptorProto extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * <pre>
      * Identifies if client streams multiple client messages
+     * </pre>
      *
-     * Generated from protobuf field <code>optional bool client_streaming = 5 [default = false];</code>
-     * @return bool
+     * <code>optional bool client_streaming = 5 [default = false];</code>
      */
     public function getClientStreaming()
     {
@@ -191,11 +192,11 @@ class MethodDescriptorProto extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * <pre>
      * Identifies if client streams multiple client messages
+     * </pre>
      *
-     * Generated from protobuf field <code>optional bool client_streaming = 5 [default = false];</code>
-     * @param bool $var
-     * @return $this
+     * <code>optional bool client_streaming = 5 [default = false];</code>
      */
     public function setClientStreaming($var)
     {
@@ -212,10 +213,11 @@ class MethodDescriptorProto extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * <pre>
      * Identifies if server streams multiple server messages
+     * </pre>
      *
-     * Generated from protobuf field <code>optional bool server_streaming = 6 [default = false];</code>
-     * @return bool
+     * <code>optional bool server_streaming = 6 [default = false];</code>
      */
     public function getServerStreaming()
     {
@@ -223,11 +225,11 @@ class MethodDescriptorProto extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * <pre>
      * Identifies if server streams multiple server messages
+     * </pre>
      *
-     * Generated from protobuf field <code>optional bool server_streaming = 6 [default = false];</code>
-     * @param bool $var
-     * @return $this
+     * <code>optional bool server_streaming = 6 [default = false];</code>
      */
     public function setServerStreaming($var)
     {
