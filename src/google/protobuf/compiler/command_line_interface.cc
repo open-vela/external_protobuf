@@ -45,7 +45,10 @@
 #endif
 #include <sys/stat.h>
 #include <fcntl.h>
-#ifndef _MSC_VER
+#ifdef _MSC_VER
+#include <io.h>
+#include <direct.h>
+#else
 #include <unistd.h>
 #endif
 #include <errno.h>
@@ -77,7 +80,6 @@
 #include <google/protobuf/io/coded_stream.h>
 #include <google/protobuf/io/zero_copy_stream_impl.h>
 #include <google/protobuf/io/printer.h>
-#include <google/protobuf/stubs/io_win32.h>
 #include <google/protobuf/stubs/logging.h>
 #include <google/protobuf/stubs/strutil.h>
 #include <google/protobuf/stubs/substitute.h>
@@ -88,6 +90,22 @@
 namespace google {
 namespace protobuf {
 namespace compiler {
+
+#if defined(_WIN32)
+#define mkdir(name, mode) mkdir(name)
+#ifndef W_OK
+#define W_OK 02  // not defined by MSVC for whatever reason
+#endif
+#ifndef F_OK
+#define F_OK 00  // not defined by MSVC for whatever reason
+#endif
+#ifndef STDIN_FILENO
+#define STDIN_FILENO 0
+#endif
+#ifndef STDOUT_FILENO
+#define STDOUT_FILENO 1
+#endif
+#endif
 
 #ifndef O_BINARY
 #ifdef _O_BINARY
@@ -100,14 +118,6 @@ namespace compiler {
 namespace {
 #if defined(_WIN32) && !defined(__CYGWIN__)
 static const char* kPathSeparator = ";";
-// DO NOT include <io.h>, instead create functions in io_win32.{h,cc} and import
-// them like we do below.
-using google::protobuf::internal::win32::access;
-using google::protobuf::internal::win32::close;
-using google::protobuf::internal::win32::mkdir;
-using google::protobuf::internal::win32::open;
-using google::protobuf::internal::win32::setmode;
-using google::protobuf::internal::win32::write;
 #else
 static const char* kPathSeparator = ":";
 #endif
@@ -131,9 +141,9 @@ static bool IsWindowsAbsolutePath(const string& text) {
 
 void SetFdToTextMode(int fd) {
 #ifdef _WIN32
-  if (setmode(fd, _O_TEXT) == -1) {
+  if (_setmode(fd, _O_TEXT) == -1) {
     // This should never happen, I think.
-    GOOGLE_LOG(WARNING) << "setmode(" << fd << ", _O_TEXT): " << strerror(errno);
+    GOOGLE_LOG(WARNING) << "_setmode(" << fd << ", _O_TEXT): " << strerror(errno);
   }
 #endif
   // (Text and binary are the same on non-Windows platforms.)
@@ -141,9 +151,9 @@ void SetFdToTextMode(int fd) {
 
 void SetFdToBinaryMode(int fd) {
 #ifdef _WIN32
-  if (setmode(fd, _O_BINARY) == -1) {
+  if (_setmode(fd, _O_BINARY) == -1) {
     // This should never happen, I think.
-    GOOGLE_LOG(WARNING) << "setmode(" << fd << ", _O_BINARY): " << strerror(errno);
+    GOOGLE_LOG(WARNING) << "_setmode(" << fd << ", _O_BINARY): " << strerror(errno);
   }
 #endif
   // (Text and binary are the same on non-Windows platforms.)
