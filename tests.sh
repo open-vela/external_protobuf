@@ -346,7 +346,7 @@ generate_php_test_proto() {
   # Generate test file
   rm -rf generated
   mkdir generated
-  ../../src/protoc --php_out=generated proto/test.proto proto/test_include.proto proto/test_no_namespace.proto proto/test_prefix.proto proto/test_php_namespace.proto proto/test_empty_php_namespace.proto
+  ../../src/protoc --php_out=generated proto/test.proto proto/test_include.proto proto/test_no_namespace.proto proto/test_prefix.proto proto/test_php_namespace.proto proto/test_empty_php_namespace.proto proto/test_service.proto proto/test_service_namespace.proto
   pushd ../../src
   ./protoc --php_out=../php/tests/generated google/protobuf/empty.proto
   ./protoc --php_out=../php/tests/generated -I../php/tests -I. ../php/tests/proto/test_import_descriptor_proto.proto
@@ -544,51 +544,16 @@ build_php_compatibility() {
   php/tests/compatibility_test.sh
 }
 
-build_php7.1() {
-  use_php 7.1
-  pushd php
-  rm -rf vendor
-  cp -r /usr/local/vendor-7.1 vendor
-  wget https://phar.phpunit.de/phpunit-5.6.0.phar -O /usr/bin/phpunit
-  phpunit
-  popd
-  pushd conformance
-  # TODO(teboring): Add it back
-  # make test_php
-  popd
-}
-
-build_php7.1_c() {
-  use_php 7.1
-  wget https://phar.phpunit.de/phpunit-5.6.0.phar -O /usr/bin/phpunit
-  cd php/tests && /bin/bash ./test.sh && cd ../..
-  pushd conformance
-  # make test_php_c
-  popd
-}
-
-build_php7.1_zts_c() {
-  use_php_zts 7.1
-  wget https://phar.phpunit.de/phpunit-5.6.0.phar -O /usr/bin/phpunit
-  cd php/tests && /bin/bash ./test.sh && cd ../..
-  pushd conformance
-  # make test_php_c
-  popd
-}
-
 build_php_all_32() {
   build_php5.5
   build_php5.6
   build_php7.0
-  build_php7.1
   build_php5.5_c
   build_php5.6_c
   build_php7.0_c
-  build_php7.1_c
   build_php5.5_zts_c
   build_php5.6_zts_c
   build_php7.0_zts_c
-  build_php7.1_zts_c
 }
 
 build_php_all() {
@@ -635,8 +600,6 @@ Usage: $0 { cpp |
             php7.0   |
             php7.0_c |
             php_compatibility |
-            php7.1   |
-            php7.1_c |
             php_all)
 "
   exit 1
