@@ -43,8 +43,6 @@
 #include <google/protobuf/wire_format.h>
 #include <google/protobuf/stubs/strutil.h>
 #include <google/protobuf/stubs/substitute.h>
-
-
 #include <google/protobuf/stubs/hash.h>  // for hash<T *>
 
 namespace google {
@@ -167,14 +165,6 @@ string UnderscoresToCamelCase(const MethodDescriptor* method) {
 
 string UniqueFileScopeIdentifier(const Descriptor* descriptor) {
   return "static_" + StringReplace(descriptor->full_name(), ".", "_", true);
-}
-
-string CamelCaseFieldName(const FieldDescriptor* field) {
-  string fieldName = UnderscoresToCamelCase(field);
-  if ('0' <= fieldName[0] && fieldName[0] <= '9') {
-    return '_' + fieldName;
-  }
-  return fieldName;
 }
 
 string StripProto(const string& filename) {
