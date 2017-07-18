@@ -12,14 +12,16 @@ use Google\Protobuf\Internal\InputStream;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Generated from protobuf message <code>google.protobuf.OneofOptions</code>
+ * Protobuf type <code>google.protobuf.OneofOptions</code>
  */
 class OneofOptions extends \Google\Protobuf\Internal\Message
 {
     /**
+     * <pre>
      * The parser stores options it doesn't recognize here. See above.
+     * </pre>
      *
-     * Generated from protobuf field <code>repeated .google.protobuf.UninterpretedOption uninterpreted_option = 999;</code>
+     * <code>repeated .google.protobuf.UninterpretedOption uninterpreted_option = 999;</code>
      */
     private $uninterpreted_option;
     private $has_uninterpreted_option = false;
@@ -30,10 +32,11 @@ class OneofOptions extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * <pre>
      * The parser stores options it doesn't recognize here. See above.
+     * </pre>
      *
-     * Generated from protobuf field <code>repeated .google.protobuf.UninterpretedOption uninterpreted_option = 999;</code>
-     * @return \Google\Protobuf\Internal\RepeatedField
+     * <code>repeated .google.protobuf.UninterpretedOption uninterpreted_option = 999;</code>
      */
     public function getUninterpretedOption()
     {
@@ -41,19 +44,17 @@ class OneofOptions extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * <pre>
      * The parser stores options it doesn't recognize here. See above.
+     * </pre>
      *
-     * Generated from protobuf field <code>repeated .google.protobuf.UninterpretedOption uninterpreted_option = 999;</code>
-     * @param \Google\Protobuf\Internal\UninterpretedOption[]|\Google\Protobuf\Internal\RepeatedField $var
-     * @return $this
+     * <code>repeated .google.protobuf.UninterpretedOption uninterpreted_option = 999;</code>
      */
-    public function setUninterpretedOption($var)
+    public function setUninterpretedOption(&$var)
     {
         $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Google\Protobuf\Internal\UninterpretedOption::class);
         $this->uninterpreted_option = $arr;
         $this->has_uninterpreted_option = true;
-
-        return $this;
     }
 
     public function hasUninterpretedOption()

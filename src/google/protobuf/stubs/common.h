@@ -200,7 +200,8 @@ namespace internal {
 
 // Register a function to be called when ShutdownProtocolBuffers() is called.
 LIBPROTOBUF_EXPORT void OnShutdown(void (*func)());
-
+// Destroy the string (call string destructor)
+LIBPROTOBUF_EXPORT void OnShutdownDestroyString(const std::string* ptr);
 }  // namespace internal
 
 #if PROTOBUF_USE_EXCEPTIONS
@@ -227,8 +228,10 @@ class FatalException : public std::exception {
 // in some versions of MSVC.
 // TODO(acozzette): remove these using statements
 using std::istream;
+using std::map;
 using std::ostream;
 using std::pair;
+using std::set;
 using std::string;
 using std::vector;
 

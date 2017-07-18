@@ -12,24 +12,26 @@ use Google\Protobuf\Internal\InputStream;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
+ * <pre>
  * Describes an enum type.
+ * </pre>
  *
- * Generated from protobuf message <code>google.protobuf.EnumDescriptorProto</code>
+ * Protobuf type <code>google.protobuf.EnumDescriptorProto</code>
  */
 class EnumDescriptorProto extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Generated from protobuf field <code>optional string name = 1;</code>
+     * <code>optional string name = 1;</code>
      */
     private $name = '';
     private $has_name = false;
     /**
-     * Generated from protobuf field <code>repeated .google.protobuf.EnumValueDescriptorProto value = 2;</code>
+     * <code>repeated .google.protobuf.EnumValueDescriptorProto value = 2;</code>
      */
     private $value;
     private $has_value = false;
     /**
-     * Generated from protobuf field <code>optional .google.protobuf.EnumOptions options = 3;</code>
+     * <code>optional .google.protobuf.EnumOptions options = 3;</code>
      */
     private $options = null;
     private $has_options = false;
@@ -40,8 +42,7 @@ class EnumDescriptorProto extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>optional string name = 1;</code>
-     * @return string
+     * <code>optional string name = 1;</code>
      */
     public function getName()
     {
@@ -49,17 +50,13 @@ class EnumDescriptorProto extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>optional string name = 1;</code>
-     * @param string $var
-     * @return $this
+     * <code>optional string name = 1;</code>
      */
     public function setName($var)
     {
         GPBUtil::checkString($var, True);
         $this->name = $var;
         $this->has_name = true;
-
-        return $this;
     }
 
     public function hasName()
@@ -68,8 +65,7 @@ class EnumDescriptorProto extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>repeated .google.protobuf.EnumValueDescriptorProto value = 2;</code>
-     * @return \Google\Protobuf\Internal\RepeatedField
+     * <code>repeated .google.protobuf.EnumValueDescriptorProto value = 2;</code>
      */
     public function getValue()
     {
@@ -77,17 +73,13 @@ class EnumDescriptorProto extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>repeated .google.protobuf.EnumValueDescriptorProto value = 2;</code>
-     * @param \Google\Protobuf\Internal\EnumValueDescriptorProto[]|\Google\Protobuf\Internal\RepeatedField $var
-     * @return $this
+     * <code>repeated .google.protobuf.EnumValueDescriptorProto value = 2;</code>
      */
-    public function setValue($var)
+    public function setValue(&$var)
     {
         $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Google\Protobuf\Internal\EnumValueDescriptorProto::class);
         $this->value = $arr;
         $this->has_value = true;
-
-        return $this;
     }
 
     public function hasValue()
@@ -96,8 +88,7 @@ class EnumDescriptorProto extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>optional .google.protobuf.EnumOptions options = 3;</code>
-     * @return \Google\Protobuf\Internal\EnumOptions
+     * <code>optional .google.protobuf.EnumOptions options = 3;</code>
      */
     public function getOptions()
     {
@@ -105,17 +96,13 @@ class EnumDescriptorProto extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>optional .google.protobuf.EnumOptions options = 3;</code>
-     * @param \Google\Protobuf\Internal\EnumOptions $var
-     * @return $this
+     * <code>optional .google.protobuf.EnumOptions options = 3;</code>
      */
-    public function setOptions($var)
+    public function setOptions(&$var)
     {
         GPBUtil::checkMessage($var, \Google\Protobuf\Internal\EnumOptions::class);
         $this->options = $var;
         $this->has_options = true;
-
-        return $this;
     }
 
     public function hasOptions()

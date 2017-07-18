@@ -49,7 +49,7 @@ namespace objectivec {
 namespace {
 
 void SetCommonFieldVariables(const FieldDescriptor* descriptor,
-                             std::map<string, string>* variables) {
+                             map<string, string>* variables) {
   string camel_case_name = FieldName(descriptor);
   string raw_field_name;
   if (descriptor->type() == FieldDescriptor::TYPE_GROUP) {
@@ -178,7 +178,7 @@ void FieldGenerator::GenerateCFunctionImplementations(
 }
 
 void FieldGenerator::DetermineForwardDeclarations(
-    std::set<string>* fwd_decls) const {
+    set<string>* fwd_decls) const {
   // Nothing
 }
 

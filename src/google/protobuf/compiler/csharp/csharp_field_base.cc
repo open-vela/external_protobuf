@@ -54,7 +54,7 @@ namespace compiler {
 namespace csharp {
 
 void FieldGeneratorBase::SetCommonFieldVariables(
-    std::map<string, string>* variables) {
+    map<string, string>* variables) {
   // Note: this will be valid even though the tag emitted for packed and unpacked versions of
   // repeated fields varies by wire format. The wire format is encoded in the bottom 3 bits, which
   // never effects the tag size.
@@ -92,7 +92,7 @@ void FieldGeneratorBase::SetCommonFieldVariables(
 }
 
 void FieldGeneratorBase::SetCommonOneofFieldVariables(
-    std::map<string, string>* variables) {
+    map<string, string>* variables) {
   (*variables)["oneof_name"] = oneof_name();
   (*variables)["has_property_check"] =
     oneof_name() + "Case_ == " + oneof_property_name() +

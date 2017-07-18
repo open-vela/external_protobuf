@@ -373,7 +373,6 @@ struct MessageLayout;
 struct RepeatedField;
 struct RepeatedFieldIter;
 struct Map;
-struct MapIter;
 struct Oneof;
 
 typedef struct DescriptorPool DescriptorPool;
@@ -386,7 +385,6 @@ typedef struct MessageLayout MessageLayout;
 typedef struct RepeatedField RepeatedField;
 typedef struct RepeatedFieldIter RepeatedFieldIter;
 typedef struct Map Map;
-typedef struct MapIter MapIter;
 typedef struct Oneof Oneof;
 
 // -----------------------------------------------------------------------------
@@ -402,7 +400,6 @@ void enum_descriptor_init(TSRMLS_D);
 void descriptor_pool_init(TSRMLS_D);
 void gpb_type_init(TSRMLS_D);
 void map_field_init(TSRMLS_D);
-void map_field_iter_init(TSRMLS_D);
 void repeated_field_init(TSRMLS_D);
 void repeated_field_iter_init(TSRMLS_D);
 void util_init(TSRMLS_D);
@@ -596,8 +593,8 @@ const upb_pbdecodermethod *new_fillmsg_decodermethod(Descriptor *desc,
 
 PHP_METHOD(Message, serializeToString);
 PHP_METHOD(Message, mergeFromString);
-PHP_METHOD(Message, serializeToJsonString);
-PHP_METHOD(Message, mergeFromJsonString);
+PHP_METHOD(Message, jsonEncode);
+PHP_METHOD(Message, jsonDecode);
 
 // -----------------------------------------------------------------------------
 // Type check / conversion.
@@ -640,7 +637,7 @@ bool native_slot_set(upb_fieldtype_t type, const zend_class_entry* klass,
 bool native_slot_set_by_array(upb_fieldtype_t type,
                               const zend_class_entry* klass, void* memory,
                               zval* value TSRMLS_DC);
-void native_slot_init(upb_fieldtype_t type, void* memory, CACHED_VALUE* cache);
+void native_slot_init(upb_fieldtype_t type, void* memory, void* cache);
 // For each property, in order to avoid conversion between the zval object and
 // the actual data type during parsing/serialization, the containing message
 // object use the custom memory layout to store the actual data type for each
@@ -662,7 +659,6 @@ void native_slot_get_default(upb_fieldtype_t type,
 // -----------------------------------------------------------------------------
 
 extern zend_object_handlers* map_field_handlers;
-extern zend_object_handlers* map_field_iter_handlers;
 
 PHP_PROTO_WRAP_OBJECT_START(Map)
   upb_fieldtype_t key_type;
@@ -671,10 +667,10 @@ PHP_PROTO_WRAP_OBJECT_START(Map)
   upb_strtable table;
 PHP_PROTO_WRAP_OBJECT_END
 
-PHP_PROTO_WRAP_OBJECT_START(MapIter)
+typedef struct {
   Map* self;
   upb_strtable_iter it;
-PHP_PROTO_WRAP_OBJECT_END
+} MapIter;
 
 void map_begin(zval* self, MapIter* iter TSRMLS_DC);
 void map_next(MapIter* iter);
@@ -713,13 +709,6 @@ PHP_METHOD(MapField, offsetGet);
 PHP_METHOD(MapField, offsetSet);
 PHP_METHOD(MapField, offsetUnset);
 PHP_METHOD(MapField, count);
-PHP_METHOD(MapField, getIterator);
-
-PHP_METHOD(MapFieldIter, rewind);
-PHP_METHOD(MapFieldIter, current);
-PHP_METHOD(MapFieldIter, key);
-PHP_METHOD(MapFieldIter, next);
-PHP_METHOD(MapFieldIter, valid);
 
 // -----------------------------------------------------------------------------
 // Repeated Field.

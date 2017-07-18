@@ -18,11 +18,8 @@ function run_test() {
     protos/src/google/protobuf/map_unittest_proto3.proto
 
   # Build and test.
-  dotnet restore src/Google.Protobuf/Google.Protobuf.csproj
-  dotnet restore src/Google.Protobuf.Test/Google.Protobuf.Test.csproj
-  dotnet build -c Release src/Google.Protobuf/Google.Protobuf.csproj
-  dotnet build -c Release src/Google.Protobuf.Test/Google.Protobuf.Test.csproj
-  dotnet run -c Release -f netcoreapp1.0 -p src/Google.Protobuf.Test/Google.Protobuf.Test.csproj
+  dotnet build -c release src/Google.Protobuf src/Google.Protobuf.Test
+  dotnet test -c release -f netcoreapp1.0 src/Google.Protobuf.Test
 }
 
 set -ex
@@ -75,6 +72,7 @@ chmod +x old_protoc
 # Copy the new runtime and keys.
 cp ../../src/Google.Protobuf src/Google.Protobuf -r
 cp ../../keys . -r
+dotnet restore
 
 # Test A.1:
 #   proto set 1: use old version
