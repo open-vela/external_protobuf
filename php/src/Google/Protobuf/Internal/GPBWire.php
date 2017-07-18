@@ -117,12 +117,19 @@ class GPBWire
   //        << decode <<
   public static function zigZagEncode32($int32)
   {
-      if (PHP_INT_SIZE == 8) {
-          $trim_int32 = $int32 & 0xFFFFFFFF;
-          return (($trim_int32 << 1) ^ ($int32 << 32 >> 63)) & 0xFFFFFFFF;
-      } else {
-          return ($int32 << 1) ^ ($int32 >> 31);
+      // Fill high 32 bits.
+      if (PHP_INT_SIZE === 8) {
+          $int32 |= ((($int32 << 32) >> 31) & (0xFFFFFFFF << 32));
       }
+
+      $uint32 = ($int32 << 1) ^ ($int32 >> 31);
+
+      // Fill high 32 bits.
+      if (PHP_INT_SIZE === 8) {
+          $uint32 |= ((($uint32 << 32) >> 31) & (0xFFFFFFFF << 32));
+      }
+
+      return $uint32;
   }
 
     public static function zigZagDecode32($uint32)
@@ -170,11 +177,7 @@ class GPBWire
 
     public static function readInt64(&$input, &$value)
     {
-        $success = $input->readVarint64($value);
-        if (PHP_INT_SIZE == 4 && bccomp($value, "9223372036854775807") > 0) {
-            $value = bcsub($value, "18446744073709551616");
-        }
-        return $success;
+        return $input->readVarint64($value);
     }
 
     public static function readUint32(&$input, &$value)
@@ -228,11 +231,7 @@ class GPBWire
 
     public static function readSfixed64(&$input, &$value)
     {
-        $success = $input->readLittleEndian64($value);
-        if (PHP_INT_SIZE == 4 && bccomp($value, "9223372036854775807") > 0) {
-            $value = bcsub($value, "18446744073709551616");
-        }
-        return $success;
+        return $input->readLittleEndian64($value);
     }
 
     public static function readFloat(&$input, &$value)
@@ -299,7 +298,7 @@ class GPBWire
 
     public static function writeInt32(&$output, $value)
     {
-        return $output->writeVarint32($value, false);
+        return $output->writeVarint32($value);
     }
 
     public static function writeInt64(&$output, $value)
@@ -309,7 +308,7 @@ class GPBWire
 
     public static function writeUint32(&$output, $value)
     {
-        return $output->writeVarint32($value, true);
+        return $output->writeVarint32($value);
     }
 
     public static function writeUint64(&$output, $value)
@@ -320,7 +319,7 @@ class GPBWire
     public static function writeSint32(&$output, $value)
     {
         $value = GPBWire::zigZagEncode32($value);
-        return $output->writeVarint32($value, true);
+        return $output->writeVarint64($value);
     }
 
     public static function writeSint64(&$output, $value)
@@ -352,9 +351,9 @@ class GPBWire
     public static function writeBool(&$output, $value)
     {
         if ($value) {
-            return $output->writeVarint32(1, true);
+            return $output->writeVarint32(1);
         } else {
-            return $output->writeVarint32(0, true);
+            return $output->writeVarint32(0);
         }
     }
 
@@ -378,7 +377,7 @@ class GPBWire
     public static function writeBytes(&$output, $value)
     {
         $size = strlen($value);
-        if (!$output->writeVarint32($size, true)) {
+        if (!$output->writeVarint32($size)) {
             return false;
         }
         return $output->writeRaw($value, $size);
@@ -387,7 +386,7 @@ class GPBWire
     public static function writeMessage(&$output, $value)
     {
         $size = $value->byteSize();
-        if (!$output->writeVarint32($size, true)) {
+        if (!$output->writeVarint32($size)) {
             return false;
         }
         return $value->serializeToStream($output);
@@ -443,8 +442,7 @@ class GPBWire
     public static function varint64Size($value)
     {
         if (PHP_INT_SIZE == 4) {
-            if (bccomp($value, 0) < 0 ||
-                bccomp($value, "9223372036854775807") > 0) {
+            if (bccomp($value, 0) < 0) {
                 return 10;
             }    
             if (bccomp($value, 1 << 7) < 0) {
@@ -580,9 +578,6 @@ class GPBWire
                 }
                 break;
             case GPBType::UINT32:
-                if (PHP_INT_SIZE === 8 && $value < 0) {
-                    $value += 4294967296;
-                }
                 if (!GPBWire::writeUint32($output, $value)) {
                     return false;
                 }

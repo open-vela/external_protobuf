@@ -57,16 +57,14 @@
 
 - (instancetype)copyWithZone:(NSZone *)zone {
   GPBExtensionRegistry *result = [[[self class] allocWithZone:zone] init];
-  [result addExtensions:self];
+  if (result && mutableClassMap_.count) {
+    [result->mutableClassMap_ addEntriesFromDictionary:mutableClassMap_];
+  }
   return result;
 }
 
-- (void)addExtension:(GPBExtensionDescriptor *)extension {
-  if (extension == nil) {
-    return;
-  }
-
-  Class containingMessageClass = extension.containingMessageClass;
+- (CFMutableDictionaryRef)extensionMapForContainingMessageClass:
+        (Class)containingMessageClass {
   CFMutableDictionaryRef extensionMap = (CFMutableDictionaryRef)
       [mutableClassMap_ objectForKey:containingMessageClass];
   if (extensionMap == nil) {
@@ -76,9 +74,18 @@
                                              &kCFTypeDictionaryValueCallBacks);
     [mutableClassMap_ setObject:(id)extensionMap
                          forKey:(id<NSCopying>)containingMessageClass];
-    CFRelease(extensionMap);
+  }
+  return extensionMap;
+}
+
+- (void)addExtension:(GPBExtensionDescriptor *)extension {
+  if (extension == nil) {
+    return;
   }
 
+  Class containingMessageClass = extension.containingMessageClass;
+  CFMutableDictionaryRef extensionMap =
+      [self extensionMapForContainingMessageClass:containingMessageClass];
   ssize_t key = extension.fieldNumber;
   CFDictionarySetValue(extensionMap, (const void *)key, extension);
 }
@@ -112,16 +119,10 @@ static void CopyKeyValue(const void *key, const void *value, void *context) {
     Class containingMessageClass = key;
     CFMutableDictionaryRef otherExtensionMap = (CFMutableDictionaryRef)value;
 
-    CFMutableDictionaryRef extensionMap = (CFMutableDictionaryRef)
-        [mutableClassMap_ objectForKey:containingMessageClass];
-    if (extensionMap == nil) {
-      extensionMap = CFDictionaryCreateMutableCopy(kCFAllocatorDefault, 0, otherExtensionMap);
-      [mutableClassMap_ setObject:(id)extensionMap
-                           forKey:(id<NSCopying>)containingMessageClass];
-      CFRelease(extensionMap);
-    } else {
-      CFDictionaryApplyFunction(otherExtensionMap, CopyKeyValue, extensionMap);
-    }
+    CFMutableDictionaryRef extensionMap =
+        [self extensionMapForContainingMessageClass:containingMessageClass];
+
+    CFDictionaryApplyFunction(otherExtensionMap, CopyKeyValue, extensionMap);
   }];
 }
 

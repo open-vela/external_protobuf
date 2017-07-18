@@ -19,15 +19,11 @@ goto :EOF
 :build_csharp
 echo Building C#
 cd csharp\src
-REM The platform environment variable is implicitly used by msbuild;
-REM we don't want it.
-set platform=
 dotnet restore
-dotnet build -c %configuration% || goto error
+dotnet build -c %configuration% Google.Protobuf Google.Protobuf.Test Google.Protobuf.Conformance || goto error
 
 echo Testing C#
-dotnet run -c %configuration% -f netcoreapp1.0 -p Google.Protobuf.Test\Google.Protobuf.Test.csproj || goto error
-dotnet run -c %configuration% -f net451 -p Google.Protobuf.Test\Google.Protobuf.Test.csproj || goto error
+dotnet test -c %configuration% Google.Protobuf.Test || goto error
 
 goto :EOF
 

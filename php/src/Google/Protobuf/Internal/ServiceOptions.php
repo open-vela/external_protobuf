@@ -12,24 +12,28 @@ use Google\Protobuf\Internal\InputStream;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Generated from protobuf message <code>google.protobuf.ServiceOptions</code>
+ * Protobuf type <code>google.protobuf.ServiceOptions</code>
  */
 class ServiceOptions extends \Google\Protobuf\Internal\Message
 {
     /**
+     * <pre>
      * Is this service deprecated?
      * Depending on the target platform, this can emit Deprecated annotations
      * for the service, or it will be completely ignored; in the very least,
      * this is a formalization for deprecating services.
+     * </pre>
      *
-     * Generated from protobuf field <code>optional bool deprecated = 33 [default = false];</code>
+     * <code>optional bool deprecated = 33 [default = false];</code>
      */
     private $deprecated = false;
     private $has_deprecated = false;
     /**
+     * <pre>
      * The parser stores options it doesn't recognize here. See above.
+     * </pre>
      *
-     * Generated from protobuf field <code>repeated .google.protobuf.UninterpretedOption uninterpreted_option = 999;</code>
+     * <code>repeated .google.protobuf.UninterpretedOption uninterpreted_option = 999;</code>
      */
     private $uninterpreted_option;
     private $has_uninterpreted_option = false;
@@ -40,13 +44,14 @@ class ServiceOptions extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * <pre>
      * Is this service deprecated?
      * Depending on the target platform, this can emit Deprecated annotations
      * for the service, or it will be completely ignored; in the very least,
      * this is a formalization for deprecating services.
+     * </pre>
      *
-     * Generated from protobuf field <code>optional bool deprecated = 33 [default = false];</code>
-     * @return bool
+     * <code>optional bool deprecated = 33 [default = false];</code>
      */
     public function getDeprecated()
     {
@@ -54,22 +59,20 @@ class ServiceOptions extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * <pre>
      * Is this service deprecated?
      * Depending on the target platform, this can emit Deprecated annotations
      * for the service, or it will be completely ignored; in the very least,
      * this is a formalization for deprecating services.
+     * </pre>
      *
-     * Generated from protobuf field <code>optional bool deprecated = 33 [default = false];</code>
-     * @param bool $var
-     * @return $this
+     * <code>optional bool deprecated = 33 [default = false];</code>
      */
     public function setDeprecated($var)
     {
         GPBUtil::checkBool($var);
         $this->deprecated = $var;
         $this->has_deprecated = true;
-
-        return $this;
     }
 
     public function hasDeprecated()
@@ -78,10 +81,11 @@ class ServiceOptions extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * <pre>
      * The parser stores options it doesn't recognize here. See above.
+     * </pre>
      *
-     * Generated from protobuf field <code>repeated .google.protobuf.UninterpretedOption uninterpreted_option = 999;</code>
-     * @return \Google\Protobuf\Internal\RepeatedField
+     * <code>repeated .google.protobuf.UninterpretedOption uninterpreted_option = 999;</code>
      */
     public function getUninterpretedOption()
     {
@@ -89,19 +93,17 @@ class ServiceOptions extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * <pre>
      * The parser stores options it doesn't recognize here. See above.
+     * </pre>
      *
-     * Generated from protobuf field <code>repeated .google.protobuf.UninterpretedOption uninterpreted_option = 999;</code>
-     * @param \Google\Protobuf\Internal\UninterpretedOption[]|\Google\Protobuf\Internal\RepeatedField $var
-     * @return $this
+     * <code>repeated .google.protobuf.UninterpretedOption uninterpreted_option = 999;</code>
      */
-    public function setUninterpretedOption($var)
+    public function setUninterpretedOption(&$var)
     {
         $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Google\Protobuf\Internal\UninterpretedOption::class);
         $this->uninterpreted_option = $arr;
         $this->has_uninterpreted_option = true;
-
-        return $this;
     }
 
     public function hasUninterpretedOption()

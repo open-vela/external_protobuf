@@ -12,24 +12,26 @@ use Google\Protobuf\Internal\InputStream;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
+ * <pre>
  * Describes a service.
+ * </pre>
  *
- * Generated from protobuf message <code>google.protobuf.ServiceDescriptorProto</code>
+ * Protobuf type <code>google.protobuf.ServiceDescriptorProto</code>
  */
 class ServiceDescriptorProto extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Generated from protobuf field <code>optional string name = 1;</code>
+     * <code>optional string name = 1;</code>
      */
     private $name = '';
     private $has_name = false;
     /**
-     * Generated from protobuf field <code>repeated .google.protobuf.MethodDescriptorProto method = 2;</code>
+     * <code>repeated .google.protobuf.MethodDescriptorProto method = 2;</code>
      */
     private $method;
     private $has_method = false;
     /**
-     * Generated from protobuf field <code>optional .google.protobuf.ServiceOptions options = 3;</code>
+     * <code>optional .google.protobuf.ServiceOptions options = 3;</code>
      */
     private $options = null;
     private $has_options = false;
@@ -40,8 +42,7 @@ class ServiceDescriptorProto extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>optional string name = 1;</code>
-     * @return string
+     * <code>optional string name = 1;</code>
      */
     public function getName()
     {
@@ -49,17 +50,13 @@ class ServiceDescriptorProto extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>optional string name = 1;</code>
-     * @param string $var
-     * @return $this
+     * <code>optional string name = 1;</code>
      */
     public function setName($var)
     {
         GPBUtil::checkString($var, True);
         $this->name = $var;
         $this->has_name = true;
-
-        return $this;
     }
 
     public function hasName()
@@ -68,8 +65,7 @@ class ServiceDescriptorProto extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>repeated .google.protobuf.MethodDescriptorProto method = 2;</code>
-     * @return \Google\Protobuf\Internal\RepeatedField
+     * <code>repeated .google.protobuf.MethodDescriptorProto method = 2;</code>
      */
     public function getMethod()
     {
@@ -77,17 +73,13 @@ class ServiceDescriptorProto extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>repeated .google.protobuf.MethodDescriptorProto method = 2;</code>
-     * @param \Google\Protobuf\Internal\MethodDescriptorProto[]|\Google\Protobuf\Internal\RepeatedField $var
-     * @return $this
+     * <code>repeated .google.protobuf.MethodDescriptorProto method = 2;</code>
      */
-    public function setMethod($var)
+    public function setMethod(&$var)
     {
         $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Google\Protobuf\Internal\MethodDescriptorProto::class);
         $this->method = $arr;
         $this->has_method = true;
-
-        return $this;
     }
 
     public function hasMethod()
@@ -96,8 +88,7 @@ class ServiceDescriptorProto extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>optional .google.protobuf.ServiceOptions options = 3;</code>
-     * @return \Google\Protobuf\Internal\ServiceOptions
+     * <code>optional .google.protobuf.ServiceOptions options = 3;</code>
      */
     public function getOptions()
     {
@@ -105,17 +96,13 @@ class ServiceDescriptorProto extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>optional .google.protobuf.ServiceOptions options = 3;</code>
-     * @param \Google\Protobuf\Internal\ServiceOptions $var
-     * @return $this
+     * <code>optional .google.protobuf.ServiceOptions options = 3;</code>
      */
-    public function setOptions($var)
+    public function setOptions(&$var)
     {
         GPBUtil::checkMessage($var, \Google\Protobuf\Internal\ServiceOptions::class);
         $this->options = $var;
         $this->has_options = true;
-
-        return $this;
     }
 
     public function hasOptions()
