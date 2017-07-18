@@ -127,7 +127,6 @@ bool GenerateCode(const CodeGeneratorRequest& request,
   GeneratorResponseContext context(
       request.compiler_version(), response, parsed_files);
 
-
   string error;
   bool succeeded = generator.GenerateAll(
       parsed_files, request.parameter(), &context, &error);
