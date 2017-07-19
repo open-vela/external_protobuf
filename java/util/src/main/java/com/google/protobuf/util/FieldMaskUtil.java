@@ -311,19 +311,16 @@ public class FieldMaskUtil {
       return replacePrimitiveFields;
     }
 
-    public MergeOptions setReplaceMessageFields(boolean value) {
+    public void setReplaceMessageFields(boolean value) {
       replaceMessageFields = value;
-      return this;
     }
 
-    public MergeOptions setReplaceRepeatedFields(boolean value) {
+    public void setReplaceRepeatedFields(boolean value) {
       replaceRepeatedFields = value;
-      return this;
     }
 
-    public MergeOptions setReplacePrimitiveFields(boolean value) {
+    public void setReplacePrimitiveFields(boolean value) {
       replacePrimitiveFields = value;
-      return this;
     }
   }
 

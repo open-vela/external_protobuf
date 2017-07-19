@@ -52,7 +52,6 @@
 #include <google/protobuf/stubs/common.h>
 #include <google/protobuf/stubs/logging.h>
 #include <google/protobuf/io/coded_stream.h>
-#include <google/protobuf/io/zero_copy_stream_impl_lite.h>
 #include <google/protobuf/util/message_differencer.h>
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/message.h>
@@ -1809,25 +1808,8 @@ static string GetMessageName(CMessage* self) {
   }
 }
 
-static PyObject* InternalSerializeToString(
-    CMessage* self, PyObject* args, PyObject* kwargs,
-    bool require_initialized) {
-  // Parse the "deterministic" kwarg; defaults to False.
-  static char* kwlist[] = { "deterministic", 0 };
-  PyObject* deterministic_obj = Py_None;
-  if (!PyArg_ParseTupleAndKeywords(args, kwargs, "|O", kwlist,
-                                   &deterministic_obj)) {
-    return NULL;
-  }
-  // Preemptively convert to a bool first, so we don't need to back out of
-  // allocating memory if this raises an exception.
-  // NOTE: This is unused later if deterministic == Py_None, but that's fine.
-  int deterministic = PyObject_IsTrue(deterministic_obj);
-  if (deterministic < 0) {
-    return NULL;
-  }
-
-  if (require_initialized && !self->message->IsInitialized()) {
+static PyObject* SerializeToString(CMessage* self, PyObject* args) {
+  if (!self->message->IsInitialized()) {
     ScopedPyObjectPtr errors(FindInitializationErrors(self));
     if (errors == NULL) {
       return NULL;
@@ -1865,36 +1847,24 @@ static PyObject* InternalSerializeToString(
                  GetMessageName(self).c_str(), PyString_AsString(joined.get()));
     return NULL;
   }
-
-  // Ok, arguments parsed and errors checked, now encode to a string
-  const size_t size = self->message->ByteSizeLong();
-  if (size == 0) {
+  int size = self->message->ByteSize();
+  if (size <= 0) {
     return PyBytes_FromString("");
   }
   PyObject* result = PyBytes_FromStringAndSize(NULL, size);
   if (result == NULL) {
     return NULL;
   }
-  io::ArrayOutputStream out(PyBytes_AS_STRING(result), size);
-  io::CodedOutputStream coded_out(&out);
-  if (deterministic_obj != Py_None) {
-    coded_out.SetSerializationDeterministic(deterministic);
-  }
-  self->message->SerializeWithCachedSizes(&coded_out);
-  GOOGLE_CHECK(!coded_out.HadError());
+  char* buffer = PyBytes_AS_STRING(result);
+  self->message->SerializeWithCachedSizesToArray(
+      reinterpret_cast<uint8*>(buffer));
   return result;
 }
 
-static PyObject* SerializeToString(
-    CMessage* self, PyObject* args, PyObject* kwargs) {
-  return InternalSerializeToString(self, args, kwargs,
-                                   /*require_initialized=*/true);
-}
-
-static PyObject* SerializePartialToString(
-    CMessage* self, PyObject* args, PyObject* kwargs) {
-  return InternalSerializeToString(self, args, kwargs,
-                                   /*require_initialized=*/false);
+static PyObject* SerializePartialToString(CMessage* self) {
+  string contents;
+  self->message->SerializePartialToString(&contents);
+  return PyBytes_FromStringAndSize(contents.c_str(), contents.size());
 }
 
 // Formats proto fields for ascii dumps using python formatting functions where
@@ -2565,10 +2535,7 @@ PyObject* Reduce(CMessage* self) {
   if (state == NULL) {
     return  NULL;
   }
-  string contents;
-  self->message->SerializePartialToString(&contents);
-  ScopedPyObjectPtr serialized(
-      PyBytes_FromStringAndSize(contents.c_str(), contents.size()));
+  ScopedPyObjectPtr serialized(SerializePartialToString(self));
   if (serialized == NULL) {
     return NULL;
   }
@@ -2689,10 +2656,9 @@ static PyMethodDef Methods[] = {
   { "RegisterExtension", (PyCFunction)RegisterExtension, METH_O | METH_CLASS,
     "Registers an extension with the current message." },
   { "SerializePartialToString", (PyCFunction)SerializePartialToString,
-    METH_VARARGS | METH_KEYWORDS,
+    METH_NOARGS,
     "Serializes the message to a string, even if it isn't initialized." },
-  { "SerializeToString", (PyCFunction)SerializeToString,
-    METH_VARARGS | METH_KEYWORDS,
+  { "SerializeToString", (PyCFunction)SerializeToString, METH_NOARGS,
     "Serializes the message to a string, only for initialized messages." },
   { "SetInParent", (PyCFunction)SetInParent, METH_NOARGS,
     "Sets the has bit of the given field in its parent message." },
