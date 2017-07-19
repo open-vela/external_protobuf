@@ -56,9 +56,8 @@
 #include <google/protobuf/io/printer.h>
 #include <google/protobuf/descriptor.pb.h>
 #include <google/protobuf/wire_format.h>
-#include <google/protobuf/stubs/substitute.h>
 #include <google/protobuf/stubs/strutil.h>
-
+#include <google/protobuf/stubs/substitute.h>
 
 namespace google {
 namespace protobuf {
@@ -125,7 +124,7 @@ void ImmutableMessageLiteGenerator::GenerateInterface(io::Printer* printer) {
                                 /* immutable = */ true, "OrBuilder");
   if (descriptor_->extension_range_count() > 0) {
     printer->Print(
-        "$deprecation$public interface ${$$classname$OrBuilder$}$ extends \n"
+        "$deprecation$public interface $classname$OrBuilder$idend$ extends \n"
         "    $extra_interfaces$\n"
         "     com.google.protobuf.GeneratedMessageLite.\n"
         "          ExtendableMessageOrBuilder<\n"
@@ -134,19 +133,19 @@ void ImmutableMessageLiteGenerator::GenerateInterface(io::Printer* printer) {
             "@java.lang.Deprecated " : "",
         "extra_interfaces", ExtraMessageOrBuilderInterfaces(descriptor_),
         "classname", descriptor_->name(),
-        "{", "", "}", "");
+        "idend", "");
   } else {
     printer->Print(
-        "$deprecation$public interface ${$$classname$OrBuilder$}$ extends\n"
+        "$deprecation$public interface $classname$OrBuilder$idend$ extends\n"
         "    $extra_interfaces$\n"
         "    com.google.protobuf.MessageLiteOrBuilder {\n",
         "deprecation", descriptor_->options().deprecated() ?
             "@java.lang.Deprecated " : "",
         "extra_interfaces", ExtraMessageOrBuilderInterfaces(descriptor_),
         "classname", descriptor_->name(),
-        "{", "", "}", "");
+        "idend", "");
   }
-  printer->Annotate("{", "}", descriptor_);
+  printer->Annotate("classname", "idend", descriptor_);
 
   printer->Indent();
     for (int i = 0; i < descriptor_->field_count(); i++) {
@@ -346,15 +345,15 @@ void ImmutableMessageLiteGenerator::Generate(io::Printer* printer) {
   }
 
   printer->Print(
-      "@java.lang.SuppressWarnings({\"unchecked\", \"fallthrough\"})\n"
-      "protected final java.lang.Object dynamicMethod(\n"
-      "    com.google.protobuf.GeneratedMessageLite.MethodToInvoke method,\n"
-      "    java.lang.Object arg0, java.lang.Object arg1) {\n"
-      "  switch (method) {\n"
-      "    case NEW_MUTABLE_INSTANCE: {\n"
-      "      return new $classname$();\n"
-      "    }\n",
-      "classname", name_resolver_->GetImmutableClassName(descriptor_));
+    "@java.lang.SuppressWarnings({\"unchecked\", \"fallthrough\"})\n"
+    "protected final java.lang.Object dynamicMethod(\n"
+    "    com.google.protobuf.GeneratedMessageLite.MethodToInvoke method,\n"
+    "    java.lang.Object arg0, java.lang.Object arg1) {\n"
+    "  switch (method) {\n"
+    "    case NEW_MUTABLE_INSTANCE: {\n"
+    "      return new $classname$();\n"
+    "    }\n",
+    "classname", name_resolver_->GetImmutableClassName(descriptor_));
 
   printer->Indent();
   printer->Indent();
@@ -531,12 +530,14 @@ GenerateMessageSerializationMethods(io::Printer* printer) {
     }
   }
 
-  if (descriptor_->options().message_set_wire_format()) {
-    printer->Print(
-      "unknownFields.writeAsMessageSetTo(output);\n");
-  } else {
-    printer->Print(
-      "unknownFields.writeTo(output);\n");
+  if (PreserveUnknownFields(descriptor_)) {
+    if (descriptor_->options().message_set_wire_format()) {
+      printer->Print(
+        "unknownFields.writeAsMessageSetTo(output);\n");
+    } else {
+      printer->Print(
+        "unknownFields.writeTo(output);\n");
+    }
   }
 
   printer->Outdent();
@@ -564,12 +565,14 @@ GenerateMessageSerializationMethods(io::Printer* printer) {
     }
   }
 
-  if (descriptor_->options().message_set_wire_format()) {
-    printer->Print(
-      "size += unknownFields.getSerializedSizeAsMessageSet();\n");
-  } else {
-    printer->Print(
-      "size += unknownFields.getSerializedSize();\n");
+  if (PreserveUnknownFields(descriptor_)) {
+    if (descriptor_->options().message_set_wire_format()) {
+      printer->Print(
+        "size += unknownFields.getSerializedSizeAsMessageSet();\n");
+    } else {
+      printer->Print(
+        "size += unknownFields.getSerializedSize();\n");
+    }
   }
 
   printer->Outdent();
@@ -965,31 +968,41 @@ void ImmutableMessageLiteGenerator::GenerateDynamicMethodMergeFromStream(
     "  done = true;\n"
     "  break;\n");
 
-  if (descriptor_->extension_range_count() > 0) {
-    if (descriptor_->options().message_set_wire_format()) {
-      printer->Print(
-          "default: {\n"
-          "  if (!parseUnknownFieldAsMessageSet(\n"
-          "      getDefaultInstanceForType(), input, extensionRegistry,\n"
-          "      tag)) {\n"
-          "    done = true;\n"  // it's an endgroup tag
-          "  }\n"
-          "  break;\n"
-          "}\n");
+  if (PreserveUnknownFields(descriptor_)) {
+    if (descriptor_->extension_range_count() > 0) {
+      if (descriptor_->options().message_set_wire_format()) {
+        printer->Print(
+            "default: {\n"
+            "  if (!parseUnknownFieldAsMessageSet(\n"
+            "      getDefaultInstanceForType(), input, extensionRegistry,\n"
+            "      tag)) {\n"
+            "    done = true;\n"  // it's an endgroup tag
+            "  }\n"
+            "  break;\n"
+            "}\n");
+      } else {
+        printer->Print(
+            "default: {\n"
+            "  if (!parseUnknownField(getDefaultInstanceForType(),\n"
+            "      input, extensionRegistry, tag)) {\n"
+            "    done = true;\n"  // it's an endgroup tag
+            "  }\n"
+            "  break;\n"
+            "}\n");
+      }
     } else {
       printer->Print(
-          "default: {\n"
-          "  if (!parseUnknownField(getDefaultInstanceForType(),\n"
-          "      input, extensionRegistry, tag)) {\n"
-          "    done = true;\n"  // it's an endgroup tag
-          "  }\n"
-          "  break;\n"
-          "}\n");
+        "default: {\n"
+        "  if (!parseUnknownField(tag, input)) {\n"
+        "    done = true;\n"  // it's an endgroup tag
+        "  }\n"
+        "  break;\n"
+        "}\n");
     }
   } else {
     printer->Print(
       "default: {\n"
-      "  if (!parseUnknownField(tag, input)) {\n"
+      "  if (!input.skipField(tag)) {\n"
       "    done = true;\n"  // it's an endgroup tag
       "  }\n"
       "  break;\n"

@@ -101,7 +101,7 @@ namespace internal {
 
 // The current version, represented as a single integer to make comparison
 // easier:  major * 10^6 + minor * 10^3 + micro
-#define GOOGLE_PROTOBUF_VERSION 3003000
+#define GOOGLE_PROTOBUF_VERSION 3003002
 
 // A suffix string for alpha, beta or rc releases. Empty for stable releases.
 #define GOOGLE_PROTOBUF_VERSION_SUFFIX ""
@@ -200,8 +200,7 @@ namespace internal {
 
 // Register a function to be called when ShutdownProtocolBuffers() is called.
 LIBPROTOBUF_EXPORT void OnShutdown(void (*func)());
-// Destroy the string (call string destructor)
-LIBPROTOBUF_EXPORT void OnShutdownDestroyString(const std::string* ptr);
+
 }  // namespace internal
 
 #if PROTOBUF_USE_EXCEPTIONS
