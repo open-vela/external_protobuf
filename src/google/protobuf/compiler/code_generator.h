@@ -50,7 +50,6 @@ namespace io { class ZeroCopyOutputStream; }
 class FileDescriptor;
 
 namespace compiler {
-class AccessInfoMap;
 class Version;
 
 // Defined in this file.
@@ -113,8 +112,7 @@ class LIBPROTOC_EXPORT CodeGenerator {
 // runs.
 class LIBPROTOC_EXPORT GeneratorContext {
  public:
-  inline GeneratorContext() {
-  }
+  inline GeneratorContext() {}
   virtual ~GeneratorContext();
 
   // Opens the given file, truncating it if it exists, and returns a
@@ -150,7 +148,6 @@ class LIBPROTOC_EXPORT GeneratorContext {
   // this GeneratorContext.
   virtual void GetCompilerVersion(Version* version) const;
 
-
  private:
   GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(GeneratorContext);
 };
@@ -165,8 +162,8 @@ typedef GeneratorContext OutputDirectory;
 //   "foo=bar,baz,qux=corge"
 // parses to the pairs:
 //   ("foo", "bar"), ("baz", ""), ("qux", "corge")
-LIBPROTOC_EXPORT void ParseGeneratorParameter(const string&,
-                             std::vector<std::pair<string, string> >*);
+LIBPROTOC_EXPORT void ParseGeneratorParameter(
+    const string&, std::vector<std::pair<string, string> >*);
 
 }  // namespace compiler
 }  // namespace protobuf

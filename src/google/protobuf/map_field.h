@@ -170,7 +170,6 @@ class LIBPROTOBUF_EXPORT MapFieldBase {
   // IncreaseIterator() is called by operator++() of MapIterator only.
   // It implements the ++ operator of MapIterator.
   virtual void IncreaseIterator(MapIterator* map_iter) const = 0;
-  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(MapFieldBase);
 };
 
 // This class provides common Map Reflection implementations for generated
@@ -200,7 +199,6 @@ class TypeDefinedMapFieldBase : public MapFieldBase {
   void IncreaseIterator(MapIterator* map_iter) const;
 
   virtual void SetMapIteratorValue(MapIterator* map_iter) const = 0;
-  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(TypeDefinedMapFieldBase);
 };
 
 // This class provides access to map field using generated api. It is used for
@@ -233,9 +231,6 @@ class MapField : public TypeDefinedMapFieldBase<Key, T> {
   typedef typename MapIf<kIsValueEnum, T, const T&>::type CastValueType;
 
  public:
-  typedef typename Derived::SuperType EntryTypeTrait;
-  typedef Map<Key, T> MapType;
-
   MapField() {}
   explicit MapField(Arena* arena)
       : TypeDefinedMapFieldBase<Key, T>(arena), impl_(arena) {}
@@ -292,15 +287,6 @@ class MapField : public TypeDefinedMapFieldBase<Key, T> {
 
   friend class ::google::protobuf::Arena;
   friend class MapFieldStateTest;  // For testing, it needs raw access to impl_
-  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(MapField);
-};
-
-template <typename MEntry>
-struct MapEntryToMapField {
-  typedef DeconstructMapEntry<typename MEntry::SuperType> T;
-  typedef MapField<MEntry, typename T::Key, typename T::Value, T::kKeyFieldType,
-                   T::kValueFieldType, T::default_enum_value>
-      MapFieldType;
 };
 
 class LIBPROTOBUF_EXPORT DynamicMapField: public TypeDefinedMapFieldBase<MapKey, MapValueRef> {
@@ -328,7 +314,6 @@ class LIBPROTOBUF_EXPORT DynamicMapField: public TypeDefinedMapFieldBase<MapKey,
   void SyncMapWithRepeatedFieldNoLock() const;
   size_t SpaceUsedExcludingSelfNoLock() const;
   void SetMapIteratorValue(MapIterator* map_iter) const;
-  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(DynamicMapField);
 };
 
 }  // namespace internal
@@ -352,10 +337,6 @@ class LIBPROTOBUF_EXPORT MapKey {
   }
   MapKey(const MapKey& other) : type_(0) {
     CopyFrom(other);
-  }
-  MapKey& operator=(const MapKey& other) {
-    CopyFrom(other);
-    return *this;
   }
 
   ~MapKey() {
@@ -716,7 +697,6 @@ class LIBPROTOBUF_EXPORT MapValueRef {
   void* data_;
   // type_ is 0 or a valid FieldDescriptor::CppType.
   int type_;
-  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(MapValueRef);
 };
 
 #undef TYPE_CHECK
@@ -737,11 +717,6 @@ class LIBPROTOBUF_EXPORT MapIterator {
   }
   ~MapIterator() {
     map_->DeleteIterator(this);
-  }
-  MapIterator& operator=(const MapIterator& other) {
-    map_ = other.map_;
-    map_->CopyIterator(this, other);
-    return *this;
   }
   friend bool operator==(const MapIterator& a, const MapIterator& b) {
     return a.map_->EqualIterator(a, b);
