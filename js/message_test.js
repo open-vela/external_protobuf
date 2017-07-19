@@ -33,7 +33,6 @@
 goog.setTestOnly();
 
 goog.require('goog.json');
-goog.require('goog.string');
 goog.require('goog.testing.asserts');
 goog.require('goog.userAgent');
 
@@ -82,6 +81,8 @@ goog.require('proto.jspb.test.TestReservedNamesExtension');
 // CommonJS-LoadFromFile: test2_pb proto.jspb.test
 goog.require('proto.jspb.test.ExtensionMessage');
 goog.require('proto.jspb.test.TestExtensionsMessage');
+
+
 
 
 describe('Message test suite', function() {
@@ -270,6 +271,12 @@ describe('Message test suite', function() {
     assertFalse(response.hasBoolField());
     assertFalse(response.hasIntField());
     assertFalse(response.hasEnumField());
+  });
+
+  it('testMessageRegistration', /** @suppress {visibility} */ function() {
+    // goog.require(SomeResponse) will include its library, which will in
+    // turn add SomeResponse to the message registry.
+    assertEquals(jspb.Message.registry_['res'], proto.jspb.test.SomeResponse);
   });
 
   it('testClearFields', function() {
@@ -654,7 +661,12 @@ describe('Message test suite', function() {
 
   it('testInitialization_emptyArray', function() {
     var msg = new proto.jspb.test.HasExtensions([]);
-    assertArrayEquals([], msg.toArray());
+    if (jspb.Message.MINIMIZE_MEMORY_ALLOCATIONS) {
+      assertArrayEquals([], msg.toArray());
+    } else {
+      // Extension object is created past all regular fields.
+      assertArrayEquals([,,, {}], msg.toArray());
+    }
   });
 
   it('testInitialization_justExtensionObject', function() {
