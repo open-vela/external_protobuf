@@ -30,8 +30,8 @@
 
 package com.google.protobuf;
 
-import static com.google.protobuf.WireFormat.FIXED32_SIZE;
-import static com.google.protobuf.WireFormat.FIXED64_SIZE;
+import static com.google.protobuf.WireFormat.FIXED_32_SIZE;
+import static com.google.protobuf.WireFormat.FIXED_64_SIZE;
 import static com.google.protobuf.WireFormat.MAX_VARINT_SIZE;
 import static java.lang.Math.max;
 
@@ -59,12 +59,13 @@ import java.util.logging.Logger;
 public abstract class CodedOutputStream extends ByteOutput {
   private static final Logger logger = Logger.getLogger(CodedOutputStream.class.getName());
   private static final boolean HAS_UNSAFE_ARRAY_OPERATIONS = UnsafeUtil.hasUnsafeArrayOperations();
+  private static final long ARRAY_BASE_OFFSET = UnsafeUtil.getArrayBaseOffset();
 
   /**
    * @deprecated Use {@link #computeFixed32SizeNoTag(int)} instead.
    */
   @Deprecated
-  public static final int LITTLE_ENDIAN_32_SIZE = FIXED32_SIZE;
+  public static final int LITTLE_ENDIAN_32_SIZE = FIXED_32_SIZE;
 
   /**
    * The buffer size used in {@link #newInstance(OutputStream)}.
@@ -754,7 +755,7 @@ public abstract class CodedOutputStream extends ByteOutput {
    * {@code fixed32} field.
    */
   public static int computeFixed32SizeNoTag(@SuppressWarnings("unused") final int unused) {
-    return FIXED32_SIZE;
+    return FIXED_32_SIZE;
   }
 
   /**
@@ -762,7 +763,7 @@ public abstract class CodedOutputStream extends ByteOutput {
    * {@code sfixed32} field.
    */
   public static int computeSFixed32SizeNoTag(@SuppressWarnings("unused") final int unused) {
-    return FIXED32_SIZE;
+    return FIXED_32_SIZE;
   }
 
   /**
@@ -812,7 +813,7 @@ public abstract class CodedOutputStream extends ByteOutput {
    * {@code fixed64} field.
    */
   public static int computeFixed64SizeNoTag(@SuppressWarnings("unused") final long unused) {
-    return FIXED64_SIZE;
+    return FIXED_64_SIZE;
   }
 
   /**
@@ -820,7 +821,7 @@ public abstract class CodedOutputStream extends ByteOutput {
    * {@code sfixed64} field.
    */
   public static int computeSFixed64SizeNoTag(@SuppressWarnings("unused") final long unused) {
-    return FIXED64_SIZE;
+    return FIXED_64_SIZE;
   }
 
   /**
@@ -828,7 +829,7 @@ public abstract class CodedOutputStream extends ByteOutput {
    * {@code float} field, including tag.
    */
   public static int computeFloatSizeNoTag(@SuppressWarnings("unused") final float unused) {
-    return FIXED32_SIZE;
+    return FIXED_32_SIZE;
   }
 
   /**
@@ -836,7 +837,7 @@ public abstract class CodedOutputStream extends ByteOutput {
    * {@code double} field, including tag.
    */
   public static int computeDoubleSizeNoTag(@SuppressWarnings("unused") final double unused) {
-    return FIXED64_SIZE;
+    return FIXED_64_SIZE;
   }
 
   /**
@@ -1320,12 +1321,15 @@ public abstract class CodedOutputStream extends ByteOutput {
     @Override
     public final void writeUInt32NoTag(int value) throws IOException {
       if (HAS_UNSAFE_ARRAY_OPERATIONS && spaceLeft() >= MAX_VARINT_SIZE) {
+        long pos = ARRAY_BASE_OFFSET + position;
         while (true) {
           if ((value & ~0x7F) == 0) {
-            UnsafeUtil.putByte(buffer, position++, (byte) value);
+            UnsafeUtil.putByte(buffer, pos++, (byte) value);
+            position++;
             return;
           } else {
-            UnsafeUtil.putByte(buffer, position++, (byte) ((value & 0x7F) | 0x80));
+            UnsafeUtil.putByte(buffer, pos++, (byte) ((value & 0x7F) | 0x80));
+            position++;
             value >>>= 7;
           }
         }
@@ -1363,12 +1367,15 @@ public abstract class CodedOutputStream extends ByteOutput {
     @Override
     public final void writeUInt64NoTag(long value) throws IOException {
       if (HAS_UNSAFE_ARRAY_OPERATIONS && spaceLeft() >= MAX_VARINT_SIZE) {
+        long pos = ARRAY_BASE_OFFSET + position;
         while (true) {
           if ((value & ~0x7FL) == 0) {
-            UnsafeUtil.putByte(buffer, position++, (byte) value);
+            UnsafeUtil.putByte(buffer, pos++, (byte) value);
+            position++;
             return;
           } else {
-            UnsafeUtil.putByte(buffer, position++, (byte) (((int) value & 0x7F) | 0x80));
+            UnsafeUtil.putByte(buffer, pos++, (byte) (((int) value & 0x7F) | 0x80));
+            position++;
             value >>>= 7;
           }
         }
@@ -1847,7 +1854,7 @@ public abstract class CodedOutputStream extends ByteOutput {
     }
 
     static boolean isSupported() {
-      return UnsafeUtil.hasUnsafeByteBufferOperations();
+      return UnsafeUtil.hasUnsafeByteBufferOperations() && UnsafeUtil.hasUnsafeCopyMemory();
     }
 
     @Override
@@ -2023,7 +2030,7 @@ public abstract class CodedOutputStream extends ByteOutput {
     @Override
     public void writeFixed32NoTag(int value) throws IOException {
       buffer.putInt(bufferPos(position), value);
-      position += FIXED32_SIZE;
+      position += FIXED_32_SIZE;
     }
 
     @Override
@@ -2057,7 +2064,7 @@ public abstract class CodedOutputStream extends ByteOutput {
     @Override
     public void writeFixed64NoTag(long value) throws IOException {
       buffer.putLong(bufferPos(position), value);
-      position += FIXED64_SIZE;
+      position += FIXED_64_SIZE;
     }
 
     @Override
@@ -2074,7 +2081,8 @@ public abstract class CodedOutputStream extends ByteOutput {
             String.format("Pos: %d, limit: %d, len: %d", position, limit, length));
       }
 
-      UnsafeUtil.copyMemory(value, offset, position, length);
+      UnsafeUtil.copyMemory(
+          value, UnsafeUtil.getArrayBaseOffset() + offset, null, position, length);
       position += length;
     }
 
@@ -2241,17 +2249,19 @@ public abstract class CodedOutputStream extends ByteOutput {
      */
     final void bufferUInt32NoTag(int value) {
       if (HAS_UNSAFE_ARRAY_OPERATIONS) {
-        final long originalPos = position;
+        final long originalPos = ARRAY_BASE_OFFSET + position;
+        long pos = originalPos;
         while (true) {
           if ((value & ~0x7F) == 0) {
-            UnsafeUtil.putByte(buffer, position++, (byte) value);
+            UnsafeUtil.putByte(buffer, pos++, (byte) value);
             break;
           } else {
-            UnsafeUtil.putByte(buffer, position++, (byte) ((value & 0x7F) | 0x80));
+            UnsafeUtil.putByte(buffer, pos++, (byte) ((value & 0x7F) | 0x80));
             value >>>= 7;
           }
         }
-        int delta = (int) (position - originalPos);
+        int delta = (int) (pos - originalPos);
+        position += delta;
         totalBytesWritten += delta;
       } else {
         while (true) {
@@ -2274,17 +2284,19 @@ public abstract class CodedOutputStream extends ByteOutput {
      */
     final void bufferUInt64NoTag(long value) {
       if (HAS_UNSAFE_ARRAY_OPERATIONS) {
-        final long originalPos = position;
+        final long originalPos = ARRAY_BASE_OFFSET + position;
+        long pos = originalPos;
         while (true) {
           if ((value & ~0x7FL) == 0) {
-            UnsafeUtil.putByte(buffer, position++, (byte) value);
+            UnsafeUtil.putByte(buffer, pos++, (byte) value);
             break;
           } else {
-            UnsafeUtil.putByte(buffer, position++, (byte) (((int) value & 0x7F) | 0x80));
+            UnsafeUtil.putByte(buffer, pos++, (byte) (((int) value & 0x7F) | 0x80));
             value >>>= 7;
           }
         }
-        int delta = (int) (position - originalPos);
+        int delta = (int) (pos - originalPos);
+        position += delta;
         totalBytesWritten += delta;
       } else {
         while (true) {
@@ -2310,7 +2322,7 @@ public abstract class CodedOutputStream extends ByteOutput {
       buffer[position++] = (byte) ((value >> 8) & 0xFF);
       buffer[position++] = (byte) ((value >> 16) & 0xFF);
       buffer[position++] = (byte) ((value >> 24) & 0xFF);
-      totalBytesWritten += FIXED32_SIZE;
+      totalBytesWritten += FIXED_32_SIZE;
     }
 
     /**
@@ -2326,7 +2338,7 @@ public abstract class CodedOutputStream extends ByteOutput {
       buffer[position++] = (byte) ((int) (value >> 40) & 0xFF);
       buffer[position++] = (byte) ((int) (value >> 48) & 0xFF);
       buffer[position++] = (byte) ((int) (value >> 56) & 0xFF);
-      totalBytesWritten += FIXED64_SIZE;
+      totalBytesWritten += FIXED_64_SIZE;
     }
   }
 
@@ -2367,7 +2379,7 @@ public abstract class CodedOutputStream extends ByteOutput {
 
     @Override
     public void writeFixed32(final int fieldNumber, final int value) throws IOException {
-      flushIfNotAvailable(MAX_VARINT_SIZE + FIXED32_SIZE);
+      flushIfNotAvailable(MAX_VARINT_SIZE + FIXED_32_SIZE);
       bufferTag(fieldNumber, WireFormat.WIRETYPE_FIXED32);
       bufferFixed32NoTag(value);
     }
@@ -2381,7 +2393,7 @@ public abstract class CodedOutputStream extends ByteOutput {
 
     @Override
     public void writeFixed64(final int fieldNumber, final long value) throws IOException {
-      flushIfNotAvailable(MAX_VARINT_SIZE + FIXED64_SIZE);
+      flushIfNotAvailable(MAX_VARINT_SIZE + FIXED_64_SIZE);
       bufferTag(fieldNumber, WireFormat.WIRETYPE_FIXED64);
       bufferFixed64NoTag(value);
     }
@@ -2507,7 +2519,7 @@ public abstract class CodedOutputStream extends ByteOutput {
 
     @Override
     public void writeFixed32NoTag(final int value) throws IOException {
-      flushIfNotAvailable(FIXED32_SIZE);
+      flushIfNotAvailable(FIXED_32_SIZE);
       bufferFixed32NoTag(value);
     }
 
@@ -2519,7 +2531,7 @@ public abstract class CodedOutputStream extends ByteOutput {
 
     @Override
     public void writeFixed64NoTag(final long value) throws IOException {
-      flushIfNotAvailable(FIXED64_SIZE);
+      flushIfNotAvailable(FIXED_64_SIZE);
       bufferFixed64NoTag(value);
     }
 
@@ -2670,7 +2682,7 @@ public abstract class CodedOutputStream extends ByteOutput {
 
     @Override
     public void writeFixed32(final int fieldNumber, final int value) throws IOException {
-      flushIfNotAvailable(MAX_VARINT_SIZE + FIXED32_SIZE);
+      flushIfNotAvailable(MAX_VARINT_SIZE + FIXED_32_SIZE);
       bufferTag(fieldNumber, WireFormat.WIRETYPE_FIXED32);
       bufferFixed32NoTag(value);
     }
@@ -2684,7 +2696,7 @@ public abstract class CodedOutputStream extends ByteOutput {
 
     @Override
     public void writeFixed64(final int fieldNumber, final long value) throws IOException {
-      flushIfNotAvailable(MAX_VARINT_SIZE + FIXED64_SIZE);
+      flushIfNotAvailable(MAX_VARINT_SIZE + FIXED_64_SIZE);
       bufferTag(fieldNumber, WireFormat.WIRETYPE_FIXED64);
       bufferFixed64NoTag(value);
     }
@@ -2810,7 +2822,7 @@ public abstract class CodedOutputStream extends ByteOutput {
 
     @Override
     public void writeFixed32NoTag(final int value) throws IOException {
-      flushIfNotAvailable(FIXED32_SIZE);
+      flushIfNotAvailable(FIXED_32_SIZE);
       bufferFixed32NoTag(value);
     }
 
@@ -2822,7 +2834,7 @@ public abstract class CodedOutputStream extends ByteOutput {
 
     @Override
     public void writeFixed64NoTag(final long value) throws IOException {
-      flushIfNotAvailable(FIXED64_SIZE);
+      flushIfNotAvailable(FIXED_64_SIZE);
       bufferFixed64NoTag(value);
     }
 
