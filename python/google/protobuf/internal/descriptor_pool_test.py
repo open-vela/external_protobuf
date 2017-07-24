@@ -131,19 +131,11 @@ class DescriptorPoolTest(unittest.TestCase):
     self.assertEqual('google/protobuf/internal/factory_test2.proto',
                      file_desc4.name)
 
-    file_desc5 = self.pool.FindFileContainingSymbol(
-        'protobuf_unittest.TestService')
-    self.assertIsInstance(file_desc5, descriptor.FileDescriptor)
-    self.assertEqual('google/protobuf/unittest.proto',
-                     file_desc5.name)
-
     # Tests the generated pool.
     assert descriptor_pool.Default().FindFileContainingSymbol(
         'google.protobuf.python.internal.Factory2Message.one_more_field')
     assert descriptor_pool.Default().FindFileContainingSymbol(
         'google.protobuf.python.internal.another_field')
-    assert descriptor_pool.Default().FindFileContainingSymbol(
-        'protobuf_unittest.TestService')
 
   def testFindFileContainingSymbolFailure(self):
     with self.assertRaises(KeyError):
@@ -514,10 +506,10 @@ class MessageType(object):
       subtype.CheckType(test, desc, name, file_desc)
 
     for index, (name, field) in enumerate(self.field_list):
-      field.CheckField(test, desc, name, index, file_desc)
+      field.CheckField(test, desc, name, index)
 
     for index, (name, field) in enumerate(self.extensions):
-      field.CheckField(test, desc, name, index, file_desc)
+      field.CheckField(test, desc, name, index)
 
 
 class EnumField(object):
@@ -527,7 +519,7 @@ class EnumField(object):
     self.type_name = type_name
     self.default_value = default_value
 
-  def CheckField(self, test, msg_desc, name, index, file_desc):
+  def CheckField(self, test, msg_desc, name, index):
     field_desc = msg_desc.fields_by_name[name]
     enum_desc = msg_desc.enum_types_by_name[self.type_name]
     test.assertEqual(name, field_desc.name)
@@ -544,7 +536,6 @@ class EnumField(object):
     test.assertFalse(enum_desc.values_by_name[self.default_value].has_options)
     test.assertEqual(msg_desc, field_desc.containing_type)
     test.assertEqual(enum_desc, field_desc.enum_type)
-    test.assertEqual(file_desc, enum_desc.file)
 
 
 class MessageField(object):
@@ -553,7 +544,7 @@ class MessageField(object):
     self.number = number
     self.type_name = type_name
 
-  def CheckField(self, test, msg_desc, name, index, file_desc):
+  def CheckField(self, test, msg_desc, name, index):
     field_desc = msg_desc.fields_by_name[name]
     field_type_desc = msg_desc.nested_types_by_name[self.type_name]
     test.assertEqual(name, field_desc.name)
@@ -567,7 +558,6 @@ class MessageField(object):
     test.assertFalse(field_desc.has_default_value)
     test.assertEqual(msg_desc, field_desc.containing_type)
     test.assertEqual(field_type_desc, field_desc.message_type)
-    test.assertEqual(file_desc, field_desc.file)
 
 
 class StringField(object):
@@ -576,7 +566,7 @@ class StringField(object):
     self.number = number
     self.default_value = default_value
 
-  def CheckField(self, test, msg_desc, name, index, file_desc):
+  def CheckField(self, test, msg_desc, name, index):
     field_desc = msg_desc.fields_by_name[name]
     test.assertEqual(name, field_desc.name)
     expected_field_full_name = '.'.join([msg_desc.full_name, name])
@@ -588,7 +578,6 @@ class StringField(object):
                      field_desc.cpp_type)
     test.assertTrue(field_desc.has_default_value)
     test.assertEqual(self.default_value, field_desc.default_value)
-    test.assertEqual(file_desc, field_desc.file)
 
 
 class ExtensionField(object):
@@ -597,7 +586,7 @@ class ExtensionField(object):
     self.number = number
     self.extended_type = extended_type
 
-  def CheckField(self, test, msg_desc, name, index, file_desc):
+  def CheckField(self, test, msg_desc, name, index):
     field_desc = msg_desc.extensions_by_name[name]
     test.assertEqual(name, field_desc.name)
     expected_field_full_name = '.'.join([msg_desc.full_name, name])
@@ -612,7 +601,6 @@ class ExtensionField(object):
     test.assertEqual(msg_desc, field_desc.extension_scope)
     test.assertEqual(msg_desc, field_desc.message_type)
     test.assertEqual(self.extended_type, field_desc.containing_type.name)
-    test.assertEqual(file_desc, field_desc.file)
 
 
 class AddDescriptorTest(unittest.TestCase):
@@ -758,10 +746,15 @@ class AddDescriptorTest(unittest.TestCase):
     self.assertIs(options, file_descriptor.GetOptions())
 
 
+@unittest.skipIf(
+    api_implementation.Type() != 'cpp',
+    'default_pool is only supported by the C++ implementation')
 class DefaultPoolTest(unittest.TestCase):
 
   def testFindMethods(self):
-    pool = descriptor_pool.Default()
+    # pylint: disable=g-import-not-at-top
+    from google.protobuf.pyext import _message
+    pool = _message.default_pool
     self.assertIs(
         pool.FindFileByName('google/protobuf/unittest.proto'),
         unittest_pb2.DESCRIPTOR)
@@ -772,22 +765,19 @@ class DefaultPoolTest(unittest.TestCase):
         pool.FindFieldByName('protobuf_unittest.TestAllTypes.optional_int32'),
         unittest_pb2.TestAllTypes.DESCRIPTOR.fields_by_name['optional_int32'])
     self.assertIs(
-        pool.FindEnumTypeByName('protobuf_unittest.ForeignEnum'),
-        unittest_pb2.ForeignEnum.DESCRIPTOR)
-    if api_implementation.Type() != 'cpp':
-      self.skipTest('Only the C++ implementation correctly indexes all types')
-    self.assertIs(
         pool.FindExtensionByName('protobuf_unittest.optional_int32_extension'),
         unittest_pb2.DESCRIPTOR.extensions_by_name['optional_int32_extension'])
     self.assertIs(
+        pool.FindEnumTypeByName('protobuf_unittest.ForeignEnum'),
+        unittest_pb2.ForeignEnum.DESCRIPTOR)
+    self.assertIs(
         pool.FindOneofByName('protobuf_unittest.TestAllTypes.oneof_field'),
         unittest_pb2.TestAllTypes.DESCRIPTOR.oneofs_by_name['oneof_field'])
-    self.assertIs(
-        pool.FindServiceByName('protobuf_unittest.TestService'),
-        unittest_pb2.DESCRIPTOR.services_by_name['TestService'])
 
   def testAddFileDescriptor(self):
-    pool = descriptor_pool.Default()
+    # pylint: disable=g-import-not-at-top
+    from google.protobuf.pyext import _message
+    pool = _message.default_pool
     file_desc = descriptor_pb2.FileDescriptorProto(name='some/file.proto')
     pool.Add(file_desc)
     pool.AddSerializedFile(file_desc.SerializeToString())
