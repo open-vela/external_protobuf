@@ -7,8 +7,6 @@
 # TODO(haberman): insert links to corresponding bugs tracking the issue.
 # Should we use GitHub issues or the Google-internal bug tracker?
 
-Recommended.Proto3.JsonInput.BytesFieldBase64Url.JsonOutput
-Recommended.Proto3.JsonInput.BytesFieldBase64Url.ProtobufOutput
 Recommended.Proto3.JsonInput.DoubleFieldInfinityNotQuoted
 Recommended.Proto3.JsonInput.DoubleFieldNanNotQuoted
 Recommended.Proto3.JsonInput.DoubleFieldNegativeInfinityNotQuoted
