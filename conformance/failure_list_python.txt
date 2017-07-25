@@ -1,3 +1,5 @@
+Recommended.JsonInput.BytesFieldBase64Url.JsonOutput
+Recommended.JsonInput.BytesFieldBase64Url.ProtobufOutput
 Recommended.Proto3.JsonInput.DoubleFieldInfinityNotQuoted
 Recommended.Proto3.JsonInput.DoubleFieldNanNotQuoted
 Recommended.Proto3.JsonInput.DoubleFieldNegativeInfinityNotQuoted
