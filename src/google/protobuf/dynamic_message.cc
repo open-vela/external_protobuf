@@ -250,10 +250,6 @@ class DynamicMessage : public Message {
   };
 
   DynamicMessage(const TypeInfo* type_info);
-
-  // This should only be used by GetPrototypeNoLock() to avoid dead lock.
-  DynamicMessage(const TypeInfo* type_info, bool lock_factory);
-
   ~DynamicMessage();
 
   // Called on the prototype after construction to initialize message fields.
@@ -284,8 +280,7 @@ class DynamicMessage : public Message {
  private:
   GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(DynamicMessage);
   DynamicMessage(const TypeInfo* type_info, ::google::protobuf::Arena* arena);
-
-  void SharedCtor(bool lock_factory);
+  void SharedCtor();
 
   inline bool is_prototype() const {
     return type_info_->prototype == this ||
@@ -309,22 +304,17 @@ class DynamicMessage : public Message {
 DynamicMessage::DynamicMessage(const TypeInfo* type_info)
   : type_info_(type_info),
     cached_byte_size_(0) {
-  SharedCtor(true);
+  SharedCtor();
 }
 
 DynamicMessage::DynamicMessage(const TypeInfo* type_info,
                                ::google::protobuf::Arena* arena)
   : type_info_(type_info),
     cached_byte_size_(0) {
-  SharedCtor(true);
+  SharedCtor();
 }
 
-DynamicMessage::DynamicMessage(const TypeInfo* type_info, bool lock_factory)
-    : type_info_(type_info), cached_byte_size_(0) {
-  SharedCtor(lock_factory);
-}
-
-void DynamicMessage::SharedCtor(bool lock_factory) {
+void DynamicMessage::SharedCtor() {
   // We need to call constructors for various fields manually and set
   // default values where appropriate.  We use placement new to call
   // constructors.  If you haven't heard of placement new, I suggest Googling
@@ -408,17 +398,8 @@ void DynamicMessage::SharedCtor(bool lock_factory) {
           new(field_ptr) Message*(NULL);
         } else {
           if (IsMapFieldInApi(field)) {
-            // We need to lock in most cases to avoid data racing. Only not lock
-            // when the constructor is called inside GetPrototype(), in which
-            // case we have already locked the factory.
-            if (lock_factory) {
-              new (field_ptr) DynamicMapField(
-                  type_info_->factory->GetPrototype(field->message_type()));
-            } else {
-              new (field_ptr)
-                  DynamicMapField(type_info_->factory->GetPrototypeNoLock(
-                      field->message_type()));
-            }
+            new (field_ptr) DynamicMapField(
+                type_info_->factory->GetPrototypeNoLock(field->message_type()));
           } else {
             new (field_ptr) RepeatedPtrField<Message>();
           }
@@ -770,10 +751,7 @@ const Message* DynamicMessageFactory::GetPrototypeNoLock(
   // map). To break the cyclic dependency, we have to assgin the address of
   // prototype into type_info first.
   type_info->prototype = static_cast<DynamicMessage*>(base);
-
-  // We have already locked the factory so we should not lock in the constructor
-  // of dynamic message to avoid dead lock.
-  DynamicMessage* prototype = new (base) DynamicMessage(type_info, false);
+  DynamicMessage* prototype = new(base) DynamicMessage(type_info);
 
   if (type->oneof_decl_count() > 0 || num_weak_fields > 0) {
     // Construct default oneof instance.
