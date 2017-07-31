@@ -467,10 +467,6 @@ class BigEndian {
   }
 };
 
-#ifndef GOOGLE_ATTRIBUTE_SECTION_VARIABLE
-#define GOOGLE_ATTRIBUTE_SECTION_VARIABLE(name)
-#endif
-
 }  // namespace protobuf
 }  // namespace google
 
