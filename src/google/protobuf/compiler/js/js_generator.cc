@@ -143,16 +143,12 @@ bool IsReserved(const string& ident) {
   return false;
 }
 
-bool StrEndsWith(StringPiece sp, StringPiece x) {
-  return sp.size() >= x.size() && sp.substr(sp.size() - x.size()) == x;
-}
-
 // Returns a copy of |filename| with any trailing ".protodevel" or ".proto
 // suffix stripped.
 // TODO(haberman): Unify with copy in compiler/cpp/internal/helpers.cc.
 string StripProto(const string& filename) {
-  const char* suffix =
-      StrEndsWith(filename, ".protodevel") ? ".protodevel" : ".proto";
+  const char* suffix = HasSuffixString(filename, ".protodevel")
+      ? ".protodevel" : ".proto";
   return StripSuffixString(filename, suffix);
 }
 
@@ -197,6 +193,7 @@ string ModuleAlias(const string& filename) {
   string basename = StripProto(filename);
   StripString(&basename, "-", '$');
   StripString(&basename, "/", '_');
+  StripString(&basename, ".", '_');
   return basename + "_pb";
 }
 
@@ -760,22 +757,8 @@ string DoubleToString(double value) {
   return PostProcessFloat(result);
 }
 
-// Return true if this is an integral field that should be represented as string
-// in JS.
-bool IsIntegralFieldWithStringJSType(const FieldDescriptor* field) {
-  switch (field->cpp_type()) {
-    case FieldDescriptor::CPPTYPE_INT64:
-    case FieldDescriptor::CPPTYPE_UINT64:
-      // The default value of JSType is JS_NORMAL, which behaves the same as
-      // JS_NUMBER.
-      return field->options().jstype() == google::protobuf::FieldOptions::JS_STRING;
-    default:
-      return false;
-  }
-}
-
 string MaybeNumberString(const FieldDescriptor* field, const string& orig) {
-  return IsIntegralFieldWithStringJSType(field) ? ("\"" + orig + "\"") : orig;
+  return orig;
 }
 
 string JSFieldDefault(const FieldDescriptor* field) {
@@ -874,7 +857,7 @@ string ProtoTypeName(const GeneratorOptions& options,
 }
 
 string JSIntegerTypeName(const FieldDescriptor* field) {
-  return IsIntegralFieldWithStringJSType(field) ? "string" : "number";
+  return "number";
 }
 
 string JSStringTypeName(const GeneratorOptions& options,
@@ -1051,7 +1034,8 @@ string JSBinaryReaderMethodType(const FieldDescriptor* field) {
   if (name[0] >= 'a' && name[0] <= 'z') {
     name[0] = (name[0] - 'a') + 'A';
   }
-  return IsIntegralFieldWithStringJSType(field) ? (name + "String") : name;
+
+  return name;
 }
 
 string JSBinaryReadWriteMethodName(const FieldDescriptor* field,
@@ -1261,6 +1245,13 @@ string FieldComments(const FieldDescriptor* field, BytesMode bytes_mode) {
         " * You should avoid comparisons like {@code val === true/false} in "
         "those cases.\n";
   }
+  if (field->is_repeated()) {
+    comments +=
+        " * If you change this array by adding, removing or replacing "
+        "elements, or if you\n"
+        " * replace the array itself, then you must call the setter to "
+        "update it.\n";
+  }
   if (field->type() == FieldDescriptor::TYPE_BYTES && bytes_mode == BYTES_U8) {
     comments +=
         " * Note that Uint8Array is not supported on all browsers.\n"
@@ -1333,7 +1324,7 @@ bool IsExtendable(const Descriptor* desc) {
 // Returns the max index in the underlying data storage array beyond which the
 // extension object is used.
 string GetPivot(const Descriptor* desc) {
-  static const int kDefaultPivot = 500;
+  static const int kDefaultPivot = (1 << 29);  // max field number (29 bits)
 
   // Find the max field number
   int max_field_number = 0;
@@ -1345,7 +1336,7 @@ string GetPivot(const Descriptor* desc) {
   }
 
   int pivot = -1;
-  if (IsExtendable(desc) || (max_field_number >= kDefaultPivot)) {
+  if (IsExtendable(desc)) {
     pivot = ((max_field_number + 1) < kDefaultPivot) ?
         (max_field_number + 1) : kDefaultPivot;
   }
@@ -1517,10 +1508,6 @@ void Generator::GenerateHeader(const GeneratorOptions& options,
   printer->Print("/**\n"
                  " * @fileoverview\n"
                  " * @enhanceable\n"
-                 " * @suppress {messageConventions} JS Compiler reports an "
-                 "error if a variable or\n"
-                 " *     field starts with 'MSG_' and isn't a translatable "
-                 "message.\n"
                  " * @public\n"
                  " */\n"
                  "// GENERATED CODE -- DO NOT EDIT!\n"
@@ -1712,16 +1699,18 @@ void Generator::GenerateRequiresImpl(const GeneratorOptions& options,
                                      bool require_jspb, bool require_extension,
                                      bool require_map) const {
   if (require_jspb) {
-    required->insert("jspb.Message");
-    required->insert("jspb.BinaryReader");
-    required->insert("jspb.BinaryWriter");
+    printer->Print(
+        "goog.require('jspb.Message');\n"
+        "goog.require('jspb.BinaryReader');\n"
+        "goog.require('jspb.BinaryWriter');\n");
   }
   if (require_extension) {
-    required->insert("jspb.ExtensionFieldBinaryInfo");
-    required->insert("jspb.ExtensionFieldInfo");
+    printer->Print("goog.require('jspb.ExtensionFieldBinaryInfo');\n");
+    printer->Print(
+        "goog.require('jspb.ExtensionFieldInfo');\n");
   }
   if (require_map) {
-    required->insert("jspb.Map");
+    printer->Print("goog.require('jspb.Map');\n");
   }
 
   std::set<string>::iterator it;
@@ -2049,7 +2038,6 @@ void Generator::GenerateClassToObject(const GeneratorOptions& options,
       " *     http://goto/soy-param-migration\n"
       " * @param {!$classname$} msg The msg instance to transform.\n"
       " * @return {!Object}\n"
-      " * @suppress {unusedLocalVariables} f is only used for nested messages\n"
       " */\n"
       "$classname$.toObject = function(includeInstance, msg) {\n"
       "  var f, obj = {",
@@ -2138,8 +2126,7 @@ void Generator::GenerateFieldValueExpression(io::Printer* printer,
             "obj", obj_reference);
       }
     } else {
-      printer->Print("jspb.Message.get$cardinality$Field($obj$, $index$)",
-                     "cardinality", field->is_repeated() ? "Repeated" : "",
+      printer->Print("jspb.Message.getField($obj$, $index$)",
                      "index", JSFieldIndex(field),
                      "obj", obj_reference);
     }
@@ -2347,6 +2334,7 @@ void GenerateBytesWrapper(const GeneratorOptions& options,
       "defname", JSGetterName(options, field, BYTES_DEFAULT));
 }
 
+
 void Generator::GenerateClassField(const GeneratorOptions& options,
                                    io::Printer* printer,
                                    const FieldDescriptor* field) const {
@@ -2476,7 +2464,7 @@ void Generator::GenerateClassField(const GeneratorOptions& options,
     // Simple (primitive) field, either singular or repeated.
 
     // TODO(b/26173701): Always use BYTES_DEFAULT for the getter return type;
-    // at this point we "lie" to non-binary users and tell the return
+    // at this point we "lie" to non-binary users and tell the the return
     // type is always base64 string, pending a LSC to migrate to typed getters.
     BytesMode bytes_mode =
         field->type() == FieldDescriptor::TYPE_BYTES && !options.binary ?
@@ -2923,7 +2911,6 @@ void Generator::GenerateClassSerializeBinary(const GeneratorOptions& options,
       " * format), writing to the given BinaryWriter.\n"
       " * @param {!$class$} message\n"
       " * @param {!jspb.BinaryWriter} writer\n"
-      " * @suppress {unusedLocalVariables} f is only used for nested messages\n"
       " */\n"
       "$class$.serializeBinaryToWriter = function(message, "
       "writer) {\n"
@@ -2996,13 +2983,7 @@ void Generator::GenerateClassSerializeBinaryField(
         case FieldDescriptor::CPPTYPE_INT64:
         case FieldDescriptor::CPPTYPE_UINT32:
         case FieldDescriptor::CPPTYPE_UINT64: {
-          if (IsIntegralFieldWithStringJSType(field)) {
-            // We can use `parseInt` here even though it will not be precise for
-            // 64-bit quantities because we are only testing for zero/nonzero,
-            // and JS numbers (64-bit floating point values, i.e., doubles) are
-            // integer-precise in the range that includes zero.
-            printer->Print("  if (parseInt(f, 10) !== 0) {\n");
-          } else {
+          {
             printer->Print("  if (f !== 0) {\n");
           }
           break;
@@ -3326,8 +3307,7 @@ void Generator::GenerateFile(const GeneratorOptions& options,
       printer->Print(
           "var $alias$ = require('$file$');\n",
           "alias", ModuleAlias(name),
-          "file",
-          GetRootPath(file->name(), name) + GetJSFilename(options, name));
+          "file", GetRootPath(file->name(), name) + GetJSFilename(options, name));
     }
   }
 
