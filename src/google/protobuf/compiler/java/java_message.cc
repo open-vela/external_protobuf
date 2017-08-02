@@ -56,9 +56,8 @@
 #include <google/protobuf/io/printer.h>
 #include <google/protobuf/descriptor.pb.h>
 #include <google/protobuf/wire_format.h>
-#include <google/protobuf/stubs/substitute.h>
 #include <google/protobuf/stubs/strutil.h>
-
+#include <google/protobuf/stubs/substitute.h>
 
 namespace google {
 namespace protobuf {
@@ -254,7 +253,7 @@ void ImmutableMessageGenerator::GenerateInterface(io::Printer* printer) {
                                 /* immutable = */ true, "OrBuilder");
   if (descriptor_->extension_range_count() > 0) {
     printer->Print(
-        "$deprecation$public interface ${$$classname$OrBuilder$}$ extends\n"
+        "$deprecation$public interface $classname$OrBuilder$idend$ extends\n"
         "    $extra_interfaces$\n"
         "    com.google.protobuf.GeneratedMessage$ver$.\n"
         "        ExtendableMessageOrBuilder<$classname$> {\n",
@@ -262,19 +261,19 @@ void ImmutableMessageGenerator::GenerateInterface(io::Printer* printer) {
             "@java.lang.Deprecated " : "",
         "extra_interfaces", ExtraMessageOrBuilderInterfaces(descriptor_),
         "classname", descriptor_->name(),
-        "{", "", "}", "", "ver", GeneratedCodeVersionSuffix());
+        "idend", "", "ver", GeneratedCodeVersionSuffix());
   } else {
     printer->Print(
-        "$deprecation$public interface ${$$classname$OrBuilder$}$ extends\n"
+        "$deprecation$public interface $classname$OrBuilder$idend$ extends\n"
         "    $extra_interfaces$\n"
         "    com.google.protobuf.MessageOrBuilder {\n",
         "deprecation", descriptor_->options().deprecated() ?
             "@java.lang.Deprecated " : "",
         "extra_interfaces", ExtraMessageOrBuilderInterfaces(descriptor_),
         "classname", descriptor_->name(),
-        "{", "", "}", "");
+        "idend", "");
   }
-  printer->Annotate("{", "}", descriptor_);
+  printer->Annotate("classname", "idend", descriptor_);
 
   printer->Indent();
     for (int i = 0; i < descriptor_->field_count(); i++) {
@@ -346,9 +345,6 @@ void ImmutableMessageGenerator::Generate(io::Printer* printer) {
         "com.google.protobuf.GeneratedMessage$0.Builder<?>",
         GeneratedCodeVersionSuffix());
   }
-  printer->Print(
-    "private static final long serialVersionUID = 0L;\n");
-
   printer->Indent();
   // Using builder_type, instead of Builder, prevents the Builder class from
   // being loaded into PermGen space when the default instance is created.
@@ -374,8 +370,15 @@ void ImmutableMessageGenerator::Generate(io::Printer* printer) {
   printer->Print(
     "@java.lang.Override\n"
     "public final com.google.protobuf.UnknownFieldSet\n"
-    "getUnknownFields() {\n"
-    "  return this.unknownFields;\n"
+    "getUnknownFields() {\n");
+  if (PreserveUnknownFields(descriptor_)) {
+    printer->Print(
+      "  return this.unknownFields;\n");
+  } else {
+    printer->Print(
+      "  return com.google.protobuf.UnknownFieldSet.getDefaultInstance();\n");
+  }
+  printer->Print(
     "}\n");
 
   if (context_->HasGeneratedMethods(descriptor_)) {
@@ -620,12 +623,14 @@ GenerateMessageSerializationMethods(io::Printer* printer) {
     }
   }
 
-  if (descriptor_->options().message_set_wire_format()) {
-    printer->Print(
+  if (PreserveUnknownFields(descriptor_)) {
+    if (descriptor_->options().message_set_wire_format()) {
+      printer->Print(
         "unknownFields.writeAsMessageSetTo(output);\n");
-  } else {
-    printer->Print(
+    } else {
+      printer->Print(
         "unknownFields.writeTo(output);\n");
+    }
   }
 
   printer->Outdent();
@@ -653,12 +658,14 @@ GenerateMessageSerializationMethods(io::Printer* printer) {
     }
   }
 
-  if (descriptor_->options().message_set_wire_format()) {
-    printer->Print(
+  if (PreserveUnknownFields(descriptor_)) {
+    if (descriptor_->options().message_set_wire_format()) {
+      printer->Print(
         "size += unknownFields.getSerializedSizeAsMessageSet();\n");
-  } else {
-    printer->Print(
+    } else {
+      printer->Print(
         "size += unknownFields.getSerializedSize();\n");
+    }
   }
 
   printer->Outdent();
@@ -667,6 +674,9 @@ GenerateMessageSerializationMethods(io::Printer* printer) {
     "  return size;\n"
     "}\n"
     "\n");
+
+  printer->Print(
+    "private static final long serialVersionUID = 0L;\n");
 }
 
 void ImmutableMessageGenerator::
@@ -1068,11 +1078,13 @@ GenerateEqualsAndHashCode(io::Printer* printer) {
     printer->Print("}\n");
   }
 
-  // Always consider unknown fields for equality. This will sometimes return
-  // false for non-canonical ordering when running in LITE_RUNTIME but it's
-  // the best we can do.
-  printer->Print(
+  if (PreserveUnknownFields(descriptor_)) {
+    // Always consider unknown fields for equality. This will sometimes return
+    // false for non-canonical ordering when running in LITE_RUNTIME but it's
+    // the best we can do.
+    printer->Print(
       "result = result && unknownFields.equals(other.unknownFields);\n");
+  }
   if (descriptor_->extension_range_count() > 0) {
     printer->Print(
       "result = result &&\n"
@@ -1214,9 +1226,11 @@ GenerateParsingConstructor(io::Printer* printer) {
       "bit_field_name", GetBitFieldName(i));
   }
 
-  printer->Print(
+  if (PreserveUnknownFields(descriptor_)) {
+    printer->Print(
       "com.google.protobuf.UnknownFieldSet.Builder unknownFields =\n"
       "    com.google.protobuf.UnknownFieldSet.newBuilder();\n");
+  }
 
   printer->Print(
       "try {\n");
@@ -1233,19 +1247,28 @@ GenerateParsingConstructor(io::Printer* printer) {
   printer->Indent();
 
   printer->Print(
-    "case 0:\n"  // zero signals EOF / limit reached
+    "case 0:\n"          // zero signals EOF / limit reached
     "  done = true;\n"
-    "  break;\n"
-    "default: {\n"
-    "  if (!parseUnknownField$suffix$(\n"
-    "      input, unknownFields, extensionRegistry, tag)) {\n"
-    "    done = true;\n"  // it's an endgroup tag
-    "  }\n"
-    "  break;\n"
-    "}\n",
-    "suffix",
-    descriptor_->file()->syntax() == FileDescriptor::SYNTAX_PROTO3 ? "Proto3"
-                                                                   : "");
+    "  break;\n");
+
+  if (PreserveUnknownFields(descriptor_)) {
+    printer->Print(
+      "default: {\n"
+      "  if (!parseUnknownField(input, unknownFields,\n"
+      "                         extensionRegistry, tag)) {\n"
+      "    done = true;\n"  // it's an endgroup tag
+      "  }\n"
+      "  break;\n"
+      "}\n");
+  } else {
+    printer->Print(
+      "default: {\n"
+      "  if (!input.skipField(tag)) {\n"
+      "    done = true;\n"  // it's an endgroup tag
+      "  }\n"
+      "  break;\n"
+      "}\n");
+  }
 
   for (int i = 0; i < descriptor_->field_count(); i++) {
     const FieldDescriptor* field = sorted_fields[i];
@@ -1305,8 +1328,10 @@ GenerateParsingConstructor(io::Printer* printer) {
     field_generators_.get(field).GenerateParsingDoneCode(printer);
   }
 
-  // Make unknown fields immutable.
-  printer->Print("this.unknownFields = unknownFields.build();\n");
+  if (PreserveUnknownFields(descriptor_)) {
+    // Make unknown fields immutable.
+    printer->Print("this.unknownFields = unknownFields.build();\n");
+  }
 
   // Make extensions immutable.
   printer->Print(
