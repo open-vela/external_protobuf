@@ -661,7 +661,6 @@ php_EXTRA_DIST=                                                       \
   php/tests/array_test.php                                            \
   php/tests/autoload.php                                              \
   php/tests/compatibility_test.sh                                     \
-  php/tests/descriptors_test.php                                      \
   php/tests/encode_decode_test.php                                    \
   php/tests/gdb_test.sh                                               \
   php/tests/generated_class_test.php                                  \
@@ -670,7 +669,6 @@ php_EXTRA_DIST=                                                       \
   php/tests/map_field_test.php                                        \
   php/tests/memory_leak_test.php                                      \
   php/tests/php_implementation_test.php                               \
-  php/tests/proto/test_descriptors.proto                              \
   php/tests/proto/test_empty_php_namespace.proto                      \
   php/tests/proto/test_import_descriptor_proto.proto                  \
   php/tests/proto/test_include.proto                                  \
