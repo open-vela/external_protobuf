@@ -19,10 +19,7 @@
 
 namespace google {
 namespace protobuf {
-class FieldMaskDefaultTypeInternal {
-public:
- ::google::protobuf::internal::ExplicitlyConstructed<FieldMask>
-     _instance;
+class FieldMaskDefaultTypeInternal : public ::google::protobuf::internal::ExplicitlyConstructed<FieldMask> {
 } _FieldMask_default_instance_;
 
 namespace protobuf_google_2fprotobuf_2ffield_5fmask_2eproto {
@@ -90,7 +87,7 @@ void TableStruct::InitDefaultsImpl() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
   ::google::protobuf::internal::InitProtobufDefaults();
-  _FieldMask_default_instance_._instance.DefaultConstruct();
+  _FieldMask_default_instance_.DefaultConstruct();
   ::google::protobuf::internal::OnShutdownDestroyMessage(
       &_FieldMask_default_instance_);}
 

@@ -20,25 +20,13 @@
 namespace google {
 namespace protobuf {
 namespace compiler {
-class VersionDefaultTypeInternal {
-public:
- ::google::protobuf::internal::ExplicitlyConstructed<Version>
-     _instance;
+class VersionDefaultTypeInternal : public ::google::protobuf::internal::ExplicitlyConstructed<Version> {
 } _Version_default_instance_;
-class CodeGeneratorRequestDefaultTypeInternal {
-public:
- ::google::protobuf::internal::ExplicitlyConstructed<CodeGeneratorRequest>
-     _instance;
+class CodeGeneratorRequestDefaultTypeInternal : public ::google::protobuf::internal::ExplicitlyConstructed<CodeGeneratorRequest> {
 } _CodeGeneratorRequest_default_instance_;
-class CodeGeneratorResponse_FileDefaultTypeInternal {
-public:
- ::google::protobuf::internal::ExplicitlyConstructed<CodeGeneratorResponse_File>
-     _instance;
+class CodeGeneratorResponse_FileDefaultTypeInternal : public ::google::protobuf::internal::ExplicitlyConstructed<CodeGeneratorResponse_File> {
 } _CodeGeneratorResponse_File_default_instance_;
-class CodeGeneratorResponseDefaultTypeInternal {
-public:
- ::google::protobuf::internal::ExplicitlyConstructed<CodeGeneratorResponse>
-     _instance;
+class CodeGeneratorResponseDefaultTypeInternal : public ::google::protobuf::internal::ExplicitlyConstructed<CodeGeneratorResponse> {
 } _CodeGeneratorResponse_default_instance_;
 
 namespace protobuf_google_2fprotobuf_2fcompiler_2fplugin_2eproto {
@@ -156,15 +144,15 @@ void TableStruct::InitDefaultsImpl() {
 
   ::google::protobuf::internal::InitProtobufDefaults();
   ::google::protobuf::protobuf_google_2fprotobuf_2fdescriptor_2eproto::InitDefaults();
-  _Version_default_instance_._instance.DefaultConstruct();
+  _Version_default_instance_.DefaultConstruct();
   ::google::protobuf::internal::OnShutdownDestroyMessage(
-      &_Version_default_instance_);_CodeGeneratorRequest_default_instance_._instance.DefaultConstruct();
+      &_Version_default_instance_);_CodeGeneratorRequest_default_instance_.DefaultConstruct();
   ::google::protobuf::internal::OnShutdownDestroyMessage(
-      &_CodeGeneratorRequest_default_instance_);_CodeGeneratorResponse_File_default_instance_._instance.DefaultConstruct();
+      &_CodeGeneratorRequest_default_instance_);_CodeGeneratorResponse_File_default_instance_.DefaultConstruct();
   ::google::protobuf::internal::OnShutdownDestroyMessage(
-      &_CodeGeneratorResponse_File_default_instance_);_CodeGeneratorResponse_default_instance_._instance.DefaultConstruct();
+      &_CodeGeneratorResponse_File_default_instance_);_CodeGeneratorResponse_default_instance_.DefaultConstruct();
   ::google::protobuf::internal::OnShutdownDestroyMessage(
-      &_CodeGeneratorResponse_default_instance_);_CodeGeneratorRequest_default_instance_._instance.get_mutable()->compiler_version_ = const_cast< ::google::protobuf::compiler::Version*>(
+      &_CodeGeneratorResponse_default_instance_);_CodeGeneratorRequest_default_instance_.get_mutable()->compiler_version_ = const_cast< ::google::protobuf::compiler::Version*>(
       ::google::protobuf::compiler::Version::internal_default_instance());
 }
 

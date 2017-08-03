@@ -19,10 +19,7 @@
 
 namespace google {
 namespace protobuf {
-class TimestampDefaultTypeInternal {
-public:
- ::google::protobuf::internal::ExplicitlyConstructed<Timestamp>
-     _instance;
+class TimestampDefaultTypeInternal : public ::google::protobuf::internal::ExplicitlyConstructed<Timestamp> {
 } _Timestamp_default_instance_;
 
 namespace protobuf_google_2fprotobuf_2ftimestamp_2eproto {
@@ -91,7 +88,7 @@ void TableStruct::InitDefaultsImpl() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
   ::google::protobuf::internal::InitProtobufDefaults();
-  _Timestamp_default_instance_._instance.DefaultConstruct();
+  _Timestamp_default_instance_.DefaultConstruct();
   ::google::protobuf::internal::OnShutdownDestroyMessage(
       &_Timestamp_default_instance_);}
 

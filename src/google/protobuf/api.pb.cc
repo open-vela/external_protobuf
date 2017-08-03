@@ -19,20 +19,11 @@
 
 namespace google {
 namespace protobuf {
-class ApiDefaultTypeInternal {
-public:
- ::google::protobuf::internal::ExplicitlyConstructed<Api>
-     _instance;
+class ApiDefaultTypeInternal : public ::google::protobuf::internal::ExplicitlyConstructed<Api> {
 } _Api_default_instance_;
-class MethodDefaultTypeInternal {
-public:
- ::google::protobuf::internal::ExplicitlyConstructed<Method>
-     _instance;
+class MethodDefaultTypeInternal : public ::google::protobuf::internal::ExplicitlyConstructed<Method> {
 } _Method_default_instance_;
-class MixinDefaultTypeInternal {
-public:
- ::google::protobuf::internal::ExplicitlyConstructed<Mixin>
-     _instance;
+class MixinDefaultTypeInternal : public ::google::protobuf::internal::ExplicitlyConstructed<Mixin> {
 } _Mixin_default_instance_;
 
 namespace protobuf_google_2fprotobuf_2fapi_2eproto {
@@ -133,13 +124,13 @@ void TableStruct::InitDefaultsImpl() {
   ::google::protobuf::internal::InitProtobufDefaults();
   ::google::protobuf::protobuf_google_2fprotobuf_2fsource_5fcontext_2eproto::InitDefaults();
   ::google::protobuf::protobuf_google_2fprotobuf_2ftype_2eproto::InitDefaults();
-  _Api_default_instance_._instance.DefaultConstruct();
+  _Api_default_instance_.DefaultConstruct();
   ::google::protobuf::internal::OnShutdownDestroyMessage(
-      &_Api_default_instance_);_Method_default_instance_._instance.DefaultConstruct();
+      &_Api_default_instance_);_Method_default_instance_.DefaultConstruct();
   ::google::protobuf::internal::OnShutdownDestroyMessage(
-      &_Method_default_instance_);_Mixin_default_instance_._instance.DefaultConstruct();
+      &_Method_default_instance_);_Mixin_default_instance_.DefaultConstruct();
   ::google::protobuf::internal::OnShutdownDestroyMessage(
-      &_Mixin_default_instance_);_Api_default_instance_._instance.get_mutable()->source_context_ = const_cast< ::google::protobuf::SourceContext*>(
+      &_Mixin_default_instance_);_Api_default_instance_.get_mutable()->source_context_ = const_cast< ::google::protobuf::SourceContext*>(
       ::google::protobuf::SourceContext::internal_default_instance());
 }
 
