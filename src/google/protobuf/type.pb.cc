@@ -19,30 +19,15 @@
 
 namespace google {
 namespace protobuf {
-class TypeDefaultTypeInternal {
-public:
- ::google::protobuf::internal::ExplicitlyConstructed<Type>
-     _instance;
+class TypeDefaultTypeInternal : public ::google::protobuf::internal::ExplicitlyConstructed<Type> {
 } _Type_default_instance_;
-class FieldDefaultTypeInternal {
-public:
- ::google::protobuf::internal::ExplicitlyConstructed<Field>
-     _instance;
+class FieldDefaultTypeInternal : public ::google::protobuf::internal::ExplicitlyConstructed<Field> {
 } _Field_default_instance_;
-class EnumDefaultTypeInternal {
-public:
- ::google::protobuf::internal::ExplicitlyConstructed<Enum>
-     _instance;
+class EnumDefaultTypeInternal : public ::google::protobuf::internal::ExplicitlyConstructed<Enum> {
 } _Enum_default_instance_;
-class EnumValueDefaultTypeInternal {
-public:
- ::google::protobuf::internal::ExplicitlyConstructed<EnumValue>
-     _instance;
+class EnumValueDefaultTypeInternal : public ::google::protobuf::internal::ExplicitlyConstructed<EnumValue> {
 } _EnumValue_default_instance_;
-class OptionDefaultTypeInternal {
-public:
- ::google::protobuf::internal::ExplicitlyConstructed<Option>
-     _instance;
+class OptionDefaultTypeInternal : public ::google::protobuf::internal::ExplicitlyConstructed<Option> {
 } _Option_default_instance_;
 
 namespace protobuf_google_2fprotobuf_2ftype_2eproto {
@@ -170,21 +155,21 @@ void TableStruct::InitDefaultsImpl() {
   ::google::protobuf::internal::InitProtobufDefaults();
   ::google::protobuf::protobuf_google_2fprotobuf_2fany_2eproto::InitDefaults();
   ::google::protobuf::protobuf_google_2fprotobuf_2fsource_5fcontext_2eproto::InitDefaults();
-  _Type_default_instance_._instance.DefaultConstruct();
+  _Type_default_instance_.DefaultConstruct();
   ::google::protobuf::internal::OnShutdownDestroyMessage(
-      &_Type_default_instance_);_Field_default_instance_._instance.DefaultConstruct();
+      &_Type_default_instance_);_Field_default_instance_.DefaultConstruct();
   ::google::protobuf::internal::OnShutdownDestroyMessage(
-      &_Field_default_instance_);_Enum_default_instance_._instance.DefaultConstruct();
+      &_Field_default_instance_);_Enum_default_instance_.DefaultConstruct();
   ::google::protobuf::internal::OnShutdownDestroyMessage(
-      &_Enum_default_instance_);_EnumValue_default_instance_._instance.DefaultConstruct();
+      &_Enum_default_instance_);_EnumValue_default_instance_.DefaultConstruct();
   ::google::protobuf::internal::OnShutdownDestroyMessage(
-      &_EnumValue_default_instance_);_Option_default_instance_._instance.DefaultConstruct();
+      &_EnumValue_default_instance_);_Option_default_instance_.DefaultConstruct();
   ::google::protobuf::internal::OnShutdownDestroyMessage(
-      &_Option_default_instance_);_Type_default_instance_._instance.get_mutable()->source_context_ = const_cast< ::google::protobuf::SourceContext*>(
+      &_Option_default_instance_);_Type_default_instance_.get_mutable()->source_context_ = const_cast< ::google::protobuf::SourceContext*>(
       ::google::protobuf::SourceContext::internal_default_instance());
-  _Enum_default_instance_._instance.get_mutable()->source_context_ = const_cast< ::google::protobuf::SourceContext*>(
+  _Enum_default_instance_.get_mutable()->source_context_ = const_cast< ::google::protobuf::SourceContext*>(
       ::google::protobuf::SourceContext::internal_default_instance());
-  _Option_default_instance_._instance.get_mutable()->value_ = const_cast< ::google::protobuf::Any*>(
+  _Option_default_instance_.get_mutable()->value_ = const_cast< ::google::protobuf::Any*>(
       ::google::protobuf::Any::internal_default_instance());
 }
 

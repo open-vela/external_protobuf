@@ -351,10 +351,9 @@ void FileGenerator::GenerateSource(io::Printer* printer) {
                "::";
     }
     printer->Print(
-        "class $classname$DefaultTypeInternal {\n"
-        "public:\n"
-        " ::google::protobuf::internal::ExplicitlyConstructed<$parent$$classname$>\n"
-        "     _instance;\n",
+        "class $classname$DefaultTypeInternal : "
+        "public ::google::protobuf::internal::ExplicitlyConstructed<$parent$$classname$> "
+        "{\n",
         "parent", parent, "classname", message_generators_[i]->classname_);
     printer->Indent();
     message_generators_[i]->GenerateExtraDefaultFields(printer);
@@ -741,7 +740,7 @@ void FileGenerator::GenerateBuildDescriptors(io::Printer* printer) {
       printer->Print(
           "file_level_metadata[$index$].reflection = "
           "$parent$::$classname$::CreateReflection(file_level_metadata[$index$]"
-          ".descriptor, _$classname$_default_instance_._instance.get_mutable());\n",
+          ".descriptor, _$classname$_default_instance_.get_mutable());\n",
           "index", SimpleItoa(i), "parent",
           ClassName(message_generators_[i]->descriptor_->containing_type(),
                     false),

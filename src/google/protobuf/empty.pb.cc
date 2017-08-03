@@ -19,10 +19,7 @@
 
 namespace google {
 namespace protobuf {
-class EmptyDefaultTypeInternal {
-public:
- ::google::protobuf::internal::ExplicitlyConstructed<Empty>
-     _instance;
+class EmptyDefaultTypeInternal : public ::google::protobuf::internal::ExplicitlyConstructed<Empty> {
 } _Empty_default_instance_;
 
 namespace protobuf_google_2fprotobuf_2fempty_2eproto {
@@ -89,7 +86,7 @@ void TableStruct::InitDefaultsImpl() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
   ::google::protobuf::internal::InitProtobufDefaults();
-  _Empty_default_instance_._instance.DefaultConstruct();
+  _Empty_default_instance_.DefaultConstruct();
   ::google::protobuf::internal::OnShutdownDestroyMessage(
       &_Empty_default_instance_);}
 
