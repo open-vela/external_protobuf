@@ -841,6 +841,7 @@ class Message
                 if (is_null($value)) {
                     continue;
                 }
+                $getter = $field->getGetter();
                 $key_field = $field->getMessageType()->getFieldByNumber(1);
                 $value_field = $field->getMessageType()->getFieldByNumber(2);
                 foreach ($value as $tmp_key => $tmp_value) {
@@ -857,12 +858,13 @@ class Message
                         $this->convertJsonValueToProtoValue(
                             $tmp_value,
                             $value_field);
-                    self::kvUpdateHelper($field, $proto_key, $proto_value);
+                    $this->$getter()[$proto_key] = $proto_value;
                 }
             } else if ($field->isRepeated()) {
                 if (is_null($value)) {
                     continue;
                 }
+                $getter = $field->getGetter();
                 foreach ($value as $tmp) {
                     if (is_null($tmp)) {
                         throw new \Exception(
@@ -870,7 +872,7 @@ class Message
                     }
                     $proto_value =
                         $this->convertJsonValueToProtoValue($tmp, $field);
-                    self::appendHelper($field, $proto_value);
+                    $this->$getter()[] = $proto_value;
                 }
             } else {
                 $setter = $field->getSetter();
