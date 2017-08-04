@@ -81,16 +81,10 @@ void EnumGenerator::GenerateDefinition(io::Printer* printer) {
   std::map<string, string> vars;
   vars["classname"] = classname_;
   vars["short_name"] = descriptor_->name();
-  vars["enumbase"] = options_.proto_h ? " : int" : "";
-  // These variables are placeholders to pick out the beginning and ends of
-  // identifiers for annotations (when doing so with existing variables would
-  // be ambiguous or impossible). They should never be set to anything but the
-  // empty string.
-  vars["{"] = "";
-  vars["}"] = "";
+  vars["enumbase"] = classname_ + (options_.proto_h ? " : int" : "");
 
-  printer->Print(vars, "enum $classname$$enumbase$ {\n");
-  printer->Annotate("classname", descriptor_);
+  printer->Print(vars, "enum $enumbase$ {\n");
+  printer->Annotate("enumbase", descriptor_);
   printer->Indent();
 
   const EnumValueDescriptor* min_value = descriptor_->value(0);
@@ -108,8 +102,7 @@ void EnumGenerator::GenerateDefinition(io::Printer* printer) {
         " PROTOBUF_DEPRECATED" : "";
 
     if (i > 0) printer->Print(",\n");
-    printer->Print(vars, "${$$prefix$$name$$}$$deprecation$ = $number$");
-    printer->Annotate("{", "}", descriptor_->value(i));
+    printer->Print(vars, "$prefix$$name$$deprecation$ = $number$");
 
     if (descriptor_->value(i)->number() < min_value->number()) {
       min_value = descriptor_->value(i);
@@ -141,20 +134,14 @@ void EnumGenerator::GenerateDefinition(io::Printer* printer) {
   }
 
   printer->Print(vars,
-                 "$dllexport$bool $classname$_IsValid(int value);\n"
-                 "const $classname$ ${$$prefix$$short_name$_MIN$}$ = "
-                 "$prefix$$min_name$;\n");
-  printer->Annotate("{", "}", descriptor_);
-  printer->Print(vars,
-                 "const $classname$ ${$$prefix$$short_name$_MAX$}$ = "
-                 "$prefix$$max_name$;\n");
-  printer->Annotate("{", "}", descriptor_);
+    "$dllexport$bool $classname$_IsValid(int value);\n"
+    "const $classname$ $prefix$$short_name$_MIN = $prefix$$min_name$;\n"
+    "const $classname$ $prefix$$short_name$_MAX = $prefix$$max_name$;\n");
 
   if (generate_array_size_) {
     printer->Print(vars,
-                   "const int ${$$prefix$$short_name$_ARRAYSIZE$}$ = "
-                   "$prefix$$short_name$_MAX + 1;\n\n");
-    printer->Annotate("{", "}", descriptor_);
+      "const int $prefix$$short_name$_ARRAYSIZE = "
+      "$prefix$$short_name$_MAX + 1;\n\n");
   }
 
   if (HasDescriptorMethods(descriptor_->file(), options_)) {
