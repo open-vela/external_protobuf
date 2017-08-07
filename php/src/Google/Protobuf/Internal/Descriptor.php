@@ -34,23 +34,16 @@ namespace Google\Protobuf\Internal;
 
 class Descriptor
 {
-    use HasPublicDescriptorTrait;
 
     private $full_name;
     private $field = [];
     private $json_to_field = [];
     private $name_to_field = [];
-    private $index_to_field = [];
     private $nested_type = [];
     private $enum_type = [];
     private $klass;
     private $options;
     private $oneof_decl = [];
-
-    public function __construct()
-    {
-        $this->public_desc = new \Google\Protobuf\Descriptor($this);
-    }
 
     public function addOneofDecl($oneof)
     {
@@ -77,7 +70,6 @@ class Descriptor
         $this->field[$field->getNumber()] = $field;
         $this->json_to_field[$field->getJsonName()] = $field;
         $this->name_to_field[$field->getName()] = $field;
-        $this->index_to_field[] = $field;
     }
 
     public function getField()
@@ -129,15 +121,6 @@ class Descriptor
           return NULL;
         } else {
           return $this->name_to_field[$name];
-        }
-    }
-
-    public function getFieldByIndex($index)
-    {
-        if (count($this->index_to_field) <= $index) {
-            return NULL;
-        } else {
-            return $this->index_to_field[$index];
         }
     }
 
@@ -196,11 +179,9 @@ class Descriptor
         }
 
         // Handle oneof fields.
-        $index = 0;
         foreach ($proto->getOneofDecl() as $oneof_proto) {
             $desc->addOneofDecl(
-                OneofDescriptor::buildFromProto($oneof_proto, $desc, $index));
-            $index++;
+                OneofDescriptor::buildFromProto($oneof_proto, $desc));
         }
 
         return $desc;
