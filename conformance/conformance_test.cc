@@ -1605,10 +1605,9 @@ bool ConformanceTestSuite::RunSuite(ConformanceTestRunner* runner,
       "BytesField", REQUIRED,
       R"({"optionalBytes": "AQI="})",
       R"(optional_bytes: "\x01\x02")");
-  RunValidJsonTest(
-      "BytesFieldBase64Url", RECOMMENDED,
-      R"({"optionalBytes": "-_"})",
-      R"(optional_bytes: "\xfb")");
+  ExpectParseFailureForJson(
+      "BytesFieldInvalidBase64Characters", REQUIRED,
+      R"({"optionalBytes": "-_=="})");
 
   // Message fields.
   RunValidJsonTest(
