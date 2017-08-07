@@ -1,5 +1,7 @@
+<?php
+
 // Protocol Buffers - Google's data interchange format
-// Copyright 2008 Google Inc.  All rights reserved.
+// Copyright 2017 Google Inc.  All rights reserved.
 // https://developers.google.com/protocol-buffers/
 //
 // Redistribution and use in source and binary forms, with or without
@@ -28,27 +30,47 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-syntax = "proto2";
+namespace Google\Protobuf;
 
-option java_package = "com.google.apps.jspb.proto";
-option java_multiple_files = true;
+class DescriptorPool
+{
+    private static $pool;
 
-package jspb.test;
+    private $internal_pool;
 
-message TestExtensionsMessage {
-  optional int32 intfield = 1;
-  extensions 100 to max;
-}
+    /**
+     * @return DescriptorPool
+     */
+    public static function getGeneratedPool()
+    {
+        if (!isset(self::$pool)) {
+            self::$pool = new DescriptorPool(\Google\Protobuf\Internal\DescriptorPool::getGeneratedPool());
+        }
+        return self::$pool;
+    }
 
-message ExtensionMessage {
-  extend TestExtensionsMessage {
-    optional ExtensionMessage ext_field = 100;
-  }
-  optional string ext1 = 1;
-}
+    private function __construct($internal_pool)
+    {
+        $this->internal_pool = $internal_pool;
+    }
 
-// Floating extensions are only supported when generating a _lib.js library.
-extend TestExtensionsMessage {
-  optional ExtensionMessage floating_msg_field = 101;
-  optional string floating_str_field = 102;
+    /**
+     * @param string $className A fully qualified protobuf class name
+     * @return Descriptor
+     */
+    public function getDescriptorByClassName($className)
+    {
+        $desc = $this->internal_pool->getDescriptorByClassName($className);
+        return is_null($desc) ? null : $desc->getPublicDescriptor();
+    }
+
+    /**
+     * @param string $className A fully qualified protobuf class name
+     * @return EnumDescriptor
+     */
+    public function getEnumDescriptorByClassName($className)
+    {
+        $desc = $this->internal_pool->getEnumDescriptorByClassName($className);
+        return is_null($desc) ? null : $desc->getPublicDescriptor();
+    }
 }

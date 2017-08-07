@@ -1,3 +1,5 @@
+<?php
+
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
 // https://developers.google.com/protocol-buffers/
@@ -28,7 +30,35 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-syntax = "proto2";
+namespace Google\Protobuf;
 
-package javatests.com.google.apps.jspb;
+class EnumValueDescriptor
+{
+    private $name;
+    private $number;
 
+    /**
+     * @internal
+     */
+    public function __construct($name, $number)
+    {
+        $this->name = $name;
+        $this->number = $number;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * @return int
+     */
+    public function getNumber()
+    {
+        return $this->number;
+    }
+}

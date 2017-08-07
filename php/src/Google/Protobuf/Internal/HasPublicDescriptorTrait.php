@@ -1,5 +1,7 @@
+<?php
+
 // Protocol Buffers - Google's data interchange format
-// Copyright 2016 Google Inc.  All rights reserved.
+// Copyright 2008 Google Inc.  All rights reserved.
 // https://developers.google.com/protocol-buffers/
 //
 // Redistribution and use in source and binary forms, with or without
@@ -28,13 +30,14 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-syntax = "proto3";
+namespace Google\Protobuf\Internal;
 
-option java_package = "com.google.apps.jspb.proto";
-option java_multiple_files = true;
+trait HasPublicDescriptorTrait
+{
+    private $public_desc;
 
-package jspb.test.importing;
-
-message ImportedMessage {
-  string string_value = 1;
+    public function getPublicDescriptor()
+    {
+        return $this->public_desc;
+    }
 }

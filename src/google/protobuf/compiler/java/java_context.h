@@ -70,7 +70,7 @@ class Context {
 
   // Get the name resolver associated with this context. The resolver
   // can be used to map descriptors to Java class names.
-  ClassNameResolver* GetNameResolver() const;
+  ClassNameResolver* GetNameResolver();
 
   // Get the FieldGeneratorInfo for a given field.
   const FieldGeneratorInfo* GetFieldGeneratorInfo(
