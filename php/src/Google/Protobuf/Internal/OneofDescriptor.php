@@ -34,15 +34,9 @@ namespace Google\Protobuf\Internal;
 
 class OneofDescriptor
 {
-    use HasPublicDescriptorTrait;
 
     private $name;
     private $fields;
-
-    public function __construct()
-    {
-        $this->public_desc = new \Google\Protobuf\OneofDescriptor($this);
-    }
 
     public function setName($name)
     {
@@ -54,7 +48,7 @@ class OneofDescriptor
         return $this->name;
     }
 
-    public function addField(FieldDescriptor $field)
+    public function addField(&$field)
     {
         $this->fields[] = $field;
     }
@@ -64,15 +58,10 @@ class OneofDescriptor
         return $this->fields;
     }
 
-    public static function buildFromProto($oneof_proto, $desc, $index)
+    public static function buildFromProto($oneof_proto)
     {
         $oneof = new OneofDescriptor();
         $oneof->setName($oneof_proto->getName());
-        foreach ($desc->getField() as $field) {
-            if ($field->getOneofIndex() == $index) {
-                $oneof->addField($field);
-            }
-        }
         return $oneof;
     }
 }
