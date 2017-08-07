@@ -1,5 +1,7 @@
+<?php
+
 // Protocol Buffers - Google's data interchange format
-// Copyright 2008 Google Inc.  All rights reserved.
+// Copyright 2017 Google Inc.  All rights reserved.
 // https://developers.google.com/protocol-buffers/
 //
 // Redistribution and use in source and binary forms, with or without
@@ -28,26 +30,46 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-syntax = "proto2";
+namespace Google\Protobuf;
 
-option java_package = "com.google.apps.jspb.proto";
-option java_multiple_files = true;
+use Google\Protobuf\Internal\GetPublicDescriptorTrait;
 
-package jspb.exttest;
+class OneofDescriptor
+{
+    use GetPublicDescriptorTrait;
 
-message TestExtensionsMessage {
-  optional int32 intfield = 1;
-  extensions 100 to max;
-}
+    private $internal_desc;
 
-message ExtensionMessage {
-  extend TestExtensionsMessage {
-    optional ExtensionMessage ext_field = 100;
-  }
-  optional string ext1 = 1;
-}
+    /**
+     * @internal
+     */
+    public function __construct($internal_desc)
+    {
+        $this->internal_desc = $internal_desc;
+    }
 
-extend TestExtensionsMessage {
-  optional ExtensionMessage floating_msg_field = 101;
-  optional string floating_str_field = 102;
+    /**
+     * @return string The name of the oneof
+     */
+    public function getName()
+    {
+        return $this->internal_desc->getName();
+    }
+
+    /**
+     * @param int $index Must be >= 0 and < getFieldCount()
+     * @return FieldDescriptor
+     */
+    public function getField($index)
+    {
+        return $this->getPublicDescriptor($this->internal_desc->getFields()[$index]);
+    }
+
+    /**
+     * @return int Number of fields in the oneof
+     */
+    public function getFieldCount()
+    {
+        return count($this->internal_desc->getFields());
+    }
 }

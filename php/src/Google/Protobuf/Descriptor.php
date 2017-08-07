@@ -1,7 +1,7 @@
 <?php
 
 // Protocol Buffers - Google's data interchange format
-// Copyright 2008 Google Inc.  All rights reserved.
+// Copyright 2017 Google Inc.  All rights reserved.
 // https://developers.google.com/protocol-buffers/
 //
 // Redistribution and use in source and binary forms, with or without
@@ -30,30 +30,71 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-namespace Google\Protobuf\Internal;
+namespace Google\Protobuf;
 
-class EnumValueDescriptor
+use Google\Protobuf\Internal\GetPublicDescriptorTrait;
+
+class Descriptor
 {
-    private $name;
-    private $number;
+    use GetPublicDescriptorTrait;
 
-    public function setName($name)
+    private $internal_desc;
+
+    /**
+     * @internal
+     */
+    public function __construct($internal_desc)
     {
-        $this->name = $name;
+        $this->internal_desc = $internal_desc;
     }
 
-    public function getName()
+    /**
+     * @return string Full protobuf message name
+     */
+    public function getFullName()
     {
-        return $this->name;
+        return trim($this->internal_desc->getFullName(), ".");
     }
 
-    public function setNumber($number)
+    /**
+     * @return string PHP class name
+     */
+    public function getClass()
     {
-        $this->number = $number;
+        return $this->internal_desc->getClass();
     }
 
-    public function getNumber()
+    /**
+     * @param int $index Must be >= 0 and < getFieldCount()
+     * @return FieldDescriptor
+     */
+    public function getField($index)
     {
-        return $this->number;
+        return $this->getPublicDescriptor($this->internal_desc->getFieldByIndex($index));
+    }
+
+    /**
+     * @return int Number of fields in message
+     */
+    public function getFieldCount()
+    {
+        return count($this->internal_desc->getField());
+    }
+
+    /**
+     * @param int $index Must be >= 0 and < getOneofDeclCount()
+     * @return OneofDescriptor
+     */
+    public function getOneofDecl($index)
+    {
+        return $this->getPublicDescriptor($this->internal_desc->getOneofDecl()[$index]);
+    }
+
+    /**
+     * @return int Number of oneofs in message
+     */
+    public function getOneofDeclCount()
+    {
+        return count($this->internal_desc->getOneofDecl());
     }
 }

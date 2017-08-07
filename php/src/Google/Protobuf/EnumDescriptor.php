@@ -1,5 +1,7 @@
+<?php
+
 // Protocol Buffers - Google's data interchange format
-// Copyright 2008 Google Inc.  All rights reserved.
+// Copyright 2017 Google Inc.  All rights reserved.
 // https://developers.google.com/protocol-buffers/
 //
 // Redistribution and use in source and binary forms, with or without
@@ -28,24 +30,50 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-// Author: mwr@google.com (Mark Rawling)
+namespace Google\Protobuf;
 
-syntax = "proto2";
+class EnumDescriptor
+{
+    private $internal_desc;
 
-option java_package = "com.google.apps.jspb.proto";
-option java_multiple_files = true;
+    /**
+     * @internal
+     */
+    public function __construct($internal_desc)
+    {
+        $this->internal_desc = $internal_desc;
+    }
 
-package jspb.test;
+    /**
+     * @return string Full protobuf message name
+     */
+    public function getFullName()
+    {
+        return $this->internal_desc->getFullName();
+    }
 
-// legacy data, must be nested
-message data {
-  message NestedData {
-    required string str = 1;
-  }
+    /**
+     * @return string PHP class name
+     */
+    public function getClass()
+    {
+        return $this->internal_desc->getClass();
+    }
+
+    /**
+     * @param int $index Must be >= 0 and < getValueCount()
+     * @return EnumValueDescriptor
+     */
+    public function getValue($index)
+    {
+        return $this->internal_desc->getValueDescriptorByIndex($index);
+    }
+
+    /**
+     * @return int Number of values in enum
+     */
+    public function getValueCount()
+    {
+        return $this->internal_desc->getValueCount();
+    }
 }
-
-// new data, does not require nesting
-message UnnestedData {
-  required string str = 1;
-}
-
