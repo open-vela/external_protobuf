@@ -590,8 +590,9 @@ public final class DynamicMessage extends AbstractMessage {
 
     @Override
     public Builder setUnknownFields(UnknownFieldSet unknownFields) {
-      if (getDescriptorForType().getFile().getSyntax() == Descriptors.FileDescriptor.Syntax.PROTO3
-          && CodedInputStream.getProto3DiscardUnknownFieldsDefault()) {
+      if (getDescriptorForType().getFile().getSyntax()
+          == Descriptors.FileDescriptor.Syntax.PROTO3) {
+        // Proto3 discards unknown fields.
         return this;
       }
       this.unknownFields = unknownFields;
@@ -600,8 +601,9 @@ public final class DynamicMessage extends AbstractMessage {
 
     @Override
     public Builder mergeUnknownFields(UnknownFieldSet unknownFields) {
-      if (getDescriptorForType().getFile().getSyntax() == Descriptors.FileDescriptor.Syntax.PROTO3
-          && CodedInputStream.getProto3DiscardUnknownFieldsDefault()) {
+      if (getDescriptorForType().getFile().getSyntax()
+          == Descriptors.FileDescriptor.Syntax.PROTO3) {
+        // Proto3 discards unknown fields.
         return this;
       }
       this.unknownFields =
