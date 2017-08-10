@@ -183,14 +183,7 @@ class MessageFactoryTest(unittest.TestCase):
     with self.assertRaises(Exception) as cm:
       factory.GetMessages([f.name])
 
-    self.assertIn(str(cm.exception),
-                  ['Extensions '
-                   '"google.protobuf.python.internal.Duplicate.extension_field" and'
-                   ' "google.protobuf.python.internal.Extension.extension_field"'
-                   ' both try to extend message type'
-                   ' "google.protobuf.python.internal.Container"'
-                   ' with field number 2.',
-                   'Double registration of Extensions'])
+    self.assertIsInstance(cm.exception, (AssertionError, ValueError))
 
 
 if __name__ == '__main__':
