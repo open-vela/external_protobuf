@@ -78,17 +78,9 @@ class SymbolDatabase(message_factory.MessageFactory):
     """
 
     desc = message.DESCRIPTOR
-    self._classes[desc] = message
-    self.RegisterMessageDescriptor(desc)
+    self._classes[desc.full_name] = message
+    self.pool.AddDescriptor(desc)
     return message
-
-  def RegisterMessageDescriptor(self, message_descriptor):
-    """Registers the given message descriptor in the local database.
-
-    Args:
-      message_descriptor: a descriptor.MessageDescriptor.
-    """
-    self.pool.AddDescriptor(message_descriptor)
 
   def RegisterEnumDescriptor(self, enum_descriptor):
     """Registers the given enum descriptor in the local database.
@@ -140,7 +132,7 @@ class SymbolDatabase(message_factory.MessageFactory):
       KeyError: if the symbol could not be found.
     """
 
-    return self._classes[self.pool.FindMessageTypeByName(symbol)]
+    return self._classes[symbol]
 
   def GetMessages(self, files):
     # TODO(amauryfa): Fix the differences with MessageFactory.
@@ -161,20 +153,20 @@ class SymbolDatabase(message_factory.MessageFactory):
       KeyError: if a file could not be found.
     """
 
-    def _GetAllMessages(desc):
+    def _GetAllMessageNames(desc):
       """Walk a message Descriptor and recursively yields all message names."""
-      yield desc
+      yield desc.full_name
       for msg_desc in desc.nested_types:
-        for nested_desc in _GetAllMessages(msg_desc):
-          yield nested_desc
+        for full_name in _GetAllMessageNames(msg_desc):
+          yield full_name
 
     result = {}
     for file_name in files:
       file_desc = self.pool.FindFileByName(file_name)
       for msg_desc in file_desc.message_types_by_name.values():
-        for desc in _GetAllMessages(msg_desc):
+        for full_name in _GetAllMessageNames(msg_desc):
           try:
-            result[desc.full_name] = self._classes[desc]
+            result[full_name] = self._classes[full_name]
           except KeyError:
             # This descriptor has no registered class, skip it.
             pass
