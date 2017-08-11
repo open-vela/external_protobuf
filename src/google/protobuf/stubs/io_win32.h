@@ -50,9 +50,6 @@
 #include <string>
 #include <google/protobuf/stubs/port.h>
 
-// Compilers on Windows other than MSVC (e.g. Cygwin, MinGW32) define the
-// following functions already, except for mkdir.
-#ifdef _MSC_VER
 namespace google {
 namespace protobuf {
 namespace internal {
@@ -77,9 +74,6 @@ LIBPROTOBUF_EXPORT std::wstring testonly_path_to_winpath(
 }  // namespace internal
 }  // namespace protobuf
 }  // namespace google
-#else  // _MSC_VER
-#define mkdir(name, mode) mkdir(name)
-#endif // !_MSC_VER
 
 #ifndef W_OK
 #define W_OK 02  // not defined by MSVC for whatever reason
