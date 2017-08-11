@@ -54,9 +54,8 @@
 #include <google/protobuf/io/printer.h>
 #include <google/protobuf/descriptor.pb.h>
 #include <google/protobuf/wire_format.h>
-#include <google/protobuf/stubs/substitute.h>
 #include <google/protobuf/stubs/strutil.h>
-
+#include <google/protobuf/stubs/substitute.h>
 
 namespace google {
 namespace protobuf {
@@ -172,25 +171,36 @@ Generate(io::Printer* printer) {
                      .GenerateBuilderMembers(printer);
   }
 
-  bool is_proto3 =
-      descriptor_->file()->syntax() == FileDescriptor::SYNTAX_PROTO3;
+  if (!PreserveUnknownFields(descriptor_)) {
+    printer->Print(
+      "public final Builder setUnknownFields(\n"
+      "    final com.google.protobuf.UnknownFieldSet unknownFields) {\n"
+      "  return this;\n"
+      "}\n"
+      "\n"
+      "public final Builder mergeUnknownFields(\n"
+      "    final com.google.protobuf.UnknownFieldSet unknownFields) {\n"
+      "  return this;\n"
+      "}\n"
+      "\n");
+  } else {
     // Override methods declared in GeneratedMessage to return the concrete
     // generated type so callsites won't depend on GeneratedMessage. This
     // is needed to keep binary compatibility when we change generated code
     // to subclass a different GeneratedMessage class (e.g., in v3.0.0 release
     // we changed all generated code to subclass GeneratedMessageV3).
-  printer->Print(
-    "public final Builder setUnknownFields(\n"
-    "    final com.google.protobuf.UnknownFieldSet unknownFields) {\n"
-    "  return super.setUnknownFields$suffix$(unknownFields);\n"
-    "}\n"
-    "\n"
-    "public final Builder mergeUnknownFields(\n"
-    "    final com.google.protobuf.UnknownFieldSet unknownFields) {\n"
-    "  return super.mergeUnknownFields(unknownFields);\n"
-    "}\n"
-    "\n",
-    "suffix", is_proto3 ? "Proto3" : "");
+    printer->Print(
+      "public final Builder setUnknownFields(\n"
+      "    final com.google.protobuf.UnknownFieldSet unknownFields) {\n"
+      "  return super.setUnknownFields(unknownFields);\n"
+      "}\n"
+      "\n"
+      "public final Builder mergeUnknownFields(\n"
+      "    final com.google.protobuf.UnknownFieldSet unknownFields) {\n"
+      "  return super.mergeUnknownFields(unknownFields);\n"
+      "}\n"
+      "\n");
+  }
 
   printer->Print(
     "\n"
@@ -584,8 +594,10 @@ GenerateCommonBuilderMethods(io::Printer* printer) {
         "  this.mergeExtensionFields(other);\n");
     }
 
-    printer->Print(
-      "  this.mergeUnknownFields(other.unknownFields);\n");
+    if (PreserveUnknownFields(descriptor_)) {
+      printer->Print(
+        "  this.mergeUnknownFields(other.unknownFields);\n");
+    }
 
     printer->Print(
       "  onChanged();\n");

@@ -31,6 +31,7 @@
 package com.google.protobuf;
 
 import static com.google.protobuf.UnsafeUtil.addressOffset;
+import static com.google.protobuf.UnsafeUtil.getArrayBaseOffset;
 import static com.google.protobuf.UnsafeUtil.hasUnsafeArrayOperations;
 import static com.google.protobuf.UnsafeUtil.hasUnsafeByteBufferOperations;
 import static java.lang.Character.MAX_SURROGATE;
@@ -1000,8 +1001,8 @@ final class Utf8 {
         throw new ArrayIndexOutOfBoundsException(
             String.format("Array length=%d, index=%d, limit=%d", bytes.length, index, limit));
       }
-      long offset = index;
-      final long offsetLimit = limit;
+      long offset = getArrayBaseOffset() + index;
+      final long offsetLimit = getArrayBaseOffset() + limit;
       if (state != COMPLETE) {
         // The previous decoding operation was incomplete (or malformed).
         // We look for a well-formed sequence consisting of bytes from
@@ -1186,7 +1187,7 @@ final class Utf8 {
 
     @Override
     int encodeUtf8(final CharSequence in, final byte[] out, final int offset, final int length) {
-      long outIx = offset;
+      long outIx = getArrayBaseOffset() + offset;
       final long outLimit = outIx + length;
       final int inLimit = in.length();
       if (inLimit > length || out.length - length < offset) {
@@ -1203,7 +1204,7 @@ final class Utf8 {
       }
       if (inIx == inLimit) {
         // We're done, it was ASCII encoded.
-        return (int) outIx;
+        return (int) (outIx - getArrayBaseOffset());
       }
 
       for (char c; inIx < inLimit; ++inIx) {
@@ -1242,7 +1243,7 @@ final class Utf8 {
       }
 
       // All bytes have been encoded.
-      return (int) outIx;
+      return (int) (outIx - getArrayBaseOffset());
     }
 
     @Override
@@ -1320,17 +1321,31 @@ final class Utf8 {
      */
     private static int unsafeEstimateConsecutiveAscii(
         byte[] bytes, long offset, final int maxChars) {
-      if (maxChars < UNSAFE_COUNT_ASCII_THRESHOLD) {
+      int remaining = maxChars;
+      if (remaining < UNSAFE_COUNT_ASCII_THRESHOLD) {
         // Don't bother with small strings.
         return 0;
       }
 
-      for (int i = 0; i < maxChars; i++) {
+      // Read bytes until 8-byte aligned so that we can read longs in the loop below.
+      // Byte arrays are already either 8 or 16-byte aligned, so we just need to make sure that
+      // the index (relative to the start of the array) is also 8-byte aligned. We do this by
+      // ANDing the index with 7 to determine the number of bytes that need to be read before
+      // we're 8-byte aligned.
+      final int unaligned = 8 - ((int) offset & 7);
+      for (int j = unaligned; j > 0; j--) {
         if (UnsafeUtil.getByte(bytes, offset++) < 0) {
-          return i;
+          return unaligned - j;
         }
       }
-      return maxChars;
+
+      // This simple loop stops when we encounter a byte >= 0x80 (i.e. non-ASCII).
+      // To speed things up further, we're reading longs instead of bytes so we use a mask to
+      // determine if any byte in the current long is non-ASCII.
+      remaining -= unaligned;
+      for (; remaining >= 8 && (UnsafeUtil.getLong(bytes, offset) & ASCII_MASK_LONG) == 0;
+          offset += 8, remaining -= 8) {}
+      return maxChars - remaining;
     }
 
     /**
@@ -1347,7 +1362,7 @@ final class Utf8 {
       // Read bytes until 8-byte aligned so that we can read longs in the loop below.
       // We do this by ANDing the address with 7 to determine the number of bytes that need to
       // be read before we're 8-byte aligned.
-      final int unaligned = (int) address & 7;
+      final int unaligned = 8 - ((int) address & 7);
       for (int j = unaligned; j > 0; j--) {
         if (UnsafeUtil.getByte(address++) < 0) {
           return unaligned - j;
