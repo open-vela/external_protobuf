@@ -69,7 +69,7 @@ proto.google.protobuf.Any.prototype.pack = function(serialized, name,
  *     the binary data properly.
  * @param {string} name The expected type name of this message object.
  * @return {?T} If the name matched the expected name, returns the deserialized
- *     object, otherwise returns null.
+ *     object, otherwise returns undefined.
  */
 proto.google.protobuf.Any.prototype.unpack = function(deserialize, name) {
   if (this.getTypeName() == name) {

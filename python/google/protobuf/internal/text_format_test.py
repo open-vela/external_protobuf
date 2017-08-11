@@ -452,18 +452,16 @@ class TextFormatTest(TextFormatBase):
     text_format.Parse(text_format.MessageToString(m), m2)
     self.assertEqual('oneof_uint32', m2.WhichOneof('oneof_field'))
 
-  def testMergeMultipleOneof(self, message_module):
-    m_string = '\n'.join(['oneof_uint32: 11', 'oneof_string: "foo"'])
-    m2 = message_module.TestAllTypes()
-    text_format.Merge(m_string, m2)
-    self.assertEqual('oneof_string', m2.WhichOneof('oneof_field'))
-
   def testParseMultipleOneof(self, message_module):
     m_string = '\n'.join(['oneof_uint32: 11', 'oneof_string: "foo"'])
     m2 = message_module.TestAllTypes()
-    with self.assertRaisesRegexp(text_format.ParseError,
-                                 ' is specified along with field '):
+    if message_module is unittest_pb2:
+      with self.assertRaisesRegexp(text_format.ParseError,
+                                   ' is specified along with field '):
+        text_format.Parse(m_string, m2)
+    else:
       text_format.Parse(m_string, m2)
+      self.assertEqual('oneof_string', m2.WhichOneof('oneof_field'))
 
 
 # These are tests that aren't fundamentally specific to proto2, but are at
@@ -1028,7 +1026,8 @@ class Proto3Tests(unittest.TestCase):
     packed_message.data = 'string1'
     message.repeated_any_value.add().Pack(packed_message)
     self.assertEqual(
-        text_format.MessageToString(message),
+        text_format.MessageToString(message,
+                                    descriptor_pool=descriptor_pool.Default()),
         'repeated_any_value {\n'
         '  [type.googleapis.com/protobuf_unittest.OneString] {\n'
         '    data: "string0"\n'
@@ -1038,6 +1037,18 @@ class Proto3Tests(unittest.TestCase):
         '  [type.googleapis.com/protobuf_unittest.OneString] {\n'
         '    data: "string1"\n'
         '  }\n'
+        '}\n')
+
+  def testPrintMessageExpandAnyNoDescriptorPool(self):
+    packed_message = unittest_pb2.OneString()
+    packed_message.data = 'string'
+    message = any_test_pb2.TestAny()
+    message.any_value.Pack(packed_message)
+    self.assertEqual(
+        text_format.MessageToString(message, descriptor_pool=None),
+        'any_value {\n'
+        '  type_url: "type.googleapis.com/protobuf_unittest.OneString"\n'
+        '  value: "\\n\\006string"\n'
         '}\n')
 
   def testPrintMessageExpandAnyDescriptorPoolMissingType(self):
@@ -1060,7 +1071,8 @@ class Proto3Tests(unittest.TestCase):
     message.any_value.Pack(packed_message)
     self.assertEqual(
         text_format.MessageToString(message,
-                                    pointy_brackets=True),
+                                    pointy_brackets=True,
+                                    descriptor_pool=descriptor_pool.Default()),
         'any_value <\n'
         '  [type.googleapis.com/protobuf_unittest.OneString] <\n'
         '    data: "string"\n'
@@ -1074,7 +1086,8 @@ class Proto3Tests(unittest.TestCase):
     message.any_value.Pack(packed_message)
     self.assertEqual(
         text_format.MessageToString(message,
-                                    as_one_line=True),
+                                    as_one_line=True,
+                                    descriptor_pool=descriptor_pool.Default()),
         'any_value {'
         ' [type.googleapis.com/protobuf_unittest.OneString]'
         ' { data: "string" } '
@@ -1102,12 +1115,12 @@ class Proto3Tests(unittest.TestCase):
             '    data: "string"\n'
             '  }\n'
             '}\n')
-    text_format.Merge(text, message)
+    text_format.Merge(text, message, descriptor_pool=descriptor_pool.Default())
     packed_message = unittest_pb2.OneString()
     message.any_value.Unpack(packed_message)
     self.assertEqual('string', packed_message.data)
     message.Clear()
-    text_format.Parse(text, message)
+    text_format.Parse(text, message, descriptor_pool=descriptor_pool.Default())
     packed_message = unittest_pb2.OneString()
     message.any_value.Unpack(packed_message)
     self.assertEqual('string', packed_message.data)
@@ -1124,7 +1137,7 @@ class Proto3Tests(unittest.TestCase):
             '    data: "string1"\n'
             '  }\n'
             '}\n')
-    text_format.Merge(text, message)
+    text_format.Merge(text, message, descriptor_pool=descriptor_pool.Default())
     packed_message = unittest_pb2.OneString()
     message.repeated_any_value[0].Unpack(packed_message)
     self.assertEqual('string0', packed_message.data)
@@ -1138,22 +1151,22 @@ class Proto3Tests(unittest.TestCase):
             '    data: "string"\n'
             '  >\n'
             '}\n')
-    text_format.Merge(text, message)
+    text_format.Merge(text, message, descriptor_pool=descriptor_pool.Default())
     packed_message = unittest_pb2.OneString()
     message.any_value.Unpack(packed_message)
     self.assertEqual('string', packed_message.data)
 
-  def testMergeAlternativeUrl(self):
+  def testMergeExpandedAnyNoDescriptorPool(self):
     message = any_test_pb2.TestAny()
     text = ('any_value {\n'
-            '  [type.otherapi.com/protobuf_unittest.OneString] {\n'
+            '  [type.googleapis.com/protobuf_unittest.OneString] {\n'
             '    data: "string"\n'
             '  }\n'
             '}\n')
-    text_format.Merge(text, message)
-    packed_message = unittest_pb2.OneString()
-    self.assertEqual('type.otherapi.com/protobuf_unittest.OneString',
-                     message.any_value.type_url)
+    with self.assertRaises(text_format.ParseError) as e:
+      text_format.Merge(text, message, descriptor_pool=None)
+    self.assertEqual(str(e.exception),
+                     'Descriptor pool required to parse expanded Any field')
 
   def testMergeExpandedAnyDescriptorPoolMissingType(self):
     message = any_test_pb2.TestAny()
@@ -1411,102 +1424,6 @@ class TokenizerTest(unittest.TestCase):
     self.assertEqual((True, '# some comment # not a new comment'),
                      tokenizer.ConsumeCommentOrTrailingComment())
     self.assertTrue(tokenizer.AtEnd())
-
-
-# Tests for pretty printer functionality.
-@_parameterized.Parameters((unittest_pb2), (unittest_proto3_arena_pb2))
-class PrettyPrinterTest(TextFormatBase):
-
-  def testPrettyPrintNoMatch(self, message_module):
-
-    def printer(message, indent, as_one_line):
-      del message, indent, as_one_line
-      return None
-
-    message = message_module.TestAllTypes()
-    msg = message.repeated_nested_message.add()
-    msg.bb = 42
-    self.CompareToGoldenText(
-        text_format.MessageToString(
-            message, as_one_line=True, message_formatter=printer),
-        'repeated_nested_message { bb: 42 }')
-
-  def testPrettyPrintOneLine(self, message_module):
-
-    def printer(m, indent, as_one_line):
-      del indent, as_one_line
-      if m.DESCRIPTOR == message_module.TestAllTypes.NestedMessage.DESCRIPTOR:
-        return 'My lucky number is %s' % m.bb
-
-    message = message_module.TestAllTypes()
-    msg = message.repeated_nested_message.add()
-    msg.bb = 42
-    self.CompareToGoldenText(
-        text_format.MessageToString(
-            message, as_one_line=True, message_formatter=printer),
-        'repeated_nested_message { My lucky number is 42 }')
-
-  def testPrettyPrintMultiLine(self, message_module):
-
-    def printer(m, indent, as_one_line):
-      if m.DESCRIPTOR == message_module.TestAllTypes.NestedMessage.DESCRIPTOR:
-        line_deliminator = (' ' if as_one_line else '\n') + ' ' * indent
-        return 'My lucky number is:%s%s' % (line_deliminator, m.bb)
-      return None
-
-    message = message_module.TestAllTypes()
-    msg = message.repeated_nested_message.add()
-    msg.bb = 42
-    self.CompareToGoldenText(
-        text_format.MessageToString(
-            message, as_one_line=True, message_formatter=printer),
-        'repeated_nested_message { My lucky number is: 42 }')
-    self.CompareToGoldenText(
-        text_format.MessageToString(
-            message, as_one_line=False, message_formatter=printer),
-        'repeated_nested_message {\n  My lucky number is:\n  42\n}\n')
-
-  def testPrettyPrintEntireMessage(self, message_module):
-
-    def printer(m, indent, as_one_line):
-      del indent, as_one_line
-      if m.DESCRIPTOR == message_module.TestAllTypes.DESCRIPTOR:
-        return 'The is the message!'
-      return None
-
-    message = message_module.TestAllTypes()
-    self.CompareToGoldenText(
-        text_format.MessageToString(
-            message, as_one_line=False, message_formatter=printer),
-        'The is the message!\n')
-    self.CompareToGoldenText(
-        text_format.MessageToString(
-            message, as_one_line=True, message_formatter=printer),
-        'The is the message!')
-
-  def testPrettyPrintMultipleParts(self, message_module):
-
-    def printer(m, indent, as_one_line):
-      del indent, as_one_line
-      if m.DESCRIPTOR == message_module.TestAllTypes.NestedMessage.DESCRIPTOR:
-        return 'My lucky number is %s' % m.bb
-      return None
-
-    message = message_module.TestAllTypes()
-    message.optional_int32 = 61
-    msg = message.repeated_nested_message.add()
-    msg.bb = 42
-    msg = message.repeated_nested_message.add()
-    msg.bb = 99
-    msg = message.optional_nested_message
-    msg.bb = 1
-    self.CompareToGoldenText(
-        text_format.MessageToString(
-            message, as_one_line=True, message_formatter=printer),
-        ('optional_int32: 61 '
-         'optional_nested_message { My lucky number is 1 } '
-         'repeated_nested_message { My lucky number is 42 } '
-         'repeated_nested_message { My lucky number is 99 }'))
 
 if __name__ == '__main__':
   unittest.main()

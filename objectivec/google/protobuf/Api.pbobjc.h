@@ -63,41 +63,34 @@ typedef GPB_ENUM(GPBApi_FieldNumber) {
 };
 
 /**
- * Api is a light-weight descriptor for an API Interface.
- *
- * Interfaces are also described as "protocol buffer services" in some contexts,
- * such as by the "service" keyword in a .proto file, but they are different
- * from API Services, which represent a concrete implementation of an interface
- * as opposed to simply a description of methods and bindings. They are also
- * sometimes simply referred to as "APIs" in other contexts, such as the name of
- * this message itself. See https://cloud.google.com/apis/design/glossary for
- * detailed terminology.
+ * Api is a light-weight descriptor for a protocol buffer service.
  **/
 @interface GPBApi : GPBMessage
 
 /**
- * The fully qualified name of this interface, including package name
- * followed by the interface's simple name.
+ * The fully qualified name of this api, including package name
+ * followed by the api's simple name.
  **/
 @property(nonatomic, readwrite, copy, null_resettable) NSString *name;
 
-/** The methods of this interface, in unspecified order. */
+/** The methods of this api, in unspecified order. */
 @property(nonatomic, readwrite, strong, null_resettable) NSMutableArray<GPBMethod*> *methodsArray;
 /** The number of items in @c methodsArray without causing the array to be created. */
 @property(nonatomic, readonly) NSUInteger methodsArray_Count;
 
-/** Any metadata attached to the interface. */
+/** Any metadata attached to the API. */
 @property(nonatomic, readwrite, strong, null_resettable) NSMutableArray<GPBOption*> *optionsArray;
 /** The number of items in @c optionsArray without causing the array to be created. */
 @property(nonatomic, readonly) NSUInteger optionsArray_Count;
 
 /**
- * A version string for this interface. If specified, must have the form
- * `major-version.minor-version`, as in `1.10`. If the minor version is
- * omitted, it defaults to zero. If the entire version field is empty, the
- * major version is derived from the package name, as outlined below. If the
- * field is not empty, the version in the package name will be verified to be
- * consistent with what is provided here.
+ * A version string for this api. If specified, must have the form
+ * `major-version.minor-version`, as in `1.10`. If the minor version
+ * is omitted, it defaults to zero. If the entire version field is
+ * empty, the major version is derived from the package name, as
+ * outlined below. If the field is not empty, the version in the
+ * package name will be verified to be consistent with what is
+ * provided here.
  *
  * The versioning schema uses [semantic
  * versioning](http://semver.org) where the major version number
@@ -107,10 +100,10 @@ typedef GPB_ENUM(GPBApi_FieldNumber) {
  * chosen based on the product plan.
  *
  * The major version is also reflected in the package name of the
- * interface, which must end in `v<major-version>`, as in
+ * API, which must end in `v<major-version>`, as in
  * `google.feature.v1`. For major versions 0 and 1, the suffix can
  * be omitted. Zero major versions must only be used for
- * experimental, non-GA interfaces.
+ * experimental, none-GA apis.
  **/
 @property(nonatomic, readwrite, copy, null_resettable) NSString *version;
 
@@ -122,7 +115,7 @@ typedef GPB_ENUM(GPBApi_FieldNumber) {
 /** Test to see if @c sourceContext has been set. */
 @property(nonatomic, readwrite) BOOL hasSourceContext;
 
-/** Included interfaces. See [Mixin][]. */
+/** Included APIs. See [Mixin][]. */
 @property(nonatomic, readwrite, strong, null_resettable) NSMutableArray<GPBMixin*> *mixinsArray;
 /** The number of items in @c mixinsArray without causing the array to be created. */
 @property(nonatomic, readonly) NSUInteger mixinsArray_Count;
@@ -157,7 +150,7 @@ typedef GPB_ENUM(GPBMethod_FieldNumber) {
 };
 
 /**
- * Method represents a method of an API interface.
+ * Method represents a method of an api.
  **/
 @interface GPBMethod : GPBMessage
 
@@ -206,9 +199,9 @@ typedef GPB_ENUM(GPBMixin_FieldNumber) {
 };
 
 /**
- * Declares an API Interface to be included in this interface. The including
- * interface must redeclare all the methods from the included interface, but
- * documentation and options are inherited as follows:
+ * Declares an API to be included in this API. The including API must
+ * redeclare all the methods from the included API, but documentation
+ * and options are inherited as follows:
  *
  * - If after comment and whitespace stripping, the documentation
  *   string of the redeclared method is empty, it will be inherited
@@ -220,8 +213,7 @@ typedef GPB_ENUM(GPBMixin_FieldNumber) {
  *
  * - If an http annotation is inherited, the path pattern will be
  *   modified as follows. Any version prefix will be replaced by the
- *   version of the including interface plus the [root][] path if
- *   specified.
+ *   version of the including API plus the [root][] path if specified.
  *
  * Example of a simple mixin:
  *
@@ -287,7 +279,7 @@ typedef GPB_ENUM(GPBMixin_FieldNumber) {
  **/
 @interface GPBMixin : GPBMessage
 
-/** The fully qualified name of the interface which is included. */
+/** The fully qualified name of the API which is included. */
 @property(nonatomic, readwrite, copy, null_resettable) NSString *name;
 
 /**

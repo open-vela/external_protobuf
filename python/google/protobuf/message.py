@@ -184,14 +184,8 @@ class Message(object):
     self.Clear()
     self.MergeFromString(serialized)
 
-  def SerializeToString(self, **kwargs):
+  def SerializeToString(self):
     """Serializes the protocol message to a binary string.
-
-    Arguments:
-      **kwargs: Keyword arguments to the serialize method, accepts
-        the following keyword args:
-        deterministic: If true, requests deterministic serialization of the
-          protobuf, with predictable ordering of map keys.
 
     Returns:
       A binary string representation of the message if all of the required
@@ -202,17 +196,11 @@ class Message(object):
     """
     raise NotImplementedError
 
-  def SerializePartialToString(self, **kwargs):
+  def SerializePartialToString(self):
     """Serializes the protocol message to a binary string.
 
     This method is similar to SerializeToString but doesn't check if the
     message is initialized.
-
-    Arguments:
-      **kwargs: Keyword arguments to the serialize method, accepts
-        the following keyword args:
-        deterministic: If true, requests deterministic serialization of the
-          protobuf, with predictable ordering of map keys.
 
     Returns:
       A string representation of the partial message.

@@ -108,7 +108,7 @@ public class FieldPresenceTest extends TestCase {
     assertFalse(TestAllTypes.newBuilder().build().hasOptionalNestedMessage());
     assertFalse(TestAllTypes.newBuilder().hasOptionalNestedMessage());
 
-    // oneof fields don't have hasFoo() methods for non-message types.
+    // oneof fields don't have hasFoo() methods (even for message types).
     assertHasMethodRemoved(
         UnittestProto.TestAllTypes.class,
         TestAllTypes.class,
@@ -121,8 +121,10 @@ public class FieldPresenceTest extends TestCase {
         UnittestProto.TestAllTypes.class,
         TestAllTypes.class,
         "OneofBytes");
-    assertFalse(TestAllTypes.newBuilder().build().hasOneofNestedMessage());
-    assertFalse(TestAllTypes.newBuilder().hasOneofNestedMessage());
+    assertHasMethodRemoved(
+        UnittestProto.TestAllTypes.class,
+        TestAllTypes.class,
+        "OneofNestedMessage");
 
     assertHasMethodRemoved(
         UnittestProto.TestAllTypes.Builder.class,
@@ -136,6 +138,10 @@ public class FieldPresenceTest extends TestCase {
         UnittestProto.TestAllTypes.Builder.class,
         TestAllTypes.Builder.class,
         "OneofBytes");
+    assertHasMethodRemoved(
+        UnittestProto.TestAllTypes.Builder.class,
+        TestAllTypes.Builder.class,
+        "OneofNestedMessage");
   }
 
   public void testOneofEquals() throws Exception {
