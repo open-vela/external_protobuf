@@ -108,7 +108,7 @@ namespace compiler {
 #endif
 
 namespace {
-#if defined(_MSC_VER)
+#if defined(_WIN32) && !defined(__CYGWIN__)
 // DO NOT include <io.h>, instead create functions in io_win32.{h,cc} and import
 // them like we do below.
 using google::protobuf::internal::win32::access;
