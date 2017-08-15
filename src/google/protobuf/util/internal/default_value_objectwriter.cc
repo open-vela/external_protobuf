@@ -637,7 +637,6 @@ void DefaultValueObjectWriter::RenderDataPiece(StringPiece name,
     current_->AddChild(node.release());
   } else {
     child->set_data(data);
-    child->set_is_placeholder(false);
   }
 }
 
