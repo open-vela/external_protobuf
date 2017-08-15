@@ -49,7 +49,7 @@
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/io/zero_copy_stream_impl.h>
 
-#if defined(_MSC_VER)
+#if defined(_WIN32)
 // DO NOT include <io.h>, instead create functions in io_win32.{h,cc} and import
 // them like we do below.
 using google::protobuf::internal::win32::setmode;
@@ -125,7 +125,6 @@ bool GenerateCode(const CodeGeneratorRequest& request,
 
   GeneratorResponseContext context(
       request.compiler_version(), response, parsed_files);
-
 
   string error;
   bool succeeded = generator.GenerateAll(

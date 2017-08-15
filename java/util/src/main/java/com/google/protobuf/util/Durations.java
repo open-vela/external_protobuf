@@ -30,6 +30,7 @@
 
 package com.google.protobuf.util;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.math.IntMath.checkedAdd;
 import static com.google.common.math.IntMath.checkedSubtract;
 import static com.google.common.math.LongMath.checkedAdd;
@@ -83,17 +84,6 @@ public final class Durations {
   }
 
   /**
-   * Compares two durations. The value returned is identical to what would be returned by:
-   * {@code Durations.comparator().compare(x, y)}.
-   *
-   * @return the value {@code 0} if {@code x == y}; a value less than {@code 0} if {@code x < y};
-   *     and a value greater than {@code 0} if {@code x > y}
-   */
-  public static int compare(Duration x, Duration y) {
-    return COMPARATOR.compare(x, y);
-  }
-
-  /**
    * Returns true if the given {@link Duration} is valid. The {@code seconds} value must be in the
    * range [-315,576,000,000, +315,576,000,000]. The {@code nanos} value must be in the range
    * [-999,999,999, +999,999,999].
@@ -134,13 +124,14 @@ public final class Durations {
   public static Duration checkValid(Duration duration) {
     long seconds = duration.getSeconds();
     int nanos = duration.getNanos();
-    if (!isValid(seconds, nanos)) {
-        throw new IllegalArgumentException(String.format(
-            "Duration is not valid. See proto definition for valid values. "
+    checkArgument(
+        isValid(seconds, nanos),
+        "Duration is not valid. See proto definition for valid values. "
             + "Seconds (%s) must be in range [-315,576,000,000, +315,576,000,000]. "
             + "Nanos (%s) must be in range [-999,999,999, +999,999,999]. "
-            + "Nanos must have the same sign as seconds", seconds, nanos));
-    }
+            + "Nanos must have the same sign as seconds",
+        seconds,
+        nanos);
     return duration;
   }
 
