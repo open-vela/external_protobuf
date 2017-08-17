@@ -350,12 +350,12 @@ class Duration(object):
             self.nanos, _NANOS_PER_MICROSECOND))
 
   def FromTimedelta(self, td):
-    """Converts timedelta to Duration."""
+    """Convertd timedelta to Duration."""
     self._NormalizeDuration(td.seconds + td.days * _SECONDS_PER_DAY,
                             td.microseconds * _NANOS_PER_MICROSECOND)
 
   def _NormalizeDuration(self, seconds, nanos):
-    """Set Duration by seconds and nanos."""
+    """Set Duration by seconds and nonas."""
     # Force nanos to be negative if the duration is negative.
     if seconds < 0 and nanos > 0:
       seconds += 1
