@@ -256,11 +256,8 @@ static const uint64 kuint64max = GOOGLE_ULONGLONG(0xFFFFFFFFFFFFFFFF);
 # define GOOGLE_PROTOBUF_USE_UNALIGNED 0
 #else
 // x86 and x86-64 can perform unaligned loads/stores directly.
-# if defined(_M_X64) || defined(__x86_64__) || defined(_M_IX86) || defined(__i386__)
-#  define GOOGLE_PROTOBUF_USE_UNALIGNED 1
-# else
-#  define GOOGLE_PROTOBUF_USE_UNALIGNED 0
-# endif
+# define GOOGLE_PROTOBUF_USE_UNALIGNED defined(_M_X64) || \
+     defined(__x86_64__) || defined(_M_IX86) || defined(__i386__)
 #endif
 
 #if GOOGLE_PROTOBUF_USE_UNALIGNED
