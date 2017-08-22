@@ -39,8 +39,7 @@
 #include <google/protobuf/stubs/common.h>
 #include <gmock/gmock.h>
 // Disable death tests if we use exceptions in CHECK().
-#if !PROTOBUF_USE_EXCEPTIONS && defined(GTEST_HAS_DEATH_TEST) && \
-    !GTEST_OS_WINDOWS
+#if !PROTOBUF_USE_EXCEPTIONS && defined(GTEST_HAS_DEATH_TEST)
 #define PROTOBUF_HAS_DEATH_TEST
 #endif
 
