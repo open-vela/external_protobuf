@@ -294,7 +294,8 @@ build_python_cpp() {
   cd python
   # Only test Python 2.6/3.x on Linux
   if [ $(uname -s) == "Linux" ]; then
-    envlist=py\{26,27,33,34\}-cpp
+    # py26 is currently disabled due to json_format
+    envlist=py\{27,33,34\}-cpp
   else
     envlist=py27-cpp
   fi
