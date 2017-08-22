@@ -63,21 +63,28 @@ namespace google {
 namespace protobuf {
 namespace internal {
 
-#ifdef GOOGLE_PROTOBUF_ARCH_32_BIT
-  typedef intptr_t Atomic32;
-  typedef int64 Atomic64;
+#if defined(GOOGLE_PROTOBUF_ARCH_POWER)
+#if defined(_LP64) || defined(__LP64__)
+typedef int32 Atomic32;
+typedef intptr_t Atomic64;
 #else
-  typedef int32 Atomic32;
-  // We need to be able to go between Atomic64 and AtomicWord implicitly.  This
-  // means Atomic64 and AtomicWord should be the same type on 64-bit.
-  #if defined(__ILP32__) || defined(GOOGLE_PROTOBUF_OS_NACL)
-  // NaCl's intptr_t is not actually 64-bits on 64-bit!
-  // http://code.google.com/p/nativeclient/issues/detail?id=1162
-  // sparcv9's pointer type is 32bits
-  typedef int64 Atomic64;
-  #else
-  typedef intptr_t Atomic64;
-  #endif
+typedef intptr_t Atomic32;
+typedef int64 Atomic64;
+#endif
+#else
+typedef int32 Atomic32;
+#ifdef GOOGLE_PROTOBUF_ARCH_64_BIT
+// We need to be able to go between Atomic64 and AtomicWord implicitly.  This
+// means Atomic64 and AtomicWord should be the same type on 64-bit.
+#if defined(__ILP32__) || defined(GOOGLE_PROTOBUF_OS_NACL)
+// NaCl's intptr_t is not actually 64-bits on 64-bit!
+// http://code.google.com/p/nativeclient/issues/detail?id=1162
+// sparcv9's pointer type is 32bits
+typedef int64 Atomic64;
+#else
+typedef intptr_t Atomic64;
+#endif
+#endif
 #endif
 
 // Use AtomicWord for a machine-sized pointer.  It will use the Atomic32 or
