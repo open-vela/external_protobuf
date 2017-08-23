@@ -17,10 +17,8 @@ export CXX=g++
 # Install Brew and core softwares
 
 ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-source $HOME/.rvm/scripts/rvm
 brew tap homebrew/homebrew-php
-brew uninstall node icu4c
-brew install gflags gpg gpg2 node pcre php56 ruby
+brew install autoconf automake ccache cmake gflags gpg gpg2 libtool maven node pcre php56 ruby wget
 
 ##
 # Install Tox
