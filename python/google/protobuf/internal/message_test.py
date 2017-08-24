@@ -53,9 +53,13 @@ import six
 import sys
 
 try:
-  import unittest2 as unittest  #PY26
+  import unittest2 as unittest  # PY26
 except ImportError:
   import unittest
+try:
+  cmp                                   # Python 2
+except NameError:
+  cmp = lambda x, y: (x > y) - (x < y)  # Python 3
 
 from google.protobuf import map_unittest_pb2
 from google.protobuf import unittest_pb2
@@ -1927,8 +1931,9 @@ class PackedFieldTest(BaseTestCase):
     self.assertEqual(golden_data, message.SerializeToString())
 
 
-@unittest.skipIf(api_implementation.Type() != 'cpp',
-                 'explicit tests of the C++ implementation')
+@unittest.skipIf(api_implementation.Type() != 'cpp' or
+                 sys.version_info < (2, 7),
+                 'explicit tests of the C++ implementation for PY27 and above')
 class OversizeProtosTest(BaseTestCase):
 
   @classmethod
