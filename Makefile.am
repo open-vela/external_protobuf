@@ -332,7 +332,6 @@ java_EXTRA_DIST=                                                                
   java/core/src/test/java/com/google/protobuf/WellKnownTypesTest.java              \
   java/core/src/test/java/com/google/protobuf/WireFormatTest.java                  \
   java/core/src/test/proto/com/google/protobuf/any_test.proto                      \
-  java/core/src/test/proto/com/google/protobuf/deprecated_file.proto               \
   java/core/src/test/proto/com/google/protobuf/field_presence_test.proto           \
   java/core/src/test/proto/com/google/protobuf/lazy_fields_lite.proto              \
   java/core/src/test/proto/com/google/protobuf/lite_equals_and_hash.proto          \
@@ -622,7 +621,6 @@ php_EXTRA_DIST=                                                       \
   php/src/Google/Protobuf/Internal/EnumOptions.php                    \
   php/src/Google/Protobuf/Internal/EnumValueDescriptorProto.php       \
   php/src/Google/Protobuf/Internal/EnumValueOptions.php               \
-  php/src/Google/Protobuf/Internal/ExtensionRangeOptions.php          \
   php/src/Google/Protobuf/Internal/FieldDescriptorProto_Label.php     \
   php/src/Google/Protobuf/Internal/FieldDescriptorProto.php           \
   php/src/Google/Protobuf/Internal/FieldDescriptor.php                \
@@ -988,10 +986,8 @@ EXTRA_DIST = $(@DIST_LANG@_EXTRA_DIST)   \
   cmake/libprotoc.cmake                  \
   cmake/protobuf-config-version.cmake.in \
   cmake/protobuf-config.cmake.in         \
-  cmake/protobuf-lite.pc.cmake           \
   cmake/protobuf-module.cmake.in         \
   cmake/protobuf-options.cmake           \
-  cmake/protobuf.pc.cmake                \
   cmake/protoc.cmake                     \
   cmake/tests.cmake                      \
   editors/README.txt                     \
