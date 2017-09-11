@@ -30,24 +30,6 @@
 
 #include "protobuf.h"
 
-const char *const kReservedNames[] = {
-    "abstract",   "and",        "array",        "as",           "break",
-    "callable",   "case",       "catch",        "class",        "clone",
-    "const",      "continue",   "declare",      "default",      "die",
-    "do",         "echo",       "else",         "elseif",       "empty",
-    "enddeclare", "endfor",     "endforeach",   "endif",        "endswitch",
-    "endwhile",   "eval",       "exit",         "extends",      "final",
-    "for",        "foreach",    "function",     "global",       "goto",
-    "if",         "implements", "include",      "include_once", "instanceof",
-    "insteadof",  "interface",  "isset",        "list",         "namespace",
-    "new",        "or",         "print",        "private",      "protected",
-    "public",     "require",    "require_once", "return",       "static",
-    "switch",     "throw",      "trait",        "try",          "unset",
-    "use",        "var",        "while",        "xor",          "int",
-    "float",      "bool",       "string",       "true",         "false",
-    "null",       "void",       "iterable"};
-const int kReservedNamesSize = 73;
-
 // Forward declare.
 static void descriptor_init_c_instance(Descriptor* intern TSRMLS_DC);
 static void descriptor_free_c(Descriptor* object TSRMLS_DC);
@@ -129,6 +111,33 @@ static void append_map_entry_name(char *result, const char *field_name,
     code;                                \
     check_upb_status(&status, msg);      \
   } while (0)
+
+// Define PHP class
+#define DEFINE_PROTOBUF_INIT_CLASS(CLASSNAME, CAMELNAME, LOWERNAME) \
+  PHP_PROTO_INIT_CLASS_START(CLASSNAME, CAMELNAME, LOWERNAME)       \
+  PHP_PROTO_INIT_CLASS_END
+
+#define DEFINE_PROTOBUF_CREATE(NAME, LOWERNAME)  \
+  PHP_PROTO_OBJECT_CREATE_START(NAME, LOWERNAME) \
+  LOWERNAME##_init_c_instance(intern TSRMLS_CC); \
+  PHP_PROTO_OBJECT_CREATE_END(NAME, LOWERNAME)
+
+#define DEFINE_PROTOBUF_FREE(CAMELNAME, LOWERNAME)  \
+  PHP_PROTO_OBJECT_FREE_START(CAMELNAME, LOWERNAME) \
+  LOWERNAME##_free_c(intern TSRMLS_CC);             \
+  PHP_PROTO_OBJECT_FREE_END
+
+#define DEFINE_PROTOBUF_DTOR(CAMELNAME, LOWERNAME)  \
+  PHP_PROTO_OBJECT_DTOR_START(CAMELNAME, LOWERNAME) \
+  PHP_PROTO_OBJECT_DTOR_END
+
+#define DEFINE_CLASS(NAME, LOWERNAME, string_name) \
+  zend_class_entry *LOWERNAME##_type;              \
+  zend_object_handlers *LOWERNAME##_handlers;      \
+  DEFINE_PROTOBUF_FREE(NAME, LOWERNAME)            \
+  DEFINE_PROTOBUF_DTOR(NAME, LOWERNAME)            \
+  DEFINE_PROTOBUF_CREATE(NAME, LOWERNAME)          \
+  DEFINE_PROTOBUF_INIT_CLASS(string_name, NAME, LOWERNAME)
 
 // -----------------------------------------------------------------------------
 // GPBType
@@ -645,7 +654,7 @@ zend_object *internal_generated_pool_php;
 #endif
 InternalDescriptorPool *generated_pool;  // The actual generated pool
 
-void init_generated_pool_once(TSRMLS_D) {
+static void init_generated_pool_once(TSRMLS_D) {
   if (generated_pool == NULL) {
 #if PHP_MAJOR_VERSION < 7
     MAKE_STD_ZVAL(generated_pool_php);
@@ -770,12 +779,7 @@ static const char *classname_prefix(const char *classname,
   }
   lower[i] = 0;
 
-  for (i = 0; i < kReservedNamesSize; i++) {
-    if (strcmp(kReservedNames[i], lower) == 0) {
-      is_reserved = true;
-      break;
-    }
-  }
+  is_reserved = is_reserved_name(lower);
   FREE(lower);
 
   if (is_reserved) {
@@ -840,11 +844,18 @@ static void convert_to_class_name_inplace(const char *package,
   memcpy(classname + i, prefix, prefix_len);
 }
 
-void internal_add_generated_file(const char *data, PHP_PROTO_SIZE data_len,
-                                 InternalDescriptorPool *pool TSRMLS_DC) {
+PHP_METHOD(InternalDescriptorPool, internalAddGeneratedFile) {
+  char *data = NULL;
+  PHP_PROTO_SIZE data_len;
   upb_filedef **files;
   size_t i;
 
+  if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &data, &data_len) ==
+      FAILURE) {
+    return;
+  }
+
+  InternalDescriptorPool *pool = UNBOX(InternalDescriptorPool, getThis());
   CHECK_UPB(files = upb_loaddescriptor(data, data_len, &pool, &status),
             "Parse binary descriptors to internal descriptors failed");
 
@@ -903,8 +914,6 @@ void internal_add_generated_file(const char *data, PHP_PROTO_SIZE data_len,
       desc->klass = PHP_PROTO_CE_UNREF(pce);                                   \
     }                                                                          \
     add_ce_obj(desc->klass, desc_php);                                         \
-    add_proto_obj(upb_##def_type_lower##_fullname(desc->def_type_lower),       \
-                  desc_php);                                                   \
     efree(classname);                                                          \
     break;                                                                     \
   }
@@ -929,21 +938,6 @@ void internal_add_generated_file(const char *data, PHP_PROTO_SIZE data_len,
 
   upb_filedef_unref(files[0], &pool);
   upb_gfree(files);
-}
-
-PHP_METHOD(InternalDescriptorPool, internalAddGeneratedFile) {
-  char *data = NULL;
-  PHP_PROTO_SIZE data_len;
-  upb_filedef **files;
-  size_t i;
-
-  if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &data, &data_len) ==
-      FAILURE) {
-    return;
-  }
-
-  InternalDescriptorPool *pool = UNBOX(InternalDescriptorPool, getThis());
-  internal_add_generated_file(data, data_len, pool TSRMLS_CC);
 }
 
 PHP_METHOD(DescriptorPool, getDescriptorByClassName) {
