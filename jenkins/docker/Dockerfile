@@ -217,13 +217,6 @@ RUN apt-get install -y \
   # -- For javascript -- \
   npm
 
-##################
-# Python 3.5 3.6 dependencies.
-RUN apt-get clean && apt-get update && apt-get install -y --force-yes \
-  python3.5-dev \
-  python3.6-dev \
-  && apt-get clean
-
 # On Debian/Ubuntu, nodejs binary is named 'nodejs' because the name 'node'
 # is taken by another legacy binary. We don't have that legacy binary and
 # npm expects the binary to be named 'node', so we just create a symbol
