@@ -600,15 +600,12 @@ php_EXTRA_DIST=                                                       \
   php/ext/google/protobuf/upb.c                                       \
   php/ext/google/protobuf/protobuf.c                                  \
   php/src/phpdoc.dist.xml                                             \
-  php/src/Google/Protobuf/Any.php                                     \
   php/src/Google/Protobuf/Descriptor.php                              \
   php/src/Google/Protobuf/DescriptorPool.php                          \
-  php/src/Google/Protobuf/Duration.php                                \
   php/src/Google/Protobuf/EnumDescriptor.php                          \
   php/src/Google/Protobuf/EnumValueDescriptor.php                     \
   php/src/Google/Protobuf/FieldDescriptor.php                         \
   php/src/Google/Protobuf/OneofDescriptor.php                         \
-  php/src/Google/Protobuf/Timestamp.php                               \
   php/src/Google/Protobuf/Internal/CodedInputStream.php               \
   php/src/Google/Protobuf/Internal/CodedOutputStream.php              \
   php/src/Google/Protobuf/Internal/DescriptorPool.php                 \
@@ -622,6 +619,7 @@ php_EXTRA_DIST=                                                       \
   php/src/Google/Protobuf/Internal/EnumOptions.php                    \
   php/src/Google/Protobuf/Internal/EnumValueDescriptorProto.php       \
   php/src/Google/Protobuf/Internal/EnumValueOptions.php               \
+  php/src/Google/Protobuf/Internal/ExtensionRangeOptions.php          \
   php/src/Google/Protobuf/Internal/FieldDescriptorProto_Label.php     \
   php/src/Google/Protobuf/Internal/FieldDescriptorProto.php           \
   php/src/Google/Protobuf/Internal/FieldDescriptor.php                \
@@ -667,9 +665,6 @@ php_EXTRA_DIST=                                                       \
   php/src/Google/Protobuf/Internal/SourceCodeInfo.php                 \
   php/src/Google/Protobuf/Internal/UninterpretedOption_NamePart.php   \
   php/src/Google/Protobuf/Internal/UninterpretedOption.php            \
-  php/src/GPBMetadata/Google/Protobuf/Any.php                         \
-  php/src/GPBMetadata/Google/Protobuf/Duration.php                    \
-  php/src/GPBMetadata/Google/Protobuf/Timestamp.php                   \
   php/src/GPBMetadata/Google/Protobuf/Internal/Descriptor.php         \
   php/tests/array_test.php                                            \
   php/tests/autoload.php                                              \
@@ -691,6 +686,12 @@ php_EXTRA_DIST=                                                       \
   php/tests/proto/test_no_namespace.proto                             \
   php/tests/proto/test_php_namespace.proto                            \
   php/tests/proto/test_prefix.proto                                   \
+  php/tests/proto/test_reserved_enum_lower.proto                      \
+  php/tests/proto/test_reserved_enum_upper.proto                      \
+  php/tests/proto/test_reserved_enum_value_lower.proto                \
+  php/tests/proto/test_reserved_enum_value_upper.proto                \
+  php/tests/proto/test_reserved_message_lower.proto                   \
+  php/tests/proto/test_reserved_message_upper.proto                   \
   php/tests/proto/test_service.proto                                  \
   php/tests/proto/test_service_namespace.proto                        \
   php/tests/test.sh                                                   \
@@ -988,27 +989,28 @@ EXTRA_DIST = $(@DIST_LANG@_EXTRA_DIST)   \
   cmake/libprotoc.cmake                  \
   cmake/protobuf-config-version.cmake.in \
   cmake/protobuf-config.cmake.in         \
+  cmake/protobuf-lite.pc.cmake           \
   cmake/protobuf-module.cmake.in         \
   cmake/protobuf-options.cmake           \
+  cmake/protobuf.pc.cmake                \
   cmake/protoc.cmake                     \
   cmake/tests.cmake                      \
   editors/README.txt                     \
   editors/proto.vim                      \
   editors/protobuf-mode.el               \
-  examples/AddPerson.java                \
-  examples/BUILD                         \
   examples/CMakeLists.txt                \
-  examples/ListPeople.java               \
+  examples/README.txt                    \
   examples/Makefile                      \
-  examples/README.md                     \
-  examples/WORKSPACE                     \
+  examples/addressbook.proto             \
   examples/add_person.cc                 \
   examples/add_person.go                 \
-  examples/add_person.py                 \
   examples/add_person_test.go            \
-  examples/addressbook.proto             \
   examples/list_people.cc                \
   examples/list_people.go                \
+  examples/AddPerson.java                \
+  examples/CMakeLists.txt                \
+  examples/ListPeople.java               \
+  examples/add_person.py                 \
   examples/list_people.py                \
   examples/list_people_test.go           \
   protobuf.bzl                           \
