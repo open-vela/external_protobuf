@@ -585,7 +585,6 @@ cc_test(
         # Files for csharp_bootstrap_unittest.cc.
         "conformance/**/*",
         "csharp/src/**/*",
-        "examples/**/*",
     ]),
     includes = [
         "src/",
