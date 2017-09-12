@@ -38,9 +38,6 @@ use Google\Protobuf\Internal\MapField;
 
 class GPBUtil
 {
-    const NANOS_PER_MILLISECOND = 1000000;
-    const NANOS_PER_MICROSECOND = 1000;
-
     public static function divideInt64ToInt32($value, &$high, &$low, $trim = false)
     {
         $isNeg = (bccomp($value, 0) < 0);
@@ -255,14 +252,29 @@ class GPBUtil
             return $prefix;
         }
 
-        $reserved_words = array("Empty", "ECHO", "ARRAY");
-        foreach ($reserved_words as $reserved_word) {
-            if ($classname === $reserved_word) {
-                if ($file_proto->getPackage() === "google.protobuf") {
-                    return "GPB";
-                } else {
-                    return "PB";
-                }
+        $reserved_words = array(
+            "abstract"=>0, "and"=>0, "array"=>0, "as"=>0, "break"=>0,
+            "callable"=>0, "case"=>0, "catch"=>0, "class"=>0, "clone"=>0,
+            "const"=>0, "continue"=>0, "declare"=>0, "default"=>0, "die"=>0,
+            "do"=>0, "echo"=>0, "else"=>0, "elseif"=>0, "empty"=>0,
+            "enddeclare"=>0, "endfor"=>0, "endforeach"=>0, "endif"=>0,
+            "endswitch"=>0, "endwhile"=>0, "eval"=>0, "exit"=>0, "extends"=>0,
+            "final"=>0, "for"=>0, "foreach"=>0, "function"=>0, "global"=>0,
+            "goto"=>0, "if"=>0, "implements"=>0, "include"=>0,
+            "include_once"=>0, "instanceof"=>0, "insteadof"=>0, "interface"=>0,
+            "isset"=>0, "list"=>0, "namespace"=>0, "new"=>0, "or"=>0,
+            "print"=>0, "private"=>0, "protected"=>0, "public"=>0, "require"=>0,
+            "require_once"=>0, "return"=>0, "static"=>0, "switch"=>0,
+            "throw"=>0, "trait"=>0, "try"=>0, "unset"=>0, "use"=>0, "var"=>0,
+            "while"=>0, "xor"=>0, "int"=>0, "float"=>0, "bool"=>0, "string"=>0,
+            "true"=>0, "false"=>0, "null"=>0, "void"=>0, "iterable"=>0
+        );
+
+        if (array_key_exists(strtolower($classname), $reserved_words)) {
+            if ($file_proto->getPackage() === "google.protobuf") {
+                return "GPB";
+            } else {
+                return "PB";
             }
         }
 
@@ -342,82 +354,5 @@ class GPBUtil
           $result = bcsub(0, $result);
         }
         return $result;
-    }
-    
-    public static function parseTimestamp($timestamp)
-    {
-        // prevent parsing timestamps containing with the non-existant year "0000"
-        // DateTime::createFromFormat parses without failing but as a nonsensical date
-        if (substr($timestamp, 0, 4) === "0000") {
-            throw new \Exception("Year cannot be zero.");
-        }
-        // prevent parsing timestamps ending with a lowercase z
-        if (substr($timestamp, -1, 1) === "z") {
-            throw new \Exception("Timezone cannot be a lowercase z.");
-        }
-        
-        $nanoseconds = 0;
-        $periodIndex = strpos($timestamp, ".");
-        if ($periodIndex !== false) {
-            $nanosecondsLength = 0;
-            // find the next non-numeric character in the timestamp to calculate
-            // the length of the nanoseconds text
-            for ($i = $periodIndex + 1, $length = strlen($timestamp); $i < $length; $i++) {
-                if (!is_numeric($timestamp[$i])) {
-                    $nanosecondsLength = $i - ($periodIndex + 1);
-                    break;
-                }
-            }
-            if ($nanosecondsLength % 3 !== 0) {
-                throw new \Exception("Nanoseconds must be disible by 3.");
-            }
-            if ($nanosecondsLength > 9) {
-                throw new \Exception("Nanoseconds must be in the range of 0 to 999,999,999 nanoseconds.");
-            }
-            if ($nanosecondsLength > 0) {
-                $nanoseconds = substr($timestamp, $periodIndex + 1, $nanosecondsLength);
-                $nanoseconds = intval($nanoseconds);
-
-                // remove the nanoseconds and preceding period from the timestamp
-                $date = substr($timestamp, 0, $periodIndex - 1);
-                $timezone = substr($timestamp, $periodIndex + $nanosecondsLength);
-                $timestamp = $date.$timezone;
-            }
-        }
-
-        $date = \DateTime::createFromFormat(\DateTime::RFC3339, $timestamp, new \DateTimeZone("UTC"));
-        if ($date === false) {
-            throw new \Exception("Invalid RFC 3339 timestamp.");
-        }
-
-        $value = new \Google\Protobuf\Timestamp();
-        $seconds = $date->format("U");
-        $value->setSeconds($seconds);
-        $value->setNanos($nanoseconds);
-        return $value;
-    }
-    
-    public static function formatTimestamp($value)
-    {
-        $nanoseconds = static::getNanosecondsForTimestamp($value->getNanos());
-        if (!empty($nanoseconds)) {
-            $nanoseconds = ".".$nanoseconds;
-        }
-        $date = new \DateTime('@'.$value->getSeconds(), new \DateTimeZone("UTC"));
-        return $date->format("Y-m-d\TH:i:s".$nanoseconds."\Z");
-    }
-
-    public static function getNanosecondsForTimestamp($nanoseconds)
-    {
-        if ($nanoseconds == 0) {
-            return '';
-        }
-        if ($nanoseconds % static::NANOS_PER_MILLISECOND == 0) {
-            return sprintf('%03d', $nanoseconds / static::NANOS_PER_MILLISECOND);
-        }
-        if ($nanoseconds % static::NANOS_PER_MICROSECOND == 0) {
-            return sprintf('%06d', $nanoseconds / static::NANOS_PER_MICROSECOND);
-        }
-        return sprintf('%09d', $nanoseconds);
     }
 }
