@@ -30,6 +30,9 @@
 
 #include "protobuf.h"
 
+const char* const kReservedNames[] = {"Empty", "ECHO", "ARRAY"};
+const int kReservedNamesSize = 3;
+
 // Forward declare.
 static void descriptor_init_c_instance(Descriptor* intern TSRMLS_DC);
 static void descriptor_free_c(Descriptor* object TSRMLS_DC);
@@ -771,16 +774,12 @@ static const char *classname_prefix(const char *classname,
     return prefix_given;
   }
 
-  char* lower = ALLOC_N(char, strlen(classname) + 1);
-  i = 0;
-  while(classname[i]) {
-    lower[i] = (char)tolower(classname[i]);
-    i++;
+  for (i = 0; i < kReservedNamesSize; i++) {
+    if (strcmp(kReservedNames[i], classname) == 0) {
+      is_reserved = true;
+      break;
+    }
   }
-  lower[i] = 0;
-
-  is_reserved = is_reserved_name(lower);
-  FREE(lower);
 
   if (is_reserved) {
     if (package_name != NULL && strcmp("google.protobuf", package_name) == 0) {
