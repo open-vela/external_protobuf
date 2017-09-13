@@ -356,10 +356,7 @@ libprotoc_la_SOURCES =                                         \
   google/protobuf/compiler/cpp/cpp_message.h                   \
   google/protobuf/compiler/cpp/cpp_message_field.cc            \
   google/protobuf/compiler/cpp/cpp_message_field.h             \
-  google/protobuf/compiler/cpp/cpp_message_layout_helper.h     \
   google/protobuf/compiler/cpp/cpp_options.h                   \
-  google/protobuf/compiler/cpp/cpp_padding_optimizer.cc        \
-  google/protobuf/compiler/cpp/cpp_padding_optimizer.h         \
   google/protobuf/compiler/cpp/cpp_primitive_field.cc          \
   google/protobuf/compiler/cpp/cpp_primitive_field.h           \
   google/protobuf/compiler/cpp/cpp_service.cc                  \
@@ -564,8 +561,8 @@ protoc_inputs =                                                   \
   google/protobuf/unittest_preserve_unknown_enum.proto            \
   google/protobuf/unittest.proto                                  \
   google/protobuf/unittest_proto3_arena.proto                     \
-  google/protobuf/unittest_proto3_arena_lite.proto                     \
-  google/protobuf/unittest_proto3_lite.proto                     \
+  google/protobuf/unittest_proto3_arena_lite.proto                \
+  google/protobuf/unittest_proto3_lite.proto                      \
   google/protobuf/unittest_well_known_types.proto                 \
   google/protobuf/util/internal/testdata/anys.proto               \
   google/protobuf/util/internal/testdata/books.proto              \
@@ -586,6 +583,12 @@ EXTRA_DIST =                                                   \
   $(protoc_inputs)                                             \
   $(js_well_known_types_sources)                               \
   solaris/libstdc++.la                                         \
+  google/protobuf/unittest_proto3.proto                        \
+  google/protobuf/unittest_import_public_proto3.proto          \
+  google/protobuf/unittest_import_proto3.proto                 \
+  google/protobuf/test_messages_proto3.proto                   \
+  google/protobuf/test_messages_proto2.proto                   \
+  google/protobuf/map_unittest_proto3.proto                    \
   google/protobuf/io/gzip_stream.h                             \
   google/protobuf/io/gzip_stream_unittest.sh                   \
   google/protobuf/testdata/golden_message                      \
