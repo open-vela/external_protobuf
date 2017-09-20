@@ -217,32 +217,20 @@ VALUE Message_respond_to_missing(int argc, VALUE* argv, VALUE _self) {
   return Qtrue;
 }
 
-VALUE create_submsg_from_hash(const upb_fielddef *f, VALUE hash) {
-  const upb_def *d = upb_fielddef_subdef(f);
-  assert(d != NULL);
-
-  VALUE descriptor = get_def_obj(d);
-  VALUE msgclass = rb_funcall(descriptor, rb_intern("msgclass"), 0, NULL);
-
-  VALUE args[1] = { hash };
-  return rb_class_new_instance(1, args, msgclass);
-}
-
 int Message_initialize_kwarg(VALUE key, VALUE val, VALUE _self) {
   MessageHeader* self;
-  char *name;
+  VALUE method_str;
+  char* name;
   const upb_fielddef* f;
   TypedData_Get_Struct(_self, MessageHeader, &Message_type, self);
 
-  if (TYPE(key) == T_STRING) {
-    name = RSTRING_PTR(key);
-  } else if (TYPE(key) == T_SYMBOL) {
-    name = RSTRING_PTR(rb_id2str(SYM2ID(key)));
-  } else {
+  if (!SYMBOL_P(key)) {
     rb_raise(rb_eArgError,
-             "Expected string or symbols as hash keys when initializing proto from hash.");
+             "Expected symbols as hash keys in initialization map.");
   }
 
+  method_str = rb_id2str(SYM2ID(key));
+  name = RSTRING_PTR(method_str);
   f = upb_msgdef_ntofz(self->descriptor->msgdef, name);
   if (f == NULL) {
     rb_raise(rb_eArgError,
@@ -260,7 +248,6 @@ int Message_initialize_kwarg(VALUE key, VALUE val, VALUE _self) {
     Map_merge_into_self(map, val);
   } else if (upb_fielddef_label(f) == UPB_LABEL_REPEATED) {
     VALUE ary;
-    VALUE entry;
 
     if (TYPE(val) != T_ARRAY) {
       rb_raise(rb_eArgError,
@@ -268,18 +255,9 @@ int Message_initialize_kwarg(VALUE key, VALUE val, VALUE _self) {
     }
     ary = layout_get(self->descriptor->layout, Message_data(self), f);
     for (int i = 0; i < RARRAY_LEN(val); i++) {
-      entry = rb_ary_entry(val, i);
-      if (TYPE(entry) == T_HASH && upb_fielddef_issubmsg(f)) {
-        entry = create_submsg_from_hash(f, entry);
-      }
-
-      RepeatedField_push(ary, entry);
+      RepeatedField_push(ary, rb_ary_entry(val, i));
     }
   } else {
-    if (TYPE(val) == T_HASH && upb_fielddef_issubmsg(f)) {
-      val = create_submsg_from_hash(f, val);
-    }
-
     layout_set(self->descriptor->layout, Message_data(self), f, val);
   }
   return 0;
