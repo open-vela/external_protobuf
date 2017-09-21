@@ -247,10 +247,6 @@ TEST_P(DescriptorDatabaseTest, FindFileContainingSymbol) {
     FileDescriptorProto file;
     EXPECT_TRUE(database_->FindFileContainingSymbol("Foo.qux", &file));
     EXPECT_EQ("foo.proto", file.name());
-    // Non-existent field under a valid top level symbol can also be
-    // found.
-    EXPECT_TRUE(database_->FindFileContainingSymbol("Foo.none_field.none",
-                                                    &file));
   }
 
   {

@@ -2250,15 +2250,17 @@ class AssignDescriptorsHelper {
 
     file_level_metadata_->descriptor = descriptor;
 
-    file_level_metadata_->reflection = new GeneratedMessageReflection(
-        descriptor,
-        MigrationToReflectionSchema(default_instance_data_, offsets_,
-                                    *schemas_),
-        ::google::protobuf::DescriptorPool::generated_pool(), factory_);
-    for (int i = 0; i < descriptor->enum_type_count(); i++) {
-      AssignEnumDescriptor(descriptor->enum_type(i));
+    if (!descriptor->options().map_entry()) {
+      // Only set reflection for non map types.
+      file_level_metadata_->reflection = new GeneratedMessageReflection(
+          descriptor, MigrationToReflectionSchema(default_instance_data_,
+                                                  offsets_, *schemas_),
+          ::google::protobuf::DescriptorPool::generated_pool(), factory_);
+      for (int i = 0; i < descriptor->enum_type_count(); i++) {
+        AssignEnumDescriptor(descriptor->enum_type(i));
+      }
+      schemas_++;
     }
-    schemas_++;
     default_instance_data_++;
     file_level_metadata_++;
   }
