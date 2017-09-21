@@ -33,11 +33,12 @@
 
 #include <string>
 
-#include <google/protobuf/arena.h>
+#include <google/protobuf/stubs/logging.h>
 #include <google/protobuf/stubs/common.h>
 #include <google/protobuf/stubs/fastmem.h>
-#include <google/protobuf/stubs/logging.h>
-#include <google/protobuf/stubs/port.h>
+#include <google/protobuf/arena.h>
+
+
 
 // This is the implementation of arena string fields written for the open-source
 // release. The ArenaStringPtr struct below is an internal implementation class
@@ -59,12 +60,6 @@ struct LIBPROTOBUF_EXPORT ArenaStringPtr {
     } else {
       *ptr_ = value;
     }
-  }
-
-  inline void SetLite(const ::std::string* default_value,
-                      const ::std::string& value,
-                      ::google::protobuf::Arena* arena) {
-    Set(default_value, value, arena);
   }
 
   // Basic accessors.
@@ -89,9 +84,8 @@ struct LIBPROTOBUF_EXPORT ArenaStringPtr {
     }
     ::std::string* released = NULL;
     if (arena != NULL) {
-      // ptr_ is owned by the arena.
-      released = new ::std::string;
-      released->swap(*ptr_);
+      // ptr_ is owned by the arena -- we need to return a copy.
+      released = new ::std::string(*ptr_);
     } else {
       released = ptr_;
     }
@@ -149,7 +143,7 @@ struct LIBPROTOBUF_EXPORT ArenaStringPtr {
   // Swaps internal pointers. Arena-safety semantics: this is guarded by the
   // logic in Swap()/UnsafeArenaSwap() at the message level, so this method is
   // 'unsafe' if called directly.
-  GOOGLE_PROTOBUF_ATTRIBUTE_ALWAYS_INLINE void Swap(ArenaStringPtr* other) {
+  GOOGLE_ATTRIBUTE_ALWAYS_INLINE void Swap(ArenaStringPtr* other) {
     std::swap(ptr_, other->ptr_);
   }
 
@@ -297,17 +291,15 @@ struct LIBPROTOBUF_EXPORT ArenaStringPtr {
  private:
   ::std::string* ptr_;
 
-  GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE
-  void CreateInstance(::google::protobuf::Arena* arena,
-                      const ::std::string* initial_value) {
+  GOOGLE_ATTRIBUTE_NOINLINE void CreateInstance(::google::protobuf::Arena* arena,
+                                         const ::std::string* initial_value) {
     GOOGLE_DCHECK(initial_value != NULL);
     ptr_ = new ::std::string(*initial_value);
     if (arena != NULL) {
       arena->Own(ptr_);
     }
   }
-  GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE
-  void CreateInstanceNoArena(const ::std::string* initial_value) {
+  GOOGLE_ATTRIBUTE_NOINLINE void CreateInstanceNoArena(const ::std::string* initial_value) {
     GOOGLE_DCHECK(initial_value != NULL);
     ptr_ = new ::std::string(*initial_value);
   }
