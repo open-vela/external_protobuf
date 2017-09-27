@@ -41,12 +41,10 @@
 #define GOOGLE_PROTOBUF_WIRE_FORMAT_LITE_H__
 
 #include <string>
-
 #include <google/protobuf/stubs/common.h>
-#include <google/protobuf/io/coded_stream.h>
-#include <google/protobuf/message_lite.h>
-#include <google/protobuf/stubs/port.h>
 #include <google/protobuf/repeated_field.h>
+#include <google/protobuf/message_lite.h>
+#include <google/protobuf/io/coded_stream.h>  // for CodedOutputStream::Varint32Size
 
 // Do UTF-8 validation on string type in Debug build only
 #ifndef NDEBUG
@@ -151,7 +149,7 @@ class LIBPROTOBUF_EXPORT WireFormatLite {
   // Helper method to get the CppType for a particular Type.
   static CppType FieldTypeToCppType(FieldType type);
 
-  // Given a FieldDescriptor::Type return its WireType
+  // Given a FieldSescriptor::Type return its WireType
   static inline WireFormatLite::WireType WireTypeForFieldType(
       WireFormatLite::FieldType type) {
     return kWireTypeForFieldType[type];
@@ -258,7 +256,7 @@ class LIBPROTOBUF_EXPORT WireFormatLite {
   // that file to use these.
 
 #ifdef NDEBUG
-#define INL GOOGLE_PROTOBUF_ATTRIBUTE_ALWAYS_INLINE
+#define INL GOOGLE_ATTRIBUTE_ALWAYS_INLINE
 #else
 // Avoid excessive inlining in non-optimized builds. Without other optimizations
 // the inlining is not going to provide benefits anyway and the huge resulting
@@ -714,8 +712,7 @@ class LIBPROTOBUF_EXPORT WireFormatLite {
   // A helper method for the repeated primitive reader. This method has
   // optimizations for primitive types that have fixed size on the wire, and
   // can be read using potentially faster paths.
-  template <typename CType, enum FieldType DeclaredType>
-  GOOGLE_PROTOBUF_ATTRIBUTE_ALWAYS_INLINE
+  template <typename CType, enum FieldType DeclaredType> GOOGLE_ATTRIBUTE_ALWAYS_INLINE
   static bool ReadRepeatedFixedSizePrimitive(
       int tag_size,
       uint32 tag,
@@ -724,8 +721,7 @@ class LIBPROTOBUF_EXPORT WireFormatLite {
 
   // Like ReadRepeatedFixedSizePrimitive but for packed primitive fields.
   template <typename CType, enum FieldType DeclaredType>
-  GOOGLE_PROTOBUF_ATTRIBUTE_ALWAYS_INLINE
-  static bool ReadPackedFixedSizePrimitive(
+  GOOGLE_ATTRIBUTE_ALWAYS_INLINE static bool ReadPackedFixedSizePrimitive(
       google::protobuf::io::CodedInputStream* input, RepeatedField<CType>* value);
 
   static const CppType kFieldTypeToCppTypeMap[];
