@@ -699,25 +699,12 @@ class Message
         switch ($field->getType()) {
             case GPBType::MESSAGE:
                 $klass = $field->getMessageType()->getClass();
+                if (!is_object($value) && !is_array($value)) {
+                    throw new \Exception("Expect message.");
+                }
                 $submsg = new $klass;
-
-                if ($field->isTimestamp()) {
-                    if (!is_string($value)) {
-                        throw new GPBDecodeException("Expect string.");
-                    }
-                    try {
-                        $timestamp = GPBUtil::parseTimestamp($value);
-                    } catch (\Exception $e) {
-                        throw new GPBDecodeException("Invalid RFC 3339 timestamp: ".$e->getMessage());
-                    }
-
-                    $submsg->setSeconds($timestamp->getSeconds());
-                    $submsg->setNanos($timestamp->getNanos());
-                } else if ($klass !== "Google\Protobuf\Any") {
-                    if (!is_object($value) && !is_array($value)) {
-                        throw new GPBDecodeException("Expect message.");
-                    }
-
+                if (!is_null($value) &&
+                    $klass !== "Google\Protobuf\Any") {
                     $submsg->mergeFromJsonArray($value);
                 }
                 return $submsg;
@@ -1051,28 +1038,22 @@ class Message
      */
     public function serializeToJsonStream(&$output)
     {
-        if (get_class($this) === 'Google\Protobuf\Timestamp') {
-            $timestamp = GPBUtil::formatTimestamp($this);
-            $timestamp = json_encode($timestamp);
-            $output->writeRaw($timestamp, strlen($timestamp));
-        } else {
-            $output->writeRaw("{", 1);
-            $fields = $this->desc->getField();
-            $first = true;
-            foreach ($fields as $field) {
-                if ($this->existField($field)) {
-                    if ($first) {
-                        $first = false;
-                    } else {
-                        $output->writeRaw(",", 1);
-                    }
-                    if (!$this->serializeFieldToJsonStream($output, $field)) {
-                        return false;
-                    }
+        $output->writeRaw("{", 1);
+        $fields = $this->desc->getField();
+        $first = true;
+        foreach ($fields as $field) {
+            if ($this->existField($field)) {
+                if ($first) {
+                    $first = false;
+                } else {
+                    $output->writeRaw(",", 1);
+                }
+                if (!$this->serializeFieldToJsonStream($output, $field)) {
+                    return false;
                 }
             }
-            $output->writeRaw("}", 1);
         }
+        $output->writeRaw("}", 1);
         return true;
     }
 
@@ -1360,7 +1341,6 @@ class Message
     private function fieldJsonByteSize($field)
     {
         $size = 0;
-
         if ($field->isMap()) {
             $getter = $field->getGetter();
             $values = $this->$getter();
@@ -1463,26 +1443,21 @@ class Message
     public function jsonByteSize()
     {
         $size = 0;
-        if (get_class($this) === 'Google\Protobuf\Timestamp') {
-            $timestamp = GPBUtil::formatTimestamp($this);
-            $timestamp = json_encode($timestamp);
-            $size += strlen($timestamp);
-        } else {
-            // Size for "{}".
-            $size += 2;
-            
-            $fields = $this->desc->getField();
-            $count = 0;
-            foreach ($fields as $field) {
-                $field_size = $this->fieldJsonByteSize($field);
-                $size += $field_size;
-                if ($field_size != 0) {
-                  $count++;
-                }
+
+        // Size for "{}".
+        $size += 2;
+
+        $fields = $this->desc->getField();
+        $count = 0;
+        foreach ($fields as $field) {
+            $field_size = $this->fieldJsonByteSize($field);
+            $size += $field_size;
+            if ($field_size != 0) {
+              $count++;
             }
-            // size for comma
-            $size += $count > 0 ? ($count - 1) : 0;
         }
+        // size for comma
+        $size += $count > 0 ? ($count - 1) : 0;
         return $size;
     }
 }
