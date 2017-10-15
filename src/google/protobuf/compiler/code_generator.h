@@ -51,7 +51,6 @@ class FileDescriptor;
 
 namespace compiler {
 class AccessInfoMap;
-
 class Version;
 
 // Defined in this file.
@@ -166,7 +165,7 @@ typedef GeneratorContext OutputDirectory;
 //   "foo=bar,baz,qux=corge"
 // parses to the pairs:
 //   ("foo", "bar"), ("baz", ""), ("qux", "corge")
-void ParseGeneratorParameter(
+LIBPROTOC_EXPORT void ParseGeneratorParameter(
     const string&, std::vector<std::pair<string, string> >*);
 
 }  // namespace compiler
