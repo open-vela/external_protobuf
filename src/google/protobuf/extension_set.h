@@ -697,10 +697,6 @@ inline void ExtensionSet::AddString(int number, FieldType type,
 //                                       ExtensionSet* set);
 //     static inline void Add(int number, ConstType value, ExtensionSet* set);
 //     static inline MutableType Add(int number, ExtensionSet* set);
-//     This is used by the ExtensionIdentifier constructor to register
-//     the extension at dynamic initialization.
-//     template <typename ExtendeeT>
-//     static void Register(int number, FieldType type, bool is_packed);
 //   };
 //
 // Not all of these methods make sense for all field types.  For example, the
@@ -732,11 +728,6 @@ class PrimitiveTypeTraits {
                               ConstType default_value);
   static inline void Set(int number, FieldType field_type,
                          ConstType value, ExtensionSet* set);
-  template <typename ExtendeeT>
-  static void Register(int number, FieldType type, bool is_packed) {
-    ExtensionSet::RegisterExtension(&ExtendeeT::default_instance(), number,
-                                    type, false, is_packed);
-  }
 };
 
 template <typename Type>
@@ -760,11 +751,6 @@ class RepeatedPrimitiveTypeTraits {
                       bool is_packed, ExtensionSet* set);
 
   static const RepeatedFieldType* GetDefaultRepeatedField();
-  template <typename ExtendeeT>
-  static void Register(int number, FieldType type, bool is_packed) {
-    ExtensionSet::RegisterExtension(&ExtendeeT::default_instance(), number,
-                                    type, true, is_packed);
-  }
 };
 
 LIBPROTOBUF_EXPORT extern ProtobufOnceType repeated_primitive_generic_type_traits_once_init_;
@@ -862,11 +848,6 @@ class LIBPROTOBUF_EXPORT StringTypeTraits {
                                 ExtensionSet* set) {
     return set->MutableString(number, field_type, NULL);
   }
-  template <typename ExtendeeT>
-  static void Register(int number, FieldType type, bool is_packed) {
-    ExtensionSet::RegisterExtension(&ExtendeeT::default_instance(), number,
-                                    type, false, is_packed);
-  }
 };
 
 LIBPROTOBUF_EXPORT extern ProtobufOnceType repeated_string_type_traits_once_init_;
@@ -919,12 +900,6 @@ class LIBPROTOBUF_EXPORT RepeatedStringTypeTraits {
     return default_repeated_field_;
   }
 
-  template <typename ExtendeeT>
-  static void Register(int number, FieldType type, bool is_packed) {
-    ExtensionSet::RegisterExtension(&ExtendeeT::default_instance(), number,
-                                    type, true, is_packed);
-  }
-
  private:
   static void InitializeDefaultRepeatedFields();
   static void DestroyDefaultRepeatedFields();
@@ -951,11 +926,6 @@ class EnumTypeTraits {
                          ConstType value, ExtensionSet* set) {
     GOOGLE_DCHECK(IsValid(value));
     set->SetEnum(number, field_type, value, NULL);
-  }
-  template <typename ExtendeeT>
-  static void Register(int number, FieldType type, bool is_packed) {
-    ExtensionSet::RegisterEnumExtension(&ExtendeeT::default_instance(), number,
-                                        type, false, is_packed, IsValid);
   }
 };
 
@@ -1010,11 +980,6 @@ class RepeatedEnumTypeTraits {
     return reinterpret_cast<const RepeatedField<Type>*>(
         RepeatedPrimitiveTypeTraits<int32>::GetDefaultRepeatedField());
   }
-  template <typename ExtendeeT>
-  static void Register(int number, FieldType type, bool is_packed) {
-    ExtensionSet::RegisterEnumExtension(&ExtendeeT::default_instance(), number,
-                                        type, true, is_packed, IsValid);
-  }
 };
 
 // -------------------------------------------------------------------
@@ -1059,12 +1024,6 @@ class MessageTypeTraits {
                                                ExtensionSet* set) {
     return static_cast<Type*>(set->UnsafeArenaReleaseMessage(
         number, Type::default_instance()));
-  }
-  template <typename ExtendeeT>
-  static void Register(int number, FieldType type, bool is_packed) {
-    ExtensionSet::RegisterMessageExtension(&ExtendeeT::default_instance(),
-                                           number, type, false, is_packed,
-                                           &Type::default_instance());
   }
 };
 
@@ -1111,12 +1070,6 @@ class RepeatedMessageTypeTraits {
   }
 
   static const RepeatedFieldType* GetDefaultRepeatedField();
-  template <typename ExtendeeT>
-  static void Register(int number, FieldType type, bool is_packed) {
-    ExtensionSet::RegisterMessageExtension(&ExtendeeT::default_instance(),
-                                           number, type, true, is_packed,
-                                           &Type::default_instance());
-  }
 };
 
 LIBPROTOBUF_EXPORT extern ProtobufOnceType repeated_message_generic_type_traits_once_init_;
@@ -1168,16 +1121,10 @@ class ExtensionIdentifier {
   typedef ExtendeeType Extendee;
 
   ExtensionIdentifier(int number, typename TypeTraits::ConstType default_value)
-      : number_(number), default_value_(default_value) {
-    Register(number);
-  }
+      : number_(number), default_value_(default_value) {}
   inline int number() const { return number_; }
   typename TypeTraits::ConstType default_value() const {
     return default_value_;
-  }
-
-  static void Register(int number) {
-    TypeTraits::template Register<ExtendeeType>(number, field_type, is_packed);
   }
 
  private:

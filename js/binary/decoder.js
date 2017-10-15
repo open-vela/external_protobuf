@@ -47,7 +47,6 @@ goog.provide('jspb.BinaryDecoder');
 goog.provide('jspb.BinaryIterator');
 
 goog.require('goog.asserts');
-goog.require('goog.crypt');
 goog.require('jspb.utils');
 
 

@@ -428,15 +428,21 @@ PHP_METHOD(Util, checkMessage) {
   RETURN_ZVAL(val, 1, 0);
 }
 
-void check_repeated_field(const zend_class_entry* klass, PHP_PROTO_LONG type,
-                          zval* val, zval* return_value) {
+PHP_METHOD(Util, checkRepeatedField) {
+  zval* val;
+  PHP_PROTO_LONG type;
+  const zend_class_entry* klass = NULL;
+  if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "zl|C", &val, &type,
+                            &klass) == FAILURE) {
+    return;
+  }
+
 #if PHP_MAJOR_VERSION >= 7
   if (Z_ISREF_P(val)) {
     ZVAL_DEREF(val);
   }
 #endif
 
-  TSRMLS_FETCH();
   if (Z_TYPE_P(val) == IS_ARRAY) {
     HashTable* table = HASH_OF(val);
     HashPosition pointer;
@@ -486,28 +492,24 @@ void check_repeated_field(const zend_class_entry* klass, PHP_PROTO_LONG type,
     zend_error(E_USER_ERROR, "Incorrect repeated field type.");
     return;
   }
+
 }
 
-PHP_METHOD(Util, checkRepeatedField) {
+PHP_METHOD(Util, checkMapField) {
   zval* val;
-  PHP_PROTO_LONG type;
+  PHP_PROTO_LONG key_type, value_type;
   const zend_class_entry* klass = NULL;
-  if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "zl|C", &val, &type,
-                            &klass) == FAILURE) {
+  if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "zll|C", &val, &key_type,
+                            &value_type, &klass) == FAILURE) {
     return;
   }
-  RETURN_ZVAL(val, 1, 0);
-}
 
-void check_map_field(const zend_class_entry* klass, PHP_PROTO_LONG key_type,
-                     PHP_PROTO_LONG value_type, zval* val, zval* return_value) {
 #if PHP_MAJOR_VERSION >= 7
   if (Z_ISREF_P(val)) {
     ZVAL_DEREF(val);
   }
 #endif
 
-  TSRMLS_FETCH();
   if (Z_TYPE_P(val) == IS_ARRAY) {
     HashTable* table = Z_ARRVAL_P(val);
     HashPosition pointer;
@@ -562,15 +564,4 @@ void check_map_field(const zend_class_entry* klass, PHP_PROTO_LONG key_type,
     zend_error(E_USER_ERROR, "Incorrect map field type.");
     return;
   }
-}
-
-PHP_METHOD(Util, checkMapField) {
-  zval* val;
-  PHP_PROTO_LONG key_type, value_type;
-  const zend_class_entry* klass = NULL;
-  if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "zll|C", &val, &key_type,
-                            &value_type, &klass) == FAILURE) {
-    return;
-  }
-  RETURN_ZVAL(val, 1, 0);
 }

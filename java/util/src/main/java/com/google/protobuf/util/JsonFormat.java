@@ -1522,8 +1522,7 @@ public class JsonFormat {
       for (int i = 0; i < array.size(); ++i) {
         Object value = parseFieldValue(field, array.get(i), builder);
         if (value == null) {
-          throw new InvalidProtocolBufferException(
-              "Repeated field elements cannot be null in field: " + field.getFullName());
+          throw new InvalidProtocolBufferException("Repeated field elements cannot be null");
         }
         builder.addRepeatedField(field, value);
       }
