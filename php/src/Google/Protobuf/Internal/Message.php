@@ -57,6 +57,7 @@ class Message
      * @ignore
      */
     private $desc;
+    private $unknown = "";
 
     /**
      * @ignore
@@ -226,13 +227,14 @@ class Message
     /**
      * @ignore
      */
-    private static function skipField($input, $tag)
+    private function skipField($input, $tag)
     {
         $number = GPBWire::getTagFieldNumber($tag);
         if ($number === 0) {
             throw new GPBDecodeException("Illegal field number zero.");
         }
 
+        $start = $input->current();
         switch (GPBWire::getTagWireType($tag)) {
             case GPBWireType::VARINT:
                 $uint64 = 0;
@@ -240,21 +242,21 @@ class Message
                     throw new GPBDecodeException(
                         "Unexpected EOF inside varint.");
                 }
-                return;
+                break;
             case GPBWireType::FIXED64:
                 $uint64 = 0;
                 if (!$input->readLittleEndian64($uint64)) {
                     throw new GPBDecodeException(
                         "Unexpected EOF inside fixed64.");
                 }
-                return;
+                break;
             case GPBWireType::FIXED32:
                 $uint32 = 0;
                 if (!$input->readLittleEndian32($uint32)) {
                     throw new GPBDecodeException(
                         "Unexpected EOF inside fixed32.");
                 }
-                return;
+                break;
             case GPBWireType::LENGTH_DELIMITED:
                 $length = 0;
                 if (!$input->readVarint32($length)) {
@@ -266,13 +268,18 @@ class Message
                     throw new GPBDecodeException(
                         "Unexpected EOF inside length delimited data.");
                 }
-                return;
+                break;
             case GPBWireType::START_GROUP:
             case GPBWireType::END_GROUP:
                 throw new GPBDecodeException("Unexpected wire type.");
             default:
                 throw new GPBDecodeException("Unexpected wire type.");
         }
+        $end = $input->current();
+
+        $bytes = str_repeat(chr(0), CodedOutputStream::MAX_VARINT64_BYTES);
+        $size = CodedOutputStream::writeVarintToArray($tag, $bytes, true);
+        $this->unknown .= substr($bytes, 0, $size) . $input->substr($start, $end);
     }
 
     /**
@@ -423,7 +430,7 @@ class Message
         }
 
         if ($value_format === GPBWire::UNKNOWN) {
-            self::skipField($input, $tag);
+            $this->skipField($input, $tag);
             return;
         } elseif ($value_format === GPBWire::NORMAL_FORMAT) {
             self::parseFieldFromStreamNoTag($input, $field, $value);
@@ -461,6 +468,7 @@ class Message
      */
     public function clear()
     {
+        $this->unknown = "";
         foreach ($this->desc->getField() as $field) {
             $setter = $field->getSetter();
             if ($field->isMap()) {
@@ -699,12 +707,25 @@ class Message
         switch ($field->getType()) {
             case GPBType::MESSAGE:
                 $klass = $field->getMessageType()->getClass();
-                if (!is_object($value) && !is_array($value)) {
-                    throw new \Exception("Expect message.");
-                }
                 $submsg = new $klass;
-                if (!is_null($value) &&
-                    $klass !== "Google\Protobuf\Any") {
+
+                if ($field->isTimestamp()) {
+                    if (!is_string($value)) {
+                        throw new GPBDecodeException("Expect string.");
+                    }
+                    try {
+                        $timestamp = GPBUtil::parseTimestamp($value);
+                    } catch (\Exception $e) {
+                        throw new GPBDecodeException("Invalid RFC 3339 timestamp: ".$e->getMessage());
+                    }
+
+                    $submsg->setSeconds($timestamp->getSeconds());
+                    $submsg->setNanos($timestamp->getNanos());
+                } else if ($klass !== "Google\Protobuf\Any") {
+                    if (!is_object($value) && !is_array($value)) {
+                        throw new GPBDecodeException("Expect message.");
+                    }
+
                     $submsg->mergeFromJsonArray($value);
                 }
                 return $submsg;
@@ -1030,6 +1051,7 @@ class Message
                 return false;
             }
         }
+        $output->writeRaw($this->unknown, strlen($this->unknown));
         return true;
     }
 
@@ -1038,22 +1060,28 @@ class Message
      */
     public function serializeToJsonStream(&$output)
     {
-        $output->writeRaw("{", 1);
-        $fields = $this->desc->getField();
-        $first = true;
-        foreach ($fields as $field) {
-            if ($this->existField($field)) {
-                if ($first) {
-                    $first = false;
-                } else {
-                    $output->writeRaw(",", 1);
-                }
-                if (!$this->serializeFieldToJsonStream($output, $field)) {
-                    return false;
+        if (get_class($this) === 'Google\Protobuf\Timestamp') {
+            $timestamp = GPBUtil::formatTimestamp($this);
+            $timestamp = json_encode($timestamp);
+            $output->writeRaw($timestamp, strlen($timestamp));
+        } else {
+            $output->writeRaw("{", 1);
+            $fields = $this->desc->getField();
+            $first = true;
+            foreach ($fields as $field) {
+                if ($this->existField($field)) {
+                    if ($first) {
+                        $first = false;
+                    } else {
+                        $output->writeRaw(",", 1);
+                    }
+                    if (!$this->serializeFieldToJsonStream($output, $field)) {
+                        return false;
+                    }
                 }
             }
+            $output->writeRaw("}", 1);
         }
-        $output->writeRaw("}", 1);
         return true;
     }
 
@@ -1341,6 +1369,7 @@ class Message
     private function fieldJsonByteSize($field)
     {
         $size = 0;
+
         if ($field->isMap()) {
             $getter = $field->getGetter();
             $values = $this->$getter();
@@ -1408,6 +1437,7 @@ class Message
         foreach ($fields as $field) {
             $size += $this->fieldByteSize($field);
         }
+        $size += strlen($this->unknown);
         return $size;
     }
 
@@ -1443,21 +1473,26 @@ class Message
     public function jsonByteSize()
     {
         $size = 0;
-
-        // Size for "{}".
-        $size += 2;
-
-        $fields = $this->desc->getField();
-        $count = 0;
-        foreach ($fields as $field) {
-            $field_size = $this->fieldJsonByteSize($field);
-            $size += $field_size;
-            if ($field_size != 0) {
-              $count++;
+        if (get_class($this) === 'Google\Protobuf\Timestamp') {
+            $timestamp = GPBUtil::formatTimestamp($this);
+            $timestamp = json_encode($timestamp);
+            $size += strlen($timestamp);
+        } else {
+            // Size for "{}".
+            $size += 2;
+            
+            $fields = $this->desc->getField();
+            $count = 0;
+            foreach ($fields as $field) {
+                $field_size = $this->fieldJsonByteSize($field);
+                $size += $field_size;
+                if ($field_size != 0) {
+                  $count++;
+                }
             }
+            // size for comma
+            $size += $count > 0 ? ($count - 1) : 0;
         }
-        // size for comma
-        $size += $count > 0 ? ($count - 1) : 0;
         return $size;
     }
 }
