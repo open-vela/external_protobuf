@@ -541,7 +541,6 @@ cc_test(
         "src/google/protobuf/any_test.cc",
         "src/google/protobuf/arena_unittest.cc",
         "src/google/protobuf/arenastring_unittest.cc",
-        "src/google/protobuf/compiler/annotation_test_util.cc",
         "src/google/protobuf/compiler/command_line_interface_unittest.cc",
         "src/google/protobuf/compiler/cpp/cpp_bootstrap_unittest.cc",
         "src/google/protobuf/compiler/cpp/cpp_move_unittest.cc",
