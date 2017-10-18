@@ -586,7 +586,7 @@ void WireFormatLite::WriteMessageMaybeToArray(int field_number,
   }
 }
 
-GOOGLE_PROTOBUF_ATTRIBUTE_ALWAYS_INLINE static bool ReadBytesToString(
+GOOGLE_ATTRIBUTE_ALWAYS_INLINE static bool ReadBytesToString(
     io::CodedInputStream* input, string* value);
 inline static bool ReadBytesToString(io::CodedInputStream* input,
                                      string* value) {
