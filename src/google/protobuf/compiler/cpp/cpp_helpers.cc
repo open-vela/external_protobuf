@@ -216,7 +216,7 @@ string DefaultInstanceName(const Descriptor* descriptor) {
 }
 
 string ReferenceFunctionName(const Descriptor* descriptor) {
-  return QualifiedClassName(descriptor) + "_ReferenceStrong";
+  return QualifiedClassName(descriptor) + "_Reference";
 }
 
 string DependentBaseClassTemplateName(const Descriptor* descriptor) {
@@ -753,7 +753,8 @@ bool IsImplicitWeakField(const FieldDescriptor* field, const Options& options) {
   return UsingImplicitWeakFields(field->file(), options) &&
          field->type() == FieldDescriptor::TYPE_MESSAGE &&
          !field->is_required() && !field->is_repeated() && !field->is_map() &&
-         field->containing_oneof() == NULL;
+         field->containing_oneof() == NULL &&
+         field->message_type()->file() != field->file();
 }
 
 struct CompareDescriptors {

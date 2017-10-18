@@ -69,14 +69,6 @@ using internal::WireFormat;
 using internal::WireFormatLite;
 
 namespace {
-bool EnableExperimentalRuntimeForLite() {
-#ifdef PROTOBUF_EXPERIMENT
-  return PROTOBUF_EXPERIMENT;
-#else   // PROTOBUF_EXPERIMENT
-  return false;
-#endif  // !PROTOBUF_EXPERIMENT
-}
-
 bool GenerateHasBits(const Descriptor* descriptor) {
   return SupportFieldPresence(descriptor->file()) ||
       HasRepeatedFields(descriptor);
@@ -369,14 +361,14 @@ void ImmutableMessageLiteGenerator::Generate(io::Printer* printer) {
   printer->Indent();
   printer->Indent();
 
-  printer->Print("case IS_INITIALIZED: {\n");
+  printer->Print(
+    "case IS_INITIALIZED: {\n");
   printer->Indent();
   GenerateDynamicMethodIsInitialized(printer);
   printer->Outdent();
 
-  printer->Print("}\n");
-
   printer->Print(
+    "}\n"
     "case MAKE_IMMUTABLE: {\n");
 
   printer->Indent();
@@ -391,15 +383,13 @@ void ImmutableMessageLiteGenerator::Generate(io::Printer* printer) {
   GenerateDynamicMethodNewBuilder(printer);
   printer->Outdent();
 
-  if (!EnableExperimentalRuntimeForLite()) {
-    printer->Print(
-        "}\n"
-        "case VISIT: {\n");
+  printer->Print(
+    "}\n"
+    "case VISIT: {\n");
 
-    printer->Indent();
-    GenerateDynamicMethodVisit(printer);
-    printer->Outdent();
-  }
+  printer->Indent();
+  GenerateDynamicMethodVisit(printer);
+  printer->Outdent();
 
   printer->Print(
     "}\n"
@@ -480,17 +470,6 @@ void ImmutableMessageLiteGenerator::Generate(io::Printer* printer) {
     "}\n"
     "\n",
     "classname", descriptor_->name());
-  if (EnableExperimentalRuntimeForLite()) {
-    // Register the default instance in a map. This map will be used by
-    // experimental runtime to lookup default instance given a class instance
-    // without using Java reflection.
-    printer->Print(
-        "static {\n"
-        "  com.google.protobuf.GeneratedMessageLite.registerDefaultInstance(\n"
-        "    $classname$.class, DEFAULT_INSTANCE);\n"
-        "}\n",
-        "classname", descriptor_->name());
-  }
   printer->Print(
       "public static $classname$ getDefaultInstance() {\n"
       "  return DEFAULT_INSTANCE;\n"
@@ -522,7 +501,6 @@ void ImmutableMessageLiteGenerator::Generate(io::Printer* printer) {
   printer->Outdent();
   printer->Print("}\n\n");
 }
-
 
 // ===================================================================
 
@@ -730,10 +708,10 @@ void ImmutableMessageLiteGenerator::GenerateSerializeOneExtensionRange(
 void ImmutableMessageLiteGenerator::GenerateBuilder(io::Printer* printer) {
   printer->Print(
     "public static Builder newBuilder() {\n"
-    "  return DEFAULT_INSTANCE.createBuilder();\n"
+    "  return DEFAULT_INSTANCE.toBuilder();\n"
     "}\n"
     "public static Builder newBuilder($classname$ prototype) {\n"
-    "  return DEFAULT_INSTANCE.createBuilder(prototype);\n"
+    "  return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);\n"
     "}\n"
     "\n",
     "classname", name_resolver_->GetImmutableClassName(descriptor_));

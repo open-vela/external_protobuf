@@ -380,10 +380,6 @@ public abstract class AbstractMessage
 
     @Override
     public BuilderType mergeFrom(final Message other) {
-      return mergeFrom(other, other.getAllFields());
-    }
-    
-    BuilderType mergeFrom(final Message other, Map<FieldDescriptor, Object> allFields) {
       if (other.getDescriptorForType() != getDescriptorForType()) {
         throw new IllegalArgumentException(
           "mergeFrom(Message) can only merge messages of the same type.");
@@ -398,7 +394,8 @@ public abstract class AbstractMessage
       // TODO(kenton):  Provide a function somewhere called makeDeepCopy()
       //   which allows people to make secure deep copies of messages.
 
-      for (final Map.Entry<FieldDescriptor, Object> entry : allFields.entrySet()) {
+      for (final Map.Entry<FieldDescriptor, Object> entry :
+           other.getAllFields().entrySet()) {
         final FieldDescriptor field = entry.getKey();
         if (field.isRepeated()) {
           for (final Object element : (List)entry.getValue()) {

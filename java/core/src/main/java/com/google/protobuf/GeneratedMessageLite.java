@@ -31,6 +31,7 @@
 package com.google.protobuf;
 
 import com.google.protobuf.AbstractMessageLite.Builder.LimitedInputStream;
+import com.google.protobuf.GeneratedMessageLite.EqualsVisitor.NotEqualsException;
 import com.google.protobuf.Internal.BooleanList;
 import com.google.protobuf.Internal.DoubleList;
 import com.google.protobuf.Internal.EnumLiteMap;
@@ -51,7 +52,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Lite version of {@link GeneratedMessage}.
@@ -62,12 +62,6 @@ public abstract class GeneratedMessageLite<
     MessageType extends GeneratedMessageLite<MessageType, BuilderType>,
     BuilderType extends GeneratedMessageLite.Builder<MessageType, BuilderType>>
         extends AbstractMessageLite<MessageType, BuilderType> {
-  // BEGIN REGULAR
-  static final boolean ENABLE_EXPERIMENTAL_RUNTIME_AT_BUILD_TIME = false;
-  // END REGULAR
-  // BEGIN EXPERIMENTAL
-  // static final boolean ENABLE_EXPERIMENTAL_RUNTIME_AT_BUILD_TIME = true;
-  // END EXPERIMENTAL
 
   /** For use by generated code only. Lazily initialized to reduce allocations. */
   protected UnknownFieldSetLite unknownFields = UnknownFieldSetLite.getDefaultInstance();
@@ -116,19 +110,12 @@ public abstract class GeneratedMessageLite<
     if (memoizedHashCode != 0) {
       return memoizedHashCode;
     }
-    // BEGIN EXPERIMENTAL
-    // memoizedHashCode = Protobuf.getInstance().schemaFor(this).hashCode(this);
-    // return memoizedHashCode;
-    // END EXPERIMENTAL
-    // BEGIN REGULAR
     HashCodeVisitor visitor = new HashCodeVisitor();
     visit(visitor, (MessageType) this);
     memoizedHashCode = visitor.hashCode;
     return memoizedHashCode;
-    // END REGULAR
   }
 
-  // BEGIN REGULAR
   @SuppressWarnings("unchecked") // Guaranteed by runtime
   int hashCode(HashCodeVisitor visitor) {
     if (memoizedHashCode == 0) {
@@ -140,7 +127,6 @@ public abstract class GeneratedMessageLite<
     }
     return memoizedHashCode;
   }
-  // END REGULAR
 
   @SuppressWarnings("unchecked") // Guaranteed by isInstance + runtime
   @Override
@@ -153,22 +139,18 @@ public abstract class GeneratedMessageLite<
       return false;
     }
 
-    // BEGIN EXPERIMENTAL
-    // return Protobuf.getInstance().schemaFor(this).equals(this, (MessageType) other);
-    // END EXPERIMENTAL
-    // BEGIN REGULAR
 
     try {
       visit(EqualsVisitor.INSTANCE, (MessageType) other);
-    } catch (EqualsVisitor.NotEqualsException e) {
+    } catch (NotEqualsException e) {
       return false;
     }
     return true;
-    // END REGULAR
   }
 
-  // BEGIN REGULAR
-  /** Same as {@link #equals(Object)} but throws {@code NotEqualsException}. */
+  /**
+   * Same as {@link #equals(Object)} but throws {@code NotEqualsException}.
+   */
   @SuppressWarnings("unchecked") // Guaranteed by isInstance + runtime
   boolean equals(EqualsVisitor visitor, MessageLite other) {
     if (this == other) {
@@ -182,13 +164,14 @@ public abstract class GeneratedMessageLite<
     visit(visitor, (MessageType) other);
     return true;
   }
-  // END REGULAR
 
   // The general strategy for unknown fields is to use an UnknownFieldSetLite that is treated as
   // mutable during the parsing constructor and immutable after. This allows us to avoid
   // any unnecessary intermediary allocations while reducing the generated code size.
 
-  /** Lazily initializes unknown fields. */
+  /**
+   * Lazily initializes unknown fields.
+   */
   private final void ensureUnknownFieldsInitialized() {
     if (unknownFields == UnknownFieldSetLite.getDefaultInstance()) {
       unknownFields = UnknownFieldSetLite.newInstance();
@@ -235,20 +218,6 @@ public abstract class GeneratedMessageLite<
     unknownFields.makeImmutable();
   }
 
-  protected final <
-    MessageType extends GeneratedMessageLite<MessageType, BuilderType>,
-    BuilderType extends GeneratedMessageLite.Builder<MessageType, BuilderType>>
-        BuilderType createBuilder() {
-    return (BuilderType) dynamicMethod(MethodToInvoke.NEW_BUILDER);
-  }
-
-  protected final <
-    MessageType extends GeneratedMessageLite<MessageType, BuilderType>,
-    BuilderType extends GeneratedMessageLite.Builder<MessageType, BuilderType>>
-        BuilderType createBuilder(MessageType prototype) {
-    return ((BuilderType) createBuilder()).mergeFrom(prototype);
-  }
-
   @Override
   public final boolean isInitialized() {
     return isInitialized((MessageType) this, Boolean.TRUE);
@@ -269,13 +238,11 @@ public abstract class GeneratedMessageLite<
    * For use by generated code only.
    */
   public static enum MethodToInvoke {
-    IS_INITIALIZED,
-    // BEGIN REGULAR
-    VISIT,
-    // END REGULAR
     // Rely on/modify instance state
+    IS_INITIALIZED,
     GET_MEMOIZED_IS_INITIALIZED,
     SET_MEMOIZED_IS_INITIALIZED,
+    VISIT,
     MERGE_FROM_STREAM,
     MAKE_IMMUTABLE,
 
@@ -332,13 +299,10 @@ public abstract class GeneratedMessageLite<
     return dynamicMethod(method, null, null);
   }
 
-  // BEGIN REGULAR
   void visit(Visitor visitor, MessageType other) {
     dynamicMethod(MethodToInvoke.VISIT, visitor, other);
     unknownFields = visitor.visitUnknownFields(unknownFields, other.unknownFields);
   }
-  // END REGULAR
-
 
 
   /**
@@ -435,12 +399,7 @@ public abstract class GeneratedMessageLite<
     }
 
     private void mergeFromInstance(MessageType dest, MessageType src) {
-      // BEGIN EXPERIMENTAL
-      // Protobuf.getInstance().schemaFor(dest).mergeFrom(dest, src);
-      // END EXPERIMENTAL
-      // BEGIN REGULAR
       dest.visit(MergeFromVisitor.INSTANCE, src);
-      // END REGULAR
     }
 
     @Override
@@ -518,13 +477,11 @@ public abstract class GeneratedMessageLite<
       extensions.mergeFrom(((ExtendableMessage) other).extensions);
     }
 
-    // BEGIN REGULAR
     @Override
     final void visit(Visitor visitor, MessageType other) {
       super.visit(visitor, other);
       extensions = visitor.visitExtensions(extensions, other.extensions);
     }
-    // END REGULAR
 
     /**
      * Parse an unknown field or an extension. For use by generated code only.
@@ -537,8 +494,7 @@ public abstract class GeneratedMessageLite<
         MessageType defaultInstance,
         CodedInputStream input,
         ExtensionRegistryLite extensionRegistry,
-        int tag)
-        throws IOException {
+        int tag) throws IOException {
       int fieldNumber = WireFormat.getTagFieldNumber(tag);
 
       // TODO(dweis): How much bytecode would be saved by not requiring the generated code to
@@ -1760,7 +1716,6 @@ public abstract class GeneratedMessageLite<
     return message;
   }
 
-  // BEGIN REGULAR
   /**
    * An abstract visitor that the generated code calls into that we use to implement various
    * features. Fields that are not members of oneofs are always visited. Members of a oneof are only
@@ -2446,5 +2401,4 @@ public abstract class GeneratedMessageLite<
       return mine;
     }
   }
-  // END REGULAR
 }

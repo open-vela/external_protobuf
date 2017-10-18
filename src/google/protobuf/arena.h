@@ -61,7 +61,7 @@ class Arena;       // defined below
 class Message;     // message.h
 
 namespace internal {
-struct ArenaStringPtr;  // arenastring.h
+class ArenaString; // arenastring.h
 class LazyField;   // lazy_field.h
 
 template<typename Type>
@@ -222,14 +222,6 @@ class LIBPROTOBUF_EXPORT Arena {
   explicit Arena(const ArenaOptions& options) : impl_(options) {
     Init(options);
   }
-
-  // Block overhead.  Use this as a guide for how much to over-allocate the
-  // initial block if you want an allocation of size N to fit inside it.
-  //
-  // WARNING: if you allocate multiple objects, it is difficult to guarantee
-  // that a series of allocations will fit in the initial block, especially if
-  // Arena changes its alignment guarantees in the future!
-  static const size_t kBlockOverhead = internal::ArenaImpl::kHeaderSize;
 
   // Default constructor with sensible default options, tuned for average
   // use-cases.
@@ -532,9 +524,10 @@ class LIBPROTOBUF_EXPORT Arena {
   // returns the total space used by the arena which is the sums of the sizes
   // of the allocated blocks. This method is not thread-safe.
   GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE uint64 Reset() {
+    uint64 space_allocated = SpaceAllocated();
     // Call the reset hook
     if (on_arena_reset_ != NULL) {
-      on_arena_reset_(this, hooks_cookie_, impl_.SpaceAllocated());
+      on_arena_reset_(this, hooks_cookie_, space_allocated);
     }
     return impl_.Reset();
   }
@@ -919,7 +912,7 @@ class LIBPROTOBUF_EXPORT Arena {
 
   template <typename Type>
   friend class ::google::protobuf::internal::GenericTypeHandler;
-  friend struct internal::ArenaStringPtr;  // For AllocateAligned.
+  friend class internal::ArenaString;  // For AllocateAligned.
   friend class internal::LazyField;    // For CreateMaybeMessage.
   template <typename Key, typename T>
   friend class Map;

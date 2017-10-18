@@ -2065,11 +2065,6 @@ static PyObject* MergeFromString(CMessage* self, PyObject* arg) {
   input.SetExtensionRegistry(factory->pool->pool, factory->message_factory);
   bool success = self->message->MergePartialFromCodedStream(&input);
   if (success) {
-    if (!input.ConsumedEntireMessage()) {
-      // TODO(jieluo): Raise error and return NULL instead.
-      // b/27494216
-      PyErr_Warn(NULL, "Unexpected end-group tag: Not all data was converted");
-    }
     return PyInt_FromLong(input.CurrentPosition());
   } else {
     PyErr_Format(DecodeError_class, "Error parsing message");

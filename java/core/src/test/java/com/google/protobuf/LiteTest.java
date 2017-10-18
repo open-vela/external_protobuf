@@ -1453,15 +1453,6 @@ public class LiteTest extends TestCase {
             UnittestLite.optionalFixed32ExtensionLite));
   }
 
-  public void testBuilderMergeFromNull() throws Exception {
-    try {
-      TestAllTypesLite.newBuilder().mergeFrom((TestAllTypesLite) null);
-      fail("Expected exception");
-    } catch (NullPointerException e) {
-      // Pass.
-    }
-  }
-
   // Builder.mergeFrom() should keep existing extensions.
   public void testBuilderMergeFromWithExtensions() throws Exception {
     TestAllExtensionsLite message =

@@ -371,7 +371,6 @@ void ImmutableMessageGenerator::Generate(io::Printer* printer) {
     "}\n"
     "\n");
 
-
   printer->Print(
     "@java.lang.Override\n"
     "public final com.google.protobuf.UnknownFieldSet\n"

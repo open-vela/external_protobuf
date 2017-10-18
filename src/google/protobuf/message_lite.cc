@@ -394,8 +394,7 @@ void GenericTypeHandler<string>::Merge(const string& from,
   *to = from;
 }
 
-bool proto3_preserve_unknown_ = true;
-
+bool proto3_preserve_unknown_ = false;
 void SetProto3PreserveUnknownsDefault(bool preserve) {
   proto3_preserve_unknown_ = preserve;
 }
