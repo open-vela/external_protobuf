@@ -217,32 +217,20 @@ VALUE Message_respond_to_missing(int argc, VALUE* argv, VALUE _self) {
   return Qtrue;
 }
 
-VALUE create_submsg_from_hash(const upb_fielddef *f, VALUE hash) {
-  const upb_def *d = upb_fielddef_subdef(f);
-  assert(d != NULL);
-
-  VALUE descriptor = get_def_obj(d);
-  VALUE msgclass = rb_funcall(descriptor, rb_intern("msgclass"), 0, NULL);
-
-  VALUE args[1] = { hash };
-  return rb_class_new_instance(1, args, msgclass);
-}
-
 int Message_initialize_kwarg(VALUE key, VALUE val, VALUE _self) {
   MessageHeader* self;
-  char *name;
+  VALUE method_str;
+  char* name;
   const upb_fielddef* f;
   TypedData_Get_Struct(_self, MessageHeader, &Message_type, self);
 
-  if (TYPE(key) == T_STRING) {
-    name = RSTRING_PTR(key);
-  } else if (TYPE(key) == T_SYMBOL) {
-    name = RSTRING_PTR(rb_id2str(SYM2ID(key)));
-  } else {
+  if (!SYMBOL_P(key)) {
     rb_raise(rb_eArgError,
-             "Expected string or symbols as hash keys when initializing proto from hash.");
+             "Expected symbols as hash keys in initialization map.");
   }
 
+  method_str = rb_id2str(SYM2ID(key));
+  name = RSTRING_PTR(method_str);
   f = upb_msgdef_ntofz(self->descriptor->msgdef, name);
   if (f == NULL) {
     rb_raise(rb_eArgError,
@@ -267,18 +255,9 @@ int Message_initialize_kwarg(VALUE key, VALUE val, VALUE _self) {
     }
     ary = layout_get(self->descriptor->layout, Message_data(self), f);
     for (int i = 0; i < RARRAY_LEN(val); i++) {
-      VALUE entry = rb_ary_entry(val, i);
-      if (TYPE(entry) == T_HASH && upb_fielddef_issubmsg(f)) {
-        entry = create_submsg_from_hash(f, entry);
-      }
-
-      RepeatedField_push(ary, entry);
+      RepeatedField_push(ary, rb_ary_entry(val, i));
     }
   } else {
-    if (TYPE(val) == T_HASH && upb_fielddef_issubmsg(f)) {
-      val = create_submsg_from_hash(f, val);
-    }
-
     layout_set(self->descriptor->layout, Message_data(self), f, val);
   }
   return 0;
@@ -440,13 +419,6 @@ VALUE Message_to_h(VALUE _self) {
       msg_value = Map_to_h(msg_value);
     } else if (upb_fielddef_label(field) == UPB_LABEL_REPEATED) {
       msg_value = RepeatedField_to_ary(msg_value);
-
-      if (upb_fielddef_type(field) == UPB_TYPE_MESSAGE) {
-        for (int i = 0; i < RARRAY_LEN(msg_value); i++) {
-          VALUE elem = rb_ary_entry(msg_value, i);
-          rb_ary_store(msg_value, i, Message_to_h(elem));
-        }
-      }
     } else if (msg_value != Qnil &&
                upb_fielddef_type(field) == UPB_TYPE_MESSAGE) {
       msg_value = Message_to_h(msg_value);

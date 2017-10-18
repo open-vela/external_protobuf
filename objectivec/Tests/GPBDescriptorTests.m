@@ -32,7 +32,7 @@
 
 #import <objc/runtime.h>
 
-#import "GPBDescriptor_PackagePrivate.h"
+#import "GPBDescriptor.h"
 #import "google/protobuf/Unittest.pbobjc.h"
 #import "google/protobuf/UnittestObjc.pbobjc.h"
 #import "google/protobuf/Descriptor.pbobjc.h"
@@ -83,8 +83,6 @@
   XCTAssertNotNil(fieldDescriptorWithNumber.enumDescriptor);
   XCTAssertEqualObjects(fieldDescriptorWithNumber.enumDescriptor.name,
                         @"TestAllTypes_NestedEnum");
-  XCTAssertEqual(fieldDescriptorWithName.number, fieldDescriptorWithNumber.number);
-  XCTAssertEqual(fieldDescriptorWithName.dataType, GPBDataTypeEnum);
 
   // Foreign Enum
   fieldDescriptorWithName = [descriptor fieldWithName:@"optionalForeignEnum"];
@@ -95,8 +93,6 @@
   XCTAssertNotNil(fieldDescriptorWithNumber.enumDescriptor);
   XCTAssertEqualObjects(fieldDescriptorWithNumber.enumDescriptor.name,
                         @"ForeignEnum");
-  XCTAssertEqual(fieldDescriptorWithName.number, fieldDescriptorWithNumber.number);
-  XCTAssertEqual(fieldDescriptorWithName.dataType, GPBDataTypeEnum);
 
   // Import Enum
   fieldDescriptorWithName = [descriptor fieldWithName:@"optionalImportEnum"];
@@ -107,8 +103,6 @@
   XCTAssertNotNil(fieldDescriptorWithNumber.enumDescriptor);
   XCTAssertEqualObjects(fieldDescriptorWithNumber.enumDescriptor.name,
                         @"ImportEnum");
-  XCTAssertEqual(fieldDescriptorWithName.number, fieldDescriptorWithNumber.number);
-  XCTAssertEqual(fieldDescriptorWithName.dataType, GPBDataTypeEnum);
 
   // Nested Message
   fieldDescriptorWithName = [descriptor fieldWithName:@"optionalNestedMessage"];
@@ -117,8 +111,6 @@
   XCTAssertNotNil(fieldDescriptorWithNumber);
   XCTAssertEqual(fieldDescriptorWithName, fieldDescriptorWithNumber);
   XCTAssertNil(fieldDescriptorWithNumber.enumDescriptor);
-  XCTAssertEqual(fieldDescriptorWithName.number, fieldDescriptorWithNumber.number);
-  XCTAssertEqual(fieldDescriptorWithName.dataType, GPBDataTypeMessage);
 
   // Foreign Message
   fieldDescriptorWithName =
@@ -128,8 +120,6 @@
   XCTAssertNotNil(fieldDescriptorWithNumber);
   XCTAssertEqual(fieldDescriptorWithName, fieldDescriptorWithNumber);
   XCTAssertNil(fieldDescriptorWithNumber.enumDescriptor);
-  XCTAssertEqual(fieldDescriptorWithName.number, fieldDescriptorWithNumber.number);
-  XCTAssertEqual(fieldDescriptorWithName.dataType, GPBDataTypeMessage);
 
   // Import Message
   fieldDescriptorWithName = [descriptor fieldWithName:@"optionalImportMessage"];
@@ -138,12 +128,6 @@
   XCTAssertNotNil(fieldDescriptorWithNumber);
   XCTAssertEqual(fieldDescriptorWithName, fieldDescriptorWithNumber);
   XCTAssertNil(fieldDescriptorWithNumber.enumDescriptor);
-  XCTAssertEqual(fieldDescriptorWithName.number, fieldDescriptorWithNumber.number);
-  XCTAssertEqual(fieldDescriptorWithName.dataType, GPBDataTypeMessage);
-
-  // Some failed lookups.
-  XCTAssertNil([descriptor fieldWithName:@"NOT THERE"]);
-  XCTAssertNil([descriptor fieldWithNumber:9876543]);
 }
 
 - (void)testEnumDescriptor {
@@ -175,7 +159,6 @@
   XCTAssertNotNil(enumName);
   XCTAssertTrue([descriptor getValue:&value forEnumTextFormatName:@"FOO"]);
   XCTAssertEqual(value, TestAllTypes_NestedEnum_Foo);
-  XCTAssertNil([descriptor textFormatNameForValue:99999]);
 
   // Bad values
   enumName = [descriptor enumNameForValue:0];
@@ -268,104 +251,6 @@
       [descriptor fieldWithNumber:TestOneof2_FieldNumber_BazString];
   XCTAssertNotNil(bazString);
   XCTAssertNil(bazString.containingOneof);
-}
-
-- (void)testExtensiondDescriptor {
-  Class msgClass = [TestAllExtensions class];
-  Class packedMsgClass = [TestPackedExtensions class];
-
-  // Int
-
-  GPBExtensionDescriptor *descriptor = [UnittestRoot optionalInt32Extension];
-  XCTAssertNotNil(descriptor);
-  XCTAssertEqual(descriptor.containingMessageClass, msgClass);  // ptr equality
-  XCTAssertFalse(descriptor.isPackable);
-  XCTAssertEqualObjects(descriptor.defaultValue, @0);
-  XCTAssertNil(descriptor.enumDescriptor);
-
-  descriptor = [UnittestRoot defaultInt32Extension];
-  XCTAssertNotNil(descriptor);
-  XCTAssertEqual(descriptor.containingMessageClass, msgClass);  // ptr equality
-  XCTAssertFalse(descriptor.isPackable);
-  XCTAssertEqualObjects(descriptor.defaultValue, @41);
-  XCTAssertNil(descriptor.enumDescriptor);
-
-  // Enum
-
-  descriptor = [UnittestRoot optionalNestedEnumExtension];
-  XCTAssertNotNil(descriptor);
-  XCTAssertEqual(descriptor.containingMessageClass, msgClass);  // ptr equality
-  XCTAssertFalse(descriptor.isPackable);
-  XCTAssertEqual(descriptor.defaultValue, @1);
-  XCTAssertEqualObjects(descriptor.enumDescriptor.name, @"TestAllTypes_NestedEnum");
-
-  descriptor = [UnittestRoot defaultNestedEnumExtension];
-  XCTAssertNotNil(descriptor);
-  XCTAssertEqual(descriptor.containingMessageClass, msgClass);  // ptr equality
-  XCTAssertFalse(descriptor.isPackable);
-  XCTAssertEqual(descriptor.defaultValue, @2);
-  XCTAssertEqualObjects(descriptor.enumDescriptor.name, @"TestAllTypes_NestedEnum");
-
-  // Message
-
-  descriptor = [UnittestRoot optionalNestedMessageExtension];
-  XCTAssertNotNil(descriptor);
-  XCTAssertEqual(descriptor.containingMessageClass, msgClass);  // ptr equality
-  XCTAssertFalse(descriptor.isPackable);
-  XCTAssertNil(descriptor.defaultValue);
-  XCTAssertNil(descriptor.enumDescriptor);
-
-  // Repeated Int
-
-  descriptor = [UnittestRoot repeatedInt32Extension];
-  XCTAssertNotNil(descriptor);
-  XCTAssertEqual(descriptor.containingMessageClass, msgClass);  // ptr equality
-  XCTAssertFalse(descriptor.isPackable);
-  XCTAssertNil(descriptor.defaultValue);
-  XCTAssertNil(descriptor.enumDescriptor);
-
-  descriptor = [UnittestRoot packedInt32Extension];
-  XCTAssertNotNil(descriptor);
-  XCTAssertEqual(descriptor.containingMessageClass, packedMsgClass);  // ptr equality
-  XCTAssertTrue(descriptor.isPackable);
-  XCTAssertNil(descriptor.defaultValue);
-  XCTAssertNil(descriptor.enumDescriptor);
-
-  // Repeated Enum
-
-  descriptor = [UnittestRoot repeatedNestedEnumExtension];
-  XCTAssertNotNil(descriptor);
-  XCTAssertEqual(descriptor.containingMessageClass, msgClass);  // ptr equality
-  XCTAssertFalse(descriptor.isPackable);
-  XCTAssertNil(descriptor.defaultValue);
-  XCTAssertEqualObjects(descriptor.enumDescriptor.name, @"TestAllTypes_NestedEnum");
-
-  descriptor = [UnittestRoot packedEnumExtension];
-  XCTAssertNotNil(descriptor);
-  XCTAssertEqual(descriptor.containingMessageClass, packedMsgClass);  // ptr equality
-  XCTAssertTrue(descriptor.isPackable);
-  XCTAssertNil(descriptor.defaultValue);
-  XCTAssertEqualObjects(descriptor.enumDescriptor.name, @"ForeignEnum");
-
-  // Repeated Message
-
-  descriptor = [UnittestRoot repeatedNestedMessageExtension];
-  XCTAssertNotNil(descriptor);
-  XCTAssertEqual(descriptor.containingMessageClass, msgClass);  // ptr equality
-  XCTAssertFalse(descriptor.isPackable);
-  XCTAssertNil(descriptor.defaultValue);
-  XCTAssertNil(descriptor.enumDescriptor);
-
-  // Compare (used internally for serialization).
-
-  GPBExtensionDescriptor *ext1 = [UnittestRoot optionalInt32Extension];
-  XCTAssertEqual(ext1.fieldNumber, 1u);
-  GPBExtensionDescriptor *ext2 = [UnittestRoot optionalInt64Extension];
-  XCTAssertEqual(ext2.fieldNumber, 2u);
-
-  XCTAssertEqual([ext1 compareByFieldNumber:ext2], NSOrderedAscending);
-  XCTAssertEqual([ext2 compareByFieldNumber:ext1], NSOrderedDescending);
-  XCTAssertEqual([ext1 compareByFieldNumber:ext1], NSOrderedSame);
 }
 
 @end

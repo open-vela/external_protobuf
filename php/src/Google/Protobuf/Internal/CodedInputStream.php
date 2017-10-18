@@ -78,16 +78,11 @@ class CodedInputStream
         return $this->buffer_end - $this->current;
     }
 
-    public function current()
+    private function current()
     {
         return $this->total_bytes_read -
             ($this->buffer_end - $this->current +
             $this->buffer_size_after_limit);
-    }
-
-    public function substr($start, $end)
-    {
-        return substr($this->buffer, $start, $end - $start);
     }
 
     private function recomputeBufferLimits()
