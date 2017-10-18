@@ -286,8 +286,6 @@ namespace {
 struct ForceShutdown {
   ~ForceShutdown() {
     ShutdownProtobufLibrary();
-    // Test to shutdown the library twice, which should succeed.
-    ShutdownProtobufLibrary();
   }
 } force_shutdown;
 
