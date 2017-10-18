@@ -14,10 +14,6 @@
 #include <google/protobuf/generated_message_reflection.h>
 #include <google/protobuf/reflection_ops.h>
 #include <google/protobuf/wire_format.h>
-// This is a temporary google only hack
-#ifdef GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
-#include "third_party/protobuf/version.h"
-#endif
 // @@protoc_insertion_point(includes)
 namespace google {
 namespace protobuf {
@@ -42,11 +38,7 @@ namespace protobuf_google_2fprotobuf_2fapi_2eproto {
 void InitDefaultsApiImpl() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
-#ifdef GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
-  ::google::protobuf::internal::InitProtobufDefaultsForceUnique();
-#else
   ::google::protobuf::internal::InitProtobufDefaults();
-#endif  // GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
   protobuf_google_2fprotobuf_2fapi_2eproto::InitDefaultsMethod();
   protobuf_google_2fprotobuf_2ftype_2eproto::InitDefaultsOption();
   protobuf_google_2fprotobuf_2fsource_5fcontext_2eproto::InitDefaultsSourceContext();
@@ -67,11 +59,7 @@ void InitDefaultsApi() {
 void InitDefaultsMethodImpl() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
-#ifdef GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
-  ::google::protobuf::internal::InitProtobufDefaultsForceUnique();
-#else
   ::google::protobuf::internal::InitProtobufDefaults();
-#endif  // GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
   protobuf_google_2fprotobuf_2ftype_2eproto::InitDefaultsOption();
   {
     void* ptr = &::google::protobuf::_Method_default_instance_;
@@ -89,11 +77,7 @@ void InitDefaultsMethod() {
 void InitDefaultsMixinImpl() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
-#ifdef GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
-  ::google::protobuf::internal::InitProtobufDefaultsForceUnique();
-#else
   ::google::protobuf::internal::InitProtobufDefaults();
-#endif  // GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
   {
     void* ptr = &::google::protobuf::_Mixin_default_instance_;
     new (ptr) ::google::protobuf::Mixin();
@@ -223,15 +207,6 @@ namespace protobuf {
 void Api::InitAsDefaultInstance() {
   ::google::protobuf::_Api_default_instance_._instance.get_mutable()->source_context_ = const_cast< ::google::protobuf::SourceContext*>(
       ::google::protobuf::SourceContext::internal_default_instance());
-}
-void Api::clear_options() {
-  options_.Clear();
-}
-void Api::clear_source_context() {
-  if (GetArenaNoVirtual() == NULL && source_context_ != NULL) {
-    delete source_context_;
-  }
-  source_context_ = NULL;
 }
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int Api::kNameFieldNumber;
@@ -368,7 +343,8 @@ bool Api::MergePartialFromCodedStream(
       case 2: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
             static_cast< ::google::protobuf::uint8>(18u /* 18 & 0xFF */)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(input, add_methods()));
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+                input, add_methods()));
         } else {
           goto handle_unusual;
         }
@@ -379,7 +355,8 @@ bool Api::MergePartialFromCodedStream(
       case 3: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
             static_cast< ::google::protobuf::uint8>(26u /* 26 & 0xFF */)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(input, add_options()));
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+                input, add_options()));
         } else {
           goto handle_unusual;
         }
@@ -406,7 +383,7 @@ bool Api::MergePartialFromCodedStream(
       case 5: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
             static_cast< ::google::protobuf::uint8>(42u /* 42 & 0xFF */)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
                input, mutable_source_context()));
         } else {
           goto handle_unusual;
@@ -418,7 +395,8 @@ bool Api::MergePartialFromCodedStream(
       case 6: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
             static_cast< ::google::protobuf::uint8>(50u /* 50 & 0xFF */)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(input, add_mixins()));
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+                input, add_mixins()));
         } else {
           goto handle_unusual;
         }
@@ -548,7 +526,7 @@ void Api::SerializeWithCachedSizes(
   for (unsigned int i = 0,
       n = static_cast<unsigned int>(this->methods_size()); i < n; i++) {
     target = ::google::protobuf::internal::WireFormatLite::
-      InternalWriteMessageToArray(
+      InternalWriteMessageNoVirtualToArray(
         2, this->methods(static_cast<int>(i)), deterministic, target);
   }
 
@@ -556,7 +534,7 @@ void Api::SerializeWithCachedSizes(
   for (unsigned int i = 0,
       n = static_cast<unsigned int>(this->options_size()); i < n; i++) {
     target = ::google::protobuf::internal::WireFormatLite::
-      InternalWriteMessageToArray(
+      InternalWriteMessageNoVirtualToArray(
         3, this->options(static_cast<int>(i)), deterministic, target);
   }
 
@@ -574,7 +552,7 @@ void Api::SerializeWithCachedSizes(
   // .google.protobuf.SourceContext source_context = 5;
   if (this->has_source_context()) {
     target = ::google::protobuf::internal::WireFormatLite::
-      InternalWriteMessageToArray(
+      InternalWriteMessageNoVirtualToArray(
         5, *this->source_context_, deterministic, target);
   }
 
@@ -582,7 +560,7 @@ void Api::SerializeWithCachedSizes(
   for (unsigned int i = 0,
       n = static_cast<unsigned int>(this->mixins_size()); i < n; i++) {
     target = ::google::protobuf::internal::WireFormatLite::
-      InternalWriteMessageToArray(
+      InternalWriteMessageNoVirtualToArray(
         6, this->mixins(static_cast<int>(i)), deterministic, target);
   }
 
@@ -615,7 +593,7 @@ size_t Api::ByteSizeLong() const {
     total_size += 1UL * count;
     for (unsigned int i = 0; i < count; i++) {
       total_size +=
-        ::google::protobuf::internal::WireFormatLite::MessageSize(
+        ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
           this->methods(static_cast<int>(i)));
     }
   }
@@ -626,7 +604,7 @@ size_t Api::ByteSizeLong() const {
     total_size += 1UL * count;
     for (unsigned int i = 0; i < count; i++) {
       total_size +=
-        ::google::protobuf::internal::WireFormatLite::MessageSize(
+        ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
           this->options(static_cast<int>(i)));
     }
   }
@@ -637,7 +615,7 @@ size_t Api::ByteSizeLong() const {
     total_size += 1UL * count;
     for (unsigned int i = 0; i < count; i++) {
       total_size +=
-        ::google::protobuf::internal::WireFormatLite::MessageSize(
+        ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
           this->mixins(static_cast<int>(i)));
     }
   }
@@ -659,7 +637,7 @@ size_t Api::ByteSizeLong() const {
   // .google.protobuf.SourceContext source_context = 5;
   if (this->has_source_context()) {
     total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::MessageSize(
+      ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
         *this->source_context_);
   }
 
@@ -761,9 +739,6 @@ void Api::InternalSwap(Api* other) {
 // ===================================================================
 
 void Method::InitAsDefaultInstance() {
-}
-void Method::clear_options() {
-  options_.Clear();
 }
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int Method::kNameFieldNumber;
@@ -957,7 +932,8 @@ bool Method::MergePartialFromCodedStream(
       case 6: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
             static_cast< ::google::protobuf::uint8>(50u /* 50 & 0xFF */)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(input, add_options()));
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+                input, add_options()));
         } else {
           goto handle_unusual;
         }
@@ -1119,7 +1095,7 @@ void Method::SerializeWithCachedSizes(
   for (unsigned int i = 0,
       n = static_cast<unsigned int>(this->options_size()); i < n; i++) {
     target = ::google::protobuf::internal::WireFormatLite::
-      InternalWriteMessageToArray(
+      InternalWriteMessageNoVirtualToArray(
         6, this->options(static_cast<int>(i)), deterministic, target);
   }
 
@@ -1152,7 +1128,7 @@ size_t Method::ByteSizeLong() const {
     total_size += 1UL * count;
     for (unsigned int i = 0; i < count; i++) {
       total_size +=
-        ::google::protobuf::internal::WireFormatLite::MessageSize(
+        ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
           this->options(static_cast<int>(i)));
     }
   }

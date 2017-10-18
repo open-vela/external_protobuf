@@ -137,14 +137,17 @@ GenerateAccessorDeclarations(io::Printer* printer) const {
 }
 
 void MapFieldGenerator::
-GenerateInlineAccessorDefinitions(io::Printer* printer) const {
-  printer->Print(variables_,
-      "inline const ::google::protobuf::Map< $key_cpp$, $val_cpp$ >&\n"
+GenerateInlineAccessorDefinitions(io::Printer* printer,
+                                  bool is_inline) const {
+  std::map<string, string> variables(variables_);
+  variables["inline"] = is_inline ? "inline" : "";
+  printer->Print(variables,
+      "$inline$ const ::google::protobuf::Map< $key_cpp$, $val_cpp$ >&\n"
       "$classname$::$name$() const {\n"
       "  // @@protoc_insertion_point(field_map:$full_name$)\n"
       "  return $name$_.GetMap();\n"
       "}\n"
-      "inline ::google::protobuf::Map< $key_cpp$, $val_cpp$ >*\n"
+      "$inline$ ::google::protobuf::Map< $key_cpp$, $val_cpp$ >*\n"
       "$classname$::mutable_$name$() {\n"
       "  // @@protoc_insertion_point(field_mutable_map:$full_name$)\n"
       "  return $name$_.MutableMap();\n"
@@ -153,7 +156,9 @@ GenerateInlineAccessorDefinitions(io::Printer* printer) const {
 
 void MapFieldGenerator::
 GenerateClearingCode(io::Printer* printer) const {
-  printer->Print(variables_, "$name$_.Clear();\n");
+  std::map<string, string> variables(variables_);
+  variables["this_message"] = dependent_field_ ? DependentBaseDownCast() : "";
+  printer->Print(variables, "$this_message$$name$_.Clear();\n");
 }
 
 void MapFieldGenerator::

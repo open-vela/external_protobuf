@@ -376,7 +376,7 @@ struct TypeImplementsMergeBehaviorProbeForMergeFrom {
       CheckType<U, bool, &U::MergeFrom>*);
   template<typename U> static HasNoMerge Check(...);
 
-  // Resolves to either google::protobuf::internal::true_type or google::protobuf::internal::false_type.
+  // Resovles to either google::protobuf::internal::true_type or google::protobuf::internal::false_type.
   typedef google::protobuf::internal::integral_constant<bool,
                (sizeof(Check<T>(0)) == sizeof(HasMerge))> type;
 };
@@ -528,9 +528,11 @@ class LIBPROTOBUF_EXPORT RepeatedPtrFieldBase {
   inline void InternalSwap(RepeatedPtrFieldBase* other);
 
   template <typename TypeHandler>
-  void AddAllocatedInternal(typename TypeHandler::Type* value, google::protobuf::internal::true_type);
+  void AddAllocatedInternal(typename TypeHandler::Type* value,
+                            google::protobuf::internal::true_type);
   template <typename TypeHandler>
-  void AddAllocatedInternal(typename TypeHandler::Type* value, google::protobuf::internal::false_type);
+  void AddAllocatedInternal(typename TypeHandler::Type* value,
+                            google::protobuf::internal::false_type);
 
   template <typename TypeHandler> GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE
   void AddAllocatedSlowWithCopy(typename TypeHandler::Type* value,
@@ -1733,6 +1735,7 @@ void RepeatedPtrFieldBase::AddAllocatedInternal(
     elems[current_size_] = value;
     current_size_ = current_size_ + 1;
     rep_->allocated_size = rep_->allocated_size + 1;
+    return;
   } else {
     AddAllocatedSlowWithCopy<TypeHandler>(
         value, TypeHandler::GetArena(value), arena);
@@ -1779,6 +1782,7 @@ void RepeatedPtrFieldBase::AddAllocatedInternal(
     elems[current_size_] = value;
     current_size_ = current_size_ + 1;
     ++rep_->allocated_size;
+    return;
   } else {
     UnsafeArenaAddAllocated<TypeHandler>(value);
   }

@@ -154,9 +154,6 @@ class LIBPROTOBUF_EXPORT JsonStreamParser {
   // component.
   util::Status ParseNumberHelper(NumberResult* result);
 
-  // Parse a number as double into a NumberResult.
-  util::Status ParseDoubleHelper(const string& number, NumberResult* result);
-
   // Handles a { during parsing of a value.
   util::Status HandleBeginObject();
 

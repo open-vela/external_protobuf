@@ -79,8 +79,7 @@ struct GeneratorOptions {
         library(""),
         error_on_name_conflict(false),
         extension(".js"),
-        one_output_file_per_input_file(false),
-        annotate_code(false) {}
+        one_output_file_per_input_file(false) {}
 
   bool ParseFromOptions(
       const std::vector< std::pair< string, string > >& options,
@@ -119,9 +118,6 @@ struct GeneratorOptions {
   string extension;
   // Create a separate output file for each input file?
   bool one_output_file_per_input_file;
-  // If true, we should build .meta files that contain annotations for
-  // generated code. See GeneratedCodeInfo in descriptor.proto.
-  bool annotate_code;
 };
 
 // CodeGenerator implementation which generates a JavaScript source file and
