@@ -109,30 +109,18 @@ class DescriptorPool
 
     public function getDescriptorByClassName($klass)
     {
-        if (isset($this->class_to_desc[$klass])) {
-            return $this->class_to_desc[$klass];
-        } else {
-            return null;
-        }
+        return $this->class_to_desc[$klass];
     }
 
     public function getEnumDescriptorByClassName($klass)
     {
-        if (isset($this->class_to_enum_desc[$klass])) {
-            return $this->class_to_enum_desc[$klass];
-        } else {
-            return null;
-        }
+        return $this->class_to_enum_desc[$klass];
     }
 
     public function getDescriptorByProtoName($proto)
     {
-        if (isset($this->proto_to_class[$proto])) {
-            $klass = $this->proto_to_class[$proto];
-            return $this->class_to_desc[$klass];
-        } else {
-          return null;
-        }
+        $klass = $this->proto_to_class[$proto];
+        return $this->class_to_desc[$klass];
     }
 
     public function getEnumDescriptorByProtoName($proto)

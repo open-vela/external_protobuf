@@ -356,10 +356,7 @@ libprotoc_la_SOURCES =                                         \
   google/protobuf/compiler/cpp/cpp_message.h                   \
   google/protobuf/compiler/cpp/cpp_message_field.cc            \
   google/protobuf/compiler/cpp/cpp_message_field.h             \
-  google/protobuf/compiler/cpp/cpp_message_layout_helper.h     \
   google/protobuf/compiler/cpp/cpp_options.h                   \
-  google/protobuf/compiler/cpp/cpp_padding_optimizer.cc        \
-  google/protobuf/compiler/cpp/cpp_padding_optimizer.h         \
   google/protobuf/compiler/cpp/cpp_primitive_field.cc          \
   google/protobuf/compiler/cpp/cpp_primitive_field.h           \
   google/protobuf/compiler/cpp/cpp_service.cc                  \
@@ -813,8 +810,6 @@ protobuf_test_SOURCES =                                        \
   google/protobuf/io/printer_unittest.cc                       \
   google/protobuf/io/tokenizer_unittest.cc                     \
   google/protobuf/io/zero_copy_stream_unittest.cc              \
-  google/protobuf/compiler/annotation_test_util.h              \
-  google/protobuf/compiler/annotation_test_util.cc             \
   google/protobuf/compiler/command_line_interface_unittest.cc  \
   google/protobuf/compiler/importer_unittest.cc                \
   google/protobuf/compiler/mock_code_generator.cc              \

@@ -1995,10 +1995,6 @@ bool ConformanceTestSuite::RunSuite(ConformanceTestRunner* runner,
       R"({"repeatedDuration": ["1.5s", "-1.5s"]})",
       "repeated_duration: {seconds: 1 nanos: 500000000}"
       "repeated_duration: {seconds: -1 nanos: -500000000}");
-  RunValidJsonTest(
-      "DurationNull", REQUIRED,
-      R"({"optionalDuration": null})",
-      "");
 
   ExpectParseFailureForJson(
       "DurationMissingS", REQUIRED,
@@ -2068,10 +2064,6 @@ bool ConformanceTestSuite::RunSuite(ConformanceTestRunner* runner,
       "TimestampWithNegativeOffset", REQUIRED,
       R"({"optionalTimestamp": "1969-12-31T16:00:00-08:00"})",
       "optional_timestamp: {seconds: 0}");
-  RunValidJsonTest(
-      "TimestampNull", REQUIRED,
-      R"({"optionalTimestamp": null})",
-      "");
 
   ExpectParseFailureForJson(
       "TimestampJsonInputTooSmall", REQUIRED,
