@@ -33,8 +33,7 @@
 
 #include <google/protobuf/stubs/common.h>
 #include <google/protobuf/arena.h>
-#include <google/protobuf/message_lite.h>
-#include <google/protobuf/stubs/port.h>
+#include <google/protobuf/generated_message_util.h>
 
 namespace google {
 namespace protobuf {
@@ -63,7 +62,7 @@ class InternalMetadataWithArenaBase {
     ptr_ = NULL;
   }
 
-  GOOGLE_PROTOBUF_ATTRIBUTE_ALWAYS_INLINE const T& unknown_fields() const {
+  GOOGLE_ATTRIBUTE_ALWAYS_INLINE const T& unknown_fields() const {
     if (GOOGLE_PREDICT_FALSE(have_unknown_fields())) {
       return PtrValue<Container>()->unknown_fields;
     } else {
@@ -71,7 +70,7 @@ class InternalMetadataWithArenaBase {
     }
   }
 
-  GOOGLE_PROTOBUF_ATTRIBUTE_ALWAYS_INLINE T* mutable_unknown_fields() {
+  GOOGLE_ATTRIBUTE_ALWAYS_INLINE T* mutable_unknown_fields() {
     if (GOOGLE_PREDICT_TRUE(have_unknown_fields())) {
       return &PtrValue<Container>()->unknown_fields;
     } else {
@@ -79,7 +78,7 @@ class InternalMetadataWithArenaBase {
     }
   }
 
-  GOOGLE_PROTOBUF_ATTRIBUTE_ALWAYS_INLINE Arena* arena() const {
+  GOOGLE_ATTRIBUTE_ALWAYS_INLINE Arena* arena() const {
     if (GOOGLE_PREDICT_FALSE(have_unknown_fields())) {
       return PtrValue<Container>()->arena;
     } else {
@@ -87,11 +86,11 @@ class InternalMetadataWithArenaBase {
     }
   }
 
-  GOOGLE_PROTOBUF_ATTRIBUTE_ALWAYS_INLINE bool have_unknown_fields() const {
+  GOOGLE_ATTRIBUTE_ALWAYS_INLINE bool have_unknown_fields() const {
     return PtrTag() == kTagContainer;
   }
 
-  GOOGLE_PROTOBUF_ATTRIBUTE_ALWAYS_INLINE void Swap(Derived* other) {
+  GOOGLE_ATTRIBUTE_ALWAYS_INLINE void Swap(Derived* other) {
     // Semantics here are that we swap only the unknown fields, not the arena
     // pointer. We cannot simply swap ptr_ with other->ptr_ because we need to
     // maintain our own arena ptr. Also, our ptr_ and other's ptr_ may be in
@@ -103,19 +102,19 @@ class InternalMetadataWithArenaBase {
     }
   }
 
-  GOOGLE_PROTOBUF_ATTRIBUTE_ALWAYS_INLINE void MergeFrom(const Derived& other) {
+  GOOGLE_ATTRIBUTE_ALWAYS_INLINE void MergeFrom(const Derived& other) {
     if (other.have_unknown_fields()) {
       static_cast<Derived*>(this)->DoMergeFrom(other.unknown_fields());
     }
   }
 
-  GOOGLE_PROTOBUF_ATTRIBUTE_ALWAYS_INLINE void Clear() {
+  GOOGLE_ATTRIBUTE_ALWAYS_INLINE void Clear() {
     if (have_unknown_fields()) {
       static_cast<Derived*>(this)->DoClear();
     }
   }
 
-  GOOGLE_PROTOBUF_ATTRIBUTE_ALWAYS_INLINE void* raw_arena_ptr() const {
+  GOOGLE_ATTRIBUTE_ALWAYS_INLINE void* raw_arena_ptr() const {
     return ptr_;
   }
 
@@ -133,7 +132,7 @@ class InternalMetadataWithArenaBase {
   static const intptr_t kPtrValueMask = ~kPtrTagMask;
 
   // Accessors for pointer tag and pointer value.
-  GOOGLE_PROTOBUF_ATTRIBUTE_ALWAYS_INLINE int PtrTag() const {
+  GOOGLE_ATTRIBUTE_ALWAYS_INLINE int PtrTag() const {
     return reinterpret_cast<intptr_t>(ptr_) & kPtrTagMask;
   }
 
@@ -148,14 +147,11 @@ class InternalMetadataWithArenaBase {
     Arena* arena;
   };
 
-  GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE T* mutable_unknown_fields_slow() {
+  GOOGLE_ATTRIBUTE_NOINLINE T* mutable_unknown_fields_slow() {
     Arena* my_arena = arena();
     Container* container = Arena::Create<Container>(my_arena);
-    // Two-step assignment works around a bug in clang's static analyzer:
-    // https://bugs.llvm.org/show_bug.cgi?id=34198.
-    ptr_ = container;
     ptr_ = reinterpret_cast<void*>(
-        reinterpret_cast<intptr_t>(ptr_) | kTagContainer);
+        reinterpret_cast<intptr_t>(container) | kTagContainer);
     container->arena = my_arena;
     return &(container->unknown_fields);
   }
@@ -189,32 +185,6 @@ class InternalMetadataWithArenaLite
   static const string& default_instance() {
     return GetEmptyStringAlreadyInited();
   }
-};
-
-// This helper RAII class is needed to efficiently parse unknown fields. We
-// should only call mutable_unknown_fields if there are actual unknown fields.
-// The obvious thing to just use a stack string and swap it at the end of the
-// parse won't work, because the destructor of StringOutputStream needs to be
-// called before we can modify the string (it check-fails). Using
-// LiteUnknownFieldSetter setter(&_internal_metadata_);
-// StringOutputStream stream(setter.buffer());
-// guarantees that the string is only swapped after stream is destroyed.
-class LIBPROTOBUF_EXPORT LiteUnknownFieldSetter {
- public:
-  explicit LiteUnknownFieldSetter(InternalMetadataWithArenaLite* metadata)
-      : metadata_(metadata) {
-    if (metadata->have_unknown_fields()) {
-      buffer_.swap(*metadata->mutable_unknown_fields());
-    }
-  }
-  ~LiteUnknownFieldSetter() {
-    if (!buffer_.empty()) metadata_->mutable_unknown_fields()->swap(buffer_);
-  }
-  string* buffer() { return &buffer_; }
-
- private:
-  InternalMetadataWithArenaLite* metadata_;
-  string buffer_;
 };
 
 }  // namespace internal

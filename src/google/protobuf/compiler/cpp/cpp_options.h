@@ -39,8 +39,6 @@
 namespace google {
 namespace protobuf {
 namespace compiler {
-class AccessInfoMap;
-
 namespace cpp {
 
 // Generator options (see generator.cc for a description of each):
@@ -52,9 +50,7 @@ struct Options {
         annotate_headers(false),
         enforce_lite(false),
         table_driven_parsing(false),
-        table_driven_serialization(false),
-        lite_implicit_weak_fields(false),
-        access_info_map(NULL) {}
+        table_driven_serialization(false) {}
 
   string dllexport_decl;
   bool safe_boundary_check;
@@ -64,10 +60,8 @@ struct Options {
   bool enforce_lite;
   bool table_driven_parsing;
   bool table_driven_serialization;
-  bool lite_implicit_weak_fields;
   string annotation_pragma_name;
   string annotation_guard_name;
-  const AccessInfoMap* access_info_map;
 };
 
 }  // namespace cpp

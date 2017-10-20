@@ -174,8 +174,7 @@ class FileOptions extends \Google\Protobuf\Internal\Message
     private $php_namespace = '';
     private $has_php_namespace = false;
     /**
-     * The parser stores options it doesn't recognize here.
-     * See the documentation for the "Options" section above.
+     * The parser stores options it doesn't recognize here. See above.
      *
      * Generated from protobuf field <code>repeated .google.protobuf.UninterpretedOption uninterpreted_option = 999;</code>
      */
@@ -828,8 +827,7 @@ class FileOptions extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The parser stores options it doesn't recognize here.
-     * See the documentation for the "Options" section above.
+     * The parser stores options it doesn't recognize here. See above.
      *
      * Generated from protobuf field <code>repeated .google.protobuf.UninterpretedOption uninterpreted_option = 999;</code>
      * @return \Google\Protobuf\Internal\RepeatedField
@@ -840,8 +838,7 @@ class FileOptions extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The parser stores options it doesn't recognize here.
-     * See the documentation for the "Options" section above.
+     * The parser stores options it doesn't recognize here. See above.
      *
      * Generated from protobuf field <code>repeated .google.protobuf.UninterpretedOption uninterpreted_option = 999;</code>
      * @param \Google\Protobuf\Internal\UninterpretedOption[]|\Google\Protobuf\Internal\RepeatedField $var

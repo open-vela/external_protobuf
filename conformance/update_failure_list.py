@@ -35,6 +35,7 @@ This is sort of like comm(1), except it recognizes comments and ignores them.
 """
 
 import argparse
+import fileinput
 
 parser = argparse.ArgumentParser(
     description='Adds/removes failures from the failure list.')
@@ -61,8 +62,7 @@ for remove_file in (args.remove_list or []):
 
 add_list = sorted(add_set, reverse=True)
 
-with open(args.filename) as in_file:
-    existing_list = in_file.read()
+existing_list = file(args.filename).read()
 
 with open(args.filename, "w") as f:
   for line in existing_list.splitlines(True):

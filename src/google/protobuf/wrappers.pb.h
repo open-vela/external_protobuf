@@ -30,48 +30,6 @@
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
 #include <google/protobuf/unknown_field_set.h>
 // @@protoc_insertion_point(includes)
-
-namespace protobuf_google_2fprotobuf_2fwrappers_2eproto {
-// Internal implementation detail -- do not use these members.
-struct LIBPROTOBUF_EXPORT TableStruct {
-  static const ::google::protobuf::internal::ParseTableField entries[];
-  static const ::google::protobuf::internal::AuxillaryParseTableField aux[];
-  static const ::google::protobuf::internal::ParseTable schema[9];
-  static const ::google::protobuf::internal::FieldMetadata field_metadata[];
-  static const ::google::protobuf::internal::SerializationTable serialization_table[];
-  static const ::google::protobuf::uint32 offsets[];
-};
-void LIBPROTOBUF_EXPORT AddDescriptors();
-void LIBPROTOBUF_EXPORT InitDefaultsDoubleValueImpl();
-void LIBPROTOBUF_EXPORT InitDefaultsDoubleValue();
-void LIBPROTOBUF_EXPORT InitDefaultsFloatValueImpl();
-void LIBPROTOBUF_EXPORT InitDefaultsFloatValue();
-void LIBPROTOBUF_EXPORT InitDefaultsInt64ValueImpl();
-void LIBPROTOBUF_EXPORT InitDefaultsInt64Value();
-void LIBPROTOBUF_EXPORT InitDefaultsUInt64ValueImpl();
-void LIBPROTOBUF_EXPORT InitDefaultsUInt64Value();
-void LIBPROTOBUF_EXPORT InitDefaultsInt32ValueImpl();
-void LIBPROTOBUF_EXPORT InitDefaultsInt32Value();
-void LIBPROTOBUF_EXPORT InitDefaultsUInt32ValueImpl();
-void LIBPROTOBUF_EXPORT InitDefaultsUInt32Value();
-void LIBPROTOBUF_EXPORT InitDefaultsBoolValueImpl();
-void LIBPROTOBUF_EXPORT InitDefaultsBoolValue();
-void LIBPROTOBUF_EXPORT InitDefaultsStringValueImpl();
-void LIBPROTOBUF_EXPORT InitDefaultsStringValue();
-void LIBPROTOBUF_EXPORT InitDefaultsBytesValueImpl();
-void LIBPROTOBUF_EXPORT InitDefaultsBytesValue();
-inline void LIBPROTOBUF_EXPORT InitDefaults() {
-  InitDefaultsDoubleValue();
-  InitDefaultsFloatValue();
-  InitDefaultsInt64Value();
-  InitDefaultsUInt64Value();
-  InitDefaultsInt32Value();
-  InitDefaultsUInt32Value();
-  InitDefaultsBoolValue();
-  InitDefaultsStringValue();
-  InitDefaultsBytesValue();
-}
-}  // namespace protobuf_google_2fprotobuf_2fwrappers_2eproto
 namespace google {
 namespace protobuf {
 class BoolValue;
@@ -103,8 +61,24 @@ class UInt64ValueDefaultTypeInternal;
 LIBPROTOBUF_EXPORT extern UInt64ValueDefaultTypeInternal _UInt64Value_default_instance_;
 }  // namespace protobuf
 }  // namespace google
+
 namespace google {
 namespace protobuf {
+
+namespace protobuf_google_2fprotobuf_2fwrappers_2eproto {
+// Internal implementation detail -- do not call these.
+struct LIBPROTOBUF_EXPORT TableStruct {
+  static const ::google::protobuf::internal::ParseTableField entries[];
+  static const ::google::protobuf::internal::AuxillaryParseTableField aux[];
+  static const ::google::protobuf::internal::ParseTable schema[];
+  static const ::google::protobuf::uint32 offsets[];
+  static const ::google::protobuf::internal::FieldMetadata field_metadata[];
+  static const ::google::protobuf::internal::SerializationTable serialization_table[];
+  static void InitDefaultsImpl();
+};
+void LIBPROTOBUF_EXPORT AddDescriptors();
+void LIBPROTOBUF_EXPORT InitDefaults();
+}  // namespace protobuf_google_2fprotobuf_2fwrappers_2eproto
 
 // ===================================================================
 
@@ -143,7 +117,6 @@ class LIBPROTOBUF_EXPORT DoubleValue : public ::google::protobuf::Message /* @@p
   static const ::google::protobuf::Descriptor* descriptor();
   static const DoubleValue& default_instance();
 
-  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
   static inline const DoubleValue* internal_default_instance() {
     return reinterpret_cast<const DoubleValue*>(
                &_DoubleValue_default_instance_);
@@ -217,8 +190,7 @@ class LIBPROTOBUF_EXPORT DoubleValue : public ::google::protobuf::Message /* @@p
   typedef void DestructorSkippable_;
   double value_;
   mutable int _cached_size_;
-  friend struct ::protobuf_google_2fprotobuf_2fwrappers_2eproto::TableStruct;
-  friend void ::protobuf_google_2fprotobuf_2fwrappers_2eproto::InitDefaultsDoubleValueImpl();
+  friend struct protobuf_google_2fprotobuf_2fwrappers_2eproto::TableStruct;
 };
 // -------------------------------------------------------------------
 
@@ -257,7 +229,6 @@ class LIBPROTOBUF_EXPORT FloatValue : public ::google::protobuf::Message /* @@pr
   static const ::google::protobuf::Descriptor* descriptor();
   static const FloatValue& default_instance();
 
-  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
   static inline const FloatValue* internal_default_instance() {
     return reinterpret_cast<const FloatValue*>(
                &_FloatValue_default_instance_);
@@ -331,8 +302,7 @@ class LIBPROTOBUF_EXPORT FloatValue : public ::google::protobuf::Message /* @@pr
   typedef void DestructorSkippable_;
   float value_;
   mutable int _cached_size_;
-  friend struct ::protobuf_google_2fprotobuf_2fwrappers_2eproto::TableStruct;
-  friend void ::protobuf_google_2fprotobuf_2fwrappers_2eproto::InitDefaultsFloatValueImpl();
+  friend struct protobuf_google_2fprotobuf_2fwrappers_2eproto::TableStruct;
 };
 // -------------------------------------------------------------------
 
@@ -371,7 +341,6 @@ class LIBPROTOBUF_EXPORT Int64Value : public ::google::protobuf::Message /* @@pr
   static const ::google::protobuf::Descriptor* descriptor();
   static const Int64Value& default_instance();
 
-  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
   static inline const Int64Value* internal_default_instance() {
     return reinterpret_cast<const Int64Value*>(
                &_Int64Value_default_instance_);
@@ -445,8 +414,7 @@ class LIBPROTOBUF_EXPORT Int64Value : public ::google::protobuf::Message /* @@pr
   typedef void DestructorSkippable_;
   ::google::protobuf::int64 value_;
   mutable int _cached_size_;
-  friend struct ::protobuf_google_2fprotobuf_2fwrappers_2eproto::TableStruct;
-  friend void ::protobuf_google_2fprotobuf_2fwrappers_2eproto::InitDefaultsInt64ValueImpl();
+  friend struct protobuf_google_2fprotobuf_2fwrappers_2eproto::TableStruct;
 };
 // -------------------------------------------------------------------
 
@@ -485,7 +453,6 @@ class LIBPROTOBUF_EXPORT UInt64Value : public ::google::protobuf::Message /* @@p
   static const ::google::protobuf::Descriptor* descriptor();
   static const UInt64Value& default_instance();
 
-  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
   static inline const UInt64Value* internal_default_instance() {
     return reinterpret_cast<const UInt64Value*>(
                &_UInt64Value_default_instance_);
@@ -559,8 +526,7 @@ class LIBPROTOBUF_EXPORT UInt64Value : public ::google::protobuf::Message /* @@p
   typedef void DestructorSkippable_;
   ::google::protobuf::uint64 value_;
   mutable int _cached_size_;
-  friend struct ::protobuf_google_2fprotobuf_2fwrappers_2eproto::TableStruct;
-  friend void ::protobuf_google_2fprotobuf_2fwrappers_2eproto::InitDefaultsUInt64ValueImpl();
+  friend struct protobuf_google_2fprotobuf_2fwrappers_2eproto::TableStruct;
 };
 // -------------------------------------------------------------------
 
@@ -599,7 +565,6 @@ class LIBPROTOBUF_EXPORT Int32Value : public ::google::protobuf::Message /* @@pr
   static const ::google::protobuf::Descriptor* descriptor();
   static const Int32Value& default_instance();
 
-  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
   static inline const Int32Value* internal_default_instance() {
     return reinterpret_cast<const Int32Value*>(
                &_Int32Value_default_instance_);
@@ -673,8 +638,7 @@ class LIBPROTOBUF_EXPORT Int32Value : public ::google::protobuf::Message /* @@pr
   typedef void DestructorSkippable_;
   ::google::protobuf::int32 value_;
   mutable int _cached_size_;
-  friend struct ::protobuf_google_2fprotobuf_2fwrappers_2eproto::TableStruct;
-  friend void ::protobuf_google_2fprotobuf_2fwrappers_2eproto::InitDefaultsInt32ValueImpl();
+  friend struct protobuf_google_2fprotobuf_2fwrappers_2eproto::TableStruct;
 };
 // -------------------------------------------------------------------
 
@@ -713,7 +677,6 @@ class LIBPROTOBUF_EXPORT UInt32Value : public ::google::protobuf::Message /* @@p
   static const ::google::protobuf::Descriptor* descriptor();
   static const UInt32Value& default_instance();
 
-  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
   static inline const UInt32Value* internal_default_instance() {
     return reinterpret_cast<const UInt32Value*>(
                &_UInt32Value_default_instance_);
@@ -787,8 +750,7 @@ class LIBPROTOBUF_EXPORT UInt32Value : public ::google::protobuf::Message /* @@p
   typedef void DestructorSkippable_;
   ::google::protobuf::uint32 value_;
   mutable int _cached_size_;
-  friend struct ::protobuf_google_2fprotobuf_2fwrappers_2eproto::TableStruct;
-  friend void ::protobuf_google_2fprotobuf_2fwrappers_2eproto::InitDefaultsUInt32ValueImpl();
+  friend struct protobuf_google_2fprotobuf_2fwrappers_2eproto::TableStruct;
 };
 // -------------------------------------------------------------------
 
@@ -827,7 +789,6 @@ class LIBPROTOBUF_EXPORT BoolValue : public ::google::protobuf::Message /* @@pro
   static const ::google::protobuf::Descriptor* descriptor();
   static const BoolValue& default_instance();
 
-  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
   static inline const BoolValue* internal_default_instance() {
     return reinterpret_cast<const BoolValue*>(
                &_BoolValue_default_instance_);
@@ -901,8 +862,7 @@ class LIBPROTOBUF_EXPORT BoolValue : public ::google::protobuf::Message /* @@pro
   typedef void DestructorSkippable_;
   bool value_;
   mutable int _cached_size_;
-  friend struct ::protobuf_google_2fprotobuf_2fwrappers_2eproto::TableStruct;
-  friend void ::protobuf_google_2fprotobuf_2fwrappers_2eproto::InitDefaultsBoolValueImpl();
+  friend struct protobuf_google_2fprotobuf_2fwrappers_2eproto::TableStruct;
 };
 // -------------------------------------------------------------------
 
@@ -941,7 +901,6 @@ class LIBPROTOBUF_EXPORT StringValue : public ::google::protobuf::Message /* @@p
   static const ::google::protobuf::Descriptor* descriptor();
   static const StringValue& default_instance();
 
-  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
   static inline const StringValue* internal_default_instance() {
     return reinterpret_cast<const StringValue*>(
                &_StringValue_default_instance_);
@@ -1013,13 +972,7 @@ class LIBPROTOBUF_EXPORT StringValue : public ::google::protobuf::Message /* @@p
   ::std::string* mutable_value();
   ::std::string* release_value();
   void set_allocated_value(::std::string* value);
-  PROTOBUF_RUNTIME_DEPRECATED("The unsafe_arena_ accessors for"
-  "    string fields are deprecated and will be removed in a"
-  "    future release.")
   ::std::string* unsafe_arena_release_value();
-  PROTOBUF_RUNTIME_DEPRECATED("The unsafe_arena_ accessors for"
-  "    string fields are deprecated and will be removed in a"
-  "    future release.")
   void unsafe_arena_set_allocated_value(
       ::std::string* value);
 
@@ -1032,8 +985,7 @@ class LIBPROTOBUF_EXPORT StringValue : public ::google::protobuf::Message /* @@p
   typedef void DestructorSkippable_;
   ::google::protobuf::internal::ArenaStringPtr value_;
   mutable int _cached_size_;
-  friend struct ::protobuf_google_2fprotobuf_2fwrappers_2eproto::TableStruct;
-  friend void ::protobuf_google_2fprotobuf_2fwrappers_2eproto::InitDefaultsStringValueImpl();
+  friend struct protobuf_google_2fprotobuf_2fwrappers_2eproto::TableStruct;
 };
 // -------------------------------------------------------------------
 
@@ -1072,7 +1024,6 @@ class LIBPROTOBUF_EXPORT BytesValue : public ::google::protobuf::Message /* @@pr
   static const ::google::protobuf::Descriptor* descriptor();
   static const BytesValue& default_instance();
 
-  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
   static inline const BytesValue* internal_default_instance() {
     return reinterpret_cast<const BytesValue*>(
                &_BytesValue_default_instance_);
@@ -1144,13 +1095,7 @@ class LIBPROTOBUF_EXPORT BytesValue : public ::google::protobuf::Message /* @@pr
   ::std::string* mutable_value();
   ::std::string* release_value();
   void set_allocated_value(::std::string* value);
-  PROTOBUF_RUNTIME_DEPRECATED("The unsafe_arena_ accessors for"
-  "    string fields are deprecated and will be removed in a"
-  "    future release.")
   ::std::string* unsafe_arena_release_value();
-  PROTOBUF_RUNTIME_DEPRECATED("The unsafe_arena_ accessors for"
-  "    string fields are deprecated and will be removed in a"
-  "    future release.")
   void unsafe_arena_set_allocated_value(
       ::std::string* value);
 
@@ -1163,14 +1108,14 @@ class LIBPROTOBUF_EXPORT BytesValue : public ::google::protobuf::Message /* @@pr
   typedef void DestructorSkippable_;
   ::google::protobuf::internal::ArenaStringPtr value_;
   mutable int _cached_size_;
-  friend struct ::protobuf_google_2fprotobuf_2fwrappers_2eproto::TableStruct;
-  friend void ::protobuf_google_2fprotobuf_2fwrappers_2eproto::InitDefaultsBytesValueImpl();
+  friend struct protobuf_google_2fprotobuf_2fwrappers_2eproto::TableStruct;
 };
 // ===================================================================
 
 
 // ===================================================================
 
+#if !PROTOBUF_INLINE_NOT_IN_HEADERS
 #ifdef __GNUC__
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wstrict-aliasing"
@@ -1348,6 +1293,13 @@ inline ::std::string* StringValue::release_value() {
   
   return value_.Release(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
 }
+inline ::std::string* StringValue::unsafe_arena_release_value() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:google.protobuf.StringValue.value)
+  GOOGLE_DCHECK(GetArenaNoVirtual() != NULL);
+  
+  return value_.UnsafeArenaRelease(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      GetArenaNoVirtual());
+}
 inline void StringValue::set_allocated_value(::std::string* value) {
   if (value != NULL) {
     
@@ -1357,13 +1309,6 @@ inline void StringValue::set_allocated_value(::std::string* value) {
   value_.SetAllocated(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value,
       GetArenaNoVirtual());
   // @@protoc_insertion_point(field_set_allocated:google.protobuf.StringValue.value)
-}
-inline ::std::string* StringValue::unsafe_arena_release_value() {
-  // @@protoc_insertion_point(field_unsafe_arena_release:google.protobuf.StringValue.value)
-  GOOGLE_DCHECK(GetArenaNoVirtual() != NULL);
-  
-  return value_.UnsafeArenaRelease(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      GetArenaNoVirtual());
 }
 inline void StringValue::unsafe_arena_set_allocated_value(
     ::std::string* value) {
@@ -1427,6 +1372,13 @@ inline ::std::string* BytesValue::release_value() {
   
   return value_.Release(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
 }
+inline ::std::string* BytesValue::unsafe_arena_release_value() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:google.protobuf.BytesValue.value)
+  GOOGLE_DCHECK(GetArenaNoVirtual() != NULL);
+  
+  return value_.UnsafeArenaRelease(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      GetArenaNoVirtual());
+}
 inline void BytesValue::set_allocated_value(::std::string* value) {
   if (value != NULL) {
     
@@ -1436,13 +1388,6 @@ inline void BytesValue::set_allocated_value(::std::string* value) {
   value_.SetAllocated(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value,
       GetArenaNoVirtual());
   // @@protoc_insertion_point(field_set_allocated:google.protobuf.BytesValue.value)
-}
-inline ::std::string* BytesValue::unsafe_arena_release_value() {
-  // @@protoc_insertion_point(field_unsafe_arena_release:google.protobuf.BytesValue.value)
-  GOOGLE_DCHECK(GetArenaNoVirtual() != NULL);
-  
-  return value_.UnsafeArenaRelease(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      GetArenaNoVirtual());
 }
 inline void BytesValue::unsafe_arena_set_allocated_value(
     ::std::string* value) {
@@ -1460,6 +1405,7 @@ inline void BytesValue::unsafe_arena_set_allocated_value(
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+#endif  // !PROTOBUF_INLINE_NOT_IN_HEADERS
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------
@@ -1478,6 +1424,7 @@ inline void BytesValue::unsafe_arena_set_allocated_value(
 
 
 // @@protoc_insertion_point(namespace_scope)
+
 
 }  // namespace protobuf
 }  // namespace google
