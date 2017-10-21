@@ -560,11 +560,6 @@ static size_t align_up_to(size_t offset, size_t granularity) {
   return (offset + granularity - 1) & ~(granularity - 1);
 }
 
-static void* slot_memory(MessageLayout* layout, const void* storage,
-                         const upb_fielddef* field) {
-  return ((uint8_t*)storage) + layout->fields[upb_fielddef_index(field)].offset;
-}
-
 static uint32_t* slot_oneof_case(MessageLayout* layout, const void* storage,
                                  const upb_fielddef* field) {
   return (uint32_t*)(((uint8_t*)storage) +
@@ -574,6 +569,11 @@ static uint32_t* slot_oneof_case(MessageLayout* layout, const void* storage,
 static int slot_property_cache(MessageLayout* layout, const void* storage,
                                const upb_fielddef* field) {
   return layout->fields[upb_fielddef_index(field)].cache_index;
+}
+
+void* slot_memory(MessageLayout* layout, const void* storage,
+                         const upb_fielddef* field) {
+  return ((uint8_t*)storage) + layout->fields[upb_fielddef_index(field)].offset;
 }
 
 MessageLayout* create_layout(const upb_msgdef* msgdef) {
@@ -856,12 +856,41 @@ void layout_set(MessageLayout* layout, MessageHeader* header,
     zval* property_ptr = CACHED_PTR_TO_ZVAL_PTR((CACHED_VALUE*)memory);
 
     if (EXPECTED(property_ptr != val)) {
+      zend_class_entry *subce = NULL;
+      zval converted_value;
+
+      if (upb_fielddef_ismap(field)) {
+        const upb_msgdef* mapmsg = upb_fielddef_msgsubdef(field);
+        const upb_fielddef* keyfield = upb_msgdef_ntof(mapmsg, "key", 3);
+        const upb_fielddef* valuefield = upb_msgdef_ntof(mapmsg, "value", 5);
+        if (upb_fielddef_descriptortype(valuefield) ==
+            UPB_DESCRIPTOR_TYPE_MESSAGE) {
+          const upb_msgdef* submsg = upb_fielddef_msgsubdef(valuefield);
+          Descriptor* subdesc =
+              UNBOX_HASHTABLE_VALUE(Descriptor, get_def_obj(submsg));
+          subce = subdesc->klass;
+        }
+        check_map_field(subce, upb_fielddef_descriptortype(keyfield),
+                        upb_fielddef_descriptortype(valuefield), val,
+                        &converted_value);
+      } else {
+        if (upb_fielddef_type(field) == UPB_TYPE_MESSAGE) {
+          const upb_msgdef* submsg = upb_fielddef_msgsubdef(field);
+          Descriptor* subdesc =
+              UNBOX_HASHTABLE_VALUE(Descriptor, get_def_obj(submsg));
+          subce = subdesc->klass;
+        }
+
+        check_repeated_field(subce, upb_fielddef_descriptortype(field), val,
+                             &converted_value);
+      }
 #if PHP_MAJOR_VERSION < 7
-        REPLACE_ZVAL_VALUE((zval**)memory, val, 1);
+      REPLACE_ZVAL_VALUE((zval**)memory, &converted_value, 1);
 #else
-        php_proto_zval_ptr_dtor(property_ptr);
-        ZVAL_ZVAL(property_ptr, val, 1, 0);
+      php_proto_zval_ptr_dtor(property_ptr);
+      ZVAL_ZVAL(property_ptr, &converted_value, 1, 0);
 #endif
+      zval_dtor(&converted_value);
     }
   } else {
     upb_fieldtype_t type = upb_fielddef_type(field);

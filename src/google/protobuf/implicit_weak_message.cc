@@ -28,11 +28,24 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-syntax = "proto3";
+#include <google/protobuf/implicit_weak_message.h>
 
-package deprecated_file;
+#include <google/protobuf/io/zero_copy_stream_impl_lite.h>
+#include <google/protobuf/wire_format_lite.h>
 
-option deprecated = true;
+namespace google {
+namespace protobuf {
+namespace internal {
 
-// TODO (liujisi): Add deprecation options on messages, enums fields as well and
-// add tests to verify those annotations are actually generated.
+::google::protobuf::internal::ExplicitlyConstructed<ImplicitWeakMessage>
+    implicit_weak_message_default_instance;
+
+bool ImplicitWeakMessage::MergePartialFromCodedStream(io::CodedInputStream* input) {
+  io::StringOutputStream string_stream(&data_);
+  io::CodedOutputStream coded_stream(&string_stream, false);
+  return WireFormatLite::SkipMessage(input, &coded_stream);
+}
+
+}  // namespace internal
+}  // namespace protobuf
+}  // namespace google
