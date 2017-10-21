@@ -59,6 +59,37 @@ load(
     "internal_protobuf_py_tests",
 )
 
+config_setting(
+    name = "ios_armv7",
+    values = {
+        "ios_cpu": "armv7",
+    },
+)
+
+config_setting(
+    name = "ios_armv7s",
+    values = {
+        "ios_cpu": "armv7s",
+    },
+)
+
+config_setting(
+    name = "ios_arm64",
+    values = {
+        "ios_cpu": "arm64",
+    },
+)
+
+IOS_ARM_COPTS = [
+    "-DOS_IOS",
+    "-miphoneos-version-min=7.0",
+    "-arch armv7",
+    "-arch armv7s",
+    "-arch arm64",
+    "-D__thread=",
+    "-isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS9.2.sdk/",
+]
+
 cc_library(
     name = "protobuf_lite",
     srcs = [
@@ -90,7 +121,12 @@ cc_library(
         "src/google/protobuf/wire_format_lite.cc",
     ],
     hdrs = glob(["src/google/protobuf/**/*.h"]),
-    copts = COPTS,
+    copts = select({
+        ":ios_armv7": IOS_ARM_COPTS,
+        ":ios_armv7s": IOS_ARM_COPTS,
+        ":ios_arm64": IOS_ARM_COPTS,
+        "//conditions:default": [],
+    }) + COPTS,
     includes = ["src/"],
     linkopts = LINK_OPTS,
     visibility = ["//visibility:public"],
@@ -157,7 +193,12 @@ cc_library(
         "src/google/protobuf/wrappers.pb.cc",
     ],
     hdrs = glob(["src/**/*.h"]),
-    copts = COPTS,
+    copts = select({
+        ":ios_armv7": IOS_ARM_COPTS,
+        ":ios_armv7s": IOS_ARM_COPTS,
+        ":ios_arm64": IOS_ARM_COPTS,
+        "//conditions:default": [],
+    }) + COPTS,
     includes = ["src/"],
     linkopts = LINK_OPTS,
     visibility = ["//visibility:public"],
@@ -183,21 +224,24 @@ objc_library(
     visibility = ["//visibility:public"],
 )
 
-RELATIVE_WELL_KNOWN_PROTOS = [
-    # AUTOGEN(well_known_protos)
-    "google/protobuf/any.proto",
-    "google/protobuf/api.proto",
-    "google/protobuf/compiler/plugin.proto",
-    "google/protobuf/descriptor.proto",
-    "google/protobuf/duration.proto",
-    "google/protobuf/empty.proto",
-    "google/protobuf/field_mask.proto",
-    "google/protobuf/source_context.proto",
-    "google/protobuf/struct.proto",
-    "google/protobuf/timestamp.proto",
-    "google/protobuf/type.proto",
-    "google/protobuf/wrappers.proto",
-]
+# Map of all well known protos.
+# name => (include path, imports)
+WELL_KNOWN_PROTO_MAP = {
+    "any" : ("google/protobuf/any.proto", []),
+    "api" : ("google/protobuf/api.proto", ["source_context", "type"]),
+    "compiler_plugin" : ("google/protobuf/compiler/plugin.proto", ["descriptor"]),
+    "descriptor" : ("google/protobuf/descriptor.proto", []),
+    "duration" : ("google/protobuf/duration.proto", []),
+    "empty" : ("google/protobuf/empty.proto", []),
+    "field_mask" : ("google/protobuf/field_mask.proto", []),
+    "source_context" : ("google/protobuf/source_context.proto", []),
+    "struct" : ("google/protobuf/struct.proto", []),
+    "timestamp" : ("google/protobuf/timestamp.proto", []),
+    "type" : ("google/protobuf/type.proto", ["any", "source_context"]),
+    "wrappers" : ("google/protobuf/wrappers.proto", []),
+}
+
+RELATIVE_WELL_KNOWN_PROTOS = [proto[1][0] for proto in WELL_KNOWN_PROTO_MAP.items()]
 
 WELL_KNOWN_PROTOS = ["src/" + s for s in RELATIVE_WELL_KNOWN_PROTOS]
 
@@ -216,6 +260,33 @@ cc_proto_library(
     protoc = ":protoc",
     visibility = ["//visibility:public"],
 )
+
+################################################################################
+# Well Known Types Proto Library Rules
+#
+# These proto_library rules can be used with one of the language specific proto
+# library rules i.e. java_proto_library:
+#
+# java_proto_library(
+#   name = "any_java_proto",
+#   deps = ["@com_google_protobuf//:any_proto],
+# )
+################################################################################
+
+internal_copied_filegroup(
+    name = "_internal_wkt_protos",
+    srcs = WELL_KNOWN_PROTOS,
+    dest = "",
+    strip_prefix = "src",
+    visibility = ["//visibility:hidden"],
+)
+
+[proto_library(
+    name = proto[0] + "_proto",
+    srcs = [proto[1][0]],
+    deps = [dep + "_proto" for dep in proto[1][1]],
+    visibility = ["//visibility:public"],
+    ) for proto in WELL_KNOWN_PROTO_MAP.items()]
 
 ################################################################################
 # Protocol Buffers Compiler
@@ -255,6 +326,7 @@ cc_library(
         "src/google/protobuf/compiler/cpp/cpp_map_field.cc",
         "src/google/protobuf/compiler/cpp/cpp_message.cc",
         "src/google/protobuf/compiler/cpp/cpp_message_field.cc",
+        "src/google/protobuf/compiler/cpp/cpp_padding_optimizer.cc",
         "src/google/protobuf/compiler/cpp/cpp_primitive_field.cc",
         "src/google/protobuf/compiler/cpp/cpp_service.cc",
         "src/google/protobuf/compiler/cpp/cpp_string_field.cc",
@@ -544,7 +616,6 @@ cc_test(
         # Files for csharp_bootstrap_unittest.cc.
         "conformance/**/*",
         "csharp/src/**/*",
-        "examples/**/*",
     ]),
     includes = [
         "src/",
