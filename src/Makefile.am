@@ -564,8 +564,8 @@ protoc_inputs =                                                   \
   google/protobuf/unittest_preserve_unknown_enum.proto            \
   google/protobuf/unittest.proto                                  \
   google/protobuf/unittest_proto3_arena.proto                     \
-  google/protobuf/unittest_proto3_arena_lite.proto                     \
-  google/protobuf/unittest_proto3_lite.proto                     \
+  google/protobuf/unittest_proto3_arena_lite.proto                \
+  google/protobuf/unittest_proto3_lite.proto                      \
   google/protobuf/unittest_well_known_types.proto                 \
   google/protobuf/util/internal/testdata/anys.proto               \
   google/protobuf/util/internal/testdata/books.proto              \
@@ -586,6 +586,12 @@ EXTRA_DIST =                                                   \
   $(protoc_inputs)                                             \
   $(js_well_known_types_sources)                               \
   solaris/libstdc++.la                                         \
+  google/protobuf/unittest_proto3.proto                        \
+  google/protobuf/unittest_import_public_proto3.proto          \
+  google/protobuf/unittest_import_proto3.proto                 \
+  google/protobuf/test_messages_proto3.proto                   \
+  google/protobuf/test_messages_proto2.proto                   \
+  google/protobuf/map_unittest_proto3.proto                    \
   google/protobuf/io/gzip_stream.h                             \
   google/protobuf/io/gzip_stream_unittest.sh                   \
   google/protobuf/testdata/golden_message                      \
@@ -807,6 +813,8 @@ protobuf_test_SOURCES =                                        \
   google/protobuf/io/printer_unittest.cc                       \
   google/protobuf/io/tokenizer_unittest.cc                     \
   google/protobuf/io/zero_copy_stream_unittest.cc              \
+  google/protobuf/compiler/annotation_test_util.h              \
+  google/protobuf/compiler/annotation_test_util.cc             \
   google/protobuf/compiler/command_line_interface_unittest.cc  \
   google/protobuf/compiler/importer_unittest.cc                \
   google/protobuf/compiler/mock_code_generator.cc              \
