@@ -248,12 +248,9 @@ void FileGenerator::Generate(io::Printer* printer) {
   PrintGeneratedAnnotation(
       printer, '$', options_.annotate_code ? classname_ + ".java.pb.meta" : "");
   printer->Print(
-      "$deprecation$public final class $classname$ {\n"
+      "public final class $classname$ {\n"
       "  private $ctor$() {}\n",
-      "deprecation", file_->options().deprecated() ?
-          "@java.lang.Deprecated " : "",
-      "classname", classname_,
-      "ctor", classname_);
+      "classname", classname_, "ctor", classname_);
   printer->Annotate("classname", file_->name());
   printer->Indent();
 
