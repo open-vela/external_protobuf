@@ -2591,14 +2591,13 @@ static void MergeRepeatedNotPackedFieldFromCodedInputStream(
   if (other == self) {
     return YES;
   }
-  if (![other isKindOfClass:[GPBMessage class]]) {
+  if (![other isKindOfClass:[self class]] &&
+      ![self isKindOfClass:[other class]]) {
     return NO;
   }
+
   GPBMessage *otherMsg = other;
   GPBDescriptor *descriptor = [[self class] descriptor];
-  if ([[otherMsg class] descriptor] != descriptor) {
-    return NO;
-  }
   uint8_t *selfStorage = (uint8_t *)messageStorage_;
   uint8_t *otherStorage = (uint8_t *)otherMsg->messageStorage_;
 
