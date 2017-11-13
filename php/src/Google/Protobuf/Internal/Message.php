@@ -833,8 +833,6 @@ class Message
                 }
                 return $value;
             case GPBType::INT32:
-            case GPBType::SINT32:
-            case GPBType::SFIXED32:
                 if (is_null($value)) {
                     return $this->defaultValue($field);
                 }
@@ -852,7 +850,6 @@ class Message
                 }
                 return $value;
             case GPBType::UINT32:
-            case GPBType::FIXED32:
                 if (is_null($value)) {
                     return $this->defaultValue($field);
                 }
@@ -866,8 +863,6 @@ class Message
                 }
                 return $value;
             case GPBType::INT64:
-            case GPBType::SINT64:
-            case GPBType::SFIXED64:
                 if (is_null($value)) {
                     return $this->defaultValue($field);
                 }
@@ -885,7 +880,6 @@ class Message
                 }
                 return $value;
             case GPBType::UINT64:
-            case GPBType::FIXED64:
                 if (is_null($value)) {
                     return $this->defaultValue($field);
                 }
@@ -899,6 +893,11 @@ class Message
                 }
                 if (bccomp($value, "9223372036854775807") > 0) {
                     $value = bcsub($value, "18446744073709551616");
+                }
+                return $value;
+            case GPBType::FIXED64:
+                if (is_null($value)) {
+                    return $this->defaultValue($field);
                 }
                 return $value;
             default:
