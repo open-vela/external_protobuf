@@ -57,7 +57,7 @@ namespace protobuf {
 // them like we do below.
 #endif
 
-#ifdef _WIN32
+#ifdef _MSC_VER
 using google::protobuf::internal::win32::access;
 using google::protobuf::internal::win32::chdir;
 using google::protobuf::internal::win32::fopen;
