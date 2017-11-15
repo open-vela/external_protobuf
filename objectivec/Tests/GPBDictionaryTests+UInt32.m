@@ -45,6 +45,7 @@
 
 // To let the testing macros work, add some extra methods to simplify things.
 @interface GPBUInt32EnumDictionary (TestingTweak)
++ (instancetype)dictionaryWithEnum:(int32_t)value forKey:(uint32_t)key;
 - (instancetype)initWithEnums:(const int32_t [])values
                       forKeys:(const uint32_t [])keys
                         count:(NSUInteger)count;
@@ -63,6 +64,14 @@ static BOOL TestingEnum_IsValidValue(int32_t value) {
 }
 
 @implementation GPBUInt32EnumDictionary (TestingTweak)
++ (instancetype)dictionaryWithEnum:(int32_t)value forKey:(uint32_t)key {
+  // Cast is needed to compiler knows what class we are invoking initWithValues: on to get the
+  // type correct.
+  return [[(GPBUInt32EnumDictionary*)[self alloc] initWithValidationFunction:TestingEnum_IsValidValue
+                                                                   rawValues:&value
+                                                                     forKeys:&key
+                                                                       count:1] autorelease];
+}
 - (instancetype)initWithEnums:(const int32_t [])values
                       forKeys:(const uint32_t [])keys
                         count:(NSUInteger)count {
@@ -94,8 +103,7 @@ static BOOL TestingEnum_IsValidValue(int32_t value) {
 }
 
 - (void)testOne {
-  GPBUInt32UInt32Dictionary *dict = [[GPBUInt32UInt32Dictionary alloc] init];
-  [dict setUInt32:100U forKey:1U];
+  GPBUInt32UInt32Dictionary *dict = [GPBUInt32UInt32Dictionary dictionaryWithUInt32:100U forKey:1U];
   XCTAssertNotNil(dict);
   XCTAssertEqual(dict.count, 1U);
   uint32_t value;
@@ -108,7 +116,6 @@ static BOOL TestingEnum_IsValidValue(int32_t value) {
     XCTAssertEqual(aValue, 100U);
     XCTAssertNotEqual(stop, NULL);
   }];
-  [dict release];
 }
 
 - (void)testBasics {
@@ -251,18 +258,17 @@ static BOOL TestingEnum_IsValidValue(int32_t value) {
   XCTAssertNotNil(dict);
 
   GPBUInt32UInt32Dictionary *dict2 =
-      [[GPBUInt32UInt32Dictionary alloc] initWithDictionary:dict];
+      [GPBUInt32UInt32Dictionary dictionaryWithDictionary:dict];
   XCTAssertNotNil(dict2);
 
   // Should be new pointer, but equal objects.
   XCTAssertNotEqual(dict, dict2);
   XCTAssertEqualObjects(dict, dict2);
-  [dict2 release];
   [dict release];
 }
 
 - (void)testAdds {
-  GPBUInt32UInt32Dictionary *dict = [[GPBUInt32UInt32Dictionary alloc] init];
+  GPBUInt32UInt32Dictionary *dict = [GPBUInt32UInt32Dictionary dictionary];
   XCTAssertNotNil(dict);
 
   XCTAssertEqual(dict.count, 0U);
@@ -293,7 +299,6 @@ static BOOL TestingEnum_IsValidValue(int32_t value) {
   XCTAssertTrue([dict getUInt32:&value forKey:4U]);
   XCTAssertEqual(value, 103U);
   [dict2 release];
-  [dict release];
 }
 
 - (void)testRemove {
@@ -455,8 +460,7 @@ static BOOL TestingEnum_IsValidValue(int32_t value) {
 }
 
 - (void)testOne {
-  GPBUInt32Int32Dictionary *dict = [[GPBUInt32Int32Dictionary alloc] init];
-  [dict setInt32:200 forKey:1U];
+  GPBUInt32Int32Dictionary *dict = [GPBUInt32Int32Dictionary dictionaryWithInt32:200 forKey:1U];
   XCTAssertNotNil(dict);
   XCTAssertEqual(dict.count, 1U);
   int32_t value;
@@ -469,7 +473,6 @@ static BOOL TestingEnum_IsValidValue(int32_t value) {
     XCTAssertEqual(aValue, 200);
     XCTAssertNotEqual(stop, NULL);
   }];
-  [dict release];
 }
 
 - (void)testBasics {
@@ -612,18 +615,17 @@ static BOOL TestingEnum_IsValidValue(int32_t value) {
   XCTAssertNotNil(dict);
 
   GPBUInt32Int32Dictionary *dict2 =
-      [[GPBUInt32Int32Dictionary alloc] initWithDictionary:dict];
+      [GPBUInt32Int32Dictionary dictionaryWithDictionary:dict];
   XCTAssertNotNil(dict2);
 
   // Should be new pointer, but equal objects.
   XCTAssertNotEqual(dict, dict2);
   XCTAssertEqualObjects(dict, dict2);
-  [dict2 release];
   [dict release];
 }
 
 - (void)testAdds {
-  GPBUInt32Int32Dictionary *dict = [[GPBUInt32Int32Dictionary alloc] init];
+  GPBUInt32Int32Dictionary *dict = [GPBUInt32Int32Dictionary dictionary];
   XCTAssertNotNil(dict);
 
   XCTAssertEqual(dict.count, 0U);
@@ -654,7 +656,6 @@ static BOOL TestingEnum_IsValidValue(int32_t value) {
   XCTAssertTrue([dict getInt32:&value forKey:4U]);
   XCTAssertEqual(value, 203);
   [dict2 release];
-  [dict release];
 }
 
 - (void)testRemove {
@@ -816,8 +817,7 @@ static BOOL TestingEnum_IsValidValue(int32_t value) {
 }
 
 - (void)testOne {
-  GPBUInt32UInt64Dictionary *dict = [[GPBUInt32UInt64Dictionary alloc] init];
-  [dict setUInt64:300U forKey:1U];
+  GPBUInt32UInt64Dictionary *dict = [GPBUInt32UInt64Dictionary dictionaryWithUInt64:300U forKey:1U];
   XCTAssertNotNil(dict);
   XCTAssertEqual(dict.count, 1U);
   uint64_t value;
@@ -830,7 +830,6 @@ static BOOL TestingEnum_IsValidValue(int32_t value) {
     XCTAssertEqual(aValue, 300U);
     XCTAssertNotEqual(stop, NULL);
   }];
-  [dict release];
 }
 
 - (void)testBasics {
@@ -973,18 +972,17 @@ static BOOL TestingEnum_IsValidValue(int32_t value) {
   XCTAssertNotNil(dict);
 
   GPBUInt32UInt64Dictionary *dict2 =
-      [[GPBUInt32UInt64Dictionary alloc] initWithDictionary:dict];
+      [GPBUInt32UInt64Dictionary dictionaryWithDictionary:dict];
   XCTAssertNotNil(dict2);
 
   // Should be new pointer, but equal objects.
   XCTAssertNotEqual(dict, dict2);
   XCTAssertEqualObjects(dict, dict2);
-  [dict2 release];
   [dict release];
 }
 
 - (void)testAdds {
-  GPBUInt32UInt64Dictionary *dict = [[GPBUInt32UInt64Dictionary alloc] init];
+  GPBUInt32UInt64Dictionary *dict = [GPBUInt32UInt64Dictionary dictionary];
   XCTAssertNotNil(dict);
 
   XCTAssertEqual(dict.count, 0U);
@@ -1015,7 +1013,6 @@ static BOOL TestingEnum_IsValidValue(int32_t value) {
   XCTAssertTrue([dict getUInt64:&value forKey:4U]);
   XCTAssertEqual(value, 303U);
   [dict2 release];
-  [dict release];
 }
 
 - (void)testRemove {
@@ -1177,8 +1174,7 @@ static BOOL TestingEnum_IsValidValue(int32_t value) {
 }
 
 - (void)testOne {
-  GPBUInt32Int64Dictionary *dict = [[GPBUInt32Int64Dictionary alloc] init];
-  [dict setInt64:400 forKey:1U];
+  GPBUInt32Int64Dictionary *dict = [GPBUInt32Int64Dictionary dictionaryWithInt64:400 forKey:1U];
   XCTAssertNotNil(dict);
   XCTAssertEqual(dict.count, 1U);
   int64_t value;
@@ -1191,7 +1187,6 @@ static BOOL TestingEnum_IsValidValue(int32_t value) {
     XCTAssertEqual(aValue, 400);
     XCTAssertNotEqual(stop, NULL);
   }];
-  [dict release];
 }
 
 - (void)testBasics {
@@ -1334,18 +1329,17 @@ static BOOL TestingEnum_IsValidValue(int32_t value) {
   XCTAssertNotNil(dict);
 
   GPBUInt32Int64Dictionary *dict2 =
-      [[GPBUInt32Int64Dictionary alloc] initWithDictionary:dict];
+      [GPBUInt32Int64Dictionary dictionaryWithDictionary:dict];
   XCTAssertNotNil(dict2);
 
   // Should be new pointer, but equal objects.
   XCTAssertNotEqual(dict, dict2);
   XCTAssertEqualObjects(dict, dict2);
-  [dict2 release];
   [dict release];
 }
 
 - (void)testAdds {
-  GPBUInt32Int64Dictionary *dict = [[GPBUInt32Int64Dictionary alloc] init];
+  GPBUInt32Int64Dictionary *dict = [GPBUInt32Int64Dictionary dictionary];
   XCTAssertNotNil(dict);
 
   XCTAssertEqual(dict.count, 0U);
@@ -1376,7 +1370,6 @@ static BOOL TestingEnum_IsValidValue(int32_t value) {
   XCTAssertTrue([dict getInt64:&value forKey:4U]);
   XCTAssertEqual(value, 403);
   [dict2 release];
-  [dict release];
 }
 
 - (void)testRemove {
@@ -1538,8 +1531,7 @@ static BOOL TestingEnum_IsValidValue(int32_t value) {
 }
 
 - (void)testOne {
-  GPBUInt32BoolDictionary *dict = [[GPBUInt32BoolDictionary alloc] init];
-  [dict setBool:YES forKey:1U];
+  GPBUInt32BoolDictionary *dict = [GPBUInt32BoolDictionary dictionaryWithBool:YES forKey:1U];
   XCTAssertNotNil(dict);
   XCTAssertEqual(dict.count, 1U);
   BOOL value;
@@ -1552,7 +1544,6 @@ static BOOL TestingEnum_IsValidValue(int32_t value) {
     XCTAssertEqual(aValue, YES);
     XCTAssertNotEqual(stop, NULL);
   }];
-  [dict release];
 }
 
 - (void)testBasics {
@@ -1695,18 +1686,17 @@ static BOOL TestingEnum_IsValidValue(int32_t value) {
   XCTAssertNotNil(dict);
 
   GPBUInt32BoolDictionary *dict2 =
-      [[GPBUInt32BoolDictionary alloc] initWithDictionary:dict];
+      [GPBUInt32BoolDictionary dictionaryWithDictionary:dict];
   XCTAssertNotNil(dict2);
 
   // Should be new pointer, but equal objects.
   XCTAssertNotEqual(dict, dict2);
   XCTAssertEqualObjects(dict, dict2);
-  [dict2 release];
   [dict release];
 }
 
 - (void)testAdds {
-  GPBUInt32BoolDictionary *dict = [[GPBUInt32BoolDictionary alloc] init];
+  GPBUInt32BoolDictionary *dict = [GPBUInt32BoolDictionary dictionary];
   XCTAssertNotNil(dict);
 
   XCTAssertEqual(dict.count, 0U);
@@ -1737,7 +1727,6 @@ static BOOL TestingEnum_IsValidValue(int32_t value) {
   XCTAssertTrue([dict getBool:&value forKey:4U]);
   XCTAssertEqual(value, NO);
   [dict2 release];
-  [dict release];
 }
 
 - (void)testRemove {
@@ -1899,8 +1888,7 @@ static BOOL TestingEnum_IsValidValue(int32_t value) {
 }
 
 - (void)testOne {
-  GPBUInt32FloatDictionary *dict = [[GPBUInt32FloatDictionary alloc] init];
-  [dict setFloat:500.f forKey:1U];
+  GPBUInt32FloatDictionary *dict = [GPBUInt32FloatDictionary dictionaryWithFloat:500.f forKey:1U];
   XCTAssertNotNil(dict);
   XCTAssertEqual(dict.count, 1U);
   float value;
@@ -1913,7 +1901,6 @@ static BOOL TestingEnum_IsValidValue(int32_t value) {
     XCTAssertEqual(aValue, 500.f);
     XCTAssertNotEqual(stop, NULL);
   }];
-  [dict release];
 }
 
 - (void)testBasics {
@@ -2056,18 +2043,17 @@ static BOOL TestingEnum_IsValidValue(int32_t value) {
   XCTAssertNotNil(dict);
 
   GPBUInt32FloatDictionary *dict2 =
-      [[GPBUInt32FloatDictionary alloc] initWithDictionary:dict];
+      [GPBUInt32FloatDictionary dictionaryWithDictionary:dict];
   XCTAssertNotNil(dict2);
 
   // Should be new pointer, but equal objects.
   XCTAssertNotEqual(dict, dict2);
   XCTAssertEqualObjects(dict, dict2);
-  [dict2 release];
   [dict release];
 }
 
 - (void)testAdds {
-  GPBUInt32FloatDictionary *dict = [[GPBUInt32FloatDictionary alloc] init];
+  GPBUInt32FloatDictionary *dict = [GPBUInt32FloatDictionary dictionary];
   XCTAssertNotNil(dict);
 
   XCTAssertEqual(dict.count, 0U);
@@ -2098,7 +2084,6 @@ static BOOL TestingEnum_IsValidValue(int32_t value) {
   XCTAssertTrue([dict getFloat:&value forKey:4U]);
   XCTAssertEqual(value, 503.f);
   [dict2 release];
-  [dict release];
 }
 
 - (void)testRemove {
@@ -2260,8 +2245,7 @@ static BOOL TestingEnum_IsValidValue(int32_t value) {
 }
 
 - (void)testOne {
-  GPBUInt32DoubleDictionary *dict = [[GPBUInt32DoubleDictionary alloc] init];
-  [dict setDouble:600. forKey:1U];
+  GPBUInt32DoubleDictionary *dict = [GPBUInt32DoubleDictionary dictionaryWithDouble:600. forKey:1U];
   XCTAssertNotNil(dict);
   XCTAssertEqual(dict.count, 1U);
   double value;
@@ -2274,7 +2258,6 @@ static BOOL TestingEnum_IsValidValue(int32_t value) {
     XCTAssertEqual(aValue, 600.);
     XCTAssertNotEqual(stop, NULL);
   }];
-  [dict release];
 }
 
 - (void)testBasics {
@@ -2417,18 +2400,17 @@ static BOOL TestingEnum_IsValidValue(int32_t value) {
   XCTAssertNotNil(dict);
 
   GPBUInt32DoubleDictionary *dict2 =
-      [[GPBUInt32DoubleDictionary alloc] initWithDictionary:dict];
+      [GPBUInt32DoubleDictionary dictionaryWithDictionary:dict];
   XCTAssertNotNil(dict2);
 
   // Should be new pointer, but equal objects.
   XCTAssertNotEqual(dict, dict2);
   XCTAssertEqualObjects(dict, dict2);
-  [dict2 release];
   [dict release];
 }
 
 - (void)testAdds {
-  GPBUInt32DoubleDictionary *dict = [[GPBUInt32DoubleDictionary alloc] init];
+  GPBUInt32DoubleDictionary *dict = [GPBUInt32DoubleDictionary dictionary];
   XCTAssertNotNil(dict);
 
   XCTAssertEqual(dict.count, 0U);
@@ -2459,7 +2441,6 @@ static BOOL TestingEnum_IsValidValue(int32_t value) {
   XCTAssertTrue([dict getDouble:&value forKey:4U]);
   XCTAssertEqual(value, 603.);
   [dict2 release];
-  [dict release];
 }
 
 - (void)testRemove {
@@ -2621,8 +2602,7 @@ static BOOL TestingEnum_IsValidValue(int32_t value) {
 }
 
 - (void)testOne {
-  GPBUInt32EnumDictionary *dict = [[GPBUInt32EnumDictionary alloc] init];
-  [dict setEnum:700 forKey:1U];
+  GPBUInt32EnumDictionary *dict = [GPBUInt32EnumDictionary dictionaryWithEnum:700 forKey:1U];
   XCTAssertNotNil(dict);
   XCTAssertEqual(dict.count, 1U);
   int32_t value;
@@ -2635,7 +2615,6 @@ static BOOL TestingEnum_IsValidValue(int32_t value) {
     XCTAssertEqual(aValue, 700);
     XCTAssertNotEqual(stop, NULL);
   }];
-  [dict release];
 }
 
 - (void)testBasics {
@@ -2778,18 +2757,17 @@ static BOOL TestingEnum_IsValidValue(int32_t value) {
   XCTAssertNotNil(dict);
 
   GPBUInt32EnumDictionary *dict2 =
-      [[GPBUInt32EnumDictionary alloc] initWithDictionary:dict];
+      [GPBUInt32EnumDictionary dictionaryWithDictionary:dict];
   XCTAssertNotNil(dict2);
 
   // Should be new pointer, but equal objects.
   XCTAssertNotEqual(dict, dict2);
   XCTAssertEqualObjects(dict, dict2);
-  [dict2 release];
   [dict release];
 }
 
 - (void)testAdds {
-  GPBUInt32EnumDictionary *dict = [[GPBUInt32EnumDictionary alloc] init];
+  GPBUInt32EnumDictionary *dict = [GPBUInt32EnumDictionary dictionary];
   XCTAssertNotNil(dict);
 
   XCTAssertEqual(dict.count, 0U);
@@ -2820,7 +2798,6 @@ static BOOL TestingEnum_IsValidValue(int32_t value) {
   XCTAssertTrue([dict getEnum:&value forKey:4U]);
   XCTAssertEqual(value, 703);
   [dict2 release];
-  [dict release];
 }
 
 - (void)testRemove {
@@ -3143,20 +3120,19 @@ static BOOL TestingEnum_IsValidValue(int32_t value) {
   XCTAssertNotNil(dict);
 
   GPBUInt32EnumDictionary *dict2 =
-      [[GPBUInt32EnumDictionary alloc] initWithDictionary:dict];
+      [GPBUInt32EnumDictionary dictionaryWithDictionary:dict];
   XCTAssertNotNil(dict2);
 
   // Should be new pointer, but equal objects.
   XCTAssertNotEqual(dict, dict2);
   XCTAssertEqualObjects(dict, dict2);
   XCTAssertEqual(dict.validationFunc, dict2.validationFunc);  // Pointer comparison
-  [dict2 release];
   [dict release];
 }
 
 - (void)testUnknownAdds {
   GPBUInt32EnumDictionary *dict =
-      [[GPBUInt32EnumDictionary alloc] initWithValidationFunction:TestingEnum_IsValidValue];
+    [GPBUInt32EnumDictionary dictionaryWithValidationFunction:TestingEnum_IsValidValue];
   XCTAssertNotNil(dict);
 
   XCTAssertEqual(dict.count, 0U);
@@ -3196,7 +3172,6 @@ static BOOL TestingEnum_IsValidValue(int32_t value) {
   XCTAssertTrue([dict getRawValue:&value forKey:4U]);
   XCTAssertEqual(value, 803);
   [dict2 release];
-  [dict release];
 }
 
 - (void)testUnknownRemove {
@@ -3400,8 +3375,7 @@ static BOOL TestingEnum_IsValidValue(int32_t value) {
 }
 
 - (void)testOne {
-  GPBUInt32ObjectDictionary<NSString*> *dict = [[GPBUInt32ObjectDictionary alloc] init];
-  [dict setObject:@"abc" forKey:1U];
+  GPBUInt32ObjectDictionary<NSString*> *dict = [GPBUInt32ObjectDictionary dictionaryWithObject:@"abc" forKey:1U];
   XCTAssertNotNil(dict);
   XCTAssertEqual(dict.count, 1U);
   XCTAssertEqualObjects([dict objectForKey:1U], @"abc");
@@ -3411,7 +3385,6 @@ static BOOL TestingEnum_IsValidValue(int32_t value) {
     XCTAssertEqualObjects(aObject, @"abc");
     XCTAssertNotEqual(stop, NULL);
   }];
-  [dict release];
 }
 
 - (void)testBasics {
@@ -3547,18 +3520,17 @@ static BOOL TestingEnum_IsValidValue(int32_t value) {
   XCTAssertNotNil(dict);
 
   GPBUInt32ObjectDictionary<NSString*> *dict2 =
-      [[GPBUInt32ObjectDictionary alloc] initWithDictionary:dict];
+      [GPBUInt32ObjectDictionary dictionaryWithDictionary:dict];
   XCTAssertNotNil(dict2);
 
   // Should be new pointer, but equal objects.
   XCTAssertNotEqual(dict, dict2);
   XCTAssertEqualObjects(dict, dict2);
-  [dict2 release];
   [dict release];
 }
 
 - (void)testAdds {
-  GPBUInt32ObjectDictionary<NSString*> *dict = [[GPBUInt32ObjectDictionary alloc] init];
+  GPBUInt32ObjectDictionary<NSString*> *dict = [GPBUInt32ObjectDictionary dictionary];
   XCTAssertNotNil(dict);
 
   XCTAssertEqual(dict.count, 0U);
@@ -3580,7 +3552,6 @@ static BOOL TestingEnum_IsValidValue(int32_t value) {
   XCTAssertEqualObjects([dict objectForKey:3U], @"ghi");
   XCTAssertEqualObjects([dict objectForKey:4U], @"jkl");
   [dict2 release];
-  [dict release];
 }
 
 - (void)testRemove {
