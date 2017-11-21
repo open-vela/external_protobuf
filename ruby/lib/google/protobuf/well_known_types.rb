@@ -149,8 +149,6 @@ module Google
     Struct.class_eval do
       def [](key)
         self.fields[key].to_ruby
-      rescue NoMethodError
-        nil
       end
 
       def []=(key, value)
@@ -171,10 +169,6 @@ module Google
         ret = Struct.new
         hash.each { |key, val| ret[key] = val }
         ret
-      end
-
-      def has_key?(key)
-        self.fields.has_key?(key)
       end
     end
 
