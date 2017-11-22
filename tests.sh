@@ -87,7 +87,9 @@ build_cpp_distcheck() {
 }
 
 build_csharp() {
-  # Required for conformance tests and to regenerate protos.
+  # Just for the conformance tests. We don't currently
+  # need to really build protoc, but it's simplest to keep with the
+  # conventions of the other builds.
   internal_build_cpp
   NUGET=/usr/local/bin/nuget.exe
 
@@ -102,10 +104,6 @@ build_csharp() {
   (cd dotnettmp; dotnet new > /dev/null)
   rm -rf dotnettmp
 
-  # Check that the protos haven't broken C# codegen.
-  # TODO(jonskeet): Fail if regenerating creates any changes.
-  csharp/generate_protos.sh
-  
   csharp/buildall.sh
   cd conformance && make test_csharp && cd ..
 
