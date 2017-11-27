@@ -127,9 +127,6 @@ class DescriptorPool(object):
     self._service_descriptors = {}
     self._file_descriptors = {}
     self._toplevel_extensions = {}
-    # TODO(jieluo): Remove _file_desc_by_toplevel_extension after
-    # maybe year 2020 for compatibility issue (with 3.4.1 only).
-    self._file_desc_by_toplevel_extension = {}
     # We store extensions in two two-level mappings: The first key is the
     # descriptor of the message being extended, the second key is the extension
     # full name or its tag number.
@@ -255,12 +252,6 @@ class DescriptorPool(object):
     """
 
     self._AddFileDescriptor(file_desc)
-    # TODO(jieluo): This is a temporary solution for FieldDescriptor.file.
-    # FieldDescriptor.file is added in code gen. Remove this solution after
-    # maybe 2020 for compatibility reason (with 3.4.1 only).
-    for extension in file_desc.extensions_by_name.values():
-      self._file_desc_by_toplevel_extension[
-          extension.full_name] = file_desc
 
   def _AddFileDescriptor(self, file_desc):
     """Adds a FileDescriptor to the pool, non-recursively.
@@ -340,7 +331,7 @@ class DescriptorPool(object):
       pass
 
     try:
-      return self._file_desc_by_toplevel_extension[symbol]
+      return self._toplevel_extensions[symbol].file
     except KeyError:
       pass
 
