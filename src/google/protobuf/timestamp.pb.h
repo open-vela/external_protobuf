@@ -57,11 +57,6 @@ LIBPROTOBUF_EXPORT extern TimestampDefaultTypeInternal _Timestamp_default_instan
 }  // namespace google
 namespace google {
 namespace protobuf {
-template<> LIBPROTOBUF_EXPORT ::google::protobuf::Timestamp* Arena::CreateMessage< ::google::protobuf::Timestamp>(Arena*);
-}  // namespace protobuf
-}  // namespace google
-namespace google {
-namespace protobuf {
 
 // ===================================================================
 
@@ -116,13 +111,9 @@ class LIBPROTOBUF_EXPORT Timestamp : public ::google::protobuf::Message /* @@pro
 
   // implements Message ----------------------------------------------
 
-  inline Timestamp* New() const PROTOBUF_FINAL {
-    return ::google::protobuf::Arena::CreateMessage<Timestamp>(NULL);
-  }
+  inline Timestamp* New() const PROTOBUF_FINAL { return New(NULL); }
 
-  Timestamp* New(::google::protobuf::Arena* arena) const PROTOBUF_FINAL {
-    return ::google::protobuf::Arena::CreateMessage<Timestamp>(arena);
-  }
+  Timestamp* New(::google::protobuf::Arena* arena) const PROTOBUF_FINAL;
   void CopyFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
   void MergeFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
   void CopyFrom(const Timestamp& from);

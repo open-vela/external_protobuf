@@ -4,6 +4,7 @@
 
 namespace Google\Protobuf;
 
+use Google\Protobuf\Internal\DescriptorPool;
 use Google\Protobuf\Internal\GPBType;
 use Google\Protobuf\Internal\GPBUtil;
 use Google\Protobuf\Internal\Message;
@@ -216,7 +217,7 @@ class Any extends \Google\Protobuf\Internal\Message
             substr($this->type_url, $url_prifix_len);
 
         // Create message according to fully qualified name.
-        $pool = \Google\Protobuf\Internal\DescriptorPool::getGeneratedPool();
+        $pool = DescriptorPool::getGeneratedPool();
         $desc = $pool->getDescriptorByProtoName( ".".$fully_qualifed_name);
         if (is_null($desc)) {
             throw new \Exception("Class ".$fully_qualifed_name
@@ -247,7 +248,7 @@ class Any extends \Google\Protobuf\Internal\Message
         $this->value = $msg->serializeToString();
 
         // Set type url.
-        $pool = \Google\Protobuf\Internal\DescriptorPool::getGeneratedPool();
+        $pool = DescriptorPool::getGeneratedPool();
         $desc = $pool->getDescriptorByClassName(get_class($msg));
         $fully_qualifed_name = $desc->getFullName();
         $this->type_url = GPBUtil::TYPE_URL_PREFIX.substr(
@@ -261,7 +262,7 @@ class Any extends \Google\Protobuf\Internal\Message
      */
     public function is($klass)
     {
-        $pool = \Google\Protobuf\Internal\DescriptorPool::getGeneratedPool();
+        $pool = DescriptorPool::getGeneratedPool();
         $desc = $pool->getDescriptorByClassName($klass);
         $fully_qualifed_name = $desc->getFullName();
         $type_url = GPBUtil::TYPE_URL_PREFIX.substr(

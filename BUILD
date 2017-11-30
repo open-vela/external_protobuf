@@ -24,8 +24,6 @@ COPTS = select({
         "-Woverloaded-virtual",
         "-Wno-sign-compare",
         "-Wno-unused-function",
-        # Prevents ISO C++ const string assignment warnings for pyext sources.
-        "-Wno-writable-strings",
     ],
 })
 
