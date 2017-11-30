@@ -43,15 +43,13 @@ MapFieldBase::~MapFieldBase() {
 
 const RepeatedPtrFieldBase& MapFieldBase::GetRepeatedField() const {
   SyncRepeatedFieldWithMap();
-  return *reinterpret_cast< ::google::protobuf::internal::RepeatedPtrFieldBase*>(
-      repeated_field_);
+  return *repeated_field_;
 }
 
 RepeatedPtrFieldBase* MapFieldBase::MutableRepeatedField() {
   SyncRepeatedFieldWithMap();
   SetRepeatedDirty();
-  return reinterpret_cast< ::google::protobuf::internal::RepeatedPtrFieldBase*>(
-      repeated_field_);
+  return repeated_field_;
 }
 
 size_t MapFieldBase::SpaceUsedExcludingSelfLong() const {
@@ -132,7 +130,6 @@ DynamicMapField::DynamicMapField(const Message* default_entry)
 DynamicMapField::DynamicMapField(const Message* default_entry,
                                  Arena* arena)
     : TypeDefinedMapFieldBase<MapKey, MapValueRef>(arena),
-      map_(arena),
       default_entry_(default_entry) {
 }
 

@@ -37,7 +37,7 @@
 #include "upb.h"
 
 #define PHP_PROTOBUF_EXTNAME "protobuf"
-#define PHP_PROTOBUF_VERSION "3.5.0"
+#define PHP_PROTOBUF_VERSION "3.4.1"
 
 #define MAX_LENGTH_OF_INT64 20
 #define SIZEOF_INT64 8
@@ -957,7 +957,6 @@ PHP_METHOD(Message, serializeToString);
 PHP_METHOD(Message, mergeFromString);
 PHP_METHOD(Message, serializeToJsonString);
 PHP_METHOD(Message, mergeFromJsonString);
-PHP_METHOD(Message, discardUnknownFields);
 
 // -----------------------------------------------------------------------------
 // Type check / conversion.
