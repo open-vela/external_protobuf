@@ -54,7 +54,6 @@ struct Options {
         table_driven_parsing(false),
         table_driven_serialization(false),
         lite_implicit_weak_fields(false),
-        num_cc_files(0),
         access_info_map(NULL) {}
 
   string dllexport_decl;
@@ -66,7 +65,6 @@ struct Options {
   bool table_driven_parsing;
   bool table_driven_serialization;
   bool lite_implicit_weak_fields;
-  int num_cc_files;
   string annotation_pragma_name;
   string annotation_guard_name;
   const AccessInfoMap* access_info_map;

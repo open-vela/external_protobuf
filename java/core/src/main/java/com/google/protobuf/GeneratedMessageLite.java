@@ -504,8 +504,11 @@ public abstract class GeneratedMessageLite<
             extends GeneratedMessageLite<MessageType, BuilderType>
             implements ExtendableMessageOrBuilder<MessageType, BuilderType> {
 
-    /** Represents the set of extensions on this message. For use by generated code only. */
-    protected FieldSet<ExtensionDescriptor> extensions = FieldSet.emptySet();
+    /**
+     * Represents the set of extensions on this message. For use by generated
+     * code only.
+     */
+    protected FieldSet<ExtensionDescriptor> extensions = FieldSet.newFieldSet();
 
     @SuppressWarnings("unchecked")
     protected final void mergeExtensionFields(final MessageType other) {
@@ -575,11 +578,7 @@ public abstract class GeneratedMessageLite<
       if (unknown) {  // Unknown field or wrong wire type.  Skip.
         return parseUnknownField(tag, input);
       }
-
-      if (extensions.isImmutable()) {
-        extensions = extensions.clone();
-      }
-
+      
       if (packed) {
         int length = input.readRawVarint32();
         int limit = input.pushLimit(length);
@@ -943,6 +942,12 @@ public abstract class GeneratedMessageLite<
       implements ExtendableMessageOrBuilder<MessageType, BuilderType> {
     protected ExtendableBuilder(MessageType defaultInstance) {
       super(defaultInstance);
+
+      // TODO(dweis): This is kind of an unnecessary clone since we construct a
+      //     new instance in the parent constructor which makes the extensions
+      //     immutable. This extra allocation shouldn't matter in practice
+      //     though.
+      instance.extensions = instance.extensions.clone();
     }
 
     // For immutable message conversion.
@@ -959,15 +964,6 @@ public abstract class GeneratedMessageLite<
 
       super.copyOnWrite();
       instance.extensions = instance.extensions.clone();
-    }
-
-    private FieldSet<ExtensionDescriptor> ensureExtensionsAreMutable() {
-      FieldSet<ExtensionDescriptor> extensions = instance.extensions;
-      if (extensions.isImmutable()) {
-        extensions = extensions.clone();
-        instance.extensions = extensions;
-      }
-      return extensions;
     }
 
     @Override
@@ -1028,8 +1024,7 @@ public abstract class GeneratedMessageLite<
 
       verifyExtensionContainingType(extensionLite);
       copyOnWrite();
-      ensureExtensionsAreMutable()
-          .setField(extensionLite.descriptor, extensionLite.toFieldSetType(value));
+      instance.extensions.setField(extensionLite.descriptor, extensionLite.toFieldSetType(value));
       return (BuilderType) this;
     }
 
@@ -1042,9 +1037,8 @@ public abstract class GeneratedMessageLite<
 
       verifyExtensionContainingType(extensionLite);
       copyOnWrite();
-      ensureExtensionsAreMutable()
-          .setRepeatedField(
-              extensionLite.descriptor, index, extensionLite.singularToFieldSetType(value));
+      instance.extensions.setRepeatedField(
+          extensionLite.descriptor, index, extensionLite.singularToFieldSetType(value));
       return (BuilderType) this;
     }
 
@@ -1057,8 +1051,8 @@ public abstract class GeneratedMessageLite<
 
       verifyExtensionContainingType(extensionLite);
       copyOnWrite();
-      ensureExtensionsAreMutable()
-          .addRepeatedField(extensionLite.descriptor, extensionLite.singularToFieldSetType(value));
+      instance.extensions.addRepeatedField(
+          extensionLite.descriptor, extensionLite.singularToFieldSetType(value));
       return (BuilderType) this;
     }
 
@@ -1069,7 +1063,7 @@ public abstract class GeneratedMessageLite<
 
       verifyExtensionContainingType(extensionLite);
       copyOnWrite();
-      ensureExtensionsAreMutable().clearField(extensionLite.descriptor);
+      instance.extensions.clearField(extensionLite.descriptor);
       return (BuilderType) this;
     }
   }
