@@ -48,10 +48,6 @@
 #include <google/protobuf/map_type_handler.h>
 #include <google/protobuf/stubs/hash.h>
 
-#if LANG_CXX11
-#include <initializer_list>
-#endif
-
 namespace google {
 namespace protobuf {
 
@@ -745,7 +741,7 @@ class Map {
           return true;
         }
       } else if (GOOGLE_PREDICT_FALSE(new_size <= lo_cutoff &&
-                                    num_buckets_ > kMinTableSize)) {
+                               num_buckets_ > kMinTableSize)) {
         size_type lg2_of_size_reduction_factor = 1;
         // It's possible we want to shrink a lot here... size() could even be 0.
         // So, estimate how much to shrink by making sure we don't shrink so
@@ -1117,11 +1113,6 @@ class Map {
       }
     }
   }
-#if LANG_CXX11
-  void insert(std::initializer_list<value_type> values) {
-    insert(values.begin(), values.end());
-  }
-#endif
 
   // Erase and clear
   size_type erase(const key_type& key) {
