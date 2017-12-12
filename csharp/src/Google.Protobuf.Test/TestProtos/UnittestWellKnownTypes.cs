@@ -470,8 +470,8 @@ namespace Google.Protobuf.TestProtos {
       if (!object.Equals(StructField, other.StructField)) return false;
       if (!object.Equals(TimestampField, other.TimestampField)) return false;
       if (!object.Equals(TypeField, other.TypeField)) return false;
-      if (DoubleField != other.DoubleField) return false;
-      if (FloatField != other.FloatField) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseNullableDoubleEqualityComparer.Equals(DoubleField, other.DoubleField)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseNullableSingleEqualityComparer.Equals(FloatField, other.FloatField)) return false;
       if (Int64Field != other.Int64Field) return false;
       if (Uint64Field != other.Uint64Field) return false;
       if (Int32Field != other.Int32Field) return false;
@@ -495,8 +495,8 @@ namespace Google.Protobuf.TestProtos {
       if (structField_ != null) hash ^= StructField.GetHashCode();
       if (timestampField_ != null) hash ^= TimestampField.GetHashCode();
       if (typeField_ != null) hash ^= TypeField.GetHashCode();
-      if (doubleField_ != null) hash ^= DoubleField.GetHashCode();
-      if (floatField_ != null) hash ^= FloatField.GetHashCode();
+      if (doubleField_ != null) hash ^= pbc::ProtobufEqualityComparers.BitwiseNullableDoubleEqualityComparer.GetHashCode(DoubleField);
+      if (floatField_ != null) hash ^= pbc::ProtobufEqualityComparers.BitwiseNullableSingleEqualityComparer.GetHashCode(FloatField);
       if (int64Field_ != null) hash ^= Int64Field.GetHashCode();
       if (uint64Field_ != null) hash ^= Uint64Field.GetHashCode();
       if (int32Field_ != null) hash ^= Int32Field.GetHashCode();
@@ -1713,8 +1713,8 @@ namespace Google.Protobuf.TestProtos {
       if (!object.Equals(StructField, other.StructField)) return false;
       if (!object.Equals(TimestampField, other.TimestampField)) return false;
       if (!object.Equals(TypeField, other.TypeField)) return false;
-      if (DoubleField != other.DoubleField) return false;
-      if (FloatField != other.FloatField) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseNullableDoubleEqualityComparer.Equals(DoubleField, other.DoubleField)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseNullableSingleEqualityComparer.Equals(FloatField, other.FloatField)) return false;
       if (Int64Field != other.Int64Field) return false;
       if (Uint64Field != other.Uint64Field) return false;
       if (Int32Field != other.Int32Field) return false;
@@ -1738,8 +1738,8 @@ namespace Google.Protobuf.TestProtos {
       if (oneofFieldCase_ == OneofFieldOneofCase.StructField) hash ^= StructField.GetHashCode();
       if (oneofFieldCase_ == OneofFieldOneofCase.TimestampField) hash ^= TimestampField.GetHashCode();
       if (oneofFieldCase_ == OneofFieldOneofCase.TypeField) hash ^= TypeField.GetHashCode();
-      if (oneofFieldCase_ == OneofFieldOneofCase.DoubleField) hash ^= DoubleField.GetHashCode();
-      if (oneofFieldCase_ == OneofFieldOneofCase.FloatField) hash ^= FloatField.GetHashCode();
+      if (oneofFieldCase_ == OneofFieldOneofCase.DoubleField) hash ^= pbc::ProtobufEqualityComparers.BitwiseNullableDoubleEqualityComparer.GetHashCode(DoubleField);
+      if (oneofFieldCase_ == OneofFieldOneofCase.FloatField) hash ^= pbc::ProtobufEqualityComparers.BitwiseNullableSingleEqualityComparer.GetHashCode(FloatField);
       if (oneofFieldCase_ == OneofFieldOneofCase.Int64Field) hash ^= Int64Field.GetHashCode();
       if (oneofFieldCase_ == OneofFieldOneofCase.Uint64Field) hash ^= Uint64Field.GetHashCode();
       if (oneofFieldCase_ == OneofFieldOneofCase.Int32Field) hash ^= Int32Field.GetHashCode();
@@ -1890,31 +1890,58 @@ namespace Google.Protobuf.TestProtos {
       }
       switch (other.OneofFieldCase) {
         case OneofFieldOneofCase.AnyField:
-          AnyField = other.AnyField;
+          if (AnyField == null) {
+            AnyField = new global::Google.Protobuf.WellKnownTypes.Any();
+          }
+          AnyField.MergeFrom(other.AnyField);
           break;
         case OneofFieldOneofCase.ApiField:
-          ApiField = other.ApiField;
+          if (ApiField == null) {
+            ApiField = new global::Google.Protobuf.WellKnownTypes.Api();
+          }
+          ApiField.MergeFrom(other.ApiField);
           break;
         case OneofFieldOneofCase.DurationField:
-          DurationField = other.DurationField;
+          if (DurationField == null) {
+            DurationField = new global::Google.Protobuf.WellKnownTypes.Duration();
+          }
+          DurationField.MergeFrom(other.DurationField);
           break;
         case OneofFieldOneofCase.EmptyField:
-          EmptyField = other.EmptyField;
+          if (EmptyField == null) {
+            EmptyField = new global::Google.Protobuf.WellKnownTypes.Empty();
+          }
+          EmptyField.MergeFrom(other.EmptyField);
           break;
         case OneofFieldOneofCase.FieldMaskField:
-          FieldMaskField = other.FieldMaskField;
+          if (FieldMaskField == null) {
+            FieldMaskField = new global::Google.Protobuf.WellKnownTypes.FieldMask();
+          }
+          FieldMaskField.MergeFrom(other.FieldMaskField);
           break;
         case OneofFieldOneofCase.SourceContextField:
-          SourceContextField = other.SourceContextField;
+          if (SourceContextField == null) {
+            SourceContextField = new global::Google.Protobuf.WellKnownTypes.SourceContext();
+          }
+          SourceContextField.MergeFrom(other.SourceContextField);
           break;
         case OneofFieldOneofCase.StructField:
-          StructField = other.StructField;
+          if (StructField == null) {
+            StructField = new global::Google.Protobuf.WellKnownTypes.Struct();
+          }
+          StructField.MergeFrom(other.StructField);
           break;
         case OneofFieldOneofCase.TimestampField:
-          TimestampField = other.TimestampField;
+          if (TimestampField == null) {
+            TimestampField = new global::Google.Protobuf.WellKnownTypes.Timestamp();
+          }
+          TimestampField.MergeFrom(other.TimestampField);
           break;
         case OneofFieldOneofCase.TypeField:
-          TypeField = other.TypeField;
+          if (TypeField == null) {
+            TypeField = new global::Google.Protobuf.WellKnownTypes.Type();
+          }
+          TypeField.MergeFrom(other.TypeField);
           break;
         case OneofFieldOneofCase.DoubleField:
           DoubleField = other.DoubleField;
