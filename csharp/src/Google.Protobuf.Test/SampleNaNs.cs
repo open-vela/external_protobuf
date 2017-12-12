@@ -1,5 +1,6 @@
+﻿#region Copyright notice and license
 // Protocol Buffers - Google's data interchange format
-// Copyright 2008 Google Inc.  All rights reserved.
+// Copyright 2017 Google Inc.  All rights reserved.
 // https://developers.google.com/protocol-buffers/
 //
 // Redistribution and use in source and binary forms, with or without
@@ -27,42 +28,26 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#endregion
 
-// Author: kenton@google.com (Kenton Varda)
-//  Based on original Protocol Buffers design by
-//  Sanjay Ghemawat, Jeff Dean, and others.
-//
-// A proto file which is imported by unittest_proto3.proto to test importing.
+using System;
 
-syntax = "proto3";
+namespace Google.Protobuf
+{
+    /// <summary>
+    /// Samples of different not-a-number values, for testing equality comparisons.
+    /// </summary>
+    public static class SampleNaNs
+    {
+        public static double Regular { get; } = double.NaN;
 
-// We don't put this in a package within proto2 because we need to make sure
-// that the generated code doesn't depend on being in the proto2 namespace.
-// In test_util.h we do
-// "using namespace unittest_import = protobuf_unittest_import".
-package protobuf_unittest_import;
+        // Signalling bit is inverted compared with double.NaN. Doesn't really matter
+        // whether that makes it quiet or signalling - it's different.
+        public static double SignallingFlipped { get; } = 
+            BitConverter.Int64BitsToDouble(BitConverter.DoubleToInt64Bits(double.NaN) ^ -0x8000_0000_0000_0000L);
 
-option optimize_for = SPEED;
-option cc_enable_arenas = true;
-
-// Exercise the java_package option.
-option java_package = "com.google.protobuf.test";
-option csharp_namespace = "Google.Protobuf.TestProtos";
-
-// Do not set a java_outer_classname here to verify that Proto2 works without
-// one.
-
-// Test public import
-import public "google/protobuf/unittest_import_public_proto3.proto";
-
-message ImportMessage {
-  int32 d = 1;
+        // A bit in the middle of the mantissa is flipped; this difference is preserved when casting to float.
+        public static double PayloadFlipped { get; } =
+            BitConverter.Int64BitsToDouble(BitConverter.DoubleToInt64Bits(double.NaN) ^ 0x1_0000_0000L);
+    }
 }
-
-enum ImportEnum {
-  IMPORT_ENUM_UNSPECIFIED = 0;
-  IMPORT_FOO = 7;
-  IMPORT_BAR = 8;
-  IMPORT_BAZ = 9;
-}
-
