@@ -57,11 +57,6 @@ LIBPROTOBUF_EXPORT extern FieldMaskDefaultTypeInternal _FieldMask_default_instan
 }  // namespace google
 namespace google {
 namespace protobuf {
-template<> LIBPROTOBUF_EXPORT ::google::protobuf::FieldMask* Arena::Create< ::google::protobuf::FieldMask>(Arena*);
-}  // namespace protobuf
-}  // namespace google
-namespace google {
-namespace protobuf {
 
 // ===================================================================
 
@@ -109,13 +104,9 @@ class LIBPROTOBUF_EXPORT FieldMask : public ::google::protobuf::Message /* @@pro
 
   // implements Message ----------------------------------------------
 
-  inline FieldMask* New() const PROTOBUF_FINAL {
-    return ::google::protobuf::Arena::Create<FieldMask>(NULL);
-  }
+  inline FieldMask* New() const PROTOBUF_FINAL { return New(NULL); }
 
-  FieldMask* New(::google::protobuf::Arena* arena) const PROTOBUF_FINAL {
-    return ::google::protobuf::Arena::Create<FieldMask>(arena);
-  }
+  FieldMask* New(::google::protobuf::Arena* arena) const PROTOBUF_FINAL;
   void CopyFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
   void MergeFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
   void CopyFrom(const FieldMask& from);
