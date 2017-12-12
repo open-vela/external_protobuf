@@ -27,7 +27,7 @@ namespace ProtobufTestMessages.Proto3 {
             "dWYvYW55LnByb3RvGh5nb29nbGUvcHJvdG9idWYvZHVyYXRpb24ucHJvdG8a",
             "IGdvb2dsZS9wcm90b2J1Zi9maWVsZF9tYXNrLnByb3RvGhxnb29nbGUvcHJv",
             "dG9idWYvc3RydWN0LnByb3RvGh9nb29nbGUvcHJvdG9idWYvdGltZXN0YW1w",
-            "LnByb3RvGh5nb29nbGUvcHJvdG9idWYvd3JhcHBlcnMucHJvdG8irDsKElRl",
+            "LnByb3RvGh5nb29nbGUvcHJvdG9idWYvd3JhcHBlcnMucHJvdG8itDsKElRl",
             "c3RBbGxUeXBlc1Byb3RvMxIWCg5vcHRpb25hbF9pbnQzMhgBIAEoBRIWCg5v",
             "cHRpb25hbF9pbnQ2NBgCIAEoAxIXCg9vcHRpb25hbF91aW50MzIYAyABKA0S",
             "FwoPb3B0aW9uYWxfdWludDY0GAQgASgEEhcKD29wdGlvbmFsX3NpbnQzMhgF",
@@ -196,11 +196,11 @@ namespace ProtobufTestMessages.Proto3 {
             "Z0ZvcmVpZ25FbnVtRW50cnkSCwoDa2V5GAEgASgJEjkKBXZhbHVlGAIgASgO",
             "MioucHJvdG9idWZfdGVzdF9tZXNzYWdlcy5wcm90bzMuRm9yZWlnbkVudW06",
             "AjgBIjkKCk5lc3RlZEVudW0SBwoDRk9PEAASBwoDQkFSEAESBwoDQkFaEAIS",
-            "EAoDTkVHEP///////////wFCDQoLb25lb2ZfZmllbGQiGwoORm9yZWlnbk1l",
-            "c3NhZ2USCQoBYxgBIAEoBSpACgtGb3JlaWduRW51bRIPCgtGT1JFSUdOX0ZP",
-            "TxAAEg8KC0ZPUkVJR05fQkFSEAESDwoLRk9SRUlHTl9CQVoQAkI4Cihjb20u",
-            "Z29vZ2xlLnByb3RvYnVmX3Rlc3RfbWVzc2FnZXMucHJvdG8zSAH4AQGiAgZQ",
-            "cm90bzNiBnByb3RvMw=="));
+            "EAoDTkVHEP///////////wFCDQoLb25lb2ZfZmllbGRKBgj1AxD/AyIbCg5G",
+            "b3JlaWduTWVzc2FnZRIJCgFjGAEgASgFKkAKC0ZvcmVpZ25FbnVtEg8KC0ZP",
+            "UkVJR05fRk9PEAASDwoLRk9SRUlHTl9CQVIQARIPCgtGT1JFSUdOX0JBWhAC",
+            "QjgKKGNvbS5nb29nbGUucHJvdG9idWZfdGVzdF9tZXNzYWdlcy5wcm90bzNI",
+            "AfgBAaICBlByb3RvM2IGcHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { global::Google.Protobuf.WellKnownTypes.AnyReflection.Descriptor, global::Google.Protobuf.WellKnownTypes.DurationReflection.Descriptor, global::Google.Protobuf.WellKnownTypes.FieldMaskReflection.Descriptor, global::Google.Protobuf.WellKnownTypes.StructReflection.Descriptor, global::Google.Protobuf.WellKnownTypes.TimestampReflection.Descriptor, global::Google.Protobuf.WellKnownTypes.WrappersReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(new[] {typeof(global::ProtobufTestMessages.Proto3.ForeignEnum), }, new pbr::GeneratedClrTypeInfo[] {
@@ -1730,8 +1730,8 @@ namespace ProtobufTestMessages.Proto3 {
       if (OptionalFixed64 != other.OptionalFixed64) return false;
       if (OptionalSfixed32 != other.OptionalSfixed32) return false;
       if (OptionalSfixed64 != other.OptionalSfixed64) return false;
-      if (OptionalFloat != other.OptionalFloat) return false;
-      if (OptionalDouble != other.OptionalDouble) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(OptionalFloat, other.OptionalFloat)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseDoubleEqualityComparer.Equals(OptionalDouble, other.OptionalDouble)) return false;
       if (OptionalBool != other.OptionalBool) return false;
       if (OptionalString != other.OptionalString) return false;
       if (OptionalBytes != other.OptionalBytes) return false;
@@ -1788,16 +1788,16 @@ namespace ProtobufTestMessages.Proto3 {
       if (OneofBytes != other.OneofBytes) return false;
       if (OneofBool != other.OneofBool) return false;
       if (OneofUint64 != other.OneofUint64) return false;
-      if (OneofFloat != other.OneofFloat) return false;
-      if (OneofDouble != other.OneofDouble) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(OneofFloat, other.OneofFloat)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseDoubleEqualityComparer.Equals(OneofDouble, other.OneofDouble)) return false;
       if (OneofEnum != other.OneofEnum) return false;
       if (OptionalBoolWrapper != other.OptionalBoolWrapper) return false;
       if (OptionalInt32Wrapper != other.OptionalInt32Wrapper) return false;
       if (OptionalInt64Wrapper != other.OptionalInt64Wrapper) return false;
       if (OptionalUint32Wrapper != other.OptionalUint32Wrapper) return false;
       if (OptionalUint64Wrapper != other.OptionalUint64Wrapper) return false;
-      if (OptionalFloatWrapper != other.OptionalFloatWrapper) return false;
-      if (OptionalDoubleWrapper != other.OptionalDoubleWrapper) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseNullableSingleEqualityComparer.Equals(OptionalFloatWrapper, other.OptionalFloatWrapper)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseNullableDoubleEqualityComparer.Equals(OptionalDoubleWrapper, other.OptionalDoubleWrapper)) return false;
       if (OptionalStringWrapper != other.OptionalStringWrapper) return false;
       if (OptionalBytesWrapper != other.OptionalBytesWrapper) return false;
       if(!repeatedBoolWrapper_.Equals(other.repeatedBoolWrapper_)) return false;
@@ -1856,8 +1856,8 @@ namespace ProtobufTestMessages.Proto3 {
       if (OptionalFixed64 != 0UL) hash ^= OptionalFixed64.GetHashCode();
       if (OptionalSfixed32 != 0) hash ^= OptionalSfixed32.GetHashCode();
       if (OptionalSfixed64 != 0L) hash ^= OptionalSfixed64.GetHashCode();
-      if (OptionalFloat != 0F) hash ^= OptionalFloat.GetHashCode();
-      if (OptionalDouble != 0D) hash ^= OptionalDouble.GetHashCode();
+      if (OptionalFloat != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(OptionalFloat);
+      if (OptionalDouble != 0D) hash ^= pbc::ProtobufEqualityComparers.BitwiseDoubleEqualityComparer.GetHashCode(OptionalDouble);
       if (OptionalBool != false) hash ^= OptionalBool.GetHashCode();
       if (OptionalString.Length != 0) hash ^= OptionalString.GetHashCode();
       if (OptionalBytes.Length != 0) hash ^= OptionalBytes.GetHashCode();
@@ -1914,16 +1914,16 @@ namespace ProtobufTestMessages.Proto3 {
       if (oneofFieldCase_ == OneofFieldOneofCase.OneofBytes) hash ^= OneofBytes.GetHashCode();
       if (oneofFieldCase_ == OneofFieldOneofCase.OneofBool) hash ^= OneofBool.GetHashCode();
       if (oneofFieldCase_ == OneofFieldOneofCase.OneofUint64) hash ^= OneofUint64.GetHashCode();
-      if (oneofFieldCase_ == OneofFieldOneofCase.OneofFloat) hash ^= OneofFloat.GetHashCode();
-      if (oneofFieldCase_ == OneofFieldOneofCase.OneofDouble) hash ^= OneofDouble.GetHashCode();
+      if (oneofFieldCase_ == OneofFieldOneofCase.OneofFloat) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(OneofFloat);
+      if (oneofFieldCase_ == OneofFieldOneofCase.OneofDouble) hash ^= pbc::ProtobufEqualityComparers.BitwiseDoubleEqualityComparer.GetHashCode(OneofDouble);
       if (oneofFieldCase_ == OneofFieldOneofCase.OneofEnum) hash ^= OneofEnum.GetHashCode();
       if (optionalBoolWrapper_ != null) hash ^= OptionalBoolWrapper.GetHashCode();
       if (optionalInt32Wrapper_ != null) hash ^= OptionalInt32Wrapper.GetHashCode();
       if (optionalInt64Wrapper_ != null) hash ^= OptionalInt64Wrapper.GetHashCode();
       if (optionalUint32Wrapper_ != null) hash ^= OptionalUint32Wrapper.GetHashCode();
       if (optionalUint64Wrapper_ != null) hash ^= OptionalUint64Wrapper.GetHashCode();
-      if (optionalFloatWrapper_ != null) hash ^= OptionalFloatWrapper.GetHashCode();
-      if (optionalDoubleWrapper_ != null) hash ^= OptionalDoubleWrapper.GetHashCode();
+      if (optionalFloatWrapper_ != null) hash ^= pbc::ProtobufEqualityComparers.BitwiseNullableSingleEqualityComparer.GetHashCode(OptionalFloatWrapper);
+      if (optionalDoubleWrapper_ != null) hash ^= pbc::ProtobufEqualityComparers.BitwiseNullableDoubleEqualityComparer.GetHashCode(OptionalDoubleWrapper);
       if (optionalStringWrapper_ != null) hash ^= OptionalStringWrapper.GetHashCode();
       if (optionalBytesWrapper_ != null) hash ^= OptionalBytesWrapper.GetHashCode();
       hash ^= repeatedBoolWrapper_.GetHashCode();
@@ -2808,7 +2808,10 @@ namespace ProtobufTestMessages.Proto3 {
           OneofUint32 = other.OneofUint32;
           break;
         case OneofFieldOneofCase.OneofNestedMessage:
-          OneofNestedMessage = other.OneofNestedMessage;
+          if (OneofNestedMessage == null) {
+            OneofNestedMessage = new global::ProtobufTestMessages.Proto3.TestAllTypesProto3.Types.NestedMessage();
+          }
+          OneofNestedMessage.MergeFrom(other.OneofNestedMessage);
           break;
         case OneofFieldOneofCase.OneofString:
           OneofString = other.OneofString;
