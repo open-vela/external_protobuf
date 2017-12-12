@@ -29,11 +29,8 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <php.h>
-#include <stdlib.h>
-
-#ifdef PROTOBUF_ENABLE_TIMESTAMP
 #include <ext/date/php_date.h>
-#endif
+#include <stdlib.h>
 
 #include "protobuf.h"
 #include "utf8.h"
@@ -1124,7 +1121,6 @@ PHP_PROTO_FIELD_ACCESSORS(Timestamp, timestamp, Seconds, "seconds")
 PHP_PROTO_FIELD_ACCESSORS(Timestamp, timestamp, Nanos,   "nanos")
 
 PHP_METHOD(Timestamp, fromDateTime) {
-#ifdef PROTOBUF_ENABLE_TIMESTAMP
   zval* datetime;
   zval member;
 
@@ -1133,24 +1129,12 @@ PHP_METHOD(Timestamp, fromDateTime) {
     return;
   }
 
-  // Get timestamp from Datetime object.
-  zval* retval_ptr;
-  zval* function_name;
-  int64_t timestamp;
-
-  MAKE_STD_ZVAL(retval_ptr);
-  MAKE_STD_ZVAL(function_name);
-
-  ZVAL_STRING(function_name, "date_timestamp_get", 1);
-
-  if (call_user_function(EG(function_table), NULL,
-                         function_name, retval_ptr, 1,
-                         &datetime TSRMLS_CC) == SUCCESS) {
-    protobuf_convert_to_int64(retval_ptr, &timestamp);
+  php_date_obj* dateobj = UNBOX(php_date_obj, datetime);
+  if (!dateobj->time->sse_uptodate) {
+    timelib_update_ts(dateobj->time, NULL);
   }
 
-  zval_ptr_dtor(&retval_ptr);
-  zval_ptr_dtor(&function_name);
+  int64_t timestamp = dateobj->time->sse;
 
   // Set seconds
   MessageHeader* self = UNBOX(MessageHeader, getThis());
@@ -1158,22 +1142,16 @@ PHP_METHOD(Timestamp, fromDateTime) {
       upb_msgdef_ntofz(self->descriptor->msgdef, "seconds");
   void* storage = message_data(self);
   void* memory = slot_memory(self->descriptor->layout, storage, field);
-  *(int64_t*)memory = timestamp;
+  *(int64_t*)memory = dateobj->time->sse;
 
   // Set nanos
   field = upb_msgdef_ntofz(self->descriptor->msgdef, "nanos");
   storage = message_data(self);
   memory = slot_memory(self->descriptor->layout, storage, field);
   *(int32_t*)memory = 0;
-
-  RETURN_NULL();
-#else
-  zend_error(E_USER_ERROR, "fromDateTime needs date extension.");
-#endif
 }
 
 PHP_METHOD(Timestamp, toDateTime) {
-#ifdef PROTOBUF_ENABLE_TIMESTAMP
   zval datetime;
   php_date_instantiate(php_date_get_date_ce(), &datetime TSRMLS_CC);
   php_date_obj* dateobj = UNBOX(php_date_obj, &datetime);
@@ -1206,9 +1184,6 @@ PHP_METHOD(Timestamp, toDateTime) {
 
   zval* datetime_ptr = &datetime;
   PHP_PROTO_RETVAL_ZVAL(datetime_ptr);
-#else
-  zend_error(E_USER_ERROR, "toDateTime needs date extension.");
-#endif
 }
 
 // -----------------------------------------------------------------------------
