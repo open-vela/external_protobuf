@@ -51,6 +51,7 @@ namespace Google.Protobuf.Examples.AddressBook {
   /// </summary>
   public sealed partial class Person : pb::IMessage<Person> {
     private static readonly pb::MessageParser<Person> _parser = new pb::MessageParser<Person>(() => new Person());
+    private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pb::MessageParser<Person> Parser { get { return _parser; } }
 
@@ -78,6 +79,7 @@ namespace Google.Protobuf.Examples.AddressBook {
       email_ = other.email_;
       phones_ = other.phones_.Clone();
       LastUpdated = other.lastUpdated_ != null ? other.LastUpdated.Clone() : null;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -160,7 +162,7 @@ namespace Google.Protobuf.Examples.AddressBook {
       if (Email != other.Email) return false;
       if(!phones_.Equals(other.phones_)) return false;
       if (!object.Equals(LastUpdated, other.LastUpdated)) return false;
-      return true;
+      return Equals(_unknownFields, other._unknownFields);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -171,6 +173,9 @@ namespace Google.Protobuf.Examples.AddressBook {
       if (Email.Length != 0) hash ^= Email.GetHashCode();
       hash ^= phones_.GetHashCode();
       if (lastUpdated_ != null) hash ^= LastUpdated.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
       return hash;
     }
 
@@ -198,6 +203,9 @@ namespace Google.Protobuf.Examples.AddressBook {
         output.WriteRawTag(42);
         output.WriteMessage(LastUpdated);
       }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -215,6 +223,9 @@ namespace Google.Protobuf.Examples.AddressBook {
       size += phones_.CalculateSize(_repeated_phones_codec);
       if (lastUpdated_ != null) {
         size += 1 + pb::CodedOutputStream.ComputeMessageSize(LastUpdated);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
       }
       return size;
     }
@@ -240,6 +251,7 @@ namespace Google.Protobuf.Examples.AddressBook {
         }
         LastUpdated.MergeFrom(other.LastUpdated);
       }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -248,7 +260,7 @@ namespace Google.Protobuf.Examples.AddressBook {
       while ((tag = input.ReadTag()) != 0) {
         switch(tag) {
           default:
-            input.SkipLastField();
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 10: {
             Name = input.ReadString();
@@ -289,6 +301,7 @@ namespace Google.Protobuf.Examples.AddressBook {
 
       public sealed partial class PhoneNumber : pb::IMessage<PhoneNumber> {
         private static readonly pb::MessageParser<PhoneNumber> _parser = new pb::MessageParser<PhoneNumber>(() => new PhoneNumber());
+        private pb::UnknownFieldSet _unknownFields;
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
         public static pb::MessageParser<PhoneNumber> Parser { get { return _parser; } }
 
@@ -313,6 +326,7 @@ namespace Google.Protobuf.Examples.AddressBook {
         public PhoneNumber(PhoneNumber other) : this() {
           number_ = other.number_;
           type_ = other.type_;
+          _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
         }
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -357,7 +371,7 @@ namespace Google.Protobuf.Examples.AddressBook {
           }
           if (Number != other.Number) return false;
           if (Type != other.Type) return false;
-          return true;
+          return Equals(_unknownFields, other._unknownFields);
         }
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -365,6 +379,9 @@ namespace Google.Protobuf.Examples.AddressBook {
           int hash = 1;
           if (Number.Length != 0) hash ^= Number.GetHashCode();
           if (Type != 0) hash ^= Type.GetHashCode();
+          if (_unknownFields != null) {
+            hash ^= _unknownFields.GetHashCode();
+          }
           return hash;
         }
 
@@ -383,6 +400,9 @@ namespace Google.Protobuf.Examples.AddressBook {
             output.WriteRawTag(16);
             output.WriteEnum((int) Type);
           }
+          if (_unknownFields != null) {
+            _unknownFields.WriteTo(output);
+          }
         }
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -393,6 +413,9 @@ namespace Google.Protobuf.Examples.AddressBook {
           }
           if (Type != 0) {
             size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) Type);
+          }
+          if (_unknownFields != null) {
+            size += _unknownFields.CalculateSize();
           }
           return size;
         }
@@ -408,6 +431,7 @@ namespace Google.Protobuf.Examples.AddressBook {
           if (other.Type != 0) {
             Type = other.Type;
           }
+          _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
         }
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -416,7 +440,7 @@ namespace Google.Protobuf.Examples.AddressBook {
           while ((tag = input.ReadTag()) != 0) {
             switch(tag) {
               default:
-                input.SkipLastField();
+                _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
                 break;
               case 10: {
                 Number = input.ReadString();
@@ -442,6 +466,7 @@ namespace Google.Protobuf.Examples.AddressBook {
   /// </summary>
   public sealed partial class AddressBook : pb::IMessage<AddressBook> {
     private static readonly pb::MessageParser<AddressBook> _parser = new pb::MessageParser<AddressBook>(() => new AddressBook());
+    private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pb::MessageParser<AddressBook> Parser { get { return _parser; } }
 
@@ -465,6 +490,7 @@ namespace Google.Protobuf.Examples.AddressBook {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public AddressBook(AddressBook other) : this() {
       people_ = other.people_.Clone();
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -496,13 +522,16 @@ namespace Google.Protobuf.Examples.AddressBook {
         return true;
       }
       if(!people_.Equals(other.people_)) return false;
-      return true;
+      return Equals(_unknownFields, other._unknownFields);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override int GetHashCode() {
       int hash = 1;
       hash ^= people_.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
       return hash;
     }
 
@@ -514,12 +543,18 @@ namespace Google.Protobuf.Examples.AddressBook {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void WriteTo(pb::CodedOutputStream output) {
       people_.WriteTo(output, _repeated_people_codec);
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public int CalculateSize() {
       int size = 0;
       size += people_.CalculateSize(_repeated_people_codec);
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
       return size;
     }
 
@@ -529,6 +564,7 @@ namespace Google.Protobuf.Examples.AddressBook {
         return;
       }
       people_.Add(other.people_);
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -537,7 +573,7 @@ namespace Google.Protobuf.Examples.AddressBook {
       while ((tag = input.ReadTag()) != 0) {
         switch(tag) {
           default:
-            input.SkipLastField();
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 10: {
             people_.AddEntriesFrom(input, _repeated_people_codec);
