@@ -72,7 +72,6 @@ cc_library(
         "src/google/protobuf/extension_set.cc",
         "src/google/protobuf/generated_message_table_driven_lite.cc",
         "src/google/protobuf/generated_message_util.cc",
-        "src/google/protobuf/implicit_weak_message.cc",
         "src/google/protobuf/io/coded_stream.cc",
         "src/google/protobuf/io/zero_copy_stream.cc",
         "src/google/protobuf/io/zero_copy_stream_impl_lite.cc",
@@ -735,7 +734,6 @@ py_proto_library(
         ":python_srcs",
         "//external:six",
     ],
-    py_extra_srcs = glob(["python/**/__init__.py"]),
     srcs_version = "PY2AND3",
     visibility = ["//visibility:public"],
 )

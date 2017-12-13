@@ -377,4 +377,3 @@ service TestService {
 message BarRequest  {}
 message BarResponse {}
 
-message TestEmptyMessage {}
