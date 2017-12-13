@@ -57,11 +57,6 @@ LIBPROTOBUF_EXPORT extern SourceContextDefaultTypeInternal _SourceContext_defaul
 }  // namespace google
 namespace google {
 namespace protobuf {
-template<> LIBPROTOBUF_EXPORT ::google::protobuf::SourceContext* Arena::Create< ::google::protobuf::SourceContext>(Arena*);
-}  // namespace protobuf
-}  // namespace google
-namespace google {
-namespace protobuf {
 
 // ===================================================================
 
@@ -109,13 +104,9 @@ class LIBPROTOBUF_EXPORT SourceContext : public ::google::protobuf::Message /* @
 
   // implements Message ----------------------------------------------
 
-  inline SourceContext* New() const PROTOBUF_FINAL {
-    return ::google::protobuf::Arena::Create<SourceContext>(NULL);
-  }
+  inline SourceContext* New() const PROTOBUF_FINAL { return New(NULL); }
 
-  SourceContext* New(::google::protobuf::Arena* arena) const PROTOBUF_FINAL {
-    return ::google::protobuf::Arena::Create<SourceContext>(arena);
-  }
+  SourceContext* New(::google::protobuf::Arena* arena) const PROTOBUF_FINAL;
   void CopyFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
   void MergeFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
   void CopyFrom(const SourceContext& from);

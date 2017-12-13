@@ -57,11 +57,6 @@ LIBPROTOBUF_EXPORT extern DurationDefaultTypeInternal _Duration_default_instance
 }  // namespace google
 namespace google {
 namespace protobuf {
-template<> LIBPROTOBUF_EXPORT ::google::protobuf::Duration* Arena::CreateMessage< ::google::protobuf::Duration>(Arena*);
-}  // namespace protobuf
-}  // namespace google
-namespace google {
-namespace protobuf {
 
 // ===================================================================
 
@@ -116,13 +111,9 @@ class LIBPROTOBUF_EXPORT Duration : public ::google::protobuf::Message /* @@prot
 
   // implements Message ----------------------------------------------
 
-  inline Duration* New() const PROTOBUF_FINAL {
-    return ::google::protobuf::Arena::CreateMessage<Duration>(NULL);
-  }
+  inline Duration* New() const PROTOBUF_FINAL { return New(NULL); }
 
-  Duration* New(::google::protobuf::Arena* arena) const PROTOBUF_FINAL {
-    return ::google::protobuf::Arena::CreateMessage<Duration>(arena);
-  }
+  Duration* New(::google::protobuf::Arena* arena) const PROTOBUF_FINAL;
   void CopyFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
   void MergeFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
   void CopyFrom(const Duration& from);
