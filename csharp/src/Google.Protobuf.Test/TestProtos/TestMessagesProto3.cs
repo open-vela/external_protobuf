@@ -235,6 +235,7 @@ namespace ProtobufTestMessages.Proto3 {
   /// </summary>
   public sealed partial class TestAllTypesProto3 : pb::IMessage<TestAllTypesProto3> {
     private static readonly pb::MessageParser<TestAllTypesProto3> _parser = new pb::MessageParser<TestAllTypesProto3>(() => new TestAllTypesProto3());
+    private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pb::MessageParser<TestAllTypesProto3> Parser { get { return _parser; } }
 
@@ -397,6 +398,7 @@ namespace ProtobufTestMessages.Proto3 {
           break;
       }
 
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1732,8 +1734,8 @@ namespace ProtobufTestMessages.Proto3 {
       if (OptionalFixed64 != other.OptionalFixed64) return false;
       if (OptionalSfixed32 != other.OptionalSfixed32) return false;
       if (OptionalSfixed64 != other.OptionalSfixed64) return false;
-      if (OptionalFloat != other.OptionalFloat) return false;
-      if (OptionalDouble != other.OptionalDouble) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(OptionalFloat, other.OptionalFloat)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseDoubleEqualityComparer.Equals(OptionalDouble, other.OptionalDouble)) return false;
       if (OptionalBool != other.OptionalBool) return false;
       if (OptionalString != other.OptionalString) return false;
       if (OptionalBytes != other.OptionalBytes) return false;
@@ -1790,16 +1792,16 @@ namespace ProtobufTestMessages.Proto3 {
       if (OneofBytes != other.OneofBytes) return false;
       if (OneofBool != other.OneofBool) return false;
       if (OneofUint64 != other.OneofUint64) return false;
-      if (OneofFloat != other.OneofFloat) return false;
-      if (OneofDouble != other.OneofDouble) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(OneofFloat, other.OneofFloat)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseDoubleEqualityComparer.Equals(OneofDouble, other.OneofDouble)) return false;
       if (OneofEnum != other.OneofEnum) return false;
       if (OptionalBoolWrapper != other.OptionalBoolWrapper) return false;
       if (OptionalInt32Wrapper != other.OptionalInt32Wrapper) return false;
       if (OptionalInt64Wrapper != other.OptionalInt64Wrapper) return false;
       if (OptionalUint32Wrapper != other.OptionalUint32Wrapper) return false;
       if (OptionalUint64Wrapper != other.OptionalUint64Wrapper) return false;
-      if (OptionalFloatWrapper != other.OptionalFloatWrapper) return false;
-      if (OptionalDoubleWrapper != other.OptionalDoubleWrapper) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseNullableSingleEqualityComparer.Equals(OptionalFloatWrapper, other.OptionalFloatWrapper)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseNullableDoubleEqualityComparer.Equals(OptionalDoubleWrapper, other.OptionalDoubleWrapper)) return false;
       if (OptionalStringWrapper != other.OptionalStringWrapper) return false;
       if (OptionalBytesWrapper != other.OptionalBytesWrapper) return false;
       if(!repeatedBoolWrapper_.Equals(other.repeatedBoolWrapper_)) return false;
@@ -1842,7 +1844,7 @@ namespace ProtobufTestMessages.Proto3 {
       if (FieldName17 != other.FieldName17) return false;
       if (FieldName18 != other.FieldName18) return false;
       if (OneofFieldCase != other.OneofFieldCase) return false;
-      return true;
+      return Equals(_unknownFields, other._unknownFields);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1858,8 +1860,8 @@ namespace ProtobufTestMessages.Proto3 {
       if (OptionalFixed64 != 0UL) hash ^= OptionalFixed64.GetHashCode();
       if (OptionalSfixed32 != 0) hash ^= OptionalSfixed32.GetHashCode();
       if (OptionalSfixed64 != 0L) hash ^= OptionalSfixed64.GetHashCode();
-      if (OptionalFloat != 0F) hash ^= OptionalFloat.GetHashCode();
-      if (OptionalDouble != 0D) hash ^= OptionalDouble.GetHashCode();
+      if (OptionalFloat != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(OptionalFloat);
+      if (OptionalDouble != 0D) hash ^= pbc::ProtobufEqualityComparers.BitwiseDoubleEqualityComparer.GetHashCode(OptionalDouble);
       if (OptionalBool != false) hash ^= OptionalBool.GetHashCode();
       if (OptionalString.Length != 0) hash ^= OptionalString.GetHashCode();
       if (OptionalBytes.Length != 0) hash ^= OptionalBytes.GetHashCode();
@@ -1916,16 +1918,16 @@ namespace ProtobufTestMessages.Proto3 {
       if (oneofFieldCase_ == OneofFieldOneofCase.OneofBytes) hash ^= OneofBytes.GetHashCode();
       if (oneofFieldCase_ == OneofFieldOneofCase.OneofBool) hash ^= OneofBool.GetHashCode();
       if (oneofFieldCase_ == OneofFieldOneofCase.OneofUint64) hash ^= OneofUint64.GetHashCode();
-      if (oneofFieldCase_ == OneofFieldOneofCase.OneofFloat) hash ^= OneofFloat.GetHashCode();
-      if (oneofFieldCase_ == OneofFieldOneofCase.OneofDouble) hash ^= OneofDouble.GetHashCode();
+      if (oneofFieldCase_ == OneofFieldOneofCase.OneofFloat) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(OneofFloat);
+      if (oneofFieldCase_ == OneofFieldOneofCase.OneofDouble) hash ^= pbc::ProtobufEqualityComparers.BitwiseDoubleEqualityComparer.GetHashCode(OneofDouble);
       if (oneofFieldCase_ == OneofFieldOneofCase.OneofEnum) hash ^= OneofEnum.GetHashCode();
       if (optionalBoolWrapper_ != null) hash ^= OptionalBoolWrapper.GetHashCode();
       if (optionalInt32Wrapper_ != null) hash ^= OptionalInt32Wrapper.GetHashCode();
       if (optionalInt64Wrapper_ != null) hash ^= OptionalInt64Wrapper.GetHashCode();
       if (optionalUint32Wrapper_ != null) hash ^= OptionalUint32Wrapper.GetHashCode();
       if (optionalUint64Wrapper_ != null) hash ^= OptionalUint64Wrapper.GetHashCode();
-      if (optionalFloatWrapper_ != null) hash ^= OptionalFloatWrapper.GetHashCode();
-      if (optionalDoubleWrapper_ != null) hash ^= OptionalDoubleWrapper.GetHashCode();
+      if (optionalFloatWrapper_ != null) hash ^= pbc::ProtobufEqualityComparers.BitwiseNullableSingleEqualityComparer.GetHashCode(OptionalFloatWrapper);
+      if (optionalDoubleWrapper_ != null) hash ^= pbc::ProtobufEqualityComparers.BitwiseNullableDoubleEqualityComparer.GetHashCode(OptionalDoubleWrapper);
       if (optionalStringWrapper_ != null) hash ^= OptionalStringWrapper.GetHashCode();
       if (optionalBytesWrapper_ != null) hash ^= OptionalBytesWrapper.GetHashCode();
       hash ^= repeatedBoolWrapper_.GetHashCode();
@@ -1968,6 +1970,9 @@ namespace ProtobufTestMessages.Proto3 {
       if (FieldName17 != 0) hash ^= FieldName17.GetHashCode();
       if (FieldName18 != 0) hash ^= FieldName18.GetHashCode();
       hash ^= (int) oneofFieldCase_;
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
       return hash;
     }
 
@@ -2280,6 +2285,9 @@ namespace ProtobufTestMessages.Proto3 {
         output.WriteRawTag(144, 26);
         output.WriteInt32(FieldName18);
       }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -2531,6 +2539,9 @@ namespace ProtobufTestMessages.Proto3 {
       }
       if (FieldName18 != 0) {
         size += 2 + pb::CodedOutputStream.ComputeInt32Size(FieldName18);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
       }
       return size;
     }
@@ -2838,6 +2849,7 @@ namespace ProtobufTestMessages.Proto3 {
           break;
       }
 
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -2846,7 +2858,7 @@ namespace ProtobufTestMessages.Proto3 {
       while ((tag = input.ReadTag()) != 0) {
         switch(tag) {
           default:
-            input.SkipLastField();
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 8: {
             OptionalInt32 = input.ReadInt32();
@@ -3419,6 +3431,7 @@ namespace ProtobufTestMessages.Proto3 {
 
       public sealed partial class NestedMessage : pb::IMessage<NestedMessage> {
         private static readonly pb::MessageParser<NestedMessage> _parser = new pb::MessageParser<NestedMessage>(() => new NestedMessage());
+        private pb::UnknownFieldSet _unknownFields;
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
         public static pb::MessageParser<NestedMessage> Parser { get { return _parser; } }
 
@@ -3443,6 +3456,7 @@ namespace ProtobufTestMessages.Proto3 {
         public NestedMessage(NestedMessage other) : this() {
           a_ = other.a_;
           Corecursive = other.corecursive_ != null ? other.Corecursive.Clone() : null;
+          _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
         }
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -3487,7 +3501,7 @@ namespace ProtobufTestMessages.Proto3 {
           }
           if (A != other.A) return false;
           if (!object.Equals(Corecursive, other.Corecursive)) return false;
-          return true;
+          return Equals(_unknownFields, other._unknownFields);
         }
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -3495,6 +3509,9 @@ namespace ProtobufTestMessages.Proto3 {
           int hash = 1;
           if (A != 0) hash ^= A.GetHashCode();
           if (corecursive_ != null) hash ^= Corecursive.GetHashCode();
+          if (_unknownFields != null) {
+            hash ^= _unknownFields.GetHashCode();
+          }
           return hash;
         }
 
@@ -3513,6 +3530,9 @@ namespace ProtobufTestMessages.Proto3 {
             output.WriteRawTag(18);
             output.WriteMessage(Corecursive);
           }
+          if (_unknownFields != null) {
+            _unknownFields.WriteTo(output);
+          }
         }
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -3523,6 +3543,9 @@ namespace ProtobufTestMessages.Proto3 {
           }
           if (corecursive_ != null) {
             size += 1 + pb::CodedOutputStream.ComputeMessageSize(Corecursive);
+          }
+          if (_unknownFields != null) {
+            size += _unknownFields.CalculateSize();
           }
           return size;
         }
@@ -3541,6 +3564,7 @@ namespace ProtobufTestMessages.Proto3 {
             }
             Corecursive.MergeFrom(other.Corecursive);
           }
+          _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
         }
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -3549,7 +3573,7 @@ namespace ProtobufTestMessages.Proto3 {
           while ((tag = input.ReadTag()) != 0) {
             switch(tag) {
               default:
-                input.SkipLastField();
+                _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
                 break;
               case 8: {
                 A = input.ReadInt32();
@@ -3575,6 +3599,7 @@ namespace ProtobufTestMessages.Proto3 {
 
   public sealed partial class ForeignMessage : pb::IMessage<ForeignMessage> {
     private static readonly pb::MessageParser<ForeignMessage> _parser = new pb::MessageParser<ForeignMessage>(() => new ForeignMessage());
+    private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pb::MessageParser<ForeignMessage> Parser { get { return _parser; } }
 
@@ -3598,6 +3623,7 @@ namespace ProtobufTestMessages.Proto3 {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public ForeignMessage(ForeignMessage other) : this() {
       c_ = other.c_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -3630,13 +3656,16 @@ namespace ProtobufTestMessages.Proto3 {
         return true;
       }
       if (C != other.C) return false;
-      return true;
+      return Equals(_unknownFields, other._unknownFields);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override int GetHashCode() {
       int hash = 1;
       if (C != 0) hash ^= C.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
       return hash;
     }
 
@@ -3651,6 +3680,9 @@ namespace ProtobufTestMessages.Proto3 {
         output.WriteRawTag(8);
         output.WriteInt32(C);
       }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -3658,6 +3690,9 @@ namespace ProtobufTestMessages.Proto3 {
       int size = 0;
       if (C != 0) {
         size += 1 + pb::CodedOutputStream.ComputeInt32Size(C);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
       }
       return size;
     }
@@ -3670,6 +3705,7 @@ namespace ProtobufTestMessages.Proto3 {
       if (other.C != 0) {
         C = other.C;
       }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -3678,7 +3714,7 @@ namespace ProtobufTestMessages.Proto3 {
       while ((tag = input.ReadTag()) != 0) {
         switch(tag) {
           default:
-            input.SkipLastField();
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 8: {
             C = input.ReadInt32();

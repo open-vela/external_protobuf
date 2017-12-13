@@ -250,6 +250,7 @@ namespace Google.Protobuf.WellKnownTypes {
   /// </summary>
   public sealed partial class FieldMask : pb::IMessage<FieldMask> {
     private static readonly pb::MessageParser<FieldMask> _parser = new pb::MessageParser<FieldMask>(() => new FieldMask());
+    private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pb::MessageParser<FieldMask> Parser { get { return _parser; } }
 
@@ -273,6 +274,7 @@ namespace Google.Protobuf.WellKnownTypes {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public FieldMask(FieldMask other) : this() {
       paths_ = other.paths_.Clone();
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -307,13 +309,16 @@ namespace Google.Protobuf.WellKnownTypes {
         return true;
       }
       if(!paths_.Equals(other.paths_)) return false;
-      return true;
+      return Equals(_unknownFields, other._unknownFields);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override int GetHashCode() {
       int hash = 1;
       hash ^= paths_.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
       return hash;
     }
 
@@ -325,12 +330,18 @@ namespace Google.Protobuf.WellKnownTypes {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void WriteTo(pb::CodedOutputStream output) {
       paths_.WriteTo(output, _repeated_paths_codec);
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public int CalculateSize() {
       int size = 0;
       size += paths_.CalculateSize(_repeated_paths_codec);
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
       return size;
     }
 
@@ -340,6 +351,7 @@ namespace Google.Protobuf.WellKnownTypes {
         return;
       }
       paths_.Add(other.paths_);
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -348,7 +360,7 @@ namespace Google.Protobuf.WellKnownTypes {
       while ((tag = input.ReadTag()) != 0) {
         switch(tag) {
           default:
-            input.SkipLastField();
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 10: {
             paths_.AddEntriesFrom(input, _repeated_paths_codec);
