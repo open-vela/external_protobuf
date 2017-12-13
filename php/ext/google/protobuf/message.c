@@ -379,7 +379,6 @@ PHP_METHOD(Message, whichOneof) {
     PHP_PROTO_FAKE_SCOPE_BEGIN(LOWER_CLASS##_type);                            \
     zval* value = message_get_property_internal(getThis(), &member TSRMLS_CC); \
     PHP_PROTO_FAKE_SCOPE_END;                                                  \
-    zval_dtor(&member);                                                        \
     PHP_PROTO_RETVAL_ZVAL(value);                                              \
   }                                                                            \
   PHP_METHOD(UPPER_CLASS, set##UPPER_FIELD) {                                  \
@@ -391,7 +390,6 @@ PHP_METHOD(Message, whichOneof) {
     zval member;                                                               \
     PHP_PROTO_ZVAL_STRING(&member, LOWER_FIELD, 1);                            \
     message_set_property_internal(getThis(), &member, value TSRMLS_CC);        \
-    zval_dtor(&member);                                                        \
     PHP_PROTO_RETVAL_ZVAL(getThis());                                          \
   }
 
@@ -404,7 +402,6 @@ PHP_METHOD(Message, whichOneof) {
     message_get_oneof_property_internal(getThis(), &member,                    \
                                         return_value TSRMLS_CC);               \
     PHP_PROTO_FAKE_SCOPE_END;                                                  \
-    zval_dtor(&member);                                                        \
   }                                                                            \
   PHP_METHOD(UPPER_CLASS, set##UPPER_FIELD) {                                  \
     zval* value = NULL;                                                        \
@@ -415,7 +412,6 @@ PHP_METHOD(Message, whichOneof) {
     zval member;                                                               \
     PHP_PROTO_ZVAL_STRING(&member, LOWER_FIELD, 1);                            \
     message_set_property_internal(getThis(), &member, value TSRMLS_CC);        \
-    zval_dtor(&member);                                                        \
     PHP_PROTO_RETVAL_ZVAL(getThis());                                          \
   }
 
