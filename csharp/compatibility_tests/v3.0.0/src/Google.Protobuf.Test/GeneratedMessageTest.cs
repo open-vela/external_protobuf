@@ -638,7 +638,7 @@ namespace Google.Protobuf
         }
 
         [Test]
-        public void DiscardUnknownFields_RealDataStillRead()
+        public void IgnoreUnknownFields_RealDataStillRead()
         {
             var message = SampleMessages.CreateFullTestAllTypes();
             var stream = new MemoryStream();
@@ -652,18 +652,16 @@ namespace Google.Protobuf
 
             stream.Position = 0;
             var parsed = TestAllTypes.Parser.ParseFrom(stream);
-	    // TODO(jieluo): Add test back after DiscardUnknownFields is supported
-            // Assert.AreEqual(message, parsed);
+            Assert.AreEqual(message, parsed);
         }
 
         [Test]
-        public void DiscardUnknownFields_AllTypes()
+        public void IgnoreUnknownFields_AllTypes()
         {
             // Simple way of ensuring we can skip all kinds of fields.
             var data = SampleMessages.CreateFullTestAllTypes().ToByteArray();
             var empty = Empty.Parser.ParseFrom(data);
-	    // TODO(jieluo): Add test back after DiscardUnknownField is supported.
-            // Assert.AreEqual(new Empty(), empty);
+            Assert.AreEqual(new Empty(), empty);
         }
 
         // This was originally seen as a conformance test failure.
