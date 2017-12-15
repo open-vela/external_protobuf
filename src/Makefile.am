@@ -118,7 +118,6 @@ nobase_include_HEADERS =                                         \
   google/protobuf/generated_message_table_driven.h               \
   google/protobuf/generated_message_util.h                       \
   google/protobuf/has_bits.h                                     \
-  google/protobuf/implicit_weak_message.h                        \
   google/protobuf/map_entry.h                                    \
   google/protobuf/map_entry_lite.h                               \
   google/protobuf/map_field.h                                    \
@@ -223,7 +222,6 @@ libprotobuf_lite_la_SOURCES =                                  \
   google/protobuf/generated_message_util.cc                    \
   google/protobuf/generated_message_table_driven_lite.h        \
   google/protobuf/generated_message_table_driven_lite.cc       \
-  google/protobuf/implicit_weak_message.cc                     \
   google/protobuf/message_lite.cc                              \
   google/protobuf/repeated_field.cc                            \
   google/protobuf/wire_format_lite.cc                          \
@@ -527,6 +525,7 @@ js_well_known_types_sources =                                  \
 	google/protobuf/compiler/js/well_known_types/timestamp.js
 # We have to cd to $(srcdir) so that out-of-tree builds work properly.
 google/protobuf/compiler/js/well_known_types_embed.cc: js_embed$(EXEEXT) $(js_well_known_types_sources)
+	mkdir -p `dirname $@` && \
 	oldpwd=`pwd` && cd $(srcdir) && \
 	$$oldpwd/js_embed$(EXEEXT) $(js_well_known_types_sources) > $$oldpwd/$@
 
@@ -588,8 +587,11 @@ EXTRA_DIST =                                                   \
   $(js_well_known_types_sources)                               \
   solaris/libstdc++.la                                         \
   google/protobuf/unittest_proto3.proto                        \
+  google/protobuf/unittest_import_public_proto3.proto          \
+  google/protobuf/unittest_import_proto3.proto                 \
   google/protobuf/test_messages_proto3.proto                   \
   google/protobuf/test_messages_proto2.proto                   \
+  google/protobuf/map_unittest_proto3.proto                    \
   google/protobuf/io/gzip_stream.h                             \
   google/protobuf/io/gzip_stream_unittest.sh                   \
   google/protobuf/testdata/golden_message                      \
