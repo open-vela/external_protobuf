@@ -71,12 +71,9 @@ namespace Google.Protobuf.Collections
         , IReadOnlyDictionary<TKey, TValue>
 #endif
     {
-        private static readonly EqualityComparer<TValue> ValueEqualityComparer = ProtobufEqualityComparers.GetEqualityComparer<TValue>();
-        private static readonly EqualityComparer<TKey> KeyEqualityComparer = ProtobufEqualityComparers.GetEqualityComparer<TKey>();
-
         // TODO: Don't create the map/list until we have an entry. (Assume many maps will be empty.)
         private readonly Dictionary<TKey, LinkedListNode<KeyValuePair<TKey, TValue>>> map =
-            new Dictionary<TKey, LinkedListNode<KeyValuePair<TKey, TValue>>>(KeyEqualityComparer);
+            new Dictionary<TKey, LinkedListNode<KeyValuePair<TKey, TValue>>>();
         private readonly LinkedList<KeyValuePair<TKey, TValue>> list = new LinkedList<KeyValuePair<TKey, TValue>>();
 
         /// <summary>
@@ -134,8 +131,11 @@ namespace Google.Protobuf.Collections
             return map.ContainsKey(key);
         }
 
-        private bool ContainsValue(TValue value) =>
-            list.Any(pair => ValueEqualityComparer.Equals(pair.Value, value));
+        private bool ContainsValue(TValue value)
+        {
+            var comparer = EqualityComparer<TValue>.Default;
+            return list.Any(pair => comparer.Equals(pair.Value, value));
+        }
 
         /// <summary>
         /// Removes the entry identified by the given key from the map.
@@ -293,7 +293,8 @@ namespace Google.Protobuf.Collections
         bool ICollection<KeyValuePair<TKey, TValue>>.Contains(KeyValuePair<TKey, TValue> item)
         {
             TValue value;
-            return TryGetValue(item.Key, out value) && ValueEqualityComparer.Equals(item.Value, value);
+            return TryGetValue(item.Key, out value)
+                && EqualityComparer<TValue>.Default.Equals(item.Value, value);
         }
 
         /// <summary>
@@ -362,12 +363,11 @@ namespace Google.Protobuf.Collections
         /// </returns>
         public override int GetHashCode()
         {
-            var keyComparer = KeyEqualityComparer;
-            var valueComparer = ValueEqualityComparer;
+            var valueComparer = EqualityComparer<TValue>.Default;
             int hash = 0;
             foreach (var pair in list)
             {
-                hash ^= keyComparer.GetHashCode(pair.Key) * 31 + valueComparer.GetHashCode(pair.Value);
+                hash ^= pair.Key.GetHashCode() * 31 + valueComparer.GetHashCode(pair.Value);
             }
             return hash;
         }
@@ -394,7 +394,7 @@ namespace Google.Protobuf.Collections
             {
                 return false;
             }
-            var valueComparer = ValueEqualityComparer;
+            var valueComparer = EqualityComparer<TValue>.Default;
             foreach (var pair in this)
             {
                 TValue value;

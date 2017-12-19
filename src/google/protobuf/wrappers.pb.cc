@@ -463,6 +463,9 @@ const DoubleValue& DoubleValue::default_instance() {
   return *internal_default_instance();
 }
 
+DoubleValue* DoubleValue::New(::google::protobuf::Arena* arena) const {
+  return ::google::protobuf::Arena::CreateMessage<DoubleValue>(arena);
+}
 
 void DoubleValue::Clear() {
 // @@protoc_insertion_point(message_clear_start:google.protobuf.DoubleValue)
@@ -722,6 +725,9 @@ const FloatValue& FloatValue::default_instance() {
   return *internal_default_instance();
 }
 
+FloatValue* FloatValue::New(::google::protobuf::Arena* arena) const {
+  return ::google::protobuf::Arena::CreateMessage<FloatValue>(arena);
+}
 
 void FloatValue::Clear() {
 // @@protoc_insertion_point(message_clear_start:google.protobuf.FloatValue)
@@ -981,6 +987,9 @@ const Int64Value& Int64Value::default_instance() {
   return *internal_default_instance();
 }
 
+Int64Value* Int64Value::New(::google::protobuf::Arena* arena) const {
+  return ::google::protobuf::Arena::CreateMessage<Int64Value>(arena);
+}
 
 void Int64Value::Clear() {
 // @@protoc_insertion_point(message_clear_start:google.protobuf.Int64Value)
@@ -1242,6 +1251,9 @@ const UInt64Value& UInt64Value::default_instance() {
   return *internal_default_instance();
 }
 
+UInt64Value* UInt64Value::New(::google::protobuf::Arena* arena) const {
+  return ::google::protobuf::Arena::CreateMessage<UInt64Value>(arena);
+}
 
 void UInt64Value::Clear() {
 // @@protoc_insertion_point(message_clear_start:google.protobuf.UInt64Value)
@@ -1503,6 +1515,9 @@ const Int32Value& Int32Value::default_instance() {
   return *internal_default_instance();
 }
 
+Int32Value* Int32Value::New(::google::protobuf::Arena* arena) const {
+  return ::google::protobuf::Arena::CreateMessage<Int32Value>(arena);
+}
 
 void Int32Value::Clear() {
 // @@protoc_insertion_point(message_clear_start:google.protobuf.Int32Value)
@@ -1764,6 +1779,9 @@ const UInt32Value& UInt32Value::default_instance() {
   return *internal_default_instance();
 }
 
+UInt32Value* UInt32Value::New(::google::protobuf::Arena* arena) const {
+  return ::google::protobuf::Arena::CreateMessage<UInt32Value>(arena);
+}
 
 void UInt32Value::Clear() {
 // @@protoc_insertion_point(message_clear_start:google.protobuf.UInt32Value)
@@ -2025,6 +2043,9 @@ const BoolValue& BoolValue::default_instance() {
   return *internal_default_instance();
 }
 
+BoolValue* BoolValue::New(::google::protobuf::Arena* arena) const {
+  return ::google::protobuf::Arena::CreateMessage<BoolValue>(arena);
+}
 
 void BoolValue::Clear() {
 // @@protoc_insertion_point(message_clear_start:google.protobuf.BoolValue)
@@ -2289,6 +2310,9 @@ const StringValue& StringValue::default_instance() {
   return *internal_default_instance();
 }
 
+StringValue* StringValue::New(::google::protobuf::Arena* arena) const {
+  return ::google::protobuf::Arena::CreateMessage<StringValue>(arena);
+}
 
 void StringValue::Clear() {
 // @@protoc_insertion_point(message_clear_start:google.protobuf.StringValue)
@@ -2568,6 +2592,9 @@ const BytesValue& BytesValue::default_instance() {
   return *internal_default_instance();
 }
 
+BytesValue* BytesValue::New(::google::protobuf::Arena* arena) const {
+  return ::google::protobuf::Arena::CreateMessage<BytesValue>(arena);
+}
 
 void BytesValue::Clear() {
 // @@protoc_insertion_point(message_clear_start:google.protobuf.BytesValue)
@@ -2763,37 +2790,6 @@ void BytesValue::InternalSwap(BytesValue* other) {
 
 
 // @@protoc_insertion_point(namespace_scope)
-}  // namespace protobuf
-}  // namespace google
-namespace google {
-namespace protobuf {
-template<> GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE ::google::protobuf::DoubleValue* Arena::CreateMessage< ::google::protobuf::DoubleValue >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::google::protobuf::DoubleValue >(arena);
-}
-template<> GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE ::google::protobuf::FloatValue* Arena::CreateMessage< ::google::protobuf::FloatValue >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::google::protobuf::FloatValue >(arena);
-}
-template<> GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE ::google::protobuf::Int64Value* Arena::CreateMessage< ::google::protobuf::Int64Value >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::google::protobuf::Int64Value >(arena);
-}
-template<> GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE ::google::protobuf::UInt64Value* Arena::CreateMessage< ::google::protobuf::UInt64Value >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::google::protobuf::UInt64Value >(arena);
-}
-template<> GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE ::google::protobuf::Int32Value* Arena::CreateMessage< ::google::protobuf::Int32Value >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::google::protobuf::Int32Value >(arena);
-}
-template<> GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE ::google::protobuf::UInt32Value* Arena::CreateMessage< ::google::protobuf::UInt32Value >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::google::protobuf::UInt32Value >(arena);
-}
-template<> GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE ::google::protobuf::BoolValue* Arena::CreateMessage< ::google::protobuf::BoolValue >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::google::protobuf::BoolValue >(arena);
-}
-template<> GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE ::google::protobuf::StringValue* Arena::CreateMessage< ::google::protobuf::StringValue >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::google::protobuf::StringValue >(arena);
-}
-template<> GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE ::google::protobuf::BytesValue* Arena::CreateMessage< ::google::protobuf::BytesValue >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::google::protobuf::BytesValue >(arena);
-}
 }  // namespace protobuf
 }  // namespace google
 
