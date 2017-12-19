@@ -34,7 +34,6 @@
 #include <assert.h>
 
 #include <google/protobuf/arena.h>
-#include <google/protobuf/arenastring.h>
 #include <google/protobuf/map.h>
 #include <google/protobuf/map_type_handler.h>
 #include <google/protobuf/stubs/port.h>
@@ -604,9 +603,7 @@ template <>
 struct FromHelper<WireFormatLite::TYPE_STRING> {
   static ArenaStringPtr From(const string& x) {
     ArenaStringPtr res;
-    TaggedPtr< ::std::string> ptr;
-    ptr.Set(const_cast<string*>(&x));
-    res.UnsafeSetTaggedPointer(ptr);
+    *res.UnsafeRawStringPointer() = const_cast<string*>(&x);
     return res;
   }
 };
@@ -614,9 +611,7 @@ template <>
 struct FromHelper<WireFormatLite::TYPE_BYTES> {
   static ArenaStringPtr From(const string& x) {
     ArenaStringPtr res;
-    TaggedPtr< ::std::string> ptr;
-    ptr.Set(const_cast<string*>(&x));
-    res.UnsafeSetTaggedPointer(ptr);
+    *res.UnsafeRawStringPointer() = const_cast<string*>(&x);
     return res;
   }
 };
