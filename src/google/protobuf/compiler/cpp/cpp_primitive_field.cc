@@ -215,7 +215,7 @@ GenerateInlineAccessorDefinitions(io::Printer* printer) const {
     "inline $type$ $classname$::$name$() const {\n"
     "  // @@protoc_insertion_point(field_get:$full_name$)\n"
     "  if (has_$name$()) {\n"
-    "    return $field_member$;\n"
+    "    return $oneof_prefix$$name$_;\n"
     "  }\n"
     "  return $default$;\n"
     "}\n"
@@ -224,14 +224,14 @@ GenerateInlineAccessorDefinitions(io::Printer* printer) const {
     "    clear_$oneof_name$();\n"
     "    set_has_$name$();\n"
     "  }\n"
-    "  $field_member$ = value;\n"
+    "  $oneof_prefix$$name$_ = value;\n"
     "  // @@protoc_insertion_point(field_set:$full_name$)\n"
     "}\n");
 }
 
 void PrimitiveOneofFieldGenerator::
 GenerateClearingCode(io::Printer* printer) const {
-  printer->Print(variables_, "$field_member$ = $default$;\n");
+  printer->Print(variables_, "$oneof_prefix$$name$_ = $default$;\n");
 }
 
 void PrimitiveOneofFieldGenerator::
@@ -251,7 +251,7 @@ GenerateMergeFromCodedStream(io::Printer* printer) const {
     "clear_$oneof_name$();\n"
     "DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<\n"
     "         $type$, $wire_format_field_type$>(\n"
-    "       input, &$field_member$)));\n"
+    "       input, &$oneof_prefix$$name$_)));\n"
     "set_has_$name$();\n");
 }
 

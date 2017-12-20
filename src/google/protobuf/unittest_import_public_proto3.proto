@@ -28,29 +28,15 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-// Author: kenton@google.com (Kenton Varda)
-//  Based on original Protocol Buffers design by
-//  Sanjay Ghemawat, Jeff Dean, and others.
-//
-// A proto file which is imported by unittest_proto3.proto to test importing.
+// Author: liujisi@google.com (Pherl Liu)
 
 syntax = "proto3";
 
 package protobuf_unittest_import;
 
+option java_package = "com.google.protobuf.test";
 option csharp_namespace = "Google.Protobuf.TestProtos";
 
-// Test public import
-import public "unittest_import_public_proto3.proto";
-
-message ImportMessage {
-  int32 d = 1;
+message PublicImportMessage {
+ int32 e = 1;
 }
-
-enum ImportEnum {
-  IMPORT_ENUM_UNSPECIFIED = 0;
-  IMPORT_FOO = 7;
-  IMPORT_BAR = 8;
-  IMPORT_BAZ = 9;
-}
-
