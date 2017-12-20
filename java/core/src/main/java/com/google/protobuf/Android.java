@@ -28,41 +28,30 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-// Author: kenton@google.com (Kenton Varda)
-//  Based on original Protocol Buffers design by
-//  Sanjay Ghemawat, Jeff Dean, and others.
-//
-// A proto file which is imported by unittest_proto3.proto to test importing.
+package com.google.protobuf;
 
-syntax = "proto3";
+final class Android {
 
-// We don't put this in a package within proto2 because we need to make sure
-// that the generated code doesn't depend on being in the proto2 namespace.
-// In test_util.h we do
-// "using namespace unittest_import = protobuf_unittest_import".
-package protobuf_unittest_import;
+  private static final Class<?> MEMORY_CLASS = getClassForName("libcore.io.Memory");
+  private static final boolean IS_ROBOLECTRIC =
+      getClassForName("org.robolectric.Robolectric") != null;
 
-option optimize_for = SPEED;
-option cc_enable_arenas = true;
+  /** Returns {@code true} if running on an Android device. */
+  static boolean isOnAndroidDevice() {
+    return MEMORY_CLASS != null && !IS_ROBOLECTRIC;
+  }
 
-// Exercise the java_package option.
-option java_package = "com.google.protobuf.test";
-option csharp_namespace = "Google.Protobuf.TestProtos";
+  /** Returns the memory class or {@code null} if not on Android device. */
+  static Class<?> getMemoryClass() {
+    return MEMORY_CLASS;
+  }
 
-// Do not set a java_outer_classname here to verify that Proto2 works without
-// one.
-
-// Test public import
-import public "google/protobuf/unittest_import_public_proto3.proto";
-
-message ImportMessage {
-  int32 d = 1;
+  @SuppressWarnings("unchecked")
+  private static <T> Class<T> getClassForName(String name) {
+    try {
+      return (Class<T>) Class.forName(name);
+    } catch (Throwable e) {
+      return null;
+    }
+  }
 }
-
-enum ImportEnum {
-  IMPORT_ENUM_UNSPECIFIED = 0;
-  IMPORT_FOO = 7;
-  IMPORT_BAR = 8;
-  IMPORT_BAZ = 9;
-}
-
