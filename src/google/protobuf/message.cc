@@ -170,12 +170,12 @@ size_t Message::SpaceUsedLong() const {
 
 bool Message::SerializeToFileDescriptor(int file_descriptor) const {
   io::FileOutputStream output(file_descriptor);
-  return SerializeToZeroCopyStream(&output) && output.Flush();
+  return SerializeToZeroCopyStream(&output);
 }
 
 bool Message::SerializePartialToFileDescriptor(int file_descriptor) const {
   io::FileOutputStream output(file_descriptor);
-  return SerializePartialToZeroCopyStream(&output) && output.Flush();
+  return SerializePartialToZeroCopyStream(&output);
 }
 
 bool Message::SerializeToOstream(std::ostream* output) const {

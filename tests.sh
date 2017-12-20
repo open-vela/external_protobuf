@@ -47,7 +47,7 @@ build_cpp() {
     git submodule init
     git submodule update
     cd third_party/benchmark && cmake -DCMAKE_BUILD_TYPE=Release && make && cd ../..
-    cd benchmarks && make && ./generate-datasets && cd ..
+    cd benchmarks && make cpp-benchmark && cd ..
   else
     echo ""
     echo "WARNING: Skipping validation of the bench marking code, cmake isn't installed."
@@ -87,9 +87,7 @@ build_cpp_distcheck() {
 }
 
 build_csharp() {
-  # Just for the conformance tests. We don't currently
-  # need to really build protoc, but it's simplest to keep with the
-  # conventions of the other builds.
+  # Required for conformance tests and to regenerate protos.
   internal_build_cpp
   NUGET=/usr/local/bin/nuget.exe
 
@@ -104,6 +102,10 @@ build_csharp() {
   (cd dotnettmp; dotnet new > /dev/null)
   rm -rf dotnettmp
 
+  # Check that the protos haven't broken C# codegen.
+  # TODO(jonskeet): Fail if regenerating creates any changes.
+  csharp/generate_protos.sh
+  
   csharp/buildall.sh
   cd conformance && make test_csharp && cd ..
 
