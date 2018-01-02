@@ -483,8 +483,6 @@ class LIBPROTOBUF_EXPORT ExtensionSet {
     }
 
    private:
-    virtual void UnusedKeyMethod();  // Dummy key method to avoid weak vtable.
-
     GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(LazyMessageExtension);
   };
   struct Extension {
