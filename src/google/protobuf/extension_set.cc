@@ -33,7 +33,6 @@
 //  Sanjay Ghemawat, Jeff Dean, and others.
 
 #include <google/protobuf/stubs/hash.h>
-#include <utility>
 #include <google/protobuf/stubs/common.h>
 #include <google/protobuf/stubs/once.h>
 #include <google/protobuf/extension_set.h>
@@ -751,10 +750,8 @@ MessageLite* ExtensionSet::AddMessage(int number, FieldType type,
 
   // RepeatedPtrField<MessageLite> does not know how to Add() since it cannot
   // allocate an abstract object, so we have to be tricky.
-  MessageLite* result =
-      reinterpret_cast< ::google::protobuf::internal::RepeatedPtrFieldBase*>(
-          extension->repeated_message_value)
-          ->AddFromCleared<GenericTypeHandler<MessageLite> >();
+  MessageLite* result = extension->repeated_message_value
+      ->AddFromCleared<GenericTypeHandler<MessageLite> >();
   if (result == NULL) {
     result = prototype.New(arena_);
     extension->repeated_message_value->AddAllocated(result);
@@ -928,10 +925,8 @@ void ExtensionSet::InternalExtensionMergeFrom(
             other_extension.repeated_message_value;
         for (int i = 0; i < other_repeated_message->size(); i++) {
           const MessageLite& other_message = other_repeated_message->Get(i);
-          MessageLite* target =
-              reinterpret_cast< ::google::protobuf::internal::RepeatedPtrFieldBase*>(
-                  extension->repeated_message_value)
-                  ->AddFromCleared<GenericTypeHandler<MessageLite> >();
+          MessageLite* target = extension->repeated_message_value
+                   ->AddFromCleared<GenericTypeHandler<MessageLite> >();
           if (target == NULL) {
             target = other_message.New(arena_);
             extension->repeated_message_value->AddAllocated(target);
@@ -1751,9 +1746,6 @@ void ExtensionSet::Extension::Free() {
 
 // Defined in extension_set_heavy.cc.
 // int ExtensionSet::Extension::SpaceUsedExcludingSelf() const
-
-// Dummy key method to avoid weak vtable.
-void ExtensionSet::LazyMessageExtension::UnusedKeyMethod() {}
 
 // ==================================================================
 // Default repeated field instances for iterator-compatible accessors
