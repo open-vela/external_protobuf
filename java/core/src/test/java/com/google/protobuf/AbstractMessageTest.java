@@ -30,9 +30,6 @@
 
 package com.google.protobuf;
 
-import static com.google.protobuf.TestUtil.TEST_REQUIRED_INITIALIZED;
-import static com.google.protobuf.TestUtil.TEST_REQUIRED_UNINITIALIZED;
-
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import protobuf_unittest.UnittestOptimizeFor.TestOptimizedForSize;
 import protobuf_unittest.UnittestProto;
@@ -349,6 +346,11 @@ public class AbstractMessageTest extends TestCase {
   // -----------------------------------------------------------------
   // Tests for isInitialized().
 
+  private static final TestRequired TEST_REQUIRED_UNINITIALIZED =
+    TestRequired.getDefaultInstance();
+  private static final TestRequired TEST_REQUIRED_INITIALIZED =
+    TestRequired.newBuilder().setA(1).setB(2).setC(3).build();
+
   public void testIsInitialized() throws Exception {
     TestRequired.Builder builder = TestRequired.newBuilder();
     AbstractMessageWrapper.Builder abstractBuilder =
@@ -378,7 +380,7 @@ public class AbstractMessageTest extends TestCase {
     builder.setOptionalMessage(TEST_REQUIRED_UNINITIALIZED);
     assertFalse(abstractBuilder.isInitialized());
     assertEquals(
-        "optional_message.b, optional_message.c",
+        "optional_message.a, optional_message.b, optional_message.c",
         abstractBuilder.getInitializationErrorString());
 
     builder.setOptionalMessage(TEST_REQUIRED_INITIALIZED);
@@ -388,7 +390,7 @@ public class AbstractMessageTest extends TestCase {
     builder.addRepeatedMessage(TEST_REQUIRED_UNINITIALIZED);
     assertFalse(abstractBuilder.isInitialized());
     assertEquals(
-        "repeated_message[0].b, repeated_message[0].c",
+        "repeated_message[0].a, repeated_message[0].b, repeated_message[0].c",
         abstractBuilder.getInitializationErrorString());
 
     builder.setRepeatedMessage(0, TEST_REQUIRED_INITIALIZED);

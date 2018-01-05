@@ -57,7 +57,7 @@ JsonObjectWriter::~JsonObjectWriter() {
 JsonObjectWriter* JsonObjectWriter::StartObject(StringPiece name) {
   WritePrefix(name);
   WriteChar('{');
-  PushObject();
+  Push();
   return this;
 }
 
@@ -71,7 +71,7 @@ JsonObjectWriter* JsonObjectWriter::EndObject() {
 JsonObjectWriter* JsonObjectWriter::StartList(StringPiece name) {
   WritePrefix(name);
   WriteChar('[');
-  PushArray();
+  Push();
   return this;
 }
 
@@ -172,7 +172,8 @@ void JsonObjectWriter::WritePrefix(StringPiece name) {
   bool not_first = !element()->is_first();
   if (not_first) WriteChar(',');
   if (not_first || !element()->is_root()) NewLine();
-  if (!name.empty() || element()->is_json_object()) {
+  bool empty_key_ok = GetAndResetEmptyKeyOk();
+  if (!name.empty() || empty_key_ok) {
     WriteChar('"');
     if (!name.empty()) {
       ArrayByteSource source(name);
@@ -181,6 +182,12 @@ void JsonObjectWriter::WritePrefix(StringPiece name) {
     stream_->WriteString("\":");
     if (!indent_string_.empty()) WriteChar(' ');
   }
+}
+
+bool JsonObjectWriter::GetAndResetEmptyKeyOk() {
+  bool retval = empty_name_ok_for_next_key_;
+  empty_name_ok_for_next_key_ = false;
+  return retval;
 }
 
 }  // namespace converter
