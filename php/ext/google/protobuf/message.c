@@ -29,7 +29,6 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <php.h>
-#include <ext/date/php_date.h>
 #include <stdlib.h>
 
 #include "protobuf.h"
@@ -379,6 +378,7 @@ PHP_METHOD(Message, whichOneof) {
     PHP_PROTO_FAKE_SCOPE_BEGIN(LOWER_CLASS##_type);                            \
     zval* value = message_get_property_internal(getThis(), &member TSRMLS_CC); \
     PHP_PROTO_FAKE_SCOPE_END;                                                  \
+    zval_dtor(&member);                                                        \
     PHP_PROTO_RETVAL_ZVAL(value);                                              \
   }                                                                            \
   PHP_METHOD(UPPER_CLASS, set##UPPER_FIELD) {                                  \
@@ -390,6 +390,7 @@ PHP_METHOD(Message, whichOneof) {
     zval member;                                                               \
     PHP_PROTO_ZVAL_STRING(&member, LOWER_FIELD, 1);                            \
     message_set_property_internal(getThis(), &member, value TSRMLS_CC);        \
+    zval_dtor(&member);                                                        \
     PHP_PROTO_RETVAL_ZVAL(getThis());                                          \
   }
 
@@ -402,6 +403,7 @@ PHP_METHOD(Message, whichOneof) {
     message_get_oneof_property_internal(getThis(), &member,                    \
                                         return_value TSRMLS_CC);               \
     PHP_PROTO_FAKE_SCOPE_END;                                                  \
+    zval_dtor(&member);                                                        \
   }                                                                            \
   PHP_METHOD(UPPER_CLASS, set##UPPER_FIELD) {                                  \
     zval* value = NULL;                                                        \
@@ -412,6 +414,7 @@ PHP_METHOD(Message, whichOneof) {
     zval member;                                                               \
     PHP_PROTO_ZVAL_STRING(&member, LOWER_FIELD, 1);                            \
     message_set_property_internal(getThis(), &member, value TSRMLS_CC);        \
+    zval_dtor(&member);                                                        \
     PHP_PROTO_RETVAL_ZVAL(getThis());                                          \
   }
 
@@ -442,7 +445,8 @@ static void init_file_wrappers(TSRMLS_D);
 
 // Define file init functions
 static void init_file_any(TSRMLS_D) {
-  if (is_inited_file_any) return;
+  static bool is_initialized = false;
+  if (is_initialized) return;
   init_generated_pool_once(TSRMLS_C);
   const char* generated_file =
       "0acd010a19676f6f676c652f70726f746f6275662f616e792e70726f746f"
@@ -457,11 +461,12 @@ static void init_file_any(TSRMLS_D) {
   hex_to_binary(generated_file, &binary, &binary_len);
   internal_add_generated_file(binary, binary_len, generated_pool TSRMLS_CC);
   FREE(binary);
-  is_inited_file_any = true;
+  is_initialized = true;
 }
 
 static void init_file_api(TSRMLS_D) {
-  if (is_inited_file_api) return;
+  static bool is_initialized = false;
+  if (is_initialized) return;
   init_file_source_context(TSRMLS_C);
   init_file_type(TSRMLS_C);
   init_generated_pool_once(TSRMLS_C);
@@ -497,11 +502,12 @@ static void init_file_api(TSRMLS_D) {
   hex_to_binary(generated_file, &binary, &binary_len);
   internal_add_generated_file(binary, binary_len, generated_pool TSRMLS_CC);
   FREE(binary);
-  is_inited_file_api = true;
+  is_initialized = true;
 }
 
 static void init_file_duration(TSRMLS_D) {
-  if (is_inited_file_duration) return;
+  static bool is_initialized = false;
+  if (is_initialized) return;
   init_generated_pool_once(TSRMLS_C);
   const char* generated_file =
       "0ae3010a1e676f6f676c652f70726f746f6275662f6475726174696f6e2e"
@@ -517,11 +523,12 @@ static void init_file_duration(TSRMLS_D) {
   hex_to_binary(generated_file, &binary, &binary_len);
   internal_add_generated_file(binary, binary_len, generated_pool TSRMLS_CC);
   FREE(binary);
-  is_inited_file_duration = true;
+  is_initialized = true;
 }
 
 static void init_file_field_mask(TSRMLS_D) {
-  if (is_inited_file_field_mask) return;
+  static bool is_initialized = false;
+  if (is_initialized) return;
   init_generated_pool_once(TSRMLS_C);
   const char* generated_file =
       "0ae3010a20676f6f676c652f70726f746f6275662f6669656c645f6d6173"
@@ -537,11 +544,12 @@ static void init_file_field_mask(TSRMLS_D) {
   hex_to_binary(generated_file, &binary, &binary_len);
   internal_add_generated_file(binary, binary_len, generated_pool TSRMLS_CC);
   FREE(binary);
-  is_inited_file_field_mask = true;
+  is_initialized = true;
 }
 
 static void init_file_empty(TSRMLS_D) {
-  if (is_inited_file_empty) return;
+  static bool is_initialized = false;
+  if (is_initialized) return;
   init_generated_pool_once(TSRMLS_C);
   const char* generated_file =
       "0ab7010a1b676f6f676c652f70726f746f6275662f656d7074792e70726f"
@@ -556,11 +564,12 @@ static void init_file_empty(TSRMLS_D) {
   hex_to_binary(generated_file, &binary, &binary_len);
   internal_add_generated_file(binary, binary_len, generated_pool TSRMLS_CC);
   FREE(binary);
-  is_inited_file_empty = true;
+  is_initialized = true;
 }
 
 static void init_file_source_context(TSRMLS_D) {
-  if (is_inited_file_source_context) return;
+  static bool is_initialized = false;
+  if (is_initialized) return;
   init_generated_pool_once(TSRMLS_C);
   const char* generated_file =
       "0afb010a24676f6f676c652f70726f746f6275662f736f757263655f636f"
@@ -577,11 +586,12 @@ static void init_file_source_context(TSRMLS_D) {
   hex_to_binary(generated_file, &binary, &binary_len);
   internal_add_generated_file(binary, binary_len, generated_pool TSRMLS_CC);
   FREE(binary);
-  is_inited_file_source_context = true;
+  is_initialized = true;
 }
 
 static void init_file_struct(TSRMLS_D) {
-  if (is_inited_file_struct) return;
+  static bool is_initialized = false;
+  if (is_initialized) return;
   init_generated_pool_once(TSRMLS_C);
   const char* generated_file =
       "0a81050a1c676f6f676c652f70726f746f6275662f7374727563742e7072"
@@ -611,11 +621,12 @@ static void init_file_struct(TSRMLS_D) {
   hex_to_binary(generated_file, &binary, &binary_len);
   internal_add_generated_file(binary, binary_len, generated_pool TSRMLS_CC);
   FREE(binary);
-  is_inited_file_struct = true;
+  is_initialized = true;
 }
 
 static void init_file_timestamp(TSRMLS_D) {
-  if (is_inited_file_timestamp) return;
+  static bool is_initialized = false;
+  if (is_initialized) return;
   init_generated_pool_once(TSRMLS_C);
   const char* generated_file =
       "0ae7010a1f676f6f676c652f70726f746f6275662f74696d657374616d70"
@@ -631,11 +642,12 @@ static void init_file_timestamp(TSRMLS_D) {
   hex_to_binary(generated_file, &binary, &binary_len);
   internal_add_generated_file(binary, binary_len, generated_pool TSRMLS_CC);
   FREE(binary);
-  is_inited_file_timestamp = true;
+  is_initialized = true;
 }
 
 static void init_file_type(TSRMLS_D) {
-  if (is_inited_file_type) return;
+  static bool is_initialized = false;
+  if (is_initialized) return;
   init_file_any(TSRMLS_C);
   init_file_source_context(TSRMLS_C);
   init_generated_pool_once(TSRMLS_C);
@@ -699,11 +711,12 @@ static void init_file_type(TSRMLS_D) {
   hex_to_binary(generated_file, &binary, &binary_len);
   internal_add_generated_file(binary, binary_len, generated_pool TSRMLS_CC);
   FREE(binary);
-  is_inited_file_type = true;
+  is_initialized = true;
 }
 
 static void init_file_wrappers(TSRMLS_D) {
-  if (is_inited_file_wrappers) return;
+  static bool is_initialized = false;
+  if (is_initialized) return;
   init_generated_pool_once(TSRMLS_C);
   const char* generated_file =
       "0abf030a1e676f6f676c652f70726f746f6275662f77726170706572732e"
@@ -726,7 +739,7 @@ static void init_file_wrappers(TSRMLS_D) {
   hex_to_binary(generated_file, &binary, &binary_len);
   internal_add_generated_file(binary, binary_len, generated_pool TSRMLS_CC);
   FREE(binary);
-  is_inited_file_wrappers = true;
+  is_initialized = true;
 }
 
 // -----------------------------------------------------------------------------
@@ -1110,17 +1123,41 @@ PHP_METHOD(Timestamp, fromDateTime) {
   zval* datetime;
   zval member;
 
-  if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "O", &datetime,
-                            php_date_get_date_ce()) == FAILURE) {
+  PHP_PROTO_CE_DECLARE date_interface_ce;
+  if (php_proto_zend_lookup_class("\\DatetimeInterface", 18,
+                                  &date_interface_ce) == FAILURE) {
+    zend_error(E_ERROR, "Make sure date extension is enabled.");
     return;
   }
 
-  php_date_obj* dateobj = UNBOX(php_date_obj, datetime);
-  if (!dateobj->time->sse_uptodate) {
-    timelib_update_ts(dateobj->time, NULL);
+  if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "O", &datetime,
+                            PHP_PROTO_CE_UNREF(date_interface_ce)) == FAILURE) {
+    zend_error(E_USER_ERROR, "Expect DatetimeInterface.");
+    return;
   }
 
-  int64_t timestamp = dateobj->time->sse;
+  // Get timestamp from Datetime object.
+  zval retval;
+  zval function_name;
+  int64_t timestamp;
+
+#if PHP_MAJOR_VERSION < 7
+  INIT_ZVAL(retval);
+  INIT_ZVAL(function_name);
+#endif
+
+  PHP_PROTO_ZVAL_STRING(&function_name, "date_timestamp_get", 1);
+
+  if (call_user_function(EG(function_table), NULL, &function_name, &retval, 1,
+          ZVAL_PTR_TO_CACHED_PTR(datetime) TSRMLS_CC) == FAILURE) {
+    zend_error(E_ERROR, "Cannot get timestamp from DateTime.");
+    return;
+  }
+
+  protobuf_convert_to_int64(&retval, &timestamp);
+
+  zval_dtor(&retval);
+  zval_dtor(&function_name);
 
   // Set seconds
   MessageHeader* self = UNBOX(MessageHeader, getThis());
@@ -1128,20 +1165,18 @@ PHP_METHOD(Timestamp, fromDateTime) {
       upb_msgdef_ntofz(self->descriptor->msgdef, "seconds");
   void* storage = message_data(self);
   void* memory = slot_memory(self->descriptor->layout, storage, field);
-  *(int64_t*)memory = dateobj->time->sse;
+  *(int64_t*)memory = timestamp;
 
   // Set nanos
   field = upb_msgdef_ntofz(self->descriptor->msgdef, "nanos");
   storage = message_data(self);
   memory = slot_memory(self->descriptor->layout, storage, field);
   *(int32_t*)memory = 0;
+
+  RETURN_NULL();
 }
 
 PHP_METHOD(Timestamp, toDateTime) {
-  zval datetime;
-  php_date_instantiate(php_date_get_date_ce(), &datetime TSRMLS_CC);
-  php_date_obj* dateobj = UNBOX(php_date_obj, &datetime);
-
   // Get seconds
   MessageHeader* self = UNBOX(MessageHeader, getThis());
   const upb_fielddef* field =
@@ -1162,14 +1197,38 @@ PHP_METHOD(Timestamp, toDateTime) {
   strftime(formated_time, sizeof(formated_time), "%Y-%m-%dT%H:%M:%SUTC",
            utc_time);
 
-  if (!php_date_initialize(dateobj, formated_time, strlen(formated_time), NULL,
-                           NULL, 0 TSRMLS_CC)) {
-    zval_dtor(&datetime);
-    RETURN_NULL();
+  // Create Datetime object.
+  zval datetime;
+  zval formated_time_php;
+  zval function_name;
+  int64_t timestamp = 0;
+
+#if PHP_MAJOR_VERSION < 7
+  INIT_ZVAL(function_name);
+  INIT_ZVAL(formated_time_php);
+#endif
+
+  PHP_PROTO_ZVAL_STRING(&function_name, "date_create", 1);
+  PHP_PROTO_ZVAL_STRING(&formated_time_php, formated_time, 1);
+
+  CACHED_VALUE params[1] = {ZVAL_TO_CACHED_VALUE(formated_time_php)};
+
+  if (call_user_function(EG(function_table), NULL,
+                         &function_name, &datetime, 1,
+                         params TSRMLS_CC) == FAILURE) {
+    zend_error(E_ERROR, "Cannot create DateTime.");
+    return;
   }
 
+  zval_dtor(&formated_time_php);
+  zval_dtor(&function_name);
+
+#if PHP_MAJOR_VERSION < 7
   zval* datetime_ptr = &datetime;
   PHP_PROTO_RETVAL_ZVAL(datetime_ptr);
+#else
+  ZVAL_OBJ(return_value, Z_OBJ(datetime));
+#endif
 }
 
 // -----------------------------------------------------------------------------
