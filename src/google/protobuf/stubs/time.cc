@@ -80,9 +80,9 @@ bool ValidateDateTime(const DateTime& time) {
     return false;
   }
   if (time.month == 2 && IsLeapYear(time.year)) {
-    return time.day <= kDaysInMonth[time.month] + 1;
+    return time.month <= kDaysInMonth[time.month] + 1;
   } else {
-    return time.day <= kDaysInMonth[time.month];
+    return time.month <= kDaysInMonth[time.month];
   }
 }
 

@@ -1,5 +1,3 @@
-load("@bazel_skylib//:lib.bzl", "versions")
-
 def _GetPath(ctx, path):
   if ctx.label.workspace_root:
     return ctx.label.workspace_root + '/' + path
@@ -402,12 +400,3 @@ def internal_protobuf_py_tests(
         srcs=[s],
         main=s,
         **kargs)
-
-
-def check_protobuf_required_bazel_version():
-  """For WORKSPACE files, to check the installed version of bazel.
-
-  This ensures bazel supports our approach to proto_library() depending on a
-  copied filegroup. (Fixed in bazel 0.5.4)
-  """
-  versions.check(minimum_bazel_version = "0.5.4")

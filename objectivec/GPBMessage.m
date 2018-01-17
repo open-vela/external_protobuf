@@ -969,8 +969,7 @@ static GPBUnknownFieldSet *GetOrMakeUnknownFields(GPBMessage *self) {
               newValue = [value copyWithZone:zone];
             }
           } else {
-            if ((field.mapKeyDataType == GPBDataTypeString) &&
-                GPBFieldDataTypeIsObject(field)) {
+            if (field.mapKeyDataType == GPBDataTypeString) {
               // NSDictionary
               newValue = [value mutableCopyWithZone:zone];
             } else {
@@ -2027,12 +2026,7 @@ static GPBUnknownFieldSet *GetOrMakeUnknownFields(GPBMessage *self) {
       [newInput release];
     } else {
       GPBUnknownFieldSet *unknownFields = GetOrMakeUnknownFields(self);
-      // rawBytes was created via a NoCopy, so it can be reusing a
-      // subrange of another NSData that might go out of scope as things
-      // unwind, so a copy is needed to ensure what is saved in the
-      // unknown fields stays valid.
-      NSData *cloned = [NSData dataWithData:rawBytes];
-      [unknownFields mergeMessageSetMessage:typeId data:cloned];
+      [unknownFields mergeMessageSetMessage:typeId data:rawBytes];
     }
   }
 }
@@ -2597,14 +2591,13 @@ static void MergeRepeatedNotPackedFieldFromCodedInputStream(
   if (other == self) {
     return YES;
   }
-  if (![other isKindOfClass:[GPBMessage class]]) {
+  if (![other isKindOfClass:[self class]] &&
+      ![self isKindOfClass:[other class]]) {
     return NO;
   }
+
   GPBMessage *otherMsg = other;
   GPBDescriptor *descriptor = [[self class] descriptor];
-  if ([[otherMsg class] descriptor] != descriptor) {
-    return NO;
-  }
   uint8_t *selfStorage = (uint8_t *)messageStorage_;
   uint8_t *otherStorage = (uint8_t *)otherMsg->messageStorage_;
 
@@ -3004,10 +2997,7 @@ typedef struct ResolveIvarAccessorMethodResult {
   SEL encodingSelector;
 } ResolveIvarAccessorMethodResult;
 
-// |field| can be __unsafe_unretained because they are created at startup
-// and are essentially global. No need to pay for retain/release when
-// they are captured in blocks.
-static void ResolveIvarGet(__unsafe_unretained GPBFieldDescriptor *field,
+static void ResolveIvarGet(GPBFieldDescriptor *field,
                            ResolveIvarAccessorMethodResult *result) {
   GPBDataType fieldDataType = GPBGetFieldDataType(field);
   switch (fieldDataType) {
@@ -3049,8 +3039,7 @@ static void ResolveIvarGet(__unsafe_unretained GPBFieldDescriptor *field,
   }
 }
 
-// See comment about __unsafe_unretained on ResolveIvarGet.
-static void ResolveIvarSet(__unsafe_unretained GPBFieldDescriptor *field,
+static void ResolveIvarSet(GPBFieldDescriptor *field,
                            GPBFileSyntax syntax,
                            ResolveIvarAccessorMethodResult *result) {
   GPBDataType fieldDataType = GPBGetFieldDataType(field);
@@ -3094,10 +3083,9 @@ static void ResolveIvarSet(__unsafe_unretained GPBFieldDescriptor *field,
   // NOTE: hasOrCountSel_/setHasSel_ will be NULL if the field for the given
   // message should not have has support (done in GPBDescriptor.m), so there is
   // no need for checks here to see if has*/setHas* are allowed.
-  ResolveIvarAccessorMethodResult result = {NULL, NULL};
 
-  // See comment about __unsafe_unretained on ResolveIvarGet.
-  for (__unsafe_unretained GPBFieldDescriptor *field in descriptor->fields_) {
+  ResolveIvarAccessorMethodResult result = {NULL, NULL};
+  for (GPBFieldDescriptor *field in descriptor->fields_) {
     BOOL isMapOrArray = GPBFieldIsMapOrArray(field);
     if (!isMapOrArray) {
       // Single fields.

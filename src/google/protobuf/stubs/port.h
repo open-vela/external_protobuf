@@ -348,13 +348,6 @@ inline void GOOGLE_UNALIGNED_STORE64(void *p, uint64 v) {
 }
 #endif
 
-#if defined(GOOGLE_PROTOBUF_OS_NACL) \
-    || (defined(__ANDROID__) && defined(__clang__) \
-        && (__clang_major__ == 3 && __clang_minor__ == 8) \
-        && (__clang_patchlevel__ < 275480))
-# define GOOGLE_PROTOBUF_USE_PORTABLE_LOG2
-#endif
-
 #if defined(_MSC_VER)
 #define GOOGLE_THREAD_LOCAL __declspec(thread)
 #else
@@ -375,14 +368,10 @@ inline void GOOGLE_UNALIGNED_STORE64(void *p, uint64 v) {
 
 #elif !defined(__GLIBC__) && !defined(__CYGWIN__)
 
-#ifndef bswap_16
 static inline uint16 bswap_16(uint16 x) {
   return static_cast<uint16>(((x & 0xFF) << 8) | ((x & 0xFF00) >> 8));
 }
 #define bswap_16(x) bswap_16(x)
-#endif
-
-#ifndef bswap_32
 static inline uint32 bswap_32(uint32 x) {
   return (((x & 0xFF) << 24) |
           ((x & 0xFF00) << 8) |
@@ -390,9 +379,6 @@ static inline uint32 bswap_32(uint32 x) {
           ((x & 0xFF000000) >> 24));
 }
 #define bswap_32(x) bswap_32(x)
-#endif
-
-#ifndef bswap_64
 static inline uint64 bswap_64(uint64 x) {
   return (((x & GOOGLE_ULONGLONG(0xFF)) << 56) |
           ((x & GOOGLE_ULONGLONG(0xFF00)) << 40) |
@@ -404,7 +390,6 @@ static inline uint64 bswap_64(uint64 x) {
           ((x & GOOGLE_ULONGLONG(0xFF00000000000000)) >> 56));
 }
 #define bswap_64(x) bswap_64(x)
-#endif
 
 #endif
 
@@ -428,13 +413,12 @@ class Bits {
   }
 
   static uint32 Log2FloorNonZero64(uint64 n) {
-    // Older versions of clang run into an instruction-selection failure when
-    // it encounters __builtin_clzll:
+    // arm-nacl-clang runs into an instruction-selection failure when it
+    // encounters __builtin_clzll:
     // https://bugs.chromium.org/p/nativeclient/issues/detail?id=4395
-    // This includes arm-nacl-clang and clang in older Android NDK versions.
-    // To work around this, when we build with those we use the portable
+    // To work around this, when we build for NaCl we use the portable
     // implementation instead.
-#if defined(__GNUC__) && !defined(GOOGLE_PROTOBUF_USE_PORTABLE_LOG2)
+#if defined(__GNUC__) && !defined(GOOGLE_PROTOBUF_OS_NACL)
   return 63 ^ static_cast<uint32>(__builtin_clzll(n));
 #else
   return Log2FloorNonZero64_Portable(n);
