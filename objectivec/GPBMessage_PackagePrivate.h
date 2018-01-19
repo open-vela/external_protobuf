@@ -34,6 +34,10 @@
 
 #import "GPBMessage.h"
 
+// TODO: Remove this import. Older generated code use the OSAtomic* apis,
+// so anyone that hasn't regenerated says building by having this. After
+// enough time has passed, this likely can be removed as folks should have
+// regenerated.
 #import <libkern/OSAtomic.h>
 
 #import "GPBBootstrap.h"
@@ -70,7 +74,7 @@ typedef struct GPBMessage_Storage *GPBMessage_StoragePtr;
   // Use of readOnlySemaphore_ must be prefaced by a call to
   // GPBPrepareReadOnlySemaphore to ensure it has been created. This allows
   // readOnlySemaphore_ to be only created when actually needed.
-  dispatch_semaphore_t readOnlySemaphore_;
+  _Atomic(dispatch_semaphore_t) readOnlySemaphore_;
 }
 
 // Gets an extension value without autocreating the result if not found. (i.e.
