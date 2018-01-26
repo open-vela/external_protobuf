@@ -45,7 +45,6 @@ These are projects we know about implementing Protocol Buffers for other program
 * GopherJS: https://github.com/johanbrandhorst/protobuf
 * Haskell: http://hackage.haskell.org/package/hprotoc
 * Haskell: https://github.com/google/proto-lens (Google-unofficial implementation)
-* Haskell: https://github.com/awakesecurity/proto3-suite (code generator) https://github.com/awakesecurity/proto3-wire (binary serializer/deserializer)
 * Haxe: https://github.com/Atry/protoc-gen-haxe
 * Java: https://github.com/google/protobuf (Google-official implementation)
 * Java/Android: https://github.com/square/wire
@@ -110,6 +109,7 @@ GRPC (http://www.grpc.io/) is Google's RPC implementation for Protocol Buffers. 
 * http://code.google.com/p/cxf-protobuf/ (Java)
 * http://code.google.com/p/protobuf-remote/ (C++/C#)
 * http://code.google.com/p/protobuf-rpc-pro/ (Java)
+* https://code.google.com/p/protorpc/ (Go/C++)
 * https://code.google.com/p/eneter-protobuf-serializer/ (Java/.NET)
 * http://www.deltavsoft.com/RCFProto.html (C++/Java/Python/C#)
 * https://github.com/robbinfan/claire-protorpc (C++)
@@ -122,7 +122,6 @@ GRPC (http://www.grpc.io/) is Google's RPC implementation for Protocol Buffers. 
 * https://github.com/SeriousMa/grpc-protobuf-validation (Java)
 * https://github.com/tony612/grpc-elixir (Elixir)
 * https://github.com/johanbrandhorst/protobuf (GopherJS)
-* https://github.com/awakesecurity/gRPC-haskell (Haskell)
 
 ## Other Utilities
 
@@ -163,4 +162,3 @@ There are miscellaneous other things you may find useful as a Protocol Buffers d
 * [Protocol Buffers Dynamic Schema - create protobuf schemas programmatically (Java)] (https://github.com/os72/protobuf-dynamic)
 * [Make protoc plugins in NodeJS](https://github.com/konsumer/node-protoc-plugin)
 * [ProfaneDB - A Protocol Buffers database](https://profanedb.gitlab.io)
-* [Protocol Buffer property-based testing utility and example message generator (Python / Hypothesis)](https://github.com/CurataEng/hypothesis-protobuf)

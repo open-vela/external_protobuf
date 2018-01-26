@@ -52,16 +52,6 @@ AC_ARG_WITH([zlib],
     [include classes for streaming compressed data in and out @<:@default=check@:>@])],
   [],[with_zlib=check])
 
-AC_ARG_WITH([zlib-include],
-  [AS_HELP_STRING([--with-zlib-include=PATH],
-    [zlib include directory])],
-  [CPPFLAGS="-I$withval $CPPFLAGS"])
-
-AC_ARG_WITH([zlib-lib],
-  [AS_HELP_STRING([--with-zlib-lib=PATH],
-    [zlib lib directory])],
-  [LDFLAGS="-L$withval $LDFLAGS"])
-
 AC_ARG_WITH([protoc],
   [AS_HELP_STRING([--with-protoc=COMMAND],
     [use the given protoc command instead of building a new one when building tests (useful for cross-compiling)])],
@@ -191,7 +181,7 @@ AM_CONDITIONAL([HAVE_PTHREAD], [test "x$acx_pthread_ok" = "xyes"])
 AC_CXX_STL_HASH
 
 case "$target_os" in
-  mingw* | cygwin* | win* | aix*)
+  mingw* | cygwin* | win*)
     ;;
   *)
     # Need to link against rt on Solaris
