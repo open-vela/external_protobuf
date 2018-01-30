@@ -34,7 +34,11 @@
 
 #import "GPBMessage.h"
 
-#import <stdatomic.h>
+// TODO: Remove this import. Older generated code use the OSAtomic* apis,
+// so anyone that hasn't regenerated says building by having this. After
+// enough time has passed, this likely can be removed as folks should have
+// regenerated.
+#import <libkern/OSAtomic.h>
 
 #import "GPBBootstrap.h"
 
