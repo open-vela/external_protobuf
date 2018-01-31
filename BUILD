@@ -5,17 +5,6 @@ licenses(["notice"])
 exports_files(["LICENSE"])
 
 ################################################################################
-# Java 9 configuration
-################################################################################
-
-config_setting(
-    name = "jdk9",
-    values = {
-        "java_toolchain": "@bazel_tools//tools/jdk:toolchain_jdk9",
-    },
-)
-
-################################################################################
 # Protobuf Runtime Library
 ################################################################################
 
@@ -619,10 +608,7 @@ java_library(
     ]) + [
         ":gen_well_known_protos_java",
     ],
-    javacopts = select({
-       "//:jdk9": ["--add-modules=jdk.unsupported"],
-       "//conditions:default": ["-source 7", "-target 7"],
-    }),
+    javacopts = ["-source 7", "-target 7"],
     visibility = ["//visibility:public"],
 )
 
