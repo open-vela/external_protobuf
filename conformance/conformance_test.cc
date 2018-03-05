@@ -2321,24 +2321,6 @@ bool ConformanceTestSuite::RunSuite(ConformanceTestRunner* runner,
         }
       )");
   RunValidJsonTest(
-      "ValueAcceptListWithNull", REQUIRED,
-      R"({"optionalValue": ["x", null, "y"]})",
-      R"(
-        optional_value: {
-          list_value: {
-            values: {
-              string_value: "x"
-            }
-            values: {
-              null_value: NULL_VALUE
-            }
-            values: {
-              string_value: "y"
-            }
-          }
-        }
-      )");
-  RunValidJsonTest(
       "ValueAcceptObject", REQUIRED,
       R"({"optionalValue": {"value": 1}})",
       R"(
