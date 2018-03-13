@@ -253,7 +253,7 @@ internal_copied_filegroup(
     srcs = WELL_KNOWN_PROTOS,
     dest = "",
     strip_prefix = "src",
-    visibility = ["//visibility:private"],
+    visibility = ["//visibility:hidden"],
 )
 
 [proto_library(
@@ -843,7 +843,6 @@ proto_lang_toolchain(
     command_line = "--cpp_out=$(OUT)",
     runtime = ":protobuf",
     visibility = ["//visibility:public"],
-    blacklisted_protos = [":_internal_wkt_protos_genrule"],
 )
 
 proto_lang_toolchain(
