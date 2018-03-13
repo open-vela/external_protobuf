@@ -61,11 +61,12 @@ import junit.framework.TestCase;
 public class TextFormatTest extends TestCase {
 
   // A basic string with different escapable characters for testing.
-  private static final String ESCAPE_TEST_STRING =
-      "\"A string with ' characters \n and \r newlines and \t tabs and \001 " + "slashes \\";
+  private final static String kEscapeTestString =
+      "\"A string with ' characters \n and \r newlines and \t tabs and \001 "
+          + "slashes \\";
 
   // A representation of the above string with all the characters escaped.
-  private static final String ESCAPE_TEST_STRING_ESCAPED =
+  private final static String kEscapeTestStringEscaped =
       "\\\"A string with \\' characters \\n and \\r newlines "
           + "and \\t tabs and \\001 slashes \\\\";
 
@@ -575,10 +576,10 @@ public class TextFormatTest extends TestCase {
         "integer: 82301481290849012385230157",
       "optional_int32: 82301481290849012385230157");
     assertParseError(
-      "1:16: Expected \"true\" or \"false\". Found \"maybe\".",
+      "1:16: Expected \"true\" or \"false\".",
       "optional_bool: maybe");
     assertParseError(
-      "1:16: Expected \"true\" or \"false\". Found \"2\".",
+      "1:16: Expected \"true\" or \"false\".",
       "optional_bool: 2");
     assertParseError(
       "1:18: Expected string.",
@@ -642,8 +643,10 @@ public class TextFormatTest extends TestCase {
       TextFormat.unescapeBytes("\\000\\001\\a\\b\\f\\n\\r\\t\\v\\\\\\'\\\""));
     assertEquals("\0\001\007\b\f\n\r\t\013\\\'\"",
       TextFormat.unescapeText("\\000\\001\\a\\b\\f\\n\\r\\t\\v\\\\\\'\\\""));
-    assertEquals(ESCAPE_TEST_STRING_ESCAPED, TextFormat.escapeText(ESCAPE_TEST_STRING));
-    assertEquals(ESCAPE_TEST_STRING, TextFormat.unescapeText(ESCAPE_TEST_STRING_ESCAPED));
+    assertEquals(kEscapeTestStringEscaped,
+      TextFormat.escapeText(kEscapeTestString));
+    assertEquals(kEscapeTestString,
+      TextFormat.unescapeText(kEscapeTestStringEscaped));
 
     // Invariant
     assertEquals("hello",

@@ -147,14 +147,12 @@ GenerateMembers(io::Printer* printer) const {
   if (SupportFieldPresence(descriptor_->file())) {
     WriteFieldDocComment(printer, descriptor_);
     printer->Print(variables_,
-      "@java.lang.Override\n"
       "$deprecation$public boolean ${$has$capitalized_name$$}$() {\n"
       "  return $get_has_field_bit_message$;\n"
       "}\n");
     printer->Annotate("{", "}", descriptor_);
     WriteFieldDocComment(printer, descriptor_);
     printer->Print(variables_,
-      "@java.lang.Override\n"
       "$deprecation$public $type$ ${$get$capitalized_name$$}$() {\n"
       "  return $name$_ == null ? $type$.getDefaultInstance() : $name$_;\n"
       "}\n");
@@ -162,14 +160,12 @@ GenerateMembers(io::Printer* printer) const {
   } else {
     WriteFieldDocComment(printer, descriptor_);
     printer->Print(variables_,
-      "@java.lang.Override\n"
       "$deprecation$public boolean ${$has$capitalized_name$$}$() {\n"
       "  return $name$_ != null;\n"
       "}\n");
     printer->Annotate("{", "}", descriptor_);
     WriteFieldDocComment(printer, descriptor_);
     printer->Print(variables_,
-      "@java.lang.Override\n"
       "$deprecation$public $type$ ${$get$capitalized_name$$}$() {\n"
       "  return $name$_ == null ? $type$.getDefaultInstance() : $name$_;\n"
       "}\n");
@@ -199,11 +195,7 @@ GenerateMembers(io::Printer* printer) const {
   // Field.Builder mergeField(Field value)
   WriteFieldDocComment(printer, descriptor_);
   printer->Print(variables_,
-    "@java.lang.SuppressWarnings({\"ReferenceEquality\"})\n"
     "private void merge$capitalized_name$($type$ value) {\n"
-    "  if (value == null) {\n"
-    "    throw new NullPointerException();\n"
-    "  }\n"
     "  if ($name$_ != null &&\n"
     "      $name$_ != $type$.getDefaultInstance()) {\n"
     "    $name$_ =\n"
@@ -231,7 +223,6 @@ GenerateBuilderMembers(io::Printer* printer) const {
   // boolean hasField()
   WriteFieldDocComment(printer, descriptor_);
   printer->Print(variables_,
-    "@java.lang.Override\n"
     "$deprecation$public boolean ${$has$capitalized_name$$}$() {\n"
     "  return instance.has$capitalized_name$();\n"
     "}\n");
@@ -240,7 +231,6 @@ GenerateBuilderMembers(io::Printer* printer) const {
   // Field getField()
   WriteFieldDocComment(printer, descriptor_);
   printer->Print(variables_,
-    "@java.lang.Override\n"
     "$deprecation$public $type$ ${$get$capitalized_name$$}$() {\n"
     "  return instance.get$capitalized_name$();\n"
     "}\n");
@@ -406,14 +396,12 @@ GenerateMembers(io::Printer* printer) const {
   PrintExtraFieldInfo(variables_, printer);
   WriteFieldDocComment(printer, descriptor_);
   printer->Print(variables_,
-    "@java.lang.Override\n"
     "$deprecation$public boolean ${$has$capitalized_name$$}$() {\n"
     "  return $has_oneof_case_message$;\n"
     "}\n");
   printer->Annotate("{", "}", descriptor_);
   WriteFieldDocComment(printer, descriptor_);
   printer->Print(variables_,
-    "@java.lang.Override\n"
     "$deprecation$public $type$ ${$get$capitalized_name$$}$() {\n"
     "  if ($has_oneof_case_message$) {\n"
     "     return ($type$) $oneof_name$_;\n"
@@ -446,9 +434,6 @@ GenerateMembers(io::Printer* printer) const {
   WriteFieldDocComment(printer, descriptor_);
   printer->Print(variables_,
     "private void merge$capitalized_name$($type$ value) {\n"
-    "  if (value == null) {\n"
-    "    throw new NullPointerException();\n"
-    "  }\n"
     "  if ($has_oneof_case_message$ &&\n"
     "      $oneof_name$_ != $type$.getDefaultInstance()) {\n"
     "    $oneof_name$_ = $type$.newBuilder(($type$) $oneof_name$_)\n"
@@ -479,7 +464,6 @@ GenerateBuilderMembers(io::Printer* printer) const {
   // boolean hasField()
   WriteFieldDocComment(printer, descriptor_);
   printer->Print(variables_,
-    "@java.lang.Override\n"
     "$deprecation$public boolean ${$has$capitalized_name$$}$() {\n"
     "  return instance.has$capitalized_name$();\n"
     "}\n");
@@ -488,7 +472,6 @@ GenerateBuilderMembers(io::Printer* printer) const {
   // Field getField()
   WriteFieldDocComment(printer, descriptor_);
   printer->Print(variables_,
-    "@java.lang.Override\n"
     "$deprecation$public $type$ ${$get$capitalized_name$$}$() {\n"
     "  return instance.get$capitalized_name$();\n"
     "}\n");
@@ -641,7 +624,6 @@ GenerateMembers(io::Printer* printer) const {
   PrintExtraFieldInfo(variables_, printer);
   WriteFieldDocComment(printer, descriptor_);
   printer->Print(variables_,
-    "@java.lang.Override\n"
     "$deprecation$public java.util.List<$type$> "
     "${$get$capitalized_name$List$}$() {\n"
     "  return $name$_;\n"   // note:  unmodifiable list
@@ -656,14 +638,12 @@ GenerateMembers(io::Printer* printer) const {
   printer->Annotate("{", "}", descriptor_);
   WriteFieldDocComment(printer, descriptor_);
   printer->Print(variables_,
-    "@java.lang.Override\n"
     "$deprecation$public int ${$get$capitalized_name$Count$}$() {\n"
     "  return $name$_.size();\n"
     "}\n");
   printer->Annotate("{", "}", descriptor_);
   WriteFieldDocComment(printer, descriptor_);
   printer->Print(variables_,
-    "@java.lang.Override\n"
     "$deprecation$public $type$ ${$get$capitalized_name$$}$(int index) {\n"
     "  return $name$_.get(index);\n"
     "}\n");
@@ -781,7 +761,6 @@ GenerateBuilderMembers(io::Printer* printer) const {
   // List<Field> getRepeatedFieldList()
   WriteFieldDocComment(printer, descriptor_);
   printer->Print(variables_,
-    "@java.lang.Override\n"
     "$deprecation$public java.util.List<$type$> "
     "${$get$capitalized_name$List$}$() {\n"
     "  return java.util.Collections.unmodifiableList(\n"
@@ -792,7 +771,6 @@ GenerateBuilderMembers(io::Printer* printer) const {
   // int getRepeatedFieldCount()
   WriteFieldDocComment(printer, descriptor_);
   printer->Print(variables_,
-    "@java.lang.Override\n"
     "$deprecation$public int ${$get$capitalized_name$Count$}$() {\n"
     "  return instance.get$capitalized_name$Count();\n"
     "}");
@@ -801,7 +779,6 @@ GenerateBuilderMembers(io::Printer* printer) const {
   // Field getRepeatedField(int index)
   WriteFieldDocComment(printer, descriptor_);
   printer->Print(variables_,
-    "@java.lang.Override\n"
     "$deprecation$public $type$ ${$get$capitalized_name$$}$(int index) {\n"
     "  return instance.get$capitalized_name$(index);\n"
     "}\n");
