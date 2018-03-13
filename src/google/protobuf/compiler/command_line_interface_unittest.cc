@@ -40,6 +40,9 @@
 #include <unistd.h>
 #endif
 #include <memory>
+#ifndef _SHARED_PTR_H
+#include <google/protobuf/stubs/shared_ptr.h>
+#endif
 #include <vector>
 
 #include <google/protobuf/stubs/stringprintf.h>
@@ -341,7 +344,7 @@ void CommandLineInterfaceTest::RunWithArgs(std::vector<string> args) {
     }
   }
 
-  std::unique_ptr<const char * []> argv(new const char* [args.size()]);
+  google::protobuf::scoped_array<const char * > argv(new const char* [args.size()]);
 
   for (int i = 0; i < args.size(); i++) {
     args[i] = StringReplace(args[i], "$tmpdir", temp_directory_, true);
@@ -2295,7 +2298,7 @@ class EncodeDecodeTest : public testing::TestWithParam<EncodeDecodeTestMode> {
         ADD_FAILURE() << "unexpected EncodeDecodeTestMode: " << GetParam();
     }
 
-    std::unique_ptr<const char * []> argv(new const char* [args.size()]);
+    google::protobuf::scoped_array<const char * > argv(new const char* [args.size()]);
     for (int i = 0; i < args.size(); i++) {
       argv[i] = args[i].c_str();
     }

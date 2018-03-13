@@ -222,7 +222,6 @@ GenerateMembers(io::Printer* printer) const {
   if (SupportFieldPresence(descriptor_->file())) {
     WriteFieldDocComment(printer, descriptor_);
     printer->Print(variables_,
-      "@java.lang.Override\n"
       "$deprecation$public boolean ${$has$capitalized_name$$}$() {\n"
       "  return $get_has_field_bit_message$;\n"
       "}\n");
@@ -231,7 +230,6 @@ GenerateMembers(io::Printer* printer) const {
 
   WriteFieldDocComment(printer, descriptor_);
   printer->Print(variables_,
-    "@java.lang.Override\n"
     "$deprecation$public $type$ ${$get$capitalized_name$$}$() {\n"
     "  return $name$_;\n"
     "}\n");
@@ -268,7 +266,6 @@ GenerateBuilderMembers(io::Printer* printer) const {
   if (SupportFieldPresence(descriptor_->file())) {
     WriteFieldDocComment(printer, descriptor_);
     printer->Print(variables_,
-      "@java.lang.Override\n"
       "$deprecation$public boolean ${$has$capitalized_name$$}$() {\n"
       "  return instance.has$capitalized_name$();\n"
       "}\n");
@@ -277,7 +274,6 @@ GenerateBuilderMembers(io::Printer* printer) const {
 
   WriteFieldDocComment(printer, descriptor_);
   printer->Print(variables_,
-    "@java.lang.Override\n"
     "$deprecation$public $type$ ${$get$capitalized_name$$}$() {\n"
     "  return instance.get$capitalized_name$();\n"
     "}\n");
@@ -492,7 +488,6 @@ GenerateMembers(io::Printer* printer) const {
   if (SupportFieldPresence(descriptor_->file())) {
     WriteFieldDocComment(printer, descriptor_);
     printer->Print(variables_,
-      "@java.lang.Override\n"
       "$deprecation$public boolean ${$has$capitalized_name$$}$() {\n"
       "  return $has_oneof_case_message$;\n"
       "}\n");
@@ -501,7 +496,6 @@ GenerateMembers(io::Printer* printer) const {
 
   WriteFieldDocComment(printer, descriptor_);
   printer->Print(variables_,
-    "@java.lang.Override\n"
     "$deprecation$public $type$ ${$get$capitalized_name$$}$() {\n"
     "  if ($has_oneof_case_message$) {\n"
     "    return ($boxed_type$) $oneof_name$_;\n"
@@ -534,7 +528,6 @@ GenerateBuilderMembers(io::Printer* printer) const {
   if (SupportFieldPresence(descriptor_->file())) {
     WriteFieldDocComment(printer, descriptor_);
     printer->Print(variables_,
-      "@java.lang.Override\n"
       "$deprecation$public boolean ${$has$capitalized_name$$}$() {\n"
       "  return instance.has$capitalized_name$();\n"
       "}\n");
@@ -543,7 +536,6 @@ GenerateBuilderMembers(io::Printer* printer) const {
 
   WriteFieldDocComment(printer, descriptor_);
   printer->Print(variables_,
-    "@java.lang.Override\n"
     "$deprecation$public $type$ ${$get$capitalized_name$$}$() {\n"
     "  return instance.get$capitalized_name$();\n"
     "}\n");
@@ -653,7 +645,6 @@ GenerateMembers(io::Printer* printer) const {
   PrintExtraFieldInfo(variables_, printer);
   WriteFieldDocComment(printer, descriptor_);
   printer->Print(variables_,
-    "@java.lang.Override\n"
     "$deprecation$public java.util.List<$boxed_type$>\n"
     "    ${$get$capitalized_name$List$}$() {\n"
     "  return $name$_;\n"   // note:  unmodifiable list
@@ -661,14 +652,12 @@ GenerateMembers(io::Printer* printer) const {
   printer->Annotate("{", "}", descriptor_);
   WriteFieldDocComment(printer, descriptor_);
   printer->Print(variables_,
-    "@java.lang.Override\n"
     "$deprecation$public int ${$get$capitalized_name$Count$}$() {\n"
     "  return $name$_.size();\n"
     "}\n");
   printer->Annotate("{", "}", descriptor_);
   WriteFieldDocComment(printer, descriptor_);
   printer->Print(variables_,
-    "@java.lang.Override\n"
     "$deprecation$public $type$ ${$get$capitalized_name$$}$(int index) {\n"
     "  return $repeated_get$(index);\n"
     "}\n");
@@ -722,7 +711,6 @@ void RepeatedImmutablePrimitiveFieldLiteGenerator::
 GenerateBuilderMembers(io::Printer* printer) const {
   WriteFieldDocComment(printer, descriptor_);
   printer->Print(variables_,
-    "@java.lang.Override\n"
     "$deprecation$public java.util.List<$boxed_type$>\n"
     "    ${$get$capitalized_name$List$}$() {\n"
     "  return java.util.Collections.unmodifiableList(\n"
@@ -731,14 +719,12 @@ GenerateBuilderMembers(io::Printer* printer) const {
   printer->Annotate("{", "}", descriptor_);
   WriteFieldDocComment(printer, descriptor_);
   printer->Print(variables_,
-    "@java.lang.Override\n"
     "$deprecation$public int ${$get$capitalized_name$Count$}$() {\n"
     "  return instance.get$capitalized_name$Count();\n"
     "}\n");
   printer->Annotate("{", "}", descriptor_);
   WriteFieldDocComment(printer, descriptor_);
   printer->Print(variables_,
-    "@java.lang.Override\n"
     "$deprecation$public $type$ ${$get$capitalized_name$$}$(int index) {\n"
     "  return instance.get$capitalized_name$(index);\n"
     "}\n");

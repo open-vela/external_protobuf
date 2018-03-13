@@ -64,6 +64,20 @@ MAINTAINERCLEANFILES =   \
   Makefile.in
 
 nobase_include_HEADERS =                                         \
+  google/protobuf/stubs/atomic_sequence_num.h                    \
+  google/protobuf/stubs/atomicops.h                              \
+  google/protobuf/stubs/atomicops_internals_power.h              \
+  google/protobuf/stubs/atomicops_internals_ppc_gcc.h            \
+  google/protobuf/stubs/atomicops_internals_arm64_gcc.h          \
+  google/protobuf/stubs/atomicops_internals_arm_gcc.h            \
+  google/protobuf/stubs/atomicops_internals_arm_qnx.h            \
+  google/protobuf/stubs/atomicops_internals_generic_c11_atomic.h \
+  google/protobuf/stubs/atomicops_internals_generic_gcc.h        \
+  google/protobuf/stubs/atomicops_internals_mips_gcc.h           \
+  google/protobuf/stubs/atomicops_internals_solaris.h            \
+  google/protobuf/stubs/atomicops_internals_tsan.h               \
+  google/protobuf/stubs/atomicops_internals_x86_gcc.h            \
+  google/protobuf/stubs/atomicops_internals_x86_msvc.h           \
   google/protobuf/stubs/callback.h                               \
   google/protobuf/stubs/bytestream.h                             \
   google/protobuf/stubs/casts.h                                  \
@@ -76,6 +90,8 @@ nobase_include_HEADERS =                                         \
   google/protobuf/stubs/once.h                                   \
   google/protobuf/stubs/platform_macros.h                        \
   google/protobuf/stubs/port.h                                   \
+  google/protobuf/stubs/scoped_ptr.h                             \
+  google/protobuf/stubs/shared_ptr.h                             \
   google/protobuf/stubs/singleton.h                              \
   google/protobuf/stubs/status.h                                 \
   google/protobuf/stubs/stl_util.h                               \
@@ -173,6 +189,8 @@ libprotobuf_lite_la_LDFLAGS += -Wl,--version-script=$(srcdir)/libprotobuf-lite.m
 EXTRA_libprotobuf_lite_la_DEPENDENCIES = libprotobuf-lite.map
 endif
 libprotobuf_lite_la_SOURCES =                                  \
+  google/protobuf/stubs/atomicops_internals_x86_gcc.cc         \
+  google/protobuf/stubs/atomicops_internals_x86_msvc.cc        \
   google/protobuf/stubs/bytestream.cc                          \
   google/protobuf/stubs/bytestream.h                           \
   google/protobuf/stubs/common.cc                              \
@@ -183,6 +201,8 @@ libprotobuf_lite_la_SOURCES =                                  \
   google/protobuf/stubs/io_win32.h                             \
   google/protobuf/stubs/map_util.h                             \
   google/protobuf/stubs/mathutil.h                             \
+  google/protobuf/stubs/once.cc                                \
+  google/protobuf/stubs/shared_ptr.h                           \
   google/protobuf/stubs/status.cc                              \
   google/protobuf/stubs/status.h                               \
   google/protobuf/stubs/status_macros.h                        \
@@ -258,6 +278,7 @@ libprotobuf_la_SOURCES =                                       \
   google/protobuf/io/zero_copy_stream_impl.cc                  \
   google/protobuf/compiler/importer.cc                         \
   google/protobuf/compiler/parser.cc                           \
+  google/protobuf/compiler/plugin.pb.cc                        \
   google/protobuf/util/delimited_message_util.cc               \
   google/protobuf/util/field_comparator.cc                     \
   google/protobuf/util/field_mask_util.cc                      \
@@ -313,7 +334,6 @@ libprotoc_la_SOURCES =                                         \
   google/protobuf/compiler/code_generator.cc                   \
   google/protobuf/compiler/command_line_interface.cc           \
   google/protobuf/compiler/plugin.cc                           \
-  google/protobuf/compiler/plugin.pb.cc                        \
   google/protobuf/compiler/subprocess.cc                       \
   google/protobuf/compiler/subprocess.h                        \
   google/protobuf/compiler/zip_writer.cc                       \
@@ -752,6 +772,7 @@ protobuf_test_SOURCES =                                        \
   google/protobuf/stubs/common_unittest.cc                     \
   google/protobuf/stubs/int128_unittest.cc                     \
   google/protobuf/stubs/io_win32_unittest.cc                   \
+  google/protobuf/stubs/once_unittest.cc                       \
   google/protobuf/stubs/statusor_test.cc                       \
   google/protobuf/stubs/status_test.cc                         \
   google/protobuf/stubs/stringpiece_unittest.cc                \
@@ -775,8 +796,8 @@ protobuf_test_SOURCES =                                        \
   google/protobuf/message_unittest.cc                          \
   google/protobuf/no_field_presence_test.cc                    \
   google/protobuf/preserve_unknown_enum_test.cc                \
-  google/protobuf/proto3_arena_lite_unittest.cc                \
   google/protobuf/proto3_arena_unittest.cc                     \
+  google/protobuf/proto3_arena_lite_unittest.cc                \
   google/protobuf/proto3_lite_unittest.cc                      \
   google/protobuf/reflection_ops_unittest.cc                   \
   google/protobuf/repeated_field_reflection_unittest.cc        \
@@ -907,7 +928,9 @@ endif
 no_warning_test.cc:
 	echo "// Generated from Makefile.am" > no_warning_test.cc
 	for FILE in $(nobase_include_HEADERS); do \
-    echo "#include <$${FILE}>" >> no_warning_test.cc; \
+	  if ! echo $${FILE} | grep "atomicops"; then \
+	    echo "#include <$${FILE}>" >> no_warning_test.cc; \
+	  fi \
 	done
 	echo "int main(int, char**) { return 0; }" >> no_warning_test.cc
 

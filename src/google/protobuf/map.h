@@ -37,7 +37,6 @@
 #ifndef GOOGLE_PROTOBUF_MAP_H__
 #define GOOGLE_PROTOBUF_MAP_H__
 
-#include <initializer_list>
 #include <iterator>
 #include <limits>  // To support Visual Studio 2008
 #include <set>
@@ -48,6 +47,10 @@
 #include <google/protobuf/generated_enum_util.h>
 #include <google/protobuf/map_type_handler.h>
 #include <google/protobuf/stubs/hash.h>
+
+#if LANG_CXX11
+#include <initializer_list>
+#endif
 
 namespace google {
 namespace protobuf {
@@ -143,6 +146,7 @@ class Map {
     insert(other.begin(), other.end());
   }
 
+#if LANG_CXX11
   Map(Map&& other) noexcept : Map() {
     if (other.arena_) {
       *this = other;
@@ -160,6 +164,7 @@ class Map {
     }
     return *this;
   }
+#endif
 
   template <class InputIt>
   Map(const InputIt& first, const InputIt& last)
@@ -1112,9 +1117,11 @@ class Map {
       }
     }
   }
+#if LANG_CXX11
   void insert(std::initializer_list<value_type> values) {
     insert(values.begin(), values.end());
   }
+#endif
 
   // Erase and clear
   size_type erase(const key_type& key) {

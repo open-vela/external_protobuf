@@ -50,8 +50,6 @@ class LIBPROTOBUF_EXPORT ImplicitWeakMessage : public MessageLite {
   ImplicitWeakMessage() : arena_(NULL) {}
   explicit ImplicitWeakMessage(Arena* arena) : arena_(arena) {}
 
-  static const ImplicitWeakMessage* default_instance();
-
   string GetTypeName() const { return ""; }
 
   MessageLite* New() const { return new ImplicitWeakMessage; }
@@ -93,7 +91,9 @@ class ImplicitWeakTypeHandler {
  public:
   typedef ImplicitWeakType Type;
   typedef ::google::protobuf::MessageLite WeakType;
+#if LANG_CXX11
   static const bool Moveable = false;
+#endif
 
   // With implicit weak fields, we need separate NewFromPrototype and
   // NewFromPrototypeWeak functions. The former is used when we want to create a
@@ -127,6 +127,9 @@ class ImplicitWeakTypeHandler {
     return value.SpaceUsedLong();
   }
 };
+
+extern ::google::protobuf::internal::ExplicitlyConstructed<ImplicitWeakMessage>
+    implicit_weak_message_default_instance;
 
 }  // namespace internal
 }  // namespace protobuf
