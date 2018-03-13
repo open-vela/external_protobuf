@@ -33,6 +33,7 @@
 
 #include <assert.h>
 
+#include <google/protobuf/stubs/casts.h>
 #include <google/protobuf/arena.h>
 #include <google/protobuf/arenastring.h>
 #include <google/protobuf/map.h>
@@ -354,9 +355,9 @@ class MapEntryImpl : public Base {
         // We could use memcmp here, but we don't bother. The tag is one byte.
         GOOGLE_COMPILE_ASSERT(kTagSize == 1, tag_size_error);
         if (size > 0 && *reinterpret_cast<const char*>(data) == kValueTag) {
-          typename Map::size_type map_size = map_->size();
+          typename Map::size_type size = map_->size();
           value_ptr_ = &(*map_)[key_];
-          if (GOOGLE_PREDICT_TRUE(map_size != map_->size())) {
+          if (GOOGLE_PREDICT_TRUE(size != map_->size())) {
             // We created a new key-value pair.  Fill in the value.
             typedef
                 typename MapIf<ValueTypeHandler::kIsEnum, int*, Value*>::type T;
@@ -431,7 +432,7 @@ class MapEntryImpl : public Base {
     Value* value_ptr_;
     // On the fast path entry_ is not used.  And, when entry_ is used, it's set
     // to mf_->NewEntry(), so in the arena case we must call entry_.release.
-    google::protobuf::scoped_ptr<MapEntryImpl> entry_;
+    std::unique_ptr<MapEntryImpl> entry_;
   };
 
  protected:
@@ -603,7 +604,7 @@ template <>
 struct FromHelper<WireFormatLite::TYPE_STRING> {
   static ArenaStringPtr From(const string& x) {
     ArenaStringPtr res;
-    TaggedPtr< ::std::string> ptr;
+    TaggedPtr<::std::string> ptr;
     ptr.Set(const_cast<string*>(&x));
     res.UnsafeSetTaggedPointer(ptr);
     return res;
@@ -613,7 +614,7 @@ template <>
 struct FromHelper<WireFormatLite::TYPE_BYTES> {
   static ArenaStringPtr From(const string& x) {
     ArenaStringPtr res;
-    TaggedPtr< ::std::string> ptr;
+    TaggedPtr<::std::string> ptr;
     ptr.Set(const_cast<string*>(&x));
     res.UnsafeSetTaggedPointer(ptr);
     return res;
