@@ -39,6 +39,8 @@
 
 #include <google/protobuf/compiler/ruby/ruby_generator.h>
 
+using google::protobuf::internal::scoped_ptr;
+
 namespace google {
 namespace protobuf {
 namespace compiler {
@@ -486,7 +488,7 @@ bool Generator::Generate(
     return false;
   }
 
-  std::unique_ptr<io::ZeroCopyOutputStream> output(
+  scoped_ptr<io::ZeroCopyOutputStream> output(
       generator_context->Open(GetOutputFilename(file->name())));
   io::Printer printer(output.get(), '$');
 

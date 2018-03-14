@@ -115,4 +115,3 @@ class Benchmark:
 if __name__ == "__main__":
   for i in range(2, len(sys.argv)):
     run_one_test(sys.argv[i])
-

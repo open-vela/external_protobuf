@@ -377,7 +377,6 @@ public abstract class CodedOutputStream extends ByteOutput {
   public abstract void writeMessage(final int fieldNumber, final MessageLite value)
       throws IOException;
 
-
   /**
    * Write a MessageSet extension field to the stream.  For historical reasons,
    * the wire format differs from normal fields.
@@ -481,7 +480,6 @@ public abstract class CodedOutputStream extends ByteOutput {
   /** Write an embedded message field to the stream. */
   // Abstract to avoid overhead of additional virtual method calls.
   public abstract void writeMessageNoTag(final MessageLite value) throws IOException;
-
 
   //=================================================================
 
@@ -667,7 +665,6 @@ public abstract class CodedOutputStream extends ByteOutput {
   public static int computeMessageSize(final int fieldNumber, final MessageLite value) {
     return computeTagSize(fieldNumber) + computeMessageSizeNoTag(value);
   }
-
 
   /**
    * Compute the number of bytes that would be needed to encode a
@@ -916,7 +913,6 @@ public abstract class CodedOutputStream extends ByteOutput {
     return computeLengthDelimitedFieldSize(value.getSerializedSize());
   }
 
-
   static int computeLengthDelimitedFieldSize(int fieldLength) {
     return computeUInt32SizeNoTag(fieldLength) + fieldLength;
   }
@@ -1053,7 +1049,6 @@ public abstract class CodedOutputStream extends ByteOutput {
     writeTag(fieldNumber, WireFormat.WIRETYPE_END_GROUP);
   }
 
-
   /**
    * Write a {@code group} field to the stream.
    *
@@ -1063,7 +1058,6 @@ public abstract class CodedOutputStream extends ByteOutput {
   public final void writeGroupNoTag(final MessageLite value) throws IOException {
     value.writeTo(this);
   }
-
 
   /**
    * Compute the number of bytes that would be needed to encode a
@@ -1076,7 +1070,6 @@ public abstract class CodedOutputStream extends ByteOutput {
     return computeTagSize(fieldNumber) * 2 + computeGroupSizeNoTag(value);
   }
 
-
   /**
    * Compute the number of bytes that would be needed to encode a
    * {@code group} field.
@@ -1085,7 +1078,6 @@ public abstract class CodedOutputStream extends ByteOutput {
   public static int computeGroupSizeNoTag(final MessageLite value) {
     return value.getSerializedSize();
   }
-
 
   /**
    * Encode and write a varint.  {@code value} is treated as
@@ -1281,7 +1273,6 @@ public abstract class CodedOutputStream extends ByteOutput {
       writeMessageNoTag(value);
     }
 
-
     @Override
     public final void writeMessageSetExtension(final int fieldNumber, final MessageLite value)
         throws IOException {
@@ -1305,7 +1296,6 @@ public abstract class CodedOutputStream extends ByteOutput {
       writeUInt32NoTag(value.getSerializedSize());
       value.writeTo(this);
     }
-
 
     @Override
     public final void write(byte value) throws IOException {
@@ -1618,7 +1608,6 @@ public abstract class CodedOutputStream extends ByteOutput {
       writeMessageNoTag(value);
     }
 
-
     @Override
     public void writeMessageSetExtension(final int fieldNumber, final MessageLite value)
         throws IOException {
@@ -1642,7 +1631,6 @@ public abstract class CodedOutputStream extends ByteOutput {
       writeUInt32NoTag(value.getSerializedSize());
       value.writeTo(this);
     }
-
 
     @Override
     public void write(byte value) throws IOException {
@@ -1940,7 +1928,6 @@ public abstract class CodedOutputStream extends ByteOutput {
       writeMessageNoTag(value);
     }
 
-
     @Override
     public void writeMessageSetExtension(int fieldNumber, MessageLite value) throws IOException {
       writeTag(WireFormat.MESSAGE_SET_ITEM, WireFormat.WIRETYPE_START_GROUP);
@@ -1962,7 +1949,6 @@ public abstract class CodedOutputStream extends ByteOutput {
       writeUInt32NoTag(value.getSerializedSize());
       value.writeTo(this);
     }
-
 
     @Override
     public void write(byte value) throws IOException {
@@ -2470,7 +2456,6 @@ public abstract class CodedOutputStream extends ByteOutput {
       writeMessageNoTag(value);
     }
 
-
     @Override
     public void writeMessageSetExtension(final int fieldNumber, final MessageLite value)
         throws IOException {
@@ -2494,7 +2479,6 @@ public abstract class CodedOutputStream extends ByteOutput {
       writeUInt32NoTag(value.getSerializedSize());
       value.writeTo(this);
     }
-
 
     @Override
     public void write(byte value) throws IOException {
@@ -2775,7 +2759,6 @@ public abstract class CodedOutputStream extends ByteOutput {
       writeMessageNoTag(value);
     }
 
-
     @Override
     public void writeMessageSetExtension(final int fieldNumber, final MessageLite value)
         throws IOException {
@@ -2799,7 +2782,6 @@ public abstract class CodedOutputStream extends ByteOutput {
       writeUInt32NoTag(value.getSerializedSize());
       value.writeTo(this);
     }
-
 
     @Override
     public void write(byte value) throws IOException {

@@ -30,7 +30,6 @@
 
 #include <google/protobuf/util/internal/field_mask_utility.h>
 
-#include <google/protobuf/util/internal/utility.h>
 #include <google/protobuf/stubs/strutil.h>
 #include <google/protobuf/stubs/status_macros.h>
 
@@ -54,7 +53,7 @@ string AppendPathSegmentToPrefix(StringPiece prefix, StringPiece segment) {
     return prefix.ToString();
   }
   // If the segment is a map key, appends it to the prefix without the ".".
-  if (StringStartsWith(segment, "[\"")) {
+  if (segment.starts_with("[\"")) {
     return StrCat(prefix, segment);
   }
   return StrCat(prefix, ".", segment);

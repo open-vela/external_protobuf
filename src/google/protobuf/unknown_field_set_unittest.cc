@@ -49,7 +49,6 @@
 #include <google/protobuf/stubs/mutex.h>
 #include <google/protobuf/testing/googletest.h>
 #include <gtest/gtest.h>
-
 #include <google/protobuf/stubs/stl_util.h>
 
 namespace google {

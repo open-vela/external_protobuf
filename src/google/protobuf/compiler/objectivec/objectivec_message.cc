@@ -310,7 +310,7 @@ void MessageGenerator::GenerateMessageHeader(io::Printer* printer) {
       "classname", class_name_);
 
   if (descriptor_->field_count()) {
-    std::unique_ptr<const FieldDescriptor*[]> sorted_fields(
+    scoped_array<const FieldDescriptor*> sorted_fields(
         SortFieldsByNumber(descriptor_));
 
     printer->Print("typedef GPB_ENUM($classname$_FieldNumber) {\n",
@@ -420,9 +420,9 @@ void MessageGenerator::GenerateSource(io::Printer* printer) {
           .GeneratePropertyImplementation(printer);
     }
 
-    std::unique_ptr<const FieldDescriptor*[]> sorted_fields(
+    scoped_array<const FieldDescriptor*> sorted_fields(
         SortFieldsByNumber(descriptor_));
-    std::unique_ptr<const FieldDescriptor*[]> size_order_fields(
+    scoped_array<const FieldDescriptor*> size_order_fields(
         SortFieldsByStorageSize(descriptor_));
 
     std::vector<const Descriptor::ExtensionRange*> sorted_extensions;

@@ -29,6 +29,9 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <memory>
+#ifndef _SHARED_PTR_H
+#include <google/protobuf/stubs/shared_ptr.h>
+#endif
 
 #include <google/protobuf/unittest_drop_unknown_fields.pb.h>
 #include <google/protobuf/dynamic_message.h>
@@ -91,7 +94,7 @@ TEST(DropUnknownFieldsTest, DynamicMessageDefaultDrop) {
   foo_with_extra_fields.set_extra_int32_value(2);
 
   google::protobuf::DynamicMessageFactory factory;
-  std::unique_ptr<google::protobuf::Message> foo(
+  google::protobuf::scoped_ptr<google::protobuf::Message> foo(
       factory.GetPrototype(Foo::descriptor())->New());
   ASSERT_TRUE(foo->ParseFromString(foo_with_extra_fields.SerializeAsString()));
   EXPECT_TRUE(foo->GetReflection()->GetUnknownFields(*foo).empty());
@@ -111,7 +114,7 @@ TEST(DropUnknownFieldsTest, DynamicMessageDefaultPreserve) {
   foo_with_extra_fields.set_extra_int32_value(2);
 
   google::protobuf::DynamicMessageFactory factory;
-  std::unique_ptr<google::protobuf::Message> foo(
+  google::protobuf::scoped_ptr<google::protobuf::Message> foo(
       factory.GetPrototype(Foo::descriptor())->New());
   ASSERT_TRUE(foo->ParseFromString(foo_with_extra_fields.SerializeAsString()));
   EXPECT_FALSE(foo->GetReflection()->GetUnknownFields(*foo).empty());
