@@ -32,29 +32,28 @@
 //  Based on original Protocol Buffers design by
 //  Sanjay Ghemawat, Jeff Dean, and others.
 
+#include <algorithm>
+#include <functional>
 #include <google/protobuf/stubs/hash.h>
+#include <limits>
 #include <map>
 #include <memory>
-#ifndef _SHARED_PTR_H
-#include <google/protobuf/stubs/shared_ptr.h>
-#endif
 #include <set>
 #include <string>
 #include <vector>
-#include <algorithm>
-#include <limits>
 
+#include <google/protobuf/stubs/casts.h>
 #include <google/protobuf/stubs/common.h>
 #include <google/protobuf/stubs/logging.h>
 #include <google/protobuf/stubs/mutex.h>
 #include <google/protobuf/stubs/once.h>
 #include <google/protobuf/stubs/stringprintf.h>
 #include <google/protobuf/stubs/strutil.h>
+#include <google/protobuf/descriptor.pb.h>
 #include <google/protobuf/io/strtod.h>
 #include <google/protobuf/io/coded_stream.h>
 #include <google/protobuf/io/tokenizer.h>
 #include <google/protobuf/io/zero_copy_stream_impl.h>
-#include <google/protobuf/descriptor.pb.h>
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/descriptor_database.h>
 #include <google/protobuf/dynamic_message.h>
@@ -63,6 +62,7 @@
 #include <google/protobuf/unknown_field_set.h>
 #include <google/protobuf/wire_format.h>
 #include <google/protobuf/stubs/substitute.h>
+
 
 #include <google/protobuf/stubs/map_util.h>
 #include <google/protobuf/stubs/stl_util.h>
@@ -346,14 +346,14 @@ class PrefixRemover {
       }
 
       if (ascii_tolower(str[i]) != prefix_[j++]) {
-        return str.as_string();
+        return string(str);
       }
     }
 
     // If we didn't make it through the prefix, we've failed to strip the
     // prefix.
     if (j < prefix_.size()) {
-      return str.as_string();
+      return string(str);
     }
 
     // Skip underscores between prefix and further characters.
@@ -363,27 +363,25 @@ class PrefixRemover {
 
     // Enum label can't be the empty string.
     if (i == str.size()) {
-      return str.as_string();
+      return string(str);
     }
 
     // We successfully stripped the prefix.
     str.remove_prefix(i);
-    return str.as_string();
+    return string(str);
   }
 
  private:
   string prefix_;
 };
 
-// A DescriptorPool contains a bunch of hash_maps to implement the
+// A DescriptorPool contains a bunch of hash-maps to implement the
 // various Find*By*() methods.  Since hashtable lookups are O(1), it's
-// most efficient to construct a fixed set of large hash_maps used by
+// most efficient to construct a fixed set of large hash-maps used by
 // all objects in the pool rather than construct one or more small
-// hash_maps for each object.
+// hash-maps for each object.
 //
-// The keys to these hash_maps are (parent, name) or (parent, number)
-// pairs.  Unfortunately STL doesn't provide hash functions for pair<>,
-// so we must invent our own.
+// The keys to these hash-maps are (parent, name) or (parent, number) pairs.
 //
 // TODO(kenton):  Use StringPiece rather than const char* in keys?  It would
 //   be a lot cleaner but we'd just have to convert it back to const char*
@@ -397,6 +395,13 @@ struct PointerStringPairEqual {
     return a.first == b.first && strcmp(a.second, b.second) == 0;
   }
 };
+
+typedef std::pair<const Descriptor*, int> DescriptorIntPair;
+typedef std::pair<const EnumDescriptor*, int> EnumIntPair;
+
+#define HASH_MAP hash_map
+#define HASH_SET hash_set
+#define HASH_FXN hash
 
 template<typename PairType>
 struct PointerIntegerPairHash {
@@ -416,9 +421,6 @@ struct PointerIntegerPairHash {
           (a.first == b.first && a.second < b.second);
   }
 };
-
-typedef std::pair<const Descriptor*, int> DescriptorIntPair;
-typedef std::pair<const EnumDescriptor*, int> EnumIntPair;
 
 struct PointerStringPairHash {
   size_t operator()(const PointerStringPair& p) const {
@@ -445,31 +447,37 @@ struct PointerStringPairHash {
 
 const Symbol kNullSymbol;
 
-typedef hash_map<const char*, Symbol,
-                 hash<const char*>, streq>
-  SymbolsByNameMap;
-typedef hash_map<PointerStringPair, Symbol,
+typedef HASH_MAP<const char*, Symbol, HASH_FXN<const char*>, streq>
+    SymbolsByNameMap;
+
+typedef HASH_MAP<PointerStringPair, Symbol, PointerStringPairHash,
+                 PointerStringPairEqual>
+    SymbolsByParentMap;
+
+typedef HASH_MAP<const char*, const FileDescriptor*, HASH_FXN<const char*>,
+                 streq>
+    FilesByNameMap;
+
+typedef HASH_MAP<PointerStringPair, const FieldDescriptor*,
                  PointerStringPairHash, PointerStringPairEqual>
-  SymbolsByParentMap;
-typedef hash_map<const char*, const FileDescriptor*,
-                 hash<const char*>, streq>
-  FilesByNameMap;
-typedef hash_map<PointerStringPair, const FieldDescriptor*,
-                 PointerStringPairHash, PointerStringPairEqual>
-  FieldsByNameMap;
-typedef hash_map<DescriptorIntPair, const FieldDescriptor*,
-                 PointerIntegerPairHash<DescriptorIntPair> >
-  FieldsByNumberMap;
-typedef hash_map<EnumIntPair, const EnumValueDescriptor*,
-                 PointerIntegerPairHash<EnumIntPair> >
-  EnumValuesByNumberMap;
-// This is a map rather than a hash_map, since we use it to iterate
+    FieldsByNameMap;
+
+typedef HASH_MAP<DescriptorIntPair, const FieldDescriptor*,
+                 PointerIntegerPairHash<DescriptorIntPair>,
+                 std::equal_to<DescriptorIntPair> >
+    FieldsByNumberMap;
+
+typedef HASH_MAP<EnumIntPair, const EnumValueDescriptor*,
+                 PointerIntegerPairHash<EnumIntPair>,
+                 std::equal_to<EnumIntPair> >
+    EnumValuesByNumberMap;
+// This is a map rather than a hash-map, since we use it to iterate
 // through all the extensions that extend a given Descriptor, and an
 // ordered data structure that implements lower_bound is convenient
 // for that.
 typedef std::map<DescriptorIntPair, const FieldDescriptor*>
   ExtensionsGroupedByDescriptorMap;
-typedef hash_map<string, const SourceCodeInfo_Location*> LocationsByPathMap;
+typedef HASH_MAP<string, const SourceCodeInfo_Location*> LocationsByPathMap;
 
 std::set<string>* allowed_proto3_extendees_ = NULL;
 GOOGLE_PROTOBUF_DECLARE_ONCE(allowed_proto3_extendees_init_);
@@ -564,17 +572,17 @@ class DescriptorPool::Tables {
   // execution of the current public API call, but for compatibility with
   // legacy clients, this is cleared at the beginning of each public API call.
   // Not used when fallback_database_ == NULL.
-  hash_set<string> known_bad_files_;
+  HASH_SET<string> known_bad_files_;
 
   // A set of symbols which we have tried to load from the fallback database
   // and encountered errors. We will not attempt to load them again during
   // execution of the current public API call, but for compatibility with
   // legacy clients, this is cleared at the beginning of each public API call.
-  hash_set<string> known_bad_symbols_;
+  HASH_SET<string> known_bad_symbols_;
 
   // The set of descriptors for which we've already loaded the full
   // set of extensions numbers from fallback_database_.
-  hash_set<const Descriptor*> extensions_loaded_from_db_;
+  HASH_SET<const Descriptor*> extensions_loaded_from_db_;
 
   // -----------------------------------------------------------------
   // Finding items.
@@ -787,13 +795,12 @@ class FileDescriptorTables {
 };
 
 DescriptorPool::Tables::Tables()
-    // Start some hash_map and hash_set objects with a small # of buckets
+    // Start some hash-map and hash-set objects with a small # of buckets
     : known_bad_files_(3),
       known_bad_symbols_(3),
       extensions_loaded_from_db_(3),
       symbols_by_name_(3),
       files_by_name_(3) {}
-
 
 DescriptorPool::Tables::~Tables() {
   GOOGLE_DCHECK(checkpoints_.empty());
@@ -948,8 +955,10 @@ inline Symbol FileDescriptorTables::FindNestedSymbolOfType(
 Symbol DescriptorPool::Tables::FindByNameHelper(
     const DescriptorPool* pool, const string& name) {
   MutexLockMaybe lock(pool->mutex_);
-  known_bad_symbols_.clear();
-  known_bad_files_.clear();
+  if (pool->fallback_database_ != NULL) {
+    known_bad_symbols_.clear();
+    known_bad_files_.clear();
+  }
   Symbol result = FindSymbol(name);
 
   if (result.IsNull() && pool->underlay_ != NULL) {
@@ -1403,8 +1412,10 @@ void DescriptorPool::InternalAddGeneratedFile(
 
 const FileDescriptor* DescriptorPool::FindFileByName(const string& name) const {
   MutexLockMaybe lock(mutex_);
-  tables_->known_bad_symbols_.clear();
-  tables_->known_bad_files_.clear();
+  if (fallback_database_ != NULL) {
+    tables_->known_bad_symbols_.clear();
+    tables_->known_bad_files_.clear();
+  }
   const FileDescriptor* result = tables_->FindFile(name);
   if (result != NULL) return result;
   if (underlay_ != NULL) {
@@ -1421,8 +1432,10 @@ const FileDescriptor* DescriptorPool::FindFileByName(const string& name) const {
 const FileDescriptor* DescriptorPool::FindFileContainingSymbol(
     const string& symbol_name) const {
   MutexLockMaybe lock(mutex_);
-  tables_->known_bad_symbols_.clear();
-  tables_->known_bad_files_.clear();
+  if (fallback_database_ != NULL) {
+    tables_->known_bad_symbols_.clear();
+    tables_->known_bad_files_.clear();
+  }
   Symbol result = tables_->FindSymbol(symbol_name);
   if (!result.IsNull()) return result.GetFile();
   if (underlay_ != NULL) {
@@ -1508,8 +1521,10 @@ const FieldDescriptor* DescriptorPool::FindExtensionByNumber(
     }
   }
   MutexLockMaybe lock(mutex_);
-  tables_->known_bad_symbols_.clear();
-  tables_->known_bad_files_.clear();
+  if (fallback_database_ != NULL) {
+    tables_->known_bad_symbols_.clear();
+    tables_->known_bad_files_.clear();
+  }
   const FieldDescriptor* result = tables_->FindExtension(extendee, number);
   if (result != NULL) {
     return result;
@@ -1531,8 +1546,10 @@ void DescriptorPool::FindAllExtensions(
     const Descriptor* extendee,
     std::vector<const FieldDescriptor*>* out) const {
   MutexLockMaybe lock(mutex_);
-  tables_->known_bad_symbols_.clear();
-  tables_->known_bad_files_.clear();
+  if (fallback_database_ != NULL) {
+    tables_->known_bad_symbols_.clear();
+    tables_->known_bad_files_.clear();
+  }
 
   // Initialize tables_->extensions_ from the fallback database first
   // (but do this only once per descriptor).
@@ -1781,6 +1798,15 @@ FileDescriptor::FindExtensionByCamelcaseName(const string& key) const {
     return NULL;
   } else {
     return result;
+  }
+}
+
+void Descriptor::ExtensionRange::CopyTo(
+    DescriptorProto_ExtensionRange* proto) const {
+  proto->set_start(this->start);
+  proto->set_end(this->end);
+  if (options_ != &google::protobuf::ExtensionRangeOptions::default_instance()) {
+    *proto->mutable_options() = *options_;
   }
 }
 
@@ -2051,13 +2077,7 @@ void Descriptor::CopyTo(DescriptorProto* proto) const {
     enum_type(i)->CopyTo(proto->add_enum_type());
   }
   for (int i = 0; i < extension_range_count(); i++) {
-    DescriptorProto::ExtensionRange* range = proto->add_extension_range();
-    range->set_start(extension_range(i)->start);
-    range->set_end(extension_range(i)->end);
-    const ExtensionRangeOptions* options = extension_range(i)->options_;
-    if (options != &ExtensionRangeOptions::default_instance()) {
-      range->mutable_options()->CopyFrom(*options);
-    }
+    extension_range(i)->CopyTo(proto->add_extension_range());
   }
   for (int i = 0; i < extension_count(); i++) {
     extension(i)->CopyTo(proto->add_extension());
@@ -2288,7 +2308,7 @@ bool RetrieveOptions(int depth, const Message& options,
       return RetrieveOptionsAssumingRightPool(depth, options, option_entries);
     }
     DynamicMessageFactory factory;
-    google::protobuf::scoped_ptr<Message> dynamic_options(
+    std::unique_ptr<Message> dynamic_options(
         factory.GetPrototype(option_descriptor)->New());
     if (dynamic_options->ParseFromString(options.SerializeAsString())) {
       return RetrieveOptionsAssumingRightPool(depth, *dynamic_options,
@@ -4539,7 +4559,7 @@ void DescriptorBuilder::BuildMessage(const DescriptorProto& proto,
     }
   }
 
-  hash_set<string> reserved_name_set;
+  HASH_SET<string> reserved_name_set;
   for (int i = 0; i < proto.reserved_name_size(); i++) {
     const string& name = proto.reserved_name(i);
     if (reserved_name_set.find(name) == reserved_name_set.end()) {
@@ -5114,18 +5134,18 @@ void DescriptorBuilder::BuildEnum(const EnumDescriptorProto& proto,
     for (int j = i + 1; j < proto.reserved_range_size(); j++) {
       const EnumDescriptorProto_EnumReservedRange& range2 =
           proto.reserved_range(j);
-      if (range1.end() > range2.start() && range2.end() > range1.start()) {
+      if (range1.end() >= range2.start() && range2.end() >= range1.start()) {
         AddError(result->full_name(), proto.reserved_range(i),
                  DescriptorPool::ErrorCollector::NUMBER,
                  strings::Substitute("Reserved range $0 to $1 overlaps with "
                                      "already-defined range $2 to $3.",
-                                     range2.start(), range2.end() - 1,
-                                     range1.start(), range1.end() - 1));
+                                     range2.start(), range2.end(),
+                                     range1.start(), range1.end()));
       }
     }
   }
 
-  hash_set<string> reserved_name_set;
+  HASH_SET<string> reserved_name_set;
   for (int i = 0; i < proto.reserved_name_size(); i++) {
     const string& name = proto.reserved_name(i);
     if (reserved_name_set.find(name) == reserved_name_set.end()) {
@@ -5643,13 +5663,15 @@ void DescriptorBuilder::CrossLinkField(
       if (!tables_->AddExtension(field)) {
         const FieldDescriptor* conflicting_field =
             tables_->FindExtension(field->containing_type(), field->number());
+        string containing_type_name =
+            field->containing_type() == NULL
+                ? "unknown"
+                : field->containing_type()->full_name();
         string error_msg = strings::Substitute(
             "Extension number $0 has already been used in \"$1\" by extension "
             "\"$2\" defined in $3.",
-            field->number(),
-            field->containing_type()->full_name(),
-            conflicting_field->full_name(),
-            conflicting_field->file()->name());
+            field->number(), containing_type_name,
+            conflicting_field->full_name(), conflicting_field->file()->name());
         // Conflicting extension numbers should be an error. However, before
         // turning this into an error we need to fix all existing broken
         // protos first.
@@ -6438,7 +6460,7 @@ bool DescriptorBuilder::OptionInterpreter::InterpretSingleOption(
 
   // First set the value on the UnknownFieldSet corresponding to the
   // innermost message.
-  google::protobuf::scoped_ptr<UnknownFieldSet> unknown_fields(new UnknownFieldSet());
+  std::unique_ptr<UnknownFieldSet> unknown_fields(new UnknownFieldSet());
   if (!SetOptionValue(field, unknown_fields.get())) {
     return false;  // SetOptionValue() already added the error.
   }
@@ -6448,7 +6470,7 @@ bool DescriptorBuilder::OptionInterpreter::InterpretSingleOption(
   for (std::vector<const FieldDescriptor*>::reverse_iterator iter =
            intermediate_fields.rbegin();
        iter != intermediate_fields.rend(); ++iter) {
-    google::protobuf::scoped_ptr<UnknownFieldSet> parent_unknown_fields(
+    std::unique_ptr<UnknownFieldSet> parent_unknown_fields(
         new UnknownFieldSet());
     switch ((*iter)->type()) {
       case FieldDescriptor::TYPE_MESSAGE: {
@@ -6836,7 +6858,7 @@ bool DescriptorBuilder::OptionInterpreter::SetAggregateOption(
   }
 
   const Descriptor* type = option_field->message_type();
-  google::protobuf::scoped_ptr<Message> dynamic(dynamic_factory_.GetPrototype(type)->New());
+  std::unique_ptr<Message> dynamic(dynamic_factory_.GetPrototype(type)->New());
   GOOGLE_CHECK(dynamic.get() != NULL)
       << "Could not create an instance of " << option_field->DebugString();
 
