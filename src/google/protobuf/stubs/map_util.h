@@ -654,8 +654,7 @@ InsertOrReturnExisting(
 //     delete EraseKeyReturnValuePtr(&my_map, "abc");
 //
 // Use returned value:
-//     std::unique_ptr<MyType> value_ptr(
-//         EraseKeyReturnValuePtr(&my_map, "abc"));
+//     scoped_ptr<MyType> value_ptr(EraseKeyReturnValuePtr(&my_map, "abc"));
 //     if (value_ptr.get())
 //       value_ptr->DoSomething();
 //

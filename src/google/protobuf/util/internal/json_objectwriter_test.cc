@@ -47,7 +47,7 @@ class JsonObjectWriterTest : public ::testing::Test {
   JsonObjectWriterTest()
       : str_stream_(new StringOutputStream(&output_)),
         out_stream_(new CodedOutputStream(str_stream_)),
-        ow_(nullptr) {}
+        ow_(NULL) {}
 
   virtual ~JsonObjectWriterTest() {
     delete ow_;

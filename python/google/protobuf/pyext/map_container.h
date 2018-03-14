@@ -34,18 +34,27 @@
 #include <Python.h>
 
 #include <memory>
+#ifndef _SHARED_PTR_H
+#include <google/protobuf/stubs/shared_ptr.h>
+#endif
 
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/message.h>
-#include <google/protobuf/pyext/message.h>
 
 namespace google {
 namespace protobuf {
 
 class Message;
 
+#ifdef _SHARED_PTR_H
+using std::shared_ptr;
+#else
+using internal::shared_ptr;
+#endif
+
 namespace python {
 
+struct CMessage;
 struct CMessageClass;
 
 // This struct is used directly for ScalarMap, and is the base class of
@@ -57,7 +66,7 @@ struct MapContainer {
   // proto tree.  Every Python MapContainer holds a
   // reference to it in order to keep it alive as long as there's a
   // Python object that references any part of the tree.
-  CMessage::OwnerRef owner;
+  shared_ptr<Message> owner;
 
   // Pointer to the C++ Message that contains this container.  The
   // MapContainer does not own this pointer.
@@ -90,7 +99,9 @@ struct MapContainer {
   int Release();
 
   // Set the owner field of self and any children of self.
-  void SetOwner(const CMessage::OwnerRef& new_owner) { owner = new_owner; }
+  void SetOwner(const shared_ptr<Message>& new_owner) {
+    owner = new_owner;
+  }
 };
 
 struct MessageMapContainer : public MapContainer {

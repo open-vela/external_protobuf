@@ -142,7 +142,7 @@ bool ObjectiveCGenerator::GenerateAll(const std::vector<const FileDescriptor*>& 
 
     // Generate header.
     {
-      std::unique_ptr<io::ZeroCopyOutputStream> output(
+      scoped_ptr<io::ZeroCopyOutputStream> output(
           context->Open(filepath + ".pbobjc.h"));
       io::Printer printer(output.get(), '$');
       file_generator.GenerateHeader(&printer);
@@ -150,7 +150,7 @@ bool ObjectiveCGenerator::GenerateAll(const std::vector<const FileDescriptor*>& 
 
     // Generate m file.
     {
-      std::unique_ptr<io::ZeroCopyOutputStream> output(
+      scoped_ptr<io::ZeroCopyOutputStream> output(
           context->Open(filepath + ".pbobjc.m"));
       io::Printer printer(output.get(), '$');
       file_generator.GenerateSource(&printer);

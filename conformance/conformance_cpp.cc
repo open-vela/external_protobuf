@@ -45,6 +45,7 @@ using google::protobuf::Descriptor;
 using google::protobuf::DescriptorPool;
 using google::protobuf::Message;
 using google::protobuf::MessageFactory;
+using google::protobuf::internal::scoped_ptr;
 using google::protobuf::util::BinaryToJsonString;
 using google::protobuf::util::JsonToBinaryString;
 using google::protobuf::util::NewTypeResolverForDescriptorPool;
