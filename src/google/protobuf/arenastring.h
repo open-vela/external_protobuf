@@ -51,18 +51,6 @@ namespace google {
 namespace protobuf {
 namespace internal {
 
-template <typename T>
-class TaggedPtr {
- public:
-  void Set(T* p) { ptr_ = reinterpret_cast<uintptr_t>(p); }
-  T* Get() const { return reinterpret_cast<T*>(ptr_); }
-
-  bool IsNull() { return ptr_ == 0; }
-
- private:
-  uintptr_t ptr_;
-};
-
 struct LIBPROTOBUF_EXPORT ArenaStringPtr {
   inline void Set(const ::std::string* default_value,
                   const ::std::string& value, ::google::protobuf::Arena* arena) {
@@ -306,15 +294,6 @@ struct LIBPROTOBUF_EXPORT ArenaStringPtr {
     return ptr_ == default_value;
   }
 
-  // Internal accessors!!!!
-  void UnsafeSetTaggedPointer(TaggedPtr< ::std::string> value) {
-    ptr_ = value.Get();
-  }
-  // Generated code only! An optimization, in certain cases the generated
-  // code is certain we can obtain a string with no default checks and
-  // tag tests.
-  ::std::string* UnsafeMutablePointer() { return ptr_; }
-
  private:
   ::std::string* ptr_;
 
@@ -322,8 +301,10 @@ struct LIBPROTOBUF_EXPORT ArenaStringPtr {
   void CreateInstance(::google::protobuf::Arena* arena,
                       const ::std::string* initial_value) {
     GOOGLE_DCHECK(initial_value != NULL);
-    // uses "new ::std::string" when arena is nullptr
-    ptr_ = Arena::Create< ::std::string >(arena, *initial_value);
+    ptr_ = new ::std::string(*initial_value);
+    if (arena != NULL) {
+      arena->Own(ptr_);
+    }
   }
   GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE
   void CreateInstanceNoArena(const ::std::string* initial_value) {

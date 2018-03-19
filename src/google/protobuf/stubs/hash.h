@@ -235,8 +235,7 @@ class hash_set : public std::set<Key, HashFcn> {
   HashFcn hash_function() const { return HashFcn(); }
 };
 
-#elif defined(_MSC_VER) && !defined(_STLPORT_VERSION) && \
-    !(defined(_LIBCPP_STD_VER) && _LIBCPP_STD_VER >= 11)
+#elif defined(_MSC_VER) && !defined(_STLPORT_VERSION)
 
 template <typename Key>
 struct hash : public GOOGLE_PROTOBUF_HASH_COMPARE<Key> {
@@ -409,8 +408,8 @@ struct hash<string> {
 };
 
 template <typename First, typename Second>
-struct hash<std::pair<First, Second> > {
-  inline size_t operator()(const std::pair<First, Second>& key) const {
+struct hash<pair<First, Second> > {
+  inline size_t operator()(const pair<First, Second>& key) const {
     size_t first_hash = hash<First>()(key.first);
     size_t second_hash = hash<Second>()(key.second);
 
@@ -421,8 +420,8 @@ struct hash<std::pair<First, Second> > {
 
   static const size_t bucket_size = 4;
   static const size_t min_buckets = 8;
-  inline bool operator()(const std::pair<First, Second>& a,
-                           const std::pair<First, Second>& b) const {
+  inline bool operator()(const pair<First, Second>& a,
+                           const pair<First, Second>& b) const {
     return a < b;
   }
 };
