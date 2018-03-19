@@ -5,17 +5,6 @@ licenses(["notice"])
 exports_files(["LICENSE"])
 
 ################################################################################
-# Java 9 configuration
-################################################################################
-
-config_setting(
-    name = "jdk9",
-    values = {
-        "java_toolchain": "@bazel_tools//tools/jdk:toolchain_jdk9",
-    },
-)
-
-################################################################################
 # Protobuf Runtime Library
 ################################################################################
 
@@ -35,8 +24,6 @@ COPTS = select({
         "-Woverloaded-virtual",
         "-Wno-sign-compare",
         "-Wno-unused-function",
-        # Prevents ISO C++ const string assignment warnings for pyext sources.
-        "-Wno-writable-strings",
     ],
 })
 
@@ -83,7 +70,6 @@ cc_library(
         "src/google/protobuf/extension_set.cc",
         "src/google/protobuf/generated_message_table_driven_lite.cc",
         "src/google/protobuf/generated_message_util.cc",
-        "src/google/protobuf/implicit_weak_message.cc",
         "src/google/protobuf/io/coded_stream.cc",
         "src/google/protobuf/io/zero_copy_stream.cc",
         "src/google/protobuf/io/zero_copy_stream_impl_lite.cc",
@@ -121,7 +107,6 @@ cc_library(
         "src/google/protobuf/api.pb.cc",
         "src/google/protobuf/compiler/importer.cc",
         "src/google/protobuf/compiler/parser.cc",
-        "src/google/protobuf/compiler/plugin.pb.cc",
         "src/google/protobuf/descriptor.cc",
         "src/google/protobuf/descriptor.pb.cc",
         "src/google/protobuf/descriptor_database.cc",
@@ -379,6 +364,7 @@ cc_library(
         "src/google/protobuf/compiler/objectivec/objectivec_primitive_field.cc",
         "src/google/protobuf/compiler/php/php_generator.cc",
         "src/google/protobuf/compiler/plugin.cc",
+        "src/google/protobuf/compiler/plugin.pb.cc",
         "src/google/protobuf/compiler/python/python_generator.cc",
         "src/google/protobuf/compiler/ruby/ruby_generator.cc",
         "src/google/protobuf/compiler/subprocess.cc",
@@ -619,10 +605,7 @@ java_library(
     ]) + [
         ":gen_well_known_protos_java",
     ],
-    javacopts = select({
-       "//:jdk9": ["--add-modules=jdk.unsupported"],
-       "//conditions:default": ["-source 7", "-target 7"],
-    }),
+    javacopts = ["-source 6", "-target 6"],
     visibility = ["//visibility:public"],
 )
 
@@ -631,7 +614,7 @@ java_library(
     srcs = glob([
         "java/util/src/main/java/com/google/protobuf/util/*.java",
     ]),
-    javacopts = ["-source 7", "-target 7"],
+    javacopts = ["-source 6", "-target 6"],
     visibility = ["//visibility:public"],
     deps = [
         "protobuf_java",
@@ -749,7 +732,6 @@ py_proto_library(
         ":python_srcs",
         "//external:six",
     ],
-    py_extra_srcs = glob(["python/**/__init__.py"]),
     srcs_version = "PY2AND3",
     visibility = ["//visibility:public"],
 )
@@ -843,7 +825,6 @@ proto_lang_toolchain(
     command_line = "--cpp_out=$(OUT)",
     runtime = ":protobuf",
     visibility = ["//visibility:public"],
-    blacklisted_protos = [":_internal_wkt_protos_genrule"],
 )
 
 proto_lang_toolchain(
