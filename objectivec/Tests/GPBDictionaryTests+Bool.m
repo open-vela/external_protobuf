@@ -63,8 +63,7 @@
 }
 
 - (void)testOne {
-  GPBBoolUInt32Dictionary *dict = [[GPBBoolUInt32Dictionary alloc] init];
-  [dict setUInt32:100U forKey:YES];
+  GPBBoolUInt32Dictionary *dict = [GPBBoolUInt32Dictionary dictionaryWithUInt32:100U forKey:YES];
   XCTAssertNotNil(dict);
   XCTAssertEqual(dict.count, 1U);
   uint32_t value;
@@ -77,7 +76,6 @@
     XCTAssertEqual(aValue, 100U);
     XCTAssertNotEqual(stop, NULL);
   }];
-  [dict release];
 }
 
 - (void)testBasics {
@@ -216,18 +214,17 @@
   XCTAssertNotNil(dict);
 
   GPBBoolUInt32Dictionary *dict2 =
-      [[GPBBoolUInt32Dictionary alloc] initWithDictionary:dict];
+      [GPBBoolUInt32Dictionary dictionaryWithDictionary:dict];
   XCTAssertNotNil(dict2);
 
   // Should be new pointer, but equal objects.
   XCTAssertNotEqual(dict, dict2);
   XCTAssertEqualObjects(dict, dict2);
-  [dict2 release];
   [dict release];
 }
 
 - (void)testAdds {
-  GPBBoolUInt32Dictionary *dict = [[GPBBoolUInt32Dictionary alloc] init];
+  GPBBoolUInt32Dictionary *dict = [GPBBoolUInt32Dictionary dictionary];
   XCTAssertNotNil(dict);
 
   XCTAssertEqual(dict.count, 0U);
@@ -252,7 +249,6 @@
   XCTAssertTrue([dict getUInt32:&value forKey:NO]);
   XCTAssertEqual(value, 101U);
   [dict2 release];
-  [dict release];
 }
 
 - (void)testRemove {
@@ -368,8 +364,7 @@
 }
 
 - (void)testOne {
-  GPBBoolInt32Dictionary *dict = [[GPBBoolInt32Dictionary alloc] init];
-  [dict setInt32:200 forKey:YES];
+  GPBBoolInt32Dictionary *dict = [GPBBoolInt32Dictionary dictionaryWithInt32:200 forKey:YES];
   XCTAssertNotNil(dict);
   XCTAssertEqual(dict.count, 1U);
   int32_t value;
@@ -382,7 +377,6 @@
     XCTAssertEqual(aValue, 200);
     XCTAssertNotEqual(stop, NULL);
   }];
-  [dict release];
 }
 
 - (void)testBasics {
@@ -521,18 +515,17 @@
   XCTAssertNotNil(dict);
 
   GPBBoolInt32Dictionary *dict2 =
-      [[GPBBoolInt32Dictionary alloc] initWithDictionary:dict];
+      [GPBBoolInt32Dictionary dictionaryWithDictionary:dict];
   XCTAssertNotNil(dict2);
 
   // Should be new pointer, but equal objects.
   XCTAssertNotEqual(dict, dict2);
   XCTAssertEqualObjects(dict, dict2);
-  [dict2 release];
   [dict release];
 }
 
 - (void)testAdds {
-  GPBBoolInt32Dictionary *dict = [[GPBBoolInt32Dictionary alloc] init];
+  GPBBoolInt32Dictionary *dict = [GPBBoolInt32Dictionary dictionary];
   XCTAssertNotNil(dict);
 
   XCTAssertEqual(dict.count, 0U);
@@ -557,7 +550,6 @@
   XCTAssertTrue([dict getInt32:&value forKey:NO]);
   XCTAssertEqual(value, 201);
   [dict2 release];
-  [dict release];
 }
 
 - (void)testRemove {
@@ -673,8 +665,7 @@
 }
 
 - (void)testOne {
-  GPBBoolUInt64Dictionary *dict = [[GPBBoolUInt64Dictionary alloc] init];
-  [dict setUInt64:300U forKey:YES];
+  GPBBoolUInt64Dictionary *dict = [GPBBoolUInt64Dictionary dictionaryWithUInt64:300U forKey:YES];
   XCTAssertNotNil(dict);
   XCTAssertEqual(dict.count, 1U);
   uint64_t value;
@@ -687,7 +678,6 @@
     XCTAssertEqual(aValue, 300U);
     XCTAssertNotEqual(stop, NULL);
   }];
-  [dict release];
 }
 
 - (void)testBasics {
@@ -826,18 +816,17 @@
   XCTAssertNotNil(dict);
 
   GPBBoolUInt64Dictionary *dict2 =
-      [[GPBBoolUInt64Dictionary alloc] initWithDictionary:dict];
+      [GPBBoolUInt64Dictionary dictionaryWithDictionary:dict];
   XCTAssertNotNil(dict2);
 
   // Should be new pointer, but equal objects.
   XCTAssertNotEqual(dict, dict2);
   XCTAssertEqualObjects(dict, dict2);
-  [dict2 release];
   [dict release];
 }
 
 - (void)testAdds {
-  GPBBoolUInt64Dictionary *dict = [[GPBBoolUInt64Dictionary alloc] init];
+  GPBBoolUInt64Dictionary *dict = [GPBBoolUInt64Dictionary dictionary];
   XCTAssertNotNil(dict);
 
   XCTAssertEqual(dict.count, 0U);
@@ -862,7 +851,6 @@
   XCTAssertTrue([dict getUInt64:&value forKey:NO]);
   XCTAssertEqual(value, 301U);
   [dict2 release];
-  [dict release];
 }
 
 - (void)testRemove {
@@ -978,8 +966,7 @@
 }
 
 - (void)testOne {
-  GPBBoolInt64Dictionary *dict = [[GPBBoolInt64Dictionary alloc] init];
-  [dict setInt64:400 forKey:YES];
+  GPBBoolInt64Dictionary *dict = [GPBBoolInt64Dictionary dictionaryWithInt64:400 forKey:YES];
   XCTAssertNotNil(dict);
   XCTAssertEqual(dict.count, 1U);
   int64_t value;
@@ -992,7 +979,6 @@
     XCTAssertEqual(aValue, 400);
     XCTAssertNotEqual(stop, NULL);
   }];
-  [dict release];
 }
 
 - (void)testBasics {
@@ -1131,18 +1117,17 @@
   XCTAssertNotNil(dict);
 
   GPBBoolInt64Dictionary *dict2 =
-      [[GPBBoolInt64Dictionary alloc] initWithDictionary:dict];
+      [GPBBoolInt64Dictionary dictionaryWithDictionary:dict];
   XCTAssertNotNil(dict2);
 
   // Should be new pointer, but equal objects.
   XCTAssertNotEqual(dict, dict2);
   XCTAssertEqualObjects(dict, dict2);
-  [dict2 release];
   [dict release];
 }
 
 - (void)testAdds {
-  GPBBoolInt64Dictionary *dict = [[GPBBoolInt64Dictionary alloc] init];
+  GPBBoolInt64Dictionary *dict = [GPBBoolInt64Dictionary dictionary];
   XCTAssertNotNil(dict);
 
   XCTAssertEqual(dict.count, 0U);
@@ -1167,7 +1152,6 @@
   XCTAssertTrue([dict getInt64:&value forKey:NO]);
   XCTAssertEqual(value, 401);
   [dict2 release];
-  [dict release];
 }
 
 - (void)testRemove {
@@ -1283,8 +1267,7 @@
 }
 
 - (void)testOne {
-  GPBBoolBoolDictionary *dict = [[GPBBoolBoolDictionary alloc] init];
-  [dict setBool:NO forKey:YES];
+  GPBBoolBoolDictionary *dict = [GPBBoolBoolDictionary dictionaryWithBool:NO forKey:YES];
   XCTAssertNotNil(dict);
   XCTAssertEqual(dict.count, 1U);
   BOOL value;
@@ -1297,7 +1280,6 @@
     XCTAssertEqual(aValue, NO);
     XCTAssertNotEqual(stop, NULL);
   }];
-  [dict release];
 }
 
 - (void)testBasics {
@@ -1436,18 +1418,17 @@
   XCTAssertNotNil(dict);
 
   GPBBoolBoolDictionary *dict2 =
-      [[GPBBoolBoolDictionary alloc] initWithDictionary:dict];
+      [GPBBoolBoolDictionary dictionaryWithDictionary:dict];
   XCTAssertNotNil(dict2);
 
   // Should be new pointer, but equal objects.
   XCTAssertNotEqual(dict, dict2);
   XCTAssertEqualObjects(dict, dict2);
-  [dict2 release];
   [dict release];
 }
 
 - (void)testAdds {
-  GPBBoolBoolDictionary *dict = [[GPBBoolBoolDictionary alloc] init];
+  GPBBoolBoolDictionary *dict = [GPBBoolBoolDictionary dictionary];
   XCTAssertNotNil(dict);
 
   XCTAssertEqual(dict.count, 0U);
@@ -1472,7 +1453,6 @@
   XCTAssertTrue([dict getBool:&value forKey:NO]);
   XCTAssertEqual(value, YES);
   [dict2 release];
-  [dict release];
 }
 
 - (void)testRemove {
@@ -1588,8 +1568,7 @@
 }
 
 - (void)testOne {
-  GPBBoolFloatDictionary *dict = [[GPBBoolFloatDictionary alloc] init];
-  [dict setFloat:500.f forKey:YES];
+  GPBBoolFloatDictionary *dict = [GPBBoolFloatDictionary dictionaryWithFloat:500.f forKey:YES];
   XCTAssertNotNil(dict);
   XCTAssertEqual(dict.count, 1U);
   float value;
@@ -1602,7 +1581,6 @@
     XCTAssertEqual(aValue, 500.f);
     XCTAssertNotEqual(stop, NULL);
   }];
-  [dict release];
 }
 
 - (void)testBasics {
@@ -1741,18 +1719,17 @@
   XCTAssertNotNil(dict);
 
   GPBBoolFloatDictionary *dict2 =
-      [[GPBBoolFloatDictionary alloc] initWithDictionary:dict];
+      [GPBBoolFloatDictionary dictionaryWithDictionary:dict];
   XCTAssertNotNil(dict2);
 
   // Should be new pointer, but equal objects.
   XCTAssertNotEqual(dict, dict2);
   XCTAssertEqualObjects(dict, dict2);
-  [dict2 release];
   [dict release];
 }
 
 - (void)testAdds {
-  GPBBoolFloatDictionary *dict = [[GPBBoolFloatDictionary alloc] init];
+  GPBBoolFloatDictionary *dict = [GPBBoolFloatDictionary dictionary];
   XCTAssertNotNil(dict);
 
   XCTAssertEqual(dict.count, 0U);
@@ -1777,7 +1754,6 @@
   XCTAssertTrue([dict getFloat:&value forKey:NO]);
   XCTAssertEqual(value, 501.f);
   [dict2 release];
-  [dict release];
 }
 
 - (void)testRemove {
@@ -1893,8 +1869,7 @@
 }
 
 - (void)testOne {
-  GPBBoolDoubleDictionary *dict = [[GPBBoolDoubleDictionary alloc] init];
-  [dict setDouble:600. forKey:YES];
+  GPBBoolDoubleDictionary *dict = [GPBBoolDoubleDictionary dictionaryWithDouble:600. forKey:YES];
   XCTAssertNotNil(dict);
   XCTAssertEqual(dict.count, 1U);
   double value;
@@ -1907,7 +1882,6 @@
     XCTAssertEqual(aValue, 600.);
     XCTAssertNotEqual(stop, NULL);
   }];
-  [dict release];
 }
 
 - (void)testBasics {
@@ -2046,18 +2020,17 @@
   XCTAssertNotNil(dict);
 
   GPBBoolDoubleDictionary *dict2 =
-      [[GPBBoolDoubleDictionary alloc] initWithDictionary:dict];
+      [GPBBoolDoubleDictionary dictionaryWithDictionary:dict];
   XCTAssertNotNil(dict2);
 
   // Should be new pointer, but equal objects.
   XCTAssertNotEqual(dict, dict2);
   XCTAssertEqualObjects(dict, dict2);
-  [dict2 release];
   [dict release];
 }
 
 - (void)testAdds {
-  GPBBoolDoubleDictionary *dict = [[GPBBoolDoubleDictionary alloc] init];
+  GPBBoolDoubleDictionary *dict = [GPBBoolDoubleDictionary dictionary];
   XCTAssertNotNil(dict);
 
   XCTAssertEqual(dict.count, 0U);
@@ -2082,7 +2055,6 @@
   XCTAssertTrue([dict getDouble:&value forKey:NO]);
   XCTAssertEqual(value, 601.);
   [dict2 release];
-  [dict release];
 }
 
 - (void)testRemove {
@@ -2198,8 +2170,7 @@
 }
 
 - (void)testOne {
-  GPBBoolObjectDictionary<NSString*> *dict = [[GPBBoolObjectDictionary alloc] init];
-  [dict setObject:@"abc" forKey:YES];
+  GPBBoolObjectDictionary<NSString*> *dict = [GPBBoolObjectDictionary dictionaryWithObject:@"abc" forKey:YES];
   XCTAssertNotNil(dict);
   XCTAssertEqual(dict.count, 1U);
   XCTAssertEqualObjects([dict objectForKey:YES], @"abc");
@@ -2209,7 +2180,6 @@
     XCTAssertEqualObjects(aObject, @"abc");
     XCTAssertNotEqual(stop, NULL);
   }];
-  [dict release];
 }
 
 - (void)testBasics {
@@ -2343,18 +2313,17 @@
   XCTAssertNotNil(dict);
 
   GPBBoolObjectDictionary<NSString*> *dict2 =
-      [[GPBBoolObjectDictionary alloc] initWithDictionary:dict];
+      [GPBBoolObjectDictionary dictionaryWithDictionary:dict];
   XCTAssertNotNil(dict2);
 
   // Should be new pointer, but equal objects.
   XCTAssertNotEqual(dict, dict2);
   XCTAssertEqualObjects(dict, dict2);
-  [dict2 release];
   [dict release];
 }
 
 - (void)testAdds {
-  GPBBoolObjectDictionary<NSString*> *dict = [[GPBBoolObjectDictionary alloc] init];
+  GPBBoolObjectDictionary<NSString*> *dict = [GPBBoolObjectDictionary dictionary];
   XCTAssertNotNil(dict);
 
   XCTAssertEqual(dict.count, 0U);
@@ -2374,7 +2343,6 @@
   XCTAssertEqualObjects([dict objectForKey:YES], @"abc");
   XCTAssertEqualObjects([dict objectForKey:NO], @"def");
   [dict2 release];
-  [dict release];
 }
 
 - (void)testRemove {

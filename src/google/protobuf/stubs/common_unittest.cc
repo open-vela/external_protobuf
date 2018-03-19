@@ -75,7 +75,7 @@ TEST(CommonTest, IntMinMaxConstants) {
   EXPECT_EQ(0, kuint64max + 1);
 }
 
-std::vector<string> captured_messages_;
+vector<string> captured_messages_;
 
 void CaptureLog(LogLevel level, const char* filename, int line,
                 const string& message) {

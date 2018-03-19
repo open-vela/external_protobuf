@@ -40,7 +40,6 @@
 #include <google/protobuf/util/json_format_proto3.pb.h>
 #include <google/protobuf/util/type_resolver.h>
 #include <google/protobuf/util/type_resolver_util.h>
-#include <google/protobuf/io/zero_copy_stream_impl.h>
 #include <gtest/gtest.h>
 
 namespace google {
@@ -333,64 +332,6 @@ TEST_F(JsonUtilTest, TestDynamicMessage) {
   EXPECT_EQ(ToJson(generated, options), ToJson(*message, options));
 }
 
-TEST_F(JsonUtilTest, TestParsingUnknownEnumsAs0) {
-  TestMessage m;
-  {
-    JsonParseOptions options;
-    ASSERT_FALSE(options.ignore_unknown_fields);
-    string input =
-      "{\n"
-      "  \"enum_value\":\"UNKNOWN_VALUE\"\n"
-      "}";
-    m.set_enum_value(proto3::BAR);
-    EXPECT_FALSE(FromJson(input, &m, options));
-    ASSERT_EQ(proto3::BAR, m.enum_value()); // Keep previous value
-
-    options.ignore_unknown_fields = true;
-    EXPECT_TRUE(FromJson(input, &m, options));
-    EXPECT_EQ(0, m.enum_value()); // Unknown enum value must be decoded as 0
-  }
-  // Integer values are read as usual
-  {
-    JsonParseOptions options;
-    string input =
-      "{\n"
-      "  \"enum_value\":12345\n"
-      "}";
-    m.set_enum_value(proto3::BAR);
-    EXPECT_TRUE(FromJson(input, &m, options));
-    ASSERT_EQ(12345, m.enum_value());
-
-    options.ignore_unknown_fields = true;
-    EXPECT_TRUE(FromJson(input, &m, options));
-    EXPECT_EQ(12345, m.enum_value());
-  }
-
-  // Trying to pass an object as an enum field value is always treated as an error
-  {
-    JsonParseOptions options;
-    string input =
-      "{\n"
-      "  \"enum_value\":{}\n"
-      "}";
-    options.ignore_unknown_fields = true;
-    EXPECT_FALSE(FromJson(input, &m, options));
-    options.ignore_unknown_fields = false;
-    EXPECT_FALSE(FromJson(input, &m, options));
-  }
-  // Trying to pass an array as an enum field value is always treated as an error
-  {
-    JsonParseOptions options;
-    string input =
-      "{\n"
-      "  \"enum_value\":[]\n"
-      "}";
-    EXPECT_FALSE(FromJson(input, &m, options));
-    options.ignore_unknown_fields = true;
-    EXPECT_FALSE(FromJson(input, &m, options));
-  }
-}
-
 typedef std::pair<char*, int> Segment;
 // A ZeroCopyOutputStream that writes to multiple buffers.
 class SegmentedZeroCopyOutputStream : public io::ZeroCopyOutputStream {
@@ -514,29 +455,6 @@ TEST(ZeroCopyStreamByteSinkTest, TestAllInputOutputPatterns) {
                 string(buffer, kOutputBufferLength));
     }
   }
-}
-
-TEST_F(JsonUtilTest, TestWrongJsonInput) {
-  using namespace google::protobuf;
-  const char json[] = "{\"unknown_field\":\"some_value\"}";
-  io::ArrayInputStream input_stream(json, strlen(json));
-  char proto_buffer[10000];
-  io::ArrayOutputStream output_stream(proto_buffer, sizeof(proto_buffer));
-  std::string message_type = "type.googleapis.com/proto3.TestMessage";  
-  TypeResolver* resolver = NewTypeResolverForDescriptorPool(
-  				"type.googleapis.com", 
-				DescriptorPool::generated_pool());
-  
-  util::Status result_status = util::JsonToBinaryStream(resolver, 
-  							message_type, 
-							&input_stream, 
-							&output_stream);
-  
-  delete resolver;
-
-  EXPECT_FALSE(result_status.ok());
-  EXPECT_EQ(result_status.error_code(), 
-  	    google::protobuf::util::error::INVALID_ARGUMENT);
 }
 
 }  // namespace

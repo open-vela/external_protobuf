@@ -263,7 +263,7 @@ ScopedMemoryLog::~ScopedMemoryLog() {
   active_log_ = NULL;
 }
 
-const std::vector<string>& ScopedMemoryLog::GetMessages(LogLevel level) {
+const vector<string>& ScopedMemoryLog::GetMessages(LogLevel level) {
   GOOGLE_CHECK(level == ERROR ||
                level == WARNING);
   return messages_[level];
