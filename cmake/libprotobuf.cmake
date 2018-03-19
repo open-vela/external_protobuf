@@ -4,6 +4,7 @@ set(libprotobuf_files
   ${protobuf_source_dir}/src/google/protobuf/api.pb.cc
   ${protobuf_source_dir}/src/google/protobuf/compiler/importer.cc
   ${protobuf_source_dir}/src/google/protobuf/compiler/parser.cc
+  ${protobuf_source_dir}/src/google/protobuf/compiler/plugin.pb.cc
   ${protobuf_source_dir}/src/google/protobuf/descriptor.cc
   ${protobuf_source_dir}/src/google/protobuf/descriptor.pb.cc
   ${protobuf_source_dir}/src/google/protobuf/descriptor_database.cc
@@ -125,5 +126,7 @@ if(MSVC AND protobuf_BUILD_SHARED_LIBS)
     PRIVATE LIBPROTOBUF_EXPORTS)
 endif()
 set_target_properties(libprotobuf PROPERTIES
+    VERSION ${protobuf_VERSION}
     OUTPUT_NAME ${LIB_PREFIX}protobuf
     DEBUG_POSTFIX "${protobuf_DEBUG_POSTFIX}")
+add_library(protobuf::libprotobuf ALIAS libprotobuf)

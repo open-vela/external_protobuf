@@ -88,7 +88,6 @@ set(libprotoc_files
   ${protobuf_source_dir}/src/google/protobuf/compiler/objectivec/objectivec_primitive_field.cc
   ${protobuf_source_dir}/src/google/protobuf/compiler/php/php_generator.cc
   ${protobuf_source_dir}/src/google/protobuf/compiler/plugin.cc
-  ${protobuf_source_dir}/src/google/protobuf/compiler/plugin.pb.cc
   ${protobuf_source_dir}/src/google/protobuf/compiler/python/python_generator.cc
   ${protobuf_source_dir}/src/google/protobuf/compiler/ruby/ruby_generator.cc
   ${protobuf_source_dir}/src/google/protobuf/compiler/subprocess.cc
@@ -225,5 +224,7 @@ if(MSVC AND protobuf_BUILD_SHARED_LIBS)
 endif()
 set_target_properties(libprotoc PROPERTIES
     COMPILE_DEFINITIONS LIBPROTOC_EXPORTS
+    VERSION ${protobuf_VERSION}
     OUTPUT_NAME ${LIB_PREFIX}protoc
     DEBUG_POSTFIX "${protobuf_DEBUG_POSTFIX}")
+add_library(protobuf::libprotoc ALIAS libprotoc)
