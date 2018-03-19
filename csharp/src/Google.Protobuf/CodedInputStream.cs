@@ -94,7 +94,7 @@ namespace Google.Protobuf
         private bool hasNextTag = false;
 
         internal const int DefaultRecursionLimit = 64;
-        internal const int DefaultSizeLimit = Int32.MaxValue;
+        internal const int DefaultSizeLimit = 64 << 20; // 64MB
         internal const int BufferSize = 4096;
 
         /// <summary>
@@ -248,7 +248,7 @@ namespace Google.Protobuf
         /// <remarks>
         /// This limit is applied when reading from the underlying stream, as a sanity check. It is
         /// not applied when reading from a byte array data source without an underlying stream.
-        /// The default value is Int32.MaxValue.
+        /// The default value is 64MB.
         /// </remarks>
         /// <value>
         /// The size limit.
@@ -266,11 +266,6 @@ namespace Google.Protobuf
         /// The recursion limit for this stream.
         /// </value>
         public int RecursionLimit { get { return recursionLimit; } }
-
-        /// <summary>
-        /// Internal-only property; when set to true, unknown fields will be discarded while parsing.
-        /// </summary>
-        internal bool DiscardUnknownFields { get; set; }
 
         /// <summary>
         /// Disposes of this instance, potentially closing any underlying stream.
@@ -1058,7 +1053,7 @@ namespace Google.Protobuf
                 RecomputeBufferSizeAfterLimit();
                 int totalBytesRead =
                     totalBytesRetired + bufferSize + bufferSizeAfterLimit;
-                if (totalBytesRead < 0 || totalBytesRead > sizeLimit)
+                if (totalBytesRead > sizeLimit || totalBytesRead < 0)
                 {
                     throw InvalidProtocolBufferException.SizeLimitExceeded();
                 }

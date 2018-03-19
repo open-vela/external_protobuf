@@ -8,17 +8,12 @@ endif()
 # CMake policies
 cmake_policy(SET CMP0022 NEW)
 
-if(POLICY CMP0048)
-  cmake_policy(SET CMP0048 NEW)
-endif()
-
 # Project
 project(protobuf C CXX)
 
 # Options
 option(protobuf_BUILD_TESTS "Build tests" ON)
 option(protobuf_BUILD_EXAMPLES "Build examples" OFF)
-option(protobuf_BUILD_PROTOC_BINARIES "Build libprotoc and protoc compiler" ON)
 if (BUILD_SHARED_LIBS)
   set(protobuf_BUILD_SHARED_LIBS_DEFAULT ON)
 else (BUILD_SHARED_LIBS)
@@ -28,7 +23,11 @@ option(protobuf_BUILD_SHARED_LIBS "Build Shared Libraries" ${protobuf_BUILD_SHAR
 include(CMakeDependentOption)
 cmake_dependent_option(protobuf_MSVC_STATIC_RUNTIME "Link static runtime libraries" ON
   "NOT protobuf_BUILD_SHARED_LIBS" OFF)
-set(protobuf_WITH_ZLIB_DEFAULT ON)
+if (MSVC)
+  set(protobuf_WITH_ZLIB_DEFAULT OFF)
+else (MSVC)
+  set(protobuf_WITH_ZLIB_DEFAULT ON)
+endif (MSVC)
 option(protobuf_WITH_ZLIB "Build with zlib support" ${protobuf_WITH_ZLIB_DEFAULT})
 set(protobuf_DEBUG_POSTFIX "d"
   CACHE STRING "Default debug postfix")
@@ -185,10 +184,8 @@ endif (protobuf_UNICODE)
 
 include(libprotobuf-lite.cmake)
 include(libprotobuf.cmake)
-if (protobuf_BUILD_PROTOC_BINARIES)
-  include(libprotoc.cmake)
-  include(protoc.cmake)
-endif (protobuf_BUILD_PROTOC_BINARIES)
+include(libprotoc.cmake)
+include(protoc.cmake)
 
 if (protobuf_BUILD_TESTS)
   include(tests.cmake)

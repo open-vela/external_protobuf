@@ -149,7 +149,7 @@ void EnumGenerator::GenerateSource(io::Printer* printer) {
 
   printer->Print(
       "GPBEnumDescriptor *$name$_EnumDescriptor(void) {\n"
-      "  static _Atomic(GPBEnumDescriptor*) descriptor = nil;\n"
+      "  static GPBEnumDescriptor *descriptor = NULL;\n"
       "  if (!descriptor) {\n",
       "name", name_);
 
@@ -192,8 +192,7 @@ void EnumGenerator::GenerateSource(io::Printer* printer) {
         "extraTextFormatInfo", CEscape(text_format_decode_data.Data()));
     }
     printer->Print(
-      "    GPBEnumDescriptor *expected = nil;\n"
-      "    if (!atomic_compare_exchange_strong(&descriptor, &expected, worker)) {\n"
+      "    if (!OSAtomicCompareAndSwapPtrBarrier(nil, worker, (void * volatile *)&descriptor)) {\n"
       "      [worker release];\n"
       "    }\n"
       "  }\n"

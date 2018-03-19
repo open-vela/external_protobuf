@@ -437,10 +437,11 @@ void ImmutableMessageGenerator::Generate(io::Printer* printer) {
     for (int j = 0; j < descriptor_->oneof_decl(i)->field_count(); j++) {
       const FieldDescriptor* field = descriptor_->oneof_decl(i)->field(j);
       printer->Print(
-        "$deprecation$$field_name$($field_number$),\n",
-        "deprecation", field->options().deprecated() ? "@java.lang.Deprecated " : "",
-        "field_name", ToUpper(field->name()),
-        "field_number", SimpleItoa(field->number()));
+        "$field_name$($field_number$),\n",
+        "field_name",
+        ToUpper(field->name()),
+        "field_number",
+        SimpleItoa(field->number()));
     }
     printer->Print(
       "$cap_oneof_name$_NOT_SET(0);\n",
@@ -554,7 +555,6 @@ void ImmutableMessageGenerator::Generate(io::Printer* printer) {
   GenerateParser(printer);
 
   printer->Print(
-    "@java.lang.Override\n"
     "public $classname$ getDefaultInstanceForType() {\n"
     "  return DEFAULT_INSTANCE;\n"
     "}\n"
@@ -588,7 +588,6 @@ GenerateMessageSerializationMethods(io::Printer* printer) {
   std::sort(sorted_extensions.begin(), sorted_extensions.end(),
             ExtensionRangeOrdering());
   printer->Print(
-    "@java.lang.Override\n"
     "public void writeTo(com.google.protobuf.CodedOutputStream output)\n"
     "                    throws java.io.IOException {\n");
   printer->Indent();
@@ -649,7 +648,6 @@ GenerateMessageSerializationMethods(io::Printer* printer) {
   printer->Print(
       "}\n"
       "\n"
-      "@java.lang.Override\n"
       "public int getSerializedSize() {\n"
       "  int size = memoizedSize;\n"
       "  if (size != -1) return size;\n"
@@ -791,7 +789,6 @@ void ImmutableMessageGenerator::GenerateSerializeOneExtensionRange(
 void ImmutableMessageGenerator::GenerateBuilder(io::Printer* printer) {
   // LITE_RUNTIME implements this at the GeneratedMessageLite level.
   printer->Print(
-    "@java.lang.Override\n"
     "public Builder newBuilderForType() { return newBuilder(); }\n");
 
   printer->Print(
@@ -801,7 +798,6 @@ void ImmutableMessageGenerator::GenerateBuilder(io::Printer* printer) {
     "public static Builder newBuilder($classname$ prototype) {\n"
     "  return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);\n"
     "}\n"
-    "@java.lang.Override\n"
     "public Builder toBuilder() {\n"
     "  return this == DEFAULT_INSTANCE\n"
     "      ? new Builder() : new Builder().mergeFrom(this);\n"
@@ -845,7 +841,6 @@ GenerateDescriptorMethods(io::Printer* printer) {
   if (!map_fields.empty()) {
     printer->Print(
       "@SuppressWarnings({\"rawtypes\"})\n"
-      "@java.lang.Override\n"
       "protected com.google.protobuf.MapField internalGetMapField(\n"
       "    int number) {\n"
       "  switch (number) {\n");
@@ -871,7 +866,6 @@ GenerateDescriptorMethods(io::Printer* printer) {
         "}\n");
   }
   printer->Print(
-    "@java.lang.Override\n"
     "protected com.google.protobuf.GeneratedMessage$ver$.FieldAccessorTable\n"
     "    internalGetFieldAccessorTable() {\n"
     "  return $fileclass$.internal_$identifier$_fieldAccessorTable\n"
@@ -895,7 +889,6 @@ void ImmutableMessageGenerator::GenerateIsInitialized(
   printer->Print(
     "private byte memoizedIsInitialized = -1;\n");
   printer->Print(
-    "@java.lang.Override\n"
     "public final boolean isInitialized() {\n");
   printer->Indent();
 
@@ -1266,9 +1259,19 @@ GenerateParsingConstructor(io::Printer* printer) {
   printer->Indent();
 
   printer->Print(
-      "case 0:\n"  // zero signals EOF / limit reached
-      "  done = true;\n"
-      "  break;\n");
+    "case 0:\n"  // zero signals EOF / limit reached
+    "  done = true;\n"
+    "  break;\n"
+    "default: {\n"
+    "  if (!parseUnknownField$suffix$(\n"
+    "      input, unknownFields, extensionRegistry, tag)) {\n"
+    "    done = true;\n"  // it's an endgroup tag
+    "  }\n"
+    "  break;\n"
+    "}\n",
+    "suffix",
+    descriptor_->file()->syntax() == FileDescriptor::SYNTAX_PROTO3 ? "Proto3"
+                                                                   : "");
 
   for (int i = 0; i < descriptor_->field_count(); i++) {
     const FieldDescriptor* field = sorted_fields[i];
@@ -1305,18 +1308,6 @@ GenerateParsingConstructor(io::Printer* printer) {
         "}\n");
     }
   }
-
-  printer->Print(
-      "default: {\n"
-      "  if (!parseUnknownField$suffix$(\n"
-      "      input, unknownFields, extensionRegistry, tag)) {\n"
-      "    done = true;\n"  // it's an endgroup tag
-      "  }\n"
-      "  break;\n"
-      "}\n",
-      "suffix",
-      descriptor_->file()->syntax() == FileDescriptor::SYNTAX_PROTO3 ? "Proto3"
-                                                                     : "");
 
   printer->Outdent();
   printer->Outdent();
@@ -1365,7 +1356,6 @@ void ImmutableMessageGenerator::GenerateParser(io::Printer* printer) {
       "classname", descriptor_->name());
   printer->Indent();
   printer->Print(
-      "@java.lang.Override\n"
       "public $classname$ parsePartialFrom(\n"
       "    com.google.protobuf.CodedInputStream input,\n"
       "    com.google.protobuf.ExtensionRegistryLite extensionRegistry)\n"

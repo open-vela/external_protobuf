@@ -56,20 +56,6 @@ const int32 GOOGLE_PROTOBUF_OBJC_VERSION = 30002;
 
 const char* kHeaderExtension = ".pbobjc.h";
 
-// Checks if a message contains any enums definitions (on the message or
-// a nested message under it).
-bool MessageContainsEnums(const Descriptor* message) {
-  if (message->enum_type_count() > 0) {
-    return true;
-  }
-  for (int i = 0; i < message->nested_type_count(); i++) {
-    if (MessageContainsEnums(message->nested_type(i))) {
-      return true;
-    }
-  }
-  return false;
-}
-
 // Checks if a message contains any extension definitions (on the message or
 // a nested message under it).
 bool MessageContainsExtensions(const Descriptor* message) {
@@ -78,20 +64,6 @@ bool MessageContainsExtensions(const Descriptor* message) {
   }
   for (int i = 0; i < message->nested_type_count(); i++) {
     if (MessageContainsExtensions(message->nested_type(i))) {
-      return true;
-    }
-  }
-  return false;
-}
-
-// Checks if the file contains any enum definitions (at the root or
-// nested under a message).
-bool FileContainsEnums(const FileDescriptor* file) {
-  if (file->enum_type_count() > 0) {
-    return true;
-  }
-  for (int i = 0; i < file->message_type_count(); i++) {
-    if (MessageContainsEnums(file->message_type(i))) {
       return true;
     }
   }
@@ -116,9 +88,9 @@ bool FileContainsExtensions(const FileDescriptor* file) {
 // deps as visited and prunes them from the needed files list.
 void PruneFileAndDepsMarkingAsVisited(
     const FileDescriptor* file,
-    std::vector<const FileDescriptor*>* files,
+    vector<const FileDescriptor*>* files,
     std::set<const FileDescriptor*>* files_visited) {
-  std::vector<const FileDescriptor*>::iterator iter =
+  vector<const FileDescriptor*>::iterator iter =
       std::find(files->begin(), files->end(), file);
   if (iter != files->end()) {
     files->erase(iter);
@@ -132,7 +104,7 @@ void PruneFileAndDepsMarkingAsVisited(
 // Helper for CollectMinimalFileDepsContainingExtensions.
 void CollectMinimalFileDepsContainingExtensionsWorker(
     const FileDescriptor* file,
-    std::vector<const FileDescriptor*>* files,
+    vector<const FileDescriptor*>* files,
     std::set<const FileDescriptor*>* files_visited) {
   if (files_visited->find(file) != files_visited->end()) {
     return;
@@ -165,7 +137,7 @@ void CollectMinimalFileDepsContainingExtensionsWorker(
 // specifically).
 void CollectMinimalFileDepsContainingExtensions(
     const FileDescriptor* file,
-    std::vector<const FileDescriptor*>* files) {
+    vector<const FileDescriptor*>* files) {
   std::set<const FileDescriptor*> files_visited;
   for (int i = 0; i < file->dependency_count(); i++) {
     const FileDescriptor* dep = file->dependency(i);
@@ -258,7 +230,7 @@ void FileGenerator::GenerateHeader(io::Printer *printer) {
       "\n");
 
   std::set<string> fwd_decls;
-  for (std::vector<MessageGenerator *>::iterator iter = message_generators_.begin();
+  for (vector<MessageGenerator *>::iterator iter = message_generators_.begin();
        iter != message_generators_.end(); ++iter) {
     (*iter)->DetermineForwardDeclarations(&fwd_decls);
   }
@@ -275,12 +247,12 @@ void FileGenerator::GenerateHeader(io::Printer *printer) {
       "\n");
 
   // need to write out all enums first
-  for (std::vector<EnumGenerator *>::iterator iter = enum_generators_.begin();
+  for (vector<EnumGenerator *>::iterator iter = enum_generators_.begin();
        iter != enum_generators_.end(); ++iter) {
     (*iter)->GenerateHeader(printer);
   }
 
-  for (std::vector<MessageGenerator *>::iterator iter = message_generators_.begin();
+  for (vector<MessageGenerator *>::iterator iter = message_generators_.begin();
        iter != message_generators_.end(); ++iter) {
     (*iter)->GenerateEnumHeader(printer);
   }
@@ -311,7 +283,7 @@ void FileGenerator::GenerateHeader(io::Printer *printer) {
         "@interface $root_class_name$ (DynamicMethods)\n",
         "root_class_name", root_class_name_);
 
-    for (std::vector<ExtensionGenerator *>::iterator iter =
+    for (vector<ExtensionGenerator *>::iterator iter =
              extension_generators_.begin();
          iter != extension_generators_.end(); ++iter) {
       (*iter)->GenerateMembersHeader(printer);
@@ -320,7 +292,7 @@ void FileGenerator::GenerateHeader(io::Printer *printer) {
     printer->Print("@end\n\n");
   }  // extension_generators_.size() > 0
 
-  for (std::vector<MessageGenerator *>::iterator iter = message_generators_.begin();
+  for (vector<MessageGenerator *>::iterator iter = message_generators_.begin();
        iter != message_generators_.end(); ++iter) {
     (*iter)->GenerateMessageHeader(printer);
   }
@@ -339,14 +311,7 @@ void FileGenerator::GenerateSource(io::Printer *printer) {
   // #import the runtime support.
   PrintFileRuntimePreamble(printer, "GPBProtocolBuffers_RuntimeSupport.h");
 
-  // Enums use atomic in the generated code, so add the system import as needed.
-  if (FileContainsEnums(file_)) {
-    printer->Print(
-        "#import <stdatomic.h>\n"
-        "\n");
-  }
-
-  std::vector<const FileDescriptor*> deps_with_extensions;
+  vector<const FileDescriptor*> deps_with_extensions;
   CollectMinimalFileDepsContainingExtensions(file_, &deps_with_extensions);
 
   {
@@ -376,7 +341,7 @@ void FileGenerator::GenerateSource(io::Printer *printer) {
     // imported so it can get merged into the root's extensions registry.
     // See the Note by CollectMinimalFileDepsContainingExtensions before
     // changing this.
-    for (std::vector<const FileDescriptor *>::iterator iter =
+    for (vector<const FileDescriptor *>::iterator iter =
              deps_with_extensions.begin();
          iter != deps_with_extensions.end(); ++iter) {
       if (!IsDirectDependency(*iter, file_)) {
@@ -388,7 +353,7 @@ void FileGenerator::GenerateSource(io::Printer *printer) {
   }
 
   bool includes_oneof = false;
-  for (std::vector<MessageGenerator *>::iterator iter = message_generators_.begin();
+  for (vector<MessageGenerator *>::iterator iter = message_generators_.begin();
        iter != message_generators_.end(); ++iter) {
     if ((*iter)->IncludesOneOfDefinition()) {
       includes_oneof = true;
@@ -441,12 +406,12 @@ void FileGenerator::GenerateSource(io::Printer *printer) {
       printer->Print(
           "static GPBExtensionDescription descriptions[] = {\n");
       printer->Indent();
-      for (std::vector<ExtensionGenerator *>::iterator iter =
+      for (vector<ExtensionGenerator *>::iterator iter =
                extension_generators_.begin();
            iter != extension_generators_.end(); ++iter) {
         (*iter)->GenerateStaticVariablesInitialization(printer);
       }
-      for (std::vector<MessageGenerator *>::iterator iter =
+      for (vector<MessageGenerator *>::iterator iter =
                message_generators_.begin();
            iter != message_generators_.end(); ++iter) {
         (*iter)->GenerateStaticVariablesInitialization(printer);
@@ -470,7 +435,7 @@ void FileGenerator::GenerateSource(io::Printer *printer) {
     } else {
       printer->Print(
           "// Merge in the imports (direct or indirect) that defined extensions.\n");
-      for (std::vector<const FileDescriptor *>::iterator iter =
+      for (vector<const FileDescriptor *>::iterator iter =
                deps_with_extensions.begin();
            iter != deps_with_extensions.end(); ++iter) {
         const string root_class_name(FileClassName((*iter)));
@@ -546,11 +511,11 @@ void FileGenerator::GenerateSource(io::Printer *printer) {
         "\n");
   }
 
-  for (std::vector<EnumGenerator *>::iterator iter = enum_generators_.begin();
+  for (vector<EnumGenerator *>::iterator iter = enum_generators_.begin();
        iter != enum_generators_.end(); ++iter) {
     (*iter)->GenerateSource(printer);
   }
-  for (std::vector<MessageGenerator *>::iterator iter = message_generators_.begin();
+  for (vector<MessageGenerator *>::iterator iter = message_generators_.begin();
        iter != message_generators_.end(); ++iter) {
     (*iter)->GenerateSource(printer);
   }
