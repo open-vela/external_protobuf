@@ -32,6 +32,7 @@
 //  Based on original Protocol Buffers design by
 //  Sanjay Ghemawat, Jeff Dean, and others.
 
+
 #ifdef _MSC_VER
 #include <direct.h>
 #else
@@ -44,6 +45,9 @@
 
 #include <algorithm>
 #include <memory>
+#ifndef _SHARED_PTR_H
+#include <google/protobuf/stubs/shared_ptr.h>
+#endif
 
 #include <google/protobuf/compiler/importer.h>
 
@@ -51,8 +55,6 @@
 #include <google/protobuf/io/tokenizer.h>
 #include <google/protobuf/io/zero_copy_stream_impl.h>
 #include <google/protobuf/stubs/strutil.h>
-
-
 #include <google/protobuf/stubs/io_win32.h>
 
 #ifdef _WIN32
@@ -129,7 +131,7 @@ SourceTreeDescriptorDatabase::~SourceTreeDescriptorDatabase() {}
 
 bool SourceTreeDescriptorDatabase::FindFileByName(
     const string& filename, FileDescriptorProto* output) {
-  std::unique_ptr<io::ZeroCopyInputStream> input(source_tree_->Open(filename));
+  google::protobuf::scoped_ptr<io::ZeroCopyInputStream> input(source_tree_->Open(filename));
   if (input == NULL) {
     if (error_collector_ != NULL) {
       error_collector_->AddError(filename, -1, 0,
@@ -418,7 +420,7 @@ DiskSourceTree::DiskFileToVirtualFile(
   // Verify that we can open the file.  Note that this also has the side-effect
   // of verifying that we are not canonicalizing away any non-existent
   // directories.
-  std::unique_ptr<io::ZeroCopyInputStream> stream(OpenDiskFile(disk_file));
+  google::protobuf::scoped_ptr<io::ZeroCopyInputStream> stream(OpenDiskFile(disk_file));
   if (stream == NULL) {
     return CANNOT_OPEN;
   }
@@ -428,7 +430,7 @@ DiskSourceTree::DiskFileToVirtualFile(
 
 bool DiskSourceTree::VirtualFileToDiskFile(const string& virtual_file,
                                            string* disk_file) {
-  std::unique_ptr<io::ZeroCopyInputStream> stream(
+  google::protobuf::scoped_ptr<io::ZeroCopyInputStream> stream(
       OpenVirtualFile(virtual_file, disk_file));
   return stream != NULL;
 }

@@ -33,13 +33,16 @@
 #include <google/protobuf/compiler/java/java_shared_code_generator.h>
 
 #include <memory>
+#ifndef _SHARED_PTR_H
+#include <google/protobuf/stubs/shared_ptr.h>
+#endif
 
 #include <google/protobuf/compiler/java/java_helpers.h>
 #include <google/protobuf/compiler/java/java_name_resolver.h>
 #include <google/protobuf/compiler/code_generator.h>
-#include <google/protobuf/descriptor.pb.h>
 #include <google/protobuf/io/printer.h>
 #include <google/protobuf/io/zero_copy_stream.h>
+#include <google/protobuf/descriptor.pb.h>
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/stubs/strutil.h>
 
@@ -66,11 +69,11 @@ void SharedCodeGenerator::Generate(GeneratorContext* context,
     string classname = name_resolver_->GetDescriptorClassName(file_);
     string filename = package_dir + classname + ".java";
     file_list->push_back(filename);
-    std::unique_ptr<io::ZeroCopyOutputStream> output(context->Open(filename));
+    google::protobuf::scoped_ptr<io::ZeroCopyOutputStream> output(context->Open(filename));
     GeneratedCodeInfo annotations;
     io::AnnotationProtoCollector<GeneratedCodeInfo> annotation_collector(
         &annotations);
-    std::unique_ptr<io::Printer> printer(
+    google::protobuf::scoped_ptr<io::Printer> printer(
         new io::Printer(output.get(), '$',
                         options_.annotate_code ? &annotation_collector : NULL));
     string info_relative_path = classname + ".java.pb.meta";
@@ -105,7 +108,7 @@ void SharedCodeGenerator::Generate(GeneratorContext* context,
       "}\n");
 
     if (options_.annotate_code) {
-      std::unique_ptr<io::ZeroCopyOutputStream> info_output(
+      google::protobuf::scoped_ptr<io::ZeroCopyOutputStream> info_output(
           context->Open(info_full_path));
       annotations.SerializeToZeroCopyStream(info_output.get());
       annotation_file_list->push_back(info_full_path);

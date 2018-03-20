@@ -987,7 +987,7 @@ public final class TextFormat {
         nextToken();
         return false;
       } else {
-        throw parseException("Expected \"true\" or \"false\". Found \"" + currentToken + "\".");
+        throw parseException("Expected \"true\" or \"false\".");
       }
     }
 
@@ -1311,17 +1311,13 @@ public final class TextFormat {
     }
 
     private final boolean allowUnknownFields;
-    private final boolean allowUnknownEnumValues;
     private final SingularOverwritePolicy singularOverwritePolicy;
     private TextFormatParseInfoTree.Builder parseInfoTreeBuilder;
 
     private Parser(
-        boolean allowUnknownFields,
-        boolean allowUnknownEnumValues,
-        SingularOverwritePolicy singularOverwritePolicy,
+        boolean allowUnknownFields, SingularOverwritePolicy singularOverwritePolicy,
         TextFormatParseInfoTree.Builder parseInfoTreeBuilder) {
       this.allowUnknownFields = allowUnknownFields;
-      this.allowUnknownEnumValues = allowUnknownEnumValues;
       this.singularOverwritePolicy = singularOverwritePolicy;
       this.parseInfoTreeBuilder = parseInfoTreeBuilder;
     }
@@ -1338,7 +1334,6 @@ public final class TextFormat {
      */
     public static class Builder {
       private boolean allowUnknownFields = false;
-      private boolean allowUnknownEnumValues = false;
       private SingularOverwritePolicy singularOverwritePolicy =
           SingularOverwritePolicy.ALLOW_SINGULAR_OVERWRITES;
       private TextFormatParseInfoTree.Builder parseInfoTreeBuilder = null;
@@ -1360,10 +1355,7 @@ public final class TextFormat {
 
       public Parser build() {
         return new Parser(
-            allowUnknownFields,
-            allowUnknownEnumValues,
-            singularOverwritePolicy,
-            parseInfoTreeBuilder);
+            allowUnknownFields, singularOverwritePolicy, parseInfoTreeBuilder);
       }
     }
 
@@ -1427,7 +1419,7 @@ public final class TextFormat {
       return text;
     }
 
-    // Check both unknown fields and unknown extensions and log warning messages
+    // Check both unknown fields and unknown extensions and log warming messages
     // or throw exceptions according to the flag.
     private void checkUnknownFields(final List<String> unknownFields)
         throws ParseException {
@@ -1745,40 +1737,17 @@ public final class TextFormat {
               final int number = tokenizer.consumeInt32();
               value = enumType.findValueByNumber(number);
               if (value == null) {
-                String unknownValueMsg =
-                    "Enum type \""
-                        + enumType.getFullName()
-                        + "\" has no value with number "
-                        + number
-                        + '.';
-                if (allowUnknownEnumValues) {
-                  logger.warning(unknownValueMsg);
-                  return;
-                } else {
-                  throw tokenizer.parseExceptionPreviousToken(
-                      "Enum type \""
-                          + enumType.getFullName()
-                          + "\" has no value with number "
-                          + number
-                          + '.');
-                }
+                throw tokenizer.parseExceptionPreviousToken(
+                  "Enum type \"" + enumType.getFullName()
+                  + "\" has no value with number " + number + '.');
               }
             } else {
               final String id = tokenizer.consumeIdentifier();
               value = enumType.findValueByName(id);
               if (value == null) {
-                String unknownValueMsg =
-                    "Enum type \""
-                        + enumType.getFullName()
-                        + "\" has no value named \""
-                        + id
-                        + "\".";
-                if (allowUnknownEnumValues) {
-                  logger.warning(unknownValueMsg);
-                  return;
-                } else {
-                  throw tokenizer.parseExceptionPreviousToken(unknownValueMsg);
-                }
+                throw tokenizer.parseExceptionPreviousToken(
+                  "Enum type \"" + enumType.getFullName()
+                  + "\" has no value named \"" + id + "\".");
               }
             }
 

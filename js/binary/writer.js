@@ -236,12 +236,10 @@ jspb.BinaryWriter.prototype.getResultBuffer = function() {
 
 /**
  * Converts the encoded data into a base64-encoded string.
- * @param {boolean=} opt_webSafe True indicates we should use a websafe
- *     alphabet, which does not require escaping for use in URLs.
  * @return {string}
  */
-jspb.BinaryWriter.prototype.getResultBase64String = function(opt_webSafe) {
-  return goog.crypt.base64.encodeByteArray(this.getResultBuffer(), opt_webSafe);
+jspb.BinaryWriter.prototype.getResultBase64String = function() {
+  return goog.crypt.base64.encodeByteArray(this.getResultBuffer());
 };
 
 
