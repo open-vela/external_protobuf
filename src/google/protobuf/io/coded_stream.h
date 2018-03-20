@@ -110,7 +110,6 @@
 #define GOOGLE_PROTOBUF_IO_CODED_STREAM_H__
 
 #include <assert.h>
-#include <atomic>
 #include <climits>
 #include <string>
 #include <utility>
@@ -132,6 +131,7 @@
     #define PROTOBUF_LITTLE_ENDIAN 1
   #endif
 #endif
+#include <google/protobuf/stubs/atomicops.h>
 #include <google/protobuf/stubs/common.h>
 #include <google/protobuf/stubs/port.h>
 #include <google/protobuf/stubs/port.h>
@@ -829,7 +829,7 @@ class LIBPROTOBUF_EXPORT CodedOutputStream {
   // canonicalization specification and implement the serializer using
   // reflection APIs rather than relying on this API.
   //
-  // If deterministic serialization is requested, the serializer will
+  // If determinisitc serialization is requested, the serializer will
   // sort map entries by keys in lexicographical order or numerical order.
   // (This is an implementation detail and may subject to change.)
   //
@@ -840,18 +840,21 @@ class LIBPROTOBUF_EXPORT CodedOutputStream {
   // Otherwise, SetSerializationDeterministic has been called, and the last
   // value passed to it is all that matters.
   void SetSerializationDeterministic(bool value) {
-    is_serialization_deterministic_ = value;
+    serialization_deterministic_is_overridden_ = true;
+    serialization_deterministic_override_ = value;
   }
   // See above.  Also, note that users of this CodedOutputStream may need to
   // call IsSerializationDeterministic() to serialize in the intended way.  This
   // CodedOutputStream cannot enforce a desire for deterministic serialization
   // by itself.
   bool IsSerializationDeterministic() const {
-    return is_serialization_deterministic_;
+    return serialization_deterministic_is_overridden_ ?
+        serialization_deterministic_override_ :
+        IsDefaultSerializationDeterministic();
   }
 
   static bool IsDefaultSerializationDeterministic() {
-    return default_serialization_deterministic_.load(std::memory_order_relaxed);
+    return google::protobuf::internal::NoBarrier_Load(&default_serialization_deterministic_);
   }
 
  private:
@@ -863,8 +866,12 @@ class LIBPROTOBUF_EXPORT CodedOutputStream {
   int total_bytes_;  // Sum of sizes of all buffers seen so far.
   bool had_error_;   // Whether an error occurred during output.
   bool aliasing_enabled_;  // See EnableAliasing().
-  bool is_serialization_deterministic_;
-  static std::atomic<bool> default_serialization_deterministic_;
+  // See SetSerializationDeterministic() regarding these three fields.
+  bool serialization_deterministic_is_overridden_;
+  bool serialization_deterministic_override_;
+  // Conceptually, default_serialization_deterministic_ is an atomic bool.
+  // TODO(haberman): replace with std::atomic<bool> when we move to C++11.
+  static google::protobuf::internal::AtomicWord default_serialization_deterministic_;
 
   // Advance the buffer by a given number of bytes.
   void Advance(int amount);
@@ -891,7 +898,7 @@ class LIBPROTOBUF_EXPORT CodedOutputStream {
   // thread has done so.
   friend void ::google::protobuf::internal::MapTestForceDeterministic();
   static void SetDefaultSerializationDeterministic() {
-    default_serialization_deterministic_.store(true, std::memory_order_relaxed);
+    google::protobuf::internal::NoBarrier_Store(&default_serialization_deterministic_, 1);
   }
 };
 

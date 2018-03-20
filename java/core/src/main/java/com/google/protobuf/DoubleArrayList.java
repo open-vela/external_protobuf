@@ -82,18 +82,6 @@ final class DoubleArrayList extends AbstractProtobufList<Double>
   }
 
   @Override
-  protected void removeRange(int fromIndex, int toIndex) {
-    ensureIsMutable();
-    if (toIndex < fromIndex) {
-      throw new IndexOutOfBoundsException("toIndex < fromIndex");
-    }
-
-    System.arraycopy(array, toIndex, array, fromIndex, size - toIndex);
-    size -= (toIndex - fromIndex);
-    modCount++;
-  }
-
-  @Override
   public boolean equals(Object o) {
     if (this == o) {
       return true;
@@ -259,9 +247,7 @@ final class DoubleArrayList extends AbstractProtobufList<Double>
     ensureIsMutable();
     ensureIndexInRange(index);
     double value = array[index];
-    if (index < size - 1) {
-      System.arraycopy(array, index + 1, array, index, size - index);
-    }
+    System.arraycopy(array, index + 1, array, index, size - index);
     size--;
     modCount++;
     return value;
