@@ -100,9 +100,7 @@ PyObject* New(PyTypeObject* type, PyObject* args, PyObject* kwargs) {
       NewMessageFactory(type, reinterpret_cast<PyDescriptorPool*>(pool)));
 }
 
-static void Dealloc(PyObject* pself) {
-  PyMessageFactory* self = reinterpret_cast<PyMessageFactory*>(pself);
-
+static void Dealloc(PyMessageFactory* self) {
   // TODO(amauryfa): When the MessageFactory is not created from the
   // DescriptorPool this reference should be owned, not borrowed.
   // Py_CLEAR(self->pool);
@@ -113,7 +111,7 @@ static void Dealloc(PyObject* pself) {
   }
   delete self->classes_by_descriptor;
   delete self->message_factory;
-  Py_TYPE(self)->tp_free(pself);
+  Py_TYPE(self)->tp_free(reinterpret_cast<PyObject*>(self));
 }
 
 // Add a message class to our database.
@@ -233,7 +231,7 @@ PyTypeObject PyMessageFactory_Type = {
     ".MessageFactory",                        // tp_name
     sizeof(PyMessageFactory),                 // tp_basicsize
     0,                                        // tp_itemsize
-    message_factory::Dealloc,                 // tp_dealloc
+    (destructor)message_factory::Dealloc,     // tp_dealloc
     0,                                        // tp_print
     0,                                        // tp_getattr
     0,                                        // tp_setattr

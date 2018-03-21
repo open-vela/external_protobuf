@@ -49,6 +49,8 @@
 #include <google/protobuf/compiler/csharp/csharp_message.h>
 #include <google/protobuf/compiler/csharp/csharp_names.h>
 
+using google::protobuf::internal::scoped_ptr;
+
 namespace google {
 namespace protobuf {
 namespace compiler {
@@ -182,7 +184,7 @@ void MessageGenerator::Generate(io::Printer* printer) {
       "field_name", fieldDescriptor->name(),
       "field_constant_name", GetFieldConstantName(fieldDescriptor),
       "index", SimpleItoa(fieldDescriptor->number()));
-    std::unique_ptr<FieldGeneratorBase> generator(
+    scoped_ptr<FieldGeneratorBase> generator(
         CreateFieldGeneratorInternal(fieldDescriptor));
     generator->GenerateMembers(printer);
     printer->Print("\n");
@@ -291,7 +293,7 @@ void MessageGenerator::GenerateCloningCode(io::Printer* printer) {
   // Clone non-oneof fields first
   for (int i = 0; i < descriptor_->field_count(); i++) {
     if (!descriptor_->field(i)->containing_oneof()) {
-      std::unique_ptr<FieldGeneratorBase> generator(
+      scoped_ptr<FieldGeneratorBase> generator(
         CreateFieldGeneratorInternal(descriptor_->field(i)));
       generator->GenerateCloningCode(printer);
     }
@@ -305,7 +307,7 @@ void MessageGenerator::GenerateCloningCode(io::Printer* printer) {
     printer->Indent();
     for (int j = 0; j < descriptor_->oneof_decl(i)->field_count(); j++) {
       const FieldDescriptor* field = descriptor_->oneof_decl(i)->field(j);
-      std::unique_ptr<FieldGeneratorBase> generator(CreateFieldGeneratorInternal(field));
+      scoped_ptr<FieldGeneratorBase> generator(CreateFieldGeneratorInternal(field));
       vars["field_property_name"] = GetPropertyName(field);
       printer->Print(
           vars,
@@ -359,7 +361,7 @@ void MessageGenerator::GenerateFrameworkMethods(io::Printer* printer) {
         "  }\n");
     printer->Indent();
     for (int i = 0; i < descriptor_->field_count(); i++) {
-      std::unique_ptr<FieldGeneratorBase> generator(
+        scoped_ptr<FieldGeneratorBase> generator(
             CreateFieldGeneratorInternal(descriptor_->field(i)));
         generator->WriteEquals(printer);
     }
@@ -380,7 +382,7 @@ void MessageGenerator::GenerateFrameworkMethods(io::Printer* printer) {
         "  int hash = 1;\n");
     printer->Indent();
     for (int i = 0; i < descriptor_->field_count(); i++) {
-      std::unique_ptr<FieldGeneratorBase> generator(
+        scoped_ptr<FieldGeneratorBase> generator(
             CreateFieldGeneratorInternal(descriptor_->field(i)));
         generator->WriteHash(printer);
     }
@@ -411,7 +413,7 @@ void MessageGenerator::GenerateMessageSerializationMethods(io::Printer* printer)
 
   // Serialize all the fields
   for (int i = 0; i < fields_by_number().size(); i++) {
-    std::unique_ptr<FieldGeneratorBase> generator(
+    scoped_ptr<FieldGeneratorBase> generator(
       CreateFieldGeneratorInternal(fields_by_number()[i]));
     generator->GenerateSerializationCode(printer);
   }
@@ -433,7 +435,7 @@ void MessageGenerator::GenerateMessageSerializationMethods(io::Printer* printer)
   printer->Indent();
   printer->Print("int size = 0;\n");
   for (int i = 0; i < descriptor_->field_count(); i++) {
-    std::unique_ptr<FieldGeneratorBase> generator(
+    scoped_ptr<FieldGeneratorBase> generator(
         CreateFieldGeneratorInternal(descriptor_->field(i)));
     generator->GenerateSerializedSizeCode(printer);
   }
@@ -467,7 +469,7 @@ void MessageGenerator::GenerateMergingMethods(io::Printer* printer) {
   // Merge non-oneof fields
   for (int i = 0; i < descriptor_->field_count(); i++) {
     if (!descriptor_->field(i)->containing_oneof()) {      
-      std::unique_ptr<FieldGeneratorBase> generator(
+      scoped_ptr<FieldGeneratorBase> generator(
           CreateFieldGeneratorInternal(descriptor_->field(i)));
       generator->GenerateMergingCode(printer);
     }
@@ -485,7 +487,7 @@ void MessageGenerator::GenerateMergingMethods(io::Printer* printer) {
         vars,
         "case $property_name$OneofCase.$field_property_name$:\n");
       printer->Indent();
-      std::unique_ptr<FieldGeneratorBase> generator(CreateFieldGeneratorInternal(field));
+      scoped_ptr<FieldGeneratorBase> generator(CreateFieldGeneratorInternal(field));
       generator->GenerateMergingCode(printer);
       printer->Print("break;\n");
       printer->Outdent();
@@ -544,7 +546,7 @@ void MessageGenerator::GenerateMergingMethods(io::Printer* printer) {
 
     printer->Print("case $tag$: {\n", "tag", SimpleItoa(tag));
     printer->Indent();
-    std::unique_ptr<FieldGeneratorBase> generator(
+    scoped_ptr<FieldGeneratorBase> generator(
         CreateFieldGeneratorInternal(field));
     generator->GenerateParsingCode(printer);
     printer->Print("break;\n");

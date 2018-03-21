@@ -33,7 +33,6 @@
 
 #include <assert.h>
 
-#include <google/protobuf/stubs/casts.h>
 #include <google/protobuf/arena.h>
 #include <google/protobuf/arenastring.h>
 #include <google/protobuf/map.h>
@@ -432,7 +431,7 @@ class MapEntryImpl : public Base {
     Value* value_ptr_;
     // On the fast path entry_ is not used.  And, when entry_ is used, it's set
     // to mf_->NewEntry(), so in the arena case we must call entry_.release.
-    std::unique_ptr<MapEntryImpl> entry_;
+    google::protobuf::scoped_ptr<MapEntryImpl> entry_;
   };
 
  protected:
@@ -604,7 +603,7 @@ template <>
 struct FromHelper<WireFormatLite::TYPE_STRING> {
   static ArenaStringPtr From(const string& x) {
     ArenaStringPtr res;
-    TaggedPtr<::std::string> ptr;
+    TaggedPtr< ::std::string> ptr;
     ptr.Set(const_cast<string*>(&x));
     res.UnsafeSetTaggedPointer(ptr);
     return res;
@@ -614,7 +613,7 @@ template <>
 struct FromHelper<WireFormatLite::TYPE_BYTES> {
   static ArenaStringPtr From(const string& x) {
     ArenaStringPtr res;
-    TaggedPtr<::std::string> ptr;
+    TaggedPtr< ::std::string> ptr;
     ptr.Set(const_cast<string*>(&x));
     res.UnsafeSetTaggedPointer(ptr);
     return res;

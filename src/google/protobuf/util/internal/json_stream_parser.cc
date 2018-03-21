@@ -36,6 +36,9 @@
 #include <cstdlib>
 #include <cstring>
 #include <memory>
+#ifndef _SHARED_PTR_H
+#include <google/protobuf/stubs/shared_ptr.h>
+#endif
 
 #include <google/protobuf/stubs/logging.h>
 #include <google/protobuf/stubs/common.h>
@@ -154,7 +157,7 @@ util::Status JsonStreamParser::FinishParse() {
   }
 
   // Storage for UTF8-coerced string.
-  std::unique_ptr<char[]> utf8;
+  google::protobuf::scoped_array<char> utf8;
   if (coerce_to_utf8_) {
     utf8.reset(new char[leftover_.size()]);
     char* coerced = internal::UTF8CoerceToStructurallyValid(leftover_, utf8.get(), ' ');

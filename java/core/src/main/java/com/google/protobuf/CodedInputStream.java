@@ -66,9 +66,11 @@ public abstract class CodedInputStream {
 
   /**
    * Whether to enable our custom UTF-8 decode codepath which does not use {@link StringCoding}.
-   * Currently disabled.
+   * Enabled by default, disable by setting
+   * {@code -Dcom.google.protobuf.enableCustomutf8Decode=false} in JVM args.
    */
-  private static final boolean ENABLE_CUSTOM_UTF8_DECODE = false;
+  private static final boolean ENABLE_CUSTOM_UTF8_DECODE
+      = !"false".equals(System.getProperty("com.google.protobuf.enableCustomUtf8Decode"));
 
   /** Visible for subclasses. See setRecursionLimit() */
   int recursionDepth;

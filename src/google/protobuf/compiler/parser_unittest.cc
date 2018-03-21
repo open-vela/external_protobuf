@@ -33,6 +33,9 @@
 //  Sanjay Ghemawat, Jeff Dean, and others.
 
 #include <memory>
+#ifndef _SHARED_PTR_H
+#include <google/protobuf/stubs/shared_ptr.h>
+#endif
 #include <vector>
 #include <algorithm>
 #include <map>
@@ -47,7 +50,6 @@
 #include <google/protobuf/text_format.h>
 #include <google/protobuf/wire_format.h>
 #include <google/protobuf/stubs/substitute.h>
-
 #include <google/protobuf/stubs/map_util.h>
 
 #include <google/protobuf/testing/googletest.h>
@@ -175,9 +177,9 @@ class ParserTest : public testing::Test {
   MockErrorCollector error_collector_;
   DescriptorPool pool_;
 
-  std::unique_ptr<io::ZeroCopyInputStream> raw_input_;
-  std::unique_ptr<io::Tokenizer> input_;
-  std::unique_ptr<Parser> parser_;
+  google::protobuf::scoped_ptr<io::ZeroCopyInputStream> raw_input_;
+  google::protobuf::scoped_ptr<io::Tokenizer> input_;
+  google::protobuf::scoped_ptr<Parser> parser_;
   bool require_syntax_identifier_;
 };
 

@@ -40,6 +40,8 @@
 
 #include <sstream>
 
+using google::protobuf::internal::scoped_ptr;
+
 const std::string kDescriptorFile = "google/protobuf/descriptor.proto";
 const std::string kEmptyFile = "google/protobuf/empty.proto";
 const std::string kEmptyMetadataFile = "GPBMetadata/Google/Protobuf/GPBEmpty.php";
@@ -946,7 +948,7 @@ void GenerateMetadataFile(const FileDescriptor* file,
                           bool is_descriptor,
                           GeneratorContext* generator_context) {
   std::string filename = GeneratedMetadataFileName(file->name(), is_descriptor);
-  std::unique_ptr<io::ZeroCopyOutputStream> output(
+  scoped_ptr<io::ZeroCopyOutputStream> output(
       generator_context->Open(filename));
   io::Printer printer(output.get(), '^');
 
@@ -981,7 +983,7 @@ void GenerateMetadataFile(const FileDescriptor* file,
 void GenerateEnumFile(const FileDescriptor* file, const EnumDescriptor* en,
                       bool is_descriptor, GeneratorContext* generator_context) {
   std::string filename = GeneratedEnumFileName(en, is_descriptor);
-  std::unique_ptr<io::ZeroCopyOutputStream> output(
+  scoped_ptr<io::ZeroCopyOutputStream> output(
       generator_context->Open(filename));
   io::Printer printer(output.get(), '^');
 
@@ -1040,7 +1042,7 @@ void GenerateMessageFile(const FileDescriptor* file, const Descriptor* message,
   }
 
   std::string filename = GeneratedMessageFileName(message, is_descriptor);
-  std::unique_ptr<io::ZeroCopyOutputStream> output(
+  scoped_ptr<io::ZeroCopyOutputStream> output(
       generator_context->Open(filename));
   io::Printer printer(output.get(), '^');
 
@@ -1141,7 +1143,7 @@ void GenerateServiceFile(const FileDescriptor* file,
   const ServiceDescriptor* service, bool is_descriptor,
   GeneratorContext* generator_context) {
   std::string filename = GeneratedServiceFileName(service, is_descriptor);
-  std::unique_ptr<io::ZeroCopyOutputStream> output(
+  scoped_ptr<io::ZeroCopyOutputStream> output(
       generator_context->Open(filename));
   io::Printer printer(output.get(), '^');
 

@@ -942,10 +942,7 @@ static void GPBWriteRawLittleEndian64(GPBOutputBufferState *state,
       state_.position = length;
     } else {
       // Write is very big.  Let's do it all at once.
-      NSInteger written = [state_.output write:((uint8_t *)value) + offset maxLength:length];
-      if (written != (NSInteger)length) {
-        [NSException raise:GPBCodedOutputStreamException_WriteFailed format:@""];
-      }
+      [state_.output write:((uint8_t *)value) + offset maxLength:length];
     }
   }
 }
