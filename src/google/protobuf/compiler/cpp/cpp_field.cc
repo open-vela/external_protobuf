@@ -34,18 +34,21 @@
 
 #include <google/protobuf/compiler/cpp/cpp_field.h>
 #include <memory>
+#ifndef _SHARED_PTR_H
+#include <google/protobuf/stubs/shared_ptr.h>
+#endif
 
 #include <google/protobuf/compiler/cpp/cpp_helpers.h>
 #include <google/protobuf/compiler/cpp/cpp_primitive_field.h>
 #include <google/protobuf/compiler/cpp/cpp_string_field.h>
-#include <google/protobuf/stubs/logging.h>
-#include <google/protobuf/stubs/common.h>
 #include <google/protobuf/compiler/cpp/cpp_enum_field.h>
 #include <google/protobuf/compiler/cpp/cpp_map_field.h>
 #include <google/protobuf/compiler/cpp/cpp_message_field.h>
 #include <google/protobuf/descriptor.pb.h>
-#include <google/protobuf/io/printer.h>
 #include <google/protobuf/wire_format.h>
+#include <google/protobuf/io/printer.h>
+#include <google/protobuf/stubs/logging.h>
+#include <google/protobuf/stubs/common.h>
 #include <google/protobuf/stubs/strutil.h>
 
 namespace google {
@@ -113,30 +116,26 @@ GenerateMergeFromCodedStreamWithPacking(io::Printer* printer) const {
 }
 
 FieldGeneratorMap::FieldGeneratorMap(const Descriptor* descriptor,
-                                     const Options& options,
-                                     SCCAnalyzer* scc_analyzer)
+                                     const Options& options)
     : descriptor_(descriptor),
       options_(options),
       field_generators_(
-          new std::unique_ptr<FieldGenerator>[descriptor->field_count()]) {
+          new google::protobuf::scoped_ptr<FieldGenerator>[descriptor->field_count()]) {
   // Construct all the FieldGenerators.
   for (int i = 0; i < descriptor->field_count(); i++) {
-    field_generators_[i].reset(
-        MakeGenerator(descriptor->field(i), options, scc_analyzer));
+    field_generators_[i].reset(MakeGenerator(descriptor->field(i), options));
   }
 }
 
 FieldGenerator* FieldGeneratorMap::MakeGenerator(const FieldDescriptor* field,
-                                                 const Options& options,
-                                                 SCCAnalyzer* scc_analyzer) {
+                                                 const Options& options) {
   if (field->is_repeated()) {
     switch (field->cpp_type()) {
       case FieldDescriptor::CPPTYPE_MESSAGE:
         if (field->is_map()) {
           return new MapFieldGenerator(field, options);
         } else {
-          return new RepeatedMessageFieldGenerator(field, options,
-                                                   scc_analyzer);
+          return new RepeatedMessageFieldGenerator(field, options);
         }
       case FieldDescriptor::CPPTYPE_STRING:
         switch (field->options().ctype()) {
@@ -152,7 +151,7 @@ FieldGenerator* FieldGeneratorMap::MakeGenerator(const FieldDescriptor* field,
   } else if (field->containing_oneof()) {
     switch (field->cpp_type()) {
       case FieldDescriptor::CPPTYPE_MESSAGE:
-        return new MessageOneofFieldGenerator(field, options, scc_analyzer);
+        return new MessageOneofFieldGenerator(field, options);
       case FieldDescriptor::CPPTYPE_STRING:
         switch (field->options().ctype()) {
           default:  // StringOneofFieldGenerator handles unknown ctypes.
@@ -167,7 +166,7 @@ FieldGenerator* FieldGeneratorMap::MakeGenerator(const FieldDescriptor* field,
   } else {
     switch (field->cpp_type()) {
       case FieldDescriptor::CPPTYPE_MESSAGE:
-        return new MessageFieldGenerator(field, options, scc_analyzer);
+        return new MessageFieldGenerator(field, options);
       case FieldDescriptor::CPPTYPE_STRING:
         switch (field->options().ctype()) {
           default:  // StringFieldGenerator handles unknown ctypes.

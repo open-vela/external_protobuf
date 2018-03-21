@@ -36,15 +36,17 @@
 
 #include <vector>
 #include <memory>
+#ifndef _SHARED_PTR_H
+#include <google/protobuf/stubs/shared_ptr.h>
+#endif
 #include <utility>
 
 #include <google/protobuf/stubs/strutil.h>
 #include <google/protobuf/compiler/cpp/cpp_file.h>
 #include <google/protobuf/compiler/cpp/cpp_helpers.h>
-#include <google/protobuf/descriptor.pb.h>
 #include <google/protobuf/io/printer.h>
 #include <google/protobuf/io/zero_copy_stream.h>
-
+#include <google/protobuf/descriptor.pb.h>
 
 namespace google {
 namespace protobuf {
@@ -63,6 +65,12 @@ bool CppGenerator::Generate(const FileDescriptor* file,
 
   // -----------------------------------------------------------------
   // parse generator options
+
+  // TODO(kenton):  If we ever have more options, we may want to create a
+  //   class that encapsulates them which we can pass down to all the
+  //   generator classes.  Currently we pass dllexport_decl down to all of
+  //   them via the constructors, but we don't want to have to add another
+  //   constructor parameter for every option.
 
   // If the dllexport_decl option is passed to the compiler, we need to write
   // it in front of every symbol that should be exported if this .proto is
@@ -119,12 +127,11 @@ bool CppGenerator::Generate(const FileDescriptor* file,
 
   string basename = StripProto(file->name());
 
-
   FileGenerator file_generator(file, file_options);
 
   // Generate header(s).
   if (file_options.proto_h) {
-    std::unique_ptr<io::ZeroCopyOutputStream> output(
+    google::protobuf::scoped_ptr<io::ZeroCopyOutputStream> output(
         generator_context->Open(basename + ".proto.h"));
     GeneratedCodeInfo annotations;
     io::AnnotationProtoCollector<GeneratedCodeInfo> annotation_collector(
@@ -136,14 +143,14 @@ bool CppGenerator::Generate(const FileDescriptor* file,
     file_generator.GenerateProtoHeader(
         &printer, file_options.annotate_headers ? info_path : "");
     if (file_options.annotate_headers) {
-      std::unique_ptr<io::ZeroCopyOutputStream> info_output(
+      google::protobuf::scoped_ptr<io::ZeroCopyOutputStream> info_output(
           generator_context->Open(info_path));
       annotations.SerializeToZeroCopyStream(info_output.get());
     }
   }
 
   {
-    std::unique_ptr<io::ZeroCopyOutputStream> output(
+    google::protobuf::scoped_ptr<io::ZeroCopyOutputStream> output(
         generator_context->Open(basename + ".pb.h"));
     GeneratedCodeInfo annotations;
     io::AnnotationProtoCollector<GeneratedCodeInfo> annotation_collector(
@@ -155,7 +162,7 @@ bool CppGenerator::Generate(const FileDescriptor* file,
     file_generator.GeneratePBHeader(
         &printer, file_options.annotate_headers ? info_path : "");
     if (file_options.annotate_headers) {
-      std::unique_ptr<io::ZeroCopyOutputStream> info_output(
+      google::protobuf::scoped_ptr<io::ZeroCopyOutputStream> info_output(
           generator_context->Open(info_path));
       annotations.SerializeToZeroCopyStream(info_output.get());
     }
@@ -165,7 +172,7 @@ bool CppGenerator::Generate(const FileDescriptor* file,
   if (UsingImplicitWeakFields(file, file_options)) {
     {
       // This is the global .cc file, containing enum/services/tables/reflection
-      std::unique_ptr<io::ZeroCopyOutputStream> output(
+      google::protobuf::scoped_ptr<io::ZeroCopyOutputStream> output(
           generator_context->Open(basename + ".pb.cc"));
       io::Printer printer(output.get(), '$');
       file_generator.GenerateGlobalSource(&printer);
@@ -184,7 +191,7 @@ bool CppGenerator::Generate(const FileDescriptor* file,
     }
     for (int i = 0; i < num_cc_files; i++) {
       // TODO(gerbens) Agree on naming scheme.
-      std::unique_ptr<io::ZeroCopyOutputStream> output(
+      google::protobuf::scoped_ptr<io::ZeroCopyOutputStream> output(
           generator_context->Open(basename + "." + SimpleItoa(i) + ".cc"));
       io::Printer printer(output.get(), '$');
       if (i < file_generator.NumMessages()) {
@@ -192,7 +199,7 @@ bool CppGenerator::Generate(const FileDescriptor* file,
       }
     }
   } else {
-    std::unique_ptr<io::ZeroCopyOutputStream> output(
+    google::protobuf::scoped_ptr<io::ZeroCopyOutputStream> output(
         generator_context->Open(basename + ".pb.cc"));
     io::Printer printer(output.get(), '$');
     file_generator.GenerateSource(&printer);

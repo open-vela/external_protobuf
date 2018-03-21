@@ -141,7 +141,6 @@ void ImmutableExtensionGenerator::Generate(io::Printer* printer) {
         "      $singular_type$.class,\n"
         "      $prototype$);\n");
   }
-  printer->Annotate("name", descriptor_);
 }
 
 int ImmutableExtensionGenerator::GenerateNonNestedInitializationCode(
