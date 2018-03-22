@@ -19,14 +19,15 @@ config_setting(
 # Protobuf Runtime Library
 ################################################################################
 
-MSVC_COPTS = [
+WIN_COPTS = [
     "/DHAVE_PTHREAD",
     "/wd4018", # -Wno-sign-compare
     "/wd4514", # -Wno-unused-function
 ]
 
 COPTS = select({
-    ":msvc" : MSVC_COPTS,
+    ":windows" : WIN_COPTS,
+    ":windows_msvc" : WIN_COPTS,
     "//conditions:default": [
         "-DHAVE_PTHREAD",
         "-Wall",
@@ -40,8 +41,13 @@ COPTS = select({
 })
 
 config_setting(
-    name = "msvc",
-    values = { "compiler": "msvc-cl" },
+    name = "windows",
+    values = { "cpu": "x64_windows" },
+)
+
+config_setting(
+    name = "windows_msvc",
+    values = { "cpu": "x64_windows_msvc" },
 )
 
 config_setting(
@@ -51,10 +57,11 @@ config_setting(
     },
 )
 
-# Android and MSVC builds do not need to link in a separate pthread library.
+# Android and Windows builds do not need to link in a separate pthread library.
 LINK_OPTS = select({
     ":android": [],
-    ":msvc": [],
+    ":windows": [],
+    ":windows_msvc": [],
     "//conditions:default": ["-lpthread", "-lm"],
 })
 
