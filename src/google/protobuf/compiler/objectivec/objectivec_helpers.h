@@ -253,8 +253,7 @@ bool LIBPROTOC_EXPORT ParseSimpleFile(
 class LIBPROTOC_EXPORT ImportWriter {
  public:
   ImportWriter(const string& generate_for_named_framework,
-               const string& named_framework_to_proto_path_mappings_path,
-               bool include_wkt_imports);
+               const string& named_framework_to_proto_path_mappings_path);
   ~ImportWriter();
 
   void AddFile(const FileDescriptor* file, const string& header_extension);
@@ -276,7 +275,6 @@ class LIBPROTOC_EXPORT ImportWriter {
 
   const string generate_for_named_framework_;
   const string named_framework_to_proto_path_mappings_path_;
-  const bool include_wkt_imports_;
   std::map<string, string> proto_file_to_framework_name_;
   bool need_to_parse_mapping_file_;
 

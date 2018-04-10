@@ -19,14 +19,15 @@ config_setting(
 # Protobuf Runtime Library
 ################################################################################
 
-MSVC_COPTS = [
+WIN_COPTS = [
     "/DHAVE_PTHREAD",
     "/wd4018", # -Wno-sign-compare
     "/wd4514", # -Wno-unused-function
 ]
 
 COPTS = select({
-    ":msvc" : MSVC_COPTS,
+    ":windows" : WIN_COPTS,
+    ":windows_msvc" : WIN_COPTS,
     "//conditions:default": [
         "-DHAVE_PTHREAD",
         "-Wall",
@@ -40,8 +41,13 @@ COPTS = select({
 })
 
 config_setting(
-    name = "msvc",
-    values = { "compiler": "msvc-cl" },
+    name = "windows",
+    values = { "cpu": "x64_windows" },
+)
+
+config_setting(
+    name = "windows_msvc",
+    values = { "cpu": "x64_windows_msvc" },
 )
 
 config_setting(
@@ -51,10 +57,11 @@ config_setting(
     },
 )
 
-# Android and MSVC builds do not need to link in a separate pthread library.
+# Android and Windows builds do not need to link in a separate pthread library.
 LINK_OPTS = select({
     ":android": [],
-    ":msvc": [],
+    ":windows": [],
+    ":windows_msvc": [],
     "//conditions:default": ["-lpthread", "-lm"],
 })
 
@@ -82,10 +89,13 @@ cc_library(
         "src/google/protobuf/io/zero_copy_stream_impl_lite.cc",
         "src/google/protobuf/message_lite.cc",
         "src/google/protobuf/repeated_field.cc",
+        "src/google/protobuf/stubs/atomicops_internals_x86_gcc.cc",
+        "src/google/protobuf/stubs/atomicops_internals_x86_msvc.cc",
         "src/google/protobuf/stubs/bytestream.cc",
         "src/google/protobuf/stubs/common.cc",
         "src/google/protobuf/stubs/int128.cc",
         "src/google/protobuf/stubs/io_win32.cc",
+        "src/google/protobuf/stubs/once.cc",
         "src/google/protobuf/stubs/status.cc",
         "src/google/protobuf/stubs/statusor.cc",
         "src/google/protobuf/stubs/stringpiece.cc",
@@ -341,6 +351,17 @@ cc_library(
         "src/google/protobuf/compiler/java/java_shared_code_generator.cc",
         "src/google/protobuf/compiler/java/java_string_field.cc",
         "src/google/protobuf/compiler/java/java_string_field_lite.cc",
+        "src/google/protobuf/compiler/javanano/javanano_enum.cc",
+        "src/google/protobuf/compiler/javanano/javanano_enum_field.cc",
+        "src/google/protobuf/compiler/javanano/javanano_extension.cc",
+        "src/google/protobuf/compiler/javanano/javanano_field.cc",
+        "src/google/protobuf/compiler/javanano/javanano_file.cc",
+        "src/google/protobuf/compiler/javanano/javanano_generator.cc",
+        "src/google/protobuf/compiler/javanano/javanano_helpers.cc",
+        "src/google/protobuf/compiler/javanano/javanano_map_field.cc",
+        "src/google/protobuf/compiler/javanano/javanano_message.cc",
+        "src/google/protobuf/compiler/javanano/javanano_message_field.cc",
+        "src/google/protobuf/compiler/javanano/javanano_primitive_field.cc",
         "src/google/protobuf/compiler/js/js_generator.cc",
         "src/google/protobuf/compiler/js/well_known_types_embed.cc",
         "src/google/protobuf/compiler/objectivec/objectivec_enum.cc",
@@ -457,7 +478,6 @@ COMMON_TEST_SRCS = [
     "src/google/protobuf/arena_test_util.cc",
     "src/google/protobuf/map_test_util.cc",
     "src/google/protobuf/test_util.cc",
-    "src/google/protobuf/test_util.inc",
     "src/google/protobuf/testing/file.cc",
     "src/google/protobuf/testing/googletest.cc",
 ]
@@ -500,7 +520,6 @@ cc_test(
         "src/google/protobuf/compiler/cpp/cpp_move_unittest.cc",
         "src/google/protobuf/compiler/cpp/cpp_plugin_unittest.cc",
         "src/google/protobuf/compiler/cpp/cpp_unittest.cc",
-        "src/google/protobuf/compiler/cpp/cpp_unittest.inc",
         "src/google/protobuf/compiler/cpp/metadata_test.cc",
         "src/google/protobuf/compiler/csharp/csharp_bootstrap_unittest.cc",
         "src/google/protobuf/compiler/csharp/csharp_generator_unittest.cc",
@@ -525,7 +544,6 @@ cc_test(
         "src/google/protobuf/map_field_test.cc",
         "src/google/protobuf/map_test.cc",
         "src/google/protobuf/message_unittest.cc",
-        "src/google/protobuf/message_unittest.inc",
         "src/google/protobuf/no_field_presence_test.cc",
         "src/google/protobuf/preserve_unknown_enum_test.cc",
         "src/google/protobuf/proto3_arena_lite_unittest.cc",
@@ -538,6 +556,7 @@ cc_test(
         "src/google/protobuf/stubs/common_unittest.cc",
         "src/google/protobuf/stubs/int128_unittest.cc",
         "src/google/protobuf/stubs/io_win32_unittest.cc",
+        "src/google/protobuf/stubs/once_unittest.cc",
         "src/google/protobuf/stubs/status_test.cc",
         "src/google/protobuf/stubs/statusor_test.cc",
         "src/google/protobuf/stubs/stringpiece_unittest.cc",
@@ -546,6 +565,7 @@ cc_test(
         "src/google/protobuf/stubs/strutil_unittest.cc",
         "src/google/protobuf/stubs/template_util_unittest.cc",
         "src/google/protobuf/stubs/time_test.cc",
+        "src/google/protobuf/stubs/type_traits_unittest.cc",
         "src/google/protobuf/text_format_unittest.cc",
         "src/google/protobuf/unknown_field_set_unittest.cc",
         "src/google/protobuf/util/delimited_message_util_test.cc",
