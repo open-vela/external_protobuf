@@ -1,24 +1,31 @@
-if (NOT EXISTS "${PROJECT_SOURCE_DIR}/../gmock/CMakeLists.txt")
-  message(FATAL_ERROR "Cannot find gmock directory.")
+if (NOT EXISTS "${PROJECT_SOURCE_DIR}/../third_party/googletest/CMakeLists.txt")
+  message(FATAL_ERROR
+          "Cannot find third_party/googletest directory that's needed to "
+          "build tests. If you use git, make sure you have cloned submodules:\n"
+          "  git submodule update --init --recursive\n"
+          "If instead you want to skip tests, run cmake with:\n"
+          "  cmake -Dprotobuf_BUILD_TESTS=OFF\n")
 endif()
 
 option(protobuf_ABSOLUTE_TEST_PLUGIN_PATH
   "Using absolute test_plugin path in tests" ON)
 mark_as_advanced(protobuf_ABSOLUTE_TEST_PLUGIN_PATH)
 
+set(googlemock_source_dir "${protobuf_source_dir}/third_party/googletest/googlemock")
+set(googletest_source_dir "${protobuf_source_dir}/third_party/googletest/googletest")
 include_directories(
-  ${protobuf_source_dir}/gmock
-  ${protobuf_source_dir}/gmock/gtest
-  ${protobuf_source_dir}/gmock/gtest/include
-  ${protobuf_source_dir}/gmock/include
+  ${googlemock_source_dir}
+  ${googletest_source_dir}
+  ${googletest_source_dir}/include
+  ${googlemock_source_dir}/include
 )
 
 add_library(gmock STATIC
-  ${protobuf_source_dir}/gmock/src/gmock-all.cc
-  ${protobuf_source_dir}/gmock/gtest/src/gtest-all.cc
+  "${googlemock_source_dir}/src/gmock-all.cc"
+  "${googletest_source_dir}/src/gtest-all.cc"
 )
 target_link_libraries(gmock ${CMAKE_THREAD_LIBS_INIT})
-add_library(gmock_main STATIC ${protobuf_source_dir}/gmock/src/gmock_main.cc)
+add_library(gmock_main STATIC "${googlemock_source_dir}/src/gmock_main.cc")
 target_link_libraries(gmock_main gmock)
 
 set(lite_test_protos
@@ -107,6 +114,7 @@ set(common_test_files
   ${protobuf_source_dir}/src/google/protobuf/arena_test_util.cc
   ${protobuf_source_dir}/src/google/protobuf/map_test_util.cc
   ${protobuf_source_dir}/src/google/protobuf/test_util.cc
+  ${protobuf_source_dir}/src/google/protobuf/test_util.inc
   ${protobuf_source_dir}/src/google/protobuf/testing/file.cc
   ${protobuf_source_dir}/src/google/protobuf/testing/googletest.cc
 )
@@ -127,6 +135,7 @@ set(tests_files
   ${protobuf_source_dir}/src/google/protobuf/compiler/cpp/cpp_move_unittest.cc
   ${protobuf_source_dir}/src/google/protobuf/compiler/cpp/cpp_plugin_unittest.cc
   ${protobuf_source_dir}/src/google/protobuf/compiler/cpp/cpp_unittest.cc
+  ${protobuf_source_dir}/src/google/protobuf/compiler/cpp/cpp_unittest.inc
   ${protobuf_source_dir}/src/google/protobuf/compiler/cpp/metadata_test.cc
   ${protobuf_source_dir}/src/google/protobuf/compiler/csharp/csharp_bootstrap_unittest.cc
   ${protobuf_source_dir}/src/google/protobuf/compiler/csharp/csharp_generator_unittest.cc
@@ -151,12 +160,12 @@ set(tests_files
   ${protobuf_source_dir}/src/google/protobuf/map_field_test.cc
   ${protobuf_source_dir}/src/google/protobuf/map_test.cc
   ${protobuf_source_dir}/src/google/protobuf/message_unittest.cc
+  ${protobuf_source_dir}/src/google/protobuf/message_unittest.inc
   ${protobuf_source_dir}/src/google/protobuf/no_field_presence_test.cc
   ${protobuf_source_dir}/src/google/protobuf/preserve_unknown_enum_test.cc
   ${protobuf_source_dir}/src/google/protobuf/proto3_arena_lite_unittest.cc
   ${protobuf_source_dir}/src/google/protobuf/proto3_arena_unittest.cc
-# TODO(b/74491957) Make this unittest work
-#  ${protobuf_source_dir}/src/google/protobuf/proto3_lite_unittest.cc
+  ${protobuf_source_dir}/src/google/protobuf/proto3_lite_unittest.cc
   ${protobuf_source_dir}/src/google/protobuf/reflection_ops_unittest.cc
   ${protobuf_source_dir}/src/google/protobuf/repeated_field_reflection_unittest.cc
   ${protobuf_source_dir}/src/google/protobuf/repeated_field_unittest.cc
