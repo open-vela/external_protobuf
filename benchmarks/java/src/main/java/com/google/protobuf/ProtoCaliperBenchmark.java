@@ -99,6 +99,7 @@ public class ProtoCaliperBenchmark {
   private List<ByteArrayInputStream> inputStreamList;
   private List<ByteString> inputStringList;
   private List<Message> sampleMessageList;
+  private long counter;
 
   private BenchmarkMessageType getMessageType() throws IOException {
     if (benchmarkDataset.getMessageName().equals("benchmarks.proto3.GoogleMessage1")) {
@@ -148,6 +149,8 @@ public class ProtoCaliperBenchmark {
       sampleMessageList.add(
           defaultMessage.newBuilderForType().mergeFrom(singleInputData, extensions).build());
     }
+    
+    counter = 0;
   }
   
   
@@ -157,9 +160,8 @@ public class ProtoCaliperBenchmark {
       return;
     }
     for (int i = 0; i < reps; i++) {
-      for (int j = 0; j < sampleMessageList.size(); j++) {
-        sampleMessageList.get(j).toByteString();        
-      }
+      sampleMessageList.get((int) (counter % sampleMessageList.size())).toByteString();
+      counter++;
     }
   }
   
@@ -169,9 +171,8 @@ public class ProtoCaliperBenchmark {
       return;
     }
     for (int i = 0; i < reps; i++) {
-      for (int j = 0; j < sampleMessageList.size(); j++) {
-        sampleMessageList.get(j).toByteArray();  
-      }
+      sampleMessageList.get((int) (counter % sampleMessageList.size())).toByteArray();
+      counter++;
     }
   }
   
@@ -181,10 +182,9 @@ public class ProtoCaliperBenchmark {
       return;
     }
     for (int i = 0; i < reps; i++) {
-      for (int j = 0; j < sampleMessageList.size(); j++) {
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        sampleMessageList.get(j).writeTo(output); 
-      }
+      ByteArrayOutputStream output = new ByteArrayOutputStream();
+      sampleMessageList.get((int) (counter % sampleMessageList.size())).writeTo(output);
+      counter++;
     }
   }
   
@@ -194,10 +194,9 @@ public class ProtoCaliperBenchmark {
       return;
     }
     for (int i = 0; i < reps; i++) {
-      for (int j = 0; j < inputStringList.size(); j++) {
-        benchmarkMessageType.getDefaultInstance().getParserForType().parseFrom(
-          inputStringList.get(j), extensions);
-      }
+      benchmarkMessageType.getDefaultInstance().getParserForType().parseFrom(
+          inputStringList.get((int) (counter % inputStringList.size())), extensions);
+      counter++;
     }
   }
   
@@ -207,10 +206,9 @@ public class ProtoCaliperBenchmark {
       return;
     }
     for (int i = 0; i < reps; i++) {
-      for (int j = 0; j < inputDataList.size(); j++) {
-        benchmarkMessageType.getDefaultInstance().getParserForType().parseFrom(
-          inputDataList.get(j), extensions);
-      }
+      benchmarkMessageType.getDefaultInstance().getParserForType().parseFrom(
+          inputDataList.get((int) (counter % inputDataList.size())), extensions);
+      counter++;
     }
   }
   
@@ -220,11 +218,27 @@ public class ProtoCaliperBenchmark {
       return;
     }
     for (int i = 0; i < reps; i++) {
-      for (int j = 0; j < inputStreamList.size(); j++) {
-        benchmarkMessageType.getDefaultInstance().getParserForType().parseFrom(
-            inputStreamList.get(j), extensions);
-        inputStreamList.get(j).reset();
-      }
+      benchmarkMessageType.getDefaultInstance().getParserForType().parseFrom(
+          inputStreamList.get((int) (counter % inputStreamList.size())), extensions);
+      inputStreamList.get((int) (counter % inputStreamList.size())).reset();
+      counter++;
+    }
+  }
+  
+  @AfterExperiment
+  void checkCounter() throws IOException {
+    if (counter == 1) {
+      // Dry run
+      return;
+    }
+    if (benchmarkDataset.getPayloadCount() != 1 
+        && counter < benchmarkDataset.getPayloadCount() * 10L) {
+      BufferedWriter writer = new BufferedWriter(new FileWriter("JavaBenchmarkWarning.txt", true));
+      // If the total number of non-warmup reps is smaller than 100 times of the total number of 
+      // datasets, then output the scale that need to multiply to the configuration (either extend
+      // the running time for one timingInterval or run for more measurements). 
+      writer.append(1.0 * benchmarkDataset.getPayloadCount() * 10L / counter + " ");
+      writer.close();
     }
   }
 }

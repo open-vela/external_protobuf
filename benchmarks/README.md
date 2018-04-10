@@ -3,9 +3,7 @@
 
 This directory contains benchmarking schemas and data sets that you
 can use to test a variety of performance scenarios against your
-protobuf language runtime. If you are looking for performance 
-numbers of officially support languages, see [here](
-https://github.com/google/protobuf/blob/master/docs/Performance.md)
+protobuf language runtime.
 
 ## Prerequisite
 
@@ -18,11 +16,6 @@ You need to install [cmake](https://cmake.org/) before building the benchmark.
 We are using [google/benchmark](https://github.com/google/benchmark) as the
 benchmark tool for testing cpp. This will be automaticly made during build the
 cpp benchmark.
-
-The cpp protobuf performance can be improved by linking with [tcmalloc library](
-https://gperftools.github.io/gperftools/tcmalloc.html). For using tcmalloc, you
-need to build [gpertools](https://github.com/gperftools/gperftools) to generate
-libtcmallc.so library.
 
 ### Java
 We're using maven to build the java benchmarks, which is the same as to build
@@ -86,12 +79,6 @@ $ make java
 $ make cpp
 ```
 
-For linking with tcmalloc:
-
-```
-$ env LD_PRELOAD={directory to libtcmalloc.so} make cpp
-```
-
 ### Python:
 
 We have three versions of python protobuf implementation: pure python, cpp
@@ -120,51 +107,49 @@ $ make python-cpp-generated-code
 $ make go
 ```
 
-To run a specific dataset or run with specific options:
+To run a specific dataset:
 
 ### Java:
 
 ```
 $ make java-benchmark
-$ ./java-benchmark $(specific generated dataset file name) [$(caliper options)]
+$ ./java-benchmark $(specific generated dataset file name) [-- $(caliper option)]
 ```
 
 ### CPP:
 
 ```
 $ make cpp-benchmark
-$ ./cpp-benchmark $(specific generated dataset file name) [$(benchmark options)]
+$ ./cpp-benchmark $(specific generated dataset file name)
 ```
 
 ### Python:
-
-For Python benchmark we have `--json` for outputing the json result
 
 #### Pure Python:
 
 ```
 $ make python-pure-python-benchmark
-$ ./python-pure-python-benchmark [--json] $(specific generated dataset file name)
+$ ./python-pure-python-benchmark $(specific generated dataset file name)
 ```
 
 #### CPP reflection:
 
 ```
 $ make python-cpp-reflection-benchmark
-$ ./python-cpp-reflection-benchmark [--json] $(specific generated dataset file name)
+$ ./python-cpp-reflection-benchmark $(specific generated dataset file name)
 ```
 
 #### CPP generated code:
 
 ```
 $ make python-cpp-generated-code-benchmark
-$ ./python-cpp-generated-code-benchmark [--json] $(specific generated dataset file name)
+$ ./python-cpp-generated-code-benchmark $(specific generated dataset file name)
 ```
 
 ### Go:
 ```
 $ make go-benchmark
-$ ./go-benchmark $(specific generated dataset file name) [go testing options]
+$ ./go-benchmark $(specific generated dataset file name)
 ```
 
 
