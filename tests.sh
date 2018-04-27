@@ -27,6 +27,9 @@ internal_build_cpp() {
     export CXX="g++-4.8" CC="gcc-4.8"
   fi
 
+  # Initialize any submodules.
+  git submodule update --init --recursive
+
   ./autogen.sh
   ./configure CXXFLAGS="-fPIC"  # -fPIC is needed for python cpp test.
                                 # See python/setup.py for more details
@@ -44,10 +47,7 @@ build_cpp() {
   # appears to be missing it: https://github.com/travis-ci/travis-ci/issues/6996
   if [[ $(type cmake 2>/dev/null) ]]; then
     # Verify benchmarking code can build successfully.
-    git submodule init
-    git submodule update
-    cd third_party/benchmark && cmake -DCMAKE_BUILD_TYPE=Release && make && cd ../..
-    cd benchmarks && make && ./generate-datasets && cd ..
+    cd benchmarks && make cpp-benchmark && cd ..
   else
     echo ""
     echo "WARNING: Skipping validation of the bench marking code, cmake isn't installed."
@@ -56,6 +56,8 @@ build_cpp() {
 }
 
 build_cpp_distcheck() {
+  # Initialize any submodules.
+  git submodule update --init --recursive
   ./autogen.sh
   ./configure
   make dist
@@ -87,9 +89,7 @@ build_cpp_distcheck() {
 }
 
 build_csharp() {
-  # Just for the conformance tests. We don't currently
-  # need to really build protoc, but it's simplest to keep with the
-  # conventions of the other builds.
+  # Required for conformance tests and to regenerate protos.
   internal_build_cpp
   NUGET=/usr/local/bin/nuget.exe
 
@@ -104,6 +104,10 @@ build_csharp() {
   (cd dotnettmp; dotnet new > /dev/null)
   rm -rf dotnettmp
 
+  # Check that the protos haven't broken C# codegen.
+  # TODO(jonskeet): Fail if regenerating creates any changes.
+  csharp/generate_protos.sh
+  
   csharp/buildall.sh
   cd conformance && make test_csharp && cd ..
 
