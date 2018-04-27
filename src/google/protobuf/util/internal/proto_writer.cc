@@ -66,7 +66,7 @@ ProtoWriter::ProtoWriter(TypeResolver* type_resolver,
       done_(false),
       ignore_unknown_fields_(false),
       use_lower_camel_for_enums_(false),
-      element_(nullptr),
+      element_(NULL),
       size_insert_(),
       output_(output),
       buffer_(),
@@ -85,7 +85,7 @@ ProtoWriter::ProtoWriter(const TypeInfo* typeinfo,
       done_(false),
       ignore_unknown_fields_(false),
       use_lower_camel_for_enums_(false),
-      element_(nullptr),
+      element_(NULL),
       size_insert_(),
       output_(output),
       buffer_(),
@@ -99,14 +99,14 @@ ProtoWriter::~ProtoWriter() {
   if (own_typeinfo_) {
     delete typeinfo_;
   }
-  if (element_ == nullptr) return;
+  if (element_ == NULL) return;
   // Cleanup explicitly in order to avoid destructor stack overflow when input
   // is deeply nested.
   // Cast to BaseElement to avoid doing additional checks (like missing fields)
   // during pop().
-  std::unique_ptr<BaseElement> element(
+  google::protobuf::scoped_ptr<BaseElement> element(
       static_cast<BaseElement*>(element_.get())->pop<BaseElement>());
-  while (element != nullptr) {
+  while (element != NULL) {
     element.reset(element->pop<BaseElement>());
   }
 }
@@ -267,9 +267,8 @@ inline Status WriteString(int field_number, const DataPiece& data,
 inline Status WriteEnum(int field_number, const DataPiece& data,
                         const google::protobuf::Enum* enum_type,
                         CodedOutputStream* stream,
-                        bool use_lower_camel_for_enums,
-                        bool ignore_unknown_values) {
-  StatusOr<int> e = data.ToEnum(enum_type, use_lower_camel_for_enums, ignore_unknown_values);
+                        bool use_lower_camel_for_enums) {
+  StatusOr<int> e = data.ToEnum(enum_type, use_lower_camel_for_enums);
   if (e.ok()) {
     WireFormatLite::WriteEnum(field_number, e.ValueOrDie(), stream);
   }
@@ -295,9 +294,9 @@ std::set<const google::protobuf::Field*> GetRequiredFields(
 ProtoWriter::ProtoElement::ProtoElement(const TypeInfo* typeinfo,
                                         const google::protobuf::Type& type,
                                         ProtoWriter* enclosing)
-    : BaseElement(nullptr),
+    : BaseElement(NULL),
       ow_(enclosing),
-      parent_field_(nullptr),
+      parent_field_(NULL),
       typeinfo_(typeinfo),
       proto3_(type.syntax() == google::protobuf::SYNTAX_PROTO3),
       type_(type),
@@ -375,7 +374,7 @@ ProtoWriter::ProtoElement* ProtoWriter::ProtoElement::pop() {
     // all enclosing messages.
     int size = ow_->size_insert_[size_index_].size;
     int length = CodedOutputStream::VarintSize32(size);
-    for (ProtoElement* e = parent(); e != nullptr; e = e->parent()) {
+    for (ProtoElement* e = parent(); e != NULL; e = e->parent()) {
       // Only nested messages have size field, lists do not have size field.
       if (e->size_index_ >= 0) {
         ow_->size_insert_[e->size_index_].size += length;
@@ -395,7 +394,7 @@ void ProtoWriter::ProtoElement::RegisterField(
 }
 
 string ProtoWriter::ProtoElement::ToString() const {
-  if (parent() == nullptr) return "";
+  if (parent() == NULL) return "";
   string loc = parent()->ToString();
   if (!ow_->IsRepeated(*parent_field_) ||
       parent()->parent_field_ != parent_field_) {
@@ -440,7 +439,7 @@ void ProtoWriter::MissingField(StringPiece missing_name) {
 
 ProtoWriter* ProtoWriter::StartObject(StringPiece name) {
   // Starting the root message. Create the root ProtoElement and return.
-  if (element_ == nullptr) {
+  if (element_ == NULL) {
     if (!name.empty()) {
       InvalidName(name, "Root element should not be named.");
     }
@@ -448,9 +447,9 @@ ProtoWriter* ProtoWriter::StartObject(StringPiece name) {
     return this;
   }
 
-  const google::protobuf::Field* field = nullptr;
+  const google::protobuf::Field* field = NULL;
   field = BeginNamed(name, false);
-  if (field == nullptr) return this;
+  if (field == NULL) return this;
 
   // Check to see if this field is a oneof and that no oneof in that group has
   // already been set.
@@ -460,7 +459,7 @@ ProtoWriter* ProtoWriter::StartObject(StringPiece name) {
   }
 
   const google::protobuf::Type* type = LookupType(field);
-  if (type == nullptr) {
+  if (type == NULL) {
     ++invalid_depth_;
     InvalidName(name,
                 StrCat("Missing descriptor for field: ", field->type_url()));
@@ -476,14 +475,14 @@ ProtoWriter* ProtoWriter::EndObject() {
     return this;
   }
 
-  if (element_ != nullptr) {
+  if (element_ != NULL) {
     element_.reset(element_->pop());
   }
 
 
   // If ending the root element,
   // then serialize the full message with calculated sizes.
-  if (element_ == nullptr) {
+  if (element_ == NULL) {
     WriteRootMessage();
   }
   return this;
@@ -491,7 +490,7 @@ ProtoWriter* ProtoWriter::EndObject() {
 
 ProtoWriter* ProtoWriter::StartList(StringPiece name) {
   const google::protobuf::Field* field = BeginNamed(name, true);
-  if (field == nullptr) return this;
+  if (field == NULL) return this;
 
   if (!ValidOneof(*field, name)) {
     ++invalid_depth_;
@@ -499,7 +498,7 @@ ProtoWriter* ProtoWriter::StartList(StringPiece name) {
   }
 
   const google::protobuf::Type* type = LookupType(field);
-  if (type == nullptr) {
+  if (type == NULL) {
     ++invalid_depth_;
     InvalidName(name,
                 StrCat("Missing descriptor for field: ", field->type_url()));
@@ -512,7 +511,7 @@ ProtoWriter* ProtoWriter::StartList(StringPiece name) {
 ProtoWriter* ProtoWriter::EndList() {
   if (invalid_depth_ > 0) {
     --invalid_depth_;
-  } else if (element_ != nullptr) {
+  } else if (element_ != NULL) {
     element_.reset(element_->pop());
   }
   return this;
@@ -524,12 +523,12 @@ ProtoWriter* ProtoWriter::RenderDataPiece(StringPiece name,
   if (invalid_depth_ > 0) return this;
 
   const google::protobuf::Field* field = Lookup(name);
-  if (field == nullptr) return this;
+  if (field == NULL) return this;
 
   if (!ValidOneof(*field, name)) return this;
 
   const google::protobuf::Type* type = LookupType(field);
-  if (type == nullptr) {
+  if (type == NULL) {
     InvalidName(name,
                 StrCat("Missing descriptor for field: ", field->type_url()));
     return this;
@@ -540,7 +539,7 @@ ProtoWriter* ProtoWriter::RenderDataPiece(StringPiece name,
 
 bool ProtoWriter::ValidOneof(const google::protobuf::Field& field,
                              StringPiece unnormalized_name) {
-  if (element_ == nullptr) return true;
+  if (element_ == NULL) return true;
 
   if (field.oneof_index() > 0) {
     if (element_->IsOneofIndexTaken(field.oneof_index())) {
@@ -666,8 +665,7 @@ ProtoWriter* ProtoWriter::RenderPrimitiveField(
     case google::protobuf::Field_Kind_TYPE_ENUM: {
       status = WriteEnum(field.number(), data,
                          typeinfo_->GetEnumByTypeUrl(field.type_url()),
-                         stream_.get(), use_lower_camel_for_enums_,
-                         ignore_unknown_fields_);
+                         stream_.get(), use_lower_camel_for_enums_);
       break;
     }
     default:  // TYPE_GROUP or TYPE_MESSAGE
@@ -694,18 +692,18 @@ const google::protobuf::Field* ProtoWriter::BeginNamed(StringPiece name,
                                                        bool is_list) {
   if (invalid_depth_ > 0) {
     ++invalid_depth_;
-    return nullptr;
+    return NULL;
   }
   const google::protobuf::Field* field = Lookup(name);
-  if (field == nullptr) {
+  if (field == NULL) {
     ++invalid_depth_;
     // InvalidName() already called in Lookup().
-    return nullptr;
+    return NULL;
   }
   if (is_list && !IsRepeated(*field)) {
     ++invalid_depth_;
     InvalidName(name, "Proto field is not repeating, cannot start list.");
-    return nullptr;
+    return NULL;
   }
   return field;
 }
@@ -713,23 +711,23 @@ const google::protobuf::Field* ProtoWriter::BeginNamed(StringPiece name,
 const google::protobuf::Field* ProtoWriter::Lookup(
     StringPiece unnormalized_name) {
   ProtoElement* e = element();
-  if (e == nullptr) {
+  if (e == NULL) {
     InvalidName(unnormalized_name, "Root element must be a message.");
-    return nullptr;
+    return NULL;
   }
   if (unnormalized_name.empty()) {
     // Objects in repeated field inherit the same field descriptor.
-    if (e->parent_field() == nullptr) {
+    if (e->parent_field() == NULL) {
       InvalidName(unnormalized_name, "Proto fields must have a name.");
     } else if (!IsRepeated(*e->parent_field())) {
       InvalidName(unnormalized_name, "Proto fields must have a name.");
-      return nullptr;
+      return NULL;
     }
     return e->parent_field();
   }
   const google::protobuf::Field* field =
       typeinfo_->FindField(&e->type(), unnormalized_name);
-  if (field == nullptr && !ignore_unknown_fields_) {
+  if (field == NULL && !ignore_unknown_fields_) {
     InvalidName(unnormalized_name, "Cannot find field.");
   }
   return field;
@@ -748,7 +746,7 @@ void ProtoWriter::WriteRootMessage() {
   int curr_pos = 0;
   // Calls the destructor of CodedOutputStream to remove any uninitialized
   // memory from the Cord before we read it.
-  stream_.reset(nullptr);
+  stream_.reset(NULL);
   const void* data;
   int length;
   google::protobuf::io::ArrayInputStream input_stream(buffer_.data(), buffer_.size());

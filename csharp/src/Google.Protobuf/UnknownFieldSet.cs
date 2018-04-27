@@ -230,8 +230,7 @@ namespace Google.Protobuf
         /// <summary>
         /// Create a new UnknownFieldSet if unknownFields is null.
         /// Parse a single field from <paramref name="input"/> and merge it
-        /// into unknownFields. If <paramref name="input"/> is configured to discard unknown fields,
-        /// <paramref name="unknownFields"/> will be returned as-is and the field will be skipped.
+        /// into unknownFields.
         /// </summary>
         /// <param name="unknownFields">The UnknownFieldSet which need to be merged</param>
         /// <param name="input">The coded input stream containing the field</param>
@@ -239,11 +238,6 @@ namespace Google.Protobuf
         public static UnknownFieldSet MergeFieldFrom(UnknownFieldSet unknownFields,
                                                      CodedInputStream input)
         {
-            if (input.DiscardUnknownFields)
-            {
-                input.SkipLastField();
-                return unknownFields;
-            }
             if (unknownFields == null)
             {
                 unknownFields = new UnknownFieldSet();

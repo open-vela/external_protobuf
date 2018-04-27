@@ -38,7 +38,6 @@
 #include <algorithm>
 #include <iostream>
 #include <map>
-#include <memory>
 #include <set>
 #include <string>
 #include <vector>
@@ -49,6 +48,7 @@
 
 // TODO(liujisi): Remove the following includes after the include clean-up.
 #include <google/protobuf/stubs/logging.h>
+#include <google/protobuf/stubs/scoped_ptr.h>
 #include <google/protobuf/stubs/mutex.h>
 #include <google/protobuf/stubs/callback.h>
 
@@ -229,7 +229,12 @@ class FatalException : public std::exception {
 
 // This is at the end of the file instead of the beginning to work around a bug
 // in some versions of MSVC.
+// TODO(acozzette): remove these using statements
+using std::istream;
+using std::ostream;
+using std::pair;
 using std::string;
+using std::vector;
 
 }  // namespace protobuf
 }  // namespace google

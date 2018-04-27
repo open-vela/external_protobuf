@@ -35,6 +35,9 @@
 // This file contains tests and benchmarks.
 
 #include <memory>
+#ifndef _SHARED_PTR_H
+#include <google/protobuf/stubs/shared_ptr.h>
+#endif
 #include <vector>
 
 #include <google/protobuf/io/coded_stream.h>
@@ -734,7 +737,7 @@ TEST_F(CodedStreamTest, ReadStringImpossiblyLargeFromStringOnStack) {
 }
 
 TEST_F(CodedStreamTest, ReadStringImpossiblyLargeFromStringOnHeap) {
-  std::unique_ptr<uint8[]> buffer(new uint8[8]);
+  google::protobuf::scoped_array<uint8> buffer(new uint8[8]);
   CodedInputStream coded_input(buffer.get(), 8);
   string str;
   EXPECT_FALSE(coded_input.ReadString(&str, 1 << 30));
