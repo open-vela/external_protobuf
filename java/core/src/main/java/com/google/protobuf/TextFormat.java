@@ -987,7 +987,7 @@ public final class TextFormat {
         nextToken();
         return false;
       } else {
-        throw parseException("Expected \"true\" or \"false\". Found \"" + currentToken + "\".");
+        throw parseException("Expected \"true\" or \"false\".");
       }
     }
 
@@ -1224,22 +1224,6 @@ public final class TextFormat {
   }
 
   /**
-   * Parse a text-format message from {@code input}.
-   *
-   * @return the parsed message, guaranteed initialized
-   */
-  public static <T extends Message> T parse(final CharSequence input,
-                                            final Class<T> protoClass)
-                                            throws ParseException {
-    Message.Builder builder =
-        Internal.getDefaultInstance(protoClass).newBuilderForType();
-    merge(input, builder);
-    @SuppressWarnings("unchecked")
-    T output = (T) builder.build();
-    return output;
-  }
-
-  /**
    * Parse a text-format message from {@code input} and merge the contents
    * into {@code builder}.  Extensions will be recognized if they are
    * registered in {@code extensionRegistry}.
@@ -1262,25 +1246,6 @@ public final class TextFormat {
                            final Message.Builder builder)
                            throws ParseException {
     PARSER.merge(input, extensionRegistry, builder);
-  }
-
-  /**
-   * Parse a text-format message from {@code input}.  Extensions will be
-   * recognized if they are registered in {@code extensionRegistry}.
-   *
-   * @return the parsed message, guaranteed initialized
-   */
-  public static <T extends Message> T parse(
-      final CharSequence input,
-      final ExtensionRegistry extensionRegistry,
-      final Class<T> protoClass)
-      throws ParseException {
-    Message.Builder builder =
-        Internal.getDefaultInstance(protoClass).newBuilderForType();
-    merge(input, extensionRegistry, builder);
-    @SuppressWarnings("unchecked")
-    T output = (T) builder.build();
-    return output;
   }
 
 
@@ -1311,17 +1276,13 @@ public final class TextFormat {
     }
 
     private final boolean allowUnknownFields;
-    private final boolean allowUnknownEnumValues;
     private final SingularOverwritePolicy singularOverwritePolicy;
     private TextFormatParseInfoTree.Builder parseInfoTreeBuilder;
 
     private Parser(
-        boolean allowUnknownFields,
-        boolean allowUnknownEnumValues,
-        SingularOverwritePolicy singularOverwritePolicy,
+        boolean allowUnknownFields, SingularOverwritePolicy singularOverwritePolicy,
         TextFormatParseInfoTree.Builder parseInfoTreeBuilder) {
       this.allowUnknownFields = allowUnknownFields;
-      this.allowUnknownEnumValues = allowUnknownEnumValues;
       this.singularOverwritePolicy = singularOverwritePolicy;
       this.parseInfoTreeBuilder = parseInfoTreeBuilder;
     }
@@ -1338,7 +1299,6 @@ public final class TextFormat {
      */
     public static class Builder {
       private boolean allowUnknownFields = false;
-      private boolean allowUnknownEnumValues = false;
       private SingularOverwritePolicy singularOverwritePolicy =
           SingularOverwritePolicy.ALLOW_SINGULAR_OVERWRITES;
       private TextFormatParseInfoTree.Builder parseInfoTreeBuilder = null;
@@ -1360,10 +1320,7 @@ public final class TextFormat {
 
       public Parser build() {
         return new Parser(
-            allowUnknownFields,
-            allowUnknownEnumValues,
-            singularOverwritePolicy,
-            parseInfoTreeBuilder);
+            allowUnknownFields, singularOverwritePolicy, parseInfoTreeBuilder);
       }
     }
 
@@ -1427,7 +1384,7 @@ public final class TextFormat {
       return text;
     }
 
-    // Check both unknown fields and unknown extensions and log warning messages
+    // Check both unknown fields and unknown extensions and log warming messages
     // or throw exceptions according to the flag.
     private void checkUnknownFields(final List<String> unknownFields)
         throws ParseException {
@@ -1745,40 +1702,17 @@ public final class TextFormat {
               final int number = tokenizer.consumeInt32();
               value = enumType.findValueByNumber(number);
               if (value == null) {
-                String unknownValueMsg =
-                    "Enum type \""
-                        + enumType.getFullName()
-                        + "\" has no value with number "
-                        + number
-                        + '.';
-                if (allowUnknownEnumValues) {
-                  logger.warning(unknownValueMsg);
-                  return;
-                } else {
-                  throw tokenizer.parseExceptionPreviousToken(
-                      "Enum type \""
-                          + enumType.getFullName()
-                          + "\" has no value with number "
-                          + number
-                          + '.');
-                }
+                throw tokenizer.parseExceptionPreviousToken(
+                  "Enum type \"" + enumType.getFullName()
+                  + "\" has no value with number " + number + '.');
               }
             } else {
               final String id = tokenizer.consumeIdentifier();
               value = enumType.findValueByName(id);
               if (value == null) {
-                String unknownValueMsg =
-                    "Enum type \""
-                        + enumType.getFullName()
-                        + "\" has no value named \""
-                        + id
-                        + "\".";
-                if (allowUnknownEnumValues) {
-                  logger.warning(unknownValueMsg);
-                  return;
-                } else {
-                  throw tokenizer.parseExceptionPreviousToken(unknownValueMsg);
-                }
+                throw tokenizer.parseExceptionPreviousToken(
+                  "Enum type \"" + enumType.getFullName()
+                  + "\" has no value named \"" + id + "\".");
               }
             }
 

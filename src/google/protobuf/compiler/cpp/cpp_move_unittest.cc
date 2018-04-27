@@ -34,7 +34,7 @@
 #include <gtest/gtest.h>
 
 #if LANG_CXX11
-#include <type_traits>
+#include <google/protobuf/stubs/type_traits.h>
 #endif
 
 namespace google {

@@ -104,7 +104,9 @@ void SetMessageVariables(const FieldDescriptor* descriptor,
 
 MapFieldGenerator::MapFieldGenerator(const FieldDescriptor* descriptor,
                                      const Options& options)
-    : FieldGenerator(options), descriptor_(descriptor) {
+    : FieldGenerator(options),
+      descriptor_(descriptor),
+      dependent_field_(options.proto_h && IsFieldDependent(descriptor)) {
   SetMessageVariables(descriptor, &variables_, options);
 }
 
@@ -200,7 +202,7 @@ GenerateMergeFromCodedStream(io::Printer* printer) const {
     key = "entry->key()";
     value = "entry->value()";
     printer->Print(variables_,
-        "::std::unique_ptr<$map_classname$> entry($name$_.NewEntry());\n");
+        "::google::protobuf::scoped_ptr<$map_classname$> entry($name$_.NewEntry());\n");
     printer->Print(variables_,
         "{\n"
         "  ::std::string data;\n"
@@ -256,7 +258,7 @@ static void GenerateSerializationLoop(io::Printer* printer,
                                       const string& ptr,
                                       bool loop_via_iterators) {
   printer->Print(variables,
-      StrCat("::std::unique_ptr<$map_classname$> entry;\n",
+      StrCat("::google::protobuf::scoped_ptr<$map_classname$> entry;\n",
              loop_header, " {\n").c_str());
   printer->Indent();
 
@@ -363,7 +365,7 @@ void MapFieldGenerator::GenerateSerializeWithCachedSizes(
       "\n"
       "if ($deterministic$ &&\n"
       "    this->$name$().size() > 1) {\n"
-      "  ::std::unique_ptr<SortItem[]> items(\n"
+      "  ::google::protobuf::scoped_array<SortItem> items(\n"
       "      new SortItem[this->$name$().size()]);\n"
       "  typedef ::google::protobuf::Map< $key_cpp$, $val_cpp$ >::size_type size_type;\n"
       "  size_type n = 0;\n"
@@ -400,7 +402,7 @@ GenerateByteSize(io::Printer* printer) const {
       "total_size += $tag_size$ *\n"
       "    ::google::protobuf::internal::FromIntSize(this->$name$_size());\n"
       "{\n"
-      "  ::std::unique_ptr<$map_classname$> entry;\n"
+      "  ::google::protobuf::scoped_ptr<$map_classname$> entry;\n"
       "  for (::google::protobuf::Map< $key_cpp$, $val_cpp$ >::const_iterator\n"
       "      it = this->$name$().begin();\n"
       "      it != this->$name$().end(); ++it) {\n");

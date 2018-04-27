@@ -35,10 +35,9 @@
 // Contains methods defined in extension_set.h which cannot be part of the
 // lite library because they use descriptors or reflection.
 
-#include <google/protobuf/stubs/casts.h>
-#include <google/protobuf/descriptor.pb.h>
 #include <google/protobuf/io/coded_stream.h>
 #include <google/protobuf/io/zero_copy_stream_impl_lite.h>
+#include <google/protobuf/descriptor.pb.h>
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/extension_set.h>
 #include <google/protobuf/message.h>
@@ -96,14 +95,16 @@ class DescriptorPoolExtensionFinder : public ExtensionFinder {
 };
 
 void ExtensionSet::AppendToList(
-    const Descriptor* containing_type, const DescriptorPool* pool,
+    const Descriptor* containing_type,
+    const DescriptorPool* pool,
     std::vector<const FieldDescriptor*>* output) const {
-  ForEach([containing_type, pool, &output](int number, const Extension& ext) {
+  for (ExtensionMap::const_iterator iter = extensions_.begin();
+       iter != extensions_.end(); ++iter) {
     bool has = false;
-    if (ext.is_repeated) {
-      has = ext.GetSize() > 0;
+    if (iter->second.is_repeated) {
+      has = iter->second.GetSize() > 0;
     } else {
-      has = !ext.is_cleared;
+      has = !iter->second.is_cleared;
     }
 
     if (has) {
@@ -112,13 +113,14 @@ void ExtensionSet::AppendToList(
       //   initialized, so they might not even be constructed until
       //   AppendToList() is called.
 
-      if (ext.descriptor == NULL) {
-        output->push_back(pool->FindExtensionByNumber(containing_type, number));
+      if (iter->second.descriptor == NULL) {
+        output->push_back(pool->FindExtensionByNumber(
+            containing_type, iter->first));
       } else {
-        output->push_back(ext.descriptor);
+        output->push_back(iter->second.descriptor);
       }
     }
-  });
+  }
 }
 
 inline FieldDescriptor::Type real_type(FieldType type) {
@@ -145,17 +147,17 @@ inline WireFormatLite::FieldType field_type(FieldType type) {
 const MessageLite& ExtensionSet::GetMessage(int number,
                                             const Descriptor* message_type,
                                             MessageFactory* factory) const {
-  const Extension* extension = FindOrNull(number);
-  if (extension == NULL || extension->is_cleared) {
+  ExtensionMap::const_iterator iter = extensions_.find(number);
+  if (iter == extensions_.end() || iter->second.is_cleared) {
     // Not present.  Return the default value.
     return *factory->GetPrototype(message_type);
   } else {
-    GOOGLE_DCHECK_TYPE(*extension, OPTIONAL, MESSAGE);
-    if (extension->is_lazy) {
-      return extension->lazymessage_value->GetMessage(
+    GOOGLE_DCHECK_TYPE(iter->second, OPTIONAL, MESSAGE);
+    if (iter->second.is_lazy) {
+      return iter->second.lazymessage_value->GetMessage(
           *factory->GetPrototype(message_type));
     } else {
-      return *extension->message_value;
+      return *iter->second.message_value;
     }
   }
 }
@@ -188,51 +190,51 @@ MessageLite* ExtensionSet::MutableMessage(const FieldDescriptor* descriptor,
 
 MessageLite* ExtensionSet::ReleaseMessage(const FieldDescriptor* descriptor,
                                           MessageFactory* factory) {
-  Extension* extension = FindOrNull(descriptor->number());
-  if (extension == NULL) {
+  ExtensionMap::iterator iter = extensions_.find(descriptor->number());
+  if (iter == extensions_.end()) {
     // Not present.  Return NULL.
     return NULL;
   } else {
-    GOOGLE_DCHECK_TYPE(*extension, OPTIONAL, MESSAGE);
+    GOOGLE_DCHECK_TYPE(iter->second, OPTIONAL, MESSAGE);
     MessageLite* ret = NULL;
-    if (extension->is_lazy) {
-      ret = extension->lazymessage_value->ReleaseMessage(
+    if (iter->second.is_lazy) {
+      ret = iter->second.lazymessage_value->ReleaseMessage(
           *factory->GetPrototype(descriptor->message_type()));
       if (arena_ == NULL) {
-        delete extension->lazymessage_value;
+        delete iter->second.lazymessage_value;
       }
     } else {
       if (arena_ != NULL) {
-        ret = extension->message_value->New();
-        ret->CheckTypeAndMergeFrom(*extension->message_value);
+        ret = (iter->second.message_value)->New();
+        ret->CheckTypeAndMergeFrom(*(iter->second.message_value));
       } else {
-        ret = extension->message_value;
+        ret = iter->second.message_value;
       }
     }
-    Erase(descriptor->number());
+    extensions_.erase(descriptor->number());
     return ret;
   }
 }
 
 MessageLite* ExtensionSet::UnsafeArenaReleaseMessage(
     const FieldDescriptor* descriptor, MessageFactory* factory) {
-  Extension* extension = FindOrNull(descriptor->number());
-  if (extension == NULL) {
+  ExtensionMap::iterator iter = extensions_.find(descriptor->number());
+  if (iter == extensions_.end()) {
     // Not present.  Return NULL.
     return NULL;
   } else {
-    GOOGLE_DCHECK_TYPE(*extension, OPTIONAL, MESSAGE);
+    GOOGLE_DCHECK_TYPE(iter->second, OPTIONAL, MESSAGE);
     MessageLite* ret = NULL;
-    if (extension->is_lazy) {
-      ret = extension->lazymessage_value->UnsafeArenaReleaseMessage(
+    if (iter->second.is_lazy) {
+      ret = iter->second.lazymessage_value->UnsafeArenaReleaseMessage(
           *factory->GetPrototype(descriptor->message_type()));
       if (arena_ == NULL) {
-        delete extension->lazymessage_value;
+        delete iter->second.lazymessage_value;
       }
     } else {
-      ret = extension->message_value;
+      ret = iter->second.message_value;
     }
-    Erase(descriptor->number());
+    extensions_.erase(descriptor->number());
     return ret;
   }
 }
@@ -257,10 +259,8 @@ MessageLite* ExtensionSet::AddMessage(const FieldDescriptor* descriptor,
 
   // RepeatedPtrField<Message> does not know how to Add() since it cannot
   // allocate an abstract object, so we have to be tricky.
-  MessageLite* result =
-      reinterpret_cast<::google::protobuf::internal::RepeatedPtrFieldBase*>(
-          extension->repeated_message_value)
-          ->AddFromCleared<GenericTypeHandler<MessageLite> >();
+  MessageLite* result = extension->repeated_message_value
+      ->AddFromCleared<GenericTypeHandler<MessageLite> >();
   if (result == NULL) {
     const MessageLite* prototype;
     if (extension->repeated_message_value->size() == 0) {
@@ -347,10 +347,14 @@ int ExtensionSet::SpaceUsedExcludingSelf() const {
 }
 
 size_t ExtensionSet::SpaceUsedExcludingSelfLong() const {
-  size_t total_size = Size() * sizeof(KeyValue);
-  ForEach([&total_size](int /* number */, const Extension& ext) {
-    total_size += ext.SpaceUsedExcludingSelfLong();
-  });
+  size_t total_size =
+      extensions_.size() * sizeof(ExtensionMap::value_type);
+  for (ExtensionMap::const_iterator iter = extensions_.begin(),
+       end = extensions_.end();
+       iter != end;
+       ++iter) {
+    total_size += iter->second.SpaceUsedExcludingSelfLong();
+  }
   return total_size;
 }
 
@@ -387,9 +391,7 @@ size_t ExtensionSet::Extension::SpaceUsedExcludingSelfLong() const {
         // type handler.
         total_size +=
             sizeof(*repeated_message_value) +
-            RepeatedMessage_SpaceUsedExcludingSelfLong(
-                reinterpret_cast<::google::protobuf::internal::RepeatedPtrFieldBase*>(
-                    repeated_message_value));
+            RepeatedMessage_SpaceUsedExcludingSelfLong(repeated_message_value);
         break;
     }
   } else {
@@ -432,33 +434,25 @@ uint8* ExtensionSet::SerializeMessageSetWithCachedSizesToArray(
 }
 
 uint8* ExtensionSet::InternalSerializeWithCachedSizesToArray(
-    int start_field_number, int end_field_number, bool deterministic,
-    uint8* target) const {
-  if (GOOGLE_PREDICT_FALSE(is_large())) {
-    const auto& end = map_.large->end();
-    for (auto it = map_.large->lower_bound(start_field_number);
-         it != end && it->first < end_field_number; ++it) {
-      target = it->second.InternalSerializeFieldWithCachedSizesToArray(
-          it->first, deterministic, target);
-    }
-    return target;
-  }
-  const KeyValue* end = flat_end();
-  for (const KeyValue* it = std::lower_bound(
-           flat_begin(), end, start_field_number, KeyValue::FirstComparator());
-       it != end && it->first < end_field_number; ++it) {
-    target = it->second.InternalSerializeFieldWithCachedSizesToArray(
-        it->first, deterministic, target);
+    int start_field_number, int end_field_number,
+    bool deterministic, uint8* target) const {
+  ExtensionMap::const_iterator iter;
+  for (iter = extensions_.lower_bound(start_field_number);
+       iter != extensions_.end() && iter->first < end_field_number;
+       ++iter) {
+    target = iter->second.InternalSerializeFieldWithCachedSizesToArray(
+        iter->first, deterministic, target);
   }
   return target;
 }
 
 uint8* ExtensionSet::InternalSerializeMessageSetWithCachedSizesToArray(
     bool deterministic, uint8* target) const {
-  ForEach([deterministic, &target](int number, const Extension& ext) {
-    target = ext.InternalSerializeMessageSetItemWithCachedSizesToArray(
-        number, deterministic, target);
-  });
+  ExtensionMap::const_iterator iter;
+  for (iter = extensions_.begin(); iter != extensions_.end(); ++iter) {
+    target = iter->second.InternalSerializeMessageSetItemWithCachedSizesToArray(
+        iter->first, deterministic, target);
+  }
   return target;
 }
 
@@ -785,9 +779,9 @@ size_t ExtensionSet::Extension::MessageSetItemByteSize(int number) const {
   // message
   size_t message_size = 0;
   if (is_lazy) {
-    message_size = lazymessage_value->ByteSizeLong();
+    message_size = lazymessage_value->ByteSize();
   } else {
-    message_size = message_value->ByteSizeLong();
+    message_size = message_value->ByteSize();
   }
 
   our_size += io::CodedOutputStream::VarintSize32(message_size);
@@ -798,16 +792,20 @@ size_t ExtensionSet::Extension::MessageSetItemByteSize(int number) const {
 
 void ExtensionSet::SerializeMessageSetWithCachedSizes(
     io::CodedOutputStream* output) const {
-  ForEach([output](int number, const Extension& ext) {
-    ext.SerializeMessageSetItemWithCachedSizes(number, output);
-  });
+  for (ExtensionMap::const_iterator iter = extensions_.begin();
+       iter != extensions_.end(); ++iter) {
+    iter->second.SerializeMessageSetItemWithCachedSizes(iter->first, output);
+  }
 }
 
 size_t ExtensionSet::MessageSetByteSize() const {
   size_t total_size = 0;
-  ForEach([&total_size](int number, const Extension& ext) {
-    total_size += ext.MessageSetItemByteSize(number);
-  });
+
+  for (ExtensionMap::const_iterator iter = extensions_.begin();
+       iter != extensions_.end(); ++iter) {
+    total_size += iter->second.MessageSetItemByteSize(iter->first);
+  }
+
   return total_size;
 }
 

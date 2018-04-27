@@ -642,7 +642,7 @@ namespace Google.Protobuf.TestProtos {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public TestMapSubmessage(TestMapSubmessage other) : this() {
-      testMap_ = other.testMap_ != null ? other.testMap_.Clone() : null;
+      TestMap = other.testMap_ != null ? other.TestMap.Clone() : null;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 

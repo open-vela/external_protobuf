@@ -35,6 +35,9 @@
 #include <algorithm>
 #include <cstdlib>
 #include <memory>
+#ifndef _SHARED_PTR_H
+#include <google/protobuf/stubs/shared_ptr.h>
+#endif
 #include <string>
 #include <vector>
 

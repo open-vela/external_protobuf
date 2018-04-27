@@ -256,7 +256,8 @@ class ConformanceTestSuite {
   // The set of tests that the testee opted out of;
   std::set<std::string> skipped_;
 
-  std::unique_ptr<google::protobuf::util::TypeResolver> type_resolver_;
+  google::protobuf::internal::scoped_ptr<google::protobuf::util::TypeResolver>
+      type_resolver_;
   std::string type_url_;
 };
 
