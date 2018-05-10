@@ -276,8 +276,7 @@ string GetEnumPath(const GeneratorOptions& options,
 string MaybeCrossFileRef(const GeneratorOptions& options,
                          const FileDescriptor* from_file,
                          const Descriptor* to_message) {
-  if ((options.import_style == GeneratorOptions::kImportCommonJs ||
-       options.import_style == GeneratorOptions::kImportCommonJsStrict) &&
+  if (options.import_style == GeneratorOptions::kImportCommonJs &&
       from_file != to_message->file()) {
     // Cross-file ref in CommonJS needs to use the module alias instead of
     // the global name.
@@ -1676,18 +1675,8 @@ void Generator::GenerateProvides(const GeneratorOptions& options,
       //
       //   // Later generated code expects foo.bar = {} to exist:
       //   foo.bar.Baz = function() { /* ... */ }
-
-      // Do not use global scope in strict mode
-      if (options.import_style == GeneratorOptions::kImportCommonJsStrict) {
-        string namespaceObject = *it;
-        // Remove "proto." from the namespace object
-        namespaceObject.erase(0, 6);
-        printer->Print("goog.exportSymbol('$name$', null, proto);\n", "name",
-                namespaceObject);
-      } else {
-        printer->Print("goog.exportSymbol('$name$', null, global);\n", "name",
-                *it);
-      }
+      printer->Print("goog.exportSymbol('$name$', null, global);\n", "name",
+                     *it);
     }
   }
 }
@@ -3332,8 +3321,6 @@ bool GeneratorOptions::ParseFromOptions(
         import_style = kImportClosure;
       } else if (options[i].second == "commonjs") {
         import_style = kImportCommonJs;
-      } else if (options[i].second == "commonjs_strict") {
-        import_style = kImportCommonJsStrict;
       } else if (options[i].second == "browser") {
         import_style = kImportBrowser;
       } else if (options[i].second == "es6") {
@@ -3443,23 +3430,15 @@ void Generator::GenerateFile(const GeneratorOptions& options,
   GenerateHeader(options, printer);
 
   // Generate "require" statements.
-  if ((options.import_style == GeneratorOptions::kImportCommonJs ||
-       options.import_style == GeneratorOptions::kImportCommonJsStrict)) {
+  if (options.import_style == GeneratorOptions::kImportCommonJs) {
     printer->Print("var jspb = require('google-protobuf');\n");
     printer->Print("var goog = jspb;\n");
-
-    // Do not use global scope in strict mode
-    if (options.import_style == GeneratorOptions::kImportCommonJsStrict) {
-      printer->Print("var proto = {};\n\n");
-    } else {
-      printer->Print("var global = Function('return this')();\n\n");
-    }
+    printer->Print("var global = Function('return this')();\n\n");
 
     for (int i = 0; i < file->dependency_count(); i++) {
       const string& name = file->dependency(i)->name();
       printer->Print(
-          "var $alias$ = require('$file$');\n"
-          "goog.object.extend(proto, $alias$);\n",
+          "var $alias$ = require('$file$');\n",
           "alias", ModuleAlias(name),
           "file",
           GetRootPath(file->name(), name) + GetJSFilename(options, name));
@@ -3500,9 +3479,6 @@ void Generator::GenerateFile(const GeneratorOptions& options,
 
   if (options.import_style == GeneratorOptions::kImportCommonJs) {
     printer->Print("goog.object.extend(exports, $package$);\n",
-                   "package", GetFilePath(options, file));
-  } else if(options.import_style == GeneratorOptions::kImportCommonJsStrict) {
-    printer->Print("goog.object.extend(exports, proto);\n",
                    "package", GetFilePath(options, file));
   }
 
