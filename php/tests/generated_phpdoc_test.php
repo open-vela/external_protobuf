@@ -16,14 +16,6 @@ class GeneratedPhpdocTest extends TestBase
         $this->assertContains('foo.TestMessage', $doc);
     }
 
-    public function testPhpDocForConstructor()
-    {
-        $class = new ReflectionClass('Foo\TestMessage');
-        $doc = $class->getMethod('__construct')->getDocComment();
-        $this->assertContains('@param array $data', $doc);
-        $this->assertContains('@type int $optional_int32', $doc);
-    }
-
     /**
      * @dataProvider providePhpDocForGettersAndSetters
      */
@@ -201,7 +193,7 @@ class GeneratedPhpdocTest extends TestBase
                 [
                     'setRepeatedMessage',
                 ],
-                '@param \Foo\TestMessage\Sub[]|\Google\Protobuf\Internal\RepeatedField $var'
+                '@param \Foo\TestMessage_Sub[]|\Google\Protobuf\Internal\RepeatedField $var'
             ],
             [
                 [
@@ -294,14 +286,14 @@ class GeneratedPhpdocTest extends TestBase
                     'getOptionalMessage',
                     'getOneofMessage'
                 ],
-                '@return \Foo\TestMessage\Sub'
+                '@return \Foo\TestMessage_Sub'
             ],
             [
                 [
                     'setOptionalMessage',
                     'setOneofMessage'
                 ],
-                '@param \Foo\TestMessage\Sub $var'
+                '@param \Foo\TestMessage_Sub $var'
             ],
             [
                 [
