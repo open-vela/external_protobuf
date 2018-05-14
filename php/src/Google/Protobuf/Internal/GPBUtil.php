@@ -191,7 +191,7 @@ class GPBUtil
         $var = boolval($var);
     }
 
-    public static function checkMessage(&$var, $klass, $newClass = null)
+    public static function checkMessage(&$var, $klass)
     {
         if (!$var instanceof $klass && !is_null($var)) {
             throw new \Exception("Expect $klass.");
@@ -303,11 +303,8 @@ class GPBUtil
         $name,
         $file_proto)
     {
-        $parts = explode('.', $name);
-        foreach ($parts as $i => $part) {
-            $parts[$i] = static::getClassNamePrefix($parts[$i], $file_proto) . $parts[$i];
-        }
-        return implode('\\', $parts);
+        $classname = implode('_', explode('.', $name));
+        return static::getClassNamePrefix($classname, $file_proto) . $classname;
     }
 
     public static function getFullClassName(
@@ -350,14 +347,9 @@ class GPBUtil
         if ($package === "") {
             $classname = $class_name_without_package;
         } else {
-            $parts = array_map('ucwords', explode('.', $package));
-            foreach ($parts as $i => $part) {
-                $parts[$i] = self::getClassNamePrefix($part, $file_proto).$part;
-            }
             $classname =
-                implode('\\', $parts) .
-                "\\".self::getClassNamePrefix($class_name_without_package,$file_proto).
-                $class_name_without_package;
+                implode('\\', array_map('ucwords', explode('.', $package))).
+                "\\".$class_name_without_package;
         }
     }
 
