@@ -126,8 +126,10 @@ java_benchmark_testing_files =                                      \
 	java/src/main/java/com/google/protobuf/ProtoCaliperBenchmark.java
 
 javac_middleman: $(java_benchmark_testing_files) protoc_middleman protoc_middleman2
-	cp -r $(srcdir)/java tmp && cd tmp/java &&  mvn clean compile assembly:single
-	cd ../..
+	cp -r $(srcdir)/java tmp 
+	mkdir -p tmp/java/lib
+	cp $(top_srcdir)/java/core/target/*.jar tmp/java/lib/protobuf-java.jar
+	cd tmp/java && mvn clean compile assembly:single -Dprotobuf.version=$(PACKAGE_VERSION) && cd ../..
 	@touch javac_middleman
 
 java-benchmark: javac_middleman
@@ -137,10 +139,10 @@ java-benchmark: javac_middleman
 	@echo 'conf=()' >> java-benchmark
 	@echo 'data_files=""' >> java-benchmark
 	@echo 'for arg in $$@; do if [[ $${arg:0:1} == "-" ]]; then conf+=($$arg); else data_files+="$$arg,"; fi; done' >> java-benchmark
-	@echo 'java -cp '"tmp/java/target/*.jar"' com.google.caliper.runner.CaliperMain com.google.protobuf.ProtoCaliperBenchmark -i runtime '"\\"  >> java-benchmark
-	@echo '-b serializeToByteString,serializeToByteArray,serializeToMemoryStream,'"\\"  >> java-benchmark
-	@echo 'deserializeFromByteString,deserializeFromByteArray,deserializeFromMemoryStream '"\\" >> java-benchmark
-	@echo '-DdataFile=$${data_files:0:-1} $${conf[*]}' >> java-benchmark
+	@echo 'java -cp '\"tmp/java/target/*:$(top_srcdir)/java/core/target/*:$(top_srcdir)/java/util/target/*\"" \\" >>java-benchmark
+	@echo '   com.google.caliper.runner.CaliperMain com.google.protobuf.ProtoCaliperBenchmark -i runtime '"\\"  >> java-benchmark
+	@echo '   -b serializeToByteArray,serializeToMemoryStream,deserializeFromByteArray,deserializeFromMemoryStream '"\\" >> java-benchmark
+	@echo '   -DdataFile=$${data_files:0:-1} $${conf[*]}' >> java-benchmark
 	@chmod +x java-benchmark
 
 java: protoc_middleman protoc_middleman2 java-benchmark
@@ -179,8 +181,8 @@ nodist_libbenchmark_messages_la_SOURCES =                         \
 python-pure-python-benchmark: python_add_init
 	@echo "Writing shortcut script python-pure-python-benchmark..."
 	@echo '#! /bin/bash' > python-pure-python-benchmark
-	@echo export LD_LIBRARY_PATH=$(top_srcdir)/src/.libs >> python-pure-python-benchmark
-	@echo export DYLD_LIBRARY_PATH=$(top_srcdir)/src/.libs >> python-pure-python-benchmark
+	@echo export LD_LIBRARY_PATH=$(top_srcdir)/src/libprotobuf.la >> python-pure-python-benchmark
+	@echo export DYLD_LIBRARY_PATH=$(top_srcdir)/src/libprotobuf.la >> python-pure-python-benchmark
 	@echo export PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=\'python\' >> python-pure-python-benchmark
 	@echo cp $(srcdir)/python/py_benchmark.py tmp >> python-pure-python-benchmark
 	@echo python tmp/py_benchmark.py '$$@' >> python-pure-python-benchmark
@@ -189,8 +191,8 @@ python-pure-python-benchmark: python_add_init
 python-cpp-reflection-benchmark: python_add_init
 	@echo "Writing shortcut script python-cpp-reflection-benchmark..."
 	@echo '#! /bin/bash' > python-cpp-reflection-benchmark
-	@echo export LD_LIBRARY_PATH=$(top_srcdir)/src/.libs >> python-cpp-reflection-benchmark
-	@echo export DYLD_LIBRARY_PATH=$(top_srcdir)/src/.libs >> python-cpp-reflection-benchmark
+	@echo export LD_LIBRARY_PATH=$(top_srcdir)/src/libprotobuf.la >> python-cpp-reflection-benchmark
+	@echo export DYLD_LIBRARY_PATH=$(top_srcdir)/src/libprotobuf.la >> python-cpp-reflection-benchmark
 	@echo export PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=\'cpp\' >> python-cpp-reflection-benchmark
 	@echo cp $(srcdir)/python/py_benchmark.py tmp >> python-cpp-reflection-benchmark
 	@echo python tmp/py_benchmark.py '$$@' >> python-cpp-reflection-benchmark
@@ -199,8 +201,8 @@ python-cpp-reflection-benchmark: python_add_init
 python-cpp-generated-code-benchmark: python_add_init libbenchmark_messages.la
 	@echo "Writing shortcut script python-cpp-generated-code-benchmark..."
 	@echo '#! /bin/bash' > python-cpp-generated-code-benchmark
-	@echo export LD_LIBRARY_PATH=$(top_srcdir)/src/.libs >> python-cpp-generated-code-benchmark
-	@echo export DYLD_LIBRARY_PATH=$(top_srcdir)/src/.libs >> python-cpp-generated-code-benchmark
+	@echo export LD_LIBRARY_PATH=$(top_srcdir)/src/libprotobuf.la >> python-cpp-generated-code-benchmark
+	@echo export DYLD_LIBRARY_PATH=$(top_srcdir)/src/libprotobuf.la >> python-cpp-generated-code-benchmark
 	@echo export PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=\'cpp\' >> python-cpp-generated-code-benchmark
 	@echo cp $(srcdir)/python/py_benchmark.py tmp >> python-cpp-generated-code-benchmark
 	@echo python tmp/py_benchmark.py --cpp_generated '$$@' >> python-cpp-generated-code-benchmark
