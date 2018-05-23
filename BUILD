@@ -1,4 +1,4 @@
-# Bazel (http://bazel.io/) BUILD file for Protobuf.
+# Bazel (https://bazel.build/) BUILD file for Protobuf.
 
 licenses(["notice"])
 
@@ -54,7 +54,19 @@ config_setting(
 # Android and MSVC builds do not need to link in a separate pthread library.
 LINK_OPTS = select({
     ":android": [],
-    ":msvc": [],
+    ":msvc": [
+        # Linking to setargv.obj makes the default command line argument
+        # parser expand wildcards, so the main method's argv will contain the
+        # expanded list instead of the wildcards.
+        # Using -WHOLEARCHIVE, because:
+        # - Microsoft ships this object file next to default libraries
+        # - but this file is not a library, just a precompiled object
+        # - just listing the name here without "-WHOLEARCHIVE:" would make Bazel
+        #   believe that "setargv.obj" is a source or rule output in this
+        #   package, which it is not.
+        # See https://msdn.microsoft.com/en-us/library/8bch7bkk.aspx
+        "-WHOLEARCHIVE:setargv.obj",
+    ],
     "//conditions:default": ["-lpthread", "-lm"],
 })
 
