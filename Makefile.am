@@ -904,7 +904,6 @@ ruby_EXTRA_DIST=                                                             \
   ruby/tests/stress.rb                                                       \
   ruby/tests/generated_code.proto                                            \
   ruby/tests/test_import.proto                                               \
-  ruby/tests/test_ruby_package.proto                                         \
   ruby/tests/generated_code_test.rb                                          \
   ruby/tests/well_known_types_test.rb                                        \
   ruby/travis-test.sh
@@ -1034,7 +1033,6 @@ EXTRA_DIST = $(@DIST_LANG@_EXTRA_DIST)   \
   cmake/protobuf.pc.cmake                \
   cmake/protoc.cmake                     \
   cmake/tests.cmake                      \
-  cmake/version.rc.in                    \
   editors/README.txt                     \
   editors/proto.vim                      \
   editors/protobuf-mode.el               \
