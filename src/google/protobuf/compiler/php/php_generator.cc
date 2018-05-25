@@ -157,7 +157,7 @@ std::string ClassNamePrefix(const string& classname,
 }
 
 template <typename DescriptorType>
-std::string GeneratedClassNameImpl(const DescriptorType* desc) {
+std::string GeneratedClassName(const DescriptorType* desc) {
   std::string classname = ClassNamePrefix(desc->name(), desc) + desc->name();
   const Descriptor* containing = desc->containing_type();
   while (containing != NULL) {
@@ -168,21 +168,9 @@ std::string GeneratedClassNameImpl(const DescriptorType* desc) {
   return classname;
 }
 
-std::string GeneratedClassNameImpl(const ServiceDescriptor* desc) {
+std::string GeneratedClassName(const ServiceDescriptor* desc) {
   std::string classname = desc->name();
   return ClassNamePrefix(classname, desc) + classname;
-}
-
-std::string GeneratedClassName(const Descriptor* desc) {
-  return GeneratedClassNameImpl(desc);
-}
-
-std::string GeneratedClassName(const EnumDescriptor* desc) {
-  return GeneratedClassNameImpl(desc);
-}
-
-std::string GeneratedClassName(const ServiceDescriptor* desc) {
-  return GeneratedClassNameImpl(desc);
 }
 
 template <typename DescriptorType>
@@ -254,7 +242,7 @@ std::string RootPhpNamespace(const DescriptorType* desc, bool is_descriptor) {
 
 template <typename DescriptorType>
 std::string FullClassName(const DescriptorType* desc, bool is_descriptor) {
-  string classname = GeneratedClassNameImpl(desc);
+  string classname = GeneratedClassName(desc);
   string php_namespace = RootPhpNamespace(desc, is_descriptor);
   if (php_namespace != "") {
     return php_namespace + "\\" + classname;
@@ -1086,7 +1074,7 @@ void LegacyGenerateClassFile(const FileDescriptor* file, const DescriptorType* d
   Outdent(&printer);
   printer.Print("}\n");
   printer.Print("class_exists(^new^::class);\n",
-      "new", GeneratedClassNameImpl(desc));
+      "new", GeneratedClassName(desc));
   printer.Print("@trigger_error('^old^ is deprecated and will be removed in "
       "the next major release. Use ^fullname^ instead', E_USER_DEPRECATED);\n\n",
       "old", LegacyFullClassName(desc, is_descriptor),
