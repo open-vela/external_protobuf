@@ -406,9 +406,10 @@ typedef std::pair<const EnumDescriptor*, int> EnumIntPair;
 template<typename PairType>
 struct PointerIntegerPairHash {
   size_t operator()(const PairType& p) const {
-    // FIXME(kenton):  What is the best way to compute this hash?  I have
-    // no idea!  This seems a bit better than an XOR.
-    return reinterpret_cast<intptr_t>(p.first) * ((1 << 16) - 1) + p.second;
+    static const size_t prime1 = 16777499;
+    static const size_t prime2 = 16777619;
+    return reinterpret_cast<size_t>(p.first) * prime1 ^
+           static_cast<size_t>(p.second) * prime2;
   }
 
 #ifdef _MSC_VER
@@ -424,11 +425,10 @@ struct PointerIntegerPairHash {
 
 struct PointerStringPairHash {
   size_t operator()(const PointerStringPair& p) const {
-    // FIXME(kenton):  What is the best way to compute this hash?  I have
-    // no idea!  This seems a bit better than an XOR.
+    static const size_t prime = 16777619;
     hash<const char*> cstring_hash;
-    return reinterpret_cast<intptr_t>(p.first) * ((1 << 16) - 1) +
-           cstring_hash(p.second);
+    return reinterpret_cast<size_t>(p.first) * prime ^
+           static_cast<size_t>(cstring_hash(p.second));
   }
 
 #ifdef _MSC_VER
@@ -775,10 +775,10 @@ class FileDescriptorTables {
 
   SymbolsByParentMap symbols_by_parent_;
   mutable FieldsByNameMap fields_by_lowercase_name_;
-  std::unique_ptr<FieldsByNameMap> fields_by_lowercase_name_tmp_;
+  mutable FieldsByNameMap* fields_by_lowercase_name_tmp_;
   mutable GoogleOnceDynamic fields_by_lowercase_name_once_;
   mutable FieldsByNameMap fields_by_camelcase_name_;
-  std::unique_ptr<FieldsByNameMap> fields_by_camelcase_name_tmp_;
+  mutable FieldsByNameMap* fields_by_camelcase_name_tmp_;
   mutable GoogleOnceDynamic fields_by_camelcase_name_once_;
   FieldsByNumberMap fields_by_number_;  // Not including extensions.
   EnumValuesByNumberMap enum_values_by_number_;
@@ -1146,8 +1146,10 @@ bool DescriptorPool::Tables::AddFile(const FileDescriptor* file) {
 
 void FileDescriptorTables::FinalizeTables() {
   // Clean up the temporary maps used by AddFieldByStylizedNames().
-  fields_by_lowercase_name_tmp_ = nullptr;
-  fields_by_camelcase_name_tmp_ = nullptr;
+  delete fields_by_lowercase_name_tmp_;
+  fields_by_lowercase_name_tmp_ = NULL;
+  delete fields_by_camelcase_name_tmp_;
+  fields_by_camelcase_name_tmp_ = NULL;
 }
 
 void FileDescriptorTables::AddFieldByStylizedNames(
@@ -1162,7 +1164,7 @@ void FileDescriptorTables::AddFieldByStylizedNames(
   // entries from fields_by_number_.
 
   PointerStringPair lowercase_key(parent, field->lowercase_name().c_str());
-  if (!InsertIfNotPresent(fields_by_lowercase_name_tmp_.get(), lowercase_key,
+  if (!InsertIfNotPresent(fields_by_lowercase_name_tmp_, lowercase_key,
                           field)) {
     InsertIfNotPresent(
         &fields_by_lowercase_name_, lowercase_key,
@@ -1170,7 +1172,7 @@ void FileDescriptorTables::AddFieldByStylizedNames(
   }
 
   PointerStringPair camelcase_key(parent, field->camelcase_name().c_str());
-  if (!InsertIfNotPresent(fields_by_camelcase_name_tmp_.get(), camelcase_key,
+  if (!InsertIfNotPresent(fields_by_camelcase_name_tmp_, camelcase_key,
                           field)) {
     InsertIfNotPresent(
         &fields_by_camelcase_name_, camelcase_key,
