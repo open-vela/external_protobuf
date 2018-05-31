@@ -20,10 +20,11 @@ languages = [
   ]),
   Language("Java", [
       "java",
-      "src/google/protobuf/compiler/java",
+      "javanano",
+      "src/google/protobuf/compiler/cpp",
   ]),
   Language("Python", [
-      "python",
+      "javanano",
       "src/google/protobuf/compiler/python",
   ]),
   Language("JavaScript", [
