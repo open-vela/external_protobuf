@@ -2,7 +2,7 @@
 
 use Foo\TestMessage;
 use Foo\TestEnum;
-use Foo\TestMessage\Sub;
+use Foo\TestMessage_Sub;
 
 class TestBase extends PHPUnit_Framework_TestCase
 {

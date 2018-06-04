@@ -88,7 +88,7 @@ AS_IF([test "x${ac_cv_env_CXXFLAGS_set}" = "x"],[
   # Protocol Buffers contains several checks that are intended to be used only
   # for debugging and which might hurt performance.  Most users are probably
   # end users who don't want these checks, so add -DNDEBUG by default.
-  CXXFLAGS="$CXXFLAGS -std=c++11 -DNDEBUG"
+  CXXFLAGS="$CXXFLAGS -DNDEBUG"
 
   AC_MSG_RESULT([use default: $PROTOBUF_OPT_FLAG $CXXFLAGS])
 ],[
@@ -190,7 +190,7 @@ AM_CONDITIONAL([HAVE_PTHREAD], [test "x$ax_pthread_ok" = "xyes"])
 AC_CXX_STL_HASH
 
 case "$target_os" in
-  mingw* | cygwin* | win* | aix* | *android* )
+  mingw* | cygwin* | win* | aix*)
     ;;
   *)
     # Need to link against rt on Solaris
@@ -207,7 +207,7 @@ case "$target_os" in
 esac
 AM_CONDITIONAL([OBJC_CONFORMANCE_TEST], [test $OBJC_CONFORMANCE_TEST = 1])
 
-AX_CXX_COMPILE_STDCXX([11], [noext], [mandatory])
+AX_CXX_COMPILE_STDCXX([11], [noext], [optional])
 
 # HACK:  Make gmock's configure script pick up our copy of CFLAGS and CXXFLAGS,
 #   since the flags added by ACX_CHECK_SUNCC must be used when compiling gmock
