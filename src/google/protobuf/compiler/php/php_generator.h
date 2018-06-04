@@ -48,7 +48,6 @@ class LIBPROTOC_EXPORT Generator
       const string& parameter,
       GeneratorContext* generator_context,
       string* error) const;
-
 };
 
 // To skip reserved keywords in php, some generated classname are prefixed.
