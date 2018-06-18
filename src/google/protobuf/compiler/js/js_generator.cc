@@ -3477,8 +3477,7 @@ void Generator::GenerateFile(const GeneratorOptions& options,
     GenerateExtension(options, printer, *it);
   }
 
-  // if provided is empty, do not export anything
-  if (options.import_style == GeneratorOptions::kImportCommonJs && provided.size()) {
+  if (options.import_style == GeneratorOptions::kImportCommonJs) {
     printer->Print("goog.object.extend(exports, $package$);\n",
                    "package", GetFilePath(options, file));
   }
