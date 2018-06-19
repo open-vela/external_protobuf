@@ -6951,7 +6951,7 @@ class DescriptorBuilder::OptionInterpreter::AggregateOptionFinder
   DescriptorBuilder* builder_;
 
   virtual const FieldDescriptor* FindExtension(
-      Message* message, const string& name) const override {
+      Message* message, const string& name) const {
     assert_mutex_held(builder_->pool_);
     const Descriptor* descriptor = message->GetDescriptor();
     Symbol result = builder_->LookupSymbolNoPlaceholder(
@@ -6989,7 +6989,7 @@ class AggregateErrorCollector : public io::ErrorCollector {
   string error_;
 
   virtual void AddError(int /* line */, int /* column */,
-                const string& message) override {
+                        const string& message) {
     if (!error_.empty()) {
       error_ += "; ";
     }
@@ -6997,7 +6997,7 @@ class AggregateErrorCollector : public io::ErrorCollector {
   }
 
   virtual void AddWarning(int /* line */, int /* column */,
-                  const string& /* message */) override {
+                          const string& /* message */) {
     // Ignore warnings
   }
 };

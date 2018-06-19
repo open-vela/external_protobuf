@@ -78,7 +78,7 @@ class LIBPROTOBUF_EXPORT ProtoWriter : public StructuredObjectWriter {
 // Constructor. Does not take ownership of any parameter passed in.
   ProtoWriter(TypeResolver* type_resolver, const google::protobuf::Type& type,
               strings::ByteSink* output, ErrorListener* listener);
-  virtual ~ProtoWriter() override;
+  virtual ~ProtoWriter();
 
   // ObjectWriter methods.
   ProtoWriter* StartObject(StringPiece name) override;
@@ -163,7 +163,7 @@ class LIBPROTOBUF_EXPORT ProtoWriter : public StructuredObjectWriter {
     ProtoElement(ProtoElement* parent, const google::protobuf::Field* field,
                  const google::protobuf::Type& type, bool is_list);
 
-    virtual ~ProtoElement() override {}
+    virtual ~ProtoElement() {}
 
     // Called just before the destructor for clean up:
     //   - reports any missing required fields
@@ -183,9 +183,9 @@ class LIBPROTOBUF_EXPORT ProtoWriter : public StructuredObjectWriter {
     void RegisterField(const google::protobuf::Field* field);
 
     // To report location on error messages.
-    virtual string ToString() const override;
+    virtual string ToString() const;
 
-    virtual ProtoElement* parent() const override {
+    virtual ProtoElement* parent() const {
       return static_cast<ProtoElement*>(BaseElement::parent());
     }
 

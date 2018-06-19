@@ -85,9 +85,9 @@ class DescriptorPoolExtensionFinder : public ExtensionFinder {
                                 MessageFactory* factory,
                                 const Descriptor* containing_type)
       : pool_(pool), factory_(factory), containing_type_(containing_type) {}
-  virtual ~DescriptorPoolExtensionFinder() override {}
+  virtual ~DescriptorPoolExtensionFinder() {}
 
-  virtual bool Find(int number, ExtensionInfo* output) override;
+  virtual bool Find(int number, ExtensionInfo* output);
 
  private:
   const DescriptorPool* pool_;
