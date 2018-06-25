@@ -1,5 +1,3 @@
-load("@bazel_skylib//:lib.bzl", "versions")
-
 def _GetPath(ctx, path):
   if ctx.label.workspace_root:
     return ctx.label.workspace_root + '/' + path
@@ -268,8 +266,8 @@ def internal_gen_well_known_protos_java(srcs):
   Args:
     srcs: the well known protos
   """
-  root = Label("%s//protobuf_java" % (native.repository_name())).workspace_root
-  pkg = native.package_name() + "/" if native.package_name() else ""
+  root = Label("%s//protobuf_java" % (REPOSITORY_NAME)).workspace_root
+  pkg = PACKAGE_NAME + "/" if PACKAGE_NAME else ""
   if root == "":
     include = " -I%ssrc " % pkg
   else:
@@ -413,4 +411,7 @@ def check_protobuf_required_bazel_version():
   This ensures bazel supports our approach to proto_library() depending on a
   copied filegroup. (Fixed in bazel 0.5.4)
   """
-  versions.check(minimum_bazel_version = "0.5.4")
+  expected = apple_common.dotted_version("0.5.4")
+  current = apple_common.dotted_version(native.bazel_version)
+  if current.compare_to(expected) < 0:
+    fail("Bazel must be newer than 0.5.4")
