@@ -58,11 +58,7 @@ class MapField implements \ArrayAccess, \IteratorAggregate, \Countable
     /**
      * @ignore
      */
-    private $klass;
-    /**
-     * @ignore
-     */
-    private $legacy_klass;
+    private $value_klass;
 
     /**
      * Constructs an instance of MapField.
@@ -79,17 +75,6 @@ class MapField implements \ArrayAccess, \IteratorAggregate, \Countable
         $this->key_type = $key_type;
         $this->value_type = $value_type;
         $this->klass = $klass;
-
-        if ($this->value_type == GPBType::MESSAGE) {
-            $pool = DescriptorPool::getGeneratedPool();
-            $desc = $pool->getDescriptorByClassName($klass);
-            if ($desc == NULL) {
-                new $klass;  // No msg class instance has been created before.
-                $desc = $pool->getDescriptorByClassName($klass);
-            }
-            $this->klass = $desc->getClass();
-            $this->legacy_klass = $desc->getLegacyClass();
-        }
     }
 
     /**
@@ -114,14 +99,6 @@ class MapField implements \ArrayAccess, \IteratorAggregate, \Countable
     public function getValueClass()
     {
         return $this->klass;
-    }
-
-    /**
-     * @ignore
-     */
-    public function getLegacyValueClass()
-    {
-        return $this->legacy_klass;
     }
 
     /**
