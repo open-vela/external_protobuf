@@ -2962,8 +2962,12 @@ void Generator::GenerateClassDeserializeBinaryField(
     if (value_field->type() == FieldDescriptor::TYPE_MESSAGE) {
       printer->Print(", $messageType$.deserializeBinaryFromReader",
           "messageType", GetMessagePath(options, value_field->message_type()));
+    } else {
+      printer->Print(", null");
     }
-
+    printer->Print(", $defaultKey$",
+          "defaultKey", JSFieldDefault(key_field)
+    );
     printer->Print(");\n");
     printer->Print("         });\n");
   } else {
@@ -3477,8 +3481,7 @@ void Generator::GenerateFile(const GeneratorOptions& options,
     GenerateExtension(options, printer, *it);
   }
 
-  // if provided is empty, do not export anything
-  if (options.import_style == GeneratorOptions::kImportCommonJs && !provided.empty()) {
+  if (options.import_style == GeneratorOptions::kImportCommonJs) {
     printer->Print("goog.object.extend(exports, $package$);\n",
                    "package", GetFilePath(options, file));
   }

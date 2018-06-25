@@ -25,7 +25,6 @@ These are projects we know about implementing Protocol Buffers for other program
 * Clojure: http://github.com/ninjudd/clojure-protobuf
 * Common Lisp: http://github.com/ndantam/s-protobuf
 * Common Lisp: http://github.com/brown/protobuf
-* D: https://github.com/dcarp/protobuf-d
 * D: https://github.com/msoucy/dproto
 * D: http://256.makerslocal.org/wiki/index.php/ProtocolBuffer
 * D: https://github.com/opticron/ProtocolBuffer
@@ -40,7 +39,6 @@ These are projects we know about implementing Protocol Buffers for other program
 * Erlang: https://code.google.com/p/protoc-gen-erl/
 * Erlang: https://github.com/basho/erlang_protobuffs
 * Erlang: https://github.com/tomas-abrahamsson/gpb
-* GDScript: https://github.com/oniksan/godobuf (Godot v3 engine plugin)
 * Go: https://github.com/golang/protobuf (Google-official implementation)
 * Go: https://github.com/akunspy/gopbuf
 * Go: https://github.com/gogo/protobuf
@@ -89,7 +87,7 @@ These are projects we know about implementing Protocol Buffers for other program
 * Scala: http://github.com/jeffplaisance/scala-protobuf
 * Scala: http://code.google.com/p/protobuf-scala
 * Scala: https://github.com/SandroGrzicic/ScalaBuff
-* Scala: https://scalapb.github.io
+* Scala: http://trueaccord.github.io/ScalaPB/
 * Swift: https://github.com/alexeyxo/protobuf-swift
 * Swift: https://github.com/apple/swift-protobuf/
 * Vala: https://launchpad.net/protobuf-vala

@@ -51,7 +51,6 @@ pkgconfig_DATA = protobuf.pc protobuf-lite.pc
 csharp_EXTRA_DIST=                                                           \
   csharp/.gitignore                                                          \
   csharp/CHANGES.txt                                                         \
-  csharp/Google.Protobuf.Tools.targets                                       \
   csharp/Google.Protobuf.Tools.nuspec                                        \
   csharp/README.md                                                           \
   csharp/build_packages.bat                                                  \
@@ -805,7 +804,6 @@ python_EXTRA_DIST=                                                           \
   python/google/protobuf/message.py                                          \
   python/google/protobuf/message_factory.py                                  \
   python/google/protobuf/python_protobuf.h                                   \
-  python/google/protobuf/proto_api.h                                         \
   python/google/protobuf/proto_builder.py                                    \
   python/google/protobuf/pyext/README                                        \
   python/google/protobuf/pyext/__init__.py                                   \
@@ -1038,7 +1036,6 @@ EXTRA_DIST = $(@DIST_LANG@_EXTRA_DIST)   \
   cmake/protobuf.pc.cmake                \
   cmake/protoc.cmake                     \
   cmake/tests.cmake                      \
-  cmake/version.rc.in                    \
   editors/README.txt                     \
   editors/proto.vim                      \
   editors/protobuf-mode.el               \
