@@ -46,7 +46,6 @@ using google::protobuf::DescriptorPool;
 using google::protobuf::Message;
 using google::protobuf::MessageFactory;
 using google::protobuf::util::BinaryToJsonString;
-using google::protobuf::util::JsonParseOptions;
 using google::protobuf::util::JsonToBinaryString;
 using google::protobuf::util::NewTypeResolverForDescriptorPool;
 using google::protobuf::util::Status;
@@ -113,13 +112,8 @@ void DoTest(const ConformanceRequest& request, ConformanceResponse* response) {
 
     case ConformanceRequest::kJsonPayload: {
       string proto_binary;
-      JsonParseOptions options;
-      options.ignore_unknown_fields =
-          (request.test_category() ==
-              conformance::JSON_IGNORE_UNKNOWN_PARSING_TEST);
       Status status = JsonToBinaryString(type_resolver, *type_url,
-                                         request.json_payload(), &proto_binary,
-                                         options);
+                                         request.json_payload(), &proto_binary);
       if (!status.ok()) {
         response->set_parse_error(string("Parse error: ") +
                                   status.error_message().as_string());

@@ -77,7 +77,7 @@ const string kEscapeTestStringEscaped =
 class TextFormatTest : public testing::Test {
  public:
   static void SetUpTestCase() {
-    GOOGLE_CHECK_OK(File::GetContentsAsText(
+    GOOGLE_CHECK_OK(File::GetContents(
         TestSourceDir() +
             "/google/protobuf/"
             "testdata/text_format_unittest_data_oneof_implemented.txt",
@@ -99,7 +99,7 @@ string TextFormatTest::static_proto_debug_string_;
 class TextFormatExtensionsTest : public testing::Test {
  public:
   static void SetUpTestCase() {
-    GOOGLE_CHECK_OK(File::GetContentsAsText(TestSourceDir() +
+    GOOGLE_CHECK_OK(File::GetContents(TestSourceDir() +
                                    "/google/protobuf/testdata/"
                                    "text_format_unittest_extensions_data.txt",
                                &static_proto_debug_string_, true));
@@ -574,11 +574,6 @@ class CompactRepeatedFieldPrinter : public TextFormat::FastFieldValuePrinter {
       generator->PrintString(field->name());
     }
   }
-  // To prevent compiler complaining about Woverloaded-virtual
-  void PrintFieldName(const Message& message,
-                      const Reflection* reflection,
-                      const FieldDescriptor* field,
-                      TextFormat::BaseTextGenerator* generator) const override {}
   void PrintMessageStart(
       const Message& message, int field_index, int field_count,
       bool single_line_mode,
