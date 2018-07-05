@@ -260,12 +260,12 @@ class LIBPROTOBUF_EXPORT UnknownFieldSetFieldSkipper : public FieldSkipper {
  public:
   UnknownFieldSetFieldSkipper(UnknownFieldSet* unknown_fields)
       : unknown_fields_(unknown_fields) {}
-  virtual ~UnknownFieldSetFieldSkipper() override {}
+  virtual ~UnknownFieldSetFieldSkipper() {}
 
   // implements FieldSkipper -----------------------------------------
-  virtual bool SkipField(io::CodedInputStream* input, uint32 tag) override;
-  virtual bool SkipMessage(io::CodedInputStream* input) override;
-  virtual void SkipUnknownEnum(int field_number, int value) override;
+  virtual bool SkipField(io::CodedInputStream* input, uint32 tag);
+  virtual bool SkipMessage(io::CodedInputStream* input);
+  virtual void SkipUnknownEnum(int field_number, int value);
 
  protected:
   UnknownFieldSet* unknown_fields_;

@@ -204,17 +204,6 @@ if(protobuf_ABSOLUTE_TEST_PLUGIN_PATH)
   add_compile_options(-DGOOGLE_PROTOBUF_TEST_PLUGIN_PATH="$<TARGET_FILE:test_plugin>")
 endif()
 
-if(MINGW)
-  set_source_files_properties(${tests_files} PROPERTIES COMPILE_FLAGS "-Wno-narrowing")
-
-  # required for tests on MinGW Win64
-  if (CMAKE_SIZEOF_VOID_P EQUAL 8)
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--stack,16777216")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wa,-mbig-obj")
-  endif()
-
-endif()
-
 add_executable(tests ${tests_files} ${common_test_files} ${tests_proto_files} ${lite_test_proto_files})
 target_link_libraries(tests libprotoc libprotobuf gmock_main)
 

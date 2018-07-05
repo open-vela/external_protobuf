@@ -1407,7 +1407,7 @@ public abstract class GeneratedMessageLite<
 
   /**
    * A serialized (serializable) form of the generated message.  Stores the
-   * message as a class and a byte array.
+   * message as a class name and a byte array.
    */
   protected static final class SerializedForm implements Serializable {
 
@@ -1417,9 +1417,6 @@ public abstract class GeneratedMessageLite<
 
     private static final long serialVersionUID = 0L;
 
-    // since v3.6.1
-    private final Class<?> messageClass;
-    // only included for backwards compatibility before messageClass was added
     private final String messageClassName;
     private final byte[] asBytes;
 
@@ -1428,8 +1425,7 @@ public abstract class GeneratedMessageLite<
      * @param regularForm the message to serialize
      */
     SerializedForm(MessageLite regularForm) {
-      messageClass = regularForm.getClass();
-      messageClassName = messageClass.getName();
+      messageClassName = regularForm.getClass().getName();
       asBytes = regularForm.toByteArray();
     }
 
@@ -1441,7 +1437,7 @@ public abstract class GeneratedMessageLite<
     @SuppressWarnings("unchecked")
     protected Object readResolve() throws ObjectStreamException {
       try {
-        Class<?> messageClass = resolveMessageClass();
+        Class<?> messageClass = Class.forName(messageClassName);
         java.lang.reflect.Field defaultInstanceField =
             messageClass.getDeclaredField("DEFAULT_INSTANCE");
         defaultInstanceField.setAccessible(true);
@@ -1468,7 +1464,7 @@ public abstract class GeneratedMessageLite<
     @Deprecated
     private Object readResolveFallback() throws ObjectStreamException {
       try {
-        Class<?> messageClass = resolveMessageClass();
+        Class<?> messageClass = Class.forName(messageClassName);
         java.lang.reflect.Field defaultInstanceField =
             messageClass.getDeclaredField("defaultInstance");
         defaultInstanceField.setAccessible(true);
@@ -1487,10 +1483,6 @@ public abstract class GeneratedMessageLite<
       } catch (InvalidProtocolBufferException e) {
         throw new RuntimeException("Unable to understand proto buffer", e);
       }
-    }
-
-    private Class<?> resolveMessageClass() throws ClassNotFoundException {
-      return messageClass != null ? messageClass : Class.forName(messageClassName);
     }
   }
 
