@@ -1563,7 +1563,7 @@ class Message
                 }
                 break;
             case GPBType::STRING:
-                $value = json_encode($value, JSON_UNESCAPED_UNICODE);
+                $value = json_encode($value);
                 $size += strlen($value);
                 break;
             case GPBType::BYTES:

@@ -47,10 +47,10 @@ class ObjectLocationTracker : public LocationTrackerInterface {
   // Creates an empty location tracker.
   ObjectLocationTracker() {}
 
-  ~ObjectLocationTracker() override {}
+  virtual ~ObjectLocationTracker() {}
 
   // Returns empty because nothing is tracked.
-  string ToString() const override { return ""; }
+  virtual string ToString() const { return ""; }
 
  private:
   GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(ObjectLocationTracker);
