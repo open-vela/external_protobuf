@@ -262,9 +262,6 @@ namespace {
 
 class GeneratedMessageFactory : public MessageFactory {
  public:
-  GeneratedMessageFactory();
-  ~GeneratedMessageFactory();
-
   static GeneratedMessageFactory* singleton();
 
   typedef void RegistrationFunc(const string&);
@@ -272,7 +269,7 @@ class GeneratedMessageFactory : public MessageFactory {
   void RegisterType(const Descriptor* descriptor, const Message* prototype);
 
   // implements MessageFactory ---------------------------------------
-  const Message* GetPrototype(const Descriptor* type) override;
+  const Message* GetPrototype(const Descriptor* type);
 
  private:
   // Only written at static init time, so does not require locking.
@@ -284,25 +281,9 @@ class GeneratedMessageFactory : public MessageFactory {
   hash_map<const Descriptor*, const Message*> type_map_;
 };
 
-GeneratedMessageFactory* generated_message_factory_ = NULL;
-GOOGLE_PROTOBUF_DECLARE_ONCE(generated_message_factory_once_init_);
-
-void ShutdownGeneratedMessageFactory() {
-  delete generated_message_factory_;
-}
-
-void InitGeneratedMessageFactory() {
-  generated_message_factory_ = new GeneratedMessageFactory;
-  internal::OnShutdown(&ShutdownGeneratedMessageFactory);
-}
-
-GeneratedMessageFactory::GeneratedMessageFactory() {}
-GeneratedMessageFactory::~GeneratedMessageFactory() {}
-
 GeneratedMessageFactory* GeneratedMessageFactory::singleton() {
-  ::google::protobuf::GoogleOnceInit(&generated_message_factory_once_init_,
-                 &InitGeneratedMessageFactory);
-  return generated_message_factory_;
+  static auto instance = internal::OnShutdownDelete(new GeneratedMessageFactory);
+  return instance;
 }
 
 void GeneratedMessageFactory::RegisterFile(
