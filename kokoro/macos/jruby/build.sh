@@ -5,8 +5,7 @@
 # Change to repo root
 cd $(dirname $0)/../../..
 
-git submodule update --init --recursive
-bazel test :protobuf_test
+# Prepare worker environment to run tests
+source kokoro/macos/prepare_build_macos_rc
 
-cd examples
-bazel build :all
+./tests.sh jruby
