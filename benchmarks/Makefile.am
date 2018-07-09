@@ -109,6 +109,7 @@ cpp_benchmark_CPPFLAGS = -I$(top_srcdir)/src -I$(srcdir)/cpp -I$(top_srcdir)/thi
 # so a direct "make test_cpp" could fail if parallel enough.
 # See: https://www.gnu.org/software/automake/manual/html_node/Built-Sources-Example.html#Recording-Dependencies-manually
 cpp/cpp_benchmark-cpp_benchmark.$(OBJEXT): $(benchmarks_protoc_outputs) $(benchmarks_protoc_outputs_proto2) $(benchmarks_protoc_outputs_header) $(benchmarks_protoc_outputs_proto2_header) $(top_srcdir)/src/libprotobuf.la $(top_srcdir)/third_party/benchmark/src/libbenchmark.a
+cpp/benchmark-cpp_benchmark.$(OBJEXT): $(benchmarks_protoc_outputs) $(benchmarks_protoc_outputs_proto2) $(benchmarks_protoc_outputs_header) $(benchmarks_protoc_outputs_proto2_header) $(top_srcdir)/src/libprotobuf.la $(top_srcdir)/third_party/benchmark/src/libbenchmark.a
 nodist_cpp_benchmark_SOURCES =                                             \
 	$(benchmarks_protoc_outputs)                                             \
 	$(benchmarks_protoc_outputs_proto2)                                      \
@@ -126,8 +127,10 @@ java_benchmark_testing_files =                                      \
 	java/src/main/java/com/google/protobuf/ProtoCaliperBenchmark.java
 
 javac_middleman: $(java_benchmark_testing_files) protoc_middleman protoc_middleman2
-	cp -r $(srcdir)/java tmp && cd tmp/java &&  mvn clean compile assembly:single
-	cd ../..
+	cp -r $(srcdir)/java tmp 
+	mkdir -p tmp/java/lib
+	cp $(top_srcdir)/java/core/target/*.jar tmp/java/lib/protobuf-java.jar
+	cd tmp/java && mvn clean compile assembly:single -Dprotobuf.version=$(PACKAGE_VERSION) && cd ../..
 	@touch javac_middleman
 
 java-benchmark: javac_middleman
@@ -137,10 +140,10 @@ java-benchmark: javac_middleman
 	@echo 'conf=()' >> java-benchmark
 	@echo 'data_files=""' >> java-benchmark
 	@echo 'for arg in $$@; do if [[ $${arg:0:1} == "-" ]]; then conf+=($$arg); else data_files+="$$arg,"; fi; done' >> java-benchmark
-	@echo 'java -cp '"tmp/java/target/*.jar"' com.google.caliper.runner.CaliperMain com.google.protobuf.ProtoCaliperBenchmark -i runtime '"\\"  >> java-benchmark
-	@echo '-b serializeToByteString,serializeToByteArray,serializeToMemoryStream,'"\\"  >> java-benchmark
-	@echo 'deserializeFromByteString,deserializeFromByteArray,deserializeFromMemoryStream '"\\" >> java-benchmark
-	@echo '-DdataFile=$${data_files:0:-1} $${conf[*]}' >> java-benchmark
+	@echo 'java -cp '\"tmp/java/target/*:$(top_srcdir)/java/core/target/*:$(top_srcdir)/java/util/target/*\"" \\" >>java-benchmark
+	@echo '   com.google.caliper.runner.CaliperMain com.google.protobuf.ProtoCaliperBenchmark -i runtime '"\\"  >> java-benchmark
+	@echo '   -b serializeToByteArray,serializeToMemoryStream,deserializeFromByteArray,deserializeFromMemoryStream '"\\" >> java-benchmark
+	@echo '   -DdataFile=$${data_files:0:-1} $${conf[*]}' >> java-benchmark
 	@chmod +x java-benchmark
 
 java: protoc_middleman protoc_middleman2 java-benchmark
@@ -179,8 +182,8 @@ nodist_libbenchmark_messages_la_SOURCES =                         \
 python-pure-python-benchmark: python_add_init
 	@echo "Writing shortcut script python-pure-python-benchmark..."
 	@echo '#! /bin/bash' > python-pure-python-benchmark
-	@echo export LD_LIBRARY_PATH=$(top_srcdir)/src/libprotobuf.la >> python-pure-python-benchmark
-	@echo export DYLD_LIBRARY_PATH=$(top_srcdir)/src/libprotobuf.la >> python-pure-python-benchmark
+	@echo export LD_LIBRARY_PATH=$(top_srcdir)/src/.libs >> python-pure-python-benchmark
+	@echo export DYLD_LIBRARY_PATH=$(top_srcdir)/src/.libs >> python-pure-python-benchmark
 	@echo export PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=\'python\' >> python-pure-python-benchmark
 	@echo cp $(srcdir)/python/py_benchmark.py tmp >> python-pure-python-benchmark
 	@echo python tmp/py_benchmark.py '$$@' >> python-pure-python-benchmark
@@ -189,8 +192,8 @@ python-pure-python-benchmark: python_add_init
 python-cpp-reflection-benchmark: python_add_init
 	@echo "Writing shortcut script python-cpp-reflection-benchmark..."
 	@echo '#! /bin/bash' > python-cpp-reflection-benchmark
-	@echo export LD_LIBRARY_PATH=$(top_srcdir)/src/libprotobuf.la >> python-cpp-reflection-benchmark
-	@echo export DYLD_LIBRARY_PATH=$(top_srcdir)/src/libprotobuf.la >> python-cpp-reflection-benchmark
+	@echo export LD_LIBRARY_PATH=$(top_srcdir)/src/.libs >> python-cpp-reflection-benchmark
+	@echo export DYLD_LIBRARY_PATH=$(top_srcdir)/src/.libs >> python-cpp-reflection-benchmark
 	@echo export PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=\'cpp\' >> python-cpp-reflection-benchmark
 	@echo cp $(srcdir)/python/py_benchmark.py tmp >> python-cpp-reflection-benchmark
 	@echo python tmp/py_benchmark.py '$$@' >> python-cpp-reflection-benchmark
@@ -199,8 +202,8 @@ python-cpp-reflection-benchmark: python_add_init
 python-cpp-generated-code-benchmark: python_add_init libbenchmark_messages.la
 	@echo "Writing shortcut script python-cpp-generated-code-benchmark..."
 	@echo '#! /bin/bash' > python-cpp-generated-code-benchmark
-	@echo export LD_LIBRARY_PATH=$(top_srcdir)/src/libprotobuf.la >> python-cpp-generated-code-benchmark
-	@echo export DYLD_LIBRARY_PATH=$(top_srcdir)/src/libprotobuf.la >> python-cpp-generated-code-benchmark
+	@echo export LD_LIBRARY_PATH=$(top_srcdir)/src/.libs >> python-cpp-generated-code-benchmark
+	@echo export DYLD_LIBRARY_PATH=$(top_srcdir)/src/.libs >> python-cpp-generated-code-benchmark
 	@echo export PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=\'cpp\' >> python-cpp-generated-code-benchmark
 	@echo cp $(srcdir)/python/py_benchmark.py tmp >> python-cpp-generated-code-benchmark
 	@echo python tmp/py_benchmark.py --cpp_generated '$$@' >> python-cpp-generated-code-benchmark
@@ -347,11 +350,11 @@ gogo_proto_middleman: protoc-gen-gogoproto
 	oldpwd=`pwd` && ( cd $(srcdir) && $$oldpwd/../src/protoc$(EXEEXT) -I$(srcdir) -I$(top_srcdir) --plugin=protoc-gen-gogoproto --gogoproto_out=$$oldpwd/tmp/gogo_proto $(benchmarks_protoc_inputs) $(benchmarks_protoc_inputs_benchmark_wrapper) $(benchmarks_protoc_inputs_proto2) )
 	touch gogo_proto_middleman
 
-new_data = $$(for data in $(all_data); do echo "tmp$${data\#$(srcdir)}"; done | xargs)
+gogo_data = $$(for data in $(all_data); do echo "tmp/gogo_data$${data\#$(srcdir)}"; done | xargs)
 
 generate_gogo_data: protoc_middleman protoc_middleman2 gogo-data-scrubber
-	mkdir -p `dirname $(new_data)`
-	./gogo-data-scrubber $(all_data) $(new_data)
+	mkdir -p `dirname $(gogo_data)`
+	./gogo-data-scrubber $(all_data) $(gogo_data)
 	touch generate_gogo_data
 	
 make_tmp_dir_gogo:
@@ -406,8 +409,6 @@ gogoslick_protoc_middleman: make_tmp_dir_gogo $(top_srcdir)/src/protoc$(EXEEXT) 
 	oldpwd=`pwd` && ( cd $(srcdir)/tmp/gogo_proto && $$oldpwd/../src/protoc$(EXEEXT) -I. -I$$oldpwd/$(top_srcdir)/src --gogoslick_out=$$oldpwd/tmp/gogoslick $(benchmarks_protoc_inputs_proto2_message4) )
 	touch gogoslick_protoc_middleman
 
-gogo_data = $$(find . -type f -name "dataset.*.pb" -path "./tmp/*")
-
 generate-gogo-benchmark-code:
 	@echo '#! /bin/bash' > generate-gogo-benchmark-code
 	@echo 'cp $(srcdir)/go/go_benchmark_test.go tmp/$$1/benchmark_code/$$1_benchmark1_test.go' >> generate-gogo-benchmark-code
@@ -451,7 +452,7 @@ gogoslick: gogoslick_protoc_middleman  generate_gogo_data gogo-benchmark generat
  
 ############ UTIL RULES BEGIN ############
 
-bin_PROGRAMS += protoc-gen-gogoproto gogo-data-scrubber
+bin_PROGRAMS += protoc-gen-gogoproto gogo-data-scrubber protoc-gen-proto2_to_proto3 proto3-data-stripper
 
 protoc_gen_gogoproto_LDADD = $(top_srcdir)/src/libprotobuf.la $(top_srcdir)/src/libprotoc.la
 protoc_gen_gogoproto_SOURCES = util/protoc-gen-gogoproto.cc
@@ -466,8 +467,39 @@ nodist_gogo_data_scrubber_SOURCES =                                        \
 	$(benchmarks_protoc_outputs_proto2)                                      \
 	$(benchmarks_protoc_outputs_proto2_header)                               \
 	$(benchmarks_protoc_outputs_header)
+
+protoc_gen_proto2_to_proto3_LDADD = $(top_srcdir)/src/libprotobuf.la $(top_srcdir)/src/libprotoc.la
+protoc_gen_proto2_to_proto3_SOURCES = util/protoc-gen-proto2_to_proto3.cc
+protoc_gen_proto2_to_proto3_CPPFLAGS = -I$(top_srcdir)/src -I$(srcdir)/cpp -I$(srcdir)/util
+
+proto3_data_stripper_LDADD = $(top_srcdir)/src/libprotobuf.la
+proto3_data_stripper_SOURCES = util/proto3_data_stripper.cc
+proto3_data_stripper_CPPFLAGS = -I$(top_srcdir)/src -I$(srcdir)/cpp -I$(srcdir)/util
+util/proto3_data_stripper-proto3_data_stripper.$(OBJEXT): $(benchmarks_protoc_outputs) $(benchmarks_protoc_outputs_proto2) $(benchmarks_protoc_outputs_header) $(benchmarks_protoc_outputs_proto2_header)
+nodist_proto3_data_stripper_SOURCES =                                      \
+	$(benchmarks_protoc_outputs)                                             \
+	$(benchmarks_protoc_outputs_proto2)                                      \
+	$(benchmarks_protoc_outputs_proto2_header)                               \
+	$(benchmarks_protoc_outputs_header)
+
 	
 ############ UTIL RULES END ############
+
+############ PROTO3 PREPARATION BEGIN #############
+
+proto3_proto_middleman: protoc-gen-proto2_to_proto3
+	mkdir -p "tmp/proto3_proto"
+	oldpwd=`pwd` && ( cd $(srcdir) && $$oldpwd/../src/protoc$(EXEEXT) -I$(srcdir) -I$(top_srcdir) --plugin=protoc-gen-proto2_to_proto3 --proto2_to_proto3_out=$$oldpwd/tmp/proto3_proto $(benchmarks_protoc_inputs) $(benchmarks_protoc_inputs_benchmark_wrapper) $(benchmarks_protoc_inputs_proto2) )
+	touch proto3_proto_middleman
+
+proto3_data = $$(for data in $(all_data); do echo "tmp/proto3_data$${data\#$(srcdir)}"; done | xargs)
+
+generate_proto3_data: protoc_middleman protoc_middleman2 proto3-data-stripper
+	mkdir -p `dirname $(proto3_data)`
+	./proto3-data-stripper $(all_data) $(proto3_data)
+	touch generate_proto3_data
+
+############ PROTO3 PREPARATION END #############
 
 MAINTAINERCLEANFILES =                                                     \
 	Makefile.in
@@ -511,7 +543,9 @@ CLEANFILES =                                                               \
 	gogoslick_protoc_middleman                                               \
 	gogoslick                                                                \
 	gogo-benchmark                                                           \
-	gogo/cpp_no_group/cpp_benchmark.* 
+	gogo/cpp_no_group/cpp_benchmark.*                                        \
+	proto3_proto_middleman                                                   \
+	generate_proto3_data
 	
 
 clean-local:

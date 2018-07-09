@@ -56,9 +56,7 @@ clean-local:
 
 CLEANFILES = $(protoc_outputs) unittest_proto_middleman \
              testzip.jar testzip.list testzip.proto testzip.zip \
-             no_warning_test.cc \
-             google/protobuf/compiler/js/well_known_types_embed.cc \
-             js_embed$(EXEEXT)
+             no_warning_test.cc
 
 MAINTAINERCLEANFILES =   \
   Makefile.in
@@ -471,22 +469,6 @@ bin_PROGRAMS = protoc
 protoc_LDADD = $(PTHREAD_LIBS) libprotobuf.la libprotoc.la
 protoc_SOURCES = google/protobuf/compiler/main.cc
 
-# The special JS code for the well-known types is linked into the compiler via
-# well_known_types_embed.cc, which is generated from .js source files. We have
-# to build the js_embed binary using $(CXX_FOR_BUILD) so that it is executable
-# on the build machine in a cross-compilation setup.
-js_embed$(EXEEXT): $(srcdir)/google/protobuf/compiler/js/embed.cc
-	$(CXX_FOR_BUILD) -o $@ $<
-js_well_known_types_sources =                                  \
-	google/protobuf/compiler/js/well_known_types/any.js          \
-	google/protobuf/compiler/js/well_known_types/struct.js       \
-	google/protobuf/compiler/js/well_known_types/timestamp.js
-# We have to cd to $(srcdir) so that out-of-tree builds work properly.
-google/protobuf/compiler/js/well_known_types_embed.cc: js_embed$(EXEEXT) $(js_well_known_types_sources)
-	mkdir -p `dirname $@` && \
-	oldpwd=`pwd` && cd $(srcdir) && \
-	$$oldpwd/js_embed$(EXEEXT) $(js_well_known_types_sources) > $$oldpwd/$@
-
 # Tests ==============================================================
 
 protoc_inputs =                                                   \
@@ -565,7 +547,6 @@ EXTRA_DIST =                                                   \
   google/protobuf/package_info.h                               \
   google/protobuf/io/package_info.h                            \
   google/protobuf/util/package_info.h                          \
-  google/protobuf/compiler/js/embed.cc                         \
   google/protobuf/compiler/ruby/ruby_generated_code.proto      \
   google/protobuf/compiler/ruby/ruby_generated_code_pb.rb      \
   google/protobuf/compiler/package_info.h                      \
@@ -895,7 +876,7 @@ no_warning_test.cc:
 
 no_warning_test_LDADD = $(PTHREAD_LIBS) libprotobuf.la libprotoc.la
 no_warning_test_CXXFLAGS = $(PTHREAD_CFLAGS) $(PTHREAD_DEF) $(ZLIB_DEF) \
-                           -Wall -Wextra -Werror -Wno-unused-parameter
+                           -Wall -Wextra -Werror -Wno-unused-parameter -Og
 nodist_no_warning_test_SOURCES = no_warning_test.cc $(protoc_outputs)
 
 TESTS = protobuf-test protobuf-lazy-descriptor-test protobuf-lite-test \
