@@ -269,7 +269,7 @@ class GeneratedMessageFactory : public MessageFactory {
   void RegisterType(const Descriptor* descriptor, const Message* prototype);
 
   // implements MessageFactory ---------------------------------------
-  const Message* GetPrototype(const Descriptor* type);
+  const Message* GetPrototype(const Descriptor* type) override;
 
  private:
   // Only written at static init time, so does not require locking.
