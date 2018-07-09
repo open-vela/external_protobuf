@@ -76,16 +76,16 @@ class LIBPROTOBUF_EXPORT ErrorListener {
 class LIBPROTOBUF_EXPORT NoopErrorListener : public ErrorListener {
  public:
   NoopErrorListener() {}
-  virtual ~NoopErrorListener() override {}
+  virtual ~NoopErrorListener() {}
 
   virtual void InvalidName(const LocationTrackerInterface& loc,
-                           StringPiece invalid_name, StringPiece message) override {}
+                           StringPiece invalid_name, StringPiece message) {}
 
-  virtual void InvalidValue(const LocationTrackerInterface &loc, StringPiece type_name,
-                    StringPiece value) override {}
+  virtual void InvalidValue(const LocationTrackerInterface& loc,
+                            StringPiece type_name, StringPiece value) {}
 
-  virtual void MissingField(const LocationTrackerInterface &loc,
-                    StringPiece missing_name) override {}
+  virtual void MissingField(const LocationTrackerInterface& loc,
+                            StringPiece missing_name) {}
 
  private:
   GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(NoopErrorListener);
