@@ -1587,11 +1587,8 @@ PHP_METHOD(Message, mergeFromJsonString) {
 
   char *data = NULL;
   PHP_PROTO_SIZE data_len;
-  zend_bool ignore_json_unknown = false;
 
-  if (zend_parse_parameters(
-          ZEND_NUM_ARGS() TSRMLS_CC, "s|b", &data, &data_len,
-          &ignore_json_unknown) ==
+  if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &data, &data_len) ==
       FAILURE) {
     return;
   }
@@ -1610,7 +1607,7 @@ PHP_METHOD(Message, mergeFromJsonString) {
     stackenv_init(&se, "Error occurred during parsing: %s");
 
     upb_sink_reset(&sink, get_fill_handlers(desc), msg);
-    parser = upb_json_parser_create(&se.env, method, &sink, ignore_json_unknown);
+    parser = upb_json_parser_create(&se.env, method, &sink);
     upb_bufsrc_putbuf(data, data_len, upb_json_parser_input(parser));
 
     stackenv_uninit(&se);

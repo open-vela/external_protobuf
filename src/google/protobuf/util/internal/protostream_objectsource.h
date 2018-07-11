@@ -78,9 +78,9 @@ class LIBPROTOBUF_EXPORT ProtoStreamObjectSource : public ObjectSource {
                           TypeResolver* type_resolver,
                           const google::protobuf::Type& type);
 
-  virtual ~ProtoStreamObjectSource() override;
+  virtual ~ProtoStreamObjectSource();
 
-  virtual util::Status NamedWriteTo(StringPiece name, ObjectWriter* ow) const override;
+  virtual util::Status NamedWriteTo(StringPiece name, ObjectWriter* ow) const;
 
   // Sets whether or not to use lowerCamelCase casing for enum values. If set to
   // false, enum values are output without any case conversions.

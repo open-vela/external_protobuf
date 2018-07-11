@@ -134,7 +134,7 @@ class LIBPROTOBUF_EXPORT GeneratedExtensionFinder : public ExtensionFinder {
   virtual ~GeneratedExtensionFinder() {}
 
   // Returns true and fills in *output if found, otherwise returns false.
-  virtual bool Find(int number, ExtensionInfo* output) override;
+  virtual bool Find(int number, ExtensionInfo* output);
 
  private:
   const MessageLite* containing_type_;
