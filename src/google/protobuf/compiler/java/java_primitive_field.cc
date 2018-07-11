@@ -264,9 +264,7 @@ GenerateFieldBuilderInitializationCode(io::Printer* printer)  const {
 
 void ImmutablePrimitiveFieldGenerator::
 GenerateInitializationCode(io::Printer* printer) const {
-  if (!IsDefaultValueJavaDefault(descriptor_)) {
-    printer->Print(variables_, "$name$_ = $default$;\n");
-  }
+  printer->Print(variables_, "$name$_ = $default$;\n");
 }
 
 void ImmutablePrimitiveFieldGenerator::
@@ -296,21 +294,11 @@ GenerateBuildingCode(io::Printer* printer) const {
   if (SupportFieldPresence(descriptor_->file())) {
     printer->Print(variables_,
       "if ($get_has_field_bit_from_local$) {\n"
-      "  result.$name$_ = $name$_;\n"
-      "  $set_has_field_bit_to_local$;\n");
-    if (IsDefaultValueJavaDefault(descriptor_)) {
-      printer->Print(variables_,
-        "}\n");
-    } else {
-      printer->Print(variables_,
-        "} else {\n"
-        "  result.$name$_ = $default$;\n"
-        "}\n");
-    }
-  } else {
-    printer->Print(variables_,
-      "result.$name$_ = $name$_;\n");
+      "  $set_has_field_bit_to_local$;\n"
+      "}\n");
   }
+  printer->Print(variables_,
+    "result.$name$_ = $name$_;\n");
 }
 
 void ImmutablePrimitiveFieldGenerator::

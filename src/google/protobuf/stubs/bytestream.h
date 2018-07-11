@@ -57,6 +57,7 @@
 #include <google/protobuf/stubs/stringpiece.h>
 
 class CordByteSink;
+class MemBlock;
 
 namespace google {
 namespace protobuf {
@@ -161,7 +162,7 @@ class LIBPROTOBUF_EXPORT ByteSource {
 class LIBPROTOBUF_EXPORT UncheckedArrayByteSink : public ByteSink {
  public:
   explicit UncheckedArrayByteSink(char* dest) : dest_(dest) {}
-  virtual void Append(const char* data, size_t n) override;
+  virtual void Append(const char* data, size_t n);
 
   // Returns the current output pointer so that a caller can see how many bytes
   // were produced.
@@ -189,7 +190,7 @@ class LIBPROTOBUF_EXPORT UncheckedArrayByteSink : public ByteSink {
 class LIBPROTOBUF_EXPORT CheckedArrayByteSink : public ByteSink {
  public:
   CheckedArrayByteSink(char* outbuf, size_t capacity);
-  virtual void Append(const char* bytes, size_t n) override;
+  virtual void Append(const char* bytes, size_t n);
 
   // Returns the number of bytes actually written to the sink.
   size_t NumberOfBytesWritten() const { return size_; }
@@ -226,7 +227,7 @@ class LIBPROTOBUF_EXPORT GrowingArrayByteSink : public strings::ByteSink {
  public:
   explicit GrowingArrayByteSink(size_t estimated_size);
   virtual ~GrowingArrayByteSink();
-  virtual void Append(const char* bytes, size_t n) override;
+  virtual void Append(const char* bytes, size_t n);
 
   // Returns the allocated buffer, and sets nbytes to its size. The caller takes
   // ownership of the buffer and must delete it with delete[].
@@ -255,7 +256,7 @@ class LIBPROTOBUF_EXPORT GrowingArrayByteSink : public strings::ByteSink {
 class LIBPROTOBUF_EXPORT StringByteSink : public ByteSink {
  public:
   explicit StringByteSink(string* dest) : dest_(dest) {}
-  virtual void Append(const char* data, size_t n) override;
+  virtual void Append(const char* data, size_t n);
 
  private:
   string* dest_;
@@ -272,7 +273,7 @@ class LIBPROTOBUF_EXPORT StringByteSink : public ByteSink {
 class LIBPROTOBUF_EXPORT NullByteSink : public ByteSink {
  public:
   NullByteSink() {}
-  virtual void Append(const char *data, size_t n) override {}
+  virtual void Append(const char *data, size_t n) {}
 
  private:
   GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(NullByteSink);
@@ -295,9 +296,9 @@ class LIBPROTOBUF_EXPORT ArrayByteSource : public ByteSource {
  public:
   explicit ArrayByteSource(StringPiece s) : input_(s) {}
 
-  virtual size_t Available() const override;
-  virtual StringPiece Peek() override;
-  virtual void Skip(size_t n) override;
+  virtual size_t Available() const;
+  virtual StringPiece Peek();
+  virtual void Skip(size_t n);
 
  private:
   StringPiece   input_;
@@ -327,13 +328,13 @@ class LIBPROTOBUF_EXPORT LimitByteSource : public ByteSource {
   // Returns at most "limit" bytes from "source".
   LimitByteSource(ByteSource* source, size_t limit);
 
-  virtual size_t Available() const override;
-  virtual StringPiece Peek() override;
-  virtual void Skip(size_t n) override;
+  virtual size_t Available() const;
+  virtual StringPiece Peek();
+  virtual void Skip(size_t n);
 
   // We override CopyTo so that we can forward to the underlying source, in
   // case it has an efficient implementation of CopyTo.
-  virtual void CopyTo(ByteSink* sink, size_t n) override;
+  virtual void CopyTo(ByteSink* sink, size_t n);
 
  private:
   ByteSource* source_;
