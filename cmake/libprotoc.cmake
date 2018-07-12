@@ -161,14 +161,20 @@ set(libprotoc_headers
   ${protobuf_source_dir}/src/google/protobuf/compiler/zip_writer.h
 )
 
-if (MSVC)
-set(libprotoc_rc_files
-  ${CMAKE_CURRENT_BINARY_DIR}/version.rc
+set(js_well_known_types_sources
+  ${protobuf_source_dir}/src/google/protobuf/compiler/js/well_known_types/any.js
+  ${protobuf_source_dir}/src/google/protobuf/compiler/js/well_known_types/struct.js
+  ${protobuf_source_dir}/src/google/protobuf/compiler/js/well_known_types/timestamp.js
 )
-endif()
+add_executable(js_embed ${protobuf_source_dir}/src/google/protobuf/compiler/js/embed.cc)
+add_custom_command(
+  OUTPUT ${protobuf_source_dir}/src/google/protobuf/compiler/js/well_known_types_embed.cc
+  DEPENDS js_embed ${js_well_known_types_sources}
+  COMMAND js_embed ${js_well_known_types_sources} > ${protobuf_source_dir}/src/google/protobuf/compiler/js/well_known_types_embed.cc
+)
 
 add_library(libprotoc ${protobuf_SHARED_OR_STATIC}
-  ${libprotoc_files} ${libprotoc_headers} ${libprotoc_rc_files})
+  ${libprotoc_files} ${libprotoc_headers})
 target_link_libraries(libprotoc libprotobuf)
 if(MSVC AND protobuf_BUILD_SHARED_LIBS)
   target_compile_definitions(libprotoc
