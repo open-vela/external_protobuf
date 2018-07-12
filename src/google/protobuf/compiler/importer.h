@@ -96,13 +96,12 @@ class LIBPROTOBUF_EXPORT SourceTreeDescriptorDatabase : public DescriptorDatabas
   }
 
   // implements DescriptorDatabase -----------------------------------
-  bool FindFileByName(const string& filename,
-                      FileDescriptorProto* output) override;
+  bool FindFileByName(const string& filename, FileDescriptorProto* output);
   bool FindFileContainingSymbol(const string& symbol_name,
-                                FileDescriptorProto*output) override;
+                                FileDescriptorProto* output);
   bool FindFileContainingExtension(const string& containing_type,
                                    int field_number,
-                                   FileDescriptorProto* output) override;
+                                   FileDescriptorProto* output);
 
  private:
   class SingleFileErrorCollector;
@@ -120,13 +119,13 @@ class LIBPROTOBUF_EXPORT SourceTreeDescriptorDatabase : public DescriptorDatabas
                   const string& element_name,
                   const Message* descriptor,
                   ErrorLocation location,
-                  const string& message) override;
+                  const string& message);
 
     virtual void AddWarning(const string& filename,
                             const string& element_name,
                             const Message* descriptor,
                             ErrorLocation location,
-                            const string& message) override;
+                            const string& message);
 
    private:
     SourceTreeDescriptorDatabase* owner_;
@@ -294,9 +293,9 @@ class LIBPROTOBUF_EXPORT DiskSourceTree : public SourceTree {
   bool VirtualFileToDiskFile(const string& virtual_file, string* disk_file);
 
   // implements SourceTree -------------------------------------------
-  virtual io::ZeroCopyInputStream* Open(const string& filename) override;
+  virtual io::ZeroCopyInputStream* Open(const string& filename);
 
-  virtual string GetLastErrorMessage() override;
+  virtual string GetLastErrorMessage();
 
  private:
   struct Mapping {

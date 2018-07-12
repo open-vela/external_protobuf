@@ -182,7 +182,7 @@ class LIBPROTOBUF_EXPORT ZeroCopyStreamByteSink : public strings::ByteSink {
       : stream_(stream), buffer_(NULL), buffer_size_(0) {}
   ~ZeroCopyStreamByteSink();
 
-  virtual void Append(const char* bytes, size_t len) override;
+  virtual void Append(const char* bytes, size_t len);
 
  private:
   io::ZeroCopyOutputStream* stream_;
