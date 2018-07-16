@@ -443,8 +443,7 @@ jspb.Map.prototype.serializeBinary = function(
 /**
  * Read one key/value message from the given BinaryReader. Compatible as the
  * `reader` callback parameter to jspb.BinaryReader.readMessage, to be called
- * when a key/value pair submessage is encountered. If the Key is undefined,
- * we should default it to 0.
+ * when a key/value pair submessage is encountered.
  * @template K, V
  * @param {!jspb.Map} map
  * @param {!jspb.BinaryReader} reader
@@ -458,17 +457,12 @@ jspb.Map.prototype.serializeBinary = function(
  *    readMessage, in which case the second callback arg form is used.
  *
  * @param {?function(V,!jspb.BinaryReader)=} opt_valueReaderCallback
- *    The BinaryReader parsing callback for type V, if V is a message type
- *
- * @param {K=} opt_defaultKey
- *    The default value for the type of map keys. Accepting map
- *    entries with unset keys is required for maps to be backwards compatible
- *    with the repeated message representation described here: goo.gl/zuoLAC
+ *    The BinaryReader parsing callback for type V, if V is a message type.
  *
  */
 jspb.Map.deserializeBinary = function(map, reader, keyReaderFn, valueReaderFn,
-                                      opt_valueReaderCallback, opt_defaultKey) {
-  var key = opt_defaultKey;
+                                      opt_valueReaderCallback) {
+  var key = undefined;
   var value = undefined;
 
   while (reader.nextField()) {
@@ -476,7 +470,6 @@ jspb.Map.deserializeBinary = function(map, reader, keyReaderFn, valueReaderFn,
       break;
     }
     var field = reader.getFieldNumber();
-
     if (field == 1) {
       // Key.
       key = keyReaderFn.call(reader);
