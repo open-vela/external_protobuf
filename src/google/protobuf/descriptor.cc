@@ -406,9 +406,10 @@ typedef std::pair<const EnumDescriptor*, int> EnumIntPair;
 template<typename PairType>
 struct PointerIntegerPairHash {
   size_t operator()(const PairType& p) const {
-    // FIXME(kenton):  What is the best way to compute this hash?  I have
-    // no idea!  This seems a bit better than an XOR.
-    return reinterpret_cast<intptr_t>(p.first) * ((1 << 16) - 1) + p.second;
+    static const size_t prime1 = 16777499;
+    static const size_t prime2 = 16777619;
+    return reinterpret_cast<size_t>(p.first) * prime1 ^
+           static_cast<size_t>(p.second) * prime2;
   }
 
 #ifdef _MSC_VER
@@ -424,11 +425,10 @@ struct PointerIntegerPairHash {
 
 struct PointerStringPairHash {
   size_t operator()(const PointerStringPair& p) const {
-    // FIXME(kenton):  What is the best way to compute this hash?  I have
-    // no idea!  This seems a bit better than an XOR.
+    static const size_t prime = 16777619;
     hash<const char*> cstring_hash;
-    return reinterpret_cast<intptr_t>(p.first) * ((1 << 16) - 1) +
-           cstring_hash(p.second);
+    return reinterpret_cast<size_t>(p.first) * prime ^
+           static_cast<size_t>(cstring_hash(p.second));
   }
 
 #ifdef _MSC_VER
@@ -479,8 +479,15 @@ typedef std::map<DescriptorIntPair, const FieldDescriptor*>
   ExtensionsGroupedByDescriptorMap;
 typedef HASH_MAP<string, const SourceCodeInfo_Location*> LocationsByPathMap;
 
-std::set<string>* NewAllowedProto3Extendee() {
-  auto allowed_proto3_extendees = new std::set<string>;
+std::set<string>* allowed_proto3_extendees_ = NULL;
+GOOGLE_PROTOBUF_DECLARE_ONCE(allowed_proto3_extendees_init_);
+
+void DeleteAllowedProto3Extendee() {
+  delete allowed_proto3_extendees_;
+}
+
+void InitAllowedProto3Extendee() {
+  allowed_proto3_extendees_ = new std::set<string>;
   const char* kOptionNames[] = {
       "FileOptions",      "MessageOptions", "FieldOptions", "EnumOptions",
       "EnumValueOptions", "ServiceOptions", "MethodOptions", "OneofOptions"};
@@ -488,13 +495,14 @@ std::set<string>* NewAllowedProto3Extendee() {
     // descriptor.proto has a different package name in opensource. We allow
     // both so the opensource protocol compiler can also compile internal
     // proto3 files with custom options. See: b/27567912
-    allowed_proto3_extendees->insert(string("google.protobuf.") +
+    allowed_proto3_extendees_->insert(string("google.protobuf.") +
                                       kOptionNames[i]);
     // Split the word to trick the opensource processing scripts so they
     // will keep the origial package name.
-    allowed_proto3_extendees->insert(string("proto") + "2." + kOptionNames[i]);
+    allowed_proto3_extendees_->insert(string("proto") + "2." + kOptionNames[i]);
   }
-  return allowed_proto3_extendees;
+
+  google::protobuf::internal::OnShutdown(&DeleteAllowedProto3Extendee);
 }
 
 // Checks whether the extendee type is allowed in proto3.
@@ -502,10 +510,9 @@ std::set<string>* NewAllowedProto3Extendee() {
 // instead of comparing the descriptor directly because the extensions may be
 // defined in a different pool.
 bool AllowedExtendeeInProto3(const string& name) {
-  static auto allowed_proto3_extendees =
-      internal::OnShutdownDelete(NewAllowedProto3Extendee());
-  return allowed_proto3_extendees->find(name) !=
-         allowed_proto3_extendees->end();
+  ::google::protobuf::GoogleOnceInit(&allowed_proto3_extendees_init_, &InitAllowedProto3Extendee);
+  return allowed_proto3_extendees_->find(name) !=
+         allowed_proto3_extendees_->end();
 }
 
 }  // anonymous namespace
@@ -768,10 +775,10 @@ class FileDescriptorTables {
 
   SymbolsByParentMap symbols_by_parent_;
   mutable FieldsByNameMap fields_by_lowercase_name_;
-  std::unique_ptr<FieldsByNameMap> fields_by_lowercase_name_tmp_;
+  mutable FieldsByNameMap* fields_by_lowercase_name_tmp_;
   mutable GoogleOnceDynamic fields_by_lowercase_name_once_;
   mutable FieldsByNameMap fields_by_camelcase_name_;
-  std::unique_ptr<FieldsByNameMap> fields_by_camelcase_name_tmp_;
+  mutable FieldsByNameMap* fields_by_camelcase_name_tmp_;
   mutable GoogleOnceDynamic fields_by_camelcase_name_once_;
   FieldsByNumberMap fields_by_number_;  // Not including extensions.
   EnumValuesByNumberMap enum_values_by_number_;
@@ -822,10 +829,31 @@ FileDescriptorTables::FileDescriptorTables()
 
 FileDescriptorTables::~FileDescriptorTables() {}
 
+namespace {
+
+FileDescriptorTables* file_descriptor_tables_ = NULL;
+GOOGLE_PROTOBUF_DECLARE_ONCE(file_descriptor_tables_once_init_);
+
+void DeleteFileDescriptorTables() {
+  delete file_descriptor_tables_;
+  file_descriptor_tables_ = NULL;
+}
+
+void InitFileDescriptorTables() {
+  file_descriptor_tables_ = new FileDescriptorTables();
+  internal::OnShutdown(&DeleteFileDescriptorTables);
+}
+
+inline void InitFileDescriptorTablesOnce() {
+  ::google::protobuf::GoogleOnceInit(
+      &file_descriptor_tables_once_init_, &InitFileDescriptorTables);
+}
+
+}  // anonymous namespace
+
 inline const FileDescriptorTables& FileDescriptorTables::GetEmptyInstance() {
-  static auto file_descriptor_tables =
-      internal::OnShutdownDelete(new FileDescriptorTables());
-  return *file_descriptor_tables;
+  InitFileDescriptorTablesOnce();
+  return *file_descriptor_tables_;
 }
 
 void DescriptorPool::Tables::AddCheckpoint() {
@@ -1118,8 +1146,10 @@ bool DescriptorPool::Tables::AddFile(const FileDescriptor* file) {
 
 void FileDescriptorTables::FinalizeTables() {
   // Clean up the temporary maps used by AddFieldByStylizedNames().
-  fields_by_lowercase_name_tmp_ = nullptr;
-  fields_by_camelcase_name_tmp_ = nullptr;
+  delete fields_by_lowercase_name_tmp_;
+  fields_by_lowercase_name_tmp_ = NULL;
+  delete fields_by_camelcase_name_tmp_;
+  fields_by_camelcase_name_tmp_ = NULL;
 }
 
 void FileDescriptorTables::AddFieldByStylizedNames(
@@ -1134,7 +1164,7 @@ void FileDescriptorTables::AddFieldByStylizedNames(
   // entries from fields_by_number_.
 
   PointerStringPair lowercase_key(parent, field->lowercase_name().c_str());
-  if (!InsertIfNotPresent(fields_by_lowercase_name_tmp_.get(), lowercase_key,
+  if (!InsertIfNotPresent(fields_by_lowercase_name_tmp_, lowercase_key,
                           field)) {
     InsertIfNotPresent(
         &fields_by_lowercase_name_, lowercase_key,
@@ -1142,7 +1172,7 @@ void FileDescriptorTables::AddFieldByStylizedNames(
   }
 
   PointerStringPair camelcase_key(parent, field->camelcase_name().c_str());
-  if (!InsertIfNotPresent(fields_by_camelcase_name_tmp_.get(), camelcase_key,
+  if (!InsertIfNotPresent(fields_by_camelcase_name_tmp_, camelcase_key,
                           field)) {
     InsertIfNotPresent(
         &fields_by_camelcase_name_, camelcase_key,
@@ -1307,28 +1337,42 @@ bool DescriptorPool::InternalIsFileLoaded(const string& filename) const {
 
 namespace {
 
-EncodedDescriptorDatabase* GeneratedDatabase() {
-  static auto generated_database =
-      internal::OnShutdownDelete(new EncodedDescriptorDatabase());
-  return generated_database;
+
+EncodedDescriptorDatabase* generated_database_ = NULL;
+DescriptorPool* generated_pool_ = NULL;
+GOOGLE_PROTOBUF_DECLARE_ONCE(generated_pool_init_);
+
+void DeleteGeneratedPool() {
+  delete generated_database_;
+  generated_database_ = NULL;
+  delete generated_pool_;
+  generated_pool_ = NULL;
 }
 
-DescriptorPool* NewGeneratedPool() {
-  auto generated_pool = new DescriptorPool(GeneratedDatabase());
-  generated_pool->InternalSetLazilyBuildDependencies();
-  return generated_pool;
+static void InitGeneratedPool() {
+  generated_database_ = new EncodedDescriptorDatabase;
+  generated_pool_ = new DescriptorPool(generated_database_);
+  generated_pool_->InternalSetLazilyBuildDependencies();
+
+  internal::OnShutdown(&DeleteGeneratedPool);
+}
+
+inline void InitGeneratedPoolOnce() {
+  ::google::protobuf::GoogleOnceInit(&generated_pool_init_, &InitGeneratedPool);
 }
 
 }  // anonymous namespace
 
-DescriptorPool* DescriptorPool::internal_generated_pool() {
-  static DescriptorPool* generated_pool =
-      internal::OnShutdownDelete(NewGeneratedPool());
-  return generated_pool;
+const DescriptorPool* DescriptorPool::generated_pool() {
+  InitGeneratedPoolOnce();
+  return generated_pool_;
 }
 
-const DescriptorPool* DescriptorPool::generated_pool() {
-  return internal_generated_pool();
+
+
+DescriptorPool* DescriptorPool::internal_generated_pool() {
+  InitGeneratedPoolOnce();
+  return generated_pool_;
 }
 
 void DescriptorPool::InternalAddGeneratedFile(
@@ -1355,7 +1399,8 @@ void DescriptorPool::InternalAddGeneratedFile(
   // Therefore, when we parse one, we have to be very careful to avoid using
   // any descriptor-based operations, since this might cause infinite recursion
   // or deadlock.
-  GOOGLE_CHECK(GeneratedDatabase()->Add(encoded_file_descriptor, size));
+  InitGeneratedPoolOnce();
+  GOOGLE_CHECK(generated_database_->Add(encoded_file_descriptor, size));
 }
 
 
@@ -6906,7 +6951,7 @@ class DescriptorBuilder::OptionInterpreter::AggregateOptionFinder
   DescriptorBuilder* builder_;
 
   virtual const FieldDescriptor* FindExtension(
-      Message* message, const string& name) const {
+      Message* message, const string& name) const override {
     assert_mutex_held(builder_->pool_);
     const Descriptor* descriptor = message->GetDescriptor();
     Symbol result = builder_->LookupSymbolNoPlaceholder(
@@ -6944,7 +6989,7 @@ class AggregateErrorCollector : public io::ErrorCollector {
   string error_;
 
   virtual void AddError(int /* line */, int /* column */,
-                        const string& message) {
+                const string& message) override {
     if (!error_.empty()) {
       error_ += "; ";
     }
@@ -6952,7 +6997,7 @@ class AggregateErrorCollector : public io::ErrorCollector {
   }
 
   virtual void AddWarning(int /* line */, int /* column */,
-                          const string& /* message */) {
+                  const string& /* message */) override {
     // Ignore warnings
   }
 };

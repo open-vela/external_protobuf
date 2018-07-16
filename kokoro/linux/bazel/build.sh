@@ -7,6 +7,3 @@ cd $(dirname $0)/../../..
 
 git submodule update --init --recursive
 bazel test :protobuf_test
-
-cd examples
-bazel build :all
