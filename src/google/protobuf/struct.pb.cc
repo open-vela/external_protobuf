@@ -140,14 +140,14 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
   reinterpret_cast<const ::google::protobuf::Message*>(&::google::protobuf::_ListValue_default_instance_),
 };
 
-void protobuf_AssignDescriptors() {
+static void protobuf_AssignDescriptors() {
   AddDescriptors();
   AssignDescriptors(
       "google/protobuf/struct.proto", schemas, file_default_instances, TableStruct::offsets,
       file_level_metadata, file_level_enum_descriptors, NULL);
 }
 
-void protobuf_AssignDescriptorsOnce() {
+static void protobuf_AssignDescriptorsOnce() {
   static ::google::protobuf::internal::once_flag once;
   ::google::protobuf::internal::call_once(once, protobuf_AssignDescriptors);
 }
@@ -158,7 +158,7 @@ void protobuf_RegisterTypes(const ::std::string&) {
   ::google::protobuf::internal::RegisterAllTypes(file_level_metadata, 4);
 }
 
-void AddDescriptorsImpl() {
+static void AddDescriptorsImpl() {
   InitDefaults();
   static const char descriptor[] GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
       "\n\034google/protobuf/struct.proto\022\017google.p"
@@ -277,7 +277,7 @@ void Struct::ArenaDtor(void* object) {
   Struct* _this = reinterpret_cast< Struct* >(object);
   (void)_this;
 }
-void Struct::RegisterArenaDtor(::google::protobuf::Arena* arena) {
+void Struct::RegisterArenaDtor(::google::protobuf::Arena*) {
 }
 void Struct::SetCachedSize(int size) const {
   _cached_size_.Set(size);
@@ -730,7 +730,7 @@ void Value::ArenaDtor(void* object) {
   Value* _this = reinterpret_cast< Value* >(object);
   (void)_this;
 }
-void Value::RegisterArenaDtor(::google::protobuf::Arena* arena) {
+void Value::RegisterArenaDtor(::google::protobuf::Arena*) {
 }
 void Value::SetCachedSize(int size) const {
   _cached_size_.Set(size);
@@ -810,7 +810,7 @@ bool Value::MergePartialFromCodedStream(
       case 1: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
             static_cast< ::google::protobuf::uint8>(8u /* 8 & 0xFF */)) {
-          int value;
+          int value = 0;
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    int, ::google::protobuf::internal::WireFormatLite::TYPE_ENUM>(
                  input, &value)));
@@ -1225,7 +1225,7 @@ void ListValue::ArenaDtor(void* object) {
   ListValue* _this = reinterpret_cast< ListValue* >(object);
   (void)_this;
 }
-void ListValue::RegisterArenaDtor(::google::protobuf::Arena* arena) {
+void ListValue::RegisterArenaDtor(::google::protobuf::Arena*) {
 }
 void ListValue::SetCachedSize(int size) const {
   _cached_size_.Set(size);
