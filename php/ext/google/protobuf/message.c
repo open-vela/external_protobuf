@@ -30,6 +30,7 @@
 
 #include <php.h>
 #include <stdlib.h>
+#include <inttypes.h>
 
 #include "protobuf.h"
 #include "utf8.h"
@@ -222,7 +223,13 @@ static zval* message_get_property_ptr_ptr(zval* object, zval* member, int type,
 }
 
 static HashTable* message_get_properties(zval* object TSRMLS_DC) {
-  return NULL;
+  // User cannot get property directly (e.g., $a = $m->a)
+  zend_error(E_USER_ERROR, "Cannot access private properties.");
+#if PHP_MAJOR_VERSION < 7
+  return zend_std_get_properties(object TSRMLS_CC);
+#else
+  return zend_std_get_properties(object);
+#endif
 }
 
 static HashTable* message_get_gc(zval* object, CACHED_VALUE** table,
@@ -864,11 +871,7 @@ PHP_PROTO_INIT_ENUMCLASS_START("Google\\Protobuf\\Field\\Cardinality",
   zend_declare_class_constant_long(field_cardinality_type,
                                    "CARDINALITY_REPEATED", 20, 3 TSRMLS_CC);
   const char *alias = "Google\\Protobuf\\Field_Cardinality";
-#if PHP_VERSION_ID < 70300
   zend_register_class_alias_ex(alias, strlen(alias), field_cardinality_type TSRMLS_CC);
-#else
-  zend_register_class_alias_ex(alias, strlen(alias), field_cardinality_type, 1);
-#endif
 PHP_PROTO_INIT_ENUMCLASS_END
 
 // -----------------------------------------------------------------------------
@@ -923,11 +926,7 @@ PHP_PROTO_INIT_ENUMCLASS_START("Google\\Protobuf\\Field\\Kind",
   zend_declare_class_constant_long(field_kind_type,
                                    "TYPE_SINT64", 11, 18 TSRMLS_CC);
   const char *alias = "Google\\Protobuf\\Field_Kind";
-#if PHP_VERSION_ID < 70300
   zend_register_class_alias_ex(alias, strlen(alias), field_kind_type TSRMLS_CC);
-#else
-  zend_register_class_alias_ex(alias, strlen(alias), field_kind_type, 1);
-#endif
 PHP_PROTO_INIT_ENUMCLASS_END
 
 // -----------------------------------------------------------------------------
@@ -1251,28 +1250,62 @@ PHP_METHOD(Timestamp, fromDateTime) {
     return;
   }
 
-  // Get timestamp from Datetime object.
-  zval retval;
-  zval function_name;
-  int64_t timestamp;
+  int64_t timestamp_seconds;
+  {
+    zval retval;
+    zval function_name;
 
 #if PHP_MAJOR_VERSION < 7
-  INIT_ZVAL(retval);
-  INIT_ZVAL(function_name);
+    INIT_ZVAL(retval);
+    INIT_ZVAL(function_name);
 #endif
 
-  PHP_PROTO_ZVAL_STRING(&function_name, "date_timestamp_get", 1);
+    PHP_PROTO_ZVAL_STRING(&function_name, "date_timestamp_get", 1);
 
-  if (call_user_function(EG(function_table), NULL, &function_name, &retval, 1,
-          ZVAL_PTR_TO_CACHED_PTR(datetime) TSRMLS_CC) == FAILURE) {
-    zend_error(E_ERROR, "Cannot get timestamp from DateTime.");
-    return;
+    if (call_user_function(EG(function_table), NULL, &function_name, &retval, 1,
+            ZVAL_PTR_TO_CACHED_PTR(datetime) TSRMLS_CC) == FAILURE) {
+      zend_error(E_ERROR, "Cannot get timestamp from DateTime.");
+      return;
+    }
+
+    protobuf_convert_to_int64(&retval, &timestamp_seconds);
+
+    zval_dtor(&retval);
+    zval_dtor(&function_name);
   }
 
-  protobuf_convert_to_int64(&retval, &timestamp);
+  int64_t timestamp_micros;
+  {
+    zval retval;
+    zval function_name;
+    zval format_string;
 
-  zval_dtor(&retval);
-  zval_dtor(&function_name);
+#if PHP_MAJOR_VERSION < 7
+    INIT_ZVAL(retval);
+    INIT_ZVAL(function_name);
+    INIT_ZVAL(format_string);
+#endif
+
+    PHP_PROTO_ZVAL_STRING(&function_name, "date_format", 1);
+    PHP_PROTO_ZVAL_STRING(&format_string, "u", 1);
+
+    CACHED_VALUE params[2] = {
+      ZVAL_PTR_TO_CACHED_VALUE(datetime),
+      ZVAL_TO_CACHED_VALUE(format_string),
+    };
+
+    if (call_user_function(EG(function_table), NULL, &function_name, &retval,
+            ARRAY_SIZE(params), params TSRMLS_CC) == FAILURE) {
+      zend_error(E_ERROR, "Cannot format DateTime.");
+      return;
+    }
+
+    protobuf_convert_to_int64(&retval, &timestamp_micros);
+
+    zval_dtor(&retval);
+    zval_dtor(&function_name);
+    zval_dtor(&format_string);
+  }
 
   // Set seconds
   MessageHeader* self = UNBOX(MessageHeader, getThis());
@@ -1280,13 +1313,13 @@ PHP_METHOD(Timestamp, fromDateTime) {
       upb_msgdef_ntofz(self->descriptor->msgdef, "seconds");
   void* storage = message_data(self);
   void* memory = slot_memory(self->descriptor->layout, storage, field);
-  *(int64_t*)memory = timestamp;
+  *(int64_t*)memory = timestamp_seconds;
 
   // Set nanos
   field = upb_msgdef_ntofz(self->descriptor->msgdef, "nanos");
   storage = message_data(self);
   memory = slot_memory(self->descriptor->layout, storage, field);
-  *(int32_t*)memory = 0;
+  *(int32_t*)memory = timestamp_micros * 1000;
 
   RETURN_NULL();
 }
@@ -1305,38 +1338,41 @@ PHP_METHOD(Timestamp, toDateTime) {
   memory = slot_memory(self->descriptor->layout, storage, field);
   int32_t nanos = *(int32_t*)memory;
 
-  // Get formated time string.
-  char formated_time[50];
-  time_t raw_time = seconds;
-  struct tm *utc_time = gmtime(&raw_time);
-  strftime(formated_time, sizeof(formated_time), "%Y-%m-%dT%H:%M:%SUTC",
-           utc_time);
+  // Get formatted time string.
+  char formatted_time[32];
+  snprintf(formatted_time, sizeof(formatted_time), "%" PRId64 ".%06" PRId32,
+           seconds, nanos / 1000);
 
   // Create Datetime object.
   zval datetime;
-  zval formated_time_php;
   zval function_name;
-  int64_t timestamp = 0;
+  zval format_string;
+  zval formatted_time_php;
 
 #if PHP_MAJOR_VERSION < 7
   INIT_ZVAL(function_name);
-  INIT_ZVAL(formated_time_php);
+  INIT_ZVAL(format_string);
+  INIT_ZVAL(formatted_time_php);
 #endif
 
-  PHP_PROTO_ZVAL_STRING(&function_name, "date_create", 1);
-  PHP_PROTO_ZVAL_STRING(&formated_time_php, formated_time, 1);
+  PHP_PROTO_ZVAL_STRING(&function_name, "date_create_from_format", 1);
+  PHP_PROTO_ZVAL_STRING(&format_string, "U.u", 1);
+  PHP_PROTO_ZVAL_STRING(&formatted_time_php, formatted_time, 1);
 
-  CACHED_VALUE params[1] = {ZVAL_TO_CACHED_VALUE(formated_time_php)};
+  CACHED_VALUE params[2] = {
+    ZVAL_TO_CACHED_VALUE(format_string),
+    ZVAL_TO_CACHED_VALUE(formatted_time_php),
+  };
 
-  if (call_user_function(EG(function_table), NULL,
-                         &function_name, &datetime, 1,
-                         params TSRMLS_CC) == FAILURE) {
+  if (call_user_function(EG(function_table), NULL, &function_name, &datetime,
+          ARRAY_SIZE(params), params TSRMLS_CC) == FAILURE) {
     zend_error(E_ERROR, "Cannot create DateTime.");
     return;
   }
 
-  zval_dtor(&formated_time_php);
   zval_dtor(&function_name);
+  zval_dtor(&format_string);
+  zval_dtor(&formatted_time_php);
 
 #if PHP_MAJOR_VERSION < 7
   zval* datetime_ptr = &datetime;

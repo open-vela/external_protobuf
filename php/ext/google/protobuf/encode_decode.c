@@ -577,7 +577,7 @@ static void map_slot_value(upb_fieldtype_t type, const void* from,
       break;
     case UPB_TYPE_MESSAGE:
       *(zend_object**)to = Z_OBJ_P(*(zval**)from);
-      GC_ADDREF(*(zend_object**)to);
+      ++GC_REFCOUNT(*(zend_object**)to);
       break;
 #endif
     default:
@@ -1587,8 +1587,11 @@ PHP_METHOD(Message, mergeFromJsonString) {
 
   char *data = NULL;
   PHP_PROTO_SIZE data_len;
+  zend_bool ignore_json_unknown = false;
 
-  if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &data, &data_len) ==
+  if (zend_parse_parameters(
+          ZEND_NUM_ARGS() TSRMLS_CC, "s|b", &data, &data_len,
+          &ignore_json_unknown) ==
       FAILURE) {
     return;
   }
@@ -1607,7 +1610,7 @@ PHP_METHOD(Message, mergeFromJsonString) {
     stackenv_init(&se, "Error occurred during parsing: %s");
 
     upb_sink_reset(&sink, get_fill_handlers(desc), msg);
-    parser = upb_json_parser_create(&se.env, method, &sink);
+    parser = upb_json_parser_create(&se.env, method, &sink, ignore_json_unknown);
     upb_bufsrc_putbuf(data, data_len, upb_json_parser_input(parser));
 
     stackenv_uninit(&se);
