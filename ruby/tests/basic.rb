@@ -212,15 +212,6 @@ module BasicTest
       assert_equal ['foo', 'bar'], m.repeated_string
     end
 
-    def test_ctor_nil_args
-      m = TestMessage.new(:optional_enum => nil, :optional_int32 => nil, :optional_string => nil, :optional_msg => nil)
-
-      assert_equal :Default, m.optional_enum
-      assert_equal 0, m.optional_int32
-      assert_equal "", m.optional_string
-      assert_nil m.optional_msg
-    end
-
     def test_embeddedmsg_hash_init
       m = TestEmbeddedMessageParent.new(:child_msg => {sub_child: {optional_int32: 1}},
                                         :number => 2,
@@ -292,36 +283,31 @@ module BasicTest
 
     def test_type_errors
       m = TestMessage.new
-      e = assert_raise Google::Protobuf::TypeError do
+      assert_raise TypeError do
         m.optional_int32 = "hello"
       end
-
-      # Google::Protobuf::TypeError should inherit from TypeError for backwards compatibility
-      # TODO: This can be removed when we can safely migrate to Google::Protobuf::TypeError
-      assert_true e.is_a?(::TypeError)
-
-      assert_raise Google::Protobuf::TypeError do
+      assert_raise TypeError do
         m.optional_string = 42
       end
-      assert_raise Google::Protobuf::TypeError do
+      assert_raise TypeError do
         m.optional_string = nil
       end
-      assert_raise Google::Protobuf::TypeError do
+      assert_raise TypeError do
         m.optional_bool = 42
       end
-      assert_raise Google::Protobuf::TypeError do
+      assert_raise TypeError do
         m.optional_msg = TestMessage.new  # expects TestMessage2
       end
 
-      assert_raise Google::Protobuf::TypeError do
+      assert_raise TypeError do
         m.repeated_int32 = []  # needs RepeatedField
       end
 
-      assert_raise Google::Protobuf::TypeError do
+      assert_raise TypeError do
         m.repeated_int32.push "hello"
       end
 
-      assert_raise Google::Protobuf::TypeError do
+      assert_raise TypeError do
         m.repeated_msg.push TestMessage.new
       end
     end
@@ -389,7 +375,7 @@ module BasicTest
       assert l.pop == 9
       assert l == [5, 2, 3, 4, 7, 8]
 
-      assert_raise Google::Protobuf::TypeError do
+      assert_raise TypeError do
         m = TestMessage.new
         l.push m
       end
@@ -439,10 +425,10 @@ module BasicTest
       l = Google::Protobuf::RepeatedField.new(:message, TestMessage)
       l.push TestMessage.new
       assert l.count == 1
-      assert_raise Google::Protobuf::TypeError do
+      assert_raise TypeError do
         l.push TestMessage2.new
       end
-      assert_raise Google::Protobuf::TypeError do
+      assert_raise TypeError do
         l.push 42
       end
 
@@ -591,7 +577,7 @@ module BasicTest
       assert_raise RangeError do
         m[0x8000_0000] = 1
       end
-      assert_raise Google::Protobuf::TypeError do
+      assert_raise TypeError do
         m["asdf"] = 1
       end
 
@@ -600,7 +586,7 @@ module BasicTest
       assert_raise RangeError do
         m[0x1_0000_0000_0000_0000] = 1
       end
-      assert_raise Google::Protobuf::TypeError do
+      assert_raise TypeError do
         m["asdf"] = 1
       end
 
@@ -625,10 +611,10 @@ module BasicTest
       m = Google::Protobuf::Map.new(:bool, :int32)
       m[true] = 1
       m[false] = 2
-      assert_raise Google::Protobuf::TypeError do
+      assert_raise TypeError do
         m[1] = 1
       end
-      assert_raise Google::Protobuf::TypeError do
+      assert_raise TypeError do
         m["asdf"] = 1
       end
 
@@ -655,7 +641,7 @@ module BasicTest
     def test_map_msg_enum_valuetypes
       m = Google::Protobuf::Map.new(:string, :message, TestMessage)
       m["asdf"] = TestMessage.new
-      assert_raise Google::Protobuf::TypeError do
+      assert_raise TypeError do
         m["jkl;"] = TestMessage2.new
       end
 
@@ -722,17 +708,17 @@ module BasicTest
       m.map_string_msg.delete("c")
       assert m.map_string_msg == { "a" => TestMessage2.new(:foo => 1) }
 
-      assert_raise Google::Protobuf::TypeError do
+      assert_raise TypeError do
         m.map_string_msg["e"] = TestMessage.new # wrong value type
       end
       # ensure nothing was added by the above
       assert m.map_string_msg == { "a" => TestMessage2.new(:foo => 1) }
 
       m.map_string_int32 = Google::Protobuf::Map.new(:string, :int32)
-      assert_raise Google::Protobuf::TypeError do
+      assert_raise TypeError do
         m.map_string_int32 = Google::Protobuf::Map.new(:string, :int64)
       end
-      assert_raise Google::Protobuf::TypeError do
+      assert_raise TypeError do
         m.map_string_int32 = {}
       end
 
@@ -1031,7 +1017,7 @@ module BasicTest
 
     def test_def_errors
       s = Google::Protobuf::DescriptorPool.new
-      assert_raise Google::Protobuf::TypeError do
+      assert_raise TypeError do
         s.build do
           # enum with no default (integer value 0)
           add_enum "MyEnum" do
@@ -1039,7 +1025,7 @@ module BasicTest
           end
         end
       end
-      assert_raise Google::Protobuf::TypeError do
+      assert_raise TypeError do
         s.build do
           # message with required field (unsupported in proto3)
           add_message "MyMessage" do
@@ -1273,10 +1259,6 @@ module BasicTest
       Foo.encode_json(Foo.new)
       Foo.encode_json(Foo.new(bar: bar))
       Foo.encode_json(Foo.new(bar: bar, baz: [baz1, baz2]))
-    end
-
-    def test_json_empty
-      assert TestMessage.encode_json(TestMessage.new) == '{}'
     end
 
     def test_json_emit_defaults

@@ -1,4 +1,4 @@
-# Bazel (https://bazel.build/) BUILD file for Protobuf.
+# Bazel (http://bazel.io/) BUILD file for Protobuf.
 
 licenses(["notice"])
 
@@ -22,20 +22,7 @@ config_setting(
 MSVC_COPTS = [
     "/DHAVE_PTHREAD",
     "/wd4018", # -Wno-sign-compare
-    "/wd4065", # switch statement contains 'default' but no 'case' labels
-    "/wd4146", # unary minus operator applied to unsigned type, result still unsigned
-    "/wd4244", # 'conversion' conversion from 'type1' to 'type2', possible loss of data
-    "/wd4251", # 'identifier' : class 'type' needs to have dll-interface to be used by clients of class 'type2'
-    "/wd4267", # 'var' : conversion from 'size_t' to 'type', possible loss of data
-    "/wd4305", # 'identifier' : truncation from 'type1' to 'type2'
-    "/wd4307", # 'operator' : integral constant overflow
-    "/wd4309", # 'conversion' : truncation of constant value
-    "/wd4334", # 'operator' : result of 32-bit shift implicitly converted to 64 bits (was 64-bit shift intended?)
-    "/wd4355", # 'this' : used in base member initializer list
-    "/wd4506", # no definition for inline function 'function'
     "/wd4514", # -Wno-unused-function
-    "/wd4800", # 'type' : forcing value to bool 'true' or 'false' (performance warning)
-    "/wd4996", # The compiler encountered a deprecated declaration.
 ]
 
 COPTS = select({
@@ -43,12 +30,12 @@ COPTS = select({
     "//conditions:default": [
         "-DHAVE_PTHREAD",
         "-Wall",
+        "-Wwrite-strings",
         "-Woverloaded-virtual",
         "-Wno-sign-compare",
         "-Wno-unused-function",
         # Prevents ISO C++ const string assignment warnings for pyext sources.
         "-Wno-writable-strings",
-        "-Wno-write-strings",
     ],
 })
 
@@ -67,10 +54,7 @@ config_setting(
 # Android and MSVC builds do not need to link in a separate pthread library.
 LINK_OPTS = select({
     ":android": [],
-    ":msvc": [
-        # Suppress linker warnings about files with no symbols defined.
-        "-ignore:4221",
-    ],
+    ":msvc": [],
     "//conditions:default": ["-lpthread", "-lm"],
 })
 
@@ -322,6 +306,8 @@ cc_library(
         "src/google/protobuf/compiler/java/java_generator.cc",
         "src/google/protobuf/compiler/java/java_generator_factory.cc",
         "src/google/protobuf/compiler/java/java_helpers.cc",
+        "src/google/protobuf/compiler/java/java_lazy_message_field.cc",
+        "src/google/protobuf/compiler/java/java_lazy_message_field_lite.cc",
         "src/google/protobuf/compiler/java/java_map_field.cc",
         "src/google/protobuf/compiler/java/java_map_field_lite.cc",
         "src/google/protobuf/compiler/java/java_message.cc",
@@ -361,25 +347,7 @@ cc_library(
     ],
     copts = COPTS,
     includes = ["src/"],
-    linkopts = LINK_OPTS + select({
-        ":msvc": [
-            # Linking to setargv.obj makes the default command line argument
-            # parser expand wildcards, so the main method's argv will contain the
-            # expanded list instead of the wildcards.
-            #
-            # Adding dummy "-DEFAULTLIB:kernel32.lib", because:
-            # - Microsoft ships this object file next to default libraries
-            # - but this file is not a library, just a precompiled object
-            # - "-WHOLEARCHIVE" and "-DEFAULTLIB" only accept library,
-            #   not precompiled object.
-            # - Bazel would assume linkopt that does not start with "-" or "$"
-            #   as a label to a target, so we add a harmless "-DEFAULTLIB:kernel32.lib"
-            #   before "setargv.obj".
-            # See https://msdn.microsoft.com/en-us/library/8bch7bkk.aspx
-            "-DEFAULTLIB:kernel32.lib setargv.obj",
-        ],
-        "//conditions:default": [],
-    }),
+    linkopts = LINK_OPTS,
     visibility = ["//visibility:public"],
     deps = [":protobuf"],
 )
@@ -642,7 +610,6 @@ py_library(
     name = "python_srcs",
     srcs = glob(
         [
-            "python/google/__init__.py",
             "python/google/protobuf/*.py",
             "python/google/protobuf/**/*.py",
         ],
@@ -691,7 +658,6 @@ cc_binary(
     linkstatic = 1,
     deps = [
         ":protobuf",
-        ":proto_api",
     ] + select({
         "//conditions:default": [],
         ":use_fast_cpp_protos": ["//external:python_headers"],
@@ -834,15 +800,6 @@ internal_protobuf_py_tests(
     deps = [":python_tests"],
 )
 
-cc_library(
-    name = "proto_api",
-    hdrs = ["python/google/protobuf/proto_api.h"],
-    deps = [
-        "//external:python_headers",
-    ],
-    visibility = ["//visibility:public"],
-)
-
 proto_lang_toolchain(
     name = "cc_toolchain",
     command_line = "--cpp_out=$(OUT)",
@@ -932,41 +889,9 @@ OBJC_SRCS = [
 objc_library(
     name = "objectivec",
     hdrs = OBJC_HDRS + OBJC_PRIVATE_HDRS,
-    copts = [
-        "-Wno-vla",
-    ],
     includes = [
         "objectivec",
     ],
     non_arc_srcs = OBJC_SRCS,
     visibility = ["//visibility:public"],
-)
-
-################################################################################
-# Test generated proto support
-################################################################################
-
-genrule(
-    name = "generated_protos",
-    srcs = ["src/google/protobuf/unittest_import.proto"],
-    outs = ["unittest_gen.proto"],
-    cmd = "cat $(SRCS) | sed 's|google/|src/google/|' >  $(OUTS)"
-)
-
-proto_library(
-    name = "generated_protos_proto",
-    srcs = [
-        "unittest_gen.proto",
-        "src/google/protobuf/unittest_import_public.proto",
-    ],
-)
-
-py_proto_library(
-    name = "generated_protos_py",
-    srcs = [
-        "unittest_gen.proto",
-        "src/google/protobuf/unittest_import_public.proto",
-    ],
-    default_runtime = "",
-    protoc = ":protoc",
 )
