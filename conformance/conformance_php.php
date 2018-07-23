@@ -39,10 +39,8 @@ function doTest($request)
         trigger_error("Protobuf request doesn't have specific payload type", E_USER_ERROR);
       }
     } elseif ($request->getPayload() == "json_payload") {
-      $ignore_json_unknown = $request->getIgnoreUnknownJson();
       try {
-          $test_message->mergeFromJsonString($request->getJsonPayload(),
-                                             $ignore_json_unknown);
+          $test_message->mergeFromJsonString($request->getJsonPayload());
       } catch (Exception $e) {
           $response->setParseError($e->getMessage());
           return $response;

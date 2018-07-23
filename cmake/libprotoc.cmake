@@ -44,6 +44,8 @@ set(libprotoc_files
   ${protobuf_source_dir}/src/google/protobuf/compiler/java/java_generator.cc
   ${protobuf_source_dir}/src/google/protobuf/compiler/java/java_generator_factory.cc
   ${protobuf_source_dir}/src/google/protobuf/compiler/java/java_helpers.cc
+  ${protobuf_source_dir}/src/google/protobuf/compiler/java/java_lazy_message_field.cc
+  ${protobuf_source_dir}/src/google/protobuf/compiler/java/java_lazy_message_field_lite.cc
   ${protobuf_source_dir}/src/google/protobuf/compiler/java/java_map_field.cc
   ${protobuf_source_dir}/src/google/protobuf/compiler/java/java_map_field_lite.cc
   ${protobuf_source_dir}/src/google/protobuf/compiler/java/java_message.cc
@@ -126,6 +128,8 @@ set(libprotoc_headers
   ${protobuf_source_dir}/src/google/protobuf/compiler/java/java_file.h
   ${protobuf_source_dir}/src/google/protobuf/compiler/java/java_generator_factory.h
   ${protobuf_source_dir}/src/google/protobuf/compiler/java/java_helpers.h
+  ${protobuf_source_dir}/src/google/protobuf/compiler/java/java_lazy_message_field.h
+  ${protobuf_source_dir}/src/google/protobuf/compiler/java/java_lazy_message_field_lite.h
   ${protobuf_source_dir}/src/google/protobuf/compiler/java/java_map_field.h
   ${protobuf_source_dir}/src/google/protobuf/compiler/java/java_map_field_lite.h
   ${protobuf_source_dir}/src/google/protobuf/compiler/java/java_message.h
@@ -164,7 +168,7 @@ set(libprotoc_rc_files
 endif()
 
 add_library(libprotoc ${protobuf_SHARED_OR_STATIC}
-  ${libprotoc_files} ${libprotoc_headers} ${libprotoc_rc_files})
+  ${libprotoc_files} ${libprotoc_headers})
 target_link_libraries(libprotoc libprotobuf)
 if(MSVC AND protobuf_BUILD_SHARED_LIBS)
   target_compile_definitions(libprotoc

@@ -27,8 +27,8 @@ cd $oldpwd
 ./configure CXXFLAGS="-fPIC -O2"
 make -j8
 cd python
-python setup.py build --cpp_implementation
-pip install . --user
+python setup.py -q build --cpp_implementation
+pip install .
 
 
 # build and run Python benchmark
@@ -41,21 +41,16 @@ echo "benchmarking pure python..."
 ./python-pure-python-benchmark --json --behavior_prefix="pure-python-benchmark" $datasets  >> tmp/python_result.json
 echo "," >> "tmp/python_result.json"
 echo "benchmarking python cpp reflection..."
-env LD_PRELOAD="$oldpwd/gperftools/.libs/libtcmalloc.so" LD_LIBRARY_PATH="$oldpwd/src/.libs" ./python-cpp-reflection-benchmark --json --behavior_prefix="cpp-reflection-benchmark" $datasets  >> tmp/python_result.json
+env LD_PRELOAD="$oldpwd/gperftools/.libs/libtcmalloc.so" ./python-cpp-reflection-benchmark --json --behavior_prefix="cpp-reflection-benchmark" $datasets  >> tmp/python_result.json
 echo "," >> "tmp/python_result.json"
 echo "benchmarking python cpp generated code..."
-env LD_PRELOAD="$oldpwd/gperftools/.libs/libtcmalloc.so" LD_LIBRARY_PATH="$oldpwd/src/.libs" ./python-cpp-generated-code-benchmark --json --behavior_prefix="cpp-generated-code-benchmark" $datasets >> tmp/python_result.json
+env LD_PRELOAD="$oldpwd/gperftools/.libs/libtcmalloc.so" ./python-cpp-generated-code-benchmark --json --behavior_prefix="cpp-generated-code-benchmark" $datasets >> tmp/python_result.json
 echo "]" >> "tmp/python_result.json"
 cd $oldpwd
 
 # build CPP protobuf
 ./configure
 make clean && make -j8
-
-# build Java protobuf
-cd java
-mvn package
-cd ..
 
 # build CPP benchmark
 cd benchmarks
@@ -86,7 +81,7 @@ echo "benchmarking java..."
 
 # upload result to bq
 make python_add_init
-env LD_LIBRARY_PATH="$oldpwd/src/.libs" python -m util.result_uploader -cpp="../tmp/cpp_result.json" -java="../tmp/java_result.json" \
+python util/run_and_upload.py -cpp="../tmp/cpp_result.json" -java="../tmp/java_result.json" \
     -python="../tmp/python_result.json" -go="../tmp/go_result.txt"
 
 cd $oldpwd

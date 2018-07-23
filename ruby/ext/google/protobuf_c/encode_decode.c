@@ -963,15 +963,13 @@ static void putary(VALUE ary, const upb_fielddef *f, upb_sink *sink,
 
   if (ary == Qnil) return;
 
-  size = NUM2INT(RepeatedField_length(ary));
-  if (size == 0 && !emit_defaults) return;
-
   upb_sink_startseq(sink, getsel(f, UPB_HANDLER_STARTSEQ), &subsink);
 
   if (upb_fielddef_isprimitive(f)) {
     sel = getsel(f, upb_handlers_getprimitivehandlertype(f));
   }
 
+  size = NUM2INT(RepeatedField_length(ary));
   for (int i = 0; i < size; i++) {
     void* memory = RepeatedField_index_native(ary, i);
     switch (type) {
@@ -1109,7 +1107,7 @@ static void putmsg(VALUE msg_rb, const Descriptor* desc,
   TypedData_Get_Struct(msg_rb, MessageHeader, &Message_type, msg);
 
   if (desc != msg->descriptor) {
-    rb_raise(cTypeError,
+    rb_raise(rb_eArgError,
              "The type of given msg is '%s', expect '%s'.",
              upb_msgdef_fullname(msg->descriptor->msgdef),
              upb_msgdef_fullname(desc->msgdef));
