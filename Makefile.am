@@ -51,6 +51,7 @@ pkgconfig_DATA = protobuf.pc protobuf-lite.pc
 csharp_EXTRA_DIST=                                                           \
   csharp/.gitignore                                                          \
   csharp/CHANGES.txt                                                         \
+  csharp/Google.Protobuf.Tools.targets                                       \
   csharp/Google.Protobuf.Tools.nuspec                                        \
   csharp/README.md                                                           \
   csharp/build_packages.bat                                                  \
@@ -804,6 +805,7 @@ python_EXTRA_DIST=                                                           \
   python/google/protobuf/message.py                                          \
   python/google/protobuf/message_factory.py                                  \
   python/google/protobuf/python_protobuf.h                                   \
+  python/google/protobuf/proto_api.h                                         \
   python/google/protobuf/proto_builder.py                                    \
   python/google/protobuf/pyext/README                                        \
   python/google/protobuf/pyext/__init__.py                                   \
@@ -933,6 +935,7 @@ js_EXTRA_DIST=                                                         \
   js/commonjs/import_test.js                                           \
   js/commonjs/jasmine.json                                             \
   js/commonjs/rewrite_tests_for_commonjs.js                            \
+  js/commonjs/strict_test.js                                           \
   js/commonjs/test6/test6.proto                                        \
   js/commonjs/test7/test7.proto                                        \
   js/compatibility_tests/v3.0.0/binary/arith_test.js                   \
@@ -1004,6 +1007,8 @@ js_EXTRA_DIST=                                                         \
   js/test4.proto                                                       \
   js/test5.proto                                                       \
   js/test8.proto                                                       \
+  js/test9.proto                                                       \
+  js/test10.proto                                                      \
   js/test_bootstrap.js                                                 \
   js/testbinary.proto                                                  \
   js/testempty.proto
@@ -1036,6 +1041,7 @@ EXTRA_DIST = $(@DIST_LANG@_EXTRA_DIST)   \
   cmake/protobuf.pc.cmake                \
   cmake/protoc.cmake                     \
   cmake/tests.cmake                      \
+  cmake/version.rc.in                    \
   editors/README.txt                     \
   editors/proto.vim                      \
   editors/protobuf-mode.el               \
