@@ -78,11 +78,7 @@ def do_test(request):
       
     elif request.WhichOneof('payload') == 'json_payload':
       try:
-        ignore_unknown_fields = \
-            request.test_category == \
-                conformance_pb2.JSON_IGNORE_UNKNOWN_PARSING_TEST
-        json_format.Parse(request.json_payload, test_message,
-                          ignore_unknown_fields)
+        json_format.Parse(request.json_payload, test_message)
       except Exception as e:
         response.parse_error = str(e)
         return response
