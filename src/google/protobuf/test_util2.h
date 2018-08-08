@@ -28,53 +28,46 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-/* This code will be inserted into generated code for
- * google/protobuf/any.proto. */
+#ifndef GOOGLE_PROTOBUF_TEST_UTIL2_H__
+#define GOOGLE_PROTOBUF_TEST_UTIL2_H__
 
-/**
- * Returns the type name contained in this instance, if any.
- * @return {string|undefined}
- */
-proto.google.protobuf.Any.prototype.getTypeName = function() {
-  return this.getTypeUrl().split('/').pop();
-};
+#include <google/protobuf/stubs/strutil.h>
+
+#include <google/protobuf/testing/googletest.h>
 
 
-/**
- * Packs the given message instance into this Any.
- * @param {!Uint8Array} serialized The serialized data to pack.
- * @param {string} name The type name of this message object.
- * @param {string=} opt_typeUrlPrefix the type URL prefix.
- */
-proto.google.protobuf.Any.prototype.pack = function(serialized, name,
-                                                    opt_typeUrlPrefix) {
-  if (!opt_typeUrlPrefix) {
-    opt_typeUrlPrefix = 'type.googleapis.com/';
-  }
+namespace google {
+namespace protobuf {
+namespace TestUtil {
 
-  if (opt_typeUrlPrefix.substr(-1) != '/') {
-    this.setTypeUrl(opt_typeUrlPrefix + '/' + name);
-  } else {
-    this.setTypeUrl(opt_typeUrlPrefix + name);
-  }
+// Translate net/proto2/* -> google/protobuf/*
+inline ::std::string TranslatePathToOpensource(const ::std::string& google3_path) {
+  const ::std::string prefix = "net/proto2/";
+  GOOGLE_CHECK(google3_path.find(prefix) == 0) << google3_path;
+  ::std::string path = google3_path.substr(prefix.size());
 
-  this.setValue(serialized);
-};
+  path = StringReplace(path, "internal/", "", false);
+  path = StringReplace(path, "proto/", "", false);
+  path = StringReplace(path, "public/", "", false);
+  return "google/protobuf/" + path;
+}
 
+inline ::std::string MaybeTranslatePath(const ::std::string& google3_path) {
+  string path = google3_path;
+  path = TranslatePathToOpensource(path);
+  return path;
+}
 
-/**
- * @template T
- * Unpacks this Any into the given message object.
- * @param {function(Uint8Array):T} deserialize Function that will deserialize
- *     the binary data properly.
- * @param {string} name The expected type name of this message object.
- * @return {?T} If the name matched the expected name, returns the deserialized
- *     object, otherwise returns null.
- */
-proto.google.protobuf.Any.prototype.unpack = function(deserialize, name) {
-  if (this.getTypeName() == name) {
-    return deserialize(this.getValue_asU8());
-  } else {
-    return null;
-  }
-};
+inline ::std::string TestSourceDir() {
+  return google::protobuf::TestSourceDir();
+}
+
+inline ::std::string GetTestDataPath(const ::std::string& google3_path) {
+  return TestSourceDir() + "/" + MaybeTranslatePath(google3_path);
+}
+
+}  // namespace TestUtil
+}  // namespace protobuf
+}  // namespace google
+
+#endif  // GOOGLE_PROTOBUF_TEST_UTIL2_H__

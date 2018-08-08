@@ -28,26 +28,82 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-/* This code will be inserted into generated code for
- * google/protobuf/timestamp.proto. */
+// Author: kenton@google.com (Kenton Varda)
+//  Based on original Protocol Buffers design by
+//  Sanjay Ghemawat, Jeff Dean, and others.
+//
+// A proto file we will use for unit testing.
 
-/**
- * Returns a JavaScript 'Date' object corresponding to this Timestamp.
- * @return {!Date}
- */
-proto.google.protobuf.Timestamp.prototype.toDate = function() {
-  var seconds = this.getSeconds();
-  var nanos = this.getNanos();
-
-  return new Date((seconds * 1000) + (nanos / 1000000));
-};
+syntax = "proto2";
+package google.protobuf;
 
 
-/**
- * Sets the value of this Timestamp object to be the given Date.
- * @param {!Date} value The value to set.
- */
-proto.google.protobuf.Timestamp.prototype.fromDate = function(value) {
-  this.setSeconds(Math.floor(value.getTime() / 1000));
-  this.setNanos(value.getMilliseconds() * 1000000);
-};
+message TestFlagsAndStrings {
+  required int32 A = 1;
+  repeated group RepeatedGroup = 2 {
+    required string f = 3;
+  }
+}
+
+message TestBase64ByteArrays {
+  required bytes a = 1;
+}
+
+message TestJavaScriptJSON {
+  optional int32 a = 1;
+  optional float final = 2;
+  optional string in = 3;
+  optional string Var = 4;
+}
+
+message TestJavaScriptOrderJSON1 {
+  optional int32 d = 1;
+  optional int32 c = 2;
+  optional bool x = 3;
+  optional int32 b = 4;
+  optional int32 a = 5;
+}
+
+message TestJavaScriptOrderJSON2 {
+  optional int32 d = 1;
+  optional int32 c = 2;
+  optional bool x = 3;
+  optional int32 b = 4;
+  optional int32 a = 5;
+  repeated TestJavaScriptOrderJSON1 z = 6;
+}
+
+message TestLargeInt {
+  required int64 a = 1;
+  required uint64 b = 2;
+}
+
+message TestNumbers {
+  enum MyType {
+    OK = 0;
+    WARNING = 1;
+    ERROR = 2;
+  }
+  optional MyType a = 1;
+  optional int32 b = 2;
+  optional float c = 3;
+  optional bool d = 4;
+  optional double e = 5;
+  optional uint32 f = 6;
+}
+
+
+message TestCamelCase {
+  optional string normal_field = 1;
+  optional int32 CAPITAL_FIELD = 2;
+  optional int32 CamelCaseField = 3;
+}
+
+message TestBoolMap {
+  map<bool, int32> bool_map = 1;
+}
+
+message TestRecursion {
+  optional int32 value = 1;
+  optional TestRecursion child = 2;
+}
