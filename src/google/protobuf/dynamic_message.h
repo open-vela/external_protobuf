@@ -43,13 +43,9 @@
 #include <vector>
 
 #include <google/protobuf/message.h>
-#include <google/protobuf/stubs/mutex.h>
 #include <google/protobuf/repeated_field.h>
 #include <google/protobuf/stubs/common.h>
-
-#ifdef SWIG
-#error "You cannot SWIG proto headers"
-#endif
+#include <google/protobuf/stubs/mutex.h>
 
 namespace google {
 namespace protobuf {
@@ -125,14 +121,14 @@ class LIBPROTOBUF_EXPORT DynamicMessageFactory : public MessageFactory {
   const DescriptorPool* pool_;
   bool delegate_to_generated_factory_;
 
-  // This struct just contains a hash_map.  We can't #include <hash_map> from
+  // This struct just contains a hash_map.  We can't #include <google/protobuf/stubs/hash.h> from
   // this header due to hacks needed for hash_map portability in the open source
   // release.  Namely, stubs/hash.h, which defines hash_map portably, is not a
   // public header (for good reason), but dynamic_message.h is, and public
   // headers may only #include other public headers.
   struct PrototypeMap;
   std::unique_ptr<PrototypeMap> prototypes_;
-  mutable internal::WrappedMutex prototypes_mutex_;
+  mutable Mutex prototypes_mutex_;
 
   friend class DynamicMessage;
   const Message* GetPrototypeNoLock(const Descriptor* type);
@@ -232,6 +228,6 @@ class LIBPROTOBUF_EXPORT DynamicMapSorter {
 };
 
 }  // namespace protobuf
-}  // namespace google
 
+}  // namespace google
 #endif  // GOOGLE_PROTOBUF_DYNAMIC_MESSAGE_H__

@@ -46,10 +46,9 @@
 #include <google/protobuf/repeated_field.h>
 
 namespace google {
+namespace protobuf { class Message; }
+
 namespace protobuf {
-
-class Message;
-
 namespace compiler {
 
 // Defined in this file.
@@ -227,7 +226,7 @@ class LIBPROTOBUF_EXPORT Parser {
 
     // Creates a recorder that generates locations into given source code info.
     LocationRecorder(const LocationRecorder& parent, int path1,
-                     SourceCodeInfo* source_code_info);
+                    SourceCodeInfo* source_code_info);
 
     ~LocationRecorder();
 
@@ -579,6 +578,6 @@ class LIBPROTOBUF_EXPORT SourceLocationTable {
 
 }  // namespace compiler
 }  // namespace protobuf
-}  // namespace google
 
+}  // namespace google
 #endif  // GOOGLE_PROTOBUF_COMPILER_PARSER_H__

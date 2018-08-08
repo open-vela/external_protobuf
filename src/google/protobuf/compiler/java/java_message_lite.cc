@@ -35,6 +35,7 @@
 #include <google/protobuf/compiler/java/java_message_lite.h>
 
 #include <algorithm>
+#include <google/protobuf/stubs/hash.h>
 #include <map>
 #include <memory>
 #include <vector>
@@ -52,8 +53,8 @@
 #include <google/protobuf/io/coded_stream.h>
 #include <google/protobuf/io/printer.h>
 #include <google/protobuf/wire_format.h>
-#include <google/protobuf/stubs/strutil.h>
 #include <google/protobuf/stubs/substitute.h>
+#include <google/protobuf/stubs/strutil.h>
 
 
 namespace google {
@@ -265,9 +266,12 @@ void ImmutableMessageLiteGenerator::Generate(io::Printer* printer) {
     printer->Indent();
     for (int j = 0; j < oneof->field_count(); j++) {
       const FieldDescriptor* field = oneof->field(j);
-      printer->Print("$field_name$($field_number$),\n", "field_name",
-                     ToUpper(field->name()), "field_number",
-                     SimpleItoa(field->number()));
+      printer->Print(
+        "$field_name$($field_number$),\n",
+        "field_name",
+        ToUpper(field->name()),
+        "field_number",
+        SimpleItoa(field->number()));
     }
     printer->Print(
       "$cap_oneof_name$_NOT_SET(0);\n",
@@ -291,9 +295,12 @@ void ImmutableMessageLiteGenerator::Generate(io::Printer* printer) {
       "  switch (value) {\n");
     for (int j = 0; j < oneof->field_count(); j++) {
       const FieldDescriptor* field = oneof->field(j);
-      printer->Print("    case $field_number$: return $field_name$;\n",
-                     "field_number", SimpleItoa(field->number()),
-                     "field_name", ToUpper(field->name()));
+      printer->Print(
+        "    case $field_number$: return $field_name$;\n",
+        "field_number",
+        SimpleItoa(field->number()),
+        "field_name",
+        ToUpper(field->name()));
     }
     printer->Print(
       "    case 0: return $cap_oneof_name$_NOT_SET;\n"
@@ -326,14 +333,16 @@ void ImmutableMessageLiteGenerator::Generate(io::Printer* printer) {
   // Fields
   for (int i = 0; i < descriptor_->field_count(); i++) {
     printer->Print("public static final int $constant_name$ = $number$;\n",
-                   "constant_name", FieldConstantName(descriptor_->field(i)),
-                   "number",
-                   SimpleItoa(descriptor_->field(i)->number()));
+      "constant_name", FieldConstantName(descriptor_->field(i)),
+      "number", SimpleItoa(descriptor_->field(i)->number()));
     field_generators_.get(descriptor_->field(i)).GenerateMembers(printer);
     printer->Print("\n");
   }
 
-  GenerateMessageSerializationMethods(printer);
+  if (!EnableExperimentalRuntime(context_)) {
+    GenerateMessageSerializationMethods(printer);
+  }
+
   GenerateParseFromMethods(printer);
   GenerateBuilder(printer);
 
@@ -728,8 +737,9 @@ void ImmutableMessageLiteGenerator::GenerateSerializeOneField(
 
 void ImmutableMessageLiteGenerator::GenerateSerializeOneExtensionRange(
     io::Printer* printer, const Descriptor::ExtensionRange* range) {
-  printer->Print("extensionWriter.writeUntil($end$, output);\n", "end",
-                 SimpleItoa(range->end));
+  printer->Print(
+    "extensionWriter.writeUntil($end$, output);\n",
+    "end", SimpleItoa(range->end));
 }
 
 // ===================================================================
@@ -737,10 +747,10 @@ void ImmutableMessageLiteGenerator::GenerateSerializeOneExtensionRange(
 void ImmutableMessageLiteGenerator::GenerateBuilder(io::Printer* printer) {
   printer->Print(
     "public static Builder newBuilder() {\n"
-    "  return DEFAULT_INSTANCE.createBuilder();\n"
+    "  return (Builder) DEFAULT_INSTANCE.createBuilder();\n"
     "}\n"
     "public static Builder newBuilder($classname$ prototype) {\n"
-    "  return DEFAULT_INSTANCE.createBuilder(prototype);\n"
+    "  return (Builder) DEFAULT_INSTANCE.createBuilder(prototype);\n"
     "}\n"
     "\n",
     "classname", name_resolver_->GetImmutableClassName(descriptor_));
@@ -808,9 +818,10 @@ void ImmutableMessageLiteGenerator::GenerateDynamicMethodIsInitialized(
             const OneofDescriptor* oneof = field->containing_oneof();
             const OneofGeneratorInfo* oneof_info =
                 context_->GetOneofGeneratorInfo(oneof);
-            printer->Print("if ($oneof_name$Case_ == $field_number$) {\n",
-                           "oneof_name", oneof_info->name, "field_number",
-                           SimpleItoa(field->number()));
+            printer->Print(
+              "if ($oneof_name$Case_ == $field_number$) {\n",
+              "oneof_name", oneof_info->name,
+              "field_number", SimpleItoa(field->number()));
           } else {
             printer->Print(
               "if (has$name$()) {\n",
@@ -991,94 +1002,100 @@ void ImmutableMessageLiteGenerator::GenerateDynamicMethodMergeFromStream(
   printer->Print(
       "try {\n");
   printer->Indent();
-  printer->Print(
-      "boolean done = false;\n"
-      "while (!done) {\n");
-  printer->Indent();
-
-  printer->Print(
-      "int tag = input.readTag();\n"
-      "switch (tag) {\n");
-  printer->Indent();
-
-  printer->Print(
-      "case 0:\n"  // zero signals EOF / limit reached
-      "  done = true;\n"
-      "  break;\n");
-
-  std::unique_ptr<const FieldDescriptor* []> sorted_fields(
-      SortFieldsByNumber(descriptor_));
-  for (int i = 0; i < descriptor_->field_count(); i++) {
-    const FieldDescriptor* field = sorted_fields[i];
-    uint32 tag = WireFormatLite::MakeTag(
-        field->number(), WireFormat::WireTypeForFieldType(field->type()));
-
-    printer->Print("case $tag$: {\n", "tag",
-                   SimpleItoa(static_cast<int32>(tag)));
+  if (EnableExperimentalRuntime(context_)) {
+    printer->Print(
+        "mergeFromInternal(input, extensionRegistry);\n"
+        "return DEFAULT_INSTANCE;\n");
+  } else {
+    printer->Print(
+        "boolean done = false;\n"
+        "while (!done) {\n");
     printer->Indent();
 
-    field_generators_.get(field).GenerateParsingCode(printer);
-
-    printer->Outdent();
     printer->Print(
-      "  break;\n"
-      "}\n");
+        "int tag = input.readTag();\n"
+        "switch (tag) {\n");
+    printer->Indent();
 
-    if (field->is_packable()) {
-      // To make packed = true wire compatible, we generate parsing code from
-      // a packed version of this field regardless of
-      // field->options().packed().
-      uint32 packed_tag = WireFormatLite::MakeTag(
-          field->number(), WireFormatLite::WIRETYPE_LENGTH_DELIMITED);
+    printer->Print(
+        "case 0:\n"  // zero signals EOF / limit reached
+        "  done = true;\n"
+        "  break;\n");
+
+    std::unique_ptr<const FieldDescriptor* []> sorted_fields(
+        SortFieldsByNumber(descriptor_));
+    for (int i = 0; i < descriptor_->field_count(); i++) {
+      const FieldDescriptor* field = sorted_fields[i];
+      uint32 tag = WireFormatLite::MakeTag(
+          field->number(), WireFormat::WireTypeForFieldType(field->type()));
+
       printer->Print("case $tag$: {\n", "tag",
-                     SimpleItoa(static_cast<int32>(packed_tag)));
+                     SimpleItoa(static_cast<int32>(tag)));
       printer->Indent();
 
-      field_generators_.get(field).GenerateParsingCodeFromPacked(printer);
+      field_generators_.get(field).GenerateParsingCode(printer);
 
       printer->Outdent();
       printer->Print(
-          "  break;\n"
-          "}\n");
-    }
-  }
+        "  break;\n"
+        "}\n");
 
-  if (descriptor_->extension_range_count() > 0) {
-    if (descriptor_->options().message_set_wire_format()) {
-      printer->Print(
-          "default: {\n"
-          "  if (!parseUnknownFieldAsMessageSet(\n"
-          "      getDefaultInstanceForType(), input, extensionRegistry,\n"
-          "      tag)) {\n"
-          "    done = true;\n"  // it's an endgroup tag
-          "  }\n"
-          "  break;\n"
-          "}\n");
+      if (field->is_packable()) {
+        // To make packed = true wire compatible, we generate parsing code from
+        // a packed version of this field regardless of
+        // field->options().packed().
+        uint32 packed_tag = WireFormatLite::MakeTag(
+            field->number(), WireFormatLite::WIRETYPE_LENGTH_DELIMITED);
+        printer->Print("case $tag$: {\n", "tag",
+                       SimpleItoa(static_cast<int32>(packed_tag)));
+        printer->Indent();
+
+        field_generators_.get(field).GenerateParsingCodeFromPacked(printer);
+
+        printer->Outdent();
+        printer->Print(
+            "  break;\n"
+            "}\n");
+      }
+    }
+
+    if (descriptor_->extension_range_count() > 0) {
+      if (descriptor_->options().message_set_wire_format()) {
+        printer->Print(
+            "default: {\n"
+            "  if (!parseUnknownFieldAsMessageSet(\n"
+            "      getDefaultInstanceForType(), input, extensionRegistry,\n"
+            "      tag)) {\n"
+            "    done = true;\n"  // it's an endgroup tag
+            "  }\n"
+            "  break;\n"
+            "}\n");
+      } else {
+        printer->Print(
+            "default: {\n"
+            "  if (!parseUnknownField(getDefaultInstanceForType(),\n"
+            "      input, extensionRegistry, tag)) {\n"
+            "    done = true;\n"  // it's an endgroup tag
+            "  }\n"
+            "  break;\n"
+            "}\n");
+      }
     } else {
       printer->Print(
           "default: {\n"
-          "  if (!parseUnknownField(getDefaultInstanceForType(),\n"
-          "      input, extensionRegistry, tag)) {\n"
+          "  if (!parseUnknownField(tag, input)) {\n"
           "    done = true;\n"  // it's an endgroup tag
           "  }\n"
           "  break;\n"
           "}\n");
     }
-  } else {
-    printer->Print(
-        "default: {\n"
-        "  if (!parseUnknownField(tag, input)) {\n"
-        "    done = true;\n"  // it's an endgroup tag
-        "  }\n"
-        "  break;\n"
-        "}\n");
-  }
 
-  printer->Outdent();
-  printer->Outdent();
-  printer->Print(
-      "  }\n"  // switch (tag)
-      "}\n");  // while (!done)
+    printer->Outdent();
+    printer->Outdent();
+    printer->Print(
+        "  }\n"  // switch (tag)
+        "}\n");  // while (!done)
+  }
 
   printer->Outdent();
   printer->Print(

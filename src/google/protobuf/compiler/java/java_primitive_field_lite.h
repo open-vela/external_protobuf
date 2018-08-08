@@ -41,16 +41,14 @@
 
 namespace google {
 namespace protobuf {
-namespace compiler {
-namespace java {
-class Context;            // context.h
-class ClassNameResolver;  // name_resolver.h
-}  // namespace java
-}  // namespace compiler
-}  // namespace protobuf
-}  // namespace google
+  namespace compiler {
+    namespace java {
+      class Context;           // context.h
+      class ClassNameResolver; // name_resolver.h
+    }
+  }
+}
 
-namespace google {
 namespace protobuf {
 namespace compiler {
 namespace java {
@@ -59,12 +57,13 @@ class ImmutablePrimitiveFieldLiteGenerator
     : public ImmutableFieldLiteGenerator {
  public:
   explicit ImmutablePrimitiveFieldLiteGenerator(
-      const FieldDescriptor* descriptor, int messageBitIndex, Context* context);
+      const FieldDescriptor* descriptor, int messageBitIndex,
+      int builderBitIndex, Context* context);
   ~ImmutablePrimitiveFieldLiteGenerator();
 
-  // implements ImmutableFieldLiteGenerator
-  // ------------------------------------
+  // implements ImmutableFieldLiteGenerator ------------------------------------
   int GetNumBitsForMessage() const;
+  int GetNumBitsForBuilder() const;
   void GenerateInterfaceMembers(io::Printer* printer) const;
   void GenerateMembers(io::Printer* printer) const;
   void GenerateBuilderMembers(io::Printer* printer) const;
@@ -88,6 +87,7 @@ class ImmutablePrimitiveFieldLiteGenerator
   const FieldDescriptor* descriptor_;
   std::map<string, string> variables_;
   const int messageBitIndex_;
+  const int builderBitIndex_;
   Context* context_;
   ClassNameResolver* name_resolver_;
 
@@ -98,9 +98,9 @@ class ImmutablePrimitiveFieldLiteGenerator
 class ImmutablePrimitiveOneofFieldLiteGenerator
     : public ImmutablePrimitiveFieldLiteGenerator {
  public:
-  ImmutablePrimitiveOneofFieldLiteGenerator(const FieldDescriptor* descriptor,
-                                            int messageBitIndex,
-                                            Context* context);
+  ImmutablePrimitiveOneofFieldLiteGenerator(
+      const FieldDescriptor* descriptor, int messageBitIndex,
+      int builderBitIndex, Context* context);
   ~ImmutablePrimitiveOneofFieldLiteGenerator();
 
   void GenerateMembers(io::Printer* printer) const;
@@ -120,11 +120,13 @@ class RepeatedImmutablePrimitiveFieldLiteGenerator
     : public ImmutableFieldLiteGenerator {
  public:
   explicit RepeatedImmutablePrimitiveFieldLiteGenerator(
-      const FieldDescriptor* descriptor, int messageBitIndex, Context* context);
+      const FieldDescriptor* descriptor, int messageBitIndex,
+      int builderBitIndex, Context* context);
   virtual ~RepeatedImmutablePrimitiveFieldLiteGenerator();
 
   // implements ImmutableFieldLiteGenerator ------------------------------------
   int GetNumBitsForMessage() const;
+  int GetNumBitsForBuilder() const;
   void GenerateInterfaceMembers(io::Printer* printer) const;
   void GenerateMembers(io::Printer* printer) const;
   void GenerateBuilderMembers(io::Printer* printer) const;
@@ -149,6 +151,7 @@ class RepeatedImmutablePrimitiveFieldLiteGenerator
   const FieldDescriptor* descriptor_;
   std::map<string, string> variables_;
   const int messageBitIndex_;
+  const int builderBitIndex_;
   Context* context_;
   ClassNameResolver* name_resolver_;
 
@@ -158,6 +161,6 @@ class RepeatedImmutablePrimitiveFieldLiteGenerator
 }  // namespace java
 }  // namespace compiler
 }  // namespace protobuf
-}  // namespace google
 
+}  // namespace google
 #endif  // GOOGLE_PROTOBUF_COMPILER_JAVA_PRIMITIVE_FIELD_LITE_H__

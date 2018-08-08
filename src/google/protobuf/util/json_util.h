@@ -37,7 +37,6 @@
 #include <google/protobuf/util/type_resolver.h>
 #include <google/protobuf/stubs/bytestream.h>
 
-
 namespace google {
 namespace protobuf {
 namespace io {
@@ -78,9 +77,9 @@ struct JsonPrintOptions {
 // DEPRECATED. Use JsonPrintOptions instead.
 typedef JsonPrintOptions JsonOptions;
 
-// Converts from protobuf message to JSON and appends it to |output|. This is a
-// simple wrapper of BinaryToJsonString(). It will use the DescriptorPool of the
-// passed-in message to resolve Any types.
+// Converts from protobuf message to JSON. This is a simple wrapper of
+// BinaryToJsonString(). It will use the DescriptorPool of the passed-in
+// message to resolve Any types.
 LIBPROTOBUF_EXPORT util::Status MessageToJsonString(const Message& message,
                                    string* output,
                                    const JsonOptions& options);
@@ -93,10 +92,11 @@ inline util::Status MessageToJsonString(const Message& message,
 // Converts from JSON to protobuf message. This is a simple wrapper of
 // JsonStringToBinary(). It will use the DescriptorPool of the passed-in
 // message to resolve Any types.
-LIBPROTOBUF_EXPORT util::Status JsonStringToMessage(StringPiece input, Message* message,
+LIBPROTOBUF_EXPORT util::Status JsonStringToMessage(const string& input,
+                                   Message* message,
                                    const JsonParseOptions& options);
 
-inline util::Status JsonStringToMessage(StringPiece input,
+inline util::Status JsonStringToMessage(const string& input,
                                           Message* message) {
   return JsonStringToMessage(input, message, JsonParseOptions());
 }
@@ -158,16 +158,18 @@ inline util::Status JsonToBinaryStream(
                             JsonParseOptions());
 }
 
-LIBPROTOBUF_EXPORT util::Status JsonToBinaryString(TypeResolver* resolver,
-                                  const string& type_url,
-                                  StringPiece json_input,
-                                  string* binary_output,
-                                  const JsonParseOptions& options);
+LIBPROTOBUF_EXPORT util::Status JsonToBinaryString(
+    TypeResolver* resolver,
+    const string& type_url,
+    const string& json_input,
+    string* binary_output,
+    const JsonParseOptions& options);
 
-inline util::Status JsonToBinaryString(TypeResolver* resolver,
-                                         const string& type_url,
-                                         StringPiece json_input,
-                                         string* binary_output) {
+inline util::Status JsonToBinaryString(
+    TypeResolver* resolver,
+    const string& type_url,
+    const string& json_input,
+    string* binary_output) {
   return JsonToBinaryString(resolver, type_url, json_input, binary_output,
                             JsonParseOptions());
 }
@@ -180,7 +182,7 @@ class LIBPROTOBUF_EXPORT ZeroCopyStreamByteSink : public strings::ByteSink {
       : stream_(stream), buffer_(NULL), buffer_size_(0) {}
   ~ZeroCopyStreamByteSink();
 
-  void Append(const char* bytes, size_t len) override;
+  virtual void Append(const char* bytes, size_t len) override;
 
  private:
   io::ZeroCopyOutputStream* stream_;
@@ -193,6 +195,6 @@ class LIBPROTOBUF_EXPORT ZeroCopyStreamByteSink : public strings::ByteSink {
 
 }  // namespace util
 }  // namespace protobuf
-}  // namespace google
 
+}  // namespace google
 #endif  // GOOGLE_PROTOBUF_UTIL_JSON_UTIL_H__

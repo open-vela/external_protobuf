@@ -38,7 +38,6 @@
 
 #include <memory>
 #include <string>
-#include <hash_map>
 
 #include <google/protobuf/stubs/common.h>
 #include <google/protobuf/pyext/thread_unsafe_shared_ptr.h>
@@ -97,24 +96,25 @@ typedef struct CMessage {
   // made writable, at which point this field is set to false.
   bool read_only;
 
-  // A mapping indexed by field, containing CMessage,
+  // A reference to a Python dictionary containing CMessage,
   // RepeatedCompositeContainer, and RepeatedScalarContainer
   // objects. Used as a cache to make sure we don't have to make a
   // Python wrapper for the C++ Message objects on every access, or
   // deal with the synchronization nightmare that could create.
-  // Also cache extension fields.
-  // The FieldDescriptor is owned by the message's pool; PyObject references
-  // are owned.
-  typedef __gnu_cxx::hash_map<const FieldDescriptor*, PyObject*>
-      CompositeFieldsMap;
-  CompositeFieldsMap* composite_fields;
+  PyObject* composite_fields;
 
-  // A reference to PyUnknownFields.
-  PyObject* unknown_field_set;
+  // A reference to the dictionary containing the message's extensions.
+  // Similar to composite_fields, acting as a cache, but also contains the
+  // required extension dict logic.
+  ExtensionDict* extensions;
 
   // Implements the "weakref" protocol for this object.
   PyObject* weakreflist;
 } CMessage;
+
+extern PyTypeObject CMessageClass_Type;
+extern PyTypeObject CMessage_Type;
+
 
 // The (meta) type of all Messages classes.
 // It allows us to cache some C++ pointers in the class object itself, they are
@@ -142,8 +142,6 @@ struct CMessageClass {
   }
 };
 
-extern PyTypeObject* CMessageClass_Type;
-extern PyTypeObject* CMessage_Type;
 
 namespace cmessage {
 
@@ -237,13 +235,15 @@ PyObject* MergeFrom(CMessage* self, PyObject* arg);
 // has been registered with the same field number on this class.
 PyObject* RegisterExtension(PyObject* cls, PyObject* extension_handle);
 
-// Get a field from a message.
-PyObject* GetFieldValue(CMessage* self,
-                        const FieldDescriptor* field_descriptor);
-// Sets the value of a scalar field in a message.
-// On error, return -1 with an extension set.
-int SetFieldValue(CMessage* self, const FieldDescriptor* field_descriptor,
-                  PyObject* value);
+// Retrieves an attribute named 'name' from 'self', which is interpreted as a
+// CMessage. Returns the attribute value on success, or null on failure.
+//
+// Returns a new reference.
+PyObject* GetAttr(PyObject* self, PyObject* name);
+
+// Set the value of the attribute named 'name', for 'self', which is interpreted
+// as a CMessage, to the value 'value'. Returns -1 on failure.
+int SetAttr(PyObject* self, PyObject* name, PyObject* value);
 
 PyObject* FindInitializationErrors(CMessage* self);
 
@@ -357,6 +357,6 @@ extern template bool CheckAndGetInteger<uint64>(PyObject*, uint64*);
 
 }  // namespace python
 }  // namespace protobuf
-}  // namespace google
 
+}  // namespace google
 #endif  // GOOGLE_PROTOBUF_PYTHON_CPP_MESSAGE_H__

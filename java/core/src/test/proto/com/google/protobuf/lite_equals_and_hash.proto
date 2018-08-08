@@ -34,6 +34,7 @@ syntax = "proto2";
 
 package protobuf_unittest.lite_equals_and_hash;
 
+option optimize_for = LITE_RUNTIME;
 
 message TestOneofEquals {
   oneof oneof_field {
