@@ -32,7 +32,6 @@
 
 #import "GPBArray.h"
 #import "GPBCodedOutputStream_PackagePrivate.h"
-#import "GPBUnknownFieldSet.h"
 
 @implementation GPBUnknownField {
  @protected

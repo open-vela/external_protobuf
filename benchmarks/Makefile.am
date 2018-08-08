@@ -90,7 +90,8 @@ $(benchmarks_protoc_outputs_proto2_header): protoc_middleman2
 
 initialize_submodule:
 	oldpwd=`pwd`
-	cd $(top_srcdir) && git submodule update --init -r third_party/benchmark
+	cd $(top_srcdir)/third_party
+	git submodule update --init -r
 	cd $(top_srcdir)/third_party/benchmark && cmake -DCMAKE_BUILD_TYPE=Release && make
 	cd $$oldpwd
 	touch initialize_submodule
@@ -546,6 +547,58 @@ php_c: php-c-benchmark proto3_middleman_php
 
 ############ PHP RULES END #################
 
+############ protobuf.js RULE BEGIN #############
+
+pbjs_preparation:
+	mkdir -p tmp/protobuf.js
+	cd tmp/protobuf.js && git clone https://github.com/dcodeIO/protobuf.js.git && \
+			cd protobuf.js && npm install && npm run build
+	cd tmp/protobuf.js && npm install benchmark
+	cp protobuf.js/* tmp/protobuf.js
+	cp js/benchmark_suite.js tmp/protobuf.js
+	touch pbjs_preparation
+
+pbjs_middleman: pbjs_preparation
+	export OLDDIR=$$(pwd) && cd tmp/protobuf.js && node generate_pbjs_files.js --target static-module --include_path=$$OLDDIR -o generated_bundle_code.js $(benchmarks_protoc_inputs) $(benchmarks_protoc_inputs_benchmark_wrapper) $(benchmarks_protoc_inputs_proto2)
+	touch pbjs_middleman
+
+pbjs-benchmark: pbjs_middleman
+	@echo '#! /bin/bash' > pbjs-benchmark
+	@echo 'cd tmp/protobuf.js' >> pbjs-benchmark
+	@echo 'sed -i "s/protobufjs/.\/protobuf.js/g" generated_bundle_code.js' >> pbjs-benchmark
+	@echo 'env NODE_PATH=".:./node_modules:$$NODE_PATH" node protobufjs_benchmark.js $$@' >> pbjs-benchmark
+	@chmod +x pbjs-benchmark
+
+pbjs: pbjs-benchmark
+	./pbjs-benchmark $(all_data)
+
+############ protobuf.js RULE END #############
+
+############ JS RULE BEGIN #############
+
+js_preparation:
+	mkdir -p tmp/js
+	oldpwd=$$(pwd) && cd $(top_srcdir)/js && npm install && npm test
+	cd tmp/js && npm install benchmark
+	cp js/* tmp/js
+	touch js_preparation
+
+js_middleman: js_preparation
+	oldpwd=`pwd` && ( cd $(srcdir) && $$oldpwd/../src/protoc$(EXEEXT) -I. -I$(top_srcdir)/src --js_out=import_style=commonjs,binary:$$oldpwd/tmp/js $(benchmarks_protoc_inputs) $(benchmarks_protoc_inputs_benchmark_wrapper) $(benchmarks_protoc_inputs_proto2))
+	touch js_middleman
+
+js-benchmark: js_middleman
+	@echo '#! /bin/bash' > js-benchmark
+	@echo 'export TOP_JS_SRCDIR=$$(cd $(top_srcdir)/js && pwd)' >> js-benchmark
+	@echo 'cd tmp/js' >> js-benchmark
+	@echo 'env NODE_PATH="$$TOP_JS_SRCDIR:.:./node_modules:$$NODE_PATH" node --max-old-space-size=4096 js_benchmark.js $$@' >> js-benchmark
+	@chmod +x js-benchmark
+
+js: js-benchmark
+	./js-benchmark $(all_data)
+
+############ JS RULE END #############
+
 MAINTAINERCLEANFILES =                                                     \
 	Makefile.in
 
@@ -593,8 +646,13 @@ CLEANFILES =                                                               \
 	generate_proto3_data                                                     \
 	php-benchmark                                                            \
 	php-c-benchmark                                                          \
-	proto3_middleman_php
-	
+	proto3_middleman_php                                                     \
+	pbjs_preparation                                                         \
+	pbjs_middleman                                                           \
+	pbjs-benchmark                                                           \
+	js_preparation                                                           \
+	js_middleman                                                             \
+	js-benchmark
 
 clean-local:
 	-rm -rf tmp/*

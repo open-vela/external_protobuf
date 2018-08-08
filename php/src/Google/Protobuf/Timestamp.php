@@ -182,19 +182,18 @@ class Timestamp extends \Google\Protobuf\Internal\Message
      */
     public function fromDateTime(\DateTime $datetime)
     {
-        $this->seconds = $datetime->getTimestamp();
-        $this->nanos = 1000 * $datetime->format('u');
+        $this->seconds = $datetime->format('U');
+        $this->nanos = 0;
     }
 
     /**
-     * Converts Timestamp to PHP DateTime.
+     * Converts Timestamp to PHP DateTime. Nano second is ignored.
      *
      * @return \DateTime $datetime
      */
     public function toDateTime()
     {
-        $time = sprintf('%s.%06d', $this->seconds, $this->nanos / 1000);
-        return \DateTime::createFromFormat('U.u', $time);
+        return \DateTime::createFromFormat('U', $this->seconds);
     }
 }
 
