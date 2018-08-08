@@ -210,8 +210,8 @@ public class AbstractMessageTest extends TestCase {
     new TestUtil.ReflectionTester(TestAllTypes.getDescriptor(), null);
 
   TestUtil.ReflectionTester extensionsReflectionTester =
-      new TestUtil.ReflectionTester(
-          TestAllExtensions.getDescriptor(), TestUtil.getFullExtensionRegistry());
+    new TestUtil.ReflectionTester(TestAllExtensions.getDescriptor(),
+                                  TestUtil.getExtensionRegistry());
 
   public void testClear() throws Exception {
     AbstractMessageWrapper message =

@@ -42,8 +42,7 @@ import java.util.RandomAccess;
  *
  * @author dweis@google.com (Daniel Weis)
  */
-final class LongArrayList
-    extends AbstractProtobufList<Long>
+final class LongArrayList extends AbstractProtobufList<Long>
     implements LongList, RandomAccess, PrimitiveNonBoxingCollection {
 
   private static final LongArrayList EMPTY_LIST = new LongArrayList();

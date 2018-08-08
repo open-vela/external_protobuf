@@ -48,10 +48,6 @@
 #define PROTOBUF_CONSTEXPR_VAR
 #endif  // !_clang
 
-#ifdef SWIG
-#error "You cannot SWIG proto headers"
-#endif
-
 namespace google {
 namespace protobuf {
 namespace internal {
@@ -68,10 +64,6 @@ static constexpr const unsigned char kNotPackedMask = 0x10;
 static constexpr const unsigned char kInvalidMask = 0x20;
 
 enum ProcessingTypes {
-  TYPE_STRING_CORD = 19,
-  TYPE_STRING_STRING_PIECE = 20,
-  TYPE_BYTES_CORD = 21,
-  TYPE_BYTES_STRING_PIECE = 22,
   TYPE_STRING_INLINED = 23,
   TYPE_BYTES_INLINED = 24,
   TYPE_MAP = 25,
@@ -191,16 +183,18 @@ bool MergePartialFromCodedStreamLite(MessageLite* msg, const ParseTable& table,
 template <typename Entry>
 bool ParseMap(io::CodedInputStream* input, void* map_field) {
   typedef typename MapEntryToMapField<Entry>::MapFieldType MapFieldType;
-  typedef Map<typename Entry::EntryKeyType, typename Entry::EntryValueType>
+  typedef google::protobuf::Map<typename Entry::EntryKeyType,
+                      typename Entry::EntryValueType>
       MapType;
   typedef typename Entry::template Parser<MapFieldType, MapType> ParserType;
 
   ParserType parser(static_cast<MapFieldType*>(map_field));
-  return WireFormatLite::ReadMessageNoVirtual(input, &parser);
+  return ::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(input,
+                                                                  &parser);
 }
 
 }  // namespace internal
 }  // namespace protobuf
-}  // namespace google
 
+}  // namespace google
 #endif  // GOOGLE_PROTOBUF_GENERATED_MESSAGE_TABLE_DRIVEN_H__
