@@ -430,13 +430,13 @@ class LIBPROTOBUF_EXPORT TextFormat {
   // Example input: "user {\n id: 123 extra { gender: MALE language: 'en' }\n}"
   //
   // One use for this function is parsing handwritten strings in test code.
-  // Another use is to parse the output from google::protobuf::Message::DebugString()
+  // Another use is to parse the output from proto2::Message::DebugString()
   // (or ShortDebugString()), because these functions output using
-  // google::protobuf::TextFormat::Print().
+  // proto2::TextFormat::Print().
   //
   // If you would like to read a protocol buffer serialized in the
   // (non-human-readable) binary wire format, see
-  // google::protobuf::MessageLite::ParseFromString().
+  // proto2::MessageLite::ParseFromString().
   static bool Parse(io::ZeroCopyInputStream* input, Message* output);
   // Like Parse(), but reads directly from a string.
   static bool ParseFromString(const string& input, Message* output);
