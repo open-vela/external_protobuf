@@ -172,13 +172,15 @@ void SetPrimitiveVariables(const FieldDescriptor* descriptor,
 
 // ===================================================================
 
-ImmutablePrimitiveFieldLiteGenerator::ImmutablePrimitiveFieldLiteGenerator(
-    const FieldDescriptor* descriptor, int messageBitIndex, Context* context)
-    : descriptor_(descriptor),
-      messageBitIndex_(messageBitIndex),
-      context_(context),
-      name_resolver_(context->GetNameResolver()) {
-  SetPrimitiveVariables(descriptor, messageBitIndex, 0,
+ImmutablePrimitiveFieldLiteGenerator::
+ImmutablePrimitiveFieldLiteGenerator(const FieldDescriptor* descriptor,
+                                 int messageBitIndex,
+                                 int builderBitIndex,
+                                 Context* context)
+  : descriptor_(descriptor), messageBitIndex_(messageBitIndex),
+    builderBitIndex_(builderBitIndex), context_(context),
+    name_resolver_(context->GetNameResolver()) {
+  SetPrimitiveVariables(descriptor, messageBitIndex, builderBitIndex,
                         context->GetFieldGeneratorInfo(descriptor),
                         name_resolver_, &variables_);
 }
@@ -187,6 +189,10 @@ ImmutablePrimitiveFieldLiteGenerator::~ImmutablePrimitiveFieldLiteGenerator() {}
 
 int ImmutablePrimitiveFieldLiteGenerator::GetNumBitsForMessage() const {
   return 1;
+}
+
+int ImmutablePrimitiveFieldLiteGenerator::GetNumBitsForBuilder() const {
+  return 0;
 }
 
 void ImmutablePrimitiveFieldLiteGenerator::
@@ -466,11 +472,12 @@ string ImmutablePrimitiveFieldLiteGenerator::GetBoxedType() const {
 // ===================================================================
 
 ImmutablePrimitiveOneofFieldLiteGenerator::
-    ImmutablePrimitiveOneofFieldLiteGenerator(const FieldDescriptor* descriptor,
-                                              int messageBitIndex,
-                                              Context* context)
-    : ImmutablePrimitiveFieldLiteGenerator(descriptor, messageBitIndex,
-                                           context) {
+ImmutablePrimitiveOneofFieldLiteGenerator(const FieldDescriptor* descriptor,
+                                 int messageBitIndex,
+                                 int builderBitIndex,
+                                 Context* context)
+    : ImmutablePrimitiveFieldLiteGenerator(
+          descriptor, messageBitIndex, builderBitIndex, context) {
   const OneofGeneratorInfo* info =
       context->GetOneofGeneratorInfo(descriptor->containing_oneof());
   SetCommonOneofVariables(descriptor, info, &variables_);
@@ -602,14 +609,14 @@ GenerateSerializedSizeCode(io::Printer* printer) const {
 // ===================================================================
 
 RepeatedImmutablePrimitiveFieldLiteGenerator::
-    RepeatedImmutablePrimitiveFieldLiteGenerator(
-        const FieldDescriptor* descriptor, int messageBitIndex,
-        Context* context)
-    : descriptor_(descriptor),
-      messageBitIndex_(messageBitIndex),
-      context_(context),
-      name_resolver_(context->GetNameResolver()) {
-  SetPrimitiveVariables(descriptor, messageBitIndex, 0,
+RepeatedImmutablePrimitiveFieldLiteGenerator(const FieldDescriptor* descriptor,
+                                         int messageBitIndex,
+                                         int builderBitIndex,
+                                         Context* context)
+  : descriptor_(descriptor), messageBitIndex_(messageBitIndex),
+    builderBitIndex_(builderBitIndex), context_(context),
+    name_resolver_(context->GetNameResolver()) {
+  SetPrimitiveVariables(descriptor, messageBitIndex, builderBitIndex,
                         context->GetFieldGeneratorInfo(descriptor),
                         name_resolver_, &variables_);
 }
@@ -618,6 +625,10 @@ RepeatedImmutablePrimitiveFieldLiteGenerator::
 ~RepeatedImmutablePrimitiveFieldLiteGenerator() {}
 
 int RepeatedImmutablePrimitiveFieldLiteGenerator::GetNumBitsForMessage() const {
+  return 0;
+}
+
+int RepeatedImmutablePrimitiveFieldLiteGenerator::GetNumBitsForBuilder() const {
   return 0;
 }
 

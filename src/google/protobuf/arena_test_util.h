@@ -48,8 +48,9 @@ void TestParseCorruptedString(const T& message) {
   for (int i = start; i < s.size(); i += stride) {
     for (int c = 1 + (i % 17); c < 256; c += 2 * c + (i & 3)) {
       s[i] ^= c;
-      Arena arena;
-      T* message = Arena::CreateMessage<T>(use_arena ? &arena : nullptr);
+      google::protobuf::Arena arena;
+      T* message =
+          google::protobuf::Arena::CreateMessage<T>(use_arena ? &arena : nullptr);
       if (message->ParseFromString(s)) {
         ++success_count;
       }
@@ -85,6 +86,6 @@ class NoHeapChecker {
 
 }  // namespace internal
 }  // namespace protobuf
-}  // namespace google
 
+}  // namespace google
 #endif  // GOOGLE_PROTOBUF_ARENA_TEST_UTIL_H__

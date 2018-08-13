@@ -51,8 +51,8 @@ public class DynamicMessageTest extends TestCase {
     new TestUtil.ReflectionTester(TestAllTypes.getDescriptor(), null);
 
   TestUtil.ReflectionTester extensionsReflectionTester =
-      new TestUtil.ReflectionTester(
-          TestAllExtensions.getDescriptor(), TestUtil.getFullExtensionRegistry());
+    new TestUtil.ReflectionTester(TestAllExtensions.getDescriptor(),
+                                  TestUtil.getExtensionRegistry());
   TestUtil.ReflectionTester packedReflectionTester =
     new TestUtil.ReflectionTester(TestPackedTypes.getDescriptor(), null);
 
@@ -194,9 +194,9 @@ public class DynamicMessageTest extends TestCase {
 
   public void testDynamicMessageExtensionParsing() throws Exception {
     ByteString rawBytes = TestUtil.getAllExtensionsSet().toByteString();
-    Message message =
-        DynamicMessage.parseFrom(
-            TestAllExtensions.getDescriptor(), rawBytes, TestUtil.getFullExtensionRegistry());
+    Message message = DynamicMessage.parseFrom(
+        TestAllExtensions.getDescriptor(), rawBytes,
+        TestUtil.getExtensionRegistry());
     extensionsReflectionTester.assertAllFieldsSetViaReflection(message);
 
     // Test Parser interface.

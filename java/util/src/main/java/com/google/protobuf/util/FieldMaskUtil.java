@@ -235,7 +235,7 @@ public class FieldMaskUtil {
   /**
    * Converts a FieldMask to its canonical form. In the canonical form of a
    * FieldMask, all field paths are sorted alphabetically and redundant field
-   * paths are removed.
+   * paths are moved.
    */
   public static FieldMask normalize(FieldMask mask) {
     return new FieldMaskTree(mask).toFieldMask();

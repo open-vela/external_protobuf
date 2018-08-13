@@ -1236,14 +1236,10 @@ public class JsonFormatTest extends TestCase {
     assertRoundTripEquals(message);
   }
 
-  // Regression test for b/73832901. Make sure html tags are escaped.
-  public void testHtmlEscape() throws Exception {
-    TestAllTypes message = TestAllTypes.newBuilder().setOptionalString("</script>").build();
-    assertEquals("{\n  \"optionalString\": \"\\u003c/script\\u003e\"\n}", toJsonString(message));
-
-    TestAllTypes.Builder builder = TestAllTypes.newBuilder();
-    JsonFormat.parser().merge(toJsonString(message), builder);
-    assertEquals(message.getOptionalString(), builder.getOptionalString());
+  public void testDefaultGsonDoesNotHtmlEscape() throws Exception {
+    TestAllTypes message = TestAllTypes.newBuilder().setOptionalString("=").build();
+    assertEquals(
+        "{\n" + "  \"optionalString\": \"=\"" + "\n}", JsonFormat.printer().print(message));
   }
 
   public void testIncludingDefaultValueFields() throws Exception {

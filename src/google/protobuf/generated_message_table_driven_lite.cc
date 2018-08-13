@@ -54,21 +54,23 @@ struct UnknownFieldHandlerLite {
                    io::CodedInputStream* input,
                    int tag) {
     GOOGLE_DCHECK(!table.unknown_field_set);
-    io::StringOutputStream unknown_fields_string(
+    ::google::protobuf::io::StringOutputStream unknown_fields_string(
         MutableUnknownFields(msg, table.arena_offset));
-    io::CodedOutputStream unknown_fields_stream(&unknown_fields_string, false);
+    ::google::protobuf::io::CodedOutputStream unknown_fields_stream(
+        &unknown_fields_string, false);
 
-    return internal::WireFormatLite::SkipField(input, tag,
-                                               &unknown_fields_stream);
+    return ::google::protobuf::internal::WireFormatLite::SkipField(
+        input, tag, &unknown_fields_stream);
   }
 
   static void Varint(MessageLite* msg, const ParseTable& table,
                      int tag, int value) {
     GOOGLE_DCHECK(!table.unknown_field_set);
 
-    io::StringOutputStream unknown_fields_string(
+    ::google::protobuf::io::StringOutputStream unknown_fields_string(
         MutableUnknownFields(msg, table.arena_offset));
-    io::CodedOutputStream unknown_fields_stream(&unknown_fields_string, false);
+    ::google::protobuf::io::CodedOutputStream unknown_fields_stream(
+        &unknown_fields_string, false);
     unknown_fields_stream.WriteVarint32(tag);
     unknown_fields_stream.WriteVarint32(value);
   }
@@ -84,9 +86,10 @@ struct UnknownFieldHandlerLite {
     const MessageLite* prototype = table.default_instance();
 
     GOOGLE_DCHECK(!table.unknown_field_set);
-    io::StringOutputStream unknown_fields_string(
+    ::google::protobuf::io::StringOutputStream unknown_fields_string(
         MutableUnknownFields(msg, table.arena_offset));
-    io::CodedOutputStream unknown_fields_stream(&unknown_fields_string, false);
+    ::google::protobuf::io::CodedOutputStream unknown_fields_stream(
+        &unknown_fields_string, false);
     return extensions->ParseField(
         tag, input, prototype, &unknown_fields_stream);
   }

@@ -38,6 +38,8 @@
 #include <string>
 
 #include <google/protobuf/compiler/code_generator.h>
+#include <google/protobuf/stubs/mutex.h>
+#include <google/protobuf/stubs/common.h>
 
 namespace google {
 namespace protobuf {
@@ -168,6 +170,6 @@ class LIBPROTOC_EXPORT Generator : public CodeGenerator {
 }  // namespace python
 }  // namespace compiler
 }  // namespace protobuf
-}  // namespace google
 
+}  // namespace google
 #endif  // GOOGLE_PROTOBUF_COMPILER_PYTHON_GENERATOR_H__

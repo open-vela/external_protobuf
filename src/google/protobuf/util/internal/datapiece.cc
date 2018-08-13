@@ -43,6 +43,8 @@ namespace protobuf {
 namespace util {
 namespace converter {
 
+using google::protobuf::EnumDescriptor;
+using google::protobuf::EnumValueDescriptor;
 ;
 ;
 ;
@@ -128,8 +130,7 @@ StatusOr<int32> DataPiece::ToInt32() const {
 }
 
 StatusOr<uint32> DataPiece::ToUint32() const {
-  if (type_ == TYPE_STRING)
-    return StringToNumber<uint32>(safe_strtou32);
+  if (type_ == TYPE_STRING) return StringToNumber<uint32>(safe_strtou32);
 
   if (type_ == TYPE_DOUBLE)
     return FloatingPointToIntConvertAndCheck<uint32, double>(double_);
@@ -153,8 +154,7 @@ StatusOr<int64> DataPiece::ToInt64() const {
 }
 
 StatusOr<uint64> DataPiece::ToUint64() const {
-  if (type_ == TYPE_STRING)
-    return StringToNumber<uint64>(safe_strtou64);
+  if (type_ == TYPE_STRING) return StringToNumber<uint64>(safe_strtou64);
 
   if (type_ == TYPE_DOUBLE)
     return FloatingPointToIntConvertAndCheck<uint64, double>(double_);
@@ -215,7 +215,7 @@ StatusOr<bool> DataPiece::ToBool() const {
 StatusOr<string> DataPiece::ToString() const {
   switch (type_) {
     case TYPE_STRING:
-      return string(str_);
+      return str_.ToString();
     case TYPE_BYTES: {
       string base64;
       Base64Escape(str_, &base64);
@@ -227,8 +227,7 @@ StatusOr<string> DataPiece::ToString() const {
   }
 }
 
-string DataPiece::ValueAsStringOrDefault(
-    StringPiece default_string) const {
+string DataPiece::ValueAsStringOrDefault(StringPiece default_string) const {
   switch (type_) {
     case TYPE_INT32:
       return SimpleItoa(i32_);
@@ -254,7 +253,7 @@ string DataPiece::ValueAsStringOrDefault(
     case TYPE_NULL:
       return "null";
     default:
-      return string(default_string);
+      return default_string.ToString();
   }
 }
 
@@ -274,13 +273,12 @@ StatusOr<string> DataPiece::ToBytes() const {
 
 StatusOr<int> DataPiece::ToEnum(const google::protobuf::Enum* enum_type,
                                 bool use_lower_camel_for_enums,
-                                bool ignore_unknown_enum_values,
-                                bool* is_unknown_enum_value) const {
+                                bool ignore_unknown_enum_values) const {
   if (type_ == TYPE_NULL) return google::protobuf::NULL_VALUE;
 
   if (type_ == TYPE_STRING) {
     // First try the given value as a name.
-    string enum_name = string(str_);
+    string enum_name = str_.ToString();
     const google::protobuf::EnumValue* value =
         FindEnumValueByNameOrNull(enum_type, enum_name);
     if (value != nullptr) return value->number();
@@ -309,11 +307,9 @@ StatusOr<int> DataPiece::ToEnum(const google::protobuf::Enum* enum_type,
       if (value != nullptr) return value->number();
     }
 
-    // If ignore_unknown_enum_values is true an unknown enum value is ignored.
-    if (ignore_unknown_enum_values) {
-      *is_unknown_enum_value = true;
-      return enum_type->enumvalue(0).number();
-    }
+    // If ignore_unknown_enum_values is true an unknown enum value is treated
+    // as the default
+    if (ignore_unknown_enum_values) return enum_type->enumvalue(0).number();
   } else {
     // We don't need to check whether the value is actually declared in the
     // enum because we preserve unknown enum values as well.
@@ -346,14 +342,13 @@ StatusOr<To> DataPiece::GenericConvert() const {
 }
 
 template <typename To>
-StatusOr<To> DataPiece::StringToNumber(bool (*func)(StringPiece,
-                                                    To*)) const {
+StatusOr<To> DataPiece::StringToNumber(bool (*func)(StringPiece, To*)) const {
   if (str_.size() > 0 && (str_[0] == ' ' || str_[str_.size() - 1] == ' ')) {
     return InvalidArgument(StrCat("\"", str_, "\""));
   }
   To result;
   if (func(str_, &result)) return result;
-  return InvalidArgument(StrCat("\"", string(str_), "\""));
+  return InvalidArgument(StrCat("\"", str_.ToString(), "\""));
 }
 
 bool DataPiece::DecodeBase64(StringPiece src, string* dest) const {

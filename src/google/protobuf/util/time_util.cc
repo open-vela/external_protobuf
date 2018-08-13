@@ -38,8 +38,6 @@
 #include <google/protobuf/timestamp.pb.h>
 
 
-#include <google/protobuf/port_def.inc>
-
 namespace google {
 namespace protobuf {
 namespace util {
@@ -370,13 +368,12 @@ timeval TimeUtil::DurationToTimeval(const Duration& value) {
 
 }  // namespace util
 }  // namespace protobuf
-}  // namespace google
 
-namespace google {
+
 namespace protobuf {
 namespace {
-using ::GOOGLE_PROTOBUF_NAMESPACE_ID::util::CreateNormalized;
-using ::GOOGLE_PROTOBUF_NAMESPACE_ID::util::kNanosPerSecond;
+using google::protobuf::util::kNanosPerSecond;
+using google::protobuf::util::CreateNormalized;
 
 // Convert a Duration to uint128.
 void ToUint128(const Duration& value, uint128* result, bool* negative) {
@@ -392,8 +389,7 @@ void ToUint128(const Duration& value, uint128* result, bool* negative) {
 }
 
 void ToDuration(const uint128& value, bool negative, Duration* duration) {
-  int64 seconds =
-      static_cast<int64>(Uint128Low64(value / kNanosPerSecond));
+  int64 seconds = static_cast<int64>(Uint128Low64(value / kNanosPerSecond));
   int32 nanos = static_cast<int32>(Uint128Low64(value % kNanosPerSecond));
   if (negative) {
     seconds = -seconds;
@@ -505,4 +501,5 @@ Duration operator-(const Timestamp& t1, const Timestamp& t2) {
                                     t1.nanos() - t2.nanos());
 }
 }  // namespace protobuf
+
 }  // namespace google
