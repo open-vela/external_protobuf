@@ -290,9 +290,7 @@ jspb.BinaryReader.prototype.nextField = function() {
       nextWireType != jspb.BinaryConstants.WireType.DELIMITED &&
       nextWireType != jspb.BinaryConstants.WireType.START_GROUP &&
       nextWireType != jspb.BinaryConstants.WireType.END_GROUP) {
-    goog.asserts.fail(
-        'Invalid wire type: %s (at position %s)', nextWireType,
-        this.fieldCursor_);
+    goog.asserts.fail('Invalid wire type');
     this.error_ = true;
     return false;
   }

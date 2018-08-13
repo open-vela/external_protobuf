@@ -30,8 +30,6 @@
 
 package com.google.protobuf;
 
-import static com.google.protobuf.Internal.checkNotNull;
-
 /**
  * {@code SingleFieldBuilder} implements a structure that a protocol
  * message uses to hold a single field of another protocol message. It supports
@@ -86,7 +84,10 @@ public class SingleFieldBuilder
       MType message,
       GeneratedMessage.BuilderParent parent,
       boolean isClean) {
-    this.message = checkNotNull(message);
+    if (message == null) {
+      throw new NullPointerException();
+    }
+    this.message = message;
     this.parent = parent;
     this.isClean = isClean;
   }
@@ -168,7 +169,10 @@ public class SingleFieldBuilder
    */
   public SingleFieldBuilder<MType, BType, IType> setMessage(
       MType message) {
-    this.message = checkNotNull(message);
+    if (message == null) {
+      throw new NullPointerException();
+    }
+    this.message = message;
     if (builder != null) {
       builder.dispose();
       builder = null;

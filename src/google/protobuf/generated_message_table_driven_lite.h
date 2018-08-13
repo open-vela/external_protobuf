@@ -104,14 +104,15 @@ inline Type* AddField(MessageLite* msg, int64 offset) {
                 std::is_same<Type, InlinedStringField>::value,
                 "Do not assign");
 
-  RepeatedField<Type>* repeated = Raw<RepeatedField<Type>>(msg, offset);
+  google::protobuf::RepeatedField<Type>* repeated =
+      Raw<google::protobuf::RepeatedField<Type> >(msg, offset);
   return repeated->Add();
 }
 
 template <>
 inline string* AddField<string>(MessageLite* msg, int64 offset) {
-  RepeatedPtrField<string>* repeated =
-      Raw<RepeatedPtrField<string>>(msg, offset);
+  google::protobuf::RepeatedPtrField<string>* repeated =
+      Raw<google::protobuf::RepeatedPtrField<string> >(msg, offset);
   return repeated->Add();
 }
 
@@ -167,7 +168,7 @@ inline void ClearOneofField(const ParseTableField& field, Arena* arena,
     case WireFormatLite::TYPE_STRING:
     case WireFormatLite::TYPE_BYTES:
       Raw<ArenaStringPtr>(msg, field.offset)
-          ->Destroy(&GetEmptyStringAlreadyInited(), arena);
+          ->Destroy(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), arena);
       break;
 
     case TYPE_STRING_INLINED:
@@ -431,7 +432,8 @@ bool MergePartialFromCodedStreamImpl(MessageLite* msg, const ParseTable& table,
     break;                                                                     \
   }                                                                            \
   case (WireFormatLite::TYPE_##TYPE) | kRepeatedMask: {                        \
-    RepeatedField<CPPTYPE>* values = Raw<RepeatedField<CPPTYPE>>(msg, offset); \
+    google::protobuf::RepeatedField<CPPTYPE>* values =                                   \
+        Raw<google::protobuf::RepeatedField<CPPTYPE> >(msg, offset);                     \
     if (GOOGLE_PREDICT_FALSE((!WireFormatLite::ReadRepeatedPrimitive<            \
                             CPPTYPE, WireFormatLite::TYPE_##TYPE>(             \
             data->tag_size, tag, input, values)))) {                           \
@@ -676,7 +678,8 @@ bool MergePartialFromCodedStreamImpl(MessageLite* msg, const ParseTable& table,
             const MessageLite* prototype =
                 table.aux[field_number].messages.default_message();
             if (prototype == NULL) {
-              prototype = ImplicitWeakMessage::default_instance();
+              prototype =
+                  ::google::protobuf::internal::ImplicitWeakMessage::default_instance();
             }
             submsg = prototype->New(arena);
             *submsg_holder = submsg;
@@ -695,7 +698,8 @@ bool MergePartialFromCodedStreamImpl(MessageLite* msg, const ParseTable& table,
           const MessageLite* prototype =
               table.aux[field_number].messages.default_message();
           if (prototype == NULL) {
-            prototype = ImplicitWeakMessage::default_instance();
+            prototype =
+                ::google::protobuf::internal::ImplicitWeakMessage::default_instance();
           }
 
           MessageLite* submsg =
@@ -768,15 +772,16 @@ bool MergePartialFromCodedStreamImpl(MessageLite* msg, const ParseTable& table,
       // Mask out kRepeatedMask bit, allowing the jump table to be smaller.
       switch (static_cast<WireFormatLite::FieldType>(
           processing_type ^ kRepeatedMask)) {
-#define HANDLE_PACKED_TYPE(TYPE, CPPTYPE, CPPTYPE_METHOD)                      \
-  case WireFormatLite::TYPE_##TYPE: {                                          \
-    RepeatedField<CPPTYPE>* values = Raw<RepeatedField<CPPTYPE>>(msg, offset); \
-    if (GOOGLE_PREDICT_FALSE(                                                    \
-            (!WireFormatLite::ReadPackedPrimitive<                             \
-                CPPTYPE, WireFormatLite::TYPE_##TYPE>(input, values)))) {      \
-      return false;                                                            \
-    }                                                                          \
-    break;                                                                     \
+#define HANDLE_PACKED_TYPE(TYPE, CPPTYPE, CPPTYPE_METHOD)                 \
+  case WireFormatLite::TYPE_##TYPE: {                                     \
+    google::protobuf::RepeatedField<CPPTYPE>* values =                              \
+        Raw<google::protobuf::RepeatedField<CPPTYPE> >(msg, offset);                \
+    if (GOOGLE_PREDICT_FALSE(                                               \
+            (!WireFormatLite::ReadPackedPrimitive<                        \
+                CPPTYPE, WireFormatLite::TYPE_##TYPE>(input, values)))) { \
+      return false;                                                       \
+    }                                                                     \
+    break;                                                                \
   }
 
         HANDLE_PACKED_TYPE(INT32, int32, Int32)
@@ -808,13 +813,14 @@ bool MergePartialFromCodedStreamImpl(MessageLite* msg, const ParseTable& table,
 
           AuxillaryParseTableField::EnumValidator validator =
               table.aux[field_number].enums.validator;
-          RepeatedField<int>* values = Raw<RepeatedField<int>>(msg, offset);
+          google::protobuf::RepeatedField<int>* values =
+              Raw<google::protobuf::RepeatedField<int> >(msg, offset);
 
           io::CodedInputStream::Limit limit = input->PushLimit(length);
           while (input->BytesUntilLimit() > 0) {
             int value;
             if (GOOGLE_PREDICT_FALSE(
-                    (!WireFormatLite::ReadPrimitive<
+                    (!google::protobuf::internal::WireFormatLite::ReadPrimitive<
                         int, WireFormatLite::TYPE_ENUM>(input, &value)))) {
               return false;
             }
@@ -862,6 +868,6 @@ bool MergePartialFromCodedStreamImpl(MessageLite* msg, const ParseTable& table,
 
 }  // namespace internal
 }  // namespace protobuf
-}  // namespace google
 
+}  // namespace google
 #endif  // GOOGLE_PROTOBUF_GENERATED_MESSAGE_TABLE_DRIVEN_LITE_H__

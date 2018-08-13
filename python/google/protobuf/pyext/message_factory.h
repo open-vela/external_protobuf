@@ -33,7 +33,7 @@
 
 #include <Python.h>
 
-#include <unordered_map>
+#include <google/protobuf/stubs/hash.h>
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/pyext/descriptor_pool.h>
 
@@ -66,8 +66,7 @@ struct PyMessageFactory {
   //
   // Descriptor pointers stored here are owned by the DescriptorPool above.
   // Python references to classes are owned by this PyDescriptorPool.
-  typedef std::unordered_map<const Descriptor*, CMessageClass*>
-      ClassesByMessageMap;
+  typedef hash_map<const Descriptor*, CMessageClass*> ClassesByMessageMap;
   ClassesByMessageMap* classes_by_descriptor;
 };
 
@@ -99,6 +98,6 @@ bool InitMessageFactory();
 
 }  // namespace python
 }  // namespace protobuf
-}  // namespace google
 
+}  // namespace google
 #endif  // GOOGLE_PROTOBUF_PYTHON_CPP_MESSAGE_FACTORY_H__
