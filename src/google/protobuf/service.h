@@ -104,10 +104,6 @@
 #include <google/protobuf/stubs/common.h>
 #include <google/protobuf/stubs/callback.h>
 
-#ifdef SWIG
-#error "You cannot SWIG proto headers"
-#endif
-
 namespace google {
 namespace protobuf {
 
@@ -291,6 +287,6 @@ class LIBPROTOBUF_EXPORT RpcChannel {
 };
 
 }  // namespace protobuf
-}  // namespace google
 
+}  // namespace google
 #endif  // GOOGLE_PROTOBUF_SERVICE_H__

@@ -39,8 +39,6 @@
 #include <google/protobuf/field_mask.pb.h>
 #include <google/protobuf/stubs/stringpiece.h>
 
-#include <google/protobuf/port_def.inc>
-
 namespace google {
 namespace protobuf {
 namespace util {
@@ -102,8 +100,7 @@ class LIBPROTOBUF_EXPORT FieldMaskUtil {
     return out;
   }
   template <typename T>
-  GOOGLE_PROTOBUF_DEPRECATED_MSG(
-      "Use *out = GetFieldMaskForAllFields() instead")
+  PROTOBUF_RUNTIME_DEPRECATED("Use *out = GetFieldMaskForAllFields() instead")
   static void GetFieldMaskForAllFields(FieldMask* out) {
     InternalGetFieldMaskForAllFields(T::descriptor(), out);
   }
@@ -137,21 +134,21 @@ class LIBPROTOBUF_EXPORT FieldMaskUtil {
   static bool IsPathInFieldMask(StringPiece path, const FieldMask& mask);
 
   class MergeOptions;
-  // Merges fields specified in a FieldMask into another message.
+  // Merges fields specified in a FieldMask into another message. See the
+  // comments in MergeOptions regarding compatibility with
+  // google/protobuf/field_mask.proto
   static void MergeMessageTo(const Message& source, const FieldMask& mask,
                              const MergeOptions& options, Message* destination);
 
   class TrimOptions;
   // Removes from 'message' any field that is not represented in the given
   // FieldMask. If the FieldMask is empty, does nothing.
-  // Returns true if the message is modified.
-  static bool TrimMessage(const FieldMask& mask, Message* message);
+  static void TrimMessage(const FieldMask& mask, Message* message);
 
   // Removes from 'message' any field that is not represented in the given
   // FieldMask with customized TrimOptions.
   // If the FieldMask is empty, does nothing.
-  // Returns true if the message is modified.
-  static bool TrimMessage(const FieldMask& mask, Message* message,
+  static void TrimMessage(const FieldMask& mask, Message* message,
                           const TrimOptions& options);
 
  private:
@@ -192,6 +189,10 @@ class LIBPROTOBUF_EXPORT FieldMaskUtil {
                                FieldMask* out);
 };
 
+// Note that for compatibility with the defined behaviour for FieldMask in
+// google/protobuf/field_mask.proto, set replace_message_fields and
+// replace_repeated_fields to 'true'. The default options are not compatible
+// with google/protobuf/field_mask.proto.
 class LIBPROTOBUF_EXPORT FieldMaskUtil::MergeOptions {
  public:
   MergeOptions()
@@ -239,8 +240,6 @@ class LIBPROTOBUF_EXPORT FieldMaskUtil::TrimOptions {
 
 }  // namespace util
 }  // namespace protobuf
+
 }  // namespace google
-
-#include <google/protobuf/port_undef.inc>
-
 #endif  // GOOGLE_PROTOBUF_UTIL_FIELD_MASK_UTIL_H__

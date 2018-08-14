@@ -591,8 +591,8 @@ public class GeneratedMessageTest extends TestCase {
   // Extensions.
 
   TestUtil.ReflectionTester extensionsReflectionTester =
-      new TestUtil.ReflectionTester(
-          TestAllExtensions.getDescriptor(), TestUtil.getFullExtensionRegistry());
+    new TestUtil.ReflectionTester(TestAllExtensions.getDescriptor(),
+                                  TestUtil.getExtensionRegistry());
 
   public void testExtensionMessageOrBuilder() throws Exception {
     TestAllExtensions.Builder builder = TestAllExtensions.newBuilder();

@@ -93,8 +93,7 @@ class LIBPROTOBUF_EXPORT ObjectWriter {
   virtual ObjectWriter* RenderFloat(StringPiece name, float value) = 0;
 
   // Renders a StringPiece value. This is for rendering strings.
-  virtual ObjectWriter* RenderString(StringPiece name,
-                                     StringPiece value) = 0;
+  virtual ObjectWriter* RenderString(StringPiece name, StringPiece value) = 0;
 
   // Renders a bytes value.
   virtual ObjectWriter* RenderBytes(StringPiece name, StringPiece value) = 0;
@@ -135,6 +134,6 @@ class LIBPROTOBUF_EXPORT ObjectWriter {
 }  // namespace converter
 }  // namespace util
 }  // namespace protobuf
-}  // namespace google
 
+}  // namespace google
 #endif  // GOOGLE_PROTOBUF_UTIL_CONVERTER_OBJECT_WRITER_H__

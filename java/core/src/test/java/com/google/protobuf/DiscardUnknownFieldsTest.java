@@ -62,17 +62,22 @@ public class DiscardUnknownFieldsTest {
   }
 
   private static void testProto2Message(Message message) throws Exception {
-    assertUnknownFieldsPreserved(message);
+    assertUnknownFieldsDefaultPreserved(message);
     assertUnknownFieldsExplicitlyDiscarded(message);
     assertReuseCodedInputStreamPreserve(message);
     assertUnknownFieldsInUnknownFieldSetArePreserve(message);
   }
 
   private static void testProto3Message(Message message) throws Exception {
-    assertUnknownFieldsPreserved(message);
+    CodedInputStream.setProto3KeepUnknownsByDefaultForTest();
+    assertUnknownFieldsDefaultPreserved(message);
     assertUnknownFieldsExplicitlyDiscarded(message);
     assertReuseCodedInputStreamPreserve(message);
     assertUnknownFieldsInUnknownFieldSetArePreserve(message);
+    CodedInputStream.setProto3DiscardUnknownsByDefaultForTest();
+    assertUnknownFieldsDefaultDiscarded(message);
+    assertUnknownFieldsExplicitlyDiscarded(message);
+    assertUnknownFieldsInUnknownFieldSetAreDiscarded(message);
   }
 
   private static void assertReuseCodedInputStreamPreserve(Message message) throws Exception {
@@ -117,7 +122,7 @@ public class DiscardUnknownFieldsTest {
     assertEquals(message.getClass().getName(), 0, built.getSerializedSize());
   }
 
-  private static void assertUnknownFieldsPreserved(MessageLite message) throws Exception {
+  private static void assertUnknownFieldsDefaultPreserved(MessageLite message) throws Exception {
     {
       MessageLite parsed = message.getParserForType().parseFrom(payload);
       assertEquals(message.getClass().getName(), payload, parsed.toByteString());
@@ -126,6 +131,18 @@ public class DiscardUnknownFieldsTest {
     {
       MessageLite parsed = message.newBuilderForType().mergeFrom(payload).build();
       assertEquals(message.getClass().getName(), payload, parsed.toByteString());
+    }
+  }
+
+  private static void assertUnknownFieldsDefaultDiscarded(MessageLite message) throws Exception {
+    {
+      MessageLite parsed = message.getParserForType().parseFrom(payload);
+      assertEquals(message.getClass().getName(), 0, parsed.getSerializedSize());
+    }
+
+    {
+      MessageLite parsed = message.newBuilderForType().mergeFrom(payload).build();
+      assertEquals(message.getClass().getName(), 0, parsed.getSerializedSize());
     }
   }
 

@@ -51,8 +51,23 @@ namespace python {
 typedef struct ExtensionDict {
   PyObject_HEAD;
 
-  // Strong, owned reference to the parent message. Never NULL.
+  // This is the top-level C++ Message object that owns the whole
+  // proto tree.  Every Python container class holds a
+  // reference to it in order to keep it alive as long as there's a
+  // Python object that references any part of the tree.
+  CMessage::OwnerRef owner;
+
+  // Weak reference to parent message. Used to make sure
+  // the parent is writable when an extension field is modified.
   CMessage* parent;
+
+  // Pointer to the C++ Message that this ExtensionDict extends.
+  // Not owned by us.
+  Message* message;
+
+  // A dict of child messages, indexed by Extension descriptors.
+  // Similar to CMessage::composite_fields.
+  PyObject* values;
 } ExtensionDict;
 
 extern PyTypeObject ExtensionDict_Type;
@@ -65,6 +80,6 @@ ExtensionDict* NewExtensionDict(CMessage *parent);
 }  // namespace extension_dict
 }  // namespace python
 }  // namespace protobuf
-}  // namespace google
 
+}  // namespace google
 #endif  // GOOGLE_PROTOBUF_PYTHON_CPP_EXTENSION_DICT_H__

@@ -42,8 +42,7 @@ import java.util.RandomAccess;
  *
  * @author dweis@google.com (Daniel Weis)
  */
-final class DoubleArrayList
-    extends AbstractProtobufList<Double>
+final class DoubleArrayList extends AbstractProtobufList<Double>
     implements DoubleList, RandomAccess, PrimitiveNonBoxingCollection {
 
   private static final DoubleArrayList EMPTY_LIST = new DoubleArrayList();

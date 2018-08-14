@@ -35,6 +35,7 @@
 #include <google/protobuf/compiler/java/java_message_builder.h>
 
 #include <algorithm>
+#include <google/protobuf/stubs/hash.h>
 #include <map>
 #include <memory>
 #include <vector>
@@ -50,8 +51,8 @@
 #include <google/protobuf/io/coded_stream.h>
 #include <google/protobuf/io/printer.h>
 #include <google/protobuf/wire_format.h>
-#include <google/protobuf/stubs/strutil.h>
 #include <google/protobuf/stubs/substitute.h>
+#include <google/protobuf/stubs/strutil.h>
 
 
 namespace google {
@@ -125,8 +126,7 @@ Generate(io::Printer* printer) {
         descriptor_->oneof_decl(i))->name;
     vars["oneof_capitalized_name"] = context_->GetOneofGeneratorInfo(
         descriptor_->oneof_decl(i))->capitalized_name;
-    vars["oneof_index"] =
-        SimpleItoa(descriptor_->oneof_decl(i)->index());
+    vars["oneof_index"] = SimpleItoa(descriptor_->oneof_decl(i)->index());
     // oneofCase_ and oneof_
     printer->Print(vars,
       "private int $oneof_name$Case_ = 0;\n"
@@ -169,6 +169,8 @@ Generate(io::Printer* printer) {
                      .GenerateBuilderMembers(printer);
   }
 
+  bool is_proto3 =
+      descriptor_->file()->syntax() == FileDescriptor::SYNTAX_PROTO3;
     // Override methods declared in GeneratedMessage to return the concrete
     // generated type so callsites won't depend on GeneratedMessage. This
     // is needed to keep binary compatibility when we change generated code
@@ -178,7 +180,7 @@ Generate(io::Printer* printer) {
     "@java.lang.Override\n"
     "public final Builder setUnknownFields(\n"
     "    final com.google.protobuf.UnknownFieldSet unknownFields) {\n"
-    "  return super.setUnknownFields(unknownFields);\n"
+    "  return super.setUnknownFields$suffix$(unknownFields);\n"
     "}\n"
     "\n"
     "@java.lang.Override\n"
@@ -186,7 +188,8 @@ Generate(io::Printer* printer) {
     "    final com.google.protobuf.UnknownFieldSet unknownFields) {\n"
     "  return super.mergeUnknownFields(unknownFields);\n"
     "}\n"
-    "\n");
+    "\n",
+    "suffix", is_proto3 ? "Proto3" : "");
 
   printer->Print(
     "\n"
@@ -231,10 +234,10 @@ GenerateDescriptorMethods(io::Printer* printer) {
       const FieldDescriptor* field = map_fields[i];
       const FieldGeneratorInfo* info = context_->GetFieldGeneratorInfo(field);
       printer->Print(
-          "case $number$:\n"
-          "  return internalGet$capitalized_name$();\n",
-          "number", SimpleItoa(field->number()), "capitalized_name",
-          info->capitalized_name);
+        "case $number$:\n"
+        "  return internalGet$capitalized_name$();\n",
+        "number", SimpleItoa(field->number()),
+        "capitalized_name", info->capitalized_name);
     }
     printer->Print(
         "default:\n"
@@ -257,10 +260,10 @@ GenerateDescriptorMethods(io::Printer* printer) {
       const FieldGeneratorInfo* info =
           context_->GetFieldGeneratorInfo(field);
       printer->Print(
-          "case $number$:\n"
-          "  return internalGetMutable$capitalized_name$();\n",
-          "number", SimpleItoa(field->number()), "capitalized_name",
-          info->capitalized_name);
+        "case $number$:\n"
+        "  return internalGetMutable$capitalized_name$();\n",
+        "number", SimpleItoa(field->number()),
+        "capitalized_name", info->capitalized_name);
     }
     printer->Print(
         "default:\n"
@@ -683,9 +686,10 @@ void MessageBuilderGenerator::GenerateIsInitialized(
             const OneofDescriptor* oneof = field->containing_oneof();
             const OneofGeneratorInfo* oneof_info =
                 context_->GetOneofGeneratorInfo(oneof);
-            printer->Print("if ($oneof_name$Case_ == $field_number$) {\n",
-                           "oneof_name", oneof_info->name, "field_number",
-                           SimpleItoa(field->number()));
+            printer->Print(
+              "if ($oneof_name$Case_ == $field_number$) {\n",
+              "oneof_name", oneof_info->name,
+              "field_number", SimpleItoa(field->number()));
           } else {
             printer->Print(
               "if (has$name$()) {\n",

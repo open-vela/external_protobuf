@@ -45,7 +45,7 @@ class Singleton {
   }
   static void ShutDown() {
     delete instance_;
-    instance_ = nullptr;
+    instance_ = NULL;
   }
  private:
   static void Init() {
@@ -59,7 +59,7 @@ template<typename T>
 ProtobufOnceType Singleton<T>::once_;
 
 template<typename T>
-T* Singleton<T>::instance_ = nullptr;
+T* Singleton<T>::instance_ = NULL;
 }  // namespace internal
 }  // namespace protobuf
 }  // namespace google

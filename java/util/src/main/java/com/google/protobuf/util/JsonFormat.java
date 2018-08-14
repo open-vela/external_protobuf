@@ -611,7 +611,7 @@ public class JsonFormat {
     private final CharSequence blankOrNewLine;
 
     private static class GsonHolder {
-      private static final Gson DEFAULT_GSON = new GsonBuilder().create();
+      private static final Gson DEFAULT_GSON = new GsonBuilder().disableHtmlEscaping().create();
     }
 
     PrinterImpl(

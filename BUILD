@@ -111,7 +111,7 @@ cc_library(
         "src/google/protobuf/stubs/time.cc",
         "src/google/protobuf/wire_format_lite.cc",
     ],
-    hdrs = glob(["src/google/protobuf/**/*.h", "src/google/protobuf/**/*.inc"]),
+    hdrs = glob(["src/google/protobuf/**/*.h"]),
     copts = COPTS,
     includes = ["src/"],
     linkopts = LINK_OPTS,
@@ -178,7 +178,7 @@ cc_library(
         "src/google/protobuf/wire_format.cc",
         "src/google/protobuf/wrappers.pb.cc",
     ],
-    hdrs = glob(["src/**/*.h", "src/**/*.inc"]),
+    hdrs = glob(["src/**/*.h"]),
     copts = COPTS,
     includes = ["src/"],
     linkopts = LINK_OPTS,
@@ -356,13 +356,30 @@ cc_library(
         "src/google/protobuf/compiler/plugin.pb.cc",
         "src/google/protobuf/compiler/python/python_generator.cc",
         "src/google/protobuf/compiler/ruby/ruby_generator.cc",
-        "src/google/protobuf/compiler/scc.cc",
         "src/google/protobuf/compiler/subprocess.cc",
         "src/google/protobuf/compiler/zip_writer.cc",
     ],
     copts = COPTS,
     includes = ["src/"],
-    linkopts = LINK_OPTS,
+    linkopts = LINK_OPTS + select({
+        ":msvc": [
+            # Linking to setargv.obj makes the default command line argument
+            # parser expand wildcards, so the main method's argv will contain the
+            # expanded list instead of the wildcards.
+            #
+            # Adding dummy "-DEFAULTLIB:kernel32.lib", because:
+            # - Microsoft ships this object file next to default libraries
+            # - but this file is not a library, just a precompiled object
+            # - "-WHOLEARCHIVE" and "-DEFAULTLIB" only accept library,
+            #   not precompiled object.
+            # - Bazel would assume linkopt that does not start with "-" or "$"
+            #   as a label to a target, so we add a harmless "-DEFAULTLIB:kernel32.lib"
+            #   before "setargv.obj".
+            # See https://msdn.microsoft.com/en-us/library/8bch7bkk.aspx
+            "-DEFAULTLIB:kernel32.lib setargv.obj",
+        ],
+        "//conditions:default": [],
+    }),
     visibility = ["//visibility:public"],
     deps = [":protobuf"],
 )
@@ -419,7 +436,6 @@ RELATIVE_TEST_PROTOS = [
     "google/protobuf/unittest_optimize_for.proto",
     "google/protobuf/unittest_preserve_unknown_enum.proto",
     "google/protobuf/unittest_preserve_unknown_enum2.proto",
-    "google/protobuf/unittest_proto3.proto",
     "google/protobuf/unittest_proto3_arena.proto",
     "google/protobuf/unittest_proto3_arena_lite.proto",
     "google/protobuf/unittest_proto3_lite.proto",
@@ -435,7 +451,6 @@ RELATIVE_TEST_PROTOS = [
     "google/protobuf/util/internal/testdata/struct.proto",
     "google/protobuf/util/internal/testdata/timestamp_duration.proto",
     "google/protobuf/util/internal/testdata/wrappers.proto",
-    "google/protobuf/util/json_format.proto",
     "google/protobuf/util/json_format_proto3.proto",
     "google/protobuf/util/message_differencer_unittest.proto",
 ]
@@ -530,7 +545,6 @@ cc_test(
         "src/google/protobuf/proto3_arena_lite_unittest.cc",
         "src/google/protobuf/proto3_arena_unittest.cc",
         "src/google/protobuf/proto3_lite_unittest.cc",
-        "src/google/protobuf/proto3_lite_unittest.inc",
         "src/google/protobuf/reflection_ops_unittest.cc",
         "src/google/protobuf/repeated_field_reflection_unittest.cc",
         "src/google/protobuf/repeated_field_unittest.cc",
