@@ -30,6 +30,7 @@
 
 // Author: kenton@google.com (Kenton Varda)
 
+#include <google/protobuf/message_lite.h>  // TODO(gerbens) ideally remove this.
 #include <google/protobuf/stubs/common.h>
 #include <google/protobuf/stubs/once.h>
 #include <google/protobuf/stubs/status.h>
@@ -175,12 +176,12 @@ void NullLogHandler(LogLevel /* level */, const char* /* filename */,
 static LogHandler* log_handler_ = &DefaultLogHandler;
 static int log_silencer_count_ = 0;
 
-static Mutex* log_silencer_count_mutex_ = nullptr;
+static Mutex* log_silencer_count_mutex_ = NULL;
 GOOGLE_PROTOBUF_DECLARE_ONCE(log_silencer_count_init_);
 
 void DeleteLogSilencerCount() {
   delete log_silencer_count_mutex_;
-  log_silencer_count_mutex_ = nullptr;
+  log_silencer_count_mutex_ = NULL;
 }
 void InitLogSilencerCount() {
   log_silencer_count_mutex_ = new Mutex;
@@ -281,9 +282,9 @@ void LogFinisher::operator=(LogMessage& other) {
 LogHandler* SetLogHandler(LogHandler* new_func) {
   LogHandler* old = internal::log_handler_;
   if (old == &internal::NullLogHandler) {
-    old = nullptr;
+    old = NULL;
   }
-  if (new_func == nullptr) {
+  if (new_func == NULL) {
     internal::log_handler_ = &internal::NullLogHandler;
   } else {
     internal::log_handler_ = new_func;

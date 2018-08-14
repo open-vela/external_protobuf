@@ -299,22 +299,20 @@ public class BooleanArrayListTest extends TestCase {
   }
 
   public void testRemoveEndOfCapacity() {
-    BooleanList toRemove =
-        BooleanArrayList.emptyList().mutableCopyWithCapacity(1);
+    BooleanList toRemove = BooleanArrayList.emptyList().mutableCopyWithCapacity(1);
     toRemove.addBoolean(true);
     toRemove.remove(0);
     assertEquals(0, toRemove.size());
   }
 
   public void testSublistRemoveEndOfCapacity() {
-    BooleanList toRemove =
-        BooleanArrayList.emptyList().mutableCopyWithCapacity(1);
+    BooleanList toRemove = BooleanArrayList.emptyList().mutableCopyWithCapacity(1);
     toRemove.addBoolean(true);
     toRemove.subList(0, 1).clear();
     assertEquals(0, toRemove.size());
   }
 
-  private void assertImmutable(BooleanList list) {
+  private void assertImmutable(BooleanArrayList list) {
 
     try {
       list.add(true);

@@ -123,10 +123,6 @@ class GeneratedMessageReflection;
 // Defined in command_line_interface.cc
 namespace compiler {
 class CommandLineInterface;
-namespace cpp {
-// Defined in helpers.h
-class Formatter;
-}  // namespace cpp
 }  // namespace compiler
 
 namespace descriptor_unittest {
@@ -214,7 +210,7 @@ class LIBPROTOBUF_EXPORT LazyDescriptor {
 
   const Descriptor* descriptor_;
   const string* name_;
-  internal::once_flag* once_;
+  GoogleOnceDynamic* once_;
   const FileDescriptor* file_;
 };
 }  // namespace internal
@@ -249,8 +245,9 @@ class LIBPROTOBUF_EXPORT Descriptor {
 
   // Get options for this message type.  These are specified in the .proto file
   // by placing lines like "option foo = 1234;" in the message definition.
-  // Allowed options are defined by MessageOptions in descriptor.proto, and any
-  // available extensions of that message.
+  // Allowed options are defined by MessageOptions in
+  // google/protobuf/descriptor.proto, and any available extensions of that
+  // message.
   const MessageOptions& options() const;
 
   // Write the contents of this Descriptor into the given DescriptorProto.
@@ -423,11 +420,10 @@ class LIBPROTOBUF_EXPORT Descriptor {
   typedef MessageOptions OptionsType;
 
   // Allows tests to test CopyTo(proto, true).
-  friend class descriptor_unittest::DescriptorTest;
+  friend class ::google::protobuf::descriptor_unittest::DescriptorTest;
 
   // Allows access to GetLocationPath for annotations.
-  friend class io::Printer;
-  friend class compiler::cpp::Formatter;
+  friend class ::google::protobuf::io::Printer;
 
   // Fill the json_name field of FieldDescriptorProto.
   void CopyJsonNameTo(DescriptorProto* proto) const;
@@ -687,8 +683,9 @@ class LIBPROTOBUF_EXPORT FieldDescriptor {
   // Get the FieldOptions for this field.  This includes things listed in
   // square brackets after the field definition.  E.g., the field:
   //   optional string text = 1 [ctype=CORD];
-  // has the "ctype" option set.  Allowed options are defined by FieldOptions in
-  // descriptor.proto, and any available extensions of that message.
+  // has the "ctype" option set.  Allowed options are defined by FieldOptions
+  // in google/protobuf/descriptor.proto, and any available extensions of that
+  // message.
   const FieldOptions& options() const;
 
   // See Descriptor::CopyTo().
@@ -723,8 +720,7 @@ class LIBPROTOBUF_EXPORT FieldDescriptor {
   typedef FieldOptions OptionsType;
 
   // Allows access to GetLocationPath for annotations.
-  friend class io::Printer;
-  friend class compiler::cpp::Formatter;
+  friend class ::google::protobuf::io::Printer;
 
   // Fill the json_name field of FieldDescriptorProto.
   void CopyJsonNameTo(FieldDescriptorProto* proto) const;
@@ -757,7 +753,7 @@ class LIBPROTOBUF_EXPORT FieldDescriptor {
   // Otherwise, it has the same value as camelcase_name_.
   const string* json_name_;
   const FileDescriptor* file_;
-  internal::once_flag* type_once_;
+  GoogleOnceDynamic* type_once_;
   static void TypeOnceInit(const FieldDescriptor* to_init);
   void InternalTypeOnceInit() const;
   mutable Type type_;
@@ -854,8 +850,7 @@ class LIBPROTOBUF_EXPORT OneofDescriptor {
   typedef OneofOptions OptionsType;
 
   // Allows access to GetLocationPath for annotations.
-  friend class io::Printer;
-  friend class compiler::cpp::Formatter;
+  friend class ::google::protobuf::io::Printer;
 
   // See Descriptor::DebugString().
   void DebugString(int depth, string* contents,
@@ -920,8 +915,8 @@ class LIBPROTOBUF_EXPORT EnumDescriptor {
 
   // Get options for this enum type.  These are specified in the .proto file by
   // placing lines like "option foo = 1234;" in the enum definition.  Allowed
-  // options are defined by EnumOptions in descriptor.proto, and any available
-  // extensions of that message.
+  // options are defined by EnumOptions in google/protobuf/descriptor.proto,
+  // and any available extensions of that message.
   const EnumOptions& options() const;
 
   // See Descriptor::CopyTo().
@@ -980,8 +975,7 @@ class LIBPROTOBUF_EXPORT EnumDescriptor {
   typedef EnumOptions OptionsType;
 
   // Allows access to GetLocationPath for annotations.
-  friend class io::Printer;
-  friend class compiler::cpp::Formatter;
+  friend class ::google::protobuf::io::Printer;
 
   // Looks up a value by number.  If the value does not exist, dynamically
   // creates a new EnumValueDescriptor for that value, assuming that it was
@@ -1061,10 +1055,11 @@ class LIBPROTOBUF_EXPORT EnumValueDescriptor {
   // The type of this value.  Never NULL.
   const EnumDescriptor* type() const;
 
-  // Get options for this enum value.  These are specified in the .proto file by
-  // adding text like "[foo = 1234]" after an enum value definition.  Allowed
-  // options are defined by EnumValueOptions in descriptor.proto, and any
-  // available extensions of that message.
+  // Get options for this enum value.  These are specified in the .proto file
+  // by adding text like "[foo = 1234]" after an enum value definition.
+  // Allowed options are defined by EnumValueOptions in
+  // google/protobuf/descriptor.proto, and any available extensions of that
+  // message.
   const EnumValueOptions& options() const;
 
   // See Descriptor::CopyTo().
@@ -1088,8 +1083,7 @@ class LIBPROTOBUF_EXPORT EnumValueDescriptor {
   typedef EnumValueOptions OptionsType;
 
   // Allows access to GetLocationPath for annotations.
-  friend class io::Printer;
-  friend class compiler::cpp::Formatter;
+  friend class ::google::protobuf::io::Printer;
 
   // See Descriptor::DebugString().
   void DebugString(int depth, string *contents,
@@ -1135,8 +1129,9 @@ class LIBPROTOBUF_EXPORT ServiceDescriptor {
 
   // Get options for this service type.  These are specified in the .proto file
   // by placing lines like "option foo = 1234;" in the service definition.
-  // Allowed options are defined by ServiceOptions in descriptor.proto, and any
-  // available extensions of that message.
+  // Allowed options are defined by ServiceOptions in
+  // google/protobuf/descriptor.proto, and any available extensions of that
+  // message.
   const ServiceOptions& options() const;
 
   // The number of methods this service defines.
@@ -1168,8 +1163,7 @@ class LIBPROTOBUF_EXPORT ServiceDescriptor {
   typedef ServiceOptions OptionsType;
 
   // Allows access to GetLocationPath for annotations.
-  friend class io::Printer;
-  friend class compiler::cpp::Formatter;
+  friend class ::google::protobuf::io::Printer;
 
   // See Descriptor::DebugString().
   void DebugString(string *contents, const DebugStringOptions& options) const;
@@ -1228,7 +1222,8 @@ class LIBPROTOBUF_EXPORT MethodDescriptor {
   // Get options for this method.  These are specified in the .proto file by
   // placing lines like "option foo = 1234;" in curly-braces after a method
   // declaration.  Allowed options are defined by MethodOptions in
-  // descriptor.proto, and any available extensions of that message.
+  // google/protobuf/descriptor.proto, and any available extensions of that
+  // message.
   const MethodOptions& options() const;
 
   // See Descriptor::CopyTo().
@@ -1252,8 +1247,7 @@ class LIBPROTOBUF_EXPORT MethodDescriptor {
   typedef MethodOptions OptionsType;
 
   // Allows access to GetLocationPath for annotations.
-  friend class io::Printer;
-  friend class compiler::cpp::Formatter;
+  friend class ::google::protobuf::io::Printer;
 
   // See Descriptor::DebugString().
   void DebugString(int depth, string *contents,
@@ -1289,7 +1283,7 @@ class LIBPROTOBUF_EXPORT MethodDescriptor {
 class LIBPROTOBUF_EXPORT FileDescriptor {
  public:
   // The filename, relative to the source tree.
-  // e.g. "foo/bar/baz.proto"
+  // e.g. "google/protobuf/descriptor.proto"
   const string& name() const;
 
   // The package, e.g. "google.protobuf.compiler".
@@ -1351,7 +1345,8 @@ class LIBPROTOBUF_EXPORT FileDescriptor {
   // Get options for this file.  These are specified in the .proto file by
   // placing lines like "option foo = 1234;" at the top level, outside of any
   // other definitions.  Allowed options are defined by FileOptions in
-  // descriptor.proto, and any available extensions of that message.
+  // google/protobuf/descriptor.proto, and any available extensions of that
+  // message.
   const FileOptions& options() const;
 
   // Syntax of this file.
@@ -1422,7 +1417,7 @@ class LIBPROTOBUF_EXPORT FileDescriptor {
   const string* name_;
   const string* package_;
   const DescriptorPool* pool_;
-  internal::once_flag* dependencies_once_;
+  GoogleOnceDynamic* dependencies_once_;
   static void DependenciesOnceInit(const FileDescriptor* to_init);
   void InternalDependenciesOnceInit() const;
 
@@ -1798,7 +1793,7 @@ class LIBPROTOBUF_EXPORT DescriptorPool {
 
   // If fallback_database_ is NULL, this is NULL.  Otherwise, this is a mutex
   // which must be locked while accessing tables_.
-  internal::WrappedMutex* mutex_;
+  Mutex* mutex_;
 
   // See constructor.
   DescriptorDatabase* fallback_database_;
@@ -2005,7 +2000,7 @@ inline const string& EnumDescriptor::reserved_name(int index) const {
 
 inline FieldDescriptor::Type FieldDescriptor::type() const {
   if (type_once_) {
-    internal::call_once(*type_once_, &FieldDescriptor::TypeOnceInit, this);
+    type_once_->Init(&FieldDescriptor::TypeOnceInit, this);
   }
   return type_;
 }
@@ -2138,6 +2133,6 @@ inline const FieldDescriptor* OneofDescriptor::field(int index) const {
 }
 
 }  // namespace protobuf
-}  // namespace google
 
+}  // namespace google
 #endif  // GOOGLE_PROTOBUF_DESCRIPTOR_H__

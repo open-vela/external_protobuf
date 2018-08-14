@@ -18,12 +18,12 @@ internal_build_cpp() {
   ./autogen.sh
   ./configure CXXFLAGS="-fPIC"  # -fPIC is needed for python cpp test.
                                 # See python/setup.py for more details
-  make -j4
+  make -j2
 }
 
 build_cpp() {
   internal_build_cpp
-  make check -j4 || (cat src/test-suite.log; false)
+  make check -j2 || (cat src/test-suite.log; false)
   cd conformance && make test_cpp && cd ..
 
   # The benchmark code depends on cmake, so test if it is installed before
@@ -56,10 +56,10 @@ build_cpp_distcheck() {
   # Check if every file exists in the dist tar file.
   FILES_MISSING=""
   for FILE in $(<../dist.lst); do
-    [ -f "$FILE" ] || {
+    if ! file $FILE &>/dev/null; then
       echo "$FILE is not found!"
       FILES_MISSING="$FILE $FILES_MISSING"
-    }
+    fi
   done
   cd ..
   if [ ! -z "$FILES_MISSING" ]; then
@@ -68,7 +68,7 @@ build_cpp_distcheck() {
   fi
 
   # Do the regular dist-check for C++.
-  make distcheck -j4
+  make distcheck -j2
 }
 
 build_csharp() {

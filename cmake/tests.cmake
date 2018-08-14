@@ -63,7 +63,6 @@ set(tests_protos
   google/protobuf/unittest_optimize_for.proto
   google/protobuf/unittest_preserve_unknown_enum.proto
   google/protobuf/unittest_preserve_unknown_enum2.proto
-  google/protobuf/unittest_proto3.proto
   google/protobuf/unittest_proto3_arena.proto
   google/protobuf/unittest_proto3_arena_lite.proto
   google/protobuf/unittest_proto3_lite.proto
@@ -79,7 +78,6 @@ set(tests_protos
   google/protobuf/util/internal/testdata/struct.proto
   google/protobuf/util/internal/testdata/timestamp_duration.proto
   google/protobuf/util/internal/testdata/wrappers.proto
-  google/protobuf/util/json_format.proto
   google/protobuf/util/json_format_proto3.proto
   google/protobuf/util/message_differencer_unittest.proto
 )
@@ -168,7 +166,6 @@ set(tests_files
   ${protobuf_source_dir}/src/google/protobuf/proto3_arena_lite_unittest.cc
   ${protobuf_source_dir}/src/google/protobuf/proto3_arena_unittest.cc
   ${protobuf_source_dir}/src/google/protobuf/proto3_lite_unittest.cc
-  ${protobuf_source_dir}/src/google/protobuf/proto3_lite_unittest.inc
   ${protobuf_source_dir}/src/google/protobuf/reflection_ops_unittest.cc
   ${protobuf_source_dir}/src/google/protobuf/repeated_field_reflection_unittest.cc
   ${protobuf_source_dir}/src/google/protobuf/repeated_field_unittest.cc

@@ -233,7 +233,7 @@ class ConformanceJava {
       }
       case JSON_PAYLOAD: {
         try {
-          TestMessagesProto3.TestAllTypesProto3.Builder builder =
+          TestMessagesProto3.TestAllTypesProto3.Builder builder = 
               TestMessagesProto3.TestAllTypesProto3.newBuilder();
           JsonFormat.Parser parser = JsonFormat.parser().usingTypeRegistry(typeRegistry);
           if (request.getTestCategory()

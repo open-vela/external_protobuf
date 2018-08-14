@@ -45,19 +45,17 @@
 
 namespace google {
 namespace protobuf {
-namespace compiler {
-namespace java {
-class Context;            // context.h
-class ClassNameResolver;  // name_resolver.h
-}  // namespace java
-}  // namespace compiler
-namespace io {
-class Printer;  // printer.h
+  namespace compiler {
+    namespace java {
+      class Context;                // context.h
+      class ClassNameResolver;      // name_resolver.h
+    }
+  }
+  namespace io {
+    class Printer;                  // printer.h
+  }
 }
-}  // namespace protobuf
-}  // namespace google
 
-namespace google {
 namespace protobuf {
 namespace compiler {
 namespace java {
@@ -81,8 +79,8 @@ class ImmutableFieldGenerator {
   virtual void GenerateParsingDoneCode(io::Printer* printer) const = 0;
   virtual void GenerateSerializationCode(io::Printer* printer) const = 0;
   virtual void GenerateSerializedSizeCode(io::Printer* printer) const = 0;
-  virtual void GenerateFieldBuilderInitializationCode(
-      io::Printer* printer) const = 0;
+  virtual void GenerateFieldBuilderInitializationCode(io::Printer* printer)
+      const = 0;
 
   virtual void GenerateEqualsCode(io::Printer* printer) const = 0;
   virtual void GenerateHashCode(io::Printer* printer) const = 0;
@@ -99,6 +97,7 @@ class ImmutableFieldLiteGenerator {
   virtual ~ImmutableFieldLiteGenerator();
 
   virtual int GetNumBitsForMessage() const = 0;
+  virtual int GetNumBitsForBuilder() const = 0;
   virtual void GenerateInterfaceMembers(io::Printer* printer) const = 0;
   virtual void GenerateMembers(io::Printer* printer) const = 0;
   virtual void GenerateBuilderMembers(io::Printer* printer) const = 0;
@@ -199,6 +198,6 @@ void PrintExtraFieldInfo(const std::map<string, string>& variables,
 }  // namespace java
 }  // namespace compiler
 }  // namespace protobuf
-}  // namespace google
 
+}  // namespace google
 #endif  // GOOGLE_PROTOBUF_COMPILER_JAVA_FIELD_H__

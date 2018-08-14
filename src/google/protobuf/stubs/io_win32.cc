@@ -56,11 +56,6 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <wctype.h>
-
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN 1
-#endif
-
 #include <windows.h>
 
 #include <google/protobuf/stubs/io_win32.h>
@@ -96,7 +91,7 @@ struct CharTraits<wchar_t> {
 
 template <typename char_type>
 bool null_or_empty(const char_type* s) {
-  return s == nullptr || *s == 0;
+  return s == NULL || *s == 0;
 }
 
 // Returns true if the path starts with a drive letter, e.g. "c:".
@@ -230,7 +225,7 @@ bool as_windows_path(const char* path, wstring* result) {
 
 
   if (!is_path_absolute(wpath.c_str())) {
-    int size = ::GetCurrentDirectoryW(0, nullptr);
+    int size = ::GetCurrentDirectoryW(0, NULL);
     if (size == 0 && GetLastError() != ERROR_INSUFFICIENT_BUFFER) {
       return false;
     }
@@ -321,17 +316,17 @@ FILE* fopen(const char* path, const char* mode) {
 #ifdef SUPPORT_LONGPATHS
   if (null_or_empty(path)) {
     errno = EINVAL;
-    return nullptr;
+    return NULL;
   }
   wstring wpath;
   if (!as_windows_path(path, &wpath)) {
     errno = ENOENT;
-    return nullptr;
+    return NULL;
   }
   wstring wmode;
   if (!strings::utf8_to_wcs(mode, &wmode)) {
     errno = EINVAL;
-    return nullptr;
+    return NULL;
   }
   return ::_wfopen(wpath.c_str(), wmode.c_str());
 #else
@@ -360,92 +355,6 @@ wstring testonly_utf8_to_winpath(const char* path) {
   return as_windows_path(path, &wpath) ? wpath : wstring();
 }
 
-bool expand_wildcards(
-    const string& path, std::function<void(const string&)> consume) {
-  if (path.find_first_of("*?") == string::npos) {
-    // There are no wildcards in the path, we don't need to expand it.
-    consume(path);
-    return ExpandWildcardsResult::kSuccess;
-  }
-
-#ifdef SUPPORT_LONGPATHS
-
-  wstring wpath;
-  if (!as_windows_path(path.c_str(), &wpath)) {
-    return ExpandWildcardsResult::kErrorInputPathConversion;
-  }
-
-  static const wstring kDot = L".";
-  static const wstring kDotDot = L"..";
-  WIN32_FIND_DATAW metadata;
-  HANDLE handle = ::FindFirstFileW(wpath.c_str(), &metadata);
-  if (handle == INVALID_HANDLE_VALUE) {
-    // The pattern does not match any files (or directories).
-    return ExpandWildcardsResult::kErrorNoMatchingFile;
-  }
-
-  string::size_type pos = path.find_last_of("\\/");
-  string dirname;
-  if (pos != string::npos) {
-    dirname = path.substr(0, pos + 1);
-  }
-
-  int matched = ExpandWildcardsResult::kErrorNoMatchingFile;
-  do {
-    // Ignore ".", "..", and directories.
-    if ((metadata.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0
-        && kDot != metadata.cFileName && kDotDot != metadata.cFileName) {
-      matched = ExpandWildcardsResult::kSuccess;
-      string filename;
-      if (!strings::wcs_to_utf8(metadata.cFileName, &filename)) {
-        return ExpandWildcardsResult::kErrorOutputPathConversion;
-      }
-
-      if (dirname.empty()) {
-        consume(filename);
-      } else {
-        consume(dirname + filename);
-      }
-    }
-  } while (::FindNextFileW(handle, &metadata));
-  FindClose(handle);
-  return matched;
-
-#else  // not SUPPORT_LONGPATHS
-
-  static const string kDot = ".";
-  static const string kDotDot = "..";
-  WIN32_FIND_DATAA metadata;
-  HANDLE handle = ::FindFirstFileA(path.c_str(), &metadata);
-  if (handle == INVALID_HANDLE_VALUE) {
-    // The pattern does not match any files (or directories).
-    return ExpandWildcardsResult::kErrorNoMatchingFile;
-  }
-
-  string::size_type pos = path.find_last_of("\\/");
-  string dirname;
-  if (pos != string::npos) {
-    dirname = path.substr(0, pos + 1);
-  }
-
-  int matched = ExpandWildcardsResult::kErrorNoMatchingFile;
-  do {
-    // Ignore ".", "..", and directories.
-    if ((metadata.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0
-        && kDot != metadata.cFileName && kDotDot != metadata.cFileName) {
-      matched = ExpandWildcardsResult::kSuccess;
-      if (!dirname.empty()) {
-        consume(dirname + metadata.cFileName);
-      } else {
-        consume(metadata.cFileName);
-      }
-    }
-  } while (::FindNextFileA(handle, &metadata));
-  FindClose(handle);
-  return matched;
-#endif  // SUPPORT_LONGPATHS
-}
-
 namespace strings {
 
 bool wcs_to_mbs(const WCHAR* s, string* out, bool outUtf8) {
@@ -456,15 +365,15 @@ bool wcs_to_mbs(const WCHAR* s, string* out, bool outUtf8) {
   BOOL usedDefaultChar = FALSE;
   SetLastError(0);
   int size = WideCharToMultiByte(
-      outUtf8 ? CP_UTF8 : CP_ACP, 0, s, -1, nullptr, 0, nullptr,
-      outUtf8 ? nullptr : &usedDefaultChar);
+      outUtf8 ? CP_UTF8 : CP_ACP, 0, s, -1, NULL, 0, NULL,
+      outUtf8 ? NULL : &usedDefaultChar);
   if ((size == 0 && GetLastError() != ERROR_INSUFFICIENT_BUFFER)
       || usedDefaultChar) {
     return false;
   }
   std::unique_ptr<CHAR[]> astr(new CHAR[size]);
   WideCharToMultiByte(
-      outUtf8 ? CP_UTF8 : CP_ACP, 0, s, -1, astr.get(), size, nullptr, nullptr);
+      outUtf8 ? CP_UTF8 : CP_ACP, 0, s, -1, astr.get(), size, NULL, NULL);
   out->assign(astr.get());
   return true;
 }
@@ -477,7 +386,7 @@ bool mbs_to_wcs(const char* s, wstring* out, bool inUtf8) {
 
   SetLastError(0);
   int size =
-      MultiByteToWideChar(inUtf8 ? CP_UTF8 : CP_ACP, 0, s, -1, nullptr, 0);
+      MultiByteToWideChar(inUtf8 ? CP_UTF8 : CP_ACP, 0, s, -1, NULL, 0);
   if (size == 0 && GetLastError() != ERROR_INSUFFICIENT_BUFFER) {
     return false;
   }

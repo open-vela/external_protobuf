@@ -133,17 +133,11 @@
   #endif
 #endif
 #include <google/protobuf/stubs/common.h>
-#include <google/protobuf/port.h>
+#include <google/protobuf/stubs/port.h>
 #include <google/protobuf/stubs/port.h>
 
-
-#include <google/protobuf/port_def.inc>
-
-#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-#include "util/coding/varint.h"
-#endif
-
 namespace google {
+
 namespace protobuf {
 
 class DescriptorPool;
@@ -269,6 +263,7 @@ class LIBPROTOBUF_EXPORT CodedInputStream {
 
   GOOGLE_PROTOBUF_ATTRIBUTE_ALWAYS_INLINE uint32 ReadTagNoLastTag();
 
+
   // This usually a faster alternative to ReadTag() when cutoff is a manifest
   // constant.  It does particularly well for cutoff >= 127.  The first part
   // of the return value is the tag that was read, though it can also be 0 in
@@ -333,7 +328,6 @@ class LIBPROTOBUF_EXPORT CodedInputStream {
   // It also checks for some cases where, due to optimizations,
   // MergeFromCodedStream() can incorrectly return true.
   bool ConsumedEntireMessage();
-  void SetConsumed() { legitimate_message_end_ = true; }
 
   // Limits ----------------------------------------------------------
   // Limits are used when parsing length-delimited embedded messages.
@@ -390,7 +384,7 @@ class LIBPROTOBUF_EXPORT CodedInputStream {
   // This is unrelated to PushLimit()/PopLimit().
   void SetTotalBytesLimit(int total_bytes_limit);
 
-  GOOGLE_PROTOBUF_DEPRECATED_MSG(
+  PROTOBUF_RUNTIME_DEPRECATED(
       "Please use the single parameter version of SetTotalBytesLimit(). The "
       "second parameter is ignored.")
   void SetTotalBytesLimit(int total_bytes_limit, int) {
@@ -857,8 +851,7 @@ class LIBPROTOBUF_EXPORT CodedOutputStream {
   }
 
   static bool IsDefaultSerializationDeterministic() {
-    return default_serialization_deterministic_.load(
-               std::memory_order_relaxed) != 0;
+    return default_serialization_deterministic_.load(std::memory_order_relaxed) != 0;
   }
 
  private:
@@ -896,7 +889,7 @@ class LIBPROTOBUF_EXPORT CodedOutputStream {
   // that wants deterministic serialization by default needs to call
   // SetDefaultSerializationDeterministic() or ensure on its own that another
   // thread has done so.
-  friend void internal::MapTestForceDeterministic();
+  friend void ::google::protobuf::internal::MapTestForceDeterministic();
   static void SetDefaultSerializationDeterministic() {
     default_serialization_deterministic_.store(true, std::memory_order_relaxed);
   }
@@ -1397,13 +1390,11 @@ inline bool CodedInputStream::Skip(int count) {
 
 }  // namespace io
 }  // namespace protobuf
-}  // namespace google
 
 
 #if defined(_MSC_VER) && _MSC_VER >= 1300 && !defined(__INTEL_COMPILER)
   #pragma runtime_checks("c", restore)
 #endif  // _MSC_VER && !defined(__INTEL_COMPILER)
 
-#include <google/protobuf/port_undef.inc>
-
+}  // namespace google
 #endif  // GOOGLE_PROTOBUF_IO_CODED_STREAM_H__

@@ -38,14 +38,13 @@
 #ifndef GOOGLE_PROTOBUF_COMPILER_COMMAND_LINE_INTERFACE_H__
 #define GOOGLE_PROTOBUF_COMPILER_COMMAND_LINE_INTERFACE_H__
 
+#include <google/protobuf/stubs/common.h>
+#include <google/protobuf/stubs/hash.h>
+#include <string>
+#include <vector>
 #include <map>
 #include <set>
-#include <string>
-#include <unordered_map>
 #include <utility>
-#include <vector>
-
-#include <google/protobuf/stubs/common.h>
 
 namespace google {
 namespace protobuf {
@@ -207,20 +206,16 @@ class LIBPROTOC_EXPORT CommandLineInterface {
   class ErrorPrinter;
   class GeneratorContextImpl;
   class MemoryOutputStream;
-  typedef std::unordered_map<string, GeneratorContextImpl*> GeneratorContextMap;
+  typedef hash_map<string, GeneratorContextImpl*> GeneratorContextMap;
 
   // Clear state from previous Run().
   void Clear();
 
-  // Remaps the proto file so that it is relative to one of the ddirectories
-  // in proto_path_.  Returns false if an error occurred.
-  bool MakeProtoProtoPathRelative(DiskSourceTree* source_tree, string* proto);
-
   // Remaps each file in input_files_ so that it is relative to one of the
-  // directories in proto_path_.  Returns false if an error occurred.
+  // directories in proto_path_.  Returns false if an error occurred.  This
+  // is only used if inputs_are_proto_path_relative_ is false.
   bool MakeInputsBeProtoPathRelative(
     DiskSourceTree* source_tree);
-
 
   // Return status for ParseArguments() and InterpretArgument().
   enum ParseArgumentStatus {
@@ -435,6 +430,6 @@ class LIBPROTOC_EXPORT CommandLineInterface {
 
 }  // namespace compiler
 }  // namespace protobuf
-}  // namespace google
 
+}  // namespace google
 #endif  // GOOGLE_PROTOBUF_COMPILER_COMMAND_LINE_INTERFACE_H__

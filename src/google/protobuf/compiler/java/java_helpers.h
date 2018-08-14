@@ -62,15 +62,6 @@ extern const char kThinSeparator[];
 void PrintGeneratedAnnotation(io::Printer* printer, char delimiter = '$',
                               const string& annotation_file = "");
 
-// If a GeneratedMessageLite contains non-lite enums, then its verifier
-// must be instantiated inline, rather than retrieved from the enum class.
-void PrintEnumVerifierLogic(io::Printer* printer,
-                            const FieldDescriptor* descriptor,
-                            const std::map<string, string>& variables,
-                            const char* var_name,
-                            const char* terminating_string,
-                            bool enforce_lite);
-
 // Converts a name to camel-case. If cap_first_letter is true, capitalize the
 // first letter.
 string UnderscoresToCamelCase(const string& name, bool cap_first_letter);
@@ -102,8 +93,7 @@ string StripProto(const string& filename);
 string FileClassName(const FileDescriptor* file, bool immutable = true);
 
 // Returns the file's Java package name.
-string FileJavaPackage(const FileDescriptor* file);
-string FileJavaPackage(const FileDescriptor* file, bool immutable);
+string FileJavaPackage(const FileDescriptor* file, bool immutable = true);
 
 // Returns output directory for the given package name.
 string JavaPackageToDir(string package_name);
@@ -117,7 +107,7 @@ string ToJavaName(const string& full_name,
                   const FileDescriptor* file);
 
 // TODO(xiaofeng): the following methods are kept for they are exposed
-// publicly in //net/proto2/compiler/java/public/names.h. They return
+// publicly in //google/protobuf/compiler/java/names.h. They return
 // immutable names only and should be removed after mutable API is
 // integrated into google3.
 string ClassName(const Descriptor* descriptor);
@@ -150,8 +140,7 @@ inline string ShortMutableJavaClassName(const Descriptor* descriptor) {
 // cannot currently use the new runtime with core protos since there is a
 // bootstrapping problem with obtaining their descriptors.
 inline bool IsDescriptorProto(const Descriptor* descriptor) {
-  return descriptor->file()->name() == "net/proto2/proto/descriptor.proto" ||
-         descriptor->file()->name() == "google/protobuf/descriptor.proto";
+  return descriptor->file()->name() == "google/protobuf/descriptor.proto";
 }
 
 
@@ -402,6 +391,10 @@ inline string GeneratedCodeVersionSuffix() {
   return "V3";
 }
 
+inline bool EnableExperimentalRuntime(Context* context) {
+  return false;
+}
+
 void WriteUInt32ToUtf16CharSequence(uint32 number, std::vector<uint16>* output);
 
 inline void WriteIntToUtf16CharSequence(int value,
@@ -429,6 +422,6 @@ std::pair<int, int> GetTableDrivenNumberOfEntriesAndLookUpStartFieldNumber(
 }  // namespace java
 }  // namespace compiler
 }  // namespace protobuf
-}  // namespace google
 
+}  // namespace google
 #endif  // GOOGLE_PROTOBUF_COMPILER_JAVA_HELPERS_H__
