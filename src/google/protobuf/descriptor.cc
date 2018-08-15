@@ -406,10 +406,9 @@ typedef std::pair<const EnumDescriptor*, int> EnumIntPair;
 template<typename PairType>
 struct PointerIntegerPairHash {
   size_t operator()(const PairType& p) const {
-    static const size_t prime1 = 16777499;
-    static const size_t prime2 = 16777619;
-    return reinterpret_cast<size_t>(p.first) * prime1 ^
-           static_cast<size_t>(p.second) * prime2;
+    // FIXME(kenton):  What is the best way to compute this hash?  I have
+    // no idea!  This seems a bit better than an XOR.
+    return reinterpret_cast<intptr_t>(p.first) * ((1 << 16) - 1) + p.second;
   }
 
 #ifdef _MSC_VER
@@ -425,10 +424,11 @@ struct PointerIntegerPairHash {
 
 struct PointerStringPairHash {
   size_t operator()(const PointerStringPair& p) const {
-    static const size_t prime = 16777619;
+    // FIXME(kenton):  What is the best way to compute this hash?  I have
+    // no idea!  This seems a bit better than an XOR.
     hash<const char*> cstring_hash;
-    return reinterpret_cast<size_t>(p.first) * prime ^
-           static_cast<size_t>(cstring_hash(p.second));
+    return reinterpret_cast<intptr_t>(p.first) * ((1 << 16) - 1) +
+           cstring_hash(p.second);
   }
 
 #ifdef _MSC_VER
@@ -6906,7 +6906,7 @@ class DescriptorBuilder::OptionInterpreter::AggregateOptionFinder
   DescriptorBuilder* builder_;
 
   virtual const FieldDescriptor* FindExtension(
-      Message* message, const string& name) const override {
+      Message* message, const string& name) const {
     assert_mutex_held(builder_->pool_);
     const Descriptor* descriptor = message->GetDescriptor();
     Symbol result = builder_->LookupSymbolNoPlaceholder(
@@ -6944,7 +6944,7 @@ class AggregateErrorCollector : public io::ErrorCollector {
   string error_;
 
   virtual void AddError(int /* line */, int /* column */,
-                const string& message) override {
+                        const string& message) {
     if (!error_.empty()) {
       error_ += "; ";
     }
@@ -6952,7 +6952,7 @@ class AggregateErrorCollector : public io::ErrorCollector {
   }
 
   virtual void AddWarning(int /* line */, int /* column */,
-                  const string& /* message */) override {
+                          const string& /* message */) {
     // Ignore warnings
   }
 };
