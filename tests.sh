@@ -18,12 +18,12 @@ internal_build_cpp() {
   ./autogen.sh
   ./configure CXXFLAGS="-fPIC"  # -fPIC is needed for python cpp test.
                                 # See python/setup.py for more details
-  make -j2
+  make -j4
 }
 
 build_cpp() {
   internal_build_cpp
-  make check -j2 || (cat src/test-suite.log; false)
+  make check -j4 || (cat src/test-suite.log; false)
   cd conformance && make test_cpp && cd ..
 
   # The benchmark code depends on cmake, so test if it is installed before
@@ -56,10 +56,10 @@ build_cpp_distcheck() {
   # Check if every file exists in the dist tar file.
   FILES_MISSING=""
   for FILE in $(<../dist.lst); do
-    if ! file $FILE &>/dev/null; then
+    [ -f "$FILE" ] || {
       echo "$FILE is not found!"
       FILES_MISSING="$FILE $FILES_MISSING"
-    fi
+    }
   done
   cd ..
   if [ ! -z "$FILES_MISSING" ]; then
@@ -68,7 +68,7 @@ build_cpp_distcheck() {
   fi
 
   # Do the regular dist-check for C++.
-  make distcheck -j2
+  make distcheck -j4
 }
 
 build_csharp() {
@@ -507,18 +507,21 @@ build_php7.1() {
   phpunit
   popd
   pushd conformance
-  # TODO(teboring): Add it back
-  # make test_php
+  make test_php
   popd
 }
 
 build_php7.1_c() {
+  ENABLE_CONFORMANCE_TEST=$1
   use_php 7.1
   wget https://phar.phpunit.de/phpunit-5.6.0.phar -O /usr/bin/phpunit
   cd php/tests && /bin/bash ./test.sh 7.1 && cd ../..
-  pushd conformance
-  # make test_php_c
-  popd
+  if [ "$ENABLE_CONFORMANCE_TEST" = "true" ]
+  then
+    pushd conformance
+    make test_php_c
+    popd
+  fi
 }
 
 build_php7.1_zts_c() {
@@ -538,7 +541,7 @@ build_php_all_32() {
   build_php5.5_c
   build_php5.6_c
   build_php7.0_c
-  build_php7.1_c
+  build_php7.1_c $1
   build_php5.5_zts_c
   build_php5.6_zts_c
   build_php7.0_zts_c
@@ -546,7 +549,7 @@ build_php_all_32() {
 }
 
 build_php_all() {
-  build_php_all_32
+  build_php_all_32 true
   build_php_compatibility
 }
 

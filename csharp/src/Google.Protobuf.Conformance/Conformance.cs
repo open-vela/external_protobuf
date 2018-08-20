@@ -24,21 +24,25 @@ namespace Conformance {
     static ConformanceReflection() {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
-            "ChFjb25mb3JtYW5jZS5wcm90bxILY29uZm9ybWFuY2UiowEKEkNvbmZvcm1h",
+            "ChFjb25mb3JtYW5jZS5wcm90bxILY29uZm9ybWFuY2Ui1QEKEkNvbmZvcm1h",
             "bmNlUmVxdWVzdBIaChBwcm90b2J1Zl9wYXlsb2FkGAEgASgMSAASFgoManNv",
             "bl9wYXlsb2FkGAIgASgJSAASOAoXcmVxdWVzdGVkX291dHB1dF9mb3JtYXQY",
             "AyABKA4yFy5jb25mb3JtYW5jZS5XaXJlRm9ybWF0EhQKDG1lc3NhZ2VfdHlw",
-            "ZRgEIAEoCUIJCgdwYXlsb2FkIrEBChNDb25mb3JtYW5jZVJlc3BvbnNlEhUK",
-            "C3BhcnNlX2Vycm9yGAEgASgJSAASGQoPc2VyaWFsaXplX2Vycm9yGAYgASgJ",
-            "SAASFwoNcnVudGltZV9lcnJvchgCIAEoCUgAEhoKEHByb3RvYnVmX3BheWxv",
-            "YWQYAyABKAxIABIWCgxqc29uX3BheWxvYWQYBCABKAlIABIRCgdza2lwcGVk",
-            "GAUgASgJSABCCAoGcmVzdWx0KjUKCldpcmVGb3JtYXQSDwoLVU5TUEVDSUZJ",
-            "RUQQABIMCghQUk9UT0JVRhABEggKBEpTT04QAkIhCh9jb20uZ29vZ2xlLnBy",
-            "b3RvYnVmLmNvbmZvcm1hbmNlYgZwcm90bzM="));
+            "ZRgEIAEoCRIwCg10ZXN0X2NhdGVnb3J5GAUgASgOMhkuY29uZm9ybWFuY2Uu",
+            "VGVzdENhdGVnb3J5QgkKB3BheWxvYWQisQEKE0NvbmZvcm1hbmNlUmVzcG9u",
+            "c2USFQoLcGFyc2VfZXJyb3IYASABKAlIABIZCg9zZXJpYWxpemVfZXJyb3IY",
+            "BiABKAlIABIXCg1ydW50aW1lX2Vycm9yGAIgASgJSAASGgoQcHJvdG9idWZf",
+            "cGF5bG9hZBgDIAEoDEgAEhYKDGpzb25fcGF5bG9hZBgEIAEoCUgAEhEKB3Nr",
+            "aXBwZWQYBSABKAlIAEIICgZyZXN1bHQqNQoKV2lyZUZvcm1hdBIPCgtVTlNQ",
+            "RUNJRklFRBAAEgwKCFBST1RPQlVGEAESCAoESlNPThACKmoKDFRlc3RDYXRl",
+            "Z29yeRIUChBVTlNQRUNJRklFRF9URVNUEAASDwoLQklOQVJZX1RFU1QQARIN",
+            "CglKU09OX1RFU1QQAhIkCiBKU09OX0lHTk9SRV9VTktOT1dOX1BBUlNJTkdf",
+            "VEVTVBADQiEKH2NvbS5nb29nbGUucHJvdG9idWYuY29uZm9ybWFuY2ViBnBy",
+            "b3RvMw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
-          new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Conformance.WireFormat), }, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::Conformance.ConformanceRequest), global::Conformance.ConformanceRequest.Parser, new[]{ "ProtobufPayload", "JsonPayload", "RequestedOutputFormat", "MessageType" }, new[]{ "Payload" }, null, null),
+          new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Conformance.WireFormat), typeof(global::Conformance.TestCategory), }, new pbr::GeneratedClrTypeInfo[] {
+            new pbr::GeneratedClrTypeInfo(typeof(global::Conformance.ConformanceRequest), global::Conformance.ConformanceRequest.Parser, new[]{ "ProtobufPayload", "JsonPayload", "RequestedOutputFormat", "MessageType", "TestCategory" }, new[]{ "Payload" }, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Conformance.ConformanceResponse), global::Conformance.ConformanceResponse.Parser, new[]{ "ParseError", "SerializeError", "RuntimeError", "ProtobufPayload", "JsonPayload", "Skipped" }, new[]{ "Result" }, null, null)
           }));
     }
@@ -50,6 +54,26 @@ namespace Conformance {
     [pbr::OriginalName("UNSPECIFIED")] Unspecified = 0,
     [pbr::OriginalName("PROTOBUF")] Protobuf = 1,
     [pbr::OriginalName("JSON")] Json = 2,
+  }
+
+  public enum TestCategory {
+    [pbr::OriginalName("UNSPECIFIED_TEST")] UnspecifiedTest = 0,
+    /// <summary>
+    /// Test binary wire format.
+    /// </summary>
+    [pbr::OriginalName("BINARY_TEST")] BinaryTest = 1,
+    /// <summary>
+    /// Test json wire format.
+    /// </summary>
+    [pbr::OriginalName("JSON_TEST")] JsonTest = 2,
+    /// <summary>
+    /// Similar to JSON_TEST. However, during parsing json, testee should ignore
+    /// unknown fields. This feature is optional. Each implementation can descide
+    /// whether to support it.  See
+    /// https://developers.google.com/protocol-buffers/docs/proto3#json_options
+    /// for more detail.
+    /// </summary>
+    [pbr::OriginalName("JSON_IGNORE_UNKNOWN_PARSING_TEST")] JsonIgnoreUnknownParsingTest = 3,
   }
 
   #endregion
@@ -89,6 +113,7 @@ namespace Conformance {
     public ConformanceRequest(ConformanceRequest other) : this() {
       requestedOutputFormat_ = other.requestedOutputFormat_;
       messageType_ = other.messageType_;
+      testCategory_ = other.testCategory_;
       switch (other.PayloadCase) {
         case PayloadOneofCase.ProtobufPayload:
           ProtobufPayload = other.ProtobufPayload;
@@ -158,6 +183,22 @@ namespace Conformance {
       }
     }
 
+    /// <summary>Field number for the "test_category" field.</summary>
+    public const int TestCategoryFieldNumber = 5;
+    private global::Conformance.TestCategory testCategory_ = 0;
+    /// <summary>
+    /// Each test is given a specific test category. Some category may need
+    /// spedific support in testee programs. Refer to the defintion of TestCategory
+    /// for more information.
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public global::Conformance.TestCategory TestCategory {
+      get { return testCategory_; }
+      set {
+        testCategory_ = value;
+      }
+    }
+
     private object payload_;
     /// <summary>Enum of possible cases for the "payload" oneof.</summary>
     public enum PayloadOneofCase {
@@ -194,6 +235,7 @@ namespace Conformance {
       if (JsonPayload != other.JsonPayload) return false;
       if (RequestedOutputFormat != other.RequestedOutputFormat) return false;
       if (MessageType != other.MessageType) return false;
+      if (TestCategory != other.TestCategory) return false;
       if (PayloadCase != other.PayloadCase) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
@@ -205,6 +247,7 @@ namespace Conformance {
       if (payloadCase_ == PayloadOneofCase.JsonPayload) hash ^= JsonPayload.GetHashCode();
       if (RequestedOutputFormat != 0) hash ^= RequestedOutputFormat.GetHashCode();
       if (MessageType.Length != 0) hash ^= MessageType.GetHashCode();
+      if (TestCategory != 0) hash ^= TestCategory.GetHashCode();
       hash ^= (int) payloadCase_;
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
@@ -235,6 +278,10 @@ namespace Conformance {
         output.WriteRawTag(34);
         output.WriteString(MessageType);
       }
+      if (TestCategory != 0) {
+        output.WriteRawTag(40);
+        output.WriteEnum((int) TestCategory);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -255,6 +302,9 @@ namespace Conformance {
       if (MessageType.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(MessageType);
       }
+      if (TestCategory != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) TestCategory);
+      }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
       }
@@ -271,6 +321,9 @@ namespace Conformance {
       }
       if (other.MessageType.Length != 0) {
         MessageType = other.MessageType;
+      }
+      if (other.TestCategory != 0) {
+        TestCategory = other.TestCategory;
       }
       switch (other.PayloadCase) {
         case PayloadOneofCase.ProtobufPayload:
@@ -306,6 +359,10 @@ namespace Conformance {
           }
           case 34: {
             MessageType = input.ReadString();
+            break;
+          }
+          case 40: {
+            testCategory_ = (global::Conformance.TestCategory) input.ReadEnum();
             break;
           }
         }

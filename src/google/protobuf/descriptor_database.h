@@ -142,7 +142,7 @@ class LIBPROTOBUF_EXPORT DescriptorDatabase {
 class LIBPROTOBUF_EXPORT SimpleDescriptorDatabase : public DescriptorDatabase {
  public:
   SimpleDescriptorDatabase();
-  ~SimpleDescriptorDatabase();
+  ~SimpleDescriptorDatabase() override;
 
   // Adds the FileDescriptorProto to the database, making a copy.  The object
   // can be deleted after Add() returns.  Returns false if the file conflicted
@@ -155,14 +155,16 @@ class LIBPROTOBUF_EXPORT SimpleDescriptorDatabase : public DescriptorDatabase {
 
   // implements DescriptorDatabase -----------------------------------
   bool FindFileByName(const string& filename,
-                      FileDescriptorProto* output);
+                      FileDescriptorProto* output) override;
   bool FindFileContainingSymbol(const string& symbol_name,
-                                FileDescriptorProto* output);
+                                FileDescriptorProto* output) override;
   bool FindFileContainingExtension(const string& containing_type,
                                    int field_number,
-                                   FileDescriptorProto* output);
+                                   FileDescriptorProto* output) override;
   bool FindAllExtensionNumbers(const string& extendee_type,
-                               std::vector<int>* output);
+                               std::vector<int>* output) override;
+
+  bool FindAllFileNames(std::vector<string>* output) override;
 
  private:
   // So that it can use DescriptorIndex.
@@ -188,6 +190,7 @@ class LIBPROTOBUF_EXPORT SimpleDescriptorDatabase : public DescriptorDatabase {
     Value FindExtension(const string& containing_type, int field_number);
     bool FindAllExtensionNumbers(const string& containing_type,
                                  std::vector<int>* output);
+    void FindAllFileNames(std::vector<string>* output);
 
    private:
     std::map<string, Value> by_name_;
@@ -280,7 +283,7 @@ class LIBPROTOBUF_EXPORT SimpleDescriptorDatabase : public DescriptorDatabase {
 class LIBPROTOBUF_EXPORT EncodedDescriptorDatabase : public DescriptorDatabase {
  public:
   EncodedDescriptorDatabase();
-  ~EncodedDescriptorDatabase();
+  ~EncodedDescriptorDatabase() override;
 
   // Adds the FileDescriptorProto to the database.  The descriptor is provided
   // in encoded form.  The database does not make a copy of the bytes, nor
@@ -300,14 +303,14 @@ class LIBPROTOBUF_EXPORT EncodedDescriptorDatabase : public DescriptorDatabase {
 
   // implements DescriptorDatabase -----------------------------------
   bool FindFileByName(const string& filename,
-                      FileDescriptorProto* output);
+                      FileDescriptorProto* output) override;
   bool FindFileContainingSymbol(const string& symbol_name,
-                                FileDescriptorProto* output);
+                                FileDescriptorProto* output) override;
   bool FindFileContainingExtension(const string& containing_type,
                                    int field_number,
-                                   FileDescriptorProto* output);
+                                   FileDescriptorProto* output) override;
   bool FindAllExtensionNumbers(const string& extendee_type,
-                               std::vector<int>* output);
+                               std::vector<int>* output) override;
 
  private:
   SimpleDescriptorDatabase::DescriptorIndex<std::pair<const void*, int> >
@@ -326,18 +329,18 @@ class LIBPROTOBUF_EXPORT EncodedDescriptorDatabase : public DescriptorDatabase {
 class LIBPROTOBUF_EXPORT DescriptorPoolDatabase : public DescriptorDatabase {
  public:
   explicit DescriptorPoolDatabase(const DescriptorPool& pool);
-  ~DescriptorPoolDatabase();
+  ~DescriptorPoolDatabase() override;
 
   // implements DescriptorDatabase -----------------------------------
   bool FindFileByName(const string& filename,
-                      FileDescriptorProto* output);
+                      FileDescriptorProto* output) override;
   bool FindFileContainingSymbol(const string& symbol_name,
-                                FileDescriptorProto* output);
+                                FileDescriptorProto* output) override;
   bool FindFileContainingExtension(const string& containing_type,
                                    int field_number,
-                                   FileDescriptorProto* output);
+                                   FileDescriptorProto* output) override;
   bool FindAllExtensionNumbers(const string& extendee_type,
-                               std::vector<int>* output);
+                               std::vector<int>* output) override;
 
  private:
   const DescriptorPool& pool_;
@@ -356,20 +359,20 @@ class LIBPROTOBUF_EXPORT MergedDescriptorDatabase : public DescriptorDatabase {
   // DescriptorDatabases need to stick around.
   explicit MergedDescriptorDatabase(
       const std::vector<DescriptorDatabase*>& sources);
-  ~MergedDescriptorDatabase();
+  ~MergedDescriptorDatabase() override;
 
   // implements DescriptorDatabase -----------------------------------
   bool FindFileByName(const string& filename,
-                      FileDescriptorProto* output);
+                      FileDescriptorProto* output) override;
   bool FindFileContainingSymbol(const string& symbol_name,
-                                FileDescriptorProto* output);
+                                FileDescriptorProto* output) override;
   bool FindFileContainingExtension(const string& containing_type,
                                    int field_number,
-                                   FileDescriptorProto* output);
+                                   FileDescriptorProto* output) override;
   // Merges the results of calling all databases. Returns true iff any
   // of the databases returned true.
   bool FindAllExtensionNumbers(const string& extendee_type,
-                               std::vector<int>* output);
+                               std::vector<int>* output) override;
 
 
  private:
@@ -378,6 +381,6 @@ class LIBPROTOBUF_EXPORT MergedDescriptorDatabase : public DescriptorDatabase {
 };
 
 }  // namespace protobuf
-
 }  // namespace google
+
 #endif  // GOOGLE_PROTOBUF_DESCRIPTOR_DATABASE_H__

@@ -99,6 +99,7 @@
 #endif
 
 #define PROTOBUF_RUNTIME_DEPRECATED(message)
+#define GOOGLE_PROTOBUF_RUNTIME_DEPRECATED(message)
 
 // ===================================================================
 // from google3/base/port.h
@@ -174,6 +175,9 @@ static const int64 kint64max = GOOGLE_LONGLONG(0x7FFFFFFFFFFFFFFF);
 static const int64 kint64min = -kint64max - 1;
 static const uint32 kuint32max = 0xFFFFFFFFu;
 static const uint64 kuint64max = GOOGLE_ULONGLONG(0xFFFFFFFFFFFFFFFF);
+
+#define GOOGLE_PROTOBUF_NAMESPACE "google::protobuf"
+#define GOOGLE_PROTOBUF_NAMESPACE_ID google::protobuf
 
 // -------------------------------------------------------------------
 // Annotations:  Some parts of the code have been annotated in ways that might
@@ -382,10 +386,14 @@ inline void GOOGLE_UNALIGNED_STORE64(void *p, uint64 v) {
 
 #elif !defined(__GLIBC__) && !defined(__BIONIC__) && !defined(__CYGWIN__)
 
+#ifndef bswap_16
 static inline uint16 bswap_16(uint16 x) {
   return static_cast<uint16>(((x & 0xFF) << 8) | ((x & 0xFF00) >> 8));
 }
 #define bswap_16(x) bswap_16(x)
+#endif
+
+#ifndef bswap_32
 static inline uint32 bswap_32(uint32 x) {
   return (((x & 0xFF) << 24) |
           ((x & 0xFF00) << 8) |
@@ -393,6 +401,9 @@ static inline uint32 bswap_32(uint32 x) {
           ((x & 0xFF000000) >> 24));
 }
 #define bswap_32(x) bswap_32(x)
+#endif
+
+#ifndef bswap_64
 static inline uint64 bswap_64(uint64 x) {
   return (((x & GOOGLE_ULONGLONG(0xFF)) << 56) |
           ((x & GOOGLE_ULONGLONG(0xFF00)) << 40) |
@@ -404,6 +415,7 @@ static inline uint64 bswap_64(uint64 x) {
           ((x & GOOGLE_ULONGLONG(0xFF00000000000000)) >> 56));
 }
 #define bswap_64(x) bswap_64(x)
+#endif
 
 #endif
 

@@ -1,3 +1,5 @@
+load("@bazel_skylib//:lib.bzl", "versions")
+
 def _GetPath(ctx, path):
   if ctx.label.workspace_root:
     return ctx.label.workspace_root + '/' + path
@@ -72,7 +74,7 @@ def _proto_gen_impl(ctx):
   deps = []
   deps += ctx.files.srcs
   source_dir = _SourceDir(ctx)
-  gen_dir = _GenDir(ctx)
+  gen_dir = _GenDir(ctx).rstrip('/')
   if source_dir:
     import_flags = ["-I" + source_dir, "-I" + gen_dir]
   else:
@@ -82,37 +84,83 @@ def _proto_gen_impl(ctx):
     import_flags += dep.proto.import_flags
     deps += dep.proto.deps
 
-  args = []
-  if ctx.attr.gen_cc:
-    args += ["--cpp_out=" + gen_dir]
-  if ctx.attr.gen_py:
-    args += ["--python_out=" + gen_dir]
+  if not ctx.attr.gen_cc and not ctx.attr.gen_py and not ctx.executable.plugin:
+    return struct(
+        proto=struct(
+            srcs=srcs,
+            import_flags=import_flags,
+            deps=deps,
+        ),  
+    )   
 
-  inputs = srcs + deps
-  if ctx.executable.plugin:
-    plugin = ctx.executable.plugin
-    lang = ctx.attr.plugin_language
-    if not lang and plugin.basename.startswith('protoc-gen-'):
-      lang = plugin.basename[len('protoc-gen-'):]
-    if not lang:
-      fail("cannot infer the target language of plugin", "plugin_language")
+  for src in srcs:
+    args = []
 
-    outdir = gen_dir
-    if ctx.attr.plugin_options:
-      outdir = ",".join(ctx.attr.plugin_options) + ":" + outdir
-    args += ["--plugin=protoc-gen-%s=%s" % (lang, plugin.path)]
-    args += ["--%s_out=%s" % (lang, outdir)]
-    inputs += [plugin]
+    in_gen_dir = src.root.path == gen_dir
+    if in_gen_dir:
+      import_flags_real = []
+      for f in depset(import_flags):
+        path = f.replace('-I', '') 
+        import_flags_real.append('-I$(realpath -s %s)' % path)
 
-  if args:
-    ctx.action(
-        inputs=inputs,
-        outputs=ctx.outputs.outs,
-        arguments=args + import_flags + [s.path for s in srcs],
-        executable=ctx.executable.protoc,
-        mnemonic="ProtoCompile",
-        use_default_shell_env=True,
-    )
+    outs = []
+    use_grpc_plugin = (ctx.attr.plugin_language == "grpc" and ctx.attr.plugin)
+    path_tpl = "$(realpath %s)" if in_gen_dir else "%s"
+    if ctx.attr.gen_cc:
+      args += [("--cpp_out=" + path_tpl) % gen_dir]
+      outs.extend(_CcOuts([src.basename], use_grpc_plugin=use_grpc_plugin))
+    if ctx.attr.gen_py:
+      args += [("--python_out=" + path_tpl) % gen_dir]
+      outs.extend(_PyOuts([src.basename], use_grpc_plugin=use_grpc_plugin))
+
+    outs = [ctx.actions.declare_file(out, sibling=src) for out in outs]
+    inputs = [src] + deps
+    if ctx.executable.plugin:
+      plugin = ctx.executable.plugin
+      lang = ctx.attr.plugin_language
+      if not lang and plugin.basename.startswith('protoc-gen-'):
+        lang = plugin.basename[len('protoc-gen-'):]
+      if not lang:
+        fail("cannot infer the target language of plugin", "plugin_language")
+
+      outdir = "." if in_gen_dir else gen_dir
+
+      if ctx.attr.plugin_options:
+        outdir = ",".join(ctx.attr.plugin_options) + ":" + outdir
+      args += [("--plugin=protoc-gen-%s=" + path_tpl) % (lang, plugin.path)]
+      args += ["--%s_out=%s" % (lang, outdir)]
+      inputs += [plugin]
+
+    if not in_gen_dir:
+      ctx.action(
+          inputs=inputs,
+          outputs=outs,
+          arguments=args + import_flags + [src.path],
+          executable=ctx.executable.protoc,
+          mnemonic="ProtoCompile",
+          use_default_shell_env=True,
+      )
+    else:
+      for out in outs:
+        orig_command = " ".join(
+            ["$(realpath %s)" % ctx.executable.protoc.path] + args +
+            import_flags_real + ["-I.", src.basename])
+        command = ";".join([
+            'CMD="%s"' % orig_command,
+            "cd %s" % src.dirname,
+            "${CMD}",
+            "cd -",
+        ])
+        generated_out = '/'.join([gen_dir,  out.basename])
+        if generated_out != out.path:
+            command += ";mv %s %s" % (generated_out, out.path)
+        ctx.action(
+            inputs=inputs + [ctx.executable.protoc],
+            outputs=[out],
+            command=command,
+            mnemonic="ProtoCompile",
+            use_default_shell_env=True,
+        )
 
   return struct(
       proto=struct(
@@ -130,7 +178,7 @@ proto_gen = rule(
         "protoc": attr.label(
             cfg = "host",
             executable = True,
-            single_file = True,
+            allow_single_file = True,
             mandatory = True,
         ),
         "plugin": attr.label(
@@ -266,8 +314,8 @@ def internal_gen_well_known_protos_java(srcs):
   Args:
     srcs: the well known protos
   """
-  root = Label("%s//protobuf_java" % (REPOSITORY_NAME)).workspace_root
-  pkg = PACKAGE_NAME + "/" if PACKAGE_NAME else ""
+  root = Label("%s//protobuf_java" % (native.repository_name())).workspace_root
+  pkg = native.package_name() + "/" if native.package_name() else ""
   if root == "":
     include = " -I%ssrc " % pkg
   else:
@@ -411,7 +459,4 @@ def check_protobuf_required_bazel_version():
   This ensures bazel supports our approach to proto_library() depending on a
   copied filegroup. (Fixed in bazel 0.5.4)
   """
-  expected = apple_common.dotted_version("0.5.4")
-  current = apple_common.dotted_version(native.bazel_version)
-  if current.compare_to(expected) < 0:
-    fail("Bazel must be newer than 0.5.4")
+  versions.check(minimum_bazel_version = "0.5.4")

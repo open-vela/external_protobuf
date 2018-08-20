@@ -112,6 +112,9 @@ nobase_include_HEADERS =                                         \
   google/protobuf/message_lite.h                                 \
   google/protobuf/metadata.h                                     \
   google/protobuf/metadata_lite.h                                \
+  google/protobuf/port.h                                         \
+  google/protobuf/port_def.inc                                   \
+  google/protobuf/port_undef.inc                                 \
   google/protobuf/reflection.h                                   \
   google/protobuf/reflection_ops.h                               \
   google/protobuf/repeated_field.h                               \
@@ -311,6 +314,8 @@ libprotoc_la_SOURCES =                                         \
   google/protobuf/compiler/command_line_interface.cc           \
   google/protobuf/compiler/plugin.cc                           \
   google/protobuf/compiler/plugin.pb.cc                        \
+  google/protobuf/compiler/scc.cc                              \
+  google/protobuf/compiler/scc.h                               \
   google/protobuf/compiler/subprocess.cc                       \
   google/protobuf/compiler/subprocess.h                        \
   google/protobuf/compiler/zip_writer.cc                       \
@@ -367,10 +372,6 @@ libprotoc_la_SOURCES =                                         \
   google/protobuf/compiler/java/java_generator_factory.h       \
   google/protobuf/compiler/java/java_helpers.cc                \
   google/protobuf/compiler/java/java_helpers.h                 \
-  google/protobuf/compiler/java/java_lazy_message_field.cc     \
-  google/protobuf/compiler/java/java_lazy_message_field.h      \
-  google/protobuf/compiler/java/java_lazy_message_field_lite.cc\
-  google/protobuf/compiler/java/java_lazy_message_field_lite.h \
   google/protobuf/compiler/java/java_map_field.cc              \
   google/protobuf/compiler/java/java_map_field.h               \
   google/protobuf/compiler/java/java_map_field_lite.cc         \
@@ -503,6 +504,7 @@ protoc_inputs =                                                   \
   google/protobuf/unittest_preserve_unknown_enum2.proto           \
   google/protobuf/unittest_preserve_unknown_enum.proto            \
   google/protobuf/unittest.proto                                  \
+  google/protobuf/unittest_proto3.proto                           \
   google/protobuf/unittest_proto3_arena.proto                     \
   google/protobuf/unittest_proto3_arena_lite.proto                \
   google/protobuf/unittest_proto3_lite.proto                      \
@@ -518,6 +520,7 @@ protoc_inputs =                                                   \
   google/protobuf/util/internal/testdata/struct.proto             \
   google/protobuf/util/internal/testdata/timestamp_duration.proto \
   google/protobuf/util/internal/testdata/wrappers.proto           \
+  google/protobuf/util/json_format.proto                          \
   google/protobuf/util/json_format_proto3.proto                   \
   google/protobuf/util/message_differencer_unittest.proto         \
   google/protobuf/compiler/cpp/cpp_test_large_enum_value.proto
@@ -526,7 +529,6 @@ EXTRA_DIST =                                                   \
   $(protoc_inputs)                                             \
   $(js_well_known_types_sources)                               \
   solaris/libstdc++.la                                         \
-  google/protobuf/unittest_proto3.proto                        \
   google/protobuf/test_messages_proto3.proto                   \
   google/protobuf/test_messages_proto2.proto                   \
   google/protobuf/io/gzip_stream.h                             \
@@ -624,6 +626,8 @@ protoc_outputs =                                                  \
   google/protobuf/unittest_preserve_unknown_enum2.pb.h            \
   google/protobuf/unittest_preserve_unknown_enum.pb.cc            \
   google/protobuf/unittest_preserve_unknown_enum.pb.h             \
+  google/protobuf/unittest_proto3.pb.cc                           \
+  google/protobuf/unittest_proto3.pb.h                            \
   google/protobuf/unittest_proto3_arena.pb.cc                     \
   google/protobuf/unittest_proto3_arena.pb.h                      \
   google/protobuf/unittest_proto3_arena_lite.pb.cc                \
@@ -654,6 +658,8 @@ protoc_outputs =                                                  \
   google/protobuf/util/internal/testdata/timestamp_duration.pb.h  \
   google/protobuf/util/internal/testdata/wrappers.pb.cc           \
   google/protobuf/util/internal/testdata/wrappers.pb.h            \
+  google/protobuf/util/json_format.pb.cc                          \
+  google/protobuf/util/json_format.pb.h                           \
   google/protobuf/util/json_format_proto3.pb.cc                   \
   google/protobuf/util/json_format_proto3.pb.h                    \
   google/protobuf/util/message_differencer_unittest.pb.cc         \
@@ -687,6 +693,7 @@ COMMON_TEST_SOURCES =                                          \
   google/protobuf/test_util.cc                                 \
   google/protobuf/test_util.h                                  \
   google/protobuf/test_util.inc                                \
+  google/protobuf/test_util2.h                                 \
   google/protobuf/testing/googletest.cc                        \
   google/protobuf/testing/googletest.h                         \
   google/protobuf/testing/file.cc                              \
@@ -740,6 +747,7 @@ protobuf_test_SOURCES =                                        \
   google/protobuf/proto3_arena_lite_unittest.cc                \
   google/protobuf/proto3_arena_unittest.cc                     \
   google/protobuf/proto3_lite_unittest.cc                      \
+  google/protobuf/proto3_lite_unittest.inc                     \
   google/protobuf/reflection_ops_unittest.cc                   \
   google/protobuf/repeated_field_reflection_unittest.cc        \
   google/protobuf/repeated_field_unittest.cc                   \
@@ -876,7 +884,7 @@ no_warning_test.cc:
 
 no_warning_test_LDADD = $(PTHREAD_LIBS) libprotobuf.la libprotoc.la
 no_warning_test_CXXFLAGS = $(PTHREAD_CFLAGS) $(PTHREAD_DEF) $(ZLIB_DEF) \
-                           -Wall -Wextra -Werror -Wno-unused-parameter
+                           -Wall -Wextra -Werror -Wno-unused-parameter -Og
 nodist_no_warning_test_SOURCES = no_warning_test.cc $(protoc_outputs)
 
 TESTS = protobuf-test protobuf-lazy-descriptor-test protobuf-lite-test \

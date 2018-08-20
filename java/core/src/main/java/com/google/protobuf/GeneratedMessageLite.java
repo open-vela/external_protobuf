@@ -33,7 +33,6 @@ package com.google.protobuf;
 import com.google.protobuf.AbstractMessageLite.Builder.LimitedInputStream;
 import com.google.protobuf.Internal.BooleanList;
 import com.google.protobuf.Internal.DoubleList;
-import com.google.protobuf.Internal.EnumLiteMap;
 import com.google.protobuf.Internal.FloatList;
 import com.google.protobuf.Internal.IntList;
 import com.google.protobuf.Internal.LongList;
@@ -1407,7 +1406,7 @@ public abstract class GeneratedMessageLite<
 
   /**
    * A serialized (serializable) form of the generated message.  Stores the
-   * message as a class name and a byte array.
+   * message as a class and a byte array.
    */
   protected static final class SerializedForm implements Serializable {
 
@@ -1417,6 +1416,9 @@ public abstract class GeneratedMessageLite<
 
     private static final long serialVersionUID = 0L;
 
+    // since v3.6.1
+    private final Class<?> messageClass;
+    // only included for backwards compatibility before messageClass was added
     private final String messageClassName;
     private final byte[] asBytes;
 
@@ -1425,7 +1427,8 @@ public abstract class GeneratedMessageLite<
      * @param regularForm the message to serialize
      */
     SerializedForm(MessageLite regularForm) {
-      messageClassName = regularForm.getClass().getName();
+      messageClass = regularForm.getClass();
+      messageClassName = messageClass.getName();
       asBytes = regularForm.toByteArray();
     }
 
@@ -1437,7 +1440,7 @@ public abstract class GeneratedMessageLite<
     @SuppressWarnings("unchecked")
     protected Object readResolve() throws ObjectStreamException {
       try {
-        Class<?> messageClass = Class.forName(messageClassName);
+        Class<?> messageClass = resolveMessageClass();
         java.lang.reflect.Field defaultInstanceField =
             messageClass.getDeclaredField("DEFAULT_INSTANCE");
         defaultInstanceField.setAccessible(true);
@@ -1464,7 +1467,7 @@ public abstract class GeneratedMessageLite<
     @Deprecated
     private Object readResolveFallback() throws ObjectStreamException {
       try {
-        Class<?> messageClass = Class.forName(messageClassName);
+        Class<?> messageClass = resolveMessageClass();
         java.lang.reflect.Field defaultInstanceField =
             messageClass.getDeclaredField("defaultInstance");
         defaultInstanceField.setAccessible(true);
@@ -1483,6 +1486,10 @@ public abstract class GeneratedMessageLite<
       } catch (InvalidProtocolBufferException e) {
         throw new RuntimeException("Unable to understand proto buffer", e);
       }
+    }
+
+    private Class<?> resolveMessageClass() throws ClassNotFoundException {
+      return messageClass != null ? messageClass : Class.forName(messageClassName);
     }
   }
 
@@ -1600,7 +1607,7 @@ public abstract class GeneratedMessageLite<
   protected static class DefaultInstanceBasedParser<T extends GeneratedMessageLite<T, ?>>
       extends AbstractParser<T> {
 
-    private T defaultInstance;
+    private final T defaultInstance;
 
     public DefaultInstanceBasedParser(T defaultInstance) {
       this.defaultInstance = defaultInstance;
