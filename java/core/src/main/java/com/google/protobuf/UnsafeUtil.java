@@ -72,8 +72,6 @@ final class UnsafeUtil {
 
   private static final long BUFFER_ADDRESS_OFFSET = fieldOffset(bufferAddressField());
 
-  private static final long STRING_VALUE_OFFSET = fieldOffset(stringValueField());
-
   private UnsafeUtil() {}
 
   static boolean hasUnsafeArrayOperations() {
@@ -262,26 +260,6 @@ final class UnsafeUtil {
     return MEMORY_ACCESSOR.getLong(buffer, BUFFER_ADDRESS_OFFSET);
   }
 
-  /**
-   * Returns a new {@link String} backed by the given {@code chars}. The char array should not
-   * be mutated any more after calling this function.
-   */
-  static String moveToString(char[] chars) {
-    if (STRING_VALUE_OFFSET == -1) {
-      // In the off-chance that this JDK does not implement String as we'd expect, just do a copy.
-      return new String(chars);
-    }
-    final String str;
-    try {
-      str = (String) UNSAFE.allocateInstance(String.class);
-    } catch (InstantiationException e) {
-      // This should never happen, but return a copy as a fallback just in case.
-      return new String(chars);
-    }
-    putObject(str, STRING_VALUE_OFFSET, chars);
-    return str;
-  }
-
   static Object getStaticObject(Field field) {
     return MEMORY_ACCESSOR.getStaticObject(field);
   }
@@ -395,12 +373,6 @@ final class UnsafeUtil {
   private static Field bufferAddressField() {
     Field field = field(Buffer.class, "address");
     return field != null && field.getType() == long.class ? field : null;
-  }
-
-  /** Finds the value field within a {@link String}. */
-  private static Field stringValueField() {
-    Field field = field(String.class, "value");
-    return field != null && field.getType() == char[].class ? field : null;
   }
 
   /**

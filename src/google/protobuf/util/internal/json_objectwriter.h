@@ -84,12 +84,11 @@ namespace converter {
 // JsonObjectWriter is thread-unsafe.
 class LIBPROTOBUF_EXPORT JsonObjectWriter : public StructuredObjectWriter {
  public:
-  JsonObjectWriter(StringPiece indent_string,
-                   google::protobuf::io::CodedOutputStream* out)
+  JsonObjectWriter(StringPiece indent_string, io::CodedOutputStream* out)
       : element_(new Element(/*parent=*/nullptr, /*is_json_object=*/false)),
         stream_(out),
         sink_(out),
-        indent_string_(indent_string.ToString()),
+        indent_string_(indent_string),
         use_websafe_base64_for_bytes_(false) {}
   virtual ~JsonObjectWriter();
 
@@ -105,7 +104,8 @@ class LIBPROTOBUF_EXPORT JsonObjectWriter : public StructuredObjectWriter {
   virtual JsonObjectWriter* RenderUint64(StringPiece name, uint64 value);
   virtual JsonObjectWriter* RenderDouble(StringPiece name, double value);
   virtual JsonObjectWriter* RenderFloat(StringPiece name, float value);
-  virtual JsonObjectWriter* RenderString(StringPiece name, StringPiece value);
+  virtual JsonObjectWriter* RenderString(StringPiece name,
+                                         StringPiece value);
   virtual JsonObjectWriter* RenderBytes(StringPiece name, StringPiece value);
   virtual JsonObjectWriter* RenderNull(StringPiece name);
   virtual JsonObjectWriter* RenderNullAsEmpty(StringPiece name);
@@ -143,22 +143,21 @@ class LIBPROTOBUF_EXPORT JsonObjectWriter : public StructuredObjectWriter {
     GOOGLE_DISALLOW_IMPLICIT_CONSTRUCTORS(Element);
   };
 
-  virtual Element* element() { return element_.get(); }
+  Element* element() override { return element_.get(); }
 
  private:
   class LIBPROTOBUF_EXPORT ByteSinkWrapper : public strings::ByteSink {
    public:
-    explicit ByteSinkWrapper(google::protobuf::io::CodedOutputStream* stream)
-        : stream_(stream) {}
-    virtual ~ByteSinkWrapper() {}
+    explicit ByteSinkWrapper(io::CodedOutputStream* stream) : stream_(stream) {}
+    ~ByteSinkWrapper() override {}
 
     // ByteSink methods.
-    virtual void Append(const char* bytes, size_t n) {
+    void Append(const char* bytes, size_t n) override {
       stream_->WriteRaw(bytes, n);
     }
 
    private:
-    google::protobuf::io::CodedOutputStream* stream_;
+    io::CodedOutputStream* stream_;
 
     GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(ByteSinkWrapper);
   };
@@ -209,7 +208,7 @@ class LIBPROTOBUF_EXPORT JsonObjectWriter : public StructuredObjectWriter {
   void WriteChar(const char c) { stream_->WriteRaw(&c, sizeof(c)); }
 
   std::unique_ptr<Element> element_;
-  google::protobuf::io::CodedOutputStream* stream_;
+  io::CodedOutputStream* stream_;
   ByteSinkWrapper sink_;
   const string indent_string_;
 
@@ -223,6 +222,6 @@ class LIBPROTOBUF_EXPORT JsonObjectWriter : public StructuredObjectWriter {
 }  // namespace converter
 }  // namespace util
 }  // namespace protobuf
-
 }  // namespace google
+
 #endif  // GOOGLE_PROTOBUF_UTIL_CONVERTER_JSON_OBJECTWRITER_H__

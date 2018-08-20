@@ -47,6 +47,13 @@
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/message.h>
 #include <google/protobuf/message_lite.h>
+#include <google/protobuf/port.h>
+
+#include <google/protobuf/port_def.inc>
+
+#ifdef SWIG
+#error "You cannot SWIG proto headers"
+#endif
 
 namespace google {
 namespace protobuf {
@@ -149,8 +156,8 @@ class LIBPROTOBUF_EXPORT TextFormat {
     GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(FastFieldValuePrinter);
   };
 
-  class LIBPROTOBUF_EXPORT PROTOBUF_RUNTIME_DEPRECATED("Please use FastFieldValuePrinter")
-      FieldValuePrinter {
+  class LIBPROTOBUF_EXPORT GOOGLE_PROTOBUF_DEPRECATED_MSG(
+      "Please use FastFieldValuePrinter") FieldValuePrinter {
    public:
     FieldValuePrinter();
     virtual ~FieldValuePrinter();
@@ -553,6 +560,13 @@ class LIBPROTOBUF_EXPORT TextFormat {
                                    const FieldDescriptor* field,
                                    Message* output);
 
+    // When an unknown extension is met, parsing will fail if this option is set
+    // to false (the default). If true, unknown extensions will be ignored and
+    // a warning message will be generated.
+    void AllowUnknownExtension(bool allow) {
+      allow_unknown_extension_ = allow;
+    }
+
 
     void AllowFieldNumber(bool allow) {
       allow_field_number_ = allow;
@@ -575,6 +589,7 @@ class LIBPROTOBUF_EXPORT TextFormat {
     bool allow_partial_;
     bool allow_case_insensitive_field_;
     bool allow_unknown_field_;
+    bool allow_unknown_extension_;
     bool allow_unknown_enum_;
     bool allow_field_number_;
     bool allow_relaxed_whitespace_;
@@ -609,6 +624,8 @@ inline TextFormat::ParseInfoTree* TextFormat::CreateNested(
 }
 
 }  // namespace protobuf
-
 }  // namespace google
+
+#include <google/protobuf/port_undef.inc>
+
 #endif  // GOOGLE_PROTOBUF_TEXT_FORMAT_H__

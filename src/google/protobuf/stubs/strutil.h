@@ -285,7 +285,7 @@ inline string JoinStrings(const std::vector<string>& components,
 //
 //    Errors: In the first form of the call, errors are reported with
 //    LOG(ERROR). The same is true for the second form of the call if
-//    the pointer to the string std::vector is NULL; otherwise, error
+//    the pointer to the string std::vector is nullptr; otherwise, error
 //    messages are stored in the std::vector. In either case, the effect on
 //    the dest array is not defined, but rest of the source will be
 //    processed.
@@ -304,7 +304,7 @@ LIBPROTOBUF_EXPORT int UnescapeCEscapeSequences(const char* source, char* dest,
 //    to be the same.
 //
 //    The second call stores its errors in a supplied string vector.
-//    If the string vector pointer is NULL, it reports the errors with LOG().
+//    If the string vector pointer is nullptr, it reports the errors with LOG().
 //
 //    In the first and second calls, the length of dest is returned. In the
 //    the third call, the new string is returned.
@@ -871,6 +871,56 @@ LIBPROTOBUF_EXPORT int EncodeAsUTF8Char(uint32 code_point, char* output);
 //   Length of the first UTF-8 character.
 // ----------------------------------------------------------------------
 LIBPROTOBUF_EXPORT int UTF8FirstLetterNumBytes(const char* src, int len);
+
+// From google3/third_party/absl/strings/escaping.h
+
+// ----------------------------------------------------------------------
+// CleanStringLineEndings()
+//   Clean up a multi-line string to conform to Unix line endings.
+//   Reads from src and appends to dst, so usually dst should be empty.
+//
+//   If there is no line ending at the end of a non-empty string, it can
+//   be added automatically.
+//
+//   Four different types of input are correctly handled:
+//
+//     - Unix/Linux files: line ending is LF: pass through unchanged
+//
+//     - DOS/Windows files: line ending is CRLF: convert to LF
+//
+//     - Legacy Mac files: line ending is CR: convert to LF
+//
+//     - Garbled files: random line endings: convert gracefully
+//                      lonely CR, lonely LF, CRLF: convert to LF
+//
+//   @param src The multi-line string to convert
+//   @param dst The converted string is appended to this string
+//   @param auto_end_last_line Automatically terminate the last line
+//
+//   Limitations:
+//
+//     This does not do the right thing for CRCRLF files created by
+//     broken programs that do another Unix->DOS conversion on files
+//     that are already in CRLF format.  For this, a two-pass approach
+//     brute-force would be needed that
+//
+//       (1) determines the presence of LF (first one is ok)
+//       (2) if yes, removes any CR, else convert every CR to LF
+LIBPROTOBUF_EXPORT void CleanStringLineEndings(const string& src, string* dst,
+                                               bool auto_end_last_line);
+
+// Same as above, but transforms the argument in place.
+LIBPROTOBUF_EXPORT void CleanStringLineEndings(string* str,
+                                               bool auto_end_last_line);
+
+namespace strings {
+inline bool EndsWith(StringPiece text, StringPiece suffix) {
+  return suffix.empty() ||
+      (text.size() >= suffix.size() &&
+       memcmp(text.data() + (text.size() - suffix.size()), suffix.data(),
+              suffix.size()) == 0);
+}
+}  // namespace strings
 
 }  // namespace protobuf
 }  // namespace google
