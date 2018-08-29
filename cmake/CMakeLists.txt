@@ -30,7 +30,6 @@ endif()
 
 # Options
 option(protobuf_BUILD_TESTS "Build tests" ON)
-option(protobuf_BUILD_CONFORMANCE "Build conformance tests" OFF)
 option(protobuf_BUILD_EXAMPLES "Build examples" OFF)
 option(protobuf_BUILD_PROTOC_BINARIES "Build libprotoc and protoc compiler" ON)
 if (BUILD_SHARED_LIBS)
@@ -218,10 +217,6 @@ endif (protobuf_BUILD_PROTOC_BINARIES)
 if (protobuf_BUILD_TESTS)
   include(tests.cmake)
 endif (protobuf_BUILD_TESTS)
-
-if (protobuf_BUILD_CONFORMANCE)
-  include(conformance.cmake)
-endif (protobuf_BUILD_CONFORMANCE)
 
 include(install.cmake)
 
