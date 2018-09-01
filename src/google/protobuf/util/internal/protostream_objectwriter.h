@@ -323,11 +323,6 @@ class LIBPROTOBUF_EXPORT ProtoStreamObjectWriter : public ProtoWriter {
                           const google::protobuf::Type& type,
                           strings::ByteSink* output, ErrorListener* listener);
 
- ProtoStreamObjectWriter(const TypeInfo* typeinfo,
-                          const google::protobuf::Type& type,
-                          strings::ByteSink* output, ErrorListener* listener,
-                          const ProtoStreamObjectWriter::Options& options);
-
   // Returns true if the field is a map.
   inline bool IsMap(const google::protobuf::Field& field);
 
