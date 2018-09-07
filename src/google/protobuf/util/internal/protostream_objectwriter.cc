@@ -55,7 +55,7 @@ namespace protobuf {
 namespace util {
 namespace converter {
 
-using ::GOOGLE_PROTOBUF_NAMESPACE_ID::internal::WireFormatLite;
+using ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite;
 using util::Status;
 using util::StatusOr;
 using util::error::INVALID_ARGUMENT;
@@ -70,19 +70,8 @@ ProtoStreamObjectWriter::ProtoStreamObjectWriter(
       current_(nullptr),
       options_(options) {
   set_ignore_unknown_fields(options_.ignore_unknown_fields);
+  set_ignore_unknown_enum_values(options_.ignore_unknown_enum_values);
   set_use_lower_camel_for_enums(options_.use_lower_camel_for_enums);
-}
-
-ProtoStreamObjectWriter::ProtoStreamObjectWriter(
-    const TypeInfo* typeinfo, const google::protobuf::Type& type,
-    strings::ByteSink* output, ErrorListener* listener,
-    const ProtoStreamObjectWriter::Options& options)
-    : ProtoWriter(typeinfo, type, output, listener),
-      master_type_(type),
-      current_(nullptr),
-      options_(options) {
-  set_ignore_unknown_fields(options_.ignore_unknown_fields);
-  set_use_lower_camel_for_enums(options.use_lower_camel_for_enums);
 }
 
 ProtoStreamObjectWriter::ProtoStreamObjectWriter(
@@ -354,7 +343,7 @@ void ProtoStreamObjectWriter::AnyWriter::StartAny(const DataPiece& value) {
   // Create our object writer and initialize it with the first StartObject
   // call.
   ow_.reset(new ProtoStreamObjectWriter(parent_->typeinfo(), *type, &output_,
-                                        parent_->listener(), parent_->options_));
+                                        parent_->listener()));
 
   // Don't call StartObject() for well-known types yet. Depending on the
   // type of actual data, we may not need to call StartObject(). For
@@ -1165,7 +1154,7 @@ ProtoStreamObjectWriter* ProtoStreamObjectWriter::RenderDataPiece(
 // represented by the key.
 std::unordered_map<string, ProtoStreamObjectWriter::TypeRenderer>*
     ProtoStreamObjectWriter::renderers_ = NULL;
-GOOGLE_PROTOBUF_NAMESPACE_ID::internal::once_flag writer_renderers_init_;
+PROTOBUF_NAMESPACE_ID::internal::once_flag writer_renderers_init_;
 
 void ProtoStreamObjectWriter::InitRendererMap() {
   renderers_ =
@@ -1224,8 +1213,8 @@ void ProtoStreamObjectWriter::DeleteRendererMap() {
 
 ProtoStreamObjectWriter::TypeRenderer*
 ProtoStreamObjectWriter::FindTypeRenderer(const string& type_url) {
-  GOOGLE_PROTOBUF_NAMESPACE_ID::internal::call_once(writer_renderers_init_,
-                                                     InitRendererMap);
+  PROTOBUF_NAMESPACE_ID::internal::call_once(writer_renderers_init_,
+                                             InitRendererMap);
   return FindOrNull(*renderers_, type_url);
 }
 
