@@ -44,8 +44,6 @@
 #include <google/protobuf/util/type_resolver.h>
 #include <google/protobuf/stubs/stringpiece.h>
 
-#include <google/protobuf/port_def.inc>
-
 namespace google {
 namespace protobuf {
 namespace util {
@@ -57,7 +55,7 @@ namespace converter {
 // ObjectWriter when EndObject() is called on the root object. It also writes
 // out all non-repeated primitive fields that haven't been explicitly rendered
 // with their default values (0 for numbers, "" for strings, etc).
-class PROTOBUF_EXPORT DefaultValueObjectWriter : public ObjectWriter {
+class LIBPROTOBUF_EXPORT DefaultValueObjectWriter : public ObjectWriter {
  public:
   // A Callback function to check whether a field needs to be scrubbed.
   //
@@ -71,7 +69,7 @@ class PROTOBUF_EXPORT DefaultValueObjectWriter : public ObjectWriter {
   //
   // The Field* should point to the google::protobuf::Field of "c".
   typedef ResultCallback2<bool /*return*/,
-                          const std::vector<std::string>& /*path of the field*/,
+                          const std::vector<string>& /*path of the field*/,
                           const google::protobuf::Field* /*field*/>
       FieldScrubCallBack;
 
@@ -148,11 +146,11 @@ class PROTOBUF_EXPORT DefaultValueObjectWriter : public ObjectWriter {
 
   // "Node" represents a node in the tree that holds the input of
   // DefaultValueObjectWriter.
-  class PROTOBUF_EXPORT Node {
+  class LIBPROTOBUF_EXPORT Node {
    public:
-    Node(const std::string& name, const google::protobuf::Type* type, NodeKind kind,
+    Node(const string& name, const google::protobuf::Type* type, NodeKind kind,
          const DataPiece& data, bool is_placeholder,
-         const std::vector<std::string>& path, bool suppress_empty_list,
+         const std::vector<string>& path, bool suppress_empty_list,
          bool preserve_proto_field_names, bool use_ints_for_enums,
          FieldScrubCallBack* field_scrub_callback);
     virtual ~Node() {
@@ -178,9 +176,9 @@ class PROTOBUF_EXPORT DefaultValueObjectWriter : public ObjectWriter {
     virtual void WriteTo(ObjectWriter* ow);
 
     // Accessors
-    const std::string& name() const { return name_; }
+    const string& name() const { return name_; }
 
-    const std::vector<std::string>& path() const { return path_; }
+    const std::vector<string>& path() const { return path_; }
 
     const google::protobuf::Type* type() const { return type_; }
 
@@ -210,7 +208,7 @@ class PROTOBUF_EXPORT DefaultValueObjectWriter : public ObjectWriter {
     void WriteChildren(ObjectWriter* ow);
 
     // The name of this node.
-    std::string name_;
+    string name_;
     // google::protobuf::Type of this node. Owned by TypeInfo.
     const google::protobuf::Type* type_;
     // The kind of this node.
@@ -228,7 +226,7 @@ class PROTOBUF_EXPORT DefaultValueObjectWriter : public ObjectWriter {
     bool is_placeholder_;
 
     // Path of the field of this node
-    std::vector<std::string> path_;
+    std::vector<string> path_;
 
     // Whether to suppress empty list output.
     bool suppress_empty_list_;
@@ -248,10 +246,10 @@ class PROTOBUF_EXPORT DefaultValueObjectWriter : public ObjectWriter {
   };
 
   // Creates a new Node and returns it. Caller owns memory of returned object.
-  virtual Node* CreateNewNode(const std::string& name,
+  virtual Node* CreateNewNode(const string& name,
                               const google::protobuf::Type* type, NodeKind kind,
                               const DataPiece& data, bool is_placeholder,
-                              const std::vector<std::string>& path,
+                              const std::vector<string>& path,
                               bool suppress_empty_list,
                               bool preserve_proto_field_names,
                               bool use_ints_for_enums,
@@ -299,7 +297,7 @@ class PROTOBUF_EXPORT DefaultValueObjectWriter : public ObjectWriter {
   // google::protobuf::Type of the root message type.
   const google::protobuf::Type& type_;
   // Holds copies of strings passed to RenderString.
-  std::vector<std::string*> string_values_;
+  std::vector<string*> string_values_;
 
   // The current Node. Owned by its parents.
   Node* current_;
@@ -330,7 +328,5 @@ class PROTOBUF_EXPORT DefaultValueObjectWriter : public ObjectWriter {
 }  // namespace util
 }  // namespace protobuf
 }  // namespace google
-
-#include <google/protobuf/port_undef.inc>
 
 #endif  // GOOGLE_PROTOBUF_UTIL_CONVERTER_DEFAULT_VALUE_OBJECTWRITER_H__

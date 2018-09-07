@@ -232,9 +232,7 @@ bool FileGenerator::Validate(string* error) {
         << "will be ignored by protoc in the future and protoc will always "
         << "generate full runtime code for Java. To use Java Lite runtime, "
         << "users should use the Java Lite plugin instead. See:\n"
-        << "  "
-           "https://github.com/protocolbuffers/protobuf/blob/master/java/"
-           "lite.md";
+        << "  https://github.com/protocolbuffers/protobuf/blob/master/java/lite.md";
   }
   return true;
 }

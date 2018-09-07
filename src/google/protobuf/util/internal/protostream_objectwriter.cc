@@ -55,7 +55,7 @@ namespace protobuf {
 namespace util {
 namespace converter {
 
-using ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite;
+using ::GOOGLE_PROTOBUF_NAMESPACE_ID::internal::WireFormatLite;
 using util::Status;
 using util::StatusOr;
 using util::error::INVALID_ARGUMENT;
@@ -70,7 +70,6 @@ ProtoStreamObjectWriter::ProtoStreamObjectWriter(
       current_(nullptr),
       options_(options) {
   set_ignore_unknown_fields(options_.ignore_unknown_fields);
-  set_ignore_unknown_enum_values(options_.ignore_unknown_enum_values);
   set_use_lower_camel_for_enums(options_.use_lower_camel_for_enums);
 }
 
@@ -1166,7 +1165,7 @@ ProtoStreamObjectWriter* ProtoStreamObjectWriter::RenderDataPiece(
 // represented by the key.
 std::unordered_map<string, ProtoStreamObjectWriter::TypeRenderer>*
     ProtoStreamObjectWriter::renderers_ = NULL;
-PROTOBUF_NAMESPACE_ID::internal::once_flag writer_renderers_init_;
+GOOGLE_PROTOBUF_NAMESPACE_ID::internal::once_flag writer_renderers_init_;
 
 void ProtoStreamObjectWriter::InitRendererMap() {
   renderers_ =
@@ -1225,8 +1224,8 @@ void ProtoStreamObjectWriter::DeleteRendererMap() {
 
 ProtoStreamObjectWriter::TypeRenderer*
 ProtoStreamObjectWriter::FindTypeRenderer(const string& type_url) {
-  PROTOBUF_NAMESPACE_ID::internal::call_once(writer_renderers_init_,
-                                             InitRendererMap);
+  GOOGLE_PROTOBUF_NAMESPACE_ID::internal::call_once(writer_renderers_init_,
+                                                     InitRendererMap);
   return FindOrNull(*renderers_, type_url);
 }
 

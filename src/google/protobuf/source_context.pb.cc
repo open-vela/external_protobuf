@@ -13,6 +13,10 @@
 #include <google/protobuf/generated_message_reflection.h>
 #include <google/protobuf/reflection_ops.h>
 #include <google/protobuf/wire_format.h>
+// This is a temporary google only hack
+#ifdef GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
+#include "third_party/protobuf/version.h"
+#endif
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
 
@@ -35,7 +39,7 @@ static void InitDefaultsSourceContext_google_2fprotobuf_2fsource_5fcontext_2epro
   ::google::protobuf::SourceContext::InitAsDefaultInstance();
 }
 
-PROTOBUF_EXPORT ::google::protobuf::internal::SCCInfo<0> scc_info_SourceContext_google_2fprotobuf_2fsource_5fcontext_2eproto =
+LIBPROTOBUF_EXPORT ::google::protobuf::internal::SCCInfo<0> scc_info_SourceContext_google_2fprotobuf_2fsource_5fcontext_2eproto =
     {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsSourceContext_google_2fprotobuf_2fsource_5fcontext_2eproto}, {}};
 
 void InitDefaults_google_2fprotobuf_2fsource_5fcontext_2eproto() {
@@ -46,15 +50,15 @@ void InitDefaults_google_2fprotobuf_2fsource_5fcontext_2eproto() {
 constexpr ::google::protobuf::EnumDescriptor const** file_level_enum_descriptors_google_2fprotobuf_2fsource_5fcontext_2eproto = nullptr;
 constexpr ::google::protobuf::ServiceDescriptor const** file_level_service_descriptors_google_2fprotobuf_2fsource_5fcontext_2eproto = nullptr;
 
-const ::google::protobuf::uint32 TableStruct_google_2fprotobuf_2fsource_5fcontext_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
+const ::google::protobuf::uint32 TableStruct_google_2fprotobuf_2fsource_5fcontext_2eproto::offsets[] GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
   ~0u,  // no _has_bits_
-  PROTOBUF_FIELD_OFFSET(::google::protobuf::SourceContext, _internal_metadata_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::google::protobuf::SourceContext, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  PROTOBUF_FIELD_OFFSET(::google::protobuf::SourceContext, file_name_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::google::protobuf::SourceContext, file_name_),
 };
-static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
+static const ::google::protobuf::internal::MigrationSchema schemas[] GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::google::protobuf::SourceContext)},
 };
 
@@ -166,13 +170,14 @@ const char* SourceContext::_InternalParse(const char* begin, const char* end, vo
   while (ptr < end) {
     ::google::protobuf::uint32 tag;
     ptr = Varint::Parse32Inline(ptr, &tag);
-    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+    if (!ptr) goto error;
     switch (tag >> 3) {
+      case 0: goto error;
       // string file_name = 1;
       case 1: {
         if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
         ptr = Varint::Parse32Inline(ptr, &size);
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        if (!ptr) goto error;
         ctx->extra_parse_data().SetFieldName("google.protobuf.SourceContext.file_name");
         parser_till_end = ::google::protobuf::internal::StringParserUTF8;
         ::std::string* str = msg->mutable_file_name();
@@ -180,15 +185,14 @@ const char* SourceContext::_InternalParse(const char* begin, const char* end, vo
         object = str;
         if (size > end - ptr) goto len_delim_till_end;
         auto newend = ptr + size;
-        if (size) ptr = parser_till_end(ptr, newend, object, ctx);
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr == newend);
+        if (!ctx->ParseExactRange({parser_till_end, object}, ptr, newend)) goto error;
+        ptr = newend;
         break;
       }
       default: {
       handle_unusual: (void)&&handle_unusual;
-        if ((tag & 7) == 4 || tag == 0) {
-          bool ok = ctx->ValidEndGroup(tag);
-          GOOGLE_PROTOBUF_PARSER_ASSERT(ok);
+        if ((tag & 7) == 4) {
+          if (!ctx->ValidEndGroup(tag)) goto error;
           return ptr;
         }
         auto res = UnknownFieldParse(tag, {_InternalParse, msg},
@@ -199,6 +203,8 @@ const char* SourceContext::_InternalParse(const char* begin, const char* end, vo
     }  // switch
   }  // while
   return ptr;
+error:
+  return nullptr;
 len_delim_till_end: (void)&&len_delim_till_end;
   return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
                                  {parser_till_end, object}, size);
@@ -210,7 +216,7 @@ group_continues: (void)&&group_continues;
 #else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
 bool SourceContext::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
+#define DO_(EXPRESSION) if (!GOOGLE_PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
   ::google::protobuf::uint32 tag;
   // @@protoc_insertion_point(parse_start:google.protobuf.SourceContext)
   for (;;) {
@@ -396,11 +402,10 @@ void SourceContext::InternalSwap(SourceContext* other) {
 }  // namespace google
 namespace google {
 namespace protobuf {
-template<> PROTOBUF_NOINLINE ::google::protobuf::SourceContext* Arena::CreateMaybeMessage< ::google::protobuf::SourceContext >(Arena* arena) {
+template<> GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE ::google::protobuf::SourceContext* Arena::CreateMaybeMessage< ::google::protobuf::SourceContext >(Arena* arena) {
   return Arena::CreateInternal< ::google::protobuf::SourceContext >(arena);
 }
 }  // namespace protobuf
 }  // namespace google
 
 // @@protoc_insertion_point(global_scope)
-#include <google/protobuf/port_undef.inc>

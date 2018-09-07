@@ -36,19 +36,23 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 
 /**
- * A partial implementation of the {@link Parser} interface which implements as many methods of that
- * interface as possible in terms of other methods.
+ * A partial implementation of the {@link Parser} interface which implements
+ * as many methods of that interface as possible in terms of other methods.
  *
- * <p>Note: This class implements all the convenience methods in the {@link Parser} interface. See
- * {@link Parser} for related javadocs. Subclasses need to implement {@link
- * Parser#parsePartialFrom(CodedInputStream, ExtensionRegistryLite)}
+ * Note: This class implements all the convenience methods in the
+ * {@link Parser} interface. See {@link Parser} for related javadocs.
+ * Subclasses need to implement
+ * {@link Parser#parsePartialFrom(CodedInputStream, ExtensionRegistryLite)}
  *
  * @author liujisi@google.com (Pherl Liu)
  */
 public abstract class AbstractParser<MessageType extends MessageLite>
     implements Parser<MessageType> {
-  /** Creates an UninitializedMessageException for MessageType. */
-  private UninitializedMessageException newUninitializedMessageException(MessageType message) {
+  /**
+   * Creates an UninitializedMessageException for MessageType.
+   */
+  private UninitializedMessageException
+      newUninitializedMessageException(MessageType message) {
     if (message instanceof AbstractMessageLite) {
       return ((AbstractMessageLite) message).newUninitializedMessageException();
     }
@@ -71,8 +75,8 @@ public abstract class AbstractParser<MessageType extends MessageLite>
     return message;
   }
 
-  private static final ExtensionRegistryLite EMPTY_REGISTRY =
-      ExtensionRegistryLite.getEmptyRegistry();
+  private static final ExtensionRegistryLite EMPTY_REGISTRY
+      = ExtensionRegistryLite.getEmptyRegistry();
 
   @Override
   public MessageType parsePartialFrom(CodedInputStream input)
@@ -83,7 +87,8 @@ public abstract class AbstractParser<MessageType extends MessageLite>
   @Override
   public MessageType parseFrom(CodedInputStream input, ExtensionRegistryLite extensionRegistry)
       throws InvalidProtocolBufferException {
-    return checkMessageInitialized(parsePartialFrom(input, extensionRegistry));
+    return checkMessageInitialized(
+        parsePartialFrom(input, extensionRegistry));
   }
 
   @Override
@@ -188,7 +193,8 @@ public abstract class AbstractParser<MessageType extends MessageLite>
   public MessageType parseFrom(
       byte[] data, int off, int len, ExtensionRegistryLite extensionRegistry)
       throws InvalidProtocolBufferException {
-    return checkMessageInitialized(parsePartialFrom(data, off, len, extensionRegistry));
+    return checkMessageInitialized(
+        parsePartialFrom(data, off, len, extensionRegistry));
   }
 
   @Override
@@ -229,7 +235,8 @@ public abstract class AbstractParser<MessageType extends MessageLite>
   @Override
   public MessageType parseFrom(InputStream input, ExtensionRegistryLite extensionRegistry)
       throws InvalidProtocolBufferException {
-    return checkMessageInitialized(parsePartialFrom(input, extensionRegistry));
+    return checkMessageInitialized(
+        parsePartialFrom(input, extensionRegistry));
   }
 
   @Override
@@ -264,7 +271,8 @@ public abstract class AbstractParser<MessageType extends MessageLite>
   @Override
   public MessageType parseDelimitedFrom(InputStream input, ExtensionRegistryLite extensionRegistry)
       throws InvalidProtocolBufferException {
-    return checkMessageInitialized(parsePartialDelimitedFrom(input, extensionRegistry));
+    return checkMessageInitialized(
+        parsePartialDelimitedFrom(input, extensionRegistry));
   }
 
   @Override

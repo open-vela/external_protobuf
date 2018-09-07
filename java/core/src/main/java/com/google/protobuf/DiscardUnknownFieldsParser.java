@@ -30,7 +30,9 @@
 
 package com.google.protobuf;
 
-/** Parsers to discard unknown fields during parsing. */
+/**
+ * Parsers to discard unknown fields during parsing.
+ */
 public final class DiscardUnknownFieldsParser {
 
   /**
@@ -38,12 +40,11 @@ public final class DiscardUnknownFieldsParser {
    * parsing.
    *
    * <p>Usage example:
-   *
    * <pre>{@code
-   * private final static Parser<Foo> FOO_PARSER = DiscardUnknownFieldsParser.wrap(Foo.parser());
-   * Foo parseFooDiscardUnknown(ByteBuffer input) throws IOException {
-   *   return FOO_PARSER.parseFrom(input);
-   * }
+     * private final static Parser<Foo> FOO_PARSER = DiscardUnknownFieldsParser.wrap(Foo.parser());
+     * Foo parseFooDiscardUnknown(ByteBuffer input) throws IOException {
+     *   return FOO_PARSER.parseFrom(input);
+     * }
    * }</pre>
    *
    * <p>Like all other implementations of {@code Parser}, this parser is stateless and thread-safe.

@@ -46,10 +46,9 @@
 #include <google/protobuf/wire_format_lite_inl.h>
 #include <gtest/gtest.h>
 
-// When string == std::string inside Google, we can remove this typedef.
 #include <google/protobuf/stubs/strutil.h>
 
-typedef std::string ProtoString;
+using std::string;
 
 namespace google {
 namespace protobuf {
@@ -76,7 +75,7 @@ void SetAllTypesInEmptyMessageUnknownFields(
   protobuf_unittest::TestAllTypesLite message;
   TestUtilLite::ExpectClear(message);
   TestUtilLite::SetAllFields(&message);
-  ProtoString data = message.SerializeAsString();
+  string data = message.SerializeAsString();
   empty_message->ParseFromString(data);
 }
 
@@ -88,12 +87,12 @@ void SetSomeTypesInEmptyMessageUnknownFields(
   message.set_optional_int64(102);
   message.set_optional_uint32(103);
   message.set_optional_uint64(104);
-  ProtoString data = message.SerializeAsString();
+  string data = message.SerializeAsString();
   empty_message->ParseFromString(data);
 }
 
 TEST(Lite, AllLite1) {
-  ProtoString data;
+  string data;
 
   {
     protobuf_unittest::TestAllTypesLite message, message2, message3;
@@ -113,13 +112,13 @@ TEST(Lite, AllLite1) {
 }
 
 TEST(Lite, AllLite2) {
-  ProtoString data;
+  string data;
   {
     protobuf_unittest::TestAllExtensionsLite message, message2, message3;
     TestUtilLite::ExpectExtensionsClear(message);
     TestUtilLite::SetAllExtensions(&message);
     message2.CopyFrom(message);
-    ProtoString extensions_data = message.SerializeAsString();
+    string extensions_data = message.SerializeAsString();
     message3.ParseFromString(extensions_data);
     TestUtilLite::ExpectAllExtensionsSet(message);
     TestUtilLite::ExpectAllExtensionsSet(message2);
@@ -132,7 +131,7 @@ TEST(Lite, AllLite2) {
 }
 
 TEST(Lite, AllLite3) {
-  ProtoString data, packed_data;
+  string data, packed_data;
 
   {
     protobuf_unittest::TestPackedTypesLite message, message2, message3;
@@ -155,7 +154,7 @@ TEST(Lite, AllLite3) {
     TestUtilLite::ExpectPackedExtensionsClear(message);
     TestUtilLite::SetPackedExtensions(&message);
     message2.CopyFrom(message);
-    ProtoString packed_extensions_data = message.SerializeAsString();
+    string packed_extensions_data = message.SerializeAsString();
     EXPECT_EQ(packed_extensions_data, packed_data);
     message3.ParseFromString(packed_extensions_data);
     TestUtilLite::ExpectPackedExtensionsSet(message);
@@ -169,7 +168,7 @@ TEST(Lite, AllLite3) {
 }
 
 TEST(Lite, AllLite5) {
-  ProtoString data;
+  string data;
 
   {
     // Test that if an optional or required message/group field appears multiple
@@ -203,7 +202,7 @@ TEST(Lite, AllLite5) {
 
 #undef ASSIGN_REPEATED_GROUP
 
-    ProtoString buffer;
+    string buffer;
     generator.SerializeToString(&buffer);
     unittest::TestParsingMergeLite parsing_merge;
     parsing_merge.ParseFromString(buffer);
@@ -226,7 +225,7 @@ TEST(Lite, AllLite5) {
 }
 
 TEST(Lite, AllLite6) {
-  ProtoString data;
+  string data;
 
   // Test unknown fields support for lite messages.
   {
@@ -247,7 +246,7 @@ TEST(Lite, AllLite6) {
 }
 
 TEST(Lite, AllLite7) {
-  ProtoString data;
+  string data;
 
   {
     protobuf_unittest::TestAllExtensionsLite message, message2;
@@ -267,7 +266,7 @@ TEST(Lite, AllLite7) {
 }
 
 TEST(Lite, AllLite8) {
-  ProtoString data;
+  string data;
 
   {
     protobuf_unittest::TestPackedTypesLite message, message2;
@@ -287,7 +286,7 @@ TEST(Lite, AllLite8) {
 }
 
 TEST(Lite, AllLite9) {
-  ProtoString data;
+  string data;
 
   {
     protobuf_unittest::TestPackedExtensionsLite message, message2;
@@ -307,7 +306,7 @@ TEST(Lite, AllLite9) {
 }
 
 TEST(Lite, AllLite10) {
-  ProtoString data;
+  string data;
 
   {
     // Test Unknown fields swap
@@ -315,7 +314,7 @@ TEST(Lite, AllLite10) {
     SetAllTypesInEmptyMessageUnknownFields(&empty_message);
     SetSomeTypesInEmptyMessageUnknownFields(&empty_message2);
     data = empty_message.SerializeAsString();
-    ProtoString data2 = empty_message2.SerializeAsString();
+    string data2 = empty_message2.SerializeAsString();
     empty_message.Swap(&empty_message2);
     EXPECT_EQ(data, empty_message2.SerializeAsString());
     EXPECT_EQ(data2, empty_message.SerializeAsString());
@@ -323,7 +322,7 @@ TEST(Lite, AllLite10) {
 }
 
 TEST(Lite, AllLite11) {
-  ProtoString data;
+  string data;
 
   {
     // Test unknown fields swap with self
@@ -336,7 +335,7 @@ TEST(Lite, AllLite11) {
 }
 
 TEST(Lite, AllLite12) {
-  ProtoString data;
+  string data;
 
   {
     // Test MergeFrom with unknown fields
@@ -366,12 +365,12 @@ TEST(Lite, AllLite12) {
 }
 
 TEST(Lite, AllLite13) {
-  ProtoString data;
+  string data;
 
   {
     // Test unknown enum value
     protobuf_unittest::TestAllTypesLite message;
-    ProtoString buffer;
+    string buffer;
     {
       io::StringOutputStream output_stream(&buffer);
       io::CodedOutputStream coded_output(&output_stream);
@@ -391,7 +390,7 @@ TEST(Lite, AllLite13) {
 }
 
 TEST(Lite, AllLite14) {
-  ProtoString data;
+  string data;
 
   {
     // Test Clear with unknown fields
@@ -405,7 +404,7 @@ TEST(Lite, AllLite14) {
 // Tests for map lite =============================================
 
 TEST(Lite, AllLite15) {
-  ProtoString data;
+  string data;
 
   {
     // Accessors
@@ -420,7 +419,7 @@ TEST(Lite, AllLite15) {
 }
 
 TEST(Lite, AllLite16) {
-  ProtoString data;
+  string data;
 
   {
     // SetMapFieldsInitialized
@@ -432,7 +431,7 @@ TEST(Lite, AllLite16) {
 }
 
 TEST(Lite, AllLite17) {
-  ProtoString data;
+  string data;
 
   {
     // Clear
@@ -445,7 +444,7 @@ TEST(Lite, AllLite17) {
 }
 
 TEST(Lite, AllLite18) {
-  ProtoString data;
+  string data;
 
   {
     // ClearMessageMap
@@ -458,7 +457,7 @@ TEST(Lite, AllLite18) {
 }
 
 TEST(Lite, AllLite19) {
-  ProtoString data;
+  string data;
 
   {
     // CopyFrom
@@ -475,7 +474,7 @@ TEST(Lite, AllLite19) {
 }
 
 TEST(Lite, AllLite20) {
-  ProtoString data;
+  string data;
 
   {
     // CopyFromMessageMap
@@ -493,7 +492,7 @@ TEST(Lite, AllLite20) {
 }
 
 TEST(Lite, AllLite21) {
-  ProtoString data;
+  string data;
 
   {
     // SwapWithEmpty
@@ -510,7 +509,7 @@ TEST(Lite, AllLite21) {
 }
 
 TEST(Lite, AllLite22) {
-  ProtoString data;
+  string data;
 
   {
     // SwapWithSelf
@@ -525,7 +524,7 @@ TEST(Lite, AllLite22) {
 }
 
 TEST(Lite, AllLite23) {
-  ProtoString data;
+  string data;
 
   {
     // SwapWithOther
@@ -542,7 +541,7 @@ TEST(Lite, AllLite23) {
 }
 
 TEST(Lite, AllLite24) {
-  ProtoString data;
+  string data;
 
   {
     // CopyConstructor
@@ -555,7 +554,7 @@ TEST(Lite, AllLite24) {
 }
 
 TEST(Lite, AllLite25) {
-  ProtoString data;
+  string data;
 
   {
     // CopyAssignmentOperator
@@ -573,7 +572,7 @@ TEST(Lite, AllLite25) {
 }
 
 TEST(Lite, AllLite26) {
-  ProtoString data;
+  string data;
 
   {
     // NonEmptyMergeFrom
@@ -595,7 +594,7 @@ TEST(Lite, AllLite26) {
 }
 
 TEST(Lite, AllLite27) {
-  ProtoString data;
+  string data;
 
   {
     // MergeFromMessageMap
@@ -613,12 +612,12 @@ TEST(Lite, AllLite27) {
 }
 
 TEST(Lite, AllLite28) {
-  ProtoString data;
+  string data;
 
   {
     // Test the generated SerializeWithCachedSizesToArray()
     protobuf_unittest::TestMapLite message1, message2;
-    ProtoString data;
+    string data;
     MapLiteTestUtil::SetMapFields(&message1);
     int size = message1.ByteSize();
     data.resize(size);
@@ -631,14 +630,14 @@ TEST(Lite, AllLite28) {
 }
 
 TEST(Lite, AllLite29) {
-  ProtoString data;
+  string data;
 
   {
     // Test the generated SerializeWithCachedSizes()
     protobuf_unittest::TestMapLite message1, message2;
     MapLiteTestUtil::SetMapFields(&message1);
     int size = message1.ByteSize();
-    ProtoString data;
+    string data;
     data.resize(size);
     {
       // Allow the output stream to buffer only one byte at a time.
@@ -655,7 +654,7 @@ TEST(Lite, AllLite29) {
 
 
 TEST(Lite, AllLite32) {
-  ProtoString data;
+  string data;
 
   {
     // Proto2UnknownEnum
@@ -664,14 +663,14 @@ TEST(Lite, AllLite32) {
         protobuf_unittest::E_PROTO2_MAP_ENUM_FOO_LITE;
     (*from.mutable_unknown_map_field())[0] =
         protobuf_unittest::E_PROTO2_MAP_ENUM_EXTRA_LITE;
-    ProtoString data;
+    string data;
     from.SerializeToString(&data);
 
     protobuf_unittest::TestEnumMapLite to;
     EXPECT_TRUE(to.ParseFromString(data));
     EXPECT_EQ(0, to.unknown_map_field().size());
     EXPECT_FALSE(to.mutable_unknown_fields()->empty());
-    ASSERT_EQ(1, to.known_map_field().size());
+    EXPECT_EQ(1, to.known_map_field().size());
     EXPECT_EQ(protobuf_unittest::PROTO2_MAP_ENUM_FOO_LITE,
               to.known_map_field().at(0));
 
@@ -679,147 +678,141 @@ TEST(Lite, AllLite32) {
     from.Clear();
     to.SerializeToString(&data);
     EXPECT_TRUE(from.ParseFromString(data));
-    ASSERT_EQ(1, from.known_map_field().size());
+    EXPECT_EQ(1, from.known_map_field().size());
     EXPECT_EQ(protobuf_unittest::E_PROTO2_MAP_ENUM_FOO_LITE,
               from.known_map_field().at(0));
-    ASSERT_EQ(1, from.unknown_map_field().size());
+    EXPECT_EQ(1, from.unknown_map_field().size());
     EXPECT_EQ(protobuf_unittest::E_PROTO2_MAP_ENUM_EXTRA_LITE,
               from.unknown_map_field().at(0));
   }
 }
 
 TEST(Lite, AllLite33) {
-  ProtoString data;
+  string data;
 
   {
     // StandardWireFormat
     protobuf_unittest::TestMapLite message;
-    ProtoString data = "\x0A\x04\x08\x01\x10\x01";
+    string data = "\x0A\x04\x08\x01\x10\x01";
 
     EXPECT_TRUE(message.ParseFromString(data));
-    ASSERT_EQ(1, message.map_int32_int32().size());
+    EXPECT_EQ(1, message.map_int32_int32().size());
     EXPECT_EQ(1, message.map_int32_int32().at(1));
   }
 }
 
 TEST(Lite, AllLite34) {
-  ProtoString data;
+  string data;
 
   {
     // UnorderedWireFormat
     protobuf_unittest::TestMapLite message;
 
     // put value before key in wire format
-    ProtoString data = "\x0A\x04\x10\x01\x08\x02";
+    string data = "\x0A\x04\x10\x01\x08\x02";
 
     EXPECT_TRUE(message.ParseFromString(data));
-    ASSERT_EQ(1, message.map_int32_int32().size());
-    ASSERT_NE(message.map_int32_int32().find(2),
-              message.map_int32_int32().end());
+    EXPECT_EQ(1, message.map_int32_int32().size());
     EXPECT_EQ(1, message.map_int32_int32().at(2));
   }
 }
 
 TEST(Lite, AllLite35) {
-  ProtoString data;
+  string data;
 
   {
     // DuplicatedKeyWireFormat
     protobuf_unittest::TestMapLite message;
 
     // Two key fields in wire format
-    ProtoString data = "\x0A\x06\x08\x01\x08\x02\x10\x01";
+    string data = "\x0A\x06\x08\x01\x08\x02\x10\x01";
 
     EXPECT_TRUE(message.ParseFromString(data));
-    ASSERT_EQ(1, message.map_int32_int32().size());
+    EXPECT_EQ(1, message.map_int32_int32().size());
     EXPECT_EQ(1, message.map_int32_int32().at(2));
   }
 }
 
 TEST(Lite, AllLite36) {
-  ProtoString data;
+  string data;
 
   {
     // DuplicatedValueWireFormat
     protobuf_unittest::TestMapLite message;
 
     // Two value fields in wire format
-    ProtoString data = "\x0A\x06\x08\x01\x10\x01\x10\x02";
+    string data = "\x0A\x06\x08\x01\x10\x01\x10\x02";
 
     EXPECT_TRUE(message.ParseFromString(data));
-    ASSERT_EQ(1, message.map_int32_int32().size());
+    EXPECT_EQ(1, message.map_int32_int32().size());
     EXPECT_EQ(2, message.map_int32_int32().at(1));
   }
 }
 
 TEST(Lite, AllLite37) {
-  ProtoString data;
+  string data;
 
   {
     // MissedKeyWireFormat
     protobuf_unittest::TestMapLite message;
 
     // No key field in wire format
-    ProtoString data = "\x0A\x02\x10\x01";
+    string data = "\x0A\x02\x10\x01";
 
     EXPECT_TRUE(message.ParseFromString(data));
-    ASSERT_EQ(1, message.map_int32_int32().size());
-    ASSERT_NE(message.map_int32_int32().find(0),
-              message.map_int32_int32().end());
+    EXPECT_EQ(1, message.map_int32_int32().size());
     EXPECT_EQ(1, message.map_int32_int32().at(0));
   }
 }
 
 TEST(Lite, AllLite38) {
-  ProtoString data;
+  string data;
 
   {
     // MissedValueWireFormat
     protobuf_unittest::TestMapLite message;
 
     // No value field in wire format
-    ProtoString data = "\x0A\x02\x08\x01";
+    string data = "\x0A\x02\x08\x01";
 
     EXPECT_TRUE(message.ParseFromString(data));
-    ASSERT_EQ(1, message.map_int32_int32().size());
-    ASSERT_NE(message.map_int32_int32().find(1),
-              message.map_int32_int32().end());
+    EXPECT_EQ(1, message.map_int32_int32().size());
     EXPECT_EQ(0, message.map_int32_int32().at(1));
   }
 }
 
 TEST(Lite, AllLite39) {
-  ProtoString data;
+  string data;
 
   {
     // UnknownFieldWireFormat
     protobuf_unittest::TestMapLite message;
 
     // Unknown field in wire format
-    ProtoString data = "\x0A\x06\x08\x02\x10\x03\x18\x01";
+    string data = "\x0A\x06\x08\x02\x10\x03\x18\x01";
 
     EXPECT_TRUE(message.ParseFromString(data));
-    ASSERT_EQ(1, message.map_int32_int32().size());
+    EXPECT_EQ(1, message.map_int32_int32().size());
     EXPECT_EQ(3, message.map_int32_int32().at(2));
   }
 }
 
 TEST(Lite, AllLite40) {
-  ProtoString data;
+  string data;
 
   {
     // CorruptedWireFormat
     protobuf_unittest::TestMapLite message;
 
     // corrupted data in wire format
-    ProtoString data = "\x0A\x06\x08\x02\x11\x03";
+    string data = "\x0A\x06\x08\x02\x11\x03";
 
     EXPECT_FALSE(message.ParseFromString(data));
   }
 }
 
 TEST(Lite, AllLite41) {
-  ProtoString data;
+  string data;
 
   {
     // IsInitialized
@@ -838,7 +831,7 @@ TEST(Lite, AllLite41) {
 }
 
 TEST(Lite, AllLite42) {
-  ProtoString data;
+  string data;
 
   {
       // Check that adding more values to enum does not corrupt message
@@ -847,7 +840,7 @@ TEST(Lite, AllLite42) {
       v2_message.set_int_field(800);
       // Set enum field to the value not understood by the old client.
       v2_message.set_enum_field(protobuf_unittest::V2_SECOND);
-      ProtoString v2_bytes = v2_message.SerializeAsString();
+      string v2_bytes = v2_message.SerializeAsString();
 
       protobuf_unittest::V1MessageLite v1_message;
       v1_message.ParseFromString(v2_bytes);
@@ -858,7 +851,7 @@ TEST(Lite, AllLite42) {
       EXPECT_EQ(v1_message.enum_field(), protobuf_unittest::V1_FIRST);
 
       // However, when re-serialized, it should preserve enum value.
-      ProtoString v1_bytes = v1_message.SerializeAsString();
+      string v1_bytes = v1_message.SerializeAsString();
 
       protobuf_unittest::V2MessageLite same_v2_message;
       same_v2_message.ParseFromString(v1_bytes);
@@ -874,7 +867,7 @@ TEST(Lite, AllLite43) {
   protobuf_unittest::TestOneofParsingLite message1;
 
   message1.set_oneof_int32(17);
-  ProtoString serialized;
+  string serialized;
   EXPECT_TRUE(message1.SerializeToString(&serialized));
 
   // Submessage
@@ -916,7 +909,7 @@ TEST(Lite, AllLite44) {
   {
     protobuf_unittest::TestOneofParsingLite original;
     original.set_oneof_int32(17);
-    ProtoString serialized;
+    string serialized;
     EXPECT_TRUE(original.SerializeToString(&serialized));
     protobuf_unittest::TestOneofParsingLite parsed;
     for (int i = 0; i < 2; ++i) {
@@ -932,7 +925,7 @@ TEST(Lite, AllLite44) {
   {
     protobuf_unittest::TestOneofParsingLite original;
     original.mutable_oneof_submessage()->set_optional_int32(5);
-    ProtoString serialized;
+    string serialized;
     EXPECT_TRUE(original.SerializeToString(&serialized));
     protobuf_unittest::TestOneofParsingLite parsed;
     for (int i = 0; i < 2; ++i) {
@@ -948,7 +941,7 @@ TEST(Lite, AllLite44) {
   {
     protobuf_unittest::TestOneofParsingLite original;
     original.set_oneof_string("string");
-    ProtoString serialized;
+    string serialized;
     EXPECT_TRUE(original.SerializeToString(&serialized));
     protobuf_unittest::TestOneofParsingLite parsed;
     for (int i = 0; i < 2; ++i) {
@@ -964,7 +957,7 @@ TEST(Lite, AllLite44) {
   {
     protobuf_unittest::TestOneofParsingLite original;
     original.set_oneof_bytes("bytes");
-    ProtoString serialized;
+    string serialized;
     EXPECT_TRUE(original.SerializeToString(&serialized));
     protobuf_unittest::TestOneofParsingLite parsed;
     for (int i = 0; i < 2; ++i) {
@@ -980,7 +973,7 @@ TEST(Lite, AllLite44) {
   {
     protobuf_unittest::TestOneofParsingLite original;
     original.set_oneof_enum(protobuf_unittest::V2_SECOND);
-    ProtoString serialized;
+    string serialized;
     EXPECT_TRUE(original.SerializeToString(&serialized));
     protobuf_unittest::TestOneofParsingLite parsed;
     for (int i = 0; i < 2; ++i) {
@@ -997,7 +990,7 @@ TEST(Lite, AllLite44) {
 
 TEST(Lite, AllLite45) {
   // Test unknown fields are not discarded upon parsing.
-  ProtoString data = "\20\1";  // varint 1 with field number 2
+  string data = "\20\1";  // varint 1 with field number 2
 
   protobuf_unittest::ForeignMessageLite a;
   EXPECT_TRUE(a.ParseFromString(data));
@@ -1005,7 +998,7 @@ TEST(Lite, AllLite45) {
       reinterpret_cast<const ::google::protobuf::uint8*>(data.data()), data.size());
   EXPECT_TRUE(a.MergePartialFromCodedStream(&input_stream));
 
-  ProtoString serialized = a.SerializeAsString();
+  string serialized = a.SerializeAsString();
   EXPECT_EQ(serialized.substr(0, 2), data);
   EXPECT_EQ(serialized.substr(2), data);
 }
@@ -1020,7 +1013,7 @@ TEST(Lite, AllLite45) {
 TEST(Lite, AllLite46) {
   protobuf_unittest::PackedInt32 packed;
   packed.add_repeated_int32(42);
-  ProtoString serialized;
+  string serialized;
   ASSERT_TRUE(packed.SerializeToString(&serialized));
 
   protobuf_unittest::NonPackedInt32 non_packed;
@@ -1032,27 +1025,13 @@ TEST(Lite, AllLite46) {
 TEST(Lite, AllLite47) {
   protobuf_unittest::NonPackedFixed32 non_packed;
   non_packed.add_repeated_fixed32(42);
-  ProtoString serialized;
+  string serialized;
   ASSERT_TRUE(non_packed.SerializeToString(&serialized));
 
   protobuf_unittest::PackedFixed32 packed;
   ASSERT_TRUE(packed.ParseFromString(serialized));
   ASSERT_EQ(1, packed.repeated_fixed32_size());
   EXPECT_EQ(42, packed.repeated_fixed32(0));
-}
-
-TEST(Lite, MapCrash) {
-  // See b/113635730
-  Arena arena;
-  auto msg = Arena::CreateMessage<protobuf_unittest::TestMapLite>(&arena);
-  // Payload for the map<string, Enum> with a enum varint that's longer > 10
-  // bytes. This causes a parse fail and a subsequent delete.
-  // field 16 (map<int32, MapEnumLite>) tag = 128+2 = \202 \1
-  //   13 long \15
-  //   int32 key = 1  (\10 \1)
-  //   MapEnumLite value = too long varint (parse error)
-  EXPECT_FALSE(msg->ParseFromString(
-      "\202\1\15\10\1\200\200\200\200\200\200\200\200\200\200\1"));
 }
 
 }  // namespace protobuf

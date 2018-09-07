@@ -134,11 +134,7 @@ class DescriptorDatabase(object):
       # descriptor can also be found. The behavior is the same with
       # protobuf C++.
       top_level, _, _ = symbol.rpartition('.')
-      try:
-        return self._file_desc_protos_by_symbol[top_level]
-      except KeyError:
-        # Raise the original symbol as a KeyError for better diagnostics.
-        raise KeyError(symbol)
+      return self._file_desc_protos_by_symbol[top_level]
 
   def FindFileContainingExtension(self, extendee_name, extension_number):
     # TODO(jieluo): implement this API.

@@ -47,9 +47,7 @@
 
 #include <google/protobuf/stubs/common.h>
 #include <google/protobuf/stubs/logging.h>
-#include <google/protobuf/port.h>
 #include <google/protobuf/repeated_field.h>
-#include <google/protobuf/wire_format_lite.h>
 
 #include <google/protobuf/port_def.inc>
 
@@ -134,7 +132,7 @@ struct ExtensionInfo {
 
 // Abstract interface for an object which looks up extension definitions.  Used
 // when parsing.
-class PROTOBUF_EXPORT ExtensionFinder {
+class LIBPROTOBUF_EXPORT ExtensionFinder {
  public:
   virtual ~ExtensionFinder();
 
@@ -144,7 +142,7 @@ class PROTOBUF_EXPORT ExtensionFinder {
 
 // Implementation of ExtensionFinder which finds extensions defined in .proto
 // files which have been compiled into the binary.
-class PROTOBUF_EXPORT GeneratedExtensionFinder : public ExtensionFinder {
+class LIBPROTOBUF_EXPORT GeneratedExtensionFinder : public ExtensionFinder {
  public:
   GeneratedExtensionFinder(const MessageLite* containing_type)
       : containing_type_(containing_type) {}
@@ -174,7 +172,7 @@ class MessageSetFieldSkipper;
 // ExtensionSet.  When parsing, if a tag number is encountered which is
 // inside one of the message type's extension ranges, the tag is passed
 // off to the ExtensionSet for parsing.  Etc.
-class PROTOBUF_EXPORT ExtensionSet {
+class LIBPROTOBUF_EXPORT ExtensionSet {
  public:
   ExtensionSet();
   explicit ExtensionSet(Arena* arena);
@@ -251,7 +249,7 @@ class PROTOBUF_EXPORT ExtensionSet {
   double GetDouble(int number, double default_value) const;
   bool GetBool(int number, bool default_value) const;
   int GetEnum(int number, int default_value) const;
-  const std::string& GetString(int number, const std::string& default_value) const;
+  const string& GetString(int number, const string& default_value) const;
   const MessageLite& GetMessage(int number,
                                 const MessageLite& default_value) const;
   const MessageLite& GetMessage(int number, const Descriptor* message_type,
@@ -269,8 +267,8 @@ class PROTOBUF_EXPORT ExtensionSet {
   void SetDouble(int number, FieldType type, double value, desc);
   void SetBool(int number, FieldType type, bool value, desc);
   void SetEnum(int number, FieldType type, int value, desc);
-  void SetString(int number, FieldType type, const std::string& value, desc);
-  std::string* MutableString(int number, FieldType type, desc);
+  void SetString(int number, FieldType type, const string& value, desc);
+  string* MutableString(int number, FieldType type, desc);
   MessageLite* MutableMessage(int number, FieldType type,
                               const MessageLite& prototype, desc);
   MessageLite* MutableMessage(const FieldDescriptor* decsriptor,
@@ -321,7 +319,7 @@ class PROTOBUF_EXPORT ExtensionSet {
   double GetRepeatedDouble(int number, int index) const;
   bool GetRepeatedBool(int number, int index) const;
   int GetRepeatedEnum(int number, int index) const;
-  const std::string& GetRepeatedString(int number, int index) const;
+  const string& GetRepeatedString(int number, int index) const;
   const MessageLite& GetRepeatedMessage(int number, int index) const;
 
   void SetRepeatedInt32(int number, int index, int32 value);
@@ -332,8 +330,8 @@ class PROTOBUF_EXPORT ExtensionSet {
   void SetRepeatedDouble(int number, int index, double value);
   void SetRepeatedBool(int number, int index, bool value);
   void SetRepeatedEnum(int number, int index, int value);
-  void SetRepeatedString(int number, int index, const std::string& value);
-  std::string* MutableRepeatedString(int number, int index);
+  void SetRepeatedString(int number, int index, const string& value);
+  string* MutableRepeatedString(int number, int index);
   MessageLite* MutableRepeatedMessage(int number, int index);
 
 #define desc const FieldDescriptor* descriptor  // avoid line wrapping
@@ -345,8 +343,8 @@ class PROTOBUF_EXPORT ExtensionSet {
   void AddDouble(int number, FieldType type, bool packed, double value, desc);
   void AddBool(int number, FieldType type, bool packed, bool value, desc);
   void AddEnum(int number, FieldType type, bool packed, int value, desc);
-  void AddString(int number, FieldType type, const std::string& value, desc);
-  std::string* AddString(int number, FieldType type, desc);
+  void AddString(int number, FieldType type, const string& value, desc);
+  string* AddString(int number, FieldType type, desc);
   MessageLite* AddMessage(int number, FieldType type,
                           const MessageLite& prototype, desc);
   MessageLite* AddMessage(const FieldDescriptor* descriptor,
@@ -398,13 +396,13 @@ class PROTOBUF_EXPORT ExtensionSet {
 #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
   // Lite parser
   std::pair<const char*, bool> ParseField(
-      uint64 tag, ParseClosure parent, const char* begin, const char* end,
+      uint32 tag, ParseClosure parent, const char* begin, const char* end,
       const MessageLite* containing_type,
       internal::InternalMetadataWithArenaLite* metadata,
       internal::ParseContext* ctx);
   // Full parser
   std::pair<const char*, bool> ParseField(
-      uint64 tag, ParseClosure parent, const char* begin, const char* end,
+      uint32 tag, ParseClosure parent, const char* begin, const char* end,
       const Message* containing_type,
       internal::InternalMetadataWithArena* metadata,
       internal::ParseContext* ctx);
@@ -428,7 +426,7 @@ class PROTOBUF_EXPORT ExtensionSet {
   // FieldSkipper automatically).
   bool ParseMessageSet(io::CodedInputStream* input,
                        const MessageLite* containing_type,
-                       std::string* unknown_fields);
+                       string* unknown_fields);
   bool ParseMessageSet(io::CodedInputStream* input,
                        const Message* containing_type,
                        UnknownFieldSet* unknown_fields);
@@ -487,7 +485,7 @@ class PROTOBUF_EXPORT ExtensionSet {
 
  private:
   // Interface of a lazily parsed singular message extension.
-  class PROTOBUF_EXPORT LazyMessageExtension {
+  class LIBPROTOBUF_EXPORT LazyMessageExtension {
    public:
     LazyMessageExtension() {}
     virtual ~LazyMessageExtension() {}
@@ -504,7 +502,7 @@ class PROTOBUF_EXPORT ExtensionSet {
 
     virtual bool IsInitialized() const = 0;
 
-    PROTOBUF_DEPRECATED_MSG("Please use ByteSizeLong() instead")
+    GOOGLE_PROTOBUF_DEPRECATED_MSG("Please use ByteSizeLong() instead")
     virtual int ByteSize() const { return internal::ToIntSize(ByteSizeLong()); }
     virtual size_t ByteSizeLong() const = 0;
     virtual size_t SpaceUsedLong() const = 0;
@@ -541,7 +539,7 @@ class PROTOBUF_EXPORT ExtensionSet {
       double double_value;
       bool bool_value;
       int enum_value;
-      std::string* string_value;
+      string* string_value;
       MessageLite* message_value;
       LazyMessageExtension* lazymessage_value;
 
@@ -553,7 +551,7 @@ class PROTOBUF_EXPORT ExtensionSet {
       RepeatedField<double>* repeated_double_value;
       RepeatedField<bool>* repeated_bool_value;
       RepeatedField<int>* repeated_enum_value;
-      RepeatedPtrField<std::string>* repeated_string_value;
+      RepeatedPtrField<string>* repeated_string_value;
       RepeatedPtrField<MessageLite>* repeated_message_value;
     };
 
@@ -657,7 +655,7 @@ class PROTOBUF_EXPORT ExtensionSet {
   void Erase(int key);
 
   size_t Size() const {
-    return PROTOBUF_PREDICT_FALSE(is_large()) ? map_.large->size() : flat_size_;
+    return GOOGLE_PREDICT_FALSE(is_large()) ? map_.large->size() : flat_size_;
   }
 
   // Similar to std::for_each.
@@ -673,7 +671,7 @@ class PROTOBUF_EXPORT ExtensionSet {
   // Applies a functor to the <int, Extension&> pairs in sorted order.
   template <typename KeyValueFunctor>
   KeyValueFunctor ForEach(KeyValueFunctor func) {
-    if (PROTOBUF_PREDICT_FALSE(is_large())) {
+    if (GOOGLE_PREDICT_FALSE(is_large())) {
       return ForEach(map_.large->begin(), map_.large->end(), std::move(func));
     }
     return ForEach(flat_begin(), flat_end(), std::move(func));
@@ -682,7 +680,7 @@ class PROTOBUF_EXPORT ExtensionSet {
   // Applies a functor to the <int, const Extension&> pairs in sorted order.
   template <typename KeyValueFunctor>
   KeyValueFunctor ForEach(KeyValueFunctor func) const {
-    if (PROTOBUF_PREDICT_FALSE(is_large())) {
+    if (GOOGLE_PREDICT_FALSE(is_large())) {
       return ForEach(map_.large->begin(), map_.large->end(), std::move(func));
     }
     return ForEach(flat_begin(), flat_end(), std::move(func));
@@ -692,10 +690,10 @@ class PROTOBUF_EXPORT ExtensionSet {
   void InternalExtensionMergeFrom(int number, const Extension& other_extension);
 
 #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  bool FindExtension(int wire_type, uint32 field,
-                     const Message* containing_type,
+  bool FindExtension(uint32 tag, const Message* containing_type,
                      const internal::ParseContext* ctx,
-                     ExtensionInfo* extension, bool* was_packed_on_wire);
+                     ExtensionInfo* extension, int* number,
+                     bool* was_packed_on_wire);
 #endif
 
   // Returns true and fills field_number and extension if extension is found.
@@ -798,54 +796,18 @@ class PROTOBUF_EXPORT ExtensionSet {
   GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(ExtensionSet);
 };
 
-#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-template <typename Msg, typename Metadata>
-const char* ParseMessageSet(const char* begin, const char* end, Msg* msg,
-                            ExtensionSet* ext, Metadata* metadata,
-                            internal::ParseContext* ctx) {
-  auto ptr = begin;
-  int depth;
-  (void)depth;
-  while (ptr < end) {
-    uint32 tag;
-    ptr = Varint::Parse32Inline(ptr, &tag);
-    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-    if (tag == WireFormatLite::kMessageSetItemStartTag) {
-      bool ok = ctx->PrepareGroup(tag, &depth);
-      GOOGLE_PROTOBUF_PARSER_ASSERT(ok);
-      ctx->extra_parse_data().payload.clear();
-      ptr = Msg::InternalParseMessageSetItem(ptr, end, msg, ctx);
-      GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-      if (ctx->GroupContinues(depth)) goto group_continues;
-    } else {
-      auto res =
-          ext->ParseField(tag, {Msg::_InternalParse, msg}, ptr, end,
-                          Msg::internal_default_instance(), metadata, ctx);
-      ptr = res.first;
-      if (res.second) break;
-    }
-  }
-  return ptr;
-group_continues:
-  GOOGLE_DCHECK(ptr >= end);
-  ctx->StoreGroup({Msg::_InternalParse, msg},
-                  {Msg::InternalParseMessageSetItem, msg}, depth);
-  return ptr;
-}
-#endif
-
 // These are just for convenience...
 inline void ExtensionSet::SetString(int number, FieldType type,
-                                    const std::string& value,
+                                    const string& value,
                                     const FieldDescriptor* descriptor) {
   MutableString(number, type, descriptor)->assign(value);
 }
 inline void ExtensionSet::SetRepeatedString(int number, int index,
-                                            const std::string& value) {
+                                            const string& value) {
   MutableRepeatedString(number, index)->assign(value);
 }
 inline void ExtensionSet::AddString(int number, FieldType type,
-                                    const std::string& value,
+                                    const string& value,
                                     const FieldDescriptor* descriptor) {
   AddString(number, type, descriptor)->assign(value);
 }
@@ -960,7 +922,7 @@ class RepeatedPrimitiveTypeTraits {
   }
 };
 
-class PROTOBUF_EXPORT RepeatedPrimitiveDefaults {
+class LIBPROTOBUF_EXPORT RepeatedPrimitiveDefaults {
  private:
   template <typename Type>
   friend class RepeatedPrimitiveTypeTraits;
@@ -1037,21 +999,21 @@ PROTOBUF_DEFINE_PRIMITIVE_TYPE(bool, Bool)
 // StringTypeTraits
 
 // Strings support both Set() and Mutable().
-class PROTOBUF_EXPORT StringTypeTraits {
+class LIBPROTOBUF_EXPORT StringTypeTraits {
  public:
-  typedef const std::string& ConstType;
-  typedef std::string* MutableType;
+  typedef const string& ConstType;
+  typedef string* MutableType;
   typedef StringTypeTraits Singular;
 
-  static inline const std::string& Get(int number, const ExtensionSet& set,
+  static inline const string& Get(int number, const ExtensionSet& set,
                                   ConstType default_value) {
     return set.GetString(number, default_value);
   }
-  static inline void Set(int number, FieldType field_type, const std::string& value,
+  static inline void Set(int number, FieldType field_type, const string& value,
                          ExtensionSet* set) {
     set->SetString(number, field_type, value, NULL);
   }
-  static inline std::string* Mutable(int number, FieldType field_type,
+  static inline string* Mutable(int number, FieldType field_type,
                                 ExtensionSet* set) {
     return set->MutableString(number, field_type, NULL);
   }
@@ -1062,44 +1024,44 @@ class PROTOBUF_EXPORT StringTypeTraits {
   }
 };
 
-class PROTOBUF_EXPORT RepeatedStringTypeTraits {
+class LIBPROTOBUF_EXPORT RepeatedStringTypeTraits {
  public:
-  typedef const std::string& ConstType;
-  typedef std::string* MutableType;
+  typedef const string& ConstType;
+  typedef string* MutableType;
   typedef RepeatedStringTypeTraits Repeated;
 
-  typedef RepeatedPtrField<std::string> RepeatedFieldType;
+  typedef RepeatedPtrField<string> RepeatedFieldType;
 
-  static inline const std::string& Get(int number, const ExtensionSet& set,
+  static inline const string& Get(int number, const ExtensionSet& set,
                                   int index) {
     return set.GetRepeatedString(number, index);
   }
-  static inline void Set(int number, int index, const std::string& value,
+  static inline void Set(int number, int index, const string& value,
                          ExtensionSet* set) {
     set->SetRepeatedString(number, index, value);
   }
-  static inline std::string* Mutable(int number, int index, ExtensionSet* set) {
+  static inline string* Mutable(int number, int index, ExtensionSet* set) {
     return set->MutableRepeatedString(number, index);
   }
   static inline void Add(int number, FieldType field_type, bool /*is_packed*/,
-                         const std::string& value, ExtensionSet* set) {
+                         const string& value, ExtensionSet* set) {
     set->AddString(number, field_type, value, NULL);
   }
-  static inline std::string* Add(int number, FieldType field_type,
+  static inline string* Add(int number, FieldType field_type,
                             ExtensionSet* set) {
     return set->AddString(number, field_type, NULL);
   }
-  static inline const RepeatedPtrField<std::string>& GetRepeated(
+  static inline const RepeatedPtrField<string>& GetRepeated(
       int number, const ExtensionSet& set) {
-    return *reinterpret_cast<const RepeatedPtrField<std::string>*>(
+    return *reinterpret_cast<const RepeatedPtrField<string>*>(
         set.GetRawRepeatedField(number, GetDefaultRepeatedField()));
   }
 
-  static inline RepeatedPtrField<std::string>* MutableRepeated(int number,
+  static inline RepeatedPtrField<string>* MutableRepeated(int number,
                                                           FieldType field_type,
                                                           bool is_packed,
                                                           ExtensionSet* set) {
-    return reinterpret_cast<RepeatedPtrField<std::string>*>(
+    return reinterpret_cast<RepeatedPtrField<string>*>(
         set->MutableRawRepeatedField(number, field_type, is_packed, NULL));
   }
 
@@ -1363,101 +1325,101 @@ class ExtensionIdentifier {
 //
 // For similar reason, we use "_field_type" and "_is_packed" as parameter names
 // below, so that "field_type" and "is_packed" can be used as field names.
-#define GOOGLE_PROTOBUF_EXTENSION_ACCESSORS(CLASSNAME)                       \
+#define GOOGLE_PROTOBUF_EXTENSION_ACCESSORS(CLASSNAME)                        \
   /* Has, Size, Clear */                                                      \
   template <typename _proto_TypeTraits,                                       \
-            ::PROTOBUF_NAMESPACE_ID::internal::FieldType _field_type,         \
+            ::GOOGLE_PROTOBUF_NAMESPACE_ID::internal::FieldType _field_type, \
             bool _is_packed>                                                  \
   inline bool HasExtension(                                                   \
-      const ::PROTOBUF_NAMESPACE_ID::internal::ExtensionIdentifier<           \
+      const ::GOOGLE_PROTOBUF_NAMESPACE_ID::internal::ExtensionIdentifier<   \
           CLASSNAME, _proto_TypeTraits, _field_type, _is_packed>& id) const { \
     return _extensions_.Has(id.number());                                     \
   }                                                                           \
                                                                               \
   template <typename _proto_TypeTraits,                                       \
-            ::PROTOBUF_NAMESPACE_ID::internal::FieldType _field_type,         \
+            ::GOOGLE_PROTOBUF_NAMESPACE_ID::internal::FieldType _field_type, \
             bool _is_packed>                                                  \
   inline void ClearExtension(                                                 \
-      const ::PROTOBUF_NAMESPACE_ID::internal::ExtensionIdentifier<           \
+      const ::GOOGLE_PROTOBUF_NAMESPACE_ID::internal::ExtensionIdentifier<   \
           CLASSNAME, _proto_TypeTraits, _field_type, _is_packed>& id) {       \
     _extensions_.ClearExtension(id.number());                                 \
   }                                                                           \
                                                                               \
   template <typename _proto_TypeTraits,                                       \
-            ::PROTOBUF_NAMESPACE_ID::internal::FieldType _field_type,         \
+            ::GOOGLE_PROTOBUF_NAMESPACE_ID::internal::FieldType _field_type, \
             bool _is_packed>                                                  \
   inline int ExtensionSize(                                                   \
-      const ::PROTOBUF_NAMESPACE_ID::internal::ExtensionIdentifier<           \
+      const ::GOOGLE_PROTOBUF_NAMESPACE_ID::internal::ExtensionIdentifier<   \
           CLASSNAME, _proto_TypeTraits, _field_type, _is_packed>& id) const { \
     return _extensions_.ExtensionSize(id.number());                           \
   }                                                                           \
                                                                               \
   /* Singular accessors */                                                    \
   template <typename _proto_TypeTraits,                                       \
-            ::PROTOBUF_NAMESPACE_ID::internal::FieldType _field_type,         \
+            ::GOOGLE_PROTOBUF_NAMESPACE_ID::internal::FieldType _field_type, \
             bool _is_packed>                                                  \
   inline typename _proto_TypeTraits::Singular::ConstType GetExtension(        \
-      const ::PROTOBUF_NAMESPACE_ID::internal::ExtensionIdentifier<           \
+      const ::GOOGLE_PROTOBUF_NAMESPACE_ID::internal::ExtensionIdentifier<   \
           CLASSNAME, _proto_TypeTraits, _field_type, _is_packed>& id) const { \
     return _proto_TypeTraits::Get(id.number(), _extensions_,                  \
                                   id.default_value());                        \
   }                                                                           \
                                                                               \
   template <typename _proto_TypeTraits,                                       \
-            ::PROTOBUF_NAMESPACE_ID::internal::FieldType _field_type,         \
+            ::GOOGLE_PROTOBUF_NAMESPACE_ID::internal::FieldType _field_type, \
             bool _is_packed>                                                  \
   inline typename _proto_TypeTraits::Singular::MutableType MutableExtension(  \
-      const ::PROTOBUF_NAMESPACE_ID::internal::ExtensionIdentifier<           \
+      const ::GOOGLE_PROTOBUF_NAMESPACE_ID::internal::ExtensionIdentifier<   \
           CLASSNAME, _proto_TypeTraits, _field_type, _is_packed>& id) {       \
     return _proto_TypeTraits::Mutable(id.number(), _field_type,               \
                                       &_extensions_);                         \
   }                                                                           \
                                                                               \
   template <typename _proto_TypeTraits,                                       \
-            ::PROTOBUF_NAMESPACE_ID::internal::FieldType _field_type,         \
+            ::GOOGLE_PROTOBUF_NAMESPACE_ID::internal::FieldType _field_type, \
             bool _is_packed>                                                  \
   inline void SetExtension(                                                   \
-      const ::PROTOBUF_NAMESPACE_ID::internal::ExtensionIdentifier<           \
+      const ::GOOGLE_PROTOBUF_NAMESPACE_ID::internal::ExtensionIdentifier<   \
           CLASSNAME, _proto_TypeTraits, _field_type, _is_packed>& id,         \
       typename _proto_TypeTraits::Singular::ConstType value) {                \
     _proto_TypeTraits::Set(id.number(), _field_type, value, &_extensions_);   \
   }                                                                           \
                                                                               \
   template <typename _proto_TypeTraits,                                       \
-            ::PROTOBUF_NAMESPACE_ID::internal::FieldType _field_type,         \
+            ::GOOGLE_PROTOBUF_NAMESPACE_ID::internal::FieldType _field_type, \
             bool _is_packed>                                                  \
   inline void SetAllocatedExtension(                                          \
-      const ::PROTOBUF_NAMESPACE_ID::internal::ExtensionIdentifier<           \
+      const ::GOOGLE_PROTOBUF_NAMESPACE_ID::internal::ExtensionIdentifier<   \
           CLASSNAME, _proto_TypeTraits, _field_type, _is_packed>& id,         \
       typename _proto_TypeTraits::Singular::MutableType value) {              \
     _proto_TypeTraits::SetAllocated(id.number(), _field_type, value,          \
                                     &_extensions_);                           \
   }                                                                           \
   template <typename _proto_TypeTraits,                                       \
-            ::PROTOBUF_NAMESPACE_ID::internal::FieldType _field_type,         \
+            ::GOOGLE_PROTOBUF_NAMESPACE_ID::internal::FieldType _field_type, \
             bool _is_packed>                                                  \
   inline void UnsafeArenaSetAllocatedExtension(                               \
-      const ::PROTOBUF_NAMESPACE_ID::internal::ExtensionIdentifier<           \
+      const ::GOOGLE_PROTOBUF_NAMESPACE_ID::internal::ExtensionIdentifier<   \
           CLASSNAME, _proto_TypeTraits, _field_type, _is_packed>& id,         \
       typename _proto_TypeTraits::Singular::MutableType value) {              \
     _proto_TypeTraits::UnsafeArenaSetAllocated(id.number(), _field_type,      \
                                                value, &_extensions_);         \
   }                                                                           \
   template <typename _proto_TypeTraits,                                       \
-            ::PROTOBUF_NAMESPACE_ID::internal::FieldType _field_type,         \
+            ::GOOGLE_PROTOBUF_NAMESPACE_ID::internal::FieldType _field_type, \
             bool _is_packed>                                                  \
   inline typename _proto_TypeTraits::Singular::MutableType ReleaseExtension(  \
-      const ::PROTOBUF_NAMESPACE_ID::internal::ExtensionIdentifier<           \
+      const ::GOOGLE_PROTOBUF_NAMESPACE_ID::internal::ExtensionIdentifier<   \
           CLASSNAME, _proto_TypeTraits, _field_type, _is_packed>& id) {       \
     return _proto_TypeTraits::Release(id.number(), _field_type,               \
                                       &_extensions_);                         \
   }                                                                           \
   template <typename _proto_TypeTraits,                                       \
-            ::PROTOBUF_NAMESPACE_ID::internal::FieldType _field_type,         \
+            ::GOOGLE_PROTOBUF_NAMESPACE_ID::internal::FieldType _field_type, \
             bool _is_packed>                                                  \
   inline typename _proto_TypeTraits::Singular::MutableType                    \
   UnsafeArenaReleaseExtension(                                                \
-      const ::PROTOBUF_NAMESPACE_ID::internal::ExtensionIdentifier<           \
+      const ::GOOGLE_PROTOBUF_NAMESPACE_ID::internal::ExtensionIdentifier<   \
           CLASSNAME, _proto_TypeTraits, _field_type, _is_packed>& id) {       \
     return _proto_TypeTraits::UnsafeArenaRelease(id.number(), _field_type,    \
                                                  &_extensions_);              \
@@ -1465,49 +1427,49 @@ class ExtensionIdentifier {
                                                                               \
   /* Repeated accessors */                                                    \
   template <typename _proto_TypeTraits,                                       \
-            ::PROTOBUF_NAMESPACE_ID::internal::FieldType _field_type,         \
+            ::GOOGLE_PROTOBUF_NAMESPACE_ID::internal::FieldType _field_type, \
             bool _is_packed>                                                  \
   inline typename _proto_TypeTraits::Repeated::ConstType GetExtension(        \
-      const ::PROTOBUF_NAMESPACE_ID::internal::ExtensionIdentifier<           \
+      const ::GOOGLE_PROTOBUF_NAMESPACE_ID::internal::ExtensionIdentifier<   \
           CLASSNAME, _proto_TypeTraits, _field_type, _is_packed>& id,         \
       int index) const {                                                      \
     return _proto_TypeTraits::Get(id.number(), _extensions_, index);          \
   }                                                                           \
                                                                               \
   template <typename _proto_TypeTraits,                                       \
-            ::PROTOBUF_NAMESPACE_ID::internal::FieldType _field_type,         \
+            ::GOOGLE_PROTOBUF_NAMESPACE_ID::internal::FieldType _field_type, \
             bool _is_packed>                                                  \
   inline typename _proto_TypeTraits::Repeated::MutableType MutableExtension(  \
-      const ::PROTOBUF_NAMESPACE_ID::internal::ExtensionIdentifier<           \
+      const ::GOOGLE_PROTOBUF_NAMESPACE_ID::internal::ExtensionIdentifier<   \
           CLASSNAME, _proto_TypeTraits, _field_type, _is_packed>& id,         \
       int index) {                                                            \
     return _proto_TypeTraits::Mutable(id.number(), index, &_extensions_);     \
   }                                                                           \
                                                                               \
   template <typename _proto_TypeTraits,                                       \
-            ::PROTOBUF_NAMESPACE_ID::internal::FieldType _field_type,         \
+            ::GOOGLE_PROTOBUF_NAMESPACE_ID::internal::FieldType _field_type, \
             bool _is_packed>                                                  \
   inline void SetExtension(                                                   \
-      const ::PROTOBUF_NAMESPACE_ID::internal::ExtensionIdentifier<           \
+      const ::GOOGLE_PROTOBUF_NAMESPACE_ID::internal::ExtensionIdentifier<   \
           CLASSNAME, _proto_TypeTraits, _field_type, _is_packed>& id,         \
       int index, typename _proto_TypeTraits::Repeated::ConstType value) {     \
     _proto_TypeTraits::Set(id.number(), index, value, &_extensions_);         \
   }                                                                           \
                                                                               \
   template <typename _proto_TypeTraits,                                       \
-            ::PROTOBUF_NAMESPACE_ID::internal::FieldType _field_type,         \
+            ::GOOGLE_PROTOBUF_NAMESPACE_ID::internal::FieldType _field_type, \
             bool _is_packed>                                                  \
   inline typename _proto_TypeTraits::Repeated::MutableType AddExtension(      \
-      const ::PROTOBUF_NAMESPACE_ID::internal::ExtensionIdentifier<           \
+      const ::GOOGLE_PROTOBUF_NAMESPACE_ID::internal::ExtensionIdentifier<   \
           CLASSNAME, _proto_TypeTraits, _field_type, _is_packed>& id) {       \
     return _proto_TypeTraits::Add(id.number(), _field_type, &_extensions_);   \
   }                                                                           \
                                                                               \
   template <typename _proto_TypeTraits,                                       \
-            ::PROTOBUF_NAMESPACE_ID::internal::FieldType _field_type,         \
+            ::GOOGLE_PROTOBUF_NAMESPACE_ID::internal::FieldType _field_type, \
             bool _is_packed>                                                  \
   inline void AddExtension(                                                   \
-      const ::PROTOBUF_NAMESPACE_ID::internal::ExtensionIdentifier<           \
+      const ::GOOGLE_PROTOBUF_NAMESPACE_ID::internal::ExtensionIdentifier<   \
           CLASSNAME, _proto_TypeTraits, _field_type, _is_packed>& id,         \
       typename _proto_TypeTraits::Repeated::ConstType value) {                \
     _proto_TypeTraits::Add(id.number(), _field_type, _is_packed, value,       \
@@ -1515,21 +1477,21 @@ class ExtensionIdentifier {
   }                                                                           \
                                                                               \
   template <typename _proto_TypeTraits,                                       \
-            ::PROTOBUF_NAMESPACE_ID::internal::FieldType _field_type,         \
+            ::GOOGLE_PROTOBUF_NAMESPACE_ID::internal::FieldType _field_type, \
             bool _is_packed>                                                  \
   inline const typename _proto_TypeTraits::Repeated::RepeatedFieldType&       \
   GetRepeatedExtension(                                                       \
-      const ::PROTOBUF_NAMESPACE_ID::internal::ExtensionIdentifier<           \
+      const ::GOOGLE_PROTOBUF_NAMESPACE_ID::internal::ExtensionIdentifier<   \
           CLASSNAME, _proto_TypeTraits, _field_type, _is_packed>& id) const { \
     return _proto_TypeTraits::GetRepeated(id.number(), _extensions_);         \
   }                                                                           \
                                                                               \
   template <typename _proto_TypeTraits,                                       \
-            ::PROTOBUF_NAMESPACE_ID::internal::FieldType _field_type,         \
+            ::GOOGLE_PROTOBUF_NAMESPACE_ID::internal::FieldType _field_type, \
             bool _is_packed>                                                  \
   inline typename _proto_TypeTraits::Repeated::RepeatedFieldType*             \
   MutableRepeatedExtension(                                                   \
-      const ::PROTOBUF_NAMESPACE_ID::internal::ExtensionIdentifier<           \
+      const ::GOOGLE_PROTOBUF_NAMESPACE_ID::internal::ExtensionIdentifier<   \
           CLASSNAME, _proto_TypeTraits, _field_type, _is_packed>& id) {       \
     return _proto_TypeTraits::MutableRepeated(id.number(), _field_type,       \
                                               _is_packed, &_extensions_);     \

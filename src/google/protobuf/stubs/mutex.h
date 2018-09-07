@@ -46,8 +46,6 @@
 #define GOOGLE_PROTOBUF_RELEASE(...)
 #endif
 
-#include <google/protobuf/port_def.inc>
-
 // ===================================================================
 // emulates google3/base/mutex.h
 namespace google {
@@ -59,7 +57,7 @@ namespace internal {
 // Mutex is a natural type to wrap. As both google and other organization have
 // specialized mutexes. gRPC also provides an injection mechanism for custom
 // mutexes.
-class PROTOBUF_EXPORT WrappedMutex {
+class LIBPROTOBUF_EXPORT WrappedMutex {
  public:
   WrappedMutex() = default;
   void Lock() GOOGLE_PROTOBUF_ACQUIRE() { mu_.lock(); }
@@ -75,7 +73,7 @@ class PROTOBUF_EXPORT WrappedMutex {
 using Mutex = WrappedMutex;
 
 // MutexLock(mu) acquires mu when constructed and releases it when destroyed.
-class PROTOBUF_EXPORT MutexLock {
+class LIBPROTOBUF_EXPORT MutexLock {
  public:
   explicit MutexLock(Mutex *mu) : mu_(mu) { this->mu_->Lock(); }
   ~MutexLock() { this->mu_->Unlock(); }
@@ -89,7 +87,7 @@ typedef MutexLock ReaderMutexLock;
 typedef MutexLock WriterMutexLock;
 
 // MutexLockMaybe is like MutexLock, but is a no-op when mu is nullptr.
-class PROTOBUF_EXPORT MutexLockMaybe {
+class LIBPROTOBUF_EXPORT MutexLockMaybe {
  public:
   explicit MutexLockMaybe(Mutex *mu) :
     mu_(mu) { if (this->mu_ != nullptr) { this->mu_->Lock(); } }
@@ -142,7 +140,5 @@ using internal::MutexLockMaybe;
 
 #undef GOOGLE_PROTOBUF_ACQUIRE
 #undef GOOGLE_PROTOBUF_RELEASE
-
-#include <google/protobuf/port_undef.inc>
 
 #endif  // GOOGLE_PROTOBUF_STUBS_MUTEX_H_

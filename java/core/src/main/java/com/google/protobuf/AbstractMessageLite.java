@@ -41,20 +41,22 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * A partial implementation of the {@link MessageLite} interface which implements as many methods of
- * that interface as possible in terms of other methods.
+ * A partial implementation of the {@link MessageLite} interface which
+ * implements as many methods of that interface as possible in terms of other
+ * methods.
  *
  * @author kenton@google.com Kenton Varda
  */
 public abstract class AbstractMessageLite<
-        MessageType extends AbstractMessageLite<MessageType, BuilderType>,
-        BuilderType extends AbstractMessageLite.Builder<MessageType, BuilderType>>
-    implements MessageLite {
+    MessageType extends AbstractMessageLite<MessageType, BuilderType>,
+    BuilderType extends AbstractMessageLite.Builder<MessageType, BuilderType>>
+        implements MessageLite {
   protected int memoizedHashCode = 0;
   @Override
   public ByteString toByteString() {
     try {
-      final ByteString.CodedBuilder out = ByteString.newCodedBuilder(getSerializedSize());
+      final ByteString.CodedBuilder out =
+        ByteString.newCodedBuilder(getSerializedSize());
       writeTo(out.getCodedOutput());
       return out.build();
     } catch (IOException e) {
@@ -77,8 +79,10 @@ public abstract class AbstractMessageLite<
 
   @Override
   public void writeTo(final OutputStream output) throws IOException {
-    final int bufferSize = CodedOutputStream.computePreferredBufferSize(getSerializedSize());
-    final CodedOutputStream codedOutput = CodedOutputStream.newInstance(output, bufferSize);
+    final int bufferSize =
+        CodedOutputStream.computePreferredBufferSize(getSerializedSize());
+    final CodedOutputStream codedOutput =
+        CodedOutputStream.newInstance(output, bufferSize);
     writeTo(codedOutput);
     codedOutput.flush();
   }
@@ -86,10 +90,10 @@ public abstract class AbstractMessageLite<
   @Override
   public void writeDelimitedTo(final OutputStream output) throws IOException {
     final int serialized = getSerializedSize();
-    final int bufferSize =
-        CodedOutputStream.computePreferredBufferSize(
-            CodedOutputStream.computeRawVarint32Size(serialized) + serialized);
-    final CodedOutputStream codedOutput = CodedOutputStream.newInstance(output, bufferSize);
+    final int bufferSize = CodedOutputStream.computePreferredBufferSize(
+        CodedOutputStream.computeRawVarint32Size(serialized) + serialized);
+    final CodedOutputStream codedOutput =
+        CodedOutputStream.newInstance(output, bufferSize);
     codedOutput.writeRawVarint32(serialized);
     writeTo(codedOutput);
     codedOutput.flush();
@@ -106,16 +110,16 @@ public abstract class AbstractMessageLite<
   }
 
 
-  /** Package private helper method for AbstractParser to create UninitializedMessageException. */
+  /**
+   * Package private helper method for AbstractParser to create
+   * UninitializedMessageException.
+   */
   UninitializedMessageException newUninitializedMessageException() {
     return new UninitializedMessageException(this);
   }
 
   private String getSerializingExceptionMessage(String target) {
-    return "Serializing "
-        + getClass().getName()
-        + " to a "
-        + target
+    return "Serializing " + getClass().getName() + " to a " + target
         + " threw an IOException (should never happen).";
   }
 
@@ -137,13 +141,14 @@ public abstract class AbstractMessageLite<
   }
 
   /**
-   * A partial implementation of the {@link Message.Builder} interface which implements as many
-   * methods of that interface as possible in terms of other methods.
+   * A partial implementation of the {@link Message.Builder} interface which
+   * implements as many methods of that interface as possible in terms of
+   * other methods.
    */
   @SuppressWarnings("unchecked")
   public abstract static class Builder<
-          MessageType extends AbstractMessageLite<MessageType, BuilderType>,
-          BuilderType extends Builder<MessageType, BuilderType>>
+      MessageType extends AbstractMessageLite<MessageType, BuilderType>,
+      BuilderType extends Builder<MessageType, BuilderType>>
       implements MessageLite.Builder {
     // The compiler produces an error if this is not declared explicitly.
     @Override
@@ -199,7 +204,8 @@ public abstract class AbstractMessageLite<
     public BuilderType mergeFrom(final byte[] data, final int off, final int len)
         throws InvalidProtocolBufferException {
       try {
-        final CodedInputStream input = CodedInputStream.newInstance(data, off, len);
+        final CodedInputStream input =
+            CodedInputStream.newInstance(data, off, len);
         mergeFrom(input);
         input.checkLastTagWas(0);
         return (BuilderType) this;
@@ -224,7 +230,8 @@ public abstract class AbstractMessageLite<
         final ExtensionRegistryLite extensionRegistry)
         throws InvalidProtocolBufferException {
       try {
-        final CodedInputStream input = CodedInputStream.newInstance(data, off, len);
+        final CodedInputStream input =
+            CodedInputStream.newInstance(data, off, len);
         mergeFrom(input, extensionRegistry);
         input.checkLastTagWas(0);
         return (BuilderType) this;
@@ -253,9 +260,10 @@ public abstract class AbstractMessageLite<
     }
 
     /**
-     * An InputStream implementations which reads from some other InputStream but is limited to a
-     * particular number of bytes. Used by mergeDelimitedFrom(). This is intentionally
-     * package-private so that UnknownFieldSet can share it.
+     * An InputStream implementations which reads from some other InputStream
+     * but is limited to a particular number of bytes.  Used by
+     * mergeDelimitedFrom().  This is intentionally package-private so that
+     * UnknownFieldSet can share it.
      */
     static final class LimitedInputStream extends FilterInputStream {
       private int limit;
@@ -283,7 +291,8 @@ public abstract class AbstractMessageLite<
       }
 
       @Override
-      public int read(final byte[] b, final int off, int len) throws IOException {
+      public int read(final byte[] b, final int off, int len)
+                      throws IOException {
         if (limit <= 0) {
           return -1;
         }
@@ -320,7 +329,8 @@ public abstract class AbstractMessageLite<
 
     @Override
     public boolean mergeDelimitedFrom(final InputStream input) throws IOException {
-      return mergeDelimitedFrom(input, ExtensionRegistryLite.getEmptyRegistry());
+      return mergeDelimitedFrom(input,
+          ExtensionRegistryLite.getEmptyRegistry());
     }
 
     @Override
@@ -337,10 +347,7 @@ public abstract class AbstractMessageLite<
     protected abstract BuilderType internalMergeFrom(MessageType message);
 
     private String getReadingExceptionMessage(String target) {
-      return "Reading "
-          + getClass().getName()
-          + " from a "
-          + target
+      return "Reading " + getClass().getName() + " from a " + target
           + " threw an IOException (should never happen).";
     }
 
@@ -363,9 +370,12 @@ public abstract class AbstractMessageLite<
       }
     }
 
-    /** Construct an UninitializedMessageException reporting missing fields in the given message. */
-    protected static UninitializedMessageException newUninitializedMessageException(
-        MessageLite message) {
+    /**
+     * Construct an UninitializedMessageException reporting missing fields in
+     * the given message.
+     */
+    protected static UninitializedMessageException
+        newUninitializedMessageException(MessageLite message) {
       return new UninitializedMessageException(message);
     }
 

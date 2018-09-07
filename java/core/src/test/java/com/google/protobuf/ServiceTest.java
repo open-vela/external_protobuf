@@ -41,6 +41,7 @@ import protobuf_unittest.UnittestProto.FooRequest;
 import protobuf_unittest.UnittestProto.FooResponse;
 import protobuf_unittest.UnittestProto.TestAllTypes;
 import protobuf_unittest.UnittestProto.TestService;
+
 import java.util.HashSet;
 import java.util.Set;
 import junit.framework.TestCase;
@@ -269,27 +270,30 @@ public class ServiceTest extends TestCase {
   }
 
 
+
   // =================================================================
 
   /**
-   * wrapsCallback() is an EasyMock argument predicate. wrapsCallback(c) matches a callback if
-   * calling that callback causes c to be called. In other words, c wraps the given callback.
+   * wrapsCallback() is an EasyMock argument predicate.  wrapsCallback(c)
+   * matches a callback if calling that callback causes c to be called.
+   * In other words, c wraps the given callback.
    */
-  private <T extends Message> RpcCallback<T> wrapsCallback(MockCallback<?> callback) {
+  private <Type extends Message> RpcCallback<Type> wrapsCallback(
+      MockCallback<?> callback) {
     EasyMock.reportMatcher(new WrapsCallback(callback));
     return null;
   }
 
   /** The parameter to wrapsCallback() must be a MockCallback. */
-  private static class MockCallback<T extends Message> implements RpcCallback<T> {
+  private static class MockCallback<Type extends Message>
+      implements RpcCallback<Type> {
     private boolean called = false;
 
     public boolean isCalled() { return called; }
 
     public void reset() { called = false; }
-
     @Override
-    public void run(T message) {
+    public void run(Type message) {
       called = true; }
   }
 
