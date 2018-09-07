@@ -42,8 +42,6 @@
 #include <vector>
 #include <google/protobuf/stubs/common.h>
 
-#include <google/protobuf/port_def.inc>
-
 namespace google {
 namespace protobuf {
 namespace io {
@@ -51,15 +49,15 @@ namespace io {
 class ZeroCopyOutputStream;     // zero_copy_stream.h
 
 // Records annotations about a Printer's output.
-class PROTOBUF_EXPORT AnnotationCollector {
+class LIBPROTOBUF_EXPORT AnnotationCollector {
  public:
   // Annotation is a ofset range and a payload pair.
-  typedef std::pair<std::pair<size_t, size_t>, std::string> Annotation;
+  typedef std::pair<std::pair<size_t, size_t>, string> Annotation;
 
   // Records that the bytes in file_path beginning with begin_offset and ending
   // before end_offset are associated with the SourceCodeInfo-style path.
   virtual void AddAnnotation(size_t begin_offset, size_t end_offset,
-                             const std::string& file_path,
+                             const string& file_path,
                              const std::vector<int>& path) = 0;
 
   // TODO(gerbens) I don't see why we need virtuals here. Just a vector of
@@ -82,7 +80,7 @@ class AnnotationProtoCollector : public AnnotationCollector {
 
   // Override for AnnotationCollector::AddAnnotation.
   virtual void AddAnnotation(size_t begin_offset, size_t end_offset,
-                             const std::string& file_path,
+                             const string& file_path,
                              const std::vector<int>& path) {
     typename AnnotationProto::Annotation* annotation =
         annotation_proto_->add_annotation();
@@ -178,7 +176,7 @@ class AnnotationProtoCollector : public AnnotationCollector {
 // This code associates the span covering "call(bar,bar)" in the output with the
 // call_ descriptor.
 
-class PROTOBUF_EXPORT Printer {
+class LIBPROTOBUF_EXPORT Printer {
  public:
   // Create a printer that writes text to the given output stream.  Use the
   // given character as the delimiter for variables.
@@ -219,7 +217,7 @@ class PROTOBUF_EXPORT Printer {
 
   // Link a subsitution variable emitted by the last call to Print to the file
   // with path file_name.
-  void Annotate(const char* varname, const std::string& file_name) {
+  void Annotate(const char* varname, const string& file_name) {
     Annotate(varname, varname, file_name);
   }
 
@@ -228,7 +226,7 @@ class PROTOBUF_EXPORT Printer {
   // at begin_varname's value and ends after the last character of the value
   // substituted for end_varname.
   void Annotate(const char* begin_varname, const char* end_varname,
-                const std::string& file_name) {
+                const string& file_name) {
     if (annotation_collector_ == NULL) {
       // Annotations aren't turned on for this Printer.
       return;
@@ -242,12 +240,12 @@ class PROTOBUF_EXPORT Printer {
   // substituted are identified by their names surrounded by delimiter
   // characters (as given to the constructor).  The variable bindings are
   // defined by the given map.
-  void Print(const std::map<std::string, std::string>& variables, const char* text);
+  void Print(const std::map<string, string>& variables, const char* text);
 
   // Like the first Print(), except the substitutions are given as parameters.
   template <typename... Args>
   void Print(const char* text, const Args&... args) {
-    std::map<std::string, std::string> vars;
+    std::map<string, string> vars;
     PrintInternal(&vars, text, args...);
   }
 
@@ -262,7 +260,7 @@ class PROTOBUF_EXPORT Printer {
 
   // Write a string to the output buffer.
   // This method does not look for newlines to add indentation.
-  void PrintRaw(const std::string& data);
+  void PrintRaw(const string& data);
 
   // Write a zero-delimited string to output buffer.
   // This method does not look for newlines to add indentation.
@@ -277,8 +275,8 @@ class PROTOBUF_EXPORT Printer {
   // formatting text using named variables (eq. "$foo$) from a lookup map (vars)
   // and variables directly supplied by arguments (eq "$1$" meaning first
   // argument which is the zero index element of args).
-  void FormatInternal(const std::vector<std::string>& args,
-                      const std::map<std::string, std::string>& vars, const char* format);
+  void FormatInternal(const std::vector<string>& args,
+                      const std::map<string, string>& vars, const char* format);
 
   // True if any write to the underlying stream failed.  (We don't just
   // crash in this case because this is an I/O failure, not a programming
@@ -293,16 +291,16 @@ class PROTOBUF_EXPORT Printer {
   // substituted for end_varname. Note that begin_varname and end_varname
   // may refer to the same variable.
   void Annotate(const char* begin_varname, const char* end_varname,
-                const std::string& file_path, const std::vector<int>& path);
+                const string& file_path, const std::vector<int>& path);
 
   // Base case
-  void PrintInternal(std::map<std::string, std::string>* vars, const char* text) {
+  void PrintInternal(std::map<string, string>* vars, const char* text) {
     Print(*vars, text);
   }
 
   template <typename... Args>
-  void PrintInternal(std::map<std::string, std::string>* vars, const char* text,
-                     const char* key, const std::string& value,
+  void PrintInternal(std::map<string, string>* vars, const char* text,
+                     const char* key, const string& value,
                      const Args&... args) {
     (*vars)[key] = value;
     PrintInternal(vars, text, args...);
@@ -325,7 +323,7 @@ class PROTOBUF_EXPORT Printer {
 
   inline void IndentIfAtStart();
   const char* WriteVariable(
-      const std::vector<std::string>& args, const std::map<std::string, std::string>& vars,
+      const std::vector<string>& args, const std::map<string, string>& vars,
       const char* format, int* arg_index,
       std::vector<AnnotationCollector::Annotation>* annotations);
 
@@ -339,7 +337,7 @@ class PROTOBUF_EXPORT Printer {
   // used to calculate annotation ranges in the substitutions_ map below.
   size_t offset_;
 
-  std::string indent_;
+  string indent_;
   bool at_start_of_line_;
   bool failed_;
 
@@ -350,12 +348,12 @@ class PROTOBUF_EXPORT Printer {
   // start offset is the beginning of the substitution; the end offset is the
   // last byte of the substitution plus one (such that (end - start) is the
   // length of the substituted string).
-  std::map<std::string, std::pair<size_t, size_t> > substitutions_;
+  std::map<string, std::pair<size_t, size_t> > substitutions_;
 
   // Keeps track of the keys in substitutions_ that need to be updated when
   // indents are inserted. These are keys that refer to the beginning of the
   // current line.
-  std::vector<std::string> line_start_variables_;
+  std::vector<string> line_start_variables_;
 
   // Returns true and sets range to the substitution range in the output for
   // varname if varname was used once in the last call to Print. If varname
@@ -374,7 +372,5 @@ class PROTOBUF_EXPORT Printer {
 }  // namespace io
 }  // namespace protobuf
 }  // namespace google
-
-#include <google/protobuf/port_undef.inc>
 
 #endif  // GOOGLE_PROTOBUF_IO_PRINTER_H__

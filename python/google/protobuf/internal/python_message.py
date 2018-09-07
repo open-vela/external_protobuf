@@ -1003,13 +1003,8 @@ def _AddEqualsMethod(message_descriptor, cls):
     if not self.ListFields() == other.ListFields():
       return False
 
-    # TODO(jieluo): Fix UnknownFieldSet to consider MessageSet extensions,
-    # then use it for the comparison.
-    unknown_fields = list(self._unknown_fields)
-    unknown_fields.sort()
-    other_unknown_fields = list(other._unknown_fields)
-    other_unknown_fields.sort()
-    return unknown_fields == other_unknown_fields
+    # pylint: disable=protected-access
+    return self._unknown_field_set == other._unknown_field_set
 
   cls.__eq__ = __eq__
 

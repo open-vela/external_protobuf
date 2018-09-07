@@ -62,11 +62,11 @@ class ImmutableMapFieldLiteGenerator : public ImmutableFieldLiteGenerator {
   void GenerateHashCode(io::Printer* printer) const;
 
 
-  std::string GetBoxedType() const;
+  string GetBoxedType() const;
 
  private:
   const FieldDescriptor* descriptor_;
-  std::map<std::string, std::string> variables_;
+  std::map<string, string> variables_;
   Context* context_;
   ClassNameResolver* name_resolver_;
 };

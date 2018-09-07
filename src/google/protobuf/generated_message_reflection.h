@@ -361,11 +361,11 @@ class GeneratedMessageReflection final : public Reflection {
                    const FieldDescriptor* field) const override;
   bool GetBool(const Message& message,
                const FieldDescriptor* field) const override;
-  std::string GetString(const Message& message,
+  string GetString(const Message& message,
                    const FieldDescriptor* field) const override;
-  const std::string& GetStringReference(const Message& message,
+  const string& GetStringReference(const Message& message,
                                    const FieldDescriptor* field,
-                                   std::string* scratch) const override;
+                                   string* scratch) const override;
   const EnumValueDescriptor* GetEnum(
       const Message& message, const FieldDescriptor* field) const override;
   int GetEnumValue(const Message& message,
@@ -409,7 +409,7 @@ class GeneratedMessageReflection final : public Reflection {
   void SetBool(Message* message, const FieldDescriptor* field,
                bool value) const override;
   void SetString(Message* message, const FieldDescriptor* field,
-                 const std::string& value) const override;
+                 const string& value) const override;
   void SetEnum(Message* message, const FieldDescriptor* field,
                const EnumValueDescriptor* value) const override;
   void SetEnumValue(Message* message, const FieldDescriptor* field,
@@ -435,12 +435,12 @@ class GeneratedMessageReflection final : public Reflection {
                            int index) const override;
   bool GetRepeatedBool(const Message& message, const FieldDescriptor* field,
                        int index) const override;
-  std::string GetRepeatedString(const Message& message, const FieldDescriptor* field,
+  string GetRepeatedString(const Message& message, const FieldDescriptor* field,
                            int index) const override;
-  const std::string& GetRepeatedStringReference(const Message& message,
+  const string& GetRepeatedStringReference(const Message& message,
                                            const FieldDescriptor* field,
                                            int index,
-                                           std::string* scratch) const override;
+                                           string* scratch) const override;
   const EnumValueDescriptor* GetRepeatedEnum(const Message& message,
                                              const FieldDescriptor* field,
                                              int index) const override;
@@ -466,7 +466,7 @@ class GeneratedMessageReflection final : public Reflection {
   void SetRepeatedBool(Message* message, const FieldDescriptor* field,
                        int index, bool value) const override;
   void SetRepeatedString(Message* message, const FieldDescriptor* field,
-                         int index, const std::string& value) const override;
+                         int index, const string& value) const override;
   void SetRepeatedEnum(Message* message, const FieldDescriptor* field,
                        int index,
                        const EnumValueDescriptor* value) const override;
@@ -492,7 +492,7 @@ class GeneratedMessageReflection final : public Reflection {
   void AddBool(Message* message, const FieldDescriptor* field,
                bool value) const override;
   void AddString(Message* message, const FieldDescriptor* field,
-                 const std::string& value) const override;
+                 const string& value) const override;
   void AddEnum(Message* message, const FieldDescriptor* field,
                const EnumValueDescriptor* value) const override;
   void AddEnumValue(Message* message, const FieldDescriptor* field,
@@ -503,7 +503,7 @@ class GeneratedMessageReflection final : public Reflection {
                            Message* new_entry) const override;
 
   const FieldDescriptor* FindKnownExtensionByName(
-      const std::string& name) const override;
+      const string& name) const override;
   const FieldDescriptor* FindKnownExtensionByNumber(int number) const override;
 
   bool SupportsUnknownEnumValues() const override;
@@ -681,7 +681,7 @@ class GeneratedMessageReflection final : public Reflection {
 
 typedef void (*InitFunc)();
 
-struct PROTOBUF_EXPORT AssignDescriptorsTable {
+struct LIBPROTOBUF_EXPORT AssignDescriptorsTable {
   once_flag once;
   InitFunc add_descriptors;
   const char* filename;
@@ -695,9 +695,9 @@ struct PROTOBUF_EXPORT AssignDescriptorsTable {
   const ServiceDescriptor** file_level_service_descriptors;
 };
 
-void PROTOBUF_EXPORT AssignDescriptors(AssignDescriptorsTable* table);
+void LIBPROTOBUF_EXPORT AssignDescriptors(AssignDescriptorsTable* table);
 
-struct PROTOBUF_EXPORT DescriptorTable {
+struct LIBPROTOBUF_EXPORT DescriptorTable {
   bool is_initialized;
   InitFunc init_defaults;
   const char* descriptor;
@@ -706,13 +706,14 @@ struct PROTOBUF_EXPORT DescriptorTable {
   int size;  // of serialized descriptor
 };
 
-void PROTOBUF_EXPORT AddDescriptors(DescriptorTable* table,
-                                    const InitFunc* deps, int num_deps);
+void LIBPROTOBUF_EXPORT AddDescriptors(DescriptorTable* table,
+                                       const InitFunc* deps,
+                                       int num_deps);
 
 // These cannot be in lite so we put them in the reflection.
-PROTOBUF_EXPORT void UnknownFieldSetSerializer(const uint8* base, uint32 offset,
-                                               uint32 tag, uint32 has_offset,
-                                               io::CodedOutputStream* output);
+LIBPROTOBUF_EXPORT void UnknownFieldSetSerializer(const uint8* base, uint32 offset, uint32 tag,
+                               uint32 has_offset,
+                               io::CodedOutputStream* output);
 
 }  // namespace internal
 }  // namespace protobuf

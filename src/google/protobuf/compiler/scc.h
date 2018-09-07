@@ -35,8 +35,6 @@
 
 #include <google/protobuf/descriptor.h>
 
-#include <google/protobuf/port_def.inc>
-
 namespace google {
 namespace protobuf {
 namespace compiler {
@@ -54,7 +52,7 @@ struct SCC {
 // This class is used for analyzing the SCC for each message, to ensure linear
 // instead of quadratic performance, if we do this per message we would get
 // O(V*(V+E)).
-class PROTOC_EXPORT SCCAnalyzer {
+class LIBPROTOC_EXPORT SCCAnalyzer {
  public:
   explicit SCCAnalyzer() : index_(0) {}
 
@@ -93,7 +91,5 @@ class PROTOC_EXPORT SCCAnalyzer {
 }  // namespace compiler
 }  // namespace protobuf
 }  // namespace google
-
-#include <google/protobuf/port_undef.inc>
 
 #endif  // GOOGLE_PROTOBUF_COMPILER_SCC_H__

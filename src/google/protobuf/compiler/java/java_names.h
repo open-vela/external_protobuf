@@ -57,41 +57,41 @@ namespace java {
 //
 // Returns:
 //   The fully-qualified Java class name.
-std::string ClassName(const Descriptor* descriptor);
+string ClassName(const Descriptor* descriptor);
 
 // Requires:
 //   descriptor != NULL
 //
 // Returns:
 //   The fully-qualified Java class name.
-std::string ClassName(const EnumDescriptor* descriptor);
+string ClassName(const EnumDescriptor* descriptor);
 
 // Requires:
 //   descriptor != NULL
 //
 // Returns:
 //   The fully-qualified Java class name.
-std::string ClassName(const FileDescriptor* descriptor);
+string ClassName(const FileDescriptor* descriptor);
 
 // Requires:
 //   descriptor != NULL
 //
 // Returns:
 //   The fully-qualified Java class name.
-std::string ClassName(const ServiceDescriptor* descriptor);
+string ClassName(const ServiceDescriptor* descriptor);
 
 // Requires:
 //   descriptor != NULL
 //
 // Returns:
 //   Java package name.
-std::string FileJavaPackage(const FileDescriptor* descriptor);
+string FileJavaPackage(const FileDescriptor* descriptor);
 
 // Requires:
 //   descriptor != NULL
 // Returns:
 //   Captialized camel case name field name.
-std::string CapitalizedFieldName(const FieldDescriptor* descriptor);
+string CapitalizedFieldName(const FieldDescriptor* descriptor);
 
 // Requires:
 //   descriptor != NULL

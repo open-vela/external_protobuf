@@ -39,8 +39,6 @@
 
 #include <google/protobuf/compiler/code_generator.h>
 
-#include <google/protobuf/port_def.inc>
-
 namespace google {
 namespace protobuf {
 
@@ -60,16 +58,16 @@ namespace python {
 // If you create your own protocol compiler binary and you want it to support
 // Python output, you can do so by registering an instance of this
 // CodeGenerator with the CommandLineInterface in your main() function.
-class PROTOC_EXPORT Generator : public CodeGenerator {
+class LIBPROTOC_EXPORT Generator : public CodeGenerator {
  public:
   Generator();
   virtual ~Generator();
 
   // CodeGenerator methods.
   virtual bool Generate(const FileDescriptor* file,
-                        const std::string& parameter,
+                        const string& parameter,
                         GeneratorContext* generator_context,
-                        std::string* error) const;
+                        string* error) const;
 
  private:
   void PrintImports() const;
@@ -86,7 +84,7 @@ class PROTOC_EXPORT Generator : public CodeGenerator {
   void PrintFieldDescriptorsInDescriptor(
       const Descriptor& message_descriptor,
       bool is_extension,
-      const std::string& list_variable_name,
+      const string& list_variable_name,
       int (Descriptor::*CountFn)() const,
       const FieldDescriptor* (Descriptor::*GetterFn)(int) const) const;
   void PrintFieldsInDescriptor(const Descriptor& message_descriptor) const;
@@ -96,11 +94,11 @@ class PROTOC_EXPORT Generator : public CodeGenerator {
   void PrintNestedDescriptors(const Descriptor& containing_descriptor) const;
 
   void PrintMessages() const;
-  void PrintMessage(const Descriptor& message_descriptor, const std::string& prefix,
-                    std::vector<std::string>* to_register) const;
+  void PrintMessage(const Descriptor& message_descriptor, const string& prefix,
+                    std::vector<string>* to_register) const;
   void PrintNestedMessages(const Descriptor& containing_descriptor,
-                           const std::string& prefix,
-                           std::vector<std::string>* to_register) const;
+                           const string& prefix,
+                           std::vector<string>* to_register) const;
 
   void FixForeignFieldsInDescriptors() const;
   void FixForeignFieldsInDescriptor(
@@ -108,14 +106,14 @@ class PROTOC_EXPORT Generator : public CodeGenerator {
       const Descriptor* containing_descriptor) const;
   void FixForeignFieldsInField(const Descriptor* containing_type,
                                const FieldDescriptor& field,
-                               const std::string& python_dict_name) const;
+                               const string& python_dict_name) const;
   void AddMessageToFileDescriptor(const Descriptor& descriptor) const;
   void AddEnumToFileDescriptor(const EnumDescriptor& descriptor) const;
   void AddExtensionToFileDescriptor(const FieldDescriptor& descriptor) const;
   void AddServiceToFileDescriptor(const ServiceDescriptor& descriptor) const;
-  std::string FieldReferencingExpression(const Descriptor* containing_type,
+  string FieldReferencingExpression(const Descriptor* containing_type,
                                     const FieldDescriptor& field,
-                                    const std::string& python_dict_name) const;
+                                    const string& python_dict_name) const;
   template <typename DescriptorT>
   void FixContainingTypeInDescriptor(
       const DescriptorT& descriptor,
@@ -135,13 +133,13 @@ class PROTOC_EXPORT Generator : public CodeGenerator {
       const ServiceDescriptor& descriptor) const;
 
   void PrintEnumValueDescriptor(const EnumValueDescriptor& descriptor) const;
-  std::string OptionsValue(const std::string& serialized_options) const;
+  string OptionsValue(const string& serialized_options) const;
   bool GeneratingDescriptorProto() const;
 
   template <typename DescriptorT>
-  std::string ModuleLevelDescriptorName(const DescriptorT& descriptor) const;
-  std::string ModuleLevelMessageName(const Descriptor& descriptor) const;
-  std::string ModuleLevelServiceDescriptorName(
+  string ModuleLevelDescriptorName(const DescriptorT& descriptor) const;
+  string ModuleLevelMessageName(const Descriptor& descriptor) const;
+  string ModuleLevelServiceDescriptorName(
       const ServiceDescriptor& descriptor) const;
 
   template <typename DescriptorT, typename DescriptorProtoT>
@@ -155,13 +153,13 @@ class PROTOC_EXPORT Generator : public CodeGenerator {
   void FixOptionsForMessage(const Descriptor& descriptor) const;
 
   void CopyPublicDependenciesAliases(
-      const std::string& copy_from, const FileDescriptor* file) const;
+      const string& copy_from, const FileDescriptor* file) const;
 
   // Very coarse-grained lock to ensure that Generate() is reentrant.
   // Guards file_, printer_ and file_descriptor_serialized_.
   mutable Mutex mutex_;
   mutable const FileDescriptor* file_;  // Set in Generate().  Under mutex_.
-  mutable std::string file_descriptor_serialized_;
+  mutable string file_descriptor_serialized_;
   mutable io::Printer* printer_;  // Set in Generate().  Under mutex_.
 
   GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(Generator);
@@ -171,7 +169,5 @@ class PROTOC_EXPORT Generator : public CodeGenerator {
 }  // namespace compiler
 }  // namespace protobuf
 }  // namespace google
-
-#include <google/protobuf/port_undef.inc>
 
 #endif  // GOOGLE_PROTOBUF_COMPILER_PYTHON_GENERATOR_H__

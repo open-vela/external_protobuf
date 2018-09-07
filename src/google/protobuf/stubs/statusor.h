@@ -89,8 +89,6 @@
 
 #include <google/protobuf/stubs/status.h>
 
-#include <google/protobuf/port_def.inc>
-
 namespace google {
 namespace protobuf {
 namespace util {
@@ -164,7 +162,7 @@ class StatusOr {
 
 namespace internal {
 
-class PROTOBUF_EXPORT StatusOrHelper {
+class LIBPROTOBUF_EXPORT StatusOrHelper {
  public:
   // Move type-agnostic error handling to the .cc.
   static void Crash(const util::Status& status);
@@ -257,7 +255,5 @@ inline const T& StatusOr<T>::ValueOrDie() const {
 }  // namespace util
 }  // namespace protobuf
 }  // namespace google
-
-#include <google/protobuf/port_undef.inc>
 
 #endif  // GOOGLE_PROTOBUF_STUBS_STATUSOR_H_

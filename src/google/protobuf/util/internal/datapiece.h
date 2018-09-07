@@ -37,8 +37,6 @@
 #include <google/protobuf/stubs/stringpiece.h>
 #include <google/protobuf/stubs/statusor.h>
 
-#include <google/protobuf/port_def.inc>
-
 namespace google {
 namespace protobuf {
 class Enum;
@@ -60,7 +58,7 @@ class ProtoWriter;
 // Just like StringPiece, the DataPiece class does not own the storage for
 // the actual string or Cord, so it is the user's responsiblity to guarantee
 // that the underlying storage is still valid when the DataPiece is accessed.
-class PROTOBUF_EXPORT DataPiece {
+class LIBPROTOBUF_EXPORT DataPiece {
  public:
   // Identifies data type of the value.
   // These are the types supported by DataPiece.
@@ -123,7 +121,7 @@ class PROTOBUF_EXPORT DataPiece {
   bool use_strict_base64_decoding() { return use_strict_base64_decoding_; }
 
   StringPiece str() const {
-    GOOGLE_LOG_IF(DFATAL, type_ != TYPE_STRING) << "Not a std::string type.";
+    GOOGLE_LOG_IF(DFATAL, type_ != TYPE_STRING) << "Not a string type.";
     return str_;
   }
 
@@ -150,13 +148,13 @@ class PROTOBUF_EXPORT DataPiece {
   util::StatusOr<bool> ToBool() const;
 
   // Parses, casts or converts the value stored in the DataPiece into a string.
-  util::StatusOr<std::string> ToString() const;
+  util::StatusOr<string> ToString() const;
 
   // Tries to convert the value contained in this datapiece to string. If the
   // conversion fails, it returns the default_string.
-  std::string ValueAsStringOrDefault(StringPiece default_string) const;
+  string ValueAsStringOrDefault(StringPiece default_string) const;
 
-  util::StatusOr<std::string> ToBytes() const;
+  util::StatusOr<string> ToBytes() const;
 
   // Converts a value into protocol buffer enum number. If the value is a
   // string, first attempts conversion by name, trying names as follows:
@@ -200,7 +198,7 @@ class PROTOBUF_EXPORT DataPiece {
                                                    To*)) const;
 
   // Decodes a base64 string. Returns true on success.
-  bool DecodeBase64(StringPiece src, std::string* dest) const;
+  bool DecodeBase64(StringPiece src, string* dest) const;
 
   // Helper function to initialize this DataPiece with 'other'.
   void InternalCopy(const DataPiece& other);
@@ -230,7 +228,5 @@ class PROTOBUF_EXPORT DataPiece {
 }  // namespace util
 }  // namespace protobuf
 }  // namespace google
-
-#include <google/protobuf/port_undef.inc>
 
 #endif  // GOOGLE_PROTOBUF_UTIL_CONVERTER_DATAPIECE_H__

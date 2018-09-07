@@ -433,7 +433,7 @@ struct TypeImplementsMergeBehavior< ::std::string> {
 //     // Only needs to be implemented if SpaceUsedExcludingSelf() is called.
 //     static int SpaceUsedLong(const Type&);
 //   };
-class PROTOBUF_EXPORT RepeatedPtrFieldBase {
+class LIBPROTOBUF_EXPORT RepeatedPtrFieldBase {
  protected:
   RepeatedPtrFieldBase();
   explicit RepeatedPtrFieldBase(Arena* arena);
@@ -501,7 +501,8 @@ class PROTOBUF_EXPORT RepeatedPtrFieldBase {
   const typename TypeHandler::Type* const* data() const;
 
   template <typename TypeHandler>
-  PROTOBUF_ALWAYS_INLINE void Swap(RepeatedPtrFieldBase* other);
+  GOOGLE_PROTOBUF_ATTRIBUTE_ALWAYS_INLINE void Swap(
+      RepeatedPtrFieldBase* other);
 
   void SwapElements(int index1, int index2);
 
@@ -546,10 +547,10 @@ class PROTOBUF_EXPORT RepeatedPtrFieldBase {
   void AddAllocatedInternal(typename TypeHandler::Type* value, std::false_type);
 
   template <typename TypeHandler>
-  PROTOBUF_NOINLINE void AddAllocatedSlowWithCopy(
+  GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE void AddAllocatedSlowWithCopy(
       typename TypeHandler::Type* value, Arena* value_arena, Arena* my_arena);
   template <typename TypeHandler>
-  PROTOBUF_NOINLINE void AddAllocatedSlowWithoutCopy(
+  GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE void AddAllocatedSlowWithoutCopy(
       typename TypeHandler::Type* value);
 
   template <typename TypeHandler>
@@ -558,7 +559,7 @@ class PROTOBUF_EXPORT RepeatedPtrFieldBase {
   typename TypeHandler::Type* ReleaseLastInternal(std::false_type);
 
   template <typename TypeHandler>
-  PROTOBUF_NOINLINE void SwapFallback(
+  GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE void SwapFallback(
       RepeatedPtrFieldBase* other);
 
   inline Arena* GetArenaNoVirtual() const {
@@ -670,7 +671,7 @@ class GenericTypeHandler {
   }
 
   static inline void Clear(GenericType* value) { value->Clear(); }
-  PROTOBUF_NOINLINE
+  GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE
   static void Merge(const GenericType& from, GenericType* to);
   static inline size_t SpaceUsedLong(const GenericType& value) {
     return value.SpaceUsedLong();
@@ -707,25 +708,23 @@ template <>
 void GenericTypeHandler<MessageLite>::Merge(const MessageLite& from,
                                             MessageLite* to);
 template<>
-inline void GenericTypeHandler<std::string>::Clear(std::string* value) {
+inline void GenericTypeHandler<string>::Clear(string* value) {
   value->clear();
 }
 template<>
-void GenericTypeHandler<std::string>::Merge(const std::string& from,
-                                       std::string* to);
+void GenericTypeHandler<string>::Merge(const string& from,
+                                       string* to);
 
 // Declarations of the specialization as we cannot define them here, as the
 // header that defines ProtocolMessage depends on types defined in this header.
-#define DECLARE_SPECIALIZATIONS_FOR_BASE_PROTO_TYPES(TypeName)              \
-  template <>                                                               \
-  PROTOBUF_EXPORT TypeName* GenericTypeHandler<TypeName>::NewFromPrototype( \
-      const TypeName* prototype, Arena* arena);                             \
-  template <>                                                               \
-  PROTOBUF_EXPORT Arena* GenericTypeHandler<TypeName>::GetArena(            \
-      TypeName* value);                                                     \
-  template <>                                                               \
-  PROTOBUF_EXPORT void* GenericTypeHandler<TypeName>::GetMaybeArenaPointer( \
-      TypeName* value);
+#define DECLARE_SPECIALIZATIONS_FOR_BASE_PROTO_TYPES(TypeName)    \
+  template <> LIBPROTOBUF_EXPORT                                  \
+  TypeName* GenericTypeHandler<TypeName>::NewFromPrototype(       \
+      const TypeName* prototype, Arena* arena);                   \
+  template <> LIBPROTOBUF_EXPORT                                  \
+  Arena* GenericTypeHandler<TypeName>::GetArena(TypeName* value); \
+  template <> LIBPROTOBUF_EXPORT                                  \
+  void* GenericTypeHandler<TypeName>::GetMaybeArenaPointer(TypeName* value);
 
 // Message specialization bodies defined in message.cc. This split is necessary
 // to allow proto2-lite (which includes this header) to be independent of
@@ -737,32 +736,32 @@ DECLARE_SPECIALIZATIONS_FOR_BASE_PROTO_TYPES(Message)
 
 class StringTypeHandler {
  public:
-  typedef std::string Type;
-  typedef std::string WeakType;
+  typedef string Type;
+  typedef string WeakType;
   static const bool Moveable = std::is_move_constructible<Type>::value &&
                                std::is_move_assignable<Type>::value;
 
-  static inline std::string* New(Arena* arena) {
-    return Arena::Create<std::string>(arena);
+  static inline string* New(Arena* arena) {
+    return Arena::Create<string>(arena);
   }
-  static inline std::string* New(Arena* arena, std::string&& value) {
-    return Arena::Create<std::string>(arena, std::move(value));
+  static inline string* New(Arena* arena, string&& value) {
+    return Arena::Create<string>(arena, std::move(value));
   }
-  static inline std::string* NewFromPrototype(const std::string*, Arena* arena) {
+  static inline string* NewFromPrototype(const string*, Arena* arena) {
     return New(arena);
   }
-  static inline Arena* GetArena(std::string*) { return NULL; }
-  static inline void* GetMaybeArenaPointer(std::string* /* value */) {
+  static inline Arena* GetArena(string*) { return NULL; }
+  static inline void* GetMaybeArenaPointer(string* /* value */) {
     return NULL;
   }
-  static inline void Delete(std::string* value, Arena* arena) {
+  static inline void Delete(string* value, Arena* arena) {
     if (arena == NULL) {
       delete value;
     }
   }
-  static inline void Clear(std::string* value) { value->clear(); }
-  static inline void Merge(const std::string& from, std::string* to) { *to = from; }
-  static size_t SpaceUsedLong(const std::string& value)  {
+  static inline void Clear(string* value) { value->clear(); }
+  static inline void Merge(const string& from, string* to) { *to = from; }
+  static size_t SpaceUsedLong(const string& value)  {
     return sizeof(value) + StringSpaceUsedExcludingSelfLong(value);
   }
 };
@@ -1886,7 +1885,7 @@ class RepeatedPtrField<Element>::TypeHandler
 };
 
 template <>
-class RepeatedPtrField<std::string>::TypeHandler
+class RepeatedPtrField<string>::TypeHandler
     : public internal::StringTypeHandler {
 };
 
@@ -2631,14 +2630,14 @@ UnsafeArenaAllocatedRepeatedPtrFieldBackInserter(
 }
 
 // Extern declarations of common instantiations to reduce libray bloat.
-extern template class PROTOBUF_EXPORT RepeatedField<bool>;
-extern template class PROTOBUF_EXPORT RepeatedField<int32>;
-extern template class PROTOBUF_EXPORT RepeatedField<uint32>;
-extern template class PROTOBUF_EXPORT RepeatedField<int64>;
-extern template class PROTOBUF_EXPORT RepeatedField<uint64>;
-extern template class PROTOBUF_EXPORT RepeatedField<float>;
-extern template class PROTOBUF_EXPORT RepeatedField<double>;
-extern template class PROTOBUF_EXPORT RepeatedPtrField<std::string>;
+extern template class LIBPROTOBUF_EXPORT RepeatedField<bool>;
+extern template class LIBPROTOBUF_EXPORT RepeatedField<int32>;
+extern template class LIBPROTOBUF_EXPORT RepeatedField<uint32>;
+extern template class LIBPROTOBUF_EXPORT RepeatedField<int64>;
+extern template class LIBPROTOBUF_EXPORT RepeatedField<uint64>;
+extern template class LIBPROTOBUF_EXPORT RepeatedField<float>;
+extern template class LIBPROTOBUF_EXPORT RepeatedField<double>;
+extern template class LIBPROTOBUF_EXPORT RepeatedPtrField<string>;
 
 }  // namespace protobuf
 }  // namespace google

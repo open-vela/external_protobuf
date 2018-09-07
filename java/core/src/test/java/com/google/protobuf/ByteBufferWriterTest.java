@@ -37,7 +37,9 @@ import java.util.Arrays;
 import java.util.Random;
 import junit.framework.TestCase;
 
-/** Tests for {@link ByteBufferWriter}. */
+/**
+ * Tests for {@link ByteBufferWriter}.
+ */
 public class ByteBufferWriterTest extends TestCase {
 
   public void testHeapBuffer() throws IOException {

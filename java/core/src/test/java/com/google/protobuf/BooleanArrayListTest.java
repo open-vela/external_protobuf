@@ -45,7 +45,8 @@ import junit.framework.TestCase;
  */
 public class BooleanArrayListTest extends TestCase {
 
-  private static final BooleanArrayList UNARY_LIST = newImmutableBooleanArrayList(true);
+  private static final BooleanArrayList UNARY_LIST =
+      newImmutableBooleanArrayList(true);
   private static final BooleanArrayList TERTIARY_LIST =
       newImmutableBooleanArrayList(true, false, true);
 
@@ -77,10 +78,10 @@ public class BooleanArrayListTest extends TestCase {
     list.addAll(asList(true, false, true, false));
     Iterator<Boolean> iterator = list.iterator();
     assertEquals(4, list.size());
-    assertTrue(list.get(0));
-    assertTrue(iterator.next());
+    assertEquals(true, (boolean) list.get(0));
+    assertEquals(true, (boolean) iterator.next());
     list.set(0, true);
-    assertFalse(iterator.next());
+    assertEquals(false, (boolean) iterator.next());
 
     list.remove(0);
     try {
@@ -101,9 +102,9 @@ public class BooleanArrayListTest extends TestCase {
   }
 
   public void testGet() {
-    assertTrue(TERTIARY_LIST.get(0));
-    assertFalse(TERTIARY_LIST.get(1));
-    assertTrue(TERTIARY_LIST.get(2));
+    assertEquals(true, (boolean) TERTIARY_LIST.get(0));
+    assertEquals(false, (boolean) TERTIARY_LIST.get(1));
+    assertEquals(true, (boolean) TERTIARY_LIST.get(2));
 
     try {
       TERTIARY_LIST.get(-1);
@@ -121,9 +122,9 @@ public class BooleanArrayListTest extends TestCase {
   }
 
   public void testGetBoolean() {
-    assertTrue(TERTIARY_LIST.getBoolean(0));
-    assertFalse(TERTIARY_LIST.getBoolean(1));
-    assertTrue(TERTIARY_LIST.getBoolean(2));
+    assertEquals(true, TERTIARY_LIST.getBoolean(0));
+    assertEquals(false, TERTIARY_LIST.getBoolean(1));
+    assertEquals(true, TERTIARY_LIST.getBoolean(2));
 
     try {
       TERTIARY_LIST.get(-1);
@@ -162,11 +163,11 @@ public class BooleanArrayListTest extends TestCase {
     list.addBoolean(false);
     list.addBoolean(false);
 
-    assertFalse(list.set(0, true));
-    assertTrue(list.getBoolean(0));
+    assertEquals(false, (boolean) list.set(0, true));
+    assertEquals(true, list.getBoolean(0));
 
-    assertFalse(list.set(1, false));
-    assertFalse(list.getBoolean(1));
+    assertEquals(false, (boolean) list.set(1, false));
+    assertEquals(false, list.getBoolean(1));
 
     try {
       list.set(-1, false);
@@ -187,11 +188,11 @@ public class BooleanArrayListTest extends TestCase {
     list.addBoolean(true);
     list.addBoolean(true);
 
-    assertTrue(list.setBoolean(0, false));
-    assertFalse(list.getBoolean(0));
+    assertEquals(true, list.setBoolean(0, false));
+    assertEquals(false, list.getBoolean(0));
 
-    assertTrue(list.setBoolean(1, false));
-    assertFalse(list.getBoolean(1));
+    assertEquals(true, list.setBoolean(1, false));
+    assertEquals(false, list.getBoolean(1));
 
     try {
       list.setBoolean(-1, false);
@@ -225,7 +226,8 @@ public class BooleanArrayListTest extends TestCase {
       list.add(i % 2 == 0);
     }
     assertEquals(
-        asList(false, true, false, false, true, true, false, true, false, true, false), list);
+        asList(false, true, false, false, true, true, false, true, false, true, false),
+        list);
 
     try {
       list.add(-1, true);
@@ -255,8 +257,8 @@ public class BooleanArrayListTest extends TestCase {
 
     assertTrue(list.addAll(Collections.singleton(true)));
     assertEquals(1, list.size());
-    assertTrue(list.get(0));
-    assertTrue(list.getBoolean(0));
+    assertEquals(true, (boolean) list.get(0));
+    assertEquals(true, list.getBoolean(0));
 
     assertTrue(list.addAll(asList(false, true, false, true, false)));
     assertEquals(asList(true, false, true, false, true, false), list);
@@ -270,7 +272,7 @@ public class BooleanArrayListTest extends TestCase {
 
   public void testRemove() {
     list.addAll(TERTIARY_LIST);
-    assertTrue(list.remove(0));
+    assertEquals(true, (boolean) list.remove(0));
     assertEquals(asList(false, true), list);
 
     assertTrue(list.remove(Boolean.TRUE));
@@ -279,7 +281,7 @@ public class BooleanArrayListTest extends TestCase {
     assertFalse(list.remove(Boolean.TRUE));
     assertEquals(asList(false), list);
 
-    assertFalse(list.remove(0));
+    assertEquals(false, (boolean) list.remove(0));
     assertEquals(asList(), list);
 
     try {
@@ -297,14 +299,16 @@ public class BooleanArrayListTest extends TestCase {
   }
 
   public void testRemoveEndOfCapacity() {
-    BooleanList toRemove = BooleanArrayList.emptyList().mutableCopyWithCapacity(1);
+    BooleanList toRemove =
+        BooleanArrayList.emptyList().mutableCopyWithCapacity(1);
     toRemove.addBoolean(true);
     toRemove.remove(0);
     assertEquals(0, toRemove.size());
   }
 
   public void testSublistRemoveEndOfCapacity() {
-    BooleanList toRemove = BooleanArrayList.emptyList().mutableCopyWithCapacity(1);
+    BooleanList toRemove =
+        BooleanArrayList.emptyList().mutableCopyWithCapacity(1);
     toRemove.addBoolean(true);
     toRemove.subList(0, 1).clear();
     assertEquals(0, toRemove.size());

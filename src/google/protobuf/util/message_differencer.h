@@ -51,8 +51,6 @@
 #include <google/protobuf/unknown_field_set.h>
 #include <google/protobuf/util/field_comparator.h>
 
-#include <google/protobuf/port_def.inc>
-
 namespace google {
 namespace protobuf {
 
@@ -108,7 +106,7 @@ class FieldContext;  // declared below MessageDifferencer
 // guard it with a lock to use the same MessageDifferencer instance from
 // multiple threads. Note that it's fine to call static comparison methods
 // (like MessageDifferencer::Equals) concurrently.
-class PROTOBUF_EXPORT MessageDifferencer {
+class LIBPROTOBUF_EXPORT MessageDifferencer {
  public:
   // Determines whether the supplied messages are equal. Equality is defined as
   // all fields within the two messages being set to the same value. Primitive
@@ -214,7 +212,7 @@ class PROTOBUF_EXPORT MessageDifferencer {
   // FieldDescriptors. The first will be the field of the embedded message
   // itself and the second will be the actual field in the embedded message
   // that was added/deleted/modified.
-  class PROTOBUF_EXPORT Reporter {
+  class LIBPROTOBUF_EXPORT Reporter {
    public:
     Reporter();
     virtual ~Reporter();
@@ -292,7 +290,7 @@ class PROTOBUF_EXPORT MessageDifferencer {
 
   // MapKeyComparator is used to determine if two elements have the same key
   // when comparing elements of a repeated field as a map.
-  class PROTOBUF_EXPORT MapKeyComparator {
+  class LIBPROTOBUF_EXPORT MapKeyComparator {
    public:
     MapKeyComparator();
     virtual ~MapKeyComparator();
@@ -315,7 +313,7 @@ class PROTOBUF_EXPORT MessageDifferencer {
   // field IsIgnored is called on each added IgnoreCriteria until one returns
   // true or all return false.
   // IsIgnored is called for fields where at least one side has a value.
-  class PROTOBUF_EXPORT IgnoreCriteria {
+  class LIBPROTOBUF_EXPORT IgnoreCriteria {
    public:
     IgnoreCriteria();
     virtual ~IgnoreCriteria();
@@ -581,7 +579,7 @@ class PROTOBUF_EXPORT MessageDifferencer {
   // Automatically creates a reporter that will output the differences
   // found (if any) to the specified output string pointer. Note that this
   // method must be called before Compare.
-  void ReportDifferencesToString(std::string* output);
+  void ReportDifferencesToString(string* output);
 
   // Tells the MessageDifferencer to report differences via the specified
   // reporter. Note that this method must be called before Compare for
@@ -601,7 +599,7 @@ class PROTOBUF_EXPORT MessageDifferencer {
   // complete until after you destroy the reporter. For example, if you use a
   // StreamReporter to write to a StringOutputStream, the target string may
   // contain uninitialized data until the reporter is destroyed.
-  class PROTOBUF_EXPORT StreamReporter : public Reporter {
+  class LIBPROTOBUF_EXPORT StreamReporter : public Reporter {
    public:
     explicit StreamReporter(io::ZeroCopyOutputStream* output);
     explicit StreamReporter(io::Printer* printer);  // delimiter '$'
@@ -661,7 +659,7 @@ class PROTOBUF_EXPORT MessageDifferencer {
     virtual void PrintUnknownFieldValue(const UnknownField* unknown_field);
 
     // Just print a string
-    void Print(const std::string& str);
+    void Print(const string& str);
 
    private:
     io::Printer* printer_;
@@ -681,7 +679,7 @@ class PROTOBUF_EXPORT MessageDifferencer {
   class MultipleFieldsMapKeyComparator;
 
   // A MapKeyComparator for use with map_entries.
-  class PROTOBUF_EXPORT MapEntryKeyComparator : public MapKeyComparator {
+  class LIBPROTOBUF_EXPORT MapEntryKeyComparator : public MapKeyComparator {
    public:
     explicit MapEntryKeyComparator(MessageDifferencer* message_differencer);
     bool IsMatch(
@@ -865,7 +863,7 @@ class PROTOBUF_EXPORT MessageDifferencer {
   bool report_moves_;
   bool report_ignores_;
 
-  std::string* output_string_;
+  string* output_string_;
 
   std::unique_ptr<DynamicMessageFactory> dynamic_message_factory_;
   GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(MessageDifferencer);
@@ -873,7 +871,7 @@ class PROTOBUF_EXPORT MessageDifferencer {
 
 // This class provides extra information to the FieldComparator::Compare
 // function.
-class PROTOBUF_EXPORT FieldContext {
+class LIBPROTOBUF_EXPORT FieldContext {
  public:
   explicit FieldContext(
       std::vector<MessageDifferencer::SpecificField>* parent_fields)
@@ -890,7 +888,5 @@ class PROTOBUF_EXPORT FieldContext {
 }  // namespace util
 }  // namespace protobuf
 }  // namespace google
-
-#include <google/protobuf/port_undef.inc>
 
 #endif  // GOOGLE_PROTOBUF_UTIL_MESSAGE_DIFFERENCER_H__

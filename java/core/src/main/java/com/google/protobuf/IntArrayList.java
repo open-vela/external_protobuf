@@ -42,11 +42,11 @@ import java.util.RandomAccess;
  *
  * @author dweis@google.com (Daniel Weis)
  */
-final class IntArrayList extends AbstractProtobufList<Integer>
+final class IntArrayList
+    extends AbstractProtobufList<Integer>
     implements IntList, RandomAccess, PrimitiveNonBoxingCollection {
 
   private static final IntArrayList EMPTY_LIST = new IntArrayList();
-
   static {
     EMPTY_LIST.makeImmutable();
   }
@@ -55,7 +55,9 @@ final class IntArrayList extends AbstractProtobufList<Integer>
     return EMPTY_LIST;
   }
 
-  /** The backing store for the list. */
+  /**
+   * The backing store for the list.
+   */
   private int[] array;
 
   /**
@@ -64,13 +66,16 @@ final class IntArrayList extends AbstractProtobufList<Integer>
    */
   private int size;
 
-  /** Constructs a new mutable {@code IntArrayList} with default capacity. */
+  /**
+   * Constructs a new mutable {@code IntArrayList} with default capacity.
+   */
   IntArrayList() {
     this(new int[DEFAULT_CAPACITY], 0);
   }
 
   /**
-   * Constructs a new mutable {@code IntArrayList} containing the same elements as {@code other}.
+   * Constructs a new mutable {@code IntArrayList}
+   * containing the same elements as {@code other}.
    */
   private IntArrayList(int[] other, int size) {
     array = other;
@@ -164,13 +169,17 @@ final class IntArrayList extends AbstractProtobufList<Integer>
     addInt(index, element);
   }
 
-  /** Like {@link #add(Integer)} but more efficient in that it doesn't box the element. */
+  /**
+   * Like {@link #add(Integer)} but more efficient in that it doesn't box the element.
+   */
   @Override
   public void addInt(int element) {
     addInt(size, element);
   }
 
-  /** Like {@link #add(int, Integer)} but more efficient in that it doesn't box the element. */
+  /**
+   * Like {@link #add(int, Integer)} but more efficient in that it doesn't box the element.
+   */
   private void addInt(int index, int element) {
     ensureIsMutable();
     if (index < 0 || index > size) {

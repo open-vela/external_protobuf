@@ -77,11 +77,8 @@ public abstract class CodedInputStream {
     return newInstance(input, DEFAULT_BUFFER_SIZE);
   }
 
-  /** Create a new CodedInputStream wrapping the given InputStream, with a specified buffer size. */
-  public static CodedInputStream newInstance(final InputStream input, int bufferSize) {
-    if (bufferSize <= 0) {
-      throw new IllegalArgumentException("bufferSize must be > 0");
-    }
+  /** Create a new CodedInputStream wrapping the given InputStream. */
+  static CodedInputStream newInstance(final InputStream input, int bufferSize) {
     if (input == null) {
       // TODO(nathanmittler): Ideally we should throw here. This is done for backward compatibility.
       return newInstance(EMPTY_BYTE_ARRAY);
@@ -133,7 +130,7 @@ public abstract class CodedInputStream {
 
   /** Create a new CodedInputStream wrapping the given byte array slice. */
   public static CodedInputStream newInstance(final byte[] buf, final int off, final int len) {
-    return newInstance(buf, off, len, /* bufferIsImmutable= */ false);
+    return newInstance(buf, off, len, false /* bufferIsImmutable */);
   }
 
   /** Create a new CodedInputStream wrapping the given byte array slice. */
@@ -169,7 +166,7 @@ public abstract class CodedInputStream {
    * trying to alter the ByteBuffer's status.
    */
   public static CodedInputStream newInstance(ByteBuffer buf) {
-    return newInstance(buf, /* bufferIsImmutable= */ false);
+    return newInstance(buf, false /* bufferIsImmutable */);
   }
 
   /** Create a new CodedInputStream wrapping the given buffer. */
@@ -412,6 +409,7 @@ public abstract class CodedInputStream {
     sizeLimit = limit;
     return oldLimit;
   }
+
 
   private boolean shouldDiscardUnknownFields = false;
 

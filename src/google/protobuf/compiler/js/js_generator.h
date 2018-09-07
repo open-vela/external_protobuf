@@ -40,8 +40,6 @@
 #include <google/protobuf/stubs/common.h>
 #include <google/protobuf/compiler/code_generator.h>
 
-#include <google/protobuf/port_def.inc>
-
 namespace google {
 namespace protobuf {
 
@@ -58,9 +56,9 @@ namespace js {
 
 struct GeneratorOptions {
   // Output path.
-  std::string output_dir;
+  string output_dir;
   // Namespace prefix.
-  std::string namespace_prefix;
+  string namespace_prefix;
   // Enable binary-format support?
   bool binary;
   // What style of imports should be used.
@@ -86,11 +84,11 @@ struct GeneratorOptions {
         annotate_code(false) {}
 
   bool ParseFromOptions(
-      const std::vector< std::pair< std::string, std::string > >& options,
-      std::string* error);
+      const std::vector< std::pair< string, string > >& options,
+      string* error);
 
   // Returns the file name extension to use for generated code.
-  std::string GetFileNameExtension() const {
+  string GetFileNameExtension() const {
     return import_style == kImportClosure ? extension : "_pb.js";
   }
 
@@ -115,11 +113,11 @@ struct GeneratorOptions {
   bool testonly;
   // Create a library with name <name>_lib.js rather than a separate .js file
   // per type?
-  std::string library;
+  string library;
   // Error if there are two types that would generate the same output file?
   bool error_on_name_conflict;
   // The extension to use for output file names.
-  std::string extension;
+  string extension;
   // Create a separate output file for each input file?
   bool one_output_file_per_input_file;
   // If true, we should build .meta files that contain annotations for
@@ -131,15 +129,15 @@ struct GeneratorOptions {
 // header.  If you create your own protocol compiler binary and you want it to
 // support JavaScript output, you can do so by registering an instance of this
 // CodeGenerator with the CommandLineInterface in your main() function.
-class PROTOC_EXPORT Generator : public CodeGenerator {
+class LIBPROTOC_EXPORT Generator : public CodeGenerator {
  public:
   Generator() {}
   virtual ~Generator() {}
 
   virtual bool Generate(const FileDescriptor* file,
-                        const std::string& parameter,
+                        const string& parameter,
                         GeneratorContext* context,
-                        std::string* error) const {
+                        string* error) const {
     *error = "Unimplemented Generate() method. Call GenerateAll() instead.";
     return false;
   }
@@ -147,9 +145,9 @@ class PROTOC_EXPORT Generator : public CodeGenerator {
   virtual bool HasGenerateAll() const { return true; }
 
   virtual bool GenerateAll(const std::vector<const FileDescriptor*>& files,
-                           const std::string& parameter,
+                           const string& parameter,
                            GeneratorContext* context,
-                           std::string* error) const;
+                           string* error) const;
 
  private:
   void GenerateHeader(const GeneratorOptions& options,
@@ -159,28 +157,28 @@ class PROTOC_EXPORT Generator : public CodeGenerator {
   void FindProvides(const GeneratorOptions& options,
                     io::Printer* printer,
                     const std::vector<const FileDescriptor*>& file,
-                    std::set<std::string>* provided) const;
+                    std::set<string>* provided) const;
   void FindProvidesForFile(const GeneratorOptions& options,
                            io::Printer* printer,
                            const FileDescriptor* file,
-                           std::set<std::string>* provided) const;
+                           std::set<string>* provided) const;
   void FindProvidesForMessage(const GeneratorOptions& options,
                               io::Printer* printer,
                               const Descriptor* desc,
-                              std::set<std::string>* provided) const;
+                              std::set<string>* provided) const;
   void FindProvidesForEnum(const GeneratorOptions& options,
                            io::Printer* printer,
                            const EnumDescriptor* enumdesc,
-                           std::set<std::string>* provided) const;
+                           std::set<string>* provided) const;
   // For extension fields at file scope.
   void FindProvidesForFields(const GeneratorOptions& options,
                              io::Printer* printer,
                              const std::vector<const FieldDescriptor*>& fields,
-                             std::set<std::string>* provided) const;
+                             std::set<string>* provided) const;
   // Print the goog.provides() found by the methods above.
   void GenerateProvides(const GeneratorOptions& options,
                         io::Printer* printer,
-                        std::set<std::string>* provided) const;
+                        std::set<string>* provided) const;
 
   // Generate goog.setTestOnly() if indicated.
   void GenerateTestOnly(const GeneratorOptions& options,
@@ -190,34 +188,34 @@ class PROTOC_EXPORT Generator : public CodeGenerator {
   void GenerateRequiresForLibrary(
       const GeneratorOptions& options, io::Printer* printer,
       const std::vector<const FileDescriptor*>& files,
-      std::set<std::string>* provided) const;
+      std::set<string>* provided) const;
   void GenerateRequiresForMessage(const GeneratorOptions& options,
                         io::Printer* printer,
                         const Descriptor* desc,
-                        std::set<std::string>* provided) const;
+                        std::set<string>* provided) const;
   // For extension fields at file scope.
   void GenerateRequiresForExtensions(
       const GeneratorOptions& options, io::Printer* printer,
       const std::vector<const FieldDescriptor*>& fields,
-      std::set<std::string>* provided) const;
+      std::set<string>* provided) const;
   void GenerateRequiresImpl(const GeneratorOptions& options,
-                            io::Printer* printer, std::set<std::string>* required,
-                            std::set<std::string>* forwards,
-                            std::set<std::string>* provided, bool require_jspb,
+                            io::Printer* printer, std::set<string>* required,
+                            std::set<string>* forwards,
+                            std::set<string>* provided, bool require_jspb,
                             bool require_extension, bool require_map) const;
   void FindRequiresForMessage(const GeneratorOptions& options,
                               const Descriptor* desc,
-                              std::set<std::string>* required,
-                              std::set<std::string>* forwards,
+                              std::set<string>* required,
+                              std::set<string>* forwards,
                               bool* have_message) const;
   void FindRequiresForField(const GeneratorOptions& options,
                             const FieldDescriptor* field,
-                            std::set<std::string>* required,
-                            std::set<std::string>* forwards) const;
+                            std::set<string>* required,
+                            std::set<string>* forwards) const;
   void FindRequiresForExtension(const GeneratorOptions& options,
                                 const FieldDescriptor* field,
-                                std::set<std::string>* required,
-                                std::set<std::string>* forwards) const;
+                                std::set<string>* required,
+                                std::set<string>* forwards) const;
 
   void GenerateFile(const GeneratorOptions& options,
                     io::Printer* printer,
@@ -332,7 +330,5 @@ class PROTOC_EXPORT Generator : public CodeGenerator {
 }  // namespace compiler
 }  // namespace protobuf
 }  // namespace google
-
-#include <google/protobuf/port_undef.inc>
 
 #endif  // GOOGLE_PROTOBUF_COMPILER_JS_GENERATOR_H__
