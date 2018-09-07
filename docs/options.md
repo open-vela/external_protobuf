@@ -14,7 +14,7 @@ with info about your project (name and website) so we can add an entry for you.
 ## Existing Registered Extensions
 
 1. C# port of protocol buffers
-   * Website: http://github.com/jskeet/dotnet-protobufs
+   * Website: https://github.com/jskeet/protobuf-csharp-port
    * Extensions: 1000
 
 1. Perl/XS port of protocol buffers
@@ -50,7 +50,7 @@ with info about your project (name and website) so we can add an entry for you.
    * Extensions: 1008
 
 1. Goby Underwater Autonomy Project
-   * Website: https://launchpad.net/goby
+   * Website: https://github.com/GobySoft/goby
    * Extensions: 1009
 
 1. Nanopb
@@ -62,7 +62,7 @@ with info about your project (name and website) so we can add an entry for you.
    * Extensions: 1011
 
 1. Dynamic Compact Control Language
-   * Website: https://launchpad.net/dccl
+   * Website: http://github.com/GobySoft/dccl
    * Extensions: 1012
 
 1. ScaleOut StateServer® Native C++ API
@@ -188,3 +188,9 @@ with info about your project (name and website) so we can add an entry for you.
 1. Netifi Proteus
    * Website: https://github.com/netifi-proteus
    * Extensions: 1057
+
+1. CGSN Mooring Project
+   * Website: https://bitbucket.org/ooicgsn/cgsn-mooring
+   * Extensions: 1058
+   
+
