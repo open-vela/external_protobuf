@@ -271,25 +271,7 @@ namespace Google.Protobuf
             }
             return result.ToString();
         }
-
-        internal static string FromJsonName(string name)
-        {
-            StringBuilder result = new StringBuilder(name.Length);
-            foreach (char ch in name)
-            {
-                if (char.IsUpper(ch))
-                {
-                    result.Append('_');
-                    result.Append(char.ToLowerInvariant(ch));
-                }
-                else
-                {
-                    result.Append(ch);
-                }
-            }
-            return result.ToString();
-        }
-
+        
         private static void WriteNull(TextWriter writer)
         {
             writer.Write("null");
