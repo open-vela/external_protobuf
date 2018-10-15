@@ -178,10 +178,11 @@ class Message(object):
   def ParseFromString(self, serialized):
     """Parse serialized protocol buffer data into this message.
 
-    Like MergeFromString(), except we clear the object first.
+    Like MergeFromString(), except we clear the object first and
+    do not return the value that MergeFromString returns.
     """
     self.Clear()
-    return self.MergeFromString(serialized)
+    self.MergeFromString(serialized)
 
   def SerializeToString(self, **kwargs):
     """Serializes the protocol message to a binary string.
