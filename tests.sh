@@ -16,8 +16,8 @@ internal_build_cpp() {
   git submodule update --init --recursive
 
   ./autogen.sh
-  ./configure CXXFLAGS="-fPIC"  # -fPIC is needed for python cpp test.
-                                # See python/setup.py for more details
+  ./configure CXXFLAGS="-fPIC -std=c++11"  # -fPIC is needed for python cpp test.
+                                           # See python/setup.py for more details
   make -j4
 }
 
@@ -265,8 +265,6 @@ build_ruby25() {
   cd ruby && bash travis-test.sh ruby-2.5.0 && cd ..
 }
 build_ruby_all() {
-  build_ruby21
-  build_ruby22
   build_ruby23
   build_ruby24
   build_ruby25
@@ -285,6 +283,7 @@ generate_php_test_proto() {
   rm -rf generated
   mkdir generated
   ../../src/protoc --php_out=generated         \
+    -I../../src -I.                            \
     proto/empty/echo.proto                     \
     proto/test.proto                           \
     proto/test_include.proto                   \
@@ -300,6 +299,7 @@ generate_php_test_proto() {
     proto/test_reserved_message_upper.proto    \
     proto/test_service.proto                   \
     proto/test_service_namespace.proto         \
+    proto/test_wrapper_type_setters.proto      \
     proto/test_descriptors.proto
   pushd ../../src
   ./protoc --php_out=../php/tests/generated -I../php/tests -I. \
@@ -573,6 +573,9 @@ Usage: $0 { cpp |
             python_compatibility |
             ruby21 |
             ruby22 |
+            ruby23 |
+            ruby24 |
+            ruby25 |
             jruby |
             ruby_all |
             php5.5   |
