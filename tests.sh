@@ -16,8 +16,8 @@ internal_build_cpp() {
   git submodule update --init --recursive
 
   ./autogen.sh
-  ./configure CXXFLAGS="-fPIC -std=c++11"  # -fPIC is needed for python cpp test.
-                                           # See python/setup.py for more details
+  ./configure CXXFLAGS="-fPIC"  # -fPIC is needed for python cpp test.
+                                # See python/setup.py for more details
   make -j4
 }
 
@@ -244,9 +244,17 @@ build_python_compatibility() {
   ./test.sh 3.0.0-beta-1
 }
 
+build_ruby21() {
+  internal_build_cpp  # For conformance tests.
+  cd ruby && bash travis-test.sh ruby-2.1 && cd ..
+}
+build_ruby22() {
+  internal_build_cpp  # For conformance tests.
+  cd ruby && bash travis-test.sh ruby-2.2 && cd ..
+}
 build_ruby23() {
   internal_build_cpp  # For conformance tests.
-  cd ruby && bash travis-test.sh ruby-2.3.8 && cd ..
+  cd ruby && bash travis-test.sh ruby-2.3 && cd ..
 }
 build_ruby24() {
   internal_build_cpp  # For conformance tests.
@@ -254,9 +262,11 @@ build_ruby24() {
 }
 build_ruby25() {
   internal_build_cpp  # For conformance tests.
-  cd ruby && bash travis-test.sh ruby-2.5.1 && cd ..
+  cd ruby && bash travis-test.sh ruby-2.5.0 && cd ..
 }
 build_ruby_all() {
+  build_ruby21
+  build_ruby22
   build_ruby23
   build_ruby24
   build_ruby25
@@ -275,7 +285,6 @@ generate_php_test_proto() {
   rm -rf generated
   mkdir generated
   ../../src/protoc --php_out=generated         \
-    -I../../src -I.                            \
     proto/empty/echo.proto                     \
     proto/test.proto                           \
     proto/test_include.proto                   \
@@ -291,7 +300,6 @@ generate_php_test_proto() {
     proto/test_reserved_message_upper.proto    \
     proto/test_service.proto                   \
     proto/test_service_namespace.proto         \
-    proto/test_wrapper_type_setters.proto      \
     proto/test_descriptors.proto
   pushd ../../src
   ./protoc --php_out=../php/tests/generated -I../php/tests -I. \
@@ -563,9 +571,8 @@ Usage: $0 { cpp |
             python |
             python_cpp |
             python_compatibility |
-            ruby23 |
-            ruby24 |
-            ruby25 |
+            ruby21 |
+            ruby22 |
             jruby |
             ruby_all |
             php5.5   |

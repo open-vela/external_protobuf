@@ -44,13 +44,9 @@ def run_one_test(filename):
   data = open(filename).read()
   benchmark_dataset = benchmarks_pb2.BenchmarkDataset()
   benchmark_dataset.ParseFromString(data)
-  total_bytes = 0
-  for payload in benchmark_dataset.payload:
-    total_bytes += len(payload)
   benchmark_util = Benchmark(full_iteration=len(benchmark_dataset.payload),
                              module="py_benchmark",
-                             setup_method="init",
-                             total_bytes=total_bytes)
+                             setup_method="init")
   result={}
   result["filename"] =  filename
   result["message_name"] =  benchmark_dataset.message_name
@@ -65,11 +61,10 @@ def run_one_test(filename):
 
 
 def init(filename):
-  global benchmark_dataset, message_class, message_list, counter, total_bytes
+  global benchmark_dataset, message_class, message_list, counter
   message_list=[]
   counter = 0
-  total_bytes = 0
-  data = open(filename).read()
+  data = open(os.path.dirname(sys.argv[0]) + "/../" + filename).read()
   benchmark_dataset = benchmarks_pb2.BenchmarkDataset()
   benchmark_dataset.ParseFromString(data)
 
@@ -90,7 +85,6 @@ def init(filename):
     temp = message_class()
     temp.ParseFromString(one_payload)
     message_list.append(temp)
-    total_bytes += len(one_payload)
 
 
 def parse_from_benchmark():
@@ -107,12 +101,11 @@ def serialize_to_benchmark():
 
 class Benchmark:
   def __init__(self, module=None, test_method=None,
-               setup_method=None, total_bytes=None, full_iteration = 1):
+               setup_method=None, full_iteration = 1):
     self.full_iteration = full_iteration
     self.module = module
     self.test_method = test_method
     self.setup_method = setup_method
-    self.total_bytes = total_bytes
 
   def set_test_method(self, test_method):
     self.test_method = test_method
@@ -137,7 +130,7 @@ class Benchmark:
     t = timeit.timeit(stmt="%s(%s)" % (self.test_method, test_method_args),
                       setup=self.full_setup_code(setup_method_args),
                       number=reps);
-    return self.total_bytes * 1.0 / 2 ** 20 / (1.0 * t / reps)
+    return 1.0 * t / reps * (10 ** 9)
   
 
 if __name__ == "__main__":
@@ -151,10 +144,10 @@ if __name__ == "__main__":
     for result in results:
       print("Message %s of dataset file %s" % \
           (result["message_name"], result["filename"]))
-      print("Average throughput for parse_from_benchmark: %.2f MB/s" % \
+      print("Average time for parse_from_benchmark: %.2f ns" % \
           (result["benchmarks"][ \
                       args.behavior_prefix + "_parse_from_benchmark"]))
-      print("Average throughput for serialize_to_benchmark: %.2f MB/s" % \
+      print("Average time for serialize_to_benchmark: %.2f ns" % \
           (result["benchmarks"][ \
                       args.behavior_prefix + "_serialize_to_benchmark"]))
       print("")

@@ -38,7 +38,6 @@
 #include <string>
 
 #include <google/protobuf/compiler/code_generator.h>
-#include <google/protobuf/stubs/mutex.h>
 
 #include <google/protobuf/port_def.inc>
 

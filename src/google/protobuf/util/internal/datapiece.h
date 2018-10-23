@@ -34,7 +34,6 @@
 #include <string>
 
 #include <google/protobuf/stubs/common.h>
-#include <google/protobuf/stubs/logging.h>
 #include <google/protobuf/stubs/stringpiece.h>
 #include <google/protobuf/stubs/statusor.h>
 
