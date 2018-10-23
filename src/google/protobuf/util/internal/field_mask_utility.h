@@ -36,7 +36,6 @@
 #include <functional>
 #include <stack>
 
-#include <google/protobuf/stubs/callback.h>
 #include <google/protobuf/stubs/common.h>
 #include <google/protobuf/stubs/stringpiece.h>
 #include <google/protobuf/stubs/status.h>

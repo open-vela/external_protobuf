@@ -31,8 +31,6 @@
 // Author: kenton@google.com (Kenton Varda)
 
 #include <google/protobuf/stubs/substitute.h>
-
-#include <google/protobuf/stubs/logging.h>
 #include <google/protobuf/stubs/strutil.h>
 #include <google/protobuf/stubs/stl_util.h>
 

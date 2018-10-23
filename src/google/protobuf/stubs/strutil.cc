@@ -40,7 +40,6 @@
 #include <iterator>
 #include <limits>
 
-#include <google/protobuf/stubs/logging.h>
 #include <google/protobuf/stubs/stl_util.h>
 
 #ifdef _WIN32
