@@ -1,9 +1,10 @@
 workspace(name = "com_google_protobuf")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
-http_archive(
+new_local_repository(
     name = "submodule_gmock",
-    urls = ["https://github.com/google/googletest/archive/release-1.8.1.zip"]
+    path = "third_party/googletest",
+    build_file = "@//:third_party/googletest/BUILD.bazel"
 )
 
 http_archive(
