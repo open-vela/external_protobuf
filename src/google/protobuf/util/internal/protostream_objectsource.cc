@@ -49,6 +49,7 @@
 #include <google/protobuf/stubs/strutil.h>
 #include <google/protobuf/stubs/casts.h>
 
+
 #include <google/protobuf/stubs/map_util.h>
 #include <google/protobuf/stubs/status_macros.h>
 
@@ -127,8 +128,7 @@ ProtoStreamObjectSource::ProtoStreamObjectSource(
       max_recursion_depth_(kDefaultMaxRecursionDepth),
       render_unknown_fields_(false),
       render_unknown_enum_values_(true),
-      add_trailing_zeros_for_timestamp_and_duration_(false),
-      suppress_empty_object_(false) {
+      add_trailing_zeros_for_timestamp_and_duration_(false) {
   GOOGLE_LOG_IF(DFATAL, stream == nullptr) << "Input stream is nullptr.";
 }
 
@@ -146,8 +146,7 @@ ProtoStreamObjectSource::ProtoStreamObjectSource(
       max_recursion_depth_(kDefaultMaxRecursionDepth),
       render_unknown_fields_(false),
       render_unknown_enum_values_(true),
-      add_trailing_zeros_for_timestamp_and_duration_(false),
-      suppress_empty_object_(false) {
+      add_trailing_zeros_for_timestamp_and_duration_(false) {
   GOOGLE_LOG_IF(DFATAL, stream == nullptr) << "Input stream is nullptr.";
 }
 
@@ -198,10 +197,6 @@ Status ProtoStreamObjectSource::WriteMessage(const google::protobuf::Type& type,
   // last_tag set to dummy value that is different from tag.
   uint32 tag = stream_->ReadTag(), last_tag = tag + 1;
   UnknownFieldSet unknown_fields;
-
-  if (tag == end_tag && suppress_empty_object_) {
-    return util::Status();
-  }
 
   if (include_start_and_end) {
     ow->StartObject(name);
@@ -645,7 +640,7 @@ Status ProtoStreamObjectSource::RenderAny(const ProtoStreamObjectSource* os,
     // Convert into an internal error, since this means the backend gave us
     // an invalid response (missing or invalid type information).
     return util::Status(util::error::INTERNAL,
-                        resolved_type.status().message());
+                        resolved_type.status().error_message());
   }
   // nested_type cannot be null at this time.
   const google::protobuf::Type* nested_type = resolved_type.ValueOrDie();

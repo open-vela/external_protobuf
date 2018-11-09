@@ -38,7 +38,6 @@
 
 #include <google/protobuf/stubs/logging.h>
 #include <google/protobuf/stubs/common.h>
-#include <google/protobuf/compiler/scc.h>
 #include <google/protobuf/compiler/code_generator.h>
 
 #include <google/protobuf/port_def.inc>
@@ -99,7 +98,7 @@ struct GeneratorOptions {
     // Create an output file for each input .proto file.
     kOneOutputFilePerInputFile,
     // Create an output file for each type.
-    kOneOutputFilePerSCC,
+    kOneOutputFilePerType,
     // Put everything in a single file named by the library option.
     kEverythingInOneFile,
   };
@@ -192,10 +191,10 @@ class PROTOC_EXPORT Generator : public CodeGenerator {
       const GeneratorOptions& options, io::Printer* printer,
       const std::vector<const FileDescriptor*>& files,
       std::set<std::string>* provided) const;
-  void GenerateRequiresForSCC(const GeneratorOptions& options,
-                              io::Printer* printer,
-                              const SCC* scc,
-                              std::set<std::string>* provided) const;
+  void GenerateRequiresForMessage(const GeneratorOptions& options,
+                        io::Printer* printer,
+                        const Descriptor* desc,
+                        std::set<std::string>* provided) const;
   // For extension fields at file scope.
   void GenerateRequiresForExtensions(
       const GeneratorOptions& options, io::Printer* printer,
@@ -219,13 +218,7 @@ class PROTOC_EXPORT Generator : public CodeGenerator {
                                 const FieldDescriptor* field,
                                 std::set<std::string>* required,
                                 std::set<std::string>* forwards) const;
-  // Generate all things in a proto file into one file.
-  // If use_short_name is true, the generated file's name will only be short
-  // name that without directory, otherwise filename equals file->name()
-  bool GenerateFile(const FileDescriptor* file,
-                    const GeneratorOptions &options,
-                    GeneratorContext* context,
-                    bool use_short_name) const;
+
   void GenerateFile(const GeneratorOptions& options,
                     io::Printer* printer,
                     const FileDescriptor* file) const;
@@ -262,10 +255,6 @@ class PROTOC_EXPORT Generator : public CodeGenerator {
   void GenerateClassFieldInfo(const GeneratorOptions& options,
                               io::Printer* printer,
                               const Descriptor* desc) const;
-  void GenerateClassConstructorAndDeclareExtensionFieldInfo(
-      const GeneratorOptions& options,
-      io::Printer* printer,
-      const Descriptor* desc) const;
   void GenerateClassXid(const GeneratorOptions& options,
                         io::Printer* printer,
                         const Descriptor* desc) const;

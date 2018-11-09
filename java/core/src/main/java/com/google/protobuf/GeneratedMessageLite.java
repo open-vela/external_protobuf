@@ -451,18 +451,16 @@ public abstract class GeneratedMessageLite<
     }
 
     @Override
-    public BuilderType mergeFrom(
-        byte[] input, int offset, int length, ExtensionRegistryLite extensionRegistry)
+    public BuilderType mergeFrom(byte[] input, int offset, int length)
         throws InvalidProtocolBufferException {
       // BEGIN REGULAR
-      return super.mergeFrom(input, offset, length, extensionRegistry);
+      return super.mergeFrom(input, offset, length);
       // END REGULAR
       // BEGIN EXPERIMENTAL
       // copyOnWrite();
       // try {
       //   Protobuf.getInstance().schemaFor(instance).mergeFrom(
-      //       instance, input, offset, offset + length,
-      //       new ArrayDecoders.Registers(extensionRegistry));
+      //       instance, input, offset, offset + length, new ArrayDecoders.Registers());
       // } catch (InvalidProtocolBufferException e) {
       //   throw e;
       // } catch (IndexOutOfBoundsException e) {
@@ -471,18 +469,6 @@ public abstract class GeneratedMessageLite<
       //   throw new RuntimeException("Reading from byte array should not throw IOException.", e);
       // }
       // return (BuilderType) this;
-      // END EXPERIMENTAL
-    }
-
-    @Override
-    public BuilderType mergeFrom(
-        byte[] input, int offset, int length)
-        throws InvalidProtocolBufferException {
-      // BEGIN REGULAR
-      return super.mergeFrom(input, offset, length);
-      // END REGULAR
-      // BEGIN EXPERIMENTAL
-      // return mergeFrom(input, offset, length, ExtensionRegistryLite.getEmptyRegistry());
       // END EXPERIMENTAL
     }
 
@@ -497,8 +483,6 @@ public abstract class GeneratedMessageLite<
         instance.dynamicMethod(MethodToInvoke.MERGE_FROM_STREAM, input, extensionRegistry);
         // END REGULAR
         // BEGIN EXPERIMENTAL
-        // // TODO(yilunchong): Try to make input with type CodedInpuStream.ArrayDecoder use
-        // // fast path.
         // Protobuf.getInstance().schemaFor(instance).mergeFrom(
         //     instance, CodedInputStreamReader.forCodedInput(input), extensionRegistry);
         // END EXPERIMENTAL
@@ -830,7 +814,7 @@ public abstract class GeneratedMessageLite<
           .setField(extension.descriptor, extension.singularToFieldSetType(value));
     }
 
-    FieldSet<ExtensionDescriptor> ensureExtensionsAreMutable() {
+    private FieldSet<ExtensionDescriptor> ensureExtensionsAreMutable() {
       if (extensions.isImmutable()) {
         extensions = extensions.clone();
       }
@@ -1574,11 +1558,8 @@ public abstract class GeneratedMessageLite<
     }
 
     @Override
-    public T parsePartialFrom(
-        byte[] input, int offset, int length, ExtensionRegistryLite extensionRegistry)
-        throws InvalidProtocolBufferException {
-      return GeneratedMessageLite.parsePartialFrom(
-          defaultInstance, input, offset, length, extensionRegistry);
+    public T parsePartialFrom(byte[] input) throws InvalidProtocolBufferException {
+      return GeneratedMessageLite.parsePartialFrom(defaultInstance, input);
     }
   }
 
@@ -1597,8 +1578,6 @@ public abstract class GeneratedMessageLite<
       result.dynamicMethod(MethodToInvoke.MERGE_FROM_STREAM, input, extensionRegistry);
       // END REGULAR
       // BEGIN EXPERIMENTAL
-      // // TODO(yilunchong): Try to make input with type CodedInpuStream.ArrayDecoder use
-      // // fast path.
       // Protobuf.getInstance().schemaFor(result).mergeFrom(
       //     result, CodedInputStreamReader.forCodedInput(input), extensionRegistry);
       // END EXPERIMENTAL
@@ -1620,31 +1599,17 @@ public abstract class GeneratedMessageLite<
   }
 
   /** A static helper method for parsing a partial from byte array. */
-  static <T extends GeneratedMessageLite<T, ?>> T parsePartialFrom(
-      T instance, byte[] input, int offset, int length, ExtensionRegistryLite extensionRegistry)
+  static <T extends GeneratedMessageLite<T, ?>> T parsePartialFrom(T instance, byte[] input)
       throws InvalidProtocolBufferException {
     // BEGIN REGULAR
-    T message;
-    try {
-      CodedInputStream cis = CodedInputStream.newInstance(input, offset, length);
-      message = parsePartialFrom(instance, cis, extensionRegistry);
-      try {
-        cis.checkLastTagWas(0);
-      } catch (InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(message);
-      }
-      return message;
-    } catch (InvalidProtocolBufferException e) {
-      throw e;
-    }
+    return parsePartialFrom(instance, input, ExtensionRegistryLite.getEmptyRegistry());
     // END REGULAR
     // BEGIN EXPERIMENTAL
     // @SuppressWarnings("unchecked") // Guaranteed by protoc
     // T result = (T) instance.dynamicMethod(MethodToInvoke.NEW_MUTABLE_INSTANCE);
     // try {
     //   Protobuf.getInstance().schemaFor(result).mergeFrom(
-    //       result, input, offset, offset + length,
-    //       new ArrayDecoders.Registers(extensionRegistry));
+    //       result, input, 0, input.length, new ArrayDecoders.Registers());
     //   result.makeImmutable();
     //   if (result.memoizedHashCode != 0) {
     //     throw new RuntimeException();
@@ -1736,23 +1701,32 @@ public abstract class GeneratedMessageLite<
   private static <T extends GeneratedMessageLite<T, ?>> T parsePartialFrom(
       T defaultInstance, byte[] data, ExtensionRegistryLite extensionRegistry)
       throws InvalidProtocolBufferException {
-    return checkMessageInitialized(
-        parsePartialFrom(defaultInstance, data, 0, data.length, extensionRegistry));
+    T message;
+    try {
+      CodedInputStream input = CodedInputStream.newInstance(data);
+      message = parsePartialFrom(defaultInstance, input, extensionRegistry);
+      try {
+        input.checkLastTagWas(0);
+      } catch (InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(message);
+      }
+      return message;
+    } catch (InvalidProtocolBufferException e) {
+      throw e;
+    }
   }
 
   // Validates last tag.
   protected static <T extends GeneratedMessageLite<T, ?>> T parseFrom(
       T defaultInstance, byte[] data) throws InvalidProtocolBufferException {
-    return checkMessageInitialized(parsePartialFrom(
-        defaultInstance, data, 0, data.length, ExtensionRegistryLite.getEmptyRegistry()));
+    return checkMessageInitialized(parsePartialFrom(defaultInstance, data));
   }
 
   // Validates last tag.
   protected static <T extends GeneratedMessageLite<T, ?>> T parseFrom(
       T defaultInstance, byte[] data, ExtensionRegistryLite extensionRegistry)
       throws InvalidProtocolBufferException {
-    return checkMessageInitialized(
-        parsePartialFrom(defaultInstance, data, 0, data.length, extensionRegistry));
+    return checkMessageInitialized(parsePartialFrom(defaultInstance, data, extensionRegistry));
   }
 
   // Does not validate last tag.

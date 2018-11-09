@@ -242,11 +242,10 @@ template <typename Derived, typename Key, typename T,
           WireFormatLite::FieldType kKeyFieldType,
           WireFormatLite::FieldType kValueFieldType, int default_enum_value>
 void MapField<Derived, Key, T, kKeyFieldType, kValueFieldType,
-              default_enum_value>::MergeFrom(const MapFieldBase& other) {
+              default_enum_value>::MergeFrom(const MapField& other) {
   MapFieldBase::SyncMapWithRepeatedField();
-  const MapField& other_field = static_cast<const MapField&>(other);
-  other_field.SyncMapWithRepeatedField();
-  impl_.MergeFrom(other_field.impl_);
+  other.SyncMapWithRepeatedField();
+  impl_.MergeFrom(other.impl_);
   MapFieldBase::SetMapDirty();
 }
 

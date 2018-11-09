@@ -201,7 +201,7 @@ struct Metadata {
 class PROTOBUF_EXPORT Message : public MessageLite {
  public:
   inline Message() {}
-  ~Message() override {}
+  virtual ~Message() {}
 
   // Basic Operations ------------------------------------------------
 
@@ -436,12 +436,15 @@ class PROTOBUF_EXPORT Reflection {
 
   // Get the UnknownFieldSet for the message.  This contains fields which
   // were seen when the Message was parsed but were not recognized according
-  // to the Message's definition.
+  // to the Message's definition. For proto3 protos, this method will always
+  // return an empty UnknownFieldSet.
   virtual const UnknownFieldSet& GetUnknownFields(
       const Message& message) const = 0;
   // Get a mutable pointer to the UnknownFieldSet for the message.  This
   // contains fields which were seen when the Message was parsed but were not
-  // recognized according to the Message's definition.
+  // recognized according to the Message's definition. For proto3 protos, this
+  // method will return a valid mutable UnknownFieldSet pointer but modifying
+  // it won't affect the serialized bytes of the message.
   virtual UnknownFieldSet* MutableUnknownFields(Message* message) const = 0;
 
   // Estimate the amount of memory used by the message object.

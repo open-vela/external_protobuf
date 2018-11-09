@@ -32,7 +32,6 @@
 
 #include <google/protobuf/stubs/common.h>
 
-#include <atomic>
 #include <errno.h>
 #include <sstream>
 #include <stdio.h>
@@ -181,7 +180,22 @@ void NullLogHandler(LogLevel /* level */, const char* /* filename */,
 }
 
 static LogHandler* log_handler_ = &DefaultLogHandler;
-static std::atomic<int> log_silencer_count_ = ATOMIC_VAR_INIT(0);
+static int log_silencer_count_ = 0;
+
+static Mutex* log_silencer_count_mutex_ = nullptr;
+GOOGLE_PROTOBUF_DECLARE_ONCE(log_silencer_count_init_);
+
+void DeleteLogSilencerCount() {
+  delete log_silencer_count_mutex_;
+  log_silencer_count_mutex_ = nullptr;
+}
+void InitLogSilencerCount() {
+  log_silencer_count_mutex_ = new Mutex;
+  OnShutdown(&DeleteLogSilencerCount);
+}
+void InitLogSilencerCountOnce() {
+  GoogleOnceInit(&log_silencer_count_init_, &InitLogSilencerCount);
+}
 
 LogMessage& LogMessage::operator<<(const string& value) {
   message_ += value;
@@ -247,6 +261,8 @@ void LogMessage::Finish() {
   bool suppress = false;
 
   if (level_ != LOGLEVEL_FATAL) {
+    InitLogSilencerCountOnce();
+    MutexLock lock(log_silencer_count_mutex_);
     suppress = log_silencer_count_ > 0;
   }
 
@@ -283,10 +299,14 @@ LogHandler* SetLogHandler(LogHandler* new_func) {
 }
 
 LogSilencer::LogSilencer() {
+  internal::InitLogSilencerCountOnce();
+  MutexLock lock(internal::log_silencer_count_mutex_);
   ++internal::log_silencer_count_;
 };
 
 LogSilencer::~LogSilencer() {
+  internal::InitLogSilencerCountOnce();
+  MutexLock lock(internal::log_silencer_count_mutex_);
   --internal::log_silencer_count_;
 };
 

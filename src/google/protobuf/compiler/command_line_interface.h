@@ -53,7 +53,6 @@ namespace google {
 namespace protobuf {
 
 class Descriptor;            // descriptor.h
-class DescriptorDatabase;    // descriptor_database.h
 class DescriptorPool;        // descriptor.h
 class FileDescriptor;        // descriptor.h
 class FileDescriptorSet;     // descriptor.h
@@ -215,15 +214,14 @@ class PROTOC_EXPORT CommandLineInterface {
   // Clear state from previous Run().
   void Clear();
 
-  // Remaps the proto file so that it is relative to one of the directories
+  // Remaps the proto file so that it is relative to one of the ddirectories
   // in proto_path_.  Returns false if an error occurred.
-  bool MakeProtoProtoPathRelative(DiskSourceTree* source_tree, std::string* proto,
-                                  DescriptorDatabase* fallback_database);
+  bool MakeProtoProtoPathRelative(DiskSourceTree* source_tree, std::string* proto);
 
   // Remaps each file in input_files_ so that it is relative to one of the
   // directories in proto_path_.  Returns false if an error occurred.
-  bool MakeInputsBeProtoPathRelative(DiskSourceTree* source_tree,
-                                     DescriptorDatabase* fallback_database);
+  bool MakeInputsBeProtoPathRelative(
+    DiskSourceTree* source_tree);
 
 
   // Return status for ParseArguments() and InterpretArgument().
@@ -261,11 +259,7 @@ class PROTOC_EXPORT CommandLineInterface {
   void PrintHelpText();
 
   // Loads proto_path_ into the provided source_tree.
-  bool InitializeDiskSourceTree(DiskSourceTree* source_tree,
-                                DescriptorDatabase* fallback_database);
-
-  // Verify that all the input files exist in the given database.
-  bool VerifyInputFilesInDescriptors(DescriptorDatabase* fallback_database);
+  bool InitializeDiskSourceTree(DiskSourceTree* source_tree);
 
   // Loads descriptor_set_in into the provided database
   bool PopulateSimpleDescriptorDatabase(SimpleDescriptorDatabase* database);

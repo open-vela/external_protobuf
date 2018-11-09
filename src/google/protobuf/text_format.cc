@@ -32,15 +32,16 @@
 //  Based on original Protocol Buffers design by
 //  Sanjay Ghemawat, Jeff Dean, and others.
 
-#include <google/protobuf/text_format.h>
-
+#include <algorithm>
+#include <climits>
 #include <float.h>
 #include <math.h>
 #include <stdio.h>
-#include <algorithm>
-#include <climits>
+#include <stack>
 #include <limits>
 #include <vector>
+
+#include <google/protobuf/text_format.h>
 
 #include <google/protobuf/stubs/stringprintf.h>
 #include <google/protobuf/any.h>
@@ -57,6 +58,7 @@
 #include <google/protobuf/unknown_field_set.h>
 #include <google/protobuf/wire_format_lite.h>
 #include <google/protobuf/stubs/strutil.h>
+
 
 
 
@@ -444,8 +446,8 @@ class TextFormat::Parser::ParserImpl {
                       descriptor->full_name() + "\".");
           return false;
         } else {
-          ReportWarning("Ignoring extension \"" + field_name +
-                        "\" which is not defined or is not an extension of \"" +
+          ReportWarning("Extension \"" + field_name + "\" is not defined or "
+                        "is not an extension of \"" +
                         descriptor->full_name() + "\".");
         }
       }
@@ -845,8 +847,6 @@ label_skip_parsing:
     if (!LookingAtType(io::Tokenizer::TYPE_INTEGER) &&
         !LookingAtType(io::Tokenizer::TYPE_FLOAT) &&
         !LookingAtType(io::Tokenizer::TYPE_IDENTIFIER)) {
-      string text = tokenizer_.current().text;
-      ReportError("Cannot skip field value, unexpected token: " + text);
       return false;
     }
     // Combination of '-' and TYPE_IDENTIFIER may result in an invalid field

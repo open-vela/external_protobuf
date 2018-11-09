@@ -340,17 +340,11 @@ function makeTests(msgInfo, submessageCtor, suffix) {
     assertElementsEquals(entryIterator.next().value, ['key2', 'value2']);
     assertEquals(entryIterator.next().done, true);
 
-    try {
+    if (typeof(Symbol) != 'undefined') {
       var entryIterable = m.entries()[Symbol.iterator]();
       assertElementsEquals(entryIterable.next().value, ['key1', 'value1']);
       assertElementsEquals(entryIterable.next().value, ['key2', 'value2']);
       assertEquals(entryIterable.next().done, true);
-    } catch (err) {
-      // jspb.Map.ArrayIteratorIterable_.prototype[Symbol.iterator] may be
-      // undefined in some environment.
-      if (err.name != 'TypeError' && err.name != 'ReferenceError') {
-        throw err;
-      }
     }
 
     var keyIterator = m.keys();
@@ -358,34 +352,22 @@ function makeTests(msgInfo, submessageCtor, suffix) {
     assertEquals(keyIterator.next().value, 'key2');
     assertEquals(keyIterator.next().done, true);
 
-    try {
+    if (typeof(Symbol) != 'undefined') {
       var keyIterable = m.keys()[Symbol.iterator]();
       assertEquals(keyIterable.next().value, 'key1');
       assertEquals(keyIterable.next().value, 'key2');
       assertEquals(keyIterable.next().done, true);
-    } catch (err) {
-      // jspb.Map.ArrayIteratorIterable_.prototype[Symbol.iterator] may be
-      // undefined in some environment.
-      if (err.name != 'TypeError' && err.name != 'ReferenceError') {
-        throw err;
-      }
     }
     var valueIterator = m.values();
     assertEquals(valueIterator.next().value, 'value1');
     assertEquals(valueIterator.next().value, 'value2');
     assertEquals(valueIterator.next().done, true);
 
-    try {
+    if (typeof(Symbol) != 'undefined') {
       var valueIterable = m.values()[Symbol.iterator]();
       assertEquals(valueIterable.next().value, 'value1');
       assertEquals(valueIterable.next().value, 'value2');
       assertEquals(valueIterable.next().done, true);
-    } catch (err) {
-      // jspb.Map.ArrayIteratorIterable_.prototype[Symbol.iterator] may be
-      // undefined in some environment.
-      if (err.name != 'TypeError' && err.name != 'ReferenceError') {
-        throw err;
-      }
     }
   });
 }

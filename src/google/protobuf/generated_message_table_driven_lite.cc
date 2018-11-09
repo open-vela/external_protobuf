@@ -50,10 +50,6 @@ string* MutableUnknownFields(MessageLite* msg, int64 arena_offset) {
 }
 
 struct UnknownFieldHandlerLite {
-  // TODO(mvels): consider renaming UnknownFieldHandler to (TableDrivenTraits?),
-  // and conflating InternalMetaData into it, simplifying the template.
-  static constexpr bool IsLite() { return true; }
-
   static bool Skip(MessageLite* msg, const ParseTable& table,
                    io::CodedInputStream* input,
                    int tag) {

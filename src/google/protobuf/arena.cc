@@ -33,7 +33,6 @@
 #include <algorithm>
 #include <limits>
 
-#include <google/protobuf/stubs/mutex.h>
 
 #ifdef ADDRESS_SANITIZER
 #include <sanitizer/asan_interface.h>
@@ -324,22 +323,24 @@ void ArenaImpl::SerialArena::CleanupList() {
 }
 
 void ArenaImpl::SerialArena::CleanupListFallback() {
-  // The first chunk might be only partially full, so calculate its size
-  // from cleanup_ptr_. Subsequent chunks are always full, so use list->size.
+  // Cleanup newest chunk: ptrs give us length.
   size_t n = cleanup_ptr_ - &cleanup_->nodes[0];
-  CleanupChunk* list = cleanup_;
-  while (true) {
-    CleanupNode* node = &list->nodes[0];
-    // Cleanup newest elements first (allocated last).
-    for (size_t i = n; i > 0; i--) {
-      node[i - 1].cleanup(node[i - 1].elem);
+  CleanupNode* node = cleanup_ptr_;
+  for (size_t i = 0; i < n; i++) {
+    --node;
+    node->cleanup(node->elem);
+  }
+
+  // Cleanup older chunks, which are known to be full.
+  CleanupChunk* list = cleanup_->next;
+  while (list) {
+    size_t n = list->size;
+    CleanupNode* node = &list->nodes[list->size];
+    for (size_t i = 0; i < n; i++) {
+      --node;
+      node->cleanup(node->elem);
     }
     list = list->next;
-    if (list == nullptr) {
-      break;
-    }
-    // All but the first chunk are always full.
-    n = list->size;
   }
 }
 

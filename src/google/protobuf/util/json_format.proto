@@ -107,7 +107,3 @@ message TestRecursion {
   optional int32 value = 1;
   optional TestRecursion child = 2;
 }
-
-message TestStringMap {
-  map<string, string> string_map = 1;
-}
