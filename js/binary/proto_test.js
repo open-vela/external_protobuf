@@ -659,6 +659,5 @@ describe('protoBinaryTest', function() {
         'jspb.test.TestAllTypes');
 
     checkAllFields(msg, msg2);
-
   });
 });

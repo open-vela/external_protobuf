@@ -35,14 +35,17 @@ import protobuf_unittest.UnittestProto.TestAllTypes;
 import java.util.Objects;
 import junit.framework.TestCase;
 
-/** Unit tests for Any message. */
+/**
+ * Unit tests for Any message.
+ */
 public class AnyTest extends TestCase {
   public void testAnyGeneratedApi() throws Exception {
     TestAllTypes.Builder builder = TestAllTypes.newBuilder();
     TestUtil.setAllFields(builder);
     TestAllTypes message = builder.build();
 
-    TestAny container = TestAny.newBuilder().setValue(Any.pack(message)).build();
+    TestAny container = TestAny.newBuilder()
+        .setValue(Any.pack(message)).build();
 
     assertTrue(container.getValue().is(TestAllTypes.class));
     assertFalse(container.getValue().is(TestAny.class));
@@ -61,7 +64,8 @@ public class AnyTest extends TestCase {
 
     // Test that unpacking throws an exception if parsing fails.
     TestAny.Builder containerBuilder = container.toBuilder();
-    containerBuilder.getValueBuilder().setValue(ByteString.copyFrom(new byte[] {0x11}));
+    containerBuilder.getValueBuilder().setValue(
+        ByteString.copyFrom(new byte[]{0x11}));
     container = containerBuilder.build();
     try {
       container.getValue().unpack(TestAllTypes.class);
@@ -76,10 +80,12 @@ public class AnyTest extends TestCase {
     TestUtil.setAllFields(builder);
     TestAllTypes message = builder.build();
 
-    TestAny container = TestAny.newBuilder().setValue(Any.pack(message, "xxx.com")).build();
+    TestAny container = TestAny.newBuilder()
+        .setValue(Any.pack(message, "xxx.com")).build();
 
     assertEquals(
-        "xxx.com/" + TestAllTypes.getDescriptor().getFullName(), container.getValue().getTypeUrl());
+        "xxx.com/" + TestAllTypes.getDescriptor().getFullName(),
+        container.getValue().getTypeUrl());
 
     assertTrue(container.getValue().is(TestAllTypes.class));
     assertFalse(container.getValue().is(TestAny.class));
@@ -87,10 +93,12 @@ public class AnyTest extends TestCase {
     TestAllTypes result = container.getValue().unpack(TestAllTypes.class);
     TestUtil.assertAllFieldsSet(result);
 
-    container = TestAny.newBuilder().setValue(Any.pack(message, "yyy.com/")).build();
+    container = TestAny.newBuilder()
+        .setValue(Any.pack(message, "yyy.com/")).build();
 
     assertEquals(
-        "yyy.com/" + TestAllTypes.getDescriptor().getFullName(), container.getValue().getTypeUrl());
+        "yyy.com/" + TestAllTypes.getDescriptor().getFullName(),
+        container.getValue().getTypeUrl());
 
     assertTrue(container.getValue().is(TestAllTypes.class));
     assertFalse(container.getValue().is(TestAny.class));
@@ -98,10 +106,12 @@ public class AnyTest extends TestCase {
     result = container.getValue().unpack(TestAllTypes.class);
     TestUtil.assertAllFieldsSet(result);
 
-    container = TestAny.newBuilder().setValue(Any.pack(message, "")).build();
+    container = TestAny.newBuilder()
+        .setValue(Any.pack(message, "")).build();
 
     assertEquals(
-        "/" + TestAllTypes.getDescriptor().getFullName(), container.getValue().getTypeUrl());
+        "/" + TestAllTypes.getDescriptor().getFullName(),
+        container.getValue().getTypeUrl());
 
     assertTrue(container.getValue().is(TestAllTypes.class));
     assertFalse(container.getValue().is(TestAny.class));
@@ -115,7 +125,8 @@ public class AnyTest extends TestCase {
     TestUtil.setAllFields(builder);
     TestAllTypes message = builder.build();
 
-    TestAny container = TestAny.newBuilder().setValue(Any.pack(message)).build();
+    TestAny container = TestAny.newBuilder()
+        .setValue(Any.pack(message)).build();
 
     assertTrue(container.getValue().is(TestAllTypes.class));
 

@@ -46,6 +46,7 @@ final class DoubleArrayList extends AbstractProtobufList<Double>
     implements DoubleList, RandomAccess, PrimitiveNonBoxingCollection {
 
   private static final DoubleArrayList EMPTY_LIST = new DoubleArrayList();
+
   static {
     EMPTY_LIST.makeImmutable();
   }
@@ -103,7 +104,7 @@ final class DoubleArrayList extends AbstractProtobufList<Double>
 
     final double[] arr = other.array;
     for (int i = 0; i < size; i++) {
-      if (Double.doubleToLongBits(array[i]) != Double.doubleToLongBits(arr[i])) {
+      if (array[i] != arr[i]) {
         return false;
       }
     }
@@ -236,7 +237,7 @@ final class DoubleArrayList extends AbstractProtobufList<Double>
     ensureIsMutable();
     for (int i = 0; i < size; i++) {
       if (o.equals(array[i])) {
-        System.arraycopy(array, i + 1, array, i, size - i - 1);
+        System.arraycopy(array, i + 1, array, i, size - i);
         size--;
         modCount++;
         return true;
@@ -251,7 +252,7 @@ final class DoubleArrayList extends AbstractProtobufList<Double>
     ensureIndexInRange(index);
     double value = array[index];
     if (index < size - 1) {
-      System.arraycopy(array, index + 1, array, index, size - index - 1);
+      System.arraycopy(array, index + 1, array, index, size - index);
     }
     size--;
     modCount++;

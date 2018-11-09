@@ -42,7 +42,6 @@
 #ifndef GOOGLE_PROTOBUF_UTIL_MESSAGE_DIFFERENCER_H__
 #define GOOGLE_PROTOBUF_UTIL_MESSAGE_DIFFERENCER_H__
 
-#include <functional>
 #include <map>
 #include <set>
 #include <string>
@@ -69,7 +68,6 @@ namespace util {
 
 class DefaultFieldComparator;
 class FieldContext;  // declared below MessageDifferencer
-
 
 // A basic differencer that can be used to determine
 // the differences between two specified Protocol Messages. If any differences
@@ -370,18 +368,13 @@ class PROTOBUF_EXPORT MessageDifferencer {
   };
 
   enum RepeatedFieldComparison {
-    AS_LIST,      // Repeated fields are compared in order.  Differing values at
-                  // the same index are reported using ReportModified().  If the
-                  // repeated fields have different numbers of elements, the
-                  // unpaired elements are reported using ReportAdded() or
-                  // ReportDeleted().
-    AS_SET,       // Treat all the repeated fields as sets.
-                  // See TreatAsSet(), as below.
-    AS_SMART_LIST,  // Similar to AS_SET, but preserve the order and find the
-                    // longest matching sequence from the first matching
-                    // element. To use an optimal solution, call
-                    // SetMatchIndicesForSmartListCallback() to pass it in.
-    AS_SMART_SET,   // Similar to AS_SET, but match elements with fewest diffs.
+    AS_LIST,     // Repeated fields are compared in order.  Differing values at
+                 // the same index are reported using ReportModified().  If the
+                 // repeated fields have different numbers of elements, the
+                 // unpaired elements are reported using ReportAdded() or
+                 // ReportDeleted().
+    AS_SET,      // Treat all the repeated fields as sets.
+                 // See TreatAsSet(), as below.
   };
 
   // The elements of the given repeated field will be treated as a set for
@@ -413,7 +406,6 @@ class PROTOBUF_EXPORT MessageDifferencer {
   //
   // REQUIRES:  field->is_repeated() and field not registered with TreatAsList
   void TreatAsSet(const FieldDescriptor* field);
-  void TreatAsSmartSet(const FieldDescriptor* field);
 
   // The elements of the given repeated field will be treated as a list for
   // diffing purposes, so different orderings of the same elements will NOT be
@@ -421,8 +413,6 @@ class PROTOBUF_EXPORT MessageDifferencer {
   //
   // REQUIRED: field->is_repeated() and field not registered with TreatAsSet
   void TreatAsList(const FieldDescriptor* field);
-  // Note that the complexity is similar to treating as SET.
-  void TreatAsSmartList(const FieldDescriptor* field);
 
   // The elements of the given repeated field will be treated as a map for
   // diffing purposes, with |key| being the map key.  Thus, elements with the
@@ -788,20 +778,11 @@ class PROTOBUF_EXPORT MessageDifferencer {
                const MapKeyComparator* key_comparator,
                const Message* message1, const Message* message2,
                const std::vector<SpecificField>& parent_fields,
-               Reporter* reporter, int index1, int index2);
+               int index1, int index2);
 
   // Returns true when this repeated field has been configured to be treated
-  // as a Set / SmartSet / SmartList.
+  // as a set.
   bool IsTreatedAsSet(const FieldDescriptor* field);
-  bool IsTreatedAsSmartSet(const FieldDescriptor* field);
-
-  bool IsTreatedAsSmartList(const FieldDescriptor* field);
-  // When treating as SMART_LIST, it uses MatchIndicesPostProcessorForSmartList
-  // by default to find the longest matching sequence from the first matching
-  // element. The callback takes two vectors showing the matching indices from
-  // the other vector, where -1 means an unmatch.
-  void SetMatchIndicesForSmartListCallback(
-      std::function<void(std::vector<int>*, std::vector<int>*)> callback);
 
   // Returns true when this repeated field is to be compared as a subset, ie.
   // has been configured to be treated as a set or map and scope is set to
@@ -849,12 +830,6 @@ class PROTOBUF_EXPORT MessageDifferencer {
   // Checks if index is equal to new_index in all the specific fields.
   static bool CheckPathChanged(const std::vector<SpecificField>& parent_fields);
 
-  // CHECKs that the given repeated field can be compared according to
-  // new_comparison.
-  void CheckRepeatedFieldComparisons(
-      const FieldDescriptor* field,
-      const RepeatedFieldComparison& new_comparison);
-
   // Defines a map between field descriptors and their MapKeyComparators.
   // Used for repeated fields when they are configured as TreatAsMap.
   typedef std::map<const FieldDescriptor*,
@@ -863,7 +838,6 @@ class PROTOBUF_EXPORT MessageDifferencer {
   // Defines a set to store field descriptors.  Used for repeated fields when
   // they are configured as TreatAsSet.
   typedef std::set<const FieldDescriptor*> FieldSet;
-  typedef std::map<const FieldDescriptor*, RepeatedFieldComparison> FieldMap;
 
   Reporter* reporter_;
   DefaultFieldComparator default_field_comparator_;
@@ -872,7 +846,8 @@ class PROTOBUF_EXPORT MessageDifferencer {
   Scope scope_;
   RepeatedFieldComparison repeated_field_comparison_;
 
-  FieldMap repeated_field_comparisons_;
+  FieldSet set_fields_;
+  FieldSet list_fields_;
   // Keeps track of MapKeyComparators that are created within
   // MessageDifferencer. These MapKeyComparators should be deleted
   // before MessageDifferencer is destroyed.
@@ -891,10 +866,6 @@ class PROTOBUF_EXPORT MessageDifferencer {
   bool report_ignores_;
 
   std::string* output_string_;
-
-  // Callback to post-process the matched indices to support SMART_LIST.
-  std::function<void(std::vector<int>*,
-                     std::vector<int>*)> match_indices_for_smart_list_callback_;
 
   std::unique_ptr<DynamicMessageFactory> dynamic_message_factory_;
   GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(MessageDifferencer);

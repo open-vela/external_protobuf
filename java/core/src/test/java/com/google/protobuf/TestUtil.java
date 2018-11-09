@@ -119,6 +119,8 @@ import static com.google.protobuf.UnittestLite.repeatedStringExtensionLite;
 import static com.google.protobuf.UnittestLite.repeatedStringPieceExtensionLite;
 import static com.google.protobuf.UnittestLite.repeatedUint32ExtensionLite;
 import static com.google.protobuf.UnittestLite.repeatedUint64ExtensionLite;
+import static protobuf_unittest.UnittestProto.OptionalGroup_extension;
+import static protobuf_unittest.UnittestProto.RepeatedGroup_extension;
 import static protobuf_unittest.UnittestProto.defaultBoolExtension;
 import static protobuf_unittest.UnittestProto.defaultBytesExtension;
 import static protobuf_unittest.UnittestProto.defaultCordExtension;
@@ -220,8 +222,6 @@ import com.google.protobuf.test.UnittestImportPublic.PublicImportMessage;
 import protobuf_unittest.UnittestProto;
 import protobuf_unittest.UnittestProto.ForeignEnum;
 import protobuf_unittest.UnittestProto.ForeignMessage;
-import protobuf_unittest.UnittestProto.OptionalGroup_extension;
-import protobuf_unittest.UnittestProto.RepeatedGroup_extension;
 import protobuf_unittest.UnittestProto.TestAllExtensions;
 import protobuf_unittest.UnittestProto.TestAllExtensionsOrBuilder;
 import protobuf_unittest.UnittestProto.TestAllTypes;
@@ -234,11 +234,6 @@ import protobuf_unittest.UnittestProto.TestUnpackedTypes;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.logging.Handler;
-import java.util.logging.LogRecord;
 import junit.framework.Assert;
 
 /**
@@ -2639,6 +2634,7 @@ public final class TestUtil {
         break;
       case FOO_NOT_SET:
         break;
+      default:
         // TODO(b/18683919): go/enum-switch-lsc
     }
   }
@@ -2706,7 +2702,7 @@ public final class TestUtil {
       this.publicImportFile = importFile.getDependencies().get(0);
 
       Descriptors.Descriptor testAllTypes;
-      if ("TestAllTypes".equals(baseDescriptor.getName())) {
+      if (baseDescriptor.getName() == "TestAllTypes") {
         testAllTypes = baseDescriptor;
       } else {
         testAllTypes = file.findMessageTypeByName("TestAllTypes");
@@ -3861,28 +3857,4 @@ public final class TestUtil {
     }
   }
   // END FULL-RUNTIME
-
-  /** Helper class to test logged messages */
-  public static class TestLogHandler extends Handler {
-    /** We will keep a private list of all logged records */
-    private final List<LogRecord> list = new ArrayList<>();
-
-    /** Adds the most recently logged record to our list. */
-    @Override
-    public synchronized void publish(LogRecord record) {
-      list.add(record);
-    }
-
-    @Override
-    public void flush() {}
-
-    @Override
-    public void close() {}
-
-    /** Returns a snapshot of the logged records. */
-    public synchronized List<LogRecord> getStoredLogRecords() {
-      List<LogRecord> result = new ArrayList<>(list);
-      return Collections.unmodifiableList(result);
-    }
-  }
 }

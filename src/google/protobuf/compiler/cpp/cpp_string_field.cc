@@ -59,7 +59,7 @@ void SetStringVariables(const FieldDescriptor* descriptor,
       descriptor->default_value_string().empty()
           ? "&::" + (*variables)["proto_ns"] +
                 "::internal::GetEmptyStringAlreadyInited()"
-          : "&" + QualifiedClassName(descriptor->containing_type()) +
+          : "&" + Namespace(descriptor) + "::" + (*variables)["classname"] +
                 "::" + default_variable_string + ".get()";
   (*variables)["pointer_type"] =
       descriptor->type() == FieldDescriptor::TYPE_BYTES ? "void" : "char";
@@ -92,7 +92,7 @@ StringFieldGenerator::StringFieldGenerator(const FieldDescriptor* descriptor,
       inlined_(false) {
 
   // TODO(ckennelly): Handle inlining for any.proto.
-  if (IsAnyMessage(descriptor_->containing_type(), options_)) {
+  if (IsAnyMessage(descriptor_->containing_type())) {
     inlined_ = false;
   }
   if (descriptor_->containing_type()->options().map_entry()) {

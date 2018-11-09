@@ -35,7 +35,6 @@
 #ifndef GOOGLE_PROTOBUF_COMPILER_CPP_HELPERS_H__
 #define GOOGLE_PROTOBUF_COMPILER_CPP_HELPERS_H__
 
-#include <algorithm>
 #include <iterator>
 #include <map>
 #include <string>
@@ -412,8 +411,8 @@ inline std::string MakeDefaultName(const FieldDescriptor* field) {
          "_";
 }
 
-bool IsAnyMessage(const FileDescriptor* descriptor, const Options& options);
-bool IsAnyMessage(const Descriptor* descriptor, const Options& options);
+bool IsAnyMessage(const FileDescriptor* descriptor);
+bool IsAnyMessage(const Descriptor* descriptor);
 
 bool IsWellKnownMessage(const FileDescriptor* descriptor);
 
@@ -472,18 +471,7 @@ class PROTOC_EXPORT MessageSCCAnalyzer {
   }
 
  private:
-  struct DepsGenerator {
-    std::vector<const Descriptor*> operator()(const Descriptor* desc) const {
-      std::vector<const Descriptor*> deps;
-      for (int i = 0; i < desc->field_count(); i++) {
-        if (desc->field(i)->message_type()) {
-          deps.push_back(desc->field(i)->message_type());
-        }
-      }
-      return deps;
-    }
-  };
-  SCCAnalyzer<DepsGenerator> analyzer_;
+  SCCAnalyzer analyzer_;
   Options options_;
   std::map<const SCC*, MessageAnalysis> analysis_cache_;
 };

@@ -266,15 +266,6 @@ public class DoubleArrayListTest extends TestCase {
     assertFalse(list.addAll(DoubleArrayList.emptyList()));
   }
 
-  public void testEquals() {
-    DoubleArrayList list1 = new DoubleArrayList();
-    DoubleArrayList list2 = new DoubleArrayList();
-
-    list1.addDouble(Double.longBitsToDouble(0x7ff0000000000001L));
-    list2.addDouble(Double.longBitsToDouble(0x7ff0000000000002L));
-    assertEquals(list1, list2);
-  }
-
   public void testRemove() {
     list.addAll(TERTIARY_LIST);
     assertEquals(1D, (double) list.remove(0), 0.0);
@@ -303,20 +294,11 @@ public class DoubleArrayListTest extends TestCase {
     }
   }
 
-  public void testRemoveEnd_listAtCapacity() {
+  public void testRemoveEndOfCapacity() {
     DoubleList toRemove = DoubleArrayList.emptyList().mutableCopyWithCapacity(1);
     toRemove.addDouble(3);
     toRemove.remove(0);
     assertEquals(0, toRemove.size());
-  }
-
-  public void testRemove_listAtCapacity() {
-    DoubleList toRemove = DoubleArrayList.emptyList().mutableCopyWithCapacity(2);
-    toRemove.addDouble(3);
-    toRemove.addDouble(4);
-    toRemove.remove(0);
-    assertEquals(1, toRemove.size());
-    assertEquals(4D, (double) toRemove.get(0));
   }
 
   public void testSublistRemoveEndOfCapacity() {

@@ -66,17 +66,8 @@ class PROTOC_EXPORT CppGenerator : public CodeGenerator {
     kOpensourceGoogle3
   };
 
-  void set_opensource_runtime(bool opensource) {
-    opensource_runtime_ = opensource;
-  }
-
-  // If set to a non-empty string, generated code will do:
-  //   #include "<BASE>/google/protobuf/message.h"
-  // instead of:
-  //   #include <google/protobuf/message.h>
-  // This has no effect if opensource_runtime = false.
-  void set_runtime_include_base(const std::string& base) {
-    runtime_include_base_ = base;
+  void set_runtime(Runtime runtime) {
+    runtime_ = runtime;
   }
 
   // implements CodeGenerator ----------------------------------------
@@ -86,8 +77,7 @@ class PROTOC_EXPORT CppGenerator : public CodeGenerator {
                 std::string* error) const;
 
  private:
-  bool opensource_runtime_ = true;
-  std::string runtime_include_base_;
+  Runtime runtime_ = Runtime::kOpensource;
   GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(CppGenerator);
 };
 

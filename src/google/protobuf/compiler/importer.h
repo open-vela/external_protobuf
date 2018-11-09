@@ -78,11 +78,6 @@ class DiskSourceTree;
 class PROTOBUF_EXPORT SourceTreeDescriptorDatabase : public DescriptorDatabase {
  public:
   SourceTreeDescriptorDatabase(SourceTree* source_tree);
-
-  // If non-NULL, fallback_database will be checked if a file doesn't exist in
-  // the specified source_tree.
-  SourceTreeDescriptorDatabase(SourceTree* source_tree,
-                               DescriptorDatabase* fallback_database);
   ~SourceTreeDescriptorDatabase();
 
   // Instructs the SourceTreeDescriptorDatabase to report any parse errors
@@ -115,7 +110,6 @@ class PROTOBUF_EXPORT SourceTreeDescriptorDatabase : public DescriptorDatabase {
   class SingleFileErrorCollector;
 
   SourceTree* source_tree_;
-  DescriptorDatabase* fallback_database_;
   MultiFileErrorCollector* error_collector_;
 
   class PROTOBUF_EXPORT ValidationErrorCollector

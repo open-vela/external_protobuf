@@ -55,7 +55,7 @@ struct Options {
   bool lite_implicit_weak_fields = false;
   bool bootstrap = false;
   bool opensource_runtime = false;
-  std::string runtime_include_base;
+  bool opensource_include_paths = false;
   int num_cc_files = 0;
   std::string annotation_pragma_name;
   std::string annotation_guard_name;
