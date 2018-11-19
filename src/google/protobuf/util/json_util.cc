@@ -129,9 +129,9 @@ class StatusErrorListener : public converter::ErrorListener {
 
   util::Status GetStatus() { return status_; }
 
-  void InvalidName(const converter::LocationTrackerInterface& loc,
-                   StringPiece unknown_name,
-                   StringPiece message) override {
+  virtual void InvalidName(const converter::LocationTrackerInterface& loc,
+                           StringPiece unknown_name,
+                           StringPiece message) {
     string loc_string = GetLocString(loc);
     if (!loc_string.empty()) {
       loc_string.append(" ");
@@ -141,17 +141,17 @@ class StatusErrorListener : public converter::ErrorListener {
                        StrCat(loc_string, unknown_name, ": ", message));
   }
 
-  void InvalidValue(const converter::LocationTrackerInterface& loc,
-                    StringPiece type_name,
-                    StringPiece value) override {
+  virtual void InvalidValue(const converter::LocationTrackerInterface& loc,
+                            StringPiece type_name,
+                            StringPiece value) {
     status_ = util::Status(
         util::error::INVALID_ARGUMENT,
         StrCat(GetLocString(loc), ": invalid value ", string(value),
                      " for type ", string(type_name)));
   }
 
-  void MissingField(const converter::LocationTrackerInterface& loc,
-                    StringPiece missing_name) override {
+  virtual void MissingField(const converter::LocationTrackerInterface& loc,
+                            StringPiece missing_name) {
     status_ = util::Status(util::error::INVALID_ARGUMENT,
                              StrCat(GetLocString(loc), ": missing field ",
                                           string(missing_name)));
