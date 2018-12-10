@@ -120,8 +120,7 @@ namespace Google.Protobuf
                     return this;
                 }
 
-                Node childNode;
-                if (!node.Children.TryGetValue(part, out childNode))
+                if (!node.Children.TryGetValue(part, out var childNode))
                 {
                     createNewBranch = true;
                     childNode = new Node();
