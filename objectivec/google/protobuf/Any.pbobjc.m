@@ -98,9 +98,7 @@ typedef struct GPBAny__storage_ {
         "\001\001\004\241!!\000";
     [localDescriptor setupExtraTextInfo:extraTextFormatInfo];
 #endif  // !GPBOBJC_SKIP_MESSAGE_TEXTFORMAT_EXTRAS
-    #if defined(DEBUG) && DEBUG
-      NSAssert(descriptor == nil, @"Startup recursed!");
-    #endif  // DEBUG
+    NSAssert(descriptor == nil, @"Startup recursed!");
     descriptor = localDescriptor;
   }
   return descriptor;

@@ -152,9 +152,7 @@ typedef struct GPBApi__storage_ {
                                     fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
                                    storageSize:sizeof(GPBApi__storage_)
                                          flags:GPBDescriptorInitializationFlag_None];
-    #if defined(DEBUG) && DEBUG
-      NSAssert(descriptor == nil, @"Startup recursed!");
-    #endif  // DEBUG
+    NSAssert(descriptor == nil, @"Startup recursed!");
     descriptor = localDescriptor;
   }
   return descriptor;
@@ -278,9 +276,7 @@ typedef struct GPBMethod__storage_ {
         "\002\002\007\244\241!!\000\004\010\244\241!!\000";
     [localDescriptor setupExtraTextInfo:extraTextFormatInfo];
 #endif  // !GPBOBJC_SKIP_MESSAGE_TEXTFORMAT_EXTRAS
-    #if defined(DEBUG) && DEBUG
-      NSAssert(descriptor == nil, @"Startup recursed!");
-    #endif  // DEBUG
+    NSAssert(descriptor == nil, @"Startup recursed!");
     descriptor = localDescriptor;
   }
   return descriptor;
@@ -346,9 +342,7 @@ typedef struct GPBMixin__storage_ {
                                     fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
                                    storageSize:sizeof(GPBMixin__storage_)
                                          flags:GPBDescriptorInitializationFlag_None];
-    #if defined(DEBUG) && DEBUG
-      NSAssert(descriptor == nil, @"Startup recursed!");
-    #endif  // DEBUG
+    NSAssert(descriptor == nil, @"Startup recursed!");
     descriptor = localDescriptor;
   }
   return descriptor;

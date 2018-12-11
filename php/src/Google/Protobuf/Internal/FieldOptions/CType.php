@@ -41,7 +41,6 @@ class CType
         return self::$valueToName[$value];
     }
 
-
     public static function value($name)
     {
         $const = __CLASS__ . '::' . strtoupper($name);
