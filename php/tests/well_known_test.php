@@ -48,7 +48,6 @@ class WellKnownTest extends TestBase {
     public function testImportDescriptorProto()
     {
         $msg = new TestImportDescriptorProto();
-        $this->assertTrue(true);
     }
 
     public function testAny()
