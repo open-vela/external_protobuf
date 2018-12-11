@@ -206,9 +206,7 @@ EXTRA_DIST =                  \
 
 conformance_test_runner_LDADD = $(top_srcdir)/src/libprotobuf.la
 conformance_test_runner_SOURCES = conformance_test.h conformance_test.cc \
-                                  binary_json_conformance_main.cc        \
-                                  binary_json_conformance_suite.h        \
-                                  binary_json_conformance_suite.cc       \
+                                  conformance_test_impl.cc               \
                                   conformance_test_runner.cc             \
                                   third_party/jsoncpp/json.h             \
                                   third_party/jsoncpp/jsoncpp.cpp
