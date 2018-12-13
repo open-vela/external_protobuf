@@ -69,9 +69,7 @@ typedef struct GPBEmpty__storage_ {
                                     fieldCount:0
                                    storageSize:sizeof(GPBEmpty__storage_)
                                          flags:GPBDescriptorInitializationFlag_None];
-    #if defined(DEBUG) && DEBUG
-      NSAssert(descriptor == nil, @"Startup recursed!");
-    #endif  // DEBUG
+    NSAssert(descriptor == nil, @"Startup recursed!");
     descriptor = localDescriptor;
   }
   return descriptor;
