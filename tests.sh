@@ -220,38 +220,6 @@ build_python() {
   cd ..
 }
 
-build_python_version() {
-  internal_build_cpp
-  cd python
-  envlist=$1
-  tox -e $envlist
-  cd ..
-}
-
-build_python27() {
-  build_python_version py27-python
-}
-
-build_python33() {
-  build_python_version py33-python
-}
-
-build_python34() {
-  build_python_version py34-python
-}
-
-build_python35() {
-  build_python_version py35-python
-}
-
-build_python36() {
-  build_python_version py36-python
-}
-
-build_python37() {
-  build_python_version py37-python
-}
-
 build_python_cpp() {
   internal_build_cpp
   export LD_LIBRARY_PATH=../src/.libs # for Linux
@@ -264,40 +232,6 @@ build_python_cpp() {
   fi
   tox -e $envlist
   cd ..
-}
-
-build_python_cpp_version() {
-  internal_build_cpp
-  export LD_LIBRARY_PATH=../src/.libs # for Linux
-  export DYLD_LIBRARY_PATH=../src/.libs # for OS X
-  cd python
-  envlist=$1
-  tox -e $envlist
-  cd ..
-}
-
-build_python27_cpp() {
-  build_python_cpp_version py27-cpp
-}
-
-build_python33_cpp() {
-  build_python_cpp_version py33-cpp
-}
-
-build_python34_cpp() {
-  build_python_cpp_version py34-cpp
-}
-
-build_python35_cpp() {
-  build_python_cpp_version py35-cpp
-}
-
-build_python36_cpp() {
-  build_python_cpp_version py36-cpp
-}
-
-build_python37_cpp() {
-  build_python_cpp_version py37-cpp
 }
 
 build_python_compatibility() {
@@ -368,25 +302,34 @@ generate_php_test_proto() {
 
 use_php() {
   VERSION=$1
-  export PATH=/usr/local/php-${VERSION}/bin:$PATH
-  export CPLUS_INCLUDE_PATH=/usr/local/php-${VERSION}/include/php/main:/usr/local/php-${VERSION}/include/php/:$CPLUS_INCLUDE_PATH
-  export C_INCLUDE_PATH=/usr/local/php-${VERSION}/include/php/main:/usr/local/php-${VERSION}/include/php/:$C_INCLUDE_PATH
+  PHP=`which php`
+  PHP_CONFIG=`which php-config`
+  PHPIZE=`which phpize`
+  ln -sfn "/usr/local/php-${VERSION}/bin/php" $PHP
+  ln -sfn "/usr/local/php-${VERSION}/bin/php-config" $PHP_CONFIG
+  ln -sfn "/usr/local/php-${VERSION}/bin/phpize" $PHPIZE
   generate_php_test_proto
 }
 
 use_php_zts() {
   VERSION=$1
-  export PATH=/usr/local/php-${VERSION}-zts/bin:$PATH
-  export CPLUS_INCLUDE_PATH=/usr/local/php-${VERSION}-zts/include/php/main:/usr/local/php-${VERSION}-zts/include/php/:$CPLUS_INCLUDE_PATH
-  export C_INCLUDE_PATH=/usr/local/php-${VERSION}-zts/include/php/main:/usr/local/php-${VERSION}-zts/include/php/:$C_INCLUDE_PATH
+  PHP=`which php`
+  PHP_CONFIG=`which php-config`
+  PHPIZE=`which phpize`
+  ln -sfn "/usr/local/php-${VERSION}-zts/bin/php" $PHP
+  ln -sfn "/usr/local/php-${VERSION}-zts/bin/php-config" $PHP_CONFIG
+  ln -sfn "/usr/local/php-${VERSION}-zts/bin/phpize" $PHPIZE
   generate_php_test_proto
 }
 
 use_php_bc() {
   VERSION=$1
-  export PATH=/usr/local/php-${VERSION}-bc/bin:$PATH
-  export CPLUS_INCLUDE_PATH=/usr/local/php-${VERSION}-bc/include/php/main:/usr/local/php-${VERSION}-bc/include/php/:$CPLUS_INCLUDE_PATH
-  export C_INCLUDE_PATH=/usr/local/php-${VERSION}-bc/include/php/main:/usr/local/php-${VERSION}-bc/include/php/:$C_INCLUDE_PATH
+  PHP=`which php`
+  PHP_CONFIG=`which php-config`
+  PHPIZE=`which phpize`
+  ln -sfn "/usr/local/php-${VERSION}-bc/bin/php" $PHP
+  ln -sfn "/usr/local/php-${VERSION}-bc/bin/php-config" $PHP_CONFIG
+  ln -sfn "/usr/local/php-${VERSION}-bc/bin/phpize" $PHPIZE
   generate_php_test_proto
 }
 
@@ -395,8 +338,9 @@ build_php5.5() {
 
   pushd php
   rm -rf vendor
-  composer update
-  ./vendor/bin/phpunit
+  cp -r /usr/local/vendor-5.5 vendor
+  wget https://phar.phpunit.de/phpunit-4.8.0.phar -O /usr/bin/phpunit
+  phpunit
   popd
   pushd conformance
   make test_php
@@ -405,6 +349,7 @@ build_php5.5() {
 
 build_php5.5_c() {
   use_php 5.5
+  wget https://phar.phpunit.de/phpunit-4.8.0.phar -O /usr/bin/phpunit
   pushd php/tests
   /bin/bash ./test.sh 5.5
   popd
@@ -416,6 +361,7 @@ build_php5.5_c() {
 
 build_php5.5_zts_c() {
   use_php_zts 5.5
+  wget https://phar.phpunit.de/phpunit-4.8.0.phar -O /usr/bin/phpunit
   cd php/tests && /bin/bash ./test.sh 5.5-zts && cd ../..
   # TODO(teboring): Add it back
   # pushd conformance
@@ -427,8 +373,9 @@ build_php5.6() {
   use_php 5.6
   pushd php
   rm -rf vendor
-  composer update
-  ./vendor/bin/phpunit
+  cp -r /usr/local/vendor-5.6 vendor
+  wget https://phar.phpunit.de/phpunit-5.7.0.phar -O /usr/bin/phpunit
+  phpunit
   popd
   pushd conformance
   make test_php
@@ -437,6 +384,7 @@ build_php5.6() {
 
 build_php5.6_c() {
   use_php 5.6
+  wget https://phar.phpunit.de/phpunit-5.7.0.phar -O /usr/bin/phpunit
   cd php/tests && /bin/bash ./test.sh 5.6 && cd ../..
   # TODO(teboring): Add it back
   # pushd conformance
@@ -446,6 +394,7 @@ build_php5.6_c() {
 
 build_php5.6_zts_c() {
   use_php_zts 5.6
+  wget https://phar.phpunit.de/phpunit-5.7.0.phar -O /usr/bin/phpunit
   cd php/tests && /bin/bash ./test.sh 5.6-zts && cd ../..
   # TODO(teboring): Add it back
   # pushd conformance
@@ -482,8 +431,9 @@ build_php7.0() {
   use_php 7.0
   pushd php
   rm -rf vendor
-  composer update
-  ./vendor/bin/phpunit
+  cp -r /usr/local/vendor-7.0 vendor
+  wget https://phar.phpunit.de/phpunit-5.6.0.phar -O /usr/bin/phpunit
+  phpunit
   popd
   pushd conformance
   make test_php
@@ -492,6 +442,7 @@ build_php7.0() {
 
 build_php7.0_c() {
   use_php 7.0
+  wget https://phar.phpunit.de/phpunit-5.6.0.phar -O /usr/bin/phpunit
   cd php/tests && /bin/bash ./test.sh 7.0 && cd ../..
   # TODO(teboring): Add it back
   # pushd conformance
@@ -501,6 +452,7 @@ build_php7.0_c() {
 
 build_php7.0_zts_c() {
   use_php_zts 7.0
+  wget https://phar.phpunit.de/phpunit-5.6.0.phar -O /usr/bin/phpunit
   cd php/tests && /bin/bash ./test.sh 7.0-zts && cd ../..
   # TODO(teboring): Add it back.
   # pushd conformance
@@ -542,8 +494,9 @@ build_php7.1() {
   use_php 7.1
   pushd php
   rm -rf vendor
-  composer update
-  ./vendor/bin/phpunit
+  cp -r /usr/local/vendor-7.1 vendor
+  wget https://phar.phpunit.de/phpunit-5.6.0.phar -O /usr/bin/phpunit
+  phpunit
   popd
   pushd conformance
   make test_php
@@ -553,6 +506,7 @@ build_php7.1() {
 build_php7.1_c() {
   ENABLE_CONFORMANCE_TEST=$1
   use_php 7.1
+  wget https://phar.phpunit.de/phpunit-5.6.0.phar -O /usr/bin/phpunit
   cd php/tests && /bin/bash ./test.sh 7.1 && cd ../..
   if [ "$ENABLE_CONFORMANCE_TEST" = "true" ]
   then
@@ -564,6 +518,7 @@ build_php7.1_c() {
 
 build_php7.1_zts_c() {
   use_php_zts 7.1
+  wget https://phar.phpunit.de/phpunit-5.6.0.phar -O /usr/bin/phpunit
   cd php/tests && /bin/bash ./test.sh 7.1-zts && cd ../..
   pushd conformance
   # make test_php_c
@@ -588,11 +543,6 @@ build_php_all_32() {
 build_php_all() {
   build_php_all_32 true
   build_php_compatibility
-}
-
-build_benchmark() {
-  use_php 7.1
-  cd kokoro/linux/benchmark && ./run.sh
 }
 
 # -------- main --------
@@ -627,8 +577,7 @@ Usage: $0 { cpp |
             php_compatibility |
             php7.1   |
             php7.1_c |
-            php_all |
-			benchmark)
+            php_all)
 "
   exit 1
 fi

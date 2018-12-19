@@ -10,9 +10,8 @@
 # Change to repo root
 cd $(dirname $0)/../../..
 
-export DOCKERHUB_ORGANIZATION=protobuftesting
-export DOCKERFILE_DIR=kokoro/linux/dockerfile/test/python_jessie
+export DOCKERFILE_DIR=kokoro/linux/64-bit
 export DOCKER_RUN_SCRIPT=kokoro/linux/pull_request_in_docker.sh
 export OUTPUT_DIR=testoutput
-export TEST_SET="python34"
+export TEST_SET="csharp java_jdk7 javanano_jdk7 java_oracle7 javanano_oracle7 python python_cpp ruby_all javascript golang php_all"
 ./kokoro/linux/build_and_run_docker.sh
