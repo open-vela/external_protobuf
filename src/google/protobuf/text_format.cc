@@ -2049,7 +2049,7 @@ bool MapFieldPrinterHelper::SortMap(
     std::vector<const Message*>* sorted_map_field) {
   bool need_release = false;
   const MapFieldBase& base =
-      *reflection->GetMapData(message, field);
+      *reflection->MapData(const_cast<Message*>(&message), field);
 
   if (base.IsRepeatedFieldValid()) {
     const RepeatedPtrField<Message>& map_field =
