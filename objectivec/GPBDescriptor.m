@@ -872,10 +872,11 @@ uint32_t GPBFieldAlternateTag(GPBFieldDescriptor *self) {
     if (nameOffsets_ == NULL) return NO;
 
     for (uint32_t i = 0; i < valueCount_; ++i) {
-        NSString *valueTextFormatName = [self getEnumTextFormatNameForIndex:i];
+        int32_t value = values_[i];
+        NSString *valueTextFormatName = [self textFormatNameForValue:value];
         if ([valueTextFormatName isEqual:textFormatName]) {
             if (outValue) {
-                *outValue = values_[i];
+                *outValue = value;
             }
             return YES;
         }

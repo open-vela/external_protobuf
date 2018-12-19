@@ -260,14 +260,12 @@ class GeneratedClassTest extends TestBase
     {
         $m = new TestMessage();
         $m->setOptionalNestedEnum(NestedEnum::ZERO);
-        $this->assertTrue(true);
     }
 
     public function testLegacyNestedEnum()
     {
         $m = new TestMessage();
         $m->setOptionalNestedEnum(\Foo\TestMessage_NestedEnum::ZERO);
-        $this->assertTrue(true);
     }
 
     public function testLegacyTypehintWithNestedEnums()
@@ -407,7 +405,6 @@ class GeneratedClassTest extends TestBase
           $m = new TestMessage();
           $hex = hex2bin("ff");
           $m->setOptionalBytes($hex);
-          $this->assertTrue(true);
       }
 
     #########################################################
@@ -712,8 +709,6 @@ class GeneratedClassTest extends TestBase
         // test nested messages
         $sub = new NoNamespaceMessage\NestedMessage();
         $n->setNestedMessage($sub);
-
-        $this->assertTrue(true);
     }
 
     public function testEnumWithoutNamespace()
@@ -723,7 +718,6 @@ class GeneratedClassTest extends TestBase
         $repeatedNoNamespaceEnum = $m->getRepeatedNoNamespaceEnum();
         $repeatedNoNamespaceEnum[] = NoNameSpaceEnum::VALUE_A;
         $m->setRepeatedNoNamespaceEnum($repeatedNoNamespaceEnum);
-        $this->assertTrue(true);
     }
 
     #########################################################
@@ -1268,8 +1262,6 @@ class GeneratedClassTest extends TestBase
         $m = \Upper_enum_value\NotAllowed::NULL;
         $m = \Upper_enum_value\NotAllowed::VOID;
         $m = \Upper_enum_value\NotAllowed::ITERABLE;
-
-        $this->assertTrue(true);
     }
 
     #########################################################
@@ -1305,7 +1297,6 @@ class GeneratedClassTest extends TestBase
     {
         $m = new testLowerCaseMessage();
         $n = testLowerCaseEnum::VALUE;
-        $this->assertTrue(true);
     }
 
     #########################################################
@@ -1372,7 +1363,6 @@ class GeneratedClassTest extends TestBase
         ]);
 
         TestUtil::assertTestMessage($m);
-        $this->assertTrue(true);
     }
 
     #########################################################
