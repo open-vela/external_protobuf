@@ -77,10 +77,6 @@ void ReflectionOps::Merge(const Message& from, Message* to) {
 
   const Reflection* from_reflection = GetReflectionOrDie(from);
   const Reflection* to_reflection = GetReflectionOrDie(*to);
-  bool is_from_generated = (from_reflection->GetMessageFactory() ==
-                            google::protobuf::MessageFactory::generated_factory());
-  bool is_to_generated = (to_reflection->GetMessageFactory() ==
-                          google::protobuf::MessageFactory::generated_factory());
 
   std::vector<const FieldDescriptor*> fields;
   from_reflection->ListFields(from, &fields);
@@ -88,17 +84,15 @@ void ReflectionOps::Merge(const Message& from, Message* to) {
     const FieldDescriptor* field = fields[i];
 
     if (field->is_repeated()) {
-      // Use map reflection if both are in map status and have the
-      // same map type to avoid sync with repeated field.
-      // Note: As from and to messages have the same descriptor, the
-      // map field types are the same if they are both generated
-      // messages or both dynamic messages.
-      if (is_from_generated == is_to_generated && field->is_map()) {
-        const MapFieldBase* from_field =
-            from_reflection->GetMapData(from, field);
+      if (field->is_map()) {
+        MapFieldBase* from_field =
+            from_reflection->MapData(const_cast<Message*>(&from), field);
         MapFieldBase* to_field =
-            to_reflection->MutableMapData(to, field);
-        if (to_field->IsMapValid() && from_field->IsMapValid()) {
+            to_reflection->MapData(const_cast<Message*>(to), field);
+        // Use map reflection if both are in map status and have the
+        // same map type to avoid sync with repeated field.
+        if (to_field->IsMapValid() && from_field->IsMapValid()
+            && typeid(*from_field) == typeid(*to_field)) {
           to_field->MergeFrom(*from_field);
           continue;
         }
@@ -195,8 +189,8 @@ bool ReflectionOps::IsInitialized(const Message& message) {
       if (field->is_map()) {
         const FieldDescriptor* value_field = field->message_type()->field(1);
         if (value_field->cpp_type() == FieldDescriptor::CPPTYPE_MESSAGE) {
-          const MapFieldBase* map_field =
-              reflection->GetMapData(message, field);
+          MapFieldBase* map_field =
+              reflection->MapData(const_cast<Message*>(&message), field);
           if (map_field->IsMapValid()) {
             MapIterator iter(const_cast<Message*>(&message), field);
             MapIterator end(const_cast<Message*>(&message), field);
