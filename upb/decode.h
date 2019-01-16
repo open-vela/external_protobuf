@@ -7,14 +7,10 @@
 
 #include "upb/msg.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+UPB_BEGIN_EXTERN_C
 
-bool upb_decode(upb_strview buf, upb_msg *msg, const upb_msglayout *l);
+bool upb_decode(upb_stringview buf, upb_msg *msg, const upb_msglayout *l);
 
-#ifdef __cplusplus
-}  /* extern "C" */
-#endif
+UPB_END_EXTERN_C
 
 #endif  /* UPB_DECODE_H_ */
