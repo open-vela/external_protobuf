@@ -21,9 +21,10 @@
 #ifndef UPB_MSG_H_
 #define UPB_MSG_H_
 
-#include "upb/def.h"
-#include "upb/handlers.h"
-#include "upb/sink.h"
+#include <stdint.h>
+#include <string.h>
+#include "upb/upb.h"
+#include "upb/structs.int.h"
 
 #ifdef __cplusplus
 
@@ -36,16 +37,22 @@ class MessageLayout;
 
 #endif
 
-UPB_DECLARE_TYPE(upb::Array, upb_array)
-UPB_DECLARE_TYPE(upb::Map, upb_map)
-UPB_DECLARE_TYPE(upb::MapIterator, upb_mapiter)
-
 /* TODO(haberman): C++ accessors */
 
-UPB_BEGIN_EXTERN_C
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef void upb_msg;
 
+struct upb_array;
+typedef struct upb_array upb_array;
+
+struct upb_map;
+typedef struct upb_map upb_map;
+
+struct upb_mapiter;
+typedef struct upb_mapiter upb_mapiter;
 
 /** upb_msglayout *************************************************************/
 
@@ -72,23 +79,32 @@ typedef struct upb_msglayout {
   bool extendable;
 } upb_msglayout;
 
-
-/** upb_stringview ************************************************************/
+/** upb_strview ************************************************************/
 
 typedef struct {
   const char *data;
   size_t size;
-} upb_stringview;
+} upb_strview;
 
-UPB_INLINE upb_stringview upb_stringview_make(const char *data, size_t size) {
-  upb_stringview ret;
+UPB_INLINE upb_strview upb_strview_make(const char *data, size_t size) {
+  upb_strview ret;
   ret.data = data;
   ret.size = size;
   return ret;
 }
 
-#define UPB_STRINGVIEW_INIT(ptr, len) {ptr, len}
+UPB_INLINE upb_strview upb_strview_makez(const char *data) {
+  return upb_strview_make(data, strlen(data));
+}
 
+UPB_INLINE bool upb_strview_eql(upb_strview a, upb_strview b) {
+  return a.size == b.size && memcmp(a.data, b.data, a.size) == 0;
+}
+
+#define UPB_STRVIEW_INIT(ptr, len) {ptr, len}
+
+#define UPB_STRVIEW_FORMAT "%.*s"
+#define UPB_STRVIEW_ARGS(view) (int)(view).size, (view).data
 
 /** upb_msgval ****************************************************************/
 
@@ -107,7 +123,7 @@ typedef union {
   const upb_msg* msg;
   const upb_array* arr;
   const void* ptr;
-  upb_stringview str;
+  upb_strview str;
 } upb_msgval;
 
 #define ACCESSORS(name, membername, ctype) \
@@ -134,14 +150,13 @@ ACCESSORS(map,    map, const upb_map*)
 ACCESSORS(msg,    msg, const upb_msg*)
 ACCESSORS(ptr,    ptr, const void*)
 ACCESSORS(arr,    arr, const upb_array*)
-ACCESSORS(str,    str, upb_stringview)
+ACCESSORS(str,    str, upb_strview)
 
 #undef ACCESSORS
 
 UPB_INLINE upb_msgval upb_msgval_makestr(const char *data, size_t size) {
-  return upb_msgval_str(upb_stringview_make(data, size));
+  return upb_msgval_str(upb_strview_make(data, size));
 }
-
 
 /** upb_msg *******************************************************************/
 
@@ -202,7 +217,6 @@ bool upb_msg_clearfield(upb_msg *msg,
 
 /* TODO(haberman): copyfrom()/mergefrom()? */
 
-
 /** upb_array *****************************************************************/
 
 /* A upb_array stores data for a repeated field.  The memory management
@@ -221,7 +235,6 @@ upb_msgval upb_array_get(const upb_array *arr, size_t i);
  * its memory management invariants. */
 
 bool upb_array_set(upb_array *arr, size_t i, upb_msgval val);
-
 
 /** upb_map *******************************************************************/
 
@@ -254,7 +267,6 @@ bool upb_map_set(upb_map *map,
 /* Deletes an entry in the map.  Returns true if the key was present. */
 bool upb_map_del(upb_map *map, upb_msgval key);
 
-
 /** upb_mapiter ***************************************************************/
 
 /* For iterating over a map.  Map iterators are invalidated by mutations to the
@@ -276,6 +288,8 @@ upb_msgval upb_mapiter_value(const upb_mapiter *i);
 void upb_mapiter_setdone(upb_mapiter *i);
 bool upb_mapiter_isequal(const upb_mapiter *i1, const upb_mapiter *i2);
 
-UPB_END_EXTERN_C
+#ifdef __cplusplus
+}  /* extern "C" */
+#endif
 
 #endif /* UPB_MSG_H_ */

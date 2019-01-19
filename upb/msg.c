@@ -1,4 +1,6 @@
 
+#include <string.h>
+#include "upb/table.int.h"
 #include "upb/msg.h"
 #include "upb/structs.int.h"
 
@@ -51,7 +53,7 @@ static size_t upb_msgval_sizeof(upb_fieldtype_t type) {
       return sizeof(void*);
     case UPB_TYPE_BYTES:
     case UPB_TYPE_STRING:
-      return sizeof(upb_stringview);
+      return sizeof(upb_strview);
   }
   UPB_UNREACHABLE();
 }
