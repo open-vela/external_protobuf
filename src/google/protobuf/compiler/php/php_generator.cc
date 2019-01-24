@@ -1010,7 +1010,7 @@ void GenerateAddFileToPool(const FileDescriptor* file, bool is_descriptor,
 
     Outdent(printer);
     printer->Print(
-        "), true);\n\n");
+        "));\n\n");
   }
   printer->Print(
       "static::$is_initialized = true;\n");
