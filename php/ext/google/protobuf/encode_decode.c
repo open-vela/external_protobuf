@@ -36,22 +36,14 @@
 
 /* stringsink *****************************************************************/
 
-typedef struct {
-  upb_byteshandler handler;
-  upb_bytessink sink;
-  char *ptr;
-  size_t len, size;
-} stringsink;
-
-
 static void *stringsink_start(void *_sink, const void *hd, size_t size_hint) {
   stringsink *sink = _sink;
   sink->len = 0;
   return sink;
 }
 
-static size_t stringsink_string(void *_sink, const void *hd, const char *ptr,
-                                size_t len, const upb_bufhandle *handle) {
+size_t stringsink_string(void *_sink, const void *hd, const char *ptr,
+                         size_t len, const upb_bufhandle *handle) {
   stringsink *sink = _sink;
   size_t new_size = sink->size;
 
@@ -1171,7 +1163,7 @@ static void put_optional_value(const void* memory, int len,
 #define T(upbtypeconst, upbtype, ctype, default_value)                         \
   case upbtypeconst: {                                                         \
     ctype value = DEREF(memory, 0, ctype);                                     \
-    if (is_json || value != default_value) {                                   \
+    if (value != default_value) {                                              \
       upb_selector_t sel = getsel(f, upb_handlers_getprimitivehandlertype(f)); \
       upb_sink_put##upbtype(sink, sel, value);                                 \
     }                                                                          \
@@ -1189,7 +1181,8 @@ static void put_optional_value(const void* memory, int len,
 #undef T
     case UPB_TYPE_STRING:
     case UPB_TYPE_BYTES:
-      putrawstr(memory, len, f, sink, is_json);
+      putrawstr(memory, len, f, sink,
+                is_json && is_wrapper_msg(upb_fielddef_containingtype(f)));
       break;
     case UPB_TYPE_MESSAGE: {
 #if PHP_MAJOR_VERSION < 7
