@@ -39,6 +39,7 @@ These are projects we know about implementing Protocol Buffers for other program
 * Erlang: https://github.com/tomas-abrahamsson/gpb
 * Erlang: http://piqi.org/
 * Erlang: https://github.com/basho/erlang_protobuffs (no longer maintained, use gpb instead)
+* Hacklang/HHVM: https://github.com/y3llowcake/proto-hack
 * GDScript: https://github.com/oniksan/godobuf (Godot v3 engine plugin)
 * Go: https://github.com/golang/protobuf (Google-official implementation)
 * Go: https://github.com/akunspy/gopbuf
@@ -92,6 +93,7 @@ These are projects we know about implementing Protocol Buffers for other program
 * Solidity: https://github.com/celer-network/pb3-gen-sol
 * Swift: https://github.com/alexeyxo/protobuf-swift
 * Swift: https://github.com/apple/swift-protobuf/
+* Typescript: https://github.com/y3llowcake/protoc-gen-ts
 * Vala: https://launchpad.net/protobuf-vala
 * Visual Basic: http://code.google.com/p/protobuf-net/
 
