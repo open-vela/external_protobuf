@@ -1148,14 +1148,4 @@ class EncodeDecodeTest extends TestBase
                           $m->serializeToJsonString());
     }
 
-    public function testJsonDecodeNumericStringMapKey()
-    {
-        $m = new TestMessage();
-        $m->getMapStringString()["1"] = "1";
-        $data = $m->serializeToJsonString();
-        $this->assertSame("{\"mapStringString\":{\"1\":\"1\"}}", $data);
-        $n = new TestMessage();
-        $n->mergeFromJsonString($data);
-    }
-
 }
