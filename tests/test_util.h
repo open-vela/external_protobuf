@@ -12,7 +12,7 @@
 
 #ifdef __cplusplus
 
-upb_bufhandle global_handle;
+upb::BufferHandle global_handle;
 
 /* A convenience class for parser tests.  Provides some useful features:
  *
@@ -30,13 +30,33 @@ upb_bufhandle global_handle;
 class VerboseParserEnvironment {
  public:
   /* Pass verbose=true to print detailed diagnostics to stderr. */
-  VerboseParserEnvironment(bool verbose) : verbose_(verbose) {}
+  VerboseParserEnvironment(bool verbose) : verbose_(verbose) {
+    env_.SetErrorFunction(&VerboseParserEnvironment::OnError, this);
+  }
+
+  static bool OnError(void *ud, const upb::Status* status) {
+    VerboseParserEnvironment* env = static_cast<VerboseParserEnvironment*>(ud);
+
+    env->saw_error_ = true;
+
+    if (env->expect_error_ && env->verbose_) {
+      fprintf(stderr, "Encountered error, as expected: ");
+    } else if (!env->expect_error_) {
+      fprintf(stderr, "Encountered unexpected error: ");
+    } else {
+      return false;
+    }
+
+    fprintf(stderr, "%s\n", status->error_message());
+    return false;
+  }
 
   void Reset(const char *buf, size_t len, bool may_skip, bool expect_error) {
     buf_ = buf;
     len_ = len;
     ofs_ = 0;
     expect_error_ = expect_error;
+    saw_error_ = false;
     end_ok_set_ = false;
     skip_until_ = may_skip ? 0 : -1;
     skipped_with_null_ = false;
@@ -58,14 +78,14 @@ class VerboseParserEnvironment {
     if (verbose_) {
       fprintf(stderr, "Calling start()\n");
     }
-    return sink_.Start(len_, &subc_);
+    return sink_->Start(len_, &subc_);
   }
 
   bool End() {
     if (verbose_) {
       fprintf(stderr, "Calling end()\n");
     }
-    end_ok_ = sink_.End();
+    end_ok_ = sink_->End();
     end_ok_set_ = true;
 
     return end_ok_;
@@ -74,25 +94,14 @@ class VerboseParserEnvironment {
   bool CheckConsistency() {
     /* If we called end (which we should only do when previous bytes are fully
      * accepted), then end() should return true iff there were no errors. */
-    if (end_ok_set_ && end_ok_ != status_.ok()) {
+    if (end_ok_set_ && end_ok_ != !saw_error_) {
       fprintf(stderr, "End() status and saw_error didn't match.\n");
       return false;
     }
 
-    if (expect_error_ && status_.ok()) {
+    if (expect_error_ && !saw_error_) {
       fprintf(stderr, "Expected error but saw none.\n");
       return false;
-    }
-
-    if (!status_.ok()) {
-      if (expect_error_ && verbose_) {
-        fprintf(stderr, "Encountered error, as expected: %s",
-                status_.error_message());
-      } else if (!expect_error_) {
-        fprintf(stderr, "Encountered unexpected error: %s",
-                status_.error_message());
-        return false;
-      }
     }
 
     return true;
@@ -128,7 +137,7 @@ class VerboseParserEnvironment {
               (unsigned)bytes, (unsigned)ofs_, (unsigned)(ofs_ + bytes));
     }
 
-    int parsed = sink_.PutBuffer(subc_, buf2, bytes, &global_handle);
+    int parsed = sink_->PutBuffer(subc_, buf2, bytes, &global_handle);
     free(buf2);
 
     if (verbose_) {
@@ -149,9 +158,8 @@ class VerboseParserEnvironment {
       }
     }
 
-    if (!status_.ok()) {
+    if (saw_error_)
       return false;
-    }
 
     if (parsed > bytes && skip_until_ >= 0) {
       skip_until_ = ofs_ + parsed;
@@ -162,27 +170,25 @@ class VerboseParserEnvironment {
     return true;
   }
 
-  void ResetBytesSink(upb::BytesSink sink) {
+  void ResetBytesSink(upb::BytesSink* sink) {
     sink_ = sink;
   }
 
   size_t ofs() { return ofs_; }
+  upb::Environment* env() { return &env_; }
 
   bool SkippedWithNull() { return skipped_with_null_; }
 
-  upb::Arena* arena() { return &arena_; }
-  upb::Status* status() { return &status_; }
-
  private:
-  upb::Arena arena_;
-  upb::Status status_;
-  upb::BytesSink sink_;
+  upb::Environment env_;
+  upb::BytesSink* sink_;
   const char* buf_;
   size_t len_;
   bool verbose_;
   size_t ofs_;
   void *subc_;
   bool expect_error_;
+  bool saw_error_;
   bool end_ok_;
   bool end_ok_set_;
 

@@ -27,15 +27,17 @@ static int lupb_pb_decode(lua_State *L) {
 static int lupb_pb_encode(lua_State *L) {
   const upb_msglayout *layout;
   const upb_msg *msg = lupb_msg_checkmsg2(L, 1, &layout);
-  upb_arena *arena = upb_arena_new();
+  upb_arena arena;
   size_t size;
   char *result;
 
-  result = upb_encode(msg, (const void*)layout, arena, &size);
+  upb_arena_init(&arena);
+
+  result = upb_encode(msg, (const void*)layout, &arena, &size);
 
   /* Free resources before we potentially bail on error. */
   lua_pushlstring(L, result, size);
-  upb_arena_free(arena);
+  upb_arena_uninit(&arena);
   /* TODO(haberman): check for error. */
 
   return 1;
