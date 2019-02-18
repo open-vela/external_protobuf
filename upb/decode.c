@@ -1,5 +1,4 @@
 
-#include <string.h>
 #include "upb/upb.h"
 #include "upb/decode.h"
 #include "upb/structs.int.h"

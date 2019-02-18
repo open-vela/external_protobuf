@@ -99,7 +99,9 @@ static bool in_residual_buf(const upb_pbdecoder *d, const char *p);
  * benchmarks. */
 
 static void seterr(upb_pbdecoder *d, const char *msg) {
-  upb_status_seterrmsg(d->status, msg);
+  upb_status status = UPB_STATUS_INIT;
+  upb_status_seterrmsg(&status, msg);
+  upb_env_reporterror(d->env, &status);
 }
 
 void upb_pbdecoder_seterr(upb_pbdecoder *d, const char *msg) {
@@ -594,7 +596,7 @@ have_tag:
 
     if (d->top->groupnum >= 0) {
       /* TODO: More code needed for handling unknown groups. */
-      upb_sink_putunknown(d->top->sink, d->checkpoint, d->ptr - d->checkpoint);
+      upb_sink_putunknown(&d->top->sink, d->checkpoint, d->ptr - d->checkpoint);
       return DECODE_OK;
     }
 
@@ -688,7 +690,7 @@ size_t run_decoder_vm(upb_pbdecoder *d, const mgroup *group,
   VMCASE(OP_PARSE_ ## type, { \
     ctype val; \
     CHECK_RETURN(decode_ ## wt(d, &val)); \
-    upb_sink_put ## name(d->top->sink, arg, (convfunc)(val)); \
+    upb_sink_put ## name(&d->top->sink, arg, (convfunc)(val)); \
   })
 
   while(1) {
@@ -740,36 +742,36 @@ size_t run_decoder_vm(upb_pbdecoder *d, const mgroup *group,
         d->pc += sizeof(void*) / sizeof(uint32_t);
       )
       VMCASE(OP_STARTMSG,
-        CHECK_SUSPEND(upb_sink_startmsg(d->top->sink));
+        CHECK_SUSPEND(upb_sink_startmsg(&d->top->sink));
       )
       VMCASE(OP_ENDMSG,
-        CHECK_SUSPEND(upb_sink_endmsg(d->top->sink, d->status));
+        CHECK_SUSPEND(upb_sink_endmsg(&d->top->sink, d->status));
       )
       VMCASE(OP_STARTSEQ,
         upb_pbdecoder_frame *outer = outer_frame(d);
-        CHECK_SUSPEND(upb_sink_startseq(outer->sink, arg, &d->top->sink));
+        CHECK_SUSPEND(upb_sink_startseq(&outer->sink, arg, &d->top->sink));
       )
       VMCASE(OP_ENDSEQ,
-        CHECK_SUSPEND(upb_sink_endseq(d->top->sink, arg));
+        CHECK_SUSPEND(upb_sink_endseq(&d->top->sink, arg));
       )
       VMCASE(OP_STARTSUBMSG,
         upb_pbdecoder_frame *outer = outer_frame(d);
-        CHECK_SUSPEND(upb_sink_startsubmsg(outer->sink, arg, &d->top->sink));
+        CHECK_SUSPEND(upb_sink_startsubmsg(&outer->sink, arg, &d->top->sink));
       )
       VMCASE(OP_ENDSUBMSG,
-        CHECK_SUSPEND(upb_sink_endsubmsg(d->top->sink, arg));
+        CHECK_SUSPEND(upb_sink_endsubmsg(&d->top->sink, arg));
       )
       VMCASE(OP_STARTSTR,
         uint32_t len = delim_remaining(d);
         upb_pbdecoder_frame *outer = outer_frame(d);
-        CHECK_SUSPEND(upb_sink_startstr(outer->sink, arg, len, &d->top->sink));
+        CHECK_SUSPEND(upb_sink_startstr(&outer->sink, arg, len, &d->top->sink));
         if (len == 0) {
           d->pc++;  /* Skip OP_STRING. */
         }
       )
       VMCASE(OP_STRING,
         uint32_t len = curbufleft(d);
-        size_t n = upb_sink_putstring(d->top->sink, arg, d->ptr, len, handle);
+        size_t n = upb_sink_putstring(&d->top->sink, arg, d->ptr, len, handle);
         if (n > len) {
           if (n > delim_remaining(d)) {
             seterr(d, "Tried to skip past end of string.");
@@ -790,7 +792,7 @@ size_t run_decoder_vm(upb_pbdecoder *d, const mgroup *group,
         }
       )
       VMCASE(OP_ENDSTR,
-        CHECK_SUSPEND(upb_sink_endstr(d->top->sink, arg));
+        CHECK_SUSPEND(upb_sink_endstr(&d->top->sink, arg));
       )
       VMCASE(OP_PUSHTAGDELIM,
         CHECK_SUSPEND(pushtagdelim(d, arg));
@@ -990,39 +992,40 @@ void upb_pbdecoder_reset(upb_pbdecoder *d) {
   d->residual_end = d->residual;
 }
 
-upb_pbdecoder *upb_pbdecoder_create(upb_arena *a, const upb_pbdecodermethod *m,
-                                    upb_sink sink, upb_status *status) {
+upb_pbdecoder *upb_pbdecoder_create(upb_env *e, const upb_pbdecodermethod *m,
+                                    upb_sink *sink) {
   const size_t default_max_nesting = 64;
 #ifndef NDEBUG
-  size_t size_before = upb_arena_bytesallocated(a);
+  size_t size_before = upb_env_bytesallocated(e);
 #endif
 
-  upb_pbdecoder *d = upb_arena_malloc(a, sizeof(upb_pbdecoder));
+  upb_pbdecoder *d = upb_env_malloc(e, sizeof(upb_pbdecoder));
   if (!d) return NULL;
 
   d->method_ = m;
-  d->callstack = upb_arena_malloc(a, callstacksize(d, default_max_nesting));
-  d->stack = upb_arena_malloc(a, stacksize(d, default_max_nesting));
+  d->callstack = upb_env_malloc(e, callstacksize(d, default_max_nesting));
+  d->stack = upb_env_malloc(e, stacksize(d, default_max_nesting));
   if (!d->stack || !d->callstack) {
     return NULL;
   }
 
-  d->arena = a;
+  d->env = e;
   d->limit = d->stack + default_max_nesting - 1;
   d->stack_size = default_max_nesting;
-  d->status = status;
+  d->status = NULL;
 
   upb_pbdecoder_reset(d);
   upb_bytessink_reset(&d->input_, &m->input_handler_, d);
 
+  UPB_ASSERT(sink);
   if (d->method_->dest_handlers_) {
-    if (sink.handlers != d->method_->dest_handlers_)
+    if (sink->handlers != d->method_->dest_handlers_)
       return NULL;
   }
-  d->top->sink = sink;
+  upb_sink_reset(&d->top->sink, sink->handlers, sink->closure);
 
   /* If this fails, increase the value in decoder.h. */
-  UPB_ASSERT_DEBUGVAR(upb_arena_bytesallocated(a) - size_before <=
+  UPB_ASSERT_DEBUGVAR(upb_env_bytesallocated(e) - size_before <=
                       UPB_PB_DECODER_SIZE);
   return d;
 }
@@ -1035,8 +1038,8 @@ const upb_pbdecodermethod *upb_pbdecoder_method(const upb_pbdecoder *d) {
   return d->method_;
 }
 
-upb_bytessink upb_pbdecoder_input(upb_pbdecoder *d) {
-  return d->input_;
+upb_bytessink *upb_pbdecoder_input(upb_pbdecoder *d) {
+  return &d->input_;
 }
 
 size_t upb_pbdecoder_maxnesting(const upb_pbdecoder *d) {
@@ -1055,7 +1058,7 @@ bool upb_pbdecoder_setmaxnesting(upb_pbdecoder *d, size_t max) {
     /* Need to reallocate stack and callstack to accommodate. */
     size_t old_size = stacksize(d, d->stack_size);
     size_t new_size = stacksize(d, max);
-    void *p = upb_arena_realloc(d->arena, d->stack, old_size, new_size);
+    void *p = upb_env_realloc(d->env, d->stack, old_size, new_size);
     if (!p) {
       return false;
     }
@@ -1063,7 +1066,7 @@ bool upb_pbdecoder_setmaxnesting(upb_pbdecoder *d, size_t max) {
 
     old_size = callstacksize(d, d->stack_size);
     new_size = callstacksize(d, max);
-    p = upb_arena_realloc(d->arena, d->callstack, old_size, new_size);
+    p = upb_env_realloc(d->env, d->callstack, old_size, new_size);
     if (!p) {
       return false;
     }

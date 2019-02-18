@@ -9,7 +9,7 @@ namespace upb {
 template <class T>
 class FillStringHandler {
  public:
-  static void SetHandler(upb_byteshandler* handler) {
+  static void SetHandler(BytesHandler* handler) {
     upb_byteshandler_setstartstr(handler, &FillStringHandler::StartString,
                                  NULL);
     upb_byteshandler_setstring(handler, &FillStringHandler::StringBuf, NULL);
@@ -28,7 +28,7 @@ class FillStringHandler {
   }
 
   static size_t StringBuf(void* c, const void* hd, const char* buf, size_t n,
-                          const upb_bufhandle* h) {
+                          const BufferHandle* h) {
     UPB_UNUSED(hd);
     UPB_UNUSED(h);
 
@@ -48,15 +48,14 @@ class StringSink {
   explicit StringSink(T* target) {
     // TODO(haberman): we need to avoid rebuilding a new handler every time,
     // but with class globals disallowed for google3 C++ this is tricky.
-    upb_byteshandler_init(&handler_);
     FillStringHandler<T>::SetHandler(&handler_);
     input_.Reset(&handler_, target);
   }
 
-  BytesSink input() { return input_; }
+  BytesSink* input() { return &input_; }
 
  private:
-  upb_byteshandler handler_;
+  BytesHandler handler_;
   BytesSink input_;
 };
 
