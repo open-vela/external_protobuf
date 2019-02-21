@@ -364,7 +364,7 @@ public abstract class GeneratedMessageV3 extends AbstractMessage
       throw e.unwrapIOException();
     }
   }
-  
+
   protected static boolean canUseUnsafe() {
     return UnsafeUtil.hasUnsafeArrayOperations() && UnsafeUtil.hasUnsafeByteBufferOperations();
   }
@@ -710,23 +710,19 @@ public abstract class GeneratedMessageV3 extends AbstractMessage
       return (BuilderType) this;
     }
 
-    private BuilderType setUnknownFieldsInternal(final UnknownFieldSet unknownFields) {
+    @Override
+    public BuilderType setUnknownFields(final UnknownFieldSet unknownFields) {
       this.unknownFields = unknownFields;
       onChanged();
       return (BuilderType) this;
     }
 
-    @Override
-    public BuilderType setUnknownFields(final UnknownFieldSet unknownFields) {
-      return setUnknownFieldsInternal(unknownFields);
-    }
-
     /**
-     * This method is obsolete, but we must retain it for compatibility with
-     * older generated code.
+     * Delegates to setUnknownFields. This method is obsolete, but we must retain it for
+     * compatibility with older generated code.
      */
     protected BuilderType setUnknownFieldsProto3(final UnknownFieldSet unknownFields) {
-      return setUnknownFieldsInternal(unknownFields);
+      return setUnknownFields(unknownFields);
     }
 
     @Override
