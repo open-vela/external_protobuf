@@ -1135,10 +1135,6 @@ string JSBinaryReaderMethodName(const GeneratorOptions& options,
 
 string JSBinaryWriterMethodName(const GeneratorOptions& options,
                                 const FieldDescriptor* field) {
-  if (field->containing_type() &&
-      field->containing_type()->options().message_set_wire_format()) {
-    return "jspb.BinaryWriter.prototype.writeMessageSet";
-  }
   return "jspb.BinaryWriter.prototype.write" +
          JSBinaryReadWriteMethodName(field, /* is_writer = */ true);
 }
@@ -2247,17 +2243,17 @@ void Generator::GenerateClassToObject(const GeneratorOptions& options,
       "\n"
       "if (jspb.Message.GENERATE_TO_OBJECT) {\n"
       "/**\n"
-      " * Creates an object representation of this proto.\n"
+      " * Creates an object representation of this proto suitable for use in "
+      "Soy templates.\n"
       " * Field names that are reserved in JavaScript and will be renamed to "
       "pb_name.\n"
-      " * Optional fields that are not set will be set to undefined.\n"
       " * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.\n"
       " * For the list of reserved names please see:\n"
-      " *     net/proto2/compiler/js/internal/generator.cc#kKeyword.\n"
-      " * @param {boolean=} opt_includeInstance Deprecated. whether to include "
-      "the\n"
-      " *     JSPB instance for transitional soy proto support:\n"
-      " *     http://goto/soy-param-migration\n"
+      " *     com.google.apps.jspb.JsClassTemplate.JS_RESERVED_WORDS.\n"
+      " * @param {boolean=} opt_includeInstance Whether to include the JSPB "
+      "instance\n"
+      " *     for transitional soy proto support: http://goto/soy-param-"
+      "migration\n"
       " * @return {!Object}\n"
       " */\n"
       "$classname$.prototype.toObject = function(opt_includeInstance) {\n"
@@ -2267,16 +2263,16 @@ void Generator::GenerateClassToObject(const GeneratorOptions& options,
       "\n"
       "/**\n"
       " * Static version of the {@see toObject} method.\n"
-      " * @param {boolean|undefined} includeInstance Deprecated. Whether to "
-      "include\n"
-      " *     the JSPB instance for transitional soy proto support:\n"
+      " * @param {boolean|undefined} includeInstance Whether to include the "
+      "JSPB\n"
+      " *     instance for transitional soy proto support:\n"
       " *     http://goto/soy-param-migration\n"
       " * @param {!$classname$} msg The msg instance to transform.\n"
       " * @return {!Object}\n"
       " * @suppress {unusedLocalVariables} f is only used for nested messages\n"
       " */\n"
       "$classname$.toObject = function(includeInstance, msg) {\n"
-      "  var f, obj = {",
+      "  var obj = {",
       "classname", GetMessagePath(options, desc));
 
   bool first = true;
@@ -2428,39 +2424,7 @@ void Generator::GenerateClassFieldToObject(const GeneratorOptions& options,
     // We are migrating the accessors to return defaults instead of null, but
     // it may take longer to migrate toObject (or we might not want to do it at
     // all).  So we want to generate independent code.
-    // The accessor for unset optional values without default should return
-    // null. Those are converted to undefined in the generated object.
-    printer->Print("(f = ");
     GenerateFieldValueExpression(printer, "msg", field, use_default);
-    printer->Print(") == null ? undefined : f");
-  }
-}
-
-void Generator::GenerateObjectTypedef(const GeneratorOptions& options,
-                                      io::Printer* printer,
-                                      const Descriptor* desc) const {
-  // TODO(b/122687752): Consider renaming nested messages called ObjectFormat
-  //     to prevent collisions.
-  const string type_name = GetMessagePath(options, desc) + ".ObjectFormat";
-
-  printer->Print(
-      "/**\n"
-      " * The raw object form of $messageName$ as accepted by the `fromObject` "
-      "method.\n"
-      " * @record\n"
-      " */\n"
-      "$typeName$ = function() {};\n\n",
-      "messageName", desc->name(),
-      "typeName", type_name);
-
-  for (int i = 0; i < desc->field_count(); i++) {
-    printer->Print(
-        "/** @type {$fieldType$|undefined} */\n"
-        "$typeName$.prototype.$fieldName$;\n\n",
-        "typeName", type_name,
-        "fieldName", JSObjectFieldName(options, desc->field(i)),
-        // TODO(b/121097361): Add type checking for field values.
-        "fieldType", "?");
   }
 }
 
@@ -2468,16 +2432,15 @@ void Generator::GenerateClassFromObject(const GeneratorOptions& options,
                                         io::Printer* printer,
                                         const Descriptor* desc) const {
   printer->Print(
-      "if (jspb.Message.GENERATE_FROM_OBJECT) {\n\n");
-
-  GenerateObjectTypedef(options, printer, desc);
-
-  printer->Print(
+      "if (jspb.Message.GENERATE_FROM_OBJECT) {\n"
       "/**\n"
       " * Loads data from an object into a new instance of this proto.\n"
-      " * @param {!$classname$.ObjectFormat} obj\n"
-      " *     The object representation of this proto to load the data from.\n"
+      " * @param {!Object} obj The object representation of this proto to\n"
+      " *     load the data from.\n"
       " * @return {!$classname$}\n"
+      " * @suppress {missingProperties} To prevent JSCompiler errors at "
+      "the\n"
+      " *     `goog.isDef(obj.<fieldName>)` lookups.\n"
       " */\n"
       "$classname$.fromObject = function(obj) {\n"
       "  var msg = new $classname$();\n",
@@ -2493,7 +2456,7 @@ void Generator::GenerateClassFromObject(const GeneratorOptions& options,
   printer->Print(
       "  return msg;\n"
       "};\n"
-      "}\n\n");
+      "}\n");
 }
 
 void Generator::GenerateClassFieldFromObject(
@@ -2506,7 +2469,7 @@ void Generator::GenerateClassFieldFromObject(
       // Since the map values are of message type, we have to do some extra work
       // to recursively call fromObject() on them before setting the map field.
       printer->Print(
-          "  obj.$name$ && jspb.Message.setWrapperField(\n"
+          "  goog.isDef(obj.$name$) && jspb.Message.setWrapperField(\n"
           "      msg, $index$, jspb.Map.fromObject(obj.$name$, $fieldclass$, "
           "$fieldclass$.fromObject));\n",
           "name", JSObjectFieldName(options, field),
@@ -2517,7 +2480,7 @@ void Generator::GenerateClassFieldFromObject(
       // map containers wrapping underlying arrays, so we can simply directly
       // set the array here without fear of a stale wrapper.
       printer->Print(
-          "  obj.$name$ && "
+          "  goog.isDef(obj.$name$) && "
           "jspb.Message.setField(msg, $index$, obj.$name$);\n",
           "name", JSObjectFieldName(options, field),
           "index", JSFieldIndex(field));
@@ -2527,7 +2490,7 @@ void Generator::GenerateClassFieldFromObject(
     if (field->is_repeated()) {
       {
         printer->Print(
-            "  obj.$name$ && "
+            "  goog.isDef(obj.$name$) && "
             "jspb.Message.setRepeatedWrapperField(\n"
             "      msg, $index$, obj.$name$.map(\n"
             "          $fieldclass$.fromObject));\n",
@@ -2537,7 +2500,7 @@ void Generator::GenerateClassFieldFromObject(
       }
     } else {
       printer->Print(
-          "  obj.$name$ && jspb.Message.setWrapperField(\n"
+          "  goog.isDef(obj.$name$) && jspb.Message.setWrapperField(\n"
           "      msg, $index$, $fieldclass$.fromObject(obj.$name$));\n",
           "name", JSObjectFieldName(options, field),
           "index", JSFieldIndex(field),
@@ -2546,7 +2509,7 @@ void Generator::GenerateClassFieldFromObject(
   } else {
     // Simple (primitive) field.
     printer->Print(
-        "  obj.$name$ != null && jspb.Message.setField(msg, $index$, "
+        "  goog.isDef(obj.$name$) && jspb.Message.setField(msg, $index$, "
         "obj.$name$);\n",
         "name", JSObjectFieldName(options, field),
         "index", JSFieldIndex(field));

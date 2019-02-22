@@ -132,7 +132,7 @@ ImmutableEnumFieldLiteGenerator(const FieldDescriptor* descriptor,
 ImmutableEnumFieldLiteGenerator::~ImmutableEnumFieldLiteGenerator() {}
 
 int ImmutableEnumFieldLiteGenerator::GetNumBitsForMessage() const {
-  return SupportFieldPresence(descriptor_->file()) ? 1 : 0;
+  return 1;
 }
 
 void ImmutableEnumFieldLiteGenerator::

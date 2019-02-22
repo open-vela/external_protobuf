@@ -137,11 +137,11 @@ ImmutableMessageFieldGenerator(const FieldDescriptor* descriptor,
 ImmutableMessageFieldGenerator::~ImmutableMessageFieldGenerator() {}
 
 int ImmutableMessageFieldGenerator::GetNumBitsForMessage() const {
-  return SupportFieldPresence(descriptor_->file()) ? 1 : 0;
+  return 1;
 }
 
 int ImmutableMessageFieldGenerator::GetNumBitsForBuilder() const {
-  return GetNumBitsForMessage();
+  return 1;
 }
 
 void ImmutableMessageFieldGenerator::

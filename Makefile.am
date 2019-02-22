@@ -791,7 +791,6 @@ python_EXTRA_DIST=                                                           \
   python/google/protobuf/internal/descriptor_test.py                         \
   python/google/protobuf/internal/encoder.py                                 \
   python/google/protobuf/internal/enum_type_wrapper.py                       \
-  python/google/protobuf/internal/extension_dict.py                          \
   python/google/protobuf/internal/factory_test1.proto                        \
   python/google/protobuf/internal/factory_test2.proto                        \
   python/google/protobuf/internal/file_options_test.proto                    \
@@ -1088,6 +1087,7 @@ EXTRA_DIST = $(@DIST_LANG@_EXTRA_DIST)   \
   cmake/protoc.cmake                     \
   cmake/tests.cmake                      \
   cmake/version.rc.in                    \
+  compiler_config_setting.bzl            \
   editors/README.txt                     \
   editors/proto.vim                      \
   editors/protobuf-mode.el               \

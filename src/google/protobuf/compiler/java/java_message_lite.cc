@@ -74,6 +74,11 @@ bool EnableExperimentalRuntimeForLite() {
 #endif  // !PROTOBUF_EXPERIMENT
 }
 
+bool GenerateHasBits(const Descriptor* descriptor) {
+  return SupportFieldPresence(descriptor->file()) ||
+      HasRepeatedFields(descriptor);
+}
+
 string MapValueImmutableClassdName(const Descriptor* descriptor,
                                    ClassNameResolver* name_resolver) {
   const FieldDescriptor* value_field = descriptor->FindFieldByName("value");
@@ -228,16 +233,18 @@ void ImmutableMessageLiteGenerator::Generate(io::Printer* printer) {
     messageGenerator.Generate(printer);
   }
 
-  // Integers for bit fields.
-  int totalBits = 0;
-  for (int i = 0; i < descriptor_->field_count(); i++) {
-    totalBits +=
-        field_generators_.get(descriptor_->field(i)).GetNumBitsForMessage();
-  }
-  int totalInts = (totalBits + 31) / 32;
-  for (int i = 0; i < totalInts; i++) {
-    printer->Print("private int $bit_field_name$;\n", "bit_field_name",
-                   GetBitFieldName(i));
+  if (GenerateHasBits(descriptor_)) {
+    // Integers for bit fields.
+    int totalBits = 0;
+    for (int i = 0; i < descriptor_->field_count(); i++) {
+      totalBits += field_generators_.get(descriptor_->field(i))
+          .GetNumBitsForMessage();
+    }
+    int totalInts = (totalBits + 31) / 32;
+    for (int i = 0; i < totalInts; i++) {
+      printer->Print("private int $bit_field_name$;\n",
+        "bit_field_name", GetBitFieldName(i));
+    }
   }
 
   // oneof
@@ -945,17 +952,20 @@ void ImmutableMessageLiteGenerator::GenerateDynamicMethodVisit(
       "oneof_name", context_->GetOneofGeneratorInfo(field)->name);
   }
 
-  // Integers for bit fields.
-  int totalBits = 0;
-  for (int i = 0; i < descriptor_->field_count(); i++) {
-    totalBits +=
-        field_generators_.get(descriptor_->field(i)).GetNumBitsForMessage();
-  }
-  int totalInts = (totalBits + 31) / 32;
+  if (GenerateHasBits(descriptor_)) {
+    // Integers for bit fields.
+    int totalBits = 0;
+    for (int i = 0; i < descriptor_->field_count(); i++) {
+      totalBits += field_generators_.get(descriptor_->field(i))
+          .GetNumBitsForMessage();
+    }
+    int totalInts = (totalBits + 31) / 32;
 
-  for (int i = 0; i < totalInts; i++) {
-    printer->Print("$bit_field_name$ |= other.$bit_field_name$;\n",
-                   "bit_field_name", GetBitFieldName(i));
+    for (int i = 0; i < totalInts; i++) {
+      printer->Print(
+        "$bit_field_name$ |= other.$bit_field_name$;\n",
+        "bit_field_name", GetBitFieldName(i));
+    }
   }
   printer->Outdent();
   printer->Print(

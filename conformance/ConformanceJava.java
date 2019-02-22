@@ -249,30 +249,13 @@ class ConformanceJava {
         break;
       }
       case TEXT_PAYLOAD: {
-        if (isProto3) {
-          try {
-            TestMessagesProto3.TestAllTypesProto3.Builder builder =
-                TestMessagesProto3.TestAllTypesProto3.newBuilder();
-            TextFormat.merge(request.getTextPayload(), builder);
-            testMessage = builder.build();
-          } catch (TextFormat.ParseException e) {
-              return Conformance.ConformanceResponse.newBuilder()
-                  .setParseError(e.getMessage())
-                  .build();
-          }
-        } else if (isProto2) {
-          try {
-            TestMessagesProto2.TestAllTypesProto2.Builder builder =
-                TestMessagesProto2.TestAllTypesProto2.newBuilder();
-            TextFormat.merge(request.getTextPayload(), builder);
-            testMessage = builder.build();
-          } catch (TextFormat.ParseException e) {
-              return Conformance.ConformanceResponse.newBuilder()
-                  .setParseError(e.getMessage())
-                  .build();
-          }
-        } else {
-          throw new RuntimeException("Protobuf request doesn't have specific payload type.");
+        try {
+          TestMessagesProto3.TestAllTypesProto3.Builder builder =
+              TestMessagesProto3.TestAllTypesProto3.newBuilder();
+          TextFormat.merge(request.getTextPayload(), builder);
+          testMessage = builder.build();
+        } catch (TextFormat.ParseException e) {
+          return Conformance.ConformanceResponse.newBuilder().setParseError(e.getMessage()).build();
         }
         break;
       }

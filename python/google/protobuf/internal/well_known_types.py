@@ -58,6 +58,14 @@ _SECONDS_PER_DAY = 24 * 3600
 _DURATION_SECONDS_MAX = 315576000000
 
 
+class Error(Exception):
+  """Top-level module error."""
+
+
+class ParseError(Error):
+  """Thrown in case of parsing error."""
+
+
 class Any(object):
   """Class for Any Message type."""
 
@@ -128,7 +136,7 @@ class Timestamp(object):
           Example of accepted format: '1972-01-01T10:00:20.021-05:00'
 
     Raises:
-      ValueError: On parsing problems.
+      ParseError: On parsing problems.
     """
     timezone_offset = value.find('Z')
     if timezone_offset == -1:
@@ -136,7 +144,7 @@ class Timestamp(object):
     if timezone_offset == -1:
       timezone_offset = value.rfind('-')
     if timezone_offset == -1:
-      raise ValueError(
+      raise ParseError(
           'Failed to parse timestamp: missing valid timezone offset.')
     time_value = value[0:timezone_offset]
     # Parse datetime and nanos.
@@ -151,7 +159,7 @@ class Timestamp(object):
     td = date_object - datetime(1970, 1, 1)
     seconds = td.seconds + td.days * _SECONDS_PER_DAY
     if len(nano_value) > 9:
-      raise ValueError(
+      raise ParseError(
           'Failed to parse Timestamp: nanos {0} more than '
           '9 fractional digits.'.format(nano_value))
     if nano_value:
@@ -161,13 +169,13 @@ class Timestamp(object):
     # Parse timezone offsets.
     if value[timezone_offset] == 'Z':
       if len(value) != timezone_offset + 1:
-        raise ValueError('Failed to parse timestamp: invalid trailing'
+        raise ParseError('Failed to parse timestamp: invalid trailing'
                          ' data {0}.'.format(value))
     else:
       timezone = value[timezone_offset:]
       pos = timezone.find(':')
       if pos == -1:
-        raise ValueError(
+        raise ParseError(
             'Invalid timezone offset value: {0}.'.format(timezone))
       if timezone[0] == '+':
         seconds -= (int(timezone[1:pos])*60+int(timezone[pos+1:]))*60
@@ -281,10 +289,10 @@ class Duration(object):
           precision. For example: "1s", "1.01s", "1.0000001s", "-3.100s
 
     Raises:
-      ValueError: On parsing problems.
+      ParseError: On parsing problems.
     """
     if len(value) < 1 or value[-1] != 's':
-      raise ValueError(
+      raise ParseError(
           'Duration must end with letter "s": {0}.'.format(value))
     try:
       pos = value.find('.')
@@ -300,9 +308,9 @@ class Duration(object):
       _CheckDurationValid(seconds, nanos)
       self.seconds = seconds
       self.nanos = nanos
-    except ValueError as e:
-      raise ValueError(
-          'Couldn\'t parse duration: {0} : {1}.'.format(value, e))
+    except ValueError:
+      raise ParseError(
+          'Couldn\'t parse duration: {0}.'.format(value))
 
   def ToNanoseconds(self):
     """Converts a Duration to nanoseconds."""
@@ -367,15 +375,15 @@ class Duration(object):
 
 def _CheckDurationValid(seconds, nanos):
   if seconds < -_DURATION_SECONDS_MAX or seconds > _DURATION_SECONDS_MAX:
-    raise ValueError(
+    raise Error(
         'Duration is not valid: Seconds {0} must be in range '
         '[-315576000000, 315576000000].'.format(seconds))
   if nanos <= -_NANOS_PER_SECOND or nanos >= _NANOS_PER_SECOND:
-    raise ValueError(
+    raise Error(
         'Duration is not valid: Nanos {0} must be in range '
         '[-999999999, 999999999].'.format(nanos))
   if (nanos < 0 and seconds > 0) or (nanos > 0 and seconds < 0):
-    raise ValueError(
+    raise Error(
         'Duration is not valid: Sign mismatch.')
 
 
@@ -407,9 +415,8 @@ class FieldMask(object):
   def FromJsonString(self, value):
     """Converts string to FieldMask according to proto3 JSON spec."""
     self.Clear()
-    if value:
-      for path in value.split(','):
-        self.paths.append(_CamelCaseToSnakeCase(path))
+    for path in value.split(','):
+      self.paths.append(_CamelCaseToSnakeCase(path))
 
   def IsValidForDescriptor(self, message_descriptor):
     """Checks whether the FieldMask is valid for Message Descriptor."""
@@ -502,26 +509,24 @@ def _SnakeCaseToCamelCase(path_name):
   after_underscore = False
   for c in path_name:
     if c.isupper():
-      raise ValueError(
-          'Fail to print FieldMask to Json string: Path name '
-          '{0} must not contain uppercase letters.'.format(path_name))
+      raise Error('Fail to print FieldMask to Json string: Path name '
+                  '{0} must not contain uppercase letters.'.format(path_name))
     if after_underscore:
       if c.islower():
         result.append(c.upper())
         after_underscore = False
       else:
-        raise ValueError(
-            'Fail to print FieldMask to Json string: The '
-            'character after a "_" must be a lowercase letter '
-            'in path name {0}.'.format(path_name))
+        raise Error('Fail to print FieldMask to Json string: The '
+                    'character after a "_" must be a lowercase letter '
+                    'in path name {0}.'.format(path_name))
     elif c == '_':
       after_underscore = True
     else:
       result += c
 
   if after_underscore:
-    raise ValueError('Fail to print FieldMask to Json string: Trailing "_" '
-                     'in path name {0}.'.format(path_name))
+    raise Error('Fail to print FieldMask to Json string: Trailing "_" '
+                'in path name {0}.'.format(path_name))
   return ''.join(result)
 
 
@@ -530,7 +535,7 @@ def _CamelCaseToSnakeCase(path_name):
   result = []
   for c in path_name:
     if c == '_':
-      raise ValueError('Fail to parse FieldMask: Path name '
+      raise ParseError('Fail to parse FieldMask: Path name '
                        '{0} must not contain "_"s.'.format(path_name))
     if c.isupper():
       result += '_'
@@ -677,7 +682,7 @@ def _MergeMessage(
 
 def _AddFieldPaths(node, prefix, field_mask):
   """Adds the field paths descended from node to field_mask."""
-  if not node and prefix:
+  if not node:
     field_mask.paths.append(prefix)
     return
   for name in sorted(node):
