@@ -21,9 +21,7 @@ download it from maven:
 Choose the version that works on your platform (e.g., on windows you can
 download `protoc-gen-javalite-3.0.0-windows-x86_32.exe`), rename it to
 protoc-gen-javalite (or protoc-gen-javalite.exe on windows) and place it
-in a directory where it can be find in PATH. If you are using unix like OS
-then make sure to convert `protoc-gen-javalite` to unix executable. For example
-`chmod +x protoc-gen-javalite`
+in a directory where it can be find in PATH.
 
 Once you have the protoc and protoc plugin, you can generate Java Lite code
 for your .proto files:
