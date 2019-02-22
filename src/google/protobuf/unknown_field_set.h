@@ -186,7 +186,6 @@ class PROTOBUF_EXPORT UnknownFieldSet {
 
 #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
 namespace internal {
-
 inline void WriteVarint(uint32 num, uint64 val, UnknownFieldSet* unknown) {
   unknown->AddVarint(num, val);
 }
@@ -196,22 +195,20 @@ inline void WriteLengthDelimited(uint32 num, StringPiece val,
 }
 
 PROTOBUF_EXPORT
-const char* PackedEnumParser(void* object, const char* ptr, ParseContext* ctx,
-                             bool (*is_valid)(int), UnknownFieldSet* unknown,
-                             int field_num);
+const char* PackedValidEnumParser(const char* begin, const char* end,
+                                  void* object, ParseContext* ctx);
 PROTOBUF_EXPORT
-const char* PackedEnumParserArg(void* object, const char* ptr,
-                                ParseContext* ctx,
-                                bool (*is_valid)(const void*, int),
-                                const void* data, UnknownFieldSet* unknown,
-                                int field_num);
-
+const char* PackedValidEnumParserArg(const char* begin, const char* end,
+                                     void* object, ParseContext* ctx);
 PROTOBUF_EXPORT
-const char* UnknownGroupParse(UnknownFieldSet* unknown, const char* ptr,
+const char* UnknownGroupParse(const char* begin, const char* end, void* object,
                               ParseContext* ctx);
 PROTOBUF_EXPORT
-const char* UnknownFieldParse(uint64 tag, UnknownFieldSet* unknown,
-                              const char* ptr, ParseContext* ctx);
+std::pair<const char*, bool> UnknownFieldParse(uint64 tag, ParseClosure parent,
+                                               const char* begin,
+                                               const char* end,
+                                               UnknownFieldSet* unknown,
+                                               ParseContext* ctx);
 
 }  // namespace internal
 #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
@@ -270,7 +267,7 @@ class PROTOBUF_EXPORT UnknownField {
   inline void SetType(Type type);
 
   union LengthDelimited {
-    std::string* string_value;
+    std::string* string_value_;
   };
 
   uint32 number_;
@@ -344,7 +341,7 @@ inline uint64 UnknownField::fixed64() const {
 }
 inline const std::string& UnknownField::length_delimited() const {
   assert(type() == TYPE_LENGTH_DELIMITED);
-  return *data_.length_delimited_.string_value;
+  return *data_.length_delimited_.string_value_;
 }
 inline const UnknownFieldSet& UnknownField::group() const {
   assert(type() == TYPE_GROUP);
@@ -365,11 +362,11 @@ inline void UnknownField::set_fixed64(uint64 value) {
 }
 inline void UnknownField::set_length_delimited(const std::string& value) {
   assert(type() == TYPE_LENGTH_DELIMITED);
-  data_.length_delimited_.string_value->assign(value);
+  data_.length_delimited_.string_value_->assign(value);
 }
 inline std::string* UnknownField::mutable_length_delimited() {
   assert(type() == TYPE_LENGTH_DELIMITED);
-  return data_.length_delimited_.string_value;
+  return data_.length_delimited_.string_value_;
 }
 inline UnknownFieldSet* UnknownField::mutable_group() {
   assert(type() == TYPE_GROUP);
@@ -378,7 +375,7 @@ inline UnknownFieldSet* UnknownField::mutable_group() {
 
 inline size_t UnknownField::GetLengthDelimitedSize() const {
   GOOGLE_DCHECK_EQ(TYPE_LENGTH_DELIMITED, type());
-  return data_.length_delimited_.string_value->size();
+  return data_.length_delimited_.string_value_->size();
 }
 
 inline void UnknownField::SetType(Type type) {

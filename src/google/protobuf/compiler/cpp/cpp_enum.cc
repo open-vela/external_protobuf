@@ -72,6 +72,7 @@ EnumGenerator::EnumGenerator(const EnumDescriptor* descriptor,
   variables_["short_name"] = descriptor_->name();
   variables_["enumbase"] = options_.proto_h ? " : int" : "";
   variables_["nested_name"] = descriptor_->name();
+  variables_["constexpr"] = options_.proto_h ? "constexpr" : "";
   variables_["prefix"] =
       (descriptor_->containing_type() == NULL) ? "" : classname_ + "_";
 }
@@ -126,15 +127,15 @@ void EnumGenerator::GenerateDefinition(io::Printer* printer) {
 
   format(
       "$dllexport_decl $bool $classname$_IsValid(int value);\n"
-      "constexpr $classname$ ${1$$prefix$$short_name$_MIN$}$ = "
+      "const $classname$ ${1$$prefix$$short_name$_MIN$}$ = "
       "$prefix$$2$;\n"
-      "constexpr $classname$ ${1$$prefix$$short_name$_MAX$}$ = "
+      "const $classname$ ${1$$prefix$$short_name$_MAX$}$ = "
       "$prefix$$3$;\n",
       descriptor_, EnumValueName(min_value), EnumValueName(max_value));
 
   if (generate_array_size_) {
     format(
-        "constexpr int ${1$$prefix$$short_name$_ARRAYSIZE$}$ = "
+        "const int ${1$$prefix$$short_name$_ARRAYSIZE$}$ = "
         "$prefix$$short_name$_MAX + 1;\n\n",
         descriptor_);
   }
@@ -198,7 +199,7 @@ void EnumGenerator::GenerateSymbolImports(io::Printer* printer) const {
     string deprecated_attr = DeprecatedAttribute(
         options_, descriptor_->value(j)->options().deprecated());
     format(
-        "$1$static constexpr $nested_name$ ${2$$3$$}$ =\n"
+        "$1$static $constexpr $const $nested_name$ ${2$$3$$}$ =\n"
         "  $classname$_$3$;\n",
         deprecated_attr, descriptor_->value(j),
         EnumValueName(descriptor_->value(j)));
@@ -208,14 +209,14 @@ void EnumGenerator::GenerateSymbolImports(io::Printer* printer) const {
       "static inline bool $nested_name$_IsValid(int value) {\n"
       "  return $classname$_IsValid(value);\n"
       "}\n"
-      "static constexpr $nested_name$ ${1$$nested_name$_MIN$}$ =\n"
+      "static const $nested_name$ ${1$$nested_name$_MIN$}$ =\n"
       "  $classname$_$nested_name$_MIN;\n"
-      "static constexpr $nested_name$ ${1$$nested_name$_MAX$}$ =\n"
+      "static const $nested_name$ ${1$$nested_name$_MAX$}$ =\n"
       "  $classname$_$nested_name$_MAX;\n",
       descriptor_);
   if (generate_array_size_) {
     format(
-        "static constexpr int ${1$$nested_name$_ARRAYSIZE$}$ =\n"
+        "static const int ${1$$nested_name$_ARRAYSIZE$}$ =\n"
         "  $classname$_$nested_name$_ARRAYSIZE;\n",
         descriptor_);
   }
@@ -296,26 +297,25 @@ void EnumGenerator::GenerateMethods(int idx, io::Printer* printer) {
 
   if (descriptor_->containing_type() != NULL) {
     string parent = ClassName(descriptor_->containing_type(), false);
-    // Before C++17, we must define the static constants which were
-    // declared in the header, to give the linker a place to put them.
-    // But pre-2015 MSVC++ insists that we not.
-    format("#if (__cplusplus < 201703) && "
-           "(!defined(_MSC_VER) || _MSC_VER >= 1900)\n");
+    // We need to "define" the static constants which were declared in the
+    // header, to give the linker a place to put them.  Or at least the C++
+    // standard says we have to.  MSVC actually insists that we do _not_ define
+    // them again in the .cc file, prior to VC++ 2015.
+    format("#if !defined(_MSC_VER) || _MSC_VER >= 1900\n");
 
     for (int i = 0; i < descriptor_->value_count(); i++) {
-      format("constexpr $classname$ $1$::$2$;\n", parent,
+      format("$constexpr $const $classname$ $1$::$2$;\n", parent,
              EnumValueName(descriptor_->value(i)));
     }
     format(
-        "constexpr $classname$ $1$::$nested_name$_MIN;\n"
-        "constexpr $classname$ $1$::$nested_name$_MAX;\n",
+        "const $classname$ $1$::$nested_name$_MIN;\n"
+        "const $classname$ $1$::$nested_name$_MAX;\n",
         parent);
     if (generate_array_size_) {
-      format("constexpr int $1$::$nested_name$_ARRAYSIZE;\n", parent);
+      format("const int $1$::$nested_name$_ARRAYSIZE;\n", parent);
     }
 
-    format("#endif  // (__cplusplus < 201703) && "
-           "(!defined(_MSC_VER) || _MSC_VER >= 1900)\n");
+    format("#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900\n");
   }
 }
 

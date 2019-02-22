@@ -32,7 +32,6 @@
 #define GOOGLE_PROTOBUF_MAP_FIELD_LITE_H__
 
 #include <type_traits>
-#include <google/protobuf/parse_context.h>
 #include <google/protobuf/io/coded_stream.h>
 #include <google/protobuf/map.h>
 #include <google/protobuf/map_entry_lite.h>
@@ -107,11 +106,6 @@ class MapFieldLite {
   // take the ownership iff arena_ is NULL.
   EntryType* NewEntryWrapper(const Key& key, const T& t) const {
     return EntryType::Wrap(key, t, arena_);
-  }
-
-  const char* _InternalParse(const char* ptr, ParseContext* ctx) {
-    typename Derived::template Parser<MapFieldLite, Map<Key, T>> parser(this);
-    return parser._InternalParse(ptr, ctx);
   }
 
  private:
