@@ -121,8 +121,6 @@ target directory layout:
           protoc.exe
         + aarch_64
           protoc.exe
-        + ppcle_64
-          protoc.exe
       + osx
         + x86_64
           protoc.exe

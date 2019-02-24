@@ -106,10 +106,18 @@ def UpdateCpp():
       r'^#define GOOGLE_PROTOBUF_VERSION .*$',
       '#define GOOGLE_PROTOBUF_VERSION %s' % cpp_version,
       line)
+    line = re.sub(
+      r'^#define PROTOBUF_VERSION .*$',
+      '#define PROTOBUF_VERSION %s' % cpp_version,
+      line)
     if NEW_VERSION_INFO[2] == '0':
       line = re.sub(
         r'^#define GOOGLE_PROTOBUF_MIN_LIBRARY_VERSION .*$',
         '#define GOOGLE_PROTOBUF_MIN_LIBRARY_VERSION %s' % cpp_version,
+        line)
+      line = re.sub(
+        r'^#define PROTOBUF_MIN_HEADER_VERSION_FOR_PROTOC .*$',
+        '#define PROTOBUF_MIN_HEADER_VERSION_FOR_PROTOC %s' % cpp_version,
         line)
       line = re.sub(
         r'^#define GOOGLE_PROTOBUF_MIN_PROTOC_VERSION .*$',
@@ -125,6 +133,7 @@ def UpdateCpp():
         line)
     return line
   RewriteTextFile('src/google/protobuf/stubs/common.h', RewriteCpp)
+  RewriteTextFile('src/google/protobuf/port_def.inc', RewriteCpp)
 
 
 def UpdateCsharp():
@@ -217,9 +226,9 @@ def UpdatePhp():
     ReplaceText(Find(version, 'release'), GetFullVersion(rc_suffix = 'RC'))
     ReplaceText(Find(version, 'api'), NEW_VERSION)
     stability = Find(root, 'stability')
-    ReplaceText(Find(stability, 'release'),
+    ReplaceText(Find(version, 'release'),
         'stable' if RC_VERSION == 0 else 'beta')
-    ReplaceText(Find(stability, 'api'), 'stable' if RC_VERSION == 0 else 'beta')
+    ReplaceText(Find(version, 'api'), 'stable' if RC_VERSION == 0 else 'beta')
     now = datetime.datetime.now()
     ReplaceText(Find(root, 'date'), now.strftime('%Y-%m-%d'))
     ReplaceText(Find(root, 'time'), now.strftime('%H:%M:%S'))
@@ -247,11 +256,6 @@ def UpdatePhp():
     changelog.appendChild(release)
     changelog.appendChild(document.createTextNode('\n '))
   RewriteXml('php/ext/google/protobuf/package.xml', Callback)
-  RewriteTextFile('php/ext/google/protobuf/protobuf.h',
-    lambda line : re.sub(
-      r'PHP_PROTOBUF_VERSION ".*"$',
-      'PHP_PROTOBUF_VERSION "%s"' % NEW_VERSION,
-      line))
 
   RewriteTextFile('php/ext/google/protobuf/protobuf.h',
     lambda line : re.sub(
