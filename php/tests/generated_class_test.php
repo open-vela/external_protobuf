@@ -1447,20 +1447,6 @@ class GeneratedClassTest extends TestBase
         }
     }
 
-    public function testOneofMessageInArrayConstructor()
-    {
-        $m = new TestMessage([
-            'oneof_message' => new Sub(),
-        ]);
-    }
-
-    public function testOneofStringInArrayConstructor()
-    {
-        $m = new TestMessage([
-            'oneof_string' => 'abc',
-        ]);
-    }
-
     #########################################################
     # Test message equals.
     #########################################################

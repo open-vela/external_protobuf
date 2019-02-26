@@ -5,17 +5,13 @@ set -ex
 # change to repo root
 pushd $(dirname $0)/../../../..
 
-# Create stage dir
-ORIGINAL_DIR=`pwd`
-pushd ..
-cp -R $ORIGINAL_DIR stage
-export STAGE_DIR="`pwd`/stage"
-popd
-
 export REPO_DIR=protobuf
 export BUILD_VERSION=`grep -i "version" python/google/protobuf/__init__.py | grep -o "'.*'" | tr -d "'"`
-
-export BUILD_COMMIT=`git rev-parse HEAD`
+if [ -z $KOKORO_JOB_NAME ]; then
+  export BUILD_COMMIT=master
+else
+  export BUILD_COMMIT=`echo "$KOKORO_JOB_NAME" | cut -d '/' -f 3`
+fi
 export PLAT=x86_64
 export UNICODE_WIDTH=32
 export MACOSX_DEPLOYMENT_TARGET=10.9
@@ -33,8 +29,8 @@ build_artifact_version() {
 
   # Clean up env
   rm -rf venv
-  sudo rm -rf $REPO_DIR
-  cp -R $STAGE_DIR $REPO_DIR
+  sudo rm -rf protobuf
+  git clone https://github.com/google/protobuf.git
 
   source multibuild/common_utils.sh
   source multibuild/travis_steps.sh

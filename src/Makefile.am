@@ -18,7 +18,7 @@ else
 PTHREAD_DEF =
 endif
 
-PROTOBUF_VERSION = 18:0:0
+PROTOBUF_VERSION = 17:0:0
 
 if GCC
 # Turn on all warnings except for sign comparison (we ignore sign comparison
@@ -200,6 +200,7 @@ libprotobuf_lite_la_SOURCES =                                  \
   google/protobuf/stubs/strutil.cc                             \
   google/protobuf/stubs/time.cc                                \
   google/protobuf/stubs/time.h                                 \
+  google/protobuf/any_lite.cc                                  \
   google/protobuf/arena.cc                                     \
   google/protobuf/extension_set.cc                             \
   google/protobuf/generated_message_util.cc                    \
@@ -207,7 +208,7 @@ libprotobuf_lite_la_SOURCES =                                  \
   google/protobuf/generated_message_table_driven_lite.cc       \
   google/protobuf/implicit_weak_message.cc                     \
   google/protobuf/message_lite.cc                              \
-  google/protobuf/parse_context.cc                              \  
+  google/protobuf/parse_context.cc                             \
   google/protobuf/repeated_field.cc                            \
   google/protobuf/wire_format_lite.cc                          \
   google/protobuf/io/coded_stream.cc                           \
