@@ -48,6 +48,7 @@
 #include <google/protobuf/test_util.h>
 #include <google/protobuf/test_util2.h>
 #include <google/protobuf/unittest.pb.h>
+#include <google/protobuf/unittest_proto3.pb.h>
 #include <google/protobuf/unittest_mset.pb.h>
 #include <google/protobuf/unittest_mset_wire_format.pb.h>
 #include <google/protobuf/io/tokenizer.h>
@@ -744,6 +745,38 @@ TEST_F(TextFormatTest, ParseEnumFieldFromNegativeNumber) {
   EXPECT_EQ(unittest::SPARSE_E, proto.sparse_enum());
 }
 
+TEST_F(TextFormatTest, PrintUnknownEnumFieldProto3) {
+  proto3_unittest::TestAllTypes proto;
+
+  proto.add_repeated_nested_enum(
+      static_cast<proto3_unittest::TestAllTypes::NestedEnum>(10));
+  proto.add_repeated_nested_enum(
+      static_cast<proto3_unittest::TestAllTypes::NestedEnum>(-10));
+  proto.add_repeated_nested_enum(
+      static_cast<proto3_unittest::TestAllTypes::NestedEnum>(2147483647));
+  proto.add_repeated_nested_enum(
+      static_cast<proto3_unittest::TestAllTypes::NestedEnum>(-2147483648));
+
+  EXPECT_EQ(
+      "repeated_nested_enum: 10\n"
+      "repeated_nested_enum: -10\n"
+      "repeated_nested_enum: 2147483647\n"
+      "repeated_nested_enum: -2147483648\n",
+      proto.DebugString());
+}
+
+TEST_F(TextFormatTest, ParseUnknownEnumFieldProto3) {
+  proto3_unittest::TestAllTypes proto;
+  string parse_string =
+      "repeated_nested_enum: [10, -10, 2147483647, -2147483648]";
+  EXPECT_TRUE(TextFormat::ParseFromString(parse_string, &proto));
+  ASSERT_EQ(4, proto.repeated_nested_enum_size());
+  EXPECT_EQ(10, proto.repeated_nested_enum(0));
+  EXPECT_EQ(-10, proto.repeated_nested_enum(1));
+  EXPECT_EQ(2147483647, proto.repeated_nested_enum(2));
+  EXPECT_EQ(-2147483648, proto.repeated_nested_enum(3));
+}
+
 TEST_F(TextFormatTest, ParseStringEscape) {
   // Create a parse string with escpaed characters in it.
   string parse_string = "optional_string: "
@@ -1280,24 +1313,24 @@ class TextFormatParserTest : public testing::Test {
 
   void ExpectMessage(const string& input, const string& message, int line,
                      int col, Message* proto, bool expected_result) {
-    TextFormat::Parser parser;
     MockErrorCollector error_collector;
-    parser.RecordErrorsTo(&error_collector);
-    EXPECT_EQ(expected_result, parser.ParseFromString(input, proto))
+    parser_.RecordErrorsTo(&error_collector);
+    EXPECT_EQ(expected_result, parser_.ParseFromString(input, proto))
         << input << " -> " << proto->DebugString();
     EXPECT_EQ(
         StrCat(line) + ":" + StrCat(col) + ": " + message + "\n",
         error_collector.text_);
+    parser_.RecordErrorsTo(nullptr);
   }
 
   void ExpectSuccessAndTree(const string& input, Message* proto,
                             TextFormat::ParseInfoTree* info_tree) {
-    TextFormat::Parser parser;
     MockErrorCollector error_collector;
-    parser.RecordErrorsTo(&error_collector);
-    parser.WriteLocationsTo(info_tree);
-
-    EXPECT_TRUE(parser.ParseFromString(input, proto));
+    parser_.RecordErrorsTo(&error_collector);
+    parser_.WriteLocationsTo(info_tree);
+    EXPECT_TRUE(parser_.ParseFromString(input, proto));
+    parser_.WriteLocationsTo(nullptr);
+    parser_.RecordErrorsTo(nullptr);
   }
 
   void ExpectLocation(TextFormat::ParseInfoTree* tree,
@@ -1328,6 +1361,8 @@ class TextFormatParserTest : public testing::Test {
       AddError(line, column, "WARNING:" + message);
     }
   };
+
+  TextFormat::Parser parser_;
 };
 
 TEST_F(TextFormatParserTest, ParseInfoTreeBuilding) {
@@ -1775,6 +1810,22 @@ TEST_F(TextFormatParserTest, ParseDeprecatedField) {
   ExpectMessage("deprecated_int32: 42",
                 "WARNING:text format contains deprecated field "
                 "\"deprecated_int32\"", 1, 21, &message, true);
+}
+
+TEST_F(TextFormatParserTest, SetRecursionLimit) {
+  const char* format = "child: { $0 }";
+  std::string input;
+  for (int i = 0; i < 100; ++i) input = strings::Substitute(format, input);
+
+  unittest::NestedTestAllTypes message;
+  ExpectSuccessAndTree(input, &message, nullptr);
+
+  input = strings::Substitute(format, input);
+  parser_.SetRecursionLimit(100);
+  ExpectMessage(input, "Message is too deep", 1, 908, &message, false);
+
+  parser_.SetRecursionLimit(101);
+  ExpectSuccessAndTree(input, &message, nullptr);
 }
 
 class TextFormatMessageSetTest : public testing::Test {
