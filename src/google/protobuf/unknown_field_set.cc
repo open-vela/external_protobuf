@@ -36,7 +36,6 @@
 
 #include <google/protobuf/stubs/logging.h>
 #include <google/protobuf/stubs/common.h>
-#include <google/protobuf/parse_context.h>
 #include <google/protobuf/io/coded_stream.h>
 #include <google/protobuf/io/zero_copy_stream.h>
 #include <google/protobuf/io/zero_copy_stream_impl.h>
@@ -113,9 +112,9 @@ size_t UnknownFieldSet::SpaceUsedExcludingSelfLong() const {
     const UnknownField& field = (fields_)[i];
     switch (field.type()) {
       case UnknownField::TYPE_LENGTH_DELIMITED:
-        total_size += sizeof(*field.data_.length_delimited_.string_value) +
+        total_size += sizeof(*field.data_.length_delimited_.string_value_) +
                       internal::StringSpaceUsedExcludingSelfLong(
-                          *field.data_.length_delimited_.string_value);
+                          *field.data_.length_delimited_.string_value_);
         break;
       case UnknownField::TYPE_GROUP:
         total_size += field.data_.group_->SpaceUsedLong();
@@ -159,9 +158,9 @@ string* UnknownFieldSet::AddLengthDelimited(int number) {
   UnknownField field;
   field.number_ = number;
   field.SetType(UnknownField::TYPE_LENGTH_DELIMITED);
-  field.data_.length_delimited_.string_value = new string;
+  field.data_.length_delimited_.string_value_ = new string;
   fields_.push_back(field);
-  return field.data_.length_delimited_.string_value;
+  return field.data_.length_delimited_.string_value_;
 }
 
 
@@ -240,7 +239,7 @@ bool UnknownFieldSet::ParseFromArray(const void* data, int size) {
 void UnknownField::Delete() {
   switch (type()) {
     case UnknownField::TYPE_LENGTH_DELIMITED:
-      delete data_.length_delimited_.string_value;
+      delete data_.length_delimited_.string_value_;
       break;
     case UnknownField::TYPE_GROUP:
       delete data_.group_;
@@ -253,8 +252,8 @@ void UnknownField::Delete() {
 void UnknownField::DeepCopy(const UnknownField& other) {
   switch (type()) {
     case UnknownField::TYPE_LENGTH_DELIMITED:
-      data_.length_delimited_.string_value =
-          new string(*data_.length_delimited_.string_value);
+      data_.length_delimited_.string_value_ = new string(
+          *data_.length_delimited_.string_value_);
       break;
     case UnknownField::TYPE_GROUP: {
       UnknownFieldSet* group = new UnknownFieldSet();
@@ -271,14 +270,14 @@ void UnknownField::DeepCopy(const UnknownField& other) {
 void UnknownField::SerializeLengthDelimitedNoTag(
     io::CodedOutputStream* output) const {
   GOOGLE_DCHECK_EQ(TYPE_LENGTH_DELIMITED, type());
-  const string& data = *data_.length_delimited_.string_value;
+  const string& data = *data_.length_delimited_.string_value_;
   output->WriteVarint32(data.size());
   output->WriteRawMaybeAliased(data.data(), data.size());
 }
 
 uint8* UnknownField::SerializeLengthDelimitedNoTagToArray(uint8* target) const {
   GOOGLE_DCHECK_EQ(TYPE_LENGTH_DELIMITED, type());
-  const string& data = *data_.length_delimited_.string_value;
+  const string& data = *data_.length_delimited_.string_value_;
   target = io::CodedOutputStream::WriteVarint32ToArray(data.size(), target);
   target = io::CodedOutputStream::WriteStringToArray(data, target);
   return target;
@@ -286,50 +285,34 @@ uint8* UnknownField::SerializeLengthDelimitedNoTagToArray(uint8* target) const {
 
 #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
 namespace internal {
-const char* PackedEnumParser(void* object, const char* ptr, ParseContext* ctx,
-                             bool (*is_valid)(int), UnknownFieldSet* unknown,
-                             int field_num) {
-  int size = ReadSize(&ptr);
-  GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-  auto old = ctx->PushLimit(ptr, size);
-  GOOGLE_PROTOBUF_PARSER_ASSERT(old >= 0);
+
+const char* PackedValidEnumParser(const char* begin, const char* end,
+                                  void* object, ParseContext* ctx) {
   auto repeated_field = static_cast<RepeatedField<int>*>(object);
-  while (!ctx->DoneNoSlopCheck(&ptr)) {
+  auto ptr = begin;
+  while (ptr < end) {
     uint64 varint;
-    ptr = ParseVarint64(ptr, &varint);
+    ptr = io::Parse64(ptr, &varint);
     GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
     int val = varint;
-    if (is_valid(val)) {
+    if (ctx->extra_parse_data().ValidateEnum<UnknownFieldSet>(val))
       repeated_field->Add(val);
-    } else {
-      unknown->AddVarint(field_num, val);
-    }
   }
-  ctx->PopLimit(old);
   return ptr;
 }
-const char* PackedEnumParserArg(void* object, const char* ptr,
-                                ParseContext* ctx,
-                                bool (*is_valid)(const void*, int),
-                                const void* data, UnknownFieldSet* unknown,
-                                int field_num) {
-  int size = ReadSize(&ptr);
-  GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-  auto old = ctx->PushLimit(ptr, size);
-  GOOGLE_PROTOBUF_PARSER_ASSERT(old >= 0);
+
+const char* PackedValidEnumParserArg(const char* begin, const char* end,
+                                     void* object, ParseContext* ctx) {
   auto repeated_field = static_cast<RepeatedField<int>*>(object);
-  while (!ctx->DoneNoSlopCheck(&ptr)) {
+  auto ptr = begin;
+  while (ptr < end) {
     uint64 varint;
-    ptr = ParseVarint64(ptr, &varint);
+    ptr = io::Parse64(ptr, &varint);
     GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
     int val = varint;
-    if (is_valid(data, val)) {
+    if (ctx->extra_parse_data().ValidateEnumArg<UnknownFieldSet>(val))
       repeated_field->Add(val);
-    } else {
-      unknown->AddVarint(field_num, val);
-    }
   }
-  ctx->PopLimit(old);
   return ptr;
 }
 
@@ -342,39 +325,38 @@ class UnknownFieldParserHelper {
   void AddFixed64(uint32 num, uint64 value) {
     unknown_->AddFixed64(num, value);
   }
-  const char* ParseLengthDelimited(uint32 num, const char* ptr,
-                                   ParseContext* ctx) {
+  ParseClosure AddLengthDelimited(uint32 num, uint32 size) {
     string* s = unknown_->AddLengthDelimited(num);
-    int size = ReadSize(&ptr);
-    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-    return ctx->ReadString(ptr, size, s);
+    // TODO(gerbens) SECURITY: add security
+    s->reserve(size);
+    return {GreedyStringParser, s};
   }
-  const char* ParseGroup(uint32 num, const char* ptr, ParseContext* ctx) {
-    UnknownFieldParserHelper child(unknown_->AddGroup(num));
-    return ctx->ParseGroup(&child, ptr, num * 8 + 3);
+  ParseClosure StartGroup(uint32 num) {
+    return {UnknownGroupParse, unknown_->AddGroup(num)};
   }
+  void EndGroup(uint32 num) {}
   void AddFixed32(uint32 num, uint32 value) {
     unknown_->AddFixed32(num, value);
-  }
-
-  const char* _InternalParse(const char* ptr, ParseContext* ctx) {
-    return WireFormatParser(*this, ptr, ctx);
   }
 
  private:
   UnknownFieldSet* unknown_;
 };
 
-const char* UnknownGroupParse(UnknownFieldSet* unknown, const char* ptr,
+const char* UnknownGroupParse(const char* begin, const char* end, void* object,
                               ParseContext* ctx) {
-  UnknownFieldParserHelper field_parser(unknown);
-  return WireFormatParser(field_parser, ptr, ctx);
+  UnknownFieldParserHelper field_parser(static_cast<UnknownFieldSet*>(object));
+  return WireFormatParser({UnknownGroupParse, object}, field_parser, begin, end,
+                          ctx);
 }
 
-const char* UnknownFieldParse(uint64 tag, UnknownFieldSet* unknown,
-                              const char* ptr, ParseContext* ctx) {
+std::pair<const char*, bool> UnknownFieldParse(uint64 tag, ParseClosure parent,
+                                               const char* begin,
+                                               const char* end,
+                                               UnknownFieldSet* unknown,
+                                               ParseContext* ctx) {
   UnknownFieldParserHelper field_parser(unknown);
-  return FieldParser(tag, field_parser, ptr, ctx);
+  return FieldParser(tag, parent, field_parser, begin, end, ctx);
 }
 
 }  // namespace internal

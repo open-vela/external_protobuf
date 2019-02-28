@@ -44,7 +44,7 @@ build_cpp_tcmalloc() {
       PTHREAD_CFLAGS='-pthread -DGOOGLE_PROTOBUF_HEAP_CHECK_DRACONIAN' \
       check
   cd src
-  PPROF_PATH=/usr/bin/google-pprof HEAPCHECK=strict ./protobuf-test
+  PPROF_PATH=/usr/bin/google-pprof HEAPCHECK=draconian ./protobuf-test
 }
 
 build_cpp_distcheck() {
@@ -482,7 +482,7 @@ build_php5.6_mac() {
   export PATH="$PHP_FOLDER/bin:$PATH"
 
   # Install phpunit
-  curl https://phar.phpunit.de/phpunit-5.6.10.phar -L -o phpunit.phar
+  curl https://phar.phpunit.de/phpunit-5.6.8.phar -L -o phpunit.phar
   chmod +x phpunit.phar
   sudo mv phpunit.phar /usr/local/bin/phpunit
 
