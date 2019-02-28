@@ -607,7 +607,6 @@ php_EXTRA_DIST=                                                       \
   php/ext/google/protobuf/utf8.h                                      \
   php/generate_descriptor_protos.sh                                   \
   php/phpunit.xml                                                     \
-  php/release.sh                                                      \
   php/src/GPBMetadata/Google/Protobuf/Any.php                         \
   php/src/GPBMetadata/Google/Protobuf/Api.php                         \
   php/src/GPBMetadata/Google/Protobuf/Duration.php                    \
@@ -792,6 +791,7 @@ python_EXTRA_DIST=                                                           \
   python/google/protobuf/internal/descriptor_test.py                         \
   python/google/protobuf/internal/encoder.py                                 \
   python/google/protobuf/internal/enum_type_wrapper.py                       \
+  python/google/protobuf/internal/extension_dict.py                          \
   python/google/protobuf/internal/factory_test1.proto                        \
   python/google/protobuf/internal/factory_test2.proto                        \
   python/google/protobuf/internal/file_options_test.proto                    \
@@ -951,6 +951,7 @@ ruby_EXTRA_DIST=                                                             \
   ruby/tests/test_ruby_package.proto                                         \
   ruby/tests/generated_code_test.rb                                          \
   ruby/tests/well_known_types_test.rb                                        \
+  ruby/tests/type_errors.rb                                                  \
   ruby/travis-test.sh
 
 js_EXTRA_DIST=                                                         \
@@ -1088,7 +1089,6 @@ EXTRA_DIST = $(@DIST_LANG@_EXTRA_DIST)   \
   cmake/protoc.cmake                     \
   cmake/tests.cmake                      \
   cmake/version.rc.in                    \
-  compiler_config_setting.bzl            \
   editors/README.txt                     \
   editors/proto.vim                      \
   editors/protobuf-mode.el               \
