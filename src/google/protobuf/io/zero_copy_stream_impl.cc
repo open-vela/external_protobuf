@@ -78,6 +78,7 @@ int close_no_eintr(int fd) {
 
 }  // namespace
 
+
 // ===================================================================
 
 FileInputStream::FileInputStream(int file_descriptor, int block_size)

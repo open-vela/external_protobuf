@@ -59,7 +59,6 @@
 #undef PROTOBUF_FALLTHROUGH_INTENDED
 #undef PROTOBUF_EXPORT
 #undef PROTOC_EXPORT
-#undef PROTOBUF_MUST_USE_RESULT
 
 // Restore macro that may have been #undef'd in port_def.inc.
 #ifdef _MSC_VER

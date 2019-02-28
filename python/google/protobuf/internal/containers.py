@@ -230,8 +230,6 @@ class BaseContainer(object):
       kwargs['cmp'] = kwargs.pop('sort_function')
     self._values.sort(*args, **kwargs)
 
-collections_abc.MutableSequence.register(BaseContainer)
-
 
 class RepeatedScalarFieldContainer(BaseContainer):
 
@@ -343,6 +341,8 @@ class RepeatedScalarFieldContainer(BaseContainer):
     # We are presumably comparing against some other sequence type.
     return other == self._values
 
+collections_abc.MutableSequence.register(BaseContainer)
+
 
 class RepeatedCompositeFieldContainer(BaseContainer):
 
@@ -379,24 +379,6 @@ class RepeatedCompositeFieldContainer(BaseContainer):
     if not self._message_listener.dirty:
       self._message_listener.Modified()
     return new_element
-
-  def append(self, value):
-    """Appends one element by copying the message."""
-    new_element = self._message_descriptor._concrete_class()
-    new_element._SetListener(self._message_listener)
-    new_element.CopyFrom(value)
-    self._values.append(new_element)
-    if not self._message_listener.dirty:
-      self._message_listener.Modified()
-
-  def insert(self, key, value):
-    """Inserts the item at the specified position by copying."""
-    new_element = self._message_descriptor._concrete_class()
-    new_element._SetListener(self._message_listener)
-    new_element.CopyFrom(value)
-    self._values.insert(key, new_element)
-    if not self._message_listener.dirty:
-      self._message_listener.Modified()
 
   def extend(self, elem_seq):
     """Extends by appending the given sequence of elements of the same type

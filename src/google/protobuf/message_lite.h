@@ -41,7 +41,6 @@
 
 #include <climits>
 #include <string>
-
 #include <google/protobuf/stubs/common.h>
 #include <google/protobuf/stubs/logging.h>
 #include <google/protobuf/arena.h>
@@ -72,8 +71,12 @@ class ZeroCopyOutputStream;
 }  // namespace io
 namespace internal {
 
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
 // See parse_context.h for explanation
 class ParseContext;
+typedef const char* (*ParseFunc)(const char* ptr, const char* end, void* object,
+                                 ParseContext* ctx);
+#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
 
 class RepeatedPtrFieldBase;
 class WireFormatLite;
@@ -398,8 +401,9 @@ class PROTOBUF_EXPORT MessageLite {
   virtual int GetCachedSize() const = 0;
 
 #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  virtual const char* _InternalParse(const char* ptr,
-                                     internal::ParseContext* ctx) {
+  virtual internal::ParseFunc _ParseFunc() const {
+    GOOGLE_LOG(FATAL) << "Type " << GetTypeName()
+               << " doesn't implement _InternalParse";
     return nullptr;
   }
 #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
@@ -492,6 +496,7 @@ extern template bool MergePartialFromImpl<false>(BoundedZCIS input,
 extern template bool MergePartialFromImpl<true>(BoundedZCIS input,
                                                 MessageLite* msg);
 
+
 template <typename T>
 struct SourceWrapper;
 
@@ -506,8 +511,8 @@ template <MessageLite::ParseFlags flags, typename T>
 bool MessageLite::ParseFrom(const T& input) {
   if (flags & kParse) Clear();
   constexpr bool alias = flags & kMergeWithAliasing;
-  bool res = internal::MergePartialFromImpl<alias>(input, this);
-  return res && ((flags & kMergePartial) || IsInitializedWithErrors());
+  return internal::MergePartialFromImpl<alias>(input, this) &&
+         ((flags & kMergePartial) || IsInitializedWithErrors());
 }
 
 }  // namespace protobuf

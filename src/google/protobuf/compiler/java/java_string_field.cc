@@ -154,11 +154,11 @@ ImmutableStringFieldGenerator(const FieldDescriptor* descriptor,
 ImmutableStringFieldGenerator::~ImmutableStringFieldGenerator() {}
 
 int ImmutableStringFieldGenerator::GetNumBitsForMessage() const {
-  return SupportFieldPresence(descriptor_->file()) ? 1 : 0;
+  return 1;
 }
 
 int ImmutableStringFieldGenerator::GetNumBitsForBuilder() const {
-  return GetNumBitsForMessage();
+  return 1;
 }
 
 // A note about how strings are handled. This code used to just store a String
