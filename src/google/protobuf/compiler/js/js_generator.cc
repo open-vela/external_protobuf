@@ -134,7 +134,7 @@ enum BytesMode {
   BYTES_U8,       // Explicitly coerce to Uint8Array where needed.
 };
 
-bool IsReserved(const std::string& ident) {
+bool IsReserved(const string& ident) {
   for (int i = 0; i < kNumKeyword; i++) {
     if (ident == kKeyword[i]) {
       return true;
@@ -150,29 +150,27 @@ bool StrEndsWith(StringPiece sp, StringPiece x) {
 // Returns a copy of |filename| with any trailing ".protodevel" or ".proto
 // suffix stripped.
 // TODO(haberman): Unify with copy in compiler/cpp/internal/helpers.cc.
-std::string StripProto(const std::string& filename) {
+string StripProto(const string& filename) {
   const char* suffix =
       StrEndsWith(filename, ".protodevel") ? ".protodevel" : ".proto";
   return StripSuffixString(filename, suffix);
 }
 
-std::string GetSnakeFilename(const std::string& filename) {
-  std::string snake_name = filename;
+string GetSnakeFilename(const string& filename) {
+  string snake_name = filename;
   ReplaceCharacters(&snake_name, "/", '_');
   return snake_name;
 }
 
 // Given a filename like foo/bar/baz.proto, returns the corresponding JavaScript
 // file foo/bar/baz.js.
-std::string GetJSFilename(const GeneratorOptions& options,
-                          const std::string& filename) {
+string GetJSFilename(const GeneratorOptions& options, const string& filename) {
   return StripProto(filename) + options.GetFileNameExtension();
 }
 
 // Given a filename like foo/bar/baz.proto, returns the root directory
 // path ../../
-string GetRootPath(const std::string& from_filename,
-                   const std::string& to_filename) {
+string GetRootPath(const string& from_filename, const string& to_filename) {
   if (to_filename.find("google/protobuf") == 0) {
     // Well-known types (.proto files in the google/protobuf directory) are
     // assumed to come from the 'google-protobuf' npm package.  We may want to
@@ -185,7 +183,7 @@ string GetRootPath(const std::string& from_filename,
   if (slashes == 0) {
     return "./";
   }
-  std::string result = "";
+  string result = "";
   for (size_t i = 0; i < slashes; i++) {
     result += "../";
   }
@@ -194,7 +192,7 @@ string GetRootPath(const std::string& from_filename,
 
 // Returns the alias we assign to the module of the given .proto filename
 // when importing.
-std::string ModuleAlias(const std::string& filename) {
+string ModuleAlias(const string& filename) {
   // This scheme could technically cause problems if a file includes any 2 of:
   //   foo/bar_baz.proto
   //   foo_bar_baz.proto
@@ -202,7 +200,7 @@ std::string ModuleAlias(const std::string& filename) {
   //
   // We'll worry about this problem if/when we actually see it.  This name isn't
   // exposed to users so we can change it later if we need to.
-  std::string basename = StripProto(filename);
+  string basename = StripProto(filename);
   ReplaceCharacters(&basename, "-", '$');
   ReplaceCharacters(&basename, "/", '_');
   ReplaceCharacters(&basename, ".", '_');
@@ -211,8 +209,8 @@ std::string ModuleAlias(const std::string& filename) {
 
 // Returns the fully normalized JavaScript namespace for the given
 // file descriptor's package.
-std::string GetNamespace(const GeneratorOptions& options,
-                         const FileDescriptor* file) {
+string GetNamespace(const GeneratorOptions& options,
+                   const FileDescriptor* file) {
   if (!options.namespace_prefix.empty()) {
     return options.namespace_prefix;
   } else if (!file->package().empty()) {
@@ -226,12 +224,12 @@ std::string GetNamespace(const GeneratorOptions& options,
 // nesting, for example ".OuterMessage.InnerMessage", or returns empty if
 // descriptor is null. This function does not handle namespacing, only message
 // nesting.
-std::string GetNestedMessageName(const Descriptor* descriptor) {
+string GetNestedMessageName(const Descriptor* descriptor) {
   if (descriptor == NULL) {
     return "";
   }
-  std::string result = StripPrefixString(
-      descriptor->full_name(), descriptor->file()->package());
+  string result = StripPrefixString(descriptor->full_name(),
+                                             descriptor->file()->package());
   // Add a leading dot if one is not already present.
   if (!result.empty() && result[0] != '.') {
     result = "." + result;
@@ -241,11 +239,11 @@ std::string GetNestedMessageName(const Descriptor* descriptor) {
 
 // Returns the path prefix for a message or enumeration that
 // lives under the given file and containing type.
-std::string GetPrefix(const GeneratorOptions& options,
-                      const FileDescriptor* file_descriptor,
-                      const Descriptor* containing_type) {
-  std::string prefix = GetNamespace(options, file_descriptor) +
-                       GetNestedMessageName(containing_type);
+string GetPrefix(const GeneratorOptions& options,
+                 const FileDescriptor* file_descriptor,
+                 const Descriptor* containing_type) {
+  string prefix = GetNamespace(options, file_descriptor) +
+                  GetNestedMessageName(containing_type);
   if (!prefix.empty()) {
     prefix += ".";
   }
@@ -254,36 +252,36 @@ std::string GetPrefix(const GeneratorOptions& options,
 
 // Returns the fully normalized JavaScript path prefix for the given
 // message descriptor.
-std::string GetMessagePathPrefix(const GeneratorOptions& options,
-                                 const Descriptor* descriptor) {
+string GetMessagePathPrefix(const GeneratorOptions& options,
+                            const Descriptor* descriptor) {
   return GetPrefix(options, descriptor->file(), descriptor->containing_type());
 }
 
 // Returns the fully normalized JavaScript path for the given
 // message descriptor.
-std::string GetMessagePath(const GeneratorOptions& options,
-                           const Descriptor* descriptor) {
+string GetMessagePath(const GeneratorOptions& options,
+                      const Descriptor* descriptor) {
   return GetMessagePathPrefix(options, descriptor) + descriptor->name();
 }
 
 // Returns the fully normalized JavaScript path prefix for the given
 // enumeration descriptor.
-std::string GetEnumPathPrefix(const GeneratorOptions& options,
-                              const EnumDescriptor* enum_descriptor) {
+string GetEnumPathPrefix(const GeneratorOptions& options,
+                         const EnumDescriptor* enum_descriptor) {
   return GetPrefix(options, enum_descriptor->file(),
                    enum_descriptor->containing_type());
 }
 
 // Returns the fully normalized JavaScript path for the given
 // enumeration descriptor.
-std::string GetEnumPath(const GeneratorOptions& options,
-                        const EnumDescriptor* enum_descriptor) {
+string GetEnumPath(const GeneratorOptions& options,
+                   const EnumDescriptor* enum_descriptor) {
   return GetEnumPathPrefix(options, enum_descriptor) + enum_descriptor->name();
 }
 
-std::string MaybeCrossFileRef(const GeneratorOptions& options,
-                              const FileDescriptor* from_file,
-                              const Descriptor* to_message) {
+string MaybeCrossFileRef(const GeneratorOptions& options,
+                         const FileDescriptor* from_file,
+                         const Descriptor* to_message) {
   if ((options.import_style == GeneratorOptions::kImportCommonJs ||
        options.import_style == GeneratorOptions::kImportCommonJsStrict) &&
       from_file != to_message->file()) {
@@ -298,8 +296,8 @@ std::string MaybeCrossFileRef(const GeneratorOptions& options,
   }
 }
 
-std::string SubmessageTypeRef(const GeneratorOptions& options,
-                              const FieldDescriptor* field) {
+string SubmessageTypeRef(const GeneratorOptions& options,
+                         const FieldDescriptor* field) {
   GOOGLE_CHECK(field->cpp_type() == FieldDescriptor::CPPTYPE_MESSAGE);
   return MaybeCrossFileRef(options, field->file(), field->message_type());
 }
@@ -321,9 +319,9 @@ char ToLowerASCII(char c) {
   }
 }
 
-std::vector<std::string> ParseLowerUnderscore(const std::string& input) {
-  std::vector<std::string> words;
-  std::string running = "";
+std::vector<string> ParseLowerUnderscore(const string& input) {
+  std::vector<string> words;
+  string running = "";
   for (int i = 0; i < input.size(); i++) {
     if (input[i] == '_') {
       if (!running.empty()) {
@@ -340,9 +338,9 @@ std::vector<std::string> ParseLowerUnderscore(const std::string& input) {
   return words;
 }
 
-std::vector<std::string> ParseUpperCamel(const std::string& input) {
-  std::vector<std::string> words;
-  std::string running = "";
+std::vector<string> ParseUpperCamel(const string& input) {
+  std::vector<string> words;
+  string running = "";
   for (int i = 0; i < input.size(); i++) {
     if (input[i] >= 'A' && input[i] <= 'Z' && !running.empty()) {
       words.push_back(running);
@@ -356,10 +354,10 @@ std::vector<std::string> ParseUpperCamel(const std::string& input) {
   return words;
 }
 
-std::string ToLowerCamel(const std::vector<std::string>& words) {
-  std::string result;
+string ToLowerCamel(const std::vector<string>& words) {
+  string result;
   for (int i = 0; i < words.size(); i++) {
-    std::string word = words[i];
+    string word = words[i];
     if (i == 0 && (word[0] >= 'A' && word[0] <= 'Z')) {
       word[0] = (word[0] - 'A') + 'a';
     } else if (i != 0 && (word[0] >= 'a' && word[0] <= 'z')) {
@@ -370,10 +368,10 @@ std::string ToLowerCamel(const std::vector<std::string>& words) {
   return result;
 }
 
-std::string ToUpperCamel(const std::vector<std::string>& words) {
-  std::string result;
+string ToUpperCamel(const std::vector<string>& words) {
+  string result;
   for (int i = 0; i < words.size(); i++) {
-    std::string word = words[i];
+    string word = words[i];
     if (word[0] >= 'a' && word[0] <= 'z') {
       word[0] = (word[0] - 'a') + 'A';
     }
@@ -385,8 +383,8 @@ std::string ToUpperCamel(const std::vector<std::string>& words) {
 // Based on code from descriptor.cc (Thanks Kenton!)
 // Uppercases the entire string, turning ValueName into
 // VALUENAME.
-std::string ToEnumCase(const std::string& input) {
-  std::string result;
+string ToEnumCase(const string& input) {
+  string result;
   result.reserve(input.size());
 
   for (int i = 0; i < input.size(); i++) {
@@ -400,8 +398,8 @@ std::string ToEnumCase(const std::string& input) {
   return result;
 }
 
-std::string ToLower(const std::string& input) {
-  std::string result;
+string ToLower(const string& input) {
+  string result;
   result.reserve(input.size());
 
   for (int i = 0; i < input.size(); i++) {
@@ -424,10 +422,9 @@ std::string ToLower(const std::string& input) {
 // }
 // If "with_filename" equals true, the extension filename will be
 // "proto.a_test_extensions.js", otherwise will be "proto.a.js"
-std::string GetExtensionFileName(const GeneratorOptions& options,
-                                 const FileDescriptor* file,
-                                 bool with_filename) {
-  std::string snake_name = StripProto(GetSnakeFilename(file->name()));
+string GetExtensionFileName(const GeneratorOptions& options,
+                            const FileDescriptor* file, bool with_filename) {
+  string snake_name = StripProto(GetSnakeFilename(file->name()));
   return options.output_dir + "/" + ToLower(GetNamespace(options, file)) +
       (with_filename ? ("_" + snake_name + "_extensions") : "") +
       options.GetFileNameExtension();
@@ -438,17 +435,17 @@ std::string GetExtensionFileName(const GeneratorOptions& options,
 // If the filename length is longer than 200, the filename will be the
 // SCC's proto filename with suffix "_long_sccs_(index)" (if with_package equals
 // true it still has package prefix)
-std::string GetMessagesFileName(const GeneratorOptions& options, const SCC* scc,
-                                bool with_package) {
-  static std::map<const Descriptor*, std::string>* long_name_dict =
-      new std::map<const Descriptor*, std::string>();
-  std::string package_base =
+string GetMessagesFileName(
+    const GeneratorOptions& options, const SCC* scc, bool with_package) {
+  static std::map<const Descriptor*, string>* long_name_dict =
+      new std::map<const Descriptor*, string>();
+  string package_base =
       with_package
-          ? ToLower(GetNamespace(options, scc->GetRepresentative()->file()) +
-                    "_")
-          : "";
-  std::string filename_base = "";
-  std::vector<std::string> all_message_names;
+      ? ToLower(
+          GetNamespace(options, scc->GetRepresentative()->file()) + "_")
+      : "";
+  string filename_base = "";
+  std::vector<string> all_message_names;
   for (auto one_desc : scc->descriptors) {
     if (one_desc->containing_type() == nullptr) {
       all_message_names.push_back(ToLower(one_desc->name()));
@@ -464,7 +461,7 @@ std::string GetMessagesFileName(const GeneratorOptions& options, const SCC* scc,
   if (filename_base.size() + package_base.size() > 200) {
     if ((*long_name_dict).find(scc->GetRepresentative()) ==
         (*long_name_dict).end()) {
-      std::string snake_name = StripProto(
+      string snake_name = StripProto(
           GetSnakeFilename(scc->GetRepresentative()->file()->name()));
       (*long_name_dict)[scc->GetRepresentative()] =
           StrCat(snake_name, "_long_sccs_",
@@ -479,8 +476,9 @@ std::string GetMessagesFileName(const GeneratorOptions& options, const SCC* scc,
 // When we're generating one output file per type name, this is the filename
 // that a top-level enum should go in.
 // If with_package equals true, filename will have package prefix.
-std::string GetEnumFileName(const GeneratorOptions& options,
-                            const EnumDescriptor* desc, bool with_package) {
+string GetEnumFileName(const GeneratorOptions& options,
+                       const EnumDescriptor* desc,
+                       bool with_package) {
   return options.output_dir + "/" +
          (with_package
               ? ToLower(GetNamespace(options, desc->file()) + "_")
@@ -490,8 +488,8 @@ std::string GetEnumFileName(const GeneratorOptions& options,
 }
 
 // Returns the message/response ID, if set.
-std::string GetMessageId(const Descriptor* desc) {
-  return std::string();
+string GetMessageId(const Descriptor* desc) {
+  return string();
 }
 
 bool IgnoreExtensionField(const FieldDescriptor* field) {
@@ -527,10 +525,9 @@ bool IgnoreOneof(const OneofDescriptor* oneof) {
   return true;
 }
 
-std::string JSIdent(const GeneratorOptions& options,
-                    const FieldDescriptor* field, bool is_upper_camel,
-                    bool is_map, bool drop_list) {
-  std::string result;
+string JSIdent(const GeneratorOptions& options, const FieldDescriptor* field,
+               bool is_upper_camel, bool is_map, bool drop_list) {
+  string result;
   if (field->type() == FieldDescriptor::TYPE_GROUP) {
     result = is_upper_camel ?
         ToUpperCamel(ParseUpperCamel(field->message_type()->name())) :
@@ -550,19 +547,19 @@ std::string JSIdent(const GeneratorOptions& options,
   return result;
 }
 
-std::string JSObjectFieldName(const GeneratorOptions& options,
-                              const FieldDescriptor* field) {
-  std::string name = JSIdent(options, field,
-                             /* is_upper_camel = */ false,
-                             /* is_map = */ false,
-                             /* drop_list = */ false);
+string JSObjectFieldName(const GeneratorOptions& options,
+                         const FieldDescriptor* field) {
+  string name = JSIdent(options, field,
+                        /* is_upper_camel = */ false,
+                        /* is_map = */ false,
+                        /* drop_list = */ false);
   if (IsReserved(name)) {
     name = "pb_" + name;
   }
   return name;
 }
 
-std::string JSByteGetterSuffix(BytesMode bytes_mode) {
+string JSByteGetterSuffix(BytesMode bytes_mode) {
   switch (bytes_mode) {
     case BYTES_DEFAULT:
       return "";
@@ -578,15 +575,15 @@ std::string JSByteGetterSuffix(BytesMode bytes_mode) {
 
 // Returns the field name as a capitalized portion of a getter/setter method
 // name, e.g. MyField for .getMyField().
-std::string JSGetterName(const GeneratorOptions& options,
-                         const FieldDescriptor* field,
-                         BytesMode bytes_mode = BYTES_DEFAULT,
-                         bool drop_list = false) {
-  std::string name = JSIdent(options, field,
-                             /* is_upper_camel = */ true,
-                             /* is_map = */ false, drop_list);
+string JSGetterName(const GeneratorOptions& options,
+                    const FieldDescriptor* field,
+                    BytesMode bytes_mode = BYTES_DEFAULT,
+                    bool drop_list = false) {
+  string name = JSIdent(options, field,
+                        /* is_upper_camel = */ true,
+                        /* is_map = */ false, drop_list);
   if (field->type() == FieldDescriptor::TYPE_BYTES) {
-    std::string suffix = JSByteGetterSuffix(bytes_mode);
+    string suffix = JSByteGetterSuffix(bytes_mode);
     if (!suffix.empty()) {
       name += "_as" + suffix;
     }
@@ -599,13 +596,14 @@ std::string JSGetterName(const GeneratorOptions& options,
 }
 
 
-std::string JSOneofName(const OneofDescriptor* oneof) {
+
+string JSOneofName(const OneofDescriptor* oneof) {
   return ToUpperCamel(ParseLowerUnderscore(oneof->name()));
 }
 
 // Returns the index corresponding to this field in the JSPB array (underlying
 // data storage array).
-std::string JSFieldIndex(const FieldDescriptor* field) {
+string JSFieldIndex(const FieldDescriptor* field) {
   // Determine whether this field is a member of a group. Group fields are a bit
   // wonky: their "containing type" is a message type created just for the
   // group, and that type's parent type has a field with the group-message type
@@ -625,7 +623,7 @@ std::string JSFieldIndex(const FieldDescriptor* field) {
   return StrCat(field->number());
 }
 
-std::string JSOneofIndex(const OneofDescriptor* oneof) {
+string JSOneofIndex(const OneofDescriptor* oneof) {
   int index = -1;
   for (int i = 0; i < oneof->containing_type()->oneof_decl_count(); i++) {
     const OneofDescriptor* o = oneof->containing_type()->oneof_decl(i);
@@ -685,7 +683,7 @@ uint16 DecodeUTF8Codepoint(uint8* bytes, size_t* length) {
 // Returns false if |out| was truncated because |in| contained invalid UTF-8 or
 // codepoints outside the BMP.
 // TODO(b/115551870): Support codepoints outside the BMP.
-bool EscapeJSString(const std::string& in, std::string* out) {
+bool EscapeJSString(const string& in, string* out) {
   size_t decoded = 0;
   for (size_t i = 0; i < in.size(); i += decoded) {
     uint16 codepoint = 0;
@@ -733,10 +731,10 @@ bool EscapeJSString(const std::string& in, std::string* out) {
   return true;
 }
 
-std::string EscapeBase64(const std::string& in) {
+string EscapeBase64(const string& in) {
   static const char* kAlphabet =
       "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-  std::string result;
+  string result;
 
   for (size_t i = 0; i < in.size(); i += 3) {
     int value = (in[i] << 16) |
@@ -762,7 +760,7 @@ std::string EscapeBase64(const std::string& in) {
 // Post-process the result of SimpleFtoa/SimpleDtoa to *exactly* match the
 // original codegen's formatting (which is just .toString() on java.lang.Double
 // or java.lang.Float).
-std::string PostProcessFloat(std::string result) {
+string PostProcessFloat(string result) {
   // If inf, -inf or nan, replace with +Infinity, -Infinity or NaN.
   if (result == "inf") {
     return "Infinity";
@@ -776,13 +774,13 @@ std::string PostProcessFloat(std::string result) {
   // ensure that the mantissa (portion prior to the "e") has at least one
   // fractional digit (after the decimal point), and (iii) strip any unnecessary
   // leading zeroes and/or '+' signs from the exponent.
-  std::string::size_type exp_pos = result.find('e');
-  if (exp_pos != std::string::npos) {
-    std::string mantissa = result.substr(0, exp_pos);
-    std::string exponent = result.substr(exp_pos + 1);
+  string::size_type exp_pos = result.find('e');
+  if (exp_pos != string::npos) {
+    string mantissa = result.substr(0, exp_pos);
+    string exponent = result.substr(exp_pos + 1);
 
     // Add ".0" to mantissa if no fractional part exists.
-    if (mantissa.find('.') == std::string::npos) {
+    if (mantissa.find('.') == string::npos) {
       mantissa += ".0";
     }
 
@@ -805,20 +803,20 @@ std::string PostProcessFloat(std::string result) {
 
   // Otherwise, this is an ordinary decimal number. Append ".0" if result has no
   // decimal/fractional part in order to match output of original codegen.
-  if (result.find('.') == std::string::npos) {
+  if (result.find('.') == string::npos) {
     result += ".0";
   }
 
   return result;
 }
 
-std::string FloatToString(float value) {
-  std::string result = SimpleFtoa(value);
+string FloatToString(float value) {
+  string result = SimpleFtoa(value);
   return PostProcessFloat(result);
 }
 
-std::string DoubleToString(double value) {
-  std::string result = SimpleDtoa(value);
+string DoubleToString(double value) {
+  string result = SimpleDtoa(value);
   return PostProcessFloat(result);
 }
 
@@ -836,12 +834,11 @@ bool IsIntegralFieldWithStringJSType(const FieldDescriptor* field) {
   }
 }
 
-std::string MaybeNumberString(const FieldDescriptor* field,
-                              const std::string& orig) {
+string MaybeNumberString(const FieldDescriptor* field, const string& orig) {
   return IsIntegralFieldWithStringJSType(field) ? ("\"" + orig + "\"") : orig;
 }
 
-std::string JSFieldDefault(const FieldDescriptor* field) {
+string JSFieldDefault(const FieldDescriptor* field) {
   if (field->is_repeated()) {
     return "[]";
   }
@@ -875,7 +872,7 @@ std::string JSFieldDefault(const FieldDescriptor* field) {
       return DoubleToString(field->default_value_double());
     case FieldDescriptor::CPPTYPE_STRING:
       if (field->type() == FieldDescriptor::TYPE_STRING) {
-        std::string out;
+        string out;
         bool is_valid = EscapeJSString(field->default_value_string(), &out);
         if (!is_valid) {
           // TODO(b/115551870): Decide whether this should be a hard error.
@@ -894,8 +891,8 @@ std::string JSFieldDefault(const FieldDescriptor* field) {
   return "";
 }
 
-std::string ProtoTypeName(const GeneratorOptions& options,
-                          const FieldDescriptor* field) {
+string ProtoTypeName(const GeneratorOptions& options,
+                     const FieldDescriptor* field) {
   switch (field->type()) {
     case FieldDescriptor::TYPE_BOOL:
       return "bool";
@@ -938,13 +935,13 @@ std::string ProtoTypeName(const GeneratorOptions& options,
   }
 }
 
-std::string JSIntegerTypeName(const FieldDescriptor* field) {
+string JSIntegerTypeName(const FieldDescriptor* field) {
   return IsIntegralFieldWithStringJSType(field) ? "string" : "number";
 }
 
-std::string JSStringTypeName(const GeneratorOptions& options,
-                             const FieldDescriptor* field,
-                             BytesMode bytes_mode) {
+string JSStringTypeName(const GeneratorOptions& options,
+                        const FieldDescriptor* field,
+                        BytesMode bytes_mode) {
   if (field->type() == FieldDescriptor::TYPE_BYTES) {
     switch (bytes_mode) {
       case BYTES_DEFAULT:
@@ -960,8 +957,9 @@ std::string JSStringTypeName(const GeneratorOptions& options,
   return "string";
 }
 
-std::string JSTypeName(const GeneratorOptions& options,
-                       const FieldDescriptor* field, BytesMode bytes_mode) {
+string JSTypeName(const GeneratorOptions& options,
+                  const FieldDescriptor* field,
+                  BytesMode bytes_mode) {
   switch (field->cpp_type()) {
     case FieldDescriptor::CPPTYPE_BOOL:
       return "boolean";
@@ -995,8 +993,8 @@ bool UseBrokenPresenceSemantics(const GeneratorOptions& options,
 }
 
 // Returns true for fields that return "null" from accessors when they are
-// unset. This should normally only be true for non-repeated submessages, but we
-// have legacy users who relied on old behavior where accessors behaved this
+// unset.  This should normally only be true for non-repeated submessages, but
+// we have legacy users who relied on old behavior where accessors behaved this
 // way.
 bool ReturnsNullWhenUnset(const GeneratorOptions& options,
                           const FieldDescriptor* field) {
@@ -1055,18 +1053,19 @@ bool SetterAcceptsNull(const GeneratorOptions& options,
 
 // Returns types which are known to by non-nullable by default.
 // The style guide requires that we omit "!" in this case.
-bool IsPrimitive(const std::string& type) {
+bool IsPrimitive(const string& type) {
   return type == "undefined" || type == "string" || type == "number" ||
          type == "boolean";
 }
 
-std::string JSFieldTypeAnnotation(const GeneratorOptions& options,
-                                  const FieldDescriptor* field,
-                                  bool is_setter_argument, bool force_present,
-                                  bool singular_if_not_packed,
-                                  BytesMode bytes_mode = BYTES_DEFAULT,
-                                  bool force_singular = false) {
-  std::string jstype = JSTypeName(options, field, bytes_mode);
+string JSFieldTypeAnnotation(const GeneratorOptions& options,
+                             const FieldDescriptor* field,
+                             bool is_setter_argument,
+                             bool force_present,
+                             bool singular_if_not_packed,
+                             BytesMode bytes_mode = BYTES_DEFAULT,
+                             bool force_singular = false) {
+  string jstype = JSTypeName(options, field, bytes_mode);
 
   if (!force_singular && field->is_repeated() &&
       (field->is_packed() || !singular_if_not_packed)) {
@@ -1109,17 +1108,17 @@ std::string JSFieldTypeAnnotation(const GeneratorOptions& options,
   return jstype;
 }
 
-std::string JSBinaryReaderMethodType(const FieldDescriptor* field) {
-  std::string name = field->type_name();
+string JSBinaryReaderMethodType(const FieldDescriptor* field) {
+  string name = field->type_name();
   if (name[0] >= 'a' && name[0] <= 'z') {
     name[0] = (name[0] - 'a') + 'A';
   }
   return IsIntegralFieldWithStringJSType(field) ? (name + "String") : name;
 }
 
-std::string JSBinaryReadWriteMethodName(const FieldDescriptor* field,
-                                        bool is_writer) {
-  std::string name = JSBinaryReaderMethodType(field);
+string JSBinaryReadWriteMethodName(const FieldDescriptor* field,
+                                   bool is_writer) {
+  string name = JSBinaryReaderMethodType(field);
   if (field->is_packed()) {
     name = "Packed" + name;
   } else if (is_writer && field->is_repeated()) {
@@ -1128,27 +1127,23 @@ std::string JSBinaryReadWriteMethodName(const FieldDescriptor* field,
   return name;
 }
 
-std::string JSBinaryReaderMethodName(const GeneratorOptions& options,
-                                     const FieldDescriptor* field) {
+string JSBinaryReaderMethodName(const GeneratorOptions& options,
+                                const FieldDescriptor* field) {
   return "jspb.BinaryReader.prototype.read" +
          JSBinaryReadWriteMethodName(field, /* is_writer = */ false);
 }
 
-std::string JSBinaryWriterMethodName(const GeneratorOptions& options,
-                                     const FieldDescriptor* field) {
-  if (field->containing_type() &&
-      field->containing_type()->options().message_set_wire_format()) {
-    return "jspb.BinaryWriter.prototype.writeMessageSet";
-  }
+string JSBinaryWriterMethodName(const GeneratorOptions& options,
+                                const FieldDescriptor* field) {
   return "jspb.BinaryWriter.prototype.write" +
          JSBinaryReadWriteMethodName(field, /* is_writer = */ true);
 }
 
-std::string JSReturnClause(const FieldDescriptor* desc) {
+string JSReturnClause(const FieldDescriptor* desc) {
   return "";
 }
 
-std::string JSTypeTag(const FieldDescriptor* desc) {
+string JSTypeTag(const FieldDescriptor* desc) {
   switch (desc->type()) {
     case FieldDescriptor::TYPE_DOUBLE:
     case FieldDescriptor::TYPE_FLOAT:
@@ -1182,8 +1177,8 @@ std::string JSTypeTag(const FieldDescriptor* desc) {
   return "";
 }
 
-std::string JSReturnDoc(const GeneratorOptions& options,
-                        const FieldDescriptor* desc) {
+string JSReturnDoc(const GeneratorOptions& options,
+                   const FieldDescriptor* desc) {
   return "";
 }
 
@@ -1199,8 +1194,8 @@ bool HasRepeatedFields(const GeneratorOptions& options,
 
 static const char* kRepeatedFieldArrayName = ".repeatedFields_";
 
-std::string RepeatedFieldsArrayName(const GeneratorOptions& options,
-                                    const Descriptor* desc) {
+string RepeatedFieldsArrayName(const GeneratorOptions& options,
+                               const Descriptor* desc) {
   return HasRepeatedFields(options, desc)
              ? (GetMessagePath(options, desc) + kRepeatedFieldArrayName)
              : "null";
@@ -1217,16 +1212,16 @@ bool HasOneofFields(const Descriptor* desc) {
 
 static const char* kOneofGroupArrayName = ".oneofGroups_";
 
-std::string OneofFieldsArrayName(const GeneratorOptions& options,
-                                 const Descriptor* desc) {
+string OneofFieldsArrayName(const GeneratorOptions& options,
+                            const Descriptor* desc) {
   return HasOneofFields(desc)
              ? (GetMessagePath(options, desc) + kOneofGroupArrayName)
              : "null";
 }
 
-std::string RepeatedFieldNumberList(const GeneratorOptions& options,
-                                    const Descriptor* desc) {
-  std::vector<std::string> numbers;
+string RepeatedFieldNumberList(const GeneratorOptions& options,
+                               const Descriptor* desc) {
+  std::vector<string> numbers;
   for (int i = 0; i < desc->field_count(); i++) {
     if (desc->field(i)->is_repeated() && !desc->field(i)->is_map()) {
       numbers.push_back(JSFieldIndex(desc->field(i)));
@@ -1235,16 +1230,16 @@ std::string RepeatedFieldNumberList(const GeneratorOptions& options,
   return "[" + Join(numbers, ",") + "]";
 }
 
-std::string OneofGroupList(const Descriptor* desc) {
+string OneofGroupList(const Descriptor* desc) {
   // List of arrays (one per oneof), each of which is a list of field indices
-  std::vector<std::string> oneof_entries;
+  std::vector<string> oneof_entries;
   for (int i = 0; i < desc->oneof_decl_count(); i++) {
     const OneofDescriptor* oneof = desc->oneof_decl(i);
     if (IgnoreOneof(oneof)) {
       continue;
     }
 
-    std::vector<std::string> oneof_fields;
+    std::vector<string> oneof_fields;
     for (int j = 0; j < oneof->field_count(); j++) {
       if (IgnoreField(oneof->field(j))) {
         continue;
@@ -1256,22 +1251,21 @@ std::string OneofGroupList(const Descriptor* desc) {
   return "[" + Join(oneof_entries, ",") + "]";
 }
 
-std::string JSOneofArray(const GeneratorOptions& options,
-                         const FieldDescriptor* field) {
+string JSOneofArray(const GeneratorOptions& options,
+                    const FieldDescriptor* field) {
   return OneofFieldsArrayName(options, field->containing_type()) + "[" +
       JSOneofIndex(field->containing_oneof()) + "]";
 }
 
-std::string RelativeTypeName(const FieldDescriptor* field) {
+string RelativeTypeName(const FieldDescriptor* field) {
   assert(field->cpp_type() == FieldDescriptor::CPPTYPE_ENUM ||
          field->cpp_type() == FieldDescriptor::CPPTYPE_MESSAGE);
   // For a field with an enum or message type, compute a name relative to the
   // path name of the message type containing this field.
-  std::string package = field->file()->package();
-  std::string containing_type = field->containing_type()->full_name() + ".";
-  std::string type = (field->cpp_type() == FieldDescriptor::CPPTYPE_ENUM)
-                         ? field->enum_type()->full_name()
-                         : field->message_type()->full_name();
+  string package = field->file()->package();
+  string containing_type = field->containing_type()->full_name() + ".";
+  string type = (field->cpp_type() == FieldDescriptor::CPPTYPE_ENUM) ?
+      field->enum_type()->full_name() : field->message_type()->full_name();
 
   // |prefix| is advanced as we find separators '.' past the common package
   // prefix that yield common prefixes in the containing type's name and this
@@ -1289,9 +1283,9 @@ std::string RelativeTypeName(const FieldDescriptor* field) {
   return type.substr(prefix);
 }
 
-std::string JSExtensionsObjectName(const GeneratorOptions& options,
-                                   const FileDescriptor* from_file,
-                                   const Descriptor* desc) {
+string JSExtensionsObjectName(const GeneratorOptions& options,
+                              const FileDescriptor* from_file,
+                              const Descriptor* desc) {
   if (desc->full_name() == "google.protobuf.bridge.MessageSet") {
     // TODO(haberman): fix this for the kImportCommonJs case.
     return "jspb.Message.messageSetExtensions";
@@ -1313,13 +1307,13 @@ const FieldDescriptor* MapFieldValue(const FieldDescriptor* field) {
   return field->message_type()->FindFieldByNumber(kMapValueField);
 }
 
-std::string FieldDefinition(const GeneratorOptions& options,
-                            const FieldDescriptor* field) {
+string FieldDefinition(const GeneratorOptions& options,
+                       const FieldDescriptor* field) {
   if (field->is_map()) {
     const FieldDescriptor* key_field = MapFieldKey(field);
     const FieldDescriptor* value_field = MapFieldValue(field);
-    std::string key_type = ProtoTypeName(options, key_field);
-    std::string value_type;
+    string key_type = ProtoTypeName(options, key_field);
+    string value_type;
     if (value_field->type() == FieldDescriptor::TYPE_ENUM ||
         value_field->type() == FieldDescriptor::TYPE_MESSAGE) {
       value_type = RelativeTypeName(value_field);
@@ -1332,10 +1326,9 @@ std::string FieldDefinition(const GeneratorOptions& options,
                         field->name().c_str(),
                         field->number());
   } else {
-    std::string qualifier =
-        field->is_repeated() ? "repeated"
-                             : (field->is_optional() ? "optional" : "required");
-    std::string type, name;
+    string qualifier = field->is_repeated() ? "repeated" :
+        (field->is_optional() ? "optional" : "required");
+    string type, name;
     if (field->type() == FieldDescriptor::TYPE_ENUM ||
         field->type() == FieldDescriptor::TYPE_MESSAGE) {
       type = RelativeTypeName(field);
@@ -1355,8 +1348,15 @@ std::string FieldDefinition(const GeneratorOptions& options,
   }
 }
 
-std::string FieldComments(const FieldDescriptor* field, BytesMode bytes_mode) {
-  std::string comments;
+string FieldComments(const FieldDescriptor* field, BytesMode bytes_mode) {
+  string comments;
+  if (field->cpp_type() == FieldDescriptor::CPPTYPE_BOOL) {
+    comments +=
+        " * Note that Boolean fields may be set to 0/1 when serialized from "
+        "a Java server.\n"
+        " * You should avoid comparisons like {@code val === true/false} in "
+        "those cases.\n";
+  }
   if (field->type() == FieldDescriptor::TYPE_BYTES && bytes_mode == BYTES_U8) {
     comments +=
         " * Note that Uint8Array is not supported on all browsers.\n"
@@ -1428,7 +1428,7 @@ bool IsExtendable(const Descriptor* desc) {
 
 // Returns the max index in the underlying data storage array beyond which the
 // extension object is used.
-std::string GetPivot(const Descriptor* desc) {
+string GetPivot(const Descriptor* desc) {
   static const int kDefaultPivot = 500;
 
   // Find the max field number
@@ -1487,8 +1487,9 @@ class FileDeduplicator {
   //               contains extra information)
   //   desc: The Descriptor or SCC pointer or EnumDescriptor.
   //   error: The returned error information.
-  bool AddFile(const std::pair<std::string, std::string> filenames,
-               const void* desc, std::string* error) {
+  bool AddFile(
+      const std::pair<string, string> filenames,
+      const void* desc, string* error) {
     if (descs_by_shortname_.find(filenames.first) !=
         descs_by_shortname_.end()) {
       if (error_on_conflict_) {
@@ -1508,18 +1509,18 @@ class FileDeduplicator {
     return true;
   }
 
-  void GetAllowedMap(std::map<const void*, std::string>* allowed_set) {
+  void GetAllowedMap(std::map<const void*, string>* allowed_set) {
     *allowed_set = allowed_descs_actual_name_;
   }
 
  private:
   bool error_on_conflict_;
   // The map that restores all the descs that are using short name as filename.
-  std::map<std::string, const void*> descs_by_shortname_;
+  std::map<string, const void*> descs_by_shortname_;
   // The final actual filename map.
-  std::map<const void*, std::string> allowed_descs_actual_name_;
+  std::map<const void*, string> allowed_descs_actual_name_;
   // The full name map.
-  std::map<const void*, std::string> allowed_descs_full_name_;
+  std::map<const void*, string> allowed_descs_full_name_;
 };
 
 void DepthFirstSearch(const FileDescriptor* file,
@@ -1606,9 +1607,9 @@ struct DepsGenerator {
 
 bool GenerateJspbAllowedMap(const GeneratorOptions& options,
                             const std::vector<const FileDescriptor*>& files,
-                            std::map<const void*, std::string>* allowed_set,
+                            std::map<const void*, string>* allowed_set,
                             SCCAnalyzer<DepsGenerator>* analyzer,
-                            std::string* error) {
+                            string* error) {
   std::vector<const FileDescriptor*> files_ordered;
   GenerateJspbFileOrder(files, &files_ordered);
 
@@ -1669,9 +1670,9 @@ bool GenerateJspbAllowedMap(const GeneratorOptions& options,
 void EmbedCodeAnnotations(const GeneratedCodeInfo& annotations,
                           io::Printer* printer) {
   // Serialize annotations proto into base64 string.
-  std::string meta_content;
+  string meta_content;
   annotations.SerializeToString(&meta_content);
-  std::string meta_64;
+  string meta_64;
   Base64Escape(meta_content, &meta_64);
 
   // Print base64 encoded annotations at the end of output file in
@@ -1704,7 +1705,7 @@ void Generator::GenerateHeader(const GeneratorOptions& options,
 void Generator::FindProvidesForFile(const GeneratorOptions& options,
                                     io::Printer* printer,
                                     const FileDescriptor* file,
-                                    std::set<std::string>* provided) const {
+                                    std::set<string>* provided) const {
   for (int i = 0; i < file->message_type_count(); i++) {
     FindProvidesForMessage(options, printer, file->message_type(i), provided);
   }
@@ -1716,7 +1717,7 @@ void Generator::FindProvidesForFile(const GeneratorOptions& options,
 void Generator::FindProvides(const GeneratorOptions& options,
                              io::Printer* printer,
                              const std::vector<const FileDescriptor*>& files,
-                             std::set<std::string>* provided) const {
+                             std::set<string>* provided) const {
   for (int i = 0; i < files.size(); i++) {
     FindProvidesForFile(options, printer, files[i], provided);
   }
@@ -1724,15 +1725,16 @@ void Generator::FindProvides(const GeneratorOptions& options,
   printer->Print("\n");
 }
 
-void Generator::FindProvidesForMessage(const GeneratorOptions& options,
-                                       io::Printer* printer,
-                                       const Descriptor* desc,
-                                       std::set<std::string>* provided) const {
+void Generator::FindProvidesForMessage(
+    const GeneratorOptions& options,
+    io::Printer* printer,
+    const Descriptor* desc,
+    std::set<string>* provided) const {
   if (IgnoreMessage(desc)) {
     return;
   }
 
-  std::string name = GetMessagePath(options, desc);
+  string name = GetMessagePath(options, desc);
   provided->insert(name);
 
   for (int i = 0; i < desc->enum_type_count(); i++) {
@@ -1748,15 +1750,16 @@ void Generator::FindProvidesForMessage(const GeneratorOptions& options,
 void Generator::FindProvidesForEnum(const GeneratorOptions& options,
                                     io::Printer* printer,
                                     const EnumDescriptor* enumdesc,
-                                    std::set<std::string>* provided) const {
-  std::string name = GetEnumPath(options, enumdesc);
+                                    std::set<string>* provided) const {
+  string name = GetEnumPath(options, enumdesc);
   provided->insert(name);
 }
 
 void Generator::FindProvidesForFields(
-    const GeneratorOptions& options, io::Printer* printer,
+    const GeneratorOptions& options,
+    io::Printer* printer,
     const std::vector<const FieldDescriptor*>& fields,
-    std::set<std::string>* provided) const {
+    std::set<string>* provided) const {
   for (int i = 0; i < fields.size(); i++) {
     const FieldDescriptor* field = fields[i];
 
@@ -1764,16 +1767,16 @@ void Generator::FindProvidesForFields(
       continue;
     }
 
-    std::string name = GetNamespace(options, field->file()) + "." +
-                       JSObjectFieldName(options, field);
+    string name = GetNamespace(options, field->file()) + "." +
+                  JSObjectFieldName(options, field);
     provided->insert(name);
   }
 }
 
 void Generator::GenerateProvides(const GeneratorOptions& options,
                                  io::Printer* printer,
-                                 std::set<std::string>* provided) const {
-  for (std::set<std::string>::iterator it = provided->begin();
+                                 std::set<string>* provided) const {
+  for (std::set<string>::iterator it = provided->begin();
        it != provided->end(); ++it) {
     if (options.import_style == GeneratorOptions::kImportClosure) {
       printer->Print("goog.provide('$name$');\n", "name", *it);
@@ -1788,7 +1791,7 @@ void Generator::GenerateProvides(const GeneratorOptions& options,
 
       // Do not use global scope in strict mode
       if (options.import_style == GeneratorOptions::kImportCommonJsStrict) {
-        std::string namespaceObject = *it;
+        string namespaceObject = *it;
         // Remove "proto." from the namespace object
         GOOGLE_CHECK_EQ(0, namespaceObject.compare(0, 6, "proto."));
         namespaceObject.erase(0, 6);
@@ -1804,9 +1807,9 @@ void Generator::GenerateProvides(const GeneratorOptions& options,
 
 void Generator::GenerateRequiresForSCC(const GeneratorOptions& options,
                                        io::Printer* printer, const SCC* scc,
-                                       std::set<std::string>* provided) const {
-  std::set<std::string> required;
-  std::set<std::string> forwards;
+                                       std::set<string>* provided) const {
+  std::set<string> required;
+  std::set<string> forwards;
   bool have_message = false;
   bool has_extension = false;
   bool has_map = false;
@@ -1828,11 +1831,11 @@ void Generator::GenerateRequiresForSCC(const GeneratorOptions& options,
 void Generator::GenerateRequiresForLibrary(
     const GeneratorOptions& options, io::Printer* printer,
     const std::vector<const FileDescriptor*>& files,
-    std::set<std::string>* provided) const {
+    std::set<string>* provided) const {
   GOOGLE_CHECK_EQ(options.import_style, GeneratorOptions::kImportClosure);
   // For Closure imports we need to import every message type individually.
-  std::set<std::string> required;
-  std::set<std::string> forwards;
+  std::set<string> required;
+  std::set<string> forwards;
   bool have_extensions = false;
   bool have_map = false;
   bool have_message = false;
@@ -1877,9 +1880,9 @@ void Generator::GenerateRequiresForLibrary(
 void Generator::GenerateRequiresForExtensions(
     const GeneratorOptions& options, io::Printer* printer,
     const std::vector<const FieldDescriptor*>& fields,
-    std::set<std::string>* provided) const {
-  std::set<std::string> required;
-  std::set<std::string> forwards;
+    std::set<string>* provided) const {
+  std::set<string> required;
+  std::set<string> forwards;
   for (int i = 0; i < fields.size(); i++) {
     const FieldDescriptor* field = fields[i];
     if (IgnoreField(field)) {
@@ -1896,9 +1899,9 @@ void Generator::GenerateRequiresForExtensions(
 
 void Generator::GenerateRequiresImpl(const GeneratorOptions& options,
                                      io::Printer* printer,
-                                     std::set<std::string>* required,
-                                     std::set<std::string>* forwards,
-                                     std::set<std::string>* provided,
+                                     std::set<string>* required,
+                                     std::set<string>* forwards,
+                                     std::set<string>* provided,
                                      bool require_jspb, bool require_extension,
                                      bool require_map) const {
   if (require_jspb) {
@@ -1914,7 +1917,7 @@ void Generator::GenerateRequiresImpl(const GeneratorOptions& options,
     required->insert("jspb.Map");
   }
 
-  std::set<std::string>::iterator it;
+  std::set<string>::iterator it;
   for (it = required->begin(); it != required->end(); ++it) {
     if (provided->find(*it) != provided->end()) {
       continue;
@@ -1938,11 +1941,13 @@ bool NamespaceOnly(const Descriptor* desc) {
   return false;
 }
 
-void Generator::FindRequiresForMessage(const GeneratorOptions& options,
-                                       const Descriptor* desc,
-                                       std::set<std::string>* required,
-                                       std::set<std::string>* forwards,
-                                       bool* have_message) const {
+void Generator::FindRequiresForMessage(
+    const GeneratorOptions& options,
+    const Descriptor* desc,
+    std::set<string>* required,
+    std::set<string>* forwards,
+    bool* have_message) const {
+
 
   if (!NamespaceOnly(desc)) {
     *have_message = true;
@@ -1971,8 +1976,8 @@ void Generator::FindRequiresForMessage(const GeneratorOptions& options,
 
 void Generator::FindRequiresForField(const GeneratorOptions& options,
                                      const FieldDescriptor* field,
-                                     std::set<std::string>* required,
-                                     std::set<std::string>* forwards) const {
+                                     std::set<string>* required,
+                                     std::set<string>* forwards) const {
   if (field->cpp_type() == FieldDescriptor::CPPTYPE_ENUM &&
       // N.B.: file-level extensions with enum type do *not* create
       // dependencies, as per original codegen.
@@ -1989,13 +1994,14 @@ void Generator::FindRequiresForField(const GeneratorOptions& options,
   }
 }
 
-void Generator::FindRequiresForExtension(
-    const GeneratorOptions& options, const FieldDescriptor* field,
-    std::set<std::string>* required, std::set<std::string>* forwards) const {
-  if (field->containing_type()->full_name() != "google.protobuf.bridge.MessageSet") {
-    required->insert(GetMessagePath(options, field->containing_type()));
-  }
-  FindRequiresForField(options, field, required, forwards);
+void Generator::FindRequiresForExtension(const GeneratorOptions& options,
+                                         const FieldDescriptor* field,
+                                         std::set<string>* required,
+                                         std::set<string>* forwards) const {
+    if (field->containing_type()->full_name() != "google.protobuf.bridge.MessageSet") {
+      required->insert(GetMessagePath(options, field->containing_type()));
+    }
+    FindRequiresForField(options, field, required, forwards);
 }
 
 void Generator::GenerateTestOnly(const GeneratorOptions& options,
@@ -2086,7 +2092,7 @@ void Generator::GenerateClassConstructor(const GeneratorOptions& options,
       "classprefix", GetMessagePathPrefix(options, desc),
       "classname", desc->name());
   printer->Annotate("classname", desc);
-  std::string message_id = GetMessageId(desc);
+  string message_id = GetMessageId(desc);
   printer->Print(
       "  jspb.Message.initialize(this, opt_data, $messageId$, $pivot$, "
       "$rptfields$, $oneoffields$);\n",
@@ -2237,17 +2243,17 @@ void Generator::GenerateClassToObject(const GeneratorOptions& options,
       "\n"
       "if (jspb.Message.GENERATE_TO_OBJECT) {\n"
       "/**\n"
-      " * Creates an object representation of this proto.\n"
+      " * Creates an object representation of this proto suitable for use in "
+      "Soy templates.\n"
       " * Field names that are reserved in JavaScript and will be renamed to "
       "pb_name.\n"
-      " * Optional fields that are not set will be set to undefined.\n"
       " * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.\n"
       " * For the list of reserved names please see:\n"
-      " *     net/proto2/compiler/js/internal/generator.cc#kKeyword.\n"
-      " * @param {boolean=} opt_includeInstance Deprecated. whether to include "
-      "the\n"
-      " *     JSPB instance for transitional soy proto support:\n"
-      " *     http://goto/soy-param-migration\n"
+      " *     com.google.apps.jspb.JsClassTemplate.JS_RESERVED_WORDS.\n"
+      " * @param {boolean=} opt_includeInstance Whether to include the JSPB "
+      "instance\n"
+      " *     for transitional soy proto support: http://goto/soy-param-"
+      "migration\n"
       " * @return {!Object}\n"
       " */\n"
       "$classname$.prototype.toObject = function(opt_includeInstance) {\n"
@@ -2257,16 +2263,16 @@ void Generator::GenerateClassToObject(const GeneratorOptions& options,
       "\n"
       "/**\n"
       " * Static version of the {@see toObject} method.\n"
-      " * @param {boolean|undefined} includeInstance Deprecated. Whether to "
-      "include\n"
-      " *     the JSPB instance for transitional soy proto support:\n"
+      " * @param {boolean|undefined} includeInstance Whether to include the "
+      "JSPB\n"
+      " *     instance for transitional soy proto support:\n"
       " *     http://goto/soy-param-migration\n"
       " * @param {!$classname$} msg The msg instance to transform.\n"
       " * @return {!Object}\n"
       " * @suppress {unusedLocalVariables} f is only used for nested messages\n"
       " */\n"
       "$classname$.toObject = function(includeInstance, msg) {\n"
-      "  var f, obj = {",
+      "  var obj = {",
       "classname", GetMessagePath(options, desc));
 
   bool first = true;
@@ -2318,51 +2324,45 @@ void Generator::GenerateFieldValueExpression(io::Printer* printer,
                                              const char *obj_reference,
                                              const FieldDescriptor* field,
                                              bool use_default) const {
-  const bool is_float_or_double =
+  bool is_float_or_double =
       field->cpp_type() == FieldDescriptor::CPPTYPE_FLOAT ||
       field->cpp_type() == FieldDescriptor::CPPTYPE_DOUBLE;
-  const bool is_boolean = field->cpp_type() == FieldDescriptor::CPPTYPE_BOOL;
+  if (use_default) {
+    if (is_float_or_double) {
+      // Coerce "Nan" and "Infinity" to actual float values.
+      //
+      // This will change null to 0, but that doesn't matter since we're getting
+      // with a default.
+      printer->Print("+");
+    }
 
-  const string with_default = use_default ? "WithDefault" : "";
-  const string default_arg =
-      use_default ? StrCat(", ", JSFieldDefault(field)) : "";
-  const string cardinality = field->is_repeated() ? "Repeated" : "";
-  string type = "";
-  if (is_float_or_double) {
-    type = "FloatingPoint";
-  }
-  if (is_boolean) {
-    type = "Boolean";
-  }
-
-  // Prints the appropriate function, among:
-  // - getField
-  // - getBooleanField
-  // - getFloatingPointField => Replaced by getOptionalFloatingPointField to
-  //   preserve backward compatibility.
-  // - getFieldWithDefault
-  // - getBooleanFieldWithDefault
-  // - getFloatingPointFieldWithDefault
-  // - getRepeatedField
-  // - getRepeatedBooleanField
-  // - getRepeatedFloatingPointField
-  if (is_float_or_double && !field->is_repeated() && !use_default) {
     printer->Print(
-      "jspb.Message.getOptionalFloatingPointField($obj$, "
-      "$index$$default$)",
-      "obj", obj_reference,
-      "index", JSFieldIndex(field),
-      "default", default_arg);
+        "jspb.Message.getFieldWithDefault($obj$, $index$, $default$)",
+        "obj", obj_reference,
+        "index", JSFieldIndex(field),
+        "default", JSFieldDefault(field));
   } else {
-    printer->Print(
-      "jspb.Message.get$cardinality$$type$Field$with_default$($obj$, "
-      "$index$$default$)",
-      "cardinality", cardinality,
-      "type", type,
-      "with_default", with_default,
-      "obj", obj_reference,
-      "index", JSFieldIndex(field),
-      "default", default_arg);
+    if (is_float_or_double) {
+      if (field->is_required()) {
+        // Use "+" to convert all fields to numeric (including null).
+        printer->Print(
+            "+jspb.Message.getField($obj$, $index$)",
+            "index", JSFieldIndex(field),
+            "obj", obj_reference);
+      } else {
+        // Converts "NaN" and "Infinity" while preserving null.
+        printer->Print(
+            "jspb.Message.get$cardinality$FloatingPointField($obj$, $index$)",
+            "cardinality", field->is_repeated() ? "Repeated" : "Optional",
+            "index", JSFieldIndex(field),
+            "obj", obj_reference);
+      }
+    } else {
+      printer->Print("jspb.Message.get$cardinality$Field($obj$, $index$)",
+                     "cardinality", field->is_repeated() ? "Repeated" : "",
+                     "index", JSFieldIndex(field),
+                     "obj", obj_reference);
+    }
   }
 }
 
@@ -2376,7 +2376,7 @@ void Generator::GenerateClassFieldToObject(const GeneratorOptions& options,
     const FieldDescriptor* value_field = MapFieldValue(field);
     // If the map values are of a message type, we must provide their static
     // toObject() method; otherwise we pass undefined for that argument.
-    std::string value_to_object;
+    string value_to_object;
     if (value_field->cpp_type() == FieldDescriptor::CPPTYPE_MESSAGE) {
       value_to_object =
           GetMessagePath(options, value_field->message_type()) + ".toObject";
@@ -2424,39 +2424,7 @@ void Generator::GenerateClassFieldToObject(const GeneratorOptions& options,
     // We are migrating the accessors to return defaults instead of null, but
     // it may take longer to migrate toObject (or we might not want to do it at
     // all).  So we want to generate independent code.
-    // The accessor for unset optional values without default should return
-    // null. Those are converted to undefined in the generated object.
-    printer->Print("(f = ");
     GenerateFieldValueExpression(printer, "msg", field, use_default);
-    printer->Print(") == null ? undefined : f");
-  }
-}
-
-void Generator::GenerateObjectTypedef(const GeneratorOptions& options,
-                                      io::Printer* printer,
-                                      const Descriptor* desc) const {
-  // TODO(b/122687752): Consider renaming nested messages called ObjectFormat
-  //     to prevent collisions.
-  const std::string type_name = GetMessagePath(options, desc) + ".ObjectFormat";
-
-  printer->Print(
-      "/**\n"
-      " * The raw object form of $messageName$ as accepted by the `fromObject` "
-      "method.\n"
-      " * @record\n"
-      " */\n"
-      "$typeName$ = function() {};\n\n",
-      "messageName", desc->name(),
-      "typeName", type_name);
-
-  for (int i = 0; i < desc->field_count(); i++) {
-    printer->Print(
-        "/** @type {$fieldType$|undefined} */\n"
-        "$typeName$.prototype.$fieldName$;\n\n",
-        "typeName", type_name,
-        "fieldName", JSObjectFieldName(options, desc->field(i)),
-        // TODO(b/121097361): Add type checking for field values.
-        "fieldType", "?");
   }
 }
 
@@ -2464,16 +2432,15 @@ void Generator::GenerateClassFromObject(const GeneratorOptions& options,
                                         io::Printer* printer,
                                         const Descriptor* desc) const {
   printer->Print(
-      "if (jspb.Message.GENERATE_FROM_OBJECT) {\n\n");
-
-  GenerateObjectTypedef(options, printer, desc);
-
-  printer->Print(
+      "if (jspb.Message.GENERATE_FROM_OBJECT) {\n"
       "/**\n"
       " * Loads data from an object into a new instance of this proto.\n"
-      " * @param {!$classname$.ObjectFormat} obj\n"
-      " *     The object representation of this proto to load the data from.\n"
+      " * @param {!Object} obj The object representation of this proto to\n"
+      " *     load the data from.\n"
       " * @return {!$classname$}\n"
+      " * @suppress {missingProperties} To prevent JSCompiler errors at "
+      "the\n"
+      " *     `goog.isDef(obj.<fieldName>)` lookups.\n"
       " */\n"
       "$classname$.fromObject = function(obj) {\n"
       "  var msg = new $classname$();\n",
@@ -2489,7 +2456,7 @@ void Generator::GenerateClassFromObject(const GeneratorOptions& options,
   printer->Print(
       "  return msg;\n"
       "};\n"
-      "}\n\n");
+      "}\n");
 }
 
 void Generator::GenerateClassFieldFromObject(
@@ -2502,7 +2469,7 @@ void Generator::GenerateClassFieldFromObject(
       // Since the map values are of message type, we have to do some extra work
       // to recursively call fromObject() on them before setting the map field.
       printer->Print(
-          "  obj.$name$ && jspb.Message.setWrapperField(\n"
+          "  goog.isDef(obj.$name$) && jspb.Message.setWrapperField(\n"
           "      msg, $index$, jspb.Map.fromObject(obj.$name$, $fieldclass$, "
           "$fieldclass$.fromObject));\n",
           "name", JSObjectFieldName(options, field),
@@ -2513,7 +2480,7 @@ void Generator::GenerateClassFieldFromObject(
       // map containers wrapping underlying arrays, so we can simply directly
       // set the array here without fear of a stale wrapper.
       printer->Print(
-          "  obj.$name$ && "
+          "  goog.isDef(obj.$name$) && "
           "jspb.Message.setField(msg, $index$, obj.$name$);\n",
           "name", JSObjectFieldName(options, field),
           "index", JSFieldIndex(field));
@@ -2523,7 +2490,7 @@ void Generator::GenerateClassFieldFromObject(
     if (field->is_repeated()) {
       {
         printer->Print(
-            "  obj.$name$ && "
+            "  goog.isDef(obj.$name$) && "
             "jspb.Message.setRepeatedWrapperField(\n"
             "      msg, $index$, obj.$name$.map(\n"
             "          $fieldclass$.fromObject));\n",
@@ -2533,7 +2500,7 @@ void Generator::GenerateClassFieldFromObject(
       }
     } else {
       printer->Print(
-          "  obj.$name$ && jspb.Message.setWrapperField(\n"
+          "  goog.isDef(obj.$name$) && jspb.Message.setWrapperField(\n"
           "      msg, $index$, $fieldclass$.fromObject(obj.$name$));\n",
           "name", JSObjectFieldName(options, field),
           "index", JSFieldIndex(field),
@@ -2542,7 +2509,7 @@ void Generator::GenerateClassFieldFromObject(
   } else {
     // Simple (primitive) field.
     printer->Print(
-        "  obj.$name$ != null && jspb.Message.setField(msg, $index$, "
+        "  goog.isDef(obj.$name$) && jspb.Message.setField(msg, $index$, "
         "obj.$name$);\n",
         "name", JSObjectFieldName(options, field),
         "index", JSFieldIndex(field));
@@ -2576,11 +2543,11 @@ void GenerateBytesWrapper(const GeneratorOptions& options,
                           io::Printer* printer,
                           const FieldDescriptor* field,
                           BytesMode bytes_mode) {
-  std::string type =
-      JSFieldTypeAnnotation(options, field,
-                            /* is_setter_argument = */ false,
-                            /* force_present = */ false,
-                            /* singular_if_not_packed = */ false, bytes_mode);
+  string type = JSFieldTypeAnnotation(
+      options, field,
+      /* is_setter_argument = */ false,
+      /* force_present = */ false,
+      /* singular_if_not_packed = */ false, bytes_mode);
   printer->Print(
       "/**\n"
       " * $fielddef$\n"
@@ -2611,16 +2578,18 @@ void Generator::GenerateClassField(const GeneratorOptions& options,
     const FieldDescriptor* key_field = MapFieldKey(field);
     const FieldDescriptor* value_field = MapFieldValue(field);
     // Map field: special handling to instantiate the map object on demand.
-    std::string key_type =
-        JSFieldTypeAnnotation(options, key_field,
-                              /* is_setter_argument = */ false,
-                              /* force_present = */ true,
-                              /* singular_if_not_packed = */ false);
-    std::string value_type =
-        JSFieldTypeAnnotation(options, value_field,
-                              /* is_setter_argument = */ false,
-                              /* force_present = */ true,
-                              /* singular_if_not_packed = */ false);
+    string key_type =
+        JSFieldTypeAnnotation(
+            options, key_field,
+            /* is_setter_argument = */ false,
+            /* force_present = */ true,
+            /* singular_if_not_packed = */ false);
+    string value_type =
+        JSFieldTypeAnnotation(
+            options, value_field,
+            /* is_setter_argument = */ false,
+            /* force_present = */ true,
+            /* singular_if_not_packed = */ false);
 
     printer->Print(
         "/**\n"
@@ -2739,12 +2708,12 @@ void Generator::GenerateClassField(const GeneratorOptions& options,
     BytesMode bytes_mode =
         field->type() == FieldDescriptor::TYPE_BYTES && !options.binary ?
             BYTES_B64 : BYTES_DEFAULT;
-    std::string typed_annotation =
-        JSFieldTypeAnnotation(options, field,
-                              /* is_setter_argument = */ false,
-                              /* force_present = */ false,
-                              /* singular_if_not_packed = */ false,
-                              /* bytes_mode = */ bytes_mode);
+    string typed_annotation = JSFieldTypeAnnotation(
+        options, field,
+        /* is_setter_argument = */ false,
+        /* force_present = */ false,
+        /* singular_if_not_packed = */ false,
+        /* bytes_mode = */ bytes_mode);
     if (untyped) {
       printer->Print(
           "/**\n"
@@ -3286,12 +3255,12 @@ void Generator::GenerateClassSerializeBinaryField(
     const FieldDescriptor* field) const {
   if (HasFieldPresence(options, field) &&
       field->cpp_type() != FieldDescriptor::CPPTYPE_MESSAGE) {
-    std::string typed_annotation =
-        JSFieldTypeAnnotation(options, field,
-                              /* is_setter_argument = */ false,
-                              /* force_present = */ false,
-                              /* singular_if_not_packed = */ false,
-                              /* bytes_mode = */ BYTES_DEFAULT);
+    string typed_annotation = JSFieldTypeAnnotation(
+        options, field,
+        /* is_setter_argument = */ false,
+        /* force_present = */ false,
+        /* singular_if_not_packed = */ false,
+        /* bytes_mode = */ BYTES_DEFAULT);
     printer->Print(
         "  f = /** @type {$type$} */ "
         "(jspb.Message.getField(message, $index$));\n",
@@ -3432,12 +3401,12 @@ void Generator::GenerateEnum(const GeneratorOptions& options,
 void Generator::GenerateExtension(const GeneratorOptions& options,
                                   io::Printer* printer,
                                   const FieldDescriptor* field) const {
-  std::string extension_scope =
+  string extension_scope =
       (field->extension_scope()
            ? GetMessagePath(options, field->extension_scope())
            : GetNamespace(options, field->file()));
 
-  const std::string extension_object_name = JSObjectFieldName(options, field);
+  const string extension_object_name = JSObjectFieldName(options, field);
   printer->Print(
       "\n"
       "/**\n"
@@ -3467,11 +3436,11 @@ void Generator::GenerateExtension(const GeneratorOptions& options,
       "ctor",
       (field->cpp_type() == FieldDescriptor::CPPTYPE_MESSAGE
            ? SubmessageTypeRef(options, field)
-           : std::string("null")),
+           : string("null")),
       "toObject",
       (field->cpp_type() == FieldDescriptor::CPPTYPE_MESSAGE
            ? (SubmessageTypeRef(options, field) + ".toObject")
-           : std::string("null")),
+           : string("null")),
       "repeated", (field->is_repeated() ? "1" : "0"));
 
   printer->Print(
@@ -3511,8 +3480,8 @@ void Generator::GenerateExtension(const GeneratorOptions& options,
 }
 
 bool GeneratorOptions::ParseFromOptions(
-    const std::vector<std::pair<std::string, std::string> >& options,
-    std::string* error) {
+    const std::vector< std::pair< string, string > >& options,
+    string* error) {
   for (int i = 0; i < options.size(); i++) {
     if (options[i].first == "add_require_for_enums") {
       if (options[i].second != "") {
@@ -3658,11 +3627,10 @@ bool Generator::GenerateFile(const FileDescriptor* file,
                              const GeneratorOptions &options,
                              GeneratorContext* context,
                              bool use_short_name) const {
-  std::string filename =
-      options.output_dir + "/" +
-      GetJSFilename(options, use_short_name
-                                 ? file->name().substr(file->name().rfind('/'))
-                                 : file->name());
+  string filename =
+      options.output_dir + "/" + GetJSFilename(options,
+          use_short_name ? file->name().substr(file->name().rfind('/'))
+                         : file->name());
   std::unique_ptr<io::ZeroCopyOutputStream> output(context->Open(filename));
   GOOGLE_CHECK(output);
   GeneratedCodeInfo annotations;
@@ -3705,7 +3673,7 @@ void Generator::GenerateFile(const GeneratorOptions& options,
     }
 
     for (int i = 0; i < file->dependency_count(); i++) {
-      const std::string& name = file->dependency(i)->name();
+      const string& name = file->dependency(i)->name();
       printer->Print(
           "var $alias$ = require('$file$');\n"
           "goog.object.extend(proto, $alias$);\n",
@@ -3714,7 +3682,7 @@ void Generator::GenerateFile(const GeneratorOptions& options,
     }
   }
 
-  std::set<std::string> provided;
+  std::set<string> provided;
   std::set<const FieldDescriptor*> extensions;
   for (int i = 0; i < file->extension_count(); i++) {
     // We honor the jspb::ignore option here only when working with
@@ -3758,7 +3726,7 @@ void Generator::GenerateFile(const GeneratorOptions& options,
 
   // Emit well-known type methods.
   for (FileToc* toc = well_known_types_js; toc->name != NULL; toc++) {
-    std::string name = std::string("google/protobuf/") + toc->name;
+    string name = string("google/protobuf/") + toc->name;
     if (name == StripProto(file->name()) + ".js") {
       printer->Print(toc->data);
     }
@@ -3766,10 +3734,10 @@ void Generator::GenerateFile(const GeneratorOptions& options,
 }
 
 bool Generator::GenerateAll(const std::vector<const FileDescriptor*>& files,
-                            const std::string& parameter,
+                            const string& parameter,
                             GeneratorContext* context,
-                            std::string* error) const {
-  std::vector<std::pair<std::string, std::string> > option_pairs;
+                            string* error) const {
+  std::vector< std::pair< string, string > > option_pairs;
   ParseGeneratorParameter(parameter, &option_pairs);
   GeneratorOptions options;
   if (!options.ParseFromOptions(option_pairs, error)) {
@@ -3779,8 +3747,8 @@ bool Generator::GenerateAll(const std::vector<const FileDescriptor*>& files,
 
   if (options.output_mode() == GeneratorOptions::kEverythingInOneFile) {
     // All output should go in a single file.
-    std::string filename = options.output_dir + "/" + options.library +
-                           options.GetFileNameExtension();
+    string filename = options.output_dir + "/" + options.library +
+                      options.GetFileNameExtension();
     std::unique_ptr<io::ZeroCopyOutputStream> output(context->Open(filename));
     GOOGLE_CHECK(output.get());
     io::Printer printer(output.get(), '$');
@@ -3797,7 +3765,7 @@ bool Generator::GenerateAll(const std::vector<const FileDescriptor*>& files,
 
     GenerateHeader(options, &printer);
 
-    std::set<std::string> provided;
+    std::set<string> provided;
     FindProvides(options, &printer, files, &provided);
     FindProvidesForFields(options, &printer, extensions, &provided);
     GenerateProvides(options, &printer, &provided);
@@ -3818,7 +3786,7 @@ bool Generator::GenerateAll(const std::vector<const FileDescriptor*>& files,
   } else if (options.output_mode() == GeneratorOptions::kOneOutputFilePerSCC) {
     std::set<const Descriptor*> have_printed;
     SCCAnalyzer<DepsGenerator> analyzer;
-    std::map<const void*, std::string> allowed_map;
+    std::map<const void*, string> allowed_map;
     if (!GenerateJspbAllowedMap(
         options, files, &allowed_map, &analyzer, error)) {
       return false;
@@ -3844,7 +3812,7 @@ bool Generator::GenerateAll(const std::vector<const FileDescriptor*>& files,
 
         generated = true;
         const SCC* scc = analyzer.GetSCC(desc);
-        const std::string& filename = allowed_map[scc];
+        const string& filename = allowed_map[scc];
         std::unique_ptr<io::ZeroCopyOutputStream> output(
             context->Open(filename));
         GOOGLE_CHECK(output.get());
@@ -3852,7 +3820,7 @@ bool Generator::GenerateAll(const std::vector<const FileDescriptor*>& files,
 
         GenerateHeader(options, &printer);
 
-        std::set<std::string> provided;
+        std::set<string> provided;
         for (auto one_desc : scc->descriptors) {
           if (one_desc->containing_type() == nullptr) {
             FindProvidesForMessage(options, &printer, one_desc, &provided);
@@ -3889,7 +3857,7 @@ bool Generator::GenerateAll(const std::vector<const FileDescriptor*>& files,
         }
 
         generated = true;
-        const std::string& filename = allowed_map[enumdesc];
+        const string& filename = allowed_map[enumdesc];
         std::unique_ptr<io::ZeroCopyOutputStream> output(
             context->Open(filename));
         GOOGLE_CHECK(output.get());
@@ -3897,7 +3865,7 @@ bool Generator::GenerateAll(const std::vector<const FileDescriptor*>& files,
 
         GenerateHeader(options, &printer);
 
-        std::set<std::string> provided;
+        std::set<string> provided;
         FindProvidesForEnum(options, &printer, enumdesc, &provided);
         GenerateProvides(options, &printer, &provided);
         GenerateTestOnly(options, &printer);
@@ -3912,7 +3880,7 @@ bool Generator::GenerateAll(const std::vector<const FileDescriptor*>& files,
       // the enclosing message).
       if (allowed_map.count(file) == 1) {
         generated = true;
-        const std::string& filename = allowed_map[file];
+        const string& filename = allowed_map[file];
 
         std::unique_ptr<io::ZeroCopyOutputStream> output(
             context->Open(filename));
@@ -3921,7 +3889,7 @@ bool Generator::GenerateAll(const std::vector<const FileDescriptor*>& files,
 
         GenerateHeader(options, &printer);
 
-        std::set<std::string> provided;
+        std::set<string> provided;
         std::vector<const FieldDescriptor*> fields;
 
         for (int j = 0; j < files[i]->extension_count(); j++) {
@@ -3943,9 +3911,8 @@ bool Generator::GenerateAll(const std::vector<const FileDescriptor*>& files,
       }
     }
     if (!generated) {
-      std::string filename = options.output_dir + "/" +
-                             "empty_no_content_void_file" +
-                             options.GetFileNameExtension();
+      string filename = options.output_dir + "/" +
+          "empty_no_content_void_file" + options.GetFileNameExtension();
       std::unique_ptr<io::ZeroCopyOutputStream> output(
           context->Open(filename));
     }

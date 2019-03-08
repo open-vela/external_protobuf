@@ -36,6 +36,7 @@
 #include <google/protobuf/metadata_lite.h>
 #include <google/protobuf/repeated_field.h>
 #include <google/protobuf/wire_format_lite.h>
+#include <google/protobuf/wire_format_lite_inl.h>
 
 namespace google {
 namespace protobuf {
@@ -43,7 +44,7 @@ namespace internal {
 
 namespace {
 
-std::string* MutableUnknownFields(MessageLite* msg, int64 arena_offset) {
+string* MutableUnknownFields(MessageLite* msg, int64 arena_offset) {
   return Raw<InternalMetadataWithArenaLite>(msg, arena_offset)
       ->mutable_unknown_fields();
 }

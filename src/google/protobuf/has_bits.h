@@ -53,11 +53,11 @@ class HasBits {
     memset(has_bits_, 0, sizeof(has_bits_));
   }
 
-  uint32& operator[](int index) PROTOBUF_ALWAYS_INLINE {
+  ::google::protobuf::uint32& operator[](int index) PROTOBUF_ALWAYS_INLINE {
     return has_bits_[index];
   }
 
-  const uint32& operator[](int index) const PROTOBUF_ALWAYS_INLINE {
+  const ::google::protobuf::uint32& operator[](int index) const PROTOBUF_ALWAYS_INLINE {
     return has_bits_[index];
   }
 
@@ -72,7 +72,7 @@ class HasBits {
   bool empty() const;
 
  private:
-  uint32 has_bits_[doublewords];
+  ::google::protobuf::uint32 has_bits_[doublewords];
 };
 
 template <>

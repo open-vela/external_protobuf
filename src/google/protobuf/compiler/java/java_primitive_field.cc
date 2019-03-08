@@ -58,10 +58,11 @@ using internal::WireFormatLite;
 namespace {
 
 void SetPrimitiveVariables(const FieldDescriptor* descriptor,
-                           int messageBitIndex, int builderBitIndex,
+                           int messageBitIndex,
+                           int builderBitIndex,
                            const FieldGeneratorInfo* info,
                            ClassNameResolver* name_resolver,
-                           std::map<std::string, std::string>* variables) {
+                           std::map<string, string>* variables) {
   SetCommonFieldVariables(descriptor, info, variables);
   JavaType javaType = GetJavaType(descriptor);
 
@@ -74,7 +75,7 @@ void SetPrimitiveVariables(const FieldDescriptor* descriptor,
       javaType == JAVATYPE_FLOAT ||
       javaType == JAVATYPE_INT ||
       javaType == JAVATYPE_LONG) {
-    std::string capitalized_type = UnderscoresToCamelCase(
+    string capitalized_type = UnderscoresToCamelCase(
         PrimitiveTypeName(javaType), /*cap_first_letter=*/true);
     (*variables)["field_list_type"] =
         "com.google.protobuf.Internal." + capitalized_type + "List";
@@ -200,11 +201,11 @@ ImmutablePrimitiveFieldGenerator(const FieldDescriptor* descriptor,
 ImmutablePrimitiveFieldGenerator::~ImmutablePrimitiveFieldGenerator() {}
 
 int ImmutablePrimitiveFieldGenerator::GetNumBitsForMessage() const {
-  return SupportFieldPresence(descriptor_->file()) ? 1 : 0;
+  return 1;
 }
 
 int ImmutablePrimitiveFieldGenerator::GetNumBitsForBuilder() const {
-  return GetNumBitsForMessage();
+  return 1;
 }
 
 void ImmutablePrimitiveFieldGenerator::
@@ -466,7 +467,7 @@ GenerateHashCode(io::Printer* printer) const {
   }
 }
 
-std::string ImmutablePrimitiveFieldGenerator::GetBoxedType() const {
+string ImmutablePrimitiveFieldGenerator::GetBoxedType() const {
   return BoxedPrimitiveTypeName(GetJavaType(descriptor_));
 }
 
@@ -937,7 +938,7 @@ GenerateHashCode(io::Printer* printer) const {
     "}\n");
 }
 
-std::string RepeatedImmutablePrimitiveFieldGenerator::GetBoxedType() const {
+string RepeatedImmutablePrimitiveFieldGenerator::GetBoxedType() const {
   return BoxedPrimitiveTypeName(GetJavaType(descriptor_));
 }
 
