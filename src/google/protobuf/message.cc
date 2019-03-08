@@ -66,6 +66,9 @@
 namespace google {
 namespace protobuf {
 
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+using internal::ParseClosure;
+#endif
 using internal::ReflectionOps;
 using internal::WireFormat;
 using internal::WireFormatLite;
@@ -98,9 +101,7 @@ void Message::CopyFrom(const Message& from) {
   ReflectionOps::Copy(from, this);
 }
 
-std::string Message::GetTypeName() const {
-  return GetDescriptor()->full_name();
-}
+string Message::GetTypeName() const { return GetDescriptor()->full_name(); }
 
 void Message::Clear() { ReflectionOps::Clear(this); }
 
@@ -108,12 +109,12 @@ bool Message::IsInitialized() const {
   return ReflectionOps::IsInitialized(*this);
 }
 
-void Message::FindInitializationErrors(std::vector<std::string>* errors) const {
+void Message::FindInitializationErrors(std::vector<string>* errors) const {
   return ReflectionOps::FindInitializationErrors(*this, "", errors);
 }
 
-std::string Message::InitializationErrorString() const {
-  std::vector<std::string> errors;
+string Message::InitializationErrorString() const {
+  std::vector<string> errors;
   FindInitializationErrors(&errors);
   return Join(errors, ", ");
 }
@@ -268,14 +269,14 @@ bool ReflectiveValidator(const void* arg, int val) {
   return d->FindValueByNumber(val) != nullptr;
 }
 
-const char* ParsePackedField(const FieldDescriptor* field, Message* msg,
-                             const Reflection* reflection, const char* ptr,
-                             internal::ParseContext* ctx) {
+ParseClosure GetPackedField(const FieldDescriptor* field, Message* msg,
+                            const Reflection* reflection,
+                            internal::ParseContext* ctx) {
   switch (field->type()) {
 #define HANDLE_PACKED_TYPE(TYPE, CPPTYPE, METHOD_NAME) \
   case FieldDescriptor::TYPE_##TYPE:                   \
-    return internal::Packed##METHOD_NAME##Parser(      \
-        reflection->MutableRepeatedField<CPPTYPE>(msg, field), ptr, ctx)
+    return {internal::Packed##METHOD_NAME##Parser,     \
+            reflection->MutableRepeatedField<CPPTYPE>(msg, field)}
     HANDLE_PACKED_TYPE(INT32, int32, Int32);
     HANDLE_PACKED_TYPE(INT64, int64, Int64);
     HANDLE_PACKED_TYPE(SINT32, int32, SInt32);
@@ -287,11 +288,12 @@ const char* ParsePackedField(const FieldDescriptor* field, Message* msg,
       auto object =
           internal::ReflectionAccessor::GetRepeatedEnum(reflection, field, msg);
       if (field->file()->syntax() == FileDescriptor::SYNTAX_PROTO3) {
-        return internal::PackedEnumParser(object, ptr, ctx);
+        return {internal::PackedEnumParser, object};
       } else {
-        return internal::PackedEnumParserArg(
-            object, ptr, ctx, ReflectiveValidator, field->enum_type(),
+        ctx->extra_parse_data().SetEnumValidatorArg(
+            ReflectiveValidator, field->enum_type(),
             reflection->MutableUnknownFields(msg), field->number());
+        return {internal::PackedValidEnumParserArg, object};
       }
     }
       HANDLE_PACKED_TYPE(FIXED32, uint32, Fixed32);
@@ -304,44 +306,34 @@ const char* ParsePackedField(const FieldDescriptor* field, Message* msg,
 
     default:
       GOOGLE_LOG(FATAL) << "Type is not packable " << field->type();
-      return nullptr;  // Make compiler happy
+      return {};  // Make compiler happy
   }
 }
 
-const char* ParseLenDelim(int field_number, const FieldDescriptor* field,
-                          Message* msg, const Reflection* reflection,
-                          const char* ptr, internal::ParseContext* ctx) {
+ParseClosure GetLenDelim(int field_number, const FieldDescriptor* field,
+                         Message* msg, const Reflection* reflection,
+                         internal::ParseContext* ctx) {
   if (WireFormat::WireTypeForFieldType(field->type()) !=
       WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
     GOOGLE_DCHECK(field->is_packable());
-    return ParsePackedField(field, msg, reflection, ptr, ctx);
+    return GetPackedField(field, msg, reflection, ctx);
   }
   enum { kNone = 0, kVerify, kStrict } utf8_level = kNone;
-  const char* field_name = nullptr;
-  auto parse_string = [ptr, ctx, &utf8_level, &field_name](std::string* s) {
-    switch (utf8_level) {
-      case kNone:
-        return internal::InlineGreedyStringParser(s, ptr, ctx);
-      case kVerify:
-        return internal::InlineGreedyStringParserUTF8Verify(s, ptr, ctx,
-                                                            field_name);
-      case kStrict:
-        return internal::InlineGreedyStringParserUTF8(s, ptr, ctx, field_name);
-    }
-  };
+  internal::ParseFunc string_parsers[] = {internal::StringParser,
+                                          internal::StringParserUTF8Verify,
+                                          internal::StringParserUTF8};
   switch (field->type()) {
-    case FieldDescriptor::TYPE_STRING: {
-      bool enforce_utf8 = true;
-      bool utf8_verification = true;
-      if (enforce_utf8 &&
-          field->file()->syntax() == FileDescriptor::SYNTAX_PROTO3) {
+    case FieldDescriptor::TYPE_STRING:
+      if (field->file()->syntax() == FileDescriptor::SYNTAX_PROTO3
+      ) {
+        ctx->extra_parse_data().SetFieldName(field->full_name().c_str());
         utf8_level = kStrict;
-      } else if (utf8_verification) {
+      } else if (
+          true) {
+        ctx->extra_parse_data().SetFieldName(field->full_name().c_str());
         utf8_level = kVerify;
       }
-      field_name = field->full_name().c_str();
       PROTOBUF_FALLTHROUGH_INTENDED;
-    }
     case FieldDescriptor::TYPE_BYTES: {
       if (field->is_repeated()) {
         int index = reflection->FieldSize(*msg, field);
@@ -349,15 +341,13 @@ const char* ParseLenDelim(int field_number, const FieldDescriptor* field,
         reflection->AddString(msg, field, "");
         if (field->options().ctype() == FieldOptions::STRING ||
             field->is_extension()) {
-          auto object =
-              reflection->MutableRepeatedPtrField<std::string>(msg, field)
-                  ->Mutable(index);
-          return parse_string(object);
+          auto object = reflection->MutableRepeatedPtrField<string>(msg, field)
+                            ->Mutable(index);
+          return {string_parsers[utf8_level], object};
         } else {
-          auto object =
-              reflection->MutableRepeatedPtrField<std::string>(msg, field)
-                  ->Mutable(index);
-          return parse_string(object);
+          auto object = reflection->MutableRepeatedPtrField<string>(msg, field)
+                            ->Mutable(index);
+          return {string_parsers[utf8_level], object};
         }
       } else {
         // Clear value and make sure it's set.
@@ -365,44 +355,47 @@ const char* ParseLenDelim(int field_number, const FieldDescriptor* field,
         if (field->options().ctype() == FieldOptions::STRING ||
             field->is_extension()) {
           // HACK around inability to get mutable_string in reflection
-          std::string* object = &const_cast<std::string&>(
+          string* object = &const_cast<string&>(
               reflection->GetStringReference(*msg, field, nullptr));
-          return parse_string(object);
+          return {string_parsers[utf8_level], object};
         } else {
           // HACK around inability to get mutable_string in reflection
-          std::string* object = &const_cast<std::string&>(
+          string* object = &const_cast<string&>(
               reflection->GetStringReference(*msg, field, nullptr));
-          return parse_string(object);
+          return {string_parsers[utf8_level], object};
         }
       }
       GOOGLE_LOG(FATAL) << "No other type than string supported";
     }
     case FieldDescriptor::TYPE_MESSAGE: {
       Message* object;
+      auto factory = ctx->extra_parse_data().factory;
       if (field->is_repeated()) {
-        object = reflection->AddMessage(msg, field, ctx->data().factory);
+        object = reflection->AddMessage(msg, field, factory);
       } else {
-        object = reflection->MutableMessage(msg, field, ctx->data().factory);
+        object = reflection->MutableMessage(msg, field, factory);
       }
-      return ctx->ParseMessage(object, ptr);
+      return {object->_ParseFunc(), object};
     }
     default:
       GOOGLE_LOG(FATAL) << "Wrong type for length delim " << field->type();
   }
-  return nullptr;  // Make compiler happy.
+  return {};  // Make compiler happy.
 }
 
-Message* GetGroup(int field_number, const FieldDescriptor* field, Message* msg,
-                  const Reflection* reflection) {
+ParseClosure GetGroup(int field_number, const FieldDescriptor* field,
+                      Message* msg, const Reflection* reflection) {
+  Message* object;
   if (field->is_repeated()) {
-    return reflection->AddMessage(msg, field, nullptr);
+    object = reflection->AddMessage(msg, field, nullptr);
   } else {
-    return reflection->MutableMessage(msg, field, nullptr);
+    object = reflection->MutableMessage(msg, field, nullptr);
   }
+  return {object->_ParseFunc(), object};
 }
 
-const char* Message::_InternalParse(const char* ptr,
-                                    internal::ParseContext* ctx) {
+const char* Message::_InternalParse(const char* begin, const char* end,
+                                    void* object, internal::ParseContext* ctx) {
   class ReflectiveFieldParser {
    public:
     ReflectiveFieldParser(Message* msg, internal::ParseContext* ctx)
@@ -410,18 +403,19 @@ const char* Message::_InternalParse(const char* ptr,
 
     void AddVarint(uint32 num, uint64 value) {
       if (is_item_ && num == 2) {
-        if (!payload_.empty()) {
+        if (!ctx_->extra_parse_data().payload.empty()) {
           auto field = Field(value, 2);
           if (field && field->message_type()) {
             auto child = reflection_->MutableMessage(msg_, field);
             // TODO(gerbens) signal error
-            child->ParsePartialFromString(payload_);
+            child->ParsePartialFromString(ctx_->extra_parse_data().payload);
           } else {
-            MutableUnknown()->AddLengthDelimited(value)->swap(payload_);
+            MutableUnknown()->AddLengthDelimited(value)->swap(
+                ctx_->extra_parse_data().payload);
           }
           return;
         }
-        type_id_ = value;
+        ctx_->extra_parse_data().field_number = value;
         return;
       }
       auto field = Field(num, 0);
@@ -439,41 +433,38 @@ const char* Message::_InternalParse(const char* ptr,
         MutableUnknown()->AddFixed64(num, value);
       }
     }
-    const char* ParseLengthDelimited(uint32 num, const char* ptr,
-                                     internal::ParseContext* ctx) {
+    ParseClosure AddLengthDelimited(uint32 num, uint32) {
       if (is_item_ && num == 3) {
-        if (type_id_ == 0) {
-          return InlineGreedyStringParser(&payload_, ptr, ctx);
+        int type_id = ctx_->extra_parse_data().field_number;
+        if (type_id == 0) {
+          return {internal::StringParser, &ctx_->extra_parse_data().payload};
         }
-        num = type_id_;
-        type_id_ = 0;
+        ctx_->extra_parse_data().field_number = 0;
+        num = type_id;
       }
       auto field = Field(num, 2);
       if (field) {
-        return ParseLenDelim(num, field, msg_, reflection_, ptr, ctx);
+        return GetLenDelim(num, field, msg_, reflection_, ctx_);
       } else {
-        return InlineGreedyStringParser(
-            MutableUnknown()->AddLengthDelimited(num), ptr, ctx);
+        return {internal::StringParser,
+                MutableUnknown()->AddLengthDelimited(num)};
       }
     }
-    const char* ParseGroup(uint32 num, const char* ptr,
-                           internal::ParseContext* ctx) {
+    ParseClosure StartGroup(uint32 num) {
       if (!is_item_ && descriptor_->options().message_set_wire_format() &&
           num == 1) {
-        is_item_ = true;
-        ptr = ctx->ParseGroup(this, ptr, num * 8 + 3);
-        is_item_ = false;
-        type_id_ = 0;
-        return ptr;
+        ctx_->extra_parse_data().payload.clear();
+        ctx_->extra_parse_data().field_number = 0;
+        return {ItemParser, msg_};
       }
       auto field = Field(num, 3);
       if (field) {
-        auto msg = GetGroup(num, field, msg_, reflection_);
-        return ctx->ParseGroup(msg, ptr, num * 8 + 3);
+        return GetGroup(num, field, msg_, reflection_);
       } else {
-        return UnknownFieldParse(num * 8 + 3, MutableUnknown(), ptr, ctx);
+        return {internal::UnknownGroupParse, MutableUnknown()->AddGroup(num)};
       }
     }
+    void EndGroup(uint32 num) {}
     void AddFixed32(uint32 num, uint32 value) {
       auto field = Field(num, 5);
       if (field) {
@@ -483,12 +474,6 @@ const char* Message::_InternalParse(const char* ptr,
       }
     }
 
-    const char* _InternalParse(const char* ptr, internal::ParseContext* ctx) {
-      // We're parsing the a MessageSetItem
-      GOOGLE_DCHECK(is_item_);
-      return internal::WireFormatParser(*this, ptr, ctx);
-    }
-
    private:
     Message* msg_;
     const Descriptor* descriptor_;
@@ -496,8 +481,6 @@ const char* Message::_InternalParse(const char* ptr,
     internal::ParseContext* ctx_;
     UnknownFieldSet* unknown_ = nullptr;
     bool is_item_ = false;
-    uint32 type_id_ = 0;
-    std::string payload_;
 
     ReflectiveFieldParser(Message* msg, internal::ParseContext* ctx,
                           bool is_item)
@@ -515,7 +498,7 @@ const char* Message::_InternalParse(const char* ptr,
 
       // If that failed, check if the field is an extension.
       if (field == nullptr && descriptor_->IsExtensionNumber(num)) {
-        const DescriptorPool* pool = ctx_->data().pool;
+        const DescriptorPool* pool = ctx_->extra_parse_data().pool;
         if (pool == NULL) {
           field = reflection_->FindKnownExtensionByNumber(num);
         } else {
@@ -541,10 +524,19 @@ const char* Message::_InternalParse(const char* ptr,
       if (unknown_) return unknown_;
       return unknown_ = reflection_->MutableUnknownFields(msg_);
     }
+
+    static const char* ItemParser(const char* begin, const char* end,
+                                  void* object, internal::ParseContext* ctx) {
+      auto msg = static_cast<Message*>(object);
+      ReflectiveFieldParser field_parser(msg, ctx, true);
+      return internal::WireFormatParser({ItemParser, object}, field_parser,
+                                        begin, end, ctx);
+    }
   };
 
-  ReflectiveFieldParser field_parser(this, ctx);
-  return internal::WireFormatParser(field_parser, ptr, ctx);
+  ReflectiveFieldParser field_parser(static_cast<Message*>(object), ctx);
+  return internal::WireFormatParser({_InternalParse, object}, field_parser,
+                                    begin, end, ctx);
 }
 #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
 
@@ -674,7 +666,7 @@ void RegisterFileLevelMetadata(void* assign_descriptors_table);
 namespace {
 
 void RegisterFileLevelMetadata(void* assign_descriptors_table,
-                               const std::string& filename) {
+                               const string& filename) {
   internal::RegisterFileLevelMetadata(assign_descriptors_table);
 }
 

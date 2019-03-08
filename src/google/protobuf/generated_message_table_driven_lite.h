@@ -40,6 +40,7 @@
 #include <google/protobuf/metadata_lite.h>
 #include <google/protobuf/repeated_field.h>
 #include <google/protobuf/wire_format_lite.h>
+#include <google/protobuf/wire_format_lite_inl.h>
 #include <type_traits>
 
 
@@ -252,7 +253,7 @@ static inline bool HandleString(io::CodedInputStream* input, MessageLite* msg,
           break;
       }
       GOOGLE_DCHECK(s != nullptr);
-      std::string* value = s->MutableNoArena(NULL);
+      ::std::string* value = s->MutableNoArena(NULL);
       if (PROTOBUF_PREDICT_FALSE(!WireFormatLite::ReadString(input, value))) {
         return false;
       }
@@ -264,8 +265,8 @@ static inline bool HandleString(io::CodedInputStream* input, MessageLite* msg,
         case Cardinality_SINGULAR: {
           ArenaStringPtr* field = MutableField<ArenaStringPtr>(
               msg, has_bits, has_bit_index, offset);
-          std::string* value = field->Mutable(
-              static_cast<const std::string*>(default_ptr), arena);
+          std::string* value =
+              field->Mutable(static_cast<const std::string*>(default_ptr), arena);
           if (PROTOBUF_PREDICT_FALSE(
                   !WireFormatLite::ReadString(input, value))) {
             return false;
@@ -282,8 +283,8 @@ static inline bool HandleString(io::CodedInputStream* input, MessageLite* msg,
         } break;
         case Cardinality_ONEOF: {
           ArenaStringPtr* field = Raw<ArenaStringPtr>(msg, offset);
-          std::string* value = field->Mutable(
-              static_cast<const std::string*>(default_ptr), arena);
+          std::string* value =
+              field->Mutable(static_cast<const std::string*>(default_ptr), arena);
           if (PROTOBUF_PREDICT_FALSE(
                   !WireFormatLite::ReadString(input, value))) {
             return false;
@@ -319,7 +320,7 @@ inline bool HandleEnum(const ParseTable& table, io::CodedInputStream* input,
 
   AuxillaryParseTableField::EnumValidator validator =
       table.aux[field_number].enums.validator;
-  if (validator == nullptr || validator(value)) {
+  if (validator(value)) {
     switch (cardinality) {
       case Cardinality_SINGULAR:
         SetField(msg, presence, presence_index, offset, value);
@@ -835,7 +836,7 @@ bool MergePartialFromCodedStreamInlined(MessageLite* msg,
               return false;
             }
 
-            if (validator == nullptr || validator(value)) {
+            if (validator(value)) {
               values->Add(value);
             } else {
               // TODO(ckennelly): Consider caching here.

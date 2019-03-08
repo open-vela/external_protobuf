@@ -845,7 +845,7 @@ TEST_F(JsonStreamParserTest, UnknownCharactersInObject) {
 
 TEST_F(JsonStreamParserTest, DeepNestJsonNotExceedLimit) {
   int count = 99;
-  std::string str;
+  string str;
   for (int i = 0; i < count; ++i) {
     StrAppend(&str, "{'a':");
   }
@@ -871,7 +871,7 @@ TEST_F(JsonStreamParserTest, DeepNestJsonNotExceedLimit) {
 
 TEST_F(JsonStreamParserTest, DeepNestJsonExceedLimit) {
   int count = 98;
-  std::string str;
+  string str;
   for (int i = 0; i < count; ++i) {
     StrAppend(&str, "{'a':");
   }

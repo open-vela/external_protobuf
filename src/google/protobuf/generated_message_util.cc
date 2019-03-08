@@ -50,6 +50,7 @@
 #include <google/protobuf/stubs/mutex.h>
 #include <google/protobuf/repeated_field.h>
 #include <google/protobuf/wire_format_lite.h>
+#include <google/protobuf/wire_format_lite_inl.h>
 
 #include <google/protobuf/port_def.inc>
 
@@ -61,11 +62,9 @@ namespace internal {
 void DestroyMessage(const void* message) {
   static_cast<const MessageLite*>(message)->~MessageLite();
 }
-void DestroyString(const void* s) {
-  static_cast<const std::string*>(s)->~string();
-}
+void DestroyString(const void* s) { static_cast<const string*>(s)->~string(); }
 
-ExplicitlyConstructed<std::string> fixed_address_empty_string;
+ExplicitlyConstructed<::std::string> fixed_address_empty_string;
 
 
 static bool InitProtobufDefaultsImpl() {
@@ -79,7 +78,7 @@ void InitProtobufDefaults() {
   (void)is_inited;
 }
 
-size_t StringSpaceUsedExcludingSelfLong(const std::string& str) {
+size_t StringSpaceUsedExcludingSelfLong(const string& str) {
   const void* start = &str;
   const void* end = &str + 1;
   if (start <= str.data() && str.data() < end) {
@@ -226,7 +225,7 @@ struct PrimitiveTypeHelper<WireFormatLite::TYPE_DOUBLE>
 
 template <>
 struct PrimitiveTypeHelper<WireFormatLite::TYPE_STRING> {
-  typedef std::string Type;
+  typedef string Type;
   static void Serialize(const void* ptr, io::CodedOutputStream* output) {
     const Type& value = *static_cast<const Type*>(ptr);
     output->WriteVarint32(value.size());
@@ -424,7 +423,7 @@ struct SingularFieldHelper<FieldMetadata::kInlinedType> {
   template <typename O>
   static void Serialize(const void* field, const FieldMetadata& md, O* output) {
     WriteTagTo(md.tag, output);
-    SerializeTo<FieldMetadata::kInlinedType>(&Get<std::string>(field), output);
+    SerializeTo<FieldMetadata::kInlinedType>(&Get<::std::string>(field), output);
   }
 };
 
@@ -557,7 +556,7 @@ struct OneOfFieldHelper<FieldMetadata::kInlinedType> {
   template <typename O>
   static void Serialize(const void* field, const FieldMetadata& md, O* output) {
     SingularFieldHelper<FieldMetadata::kInlinedType>::Serialize(
-        Get<const std::string*>(field), md, output);
+        Get<const ::std::string*>(field), md, output);
   }
 };
 
@@ -603,7 +602,7 @@ bool IsNull<WireFormatLite::TYPE_MESSAGE>(const void* ptr) {
 
 template <>
 bool IsNull<FieldMetadata::kInlinedType>(const void* ptr) {
-  return static_cast<const std::string*>(ptr)->empty();
+  return static_cast<const ::std::string*>(ptr)->empty();
 }
 
 #define SERIALIZERS_FOR_TYPE(type)                                            \
