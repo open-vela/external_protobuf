@@ -65,12 +65,7 @@ def do_test(request):
     # TODO(gerbens): Remove, this is a hack to detect if the old vs new
     # parser is used by the cpp code. Relying on a bug in the old parser.
     hack_proto = test_messages_proto2_pb2.TestAllTypesProto2()
-    old_parser = True
-    try:
-      hack_proto.ParseFromString(b"\322\002\001")
-    except message.DecodeError as e:
-      old_parser = False
-    if old_parser:
+    if hack_proto.ParseFromString(b"\322\002\001"):
       # the string above is one of the failing conformance test strings of the
       # old parser. If we succeed the c++ implementation is using the old
       # parser so we add the list of failing conformance tests.

@@ -66,8 +66,13 @@ using internal::WireFormat;
 using internal::WireFormatLite;
 
 namespace {
-std::string MapValueImmutableClassdName(const Descriptor* descriptor,
-                                        ClassNameResolver* name_resolver) {
+bool GenerateHasBits(const Descriptor* descriptor) {
+  return SupportFieldPresence(descriptor->file()) ||
+      HasRepeatedFields(descriptor);
+}
+
+string MapValueImmutableClassdName(const Descriptor* descriptor,
+                                   ClassNameResolver* name_resolver) {
   const FieldDescriptor* value_field = descriptor->FindFieldByName("value");
   GOOGLE_CHECK_EQ(FieldDescriptor::TYPE_MESSAGE, value_field->type());
   return name_resolver->GetImmutableClassName(value_field->message_type());
@@ -103,7 +108,7 @@ void ImmutableMessageGenerator::GenerateStaticVariables(
   // the outermost class in the file.  This way, they will be initialized in
   // a deterministic order.
 
-  std::map<std::string, std::string> vars;
+  std::map<string, string> vars;
   vars["identifier"] = UniqueFileScopeIdentifier(descriptor_);
   vars["index"] = StrCat(descriptor_->index());
   vars["classname"] = name_resolver_->GetImmutableClassName(descriptor_);
@@ -147,7 +152,7 @@ void ImmutableMessageGenerator::GenerateStaticVariables(
 int ImmutableMessageGenerator::GenerateStaticVariableInitializers(
     io::Printer* printer) {
   int bytecode_estimate = 0;
-  std::map<std::string, std::string> vars;
+  std::map<string, string> vars;
   vars["identifier"] = UniqueFileScopeIdentifier(descriptor_);
   vars["index"] = StrCat(descriptor_->index());
   vars["classname"] = name_resolver_->GetImmutableClassName(descriptor_);
@@ -184,7 +189,7 @@ int ImmutableMessageGenerator::GenerateStaticVariableInitializers(
 
 void ImmutableMessageGenerator::
 GenerateFieldAccessorTable(io::Printer* printer, int* bytecode_estimate) {
-  std::map<std::string, std::string> vars;
+  std::map<string, string> vars;
   vars["identifier"] = UniqueFileScopeIdentifier(descriptor_);
   if (MultipleJavaFiles(descriptor_->file(), /* immutable = */ true)) {
     // We can only make these package-private since the classes that use them
@@ -296,7 +301,7 @@ void ImmutableMessageGenerator::GenerateInterface(io::Printer* printer) {
 void ImmutableMessageGenerator::Generate(io::Printer* printer) {
   bool is_own_file = IsOwnFile(descriptor_, /* immutable = */ true);
 
-  std::map<std::string, std::string> variables;
+  std::map<string, string> variables;
   variables["static"] = is_own_file ? " " : " static ";
   variables["classname"] = descriptor_->name();
   variables["extra_interfaces"] = ExtraMessageInterfaces(descriptor_);
@@ -309,7 +314,7 @@ void ImmutableMessageGenerator::Generate(io::Printer* printer) {
                                 /* immutable = */ true);
 
   // The builder_type stores the super type name of the nested Builder class.
-  std::string builder_type;
+  string builder_type;
   if (descriptor_->extension_range_count() > 0) {
     printer->Print(
         variables,
@@ -392,20 +397,22 @@ void ImmutableMessageGenerator::Generate(io::Printer* printer) {
     messageGenerator.Generate(printer);
   }
 
-  // Integers for bit fields.
-  int totalBits = 0;
-  for (int i = 0; i < descriptor_->field_count(); i++) {
-    totalBits +=
-        field_generators_.get(descriptor_->field(i)).GetNumBitsForMessage();
-  }
-  int totalInts = (totalBits + 31) / 32;
-  for (int i = 0; i < totalInts; i++) {
-    printer->Print("private int $bit_field_name$;\n", "bit_field_name",
-                   GetBitFieldName(i));
+  if (GenerateHasBits(descriptor_)) {
+    // Integers for bit fields.
+    int totalBits = 0;
+    for (int i = 0; i < descriptor_->field_count(); i++) {
+      totalBits += field_generators_.get(descriptor_->field(i))
+          .GetNumBitsForMessage();
+    }
+    int totalInts = (totalBits + 31) / 32;
+    for (int i = 0; i < totalInts; i++) {
+      printer->Print("private int $bit_field_name$;\n",
+        "bit_field_name", GetBitFieldName(i));
+    }
   }
 
   // oneof
-  std::map<std::string, std::string> vars;
+  std::map<string, string> vars;
   for (int i = 0; i < descriptor_->oneof_decl_count(); i++) {
     vars["oneof_name"] = context_->GetOneofGeneratorInfo(
         descriptor_->oneof_decl(i))->name;
@@ -1439,16 +1446,12 @@ void ImmutableMessageGenerator::GenerateAnyMethods(io::Printer* printer) {
     "public <T extends com.google.protobuf.Message> T unpack(\n"
     "    java.lang.Class<T> clazz)\n"
     "    throws com.google.protobuf.InvalidProtocolBufferException {\n"
-    "  boolean invalidClazz = false;\n"
-    "  if (cachedUnpackValue != null) {\n"
-    "    if (cachedUnpackValue.getClass() == clazz) {\n"
-    "      return (T) cachedUnpackValue;\n"
-    "    }\n"
-    "    invalidClazz = true;\n"
-    "  }\n"
-    "  if (invalidClazz || !is(clazz)) {\n"
+    "  if (!is(clazz)) {\n"
     "    throw new com.google.protobuf.InvalidProtocolBufferException(\n"
     "        \"Type of the Any message does not match the given class.\");\n"
+    "  }\n"
+    "  if (cachedUnpackValue != null) {\n"
+    "    return (T) cachedUnpackValue;\n"
     "  }\n"
     "  T defaultInstance =\n"
     "      com.google.protobuf.Internal.getDefaultInstance(clazz);\n"

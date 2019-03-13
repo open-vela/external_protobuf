@@ -59,10 +59,11 @@ using internal::WireFormatLite;
 namespace {
 
 void SetPrimitiveVariables(const FieldDescriptor* descriptor,
-                           int messageBitIndex, int builderBitIndex,
+                           int messageBitIndex,
+                           int builderBitIndex,
                            const FieldGeneratorInfo* info,
                            ClassNameResolver* name_resolver,
-                           std::map<std::string, std::string>* variables) {
+                           std::map<string, string>* variables) {
   SetCommonFieldVariables(descriptor, info, variables);
 
   (*variables)["empty_list"] =
@@ -133,7 +134,7 @@ ImmutableStringFieldLiteGenerator::ImmutableStringFieldLiteGenerator(
 ImmutableStringFieldLiteGenerator::~ImmutableStringFieldLiteGenerator() {}
 
 int ImmutableStringFieldLiteGenerator::GetNumBitsForMessage() const {
-  return SupportFieldPresence(descriptor_->file()) ? 1 : 0;
+  return 1;
 }
 
 // A note about how strings are handled. In the SPEED and CODE_SIZE runtimes,
@@ -391,7 +392,7 @@ GenerateHashCode(io::Printer* printer) const {
     "hash = (53 * hash) + get$capitalized_name$().hashCode();\n");
 }
 
-std::string ImmutableStringFieldLiteGenerator::GetBoxedType() const {
+string ImmutableStringFieldLiteGenerator::GetBoxedType() const {
   return "java.lang.String";
 }
 
@@ -911,7 +912,7 @@ GenerateHashCode(io::Printer* printer) const {
     "}\n");
 }
 
-std::string RepeatedImmutableStringFieldLiteGenerator::GetBoxedType() const {
+string RepeatedImmutableStringFieldLiteGenerator::GetBoxedType() const {
   return "java.lang.String";
 }
 

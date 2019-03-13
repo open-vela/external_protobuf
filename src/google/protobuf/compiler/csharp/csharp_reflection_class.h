@@ -48,9 +48,6 @@ class ReflectionClassGenerator : public SourceGeneratorBase {
   ReflectionClassGenerator(const FileDescriptor* file, const Options* options);
   ~ReflectionClassGenerator();
 
-  ReflectionClassGenerator(const ReflectionClassGenerator&) = delete;
-  ReflectionClassGenerator& operator=(const ReflectionClassGenerator&) = delete;
-
   void Generate(io::Printer* printer);
 
  private:
@@ -64,6 +61,8 @@ class ReflectionClassGenerator : public SourceGeneratorBase {
   void WriteGeneratedCodeInfo(const Descriptor* descriptor,
                               io::Printer* printer,
                               bool last);
+
+  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(ReflectionClassGenerator);
 };
 
 }  // namespace csharp

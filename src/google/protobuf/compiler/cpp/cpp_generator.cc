@@ -56,10 +56,10 @@ CppGenerator::CppGenerator() {}
 CppGenerator::~CppGenerator() {}
 
 bool CppGenerator::Generate(const FileDescriptor* file,
-                            const std::string& parameter,
+                            const string& parameter,
                             GeneratorContext* generator_context,
-                            std::string* error) const {
-  std::vector<std::pair<std::string, std::string> > options;
+                            string* error) const {
+  std::vector<std::pair<string, string> > options;
   ParseGeneratorParameter(parameter, &options);
 
   // -----------------------------------------------------------------
@@ -125,7 +125,7 @@ bool CppGenerator::Generate(const FileDescriptor* file,
   // -----------------------------------------------------------------
 
 
-  std::string basename = StripProto(file->name());
+  string basename = StripProto(file->name());
 
   if (MaybeBootstrap(file_options, generator_context, file_options.bootstrap,
                      &basename)) {
@@ -141,7 +141,7 @@ bool CppGenerator::Generate(const FileDescriptor* file,
     GeneratedCodeInfo annotations;
     io::AnnotationProtoCollector<GeneratedCodeInfo> annotation_collector(
         &annotations);
-    std::string info_path = basename + ".proto.h.meta";
+    string info_path = basename + ".proto.h.meta";
     io::Printer printer(output.get(), '$', file_options.annotate_headers
                                                ? &annotation_collector
                                                : NULL);
@@ -160,7 +160,7 @@ bool CppGenerator::Generate(const FileDescriptor* file,
     GeneratedCodeInfo annotations;
     io::AnnotationProtoCollector<GeneratedCodeInfo> annotation_collector(
         &annotations);
-    std::string info_path = basename + ".pb.h.meta";
+    string info_path = basename + ".pb.h.meta";
     io::Printer printer(output.get(), '$', file_options.annotate_headers
                                                ? &annotation_collector
                                                : NULL);

@@ -48,13 +48,12 @@ class EnumGenerator : public SourceGeneratorBase {
   EnumGenerator(const EnumDescriptor* descriptor, const Options* options);
   ~EnumGenerator();
 
-  EnumGenerator(const EnumGenerator&) = delete;
-  EnumGenerator& operator=(const EnumGenerator&) = delete;
-
   void Generate(io::Printer* printer);
 
  private:
   const EnumDescriptor* descriptor_;
+
+  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(EnumGenerator);
 };
 
 }  // namespace csharp

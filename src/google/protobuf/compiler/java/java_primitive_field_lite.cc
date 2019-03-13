@@ -58,10 +58,11 @@ using internal::WireFormatLite;
 namespace {
 
 void SetPrimitiveVariables(const FieldDescriptor* descriptor,
-                           int messageBitIndex, int builderBitIndex,
+                           int messageBitIndex,
+                           int builderBitIndex,
                            const FieldGeneratorInfo* info,
                            ClassNameResolver* name_resolver,
-                           std::map<std::string, std::string>* variables) {
+                           std::map<string, string>* variables) {
   SetCommonFieldVariables(descriptor, info, variables);
   JavaType javaType = GetJavaType(descriptor);
   (*variables)["type"] = PrimitiveTypeName(javaType);
@@ -76,8 +77,8 @@ void SetPrimitiveVariables(const FieldDescriptor* descriptor,
       WireFormat::TagSize(descriptor->number(), GetType(descriptor)));
   (*variables)["required"] = descriptor->is_required() ? "true" : "false";
 
-  std::string capitalized_type = UnderscoresToCamelCase(
-      PrimitiveTypeName(javaType), true /* cap_next_letter */);
+  string capitalized_type = UnderscoresToCamelCase(PrimitiveTypeName(javaType),
+                                                   true /* cap_next_letter */);
   switch (javaType) {
     case JAVATYPE_INT:
     case JAVATYPE_LONG:
@@ -186,7 +187,7 @@ ImmutablePrimitiveFieldLiteGenerator::ImmutablePrimitiveFieldLiteGenerator(
 ImmutablePrimitiveFieldLiteGenerator::~ImmutablePrimitiveFieldLiteGenerator() {}
 
 int ImmutablePrimitiveFieldLiteGenerator::GetNumBitsForMessage() const {
-  return SupportFieldPresence(descriptor_->file()) ? 1 : 0;
+  return 1;
 }
 
 void ImmutablePrimitiveFieldLiteGenerator::
@@ -459,7 +460,7 @@ GenerateHashCode(io::Printer* printer) const {
   }
 }
 
-std::string ImmutablePrimitiveFieldLiteGenerator::GetBoxedType() const {
+string ImmutablePrimitiveFieldLiteGenerator::GetBoxedType() const {
   return BoxedPrimitiveTypeName(GetJavaType(descriptor_));
 }
 
@@ -933,7 +934,7 @@ GenerateHashCode(io::Printer* printer) const {
     "}\n");
 }
 
-std::string RepeatedImmutablePrimitiveFieldLiteGenerator::GetBoxedType() const {
+string RepeatedImmutablePrimitiveFieldLiteGenerator::GetBoxedType() const {
   return BoxedPrimitiveTypeName(GetJavaType(descriptor_));
 }
 

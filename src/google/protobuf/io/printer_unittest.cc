@@ -91,7 +91,7 @@ TEST(Printer, WriteRaw) {
     ArrayOutputStream output(buffer, sizeof(buffer), block_size);
 
     {
-      std::string string_obj = "From an object\n";
+      string string_obj = "From an object\n";
       Printer printer(&output, '$');
       printer.WriteRaw("Hello World!", 12);
       printer.PrintRaw("  This is the same line.\n");
@@ -120,7 +120,7 @@ TEST(Printer, VariableSubstitution) {
 
     {
       Printer printer(&output, '$');
-      std::map<std::string, std::string> vars;
+      std::map<string, string> vars;
 
       vars["foo"] = "World";
       vars["bar"] = "$foo$";
@@ -173,20 +173,20 @@ TEST(Printer, InlineVariableSubstitution) {
 // annotations.
 class MockDescriptorFile {
  public:
-  explicit MockDescriptorFile(const std::string& file) : file_(file) {}
+  explicit MockDescriptorFile(const string& file) : file_(file) {}
 
   // The mock filename for this file.
-  const std::string& name() const { return file_; }
+  const string& name() const { return file_; }
 
  private:
-  std::string file_;
+  string file_;
 };
 
 // MockDescriptor defines only those members that Printer uses to write out
 // annotations.
 class MockDescriptor {
  public:
-  MockDescriptor(const std::string& file, const std::vector<int>& path)
+  MockDescriptor(const string& file, const std::vector<int>& path)
       : file_(file), path_(path) {}
 
   // The mock file in which this descriptor was defined.
@@ -210,7 +210,7 @@ TEST(Printer, AnnotateMap) {
   AnnotationProtoCollector<GeneratedCodeInfo> info_collector(&info);
   {
     Printer printer(&output, '$', &info_collector);
-    std::map<std::string, std::string> vars;
+    std::map<string, string> vars;
     vars["foo"] = "3";
     vars["bar"] = "5";
     printer.Print(vars, "012$foo$4$bar$\n");
@@ -444,7 +444,7 @@ TEST(Printer, Indenting) {
 
     {
       Printer printer(&output, '$');
-      std::map<std::string, std::string> vars;
+      std::map<string, string> vars;
 
       vars["newline"] = "\n";
 
@@ -594,13 +594,12 @@ TEST(Printer, WriteFailureExact) {
 }
 
 TEST(Printer, FormatInternal) {
-  std::vector<std::string> args{"arg1", "arg2"};
-  std::map<std::string, std::string> vars{
-      {"foo", "bar"}, {"baz", "bla"}, {"empty", ""}};
+  std::vector<string> args{"arg1", "arg2"};
+  std::map<string, string> vars{{"foo", "bar"}, {"baz", "bla"}, {"empty", ""}};
   // Substitution tests
   {
     // Direct arg substitution
-    std::string s;
+    string s;
     {
       StringOutputStream output(&s);
       Printer printer(&output, '$');
@@ -610,7 +609,7 @@ TEST(Printer, FormatInternal) {
   }
   {
     // Variable substitution including spaces left
-    std::string s;
+    string s;
     {
       StringOutputStream output(&s);
       Printer printer(&output, '$');
@@ -620,7 +619,7 @@ TEST(Printer, FormatInternal) {
   }
   {
     // Variable substitution including spaces right
-    std::string s;
+    string s;
     {
       StringOutputStream output(&s);
       Printer printer(&output, '$');
@@ -630,7 +629,7 @@ TEST(Printer, FormatInternal) {
   }
   {
     // Mixed variable substitution
-    std::string s;
+    string s;
     {
       StringOutputStream output(&s);
       Printer printer(&output, '$');
@@ -642,7 +641,7 @@ TEST(Printer, FormatInternal) {
   // Indentation tests
   {
     // Empty lines shouldn't indent.
-    std::string s;
+    string s;
     {
       StringOutputStream output(&s);
       Printer printer(&output, '$');
@@ -654,7 +653,7 @@ TEST(Printer, FormatInternal) {
   }
   {
     // Annotations should respect indentation.
-    std::string s;
+    string s;
     GeneratedCodeInfo info;
     {
       StringOutputStream output(&s);
@@ -664,8 +663,7 @@ TEST(Printer, FormatInternal) {
       GeneratedCodeInfo::Annotation annotation;
       annotation.set_source_file("file.proto");
       annotation.add_path(33);
-      std::vector<std::string> args{annotation.SerializeAsString(), "arg1",
-                                    "arg2"};
+      std::vector<string> args{annotation.SerializeAsString(), "arg1", "arg2"};
       printer.FormatInternal(args, vars, "$empty $\n\n${1$$2$$}$ $3$\n$baz$");
       printer.Outdent();
     }
@@ -682,42 +680,42 @@ TEST(Printer, FormatInternal) {
   // Death tests in case of illegal format strings.
   {
     // Unused arguments
-    std::string s;
+    string s;
     StringOutputStream output(&s);
     Printer printer(&output, '$');
     EXPECT_DEATH(printer.FormatInternal(args, vars, "$empty $$1$"), "Unused");
   }
   {
     // Wrong order arguments
-    std::string s;
+    string s;
     StringOutputStream output(&s);
     Printer printer(&output, '$');
     EXPECT_DEATH(printer.FormatInternal(args, vars, "$2$ $1$"), "order");
   }
   {
     // Zero is illegal argument
-    std::string s;
+    string s;
     StringOutputStream output(&s);
     Printer printer(&output, '$');
     EXPECT_DEATH(printer.FormatInternal(args, vars, "$0$"), "failed");
   }
   {
     // Argument out of bounds
-    std::string s;
+    string s;
     StringOutputStream output(&s);
     Printer printer(&output, '$');
     EXPECT_DEATH(printer.FormatInternal(args, vars, "$1$ $2$ $3$"), "bounds");
   }
   {
     // Unknown variable
-    std::string s;
+    string s;
     StringOutputStream output(&s);
     Printer printer(&output, '$');
     EXPECT_DEATH(printer.FormatInternal(args, vars, "$huh$ $1$$2$"), "Unknown");
   }
   {
     // Illegal variable
-    std::string s;
+    string s;
     StringOutputStream output(&s);
     Printer printer(&output, '$');
     EXPECT_DEATH(printer.FormatInternal({}, vars, "$ $"), "Empty");

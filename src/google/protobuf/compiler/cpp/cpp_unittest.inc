@@ -94,11 +94,11 @@ class MockErrorCollector : public MultiFileErrorCollector {
   MockErrorCollector() {}
   ~MockErrorCollector() {}
 
-  std::string text_;
+  string text_;
 
   // implements ErrorCollector ---------------------------------------
-  void AddError(const std::string& filename, int line, int column,
-                const std::string& message) {
+  void AddError(const string& filename, int line, int column,
+                const string& message) {
     strings::SubstituteAndAppend(&text_, "$0:$1:$2: $3\n",
                                  filename, line, column, message);
   }
@@ -142,7 +142,7 @@ TEST(GENERATED_DESCRIPTOR_TEST_NAME, IdenticalDescriptors) {
 // limit for string literal size
 TEST(GENERATED_DESCRIPTOR_TEST_NAME, EnormousDescriptor) {
   const Descriptor* generated_descriptor =
-    ::protobuf_unittest::TestEnormousDescriptor::descriptor();
+    TestEnormousDescriptor::descriptor();
 
   EXPECT_TRUE(generated_descriptor != NULL);
 }
@@ -241,8 +241,8 @@ TEST(GENERATED_MESSAGE_TEST_NAME, MutableStringDefault) {
 TEST(GENERATED_MESSAGE_TEST_NAME, StringDefaults) {
   UNITTEST::TestExtremeDefaultValues message;
   // Check if '\000' can be used in default string value.
-  EXPECT_EQ(std::string("hel\000lo", 6), message.string_with_zero());
-  EXPECT_EQ(std::string("wor\000ld", 6), message.bytes_with_zero());
+  EXPECT_EQ(string("hel\000lo", 6), message.string_with_zero());
+  EXPECT_EQ(string("wor\000ld", 6), message.bytes_with_zero());
 }
 
 TEST(GENERATED_MESSAGE_TEST_NAME, ReleaseString) {
@@ -256,7 +256,7 @@ TEST(GENERATED_MESSAGE_TEST_NAME, ReleaseString) {
 
   message.set_default_string("blah");
   EXPECT_TRUE(message.has_default_string());
-  std::unique_ptr<std::string> str(message.release_default_string());
+  std::unique_ptr<string> str(message.release_default_string());
   EXPECT_FALSE(message.has_default_string());
   ASSERT_TRUE(str != NULL);
   EXPECT_EQ("blah", *str);
@@ -290,7 +290,7 @@ TEST(GENERATED_MESSAGE_TEST_NAME, SetAllocatedString) {
   UNITTEST::TestAllTypes message;
 
   EXPECT_FALSE(message.has_optional_string());
-  const std::string kHello("hello");
+  const string kHello("hello");
   message.set_optional_string(kHello);
   EXPECT_TRUE(message.has_optional_string());
 
@@ -298,7 +298,7 @@ TEST(GENERATED_MESSAGE_TEST_NAME, SetAllocatedString) {
   EXPECT_FALSE(message.has_optional_string());
   EXPECT_EQ("", message.optional_string());
 
-  message.set_allocated_optional_string(new std::string(kHello));
+  message.set_allocated_optional_string(new string(kHello));
   EXPECT_TRUE(message.has_optional_string());
   EXPECT_EQ(kHello, message.optional_string());
 }
@@ -402,68 +402,70 @@ TEST(GENERATED_MESSAGE_TEST_NAME, StringCharStarLength) {
   EXPECT_EQ("wx", message.repeated_string(0));
 }
 
+#if LANG_CXX11
 TEST(GENERATED_MESSAGE_TEST_NAME, StringMove) {
   // Verify that we trigger the move behavior on a scalar setter.
   protobuf_unittest_no_arena::TestAllTypes message;
   {
-    std::string tmp(32, 'a');
+    string tmp(32, 'a');
 
     const char* old_data = tmp.data();
     message.set_optional_string(std::move(tmp));
     const char* new_data = message.optional_string().data();
 
     EXPECT_EQ(old_data, new_data);
-    EXPECT_EQ(std::string(32, 'a'), message.optional_string());
+    EXPECT_EQ(string(32, 'a'), message.optional_string());
 
-    std::string tmp2(32, 'b');
+    string tmp2(32, 'b');
     old_data = tmp2.data();
     message.set_optional_string(std::move(tmp2));
     new_data = message.optional_string().data();
 
     EXPECT_EQ(old_data, new_data);
-    EXPECT_EQ(std::string(32, 'b'), message.optional_string());
+    EXPECT_EQ(string(32, 'b'), message.optional_string());
   }
 
   // Verify that we trigger the move behavior on a oneof setter.
   {
-    std::string tmp(32, 'a');
+    string tmp(32, 'a');
 
     const char* old_data = tmp.data();
     message.set_oneof_string(std::move(tmp));
     const char* new_data = message.oneof_string().data();
 
     EXPECT_EQ(old_data, new_data);
-    EXPECT_EQ(std::string(32, 'a'), message.oneof_string());
+    EXPECT_EQ(string(32, 'a'), message.oneof_string());
 
-    std::string tmp2(32, 'b');
+    string tmp2(32, 'b');
     old_data = tmp2.data();
     message.set_oneof_string(std::move(tmp2));
     new_data = message.oneof_string().data();
 
     EXPECT_EQ(old_data, new_data);
-    EXPECT_EQ(std::string(32, 'b'), message.oneof_string());
+    EXPECT_EQ(string(32, 'b'), message.oneof_string());
   }
 
   // Verify that we trigger the move behavior on a repeated setter.
   {
-    std::string tmp(32, 'a');
+    string tmp(32, 'a');
 
     const char* old_data = tmp.data();
     message.add_repeated_string(std::move(tmp));
     const char* new_data = message.repeated_string(0).data();
 
     EXPECT_EQ(old_data, new_data);
-    EXPECT_EQ(std::string(32, 'a'), message.repeated_string(0));
+    EXPECT_EQ(string(32, 'a'), message.repeated_string(0));
 
-    std::string tmp2(32, 'b');
+    string tmp2(32, 'b');
     old_data = tmp2.data();
     message.set_repeated_string(0, std::move(tmp2));
     new_data = message.repeated_string(0).data();
 
     EXPECT_EQ(old_data, new_data);
-    EXPECT_EQ(std::string(32, 'b'), message.repeated_string(0));
+    EXPECT_EQ(string(32, 'b'), message.repeated_string(0));
   }
 }
+#endif
 
 
 TEST(GENERATED_MESSAGE_TEST_NAME, CopyFrom) {
@@ -664,7 +666,7 @@ TEST(GENERATED_MESSAGE_TEST_NAME, UpcastCopyFrom) {
 
   TestUtil::SetAllFields(&message1);
 
-  const Message* source = implicit_cast<const Message*>(&message1);
+  const Message* source = ::google::protobuf::implicit_cast<const Message*>(&message1);
   message2.CopyFrom(*source);
 
   TestUtil::ExpectAllFieldsSet(message2);
@@ -725,7 +727,7 @@ TEST(GENERATED_MESSAGE_TEST_NAME, NonEmptyMergeFrom) {
 // Test the generated SerializeWithCachedSizesToArray(),
 TEST(GENERATED_MESSAGE_TEST_NAME, SerializationToArray) {
   UNITTEST::TestAllTypes message1, message2;
-  std::string data;
+  string data;
   TestUtil::SetAllFields(&message1);
   int size = message1.ByteSizeLong();
   data.resize(size);
@@ -739,7 +741,7 @@ TEST(GENERATED_MESSAGE_TEST_NAME, SerializationToArray) {
 
 TEST(GENERATED_MESSAGE_TEST_NAME, PackedFieldsSerializationToArray) {
   UNITTEST::TestPackedTypes packed_message1, packed_message2;
-  std::string packed_data;
+  string packed_data;
   TestUtil::SetPackedFields(&packed_message1);
   int packed_size = packed_message1.ByteSizeLong();
   packed_data.resize(packed_size);
@@ -756,7 +758,7 @@ TEST(GENERATED_MESSAGE_TEST_NAME, SerializationToStream) {
   UNITTEST::TestAllTypes message1, message2;
   TestUtil::SetAllFields(&message1);
   int size = message1.ByteSizeLong();
-  std::string data;
+  string data;
   data.resize(size);
   {
     // Allow the output stream to buffer only one byte at a time.
@@ -775,7 +777,7 @@ TEST(GENERATED_MESSAGE_TEST_NAME, PackedFieldsSerializationToStream) {
   UNITTEST::TestPackedTypes message1, message2;
   TestUtil::SetPackedFields(&message1);
   int size = message1.ByteSizeLong();
-  std::string data;
+  string data;
   data.resize(size);
   {
     // Allow the output stream to buffer only one byte at a time.
@@ -842,7 +844,7 @@ TEST(GENERATED_MESSAGE_TEST_NAME, ForeignNested) {
 TEST(GENERATED_MESSAGE_TEST_NAME, ReallyLargeTagNumber) {
   // Test that really large tag numbers don't break anything.
   UNITTEST::TestReallyLargeTagNumber message1, message2;
-  std::string data;
+  string data;
 
   // For the most part, if this compiles and runs then we're probably good.
   // (The most likely cause for failure would be if something were attempting
@@ -925,7 +927,7 @@ TEST(GENERATED_MESSAGE_TEST_NAME, TestEmbedOptimizedForSize) {
   UNITTEST::TestEmbedOptimizedForSize message, message2;
   message.mutable_optional_message()->set_i(1);
   message.add_repeated_message()->mutable_msg()->set_c(2);
-  std::string data;
+  string data;
   message.SerializeToString(&data);
   ASSERT_TRUE(message2.ParseFromString(data));
   EXPECT_EQ(1, message2.optional_message().i());
@@ -954,7 +956,7 @@ TEST(GENERATED_MESSAGE_TEST_NAME, TestSpaceUsed) {
 
   // Setting a string to a value larger than the string object itself should
   // increase SpaceUsedLong(), because it cannot store the value internally.
-  message1.set_optional_string(std::string(sizeof(std::string) + 1, 'x'));
+  message1.set_optional_string(string(sizeof(string) + 1, 'x'));
   int min_expected_increase = message1.optional_string().capacity();
   EXPECT_LE(empty_message_size + min_expected_increase,
             message1.SpaceUsedLong());
@@ -984,14 +986,14 @@ TEST(GENERATED_MESSAGE_TEST_NAME, TestOneofSpaceUsed) {
   // Setting a string in oneof to a small value should only increase
   // SpaceUsedLong() by the size of a string object.
   message1.set_foo_string("abc");
-  EXPECT_LE(empty_message_size + sizeof(std::string), message1.SpaceUsedLong());
+  EXPECT_LE(empty_message_size + sizeof(string), message1.SpaceUsedLong());
 
   // Setting a string in oneof to a value larger than the string object itself
   // should increase SpaceUsedLong(), because it cannot store the value
   // internally.
-  message1.set_foo_string(std::string(sizeof(std::string) + 1, 'x'));
-  int min_expected_increase =
-      message1.foo_string().capacity() + sizeof(std::string);
+  message1.set_foo_string(string(sizeof(string) + 1, 'x'));
+  int min_expected_increase = message1.foo_string().capacity() +
+      sizeof(string);
   EXPECT_LE(empty_message_size + min_expected_increase,
             message1.SpaceUsedLong());
 
@@ -1036,10 +1038,10 @@ TEST(GENERATED_MESSAGE_TEST_NAME, ExtensionConstantValues) {
 }
 
 TEST(GENERATED_MESSAGE_TEST_NAME, ParseFromTruncated) {
-  const std::string long_string = std::string(128, 'q');
+  const string long_string = string(128, 'q');
   FileDescriptorProto p;
   p.add_extension()->set_name(long_string);
-  const std::string msg = p.SerializeAsString();
+  const string msg = p.SerializeAsString();
   int successful_count = 0;
   for (int i = 0; i <= msg.size(); i++) {
     if (p.ParseFromArray(msg.c_str(), i)) {
@@ -1242,7 +1244,7 @@ class GENERATED_SERVICE_TEST_NAME : public testing::Test {
     // ---------------------------------------------------------------
 
     bool called_;
-    std::string method_;
+    string method_;
     RpcController* controller_;
     const Message* request_;
     Message* response_;
@@ -1302,14 +1304,14 @@ class GENERATED_SERVICE_TEST_NAME : public testing::Test {
       ADD_FAILURE() << "Failed() not expected during this test.";
       return false;
     }
-    std::string ErrorText() const {
+    string ErrorText() const {
       ADD_FAILURE() << "ErrorText() not expected during this test.";
       return "";
     }
     void StartCancel() {
       ADD_FAILURE() << "StartCancel() not expected during this test.";
     }
-    void SetFailed(const std::string& reason) {
+    void SetFailed(const string& reason) {
       ADD_FAILURE() << "SetFailed() not expected during this test.";
     }
     bool IsCanceled() const {
@@ -1469,7 +1471,7 @@ TEST_F(GENERATED_SERVICE_TEST_NAME, NotImplemented) {
    public:
     ExpectUnimplementedController() : called_(false) {}
 
-    void SetFailed(const std::string& reason) {
+    void SetFailed(const string& reason) {
       EXPECT_FALSE(called_);
       called_ = true;
       EXPECT_EQ("Method Foo() not implemented.", reason);
@@ -1619,7 +1621,7 @@ TEST_F(OneofTest, SetString) {
   message.clear_foo_string();
   EXPECT_FALSE(message.has_foo_string());
 
-  message.set_foo_string(std::string("bar"));
+  message.set_foo_string(string("bar"));
   EXPECT_TRUE(message.has_foo_string());
   EXPECT_EQ(message.foo_string(), "bar");
   message.clear_foo_string();
@@ -1655,7 +1657,7 @@ TEST_F(OneofTest, ReleaseString) {
 
   message.set_foo_string("blah");
   EXPECT_TRUE(message.has_foo_string());
-  std::unique_ptr<std::string> str(message.release_foo_string());
+  std::unique_ptr<string> str(message.release_foo_string());
   EXPECT_FALSE(message.has_foo_string());
   ASSERT_TRUE(str != NULL);
   EXPECT_EQ("blah", *str);
@@ -1669,7 +1671,7 @@ TEST_F(OneofTest, SetAllocatedString) {
   UNITTEST::TestOneof2 message;
 
   EXPECT_FALSE(message.has_foo_string());
-  const std::string kHello("hello");
+  const string kHello("hello");
   message.set_foo_string(kHello);
   EXPECT_TRUE(message.has_foo_string());
 
@@ -1677,7 +1679,7 @@ TEST_F(OneofTest, SetAllocatedString) {
   EXPECT_FALSE(message.has_foo_string());
   EXPECT_EQ("", message.foo_string());
 
-  message.set_allocated_foo_string(new std::string(kHello));
+  message.set_allocated_foo_string(new string(kHello));
   EXPECT_TRUE(message.has_foo_string());
   EXPECT_EQ(kHello, message.foo_string());
 }
@@ -1871,7 +1873,7 @@ TEST_F(OneofTest, UpcastCopyFrom) {
   message1.mutable_foogroup()->set_a(123);
   EXPECT_TRUE(message1.has_foogroup());
 
-  const Message* source = implicit_cast<const Message*>(&message1);
+  const Message* source = ::google::protobuf::implicit_cast<const Message*>(&message1);
   message2.CopyFrom(*source);
 
   EXPECT_TRUE(message2.has_foogroup());
@@ -1886,21 +1888,21 @@ TEST_F(OneofTest, SerializationToArray) {
   // Primitive type
   {
     UNITTEST::TestOneof2 message1, message2;
-std::string data;
-message1.set_foo_int(123);
-int size = message1.ByteSizeLong();
-data.resize(size);
-uint8* start = reinterpret_cast<uint8*>(::google::protobuf::string_as_array(&data));
-uint8* end = message1.SerializeWithCachedSizesToArray(start);
-EXPECT_EQ(size, end - start);
-EXPECT_TRUE(message2.ParseFromString(data));
-EXPECT_EQ(message2.foo_int(), 123);
+    string data;
+    message1.set_foo_int(123);
+    int size = message1.ByteSizeLong();
+    data.resize(size);
+    uint8* start = reinterpret_cast<uint8*>(::google::protobuf::string_as_array(&data));
+    uint8* end = message1.SerializeWithCachedSizesToArray(start);
+    EXPECT_EQ(size, end - start);
+    EXPECT_TRUE(message2.ParseFromString(data));
+    EXPECT_EQ(message2.foo_int(), 123);
   }
 
   // String
   {
     UNITTEST::TestOneof2 message1, message2;
-    std::string data;
+    string data;
     message1.set_foo_string("foo");
     int size = message1.ByteSizeLong();
     data.resize(size);
@@ -1915,7 +1917,7 @@ EXPECT_EQ(message2.foo_int(), 123);
   // Bytes
   {
     UNITTEST::TestOneof2 message1, message2;
-    std::string data;
+    string data;
     message1.set_foo_bytes("qux");
     int size = message1.ByteSizeLong();
     data.resize(size);
@@ -1929,7 +1931,7 @@ EXPECT_EQ(message2.foo_int(), 123);
   // Enum
   {
     UNITTEST::TestOneof2 message1, message2;
-    std::string data;
+    string data;
     message1.set_foo_enum(UNITTEST::TestOneof2::FOO);
     int size = message1.ByteSizeLong();
     data.resize(size);
@@ -1943,7 +1945,7 @@ EXPECT_EQ(message2.foo_int(), 123);
   // Message
   {
     UNITTEST::TestOneof2 message1, message2;
-    std::string data;
+    string data;
     message1.mutable_foo_message()->set_qux_int(234);
     int size = message1.ByteSizeLong();
     data.resize(size);
@@ -1957,7 +1959,7 @@ EXPECT_EQ(message2.foo_int(), 123);
   // Group
   {
     UNITTEST::TestOneof2 message1, message2;
-    std::string data;
+    string data;
     message1.mutable_foogroup()->set_a(345);
     int size = message1.ByteSizeLong();
     data.resize(size);
@@ -1979,19 +1981,19 @@ TEST_F(OneofTest, SerializationToStream) {
   // Primitive type
   {
     UNITTEST::TestOneof2 message1, message2;
-std::string data;
-message1.set_foo_int(123);
-int size = message1.ByteSizeLong();
-data.resize(size);
+    string data;
+    message1.set_foo_int(123);
+    int size = message1.ByteSizeLong();
+    data.resize(size);
 
-{
-  // Allow the output stream to buffer only one byte at a time.
-  io::ArrayOutputStream array_stream(::google::protobuf::string_as_array(&data), size, 1);
-  io::CodedOutputStream output_stream(&array_stream);
-  message1.SerializeWithCachedSizes(&output_stream);
-  EXPECT_FALSE(output_stream.HadError());
-  EXPECT_EQ(size, output_stream.ByteCount());
-}
+    {
+      // Allow the output stream to buffer only one byte at a time.
+      io::ArrayOutputStream array_stream(::google::protobuf::string_as_array(&data), size, 1);
+      io::CodedOutputStream output_stream(&array_stream);
+      message1.SerializeWithCachedSizes(&output_stream);
+      EXPECT_FALSE(output_stream.HadError());
+      EXPECT_EQ(size, output_stream.ByteCount());
+    }
 
     EXPECT_TRUE(message2.ParseFromString(data));
     EXPECT_EQ(message2.foo_int(), 123);
@@ -2000,7 +2002,7 @@ data.resize(size);
   // String
   {
     UNITTEST::TestOneof2 message1, message2;
-    std::string data;
+    string data;
     message1.set_foo_string("foo");
     int size = message1.ByteSizeLong();
     data.resize(size);
@@ -2022,7 +2024,7 @@ data.resize(size);
   // Bytes
   {
     UNITTEST::TestOneof2 message1, message2;
-    std::string data;
+    string data;
     message1.set_foo_bytes("qux");
     int size = message1.ByteSizeLong();
     data.resize(size);
@@ -2043,7 +2045,7 @@ data.resize(size);
   // Enum
   {
     UNITTEST::TestOneof2 message1, message2;
-    std::string data;
+    string data;
     message1.set_foo_enum(UNITTEST::TestOneof2::FOO);
     int size = message1.ByteSizeLong();
     data.resize(size);
@@ -2064,7 +2066,7 @@ data.resize(size);
   // Message
   {
     UNITTEST::TestOneof2 message1, message2;
-    std::string data;
+    string data;
     message1.mutable_foo_message()->set_qux_int(234);
     int size = message1.ByteSizeLong();
     data.resize(size);
@@ -2085,7 +2087,7 @@ data.resize(size);
   // Group
   {
     UNITTEST::TestOneof2 message1, message2;
-    std::string data;
+    string data;
     message1.mutable_foogroup()->set_a(345);
     int size = message1.ByteSizeLong();
     data.resize(size);
@@ -2151,12 +2153,12 @@ TEST(HELPERS_TEST_NAME, TestSCC) {
   UNITTEST::TestMutualRecursionA a;
   MessageSCCAnalyzer scc_analyzer((Options()));
   const SCC* scc = scc_analyzer.GetSCC(a.GetDescriptor());
-  std::vector<std::string> names;
+  std::vector<string> names;
   names.reserve(scc->descriptors.size());
   for (int i = 0; i < scc->descriptors.size(); i++) {
     names.push_back(scc->descriptors[i]->full_name());
   }
-  std::string package = a.GetDescriptor()->file()->package();
+  string package = a.GetDescriptor()->file()->package();
   ASSERT_EQ(names.size(), 4);
   std::sort(names.begin(), names.end());
   EXPECT_EQ(names[0], package + ".TestMutualRecursionA");
@@ -2224,19 +2226,16 @@ namespace cpp_unittest {
 TEST_F(GENERATED_SERVICE_TEST_NAME, NoGenericServices) {
   // Verify that non-services in unittest_no_generic_services.proto were
   // generated.
-  ::protobuf_unittest::no_generic_services_test::TestMessage message;
+  no_generic_services_test::TestMessage message;
   message.set_a(1);
-  message.SetExtension(
-      ::protobuf_unittest::no_generic_services_test::test_extension, 123);
-  ::protobuf_unittest::no_generic_services_test::TestEnum e =
-      ::protobuf_unittest::no_generic_services_test::FOO;
+  message.SetExtension(no_generic_services_test::test_extension, 123);
+  no_generic_services_test::TestEnum e = no_generic_services_test::FOO;
   EXPECT_EQ(e, 1);
 
   // Verify that a ServiceDescriptor is generated for the service even if the
   // class itself is not.
   const FileDescriptor* file =
-      ::google::protobuf::unittest::no_generic_services_test::TestMessage::descriptor()
-          ->file();
+      no_generic_services_test::TestMessage::descriptor()->file();
 
   ASSERT_EQ(1, file->service_count());
   EXPECT_EQ("TestService", file->service(0)->name());

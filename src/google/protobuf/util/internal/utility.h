@@ -37,7 +37,6 @@
 
 #include <google/protobuf/stubs/common.h>
 #include <google/protobuf/stubs/logging.h>
-#include <google/protobuf/any.pb.h>
 #include <google/protobuf/type.pb.h>
 #include <google/protobuf/repeated_field.h>
 #include <google/protobuf/stubs/strutil.h>
@@ -47,6 +46,19 @@
 #include <google/protobuf/stubs/statusor.h>
 
 #include <google/protobuf/port_def.inc>
+
+namespace google {
+namespace protobuf {
+class Method;
+class Any;
+class Bool;
+class Option;
+class Field;
+class Type;
+class Enum;
+class EnumValue;
+}  // namespace protobuf
+}  // namespace google
 
 namespace google {
 namespace protobuf {
@@ -107,8 +119,7 @@ PROTOBUF_EXPORT const StringPiece GetTypeWithoutUrl(
 // E.g:
 // GetFullTypeWithUrl("google.protobuf.Timestamp") returns the string
 // "type.googleapis.com/google.protobuf.Timestamp".
-PROTOBUF_EXPORT const std::string GetFullTypeWithUrl(
-    StringPiece simple_type);
+PROTOBUF_EXPORT const std::string GetFullTypeWithUrl(StringPiece simple_type);
 
 // Finds and returns option identified by name and option_name within the
 // provided map. Returns nullptr if none found.
