@@ -57,10 +57,7 @@ function doTest($request)
           $response->setParseError($e->getMessage());
           return $response;
       }
-	} elseif ($request->getPayload() == "text_payload") {
-		$response->setSkipped("PHP doesn't support text format yet");
-        return $response;
-	} else {
+    } else {
       trigger_error("Request didn't have payload.", E_USER_ERROR);
     }
 

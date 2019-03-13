@@ -560,7 +560,7 @@ namespace Google.Protobuf
             {
                 return "";
             }
-            if (length <= bufferSize - bufferPos && length > 0)
+            if (length <= bufferSize - bufferPos)
             {
                 // Fast path:  We already have the bytes in a contiguous buffer, so
                 //   just copy directly from it.

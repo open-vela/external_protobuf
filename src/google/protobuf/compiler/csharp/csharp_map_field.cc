@@ -31,6 +31,7 @@
 #include <sstream>
 
 #include <google/protobuf/compiler/code_generator.h>
+#include <google/protobuf/compiler/plugin.h>
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/descriptor.pb.h>
 #include <google/protobuf/io/printer.h>
@@ -55,7 +56,7 @@ MapFieldGenerator::MapFieldGenerator(const FieldDescriptor* descriptor,
 MapFieldGenerator::~MapFieldGenerator() {
 }
 
-void MapFieldGenerator::GenerateMembers(io::Printer* printer) {
+void MapFieldGenerator::GenerateMembers(io::Printer* printer) {   
   const FieldDescriptor* key_descriptor =
       descriptor_->message_type()->FindFieldByName("key");
   const FieldDescriptor* value_descriptor =

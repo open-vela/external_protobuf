@@ -52,10 +52,12 @@ namespace java {
 
 namespace {
 
-void SetMessageVariables(const FieldDescriptor* descriptor, int messageBitIndex,
-                         int builderBitIndex, const FieldGeneratorInfo* info,
+void SetMessageVariables(const FieldDescriptor* descriptor,
+                         int messageBitIndex,
+                         int builderBitIndex,
+                         const FieldGeneratorInfo* info,
                          ClassNameResolver* name_resolver,
-                         std::map<std::string, std::string>* variables) {
+                         std::map<string, string>* variables) {
   SetCommonFieldVariables(descriptor, info, variables);
 
   (*variables)["type"] =
@@ -117,7 +119,7 @@ ImmutableMessageFieldLiteGenerator::ImmutableMessageFieldLiteGenerator(
 ImmutableMessageFieldLiteGenerator::~ImmutableMessageFieldLiteGenerator() {}
 
 int ImmutableMessageFieldLiteGenerator::GetNumBitsForMessage() const {
-  return SupportFieldPresence(descriptor_->file()) ? 1 : 0;
+  return 1;
 }
 
 void ImmutableMessageFieldLiteGenerator::
@@ -373,7 +375,7 @@ GenerateHashCode(io::Printer* printer) const {
     "hash = (53 * hash) + get$capitalized_name$().hashCode();\n");
 }
 
-std::string ImmutableMessageFieldLiteGenerator::GetBoxedType() const {
+string ImmutableMessageFieldLiteGenerator::GetBoxedType() const {
   return name_resolver_->GetImmutableClassName(descriptor_->message_type());
 }
 
@@ -974,7 +976,7 @@ GenerateHashCode(io::Printer* printer) const {
     "}\n");
 }
 
-std::string RepeatedImmutableMessageFieldLiteGenerator::GetBoxedType() const {
+string RepeatedImmutableMessageFieldLiteGenerator::GetBoxedType() const {
   return name_resolver_->GetImmutableClassName(descriptor_->message_type());
 }
 

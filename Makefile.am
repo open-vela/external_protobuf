@@ -49,7 +49,6 @@ pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = protobuf.pc protobuf-lite.pc
 
 csharp_EXTRA_DIST=                                                           \
-  global.json                                                                \
   csharp/.gitignore                                                          \
   csharp/CHANGES.txt                                                         \
   csharp/Google.Protobuf.Tools.targets                                       \
@@ -57,10 +56,9 @@ csharp_EXTRA_DIST=                                                           \
   csharp/README.md                                                           \
   csharp/build_packages.bat                                                  \
   csharp/build_tools.sh                                                      \
-  csharp/buildall.bat                                                        \
   csharp/buildall.sh                                                         \
   csharp/generate_protos.sh                                                  \
-  csharp/install_dotnet_sdk.ps1                                              \
+  csharp/global.json                                                         \
   csharp/keys/Google.Protobuf.public.snk                                     \
   csharp/keys/Google.Protobuf.snk                                            \
   csharp/keys/README.md                                                      \
@@ -77,12 +75,6 @@ csharp_EXTRA_DIST=                                                           \
   csharp/src/AddressBook/ListPeople.cs                                       \
   csharp/src/AddressBook/Program.cs                                          \
   csharp/src/AddressBook/SampleUsage.cs                                      \
-  csharp/src/Google.Protobuf.Benchmarks/SerializationConfig.cs               \
-  csharp/src/Google.Protobuf.Benchmarks/SerializationBenchmark.cs            \
-  csharp/src/Google.Protobuf.Benchmarks/Program.cs                           \
-  csharp/src/Google.Protobuf.Benchmarks/Google.Protobuf.Benchmarks.csproj    \
-  csharp/src/Google.Protobuf.Benchmarks/Benchmarks.cs                        \
-  csharp/src/Google.Protobuf.Benchmarks/BenchmarkMessage1Proto3.cs           \
   csharp/src/Google.Protobuf.Conformance/Conformance.cs                      \
   csharp/src/Google.Protobuf.Conformance/Google.Protobuf.Conformance.csproj  \
   csharp/src/Google.Protobuf.Conformance/Program.cs                          \
@@ -379,7 +371,6 @@ java_EXTRA_DIST=                                                                
   java/core/src/test/proto/com/google/protobuf/outer_class_name_test.proto         \
   java/core/src/test/proto/com/google/protobuf/outer_class_name_test2.proto        \
   java/core/src/test/proto/com/google/protobuf/outer_class_name_test3.proto        \
-  java/core/src/test/proto/com/google/protobuf/proto2_unknown_enum_values.proto    \
   java/core/src/test/proto/com/google/protobuf/test_bad_identifiers.proto          \
   java/core/src/test/proto/com/google/protobuf/test_check_utf8.proto               \
   java/core/src/test/proto/com/google/protobuf/test_check_utf8_size.proto          \
@@ -600,7 +591,6 @@ php_EXTRA_DIST=                                                       \
   php/README.md                                                       \
   php/composer.json                                                   \
   php/ext/google/protobuf/array.c                                     \
-  php/ext/google/protobuf/builtin_descriptors.inc                     \
   php/ext/google/protobuf/config.m4                                   \
   php/ext/google/protobuf/def.c                                       \
   php/ext/google/protobuf/encode_decode.c                             \
@@ -803,7 +793,6 @@ python_EXTRA_DIST=                                                           \
   python/google/protobuf/internal/descriptor_test.py                         \
   python/google/protobuf/internal/encoder.py                                 \
   python/google/protobuf/internal/enum_type_wrapper.py                       \
-  python/google/protobuf/internal/extension_dict.py                          \
   python/google/protobuf/internal/factory_test1.proto                        \
   python/google/protobuf/internal/factory_test2.proto                        \
   python/google/protobuf/internal/file_options_test.proto                    \
@@ -963,7 +952,6 @@ ruby_EXTRA_DIST=                                                             \
   ruby/tests/test_ruby_package.proto                                         \
   ruby/tests/generated_code_test.rb                                          \
   ruby/tests/well_known_types_test.rb                                        \
-  ruby/tests/type_errors.rb                                                  \
   ruby/travis-test.sh
 
 js_EXTRA_DIST=                                                         \

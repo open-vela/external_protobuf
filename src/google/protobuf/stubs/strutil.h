@@ -43,7 +43,7 @@
 namespace google {
 namespace protobuf {
 
-#if defined(_MSC_VER) && _MSC_VER < 1800
+#ifdef _MSC_VER
 #define strtoll  _strtoi64
 #define strtoull _strtoui64
 #elif defined(__DECCXX) && defined(__osf__)

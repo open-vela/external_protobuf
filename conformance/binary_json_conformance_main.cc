@@ -28,33 +28,10 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-syntax = "proto2";
+#include "binary_json_conformance_suite.h"
+#include "conformance_test.h"
 
-package proto2_unknown_enum_values;
-
-option java_package = "com.google.protobuf";
-option java_outer_classname = "Proto2UnknownEnumValuesTestProto";
-
-enum Proto2TestEnum {
-  ZERO = 0;
-  ONE = 1;
-  TWO = 2;
-}
-
-message Proto2EnumMessage {
-  repeated Proto2TestEnum repeated_packed_enum = 1 [packed = true];
-}
-
-// An enum containing a subset of the values of Proto2TestEnum, to test
-// parsing unknown packed enum values
-enum Proto2TestEnumSubset {
-  TESTENUM_SUBSET_ZERO = 0;
-  TESTENUM_SUBSET_ONE = 1;
-  // No enum value with number 2.
-}
-
-// Test messages for packed enum, with identical field number as
-// Proto2Message, to test parsing unknown packed enums.
-message Proto2EnumMessageWithEnumSubset {
-  repeated Proto2TestEnumSubset repeated_packed_enum = 1 [packed = true];
+int main(int argc, char *argv[]) {
+  google::protobuf::BinaryAndJsonConformanceSuite suite;
+  return google::protobuf::ForkPipeRunner::Run(argc, argv, &suite);
 }

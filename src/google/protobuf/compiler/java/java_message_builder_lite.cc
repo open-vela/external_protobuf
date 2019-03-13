@@ -59,6 +59,13 @@ namespace protobuf {
 namespace compiler {
 namespace java {
 
+namespace {
+bool GenerateHasBits(const Descriptor* descriptor) {
+  return SupportFieldPresence(descriptor->file()) ||
+      HasRepeatedFields(descriptor);
+}
+}  // namespace
+
 MessageBuilderLiteGenerator::MessageBuilderLiteGenerator(
     const Descriptor* descriptor, Context* context)
   : descriptor_(descriptor), context_(context),
@@ -89,7 +96,7 @@ Generate(io::Printer* printer) {
   GenerateCommonBuilderMethods(printer);
 
   // oneof
-  std::map<std::string, std::string> vars;
+  std::map<string, string> vars;
   for (int i = 0; i < descriptor_->oneof_decl_count(); i++) {
     vars["oneof_name"] = context_->GetOneofGeneratorInfo(
         descriptor_->oneof_decl(i))->name;

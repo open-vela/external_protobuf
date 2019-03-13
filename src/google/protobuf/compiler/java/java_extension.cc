@@ -63,10 +63,9 @@ ImmutableExtensionGenerator::~ImmutableExtensionGenerator() {}
 
 // Initializes the vars referenced in the generated code templates.
 void ExtensionGenerator::InitTemplateVars(
-    const FieldDescriptor* descriptor, const std::string& scope, bool immutable,
-    ClassNameResolver* name_resolver,
-    std::map<std::string, std::string>* vars_pointer) {
-  std::map<std::string, std::string>& vars = *vars_pointer;
+    const FieldDescriptor* descriptor, const string& scope, bool immutable,
+    ClassNameResolver* name_resolver, std::map<string, string>* vars_pointer) {
+  std::map<string, string> &vars = *vars_pointer;
   vars["scope"] = scope;
   vars["name"] = UnderscoresToCamelCase(descriptor);
   vars["containing_type"] =
@@ -82,7 +81,7 @@ void ExtensionGenerator::InitTemplateVars(
   vars["prototype"] = "null";
 
   JavaType java_type = GetJavaType(descriptor);
-  std::string singular_type;
+  string singular_type;
   switch (java_type) {
     case JAVATYPE_MESSAGE:
       singular_type = name_resolver->GetClassName(descriptor->message_type(),
@@ -110,7 +109,7 @@ void ExtensionGenerator::InitTemplateVars(
 }
 
 void ImmutableExtensionGenerator::Generate(io::Printer* printer) {
-  std::map<std::string, std::string> vars;
+  std::map<string, string> vars;
   const bool kUseImmutableNames = true;
   InitTemplateVars(descriptor_, scope_, kUseImmutableNames, name_resolver_,
                    &vars);

@@ -29,6 +29,3 @@ mono/*.exe
 mono/*.dll
 lib/protoc.exe
 *.ncrunch*
-
-# Benchmark output
-BenchmarkDotNet.Artifacts/

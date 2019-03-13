@@ -34,8 +34,6 @@
 #include <mutex>
 #include <utility>
 
-#include <google/protobuf/port_def.inc>
-
 namespace google {
 namespace protobuf {
 namespace internal {
@@ -47,9 +45,8 @@ void call_once(Args&&... args ) {
 }
 
 }  // namespace internal
+
 }  // namespace protobuf
 }  // namespace google
-
-#include <google/protobuf/port_undef.inc>
 
 #endif  // GOOGLE_PROTOBUF_STUBS_ONCE_H__

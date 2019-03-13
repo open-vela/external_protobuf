@@ -78,7 +78,7 @@ const char* kForbiddenWordList[] = {
 
 const int kDefaultLookUpStartFieldNumber = 40;
 
-bool IsForbidden(const std::string& field_name) {
+bool IsForbidden(const string& field_name) {
   for (int i = 0; i < GOOGLE_ARRAYSIZE(kForbiddenWordList); ++i) {
     if (field_name == kForbiddenWordList[i]) {
       return true;
@@ -87,8 +87,8 @@ bool IsForbidden(const std::string& field_name) {
   return false;
 }
 
-std::string FieldName(const FieldDescriptor* field) {
-  std::string field_name;
+string FieldName(const FieldDescriptor* field) {
+  string field_name;
   // Groups are hacky:  The name of the field is just the lower-cased name
   // of the group type.  In Java, though, we would like to retain the original
   // capitalization of the type name.
@@ -105,14 +105,29 @@ std::string FieldName(const FieldDescriptor* field) {
   return field_name;
 }
 
+
+// Judge whether should use table or use look up.
+// Copied from com.google.protobuf.SchemaUtil.shouldUseTableSwitch
+bool ShouldUseTable(int lo, int hi, int number_of_fields) {
+  if (hi < kDefaultLookUpStartFieldNumber) {
+    return true;
+  }
+  int64 table_space_cost = (static_cast<int64>(hi) - lo + 1);  // words
+  int64 table_time_cost = 3;           // comparisons
+  int64 lookup_space_cost = 3 + 2 * static_cast<int64>(number_of_fields);
+  int64 lookup_time_cost = 3 + number_of_fields;
+  return table_space_cost + 3 * table_time_cost <=
+         lookup_space_cost + 3 * lookup_time_cost;
+}
+
 }  // namespace
 
 void PrintGeneratedAnnotation(io::Printer* printer, char delimiter,
-                              const std::string& annotation_file) {
+                              const string& annotation_file) {
   if (annotation_file.empty()) {
     return;
   }
-  std::string ptemplate =
+  string ptemplate =
       "@javax.annotation.Generated(value=\"protoc\", comments=\"annotations:";
   ptemplate.push_back(delimiter);
   ptemplate.append("annotation_file");
@@ -123,9 +138,10 @@ void PrintGeneratedAnnotation(io::Printer* printer, char delimiter,
 
 void PrintEnumVerifierLogic(io::Printer* printer,
                             const FieldDescriptor* descriptor,
-                            const std::map<std::string, std::string>& variables,
+                            const std::map<string, string>& variables,
                             const char* var_name,
-                            const char* terminating_string, bool enforce_lite) {
+                            const char* terminating_string,
+                            bool enforce_lite) {
   std::string enum_verifier_string =
       (descriptor->enum_type()->file()->options().optimize_for() ==
        FileOptions::LITE_RUNTIME) || enforce_lite
@@ -143,9 +159,8 @@ void PrintEnumVerifierLogic(io::Printer* printer,
       StrCat(enum_verifier_string, terminating_string).c_str());
 }
 
-std::string UnderscoresToCamelCase(const std::string& input,
-                                   bool cap_next_letter) {
-  std::string result;
+string UnderscoresToCamelCase(const string& input, bool cap_next_letter) {
+  string result;
   // Note:  I distrust ctype.h due to locales.
   for (int i = 0; i < input.size(); i++) {
     if ('a' <= input[i] && input[i] <= 'z') {
@@ -179,35 +194,35 @@ std::string UnderscoresToCamelCase(const std::string& input,
   return result;
 }
 
-std::string UnderscoresToCamelCase(const FieldDescriptor* field) {
+string UnderscoresToCamelCase(const FieldDescriptor* field) {
   return UnderscoresToCamelCase(FieldName(field), false);
 }
 
-std::string UnderscoresToCapitalizedCamelCase(const FieldDescriptor* field) {
+string UnderscoresToCapitalizedCamelCase(const FieldDescriptor* field) {
   return UnderscoresToCamelCase(FieldName(field), true);
 }
 
-std::string CapitalizedFieldName(const FieldDescriptor* field) {
+string CapitalizedFieldName(const FieldDescriptor* field) {
   return UnderscoresToCapitalizedCamelCase(field);
 }
 
-std::string UnderscoresToCamelCase(const MethodDescriptor* method) {
+string UnderscoresToCamelCase(const MethodDescriptor* method) {
   return UnderscoresToCamelCase(method->name(), false);
 }
 
-std::string UniqueFileScopeIdentifier(const Descriptor* descriptor) {
+string UniqueFileScopeIdentifier(const Descriptor* descriptor) {
   return "static_" + StringReplace(descriptor->full_name(), ".", "_", true);
 }
 
-std::string CamelCaseFieldName(const FieldDescriptor* field) {
-  std::string fieldName = UnderscoresToCamelCase(field);
+string CamelCaseFieldName(const FieldDescriptor* field) {
+  string fieldName = UnderscoresToCamelCase(field);
   if ('0' <= fieldName[0] && fieldName[0] <= '9') {
     return '_' + fieldName;
   }
   return fieldName;
 }
 
-std::string StripProto(const std::string& filename) {
+string StripProto(const string& filename) {
   if (HasSuffixString(filename, ".protodevel")) {
     return StripSuffixString(filename, ".protodevel");
   } else {
@@ -215,13 +230,13 @@ std::string StripProto(const std::string& filename) {
   }
 }
 
-std::string FileClassName(const FileDescriptor* file, bool immutable) {
+string FileClassName(const FileDescriptor* file, bool immutable) {
   ClassNameResolver name_resolver;
   return name_resolver.GetFileClassName(file, immutable);
 }
 
-std::string FileJavaPackage(const FileDescriptor* file, bool immutable) {
-  std::string result;
+string FileJavaPackage(const FileDescriptor* file, bool immutable) {
+  string result;
 
   if (file->options().has_java_package()) {
     result = file->options().java_package();
@@ -236,21 +251,22 @@ std::string FileJavaPackage(const FileDescriptor* file, bool immutable) {
   return result;
 }
 
-std::string FileJavaPackage(const FileDescriptor* file) {
+string FileJavaPackage(const FileDescriptor* file) {
   return FileJavaPackage(file, true /* immutable */);
 }
 
-std::string JavaPackageToDir(std::string package_name) {
-  std::string package_dir = StringReplace(package_name, ".", "/", true);
+string JavaPackageToDir(string package_name) {
+  string package_dir =
+    StringReplace(package_name, ".", "/", true);
   if (!package_dir.empty()) package_dir += "/";
   return package_dir;
 }
 
 // TODO(xiaofeng): This function is only kept for it's publicly referenced.
 // It should be removed after mutable API up-integration.
-std::string ToJavaName(const std::string& full_name,
-                       const FileDescriptor* file) {
-  std::string result;
+string ToJavaName(const string& full_name,
+                  const FileDescriptor* file) {
+  string result;
   if (file->options().java_multiple_files()) {
     result = FileJavaPackage(file);
   } else {
@@ -269,48 +285,48 @@ std::string ToJavaName(const std::string& full_name,
   return result;
 }
 
-std::string ClassName(const Descriptor* descriptor) {
+string ClassName(const Descriptor* descriptor) {
   ClassNameResolver name_resolver;
   return name_resolver.GetClassName(descriptor, true);
 }
 
-std::string ClassName(const EnumDescriptor* descriptor) {
+string ClassName(const EnumDescriptor* descriptor) {
   ClassNameResolver name_resolver;
   return name_resolver.GetClassName(descriptor, true);
 }
 
-std::string ClassName(const ServiceDescriptor* descriptor) {
+string ClassName(const ServiceDescriptor* descriptor) {
   ClassNameResolver name_resolver;
   return name_resolver.GetClassName(descriptor, true);
 }
 
-std::string ClassName(const FileDescriptor* descriptor) {
+string ClassName(const FileDescriptor* descriptor) {
   ClassNameResolver name_resolver;
   return name_resolver.GetClassName(descriptor, true);
 }
 
 
-std::string ExtraMessageInterfaces(const Descriptor* descriptor) {
-  std::string interfaces = "// @@protoc_insertion_point(message_implements:" +
-                           descriptor->full_name() + ")";
+string ExtraMessageInterfaces(const Descriptor* descriptor) {
+  string interfaces = "// @@protoc_insertion_point(message_implements:"
+      + descriptor->full_name() + ")";
   return interfaces;
 }
 
 
-std::string ExtraBuilderInterfaces(const Descriptor* descriptor) {
-  std::string interfaces = "// @@protoc_insertion_point(builder_implements:" +
-                           descriptor->full_name() + ")";
+string ExtraBuilderInterfaces(const Descriptor* descriptor) {
+  string interfaces = "// @@protoc_insertion_point(builder_implements:"
+      + descriptor->full_name() + ")";
   return interfaces;
 }
 
-std::string ExtraMessageOrBuilderInterfaces(const Descriptor* descriptor) {
-  std::string interfaces = "// @@protoc_insertion_point(interface_extends:" +
-                           descriptor->full_name() + ")";
+string ExtraMessageOrBuilderInterfaces(const Descriptor* descriptor) {
+  string interfaces = "// @@protoc_insertion_point(interface_extends:"
+      + descriptor->full_name() + ")";
   return interfaces;
 }
 
-std::string FieldConstantName(const FieldDescriptor* field) {
-  std::string name = field->name() + "_FIELD_NUMBER";
+string FieldConstantName(const FieldDescriptor *field) {
+  string name = field->name() + "_FIELD_NUMBER";
   UpperString(&name);
   return name;
 }
@@ -443,7 +459,7 @@ const char* FieldTypeName(FieldDescriptor::Type field_type) {
   return NULL;
 }
 
-bool AllAscii(const std::string& text) {
+bool AllAscii(const string& text) {
   for (int i = 0; i < text.size(); i++) {
     if ((text[i] & 0x80) != 0) {
       return false;
@@ -452,8 +468,8 @@ bool AllAscii(const std::string& text) {
   return true;
 }
 
-std::string DefaultValue(const FieldDescriptor* field, bool immutable,
-                         ClassNameResolver* name_resolver) {
+string DefaultValue(const FieldDescriptor* field, bool immutable,
+                    ClassNameResolver* name_resolver) {
   // Switch on CppType since we need to know which default_value_* method
   // of FieldDescriptor to call.
   switch (field->cpp_type()) {
@@ -606,69 +622,69 @@ const char* bit_masks[] = {
   "0x80000000",
 };
 
-std::string GetBitFieldName(int index) {
-  std::string varName = "bitField";
+string GetBitFieldName(int index) {
+  string varName = "bitField";
   varName += StrCat(index);
   varName += "_";
   return varName;
 }
 
-std::string GetBitFieldNameForBit(int bitIndex) {
+string GetBitFieldNameForBit(int bitIndex) {
   return GetBitFieldName(bitIndex / 32);
 }
 
 namespace {
 
-std::string GenerateGetBitInternal(const std::string& prefix, int bitIndex) {
-  std::string varName = prefix + GetBitFieldNameForBit(bitIndex);
+string GenerateGetBitInternal(const string& prefix, int bitIndex) {
+  string varName = prefix + GetBitFieldNameForBit(bitIndex);
   int bitInVarIndex = bitIndex % 32;
 
-  std::string mask = bit_masks[bitInVarIndex];
-  std::string result = "((" + varName + " & " + mask + ") != 0)";
+  string mask = bit_masks[bitInVarIndex];
+  string result = "((" + varName + " & " + mask + ") != 0)";
   return result;
 }
 
-std::string GenerateSetBitInternal(const std::string& prefix, int bitIndex) {
-  std::string varName = prefix + GetBitFieldNameForBit(bitIndex);
+string GenerateSetBitInternal(const string& prefix, int bitIndex) {
+  string varName = prefix + GetBitFieldNameForBit(bitIndex);
   int bitInVarIndex = bitIndex % 32;
 
-  std::string mask = bit_masks[bitInVarIndex];
-  std::string result = varName + " |= " + mask;
+  string mask = bit_masks[bitInVarIndex];
+  string result = varName + " |= " + mask;
   return result;
 }
 
 }  // namespace
 
-std::string GenerateGetBit(int bitIndex) {
+string GenerateGetBit(int bitIndex) {
   return GenerateGetBitInternal("", bitIndex);
 }
 
-std::string GenerateSetBit(int bitIndex) {
+string GenerateSetBit(int bitIndex) {
   return GenerateSetBitInternal("", bitIndex);
 }
 
-std::string GenerateClearBit(int bitIndex) {
-  std::string varName = GetBitFieldNameForBit(bitIndex);
+string GenerateClearBit(int bitIndex) {
+  string varName = GetBitFieldNameForBit(bitIndex);
   int bitInVarIndex = bitIndex % 32;
 
-  std::string mask = bit_masks[bitInVarIndex];
-  std::string result = varName + " = (" + varName + " & ~" + mask + ")";
+  string mask = bit_masks[bitInVarIndex];
+  string result = varName + " = (" + varName + " & ~" + mask + ")";
   return result;
 }
 
-std::string GenerateGetBitFromLocal(int bitIndex) {
+string GenerateGetBitFromLocal(int bitIndex) {
   return GenerateGetBitInternal("from_", bitIndex);
 }
 
-std::string GenerateSetBitToLocal(int bitIndex) {
+string GenerateSetBitToLocal(int bitIndex) {
   return GenerateSetBitInternal("to_", bitIndex);
 }
 
-std::string GenerateGetBitMutableLocal(int bitIndex) {
+string GenerateGetBitMutableLocal(int bitIndex) {
   return GenerateGetBitInternal("mutable_", bitIndex);
 }
 
-std::string GenerateSetBitMutableLocal(int bitIndex) {
+string GenerateSetBitMutableLocal(int bitIndex) {
   return GenerateSetBitInternal("mutable_", bitIndex);
 }
 
@@ -931,7 +947,7 @@ int GetExperimentalJavaFieldType(const FieldDescriptor* field) {
 }
 
 // Escape a UTF-16 character to be embedded in a Java string.
-void EscapeUtf16ToString(uint16 code, std::string* output) {
+void EscapeUtf16ToString(uint16 code, string* output) {
   if (code == '\t') {
     output->append("\\t");
   } else if (code == '\b') {
