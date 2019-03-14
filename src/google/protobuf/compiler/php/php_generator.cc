@@ -1023,14 +1023,16 @@ void GenerateUseDeclaration(bool is_descriptor, io::Printer* printer) {
     printer->Print(
         "use Google\\Protobuf\\Internal\\GPBType;\n"
         "use Google\\Protobuf\\Internal\\RepeatedField;\n"
-        "use Google\\Protobuf\\Internal\\GPBUtil;\n\n");
+        "use Google\\Protobuf\\Internal\\GPBUtil;\n"
+        "use Google\\Protobuf\\Internal\\GPBWrapperUtils;\n\n");
   } else {
     printer->Print(
         "use Google\\Protobuf\\Internal\\GPBType;\n"
         "use Google\\Protobuf\\Internal\\GPBWire;\n"
         "use Google\\Protobuf\\Internal\\RepeatedField;\n"
         "use Google\\Protobuf\\Internal\\InputStream;\n"
-        "use Google\\Protobuf\\Internal\\GPBUtil;\n\n");
+        "use Google\\Protobuf\\Internal\\GPBUtil;\n"
+        "use Google\\Protobuf\\Internal\\GPBWrapperUtils;\n\n");
   }
 }
 
