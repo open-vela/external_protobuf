@@ -207,11 +207,9 @@ EXTRA_DIST =                  \
 
 conformance_test_runner_LDADD = $(top_srcdir)/src/libprotobuf.la
 conformance_test_runner_SOURCES = conformance_test.h conformance_test.cc \
-                                  conformance_test_main.cc               \
+                                  binary_json_conformance_main.cc        \
                                   binary_json_conformance_suite.h        \
                                   binary_json_conformance_suite.cc       \
-                                  text_format_conformance_suite.h        \
-                                  text_format_conformance_suite.cc       \
                                   conformance_test_runner.cc             \
                                   third_party/jsoncpp/json.h             \
                                   third_party/jsoncpp/jsoncpp.cpp
@@ -316,7 +314,7 @@ conformance-java-lite: javac_middleman_lite
 conformance-csharp: $(other_language_protoc_outputs)
 	@echo "Writing shortcut script conformance-csharp..."
 	@echo '#! /bin/sh' > conformance-csharp
-	@echo 'dotnet ../csharp/src/Google.Protobuf.Conformance/bin/Release/netcoreapp2.1/Google.Protobuf.Conformance.dll "$$@"' >> conformance-csharp
+	@echo 'dotnet ../csharp/src/Google.Protobuf.Conformance/bin/Release/netcoreapp1.0/Google.Protobuf.Conformance.dll "$$@"' >> conformance-csharp
 	@chmod +x conformance-csharp
 
 conformance-php:

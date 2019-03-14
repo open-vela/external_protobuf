@@ -419,8 +419,8 @@ TEST(ReflectionOpsTest, OneofIsInitialized) {
   EXPECT_TRUE(ReflectionOps::IsInitialized(message));
 }
 
-static std::string FindInitializationErrors(const Message& message) {
-  std::vector<std::string> errors;
+static string FindInitializationErrors(const Message& message) {
+  std::vector<string> errors;
   ReflectionOps::FindInitializationErrors(message, "", &errors);
   return Join(errors, ",");
 }

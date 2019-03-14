@@ -386,8 +386,6 @@ VALUE Map_index(VALUE _self, VALUE key) {
  * was just inserted.
  */
 VALUE Map_index_set(VALUE _self, VALUE key, VALUE value) {
-  rb_check_frozen(_self);
-
   Map* self = ruby_to_Map(_self);
 
   char keybuf[TABLE_KEY_BUF_LENGTH];
@@ -440,8 +438,6 @@ VALUE Map_has_key(VALUE _self, VALUE key) {
  * nil if none was present. Throws an exception if the key is of the wrong type.
  */
 VALUE Map_delete(VALUE _self, VALUE key) {
-  rb_check_frozen(_self);
-
   Map* self = ruby_to_Map(_self);
 
   char keybuf[TABLE_KEY_BUF_LENGTH];
@@ -465,8 +461,6 @@ VALUE Map_delete(VALUE _self, VALUE key) {
  * Removes all entries from the map.
  */
 VALUE Map_clear(VALUE _self) {
-  rb_check_frozen(_self);
-
   Map* self = ruby_to_Map(_self);
 
   // Uninit and reinit the table -- this is faster than iterating and doing a
