@@ -163,8 +163,7 @@ if [[ "${DO_AUTOGEN}" == "yes" ]] ; then
   header "Running autogen & configure"
   ./autogen.sh
   ./configure \
-    CPPFLAGS="-mmacosx-version-min=10.9 -Wunused-const-variable -Wunused-function" \
-    CXXFLAGS="-Wnon-virtual-dtor -Woverloaded-virtual"
+    CPPFLAGS="-mmacosx-version-min=10.9 -Wunused-const-variable -Wunused-function"
 fi
 
 if [[ "${DO_CLEAN}" == "yes" ]] ; then
@@ -341,7 +340,7 @@ if [[ "${DO_XCODE_TVOS_TESTS}" == "yes" ]] ; then
     xcodebuild
       -project objectivec/ProtocolBuffers_tvOS.xcodeproj
       -scheme ProtocolBuffers
-      # Test on the oldest and current. 
+      # Test on the oldest and current.
       -destination "platform=tvOS Simulator,name=Apple TV 1080p,OS=9.0"
       -destination "platform=tvOS Simulator,name=Apple TV,OS=latest"
   )
