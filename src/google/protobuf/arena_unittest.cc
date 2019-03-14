@@ -59,11 +59,10 @@
 
 
 using proto2_arena_unittest::ArenaMessage;
-using protobuf_unittest::TestAllExtensions;
 using protobuf_unittest::TestAllTypes;
-using protobuf_unittest::TestEmptyMessage;
+using protobuf_unittest::TestAllExtensions;
 using protobuf_unittest::TestOneof2;
-using protobuf_unittest_no_arena::TestNoArenaMessage;
+using protobuf_unittest::TestEmptyMessage;
 
 namespace google {
 namespace protobuf {
@@ -113,14 +112,14 @@ class PleaseDontCopyMe {
 // A class that takes four different types as constructor arguments.
 class MustBeConstructedWithOneThroughFour {
  public:
-  MustBeConstructedWithOneThroughFour(int one, const char* two,
-                                      const std::string& three,
-                                      const PleaseDontCopyMe* four)
+  MustBeConstructedWithOneThroughFour(
+      int one, const char* two, const string& three,
+      const PleaseDontCopyMe* four)
       : one_(one), two_(two), three_(three), four_(four) {}
 
   int one_;
   const char* const two_;
-  std::string three_;
+  string three_;
   const PleaseDontCopyMe* four_;
 
  private:
@@ -130,29 +129,21 @@ class MustBeConstructedWithOneThroughFour {
 // A class that takes eight different types as constructor arguments.
 class MustBeConstructedWithOneThroughEight {
  public:
-  MustBeConstructedWithOneThroughEight(int one, const char* two,
-                                       const std::string& three,
-                                       const PleaseDontCopyMe* four, int five,
-                                       const char* six,
-                                       const std::string& seven,
-                                       const std::string& eight)
-      : one_(one),
-        two_(two),
-        three_(three),
-        four_(four),
-        five_(five),
-        six_(six),
-        seven_(seven),
-        eight_(eight) {}
+  MustBeConstructedWithOneThroughEight(
+      int one, const char* two, const string& three,
+      const PleaseDontCopyMe* four, int five, const char* six,
+      const string& seven, const string& eight)
+      : one_(one), two_(two), three_(three), four_(four), five_(five),
+        six_(six), seven_(seven), eight_(eight) {}
 
   int one_;
   const char* const two_;
-  std::string three_;
+  string three_;
   const PleaseDontCopyMe* four_;
   int five_;
   const char* const six_;
-  std::string seven_;
-  std::string eight_;
+  string seven_;
+  string eight_;
 
  private:
   GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(MustBeConstructedWithOneThroughEight);
@@ -161,14 +152,16 @@ class MustBeConstructedWithOneThroughEight {
 TEST(ArenaTest, ArenaConstructable) {
   EXPECT_TRUE(Arena::is_arena_constructable<TestAllTypes>::type::value);
   EXPECT_TRUE(Arena::is_arena_constructable<const TestAllTypes>::type::value);
-  EXPECT_FALSE(Arena::is_arena_constructable<TestNoArenaMessage>::type::value);
+  EXPECT_FALSE(Arena::is_arena_constructable<
+               protobuf_unittest_no_arena::TestNoArenaMessage>::type::value);
   EXPECT_FALSE(Arena::is_arena_constructable<Arena>::type::value);
 }
 
 TEST(ArenaTest, DestructorSkippable) {
   EXPECT_TRUE(Arena::is_destructor_skippable<TestAllTypes>::type::value);
   EXPECT_TRUE(Arena::is_destructor_skippable<const TestAllTypes>::type::value);
-  EXPECT_FALSE(Arena::is_destructor_skippable<TestNoArenaMessage>::type::value);
+  EXPECT_FALSE(Arena::is_destructor_skippable<
+               protobuf_unittest_no_arena::TestNoArenaMessage>::type::value);
   EXPECT_FALSE(Arena::is_destructor_skippable<Arena>::type::value);
 }
 
@@ -178,12 +171,12 @@ TEST(ArenaTest, BasicCreate) {
   EXPECT_TRUE(Arena::Create<int64>(&arena) != NULL);
   EXPECT_TRUE(Arena::Create<float>(&arena) != NULL);
   EXPECT_TRUE(Arena::Create<double>(&arena) != NULL);
-  EXPECT_TRUE(Arena::Create<std::string>(&arena) != NULL);
+  EXPECT_TRUE(Arena::Create<string>(&arena) != NULL);
   arena.Own(new int32);
   arena.Own(new int64);
   arena.Own(new float);
   arena.Own(new double);
-  arena.Own(new std::string);
+  arena.Own(new string);
   arena.Own<int>(NULL);
   Notifier notifier;
   SimpleDataType* data = Arena::Create<SimpleDataType>(&arena);
@@ -197,8 +190,8 @@ TEST(ArenaTest, BasicCreate) {
 
 TEST(ArenaTest, CreateAndConstCopy) {
   Arena arena;
-  const std::string s("foo");
-  const std::string* s_copy = Arena::Create<std::string>(&arena, s);
+  const string s("foo");
+  const string* s_copy = Arena::Create<string>(&arena, s);
   EXPECT_TRUE(s_copy != NULL);
   EXPECT_EQ("foo", s);
   EXPECT_EQ("foo", *s_copy);
@@ -206,8 +199,8 @@ TEST(ArenaTest, CreateAndConstCopy) {
 
 TEST(ArenaTest, CreateAndNonConstCopy) {
   Arena arena;
-  std::string s("foo");
-  const std::string* s_copy = Arena::Create<std::string>(&arena, s);
+  string s("foo");
+  const string* s_copy = Arena::Create<string>(&arena, s);
   EXPECT_TRUE(s_copy != NULL);
   EXPECT_EQ("foo", s);
   EXPECT_EQ("foo", *s_copy);
@@ -215,8 +208,8 @@ TEST(ArenaTest, CreateAndNonConstCopy) {
 
 TEST(ArenaTest, CreateAndMove) {
   Arena arena;
-  std::string s("foo");
-  const std::string* s_move = Arena::Create<std::string>(&arena, std::move(s));
+  string s("foo");
+  const string* s_move = Arena::Create<string>(&arena, std::move(s));
   EXPECT_TRUE(s_move != NULL);
   EXPECT_TRUE(s.empty());  // NOLINT
   EXPECT_EQ("foo", *s_move);
@@ -224,7 +217,7 @@ TEST(ArenaTest, CreateAndMove) {
 
 TEST(ArenaTest, CreateWithFourConstructorArguments) {
   Arena arena;
-  const std::string three("3");
+  const string three("3");
   const PleaseDontCopyMe four(4);
   const MustBeConstructedWithOneThroughFour* new_object =
       Arena::Create<MustBeConstructedWithOneThroughFour>(
@@ -238,10 +231,10 @@ TEST(ArenaTest, CreateWithFourConstructorArguments) {
 
 TEST(ArenaTest, CreateWithEightConstructorArguments) {
   Arena arena;
-  const std::string three("3");
+  const string three("3");
   const PleaseDontCopyMe four(4);
-  const std::string seven("7");
-  const std::string eight("8");
+  const string seven("7");
+  const string eight("8");
   const MustBeConstructedWithOneThroughEight* new_object =
       Arena::Create<MustBeConstructedWithOneThroughEight>(
           &arena, 1, "2", three, &four, 5, "6", seven, eight);
@@ -258,14 +251,14 @@ TEST(ArenaTest, CreateWithEightConstructorArguments) {
 
 class PleaseMoveMe {
  public:
-  explicit PleaseMoveMe(const std::string& value) : value_(value) {}
+  explicit PleaseMoveMe(const string& value) : value_(value) {}
   PleaseMoveMe(PleaseMoveMe&&) = default;
   PleaseMoveMe(const PleaseMoveMe&) = delete;
 
-  const std::string& value() const { return value_; }
+  const string& value() const { return value_; }
 
  private:
-  std::string value_;
+  string value_;
 };
 
 TEST(ArenaTest, CreateWithMoveArguments) {
@@ -418,7 +411,7 @@ TEST(ArenaTest, ReflectionSwapFields) {
   reflection->SwapFields(arena1_message, arena2_message, fields);
   EXPECT_EQ(&arena1, arena1_message->GetArena());
   EXPECT_EQ(&arena2, arena2_message->GetArena());
-  std::string output;
+  string output;
   arena1_message->SerializeToString(&output);
   EXPECT_EQ(0, output.size());
   TestUtil::ExpectAllFieldsSet(*arena2_message);
@@ -468,7 +461,7 @@ TEST(ArenaTest, SetAllocatedMessage) {
   arena_message->set_allocated_optional_nested_message(nested);
   EXPECT_EQ(118, arena_message->optional_nested_message().bb());
 
-  TestNoArenaMessage no_arena_message;
+  protobuf_unittest_no_arena::TestNoArenaMessage no_arena_message;
   EXPECT_FALSE(no_arena_message.has_arena_message());
   no_arena_message.set_allocated_arena_message(NULL);
   EXPECT_FALSE(no_arena_message.has_arena_message());
@@ -492,7 +485,7 @@ TEST(ArenaTest, ReleaseMessage) {
 TEST(ArenaTest, SetAllocatedString) {
   Arena arena;
   TestAllTypes* arena_message = Arena::CreateMessage<TestAllTypes>(&arena);
-  std::string* allocated_str = new std::string("hello");
+  string* allocated_str = new string("hello");
   arena_message->set_allocated_optional_string(allocated_str);
   EXPECT_EQ("hello", arena_message->optional_string());
 }
@@ -501,7 +494,7 @@ TEST(ArenaTest, ReleaseString) {
   Arena arena;
   TestAllTypes* arena_message = Arena::CreateMessage<TestAllTypes>(&arena);
   arena_message->set_optional_string("hello");
-  std::unique_ptr<std::string> released_str(
+  std::unique_ptr<string> released_str(
       arena_message->release_optional_string());
   EXPECT_EQ("hello", *released_str);
 
@@ -517,7 +510,7 @@ TEST(ArenaTest, SwapBetweenArenasWithAllFieldsSet) {
     TestAllTypes* arena2_message = Arena::CreateMessage<TestAllTypes>(&arena2);
     TestUtil::SetAllFields(arena2_message);
     arena2_message->Swap(arena1_message);
-    std::string output;
+    string output;
     arena2_message->SerializeToString(&output);
     EXPECT_EQ(0, output.size());
   }
@@ -555,7 +548,7 @@ TEST(ArenaTest, SwapBetweenArenasUsingReflection) {
     TestUtil::SetAllFields(arena2_message);
     const Reflection* r = arena2_message->GetReflection();
     r->Swap(arena1_message, arena2_message);
-    std::string output;
+    string output;
     arena2_message->SerializeToString(&output);
     EXPECT_EQ(0, output.size());
   }
@@ -578,7 +571,7 @@ TEST(ArenaTest, SwapBetweenArenaAndNonArenaUsingReflection) {
 
 TEST(ArenaTest, ReleaseFromArenaMessageMakesCopy) {
   TestAllTypes::NestedMessage* nested_msg = NULL;
-  std::string* nested_string = NULL;
+  string* nested_string = NULL;
   {
     Arena arena;
     TestAllTypes* arena_message = Arena::CreateMessage<TestAllTypes>(&arena);
@@ -770,7 +763,7 @@ TEST(ArenaTest, AddAllocatedToRepeatedField) {
   // Heap-arena case for strings (which are not arena-allocated).
   arena1_message->Clear();
   for (int i = 0; i < 10; i++) {
-    std::string* s = new std::string("Test");
+    string* s = new string("Test");
     arena1_message->mutable_repeated_string()->
         AddAllocated(s);
     // Should not copy.
@@ -869,21 +862,19 @@ TEST(ArenaTest, ReleaseLastRepeatedField) {
     // no delete -- |released| is on the arena.
   }
 
-  // Test string case as well. ReleaseLast() in this case must copy the
-  // string, even though it was originally heap-allocated and its pointer
-  // was simply appended to the repeated field's internal vector, because the
-  // string was placed on the arena's destructor list and cannot be removed
-  // from that list (so the arena permanently owns the original instance).
+  // Test string case as well. ReleaseLast() in this case must copy the string,
+  // even though it was originally heap-allocated and its pointer was simply
+  // appended to the repeated field's internal vector, because the string was
+  // placed on the arena's destructor list and cannot be removed from that list
+  // (so the arena permanently owns the original instance).
   arena_message->Clear();
   for (int i = 0; i < 10; i++) {
-    std::string* s = new std::string("Test");
+    string* s = new string("Test");
     arena_message->mutable_repeated_string()->AddAllocated(s);
   }
   for (int i = 0; i < 10; i++) {
-    const std::string* orig_element =
-        &arena_message->repeated_string(10 - 1 - i);
-    std::string* released =
-        arena_message->mutable_repeated_string()->ReleaseLast();
+    const string* orig_element = &arena_message->repeated_string(10 - 1 - i);
+    string* released = arena_message->mutable_repeated_string()->ReleaseLast();
     EXPECT_NE(released, orig_element);
     EXPECT_EQ("Test", *released);
     delete released;
@@ -898,7 +889,7 @@ TEST(ArenaTest, UnsafeArenaReleaseAdd) {
   Arena arena;
   TestAllTypes* message1 = Arena::CreateMessage<TestAllTypes>(&arena);
   TestAllTypes* message2 = Arena::CreateMessage<TestAllTypes>(&arena);
-  std::string* arena_string = Arena::Create<std::string>(&arena);
+  string* arena_string = Arena::Create<string>(&arena);
   *arena_string = kContent;
 
   message1->unsafe_arena_set_allocated_optional_string(arena_string);
@@ -911,7 +902,7 @@ TEST(ArenaTest, UnsafeArenaAddAllocated) {
   Arena arena;
   TestAllTypes* message = Arena::CreateMessage<TestAllTypes>(&arena);
   for (int i = 0; i < 10; i++) {
-    std::string* arena_string = Arena::Create<std::string>(&arena);
+    string* arena_string = Arena::Create<string>(&arena);
     message->mutable_repeated_string()->UnsafeArenaAddAllocated(arena_string);
     EXPECT_EQ(arena_string, message->mutable_repeated_string(i));
   }
@@ -921,7 +912,7 @@ TEST(ArenaTest, UnsafeArenaRelease) {
   Arena arena;
   TestAllTypes* message = Arena::CreateMessage<TestAllTypes>(&arena);
 
-  std::string* s = new std::string("test string");
+  string* s = new string("test string");
   message->unsafe_arena_set_allocated_optional_string(s);
   EXPECT_TRUE(message->has_optional_string());
   EXPECT_EQ("test string", message->optional_string());
@@ -929,7 +920,7 @@ TEST(ArenaTest, UnsafeArenaRelease) {
   EXPECT_FALSE(message->has_optional_string());
   delete s;
 
-  s = new std::string("test string");
+  s = new string("test string");
   message->unsafe_arena_set_allocated_oneof_string(s);
   EXPECT_TRUE(message->has_oneof_string());
   EXPECT_EQ("test string", message->oneof_string());
@@ -943,9 +934,9 @@ TEST(ArenaTest, OneofMerge) {
   TestAllTypes* message0 = Arena::CreateMessage<TestAllTypes>(&arena);
   TestAllTypes* message1 = Arena::CreateMessage<TestAllTypes>(&arena);
 
-  message0->unsafe_arena_set_allocated_oneof_string(new std::string("x"));
+  message0->unsafe_arena_set_allocated_oneof_string(new string("x"));
   ASSERT_TRUE(message0->has_oneof_string());
-  message1->unsafe_arena_set_allocated_oneof_string(new std::string("y"));
+  message1->unsafe_arena_set_allocated_oneof_string(new string("y"));
   ASSERT_TRUE(message1->has_oneof_string());
   EXPECT_EQ("x", message0->oneof_string());
   EXPECT_EQ("y", message1->oneof_string());
@@ -1014,8 +1005,8 @@ void TestSwapRepeatedField(Arena* arena1, Arena* arena2) {
   field1.Swap(&field2);
   EXPECT_EQ(5, field1.size());
   EXPECT_EQ(10, field2.size());
-  EXPECT_TRUE(std::string("field1") == field2.Get(0).optional_string());
-  EXPECT_TRUE(std::string("field2") == field1.Get(0).optional_string());
+  EXPECT_TRUE(string("field1") == field2.Get(0).optional_string());
+  EXPECT_TRUE(string("field2") == field1.Get(0).optional_string());
   // Ensure that fields retained their original order:
   for (int i = 0; i < field1.size(); i++) {
     EXPECT_EQ(i, field1.Get(i).optional_int32());
@@ -1053,8 +1044,8 @@ TEST(ArenaTest, ExtensionsOnArena) {
       Arena::CreateMessage<TestAllExtensions>(&arena);
   message_ext->SetExtension(
       protobuf_unittest::optional_int32_extension, 42);
-  message_ext->SetExtension(protobuf_unittest::optional_string_extension,
-                            std::string("test"));
+  message_ext->SetExtension(
+      protobuf_unittest::optional_string_extension, string("test"));
   message_ext->MutableExtension(
       protobuf_unittest::optional_nested_message_extension)->set_bb(42);
 }
@@ -1166,7 +1157,7 @@ TEST(ArenaTest, MutableMessageReflection) {
 
 
 void FillArenaAwareFields(TestAllTypes* message) {
-  std::string test_string = "hello world";
+  string test_string = "hello world";
   message->set_optional_int32(42);
   message->set_optional_string(test_string);
   message->set_optional_bytes(test_string);
@@ -1222,7 +1213,7 @@ TEST(ArenaTest, MessageLiteOnArena) {
 
   TestAllTypes initial_message;
   FillArenaAwareFields(&initial_message);
-  std::string serialized;
+  string serialized;
   initial_message.SerializeToString(&serialized);
 
   {
@@ -1245,14 +1236,14 @@ TEST(ArenaTest, MessageLiteOnArena) {
 // (even if this was not its original intent).
 TEST(ArenaTest, RepeatedFieldWithNonPODType) {
   {
-    RepeatedField<std::string> field_on_heap;
+    RepeatedField<string> field_on_heap;
     for (int i = 0; i < 100; i++) {
       *field_on_heap.Add() = "test string long enough to exceed inline buffer";
     }
   }
   {
     Arena arena;
-    RepeatedField<std::string> field_on_arena(&arena);
+    RepeatedField<string> field_on_arena(&arena);
     for (int i = 0; i < 100; i++) {
       *field_on_arena.Add() = "test string long enough to exceed inline buffer";
     }
@@ -1333,12 +1324,6 @@ TEST(ArenaTest, GetArenaShouldReturnTheArenaForArenaAllocatedMessages) {
   const ArenaMessage* const_pointer_to_message = message;
   EXPECT_EQ(&arena, Arena::GetArena(message));
   EXPECT_EQ(&arena, Arena::GetArena(const_pointer_to_message));
-
-  // Test that the Message* / MessageLite* specialization SFINAE works.
-  const Message* const_pointer_to_message_type = message;
-  EXPECT_EQ(&arena, Arena::GetArena(const_pointer_to_message_type));
-  const MessageLite* const_pointer_to_message_lite_type = message;
-  EXPECT_EQ(&arena, Arena::GetArena(const_pointer_to_message_lite_type));
 }
 
 TEST(ArenaTest, GetArenaShouldReturnNullForNonArenaAllocatedMessages) {
@@ -1346,33 +1331,6 @@ TEST(ArenaTest, GetArenaShouldReturnNullForNonArenaAllocatedMessages) {
   const ArenaMessage* const_pointer_to_message = &message;
   EXPECT_EQ(NULL, Arena::GetArena(&message));
   EXPECT_EQ(NULL, Arena::GetArena(const_pointer_to_message));
-}
-
-TEST(ArenaTest, GetArenaShouldReturnNullForNonArenaCompatibleTypes) {
-  TestNoArenaMessage message;
-  const TestNoArenaMessage* const_pointer_to_message = &message;
-  EXPECT_EQ(nullptr, Arena::GetArena(&message));
-  EXPECT_EQ(nullptr, Arena::GetArena(const_pointer_to_message));
-
-  // Test that GetArena returns nullptr for types that have a GetArena method
-  // that doesn't return Arena*.
-  struct {
-    int GetArena() const { return 0; }
-  } has_get_arena_method_wrong_return_type;
-  EXPECT_EQ(nullptr, Arena::GetArena(&has_get_arena_method_wrong_return_type));
-
-  // Test that GetArena returns nullptr for types that have a GetArena alias.
-  struct {
-    using GetArena = Arena*;
-  } has_get_arena_alias;
-  EXPECT_EQ(nullptr, Arena::GetArena(&has_get_arena_alias));
-
-  // Test that GetArena returns nullptr for types that have a GetArena data
-  // member.
-  struct {
-    Arena GetArena;
-  } has_get_arena_data_member;
-  EXPECT_EQ(nullptr, Arena::GetArena(&has_get_arena_data_member));
 }
 
 TEST(ArenaTest, AddCleanup) {
@@ -1387,7 +1345,7 @@ TEST(ArenaTest, UnsafeSetAllocatedOnArena) {
   TestAllTypes* message = Arena::CreateMessage<TestAllTypes>(&arena);
   EXPECT_FALSE(message->has_optional_string());
 
-  std::string owned_string = "test with long enough content to heap-allocate";
+  string owned_string = "test with long enough content to heap-allocate";
   message->unsafe_arena_set_allocated_optional_string(&owned_string);
   EXPECT_TRUE(message->has_optional_string());
 

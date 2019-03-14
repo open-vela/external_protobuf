@@ -44,20 +44,18 @@ namespace cpp {
 
 namespace {
 
-void InitMethodVariables(const MethodDescriptor* method, const Options& options,
-                         Formatter* format) {
+void InitMethodVariables(const MethodDescriptor* method, Formatter* format) {
   format->Set("name", method->name());
-  format->Set("input_type", QualifiedClassName(method->input_type(), options));
-  format->Set("output_type",
-              QualifiedClassName(method->output_type(), options));
+  format->Set("input_type", QualifiedClassName(method->input_type()));
+  format->Set("output_type", QualifiedClassName(method->output_type()));
 }
 
 }  // namespace
 
-ServiceGenerator::ServiceGenerator(
-    const ServiceDescriptor* descriptor,
-    const std::map<std::string, std::string>& vars, const Options& options)
-    : descriptor_(descriptor), vars_(vars), options_(options) {
+ServiceGenerator::ServiceGenerator(const ServiceDescriptor* descriptor,
+                                   const std::map<string, string>& vars,
+                                   const Options& options)
+    : descriptor_(descriptor), vars_(vars) {
   vars_["classname"] = descriptor_->name();
   vars_["full_name"] = descriptor_->full_name();
 }
@@ -155,7 +153,7 @@ void ServiceGenerator::GenerateMethodSignatures(VirtualOrNon virtual_or_non,
   for (int i = 0; i < descriptor_->method_count(); i++) {
     const MethodDescriptor* method = descriptor_->method(i);
     Formatter format(printer, vars_);
-    InitMethodVariables(method, options_, &format);
+    InitMethodVariables(method, &format);
     format.Set("virtual", virtual_or_non == VIRTUAL ? "virtual " : "");
     format(
         "$virtual$void $name$(::$proto_ns$::RpcController* controller,\n"
@@ -221,7 +219,7 @@ void ServiceGenerator::GenerateNotImplementedMethods(io::Printer* printer) {
   for (int i = 0; i < descriptor_->method_count(); i++) {
     const MethodDescriptor* method = descriptor_->method(i);
     Formatter format(printer, vars_);
-    InitMethodVariables(method, options_, &format);
+    InitMethodVariables(method, &format);
     format(
         "void $classname$::$name$(::$proto_ns$::RpcController* controller,\n"
         "                         const $input_type$*,\n"
@@ -250,17 +248,15 @@ void ServiceGenerator::GenerateCallMethod(io::Printer* printer) {
   for (int i = 0; i < descriptor_->method_count(); i++) {
     const MethodDescriptor* method = descriptor_->method(i);
     Formatter format(printer, vars_);
-    InitMethodVariables(method, options_, &format);
+    InitMethodVariables(method, &format);
 
     // Note:  down_cast does not work here because it only works on pointers,
     //   not references.
     format(
         "    case $1$:\n"
         "      $name$(controller,\n"
-        "             ::$proto_ns$::internal::DownCast<const $input_type$*>(\n"
-        "                 request),\n"
-        "             ::$proto_ns$::internal::DownCast<$output_type$*>(\n"
-        "                 response),\n"
+        "             ::google::protobuf::down_cast<const $input_type$*>(request),\n"
+        "             ::google::protobuf::down_cast< $output_type$*>(response),\n"
         "             done);\n"
         "      break;\n",
         i);
@@ -297,7 +293,7 @@ void ServiceGenerator::GenerateGetPrototype(RequestOrResponse which,
     format(
         "    case $1$:\n"
         "      return $2$::default_instance();\n",
-        i, QualifiedClassName(type, options_));
+        i, QualifiedClassName(type));
   }
 
   format(
@@ -315,7 +311,7 @@ void ServiceGenerator::GenerateStubMethods(io::Printer* printer) {
   for (int i = 0; i < descriptor_->method_count(); i++) {
     const MethodDescriptor* method = descriptor_->method(i);
     Formatter format(printer, vars_);
-    InitMethodVariables(method, options_, &format);
+    InitMethodVariables(method, &format);
     format(
         "void $classname$_Stub::$name$(::$proto_ns$::RpcController* "
         "controller,\n"

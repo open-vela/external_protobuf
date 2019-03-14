@@ -129,7 +129,7 @@ template class PROTOBUF_EXPORT RepeatedField<int64>;
 template class PROTOBUF_EXPORT RepeatedField<uint64>;
 template class PROTOBUF_EXPORT RepeatedField<float>;
 template class PROTOBUF_EXPORT RepeatedField<double>;
-template class PROTOBUF_EXPORT RepeatedPtrField<std::string>;
+template class PROTOBUF_EXPORT RepeatedPtrField<string>;
 
 }  // namespace protobuf
 }  // namespace google

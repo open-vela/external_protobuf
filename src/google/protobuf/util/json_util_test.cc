@@ -49,7 +49,7 @@ namespace protobuf {
 namespace util {
 namespace {
 
-using proto_util_converter::testing::MapIn;
+using google::protobuf::testing::MapIn;
 using proto3::BAR;
 using proto3::FOO;
 using proto3::TestEnumValue;
@@ -70,18 +70,18 @@ class JsonUtilTest : public ::testing::Test {
   JsonUtilTest() {
   }
 
-  std::string ToJson(const Message& message, const JsonPrintOptions& options) {
-    std::string result;
+  string ToJson(const Message& message, const JsonPrintOptions& options) {
+    string result;
     GOOGLE_CHECK_OK(MessageToJsonString(message, &result, options));
     return result;
   }
 
-  bool FromJson(const std::string& json, Message* message,
+  bool FromJson(const string& json, Message* message,
                 const JsonParseOptions& options) {
     return JsonStringToMessage(json, message, options).ok();
   }
 
-  bool FromJson(const std::string& json, Message* message) {
+  bool FromJson(const string& json, Message* message) {
     return FromJson(json, message, JsonParseOptions());
   }
 
@@ -207,7 +207,7 @@ TEST_F(JsonUtilTest, TestAlwaysPrintEnumsAsInts) {
   JsonPrintOptions print_options;
   print_options.always_print_enums_as_ints = true;
 
-  std::string expected_json = "{\"enumValue\":1,\"repeatedEnumValue\":[0,1]}";
+  string expected_json = "{\"enumValue\":1,\"repeatedEnumValue\":[0,1]}";
   EXPECT_EQ(expected_json, ToJson(orig, print_options));
 
   TestMessage parsed;
@@ -230,8 +230,7 @@ TEST_F(JsonUtilTest, TestPrintEnumsAsIntsWithDefaultValue) {
   print_options.always_print_enums_as_ints = true;
   print_options.always_print_primitive_fields = true;
 
-  std::string expected_json =
-      "{\"enumValue1\":0,\"enumValue2\":0,\"enumValue3\":1}";
+  string expected_json = "{\"enumValue1\":0,\"enumValue2\":0,\"enumValue3\":1}";
   EXPECT_EQ(expected_json, ToJson(orig, print_options));
 
   TestEnumValue parsed;
@@ -246,7 +245,7 @@ TEST_F(JsonUtilTest, TestPrintEnumsAsIntsWithDefaultValue) {
 TEST_F(JsonUtilTest, ParseMessage) {
   // Some random message but good enough to verify that the parsing warpper
   // functions are working properly.
-  std::string input =
+  string input =
       "{\n"
       "  \"int32Value\": 1024,\n"
       "  \"repeatedInt32Value\": [1, 2],\n"
@@ -322,7 +321,7 @@ TEST_F(JsonUtilTest, TestParseErrors) {
 
 TEST_F(JsonUtilTest, TestDynamicMessage) {
   // Some random message but good enough to test the wrapper functions.
-  std::string input =
+  string input =
       "{\n"
       "  \"int32Value\": 1024,\n"
       "  \"repeatedInt32Value\": [1, 2],\n"
@@ -360,7 +359,7 @@ TEST_F(JsonUtilTest, TestDynamicMessage) {
 }
 
 TEST_F(JsonUtilTest, TestParsingUnknownAnyFields) {
-  std::string input =
+  string input =
       "{\n"
       "  \"value\": {\n"
       "    \"@type\": \"type.googleapis.com/proto3.TestMessage\",\n"
@@ -382,11 +381,11 @@ TEST_F(JsonUtilTest, TestParsingUnknownAnyFields) {
 }
 
 TEST_F(JsonUtilTest, TestParsingUnknownEnumsProto2) {
-  std::string input =
+  string input =
       "{\n"
       "  \"a\": \"UNKNOWN_VALUE\"\n"
       "}";
-  protobuf_unittest::TestNumbers m;
+  TestNumbers m;
   JsonParseOptions options;
   EXPECT_FALSE(FromJson(input, &m, options));
 
@@ -400,7 +399,7 @@ TEST_F(JsonUtilTest, TestParsingUnknownEnumsProto3) {
   {
     JsonParseOptions options;
     ASSERT_FALSE(options.ignore_unknown_fields);
-    std::string input =
+    string input =
         "{\n"
         "  \"enum_value\":\"UNKNOWN_VALUE\"\n"
         "}";
@@ -415,7 +414,7 @@ TEST_F(JsonUtilTest, TestParsingUnknownEnumsProto3) {
   // Integer values are read as usual
   {
     JsonParseOptions options;
-    std::string input =
+    string input =
         "{\n"
         "  \"enum_value\":12345\n"
         "}";
@@ -432,7 +431,7 @@ TEST_F(JsonUtilTest, TestParsingUnknownEnumsProto3) {
   // error
   {
     JsonParseOptions options;
-    std::string input =
+    string input =
         "{\n"
         "  \"enum_value\":{}\n"
         "}";
@@ -445,7 +444,7 @@ TEST_F(JsonUtilTest, TestParsingUnknownEnumsProto3) {
   // error
   {
     JsonParseOptions options;
-    std::string input =
+    string input =
         "{\n"
         "  \"enum_value\":[]\n"
         "}";
@@ -459,7 +458,7 @@ TEST_F(JsonUtilTest, TestParsingEnumIgnoreCase) {
   TestMessage m;
   {
     JsonParseOptions options;
-    std::string input =
+    string input =
         "{\n"
         "  \"enum_value\":\"bar\"\n"
         "}";
@@ -472,7 +471,7 @@ TEST_F(JsonUtilTest, TestParsingEnumIgnoreCase) {
   {
     JsonParseOptions options;
     options.case_insensitive_enum_parsing = false;
-    std::string input =
+    string input =
         "{\n"
         "  \"enum_value\":\"bar\"\n"
         "}";
@@ -483,7 +482,7 @@ TEST_F(JsonUtilTest, TestParsingEnumIgnoreCase) {
   {
     JsonParseOptions options;
     options.case_insensitive_enum_parsing = true;
-    std::string input =
+    string input =
         "{\n"
         "  \"enum_value\":\"bar\"\n"
         "}";
@@ -554,7 +553,7 @@ TEST(ZeroCopyStreamByteSinkTest, TestAllInputOutputPatterns) {
         Segment(buffer + segment_start, kOutputBufferLength - segment_start));
 
     // Write exactly 10 bytes through the ByteSink.
-    std::string input_data = "0123456789";
+    string input_data = "0123456789";
     for (int input_pattern = 0; input_pattern < (1 << (input_data.size() - 1));
          input_pattern += kSkippedPatternCount) {
       memset(buffer, 0, sizeof(buffer));
@@ -570,7 +569,7 @@ TEST(ZeroCopyStreamByteSinkTest, TestAllInputOutputPatterns) {
         }
         byte_sink.Append(&input_data[start], input_data.length() - start);
       }
-      EXPECT_EQ(input_data, std::string(buffer, input_data.length()));
+      EXPECT_EQ(input_data, string(buffer, input_data.length()));
     }
 
     // Write only 9 bytes through the ByteSink.
@@ -590,7 +589,7 @@ TEST(ZeroCopyStreamByteSinkTest, TestAllInputOutputPatterns) {
         }
         byte_sink.Append(&input_data[start], input_data.length() - start);
       }
-      EXPECT_EQ(input_data, std::string(buffer, input_data.length()));
+      EXPECT_EQ(input_data, string(buffer, input_data.length()));
       EXPECT_EQ(0, buffer[input_data.length()]);
     }
 
@@ -613,7 +612,7 @@ TEST(ZeroCopyStreamByteSinkTest, TestAllInputOutputPatterns) {
         byte_sink.Append(&input_data[start], input_data.length() - start);
       }
       EXPECT_EQ(input_data.substr(0, kOutputBufferLength),
-                std::string(buffer, kOutputBufferLength));
+                string(buffer, kOutputBufferLength));
     }
   }
 }

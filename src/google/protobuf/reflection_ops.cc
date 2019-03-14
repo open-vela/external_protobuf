@@ -54,7 +54,7 @@ static const Reflection* GetReflectionOrDie(const Message& m) {
   const Reflection* r = m.GetReflection();
   if (r == nullptr) {
     const Descriptor* d = m.GetDescriptor();
-    const std::string& mtype = d ? d->name() : "unknown";
+    const string& mtype = d ? d->name() : "unknown";
     // RawMessage is one known type for which GetReflection() returns nullptr.
     GOOGLE_LOG(FATAL) << "Message does not support reflection (type " << mtype << ").";
   }
@@ -276,9 +276,10 @@ void ReflectionOps::DiscardUnknownFields(Message* message) {
   }
 }
 
-static std::string SubMessagePrefix(const std::string& prefix,
-                                    const FieldDescriptor* field, int index) {
-  std::string result(prefix);
+static string SubMessagePrefix(const string& prefix,
+                               const FieldDescriptor* field,
+                               int index) {
+  string result(prefix);
   if (field->is_extension()) {
     result.append("(");
     result.append(field->full_name());
@@ -295,9 +296,10 @@ static std::string SubMessagePrefix(const std::string& prefix,
   return result;
 }
 
-void ReflectionOps::FindInitializationErrors(const Message& message,
-                                             const std::string& prefix,
-                                             std::vector<std::string>* errors) {
+void ReflectionOps::FindInitializationErrors(
+    const Message& message,
+    const string& prefix,
+    std::vector<string>* errors) {
   const Descriptor* descriptor = message.GetDescriptor();
   const Reflection* reflection = GetReflectionOrDie(message);
 
