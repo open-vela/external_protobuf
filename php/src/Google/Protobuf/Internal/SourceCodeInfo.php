@@ -9,6 +9,7 @@ use Google\Protobuf\Internal\GPBWire;
 use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\InputStream;
 use Google\Protobuf\Internal\GPBUtil;
+use Google\Protobuf\Internal\GPBWrapperUtils;
 
 /**
  * Encapsulates information about the original source file from which a
@@ -54,7 +55,7 @@ class SourceCodeInfo extends \Google\Protobuf\Internal\Message
      *   beginning of the "extend" block and is shared by all extensions within
      *   the block.
      * - Just because a location's span is a subset of some other location's span
-     *   does not mean that it is a descendent.  For example, a "group" defines
+     *   does not mean that it is a descendant.  For example, a "group" defines
      *   both a type and a field in a single declaration.  Thus, the locations
      *   corresponding to the type and field and their components will overlap.
      * - Code which tries to interpret locations should probably be designed to
@@ -108,7 +109,7 @@ class SourceCodeInfo extends \Google\Protobuf\Internal\Message
      *             beginning of the "extend" block and is shared by all extensions within
      *             the block.
      *           - Just because a location's span is a subset of some other location's span
-     *             does not mean that it is a descendent.  For example, a "group" defines
+     *             does not mean that it is a descendant.  For example, a "group" defines
      *             both a type and a field in a single declaration.  Thus, the locations
      *             corresponding to the type and field and their components will overlap.
      *           - Code which tries to interpret locations should probably be designed to
@@ -157,7 +158,7 @@ class SourceCodeInfo extends \Google\Protobuf\Internal\Message
      *   beginning of the "extend" block and is shared by all extensions within
      *   the block.
      * - Just because a location's span is a subset of some other location's span
-     *   does not mean that it is a descendent.  For example, a "group" defines
+     *   does not mean that it is a descendant.  For example, a "group" defines
      *   both a type and a field in a single declaration.  Thus, the locations
      *   corresponding to the type and field and their components will overlap.
      * - Code which tries to interpret locations should probably be designed to
@@ -208,7 +209,7 @@ class SourceCodeInfo extends \Google\Protobuf\Internal\Message
      *   beginning of the "extend" block and is shared by all extensions within
      *   the block.
      * - Just because a location's span is a subset of some other location's span
-     *   does not mean that it is a descendent.  For example, a "group" defines
+     *   does not mean that it is a descendant.  For example, a "group" defines
      *   both a type and a field in a single declaration.  Thus, the locations
      *   corresponding to the type and field and their components will overlap.
      * - Code which tries to interpret locations should probably be designed to
