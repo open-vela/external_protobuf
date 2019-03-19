@@ -67,6 +67,15 @@ namespace Google.Protobuf
             {
                 return new ByteString(bytes);
             }
+
+            /// <summary>
+            /// Provides direct, unrestricted access to the bytes contained in this instance.
+            /// You must not modify or resize the byte array returned by this method.
+            /// </summary>
+            internal static byte[] GetBuffer(ByteString bytes)
+            {
+                return bytes.bytes;
+            }
         }
 
         /// <summary>
@@ -110,14 +119,6 @@ namespace Google.Protobuf
             get { return Length == 0; }
         }
 
-#if NETSTANDARD2_0
-        /// <summary>
-        /// Provides read-only access to the data of this <see cref="ByteString"/>.
-        /// No data is copied so this is the most efficient way of accessing.
-        /// </summary>
-        public ReadOnlySpan<byte> Span => new ReadOnlySpan<byte>(bytes);
-#endif
-
         /// <summary>
         /// Converts this <see cref="ByteString"/> into a byte array.
         /// </summary>
@@ -160,7 +161,7 @@ namespace Google.Protobuf
             int capacity = stream.CanSeek ? checked((int) (stream.Length - stream.Position)) : 0;
             var memoryStream = new MemoryStream(capacity);
             stream.CopyTo(memoryStream);
-#if NETSTANDARD1_0 || NETSTANDARD2_0
+#if NETSTANDARD1_0
             byte[] bytes = memoryStream.ToArray();
 #else
             // Avoid an extra copy if we can.
@@ -186,7 +187,7 @@ namespace Google.Protobuf
             // We have to specify the buffer size here, as there's no overload accepting the cancellation token
             // alone. But it's documented to use 81920 by default if not specified.
             await stream.CopyToAsync(memoryStream, 81920, cancellationToken);
-#if NETSTANDARD1_0 || NETSTANDARD2_0
+#if NETSTANDARD1_0
             byte[] bytes = memoryStream.ToArray();
 #else
             // Avoid an extra copy if we can.
@@ -217,18 +218,6 @@ namespace Google.Protobuf
             ByteArray.Copy(bytes, offset, portion, 0, count);
             return new ByteString(portion);
         }
-
-#if NETSTANDARD2_0
-        /// <summary>
-        /// Constructs a <see cref="ByteString" /> from a read only span. The contents
-        /// are copied, so further modifications to the span will not
-        /// be reflected in the returned <see cref="ByteString" />.
-        /// </summary>
-        public static ByteString CopyFrom(ReadOnlySpan<byte> bytes)
-        {
-            return new ByteString(bytes.ToArray());
-        }
-#endif
 
         /// <summary>
         /// Creates a new <see cref="ByteString" /> by encoding the specified text with

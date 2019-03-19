@@ -59,10 +59,11 @@ using internal::WireFormatLite;
 namespace {
 
 void SetPrimitiveVariables(const FieldDescriptor* descriptor,
-                           int messageBitIndex, int builderBitIndex,
+                           int messageBitIndex,
+                           int builderBitIndex,
                            const FieldGeneratorInfo* info,
                            ClassNameResolver* name_resolver,
-                           std::map<std::string, std::string>* variables) {
+                           std::map<string, string>* variables) {
   SetCommonFieldVariables(descriptor, info, variables);
 
   (*variables)["empty_list"] = "com.google.protobuf.LazyStringArrayList.EMPTY";
@@ -153,11 +154,11 @@ ImmutableStringFieldGenerator(const FieldDescriptor* descriptor,
 ImmutableStringFieldGenerator::~ImmutableStringFieldGenerator() {}
 
 int ImmutableStringFieldGenerator::GetNumBitsForMessage() const {
-  return SupportFieldPresence(descriptor_->file()) ? 1 : 0;
+  return 1;
 }
 
 int ImmutableStringFieldGenerator::GetNumBitsForBuilder() const {
-  return GetNumBitsForMessage();
+  return 1;
 }
 
 // A note about how strings are handled. This code used to just store a String
@@ -463,7 +464,7 @@ GenerateHashCode(io::Printer* printer) const {
     "hash = (53 * hash) + get$capitalized_name$().hashCode();\n");
 }
 
-std::string ImmutableStringFieldGenerator::GetBoxedType() const {
+string ImmutableStringFieldGenerator::GetBoxedType() const {
   return "java.lang.String";
 }
 
@@ -1029,7 +1030,7 @@ GenerateHashCode(io::Printer* printer) const {
     "}\n");
 }
 
-std::string RepeatedImmutableStringFieldGenerator::GetBoxedType() const {
+string RepeatedImmutableStringFieldGenerator::GetBoxedType() const {
   return "String";
 }
 

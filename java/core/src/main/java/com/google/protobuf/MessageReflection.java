@@ -804,15 +804,12 @@ class MessageReflection {
                 field, field.getEnumType().findValueByNumberCreatingIfUnknown(rawValue));
           } else {
             final Object value = field.getEnumType().findValueByNumber(rawValue);
-            // If the number isn't recognized as a valid value for this enum,
-            // add it to the unknown fields.
             if (value == null) {
-              if (unknownFields != null) {
-                unknownFields.mergeVarintField(fieldNumber, rawValue);
-              }
-            } else {
-              target.addRepeatedField(field, value);
+              // If the number isn't recognized as a valid value for this
+              // enum, drop it (don't even add it to unknownFields).
+              return true;
             }
+            target.addRepeatedField(field, value);
           }
         }
       } else {
@@ -844,7 +841,7 @@ class MessageReflection {
           } else {
             value = field.getEnumType().findValueByNumber(rawValue);
             // If the number isn't recognized as a valid value for this enum,
-            // add it to the unknown fields.
+            // drop it.
             if (value == null) {
               if (unknownFields != null) {
                 unknownFields.mergeVarintField(fieldNumber, rawValue);
