@@ -54,10 +54,12 @@ namespace java {
 
 namespace {
 
-void SetEnumVariables(const FieldDescriptor* descriptor, int messageBitIndex,
-                      int builderBitIndex, const FieldGeneratorInfo* info,
+void SetEnumVariables(const FieldDescriptor* descriptor,
+                      int messageBitIndex,
+                      int builderBitIndex,
+                      const FieldGeneratorInfo* info,
                       ClassNameResolver* name_resolver,
-                      std::map<std::string, std::string>* variables) {
+                      std::map<string, string>* variables) {
   SetCommonFieldVariables(descriptor, info, variables);
 
   (*variables)["type"] =
@@ -130,7 +132,7 @@ ImmutableEnumFieldLiteGenerator(const FieldDescriptor* descriptor,
 ImmutableEnumFieldLiteGenerator::~ImmutableEnumFieldLiteGenerator() {}
 
 int ImmutableEnumFieldLiteGenerator::GetNumBitsForMessage() const {
-  return SupportFieldPresence(descriptor_->file()) ? 1 : 0;
+  return 1;
 }
 
 void ImmutableEnumFieldLiteGenerator::
@@ -350,7 +352,7 @@ GenerateHashCode(io::Printer* printer) const {
     "hash = (53 * hash) + $name$_;\n");
 }
 
-std::string ImmutableEnumFieldLiteGenerator::GetBoxedType() const {
+string ImmutableEnumFieldLiteGenerator::GetBoxedType() const {
   return name_resolver_->GetImmutableClassName(descriptor_->enum_type());
 }
 
@@ -997,7 +999,7 @@ GenerateHashCode(io::Printer* printer) const {
     "}\n");
 }
 
-std::string RepeatedImmutableEnumFieldLiteGenerator::GetBoxedType() const {
+string RepeatedImmutableEnumFieldLiteGenerator::GetBoxedType() const {
   return name_resolver_->GetImmutableClassName(descriptor_->enum_type());
 }
 

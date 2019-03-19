@@ -50,6 +50,7 @@
 #include <google/protobuf/map_field.h>
 #include <google/protobuf/map_field_inl.h>
 #include <google/protobuf/unknown_field_set.h>
+#include <google/protobuf/wire_format_lite_inl.h>
 
 
 const size_t kMapEntryTagByteSize = 2;
@@ -628,7 +629,7 @@ bool WireFormat::ParseAndMergeField(
       // Handle strings separately so that we can optimize the ctype=CORD case.
       case FieldDescriptor::TYPE_STRING: {
         bool strict_utf8_check = StrictUtf8Check(field);
-        std::string value;
+        string value;
         if (!WireFormatLite::ReadString(input, &value)) return false;
         if (strict_utf8_check) {
           if (!WireFormatLite::VerifyUtf8String(
@@ -649,7 +650,7 @@ bool WireFormat::ParseAndMergeField(
       }
 
       case FieldDescriptor::TYPE_BYTES: {
-        std::string value;
+        string value;
         if (!WireFormatLite::ReadBytes(input, &value)) return false;
         if (field->is_repeated()) {
           message_reflection->AddString(message, field, value);
@@ -1027,13 +1028,11 @@ void WireFormat::SerializeFieldWithCachedSizes(
       // instead of copying.
       case FieldDescriptor::TYPE_STRING: {
         bool strict_utf8_check = StrictUtf8Check(field);
-        std::string scratch;
-        const std::string& value =
-            field->is_repeated()
-                ? message_reflection->GetRepeatedStringReference(message, field,
-                                                                 j, &scratch)
-                : message_reflection->GetStringReference(message, field,
-                                                         &scratch);
+        string scratch;
+        const string& value = field->is_repeated() ?
+          message_reflection->GetRepeatedStringReference(
+            message, field, j, &scratch) :
+          message_reflection->GetStringReference(message, field, &scratch);
         if (strict_utf8_check) {
           WireFormatLite::VerifyUtf8String(value.data(), value.length(),
                                            WireFormatLite::SERIALIZE,
@@ -1047,13 +1046,11 @@ void WireFormat::SerializeFieldWithCachedSizes(
       }
 
       case FieldDescriptor::TYPE_BYTES: {
-        std::string scratch;
-        const std::string& value =
-            field->is_repeated()
-                ? message_reflection->GetRepeatedStringReference(message, field,
-                                                                 j, &scratch)
-                : message_reflection->GetStringReference(message, field,
-                                                         &scratch);
+        string scratch;
+        const string& value = field->is_repeated() ?
+          message_reflection->GetRepeatedStringReference(
+            message, field, j, &scratch) :
+          message_reflection->GetStringReference(message, field, &scratch);
         WireFormatLite::WriteBytes(field->number(), value, output);
         break;
       }
@@ -1335,13 +1332,11 @@ size_t WireFormat::FieldDataOnlyByteSize(
     case FieldDescriptor::TYPE_STRING:
     case FieldDescriptor::TYPE_BYTES: {
       for (int j = 0; j < count; j++) {
-        std::string scratch;
-        const std::string& value =
-            field->is_repeated()
-                ? message_reflection->GetRepeatedStringReference(message, field,
-                                                                 j, &scratch)
-                : message_reflection->GetStringReference(message, field,
-                                                         &scratch);
+        string scratch;
+        const string& value = field->is_repeated() ?
+          message_reflection->GetRepeatedStringReference(
+            message, field, j, &scratch) :
+          message_reflection->GetStringReference(message, field, &scratch);
         data_size += WireFormatLite::StringSize(value);
       }
       break;

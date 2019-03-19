@@ -28,16 +28,17 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <cmath>
 #include <limits>
 #include <sstream>
 
 #include <google/protobuf/compiler/code_generator.h>
+#include <google/protobuf/compiler/plugin.h>
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/descriptor.pb.h>
 #include <google/protobuf/io/coded_stream.h>
 #include <google/protobuf/io/printer.h>
 #include <google/protobuf/io/zero_copy_stream.h>
+#include <google/protobuf/stubs/mathlimits.h>
 #include <google/protobuf/stubs/strutil.h>
 #include <google/protobuf/wire_format.h>
 
@@ -302,7 +303,7 @@ std::string FieldGeneratorBase::default_value(const FieldDescriptor* descriptor)
   switch (descriptor->type()) {
     case FieldDescriptor::TYPE_ENUM:
       if (IsProto2(descriptor_->file())) {
-        return GetClassName(descriptor->default_value_enum()->type()) + "." +
+        return GetClassName(descriptor->default_value_enum()->type()) + "." + 
           GetEnumValueName(descriptor->default_value_enum()->type()->name(), descriptor->default_value_enum()->name());
       }
       else {
@@ -322,7 +323,7 @@ std::string FieldGeneratorBase::default_value(const FieldDescriptor* descriptor)
         return "double.PositiveInfinity";
       } else if (value == -std::numeric_limits<double>::infinity()) {
         return "double.NegativeInfinity";
-      } else if (std::isnan(value)) {
+      } else if (MathLimits<double>::IsNaN(value)) {
         return "double.NaN";
       }
       return SimpleDtoa(value) + "D";
@@ -333,7 +334,7 @@ std::string FieldGeneratorBase::default_value(const FieldDescriptor* descriptor)
         return "float.PositiveInfinity";
       } else if (value == -std::numeric_limits<float>::infinity()) {
         return "float.NegativeInfinity";
-      } else if (std::isnan(value)) {
+      } else if (MathLimits<float>::IsNaN(value)) {
         return "float.NaN";
       }
       return SimpleFtoa(value) + "F";

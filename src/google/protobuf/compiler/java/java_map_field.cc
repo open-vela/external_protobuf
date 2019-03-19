@@ -57,8 +57,9 @@ const FieldDescriptor* ValueField(const FieldDescriptor* descriptor) {
   return message->FindFieldByName("value");
 }
 
-std::string TypeName(const FieldDescriptor* field,
-                     ClassNameResolver* name_resolver, bool boxed) {
+string TypeName(const FieldDescriptor* field,
+                ClassNameResolver* name_resolver,
+                bool boxed) {
   if (GetJavaType(field) == JAVATYPE_MESSAGE) {
     return name_resolver->GetImmutableClassName(field->message_type());
   } else if (GetJavaType(field) == JAVATYPE_ENUM) {
@@ -69,15 +70,17 @@ std::string TypeName(const FieldDescriptor* field,
   }
 }
 
-std::string WireType(const FieldDescriptor* field) {
+string WireType(const FieldDescriptor* field) {
   return "com.google.protobuf.WireFormat.FieldType." +
-         std::string(FieldTypeName(field->type()));
+      string(FieldTypeName(field->type()));
 }
 
-void SetMessageVariables(const FieldDescriptor* descriptor, int messageBitIndex,
-                         int builderBitIndex, const FieldGeneratorInfo* info,
+void SetMessageVariables(const FieldDescriptor* descriptor,
+                         int messageBitIndex,
+                         int builderBitIndex,
+                         const FieldGeneratorInfo* info,
                          Context* context,
-                         std::map<std::string, std::string>* variables) {
+                         std::map<string, string>* variables) {
   SetCommonFieldVariables(descriptor, info, variables);
   ClassNameResolver* name_resolver = context->GetNameResolver();
 
@@ -89,7 +92,7 @@ void SetMessageVariables(const FieldDescriptor* descriptor, int messageBitIndex,
   const JavaType valueJavaType = GetJavaType(value);
 
   (*variables)["key_type"] = TypeName(key, name_resolver, false);
-  std::string boxed_key_type = TypeName(key, name_resolver, true);
+  string boxed_key_type = TypeName(key, name_resolver, true);
   (*variables)["boxed_key_type"] = boxed_key_type;
   // Used for calling the serialization function.
   (*variables)["short_key_type"] =
@@ -784,7 +787,7 @@ GenerateHashCode(io::Printer* printer) const {
       "}\n");
 }
 
-std::string ImmutableMapFieldGenerator::GetBoxedType() const {
+string ImmutableMapFieldGenerator::GetBoxedType() const {
   return name_resolver_->GetImmutableClassName(descriptor_->message_type());
 }
 

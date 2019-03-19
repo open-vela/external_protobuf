@@ -44,13 +44,13 @@ namespace protobuf {
 namespace compiler {
 namespace java {
 
-std::string EscapeJavadoc(const std::string& input) {
-  std::string result;
+string EscapeJavadoc(const string& input) {
+  string result;
   result.reserve(input.size() * 2);
 
   char prev = '*';
 
-  for (std::string::size_type i = 0; i < input.size(); i++) {
+  for (string::size_type i = 0; i < input.size(); i++) {
     char c = input[i];
     switch (c) {
       case '*':
@@ -104,9 +104,8 @@ std::string EscapeJavadoc(const std::string& input) {
 
 static void WriteDocCommentBodyForLocation(
     io::Printer* printer, const SourceLocation& location) {
-  std::string comments = location.leading_comments.empty()
-                             ? location.trailing_comments
-                             : location.leading_comments;
+  string comments = location.leading_comments.empty() ?
+      location.trailing_comments : location.leading_comments;
   if (!comments.empty()) {
     // TODO(kenton):  Ideally we should parse the comment text as Markdown and
     //   write it back as HTML, but this requires a Markdown parser.  For now
@@ -116,7 +115,7 @@ static void WriteDocCommentBodyForLocation(
     // HTML-escape them so that they don't accidentally close the doc comment.
     comments = EscapeJavadoc(comments);
 
-    std::vector<std::string> lines = Split(comments, "\n");
+    std::vector<string> lines = Split(comments, "\n");
     while (!lines.empty() && lines.back().empty()) {
       lines.pop_back();
     }
@@ -147,11 +146,11 @@ static void WriteDocCommentBody(
   }
 }
 
-static std::string FirstLineOf(const std::string& value) {
-  std::string result = value;
+static string FirstLineOf(const string& value) {
+  string result = value;
 
-  std::string::size_type pos = result.find_first_of('\n');
-  if (pos != std::string::npos) {
+  string::size_type pos = result.find_first_of('\n');
+  if (pos != string::npos) {
     result.erase(pos);
   }
 
