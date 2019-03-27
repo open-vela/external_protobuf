@@ -1,3 +1,0 @@
-# This is the list of text format conformance tests that are known to fail right
-# now.
-# TODO: These should be fixed.
