@@ -527,10 +527,9 @@ const double kColdRatio = 0.005;
 
 bool ColdChunkSkipper::IsColdChunk(int chunk) {
   // Mark this variable as used until it is actually used
-  (void)cold_threshold_;
+  (void) cold_threshold_;
   return false;
 }
-
 
 void ColdChunkSkipper::OnStartChunk(int chunk, int cached_has_bit_index,
                                     const std::string& from,
@@ -622,8 +621,9 @@ MessageGenerator::MessageGenerator(
   // Variables that apply to this class
   variables_["classname"] = classname_;
   variables_["classtype"] = QualifiedClassName(descriptor_, options);
-  variables_["scc_info"] =
-      SccInfoSymbol(scc_analyzer_->GetSCC(descriptor_), options_);
+  std::string scc_name =
+      ClassName(scc_analyzer_->GetSCC(descriptor_)->GetRepresentative());
+  variables_["scc_name"] = UniqueName(scc_name, descriptor_, options_);
   variables_["full_name"] = descriptor_->full_name();
   variables_["superclass"] = SuperClassName(descriptor_, options_);
 
@@ -1012,16 +1012,8 @@ void MessageGenerator::GenerateClassDefinition(io::Printer* printer) {
     if (HasDescriptorMethods(descriptor_->file(), options_)) {
       format(
           "  void MergeFrom(const ::$proto_ns$::Message& other) final;\n"
-          "  ::$proto_ns$::Metadata GetMetadata() const final;\n"
-          "  private:\n"
-          "  static ::$proto_ns$::Metadata GetMetadataStatic() {\n"
-          "    ::$proto_ns$::internal::AssignDescriptors(&::$desc_table$);\n"
-          "    return ::$desc_table$.file_level_metadata[$1$];\n"
-          "  }\n"
-          "\n"
-          "  public:\n"
-          "};\n",
-          index_in_file_messages_);
+          "  ::$proto_ns$::Metadata GetMetadata() const;\n"
+          "};\n");
     } else {
       format("};\n");
     }
@@ -1102,25 +1094,7 @@ void MessageGenerator::GenerateClassDefinition(io::Printer* printer) {
       !descriptor_->options().no_standard_descriptor_accessor()) {
     format(
         "static const ::$proto_ns$::Descriptor* descriptor() {\n"
-        "  return GetDescriptor();\n"
-        "}\n");
-  }
-
-  if (HasDescriptorMethods(descriptor_->file(), options_)) {
-    // These shadow non-static methods of the same names in Message.  We
-    // redefine them here because calls directly on the generated class can be
-    // statically analyzed -- we know what descriptor types are being requested.
-    // It also avoids a vtable dispatch.
-    //
-    // We would eventually like to eliminate the methods in Message, and having
-    // this separate also lets us track calls to the base class methods
-    // separately.
-    format(
-        "static const ::$proto_ns$::Descriptor* GetDescriptor() {\n"
-        "  return GetMetadataStatic().descriptor;\n"
-        "}\n"
-        "static const ::$proto_ns$::Reflection* GetReflection() {\n"
-        "  return GetMetadataStatic().reflection;\n"
+        "  return default_instance().GetDescriptor();\n"
         "}\n");
   }
 
@@ -1331,13 +1305,6 @@ void MessageGenerator::GenerateClassDefinition(io::Printer* printer) {
   if (HasDescriptorMethods(descriptor_->file(), options_)) {
     format(
         "::$proto_ns$::Metadata GetMetadata() const final;\n"
-        "private:\n"
-        "static ::$proto_ns$::Metadata GetMetadataStatic() {\n"
-        "  ::$proto_ns$::internal::AssignDescriptors(&::$desc_table$);\n"
-        "  return ::$desc_table$.file_level_metadata[kIndexInFileMessages];\n"
-        "}\n"
-        "\n"
-        "public:\n"
         "\n");
   } else {
     format(
@@ -1907,8 +1874,7 @@ void MessageGenerator::GenerateDefaultInstanceInitializer(
             "  $package_ns$::$name$_ = "
             "::$proto_ns$::Empty::internal_default_instance();\n"
             "}\n",
-            QualifiedDefaultInstanceName(field->message_type(),
-                                         options_));  // 1
+            DefaultInstanceName(field->message_type(), options_));  // 1
         continue;
       }
       format(
@@ -1935,8 +1901,11 @@ void MessageGenerator::GenerateClassMethods(io::Printer* printer) {
     if (HasDescriptorMethods(descriptor_->file(), options_)) {
       format(
           "::$proto_ns$::Metadata $classname$::GetMetadata() const {\n"
-          "  return GetMetadataStatic();\n"
-          "}\n");
+          "  "
+          "::$proto_ns$::internal::AssignDescriptors(&::$desc_table$);\n"
+          "  return ::$file_level_metadata$[$1$];\n"
+          "}\n",
+          index_in_file_messages_);
       format(
           "void $classname$::MergeFrom(\n"
           "    const ::$proto_ns$::Message& other) {\n"
@@ -2088,7 +2057,8 @@ void MessageGenerator::GenerateClassMethods(io::Printer* printer) {
   if (HasDescriptorMethods(descriptor_->file(), options_)) {
     format(
         "::$proto_ns$::Metadata $classname$::GetMetadata() const {\n"
-        "  return GetMetadataStatic();\n"
+        "  ::$proto_ns$::internal::AssignDescriptors(&::$desc_table$);\n"
+        "  return ::$file_level_metadata$[kIndexInFileMessages];\n"
         "}\n"
         "\n");
   } else {
@@ -2256,8 +2226,8 @@ size_t MessageGenerator::GenerateParseAuxTable(io::Printer* printer) {
           break;
         }
         format.Set("field_classname", ClassName(field->message_type(), false));
-        format.Set("default_instance", QualifiedDefaultInstanceName(
-                                           field->message_type(), options_));
+        format.Set("default_instance",
+                   DefaultInstanceName(field->message_type(), options_));
 
         format(
             "{::$proto_ns$::internal::AuxillaryParseTableField::message_aux{\n"
@@ -2371,7 +2341,9 @@ void MessageGenerator::GenerateSharedConstructorCode(io::Printer* printer) {
   format("void $classname$::SharedCtor() {\n");
   if (scc_analyzer_->GetSCCAnalysis(scc_analyzer_->GetSCC(descriptor_))
           .constructor_requires_initialization) {
-    format("  ::$proto_ns$::internal::InitSCC(&$scc_info$.base);\n");
+    format(
+        "  ::$proto_ns$::internal::InitSCC(\n"
+        "      &scc_info_$scc_name$.base);\n");
   }
 
   format.Indent();
@@ -2728,7 +2700,7 @@ void MessageGenerator::GenerateStructors(io::Printer* printer) {
   format(
       "const $classname$& $classname$::default_instance() {\n"
       "  "
-      "::$proto_ns$::internal::InitSCC(&::$scc_info$.base)"
+      "::$proto_ns$::internal::InitSCC(&::scc_info_$scc_name$.base)"
       ";\n"
       "  return *internal_default_instance();\n"
       "}\n\n");
