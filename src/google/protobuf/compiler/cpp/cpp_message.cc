@@ -177,6 +177,10 @@ bool EmitFieldNonDefaultCondition(io::Printer* printer,
     } else if (field->cpp_type() == FieldDescriptor::CPPTYPE_MESSAGE) {
       // Message fields still have has_$name$() methods.
       format("if ($prefix$has_$name$()) {\n");
+    } else if (field->cpp_type() == FieldDescriptor::CPPTYPE_DOUBLE 
+               || field->cpp_type() == FieldDescriptor::CPPTYPE_FLOAT) {
+      // Handle float comparison to prevent -Wfloat-equal warnings
+      format("if (!($prefix$$name$() <= 0 && $prefix$$name$() >= 0)) {\n");
     } else {
       format("if ($prefix$$name$() != 0) {\n");
     }
@@ -761,8 +765,8 @@ void MessageGenerator::GenerateFieldAccessorDeclarations(io::Printer* printer) {
     format.Set("oneof_name", oneof->name());
     format.Set("camel_oneof_name", UnderscoresToCamelCase(oneof->name(), true));
     format(
-        "void clear_$oneof_name$();\n"
-        "$camel_oneof_name$Case $oneof_name$_case() const;\n");
+        "void ${1$clear_$oneof_name$$}$();\n"
+        "$camel_oneof_name$Case $oneof_name$_case() const;\n", oneof);
   }
 }
 
@@ -1544,10 +1548,10 @@ void MessageGenerator::GenerateInlineMethods(io::Printer* printer) {
     format.Set("oneof_index", oneof->index());
     format(
         "inline $classname$::$camel_oneof_name$Case $classname$::"
-        "$oneof_name$_case() const {\n"
+        "${1$$oneof_name$_case$}$() const {\n"
         "  return $classname$::$camel_oneof_name$Case("
         "_oneof_case_[$oneof_index$]);\n"
-        "}\n");
+        "}\n", oneof);
   }
 }
 
