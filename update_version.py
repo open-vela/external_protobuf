@@ -178,11 +178,6 @@ def UpdateJava():
       Find(Find(document.documentElement, 'parent'), 'version'),
       GetFullVersion()))
 
-  RewriteXml('java/lite/pom.xml',
-    lambda document : ReplaceText(
-      Find(Find(document.documentElement, 'parent'), 'version'),
-      GetFullVersion()))
-
   RewriteXml('java/util/pom.xml',
     lambda document : ReplaceText(
       Find(Find(document.documentElement, 'parent'), 'version'),
