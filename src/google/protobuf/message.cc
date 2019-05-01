@@ -173,6 +173,16 @@ class ReflectionAccessor {
     return static_cast<char*>(msg) + CheckedCast(r)->schema_.GetFieldOffset(f);
   }
 
+  static ExtensionSet* GetExtensionSet(void* msg, const google::protobuf::Reflection* r) {
+    return reinterpret_cast<ExtensionSet*>(
+        static_cast<char*>(msg) +
+        CheckedCast(r)->schema_.GetExtensionSetOffset());
+  }
+  static InternalMetadataWithArena* GetMetadata(void* msg,
+                                                const google::protobuf::Reflection* r) {
+    return reinterpret_cast<InternalMetadataWithArena*>(
+        static_cast<char*>(msg) + CheckedCast(r)->schema_.GetMetadataOffset());
+  }
   static void* GetRepeatedEnum(const Reflection* reflection,
                                const FieldDescriptor* field, Message* msg) {
     return reflection->MutableRawRepeatedField(
@@ -666,6 +676,11 @@ namespace {
 class GeneratedMessageFactory : public MessageFactory {
  public:
   static GeneratedMessageFactory* singleton();
+
+  struct RegistrationData {
+    const Metadata* file_level_metadata;
+    int size;
+  };
 
   void RegisterFile(const google::protobuf::internal::DescriptorTable* table);
   void RegisterType(const Descriptor* descriptor, const Message* prototype);
