@@ -65,12 +65,15 @@ void SetMessageVariables(const FieldDescriptor* descriptor,
   switch (val->cpp_type()) {
     case FieldDescriptor::CPPTYPE_MESSAGE:
       (*variables)["val_cpp"] = FieldMessageTypeName(val, options);
+      (*variables)["wrapper"] = "MapEntryWrapper";
       break;
     case FieldDescriptor::CPPTYPE_ENUM:
       (*variables)["val_cpp"] = ClassName(val->enum_type(), true);
+      (*variables)["wrapper"] = "MapEnumEntryWrapper";
       break;
     default:
       (*variables)["val_cpp"] = PrimitiveTypeName(options, val->cpp_type());
+      (*variables)["wrapper"] = "MapEntryWrapper";
   }
   (*variables)["key_wire_type"] =
       "TYPE_" + ToUpper(DeclaredTypeMethodName(key->type()));
@@ -247,16 +250,17 @@ static void GenerateSerializationLoop(const Formatter& format, bool string_key,
   }
   format.Indent();
 
+  format(
+      "$map_classname$::$wrapper$ entry(nullptr, $1$->first, $1$->second);\n",
+      ptr);
   if (to_array) {
     format(
-        "target = $map_classname$::Funcs::SerializeToArray($number$, "
-        "$1$->first, $1$->second, target);\n",
-        ptr);
+        "target = ::$proto_ns$::internal::WireFormatLite::InternalWrite"
+        "$declared_type$NoVirtualToArray($number$, entry, target);\n");
   } else {
     format(
-        "$map_classname$::Funcs::SerializeToCodedStream($number$, "
-        "$1$->first, $1$->second, output);\n",
-        ptr);
+        "::$proto_ns$::internal::WireFormatLite::Write$stream_writer$($number$,"
+        " entry, output);\n");
   }
 
   if (string_key || string_value) {
@@ -366,8 +370,9 @@ void MapFieldGenerator::GenerateByteSize(io::Printer* printer) const {
       "for (::$proto_ns$::Map< $key_cpp$, $val_cpp$ >::const_iterator\n"
       "    it = this->$name$().begin();\n"
       "    it != this->$name$().end(); ++it) {\n"
-      "  total_size += $map_classname$::Funcs::ByteSizeLong(it->first, "
-      "it->second);\n"
+      "  $map_classname$::$wrapper$ entry(nullptr, it->first, it->second);\n"
+      "  total_size += ::$proto_ns$::internal::WireFormatLite::\n"
+      "      $declared_type$SizeNoVirtual(entry);\n"
       "}\n");
 }
 

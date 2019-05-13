@@ -206,7 +206,7 @@ class MockErrorCollector : public DescriptorPool::ErrorCollector {
   void AddError(const std::string& filename, const std::string& element_name,
                 const Message* descriptor, ErrorLocation location,
                 const std::string& message) {
-    const char* location_name = nullptr;
+    const char* location_name = NULL;
     switch (location) {
       case NAME:
         location_name = "NAME";
@@ -251,7 +251,7 @@ class MockErrorCollector : public DescriptorPool::ErrorCollector {
   void AddWarning(const std::string& filename, const std::string& element_name,
                   const Message* descriptor, ErrorLocation location,
                   const std::string& message) {
-    const char* location_name = nullptr;
+    const char* location_name = NULL;
     switch (location) {
       case NAME:
         location_name = "NAME";
@@ -343,13 +343,13 @@ class FileDescriptorTest : public testing::Test {
 
     // Build the descriptors and get the pointers.
     foo_file_ = pool_.BuildFile(foo_file);
-    ASSERT_TRUE(foo_file_ != nullptr);
+    ASSERT_TRUE(foo_file_ != NULL);
 
     bar_file_ = pool_.BuildFile(bar_file);
-    ASSERT_TRUE(bar_file_ != nullptr);
+    ASSERT_TRUE(bar_file_ != NULL);
 
     baz_file_ = pool_.BuildFile(baz_file);
-    ASSERT_TRUE(baz_file_ != nullptr);
+    ASSERT_TRUE(baz_file_ != NULL);
 
     ASSERT_EQ(1, foo_file_->message_type_count());
     foo_message_ = foo_file_->message_type(0);
@@ -414,67 +414,67 @@ TEST_F(FileDescriptorTest, FindMessageTypeByName) {
   EXPECT_EQ(foo_message_, foo_file_->FindMessageTypeByName("FooMessage"));
   EXPECT_EQ(bar_message_, bar_file_->FindMessageTypeByName("BarMessage"));
 
-  EXPECT_TRUE(foo_file_->FindMessageTypeByName("BarMessage") == nullptr);
-  EXPECT_TRUE(bar_file_->FindMessageTypeByName("FooMessage") == nullptr);
-  EXPECT_TRUE(baz_file_->FindMessageTypeByName("FooMessage") == nullptr);
+  EXPECT_TRUE(foo_file_->FindMessageTypeByName("BarMessage") == NULL);
+  EXPECT_TRUE(bar_file_->FindMessageTypeByName("FooMessage") == NULL);
+  EXPECT_TRUE(baz_file_->FindMessageTypeByName("FooMessage") == NULL);
 
-  EXPECT_TRUE(foo_file_->FindMessageTypeByName("NoSuchMessage") == nullptr);
-  EXPECT_TRUE(foo_file_->FindMessageTypeByName("FooEnum") == nullptr);
+  EXPECT_TRUE(foo_file_->FindMessageTypeByName("NoSuchMessage") == NULL);
+  EXPECT_TRUE(foo_file_->FindMessageTypeByName("FooEnum") == NULL);
 }
 
 TEST_F(FileDescriptorTest, FindEnumTypeByName) {
   EXPECT_EQ(foo_enum_, foo_file_->FindEnumTypeByName("FooEnum"));
   EXPECT_EQ(bar_enum_, bar_file_->FindEnumTypeByName("BarEnum"));
 
-  EXPECT_TRUE(foo_file_->FindEnumTypeByName("BarEnum") == nullptr);
-  EXPECT_TRUE(bar_file_->FindEnumTypeByName("FooEnum") == nullptr);
-  EXPECT_TRUE(baz_file_->FindEnumTypeByName("FooEnum") == nullptr);
+  EXPECT_TRUE(foo_file_->FindEnumTypeByName("BarEnum") == NULL);
+  EXPECT_TRUE(bar_file_->FindEnumTypeByName("FooEnum") == NULL);
+  EXPECT_TRUE(baz_file_->FindEnumTypeByName("FooEnum") == NULL);
 
-  EXPECT_TRUE(foo_file_->FindEnumTypeByName("NoSuchEnum") == nullptr);
-  EXPECT_TRUE(foo_file_->FindEnumTypeByName("FooMessage") == nullptr);
+  EXPECT_TRUE(foo_file_->FindEnumTypeByName("NoSuchEnum") == NULL);
+  EXPECT_TRUE(foo_file_->FindEnumTypeByName("FooMessage") == NULL);
 }
 
 TEST_F(FileDescriptorTest, FindEnumValueByName) {
   EXPECT_EQ(foo_enum_value_, foo_file_->FindEnumValueByName("FOO_ENUM_VALUE"));
   EXPECT_EQ(bar_enum_value_, bar_file_->FindEnumValueByName("BAR_ENUM_VALUE"));
 
-  EXPECT_TRUE(foo_file_->FindEnumValueByName("BAR_ENUM_VALUE") == nullptr);
-  EXPECT_TRUE(bar_file_->FindEnumValueByName("FOO_ENUM_VALUE") == nullptr);
-  EXPECT_TRUE(baz_file_->FindEnumValueByName("FOO_ENUM_VALUE") == nullptr);
+  EXPECT_TRUE(foo_file_->FindEnumValueByName("BAR_ENUM_VALUE") == NULL);
+  EXPECT_TRUE(bar_file_->FindEnumValueByName("FOO_ENUM_VALUE") == NULL);
+  EXPECT_TRUE(baz_file_->FindEnumValueByName("FOO_ENUM_VALUE") == NULL);
 
-  EXPECT_TRUE(foo_file_->FindEnumValueByName("NO_SUCH_VALUE") == nullptr);
-  EXPECT_TRUE(foo_file_->FindEnumValueByName("FooMessage") == nullptr);
+  EXPECT_TRUE(foo_file_->FindEnumValueByName("NO_SUCH_VALUE") == NULL);
+  EXPECT_TRUE(foo_file_->FindEnumValueByName("FooMessage") == NULL);
 }
 
 TEST_F(FileDescriptorTest, FindServiceByName) {
   EXPECT_EQ(foo_service_, foo_file_->FindServiceByName("FooService"));
   EXPECT_EQ(bar_service_, bar_file_->FindServiceByName("BarService"));
 
-  EXPECT_TRUE(foo_file_->FindServiceByName("BarService") == nullptr);
-  EXPECT_TRUE(bar_file_->FindServiceByName("FooService") == nullptr);
-  EXPECT_TRUE(baz_file_->FindServiceByName("FooService") == nullptr);
+  EXPECT_TRUE(foo_file_->FindServiceByName("BarService") == NULL);
+  EXPECT_TRUE(bar_file_->FindServiceByName("FooService") == NULL);
+  EXPECT_TRUE(baz_file_->FindServiceByName("FooService") == NULL);
 
-  EXPECT_TRUE(foo_file_->FindServiceByName("NoSuchService") == nullptr);
-  EXPECT_TRUE(foo_file_->FindServiceByName("FooMessage") == nullptr);
+  EXPECT_TRUE(foo_file_->FindServiceByName("NoSuchService") == NULL);
+  EXPECT_TRUE(foo_file_->FindServiceByName("FooMessage") == NULL);
 }
 
 TEST_F(FileDescriptorTest, FindExtensionByName) {
   EXPECT_EQ(foo_extension_, foo_file_->FindExtensionByName("foo_extension"));
   EXPECT_EQ(bar_extension_, bar_file_->FindExtensionByName("bar_extension"));
 
-  EXPECT_TRUE(foo_file_->FindExtensionByName("bar_extension") == nullptr);
-  EXPECT_TRUE(bar_file_->FindExtensionByName("foo_extension") == nullptr);
-  EXPECT_TRUE(baz_file_->FindExtensionByName("foo_extension") == nullptr);
+  EXPECT_TRUE(foo_file_->FindExtensionByName("bar_extension") == NULL);
+  EXPECT_TRUE(bar_file_->FindExtensionByName("foo_extension") == NULL);
+  EXPECT_TRUE(baz_file_->FindExtensionByName("foo_extension") == NULL);
 
-  EXPECT_TRUE(foo_file_->FindExtensionByName("no_such_extension") == nullptr);
-  EXPECT_TRUE(foo_file_->FindExtensionByName("FooMessage") == nullptr);
+  EXPECT_TRUE(foo_file_->FindExtensionByName("no_such_extension") == NULL);
+  EXPECT_TRUE(foo_file_->FindExtensionByName("FooMessage") == NULL);
 }
 
 TEST_F(FileDescriptorTest, FindExtensionByNumber) {
   EXPECT_EQ(foo_extension_, pool_.FindExtensionByNumber(foo_message_, 1));
   EXPECT_EQ(bar_extension_, pool_.FindExtensionByNumber(bar_message_, 1));
 
-  EXPECT_TRUE(pool_.FindExtensionByNumber(foo_message_, 2) == nullptr);
+  EXPECT_TRUE(pool_.FindExtensionByNumber(foo_message_, 2) == NULL);
 }
 
 
@@ -487,7 +487,7 @@ TEST_F(FileDescriptorTest, BuildAgain) {
 
   // But if we change the file then it won't work.
   file.set_package("some.other.package");
-  EXPECT_TRUE(pool_.BuildFile(file) == nullptr);
+  EXPECT_TRUE(pool_.BuildFile(file) == NULL);
 }
 
 TEST_F(FileDescriptorTest, BuildAgainWithSyntax) {
@@ -498,7 +498,7 @@ TEST_F(FileDescriptorTest, BuildAgainWithSyntax) {
   proto_syntax2.set_syntax("proto2");
 
   const FileDescriptor* proto2_descriptor = pool_.BuildFile(proto_syntax2);
-  EXPECT_TRUE(proto2_descriptor != nullptr);
+  EXPECT_TRUE(proto2_descriptor != NULL);
   EXPECT_EQ(proto2_descriptor, pool_.BuildFile(proto_syntax2));
 
   FileDescriptorProto implicit_proto2;
@@ -506,7 +506,7 @@ TEST_F(FileDescriptorTest, BuildAgainWithSyntax) {
 
   const FileDescriptor* implicit_proto2_descriptor =
       pool_.BuildFile(implicit_proto2);
-  EXPECT_TRUE(implicit_proto2_descriptor != nullptr);
+  EXPECT_TRUE(implicit_proto2_descriptor != NULL);
   // We get the same FileDescriptor back if syntax param is explicitly
   // specified.
   implicit_proto2.set_syntax("proto2");
@@ -517,7 +517,7 @@ TEST_F(FileDescriptorTest, BuildAgainWithSyntax) {
   proto_syntax3.set_syntax("proto3");
 
   const FileDescriptor* proto3_descriptor = pool_.BuildFile(proto_syntax3);
-  EXPECT_TRUE(proto3_descriptor != nullptr);
+  EXPECT_TRUE(proto3_descriptor != NULL);
   EXPECT_EQ(proto3_descriptor, pool_.BuildFile(proto_syntax3));
 }
 
@@ -530,7 +530,7 @@ TEST_F(FileDescriptorTest, Syntax) {
     proto.set_syntax("proto2");
     DescriptorPool pool;
     const FileDescriptor* file = pool.BuildFile(proto);
-    EXPECT_TRUE(file != nullptr);
+    EXPECT_TRUE(file != NULL);
     EXPECT_EQ(FileDescriptor::SYNTAX_PROTO2, file->syntax());
     FileDescriptorProto other;
     file->CopyTo(&other);
@@ -541,7 +541,7 @@ TEST_F(FileDescriptorTest, Syntax) {
     proto.set_syntax("proto3");
     DescriptorPool pool;
     const FileDescriptor* file = pool.BuildFile(proto);
-    EXPECT_TRUE(file != nullptr);
+    EXPECT_TRUE(file != NULL);
     EXPECT_EQ(FileDescriptor::SYNTAX_PROTO3, file->syntax());
     FileDescriptorProto other;
     file->CopyTo(&other);
@@ -603,7 +603,7 @@ TEST_F(FileDescriptorTest, DebugStringRoundTrip) {
     ASSERT_EQ("", error_collector.last_error());
     proto.set_name(name);
     const FileDescriptor* descriptor = pool.BuildFile(proto);
-    ASSERT_TRUE(descriptor != nullptr) << proto.DebugString();
+    ASSERT_TRUE(descriptor != NULL) << proto.DebugString();
     EXPECT_EQ(content, descriptor->DebugString());
   }
 }
@@ -726,16 +726,16 @@ class DescriptorTest : public testing::Test {
 
     // Build the descriptors and get the pointers.
     foo_file_ = pool_.BuildFile(foo_file);
-    ASSERT_TRUE(foo_file_ != nullptr);
+    ASSERT_TRUE(foo_file_ != NULL);
 
     bar_file_ = pool_.BuildFile(bar_file);
-    ASSERT_TRUE(bar_file_ != nullptr);
+    ASSERT_TRUE(bar_file_ != NULL);
 
     map_file_ = pool_.BuildFile(map_file);
-    ASSERT_TRUE(map_file_ != nullptr);
+    ASSERT_TRUE(map_file_ != NULL);
 
     json_file_ = pool_.BuildFile(json_file);
-    ASSERT_TRUE(json_file_ != nullptr);
+    ASSERT_TRUE(json_file_ != NULL);
 
     ASSERT_EQ(1, foo_file_->enum_type_count());
     enum_ = foo_file_->enum_type(0);
@@ -810,8 +810,8 @@ TEST_F(DescriptorTest, Name) {
 }
 
 TEST_F(DescriptorTest, ContainingType) {
-  EXPECT_TRUE(message_->containing_type() == nullptr);
-  EXPECT_TRUE(message2_->containing_type() == nullptr);
+  EXPECT_TRUE(message_->containing_type() == NULL);
+  EXPECT_TRUE(message2_->containing_type() == NULL);
 }
 
 TEST_F(DescriptorTest, FieldsByIndex) {
@@ -832,14 +832,14 @@ TEST_F(DescriptorTest, FindFieldByName) {
   EXPECT_EQ(bar_, message_->FindFieldByName("bar"));
   EXPECT_EQ(baz_, message_->FindFieldByName("baz"));
   EXPECT_EQ(qux_, message_->FindFieldByName("qux"));
-  EXPECT_TRUE(message_->FindFieldByName("no_such_field") == nullptr);
-  EXPECT_TRUE(message_->FindFieldByName("quux") == nullptr);
+  EXPECT_TRUE(message_->FindFieldByName("no_such_field") == NULL);
+  EXPECT_TRUE(message_->FindFieldByName("quux") == NULL);
 
   EXPECT_EQ(foo2_, message2_->FindFieldByName("foo"));
   EXPECT_EQ(bar2_, message2_->FindFieldByName("bar"));
   EXPECT_EQ(quux2_, message2_->FindFieldByName("quux"));
-  EXPECT_TRUE(message2_->FindFieldByName("baz") == nullptr);
-  EXPECT_TRUE(message2_->FindFieldByName("qux") == nullptr);
+  EXPECT_TRUE(message2_->FindFieldByName("baz") == NULL);
+  EXPECT_TRUE(message2_->FindFieldByName("qux") == NULL);
 }
 
 TEST_F(DescriptorTest, FindFieldByNumber) {
@@ -847,14 +847,14 @@ TEST_F(DescriptorTest, FindFieldByNumber) {
   EXPECT_EQ(bar_, message_->FindFieldByNumber(6));
   EXPECT_EQ(baz_, message_->FindFieldByNumber(500000000));
   EXPECT_EQ(qux_, message_->FindFieldByNumber(15));
-  EXPECT_TRUE(message_->FindFieldByNumber(837592) == nullptr);
-  EXPECT_TRUE(message_->FindFieldByNumber(2) == nullptr);
+  EXPECT_TRUE(message_->FindFieldByNumber(837592) == NULL);
+  EXPECT_TRUE(message_->FindFieldByNumber(2) == NULL);
 
   EXPECT_EQ(foo2_, message2_->FindFieldByNumber(1));
   EXPECT_EQ(bar2_, message2_->FindFieldByNumber(2));
   EXPECT_EQ(quux2_, message2_->FindFieldByNumber(6));
-  EXPECT_TRUE(message2_->FindFieldByNumber(15) == nullptr);
-  EXPECT_TRUE(message2_->FindFieldByNumber(500000000) == nullptr);
+  EXPECT_TRUE(message2_->FindFieldByNumber(15) == NULL);
+  EXPECT_TRUE(message2_->FindFieldByNumber(500000000) == NULL);
 }
 
 TEST_F(DescriptorTest, FieldName) {
@@ -873,34 +873,6 @@ TEST_F(DescriptorTest, FieldFullName) {
   EXPECT_EQ("corge.grault.TestMessage2.foo", foo2_->full_name());
   EXPECT_EQ("corge.grault.TestMessage2.bar", bar2_->full_name());
   EXPECT_EQ("corge.grault.TestMessage2.quux", quux2_->full_name());
-}
-
-TEST_F(DescriptorTest, PrintableNameIsFullNameForNonExtensionFields) {
-  EXPECT_EQ("TestMessage.foo", foo_->PrintableNameForExtension());
-  EXPECT_EQ("TestMessage.bar", bar_->PrintableNameForExtension());
-  EXPECT_EQ("TestMessage.baz", baz_->PrintableNameForExtension());
-  EXPECT_EQ("TestMessage.qux", qux_->PrintableNameForExtension());
-
-  EXPECT_EQ("corge.grault.TestMessage2.foo",
-            foo2_->PrintableNameForExtension());
-  EXPECT_EQ("corge.grault.TestMessage2.bar",
-            bar2_->PrintableNameForExtension());
-  EXPECT_EQ("corge.grault.TestMessage2.quux",
-            quux2_->PrintableNameForExtension());
-}
-
-TEST_F(DescriptorTest, PrintableNameIsFullNameForNonMessageSetExtension) {
-  EXPECT_EQ("protobuf_unittest.Aggregate.nested",
-            protobuf_unittest::Aggregate::descriptor()
-                ->FindExtensionByName("nested")
-                ->PrintableNameForExtension());
-}
-
-TEST_F(DescriptorTest, PrintableNameIsExtendingTypeForMessageSetExtension) {
-  EXPECT_EQ("protobuf_unittest.AggregateMessageSetElement",
-            protobuf_unittest::AggregateMessageSetElement::descriptor()
-                ->FindExtensionByName("message_set_extension")
-                ->PrintableNameForExtension());
 }
 
 TEST_F(DescriptorTest, FieldJsonName) {
@@ -1018,17 +990,17 @@ TEST_F(DescriptorTest, FieldContainingType) {
 }
 
 TEST_F(DescriptorTest, FieldMessageType) {
-  EXPECT_TRUE(foo_->message_type() == nullptr);
-  EXPECT_TRUE(bar_->message_type() == nullptr);
+  EXPECT_TRUE(foo_->message_type() == NULL);
+  EXPECT_TRUE(bar_->message_type() == NULL);
 
   EXPECT_EQ(foreign_, baz_->message_type());
   EXPECT_EQ(foreign_, qux_->message_type());
 }
 
 TEST_F(DescriptorTest, FieldEnumType) {
-  EXPECT_TRUE(foo_->enum_type() == nullptr);
-  EXPECT_TRUE(baz_->enum_type() == nullptr);
-  EXPECT_TRUE(qux_->enum_type() == nullptr);
+  EXPECT_TRUE(foo_->enum_type() == NULL);
+  EXPECT_TRUE(baz_->enum_type() == NULL);
+  EXPECT_TRUE(qux_->enum_type() == NULL);
 
   EXPECT_EQ(enum_, bar_->enum_type());
 }
@@ -1078,7 +1050,7 @@ class OneofDescriptorTest : public testing::Test {
 
     // Build the descriptors and get the pointers.
     baz_file_ = pool_.BuildFile(baz_file);
-    ASSERT_TRUE(baz_file_ != nullptr);
+    ASSERT_TRUE(baz_file_ != NULL);
 
     ASSERT_EQ(1, baz_file_->message_type_count());
     oneof_message_ = baz_file_->message_type(0);
@@ -1106,6 +1078,8 @@ class OneofDescriptorTest : public testing::Test {
   const FieldDescriptor* b_;
   const FieldDescriptor* c_;
   const FieldDescriptor* d_;
+  const FieldDescriptor* e_;
+  const FieldDescriptor* f_;
 };
 
 TEST_F(OneofDescriptorTest, Normal) {
@@ -1115,7 +1089,7 @@ TEST_F(OneofDescriptorTest, Normal) {
   ASSERT_EQ(2, oneof_->field_count());
   EXPECT_EQ(b_, oneof_->field(0));
   EXPECT_EQ(c_, oneof_->field(1));
-  EXPECT_TRUE(a_->containing_oneof() == nullptr);
+  EXPECT_TRUE(a_->containing_oneof() == NULL);
   EXPECT_EQ(oneof_, b_->containing_oneof());
   EXPECT_EQ(oneof_, c_->containing_oneof());
 }
@@ -1123,7 +1097,7 @@ TEST_F(OneofDescriptorTest, Normal) {
 TEST_F(OneofDescriptorTest, FindByName) {
   EXPECT_EQ(oneof_, oneof_message_->FindOneofByName("foo"));
   EXPECT_EQ(oneof2_, oneof_message_->FindOneofByName("bar"));
-  EXPECT_TRUE(oneof_message_->FindOneofByName("no_such_oneof") == nullptr);
+  EXPECT_TRUE(oneof_message_->FindOneofByName("no_such_oneof") == NULL);
 }
 
 // ===================================================================
@@ -1183,7 +1157,7 @@ class StylizedFieldNamesTest : public testing::Test {
                  FieldDescriptorProto::TYPE_INT32);
 
     file_ = pool_.BuildFile(file);
-    ASSERT_TRUE(file_ != nullptr);
+    ASSERT_TRUE(file_ != NULL);
     ASSERT_EQ(2, file_->message_type_count());
     message_ = file_->message_type(1);
     ASSERT_EQ("TestMessage", message_->name());
@@ -1241,10 +1215,10 @@ TEST_F(StylizedFieldNamesTest, FindByLowercaseName) {
   EXPECT_EQ(message_->field(0), message_->FindFieldByLowercaseName("foo_foo"));
   EXPECT_EQ(message_->field(1), message_->FindFieldByLowercaseName("foobar"));
   EXPECT_EQ(message_->field(2), message_->FindFieldByLowercaseName("foobaz"));
-  EXPECT_TRUE(message_->FindFieldByLowercaseName("FooBar") == nullptr);
-  EXPECT_TRUE(message_->FindFieldByLowercaseName("fooBaz") == nullptr);
-  EXPECT_TRUE(message_->FindFieldByLowercaseName("bar_foo") == nullptr);
-  EXPECT_TRUE(message_->FindFieldByLowercaseName("nosuchfield") == nullptr);
+  EXPECT_TRUE(message_->FindFieldByLowercaseName("FooBar") == NULL);
+  EXPECT_TRUE(message_->FindFieldByLowercaseName("fooBaz") == NULL);
+  EXPECT_TRUE(message_->FindFieldByLowercaseName("bar_foo") == NULL);
+  EXPECT_TRUE(message_->FindFieldByLowercaseName("nosuchfield") == NULL);
 
   EXPECT_EQ(message_->extension(0),
             message_->FindExtensionByLowercaseName("bar_foo"));
@@ -1252,28 +1226,28 @@ TEST_F(StylizedFieldNamesTest, FindByLowercaseName) {
             message_->FindExtensionByLowercaseName("barbar"));
   EXPECT_EQ(message_->extension(2),
             message_->FindExtensionByLowercaseName("barbaz"));
-  EXPECT_TRUE(message_->FindExtensionByLowercaseName("BarBar") == nullptr);
-  EXPECT_TRUE(message_->FindExtensionByLowercaseName("barBaz") == nullptr);
-  EXPECT_TRUE(message_->FindExtensionByLowercaseName("foo_foo") == nullptr);
-  EXPECT_TRUE(message_->FindExtensionByLowercaseName("nosuchfield") == nullptr);
+  EXPECT_TRUE(message_->FindExtensionByLowercaseName("BarBar") == NULL);
+  EXPECT_TRUE(message_->FindExtensionByLowercaseName("barBaz") == NULL);
+  EXPECT_TRUE(message_->FindExtensionByLowercaseName("foo_foo") == NULL);
+  EXPECT_TRUE(message_->FindExtensionByLowercaseName("nosuchfield") == NULL);
 
   EXPECT_EQ(file_->extension(0),
             file_->FindExtensionByLowercaseName("baz_foo"));
   EXPECT_EQ(file_->extension(1), file_->FindExtensionByLowercaseName("bazbar"));
   EXPECT_EQ(file_->extension(2), file_->FindExtensionByLowercaseName("bazbaz"));
-  EXPECT_TRUE(file_->FindExtensionByLowercaseName("BazBar") == nullptr);
-  EXPECT_TRUE(file_->FindExtensionByLowercaseName("bazBaz") == nullptr);
-  EXPECT_TRUE(file_->FindExtensionByLowercaseName("nosuchfield") == nullptr);
+  EXPECT_TRUE(file_->FindExtensionByLowercaseName("BazBar") == NULL);
+  EXPECT_TRUE(file_->FindExtensionByLowercaseName("bazBaz") == NULL);
+  EXPECT_TRUE(file_->FindExtensionByLowercaseName("nosuchfield") == NULL);
 }
 
 TEST_F(StylizedFieldNamesTest, FindByCamelcaseName) {
   EXPECT_EQ(message_->field(0), message_->FindFieldByCamelcaseName("fooFoo"));
   EXPECT_EQ(message_->field(1), message_->FindFieldByCamelcaseName("fooBar"));
   EXPECT_EQ(message_->field(2), message_->FindFieldByCamelcaseName("fooBaz"));
-  EXPECT_TRUE(message_->FindFieldByCamelcaseName("foo_foo") == nullptr);
-  EXPECT_TRUE(message_->FindFieldByCamelcaseName("FooBar") == nullptr);
-  EXPECT_TRUE(message_->FindFieldByCamelcaseName("barFoo") == nullptr);
-  EXPECT_TRUE(message_->FindFieldByCamelcaseName("nosuchfield") == nullptr);
+  EXPECT_TRUE(message_->FindFieldByCamelcaseName("foo_foo") == NULL);
+  EXPECT_TRUE(message_->FindFieldByCamelcaseName("FooBar") == NULL);
+  EXPECT_TRUE(message_->FindFieldByCamelcaseName("barFoo") == NULL);
+  EXPECT_TRUE(message_->FindFieldByCamelcaseName("nosuchfield") == NULL);
 
   EXPECT_EQ(message_->extension(0),
             message_->FindExtensionByCamelcaseName("barFoo"));
@@ -1281,17 +1255,17 @@ TEST_F(StylizedFieldNamesTest, FindByCamelcaseName) {
             message_->FindExtensionByCamelcaseName("barBar"));
   EXPECT_EQ(message_->extension(2),
             message_->FindExtensionByCamelcaseName("barBaz"));
-  EXPECT_TRUE(message_->FindExtensionByCamelcaseName("bar_foo") == nullptr);
-  EXPECT_TRUE(message_->FindExtensionByCamelcaseName("BarBar") == nullptr);
-  EXPECT_TRUE(message_->FindExtensionByCamelcaseName("fooFoo") == nullptr);
-  EXPECT_TRUE(message_->FindExtensionByCamelcaseName("nosuchfield") == nullptr);
+  EXPECT_TRUE(message_->FindExtensionByCamelcaseName("bar_foo") == NULL);
+  EXPECT_TRUE(message_->FindExtensionByCamelcaseName("BarBar") == NULL);
+  EXPECT_TRUE(message_->FindExtensionByCamelcaseName("fooFoo") == NULL);
+  EXPECT_TRUE(message_->FindExtensionByCamelcaseName("nosuchfield") == NULL);
 
   EXPECT_EQ(file_->extension(0), file_->FindExtensionByCamelcaseName("bazFoo"));
   EXPECT_EQ(file_->extension(1), file_->FindExtensionByCamelcaseName("bazBar"));
   EXPECT_EQ(file_->extension(2), file_->FindExtensionByCamelcaseName("bazBaz"));
-  EXPECT_TRUE(file_->FindExtensionByCamelcaseName("baz_foo") == nullptr);
-  EXPECT_TRUE(file_->FindExtensionByCamelcaseName("BazBar") == nullptr);
-  EXPECT_TRUE(file_->FindExtensionByCamelcaseName("nosuchfield") == nullptr);
+  EXPECT_TRUE(file_->FindExtensionByCamelcaseName("baz_foo") == NULL);
+  EXPECT_TRUE(file_->FindExtensionByCamelcaseName("BazBar") == NULL);
+  EXPECT_TRUE(file_->FindExtensionByCamelcaseName("nosuchfield") == NULL);
 }
 
 // ===================================================================
@@ -1338,10 +1312,10 @@ class EnumDescriptorTest : public testing::Test {
 
     // Build the descriptors and get the pointers.
     foo_file_ = pool_.BuildFile(foo_file);
-    ASSERT_TRUE(foo_file_ != nullptr);
+    ASSERT_TRUE(foo_file_ != NULL);
 
     bar_file_ = pool_.BuildFile(bar_file);
-    ASSERT_TRUE(bar_file_ != nullptr);
+    ASSERT_TRUE(bar_file_ != NULL);
 
     ASSERT_EQ(1, foo_file_->enum_type_count());
     enum_ = foo_file_->enum_type(0);
@@ -1384,8 +1358,8 @@ TEST_F(EnumDescriptorTest, Name) {
 }
 
 TEST_F(EnumDescriptorTest, ContainingType) {
-  EXPECT_TRUE(enum_->containing_type() == nullptr);
-  EXPECT_TRUE(enum2_->containing_type() == nullptr);
+  EXPECT_TRUE(enum_->containing_type() == NULL);
+  EXPECT_TRUE(enum2_->containing_type() == NULL);
 }
 
 TEST_F(EnumDescriptorTest, ValuesByIndex) {
@@ -1400,9 +1374,9 @@ TEST_F(EnumDescriptorTest, FindValueByName) {
   EXPECT_EQ(foo2_, enum2_->FindValueByName("FOO"));
   EXPECT_EQ(baz2_, enum2_->FindValueByName("BAZ"));
 
-  EXPECT_TRUE(enum_->FindValueByName("NO_SUCH_VALUE") == nullptr);
-  EXPECT_TRUE(enum_->FindValueByName("BAZ") == nullptr);
-  EXPECT_TRUE(enum2_->FindValueByName("BAR") == nullptr);
+  EXPECT_TRUE(enum_->FindValueByName("NO_SUCH_VALUE") == NULL);
+  EXPECT_TRUE(enum_->FindValueByName("BAZ") == NULL);
+  EXPECT_TRUE(enum2_->FindValueByName("BAR") == NULL);
 }
 
 TEST_F(EnumDescriptorTest, FindValueByNumber) {
@@ -1411,9 +1385,9 @@ TEST_F(EnumDescriptorTest, FindValueByNumber) {
   EXPECT_EQ(foo2_, enum2_->FindValueByNumber(1));
   EXPECT_EQ(baz2_, enum2_->FindValueByNumber(3));
 
-  EXPECT_TRUE(enum_->FindValueByNumber(416) == nullptr);
-  EXPECT_TRUE(enum_->FindValueByNumber(3) == nullptr);
-  EXPECT_TRUE(enum2_->FindValueByNumber(2) == nullptr);
+  EXPECT_TRUE(enum_->FindValueByNumber(416) == NULL);
+  EXPECT_TRUE(enum_->FindValueByNumber(3) == NULL);
+  EXPECT_TRUE(enum2_->FindValueByNumber(2) == NULL);
 }
 
 TEST_F(EnumDescriptorTest, ValueName) {
@@ -1497,10 +1471,10 @@ class ServiceDescriptorTest : public testing::Test {
 
     // Build the descriptors and get the pointers.
     foo_file_ = pool_.BuildFile(foo_file);
-    ASSERT_TRUE(foo_file_ != nullptr);
+    ASSERT_TRUE(foo_file_ != NULL);
 
     bar_file_ = pool_.BuildFile(bar_file);
-    ASSERT_TRUE(bar_file_ != nullptr);
+    ASSERT_TRUE(bar_file_ != NULL);
 
     ASSERT_EQ(6, foo_file_->message_type_count());
     foo_request_ = foo_file_->message_type(0);
@@ -1569,9 +1543,9 @@ TEST_F(ServiceDescriptorTest, FindMethodByName) {
   EXPECT_EQ(foo2_, service2_->FindMethodByName("Foo"));
   EXPECT_EQ(baz2_, service2_->FindMethodByName("Baz"));
 
-  EXPECT_TRUE(service_->FindMethodByName("NoSuchMethod") == nullptr);
-  EXPECT_TRUE(service_->FindMethodByName("Baz") == nullptr);
-  EXPECT_TRUE(service2_->FindMethodByName("Bar") == nullptr);
+  EXPECT_TRUE(service_->FindMethodByName("NoSuchMethod") == NULL);
+  EXPECT_TRUE(service_->FindMethodByName("Baz") == NULL);
+  EXPECT_TRUE(service2_->FindMethodByName("Bar") == NULL);
 }
 
 TEST_F(ServiceDescriptorTest, MethodName) {
@@ -1663,10 +1637,10 @@ class NestedDescriptorTest : public testing::Test {
 
     // Build the descriptors and get the pointers.
     foo_file_ = pool_.BuildFile(foo_file);
-    ASSERT_TRUE(foo_file_ != nullptr);
+    ASSERT_TRUE(foo_file_ != NULL);
 
     bar_file_ = pool_.BuildFile(bar_file);
-    ASSERT_TRUE(bar_file_ != nullptr);
+    ASSERT_TRUE(bar_file_ != NULL);
 
     ASSERT_EQ(1, foo_file_->message_type_count());
     message_ = foo_file_->message_type(0);
@@ -1750,10 +1724,10 @@ TEST_F(NestedDescriptorTest, NestedMessagesByIndex) {
 }
 
 TEST_F(NestedDescriptorTest, FindFieldByNameDoesntFindNestedTypes) {
-  EXPECT_TRUE(message_->FindFieldByName("Foo") == nullptr);
-  EXPECT_TRUE(message_->FindFieldByName("Qux") == nullptr);
-  EXPECT_TRUE(message_->FindExtensionByName("Foo") == nullptr);
-  EXPECT_TRUE(message_->FindExtensionByName("Qux") == nullptr);
+  EXPECT_TRUE(message_->FindFieldByName("Foo") == NULL);
+  EXPECT_TRUE(message_->FindFieldByName("Qux") == NULL);
+  EXPECT_TRUE(message_->FindExtensionByName("Foo") == NULL);
+  EXPECT_TRUE(message_->FindExtensionByName("Qux") == NULL);
 }
 
 TEST_F(NestedDescriptorTest, FindNestedTypeByName) {
@@ -1762,11 +1736,11 @@ TEST_F(NestedDescriptorTest, FindNestedTypeByName) {
   EXPECT_EQ(foo2_, message2_->FindNestedTypeByName("Foo"));
   EXPECT_EQ(baz2_, message2_->FindNestedTypeByName("Baz"));
 
-  EXPECT_TRUE(message_->FindNestedTypeByName("NoSuchType") == nullptr);
-  EXPECT_TRUE(message_->FindNestedTypeByName("Baz") == nullptr);
-  EXPECT_TRUE(message2_->FindNestedTypeByName("Bar") == nullptr);
+  EXPECT_TRUE(message_->FindNestedTypeByName("NoSuchType") == NULL);
+  EXPECT_TRUE(message_->FindNestedTypeByName("Baz") == NULL);
+  EXPECT_TRUE(message2_->FindNestedTypeByName("Bar") == NULL);
 
-  EXPECT_TRUE(message_->FindNestedTypeByName("Qux") == nullptr);
+  EXPECT_TRUE(message_->FindNestedTypeByName("Qux") == NULL);
 }
 
 TEST_F(NestedDescriptorTest, EnumName) {
@@ -1800,11 +1774,11 @@ TEST_F(NestedDescriptorTest, FindEnumTypeByName) {
   EXPECT_EQ(qux2_, message2_->FindEnumTypeByName("Qux"));
   EXPECT_EQ(quux2_, message2_->FindEnumTypeByName("Quux"));
 
-  EXPECT_TRUE(message_->FindEnumTypeByName("NoSuchType") == nullptr);
-  EXPECT_TRUE(message_->FindEnumTypeByName("Quux") == nullptr);
-  EXPECT_TRUE(message2_->FindEnumTypeByName("Baz") == nullptr);
+  EXPECT_TRUE(message_->FindEnumTypeByName("NoSuchType") == NULL);
+  EXPECT_TRUE(message_->FindEnumTypeByName("Quux") == NULL);
+  EXPECT_TRUE(message2_->FindEnumTypeByName("Baz") == NULL);
 
-  EXPECT_TRUE(message_->FindEnumTypeByName("Foo") == nullptr);
+  EXPECT_TRUE(message_->FindEnumTypeByName("Foo") == NULL);
 }
 
 TEST_F(NestedDescriptorTest, FindEnumValueByName) {
@@ -1813,11 +1787,11 @@ TEST_F(NestedDescriptorTest, FindEnumValueByName) {
   EXPECT_EQ(a2_, message2_->FindEnumValueByName("A"));
   EXPECT_EQ(c2_, message2_->FindEnumValueByName("C"));
 
-  EXPECT_TRUE(message_->FindEnumValueByName("NO_SUCH_VALUE") == nullptr);
-  EXPECT_TRUE(message_->FindEnumValueByName("C") == nullptr);
-  EXPECT_TRUE(message2_->FindEnumValueByName("B") == nullptr);
+  EXPECT_TRUE(message_->FindEnumValueByName("NO_SUCH_VALUE") == NULL);
+  EXPECT_TRUE(message_->FindEnumValueByName("C") == NULL);
+  EXPECT_TRUE(message2_->FindEnumValueByName("B") == NULL);
 
-  EXPECT_TRUE(message_->FindEnumValueByName("Foo") == nullptr);
+  EXPECT_TRUE(message_->FindEnumValueByName("Foo") == NULL);
 }
 
 // ===================================================================
@@ -1873,7 +1847,7 @@ class ExtensionDescriptorTest : public testing::Test {
 
     // Build the descriptors and get the pointers.
     foo_file_ = pool_.BuildFile(foo_file);
-    ASSERT_TRUE(foo_file_ != nullptr);
+    ASSERT_TRUE(foo_file_ != NULL);
 
     ASSERT_EQ(1, foo_file_->enum_type_count());
     baz_ = foo_file_->enum_type(0);
@@ -1944,8 +1918,8 @@ TEST_F(ExtensionDescriptorTest, Extensions) {
   EXPECT_EQ(foo_, bar_->extension(0)->containing_type());
   EXPECT_EQ(foo_, bar_->extension(1)->containing_type());
 
-  EXPECT_TRUE(foo_file_->extension(0)->extension_scope() == nullptr);
-  EXPECT_TRUE(foo_file_->extension(1)->extension_scope() == nullptr);
+  EXPECT_TRUE(foo_file_->extension(0)->extension_scope() == NULL);
+  EXPECT_TRUE(foo_file_->extension(1)->extension_scope() == NULL);
   EXPECT_EQ(bar_, bar_->extension(0)->extension_scope());
   EXPECT_EQ(bar_, bar_->extension(1)->extension_scope());
 };
@@ -1969,38 +1943,9 @@ TEST_F(ExtensionDescriptorTest, FindExtensionByName) {
   EXPECT_EQ(bar_->extension(0), bar_->FindExtensionByName("foo_message"));
   EXPECT_EQ(bar_->extension(1), bar_->FindExtensionByName("foo_group"));
 
-  EXPECT_TRUE(bar_->FindExtensionByName("no_such_extension") == nullptr);
-  EXPECT_TRUE(foo_->FindExtensionByName("foo_int32") == nullptr);
-  EXPECT_TRUE(foo_->FindExtensionByName("foo_message") == nullptr);
-}
-
-TEST_F(ExtensionDescriptorTest, FindExtensionByPrintableName) {
-  EXPECT_TRUE(pool_.FindExtensionByPrintableName(foo_, "no_such_extension") ==
-              nullptr);
-  EXPECT_TRUE(pool_.FindExtensionByPrintableName(bar_, "no_such_extension") ==
-              nullptr);
-
-  ASSERT_FALSE(pool_.FindExtensionByPrintableName(foo_, "Bar.foo_message") ==
-               nullptr);
-  ASSERT_FALSE(pool_.FindExtensionByPrintableName(foo_, "Bar.foo_group") ==
-               nullptr);
-  EXPECT_TRUE(pool_.FindExtensionByPrintableName(bar_, "foo_message") ==
-              nullptr);
-  EXPECT_TRUE(pool_.FindExtensionByPrintableName(bar_, "foo_group") == nullptr);
-  EXPECT_EQ(bar_->FindExtensionByName("foo_message"),
-            pool_.FindExtensionByPrintableName(foo_, "Bar.foo_message"));
-  EXPECT_EQ(bar_->FindExtensionByName("foo_group"),
-            pool_.FindExtensionByPrintableName(foo_, "Bar.foo_group"));
-
-  ASSERT_FALSE(pool_.FindExtensionByPrintableName(foo_, "foo_int32") ==
-               nullptr);
-  ASSERT_FALSE(pool_.FindExtensionByPrintableName(foo_, "foo_enum") == nullptr);
-  EXPECT_TRUE(pool_.FindExtensionByPrintableName(bar_, "foo_int32") == nullptr);
-  EXPECT_TRUE(pool_.FindExtensionByPrintableName(bar_, "foo_enum") == nullptr);
-  EXPECT_EQ(foo_file_->FindExtensionByName("foo_int32"),
-            pool_.FindExtensionByPrintableName(foo_, "foo_int32"));
-  EXPECT_EQ(foo_file_->FindExtensionByName("foo_enum"),
-            pool_.FindExtensionByPrintableName(foo_, "foo_enum"));
+  EXPECT_TRUE(bar_->FindExtensionByName("no_such_extension") == NULL);
+  EXPECT_TRUE(foo_->FindExtensionByName("foo_int32") == NULL);
+  EXPECT_TRUE(foo_->FindExtensionByName("foo_message") == NULL);
 }
 
 TEST_F(ExtensionDescriptorTest, FindAllExtensions) {
@@ -2019,7 +1964,7 @@ TEST_F(ExtensionDescriptorTest, DuplicateFieldNumber) {
   FileDescriptorProto file_proto;
   // Add "google/protobuf/descriptor.proto".
   FileDescriptorProto::descriptor()->file()->CopyTo(&file_proto);
-  ASSERT_TRUE(pool.BuildFile(file_proto) != nullptr);
+  ASSERT_TRUE(pool.BuildFile(file_proto) != NULL);
   // Add "foo.proto":
   //   import "google/protobuf/descriptor.proto";
   //   extend google.protobuf.FieldOptions {
@@ -2031,7 +1976,7 @@ TEST_F(ExtensionDescriptorTest, DuplicateFieldNumber) {
   AddExtension(&file_proto, "google.protobuf.FieldOptions", "option1", 1000,
                FieldDescriptorProto::LABEL_OPTIONAL,
                FieldDescriptorProto::TYPE_INT32);
-  ASSERT_TRUE(pool.BuildFile(file_proto) != nullptr);
+  ASSERT_TRUE(pool.BuildFile(file_proto) != NULL);
   // Add "bar.proto":
   //   import "google/protobuf/descriptor.proto";
   //   extend google.protobuf.FieldOptions {
@@ -2045,7 +1990,7 @@ TEST_F(ExtensionDescriptorTest, DuplicateFieldNumber) {
                FieldDescriptorProto::TYPE_INT32);
   // Currently we only generate a warning for conflicting extension numbers.
   // TODO(xiaofeng): Change it to an error.
-  ASSERT_TRUE(pool.BuildFile(file_proto) != nullptr);
+  ASSERT_TRUE(pool.BuildFile(file_proto) != NULL);
 }
 
 // ===================================================================
@@ -2074,7 +2019,7 @@ class ReservedDescriptorTest : public testing::Test {
 
     // Build the descriptors and get the pointers.
     foo_file_ = pool_.BuildFile(foo_file);
-    ASSERT_TRUE(foo_file_ != nullptr);
+    ASSERT_TRUE(foo_file_ != NULL);
 
     ASSERT_EQ(1, foo_file_->message_type_count());
     foo_ = foo_file_->message_type(0);
@@ -2169,7 +2114,7 @@ class ReservedEnumDescriptorTest : public testing::Test {
 
     // Build the descriptors and get the pointers.
     foo_file_ = pool_.BuildFile(foo_file);
-    ASSERT_TRUE(foo_file_ != nullptr);
+    ASSERT_TRUE(foo_file_ != NULL);
 
     ASSERT_EQ(3, foo_file_->enum_type_count());
     foo_ = foo_file_->enum_type(0);
@@ -2283,40 +2228,40 @@ class MiscTest : public testing::Test {
     pool_.reset(new DescriptorPool());
     const FileDescriptor* file = pool_->BuildFile(file_proto);
 
-    if (file != nullptr && file->message_type_count() == 1 &&
+    if (file != NULL && file->message_type_count() == 1 &&
         file->message_type(0)->field_count() == 1) {
       return file->message_type(0)->field(0);
     } else {
-      return nullptr;
+      return NULL;
     }
   }
 
   const char* GetTypeNameForFieldType(FieldDescriptor::Type type) {
     const FieldDescriptor* field = GetFieldDescriptorOfType(type);
-    return field != nullptr ? field->type_name() : "";
+    return field != NULL ? field->type_name() : "";
   }
 
   FieldDescriptor::CppType GetCppTypeForFieldType(FieldDescriptor::Type type) {
     const FieldDescriptor* field = GetFieldDescriptorOfType(type);
-    return field != nullptr ? field->cpp_type()
-                            : static_cast<FieldDescriptor::CppType>(0);
+    return field != NULL ? field->cpp_type()
+                         : static_cast<FieldDescriptor::CppType>(0);
   }
 
   const char* GetCppTypeNameForFieldType(FieldDescriptor::Type type) {
     const FieldDescriptor* field = GetFieldDescriptorOfType(type);
-    return field != nullptr ? field->cpp_type_name() : "";
+    return field != NULL ? field->cpp_type_name() : "";
   }
 
   const Descriptor* GetMessageDescriptorForFieldType(
       FieldDescriptor::Type type) {
     const FieldDescriptor* field = GetFieldDescriptorOfType(type);
-    return field != nullptr ? field->message_type() : nullptr;
+    return field != NULL ? field->message_type() : NULL;
   }
 
   const EnumDescriptor* GetEnumDescriptorForFieldType(
       FieldDescriptor::Type type) {
     const FieldDescriptor* field = GetFieldDescriptorOfType(type);
-    return field != nullptr ? field->enum_type() : nullptr;
+    return field != NULL ? field->enum_type() : NULL;
   }
 
   std::unique_ptr<DescriptorPool> pool_;
@@ -2440,53 +2385,53 @@ TEST_F(MiscTest, StaticCppTypeNames) {
 }
 
 TEST_F(MiscTest, MessageType) {
-  // Test that message_type() is nullptr for non-aggregate fields
+  // Test that message_type() is NULL for non-aggregate fields
 
   typedef FieldDescriptor FD;  // avoid ugly line wrapping
 
-  EXPECT_TRUE(nullptr == GetMessageDescriptorForFieldType(FD::TYPE_DOUBLE));
-  EXPECT_TRUE(nullptr == GetMessageDescriptorForFieldType(FD::TYPE_FLOAT));
-  EXPECT_TRUE(nullptr == GetMessageDescriptorForFieldType(FD::TYPE_INT64));
-  EXPECT_TRUE(nullptr == GetMessageDescriptorForFieldType(FD::TYPE_UINT64));
-  EXPECT_TRUE(nullptr == GetMessageDescriptorForFieldType(FD::TYPE_INT32));
-  EXPECT_TRUE(nullptr == GetMessageDescriptorForFieldType(FD::TYPE_FIXED64));
-  EXPECT_TRUE(nullptr == GetMessageDescriptorForFieldType(FD::TYPE_FIXED32));
-  EXPECT_TRUE(nullptr == GetMessageDescriptorForFieldType(FD::TYPE_BOOL));
-  EXPECT_TRUE(nullptr == GetMessageDescriptorForFieldType(FD::TYPE_STRING));
-  EXPECT_TRUE(nullptr != GetMessageDescriptorForFieldType(FD::TYPE_GROUP));
-  EXPECT_TRUE(nullptr != GetMessageDescriptorForFieldType(FD::TYPE_MESSAGE));
-  EXPECT_TRUE(nullptr == GetMessageDescriptorForFieldType(FD::TYPE_BYTES));
-  EXPECT_TRUE(nullptr == GetMessageDescriptorForFieldType(FD::TYPE_UINT32));
-  EXPECT_TRUE(nullptr == GetMessageDescriptorForFieldType(FD::TYPE_ENUM));
-  EXPECT_TRUE(nullptr == GetMessageDescriptorForFieldType(FD::TYPE_SFIXED32));
-  EXPECT_TRUE(nullptr == GetMessageDescriptorForFieldType(FD::TYPE_SFIXED64));
-  EXPECT_TRUE(nullptr == GetMessageDescriptorForFieldType(FD::TYPE_SINT32));
-  EXPECT_TRUE(nullptr == GetMessageDescriptorForFieldType(FD::TYPE_SINT64));
+  EXPECT_TRUE(NULL == GetMessageDescriptorForFieldType(FD::TYPE_DOUBLE));
+  EXPECT_TRUE(NULL == GetMessageDescriptorForFieldType(FD::TYPE_FLOAT));
+  EXPECT_TRUE(NULL == GetMessageDescriptorForFieldType(FD::TYPE_INT64));
+  EXPECT_TRUE(NULL == GetMessageDescriptorForFieldType(FD::TYPE_UINT64));
+  EXPECT_TRUE(NULL == GetMessageDescriptorForFieldType(FD::TYPE_INT32));
+  EXPECT_TRUE(NULL == GetMessageDescriptorForFieldType(FD::TYPE_FIXED64));
+  EXPECT_TRUE(NULL == GetMessageDescriptorForFieldType(FD::TYPE_FIXED32));
+  EXPECT_TRUE(NULL == GetMessageDescriptorForFieldType(FD::TYPE_BOOL));
+  EXPECT_TRUE(NULL == GetMessageDescriptorForFieldType(FD::TYPE_STRING));
+  EXPECT_TRUE(NULL != GetMessageDescriptorForFieldType(FD::TYPE_GROUP));
+  EXPECT_TRUE(NULL != GetMessageDescriptorForFieldType(FD::TYPE_MESSAGE));
+  EXPECT_TRUE(NULL == GetMessageDescriptorForFieldType(FD::TYPE_BYTES));
+  EXPECT_TRUE(NULL == GetMessageDescriptorForFieldType(FD::TYPE_UINT32));
+  EXPECT_TRUE(NULL == GetMessageDescriptorForFieldType(FD::TYPE_ENUM));
+  EXPECT_TRUE(NULL == GetMessageDescriptorForFieldType(FD::TYPE_SFIXED32));
+  EXPECT_TRUE(NULL == GetMessageDescriptorForFieldType(FD::TYPE_SFIXED64));
+  EXPECT_TRUE(NULL == GetMessageDescriptorForFieldType(FD::TYPE_SINT32));
+  EXPECT_TRUE(NULL == GetMessageDescriptorForFieldType(FD::TYPE_SINT64));
 }
 
 TEST_F(MiscTest, EnumType) {
-  // Test that enum_type() is nullptr for non-enum fields
+  // Test that enum_type() is NULL for non-enum fields
 
   typedef FieldDescriptor FD;  // avoid ugly line wrapping
 
-  EXPECT_TRUE(nullptr == GetEnumDescriptorForFieldType(FD::TYPE_DOUBLE));
-  EXPECT_TRUE(nullptr == GetEnumDescriptorForFieldType(FD::TYPE_FLOAT));
-  EXPECT_TRUE(nullptr == GetEnumDescriptorForFieldType(FD::TYPE_INT64));
-  EXPECT_TRUE(nullptr == GetEnumDescriptorForFieldType(FD::TYPE_UINT64));
-  EXPECT_TRUE(nullptr == GetEnumDescriptorForFieldType(FD::TYPE_INT32));
-  EXPECT_TRUE(nullptr == GetEnumDescriptorForFieldType(FD::TYPE_FIXED64));
-  EXPECT_TRUE(nullptr == GetEnumDescriptorForFieldType(FD::TYPE_FIXED32));
-  EXPECT_TRUE(nullptr == GetEnumDescriptorForFieldType(FD::TYPE_BOOL));
-  EXPECT_TRUE(nullptr == GetEnumDescriptorForFieldType(FD::TYPE_STRING));
-  EXPECT_TRUE(nullptr == GetEnumDescriptorForFieldType(FD::TYPE_GROUP));
-  EXPECT_TRUE(nullptr == GetEnumDescriptorForFieldType(FD::TYPE_MESSAGE));
-  EXPECT_TRUE(nullptr == GetEnumDescriptorForFieldType(FD::TYPE_BYTES));
-  EXPECT_TRUE(nullptr == GetEnumDescriptorForFieldType(FD::TYPE_UINT32));
-  EXPECT_TRUE(nullptr != GetEnumDescriptorForFieldType(FD::TYPE_ENUM));
-  EXPECT_TRUE(nullptr == GetEnumDescriptorForFieldType(FD::TYPE_SFIXED32));
-  EXPECT_TRUE(nullptr == GetEnumDescriptorForFieldType(FD::TYPE_SFIXED64));
-  EXPECT_TRUE(nullptr == GetEnumDescriptorForFieldType(FD::TYPE_SINT32));
-  EXPECT_TRUE(nullptr == GetEnumDescriptorForFieldType(FD::TYPE_SINT64));
+  EXPECT_TRUE(NULL == GetEnumDescriptorForFieldType(FD::TYPE_DOUBLE));
+  EXPECT_TRUE(NULL == GetEnumDescriptorForFieldType(FD::TYPE_FLOAT));
+  EXPECT_TRUE(NULL == GetEnumDescriptorForFieldType(FD::TYPE_INT64));
+  EXPECT_TRUE(NULL == GetEnumDescriptorForFieldType(FD::TYPE_UINT64));
+  EXPECT_TRUE(NULL == GetEnumDescriptorForFieldType(FD::TYPE_INT32));
+  EXPECT_TRUE(NULL == GetEnumDescriptorForFieldType(FD::TYPE_FIXED64));
+  EXPECT_TRUE(NULL == GetEnumDescriptorForFieldType(FD::TYPE_FIXED32));
+  EXPECT_TRUE(NULL == GetEnumDescriptorForFieldType(FD::TYPE_BOOL));
+  EXPECT_TRUE(NULL == GetEnumDescriptorForFieldType(FD::TYPE_STRING));
+  EXPECT_TRUE(NULL == GetEnumDescriptorForFieldType(FD::TYPE_GROUP));
+  EXPECT_TRUE(NULL == GetEnumDescriptorForFieldType(FD::TYPE_MESSAGE));
+  EXPECT_TRUE(NULL == GetEnumDescriptorForFieldType(FD::TYPE_BYTES));
+  EXPECT_TRUE(NULL == GetEnumDescriptorForFieldType(FD::TYPE_UINT32));
+  EXPECT_TRUE(NULL != GetEnumDescriptorForFieldType(FD::TYPE_ENUM));
+  EXPECT_TRUE(NULL == GetEnumDescriptorForFieldType(FD::TYPE_SFIXED32));
+  EXPECT_TRUE(NULL == GetEnumDescriptorForFieldType(FD::TYPE_SFIXED64));
+  EXPECT_TRUE(NULL == GetEnumDescriptorForFieldType(FD::TYPE_SINT32));
+  EXPECT_TRUE(NULL == GetEnumDescriptorForFieldType(FD::TYPE_SINT64));
 }
 
 TEST_F(MiscTest, DefaultValues) {
@@ -2549,7 +2494,7 @@ TEST_F(MiscTest, DefaultValues) {
   // Build it.
   DescriptorPool pool;
   const FileDescriptor* file = pool.BuildFile(file_proto);
-  ASSERT_TRUE(file != nullptr);
+  ASSERT_TRUE(file != NULL);
 
   ASSERT_EQ(1, file->enum_type_count());
   const EnumDescriptor* enum_type = file->enum_type(0);
@@ -2631,7 +2576,7 @@ TEST_F(MiscTest, FieldOptions) {
   // Build the descriptors and get the pointers.
   DescriptorPool pool;
   const FileDescriptor* file = pool.BuildFile(file_proto);
-  ASSERT_TRUE(file != nullptr);
+  ASSERT_TRUE(file != NULL);
 
   ASSERT_EQ(1, file->message_type_count());
   const Descriptor* message = file->message_type(0);
@@ -2701,13 +2646,13 @@ class AllowUnknownDependenciesTest
 
     // Collect pointers to stuff.
     bar_file_ = BuildFile(bar_proto);
-    ASSERT_TRUE(bar_file_ != nullptr);
+    ASSERT_TRUE(bar_file_ != NULL);
 
     ASSERT_EQ(1, bar_file_->message_type_count());
     bar_type_ = bar_file_->message_type(0);
 
     foo_file_ = BuildFile(foo_proto);
-    ASSERT_TRUE(foo_file_ != nullptr);
+    ASSERT_TRUE(foo_file_ != NULL);
 
     ASSERT_EQ(1, foo_file_->message_type_count());
     foo_type_ = foo_file_->message_type(0);
@@ -2729,7 +2674,7 @@ class AllowUnknownDependenciesTest
       }
     }
     GOOGLE_LOG(FATAL) << "Can't get here.";
-    return nullptr;
+    return NULL;
   }
 
   const FileDescriptor* bar_file_;
@@ -2756,7 +2701,7 @@ TEST_P(AllowUnknownDependenciesTest, PlaceholderFile) {
 
   // Placeholder files should not be findable.
   EXPECT_EQ(bar_file_, pool_->FindFileByName(bar_file_->name()));
-  EXPECT_TRUE(pool_->FindFileByName(baz_file->name()) == nullptr);
+  EXPECT_TRUE(pool_->FindFileByName(baz_file->name()) == NULL);
 
   // Copy*To should not crash for placeholder files.
   FileDescriptorProto baz_file_proto;
@@ -2785,8 +2730,8 @@ TEST_P(AllowUnknownDependenciesTest, PlaceholderTypes) {
 
   // Placeholder types should not be findable.
   EXPECT_EQ(bar_type_, pool_->FindMessageTypeByName(bar_type_->full_name()));
-  EXPECT_TRUE(pool_->FindMessageTypeByName(baz_type->full_name()) == nullptr);
-  EXPECT_TRUE(pool_->FindEnumTypeByName(qux_type->full_name()) == nullptr);
+  EXPECT_TRUE(pool_->FindMessageTypeByName(baz_type->full_name()) == NULL);
+  EXPECT_TRUE(pool_->FindEnumTypeByName(qux_type->full_name()) == NULL);
 }
 
 TEST_P(AllowUnknownDependenciesTest, CopyTo) {
@@ -2834,7 +2779,7 @@ TEST_P(AllowUnknownDependenciesTest, UnknownExtendee) {
       &extension_proto));
   const FileDescriptor* file = BuildFile(extension_proto);
 
-  ASSERT_TRUE(file != nullptr);
+  ASSERT_TRUE(file != NULL);
 
   ASSERT_EQ(1, file->extension_count());
   const Descriptor* extendee = file->extension(0)->containing_type();
@@ -2887,7 +2832,7 @@ TEST_P(AllowUnknownDependenciesTest, CustomOption) {
       &option_proto));
 
   const FileDescriptor* file = BuildFile(option_proto);
-  ASSERT_TRUE(file != nullptr);
+  ASSERT_TRUE(file != NULL);
 
   // Verify that no extension options were set, but they were left as
   // uninterpreted_options.
@@ -2929,7 +2874,7 @@ TEST_P(AllowUnknownDependenciesTest,
   // test.proto below.
   switch (mode()) {
     case NO_DATABASE: {
-      ASSERT_TRUE(pool_->BuildFile(undeclared_dep_proto) == nullptr);
+      ASSERT_TRUE(pool_->BuildFile(undeclared_dep_proto) == NULL);
       break;
     }
     case FALLBACK_DATABASE: {
@@ -2950,7 +2895,7 @@ TEST_P(AllowUnknownDependenciesTest,
       &test_proto));
 
   const FileDescriptor* file = BuildFile(test_proto);
-  ASSERT_TRUE(file != nullptr);
+  ASSERT_TRUE(file != NULL);
   GOOGLE_LOG(INFO) << file->DebugString();
 
   EXPECT_EQ(0, file->dependency_count());
@@ -2966,7 +2911,7 @@ TEST_P(AllowUnknownDependenciesTest,
   ASSERT_EQ("undeclared.Quux", quux_field->message_type()->full_name());
   EXPECT_TRUE(quux_field->message_type()->is_placeholder());
   // The place holder type should not be findable.
-  ASSERT_TRUE(pool_->FindMessageTypeByName("undeclared.Quux") == nullptr);
+  ASSERT_TRUE(pool_->FindMessageTypeByName("undeclared.Quux") == NULL);
 }
 
 INSTANTIATE_TEST_SUITE_P(DatabaseSource, AllowUnknownDependenciesTest,
@@ -3009,7 +2954,7 @@ TEST(CustomOptions, OptionLocations) {
 }
 
 TEST(CustomOptions, OptionTypes) {
-  const MessageOptions* options = nullptr;
+  const MessageOptions* options = NULL;
 
   options =
       &protobuf_unittest::CustomOptionMinIntegerValues::descriptor()->options();
@@ -3125,11 +3070,11 @@ TEST(CustomOptions, OptionsFromOtherFile) {
 
   FileDescriptorProto file_proto;
   FileDescriptorProto::descriptor()->file()->CopyTo(&file_proto);
-  ASSERT_TRUE(pool.BuildFile(file_proto) != nullptr);
+  ASSERT_TRUE(pool.BuildFile(file_proto) != NULL);
 
   protobuf_unittest::TestMessageWithCustomOptions::descriptor()->file()->CopyTo(
       &file_proto);
-  ASSERT_TRUE(pool.BuildFile(file_proto) != nullptr);
+  ASSERT_TRUE(pool.BuildFile(file_proto) != NULL);
 
   ASSERT_TRUE(TextFormat::ParseFromString(
       "name: \"custom_options_import.proto\" "
@@ -3165,7 +3110,7 @@ TEST(CustomOptions, OptionsFromOtherFile) {
       &file_proto));
 
   const FileDescriptor* file = pool.BuildFile(file_proto);
-  ASSERT_TRUE(file != nullptr);
+  ASSERT_TRUE(file != NULL);
   EXPECT_EQ(1234, file->options().GetExtension(protobuf_unittest::file_opt1));
   EXPECT_TRUE(file->options().has_java_package());
   EXPECT_EQ("foo", file->options().java_package());
@@ -3183,11 +3128,11 @@ TEST(CustomOptions, MessageOptionThreeFieldsSet) {
 
   FileDescriptorProto file_proto;
   FileDescriptorProto::descriptor()->file()->CopyTo(&file_proto);
-  ASSERT_TRUE(pool.BuildFile(file_proto) != nullptr);
+  ASSERT_TRUE(pool.BuildFile(file_proto) != NULL);
 
   protobuf_unittest::TestMessageWithCustomOptions::descriptor()->file()->CopyTo(
       &file_proto);
-  ASSERT_TRUE(pool.BuildFile(file_proto) != nullptr);
+  ASSERT_TRUE(pool.BuildFile(file_proto) != NULL);
 
   // The following represents the definition:
   //
@@ -3243,7 +3188,7 @@ TEST(CustomOptions, MessageOptionThreeFieldsSet) {
       &file_proto));
 
   const FileDescriptor* file = pool.BuildFile(file_proto);
-  ASSERT_TRUE(file != nullptr);
+  ASSERT_TRUE(file != NULL);
   ASSERT_EQ(1, file->message_type_count());
 
   const MessageOptions& options = file->message_type(0)->options();
@@ -3260,11 +3205,11 @@ TEST(CustomOptions, MessageOptionRepeatedLeafFieldSet) {
 
   FileDescriptorProto file_proto;
   FileDescriptorProto::descriptor()->file()->CopyTo(&file_proto);
-  ASSERT_TRUE(pool.BuildFile(file_proto) != nullptr);
+  ASSERT_TRUE(pool.BuildFile(file_proto) != NULL);
 
   protobuf_unittest::TestMessageWithCustomOptions::descriptor()->file()->CopyTo(
       &file_proto);
-  ASSERT_TRUE(pool.BuildFile(file_proto) != nullptr);
+  ASSERT_TRUE(pool.BuildFile(file_proto) != NULL);
 
   // The following represents the definition:
   //
@@ -3320,7 +3265,7 @@ TEST(CustomOptions, MessageOptionRepeatedLeafFieldSet) {
       &file_proto));
 
   const FileDescriptor* file = pool.BuildFile(file_proto);
-  ASSERT_TRUE(file != nullptr);
+  ASSERT_TRUE(file != NULL);
   ASSERT_EQ(1, file->message_type_count());
 
   const MessageOptions& options = file->message_type(0)->options();
@@ -3340,11 +3285,11 @@ TEST(CustomOptions, MessageOptionRepeatedMsgFieldSet) {
 
   FileDescriptorProto file_proto;
   FileDescriptorProto::descriptor()->file()->CopyTo(&file_proto);
-  ASSERT_TRUE(pool.BuildFile(file_proto) != nullptr);
+  ASSERT_TRUE(pool.BuildFile(file_proto) != NULL);
 
   protobuf_unittest::TestMessageWithCustomOptions::descriptor()->file()->CopyTo(
       &file_proto);
-  ASSERT_TRUE(pool.BuildFile(file_proto) != nullptr);
+  ASSERT_TRUE(pool.BuildFile(file_proto) != NULL);
 
   // The following represents the definition:
   //
@@ -3400,7 +3345,7 @@ TEST(CustomOptions, MessageOptionRepeatedMsgFieldSet) {
       &file_proto));
 
   const FileDescriptor* file = pool.BuildFile(file_proto);
-  ASSERT_TRUE(file != nullptr);
+  ASSERT_TRUE(file != NULL);
   ASSERT_EQ(1, file->message_type_count());
 
   const MessageOptions& options = file->message_type(0)->options();
@@ -3462,11 +3407,11 @@ TEST(CustomOptions, UnusedImportWarning) {
 
   FileDescriptorProto file_proto;
   FileDescriptorProto::descriptor()->file()->CopyTo(&file_proto);
-  ASSERT_TRUE(pool.BuildFile(file_proto) != nullptr);
+  ASSERT_TRUE(pool.BuildFile(file_proto) != NULL);
 
   protobuf_unittest::TestMessageWithCustomOptions::descriptor()->file()->CopyTo(
       &file_proto);
-  ASSERT_TRUE(pool.BuildFile(file_proto) != nullptr);
+  ASSERT_TRUE(pool.BuildFile(file_proto) != NULL);
 
   pool.AddUnusedImportTrackFile("custom_options_import.proto");
   ASSERT_TRUE(TextFormat::ParseFromString(
@@ -3488,7 +3433,7 @@ TEST(CustomOptions, OptionsWithIncompatibleDescriptors) {
 
   FileDescriptorProto file_proto;
   MessageOptions::descriptor()->file()->CopyTo(&file_proto);
-  ASSERT_TRUE(pool.BuildFile(file_proto) != nullptr);
+  ASSERT_TRUE(pool.BuildFile(file_proto) != NULL);
 
   // Create a new file descriptor proto containing a subset of the
   // messages defined in google/protobuf/unittest_custom_options.proto.
@@ -3528,7 +3473,7 @@ TEST(CustomOptions, OptionsWithIncompatibleDescriptors) {
                                   test_message_type->mutable_options()));
 
   // Adding the file descriptor to the pool should fail.
-  EXPECT_TRUE(pool.BuildFile(file_proto) == nullptr);
+  EXPECT_TRUE(pool.BuildFile(file_proto) == NULL);
 }
 
 // Test that FileDescriptor::DebugString() formats custom options correctly.
@@ -3537,7 +3482,7 @@ TEST(CustomOptions, DebugString) {
 
   FileDescriptorProto file_proto;
   MessageOptions::descriptor()->file()->CopyTo(&file_proto);
-  ASSERT_TRUE(pool.BuildFile(file_proto) != nullptr);
+  ASSERT_TRUE(pool.BuildFile(file_proto) != NULL);
 
   // Add "foo.proto":
   //   import "google/protobuf/descriptor.proto";
@@ -3589,7 +3534,7 @@ TEST(CustomOptions, DebugString) {
       "}",
       &file_proto));
   const FileDescriptor* descriptor = pool.BuildFile(file_proto);
-  ASSERT_TRUE(descriptor != nullptr);
+  ASSERT_TRUE(descriptor != NULL);
 
   EXPECT_EQ(2, descriptor->extension_count());
 
@@ -3632,7 +3577,7 @@ class ValidationErrorTest : public testing::Test {
 
     MockErrorCollector error_collector;
     EXPECT_TRUE(pool_.BuildFileCollectingErrors(file_proto, &error_collector) ==
-                nullptr);
+                NULL);
     EXPECT_EQ(expected_errors, error_collector.text_);
   }
 
@@ -3653,7 +3598,7 @@ class ValidationErrorTest : public testing::Test {
   void BuildFileInTestPool(const FileDescriptor* file) {
     FileDescriptorProto file_proto;
     file->CopyTo(&file_proto);
-    ASSERT_TRUE(pool_.BuildFile(file_proto) != nullptr);
+    ASSERT_TRUE(pool_.BuildFile(file_proto) != NULL);
   }
 
   // Build descriptor.proto in our test pool. This allows us to extend it in
@@ -5637,7 +5582,7 @@ TEST_F(ValidationErrorTest, NoLiteServices) {
 
       "foo.proto: Foo: NAME: Files with optimize_for = LITE_RUNTIME cannot "
       "define services unless you set both options cc_generic_services and "
-      "java_generic_services to false.\n");
+      "java_generic_sevices to false.\n");
 
   BuildFile(
       "name: \"bar.proto\" "
@@ -5713,7 +5658,7 @@ TEST_F(ValidationErrorTest, ErrorsReportedToLogError) {
 
   {
     ScopedMemoryLog log;
-    EXPECT_TRUE(pool_.BuildFile(file_proto) == nullptr);
+    EXPECT_TRUE(pool_.BuildFile(file_proto) == NULL);
     errors = log.GetMessages(ERROR);
   }
 
@@ -6438,7 +6383,7 @@ TEST_F(ValidationErrorTest, ValidateProto3Extension) {
   FileDescriptorProto file_proto;
   // Add "google/protobuf/descriptor.proto".
   FileDescriptorProto::descriptor()->file()->CopyTo(&file_proto);
-  ASSERT_TRUE(pool.BuildFile(file_proto) != nullptr);
+  ASSERT_TRUE(pool.BuildFile(file_proto) != NULL);
   // Add "foo.proto":
   //   import "google/protobuf/descriptor.proto";
   //   extend google.protobuf.FieldOptions {
@@ -6451,7 +6396,7 @@ TEST_F(ValidationErrorTest, ValidateProto3Extension) {
   AddExtension(&file_proto, "google.protobuf.FieldOptions", "option1", 1000,
                FieldDescriptorProto::LABEL_OPTIONAL,
                FieldDescriptorProto::TYPE_INT32);
-  ASSERT_TRUE(pool.BuildFile(file_proto) != nullptr);
+  ASSERT_TRUE(pool.BuildFile(file_proto) != NULL);
 
   // Copy and change the package of the descriptor.proto
   BuildFile(
@@ -6642,27 +6587,27 @@ TEST_F(DatabaseBackedPoolTest, FindFileByName) {
   DescriptorPool pool(&database_);
 
   const FileDescriptor* foo = pool.FindFileByName("foo.proto");
-  ASSERT_TRUE(foo != nullptr);
+  ASSERT_TRUE(foo != NULL);
   EXPECT_EQ("foo.proto", foo->name());
   ASSERT_EQ(1, foo->message_type_count());
   EXPECT_EQ("Foo", foo->message_type(0)->name());
 
   EXPECT_EQ(foo, pool.FindFileByName("foo.proto"));
 
-  EXPECT_TRUE(pool.FindFileByName("no_such_file.proto") == nullptr);
+  EXPECT_TRUE(pool.FindFileByName("no_such_file.proto") == NULL);
 }
 
 TEST_F(DatabaseBackedPoolTest, FindDependencyBeforeDependent) {
   DescriptorPool pool(&database_);
 
   const FileDescriptor* foo = pool.FindFileByName("foo.proto");
-  ASSERT_TRUE(foo != nullptr);
+  ASSERT_TRUE(foo != NULL);
   EXPECT_EQ("foo.proto", foo->name());
   ASSERT_EQ(1, foo->message_type_count());
   EXPECT_EQ("Foo", foo->message_type(0)->name());
 
   const FileDescriptor* bar = pool.FindFileByName("bar.proto");
-  ASSERT_TRUE(bar != nullptr);
+  ASSERT_TRUE(bar != NULL);
   EXPECT_EQ("bar.proto", bar->name());
   ASSERT_EQ(1, bar->message_type_count());
   EXPECT_EQ("Bar", bar->message_type(0)->name());
@@ -6675,13 +6620,13 @@ TEST_F(DatabaseBackedPoolTest, FindDependentBeforeDependency) {
   DescriptorPool pool(&database_);
 
   const FileDescriptor* bar = pool.FindFileByName("bar.proto");
-  ASSERT_TRUE(bar != nullptr);
+  ASSERT_TRUE(bar != NULL);
   EXPECT_EQ("bar.proto", bar->name());
   ASSERT_EQ(1, bar->message_type_count());
   ASSERT_EQ("Bar", bar->message_type(0)->name());
 
   const FileDescriptor* foo = pool.FindFileByName("foo.proto");
-  ASSERT_TRUE(foo != nullptr);
+  ASSERT_TRUE(foo != NULL);
   EXPECT_EQ("foo.proto", foo->name());
   ASSERT_EQ(1, foo->message_type_count());
   ASSERT_EQ("Foo", foo->message_type(0)->name());
@@ -6694,36 +6639,36 @@ TEST_F(DatabaseBackedPoolTest, FindFileContainingSymbol) {
   DescriptorPool pool(&database_);
 
   const FileDescriptor* file = pool.FindFileContainingSymbol("Foo");
-  ASSERT_TRUE(file != nullptr);
+  ASSERT_TRUE(file != NULL);
   EXPECT_EQ("foo.proto", file->name());
   EXPECT_EQ(file, pool.FindFileByName("foo.proto"));
 
-  EXPECT_TRUE(pool.FindFileContainingSymbol("NoSuchSymbol") == nullptr);
+  EXPECT_TRUE(pool.FindFileContainingSymbol("NoSuchSymbol") == NULL);
 }
 
 TEST_F(DatabaseBackedPoolTest, FindMessageTypeByName) {
   DescriptorPool pool(&database_);
 
   const Descriptor* type = pool.FindMessageTypeByName("Foo");
-  ASSERT_TRUE(type != nullptr);
+  ASSERT_TRUE(type != NULL);
   EXPECT_EQ("Foo", type->name());
   EXPECT_EQ(type->file(), pool.FindFileByName("foo.proto"));
 
-  EXPECT_TRUE(pool.FindMessageTypeByName("NoSuchType") == nullptr);
+  EXPECT_TRUE(pool.FindMessageTypeByName("NoSuchType") == NULL);
 }
 
 TEST_F(DatabaseBackedPoolTest, FindExtensionByNumber) {
   DescriptorPool pool(&database_);
 
   const Descriptor* foo = pool.FindMessageTypeByName("Foo");
-  ASSERT_TRUE(foo != nullptr);
+  ASSERT_TRUE(foo != NULL);
 
   const FieldDescriptor* extension = pool.FindExtensionByNumber(foo, 5);
-  ASSERT_TRUE(extension != nullptr);
+  ASSERT_TRUE(extension != NULL);
   EXPECT_EQ("foo_ext", extension->name());
   EXPECT_EQ(extension->file(), pool.FindFileByName("bar.proto"));
 
-  EXPECT_TRUE(pool.FindExtensionByNumber(foo, 12) == nullptr);
+  EXPECT_TRUE(pool.FindExtensionByNumber(foo, 12) == NULL);
 }
 
 TEST_F(DatabaseBackedPoolTest, FindAllExtensions) {
@@ -6749,7 +6694,7 @@ TEST_F(DatabaseBackedPoolTest, ErrorWithoutErrorCollector) {
 
   {
     ScopedMemoryLog log;
-    EXPECT_TRUE(pool.FindFileByName("error.proto") == nullptr);
+    EXPECT_TRUE(pool.FindFileByName("error.proto") == NULL);
     errors = log.GetMessages(ERROR);
   }
 
@@ -6761,7 +6706,7 @@ TEST_F(DatabaseBackedPoolTest, ErrorWithErrorCollector) {
   MockErrorCollector error_collector;
   DescriptorPool pool(&error_database, &error_collector);
 
-  EXPECT_TRUE(pool.FindFileByName("error.proto") == nullptr);
+  EXPECT_TRUE(pool.FindFileByName("error.proto") == NULL);
   EXPECT_EQ(
       "error.proto: error2.proto: IMPORT: File recursively imports itself: "
       "error.proto -> error2.proto -> error.proto\n"
@@ -6777,7 +6722,7 @@ TEST_F(DatabaseBackedPoolTest, UndeclaredDependencyOnUnbuiltType) {
   // in the descriptor database but that have not not been built yet.
   MockErrorCollector error_collector;
   DescriptorPool pool(&database_, &error_collector);
-  EXPECT_TRUE(pool.FindMessageTypeByName("Baz") == nullptr);
+  EXPECT_TRUE(pool.FindMessageTypeByName("Baz") == NULL);
   EXPECT_EQ(
       "baz.proto: Baz.foo: TYPE: \"Foo\" seems to be defined in \"foo.proto\", "
       "which is not imported by \"baz.proto\".  To use it here, please add "
@@ -6793,16 +6738,16 @@ TEST_F(DatabaseBackedPoolTest, RollbackAfterError) {
   // Baz is defined in the database, but the file is invalid because it is
   // missing a necessary import.
   DescriptorPool pool(&database_);
-  EXPECT_TRUE(pool.FindMessageTypeByName("Baz") == nullptr);
+  EXPECT_TRUE(pool.FindMessageTypeByName("Baz") == NULL);
   // Make sure that searching again for the file or the type fails.
-  EXPECT_TRUE(pool.FindFileByName("baz.proto") == nullptr);
-  EXPECT_TRUE(pool.FindMessageTypeByName("Baz") == nullptr);
+  EXPECT_TRUE(pool.FindFileByName("baz.proto") == NULL);
+  EXPECT_TRUE(pool.FindMessageTypeByName("Baz") == NULL);
 }
 
 TEST_F(DatabaseBackedPoolTest, UnittestProto) {
   // Try to load all of unittest.proto from a DescriptorDatabase.  This should
   // thoroughly test all paths through DescriptorBuilder to insure that there
-  // are no deadlocking problems when pool_->mutex_ is non-null.
+  // are no deadlocking problems when pool_->mutex_ is non-NULL.
   const FileDescriptor* original_file =
       protobuf_unittest::TestAllTypes::descriptor()->file();
 
@@ -6811,7 +6756,7 @@ TEST_F(DatabaseBackedPoolTest, UnittestProto) {
   const FileDescriptor* file_from_database =
       pool.FindFileByName(original_file->name());
 
-  ASSERT_TRUE(file_from_database != nullptr);
+  ASSERT_TRUE(file_from_database != NULL);
 
   FileDescriptorProto original_file_proto;
   original_file->CopyTo(&original_file_proto);
@@ -6834,39 +6779,39 @@ TEST_F(DatabaseBackedPoolTest, DoesntRetryDbUnnecessarily) {
   DescriptorPool pool(&call_counter);
 
   const FileDescriptor* file = pool.FindFileByName("foo.proto");
-  ASSERT_TRUE(file != nullptr);
+  ASSERT_TRUE(file != NULL);
   const Descriptor* foo = pool.FindMessageTypeByName("Foo");
-  ASSERT_TRUE(foo != nullptr);
+  ASSERT_TRUE(foo != NULL);
   const EnumDescriptor* test_enum = pool.FindEnumTypeByName("TestEnum");
-  ASSERT_TRUE(test_enum != nullptr);
+  ASSERT_TRUE(test_enum != NULL);
   const ServiceDescriptor* test_service = pool.FindServiceByName("TestService");
-  ASSERT_TRUE(test_service != nullptr);
+  ASSERT_TRUE(test_service != NULL);
 
   EXPECT_NE(0, call_counter.call_count_);
   call_counter.Clear();
 
-  EXPECT_TRUE(foo->FindFieldByName("no_such_field") == nullptr);
-  EXPECT_TRUE(foo->FindExtensionByName("no_such_extension") == nullptr);
-  EXPECT_TRUE(foo->FindNestedTypeByName("NoSuchMessageType") == nullptr);
-  EXPECT_TRUE(foo->FindEnumTypeByName("NoSuchEnumType") == nullptr);
-  EXPECT_TRUE(foo->FindEnumValueByName("NO_SUCH_VALUE") == nullptr);
-  EXPECT_TRUE(test_enum->FindValueByName("NO_SUCH_VALUE") == nullptr);
-  EXPECT_TRUE(test_service->FindMethodByName("NoSuchMethod") == nullptr);
+  EXPECT_TRUE(foo->FindFieldByName("no_such_field") == NULL);
+  EXPECT_TRUE(foo->FindExtensionByName("no_such_extension") == NULL);
+  EXPECT_TRUE(foo->FindNestedTypeByName("NoSuchMessageType") == NULL);
+  EXPECT_TRUE(foo->FindEnumTypeByName("NoSuchEnumType") == NULL);
+  EXPECT_TRUE(foo->FindEnumValueByName("NO_SUCH_VALUE") == NULL);
+  EXPECT_TRUE(test_enum->FindValueByName("NO_SUCH_VALUE") == NULL);
+  EXPECT_TRUE(test_service->FindMethodByName("NoSuchMethod") == NULL);
 
-  EXPECT_TRUE(file->FindMessageTypeByName("NoSuchMessageType") == nullptr);
-  EXPECT_TRUE(file->FindEnumTypeByName("NoSuchEnumType") == nullptr);
-  EXPECT_TRUE(file->FindEnumValueByName("NO_SUCH_VALUE") == nullptr);
-  EXPECT_TRUE(file->FindServiceByName("NO_SUCH_VALUE") == nullptr);
-  EXPECT_TRUE(file->FindExtensionByName("no_such_extension") == nullptr);
+  EXPECT_TRUE(file->FindMessageTypeByName("NoSuchMessageType") == NULL);
+  EXPECT_TRUE(file->FindEnumTypeByName("NoSuchEnumType") == NULL);
+  EXPECT_TRUE(file->FindEnumValueByName("NO_SUCH_VALUE") == NULL);
+  EXPECT_TRUE(file->FindServiceByName("NO_SUCH_VALUE") == NULL);
+  EXPECT_TRUE(file->FindExtensionByName("no_such_extension") == NULL);
 
-  EXPECT_TRUE(pool.FindFileContainingSymbol("Foo.no.such.field") == nullptr);
-  EXPECT_TRUE(pool.FindFileContainingSymbol("Foo.no_such_field") == nullptr);
-  EXPECT_TRUE(pool.FindMessageTypeByName("Foo.NoSuchMessageType") == nullptr);
-  EXPECT_TRUE(pool.FindFieldByName("Foo.no_such_field") == nullptr);
-  EXPECT_TRUE(pool.FindExtensionByName("Foo.no_such_extension") == nullptr);
-  EXPECT_TRUE(pool.FindEnumTypeByName("Foo.NoSuchEnumType") == nullptr);
-  EXPECT_TRUE(pool.FindEnumValueByName("Foo.NO_SUCH_VALUE") == nullptr);
-  EXPECT_TRUE(pool.FindMethodByName("TestService.NoSuchMethod") == nullptr);
+  EXPECT_TRUE(pool.FindFileContainingSymbol("Foo.no.such.field") == NULL);
+  EXPECT_TRUE(pool.FindFileContainingSymbol("Foo.no_such_field") == NULL);
+  EXPECT_TRUE(pool.FindMessageTypeByName("Foo.NoSuchMessageType") == NULL);
+  EXPECT_TRUE(pool.FindFieldByName("Foo.no_such_field") == NULL);
+  EXPECT_TRUE(pool.FindExtensionByName("Foo.no_such_extension") == NULL);
+  EXPECT_TRUE(pool.FindEnumTypeByName("Foo.NoSuchEnumType") == NULL);
+  EXPECT_TRUE(pool.FindEnumValueByName("Foo.NO_SUCH_VALUE") == NULL);
+  EXPECT_TRUE(pool.FindMethodByName("TestService.NoSuchMethod") == NULL);
 
   EXPECT_EQ(0, call_counter.call_count_);
 }
@@ -6881,11 +6826,11 @@ TEST_F(DatabaseBackedPoolTest, DoesntReloadFilesUncesessarily) {
 
   // First make sure foo.proto is loaded.
   const Descriptor* foo = pool.FindMessageTypeByName("Foo");
-  ASSERT_TRUE(foo != nullptr);
+  ASSERT_TRUE(foo != NULL);
 
   // Try inducing false positives.
-  EXPECT_TRUE(pool.FindMessageTypeByName("NoSuchSymbol") == nullptr);
-  EXPECT_TRUE(pool.FindExtensionByNumber(foo, 22) == nullptr);
+  EXPECT_TRUE(pool.FindMessageTypeByName("NoSuchSymbol") == NULL);
+  EXPECT_TRUE(pool.FindExtensionByNumber(foo, 22) == NULL);
 
   // No errors should have been reported.  (If foo.proto was incorrectly
   // loaded multiple times, errors would have been reported.)
@@ -6975,8 +6920,8 @@ TEST_F(DatabaseBackedPoolTest, DoesntReloadKnownBadFiles) {
 
   GOOGLE_LOG(INFO) << "A timeout in this test probably indicates a real bug.";
 
-  EXPECT_TRUE(pool.FindFileByName("file40.proto") == nullptr);
-  EXPECT_TRUE(pool.FindMessageTypeByName("Message40") == nullptr);
+  EXPECT_TRUE(pool.FindFileByName("file40.proto") == NULL);
+  EXPECT_TRUE(pool.FindMessageTypeByName("Message40") == NULL);
 }
 
 TEST_F(DatabaseBackedPoolTest, DoesntFallbackOnWrongType) {
@@ -6987,22 +6932,22 @@ TEST_F(DatabaseBackedPoolTest, DoesntFallbackOnWrongType) {
   DescriptorPool pool(&call_counter);
 
   const FileDescriptor* file = pool.FindFileByName("foo.proto");
-  ASSERT_TRUE(file != nullptr);
+  ASSERT_TRUE(file != NULL);
   const Descriptor* foo = pool.FindMessageTypeByName("Foo");
-  ASSERT_TRUE(foo != nullptr);
+  ASSERT_TRUE(foo != NULL);
   const EnumDescriptor* test_enum = pool.FindEnumTypeByName("TestEnum");
-  ASSERT_TRUE(test_enum != nullptr);
+  ASSERT_TRUE(test_enum != NULL);
 
   EXPECT_NE(0, call_counter.call_count_);
   call_counter.Clear();
 
-  EXPECT_TRUE(pool.FindMessageTypeByName("TestEnum") == nullptr);
-  EXPECT_TRUE(pool.FindFieldByName("Foo") == nullptr);
-  EXPECT_TRUE(pool.FindExtensionByName("Foo") == nullptr);
-  EXPECT_TRUE(pool.FindEnumTypeByName("Foo") == nullptr);
-  EXPECT_TRUE(pool.FindEnumValueByName("Foo") == nullptr);
-  EXPECT_TRUE(pool.FindServiceByName("Foo") == nullptr);
-  EXPECT_TRUE(pool.FindMethodByName("Foo") == nullptr);
+  EXPECT_TRUE(pool.FindMessageTypeByName("TestEnum") == NULL);
+  EXPECT_TRUE(pool.FindFieldByName("Foo") == NULL);
+  EXPECT_TRUE(pool.FindExtensionByName("Foo") == NULL);
+  EXPECT_TRUE(pool.FindEnumTypeByName("Foo") == NULL);
+  EXPECT_TRUE(pool.FindEnumValueByName("Foo") == NULL);
+  EXPECT_TRUE(pool.FindServiceByName("Foo") == NULL);
+  EXPECT_TRUE(pool.FindMethodByName("Foo") == NULL);
 
   EXPECT_EQ(0, call_counter.call_count_);
 }
@@ -7034,7 +6979,7 @@ class SingletonSourceTree : public compiler::SourceTree {
   virtual io::ZeroCopyInputStream* Open(const std::string& filename) {
     return filename == filename_
                ? new io::ArrayInputStream(contents_.data(), contents_.size())
-               : nullptr;
+               : NULL;
   }
 
  private:
@@ -7684,7 +7629,7 @@ TEST_F(CopySourceCodeInfoToTest, CopySourceCodeInfoTo) {
 
 class LazilyBuildDependenciesTest : public testing::Test {
  public:
-  LazilyBuildDependenciesTest() : pool_(&db_, nullptr) {
+  LazilyBuildDependenciesTest() : pool_(&db_, NULL) {
     pool_.InternalSetLazilyBuildDependencies();
   }
 
@@ -7754,7 +7699,7 @@ TEST_F(LazilyBuildDependenciesTest, Message) {
   const FileDescriptor* file = pool_.FindFileByName("foo.proto");
 
   // Verify only foo gets built when asking for foo.proto
-  EXPECT_TRUE(file != nullptr);
+  EXPECT_TRUE(file != NULL);
   EXPECT_TRUE(pool_.InternalIsFileLoaded("foo.proto"));
   EXPECT_FALSE(pool_.InternalIsFileLoaded("bar.proto"));
 
@@ -7763,7 +7708,7 @@ TEST_F(LazilyBuildDependenciesTest, Message) {
   // the field's type is defined in, as well.
   const Descriptor* desc = file->FindMessageTypeByName("Foo");
   const FieldDescriptor* field = desc->FindFieldByName("bar");
-  EXPECT_TRUE(field != nullptr);
+  EXPECT_TRUE(field != NULL);
   EXPECT_EQ(field, desc->FindFieldByNumber(1));
   EXPECT_EQ(field, desc->FindFieldByLowercaseName("bar"));
   EXPECT_EQ(field, desc->FindFieldByCamelcaseName("bar"));
@@ -7771,7 +7716,7 @@ TEST_F(LazilyBuildDependenciesTest, Message) {
 
   // Finally, verify that if we call message_type() on the field, we will
   // buid the file where the message is defined, and get a valid descriptor
-  EXPECT_TRUE(field->message_type() != nullptr);
+  EXPECT_TRUE(field->message_type() != NULL);
   EXPECT_TRUE(pool_.InternalIsFileLoaded("bar.proto"));
 }
 
@@ -7797,18 +7742,18 @@ TEST_F(LazilyBuildDependenciesTest, Enum) {
   // yet built will build the file and return a descriptor.
   EXPECT_FALSE(pool_.InternalIsFileLoaded("enum1.proto"));
   const Descriptor* desc = file->FindMessageTypeByName("Lazy");
-  EXPECT_TRUE(desc != nullptr);
+  EXPECT_TRUE(desc != NULL);
   const FieldDescriptor* field = desc->FindFieldByName("enum1");
-  EXPECT_TRUE(field != nullptr);
-  EXPECT_TRUE(field->enum_type() != nullptr);
+  EXPECT_TRUE(field != NULL);
+  EXPECT_TRUE(field->enum_type() != NULL);
   EXPECT_TRUE(pool_.InternalIsFileLoaded("enum1.proto"));
 
   // Verify calling default_value_enum() on a field whose definition is not
   // yet built will build the file and return a descriptor to the value.
   EXPECT_FALSE(pool_.InternalIsFileLoaded("enum2.proto"));
   field = desc->FindFieldByName("enum2");
-  EXPECT_TRUE(field != nullptr);
-  EXPECT_TRUE(field->default_value_enum() != nullptr);
+  EXPECT_TRUE(field != NULL);
+  EXPECT_TRUE(field->default_value_enum() != NULL);
   EXPECT_TRUE(pool_.InternalIsFileLoaded("enum2.proto"));
 }
 
@@ -7842,9 +7787,9 @@ TEST_F(LazilyBuildDependenciesTest, Type) {
   // build the type defined in another file.
   EXPECT_FALSE(pool_.InternalIsFileLoaded("message1.proto"));
   const Descriptor* desc = file->FindMessageTypeByName("Lazy");
-  EXPECT_TRUE(desc != nullptr);
+  EXPECT_TRUE(desc != NULL);
   const FieldDescriptor* field = desc->FindFieldByName("message1");
-  EXPECT_TRUE(field != nullptr);
+  EXPECT_TRUE(field != NULL);
   EXPECT_EQ(field->type(), FieldDescriptor::TYPE_MESSAGE);
   EXPECT_TRUE(pool_.InternalIsFileLoaded("message1.proto"));
 
@@ -7852,7 +7797,7 @@ TEST_F(LazilyBuildDependenciesTest, Type) {
   // build the type defined in another file.
   EXPECT_FALSE(pool_.InternalIsFileLoaded("message2.proto"));
   field = desc->FindFieldByName("message2");
-  EXPECT_TRUE(field != nullptr);
+  EXPECT_TRUE(field != NULL);
   EXPECT_EQ(field->cpp_type(), FieldDescriptor::CPPTYPE_MESSAGE);
   EXPECT_TRUE(pool_.InternalIsFileLoaded("message2.proto"));
 
@@ -7860,7 +7805,7 @@ TEST_F(LazilyBuildDependenciesTest, Type) {
   // build the type defined in another file.
   EXPECT_FALSE(pool_.InternalIsFileLoaded("enum1.proto"));
   field = desc->FindFieldByName("enum1");
-  EXPECT_TRUE(field != nullptr);
+  EXPECT_TRUE(field != NULL);
   EXPECT_EQ(field->type(), FieldDescriptor::TYPE_ENUM);
   EXPECT_TRUE(pool_.InternalIsFileLoaded("enum1.proto"));
 
@@ -7868,7 +7813,7 @@ TEST_F(LazilyBuildDependenciesTest, Type) {
   // build the type defined in another file.
   EXPECT_FALSE(pool_.InternalIsFileLoaded("enum2.proto"));
   field = desc->FindFieldByName("enum2");
-  EXPECT_TRUE(field != nullptr);
+  EXPECT_TRUE(field != NULL);
   EXPECT_EQ(field->cpp_type(), FieldDescriptor::CPPTYPE_ENUM);
   EXPECT_TRUE(pool_.InternalIsFileLoaded("enum2.proto"));
 }
@@ -7899,7 +7844,7 @@ TEST_F(LazilyBuildDependenciesTest, Extension) {
 
   // Verify foo.bar gets loaded, and bar.proto gets loaded
   // to register the extension. baz.proto should not get loaded.
-  EXPECT_TRUE(file != nullptr);
+  EXPECT_TRUE(file != NULL);
   EXPECT_TRUE(pool_.InternalIsFileLoaded("foo.proto"));
   EXPECT_TRUE(pool_.InternalIsFileLoaded("bar.proto"));
   EXPECT_FALSE(pool_.InternalIsFileLoaded("baz.proto"));
@@ -7929,15 +7874,15 @@ TEST_F(LazilyBuildDependenciesTest, Service) {
   // files defining the input and output type, and input_type() and
   // output_type() does indeed build the appropriate files.
   const ServiceDescriptor* service = file->FindServiceByName("LazyService");
-  EXPECT_TRUE(service != nullptr);
+  EXPECT_TRUE(service != NULL);
   const MethodDescriptor* method = service->FindMethodByName("A");
   EXPECT_FALSE(pool_.InternalIsFileLoaded("message1.proto"));
   EXPECT_FALSE(pool_.InternalIsFileLoaded("message2.proto"));
-  EXPECT_TRUE(method != nullptr);
-  EXPECT_TRUE(method->input_type() != nullptr);
+  EXPECT_TRUE(method != NULL);
+  EXPECT_TRUE(method->input_type() != NULL);
   EXPECT_TRUE(pool_.InternalIsFileLoaded("message1.proto"));
   EXPECT_FALSE(pool_.InternalIsFileLoaded("message2.proto"));
-  EXPECT_TRUE(method->output_type() != nullptr);
+  EXPECT_TRUE(method->output_type() != NULL);
   EXPECT_TRUE(pool_.InternalIsFileLoaded("message2.proto"));
 }
 
@@ -7962,7 +7907,7 @@ TEST_F(LazilyBuildDependenciesTest, GeneratedFile) {
   // the generated function "descriptor()" doesn't somehow subvert the laziness
   // by manually loading the dependencies or something.
   EXPECT_TRUE(protobuf_unittest::lazy_imports::ImportedMessage::descriptor() !=
-              nullptr);
+              NULL);
   EXPECT_TRUE(DescriptorPool::generated_pool()->InternalIsFileLoaded(
       "google/protobuf/unittest_lazy_dependencies.proto"));
   EXPECT_FALSE(DescriptorPool::generated_pool()->InternalIsFileLoaded(
@@ -8020,7 +7965,7 @@ TEST_F(LazilyBuildDependenciesTest, Dependency) {
   AddSimpleMessageProtoFileToDb("baz", "Baz");
 
   const FileDescriptor* foo_file = pool_.FindFileByName("foo.proto");
-  EXPECT_TRUE(foo_file != nullptr);
+  EXPECT_TRUE(foo_file != NULL);
   // As expected, requesting foo.proto shouldn't build it's dependencies
   EXPECT_TRUE(pool_.InternalIsFileLoaded("foo.proto"));
   EXPECT_FALSE(pool_.InternalIsFileLoaded("bar.proto"));
@@ -8029,7 +7974,7 @@ TEST_F(LazilyBuildDependenciesTest, Dependency) {
   // Verify calling dependency(N) will build the dependency, but
   // not that file's dependencies.
   const FileDescriptor* bar_file = foo_file->dependency(0);
-  EXPECT_TRUE(bar_file != nullptr);
+  EXPECT_TRUE(bar_file != NULL);
   EXPECT_TRUE(pool_.InternalIsFileLoaded("bar.proto"));
   EXPECT_FALSE(pool_.InternalIsFileLoaded("baz.proto"));
 }

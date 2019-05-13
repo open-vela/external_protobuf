@@ -31,7 +31,6 @@
 #ifndef GOOGLE_PROTOBUF_PARSE_CONTEXT_H__
 #define GOOGLE_PROTOBUF_PARSE_CONTEXT_H__
 
-#include <cstdint>
 #include <cstring>
 #include <string>
 
@@ -125,7 +124,7 @@ class PROTOBUF_EXPORT EpsCopyInputStream {
   // If return value is negative it's an error
   PROTOBUF_MUST_USE_RESULT int PushLimit(const char* ptr, int limit) {
     GOOGLE_DCHECK(limit >= 0);
-    limit += static_cast<int>(ptr - buffer_end_);
+    limit += ptr - buffer_end_;
     limit_end_ = buffer_end_ + (std::min)(0, limit);
     auto old_limit = limit_;
     limit_ = limit;
