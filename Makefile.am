@@ -148,17 +148,12 @@ csharp_EXTRA_DIST=                                                           \
   csharp/src/Google.Protobuf/Compatibility/PropertyInfoExtensions.cs         \
   csharp/src/Google.Protobuf/Compatibility/StreamExtensions.cs               \
   csharp/src/Google.Protobuf/Compatibility/TypeExtensions.cs                 \
-  csharp/src/Google.Protobuf/Extension.cs                                    \
-  csharp/src/Google.Protobuf/ExtensionRegistry.cs                            \
-  csharp/src/Google.Protobuf/ExtensionSet.cs                                 \
-  csharp/src/Google.Protobuf/ExtensionValue.cs                               \
   csharp/src/Google.Protobuf/FieldCodec.cs                                   \
   csharp/src/Google.Protobuf/FieldMaskTree.cs                                \
   csharp/src/Google.Protobuf/FrameworkPortability.cs                         \
   csharp/src/Google.Protobuf/Google.Protobuf.csproj                          \
   csharp/src/Google.Protobuf/ICustomDiagnosticMessage.cs                     \
   csharp/src/Google.Protobuf/IDeepCloneable.cs                               \
-  csharp/src/Google.Protobuf/IExtendableMessage.cs                           \
   csharp/src/Google.Protobuf/IMessage.cs                                     \
   csharp/src/Google.Protobuf/InvalidJsonException.cs                         \
   csharp/src/Google.Protobuf/InvalidProtocolBufferException.cs               \
@@ -169,7 +164,6 @@ csharp_EXTRA_DIST=                                                           \
   csharp/src/Google.Protobuf/LimitedInputStream.cs                           \
   csharp/src/Google.Protobuf/MessageExtensions.cs                            \
   csharp/src/Google.Protobuf/MessageParser.cs                                \
-  csharp/src/Google.Protobuf/ObjectIntPair.cs                                \
   csharp/src/Google.Protobuf/ProtoPreconditions.cs                           \
   csharp/src/Google.Protobuf/Properties/AssemblyInfo.cs                      \
   csharp/src/Google.Protobuf/Reflection/CustomOptions.cs                     \
@@ -181,8 +175,6 @@ csharp_EXTRA_DIST=                                                           \
   csharp/src/Google.Protobuf/Reflection/DescriptorValidationException.cs     \
   csharp/src/Google.Protobuf/Reflection/EnumDescriptor.cs                    \
   csharp/src/Google.Protobuf/Reflection/EnumValueDescriptor.cs               \
-  csharp/src/Google.Protobuf/Reflection/ExtensionAccessor.cs                 \
-  csharp/src/Google.Protobuf/Reflection/ExtensionCollection.cs               \
   csharp/src/Google.Protobuf/Reflection/FieldAccessorBase.cs                 \
   csharp/src/Google.Protobuf/Reflection/FieldDescriptor.cs                   \
   csharp/src/Google.Protobuf/Reflection/FieldType.cs                         \
@@ -1231,6 +1223,7 @@ EXTRA_DIST = $(@DIST_LANG@_EXTRA_DIST)   \
   python/release/wheel/protobuf_optimized_pip.sh \
   python/release/wheel/README.md         \
   six.BUILD                              \
+  third_party/zlib.BUILD                 \
   util/python/BUILD
 
 

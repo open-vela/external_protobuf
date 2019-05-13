@@ -110,7 +110,6 @@ cc_library(
         "src/google/protobuf/any_lite.cc",
         "src/google/protobuf/arena.cc",
         "src/google/protobuf/extension_set.cc",
-        "src/google/protobuf/generated_enum_util.cc",
         "src/google/protobuf/generated_message_table_driven_lite.cc",
         "src/google/protobuf/generated_message_util.cc",
         "src/google/protobuf/implicit_weak_message.cc",
@@ -118,7 +117,6 @@ cc_library(
         "src/google/protobuf/io/strtod.cc",
         "src/google/protobuf/io/io_win32.cc",
         "src/google/protobuf/io/zero_copy_stream.cc",
-        "src/google/protobuf/io/zero_copy_stream_impl.cc",
         "src/google/protobuf/io/zero_copy_stream_impl_lite.cc",
         "src/google/protobuf/message_lite.cc",
         "src/google/protobuf/parse_context.cc",
@@ -169,6 +167,7 @@ cc_library(
         "src/google/protobuf/io/gzip_stream.cc",
         "src/google/protobuf/io/printer.cc",
         "src/google/protobuf/io/tokenizer.cc",
+        "src/google/protobuf/io/zero_copy_stream_impl.cc",
         "src/google/protobuf/map_field.cc",
         "src/google/protobuf/message.cc",
         "src/google/protobuf/reflection_ops.cc",
@@ -998,106 +997,4 @@ py_proto_library(
     ],
     default_runtime = "",
     protoc = ":protoc",
-)
-
-################################################################################
-# Conformance tests
-################################################################################
-
-proto_library(
-    name = "test_messages_proto2_proto",
-    srcs = ["src/google/protobuf/test_messages_proto2.proto"],
-    visibility = ["//visibility:public"],
-)
-
-proto_library(
-    name = "test_messages_proto3_proto",
-    srcs = ["src/google/protobuf/test_messages_proto3.proto"],
-    deps = [
-        ":any_proto",
-        ":duration_proto",
-        ":field_mask_proto",
-        ":struct_proto",
-        ":timestamp_proto",
-        ":wrappers_proto",
-    ],
-    visibility = ["//visibility:public"],
-)
-
-cc_proto_library(
-    name = "test_messages_proto2_proto_cc",
-    srcs = ["src/google/protobuf/test_messages_proto2.proto"],
-)
-
-cc_proto_library(
-    name = "test_messages_proto3_proto_cc",
-    srcs = ["src/google/protobuf/test_messages_proto3.proto"],
-    deps = [
-        ":cc_wkt_protos",
-    ],
-)
-
-proto_library(
-    name = "conformance_proto",
-    srcs = ["conformance/conformance.proto"],
-    visibility = ["//visibility:public"],
-)
-
-cc_proto_library(
-    name = "conformance_proto_cc",
-    srcs = ["conformance/conformance.proto"],
-)
-
-cc_library(
-    name = "jsoncpp",
-    hdrs = ["conformance/third_party/jsoncpp/json.h"],
-    srcs = ["conformance/third_party/jsoncpp/jsoncpp.cpp"],
-    includes = ["conformance"],
-)
-
-cc_library(
-    name = "conformance_test",
-    srcs = [
-        "conformance/conformance_test.cc",
-        "conformance/conformance_test_runner.cc",
-    ],
-    hdrs = [
-        "conformance/conformance_test.h",
-    ],
-    deps = [":conformance_proto_cc"],
-    includes = ["conformance", "src"],
-)
-
-cc_library(
-    name = "binary_json_conformance_suite",
-    srcs = ["conformance/binary_json_conformance_suite.cc"],
-    hdrs = ["conformance/binary_json_conformance_suite.h"],
-    deps = [
-        ":conformance_test",
-        ":jsoncpp",
-        ":test_messages_proto2_proto_cc",
-        ":test_messages_proto3_proto_cc",
-    ],
-)
-
-cc_library(
-    name = "text_format_conformance_suite",
-    srcs = ["conformance/text_format_conformance_suite.cc"],
-    hdrs = ["conformance/text_format_conformance_suite.h"],
-    deps = [
-        ":conformance_test",
-        ":test_messages_proto2_proto_cc",
-        ":test_messages_proto3_proto_cc",
-    ],
-)
-
-cc_library(
-    name = "conformance_test_runner",
-    srcs = ["conformance/conformance_test_main.cc"],
-    deps = [
-        ":binary_json_conformance_suite",
-        ":conformance_test",
-        ":text_format_conformance_suite",
-    ],
-    visibility = ["//visibility:public"],
 )

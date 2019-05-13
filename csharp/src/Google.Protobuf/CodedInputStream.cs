@@ -273,11 +273,6 @@ namespace Google.Protobuf
         internal bool DiscardUnknownFields { get; set; }
 
         /// <summary>
-        /// Internal-only property; provides extension identifiers to compatible messages while parsing.
-        /// </summary>
-        internal ExtensionRegistry ExtensionRegistry { get; set; }
-
-        /// <summary>
         /// Disposes of this instance, potentially closing any underlying stream.
         /// </summary>
         /// <remarks>
@@ -579,7 +574,7 @@ namespace Google.Protobuf
 
         /// <summary>
         /// Reads an embedded message field value from the stream.
-        /// </summary>
+        /// </summary>   
         public void ReadMessage(IMessage builder)
         {
             int length = ReadLength();
