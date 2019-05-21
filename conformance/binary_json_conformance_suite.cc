@@ -2452,8 +2452,6 @@ void BinaryAndJsonConformanceSuite::RunSuiteImpl() {
         "unknown": {"a": 1}
       })",
       "");
-
-  ExpectParseFailureForJson("RejectTopLevelNull", REQUIRED, "null");
 }
 
 }  // namespace protobuf

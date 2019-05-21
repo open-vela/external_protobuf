@@ -199,10 +199,8 @@ class PROTOBUF_EXPORT SimpleDescriptorDatabase : public DescriptorDatabase {
     // to the index.
     bool AddFile(const FileDescriptorProto& file, Value value);
     bool AddSymbol(const std::string& name, Value value);
-    bool AddNestedExtensions(const std::string& filename,
-                             const DescriptorProto& message_type, Value value);
-    bool AddExtension(const std::string& filename,
-                      const FieldDescriptorProto& field, Value value);
+    bool AddNestedExtensions(const DescriptorProto& message_type, Value value);
+    bool AddExtension(const FieldDescriptorProto& field, Value value);
 
     Value FindFile(const std::string& filename);
     Value FindSymbol(const std::string& name);
@@ -329,7 +327,6 @@ class PROTOBUF_EXPORT EncodedDescriptorDatabase : public DescriptorDatabase {
                                    FileDescriptorProto* output) override;
   bool FindAllExtensionNumbers(const std::string& extendee_type,
                                std::vector<int>* output) override;
-  bool FindAllFileNames(std::vector<std::string>* output) override;
 
  private:
   SimpleDescriptorDatabase::DescriptorIndex<std::pair<const void*, int> >

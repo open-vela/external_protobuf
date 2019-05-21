@@ -1525,9 +1525,9 @@ public abstract class GeneratedMessageLite<
     try {
       // TODO(yilunchong): Try to make input with type CodedInpuStream.ArrayDecoder use
       // fast path.
-      Schema<T> schema = Protobuf.getInstance().schemaFor(result);
-      schema.mergeFrom(result, CodedInputStreamReader.forCodedInput(input), extensionRegistry);
-      schema.makeImmutable(result);
+      Protobuf.getInstance().schemaFor(result).mergeFrom(
+          result, CodedInputStreamReader.forCodedInput(input), extensionRegistry);
+      result.makeImmutable();
     } catch (IOException e) {
       if (e.getCause() instanceof InvalidProtocolBufferException) {
         throw (InvalidProtocolBufferException) e.getCause();
@@ -1549,10 +1549,10 @@ public abstract class GeneratedMessageLite<
     @SuppressWarnings("unchecked") // Guaranteed by protoc
     T result = (T) instance.dynamicMethod(MethodToInvoke.NEW_MUTABLE_INSTANCE);
     try {
-      Schema<T> schema = Protobuf.getInstance().schemaFor(result);
-      schema.mergeFrom(
-          result, input, offset, offset + length, new ArrayDecoders.Registers(extensionRegistry));
-      schema.makeImmutable(result);
+      Protobuf.getInstance().schemaFor(result).mergeFrom(
+          result, input, offset, offset + length,
+          new ArrayDecoders.Registers(extensionRegistry));
+      result.makeImmutable();
       if (result.memoizedHashCode != 0) {
         throw new RuntimeException();
       }
