@@ -237,7 +237,7 @@ static inline bool HandleString(io::CodedInputStream* input, MessageLite* msg,
 
   switch (ctype) {
     case StringType_INLINED: {
-      InlinedStringField* s = nullptr;
+      InlinedStringField* s;
       switch (cardinality) {
         case Cardinality_SINGULAR:
           // TODO(ckennelly): Is this optimal?

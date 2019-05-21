@@ -120,12 +120,9 @@ class PROTOBUF_EXPORT Api :
   static constexpr int kIndexInFileMessages =
     0;
 
+  void Swap(Api* other);
   friend void swap(Api& a, Api& b) {
     a.Swap(&b);
-  }
-  inline void Swap(Api* other) {
-    if (other == this) return;
-    InternalSwap(other);
   }
 
   // implements Message ----------------------------------------------
@@ -188,18 +185,10 @@ class PROTOBUF_EXPORT Api :
 
   // accessors -------------------------------------------------------
 
-  enum : int {
-    kMethodsFieldNumber = 2,
-    kOptionsFieldNumber = 3,
-    kMixinsFieldNumber = 6,
-    kNameFieldNumber = 1,
-    kVersionFieldNumber = 4,
-    kSourceContextFieldNumber = 5,
-    kSyntaxFieldNumber = 7,
-  };
   // repeated .google.protobuf.Method methods = 2;
   int methods_size() const;
   void clear_methods();
+  static const int kMethodsFieldNumber = 2;
   PROTOBUF_NAMESPACE_ID::Method* mutable_methods(int index);
   ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< PROTOBUF_NAMESPACE_ID::Method >*
       mutable_methods();
@@ -211,6 +200,7 @@ class PROTOBUF_EXPORT Api :
   // repeated .google.protobuf.Option options = 3;
   int options_size() const;
   void clear_options();
+  static const int kOptionsFieldNumber = 3;
   PROTOBUF_NAMESPACE_ID::Option* mutable_options(int index);
   ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< PROTOBUF_NAMESPACE_ID::Option >*
       mutable_options();
@@ -222,6 +212,7 @@ class PROTOBUF_EXPORT Api :
   // repeated .google.protobuf.Mixin mixins = 6;
   int mixins_size() const;
   void clear_mixins();
+  static const int kMixinsFieldNumber = 6;
   PROTOBUF_NAMESPACE_ID::Mixin* mutable_mixins(int index);
   ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< PROTOBUF_NAMESPACE_ID::Mixin >*
       mutable_mixins();
@@ -232,6 +223,7 @@ class PROTOBUF_EXPORT Api :
 
   // string name = 1;
   void clear_name();
+  static const int kNameFieldNumber = 1;
   const std::string& name() const;
   void set_name(const std::string& value);
   void set_name(std::string&& value);
@@ -243,6 +235,7 @@ class PROTOBUF_EXPORT Api :
 
   // string version = 4;
   void clear_version();
+  static const int kVersionFieldNumber = 4;
   const std::string& version() const;
   void set_version(const std::string& value);
   void set_version(std::string&& value);
@@ -255,6 +248,7 @@ class PROTOBUF_EXPORT Api :
   // .google.protobuf.SourceContext source_context = 5;
   bool has_source_context() const;
   void clear_source_context();
+  static const int kSourceContextFieldNumber = 5;
   const PROTOBUF_NAMESPACE_ID::SourceContext& source_context() const;
   PROTOBUF_NAMESPACE_ID::SourceContext* release_source_context();
   PROTOBUF_NAMESPACE_ID::SourceContext* mutable_source_context();
@@ -262,12 +256,13 @@ class PROTOBUF_EXPORT Api :
 
   // .google.protobuf.Syntax syntax = 7;
   void clear_syntax();
+  static const int kSyntaxFieldNumber = 7;
   PROTOBUF_NAMESPACE_ID::Syntax syntax() const;
   void set_syntax(PROTOBUF_NAMESPACE_ID::Syntax value);
 
   // @@protoc_insertion_point(class_scope:google.protobuf.Api)
  private:
-  class _Internal;
+  class HasBitSetters;
 
   ::PROTOBUF_NAMESPACE_ID::internal::InternalMetadataWithArena _internal_metadata_;
   ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< PROTOBUF_NAMESPACE_ID::Method > methods_;
@@ -326,12 +321,9 @@ class PROTOBUF_EXPORT Method :
   static constexpr int kIndexInFileMessages =
     1;
 
+  void Swap(Method* other);
   friend void swap(Method& a, Method& b) {
     a.Swap(&b);
-  }
-  inline void Swap(Method* other) {
-    if (other == this) return;
-    InternalSwap(other);
   }
 
   // implements Message ----------------------------------------------
@@ -394,18 +386,10 @@ class PROTOBUF_EXPORT Method :
 
   // accessors -------------------------------------------------------
 
-  enum : int {
-    kOptionsFieldNumber = 6,
-    kNameFieldNumber = 1,
-    kRequestTypeUrlFieldNumber = 2,
-    kResponseTypeUrlFieldNumber = 4,
-    kRequestStreamingFieldNumber = 3,
-    kResponseStreamingFieldNumber = 5,
-    kSyntaxFieldNumber = 7,
-  };
   // repeated .google.protobuf.Option options = 6;
   int options_size() const;
   void clear_options();
+  static const int kOptionsFieldNumber = 6;
   PROTOBUF_NAMESPACE_ID::Option* mutable_options(int index);
   ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< PROTOBUF_NAMESPACE_ID::Option >*
       mutable_options();
@@ -416,6 +400,7 @@ class PROTOBUF_EXPORT Method :
 
   // string name = 1;
   void clear_name();
+  static const int kNameFieldNumber = 1;
   const std::string& name() const;
   void set_name(const std::string& value);
   void set_name(std::string&& value);
@@ -427,6 +412,7 @@ class PROTOBUF_EXPORT Method :
 
   // string request_type_url = 2;
   void clear_request_type_url();
+  static const int kRequestTypeUrlFieldNumber = 2;
   const std::string& request_type_url() const;
   void set_request_type_url(const std::string& value);
   void set_request_type_url(std::string&& value);
@@ -438,6 +424,7 @@ class PROTOBUF_EXPORT Method :
 
   // string response_type_url = 4;
   void clear_response_type_url();
+  static const int kResponseTypeUrlFieldNumber = 4;
   const std::string& response_type_url() const;
   void set_response_type_url(const std::string& value);
   void set_response_type_url(std::string&& value);
@@ -449,22 +436,25 @@ class PROTOBUF_EXPORT Method :
 
   // bool request_streaming = 3;
   void clear_request_streaming();
+  static const int kRequestStreamingFieldNumber = 3;
   bool request_streaming() const;
   void set_request_streaming(bool value);
 
   // bool response_streaming = 5;
   void clear_response_streaming();
+  static const int kResponseStreamingFieldNumber = 5;
   bool response_streaming() const;
   void set_response_streaming(bool value);
 
   // .google.protobuf.Syntax syntax = 7;
   void clear_syntax();
+  static const int kSyntaxFieldNumber = 7;
   PROTOBUF_NAMESPACE_ID::Syntax syntax() const;
   void set_syntax(PROTOBUF_NAMESPACE_ID::Syntax value);
 
   // @@protoc_insertion_point(class_scope:google.protobuf.Method)
  private:
-  class _Internal;
+  class HasBitSetters;
 
   ::PROTOBUF_NAMESPACE_ID::internal::InternalMetadataWithArena _internal_metadata_;
   ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< PROTOBUF_NAMESPACE_ID::Option > options_;
@@ -523,12 +513,9 @@ class PROTOBUF_EXPORT Mixin :
   static constexpr int kIndexInFileMessages =
     2;
 
+  void Swap(Mixin* other);
   friend void swap(Mixin& a, Mixin& b) {
     a.Swap(&b);
-  }
-  inline void Swap(Mixin* other) {
-    if (other == this) return;
-    InternalSwap(other);
   }
 
   // implements Message ----------------------------------------------
@@ -591,12 +578,9 @@ class PROTOBUF_EXPORT Mixin :
 
   // accessors -------------------------------------------------------
 
-  enum : int {
-    kNameFieldNumber = 1,
-    kRootFieldNumber = 2,
-  };
   // string name = 1;
   void clear_name();
+  static const int kNameFieldNumber = 1;
   const std::string& name() const;
   void set_name(const std::string& value);
   void set_name(std::string&& value);
@@ -608,6 +592,7 @@ class PROTOBUF_EXPORT Mixin :
 
   // string root = 2;
   void clear_root();
+  static const int kRootFieldNumber = 2;
   const std::string& root() const;
   void set_root(const std::string& value);
   void set_root(std::string&& value);
@@ -619,7 +604,7 @@ class PROTOBUF_EXPORT Mixin :
 
   // @@protoc_insertion_point(class_scope:google.protobuf.Mixin)
  private:
-  class _Internal;
+  class HasBitSetters;
 
   ::PROTOBUF_NAMESPACE_ID::internal::InternalMetadataWithArena _internal_metadata_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr name_;

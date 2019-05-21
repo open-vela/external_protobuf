@@ -1651,11 +1651,7 @@ bool IsWellKnownTypeFile(const FileDescriptor* file) {
 }  // anonymous namespace
 
 void Generator::GenerateHeader(const GeneratorOptions& options,
-                               const FileDescriptor* file,
                                io::Printer* printer) const {
-  if (file != nullptr) {
-    printer->Print("// source: $filename$\n", "filename", file->name());
-  }
   printer->Print(
       "/**\n"
       " * @fileoverview\n"
@@ -1693,27 +1689,6 @@ void Generator::FindProvides(const GeneratorOptions& options,
   printer->Print("\n");
 }
 
-void FindProvidesForOneOfEnum(const GeneratorOptions& options,
-                              const OneofDescriptor* oneof,
-                              std::set<std::string>* provided) {
-  std::string name = GetMessagePath(options, oneof->containing_type()) + "." +
-                     JSOneofName(oneof) + "Case";
-  provided->insert(name);
-}
-
-void FindProvidesForOneOfEnums(const GeneratorOptions& options,
-                               io::Printer* printer, const Descriptor* desc,
-                               std::set<std::string>* provided) {
-  if (HasOneofFields(desc)) {
-    for (int i = 0; i < desc->oneof_decl_count(); i++) {
-      if (IgnoreOneof(desc->oneof_decl(i))) {
-        continue;
-      }
-      FindProvidesForOneOfEnum(options, desc->oneof_decl(i), provided);
-    }
-  }
-}
-
 void Generator::FindProvidesForMessage(const GeneratorOptions& options,
                                        io::Printer* printer,
                                        const Descriptor* desc,
@@ -1728,13 +1703,11 @@ void Generator::FindProvidesForMessage(const GeneratorOptions& options,
   for (int i = 0; i < desc->enum_type_count(); i++) {
     FindProvidesForEnum(options, printer, desc->enum_type(i), provided);
   }
-
-  FindProvidesForOneOfEnums(options, printer, desc, provided);
-
   for (int i = 0; i < desc->nested_type_count(); i++) {
     FindProvidesForMessage(options, printer, desc->nested_type(i), provided);
   }
 }
+
 void Generator::FindProvidesForEnum(const GeneratorOptions& options,
                                     io::Printer* printer,
                                     const EnumDescriptor* enumdesc,
@@ -2430,22 +2403,18 @@ void Generator::GenerateObjectTypedef(const GeneratorOptions& options,
       "method.\n"
       " * @record\n"
       " */\n"
-      "$typeName$ = function() {\n",
+      "$typeName$ = function() {};\n\n",
       "messageName", desc->name(), "typeName", type_name);
 
   for (int i = 0; i < desc->field_count(); i++) {
-    if (i > 0) {
-      printer->Print("\n");
-    }
     printer->Print(
-        "  /** @type {$fieldType$|undefined} */\n"
-        "  this.$fieldName$;\n",
-        "fieldName", JSObjectFieldName(options, desc->field(i)),
+        "/** @type {$fieldType$|undefined} */\n"
+        "$typeName$.prototype.$fieldName$;\n\n",
+        "typeName", type_name, "fieldName",
+        JSObjectFieldName(options, desc->field(i)),
         // TODO(b/121097361): Add type checking for field values.
         "fieldType", "?");
   }
-
-  printer->Print("};\n\n");
 }
 
 void Generator::GenerateClassFromObject(const GeneratorOptions& options,
@@ -3641,7 +3610,7 @@ bool Generator::GenerateFile(const FileDescriptor* file,
 void Generator::GenerateFile(const GeneratorOptions& options,
                              io::Printer* printer,
                              const FileDescriptor* file) const {
-  GenerateHeader(options, file, printer);
+  GenerateHeader(options, printer);
 
   // Generate "require" statements.
   if ((options.import_style == GeneratorOptions::kImportCommonJs ||
@@ -3735,12 +3704,7 @@ bool Generator::GenerateAll(const std::vector<const FileDescriptor*>& files,
                            options.GetFileNameExtension();
     std::unique_ptr<io::ZeroCopyOutputStream> output(context->Open(filename));
     GOOGLE_CHECK(output.get());
-    GeneratedCodeInfo annotations;
-    io::AnnotationProtoCollector<GeneratedCodeInfo> annotation_collector(
-        &annotations);
-    io::Printer printer(
-        output.get(), '$',
-        options.annotate_code ? &annotation_collector : nullptr);
+    io::Printer printer(output.get(), '$');
 
     // Pull out all extensions -- we need these to generate all
     // provides/requires.
@@ -3752,11 +3716,7 @@ bool Generator::GenerateAll(const std::vector<const FileDescriptor*>& files,
       }
     }
 
-    if (files.size() == 1) {
-      GenerateHeader(options, files[0], &printer);
-    } else {
-      GenerateHeader(options, nullptr, &printer);
-    }
+    GenerateHeader(options, &printer);
 
     std::set<std::string> provided;
     FindProvides(options, &printer, files, &provided);
@@ -3775,9 +3735,6 @@ bool Generator::GenerateAll(const std::vector<const FileDescriptor*>& files,
 
     if (printer.failed()) {
       return false;
-    }
-    if (options.annotate_code) {
-      EmbedCodeAnnotations(annotations, &printer);
     }
   } else if (options.output_mode() == GeneratorOptions::kOneOutputFilePerSCC) {
     std::set<const Descriptor*> have_printed;
@@ -3819,7 +3776,7 @@ bool Generator::GenerateAll(const std::vector<const FileDescriptor*>& files,
             output.get(), '$',
             options.annotate_code ? &annotation_collector : nullptr);
 
-        GenerateHeader(options, file, &printer);
+        GenerateHeader(options, &printer);
 
         std::set<std::string> provided;
         for (auto one_desc : scc->descriptors) {
@@ -3872,7 +3829,7 @@ bool Generator::GenerateAll(const std::vector<const FileDescriptor*>& files,
             output.get(), '$',
             options.annotate_code ? &annotation_collector : nullptr);
 
-        GenerateHeader(options, file, &printer);
+        GenerateHeader(options, &printer);
 
         std::set<std::string> provided;
         FindProvidesForEnum(options, &printer, enumdesc, &provided);
@@ -3904,7 +3861,7 @@ bool Generator::GenerateAll(const std::vector<const FileDescriptor*>& files,
             output.get(), '$',
             options.annotate_code ? &annotation_collector : nullptr);
 
-        GenerateHeader(options, file, &printer);
+        GenerateHeader(options, &printer);
 
         std::set<std::string> provided;
         std::vector<const FieldDescriptor*> fields;

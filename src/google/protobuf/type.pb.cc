@@ -194,7 +194,7 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&PROTOBUF_NAMESPACE_ID::_Option_default_instance_),
 };
 
-const char descriptor_table_protodef_google_2fprotobuf_2ftype_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
+const char descriptor_table_protodef_google_2fprotobuf_2ftype_2eproto[] =
   "\n\032google/protobuf/type.proto\022\017google.pro"
   "tobuf\032\031google/protobuf/any.proto\032$google"
   "/protobuf/source_context.proto\"\327\001\n\004Type\022"
@@ -360,13 +360,13 @@ void Type::InitAsDefaultInstance() {
   PROTOBUF_NAMESPACE_ID::_Type_default_instance_._instance.get_mutable()->source_context_ = const_cast< PROTOBUF_NAMESPACE_ID::SourceContext*>(
       PROTOBUF_NAMESPACE_ID::SourceContext::internal_default_instance());
 }
-class Type::_Internal {
+class Type::HasBitSetters {
  public:
   static const PROTOBUF_NAMESPACE_ID::SourceContext& source_context(const Type* msg);
 };
 
 const PROTOBUF_NAMESPACE_ID::SourceContext&
-Type::_Internal::source_context(const Type* msg) {
+Type::HasBitSetters::source_context(const Type* msg) {
   return *msg->source_context_;
 }
 void Type::unsafe_arena_set_allocated_source_context(
@@ -388,6 +388,15 @@ void Type::clear_source_context() {
   }
   source_context_ = nullptr;
 }
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int Type::kNameFieldNumber;
+const int Type::kFieldsFieldNumber;
+const int Type::kOneofsFieldNumber;
+const int Type::kOptionsFieldNumber;
+const int Type::kSourceContextFieldNumber;
+const int Type::kSyntaxFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
 Type::Type()
   : ::PROTOBUF_NAMESPACE_ID::Message(), _internal_metadata_(nullptr) {
   SharedCtor();
@@ -411,7 +420,7 @@ Type::Type(const Type& from)
       options_(from.options_) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  if (!from.name().empty()) {
+  if (from.name().size() > 0) {
     name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.name(),
       GetArenaNoVirtual());
   }
@@ -719,7 +728,7 @@ void Type::SerializeWithCachedSizes(
   // .google.protobuf.SourceContext source_context = 5;
   if (this->has_source_context()) {
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteMessageMaybeToArray(
-      5, _Internal::source_context(this), output);
+      5, HasBitSetters::source_context(this), output);
   }
 
   // .google.protobuf.Syntax syntax = 6;
@@ -782,7 +791,7 @@ void Type::SerializeWithCachedSizes(
   if (this->has_source_context()) {
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
       InternalWriteMessageToArray(
-        5, _Internal::source_context(this), target);
+        5, HasBitSetters::source_context(this), target);
   }
 
   // .google.protobuf.Syntax syntax = 6;
@@ -921,6 +930,25 @@ bool Type::IsInitialized() const {
   return true;
 }
 
+void Type::Swap(Type* other) {
+  if (other == this) return;
+  if (GetArenaNoVirtual() == other->GetArenaNoVirtual()) {
+    InternalSwap(other);
+  } else {
+    Type* temp = New(GetArenaNoVirtual());
+    temp->MergeFrom(*other);
+    other->CopyFrom(*this);
+    InternalSwap(temp);
+    if (GetArenaNoVirtual() == nullptr) {
+      delete temp;
+    }
+  }
+}
+void Type::UnsafeArenaSwap(Type* other) {
+  if (other == this) return;
+  GOOGLE_DCHECK(GetArenaNoVirtual() == other->GetArenaNoVirtual());
+  InternalSwap(other);
+}
 void Type::InternalSwap(Type* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
@@ -942,9 +970,22 @@ void Type::InternalSwap(Type* other) {
 
 void Field::InitAsDefaultInstance() {
 }
-class Field::_Internal {
+class Field::HasBitSetters {
  public:
 };
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int Field::kKindFieldNumber;
+const int Field::kCardinalityFieldNumber;
+const int Field::kNumberFieldNumber;
+const int Field::kNameFieldNumber;
+const int Field::kTypeUrlFieldNumber;
+const int Field::kOneofIndexFieldNumber;
+const int Field::kPackedFieldNumber;
+const int Field::kOptionsFieldNumber;
+const int Field::kJsonNameFieldNumber;
+const int Field::kDefaultValueFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 Field::Field()
   : ::PROTOBUF_NAMESPACE_ID::Message(), _internal_metadata_(nullptr) {
@@ -965,22 +1006,22 @@ Field::Field(const Field& from)
       options_(from.options_) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  if (!from.name().empty()) {
+  if (from.name().size() > 0) {
     name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.name(),
       GetArenaNoVirtual());
   }
   type_url_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  if (!from.type_url().empty()) {
+  if (from.type_url().size() > 0) {
     type_url_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.type_url(),
       GetArenaNoVirtual());
   }
   json_name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  if (!from.json_name().empty()) {
+  if (from.json_name().size() > 0) {
     json_name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.json_name(),
       GetArenaNoVirtual());
   }
   default_value_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  if (!from.default_value().empty()) {
+  if (from.default_value().size() > 0) {
     default_value_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.default_value(),
       GetArenaNoVirtual());
   }
@@ -1661,6 +1702,25 @@ bool Field::IsInitialized() const {
   return true;
 }
 
+void Field::Swap(Field* other) {
+  if (other == this) return;
+  if (GetArenaNoVirtual() == other->GetArenaNoVirtual()) {
+    InternalSwap(other);
+  } else {
+    Field* temp = New(GetArenaNoVirtual());
+    temp->MergeFrom(*other);
+    other->CopyFrom(*this);
+    InternalSwap(temp);
+    if (GetArenaNoVirtual() == nullptr) {
+      delete temp;
+    }
+  }
+}
+void Field::UnsafeArenaSwap(Field* other) {
+  if (other == this) return;
+  GOOGLE_DCHECK(GetArenaNoVirtual() == other->GetArenaNoVirtual());
+  InternalSwap(other);
+}
 void Field::InternalSwap(Field* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
@@ -1691,13 +1751,13 @@ void Enum::InitAsDefaultInstance() {
   PROTOBUF_NAMESPACE_ID::_Enum_default_instance_._instance.get_mutable()->source_context_ = const_cast< PROTOBUF_NAMESPACE_ID::SourceContext*>(
       PROTOBUF_NAMESPACE_ID::SourceContext::internal_default_instance());
 }
-class Enum::_Internal {
+class Enum::HasBitSetters {
  public:
   static const PROTOBUF_NAMESPACE_ID::SourceContext& source_context(const Enum* msg);
 };
 
 const PROTOBUF_NAMESPACE_ID::SourceContext&
-Enum::_Internal::source_context(const Enum* msg) {
+Enum::HasBitSetters::source_context(const Enum* msg) {
   return *msg->source_context_;
 }
 void Enum::unsafe_arena_set_allocated_source_context(
@@ -1719,6 +1779,14 @@ void Enum::clear_source_context() {
   }
   source_context_ = nullptr;
 }
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int Enum::kNameFieldNumber;
+const int Enum::kEnumvalueFieldNumber;
+const int Enum::kOptionsFieldNumber;
+const int Enum::kSourceContextFieldNumber;
+const int Enum::kSyntaxFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
 Enum::Enum()
   : ::PROTOBUF_NAMESPACE_ID::Message(), _internal_metadata_(nullptr) {
   SharedCtor();
@@ -1740,7 +1808,7 @@ Enum::Enum(const Enum& from)
       options_(from.options_) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  if (!from.name().empty()) {
+  if (from.name().size() > 0) {
     name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.name(),
       GetArenaNoVirtual());
   }
@@ -2009,7 +2077,7 @@ void Enum::SerializeWithCachedSizes(
   // .google.protobuf.SourceContext source_context = 4;
   if (this->has_source_context()) {
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteMessageMaybeToArray(
-      4, _Internal::source_context(this), output);
+      4, HasBitSetters::source_context(this), output);
   }
 
   // .google.protobuf.Syntax syntax = 5;
@@ -2062,7 +2130,7 @@ void Enum::SerializeWithCachedSizes(
   if (this->has_source_context()) {
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
       InternalWriteMessageToArray(
-        4, _Internal::source_context(this), target);
+        4, HasBitSetters::source_context(this), target);
   }
 
   // .google.protobuf.Syntax syntax = 5;
@@ -2192,6 +2260,25 @@ bool Enum::IsInitialized() const {
   return true;
 }
 
+void Enum::Swap(Enum* other) {
+  if (other == this) return;
+  if (GetArenaNoVirtual() == other->GetArenaNoVirtual()) {
+    InternalSwap(other);
+  } else {
+    Enum* temp = New(GetArenaNoVirtual());
+    temp->MergeFrom(*other);
+    other->CopyFrom(*this);
+    InternalSwap(temp);
+    if (GetArenaNoVirtual() == nullptr) {
+      delete temp;
+    }
+  }
+}
+void Enum::UnsafeArenaSwap(Enum* other) {
+  if (other == this) return;
+  GOOGLE_DCHECK(GetArenaNoVirtual() == other->GetArenaNoVirtual());
+  InternalSwap(other);
+}
 void Enum::InternalSwap(Enum* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
@@ -2212,9 +2299,15 @@ void Enum::InternalSwap(Enum* other) {
 
 void EnumValue::InitAsDefaultInstance() {
 }
-class EnumValue::_Internal {
+class EnumValue::HasBitSetters {
  public:
 };
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int EnumValue::kNameFieldNumber;
+const int EnumValue::kNumberFieldNumber;
+const int EnumValue::kOptionsFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 EnumValue::EnumValue()
   : ::PROTOBUF_NAMESPACE_ID::Message(), _internal_metadata_(nullptr) {
@@ -2235,7 +2328,7 @@ EnumValue::EnumValue(const EnumValue& from)
       options_(from.options_) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  if (!from.name().empty()) {
+  if (from.name().size() > 0) {
     name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.name(),
       GetArenaNoVirtual());
   }
@@ -2578,6 +2671,25 @@ bool EnumValue::IsInitialized() const {
   return true;
 }
 
+void EnumValue::Swap(EnumValue* other) {
+  if (other == this) return;
+  if (GetArenaNoVirtual() == other->GetArenaNoVirtual()) {
+    InternalSwap(other);
+  } else {
+    EnumValue* temp = New(GetArenaNoVirtual());
+    temp->MergeFrom(*other);
+    other->CopyFrom(*this);
+    InternalSwap(temp);
+    if (GetArenaNoVirtual() == nullptr) {
+      delete temp;
+    }
+  }
+}
+void EnumValue::UnsafeArenaSwap(EnumValue* other) {
+  if (other == this) return;
+  GOOGLE_DCHECK(GetArenaNoVirtual() == other->GetArenaNoVirtual());
+  InternalSwap(other);
+}
 void EnumValue::InternalSwap(EnumValue* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
@@ -2598,13 +2710,13 @@ void Option::InitAsDefaultInstance() {
   PROTOBUF_NAMESPACE_ID::_Option_default_instance_._instance.get_mutable()->value_ = const_cast< PROTOBUF_NAMESPACE_ID::Any*>(
       PROTOBUF_NAMESPACE_ID::Any::internal_default_instance());
 }
-class Option::_Internal {
+class Option::HasBitSetters {
  public:
   static const PROTOBUF_NAMESPACE_ID::Any& value(const Option* msg);
 };
 
 const PROTOBUF_NAMESPACE_ID::Any&
-Option::_Internal::value(const Option* msg) {
+Option::HasBitSetters::value(const Option* msg) {
   return *msg->value_;
 }
 void Option::unsafe_arena_set_allocated_value(
@@ -2626,6 +2738,11 @@ void Option::clear_value() {
   }
   value_ = nullptr;
 }
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int Option::kNameFieldNumber;
+const int Option::kValueFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
 Option::Option()
   : ::PROTOBUF_NAMESPACE_ID::Message(), _internal_metadata_(nullptr) {
   SharedCtor();
@@ -2643,7 +2760,7 @@ Option::Option(const Option& from)
       _internal_metadata_(nullptr) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  if (!from.name().empty()) {
+  if (from.name().size() > 0) {
     name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.name(),
       GetArenaNoVirtual());
   }
@@ -2820,7 +2937,7 @@ void Option::SerializeWithCachedSizes(
   // .google.protobuf.Any value = 2;
   if (this->has_value()) {
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteMessageMaybeToArray(
-      2, _Internal::value(this), output);
+      2, HasBitSetters::value(this), output);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -2851,7 +2968,7 @@ void Option::SerializeWithCachedSizes(
   if (this->has_value()) {
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
       InternalWriteMessageToArray(
-        2, _Internal::value(this), target);
+        2, HasBitSetters::value(this), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -2942,6 +3059,25 @@ bool Option::IsInitialized() const {
   return true;
 }
 
+void Option::Swap(Option* other) {
+  if (other == this) return;
+  if (GetArenaNoVirtual() == other->GetArenaNoVirtual()) {
+    InternalSwap(other);
+  } else {
+    Option* temp = New(GetArenaNoVirtual());
+    temp->MergeFrom(*other);
+    other->CopyFrom(*this);
+    InternalSwap(temp);
+    if (GetArenaNoVirtual() == nullptr) {
+      delete temp;
+    }
+  }
+}
+void Option::UnsafeArenaSwap(Option* other) {
+  if (other == this) return;
+  GOOGLE_DCHECK(GetArenaNoVirtual() == other->GetArenaNoVirtual());
+  InternalSwap(other);
+}
 void Option::InternalSwap(Option* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
