@@ -196,14 +196,13 @@ inline void WriteLengthDelimited(uint32 num, StringPiece val,
 
 PROTOBUF_EXPORT
 const char* PackedEnumParser(void* object, const char* ptr, ParseContext* ctx,
-                             bool (*is_valid)(int),
-                             InternalMetadataWithArena* unknown, int field_num);
+                             bool (*is_valid)(int), UnknownFieldSet* unknown,
+                             int field_num);
 PROTOBUF_EXPORT
 const char* PackedEnumParserArg(void* object, const char* ptr,
                                 ParseContext* ctx,
                                 bool (*is_valid)(const void*, int),
-                                const void* data,
-                                InternalMetadataWithArena* unknown,
+                                const void* data, UnknownFieldSet* unknown,
                                 int field_num);
 
 PROTOBUF_EXPORT

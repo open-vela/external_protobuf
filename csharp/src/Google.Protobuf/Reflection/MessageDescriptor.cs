@@ -88,12 +88,10 @@ namespace Google.Protobuf.Reflection
                 (type, index) =>
                 new EnumDescriptor(type, file, this, index, generatedCodeInfo?.NestedEnums[index]));
 
-            Extensions = new ExtensionCollection(this, generatedCodeInfo?.Extensions);
-
             fieldsInDeclarationOrder = DescriptorUtil.ConvertAndMakeReadOnly(
                 proto.Field,
                 (field, index) =>
-                new FieldDescriptor(field, file, this, index, generatedCodeInfo?.PropertyNames[index], null));
+                new FieldDescriptor(field, file, this, index, generatedCodeInfo?.PropertyNames[index]));
             fieldsInNumberOrder = new ReadOnlyCollection<FieldDescriptor>(fieldsInDeclarationOrder.OrderBy(field => field.FieldNumber).ToArray());
             // TODO: Use field => field.Proto.JsonName when we're confident it's appropriate. (And then use it in the formatter, too.)
             jsonFieldMap = CreateJsonFieldMap(fieldsInNumberOrder);
@@ -197,11 +195,6 @@ namespace Google.Protobuf.Reflection
         /// </value>
         public FieldCollection Fields { get; }
 
-        /// <summary>
-        /// An unmodifiable list of extensions defined in this message's scrope
-        /// </summary>
-        public ExtensionCollection Extensions { get; }
-
         /// <value>
         /// An unmodifiable list of this message type's nested types.
         /// </value>
@@ -243,27 +236,7 @@ namespace Google.Protobuf.Reflection
         /// <summary>
         /// The (possibly empty) set of custom options for this message.
         /// </summary>
-        //[Obsolete("CustomOptions are obsolete. Use GetOption")]
-        public CustomOptions CustomOptions => new CustomOptions(Proto.Options._extensions?.ValuesByNumber);
-
-        /* // uncomment this in the full proto2 support PR
-        /// <summary>
-        /// Gets a single value enum option for this descriptor
-        /// </summary>
-        public T GetOption<T>(Extension<MessageOptions, T> extension)
-        {
-            var value = Proto.Options.GetExtension(extension);
-            return value is IDeepCloneable<T> clonable ? clonable.Clone() : value;
-        }
-
-        /// <summary>
-        /// Gets a repeated value enum option for this descriptor
-        /// </summary>
-        public Collections.RepeatedField<T> GetOption<T>(RepeatedExtension<MessageOptions, T> extension)
-        {
-            return Proto.Options.GetExtension(extension).Clone();
-        }
-        */
+        public CustomOptions CustomOptions => Proto.Options?.CustomOptions ?? CustomOptions.Empty;
 
         /// <summary>
         /// Looks up and cross-links all fields and nested types.
@@ -284,8 +257,6 @@ namespace Google.Protobuf.Reflection
             {
                 oneof.CrossLink();
             }
-
-            Extensions.CrossLink();
         }
 
         /// <summary>

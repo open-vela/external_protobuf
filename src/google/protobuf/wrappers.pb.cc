@@ -263,7 +263,7 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&PROTOBUF_NAMESPACE_ID::_BytesValue_default_instance_),
 };
 
-const char descriptor_table_protodef_google_2fprotobuf_2fwrappers_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
+const char descriptor_table_protodef_google_2fprotobuf_2fwrappers_2eproto[] =
   "\n\036google/protobuf/wrappers.proto\022\017google"
   ".protobuf\"\034\n\013DoubleValue\022\r\n\005value\030\001 \001(\001\""
   "\033\n\nFloatValue\022\r\n\005value\030\001 \001(\002\"\033\n\nInt64Val"
@@ -307,9 +307,13 @@ PROTOBUF_NAMESPACE_OPEN
 
 void DoubleValue::InitAsDefaultInstance() {
 }
-class DoubleValue::_Internal {
+class DoubleValue::HasBitSetters {
  public:
 };
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int DoubleValue::kValueFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 DoubleValue::DoubleValue()
   : ::PROTOBUF_NAMESPACE_ID::Message(), _internal_metadata_(nullptr) {
@@ -554,6 +558,25 @@ bool DoubleValue::IsInitialized() const {
   return true;
 }
 
+void DoubleValue::Swap(DoubleValue* other) {
+  if (other == this) return;
+  if (GetArenaNoVirtual() == other->GetArenaNoVirtual()) {
+    InternalSwap(other);
+  } else {
+    DoubleValue* temp = New(GetArenaNoVirtual());
+    temp->MergeFrom(*other);
+    other->CopyFrom(*this);
+    InternalSwap(temp);
+    if (GetArenaNoVirtual() == nullptr) {
+      delete temp;
+    }
+  }
+}
+void DoubleValue::UnsafeArenaSwap(DoubleValue* other) {
+  if (other == this) return;
+  GOOGLE_DCHECK(GetArenaNoVirtual() == other->GetArenaNoVirtual());
+  InternalSwap(other);
+}
 void DoubleValue::InternalSwap(DoubleValue* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
@@ -569,9 +592,13 @@ void DoubleValue::InternalSwap(DoubleValue* other) {
 
 void FloatValue::InitAsDefaultInstance() {
 }
-class FloatValue::_Internal {
+class FloatValue::HasBitSetters {
  public:
 };
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int FloatValue::kValueFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 FloatValue::FloatValue()
   : ::PROTOBUF_NAMESPACE_ID::Message(), _internal_metadata_(nullptr) {
@@ -816,6 +843,25 @@ bool FloatValue::IsInitialized() const {
   return true;
 }
 
+void FloatValue::Swap(FloatValue* other) {
+  if (other == this) return;
+  if (GetArenaNoVirtual() == other->GetArenaNoVirtual()) {
+    InternalSwap(other);
+  } else {
+    FloatValue* temp = New(GetArenaNoVirtual());
+    temp->MergeFrom(*other);
+    other->CopyFrom(*this);
+    InternalSwap(temp);
+    if (GetArenaNoVirtual() == nullptr) {
+      delete temp;
+    }
+  }
+}
+void FloatValue::UnsafeArenaSwap(FloatValue* other) {
+  if (other == this) return;
+  GOOGLE_DCHECK(GetArenaNoVirtual() == other->GetArenaNoVirtual());
+  InternalSwap(other);
+}
 void FloatValue::InternalSwap(FloatValue* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
@@ -831,9 +877,13 @@ void FloatValue::InternalSwap(FloatValue* other) {
 
 void Int64Value::InitAsDefaultInstance() {
 }
-class Int64Value::_Internal {
+class Int64Value::HasBitSetters {
  public:
 };
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int Int64Value::kValueFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 Int64Value::Int64Value()
   : ::PROTOBUF_NAMESPACE_ID::Message(), _internal_metadata_(nullptr) {
@@ -1080,6 +1130,25 @@ bool Int64Value::IsInitialized() const {
   return true;
 }
 
+void Int64Value::Swap(Int64Value* other) {
+  if (other == this) return;
+  if (GetArenaNoVirtual() == other->GetArenaNoVirtual()) {
+    InternalSwap(other);
+  } else {
+    Int64Value* temp = New(GetArenaNoVirtual());
+    temp->MergeFrom(*other);
+    other->CopyFrom(*this);
+    InternalSwap(temp);
+    if (GetArenaNoVirtual() == nullptr) {
+      delete temp;
+    }
+  }
+}
+void Int64Value::UnsafeArenaSwap(Int64Value* other) {
+  if (other == this) return;
+  GOOGLE_DCHECK(GetArenaNoVirtual() == other->GetArenaNoVirtual());
+  InternalSwap(other);
+}
 void Int64Value::InternalSwap(Int64Value* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
@@ -1095,9 +1164,13 @@ void Int64Value::InternalSwap(Int64Value* other) {
 
 void UInt64Value::InitAsDefaultInstance() {
 }
-class UInt64Value::_Internal {
+class UInt64Value::HasBitSetters {
  public:
 };
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int UInt64Value::kValueFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 UInt64Value::UInt64Value()
   : ::PROTOBUF_NAMESPACE_ID::Message(), _internal_metadata_(nullptr) {
@@ -1344,6 +1417,25 @@ bool UInt64Value::IsInitialized() const {
   return true;
 }
 
+void UInt64Value::Swap(UInt64Value* other) {
+  if (other == this) return;
+  if (GetArenaNoVirtual() == other->GetArenaNoVirtual()) {
+    InternalSwap(other);
+  } else {
+    UInt64Value* temp = New(GetArenaNoVirtual());
+    temp->MergeFrom(*other);
+    other->CopyFrom(*this);
+    InternalSwap(temp);
+    if (GetArenaNoVirtual() == nullptr) {
+      delete temp;
+    }
+  }
+}
+void UInt64Value::UnsafeArenaSwap(UInt64Value* other) {
+  if (other == this) return;
+  GOOGLE_DCHECK(GetArenaNoVirtual() == other->GetArenaNoVirtual());
+  InternalSwap(other);
+}
 void UInt64Value::InternalSwap(UInt64Value* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
@@ -1359,9 +1451,13 @@ void UInt64Value::InternalSwap(UInt64Value* other) {
 
 void Int32Value::InitAsDefaultInstance() {
 }
-class Int32Value::_Internal {
+class Int32Value::HasBitSetters {
  public:
 };
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int Int32Value::kValueFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 Int32Value::Int32Value()
   : ::PROTOBUF_NAMESPACE_ID::Message(), _internal_metadata_(nullptr) {
@@ -1608,6 +1704,25 @@ bool Int32Value::IsInitialized() const {
   return true;
 }
 
+void Int32Value::Swap(Int32Value* other) {
+  if (other == this) return;
+  if (GetArenaNoVirtual() == other->GetArenaNoVirtual()) {
+    InternalSwap(other);
+  } else {
+    Int32Value* temp = New(GetArenaNoVirtual());
+    temp->MergeFrom(*other);
+    other->CopyFrom(*this);
+    InternalSwap(temp);
+    if (GetArenaNoVirtual() == nullptr) {
+      delete temp;
+    }
+  }
+}
+void Int32Value::UnsafeArenaSwap(Int32Value* other) {
+  if (other == this) return;
+  GOOGLE_DCHECK(GetArenaNoVirtual() == other->GetArenaNoVirtual());
+  InternalSwap(other);
+}
 void Int32Value::InternalSwap(Int32Value* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
@@ -1623,9 +1738,13 @@ void Int32Value::InternalSwap(Int32Value* other) {
 
 void UInt32Value::InitAsDefaultInstance() {
 }
-class UInt32Value::_Internal {
+class UInt32Value::HasBitSetters {
  public:
 };
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int UInt32Value::kValueFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 UInt32Value::UInt32Value()
   : ::PROTOBUF_NAMESPACE_ID::Message(), _internal_metadata_(nullptr) {
@@ -1872,6 +1991,25 @@ bool UInt32Value::IsInitialized() const {
   return true;
 }
 
+void UInt32Value::Swap(UInt32Value* other) {
+  if (other == this) return;
+  if (GetArenaNoVirtual() == other->GetArenaNoVirtual()) {
+    InternalSwap(other);
+  } else {
+    UInt32Value* temp = New(GetArenaNoVirtual());
+    temp->MergeFrom(*other);
+    other->CopyFrom(*this);
+    InternalSwap(temp);
+    if (GetArenaNoVirtual() == nullptr) {
+      delete temp;
+    }
+  }
+}
+void UInt32Value::UnsafeArenaSwap(UInt32Value* other) {
+  if (other == this) return;
+  GOOGLE_DCHECK(GetArenaNoVirtual() == other->GetArenaNoVirtual());
+  InternalSwap(other);
+}
 void UInt32Value::InternalSwap(UInt32Value* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
@@ -1887,9 +2025,13 @@ void UInt32Value::InternalSwap(UInt32Value* other) {
 
 void BoolValue::InitAsDefaultInstance() {
 }
-class BoolValue::_Internal {
+class BoolValue::HasBitSetters {
  public:
 };
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int BoolValue::kValueFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 BoolValue::BoolValue()
   : ::PROTOBUF_NAMESPACE_ID::Message(), _internal_metadata_(nullptr) {
@@ -2134,6 +2276,25 @@ bool BoolValue::IsInitialized() const {
   return true;
 }
 
+void BoolValue::Swap(BoolValue* other) {
+  if (other == this) return;
+  if (GetArenaNoVirtual() == other->GetArenaNoVirtual()) {
+    InternalSwap(other);
+  } else {
+    BoolValue* temp = New(GetArenaNoVirtual());
+    temp->MergeFrom(*other);
+    other->CopyFrom(*this);
+    InternalSwap(temp);
+    if (GetArenaNoVirtual() == nullptr) {
+      delete temp;
+    }
+  }
+}
+void BoolValue::UnsafeArenaSwap(BoolValue* other) {
+  if (other == this) return;
+  GOOGLE_DCHECK(GetArenaNoVirtual() == other->GetArenaNoVirtual());
+  InternalSwap(other);
+}
 void BoolValue::InternalSwap(BoolValue* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
@@ -2149,9 +2310,13 @@ void BoolValue::InternalSwap(BoolValue* other) {
 
 void StringValue::InitAsDefaultInstance() {
 }
-class StringValue::_Internal {
+class StringValue::HasBitSetters {
  public:
 };
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int StringValue::kValueFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 StringValue::StringValue()
   : ::PROTOBUF_NAMESPACE_ID::Message(), _internal_metadata_(nullptr) {
@@ -2170,7 +2335,7 @@ StringValue::StringValue(const StringValue& from)
       _internal_metadata_(nullptr) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   value_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  if (!from.value().empty()) {
+  if (from.value().size() > 0) {
     value_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.value(),
       GetArenaNoVirtual());
   }
@@ -2417,6 +2582,25 @@ bool StringValue::IsInitialized() const {
   return true;
 }
 
+void StringValue::Swap(StringValue* other) {
+  if (other == this) return;
+  if (GetArenaNoVirtual() == other->GetArenaNoVirtual()) {
+    InternalSwap(other);
+  } else {
+    StringValue* temp = New(GetArenaNoVirtual());
+    temp->MergeFrom(*other);
+    other->CopyFrom(*this);
+    InternalSwap(temp);
+    if (GetArenaNoVirtual() == nullptr) {
+      delete temp;
+    }
+  }
+}
+void StringValue::UnsafeArenaSwap(StringValue* other) {
+  if (other == this) return;
+  GOOGLE_DCHECK(GetArenaNoVirtual() == other->GetArenaNoVirtual());
+  InternalSwap(other);
+}
 void StringValue::InternalSwap(StringValue* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
@@ -2433,9 +2617,13 @@ void StringValue::InternalSwap(StringValue* other) {
 
 void BytesValue::InitAsDefaultInstance() {
 }
-class BytesValue::_Internal {
+class BytesValue::HasBitSetters {
  public:
 };
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int BytesValue::kValueFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 BytesValue::BytesValue()
   : ::PROTOBUF_NAMESPACE_ID::Message(), _internal_metadata_(nullptr) {
@@ -2454,7 +2642,7 @@ BytesValue::BytesValue(const BytesValue& from)
       _internal_metadata_(nullptr) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   value_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  if (!from.value().empty()) {
+  if (from.value().size() > 0) {
     value_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.value(),
       GetArenaNoVirtual());
   }
@@ -2689,6 +2877,25 @@ bool BytesValue::IsInitialized() const {
   return true;
 }
 
+void BytesValue::Swap(BytesValue* other) {
+  if (other == this) return;
+  if (GetArenaNoVirtual() == other->GetArenaNoVirtual()) {
+    InternalSwap(other);
+  } else {
+    BytesValue* temp = New(GetArenaNoVirtual());
+    temp->MergeFrom(*other);
+    other->CopyFrom(*this);
+    InternalSwap(temp);
+    if (GetArenaNoVirtual() == nullptr) {
+      delete temp;
+    }
+  }
+}
+void BytesValue::UnsafeArenaSwap(BytesValue* other) {
+  if (other == this) return;
+  GOOGLE_DCHECK(GetArenaNoVirtual() == other->GetArenaNoVirtual());
+  InternalSwap(other);
+}
 void BytesValue::InternalSwap(BytesValue* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);

@@ -161,18 +161,15 @@ class DescriptorPool(object):
 
         if not isinstance(desc, descriptor_type) or (
             old_file != file_name):
-          error_msg = ('Conflict register for file "' + file_name +
-                       '": ' + desc_name +
-                       ' is already defined in file "' +
-                       old_file + '". Please fix the conflict by adding '
-                       'package name on the proto file, or use different '
-                       'name for the duplication.')
+          warn_msg = ('Conflict register for file "' + file_name +
+                      '": ' + desc_name +
+                      ' is already defined in file "' +
+                      old_file + '"')
           if isinstance(desc, descriptor.EnumValueDescriptor):
-            error_msg += ('\nNote: enum values appear as '
-                          'siblings of the enum type instead of '
-                          'children of it.')
-
-          raise TypeError(error_msg)
+            warn_msg += ('\nNote: enum values appear as '
+                         'siblings of the enum type instead of '
+                         'children of it.')
+          warnings.warn(warn_msg, RuntimeWarning)
 
         return
 

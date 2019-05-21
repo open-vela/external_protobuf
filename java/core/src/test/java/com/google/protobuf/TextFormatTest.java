@@ -147,7 +147,7 @@ public class TextFormatTest extends TestCase {
 
   /** Print TestAllTypes and compare with golden file. */
   public void testPrintMessage() throws Exception {
-    String javaText = TextFormat.printer().printToString(TestUtil.getAllSet());
+    String javaText = TextFormat.printToString(TestUtil.getAllSet());
 
     // Java likes to add a trailing ".0" to floats and doubles.  C printf
     // (with %g format) does not.  Our golden files are used for both
@@ -159,7 +159,7 @@ public class TextFormatTest extends TestCase {
 
   /** Print TestAllTypes as Builder and compare with golden file. */
   public void testPrintMessageBuilder() throws Exception {
-    String javaText = TextFormat.printer().printToString(TestUtil.getAllSetBuilder());
+    String javaText = TextFormat.printToString(TestUtil.getAllSetBuilder());
 
     // Java likes to add a trailing ".0" to floats and doubles.  C printf
     // (with %g format) does not.  Our golden files are used for both
@@ -171,7 +171,7 @@ public class TextFormatTest extends TestCase {
 
   /** Print TestAllExtensions and compare with golden file. */
   public void testPrintExtensions() throws Exception {
-    String javaText = TextFormat.printer().printToString(TestUtil.getAllExtensionsSet());
+    String javaText = TextFormat.printToString(TestUtil.getAllExtensionsSet());
 
     // Java likes to add a trailing ".0" to floats and doubles.  C printf
     // (with %g format) does not.  Our golden files are used for both
@@ -237,13 +237,12 @@ public class TextFormatTest extends TestCase {
             + "15: 12379813812177893520\n"
             + "15: 0xabcd1234\n"
             + "15: 0xabcdef1234567890\n",
-        TextFormat.printer().printToString(message));
+        TextFormat.printToString(message));
   }
 
   public void testPrintField() throws Exception {
     final FieldDescriptor dataField = OneString.getDescriptor().findFieldByName("data");
-    assertEquals(
-        "data: \"test data\"\n", TextFormat.printer().printFieldToString(dataField, "test data"));
+    assertEquals("data: \"test data\"\n", TextFormat.printFieldToString(dataField, "test data"));
 
     final FieldDescriptor optionalField =
         TestAllTypes.getDescriptor().findFieldByName("optional_nested_message");
@@ -251,7 +250,7 @@ public class TextFormatTest extends TestCase {
 
     assertEquals(
         "optional_nested_message {\n  bb: 42\n}\n",
-        TextFormat.printer().printFieldToString(optionalField, value));
+        TextFormat.printFieldToString(optionalField, value));
   }
 
   /**
@@ -886,8 +885,7 @@ public class TextFormatTest extends TestCase {
   private void assertPrintFieldValue(String expect, Object value, String fieldName)
       throws Exception {
     StringBuilder sb = new StringBuilder();
-    TextFormat.printer()
-        .printFieldValue(TestAllTypes.getDescriptor().findFieldByName(fieldName), value, sb);
+    TextFormat.printFieldValue(TestAllTypes.getDescriptor().findFieldByName(fieldName), value, sb);
     assertEquals(expect, sb.toString());
   }
 
@@ -904,17 +902,14 @@ public class TextFormatTest extends TestCase {
 
   public void testShortDebugString_field() {
     final FieldDescriptor dataField = OneString.getDescriptor().findFieldByName("data");
-    assertEquals(
-        "data: \"test data\"",
-        TextFormat.printer().shortDebugString(dataField, "test data"));
+    assertEquals("data: \"test data\"", TextFormat.shortDebugString(dataField, "test data"));
 
     final FieldDescriptor optionalField =
         TestAllTypes.getDescriptor().findFieldByName("optional_nested_message");
     final Object value = NestedMessage.newBuilder().setBb(42).build();
 
     assertEquals(
-        "optional_nested_message { bb: 42 }",
-        TextFormat.printer().shortDebugString(optionalField, value));
+        "optional_nested_message { bb: 42 }", TextFormat.shortDebugString(optionalField, value));
   }
 
   public void testShortDebugString_unknown() {
@@ -922,7 +917,7 @@ public class TextFormatTest extends TestCase {
         "5: 1 5: 0x00000002 5: 0x0000000000000003 5: \"4\" 5: { 12: 6 } 5 { 10: 5 }"
             + " 8: 1 8: 2 8: 3 15: 12379813812177893520 15: 0xabcd1234 15:"
             + " 0xabcdef1234567890",
-        TextFormat.printer().shortDebugString(makeUnknownFieldSet()));
+        TextFormat.shortDebugString(makeUnknownFieldSet()));
   }
 
   public void testPrintToUnicodeString() throws Exception {
@@ -930,26 +925,23 @@ public class TextFormatTest extends TestCase {
         "optional_string: \"abc\u3042efg\"\n"
             + "optional_bytes: \"\\343\\201\\202\"\n"
             + "repeated_string: \"\u3093XYZ\"\n",
-        TextFormat.printer()
-            .escapingNonAscii(false)
-            .printToString(
-                TestAllTypes.newBuilder()
-                    .setOptionalString("abc\u3042efg")
-                    .setOptionalBytes(bytes(0xe3, 0x81, 0x82))
-                    .addRepeatedString("\u3093XYZ")
-                    .build()));
+        TextFormat.printToUnicodeString(
+            TestAllTypes.newBuilder()
+                .setOptionalString("abc\u3042efg")
+                .setOptionalBytes(bytes(0xe3, 0x81, 0x82))
+                .addRepeatedString("\u3093XYZ")
+                .build()));
 
     // Double quotes and backslashes should be escaped
     assertEquals(
         "optional_string: \"a\\\\bc\\\"ef\\\"g\"\n",
-        TextFormat.printer()
-            .escapingNonAscii(false)
-            .printToString(TestAllTypes.newBuilder().setOptionalString("a\\bc\"ef\"g").build()));
+        TextFormat.printToUnicodeString(
+            TestAllTypes.newBuilder().setOptionalString("a\\bc\"ef\"g").build()));
 
     // Test escaping roundtrip
     TestAllTypes message = TestAllTypes.newBuilder().setOptionalString("a\\bc\\\"ef\"g").build();
     TestAllTypes.Builder builder = TestAllTypes.newBuilder();
-    TextFormat.merge(TextFormat.printer().escapingNonAscii(false).printToString(message), builder);
+    TextFormat.merge(TextFormat.printToUnicodeString(message), builder);
     assertEquals(message.getOptionalString(), builder.getOptionalString());
   }
 
@@ -957,61 +949,48 @@ public class TextFormatTest extends TestCase {
     // No newlines at start and end
     assertEquals(
         "optional_string: \"test newlines\\n\\nin\\nstring\"\n",
-        TextFormat.printer()
-            .escapingNonAscii(false)
-            .printToString(
-                TestAllTypes.newBuilder()
-                    .setOptionalString("test newlines\n\nin\nstring")
-                    .build()));
+        TextFormat.printToUnicodeString(
+            TestAllTypes.newBuilder().setOptionalString("test newlines\n\nin\nstring").build()));
 
     // Newlines at start and end
     assertEquals(
         "optional_string: \"\\ntest\\nnewlines\\n\\nin\\nstring\\n\"\n",
-        TextFormat.printer()
-            .escapingNonAscii(false)
-            .printToString(
-                TestAllTypes.newBuilder()
-                    .setOptionalString("\ntest\nnewlines\n\nin\nstring\n")
-                    .build()));
+        TextFormat.printToUnicodeString(
+            TestAllTypes.newBuilder()
+                .setOptionalString("\ntest\nnewlines\n\nin\nstring\n")
+                .build()));
 
     // Strings with 0, 1 and 2 newlines.
     assertEquals(
         "optional_string: \"\"\n",
-        TextFormat.printer()
-            .escapingNonAscii(false)
-            .printToString(TestAllTypes.newBuilder().setOptionalString("").build()));
+        TextFormat.printToUnicodeString(TestAllTypes.newBuilder().setOptionalString("").build()));
     assertEquals(
         "optional_string: \"\\n\"\n",
-        TextFormat.printer()
-            .escapingNonAscii(false)
-            .printToString(TestAllTypes.newBuilder().setOptionalString("\n").build()));
+        TextFormat.printToUnicodeString(TestAllTypes.newBuilder().setOptionalString("\n").build()));
     assertEquals(
         "optional_string: \"\\n\\n\"\n",
-        TextFormat.printer()
-            .escapingNonAscii(false)
-            .printToString(TestAllTypes.newBuilder().setOptionalString("\n\n").build()));
+        TextFormat.printToUnicodeString(
+            TestAllTypes.newBuilder().setOptionalString("\n\n").build()));
 
     // Test escaping roundtrip
     TestAllTypes message =
         TestAllTypes.newBuilder().setOptionalString("\ntest\nnewlines\n\nin\nstring\n").build();
     TestAllTypes.Builder builder = TestAllTypes.newBuilder();
-    TextFormat.merge(TextFormat.printer().escapingNonAscii(false).printToString(message), builder);
+    TextFormat.merge(TextFormat.printToUnicodeString(message), builder);
     assertEquals(message.getOptionalString(), builder.getOptionalString());
   }
 
   public void testPrintToUnicodeString_unknown() {
     assertEquals(
         "1: \"\\343\\201\\202\"\n",
-        TextFormat.printer()
-            .escapingNonAscii(false)
-            .printToString(
-                UnknownFieldSet.newBuilder()
-                    .addField(
-                        1,
-                        UnknownFieldSet.Field.newBuilder()
-                            .addLengthDelimited(bytes(0xe3, 0x81, 0x82))
-                            .build())
-                    .build()));
+        TextFormat.printToUnicodeString(
+            UnknownFieldSet.newBuilder()
+                .addField(
+                    1,
+                    UnknownFieldSet.Field.newBuilder()
+                        .addLengthDelimited(bytes(0xe3, 0x81, 0x82))
+                        .build())
+                .build()));
   }
 
 
@@ -1021,46 +1000,46 @@ public class TextFormatTest extends TestCase {
     logger.addHandler(logHandler);
     // Test unknown extension can pass.
     assertParseSuccessWithUnknownExtensions("[unknown_extension]: 123");
-    assertParseSuccessWithUnknownExtensions(
-        "[unknown_extension]: 123\n" + "[unknown_ext]: inf\n" + "[unknown]: 1.234");
+    assertParseSuccessWithUnknownExtensions("[unknown_extension]: 123\n"
+        + "[unknown_ext]: inf\n"
+        + "[unknown]: 1.234");
     // Test warning messages.
-    assertEquals(
-        "Input contains unknown fields and/or extensions:\n"
-            + "1:2:\tprotobuf_unittest.TestAllTypes.[unknown_extension]",
+    assertEquals("Input contains unknown fields and/or extensions:\n"
+        + "1:2:\tprotobuf_unittest.TestAllTypes.[unknown_extension]",
         logHandler.getStoredLogRecords().get(0).getMessage());
-    assertEquals(
-        "Input contains unknown fields and/or extensions:\n"
-            + "1:2:\tprotobuf_unittest.TestAllTypes.[unknown_extension]\n"
-            + "2:2:\tprotobuf_unittest.TestAllTypes.[unknown_ext]\n"
-            + "3:2:\tprotobuf_unittest.TestAllTypes.[unknown]",
+    assertEquals("Input contains unknown fields and/or extensions:\n"
+        + "1:2:\tprotobuf_unittest.TestAllTypes.[unknown_extension]\n"
+        + "2:2:\tprotobuf_unittest.TestAllTypes.[unknown_ext]\n"
+        + "3:2:\tprotobuf_unittest.TestAllTypes.[unknown]",
         logHandler.getStoredLogRecords().get(1).getMessage());
 
     // Test unknown field can not pass.
     assertParseErrorWithUnknownExtensions(
         "2:1: Input contains unknown fields and/or extensions:\n"
-            + "1:2:\tprotobuf_unittest.TestAllTypes.[unknown_extension]\n"
-            + "2:1:\tprotobuf_unittest.TestAllTypes.unknown_field",
-        "[unknown_extension]: 1\n" + "unknown_field: 12345");
+        + "1:2:\tprotobuf_unittest.TestAllTypes.[unknown_extension]\n"
+        + "2:1:\tprotobuf_unittest.TestAllTypes.unknown_field",
+        "[unknown_extension]: 1\n"
+        + "unknown_field: 12345");
     assertParseErrorWithUnknownExtensions(
         "3:1: Input contains unknown fields and/or extensions:\n"
-            + "1:2:\tprotobuf_unittest.TestAllTypes.[unknown_extension1]\n"
-            + "2:2:\tprotobuf_unittest.TestAllTypes.[unknown_extension2]\n"
-            + "3:1:\tprotobuf_unittest.TestAllTypes.unknown_field\n"
-            + "4:2:\tprotobuf_unittest.TestAllTypes.[unknown_extension3]",
+        + "1:2:\tprotobuf_unittest.TestAllTypes.[unknown_extension1]\n"
+        + "2:2:\tprotobuf_unittest.TestAllTypes.[unknown_extension2]\n"
+        + "3:1:\tprotobuf_unittest.TestAllTypes.unknown_field\n"
+        + "4:2:\tprotobuf_unittest.TestAllTypes.[unknown_extension3]",
         "[unknown_extension1]: 1\n"
-            + "[unknown_extension2]: 2\n"
-            + "unknown_field: 12345\n"
-            + "[unknown_extension3]: 3\n");
+        + "[unknown_extension2]: 2\n"
+        + "unknown_field: 12345\n"
+        + "[unknown_extension3]: 3\n");
     assertParseErrorWithUnknownExtensions(
         "1:1: Input contains unknown fields and/or extensions:\n"
-            + "1:1:\tprotobuf_unittest.TestAllTypes.unknown_field1\n"
-            + "2:1:\tprotobuf_unittest.TestAllTypes.unknown_field2\n"
-            + "3:2:\tprotobuf_unittest.TestAllTypes.[unknown_extension]\n"
-            + "4:1:\tprotobuf_unittest.TestAllTypes.unknown_field3",
+        + "1:1:\tprotobuf_unittest.TestAllTypes.unknown_field1\n"
+        + "2:1:\tprotobuf_unittest.TestAllTypes.unknown_field2\n"
+        + "3:2:\tprotobuf_unittest.TestAllTypes.[unknown_extension]\n"
+        + "4:1:\tprotobuf_unittest.TestAllTypes.unknown_field3",
         "unknown_field1: 1\n"
-            + "unknown_field2: 2\n"
-            + "[unknown_extension]: 12345\n"
-            + "unknown_field3: 3\n");
+        + "unknown_field2: 2\n"
+        + "[unknown_extension]: 12345\n"
+        + "unknown_field3: 3\n");
   }
 
   // See additional coverage in testOneofOverwriteForbidden and testMapOverwriteForbidden.
@@ -1141,7 +1120,7 @@ public class TextFormatTest extends TestCase {
     TestUtil.setOneof(builder);
     TestOneof2 message = builder.build();
     TestOneof2.Builder dest = TestOneof2.newBuilder();
-    TextFormat.merge(TextFormat.printer().escapingNonAscii(false).printToString(message), dest);
+    TextFormat.merge(TextFormat.printToUnicodeString(message), dest);
     TestUtil.assertOneofSet(dest.build());
   }
 
@@ -1180,7 +1159,7 @@ public class TextFormatTest extends TestCase {
             .putInt32ToStringField(20, "banana")
             .putInt32ToStringField(30, "cherry")
             .build();
-    String text = TextFormat.printer().escapingNonAscii(false).printToString(message);
+    String text = TextFormat.printToUnicodeString(message);
     {
       TestMap.Builder dest = TestMap.newBuilder();
       TextFormat.merge(text, dest);

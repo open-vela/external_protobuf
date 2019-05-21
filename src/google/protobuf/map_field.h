@@ -225,6 +225,9 @@ class MapField : public TypeDefinedMapFieldBase<Key, T> {
 
   // Define message type for internal repeated field.
   typedef Derived EntryType;
+  typedef MapEntryLite<Derived, Key, T, kKeyFieldType, kValueFieldType,
+                       default_enum_value>
+      EntryLiteType;
 
   // Define abbreviation for parent MapFieldLite
   typedef MapFieldLite<Derived, Key, T, kKeyFieldType, kValueFieldType,
@@ -662,7 +665,7 @@ class PROTOBUF_EXPORT MapValueRef {
   template <typename K, typename V>
   friend class internal::TypeDefinedMapFieldBase;
   friend class ::PROTOBUF_NAMESPACE_ID::MapIterator;
-  friend class Reflection;
+  friend class internal::GeneratedMessageReflection;
   friend class internal::DynamicMapField;
 
   void SetType(FieldDescriptor::CppType type) { type_ = type; }

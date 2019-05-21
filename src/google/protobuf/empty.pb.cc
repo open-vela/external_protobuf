@@ -54,7 +54,7 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&PROTOBUF_NAMESPACE_ID::_Empty_default_instance_),
 };
 
-const char descriptor_table_protodef_google_2fprotobuf_2fempty_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
+const char descriptor_table_protodef_google_2fprotobuf_2fempty_2eproto[] =
   "\n\033google/protobuf/empty.proto\022\017google.pr"
   "otobuf\"\007\n\005EmptyBv\n\023com.google.protobufB\n"
   "EmptyProtoP\001Z\'github.com/golang/protobuf"
@@ -83,9 +83,12 @@ PROTOBUF_NAMESPACE_OPEN
 
 void Empty::InitAsDefaultInstance() {
 }
-class Empty::_Internal {
+class Empty::HasBitSetters {
  public:
 };
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 Empty::Empty()
   : ::PROTOBUF_NAMESPACE_ID::Message(), _internal_metadata_(nullptr) {
@@ -283,6 +286,25 @@ bool Empty::IsInitialized() const {
   return true;
 }
 
+void Empty::Swap(Empty* other) {
+  if (other == this) return;
+  if (GetArenaNoVirtual() == other->GetArenaNoVirtual()) {
+    InternalSwap(other);
+  } else {
+    Empty* temp = New(GetArenaNoVirtual());
+    temp->MergeFrom(*other);
+    other->CopyFrom(*this);
+    InternalSwap(temp);
+    if (GetArenaNoVirtual() == nullptr) {
+      delete temp;
+    }
+  }
+}
+void Empty::UnsafeArenaSwap(Empty* other) {
+  if (other == this) return;
+  GOOGLE_DCHECK(GetArenaNoVirtual() == other->GetArenaNoVirtual());
+  InternalSwap(other);
+}
 void Empty::InternalSwap(Empty* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);

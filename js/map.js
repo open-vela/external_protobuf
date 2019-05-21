@@ -32,8 +32,8 @@ goog.provide('jspb.Map');
 
 goog.require('goog.asserts');
 
-goog.requireType('jspb.BinaryReader');
-goog.requireType('jspb.BinaryWriter');
+goog.forwardDeclare('jspb.BinaryReader');
+goog.forwardDeclare('jspb.BinaryWriter');
 
 
 
