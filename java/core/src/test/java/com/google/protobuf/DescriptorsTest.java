@@ -30,9 +30,6 @@
 
 package com.google.protobuf;
 
-import static junit.framework.TestCase.assertFalse;
-import static junit.framework.TestCase.assertTrue;
-
 import protobuf_unittest.NestedExtension;
 import protobuf_unittest.NonNestedExtension;
 import com.google.protobuf.DescriptorProtos.DescriptorProto;
@@ -323,7 +320,6 @@ public class DescriptorsTest extends TestCase {
     assertEquals(UnittestProto.BarRequest.getDescriptor(), barMethod.getInputType());
     assertEquals(UnittestProto.BarResponse.getDescriptor(), barMethod.getOutputType());
     assertEquals(barMethod, service.findMethodByName("Bar"));
-
 
     assertNull(service.findMethodByName("NoSuchMethod"));
 

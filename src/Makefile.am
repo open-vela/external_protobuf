@@ -18,7 +18,7 @@ else
 PTHREAD_DEF =
 endif
 
-PROTOBUF_VERSION = 18:1:0
+PROTOBUF_VERSION = 19:0:0
 
 if GCC
 # Turn on all warnings except for sign comparison (we ignore sign comparison
@@ -202,7 +202,6 @@ libprotobuf_lite_la_SOURCES =                                  \
   google/protobuf/any_lite.cc                                  \
   google/protobuf/arena.cc                                     \
   google/protobuf/extension_set.cc                             \
-  google/protobuf/generated_enum_util.cc                       \
   google/protobuf/generated_message_util.cc                    \
   google/protobuf/generated_message_table_driven_lite.h        \
   google/protobuf/generated_message_table_driven_lite.cc       \
@@ -215,7 +214,6 @@ libprotobuf_lite_la_SOURCES =                                  \
   google/protobuf/io/coded_stream_inl.h                        \
   google/protobuf/io/strtod.cc                                 \
   google/protobuf/io/zero_copy_stream.cc                       \
-  google/protobuf/io/zero_copy_stream_impl.cc                  \
   google/protobuf/io/zero_copy_stream_impl_lite.cc
 
 libprotobuf_la_LIBADD = $(PTHREAD_LIBS) $(LIBATOMIC_LIBS)
@@ -260,6 +258,7 @@ libprotobuf_la_SOURCES =                                       \
   google/protobuf/io/gzip_stream.cc                            \
   google/protobuf/io/printer.cc                                \
   google/protobuf/io/tokenizer.cc                              \
+  google/protobuf/io/zero_copy_stream_impl.cc                  \
   google/protobuf/compiler/importer.cc                         \
   google/protobuf/compiler/parser.cc                           \
   google/protobuf/util/delimited_message_util.cc               \
