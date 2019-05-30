@@ -1689,6 +1689,27 @@ void Generator::FindProvides(const GeneratorOptions& options,
   printer->Print("\n");
 }
 
+void FindProvidesForOneOfEnum(const GeneratorOptions& options,
+                              const OneofDescriptor* oneof,
+                              std::set<std::string>* provided) {
+  std::string name = GetMessagePath(options, oneof->containing_type()) + "." +
+                     JSOneofName(oneof) + "Case";
+  provided->insert(name);
+}
+
+void FindProvidesForOneOfEnums(const GeneratorOptions& options,
+                               io::Printer* printer, const Descriptor* desc,
+                               std::set<std::string>* provided) {
+  if (HasOneofFields(desc)) {
+    for (int i = 0; i < desc->oneof_decl_count(); i++) {
+      if (IgnoreOneof(desc->oneof_decl(i))) {
+        continue;
+      }
+      FindProvidesForOneOfEnum(options, desc->oneof_decl(i), provided);
+    }
+  }
+}
+
 void Generator::FindProvidesForMessage(const GeneratorOptions& options,
                                        io::Printer* printer,
                                        const Descriptor* desc,
@@ -1703,11 +1724,13 @@ void Generator::FindProvidesForMessage(const GeneratorOptions& options,
   for (int i = 0; i < desc->enum_type_count(); i++) {
     FindProvidesForEnum(options, printer, desc->enum_type(i), provided);
   }
+
+  FindProvidesForOneOfEnums(options, printer, desc, provided);
+
   for (int i = 0; i < desc->nested_type_count(); i++) {
     FindProvidesForMessage(options, printer, desc->nested_type(i), provided);
   }
 }
-
 void Generator::FindProvidesForEnum(const GeneratorOptions& options,
                                     io::Printer* printer,
                                     const EnumDescriptor* enumdesc,
@@ -2403,18 +2426,22 @@ void Generator::GenerateObjectTypedef(const GeneratorOptions& options,
       "method.\n"
       " * @record\n"
       " */\n"
-      "$typeName$ = function() {};\n\n",
+      "$typeName$ = function() {\n",
       "messageName", desc->name(), "typeName", type_name);
 
   for (int i = 0; i < desc->field_count(); i++) {
+    if (i > 0) {
+      printer->Print("\n");
+    }
     printer->Print(
-        "/** @type {$fieldType$|undefined} */\n"
-        "$typeName$.prototype.$fieldName$;\n\n",
-        "typeName", type_name, "fieldName",
-        JSObjectFieldName(options, desc->field(i)),
+        "  /** @type {$fieldType$|undefined} */\n"
+        "  this.$fieldName$;\n",
+        "fieldName", JSObjectFieldName(options, desc->field(i)),
         // TODO(b/121097361): Add type checking for field values.
         "fieldType", "?");
   }
+
+  printer->Print("};\n\n");
 }
 
 void Generator::GenerateClassFromObject(const GeneratorOptions& options,
@@ -3704,7 +3731,12 @@ bool Generator::GenerateAll(const std::vector<const FileDescriptor*>& files,
                            options.GetFileNameExtension();
     std::unique_ptr<io::ZeroCopyOutputStream> output(context->Open(filename));
     GOOGLE_CHECK(output.get());
-    io::Printer printer(output.get(), '$');
+    GeneratedCodeInfo annotations;
+    io::AnnotationProtoCollector<GeneratedCodeInfo> annotation_collector(
+        &annotations);
+    io::Printer printer(
+        output.get(), '$',
+        options.annotate_code ? &annotation_collector : nullptr);
 
     // Pull out all extensions -- we need these to generate all
     // provides/requires.
@@ -3735,6 +3767,9 @@ bool Generator::GenerateAll(const std::vector<const FileDescriptor*>& files,
 
     if (printer.failed()) {
       return false;
+    }
+    if (options.annotate_code) {
+      EmbedCodeAnnotations(annotations, &printer);
     }
   } else if (options.output_mode() == GeneratorOptions::kOneOutputFilePerSCC) {
     std::set<const Descriptor*> have_printed;
