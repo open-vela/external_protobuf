@@ -285,14 +285,14 @@
 
 // Shared google3/opensource definitions. //////////////////////////////////////
 
-#define PROTOBUF_VERSION 3008000
-#define PROTOBUF_MIN_HEADER_VERSION_FOR_PROTOC 3008000
-#define PROTOBUF_MIN_PROTOC_VERSION 3008000
+#define PROTOBUF_VERSION 3007001
+#define PROTOBUF_MIN_HEADER_VERSION_FOR_PROTOC 3007000
+#define PROTOBUF_MIN_PROTOC_VERSION 3007000
 #define PROTOBUF_VERSION_SUFFIX ""
 
 // The minimum library version which works with the current version of the
 // headers.
-#define GOOGLE_PROTOBUF_MIN_LIBRARY_VERSION 3008000
+#define GOOGLE_PROTOBUF_MIN_LIBRARY_VERSION 3007000
 
 #if defined(GOOGLE_PROTOBUF_NO_RTTI) && GOOGLE_PROTOBUF_NO_RTTI
 #define PROTOBUF_RTTI 0
@@ -350,7 +350,11 @@
 #ifdef _MSC_VER
 #pragma push_macro("GetMessage")
 #undef GetMessage
-#endif
+#pragma push_macro("IGNORE")
+#undef IGNORE
+#pragma push_macro("IN")
+#undef IN
+#endif  // _MSC_VER
 
 #if defined(__clang__)
 #pragma clang diagnostic push
