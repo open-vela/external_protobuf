@@ -42,7 +42,7 @@ def _generate_output_file(ctx, src, extension):
     else:
         real_short_path = paths.relativize(src.short_path, ctx.label.package)
     output_filename = paths.replace_extension(real_short_path, extension)
-    ret = ctx.actions.declare_file(output_filename)
+    ret = ctx.new_file(ctx.genfiles_dir, output_filename)
     return ret
 
 def _filter_none(elems):
@@ -149,13 +149,12 @@ _WrappedGeneratedSrcs = provider(fields = ["srcs"])
 def _compile_upb_protos(ctx, proto_info, proto_sources, ext):
     srcs = [_generate_output_file(ctx, name, ext + ".c") for name in proto_sources]
     hdrs = [_generate_output_file(ctx, name, ext + ".h") for name in proto_sources]
-    transitive_sets = proto_info.transitive_descriptor_sets.to_list()
+    transitive_sets = list(proto_info.transitive_descriptor_sets)
     ctx.actions.run(
         inputs = depset(
-            direct = [proto_info.direct_descriptor_set],
+            direct = [ctx.executable._upbc, proto_info.direct_descriptor_set],
             transitive = [proto_info.transitive_descriptor_sets],
         ),
-        tools = [ctx.executable._upbc],
         outputs = srcs + hdrs,
         executable = ctx.executable._protoc,
         arguments = [
