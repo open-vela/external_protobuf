@@ -30,19 +30,26 @@ const uint8_t upb_desctype_to_fieldtype[] = {
 
 /* Data pertaining to the parse. */
 typedef struct {
-  /* Current decoding pointer.  Points to the beginning of a field until we
-   * have finished decoding the whole field. */
-  const char *ptr;
+  /* Parsing limit: either end of delimited region or end of buffer. */
+  const char *limit;
+
+  /* Signals how the parse ended:
+   * - when 0: parse ended at delimited limit.
+   * - when 1: parse ended due to end-of-stream.
+   * - otherwise: parse ended due to a terminating tag (either 0 or END_GROUP).
+   *
+   * In the last case, tag-1 is stored, to avoid conflicting with case 0. */
+  uint32_t parse_status;
+
+  upb_arena *arena;
 } upb_decstate;
 
-/* Data pertaining to a single message frame. */
+/* Data passed by value to each parsing function. */
 typedef struct {
-  const char *limit;
-  int32_t group_number;  /* 0 if we are not parsing a group. */
-
-  /* These members are unset for an unknown group frame. */
+  const char *ptr,
   char *msg;
   const upb_msglayout *m;
+  upb_decstate *state;
 } upb_decframe;
 
 #define CHK(x) if (!(x)) { return false; }
@@ -132,7 +139,7 @@ static void upb_set32(void *msg, size_t ofs, uint32_t val) {
 
 static bool upb_append_unknown(upb_decstate *d, upb_decframe *frame,
                                const char *start) {
-  upb_msg_addunknown(frame->msg, start, d->ptr - start);
+  upb_msg_addunknown(frame->msg, start, d->ptr - start, d->arena);
   return true;
 }
 
@@ -559,10 +566,11 @@ static bool upb_decode_message(upb_decstate *d, const char *limit,
   return true;
 }
 
-bool upb_decode(const char *buf, size_t size, void *msg,
-                const upb_msglayout *l) {
+bool upb_decode(const char *buf, size_t size, void *msg, const upb_msglayout *l,
+                upb_arena *arena) {
   upb_decstate state;
   state.ptr = buf;
+  state.arena = arena;
 
   return upb_decode_message(&state, buf + size, 0, msg, l);
 }
