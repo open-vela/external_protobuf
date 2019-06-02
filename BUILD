@@ -50,11 +50,7 @@ cc_library(
     srcs = [
         "upb/decode.c",
         "upb/encode.c",
-        "upb/generated_util.h",
         "upb/msg.c",
-        "upb/msg.h",
-        "upb/port_def.inc",
-        "upb/port_undef.inc",
         "upb/table.c",
         "upb/table.int.h",
         "upb/upb.c",
@@ -62,30 +58,16 @@ cc_library(
     hdrs = [
         "upb/decode.h",
         "upb/encode.h",
+        "upb/generated_util.h",
+        "upb/msg.h",
         "upb/upb.h",
     ],
     copts = COPTS,
-    visibility = ["//visibility:public"],
-)
-
-# Common support routines used by generated code.  This library has no
-# implementation, but depends on :upb and exposes a few more hdrs.
-#
-# This is public only because we have no way of visibility-limiting it to
-# upb_proto_library() only.  This interface is not stable and by using it you
-# give up any backward compatibility guarantees.
-cc_library(
-    name = "generated_code_support__only_for_generated_code_do_not_use__i_give_permission_to_break_me",
+    # Internal-only, but we have to make them public for generated code.
     textual_hdrs = [
         "upb/port_def.inc",
         "upb/port_undef.inc",
     ],
-    hdrs = [
-        "upb/generated_util.h",
-        "upb/msg.h",
-    ],
-    deps = [":upb"],
-    copts = COPTS,
     visibility = ["//visibility:public"],
 )
 
