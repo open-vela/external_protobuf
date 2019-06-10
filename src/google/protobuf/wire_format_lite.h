@@ -244,7 +244,9 @@ class PROTOBUF_EXPORT WireFormatLite {
   static int64 ZigZagDecode64(uint64 n);
 
   // =================================================================
-  // Methods for reading/writing individual field.
+  // Methods for reading/writing individual field.  The implementations
+  // of these methods are defined in wire_format_lite_inl.h; you must #include
+  // that file to use these.
 
   // Read fields, not including tags.  The assumption is that you already
   // read the tag to determine what field to read.

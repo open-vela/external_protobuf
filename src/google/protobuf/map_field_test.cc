@@ -58,6 +58,12 @@ class MapFieldBaseStub : public MapFieldBase {
   typedef void DestructorSkippable_;
   MapFieldBaseStub() {}
   explicit MapFieldBaseStub(Arena* arena) : MapFieldBase(arena) {}
+  void SyncRepeatedFieldWithMap() const {
+    MapFieldBase::SyncRepeatedFieldWithMap();
+  }
+  void SyncMapWithRepeatedField() const {
+    MapFieldBase::SyncMapWithRepeatedField();
+  }
   // Get underlined repeated field without synchronizing map.
   RepeatedPtrField<Message>* InternalRepeatedField() { return repeated_field_; }
   bool IsMapClean() {
@@ -93,6 +99,8 @@ class MapFieldBaseStub : public MapFieldBase {
   void CopyIterator(MapIterator* this_iterator,
                     const MapIterator& other_iterator) const override {}
   void IncreaseIterator(MapIterator* map_iter) const override {}
+  void SetDefaultMessageEntry(const Message* message) const {}
+  const Message* GetDefaultMessageEntry() const { return NULL; }
 };
 
 class MapFieldBasePrimitiveTest : public ::testing::Test {

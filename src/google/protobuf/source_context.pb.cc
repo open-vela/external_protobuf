@@ -55,7 +55,7 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&PROTOBUF_NAMESPACE_ID::_SourceContext_default_instance_),
 };
 
-const char descriptor_table_protodef_google_2fprotobuf_2fsource_5fcontext_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
+const char descriptor_table_protodef_google_2fprotobuf_2fsource_5fcontext_2eproto[] =
   "\n$google/protobuf/source_context.proto\022\017"
   "google.protobuf\"\"\n\rSourceContext\022\021\n\tfile"
   "_name\030\001 \001(\tB\225\001\n\023com.google.protobufB\022Sou"
@@ -86,7 +86,7 @@ PROTOBUF_NAMESPACE_OPEN
 
 void SourceContext::InitAsDefaultInstance() {
 }
-class SourceContext::_Internal {
+class SourceContext::HasBitSetters {
  public:
 };
 
@@ -104,7 +104,7 @@ SourceContext::SourceContext(const SourceContext& from)
       _internal_metadata_(nullptr) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   file_name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  if (!from.file_name().empty()) {
+  if (from.file_name().size() > 0) {
     file_name_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.file_name_);
   }
   // @@protoc_insertion_point(copy_constructor:google.protobuf.SourceContext)
