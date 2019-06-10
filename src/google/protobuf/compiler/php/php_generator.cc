@@ -921,7 +921,7 @@ void GenerateMessageToPool(const string& name_prefix, const Descriptor* message,
           "field", field->name(),
           "key", ToUpper(key->type_name()),
           "value", ToUpper(val->type_name()),
-          "number", SimpleItoa(field->number()),
+          "number", StrCat(field->number()),
           "other", EnumOrMessageSuffix(val, true));
     } else if (!field->containing_oneof()) {
       printer->Print(
@@ -930,7 +930,7 @@ void GenerateMessageToPool(const string& name_prefix, const Descriptor* message,
           "field", field->name(),
           "label", LabelForField(field),
           "type", ToUpper(field->type_name()),
-          "number", SimpleItoa(field->number()),
+          "number", StrCat(field->number()),
           "other", EnumOrMessageSuffix(field, true));
     }
   }
@@ -948,7 +948,7 @@ void GenerateMessageToPool(const string& name_prefix, const Descriptor* message,
           "\\Google\\Protobuf\\Internal\\GPBType::^type^, ^number^^other^)\n",
           "field", field->name(),
           "type", ToUpper(field->type_name()),
-          "number", SimpleItoa(field->number()),
+          "number", StrCat(field->number()),
           "other", EnumOrMessageSuffix(field, true));
     }
     printer->Print("->finish()\n");
