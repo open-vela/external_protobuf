@@ -30,9 +30,6 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
-using Google.Protobuf.Collections;
-using System;
-
 namespace Google.Protobuf.Reflection
 {
     /// <summary>
@@ -73,27 +70,7 @@ namespace Google.Protobuf.Reflection
         /// <summary>
         /// The (possibly empty) set of custom options for this method.
         /// </summary>
-        //[Obsolete("CustomOptions are obsolete. Use GetOption")]
-        public CustomOptions CustomOptions => new CustomOptions(Proto.Options._extensions?.ValuesByNumber);
-
-        /* // uncomment this in the full proto2 support PR
-        /// <summary>
-        /// Gets a single value enum option for this descriptor
-        /// </summary>
-        public T GetOption<T>(Extension<MethodOptions, T> extension)
-        {
-            var value = Proto.Options.GetExtension(extension);
-            return value is IDeepCloneable<T> clonable ? clonable.Clone() : value;
-        }
-
-        /// <summary>
-        /// Gets a repeated value enum option for this descriptor
-        /// </summary>
-        public RepeatedField<T> GetOption<T>(RepeatedExtension<MethodOptions, T> extension)
-        {
-            return Proto.Options.GetExtension(extension).Clone();
-        }
-        */
+        public CustomOptions CustomOptions => Proto.Options?.CustomOptions ?? CustomOptions.Empty;
 
         internal MethodDescriptor(MethodDescriptorProto proto, FileDescriptor file,
                                   ServiceDescriptor parent, int index)
@@ -129,4 +106,3 @@ namespace Google.Protobuf.Reflection
         }
     }
 }
- 

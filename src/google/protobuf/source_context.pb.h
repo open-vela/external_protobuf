@@ -189,7 +189,7 @@ class PROTOBUF_EXPORT SourceContext :
 
   // @@protoc_insertion_point(class_scope:google.protobuf.SourceContext)
  private:
-  class _Internal;
+  class HasBitSetters;
 
   ::PROTOBUF_NAMESPACE_ID::internal::InternalMetadataWithArena _internal_metadata_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr file_name_;

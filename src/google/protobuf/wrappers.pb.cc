@@ -263,7 +263,7 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&PROTOBUF_NAMESPACE_ID::_BytesValue_default_instance_),
 };
 
-const char descriptor_table_protodef_google_2fprotobuf_2fwrappers_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
+const char descriptor_table_protodef_google_2fprotobuf_2fwrappers_2eproto[] =
   "\n\036google/protobuf/wrappers.proto\022\017google"
   ".protobuf\"\034\n\013DoubleValue\022\r\n\005value\030\001 \001(\001\""
   "\033\n\nFloatValue\022\r\n\005value\030\001 \001(\002\"\033\n\nInt64Val"
@@ -307,7 +307,7 @@ PROTOBUF_NAMESPACE_OPEN
 
 void DoubleValue::InitAsDefaultInstance() {
 }
-class DoubleValue::_Internal {
+class DoubleValue::HasBitSetters {
  public:
 };
 
@@ -592,7 +592,7 @@ void DoubleValue::InternalSwap(DoubleValue* other) {
 
 void FloatValue::InitAsDefaultInstance() {
 }
-class FloatValue::_Internal {
+class FloatValue::HasBitSetters {
  public:
 };
 
@@ -877,7 +877,7 @@ void FloatValue::InternalSwap(FloatValue* other) {
 
 void Int64Value::InitAsDefaultInstance() {
 }
-class Int64Value::_Internal {
+class Int64Value::HasBitSetters {
  public:
 };
 
@@ -1164,7 +1164,7 @@ void Int64Value::InternalSwap(Int64Value* other) {
 
 void UInt64Value::InitAsDefaultInstance() {
 }
-class UInt64Value::_Internal {
+class UInt64Value::HasBitSetters {
  public:
 };
 
@@ -1451,7 +1451,7 @@ void UInt64Value::InternalSwap(UInt64Value* other) {
 
 void Int32Value::InitAsDefaultInstance() {
 }
-class Int32Value::_Internal {
+class Int32Value::HasBitSetters {
  public:
 };
 
@@ -1738,7 +1738,7 @@ void Int32Value::InternalSwap(Int32Value* other) {
 
 void UInt32Value::InitAsDefaultInstance() {
 }
-class UInt32Value::_Internal {
+class UInt32Value::HasBitSetters {
  public:
 };
 
@@ -2025,7 +2025,7 @@ void UInt32Value::InternalSwap(UInt32Value* other) {
 
 void BoolValue::InitAsDefaultInstance() {
 }
-class BoolValue::_Internal {
+class BoolValue::HasBitSetters {
  public:
 };
 
@@ -2310,7 +2310,7 @@ void BoolValue::InternalSwap(BoolValue* other) {
 
 void StringValue::InitAsDefaultInstance() {
 }
-class StringValue::_Internal {
+class StringValue::HasBitSetters {
  public:
 };
 
@@ -2335,7 +2335,7 @@ StringValue::StringValue(const StringValue& from)
       _internal_metadata_(nullptr) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   value_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  if (!from.value().empty()) {
+  if (from.value().size() > 0) {
     value_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.value(),
       GetArenaNoVirtual());
   }
@@ -2617,7 +2617,7 @@ void StringValue::InternalSwap(StringValue* other) {
 
 void BytesValue::InitAsDefaultInstance() {
 }
-class BytesValue::_Internal {
+class BytesValue::HasBitSetters {
  public:
 };
 
@@ -2642,7 +2642,7 @@ BytesValue::BytesValue(const BytesValue& from)
       _internal_metadata_(nullptr) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   value_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  if (!from.value().empty()) {
+  if (from.value().size() > 0) {
     value_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.value(),
       GetArenaNoVirtual());
   }
