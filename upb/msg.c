@@ -74,35 +74,18 @@ upb_msg *upb_msg_new(const upb_msglayout *l, upb_arena *a) {
   return msg;
 }
 
-static void upb_array_init(upb_array *arr) {
-  arr->data = NULL;
-  arr->len = 0;
-  arr->size = 0;
-}
-
 upb_array *upb_array_new(upb_arena *a) {
-  upb_array *arr = upb_arena_malloc(a, sizeof(upb_array));
+  upb_array *ret = upb_arena_malloc(a, sizeof(upb_array));
 
-  if (!arr) {
+  if (!ret) {
     return NULL;
   }
 
-  upb_array_init(arr);
+  ret->data = NULL;
+  ret->len = 0;
+  ret->size = 0;
 
-  return arr;
-}
-
-upb_strmap *upb_strmap_new(upb_arena *a) {
-  upb_strmap *map = upb_arena_malloc(a, sizeof(upb_strmap));
-
-  if (!map) {
-    return NULL;
-  }
-
-  upb_array_init(&map->array);
-  upb_strtable_init(&map->table, UPB_CTYPE_INT32);
-
-  return map;
+  return ret;
 }
 
 void upb_msg_addunknown(upb_msg *msg, const char *data, size_t len,
