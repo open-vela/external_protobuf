@@ -93,8 +93,6 @@ void MapFieldBase::SetRepeatedDirty() {
   state_.store(STATE_MODIFIED_REPEATED, std::memory_order_relaxed);
 }
 
-void* MapFieldBase::MutableRepeatedPtrField() const { return repeated_field_; }
-
 void MapFieldBase::SyncRepeatedFieldWithMap() const {
   // acquire here matches with release below to ensure that we can only see a
   // value of CLEAN after all previous changes have been synced.
@@ -283,7 +281,7 @@ void DynamicMapField::MergeFrom(const MapFieldBase& other) {
   Map<MapKey, MapValueRef>* map = MutableMap();
   const DynamicMapField& other_field =
       reinterpret_cast<const DynamicMapField&>(other);
-  for (typename Map<MapKey, MapValueRef>::const_iterator other_it =
+  for (Map<MapKey, MapValueRef>::const_iterator other_it =
            other_field.map_.begin();
        other_it != other_field.map_.end(); ++other_it) {
     Map<MapKey, MapValueRef>::iterator iter = map->find(other_it->first);
