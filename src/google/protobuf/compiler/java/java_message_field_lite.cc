@@ -121,9 +121,9 @@ int ImmutableMessageFieldLiteGenerator::GetNumBitsForMessage() const {
 
 void ImmutableMessageFieldLiteGenerator::GenerateInterfaceMembers(
     io::Printer* printer) const {
-  WriteFieldAccessorDocComment(printer, descriptor_, HAZZER);
+  WriteFieldDocComment(printer, descriptor_);
   printer->Print(variables_, "$deprecation$boolean has$capitalized_name$();\n");
-  WriteFieldAccessorDocComment(printer, descriptor_, GETTER);
+  WriteFieldDocComment(printer, descriptor_);
   printer->Print(variables_, "$deprecation$$type$ get$capitalized_name$();\n");
 }
 
