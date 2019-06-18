@@ -126,7 +126,8 @@ bool MathUtil::WithinFractionOrMargin(const T x, const T y,
   if (MathLimits<T>::kIsInteger) {
     return x == y;
   } else {
-    if (!MathLimits<T>::IsFinite(x) || !MathLimits<T>::IsFinite(y)) {
+    // IsFinite checks are to make kPosInf and kNegInf not within fraction
+    if (!MathLimits<T>::IsFinite(x) && !MathLimits<T>::IsFinite(y)) {
       return false;
     }
     T relative_margin = static_cast<T>(fraction * Max(Abs(x), Abs(y)));

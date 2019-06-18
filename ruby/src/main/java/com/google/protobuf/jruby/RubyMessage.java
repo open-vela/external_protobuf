@@ -368,7 +368,7 @@ public class RubyMessage extends RubyObject {
         return ret;
     }
 
-    @JRubyMethod(name = "to_h")
+    @JRubyMethod(name = {"to_h", "to_hash"})
     public IRubyObject toHash(ThreadContext context) {
         Ruby runtime = context.runtime;
         RubyHash ret = RubyHash.newHash(runtime);

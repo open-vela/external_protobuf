@@ -56,7 +56,7 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&PROTOBUF_NAMESPACE_ID::_Timestamp_default_instance_),
 };
 
-const char descriptor_table_protodef_google_2fprotobuf_2ftimestamp_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
+const char descriptor_table_protodef_google_2fprotobuf_2ftimestamp_2eproto[] =
   "\n\037google/protobuf/timestamp.proto\022\017googl"
   "e.protobuf\"+\n\tTimestamp\022\017\n\007seconds\030\001 \001(\003"
   "\022\r\n\005nanos\030\002 \001(\005B~\n\023com.google.protobufB\016"
@@ -86,9 +86,14 @@ PROTOBUF_NAMESPACE_OPEN
 
 void Timestamp::InitAsDefaultInstance() {
 }
-class Timestamp::_Internal {
+class Timestamp::HasBitSetters {
  public:
 };
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int Timestamp::kSecondsFieldNumber;
+const int Timestamp::kNanosFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 Timestamp::Timestamp()
   : ::PROTOBUF_NAMESPACE_ID::Message(), _internal_metadata_(nullptr) {
@@ -381,6 +386,25 @@ bool Timestamp::IsInitialized() const {
   return true;
 }
 
+void Timestamp::Swap(Timestamp* other) {
+  if (other == this) return;
+  if (GetArenaNoVirtual() == other->GetArenaNoVirtual()) {
+    InternalSwap(other);
+  } else {
+    Timestamp* temp = New(GetArenaNoVirtual());
+    temp->MergeFrom(*other);
+    other->CopyFrom(*this);
+    InternalSwap(temp);
+    if (GetArenaNoVirtual() == nullptr) {
+      delete temp;
+    }
+  }
+}
+void Timestamp::UnsafeArenaSwap(Timestamp* other) {
+  if (other == this) return;
+  GOOGLE_DCHECK(GetArenaNoVirtual() == other->GetArenaNoVirtual());
+  InternalSwap(other);
+}
 void Timestamp::InternalSwap(Timestamp* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
