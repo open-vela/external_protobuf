@@ -110,9 +110,12 @@ class PROTOBUF_EXPORT SourceContext :
   static constexpr int kIndexInFileMessages =
     0;
 
-  void Swap(SourceContext* other);
   friend void swap(SourceContext& a, SourceContext& b) {
     a.Swap(&b);
+  }
+  inline void Swap(SourceContext* other) {
+    if (other == this) return;
+    InternalSwap(other);
   }
 
   // implements Message ----------------------------------------------
@@ -175,9 +178,11 @@ class PROTOBUF_EXPORT SourceContext :
 
   // accessors -------------------------------------------------------
 
+  enum : int {
+    kFileNameFieldNumber = 1,
+  };
   // string file_name = 1;
   void clear_file_name();
-  static const int kFileNameFieldNumber = 1;
   const std::string& file_name() const;
   void set_file_name(const std::string& value);
   void set_file_name(std::string&& value);
@@ -189,7 +194,7 @@ class PROTOBUF_EXPORT SourceContext :
 
   // @@protoc_insertion_point(class_scope:google.protobuf.SourceContext)
  private:
-  class HasBitSetters;
+  class _Internal;
 
   ::PROTOBUF_NAMESPACE_ID::internal::InternalMetadataWithArena _internal_metadata_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr file_name_;

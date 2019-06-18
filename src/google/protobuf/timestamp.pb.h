@@ -116,10 +116,21 @@ class PROTOBUF_EXPORT Timestamp :
   static constexpr int kIndexInFileMessages =
     0;
 
-  void UnsafeArenaSwap(Timestamp* other);
-  void Swap(Timestamp* other);
   friend void swap(Timestamp& a, Timestamp& b) {
     a.Swap(&b);
+  }
+  inline void Swap(Timestamp* other) {
+    if (other == this) return;
+    if (GetArenaNoVirtual() == other->GetArenaNoVirtual()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(Timestamp* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetArenaNoVirtual() == other->GetArenaNoVirtual());
+    InternalSwap(other);
   }
 
   // implements Message ----------------------------------------------
@@ -187,21 +198,23 @@ class PROTOBUF_EXPORT Timestamp :
 
   // accessors -------------------------------------------------------
 
+  enum : int {
+    kSecondsFieldNumber = 1,
+    kNanosFieldNumber = 2,
+  };
   // int64 seconds = 1;
   void clear_seconds();
-  static const int kSecondsFieldNumber = 1;
   ::PROTOBUF_NAMESPACE_ID::int64 seconds() const;
   void set_seconds(::PROTOBUF_NAMESPACE_ID::int64 value);
 
   // int32 nanos = 2;
   void clear_nanos();
-  static const int kNanosFieldNumber = 2;
   ::PROTOBUF_NAMESPACE_ID::int32 nanos() const;
   void set_nanos(::PROTOBUF_NAMESPACE_ID::int32 value);
 
   // @@protoc_insertion_point(class_scope:google.protobuf.Timestamp)
  private:
-  class HasBitSetters;
+  class _Internal;
 
   ::PROTOBUF_NAMESPACE_ID::internal::InternalMetadataWithArena _internal_metadata_;
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;

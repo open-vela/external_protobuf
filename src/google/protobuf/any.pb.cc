@@ -56,7 +56,7 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&PROTOBUF_NAMESPACE_ID::_Any_default_instance_),
 };
 
-const char descriptor_table_protodef_google_2fprotobuf_2fany_2eproto[] =
+const char descriptor_table_protodef_google_2fprotobuf_2fany_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
   "\n\031google/protobuf/any.proto\022\017google.prot"
   "obuf\"&\n\003Any\022\020\n\010type_url\030\001 \001(\t\022\r\n\005value\030\002"
   " \001(\014Bo\n\023com.google.protobufB\010AnyProtoP\001Z"
@@ -111,14 +111,9 @@ bool Any::ParseAnyTypeUrl(const string& type_url,
                                              full_type_name);
 }
 
-class Any::HasBitSetters {
+class Any::_Internal {
  public:
 };
-
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int Any::kTypeUrlFieldNumber;
-const int Any::kValueFieldNumber;
-#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 Any::Any()
   : ::PROTOBUF_NAMESPACE_ID::Message(), _internal_metadata_(nullptr), _any_metadata_(&type_url_, &value_) {
@@ -131,11 +126,11 @@ Any::Any(const Any& from)
       _any_metadata_(&type_url_, &value_) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   type_url_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  if (from.type_url().size() > 0) {
+  if (!from.type_url().empty()) {
     type_url_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.type_url_);
   }
   value_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  if (from.value().size() > 0) {
+  if (!from.value().empty()) {
     value_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.value_);
   }
   // @@protoc_insertion_point(copy_constructor:google.protobuf.Any)
@@ -419,10 +414,6 @@ bool Any::IsInitialized() const {
   return true;
 }
 
-void Any::Swap(Any* other) {
-  if (other == this) return;
-  InternalSwap(other);
-}
 void Any::InternalSwap(Any* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
