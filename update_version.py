@@ -147,8 +147,30 @@ def UpdateCpp():
         '#define GOOGLE_PROTOBUF_MIN_LIBRARY_VERSION %s' % cpp_version,
         line)
     return line
+  def RewritePbH(line):
+    line = re.sub(
+        r'^#if PROTOBUF_VERSION < .*$',
+        '#if PROTOBUF_VERSION < %s' % cpp_version,
+        line)
+    line = re.sub(
+        r'^#if .* < PROTOBUF_MIN_PROTOC_VERSION$',
+        '#if %s < PROTOBUF_MIN_PROTOC_VERSION' % cpp_version,
+        line)
+    return line
+    
   RewriteTextFile('src/google/protobuf/stubs/common.h', RewriteCommon)
   RewriteTextFile('src/google/protobuf/port_def.inc', RewritePortDef)
+  RewriteTextFile('src/google/protobuf/any.pb.h', RewritePbH)
+  RewriteTextFile('src/google/protobuf/api.pb.h', RewritePbH)
+  RewriteTextFile('src/google/protobuf/descriptor.pb.h', RewritePbH)
+  RewriteTextFile('src/google/protobuf/duration.pb.h', RewritePbH)
+  RewriteTextFile('src/google/protobuf/empty.pb.h', RewritePbH)
+  RewriteTextFile('src/google/protobuf/field_mask.pb.h', RewritePbH)
+  RewriteTextFile('src/google/protobuf/source_context.pb.h', RewritePbH)
+  RewriteTextFile('src/google/protobuf/struct.pb.h', RewritePbH)
+  RewriteTextFile('src/google/protobuf/timestamp.pb.h', RewritePbH)
+  RewriteTextFile('src/google/protobuf/wrappers.pb.h', RewritePbH)
+  RewriteTextFile('src/google/protobuf/compiler/plugin.pb.h', RewritePbH)
 
 
 def UpdateCsharp():
@@ -174,6 +196,11 @@ def UpdateJava():
       Find(document.documentElement, 'version'), GetFullVersion()))
 
   RewriteXml('java/core/pom.xml',
+    lambda document : ReplaceText(
+      Find(Find(document.documentElement, 'parent'), 'version'),
+      GetFullVersion()))
+
+  RewriteXml('java/lite/pom.xml',
     lambda document : ReplaceText(
       Find(Find(document.documentElement, 'parent'), 'version'),
       GetFullVersion()))

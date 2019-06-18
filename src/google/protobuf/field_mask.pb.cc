@@ -55,7 +55,7 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&PROTOBUF_NAMESPACE_ID::_FieldMask_default_instance_),
 };
 
-const char descriptor_table_protodef_google_2fprotobuf_2ffield_5fmask_2eproto[] =
+const char descriptor_table_protodef_google_2fprotobuf_2ffield_5fmask_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
   "\n google/protobuf/field_mask.proto\022\017goog"
   "le.protobuf\"\032\n\tFieldMask\022\r\n\005paths\030\001 \003(\tB"
   "\214\001\n\023com.google.protobufB\016FieldMaskProtoP"
@@ -85,13 +85,9 @@ PROTOBUF_NAMESPACE_OPEN
 
 void FieldMask::InitAsDefaultInstance() {
 }
-class FieldMask::HasBitSetters {
+class FieldMask::_Internal {
  public:
 };
-
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int FieldMask::kPathsFieldNumber;
-#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 FieldMask::FieldMask()
   : ::PROTOBUF_NAMESPACE_ID::Message(), _internal_metadata_(nullptr) {
@@ -356,25 +352,6 @@ bool FieldMask::IsInitialized() const {
   return true;
 }
 
-void FieldMask::Swap(FieldMask* other) {
-  if (other == this) return;
-  if (GetArenaNoVirtual() == other->GetArenaNoVirtual()) {
-    InternalSwap(other);
-  } else {
-    FieldMask* temp = New(GetArenaNoVirtual());
-    temp->MergeFrom(*other);
-    other->CopyFrom(*this);
-    InternalSwap(temp);
-    if (GetArenaNoVirtual() == nullptr) {
-      delete temp;
-    }
-  }
-}
-void FieldMask::UnsafeArenaSwap(FieldMask* other) {
-  if (other == this) return;
-  GOOGLE_DCHECK(GetArenaNoVirtual() == other->GetArenaNoVirtual());
-  InternalSwap(other);
-}
 void FieldMask::InternalSwap(FieldMask* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);

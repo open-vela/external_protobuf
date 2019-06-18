@@ -124,7 +124,7 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&PROTOBUF_NAMESPACE_ID::_ListValue_default_instance_),
 };
 
-const char descriptor_table_protodef_google_2fprotobuf_2fstruct_2eproto[] =
+const char descriptor_table_protodef_google_2fprotobuf_2fstruct_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
   "\n\034google/protobuf/struct.proto\022\017google.p"
   "rotobuf\"\204\001\n\006Struct\0223\n\006fields\030\001 \003(\0132#.goo"
   "gle.protobuf.Struct.FieldsEntry\032E\n\013Field"
@@ -195,13 +195,9 @@ void Struct_FieldsEntry_DoNotUse::MergeFrom(
 
 void Struct::InitAsDefaultInstance() {
 }
-class Struct::HasBitSetters {
+class Struct::_Internal {
  public:
 };
-
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int Struct::kFieldsFieldNumber;
-#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 Struct::Struct()
   : ::PROTOBUF_NAMESPACE_ID::Message(), _internal_metadata_(nullptr) {
@@ -390,16 +386,14 @@ void Struct::SerializeWithCachedSizes(
       }
       ::std::sort(&items[0], &items[static_cast<ptrdiff_t>(n)], Less());
       for (size_type i = 0; i < n; i++) {
-        Struct_FieldsEntry_DoNotUse::MapEntryWrapper entry(nullptr, items[static_cast<ptrdiff_t>(i)]->first, items[static_cast<ptrdiff_t>(i)]->second);
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteMessageMaybeToArray(1, entry, output);
+        Struct_FieldsEntry_DoNotUse::Funcs::SerializeToCodedStream(1, items[static_cast<ptrdiff_t>(i)]->first, items[static_cast<ptrdiff_t>(i)]->second, output);
         Utf8Check::Check(&(*items[static_cast<ptrdiff_t>(i)]));
       }
     } else {
       for (::PROTOBUF_NAMESPACE_ID::Map< std::string, PROTOBUF_NAMESPACE_ID::Value >::const_iterator
           it = this->fields().begin();
           it != this->fields().end(); ++it) {
-        Struct_FieldsEntry_DoNotUse::MapEntryWrapper entry(nullptr, it->first, it->second);
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteMessageMaybeToArray(1, entry, output);
+        Struct_FieldsEntry_DoNotUse::Funcs::SerializeToCodedStream(1, it->first, it->second, output);
         Utf8Check::Check(&(*it));
       }
     }
@@ -446,16 +440,14 @@ void Struct::SerializeWithCachedSizes(
       }
       ::std::sort(&items[0], &items[static_cast<ptrdiff_t>(n)], Less());
       for (size_type i = 0; i < n; i++) {
-        Struct_FieldsEntry_DoNotUse::MapEntryWrapper entry(nullptr, items[static_cast<ptrdiff_t>(i)]->first, items[static_cast<ptrdiff_t>(i)]->second);
-        target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::InternalWriteMessageNoVirtualToArray(1, entry, target);
+        target = Struct_FieldsEntry_DoNotUse::Funcs::SerializeToArray(1, items[static_cast<ptrdiff_t>(i)]->first, items[static_cast<ptrdiff_t>(i)]->second, target);
         Utf8Check::Check(&(*items[static_cast<ptrdiff_t>(i)]));
       }
     } else {
       for (::PROTOBUF_NAMESPACE_ID::Map< std::string, PROTOBUF_NAMESPACE_ID::Value >::const_iterator
           it = this->fields().begin();
           it != this->fields().end(); ++it) {
-        Struct_FieldsEntry_DoNotUse::MapEntryWrapper entry(nullptr, it->first, it->second);
-        target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::InternalWriteMessageNoVirtualToArray(1, entry, target);
+        target = Struct_FieldsEntry_DoNotUse::Funcs::SerializeToArray(1, it->first, it->second, target);
         Utf8Check::Check(&(*it));
       }
     }
@@ -488,9 +480,7 @@ size_t Struct::ByteSizeLong() const {
   for (::PROTOBUF_NAMESPACE_ID::Map< std::string, PROTOBUF_NAMESPACE_ID::Value >::const_iterator
       it = this->fields().begin();
       it != this->fields().end(); ++it) {
-    Struct_FieldsEntry_DoNotUse::MapEntryWrapper entry(nullptr, it->first, it->second);
-    total_size += ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
-        MessageSizeNoVirtual(entry);
+    total_size += Struct_FieldsEntry_DoNotUse::Funcs::ByteSizeLong(it->first, it->second);
   }
 
   int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
@@ -541,25 +531,6 @@ bool Struct::IsInitialized() const {
   return true;
 }
 
-void Struct::Swap(Struct* other) {
-  if (other == this) return;
-  if (GetArenaNoVirtual() == other->GetArenaNoVirtual()) {
-    InternalSwap(other);
-  } else {
-    Struct* temp = New(GetArenaNoVirtual());
-    temp->MergeFrom(*other);
-    other->CopyFrom(*this);
-    InternalSwap(temp);
-    if (GetArenaNoVirtual() == nullptr) {
-      delete temp;
-    }
-  }
-}
-void Struct::UnsafeArenaSwap(Struct* other) {
-  if (other == this) return;
-  GOOGLE_DCHECK(GetArenaNoVirtual() == other->GetArenaNoVirtual());
-  InternalSwap(other);
-}
 void Struct::InternalSwap(Struct* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
@@ -584,18 +555,18 @@ void Value::InitAsDefaultInstance() {
   PROTOBUF_NAMESPACE_ID::_Value_default_instance_.list_value_ = const_cast< PROTOBUF_NAMESPACE_ID::ListValue*>(
       PROTOBUF_NAMESPACE_ID::ListValue::internal_default_instance());
 }
-class Value::HasBitSetters {
+class Value::_Internal {
  public:
   static const PROTOBUF_NAMESPACE_ID::Struct& struct_value(const Value* msg);
   static const PROTOBUF_NAMESPACE_ID::ListValue& list_value(const Value* msg);
 };
 
 const PROTOBUF_NAMESPACE_ID::Struct&
-Value::HasBitSetters::struct_value(const Value* msg) {
+Value::_Internal::struct_value(const Value* msg) {
   return *msg->kind_.struct_value_;
 }
 const PROTOBUF_NAMESPACE_ID::ListValue&
-Value::HasBitSetters::list_value(const Value* msg) {
+Value::_Internal::list_value(const Value* msg) {
   return *msg->kind_.list_value_;
 }
 void Value::set_allocated_struct_value(PROTOBUF_NAMESPACE_ID::Struct* struct_value) {
@@ -628,15 +599,6 @@ void Value::set_allocated_list_value(PROTOBUF_NAMESPACE_ID::ListValue* list_valu
   }
   // @@protoc_insertion_point(field_set_allocated:google.protobuf.Value.list_value)
 }
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int Value::kNullValueFieldNumber;
-const int Value::kNumberValueFieldNumber;
-const int Value::kStringValueFieldNumber;
-const int Value::kBoolValueFieldNumber;
-const int Value::kStructValueFieldNumber;
-const int Value::kListValueFieldNumber;
-#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
-
 Value::Value()
   : ::PROTOBUF_NAMESPACE_ID::Message(), _internal_metadata_(nullptr) {
   SharedCtor();
@@ -985,13 +947,13 @@ void Value::SerializeWithCachedSizes(
   // .google.protobuf.Struct struct_value = 5;
   if (has_struct_value()) {
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteMessageMaybeToArray(
-      5, HasBitSetters::struct_value(this), output);
+      5, _Internal::struct_value(this), output);
   }
 
   // .google.protobuf.ListValue list_value = 6;
   if (has_list_value()) {
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteMessageMaybeToArray(
-      6, HasBitSetters::list_value(this), output);
+      6, _Internal::list_value(this), output);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -1038,14 +1000,14 @@ void Value::SerializeWithCachedSizes(
   if (has_struct_value()) {
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
       InternalWriteMessageToArray(
-        5, HasBitSetters::struct_value(this), target);
+        5, _Internal::struct_value(this), target);
   }
 
   // .google.protobuf.ListValue list_value = 6;
   if (has_list_value()) {
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
       InternalWriteMessageToArray(
-        6, HasBitSetters::list_value(this), target);
+        6, _Internal::list_value(this), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -1187,25 +1149,6 @@ bool Value::IsInitialized() const {
   return true;
 }
 
-void Value::Swap(Value* other) {
-  if (other == this) return;
-  if (GetArenaNoVirtual() == other->GetArenaNoVirtual()) {
-    InternalSwap(other);
-  } else {
-    Value* temp = New(GetArenaNoVirtual());
-    temp->MergeFrom(*other);
-    other->CopyFrom(*this);
-    InternalSwap(temp);
-    if (GetArenaNoVirtual() == nullptr) {
-      delete temp;
-    }
-  }
-}
-void Value::UnsafeArenaSwap(Value* other) {
-  if (other == this) return;
-  GOOGLE_DCHECK(GetArenaNoVirtual() == other->GetArenaNoVirtual());
-  InternalSwap(other);
-}
 void Value::InternalSwap(Value* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
@@ -1222,13 +1165,9 @@ void Value::InternalSwap(Value* other) {
 
 void ListValue::InitAsDefaultInstance() {
 }
-class ListValue::HasBitSetters {
+class ListValue::_Internal {
  public:
 };
-
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int ListValue::kValuesFieldNumber;
-#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 ListValue::ListValue()
   : ::PROTOBUF_NAMESPACE_ID::Message(), _internal_metadata_(nullptr) {
@@ -1488,25 +1427,6 @@ bool ListValue::IsInitialized() const {
   return true;
 }
 
-void ListValue::Swap(ListValue* other) {
-  if (other == this) return;
-  if (GetArenaNoVirtual() == other->GetArenaNoVirtual()) {
-    InternalSwap(other);
-  } else {
-    ListValue* temp = New(GetArenaNoVirtual());
-    temp->MergeFrom(*other);
-    other->CopyFrom(*this);
-    InternalSwap(temp);
-    if (GetArenaNoVirtual() == nullptr) {
-      delete temp;
-    }
-  }
-}
-void ListValue::UnsafeArenaSwap(ListValue* other) {
-  if (other == this) return;
-  GOOGLE_DCHECK(GetArenaNoVirtual() == other->GetArenaNoVirtual());
-  InternalSwap(other);
-}
 void ListValue::InternalSwap(ListValue* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);

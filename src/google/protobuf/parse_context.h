@@ -31,6 +31,7 @@
 #ifndef GOOGLE_PROTOBUF_PARSE_CONTEXT_H__
 #define GOOGLE_PROTOBUF_PARSE_CONTEXT_H__
 
+#include <cstdint>
 #include <cstring>
 #include <string>
 
@@ -124,7 +125,7 @@ class PROTOBUF_EXPORT EpsCopyInputStream {
   // If return value is negative it's an error
   PROTOBUF_MUST_USE_RESULT int PushLimit(const char* ptr, int limit) {
     GOOGLE_DCHECK(limit >= 0);
-    limit += ptr - buffer_end_;
+    limit += static_cast<int>(ptr - buffer_end_);
     limit_end_ = buffer_end_ + (std::min)(0, limit);
     auto old_limit = limit_;
     limit_ = limit;
@@ -717,11 +718,11 @@ PROTOBUF_EXPORT PROTOBUF_MUST_USE_RESULT const char* PackedEnumParser(
     void* object, const char* ptr, ParseContext* ctx);
 PROTOBUF_EXPORT PROTOBUF_MUST_USE_RESULT const char* PackedEnumParser(
     void* object, const char* ptr, ParseContext* ctx, bool (*is_valid)(int),
-    std::string* unknown, int field_num);
+    InternalMetadataWithArenaLite* metadata, int field_num);
 PROTOBUF_EXPORT PROTOBUF_MUST_USE_RESULT const char* PackedEnumParserArg(
     void* object, const char* ptr, ParseContext* ctx,
-    bool (*is_valid)(const void*, int), const void* data, std::string* unknown,
-    int field_num);
+    bool (*is_valid)(const void*, int), const void* data,
+    InternalMetadataWithArenaLite* metadata, int field_num);
 
 PROTOBUF_EXPORT PROTOBUF_MUST_USE_RESULT const char* PackedBoolParser(
     void* object, const char* ptr, ParseContext* ctx);
