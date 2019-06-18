@@ -192,21 +192,27 @@ FileGenerator::FileGenerator(const FileDescriptor *file, const Options& options)
       options_(options) {
   for (int i = 0; i < file_->enum_type_count(); i++) {
     EnumGenerator *generator = new EnumGenerator(file_->enum_type(i));
-    enum_generators_.emplace_back(generator);
+    enum_generators_.push_back(generator);
   }
   for (int i = 0; i < file_->message_type_count(); i++) {
     MessageGenerator *generator =
         new MessageGenerator(root_class_name_, file_->message_type(i), options_);
-    message_generators_.emplace_back(generator);
+    message_generators_.push_back(generator);
   }
   for (int i = 0; i < file_->extension_count(); i++) {
     ExtensionGenerator *generator =
         new ExtensionGenerator(root_class_name_, file_->extension(i));
-    extension_generators_.emplace_back(generator);
+    extension_generators_.push_back(generator);
   }
 }
 
-FileGenerator::~FileGenerator() {}
+FileGenerator::~FileGenerator() {
+  STLDeleteContainerPointers(enum_generators_.begin(), enum_generators_.end());
+  STLDeleteContainerPointers(message_generators_.begin(),
+                             message_generators_.end());
+  STLDeleteContainerPointers(extension_generators_.begin(),
+                             extension_generators_.end());
+}
 
 void FileGenerator::GenerateHeader(io::Printer *printer) {
   std::set<string> headers;
@@ -264,8 +270,9 @@ void FileGenerator::GenerateHeader(io::Printer *printer) {
       "\n");
 
   std::set<string> fwd_decls;
-  for (const auto& generator : message_generators_) {
-    generator->DetermineForwardDeclarations(&fwd_decls);
+  for (std::vector<MessageGenerator *>::iterator iter = message_generators_.begin();
+       iter != message_generators_.end(); ++iter) {
+    (*iter)->DetermineForwardDeclarations(&fwd_decls);
   }
   for (std::set<string>::const_iterator i(fwd_decls.begin());
        i != fwd_decls.end(); ++i) {
@@ -280,12 +287,14 @@ void FileGenerator::GenerateHeader(io::Printer *printer) {
       "\n");
 
   // need to write out all enums first
-  for (const auto& generator : enum_generators_) {
-    generator->GenerateHeader(printer);
+  for (std::vector<EnumGenerator *>::iterator iter = enum_generators_.begin();
+       iter != enum_generators_.end(); ++iter) {
+    (*iter)->GenerateHeader(printer);
   }
 
-  for (const auto& generator : message_generators_) {
-    generator->GenerateEnumHeader(printer);
+  for (std::vector<MessageGenerator *>::iterator iter = message_generators_.begin();
+       iter != message_generators_.end(); ++iter) {
+    (*iter)->GenerateEnumHeader(printer);
   }
 
   // For extensions to chain together, the Root gets created even if there
@@ -314,15 +323,18 @@ void FileGenerator::GenerateHeader(io::Printer *printer) {
         "@interface $root_class_name$ (DynamicMethods)\n",
         "root_class_name", root_class_name_);
 
-    for (const auto& generator : extension_generators_) {
-      generator->GenerateMembersHeader(printer);
+    for (std::vector<ExtensionGenerator *>::iterator iter =
+             extension_generators_.begin();
+         iter != extension_generators_.end(); ++iter) {
+      (*iter)->GenerateMembersHeader(printer);
     }
 
     printer->Print("@end\n\n");
   }  // extension_generators_.size() > 0
 
-  for (const auto& generator : message_generators_) {
-    generator->GenerateMessageHeader(printer);
+  for (std::vector<MessageGenerator *>::iterator iter = message_generators_.begin();
+       iter != message_generators_.end(); ++iter) {
+    (*iter)->GenerateMessageHeader(printer);
   }
 
   printer->Print(
@@ -391,8 +403,9 @@ void FileGenerator::GenerateSource(io::Printer *printer) {
   }
 
   bool includes_oneof = false;
-  for (const auto& generator : message_generators_) {
-    if (generator->IncludesOneOfDefinition()) {
+  for (std::vector<MessageGenerator *>::iterator iter = message_generators_.begin();
+       iter != message_generators_.end(); ++iter) {
+    if ((*iter)->IncludesOneOfDefinition()) {
       includes_oneof = true;
       break;
     }
@@ -443,11 +456,15 @@ void FileGenerator::GenerateSource(io::Printer *printer) {
       printer->Print(
           "static GPBExtensionDescription descriptions[] = {\n");
       printer->Indent();
-      for (const auto& generator : extension_generators_) {
-        generator->GenerateStaticVariablesInitialization(printer);
+      for (std::vector<ExtensionGenerator *>::iterator iter =
+               extension_generators_.begin();
+           iter != extension_generators_.end(); ++iter) {
+        (*iter)->GenerateStaticVariablesInitialization(printer);
       }
-      for (const auto& generator : message_generators_) {
-        generator->GenerateStaticVariablesInitialization(printer);
+      for (std::vector<MessageGenerator *>::iterator iter =
+               message_generators_.begin();
+           iter != message_generators_.end(); ++iter) {
+        (*iter)->GenerateStaticVariablesInitialization(printer);
       }
       printer->Outdent();
       printer->Print(
@@ -544,11 +561,13 @@ void FileGenerator::GenerateSource(io::Printer *printer) {
         "\n");
   }
 
-  for (const auto& generator : enum_generators_) {
-    generator->GenerateSource(printer);
+  for (std::vector<EnumGenerator *>::iterator iter = enum_generators_.begin();
+       iter != enum_generators_.end(); ++iter) {
+    (*iter)->GenerateSource(printer);
   }
-  for (const auto& generator : message_generators_) {
-    generator->GenerateSource(printer);
+  for (std::vector<MessageGenerator *>::iterator iter = message_generators_.begin();
+       iter != message_generators_.end(); ++iter) {
+    (*iter)->GenerateSource(printer);
   }
 
   printer->Print(

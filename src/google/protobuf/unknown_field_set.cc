@@ -287,30 +287,28 @@ uint8* UnknownField::SerializeLengthDelimitedNoTagToArray(uint8* target) const {
 #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
 namespace internal {
 const char* PackedEnumParser(void* object, const char* ptr, ParseContext* ctx,
-                             bool (*is_valid)(int),
-                             InternalMetadataWithArena* metadata,
+                             bool (*is_valid)(int), UnknownFieldSet* unknown,
                              int field_num) {
   return ctx->ReadPackedVarint(
-      ptr, [object, is_valid, metadata, field_num](uint64 val) {
+      ptr, [object, is_valid, unknown, field_num](uint64 val) {
         if (is_valid(val)) {
           static_cast<RepeatedField<int>*>(object)->Add(val);
         } else {
-          WriteVarint(field_num, val, metadata->mutable_unknown_fields());
+          WriteVarint(field_num, val, unknown);
         }
       });
 }
 const char* PackedEnumParserArg(void* object, const char* ptr,
                                 ParseContext* ctx,
                                 bool (*is_valid)(const void*, int),
-                                const void* data,
-                                InternalMetadataWithArena* metadata,
+                                const void* data, UnknownFieldSet* unknown,
                                 int field_num) {
   return ctx->ReadPackedVarint(
-      ptr, [object, is_valid, data, metadata, field_num](uint64 val) {
+      ptr, [object, is_valid, data, unknown, field_num](uint64 val) {
         if (is_valid(data, val)) {
           static_cast<RepeatedField<int>*>(object)->Add(val);
         } else {
-          WriteVarint(field_num, val, metadata->mutable_unknown_fields());
+          WriteVarint(field_num, val, unknown);
         }
       });
 }

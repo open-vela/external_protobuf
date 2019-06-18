@@ -129,7 +129,7 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&PROTOBUF_NAMESPACE_ID::_Mixin_default_instance_),
 };
 
-const char descriptor_table_protodef_google_2fprotobuf_2fapi_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
+const char descriptor_table_protodef_google_2fprotobuf_2fapi_2eproto[] =
   "\n\031google/protobuf/api.proto\022\017google.prot"
   "obuf\032$google/protobuf/source_context.pro"
   "to\032\032google/protobuf/type.proto\"\201\002\n\003Api\022\014"
@@ -178,13 +178,13 @@ void Api::InitAsDefaultInstance() {
   PROTOBUF_NAMESPACE_ID::_Api_default_instance_._instance.get_mutable()->source_context_ = const_cast< PROTOBUF_NAMESPACE_ID::SourceContext*>(
       PROTOBUF_NAMESPACE_ID::SourceContext::internal_default_instance());
 }
-class Api::_Internal {
+class Api::HasBitSetters {
  public:
   static const PROTOBUF_NAMESPACE_ID::SourceContext& source_context(const Api* msg);
 };
 
 const PROTOBUF_NAMESPACE_ID::SourceContext&
-Api::_Internal::source_context(const Api* msg) {
+Api::HasBitSetters::source_context(const Api* msg) {
   return *msg->source_context_;
 }
 void Api::clear_options() {
@@ -196,6 +196,16 @@ void Api::clear_source_context() {
   }
   source_context_ = nullptr;
 }
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int Api::kNameFieldNumber;
+const int Api::kMethodsFieldNumber;
+const int Api::kOptionsFieldNumber;
+const int Api::kVersionFieldNumber;
+const int Api::kSourceContextFieldNumber;
+const int Api::kMixinsFieldNumber;
+const int Api::kSyntaxFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
 Api::Api()
   : ::PROTOBUF_NAMESPACE_ID::Message(), _internal_metadata_(nullptr) {
   SharedCtor();
@@ -209,11 +219,11 @@ Api::Api(const Api& from)
       mixins_(from.mixins_) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  if (!from.name().empty()) {
+  if (from.name().size() > 0) {
     name_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.name_);
   }
   version_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  if (!from.version().empty()) {
+  if (from.version().size() > 0) {
     version_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.version_);
   }
   if (from.has_source_context()) {
@@ -532,7 +542,7 @@ void Api::SerializeWithCachedSizes(
   // .google.protobuf.SourceContext source_context = 5;
   if (this->has_source_context()) {
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteMessageMaybeToArray(
-      5, _Internal::source_context(this), output);
+      5, HasBitSetters::source_context(this), output);
   }
 
   // repeated .google.protobuf.Mixin mixins = 6;
@@ -605,7 +615,7 @@ void Api::SerializeWithCachedSizes(
   if (this->has_source_context()) {
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
       InternalWriteMessageToArray(
-        5, _Internal::source_context(this), target);
+        5, HasBitSetters::source_context(this), target);
   }
 
   // repeated .google.protobuf.Mixin mixins = 6;
@@ -767,6 +777,10 @@ bool Api::IsInitialized() const {
   return true;
 }
 
+void Api::Swap(Api* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
 void Api::InternalSwap(Api* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
@@ -790,13 +804,23 @@ void Api::InternalSwap(Api* other) {
 
 void Method::InitAsDefaultInstance() {
 }
-class Method::_Internal {
+class Method::HasBitSetters {
  public:
 };
 
 void Method::clear_options() {
   options_.Clear();
 }
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int Method::kNameFieldNumber;
+const int Method::kRequestTypeUrlFieldNumber;
+const int Method::kRequestStreamingFieldNumber;
+const int Method::kResponseTypeUrlFieldNumber;
+const int Method::kResponseStreamingFieldNumber;
+const int Method::kOptionsFieldNumber;
+const int Method::kSyntaxFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
 Method::Method()
   : ::PROTOBUF_NAMESPACE_ID::Message(), _internal_metadata_(nullptr) {
   SharedCtor();
@@ -808,15 +832,15 @@ Method::Method(const Method& from)
       options_(from.options_) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  if (!from.name().empty()) {
+  if (from.name().size() > 0) {
     name_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.name_);
   }
   request_type_url_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  if (!from.request_type_url().empty()) {
+  if (from.request_type_url().size() > 0) {
     request_type_url_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.request_type_url_);
   }
   response_type_url_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  if (!from.response_type_url().empty()) {
+  if (from.response_type_url().size() > 0) {
     response_type_url_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.response_type_url_);
   }
   ::memcpy(&request_streaming_, &from.request_streaming_,
@@ -1350,6 +1374,10 @@ bool Method::IsInitialized() const {
   return true;
 }
 
+void Method::Swap(Method* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
 void Method::InternalSwap(Method* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
@@ -1374,9 +1402,14 @@ void Method::InternalSwap(Method* other) {
 
 void Mixin::InitAsDefaultInstance() {
 }
-class Mixin::_Internal {
+class Mixin::HasBitSetters {
  public:
 };
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int Mixin::kNameFieldNumber;
+const int Mixin::kRootFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 Mixin::Mixin()
   : ::PROTOBUF_NAMESPACE_ID::Message(), _internal_metadata_(nullptr) {
@@ -1388,11 +1421,11 @@ Mixin::Mixin(const Mixin& from)
       _internal_metadata_(nullptr) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  if (!from.name().empty()) {
+  if (from.name().size() > 0) {
     name_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.name_);
   }
   root_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  if (!from.root().empty()) {
+  if (from.root().size() > 0) {
     root_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.root_);
   }
   // @@protoc_insertion_point(copy_constructor:google.protobuf.Mixin)
@@ -1688,6 +1721,10 @@ bool Mixin::IsInitialized() const {
   return true;
 }
 
+void Mixin::Swap(Mixin* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
 void Mixin::InternalSwap(Mixin* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);

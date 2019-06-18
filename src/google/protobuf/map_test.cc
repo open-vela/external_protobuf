@@ -621,6 +621,10 @@ TEST_F(MapImplTest, IteratorConstness) {
 }
 
 bool IsForwardIteratorHelper(std::forward_iterator_tag /*tag*/) { return true; }
+template <typename T>
+bool IsForwardIteratorHelper(T /*t*/) {
+  return false;
+}
 
 TEST_F(MapImplTest, IteratorCategory) {
   EXPECT_TRUE(IsForwardIteratorHelper(
@@ -3083,13 +3087,11 @@ static std::string DeterministicSerialization(const T& t) {
   const int size = t.ByteSize();
   std::string result(size, '\0');
   io::ArrayOutputStream array_stream(::google::protobuf::string_as_array(&result), size);
-  {
-    io::CodedOutputStream output_stream(&array_stream);
-    output_stream.SetSerializationDeterministic(true);
-    t.SerializeWithCachedSizes(&output_stream);
-    EXPECT_FALSE(output_stream.HadError());
-    EXPECT_EQ(size, output_stream.ByteCount());
-  }
+  io::CodedOutputStream output_stream(&array_stream);
+  output_stream.SetSerializationDeterministic(true);
+  t.SerializeWithCachedSizes(&output_stream);
+  EXPECT_FALSE(output_stream.HadError());
+  EXPECT_EQ(size, output_stream.ByteCount());
   EXPECT_EQ(result, DeterministicSerializationWithSerializeToCodedStream(t));
   EXPECT_EQ(result,
             DeterministicSerializationWithSerializePartialToCodedStream(t));

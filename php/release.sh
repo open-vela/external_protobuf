@@ -20,7 +20,7 @@ popd
 
 # Checkout the target version
 pushd protobuf/php
-git checkout -b $VERSION
+git checkout $VERSION
 popd
 
 # Copy files

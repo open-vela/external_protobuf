@@ -766,7 +766,7 @@ public class MapForProto2Test extends TestCase {
     setMapValuesUsingAccessors(builder);
     TestMap message = builder.build();
 
-    String textData = TextFormat.printer().printToString(message);
+    String textData = TextFormat.printToString(message);
 
     builder = TestMap.newBuilder();
     TextFormat.merge(textData, builder);
