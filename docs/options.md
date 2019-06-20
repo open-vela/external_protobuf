@@ -201,7 +201,3 @@ with info about your project (name and website) so we can add an entry for you.
    * Website: https://twirpql.dev
    * Extensions: 1070
 
-1. Protoc-gen-validate
-   * Website: https://github.com/envoyproxy/protoc-gen-validate
-   * Extensions: 1071
-
