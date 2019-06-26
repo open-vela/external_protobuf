@@ -44,7 +44,6 @@
 
 #include <google/protobuf/stubs/common.h>
 #include <google/protobuf/stubs/logging.h>
-#include <google/protobuf/io/coded_stream.h>
 #include <google/protobuf/arena.h>
 #include <google/protobuf/stubs/once.h>
 #include <google/protobuf/port.h>
@@ -321,7 +320,7 @@ class PROTOBUF_EXPORT MessageLite {
   // (for groups) or input->ConsumedEntireMessage() (for non-groups) after
   // this returns to verify that the message's end was delimited correctly.
   //
-  // ParseFromCodedStream() is implemented as Clear() followed by
+  // ParsefromCodedStream() is implemented as Clear() followed by
   // MergeFromCodedStream().
   bool MergeFromCodedStream(io::CodedInputStream* input);
 
@@ -408,10 +407,7 @@ class PROTOBUF_EXPORT MessageLite {
   // Serializes the message without recomputing the size.  The message must not
   // have changed since the last call to ByteSize(), and the value returned by
   // ByteSize must be non-negative.  Otherwise the results are undefined.
-  void SerializeWithCachedSizes(io::CodedOutputStream* output) const {
-    output->SetCur(InternalSerializeWithCachedSizesToArray(output->Cur(),
-                                                           output->EpsCopy()));
-  }
+  virtual void SerializeWithCachedSizes(io::CodedOutputStream* output) const;
 
   // Functions below here are not part of the public interface.  It isn't
   // enforced, but they should be treated as private, and will be private
@@ -423,7 +419,7 @@ class PROTOBUF_EXPORT MessageLite {
   // must point at a byte array of at least ByteSize() bytes.  Whether to use
   // deterministic serialization, e.g., maps in sorted order, is determined by
   // CodedOutputStream::IsDefaultSerializationDeterministic().
-  uint8* SerializeWithCachedSizesToArray(uint8* target) const;
+  virtual uint8* SerializeWithCachedSizesToArray(uint8* target) const;
 
   // Returns the result of the last call to ByteSize().  An embedded message's
   // size is needed both to serialize it (because embedded messages are
@@ -481,15 +477,15 @@ class PROTOBUF_EXPORT MessageLite {
   template <ParseFlags flags, typename T>
   bool ParseFrom(const T& input);
 
-  // Fast path when conditions match (ie. non-deterministic)
-  //  uint8* InternalSerializeWithCachedSizesToArray(uint8* ptr) const;
-  virtual uint8* InternalSerializeWithCachedSizesToArray(
-      uint8* ptr, io::EpsCopyOutputStream* stream) const = 0;
-
  private:
   // TODO(gerbens) make this a pure abstract function
   virtual const void* InternalGetTable() const { return NULL; }
 
+  // Fast path when conditions match (ie. non-deterministic)
+ public:
+  virtual uint8* InternalSerializeWithCachedSizesToArray(uint8* target) const;
+
+ private:
   friend class internal::WireFormatLite;
   friend class Message;
   friend class internal::WeakFieldMap;

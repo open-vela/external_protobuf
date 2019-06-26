@@ -118,10 +118,6 @@ inline int CalculateReserve(Iter begin, Iter end) {
 // set-by-index, and add accessors that are generated for all repeated fields.
 template <typename Element>
 class RepeatedField final {
-  static_assert(
-      alignof(Arena) >= alignof(Element),
-      "We only support types that have an alignment smaller than Arena");
-
  public:
   RepeatedField();
   explicit RepeatedField(Arena* arena);
@@ -293,30 +289,23 @@ class RepeatedField final {
   // Element is double and pointer is 32bit).
   static const size_t kRepHeaderSize;
 
-  // If total_size_ == 0 this points to an Arena otherwise it points to the
-  // elements member of a Rep struct. Using this invariant allows the storage of
-  // the arena pointer without an extra allocation in the constructor.
-  void* arena_or_elements_;
+  // We reuse the Rep* for an Arena* when total_size == 0, to avoid having to do
+  // an allocation in the constructor when we have an Arena.
+  union Pointer {
+    Pointer(Arena* a) : arena(a) {}
+    Arena* arena;       // When total_size_ == 0.
+    Element* elements;  // When total_size_ != 0, this is Rep->elements of Rep.
+  } ptr_;
 
-  // Return pointer to elements array.
-  // pre-condition: the array must have been allocated.
   Element* elements() const {
     GOOGLE_DCHECK_GT(total_size_, 0);
-    // Because of above pre-condition this cast is safe.
-    return unsafe_elements();
+    return ptr_.elements;
   }
 
-  // Return pointer to elements array if it exists otherwise either null or
-  // a invalid pointer is returned. This only happens for empty repeated fields,
-  // where you can't dereference this pointer anyway (it's empty).
-  Element* unsafe_elements() const {
-    return static_cast<Element*>(arena_or_elements_);
-  }
-
-  // Return pointer to the Rep struct.
-  // pre-condition: the Rep must have been allocated, ie elements() is safe.
   Rep* rep() const {
-    char* addr = reinterpret_cast<char*>(elements()) - offsetof(Rep, elements);
+    GOOGLE_DCHECK_GT(total_size_, 0);
+    char* addr =
+        reinterpret_cast<char*>(ptr_.elements) - offsetof(Rep, elements);
     return reinterpret_cast<Rep*>(addr);
   }
 
@@ -334,8 +323,7 @@ class RepeatedField final {
 
   // Internal helper expected by Arena methods.
   inline Arena* GetArenaNoVirtual() const {
-    return (total_size_ == 0) ? static_cast<Arena*>(arena_or_elements_)
-                              : rep()->arena;
+    return (total_size_ == 0) ? ptr_.arena : rep()->arena;
   }
 
   // Internal helper to delete all elements and deallocate the storage.
@@ -358,6 +346,9 @@ class RepeatedField final {
       }
     }
   }
+
+  friend class internal::WireFormatLite;
+  const Element* unsafe_data() const;
 };
 
 template <typename Element>
@@ -1066,15 +1057,15 @@ class RepeatedPtrField final : private internal::RepeatedPtrFieldBase {
 
 template <typename Element>
 inline RepeatedField<Element>::RepeatedField()
-    : current_size_(0), total_size_(0), arena_or_elements_(nullptr) {}
+    : current_size_(0), total_size_(0), ptr_(NULL) {}
 
 template <typename Element>
 inline RepeatedField<Element>::RepeatedField(Arena* arena)
-    : current_size_(0), total_size_(0), arena_or_elements_(arena) {}
+    : current_size_(0), total_size_(0), ptr_(arena) {}
 
 template <typename Element>
 inline RepeatedField<Element>::RepeatedField(const RepeatedField& other)
-    : current_size_(0), total_size_(0), arena_or_elements_(nullptr) {
+    : current_size_(0), total_size_(0), ptr_(NULL) {
   if (other.current_size_ != 0) {
     Reserve(other.size());
     AddNAlreadyReserved(other.size());
@@ -1085,7 +1076,7 @@ inline RepeatedField<Element>::RepeatedField(const RepeatedField& other)
 template <typename Element>
 template <typename Iter>
 RepeatedField<Element>::RepeatedField(Iter begin, const Iter& end)
-    : current_size_(0), total_size_(0), arena_or_elements_(nullptr) {
+    : current_size_(0), total_size_(0), ptr_(NULL) {
   Add(begin, end);
 }
 
@@ -1162,11 +1153,13 @@ template <typename Element>
 inline Element* RepeatedField<Element>::AddNAlreadyReserved(int n) {
   GOOGLE_DCHECK_GE(total_size_ - current_size_, n)
       << total_size_ << ", " << current_size_;
-  // Warning: sometimes people call this when n == 0 and total_size_ == 0. In
-  // this case the return pointer points to a zero size array (n == 0). Hence
-  // we can just use unsafe_elements(), because the user cannot dereference the
-  // pointer anyway.
-  Element* ret = unsafe_elements() + current_size_;
+  // Warning: sometimes people call this when n==0 and total_size_==0.  This
+  // forces us to add this branch, to avoid reading the non-active union member
+  // (which is UB).  Luckily the compiler is smart enough to optimize the branch
+  // away.
+  Element* ret =
+      total_size_ == 0 ? reinterpret_cast<Element*>(ptr_.arena) : ptr_.elements;
+  ret += current_size_;
   current_size_ += n;
   return ret;
 }
@@ -1320,12 +1313,17 @@ inline typename RepeatedField<Element>::iterator RepeatedField<Element>::erase(
 
 template <typename Element>
 inline Element* RepeatedField<Element>::mutable_data() {
-  return unsafe_elements();
+  return total_size_ > 0 ? elements() : NULL;
 }
 
 template <typename Element>
 inline const Element* RepeatedField<Element>::data() const {
-  return unsafe_elements();
+  return total_size_ > 0 ? elements() : NULL;
+}
+
+template <typename Element>
+inline const Element* RepeatedField<Element>::unsafe_data() const {
+  return elements();
 }
 
 template <typename Element>
@@ -1333,7 +1331,7 @@ inline void RepeatedField<Element>::InternalSwap(RepeatedField* other) {
   GOOGLE_DCHECK(this != other);
   GOOGLE_DCHECK(GetArenaNoVirtual() == other->GetArenaNoVirtual());
 
-  std::swap(arena_or_elements_, other->arena_or_elements_);
+  std::swap(ptr_, other->ptr_);
   std::swap(current_size_, other->current_size_);
   std::swap(total_size_, other->total_size_);
 }
@@ -1366,31 +1364,31 @@ void RepeatedField<Element>::SwapElements(int index1, int index2) {
 template <typename Element>
 inline typename RepeatedField<Element>::iterator
 RepeatedField<Element>::begin() {
-  return unsafe_elements();
+  return total_size_ > 0 ? elements() : NULL;
 }
 template <typename Element>
 inline typename RepeatedField<Element>::const_iterator
 RepeatedField<Element>::begin() const {
-  return unsafe_elements();
+  return total_size_ > 0 ? elements() : NULL;
 }
 template <typename Element>
 inline typename RepeatedField<Element>::const_iterator
 RepeatedField<Element>::cbegin() const {
-  return unsafe_elements();
+  return total_size_ > 0 ? elements() : NULL;
 }
 template <typename Element>
 inline typename RepeatedField<Element>::iterator RepeatedField<Element>::end() {
-  return unsafe_elements() + current_size_;
+  return total_size_ > 0 ? elements() + current_size_ : NULL;
 }
 template <typename Element>
 inline typename RepeatedField<Element>::const_iterator
 RepeatedField<Element>::end() const {
-  return unsafe_elements() + current_size_;
+  return total_size_ > 0 ? elements() + current_size_ : NULL;
 }
 template <typename Element>
 inline typename RepeatedField<Element>::const_iterator
 RepeatedField<Element>::cend() const {
-  return unsafe_elements() + current_size_;
+  return total_size_ > 0 ? elements() + current_size_ : NULL;
 }
 
 template <typename Element>
@@ -1422,7 +1420,7 @@ void RepeatedField<Element>::Reserve(int new_size) {
   new_rep->arena = arena;
   int old_total_size = total_size_;
   total_size_ = new_size;
-  arena_or_elements_ = new_rep->elements;
+  ptr_.elements = new_rep->elements;
   // Invoke placement-new on newly allocated elements. We shouldn't have to do
   // this, since Element is supposed to be POD, but a previous version of this
   // code allocated storage with "new Element[size]" and some code uses

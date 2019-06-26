@@ -169,7 +169,6 @@ def UpdateCpp():
   RewriteTextFile('src/google/protobuf/source_context.pb.h', RewritePbH)
   RewriteTextFile('src/google/protobuf/struct.pb.h', RewritePbH)
   RewriteTextFile('src/google/protobuf/timestamp.pb.h', RewritePbH)
-  RewriteTextFile('src/google/protobuf/type.pb.h', RewritePbH)
   RewriteTextFile('src/google/protobuf/wrappers.pb.h', RewritePbH)
   RewriteTextFile('src/google/protobuf/compiler/plugin.pb.h', RewritePbH)
 

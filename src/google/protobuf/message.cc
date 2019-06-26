@@ -158,11 +158,6 @@ class ReflectionAccessor {
     return reflection->MutableRawRepeatedField(
         msg, field, FieldDescriptor::CPPTYPE_ENUM, 0, nullptr);
   }
-
-  static InternalMetadataWithArena* MutableInternalMetadataWithArena(
-      const Reflection* reflection, Message* msg) {
-    return reflection->MutableInternalMetadataWithArena(msg);
-  }
 };
 
 }  // namespace internal
@@ -268,9 +263,7 @@ const char* ParsePackedField(const FieldDescriptor* field, Message* msg,
       } else {
         return internal::PackedEnumParserArg(
             object, ptr, ctx, ReflectiveValidator, field->enum_type(),
-            internal::ReflectionAccessor::MutableInternalMetadataWithArena(
-                reflection, msg),
-            field->number());
+            reflection->MutableUnknownFields(msg), field->number());
       }
     }
       HANDLE_PACKED_TYPE(FIXED32, uint32, Fixed32);
@@ -527,10 +520,14 @@ const char* Message::_InternalParse(const char* ptr,
 }
 #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
 
-uint8* Message::InternalSerializeWithCachedSizesToArray(
-    uint8* target, io::EpsCopyOutputStream* stream) const {
-  return WireFormat::InternalSerializeWithCachedSizesToArray(*this, target,
-                                                             stream);
+void Message::SerializeWithCachedSizes(io::CodedOutputStream* output) const {
+  const internal::SerializationTable* table =
+      static_cast<const internal::SerializationTable*>(InternalGetTable());
+  if (table == 0) {
+    WireFormat::SerializeWithCachedSizes(*this, GetCachedSize(), output);
+  } else {
+    internal::TableSerialize(*this, table, output);
+  }
 }
 
 size_t Message::ByteSizeLong() const {

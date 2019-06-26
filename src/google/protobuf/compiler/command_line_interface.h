@@ -39,7 +39,6 @@
 #define GOOGLE_PROTOBUF_COMPILER_COMMAND_LINE_INTERFACE_H__
 
 #include <map>
-#include <memory>
 #include <set>
 #include <string>
 #include <unordered_map>
@@ -47,6 +46,7 @@
 #include <vector>
 
 #include <google/protobuf/stubs/common.h>
+
 #include <google/protobuf/port_def.inc>
 
 namespace google {
@@ -208,7 +208,7 @@ class PROTOC_EXPORT CommandLineInterface {
   class ErrorPrinter;
   class GeneratorContextImpl;
   class MemoryOutputStream;
-  typedef std::unordered_map<std::string, std::unique_ptr<GeneratorContextImpl>>
+  typedef std::unordered_map<std::string, GeneratorContextImpl*>
       GeneratorContextMap;
 
   // Clear state from previous Run().

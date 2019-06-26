@@ -524,8 +524,15 @@ void WireFormatLite::WriteMessage(int field_number, const MessageLite& value,
 
 void WireFormatLite::WriteSubMessageMaybeToArray(
     int size, const MessageLite& value, io::CodedOutputStream* output) {
-  output->SetCur(value.InternalSerializeWithCachedSizesToArray(
-      output->Cur(), output->EpsCopy()));
+  if (!output->IsSerializationDeterministic()) {
+    uint8* target = output->GetDirectBufferForNBytesAndAdvance(size);
+    if (target != nullptr) {
+      uint8* end = value.InternalSerializeWithCachedSizesToArray(target);
+      GOOGLE_DCHECK_EQ(end - target, size);
+      return;
+    }
+  }
+  value.SerializeWithCachedSizes(output);
 }
 
 void WireFormatLite::WriteGroupMaybeToArray(int field_number,

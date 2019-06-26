@@ -341,36 +341,28 @@ bool MessageLite::MergeFromString(const std::string& data) {
 
 // ===================================================================
 
-inline uint8* SerializeToArrayImpl(const MessageLite& msg, uint8* target,
-                                   int size) {
-  constexpr bool debug = false;
-  if (debug) {
-    // Force serialization to a stream with a block size of 1, which forces
-    // all writes to the stream to cross buffers triggering all fallback paths
-    // in the unittests when serializing to string / array.
-    io::ArrayOutputStream stream(target, size, 1);
-    uint8* ptr;
-    io::EpsCopyOutputStream out(
-        &stream, io::CodedOutputStream::IsDefaultSerializationDeterministic(),
-        &ptr);
-    ptr = msg.InternalSerializeWithCachedSizesToArray(ptr, &out);
-    out.Trim(ptr);
-    GOOGLE_DCHECK(!out.HadError() && stream.ByteCount() == size);
-    return target + size;
-  } else {
-    io::EpsCopyOutputStream out(
-        target, size,
-        io::CodedOutputStream::IsDefaultSerializationDeterministic());
-    auto res = msg.InternalSerializeWithCachedSizesToArray(target, &out);
-    GOOGLE_DCHECK(target + size == res);
-    return res;
-  }
-}
-
 uint8* MessageLite::SerializeWithCachedSizesToArray(uint8* target) const {
-  // We only optimize this when using optimize_for = SPEED.  In other cases
-  // we just use the CodedOutputStream path.
-  return SerializeToArrayImpl(*this, target, GetCachedSize());
+  const internal::SerializationTable* table =
+      static_cast<const internal::SerializationTable*>(InternalGetTable());
+  auto deterministic =
+      io::CodedOutputStream::IsDefaultSerializationDeterministic();
+  if (table) {
+    return internal::TableSerializeToArray(*this, table, deterministic, target);
+  } else {
+    if (deterministic) {
+      // We only optimize this when using optimize_for = SPEED.  In other cases
+      // we just use the CodedOutputStream path.
+      int size = GetCachedSize();
+      io::ArrayOutputStream out(target, size);
+      io::CodedOutputStream coded_out(&out);
+      coded_out.SetSerializationDeterministic(true);
+      SerializeWithCachedSizes(&coded_out);
+      GOOGLE_CHECK(!coded_out.HadError());
+      return target + size;
+    } else {
+      return InternalSerializeWithCachedSizesToArray(target);
+    }
+  }
 }
 
 bool MessageLite::SerializeToCodedStream(io::CodedOutputStream* output) const {
@@ -387,6 +379,16 @@ bool MessageLite::SerializePartialToCodedStream(
     return false;
   }
 
+  if (!output->IsSerializationDeterministic()) {
+    uint8* buffer = output->GetDirectBufferForNBytesAndAdvance(size);
+    if (buffer != nullptr) {
+      uint8* end = InternalSerializeWithCachedSizesToArray(buffer);
+      if (end - buffer != size) {
+        ByteSizeConsistencyError(size, ByteSizeLong(), end - buffer, *this);
+      }
+      return true;
+    }
+  }
   int original_byte_count = output->ByteCount();
   SerializeWithCachedSizes(output);
   if (output->HadError()) {
@@ -404,27 +406,14 @@ bool MessageLite::SerializePartialToCodedStream(
 
 bool MessageLite::SerializeToZeroCopyStream(
     io::ZeroCopyOutputStream* output) const {
-  GOOGLE_DCHECK(IsInitialized()) << InitializationErrorMessage("serialize", *this);
-  return SerializePartialToZeroCopyStream(output);
+  io::CodedOutputStream encoder(output);
+  return SerializeToCodedStream(&encoder);
 }
 
 bool MessageLite::SerializePartialToZeroCopyStream(
     io::ZeroCopyOutputStream* output) const {
-  const size_t size = ByteSizeLong();  // Force size to be cached.
-  if (size > INT_MAX) {
-    GOOGLE_LOG(ERROR) << GetTypeName()
-               << " exceeded maximum protobuf size of 2GB: " << size;
-    return false;
-  }
-
-  uint8* target;
-  io::EpsCopyOutputStream stream(
-      output, io::CodedOutputStream::IsDefaultSerializationDeterministic(),
-      &target);
-  target = InternalSerializeWithCachedSizesToArray(target, &stream);
-  stream.Trim(target);
-  if (stream.HadError()) return false;
-  return true;
+  io::CodedOutputStream encoder(output);
+  return SerializePartialToCodedStream(&encoder);
 }
 
 bool MessageLite::SerializeToFileDescriptor(int file_descriptor) const {
@@ -467,7 +456,10 @@ bool MessageLite::AppendPartialToString(std::string* output) const {
   STLStringResizeUninitialized(output, old_size + byte_size);
   uint8* start =
       reinterpret_cast<uint8*>(io::mutable_string_data(output) + old_size);
-  SerializeToArrayImpl(*this, start, byte_size);
+  uint8* end = SerializeWithCachedSizesToArray(start);
+  if (end - start != byte_size) {
+    ByteSizeConsistencyError(byte_size, ByteSizeLong(), end - start, *this);
+  }
   return true;
 }
 
@@ -495,7 +487,10 @@ bool MessageLite::SerializePartialToArray(void* data, int size) const {
   }
   if (size < byte_size) return false;
   uint8* start = reinterpret_cast<uint8*>(data);
-  SerializeToArrayImpl(*this, start, byte_size);
+  uint8* end = SerializeWithCachedSizesToArray(start);
+  if (end - start != byte_size) {
+    ByteSizeConsistencyError(byte_size, ByteSizeLong(), end - start, *this);
+  }
   return true;
 }
 
@@ -515,6 +510,38 @@ std::string MessageLite::SerializePartialAsString() const {
   return output;
 }
 
+void MessageLite::SerializeWithCachedSizes(
+    io::CodedOutputStream* output) const {
+  GOOGLE_DCHECK(InternalGetTable());
+  internal::TableSerialize(
+      *this,
+      static_cast<const internal::SerializationTable*>(InternalGetTable()),
+      output);
+}
+
+
+// The table driven code optimizes the case that the CodedOutputStream buffer
+// is large enough to serialize into it directly.
+// If the proto is optimized for speed, this method will be overridden by
+// generated code for maximum speed. If the proto is optimized for size or
+// is lite, then we need to specialize this to avoid infinite recursion.
+uint8* MessageLite::InternalSerializeWithCachedSizesToArray(
+    uint8* target) const {
+  const internal::SerializationTable* table =
+      static_cast<const internal::SerializationTable*>(InternalGetTable());
+  if (table == NULL) {
+    // We only optimize this when using optimize_for = SPEED.  In other cases
+    // we just use the CodedOutputStream path.
+    int size = GetCachedSize();
+    io::ArrayOutputStream out(target, size);
+    io::CodedOutputStream coded_out(&out);
+    SerializeWithCachedSizes(&coded_out);
+    GOOGLE_CHECK(!coded_out.HadError());
+    return target + size;
+  } else {
+    return internal::TableSerializeToArray(*this, table, false, target);
+  }
+}
 
 namespace internal {
 

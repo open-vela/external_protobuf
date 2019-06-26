@@ -622,12 +622,10 @@ class PROTOBUF_EXPORT WireFormatLite {
   // telling them whether to serialize deterministically.
   template <typename MessageType>
   PROTOBUF_ALWAYS_INLINE static uint8* InternalWriteGroupToArray(
-      int field_number, const MessageType& value, uint8* target,
-      io::EpsCopyOutputStream* stream);
+      int field_number, const MessageType& value, uint8* target);
   template <typename MessageType>
   PROTOBUF_ALWAYS_INLINE static uint8* InternalWriteMessageToArray(
-      int field_number, const MessageType& value, uint8* target,
-      io::EpsCopyOutputStream* stream);
+      int field_number, const MessageType& value, uint8* target);
 
   // Like above, but de-virtualize the call to SerializeWithCachedSizes().  The
   // pointer must point at an instance of MessageType, *not* a subclass (or
@@ -643,24 +641,11 @@ class PROTOBUF_EXPORT WireFormatLite {
   // that are non-deterministic always.
   PROTOBUF_ALWAYS_INLINE static uint8* WriteGroupToArray(
       int field_number, const MessageLite& value, uint8* target) {
-    io::EpsCopyOutputStream stream(
-        target,
-        value.GetCachedSize() +
-            static_cast<int>(2 * io::CodedOutputStream::VarintSize32(
-                                     static_cast<uint32>(field_number) << 3)),
-        io::CodedOutputStream::IsDefaultSerializationDeterministic());
-    return InternalWriteGroupToArray(field_number, value, target, &stream);
+    return InternalWriteGroupToArray(field_number, value, target);
   }
   PROTOBUF_ALWAYS_INLINE static uint8* WriteMessageToArray(
       int field_number, const MessageLite& value, uint8* target) {
-    int size = value.GetCachedSize();
-    io::EpsCopyOutputStream stream(
-        target,
-        size + static_cast<int>(io::CodedOutputStream::VarintSize32(
-                                    static_cast<uint32>(field_number) << 3) +
-                                io::CodedOutputStream::VarintSize32(size)),
-        io::CodedOutputStream::IsDefaultSerializationDeterministic());
-    return InternalWriteMessageToArray(field_number, value, target, &stream);
+    return InternalWriteMessageToArray(field_number, value, target);
   }
 
   // Compute the byte size of a field.  The XxSize() functions do NOT include
@@ -900,11 +885,9 @@ inline bool WireFormatLite::ReadString(io::CodedInputStream* input,
   return ReadBytes(input, p);
 }
 
-inline uint8* InternalSerializeUnknownMessageSetItemsToArray(
-    const std::string& unknown_fields, uint8* target,
-    io::EpsCopyOutputStream* stream) {
-  return stream->WriteRaw(unknown_fields.data(),
-                          static_cast<int>(unknown_fields.size()), target);
+inline void SerializeUnknownMessageSetItems(const std::string& unknown_fields,
+                                            io::CodedOutputStream* output) {
+  output->WriteString(unknown_fields);
 }
 
 inline size_t ComputeUnknownMessageSetItemsSize(
@@ -1444,7 +1427,7 @@ inline uint8* WireFormatLite::WritePrimitiveNoTagToArray(
   const int n = value.size();
   GOOGLE_DCHECK_GT(n, 0);
 
-  const T* ii = value.data();
+  const T* ii = value.unsafe_data();
   int i = 0;
   do {
     target = Writer(ii[i], target);
@@ -1462,7 +1445,7 @@ inline uint8* WireFormatLite::WriteFixedNoTagToArray(
   const int n = value.size();
   GOOGLE_DCHECK_GT(n, 0);
 
-  const T* ii = value.data();
+  const T* ii = value.unsafe_data();
   const int bytes = n * static_cast<int>(sizeof(ii[0]));
   memcpy(target, ii, static_cast<size_t>(bytes));
   return target + bytes;
@@ -1608,7 +1591,7 @@ inline uint8* WireFormatLite::WritePrimitiveToArray(
     return target;
   }
 
-  const T* ii = value.data();
+  const T* ii = value.unsafe_data();
   int i = 0;
   do {
     target = Writer(field_number, ii[i], target);
@@ -1699,21 +1682,18 @@ inline uint8* WireFormatLite::WriteBytesToArray(int field_number,
 
 template <typename MessageType>
 inline uint8* WireFormatLite::InternalWriteGroupToArray(
-    int field_number, const MessageType& value, uint8* target,
-    io::EpsCopyOutputStream* stream) {
+    int field_number, const MessageType& value, uint8* target) {
   target = WriteTagToArray(field_number, WIRETYPE_START_GROUP, target);
-  target = value.InternalSerializeWithCachedSizesToArray(target, stream);
-  stream->EnsureSpace(&target);
+  target = value.InternalSerializeWithCachedSizesToArray(target);
   return WriteTagToArray(field_number, WIRETYPE_END_GROUP, target);
 }
 template <typename MessageType>
 inline uint8* WireFormatLite::InternalWriteMessageToArray(
-    int field_number, const MessageType& value, uint8* target,
-    io::EpsCopyOutputStream* stream) {
+    int field_number, const MessageType& value, uint8* target) {
   target = WriteTagToArray(field_number, WIRETYPE_LENGTH_DELIMITED, target);
   target = io::CodedOutputStream::WriteVarint32ToArray(
       static_cast<uint32>(value.GetCachedSize()), target);
-  return value.InternalSerializeWithCachedSizesToArray(target, stream);
+  return value.InternalSerializeWithCachedSizesToArray(target);
 }
 
 // See comment on ReadGroupNoVirtual to understand the need for this template

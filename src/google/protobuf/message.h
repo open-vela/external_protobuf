@@ -304,8 +304,7 @@ class PROTOBUF_EXPORT Message : public MessageLite {
   bool MergePartialFromCodedStream(io::CodedInputStream* input) override;
 #endif
   size_t ByteSizeLong() const override;
-  uint8* InternalSerializeWithCachedSizesToArray(
-      uint8* target, io::EpsCopyOutputStream* stream) const override;
+  void SerializeWithCachedSizes(io::CodedOutputStream* output) const override;
 
  private:
   // This is called only by the default implementation of ByteSize(), to
@@ -983,7 +982,7 @@ class PROTOBUF_EXPORT Reflection final {
   inline const internal::InternalMetadataWithArena&
   GetInternalMetadataWithArena(const Message& message) const;
 
-  internal::InternalMetadataWithArena* MutableInternalMetadataWithArena(
+  inline internal::InternalMetadataWithArena* MutableInternalMetadataWithArena(
       Message* message) const;
 
   inline bool IsInlined(const FieldDescriptor* field) const;
