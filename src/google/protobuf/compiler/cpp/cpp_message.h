@@ -141,7 +141,8 @@ class MessageGenerator {
   void GenerateMergeFromCodedStream(io::Printer* printer);
   void GenerateSerializeWithCachedSizes(io::Printer* printer);
   void GenerateSerializeWithCachedSizesToArray(io::Printer* printer);
-  void GenerateSerializeWithCachedSizesBody(io::Printer* printer);
+  void GenerateSerializeWithCachedSizesBody(io::Printer* printer,
+                                            bool to_array);
   void GenerateByteSize(io::Printer* printer);
   void GenerateMergeFrom(io::Printer* printer);
   void GenerateCopyFrom(io::Printer* printer);
@@ -154,14 +155,16 @@ class MessageGenerator {
   //   cached_has_bits = _has_bits_[cached_has_bit_index]
   // for cached_has_bit_index >= 0
   void GenerateSerializeOneField(io::Printer* printer,
-                                 const FieldDescriptor* field,
+                                 const FieldDescriptor* field, bool unbounded,
                                  int cached_has_bits_index);
   // Generate a switch statement to serialize 2+ fields from the same oneof.
   // Or, if fields.size() == 1, just call GenerateSerializeOneField().
   void GenerateSerializeOneofFields(
-      io::Printer* printer, const std::vector<const FieldDescriptor*>& fields);
+      io::Printer* printer, const std::vector<const FieldDescriptor*>& fields,
+      bool to_array);
   void GenerateSerializeOneExtensionRange(
-      io::Printer* printer, const Descriptor::ExtensionRange* range);
+      io::Printer* printer, const Descriptor::ExtensionRange* range,
+      bool unbounded);
 
   // Generates has_foo() functions and variables for singular field has-bits.
   void GenerateSingularFieldHasBits(const FieldDescriptor* field,

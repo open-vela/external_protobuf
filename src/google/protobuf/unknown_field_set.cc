@@ -37,7 +37,6 @@
 #include <google/protobuf/stubs/logging.h>
 #include <google/protobuf/stubs/common.h>
 #include <google/protobuf/parse_context.h>
-#include <google/protobuf/wire_format_lite.h>
 #include <google/protobuf/io/coded_stream.h>
 #include <google/protobuf/io/zero_copy_stream.h>
 #include <google/protobuf/io/zero_copy_stream_impl.h>
@@ -269,42 +268,47 @@ void UnknownField::DeepCopy(const UnknownField& other) {
 }
 
 
-uint8* UnknownField::InternalSerializeLengthDelimitedNoTag(
-    uint8* target, io::EpsCopyOutputStream* stream) const {
+void UnknownField::SerializeLengthDelimitedNoTag(
+    io::CodedOutputStream* output) const {
+  GOOGLE_DCHECK_EQ(TYPE_LENGTH_DELIMITED, type());
+  const std::string& data = *data_.length_delimited_.string_value;
+  output->WriteVarint32(data.size());
+  output->WriteRawMaybeAliased(data.data(), data.size());
+}
+
+uint8* UnknownField::SerializeLengthDelimitedNoTagToArray(uint8* target) const {
   GOOGLE_DCHECK_EQ(TYPE_LENGTH_DELIMITED, type());
   const std::string& data = *data_.length_delimited_.string_value;
   target = io::CodedOutputStream::WriteVarint32ToArray(data.size(), target);
-  target = stream->WriteRaw(data.data(), data.size(), target);
+  target = io::CodedOutputStream::WriteStringToArray(data, target);
   return target;
 }
 
 #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
 namespace internal {
 const char* PackedEnumParser(void* object, const char* ptr, ParseContext* ctx,
-                             bool (*is_valid)(int),
-                             InternalMetadataWithArena* metadata,
+                             bool (*is_valid)(int), UnknownFieldSet* unknown,
                              int field_num) {
   return ctx->ReadPackedVarint(
-      ptr, [object, is_valid, metadata, field_num](uint64 val) {
+      ptr, [object, is_valid, unknown, field_num](uint64 val) {
         if (is_valid(val)) {
           static_cast<RepeatedField<int>*>(object)->Add(val);
         } else {
-          WriteVarint(field_num, val, metadata->mutable_unknown_fields());
+          WriteVarint(field_num, val, unknown);
         }
       });
 }
 const char* PackedEnumParserArg(void* object, const char* ptr,
                                 ParseContext* ctx,
                                 bool (*is_valid)(const void*, int),
-                                const void* data,
-                                InternalMetadataWithArena* metadata,
+                                const void* data, UnknownFieldSet* unknown,
                                 int field_num) {
   return ctx->ReadPackedVarint(
-      ptr, [object, is_valid, data, metadata, field_num](uint64 val) {
+      ptr, [object, is_valid, data, unknown, field_num](uint64 val) {
         if (is_valid(data, val)) {
           static_cast<RepeatedField<int>*>(object)->Add(val);
         } else {
-          WriteVarint(field_num, val, metadata->mutable_unknown_fields());
+          WriteVarint(field_num, val, unknown);
         }
       });
 }

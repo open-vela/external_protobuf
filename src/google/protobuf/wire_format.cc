@@ -32,11 +32,11 @@
 //  Based on original Protocol Buffers design by
 //  Sanjay Ghemawat, Jeff Dean, and others.
 
-#include <google/protobuf/wire_format.h>
-
 #include <stack>
 #include <string>
 #include <vector>
+
+#include <google/protobuf/wire_format.h>
 
 #include <google/protobuf/stubs/logging.h>
 #include <google/protobuf/stubs/common.h>
@@ -49,7 +49,6 @@
 #include <google/protobuf/dynamic_message.h>
 #include <google/protobuf/map_field.h>
 #include <google/protobuf/map_field_inl.h>
-#include <google/protobuf/message_lite.h>
 #include <google/protobuf/unknown_field_set.h>
 
 
@@ -189,17 +188,53 @@ bool WireFormat::ReadPackedEnumPreserveUnknowns(io::CodedInputStream* input,
   return true;
 }
 
-uint8* WireFormat::InternalSerializeUnknownFieldsToArray(
-    const UnknownFieldSet& unknown_fields, uint8* target,
-    io::EpsCopyOutputStream* stream) {
+void WireFormat::SerializeUnknownFields(const UnknownFieldSet& unknown_fields,
+                                        io::CodedOutputStream* output) {
+  for (int i = 0; i < unknown_fields.field_count(); i++) {
+    const UnknownField& field = unknown_fields.field(i);
+    switch (field.type()) {
+      case UnknownField::TYPE_VARINT:
+        output->WriteVarint32(WireFormatLite::MakeTag(
+            field.number(), WireFormatLite::WIRETYPE_VARINT));
+        output->WriteVarint64(field.varint());
+        break;
+      case UnknownField::TYPE_FIXED32:
+        output->WriteVarint32(WireFormatLite::MakeTag(
+            field.number(), WireFormatLite::WIRETYPE_FIXED32));
+        output->WriteLittleEndian32(field.fixed32());
+        break;
+      case UnknownField::TYPE_FIXED64:
+        output->WriteVarint32(WireFormatLite::MakeTag(
+            field.number(), WireFormatLite::WIRETYPE_FIXED64));
+        output->WriteLittleEndian64(field.fixed64());
+        break;
+      case UnknownField::TYPE_LENGTH_DELIMITED:
+        output->WriteVarint32(WireFormatLite::MakeTag(
+            field.number(), WireFormatLite::WIRETYPE_LENGTH_DELIMITED));
+        output->WriteVarint32(field.length_delimited().size());
+        output->WriteRawMaybeAliased(field.length_delimited().data(),
+                                     field.length_delimited().size());
+        break;
+      case UnknownField::TYPE_GROUP:
+        output->WriteVarint32(WireFormatLite::MakeTag(
+            field.number(), WireFormatLite::WIRETYPE_START_GROUP));
+        SerializeUnknownFields(field.group(), output);
+        output->WriteVarint32(WireFormatLite::MakeTag(
+            field.number(), WireFormatLite::WIRETYPE_END_GROUP));
+        break;
+    }
+  }
+}
+
+uint8* WireFormat::SerializeUnknownFieldsToArray(
+    const UnknownFieldSet& unknown_fields, uint8* target) {
   for (int i = 0; i < unknown_fields.field_count(); i++) {
     const UnknownField& field = unknown_fields.field(i);
 
-    stream->EnsureSpace(&target);
     switch (field.type()) {
       case UnknownField::TYPE_VARINT:
-        target = WireFormatLite::WriteUInt64ToArray(field.number(),
-                                                    field.varint(), target);
+        target = WireFormatLite::WriteInt64ToArray(field.number(),
+                                                   field.varint(), target);
         break;
       case UnknownField::TYPE_FIXED32:
         target = WireFormatLite::WriteFixed32ToArray(field.number(),
@@ -210,15 +245,13 @@ uint8* WireFormat::InternalSerializeUnknownFieldsToArray(
                                                      field.fixed64(), target);
         break;
       case UnknownField::TYPE_LENGTH_DELIMITED:
-        target = stream->WriteString(field.number(), field.length_delimited(),
-                                     target);
+        target = WireFormatLite::WriteBytesToArray(
+            field.number(), field.length_delimited(), target);
         break;
       case UnknownField::TYPE_GROUP:
         target = WireFormatLite::WriteTagToArray(
             field.number(), WireFormatLite::WIRETYPE_START_GROUP, target);
-        target = InternalSerializeUnknownFieldsToArray(field.group(), target,
-                                                       stream);
-        stream->EnsureSpace(&target);
+        target = SerializeUnknownFieldsToArray(field.group(), target);
         target = WireFormatLite::WriteTagToArray(
             field.number(), WireFormatLite::WIRETYPE_END_GROUP, target);
         break;
@@ -227,16 +260,38 @@ uint8* WireFormat::InternalSerializeUnknownFieldsToArray(
   return target;
 }
 
-uint8* WireFormat::InternalSerializeUnknownMessageSetItemsToArray(
-    const UnknownFieldSet& unknown_fields, uint8* target,
-    io::EpsCopyOutputStream* stream) {
+void WireFormat::SerializeUnknownMessageSetItems(
+    const UnknownFieldSet& unknown_fields, io::CodedOutputStream* output) {
+  for (int i = 0; i < unknown_fields.field_count(); i++) {
+    const UnknownField& field = unknown_fields.field(i);
+    // The only unknown fields that are allowed to exist in a MessageSet are
+    // messages, which are length-delimited.
+    if (field.type() == UnknownField::TYPE_LENGTH_DELIMITED) {
+      // Start group.
+      output->WriteVarint32(WireFormatLite::kMessageSetItemStartTag);
+
+      // Write type ID.
+      output->WriteVarint32(WireFormatLite::kMessageSetTypeIdTag);
+      output->WriteVarint32(field.number());
+
+      // Write message.
+      output->WriteVarint32(WireFormatLite::kMessageSetMessageTag);
+      field.SerializeLengthDelimitedNoTag(output);
+
+      // End group.
+      output->WriteVarint32(WireFormatLite::kMessageSetItemEndTag);
+    }
+  }
+}
+
+uint8* WireFormat::SerializeUnknownMessageSetItemsToArray(
+    const UnknownFieldSet& unknown_fields, uint8* target) {
   for (int i = 0; i < unknown_fields.field_count(); i++) {
     const UnknownField& field = unknown_fields.field(i);
 
     // The only unknown fields that are allowed to exist in a MessageSet are
     // messages, which are length-delimited.
     if (field.type() == UnknownField::TYPE_LENGTH_DELIMITED) {
-      stream->EnsureSpace(&target);
       // Start group.
       target = io::CodedOutputStream::WriteTagToArray(
           WireFormatLite::kMessageSetItemStartTag, target);
@@ -250,10 +305,8 @@ uint8* WireFormat::InternalSerializeUnknownMessageSetItemsToArray(
       // Write message.
       target = io::CodedOutputStream::WriteTagToArray(
           WireFormatLite::kMessageSetMessageTag, target);
+      target = field.SerializeLengthDelimitedNoTagToArray(target);
 
-      target = field.InternalSerializeLengthDelimitedNoTag(target, stream);
-
-      stream->EnsureSpace(&target);
       // End group.
       target = io::CodedOutputStream::WriteTagToArray(
           WireFormatLite::kMessageSetItemEndTag, target);
@@ -655,10 +708,11 @@ bool WireFormat::ParseAndMergeMessageSetItem(io::CodedInputStream* input,
 
 // ===================================================================
 
-uint8* WireFormat::InternalSerializeWithCachedSizesToArray(
-    const Message& message, uint8* target, io::EpsCopyOutputStream* stream) {
+void WireFormat::SerializeWithCachedSizes(const Message& message, int size,
+                                          io::CodedOutputStream* output) {
   const Descriptor* descriptor = message.GetDescriptor();
   const Reflection* message_reflection = message.GetReflection();
+  int expected_endpoint = output->ByteCount() + size;
 
   std::vector<const FieldDescriptor*> fields;
 
@@ -671,23 +725,27 @@ uint8* WireFormat::InternalSerializeWithCachedSizesToArray(
     message_reflection->ListFields(message, &fields);
   }
 
-  for (auto field : fields) {
-    target = InternalSerializeField(field, message, target, stream);
+  for (int i = 0; i < fields.size(); i++) {
+    SerializeFieldWithCachedSizes(fields[i], message, output);
   }
 
   if (descriptor->options().message_set_wire_format()) {
-    return InternalSerializeUnknownMessageSetItemsToArray(
-        message_reflection->GetUnknownFields(message), target, stream);
+    SerializeUnknownMessageSetItems(
+        message_reflection->GetUnknownFields(message), output);
   } else {
-    return InternalSerializeUnknownFieldsToArray(
-        message_reflection->GetUnknownFields(message), target, stream);
+    SerializeUnknownFields(message_reflection->GetUnknownFields(message),
+                           output);
   }
+
+  GOOGLE_CHECK_EQ(output->ByteCount(), expected_endpoint)
+      << ": Protocol message serialized to a size different from what was "
+         "originally expected.  Perhaps it was modified by another thread "
+         "during serialization?";
 }
 
-static uint8* SerializeMapKeyWithCachedSizes(const FieldDescriptor* field,
-                                             const MapKey& value, uint8* target,
-                                             io::EpsCopyOutputStream* stream) {
-  stream->EnsureSpace(&target);
+static void SerializeMapKeyWithCachedSizes(const FieldDescriptor* field,
+                                           const MapKey& value,
+                                           io::CodedOutputStream* output) {
   switch (field->type()) {
     case FieldDescriptor::TYPE_DOUBLE:
     case FieldDescriptor::TYPE_FLOAT:
@@ -697,10 +755,10 @@ static uint8* SerializeMapKeyWithCachedSizes(const FieldDescriptor* field,
     case FieldDescriptor::TYPE_ENUM:
       GOOGLE_LOG(FATAL) << "Unsupported";
       break;
-#define CASE_TYPE(FieldType, CamelFieldType, CamelCppType)   \
-  case FieldDescriptor::TYPE_##FieldType:                    \
-    target = WireFormatLite::Write##CamelFieldType##ToArray( \
-        1, value.Get##CamelCppType##Value(), target);        \
+#define CASE_TYPE(FieldType, CamelFieldType, CamelCppType)                     \
+  case FieldDescriptor::TYPE_##FieldType:                                      \
+    WireFormatLite::Write##CamelFieldType(1, value.Get##CamelCppType##Value(), \
+                                          output);                             \
     break;
       CASE_TYPE(INT64, Int64, Int64)
       CASE_TYPE(UINT64, UInt64, UInt64)
@@ -713,23 +771,19 @@ static uint8* SerializeMapKeyWithCachedSizes(const FieldDescriptor* field,
       CASE_TYPE(SFIXED64, SFixed64, Int64)
       CASE_TYPE(SINT32, SInt32, Int32)
       CASE_TYPE(SINT64, SInt64, Int64)
+      CASE_TYPE(STRING, String, String)
 #undef CASE_TYPE
-    case FieldDescriptor::TYPE_STRING:
-      target = stream->WriteString(1, value.GetStringValue(), target);
-      break;
   }
-  return target;
 }
 
-static uint8* SerializeMapValueRefWithCachedSizes(
-    const FieldDescriptor* field, const MapValueRef& value, uint8* target,
-    io::EpsCopyOutputStream* stream) {
-  stream->EnsureSpace(&target);
+static void SerializeMapValueRefWithCachedSizes(const FieldDescriptor* field,
+                                                const MapValueRef& value,
+                                                io::CodedOutputStream* output) {
   switch (field->type()) {
-#define CASE_TYPE(FieldType, CamelFieldType, CamelCppType)   \
-  case FieldDescriptor::TYPE_##FieldType:                    \
-    target = WireFormatLite::Write##CamelFieldType##ToArray( \
-        2, value.Get##CamelCppType##Value(), target);        \
+#define CASE_TYPE(FieldType, CamelFieldType, CamelCppType)                     \
+  case FieldDescriptor::TYPE_##FieldType:                                      \
+    WireFormatLite::Write##CamelFieldType(2, value.Get##CamelCppType##Value(), \
+                                          output);                             \
     break;
     CASE_TYPE(INT64, Int64, Int64)
     CASE_TYPE(UINT64, UInt64, UInt64)
@@ -745,21 +799,12 @@ static uint8* SerializeMapValueRefWithCachedSizes(
     CASE_TYPE(ENUM, Enum, Enum)
     CASE_TYPE(DOUBLE, Double, Double)
     CASE_TYPE(FLOAT, Float, Float)
+    CASE_TYPE(STRING, String, String)
+    CASE_TYPE(BYTES, Bytes, String)
+    CASE_TYPE(MESSAGE, Message, Message)
+    CASE_TYPE(GROUP, Group, Message)
 #undef CASE_TYPE
-    case FieldDescriptor::TYPE_STRING:
-    case FieldDescriptor::TYPE_BYTES:
-      target = stream->WriteString(2, value.GetStringValue(), target);
-      break;
-    case FieldDescriptor::TYPE_MESSAGE:
-      target = WireFormatLite::InternalWriteMessageToArray(
-          2, value.GetMessageValue(), target, stream);
-      break;
-    case FieldDescriptor::TYPE_GROUP:
-      target = WireFormatLite::InternalWriteGroupToArray(
-          2, value.GetMessageValue(), target, stream);
-      break;
   }
-  return target;
 }
 
 class MapKeySorter {
@@ -805,36 +850,33 @@ class MapKeySorter {
   };
 };
 
-static uint8* InternalSerializeMapEntry(const FieldDescriptor* field,
-                                        const MapKey& key,
-                                        const MapValueRef& value, uint8* target,
-                                        io::EpsCopyOutputStream* stream) {
+static void SerializeMapEntry(const FieldDescriptor* field, const MapKey& key,
+                              const MapValueRef& value,
+                              io::CodedOutputStream* output) {
   const FieldDescriptor* key_field = field->message_type()->field(0);
   const FieldDescriptor* value_field = field->message_type()->field(1);
 
+  WireFormatLite::WriteTag(field->number(),
+                           WireFormatLite::WIRETYPE_LENGTH_DELIMITED, output);
   size_t size = kMapEntryTagByteSize;
   size += MapKeyDataOnlyByteSize(key_field, key);
   size += MapValueRefDataOnlyByteSize(value_field, value);
-  stream->EnsureSpace(&target);
-  target = WireFormatLite::WriteTagToArray(
-      field->number(), WireFormatLite::WIRETYPE_LENGTH_DELIMITED, target);
-  target = io::CodedOutputStream::WriteVarint32ToArray(size, target);
-  target = SerializeMapKeyWithCachedSizes(key_field, key, target, stream);
-  target =
-      SerializeMapValueRefWithCachedSizes(value_field, value, target, stream);
-  return target;
+  output->WriteVarint32(size);
+  SerializeMapKeyWithCachedSizes(key_field, key, output);
+  SerializeMapValueRefWithCachedSizes(value_field, value, output);
 }
 
-uint8* WireFormat::InternalSerializeField(const FieldDescriptor* field,
-                                          const Message& message, uint8* target,
-                                          io::EpsCopyOutputStream* stream) {
+void WireFormat::SerializeFieldWithCachedSizes(const FieldDescriptor* field,
+                                               const Message& message,
+                                               io::CodedOutputStream* output) {
   const Reflection* message_reflection = message.GetReflection();
 
   if (field->is_extension() &&
       field->containing_type()->options().message_set_wire_format() &&
       field->cpp_type() == FieldDescriptor::CPPTYPE_MESSAGE &&
       !field->is_repeated()) {
-    return InternalSerializeMessageSetItem(field, message, target, stream);
+    SerializeMessageSetItemWithCachedSizes(field, message, output);
+    return;
   }
 
   // For map fields, we can use either repeated field reflection or map
@@ -855,7 +897,7 @@ uint8* WireFormat::InternalSerializeField(const FieldDescriptor* field,
     const MapFieldBase* map_field =
         message_reflection->GetMapData(message, field);
     if (map_field->IsMapValid()) {
-      if (stream->IsSerializationDeterministic()) {
+      if (output->IsSerializationDeterministic()) {
         std::vector<MapKey> sorted_key_list =
             MapKeySorter::SortKey(message, message_reflection, field);
         for (std::vector<MapKey>::iterator it = sorted_key_list.begin();
@@ -863,8 +905,7 @@ uint8* WireFormat::InternalSerializeField(const FieldDescriptor* field,
           MapValueRef map_value;
           message_reflection->InsertOrLookupMapValue(
               const_cast<Message*>(&message), field, *it, &map_value);
-          target =
-              InternalSerializeMapEntry(field, *it, map_value, target, stream);
+          SerializeMapEntry(field, *it, map_value, output);
         }
       } else {
         for (MapIterator it = message_reflection->MapBegin(
@@ -872,14 +913,14 @@ uint8* WireFormat::InternalSerializeField(const FieldDescriptor* field,
              it !=
              message_reflection->MapEnd(const_cast<Message*>(&message), field);
              ++it) {
-          target = InternalSerializeMapEntry(field, it.GetKey(),
-                                             it.GetValueRef(), target, stream);
+          SerializeMapEntry(field, it.GetKey(), it.GetValueRef(), output);
         }
       }
 
-      return target;
+      return;
     }
   }
+
   int count = 0;
 
   if (field->is_repeated()) {
@@ -893,57 +934,20 @@ uint8* WireFormat::InternalSerializeField(const FieldDescriptor* field,
 
   // map_entries is for maps that'll be deterministically serialized.
   std::vector<const Message*> map_entries;
-  if (count > 1 && field->is_map() && stream->IsSerializationDeterministic()) {
+  if (count > 1 && field->is_map() && output->IsSerializationDeterministic()) {
     map_entries =
         DynamicMapSorter::Sort(message, count, message_reflection, field);
   }
 
-  if (field->is_packed()) {
-    if (count == 0) return target;
-    stream->EnsureSpace(&target);
-    switch (field->type()) {
-#define HANDLE_PRIMITIVE_TYPE(TYPE, CPPTYPE, TYPE_METHOD, CPPTYPE_METHOD)   \
-  case FieldDescriptor::TYPE_##TYPE: {                                      \
-    auto r = message_reflection->GetRepeatedField<CPPTYPE>(message, field); \
-    target = stream->Write##TYPE_METHOD##Packed(                            \
-        field->number(), r, FieldDataOnlyByteSize(field, message), target); \
-    break;                                                                  \
-  }
-
-      HANDLE_PRIMITIVE_TYPE(INT32, int32, Int32, Int32)
-      HANDLE_PRIMITIVE_TYPE(INT64, int64, Int64, Int64)
-      HANDLE_PRIMITIVE_TYPE(SINT32, int32, SInt32, Int32)
-      HANDLE_PRIMITIVE_TYPE(SINT64, int64, SInt64, Int64)
-      HANDLE_PRIMITIVE_TYPE(UINT32, uint32, UInt32, UInt32)
-      HANDLE_PRIMITIVE_TYPE(UINT64, uint64, UInt64, UInt64)
-      HANDLE_PRIMITIVE_TYPE(ENUM, int, Enum, Enum)
-
-#undef HANDLE_PRIMITIVE_TYPE
-#define HANDLE_PRIMITIVE_TYPE(TYPE, CPPTYPE, TYPE_METHOD, CPPTYPE_METHOD)   \
-  case FieldDescriptor::TYPE_##TYPE: {                                      \
-    auto r = message_reflection->GetRepeatedField<CPPTYPE>(message, field); \
-    target = stream->WriteFixedPacked(field->number(), r, target);          \
-    break;                                                                  \
-  }
-
-      HANDLE_PRIMITIVE_TYPE(FIXED32, uint32, Fixed32, UInt32)
-      HANDLE_PRIMITIVE_TYPE(FIXED64, uint64, Fixed64, UInt64)
-      HANDLE_PRIMITIVE_TYPE(SFIXED32, int32, SFixed32, Int32)
-      HANDLE_PRIMITIVE_TYPE(SFIXED64, int64, SFixed64, Int64)
-
-      HANDLE_PRIMITIVE_TYPE(FLOAT, float, Float, Float)
-      HANDLE_PRIMITIVE_TYPE(DOUBLE, double, Double, Double)
-
-      HANDLE_PRIMITIVE_TYPE(BOOL, bool, Bool, Bool)
-#undef HANDLE_PRIMITIVE_TYPE
-      default:
-        GOOGLE_LOG(FATAL) << "Invalid descriptor";
-    }
-    return target;
+  const bool is_packed = field->is_packed();
+  if (is_packed && count > 0) {
+    WireFormatLite::WriteTag(field->number(),
+                             WireFormatLite::WIRETYPE_LENGTH_DELIMITED, output);
+    const size_t data_size = FieldDataOnlyByteSize(field, message);
+    output->WriteVarint32(data_size);
   }
 
   for (int j = 0; j < count; j++) {
-    stream->EnsureSpace(&target);
     switch (field->type()) {
 #define HANDLE_PRIMITIVE_TYPE(TYPE, CPPTYPE, TYPE_METHOD, CPPTYPE_METHOD)     \
   case FieldDescriptor::TYPE_##TYPE: {                                        \
@@ -952,8 +956,11 @@ uint8* WireFormat::InternalSerializeField(const FieldDescriptor* field,
             ? message_reflection->GetRepeated##CPPTYPE_METHOD(message, field, \
                                                               j)              \
             : message_reflection->Get##CPPTYPE_METHOD(message, field);        \
-    target = WireFormatLite::Write##TYPE_METHOD##ToArray(field->number(),     \
-                                                         value, target);      \
+    if (is_packed) {                                                          \
+      WireFormatLite::Write##TYPE_METHOD##NoTag(value, output);               \
+    } else {                                                                  \
+      WireFormatLite::Write##TYPE_METHOD(field->number(), value, output);     \
+    }                                                                         \
     break;                                                                    \
   }
 
@@ -977,7 +984,7 @@ uint8* WireFormat::InternalSerializeField(const FieldDescriptor* field,
 
 #define HANDLE_TYPE(TYPE, TYPE_METHOD, CPPTYPE_METHOD)                         \
   case FieldDescriptor::TYPE_##TYPE:                                           \
-    target = WireFormatLite::InternalWrite##TYPE_METHOD##ToArray(              \
+    WireFormatLite::Write##TYPE_METHOD(                                        \
         field->number(),                                                       \
         field->is_repeated()                                                   \
             ? (map_entries.empty()                                             \
@@ -985,7 +992,7 @@ uint8* WireFormat::InternalSerializeField(const FieldDescriptor* field,
                                                                      field, j) \
                    : *map_entries[j])                                          \
             : message_reflection->Get##CPPTYPE_METHOD(message, field),         \
-        target, stream);                                                       \
+        output);                                                               \
     break;
 
       HANDLE_TYPE(GROUP, Group, Message)
@@ -997,8 +1004,11 @@ uint8* WireFormat::InternalSerializeField(const FieldDescriptor* field,
             field->is_repeated()
                 ? message_reflection->GetRepeatedEnum(message, field, j)
                 : message_reflection->GetEnum(message, field);
-        target = WireFormatLite::WriteEnumToArray(field->number(),
-                                                  value->number(), target);
+        if (is_packed) {
+          WireFormatLite::WriteEnumNoTag(value->number(), output);
+        } else {
+          WireFormatLite::WriteEnum(field->number(), value->number(), output);
+        }
         break;
       }
 
@@ -1021,7 +1031,7 @@ uint8* WireFormat::InternalSerializeField(const FieldDescriptor* field,
           VerifyUTF8StringNamedField(value.data(), value.length(), SERIALIZE,
                                      field->full_name().c_str());
         }
-        target = stream->WriteString(field->number(), value, target);
+        WireFormatLite::WriteString(field->number(), value, output);
         break;
       }
 
@@ -1033,35 +1043,34 @@ uint8* WireFormat::InternalSerializeField(const FieldDescriptor* field,
                                                                  j, &scratch)
                 : message_reflection->GetStringReference(message, field,
                                                          &scratch);
-        target = stream->WriteString(field->number(), value, target);
+        WireFormatLite::WriteBytes(field->number(), value, output);
         break;
       }
     }
   }
-  return target;
 }
 
-uint8* WireFormat::InternalSerializeMessageSetItem(
-    const FieldDescriptor* field, const Message& message, uint8* target,
-    io::EpsCopyOutputStream* stream) {
+void WireFormat::SerializeMessageSetItemWithCachedSizes(
+    const FieldDescriptor* field, const Message& message,
+    io::CodedOutputStream* output) {
   const Reflection* message_reflection = message.GetReflection();
 
-  stream->EnsureSpace(&target);
   // Start group.
-  target = io::CodedOutputStream::WriteTagToArray(
-      WireFormatLite::kMessageSetItemStartTag, target);
+  output->WriteVarint32(WireFormatLite::kMessageSetItemStartTag);
+
   // Write type ID.
-  target = WireFormatLite::WriteUInt32ToArray(
-      WireFormatLite::kMessageSetTypeIdNumber, field->number(), target);
+  output->WriteVarint32(WireFormatLite::kMessageSetTypeIdTag);
+  output->WriteVarint32(field->number());
+
   // Write message.
-  target = WireFormatLite::InternalWriteMessageToArray(
-      WireFormatLite::kMessageSetMessageNumber,
-      message_reflection->GetMessage(message, field), target, stream);
+  output->WriteVarint32(WireFormatLite::kMessageSetMessageTag);
+
+  const Message& sub_message = message_reflection->GetMessage(message, field);
+  output->WriteVarint32(sub_message.GetCachedSize());
+  sub_message.SerializeWithCachedSizes(output);
+
   // End group.
-  stream->EnsureSpace(&target);
-  target = io::CodedOutputStream::WriteTagToArray(
-      WireFormatLite::kMessageSetItemEndTag, target);
-  return target;
+  output->WriteVarint32(WireFormatLite::kMessageSetItemEndTag);
 }
 
 // ===================================================================
@@ -1344,14 +1353,6 @@ size_t WireFormat::MessageSetItemByteSize(const FieldDescriptor* field,
   our_size += message_size;
 
   return our_size;
-}
-
-// Compute the size of the UnknownFieldSet on the wire.
-size_t ComputeUnknownFieldsSize(const InternalMetadataWithArena& metadata,
-                                size_t total_size, CachedSize* cached_size) {
-  total_size += WireFormat::ComputeUnknownFieldsSize(metadata.unknown_fields());
-  cached_size->Set(ToCachedSize(total_size));
-  return total_size;
 }
 
 }  // namespace internal

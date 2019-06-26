@@ -56,6 +56,11 @@
 
 namespace google {
 namespace protobuf {
+namespace io {
+class CodedInputStream;     // coded_stream.h
+class CodedOutputStream;    // coded_stream.h
+class ZeroCopyInputStream;  // zero_copy_stream.h
+}  // namespace io
 namespace internal {
 class InternalMetadataWithArena;  // metadata.h
 class WireFormat;                 // wire_format.h
@@ -191,14 +196,13 @@ inline void WriteLengthDelimited(uint32 num, StringPiece val,
 
 PROTOBUF_EXPORT
 const char* PackedEnumParser(void* object, const char* ptr, ParseContext* ctx,
-                             bool (*is_valid)(int),
-                             InternalMetadataWithArena* unknown, int field_num);
+                             bool (*is_valid)(int), UnknownFieldSet* unknown,
+                             int field_num);
 PROTOBUF_EXPORT
 const char* PackedEnumParserArg(void* object, const char* ptr,
                                 ParseContext* ctx,
                                 bool (*is_valid)(const void*, int),
-                                const void* data,
-                                InternalMetadataWithArena* unknown,
+                                const void* data, UnknownFieldSet* unknown,
                                 int field_num);
 
 PROTOBUF_EXPORT
@@ -251,14 +255,10 @@ class PROTOBUF_EXPORT UnknownField {
   // These methods can take advantage of the underlying implementation and may
   // archieve a better performance than using getters to retrieve the data and
   // do the serialization yourself.
-  void SerializeLengthDelimitedNoTag(io::CodedOutputStream* output) const {
-    output->SetCur(InternalSerializeLengthDelimitedNoTag(output->Cur(),
-                                                         output->EpsCopy()));
-  }
+  void SerializeLengthDelimitedNoTag(io::CodedOutputStream* output) const;
+  uint8* SerializeLengthDelimitedNoTagToArray(uint8* target) const;
 
   inline size_t GetLengthDelimitedSize() const;
-  uint8* InternalSerializeLengthDelimitedNoTag(
-      uint8* target, io::EpsCopyOutputStream* stream) const;
 
 
   // If this UnknownField contains a pointer, delete it.

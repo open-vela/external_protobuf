@@ -69,7 +69,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 /**
  * Unit test for generated messages and generated code. See also {@link MessageTest}, which tests
@@ -80,40 +79,6 @@ import junit.framework.TestSuite;
 public class GeneratedMessageTest extends TestCase {
   TestUtil.ReflectionTester reflectionTester =
       new TestUtil.ReflectionTester(TestAllTypes.getDescriptor(), null);
-
-  public static TestSuite suite() {
-    TestSuite suite = new TestSuite();
-    suite.addTestSuite(ReflectionTest.class);
-    suite.addTestSuite(FastInvokeTest.class);
-    return suite;
-  }
-
-  public static class ReflectionTest extends GeneratedMessageTest {
-    public ReflectionTest() {
-      super(true);
-    }
-  }
-
-  public static class FastInvokeTest extends GeneratedMessageTest {
-    public FastInvokeTest() {
-      super(false);
-    }
-  }
-
-  private final boolean useReflection;
-
-  GeneratedMessageTest(boolean useReflection) {
-    this.useReflection = useReflection;
-  }
-
-  @Override public void setUp() {
-    GeneratedMessageV3.setForTestUseReflection(useReflection);
-  }
-
-  @Override public void tearDown() {
-    GeneratedMessageV3.setForTestUseReflection(false);
-    GeneratedMessageV3.setAlwaysUseFieldBuildersForTesting(false);
-  }
 
   public void testDefaultInstance() throws Exception {
     assertSame(
@@ -972,7 +937,7 @@ public class GeneratedMessageTest extends TestCase {
   }
 
   public void testInvalidations() throws Exception {
-    GeneratedMessageV3.setAlwaysUseFieldBuildersForTesting(true);
+    GeneratedMessage.enableAlwaysUseFieldBuildersForTesting();
     TestAllTypes.NestedMessage nestedMessage1 = TestAllTypes.NestedMessage.newBuilder().build();
     TestAllTypes.NestedMessage nestedMessage2 = TestAllTypes.NestedMessage.newBuilder().build();
 
