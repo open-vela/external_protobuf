@@ -49,6 +49,7 @@
 
 #if defined(_WIN32)
 
+#include <functional>
 #include <string>
 #include <google/protobuf/port.h>
 
@@ -74,6 +75,30 @@ PROTOBUF_EXPORT int setmode(int fd, int mode);
 PROTOBUF_EXPORT int stat(const char* path, struct _stat* buffer);
 PROTOBUF_EXPORT int write(int fd, const void* buffer, size_t size);
 PROTOBUF_EXPORT std::wstring testonly_utf8_to_winpath(const char* path);
+
+struct ExpandWildcardsResult {
+  enum {
+    kSuccess = 0,
+    kErrorNoMatchingFile = 1,
+    kErrorInputPathConversion = 2,
+    kErrorOutputPathConversion = 3,
+  };
+};
+
+// Expand wildcards in a path pattern, feed the result to a consumer function.
+//
+// `path` must be a valid, Windows-style path. It may be absolute, or relative
+// to the current working directory, and it may contain wildcards ("*" and "?")
+// in the last path segment. This function passes all matching file names to
+// `consume`. The resulting paths may not be absolute nor normalized.
+//
+// The function returns true if the path did not contain any wildcards (in
+// which case the path may or may not exist), or the path did contain wildcards
+// and it matched at least one file.
+// The function returns false if the path contained wildcards but it did not
+// match any files.
+LIBPROTOBUF_EXPORT bool expand_wildcards(
+    const std::string& path, std::function<void(const std::string&)> consume);
 
 namespace strings {
 
