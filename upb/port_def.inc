@@ -77,19 +77,13 @@
 #define UPB_NORETURN
 #endif
 
-#if __STDC_VERSION__ >= 199901L || __cplusplus >= 201103L
-/* C99/C++11 versions. */
-#include <stdio.h>
-#define _upb_snprintf snprintf
-#define _upb_vsnprintf vsnprintf
-#define _upb_va_copy(a, b) va_copy(a, b)
-#elif defined(_MSC_VER)
-/* Microsoft C/C++ versions. */
+#if defined(_WIN32) || defined(WIN32)
+/* Windows versions */
 #include <stdarg.h>
 #include <stdio.h>
-#if _MSC_VER < 1900
-int msvc_snprintf(char* s, size_t n, const char* format, ...);
+#if defined(_MSC_VER) && _MSC_VER < 1900
 int msvc_vsnprintf(char* s, size_t n, const char* format, va_list arg);
+int msvc_snprintf(char* s, size_t n, const char* format, ...);
 #define UPB_MSVC_VSNPRINTF
 #define _upb_snprintf msvc_snprintf
 #define _upb_vsnprintf msvc_vsnprintf
@@ -97,6 +91,13 @@ int msvc_vsnprintf(char* s, size_t n, const char* format, va_list arg);
 #define _upb_snprintf snprintf
 #define _upb_vsnprintf vsnprintf
 #endif
+#define _upb_va_copy(a, b) va_copy(a, b)
+#else
+#if __STDC_VERSION__ >= 199901L || __cplusplus >= 201103L
+/* C99/C++11 versions. */
+#include <stdio.h>
+#define _upb_snprintf snprintf
+#define _upb_vsnprintf vsnprintf
 #define _upb_va_copy(a, b) va_copy(a, b)
 #elif defined __GNUC__
 /* A few hacky workarounds for functions not in C89.
@@ -109,6 +110,7 @@ int msvc_vsnprintf(char* s, size_t n, const char* format, va_list arg);
 #define _upb_va_copy(a, b) __va_copy(a, b)
 #else
 #error Need implementations of [v]snprintf and va_copy
+#endif
 #endif
 
 #ifdef __cplusplus
