@@ -75,8 +75,6 @@ namespace protobuf {
 class Arena;    // defined below
 class Message;  // defined in message.h
 class MessageLite;
-template <typename Key, typename T>
-class Map;
 
 namespace arena_metrics {
 
