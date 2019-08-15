@@ -59,7 +59,6 @@ typedef struct OneofDescriptor OneofDescriptor;
 typedef struct EnumDescriptor EnumDescriptor;
 typedef struct MessageLayout MessageLayout;
 typedef struct MessageField MessageField;
-typedef struct MessageOneof MessageOneof;
 typedef struct MessageHeader MessageHeader;
 typedef struct MessageBuilderContext MessageBuilderContext;
 typedef struct OneofBuilderContext OneofBuilderContext;
@@ -368,8 +367,6 @@ bool native_slot_eq(upb_fieldtype_t type, void* mem1, void* mem2);
 
 VALUE native_slot_encode_and_freeze_string(upb_fieldtype_t type, VALUE value);
 void native_slot_check_int_range_precision(const char* name, upb_fieldtype_t type, VALUE value);
-uint32_t slot_read_oneof_case(MessageLayout* layout, const void* storage,
-                              const upb_oneofdef* oneof);
 
 extern rb_encoding* kRubyStringUtf8Encoding;
 extern rb_encoding* kRubyStringASCIIEncoding;
@@ -499,32 +496,25 @@ VALUE Map_iter_value(Map_iter* iter);
 // Message layout / storage.
 // -----------------------------------------------------------------------------
 
-#define MESSAGE_FIELD_NO_HASBIT ((uint32_t)-1)
+#define MESSAGE_FIELD_NO_CASE ((size_t)-1)
+#define MESSAGE_FIELD_NO_HASBIT ((size_t)-1)
 
 struct MessageField {
-  uint32_t offset;
-  uint32_t hasbit;
-};
-
-struct MessageOneof {
-  uint32_t offset;
-  uint32_t case_offset;
+  size_t offset;
+  size_t case_offset;  // for oneofs, a uint32. Else, MESSAGE_FIELD_NO_CASE.
+  size_t hasbit;
 };
 
 // MessageLayout is owned by the enclosing Descriptor, which must outlive us.
 struct MessageLayout {
   const Descriptor* desc;
   const upb_msgdef* msgdef;
+  void* empty_template;  // Can memcpy() onto a layout to clear it.
   MessageField* fields;
-  MessageOneof* oneofs;
-  uint32_t size;
-  uint32_t value_offset;
-  int value_count;
+  size_t size;
 };
 
-#define ONEOF_CASE_MASK 0x80000000
-
-MessageLayout* create_layout(const Descriptor* desc);
+void create_layout(Descriptor* desc);
 void free_layout(MessageLayout* layout);
 bool field_contains_hasbit(MessageLayout* layout,
                  const upb_fielddef* field);
