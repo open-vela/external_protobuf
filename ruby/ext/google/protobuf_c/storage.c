@@ -478,7 +478,7 @@ bool is_value_field(const upb_fielddef* f) {
          upb_fielddef_isstring(f);
 }
 
-MessageLayout* create_layout(const Descriptor* desc) {
+MessageLayout* create_layout(Descriptor* desc) {
   const upb_msgdef *msgdef = desc->msgdef;
   MessageLayout* layout = ALLOC(MessageLayout);
   int nfields = upb_msgdef_numfields(msgdef);
@@ -488,7 +488,10 @@ MessageLayout* create_layout(const Descriptor* desc) {
   size_t off = 0;
   size_t hasbit = 0;
 
+  layout->empty_template = NULL;
   layout->desc = desc;
+  desc->layout = layout;
+
   layout->fields = ALLOC_N(MessageField, nfields);
   layout->oneofs = NULL;
 
@@ -600,10 +603,19 @@ MessageLayout* create_layout(const Descriptor* desc) {
   layout->size = off;
   layout->msgdef = msgdef;
 
-  return layout;
+  // Create the empty message template.
+  layout->empty_template = ALLOC_N(char, layout->size);
+  memset(layout->empty_template, 0, layout->size);
+
+  for (upb_msg_field_begin(&it, layout->msgdef);
+       !upb_msg_field_done(&it);
+       upb_msg_field_next(&it)) {
+    layout_clear(layout, layout->empty_template, upb_msg_iter_field(&it));
+  }
 }
 
 void free_layout(MessageLayout* layout) {
+  xfree(layout->empty_template);
   xfree(layout->fields);
   xfree(layout->oneofs);
   xfree(layout);
@@ -896,15 +908,16 @@ void layout_set(MessageLayout* layout,
   }
 }
 
-void layout_init(MessageLayout* layout,
-                 void* storage) {
-
+void layout_init(MessageLayout* layout, void* storage) {
+  memcpy(storage, layout->empty_template, layout->size);
+  /*
   upb_msg_field_iter it;
   for (upb_msg_field_begin(&it, layout->msgdef);
        !upb_msg_field_done(&it);
        upb_msg_field_next(&it)) {
     layout_clear(layout, storage, upb_msg_iter_field(&it));
   }
+  */
 }
 
 void layout_mark(MessageLayout* layout, void* storage) {

@@ -516,6 +516,7 @@ struct MessageOneof {
 struct MessageLayout {
   const Descriptor* desc;
   const upb_msgdef* msgdef;
+  void* empty_template;  // Can memcpy() onto a layout to clear it.
   MessageField* fields;
   MessageOneof* oneofs;
   uint32_t size;
@@ -525,7 +526,7 @@ struct MessageLayout {
 
 #define ONEOF_CASE_MASK 0x80000000
 
-MessageLayout* create_layout(const Descriptor* desc);
+MessageLayout* create_layout(Descriptor* desc);
 void free_layout(MessageLayout* layout);
 bool field_contains_hasbit(MessageLayout* layout,
                  const upb_fielddef* field);
