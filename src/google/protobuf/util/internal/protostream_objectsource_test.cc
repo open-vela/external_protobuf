@@ -47,6 +47,7 @@
 #include <google/protobuf/util/internal/testdata/timestamp_duration.pb.h>
 #include <google/protobuf/util/internal/type_info_test_helper.h>
 #include <google/protobuf/util/internal/constants.h>
+#include <google/protobuf/stubs/strutil.h>
 #include <gtest/gtest.h>
 #include <google/protobuf/stubs/casts.h>
 

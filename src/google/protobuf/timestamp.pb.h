@@ -150,7 +150,12 @@ class PROTOBUF_EXPORT Timestamp :
   bool IsInitialized() const final;
 
   size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
   const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  #else
+  bool MergePartialFromCodedStream(
+      ::PROTOBUF_NAMESPACE_ID::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
   ::PROTOBUF_NAMESPACE_ID::uint8* InternalSerializeWithCachedSizesToArray(
       ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
   int GetCachedSize() const final { return _cached_size_.Get(); }
@@ -199,19 +204,11 @@ class PROTOBUF_EXPORT Timestamp :
   void clear_seconds();
   ::PROTOBUF_NAMESPACE_ID::int64 seconds() const;
   void set_seconds(::PROTOBUF_NAMESPACE_ID::int64 value);
-  private:
-  ::PROTOBUF_NAMESPACE_ID::int64 _internal_seconds() const;
-  void _internal_set_seconds(::PROTOBUF_NAMESPACE_ID::int64 value);
-  public:
 
   // int32 nanos = 2;
   void clear_nanos();
   ::PROTOBUF_NAMESPACE_ID::int32 nanos() const;
   void set_nanos(::PROTOBUF_NAMESPACE_ID::int32 value);
-  private:
-  ::PROTOBUF_NAMESPACE_ID::int32 _internal_nanos() const;
-  void _internal_set_nanos(::PROTOBUF_NAMESPACE_ID::int32 value);
-  public:
 
   // @@protoc_insertion_point(class_scope:google.protobuf.Timestamp)
  private:
@@ -241,19 +238,13 @@ class PROTOBUF_EXPORT Timestamp :
 inline void Timestamp::clear_seconds() {
   seconds_ = PROTOBUF_LONGLONG(0);
 }
-inline ::PROTOBUF_NAMESPACE_ID::int64 Timestamp::_internal_seconds() const {
-  return seconds_;
-}
 inline ::PROTOBUF_NAMESPACE_ID::int64 Timestamp::seconds() const {
   // @@protoc_insertion_point(field_get:google.protobuf.Timestamp.seconds)
-  return _internal_seconds();
-}
-inline void Timestamp::_internal_set_seconds(::PROTOBUF_NAMESPACE_ID::int64 value) {
-  
-  seconds_ = value;
+  return seconds_;
 }
 inline void Timestamp::set_seconds(::PROTOBUF_NAMESPACE_ID::int64 value) {
-  _internal_set_seconds(value);
+  
+  seconds_ = value;
   // @@protoc_insertion_point(field_set:google.protobuf.Timestamp.seconds)
 }
 
@@ -261,19 +252,13 @@ inline void Timestamp::set_seconds(::PROTOBUF_NAMESPACE_ID::int64 value) {
 inline void Timestamp::clear_nanos() {
   nanos_ = 0;
 }
-inline ::PROTOBUF_NAMESPACE_ID::int32 Timestamp::_internal_nanos() const {
-  return nanos_;
-}
 inline ::PROTOBUF_NAMESPACE_ID::int32 Timestamp::nanos() const {
   // @@protoc_insertion_point(field_get:google.protobuf.Timestamp.nanos)
-  return _internal_nanos();
-}
-inline void Timestamp::_internal_set_nanos(::PROTOBUF_NAMESPACE_ID::int32 value) {
-  
-  nanos_ = value;
+  return nanos_;
 }
 inline void Timestamp::set_nanos(::PROTOBUF_NAMESPACE_ID::int32 value) {
-  _internal_set_nanos(value);
+  
+  nanos_ = value;
   // @@protoc_insertion_point(field_set:google.protobuf.Timestamp.nanos)
 }
 
