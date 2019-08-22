@@ -38,6 +38,7 @@ namespace google {
 namespace protobuf {
 namespace internal {
 
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
 template <typename T>
 const char* ExtensionSet::ParseFieldWithExtensionInfo(
     int number, bool was_packed_on_wire, const ExtensionInfo& extension,
@@ -266,6 +267,7 @@ const char* ExtensionSet::ParseMessageSetItemTmpl(const char* ptr,
   }
   return ptr;
 }
+#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
 
 }  // namespace internal
 }  // namespace protobuf

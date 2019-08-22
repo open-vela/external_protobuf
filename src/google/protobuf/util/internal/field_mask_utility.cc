@@ -34,7 +34,6 @@
 #include <google/protobuf/stubs/strutil.h>
 #include <google/protobuf/stubs/status_macros.h>
 
-// Must be included last.
 #include <google/protobuf/port_def.inc>
 
 namespace google {

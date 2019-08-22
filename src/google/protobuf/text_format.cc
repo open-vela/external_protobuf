@@ -1620,11 +1620,11 @@ void TextFormat::FastFieldValuePrinter::PrintUInt64(
 }
 void TextFormat::FastFieldValuePrinter::PrintFloat(
     float val, BaseTextGenerator* generator) const {
-  generator->PrintString(!std::isnan(val) ? SimpleFtoa(val) : "nan");
+  generator->PrintString(SimpleFtoa(val));
 }
 void TextFormat::FastFieldValuePrinter::PrintDouble(
     double val, BaseTextGenerator* generator) const {
-  generator->PrintString(!std::isnan(val) ? SimpleDtoa(val) : "nan");
+  generator->PrintString(SimpleDtoa(val));
 }
 void TextFormat::FastFieldValuePrinter::PrintEnum(
     int32 val, const std::string& name, BaseTextGenerator* generator) const {

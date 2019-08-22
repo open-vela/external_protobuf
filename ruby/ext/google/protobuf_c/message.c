@@ -64,14 +64,13 @@ VALUE Message_alloc(VALUE klass) {
   VALUE ret;
 
   if (desc->layout == NULL) {
-    create_layout(desc);
+    desc->layout = create_layout(desc);
   }
 
   msg = (MessageHeader*)ALLOC_N(uint8_t,
                                 sizeof(MessageHeader) + desc->layout->size);
 
-  // Required in case a GC happens before layout_init().
-  memset(msg, 0, desc->layout->size);
+  memset(Message_data(msg), 0, desc->layout->size);
 
   // We wrap first so that everything in the message object is GC-rooted in case
   // a collection happens during object creation in layout_init().
