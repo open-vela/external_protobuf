@@ -150,7 +150,12 @@ class PROTOBUF_EXPORT FieldMask :
   bool IsInitialized() const final;
 
   size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
   const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  #else
+  bool MergePartialFromCodedStream(
+      ::PROTOBUF_NAMESPACE_ID::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
   ::PROTOBUF_NAMESPACE_ID::uint8* InternalSerializeWithCachedSizesToArray(
       ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
   int GetCachedSize() const final { return _cached_size_.Get(); }
@@ -196,9 +201,6 @@ class PROTOBUF_EXPORT FieldMask :
   };
   // repeated string paths = 1;
   int paths_size() const;
-  private:
-  int _internal_paths_size() const;
-  public:
   void clear_paths();
   const std::string& paths(int index) const;
   std::string* mutable_paths(int index);
@@ -214,7 +216,6 @@ class PROTOBUF_EXPORT FieldMask :
   const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>& paths() const;
   ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>* mutable_paths();
   private:
-  const std::string& _internal_paths(int index) const;
   std::string* _internal_add_paths();
   public:
 
@@ -242,11 +243,8 @@ class PROTOBUF_EXPORT FieldMask :
 // FieldMask
 
 // repeated string paths = 1;
-inline int FieldMask::_internal_paths_size() const {
-  return paths_.size();
-}
 inline int FieldMask::paths_size() const {
-  return _internal_paths_size();
+  return paths_.size();
 }
 inline void FieldMask::clear_paths() {
   paths_.Clear();
@@ -255,12 +253,9 @@ inline std::string* FieldMask::add_paths() {
   // @@protoc_insertion_point(field_add_mutable:google.protobuf.FieldMask.paths)
   return _internal_add_paths();
 }
-inline const std::string& FieldMask::_internal_paths(int index) const {
-  return paths_.Get(index);
-}
 inline const std::string& FieldMask::paths(int index) const {
   // @@protoc_insertion_point(field_get:google.protobuf.FieldMask.paths)
-  return _internal_paths(index);
+  return paths_.Get(index);
 }
 inline std::string* FieldMask::mutable_paths(int index) {
   // @@protoc_insertion_point(field_mutable:google.protobuf.FieldMask.paths)

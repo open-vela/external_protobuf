@@ -58,7 +58,6 @@ Example usage:
 """
 
 
-from google.protobuf.internal import api_implementation
 from google.protobuf import descriptor_pool
 from google.protobuf import message_factory
 
@@ -89,9 +88,7 @@ class SymbolDatabase(message_factory.MessageFactory):
     Args:
       message_descriptor: a descriptor.MessageDescriptor.
     """
-    if api_implementation.Type() == 'python':
-      # pylint: disable=protected-access
-      self.pool._AddDescriptor(message_descriptor)
+    self.pool.AddDescriptor(message_descriptor)
 
   def RegisterEnumDescriptor(self, enum_descriptor):
     """Registers the given enum descriptor in the local database.
@@ -102,9 +99,7 @@ class SymbolDatabase(message_factory.MessageFactory):
     Returns:
       The provided descriptor.
     """
-    if api_implementation.Type() == 'python':
-      # pylint: disable=protected-access
-      self.pool._AddEnumDescriptor(enum_descriptor)
+    self.pool.AddEnumDescriptor(enum_descriptor)
     return enum_descriptor
 
   def RegisterServiceDescriptor(self, service_descriptor):
@@ -116,9 +111,7 @@ class SymbolDatabase(message_factory.MessageFactory):
     Returns:
       The provided descriptor.
     """
-    if api_implementation.Type() == 'python':
-      # pylint: disable=protected-access
-      self.pool._AddServiceDescriptor(service_descriptor)
+    self.pool.AddServiceDescriptor(service_descriptor)
 
   def RegisterFileDescriptor(self, file_descriptor):
     """Registers the given file descriptor in the local database.
@@ -129,9 +122,7 @@ class SymbolDatabase(message_factory.MessageFactory):
     Returns:
       The provided descriptor.
     """
-    if api_implementation.Type() == 'python':
-      # pylint: disable=protected-access
-      self.pool._InternalAddFileDescriptor(file_descriptor)
+    self.pool.AddFileDescriptor(file_descriptor)
 
   def GetSymbol(self, symbol):
     """Tries to find a symbol in the local database.
