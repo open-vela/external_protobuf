@@ -305,9 +305,7 @@ class RepeatedInputStream : public io::ZeroCopyInputStream {
     return false;
   }
 
-  virtual int64 ByteCount() const {
-    return total_byte_count_;
-  }
+  virtual int64 ByteCount() const { return total_byte_count_; }
 
  private:
   std::string data_;

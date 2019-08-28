@@ -78,7 +78,11 @@ class PROTOBUF_EXPORT ImplicitWeakMessage : public MessageLite {
     data_.append(static_cast<const ImplicitWeakMessage&>(other).data_);
   }
 
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
   const char* _InternalParse(const char* ptr, ParseContext* ctx) final;
+#else
+  bool MergePartialFromCodedStream(io::CodedInputStream* input) override;
+#endif
 
   size_t ByteSizeLong() const override { return data_.size(); }
 
