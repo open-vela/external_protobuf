@@ -62,19 +62,25 @@ VALUE Message_alloc(VALUE klass) {
   Descriptor* desc = ruby_to_Descriptor(descriptor);
   MessageHeader* msg;
   VALUE ret;
-  size_t size;
 
   if (desc->layout == NULL) {
-    create_layout(desc);
+    desc->layout = create_layout(desc);
   }
 
-  msg = ALLOC_N(uint8_t, sizeof(MessageHeader) + desc->layout->size);
-  msg->descriptor = desc;
-  msg->unknown_fields = NULL;
-  memcpy(Message_data(msg), desc->layout->empty_template, desc->layout->size);
+  msg = (MessageHeader*)ALLOC_N(uint8_t,
+                                sizeof(MessageHeader) + desc->layout->size);
 
+  memset(Message_data(msg), 0, desc->layout->size);
+
+  // We wrap first so that everything in the message object is GC-rooted in case
+  // a collection happens during object creation in layout_init().
   ret = TypedData_Wrap_Struct(klass, &Message_type, msg);
+  msg->descriptor = desc;
   rb_ivar_set(ret, descriptor_instancevar_interned, descriptor);
+
+  msg->unknown_fields = NULL;
+
+  layout_init(desc->layout, Message_data(msg));
 
   return ret;
 }
@@ -466,11 +472,7 @@ int Message_initialize_kwarg(VALUE key, VALUE val, VALUE _self) {
  * Message class are provided on each concrete message class.
  */
 VALUE Message_initialize(int argc, VALUE* argv, VALUE _self) {
-  MessageHeader* self;
   VALUE hash_args;
-  TypedData_Get_Struct(_self, MessageHeader, &Message_type, self);
-
-  layout_init(self->descriptor->layout, Message_data(self));
 
   if (argc == 0) {
     return Qnil;

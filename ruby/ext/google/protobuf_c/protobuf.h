@@ -419,7 +419,6 @@ extern VALUE cRepeatedField;
 
 RepeatedField* ruby_to_RepeatedField(VALUE value);
 
-VALUE RepeatedField_new_this_type(VALUE _self);
 VALUE RepeatedField_each(VALUE _self);
 VALUE RepeatedField_index(int argc, VALUE* argv, VALUE _self);
 void* RepeatedField_index_native(VALUE _self, int index);
@@ -468,7 +467,6 @@ extern VALUE cMap;
 
 Map* ruby_to_Map(VALUE value);
 
-VALUE Map_new_this_type(VALUE _self);
 VALUE Map_each(VALUE _self);
 VALUE Map_keys(VALUE _self);
 VALUE Map_values(VALUE _self);
@@ -518,19 +516,16 @@ struct MessageOneof {
 struct MessageLayout {
   const Descriptor* desc;
   const upb_msgdef* msgdef;
-  void* empty_template;  // Can memcpy() onto a layout to clear it.
   MessageField* fields;
   MessageOneof* oneofs;
   uint32_t size;
   uint32_t value_offset;
   int value_count;
-  int repeated_count;
-  int map_count;
 };
 
 #define ONEOF_CASE_MASK 0x80000000
 
-void create_layout(Descriptor* desc);
+MessageLayout* create_layout(const Descriptor* desc);
 void free_layout(MessageLayout* layout);
 bool field_contains_hasbit(MessageLayout* layout,
                  const upb_fielddef* field);
