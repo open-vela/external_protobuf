@@ -838,8 +838,7 @@ void RepeatedImmutableStringFieldGenerator::GenerateBuilderMembers(
                  "  return $name$_.get(index);\n"
                  "}\n");
   printer->Annotate("{", "}", descriptor_);
-  WriteFieldStringBytesAccessorDocComment(printer, descriptor_,
-                                          LIST_INDEXED_GETTER);
+  WriteFieldStringBytesAccessorDocComment(printer, descriptor_, LIST_ADDER);
   printer->Print(variables_,
                  "$deprecation$public com.google.protobuf.ByteString\n"
                  "    ${$get$capitalized_name$Bytes$}$(int index) {\n"
