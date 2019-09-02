@@ -510,7 +510,7 @@ inline const char* ReadSFIXED32(const char* ptr, int32* value) {
   template <typename Type>                                                  \
   const char* MapTypeHandler<WireFormatLite::TYPE_##FieldType, Type>::Read( \
       const char* begin, ParseContext* ctx, MapEntryAccessorType* value) {  \
-    (void)ctx;                                                              \
+    (void) ctx;                                                             \
     return Read##FieldType(begin, value);                                   \
   }
 
@@ -615,7 +615,7 @@ MapTypeHandler<WireFormatLite::TYPE_MESSAGE, Type>::DefaultIfNotInitialized(
 template <typename Type>
 inline bool MapTypeHandler<WireFormatLite::TYPE_MESSAGE, Type>::IsInitialized(
     Type* value) {
-  return value ? value->IsInitialized() : false;
+  return value->IsInitialized();
 }
 
 // Definition for string/bytes handler

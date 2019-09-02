@@ -93,7 +93,7 @@ class PROTOBUF_EXPORT CriticalSectionLock {
 // Mutex is a natural type to wrap. As both google and other organization have
 // specialized mutexes. gRPC also provides an injection mechanism for custom
 // mutexes.
-class GOOGLE_PROTOBUF_CAPABILITY("mutex") PROTOBUF_EXPORT WrappedMutex {
+class PROTOBUF_EXPORT GOOGLE_PROTOBUF_CAPABILITY("mutex") WrappedMutex {
  public:
   WrappedMutex() = default;
   void Lock() GOOGLE_PROTOBUF_ACQUIRE() { mu_.lock(); }

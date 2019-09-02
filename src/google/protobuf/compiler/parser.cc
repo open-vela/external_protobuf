@@ -2206,8 +2206,7 @@ bool Parser::ParseMethodOptions(const LocationRecorder& parent_location,
 bool Parser::ParseLabel(FieldDescriptorProto::Label* label,
                         const LocationRecorder& field_location,
                         const FileDescriptorProto* containing_file) {
-  if (!LookingAt("optional") && !LookingAt("repeated") &&
-      !LookingAt("required")) {
+  if (!LookingAt("optional") && !LookingAt("repeated") && !LookingAt("required")) {
     return false;
   }
   LocationRecorder location(field_location,

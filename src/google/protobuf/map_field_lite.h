@@ -63,9 +63,11 @@ class MapFieldLite {
   typedef Map<Key, T> MapType;
   typedef EntryType EntryTypeTrait;
 
-  MapFieldLite() { SetDefaultEnumValue(); }
+  MapFieldLite() : arena_(NULL) { SetDefaultEnumValue(); }
 
-  explicit MapFieldLite(Arena* arena) : map_(arena) { SetDefaultEnumValue(); }
+  explicit MapFieldLite(Arena* arena) : arena_(arena), map_(arena) {
+    SetDefaultEnumValue();
+  }
 
   // Accessors
   const Map<Key, T>& GetMap() const { return map_; }
@@ -90,17 +92,21 @@ class MapFieldLite {
   // Used in the implementation of parsing. Caller should take the ownership iff
   // arena_ is NULL.
   EntryType* NewEntry() const {
-    return Arena::CreateMessage<EntryType>(map_.arena_);
+    if (arena_ == NULL) {
+      return new EntryType();
+    } else {
+      return Arena::CreateMessage<EntryType>(arena_);
+    }
   }
   // Used in the implementation of serializing enum value type. Caller should
   // take the ownership iff arena_ is NULL.
   EntryType* NewEnumEntryWrapper(const Key& key, const T t) const {
-    return EntryType::EnumWrap(key, t, map_.arena_);
+    return EntryType::EnumWrap(key, t, arena_);
   }
   // Used in the implementation of serializing other value types. Caller should
   // take the ownership iff arena_ is NULL.
   EntryType* NewEntryWrapper(const Key& key, const T& t) const {
-    return EntryType::Wrap(key, t, map_.arena_);
+    return EntryType::Wrap(key, t, arena_);
   }
 
   const char* _InternalParse(const char* ptr, ParseContext* ctx) {
@@ -120,6 +126,7 @@ class MapFieldLite {
  private:
   typedef void DestructorSkippable_;
 
+  Arena* arena_;
   Map<Key, T> map_;
 
   friend class ::PROTOBUF_NAMESPACE_ID::Arena;

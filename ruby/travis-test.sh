@@ -6,7 +6,15 @@ set -e
 test_version() {
   version=$1
 
-  RUBY_CONFORMANCE=test_ruby
+  # TODO(teboring): timestamp parsing is incorrect only on mac due to mktime.
+  if [[ $(uname -s) == Linux ]]
+  then
+    RUBY_CONFORMANCE=test_ruby
+  elif [[ $(uname -s) == Darwin ]]
+  then
+    # TODO(teboring): timestamp parsing is incorrect only on mac due to mktime.
+    RUBY_CONFORMANCE=test_ruby_mac
+  fi
 
   if [ "$version" == "jruby-1.7" ] ; then
     # No conformance tests yet -- JRuby is too broken to run them.

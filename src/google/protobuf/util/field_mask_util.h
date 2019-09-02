@@ -37,9 +37,8 @@
 
 #include <google/protobuf/field_mask.pb.h>
 #include <google/protobuf/descriptor.h>
-#include <google/protobuf/stubs/strutil.h>
+#include <google/protobuf/stubs/stringpiece.h>
 
-// Must be included last.
 #include <google/protobuf/port_def.inc>
 
 namespace google {

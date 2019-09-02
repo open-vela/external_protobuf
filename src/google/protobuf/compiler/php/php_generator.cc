@@ -88,6 +88,7 @@ std::string GeneratedMetadataFileName(const FileDescriptor* file,
 std::string LabelForField(FieldDescriptor* field);
 std::string TypeName(FieldDescriptor* field);
 std::string UnderscoresToCamelCase(const string& name, bool cap_first_letter);
+std::string EscapeDollor(const string& to_escape);
 std::string BinaryToHex(const string& binary);
 void Indent(io::Printer* printer);
 void Outdent(io::Printer* printer);
@@ -152,7 +153,7 @@ template <typename DescriptorType>
 std::string ClassNamePrefix(const string& classname,
                             const DescriptorType* desc) {
   const string& prefix = (desc->file()->options()).php_class_prefix();
-  if (!prefix.empty()) {
+  if (prefix != "") {
     return prefix;
   }
 
@@ -243,13 +244,13 @@ template <typename DescriptorType>
 std::string RootPhpNamespace(const DescriptorType* desc, bool is_descriptor) {
   if (desc->file()->options().has_php_namespace()) {
     const string& php_namespace = desc->file()->options().php_namespace();
-    if (!php_namespace.empty()) {
+    if (php_namespace != "") {
       return php_namespace;
     }
     return "";
   }
 
-  if (!desc->file()->package().empty()) {
+  if (desc->file()->package() != "") {
     return PhpName(desc->file()->package(), is_descriptor);
   }
   return "";
@@ -259,7 +260,7 @@ template <typename DescriptorType>
 std::string FullClassName(const DescriptorType* desc, bool is_descriptor) {
   string classname = GeneratedClassNameImpl(desc);
   string php_namespace = RootPhpNamespace(desc, is_descriptor);
-  if (!php_namespace.empty()) {
+  if (php_namespace != "") {
     return php_namespace + "\\" + classname;
   }
   return classname;
@@ -269,7 +270,7 @@ template <typename DescriptorType>
 std::string LegacyFullClassName(const DescriptorType* desc, bool is_descriptor) {
   string classname = LegacyGeneratedClassName(desc);
   string php_namespace = RootPhpNamespace(desc, is_descriptor);
-  if (!php_namespace.empty()) {
+  if (php_namespace != "") {
     return php_namespace + "\\" + classname;
   }
   return classname;
@@ -351,7 +352,7 @@ std::string GeneratedMetadataFileName(const FileDescriptor* file,
   if (file->options().has_php_metadata_namespace()) {
     const string& php_metadata_namespace =
         file->options().php_metadata_namespace();
-    if (!php_metadata_namespace.empty() && php_metadata_namespace != "\\") {
+    if (php_metadata_namespace != "" && php_metadata_namespace != "\\") {
       result += php_metadata_namespace;
       std::replace(result.begin(), result.end(), '\\', '/');
       if (result.at(result.size() - 1) != '/') {
@@ -551,41 +552,45 @@ std::string EnumOrMessageSuffix(
 
 // Converts a name to camel-case. If cap_first_letter is true, capitalize the
 // first letter.
-std::string UnderscoresToCamelCase(const string& name, bool cap_first_letter) {
+std::string UnderscoresToCamelCase(const string& input, bool cap_first_letter) {
   std::string result;
-  for (int i = 0; i < name.size(); i++) {
-    if ('a' <= name[i] && name[i] <= 'z') {
+  for (int i = 0; i < input.size(); i++) {
+    if ('a' <= input[i] && input[i] <= 'z') {
       if (cap_first_letter) {
-        result += name[i] + ('A' - 'a');
+        result += input[i] + ('A' - 'a');
       } else {
-        result += name[i];
+        result += input[i];
       }
       cap_first_letter = false;
-    } else if ('A' <= name[i] && name[i] <= 'Z') {
+    } else if ('A' <= input[i] && input[i] <= 'Z') {
       if (i == 0 && !cap_first_letter) {
         // Force first letter to lower-case unless explicitly told to
         // capitalize it.
-        result += name[i] + ('a' - 'A');
+        result += input[i] + ('a' - 'A');
       } else {
         // Capital letters after the first are left as-is.
-        result += name[i];
+        result += input[i];
       }
       cap_first_letter = false;
-    } else if ('0' <= name[i] && name[i] <= '9') {
-      result += name[i];
+    } else if ('0' <= input[i] && input[i] <= '9') {
+      result += input[i];
       cap_first_letter = true;
     } else {
       cap_first_letter = true;
     }
   }
   // Add a trailing "_" if the name should be altered.
-  if (name[name.size() - 1] == '#') {
+  if (input[input.size() - 1] == '#') {
     result += '_';
   }
   return result;
 }
 
-std::string BinaryToHex(const string& binary) {
+std::string EscapeDollor(const string& to_escape) {
+  return StringReplace(to_escape, "$", "\\$", true);
+}
+
+std::string BinaryToHex(const string& src) {
   string dest;
   size_t i;
   unsigned char symbol[16] = {
@@ -595,12 +600,12 @@ std::string BinaryToHex(const string& binary) {
     'c', 'd', 'e', 'f',
   };
 
-  dest.resize(binary.size() * 2);
+  dest.resize(src.size() * 2);
   char* append_ptr = &dest[0];
 
-  for (i = 0; i < binary.size(); i++) {
-    *append_ptr++ = symbol[(binary[i] & 0xf0) >> 4];
-    *append_ptr++ = symbol[binary[i] & 0x0f];
+  for (i = 0; i < src.size(); i++) {
+    *append_ptr++ = symbol[(src[i] & 0xf0) >> 4];
+    *append_ptr++ = symbol[src[i] & 0x0f];
   }
 
   return dest;
@@ -1098,7 +1103,7 @@ void LegacyGenerateClassFile(const FileDescriptor* file, const DescriptorType* d
   GenerateHead(file, &printer);
 
   std::string php_namespace = RootPhpNamespace(desc, is_descriptor);
-  if (!php_namespace.empty()) {
+  if (php_namespace != "") {
     printer.Print(
         "namespace ^name^;\n\n",
         "name", php_namespace);
