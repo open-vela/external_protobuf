@@ -73,6 +73,7 @@ Recommended.Proto3.ProtobufInput.ValidDataRepeated.UINT64.PackedInput.DefaultOut
 Recommended.Proto3.ProtobufInput.ValidDataRepeated.UINT64.PackedInput.PackedOutput.ProtobufOutput
 Recommended.Proto3.ProtobufInput.ValidDataRepeated.UINT64.UnpackedInput.DefaultOutput.ProtobufOutput
 Recommended.Proto3.ProtobufInput.ValidDataRepeated.UINT64.UnpackedInput.PackedOutput.ProtobufOutput
+Recommended.Proto3.ProtobufInput.ValidDataScalarBinary.ENUM[3].ProtobufOutput
 Required.DurationProtoInputTooLarge.JsonOutput
 Required.DurationProtoInputTooSmall.JsonOutput
 Required.Proto3.JsonInput.DoubleFieldMaxNegativeValue.JsonOutput
@@ -101,8 +102,6 @@ Required.Proto3.JsonInput.OptionalInt64Wrapper.JsonOutput
 Required.Proto3.JsonInput.OptionalStringWrapper.JsonOutput
 Required.Proto3.JsonInput.OptionalUint32Wrapper.JsonOutput
 Required.Proto3.JsonInput.OptionalUint64Wrapper.JsonOutput
-Required.Proto3.JsonInput.OptionalWrapperTypesWithNonDefaultValue.JsonOutput
-Required.Proto3.JsonInput.OptionalWrapperTypesWithNonDefaultValue.ProtobufOutput
 Required.Proto3.JsonInput.RejectTopLevelNull
 Required.Proto3.JsonInput.RepeatedBoolWrapper.JsonOutput
 Required.Proto3.JsonInput.RepeatedBytesWrapper.JsonOutput
@@ -121,6 +120,6 @@ Required.Proto3.ProtobufInput.FloatFieldNormalizeQuietNan.JsonOutput
 Required.Proto3.ProtobufInput.FloatFieldNormalizeSignalingNan.JsonOutput
 Required.Proto3.ProtobufInput.ValidDataRepeated.FLOAT.PackedInput.JsonOutput
 Required.Proto3.ProtobufInput.ValidDataRepeated.FLOAT.UnpackedInput.JsonOutput
-Required.Proto3.ProtobufInput.ValidDataScalar.FLOAT[1].JsonOutput
+Required.Proto3.ProtobufInput.ValidDataScalar.FLOAT[2].JsonOutput
 Required.TimestampProtoInputTooLarge.JsonOutput
 Required.TimestampProtoInputTooSmall.JsonOutput
