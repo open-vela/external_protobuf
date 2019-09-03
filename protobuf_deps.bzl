@@ -17,17 +17,17 @@ def protobuf_deps():
         http_archive(
             name = "zlib",
             build_file = "@com_google_protobuf//:third_party/zlib.BUILD",
-            sha256 = "c3e5e9fdd5004dcb542feda5ee4f0ff0744628baf8ed2dd5d66f8ca1197cb1a1",
+            sha256 = "629380c90a77b964d896ed37163f5c3a34f6e6d897311f1df2a7016355c45eff",
             strip_prefix = "zlib-1.2.11",
-            urls = ["https://zlib.net/zlib-1.2.11.tar.gz"],
+            urls = ["https://github.com/madler/zlib/archive/v1.2.11.tar.gz"],
         )
 
     if not native.existing_rule("six"):
         http_archive(
             name = "six",
-            build_file = "@//:six.BUILD",
-            sha256 = "105f8d68616f8248e24bf0e9372ef04d3cc10104f1980f54d57b2ce73a5ad56a",
-            urls = ["https://pypi.python.org/packages/source/s/six/six-1.10.0.tar.gz#md5=34eed507548117b2ab523ab14b2f8b55"],
+            build_file = "@com_google_protobuf//:third_party/six.BUILD",
+            sha256 = "d16a0141ec1a18405cd4ce8b4613101da75da0e9a7aec5bdd4fa804d0e0eba73",
+            urls = ["https://pypi.python.org/packages/source/s/six/six-1.12.0.tar.gz"],
         )
 
     if not native.existing_rule("rules_cc"):
