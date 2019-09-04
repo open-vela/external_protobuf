@@ -110,7 +110,7 @@ namespace Google.Protobuf
             get { return Length == 0; }
         }
 
-#if GOOGLE_PROTOBUF_SUPPORT_SYSTEM_MEMORY
+#if NETSTANDARD2_0
         /// <summary>
         /// Provides read-only access to the data of this <see cref="ByteString"/>.
         /// No data is copied so this is the most efficient way of accessing.
@@ -218,7 +218,7 @@ namespace Google.Protobuf
             return new ByteString(portion);
         }
 
-#if GOOGLE_PROTOBUF_SUPPORT_SYSTEM_MEMORY
+#if NETSTANDARD2_0
         /// <summary>
         /// Constructs a <see cref="ByteString" /> from a read only span. The contents
         /// are copied, so further modifications to the span will not
