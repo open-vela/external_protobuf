@@ -39,7 +39,7 @@ namespace Google.Protobuf.Reflection
     /// <summary>
     /// A collection to simplify retrieving the descriptors of extensions in a descriptor for a message
     /// </summary>
-    public sealed class ExtensionCollection
+    public class ExtensionCollection
     {
         private IDictionary<MessageDescriptor, IList<FieldDescriptor>> extensionsByTypeInDeclarationOrder;
         private IDictionary<MessageDescriptor, IList<FieldDescriptor>> extensionsByTypeInNumberOrder;
