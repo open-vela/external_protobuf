@@ -372,7 +372,6 @@ class PROTOBUF_EXPORT MapKey {
  public:
   MapKey() : type_(0) {}
   MapKey(const MapKey& other) : type_(0) { CopyFrom(other); }
-
   MapKey& operator=(const MapKey& other) {
     CopyFrom(other);
     return *this;
@@ -380,7 +379,7 @@ class PROTOBUF_EXPORT MapKey {
 
   ~MapKey() {
     if (type_ == FieldDescriptor::CPPTYPE_STRING) {
-      val_.string_value_.Destruct();
+      delete val_.string_value_;
     }
   }
 
@@ -413,9 +412,9 @@ class PROTOBUF_EXPORT MapKey {
     SetType(FieldDescriptor::CPPTYPE_BOOL);
     val_.bool_value_ = value;
   }
-  void SetStringValue(std::string val) {
+  void SetStringValue(const std::string& val) {
     SetType(FieldDescriptor::CPPTYPE_STRING);
-    *val_.string_value_.get_mutable() = std::move(val);
+    *val_.string_value_ = val;
   }
 
   int64 GetInt64Value() const {
@@ -440,7 +439,7 @@ class PROTOBUF_EXPORT MapKey {
   }
   const std::string& GetStringValue() const {
     TYPE_CHECK(FieldDescriptor::CPPTYPE_STRING, "MapKey::GetStringValue");
-    return val_.string_value_.get();
+    return *val_.string_value_;
   }
 
   bool operator<(const MapKey& other) const {
@@ -457,7 +456,7 @@ class PROTOBUF_EXPORT MapKey {
         GOOGLE_LOG(FATAL) << "Unsupported";
         return false;
       case FieldDescriptor::CPPTYPE_STRING:
-        return val_.string_value_.get() < other.val_.string_value_.get();
+        return *val_.string_value_ < *other.val_.string_value_;
       case FieldDescriptor::CPPTYPE_INT64:
         return val_.int64_value_ < other.val_.int64_value_;
       case FieldDescriptor::CPPTYPE_INT32:
@@ -485,7 +484,7 @@ class PROTOBUF_EXPORT MapKey {
         GOOGLE_LOG(FATAL) << "Unsupported";
         break;
       case FieldDescriptor::CPPTYPE_STRING:
-        return val_.string_value_.get() == other.val_.string_value_.get();
+        return *val_.string_value_ == *other.val_.string_value_;
       case FieldDescriptor::CPPTYPE_INT64:
         return val_.int64_value_ == other.val_.int64_value_;
       case FieldDescriptor::CPPTYPE_INT32:
@@ -511,7 +510,7 @@ class PROTOBUF_EXPORT MapKey {
         GOOGLE_LOG(FATAL) << "Unsupported";
         break;
       case FieldDescriptor::CPPTYPE_STRING:
-        *val_.string_value_.get_mutable() = other.val_.string_value_.get();
+        *val_.string_value_ = *other.val_.string_value_;
         break;
       case FieldDescriptor::CPPTYPE_INT64:
         val_.int64_value_ = other.val_.int64_value_;
@@ -539,7 +538,7 @@ class PROTOBUF_EXPORT MapKey {
 
   union KeyValue {
     KeyValue() {}
-    internal::ExplicitlyConstructed<std::string> string_value_;
+    std::string* string_value_;
     int64 int64_value_;
     int32 int32_value_;
     uint64 uint64_value_;
@@ -550,11 +549,11 @@ class PROTOBUF_EXPORT MapKey {
   void SetType(FieldDescriptor::CppType type) {
     if (type_ == type) return;
     if (type_ == FieldDescriptor::CPPTYPE_STRING) {
-      val_.string_value_.Destruct();
+      delete val_.string_value_;
     }
     type_ = type;
     if (type_ == FieldDescriptor::CPPTYPE_STRING) {
-      val_.string_value_.DefaultConstruct();
+      val_.string_value_ = new std::string;
     }
   }
 

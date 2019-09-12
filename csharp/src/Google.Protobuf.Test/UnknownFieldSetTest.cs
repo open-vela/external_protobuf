@@ -33,25 +33,12 @@
 using System;
 using System.IO;
 using Google.Protobuf.TestProtos;
-using Proto2 = Google.Protobuf.TestProtos.Proto2;
 using NUnit.Framework;
 
 namespace Google.Protobuf
 {
     public class UnknownFieldSetTest
     {
-        public class Data
-        {
-            public static System.Collections.IEnumerable Messages
-            {
-                get
-                {
-                    yield return SampleMessages.CreateFullTestAllTypesProto2();
-                    yield return SampleMessages.CreateFullTestAllTypes();
-                }
-            }
-        }
-
         [Test]
         public void EmptyUnknownFieldSet()
         {
@@ -73,23 +60,24 @@ namespace Google.Protobuf
         }
 
         [Test]
-        [TestCaseSource(typeof(Data), "Messages")]
-        public void TestMergeCodedInput(IMessage message)
+        public void TestMergeCodedInput()
         {
+            var message = SampleMessages.CreateFullTestAllTypes();
             var emptyMessage = new TestEmptyMessage();
             emptyMessage.MergeFrom(message.ToByteArray());
             Assert.AreEqual(message.CalculateSize(), emptyMessage.CalculateSize());
             Assert.AreEqual(message.ToByteArray(), emptyMessage.ToByteArray());
 
-            var newMessage = message.Descriptor.Parser.ParseFrom(emptyMessage.ToByteArray());
+            var newMessage = new TestAllTypes();
+            newMessage.MergeFrom(emptyMessage.ToByteArray());
             Assert.AreEqual(message, newMessage);
             Assert.AreEqual(message.CalculateSize(), newMessage.CalculateSize());
         }
 
         [Test]
-        [TestCaseSource(typeof(Data), "Messages")]
-        public void TestMergeMessage(IMessage message)
+        public void TestMergeMessage()
         {
+            var message = SampleMessages.CreateFullTestAllTypes();
             var emptyMessage = new TestEmptyMessage();
             var otherEmptyMessage = new TestEmptyMessage();
             emptyMessage.MergeFrom(message.ToByteArray());
@@ -100,9 +88,9 @@ namespace Google.Protobuf
         }
 
         [Test]
-        [TestCaseSource(typeof(Data), "Messages")]
-        public void TestEquals(IMessage message)
+        public void TestEquals()
         {
+            var message = SampleMessages.CreateFullTestAllTypes();
             var emptyMessage = new TestEmptyMessage();
             var otherEmptyMessage = new TestEmptyMessage();
             Assert.AreEqual(emptyMessage, otherEmptyMessage);
@@ -113,9 +101,9 @@ namespace Google.Protobuf
         }
 
         [Test]
-        [TestCaseSource(typeof(Data), "Messages")]
-        public void TestHashCode(IMessage message)
+        public void TestHashCode()
         {
+            var message = SampleMessages.CreateFullTestAllTypes();
             var emptyMessage = new TestEmptyMessage();
             int hashCode = emptyMessage.GetHashCode();
             emptyMessage.MergeFrom(message.ToByteArray());
@@ -123,8 +111,7 @@ namespace Google.Protobuf
         }
 
         [Test]
-        [TestCaseSource(typeof(Data), "Messages")]
-        public void TestClone(IMessage message)
+        public void TestClone()
         {
             var emptyMessage = new TestEmptyMessage();
             var otherEmptyMessage = new TestEmptyMessage();
@@ -132,6 +119,7 @@ namespace Google.Protobuf
             Assert.AreEqual(emptyMessage.CalculateSize(), otherEmptyMessage.CalculateSize());
             Assert.AreEqual(emptyMessage.ToByteArray(), otherEmptyMessage.ToByteArray());
 
+            var message = SampleMessages.CreateFullTestAllTypes();
             emptyMessage.MergeFrom(message.ToByteArray());
             otherEmptyMessage = emptyMessage.Clone();
             Assert.AreEqual(message.CalculateSize(), otherEmptyMessage.CalculateSize());
@@ -139,9 +127,9 @@ namespace Google.Protobuf
         }
 
         [Test]
-        [TestCaseSource(typeof(Data), "Messages")]
-        public void TestDiscardUnknownFields(IMessage message)
+        public void TestDiscardUnknownFields()
         {
+            var message = SampleMessages.CreateFullTestAllTypes();
             var goldenEmptyMessage = new TestEmptyMessage();
             byte[] data = message.ToByteArray();
             int fullSize = message.CalculateSize();
