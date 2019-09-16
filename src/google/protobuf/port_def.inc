@@ -288,14 +288,14 @@
 
 // Shared google3/opensource definitions. //////////////////////////////////////
 
-#define PROTOBUF_VERSION 3010000
-#define PROTOBUF_MIN_HEADER_VERSION_FOR_PROTOC 3010000
-#define PROTOBUF_MIN_PROTOC_VERSION 3010000
+#define PROTOBUF_VERSION 3009001
+#define PROTOBUF_MIN_HEADER_VERSION_FOR_PROTOC 3009000
+#define PROTOBUF_MIN_PROTOC_VERSION 3009000
 #define PROTOBUF_VERSION_SUFFIX ""
 
 // The minimum library version which works with the current version of the
 // headers.
-#define GOOGLE_PROTOBUF_MIN_LIBRARY_VERSION 3010000
+#define GOOGLE_PROTOBUF_MIN_LIBRARY_VERSION 3009000
 
 #if defined(GOOGLE_PROTOBUF_NO_RTTI) && GOOGLE_PROTOBUF_NO_RTTI
 #define PROTOBUF_RTTI 0
@@ -331,20 +331,43 @@
                          reinterpret_cast<const char*>(16))
 #endif
 
-#if defined(_MSC_VER) && defined(PROTOBUF_USE_DLLS)
-#ifdef LIBPROTOBUF_EXPORTS
-#define PROTOBUF_EXPORT __declspec(dllexport)
-#else
-#define PROTOBUF_EXPORT __declspec(dllimport)
-#endif
-#ifdef LIBPROTOC_EXPORTS
-#define PROTOC_EXPORT __declspec(dllexport)
-#else
-#define PROTOC_EXPORT __declspec(dllimport)
-#endif
-#else
-#define PROTOBUF_EXPORT
-#define PROTOC_EXPORT
+#if defined(PROTOBUF_USE_DLLS)
+  #if defined(_MSC_VER)
+    #ifdef LIBPROTOBUF_EXPORTS
+      #define PROTOBUF_EXPORT __declspec(dllexport)
+      #define PROTOBUF_EXPORT_TEMPLATE_DECLARE
+      #define PROTOBUF_EXPORT_TEMPLATE_DEFINE __declspec(dllexport)
+    #else
+      #define PROTOBUF_EXPORT __declspec(dllimport)
+      #define PROTOBUF_EXPORT_TEMPLATE_DECLARE
+      #define PROTOBUF_EXPORT_TEMPLATE_DEFINE __declspec(dllimport)
+    #endif
+    #ifdef LIBPROTOC_EXPORTS
+      #define PROTOC_EXPORT __declspec(dllexport)
+    #else
+      #define PROTOC_EXPORT __declspec(dllimport)
+    #endif
+  #else  // defined(_MSC_VER)
+    #ifdef LIBPROTOBUF_EXPORTS
+      #define PROTOBUF_EXPORT __attribute__((visibility("default")))
+      #define PROTOBUF_EXPORT_TEMPLATE_DECLARE __attribute__((visibility("default")))
+      #define PROTOBUF_EXPORT_TEMPLATE_DEFINE
+    #else
+      #define PROTOBUF_EXPORT
+      #define PROTOBUF_EXPORT_TEMPLATE_DECLARE
+      #define PROTOBUF_EXPORT_TEMPLATE_DEFINE
+    #endif
+    #ifdef LIBPROTOC_EXPORTS
+      #define PROTOC_EXPORT   __attribute__((visibility("default")))
+    #else
+      #define PROTOC_EXPORT
+    #endif
+  #endif
+#else  // defined(PROTOBUF_USE_DLLS)
+  #define PROTOBUF_EXPORT
+  #define PROTOC_EXPORT
+  #define PROTOBUF_EXPORT_TEMPLATE_DECLARE
+  #define PROTOBUF_EXPORT_TEMPLATE_DEFINE
 #endif
 
 // Windows declares several inconvenient macro names.  We #undef them and then
