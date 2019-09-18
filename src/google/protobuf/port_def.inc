@@ -331,43 +331,20 @@
                          reinterpret_cast<const char*>(16))
 #endif
 
-#if defined(PROTOBUF_USE_DLLS)
-  #if defined(_MSC_VER)
-    #ifdef LIBPROTOBUF_EXPORTS
-      #define PROTOBUF_EXPORT __declspec(dllexport)
-      #define PROTOBUF_EXPORT_TEMPLATE_DECLARE
-      #define PROTOBUF_EXPORT_TEMPLATE_DEFINE __declspec(dllexport)
-    #else
-      #define PROTOBUF_EXPORT __declspec(dllimport)
-      #define PROTOBUF_EXPORT_TEMPLATE_DECLARE
-      #define PROTOBUF_EXPORT_TEMPLATE_DEFINE __declspec(dllimport)
-    #endif
-    #ifdef LIBPROTOC_EXPORTS
-      #define PROTOC_EXPORT __declspec(dllexport)
-    #else
-      #define PROTOC_EXPORT __declspec(dllimport)
-    #endif
-  #else  // defined(_MSC_VER)
-    #ifdef LIBPROTOBUF_EXPORTS
-      #define PROTOBUF_EXPORT __attribute__((visibility("default")))
-      #define PROTOBUF_EXPORT_TEMPLATE_DECLARE __attribute__((visibility("default")))
-      #define PROTOBUF_EXPORT_TEMPLATE_DEFINE
-    #else
-      #define PROTOBUF_EXPORT
-      #define PROTOBUF_EXPORT_TEMPLATE_DECLARE
-      #define PROTOBUF_EXPORT_TEMPLATE_DEFINE
-    #endif
-    #ifdef LIBPROTOC_EXPORTS
-      #define PROTOC_EXPORT   __attribute__((visibility("default")))
-    #else
-      #define PROTOC_EXPORT
-    #endif
-  #endif
-#else  // defined(PROTOBUF_USE_DLLS)
-  #define PROTOBUF_EXPORT
-  #define PROTOC_EXPORT
-  #define PROTOBUF_EXPORT_TEMPLATE_DECLARE
-  #define PROTOBUF_EXPORT_TEMPLATE_DEFINE
+#if defined(_MSC_VER) && defined(PROTOBUF_USE_DLLS)
+#ifdef LIBPROTOBUF_EXPORTS
+#define PROTOBUF_EXPORT __declspec(dllexport)
+#else
+#define PROTOBUF_EXPORT __declspec(dllimport)
+#endif
+#ifdef LIBPROTOC_EXPORTS
+#define PROTOC_EXPORT __declspec(dllexport)
+#else
+#define PROTOC_EXPORT __declspec(dllimport)
+#endif
+#else
+#define PROTOBUF_EXPORT
+#define PROTOC_EXPORT
 #endif
 
 // Windows declares several inconvenient macro names.  We #undef them and then
