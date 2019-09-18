@@ -269,7 +269,7 @@ class RepeatedInputStream : public io::ZeroCopyInputStream {
   RepeatedInputStream(const std::string& data, size_t count)
       : data_(data), count_(count), position_(0), total_byte_count_(0) {}
 
-  bool Next(const void** data, int* size) override {
+  virtual bool Next(const void** data, int* size) {
     if (position_ == data_.size()) {
       if (--count_ == 0) {
         return false;
@@ -283,12 +283,12 @@ class RepeatedInputStream : public io::ZeroCopyInputStream {
     return true;
   }
 
-  void BackUp(int count) override {
+  virtual void BackUp(int count) {
     position_ -= static_cast<size_t>(count);
     total_byte_count_ -= count;
   }
 
-  bool Skip(int count) override {
+  virtual bool Skip(int count) {
     while (count > 0) {
       const void* data;
       int size;
@@ -305,7 +305,9 @@ class RepeatedInputStream : public io::ZeroCopyInputStream {
     return false;
   }
 
-  int64_t ByteCount() const override { return total_byte_count_; }
+  virtual int64 ByteCount() const {
+    return total_byte_count_;
+  }
 
  private:
   std::string data_;

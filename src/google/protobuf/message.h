@@ -294,11 +294,7 @@ class PROTOBUF_EXPORT Message : public MessageLite {
 
   std::string GetTypeName() const override;
   void Clear() override;
-
-  // Returns whether all required fields have been set. Note that required
-  // fields no longer exist starting in proto3.
   bool IsInitialized() const override;
-
   void CheckTypeAndMergeFrom(const MessageLite& other) override;
   // Reflective parser
   const char* _InternalParse(const char* ptr,
@@ -330,11 +326,15 @@ class PROTOBUF_EXPORT Message : public MessageLite {
   // which can be used to read and modify the fields of the Message dynamically
   // (in other words, without knowing the message type at compile time).  This
   // object remains property of the Message.
+  //
+  // This method remains virtual in case a subclass does not implement
+  // reflection and wants to override the default behavior.
   const Reflection* GetReflection() const { return GetMetadata().reflection; }
 
  protected:
-  // Get a struct containing the metadata for the Message, which is used in turn
-  // to implement GetDescriptor() and GetReflection() above.
+  // Get a struct containing the metadata for the Message. Most subclasses only
+  // need to implement this method, rather than the GetDescriptor() and
+  // GetReflection() wrappers.
   virtual Metadata GetMetadata() const = 0;
 
 
