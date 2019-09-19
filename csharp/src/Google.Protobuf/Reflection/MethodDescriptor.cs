@@ -78,7 +78,7 @@ namespace Google.Protobuf.Reflection
 
         /* // uncomment this in the full proto2 support PR
         /// <summary>
-        /// Gets a single value enum option for this descriptor
+        /// Gets a single value method option for this descriptor
         /// </summary>
         public T GetOption<T>(Extension<MethodOptions, T> extension)
         {
@@ -87,7 +87,7 @@ namespace Google.Protobuf.Reflection
         }
 
         /// <summary>
-        /// Gets a repeated value enum option for this descriptor
+        /// Gets a repeated value method option for this descriptor
         /// </summary>
         public RepeatedField<T> GetOption<T>(RepeatedExtension<MethodOptions, T> extension)
         {
