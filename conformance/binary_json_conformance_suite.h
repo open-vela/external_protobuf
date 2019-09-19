@@ -115,6 +115,13 @@ class BinaryAndJsonConformanceSuite : public ConformanceTestSuite {
       google::protobuf::FieldDescriptor::Type,
       std::vector<std::pair<std::string, std::string>> values);
   void TestValidDataForRepeatedScalarMessage();
+  void TestValidDataForMapType(
+      google::protobuf::FieldDescriptor::Type,
+      google::protobuf::FieldDescriptor::Type);
+  void TestValidDataForOneofType(
+      google::protobuf::FieldDescriptor::Type);
+  void TestMergeOneofMessage();
+  void TestOverwriteMessageValueMap();
 
   std::unique_ptr<google::protobuf::util::TypeResolver>
       type_resolver_;
