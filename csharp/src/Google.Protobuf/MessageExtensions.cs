@@ -148,14 +148,9 @@ namespace Google.Protobuf
         /// </summary>
         public static bool IsInitialized(this IMessage message)
         {
-            if (message.Descriptor.File.Syntax == Syntax.Proto3)
+            if (message.Descriptor.File.Proto.Syntax != "proto2")
             {
                 return true;
-            }
-
-            if (!message.Descriptor.IsExtensionsInitialized(message))
-            {
-                return false;
             }
 
             return message.Descriptor
@@ -165,16 +160,8 @@ namespace Google.Protobuf
                 {
                     if (f.IsMap)
                     {
-                        var valueField = f.MessageType.Fields[2];
-                        if (valueField.FieldType == FieldType.Message)
-                        {
-                            var map = (IDictionary)f.Accessor.GetValue(message);
-                            return map.Values.Cast<IMessage>().All(IsInitialized);
-                        }
-                        else
-                        {
-                            return true;
-                        }
+                        var map = (IDictionary)f.Accessor.GetValue(message);
+                        return map.Values.OfType<IMessage>().All(IsInitialized);
                     }
                     else if (f.IsRepeated && f.FieldType == FieldType.Message || f.FieldType == FieldType.Group)
                     {
