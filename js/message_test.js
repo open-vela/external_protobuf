@@ -32,6 +32,7 @@
 
 goog.setTestOnly();
 
+goog.require('goog.json');
 goog.require('goog.testing.PropertyReplacer');
 goog.require('goog.testing.asserts');
 goog.require('goog.userAgent');
