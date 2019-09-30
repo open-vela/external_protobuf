@@ -57,7 +57,20 @@ namespace Google.Protobuf.Reflection
                 throw new ArgumentException("Not all required properties/methods available");
             }
             setValueDelegate = ReflectionUtil.CreateActionIMessageObject(property.GetSetMethod());
-            if (descriptor.File.Syntax == Syntax.Proto3)
+            if (descriptor.File.Proto.Syntax == "proto2")
+            {
+                MethodInfo hasMethod = property.DeclaringType.GetRuntimeProperty("Has" + property.Name).GetMethod;
+                if (hasMethod == null) {
+                  throw new ArgumentException("Not all required properties/methods are available");
+                }
+                hasDelegate = ReflectionUtil.CreateFuncIMessageBool(hasMethod);
+                MethodInfo clearMethod = property.DeclaringType.GetRuntimeMethod("Clear" + property.Name, ReflectionUtil.EmptyTypes);
+                if (clearMethod == null) {
+                  throw new ArgumentException("Not all required properties/methods are available");
+                }
+                clearDelegate = ReflectionUtil.CreateActionIMessage(clearMethod);
+            }
+            else
             {
                 hasDelegate = message => {
                   throw new InvalidOperationException("HasValue is not implemented for proto3 fields");
@@ -71,19 +84,6 @@ namespace Google.Protobuf.Reflection
                     : clrType == typeof(ByteString) ? ByteString.Empty
                     : Activator.CreateInstance(clrType);
                 clearDelegate = message => SetValue(message, defaultValue);
-            }
-            else
-            {
-                MethodInfo hasMethod = property.DeclaringType.GetRuntimeProperty("Has" + property.Name).GetMethod;
-                if (hasMethod == null) {
-                  throw new ArgumentException("Not all required properties/methods are available");
-                }
-                hasDelegate = ReflectionUtil.CreateFuncIMessageBool(hasMethod);
-                MethodInfo clearMethod = property.DeclaringType.GetRuntimeMethod("Clear" + property.Name, ReflectionUtil.EmptyTypes);
-                if (clearMethod == null) {
-                  throw new ArgumentException("Not all required properties/methods are available");
-                }
-                clearDelegate = ReflectionUtil.CreateActionIMessage(clearMethod);
             }
         }
 
