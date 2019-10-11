@@ -43,6 +43,9 @@ namespace protobuf {
 namespace util {
 namespace converter {
 
+;
+;
+;
 using util::Status;
 using util::StatusOr;
 using util::error::Code;
@@ -356,7 +359,7 @@ StatusOr<To> DataPiece::StringToNumber(bool (*func)(StringPiece,
   }
   To result;
   if (func(str_, &result)) return result;
-  return InvalidArgument(StrCat("\"", std::string(str_), "\""));
+  return InvalidArgument(StrCat("\"", string(str_), "\""));
 }
 
 bool DataPiece::DecodeBase64(StringPiece src, std::string* dest) const {

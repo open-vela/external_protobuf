@@ -65,10 +65,10 @@ static const int kUnicodeEscapedLength = 6;
 
 static const int kDefaultMaxRecursionDepth = 100;
 
-// These cannot be constexpr for portability with VS2015.
-static const StringPiece kKeywordTrue = "true";
-static const StringPiece kKeywordFalse = "false";
-static const StringPiece kKeywordNull = "null";
+// Length of the true, false, and null literals.
+static const int true_len = strlen("true");
+static const int false_len = strlen("false");
+static const int null_len = strlen("null");
 
 inline bool IsLetter(char c) {
   return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || (c == '_') ||
@@ -79,32 +79,11 @@ inline bool IsAlphanumeric(char c) {
   return IsLetter(c) || ('0' <= c && c <= '9');
 }
 
-// Indicates a character may not be part of an unquoted key.
-inline bool IsKeySeparator(char c) {
-  return (ascii_isspace(c) || c == '"' || c == '\'' || c == '{' || c == '}' ||
-          c == '[' || c == ']' || c == ':' || c == ',');
-}
-
 static bool ConsumeKey(StringPiece* input, StringPiece* key) {
   if (input->empty() || !IsLetter((*input)[0])) return false;
   int len = 1;
   for (; len < input->size(); ++len) {
     if (!IsAlphanumeric((*input)[len])) {
-      break;
-    }
-  }
-  *key = StringPiece(input->data(), len);
-  *input = StringPiece(input->data() + len, input->size() - len);
-  return true;
-}
-
-// Same as 'ConsumeKey', but allows a widened set of key characters.
-static bool ConsumeKeyPermissive(StringPiece* input,
-                                 StringPiece* key) {
-  if (input->empty() || !IsLetter((*input)[0])) return false;
-  int len = 1;
-  for (; len < input->size(); ++len) {
-    if (IsKeySeparator((*input)[len])) {
       break;
     }
   }
@@ -132,7 +111,6 @@ JsonStreamParser::JsonStreamParser(ObjectWriter* ow)
       chunk_storage_(),
       coerce_to_utf8_(false),
       allow_empty_null_(false),
-      allow_permissive_key_naming_(false),
       loose_float_number_conversion_(false),
       recursion_depth_(0),
       max_recursion_depth_(kDefaultMaxRecursionDepth) {
@@ -314,7 +292,7 @@ util::Status JsonStreamParser::ParseValue(TokenType type) {
       // This handles things like 'fals' being at the end of the string, we
       // don't know if the next char would be e, completing it, or something
       // else, making it invalid.
-      if (!finishing_ && p_.length() < kKeywordFalse.length()) {
+      if (!finishing_ && p_.length() < false_len) {
         return util::Status(util::error::CANCELLED, "");
       }
       return ReportFailure("Unexpected token.");
@@ -681,13 +659,6 @@ util::Status JsonStreamParser::ParseEntry(TokenType type) {
   } else if (type == BEGIN_KEY) {
     // Key is a bare key (back compat), create a StringPiece pointing to it.
     result = ParseKey();
-  } else if (type == BEGIN_NULL || type == BEGIN_TRUE || type == BEGIN_FALSE) {
-    // Key may be a bare key that begins with a reserved word.
-    result = ParseKey();
-    if (result.ok() && (key_ == kKeywordNull || key_ == kKeywordTrue ||
-                        key_ == kKeywordFalse)) {
-      result = ReportFailure("Expected an object key or }.");
-    }
   } else {
     // Unknown key type, report an error.
     result = ReportFailure("Expected an object key or }.");
@@ -769,21 +740,21 @@ util::Status JsonStreamParser::ParseArrayMid(TokenType type) {
 util::Status JsonStreamParser::ParseTrue() {
   ow_->RenderBool(key_, true);
   key_ = StringPiece();
-  p_.remove_prefix(kKeywordTrue.length());
+  p_.remove_prefix(true_len);
   return util::Status();
 }
 
 util::Status JsonStreamParser::ParseFalse() {
   ow_->RenderBool(key_, false);
   key_ = StringPiece();
-  p_.remove_prefix(kKeywordFalse.length());
+  p_.remove_prefix(false_len);
   return util::Status();
 }
 
 util::Status JsonStreamParser::ParseNull() {
   ow_->RenderNull(key_);
   key_ = StringPiece();
-  p_.remove_prefix(kKeywordNull.length());
+  p_.remove_prefix(null_len);
   return util::Status();
 }
 
@@ -850,17 +821,9 @@ void JsonStreamParser::Advance() {
 
 util::Status JsonStreamParser::ParseKey() {
   StringPiece original = p_;
-
-  if (allow_permissive_key_naming_) {
-    if (!ConsumeKeyPermissive(&p_, &key_)) {
-      return ReportFailure("Invalid key or variable name.");
-    }
-  } else {
-    if (!ConsumeKey(&p_, &key_)) {
-      return ReportFailure("Invalid key or variable name.");
-    }
+  if (!ConsumeKey(&p_, &key_)) {
+    return ReportFailure("Invalid key or variable name.");
   }
-
   // If we consumed everything but expect more data, reset p_ and cancel since
   // we can't know if the key was complete or not.
   if (!finishing_ && p_.empty()) {
@@ -884,21 +847,17 @@ JsonStreamParser::TokenType JsonStreamParser::GetNextTokenType() {
   // TODO(sven): Split this method based on context since different contexts
   // support different tokens. Would slightly speed up processing?
   const char* data = p_.data();
-  StringPiece data_view = StringPiece(data, size);
   if (*data == '\"' || *data == '\'') return BEGIN_STRING;
   if (*data == '-' || ('0' <= *data && *data <= '9')) {
     return BEGIN_NUMBER;
   }
-  if (size >= kKeywordTrue.length() &&
-      HasPrefixString(data_view, kKeywordTrue)) {
+  if (size >= true_len && !strncmp(data, "true", true_len)) {
     return BEGIN_TRUE;
   }
-  if (size >= kKeywordFalse.length() &&
-      HasPrefixString(data_view, kKeywordFalse)) {
+  if (size >= false_len && !strncmp(data, "false", false_len)) {
     return BEGIN_FALSE;
   }
-  if (size >= kKeywordNull.length() &&
-      HasPrefixString(data_view, kKeywordNull)) {
+  if (size >= null_len && !strncmp(data, "null", null_len)) {
     return BEGIN_NULL;
   }
   if (*data == '{') return BEGIN_OBJECT;

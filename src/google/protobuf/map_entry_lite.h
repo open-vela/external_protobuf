@@ -114,7 +114,7 @@ struct MapEntryFuncs {
   static uint8* InternalSerialize(int field_number, const Key& key,
                                   const Value& value, uint8* ptr,
                                   io::EpsCopyOutputStream* stream) {
-    ptr = stream->EnsureSpace(ptr);
+    stream->EnsureSpace(&ptr);
     ptr = WireFormatLite::WriteTagToArray(
         field_number, WireFormatLite::WIRETYPE_LENGTH_DELIMITED, ptr);
     ptr = io::CodedOutputStream::WriteVarint32ToArray(GetCachedSize(key, value),
@@ -255,8 +255,7 @@ class MapEntryImpl : public Base {
           ctx->SetLastTag(tag);
           return ptr;
         }
-        ptr = UnknownFieldParse(tag, static_cast<std::string*>(nullptr), ptr,
-                                ctx);
+        ptr = UnknownFieldParse(tag, static_cast<string*>(nullptr), ptr, ctx);
       }
       GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
     }

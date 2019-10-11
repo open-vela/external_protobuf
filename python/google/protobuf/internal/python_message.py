@@ -1173,8 +1173,6 @@ def _AddMergeFromStringMethod(message_descriptor, cls):
         # pylint: disable=protected-access
         (tag, _) = decoder._DecodeVarint(tag_bytes, 0)
         field_number, wire_type = wire_format.UnpackTag(tag)
-        if field_number == 0:
-          raise message_mod.DecodeError('Field number 0 is illegal.')
         # TODO(jieluo): remove old_pos.
         old_pos = new_pos
         (data, new_pos) = decoder._DecodeUnknownField(
@@ -1359,6 +1357,12 @@ def _AddWhichOneofMethod(message_descriptor, cls):
   cls.WhichOneof = WhichOneof
 
 
+def _AddReduceMethod(cls):
+  def __reduce__(self):  # pylint: disable=invalid-name
+    return (type(self), (), self.__getstate__())
+  cls.__reduce__ = __reduce__
+
+
 def _Clear(self):
   # Clear fields.
   self._fields = {}
@@ -1421,6 +1425,7 @@ def _AddMessageMethods(message_descriptor, cls):
   _AddIsInitializedMethod(message_descriptor, cls)
   _AddMergeFromMethod(cls)
   _AddWhichOneofMethod(message_descriptor, cls)
+  _AddReduceMethod(cls)
   # Adds methods which do not depend on cls.
   cls.Clear = _Clear
   cls.UnknownFields = _UnknownFields

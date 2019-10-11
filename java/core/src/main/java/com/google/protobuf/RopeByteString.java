@@ -811,16 +811,6 @@ final class RopeByteString extends ByteString {
       initialize();
     }
 
-    /**
-     * Reads up to {@code len} bytes of data into array {@code b}.
-     *
-     * <p>Note that {@link InputStream#read(byte[], int, int)} and {@link
-     * ByteArrayInputStream#read(byte[], int, int)} behave inconsistently when reading 0 bytes at
-     * EOF; the interface defines the return value to be 0 and the latter returns -1.  We use the
-     * latter behavior so that all ByteString streams are consistent.
-     *
-     * @return -1 if at EOF, otherwise the actual number of bytes read.
-     */
     @Override
     public int read(byte[] b, int offset, int length) {
       if (b == null) {
@@ -828,12 +818,7 @@ final class RopeByteString extends ByteString {
       } else if (offset < 0 || length < 0 || length > b.length - offset) {
         throw new IndexOutOfBoundsException();
       }
-      int bytesRead = readSkipInternal(b, offset, length);
-      if (bytesRead == 0) {
-        return -1;
-      } else {
-        return bytesRead;
-      }
+      return readSkipInternal(b, offset, length);
     }
 
     @Override
@@ -860,6 +845,10 @@ final class RopeByteString extends ByteString {
       while (bytesRemaining > 0) {
         advanceIfCurrentPieceFullyRead();
         if (currentPiece == null) {
+          if (bytesRemaining == length) {
+            // We didn't manage to read anything
+            return -1;
+          }
           break;
         } else {
           // Copy the bytes from this piece.

@@ -224,7 +224,7 @@ TEST_F(ParserTest, WarnIfSyntaxIdentifierOmmitted) {
   CaptureTestStderr();
   EXPECT_TRUE(parser_->Parse(input_.get(), &file));
   EXPECT_TRUE(GetCapturedTestStderr().find("No syntax specified") !=
-              std::string::npos);
+              string::npos);
 }
 
 TEST_F(ParserTest, WarnIfFieldNameIsNotUpperCamel) {
@@ -235,7 +235,7 @@ TEST_F(ParserTest, WarnIfFieldNameIsNotUpperCamel) {
   EXPECT_TRUE(parser_->Parse(input_.get(), &file));
   EXPECT_TRUE(error_collector_.warning_.find(
                   "Message name should be in UpperCamelCase. Found: abc.") !=
-              std::string::npos);
+              string::npos);
 }
 
 TEST_F(ParserTest, WarnIfFieldNameIsNotLowerUnderscore) {
@@ -248,7 +248,7 @@ TEST_F(ParserTest, WarnIfFieldNameIsNotLowerUnderscore) {
   EXPECT_TRUE(parser_->Parse(input_.get(), &file));
   EXPECT_TRUE(error_collector_.warning_.find(
                   "Field name should be lowercase. Found: SongName") !=
-              std::string::npos);
+              string::npos);
 }
 
 TEST_F(ParserTest, WarnIfFieldNameContainsNumberImmediatelyFollowUnderscore) {
@@ -261,7 +261,7 @@ TEST_F(ParserTest, WarnIfFieldNameContainsNumberImmediatelyFollowUnderscore) {
   EXPECT_TRUE(parser_->Parse(input_.get(), &file));
   EXPECT_TRUE(error_collector_.warning_.find(
                   "Number should not come right after an underscore. Found: "
-                  "song_name_1.") != std::string::npos);
+                  "song_name_1.") != string::npos);
 }
 
 // ===================================================================
@@ -2039,7 +2039,7 @@ TEST_F(ParserValidationErrorTest, MethodOutputTypeError) {
 }
 
 
-TEST_F(ParserValidationErrorTest, ResolvedUndefinedError) {
+TEST_F(ParserValidationErrorTest, ResovledUndefinedError) {
   // Create another file which defines symbol ".base.bar".
   FileDescriptorProto other_file;
   other_file.set_name("base.proto");
@@ -2084,14 +2084,14 @@ TEST_F(ParserValidationErrorTest, ResovledUndefinedOptionError) {
   FieldDescriptorProto* field(message->add_field());
   field->set_name("foo");
   field->set_number(1);
-  field->set_label(FieldDescriptorProto::LABEL_OPTIONAL);
-  field->set_type(FieldDescriptorProto::TYPE_INT32);
+  field->set_label(FieldDescriptorProto_Label_LABEL_OPTIONAL);
+  field->set_type(FieldDescriptorProto_Type_TYPE_INT32);
 
   FieldDescriptorProto* extension(other_file.add_extension());
   extension->set_name("bar");
   extension->set_number(7672757);
-  extension->set_label(FieldDescriptorProto::LABEL_OPTIONAL);
-  extension->set_type(FieldDescriptorProto::TYPE_MESSAGE);
+  extension->set_label(FieldDescriptorProto_Label_LABEL_OPTIONAL);
+  extension->set_type(FieldDescriptorProto_Type_TYPE_MESSAGE);
   extension->set_type_name("Bar");
   extension->set_extendee("google.protobuf.FileOptions");
 
@@ -2403,9 +2403,9 @@ TEST_F(ParseDescriptorDebugTest, TestMaps) {
   // Make sure the debug string uses map syntax and does not have the auto
   // generated entry.
   std::string debug_string = file->DebugString();
-  EXPECT_TRUE(debug_string.find("map<") != std::string::npos);
-  EXPECT_TRUE(debug_string.find("option map_entry") == std::string::npos);
-  EXPECT_TRUE(debug_string.find("MapEntry") == std::string::npos);
+  EXPECT_TRUE(debug_string.find("map<") != string::npos);
+  EXPECT_TRUE(debug_string.find("option map_entry") == string::npos);
+  EXPECT_TRUE(debug_string.find("MapEntry") == string::npos);
 
   // Make sure the descriptor debug string is parsable.
   FileDescriptorProto parsed;

@@ -263,8 +263,8 @@ void AddDefaultProtoPaths(
   }
 }
 
-std::string PluginName(const std::string& plugin_prefix,
-                       const std::string& directive) {
+string PluginName(const std::string& plugin_prefix,
+                  const std::string& directive) {
   // Assuming the directive starts with "--" and ends with "_out" or "_opt",
   // strip the "--" and "_out/_opt" and add the plugin prefix.
   return plugin_prefix + "gen-" + directive.substr(2, directive.size() - 6);
@@ -411,11 +411,11 @@ class CommandLineInterface::MemoryOutputStream
   virtual ~MemoryOutputStream();
 
   // implements ZeroCopyOutputStream ---------------------------------
-  bool Next(void** data, int* size) override {
-    return inner_->Next(data, size);
+  virtual bool Next(void** data, int* size) { return inner_->Next(data, size); }
+  virtual void BackUp(int count) { inner_->BackUp(count); }
+  virtual int64 ByteCount() const {
+    return inner_->ByteCount();
   }
-  void BackUp(int count) override { inner_->BackUp(count); }
-  int64_t ByteCount() const override { return inner_->ByteCount(); }
 
  private:
   // Checks to see if "filename_.meta" exists in directory_; if so, fixes the
