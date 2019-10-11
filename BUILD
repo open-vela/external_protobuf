@@ -59,7 +59,6 @@ COPTS = select({
         "-Wno-unused-function",
         # Prevents ISO C++ const string assignment warnings for pyext sources.
         "-Wno-write-strings",
-        "-Wno-deprecated-declarations",
     ],
 })
 

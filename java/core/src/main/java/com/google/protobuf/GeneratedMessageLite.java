@@ -115,8 +115,7 @@ public abstract class GeneratedMessageLite<
 
   @SuppressWarnings("unchecked") // Guaranteed by isInstance + runtime
   @Override
-  public boolean equals(
-          Object other) {
+  public boolean equals(Object other) {
     if (this == other) {
       return true;
     }
@@ -349,18 +348,14 @@ public abstract class GeneratedMessageLite<
      * Called before any method that would mutate the builder to ensure that it correctly copies any
      * state before the write happens to preserve immutability guarantees.
      */
-    protected final void copyOnWrite() {
+    protected void copyOnWrite() {
       if (isBuilt) {
-        copyOnWriteInternal();
+        MessageType newInstance =
+            (MessageType) instance.dynamicMethod(MethodToInvoke.NEW_MUTABLE_INSTANCE);
+        mergeFromInstance(newInstance, instance);
+        instance = newInstance;
         isBuilt = false;
       }
-    }
-
-    protected void copyOnWriteInternal() {
-      MessageType newInstance =
-          (MessageType) instance.dynamicMethod(MethodToInvoke.NEW_MUTABLE_INSTANCE);
-      mergeFromInstance(newInstance, instance);
-      instance = newInstance;
     }
 
     @Override
@@ -924,8 +919,12 @@ public abstract class GeneratedMessageLite<
     }
 
     @Override
-    protected void copyOnWriteInternal() {
-      super.copyOnWriteInternal();
+    protected void copyOnWrite() {
+      if (!isBuilt) {
+        return;
+      }
+
+      super.copyOnWrite();
       instance.extensions = instance.extensions.clone();
     }
 
@@ -1239,7 +1238,7 @@ public abstract class GeneratedMessageLite<
     Object fromFieldSetType(final Object value) {
       if (descriptor.isRepeated()) {
         if (descriptor.getLiteJavaType() == WireFormat.JavaType.ENUM) {
-          final List result = new ArrayList<>();
+          final List result = new ArrayList();
           for (final Object element : (List) value) {
             result.add(singularFromFieldSetType(element));
           }
@@ -1264,7 +1263,7 @@ public abstract class GeneratedMessageLite<
     Object toFieldSetType(final Object value) {
       if (descriptor.isRepeated()) {
         if (descriptor.getLiteJavaType() == WireFormat.JavaType.ENUM) {
-          final List result = new ArrayList<>();
+          final List result = new ArrayList();
           for (final Object element : (List) value) {
             result.add(singularToFieldSetType(element));
           }

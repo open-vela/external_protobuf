@@ -267,7 +267,6 @@ void FileGenerator::Generate(io::Printer* printer) {
   }
   PrintGeneratedAnnotation(
       printer, '$', options_.annotate_code ? classname_ + ".java.pb.meta" : "");
-
   printer->Print(
       "$deprecation$public final class $classname$ {\n"
       "  private $ctor$() {}\n",

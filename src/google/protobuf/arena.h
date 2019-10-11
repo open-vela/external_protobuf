@@ -33,7 +33,6 @@
 #ifndef GOOGLE_PROTOBUF_ARENA_H__
 #define GOOGLE_PROTOBUF_ARENA_H__
 
-
 #include <limits>
 #include <type_traits>
 #include <utility>
@@ -68,6 +67,7 @@ struct ArenaOptions;  // defined below
 
 }  // namespace protobuf
 }  // namespace google
+
 
 namespace google {
 namespace protobuf {
@@ -359,6 +359,14 @@ class PROTOBUF_EXPORT alignas(8) Arena final {
   // may not include space used by other threads executing concurrently with
   // the call to this method.
   uint64 SpaceUsed() const { return impl_.SpaceUsed(); }
+  // DEPRECATED. Please use SpaceAllocated() and SpaceUsed().
+  //
+  // Combines SpaceAllocated and SpaceUsed. Returns a pair of
+  // <space_allocated, space_used>.
+  PROTOBUF_DEPRECATED_MSG("Please use SpaceAllocated() and SpaceUsed()")
+  std::pair<uint64, uint64> SpaceAllocatedAndUsed() const {
+    return std::make_pair(SpaceAllocated(), SpaceUsed());
+  }
 
   // Frees all storage allocated by this arena after calling destructors
   // registered with OwnDestructor() and freeing objects registered with Own().

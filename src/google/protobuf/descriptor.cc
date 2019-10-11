@@ -802,7 +802,9 @@ DescriptorPool::Tables::Tables()
       symbols_by_name_(3),
       files_by_name_(3) {}
 
-DescriptorPool::Tables::~Tables() { GOOGLE_DCHECK(checkpoints_.empty()); }
+DescriptorPool::Tables::~Tables() {
+  GOOGLE_DCHECK(checkpoints_.empty());
+}
 
 FileDescriptorTables::FileDescriptorTables()
     // Initialize all the hash tables to start out with a small # of buckets.
@@ -1329,6 +1331,7 @@ const DescriptorPool* DescriptorPool::generated_pool() {
 }
 
 
+
 void DescriptorPool::InternalAddGeneratedFile(
     const void* encoded_file_descriptor, int size) {
   // So, this function is called in the process of initializing the
@@ -1493,23 +1496,6 @@ const FieldDescriptor* DescriptorPool::FindExtensionByNumber(
       return result;
     }
   }
-  return nullptr;
-}
-
-const FieldDescriptor* DescriptorPool::InternalFindExtensionByNumberNoLock(
-    const Descriptor* extendee, int number) const {
-  if (extendee->extension_range_count() == 0) return nullptr;
-
-  const FieldDescriptor* result = tables_->FindExtension(extendee, number);
-  if (result != nullptr) {
-    return result;
-  }
-
-  if (underlay_ != nullptr) {
-    result = underlay_->InternalFindExtensionByNumberNoLock(extendee, number);
-    if (result != nullptr) return result;
-  }
-
   return nullptr;
 }
 
@@ -3269,8 +3255,7 @@ class DescriptorBuilder {
   // descriptor.proto.
   template <class DescriptorT>
   void AllocateOptions(const typename DescriptorT::OptionsType& orig_options,
-                       DescriptorT* descriptor, int options_field_tag,
-                       const std::string& option_name);
+                       DescriptorT* descriptor, int options_field_tag);
   // Specialization for FileOptions.
   void AllocateOptions(const FileOptions& orig_options,
                        FileDescriptor* descriptor);
@@ -3280,8 +3265,7 @@ class DescriptorBuilder {
   void AllocateOptionsImpl(
       const std::string& name_scope, const std::string& element_name,
       const typename DescriptorT::OptionsType& orig_options,
-      DescriptorT* descriptor, const std::vector<int>& options_path,
-      const std::string& option_name);
+      DescriptorT* descriptor, const std::vector<int>& options_path);
 
   // Allocate string on the string pool and initialize it to full proto name.
   // Full proto name is "scope.proto_name" if scope is non-empty and
@@ -4094,13 +4078,12 @@ void DescriptorBuilder::ValidateSymbolName(const std::string& name,
 template <class DescriptorT>
 void DescriptorBuilder::AllocateOptions(
     const typename DescriptorT::OptionsType& orig_options,
-    DescriptorT* descriptor, int options_field_tag,
-    const std::string& option_name) {
+    DescriptorT* descriptor, int options_field_tag) {
   std::vector<int> options_path;
   descriptor->GetLocationPath(&options_path);
   options_path.push_back(options_field_tag);
   AllocateOptionsImpl(descriptor->full_name(), descriptor->full_name(),
-                      orig_options, descriptor, options_path, option_name);
+                      orig_options, descriptor, options_path);
 }
 
 // We specialize for FileDescriptor.
@@ -4110,16 +4093,14 @@ void DescriptorBuilder::AllocateOptions(const FileOptions& orig_options,
   options_path.push_back(FileDescriptorProto::kOptionsFieldNumber);
   // We add the dummy token so that LookupSymbol does the right thing.
   AllocateOptionsImpl(descriptor->package() + ".dummy", descriptor->name(),
-                      orig_options, descriptor, options_path,
-                      "google.protobuf.FileOptions");
+                      orig_options, descriptor, options_path);
 }
 
 template <class DescriptorT>
 void DescriptorBuilder::AllocateOptionsImpl(
     const std::string& name_scope, const std::string& element_name,
     const typename DescriptorT::OptionsType& orig_options,
-    DescriptorT* descriptor, const std::vector<int>& options_path,
-    const std::string& option_name) {
+    DescriptorT* descriptor, const std::vector<int>& options_path) {
   // We need to use a dummy pointer to work around a bug in older versions of
   // GCC.  Otherwise, the following two lines could be replaced with:
   //   typename DescriptorT::OptionsType* options =
@@ -4151,25 +4132,6 @@ void DescriptorBuilder::AllocateOptionsImpl(
   if (options->uninterpreted_option_size() > 0) {
     options_to_interpret_.push_back(OptionsToInterpret(
         name_scope, element_name, options_path, &orig_options, options));
-  }
-
-  // If the custom option is in unknown fields, no need to interpret it.
-  // Remove the dependency file from unused_dependency.
-  const UnknownFieldSet& unknown_fields = orig_options.unknown_fields();
-  if (!unknown_fields.empty()) {
-    // Can not use options->GetDescriptor() which may case deadlock.
-    Symbol msg_symbol = tables_->FindSymbol(option_name);
-    if (msg_symbol.type == Symbol::MESSAGE) {
-      for (int i = 0; i < unknown_fields.field_count(); ++i) {
-        assert_mutex_held(pool_);
-        const FieldDescriptor* field =
-            pool_->InternalFindExtensionByNumberNoLock(
-                msg_symbol.descriptor, unknown_fields.field(i).number());
-        if (field) {
-          unused_dependency_.erase(field->file());
-        }
-      }
-    }
   }
 }
 
@@ -4596,8 +4558,7 @@ void DescriptorBuilder::BuildMessage(const DescriptorProto& proto,
     result->options_ = nullptr;  // Will set to default_instance later.
   } else {
     AllocateOptions(proto.options(), result,
-                    DescriptorProto::kOptionsFieldNumber,
-                    "google.protobuf.MessageOptions");
+                    DescriptorProto::kOptionsFieldNumber);
   }
 
   AddSymbol(result->full_name(), parent, result->name(), proto, Symbol(result));
@@ -4970,8 +4931,7 @@ void DescriptorBuilder::BuildFieldOrExtension(const FieldDescriptorProto& proto,
     result->options_ = nullptr;  // Will set to default_instance later.
   } else {
     AllocateOptions(proto.options(), result,
-                    FieldDescriptorProto::kOptionsFieldNumber,
-                    "google.protobuf.FieldOptions");
+                    FieldDescriptorProto::kOptionsFieldNumber);
   }
 
 
@@ -5011,8 +4971,7 @@ void DescriptorBuilder::BuildExtensionRange(
     options_path.push_back(index);
     options_path.push_back(DescriptorProto_ExtensionRange::kOptionsFieldNumber);
     AllocateOptionsImpl(parent->full_name(), parent->full_name(),
-                        proto.options(), result, options_path,
-                        "google.protobuf.ExtensionRangeOptions");
+                        proto.options(), result, options_path);
   }
 }
 
@@ -5054,13 +5013,13 @@ void DescriptorBuilder::BuildOneof(const OneofDescriptorProto& proto,
   // We need to fill these in later.
   result->field_count_ = 0;
   result->fields_ = nullptr;
-  result->options_ = nullptr;
 
   // Copy options.
-  if (proto.has_options()) {
+  if (!proto.has_options()) {
+    result->options_ = nullptr;  // Will set to default_instance later.
+  } else {
     AllocateOptions(proto.options(), result,
-                    OneofDescriptorProto::kOptionsFieldNumber,
-                    "google.protobuf.OneofOptions");
+                    OneofDescriptorProto::kOptionsFieldNumber);
   }
 
   AddSymbol(result->full_name(), parent, result->name(), proto, Symbol(result));
@@ -5174,8 +5133,7 @@ void DescriptorBuilder::BuildEnum(const EnumDescriptorProto& proto,
     result->options_ = nullptr;  // Will set to default_instance later.
   } else {
     AllocateOptions(proto.options(), result,
-                    EnumDescriptorProto::kOptionsFieldNumber,
-                    "google.protobuf.EnumOptions");
+                    EnumDescriptorProto::kOptionsFieldNumber);
   }
 
   AddSymbol(result->full_name(), parent, result->name(), proto, Symbol(result));
@@ -5253,8 +5211,7 @@ void DescriptorBuilder::BuildEnumValue(const EnumValueDescriptorProto& proto,
     result->options_ = nullptr;  // Will set to default_instance later.
   } else {
     AllocateOptions(proto.options(), result,
-                    EnumValueDescriptorProto::kOptionsFieldNumber,
-                    "google.protobuf.EnumValueOptions");
+                    EnumValueDescriptorProto::kOptionsFieldNumber);
   }
 
   // Again, enum values are weird because we makes them appear as siblings
@@ -5319,8 +5276,7 @@ void DescriptorBuilder::BuildService(const ServiceDescriptorProto& proto,
     result->options_ = nullptr;  // Will set to default_instance later.
   } else {
     AllocateOptions(proto.options(), result,
-                    ServiceDescriptorProto::kOptionsFieldNumber,
-                    "google.protobuf.ServiceOptions");
+                    ServiceDescriptorProto::kOptionsFieldNumber);
   }
 
   AddSymbol(result->full_name(), nullptr, result->name(), proto,
@@ -5348,8 +5304,7 @@ void DescriptorBuilder::BuildMethod(const MethodDescriptorProto& proto,
     result->options_ = nullptr;  // Will set to default_instance later.
   } else {
     AllocateOptions(proto.options(), result,
-                    MethodDescriptorProto::kOptionsFieldNumber,
-                    "google.protobuf.MethodOptions");
+                    MethodDescriptorProto::kOptionsFieldNumber);
   }
 
   result->client_streaming_ = proto.client_streaming();
@@ -5511,19 +5466,12 @@ void DescriptorBuilder::CrossLinkField(FieldDescriptor* field,
             field->number());
 
     if (extension_range == nullptr) {
-      // Set of valid extension numbers for MessageSet is different (< 2^32)
-      // from other extendees (< 2^29). If unknown deps are allowed, we may not
-      // have that information, and wrongly deem the extension as invalid.
-      auto skip_check = get_allow_unknown(pool_) &&
-                        proto.extendee() == "google.protobuf.bridge.MessageSet";
-      if (!skip_check) {
-        AddError(field->full_name(), proto,
-                 DescriptorPool::ErrorCollector::NUMBER,
-                 strings::Substitute("\"$0\" does not declare $1 as an "
-                                     "extension number.",
-                                     field->containing_type()->full_name(),
-                                     field->number()));
-      }
+      AddError(field->full_name(), proto,
+               DescriptorPool::ErrorCollector::NUMBER,
+               strings::Substitute("\"$0\" does not declare $1 as an "
+                                   "extension number.",
+                                   field->containing_type()->full_name(),
+                                   field->number()));
     }
   }
 
@@ -7174,7 +7122,7 @@ void DescriptorBuilder::LogUnusedDependency(const FileDescriptorProto& proto,
              unused_dependency_.begin();
          it != unused_dependency_.end(); ++it) {
       // Log warnings for unused imported files.
-      std::string error_message = "Import " + (*it)->name() + " is unused.";
+      std::string error_message = "Import " + (*it)->name() + " but not used.";
       AddWarning((*it)->name(), proto, DescriptorPool::ErrorCollector::IMPORT,
                  error_message);
     }

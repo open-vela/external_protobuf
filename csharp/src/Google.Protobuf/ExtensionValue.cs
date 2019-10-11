@@ -32,7 +32,6 @@
 
 using Google.Protobuf.Collections;
 using System;
-using System.Linq;
 
 namespace Google.Protobuf
 {
@@ -42,11 +41,11 @@ namespace Google.Protobuf
         void MergeFrom(IExtensionValue value);
         void WriteTo(CodedOutputStream output);
         int CalculateSize();
-        bool IsInitialized();
     }
 
     internal sealed class ExtensionValue<T> : IExtensionValue
     {
+        private bool hasValue;
         private T field;
         private FieldCodec<T> codec;
 
@@ -58,6 +57,10 @@ namespace Google.Protobuf
 
         public int CalculateSize()
         {
+            if (!hasValue)
+            {
+                return 0;
+            }
             return codec.CalculateSizeWithTag(field);
         }
 
@@ -65,6 +68,7 @@ namespace Google.Protobuf
         {
             return new ExtensionValue<T>(codec)
             {
+                hasValue = hasValue,
                 field = field is IDeepCloneable<T> ? (field as IDeepCloneable<T>).Clone() : field
             };
         }
@@ -76,6 +80,7 @@ namespace Google.Protobuf
 
             return other is ExtensionValue<T>
                 && codec.Equals((other as ExtensionValue<T>).codec)
+                && hasValue.Equals((other as ExtensionValue<T>).hasValue)
                 && Equals(field, (other as ExtensionValue<T>).field);
             // we check for equality in the codec since we could have equal field values however the values could be written in different ways
         }
@@ -85,6 +90,7 @@ namespace Google.Protobuf
             unchecked
             {
                 int hash = 17;
+                hash = hash * 31 + hasValue.GetHashCode();
                 hash = hash * 31 + field.GetHashCode();
                 hash = hash * 31 + codec.GetHashCode();
                 return hash;
@@ -93,6 +99,7 @@ namespace Google.Protobuf
 
         public void MergeFrom(CodedInputStream input)
         {
+            hasValue = true;
             codec.ValueMerger(input, ref field);
         }
 
@@ -101,17 +108,23 @@ namespace Google.Protobuf
             if (value is ExtensionValue<T>)
             {
                 var extensionValue = value as ExtensionValue<T>;
-                codec.FieldMerger(ref field, extensionValue.field);
+                if (extensionValue.hasValue)
+                {
+                    hasValue |= codec.FieldMerger(ref field, extensionValue.field);
+                }
             }
         }
 
         public void WriteTo(CodedOutputStream output)
         {
-            output.WriteTag(codec.Tag);
-            codec.ValueWriter(output, field);
-            if (codec.EndTag != 0)
+            if (hasValue)
             {
-                output.WriteTag(codec.EndTag);
+                output.WriteTag(codec.Tag);
+                codec.ValueWriter(output, field);
+                if (codec.EndTag != 0)
+                {
+                    output.WriteTag(codec.EndTag);
+                }
             }
         }
 
@@ -119,20 +132,11 @@ namespace Google.Protobuf
 
         public void SetValue(T value)
         {
+            hasValue = true;
             field = value;
         }
 
-        public bool IsInitialized()
-        {
-            if (field is IMessage)
-            {
-                return (field as IMessage).IsInitialized();
-            }
-            else
-            {
-                return true;
-            }
-        }
+        public bool HasValue => hasValue;
     }
 
     internal sealed class RepeatedExtensionValue<T> : IExtensionValue
@@ -199,26 +203,5 @@ namespace Google.Protobuf
         }
 
         public RepeatedField<T> GetValue() => field;
-
-        public bool IsInitialized()
-        {
-            for (int i = 0; i < field.Count; i++)
-            {
-                var element = field[i];
-                if (element is IMessage)
-                {
-                    if (!(element as IMessage).IsInitialized())
-                    {
-                        return false;
-                    }
-                }
-                else
-                {
-                    break;
-                }
-            }
-
-            return true;
-        }
     }
 }
