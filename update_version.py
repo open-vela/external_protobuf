@@ -34,7 +34,7 @@ Example:
 """
   exit(1)
 
-RC_VERSION = 0
+RC_VERSION = -1
 if len(sys.argv) > 2:
   RC_VERSION = int(sys.argv[2])
 
@@ -55,7 +55,7 @@ def ReplaceText(elem, text):
 
 
 def GetFullVersion(rc_suffix = '-rc-'):
-  if RC_VERSION == 0:
+  if RC_VERSION < 0:
     return NEW_VERSION
   else:
     return '%s%s%s' % (NEW_VERSION, rc_suffix, RC_VERSION)
@@ -280,31 +280,32 @@ def UpdatePhp():
     ReplaceText(Find(version, 'api'), NEW_VERSION)
     stability = Find(root, 'stability')
     ReplaceText(Find(stability, 'release'),
-        'stable' if RC_VERSION == 0 else 'beta')
-    ReplaceText(Find(stability, 'api'), 'stable' if RC_VERSION == 0 else 'beta')
+        'stable' if RC_VERSION < 0 else 'beta')
+    ReplaceText(Find(stability, 'api'), 'stable' if RC_VERSION < 0 else 'beta')
     changelog = Find(root, 'changelog')
     for old_version in changelog.getElementsByTagName('version'):
       if Find(old_version, 'release').firstChild.nodeValue == NEW_VERSION:
         print ('[WARNING] Version %s already exists in the change log.'
           % NEW_VERSION)
         return
-    changelog.appendChild(document.createTextNode(' '))
-    release = CreateNode('release', 2, [
-        CreateNode('version', 3, [
-          FindAndClone(version, 'release'),
-          FindAndClone(version, 'api')
-        ]),
-        CreateNode('stability', 3, [
-          FindAndClone(stability, 'release'),
-          FindAndClone(stability, 'api')
-        ]),
-        FindAndClone(root, 'date'),
-        FindAndClone(root, 'time'),
-        FindAndClone(root, 'license'),
-        FindAndClone(root, 'notes')
-      ])
-    changelog.appendChild(release)
-    changelog.appendChild(document.createTextNode('\n '))
+    if RC_VERSION != 0:
+      changelog.appendChild(document.createTextNode(' '))
+      release = CreateNode('release', 2, [
+          CreateNode('version', 3, [
+            FindAndClone(version, 'release'),
+            FindAndClone(version, 'api')
+          ]),
+          CreateNode('stability', 3, [
+            FindAndClone(stability, 'release'),
+            FindAndClone(stability, 'api')
+          ]),
+          FindAndClone(root, 'date'),
+          FindAndClone(root, 'time'),
+          FindAndClone(root, 'license'),
+          FindAndClone(root, 'notes')
+        ])
+      changelog.appendChild(release)
+      changelog.appendChild(document.createTextNode('\n '))
   RewriteXml('php/ext/google/protobuf/package.xml', Callback)
   RewriteTextFile('php/ext/google/protobuf/protobuf.h',
     lambda line : re.sub(
