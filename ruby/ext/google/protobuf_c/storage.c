@@ -843,15 +843,8 @@ VALUE layout_get(MessageLayout* layout,
   } else if (!field_set) {
     return layout_get_default(field);
   } else {
-    VALUE type_class = field_type_class(layout, field);
-    VALUE val = native_slot_get(upb_fielddef_type(field), type_class, memory);
-    int type = TYPE(val);
-    if (type != T_DATA && type != T_NIL && is_wrapper_type_field(field)) {
-      val = ruby_wrapper_type(layout, field, val);
-      native_slot_set(upb_fielddef_name(field), upb_fielddef_type(field),
-                      type_class, memory, val);
-    }
-    return val;
+    return native_slot_get(upb_fielddef_type(field),
+                           field_type_class(layout, field), memory);
   }
 }
 
