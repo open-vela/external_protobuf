@@ -829,10 +829,9 @@ def MessageSetItemDecoder(descriptor):
           (MESSAGE_SET_ITEM_TAG, buffer[message_set_item_start:pos].tobytes()))
       if message._unknown_field_set is None:
         message._unknown_field_set = containers.UnknownFieldSet()
-      message._unknown_field_set._add(
-          type_id,
-          wire_format.WIRETYPE_LENGTH_DELIMITED,
-          buffer[message_start:message_end].tobytes())
+      message._unknown_field_set._add(type_id,
+                                      wire_format.WIRETYPE_LENGTH_DELIMITED,
+                                      buffer[message_start:message_end])
       # pylint: enable=protected-access
 
     return pos
@@ -871,7 +870,7 @@ def MapDecoder(field_descriptor, new_default, is_message_map):
         raise _DecodeError('Unexpected end-group tag.')
 
       if is_message_map:
-        value[submsg.key].CopyFrom(submsg.value)
+        value[submsg.key].MergeFrom(submsg.value)
       else:
         value[submsg.key] = submsg.value
 
@@ -963,7 +962,7 @@ def _DecodeUnknownField(buffer, pos, wire_type):
     (data, pos) = _DecodeFixed32(buffer, pos)
   elif wire_type == wire_format.WIRETYPE_LENGTH_DELIMITED:
     (size, pos) = _DecodeVarint(buffer, pos)
-    data = buffer[pos:pos+size].tobytes()
+    data = buffer[pos:pos+size]
     pos += size
   elif wire_type == wire_format.WIRETYPE_START_GROUP:
     (data, pos) = _DecodeUnknownFieldSet(buffer, pos)
