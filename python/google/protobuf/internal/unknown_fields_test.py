@@ -112,7 +112,8 @@ class UnknownFieldsTest(unittest.TestCase):
                      wire_format.WIRETYPE_LENGTH_DELIMITED)
     d = unknown_fields[0].data
     message_new = message_set_extensions_pb2.TestMessageSetExtension1()
-    message_new.ParseFromString(d)
+    message_new.ParseFromString(d.tobytes() if isinstance(d, (
+        memoryview)) else d)
     self.assertEqual(message1, message_new)
 
     # Verify that the unknown extension is serialized unchanged
@@ -207,8 +208,6 @@ class UnknownFieldsAccessorsTest(unittest.TestCase):
           self.assertEqual(expected_value[1], unknown_field.data[0].wire_type)
           self.assertEqual(expected_value[2], unknown_field.data[0].data)
           continue
-        if expected_type == wire_format.WIRETYPE_LENGTH_DELIMITED:
-          self.assertIn(type(unknown_field.data), (str, bytes))
         if field_descriptor.label == descriptor.FieldDescriptor.LABEL_REPEATED:
           self.assertIn(unknown_field.data, expected_value)
         else:
@@ -251,7 +250,7 @@ class UnknownFieldsAccessorsTest(unittest.TestCase):
     self.InternalCheckUnknownField('optional_fixed64',
                                    self.all_fields.optional_fixed64)
 
-    # Test length delimited.
+    # Test lengthd elimited.
     self.CheckUnknownField('optional_string',
                            unknown_fields,
                            self.all_fields.optional_string.encode('utf-8'))

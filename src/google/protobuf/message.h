@@ -945,7 +945,6 @@ class PROTOBUF_EXPORT Reflection final {
 
   // Help method for MapIterator.
   friend class MapIterator;
-  friend class WireFormatForMapFieldTest;
   internal::MapFieldBase* MutableMapData(Message* message,
                                          const FieldDescriptor* field) const;
 
