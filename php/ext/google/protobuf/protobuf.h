@@ -171,7 +171,7 @@
                         LOWWERNAME##_methods);                               \
     LOWWERNAME##_type = zend_register_internal_class(&class_type TSRMLS_CC); \
     LOWWERNAME##_type->create_object = LOWWERNAME##_create;                  \
-    LOWWERNAME##_handlers = PEMALLOC(zend_object_handlers, 1);               \
+    LOWWERNAME##_handlers = PEMALLOC(zend_object_handlers);                  \
     memcpy(LOWWERNAME##_handlers, zend_get_std_object_handlers(),            \
            sizeof(zend_object_handlers));
 #define PHP_PROTO_INIT_CLASS_END \
@@ -440,7 +440,7 @@ static inline int php_proto_zend_hash_get_current_data_ex(HashTable* ht,
                         LOWWERNAME##_methods);                               \
     LOWWERNAME##_type = zend_register_internal_class(&class_type TSRMLS_CC); \
     LOWWERNAME##_type->create_object = LOWWERNAME##_create;                  \
-    LOWWERNAME##_handlers = PEMALLOC(zend_object_handlers, 1);               \
+    LOWWERNAME##_handlers = PEMALLOC(zend_object_handlers);                  \
     memcpy(LOWWERNAME##_handlers, zend_get_std_object_handlers(),            \
            sizeof(zend_object_handlers));                                    \
     LOWWERNAME##_handlers->free_obj = LOWWERNAME##_free;                     \
@@ -590,13 +590,11 @@ struct Api;
 struct BoolValue;
 struct BytesValue;
 struct Descriptor;
-struct DescriptorInternal;
 struct DescriptorPool;
 struct DoubleValue;
 struct Duration;
 struct Enum;
 struct EnumDescriptor;
-struct EnumDescriptorInternal;
 struct EnumValue;
 struct EnumValueDescriptor;
 struct Field;
@@ -609,7 +607,6 @@ struct GPBEmpty;
 struct Int32Value;
 struct Int64Value;
 struct InternalDescriptorPool;
-struct InternalDescriptorPoolImpl;
 struct ListValue;
 struct Map;
 struct MapIter;
@@ -638,12 +635,10 @@ typedef struct Api Api;
 typedef struct BoolValue BoolValue;
 typedef struct BytesValue BytesValue;
 typedef struct Descriptor Descriptor;
-typedef struct DescriptorInternal DescriptorInternal;
 typedef struct DescriptorPool DescriptorPool;
 typedef struct DoubleValue DoubleValue;
 typedef struct Duration Duration;
 typedef struct EnumDescriptor EnumDescriptor;
-typedef struct EnumDescriptorInternal EnumDescriptorInternal;
 typedef struct Enum Enum;
 typedef struct EnumValueDescriptor EnumValueDescriptor;
 typedef struct EnumValue EnumValue;
@@ -657,7 +652,6 @@ typedef struct GPBEmpty GPBEmpty;
 typedef struct Int32Value Int32Value;
 typedef struct Int64Value Int64Value;
 typedef struct InternalDescriptorPool InternalDescriptorPool;
-typedef struct InternalDescriptorPoolImpl InternalDescriptorPoolImpl;
 typedef struct ListValue ListValue;
 typedef struct MapIter MapIter;
 typedef struct Map Map;
@@ -686,16 +680,7 @@ typedef struct Value Value;
 // -----------------------------------------------------------------------------
 
 ZEND_BEGIN_MODULE_GLOBALS(protobuf)
-  zend_bool keep_descriptor_pool_after_request;
 ZEND_END_MODULE_GLOBALS(protobuf)
-
-ZEND_DECLARE_MODULE_GLOBALS(protobuf)
-
-#ifdef ZTS
-#define PROTOBUF_G(v) TSRMG(protobuf_globals_id, zend_protobuf_globals *, v)
-#else
-#define PROTOBUF_G(v) (protobuf_globals.v)
-#endif
 
 // Init module and PHP classes.
 void any_init(TSRMLS_D);
@@ -758,27 +743,17 @@ void gpb_metadata_wrappers_init(TSRMLS_D);
 // instances.
 void add_def_obj(const void* def, PHP_PROTO_HASHTABLE_VALUE value);
 PHP_PROTO_HASHTABLE_VALUE get_def_obj(const void* def);
-void add_msgdef_desc(const upb_msgdef* m, DescriptorInternal* desc);
-DescriptorInternal* get_msgdef_desc(const upb_msgdef* m);
-void add_enumdef_enumdesc(const upb_enumdef* e, EnumDescriptorInternal* desc);
-EnumDescriptorInternal* get_enumdef_enumdesc(const upb_enumdef* e);
 
 // Global map from PHP class entries to wrapper Descriptor/EnumDescriptor
 // instances.
 void add_ce_obj(const void* ce, PHP_PROTO_HASHTABLE_VALUE value);
 PHP_PROTO_HASHTABLE_VALUE get_ce_obj(const void* ce);
 bool class_added(const void* ce);
-void add_ce_desc(const zend_class_entry* ce, DescriptorInternal* desc);
-DescriptorInternal* get_ce_desc(const zend_class_entry* ce);
-void add_ce_enumdesc(const zend_class_entry* ce, EnumDescriptorInternal* desc);
-EnumDescriptorInternal* get_ce_enumdesc(const zend_class_entry* ce);
 
 // Global map from message/enum's proto fully-qualified name to corresponding
 // wrapper Descriptor/EnumDescriptor instances.
-void add_proto_desc(const char* proto, DescriptorInternal* desc);
-DescriptorInternal* get_proto_desc(const char* proto);
-void add_proto_enumdesc(const char* proto, EnumDescriptorInternal* desc);
-EnumDescriptorInternal* get_proto_enumdesc(const char* proto);
+void add_proto_obj(const char* proto, PHP_PROTO_HASHTABLE_VALUE value);
+PHP_PROTO_HASHTABLE_VALUE get_proto_obj(const char* proto);
 
 extern zend_class_entry* map_field_type;
 extern zend_class_entry* repeated_field_type;
@@ -788,14 +763,14 @@ extern zend_class_entry* repeated_field_type;
 // -----------------------------------------------------------------------------
 
 PHP_PROTO_WRAP_OBJECT_START(DescriptorPool)
-  InternalDescriptorPoolImpl* intern;
+  InternalDescriptorPool* intern;
 PHP_PROTO_WRAP_OBJECT_END
 
 PHP_METHOD(DescriptorPool, getGeneratedPool);
 PHP_METHOD(DescriptorPool, getDescriptorByClassName);
 PHP_METHOD(DescriptorPool, getEnumDescriptorByClassName);
 
-struct InternalDescriptorPoolImpl {
+PHP_PROTO_WRAP_OBJECT_START(InternalDescriptorPool)
   upb_symtab* symtab;
   upb_handlercache* fill_handler_cache;
   upb_handlercache* pb_serialize_handler_cache;
@@ -803,17 +778,13 @@ struct InternalDescriptorPoolImpl {
   upb_handlercache* json_serialize_handler_preserve_cache;
   upb_pbcodecache* fill_method_cache;
   upb_json_codecache* json_fill_method_cache;
-};
-
-PHP_PROTO_WRAP_OBJECT_START(InternalDescriptorPool)
-  InternalDescriptorPoolImpl* intern;
 PHP_PROTO_WRAP_OBJECT_END
 
 PHP_METHOD(InternalDescriptorPool, getGeneratedPool);
 PHP_METHOD(InternalDescriptorPool, internalAddGeneratedFile);
 
 void internal_add_generated_file(const char* data, PHP_PROTO_SIZE data_len,
-                                 InternalDescriptorPoolImpl* pool,
+                                 InternalDescriptorPool* pool,
                                  bool use_nested_submsg TSRMLS_DC);
 void init_generated_pool_once(TSRMLS_D);
 void add_handlers_for_message(const void* closure, upb_handlers* h);
@@ -830,24 +801,13 @@ extern zend_object *internal_generated_pool_php;
 void descriptor_pool_free(zend_object* object);
 void internal_descriptor_pool_free(zend_object* object);
 #endif
-extern InternalDescriptorPoolImpl* generated_pool;
-// The actual generated pool
-extern InternalDescriptorPoolImpl generated_pool_impl;
+extern InternalDescriptorPool* generated_pool;  // The actual generated pool
 
-void internal_descriptor_pool_impl_init(
-    InternalDescriptorPoolImpl *pool TSRMLS_DC);
-void internal_descriptor_pool_impl_destroy(
-    InternalDescriptorPoolImpl *pool TSRMLS_DC);
-
-struct DescriptorInternal {
-  InternalDescriptorPoolImpl* pool;
+PHP_PROTO_WRAP_OBJECT_START(Descriptor)
+  InternalDescriptorPool* pool;
   const upb_msgdef* msgdef;
   MessageLayout* layout;
   zend_class_entry* klass;  // begins as NULL
-};
-
-PHP_PROTO_WRAP_OBJECT_START(Descriptor)
-  DescriptorInternal* intern;
 PHP_PROTO_WRAP_OBJECT_END
 
 PHP_METHOD(Descriptor, getClass);
@@ -875,13 +835,9 @@ PHP_METHOD(FieldDescriptor, getMessageType);
 
 extern zend_class_entry* field_descriptor_type;
 
-struct EnumDescriptorInternal {
+PHP_PROTO_WRAP_OBJECT_START(EnumDescriptor)
   const upb_enumdef* enumdef;
   zend_class_entry* klass;  // begins as NULL
-};
-
-PHP_PROTO_WRAP_OBJECT_START(EnumDescriptor)
-  EnumDescriptorInternal* intern;
 PHP_PROTO_WRAP_OBJECT_END
 
 PHP_METHOD(EnumDescriptor, getValue);
@@ -987,8 +943,7 @@ struct MessageLayout {
 PHP_PROTO_WRAP_OBJECT_START(MessageHeader)
   void* data;  // Point to the real message data.
                // Place needs to be consistent with map_parse_frame_data_t.
-  DescriptorInternal* descriptor;  // Kept alive by self.class.descriptor
-                                   // reference.
+  Descriptor* descriptor;  // Kept alive by self.class.descriptor reference.
 PHP_PROTO_WRAP_OBJECT_END
 
 MessageLayout* create_layout(const upb_msgdef* msgdef);
@@ -1030,7 +985,7 @@ PHP_METHOD(Message, __construct);
 const upb_pbdecodermethod *new_fillmsg_decodermethod(Descriptor *desc,
                                                      const void *owner);
 void serialize_to_string(zval* val, zval* return_value TSRMLS_DC);
-void merge_from_string(const char* data, int data_len, DescriptorInternal* desc,
+void merge_from_string(const char* data, int data_len, Descriptor* desc,
                        MessageHeader* msg);
 
 PHP_METHOD(Message, serializeToString);
@@ -1536,11 +1491,8 @@ size_t stringsink_string(void *_sink, const void *hd, const char *ptr,
 // -----------------------------------------------------------------------------
 
 // Memory management
-#define SYS_MALLOC(class_name) (class_name*) malloc(sizeof(class_name))
-#define SYS_MALLOC_N(class_name, n) (class_name*) malloc(sizeof(class_name) * n)
-#define SYS_FREE(ptr) free(ptr)
 #define ALLOC(class_name) (class_name*) emalloc(sizeof(class_name))
-#define PEMALLOC(class_name, persistent) (class_name*) pemalloc(sizeof(class_name), persistent)
+#define PEMALLOC(class_name) (class_name*) pemalloc(sizeof(class_name), 1)
 #define ALLOC_N(class_name, n) (class_name*) emalloc(sizeof(class_name) * n)
 #define FREE(object) efree(object)
 #define PEFREE(object) pefree(object, 1)
