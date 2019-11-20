@@ -107,13 +107,13 @@ namespace Google.Protobuf.Reflection
             {
                 descriptor.CrossLink();
 
-                IList<FieldDescriptor> _;
-                if (!declarationOrder.TryGetValue(descriptor.ExtendeeType, out _))
+                IList<FieldDescriptor> list;
+                if (!declarationOrder.TryGetValue(descriptor.ExtendeeType, out list))
                 {
-                    declarationOrder.Add(descriptor.ExtendeeType, new List<FieldDescriptor>());
+                    declarationOrder.Add(descriptor.ExtendeeType, list = new List<FieldDescriptor>());
                 }
 
-                declarationOrder[descriptor.ExtendeeType].Add(descriptor);
+                list.Add(descriptor);
             }
 
             extensionsByTypeInDeclarationOrder = declarationOrder
