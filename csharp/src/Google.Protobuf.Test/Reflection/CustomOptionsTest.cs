@@ -42,7 +42,6 @@ using static UnitTest.Issues.TestProtos.ComplexOptionType2.Types;
 using static UnitTest.Issues.TestProtos.UnittestCustomOptionsProto3Extensions;
 using static UnitTest.Issues.TestProtos.DummyMessageContainingEnum.Types;
 using Google.Protobuf.TestProtos;
-using Google.Protobuf.TestProtos.Extensions;
 
 #pragma warning disable CS0618
 
@@ -192,16 +191,6 @@ namespace Google.Protobuf.Test.Reflection
             Assert.NotNull(fileDescriptor.EnumTypes[0].CustomOptions);
             Assert.NotNull(fileDescriptor.EnumTypes[0].Values[0].CustomOptions);
             Assert.NotNull(TestAllTypes.Descriptor.Oneofs[0].CustomOptions);
-        }
-
-        [Test]
-        public void MultipleImportOfSameFileWithExtension()
-        {
-            var descriptor = ExtensionsCReflection.Descriptor;
-            var foo = Foo.Descriptor;
-            var bar = Bar.Descriptor;
-            AssertOption("bar", foo.CustomOptions.TryGetString, ExtensionsAExtensions.Opt, foo.GetOption);
-            AssertOption("foo", bar.CustomOptions.TryGetString, ExtensionsAExtensions.Opt, bar.GetOption);
         }
 
         private void AssertOption<T, D>(T expected, OptionFetcher<T> fetcher, Extension<D, T> extension, Func<Extension<D, T>, T> descriptorOptionFetcher) where D : IExtendableMessage<D>
