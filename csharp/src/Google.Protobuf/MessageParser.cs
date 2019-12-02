@@ -72,6 +72,7 @@ namespace Google.Protobuf
         {
             IMessage message = factory();
             message.MergeFrom(data, DiscardUnknownFields, Extensions);
+            CheckMergedRequiredFields(message);
             return message;
         }
 
@@ -86,6 +87,7 @@ namespace Google.Protobuf
         {
             IMessage message = factory();
             message.MergeFrom(data, offset, length, DiscardUnknownFields, Extensions);
+            CheckMergedRequiredFields(message);
             return message;
         }
 
@@ -98,6 +100,7 @@ namespace Google.Protobuf
         {
             IMessage message = factory();
             message.MergeFrom(data, DiscardUnknownFields, Extensions);
+            CheckMergedRequiredFields(message);
             return message;
         }
 
@@ -110,6 +113,7 @@ namespace Google.Protobuf
         {
             IMessage message = factory();
             message.MergeFrom(input, DiscardUnknownFields, Extensions);
+            CheckMergedRequiredFields(message);
             return message;
         }
 
@@ -126,6 +130,7 @@ namespace Google.Protobuf
         {
             IMessage message = factory();
             message.MergeDelimitedFrom(input, DiscardUnknownFields, Extensions);
+            CheckMergedRequiredFields(message);
             return message;
         }
 
@@ -138,6 +143,7 @@ namespace Google.Protobuf
         {
             IMessage message = factory();
             MergeFrom(message, input);
+            CheckMergedRequiredFields(message);
             return message;
         }
 
@@ -168,6 +174,12 @@ namespace Google.Protobuf
             {
                 codedInput.DiscardUnknownFields = originalDiscard;
             }
+        }
+
+        internal static void CheckMergedRequiredFields(IMessage message)
+        {
+            if (!message.IsInitialized())
+                throw new InvalidOperationException("Parsed message does not contain all required fields");
         }
 
         /// <summary>
