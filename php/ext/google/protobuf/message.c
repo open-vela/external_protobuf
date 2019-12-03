@@ -274,6 +274,25 @@ void custom_data_init(const zend_class_entry* ce,
     Message_construct(getThis(), array_wrapper);                   \
   }
 
+void build_class_from_descriptor(
+    PHP_PROTO_HASHTABLE_VALUE php_descriptor TSRMLS_DC) {
+  Descriptor* desc = UNBOX_HASHTABLE_VALUE(Descriptor, php_descriptor);
+
+  // Map entries don't have existing php class.
+  if (upb_msgdef_mapentry(desc->intern->msgdef)) {
+    return;
+  }
+
+  zend_class_entry* registered_ce = desc->intern->klass;
+
+  if (desc->intern->layout == NULL) {
+    MessageLayout* layout = create_layout(desc->intern->msgdef);
+    desc->intern->layout = layout;
+  }
+
+  registered_ce->create_object = message_create;
+}
+
 // -----------------------------------------------------------------------------
 // PHP Methods
 // -----------------------------------------------------------------------------
@@ -327,18 +346,10 @@ void Message_construct(zval* msg, zval* array_wrapper) {
   TSRMLS_FETCH();
   zend_class_entry* ce = Z_OBJCE_P(msg);
   MessageHeader* intern = NULL;
-
-  if (!class_added(ce)) {
-#if PHP_MAJOR_VERSION < 7
-    DescriptorInternal* desc = get_class_desc(ce->name);
-#else
-    DescriptorInternal* desc = get_class_desc(ZSTR_VAL(ce->name));
-#endif
-    register_class(desc, false TSRMLS_CC);
+  if (EXPECTED(class_added(ce))) {
+    intern = UNBOX(MessageHeader, msg);
+    custom_data_init(ce, intern PHP_PROTO_TSRMLS_CC);
   }
-
-  intern = UNBOX(MessageHeader, msg);
-  custom_data_init(ce, intern PHP_PROTO_TSRMLS_CC);
 
   if (array_wrapper == NULL) {
     return;
@@ -385,7 +396,6 @@ void Message_construct(zval* msg, zval* array_wrapper) {
 
         if (is_wrapper) {
           DescriptorInternal* subdesc = get_msgdef_desc(submsgdef);
-          register_class(subdesc, false TSRMLS_CC);
           subklass = subdesc->klass;
         }
       }
@@ -425,7 +435,6 @@ void Message_construct(zval* msg, zval* array_wrapper) {
 
         if (is_wrapper) {
           DescriptorInternal* subdesc = get_msgdef_desc(submsgdef);
-          register_class(subdesc, false TSRMLS_CC);
           subklass = subdesc->klass;
         }
       }
@@ -449,7 +458,6 @@ void Message_construct(zval* msg, zval* array_wrapper) {
     } else if (upb_fielddef_issubmsg(field)) {
       const upb_msgdef* submsgdef = upb_fielddef_msgsubdef(field);
       DescriptorInternal* desc = get_msgdef_desc(submsgdef);
-      register_class(desc, false TSRMLS_CC);
 
       CACHED_VALUE* cached = NULL;
       if (upb_fielddef_containingoneof(field)) {
@@ -520,7 +528,6 @@ PHP_METHOD(Message, __construct) {
 PHP_METHOD(Message, clear) {
   MessageHeader* msg = UNBOX(MessageHeader, getThis());
   DescriptorInternal* desc = msg->descriptor;
-  register_class(desc, false TSRMLS_CC);
   zend_class_entry* ce = desc->klass;
 
   zend_object_std_dtor(&msg->std TSRMLS_CC);
@@ -1533,7 +1540,6 @@ PHP_METHOD(Any, unpack) {
         0 TSRMLS_CC);
     return;
   }
-  register_class(desc, false TSRMLS_CC);
   zend_class_entry* klass = desc->klass;
   ZVAL_OBJ(return_value, klass->create_object(klass TSRMLS_CC));
   MessageHeader* msg = UNBOX(MessageHeader, return_value);
