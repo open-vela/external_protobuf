@@ -52,7 +52,18 @@ typedef enum {
 
 typedef struct {
   uint64_t val;
+#ifndef NDEBUG
+  /* In debug mode we carry the value type around also so we can check accesses
+   * to be sure the right member is being read. */
+  upb_ctype_t ctype;
+#endif
 } upb_value;
+
+#ifdef NDEBUG
+#define SET_TYPE(dest, val)      UPB_UNUSED(val)
+#else
+#define SET_TYPE(dest, val) dest = val
+#endif
 
 /* Like strdup(), which isn't always available since it's not ANSI C. */
 char *upb_strdup(const char *s, upb_alloc *a);
@@ -64,13 +75,15 @@ UPB_INLINE char *upb_gstrdup(const char *s) {
   return upb_strdup(s, &upb_alloc_global);
 }
 
-UPB_INLINE void _upb_value_setval(upb_value *v, uint64_t val) {
+UPB_INLINE void _upb_value_setval(upb_value *v, uint64_t val,
+                                  upb_ctype_t ctype) {
   v->val = val;
+  SET_TYPE(v->ctype, ctype);
 }
 
-UPB_INLINE upb_value _upb_value_val(uint64_t val) {
+UPB_INLINE upb_value _upb_value_val(uint64_t val, upb_ctype_t ctype) {
   upb_value ret;
-  _upb_value_setval(&ret, val);
+  _upb_value_setval(&ret, val, ctype);
   return ret;
 }
 
@@ -85,6 +98,7 @@ UPB_INLINE upb_value _upb_value_val(uint64_t val) {
 #define FUNCS(name, membername, type_t, converter, proto_type) \
   UPB_INLINE void upb_value_set ## name(upb_value *val, type_t cval) { \
     val->val = (converter)cval; \
+    SET_TYPE(val->ctype, proto_type); \
   } \
   UPB_INLINE upb_value upb_value_ ## name(type_t val) { \
     upb_value ret; \
@@ -92,6 +106,7 @@ UPB_INLINE upb_value _upb_value_val(uint64_t val) {
     return ret; \
   } \
   UPB_INLINE type_t upb_value_get ## name(upb_value val) { \
+    UPB_ASSERT_DEBUGVAR(val.ctype == proto_type); \
     return (type_t)(converter)val.val; \
   }
 
@@ -109,10 +124,12 @@ FUNCS(fptr,     fptr,         upb_func*,    uintptr_t,  UPB_CTYPE_FPTR)
 
 UPB_INLINE void upb_value_setfloat(upb_value *val, float cval) {
   memcpy(&val->val, &cval, sizeof(cval));
+  SET_TYPE(val->ctype, UPB_CTYPE_FLOAT);
 }
 
 UPB_INLINE void upb_value_setdouble(upb_value *val, double cval) {
   memcpy(&val->val, &cval, sizeof(cval));
+  SET_TYPE(val->ctype, UPB_CTYPE_DOUBLE);
 }
 
 UPB_INLINE upb_value upb_value_float(float cval) {
@@ -156,6 +173,7 @@ typedef struct {
 
 #define UPB_TABVALUE_EMPTY_INIT  {-1}
 
+
 /* upb_table ******************************************************************/
 
 typedef struct _upb_tabent {
@@ -172,6 +190,7 @@ typedef struct _upb_tabent {
 typedef struct {
   size_t count;          /* Number of entries in the hash part. */
   size_t mask;           /* Mask to turn hash value -> bucket. */
+  upb_ctype_t ctype;     /* Type of all values. */
   uint8_t size_lg2;      /* Size of the hashtable part is 2^size_lg2 entries. */
 
   /* Hash table entries.
@@ -181,6 +200,17 @@ typedef struct {
    * initialize const hash tables.  Then we cast away const when we have to.
    */
   const upb_tabent *entries;
+
+#ifndef NDEBUG
+  /* This table's allocator.  We make the user pass it in to every relevant
+   * function and only use this to check it in debug mode.  We do this solely
+   * to keep upb_table as small as possible.  This might seem slightly paranoid
+   * but the plan is to use upb_table for all map fields and extension sets in
+   * a forthcoming message representation, so there could be a lot of these.
+   * If this turns out to be too annoying later, we can change it (since this
+   * is an internal-only header file). */
+  upb_alloc *alloc;
+#endif
 } upb_table;
 
 typedef struct {
@@ -193,6 +223,12 @@ typedef struct {
   size_t array_size;        /* Array part size. */
   size_t array_count;       /* Array part number of elements. */
 } upb_inttable;
+
+#define UPB_INTTABLE_INIT(count, mask, ctype, size_lg2, ent, a, asize, acount) \
+  {UPB_TABLE_INIT(count, mask, ctype, size_lg2, ent), a, asize, acount}
+
+#define UPB_EMPTY_INTTABLE_INIT(ctype) \
+  UPB_INTTABLE_INIT(0, 0, ctype, 0, NULL, NULL, 0, 0)
 
 #define UPB_ARRAY_EMPTYENT -1
 
@@ -363,7 +399,7 @@ UPB_INLINE bool upb_inttable_lookup32(const upb_inttable *t, uint32_t key,
   if (key < t->array_size) {
     upb_tabval arrval = t->array[key];
     if (upb_arrhas(arrval)) {
-      _upb_value_setval(v, arrval.val);
+      _upb_value_setval(v, arrval.val, t->t.ctype);
       return true;
     } else {
       return false;
@@ -373,7 +409,7 @@ UPB_INLINE bool upb_inttable_lookup32(const upb_inttable *t, uint32_t key,
     if (t->t.entries == NULL) return false;
     for (e = upb_getentry(&t->t, upb_inthash(key)); true; e = e->next) {
       if ((uint32_t)e->key == key) {
-        _upb_value_setval(v, e->val.val);
+        _upb_value_setval(v, e->val.val, t->t.ctype);
         return true;
       }
       if (e->next == NULL) return false;
@@ -427,7 +463,8 @@ typedef struct {
 void upb_strtable_begin(upb_strtable_iter *i, const upb_strtable *t);
 void upb_strtable_next(upb_strtable_iter *i);
 bool upb_strtable_done(const upb_strtable_iter *i);
-upb_strview upb_strtable_iter_key(const upb_strtable_iter *i);
+const char *upb_strtable_iter_key(const upb_strtable_iter *i);
+size_t upb_strtable_iter_keylength(const upb_strtable_iter *i);
 upb_value upb_strtable_iter_value(const upb_strtable_iter *i);
 void upb_strtable_iter_setdone(upb_strtable_iter *i);
 bool upb_strtable_iter_isequal(const upb_strtable_iter *i1,
