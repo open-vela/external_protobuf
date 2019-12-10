@@ -1,6 +1,5 @@
 
 #include "upbc/message_layout.h"
-#include "google/protobuf/descriptor.pb.h"
 
 namespace upbc {
 
@@ -26,18 +25,12 @@ MessageLayout::Size MessageLayout::Place(
 bool MessageLayout::HasHasbit(const protobuf::FieldDescriptor* field) {
   return field->file()->syntax() == protobuf::FileDescriptor::SYNTAX_PROTO2 &&
          field->label() != protobuf::FieldDescriptor::LABEL_REPEATED &&
-         !field->containing_oneof() &&
-         !field->containing_type()->options().map_entry();
+         !field->containing_oneof();
 }
 
 MessageLayout::SizeAndAlign MessageLayout::SizeOf(
     const protobuf::FieldDescriptor* field) {
-  if (field->containing_type()->options().map_entry()) {
-    // Map entries aren't actually stored, they are only used during parsing.
-    // For parsing, it helps a lot if all map entry messages have the same
-    // layout.
-    return {{8, 16}, {4, 8}};  // upb_stringview
-  } else if (field->is_repeated()) {
+  if (field->is_repeated()) {
     return {{4, 8}, {4, 8}};  // Pointer to array object.
   } else {
     return SizeOfUnwrapped(field);

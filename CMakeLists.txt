@@ -80,15 +80,21 @@ target_link_libraries(generated_code_support__only_for_generated_code_do_not_use
   upb)
 add_library(reflection
   upb/def.c
-  upb/reflection.c
+  upb/msgfactory.c
   upb/def.h
-  upb/reflection.h)
+  upb/msgfactory.h)
 target_link_libraries(reflection
   descriptor_upbproto
   table
   upb)
 add_library(table INTERFACE)
 target_link_libraries(table INTERFACE
+  upb)
+add_library(legacy_msg_reflection
+  upb/legacy_msg_reflection.c
+  upb/legacy_msg_reflection.h)
+target_link_libraries(legacy_msg_reflection
+  table
   upb)
 add_library(handlers
   upb/handlers.c
