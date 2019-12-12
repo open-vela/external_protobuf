@@ -579,14 +579,8 @@ inline uint32 ReadSize(const char** pp) {
 // function composition. We rely on the compiler to inline this.
 // Also in debug compiles having local scoped variables tend to generated
 // stack frames that scale as O(num fields).
-inline uint64 ReadVarint64(const char** p) {
+inline uint64 ReadVarint(const char** p) {
   uint64 tmp;
-  *p = VarintParse(*p, &tmp);
-  return tmp;
-}
-
-inline uint32 ReadVarint32(const char** p) {
-  uint32 tmp;
   *p = VarintParse(*p, &tmp);
   return tmp;
 }

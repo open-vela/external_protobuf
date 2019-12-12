@@ -68,9 +68,6 @@ csharp_EXTRA_DIST=                                                           \
   csharp/protos/map_unittest_proto3.proto                                    \
   csharp/protos/old_extensions1.proto                                        \
   csharp/protos/old_extensions2.proto                                        \
-  csharp/protos/unittest_issue6936_a.proto                                   \
-  csharp/protos/unittest_issue6936_b.proto                                   \
-  csharp/protos/unittest_issue6936_c.proto                                   \
   csharp/protos/unittest_custom_options_proto3.proto                         \
   csharp/protos/unittest_import_public_proto3.proto                          \
   csharp/protos/unittest_import_public.proto                                 \
@@ -131,9 +128,6 @@ csharp_EXTRA_DIST=                                                           \
   csharp/src/Google.Protobuf.Test/SampleNaNs.cs                              \
   csharp/src/Google.Protobuf.Test/TestCornerCases.cs                         \
   csharp/src/Google.Protobuf.Test.TestProtos/Google.Protobuf.Test.TestProtos.csproj \
-  csharp/src/Google.Protobuf.Test.TestProtos/UnittestIssue6936A.cs              \
-  csharp/src/Google.Protobuf.Test.TestProtos/UnittestIssue6936B.cs              \
-  csharp/src/Google.Protobuf.Test.TestProtos/UnittestIssue6936C.cs              \
   csharp/src/Google.Protobuf.Test.TestProtos/ForeignMessagePartial.cs           \
   csharp/src/Google.Protobuf.Test.TestProtos/MapUnittestProto3.cs               \
   csharp/src/Google.Protobuf.Test.TestProtos/OldExtensions1.cs                  \
@@ -883,6 +877,8 @@ php_EXTRA_DIST=                                                       \
   php/tests/generated_service_test.php                                \
   php/tests/map_field_test.php                                        \
   php/tests/memory_leak_test.php                                      \
+  php/tests/multirequest.php                                          \
+  php/tests/multirequest.sh                                           \
   php/tests/php_implementation_test.php                               \
   php/tests/proto/empty/echo.proto                                    \
   php/tests/proto/test.proto                                          \
