@@ -61,7 +61,10 @@ cc_library(
         "upb/encode.c",
         "upb/generated_util.h",
         "upb/msg.c",
+        "upb/msg.h",
         "upb/port.c",
+        "upb/port_def.inc",
+        "upb/port_undef.inc",
         "upb/table.c",
         "upb/table.int.h",
         "upb/upb.c",
@@ -69,9 +72,6 @@ cc_library(
     hdrs = [
         "upb/decode.h",
         "upb/encode.h",
-        "upb/msg.h",
-        "upb/port_def.inc",
-        "upb/port_undef.inc",
         "upb/upb.h",
     ],
     copts = select({
@@ -259,9 +259,9 @@ cc_library(
         "//conditions:default": CPPOPTS
     }),
     deps = [
-        "@absl//absl/base:core_headers",
-        "@absl//absl/container:flat_hash_map",
-        "@absl//absl/strings",
+        "@com_google_absl//absl/base:core_headers",
+        "@com_google_absl//absl/container:flat_hash_map",
+        "@com_google_absl//absl/strings",
         "@com_google_protobuf//:protobuf",
         "@com_google_protobuf//:protoc_lib",
     ],
@@ -285,11 +285,6 @@ cc_binary(
 # and upb_proto_reflection_library() rules are fixed.
 
 # C/C++ tests ##################################################################
-
-upb_proto_reflection_library(
-    name = "descriptor_upbreflection",
-    deps = ["@com_google_protobuf//:descriptor_proto"],
-)
 
 cc_binary(
     name = "benchmark",
@@ -436,6 +431,11 @@ cc_binary(
 )
 
 # copybara:strip_for_google3_begin
+upb_proto_reflection_library(
+    name = "descriptor_upbreflection",
+    deps = ["@com_google_protobuf//:descriptor_proto"],
+)
+
 cc_test(
     name = "test_encoder",
     srcs = ["tests/pb/test_encoder.cc"],
