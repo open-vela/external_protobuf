@@ -241,7 +241,7 @@ TEST_F(JsonUtilTest, TestPrintEnumsAsIntsWithDefaultValue) {
 }
 
 TEST_F(JsonUtilTest, ParseMessage) {
-  // Some random message but good enough to verify that the parsing wrapper
+  // Some random message but good enough to verify that the parsing warpper
   // functions are working properly.
   std::string input =
       "{\n"
