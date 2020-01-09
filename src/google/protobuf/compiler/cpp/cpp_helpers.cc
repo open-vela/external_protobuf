@@ -1605,7 +1605,7 @@ class ParseLoopGenerator {
         std::string prefix = field->is_repeated() ? "add" : "set";
         if (field->type() == FieldDescriptor::TYPE_ENUM) {
           format_(
-              "$uint64$ val = $pi_ns$::ReadVarint64(&ptr);\n"
+              "$uint64$ val = $pi_ns$::ReadVarint(&ptr);\n"
               "CHK_(ptr);\n");
           if (!HasPreservingUnknownEnumSemantics(field)) {
             format_("if (PROTOBUF_PREDICT_TRUE($1$_IsValid(val))) {\n",
@@ -1624,27 +1624,27 @@ class ParseLoopGenerator {
                 field->number());
           }
         } else {
-          std::string size = (field->type() == FieldDescriptor::TYPE_SINT32 || field->type() == FieldDescriptor::TYPE_UINT32) ? "32" : "64";
+          int size = field->type() == FieldDescriptor::TYPE_SINT32 ? 32 : 64;
           std::string zigzag;
           if ((field->type() == FieldDescriptor::TYPE_SINT32 ||
                field->type() == FieldDescriptor::TYPE_SINT64)) {
-            zigzag = "ZigZag";
+            zigzag = StrCat("ZigZag", size);
           }
           if (field->is_repeated() || field->containing_oneof()) {
             std::string prefix = field->is_repeated() ? "add" : "set";
             format_(
-                "_internal_$1$_$2$($pi_ns$::ReadVarint$3$$4$(&ptr));\n"
+                "_internal_$1$_$2$($pi_ns$::ReadVarint$3$(&ptr));\n"
                 "CHK_(ptr);\n",
-                prefix, FieldName(field), zigzag, size);
+                prefix, FieldName(field), zigzag);
           } else {
             if (HasFieldPresence(field->file())) {
               format_("_Internal::set_has_$1$(&$has_bits$);\n",
                       FieldName(field));
             }
             format_(
-                "$1$_ = $pi_ns$::ReadVarint$2$$3$(&ptr);\n"
+                "$1$_ = $pi_ns$::ReadVarint$2$(&ptr);\n"
                 "CHK_(ptr);\n",
-                FieldName(field), zigzag, size);
+                FieldName(field), zigzag);
           }
         }
         break;
