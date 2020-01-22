@@ -73,7 +73,7 @@ namespace internal {
 #include <google/protobuf/port_def.inc>
 
 // This class is for internal use by the protocol buffer library and by
-// protocol-compiler-generated message classes.  It must not be called
+// protocol-complier-generated message classes.  It must not be called
 // directly by clients.
 //
 // This class contains helpers for implementing the binary protocol buffer

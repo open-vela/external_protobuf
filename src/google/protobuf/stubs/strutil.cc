@@ -1435,44 +1435,32 @@ AlphaNum::AlphaNum(strings::Hex hex) {
 // after the area just overwritten.  It comes in multiple flavors to minimize
 // call overhead.
 static char *Append1(char *out, const AlphaNum &x) {
-  if (x.size() > 0) {
-    memcpy(out, x.data(), x.size());
-    out += x.size();
-  }
-  return out;
+  memcpy(out, x.data(), x.size());
+  return out + x.size();
 }
 
 static char *Append2(char *out, const AlphaNum &x1, const AlphaNum &x2) {
-  if (x1.size() > 0) {
-    memcpy(out, x1.data(), x1.size());
-    out += x1.size();
-  }
-  if (x2.size() > 0) {
-    memcpy(out, x2.data(), x2.size());
-    out += x2.size();
-  }
-  return out;
+  memcpy(out, x1.data(), x1.size());
+  out += x1.size();
+
+  memcpy(out, x2.data(), x2.size());
+  return out + x2.size();
 }
 
-static char *Append4(char *out, const AlphaNum &x1, const AlphaNum &x2,
+static char *Append4(char *out,
+                     const AlphaNum &x1, const AlphaNum &x2,
                      const AlphaNum &x3, const AlphaNum &x4) {
-  if (x1.size() > 0) {
-    memcpy(out, x1.data(), x1.size());
-    out += x1.size();
-  }
-  if (x2.size() > 0) {
-    memcpy(out, x2.data(), x2.size());
-    out += x2.size();
-  }
-  if (x3.size() > 0) {
-    memcpy(out, x3.data(), x3.size());
-    out += x3.size();
-  }
-  if (x4.size() > 0) {
-    memcpy(out, x4.data(), x4.size());
-    out += x4.size();
-  }
-  return out;
+  memcpy(out, x1.data(), x1.size());
+  out += x1.size();
+
+  memcpy(out, x2.data(), x2.size());
+  out += x2.size();
+
+  memcpy(out, x3.data(), x3.size());
+  out += x3.size();
+
+  memcpy(out, x4.data(), x4.size());
+  return out + x4.size();
 }
 
 string StrCat(const AlphaNum &a, const AlphaNum &b) {
@@ -2292,7 +2280,7 @@ static const unsigned char kUTF8LenTbl[256] = {
   1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,
   1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,
   2,2,2,2,2,2,2,2, 2,2,2,2,2,2,2,2, 2,2,2,2,2,2,2,2, 2,2,2,2,2,2,2,2,
-  3,3,3,3,3,3,3,3, 3,3,3,3,3,3,3,3, 4,4,4,4,4,1,1,1, 1,1,1,1,1,1,1,1
+  3,3,3,3,3,3,3,3, 3,3,3,3,3,3,3,3, 4,4,4,4,4,4,4,4, 4,4,4,4,4,4,4,4
 };
 
 // Return length of a single UTF-8 source character
