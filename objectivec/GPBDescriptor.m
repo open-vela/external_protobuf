@@ -44,7 +44,7 @@
 
 // The addresses of these variables are used as keys for objc_getAssociatedObject.
 static const char kTextFormatExtraValueKey = 0;
-static const char kParentClassValueKey = 0;
+static const char kParentClassNameValueKey = 0;
 static const char kClassNameSuffixKey = 0;
 
 // Utility function to generate selectors on the fly.
@@ -126,8 +126,6 @@ static NSArray *NewFieldsArrayForHasIndex(int hasIndex,
   GPBFileSyntax syntax = file.syntax;
   BOOL fieldsIncludeDefault =
       (flags & GPBDescriptorInitializationFlag_FieldsWithDefault) != 0;
-  BOOL usesClassRefs =
-      (flags & GPBDescriptorInitializationFlag_UsesClassRefs) != 0;
 
   void *desc;
   for (uint32_t i = 0; i < fieldCount; ++i) {
@@ -145,7 +143,6 @@ static NSArray *NewFieldsArrayForHasIndex(int hasIndex,
     GPBFieldDescriptor *fieldDescriptor =
         [[GPBFieldDescriptor alloc] initWithFieldDescription:desc
                                              includesDefault:fieldsIncludeDefault
-                                               usesClassRefs:usesClassRefs
                                                       syntax:syntax];
     [fields addObject:fieldDescriptor];
     [fieldDescriptor release];
@@ -220,19 +217,15 @@ static NSArray *NewFieldsArrayForHasIndex(int hasIndex,
   extensionRangesCount_ = count;
 }
 
-- (void)setupContainingMessageClass:(Class)messageClass {
-  objc_setAssociatedObject(self, &kParentClassValueKey,
-                           messageClass,
-                           OBJC_ASSOCIATION_ASSIGN);
-}
-
 - (void)setupContainingMessageClassName:(const char *)msgClassName {
   // Note: Only fetch the class here, can't send messages to it because
   // that could cause cycles back to this class within +initialize if
   // two messages have each other in fields (i.e. - they build a graph).
-  Class clazz = objc_getClass(msgClassName);
-  NSAssert(clazz, @"Class %s not defined", msgClassName);
-  [self setupContainingMessageClass:clazz];
+  NSAssert(objc_getClass(msgClassName), @"Class %s not defined", msgClassName);
+  NSValue *parentNameValue = [NSValue valueWithPointer:msgClassName];
+  objc_setAssociatedObject(self, &kParentClassNameValueKey,
+                           parentNameValue,
+                           OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 - (void)setupMessageClassNameSuffix:(NSString *)suffix {
@@ -248,7 +241,14 @@ static NSArray *NewFieldsArrayForHasIndex(int hasIndex,
 }
 
 - (GPBDescriptor *)containingType {
-  Class parentClass = objc_getAssociatedObject(self, &kParentClassValueKey);
+  NSValue *parentNameValue =
+      objc_getAssociatedObject(self, &kParentClassNameValueKey);
+  if (!parentNameValue) {
+    return nil;
+  }
+  const char *parentName = [parentNameValue pointerValue];
+  Class parentClass = objc_getClass(parentName);
+  NSAssert(parentClass, @"Class %s not defined", parentName);
   return [parentClass descriptor];
 }
 
@@ -487,7 +487,6 @@ uint32_t GPBFieldAlternateTag(GPBFieldDescriptor *self) {
 
 - (instancetype)initWithFieldDescription:(void *)description
                          includesDefault:(BOOL)includesDefault
-                           usesClassRefs:(BOOL)usesClassRefs
                                   syntax:(GPBFileSyntax)syntax {
   if ((self = [super init])) {
     GPBMessageFieldDescription *coreDesc;
@@ -525,17 +524,12 @@ uint32_t GPBFieldAlternateTag(GPBFieldDescriptor *self) {
 
     // Extra type specific data.
     if (isMessage) {
+      const char *className = coreDesc->dataTypeSpecific.className;
       // Note: Only fetch the class here, can't send messages to it because
       // that could cause cycles back to this class within +initialize if
       // two messages have each other in fields (i.e. - they build a graph).
-      if (usesClassRefs) {
-        msgClass_ = coreDesc->dataTypeSpecific.clazz;
-      } else {
-        // Backwards compatibility for sources generated with older protoc.
-        const char *className = coreDesc->dataTypeSpecific.className;
-        msgClass_ = objc_getClass(className);
-        NSAssert(msgClass_, @"Class %s not defined", className);
-      }
+      msgClass_ = objc_getClass(className);
+      NSAssert(msgClass_, @"Class %s not defined", className);
     } else if (dataType == GPBDataTypeEnum) {
       if ((coreDesc->flags & GPBFieldHasEnumDescriptor) != 0) {
         enumHandling_.enumDescriptor_ =
@@ -565,15 +559,6 @@ uint32_t GPBFieldAlternateTag(GPBFieldDescriptor *self) {
     }
   }
   return self;
-}
-
-- (instancetype)initWithFieldDescription:(void *)description
-                         includesDefault:(BOOL)includesDefault
-                                  syntax:(GPBFileSyntax)syntax {
-  return [self initWithFieldDescription:description
-                        includesDefault:includesDefault
-                          usesClassRefs:NO
-                                 syntax:syntax];
 }
 
 - (void)dealloc {
@@ -972,32 +957,33 @@ uint32_t GPBFieldAlternateTag(GPBFieldDescriptor *self) {
   GPBGenericValue defaultValue_;
 }
 
-- (instancetype)initWithExtensionDescription:(GPBExtensionDescription *)desc
-                               usesClassRefs:(BOOL)usesClassRefs {
-  if ((self = [super init])) {
-    description_ = desc;
-    if (!usesClassRefs) {
-      // Legacy without class ref support.
-      const char *className = description_->messageOrGroupClass.name;
-      if (className) {
-        Class clazz = objc_lookUpClass(className);
-        NSAssert(clazz != Nil, @"Class %s not defined", className);
-        description_->messageOrGroupClass.clazz = clazz;
-      }
+@synthesize containingMessageClass = containingMessageClass_;
 
-      const char *extendedClassName = description_->extendedClass.name;
-      if (extendedClassName) {
-        Class clazz = objc_lookUpClass(extendedClassName);
-        NSAssert(clazz, @"Class %s not defined", extendedClassName);
-        description_->extendedClass.clazz = clazz;
-      }
+- (instancetype)initWithExtensionDescription:
+        (GPBExtensionDescription *)description {
+  if ((self = [super init])) {
+    description_ = description;
+
+#if defined(DEBUG) && DEBUG
+    const char *className = description->messageOrGroupClassName;
+    if (className) {
+      NSAssert(objc_lookUpClass(className) != Nil,
+               @"Class %s not defined", className);
+    }
+#endif
+
+    if (description->extendedClass) {
+      Class containingClass = objc_lookUpClass(description->extendedClass);
+      NSAssert(containingClass, @"Class %s not defined",
+               description->extendedClass);
+      containingMessageClass_ = containingClass;
     }
 
     GPBDataType type = description_->dataType;
     if (type == GPBDataTypeBytes) {
       // Data stored as a length prefixed c-string in descriptor records.
       const uint8_t *bytes =
-          (const uint8_t *)description_->defaultValue.valueData;
+          (const uint8_t *)description->defaultValue.valueData;
       if (bytes) {
         uint32_t length;
         memcpy(&length, bytes, sizeof(length));
@@ -1012,14 +998,10 @@ uint32_t GPBFieldAlternateTag(GPBFieldDescriptor *self) {
       // aren't common, we avoid the hit startup hit and it avoid initialization
       // order issues.
     } else {
-      defaultValue_ = description_->defaultValue;
+      defaultValue_ = description->defaultValue;
     }
   }
   return self;
-}
-
-- (instancetype)initWithExtensionDescription:(GPBExtensionDescription *)desc {
-  return [self initWithExtensionDescription:desc usesClassRefs:NO];
 }
 
 - (void)dealloc {
@@ -1073,11 +1055,7 @@ uint32_t GPBFieldAlternateTag(GPBFieldDescriptor *self) {
 }
 
 - (Class)msgClass {
-  return description_->messageOrGroupClass.clazz;
-}
-
-- (Class)containingMessageClass {
-  return description_->extendedClass.clazz;
+  return objc_getClass(description_->messageOrGroupClassName);
 }
 
 - (GPBEnumDescriptor *)enumDescriptor {

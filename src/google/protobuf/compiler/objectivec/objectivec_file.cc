@@ -398,20 +398,10 @@ void FileGenerator::GenerateSource(io::Printer *printer) {
     }
   }
 
-  std::set<string> fwd_decls;
-  for (const auto& generator : message_generators_) {
-    generator->DetermineObjectiveCClassDefinitions(&fwd_decls);
-  }
-  for (const auto& generator : extension_generators_) {
-    generator->DetermineObjectiveCClassDefinitions(&fwd_decls);
-  }
-
   // Note:
   //  deprecated-declarations suppression is only needed if some place in this
   //    proto file is something deprecated or if it references something from
   //    another file that is deprecated.
-  //  dollar-in-identifier-extension is needed because we use references to
-  //    objc class names that have $ in identifiers.
   printer->Print(
       "// @@protoc_insertion_point(imports)\n"
       "\n"
@@ -424,26 +414,9 @@ void FileGenerator::GenerateSource(io::Printer *printer) {
     printer->Print(
         "#pragma clang diagnostic ignored \"-Wdirect-ivar-access\"\n");
   }
-  if (!fwd_decls.empty()) {
-    printer->Print(
-      "#pragma clang diagnostic ignored \"-Wdollar-in-identifier-extension\"\n");
-  }
+
   printer->Print(
-      "\n");
-  if (!fwd_decls.empty()) {
-    printer->Print(
-        "#pragma mark - Objective C Class declarations\n"
-        "// Forward declarations of Objective C classes that we can use as\n"
-        "// static values in struct initializers.\n"
-        "// We don't use [Foo class] because it is not a static value.\n");
-  }
-  for (const auto& i : fwd_decls) {
-    printer->Print("$value$\n", "value", i);
-  }
-  if (!fwd_decls.empty()) {
-    printer->Print("\n");
-  }
-  printer->Print(
+      "\n"
       "#pragma mark - $root_class_name$\n"
       "\n"
       "@implementation $root_class_name$\n\n",
@@ -481,8 +454,7 @@ void FileGenerator::GenerateSource(io::Printer *printer) {
           "};\n"
           "for (size_t i = 0; i < sizeof(descriptions) / sizeof(descriptions[0]); ++i) {\n"
           "  GPBExtensionDescriptor *extension =\n"
-          "      [[GPBExtensionDescriptor alloc] initWithExtensionDescription:&descriptions[i]\n"
-          "                                                     usesClassRefs:YES];\n"
+          "      [[GPBExtensionDescriptor alloc] initWithExtensionDescription:&descriptions[i]];\n"
           "  [registry addExtension:extension];\n"
           "  [self globallyRegisterExtension:extension];\n"
           "  [extension release];\n"
