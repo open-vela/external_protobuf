@@ -68,7 +68,7 @@ typedef struct GPBDuration__storage_ {
     static GPBMessageFieldDescription fields[] = {
       {
         .name = "seconds",
-        .dataTypeSpecific.clazz = Nil,
+        .dataTypeSpecific.className = NULL,
         .number = GPBDuration_FieldNumber_Seconds,
         .hasIndex = 0,
         .offset = (uint32_t)offsetof(GPBDuration__storage_, seconds),
@@ -77,7 +77,7 @@ typedef struct GPBDuration__storage_ {
       },
       {
         .name = "nanos",
-        .dataTypeSpecific.clazz = Nil,
+        .dataTypeSpecific.className = NULL,
         .number = GPBDuration_FieldNumber_Nanos,
         .hasIndex = 1,
         .offset = (uint32_t)offsetof(GPBDuration__storage_, nanos),
@@ -92,7 +92,7 @@ typedef struct GPBDuration__storage_ {
                                         fields:fields
                                     fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
                                    storageSize:sizeof(GPBDuration__storage_)
-                                         flags:GPBDescriptorInitializationFlag_UsesClassRefs];
+                                         flags:GPBDescriptorInitializationFlag_None];
     #if defined(DEBUG) && DEBUG
       NSAssert(descriptor == nil, @"Startup recursed!");
     #endif  // DEBUG

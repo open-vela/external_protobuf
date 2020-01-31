@@ -117,7 +117,7 @@ jspb.utils.splitInt64 = function(value) {
 
 
 /**
- * Converts a signed Javascript integer into zigzag format, splits it into two
+ * Convers a signed Javascript integer into zigzag format, splits it into two
  * 32-bit halves, and stores it in the temp values above.
  * @param {number} value The number to split.
  */
