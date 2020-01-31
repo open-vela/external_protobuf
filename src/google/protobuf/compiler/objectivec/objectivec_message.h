@@ -63,7 +63,6 @@ class MessageGenerator {
   void GenerateMessageHeader(io::Printer* printer);
   void GenerateSource(io::Printer* printer);
   void GenerateExtensionRegistrationSource(io::Printer* printer);
-  void DetermineObjectiveCClassDefinitions(std::set<string>* fwd_decls);
   void DetermineForwardDeclarations(std::set<string>* fwd_decls);
 
   // Checks if the message or a nested message includes a oneof definition.

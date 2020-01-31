@@ -68,7 +68,7 @@ typedef struct GPBAny__storage_ {
     static GPBMessageFieldDescription fields[] = {
       {
         .name = "typeURL",
-        .dataTypeSpecific.clazz = Nil,
+        .dataTypeSpecific.className = NULL,
         .number = GPBAny_FieldNumber_TypeURL,
         .hasIndex = 0,
         .offset = (uint32_t)offsetof(GPBAny__storage_, typeURL),
@@ -77,7 +77,7 @@ typedef struct GPBAny__storage_ {
       },
       {
         .name = "value",
-        .dataTypeSpecific.clazz = Nil,
+        .dataTypeSpecific.className = NULL,
         .number = GPBAny_FieldNumber_Value,
         .hasIndex = 1,
         .offset = (uint32_t)offsetof(GPBAny__storage_, value),
@@ -92,7 +92,7 @@ typedef struct GPBAny__storage_ {
                                         fields:fields
                                     fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
                                    storageSize:sizeof(GPBAny__storage_)
-                                         flags:GPBDescriptorInitializationFlag_UsesClassRefs];
+                                         flags:GPBDescriptorInitializationFlag_None];
 #if !GPBOBJC_SKIP_MESSAGE_TEXTFORMAT_EXTRAS
     static const char *extraTextFormatInfo =
         "\001\001\004\241!!\000";
