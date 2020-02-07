@@ -1,22 +1,3 @@
-2020-02-14 version 3.11.4 (C++/Java/Python/PHP/Objective-C/C#/Ruby/JavaScript)
-  
-  C#
-  * Fix latest ArgumentException for C# extensions (#7188)
-  
-  Ruby
-  * Fix wrappers with a zero value (#7195)
-  * Fix JSON serialization of 0/empty-valued wrapper types (#7198)
-
-2020-01-31 version 3.11.3 (C++/Java/Python/PHP/Objective-C/C#/Ruby/JavaScript)
-
-  C++
-  * Add OUT and OPTIONAL to windows portability files (#7087)
-
-  PHP
-  * Refactored ulong to zend_ulong for php7.4 compatibility (#7147)
-  * Call register_class before getClass from desc to fix segfault (#7077)
-  
-
 2019-12-10 version 3.11.2 (C++/Java/Python/PHP/Objective-C/C#/Ruby/JavaScript)
 
   PHP
@@ -298,7 +279,7 @@
   * Introduce Proto C API.
   * FindFileContainingSymbol in descriptor pool is now able to find field and enum values.
   * reflection.MakeClass()  and  reflection.ParseMessage() are deprecated.
-  * Added DescriptorPool.FindMethodByName() method in pure python (c extension alreay has it)
+  * Added DescriptorPool.FindMethodByName() method in pure python (c extension already has it)
   * Flipped proto3 to preserve unknown fields by default.
   * Added support for memoryview in python3 proto message parsing.
   * Added MergeFrom for repeated scalar fields in c extension (pure python already has it)
@@ -461,7 +442,7 @@
   PHP
   * Fixed memory leak in C-extension implementation.
   * Added discardUnknokwnFields API.
-  * Removed duplicatd typedef in C-extension headers.
+  * Removed duplicated typedef in C-extension headers.
   * Avoided calling private php methods (timelib_update_ts).
   * Fixed Any.php to use fully-qualified name for DescriptorPool.
 
