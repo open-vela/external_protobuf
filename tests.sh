@@ -195,7 +195,7 @@ use_java() {
   $MVN -version
 }
 
-# --batch-mode suppresses download progress output that spams the logs.
+# --batch-mode supresses download progress output that spams the logs.
 MVN="mvn --batch-mode"
 
 build_java() {
@@ -233,7 +233,7 @@ build_java_oracle7() {
 build_java_compatibility() {
   use_java jdk7
   internal_build_cpp
-  # Use the unit-tests extracted from 2.5.0 to test the compatibility between
+  # Use the unit-tests extraced from 2.5.0 to test the compatibilty between
   # 3.0.0-beta-4 and the current version.
   cd java/compatibility_tests/v2.5.0
   ./test.sh 3.0.0-beta-4
@@ -251,6 +251,16 @@ build_java_linkage_monitor() {
   # Linkage Monitor uses $HOME/.m2 local repository
   MVN="mvn -e -B -Dhttps.protocols=TLSv1.2"
   cd java
+  # Sets java artifact version with SNAPSHOT, as Linkage Monitor looks for SNAPSHOT versions.
+  # Example: "3.9.0" (without 'rc')
+  VERSION=`grep '<version>' pom.xml |head -1 |perl -nle 'print $1 if m/<version>(\d+\.\d+.\d+)/'`
+  cd bom
+  # This local installation avoids the problem caused by a new version not yet in Maven Central
+  # https://github.com/protocolbuffers/protobuf/issues/6627
+  $MVN install
+  $MVN versions:set -DnewVersion=${VERSION}-SNAPSHOT
+  cd ..
+  $MVN versions:set -DnewVersion=${VERSION}-SNAPSHOT
   # Installs the snapshot version locally
   $MVN install -Dmaven.test.skip=true
 
@@ -408,7 +418,7 @@ build_python38_cpp() {
 
 build_python_compatibility() {
   internal_build_cpp
-  # Use the unit-tests extracted from 2.5.0 to test the compatibility.
+  # Use the unit-tests extraced from 2.5.0 to test the compatibilty.
   cd python/compatibility_tests/v2.5.0
   # Test between 2.5.0 and the current version.
   ./test.sh 2.5.0
@@ -690,6 +700,30 @@ build_php7.0_mac() {
 
   # Install phpunit
   curl https://phar.phpunit.de/phpunit-5.6.0.phar -L -o phpunit.phar
+  chmod +x phpunit.phar
+  sudo mv phpunit.phar /usr/local/bin/phpunit
+
+  # Install valgrind
+  echo "#! /bin/bash" > valgrind
+  chmod ug+x valgrind
+  sudo mv valgrind /usr/local/bin/valgrind
+
+  # Test
+  cd php/tests && /bin/bash ./test.sh && cd ../..
+  pushd conformance
+  make test_php_c
+  popd
+}
+
+build_php7.4_mac() {
+  generate_php_test_proto
+  # Install PHP
+  curl -s https://php-osx.liip.ch/install.sh | bash -s 7.4
+  PHP_FOLDER=`find /usr/local -type d -name "php7-7.4*"`  # The folder name may change upon time
+  export PATH="$PHP_FOLDER/bin:$PATH"
+
+  # Install phpunit
+  curl https://phar.phpunit.de/phpunit-8.phar -L -o phpunit.phar
   chmod +x phpunit.phar
   sudo mv phpunit.phar /usr/local/bin/phpunit
 
