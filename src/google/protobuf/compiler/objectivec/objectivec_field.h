@@ -66,7 +66,6 @@ class FieldGenerator {
 
   // Exposed for subclasses, should always call it on the parent class also.
   virtual void DetermineForwardDeclarations(std::set<string>* fwd_decls) const;
-  virtual void DetermineObjectiveCClassDefinitions(std::set<string>* fwd_decls) const;
 
   // Used during generation, not intended to be extended by subclasses.
   void GenerateFieldDescription(
