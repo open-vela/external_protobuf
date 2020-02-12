@@ -585,14 +585,6 @@ string OneofNameCapitalized(const OneofDescriptor* descriptor) {
   return result;
 }
 
-string ObjCClass(const string& class_name) {
-  return string("GPBObjCClass(") + class_name + ")";
-}
-
-string ObjCClassDeclaration(const string& class_name) {
-  return string("GPBObjCClassDeclaration(") + class_name + ");";
-}
-
 string UnCamelCaseFieldName(const string& name, const FieldDescriptor* field) {
   string worker(name);
   if (HasSuffixString(worker, "_p")) {
@@ -918,7 +910,7 @@ bool HasNonZeroDefaultValue(const FieldDescriptor* field) {
 
 string BuildFlagsString(const FlagType flag_type,
                         const std::vector<string>& strings) {
-  if (strings.empty()) {
+  if (strings.size() == 0) {
     return GetZeroEnumNameForFlagType(flag_type);
   } else if (strings.size() == 1) {
     return strings[0];
@@ -945,7 +937,7 @@ string BuildCommentsString(const SourceLocation& location,
     lines.pop_back();
   }
   // If there are no comments, just return an empty string.
-  if (lines.empty()) {
+  if (lines.size() == 0) {
     return "";
   }
 
@@ -990,7 +982,7 @@ string BuildCommentsString(const SourceLocation& location,
 // want to put the library in a framework is an interesting question. The
 // problem is it means changing sources shipped with the library to actually
 // use a different value; so it isn't as simple as a option.
-const char* const ProtobufLibraryFrameworkName = "Protobuf";
+const char* const ProtobufLibraryFrameworkName = "protobuf";
 
 string ProtobufFrameworkImportSymbol(const string& framework_name) {
   // GPB_USE_[framework_name]_FRAMEWORK_IMPORTS
@@ -1405,7 +1397,7 @@ string DirectDecodeString(const string& str) {
 // static
 string TextFormatDecodeData::DecodeDataForString(const string& input_for_decode,
                                                  const string& desired_output) {
-  if (input_for_decode.empty() || desired_output.empty()) {
+  if ((input_for_decode.size() == 0) || (desired_output.size() == 0)) {
     std::cerr << "error: got empty string for making TextFormat data, input: \""
          << input_for_decode << "\", desired: \"" << desired_output << "\"."
          << std::endl;
@@ -1515,7 +1507,7 @@ bool Parser::ParseLoop() {
     ++line_;
     RemoveComment(&line);
     TrimWhitespace(&line);
-    if (line.empty()) {
+    if (line.size() == 0) {
       continue;  // Blank line.
     }
     if (!line_consumer_->ConsumeLine(line, &error_str_)) {
@@ -1578,15 +1570,16 @@ ImportWriter::~ImportWriter() {}
 
 void ImportWriter::AddFile(const FileDescriptor* file,
                            const string& header_extension) {
+  const string file_path(FilePath(file));
+
   if (IsProtobufLibraryBundledProtoFile(file)) {
     // The imports of the WKTs are only needed within the library itself,
     // in other cases, they get skipped because the generated code already
     // import GPBProtocolBuffers.h and hence proves them.
     if (include_wkt_imports_) {
-      const string header_name =
-        "GPB" + FilePathBasename(file) + header_extension;
-      protobuf_framework_imports_.push_back(header_name);
-      protobuf_non_framework_imports_.push_back(header_name);
+      protobuf_framework_imports_.push_back(
+          FilePathBasename(file) + header_extension);
+      protobuf_non_framework_imports_.push_back(file_path + header_extension);
     }
     return;
   }
@@ -1612,7 +1605,7 @@ void ImportWriter::AddFile(const FileDescriptor* file,
     return;
   }
 
-  other_imports_.push_back(FilePath(file) + header_extension);
+  other_imports_.push_back(file_path + header_extension);
 }
 
 void ImportWriter::Print(io::Printer* printer) const {
@@ -1621,7 +1614,7 @@ void ImportWriter::Print(io::Printer* printer) const {
 
   bool add_blank_line = false;
 
-  if (!protobuf_framework_imports_.empty()) {
+  if (protobuf_framework_imports_.size() > 0) {
     const string framework_name(ProtobufLibraryFrameworkName);
     const string cpp_symbol(ProtobufFrameworkImportSymbol(framework_name));
 
@@ -1649,7 +1642,7 @@ void ImportWriter::Print(io::Printer* printer) const {
     add_blank_line = true;
   }
 
-  if (!other_framework_imports_.empty()) {
+  if (other_framework_imports_.size() > 0) {
     if (add_blank_line) {
       printer->Print("\n");
     }
@@ -1664,7 +1657,7 @@ void ImportWriter::Print(io::Printer* printer) const {
     add_blank_line = true;
   }
 
-  if (!other_imports_.empty()) {
+  if (other_imports_.size() > 0) {
     if (add_blank_line) {
       printer->Print("\n");
     }
@@ -1716,7 +1709,7 @@ bool ImportWriter::ProtoFrameworkCollector::ConsumeLine(
 
     StringPiece proto_file = proto_file_list.substr(start, offset - start);
     TrimWhitespace(&proto_file);
-    if (!proto_file.empty()) {
+    if (proto_file.size() != 0) {
       std::map<string, string>::iterator existing_entry =
           map_->find(string(proto_file));
       if (existing_entry != map_->end()) {
