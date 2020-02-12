@@ -2228,20 +2228,12 @@ bool CommandLineInterface::WriteDescriptorSet(
   }
 
   io::FileOutputStream out(fd);
-
-  {
-    io::CodedOutputStream coded_out(&out);
-    // Determinism is useful here because build outputs are sometimes checked
-    // into version control.
-    coded_out.SetSerializationDeterministic(true);
-    if (!file_set.SerializeToCodedStream(&coded_out)) {
-      std::cerr << descriptor_set_out_name_ << ": " << strerror(out.GetErrno())
-                << std::endl;
-      out.Close();
-      return false;
-    }
+  if (!file_set.SerializeToZeroCopyStream(&out)) {
+    std::cerr << descriptor_set_out_name_ << ": " << strerror(out.GetErrno())
+              << std::endl;
+    out.Close();
+    return false;
   }
-
   if (!out.Close()) {
     std::cerr << descriptor_set_out_name_ << ": " << strerror(out.GetErrno())
               << std::endl;
