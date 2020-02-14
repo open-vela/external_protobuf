@@ -936,7 +936,7 @@ class PROTOBUF_EXPORT Reflection final {
 
   // If key is in map field: Saves the value pointer to val and returns
   // false. If key in not in map field: Insert the key into map, saves
-  // value pointer to val and returns true.
+  // value pointer to val and retuns true.
   bool InsertOrLookupMapValue(Message* message, const FieldDescriptor* field,
                               const MapKey& key, MapValueRef* val) const;
 
@@ -1193,11 +1193,11 @@ const T* DynamicCastToGenerated(const Message* from) {
   const Message* unused = static_cast<T*>(nullptr);
   (void)unused;
 
-#if PROTOBUF_RTTI
-  return dynamic_cast<const T*>(from);
-#else
+#ifdef GOOGLE_PROTOBUF_NO_RTTI
   bool ok = T::default_instance().GetReflection() == from->GetReflection();
   return ok ? down_cast<const T*>(from) : nullptr;
+#else
+  return dynamic_cast<const T*>(from);
 #endif
 }
 
