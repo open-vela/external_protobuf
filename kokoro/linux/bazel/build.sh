@@ -25,10 +25,9 @@ git submodule update --init --recursive
 trap print_test_logs EXIT
 bazel test --copt=-Werror --host_copt=-Werror \
   //:build_files_updated_unittest \
-  //java/... \
   //:protobuf_test \
   @com_google_protobuf//:cc_proto_blacklist_test
 trap - EXIT
 
 cd examples
-bazel build //...
+bazel build :all
