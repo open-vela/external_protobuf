@@ -584,7 +584,7 @@ namespace Google.Protobuf
         /// </summary>
         public bool ReadBool()
         {
-            return ReadRawVarint32() != 0;
+            return ReadRawVarint64() != 0;
         }
 
         /// <summary>
@@ -872,7 +872,7 @@ namespace Google.Protobuf
 
         internal static bool? ReadBoolWrapper(CodedInputStream input)
         {
-            return ReadUInt32Wrapper(input) != 0;
+            return ReadUInt64Wrapper(input) != 0;
         }
 
         internal static uint? ReadUInt32Wrapper(CodedInputStream input)
