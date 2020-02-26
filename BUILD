@@ -162,11 +162,9 @@ cc_library(
 cc_library(
     name = "json",
     srcs = [
-        "upb/json_decode.c",
         "upb/json_encode.c",
     ],
     hdrs = [
-        "upb/json_decode.h",
         "upb/json_encode.h",
     ],
     deps = [
