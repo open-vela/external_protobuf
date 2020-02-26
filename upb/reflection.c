@@ -90,18 +90,6 @@ bool upb_msg_has(const upb_msg *msg, const upb_fielddef *f) {
   }
 }
 
-bool upb_msg_hasoneof(const upb_msg *msg, const upb_oneofdef *o) {
-  upb_oneof_iter i;
-  const upb_fielddef *f;
-  const upb_msglayout_field *field;
-
-  upb_oneof_begin(&i, o);
-  if (upb_oneof_done(&i)) return false;
-  f = upb_oneof_iter_field(&i);
-  field = upb_fielddef_layout(f);
-  return *oneofcase(msg, field) != 0;
-}
-
 upb_msgval upb_msg_get(const upb_msg *msg, const upb_fielddef *f) {
   if (!upb_fielddef_haspresence(f) || upb_msg_has(msg, f)) {
     return _upb_msg_getraw(msg, f);
@@ -148,11 +136,8 @@ upb_mutmsgval upb_msg_mutable(upb_msg *msg, const upb_fielddef *f,
   const upb_msglayout_field *field = upb_fielddef_layout(f);
   upb_mutmsgval ret;
   char *mem = PTR_AT(msg, field->offset, char);
-  bool wrong_oneof = in_oneof(field) && *oneofcase(msg, field) != field->number;
-
   memcpy(&ret, mem, sizeof(void*));
-
-  if (a && (!ret.msg || wrong_oneof)) {
+  if (a && !ret.msg) {
     if (upb_fielddef_ismap(f)) {
       const upb_msgdef *entry = upb_fielddef_msgsubdef(f);
       const upb_fielddef *key = upb_msgdef_itof(entry, UPB_MAPENTRY_KEY);
@@ -164,12 +149,7 @@ upb_mutmsgval upb_msg_mutable(upb_msg *msg, const upb_fielddef *f,
       UPB_ASSERT(upb_fielddef_issubmsg(f));
       ret.msg = upb_msg_new(upb_fielddef_msgsubdef(f), a);
     }
-
     memcpy(mem, &ret, sizeof(void*));
-
-    if (wrong_oneof) {
-      *oneofcase(msg, field) = field->number;
-    }
   }
   return ret;
 }
@@ -189,10 +169,10 @@ void upb_msg_set(upb_msg *msg, const upb_fielddef *f, upb_msgval val,
 bool upb_msg_next(const upb_msg *msg, const upb_msgdef *m,
                   const upb_symtab *ext_pool, const upb_fielddef **out_f,
                   upb_msgval *out_val, size_t *iter) {
-  int i = *iter;
+  size_t i = *iter;
   const upb_msgval zero = {0};
   const upb_fielddef *f;
-  while ((f = _upb_msgdef_field(m, ++i)) != NULL) {
+  while ((f = _upb_msgdef_field(m, (int)++i)) != NULL) {
     upb_msgval val = _upb_msg_getraw(msg, f);
 
     /* Skip field if unset or empty. */
