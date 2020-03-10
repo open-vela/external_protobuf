@@ -1,14 +1,14 @@
 /**
  * @fileoverview Tests for repeated methods in lazy_accessor.js.
  */
-goog.module('protobuf.runtime.KernelTest');
+goog.module('protobuf.binary.LazyAccessorTest');
 
 goog.setTestOnly();
 
 const ByteString = goog.require('protobuf.ByteString');
 const Int64 = goog.require('protobuf.Int64');
 const InternalMessage = goog.require('protobuf.binary.InternalMessage');
-const LazyAccessor = goog.require('protobuf.runtime.Kernel');
+const LazyAccessor = goog.require('protobuf.binary.LazyAccessor');
 const TestMessage = goog.require('protobuf.testing.binary.TestMessage');
 // Note to the reader:
 // Since the lazy accessor behavior changes with the checking level some of the

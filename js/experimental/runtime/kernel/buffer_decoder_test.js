@@ -41,7 +41,7 @@ describe('Skip varint does', () => {
   it('skip a varint', () => {
     const bufferDecoder =
         BufferDecoder.fromArrayBuffer(createArrayBuffer(0x01));
-    bufferDecoder.skipVarint();
+    bufferDecoder.skipVarint(0);
     expect(bufferDecoder.cursor()).toBe(1);
   });
 
@@ -50,13 +50,13 @@ describe('Skip varint does', () => {
         0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x00));
 
     if (CHECK_CRITICAL_STATE) {
-      expect(() => bufferDecoder.skipVarint()).toThrow();
+      expect(() => bufferDecoder.skipVarint(0)).toThrow();
     } else {
       // Note in unchecked mode we produce invalid output for invalid inputs.
       // This test just documents our behavior in those cases.
       // These values might change at any point and are not considered
       // what the implementation should be doing here.
-      bufferDecoder.skipVarint();
+      bufferDecoder.skipVarint(0);
       expect(bufferDecoder.cursor()).toBe(11);
     }
   });
@@ -64,7 +64,7 @@ describe('Skip varint does', () => {
   it('fail when varint is beyond end of underlying array', () => {
     const bufferDecoder =
         BufferDecoder.fromArrayBuffer(createArrayBuffer(0x80, 0x80));
-    expect(() => bufferDecoder.skipVarint()).toThrow();
+    expect(() => bufferDecoder.skipVarint(0)).toThrow();
   });
 });
 
