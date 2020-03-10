@@ -279,14 +279,15 @@ class BufferDecoder {
   }
 
   /**
-   * Skips over a varint from the current cursor position.
+   * Skips over a varint at a given index.
+   * @param {number} index Start of the data.
    * @package
    */
-  skipVarint() {
-    const startIndex = this.cursor_;
+  skipVarint(index) {
+    this.cursor_ = index;
     while (this.dataView_.getUint8(this.cursor_++) & 0x80) {
     }
-    checkCriticalPositionIndex(this.cursor_, startIndex + 10);
+    checkCriticalPositionIndex(this.cursor_, index + 10);
   }
 
   /**

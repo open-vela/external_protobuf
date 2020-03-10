@@ -4,7 +4,7 @@
 goog.module('proto.conformance.TestAllTypesProto2');
 
 const InternalMessage = goog.require('protobuf.binary.InternalMessage');
-const LazyAccessor = goog.require('protobuf.runtime.Kernel');
+const LazyAccessor = goog.require('protobuf.binary.LazyAccessor');
 
 /**
  * Handwritten code of conformance.TestAllTypesProto2.

@@ -451,8 +451,7 @@ class Writer {
   getLength_(bufferDecoder, start, wireType) {
     switch (wireType) {
       case WireType.VARINT:
-        bufferDecoder.setCursor(start);
-        bufferDecoder.skipVarint();
+        bufferDecoder.skipVarint(start);
         return bufferDecoder.cursor() - start;
       case WireType.FIXED64:
         return 8;

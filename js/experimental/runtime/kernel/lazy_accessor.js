@@ -12,7 +12,7 @@
  * fields), LazyAccessor will only need the full type information of used
  * fields.
  */
-goog.module('protobuf.runtime.Kernel');
+goog.module('protobuf.binary.LazyAccessor');
 
 const BufferDecoder = goog.require('protobuf.binary.BufferDecoder');
 const ByteString = goog.require('protobuf.ByteString');
