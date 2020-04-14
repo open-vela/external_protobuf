@@ -35,7 +35,6 @@ using System;
 using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.IO;
-using System.Buffers;
 
 namespace Google.Protobuf.Benchmarks
 {
@@ -86,7 +85,7 @@ namespace Google.Protobuf.Benchmarks
         [Arguments(3)]
         [Arguments(4)]
         [Arguments(5)]
-        public int ParseRawVarint32_CodedInputStream(int encodedSize)
+        public int ParseRawVarint32(int encodedSize)
         {
             CodedInputStream cis = new CodedInputStream(varintInputBuffers[encodedSize]);
             int sum = 0;
@@ -103,29 +102,12 @@ namespace Google.Protobuf.Benchmarks
         [Arguments(3)]
         [Arguments(4)]
         [Arguments(5)]
-        public int ParseRawVarint32_ParseContext(int encodedSize)
-        {
-            InitializeParseContext(varintInputBuffers[encodedSize], out ParseContext ctx);
-            int sum = 0;
-            for (int i = 0; i < BytesToParse / encodedSize; i++)
-            {
-                sum += ctx.ReadInt32();
-            }
-            return sum;
-        }
-
-        [Benchmark]
-        [Arguments(1)]
-        [Arguments(2)]
-        [Arguments(3)]
-        [Arguments(4)]
-        [Arguments(5)]
         [Arguments(6)]
         [Arguments(7)]
         [Arguments(8)]
         [Arguments(9)]
         [Arguments(10)]
-        public long ParseRawVarint64_CodedInputStream(int encodedSize)
+        public long ParseRawVarint64(int encodedSize)
         {
             CodedInputStream cis = new CodedInputStream(varintInputBuffers[encodedSize]);
             long sum = 0;
@@ -137,29 +119,7 @@ namespace Google.Protobuf.Benchmarks
         }
 
         [Benchmark]
-        [Arguments(1)]
-        [Arguments(2)]
-        [Arguments(3)]
-        [Arguments(4)]
-        [Arguments(5)]
-        [Arguments(6)]
-        [Arguments(7)]
-        [Arguments(8)]
-        [Arguments(9)]
-        [Arguments(10)]
-        public long ParseRawVarint64_ParseContext(int encodedSize)
-        {
-            InitializeParseContext(varintInputBuffers[encodedSize], out ParseContext ctx);
-            long sum = 0;
-            for (int i = 0; i < BytesToParse / encodedSize; i++)
-            {
-                sum += ctx.ReadInt64();
-            }
-            return sum;
-        }
-
-        [Benchmark]
-        public uint ParseFixed32_CodedInputStream()
+        public uint ParseFixed32()
         {
             const int encodedSize = sizeof(uint);
             CodedInputStream cis = new CodedInputStream(fixedIntInputBuffer);
@@ -172,20 +132,7 @@ namespace Google.Protobuf.Benchmarks
         }
 
         [Benchmark]
-        public uint ParseFixed32_ParseContext()
-        {
-            const int encodedSize = sizeof(uint);
-            InitializeParseContext(fixedIntInputBuffer, out ParseContext ctx);
-            uint sum = 0;
-            for (uint i = 0; i < BytesToParse / encodedSize; i++)
-            {
-                sum += ctx.ReadFixed32();
-            }
-            return sum;
-        }
-
-        [Benchmark]
-        public ulong ParseFixed64_CodedInputStream()
+        public ulong ParseFixed64()
         {
             const int encodedSize = sizeof(ulong);
             CodedInputStream cis = new CodedInputStream(fixedIntInputBuffer);
@@ -198,20 +145,7 @@ namespace Google.Protobuf.Benchmarks
         }
 
         [Benchmark]
-        public ulong ParseFixed64_ParseContext()
-        {
-            const int encodedSize = sizeof(ulong);
-            InitializeParseContext(fixedIntInputBuffer, out ParseContext ctx);
-            ulong sum = 0;
-            for (int i = 0; i < BytesToParse / encodedSize; i++)
-            {
-                sum += ctx.ReadFixed64();
-            }
-            return sum;
-        }
-
-        [Benchmark]
-        public float ParseRawFloat_CodedInputStream()
+        public float ParseRawFloat()
         {
             const int encodedSize = sizeof(float);
             CodedInputStream cis = new CodedInputStream(floatInputBuffer);
@@ -224,20 +158,7 @@ namespace Google.Protobuf.Benchmarks
         }
 
         [Benchmark]
-        public float ParseRawFloat_ParseContext()
-        {
-            const int encodedSize = sizeof(float);
-            InitializeParseContext(floatInputBuffer, out ParseContext ctx);
-            float sum = 0;
-            for (int i = 0; i < BytesToParse / encodedSize; i++)
-            {
-               sum += ctx.ReadFloat();
-            }
-            return sum;
-        }
-
-        [Benchmark]
-        public double ParseRawDouble_CodedInputStream()
+        public double ParseRawDouble()
         {
             const int encodedSize = sizeof(double);
             CodedInputStream cis = new CodedInputStream(doubleInputBuffer);
@@ -247,24 +168,6 @@ namespace Google.Protobuf.Benchmarks
                 sum += cis.ReadDouble();
             }
             return sum;
-        }
-
-        [Benchmark]
-        public double ParseRawDouble_ParseContext()
-        {
-            const int encodedSize = sizeof(double);
-            InitializeParseContext(doubleInputBuffer, out ParseContext ctx);
-            double sum = 0;
-            for (int i = 0; i < BytesToParse / encodedSize; i++)
-            {
-                sum += ctx.ReadDouble();
-            }
-            return sum;
-        }
-
-        private static void InitializeParseContext(byte[] buffer, out ParseContext ctx)
-        {
-            ParseContext.Initialize(new ReadOnlySequence<byte>(buffer), out ctx);
         }
 
         private static byte[] CreateBufferWithRandomVarints(Random random, int valueCount, int encodedSize, int paddingValueCount)
