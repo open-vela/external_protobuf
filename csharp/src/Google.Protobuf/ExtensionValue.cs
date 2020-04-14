@@ -39,9 +39,6 @@ namespace Google.Protobuf
     internal interface IExtensionValue : IEquatable<IExtensionValue>, IDeepCloneable<IExtensionValue>
     {
         void MergeFrom(CodedInputStream input);
-
-        void MergeFrom(ref ParseContext ctx);
-
         void MergeFrom(IExtensionValue value);
         void WriteTo(CodedOutputStream output);
         int CalculateSize();
@@ -96,20 +93,7 @@ namespace Google.Protobuf
 
         public void MergeFrom(CodedInputStream input)
         {
-            ParseContext.Initialize(input, out ParseContext ctx);
-            try
-            {
-                codec.ValueMerger(ref ctx, ref field);
-            }
-            finally
-            {
-                ctx.CopyStateTo(input);
-            }
-        }
-
-        public void MergeFrom(ref ParseContext ctx)
-        {
-            codec.ValueMerger(ref ctx, ref field);
+            codec.ValueMerger(input, ref field);
         }
 
         public void MergeFrom(IExtensionValue value)
@@ -199,11 +183,6 @@ namespace Google.Protobuf
         public void MergeFrom(CodedInputStream input)
         {
             field.AddEntriesFrom(input, codec);
-        }
-
-        public void MergeFrom(ref ParseContext ctx)
-        {
-            field.AddEntriesFrom(ref ctx, codec);
         }
 
         public void MergeFrom(IExtensionValue value)
