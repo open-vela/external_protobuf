@@ -156,7 +156,7 @@ FieldGenerator* FieldGeneratorMap::MakeGenerator(
       default:
         return new RepeatedPrimitiveFieldGenerator(field, options);
     }
-  } else if (field->real_containing_oneof()) {
+  } else if (InRealOneof(field)) {
     switch (field->cpp_type()) {
       case FieldDescriptor::CPPTYPE_MESSAGE:
         return new MessageOneofFieldGenerator(field, options, scc_analyzer);

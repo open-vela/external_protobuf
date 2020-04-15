@@ -153,7 +153,6 @@ class StatusOr {
   // If you need to initialize a T object from the stored value,
   // ConsumeValueOrDie() may be more efficient.
   const T& ValueOrDie() const;
-  const T& value () const;
 
  private:
   Status status_;
@@ -250,14 +249,6 @@ inline bool StatusOr<T>::ok() const {
 
 template<typename T>
 inline const T& StatusOr<T>::ValueOrDie() const {
-  if (!status_.ok()) {
-    internal::StatusOrHelper::Crash(status_);
-  }
-  return value_;
-}
-
-template<typename T>
-inline const T& StatusOr<T>::value() const {
   if (!status_.ok()) {
     internal::StatusOrHelper::Crash(status_);
   }
