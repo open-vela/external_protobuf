@@ -334,7 +334,7 @@ void ProtoStreamObjectWriter::AnyWriter::StartAny(const DataPiece& value) {
       invalid_ = true;
       return;
     }
-    type_url_ = s.value();
+    type_url_ = s.ValueOrDie();
   }
   // Resolve the type url, and report an error if we failed to resolve it.
   StatusOr<const google::protobuf::Type*> resolved_type =
@@ -345,7 +345,7 @@ void ProtoStreamObjectWriter::AnyWriter::StartAny(const DataPiece& value) {
     return;
   }
   // At this point, type is never null.
-  const google::protobuf::Type* type = resolved_type.value();
+  const google::protobuf::Type* type = resolved_type.ValueOrDie();
 
   well_known_type_render_ = FindTypeRenderer(type_url_);
   if (well_known_type_render_ != nullptr ||
@@ -897,7 +897,7 @@ Status ProtoStreamObjectWriter::RenderStructValue(ProtoStreamObjectWriter* ow,
         if (int_value.ok()) {
           ow->ProtoWriter::RenderDataPiece(
               "string_value",
-              DataPiece(SimpleDtoa(int_value.value()), true));
+              DataPiece(SimpleDtoa(int_value.ValueOrDie()), true));
           return Status();
         }
       }
@@ -910,7 +910,7 @@ Status ProtoStreamObjectWriter::RenderStructValue(ProtoStreamObjectWriter* ow,
         if (int_value.ok()) {
           ow->ProtoWriter::RenderDataPiece(
               "string_value",
-              DataPiece(SimpleDtoa(int_value.value()), true));
+              DataPiece(SimpleDtoa(int_value.ValueOrDie()), true));
           return Status();
         }
       }
@@ -924,7 +924,8 @@ Status ProtoStreamObjectWriter::RenderStructValue(ProtoStreamObjectWriter* ow,
         StatusOr<int64> int_value = data.ToInt64();
         if (int_value.ok()) {
           ow->ProtoWriter::RenderDataPiece(
-              "string_value", DataPiece(StrCat(int_value.value()), true));
+              "string_value",
+              DataPiece(StrCat(int_value.ValueOrDie()), true));
           return Status();
         }
       }
@@ -938,7 +939,8 @@ Status ProtoStreamObjectWriter::RenderStructValue(ProtoStreamObjectWriter* ow,
         StatusOr<uint64> int_value = data.ToUint64();
         if (int_value.ok()) {
           ow->ProtoWriter::RenderDataPiece(
-              "string_value", DataPiece(StrCat(int_value.value()), true));
+              "string_value",
+              DataPiece(StrCat(int_value.ValueOrDie()), true));
           return Status();
         }
       }
@@ -951,7 +953,7 @@ Status ProtoStreamObjectWriter::RenderStructValue(ProtoStreamObjectWriter* ow,
         if (float_value.ok()) {
           ow->ProtoWriter::RenderDataPiece(
               "string_value",
-              DataPiece(SimpleDtoa(float_value.value()), true));
+              DataPiece(SimpleDtoa(float_value.ValueOrDie()), true));
           return Status();
         }
       }
@@ -964,7 +966,7 @@ Status ProtoStreamObjectWriter::RenderStructValue(ProtoStreamObjectWriter* ow,
         if (double_value.ok()) {
           ow->ProtoWriter::RenderDataPiece(
               "string_value",
-              DataPiece(SimpleDtoa(double_value.value()), true));
+              DataPiece(SimpleDtoa(double_value.ValueOrDie()), true));
           return Status();
         }
       }

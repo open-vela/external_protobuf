@@ -1,3 +1,4 @@
+﻿#region Copyright notice and license
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
 // https://developers.google.com/protocol-buffers/
@@ -27,67 +28,22 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#endregion
 
-#include <google/protobuf/util/internal/object_writer.h>
-
-#include <google/protobuf/util/internal/datapiece.h>
-
-namespace google {
-namespace protobuf {
-namespace util {
-namespace converter {
-
-// static
-void ObjectWriter::RenderDataPieceTo(const DataPiece& data,
-                                     StringPiece name, ObjectWriter* ow) {
-  switch (data.type()) {
-    case DataPiece::TYPE_INT32: {
-      ow->RenderInt32(name, data.ToInt32().ValueOrDie());
-      break;
+namespace Google.Protobuf
+{
+#if GOOGLE_PROTOBUF_SUPPORT_SYSTEM_MEMORY
+    /// <summary>
+    /// Interface for a Protocol Buffers message, supporting
+    /// parsing from <see cref="ParseContext"/>.
+    /// </summary>
+    public interface IBufferMessage : IMessage
+    {
+        /// <summary>
+        /// Internal implementation of merging data from given parse context into this message.
+        /// Users should never invoke this method directly.
+        /// </summary>        
+        void InternalMergeFrom(ref ParseContext ctx);
     }
-    case DataPiece::TYPE_INT64: {
-      ow->RenderInt64(name, data.ToInt64().ValueOrDie());
-      break;
-    }
-    case DataPiece::TYPE_UINT32: {
-      ow->RenderUint32(name, data.ToUint32().ValueOrDie());
-      break;
-    }
-    case DataPiece::TYPE_UINT64: {
-      ow->RenderUint64(name, data.ToUint64().ValueOrDie());
-      break;
-    }
-    case DataPiece::TYPE_DOUBLE: {
-      ow->RenderDouble(name, data.ToDouble().ValueOrDie());
-      break;
-    }
-    case DataPiece::TYPE_FLOAT: {
-      ow->RenderFloat(name, data.ToFloat().ValueOrDie());
-      break;
-    }
-    case DataPiece::TYPE_BOOL: {
-      ow->RenderBool(name, data.ToBool().ValueOrDie());
-      break;
-    }
-    case DataPiece::TYPE_STRING: {
-      ow->RenderString(name, data.ToString().ValueOrDie());
-      break;
-    }
-    case DataPiece::TYPE_BYTES: {
-      ow->RenderBytes(name, data.ToBytes().ValueOrDie());
-      break;
-    }
-    case DataPiece::TYPE_NULL: {
-      ow->RenderNull(name);
-      break;
-    }
-    default:
-      break;
-  }
+#endif
 }
-
-
-}  // namespace converter
-}  // namespace util
-}  // namespace protobuf
-}  // namespace google
