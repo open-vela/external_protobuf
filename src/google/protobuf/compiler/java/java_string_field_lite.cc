@@ -104,6 +104,9 @@ void SetPrimitiveVariables(const FieldDescriptor* descriptor,
         "!" + (*variables)["name"] + "_.isEmpty()";
   }
 
+  // For repeated builders, the underlying list tracks mutability state.
+  (*variables)["is_mutable"] = (*variables)["name"] + "_.isModifiable()";
+
   (*variables)["get_has_field_bit_from_local"] =
       GenerateGetBitFromLocal(builderBitIndex);
   (*variables)["set_has_field_bit_to_local"] =
@@ -564,12 +567,9 @@ void RepeatedImmutableStringFieldLiteGenerator::GenerateMembers(
   printer->Print(
       variables_,
       "private void ensure$capitalized_name$IsMutable() {\n"
-      // Use a temporary to avoid a redundant iget-object.
-      "  com.google.protobuf.Internal.ProtobufList<java.lang.String> tmp =\n"
-      "      $name$_;"
-      "  if (!tmp.isModifiable()) {\n"
+      "  if (!$is_mutable$) {\n"
       "    $name$_ =\n"
-      "        com.google.protobuf.GeneratedMessageLite.mutableCopy(tmp);\n"
+      "        com.google.protobuf.GeneratedMessageLite.mutableCopy($name$_);\n"
       "   }\n"
       "}\n");
 
