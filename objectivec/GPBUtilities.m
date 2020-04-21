@@ -267,18 +267,17 @@ void GPBClearMessageField(GPBMessage *self, GPBFieldDescriptor *field) {
     return;
   }
 
-  GPBMessageFieldDescription *fieldDesc = field->description_;
   if (GPBFieldStoresObject(field)) {
     // Object types are handled slightly differently, they need to be released.
     uint8_t *storage = (uint8_t *)self->messageStorage_;
-    id *typePtr = (id *)&storage[fieldDesc->offset];
+    id *typePtr = (id *)&storage[field->description_->offset];
     [*typePtr release];
     *typePtr = nil;
   } else {
     // POD types just need to clear the has bit as the Get* method will
     // fetch the default when needed.
   }
-  GPBSetHasIvar(self, fieldDesc->hasIndex, fieldDesc->number, NO);
+  GPBSetHasIvarField(self, field, NO);
 }
 
 BOOL GPBGetHasIvar(GPBMessage *self, int32_t idx, uint32_t fieldNumber) {
@@ -357,9 +356,6 @@ void GPBMaybeClearOneof(GPBMessage *self, GPBOneofDescriptor *oneof,
 //%TYPE GPBGetMessage##NAME##Field(GPBMessage *self,
 //% TYPE$S            NAME$S       GPBFieldDescriptor *field) {
 //%#if defined(DEBUG) && DEBUG
-//%  NSCAssert([[self descriptor] fieldWithNumber:field.number] == field,
-//%            @"FieldDescriptor %@ doesn't appear to be for %@ messages.",
-//%            field.name, [self class]);
 //%  NSCAssert(DataTypesEquivalent(GPBGetFieldDataType(field),
 //%                                GPBDataType##NAME),
 //%            @"Attempting to get value of TYPE from field %@ "
@@ -381,17 +377,6 @@ void GPBMaybeClearOneof(GPBMessage *self, GPBOneofDescriptor *oneof,
 //%                   NAME$S     GPBFieldDescriptor *field,
 //%                   NAME$S     TYPE value) {
 //%  if (self == nil || field == nil) return;
-//%#if defined(DEBUG) && DEBUG
-//%  NSCAssert([[self descriptor] fieldWithNumber:field.number] == field,
-//%            @"FieldDescriptor %@ doesn't appear to be for %@ messages.",
-//%            field.name, [self class]);
-//%  NSCAssert(DataTypesEquivalent(GPBGetFieldDataType(field),
-//%                                GPBDataType##NAME),
-//%            @"Attempting to set field %@ of %@ which is of type %@ with "
-//%            @"value of type TYPE.",
-//%            [self class], field.name,
-//%            TypeToString(GPBGetFieldDataType(field)));
-//%#endif
 //%  GPBFileSyntax syntax = [self descriptor].file.syntax;
 //%  GPBSet##NAME##IvarWithFieldInternal(self, field, value, syntax);
 //%}
@@ -400,9 +385,17 @@ void GPBMaybeClearOneof(GPBMessage *self, GPBOneofDescriptor *oneof,
 //%            NAME$S                     GPBFieldDescriptor *field,
 //%            NAME$S                     TYPE value,
 //%            NAME$S                     GPBFileSyntax syntax) {
+//%#if defined(DEBUG) && DEBUG
+//%  NSCAssert(DataTypesEquivalent(GPBGetFieldDataType(field),
+//%                                GPBDataType##NAME),
+//%            @"Attempting to set field %@ of %@ which is of type %@ with "
+//%            @"value of type TYPE.",
+//%            [self class], field.name,
+//%            TypeToString(GPBGetFieldDataType(field)));
+//%#endif
 //%  GPBOneofDescriptor *oneof = field->containingOneof_;
-//%  GPBMessageFieldDescription *fieldDesc = field->description_;
 //%  if (oneof) {
+//%    GPBMessageFieldDescription *fieldDesc = field->description_;
 //%    GPBMaybeClearOneof(self, oneof, fieldDesc->hasIndex, fieldDesc->number);
 //%  }
 //%#if defined(DEBUG) && DEBUG
@@ -414,14 +407,14 @@ void GPBMaybeClearOneof(GPBMessage *self, GPBOneofDescriptor *oneof,
 //%  if (self->messageStorage_ == NULL) return;
 //%#endif
 //%  uint8_t *storage = (uint8_t *)self->messageStorage_;
-//%  TYPE *typePtr = (TYPE *)&storage[fieldDesc->offset];
+//%  TYPE *typePtr = (TYPE *)&storage[field->description_->offset];
 //%  *typePtr = value;
 //%  // proto2: any value counts as having been set; proto3, it
 //%  // has to be a non zero value or be in a oneof.
 //%  BOOL hasValue = ((syntax == GPBFileSyntaxProto2)
 //%                   || (value != (TYPE)0)
 //%                   || (field->containingOneof_ != NULL));
-//%  GPBSetHasIvar(self, fieldDesc->hasIndex, fieldDesc->number, hasValue);
+//%  GPBSetHasIvarField(self, field, hasValue);
 //%  GPBBecomeVisibleToAutocreator(self);
 //%}
 //%
@@ -586,12 +579,12 @@ void GPBSetRetainedObjectIvarWithFieldInternal(GPBMessage *self,
     // valueData/valueMessage.
   }
 #endif  // DEBUG
-  GPBMessageFieldDescription *fieldDesc = field->description_;
   if (!isMapOrArray) {
     // Non repeated/map can be in an oneof, clear any existing value from the
     // oneof.
     GPBOneofDescriptor *oneof = field->containingOneof_;
     if (oneof) {
+      GPBMessageFieldDescription *fieldDesc = field->description_;
       GPBMaybeClearOneof(self, oneof, fieldDesc->hasIndex, fieldDesc->number);
     }
     // Clear "has" if they are being set to nil.
@@ -615,10 +608,10 @@ void GPBSetRetainedObjectIvarWithFieldInternal(GPBMessage *self,
         value = nil;
       }
     }
-    GPBSetHasIvar(self, fieldDesc->hasIndex, fieldDesc->number, setHasValue);
+    GPBSetHasIvarField(self, field, setHasValue);
   }
   uint8_t *storage = (uint8_t *)self->messageStorage_;
-  id *typePtr = (id *)&storage[fieldDesc->offset];
+  id *typePtr = (id *)&storage[field->description_->offset];
 
   id oldValue = *typePtr;
 
@@ -685,16 +678,6 @@ id GPBGetObjectIvarWithFieldNoAutocreate(GPBMessage *self,
 
 // Only exists for public api, no core code should use this.
 int32_t GPBGetMessageEnumField(GPBMessage *self, GPBFieldDescriptor *field) {
-  #if defined(DEBUG) && DEBUG
-    NSCAssert([[self descriptor] fieldWithNumber:field.number] == field,
-              @"FieldDescriptor %@ doesn't appear to be for %@ messages.",
-              field.name, [self class]);
-    NSCAssert(GPBGetFieldDataType(field) == GPBDataTypeEnum,
-              @"Attempting to get value of type Enum from field %@ "
-              @"of %@ which is of type %@.",
-              [self class], field.name,
-              TypeToString(GPBGetFieldDataType(field)));
-  #endif
   GPBFileSyntax syntax = [self descriptor].file.syntax;
   return GPBGetEnumIvarWithFieldInternal(self, field, syntax);
 }
@@ -702,6 +685,13 @@ int32_t GPBGetMessageEnumField(GPBMessage *self, GPBFieldDescriptor *field) {
 int32_t GPBGetEnumIvarWithFieldInternal(GPBMessage *self,
                                         GPBFieldDescriptor *field,
                                         GPBFileSyntax syntax) {
+#if defined(DEBUG) && DEBUG
+  NSCAssert(GPBGetFieldDataType(field) == GPBDataTypeEnum,
+            @"Attempting to get value of type Enum from field %@ "
+            @"of %@ which is of type %@.",
+            [self class], field.name,
+            TypeToString(GPBGetFieldDataType(field)));
+#endif
   int32_t result = GPBGetMessageInt32Field(self, field);
   // If this is presevering unknown enums, make sure the value is valid before
   // returning it.
@@ -715,16 +705,6 @@ int32_t GPBGetEnumIvarWithFieldInternal(GPBMessage *self,
 // Only exists for public api, no core code should use this.
 void GPBSetMessageEnumField(GPBMessage *self, GPBFieldDescriptor *field,
                             int32_t value) {
-  #if defined(DEBUG) && DEBUG
-    NSCAssert([[self descriptor] fieldWithNumber:field.number] == field,
-              @"FieldDescriptor %@ doesn't appear to be for %@ messages.",
-              field.name, [self class]);
-    NSCAssert(GPBGetFieldDataType(field) == GPBDataTypeEnum,
-              @"Attempting to set field %@ of %@ which is of type %@ with "
-              @"value of type Enum.",
-              [self class], field.name,
-              TypeToString(GPBGetFieldDataType(field)));
-  #endif
   GPBFileSyntax syntax = [self descriptor].file.syntax;
   GPBSetInt32IvarWithFieldInternal(self, field, value, syntax);
 }
@@ -732,6 +712,13 @@ void GPBSetMessageEnumField(GPBMessage *self, GPBFieldDescriptor *field,
 void GPBSetEnumIvarWithFieldInternal(GPBMessage *self,
                                      GPBFieldDescriptor *field, int32_t value,
                                      GPBFileSyntax syntax) {
+#if defined(DEBUG) && DEBUG
+  NSCAssert(GPBGetFieldDataType(field) == GPBDataTypeEnum,
+            @"Attempting to set field %@ of %@ which is of type %@ with "
+            @"value of type Enum.",
+            [self class], field.name,
+            TypeToString(GPBGetFieldDataType(field)));
+#endif
   // Don't allow in unknown values.  Proto3 can use the Raw method.
   if (![field isValidEnumValue:value]) {
     [NSException raise:NSInvalidArgumentException
@@ -758,9 +745,6 @@ void GPBSetMessageRawEnumField(GPBMessage *self, GPBFieldDescriptor *field,
 BOOL GPBGetMessageBoolField(GPBMessage *self,
                             GPBFieldDescriptor *field) {
 #if defined(DEBUG) && DEBUG
-  NSCAssert([[self descriptor] fieldWithNumber:field.number] == field,
-            @"FieldDescriptor %@ doesn't appear to be for %@ messages.",
-            field.name, [self class]);
   NSCAssert(DataTypesEquivalent(GPBGetFieldDataType(field), GPBDataTypeBool),
             @"Attempting to get value of type bool from field %@ "
             @"of %@ which is of type %@.",
@@ -784,16 +768,6 @@ void GPBSetMessageBoolField(GPBMessage *self,
                             GPBFieldDescriptor *field,
                             BOOL value) {
   if (self == nil || field == nil) return;
-  #if defined(DEBUG) && DEBUG
-    NSCAssert([[self descriptor] fieldWithNumber:field.number] == field,
-              @"FieldDescriptor %@ doesn't appear to be for %@ messages.",
-              field.name, [self class]);
-    NSCAssert(DataTypesEquivalent(GPBGetFieldDataType(field), GPBDataTypeBool),
-              @"Attempting to set field %@ of %@ which is of type %@ with "
-              @"value of type bool.",
-              [self class], field.name,
-              TypeToString(GPBGetFieldDataType(field)));
-  #endif
   GPBFileSyntax syntax = [self descriptor].file.syntax;
   GPBSetBoolIvarWithFieldInternal(self, field, value, syntax);
 }
@@ -802,6 +776,13 @@ void GPBSetBoolIvarWithFieldInternal(GPBMessage *self,
                                      GPBFieldDescriptor *field,
                                      BOOL value,
                                      GPBFileSyntax syntax) {
+#if defined(DEBUG) && DEBUG
+  NSCAssert(DataTypesEquivalent(GPBGetFieldDataType(field), GPBDataTypeBool),
+            @"Attempting to set field %@ of %@ which is of type %@ with "
+            @"value of type bool.",
+            [self class], field.name,
+            TypeToString(GPBGetFieldDataType(field)));
+#endif
   GPBMessageFieldDescription *fieldDesc = field->description_;
   GPBOneofDescriptor *oneof = field->containingOneof_;
   if (oneof) {
@@ -819,7 +800,7 @@ void GPBSetBoolIvarWithFieldInternal(GPBMessage *self,
   BOOL hasValue = ((syntax == GPBFileSyntaxProto2)
                    || (value != (BOOL)0)
                    || (field->containingOneof_ != NULL));
-  GPBSetHasIvar(self, fieldDesc->hasIndex, fieldDesc->number, hasValue);
+  GPBSetHasIvarField(self, field, hasValue);
   GPBBecomeVisibleToAutocreator(self);
 }
 
@@ -830,9 +811,6 @@ void GPBSetBoolIvarWithFieldInternal(GPBMessage *self,
 int32_t GPBGetMessageInt32Field(GPBMessage *self,
                                 GPBFieldDescriptor *field) {
 #if defined(DEBUG) && DEBUG
-  NSCAssert([[self descriptor] fieldWithNumber:field.number] == field,
-            @"FieldDescriptor %@ doesn't appear to be for %@ messages.",
-            field.name, [self class]);
   NSCAssert(DataTypesEquivalent(GPBGetFieldDataType(field),
                                 GPBDataTypeInt32),
             @"Attempting to get value of int32_t from field %@ "
@@ -854,17 +832,6 @@ void GPBSetMessageInt32Field(GPBMessage *self,
                              GPBFieldDescriptor *field,
                              int32_t value) {
   if (self == nil || field == nil) return;
-#if defined(DEBUG) && DEBUG
-  NSCAssert([[self descriptor] fieldWithNumber:field.number] == field,
-            @"FieldDescriptor %@ doesn't appear to be for %@ messages.",
-            field.name, [self class]);
-  NSCAssert(DataTypesEquivalent(GPBGetFieldDataType(field),
-                                GPBDataTypeInt32),
-            @"Attempting to set field %@ of %@ which is of type %@ with "
-            @"value of type int32_t.",
-            [self class], field.name,
-            TypeToString(GPBGetFieldDataType(field)));
-#endif
   GPBFileSyntax syntax = [self descriptor].file.syntax;
   GPBSetInt32IvarWithFieldInternal(self, field, value, syntax);
 }
@@ -873,9 +840,17 @@ void GPBSetInt32IvarWithFieldInternal(GPBMessage *self,
                                       GPBFieldDescriptor *field,
                                       int32_t value,
                                       GPBFileSyntax syntax) {
+#if defined(DEBUG) && DEBUG
+  NSCAssert(DataTypesEquivalent(GPBGetFieldDataType(field),
+                                GPBDataTypeInt32),
+            @"Attempting to set field %@ of %@ which is of type %@ with "
+            @"value of type int32_t.",
+            [self class], field.name,
+            TypeToString(GPBGetFieldDataType(field)));
+#endif
   GPBOneofDescriptor *oneof = field->containingOneof_;
-  GPBMessageFieldDescription *fieldDesc = field->description_;
   if (oneof) {
+    GPBMessageFieldDescription *fieldDesc = field->description_;
     GPBMaybeClearOneof(self, oneof, fieldDesc->hasIndex, fieldDesc->number);
   }
 #if defined(DEBUG) && DEBUG
@@ -887,14 +862,14 @@ void GPBSetInt32IvarWithFieldInternal(GPBMessage *self,
   if (self->messageStorage_ == NULL) return;
 #endif
   uint8_t *storage = (uint8_t *)self->messageStorage_;
-  int32_t *typePtr = (int32_t *)&storage[fieldDesc->offset];
+  int32_t *typePtr = (int32_t *)&storage[field->description_->offset];
   *typePtr = value;
   // proto2: any value counts as having been set; proto3, it
   // has to be a non zero value or be in a oneof.
   BOOL hasValue = ((syntax == GPBFileSyntaxProto2)
                    || (value != (int32_t)0)
                    || (field->containingOneof_ != NULL));
-  GPBSetHasIvar(self, fieldDesc->hasIndex, fieldDesc->number, hasValue);
+  GPBSetHasIvarField(self, field, hasValue);
   GPBBecomeVisibleToAutocreator(self);
 }
 
@@ -906,9 +881,6 @@ void GPBSetInt32IvarWithFieldInternal(GPBMessage *self,
 uint32_t GPBGetMessageUInt32Field(GPBMessage *self,
                                   GPBFieldDescriptor *field) {
 #if defined(DEBUG) && DEBUG
-  NSCAssert([[self descriptor] fieldWithNumber:field.number] == field,
-            @"FieldDescriptor %@ doesn't appear to be for %@ messages.",
-            field.name, [self class]);
   NSCAssert(DataTypesEquivalent(GPBGetFieldDataType(field),
                                 GPBDataTypeUInt32),
             @"Attempting to get value of uint32_t from field %@ "
@@ -930,17 +902,6 @@ void GPBSetMessageUInt32Field(GPBMessage *self,
                               GPBFieldDescriptor *field,
                               uint32_t value) {
   if (self == nil || field == nil) return;
-#if defined(DEBUG) && DEBUG
-  NSCAssert([[self descriptor] fieldWithNumber:field.number] == field,
-            @"FieldDescriptor %@ doesn't appear to be for %@ messages.",
-            field.name, [self class]);
-  NSCAssert(DataTypesEquivalent(GPBGetFieldDataType(field),
-                                GPBDataTypeUInt32),
-            @"Attempting to set field %@ of %@ which is of type %@ with "
-            @"value of type uint32_t.",
-            [self class], field.name,
-            TypeToString(GPBGetFieldDataType(field)));
-#endif
   GPBFileSyntax syntax = [self descriptor].file.syntax;
   GPBSetUInt32IvarWithFieldInternal(self, field, value, syntax);
 }
@@ -949,9 +910,17 @@ void GPBSetUInt32IvarWithFieldInternal(GPBMessage *self,
                                        GPBFieldDescriptor *field,
                                        uint32_t value,
                                        GPBFileSyntax syntax) {
+#if defined(DEBUG) && DEBUG
+  NSCAssert(DataTypesEquivalent(GPBGetFieldDataType(field),
+                                GPBDataTypeUInt32),
+            @"Attempting to set field %@ of %@ which is of type %@ with "
+            @"value of type uint32_t.",
+            [self class], field.name,
+            TypeToString(GPBGetFieldDataType(field)));
+#endif
   GPBOneofDescriptor *oneof = field->containingOneof_;
-  GPBMessageFieldDescription *fieldDesc = field->description_;
   if (oneof) {
+    GPBMessageFieldDescription *fieldDesc = field->description_;
     GPBMaybeClearOneof(self, oneof, fieldDesc->hasIndex, fieldDesc->number);
   }
 #if defined(DEBUG) && DEBUG
@@ -963,14 +932,14 @@ void GPBSetUInt32IvarWithFieldInternal(GPBMessage *self,
   if (self->messageStorage_ == NULL) return;
 #endif
   uint8_t *storage = (uint8_t *)self->messageStorage_;
-  uint32_t *typePtr = (uint32_t *)&storage[fieldDesc->offset];
+  uint32_t *typePtr = (uint32_t *)&storage[field->description_->offset];
   *typePtr = value;
   // proto2: any value counts as having been set; proto3, it
   // has to be a non zero value or be in a oneof.
   BOOL hasValue = ((syntax == GPBFileSyntaxProto2)
                    || (value != (uint32_t)0)
                    || (field->containingOneof_ != NULL));
-  GPBSetHasIvar(self, fieldDesc->hasIndex, fieldDesc->number, hasValue);
+  GPBSetHasIvarField(self, field, hasValue);
   GPBBecomeVisibleToAutocreator(self);
 }
 
@@ -982,9 +951,6 @@ void GPBSetUInt32IvarWithFieldInternal(GPBMessage *self,
 int64_t GPBGetMessageInt64Field(GPBMessage *self,
                                 GPBFieldDescriptor *field) {
 #if defined(DEBUG) && DEBUG
-  NSCAssert([[self descriptor] fieldWithNumber:field.number] == field,
-            @"FieldDescriptor %@ doesn't appear to be for %@ messages.",
-            field.name, [self class]);
   NSCAssert(DataTypesEquivalent(GPBGetFieldDataType(field),
                                 GPBDataTypeInt64),
             @"Attempting to get value of int64_t from field %@ "
@@ -1006,17 +972,6 @@ void GPBSetMessageInt64Field(GPBMessage *self,
                              GPBFieldDescriptor *field,
                              int64_t value) {
   if (self == nil || field == nil) return;
-#if defined(DEBUG) && DEBUG
-  NSCAssert([[self descriptor] fieldWithNumber:field.number] == field,
-            @"FieldDescriptor %@ doesn't appear to be for %@ messages.",
-            field.name, [self class]);
-  NSCAssert(DataTypesEquivalent(GPBGetFieldDataType(field),
-                                GPBDataTypeInt64),
-            @"Attempting to set field %@ of %@ which is of type %@ with "
-            @"value of type int64_t.",
-            [self class], field.name,
-            TypeToString(GPBGetFieldDataType(field)));
-#endif
   GPBFileSyntax syntax = [self descriptor].file.syntax;
   GPBSetInt64IvarWithFieldInternal(self, field, value, syntax);
 }
@@ -1025,9 +980,17 @@ void GPBSetInt64IvarWithFieldInternal(GPBMessage *self,
                                       GPBFieldDescriptor *field,
                                       int64_t value,
                                       GPBFileSyntax syntax) {
+#if defined(DEBUG) && DEBUG
+  NSCAssert(DataTypesEquivalent(GPBGetFieldDataType(field),
+                                GPBDataTypeInt64),
+            @"Attempting to set field %@ of %@ which is of type %@ with "
+            @"value of type int64_t.",
+            [self class], field.name,
+            TypeToString(GPBGetFieldDataType(field)));
+#endif
   GPBOneofDescriptor *oneof = field->containingOneof_;
-  GPBMessageFieldDescription *fieldDesc = field->description_;
   if (oneof) {
+    GPBMessageFieldDescription *fieldDesc = field->description_;
     GPBMaybeClearOneof(self, oneof, fieldDesc->hasIndex, fieldDesc->number);
   }
 #if defined(DEBUG) && DEBUG
@@ -1039,14 +1002,14 @@ void GPBSetInt64IvarWithFieldInternal(GPBMessage *self,
   if (self->messageStorage_ == NULL) return;
 #endif
   uint8_t *storage = (uint8_t *)self->messageStorage_;
-  int64_t *typePtr = (int64_t *)&storage[fieldDesc->offset];
+  int64_t *typePtr = (int64_t *)&storage[field->description_->offset];
   *typePtr = value;
   // proto2: any value counts as having been set; proto3, it
   // has to be a non zero value or be in a oneof.
   BOOL hasValue = ((syntax == GPBFileSyntaxProto2)
                    || (value != (int64_t)0)
                    || (field->containingOneof_ != NULL));
-  GPBSetHasIvar(self, fieldDesc->hasIndex, fieldDesc->number, hasValue);
+  GPBSetHasIvarField(self, field, hasValue);
   GPBBecomeVisibleToAutocreator(self);
 }
 
@@ -1058,9 +1021,6 @@ void GPBSetInt64IvarWithFieldInternal(GPBMessage *self,
 uint64_t GPBGetMessageUInt64Field(GPBMessage *self,
                                   GPBFieldDescriptor *field) {
 #if defined(DEBUG) && DEBUG
-  NSCAssert([[self descriptor] fieldWithNumber:field.number] == field,
-            @"FieldDescriptor %@ doesn't appear to be for %@ messages.",
-            field.name, [self class]);
   NSCAssert(DataTypesEquivalent(GPBGetFieldDataType(field),
                                 GPBDataTypeUInt64),
             @"Attempting to get value of uint64_t from field %@ "
@@ -1082,17 +1042,6 @@ void GPBSetMessageUInt64Field(GPBMessage *self,
                               GPBFieldDescriptor *field,
                               uint64_t value) {
   if (self == nil || field == nil) return;
-#if defined(DEBUG) && DEBUG
-  NSCAssert([[self descriptor] fieldWithNumber:field.number] == field,
-            @"FieldDescriptor %@ doesn't appear to be for %@ messages.",
-            field.name, [self class]);
-  NSCAssert(DataTypesEquivalent(GPBGetFieldDataType(field),
-                                GPBDataTypeUInt64),
-            @"Attempting to set field %@ of %@ which is of type %@ with "
-            @"value of type uint64_t.",
-            [self class], field.name,
-            TypeToString(GPBGetFieldDataType(field)));
-#endif
   GPBFileSyntax syntax = [self descriptor].file.syntax;
   GPBSetUInt64IvarWithFieldInternal(self, field, value, syntax);
 }
@@ -1101,9 +1050,17 @@ void GPBSetUInt64IvarWithFieldInternal(GPBMessage *self,
                                        GPBFieldDescriptor *field,
                                        uint64_t value,
                                        GPBFileSyntax syntax) {
+#if defined(DEBUG) && DEBUG
+  NSCAssert(DataTypesEquivalent(GPBGetFieldDataType(field),
+                                GPBDataTypeUInt64),
+            @"Attempting to set field %@ of %@ which is of type %@ with "
+            @"value of type uint64_t.",
+            [self class], field.name,
+            TypeToString(GPBGetFieldDataType(field)));
+#endif
   GPBOneofDescriptor *oneof = field->containingOneof_;
-  GPBMessageFieldDescription *fieldDesc = field->description_;
   if (oneof) {
+    GPBMessageFieldDescription *fieldDesc = field->description_;
     GPBMaybeClearOneof(self, oneof, fieldDesc->hasIndex, fieldDesc->number);
   }
 #if defined(DEBUG) && DEBUG
@@ -1115,14 +1072,14 @@ void GPBSetUInt64IvarWithFieldInternal(GPBMessage *self,
   if (self->messageStorage_ == NULL) return;
 #endif
   uint8_t *storage = (uint8_t *)self->messageStorage_;
-  uint64_t *typePtr = (uint64_t *)&storage[fieldDesc->offset];
+  uint64_t *typePtr = (uint64_t *)&storage[field->description_->offset];
   *typePtr = value;
   // proto2: any value counts as having been set; proto3, it
   // has to be a non zero value or be in a oneof.
   BOOL hasValue = ((syntax == GPBFileSyntaxProto2)
                    || (value != (uint64_t)0)
                    || (field->containingOneof_ != NULL));
-  GPBSetHasIvar(self, fieldDesc->hasIndex, fieldDesc->number, hasValue);
+  GPBSetHasIvarField(self, field, hasValue);
   GPBBecomeVisibleToAutocreator(self);
 }
 
@@ -1134,9 +1091,6 @@ void GPBSetUInt64IvarWithFieldInternal(GPBMessage *self,
 float GPBGetMessageFloatField(GPBMessage *self,
                               GPBFieldDescriptor *field) {
 #if defined(DEBUG) && DEBUG
-  NSCAssert([[self descriptor] fieldWithNumber:field.number] == field,
-            @"FieldDescriptor %@ doesn't appear to be for %@ messages.",
-            field.name, [self class]);
   NSCAssert(DataTypesEquivalent(GPBGetFieldDataType(field),
                                 GPBDataTypeFloat),
             @"Attempting to get value of float from field %@ "
@@ -1158,17 +1112,6 @@ void GPBSetMessageFloatField(GPBMessage *self,
                              GPBFieldDescriptor *field,
                              float value) {
   if (self == nil || field == nil) return;
-#if defined(DEBUG) && DEBUG
-  NSCAssert([[self descriptor] fieldWithNumber:field.number] == field,
-            @"FieldDescriptor %@ doesn't appear to be for %@ messages.",
-            field.name, [self class]);
-  NSCAssert(DataTypesEquivalent(GPBGetFieldDataType(field),
-                                GPBDataTypeFloat),
-            @"Attempting to set field %@ of %@ which is of type %@ with "
-            @"value of type float.",
-            [self class], field.name,
-            TypeToString(GPBGetFieldDataType(field)));
-#endif
   GPBFileSyntax syntax = [self descriptor].file.syntax;
   GPBSetFloatIvarWithFieldInternal(self, field, value, syntax);
 }
@@ -1177,9 +1120,17 @@ void GPBSetFloatIvarWithFieldInternal(GPBMessage *self,
                                       GPBFieldDescriptor *field,
                                       float value,
                                       GPBFileSyntax syntax) {
+#if defined(DEBUG) && DEBUG
+  NSCAssert(DataTypesEquivalent(GPBGetFieldDataType(field),
+                                GPBDataTypeFloat),
+            @"Attempting to set field %@ of %@ which is of type %@ with "
+            @"value of type float.",
+            [self class], field.name,
+            TypeToString(GPBGetFieldDataType(field)));
+#endif
   GPBOneofDescriptor *oneof = field->containingOneof_;
-  GPBMessageFieldDescription *fieldDesc = field->description_;
   if (oneof) {
+    GPBMessageFieldDescription *fieldDesc = field->description_;
     GPBMaybeClearOneof(self, oneof, fieldDesc->hasIndex, fieldDesc->number);
   }
 #if defined(DEBUG) && DEBUG
@@ -1191,14 +1142,14 @@ void GPBSetFloatIvarWithFieldInternal(GPBMessage *self,
   if (self->messageStorage_ == NULL) return;
 #endif
   uint8_t *storage = (uint8_t *)self->messageStorage_;
-  float *typePtr = (float *)&storage[fieldDesc->offset];
+  float *typePtr = (float *)&storage[field->description_->offset];
   *typePtr = value;
   // proto2: any value counts as having been set; proto3, it
   // has to be a non zero value or be in a oneof.
   BOOL hasValue = ((syntax == GPBFileSyntaxProto2)
                    || (value != (float)0)
                    || (field->containingOneof_ != NULL));
-  GPBSetHasIvar(self, fieldDesc->hasIndex, fieldDesc->number, hasValue);
+  GPBSetHasIvarField(self, field, hasValue);
   GPBBecomeVisibleToAutocreator(self);
 }
 
@@ -1210,9 +1161,6 @@ void GPBSetFloatIvarWithFieldInternal(GPBMessage *self,
 double GPBGetMessageDoubleField(GPBMessage *self,
                                 GPBFieldDescriptor *field) {
 #if defined(DEBUG) && DEBUG
-  NSCAssert([[self descriptor] fieldWithNumber:field.number] == field,
-            @"FieldDescriptor %@ doesn't appear to be for %@ messages.",
-            field.name, [self class]);
   NSCAssert(DataTypesEquivalent(GPBGetFieldDataType(field),
                                 GPBDataTypeDouble),
             @"Attempting to get value of double from field %@ "
@@ -1234,17 +1182,6 @@ void GPBSetMessageDoubleField(GPBMessage *self,
                               GPBFieldDescriptor *field,
                               double value) {
   if (self == nil || field == nil) return;
-#if defined(DEBUG) && DEBUG
-  NSCAssert([[self descriptor] fieldWithNumber:field.number] == field,
-            @"FieldDescriptor %@ doesn't appear to be for %@ messages.",
-            field.name, [self class]);
-  NSCAssert(DataTypesEquivalent(GPBGetFieldDataType(field),
-                                GPBDataTypeDouble),
-            @"Attempting to set field %@ of %@ which is of type %@ with "
-            @"value of type double.",
-            [self class], field.name,
-            TypeToString(GPBGetFieldDataType(field)));
-#endif
   GPBFileSyntax syntax = [self descriptor].file.syntax;
   GPBSetDoubleIvarWithFieldInternal(self, field, value, syntax);
 }
@@ -1253,9 +1190,17 @@ void GPBSetDoubleIvarWithFieldInternal(GPBMessage *self,
                                        GPBFieldDescriptor *field,
                                        double value,
                                        GPBFileSyntax syntax) {
+#if defined(DEBUG) && DEBUG
+  NSCAssert(DataTypesEquivalent(GPBGetFieldDataType(field),
+                                GPBDataTypeDouble),
+            @"Attempting to set field %@ of %@ which is of type %@ with "
+            @"value of type double.",
+            [self class], field.name,
+            TypeToString(GPBGetFieldDataType(field)));
+#endif
   GPBOneofDescriptor *oneof = field->containingOneof_;
-  GPBMessageFieldDescription *fieldDesc = field->description_;
   if (oneof) {
+    GPBMessageFieldDescription *fieldDesc = field->description_;
     GPBMaybeClearOneof(self, oneof, fieldDesc->hasIndex, fieldDesc->number);
   }
 #if defined(DEBUG) && DEBUG
@@ -1267,14 +1212,14 @@ void GPBSetDoubleIvarWithFieldInternal(GPBMessage *self,
   if (self->messageStorage_ == NULL) return;
 #endif
   uint8_t *storage = (uint8_t *)self->messageStorage_;
-  double *typePtr = (double *)&storage[fieldDesc->offset];
+  double *typePtr = (double *)&storage[field->description_->offset];
   *typePtr = value;
   // proto2: any value counts as having been set; proto3, it
   // has to be a non zero value or be in a oneof.
   BOOL hasValue = ((syntax == GPBFileSyntaxProto2)
                    || (value != (double)0)
                    || (field->containingOneof_ != NULL));
-  GPBSetHasIvar(self, fieldDesc->hasIndex, fieldDesc->number, hasValue);
+  GPBSetHasIvarField(self, field, hasValue);
   GPBBecomeVisibleToAutocreator(self);
 }
 

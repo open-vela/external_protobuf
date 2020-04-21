@@ -33,14 +33,11 @@
 
 #include <google/protobuf/pyext/message.h>
 
-#include <structmember.h>  // A Python header file.
-
 #include <map>
 #include <memory>
 #include <string>
 #include <vector>
-
-#include <google/protobuf/stubs/strutil.h>
+#include <structmember.h>  // A Python header file.
 
 #ifndef PyVarObject_HEAD_INIT
 #define PyVarObject_HEAD_INIT(type, size) PyObject_HEAD_INIT(type) size,
@@ -459,7 +456,7 @@ static PyObject* GetClassAttribute(CMessageClass *self, PyObject* name) {
   Py_ssize_t attr_size;
   static const char kSuffix[] = "_FIELD_NUMBER";
   if (PyString_AsStringAndSize(name, &attr, &attr_size) >= 0 &&
-      HasSuffixString(StringPiece(attr, attr_size), kSuffix)) {
+      strings::EndsWith(StringPiece(attr, attr_size), kSuffix)) {
     std::string field_name(attr, attr_size - sizeof(kSuffix) + 1);
     LowerString(&field_name);
 
@@ -1427,7 +1424,8 @@ bool CheckHasPresence(const FieldDescriptor* field_descriptor, bool in_oneof) {
     return false;
   }
 
-  if (!field_descriptor->has_presence()) {
+  if (field_descriptor->containing_oneof() == NULL &&
+      !field_descriptor->is_singular_with_presence()) {
     PyErr_Format(PyExc_ValueError,
                  "Can't test non-optional, non-submessage field \"%s.%s\" for "
                  "presence in proto3.",
@@ -2170,21 +2168,19 @@ static PyObject* RichCompare(CMessage* self, PyObject* other, int opid) {
   // If other is not a message, it cannot be equal.
   if (!PyObject_TypeCheck(other, CMessage_Type)) {
     equals = false;
-  } else {
-    // Otherwise, we have a CMessage whose message we can inspect.
-    const google::protobuf::Message* other_message =
-        reinterpret_cast<CMessage*>(other)->message;
-    // If messages don't have the same descriptors, they are not equal.
-    if (equals &&
-        self->message->GetDescriptor() != other_message->GetDescriptor()) {
-      equals = false;
-    }
-    // Check the message contents.
-    if (equals &&
-        !google::protobuf::util::MessageDifferencer::Equals(
-            *self->message, *reinterpret_cast<CMessage*>(other)->message)) {
-      equals = false;
-    }
+  }
+  const google::protobuf::Message* other_message =
+      reinterpret_cast<CMessage*>(other)->message;
+  // If messages don't have the same descriptors, they are not equal.
+  if (equals &&
+      self->message->GetDescriptor() != other_message->GetDescriptor()) {
+    equals = false;
+  }
+  // Check the message contents.
+  if (equals && !google::protobuf::util::MessageDifferencer::Equals(
+          *self->message,
+          *reinterpret_cast<CMessage*>(other)->message)) {
+    equals = false;
   }
 
   if (equals ^ (opid == Py_EQ)) {
