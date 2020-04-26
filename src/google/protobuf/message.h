@@ -740,7 +740,8 @@ class PROTOBUF_EXPORT Reflection final {
   // long as the message is not destroyed.
   //
   // Note that to use this method users need to include the header file
-  // "reflection.h" (which defines the RepeatedFieldRef class templates).
+  // "net/proto2/public/reflection.h" (which defines the RepeatedFieldRef
+  // class templates).
   template <typename T>
   RepeatedFieldRef<T> GetRepeatedFieldRef(const Message& message,
                                           const FieldDescriptor* field) const;
@@ -1010,10 +1011,8 @@ class PROTOBUF_EXPORT Reflection final {
                              const OneofDescriptor* oneof_descriptor) const;
   inline uint32* MutableOneofCase(
       Message* message, const OneofDescriptor* oneof_descriptor) const;
-  inline bool HasExtensionSet(const Message& message) const {
-    return schema_.HasExtensionSet();
-  }
-  const internal::ExtensionSet& GetExtensionSet(const Message& message) const;
+  inline const internal::ExtensionSet& GetExtensionSet(
+      const Message& message) const;
   internal::ExtensionSet* MutableExtensionSet(Message* message) const;
   inline Arena* GetArena(Message* message) const;
 

@@ -49,7 +49,7 @@ namespace Google.Protobuf.Examples.AddressBook {
   /// <summary>
   /// [START messages]
   /// </summary>
-  public sealed partial class Person : pb::IMessage<Person>, pb::IBufferMessage {
+  public sealed partial class Person : pb::IMessage<Person> {
     private static readonly pb::MessageParser<Person> _parser = new pb::MessageParser<Person>(() => new Person());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -256,16 +256,11 @@ namespace Google.Protobuf.Examples.AddressBook {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void MergeFrom(pb::CodedInputStream input) {
-      input.ReadRawMessage(this);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
       uint tag;
       while ((tag = input.ReadTag()) != 0) {
         switch(tag) {
           default:
-            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 10: {
             Name = input.ReadString();
@@ -280,7 +275,7 @@ namespace Google.Protobuf.Examples.AddressBook {
             break;
           }
           case 34: {
-            phones_.AddEntriesFrom(ref input, _repeated_phones_codec);
+            phones_.AddEntriesFrom(input, _repeated_phones_codec);
             break;
           }
           case 42: {
@@ -304,7 +299,7 @@ namespace Google.Protobuf.Examples.AddressBook {
         [pbr::OriginalName("WORK")] Work = 2,
       }
 
-      public sealed partial class PhoneNumber : pb::IMessage<PhoneNumber>, pb::IBufferMessage {
+      public sealed partial class PhoneNumber : pb::IMessage<PhoneNumber> {
         private static readonly pb::MessageParser<PhoneNumber> _parser = new pb::MessageParser<PhoneNumber>(() => new PhoneNumber());
         private pb::UnknownFieldSet _unknownFields;
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -441,16 +436,11 @@ namespace Google.Protobuf.Examples.AddressBook {
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
         public void MergeFrom(pb::CodedInputStream input) {
-          input.ReadRawMessage(this);
-        }
-
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
           uint tag;
           while ((tag = input.ReadTag()) != 0) {
             switch(tag) {
               default:
-                _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+                _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
                 break;
               case 10: {
                 Number = input.ReadString();
@@ -474,7 +464,7 @@ namespace Google.Protobuf.Examples.AddressBook {
   /// <summary>
   /// Our address book file is just one of these.
   /// </summary>
-  public sealed partial class AddressBook : pb::IMessage<AddressBook>, pb::IBufferMessage {
+  public sealed partial class AddressBook : pb::IMessage<AddressBook> {
     private static readonly pb::MessageParser<AddressBook> _parser = new pb::MessageParser<AddressBook>(() => new AddressBook());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -579,19 +569,14 @@ namespace Google.Protobuf.Examples.AddressBook {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void MergeFrom(pb::CodedInputStream input) {
-      input.ReadRawMessage(this);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
       uint tag;
       while ((tag = input.ReadTag()) != 0) {
         switch(tag) {
           default:
-            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 10: {
-            people_.AddEntriesFrom(ref input, _repeated_people_codec);
+            people_.AddEntriesFrom(input, _repeated_people_codec);
             break;
           }
         }
