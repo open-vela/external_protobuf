@@ -25,7 +25,7 @@ namespace ProtobufUnittest {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
             "Ci5nb29nbGUvcHJvdG9idWYvdW5pdHRlc3RfcHJvdG8zX29wdGlvbmFsLnBy",
-            "b3RvEhFwcm90b2J1Zl91bml0dGVzdCKxCgoSVGVzdFByb3RvM09wdGlvbmFs",
+            "b3RvEhFwcm90b2J1Zl91bml0dGVzdCKBCgoSVGVzdFByb3RvM09wdGlvbmFs",
             "EhsKDm9wdGlvbmFsX2ludDMyGAEgASgFSACIAQESGwoOb3B0aW9uYWxfaW50",
             "NjQYAiABKANIAYgBARIcCg9vcHRpb25hbF91aW50MzIYAyABKA1IAogBARIc",
             "Cg9vcHRpb25hbF91aW50NjQYBCABKARIA4gBARIcCg9vcHRpb25hbF9zaW50",
@@ -42,32 +42,31 @@ namespace ProtobufUnittest {
             "dGVkX21lc3NhZ2UYEyABKAsyMy5wcm90b2J1Zl91bml0dGVzdC5UZXN0UHJv",
             "dG8zT3B0aW9uYWwuTmVzdGVkTWVzc2FnZUICKAFIEYgBARJTChRvcHRpb25h",
             "bF9uZXN0ZWRfZW51bRgVIAEoDjIwLnByb3RvYnVmX3VuaXR0ZXN0LlRlc3RQ",
-            "cm90bzNPcHRpb25hbC5OZXN0ZWRFbnVtSBKIAQESFgoOc2luZ3VsYXJfaW50",
-            "MzIYFiABKAUSFgoOc2luZ3VsYXJfaW50NjQYFyABKAMaJwoNTmVzdGVkTWVz",
-            "c2FnZRIPCgJiYhgBIAEoBUgAiAEBQgUKA19iYiJKCgpOZXN0ZWRFbnVtEg8K",
-            "C1VOU1BFQ0lGSUVEEAASBwoDRk9PEAESBwoDQkFSEAISBwoDQkFaEAMSEAoD",
-            "TkVHEP///////////wFCEQoPX29wdGlvbmFsX2ludDMyQhEKD19vcHRpb25h",
-            "bF9pbnQ2NEISChBfb3B0aW9uYWxfdWludDMyQhIKEF9vcHRpb25hbF91aW50",
-            "NjRCEgoQX29wdGlvbmFsX3NpbnQzMkISChBfb3B0aW9uYWxfc2ludDY0QhMK",
-            "EV9vcHRpb25hbF9maXhlZDMyQhMKEV9vcHRpb25hbF9maXhlZDY0QhQKEl9v",
-            "cHRpb25hbF9zZml4ZWQzMkIUChJfb3B0aW9uYWxfc2ZpeGVkNjRCEQoPX29w",
-            "dGlvbmFsX2Zsb2F0QhIKEF9vcHRpb25hbF9kb3VibGVCEAoOX29wdGlvbmFs",
-            "X2Jvb2xCEgoQX29wdGlvbmFsX3N0cmluZ0IRCg9fb3B0aW9uYWxfYnl0ZXNC",
-            "EAoOX29wdGlvbmFsX2NvcmRCGgoYX29wdGlvbmFsX25lc3RlZF9tZXNzYWdl",
-            "QhYKFF9sYXp5X25lc3RlZF9tZXNzYWdlQhcKFV9vcHRpb25hbF9uZXN0ZWRf",
-            "ZW51bUIlCiFjb20uZ29vZ2xlLnByb3RvYnVmLnRlc3RpbmcucHJvdG9QAWIG",
-            "cHJvdG8z"));
+            "cm90bzNPcHRpb25hbC5OZXN0ZWRFbnVtSBKIAQEaJwoNTmVzdGVkTWVzc2Fn",
+            "ZRIPCgJiYhgBIAEoBUgAiAEBQgUKA19iYiJKCgpOZXN0ZWRFbnVtEg8KC1VO",
+            "U1BFQ0lGSUVEEAASBwoDRk9PEAESBwoDQkFSEAISBwoDQkFaEAMSEAoDTkVH",
+            "EP///////////wFCEQoPX29wdGlvbmFsX2ludDMyQhEKD19vcHRpb25hbF9p",
+            "bnQ2NEISChBfb3B0aW9uYWxfdWludDMyQhIKEF9vcHRpb25hbF91aW50NjRC",
+            "EgoQX29wdGlvbmFsX3NpbnQzMkISChBfb3B0aW9uYWxfc2ludDY0QhMKEV9v",
+            "cHRpb25hbF9maXhlZDMyQhMKEV9vcHRpb25hbF9maXhlZDY0QhQKEl9vcHRp",
+            "b25hbF9zZml4ZWQzMkIUChJfb3B0aW9uYWxfc2ZpeGVkNjRCEQoPX29wdGlv",
+            "bmFsX2Zsb2F0QhIKEF9vcHRpb25hbF9kb3VibGVCEAoOX29wdGlvbmFsX2Jv",
+            "b2xCEgoQX29wdGlvbmFsX3N0cmluZ0IRCg9fb3B0aW9uYWxfYnl0ZXNCEAoO",
+            "X29wdGlvbmFsX2NvcmRCGgoYX29wdGlvbmFsX25lc3RlZF9tZXNzYWdlQhYK",
+            "FF9sYXp5X25lc3RlZF9tZXNzYWdlQhcKFV9vcHRpb25hbF9uZXN0ZWRfZW51",
+            "bUIlCiFjb20uZ29vZ2xlLnByb3RvYnVmLnRlc3RpbmcucHJvdG9QAWIGcHJv",
+            "dG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::ProtobufUnittest.TestProto3Optional), global::ProtobufUnittest.TestProto3Optional.Parser, new[]{ "OptionalInt32", "OptionalInt64", "OptionalUint32", "OptionalUint64", "OptionalSint32", "OptionalSint64", "OptionalFixed32", "OptionalFixed64", "OptionalSfixed32", "OptionalSfixed64", "OptionalFloat", "OptionalDouble", "OptionalBool", "OptionalString", "OptionalBytes", "OptionalCord", "OptionalNestedMessage", "LazyNestedMessage", "OptionalNestedEnum", "SingularInt32", "SingularInt64" }, new[]{ "OptionalInt32", "OptionalInt64", "OptionalUint32", "OptionalUint64", "OptionalSint32", "OptionalSint64", "OptionalFixed32", "OptionalFixed64", "OptionalSfixed32", "OptionalSfixed64", "OptionalFloat", "OptionalDouble", "OptionalBool", "OptionalString", "OptionalBytes", "OptionalCord", "OptionalNestedMessage", "LazyNestedMessage", "OptionalNestedEnum" }, new[]{ typeof(global::ProtobufUnittest.TestProto3Optional.Types.NestedEnum) }, null, new pbr::GeneratedClrTypeInfo[] { new pbr::GeneratedClrTypeInfo(typeof(global::ProtobufUnittest.TestProto3Optional.Types.NestedMessage), global::ProtobufUnittest.TestProto3Optional.Types.NestedMessage.Parser, new[]{ "Bb" }, new[]{ "Bb" }, null, null, null)})
+            new pbr::GeneratedClrTypeInfo(typeof(global::ProtobufUnittest.TestProto3Optional), global::ProtobufUnittest.TestProto3Optional.Parser, new[]{ "OptionalInt32", "OptionalInt64", "OptionalUint32", "OptionalUint64", "OptionalSint32", "OptionalSint64", "OptionalFixed32", "OptionalFixed64", "OptionalSfixed32", "OptionalSfixed64", "OptionalFloat", "OptionalDouble", "OptionalBool", "OptionalString", "OptionalBytes", "OptionalCord", "OptionalNestedMessage", "LazyNestedMessage", "OptionalNestedEnum" }, new[]{ "OptionalInt32", "OptionalInt64", "OptionalUint32", "OptionalUint64", "OptionalSint32", "OptionalSint64", "OptionalFixed32", "OptionalFixed64", "OptionalSfixed32", "OptionalSfixed64", "OptionalFloat", "OptionalDouble", "OptionalBool", "OptionalString", "OptionalBytes", "OptionalCord", "OptionalNestedMessage", "LazyNestedMessage", "OptionalNestedEnum" }, new[]{ typeof(global::ProtobufUnittest.TestProto3Optional.Types.NestedEnum) }, null, new pbr::GeneratedClrTypeInfo[] { new pbr::GeneratedClrTypeInfo(typeof(global::ProtobufUnittest.TestProto3Optional.Types.NestedMessage), global::ProtobufUnittest.TestProto3Optional.Types.NestedMessage.Parser, new[]{ "Bb" }, new[]{ "Bb" }, null, null, null)})
           }));
     }
     #endregion
 
   }
   #region Messages
-  public sealed partial class TestProto3Optional : pb::IMessage<TestProto3Optional>, pb::IBufferMessage {
+  public sealed partial class TestProto3Optional : pb::IMessage<TestProto3Optional> {
     private static readonly pb::MessageParser<TestProto3Optional> _parser = new pb::MessageParser<TestProto3Optional>(() => new TestProto3Optional());
     private pb::UnknownFieldSet _unknownFields;
     private int _hasBits0;
@@ -113,8 +112,6 @@ namespace ProtobufUnittest {
       optionalNestedMessage_ = other.optionalNestedMessage_ != null ? other.optionalNestedMessage_.Clone() : null;
       lazyNestedMessage_ = other.lazyNestedMessage_ != null ? other.lazyNestedMessage_.Clone() : null;
       optionalNestedEnum_ = other.optionalNestedEnum_;
-      singularInt32_ = other.singularInt32_;
-      singularInt64_ = other.singularInt64_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -519,31 +516,6 @@ namespace ProtobufUnittest {
       _hasBits0 &= ~8192;
     }
 
-    /// <summary>Field number for the "singular_int32" field.</summary>
-    public const int SingularInt32FieldNumber = 22;
-    private int singularInt32_;
-    /// <summary>
-    /// Add some non-optional fields to verify we can mix them.
-    /// </summary>
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public int SingularInt32 {
-      get { return singularInt32_; }
-      set {
-        singularInt32_ = value;
-      }
-    }
-
-    /// <summary>Field number for the "singular_int64" field.</summary>
-    public const int SingularInt64FieldNumber = 23;
-    private long singularInt64_;
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public long SingularInt64 {
-      get { return singularInt64_; }
-      set {
-        singularInt64_ = value;
-      }
-    }
-
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override bool Equals(object other) {
       return Equals(other as TestProto3Optional);
@@ -576,8 +548,6 @@ namespace ProtobufUnittest {
       if (!object.Equals(OptionalNestedMessage, other.OptionalNestedMessage)) return false;
       if (!object.Equals(LazyNestedMessage, other.LazyNestedMessage)) return false;
       if (OptionalNestedEnum != other.OptionalNestedEnum) return false;
-      if (SingularInt32 != other.SingularInt32) return false;
-      if (SingularInt64 != other.SingularInt64) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -603,8 +573,6 @@ namespace ProtobufUnittest {
       if (optionalNestedMessage_ != null) hash ^= OptionalNestedMessage.GetHashCode();
       if (lazyNestedMessage_ != null) hash ^= LazyNestedMessage.GetHashCode();
       if (HasOptionalNestedEnum) hash ^= OptionalNestedEnum.GetHashCode();
-      if (SingularInt32 != 0) hash ^= SingularInt32.GetHashCode();
-      if (SingularInt64 != 0L) hash ^= SingularInt64.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -694,14 +662,6 @@ namespace ProtobufUnittest {
         output.WriteRawTag(168, 1);
         output.WriteEnum((int) OptionalNestedEnum);
       }
-      if (SingularInt32 != 0) {
-        output.WriteRawTag(176, 1);
-        output.WriteInt32(SingularInt32);
-      }
-      if (SingularInt64 != 0L) {
-        output.WriteRawTag(184, 1);
-        output.WriteInt64(SingularInt64);
-      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -766,12 +726,6 @@ namespace ProtobufUnittest {
       }
       if (HasOptionalNestedEnum) {
         size += 2 + pb::CodedOutputStream.ComputeEnumSize((int) OptionalNestedEnum);
-      }
-      if (SingularInt32 != 0) {
-        size += 2 + pb::CodedOutputStream.ComputeInt32Size(SingularInt32);
-      }
-      if (SingularInt64 != 0L) {
-        size += 2 + pb::CodedOutputStream.ComputeInt64Size(SingularInt64);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -847,27 +801,16 @@ namespace ProtobufUnittest {
       if (other.HasOptionalNestedEnum) {
         OptionalNestedEnum = other.OptionalNestedEnum;
       }
-      if (other.SingularInt32 != 0) {
-        SingularInt32 = other.SingularInt32;
-      }
-      if (other.SingularInt64 != 0L) {
-        SingularInt64 = other.SingularInt64;
-      }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void MergeFrom(pb::CodedInputStream input) {
-      input.ReadRawMessage(this);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
       uint tag;
       while ((tag = input.ReadTag()) != 0) {
         switch(tag) {
           default:
-            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 8: {
             OptionalInt32 = input.ReadInt32();
@@ -951,14 +894,6 @@ namespace ProtobufUnittest {
             OptionalNestedEnum = (global::ProtobufUnittest.TestProto3Optional.Types.NestedEnum) input.ReadEnum();
             break;
           }
-          case 176: {
-            SingularInt32 = input.ReadInt32();
-            break;
-          }
-          case 184: {
-            SingularInt64 = input.ReadInt64();
-            break;
-          }
         }
       }
     }
@@ -978,7 +913,7 @@ namespace ProtobufUnittest {
         [pbr::OriginalName("NEG")] Neg = -1,
       }
 
-      public sealed partial class NestedMessage : pb::IMessage<NestedMessage>, pb::IBufferMessage {
+      public sealed partial class NestedMessage : pb::IMessage<NestedMessage> {
         private static readonly pb::MessageParser<NestedMessage> _parser = new pb::MessageParser<NestedMessage>(() => new NestedMessage());
         private pb::UnknownFieldSet _unknownFields;
         private int _hasBits0;
@@ -1109,16 +1044,11 @@ namespace ProtobufUnittest {
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
         public void MergeFrom(pb::CodedInputStream input) {
-          input.ReadRawMessage(this);
-        }
-
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
           uint tag;
           while ((tag = input.ReadTag()) != 0) {
             switch(tag) {
               default:
-                _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+                _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
                 break;
               case 8: {
                 Bb = input.ReadInt32();
