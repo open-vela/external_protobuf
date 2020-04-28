@@ -304,12 +304,20 @@ namespace Google.Protobuf.Reflection
         /// <summary>
         /// The (possibly empty) set of custom options for this field.
         /// </summary>
-        [Obsolete("CustomOptions are obsolete. Use GetOption")]
+        [Obsolete("CustomOptions are obsolete. Use the Options property.")]
         public CustomOptions CustomOptions => new CustomOptions(Proto.Options?._extensions?.ValuesByNumber);
+
+        /// <summary>
+        /// The <c>FieldOptions</c>, defined in <c>descriptor.proto</c>.
+        /// Custom options can be retrieved as extensions of the returned message.
+        /// NOTE: A defensive copy is created each time this property is retrieved.
+        /// </summary>
+        public FieldOptions Options => (Proto.Options as IDeepCloneable<FieldOptions>)?.Clone();
 
         /// <summary>
         /// Gets a single value field option for this descriptor
         /// </summary>
+         [Obsolete("GetOption is obsolete. Use the Options property.")]
         public T GetOption<T>(Extension<FieldOptions, T> extension)
         {
             var value = Proto.Options.GetExtension(extension);
@@ -319,6 +327,7 @@ namespace Google.Protobuf.Reflection
         /// <summary>
         /// Gets a repeated value field option for this descriptor
         /// </summary>
+         [Obsolete("GetOption is obsolete. Use the Options property.")]
         public RepeatedField<T> GetOption<T>(RepeatedExtension<FieldOptions, T> extension)
         {
             return Proto.Options.GetExtension(extension).Clone();
