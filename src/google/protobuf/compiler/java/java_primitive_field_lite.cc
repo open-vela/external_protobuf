@@ -32,8 +32,6 @@
 //  Based on original Protocol Buffers design by
 //  Sanjay Ghemawat, Jeff Dean, and others.
 
-#include <google/protobuf/compiler/java/java_primitive_field_lite.h>
-
 #include <map>
 #include <string>
 
@@ -43,6 +41,7 @@
 #include <google/protobuf/compiler/java/java_doc_comment.h>
 #include <google/protobuf/compiler/java/java_helpers.h>
 #include <google/protobuf/compiler/java/java_name_resolver.h>
+#include <google/protobuf/compiler/java/java_primitive_field_lite.h>
 #include <google/protobuf/io/printer.h>
 #include <google/protobuf/wire_format.h>
 #include <google/protobuf/stubs/strutil.h>
@@ -300,7 +299,6 @@ void ImmutablePrimitiveFieldLiteGenerator::GenerateBuilderMembers(
       "}\n");
   printer->Annotate("{", "}", descriptor_);
 }
-
 
 void ImmutablePrimitiveFieldLiteGenerator::GenerateFieldInfo(
     io::Printer* printer, std::vector<uint16>* output) const {

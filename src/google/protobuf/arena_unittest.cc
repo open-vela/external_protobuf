@@ -58,9 +58,6 @@
 #include <google/protobuf/stubs/strutil.h>
 
 
-// Must be included last
-#include <google/protobuf/port_def.inc>
-
 using proto2_arena_unittest::ArenaMessage;
 using protobuf_unittest::TestAllExtensions;
 using protobuf_unittest::TestAllTypes;
