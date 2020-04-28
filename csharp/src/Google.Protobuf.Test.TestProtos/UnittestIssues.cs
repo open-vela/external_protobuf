@@ -88,7 +88,7 @@ namespace UnitTest.Issues.TestProtos {
   /// Issue 307: when generating doubly-nested types, any references
   /// should be of the form A.Types.B.Types.C.
   /// </summary>
-  public sealed partial class Issue307 : pb::IMessage<Issue307>, pb::IBufferMessage {
+  public sealed partial class Issue307 : pb::IMessage<Issue307> {
     private static readonly pb::MessageParser<Issue307> _parser = new pb::MessageParser<Issue307>(() => new Issue307());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -177,16 +177,11 @@ namespace UnitTest.Issues.TestProtos {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void MergeFrom(pb::CodedInputStream input) {
-      input.ReadRawMessage(this);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
       uint tag;
       while ((tag = input.ReadTag()) != 0) {
         switch(tag) {
           default:
-            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
         }
       }
@@ -196,7 +191,7 @@ namespace UnitTest.Issues.TestProtos {
     /// <summary>Container for nested types declared in the Issue307 message type.</summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static partial class Types {
-      public sealed partial class NestedOnce : pb::IMessage<NestedOnce>, pb::IBufferMessage {
+      public sealed partial class NestedOnce : pb::IMessage<NestedOnce> {
         private static readonly pb::MessageParser<NestedOnce> _parser = new pb::MessageParser<NestedOnce>(() => new NestedOnce());
         private pb::UnknownFieldSet _unknownFields;
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -285,16 +280,11 @@ namespace UnitTest.Issues.TestProtos {
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
         public void MergeFrom(pb::CodedInputStream input) {
-          input.ReadRawMessage(this);
-        }
-
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
           uint tag;
           while ((tag = input.ReadTag()) != 0) {
             switch(tag) {
               default:
-                _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+                _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
                 break;
             }
           }
@@ -304,7 +294,7 @@ namespace UnitTest.Issues.TestProtos {
         /// <summary>Container for nested types declared in the NestedOnce message type.</summary>
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
         public static partial class Types {
-          public sealed partial class NestedTwice : pb::IMessage<NestedTwice>, pb::IBufferMessage {
+          public sealed partial class NestedTwice : pb::IMessage<NestedTwice> {
             private static readonly pb::MessageParser<NestedTwice> _parser = new pb::MessageParser<NestedTwice>(() => new NestedTwice());
             private pb::UnknownFieldSet _unknownFields;
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -393,16 +383,11 @@ namespace UnitTest.Issues.TestProtos {
 
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
             public void MergeFrom(pb::CodedInputStream input) {
-              input.ReadRawMessage(this);
-            }
-
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-            void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
               uint tag;
               while ((tag = input.ReadTag()) != 0) {
                 switch(tag) {
                   default:
-                    _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+                    _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
                     break;
                 }
               }
@@ -420,7 +405,7 @@ namespace UnitTest.Issues.TestProtos {
 
   }
 
-  public sealed partial class NegativeEnumMessage : pb::IMessage<NegativeEnumMessage>, pb::IBufferMessage {
+  public sealed partial class NegativeEnumMessage : pb::IMessage<NegativeEnumMessage> {
     private static readonly pb::MessageParser<NegativeEnumMessage> _parser = new pb::MessageParser<NegativeEnumMessage>(() => new NegativeEnumMessage());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -565,16 +550,11 @@ namespace UnitTest.Issues.TestProtos {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void MergeFrom(pb::CodedInputStream input) {
-      input.ReadRawMessage(this);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
       uint tag;
       while ((tag = input.ReadTag()) != 0) {
         switch(tag) {
           default:
-            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 8: {
             Value = (global::UnitTest.Issues.TestProtos.NegativeEnum) input.ReadEnum();
@@ -582,12 +562,12 @@ namespace UnitTest.Issues.TestProtos {
           }
           case 18:
           case 16: {
-            values_.AddEntriesFrom(ref input, _repeated_values_codec);
+            values_.AddEntriesFrom(input, _repeated_values_codec);
             break;
           }
           case 26:
           case 24: {
-            packedValues_.AddEntriesFrom(ref input, _repeated_packedValues_codec);
+            packedValues_.AddEntriesFrom(input, _repeated_packedValues_codec);
             break;
           }
         }
@@ -596,7 +576,7 @@ namespace UnitTest.Issues.TestProtos {
 
   }
 
-  public sealed partial class DeprecatedChild : pb::IMessage<DeprecatedChild>, pb::IBufferMessage {
+  public sealed partial class DeprecatedChild : pb::IMessage<DeprecatedChild> {
     private static readonly pb::MessageParser<DeprecatedChild> _parser = new pb::MessageParser<DeprecatedChild>(() => new DeprecatedChild());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -685,16 +665,11 @@ namespace UnitTest.Issues.TestProtos {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void MergeFrom(pb::CodedInputStream input) {
-      input.ReadRawMessage(this);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
       uint tag;
       while ((tag = input.ReadTag()) != 0) {
         switch(tag) {
           default:
-            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
         }
       }
@@ -702,7 +677,7 @@ namespace UnitTest.Issues.TestProtos {
 
   }
 
-  public sealed partial class DeprecatedFieldsMessage : pb::IMessage<DeprecatedFieldsMessage>, pb::IBufferMessage {
+  public sealed partial class DeprecatedFieldsMessage : pb::IMessage<DeprecatedFieldsMessage> {
     private static readonly pb::MessageParser<DeprecatedFieldsMessage> _parser = new pb::MessageParser<DeprecatedFieldsMessage>(() => new DeprecatedFieldsMessage());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -920,16 +895,11 @@ namespace UnitTest.Issues.TestProtos {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void MergeFrom(pb::CodedInputStream input) {
-      input.ReadRawMessage(this);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
       uint tag;
       while ((tag = input.ReadTag()) != 0) {
         switch(tag) {
           default:
-            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 8: {
             PrimitiveValue = input.ReadInt32();
@@ -937,7 +907,7 @@ namespace UnitTest.Issues.TestProtos {
           }
           case 18:
           case 16: {
-            primitiveArray_.AddEntriesFrom(ref input, _repeated_primitiveArray_codec);
+            primitiveArray_.AddEntriesFrom(input, _repeated_primitiveArray_codec);
             break;
           }
           case 26: {
@@ -948,7 +918,7 @@ namespace UnitTest.Issues.TestProtos {
             break;
           }
           case 34: {
-            messageArray_.AddEntriesFrom(ref input, _repeated_messageArray_codec);
+            messageArray_.AddEntriesFrom(input, _repeated_messageArray_codec);
             break;
           }
           case 40: {
@@ -957,7 +927,7 @@ namespace UnitTest.Issues.TestProtos {
           }
           case 50:
           case 48: {
-            enumArray_.AddEntriesFrom(ref input, _repeated_enumArray_codec);
+            enumArray_.AddEntriesFrom(input, _repeated_enumArray_codec);
             break;
           }
         }
@@ -969,7 +939,7 @@ namespace UnitTest.Issues.TestProtos {
   /// <summary>
   /// Issue 45: http://code.google.com/p/protobuf-csharp-port/issues/detail?id=45
   /// </summary>
-  public sealed partial class ItemField : pb::IMessage<ItemField>, pb::IBufferMessage {
+  public sealed partial class ItemField : pb::IMessage<ItemField> {
     private static readonly pb::MessageParser<ItemField> _parser = new pb::MessageParser<ItemField>(() => new ItemField());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1082,16 +1052,11 @@ namespace UnitTest.Issues.TestProtos {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void MergeFrom(pb::CodedInputStream input) {
-      input.ReadRawMessage(this);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
       uint tag;
       while ((tag = input.ReadTag()) != 0) {
         switch(tag) {
           default:
-            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 8: {
             Item = input.ReadInt32();
@@ -1103,7 +1068,7 @@ namespace UnitTest.Issues.TestProtos {
 
   }
 
-  public sealed partial class ReservedNames : pb::IMessage<ReservedNames>, pb::IBufferMessage {
+  public sealed partial class ReservedNames : pb::IMessage<ReservedNames> {
     private static readonly pb::MessageParser<ReservedNames> _parser = new pb::MessageParser<ReservedNames>(() => new ReservedNames());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1240,16 +1205,11 @@ namespace UnitTest.Issues.TestProtos {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void MergeFrom(pb::CodedInputStream input) {
-      input.ReadRawMessage(this);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
       uint tag;
       while ((tag = input.ReadTag()) != 0) {
         switch(tag) {
           default:
-            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 8: {
             Types_ = input.ReadInt32();
@@ -1270,7 +1230,7 @@ namespace UnitTest.Issues.TestProtos {
       /// <summary>
       /// Force a nested type called Types
       /// </summary>
-      public sealed partial class SomeNestedType : pb::IMessage<SomeNestedType>, pb::IBufferMessage {
+      public sealed partial class SomeNestedType : pb::IMessage<SomeNestedType> {
         private static readonly pb::MessageParser<SomeNestedType> _parser = new pb::MessageParser<SomeNestedType>(() => new SomeNestedType());
         private pb::UnknownFieldSet _unknownFields;
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1359,16 +1319,11 @@ namespace UnitTest.Issues.TestProtos {
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
         public void MergeFrom(pb::CodedInputStream input) {
-          input.ReadRawMessage(this);
-        }
-
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
           uint tag;
           while ((tag = input.ReadTag()) != 0) {
             switch(tag) {
               default:
-                _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+                _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
                 break;
             }
           }
@@ -1393,7 +1348,7 @@ namespace UnitTest.Issues.TestProtos {
   /// Alternatively, consider just adding this to
   /// unittest_proto3.proto if multiple platforms want it.
   /// </summary>
-  public sealed partial class TestJsonFieldOrdering : pb::IMessage<TestJsonFieldOrdering>, pb::IBufferMessage {
+  public sealed partial class TestJsonFieldOrdering : pb::IMessage<TestJsonFieldOrdering> {
     private static readonly pb::MessageParser<TestJsonFieldOrdering> _parser = new pb::MessageParser<TestJsonFieldOrdering>(() => new TestJsonFieldOrdering());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1688,16 +1643,11 @@ namespace UnitTest.Issues.TestProtos {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void MergeFrom(pb::CodedInputStream input) {
-      input.ReadRawMessage(this);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
       uint tag;
       while ((tag = input.ReadTag()) != 0) {
         switch(tag) {
           default:
-            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 10: {
             PlainString = input.ReadString();
@@ -1729,7 +1679,7 @@ namespace UnitTest.Issues.TestProtos {
 
   }
 
-  public sealed partial class TestJsonName : pb::IMessage<TestJsonName>, pb::IBufferMessage {
+  public sealed partial class TestJsonName : pb::IMessage<TestJsonName> {
     private static readonly pb::MessageParser<TestJsonName> _parser = new pb::MessageParser<TestJsonName>(() => new TestJsonName());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1893,16 +1843,11 @@ namespace UnitTest.Issues.TestProtos {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void MergeFrom(pb::CodedInputStream input) {
-      input.ReadRawMessage(this);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
       uint tag;
       while ((tag = input.ReadTag()) != 0) {
         switch(tag) {
           default:
-            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 10: {
             Name = input.ReadString();
@@ -1927,7 +1872,7 @@ namespace UnitTest.Issues.TestProtos {
   /// oneof case, which is itself a message type, the submessages should
   /// be merged.
   /// </summary>
-  public sealed partial class OneofMerging : pb::IMessage<OneofMerging>, pb::IBufferMessage {
+  public sealed partial class OneofMerging : pb::IMessage<OneofMerging> {
     private static readonly pb::MessageParser<OneofMerging> _parser = new pb::MessageParser<OneofMerging>(() => new OneofMerging());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -2098,16 +2043,11 @@ namespace UnitTest.Issues.TestProtos {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void MergeFrom(pb::CodedInputStream input) {
-      input.ReadRawMessage(this);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
       uint tag;
       while ((tag = input.ReadTag()) != 0) {
         switch(tag) {
           default:
-            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 10: {
             Text = input.ReadString();
@@ -2130,7 +2070,7 @@ namespace UnitTest.Issues.TestProtos {
     /// <summary>Container for nested types declared in the OneofMerging message type.</summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static partial class Types {
-      public sealed partial class Nested : pb::IMessage<Nested>, pb::IBufferMessage {
+      public sealed partial class Nested : pb::IMessage<Nested> {
         private static readonly pb::MessageParser<Nested> _parser = new pb::MessageParser<Nested>(() => new Nested());
         private pb::UnknownFieldSet _unknownFields;
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -2267,16 +2207,11 @@ namespace UnitTest.Issues.TestProtos {
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
         public void MergeFrom(pb::CodedInputStream input) {
-          input.ReadRawMessage(this);
-        }
-
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
           uint tag;
           while ((tag = input.ReadTag()) != 0) {
             switch(tag) {
               default:
-                _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+                _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
                 break;
               case 8: {
                 X = input.ReadInt32();

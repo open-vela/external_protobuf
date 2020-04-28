@@ -287,15 +287,25 @@ namespace Google.Protobuf.Reflection
         /// <summary>
         /// The (possibly empty) set of custom options for this message.
         /// </summary>
-        [Obsolete("CustomOptions are obsolete. Use the Options property")]
+        [Obsolete("CustomOptions are obsolete. Use GetOption")]
         public CustomOptions CustomOptions => new CustomOptions(Proto.Options?._extensions?.ValuesByNumber);
 
         /// <summary>
-        /// The <c>MessageOptions</c>, defined in <c>descriptor.proto</c>.
-        /// Custom options can be retrieved as extensions of the returned message.
-        /// NOTE: A defensive copy is created each time this property is retrieved.
+        /// Gets a single value message option for this descriptor
         /// </summary>
-        public MessageOptions Options => (Proto.Options as IDeepCloneable<MessageOptions>)?.Clone();
+        public T GetOption<T>(Extension<MessageOptions, T> extension)
+        {
+            var value = Proto.Options.GetExtension(extension);
+            return value is IDeepCloneable<T> ? (value as IDeepCloneable<T>).Clone() : value;
+        }
+
+        /// <summary>
+        /// Gets a repeated value message option for this descriptor
+        /// </summary>
+        public Collections.RepeatedField<T> GetOption<T>(RepeatedExtension<MessageOptions, T> extension)
+        {
+            return Proto.Options.GetExtension(extension).Clone();
+        }
 
         /// <summary>
         /// Looks up and cross-links all fields and nested types.
