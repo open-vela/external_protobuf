@@ -244,7 +244,7 @@ namespace ProtobufTestMessages.Proto2 {
   /// could trigger bugs that occur in any message type in this file.  We verify
   /// this stays true in a unit test.
   /// </summary>
-  public sealed partial class TestAllTypesProto2 : pb::IExtendableMessage<TestAllTypesProto2>, pb::IBufferMessage {
+  public sealed partial class TestAllTypesProto2 : pb::IExtendableMessage<TestAllTypesProto2> {
     private static readonly pb::MessageParser<TestAllTypesProto2> _parser = new pb::MessageParser<TestAllTypesProto2>(() => new TestAllTypesProto2());
     private pb::UnknownFieldSet _unknownFields;
     private pb::ExtensionSet<TestAllTypesProto2> _extensions;
@@ -290,13 +290,13 @@ namespace ProtobufTestMessages.Proto2 {
       optionalBool_ = other.optionalBool_;
       optionalString_ = other.optionalString_;
       optionalBytes_ = other.optionalBytes_;
-      optionalNestedMessage_ = other.optionalNestedMessage_ != null ? other.optionalNestedMessage_.Clone() : null;
-      optionalForeignMessage_ = other.optionalForeignMessage_ != null ? other.optionalForeignMessage_.Clone() : null;
+      optionalNestedMessage_ = other.HasOptionalNestedMessage ? other.optionalNestedMessage_.Clone() : null;
+      optionalForeignMessage_ = other.HasOptionalForeignMessage ? other.optionalForeignMessage_.Clone() : null;
       optionalNestedEnum_ = other.optionalNestedEnum_;
       optionalForeignEnum_ = other.optionalForeignEnum_;
       optionalStringPiece_ = other.optionalStringPiece_;
       optionalCord_ = other.optionalCord_;
-      recursiveMessage_ = other.recursiveMessage_ != null ? other.recursiveMessage_.Clone() : null;
+      recursiveMessage_ = other.HasRecursiveMessage ? other.recursiveMessage_.Clone() : null;
       repeatedInt32_ = other.repeatedInt32_.Clone();
       repeatedInt64_ = other.repeatedInt64_.Clone();
       repeatedUint32_ = other.repeatedUint32_.Clone();
@@ -794,6 +794,16 @@ namespace ProtobufTestMessages.Proto2 {
         optionalNestedMessage_ = value;
       }
     }
+    /// <summary>Gets whether the optional_nested_message field is set</summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public bool HasOptionalNestedMessage {
+      get { return optionalNestedMessage_ != null; }
+    }
+    /// <summary>Clears the value of the optional_nested_message field</summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void ClearOptionalNestedMessage() {
+      optionalNestedMessage_ = null;
+    }
 
     /// <summary>Field number for the "optional_foreign_message" field.</summary>
     public const int OptionalForeignMessageFieldNumber = 19;
@@ -804,6 +814,16 @@ namespace ProtobufTestMessages.Proto2 {
       set {
         optionalForeignMessage_ = value;
       }
+    }
+    /// <summary>Gets whether the optional_foreign_message field is set</summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public bool HasOptionalForeignMessage {
+      get { return optionalForeignMessage_ != null; }
+    }
+    /// <summary>Clears the value of the optional_foreign_message field</summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void ClearOptionalForeignMessage() {
+      optionalForeignMessage_ = null;
     }
 
     /// <summary>Field number for the "optional_nested_enum" field.</summary>
@@ -909,6 +929,16 @@ namespace ProtobufTestMessages.Proto2 {
       set {
         recursiveMessage_ = value;
       }
+    }
+    /// <summary>Gets whether the recursive_message field is set</summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public bool HasRecursiveMessage {
+      get { return recursiveMessage_ != null; }
+    }
+    /// <summary>Clears the value of the recursive_message field</summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void ClearRecursiveMessage() {
+      recursiveMessage_ = null;
     }
 
     /// <summary>Field number for the "repeated_int32" field.</summary>
@@ -1630,10 +1660,22 @@ namespace ProtobufTestMessages.Proto2 {
     public const int OneofNestedMessageFieldNumber = 112;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public global::ProtobufTestMessages.Proto2.TestAllTypesProto2.Types.NestedMessage OneofNestedMessage {
-      get { return oneofFieldCase_ == OneofFieldOneofCase.OneofNestedMessage ? (global::ProtobufTestMessages.Proto2.TestAllTypesProto2.Types.NestedMessage) oneofField_ : null; }
+      get { return HasOneofNestedMessage ? (global::ProtobufTestMessages.Proto2.TestAllTypesProto2.Types.NestedMessage) oneofField_ : null; }
       set {
         oneofField_ = value;
         oneofFieldCase_ = value == null ? OneofFieldOneofCase.None : OneofFieldOneofCase.OneofNestedMessage;
+      }
+    }
+    /// <summary>Gets whether the "oneof_nested_message" field is set</summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public bool HasOneofNestedMessage {
+      get { return oneofFieldCase_ == OneofFieldOneofCase.OneofNestedMessage; }
+    }
+    /// <summary> Clears the value of the oneof if it's currently set to "oneof_nested_message" </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void ClearOneofNestedMessage() {
+      if (HasOneofNestedMessage) {
+        ClearOneofField();
       }
     }
 
@@ -2437,13 +2479,13 @@ namespace ProtobufTestMessages.Proto2 {
       if (HasOptionalBool) hash ^= OptionalBool.GetHashCode();
       if (HasOptionalString) hash ^= OptionalString.GetHashCode();
       if (HasOptionalBytes) hash ^= OptionalBytes.GetHashCode();
-      if (optionalNestedMessage_ != null) hash ^= OptionalNestedMessage.GetHashCode();
-      if (optionalForeignMessage_ != null) hash ^= OptionalForeignMessage.GetHashCode();
+      if (HasOptionalNestedMessage) hash ^= OptionalNestedMessage.GetHashCode();
+      if (HasOptionalForeignMessage) hash ^= OptionalForeignMessage.GetHashCode();
       if (HasOptionalNestedEnum) hash ^= OptionalNestedEnum.GetHashCode();
       if (HasOptionalForeignEnum) hash ^= OptionalForeignEnum.GetHashCode();
       if (HasOptionalStringPiece) hash ^= OptionalStringPiece.GetHashCode();
       if (HasOptionalCord) hash ^= OptionalCord.GetHashCode();
-      if (recursiveMessage_ != null) hash ^= RecursiveMessage.GetHashCode();
+      if (HasRecursiveMessage) hash ^= RecursiveMessage.GetHashCode();
       hash ^= repeatedInt32_.GetHashCode();
       hash ^= repeatedInt64_.GetHashCode();
       hash ^= repeatedUint32_.GetHashCode();
@@ -2513,7 +2555,7 @@ namespace ProtobufTestMessages.Proto2 {
       hash ^= MapStringNestedEnum.GetHashCode();
       hash ^= MapStringForeignEnum.GetHashCode();
       if (HasOneofUint32) hash ^= OneofUint32.GetHashCode();
-      if (oneofFieldCase_ == OneofFieldOneofCase.OneofNestedMessage) hash ^= OneofNestedMessage.GetHashCode();
+      if (HasOneofNestedMessage) hash ^= OneofNestedMessage.GetHashCode();
       if (HasOneofString) hash ^= OneofString.GetHashCode();
       if (HasOneofBytes) hash ^= OneofBytes.GetHashCode();
       if (HasOneofBool) hash ^= OneofBool.GetHashCode();
@@ -2617,11 +2659,11 @@ namespace ProtobufTestMessages.Proto2 {
         output.WriteRawTag(122);
         output.WriteBytes(OptionalBytes);
       }
-      if (optionalNestedMessage_ != null) {
+      if (HasOptionalNestedMessage) {
         output.WriteRawTag(146, 1);
         output.WriteMessage(OptionalNestedMessage);
       }
-      if (optionalForeignMessage_ != null) {
+      if (HasOptionalForeignMessage) {
         output.WriteRawTag(154, 1);
         output.WriteMessage(OptionalForeignMessage);
       }
@@ -2641,7 +2683,7 @@ namespace ProtobufTestMessages.Proto2 {
         output.WriteRawTag(202, 1);
         output.WriteString(OptionalCord);
       }
-      if (recursiveMessage_ != null) {
+      if (HasRecursiveMessage) {
         output.WriteRawTag(218, 1);
         output.WriteMessage(RecursiveMessage);
       }
@@ -2717,7 +2759,7 @@ namespace ProtobufTestMessages.Proto2 {
         output.WriteRawTag(248, 6);
         output.WriteUInt32(OneofUint32);
       }
-      if (oneofFieldCase_ == OneofFieldOneofCase.OneofNestedMessage) {
+      if (HasOneofNestedMessage) {
         output.WriteRawTag(130, 7);
         output.WriteMessage(OneofNestedMessage);
       }
@@ -2882,10 +2924,10 @@ namespace ProtobufTestMessages.Proto2 {
       if (HasOptionalBytes) {
         size += 1 + pb::CodedOutputStream.ComputeBytesSize(OptionalBytes);
       }
-      if (optionalNestedMessage_ != null) {
+      if (HasOptionalNestedMessage) {
         size += 2 + pb::CodedOutputStream.ComputeMessageSize(OptionalNestedMessage);
       }
-      if (optionalForeignMessage_ != null) {
+      if (HasOptionalForeignMessage) {
         size += 2 + pb::CodedOutputStream.ComputeMessageSize(OptionalForeignMessage);
       }
       if (HasOptionalNestedEnum) {
@@ -2900,7 +2942,7 @@ namespace ProtobufTestMessages.Proto2 {
       if (HasOptionalCord) {
         size += 2 + pb::CodedOutputStream.ComputeStringSize(OptionalCord);
       }
-      if (recursiveMessage_ != null) {
+      if (HasRecursiveMessage) {
         size += 2 + pb::CodedOutputStream.ComputeMessageSize(RecursiveMessage);
       }
       size += repeatedInt32_.CalculateSize(_repeated_repeatedInt32_codec);
@@ -2974,7 +3016,7 @@ namespace ProtobufTestMessages.Proto2 {
       if (HasOneofUint32) {
         size += 2 + pb::CodedOutputStream.ComputeUInt32Size(OneofUint32);
       }
-      if (oneofFieldCase_ == OneofFieldOneofCase.OneofNestedMessage) {
+      if (HasOneofNestedMessage) {
         size += 2 + pb::CodedOutputStream.ComputeMessageSize(OneofNestedMessage);
       }
       if (HasOneofString) {
@@ -3114,14 +3156,14 @@ namespace ProtobufTestMessages.Proto2 {
       if (other.HasOptionalBytes) {
         OptionalBytes = other.OptionalBytes;
       }
-      if (other.optionalNestedMessage_ != null) {
-        if (optionalNestedMessage_ == null) {
+      if (other.HasOptionalNestedMessage) {
+        if (!HasOptionalNestedMessage) {
           OptionalNestedMessage = new global::ProtobufTestMessages.Proto2.TestAllTypesProto2.Types.NestedMessage();
         }
         OptionalNestedMessage.MergeFrom(other.OptionalNestedMessage);
       }
-      if (other.optionalForeignMessage_ != null) {
-        if (optionalForeignMessage_ == null) {
+      if (other.HasOptionalForeignMessage) {
+        if (!HasOptionalForeignMessage) {
           OptionalForeignMessage = new global::ProtobufTestMessages.Proto2.ForeignMessageProto2();
         }
         OptionalForeignMessage.MergeFrom(other.OptionalForeignMessage);
@@ -3138,8 +3180,8 @@ namespace ProtobufTestMessages.Proto2 {
       if (other.HasOptionalCord) {
         OptionalCord = other.OptionalCord;
       }
-      if (other.recursiveMessage_ != null) {
-        if (recursiveMessage_ == null) {
+      if (other.HasRecursiveMessage) {
+        if (!HasRecursiveMessage) {
           RecursiveMessage = new global::ProtobufTestMessages.Proto2.TestAllTypesProto2();
         }
         RecursiveMessage.MergeFrom(other.RecursiveMessage);
@@ -3311,17 +3353,12 @@ namespace ProtobufTestMessages.Proto2 {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void MergeFrom(pb::CodedInputStream input) {
-      input.ReadRawMessage(this);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
       uint tag;
       while ((tag = input.ReadTag()) != 0) {
         switch(tag) {
           default:
-            if (!pb::ExtensionSet.TryMergeFieldFrom(ref _extensions, ref input)) {
-              _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            if (!pb::ExtensionSet.TryMergeFieldFrom(ref _extensions, input)) {
+              _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             }
             break;
           case 8: {
@@ -3385,14 +3422,14 @@ namespace ProtobufTestMessages.Proto2 {
             break;
           }
           case 146: {
-            if (optionalNestedMessage_ == null) {
+            if (!HasOptionalNestedMessage) {
               OptionalNestedMessage = new global::ProtobufTestMessages.Proto2.TestAllTypesProto2.Types.NestedMessage();
             }
             input.ReadMessage(OptionalNestedMessage);
             break;
           }
           case 154: {
-            if (optionalForeignMessage_ == null) {
+            if (!HasOptionalForeignMessage) {
               OptionalForeignMessage = new global::ProtobufTestMessages.Proto2.ForeignMessageProto2();
             }
             input.ReadMessage(OptionalForeignMessage);
@@ -3415,7 +3452,7 @@ namespace ProtobufTestMessages.Proto2 {
             break;
           }
           case 218: {
-            if (recursiveMessage_ == null) {
+            if (!HasRecursiveMessage) {
               RecursiveMessage = new global::ProtobufTestMessages.Proto2.TestAllTypesProto2();
             }
             input.ReadMessage(RecursiveMessage);
@@ -3423,317 +3460,317 @@ namespace ProtobufTestMessages.Proto2 {
           }
           case 250:
           case 248: {
-            repeatedInt32_.AddEntriesFrom(ref input, _repeated_repeatedInt32_codec);
+            repeatedInt32_.AddEntriesFrom(input, _repeated_repeatedInt32_codec);
             break;
           }
           case 258:
           case 256: {
-            repeatedInt64_.AddEntriesFrom(ref input, _repeated_repeatedInt64_codec);
+            repeatedInt64_.AddEntriesFrom(input, _repeated_repeatedInt64_codec);
             break;
           }
           case 266:
           case 264: {
-            repeatedUint32_.AddEntriesFrom(ref input, _repeated_repeatedUint32_codec);
+            repeatedUint32_.AddEntriesFrom(input, _repeated_repeatedUint32_codec);
             break;
           }
           case 274:
           case 272: {
-            repeatedUint64_.AddEntriesFrom(ref input, _repeated_repeatedUint64_codec);
+            repeatedUint64_.AddEntriesFrom(input, _repeated_repeatedUint64_codec);
             break;
           }
           case 282:
           case 280: {
-            repeatedSint32_.AddEntriesFrom(ref input, _repeated_repeatedSint32_codec);
+            repeatedSint32_.AddEntriesFrom(input, _repeated_repeatedSint32_codec);
             break;
           }
           case 290:
           case 288: {
-            repeatedSint64_.AddEntriesFrom(ref input, _repeated_repeatedSint64_codec);
+            repeatedSint64_.AddEntriesFrom(input, _repeated_repeatedSint64_codec);
             break;
           }
           case 298:
           case 301: {
-            repeatedFixed32_.AddEntriesFrom(ref input, _repeated_repeatedFixed32_codec);
+            repeatedFixed32_.AddEntriesFrom(input, _repeated_repeatedFixed32_codec);
             break;
           }
           case 306:
           case 305: {
-            repeatedFixed64_.AddEntriesFrom(ref input, _repeated_repeatedFixed64_codec);
+            repeatedFixed64_.AddEntriesFrom(input, _repeated_repeatedFixed64_codec);
             break;
           }
           case 314:
           case 317: {
-            repeatedSfixed32_.AddEntriesFrom(ref input, _repeated_repeatedSfixed32_codec);
+            repeatedSfixed32_.AddEntriesFrom(input, _repeated_repeatedSfixed32_codec);
             break;
           }
           case 322:
           case 321: {
-            repeatedSfixed64_.AddEntriesFrom(ref input, _repeated_repeatedSfixed64_codec);
+            repeatedSfixed64_.AddEntriesFrom(input, _repeated_repeatedSfixed64_codec);
             break;
           }
           case 330:
           case 333: {
-            repeatedFloat_.AddEntriesFrom(ref input, _repeated_repeatedFloat_codec);
+            repeatedFloat_.AddEntriesFrom(input, _repeated_repeatedFloat_codec);
             break;
           }
           case 338:
           case 337: {
-            repeatedDouble_.AddEntriesFrom(ref input, _repeated_repeatedDouble_codec);
+            repeatedDouble_.AddEntriesFrom(input, _repeated_repeatedDouble_codec);
             break;
           }
           case 346:
           case 344: {
-            repeatedBool_.AddEntriesFrom(ref input, _repeated_repeatedBool_codec);
+            repeatedBool_.AddEntriesFrom(input, _repeated_repeatedBool_codec);
             break;
           }
           case 354: {
-            repeatedString_.AddEntriesFrom(ref input, _repeated_repeatedString_codec);
+            repeatedString_.AddEntriesFrom(input, _repeated_repeatedString_codec);
             break;
           }
           case 362: {
-            repeatedBytes_.AddEntriesFrom(ref input, _repeated_repeatedBytes_codec);
+            repeatedBytes_.AddEntriesFrom(input, _repeated_repeatedBytes_codec);
             break;
           }
           case 386: {
-            repeatedNestedMessage_.AddEntriesFrom(ref input, _repeated_repeatedNestedMessage_codec);
+            repeatedNestedMessage_.AddEntriesFrom(input, _repeated_repeatedNestedMessage_codec);
             break;
           }
           case 394: {
-            repeatedForeignMessage_.AddEntriesFrom(ref input, _repeated_repeatedForeignMessage_codec);
+            repeatedForeignMessage_.AddEntriesFrom(input, _repeated_repeatedForeignMessage_codec);
             break;
           }
           case 410:
           case 408: {
-            repeatedNestedEnum_.AddEntriesFrom(ref input, _repeated_repeatedNestedEnum_codec);
+            repeatedNestedEnum_.AddEntriesFrom(input, _repeated_repeatedNestedEnum_codec);
             break;
           }
           case 418:
           case 416: {
-            repeatedForeignEnum_.AddEntriesFrom(ref input, _repeated_repeatedForeignEnum_codec);
+            repeatedForeignEnum_.AddEntriesFrom(input, _repeated_repeatedForeignEnum_codec);
             break;
           }
           case 434: {
-            repeatedStringPiece_.AddEntriesFrom(ref input, _repeated_repeatedStringPiece_codec);
+            repeatedStringPiece_.AddEntriesFrom(input, _repeated_repeatedStringPiece_codec);
             break;
           }
           case 442: {
-            repeatedCord_.AddEntriesFrom(ref input, _repeated_repeatedCord_codec);
+            repeatedCord_.AddEntriesFrom(input, _repeated_repeatedCord_codec);
             break;
           }
           case 450: {
-            mapInt32Int32_.AddEntriesFrom(ref input, _map_mapInt32Int32_codec);
+            mapInt32Int32_.AddEntriesFrom(input, _map_mapInt32Int32_codec);
             break;
           }
           case 458: {
-            mapInt64Int64_.AddEntriesFrom(ref input, _map_mapInt64Int64_codec);
+            mapInt64Int64_.AddEntriesFrom(input, _map_mapInt64Int64_codec);
             break;
           }
           case 466: {
-            mapUint32Uint32_.AddEntriesFrom(ref input, _map_mapUint32Uint32_codec);
+            mapUint32Uint32_.AddEntriesFrom(input, _map_mapUint32Uint32_codec);
             break;
           }
           case 474: {
-            mapUint64Uint64_.AddEntriesFrom(ref input, _map_mapUint64Uint64_codec);
+            mapUint64Uint64_.AddEntriesFrom(input, _map_mapUint64Uint64_codec);
             break;
           }
           case 482: {
-            mapSint32Sint32_.AddEntriesFrom(ref input, _map_mapSint32Sint32_codec);
+            mapSint32Sint32_.AddEntriesFrom(input, _map_mapSint32Sint32_codec);
             break;
           }
           case 490: {
-            mapSint64Sint64_.AddEntriesFrom(ref input, _map_mapSint64Sint64_codec);
+            mapSint64Sint64_.AddEntriesFrom(input, _map_mapSint64Sint64_codec);
             break;
           }
           case 498: {
-            mapFixed32Fixed32_.AddEntriesFrom(ref input, _map_mapFixed32Fixed32_codec);
+            mapFixed32Fixed32_.AddEntriesFrom(input, _map_mapFixed32Fixed32_codec);
             break;
           }
           case 506: {
-            mapFixed64Fixed64_.AddEntriesFrom(ref input, _map_mapFixed64Fixed64_codec);
+            mapFixed64Fixed64_.AddEntriesFrom(input, _map_mapFixed64Fixed64_codec);
             break;
           }
           case 514: {
-            mapSfixed32Sfixed32_.AddEntriesFrom(ref input, _map_mapSfixed32Sfixed32_codec);
+            mapSfixed32Sfixed32_.AddEntriesFrom(input, _map_mapSfixed32Sfixed32_codec);
             break;
           }
           case 522: {
-            mapSfixed64Sfixed64_.AddEntriesFrom(ref input, _map_mapSfixed64Sfixed64_codec);
+            mapSfixed64Sfixed64_.AddEntriesFrom(input, _map_mapSfixed64Sfixed64_codec);
             break;
           }
           case 530: {
-            mapInt32Float_.AddEntriesFrom(ref input, _map_mapInt32Float_codec);
+            mapInt32Float_.AddEntriesFrom(input, _map_mapInt32Float_codec);
             break;
           }
           case 538: {
-            mapInt32Double_.AddEntriesFrom(ref input, _map_mapInt32Double_codec);
+            mapInt32Double_.AddEntriesFrom(input, _map_mapInt32Double_codec);
             break;
           }
           case 546: {
-            mapBoolBool_.AddEntriesFrom(ref input, _map_mapBoolBool_codec);
+            mapBoolBool_.AddEntriesFrom(input, _map_mapBoolBool_codec);
             break;
           }
           case 554: {
-            mapStringString_.AddEntriesFrom(ref input, _map_mapStringString_codec);
+            mapStringString_.AddEntriesFrom(input, _map_mapStringString_codec);
             break;
           }
           case 562: {
-            mapStringBytes_.AddEntriesFrom(ref input, _map_mapStringBytes_codec);
+            mapStringBytes_.AddEntriesFrom(input, _map_mapStringBytes_codec);
             break;
           }
           case 570: {
-            mapStringNestedMessage_.AddEntriesFrom(ref input, _map_mapStringNestedMessage_codec);
+            mapStringNestedMessage_.AddEntriesFrom(input, _map_mapStringNestedMessage_codec);
             break;
           }
           case 578: {
-            mapStringForeignMessage_.AddEntriesFrom(ref input, _map_mapStringForeignMessage_codec);
+            mapStringForeignMessage_.AddEntriesFrom(input, _map_mapStringForeignMessage_codec);
             break;
           }
           case 586: {
-            mapStringNestedEnum_.AddEntriesFrom(ref input, _map_mapStringNestedEnum_codec);
+            mapStringNestedEnum_.AddEntriesFrom(input, _map_mapStringNestedEnum_codec);
             break;
           }
           case 594: {
-            mapStringForeignEnum_.AddEntriesFrom(ref input, _map_mapStringForeignEnum_codec);
+            mapStringForeignEnum_.AddEntriesFrom(input, _map_mapStringForeignEnum_codec);
             break;
           }
           case 602:
           case 600: {
-            packedInt32_.AddEntriesFrom(ref input, _repeated_packedInt32_codec);
+            packedInt32_.AddEntriesFrom(input, _repeated_packedInt32_codec);
             break;
           }
           case 610:
           case 608: {
-            packedInt64_.AddEntriesFrom(ref input, _repeated_packedInt64_codec);
+            packedInt64_.AddEntriesFrom(input, _repeated_packedInt64_codec);
             break;
           }
           case 618:
           case 616: {
-            packedUint32_.AddEntriesFrom(ref input, _repeated_packedUint32_codec);
+            packedUint32_.AddEntriesFrom(input, _repeated_packedUint32_codec);
             break;
           }
           case 626:
           case 624: {
-            packedUint64_.AddEntriesFrom(ref input, _repeated_packedUint64_codec);
+            packedUint64_.AddEntriesFrom(input, _repeated_packedUint64_codec);
             break;
           }
           case 634:
           case 632: {
-            packedSint32_.AddEntriesFrom(ref input, _repeated_packedSint32_codec);
+            packedSint32_.AddEntriesFrom(input, _repeated_packedSint32_codec);
             break;
           }
           case 642:
           case 640: {
-            packedSint64_.AddEntriesFrom(ref input, _repeated_packedSint64_codec);
+            packedSint64_.AddEntriesFrom(input, _repeated_packedSint64_codec);
             break;
           }
           case 650:
           case 653: {
-            packedFixed32_.AddEntriesFrom(ref input, _repeated_packedFixed32_codec);
+            packedFixed32_.AddEntriesFrom(input, _repeated_packedFixed32_codec);
             break;
           }
           case 658:
           case 657: {
-            packedFixed64_.AddEntriesFrom(ref input, _repeated_packedFixed64_codec);
+            packedFixed64_.AddEntriesFrom(input, _repeated_packedFixed64_codec);
             break;
           }
           case 666:
           case 669: {
-            packedSfixed32_.AddEntriesFrom(ref input, _repeated_packedSfixed32_codec);
+            packedSfixed32_.AddEntriesFrom(input, _repeated_packedSfixed32_codec);
             break;
           }
           case 674:
           case 673: {
-            packedSfixed64_.AddEntriesFrom(ref input, _repeated_packedSfixed64_codec);
+            packedSfixed64_.AddEntriesFrom(input, _repeated_packedSfixed64_codec);
             break;
           }
           case 682:
           case 685: {
-            packedFloat_.AddEntriesFrom(ref input, _repeated_packedFloat_codec);
+            packedFloat_.AddEntriesFrom(input, _repeated_packedFloat_codec);
             break;
           }
           case 690:
           case 689: {
-            packedDouble_.AddEntriesFrom(ref input, _repeated_packedDouble_codec);
+            packedDouble_.AddEntriesFrom(input, _repeated_packedDouble_codec);
             break;
           }
           case 698:
           case 696: {
-            packedBool_.AddEntriesFrom(ref input, _repeated_packedBool_codec);
+            packedBool_.AddEntriesFrom(input, _repeated_packedBool_codec);
             break;
           }
           case 706:
           case 704: {
-            packedNestedEnum_.AddEntriesFrom(ref input, _repeated_packedNestedEnum_codec);
+            packedNestedEnum_.AddEntriesFrom(input, _repeated_packedNestedEnum_codec);
             break;
           }
           case 714:
           case 712: {
-            unpackedInt32_.AddEntriesFrom(ref input, _repeated_unpackedInt32_codec);
+            unpackedInt32_.AddEntriesFrom(input, _repeated_unpackedInt32_codec);
             break;
           }
           case 722:
           case 720: {
-            unpackedInt64_.AddEntriesFrom(ref input, _repeated_unpackedInt64_codec);
+            unpackedInt64_.AddEntriesFrom(input, _repeated_unpackedInt64_codec);
             break;
           }
           case 730:
           case 728: {
-            unpackedUint32_.AddEntriesFrom(ref input, _repeated_unpackedUint32_codec);
+            unpackedUint32_.AddEntriesFrom(input, _repeated_unpackedUint32_codec);
             break;
           }
           case 738:
           case 736: {
-            unpackedUint64_.AddEntriesFrom(ref input, _repeated_unpackedUint64_codec);
+            unpackedUint64_.AddEntriesFrom(input, _repeated_unpackedUint64_codec);
             break;
           }
           case 746:
           case 744: {
-            unpackedSint32_.AddEntriesFrom(ref input, _repeated_unpackedSint32_codec);
+            unpackedSint32_.AddEntriesFrom(input, _repeated_unpackedSint32_codec);
             break;
           }
           case 754:
           case 752: {
-            unpackedSint64_.AddEntriesFrom(ref input, _repeated_unpackedSint64_codec);
+            unpackedSint64_.AddEntriesFrom(input, _repeated_unpackedSint64_codec);
             break;
           }
           case 762:
           case 765: {
-            unpackedFixed32_.AddEntriesFrom(ref input, _repeated_unpackedFixed32_codec);
+            unpackedFixed32_.AddEntriesFrom(input, _repeated_unpackedFixed32_codec);
             break;
           }
           case 770:
           case 769: {
-            unpackedFixed64_.AddEntriesFrom(ref input, _repeated_unpackedFixed64_codec);
+            unpackedFixed64_.AddEntriesFrom(input, _repeated_unpackedFixed64_codec);
             break;
           }
           case 778:
           case 781: {
-            unpackedSfixed32_.AddEntriesFrom(ref input, _repeated_unpackedSfixed32_codec);
+            unpackedSfixed32_.AddEntriesFrom(input, _repeated_unpackedSfixed32_codec);
             break;
           }
           case 786:
           case 785: {
-            unpackedSfixed64_.AddEntriesFrom(ref input, _repeated_unpackedSfixed64_codec);
+            unpackedSfixed64_.AddEntriesFrom(input, _repeated_unpackedSfixed64_codec);
             break;
           }
           case 794:
           case 797: {
-            unpackedFloat_.AddEntriesFrom(ref input, _repeated_unpackedFloat_codec);
+            unpackedFloat_.AddEntriesFrom(input, _repeated_unpackedFloat_codec);
             break;
           }
           case 802:
           case 801: {
-            unpackedDouble_.AddEntriesFrom(ref input, _repeated_unpackedDouble_codec);
+            unpackedDouble_.AddEntriesFrom(input, _repeated_unpackedDouble_codec);
             break;
           }
           case 810:
           case 808: {
-            unpackedBool_.AddEntriesFrom(ref input, _repeated_unpackedBool_codec);
+            unpackedBool_.AddEntriesFrom(input, _repeated_unpackedBool_codec);
             break;
           }
           case 818:
           case 816: {
-            unpackedNestedEnum_.AddEntriesFrom(ref input, _repeated_unpackedNestedEnum_codec);
+            unpackedNestedEnum_.AddEntriesFrom(input, _repeated_unpackedNestedEnum_codec);
             break;
           }
           case 888: {
@@ -3742,7 +3779,7 @@ namespace ProtobufTestMessages.Proto2 {
           }
           case 898: {
             global::ProtobufTestMessages.Proto2.TestAllTypesProto2.Types.NestedMessage subBuilder = new global::ProtobufTestMessages.Proto2.TestAllTypesProto2.Types.NestedMessage();
-            if (oneofFieldCase_ == OneofFieldOneofCase.OneofNestedMessage) {
+            if (HasOneofNestedMessage) {
               subBuilder.MergeFrom(OneofNestedMessage);
             }
             input.ReadMessage(subBuilder);
@@ -3897,7 +3934,7 @@ namespace ProtobufTestMessages.Proto2 {
         [pbr::OriginalName("NEG")] Neg = -1,
       }
 
-      public sealed partial class NestedMessage : pb::IMessage<NestedMessage>, pb::IBufferMessage {
+      public sealed partial class NestedMessage : pb::IMessage<NestedMessage> {
         private static readonly pb::MessageParser<NestedMessage> _parser = new pb::MessageParser<NestedMessage>(() => new NestedMessage());
         private pb::UnknownFieldSet _unknownFields;
         private int _hasBits0;
@@ -3925,7 +3962,7 @@ namespace ProtobufTestMessages.Proto2 {
         public NestedMessage(NestedMessage other) : this() {
           _hasBits0 = other._hasBits0;
           a_ = other.a_;
-          corecursive_ = other.corecursive_ != null ? other.corecursive_.Clone() : null;
+          corecursive_ = other.HasCorecursive ? other.corecursive_.Clone() : null;
           _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
         }
 
@@ -3968,6 +4005,16 @@ namespace ProtobufTestMessages.Proto2 {
             corecursive_ = value;
           }
         }
+        /// <summary>Gets whether the corecursive field is set</summary>
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+        public bool HasCorecursive {
+          get { return corecursive_ != null; }
+        }
+        /// <summary>Clears the value of the corecursive field</summary>
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+        public void ClearCorecursive() {
+          corecursive_ = null;
+        }
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
         public override bool Equals(object other) {
@@ -3991,7 +4038,7 @@ namespace ProtobufTestMessages.Proto2 {
         public override int GetHashCode() {
           int hash = 1;
           if (HasA) hash ^= A.GetHashCode();
-          if (corecursive_ != null) hash ^= Corecursive.GetHashCode();
+          if (HasCorecursive) hash ^= Corecursive.GetHashCode();
           if (_unknownFields != null) {
             hash ^= _unknownFields.GetHashCode();
           }
@@ -4009,7 +4056,7 @@ namespace ProtobufTestMessages.Proto2 {
             output.WriteRawTag(8);
             output.WriteInt32(A);
           }
-          if (corecursive_ != null) {
+          if (HasCorecursive) {
             output.WriteRawTag(18);
             output.WriteMessage(Corecursive);
           }
@@ -4024,7 +4071,7 @@ namespace ProtobufTestMessages.Proto2 {
           if (HasA) {
             size += 1 + pb::CodedOutputStream.ComputeInt32Size(A);
           }
-          if (corecursive_ != null) {
+          if (HasCorecursive) {
             size += 1 + pb::CodedOutputStream.ComputeMessageSize(Corecursive);
           }
           if (_unknownFields != null) {
@@ -4041,8 +4088,8 @@ namespace ProtobufTestMessages.Proto2 {
           if (other.HasA) {
             A = other.A;
           }
-          if (other.corecursive_ != null) {
-            if (corecursive_ == null) {
+          if (other.HasCorecursive) {
+            if (!HasCorecursive) {
               Corecursive = new global::ProtobufTestMessages.Proto2.TestAllTypesProto2();
             }
             Corecursive.MergeFrom(other.Corecursive);
@@ -4052,23 +4099,18 @@ namespace ProtobufTestMessages.Proto2 {
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
         public void MergeFrom(pb::CodedInputStream input) {
-          input.ReadRawMessage(this);
-        }
-
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
           uint tag;
           while ((tag = input.ReadTag()) != 0) {
             switch(tag) {
               default:
-                _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+                _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
                 break;
               case 8: {
                 A = input.ReadInt32();
                 break;
               }
               case 18: {
-                if (corecursive_ == null) {
+                if (!HasCorecursive) {
                   Corecursive = new global::ProtobufTestMessages.Proto2.TestAllTypesProto2();
                 }
                 input.ReadMessage(Corecursive);
@@ -4083,7 +4125,7 @@ namespace ProtobufTestMessages.Proto2 {
       /// <summary>
       /// groups
       /// </summary>
-      public sealed partial class Data : pb::IMessage<Data>, pb::IBufferMessage {
+      public sealed partial class Data : pb::IMessage<Data> {
         private static readonly pb::MessageParser<Data> _parser = new pb::MessageParser<Data>(() => new Data());
         private pb::UnknownFieldSet _unknownFields;
         private int _hasBits0;
@@ -4248,18 +4290,13 @@ namespace ProtobufTestMessages.Proto2 {
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
         public void MergeFrom(pb::CodedInputStream input) {
-          input.ReadRawMessage(this);
-        }
-
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
           uint tag;
           while ((tag = input.ReadTag()) != 0) {
             switch(tag) {
               case 1612:
                 return;
               default:
-                _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+                _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
                 break;
               case 1616: {
                 GroupInt32 = input.ReadInt32();
@@ -4278,7 +4315,7 @@ namespace ProtobufTestMessages.Proto2 {
       /// <summary>
       /// message_set test case.
       /// </summary>
-      public sealed partial class MessageSetCorrect : pb::IExtendableMessage<MessageSetCorrect>, pb::IBufferMessage {
+      public sealed partial class MessageSetCorrect : pb::IExtendableMessage<MessageSetCorrect> {
         private static readonly pb::MessageParser<MessageSetCorrect> _parser = new pb::MessageParser<MessageSetCorrect>(() => new MessageSetCorrect());
         private pb::UnknownFieldSet _unknownFields;
         private pb::ExtensionSet<MessageSetCorrect> _extensions;
@@ -4383,17 +4420,12 @@ namespace ProtobufTestMessages.Proto2 {
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
         public void MergeFrom(pb::CodedInputStream input) {
-          input.ReadRawMessage(this);
-        }
-
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
           uint tag;
           while ((tag = input.ReadTag()) != 0) {
             switch(tag) {
               default:
-                if (!pb::ExtensionSet.TryMergeFieldFrom(ref _extensions, ref input)) {
-                  _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+                if (!pb::ExtensionSet.TryMergeFieldFrom(ref _extensions, input)) {
+                  _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
                 }
                 break;
             }
@@ -4424,7 +4456,7 @@ namespace ProtobufTestMessages.Proto2 {
 
       }
 
-      public sealed partial class MessageSetCorrectExtension1 : pb::IMessage<MessageSetCorrectExtension1>, pb::IBufferMessage {
+      public sealed partial class MessageSetCorrectExtension1 : pb::IMessage<MessageSetCorrectExtension1> {
         private static readonly pb::MessageParser<MessageSetCorrectExtension1> _parser = new pb::MessageParser<MessageSetCorrectExtension1>(() => new MessageSetCorrectExtension1());
         private pb::UnknownFieldSet _unknownFields;
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -4549,16 +4581,11 @@ namespace ProtobufTestMessages.Proto2 {
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
         public void MergeFrom(pb::CodedInputStream input) {
-          input.ReadRawMessage(this);
-        }
-
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
           uint tag;
           while ((tag = input.ReadTag()) != 0) {
             switch(tag) {
               default:
-                _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+                _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
                 break;
               case 202: {
                 Str = input.ReadString();
@@ -4579,7 +4606,7 @@ namespace ProtobufTestMessages.Proto2 {
 
       }
 
-      public sealed partial class MessageSetCorrectExtension2 : pb::IMessage<MessageSetCorrectExtension2>, pb::IBufferMessage {
+      public sealed partial class MessageSetCorrectExtension2 : pb::IMessage<MessageSetCorrectExtension2> {
         private static readonly pb::MessageParser<MessageSetCorrectExtension2> _parser = new pb::MessageParser<MessageSetCorrectExtension2>(() => new MessageSetCorrectExtension2());
         private pb::UnknownFieldSet _unknownFields;
         private int _hasBits0;
@@ -4707,16 +4734,11 @@ namespace ProtobufTestMessages.Proto2 {
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
         public void MergeFrom(pb::CodedInputStream input) {
-          input.ReadRawMessage(this);
-        }
-
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
           uint tag;
           while ((tag = input.ReadTag()) != 0) {
             switch(tag) {
               default:
-                _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+                _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
                 break;
               case 72: {
                 I = input.ReadInt32();
@@ -4742,7 +4764,7 @@ namespace ProtobufTestMessages.Proto2 {
 
   }
 
-  public sealed partial class ForeignMessageProto2 : pb::IMessage<ForeignMessageProto2>, pb::IBufferMessage {
+  public sealed partial class ForeignMessageProto2 : pb::IMessage<ForeignMessageProto2> {
     private static readonly pb::MessageParser<ForeignMessageProto2> _parser = new pb::MessageParser<ForeignMessageProto2>(() => new ForeignMessageProto2());
     private pb::UnknownFieldSet _unknownFields;
     private int _hasBits0;
@@ -4870,16 +4892,11 @@ namespace ProtobufTestMessages.Proto2 {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void MergeFrom(pb::CodedInputStream input) {
-      input.ReadRawMessage(this);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
       uint tag;
       while ((tag = input.ReadTag()) != 0) {
         switch(tag) {
           default:
-            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 8: {
             C = input.ReadInt32();
@@ -4891,7 +4908,7 @@ namespace ProtobufTestMessages.Proto2 {
 
   }
 
-  public sealed partial class UnknownToTestAllTypes : pb::IMessage<UnknownToTestAllTypes>, pb::IBufferMessage {
+  public sealed partial class UnknownToTestAllTypes : pb::IMessage<UnknownToTestAllTypes> {
     private static readonly pb::MessageParser<UnknownToTestAllTypes> _parser = new pb::MessageParser<UnknownToTestAllTypes>(() => new UnknownToTestAllTypes());
     private pb::UnknownFieldSet _unknownFields;
     private int _hasBits0;
@@ -4920,7 +4937,7 @@ namespace ProtobufTestMessages.Proto2 {
       _hasBits0 = other._hasBits0;
       optionalInt32_ = other.optionalInt32_;
       optionalString_ = other.optionalString_;
-      nestedMessage_ = other.nestedMessage_ != null ? other.nestedMessage_.Clone() : null;
+      nestedMessage_ = other.HasNestedMessage ? other.nestedMessage_.Clone() : null;
       optionalGroup_ = other.HasOptionalGroup ? other.optionalGroup_.Clone() : null;
       optionalBool_ = other.optionalBool_;
       repeatedInt32_ = other.repeatedInt32_.Clone();
@@ -4988,6 +5005,16 @@ namespace ProtobufTestMessages.Proto2 {
       set {
         nestedMessage_ = value;
       }
+    }
+    /// <summary>Gets whether the nested_message field is set</summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public bool HasNestedMessage {
+      get { return nestedMessage_ != null; }
+    }
+    /// <summary>Clears the value of the nested_message field</summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void ClearNestedMessage() {
+      nestedMessage_ = null;
     }
 
     /// <summary>Field number for the "optionalgroup" field.</summary>
@@ -5072,7 +5099,7 @@ namespace ProtobufTestMessages.Proto2 {
       int hash = 1;
       if (HasOptionalInt32) hash ^= OptionalInt32.GetHashCode();
       if (HasOptionalString) hash ^= OptionalString.GetHashCode();
-      if (nestedMessage_ != null) hash ^= NestedMessage.GetHashCode();
+      if (HasNestedMessage) hash ^= NestedMessage.GetHashCode();
       if (HasOptionalGroup) hash ^= OptionalGroup.GetHashCode();
       if (HasOptionalBool) hash ^= OptionalBool.GetHashCode();
       hash ^= repeatedInt32_.GetHashCode();
@@ -5097,7 +5124,7 @@ namespace ProtobufTestMessages.Proto2 {
         output.WriteRawTag(210, 62);
         output.WriteString(OptionalString);
       }
-      if (nestedMessage_ != null) {
+      if (HasNestedMessage) {
         output.WriteRawTag(218, 62);
         output.WriteMessage(NestedMessage);
       }
@@ -5125,7 +5152,7 @@ namespace ProtobufTestMessages.Proto2 {
       if (HasOptionalString) {
         size += 2 + pb::CodedOutputStream.ComputeStringSize(OptionalString);
       }
-      if (nestedMessage_ != null) {
+      if (HasNestedMessage) {
         size += 2 + pb::CodedOutputStream.ComputeMessageSize(NestedMessage);
       }
       if (HasOptionalGroup) {
@@ -5152,8 +5179,8 @@ namespace ProtobufTestMessages.Proto2 {
       if (other.HasOptionalString) {
         OptionalString = other.OptionalString;
       }
-      if (other.nestedMessage_ != null) {
-        if (nestedMessage_ == null) {
+      if (other.HasNestedMessage) {
+        if (!HasNestedMessage) {
           NestedMessage = new global::ProtobufTestMessages.Proto2.ForeignMessageProto2();
         }
         NestedMessage.MergeFrom(other.NestedMessage);
@@ -5173,16 +5200,11 @@ namespace ProtobufTestMessages.Proto2 {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void MergeFrom(pb::CodedInputStream input) {
-      input.ReadRawMessage(this);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
       uint tag;
       while ((tag = input.ReadTag()) != 0) {
         switch(tag) {
           default:
-            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 8008: {
             OptionalInt32 = input.ReadInt32();
@@ -5193,7 +5215,7 @@ namespace ProtobufTestMessages.Proto2 {
             break;
           }
           case 8026: {
-            if (nestedMessage_ == null) {
+            if (!HasNestedMessage) {
               NestedMessage = new global::ProtobufTestMessages.Proto2.ForeignMessageProto2();
             }
             input.ReadMessage(NestedMessage);
@@ -5212,7 +5234,7 @@ namespace ProtobufTestMessages.Proto2 {
           }
           case 8090:
           case 8088: {
-            repeatedInt32_.AddEntriesFrom(ref input, _repeated_repeatedInt32_codec);
+            repeatedInt32_.AddEntriesFrom(input, _repeated_repeatedInt32_codec);
             break;
           }
         }
@@ -5223,7 +5245,7 @@ namespace ProtobufTestMessages.Proto2 {
     /// <summary>Container for nested types declared in the UnknownToTestAllTypes message type.</summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static partial class Types {
-      public sealed partial class OptionalGroup : pb::IMessage<OptionalGroup>, pb::IBufferMessage {
+      public sealed partial class OptionalGroup : pb::IMessage<OptionalGroup> {
         private static readonly pb::MessageParser<OptionalGroup> _parser = new pb::MessageParser<OptionalGroup>(() => new OptionalGroup());
         private pb::UnknownFieldSet _unknownFields;
         private int _hasBits0;
@@ -5351,18 +5373,13 @@ namespace ProtobufTestMessages.Proto2 {
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
         public void MergeFrom(pb::CodedInputStream input) {
-          input.ReadRawMessage(this);
-        }
-
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
           uint tag;
           while ((tag = input.ReadTag()) != 0) {
             switch(tag) {
               case 8036:
                 return;
               default:
-                _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+                _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
                 break;
               case 8: {
                 A = input.ReadInt32();

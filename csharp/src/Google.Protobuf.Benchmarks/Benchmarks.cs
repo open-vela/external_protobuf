@@ -38,7 +38,7 @@ namespace Benchmarks {
 
   }
   #region Messages
-  public sealed partial class BenchmarkDataset : pb::IMessage<BenchmarkDataset>, pb::IBufferMessage {
+  public sealed partial class BenchmarkDataset : pb::IMessage<BenchmarkDataset> {
     private static readonly pb::MessageParser<BenchmarkDataset> _parser = new pb::MessageParser<BenchmarkDataset>(() => new BenchmarkDataset());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -219,16 +219,11 @@ namespace Benchmarks {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void MergeFrom(pb::CodedInputStream input) {
-      input.ReadRawMessage(this);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
       uint tag;
       while ((tag = input.ReadTag()) != 0) {
         switch(tag) {
           default:
-            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 10: {
             Name = input.ReadString();
@@ -239,7 +234,7 @@ namespace Benchmarks {
             break;
           }
           case 26: {
-            payload_.AddEntriesFrom(ref input, _repeated_payload_codec);
+            payload_.AddEntriesFrom(input, _repeated_payload_codec);
             break;
           }
         }
