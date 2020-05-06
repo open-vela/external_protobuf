@@ -85,9 +85,9 @@ MapFieldGenerator::MapFieldGenerator(const FieldDescriptor* descriptor,
                                      const Options& options)
     : RepeatedFieldGenerator(descriptor, options) {
   const FieldDescriptor* key_descriptor =
-      descriptor->message_type()->map_key();
+      descriptor->message_type()->FindFieldByName("key");
   const FieldDescriptor* value_descriptor =
-      descriptor->message_type()->map_value();
+      descriptor->message_type()->FindFieldByName("value");
   value_field_generator_.reset(FieldGenerator::Make(value_descriptor, options));
 
   // Pull over some variables_ from the value.

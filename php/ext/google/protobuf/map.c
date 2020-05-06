@@ -516,8 +516,8 @@ bool map_done(MapIter *iter) {
 }
 
 const char *map_iter_key(MapIter *iter, int *len) {
-  *len = upb_strtable_iter_key(&iter->it).size;
-  return upb_strtable_iter_key(&iter->it).data;
+  *len = upb_strtable_iter_keylength(&iter->it);
+  return upb_strtable_iter_key(&iter->it);
 }
 
 upb_value map_iter_value(MapIter *iter, int *len) {
