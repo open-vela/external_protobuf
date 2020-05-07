@@ -304,21 +304,12 @@ namespace Google.Protobuf.Reflection
         /// <summary>
         /// The (possibly empty) set of custom options for this field.
         /// </summary>
-        [Obsolete("CustomOptions are obsolete. Use the GetOptions() method.")]
+        [Obsolete("CustomOptions are obsolete. Use GetOption")]
         public CustomOptions CustomOptions => new CustomOptions(Proto.Options?._extensions?.ValuesByNumber);
-
-        /// <summary>
-        /// The <c>FieldOptions</c>, defined in <c>descriptor.proto</c>.
-        /// If the options message is not present (i.e. there are no options), <c>null</c> is returned.
-        /// Custom options can be retrieved as extensions of the returned message.
-        /// NOTE: A defensive copy is created each time this property is retrieved.
-        /// </summary>
-        public FieldOptions GetOptions() => Proto.Options?.Clone();
 
         /// <summary>
         /// Gets a single value field option for this descriptor
         /// </summary>
-         [Obsolete("GetOption is obsolete. Use the GetOptions() method.")]
         public T GetOption<T>(Extension<FieldOptions, T> extension)
         {
             var value = Proto.Options.GetExtension(extension);
@@ -328,7 +319,6 @@ namespace Google.Protobuf.Reflection
         /// <summary>
         /// Gets a repeated value field option for this descriptor
         /// </summary>
-         [Obsolete("GetOption is obsolete. Use the GetOptions() method.")]
         public RepeatedField<T> GetOption<T>(RepeatedExtension<FieldOptions, T> extension)
         {
             return Proto.Options.GetExtension(extension).Clone();
@@ -404,7 +394,7 @@ namespace Google.Protobuf.Reflection
 
             File.DescriptorPool.AddFieldByNumber(this);
 
-            if (ContainingType != null && ContainingType.Proto.HasOptions && ContainingType.Proto.Options.MessageSetWireFormat)
+            if (ContainingType != null && ContainingType.Proto.Options != null && ContainingType.Proto.Options.MessageSetWireFormat)
             {
                 throw new DescriptorValidationException(this, "MessageSet format is not supported.");
             }

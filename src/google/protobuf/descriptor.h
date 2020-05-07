@@ -487,6 +487,16 @@ class PROTOBUF_EXPORT Descriptor {
   // |*out_location| unchanged iff location information was not available.
   bool GetSourceLocation(SourceLocation* out_location) const;
 
+  // Maps --------------------------------------------------------------
+
+  // Returns the FieldDescriptor for the "key" field. If this isn't a map entry
+  // field, returns nullptr.
+  const FieldDescriptor* map_key() const;
+
+  // Returns the FieldDescriptor for the "value" field. If this isn't a map
+  // entry field, returns nullptr.
+  const FieldDescriptor* map_value() const;
+
  private:
   typedef MessageOptions OptionsType;
 
@@ -693,7 +703,7 @@ class PROTOBUF_EXPORT FieldDescriptor {
   // .proto file. Excludes singular proto3 fields that do not have a label.
   bool has_optional_keyword() const;
 
-  // Returns true if this field tracks presence, ie. does the message
+  // Returns true if this field tracks presence, ie. does the field
   // distinguish between "unset" and "present with default value."
   // This includes required, optional, and oneof fields. It excludes maps,
   // repeated fields, and singular proto3 fields without "optional".
@@ -1831,6 +1841,11 @@ class PROTOBUF_EXPORT DescriptorPool {
   // not a concern.  If both an underlay and a fallback database are present,
   // the underlay takes precedence.
   static DescriptorPool* internal_generated_pool();
+
+  // For internal use only:  Gets a non-const pointer to the generated
+  // descriptor database.
+  // Only used for testing.
+  static DescriptorDatabase* internal_generated_database();
 
   // For internal use only:  Changes the behavior of BuildFile() such that it
   // allows the file to make reference to message types declared in other files
