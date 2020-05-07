@@ -1341,6 +1341,10 @@ DescriptorPool* NewGeneratedPool() {
 
 }  // anonymous namespace
 
+DescriptorDatabase* DescriptorPool::internal_generated_database() {
+  return GeneratedDatabase();
+}
+
 DescriptorPool* DescriptorPool::internal_generated_pool() {
   static DescriptorPool* generated_pool =
       internal::OnShutdownDelete(NewGeneratedPool());
@@ -1718,6 +1722,18 @@ const EnumValueDescriptor* Descriptor::FindEnumValueByName(
   } else {
     return nullptr;
   }
+}
+
+const FieldDescriptor* Descriptor::map_key() const {
+  if (!options().map_entry()) return nullptr;
+  GOOGLE_DCHECK_EQ(field_count(), 2);
+  return field(0);
+}
+
+const FieldDescriptor* Descriptor::map_value() const {
+  if (!options().map_entry()) return nullptr;
+  GOOGLE_DCHECK_EQ(field_count(), 2);
+  return field(1);
 }
 
 const EnumValueDescriptor* EnumDescriptor::FindValueByName(
@@ -3510,7 +3526,7 @@ class DescriptorBuilder {
     return pool->enforce_weak_;
   }
   static inline bool get_is_placeholder(const Descriptor* descriptor) {
-    return descriptor->is_placeholder_;
+    return descriptor != nullptr && descriptor->is_placeholder_;
   }
   static inline void assert_mutex_held(const DescriptorPool* pool) {
     if (pool->mutex_ != nullptr) {
@@ -6222,8 +6238,8 @@ bool DescriptorBuilder::ValidateMapEntry(FieldDescriptor* field,
     return false;
   }
 
-  const FieldDescriptor* key = message->field(0);
-  const FieldDescriptor* value = message->field(1);
+  const FieldDescriptor* key = message->map_key();
+  const FieldDescriptor* value = message->map_value();
   if (key->label() != FieldDescriptor::LABEL_OPTIONAL || key->number() != 1 ||
       key->name() != "key") {
     return false;

@@ -999,6 +999,22 @@ TEST_F(DescriptorTest, IsMap) {
   EXPECT_TRUE(map_->message_type()->options().map_entry());
 }
 
+TEST_F(DescriptorTest, GetMap) {
+  const Descriptor* map_desc = map_->message_type();
+  const FieldDescriptor* map_key = map_desc->map_key();
+  ASSERT_TRUE(map_key != nullptr);
+  EXPECT_EQ(map_key->name(), "key");
+  EXPECT_EQ(map_key->number(), 1);
+
+  const FieldDescriptor* map_value = map_desc->map_value();
+  ASSERT_TRUE(map_value != nullptr);
+  EXPECT_EQ(map_value->name(), "value");
+  EXPECT_EQ(map_value->number(), 2);
+
+  EXPECT_EQ(message_->map_key(), nullptr);
+  EXPECT_EQ(message_->map_value(), nullptr);
+}
+
 TEST_F(DescriptorTest, FieldHasDefault) {
   EXPECT_FALSE(foo_->has_default_value());
   EXPECT_FALSE(bar_->has_default_value());
@@ -2576,11 +2592,9 @@ TEST_F(MiscTest, DefaultValues) {
   ASSERT_TRUE(message->field(10)->has_default_value());
 
   EXPECT_EQ(-1, message->field(0)->default_value_int32());
-  EXPECT_EQ(-PROTOBUF_ULONGLONG(1000000000000),
-            message->field(1)->default_value_int64());
+  EXPECT_EQ(int64{-1000000000000}, message->field(1)->default_value_int64());
   EXPECT_EQ(42, message->field(2)->default_value_uint32());
-  EXPECT_EQ(PROTOBUF_ULONGLONG(2000000000000),
-            message->field(3)->default_value_uint64());
+  EXPECT_EQ(uint64{2000000000000}, message->field(3)->default_value_uint64());
   EXPECT_EQ(4.5, message->field(4)->default_value_float());
   EXPECT_EQ(10e100, message->field(5)->default_value_double());
   EXPECT_TRUE(message->field(6)->default_value_bool());
@@ -2993,11 +3007,11 @@ TEST(CustomOptions, OptionLocations) {
       file->FindServiceByName("TestServiceWithCustomOptions");
   const MethodDescriptor* method = service->FindMethodByName("Foo");
 
-  EXPECT_EQ(PROTOBUF_LONGLONG(9876543210),
+  EXPECT_EQ(int64{9876543210},
             file->options().GetExtension(protobuf_unittest::file_opt1));
   EXPECT_EQ(-56,
             message->options().GetExtension(protobuf_unittest::message_opt1));
-  EXPECT_EQ(PROTOBUF_LONGLONG(8765432109),
+  EXPECT_EQ(int64{8765432109},
             field->options().GetExtension(protobuf_unittest::field_opt1));
   EXPECT_EQ(42,  // Check that we get the default for an option we don't set.
             field->options().GetExtension(protobuf_unittest::field_opt2));
@@ -3005,7 +3019,7 @@ TEST(CustomOptions, OptionLocations) {
   EXPECT_EQ(-789, enm->options().GetExtension(protobuf_unittest::enum_opt1));
   EXPECT_EQ(123, enm->value(1)->options().GetExtension(
                      protobuf_unittest::enum_value_opt1));
-  EXPECT_EQ(PROTOBUF_LONGLONG(-9876543210),
+  EXPECT_EQ(int64{-9876543210},
             service->options().GetExtension(protobuf_unittest::service_opt1));
   EXPECT_EQ(protobuf_unittest::METHODOPT1_VAL2,
             method->options().GetExtension(protobuf_unittest::method_opt1));
@@ -7184,9 +7198,9 @@ class SourceLocationTest : public testing::Test {
   DescriptorPool pool_;
 
   // tag number of all custom options in above test file
-  static const int kCustomOptionFieldNumber = 10101;
+  static constexpr int kCustomOptionFieldNumber = 10101;
   // tag number of field "a" in message type "A" in above test file
-  static const int kAFieldNumber = 1;
+  static constexpr int kAFieldNumber = 1;
 };
 
 // TODO(adonovan): implement support for option fields and for
