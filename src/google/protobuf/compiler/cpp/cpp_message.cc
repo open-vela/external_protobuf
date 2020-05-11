@@ -614,6 +614,7 @@ MessageGenerator::MessageGenerator(
     }
   }
 
+
   if (!has_bit_indices_.empty()) {
     field_generators_.SetHasBitIndices(has_bit_indices_);
   }

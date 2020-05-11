@@ -1689,9 +1689,7 @@ inline void Type::unsafe_arena_set_allocated_source_context(
   // @@protoc_insertion_point(field_unsafe_arena_set_allocated:google.protobuf.Type.source_context)
 }
 inline PROTOBUF_NAMESPACE_ID::SourceContext* Type::release_source_context() {
-  
-  PROTOBUF_NAMESPACE_ID::SourceContext* temp = source_context_;
-  source_context_ = nullptr;
+  auto temp = unsafe_arena_release_source_context();
   if (GetArena() != nullptr) {
     temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
   }
@@ -2416,9 +2414,7 @@ inline void Enum::unsafe_arena_set_allocated_source_context(
   // @@protoc_insertion_point(field_unsafe_arena_set_allocated:google.protobuf.Enum.source_context)
 }
 inline PROTOBUF_NAMESPACE_ID::SourceContext* Enum::release_source_context() {
-  
-  PROTOBUF_NAMESPACE_ID::SourceContext* temp = source_context_;
-  source_context_ = nullptr;
+  auto temp = unsafe_arena_release_source_context();
   if (GetArena() != nullptr) {
     temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
   }
@@ -2742,9 +2738,7 @@ inline void Option::unsafe_arena_set_allocated_value(
   // @@protoc_insertion_point(field_unsafe_arena_set_allocated:google.protobuf.Option.value)
 }
 inline PROTOBUF_NAMESPACE_ID::Any* Option::release_value() {
-  
-  PROTOBUF_NAMESPACE_ID::Any* temp = value_;
-  value_ = nullptr;
+  auto temp = unsafe_arena_release_value();
   if (GetArena() != nullptr) {
     temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
   }

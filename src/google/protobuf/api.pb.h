@@ -1063,9 +1063,7 @@ inline void Api::unsafe_arena_set_allocated_source_context(
   // @@protoc_insertion_point(field_unsafe_arena_set_allocated:google.protobuf.Api.source_context)
 }
 inline PROTOBUF_NAMESPACE_ID::SourceContext* Api::release_source_context() {
-  
-  PROTOBUF_NAMESPACE_ID::SourceContext* temp = source_context_;
-  source_context_ = nullptr;
+  auto temp = unsafe_arena_release_source_context();
   if (GetArena() != nullptr) {
     temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
   }
