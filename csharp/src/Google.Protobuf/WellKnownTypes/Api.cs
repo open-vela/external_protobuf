@@ -64,7 +64,7 @@ namespace Google.Protobuf.WellKnownTypes {
   /// this message itself. See https://cloud.google.com/apis/design/glossary for
   /// detailed terminology.
   /// </summary>
-  public sealed partial class Api : pb::IMessage<Api>, pb::IBufferMessage {
+  public sealed partial class Api : pb::IMessage<Api> {
     private static readonly pb::MessageParser<Api> _parser = new pb::MessageParser<Api>(() => new Api());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -341,27 +341,22 @@ namespace Google.Protobuf.WellKnownTypes {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void MergeFrom(pb::CodedInputStream input) {
-      input.ReadRawMessage(this);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
       uint tag;
       while ((tag = input.ReadTag()) != 0) {
         switch(tag) {
           default:
-            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 10: {
             Name = input.ReadString();
             break;
           }
           case 18: {
-            methods_.AddEntriesFrom(ref input, _repeated_methods_codec);
+            methods_.AddEntriesFrom(input, _repeated_methods_codec);
             break;
           }
           case 26: {
-            options_.AddEntriesFrom(ref input, _repeated_options_codec);
+            options_.AddEntriesFrom(input, _repeated_options_codec);
             break;
           }
           case 34: {
@@ -376,7 +371,7 @@ namespace Google.Protobuf.WellKnownTypes {
             break;
           }
           case 50: {
-            mixins_.AddEntriesFrom(ref input, _repeated_mixins_codec);
+            mixins_.AddEntriesFrom(input, _repeated_mixins_codec);
             break;
           }
           case 56: {
@@ -392,7 +387,7 @@ namespace Google.Protobuf.WellKnownTypes {
   /// <summary>
   /// Method represents a method of an API interface.
   /// </summary>
-  public sealed partial class Method : pb::IMessage<Method>, pb::IBufferMessage {
+  public sealed partial class Method : pb::IMessage<Method> {
     private static readonly pb::MessageParser<Method> _parser = new pb::MessageParser<Method>(() => new Method());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -662,16 +657,11 @@ namespace Google.Protobuf.WellKnownTypes {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void MergeFrom(pb::CodedInputStream input) {
-      input.ReadRawMessage(this);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
       uint tag;
       while ((tag = input.ReadTag()) != 0) {
         switch(tag) {
           default:
-            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 10: {
             Name = input.ReadString();
@@ -694,7 +684,7 @@ namespace Google.Protobuf.WellKnownTypes {
             break;
           }
           case 50: {
-            options_.AddEntriesFrom(ref input, _repeated_options_codec);
+            options_.AddEntriesFrom(input, _repeated_options_codec);
             break;
           }
           case 56: {
@@ -787,7 +777,7 @@ namespace Google.Protobuf.WellKnownTypes {
   ///       ...
   ///     }
   /// </summary>
-  public sealed partial class Mixin : pb::IMessage<Mixin>, pb::IBufferMessage {
+  public sealed partial class Mixin : pb::IMessage<Mixin> {
     private static readonly pb::MessageParser<Mixin> _parser = new pb::MessageParser<Mixin>(() => new Mixin());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -931,16 +921,11 @@ namespace Google.Protobuf.WellKnownTypes {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void MergeFrom(pb::CodedInputStream input) {
-      input.ReadRawMessage(this);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
       uint tag;
       while ((tag = input.ReadTag()) != 0) {
         switch(tag) {
           default:
-            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 10: {
             Name = input.ReadString();
