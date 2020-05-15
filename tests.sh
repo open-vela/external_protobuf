@@ -163,13 +163,10 @@ build_golang() {
 
   export GOPATH="$HOME/gocode"
   mkdir -p "$GOPATH/src/github.com/protocolbuffers"
-  mkdir -p "$GOPATH/src/github.com/golang"
   rm -f "$GOPATH/src/github.com/protocolbuffers/protobuf"
-  rm -f "$GOPATH/src/github.com/golang/protobuf"
   ln -s "`pwd`" "$GOPATH/src/github.com/protocolbuffers/protobuf"
   export PATH="$GOPATH/bin:$PATH"
-  (cd $GOPATH/src/github.com/golang && git clone https://github.com/golang/protobuf.git && cd protobuf && git checkout v1.3.5)
-  go install github.com/golang/protobuf/protoc-gen-go
+  go get github.com/golang/protobuf/protoc-gen-go
 
   cd examples && PROTO_PATH="-I../src -I." make gotest && cd ..
 }
@@ -446,13 +443,6 @@ build_ruby27() {
 
 build_javascript() {
   internal_build_cpp
-  NODE_VERSION=node-v12.16.3-darwin-x64
-  NODE_TGZ="$NODE_VERSION.tar.gz"
-  pushd /tmp
-  curl -OL https://nodejs.org/dist/v12.16.3/$NODE_TGZ
-  tar zxvf $NODE_TGZ
-  export PATH=$PATH:`pwd`/$NODE_VERSION/bin
-  popd
   cd js && npm install && npm test && cd ..
   cd conformance && make test_nodejs && cd ..
 }
@@ -625,7 +615,6 @@ build_php5.6_mac() {
   # Install PHP
   curl -s https://php-osx.liip.ch/install.sh | bash -s 5.6
   PHP_FOLDER=`find /usr/local -type d -name "php5-5.6*"`  # The folder name may change upon time
-  test ! -z "$PHP_FOLDER"
   export PATH="$PHP_FOLDER/bin:$PATH"
 
   # Install phpunit
@@ -701,8 +690,7 @@ build_php7.0_mac() {
   generate_php_test_proto
   # Install PHP
   curl -s https://php-osx.liip.ch/install.sh | bash -s 7.0
-  PHP_FOLDER=`find /usr/local -type d -name "php5-7.0*"`  # The folder name may change upon time
-  test ! -z "$PHP_FOLDER"
+  PHP_FOLDER=`find /usr/local -type d -name "php7-7.0*"`  # The folder name may change upon time
   export PATH="$PHP_FOLDER/bin:$PATH"
 
   # Install phpunit
@@ -722,14 +710,11 @@ build_php7.0_mac() {
   popd
 }
 
-build_php7.3_mac() {
+build_php7.4_mac() {
   generate_php_test_proto
   # Install PHP
-  # We can't test PHP 7.4 with these binaries yet:
-  #   https://github.com/liip/php-osx/issues/276
-  curl -s https://php-osx.liip.ch/install.sh | bash -s 7.3
-  PHP_FOLDER=`find /usr/local -type d -name "php5-7.3*"`  # The folder name may change upon time
-  test ! -z "$PHP_FOLDER"
+  curl -s https://php-osx.liip.ch/install.sh | bash -s 7.4
+  PHP_FOLDER=`find /usr/local -type d -name "php7-7.4*"`  # The folder name may change upon time
   export PATH="$PHP_FOLDER/bin:$PATH"
 
   # Install phpunit

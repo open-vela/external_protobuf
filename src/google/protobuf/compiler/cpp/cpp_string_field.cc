@@ -754,10 +754,6 @@ void StringOneofFieldGenerator::GenerateInlineAccessorDefinitions(
         "  if ($name$ != nullptr) {\n"
         "    set_has_$name$();\n"
         "    $field_member$.UnsafeSetDefault($name$);\n"
-        "    ::$proto_ns$::Arena* arena = GetArena();\n"
-        "    if (arena != nullptr) {\n"
-        "      arena->Own($name$);\n"
-        "    }\n"
         "  }\n"
         "  // @@protoc_insertion_point(field_set_allocated:$full_name$)\n"
         "}\n");
@@ -919,6 +915,15 @@ void StringOneofFieldGenerator::GenerateConstructorCode(
   format(
       "$ns$::_$classname$_default_instance_.$name$_.UnsafeSetDefault(\n"
       "    $default_variable$);\n");
+}
+
+void StringOneofFieldGenerator::GenerateDestructorCode(
+    io::Printer* printer) const {
+  Formatter format(printer, variables_);
+  format(
+      "if (_internal_has_$name$()) {\n"
+      "  $field_member$.DestroyNoArena($default_variable$);\n"
+      "}\n");
 }
 
 // ===================================================================
