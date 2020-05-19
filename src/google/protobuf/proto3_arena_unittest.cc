@@ -40,7 +40,6 @@
 #include <google/protobuf/text_format.h>
 #include <google/protobuf/testing/googletest.h>
 #include <gtest/gtest.h>
-#include <google/protobuf/stubs/strutil.h>
 
 using proto3_arena_unittest::TestAllTypes;
 
