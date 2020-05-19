@@ -239,19 +239,16 @@ class JsonFormatTest(JsonFormatBase):
     golden_dict = {
         'messageSet': {
             '[protobuf_unittest.'
-            'TestMessageSetExtension1.message_set_extension]': {
+            'TestMessageSetExtension1.messageSetExtension]': {
                 'i': 23,
             },
             '[protobuf_unittest.'
-            'TestMessageSetExtension2.message_set_extension]': {
+            'TestMessageSetExtension2.messageSetExtension]': {
                 'str': u'foo',
             },
         },
     }
     self.assertEqual(golden_dict, message_dict)
-    parsed_msg = unittest_mset_pb2.TestMessageSetContainer()
-    json_format.ParseDict(golden_dict, parsed_msg)
-    self.assertEqual(message, parsed_msg)
 
   def testExtensionSerializationDictMatchesProto3SpecMore(self):
     """See go/proto3-json-spec for spec.
@@ -282,9 +279,9 @@ class JsonFormatTest(JsonFormatBase):
         message
     )
     ext1_text = ('protobuf_unittest.TestMessageSetExtension1.'
-                 'message_set_extension')
+                 'messageSetExtension')
     ext2_text = ('protobuf_unittest.TestMessageSetExtension2.'
-                 'message_set_extension')
+                 'messageSetExtension')
     golden_text = ('{"messageSet": {'
                    '    "[%s]": {'
                    '        "i": 23'

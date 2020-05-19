@@ -37,11 +37,10 @@
 #ifndef GOOGLE_PROTOBUF_MAP_H__
 #define GOOGLE_PROTOBUF_MAP_H__
 
-#include <functional>
 #include <initializer_list>
 #include <iterator>
 #include <limits>  // To support Visual Studio 2008
-#include <map>
+#include <set>
 #include <type_traits>
 #include <utility>
 
@@ -181,10 +180,39 @@ class MapAllocator {
   Arena* const arena_;
 };
 
-template <typename T>
-using KeyForTree =
-    typename std::conditional<std::is_scalar<T>::value, T,
-                              std::reference_wrapper<const T>>::type;
+template <typename Key>
+struct DerefCompare {
+  bool operator()(const Key* n0, const Key* n1) const { return *n0 < *n1; }
+};
+
+// This class is used to get trivially destructible views of std::string and
+// MapKey, which are the only non-trivially destructible allowed key types.
+template <typename Key>
+class KeyView {
+ public:
+  KeyView(const Key& key) : key_(&key) {}  // NOLINT(runtime/explicit)
+
+  const Key& get() const { return *key_; }
+  // Allows implicit conversions to `const Key&`, which allows us to use the
+  // hasher defined for Key.
+  operator const Key&() const { return get(); }  // NOLINT(runtime/explicit)
+
+  bool operator==(const KeyView& other) const { return get() == other.get(); }
+  bool operator==(const Key& other) const { return get() == other; }
+  bool operator<(const KeyView& other) const { return get() < other.get(); }
+  bool operator<(const Key& other) const { return get() < other; }
+
+ private:
+  const Key* key_;
+};
+
+// Allows the InnerMap type to support skippable destruction.
+template <typename Key>
+struct GetTrivialKey {
+  using type =
+      typename std::conditional<std::is_trivially_destructible<Key>::value, Key,
+                                KeyView<Key>>::type;
+};
 
 }  // namespace internal
 
@@ -240,7 +268,7 @@ class Map {
   using const_reference = const value_type&;
 
   using size_type = size_t;
-  using hasher = std::hash<Key>;
+  using hasher = hash<Key>;
 
   Map() : arena_(nullptr), default_enum_value_(0) { Init(); }
   explicit Map(Arena* arena) : arena_(arena), default_enum_value_(0) { Init(); }
@@ -284,9 +312,31 @@ class Map {
   }
 
  private:
-  void Init() { elements_ = Arena::CreateMessage<InnerMap>(arena_, 0); }
+  void Init() { elements_ = Arena::CreateMessage<InnerMap>(arena_, 0u); }
 
-  using Allocator = internal::MapAllocator<void*>;
+  // InnerMap's key type is TrivialKey and its value type is value_type*.  We
+  // use a custom class here and for Node, below, to ensure that k_ is at offset
+  // 0, allowing safe conversion from pointer to Node to pointer to TrivialKey,
+  // and vice versa when appropriate.  We use GetTrivialKey to adapt Key to
+  // be a trivially destructible view if Key is not already trivially
+  // destructible.  This view points into the Key inside v_ once it's
+  // initialized.
+  using TrivialKey = typename internal::GetTrivialKey<Key>::type;
+  class KeyValuePair {
+   public:
+    KeyValuePair(const TrivialKey& k, value_type* v) : k_(k), v_(v) {}
+
+    const TrivialKey& key() const { return k_; }
+    TrivialKey& key() { return k_; }
+    value_type* value() const { return v_; }
+    value_type*& value() { return v_; }
+
+   private:
+    TrivialKey k_;
+    value_type* v_;
+  };
+
+  using Allocator = internal::MapAllocator<KeyValuePair>;
 
   // InnerMap is a generic hash-based map.  It doesn't contain any
   // protocol-buffer-specific logic.  It is a chaining hash map with the
@@ -317,11 +367,14 @@ class Map {
   // 8. Mutations to a map do not invalidate the map's iterators, pointers to
   //    elements, or references to elements.
   // 9. Except for erase(iterator), any non-const method can reorder iterators.
-  // 10. InnerMap uses KeyForTree<Key> when using the Tree representation, which
-  //    is either `Key`, if Key is a scalar, or `reference_wrapper<const Key>`
-  //    otherwise. This avoids unncessary copies of string keys, for example.
+  // 10. InnerMap's key is TrivialKey, which is either Key, if Key is trivially
+  //    destructible, or a trivially destructible view of Key otherwise. This
+  //    allows InnerMap's destructor to be skipped when InnerMap is
+  //    arena-allocated.
   class InnerMap : private hasher {
    public:
+    using Value = value_type*;
+
     explicit InnerMap(size_type n) : InnerMap(nullptr, n) {}
     InnerMap(Arena* arena, size_type n)
         : hasher(),
@@ -332,6 +385,10 @@ class Map {
       n = TableSize(n);
       table_ = CreateEmptyTable(n);
       num_buckets_ = index_of_first_non_null_ = n;
+      static_assert(
+          std::is_trivially_destructible<KeyValuePair>::value,
+          "We require KeyValuePair to be trivially destructible so that we can "
+          "skip InnerMap's destructor when it's arena allocated.");
     }
 
     ~InnerMap() {
@@ -346,24 +403,26 @@ class Map {
 
     // Linked-list nodes, as one would expect for a chaining hash table.
     struct Node {
-      value_type kv;
+      KeyValuePair kv;
       Node* next;
     };
 
-    // Trees. The payload type is a copy of Key, so that we can query the tree
-    // with Keys that are not in any particular data structure.
-    // The value is a void* pointing to Node. We use void* instead of Node* to
-    // avoid code bloat. That way there is only one instantiation of the tree
-    // class per key type.
-    using TreeAllocator = typename Allocator::template rebind<
-        std::pair<const internal::KeyForTree<Key>, void*>>::other;
-    using Tree = std::map<internal::KeyForTree<Key>, void*, std::less<Key>,
-                          TreeAllocator>;
-    using TreeIterator = typename Tree::iterator;
-
-    static Node* NodeFromTreeIterator(TreeIterator it) {
-      return static_cast<Node*>(it->second);
+    // This is safe only if the given pointer is known to point to a Key that is
+    // part of a Node.
+    static Node* NodePtrFromKeyPtr(TrivialKey* k) {
+      return reinterpret_cast<Node*>(k);
     }
+
+    static TrivialKey* KeyPtrFromNodePtr(Node* node) { return &node->kv.key(); }
+
+    // Trees.  The payload type is pointer to Key, so that we can query the tree
+    // with Keys that are not in any particular data structure.  When we insert,
+    // though, the pointer is always pointing to a Key that is inside a Node.
+    using KeyPtrAllocator =
+        typename Allocator::template rebind<TrivialKey*>::other;
+    using Tree = std::set<TrivialKey*, internal::DerefCompare<TrivialKey>,
+                          KeyPtrAllocator>;
+    using TreeIterator = typename Tree::iterator;
 
     // iterator and const_iterator are instantiations of iterator_base.
     template <typename KeyValueType>
@@ -396,7 +455,7 @@ class Map {
           : node_(n), m_(m), bucket_index_(index) {}
 
       iterator_base(TreeIterator tree_it, const InnerMap* m, size_type index)
-          : node_(NodeFromTreeIterator(tree_it)), m_(m), bucket_index_(index) {
+          : node_(NodePtrFromKeyPtr(*tree_it)), m_(m), bucket_index_(index) {
         // Invariant: iterators that use buckets with trees have an even
         // bucket_index_.
         GOOGLE_DCHECK_EQ(bucket_index_ % 2, 0u);
@@ -416,7 +475,7 @@ class Map {
           } else if (m_->TableEntryIsTree(bucket_index_)) {
             Tree* tree = static_cast<Tree*>(m_->table_[bucket_index_]);
             GOOGLE_DCHECK(!tree->empty());
-            node_ = NodeFromTreeIterator(tree->begin());
+            node_ = NodePtrFromKeyPtr(*tree->begin());
             break;
           }
         }
@@ -444,7 +503,7 @@ class Map {
             if (++tree_it == tree->end()) {
               SearchFrom(bucket_index_ + 2);
             } else {
-              node_ = NodeFromTreeIterator(tree_it);
+              node_ = NodePtrFromKeyPtr(*tree_it);
             }
           }
         } else {
@@ -482,8 +541,8 @@ class Map {
         // Well, bucket_index_ still might be correct, but probably
         // not.  Revalidate just to be sure.  This case is rare enough that we
         // don't worry about potential optimizations, such as having a custom
-        // find-like method that compares Node* instead of the key.
-        iterator_base i(m_->find(node_->kv.first, it));
+        // find-like method that compares Node* instead of TrivialKey.
+        iterator_base i(m_->find(*KeyPtrFromNodePtr(node_), it));
         bucket_index_ = i.bucket_index_;
         return m_->TableEntryIsList(bucket_index_);
       }
@@ -494,8 +553,8 @@ class Map {
     };
 
    public:
-    using iterator = iterator_base<value_type>;
-    using const_iterator = iterator_base<const value_type>;
+    using iterator = iterator_base<KeyValuePair>;
+    using const_iterator = iterator_base<const KeyValuePair>;
 
     iterator begin() { return iterator(this); }
     iterator end() { return iterator(); }
@@ -518,7 +577,7 @@ class Map {
           table_[b] = table_[b + 1] = nullptr;
           typename Tree::iterator tree_it = tree->begin();
           do {
-            Node* node = NodeFromTreeIterator(tree_it);
+            Node* node = NodePtrFromKeyPtr(*tree_it);
             typename Tree::iterator next = tree_it;
             ++next;
             tree->erase(tree_it);
@@ -541,13 +600,31 @@ class Map {
     size_type size() const { return num_elements_; }
     bool empty() const { return size() == 0; }
 
-    iterator find(const Key& k) { return iterator(FindHelper(k).first); }
-    const_iterator find(const Key& k) const { return find(k, nullptr); }
-    bool contains(const Key& k) const { return find(k) != end(); }
+    iterator find(const TrivialKey& k) { return iterator(FindHelper(k).first); }
+    const_iterator find(const TrivialKey& k) const { return find(k, nullptr); }
+    bool contains(const TrivialKey& k) const { return find(k) != end(); }
 
-    // Insert the key into the map, if not present. In that case, the value will
-    // be value initialized.
-    std::pair<iterator, bool> insert(const Key& k) {
+    // In traditional C++ style, this performs "insert if not present."
+    std::pair<iterator, bool> insert(const KeyValuePair& kv) {
+      std::pair<const_iterator, size_type> p = FindHelper(kv.key());
+      // Case 1: key was already present.
+      if (p.first.node_ != nullptr)
+        return std::make_pair(iterator(p.first), false);
+      // Case 2: insert.
+      if (ResizeIfLoadIsOutOfRange(num_elements_ + 1)) {
+        p = FindHelper(kv.key());
+      }
+      const size_type b = p.second;  // bucket number
+      Node* node = Alloc<Node>(1);
+      alloc_.construct(&node->kv, kv);
+      iterator result = InsertUnique(b, node);
+      ++num_elements_;
+      return std::make_pair(result, true);
+    }
+
+    // The same, but if an insertion is necessary then the value portion of the
+    // inserted key-value pair is left uninitialized.
+    std::pair<iterator, bool> insert(const TrivialKey& k) {
       std::pair<const_iterator, size_type> p = FindHelper(k);
       // Case 1: key was already present.
       if (p.first.node_ != nullptr)
@@ -557,22 +634,21 @@ class Map {
         p = FindHelper(k);
       }
       const size_type b = p.second;  // bucket number
-      Node* node;
-      if (alloc_.arena() == nullptr) {
-        node = new Node{value_type(k), nullptr};
-      } else {
-        node = Alloc<Node>(1);
-        Arena::CreateInArenaStorage(const_cast<Key*>(&node->kv.first),
-                                    alloc_.arena(), k);
-        Arena::CreateInArenaStorage(&node->kv.second, alloc_.arena());
-      }
-
+      Node* node = Alloc<Node>(1);
+      using KeyAllocator =
+          typename Allocator::template rebind<TrivialKey>::other;
+      KeyAllocator(alloc_).construct(&node->kv.key(), k);
       iterator result = InsertUnique(b, node);
       ++num_elements_;
       return std::make_pair(result, true);
     }
 
-    value_type& operator[](const Key& k) { return *insert(k).first; }
+    // Returns iterator so that outer map can update the TrivialKey to point to
+    // the Key inside value_type in case TrivialKey is a view type.
+    iterator operator[](const TrivialKey& k) {
+      KeyValuePair kv(k, Value());
+      return insert(kv).first;
+    }
 
     void erase(iterator it) {
       GOOGLE_DCHECK_EQ(it.m_, this);
@@ -588,7 +664,7 @@ class Map {
       } else {
         GOOGLE_DCHECK(TableEntryIsTree(b));
         Tree* tree = static_cast<Tree*>(table_[b]);
-        tree->erase(tree_it);
+        tree->erase(*tree_it);
         if (tree->empty()) {
           // Force b to be the minimum of b and b ^ 1.  This is important
           // only because we want index_of_first_non_null_ to be correct.
@@ -608,19 +684,19 @@ class Map {
     }
 
    private:
-    const_iterator find(const Key& k, TreeIterator* it) const {
+    const_iterator find(const TrivialKey& k, TreeIterator* it) const {
       return FindHelper(k, it).first;
     }
-    std::pair<const_iterator, size_type> FindHelper(const Key& k) const {
+    std::pair<const_iterator, size_type> FindHelper(const TrivialKey& k) const {
       return FindHelper(k, nullptr);
     }
-    std::pair<const_iterator, size_type> FindHelper(const Key& k,
+    std::pair<const_iterator, size_type> FindHelper(const TrivialKey& k,
                                                     TreeIterator* it) const {
       size_type b = BucketNumber(k);
       if (TableEntryIsNonEmptyList(b)) {
         Node* node = static_cast<Node*>(table_[b]);
         do {
-          if (IsMatch(node->kv.first, k)) {
+          if (IsMatch(*KeyPtrFromNodePtr(node), k)) {
             return std::make_pair(const_iterator(node, this, b), b);
           } else {
             node = node->next;
@@ -630,7 +706,8 @@ class Map {
         GOOGLE_DCHECK_EQ(table_[b], table_[b ^ 1]);
         b &= ~static_cast<size_t>(1);
         Tree* tree = static_cast<Tree*>(table_[b]);
-        auto tree_it = tree->find(k);
+        TrivialKey* key = const_cast<TrivialKey*>(&k);
+        typename Tree::iterator tree_it = tree->find(key);
         if (tree_it != tree->end()) {
           if (it != nullptr) *it = tree_it;
           return std::make_pair(const_iterator(tree_it, this, b), b);
@@ -651,7 +728,7 @@ class Map {
       // or whatever.  But it's probably cheap enough to recompute that here;
       // it's likely that we're inserting into an empty or short list.
       iterator result;
-      GOOGLE_DCHECK(find(node->kv.first) == end());
+      GOOGLE_DCHECK(find(*KeyPtrFromNodePtr(node)) == end());
       if (TableEntryIsEmpty(b)) {
         result = InsertUniqueInList(b, node);
       } else if (TableEntryIsNonEmptyList(b)) {
@@ -690,7 +767,7 @@ class Map {
       // Maintain the invariant that node->next is null for all Nodes in Trees.
       node->next = nullptr;
       return iterator(
-          static_cast<Tree*>(table_[b])->insert({node->kv.first, node}).first,
+          static_cast<Tree*>(table_[b])->insert(KeyPtrFromNodePtr(node)).first,
           this, b & ~static_cast<size_t>(1));
     }
 
@@ -758,7 +835,7 @@ class Map {
       Node* node = static_cast<Node*>(table[index]);
       do {
         Node* next = node->next;
-        InsertUnique(BucketNumber(node->kv.first), node);
+        InsertUnique(BucketNumber(*KeyPtrFromNodePtr(node)), node);
         node = next;
       } while (node != nullptr);
     }
@@ -767,8 +844,8 @@ class Map {
       Tree* tree = static_cast<Tree*>(table[index]);
       typename Tree::iterator tree_it = tree->begin();
       do {
-        InsertUnique(BucketNumber(tree_it->first),
-                     NodeFromTreeIterator(tree_it));
+        Node* node = NodePtrFromKeyPtr(*tree_it);
+        InsertUnique(BucketNumber(**tree_it), node);
       } while (++tree_it != tree->end());
       DestroyTree(tree);
     }
@@ -810,9 +887,15 @@ class Map {
 
     void TreeConvert(size_type b) {
       GOOGLE_DCHECK(!TableEntryIsTree(b) && !TableEntryIsTree(b ^ 1));
-      Tree* tree =
-          Arena::Create<Tree>(alloc_.arena(), typename Tree::key_compare(),
-                              typename Tree::allocator_type(alloc_));
+      typename Allocator::template rebind<Tree>::other tree_allocator(alloc_);
+      Tree* tree = tree_allocator.allocate(1);
+      // We want to use the three-arg form of construct, if it exists, but we
+      // create a temporary and use the two-arg construct that's known to exist.
+      // It's clunky, but the compiler should be able to generate more-or-less
+      // the same code.
+      tree_allocator.construct(
+          tree, Tree(typename Tree::key_compare(), KeyPtrAllocator(alloc_)));
+      // Now the tree is ready to use.
       size_type count = CopyListToTree(b, tree) + CopyListToTree(b ^ 1, tree);
       GOOGLE_DCHECK_EQ(count, tree->size());
       table_[b] = table_[b ^ 1] = static_cast<void*>(tree);
@@ -824,7 +907,7 @@ class Map {
       size_type count = 0;
       Node* node = static_cast<Node*>(table_[b]);
       while (node != nullptr) {
-        tree->insert({node->kv.first, node});
+        tree->insert(KeyPtrFromNodePtr(node));
         ++count;
         Node* next = node->next;
         node->next = nullptr;
@@ -848,12 +931,14 @@ class Map {
       return count >= kMaxLength;
     }
 
-    size_type BucketNumber(const Key& k) const {
+    size_type BucketNumber(const TrivialKey& k) const {
       size_type h = hash_function()(k);
       return (h + seed_) & (num_buckets_ - 1);
     }
 
-    bool IsMatch(const Key& k0, const Key& k1) const { return k0 == k1; }
+    bool IsMatch(const TrivialKey& k0, const TrivialKey& k1) const {
+      return k0 == k1;
+    }
 
     // Return a power of two no less than max(kMinTableSize, n).
     // Assumes either n < kMinTableSize or n is a power of two.
@@ -878,15 +963,14 @@ class Map {
     }
 
     void DestroyNode(Node* node) {
-      if (alloc_.arena() == nullptr) {
-        delete node;
-      }
+      alloc_.destroy(&node->kv);
+      Dealloc<Node>(node, 1);
     }
 
     void DestroyTree(Tree* tree) {
-      if (alloc_.arena() == nullptr) {
-        delete tree;
-      }
+      typename Allocator::template rebind<Tree>::other tree_allocator(alloc_);
+      tree_allocator.destroy(tree);
+      tree_allocator.deallocate(tree, 1);
     }
 
     void** CreateEmptyTable(size_type n) {
@@ -937,7 +1021,7 @@ class Map {
     const_iterator() {}
     explicit const_iterator(const InnerIt& it) : it_(it) {}
 
-    const_reference operator*() const { return *it_; }
+    const_reference operator*() const { return *it_->value(); }
     const_pointer operator->() const { return &(operator*()); }
 
     const_iterator& operator++() {
@@ -970,7 +1054,7 @@ class Map {
     iterator() {}
     explicit iterator(const InnerIt& it) : it_(it) {}
 
-    reference operator*() const { return *it_; }
+    reference operator*() const { return *it_->value(); }
     pointer operator->() const { return &(operator*()); }
 
     iterator& operator++() {
@@ -1013,7 +1097,18 @@ class Map {
   bool empty() const { return size() == 0; }
 
   // Element access
-  T& operator[](const key_type& key) { return (*elements_)[key].second; }
+  T& operator[](const key_type& key) {
+    typename InnerMap::iterator it = (*elements_)[key];
+    value_type** value = &it->value();
+    if (*value == nullptr) {
+      *value = CreateValueTypeInternal(key);
+      // We need to update the key in case it's a view type.
+      it->key() = (*value)->first;
+      internal::MapValueInitializer<is_proto_enum<T>::value, T>::Initialize(
+          (*value)->second, default_enum_value_);
+    }
+    return (*value)->second;
+  }
   const T& at(const key_type& key) const {
     const_iterator it = find(key);
     GOOGLE_CHECK(it != end()) << "key not found: " << key;
@@ -1061,7 +1156,9 @@ class Map {
     std::pair<typename InnerMap::iterator, bool> p =
         elements_->insert(value.first);
     if (p.second) {
-      p.first->second = value.second;
+      p.first->value() = CreateValueTypeInternal(value);
+      // We need to update the key in case it's a view type.
+      p.first->key() = p.first->value()->first;
     }
     return std::pair<iterator, bool>(iterator(p.first), p.second);
   }
@@ -1089,8 +1186,12 @@ class Map {
     }
   }
   iterator erase(iterator pos) {
+    value_type* value = pos.operator->();
     iterator i = pos++;
     elements_->erase(i.it_);
+    // Note: we need to delete the value after erasing from the inner map
+    // because the inner map's key may be a view of the value's key.
+    if (arena_ == nullptr) delete value;
     return pos;
   }
   void erase(iterator first, iterator last) {
@@ -1131,6 +1232,32 @@ class Map {
   // Set default enum value only for proto2 map field whose value is enum type.
   void SetDefaultEnumValue(int default_enum_value) {
     default_enum_value_ = default_enum_value;
+  }
+
+  value_type* CreateValueTypeInternal(const Key& key) {
+    if (arena_ == nullptr) {
+      return new value_type(key);
+    } else {
+      value_type* value = reinterpret_cast<value_type*>(
+          Arena::CreateArray<uint8>(arena_, sizeof(value_type)));
+      Arena::CreateInArenaStorage(const_cast<Key*>(&value->first), arena_, key);
+      Arena::CreateInArenaStorage(&value->second, arena_);
+      return value;
+    }
+  }
+
+  value_type* CreateValueTypeInternal(const value_type& value) {
+    if (arena_ == nullptr) {
+      return new value_type(value);
+    } else {
+      value_type* p = reinterpret_cast<value_type*>(
+          Arena::CreateArray<uint8>(arena_, sizeof(value_type)));
+      Arena::CreateInArenaStorage(const_cast<Key*>(&p->first), arena_,
+                                  value.first);
+      Arena::CreateInArenaStorage(&p->second, arena_);
+      p->second = value.second;
+      return p;
+    }
   }
 
   Arena* arena_;
