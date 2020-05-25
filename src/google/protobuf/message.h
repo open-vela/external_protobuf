@@ -912,6 +912,22 @@ class PROTOBUF_EXPORT Reflection final {
   const internal::RepeatedFieldAccessor* RepeatedFieldAccessor(
       const FieldDescriptor* field) const;
 
+  // Lists all fields of the message which are currently set, except for unknown
+  // fields and stripped fields. See ListFields for details.
+  void ListFieldsOmitStripped(
+      const Message& message,
+      std::vector<const FieldDescriptor*>* output) const;
+
+  bool IsMessageStripped(const Descriptor* descriptor) const {
+    return schema_.IsMessageStripped(descriptor);
+  }
+
+  friend class TextFormat;
+
+  void ListFieldsMayFailOnStripped(
+      const Message& message, bool should_fail,
+      std::vector<const FieldDescriptor*>* output) const;
+
   const Descriptor* const descriptor_;
   const internal::ReflectionSchema schema_;
   const DescriptorPool* const descriptor_pool_;
@@ -1011,8 +1027,10 @@ class PROTOBUF_EXPORT Reflection final {
                              const OneofDescriptor* oneof_descriptor) const;
   inline uint32* MutableOneofCase(
       Message* message, const OneofDescriptor* oneof_descriptor) const;
-  inline const internal::ExtensionSet& GetExtensionSet(
-      const Message& message) const;
+  inline bool HasExtensionSet(const Message& message) const {
+    return schema_.HasExtensionSet();
+  }
+  const internal::ExtensionSet& GetExtensionSet(const Message& message) const;
   internal::ExtensionSet* MutableExtensionSet(Message* message) const;
   inline Arena* GetArena(Message* message) const;
 
