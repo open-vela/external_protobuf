@@ -34,7 +34,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Security;
 
 namespace Google.Protobuf.Collections
 {
@@ -96,41 +95,22 @@ namespace Google.Protobuf.Collections
         /// <param name="codec">The codec to use in order to read each entry.</param>
         public void AddEntriesFrom(CodedInputStream input, FieldCodec<T> codec)
         {
-            ParseContext.Initialize(input, out ParseContext ctx);
-            try
-            {
-                AddEntriesFrom(ref ctx, codec);
-            }
-            finally
-            {
-                ctx.CopyStateTo(input);
-            }
-        }
-
-        /// <summary>
-        /// Adds the entries from the given parse context, decoding them with the specified codec.
-        /// </summary>
-        /// <param name="ctx">The input to read from.</param>
-        /// <param name="codec">The codec to use in order to read each entry.</param>
-        [SecuritySafeCritical]
-        public void AddEntriesFrom(ref ParseContext ctx, FieldCodec<T> codec)
-        {
             // TODO: Inline some of the Add code, so we can avoid checking the size on every
             // iteration.
-            uint tag = ctx.state.lastTag;
+            uint tag = input.LastTag;
             var reader = codec.ValueReader;
             // Non-nullable value types can be packed or not.
             if (FieldCodec<T>.IsPackedRepeatedField(tag))
             {
-                int length = ctx.ReadLength();
+                int length = input.ReadLength();
                 if (length > 0)
                 {
-                    int oldLimit = SegmentedBufferHelper.PushLimit(ref ctx.state, length);
-                    while (!SegmentedBufferHelper.IsReachedLimit(ref ctx.state))
+                    int oldLimit = input.PushLimit(length);
+                    while (!input.ReachedLimit)
                     {
-                        Add(reader(ref ctx));
+                        Add(reader(input));
                     }
-                    SegmentedBufferHelper.PopLimit(ref ctx.state, oldLimit);
+                    input.PopLimit(oldLimit);
                 }
                 // Empty packed field. Odd, but valid - just ignore.
             }
@@ -139,8 +119,8 @@ namespace Google.Protobuf.Collections
                 // Not packed... (possibly not packable)
                 do
                 {
-                    Add(reader(ref ctx));
-                } while (ParsingPrimitives.MaybeConsumeTag(ref ctx.buffer, ref ctx.state, tag));
+                    Add(reader(input));
+                } while (input.MaybeConsumeTag(tag));
             }
         }
 

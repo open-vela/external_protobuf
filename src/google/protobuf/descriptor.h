@@ -63,7 +63,6 @@
 #include <google/protobuf/stubs/common.h>
 #include <google/protobuf/stubs/mutex.h>
 #include <google/protobuf/stubs/once.h>
-#include <google/protobuf/port.h>
 #include <google/protobuf/port_def.inc>
 
 // TYPE_BOOL is defined in the MacOS's ConditionalMacros.h.
@@ -1030,7 +1029,7 @@ class PROTOBUF_EXPORT EnumDescriptor {
   const EnumValueDescriptor* value(int index) const;
 
   // Looks up a value by name.  Returns nullptr if no such value exists.
-  const EnumValueDescriptor* FindValueByName(ConstStringParam name) const;
+  const EnumValueDescriptor* FindValueByName(const std::string& name) const;
   // Looks up a value by number.  Returns nullptr if no such value exists.  If
   // multiple values have this number, the first one defined is returned.
   const EnumValueDescriptor* FindValueByNumber(int number) const;
@@ -1842,11 +1841,6 @@ class PROTOBUF_EXPORT DescriptorPool {
   // not a concern.  If both an underlay and a fallback database are present,
   // the underlay takes precedence.
   static DescriptorPool* internal_generated_pool();
-
-  // For internal use only:  Gets a non-const pointer to the generated
-  // descriptor database.
-  // Only used for testing.
-  static DescriptorDatabase* internal_generated_database();
 
   // For internal use only:  Changes the behavior of BuildFile() such that it
   // allows the file to make reference to message types declared in other files

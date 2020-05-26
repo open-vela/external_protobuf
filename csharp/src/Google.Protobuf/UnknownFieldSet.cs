@@ -33,7 +33,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Security;
 using Google.Protobuf.Reflection;
 
 namespace Google.Protobuf
@@ -177,47 +176,47 @@ namespace Google.Protobuf
             fields[number] = field;
             return this;
         }
-        
+
         /// <summary>
-        /// Parse a single field from <paramref name="ctx"/> and merge it
+        /// Parse a single field from <paramref name="input"/> and merge it
         /// into this set.
         /// </summary>
-        /// <param name="ctx">The parse context from which to read the field</param>
+        /// <param name="input">The coded input stream containing the field</param>
         /// <returns>false if the tag is an "end group" tag, true otherwise</returns>
-        private bool MergeFieldFrom(ref ParseContext ctx)
+        private bool MergeFieldFrom(CodedInputStream input)
         {
-            uint tag = ctx.LastTag;
+            uint tag = input.LastTag;
             int number = WireFormat.GetTagFieldNumber(tag);
             switch (WireFormat.GetTagWireType(tag))
             {
                 case WireFormat.WireType.Varint:
                     {
-                        ulong uint64 = ctx.ReadUInt64();
+                        ulong uint64 = input.ReadUInt64();
                         GetOrAddField(number).AddVarint(uint64);
                         return true;
                     }
                 case WireFormat.WireType.Fixed32:
                     {
-                        uint uint32 = ctx.ReadFixed32();
+                        uint uint32 = input.ReadFixed32();
                         GetOrAddField(number).AddFixed32(uint32);
                         return true;
                     }
                 case WireFormat.WireType.Fixed64:
                     {
-                        ulong uint64 = ctx.ReadFixed64();
+                        ulong uint64 = input.ReadFixed64();
                         GetOrAddField(number).AddFixed64(uint64);
                         return true;
                     }
                 case WireFormat.WireType.LengthDelimited:
                     {
-                        ByteString bytes = ctx.ReadBytes();
+                        ByteString bytes = input.ReadBytes();
                         GetOrAddField(number).AddLengthDelimited(bytes);
                         return true;
                     }
                 case WireFormat.WireType.StartGroup:
                     {
                         UnknownFieldSet set = new UnknownFieldSet();
-                        ParsingPrimitivesMessages.ReadGroup(ref ctx, number, set);
+                        input.ReadGroup(number, set);
                         GetOrAddField(number).AddGroup(set);
                         return true;
                     }
@@ -230,16 +229,16 @@ namespace Google.Protobuf
             }
         }
 
-        internal void MergeGroupFrom(ref ParseContext ctx)
+        internal void MergeGroupFrom(CodedInputStream input)
         {
             while (true)
             {
-                uint tag = ctx.ReadTag();
+                uint tag = input.ReadTag();
                 if (tag == 0)
                 {
                     break;
                 }
-                if (!MergeFieldFrom(ref ctx))
+                if (!MergeFieldFrom(input))
                 {
                     break;
                 }
@@ -258,40 +257,16 @@ namespace Google.Protobuf
         public static UnknownFieldSet MergeFieldFrom(UnknownFieldSet unknownFields,
                                                      CodedInputStream input)
         {
-            ParseContext.Initialize(input, out ParseContext ctx);
-            try
+            if (input.DiscardUnknownFields)
             {
-                return MergeFieldFrom(unknownFields, ref ctx);
-            }
-            finally
-            {
-                ctx.CopyStateTo(input);
-            }
-        }
-
-        /// <summary>
-        /// Create a new UnknownFieldSet if unknownFields is null.
-        /// Parse a single field from <paramref name="ctx"/> and merge it
-        /// into unknownFields. If <paramref name="ctx"/> is configured to discard unknown fields,
-        /// <paramref name="unknownFields"/> will be returned as-is and the field will be skipped.
-        /// </summary>
-        /// <param name="unknownFields">The UnknownFieldSet which need to be merged</param>
-        /// <param name="ctx">The parse context from which to read the field</param>
-        /// <returns>The merged UnknownFieldSet</returns>
-        [SecuritySafeCritical]
-        public static UnknownFieldSet MergeFieldFrom(UnknownFieldSet unknownFields,
-                                                     ref ParseContext ctx)
-        {
-            if (ctx.DiscardUnknownFields)
-            {
-                ParsingPrimitivesMessages.SkipLastField(ref ctx.buffer, ref ctx.state);
+                input.SkipLastField();
                 return unknownFields;
             }
             if (unknownFields == null)
             {
                 unknownFields = new UnknownFieldSet();
             }
-            if (!unknownFields.MergeFieldFrom(ref ctx))
+            if (!unknownFields.MergeFieldFrom(input))
             {
                 throw new InvalidProtocolBufferException("Merge an unknown field of end-group tag, indicating that the corresponding start-group was missing."); // match the old code-gen
             }
