@@ -53,7 +53,7 @@ PROTOBUF_NAMESPACE_CLOSE
 struct PROTOC_EXPORT TableStruct_google_2fprotobuf_2fcompiler_2fplugin_2eproto {
   static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTableField entries[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::PROTOBUF_NAMESPACE_ID::internal::AuxillaryParseTableField aux[]
+  static const ::PROTOBUF_NAMESPACE_ID::internal::AuxiliaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[4]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
@@ -106,7 +106,7 @@ inline const std::string& CodeGeneratorResponse_Feature_Name(T enum_t_value) {
     CodeGeneratorResponse_Feature_descriptor(), enum_t_value);
 }
 inline bool CodeGeneratorResponse_Feature_Parse(
-    const std::string& name, CodeGeneratorResponse_Feature* value) {
+    ::PROTOBUF_NAMESPACE_ID::ConstStringParam name, CodeGeneratorResponse_Feature* value) {
   return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<CodeGeneratorResponse_Feature>(
     CodeGeneratorResponse_Feature_descriptor(), name, value);
 }
@@ -924,7 +924,7 @@ class PROTOC_EXPORT CodeGeneratorResponse PROTOBUF_FINAL :
       "Incorrect type passed to function Feature_Name.");
     return CodeGeneratorResponse_Feature_Name(enum_t_value);
   }
-  static inline bool Feature_Parse(const std::string& name,
+  static inline bool Feature_Parse(::PROTOBUF_NAMESPACE_ID::ConstStringParam name,
       Feature* value) {
     return CodeGeneratorResponse_Feature_Parse(name, value);
   }
@@ -1441,7 +1441,9 @@ inline void CodeGeneratorRequest::unsafe_arena_set_allocated_compiler_version(
   // @@protoc_insertion_point(field_unsafe_arena_set_allocated:google.protobuf.compiler.CodeGeneratorRequest.compiler_version)
 }
 inline PROTOBUF_NAMESPACE_ID::compiler::Version* CodeGeneratorRequest::release_compiler_version() {
-  auto temp = unsafe_arena_release_compiler_version();
+  _has_bits_[0] &= ~0x00000002u;
+  PROTOBUF_NAMESPACE_ID::compiler::Version* temp = compiler_version_;
+  compiler_version_ = nullptr;
   if (GetArena() != nullptr) {
     temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
   }
