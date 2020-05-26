@@ -1,4 +1,4 @@
-;;; protobuf-mode.el --- major mode for editing protocol buffers.  -*- lexical-binding: t; -*-
+;;; protobuf-mode.el --- major mode for editing protocol buffers.
 
 ;; Author: Alexandre Vassalotti <alexandre@peadrop.com>
 ;; Created: 23-Apr-2009
