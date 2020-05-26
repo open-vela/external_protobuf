@@ -49,7 +49,7 @@ PROTOBUF_NAMESPACE_CLOSE
 struct PROTOBUF_EXPORT TableStruct_google_2fprotobuf_2fstruct_2eproto {
   static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTableField entries[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::PROTOBUF_NAMESPACE_ID::internal::AuxillaryParseTableField aux[]
+  static const ::PROTOBUF_NAMESPACE_ID::internal::AuxiliaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[4]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
@@ -100,7 +100,7 @@ inline const std::string& NullValue_Name(T enum_t_value) {
     NullValue_descriptor(), enum_t_value);
 }
 inline bool NullValue_Parse(
-    const std::string& name, NullValue* value) {
+    ::PROTOBUF_NAMESPACE_ID::ConstStringParam name, NullValue* value) {
   return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<NullValue>(
     NullValue_descriptor(), name, value);
 }
@@ -118,7 +118,7 @@ public:
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_MESSAGE,
     0 > SuperType;
   Struct_FieldsEntry_DoNotUse();
-  Struct_FieldsEntry_DoNotUse(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  explicit Struct_FieldsEntry_DoNotUse(::PROTOBUF_NAMESPACE_ID::Arena* arena);
   void MergeFrom(const Struct_FieldsEntry_DoNotUse& other);
   static const Struct_FieldsEntry_DoNotUse* internal_default_instance() { return reinterpret_cast<const Struct_FieldsEntry_DoNotUse*>(&_Struct_FieldsEntry_DoNotUse_default_instance_); }
   static bool ValidateKey(std::string* s) {
@@ -911,6 +911,10 @@ inline void Value::set_allocated_string_value(std::string* string_value) {
   if (string_value != nullptr) {
     set_has_string_value();
     kind_.string_value_.UnsafeSetDefault(string_value);
+    ::PROTOBUF_NAMESPACE_ID::Arena* arena = GetArena();
+    if (arena != nullptr) {
+      arena->Own(string_value);
+    }
   }
   // @@protoc_insertion_point(field_set_allocated:google.protobuf.Value.string_value)
 }

@@ -48,7 +48,7 @@ PROTOBUF_NAMESPACE_CLOSE
 struct PROTOBUF_EXPORT TableStruct_google_2fprotobuf_2ftype_2eproto {
   static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTableField entries[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::PROTOBUF_NAMESPACE_ID::internal::AuxillaryParseTableField aux[]
+  static const ::PROTOBUF_NAMESPACE_ID::internal::AuxiliaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[5]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
@@ -121,7 +121,7 @@ inline const std::string& Field_Kind_Name(T enum_t_value) {
     Field_Kind_descriptor(), enum_t_value);
 }
 inline bool Field_Kind_Parse(
-    const std::string& name, Field_Kind* value) {
+    ::PROTOBUF_NAMESPACE_ID::ConstStringParam name, Field_Kind* value) {
   return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<Field_Kind>(
     Field_Kind_descriptor(), name, value);
 }
@@ -148,7 +148,7 @@ inline const std::string& Field_Cardinality_Name(T enum_t_value) {
     Field_Cardinality_descriptor(), enum_t_value);
 }
 inline bool Field_Cardinality_Parse(
-    const std::string& name, Field_Cardinality* value) {
+    ::PROTOBUF_NAMESPACE_ID::ConstStringParam name, Field_Cardinality* value) {
   return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<Field_Cardinality>(
     Field_Cardinality_descriptor(), name, value);
 }
@@ -173,7 +173,7 @@ inline const std::string& Syntax_Name(T enum_t_value) {
     Syntax_descriptor(), enum_t_value);
 }
 inline bool Syntax_Parse(
-    const std::string& name, Syntax* value) {
+    ::PROTOBUF_NAMESPACE_ID::ConstStringParam name, Syntax* value) {
   return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<Syntax>(
     Syntax_descriptor(), name, value);
 }
@@ -598,7 +598,7 @@ class PROTOBUF_EXPORT Field PROTOBUF_FINAL :
       "Incorrect type passed to function Kind_Name.");
     return Field_Kind_Name(enum_t_value);
   }
-  static inline bool Kind_Parse(const std::string& name,
+  static inline bool Kind_Parse(::PROTOBUF_NAMESPACE_ID::ConstStringParam name,
       Kind* value) {
     return Field_Kind_Parse(name, value);
   }
@@ -632,7 +632,7 @@ class PROTOBUF_EXPORT Field PROTOBUF_FINAL :
       "Incorrect type passed to function Cardinality_Name.");
     return Field_Cardinality_Name(enum_t_value);
   }
-  static inline bool Cardinality_Parse(const std::string& name,
+  static inline bool Cardinality_Parse(::PROTOBUF_NAMESPACE_ID::ConstStringParam name,
       Cardinality* value) {
     return Field_Cardinality_Parse(name, value);
   }
@@ -1689,7 +1689,9 @@ inline void Type::unsafe_arena_set_allocated_source_context(
   // @@protoc_insertion_point(field_unsafe_arena_set_allocated:google.protobuf.Type.source_context)
 }
 inline PROTOBUF_NAMESPACE_ID::SourceContext* Type::release_source_context() {
-  auto temp = unsafe_arena_release_source_context();
+  
+  PROTOBUF_NAMESPACE_ID::SourceContext* temp = source_context_;
+  source_context_ = nullptr;
   if (GetArena() != nullptr) {
     temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
   }
@@ -2414,7 +2416,9 @@ inline void Enum::unsafe_arena_set_allocated_source_context(
   // @@protoc_insertion_point(field_unsafe_arena_set_allocated:google.protobuf.Enum.source_context)
 }
 inline PROTOBUF_NAMESPACE_ID::SourceContext* Enum::release_source_context() {
-  auto temp = unsafe_arena_release_source_context();
+  
+  PROTOBUF_NAMESPACE_ID::SourceContext* temp = source_context_;
+  source_context_ = nullptr;
   if (GetArena() != nullptr) {
     temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
   }
@@ -2738,7 +2742,9 @@ inline void Option::unsafe_arena_set_allocated_value(
   // @@protoc_insertion_point(field_unsafe_arena_set_allocated:google.protobuf.Option.value)
 }
 inline PROTOBUF_NAMESPACE_ID::Any* Option::release_value() {
-  auto temp = unsafe_arena_release_value();
+  
+  PROTOBUF_NAMESPACE_ID::Any* temp = value_;
+  value_ = nullptr;
   if (GetArena() != nullptr) {
     temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
   }

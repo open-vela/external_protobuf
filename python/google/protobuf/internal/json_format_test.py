@@ -239,16 +239,19 @@ class JsonFormatTest(JsonFormatBase):
     golden_dict = {
         'messageSet': {
             '[protobuf_unittest.'
-            'TestMessageSetExtension1.messageSetExtension]': {
+            'TestMessageSetExtension1.message_set_extension]': {
                 'i': 23,
             },
             '[protobuf_unittest.'
-            'TestMessageSetExtension2.messageSetExtension]': {
+            'TestMessageSetExtension2.message_set_extension]': {
                 'str': u'foo',
             },
         },
     }
     self.assertEqual(golden_dict, message_dict)
+    parsed_msg = unittest_mset_pb2.TestMessageSetContainer()
+    json_format.ParseDict(golden_dict, parsed_msg)
+    self.assertEqual(message, parsed_msg)
 
   def testExtensionSerializationDictMatchesProto3SpecMore(self):
     """See go/proto3-json-spec for spec.
@@ -279,9 +282,9 @@ class JsonFormatTest(JsonFormatBase):
         message
     )
     ext1_text = ('protobuf_unittest.TestMessageSetExtension1.'
-                 'messageSetExtension')
+                 'message_set_extension')
     ext2_text = ('protobuf_unittest.TestMessageSetExtension2.'
-                 'messageSetExtension')
+                 'message_set_extension')
     golden_text = ('{"messageSet": {'
                    '    "[%s]": {'
                    '        "i": 23'
@@ -1153,6 +1156,19 @@ class JsonFormatTest(JsonFormatBase):
         str(cm.exception),
         'Failed to parse any_value field: Can not find message descriptor by'
         ' type_url: type.googleapis.com/proto3.MessageType..')
+
+  def testParseDictUnknownValueType(self):
+    class UnknownClass(object):
+
+      def __str__(self):
+        return 'v'
+    message = json_format_proto3_pb2.TestValue()
+    self.assertRaisesRegexp(
+        json_format.ParseError,
+        r"Value v has unexpected type <class '.*\.UnknownClass'>.",
+        json_format.ParseDict,
+        {'value': UnknownClass()},
+        message)
 
   def testMessageToDict(self):
     message = json_format_proto3_pb2.TestMessage()
