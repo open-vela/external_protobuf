@@ -105,15 +105,9 @@ void RepeatedMessageFieldGenerator::GenerateParsingCode(io::Printer* printer, bo
 }
 
 void RepeatedMessageFieldGenerator::GenerateSerializationCode(io::Printer* printer) {
-  GenerateSerializationCode(printer, true);
-}
-
-void RepeatedMessageFieldGenerator::GenerateSerializationCode(io::Printer* printer, bool use_write_context) {
   printer->Print(
     variables_,
-    use_write_context
-    ? "$name$_.WriteTo(ref output, _repeated_$name$_codec);\n"
-    : "$name$_.WriteTo(output, _repeated_$name$_codec);\n");
+    "$name$_.WriteTo(output, _repeated_$name$_codec);\n");
 }
 
 void RepeatedMessageFieldGenerator::GenerateSerializedSizeCode(io::Printer* printer) {

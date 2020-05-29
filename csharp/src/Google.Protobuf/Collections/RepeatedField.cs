@@ -35,6 +35,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Security;
+using System.Threading;
 
 namespace Google.Protobuf.Collections
 {
@@ -126,9 +127,31 @@ namespace Google.Protobuf.Collections
                 if (length > 0)
                 {
                     int oldLimit = SegmentedBufferHelper.PushLimit(ref ctx.state, length);
-                    while (!SegmentedBufferHelper.IsReachedLimit(ref ctx.state))
+
+                    // If the content is fixed size then we can calculate the length
+                    // of the repeated field and pre-initialize the underlying collection.
+                    //
+                    // Check that the supplied length doesn't exceed the underlying buffer.
+                    // That prevents a malicious length from initializing a very large collection.
+                    if (codec.FixedSize > 0 && length % codec.FixedSize == 0 && IsDataAvailable(ref ctx, length))
                     {
-                        Add(reader(ref ctx));
+                        EnsureSize(count + (length / codec.FixedSize));
+
+                        while (!SegmentedBufferHelper.IsReachedLimit(ref ctx.state))
+                        {
+                            // Only FieldCodecs with a fixed size can reach here, and they are all known
+                            // types that don't allow the user to specify a custom reader action.
+                            // reader action will never return null.
+                            array[count++] = reader(ref ctx);
+                        }
+                    }
+                    else
+                    {
+                        // Content is variable size so add until we reach the limit.
+                        while (!SegmentedBufferHelper.IsReachedLimit(ref ctx.state))
+                        {
+                            Add(reader(ref ctx));
+                        }
                     }
                     SegmentedBufferHelper.PopLimit(ref ctx.state, oldLimit);
                 }
@@ -144,11 +167,29 @@ namespace Google.Protobuf.Collections
             }
         }
 
+        private bool IsDataAvailable(ref ParseContext ctx, int size)
+        {
+            // Data fits in remaining buffer
+            if (size <= ctx.state.bufferSize - ctx.state.bufferPos)
+            {
+                return true;
+            }
+
+            // Data fits in remaining source data.
+            // Note that this will never be true when reading from a stream as the total length is unknown.
+            if (size < ctx.state.segmentedBufferHelper.TotalLength - ctx.state.totalBytesRetired - ctx.state.bufferPos)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
         /// <summary>
         /// Calculates the size of this collection based on the given codec.
         /// </summary>
         /// <param name="codec">The codec to use when encoding each field.</param>
-        /// <returns>The number of bytes that would be written to an output by one of the <c>WriteTo</c> methods,
+        /// <returns>The number of bytes that would be written to a <see cref="CodedOutputStream"/> by <see cref="WriteTo"/>,
         /// using the same codec.</returns>
         public int CalculateSize(FieldCodec<T> codec)
         {
@@ -207,58 +248,6 @@ namespace Google.Protobuf.Collections
         /// <param name="codec">The codec to use when encoding each value.</param>
         public void WriteTo(CodedOutputStream output, FieldCodec<T> codec)
         {
-            WriteContext.Initialize(output, out WriteContext ctx);
-            try
-            {
-                WriteTo(ref ctx, codec);
-            }
-            finally
-            {
-                ctx.CopyStateTo(output);
-            }
-
-            //if (count == 0)
-            //{
-            //    return;
-            //}
-            //var writer = codec.ValueWriter;
-            //var tag = codec.Tag;
-            //if (codec.PackedRepeatedField)
-            //{
-            //    // Packed primitive type
-            //    int size = CalculatePackedDataSize(codec);
-            //    output.WriteTag(tag);
-            //    output.WriteLength(size);
-            //    for (int i = 0; i < count; i++)
-            //    {
-            //        writer(output, array[i]);
-            //    }
-            //}
-            //else
-            //{
-            //    // Not packed: a simple tag/value pair for each value.
-            //    // Can't use codec.WriteTagAndValue, as that omits default values.
-            //    for (int i = 0; i < count; i++)
-            //    {
-            //        output.WriteTag(tag);
-            //        writer(output, array[i]);
-            //        if (codec.EndTag != 0)
-            //        {
-            //            output.WriteTag(codec.EndTag);
-            //        }
-            //    }
-            //}
-        }
-
-        /// <summary>
-        /// Writes the contents of this collection to the given write context,
-        /// encoding each value using the specified codec.
-        /// </summary>
-        /// <param name="ctx">The write context to write to.</param>
-        /// <param name="codec">The codec to use when encoding each value.</param>
-        [SecuritySafeCritical]
-        public void WriteTo(ref WriteContext ctx, FieldCodec<T> codec)
-        {
             if (count == 0)
             {
                 return;
@@ -268,12 +257,12 @@ namespace Google.Protobuf.Collections
             if (codec.PackedRepeatedField)
             {
                 // Packed primitive type
-                int size = CalculatePackedDataSize(codec);
-                ctx.WriteTag(tag);
-                ctx.WriteLength(size);
+                uint size = (uint)CalculatePackedDataSize(codec);
+                output.WriteTag(tag);
+                output.WriteRawVarint32(size);
                 for (int i = 0; i < count; i++)
                 {
-                    writer(ref ctx, array[i]);
+                    writer(output, array[i]);
                 }
             }
             else
@@ -282,11 +271,11 @@ namespace Google.Protobuf.Collections
                 // Can't use codec.WriteTagAndValue, as that omits default values.
                 for (int i = 0; i < count; i++)
                 {
-                    ctx.WriteTag(tag);
-                    writer(ref ctx, array[i]);
+                    output.WriteTag(tag);
+                    writer(output, array[i]);
                     if (codec.EndTag != 0)
                     {
-                        ctx.WriteTag(codec.EndTag);
+                        output.WriteTag(codec.EndTag);
                     }
                 }
             }
