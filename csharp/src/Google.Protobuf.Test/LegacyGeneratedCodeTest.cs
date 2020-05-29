@@ -35,9 +35,7 @@ using System.Buffers;
 using pb = global::Google.Protobuf;
 using pbr = global::Google.Protobuf.Reflection;
 using NUnit.Framework;
-using System.IO;
-using System;
-using Google.Protobuf.Buffers;
+
 
 namespace Google.Protobuf
 {
@@ -48,14 +46,14 @@ namespace Google.Protobuf
         {
             var message = new ParseContextEnabledMessageB
             {
-                A = new LegacyGeneratedCodeMessageA
-                {
-                    Bb = new ParseContextEnabledMessageB { OptionalInt32 = 12345 }
-                },
-                OptionalInt32 = 6789
+              A = new LegacyGeneratedCodeMessageA
+              {
+                Bb = new ParseContextEnabledMessageB { OptionalInt32 = 12345 }
+              },
+              OptionalInt32 = 6789
             };
             var data = message.ToByteArray();
-
+            
             // when parsing started using CodedInputStream and a message with legacy generated code
             // is encountered somewhere in the parse tree, we still need to be able to use its
             // MergeFrom(CodedInputStream) method to parse correctly.
@@ -73,11 +71,11 @@ namespace Google.Protobuf
         {
             var message = new ParseContextEnabledMessageB
             {
-                A = new LegacyGeneratedCodeMessageA
-                {
-                    Bb = new ParseContextEnabledMessageB { OptionalInt32 = 12345 }
-                },
-                OptionalInt32 = 6789
+              A = new LegacyGeneratedCodeMessageA
+              {
+                Bb = new ParseContextEnabledMessageB { OptionalInt32 = 12345 }
+              },
+              OptionalInt32 = 6789
             };
             var data = message.ToByteArray();
 
@@ -88,63 +86,11 @@ namespace Google.Protobuf
             // code up to date.
             var exception = Assert.Throws<InvalidProtocolBufferException>(() =>
             {
-                ParseContext.Initialize(new ReadOnlySequence<byte>(data), out ParseContext parseCtx);
-                var parsed = new ParseContextEnabledMessageB();
-                ParsingPrimitivesMessages.ReadRawMessage(ref parseCtx, parsed);
+              ParseContext.Initialize(new ReadOnlySequence<byte>(data), out ParseContext parseCtx);
+              var parsed = new ParseContextEnabledMessageB();
+              ParsingPrimitivesMessages.ReadRawMessage(ref parseCtx, parsed);
             });
             Assert.AreEqual($"Message {typeof(LegacyGeneratedCodeMessageA).Name} doesn't provide the generated method that enables ParseContext-based parsing. You might need to regenerate the generated protobuf code.", exception.Message);
-        }
-
-        [Test]
-        public void IntermixingOfNewAndLegacyGeneratedCodeWorksWithCodedOutputStream()
-        {
-            // when serialization started using CodedOutputStream and a message with legacy generated code
-            // is encountered somewhere in the parse tree, we still need to be able to use its
-            // WriteTo(CodedOutputStream) method to serialize correctly.
-            var ms = new MemoryStream();
-            var codedOutput = new CodedOutputStream(ms);
-            var message = new ParseContextEnabledMessageB
-            {
-                A = new LegacyGeneratedCodeMessageA
-                {
-                    Bb = new ParseContextEnabledMessageB { OptionalInt32 = 12345 }
-                },
-                OptionalInt32 = 6789
-            };
-            message.WriteTo(codedOutput);
-            codedOutput.Flush();
-
-            var codedInput = new CodedInputStream(ms.ToArray());
-            var parsed = new ParseContextEnabledMessageB();
-            codedInput.ReadRawMessage(parsed);
-            Assert.IsTrue(codedInput.IsAtEnd);
-
-            Assert.AreEqual(12345, parsed.A.Bb.OptionalInt32);
-            Assert.AreEqual(6789, parsed.OptionalInt32);
-        }
-
-        [Test]
-        public void LegacyGeneratedCodeThrowsWithIBufferWriter()
-        {
-            // if serialization started using IBufferWriter and we don't have a CodedOutputStream
-            // instance at hand, we cannot fall back to the legacy WriteTo(CodedOutputStream)
-            // method and serializatin will fail. As a consequence, one can only use serialization
-            // to IBufferWriter if all the messages in the parsing tree have their generated
-            // code up to date.
-            var message = new ParseContextEnabledMessageB
-            {
-                A = new LegacyGeneratedCodeMessageA
-                {
-                    Bb = new ParseContextEnabledMessageB { OptionalInt32 = 12345 }
-                },
-                OptionalInt32 = 6789
-            };
-            var exception = Assert.Throws<InvalidProtocolBufferException>(() =>
-            {
-                WriteContext.Initialize(new ArrayBufferWriter<byte>(), out WriteContext writeCtx);
-                ((IBufferMessage)message).InternalWriteTo(ref writeCtx);
-            });
-            Assert.AreEqual($"Message {typeof(LegacyGeneratedCodeMessageA).Name} doesn't provide the generated method that enables WriteContext-based serialization. You might need to regenerate the generated protobuf code.", exception.Message);
         }
 
         // hand-modified version of a generated message that only provides the legacy
@@ -232,27 +178,18 @@ namespace Google.Protobuf
           }
 
           public void WriteTo(pb::CodedOutputStream output) {
-            output.WriteRawMessage(this);
-          }
-
-          void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output)
-          {
-            if (a_ != null)
-            {
+            if (a_ != null) {
               output.WriteRawTag(10);
               output.WriteMessage(A);
             }
-            if (OptionalInt32 != 0)
-            {
+            if (OptionalInt32 != 0) {
               output.WriteRawTag(16);
               output.WriteInt32(OptionalInt32);
             }
-            if (_unknownFields != null)
-            {
-              _unknownFields.WriteTo(ref output);
+            if (_unknownFields != null) {
+              _unknownFields.WriteTo(output);
             }
           }
-
           public int CalculateSize() {
             int size = 0;
             if (a_ != null) {
