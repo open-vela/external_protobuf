@@ -1,17 +1,14 @@
 #!/bin/bash
 
-cd $(dirname $0)
+VERSION=$2
 
-if [ "$1" = "--release"]; then
-  CFLAGS="-Wall"
-else
-  # To get debugging symbols in PHP itself, build PHP with:
-  #   $ ./configure --enable-debug CFLAGS='-g -O0'
-  CFLAGS="-g -O0 -Wall"
-fi
+export PATH=/usr/local/php-$VERSION/bin:$PATH
+export C_INCLUDE_PATH=/usr/local/php-$VERSION/include/php/main:/usr/local/php-$VERSION/include/php:$C_INCLUDE_PATH
+export CPLUS_INCLUDE_PATH=/usr/local/php-$VERSION/include/php/main:/usr/local/php-$VERSION/include/php:$CPLUS_INCLUDE_PATH
 
 pushd  ../ext/google/protobuf
 make clean || true
 set -e
-phpize && ./configure --with-php-config=$(which php-config) CFLAGS="$CFLAGS" && make
+# Add following in configure for debug: --enable-debug CFLAGS='-g -O0'
+phpize && ./configure CFLAGS='-g -O0 -Wall' && make
 popd

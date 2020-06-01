@@ -176,7 +176,7 @@ namespace Google.Protobuf.TestProtos {
   /// <summary>
   /// Tests maps.
   /// </summary>
-  public sealed partial class TestMap : pb::IMessage<TestMap>, pb::IBufferMessage {
+  public sealed partial class TestMap : pb::IMessage<TestMap> {
     private static readonly pb::MessageParser<TestMap> _parser = new pb::MessageParser<TestMap>(() => new TestMap());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -537,83 +537,78 @@ namespace Google.Protobuf.TestProtos {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void MergeFrom(pb::CodedInputStream input) {
-      input.ReadRawMessage(this);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
       uint tag;
       while ((tag = input.ReadTag()) != 0) {
         switch(tag) {
           default:
-            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 10: {
-            mapInt32Int32_.AddEntriesFrom(ref input, _map_mapInt32Int32_codec);
+            mapInt32Int32_.AddEntriesFrom(input, _map_mapInt32Int32_codec);
             break;
           }
           case 18: {
-            mapInt64Int64_.AddEntriesFrom(ref input, _map_mapInt64Int64_codec);
+            mapInt64Int64_.AddEntriesFrom(input, _map_mapInt64Int64_codec);
             break;
           }
           case 26: {
-            mapUint32Uint32_.AddEntriesFrom(ref input, _map_mapUint32Uint32_codec);
+            mapUint32Uint32_.AddEntriesFrom(input, _map_mapUint32Uint32_codec);
             break;
           }
           case 34: {
-            mapUint64Uint64_.AddEntriesFrom(ref input, _map_mapUint64Uint64_codec);
+            mapUint64Uint64_.AddEntriesFrom(input, _map_mapUint64Uint64_codec);
             break;
           }
           case 42: {
-            mapSint32Sint32_.AddEntriesFrom(ref input, _map_mapSint32Sint32_codec);
+            mapSint32Sint32_.AddEntriesFrom(input, _map_mapSint32Sint32_codec);
             break;
           }
           case 50: {
-            mapSint64Sint64_.AddEntriesFrom(ref input, _map_mapSint64Sint64_codec);
+            mapSint64Sint64_.AddEntriesFrom(input, _map_mapSint64Sint64_codec);
             break;
           }
           case 58: {
-            mapFixed32Fixed32_.AddEntriesFrom(ref input, _map_mapFixed32Fixed32_codec);
+            mapFixed32Fixed32_.AddEntriesFrom(input, _map_mapFixed32Fixed32_codec);
             break;
           }
           case 66: {
-            mapFixed64Fixed64_.AddEntriesFrom(ref input, _map_mapFixed64Fixed64_codec);
+            mapFixed64Fixed64_.AddEntriesFrom(input, _map_mapFixed64Fixed64_codec);
             break;
           }
           case 74: {
-            mapSfixed32Sfixed32_.AddEntriesFrom(ref input, _map_mapSfixed32Sfixed32_codec);
+            mapSfixed32Sfixed32_.AddEntriesFrom(input, _map_mapSfixed32Sfixed32_codec);
             break;
           }
           case 82: {
-            mapSfixed64Sfixed64_.AddEntriesFrom(ref input, _map_mapSfixed64Sfixed64_codec);
+            mapSfixed64Sfixed64_.AddEntriesFrom(input, _map_mapSfixed64Sfixed64_codec);
             break;
           }
           case 90: {
-            mapInt32Float_.AddEntriesFrom(ref input, _map_mapInt32Float_codec);
+            mapInt32Float_.AddEntriesFrom(input, _map_mapInt32Float_codec);
             break;
           }
           case 98: {
-            mapInt32Double_.AddEntriesFrom(ref input, _map_mapInt32Double_codec);
+            mapInt32Double_.AddEntriesFrom(input, _map_mapInt32Double_codec);
             break;
           }
           case 106: {
-            mapBoolBool_.AddEntriesFrom(ref input, _map_mapBoolBool_codec);
+            mapBoolBool_.AddEntriesFrom(input, _map_mapBoolBool_codec);
             break;
           }
           case 114: {
-            mapStringString_.AddEntriesFrom(ref input, _map_mapStringString_codec);
+            mapStringString_.AddEntriesFrom(input, _map_mapStringString_codec);
             break;
           }
           case 122: {
-            mapInt32Bytes_.AddEntriesFrom(ref input, _map_mapInt32Bytes_codec);
+            mapInt32Bytes_.AddEntriesFrom(input, _map_mapInt32Bytes_codec);
             break;
           }
           case 130: {
-            mapInt32Enum_.AddEntriesFrom(ref input, _map_mapInt32Enum_codec);
+            mapInt32Enum_.AddEntriesFrom(input, _map_mapInt32Enum_codec);
             break;
           }
           case 138: {
-            mapInt32ForeignMessage_.AddEntriesFrom(ref input, _map_mapInt32ForeignMessage_codec);
+            mapInt32ForeignMessage_.AddEntriesFrom(input, _map_mapInt32ForeignMessage_codec);
             break;
           }
         }
@@ -622,7 +617,7 @@ namespace Google.Protobuf.TestProtos {
 
   }
 
-  public sealed partial class TestMapSubmessage : pb::IMessage<TestMapSubmessage>, pb::IBufferMessage {
+  public sealed partial class TestMapSubmessage : pb::IMessage<TestMapSubmessage> {
     private static readonly pb::MessageParser<TestMapSubmessage> _parser = new pb::MessageParser<TestMapSubmessage>(() => new TestMapSubmessage());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -738,16 +733,11 @@ namespace Google.Protobuf.TestProtos {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void MergeFrom(pb::CodedInputStream input) {
-      input.ReadRawMessage(this);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
       uint tag;
       while ((tag = input.ReadTag()) != 0) {
         switch(tag) {
           default:
-            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 10: {
             if (testMap_ == null) {
@@ -762,7 +752,7 @@ namespace Google.Protobuf.TestProtos {
 
   }
 
-  public sealed partial class TestMessageMap : pb::IMessage<TestMessageMap>, pb::IBufferMessage {
+  public sealed partial class TestMessageMap : pb::IMessage<TestMessageMap> {
     private static readonly pb::MessageParser<TestMessageMap> _parser = new pb::MessageParser<TestMessageMap>(() => new TestMessageMap());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -867,19 +857,14 @@ namespace Google.Protobuf.TestProtos {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void MergeFrom(pb::CodedInputStream input) {
-      input.ReadRawMessage(this);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
       uint tag;
       while ((tag = input.ReadTag()) != 0) {
         switch(tag) {
           default:
-            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 10: {
-            mapInt32Message_.AddEntriesFrom(ref input, _map_mapInt32Message_codec);
+            mapInt32Message_.AddEntriesFrom(input, _map_mapInt32Message_codec);
             break;
           }
         }
@@ -891,7 +876,7 @@ namespace Google.Protobuf.TestProtos {
   /// <summary>
   /// Two map fields share the same entry default instance.
   /// </summary>
-  public sealed partial class TestSameTypeMap : pb::IMessage<TestSameTypeMap>, pb::IBufferMessage {
+  public sealed partial class TestSameTypeMap : pb::IMessage<TestSameTypeMap> {
     private static readonly pb::MessageParser<TestSameTypeMap> _parser = new pb::MessageParser<TestSameTypeMap>(() => new TestSameTypeMap());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1012,23 +997,18 @@ namespace Google.Protobuf.TestProtos {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void MergeFrom(pb::CodedInputStream input) {
-      input.ReadRawMessage(this);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
       uint tag;
       while ((tag = input.ReadTag()) != 0) {
         switch(tag) {
           default:
-            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 10: {
-            map1_.AddEntriesFrom(ref input, _map_map1_codec);
+            map1_.AddEntriesFrom(input, _map_map1_codec);
             break;
           }
           case 18: {
-            map2_.AddEntriesFrom(ref input, _map_map2_codec);
+            map2_.AddEntriesFrom(input, _map_map2_codec);
             break;
           }
         }
@@ -1037,7 +1017,7 @@ namespace Google.Protobuf.TestProtos {
 
   }
 
-  public sealed partial class TestArenaMap : pb::IMessage<TestArenaMap>, pb::IBufferMessage {
+  public sealed partial class TestArenaMap : pb::IMessage<TestArenaMap> {
     private static readonly pb::MessageParser<TestArenaMap> _parser = new pb::MessageParser<TestArenaMap>(() => new TestArenaMap());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1366,75 +1346,70 @@ namespace Google.Protobuf.TestProtos {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void MergeFrom(pb::CodedInputStream input) {
-      input.ReadRawMessage(this);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
       uint tag;
       while ((tag = input.ReadTag()) != 0) {
         switch(tag) {
           default:
-            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 10: {
-            mapInt32Int32_.AddEntriesFrom(ref input, _map_mapInt32Int32_codec);
+            mapInt32Int32_.AddEntriesFrom(input, _map_mapInt32Int32_codec);
             break;
           }
           case 18: {
-            mapInt64Int64_.AddEntriesFrom(ref input, _map_mapInt64Int64_codec);
+            mapInt64Int64_.AddEntriesFrom(input, _map_mapInt64Int64_codec);
             break;
           }
           case 26: {
-            mapUint32Uint32_.AddEntriesFrom(ref input, _map_mapUint32Uint32_codec);
+            mapUint32Uint32_.AddEntriesFrom(input, _map_mapUint32Uint32_codec);
             break;
           }
           case 34: {
-            mapUint64Uint64_.AddEntriesFrom(ref input, _map_mapUint64Uint64_codec);
+            mapUint64Uint64_.AddEntriesFrom(input, _map_mapUint64Uint64_codec);
             break;
           }
           case 42: {
-            mapSint32Sint32_.AddEntriesFrom(ref input, _map_mapSint32Sint32_codec);
+            mapSint32Sint32_.AddEntriesFrom(input, _map_mapSint32Sint32_codec);
             break;
           }
           case 50: {
-            mapSint64Sint64_.AddEntriesFrom(ref input, _map_mapSint64Sint64_codec);
+            mapSint64Sint64_.AddEntriesFrom(input, _map_mapSint64Sint64_codec);
             break;
           }
           case 58: {
-            mapFixed32Fixed32_.AddEntriesFrom(ref input, _map_mapFixed32Fixed32_codec);
+            mapFixed32Fixed32_.AddEntriesFrom(input, _map_mapFixed32Fixed32_codec);
             break;
           }
           case 66: {
-            mapFixed64Fixed64_.AddEntriesFrom(ref input, _map_mapFixed64Fixed64_codec);
+            mapFixed64Fixed64_.AddEntriesFrom(input, _map_mapFixed64Fixed64_codec);
             break;
           }
           case 74: {
-            mapSfixed32Sfixed32_.AddEntriesFrom(ref input, _map_mapSfixed32Sfixed32_codec);
+            mapSfixed32Sfixed32_.AddEntriesFrom(input, _map_mapSfixed32Sfixed32_codec);
             break;
           }
           case 82: {
-            mapSfixed64Sfixed64_.AddEntriesFrom(ref input, _map_mapSfixed64Sfixed64_codec);
+            mapSfixed64Sfixed64_.AddEntriesFrom(input, _map_mapSfixed64Sfixed64_codec);
             break;
           }
           case 90: {
-            mapInt32Float_.AddEntriesFrom(ref input, _map_mapInt32Float_codec);
+            mapInt32Float_.AddEntriesFrom(input, _map_mapInt32Float_codec);
             break;
           }
           case 98: {
-            mapInt32Double_.AddEntriesFrom(ref input, _map_mapInt32Double_codec);
+            mapInt32Double_.AddEntriesFrom(input, _map_mapInt32Double_codec);
             break;
           }
           case 106: {
-            mapBoolBool_.AddEntriesFrom(ref input, _map_mapBoolBool_codec);
+            mapBoolBool_.AddEntriesFrom(input, _map_mapBoolBool_codec);
             break;
           }
           case 114: {
-            mapInt32Enum_.AddEntriesFrom(ref input, _map_mapInt32Enum_codec);
+            mapInt32Enum_.AddEntriesFrom(input, _map_mapInt32Enum_codec);
             break;
           }
           case 122: {
-            mapInt32ForeignMessage_.AddEntriesFrom(ref input, _map_mapInt32ForeignMessage_codec);
+            mapInt32ForeignMessage_.AddEntriesFrom(input, _map_mapInt32ForeignMessage_codec);
             break;
           }
         }
@@ -1447,7 +1422,7 @@ namespace Google.Protobuf.TestProtos {
   /// Previously, message containing enum called Type cannot be used as value of
   /// map field.
   /// </summary>
-  public sealed partial class MessageContainingEnumCalledType : pb::IMessage<MessageContainingEnumCalledType>, pb::IBufferMessage {
+  public sealed partial class MessageContainingEnumCalledType : pb::IMessage<MessageContainingEnumCalledType> {
     private static readonly pb::MessageParser<MessageContainingEnumCalledType> _parser = new pb::MessageParser<MessageContainingEnumCalledType>(() => new MessageContainingEnumCalledType());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1552,19 +1527,14 @@ namespace Google.Protobuf.TestProtos {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void MergeFrom(pb::CodedInputStream input) {
-      input.ReadRawMessage(this);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
       uint tag;
       while ((tag = input.ReadTag()) != 0) {
         switch(tag) {
           default:
-            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 10: {
-            type_.AddEntriesFrom(ref input, _map_type_codec);
+            type_.AddEntriesFrom(input, _map_type_codec);
             break;
           }
         }
@@ -1587,7 +1557,7 @@ namespace Google.Protobuf.TestProtos {
   /// <summary>
   /// Previously, message cannot contain map field called "entry".
   /// </summary>
-  public sealed partial class MessageContainingMapCalledEntry : pb::IMessage<MessageContainingMapCalledEntry>, pb::IBufferMessage {
+  public sealed partial class MessageContainingMapCalledEntry : pb::IMessage<MessageContainingMapCalledEntry> {
     private static readonly pb::MessageParser<MessageContainingMapCalledEntry> _parser = new pb::MessageParser<MessageContainingMapCalledEntry>(() => new MessageContainingMapCalledEntry());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1692,19 +1662,14 @@ namespace Google.Protobuf.TestProtos {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void MergeFrom(pb::CodedInputStream input) {
-      input.ReadRawMessage(this);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
       uint tag;
       while ((tag = input.ReadTag()) != 0) {
         switch(tag) {
           default:
-            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 10: {
-            entry_.AddEntriesFrom(ref input, _map_entry_codec);
+            entry_.AddEntriesFrom(input, _map_entry_codec);
             break;
           }
         }
