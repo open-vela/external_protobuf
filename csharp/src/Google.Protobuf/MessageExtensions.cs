@@ -129,7 +129,7 @@ namespace Google.Protobuf
             ProtoPreconditions.CheckNotNull(message, "message");
             ProtoPreconditions.CheckNotNull(output, "output");
             CodedOutputStream codedOutput = new CodedOutputStream(output);
-            codedOutput.WriteLength(message.CalculateSize());
+            codedOutput.WriteRawVarint32((uint)message.CalculateSize());
             message.WriteTo(codedOutput);
             codedOutput.Flush();
         }
