@@ -41,7 +41,7 @@ namespace Google.Protobuf
         void MergeFrom(ref ParseContext ctx);
 
         void MergeFrom(IExtensionValue value);
-        void WriteTo(ref WriteContext ctx);
+        void WriteTo(CodedOutputStream output);
         int CalculateSize();
         bool IsInitialized();
     }
@@ -106,13 +106,13 @@ namespace Google.Protobuf
             }
         }
 
-        public void WriteTo(ref WriteContext ctx)
+        public void WriteTo(CodedOutputStream output)
         {
-            ctx.WriteTag(codec.Tag);
-            codec.ValueWriter(ref ctx, field);
+            output.WriteTag(codec.Tag);
+            codec.ValueWriter(output, field);
             if (codec.EndTag != 0)
             {
-                ctx.WriteTag(codec.EndTag);
+                output.WriteTag(codec.EndTag);
             }
         }
 
@@ -181,10 +181,10 @@ namespace Google.Protobuf
             }
         }
 
-        //public void MergeFrom(CodedInputStream input)
-        //{
-        //    field.AddEntriesFrom(input, codec);
-        //}
+        public void MergeFrom(CodedInputStream input)
+        {
+            field.AddEntriesFrom(input, codec);
+        }
 
         public void MergeFrom(ref ParseContext ctx)
         {
@@ -199,9 +199,9 @@ namespace Google.Protobuf
             }
         }
 
-        public void WriteTo(ref WriteContext ctx)
+        public void WriteTo(CodedOutputStream output)
         {
-            field.WriteTo(ref ctx, codec);
+            field.WriteTo(output, codec);
         }
 
         public RepeatedField<T> GetValue() => field;

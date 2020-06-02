@@ -269,9 +269,6 @@ namespace Google.Protobuf.WellKnownTypes {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void WriteTo(pb::CodedOutputStream output) {
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-      output.WriteRawMessage(this);
-    #else
       if (Name.Length != 0) {
         output.WriteRawTag(10);
         output.WriteString(Name);
@@ -294,36 +291,7 @@ namespace Google.Protobuf.WellKnownTypes {
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
-    #endif
     }
-
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
-      if (Name.Length != 0) {
-        output.WriteRawTag(10);
-        output.WriteString(Name);
-      }
-      methods_.WriteTo(ref output, _repeated_methods_codec);
-      options_.WriteTo(ref output, _repeated_options_codec);
-      if (Version.Length != 0) {
-        output.WriteRawTag(34);
-        output.WriteString(Version);
-      }
-      if (sourceContext_ != null) {
-        output.WriteRawTag(42);
-        output.WriteMessage(SourceContext);
-      }
-      mixins_.WriteTo(ref output, _repeated_mixins_codec);
-      if (Syntax != global::Google.Protobuf.WellKnownTypes.Syntax.Proto2) {
-        output.WriteRawTag(56);
-        output.WriteEnum((int) Syntax);
-      }
-      if (_unknownFields != null) {
-        _unknownFields.WriteTo(ref output);
-      }
-    }
-    #endif
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public int CalculateSize() {
@@ -659,9 +627,6 @@ namespace Google.Protobuf.WellKnownTypes {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void WriteTo(pb::CodedOutputStream output) {
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-      output.WriteRawMessage(this);
-    #else
       if (Name.Length != 0) {
         output.WriteRawTag(10);
         output.WriteString(Name);
@@ -690,42 +655,7 @@ namespace Google.Protobuf.WellKnownTypes {
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
-    #endif
     }
-
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
-      if (Name.Length != 0) {
-        output.WriteRawTag(10);
-        output.WriteString(Name);
-      }
-      if (RequestTypeUrl.Length != 0) {
-        output.WriteRawTag(18);
-        output.WriteString(RequestTypeUrl);
-      }
-      if (RequestStreaming != false) {
-        output.WriteRawTag(24);
-        output.WriteBool(RequestStreaming);
-      }
-      if (ResponseTypeUrl.Length != 0) {
-        output.WriteRawTag(34);
-        output.WriteString(ResponseTypeUrl);
-      }
-      if (ResponseStreaming != false) {
-        output.WriteRawTag(40);
-        output.WriteBool(ResponseStreaming);
-      }
-      options_.WriteTo(ref output, _repeated_options_codec);
-      if (Syntax != global::Google.Protobuf.WellKnownTypes.Syntax.Proto2) {
-        output.WriteRawTag(56);
-        output.WriteEnum((int) Syntax);
-      }
-      if (_unknownFields != null) {
-        _unknownFields.WriteTo(ref output);
-      }
-    }
-    #endif
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public int CalculateSize() {
@@ -1054,9 +984,6 @@ namespace Google.Protobuf.WellKnownTypes {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void WriteTo(pb::CodedOutputStream output) {
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-      output.WriteRawMessage(this);
-    #else
       if (Name.Length != 0) {
         output.WriteRawTag(10);
         output.WriteString(Name);
@@ -1068,25 +995,7 @@ namespace Google.Protobuf.WellKnownTypes {
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
-    #endif
     }
-
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
-      if (Name.Length != 0) {
-        output.WriteRawTag(10);
-        output.WriteString(Name);
-      }
-      if (Root.Length != 0) {
-        output.WriteRawTag(18);
-        output.WriteString(Root);
-      }
-      if (_unknownFields != null) {
-        _unknownFields.WriteTo(ref output);
-      }
-    }
-    #endif
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public int CalculateSize() {
