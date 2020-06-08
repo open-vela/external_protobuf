@@ -285,10 +285,6 @@ class PROTOC_EXPORT ImportWriter {
   void AddFile(const FileDescriptor* file, const string& header_extension);
   void Print(io::Printer *printer) const;
 
-  static void PrintRuntimeImports(io::Printer *printer,
-                                  const std::vector<string>& header_to_import,
-                                  bool default_cpp_symbol = false);
-
  private:
   class ProtoFrameworkCollector : public LineConsumer {
    public:
@@ -309,7 +305,8 @@ class PROTOC_EXPORT ImportWriter {
   std::map<string, string> proto_file_to_framework_name_;
   bool need_to_parse_mapping_file_;
 
-  std::vector<string> protobuf_imports_;
+  std::vector<string> protobuf_framework_imports_;
+  std::vector<string> protobuf_non_framework_imports_;
   std::vector<string> other_framework_imports_;
   std::vector<string> other_imports_;
 };
