@@ -1585,7 +1585,8 @@ void ImportWriter::AddFile(const FileDescriptor* file,
     if (include_wkt_imports_) {
       const string header_name =
         "GPB" + FilePathBasename(file) + header_extension;
-      protobuf_imports_.push_back(header_name);
+      protobuf_framework_imports_.push_back(header_name);
+      protobuf_non_framework_imports_.push_back(header_name);
     }
     return;
   }
@@ -1615,10 +1616,36 @@ void ImportWriter::AddFile(const FileDescriptor* file,
 }
 
 void ImportWriter::Print(io::Printer* printer) const {
+  assert(protobuf_non_framework_imports_.size() ==
+         protobuf_framework_imports_.size());
+
   bool add_blank_line = false;
 
-  if (!protobuf_imports_.empty()) {
-    PrintRuntimeImports(printer, protobuf_imports_);
+  if (!protobuf_framework_imports_.empty()) {
+    const string framework_name(ProtobufLibraryFrameworkName);
+    const string cpp_symbol(ProtobufFrameworkImportSymbol(framework_name));
+
+    printer->Print(
+        "#if $cpp_symbol$\n",
+        "cpp_symbol", cpp_symbol);
+    for (std::vector<string>::const_iterator iter = protobuf_framework_imports_.begin();
+         iter != protobuf_framework_imports_.end(); ++iter) {
+      printer->Print(
+          " #import <$framework_name$/$header$>\n",
+          "framework_name", framework_name,
+          "header", *iter);
+    }
+    printer->Print(
+        "#else\n");
+    for (std::vector<string>::const_iterator iter = protobuf_non_framework_imports_.begin();
+         iter != protobuf_non_framework_imports_.end(); ++iter) {
+      printer->Print(
+          " #import \"$header$\"\n",
+          "header", *iter);
+    }
+    printer->Print(
+        "#endif\n");
+
     add_blank_line = true;
   }
 
@@ -1649,44 +1676,6 @@ void ImportWriter::Print(io::Printer* printer) const {
           "header", *iter);
     }
   }
-}
-
-void ImportWriter::PrintRuntimeImports(
-    io::Printer* printer,
-    const std::vector<string>& header_to_import,
-    bool default_cpp_symbol) {
-  const string framework_name(ProtobufLibraryFrameworkName);
-  const string cpp_symbol(ProtobufFrameworkImportSymbol(framework_name));
-
-  if (default_cpp_symbol) {
-    printer->Print(
-        "// This CPP symbol can be defined to use imports that match up to the framework\n"
-        "// imports needed when using CocoaPods.\n"
-        "#if !defined($cpp_symbol$)\n"
-        " #define $cpp_symbol$ 0\n"
-        "#endif\n"
-        "\n",
-        "cpp_symbol", cpp_symbol);
-  }
-
-  printer->Print(
-      "#if $cpp_symbol$\n",
-      "cpp_symbol", cpp_symbol);
-  for (const auto& header : header_to_import) {
-    printer->Print(
-        " #import <$framework_name$/$header$>\n",
-        "framework_name", framework_name,
-        "header", header);
-  }
-  printer->Print(
-      "#else\n");
-  for (const auto& header : header_to_import) {
-    printer->Print(
-        " #import \"$header$\"\n",
-        "header", header);
-  }
-  printer->Print(
-      "#endif\n");
 }
 
 void ImportWriter::ParseFrameworkMappings() {
