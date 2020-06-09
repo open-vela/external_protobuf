@@ -465,33 +465,13 @@ namespace Google.Protobuf.Collections
         /// <param name="codec">The codec to use for each entry.</param>
         public void WriteTo(CodedOutputStream output, Codec codec)
         {
-            WriteContext.Initialize(output, out WriteContext ctx);
-            try
-            {
-                WriteTo(ref ctx, codec);
-            }
-            finally
-            {
-                ctx.CopyStateTo(output);
-            }
-        }
-
-        /// <summary>
-        /// Writes the contents of this map to the given write context, using the specified codec
-        /// to encode each entry.
-        /// </summary>
-        /// <param name="ctx">The write context to write to.</param>
-        /// <param name="codec">The codec to use for each entry.</param>
-        [SecuritySafeCritical]
-        public void WriteTo(ref WriteContext ctx, Codec codec)
-        {
             var message = new Codec.MessageAdapter(codec);
             foreach (var entry in list)
             {
                 message.Key = entry.Key;
                 message.Value = entry.Value;
-                ctx.WriteTag(codec.MapTag);
-                ctx.WriteMessage(message);
+                output.WriteTag(codec.MapTag);
+                output.WriteMessage(message);
             }
         }
 
@@ -731,15 +711,8 @@ namespace Google.Protobuf.Collections
 
                 public void WriteTo(CodedOutputStream output)
                 {
-                    // Message adapter is an internal class and we know that all the writing will happen via InternalWriteTo.
-                    throw new NotImplementedException();
-                }
-
-                [SecuritySafeCritical]
-                public void InternalWriteTo(ref WriteContext ctx)
-                {
-                    codec.keyCodec.WriteTagAndValue(ref ctx, Key);
-                    codec.valueCodec.WriteTagAndValue(ref ctx, Value);
+                    codec.keyCodec.WriteTagAndValue(output, Key);
+                    codec.valueCodec.WriteTagAndValue(output, Value);
                 }
 
                 public int CalculateSize()

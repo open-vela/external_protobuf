@@ -60,7 +60,6 @@ class WrapperFieldGenerator : public FieldGeneratorBase {
   virtual void GenerateParsingCode(io::Printer* printer);
   virtual void GenerateParsingCode(io::Printer* printer, bool use_parse_context);
   virtual void GenerateSerializationCode(io::Printer* printer);
-  virtual void GenerateSerializationCode(io::Printer* printer, bool use_write_context);
   virtual void GenerateSerializedSizeCode(io::Printer* printer);
   virtual void GenerateExtensionCode(io::Printer* printer);
 
@@ -87,7 +86,6 @@ class WrapperOneofFieldGenerator : public WrapperFieldGenerator {
   virtual void GenerateParsingCode(io::Printer* printer);
   virtual void GenerateParsingCode(io::Printer* printer, bool use_parse_context);
   virtual void GenerateSerializationCode(io::Printer* printer);
-  virtual void GenerateSerializationCode(io::Printer* printer, bool use_write_context);
   virtual void GenerateSerializedSizeCode(io::Printer* printer);
 };
 
