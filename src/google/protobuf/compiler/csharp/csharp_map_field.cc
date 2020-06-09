@@ -106,15 +106,9 @@ void MapFieldGenerator::GenerateParsingCode(io::Printer* printer, bool use_parse
 }
 
 void MapFieldGenerator::GenerateSerializationCode(io::Printer* printer) {
-  GenerateSerializationCode(printer, true);
-}
-
-void MapFieldGenerator::GenerateSerializationCode(io::Printer* printer, bool use_write_context) {
   printer->Print(
     variables_,
-    use_write_context
-    ? "$name$_.WriteTo(ref output, _map_$name$_codec);\n"
-    : "$name$_.WriteTo(output, _map_$name$_codec);\n");
+    "$name$_.WriteTo(output, _map_$name$_codec);\n");
 }
 
 void MapFieldGenerator::GenerateSerializedSizeCode(io::Printer* printer) {

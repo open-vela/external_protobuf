@@ -344,8 +344,6 @@ namespace Google.Protobuf
                 }
             };
 
-            MessageParsingHelpers.AssertWritingMessage(message);
-
             MessageParsingHelpers.AssertRoundtrip(Proto2.TestAllTypes.Parser, message);
         }
 
@@ -361,8 +359,6 @@ namespace Google.Protobuf
                 new RepeatedGroup_extension { A = 30 }
             });
 
-            MessageParsingHelpers.AssertWritingMessage(message);
-
             MessageParsingHelpers.AssertRoundtrip(
                 TestAllExtensions.Parser.WithExtensionRegistry(new ExtensionRegistry() { UnittestExtensions.OptionalGroupExtension, UnittestExtensions.RepeatedGroupExtension }),
                 message);
@@ -374,8 +370,6 @@ namespace Google.Protobuf
             var message = new TestGroupExtension();
             message.SetExtension(TestNestedExtension.Extensions.OptionalGroupExtension, new TestNestedExtension.Types.OptionalGroup_extension { A = 10 });
 
-            MessageParsingHelpers.AssertWritingMessage(message);
-            
             MessageParsingHelpers.AssertRoundtrip(
                 TestGroupExtension.Parser.WithExtensionRegistry(new ExtensionRegistry() { TestNestedExtension.Extensions.OptionalGroupExtension }),
                 message);
