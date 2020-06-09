@@ -305,6 +305,8 @@ build_objectivec_tvos_release() {
 }
 
 build_objectivec_cocoapods_integration() {
+  # Update pod to the latest version.
+  gem install cocoapods --no_document
   objectivec/Tests/CocoaPods/run_tests.sh
 }
 

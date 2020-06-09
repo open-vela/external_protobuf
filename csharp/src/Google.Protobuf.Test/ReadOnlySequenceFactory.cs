@@ -50,9 +50,9 @@ namespace Google.Protobuf
             while (currentIndex < data.Length)
             {
                 var segment = new List<byte>();
-                while (segment.Count < segmentSize && currentIndex < data.Length)
+                for (; currentIndex < Math.Min(currentIndex + segmentSize, data.Length); currentIndex++)
                 {
-                    segment.Add(data[currentIndex++]);
+                    segment.Add(data[currentIndex]);
                 }
                 segments.Add(segment.ToArray());
                 segments.Add(new byte[0]);
