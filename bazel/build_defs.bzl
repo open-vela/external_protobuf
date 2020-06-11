@@ -50,8 +50,7 @@ def _remove_suffix(str, suffix):
     return str[:-len(suffix)]
 
 def make_shell_script(name, contents, out):
-    contents = runfiles_init + contents  # copybara:strip_for_google3
-    contents = contents.replace("$", "$$")
+    contents = (runfiles_init + contents).replace("$", "$$")
     native.genrule(
         name = "gen_" + name,
         outs = [out],
