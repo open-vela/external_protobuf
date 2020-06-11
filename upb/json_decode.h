@@ -3,6 +3,7 @@
 #define UPB_JSONDECODE_H_
 
 #include "upb/def.h"
+#include "upb/msg.h"
 
 #ifdef __cplusplus
 extern "C" {
