@@ -631,7 +631,16 @@ MessageGenerator::MessageGenerator(
 MessageGenerator::~MessageGenerator() = default;
 
 size_t MessageGenerator::HasBitsSize() const {
-  return (max_has_bit_index_ + 31) / 32;
+  size_t sizeof_has_bits = (max_has_bit_index_ + 31) / 32 * 4;
+  if (sizeof_has_bits == 0) {
+    // Zero-size arrays aren't technically allowed, and MSVC in particular
+    // doesn't like them.  We still need to declare these arrays to make
+    // other code compile.  Since this is an uncommon case, we'll just declare
+    // them with size 1 and waste some space.  Oh well.
+    sizeof_has_bits = 4;
+  }
+
+  return sizeof_has_bits;
 }
 
 int MessageGenerator::HasBitIndex(const FieldDescriptor* field) const {
@@ -1114,7 +1123,7 @@ void MessageGenerator::GenerateClassDefinition(io::Printer* printer) {
   format.Indent();
 
   if (SupportsArenas(descriptor_)) {
-    format("inline $classname$() : $classname$(nullptr) {}\n");
+    format("inline $classname$() : $classname$(nullptr) {};\n");
   } else {
     format("$classname$();\n");
   }
@@ -1506,9 +1515,10 @@ void MessageGenerator::GenerateClassDefinition(io::Printer* printer) {
 
   const size_t sizeof_has_bits = HasBitsSize();
   const std::string has_bits_decl =
-      sizeof_has_bits == 0 ? ""
-                           : StrCat("::$proto_ns$::internal::HasBits<",
-                                          sizeof_has_bits, "> _has_bits_;\n");
+      sizeof_has_bits == 0
+          ? ""
+          : StrCat("::$proto_ns$::internal::HasBits<",
+                         sizeof_has_bits / 4, "> _has_bits_;\n");
 
   // To minimize padding, data members are divided into three sections:
   // (1) members assumed to align to 8 bytes
@@ -3055,7 +3065,7 @@ void MessageGenerator::GenerateSwap(io::Printer* printer) {
         "metadata_);\n");
 
     if (!has_bit_indices_.empty()) {
-      for (int i = 0; i < HasBitsSize(); ++i) {
+      for (int i = 0; i < HasBitsSize() / 4; ++i) {
         format("swap(_has_bits_[$1$], other->_has_bits_[$1$]);\n", i);
       }
     }

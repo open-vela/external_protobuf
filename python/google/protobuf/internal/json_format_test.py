@@ -636,20 +636,6 @@ class JsonFormatTest(JsonFormatBase):
     parsed_message = json_format_proto3_pb2.TestListValue()
     self.CheckParseBack(message, parsed_message)
 
-  def testNullValue(self):
-    message = json_format_proto3_pb2.TestOneof()
-    message.oneof_null_value = 0
-    self.assertEqual(json_format.MessageToJson(message),
-                     '{\n  "oneofNullValue": null\n}')
-    parsed_message = json_format_proto3_pb2.TestOneof()
-    self.CheckParseBack(message, parsed_message)
-    # Check old format is also accepted
-    new_message = json_format_proto3_pb2.TestOneof()
-    json_format.Parse('{\n  "oneofNullValue": "NULL_VALUE"\n}',
-                      new_message)
-    self.assertEqual(json_format.MessageToJson(new_message),
-                     '{\n  "oneofNullValue": null\n}')
-
   def testAnyMessage(self):
     message = json_format_proto3_pb2.TestAny()
     value1 = json_format_proto3_pb2.MessageType()
@@ -844,14 +830,10 @@ class JsonFormatTest(JsonFormatBase):
 
   def testParseDoubleToFloat(self):
     message = json_format_proto3_pb2.TestMessage()
-    text = ('{"repeatedDoubleValue": [3.4028235e+39, 1.4028235e-39]\n}')
-    json_format.Parse(text, message)
-    self.assertEqual(message.repeated_double_value[0], 3.4028235e+39)
-    self.assertEqual(message.repeated_double_value[1], 1.4028235e-39)
     text = ('{"repeatedFloatValue": [3.4028235e+39, 1.4028235e-39]\n}')
-    self.CheckError(text,
-                    'Failed to parse repeatedFloatValue field: '
-                    'Float value too large.')
+    json_format.Parse(text, message)
+    self.assertEqual(message.repeated_float_value[0], float('inf'))
+    self.assertAlmostEqual(message.repeated_float_value[1], 1.4028235e-39)
 
   def testFloatPrecision(self):
     message = json_format_proto3_pb2.TestMessage()
@@ -916,23 +898,6 @@ class JsonFormatTest(JsonFormatBase):
         'for enum type protobuf_unittest.TestAllTypes.NestedEnum.',
         json_format.Parse, '{"optionalNestedEnum": 12345}', message)
 
-  def testBytes(self):
-    message = json_format_proto3_pb2.TestMessage()
-    # Test url base64
-    text = '{"bytesValue": "-_"}'
-    json_format.Parse(text, message)
-    self.assertEqual(message.bytes_value, b'\xfb')
-    # Test padding
-    text = '{"bytesValue": "AQI="}'
-    json_format.Parse(text, message)
-    self.assertEqual(message.bytes_value, b'\x01\x02')
-    text = '{"bytesValue": "AQI"}'
-    json_format.Parse(text, message)
-    self.assertEqual(message.bytes_value, b'\x01\x02')
-    text = '{"bytesValue": "AQI*"}'
-    json_format.Parse(text, message)
-    self.assertEqual(message.bytes_value, b'\x01\x02')
-
   def testParseBadIdentifer(self):
     self.CheckError('{int32Value: 1}',
                     (r'Failed to load JSON: Expecting property name'
@@ -983,9 +948,6 @@ class JsonFormatTest(JsonFormatBase):
     self.CheckError('{"int32Value": "1 "}',
                     'Failed to parse int32Value field: '
                     'Couldn\'t parse integer: "1 ".')
-    self.CheckError('{"int32Value": false}',
-                    'Failed to parse int32Value field: Bool value False '
-                    'is not acceptable for integer field.')
     self.CheckError('{"int32Value": 12345678901234567890}',
                     'Failed to parse int32Value field: Value out of range: '
                     '12345678901234567890.')
@@ -997,24 +959,12 @@ class JsonFormatTest(JsonFormatBase):
     self.CheckError('{"floatValue": "nan"}',
                     'Failed to parse floatValue field: Couldn\'t '
                     'parse float "nan", use "NaN" instead.')
-    self.CheckError('{"floatValue": NaN}',
-                    'Failed to parse floatValue field: Couldn\'t '
-                    'parse NaN, use quoted "NaN" instead.')
-    self.CheckError('{"floatValue": Infinity}',
-                    'Failed to parse floatValue field: Couldn\'t parse Infinity'
-                    ' or value too large, use quoted "Infinity" instead.')
-    self.CheckError('{"floatValue": -Infinity}',
-                    'Failed to parse floatValue field: Couldn\'t parse '
-                    '-Infinity or value too small, '
-                    'use quoted "-Infinity" instead.')
-    self.CheckError('{"doubleValue": -1.89769e+308}',
-                    'Failed to parse doubleValue field: Couldn\'t parse '
-                    '-Infinity or value too small, '
-                    'use quoted "-Infinity" instead.')
-    self.CheckError('{"floatValue": 3.4028235e+39}',
-                    'Failed to parse floatValue field: Float value too large.')
-    self.CheckError('{"floatValue": -3.502823e+38}',
-                    'Failed to parse floatValue field: Float value too small.')
+
+  def testInvalidBytesValue(self):
+    self.CheckError('{"bytesValue": "AQI"}',
+                    'Failed to parse bytesValue field: Incorrect padding.')
+    self.CheckError('{"bytesValue": "AQI*"}',
+                    'Failed to parse bytesValue field: Incorrect padding.')
 
   def testInvalidRepeated(self):
     self.CheckError('{"repeatedInt32Value": 12345}',

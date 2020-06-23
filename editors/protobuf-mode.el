@@ -216,11 +216,7 @@ Key bindings:
   (c-common-init 'protobuf-mode)
   (easy-menu-add protobuf-menu)
   (c-run-mode-hooks 'c-mode-common-hook 'protobuf-mode-hook)
-  (c-update-modeline)
-  (setq imenu-generic-expression
-	    '(("Message" "^[[:space:]]*message[[:space:]]+\\([[:alnum:]]+\\)" 1)
-          ("Enum" "^[[:space:]]*enum[[:space:]]+\\([[:alnum:]]+\\)" 1)
-          ("Service" "^[[:space:]]*service[[:space:]]+\\([[:alnum:]]+\\)" 1))))
+  (c-update-modeline))
 
 (provide 'protobuf-mode)
 
