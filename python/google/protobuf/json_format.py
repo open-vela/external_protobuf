@@ -195,6 +195,7 @@ class _Printer(object):
     self.preserving_proto_field_name = preserving_proto_field_name
     self.use_integers_for_enums = use_integers_for_enums
     self.descriptor_pool = descriptor_pool
+    # TODO(jieluo): change the float precision default to 8 valid digits.
     if float_precision:
       self.float_format = '.{}g'.format(float_precision)
     else:
@@ -286,8 +287,6 @@ class _Printer(object):
     elif field.cpp_type == descriptor.FieldDescriptor.CPPTYPE_ENUM:
       if self.use_integers_for_enums:
         return value
-      if field.enum_type.full_name == 'google.protobuf.NullValue':
-        return None
       enum_value = field.enum_type.values_by_number.get(value, None)
       if enum_value is not None:
         return enum_value.name
@@ -546,9 +545,6 @@ class _Parser(object):
               and field.message_type.full_name == 'google.protobuf.Value'):
             sub_message = getattr(message, field.name)
             sub_message.null_value = 0
-          elif (field.cpp_type == descriptor.FieldDescriptor.CPPTYPE_ENUM
-                and field.enum_type.full_name == 'google.protobuf.NullValue'):
-            setattr(message, field.name, 0)
           else:
             message.ClearField(field.name)
           continue
@@ -724,18 +720,12 @@ def _ConvertScalarFieldValue(value, field, require_str=False):
   if field.cpp_type in _INT_TYPES:
     return _ConvertInteger(value)
   elif field.cpp_type in _FLOAT_TYPES:
-    return _ConvertFloat(value, field)
+    return _ConvertFloat(value)
   elif field.cpp_type == descriptor.FieldDescriptor.CPPTYPE_BOOL:
     return _ConvertBool(value, require_str)
   elif field.cpp_type == descriptor.FieldDescriptor.CPPTYPE_STRING:
     if field.type == descriptor.FieldDescriptor.TYPE_BYTES:
-      if isinstance(value, six.text_type):
-        encoded = value.encode('utf-8')
-      else:
-        encoded = value
-      # Add extra padding '='
-      padded_value = encoded + b'=' * (4 - len(encoded) % 4)
-      return base64.urlsafe_b64decode(padded_value)
+      return base64.b64decode(value)
     else:
       # Checking for unpaired surrogates appears to be unreliable,
       # depending on the specific Python version, so we check manually.
@@ -779,32 +769,11 @@ def _ConvertInteger(value):
   if isinstance(value, six.text_type) and value.find(' ') != -1:
     raise ParseError('Couldn\'t parse integer: "{0}".'.format(value))
 
-  if isinstance(value, bool):
-    raise ParseError('Bool value {0} is not acceptable for '
-                     'integer field.'.format(value))
-
   return int(value)
 
 
-def _ConvertFloat(value, field):
+def _ConvertFloat(value):
   """Convert an floating point number."""
-  if isinstance(value, float):
-    if math.isnan(value):
-      raise ParseError('Couldn\'t parse NaN, use quoted "NaN" instead.')
-    if math.isinf(value):
-      if value > 0:
-        raise ParseError('Couldn\'t parse Infinity or value too large, '
-                         'use quoted "Infinity" instead.')
-      else:
-        raise ParseError('Couldn\'t parse -Infinity or value too small, '
-                         'use quoted "-Infinity" instead.')
-    if field.cpp_type == descriptor.FieldDescriptor.CPPTYPE_FLOAT:
-      # pylint: disable=protected-access
-      if value > type_checkers._FLOAT_MAX:
-        raise ParseError('Float value too large')
-      # pylint: disable=protected-access
-      if value < type_checkers._FLOAT_MIN:
-        raise ParseError('Float value too small')
   if value == 'nan':
     raise ParseError('Couldn\'t parse float "nan", use "NaN" instead.')
   try:

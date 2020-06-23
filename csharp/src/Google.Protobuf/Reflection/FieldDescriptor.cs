@@ -45,6 +45,7 @@ namespace Google.Protobuf.Reflection
         private MessageDescriptor extendeeType;
         private MessageDescriptor messageType;
         private FieldType fieldType;
+        private readonly string propertyName; // Annoyingly, needed in Crosslink.
         private IFieldAccessor accessor;
 
         /// <summary>
@@ -68,11 +69,6 @@ namespace Google.Protobuf.Reflection
         /// but can be overridden using the <c>json_name</c> option in the .proto file.
         /// </summary>
         public string JsonName { get; }
-
-        /// <summary>
-        /// The name of the property in the <c>ContainingType.ClrType</c> class.
-        /// </summary>
-        public string PropertyName { get; }
 
         /// <summary>
         /// Indicates whether this field supports presence, either implicitly (e.g. due to it being a message
@@ -127,7 +123,7 @@ namespace Google.Protobuf.Reflection
             // for later.
             // We could trust the generated code and check whether the type of the property is
             // a MapField, but that feels a tad nasty.
-            PropertyName = propertyName;
+            this.propertyName = propertyName;
             Extension = extension;
             JsonName =  Proto.JsonName == "" ? JsonFormatter.ToJsonName(Proto.Name) : Proto.JsonName;
         }
@@ -440,15 +436,15 @@ namespace Google.Protobuf.Reflection
             // If we're given no property name, that's because we really don't want an accessor.
             // This could be because it's a map message, or it could be that we're loading a FileDescriptor dynamically.
             // TODO: Support dynamic messages.
-            if (PropertyName == null)
+            if (propertyName == null)
             {
                 return null;
             }
 
-            var property = ContainingType.ClrType.GetProperty(PropertyName);
+            var property = ContainingType.ClrType.GetProperty(propertyName);
             if (property == null)
             {
-                throw new DescriptorValidationException(this, $"Property {PropertyName} not found in {ContainingType.ClrType}");
+                throw new DescriptorValidationException(this, $"Property {propertyName} not found in {ContainingType.ClrType}");
             }
             return IsMap ? new MapFieldAccessor(property, this)
                 : IsRepeated ? new RepeatedFieldAccessor(property, this)
