@@ -1278,9 +1278,8 @@ bool CommandLineInterface::MakeProtoProtoPathRelative(
       if (in_fallback_database) {
         return true;
       }
-      std::string error_str = source_tree->GetLastErrorMessage().empty()
-                                  ? strerror(errno)
-                                  : source_tree->GetLastErrorMessage();
+      std::string error_str = source_tree->GetLastErrorMessage().empty() ?
+        strerror(errno) : source_tree->GetLastErrorMessage();
       std::cerr << "Could not map to virtual file: " << *proto << ": "
                 << error_str << std::endl;
       return false;

@@ -93,6 +93,12 @@ std::string GetTypeUrl(const Descriptor* descriptor) {
 }
 }  // namespace
 
+#if __cplusplus >= 201103L
+using std::get;
+#else
+using std::tr1::get;
+#endif
+
 class BaseProtoStreamObjectWriterTest
     : public ::testing::TestWithParam<testing::TypeInfoSource> {
  protected:
@@ -165,7 +171,7 @@ class BaseProtoStreamObjectWriterTest
 
 MATCHER_P(HasObjectLocation, expected,
           "Verifies the expected object location") {
-  std::string actual = std::get<0>(arg).ToString();
+  std::string actual = get<0>(arg).ToString();
   if (actual == expected) return true;
   *result_listener << "actual location is: " << actual;
   return false;
