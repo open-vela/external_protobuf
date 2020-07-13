@@ -49,7 +49,6 @@
 #include <google/protobuf/util/internal/constants.h>
 #include <gtest/gtest.h>
 #include <google/protobuf/stubs/casts.h>
-#include <google/protobuf/stubs/status.h>
 
 
 namespace google {

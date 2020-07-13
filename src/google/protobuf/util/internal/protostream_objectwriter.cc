@@ -42,7 +42,6 @@
 #include <google/protobuf/util/internal/constants.h>
 #include <google/protobuf/util/internal/utility.h>
 #include <google/protobuf/stubs/strutil.h>
-#include <google/protobuf/stubs/status.h>
 #include <google/protobuf/stubs/time.h>
 #include <google/protobuf/stubs/map_util.h>
 #include <google/protobuf/stubs/statusor.h>

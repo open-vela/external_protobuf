@@ -109,12 +109,14 @@ inline bool NullValue_Parse(
 class Struct_FieldsEntry_DoNotUse : public ::PROTOBUF_NAMESPACE_ID::internal::MapEntry<Struct_FieldsEntry_DoNotUse, 
     std::string, PROTOBUF_NAMESPACE_ID::Value,
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_STRING,
-    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_MESSAGE> {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_MESSAGE,
+    0 > {
 public:
   typedef ::PROTOBUF_NAMESPACE_ID::internal::MapEntry<Struct_FieldsEntry_DoNotUse, 
     std::string, PROTOBUF_NAMESPACE_ID::Value,
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_STRING,
-    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_MESSAGE> SuperType;
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_MESSAGE,
+    0 > SuperType;
   Struct_FieldsEntry_DoNotUse();
   explicit Struct_FieldsEntry_DoNotUse(::PROTOBUF_NAMESPACE_ID::Arena* arena);
   void MergeFrom(const Struct_FieldsEntry_DoNotUse& other);
@@ -280,7 +282,8 @@ class PROTOBUF_EXPORT Struct PROTOBUF_FINAL :
       Struct_FieldsEntry_DoNotUse,
       std::string, PROTOBUF_NAMESPACE_ID::Value,
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_STRING,
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_MESSAGE> fields_;
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_MESSAGE,
+      0 > fields_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_google_2fprotobuf_2fstruct_2eproto;
 };
