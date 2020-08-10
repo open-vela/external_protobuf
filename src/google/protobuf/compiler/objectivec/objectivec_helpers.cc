@@ -78,8 +78,7 @@ Options::Options() {
   }
   const char* suppressions = getenv("GPB_OBJC_EXPECTED_PACKAGE_PREFIXES_SUPPRESSIONS");
   if (suppressions) {
-    expected_prefixes_suppressions =
-        Split(suppressions, ";", true);
+    SplitStringUsing(suppressions, ";", &expected_prefixes_suppressions);
   }
 }
 

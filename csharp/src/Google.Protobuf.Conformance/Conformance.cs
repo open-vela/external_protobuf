@@ -82,7 +82,7 @@ namespace Conformance {
     [pbr::OriginalName("JSON_TEST")] JsonTest = 2,
     /// <summary>
     /// Similar to JSON_TEST. However, during parsing json, testee should ignore
-    /// unknown fields. This feature is optional. Each implementation can decide
+    /// unknown fields. This feature is optional. Each implementation can descide
     /// whether to support it.  See
     /// https://developers.google.com/protocol-buffers/docs/proto3#json_options
     /// for more detail.
@@ -414,7 +414,7 @@ namespace Conformance {
     private global::Conformance.TestCategory testCategory_ = global::Conformance.TestCategory.UnspecifiedTest;
     /// <summary>
     /// Each test is given a specific test category. Some category may need
-    /// specific support in testee programs. Refer to the definition of TestCategory
+    /// spedific support in testee programs. Refer to the definition of TestCategory
     /// for more information.
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
