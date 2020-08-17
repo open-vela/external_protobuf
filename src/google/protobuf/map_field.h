@@ -319,7 +319,7 @@ class MapFieldAccessor;
 
 // This class provides access to map field using reflection, which is the same
 // as those provided for RepeatedPtrField<Message>. It is used for internal
-// reflection implentation only. Users should never use this directly.
+// reflection implementation only. Users should never use this directly.
 class PROTOBUF_EXPORT MapFieldBase {
  public:
   MapFieldBase()
@@ -468,7 +468,7 @@ class TypeDefinedMapFieldBase : public MapFieldBase {
 };
 
 // This class provides access to map field using generated api. It is used for
-// internal generated message implentation only. Users should never use this
+// internal generated message implementation only. Users should never use this
 // directly.
 template <typename Derived, typename Key, typename T,
           WireFormatLite::FieldType kKeyFieldType,
