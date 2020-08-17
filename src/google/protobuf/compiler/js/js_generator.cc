@@ -1654,8 +1654,6 @@ void Generator::GenerateHeader(const GeneratorOptions& options,
       " * @public\n"
       " */\n"
       "// GENERATED CODE -- DO NOT EDIT!\n"
-      "/* eslint-disable */\n"
-      "// @ts-nocheck\n"
       "\n");
 }
 
@@ -2689,8 +2687,7 @@ void Generator::GenerateClassField(const GeneratorOptions& options,
         "\n"
         "\n",
         "index", JSFieldIndex(field), "oneofgroup",
-        (InRealOneof(field) ? (", " + JSOneofArray(options, field))
-                                   : ""));
+        (InRealOneof(field) ? (", " + JSOneofArray(options, field)) : ""));
 
     if (field->is_repeated()) {
       GenerateRepeatedMessageHelperMethods(options, printer, field);
@@ -2995,8 +2992,8 @@ void Generator::GenerateRepeatedMessageHelperMethods(
       "\n"
       "\n",
       "index", JSFieldIndex(field), "oneofgroup",
-      (InRealOneof(field) ? (", " + JSOneofArray(options, field)) : ""),
-      "ctor", GetMessagePath(options, field->message_type()));
+      (InRealOneof(field) ? (", " + JSOneofArray(options, field)) : ""), "ctor",
+      GetMessagePath(options, field->message_type()));
 }
 
 void Generator::GenerateClassExtensionFieldInfo(const GeneratorOptions& options,
