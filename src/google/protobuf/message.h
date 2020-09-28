@@ -1045,7 +1045,7 @@ class PROTOBUF_EXPORT Reflection final {
                              const OneofDescriptor* oneof_descriptor) const;
   inline uint32* MutableOneofCase(
       Message* message, const OneofDescriptor* oneof_descriptor) const;
-  inline bool HasExtensionSet(const Message& /* message */) const {
+  inline bool HasExtensionSet(const Message& message) const {
     return schema_.HasExtensionSet();
   }
   const internal::ExtensionSet& GetExtensionSet(const Message& message) const;
@@ -1056,8 +1056,6 @@ class PROTOBUF_EXPORT Reflection final {
       const Message& message) const;
 
   internal::InternalMetadata* MutableInternalMetadata(Message* message) const;
-
-  inline bool IsInlined(const FieldDescriptor* field) const;
 
   inline bool HasBit(const Message& message,
                      const FieldDescriptor* field) const;
