@@ -1054,8 +1054,6 @@ void MessageGenerator::GenerateClassDefinition(io::Printer* printer) {
             "       s->data(), static_cast<int>(s->size()), "
             "::$proto_ns$::internal::"
             "WireFormatLite::PARSE, \"$1$\");\n"
-            "#else\n"
-            "    (void) s;\n"
             "#endif\n"
             "    return true;\n"
             " }\n",
@@ -1083,8 +1081,6 @@ void MessageGenerator::GenerateClassDefinition(io::Printer* printer) {
             "       s->data(), static_cast<int>(s->size()), "
             "::$proto_ns$::internal::"
             "WireFormatLite::PARSE, \"$1$\");\n"
-            "#else\n"
-            "    (void) s;\n"
             "#endif\n"
             "    return true;\n"
             " }\n",
@@ -1699,9 +1695,6 @@ uint32 CalcFieldNum(const FieldGenerator& generator,
   int type = field->type();
   if (type == FieldDescriptor::TYPE_STRING ||
       type == FieldDescriptor::TYPE_BYTES) {
-    if (generator.IsInlined()) {
-      type = internal::FieldMetadata::kInlinedType;
-    }
     // string field
     if (IsCord(field, options)) {
       type = internal::FieldMetadata::kCordType;
@@ -2111,14 +2104,9 @@ size_t MessageGenerator::GenerateParseOffsets(io::Printer* printer) {
     }
 
     processing_type = static_cast<unsigned>(field->type());
-    const FieldGenerator& generator = field_generators_.get(field);
     if (field->type() == FieldDescriptor::TYPE_STRING) {
       switch (EffectiveStringCType(field, options_)) {
         case FieldOptions::STRING:
-          if (generator.IsInlined()) {
-            processing_type = internal::TYPE_STRING_INLINED;
-            break;
-          }
           break;
         case FieldOptions::CORD:
           processing_type = internal::TYPE_STRING_CORD;
@@ -2130,10 +2118,6 @@ size_t MessageGenerator::GenerateParseOffsets(io::Printer* printer) {
     } else if (field->type() == FieldDescriptor::TYPE_BYTES) {
       switch (EffectiveStringCType(field, options_)) {
         case FieldOptions::STRING:
-          if (generator.IsInlined()) {
-            processing_type = internal::TYPE_BYTES_INLINED;
-            break;
-          }
           break;
         case FieldOptions::CORD:
           processing_type = internal::TYPE_BYTES_CORD;
@@ -2315,11 +2299,6 @@ std::pair<size_t, size_t> MessageGenerator::GenerateOffsets(
       format("::$proto_ns$::internal::kInvalidFieldOffsetTag");
     } else {
       format("PROTOBUF_FIELD_OFFSET($classtype$, $1$_)", FieldName(field));
-    }
-
-    uint32 tag = field_generators_.get(field).CalculateFieldTag();
-    if (tag != 0) {
-      format(" | $1$", tag);
     }
 
     if (!IsFieldUsed(field, options_)) {
