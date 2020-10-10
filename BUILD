@@ -79,7 +79,6 @@ cc_library(
     name = "upb",
     srcs = [
         "upb/decode.c",
-        "upb/decode_fast.c",
         "upb/encode.c",
         "upb/msg.c",
         "upb/msg.h",
