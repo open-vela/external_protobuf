@@ -27,33 +27,30 @@ def GitWorktree(commit):
 def Run(cmd):
   subprocess.check_call(cmd, shell=True)
 
-def Benchmark(outbase, bench_cpu=True, runs=12):
+def Benchmark(outbase, runs=12):
   tmpfile = "/tmp/bench-output.json"
   Run("rm -rf {}".format(tmpfile))
   Run("CC=clang bazel test :all")
+  Run("CC=clang bazel build -c opt --copt=-march=native :benchmark")
 
-  if bench_cpu:
-    Run("CC=clang bazel build -c opt --copt=-march=native :benchmark")
-
-    Run("./bazel-bin/benchmark --benchmark_out_format=json --benchmark_out={} --benchmark_repetitions={}".format(tmpfile, runs))
-    with open(tmpfile) as f:
-      bench_json = json.load(f)
-
-    # Translate into the format expected by benchstat.
-    with open(outbase + ".txt", "w") as f:
-      for run in bench_json["benchmarks"]:
-        name = re.sub(r'^BM_', 'Benchmark', run["name"])
-        if name.endswith("_mean") or name.endswith("_median") or name.endswith("_stddev"):
-          continue
-        values = (name, run["iterations"], run["cpu_time"])
-        print("{} {} {} ns/op".format(*values), file=f)
+  Run("./bazel-bin/benchmark --benchmark_out_format=json --benchmark_out={} --benchmark_repetitions={}".format(tmpfile, runs))
 
   Run("CC=clang bazel build -c opt --copt=-g :conformance_upb")
   Run("cp -f bazel-bin/conformance_upb {}.bin".format(outbase))
 
+  with open(tmpfile) as f:
+    bench_json = json.load(f)
+
+  # Translate into the format expected by benchstat.
+  with open(outbase + ".txt", "w") as f:
+    for run in bench_json["benchmarks"]:
+      name = re.sub(r'^BM_', 'Benchmark', run["name"])
+      if name.endswith("_mean") or name.endswith("_median") or name.endswith("_stddev"):
+        continue
+      values = (name, run["iterations"], run["cpu_time"])
+      print("{} {} {} ns/op".format(*values), file=f)
 
 baseline = "master"
-bench_cpu = True
 
 if len(sys.argv) > 1:
   baseline = sys.argv[1]
@@ -63,17 +60,16 @@ if len(sys.argv) > 1:
     pass
 
 # Benchmark our current directory first, since it's more likely to be broken.
-Benchmark("/tmp/new", bench_cpu)
+Benchmark("/tmp/new")
 
 # Benchmark the baseline.
 with GitWorktree(baseline):
-  Benchmark("/tmp/old", bench_cpu)
+  Benchmark("/tmp/old")
 
 print()
 print()
 
-if bench_cpu:
-  Run("~/go/bin/benchstat /tmp/old.txt /tmp/new.txt")
+Run("~/go/bin/benchstat /tmp/old.txt /tmp/new.txt")
 
 print()
 print()
