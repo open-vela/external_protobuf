@@ -1,12 +1,14 @@
 
-#include <string.h>
 #include <benchmark/benchmark.h>
+
+#include <string.h>
+
+#include "google/protobuf/descriptor.pb.h"
+#include "google/protobuf/arena.h"
 #include "google/protobuf/descriptor.upb.h"
 #include "google/protobuf/descriptor.upbdefs.h"
-#include "google/protobuf/descriptor.pb.h"
 
 upb_strview descriptor = google_protobuf_descriptor_proto_upbdefinit.descriptor;
-namespace protobuf = ::google::protobuf;
 
 /* A buffer big enough to parse descriptor.proto without going to heap. */
 char buf[65535];
@@ -29,24 +31,6 @@ static void BM_ArenaInitialBlockOneAlloc(benchmark::State& state) {
 }
 BENCHMARK(BM_ArenaInitialBlockOneAlloc);
 
-static void BM_ParseDescriptor_Upb_LargeInitialBlock(benchmark::State& state) {
-  size_t bytes = 0;
-  for (auto _ : state) {
-    upb_arena* arena = upb_arena_init(buf, sizeof(buf), NULL);
-    google_protobuf_FileDescriptorProto* set =
-        google_protobuf_FileDescriptorProto_parse(descriptor.data,
-                                                descriptor.size, arena);
-    if (!set) {
-      printf("Failed to parse.\n");
-      exit(1);
-    }
-    bytes += descriptor.size;
-    upb_arena_free(arena);
-  }
-  state.SetBytesProcessed(state.iterations() * descriptor.size);
-}
-BENCHMARK(BM_ParseDescriptor_Upb_LargeInitialBlock);
-
 static void BM_ParseDescriptor_Upb(benchmark::State& state) {
   size_t bytes = 0;
   for (auto _ : state) {
@@ -65,12 +49,31 @@ static void BM_ParseDescriptor_Upb(benchmark::State& state) {
 }
 BENCHMARK(BM_ParseDescriptor_Upb);
 
+static void BM_ParseDescriptor_Upb_LargeInitialBlock(benchmark::State& state) {
+  size_t bytes = 0;
+  for (auto _ : state) {
+    upb_arena* arena = upb_arena_init(buf, sizeof(buf), NULL);
+    google_protobuf_FileDescriptorProto* set =
+        google_protobuf_FileDescriptorProto_parse(descriptor.data,
+                                                descriptor.size, arena);
+    if (!set) {
+      printf("Failed to parse.\n");
+      exit(1);
+    }
+    bytes += descriptor.size;
+    upb_arena_free(arena);
+    //fprintf(stderr, "+++ finished parse: %zu\n", descriptor.size);
+  }
+  state.SetBytesProcessed(state.iterations() * descriptor.size);
+}
+BENCHMARK(BM_ParseDescriptor_Upb_LargeInitialBlock);
+
 static void BM_ParseDescriptor_Proto2_NoArena(benchmark::State& state) {
   size_t bytes = 0;
   for (auto _ : state) {
-    protobuf::FileDescriptorProto proto;
-    protobuf::StringPiece input(descriptor.data,descriptor.size);
-    bool ok = proto.ParseFrom<protobuf::MessageLite::kMergePartial>(input);
+    google::protobuf::FileDescriptorProto proto;
+    bool ok = proto.ParsePartialFromArray(descriptor.data, descriptor.size);
+
     if (!ok) {
       printf("Failed to parse.\n");
       exit(1);
@@ -84,11 +87,10 @@ BENCHMARK(BM_ParseDescriptor_Proto2_NoArena);
 static void BM_ParseDescriptor_Proto2_Arena(benchmark::State& state) {
   size_t bytes = 0;
   for (auto _ : state) {
-    protobuf::Arena arena;
-    protobuf::StringPiece input(descriptor.data,descriptor.size);
-    auto proto = protobuf::Arena::CreateMessage<protobuf::FileDescriptorProto>(
-        &arena);
-    bool ok = proto->ParseFrom<protobuf::MessageLite::kMergePartial>(input);
+    google::protobuf::Arena arena;
+    arena.Reset();
+    auto proto = google::protobuf::Arena::CreateMessage<google::protobuf::FileDescriptorProto>(&arena);
+    bool ok = proto->ParsePartialFromArray(descriptor.data, descriptor.size);
 
     if (!ok) {
       printf("Failed to parse.\n");
@@ -102,15 +104,15 @@ BENCHMARK(BM_ParseDescriptor_Proto2_Arena);
 
 static void BM_ParseDescriptor_Proto2_Arena_LargeInitialBlock(benchmark::State& state) {
   size_t bytes = 0;
-  protobuf::ArenaOptions opts;
-  opts.initial_block = buf;
-  opts.initial_block_size = sizeof(buf);
+  //fprintf(stderr, "size: %d\n", (int)descriptor.size);
+  google::protobuf::ArenaOptions options;
+  options.initial_block = buf;
+  options.initial_block_size = sizeof(buf);
   for (auto _ : state) {
-    protobuf::Arena arena(opts);
-    protobuf::StringPiece input(descriptor.data,descriptor.size);
-    auto proto = protobuf::Arena::CreateMessage<protobuf::FileDescriptorProto>(
-        &arena);
-    bool ok = proto->ParseFrom<protobuf::MessageLite::kMergePartial>(input);
+    google::protobuf::Arena arena(options);
+    arena.Reset();
+    auto proto = google::protobuf::Arena::CreateMessage<google::protobuf::FileDescriptorProto>(&arena);
+    bool ok = proto->ParsePartialFromArray(descriptor.data, descriptor.size);
 
     if (!ok) {
       printf("Failed to parse.\n");
@@ -122,19 +124,19 @@ static void BM_ParseDescriptor_Proto2_Arena_LargeInitialBlock(benchmark::State& 
 }
 BENCHMARK(BM_ParseDescriptor_Proto2_Arena_LargeInitialBlock);
 
-static void BM_SerializeDescriptor_Proto2(benchmark::State& state) {
+static void BM_SerializeDescriptorProto2(benchmark::State& state) {
   size_t bytes = 0;
-  protobuf::FileDescriptorProto proto;
+  google::protobuf::FileDescriptorProto proto;
   proto.ParseFromArray(descriptor.data, descriptor.size);
   for (auto _ : state) {
-    proto.SerializePartialToArray(buf, sizeof(buf));
+    proto.SerializeToArray(buf, sizeof(buf));
     bytes += descriptor.size;
   }
   state.SetBytesProcessed(state.iterations() * descriptor.size);
 }
-BENCHMARK(BM_SerializeDescriptor_Proto2);
+BENCHMARK(BM_SerializeDescriptorProto2);
 
-static void BM_SerializeDescriptor_Upb(benchmark::State& state) {
+static void BM_SerializeDescriptor(benchmark::State& state) {
   int64_t total = 0;
   upb_arena* arena = upb_arena_new();
   google_protobuf_FileDescriptorProto* set =
@@ -156,4 +158,4 @@ static void BM_SerializeDescriptor_Upb(benchmark::State& state) {
   }
   state.SetBytesProcessed(total);
 }
-BENCHMARK(BM_SerializeDescriptor_Upb);
+BENCHMARK(BM_SerializeDescriptor);
