@@ -207,12 +207,11 @@ void upb_msg_clear(upb_msg *msg, const upb_msgdef *m) {
 bool upb_msg_next(const upb_msg *msg, const upb_msgdef *m,
                   const upb_symtab *ext_pool, const upb_fielddef **out_f,
                   upb_msgval *out_val, size_t *iter) {
-  int i = *iter;
-  int n = upb_msgdef_fieldcount(m);
+  size_t i = *iter;
   const upb_msgval zero = {0};
+  const upb_fielddef *f;
   UPB_UNUSED(ext_pool);
-  while (++i < n) {
-    const upb_fielddef *f = upb_msgdef_field(m, i);
+  while ((f = _upb_msgdef_field(m, (int)++i)) != NULL) {
     upb_msgval val = _upb_msg_getraw(msg, f);
 
     /* Skip field if unset or empty. */
