@@ -46,7 +46,17 @@ typedef struct {
   uint8_t label;          /* google.protobuf.Label or _UPB_LABEL_* above. */
 } upb_msglayout_field;
 
+struct upb_msglayout;
+struct upb_decstate;
+
+typedef const char *_upb_field_parser(struct upb_decstate *d, const char *ptr,
+                                      upb_msg *msg,
+                                      const struct upb_msglayout *table,
+                                      uint64_t hasbits, uint64_t data);
+
 typedef struct upb_msglayout {
+  _upb_field_parser *field_parser[32];
+  uint64_t field_data[32];
   const struct upb_msglayout *const* submsgs;
   const upb_msglayout_field *fields;
   /* Must be aligned to sizeof(void*).  Doesn't include internal members like
@@ -62,24 +72,27 @@ typedef struct upb_msglayout {
  * compatibility.  We put these before the user's data.  The user's upb_msg*
  * points after the upb_msg_internal. */
 
+typedef struct {
+  uint32_t len;
+  uint32_t size;
+  /* Data follows. */
+} upb_msg_unknowndata;
+
 /* Used when a message is not extendable. */
 typedef struct {
-  char *unknown;
-  size_t unknown_len;
-  size_t unknown_size;
+  upb_msg_unknowndata *unknown;
 } upb_msg_internal;
-
-/* Used when a message is extendable. */
-typedef struct {
-  upb_inttable *extdict;
-  upb_msg_internal base;
-} upb_msg_internal_withext;
 
 /* Maps upb_fieldtype_t -> memory size. */
 extern char _upb_fieldtype_to_size[12];
+extern const char _upb_fieldtype_to_sizelg2[12];
 
 /* Creates a new messages with the given layout on the given arena. */
 upb_msg *_upb_msg_new(const upb_msglayout *l, upb_arena *a);
+
+UPB_INLINE upb_msg_internal *upb_msg_getinternal(upb_msg *msg) {
+  return UPB_PTR_AT(msg, -sizeof(upb_msg_internal), upb_msg_internal);
+}
 
 /* Clears the given message. */
 void _upb_msg_clear(upb_msg *msg, const upb_msglayout *l);
@@ -177,6 +190,11 @@ typedef struct {
 
 UPB_INLINE const void *_upb_array_constptr(const upb_array *arr) {
   return (void*)(arr->data & ~(uintptr_t)7);
+}
+
+UPB_INLINE uintptr_t _upb_array_tagptr(void* ptr, int elem_size_lg2) {
+  UPB_ASSERT(elem_size_lg2 <= 4);
+  return (uintptr_t)ptr | elem_size_lg2;
 }
 
 UPB_INLINE void *_upb_array_ptr(upb_array *arr) {
