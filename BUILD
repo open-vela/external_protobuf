@@ -40,8 +40,8 @@ CPPOPTS = [
 
 COPTS = CPPOPTS + [
     # copybara:strip_for_google3_begin
-    #"-pedantic",
-    #"-Werror=pedantic",
+    "-pedantic",
+    "-Werror=pedantic",
     "-Wstrict-prototypes",
     # copybara:strip_end
 ]
@@ -79,13 +79,13 @@ cc_library(
     name = "upb",
     srcs = [
         "upb/decode.c",
-        "upb/decode_fast.c",
         "upb/encode.c",
         "upb/msg.c",
         "upb/msg.h",
         "upb/table.c",
         "upb/table.int.h",
         "upb/upb.c",
+        "upb/upb.int.h",
     ],
     hdrs = [
         "upb/decode.h",
