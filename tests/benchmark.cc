@@ -1,10 +1,6 @@
 
-#include <benchmark/benchmark.h>
-
 #include <string.h>
-
-#include "google/protobuf/descriptor.pb.h"
-#include "google/protobuf/arena.h"
+#include <benchmark/benchmark.h>
 #include "google/protobuf/descriptor.upb.h"
 #include "google/protobuf/descriptor.upbdefs.h"
 #include "google/protobuf/descriptor.pb.h"
@@ -33,24 +29,6 @@ static void BM_ArenaInitialBlockOneAlloc(benchmark::State& state) {
 }
 BENCHMARK(BM_ArenaInitialBlockOneAlloc);
 
-static void BM_ParseDescriptor_Upb(benchmark::State& state) {
-  size_t bytes = 0;
-  for (auto _ : state) {
-    upb_arena* arena = upb_arena_new();
-    google_protobuf_FileDescriptorProto* set =
-        google_protobuf_FileDescriptorProto_parse(descriptor.data,
-                                                descriptor.size, arena);
-    if (!set) {
-      printf("Failed to parse.\n");
-      exit(1);
-    }
-    bytes += descriptor.size;
-    upb_arena_free(arena);
-  }
-  state.SetBytesProcessed(state.iterations() * descriptor.size);
-}
-BENCHMARK(BM_ParseDescriptor_Upb);
-
 static void BM_ParseDescriptor_Upb_LargeInitialBlock(benchmark::State& state) {
   size_t bytes = 0;
   for (auto _ : state) {
@@ -68,6 +46,24 @@ static void BM_ParseDescriptor_Upb_LargeInitialBlock(benchmark::State& state) {
   state.SetBytesProcessed(state.iterations() * descriptor.size);
 }
 BENCHMARK(BM_ParseDescriptor_Upb_LargeInitialBlock);
+
+static void BM_ParseDescriptor_Upb(benchmark::State& state) {
+  size_t bytes = 0;
+  for (auto _ : state) {
+    upb_arena* arena = upb_arena_new();
+    google_protobuf_FileDescriptorProto* set =
+        google_protobuf_FileDescriptorProto_parse(descriptor.data,
+                                                descriptor.size, arena);
+    if (!set) {
+      printf("Failed to parse.\n");
+      exit(1);
+    }
+    bytes += descriptor.size;
+    upb_arena_free(arena);
+  }
+  state.SetBytesProcessed(state.iterations() * descriptor.size);
+}
+BENCHMARK(BM_ParseDescriptor_Upb);
 
 static void BM_ParseDescriptor_Proto2_NoArena(benchmark::State& state) {
   size_t bytes = 0;
