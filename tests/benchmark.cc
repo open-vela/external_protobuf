@@ -58,6 +58,22 @@ static void BM_ArenaInitialBlockOneAlloc(benchmark::State& state) {
 }
 BENCHMARK(BM_ArenaInitialBlockOneAlloc);
 
+static void BM_LoadDescriptor(benchmark::State& state) {
+  for (auto _ : state) {
+    upb::SymbolTable symtab;
+    upb::Arena arena;
+    google_protobuf_FileDescriptorProto* file_proto =
+        google_protobuf_FileDescriptorProto_parse(descriptor.data,
+                                                  descriptor.size, arena.ptr());
+    upb::FileDefPtr file_def = symtab.AddFile(file_proto, NULL);
+    if (!file_def) {
+      printf("Failed to add file.\n");
+      exit(1);
+    }
+  }
+}
+BENCHMARK(BM_LoadDescriptor);
+
 static void BM_ParseDescriptor_Upb_LargeInitialBlock(benchmark::State& state) {
   size_t bytes = 0;
   for (auto _ : state) {
