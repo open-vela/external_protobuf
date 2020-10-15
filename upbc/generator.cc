@@ -598,6 +598,7 @@ void WriteHeader(const protobuf::FileDescriptor* file, Output& output) {
       "#define $0_UPB_H_\n\n"
       "#include \"upb/msg.h\"\n"
       "#include \"upb/decode.h\"\n"
+      "#include \"upb/decode_fast.h\"\n"
       "#include \"upb/encode.h\"\n\n",
       ToPreproc(file->name()));
 
@@ -735,6 +736,136 @@ struct SubmsgArray {
   absl::flat_hash_map<const protobuf::Descriptor*, int> indexes_;
 };
 
+typedef std::pair<std::string, MessageLayout::Size> TableEntry;
+
+void TryFillTableEntry(const protobuf::Descriptor* message,
+                       const MessageLayout& layout, int num, TableEntry& ent) {
+  const protobuf::FieldDescriptor* field = message->FindFieldByNumber(num);
+  if (!field) return;
+
+  std::string type = "";
+  std::string cardinality = "";
+  uint8_t wire_type = 0;
+  switch (field->type()) {
+    case protobuf::FieldDescriptor::TYPE_BOOL:
+      type = "b1";
+      break;
+    case protobuf::FieldDescriptor::TYPE_INT32:
+    case protobuf::FieldDescriptor::TYPE_ENUM:
+    case protobuf::FieldDescriptor::TYPE_UINT32:
+      type = "v4";
+      break;
+    case protobuf::FieldDescriptor::TYPE_INT64:
+    case protobuf::FieldDescriptor::TYPE_UINT64:
+      type = "v8";
+      break;
+    case protobuf::FieldDescriptor::TYPE_SINT32:
+      type = "z4";
+      break;
+    case protobuf::FieldDescriptor::TYPE_SINT64:
+      type = "z8";
+      break;
+    case protobuf::FieldDescriptor::TYPE_STRING:
+    case protobuf::FieldDescriptor::TYPE_BYTES:
+      type = "s";
+      wire_type = 2;
+      break;
+    case protobuf::FieldDescriptor::TYPE_MESSAGE:
+      if (field->is_map()) {
+        return;  // Not supported yet (ever?).
+      }
+      type = "m";
+      wire_type = 2;
+      break;
+    default:
+      return;  // Not supported yet.
+  }
+
+  switch (field->label()) {
+    case protobuf::FieldDescriptor::LABEL_REPEATED:
+      if (field->type() == protobuf::FieldDescriptor::TYPE_MESSAGE) {
+        cardinality = "r";
+        break;
+      } else {
+        return;  // Not supported yet.
+      }
+    case protobuf::FieldDescriptor::LABEL_OPTIONAL:
+    case protobuf::FieldDescriptor::LABEL_REQUIRED:
+      if (field->real_containing_oneof()) {
+        return;  // Not supported yet.
+      } else {
+        cardinality = "s";
+      }
+      break;
+  }
+
+  uint16_t expected_tag = (num << 3) | wire_type;
+  if (num > 15) expected_tag |= 0x100;
+  MessageLayout::Size offset = layout.GetFieldOffset(field);
+  uint64_t hasbit_index = 0;  // Zero means no hasbits.
+
+  if (layout.HasHasbit(field)) {
+    hasbit_index = layout.GetHasbitIndex(field);
+    if (hasbit_index > 31) return;
+    // thas hasbits mask in the parser occupies bits 16-48
+    // in the 64 bit register. 
+    hasbit_index += 16;  // account for the shifted hasbits
+  }
+
+  MessageLayout::Size data;
+
+  data.size32 = ((uint64_t)offset.size32 << 48) | expected_tag;
+  data.size64 = ((uint64_t)offset.size64 << 48) | expected_tag;
+
+  if (field->type() == protobuf::FieldDescriptor::TYPE_MESSAGE) {
+    SubmsgArray submsg_array(message);
+    uint64_t idx = submsg_array.GetIndex(field);
+    data.size32 |= idx << 16 | hasbit_index << 32;
+    data.size64 |= idx << 16 | hasbit_index << 32;
+  } else {
+    uint64_t hasbit_mask = (1ull << hasbit_index) & -0x10000;
+    data.size32 |= (uint64_t)hasbit_mask;
+    data.size64 |= (uint64_t)hasbit_mask;
+  }
+
+
+  if (field->type() == protobuf::FieldDescriptor::TYPE_MESSAGE) {
+    std::string size_ceil = "max";
+    size_t size = SIZE_MAX;
+    if (field->message_type()->file() == field->file()) {
+      MessageLayout sub_layout(field->message_type());
+      size = sub_layout.message_size().size64 + 8;
+    }
+    std::vector<size_t> breaks = {64, 128, 192, 256};
+    for (auto brk : breaks) {
+      if (size <= brk) {
+        size_ceil = std::to_string(brk);
+        break;
+      }
+    }
+    ent.first = absl::Substitute("upb_p$0$1_$2bt_max$3b", cardinality, type,
+                                 (num > 15) ? "2" : "1", size_ceil);
+
+  } else {
+    ent.first = absl::Substitute("upb_p$0$1_$2bt", cardinality, type,
+                                 (num > 15) ? "2" : "1");
+  }
+  ent.second = data;
+}
+
+std::vector<TableEntry> FastDecodeTable(const protobuf::Descriptor* message,
+                                        const MessageLayout& layout) {
+  std::vector<TableEntry> table;
+  MessageLayout::Size empty_size;
+  empty_size.size32 = 0;
+  empty_size.size64 = 0;
+  for (int i = 0; i < 32; i++) {
+    table.emplace_back(TableEntry{"fastdecode_generic", empty_size});
+    TryFillTableEntry(message, layout, i, table.back());
+  }
+  return table;
+}
+
 void WriteSource(const protobuf::FileDescriptor* file, Output& output) {
   EmitFileWarning(file, output);
 
@@ -827,7 +958,14 @@ void WriteSource(const protobuf::FileDescriptor* file, Output& output) {
       output("};\n\n");
     }
 
+    std::vector<TableEntry> table = FastDecodeTable(message, layout);
+
     output("const upb_msglayout $0 = {\n", MessageInit(message));
+    output("  {\n");
+    for (const auto& ent : table) {
+      output("    {&$0, $1},\n", ent.first, GetSizeInit(ent.second));
+    }
+    output("  },\n");
     output("  $0,\n", submsgs_array_ref);
     output("  $0,\n", fields_array_ref);
     output("  $0, $1, $2,\n", GetSizeInit(layout.message_size()),

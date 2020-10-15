@@ -117,9 +117,6 @@ class BuildFileFunctions(object):
   def proto_library(self, **kwargs):
     pass
 
-  def cc_proto_library(self, **kwargs):
-    pass
-
   def generated_file_staleness_test(self, **kwargs):
     pass
 
