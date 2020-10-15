@@ -40,8 +40,9 @@ CPPOPTS = [
 
 COPTS = CPPOPTS + [
     # copybara:strip_for_google3_begin
-    "-pedantic",
-    "-Werror=pedantic",
+    #"-pedantic",
+    #"-Werror=pedantic",
+    "-std=gnu11",
     "-Wstrict-prototypes",
     # copybara:strip_end
 ]
@@ -79,6 +80,9 @@ cc_library(
     name = "upb",
     srcs = [
         "upb/decode.c",
+        "upb/decode.int.h",
+        "upb/decode_fast.c",
+        "upb/decode_fast.h",
         "upb/encode.c",
         "upb/msg.c",
         "upb/msg.h",
@@ -110,6 +114,7 @@ cc_library(
 cc_library(
     name = "generated_code_support__only_for_generated_code_do_not_use__i_give_permission_to_break_me",
     hdrs = [
+        "upb/decode_fast.h",
         "upb/msg.h",
         "upb/port_def.inc",
         "upb/port_undef.inc",
@@ -365,23 +370,12 @@ cc_proto_library(
     deps = [":benchmark_descriptor_proto"],
 )
 
-proto_library(
-    name = "benchmark_descriptor_sv_proto",
-    srcs = ["tests/descriptor_sv.proto"],
-)
-
-cc_proto_library(
-    name = "benchmark_descriptor_sv_cc_proto",
-    deps = [":benchmark_descriptor_sv_proto"],
-)
-
 cc_binary(
     name = "benchmark",
     testonly = 1,
     srcs = ["tests/benchmark.cc"],
     deps = [
         ":benchmark_descriptor_cc_proto",
-        ":benchmark_descriptor_sv_cc_proto",
         ":benchmark_descriptor_upb_proto",
         ":benchmark_descriptor_upb_proto_reflection",
         ":descriptor_upb_proto",
