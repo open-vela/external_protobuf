@@ -46,21 +46,7 @@ typedef struct {
   uint8_t label;          /* google.protobuf.Label or _UPB_LABEL_* above. */
 } upb_msglayout_field;
 
-struct upb_msglayout;
-struct upb_decstate;
-
-typedef const char *_upb_field_parser(struct upb_decstate *d, const char *ptr,
-                                      upb_msg *msg,
-                                      const struct upb_msglayout *table,
-                                      uint64_t hasbits, uint64_t data);
-
-typedef struct _upb_table_pair {
-  _upb_field_parser *field_parser;
-  uint64_t field_data;
-} _upb_table_pair;
-
 typedef struct upb_msglayout {
-  _upb_table_pair fasttable[32];
   const struct upb_msglayout *const* submsgs;
   const upb_msglayout_field *fields;
   /* Must be aligned to sizeof(void*).  Doesn't include internal members like
@@ -207,11 +193,6 @@ typedef struct {
 
 UPB_INLINE const void *_upb_array_constptr(const upb_array *arr) {
   return (void*)(arr->data & ~(uintptr_t)7);
-}
-
-UPB_INLINE uintptr_t _upb_array_tagptr(void* ptr, int elem_size_lg2) {
-  UPB_ASSERT(elem_size_lg2 <= 4);
-  return (uintptr_t)ptr | elem_size_lg2;
 }
 
 UPB_INLINE void *_upb_array_ptr(upb_array *arr) {
