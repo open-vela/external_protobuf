@@ -14,8 +14,8 @@
 
 // The standard set of arguments passed to each parsing function.
 // Thanks to x86-64 calling conventions, these will stay in registers.
-#define UPB_PARSE_PARAMS                                          \
-  upb_decstate *d, const char *ptr, upb_msg *msg, intptr_t table, \
+#define UPB_PARSE_PARAMS                                                      \
+  upb_decstate *d, const char *ptr, upb_msg *msg, const upb_msglayout *table, \
       uint64_t hasbits, uint64_t data
 
 #define UPB_PARSE_ARGS d, ptr, msg, table, hasbits, data
@@ -31,7 +31,9 @@ typedef enum {
 } upb_card;
 
 UPB_INLINE
-upb_msg *decode_newmsg_ceil(upb_decstate *d, size_t size, int msg_ceil_bytes) {
+upb_msg *decode_newmsg_ceil(upb_decstate *d, const upb_msglayout *l,
+                            int msg_ceil_bytes) {
+  size_t size = l->size + sizeof(upb_msg_internal);
   char *msg_data;
   if (UPB_LIKELY(msg_ceil_bytes > 0 && _upb_arenahas(&d->arena, msg_ceil_bytes))) {
     UPB_ASSERT(size <= (size_t)msg_ceil_bytes);
@@ -48,20 +50,20 @@ upb_msg *decode_newmsg_ceil(upb_decstate *d, size_t size, int msg_ceil_bytes) {
 }
 
 UPB_FORCEINLINE
-const char *fastdecode_tagdispatch(upb_decstate *d, const char *ptr,
-                                   upb_msg *msg, intptr_t table,
-                                   uint64_t hasbits, uint32_t tag) {
-  const upb_msglayout *table_p = decode_totablep(table);
-  uint8_t mask = table;
+static const char *fastdecode_tagdispatch(upb_decstate *d, const char *ptr,
+                                          upb_msg *msg,
+                                          const upb_msglayout *table,
+                                          uint64_t hasbits, uint32_t tag) {
+  // Get 5 bits of field number (we pretend the continuation bit is a data bit,
+  // speculating that the second byte, if any, will be 0x01).
+  size_t idx = (tag & 0xf8) >> 3;
 
-  // Get N bits of field number, based on the message table size.
-  size_t idx = tag & mask;
-  __builtin_assume((idx & 7) == 0);
-  idx >>= 3;
-  uint64_t data = table_p->fasttable[idx].field_data ^ tag;
+  // Xor the actual tag with the expected tag (in the low bytes of the table)
+  // so that the field parser can verify the tag by comparing with zero.
+  uint64_t data = table->fasttable[idx].field_data ^ tag;
 
   // Jump to the specialized field parser function.
-  return table_p->fasttable[idx].field_parser(UPB_PARSE_ARGS);
+  return table->fasttable[idx].field_parser(UPB_PARSE_ARGS);
 }
 
 UPB_FORCEINLINE
@@ -73,7 +75,7 @@ static uint32_t fastdecode_loadtag(const char *ptr) {
 
 UPB_FORCEINLINE
 const char *fastdecode_dispatch(upb_decstate *d, const char *ptr, upb_msg *msg,
-                                intptr_t table, uint64_t hasbits) {
+                                const upb_msglayout *table, uint64_t hasbits) {
   if (UPB_UNLIKELY(ptr >= d->fastlimit)) {
     if (UPB_LIKELY(ptr == d->limit)) {
       // Parse is finished.
@@ -294,7 +296,7 @@ const char *upb_pos_2bt(UPB_PARSE_PARAMS) {
 
 UPB_NOINLINE
 static const char *fastdecode_tosubmsg(upb_decstate *d, const char *ptr,
-                                       upb_msg *msg, intptr_t table,
+                                       upb_msg *msg, const upb_msglayout *table,
                                        uint64_t hasbits,
                                        const char *saved_limit) {
   size_t len = (uint8_t)ptr[-1];
@@ -338,10 +340,7 @@ static const char *fastdecode_submsg(UPB_PARSE_PARAMS, int tagbytes,
   void *end;
   uint32_t submsg_idx = data;
   submsg_idx >>= 16;
-  const upb_msglayout *table_p = decode_totablep(table);
-  const upb_msglayout *subl = table_p->submsgs[submsg_idx];
-  intptr_t subt = decode_totable(subl);
-  size_t submsg_size = subl->size + sizeof(upb_msg_internal);
+  const upb_msglayout *subl = table->submsgs[submsg_idx];
   submsg = fastdecode_getfield_ofs(d, ptr, msg, &data, &hasbits, &arr, &end,
                                    sizeof(upb_msg *), card, true);
 
@@ -372,11 +371,12 @@ again:
   upb_msg* child = *submsg;
 
   if (card == CARD_r || UPB_LIKELY(!child)) {
-    *submsg = child = decode_newmsg_ceil(d, submsg_size, msg_ceil_bytes);
+    *submsg = child = decode_newmsg_ceil(d, subl, msg_ceil_bytes);
   }
 
   ptr += tagbytes + 1;
-  ptr = fastdecode_tosubmsg(d, ptr, child, subt, 0, saved_limit);
+
+  ptr = fastdecode_tosubmsg(d, ptr, child, subl, 0, saved_limit);
 
   if (UPB_UNLIKELY(ptr != d->limit || d->end_group != 0)) {
     return fastdecode_err(d);
