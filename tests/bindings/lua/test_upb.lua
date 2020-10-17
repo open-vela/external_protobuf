@@ -1,7 +1,7 @@
 
 local upb = require "lupb"
 local lunit = require "lunit"
-local upb_test = require "tests.test_pb"
+local upb_test = require "tests.bindings.lua.test_pb"
 local test_messages_proto3 = require "google.protobuf.test_messages_proto3_pb"
 local test_messages_proto2 = require "google.protobuf.test_messages_proto2_pb"
 local descriptor = require "google.protobuf.descriptor_pb"
@@ -482,7 +482,7 @@ function test_numeric_map()
 end
 
 function test_unknown()
-  local bytes = string.rep("\x38\x00", 1000)
+  local bytes = string.rep("\x38\x00", 10000)
   for i=1,1000 do
     local msg = upb.decode(test_messages_proto3.TestAllTypesProto3, bytes)
   end
