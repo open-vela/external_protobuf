@@ -13,8 +13,8 @@
 
 // The standard set of arguments passed to each parsing function.
 // Thanks to x86-64 calling conventions, these will stay in registers.
-#define UPB_PARSE_PARAMS                                          \
-  upb_decstate *d, const char *ptr, upb_msg *msg, intptr_t table, \
+#define UPB_PARSE_PARAMS                                                      \
+  upb_decstate *d, const char *ptr, upb_msg *msg, const upb_msglayout *table, \
       uint64_t hasbits, uint64_t data
 
 #define UPB_PARSE_ARGS d, ptr, msg, table, hasbits, data
@@ -30,7 +30,9 @@ typedef enum {
 } upb_card;
 
 UPB_INLINE
-upb_msg *decode_newmsg_ceil(upb_decstate *d, size_t size, int msg_ceil_bytes) {
+upb_msg *decode_newmsg_ceil(upb_decstate *d, const upb_msglayout *l,
+                            int msg_ceil_bytes) {
+  size_t size = l->size + sizeof(upb_msg_internal);
   char *msg_data;
   if (UPB_LIKELY(msg_ceil_bytes > 0 && _upb_arenahas(&d->arena, msg_ceil_bytes))) {
     UPB_ASSERT(size <= (size_t)msg_ceil_bytes);
@@ -44,6 +46,50 @@ upb_msg *decode_newmsg_ceil(upb_decstate *d, size_t size, int msg_ceil_bytes) {
     memset(msg_data, 0, size);
   }
   return msg_data + sizeof(upb_msg_internal);
+}
+
+UPB_FORCEINLINE
+static const char *fastdecode_tagdispatch(upb_decstate *d, const char *ptr,
+                                          upb_msg *msg,
+                                          const upb_msglayout *table,
+                                          uint64_t hasbits, uint32_t tag) {
+  // Get 5 bits of field number (we pretend the continuation bit is a data bit,
+  // speculating that the second byte, if any, will be 0x01).
+  size_t idx = (tag & 0xf8) >> 3;
+
+  // Xor the actual tag with the expected tag (in the low bytes of the table)
+  // so that the field parser can verify the tag by comparing with zero.
+  uint64_t data = table->fasttable[idx].field_data ^ tag;
+
+  // Jump to the specialized field parser function.
+  return table->fasttable[idx].field_parser(UPB_PARSE_ARGS);
+}
+
+UPB_FORCEINLINE
+static uint32_t fastdecode_loadtag(const char *ptr) {
+  uint16_t tag;
+  memcpy(&tag, ptr, 2);
+  return tag;
+}
+
+UPB_FORCEINLINE
+const char *fastdecode_dispatch(upb_decstate *d, const char *ptr, upb_msg *msg,
+                                const upb_msglayout *table, uint64_t hasbits) {
+  if (UPB_UNLIKELY(ptr >= d->fastlimit)) {
+    if (UPB_LIKELY(ptr == d->limit)) {
+      // Parse is finished.
+      *(uint32_t*)msg |= hasbits >> 16;  // Sync hasbits.
+      return ptr;
+    }
+    // We are within 16 bytes of end-of-buffer, so we can't use fast parsing
+    // functions anymore (they will read up to 16b without bounds checks).
+    uint64_t data = 0;
+    RETURN_GENERIC("dispatch hit end\n");
+  }
+
+  // Read two bytes of tag data (for a one-byte tag, the high byte is junk).
+  uint16_t tag = fastdecode_loadtag(ptr);
+  return fastdecode_tagdispatch(d, ptr, msg, table, hasbits, tag);
 }
 
 UPB_FORCEINLINE
@@ -100,6 +146,14 @@ static void *fastdecode_getfield_ofs(upb_decstate *d, const char *ptr,
   }
 }
 
+UPB_FORCEINLINE
+static void *fastdecode_getfield(upb_decstate *d, const char *ptr, upb_msg *msg,
+                                 uint64_t *data, uint64_t *hasbits,
+                                 int valbytes, upb_card card) {
+  return fastdecode_getfield_ofs(d, ptr, msg, data, hasbits, NULL, NULL,
+                                 valbytes, card, false);
+}
+
 /* varint fields **************************************************************/
 
 UPB_FORCEINLINE
@@ -126,33 +180,8 @@ static const char *fastdecode_varint(UPB_PARSE_PARAMS, int tagbytes,
   if (UPB_UNLIKELY(!fastdecode_checktag(data, tagbytes))) {
     RETURN_GENERIC("varint field tag mismatch\n");
   }
-  
-  upb_array* arr;
-  void* end;
-  dst = fastdecode_getfield_ofs(d, ptr, msg, &data, &hasbits, &arr, &end,
-                            valbytes, card, false);
-  if (card == CARD_r) {
-    if (UPB_UNLIKELY(!dst)) {
-      RETURN_GENERIC("need array resize\n");
-    }
-  }
-  
-again:
-  if (card == CARD_r) {
-    if (UPB_UNLIKELY(dst == end)) {
-      size_t old_size = arr->size;
-      size_t old_bytes = old_size * valbytes;
-      size_t new_size = old_size * 2;
-      size_t new_bytes = new_size * valbytes;
-      char *old_ptr = _upb_array_ptr(arr);
-      char *new_ptr = upb_arena_realloc(&d->arena, old_ptr, old_bytes, new_bytes);
-      arr->size = new_size;
-      arr->data = _upb_array_tagptr(new_ptr, 3);
-      dst = (void*)(new_ptr + (old_size * valbytes));
-      end = (void*)(new_ptr + (new_size * valbytes));
-    }
-  }
-  
+  dst = fastdecode_getfield(d, ptr, msg, &data, &hasbits, valbytes,
+                            card);
   ptr += tagbytes + 1;
   val = (uint8_t)ptr[-1];
   if (UPB_UNLIKELY(val & 0x80)) {
@@ -165,32 +194,12 @@ again:
     }
     ptr++;
     uint64_t byte = (uint8_t)ptr[-1];
-    if (byte > 1) {
-      return fastdecode_err(d);
-    }
+    if (byte > 1) return fastdecode_err(d);
     val += (byte - 1) << 63;
   }
 done:
   val = fastdecode_munge(val, valbytes, zigzag);
   memcpy(dst, &val, valbytes);
-  
-  if (card == CARD_r) {
-    dst = (char*)dst + valbytes;
-    if (UPB_LIKELY(ptr < d->fastlimit)) {
-      uint32_t tag = fastdecode_loadtag(ptr);
-      if (tagbytes == 1) {
-        if ((uint8_t)tag == (uint8_t)data) goto again;
-      } else {
-        if ((uint16_t)tag == (uint16_t)data) goto again;
-      }
-      arr->len = (size_t)((char*)dst - (char*)_upb_array_ptr(arr)) / valbytes;
-      return fastdecode_tagdispatch(d, ptr, msg, table, hasbits, tag);
-    } else {
-      arr->len = (size_t)((char*)dst - (char*)_upb_array_ptr(arr)) / valbytes;
-      RETURN_GENERIC("repeated generic");
-    }
-  }
-  
   return fastdecode_dispatch(d, ptr, msg, table, hasbits);
 }
 
@@ -220,94 +229,14 @@ done:
 
 TAGBYTES(s)
 TAGBYTES(o)
-TAGBYTES(r)
+/* TAGBYTES(r) */
 
 #undef z_ZZ
 #undef b_ZZ
 #undef v_ZZ
-#undef F
-#undef TYPES
-#undef TAGBYTES
-
-/* fixed fields ***************************************************************/
-
-UPB_FORCEINLINE
-static const char *fastdecode_fixed(UPB_PARSE_PARAMS, int tagbytes,
-                                    int valbytes, upb_card card) {
-  void *dst;
-  if (UPB_UNLIKELY(!fastdecode_checktag(data, tagbytes))) {
-    RETURN_GENERIC("varint field tag mismatch\n");
-  }
-  upb_array* arr;
-  void* end;
-  dst = fastdecode_getfield_ofs(d, ptr, msg, &data, &hasbits, &arr, &end,
-                            valbytes, card, false);
-  if (card == CARD_r) {
-    if (UPB_UNLIKELY(!dst)) {
-      RETURN_GENERIC("need array resize\n");
-    }
-  }
-  
-again:
-  if (card == CARD_r) {
-    if (UPB_UNLIKELY(dst == end)) {
-      size_t old_size = arr->size;
-      size_t old_bytes = old_size * valbytes;
-      size_t new_size = old_size * 2;
-      size_t new_bytes = new_size * valbytes;
-      char *old_ptr = _upb_array_ptr(arr);
-      char *new_ptr = upb_arena_realloc(&d->arena, old_ptr, old_bytes, new_bytes);
-      arr->size = new_size;
-      arr->data = _upb_array_tagptr(new_ptr, 3);
-      dst = (void*)(new_ptr + (old_size * valbytes));
-      end = (void*)(new_ptr + (new_size * valbytes));
-    }
-  }
-  
-  ptr += tagbytes;
-  memcpy(dst, ptr, valbytes);
-  ptr += valbytes;
-  
-  if (card == CARD_r) {
-    dst = (char*)dst + valbytes;
-    if (UPB_LIKELY(ptr < d->fastlimit)) {
-      uint32_t tag = fastdecode_loadtag(ptr);
-      if (tagbytes == 1) {
-        if ((uint8_t)tag == (uint8_t)data) goto again;
-      } else {
-        if ((uint16_t)tag == (uint16_t)data) goto again;
-      }
-      arr->len = (size_t)((char*)dst - (char*)_upb_array_ptr(arr)) / valbytes;
-      return fastdecode_tagdispatch(d, ptr, msg, table, hasbits, tag);
-    } else {
-      arr->len = (size_t)((char*)dst - (char*)_upb_array_ptr(arr)) / valbytes;
-      RETURN_GENERIC("repeated generic");
-    }
-  }
-  
-  return fastdecode_dispatch(d, ptr, msg, table, hasbits);
-}
-
-/* Generate all varint functions.
- * {s,o,r} x {b1,v4,z4,v8,z8} x {1bt,2bt} */
-
-#define F(card, type, valbytes, tagbytes)                                      \
-  const char *upb_p##card##type##valbytes##_##tagbytes##bt(UPB_PARSE_PARAMS) { \
-    return fastdecode_fixed(UPB_PARSE_ARGS, tagbytes, valbytes, CARD_##card);            \
-  }
-
-#define TYPES(card, tagbytes) \
-  F(card, f, 4, tagbytes)     \
-  F(card, f, 8, tagbytes)
-
-#define TAGBYTES(card) \
-  TYPES(card, 1)       \
-  TYPES(card, 2)
-
-TAGBYTES(s)
-TAGBYTES(o)
-TAGBYTES(r)
-
+#undef o_ONEOF
+#undef s_ONEOF
+#undef r_ONEOF
 #undef F
 #undef TYPES
 #undef TAGBYTES
@@ -333,97 +262,40 @@ static const char *fastdecode_string(UPB_PARSE_PARAMS, int tagbytes,
     RETURN_GENERIC("string field tag mismatch\n");
   }
 
-  upb_array* arr;
-  void* end;
-  dst = fastdecode_getfield_ofs(d, ptr, msg, &data, &hasbits, &arr, &end,
-                            sizeof(upb_strview), card, false);
-  if (card == CARD_r) {
-    if (UPB_UNLIKELY(!dst)) {
-      RETURN_GENERIC("need array resize\n");
-    }
-  }
-  
-again:
-  if (card == CARD_r) {
-    if (UPB_UNLIKELY(dst == end)) {
-      size_t old_size = arr->size;
-      size_t old_bytes = old_size * sizeof(upb_strview);
-      size_t new_size = old_size * 2;
-      size_t new_bytes = new_size * sizeof(upb_strview);
-      char *old_ptr = _upb_array_ptr(arr);
-      char *new_ptr = upb_arena_realloc(&d->arena, old_ptr, old_bytes, new_bytes);
-      arr->size = new_size;
-      arr->data = _upb_array_tagptr(new_ptr, 3);
-      dst = (void*)(new_ptr + (old_size * sizeof(upb_strview*)));
-      end = (void*)(new_ptr + (new_size * sizeof(upb_strview*)));
-    }
-  }
-  
+  dst = fastdecode_getfield(d, ptr, msg, &data, &hasbits,
+                            sizeof(upb_strview), card);
   len = (int8_t)ptr[tagbytes];
   str = ptr + tagbytes + 1;
   dst->data = str;
   dst->size = len;
-  ptr = str + len;
   if (UPB_UNLIKELY(fastdecode_boundscheck(str, len, d->limit))) {
     dst->size = 0;
-    goto generic;
+    RETURN_GENERIC("string field len >1 byte\n");
   }
-  if (card == CARD_r) {
-    dst++;
-    if (UPB_LIKELY(ptr < d->fastlimit)) {
-      uint32_t tag = fastdecode_loadtag(ptr);
-      if (tagbytes == 1) {
-        if ((uint8_t)tag == (uint8_t)data) goto again;
-      } else {
-        if ((uint16_t)tag == (uint16_t)data) goto again;
-      }
-      arr->len = dst - (upb_strview*)_upb_array_ptr(arr);
-      return fastdecode_tagdispatch(d, ptr, msg, table, hasbits, tag);
-    } else {
-      goto generic;
-    }
-  }
-  if (card == CARD_r) {
-    arr->len = dst - (upb_strview*)_upb_array_ptr(arr);
-  }
-  return fastdecode_dispatch(d, ptr, msg, table, hasbits);
-  
-generic:
-  if (card == CARD_r) {
-    arr->len = dst - (upb_strview*)_upb_array_ptr(arr);
-  }
-  RETURN_GENERIC("repeated generic");
+  return fastdecode_dispatch(d, str + len, msg, table, hasbits);
 }
 
 const char *upb_pss_1bt(UPB_PARSE_PARAMS) {
   return fastdecode_string(UPB_PARSE_ARGS, 1, CARD_s);
 }
 
-const char *upb_pss_2bt(UPB_PARSE_PARAMS) {
-  return fastdecode_string(UPB_PARSE_ARGS, 2, CARD_s);
-}
-
 const char *upb_pos_1bt(UPB_PARSE_PARAMS) {
   return fastdecode_string(UPB_PARSE_ARGS, 1, CARD_o);
+}
+
+const char *upb_pss_2bt(UPB_PARSE_PARAMS) {
+  return fastdecode_string(UPB_PARSE_ARGS, 2, CARD_s);
 }
 
 const char *upb_pos_2bt(UPB_PARSE_PARAMS) {
   return fastdecode_string(UPB_PARSE_ARGS, 2, CARD_o);
 }
 
-const char *upb_prs_1bt(UPB_PARSE_PARAMS) {
-  return fastdecode_string(UPB_PARSE_ARGS, 1, CARD_r);
-}
-
-const char *upb_prs_2bt(UPB_PARSE_PARAMS) {
-  return fastdecode_string(UPB_PARSE_ARGS, 2, CARD_r);
-}
-
 /* message fields *************************************************************/
 
 UPB_NOINLINE
 static const char *fastdecode_tosubmsg(upb_decstate *d, const char *ptr,
-                                       upb_msg *msg, intptr_t table,
+                                       upb_msg *msg, const upb_msglayout *table,
                                        uint64_t hasbits,
                                        const char *saved_limit) {
   size_t len = (uint8_t)ptr[-1];
@@ -467,10 +339,7 @@ static const char *fastdecode_submsg(UPB_PARSE_PARAMS, int tagbytes,
   void *end;
   uint32_t submsg_idx = data;
   submsg_idx >>= 16;
-  const upb_msglayout *table_p = decode_totablep(table);
-  const upb_msglayout *subl = table_p->submsgs[submsg_idx];
-  intptr_t subt = decode_totable(subl);
-  size_t submsg_size = subl->size + sizeof(upb_msg_internal);
+  const upb_msglayout *subl = table->submsgs[submsg_idx];
   submsg = fastdecode_getfield_ofs(d, ptr, msg, &data, &hasbits, &arr, &end,
                                    sizeof(upb_msg *), card, true);
 
@@ -479,12 +348,6 @@ static const char *fastdecode_submsg(UPB_PARSE_PARAMS, int tagbytes,
     hasbits = 0;
   }
 
-  if (card == CARD_r) {
-    if (UPB_UNLIKELY(!submsg)) {
-      RETURN_GENERIC("need array resize\n");
-    }
-  }
-  
   const char *saved_limit = d->limit;
   const char *saved_fastlimit = d->fastlimit;
 
@@ -503,15 +366,16 @@ again:
       end = (void*)(new_ptr + (new_size * sizeof(upb_msg*)));
     }
   }
-  
+
   upb_msg* child = *submsg;
 
   if (card == CARD_r || UPB_LIKELY(!child)) {
-    *submsg = child = decode_newmsg_ceil(d, submsg_size, msg_ceil_bytes);
+    *submsg = child = decode_newmsg_ceil(d, subl, msg_ceil_bytes);
   }
 
   ptr += tagbytes + 1;
-  ptr = fastdecode_tosubmsg(d, ptr, child, subt, 0, saved_limit);
+
+  ptr = fastdecode_tosubmsg(d, ptr, child, subl, 0, saved_limit);
 
   if (UPB_UNLIKELY(ptr != d->limit || d->end_group != 0)) {
     return fastdecode_err(d);
@@ -548,6 +412,7 @@ again:
   d->depth++;
 
   return fastdecode_dispatch(d, ptr, msg, table, hasbits);
+
 repeated_generic:
   arr->len = submsg - (upb_msg**)_upb_array_ptr(arr);
   d->limit = saved_limit;

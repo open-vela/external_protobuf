@@ -50,7 +50,8 @@ struct upb_decstate;
 struct upb_msglayout;
 
 typedef const char *_upb_field_parser(struct upb_decstate *d, const char *ptr,
-                                      upb_msg *msg, intptr_t table,
+                                      upb_msg *msg,
+                                      const struct upb_msglayout *table,
                                       uint64_t hasbits, uint64_t data);
 
 typedef struct {
@@ -59,6 +60,7 @@ typedef struct {
 } _upb_fasttable_entry;
 
 typedef struct upb_msglayout {
+  _upb_fasttable_entry fasttable[32];
   const struct upb_msglayout *const* submsgs;
   const upb_msglayout_field *fields;
   /* Must be aligned to sizeof(void*).  Doesn't include internal members like
@@ -66,8 +68,6 @@ typedef struct upb_msglayout {
   uint16_t size;
   uint16_t field_count;
   bool extendable;
-  uint8_t table_mask;
-  _upb_fasttable_entry fasttable[];
 } upb_msglayout;
 
 /** upb_msg *******************************************************************/
