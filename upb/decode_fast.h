@@ -14,12 +14,12 @@ struct upb_decstate;
 // The fallback, generic parsing function that can handle any field type.
 // This just uses the regular (non-fast) parser to parse a single field.
 const char *fastdecode_generic(struct upb_decstate *d, const char *ptr,
-                               upb_msg *msg, const upb_msglayout *table,
-                               uint64_t hasbits, uint64_t data);
+                               upb_msg *msg, intptr_t table, uint64_t hasbits,
+                               uint64_t data);
 
-#define UPB_PARSE_PARAMS                                 \
-  struct upb_decstate *d, const char *ptr, upb_msg *msg, \
-      const upb_msglayout *table, uint64_t hasbits, uint64_t data
+#define UPB_PARSE_PARAMS                                                 \
+  struct upb_decstate *d, const char *ptr, upb_msg *msg, intptr_t table, \
+      uint64_t hasbits, uint64_t data
 
 #define F(card, type, valbytes, tagbytes) \
   const char *upb_p##card##type##valbytes##_##tagbytes##bt(UPB_PARSE_PARAMS);
@@ -29,20 +29,24 @@ const char *fastdecode_generic(struct upb_decstate *d, const char *ptr,
   F(card, v, 4, tagbytes)     \
   F(card, v, 8, tagbytes)     \
   F(card, z, 4, tagbytes)     \
-  F(card, z, 8, tagbytes)
+  F(card, z, 8, tagbytes)     \
+  F(card, f, 4, tagbytes)     \
+  F(card, f, 8, tagbytes)
 
 #define TAGBYTES(card) \
   TYPES(card, 1)       \
   TYPES(card, 2)
 
 TAGBYTES(s)
-TAGBYTES(o)
-/* TAGBYTES(r) */
+// TAGBYTES(o)
+TAGBYTES(r)
 
 const char *upb_pss_1bt(UPB_PARSE_PARAMS);
 const char *upb_pss_2bt(UPB_PARSE_PARAMS);
 const char *upb_pos_1bt(UPB_PARSE_PARAMS);
 const char *upb_pos_2bt(UPB_PARSE_PARAMS);
+const char *upb_prs_1bt(UPB_PARSE_PARAMS);
+const char *upb_prs_2bt(UPB_PARSE_PARAMS);
 
 #undef F
 #undef TYPES
