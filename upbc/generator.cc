@@ -777,18 +777,27 @@ void TryFillTableEntry(const protobuf::Descriptor* message,
       type = "m";
       wire_type = 2;
       break;
+    case protobuf::FieldDescriptor::TYPE_FIXED32:
+    case protobuf::FieldDescriptor::TYPE_SFIXED32:
+    case protobuf::FieldDescriptor::TYPE_FLOAT:
+      type = "f4";
+      wire_type = 5;
+      break;
+    case protobuf::FieldDescriptor::TYPE_FIXED64:
+    case protobuf::FieldDescriptor::TYPE_SFIXED64:
+    case protobuf::FieldDescriptor::TYPE_DOUBLE:
+      type = "f8";
+      wire_type = 1;
+      break;      
     default:
       return;  // Not supported yet.
   }
 
   switch (field->label()) {
     case protobuf::FieldDescriptor::LABEL_REPEATED:
-      if (field->type() == protobuf::FieldDescriptor::TYPE_MESSAGE) {
-        cardinality = "r";
-        break;
-      } else {
-        return;  // Not supported yet.
-      }
+      if (field->is_packed()) return;  // Packed fields are not supported
+      cardinality = "r";
+      break;
     case protobuf::FieldDescriptor::LABEL_OPTIONAL:
     case protobuf::FieldDescriptor::LABEL_REQUIRED:
       if (field->real_containing_oneof()) {
@@ -855,11 +864,19 @@ void TryFillTableEntry(const protobuf::Descriptor* message,
 
 std::vector<TableEntry> FastDecodeTable(const protobuf::Descriptor* message,
                                         const MessageLayout& layout) {
+  int table_size = 1;
+  for (int i = 0; i < message->field_count(); i++) {
+    int num = message->field(i)->number();
+    while (num >= table_size && num < 32) {
+      table_size *= 2;
+    }
+  }
+
   std::vector<TableEntry> table;
   MessageLayout::Size empty_size;
   empty_size.size32 = 0;
   empty_size.size64 = 0;
-  for (int i = 0; i < 32; i++) {
+  for (int i = 0; i < table_size; i++) {
     table.emplace_back(TableEntry{"fastdecode_generic", empty_size});
     TryFillTableEntry(message, layout, i, table.back());
   }
@@ -961,17 +978,18 @@ void WriteSource(const protobuf::FileDescriptor* file, Output& output) {
     std::vector<TableEntry> table = FastDecodeTable(message, layout);
 
     output("const upb_msglayout $0 = {\n", MessageInit(message));
+    output("  $0,\n", submsgs_array_ref);
+    output("  $0,\n", fields_array_ref);
+    output("  $0, $1, $2, $3,\n", GetSizeInit(layout.message_size()),
+           field_number_order.size(),
+           "false",  // TODO: extendable
+           (table.size() - 1) << 3
+    );
     output("  {\n");
     for (const auto& ent : table) {
       output("    {&$0, $1},\n", ent.first, GetSizeInit(ent.second));
     }
     output("  },\n");
-    output("  $0,\n", submsgs_array_ref);
-    output("  $0,\n", fields_array_ref);
-    output("  $0, $1, $2,\n", GetSizeInit(layout.message_size()),
-           field_number_order.size(),
-           "false"  // TODO: extendable
-    );
 
     output("};\n\n");
   }
