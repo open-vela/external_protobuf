@@ -141,9 +141,6 @@ class BuildFileFunctions(object):
   def config_setting(self, **kwargs):
     pass
 
-  def upb_fasttable_enabled(self, **kwargs):
-    pass
-
   def select(self, arg_dict):
     return []
 

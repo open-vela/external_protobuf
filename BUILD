@@ -5,7 +5,6 @@ load(
 )
 load(
     "//bazel:upb_proto_library.bzl",
-    "upb_fasttable_enabled",
     "upb_proto_library",
     "upb_proto_reflection_library",
 )
@@ -36,12 +35,6 @@ config_setting(
     constraint_values = ["@bazel_tools//platforms:windows"],
 )
 
-upb_fasttable_enabled(
-    name = "fasttable_enabled",
-    build_setting_default = True,
-    visibility = ["//visibility:public"],
-)
-
 # Public C/C++ libraries #######################################################
 
 cc_library(
@@ -60,7 +53,6 @@ cc_library(
     name = "upb",
     srcs = [
         "upb/decode.c",
-        "upb/decode.int.h",
         "upb/encode.c",
         "upb/msg.c",
         "upb/msg.h",
@@ -77,19 +69,7 @@ cc_library(
     ],
     copts = UPB_DEFAULT_COPTS,
     visibility = ["//visibility:public"],
-    deps = [":port", ":fastdecode"],
-)
-
-cc_library(
-    name = "fastdecode",
-    srcs = [
-        "upb/decode_fast.c",
-        "upb/decode_fast.h",
-        "upb/decode.int.h",
-        "upb/msg.h",
-        "upb/upb.int.h",
-    ],
-    deps = [":port", ":table"],
+    deps = [":port"],
 )
 
 # Common support routines used by generated code.  This library has no
@@ -101,7 +81,6 @@ cc_library(
 cc_library(
     name = "generated_code_support__only_for_generated_code_do_not_use__i_give_permission_to_break_me",
     hdrs = [
-        "upb/decode_fast.h",
         "upb/msg.h",
         "upb/port_def.inc",
         "upb/port_undef.inc",
@@ -187,13 +166,11 @@ cc_library(
 
 cc_library(
     name = "table",
-    hdrs = [
-      "upb/table.int.h",
-      "upb/upb.h",
-    ],
+    hdrs = ["upb/table.int.h"],
     visibility = ["//tests:__pkg__"],
     deps = [
         ":port",
+        ":upb",
     ],
 )
 
@@ -291,7 +268,6 @@ upb_amalgamation(
     amalgamator = ":amalgamate",
     libs = [
         ":upb",
-        ":fastdecode",
         ":descriptor_upb_proto",
         ":reflection",
         ":handlers",
@@ -305,6 +281,7 @@ cc_library(
     name = "amalgamation",
     srcs = ["upb.c"],
     hdrs = ["upb.h"],
+    copts = UPB_DEFAULT_COPTS,
 )
 
 upb_amalgamation(
@@ -316,7 +293,6 @@ upb_amalgamation(
     amalgamator = ":amalgamate",
     libs = [
         ":upb",
-        ":fastdecode",
         ":descriptor_upb_proto",
         ":descriptor_upb_proto_reflection",
         ":reflection",
@@ -330,6 +306,7 @@ cc_library(
     name = "php_amalgamation",
     srcs = ["php-upb.c"],
     hdrs = ["php-upb.h"],
+    copts = UPB_DEFAULT_COPTS,
 )
 
 upb_amalgamation(
@@ -341,7 +318,6 @@ upb_amalgamation(
     amalgamator = ":amalgamate",
     libs = [
         ":upb",
-        ":fastdecode",
         ":descriptor_upb_proto",
         ":reflection",
         ":port",
@@ -354,6 +330,7 @@ cc_library(
     name = "ruby_amalgamation",
     srcs = ["ruby-upb.c"],
     hdrs = ["ruby-upb.h"],
+    copts = UPB_DEFAULT_COPTS,
 )
 
 exports_files(
