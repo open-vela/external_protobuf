@@ -482,7 +482,7 @@ function test_numeric_map()
 end
 
 function test_unknown()
-  local bytes = string.rep("\x38\x00", 10000)
+  local bytes = string.rep("\x38\x00", 1000)
   for i=1,1000 do
     local msg = upb.decode(test_messages_proto3.TestAllTypesProto3, bytes)
   end
