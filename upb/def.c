@@ -940,7 +940,6 @@ static bool make_layout(const upb_symtab *symtab, const upb_msgdef *m) {
   const upb_msglayout **submsgs;
   upb_msglayout_field *fields;
   upb_alloc *alloc = upb_arena_alloc(symtab->arena);
-  size_t i;
 
   memset(l, 0, sizeof(*l));
 
@@ -956,12 +955,6 @@ static bool make_layout(const upb_symtab *symtab, const upb_msgdef *m) {
   l->field_count = upb_msgdef_numfields(m);
   l->fields = fields;
   l->submsgs = submsgs;
-
-  /* TODO(haberman): initialize fast tables so that reflection-based parsing
-   * can get the same speeds as linked-in types. */
-  for (i = 0; i < 32; i++) {
-    l->fasttable[i].field_parser = &fastdecode_generic;
-  }
 
   if (upb_msgdef_mapentry(m)) {
     /* TODO(haberman): refactor this method so this special case is more
