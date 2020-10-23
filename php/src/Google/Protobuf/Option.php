@@ -24,7 +24,7 @@ class Option extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1;</code>
      */
-    protected $name = '';
+    private $name = '';
     /**
      * The option's value packed in an Any message. If the value is a primitive,
      * the corresponding wrapper type defined in google/protobuf/wrappers.proto
@@ -33,7 +33,7 @@ class Option extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.Any value = 2;</code>
      */
-    protected $value = null;
+    private $value = null;
 
     /**
      * Constructor.
@@ -101,17 +101,7 @@ class Option extends \Google\Protobuf\Internal\Message
      */
     public function getValue()
     {
-        return isset($this->value) ? $this->value : null;
-    }
-
-    public function hasValue()
-    {
-        return isset($this->value);
-    }
-
-    public function clearValue()
-    {
-        unset($this->value);
+        return $this->value;
     }
 
     /**
