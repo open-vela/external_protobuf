@@ -65,10 +65,8 @@ class FieldGenerator {
   virtual void GenerateCFunctionImplementations(io::Printer* printer) const;
 
   // Exposed for subclasses, should always call it on the parent class also.
-  virtual void DetermineForwardDeclarations(
-      std::set<std::string>* fwd_decls) const;
-  virtual void DetermineObjectiveCClassDefinitions(
-      std::set<std::string>* fwd_decls) const;
+  virtual void DetermineForwardDeclarations(std::set<string>* fwd_decls) const;
+  virtual void DetermineObjectiveCClassDefinitions(std::set<string>* fwd_decls) const;
 
   // Used during generation, not intended to be extended by subclasses.
   void GenerateFieldDescription(
@@ -83,17 +81,16 @@ class FieldGenerator {
   virtual void SetExtraRuntimeHasBitsBase(int index_base);
   void SetOneofIndexBase(int index_base);
 
-  std::string variable(const char* key) const {
+  string variable(const char* key) const {
     return variables_.find(key)->second;
   }
 
   bool needs_textformat_name_support() const {
-    const std::string& field_flags = variable("fieldflags");
-    return field_flags.find("GPBFieldTextFormatNameCustom") !=
-           std::string::npos;
+    const string& field_flags = variable("fieldflags");
+    return field_flags.find("GPBFieldTextFormatNameCustom") != string::npos;
   }
-  std::string generated_objc_name() const { return variable("name"); }
-  std::string raw_field_name() const { return variable("raw_field_name"); }
+  string generated_objc_name() const { return variable("name"); }
+  string raw_field_name() const { return variable("raw_field_name"); }
 
  protected:
   FieldGenerator(const FieldDescriptor* descriptor, const Options& options);
@@ -102,7 +99,7 @@ class FieldGenerator {
   bool WantsHasProperty(void) const;
 
   const FieldDescriptor* descriptor_;
-  std::map<std::string, std::string> variables_;
+  std::map<string, string> variables_;
 };
 
 class SingleFieldGenerator : public FieldGenerator {

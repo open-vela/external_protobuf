@@ -1,6 +1,7 @@
 set(libprotobuf_lite_files
   ${protobuf_source_dir}/src/google/protobuf/any_lite.cc
   ${protobuf_source_dir}/src/google/protobuf/arena.cc
+  ${protobuf_source_dir}/src/google/protobuf/arenastring.cc
   ${protobuf_source_dir}/src/google/protobuf/extension_set.cc
   ${protobuf_source_dir}/src/google/protobuf/generated_enum_util.cc
   ${protobuf_source_dir}/src/google/protobuf/generated_message_table_driven_lite.cc
@@ -67,9 +68,6 @@ add_library(libprotobuf-lite ${protobuf_SHARED_OR_STATIC}
 target_link_libraries(libprotobuf-lite ${CMAKE_THREAD_LIBS_INIT})
 if(protobuf_LINK_LIBATOMIC)
   target_link_libraries(libprotobuf-lite atomic)
-endif()
-if(${CMAKE_SYSTEM_NAME} STREQUAL "Android")
-	target_link_libraries(libprotobuf-lite log)
 endif()
 target_include_directories(libprotobuf-lite PUBLIC ${protobuf_source_dir}/src)
 if(MSVC AND protobuf_BUILD_SHARED_LIBS)

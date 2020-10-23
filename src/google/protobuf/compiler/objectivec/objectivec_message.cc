@@ -170,15 +170,16 @@ const FieldDescriptor** SortFieldsByStorageSize(const Descriptor* descriptor) {
 }
 }  // namespace
 
-MessageGenerator::MessageGenerator(const std::string& root_classname,
+MessageGenerator::MessageGenerator(const string& root_classname,
                                    const Descriptor* descriptor,
                                    const Options& options)
     : root_classname_(root_classname),
       descriptor_(descriptor),
       field_generators_(descriptor, options),
       class_name_(ClassName(descriptor_)),
-      deprecated_attribute_(GetOptionalDeprecatedAttribute(
-          descriptor, descriptor->file(), false, true)) {
+      deprecated_attribute_(
+          GetOptionalDeprecatedAttribute(descriptor, descriptor->file(), false, true)) {
+
   for (int i = 0; i < descriptor_->extension_count(); i++) {
     extension_generators_.emplace_back(
         new ExtensionGenerator(class_name_, descriptor_->extension(i)));
@@ -216,8 +217,7 @@ void MessageGenerator::GenerateStaticVariablesInitialization(
   }
 }
 
-void MessageGenerator::DetermineForwardDeclarations(
-    std::set<std::string>* fwd_decls) {
+void MessageGenerator::DetermineForwardDeclarations(std::set<string>* fwd_decls) {
   if (!IsMapEntryMessage(descriptor_)) {
     for (int i = 0; i < descriptor_->field_count(); i++) {
       const FieldDescriptor* fieldDescriptor = descriptor_->field(i);
@@ -231,8 +231,7 @@ void MessageGenerator::DetermineForwardDeclarations(
   }
 }
 
-void MessageGenerator::DetermineObjectiveCClassDefinitions(
-    std::set<std::string>* fwd_decls) {
+void MessageGenerator::DetermineObjectiveCClassDefinitions(std::set<string>* fwd_decls) {
   if (!IsMapEntryMessage(descriptor_)) {
     for (int i = 0; i < descriptor_->field_count(); i++) {
       const FieldDescriptor* fieldDescriptor = descriptor_->field(i);
@@ -251,7 +250,7 @@ void MessageGenerator::DetermineObjectiveCClassDefinitions(
 
   const Descriptor* containing_descriptor = descriptor_->containing_type();
   if (containing_descriptor != NULL) {
-    std::string containing_class = ClassName(containing_descriptor);
+    string containing_class = ClassName(containing_descriptor);
     fwd_decls->insert(ObjCClassDeclaration(containing_class));
   }
 }
@@ -326,7 +325,7 @@ void MessageGenerator::GenerateMessageHeader(io::Printer* printer) {
     generator->GenerateCaseEnum(printer);
   }
 
-  std::string message_comments;
+  string message_comments;
   SourceLocation location;
   if (descriptor_->GetSourceLocation(&location)) {
     message_comments = BuildCommentsString(location, false);
@@ -474,7 +473,7 @@ void MessageGenerator::GenerateSource(io::Printer* printer) {
     TextFormatDecodeData text_format_decode_data;
     bool has_fields = descriptor_->field_count() > 0;
     bool need_defaults = field_generators_.DoesAnyFieldHaveNonZeroDefault();
-    std::string field_description_type;
+    string field_description_type;
     if (need_defaults) {
       field_description_type = "GPBMessageFieldDescriptionWithDefault";
     } else {
@@ -504,7 +503,7 @@ void MessageGenerator::GenerateSource(io::Printer* printer) {
       printer->Outdent();
     }
 
-    std::map<std::string, std::string> vars;
+    std::map<string, string> vars;
     vars["classname"] = class_name_;
     vars["rootclassname"] = root_classname_;
     vars["fields"] = has_fields ? "fields" : "NULL";
@@ -515,7 +514,7 @@ void MessageGenerator::GenerateSource(io::Printer* printer) {
       vars["fields_count"] = "0";
     }
 
-    std::vector<std::string> init_flags;
+    std::vector<string> init_flags;
     init_flags.push_back("GPBDescriptorInitializationFlag_UsesClassRefs");
     init_flags.push_back("GPBDescriptorInitializationFlag_Proto3OptionalKnown");
     if (need_defaults) {
@@ -552,7 +551,7 @@ void MessageGenerator::GenerateSource(io::Printer* printer) {
           "first_has_index", oneof_generators_[0]->HasIndexAsString());
     }
     if (text_format_decode_data.num_entries() != 0) {
-      const std::string text_format_data_str(text_format_decode_data.Data());
+      const string text_format_data_str(text_format_decode_data.Data());
       printer->Print(
           "#if !GPBOBJC_SKIP_MESSAGE_TEXTFORMAT_EXTRAS\n"
           "    static const char *extraTextFormatInfo =");
@@ -582,13 +581,13 @@ void MessageGenerator::GenerateSource(io::Printer* printer) {
           "                                    count:(uint32_t)(sizeof(ranges) / sizeof(GPBExtensionRange))];\n");
     }
     if (descriptor_->containing_type() != NULL) {
-      std::string containing_class = ClassName(descriptor_->containing_type());
-      std::string parent_class_ref = ObjCClass(containing_class);
+      string containing_class = ClassName(descriptor_->containing_type());
+      string parent_class_ref = ObjCClass(containing_class);
       printer->Print(
           "    [localDescriptor setupContainingMessageClass:$parent_class_ref$];\n",
           "parent_class_ref", parent_class_ref);
     }
-    std::string suffix_added;
+    string suffix_added;
     ClassName(descriptor_, &suffix_added);
     if (!suffix_added.empty()) {
       printer->Print(

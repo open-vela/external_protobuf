@@ -61,11 +61,13 @@ void GenerateFile(const FileDescriptor* file, io::Printer* printer,
   reflectionClassGenerator.Generate(printer);
 }
 
-bool Generator::Generate(const FileDescriptor* file,
-                         const std::string& parameter,
-                         GeneratorContext* generator_context,
-                         std::string* error) const {
-  std::vector<std::pair<std::string, std::string> > options;
+bool Generator::Generate(
+    const FileDescriptor* file,
+    const string& parameter,
+    GeneratorContext* generator_context,
+    string* error) const {
+
+  std::vector<std::pair<string, string> > options;
   ParseGeneratorParameter(parameter, &options);
 
   struct Options cli_options;
@@ -86,7 +88,7 @@ bool Generator::Generate(const FileDescriptor* file,
     }
   }
 
-  std::string filename_error = "";
+  string filename_error = "";
   std::string filename = GetOutputFile(file,
       cli_options.file_extension,
       cli_options.base_namespace_specified,
