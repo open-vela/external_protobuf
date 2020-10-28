@@ -3,7 +3,7 @@
 //
 // The function names are encoded with names like:
 //
-//   //  123
+//   //  123 4
 //   upb_pss_1bt();   // Parse singular string, 1 byte tag.
 //
 // In position 1:
@@ -25,7 +25,11 @@
 //   - 'f4' for 4-byte fixed
 //   - 'f8' for 8-byte fixed
 //   - 'm' for sub-message
-//   - 's' for string
+//   - 's' for string/bytes
+//
+// In position 4 (tag length):
+//   - '1' for one-byte tags (field numbers 1-15)
+//   - '2' for two-byte tags (field numbers 16-2048)
 
 #ifndef UPB_DECODE_FAST_H_
 #define UPB_DECODE_FAST_H_
@@ -37,12 +41,12 @@ struct upb_decstate;
 // The fallback, generic parsing function that can handle any field type.
 // This just uses the regular (non-fast) parser to parse a single field.
 const char *fastdecode_generic(struct upb_decstate *d, const char *ptr,
-                               upb_msg *msg, const upb_msglayout *table,
-                               uint64_t hasbits, uint64_t data);
+                               upb_msg *msg, intptr_t table, uint64_t hasbits,
+                               uint64_t data);
 
-#define UPB_PARSE_PARAMS                                 \
-  struct upb_decstate *d, const char *ptr, upb_msg *msg, \
-      const upb_msglayout *table, uint64_t hasbits, uint64_t data
+#define UPB_PARSE_PARAMS                                                 \
+  struct upb_decstate *d, const char *ptr, upb_msg *msg, intptr_t table, \
+      uint64_t hasbits, uint64_t data
 
 /* primitive fields ***********************************************************/
 
