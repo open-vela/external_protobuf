@@ -5,9 +5,10 @@ load(
 )
 load(
     "//bazel:upb_proto_library.bzl",
+    "upb_fasttable_enabled",
     "upb_proto_library",
-    "upb_proto_library_copts",
     "upb_proto_reflection_library",
+    "upb_proto_library_copts",
 )
 
 # copybara:strip_for_google3_begin
@@ -26,14 +27,14 @@ exports_files([
 ])
 
 config_setting(
-    name = "darwin",
-    values = {"cpu": "darwin"},
-    visibility = ["//visibility:public"],
-)
-
-config_setting(
     name = "windows",
     constraint_values = ["@bazel_tools//platforms:windows"],
+)
+
+upb_fasttable_enabled(
+    name = "fasttable_enabled",
+    build_setting_default = False,
+    visibility = ["//visibility:public"],
 )
 
 upb_proto_library_copts(

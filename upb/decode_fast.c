@@ -17,8 +17,8 @@
 
 // The standard set of arguments passed to each parsing function.
 // Thanks to x86-64 calling conventions, these will stay in registers.
-#define UPB_PARSE_PARAMS                                                      \
-  upb_decstate *d, const char *ptr, upb_msg *msg, const upb_msglayout *table, \
+#define UPB_PARSE_PARAMS                                          \
+  upb_decstate *d, const char *ptr, upb_msg *msg, intptr_t table, \
       uint64_t hasbits, uint64_t data
 
 #define UPB_PARSE_ARGS d, ptr, msg, table, hasbits, data
@@ -34,34 +34,9 @@ typedef enum {
   CARD_p = 3   /* Packed Repeated */
 } upb_card;
 
-UPB_FORCEINLINE
-static const char *fastdecode_tagdispatch(upb_decstate *d, const char *ptr,
-                                          upb_msg *msg,
-                                          const upb_msglayout *table,
-                                          uint64_t hasbits, uint32_t tag) {
-  // Get 5 bits of field number (we pretend the continuation bit is a data bit,
-  // speculating that the second byte, if any, will be 0x01).
-  size_t idx = (tag & 0xf8) >> 3;
-
-  // Xor the actual tag with the expected tag (in the low bytes of the table)
-  // so that the field parser can verify the tag by comparing with zero.
-  uint64_t data = table->fasttable[idx].field_data ^ tag;
-
-  // Jump to the specialized field parser function.
-  return table->fasttable[idx].field_parser(UPB_PARSE_ARGS);
-}
-
-UPB_FORCEINLINE
-static uint32_t fastdecode_loadtag(const char *ptr) {
-  uint16_t tag;
-  memcpy(&tag, ptr, 2);
-  return tag;
-}
-
 UPB_NOINLINE
 static const char *fastdecode_isdonefallback(upb_decstate *d, const char *ptr,
-                                             upb_msg *msg,
-                                             const upb_msglayout *table,
+                                             upb_msg *msg, intptr_t table,
                                              uint64_t hasbits, int overrun) {
   ptr = decode_isdonefallback_inl(d, ptr, overrun);
   if (ptr == NULL) {
@@ -72,8 +47,9 @@ static const char *fastdecode_isdonefallback(upb_decstate *d, const char *ptr,
 }
 
 UPB_FORCEINLINE
-const char *fastdecode_dispatch(upb_decstate *d, const char *ptr, upb_msg *msg,
-                                const upb_msglayout *table, uint64_t hasbits) {
+static const char *fastdecode_dispatch(upb_decstate *d, const char *ptr,
+                                       upb_msg *msg, intptr_t table,
+                                       uint64_t hasbits) {
   if (UPB_UNLIKELY(ptr >= d->limit_ptr)) {
     int overrun = ptr - d->end;
     if (UPB_LIKELY(overrun == d->limit)) {
@@ -101,9 +77,10 @@ static bool fastdecode_checktag(uint64_t data, int tagbytes) {
 
 UPB_FORCEINLINE
 static const char *fastdecode_longsize(const char *ptr, int *size) {
+  int i;
   UPB_ASSERT(*size & 0x80);
   *size &= 0xff;
-  for (int i = 0; i < 3; i++) {
+  for (i = 0; i < 3; i++) {
     ptr++;
     size_t byte = (uint8_t)ptr[-1];
     *size += (byte - 1) << (7 + 7 * i);
@@ -167,7 +144,7 @@ static const char *fastdecode_delimited(upb_decstate *d, const char *ptr,
     }
     int delta = decode_pushlimit(d, ptr, len);
     ptr = func(d, ptr, ctx);
-    decode_poplimit(d, delta);
+    decode_poplimit(d, ptr, delta);
   } else {
     // Fast case: Sub-message is <128 bytes and fits in the current buffer.
     // This means we can preserve limit/limit_ptr verbatim.
@@ -673,8 +650,8 @@ typedef const char *fastdecode_copystr_func(struct upb_decstate *d,
 UPB_NOINLINE
 static const char *fastdecode_longstring(struct upb_decstate *d,
                                          const char *ptr, upb_msg *msg,
-                                         const upb_msglayout *table,
-                                         uint64_t hasbits, upb_strview *dst) {
+                                         intptr_t table, uint64_t hasbits,
+                                         upb_strview *dst) {
   int size = (uint8_t)ptr[0];  // Could plumb through hasbits.
   ptr++;
   if (size & 0x80) {
@@ -888,7 +865,7 @@ upb_msg *decode_newmsg_ceil(upb_decstate *d, const upb_msglayout *l,
 }
 
 typedef struct {
-  const upb_msglayout *layout;
+  intptr_t table;
   upb_msg *msg;
 } fastdecode_submsgdata;
 
@@ -896,7 +873,7 @@ UPB_FORCEINLINE
 static const char *fastdecode_tosubmsg(upb_decstate *d, const char *ptr,
                                        void *ctx) {
   fastdecode_submsgdata *submsg = ctx;
-  ptr = fastdecode_dispatch(d, ptr, submsg->msg, submsg->layout, 0);
+  ptr = fastdecode_dispatch(d, ptr, submsg->msg, submsg->table, 0);
   UPB_ASSUME(ptr != NULL);
   return ptr;
 }
@@ -913,8 +890,14 @@ static const char *fastdecode_submsg(UPB_PARSE_PARAMS, int tagbytes,
 
   upb_msg **dst;
   uint32_t submsg_idx = (data >> 16) & 0xff;
-  fastdecode_submsgdata submsg = {table->submsgs[submsg_idx]};
+  const upb_msglayout *tablep = decode_totablep(table);
+  const upb_msglayout *subtablep = tablep->submsgs[submsg_idx];
+  fastdecode_submsgdata submsg = {decode_totable(subtablep)};
   fastdecode_arr farr;
+
+  if (subtablep->table_mask == (uint8_t)-1) {
+    RETURN_GENERIC("submessage doesn't have fast tables.");
+  }
 
   dst = fastdecode_getfield(d, ptr, msg, &data, &hasbits, &farr,
                             sizeof(upb_msg *), card);
@@ -932,7 +915,7 @@ again:
   submsg.msg = *dst;
 
   if (card == CARD_r || UPB_LIKELY(!submsg.msg)) {
-    *dst = submsg.msg = decode_newmsg_ceil(d, submsg.layout, msg_ceil_bytes);
+    *dst = submsg.msg = decode_newmsg_ceil(d, subtablep, msg_ceil_bytes);
   }
 
   ptr += tagbytes;
