@@ -281,6 +281,7 @@ genrule(
     outs = ["upb/json/parser.c"],
     cmd = "$(location @ragel//:ragelc) -C -o upb/json/parser.c $< && mv upb/json/parser.c $@",
     tools = ["@ragel//:ragelc"],
+    visibility = ["//cmake:__pkg__"],
 )
 
 # Amalgamation #################################################################
