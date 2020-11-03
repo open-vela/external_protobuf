@@ -478,10 +478,16 @@ build_php7.0() {
 }
 
 build_php7.0_c() {
+  IS_64BIT=$1
   use_php 7.0
   php/tests/test.sh
   pushd conformance
-  make test_php_c
+  if [ "$IS_64BIT" = "true" ]
+  then
+    make test_php_c
+  else
+    make test_php_c_32
+  fi
   popd
 }
 
@@ -497,10 +503,16 @@ build_php7.0_mixed() {
 }
 
 build_php7.0_zts_c() {
+  IS_64BIT=$1
   use_php_zts 7.0
   php/tests/test.sh
   pushd conformance
-  make test_php_c
+  if [ "$IS_64BIT" = "true" ]
+  then
+    make test_php_c
+  else
+    make test_php_c_32
+  fi
   popd
 }
 
@@ -563,10 +575,16 @@ build_php7.1() {
 }
 
 build_php7.1_c() {
+  IS_64BIT=$1
   use_php 7.1
   php/tests/test.sh
   pushd conformance
-  make test_php_c
+  if [ "$IS_64BIT" = "true" ]
+  then
+    make test_php_c
+  else
+    make test_php_c_32
+  fi
   popd
 }
 
@@ -582,10 +600,16 @@ build_php7.1_mixed() {
 }
 
 build_php7.1_zts_c() {
+  IS_64BIT=$1
   use_php_zts 7.1
   php/tests/test.sh
   pushd conformance
-  make test_php_c
+  if [ "$IS_64BIT" = "true" ]
+  then
+    make test_php_c
+  else
+    make test_php_c_32
+  fi
   popd
 }
 
@@ -600,10 +624,16 @@ build_php7.4() {
 }
 
 build_php7.4_c() {
+  IS_64BIT=$1
   use_php 7.4
   php/tests/test.sh
   pushd conformance
-  make test_php_c
+  if [ "$IS_64BIT" = "true" ]
+  then
+    make test_php_c
+  else
+    make test_php_c_32
+  fi
   popd
 }
 
@@ -619,10 +649,16 @@ build_php7.4_mixed() {
 }
 
 build_php7.4_zts_c() {
+  IS_64BIT=$1
   use_php_zts 7.4
   php/tests/test.sh
   pushd conformance
-  make test_php_c
+  if [ "$IS_64BIT" = "true" ]
+  then
+    make test_php_c
+  else
+    make test_php_c_32
+  fi
   popd
 }
 
@@ -637,10 +673,16 @@ build_php8.0() {
 }
 
 build_php8.0_c() {
+  IS_64BIT=$1
   use_php 8.0
   php/tests/test.sh
   pushd conformance
-  make test_php_c
+  if [ "$IS_64BIT" = "true" ]
+  then
+    make test_php_c
+  else
+    make test_php_c_32
+  fi
   popd
 }
 
