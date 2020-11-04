@@ -1,3 +1,4 @@
+
 def generated_file_staleness_test(name, outs, generated_pattern):
     """Tests that checked-in file(s) match the contents of generated file(s).
 
