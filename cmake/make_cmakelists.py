@@ -144,9 +144,6 @@ class BuildFileFunctions(object):
   def config_setting(self, **kwargs):
     pass
 
-  def upb_fasttable_enabled(self, **kwargs):
-    pass
-
   def select(self, arg_dict):
     return []
 
@@ -283,7 +280,6 @@ globs = GetDict(converter)
 
 exec(open("WORKSPACE").read(), GetDict(WorkspaceFileFunctions(converter)))
 exec(open("BUILD").read(), GetDict(BuildFileFunctions(converter)))
-exec(open("third_party/wyhash/BUILD").read(), GetDict(BuildFileFunctions(converter)))
 
 with open(sys.argv[1], "w") as f:
   f.write(converter.convert())

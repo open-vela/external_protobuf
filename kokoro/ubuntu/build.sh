@@ -17,22 +17,6 @@ which bazel
 bazel version
 
 cd $(dirname $0)/../..
-<<<<<<< HEAD
-
-if which gcc; then
-  gcc --version
-  bazel test --test_output=errors ...
-  # The checked-in code is with fasttable not enabled.
-  bazel test --test_output=errors ... --//:fasttable_enabled=true -- -cmake:test_generated_files
-fi
-
-if which clang; then
-  CC=clang bazel test --test_output=errors ...
-  # The checked-in code is with fasttable not enabled.
-  CC=clang bazel test --test_output=errors ... --//:fasttable_enabled=true -- -cmake:test_generated_files
-fi
-=======
->>>>>>> master
 
 if which gcc; then
   gcc --version
