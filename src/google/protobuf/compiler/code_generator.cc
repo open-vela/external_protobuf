@@ -123,15 +123,6 @@ void ParseGeneratorParameter(
   }
 }
 
-// Strips ".proto" or ".protodevel" from the end of a filename.
-std::string StripProto(const std::string& filename) {
-  if (HasSuffixString(filename, ".protodevel")) {
-    return StripSuffixString(filename, ".protodevel");
-  } else {
-    return StripSuffixString(filename, ".proto");
-  }
-}
-
 }  // namespace compiler
 }  // namespace protobuf
 }  // namespace google

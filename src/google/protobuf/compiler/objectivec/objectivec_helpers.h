@@ -59,6 +59,9 @@ struct Options {
 // Escape C++ trigraphs by escaping question marks to "\?".
 std::string PROTOC_EXPORT EscapeTrigraphs(const std::string& to_escape);
 
+// Strips ".proto" or ".protodevel" from the end of a filename.
+std::string PROTOC_EXPORT StripProto(const std::string& filename);
+
 // Remove white space from either end of a StringPiece.
 void PROTOC_EXPORT TrimWhitespace(StringPiece* input);
 

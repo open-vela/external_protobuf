@@ -41,7 +41,6 @@
 #include <unordered_set>
 #include <vector>
 
-#include <google/protobuf/compiler/code_generator.h>
 #include <google/protobuf/compiler/objectivec/objectivec_helpers.h>
 #include <google/protobuf/compiler/objectivec/objectivec_nsobject_methods.h>
 #include <google/protobuf/descriptor.pb.h>
@@ -361,6 +360,14 @@ std::string GetEnumNameForFlagType(const FlagType flag_type) {
 // Escape C++ trigraphs by escaping question marks to \?
 std::string EscapeTrigraphs(const std::string& to_escape) {
   return StringReplace(to_escape, "?", "\\?", true);
+}
+
+std::string StripProto(const std::string& filename) {
+  if (HasSuffixString(filename, ".protodevel")) {
+    return StripSuffixString(filename, ".protodevel");
+  } else {
+    return StripSuffixString(filename, ".proto");
+  }
 }
 
 void TrimWhitespace(StringPiece* input) {
