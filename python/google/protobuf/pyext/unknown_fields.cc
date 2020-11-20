@@ -142,7 +142,6 @@ static void Dealloc(PyObject* pself) {
   }
   Py_CLEAR(self->parent);
   self->~PyUnknownFields();
-  Py_TYPE(pself)->tp_free(pself);
 }
 
 static PySequenceMethods SqMethods = {

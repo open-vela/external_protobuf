@@ -209,6 +209,9 @@ inline const Descriptor* FieldScope(const FieldDescriptor* field) {
 std::string FieldMessageTypeName(const FieldDescriptor* field,
                                  const Options& options);
 
+// Strips ".proto" or ".protodevel" from the end of a filename.
+PROTOC_EXPORT std::string StripProto(const std::string& filename);
+
 // Get the C++ type name for a primitive type (e.g. "double", "::google::protobuf::int32", etc.).
 const char* PrimitiveTypeName(FieldDescriptor::CppType type);
 std::string PrimitiveTypeName(const Options& options,
@@ -880,14 +883,6 @@ inline OneOfRangeImpl OneOfRange(const Descriptor* desc) { return {desc}; }
 void GenerateParserLoop(const Descriptor* descriptor, int num_hasbits,
                         const Options& options,
                         MessageSCCAnalyzer* scc_analyzer, io::Printer* printer);
-
-inline std::string StripProto(const std::string& filename) {
-  /*
-   * TODO(github/georgthegreat) remove this proxy method
-   * once Google's internal codebase will become ready
-   */
-  return compiler::StripProto(filename);
-}
 
 }  // namespace cpp
 }  // namespace compiler
