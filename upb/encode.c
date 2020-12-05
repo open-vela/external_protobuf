@@ -408,16 +408,15 @@ static void encode_scalarfield(upb_encstate *e, const char *msg,
 static void encode_message(upb_encstate *e, const char *msg,
                            const upb_msglayout *m, size_t *size) {
   size_t pre_len = e->limit - e->ptr;
+  const char *unknown;
+  size_t unknown_size;
   const upb_msglayout_field *f = &m->fields[m->field_count];
   const upb_msglayout_field *first = &m->fields[0];
 
-  if ((e->options & UPB_ENCODE_SKIPUNKNOWN) == 0) {
-    size_t unknown_size;
-    const char *unknown = upb_msg_getunknown(msg, &unknown_size);
+  unknown = upb_msg_getunknown(msg, &unknown_size);
 
-    if (unknown) {
-      encode_bytes(e, unknown, unknown_size);
-    }
+  if (unknown) {
+    encode_bytes(e, unknown, unknown_size);
   }
 
   while (f != first) {
