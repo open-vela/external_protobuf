@@ -1,6 +1,5 @@
 <?php
 
-require_once('test_base.php');
 require_once('test_util.php');
 
 use Google\Protobuf\Internal\RepeatedField;
@@ -8,7 +7,7 @@ use Google\Protobuf\Internal\GPBType;
 use Foo\TestMessage;
 use Foo\TestMessage\Sub;
 
-class ArrayTest extends TestBase
+class ArrayTest extends \PHPUnit\Framework\TestCase
 {
 
     #########################################################
@@ -297,15 +296,15 @@ class ArrayTest extends TestBase
 
         // Test append.
         $arr[] = 1;
-        $this->assertFloatEquals(1.0, $arr[0], MAX_FLOAT_DIFF);
+        $this->assertEquals(1.0, $arr[0], '', MAX_FLOAT_DIFF);
 
         $arr[] = 1.1;
-        $this->assertFloatEquals(1.1, $arr[1], MAX_FLOAT_DIFF);
+        $this->assertEquals(1.1, $arr[1], '', MAX_FLOAT_DIFF);
 
         $arr[] = '2';
-        $this->assertFloatEquals(2.0, $arr[2], MAX_FLOAT_DIFF);
+        $this->assertEquals(2.0, $arr[2], '', MAX_FLOAT_DIFF);
         $arr[] = '3.1';
-        $this->assertFloatEquals(3.1, $arr[3], MAX_FLOAT_DIFF);
+        $this->assertEquals(3.1, $arr[3], '', MAX_FLOAT_DIFF);
 
         $this->assertEquals(4, count($arr));
 
@@ -316,15 +315,15 @@ class ArrayTest extends TestBase
 
         // Test set.
         $arr[0] = 1;
-        $this->assertFloatEquals(1.0, $arr[0], MAX_FLOAT_DIFF);
+        $this->assertEquals(1.0, $arr[0], '', MAX_FLOAT_DIFF);
 
         $arr[1] = 1.1;
-        $this->assertFloatEquals(1.1, $arr[1], MAX_FLOAT_DIFF);
+        $this->assertEquals(1.1, $arr[1], '', MAX_FLOAT_DIFF);
 
         $arr[2] = '2';
-        $this->assertFloatEquals(2.0, $arr[2], MAX_FLOAT_DIFF);
+        $this->assertEquals(2.0, $arr[2], '', MAX_FLOAT_DIFF);
         $arr[3] = '3.1';
-        $this->assertFloatEquals(3.1, $arr[3], MAX_FLOAT_DIFF);
+        $this->assertEquals(3.1, $arr[3], '', MAX_FLOAT_DIFF);
     }
 
     #########################################################
@@ -337,15 +336,15 @@ class ArrayTest extends TestBase
 
         // Test append.
         $arr[] = 1;
-        $this->assertFloatEquals(1.0, $arr[0], MAX_FLOAT_DIFF);
+        $this->assertEquals(1.0, $arr[0], '', MAX_FLOAT_DIFF);
 
         $arr[] = 1.1;
-        $this->assertFloatEquals(1.1, $arr[1], MAX_FLOAT_DIFF);
+        $this->assertEquals(1.1, $arr[1], '', MAX_FLOAT_DIFF);
 
         $arr[] = '2';
-        $this->assertFloatEquals(2.0, $arr[2], MAX_FLOAT_DIFF);
+        $this->assertEquals(2.0, $arr[2], '', MAX_FLOAT_DIFF);
         $arr[] = '3.1';
-        $this->assertFloatEquals(3.1, $arr[3], MAX_FLOAT_DIFF);
+        $this->assertEquals(3.1, $arr[3], '', MAX_FLOAT_DIFF);
 
         $this->assertEquals(4, count($arr));
 
@@ -356,15 +355,15 @@ class ArrayTest extends TestBase
 
         // Test set.
         $arr[0] = 1;
-        $this->assertFloatEquals(1.0, $arr[0], MAX_FLOAT_DIFF);
+        $this->assertEquals(1.0, $arr[0], '', MAX_FLOAT_DIFF);
 
         $arr[1] = 1.1;
-        $this->assertFloatEquals(1.1, $arr[1], MAX_FLOAT_DIFF);
+        $this->assertEquals(1.1, $arr[1], '', MAX_FLOAT_DIFF);
 
         $arr[2] = '2';
-        $this->assertFloatEquals(2.0, $arr[2], MAX_FLOAT_DIFF);
+        $this->assertEquals(2.0, $arr[2], '', MAX_FLOAT_DIFF);
         $arr[3] = '3.1';
-        $this->assertFloatEquals(3.1, $arr[3], MAX_FLOAT_DIFF);
+        $this->assertEquals(3.1, $arr[3], '', MAX_FLOAT_DIFF);
     }
 
     #########################################################
@@ -567,8 +566,6 @@ class ArrayTest extends TestBase
             $sub = new Sub(['a' => $sub]);
         }
         $m->setRepeatedMessage($subs);
-
-        $this->assertTrue(true);
     }
 
     #########################################################

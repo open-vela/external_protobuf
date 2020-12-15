@@ -241,12 +241,8 @@ module BasicTest
         :map_string_msg => {"a" => TestMessage2.new(:foo => 1),
                             "b" => TestMessage2.new(:foo => 2)},
         :map_string_enum => {"a" => :A, "b" => :B})
-
-      # JRuby doesn't keep consistent ordering so check for either version
-      expected_a = "<BasicTest::MapMessage: map_string_int32: {\"b\"=>2, \"a\"=>1}, map_string_msg: {\"b\"=><BasicTest::TestMessage2: foo: 2>, \"a\"=><BasicTest::TestMessage2: foo: 1>}, map_string_enum: {\"b\"=>:B, \"a\"=>:A}>"
-      expected_b = "<BasicTest::MapMessage: map_string_int32: {\"a\"=>1, \"b\"=>2}, map_string_msg: {\"a\"=><BasicTest::TestMessage2: foo: 1>, \"b\"=><BasicTest::TestMessage2: foo: 2>}, map_string_enum: {\"a\"=>:A, \"b\"=>:B}>"
-      inspect_result = m.inspect
-      assert expected_a == inspect_result || expected_b == inspect_result, "Incorrect inspect result: #{inspect_result}"
+      expected = "<BasicTest::MapMessage: map_string_int32: {\"b\"=>2, \"a\"=>1}, map_string_msg: {\"b\"=><BasicTest::TestMessage2: foo: 2>, \"a\"=><BasicTest::TestMessage2: foo: 1>}, map_string_enum: {\"b\"=>:B, \"a\"=>:A}>"
+      assert_equal expected, m.inspect
     end
 
     def test_map_corruption

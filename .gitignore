@@ -137,7 +137,6 @@ conformance/*.class
 
 # php test output
 composer.lock
-php/.phpunit.result.cache
 php/tests/.phpunit.result.cache
 php/tests/generated/
 php/tests/old_protoc
@@ -163,7 +162,6 @@ php/ext/google/protobuf/configure.ac
 php/ext/google/protobuf/configure.in
 php/ext/google/protobuf/mkinstalldirs
 php/ext/google/protobuf/run-tests.php
-php/ext/google/protobuf/third_party/
 vendor/
 
 # JavaScript artifacts

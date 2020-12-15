@@ -207,7 +207,7 @@ if __name__ == '__main__':
     # C++ projects must now migrate to libc++ and are recommended to set a
     # deployment target of macOS 10.9 or later, or iOS 7 or later.
     if sys.platform == 'darwin':
-      mac_target = str(sysconfig.get_config_var('MACOSX_DEPLOYMENT_TARGET'))
+      mac_target = sysconfig.get_config_var('MACOSX_DEPLOYMENT_TARGET')
       if mac_target and (pkg_resources.parse_version(mac_target) <
                        pkg_resources.parse_version('10.9.0')):
         os.environ['MACOSX_DEPLOYMENT_TARGET'] = '10.9'
@@ -279,6 +279,8 @@ if __name__ == '__main__':
         "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
         ],
       namespace_packages=['google'],
       packages=find_packages(
