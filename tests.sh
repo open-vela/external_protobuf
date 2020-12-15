@@ -356,6 +356,10 @@ build_python38() {
   build_python_version py38-python
 }
 
+build_python39() {
+  build_python_version py39-python
+}
+
 build_python_cpp() {
   internal_build_cpp
   export LD_LIBRARY_PATH=../src/.libs # for Linux
@@ -408,6 +412,10 @@ build_python38_cpp() {
   build_python_cpp_version py38-cpp
 }
 
+build_python39_cpp() {
+  build_python_cpp_version py39-cpp
+}
+
 build_python_compatibility() {
   internal_build_cpp
   # Use the unit-tests extracted from 2.5.0 to test the compatibility.
@@ -440,11 +448,6 @@ build_ruby26() {
 build_ruby27() {
   internal_build_cpp  # For conformance tests.
   cd ruby && bash travis-test.sh ruby-2.7.0 && cd ..
-}
-
-build_jruby() {
-  internal_build_cpp  # For conformance tests.
-  cd ruby && bash travis-test.sh jruby-9.2.11.1 && cd ..
 }
 
 build_javascript() {
@@ -731,7 +734,6 @@ Usage: $0 { cpp |
             php7.1   |
             php7.1_c |
             php_all |
-            php8.0_all |
             dist_install |
             benchmark)
 "

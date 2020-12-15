@@ -10,6 +10,7 @@
     <LangVersion>3.0</LangVersion>
     <AssemblyOriginatorKeyFile>../../keys/Google.Protobuf.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
+    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
     <IsPackable>False</IsPackable>
   </PropertyGroup>
 
