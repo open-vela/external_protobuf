@@ -18,7 +18,6 @@
 #include "upb/table.int.h"
 #include "google/protobuf/descriptor.upb.h"
 
-/* Must be last. */
 #include "upb/port_def.inc"
 
 #ifdef __cplusplus

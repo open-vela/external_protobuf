@@ -99,8 +99,7 @@ add_library(reflection
   ../upb/reflection.c
   ../upb/def.h
   ../upb/def.hpp
-  ../upb/reflection.h
-  ../upb/reflection.hpp)
+  ../upb/reflection.h)
 target_link_libraries(reflection
   descriptor_upb_proto
   port

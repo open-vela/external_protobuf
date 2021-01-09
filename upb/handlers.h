@@ -22,6 +22,8 @@
 #include "upb/def.h"
 #include "upb/table.int.h"
 
+#include "upb/port_def.inc"
+
 #ifdef __cplusplus
 #include "upb/def.hpp"
 namespace upb {
@@ -32,8 +34,6 @@ template <class T> struct CanonicalType;
 }  /* namespace upb */
 #endif
 
-/* Must be last. */
-#include "upb/port_def.inc"
 
 /* The maximum depth that the handler graph can have.  This is a resource limit
  * for the C stack since we sometimes need to recursively traverse the graph.
