@@ -151,7 +151,7 @@ class Enum extends \Google\Protobuf\Internal\Message
      * The source context.
      *
      * Generated from protobuf field <code>.google.protobuf.SourceContext source_context = 4;</code>
-     * @return \Google\Protobuf\SourceContext|null
+     * @return \Google\Protobuf\SourceContext
      */
     public function getSourceContext()
     {

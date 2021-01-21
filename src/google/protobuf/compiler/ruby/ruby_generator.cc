@@ -242,7 +242,8 @@ void GenerateOneof(const OneofDescriptor* oneof, io::Printer* printer) {
 bool GenerateMessage(const Descriptor* message, io::Printer* printer,
                      std::string* error) {
   if (message->extension_range_count() > 0 || message->extension_count() > 0) {
-    GOOGLE_LOG(WARNING) << "Extensions are not yet supported for proto2 .proto files.";
+    *error = "Extensions are not yet supported for proto2 .proto files.";
+    return false;
   }
 
   // Don't generate MapEntry messages -- we use the Ruby extension's native
@@ -542,7 +543,8 @@ bool GenerateFile(const FileDescriptor* file, io::Printer* printer,
   // TODO: Remove this when ruby supports extensions for proto2 syntax.
   if (file->syntax() == FileDescriptor::SYNTAX_PROTO2 &&
       file->extension_count() > 0) {
-    GOOGLE_LOG(WARNING) << "Extensions are not yet supported for proto2 .proto files.";
+    *error = "Extensions are not yet supported for proto2 .proto files.";
+    return false;
   }
 
   printer->Print("Google::Protobuf::DescriptorPool.generated_pool.build do\n");
