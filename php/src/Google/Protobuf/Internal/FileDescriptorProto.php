@@ -371,7 +371,7 @@ class FileDescriptorProto extends \Google\Protobuf\Internal\Message
 
     /**
      * Generated from protobuf field <code>optional .google.protobuf.FileOptions options = 8;</code>
-     * @return \Google\Protobuf\Internal\FileOptions|null
+     * @return \Google\Protobuf\Internal\FileOptions
      */
     public function getOptions()
     {
@@ -408,7 +408,7 @@ class FileDescriptorProto extends \Google\Protobuf\Internal\Message
      * development tools.
      *
      * Generated from protobuf field <code>optional .google.protobuf.SourceCodeInfo source_code_info = 9;</code>
-     * @return \Google\Protobuf\Internal\SourceCodeInfo|null
+     * @return \Google\Protobuf\Internal\SourceCodeInfo
      */
     public function getSourceCodeInfo()
     {
