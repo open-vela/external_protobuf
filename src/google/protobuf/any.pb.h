@@ -53,10 +53,9 @@ struct PROTOBUF_EXPORT TableStruct_google_2fprotobuf_2fany_2eproto {
   static const ::PROTOBUF_NAMESPACE_ID::uint32 offsets[];
 };
 extern PROTOBUF_EXPORT const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_google_2fprotobuf_2fany_2eproto;
-PROTOBUF_EXPORT ::PROTOBUF_NAMESPACE_ID::Metadata descriptor_table_google_2fprotobuf_2fany_2eproto_metadata_getter(int index);
 PROTOBUF_NAMESPACE_OPEN
 class Any;
-struct AnyDefaultTypeInternal;
+class AnyDefaultTypeInternal;
 PROTOBUF_EXPORT extern AnyDefaultTypeInternal _Any_default_instance_;
 PROTOBUF_NAMESPACE_CLOSE
 PROTOBUF_NAMESPACE_OPEN
@@ -71,7 +70,6 @@ class PROTOBUF_EXPORT Any PROTOBUF_FINAL :
  public:
   inline Any() : Any(nullptr) {}
   virtual ~Any();
-  explicit constexpr Any(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
 
   Any(const Any& from);
   Any(Any&& from) noexcept
@@ -101,9 +99,8 @@ class PROTOBUF_EXPORT Any PROTOBUF_FINAL :
   static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
     return GetMetadataStatic().reflection;
   }
-  static const Any& default_instance() {
-    return *internal_default_instance();
-  }
+  static const Any& default_instance();
+
   static inline const Any* internal_default_instance() {
     return reinterpret_cast<const Any*>(
                &_Any_default_instance_);
@@ -202,7 +199,8 @@ class PROTOBUF_EXPORT Any PROTOBUF_FINAL :
   ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
   private:
   static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
-    return ::descriptor_table_google_2fprotobuf_2fany_2eproto_metadata_getter(kIndexInFileMessages);
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_google_2fprotobuf_2fany_2eproto);
+    return ::descriptor_table_google_2fprotobuf_2fany_2eproto.file_level_metadata[kIndexInFileMessages];
   }
 
   public:

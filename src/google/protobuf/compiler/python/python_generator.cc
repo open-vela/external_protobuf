@@ -69,7 +69,6 @@ namespace python {
 
 namespace {
 
-
 // Returns the Python module name expected for a given .proto filename.
 std::string ModuleName(const std::string& filename) {
   std::string basename = StripProto(filename);
@@ -312,6 +311,7 @@ bool Generator::Generate(const FileDescriptor* file,
       return false;
     }
   }
+
 
   // Completely serialize all Generate() calls on this instance.  The
   // thread-safety constraints of the CodeGenerator interface aren't clear so
@@ -675,8 +675,7 @@ void Generator::PrintDescriptorKeyAndModuleName(
     const ServiceDescriptor& descriptor) const {
   std::string name = ModuleLevelServiceDescriptorName(descriptor);
   if (!pure_python_workable_) {
-    name = "_descriptor.ServiceDescriptor(full_name='" +
-           descriptor.full_name() + "')";
+    name = "'" + descriptor.full_name() + "'";
   }
   printer_->Print("$descriptor_key$ = $descriptor_name$,\n", "descriptor_key",
                   kDescriptorKey, "descriptor_name", name);
@@ -873,8 +872,7 @@ void Generator::PrintMessage(const Descriptor& message_descriptor,
   if (pure_python_workable_) {
     m["descriptor_name"] = ModuleLevelDescriptorName(message_descriptor);
   } else {
-    m["descriptor_name"] = "_descriptor.Descriptor(full_name='" +
-                           message_descriptor.full_name() + "')";
+    m["descriptor_name"] = "'" + message_descriptor.full_name() + "'";
   }
   printer_->Print(m, "'$descriptor_key$' : $descriptor_name$,\n");
   std::string module_name = ModuleName(file_->name());
