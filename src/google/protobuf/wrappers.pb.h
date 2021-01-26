@@ -53,34 +53,33 @@ struct PROTOBUF_EXPORT TableStruct_google_2fprotobuf_2fwrappers_2eproto {
   static const ::PROTOBUF_NAMESPACE_ID::uint32 offsets[];
 };
 extern PROTOBUF_EXPORT const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_google_2fprotobuf_2fwrappers_2eproto;
-PROTOBUF_EXPORT ::PROTOBUF_NAMESPACE_ID::Metadata descriptor_table_google_2fprotobuf_2fwrappers_2eproto_metadata_getter(int index);
 PROTOBUF_NAMESPACE_OPEN
 class BoolValue;
-struct BoolValueDefaultTypeInternal;
+class BoolValueDefaultTypeInternal;
 PROTOBUF_EXPORT extern BoolValueDefaultTypeInternal _BoolValue_default_instance_;
 class BytesValue;
-struct BytesValueDefaultTypeInternal;
+class BytesValueDefaultTypeInternal;
 PROTOBUF_EXPORT extern BytesValueDefaultTypeInternal _BytesValue_default_instance_;
 class DoubleValue;
-struct DoubleValueDefaultTypeInternal;
+class DoubleValueDefaultTypeInternal;
 PROTOBUF_EXPORT extern DoubleValueDefaultTypeInternal _DoubleValue_default_instance_;
 class FloatValue;
-struct FloatValueDefaultTypeInternal;
+class FloatValueDefaultTypeInternal;
 PROTOBUF_EXPORT extern FloatValueDefaultTypeInternal _FloatValue_default_instance_;
 class Int32Value;
-struct Int32ValueDefaultTypeInternal;
+class Int32ValueDefaultTypeInternal;
 PROTOBUF_EXPORT extern Int32ValueDefaultTypeInternal _Int32Value_default_instance_;
 class Int64Value;
-struct Int64ValueDefaultTypeInternal;
+class Int64ValueDefaultTypeInternal;
 PROTOBUF_EXPORT extern Int64ValueDefaultTypeInternal _Int64Value_default_instance_;
 class StringValue;
-struct StringValueDefaultTypeInternal;
+class StringValueDefaultTypeInternal;
 PROTOBUF_EXPORT extern StringValueDefaultTypeInternal _StringValue_default_instance_;
 class UInt32Value;
-struct UInt32ValueDefaultTypeInternal;
+class UInt32ValueDefaultTypeInternal;
 PROTOBUF_EXPORT extern UInt32ValueDefaultTypeInternal _UInt32Value_default_instance_;
 class UInt64Value;
-struct UInt64ValueDefaultTypeInternal;
+class UInt64ValueDefaultTypeInternal;
 PROTOBUF_EXPORT extern UInt64ValueDefaultTypeInternal _UInt64Value_default_instance_;
 PROTOBUF_NAMESPACE_CLOSE
 PROTOBUF_NAMESPACE_OPEN
@@ -103,7 +102,6 @@ class PROTOBUF_EXPORT DoubleValue PROTOBUF_FINAL :
  public:
   inline DoubleValue() : DoubleValue(nullptr) {}
   virtual ~DoubleValue();
-  explicit constexpr DoubleValue(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
 
   DoubleValue(const DoubleValue& from);
   DoubleValue(DoubleValue&& from) noexcept
@@ -133,9 +131,8 @@ class PROTOBUF_EXPORT DoubleValue PROTOBUF_FINAL :
   static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
     return GetMetadataStatic().reflection;
   }
-  static const DoubleValue& default_instance() {
-    return *internal_default_instance();
-  }
+  static const DoubleValue& default_instance();
+
   static inline const DoubleValue* internal_default_instance() {
     return reinterpret_cast<const DoubleValue*>(
                &_DoubleValue_default_instance_);
@@ -201,7 +198,8 @@ class PROTOBUF_EXPORT DoubleValue PROTOBUF_FINAL :
   ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
   private:
   static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
-    return ::descriptor_table_google_2fprotobuf_2fwrappers_2eproto_metadata_getter(kIndexInFileMessages);
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_google_2fprotobuf_2fwrappers_2eproto);
+    return ::descriptor_table_google_2fprotobuf_2fwrappers_2eproto.file_level_metadata[kIndexInFileMessages];
   }
 
   public:
@@ -240,7 +238,6 @@ class PROTOBUF_EXPORT FloatValue PROTOBUF_FINAL :
  public:
   inline FloatValue() : FloatValue(nullptr) {}
   virtual ~FloatValue();
-  explicit constexpr FloatValue(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
 
   FloatValue(const FloatValue& from);
   FloatValue(FloatValue&& from) noexcept
@@ -270,9 +267,8 @@ class PROTOBUF_EXPORT FloatValue PROTOBUF_FINAL :
   static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
     return GetMetadataStatic().reflection;
   }
-  static const FloatValue& default_instance() {
-    return *internal_default_instance();
-  }
+  static const FloatValue& default_instance();
+
   static inline const FloatValue* internal_default_instance() {
     return reinterpret_cast<const FloatValue*>(
                &_FloatValue_default_instance_);
@@ -338,7 +334,8 @@ class PROTOBUF_EXPORT FloatValue PROTOBUF_FINAL :
   ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
   private:
   static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
-    return ::descriptor_table_google_2fprotobuf_2fwrappers_2eproto_metadata_getter(kIndexInFileMessages);
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_google_2fprotobuf_2fwrappers_2eproto);
+    return ::descriptor_table_google_2fprotobuf_2fwrappers_2eproto.file_level_metadata[kIndexInFileMessages];
   }
 
   public:
@@ -377,7 +374,6 @@ class PROTOBUF_EXPORT Int64Value PROTOBUF_FINAL :
  public:
   inline Int64Value() : Int64Value(nullptr) {}
   virtual ~Int64Value();
-  explicit constexpr Int64Value(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
 
   Int64Value(const Int64Value& from);
   Int64Value(Int64Value&& from) noexcept
@@ -407,9 +403,8 @@ class PROTOBUF_EXPORT Int64Value PROTOBUF_FINAL :
   static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
     return GetMetadataStatic().reflection;
   }
-  static const Int64Value& default_instance() {
-    return *internal_default_instance();
-  }
+  static const Int64Value& default_instance();
+
   static inline const Int64Value* internal_default_instance() {
     return reinterpret_cast<const Int64Value*>(
                &_Int64Value_default_instance_);
@@ -475,7 +470,8 @@ class PROTOBUF_EXPORT Int64Value PROTOBUF_FINAL :
   ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
   private:
   static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
-    return ::descriptor_table_google_2fprotobuf_2fwrappers_2eproto_metadata_getter(kIndexInFileMessages);
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_google_2fprotobuf_2fwrappers_2eproto);
+    return ::descriptor_table_google_2fprotobuf_2fwrappers_2eproto.file_level_metadata[kIndexInFileMessages];
   }
 
   public:
@@ -514,7 +510,6 @@ class PROTOBUF_EXPORT UInt64Value PROTOBUF_FINAL :
  public:
   inline UInt64Value() : UInt64Value(nullptr) {}
   virtual ~UInt64Value();
-  explicit constexpr UInt64Value(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
 
   UInt64Value(const UInt64Value& from);
   UInt64Value(UInt64Value&& from) noexcept
@@ -544,9 +539,8 @@ class PROTOBUF_EXPORT UInt64Value PROTOBUF_FINAL :
   static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
     return GetMetadataStatic().reflection;
   }
-  static const UInt64Value& default_instance() {
-    return *internal_default_instance();
-  }
+  static const UInt64Value& default_instance();
+
   static inline const UInt64Value* internal_default_instance() {
     return reinterpret_cast<const UInt64Value*>(
                &_UInt64Value_default_instance_);
@@ -612,7 +606,8 @@ class PROTOBUF_EXPORT UInt64Value PROTOBUF_FINAL :
   ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
   private:
   static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
-    return ::descriptor_table_google_2fprotobuf_2fwrappers_2eproto_metadata_getter(kIndexInFileMessages);
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_google_2fprotobuf_2fwrappers_2eproto);
+    return ::descriptor_table_google_2fprotobuf_2fwrappers_2eproto.file_level_metadata[kIndexInFileMessages];
   }
 
   public:
@@ -651,7 +646,6 @@ class PROTOBUF_EXPORT Int32Value PROTOBUF_FINAL :
  public:
   inline Int32Value() : Int32Value(nullptr) {}
   virtual ~Int32Value();
-  explicit constexpr Int32Value(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
 
   Int32Value(const Int32Value& from);
   Int32Value(Int32Value&& from) noexcept
@@ -681,9 +675,8 @@ class PROTOBUF_EXPORT Int32Value PROTOBUF_FINAL :
   static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
     return GetMetadataStatic().reflection;
   }
-  static const Int32Value& default_instance() {
-    return *internal_default_instance();
-  }
+  static const Int32Value& default_instance();
+
   static inline const Int32Value* internal_default_instance() {
     return reinterpret_cast<const Int32Value*>(
                &_Int32Value_default_instance_);
@@ -749,7 +742,8 @@ class PROTOBUF_EXPORT Int32Value PROTOBUF_FINAL :
   ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
   private:
   static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
-    return ::descriptor_table_google_2fprotobuf_2fwrappers_2eproto_metadata_getter(kIndexInFileMessages);
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_google_2fprotobuf_2fwrappers_2eproto);
+    return ::descriptor_table_google_2fprotobuf_2fwrappers_2eproto.file_level_metadata[kIndexInFileMessages];
   }
 
   public:
@@ -788,7 +782,6 @@ class PROTOBUF_EXPORT UInt32Value PROTOBUF_FINAL :
  public:
   inline UInt32Value() : UInt32Value(nullptr) {}
   virtual ~UInt32Value();
-  explicit constexpr UInt32Value(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
 
   UInt32Value(const UInt32Value& from);
   UInt32Value(UInt32Value&& from) noexcept
@@ -818,9 +811,8 @@ class PROTOBUF_EXPORT UInt32Value PROTOBUF_FINAL :
   static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
     return GetMetadataStatic().reflection;
   }
-  static const UInt32Value& default_instance() {
-    return *internal_default_instance();
-  }
+  static const UInt32Value& default_instance();
+
   static inline const UInt32Value* internal_default_instance() {
     return reinterpret_cast<const UInt32Value*>(
                &_UInt32Value_default_instance_);
@@ -886,7 +878,8 @@ class PROTOBUF_EXPORT UInt32Value PROTOBUF_FINAL :
   ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
   private:
   static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
-    return ::descriptor_table_google_2fprotobuf_2fwrappers_2eproto_metadata_getter(kIndexInFileMessages);
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_google_2fprotobuf_2fwrappers_2eproto);
+    return ::descriptor_table_google_2fprotobuf_2fwrappers_2eproto.file_level_metadata[kIndexInFileMessages];
   }
 
   public:
@@ -925,7 +918,6 @@ class PROTOBUF_EXPORT BoolValue PROTOBUF_FINAL :
  public:
   inline BoolValue() : BoolValue(nullptr) {}
   virtual ~BoolValue();
-  explicit constexpr BoolValue(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
 
   BoolValue(const BoolValue& from);
   BoolValue(BoolValue&& from) noexcept
@@ -955,9 +947,8 @@ class PROTOBUF_EXPORT BoolValue PROTOBUF_FINAL :
   static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
     return GetMetadataStatic().reflection;
   }
-  static const BoolValue& default_instance() {
-    return *internal_default_instance();
-  }
+  static const BoolValue& default_instance();
+
   static inline const BoolValue* internal_default_instance() {
     return reinterpret_cast<const BoolValue*>(
                &_BoolValue_default_instance_);
@@ -1023,7 +1014,8 @@ class PROTOBUF_EXPORT BoolValue PROTOBUF_FINAL :
   ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
   private:
   static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
-    return ::descriptor_table_google_2fprotobuf_2fwrappers_2eproto_metadata_getter(kIndexInFileMessages);
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_google_2fprotobuf_2fwrappers_2eproto);
+    return ::descriptor_table_google_2fprotobuf_2fwrappers_2eproto.file_level_metadata[kIndexInFileMessages];
   }
 
   public:
@@ -1062,7 +1054,6 @@ class PROTOBUF_EXPORT StringValue PROTOBUF_FINAL :
  public:
   inline StringValue() : StringValue(nullptr) {}
   virtual ~StringValue();
-  explicit constexpr StringValue(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
 
   StringValue(const StringValue& from);
   StringValue(StringValue&& from) noexcept
@@ -1092,9 +1083,8 @@ class PROTOBUF_EXPORT StringValue PROTOBUF_FINAL :
   static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
     return GetMetadataStatic().reflection;
   }
-  static const StringValue& default_instance() {
-    return *internal_default_instance();
-  }
+  static const StringValue& default_instance();
+
   static inline const StringValue* internal_default_instance() {
     return reinterpret_cast<const StringValue*>(
                &_StringValue_default_instance_);
@@ -1160,7 +1150,8 @@ class PROTOBUF_EXPORT StringValue PROTOBUF_FINAL :
   ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
   private:
   static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
-    return ::descriptor_table_google_2fprotobuf_2fwrappers_2eproto_metadata_getter(kIndexInFileMessages);
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_google_2fprotobuf_2fwrappers_2eproto);
+    return ::descriptor_table_google_2fprotobuf_2fwrappers_2eproto.file_level_metadata[kIndexInFileMessages];
   }
 
   public:
@@ -1206,7 +1197,6 @@ class PROTOBUF_EXPORT BytesValue PROTOBUF_FINAL :
  public:
   inline BytesValue() : BytesValue(nullptr) {}
   virtual ~BytesValue();
-  explicit constexpr BytesValue(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
 
   BytesValue(const BytesValue& from);
   BytesValue(BytesValue&& from) noexcept
@@ -1236,9 +1226,8 @@ class PROTOBUF_EXPORT BytesValue PROTOBUF_FINAL :
   static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
     return GetMetadataStatic().reflection;
   }
-  static const BytesValue& default_instance() {
-    return *internal_default_instance();
-  }
+  static const BytesValue& default_instance();
+
   static inline const BytesValue* internal_default_instance() {
     return reinterpret_cast<const BytesValue*>(
                &_BytesValue_default_instance_);
@@ -1304,7 +1293,8 @@ class PROTOBUF_EXPORT BytesValue PROTOBUF_FINAL :
   ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
   private:
   static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
-    return ::descriptor_table_google_2fprotobuf_2fwrappers_2eproto_metadata_getter(kIndexInFileMessages);
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_google_2fprotobuf_2fwrappers_2eproto);
+    return ::descriptor_table_google_2fprotobuf_2fwrappers_2eproto.file_level_metadata[kIndexInFileMessages];
   }
 
   public:
