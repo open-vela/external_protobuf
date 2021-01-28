@@ -38,7 +38,6 @@
 #include <map>
 #include <memory>
 #include <set>
-#include <unordered_map>
 #include <unordered_set>
 #include <vector>
 
@@ -53,7 +52,6 @@
 #include <google/protobuf/io/printer.h>
 #include <google/protobuf/stubs/strutil.h>
 
-// Must be last.
 #include <google/protobuf/port_def.inc>
 
 namespace google {
@@ -140,6 +138,13 @@ FileGenerator::FileGenerator(const FileDescriptor* file, const Options& options)
   for (int i = 0; i < file->weak_dependency_count(); ++i) {
     weak_deps_.insert(file->weak_dependency(i));
   }
+  for (int i = 0; i < message_generators_.size(); i++) {
+    if (IsSCCRepresentative(message_generators_[i]->descriptor_)) {
+      sccs_.push_back(GetSCC(message_generators_[i]->descriptor_));
+    }
+  }
+
+  std::sort(sccs_.begin(), sccs_.end(), CompareSortKeys<SCC>);
 }
 
 FileGenerator::~FileGenerator() = default;
@@ -421,10 +426,6 @@ void FileGenerator::GenerateSourceIncludes(io::Printer* printer) {
       format("#include \"$1$.proto.h\"\n", basename);
     }
   }
-  if (HasCordFields(file_, options_)) {
-    format(
-        "#include \"third_party/absl/strings/internal/string_constant.h\"\n");
-  }
 
   format("// @@protoc_insertion_point(includes)\n");
   IncludeFile("net/proto2/public/port_def.inc", printer);
@@ -440,28 +441,13 @@ void FileGenerator::GenerateSourceDefaultInstance(int idx,
                                                   io::Printer* printer) {
   Formatter format(printer, variables_);
   MessageGenerator* generator = message_generators_[idx].get();
-  generator->GenerateConstexprConstructor(printer);
-  // Use a union to disable the destructor of the _instance member.
-  // We can constant initialize, but the object will still have a non-trivial
-  // destructor that we need to elide.
   format(
-      "struct $1$ {\n"
-      "  constexpr $1$()\n"
-      "    : _instance(::$proto_ns$::internal::ConstantInitialized{}) {}\n"
-      "  ~$1$() {}\n"
-      "  union {\n"
-      "    $2$ _instance;\n"
-      "  };\n"
-      "};\n",
+      "class $1$ {\n"
+      " public:\n"
+      "  ::$proto_ns$::internal::ExplicitlyConstructed<$2$> _instance;\n",
       DefaultInstanceType(generator->descriptor_, options_),
       generator->classname_);
-  // NO_DESTROY is not necessary for correctness. The empty destructor is
-  // enough. However, the empty destructor fails to be elided in some
-  // configurations (like non-opt or with certain sanitizers). NO_DESTROY is
-  // there just to improve performance and binary size in these builds.
-  format("PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_NO_DESTROY $1$ $2$;\n",
-         DefaultInstanceType(generator->descriptor_, options_),
-         DefaultInstanceName(generator->descriptor_, options_));
+  format("} $1$;\n", DefaultInstanceName(generator->descriptor_, options_));
 
   if (options_.lite_implicit_weak_fields) {
     format("$1$* $2$ = &$3$;\n",
@@ -475,6 +461,8 @@ void FileGenerator::GenerateSourceDefaultInstance(int idx,
 // another .pb.cc file.
 struct FileGenerator::CrossFileReferences {
   // Populated if we are referencing from messages or files.
+  std::unordered_set<const SCC*> strong_sccs;
+  std::unordered_set<const SCC*> weak_sccs;
   std::unordered_set<const Descriptor*> weak_default_instances;
 
   // Only if we are referencing from files.
@@ -486,10 +474,16 @@ void FileGenerator::GetCrossFileReferencesForField(const FieldDescriptor* field,
                                                    CrossFileReferences* refs) {
   const Descriptor* msg = field->message_type();
   if (msg == nullptr) return;
+  const SCC* scc = GetSCC(msg);
 
   if (IsImplicitWeakField(field, options_, &scc_analyzer_) ||
       IsWeak(field, options_)) {
+    refs->weak_sccs.insert(scc);
     refs->weak_default_instances.insert(msg);
+  } else {
+    refs->strong_sccs.insert(scc);
+    // We don't need to declare default instances, because it is declared in the
+    // .proto.h file we imported.
   }
 }
 
@@ -515,6 +509,35 @@ void FileGenerator::GetCrossFileReferencesForFile(const FileDescriptor* file,
 void FileGenerator::GenerateInternalForwardDeclarations(
     const CrossFileReferences& refs, io::Printer* printer) {
   Formatter format(printer, variables_);
+
+  for (auto scc : Sorted(refs.strong_sccs)) {
+    format("extern $1$ ::$proto_ns$::internal::SCCInfo<$2$> $3$;\n",
+           FileDllExport(scc->GetFile(), options_), scc->children.size(),
+           SccInfoSymbol(scc, options_));
+  }
+
+  for (auto scc : Sorted(refs.weak_sccs)) {
+    // We do things a little bit differently for proto1-style weak fields versus
+    // lite implicit weak fields, even though they are trying to accomplish
+    // similar things. We need to support implicit weak fields on iOS, and the
+    // Apple linker only supports weak definitions, not weak declarations. For
+    // that reason we need a pointer type which we can weakly define to be null.
+    // However, code size considerations prevent us from using the same approach
+    // for proto1-style weak fields.
+    if (options_.lite_implicit_weak_fields) {
+      format("extern ::$proto_ns$::internal::SCCInfo<$1$> $2$;\n",
+             scc->children.size(), SccInfoSymbol(scc, options_));
+      format(
+          "__attribute__((weak)) ::$proto_ns$::internal::SCCInfo<$1$>*\n"
+          "    $2$ = nullptr;\n",
+          scc->children.size(), SccInfoPtrSymbol(scc, options_));
+    } else {
+      format(
+          "extern __attribute__((weak)) ::$proto_ns$::internal::SCCInfo<$1$> "
+          "$2$;\n",
+          scc->children.size(), SccInfoSymbol(scc, options_));
+    }
+  }
 
   {
     NamespaceOpener ns(format);
@@ -546,12 +569,23 @@ void FileGenerator::GenerateSourceForMessage(int idx, io::Printer* printer) {
   Formatter format(printer, variables_);
   GenerateSourceIncludes(printer);
 
+  // Generate weak declarations. We do this for the whole strongly-connected
+  // component (SCC), because we have a single InitDefaults* function for the
+  // SCC.
   CrossFileReferences refs;
-  ForEachField(message_generators_[idx]->descriptor_,
-               [this, &refs](const FieldDescriptor* field) {
-                 GetCrossFileReferencesForField(field, &refs);
-               });
+  for (const Descriptor* message :
+       scc_analyzer_.GetSCC(message_generators_[idx]->descriptor_)
+           ->descriptors) {
+    ForEachField(message, [this, &refs](const FieldDescriptor* field) {
+      GetCrossFileReferencesForField(field, &refs);
+    });
+  }
   GenerateInternalForwardDeclarations(refs, printer);
+
+  if (IsSCCRepresentative(message_generators_[idx]->descriptor_)) {
+    GenerateInitForSCC(GetSCC(message_generators_[idx]->descriptor_), refs,
+                       printer);
+  }
 
   {  // package namespace
     NamespaceOpener ns(Namespace(file_, options_), format);
@@ -633,6 +667,11 @@ void FileGenerator::GenerateSource(io::Printer* printer) {
 
   {
     GenerateTables(printer);
+
+    // Now generate the InitDefaults for each SCC.
+    for (auto scc : sccs_) {
+      GenerateInitForSCC(scc, refs, printer);
+    }
 
     if (HasDescriptorMethods(file_, options_)) {
       // Define the code to initialize reflection. This code uses a global
@@ -833,21 +872,31 @@ void FileGenerator::GenerateReflectionInitializationCode(io::Printer* printer) {
       refs.strong_reflection_files.size() + refs.weak_reflection_files.size();
 
   // Build array of DescriptorTable deps.
-  if (num_deps > 0) {
-    format(
-        "static const ::$proto_ns$::internal::DescriptorTable*const "
-        "$desc_table$_deps[$1$] = {\n",
-        num_deps);
+  format(
+      "static const ::$proto_ns$::internal::DescriptorTable*const "
+      "$desc_table$_deps[$1$] = {\n",
+      std::max(num_deps, 1));
 
-    for (auto dep : Sorted(refs.strong_reflection_files)) {
-      format("  &::$1$,\n", DescriptorTableName(dep, options_));
-    }
-    for (auto dep : Sorted(refs.weak_reflection_files)) {
-      format("  &::$1$,\n", DescriptorTableName(dep, options_));
-    }
-
-    format("};\n");
+  for (auto dep : Sorted(refs.strong_reflection_files)) {
+    format("  &::$1$,\n", DescriptorTableName(dep, options_));
   }
+  for (auto dep : Sorted(refs.weak_reflection_files)) {
+    format("  &::$1$,\n", DescriptorTableName(dep, options_));
+  }
+
+  format("};\n");
+
+  // Build array of SCCs from this file.
+  format(
+      "static ::$proto_ns$::internal::SCCInfoBase*const "
+      "$desc_table$_sccs[$1$] = {\n",
+      std::max<int>(sccs_.size(), 1));
+
+  for (auto scc : sccs_) {
+    format("  &$1$.base,\n", SccInfoSymbol(scc, options_));
+  }
+
+  format("};\n");
 
   // The DescriptorTable itself.
   // Should be "bool eager = NeedsEagerDescriptorAssignment(file_, options_);"
@@ -857,27 +906,14 @@ void FileGenerator::GenerateReflectionInitializationCode(io::Printer* printer) {
   format(
       "static ::$proto_ns$::internal::once_flag $desc_table$_once;\n"
       "const ::$proto_ns$::internal::DescriptorTable $desc_table$ = {\n"
-      "  false, $1$, $2$, $3$, \"$filename$\", \n"
-      "  &$desc_table$_once, $4$, $5$, $6$,\n"
+      "  false, $1$, $2$, \"$filename$\", $3$,\n"
+      "  &$desc_table$_once, $desc_table$_sccs, $desc_table$_deps, $4$, $5$,\n"
       "  schemas, file_default_instances, $tablename$::offsets,\n"
-      "  $file_level_metadata$, $file_level_enum_descriptors$, "
+      "  $file_level_metadata$, $6$, $file_level_enum_descriptors$, "
       "$file_level_service_descriptors$,\n"
-      "};\n"
-      // This function exists to be marked as weak.
-      // It can significantly speed up compilation by breaking up the SCC.
-      // Without the weak attribute all the messages in the file, including all
-      // the vtables and everything they use become part of the same SCC.
-      // By adding a weak function here we break the connection from the
-      // individual vtables back into the descriptor table.
-      "PROTOBUF_ATTRIBUTE_WEAK ::$proto_ns$::Metadata\n"
-      "$desc_table$_metadata_getter(int index) {\n"
-      "  ::$proto_ns$::internal::AssignDescriptors(&$desc_table$);\n"
-      "  return $desc_table$.file_level_metadata[index];\n"
-      "}\n"
-      "\n",
-      eager ? "true" : "false", file_data.size(), protodef_name,
-      num_deps == 0 ? "nullptr" : variables_["desc_table"] + "_deps", num_deps,
-      message_generators_.size());
+      "};\n\n",
+      eager ? "true" : "false", protodef_name, file_data.size(), sccs_.size(),
+      num_deps, message_generators_.size());
 
   // For descriptor.proto we want to avoid doing any dynamic initialization,
   // because in some situations that would otherwise pull in a lot of
@@ -890,6 +926,86 @@ void FileGenerator::GenerateReflectionInitializationCode(io::Printer* printer) {
         "static ::$proto_ns$::internal::AddDescriptorsRunner "
         "$1$(&$desc_table$);\n",
         UniqueName("dynamic_init_dummy", file_, options_));
+  }
+}
+
+void FileGenerator::GenerateInitForSCC(const SCC* scc,
+                                       const CrossFileReferences& refs,
+                                       io::Printer* printer) {
+  Formatter format(printer, variables_);
+  // We use static and not anonymous namespace because symbol names are
+  // substantially shorter.
+  format("static void InitDefaults$1$() {\n", SccInfoSymbol(scc, options_));
+
+  if (options_.opensource_runtime) {
+    format("  GOOGLE_PROTOBUF_VERIFY_VERSION;\n\n");
+  }
+
+  format.Indent();
+
+  // First construct all the necessary default instances.
+  for (int i = 0; i < message_generators_.size(); i++) {
+    if (scc_analyzer_.GetSCC(message_generators_[i]->descriptor_) != scc) {
+      continue;
+    }
+    format(
+        "{\n"
+        "  void* ptr = &$1$;\n"
+        "  new (ptr) $2$();\n",
+        QualifiedDefaultInstanceName(message_generators_[i]->descriptor_,
+                                     options_),
+        QualifiedClassName(message_generators_[i]->descriptor_, options_));
+    if (options_.opensource_runtime &&
+        !IsMapEntryMessage(message_generators_[i]->descriptor_)) {
+      format(
+          "  "
+          "::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);"
+          "\n");
+    }
+    format("}\n");
+  }
+  format.Outdent();
+  format("}\n\n");
+
+  // If we are using lite implicit weak fields then we need to distinguish
+  // between regular SCC dependencies and ones that we need to reference weakly
+  // through an extra pointer indirection.
+  std::vector<const SCC*> regular_sccs;
+  std::vector<const SCC*> implicit_weak_sccs;
+  for (const SCC* child : scc->children) {
+    if (options_.lite_implicit_weak_fields &&
+        refs.weak_sccs.find(child) != refs.weak_sccs.end()) {
+      implicit_weak_sccs.push_back(child);
+    } else {
+      regular_sccs.push_back(child);
+    }
+  }
+
+  format(
+      "$dllexport_decl $::$proto_ns$::internal::SCCInfo<$1$> $2$ =\n"
+      "    "
+      "{{ATOMIC_VAR_INIT(::$proto_ns$::internal::SCCInfoBase::kUninitialized), "
+      "$3$, $4$, InitDefaults$2$}, {",
+      scc->children.size(),  // 1
+      SccInfoSymbol(scc, options_), regular_sccs.size(),
+      implicit_weak_sccs.size());
+  for (const SCC* child : regular_sccs) {
+    format("\n      &$1$.base,", SccInfoSymbol(child, options_));
+  }
+  for (const SCC* child : implicit_weak_sccs) {
+    format(
+        "\n      reinterpret_cast<::$proto_ns$::internal::SCCInfoBase**>("
+        "\n          &$1$),",
+        SccInfoPtrSymbol(child, options_));
+  }
+  format("}};\n\n");
+
+  if (options_.lite_implicit_weak_fields) {
+    format(
+        "$dllexport_decl $::$proto_ns$::internal::SCCInfo<$1$>*\n"
+        "    $2$ = &$3$;\n\n",
+        scc->children.size(), SccInfoPtrSymbol(scc, options_),
+        SccInfoSymbol(scc, options_));
   }
 }
 
@@ -1022,7 +1138,7 @@ class FileGenerator::ForwardDeclarations {
       const Descriptor* class_desc = p.second;
       format(
           "class ${1$$2$$}$;\n"
-          "struct $3$;\n"
+          "class $3$;\n"
           "$dllexport_decl $extern $3$ $4$;\n",
           class_desc, classname, DefaultInstanceType(class_desc, options),
           DefaultInstanceName(class_desc, options));
@@ -1293,9 +1409,7 @@ void FileGenerator::GenerateGlobalStateFunctionDeclarations(
   if (HasDescriptorMethods(file_, options_)) {
     format(
         "extern $dllexport_decl $const ::$proto_ns$::internal::DescriptorTable "
-        "$desc_table$;\n"
-        "$dllexport_decl $::$proto_ns$::Metadata "
-        "$desc_table$_metadata_getter(int index);\n");
+        "$desc_table$;\n");
   }
 }
 

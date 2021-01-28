@@ -61,20 +61,19 @@ struct PROTOC_EXPORT TableStruct_google_2fprotobuf_2fcompiler_2fplugin_2eproto {
   static const ::PROTOBUF_NAMESPACE_ID::uint32 offsets[];
 };
 extern PROTOC_EXPORT const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_google_2fprotobuf_2fcompiler_2fplugin_2eproto;
-PROTOC_EXPORT ::PROTOBUF_NAMESPACE_ID::Metadata descriptor_table_google_2fprotobuf_2fcompiler_2fplugin_2eproto_metadata_getter(int index);
 PROTOBUF_NAMESPACE_OPEN
 namespace compiler {
 class CodeGeneratorRequest;
-struct CodeGeneratorRequestDefaultTypeInternal;
+class CodeGeneratorRequestDefaultTypeInternal;
 PROTOC_EXPORT extern CodeGeneratorRequestDefaultTypeInternal _CodeGeneratorRequest_default_instance_;
 class CodeGeneratorResponse;
-struct CodeGeneratorResponseDefaultTypeInternal;
+class CodeGeneratorResponseDefaultTypeInternal;
 PROTOC_EXPORT extern CodeGeneratorResponseDefaultTypeInternal _CodeGeneratorResponse_default_instance_;
 class CodeGeneratorResponse_File;
-struct CodeGeneratorResponse_FileDefaultTypeInternal;
+class CodeGeneratorResponse_FileDefaultTypeInternal;
 PROTOC_EXPORT extern CodeGeneratorResponse_FileDefaultTypeInternal _CodeGeneratorResponse_File_default_instance_;
 class Version;
-struct VersionDefaultTypeInternal;
+class VersionDefaultTypeInternal;
 PROTOC_EXPORT extern VersionDefaultTypeInternal _Version_default_instance_;
 }  // namespace compiler
 PROTOBUF_NAMESPACE_CLOSE
@@ -117,7 +116,6 @@ class PROTOC_EXPORT Version PROTOBUF_FINAL :
  public:
   inline Version() : Version(nullptr) {}
   virtual ~Version();
-  explicit constexpr Version(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
 
   Version(const Version& from);
   Version(Version&& from) noexcept
@@ -154,9 +152,8 @@ class PROTOC_EXPORT Version PROTOBUF_FINAL :
   static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
     return GetMetadataStatic().reflection;
   }
-  static const Version& default_instance() {
-    return *internal_default_instance();
-  }
+  static const Version& default_instance();
+
   static inline const Version* internal_default_instance() {
     return reinterpret_cast<const Version*>(
                &_Version_default_instance_);
@@ -222,7 +219,8 @@ class PROTOC_EXPORT Version PROTOBUF_FINAL :
   ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
   private:
   static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
-    return ::descriptor_table_google_2fprotobuf_2fcompiler_2fplugin_2eproto_metadata_getter(kIndexInFileMessages);
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_google_2fprotobuf_2fcompiler_2fplugin_2eproto);
+    return ::descriptor_table_google_2fprotobuf_2fcompiler_2fplugin_2eproto.file_level_metadata[kIndexInFileMessages];
   }
 
   public:
@@ -318,7 +316,6 @@ class PROTOC_EXPORT CodeGeneratorRequest PROTOBUF_FINAL :
  public:
   inline CodeGeneratorRequest() : CodeGeneratorRequest(nullptr) {}
   virtual ~CodeGeneratorRequest();
-  explicit constexpr CodeGeneratorRequest(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
 
   CodeGeneratorRequest(const CodeGeneratorRequest& from);
   CodeGeneratorRequest(CodeGeneratorRequest&& from) noexcept
@@ -355,9 +352,8 @@ class PROTOC_EXPORT CodeGeneratorRequest PROTOBUF_FINAL :
   static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
     return GetMetadataStatic().reflection;
   }
-  static const CodeGeneratorRequest& default_instance() {
-    return *internal_default_instance();
-  }
+  static const CodeGeneratorRequest& default_instance();
+
   static inline const CodeGeneratorRequest* internal_default_instance() {
     return reinterpret_cast<const CodeGeneratorRequest*>(
                &_CodeGeneratorRequest_default_instance_);
@@ -423,7 +419,8 @@ class PROTOC_EXPORT CodeGeneratorRequest PROTOBUF_FINAL :
   ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
   private:
   static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
-    return ::descriptor_table_google_2fprotobuf_2fcompiler_2fplugin_2eproto_metadata_getter(kIndexInFileMessages);
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_google_2fprotobuf_2fcompiler_2fplugin_2eproto);
+    return ::descriptor_table_google_2fprotobuf_2fcompiler_2fplugin_2eproto.file_level_metadata[kIndexInFileMessages];
   }
 
   public:
@@ -540,7 +537,6 @@ class PROTOC_EXPORT CodeGeneratorResponse_File PROTOBUF_FINAL :
  public:
   inline CodeGeneratorResponse_File() : CodeGeneratorResponse_File(nullptr) {}
   virtual ~CodeGeneratorResponse_File();
-  explicit constexpr CodeGeneratorResponse_File(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
 
   CodeGeneratorResponse_File(const CodeGeneratorResponse_File& from);
   CodeGeneratorResponse_File(CodeGeneratorResponse_File&& from) noexcept
@@ -577,9 +573,8 @@ class PROTOC_EXPORT CodeGeneratorResponse_File PROTOBUF_FINAL :
   static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
     return GetMetadataStatic().reflection;
   }
-  static const CodeGeneratorResponse_File& default_instance() {
-    return *internal_default_instance();
-  }
+  static const CodeGeneratorResponse_File& default_instance();
+
   static inline const CodeGeneratorResponse_File* internal_default_instance() {
     return reinterpret_cast<const CodeGeneratorResponse_File*>(
                &_CodeGeneratorResponse_File_default_instance_);
@@ -645,7 +640,8 @@ class PROTOC_EXPORT CodeGeneratorResponse_File PROTOBUF_FINAL :
   ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
   private:
   static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
-    return ::descriptor_table_google_2fprotobuf_2fcompiler_2fplugin_2eproto_metadata_getter(kIndexInFileMessages);
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_google_2fprotobuf_2fcompiler_2fplugin_2eproto);
+    return ::descriptor_table_google_2fprotobuf_2fcompiler_2fplugin_2eproto.file_level_metadata[kIndexInFileMessages];
   }
 
   public:
@@ -760,7 +756,6 @@ class PROTOC_EXPORT CodeGeneratorResponse PROTOBUF_FINAL :
  public:
   inline CodeGeneratorResponse() : CodeGeneratorResponse(nullptr) {}
   virtual ~CodeGeneratorResponse();
-  explicit constexpr CodeGeneratorResponse(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
 
   CodeGeneratorResponse(const CodeGeneratorResponse& from);
   CodeGeneratorResponse(CodeGeneratorResponse&& from) noexcept
@@ -797,9 +792,8 @@ class PROTOC_EXPORT CodeGeneratorResponse PROTOBUF_FINAL :
   static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
     return GetMetadataStatic().reflection;
   }
-  static const CodeGeneratorResponse& default_instance() {
-    return *internal_default_instance();
-  }
+  static const CodeGeneratorResponse& default_instance();
+
   static inline const CodeGeneratorResponse* internal_default_instance() {
     return reinterpret_cast<const CodeGeneratorResponse*>(
                &_CodeGeneratorResponse_default_instance_);
@@ -865,7 +859,8 @@ class PROTOC_EXPORT CodeGeneratorResponse PROTOBUF_FINAL :
   ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
   private:
   static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
-    return ::descriptor_table_google_2fprotobuf_2fcompiler_2fplugin_2eproto_metadata_getter(kIndexInFileMessages);
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_google_2fprotobuf_2fcompiler_2fplugin_2eproto);
+    return ::descriptor_table_google_2fprotobuf_2fcompiler_2fplugin_2eproto.file_level_metadata[kIndexInFileMessages];
   }
 
   public:

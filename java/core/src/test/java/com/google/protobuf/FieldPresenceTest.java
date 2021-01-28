@@ -66,11 +66,6 @@ public class FieldPresenceTest extends TestCase {
     assertFalse(hasMethod(classWithoutFieldPresence, "has" + camelName));
   }
 
-  private static void assertHasMethodExisting(Class<?> clazz, String camelName) {
-    assertTrue(hasMethod(clazz, "get" + camelName));
-    assertTrue(hasMethod(clazz, "has" + camelName));
-  }
-
   public void testHasMethod() {
     // Optional non-message fields don't have a hasFoo() method generated.
     assertHasMethodRemoved(UnittestProto.TestAllTypes.class, TestAllTypes.class, "OptionalInt32");
@@ -92,16 +87,19 @@ public class FieldPresenceTest extends TestCase {
     assertFalse(TestAllTypes.getDefaultInstance().hasOptionalNestedMessage());
     assertFalse(TestAllTypes.newBuilder().hasOptionalNestedMessage());
 
-    // oneof fields support hasFoo() methods for non-message types.
-    assertHasMethodExisting(TestAllTypes.class, "OneofUint32");
-    assertHasMethodExisting(TestAllTypes.class, "OneofString");
-    assertHasMethodExisting(TestAllTypes.class, "OneofBytes");
+    // oneof fields don't have hasFoo() methods for non-message types.
+    assertHasMethodRemoved(UnittestProto.TestAllTypes.class, TestAllTypes.class, "OneofUint32");
+    assertHasMethodRemoved(UnittestProto.TestAllTypes.class, TestAllTypes.class, "OneofString");
+    assertHasMethodRemoved(UnittestProto.TestAllTypes.class, TestAllTypes.class, "OneofBytes");
     assertFalse(TestAllTypes.getDefaultInstance().hasOneofNestedMessage());
     assertFalse(TestAllTypes.newBuilder().hasOneofNestedMessage());
 
-    assertHasMethodExisting(TestAllTypes.Builder.class, "OneofUint32");
-    assertHasMethodExisting(TestAllTypes.Builder.class, "OneofString");
-    assertHasMethodExisting(TestAllTypes.Builder.class, "OneofBytes");
+    assertHasMethodRemoved(
+        UnittestProto.TestAllTypes.Builder.class, TestAllTypes.Builder.class, "OneofUint32");
+    assertHasMethodRemoved(
+        UnittestProto.TestAllTypes.Builder.class, TestAllTypes.Builder.class, "OneofString");
+    assertHasMethodRemoved(
+        UnittestProto.TestAllTypes.Builder.class, TestAllTypes.Builder.class, "OneofBytes");
   }
 
   public void testHasMethodForProto3Optional() throws Exception {
