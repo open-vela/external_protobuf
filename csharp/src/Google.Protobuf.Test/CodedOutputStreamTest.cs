@@ -35,7 +35,6 @@ using System.IO;
 using Google.Protobuf.TestProtos;
 using Google.Protobuf.Buffers;
 using NUnit.Framework;
-using System.Text;
 
 namespace Google.Protobuf
 {
@@ -516,29 +515,6 @@ namespace Google.Protobuf
         {
             var stream = new CodedOutputStream(new byte[10]);
             stream.Dispose();
-        }
-
-        [Test]
-        public void WriteStringsOfDifferentSizes()
-        {
-            for (int i = 1; i <= 1024; i++)
-            {
-                var buffer = new byte[4096];
-                var output = new CodedOutputStream(buffer);
-                var sb = new StringBuilder();
-                for (int j = 0; j < i; j++)
-                {
-                    sb.Append((j % 10).ToString()); // incrementing numbers, repeating
-                }
-                var s = sb.ToString();
-                output.WriteString(s);
-
-                output.Flush();
-
-                // Verify written content
-                var input = new CodedInputStream(buffer);
-                Assert.AreEqual(s, input.ReadString());
-            }
         }
     }
 }
