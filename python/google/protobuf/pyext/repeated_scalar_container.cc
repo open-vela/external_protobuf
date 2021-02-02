@@ -753,11 +753,7 @@ PyTypeObject RepeatedScalarContainer_Type = {
     sizeof(RepeatedScalarContainer),         // tp_basicsize
     0,                                       //  tp_itemsize
     repeated_scalar_container::Dealloc,      //  tp_dealloc
-#if PY_VERSION_HEX >= 0x03080000
-    0,                                       //  tp_vectorcall_offset
-#else
-    nullptr,                                 //  tp_print
-#endif
+    0,                                       //  tp_print, in Python >=3.8: Py_ssize_t tp_vectorcall_offset
     nullptr,                                 //  tp_getattr
     nullptr,                                 //  tp_setattr
     nullptr,                                 //  tp_compare

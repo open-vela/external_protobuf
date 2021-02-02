@@ -35,7 +35,6 @@
 #include <string>
 
 #include <google/protobuf/stubs/common.h>
-#include <google/protobuf/stubs/status.h>
 #include <google/protobuf/stubs/strutil.h>
 #include <google/protobuf/stubs/status.h>
 
@@ -166,7 +165,7 @@ class PROTOBUF_EXPORT JsonStreamParser {
 
   // Parse a number as double into a NumberResult.
   util::Status ParseDoubleHelper(const std::string& number,
-                                 NumberResult* result);
+                                   NumberResult* result);
 
   // Handles a { during parsing of a value.
   util::Status HandleBeginObject();
