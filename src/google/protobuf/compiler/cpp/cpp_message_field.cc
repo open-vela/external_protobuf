@@ -466,12 +466,6 @@ void MessageFieldGenerator::GenerateByteSize(io::Printer* printer) const {
       "    *$field_member$);\n");
 }
 
-void MessageFieldGenerator::GenerateConstinitInitializer(
-    io::Printer* printer) const {
-  Formatter format(printer, variables_);
-  format("$name$_(nullptr)");
-}
-
 // ===================================================================
 
 MessageOneofFieldGenerator::MessageOneofFieldGenerator(
@@ -813,12 +807,6 @@ void RepeatedMessageFieldGenerator::GenerateByteSize(
       "  total_size +=\n"
       "    ::$proto_ns$::internal::WireFormatLite::$declared_type$Size(msg);\n"
       "}\n");
-}
-
-void RepeatedMessageFieldGenerator::GenerateConstinitInitializer(
-    io::Printer* printer) const {
-  Formatter format(printer, variables_);
-  format("$name$_()");
 }
 
 }  // namespace cpp

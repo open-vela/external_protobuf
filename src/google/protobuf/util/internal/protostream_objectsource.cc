@@ -114,27 +114,41 @@ util::StatusOr<std::string> MapKeyDefaultValueAsString(
 
 ProtoStreamObjectSource::ProtoStreamObjectSource(
     io::CodedInputStream* stream, TypeResolver* type_resolver,
-    const google::protobuf::Type& type, const RenderOptions& render_options)
+    const google::protobuf::Type& type)
     : stream_(stream),
       typeinfo_(TypeInfo::NewTypeInfo(type_resolver)),
       own_typeinfo_(true),
       type_(type),
-      render_options_(render_options),
+      use_lower_camel_for_enums_(false),
+      use_ints_for_enums_(false),
+      preserve_proto_field_names_(false),
       recursion_depth_(0),
-      max_recursion_depth_(kDefaultMaxRecursionDepth) {
+      max_recursion_depth_(kDefaultMaxRecursionDepth),
+      render_unknown_fields_(false),
+      render_unknown_enum_values_(true),
+      add_trailing_zeros_for_timestamp_and_duration_(false),
+      suppress_empty_object_(false),
+      use_legacy_json_map_format_(false) {
   GOOGLE_LOG_IF(DFATAL, stream == nullptr) << "Input stream is nullptr.";
 }
 
 ProtoStreamObjectSource::ProtoStreamObjectSource(
     io::CodedInputStream* stream, const TypeInfo* typeinfo,
-    const google::protobuf::Type& type, const RenderOptions& render_options)
+    const google::protobuf::Type& type)
     : stream_(stream),
       typeinfo_(typeinfo),
       own_typeinfo_(false),
       type_(type),
-      render_options_(render_options),
+      use_lower_camel_for_enums_(false),
+      use_ints_for_enums_(false),
+      preserve_proto_field_names_(false),
       recursion_depth_(0),
-      max_recursion_depth_(kDefaultMaxRecursionDepth) {
+      max_recursion_depth_(kDefaultMaxRecursionDepth),
+      render_unknown_fields_(false),
+      render_unknown_enum_values_(true),
+      add_trailing_zeros_for_timestamp_and_duration_(false),
+      suppress_empty_object_(false),
+      use_legacy_json_map_format_(false) {
   GOOGLE_LOG_IF(DFATAL, stream == nullptr) << "Input stream is nullptr.";
 }
 
@@ -184,6 +198,9 @@ util::Status ProtoStreamObjectSource::WriteMessage(
   uint32 tag = stream_->ReadTag(), last_tag = tag + 1;
   UnknownFieldSet unknown_fields;
 
+  if (!name.empty() && tag == end_tag && suppress_empty_object_) {
+    return util::Status();
+  }
 
   if (include_start_and_end) {
     ow->StartObject(name);
@@ -193,7 +210,7 @@ util::Status ProtoStreamObjectSource::WriteMessage(
       last_tag = tag;
       field = FindAndVerifyField(type, tag);
       if (field != nullptr) {
-        if (render_options_.preserve_proto_field_names) {
+        if (preserve_proto_field_names_) {
           field_name = field->name();
         } else {
           field_name = field->json_name();
@@ -203,9 +220,8 @@ util::Status ProtoStreamObjectSource::WriteMessage(
     if (field == nullptr) {
       // If we didn't find a field, skip this unknown tag.
       // TODO(wpoon): Check return boolean value.
-      WireFormat::SkipField(
-          stream_, tag,
-                                                nullptr);
+      WireFormat::SkipField(stream_, tag,
+                            render_unknown_fields_ ? &unknown_fields : nullptr);
       tag = stream_->ReadTag();
       continue;
     }
@@ -374,10 +390,7 @@ util::Status ProtoStreamObjectSource::RenderDuration(
   }
   std::string formatted_duration = StringPrintf(
       "%s%lld%ss", sign.c_str(), static_cast<long long>(seconds),  // NOLINT
-      FormatNanos(
-          nanos,
-          false
-          )
+      FormatNanos(nanos, os->add_trailing_zeros_for_timestamp_and_duration_)
           .c_str());
   ow->RenderString(field_name, formatted_duration);
   return util::Status();
@@ -633,8 +646,14 @@ util::Status ProtoStreamObjectSource::RenderAny(
   io::CodedInputStream in_stream(&zero_copy_stream);
   // We know the type so we can render it. Recursively parse the nested stream
   // using a nested ProtoStreamObjectSource using our nested type information.
-  ProtoStreamObjectSource nested_os(&in_stream, os->typeinfo_, *nested_type,
-                                    os->render_options_);
+  ProtoStreamObjectSource nested_os(&in_stream, os->typeinfo_, *nested_type);
+
+  // TODO(htuch): This is somewhat fragile, since new options may be omitted.
+  // We should probably do this via the constructor or some object grouping
+  // options.
+  nested_os.set_use_lower_camel_for_enums(os->use_lower_camel_for_enums_);
+  nested_os.set_use_ints_for_enums(os->use_ints_for_enums_);
+  nested_os.set_preserve_proto_field_names(os->preserve_proto_field_names_);
 
   // We manually call start and end object here so we can inject the @type.
   ow->StartObject(field_name);
@@ -869,19 +888,19 @@ util::Status ProtoStreamObjectSource::RenderNonMessageField(
         const google::protobuf::EnumValue* enum_value =
             FindEnumValueByNumber(*en, buffer32);
         if (enum_value != nullptr) {
-          if (render_options_.use_ints_for_enums) {
+          if (use_ints_for_enums_) {
             ow->RenderInt32(field_name, buffer32);
-          } else if (render_options_.use_lower_camel_for_enums) {
+          } else if (use_lower_camel_for_enums_) {
             ow->RenderString(field_name,
                              EnumValueNameToLowerCamelCase(enum_value->name()));
           } else {
             ow->RenderString(field_name, enum_value->name());
           }
-        } else {
-            ow->RenderInt32(field_name, buffer32);
-        }
-      } else {
+        } else if (render_unknown_enum_values_) {
           ow->RenderInt32(field_name, buffer32);
+        }
+      } else if (render_unknown_enum_values_) {
+        ow->RenderInt32(field_name, buffer32);
       }
       break;
     }
@@ -1111,9 +1130,8 @@ const std::string FormatNanos(uint32 nanos, bool with_trailing_zeros) {
     return with_trailing_zeros ? ".000" : "";
   }
 
-  const char* format = (nanos % 1000 != 0)      ? "%.9f"
-                       : (nanos % 1000000 != 0) ? "%.6f"
-                                                : "%.3f";
+  const char* format =
+      (nanos % 1000 != 0) ? "%.9f" : (nanos % 1000000 != 0) ? "%.6f" : "%.3f";
   std::string formatted =
       StringPrintf(format, static_cast<double>(nanos) / kNanosPerSecond);
   // remove the leading 0 before decimal.

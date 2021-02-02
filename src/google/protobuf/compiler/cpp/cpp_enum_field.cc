@@ -156,12 +156,6 @@ void EnumFieldGenerator::GenerateByteSize(io::Printer* printer) const {
       "));\n");
 }
 
-void EnumFieldGenerator::GenerateConstinitInitializer(
-    io::Printer* printer) const {
-  Formatter format(printer, variables_);
-  format("$name$_($default$)\n");
-}
-
 // ===================================================================
 
 EnumOneofFieldGenerator::EnumOneofFieldGenerator(
@@ -488,16 +482,6 @@ void RepeatedEnumFieldGenerator::GenerateByteSize(io::Printer* printer) const {
   }
   format.Outdent();
   format("}\n");
-}
-
-void RepeatedEnumFieldGenerator::GenerateConstinitInitializer(
-    io::Printer* printer) const {
-  Formatter format(printer, variables_);
-  format("$name$_()");
-  if (descriptor_->is_packed() &&
-      HasGeneratedMethods(descriptor_->file(), options_)) {
-    format("\n, _$name$_cached_byte_size_()");
-  }
 }
 
 }  // namespace cpp
