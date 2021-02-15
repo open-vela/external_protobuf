@@ -6711,10 +6711,6 @@ size_t _upb_symtab_bytesloaded(const upb_symtab *s) {
   return s->bytes_loaded;
 }
 
-upb_arena *_upb_symtab_arena(const upb_symtab *s) {
-  return s->arena;
-}
-
 #undef CHK_OOM
 
 
@@ -8024,7 +8020,7 @@ static void jsondec_field(jsondec *d, upb_msg *msg, const upb_msgdef *m) {
 
   if (!f) {
     if ((d->options & UPB_JSONDEC_IGNOREUNKNOWN) == 0) {
-      jsondec_errf(d, "No such field: " UPB_STRVIEW_FORMAT,
+      jsondec_errf(d, "Unknown field: '" UPB_STRVIEW_FORMAT "'",
                    UPB_STRVIEW_ARGS(name));
     }
     jsondec_skipval(d);
@@ -8177,8 +8173,7 @@ static void jsondec_timestamp(jsondec *d, upb_msg *msg, const upb_msgdef *m) {
 
   {
     /* [+-]08:00 or Z */
-    int ofs_hour = 0;
-    int ofs_min = 0;
+    int ofs = 0;
     bool neg = false;
 
     if (ptr == end) goto malformed;
@@ -8189,10 +8184,9 @@ static void jsondec_timestamp(jsondec *d, upb_msg *msg, const upb_msgdef *m) {
         /* fallthrough */
       case '+':
         if ((end - ptr) != 5) goto malformed;
-        ofs_hour = jsondec_tsdigits(d, &ptr, 2, ":");
-        ofs_min = jsondec_tsdigits(d, &ptr, 2, NULL);
-        ofs_min = ((ofs_hour * 60) + ofs_min) * 60;
-        seconds.int64_val += (neg ? ofs_min : -ofs_min);
+        ofs = jsondec_tsdigits(d, &ptr, 2, ":00");
+        ofs *= 60 * 60;
+        seconds.int64_val += (neg ? ofs : -ofs);
         break;
       case 'Z':
         if (ptr != end) goto malformed;

@@ -39,6 +39,7 @@
 namespace google {
 namespace protobuf {
 namespace util {
+using util::Status;
 namespace converter {
 
 namespace {

@@ -54,6 +54,7 @@ namespace converter {
 
 using io::CodedOutputStream;
 using ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite;
+using util::Status;
 using util::error::INVALID_ARGUMENT;
 
 

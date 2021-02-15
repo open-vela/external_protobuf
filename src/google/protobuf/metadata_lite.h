@@ -68,7 +68,7 @@ class InternalMetadata {
   void Delete() {
     // Note that Delete<> should be called not more than once.
     if (have_unknown_fields() && arena() == NULL) {
-      DeleteOutOfLineHelper<T>();
+      delete PtrValue<Container<T>>();
     }
   }
 
@@ -203,11 +203,6 @@ class InternalMetadata {
   };
 
   template <typename T>
-  PROTOBUF_NOINLINE void DeleteOutOfLineHelper() {
-    delete PtrValue<Container<T>>();
-  }
-
-  template <typename T>
   PROTOBUF_NOINLINE T* mutable_unknown_fields_slow() {
     Arena* my_arena = arena();
     Arena* owning_arena = GetOwningArena();
@@ -226,17 +221,17 @@ class InternalMetadata {
   // Templated functions.
 
   template <typename T>
-  PROTOBUF_NOINLINE void DoClear() {
+  void DoClear() {
     mutable_unknown_fields<T>()->Clear();
   }
 
   template <typename T>
-  PROTOBUF_NOINLINE void DoMergeFrom(const T& other) {
+  void DoMergeFrom(const T& other) {
     mutable_unknown_fields<T>()->MergeFrom(other);
   }
 
   template <typename T>
-  PROTOBUF_NOINLINE void DoSwap(T* other) {
+  void DoSwap(T* other) {
     mutable_unknown_fields<T>()->Swap(other);
   }
 };
@@ -244,12 +239,20 @@ class InternalMetadata {
 // String Template specializations.
 
 template <>
-PROTOBUF_EXPORT void InternalMetadata::DoClear<std::string>();
+inline void InternalMetadata::DoClear<std::string>() {
+  mutable_unknown_fields<std::string>()->clear();
+}
+
 template <>
-PROTOBUF_EXPORT void InternalMetadata::DoMergeFrom<std::string>(
-    const std::string& other);
+inline void InternalMetadata::DoMergeFrom<std::string>(
+    const std::string& other) {
+  mutable_unknown_fields<std::string>()->append(other);
+}
+
 template <>
-PROTOBUF_EXPORT void InternalMetadata::DoSwap<std::string>(std::string* other);
+inline void InternalMetadata::DoSwap<std::string>(std::string* other) {
+  mutable_unknown_fields<std::string>()->swap(*other);
+}
 
 // This helper RAII class is needed to efficiently parse unknown fields. We
 // should only call mutable_unknown_fields if there are actual unknown fields.
