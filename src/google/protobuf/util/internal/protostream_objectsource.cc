@@ -59,6 +59,7 @@
 namespace google {
 namespace protobuf {
 namespace util {
+using util::Status;
 namespace error {
 using util::error::Code;
 using util::error::INTERNAL;
@@ -66,6 +67,7 @@ using util::error::INTERNAL;
 namespace converter {
 using ::PROTOBUF_NAMESPACE_ID::internal::WireFormat;
 using ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite;
+using util::Status;
 
 namespace {
 

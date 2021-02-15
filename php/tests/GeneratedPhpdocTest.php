@@ -340,13 +340,6 @@ class GeneratedPhpdocTest extends TestBase
                 ],
                 '@param \NoNamespaceMessage $var'
             ],
-            [
-                [
-                    'setDeprecatedOptionalInt32',
-                    'getDeprecatedOptionalInt32',
-                ],
-                '@deprecated'
-            ],
         ];
     }
 }

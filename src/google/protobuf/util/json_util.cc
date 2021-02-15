@@ -92,12 +92,10 @@ util::Status BinaryToJsonStream(TypeResolver* resolver,
   io::CodedInputStream in_stream(binary_input);
   google::protobuf::Type type;
   RETURN_IF_ERROR(resolver->ResolveMessageType(type_url, &type));
-  converter::ProtoStreamObjectSource::RenderOptions render_options;
-  render_options.use_ints_for_enums = options.always_print_enums_as_ints;
-  render_options.preserve_proto_field_names =
-      options.preserve_proto_field_names;
-  converter::ProtoStreamObjectSource proto_source(&in_stream, resolver, type,
-                                                  render_options);
+  converter::ProtoStreamObjectSource proto_source(&in_stream, resolver, type);
+  proto_source.set_use_ints_for_enums(options.always_print_enums_as_ints);
+  proto_source.set_preserve_proto_field_names(
+      options.preserve_proto_field_names);
   io::CodedOutputStream out_stream(json_output);
   converter::JsonObjectWriter json_writer(options.add_whitespace ? " " : "",
                                           &out_stream);
