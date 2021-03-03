@@ -52,15 +52,10 @@ module BasicTest
 
       outer = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("Outer").msgclass
 
-      outer.new(
+      outer_proto = outer.new(
           inners: []
-      )['inners'].to_s
-
-      assert_raise Google::Protobuf::TypeError do
-        outer.new(
-            inners: [nil]
-        ).to_s
-      end
+      )
+      outer_proto['inners'].to_s
     end
 
     def test_has_field
