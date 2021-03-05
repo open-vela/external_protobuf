@@ -263,8 +263,8 @@ with info about your project (name and website) so we can add an entry for you.
 
 1. Protoc-gen-psql
    * Website: https://github.com/Intrinsec/protoc-gen-psql
-   * Extension: 1091-1101
+   * Extension: 1091
 
 1. Protoc-gen-sanitize
    * Website: https://github.com/Intrinsec/protoc-gen-sanitize
-   * Extension: 1102-1106
+   * Extension: 1092
