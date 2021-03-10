@@ -325,14 +325,7 @@ void MessageDifferencer::CheckRepeatedFieldComparisons(
   const MapKeyComparator* key_comparator = GetMapKeyComparator(field);
   GOOGLE_CHECK(key_comparator == NULL)
       << "Cannot treat this repeated field as both MAP and " << new_comparison
-      << " for"
-      << " comparison.  Field name is: " << field->full_name();
-  GOOGLE_CHECK(repeated_field_comparisons_.find(field) ==
-            repeated_field_comparisons_.end() ||
-        repeated_field_comparisons_[field] == new_comparison)
-      << "Cannot treat the same field as both "
-      << repeated_field_comparisons_[field] << " and " << new_comparison
-      << ". Field name is: " << field->full_name();
+      << " for comparison.  Field name is: " << field->full_name();
 }
 
 void MessageDifferencer::TreatAsSet(const FieldDescriptor* field) {
@@ -1927,11 +1920,6 @@ void MessageDifferencer::StreamReporter::PrintPath(
   }
 }
 
-void MessageDifferencer::StreamReporter::PrintPath(
-    const std::vector<SpecificField>& field_path, bool left_side,
-    const Message& message) {
-  PrintPath(field_path, left_side);
-}
 
 void MessageDifferencer::StreamReporter::PrintValue(
     const Message& message, const std::vector<SpecificField>& field_path,
@@ -2100,7 +2088,7 @@ void MessageDifferencer::StreamReporter::ReportAdded(
     const Message& message1, const Message& message2,
     const std::vector<SpecificField>& field_path) {
   printer_->Print("added: ");
-  PrintPath(field_path, false, message2);
+  PrintPath(field_path, false);
   printer_->Print(": ");
   PrintValue(message2, field_path, false);
   printer_->Print("\n");  // Print for newlines.
@@ -2110,7 +2098,7 @@ void MessageDifferencer::StreamReporter::ReportDeleted(
     const Message& message1, const Message& message2,
     const std::vector<SpecificField>& field_path) {
   printer_->Print("deleted: ");
-  PrintPath(field_path, true, message1);
+  PrintPath(field_path, true);
   printer_->Print(": ");
   PrintValue(message1, field_path, true);
   printer_->Print("\n");  // Print for newlines
@@ -2133,10 +2121,10 @@ void MessageDifferencer::StreamReporter::ReportModified(
   }
 
   printer_->Print("modified: ");
-  PrintPath(field_path, true, message1);
+  PrintPath(field_path, true);
   if (CheckPathChanged(field_path)) {
     printer_->Print(" -> ");
-    PrintPath(field_path, false, message2);
+    PrintPath(field_path, false);
   }
   printer_->Print(": ");
   PrintValue(message1, field_path, true);
@@ -2149,9 +2137,9 @@ void MessageDifferencer::StreamReporter::ReportMoved(
     const Message& message1, const Message& message2,
     const std::vector<SpecificField>& field_path) {
   printer_->Print("moved: ");
-  PrintPath(field_path, true, message1);
+  PrintPath(field_path, true);
   printer_->Print(" -> ");
-  PrintPath(field_path, false, message2);
+  PrintPath(field_path, false);
   printer_->Print(" : ");
   PrintValue(message1, field_path, true);
   printer_->Print("\n");  // Print for newlines.
@@ -2161,10 +2149,10 @@ void MessageDifferencer::StreamReporter::ReportMatched(
     const Message& message1, const Message& message2,
     const std::vector<SpecificField>& field_path) {
   printer_->Print("matched: ");
-  PrintPath(field_path, true, message1);
+  PrintPath(field_path, true);
   if (CheckPathChanged(field_path)) {
     printer_->Print(" -> ");
-    PrintPath(field_path, false, message2);
+    PrintPath(field_path, false);
   }
   printer_->Print(" : ");
   PrintValue(message1, field_path, true);
@@ -2175,10 +2163,10 @@ void MessageDifferencer::StreamReporter::ReportIgnored(
     const Message& message1, const Message& message2,
     const std::vector<SpecificField>& field_path) {
   printer_->Print("ignored: ");
-  PrintPath(field_path, true, message1);
+  PrintPath(field_path, true);
   if (CheckPathChanged(field_path)) {
     printer_->Print(" -> ");
-    PrintPath(field_path, false, message2);
+    PrintPath(field_path, false);
   }
   printer_->Print("\n");  // Print for newlines.
 }
@@ -2193,10 +2181,10 @@ void MessageDifferencer::StreamReporter::ReportUnknownFieldIgnored(
     const Message& message1, const Message& message2,
     const std::vector<SpecificField>& field_path) {
   printer_->Print("ignored: ");
-  PrintPath(field_path, true, message1);
+  PrintPath(field_path, true);
   if (CheckPathChanged(field_path)) {
     printer_->Print(" -> ");
-    PrintPath(field_path, false, message2);
+    PrintPath(field_path, false);
   }
   printer_->Print("\n");  // Print for newlines.
 }
