@@ -632,7 +632,8 @@ TEST_F(JsonUtilTest, TestWrongJsonInput) {
   delete resolver;
 
   EXPECT_FALSE(result_status.ok());
-  EXPECT_TRUE(util::IsInvalidArgument(result_status));
+  EXPECT_EQ(result_status.code(),
+            util::error::INVALID_ARGUMENT);
 }
 
 TEST_F(JsonUtilTest, HtmlEscape) {
