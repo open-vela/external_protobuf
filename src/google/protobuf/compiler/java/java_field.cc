@@ -258,11 +258,6 @@ void SetCommonFieldVariables(const FieldDescriptor* descriptor,
   // empty string.
   (*variables)["{"] = "";
   (*variables)["}"] = "";
-  (*variables)["kt_name"] =
-      IsForbiddenKotlin(info->name) ? info->name + "_" : info->name;
-  (*variables)["kt_capitalized_name"] = IsForbiddenKotlin(info->name)
-                                            ? info->capitalized_name + "_"
-                                            : info->capitalized_name;
 }
 
 void SetCommonOneofVariables(const FieldDescriptor* descriptor,
