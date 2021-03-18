@@ -1076,9 +1076,19 @@ void MessageGenerator::GenerateClassDefinition(io::Printer* printer) {
     if (HasDescriptorMethods(descriptor_->file(), options_)) {
       format(
           "  void MergeFrom(const ::$proto_ns$::Message& other) final;\n"
-          "  ::$proto_ns$::Metadata GetMetadata() const final;\n");
+          "  ::$proto_ns$::Metadata GetMetadata() const final;\n"
+          "  private:\n"
+          "  static ::$proto_ns$::Metadata GetMetadataStatic() {\n"
+          "    ::$proto_ns$::internal::AssignDescriptors(&::$desc_table$);\n"
+          "    return ::$desc_table$.file_level_metadata[$1$];\n"
+          "  }\n"
+          "\n"
+          "  public:\n"
+          "};\n",
+          index_in_file_messages_);
+    } else {
+      format("};\n");
     }
-    format("};\n");
     return;
   }
 
@@ -1092,7 +1102,7 @@ void MessageGenerator::GenerateClassDefinition(io::Printer* printer) {
 
   format(
       "inline $classname$() : $classname$(nullptr) {}\n"
-      "~$classname$() override;\n"
+      "virtual ~$classname$();\n"
       "explicit constexpr "
       "$classname$(::$proto_ns$::internal::ConstantInitialized);\n"
       "\n"
@@ -1158,10 +1168,10 @@ void MessageGenerator::GenerateClassDefinition(io::Printer* printer) {
     // separately.
     format(
         "static const ::$proto_ns$::Descriptor* GetDescriptor() {\n"
-        "  return default_instance().GetMetadata().descriptor;\n"
+        "  return GetMetadataStatic().descriptor;\n"
         "}\n"
         "static const ::$proto_ns$::Reflection* GetReflection() {\n"
-        "  return default_instance().GetMetadata().reflection;\n"
+        "  return GetMetadataStatic().reflection;\n"
         "}\n");
   }
 
@@ -1370,6 +1380,12 @@ void MessageGenerator::GenerateClassDefinition(io::Printer* printer) {
   if (HasDescriptorMethods(descriptor_->file(), options_)) {
     format(
         "::$proto_ns$::Metadata GetMetadata() const final;\n"
+        "private:\n"
+        "static ::$proto_ns$::Metadata GetMetadataStatic() {\n"
+        "  return ::$desc_table$_metadata_getter(kIndexInFileMessages);\n"
+        "}\n"
+        "\n"
+        "public:\n"
         "\n");
   } else {
     format(
@@ -1873,11 +1889,8 @@ void MessageGenerator::GenerateClassMethods(io::Printer* printer) {
     if (HasDescriptorMethods(descriptor_->file(), options_)) {
       format(
           "::$proto_ns$::Metadata $classname$::GetMetadata() const {\n"
-          "  return ::$proto_ns$::internal::AssignDescriptors(\n"
-          "      &$desc_table$_getter, &$desc_table$_once,\n"
-          "      $file_level_metadata$[$1$]);\n"
-          "}\n",
-          index_in_file_messages_);
+          "  return GetMetadataStatic();\n"
+          "}\n");
       format(
           "void $classname$::MergeFrom(\n"
           "    const ::$proto_ns$::Message& other) {\n"
@@ -2016,11 +2029,9 @@ void MessageGenerator::GenerateClassMethods(io::Printer* printer) {
   if (HasDescriptorMethods(descriptor_->file(), options_)) {
     format(
         "::$proto_ns$::Metadata $classname$::GetMetadata() const {\n"
-        "  return ::$proto_ns$::internal::AssignDescriptors(\n"
-        "      &$desc_table$_getter, &$desc_table$_once,\n"
-        "      $file_level_metadata$[$1$]);\n"
-        "}\n",
-        index_in_file_messages_);
+        "  return GetMetadataStatic();\n"
+        "}\n"
+        "\n");
   } else {
     format(
         "std::string $classname$::GetTypeName() const {\n"

@@ -1,0 +1,172 @@
+[[1;34mINFO[m] Scanning for projects...
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m-----------------< [0;36mcom.google.protobuf:protobuf-java[0;1m >------------------[m
+[[1;34mINFO[m] [1mBuilding Protocol Buffers [Core] 3.14.0[m
+[[1;34mINFO[m] [1m-------------------------------[ bundle ]-------------------------------[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-clean-plugin:2.5:clean[m [1m(default-clean)[m @ [36mprotobuf-java[0;1m ---[m
+[[1;34mINFO[m] Deleting /usr/local/google/home/deannagarcia/protobuf/java/core/target
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-antrun-plugin:1.8:run[m [1m(generate-sources)[m @ [36mprotobuf-java[0;1m ---[m
+[[1;34mINFO[m] Executing tasks
+
+main:
+     [echo] Running protoc ...
+    [mkdir] Created dir: /usr/local/google/home/deannagarcia/protobuf/java/core/target/generated-sources
+[[1;34mINFO[m] Executed tasks
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mbuild-helper-maven-plugin:1.10:add-source[m [1m(add-generated-sources)[m @ [36mprotobuf-java[0;1m ---[m
+[[1;34mINFO[m] Source directory: /usr/local/google/home/deannagarcia/protobuf/java/core/target/generated-sources added.
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-resources-plugin:3.2.0:resources[m [1m(default-resources)[m @ [36mprotobuf-java[0;1m ---[m
+[[1;34mINFO[m] Using 'UTF-8' encoding to copy filtered resources.
+[[1;34mINFO[m] Using 'UTF-8' encoding to copy filtered properties files.
+[[1;34mINFO[m] Copying 12 resources
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-compiler-plugin:3.6.1:compile[m [1m(default-compile)[m @ [36mprotobuf-java[0;1m ---[m
+[[1;34mINFO[m] Changes detected - recompiling the module!
+[[1;34mINFO[m] Compiling 189 source files to /usr/local/google/home/deannagarcia/protobuf/java/core/target/classes
+[[1;33mWARNING[m] /usr/local/google/home/deannagarcia/protobuf/java/core/src/main/java/com/google/protobuf/UnsafeUtil.java:[44,32] sun.misc.Unsafe is internal proprietary API and may be removed in a future release
+[[1;33mWARNING[m] /usr/local/google/home/deannagarcia/protobuf/java/core/src/main/java/com/google/protobuf/UnsafeUtil.java:[289,18] sun.misc.Unsafe is internal proprietary API and may be removed in a future release
+[[1;33mWARNING[m] /usr/local/google/home/deannagarcia/protobuf/java/core/src/main/java/com/google/protobuf/UnsafeUtil.java:[290,13] sun.misc.Unsafe is internal proprietary API and may be removed in a future release
+[[1;33mWARNING[m] /usr/local/google/home/deannagarcia/protobuf/java/core/src/main/java/com/google/protobuf/UnsafeUtil.java:[294,53] sun.misc.Unsafe is internal proprietary API and may be removed in a future release
+[[1;33mWARNING[m] /usr/local/google/home/deannagarcia/protobuf/java/core/src/main/java/com/google/protobuf/UnsafeUtil.java:[296,32] sun.misc.Unsafe is internal proprietary API and may be removed in a future release
+[[1;33mWARNING[m] /usr/local/google/home/deannagarcia/protobuf/java/core/src/main/java/com/google/protobuf/UnsafeUtil.java:[297,33] sun.misc.Unsafe is internal proprietary API and may be removed in a future release
+[[1;33mWARNING[m] /usr/local/google/home/deannagarcia/protobuf/java/core/src/main/java/com/google/protobuf/UnsafeUtil.java:[297,54] sun.misc.Unsafe is internal proprietary API and may be removed in a future release
+[[1;33mWARNING[m] /usr/local/google/home/deannagarcia/protobuf/java/core/src/main/java/com/google/protobuf/UnsafeUtil.java:[481,13] sun.misc.Unsafe is internal proprietary API and may be removed in a future release
+[[1;33mWARNING[m] /usr/local/google/home/deannagarcia/protobuf/java/core/src/main/java/com/google/protobuf/UnsafeUtil.java:[483,28] sun.misc.Unsafe is internal proprietary API and may be removed in a future release
+[[1;33mWARNING[m] /usr/local/google/home/deannagarcia/protobuf/java/core/src/main/java/com/google/protobuf/UnsafeUtil.java:[612,31] sun.misc.Unsafe is internal proprietary API and may be removed in a future release
+[[1;33mWARNING[m] /usr/local/google/home/deannagarcia/protobuf/java/core/src/main/java/com/google/protobuf/UnsafeUtil.java:[752,37] sun.misc.Unsafe is internal proprietary API and may be removed in a future release
+[[1;33mWARNING[m] /usr/local/google/home/deannagarcia/protobuf/java/core/src/main/java/com/google/protobuf/UnsafeUtil.java:[877,37] sun.misc.Unsafe is internal proprietary API and may be removed in a future release
+[[1;33mWARNING[m] /usr/local/google/home/deannagarcia/protobuf/java/core/src/main/java/com/google/protobuf/MessageSchema.java:[102,32] sun.misc.Unsafe is internal proprietary API and may be removed in a future release
+[[1;33mWARNING[m] /usr/local/google/home/deannagarcia/protobuf/java/core/src/main/java/com/google/protobuf/MessageSchema.java:[405,19] sun.misc.Unsafe is internal proprietary API and may be removed in a future release
+[[1;33mWARNING[m] /usr/local/google/home/deannagarcia/protobuf/java/core/src/main/java/com/google/protobuf/MessageSchema.java:[1429,19] sun.misc.Unsafe is internal proprietary API and may be removed in a future release
+[[1;33mWARNING[m] /usr/local/google/home/deannagarcia/protobuf/java/core/src/main/java/com/google/protobuf/MessageSchema.java:[1995,19] sun.misc.Unsafe is internal proprietary API and may be removed in a future release
+[[1;33mWARNING[m] /usr/local/google/home/deannagarcia/protobuf/java/core/src/main/java/com/google/protobuf/MessageSchema.java:[2567,19] sun.misc.Unsafe is internal proprietary API and may be removed in a future release
+[[1;33mWARNING[m] /usr/local/google/home/deannagarcia/protobuf/java/core/src/main/java/com/google/protobuf/MessageSchema.java:[4669,19] sun.misc.Unsafe is internal proprietary API and may be removed in a future release
+[[1;33mWARNING[m] /usr/local/google/home/deannagarcia/protobuf/java/core/src/main/java/com/google/protobuf/MessageSchema.java:[4701,19] sun.misc.Unsafe is internal proprietary API and may be removed in a future release
+[[1;33mWARNING[m] /usr/local/google/home/deannagarcia/protobuf/java/core/src/main/java/com/google/protobuf/MessageSchema.java:[4881,19] sun.misc.Unsafe is internal proprietary API and may be removed in a future release
+[[1;33mWARNING[m] /usr/local/google/home/deannagarcia/protobuf/java/core/src/main/java/com/google/protobuf/MessageSchema.java:[5189,19] sun.misc.Unsafe is internal proprietary API and may be removed in a future release
+[[1;34mINFO[m] /usr/local/google/home/deannagarcia/protobuf/java/core/src/main/java/com/google/protobuf/AbstractMessageLite.java: Some input files use or override a deprecated API.
+[[1;34mINFO[m] /usr/local/google/home/deannagarcia/protobuf/java/core/src/main/java/com/google/protobuf/AbstractMessageLite.java: Recompile with -Xlint:deprecation for details.
+[[1;34mINFO[m] /usr/local/google/home/deannagarcia/protobuf/java/core/src/main/java/com/google/protobuf/AbstractMessageLite.java: Some input files use unchecked or unsafe operations.
+[[1;34mINFO[m] /usr/local/google/home/deannagarcia/protobuf/java/core/src/main/java/com/google/protobuf/AbstractMessageLite.java: Recompile with -Xlint:unchecked for details.
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mkotlin-maven-plugin:1.4.31:compile[m [1m(compile)[m @ [36mprotobuf-java[0;1m ---[m
+[[1;33mWARNING[m] /usr/local/google/home/deannagarcia/protobuf/java/core/src/main/kotlin/com/google/protobuf/OnlyForUseByGeneratedProtoCode.kt: (8, 2) This class can only be used with the compiler argument '-Xopt-in=kotlin.RequiresOptIn'
+[[1;33mWARNING[m] /usr/local/google/home/deannagarcia/protobuf/java/core/src/main/kotlin/com/google/protobuf/OnlyForUseByGeneratedProtoCode.kt: (14, 11) This class can only be used with the compiler argument '-Xopt-in=kotlin.RequiresOptIn'
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-antrun-plugin:1.8:run[m [1m(generate-test-sources)[m @ [36mprotobuf-java[0;1m ---[m
+[[1;34mINFO[m] Executing tasks
+
+main:
+    [mkdir] Created dir: /usr/local/google/home/deannagarcia/protobuf/java/core/target/generated-test-sources
+     [exec] [libprotobuf WARNING google/protobuf/compiler/java/java_file.cc:244] The optimize_for = LITE_RUNTIME option is no longer supported by protobuf Java code generator and is ignored--protoc will always generate full runtime code for Java. To use Java Lite runtime, users should use the Java Lite plugin instead. See:
+     [exec]   https://github.com/protocolbuffers/protobuf/blob/master/java/lite.md
+     [exec] [libprotobuf WARNING google/protobuf/compiler/java/java_file.cc:244] The optimize_for = LITE_RUNTIME option is no longer supported by protobuf Java code generator and is ignored--protoc will always generate full runtime code for Java. To use Java Lite runtime, users should use the Java Lite plugin instead. See:
+     [exec]   https://github.com/protocolbuffers/protobuf/blob/master/java/lite.md
+     [exec] [libprotobuf WARNING google/protobuf/compiler/java/java_file.cc:244] The optimize_for = LITE_RUNTIME option is no longer supported by protobuf Java code generator and is ignored--protoc will always generate full runtime code for Java. To use Java Lite runtime, users should use the Java Lite plugin instead. See:
+     [exec]   https://github.com/protocolbuffers/protobuf/blob/master/java/lite.md
+     [exec] [libprotobuf WARNING google/protobuf/compiler/java/java_file.cc:244] The optimize_for = LITE_RUNTIME option is no longer supported by protobuf Java code generator and is ignored--protoc will always generate full runtime code for Java. To use Java Lite runtime, users should use the Java Lite plugin instead. See:
+     [exec]   https://github.com/protocolbuffers/protobuf/blob/master/java/lite.md
+     [exec] [libprotobuf WARNING google/protobuf/compiler/java/java_file.cc:244] The optimize_for = LITE_RUNTIME option is no longer supported by protobuf Java code generator and is ignored--protoc will always generate full runtime code for Java. To use Java Lite runtime, users should use the Java Lite plugin instead. See:
+     [exec]   https://github.com/protocolbuffers/protobuf/blob/master/java/lite.md
+     [exec] [libprotobuf WARNING google/protobuf/compiler/java/java_context.cc:149] field "io_protocol_tests.TestConflictingFieldNames.int32_field" is conflicting with another field: both repeated field "int32_field" and singular field "int32_field_list" generate the method "getInt32FieldList()"
+     [exec] [libprotobuf WARNING google/protobuf/compiler/java/java_context.cc:149] field "io_protocol_tests.TestConflictingFieldNames.enum_field" is conflicting with another field: capitalized name of field "enum_field" conflicts with field "EnumField"
+     [exec] [libprotobuf WARNING google/protobuf/compiler/java/java_context.cc:149] field "io_protocol_tests.TestConflictingFieldNames.string_field" is conflicting with another field: capitalized name of field "string_field" conflicts with field "StringField"
+     [exec] [libprotobuf WARNING google/protobuf/compiler/java/java_context.cc:149] field "io_protocol_tests.TestConflictingFieldNames.bytes_field" is conflicting with another field: capitalized name of field "bytes_field" conflicts with field "BytesField"
+     [exec] [libprotobuf WARNING google/protobuf/compiler/java/java_context.cc:149] field "io_protocol_tests.TestConflictingFieldNames.message_field" is conflicting with another field: capitalized name of field "message_field" conflicts with field "MessageField"
+     [exec] [libprotobuf WARNING google/protobuf/compiler/java/java_context.cc:149] field "io_protocol_tests.TestConflictingFieldNames.int32_field_count" is conflicting with another field: both repeated field "Int32Field" and singular field "int32_field_count" generate the method "getInt32FieldCount()"
+     [exec] [libprotobuf WARNING google/protobuf/compiler/java/java_context.cc:149] field "io_protocol_tests.TestConflictingFieldNames.enum_field_count" is conflicting with another field: both repeated field "EnumField" and singular field "enum_field_count" generate the method "getEnumFieldCount()"
+     [exec] [libprotobuf WARNING google/protobuf/compiler/java/java_context.cc:149] field "io_protocol_tests.TestConflictingFieldNames.string_field_count" is conflicting with another field: both repeated field "StringField" and singular field "string_field_count" generate the method "getStringFieldCount()"
+     [exec] [libprotobuf WARNING google/protobuf/compiler/java/java_context.cc:149] field "io_protocol_tests.TestConflictingFieldNames.bytes_field_count" is conflicting with another field: both repeated field "BytesField" and singular field "bytes_field_count" generate the method "getBytesFieldCount()"
+     [exec] [libprotobuf WARNING google/protobuf/compiler/java/java_context.cc:149] field "io_protocol_tests.TestConflictingFieldNames.message_field_count" is conflicting with another field: both repeated field "MessageField" and singular field "message_field_count" generate the method "getMessageFieldCount()"
+     [exec] [libprotobuf WARNING google/protobuf/compiler/java/java_context.cc:149] field "io_protocol_tests.TestConflictingFieldNames.Int32Field" is conflicting with another field: both repeated field "Int32Field" and singular field "int32_field_list" generate the method "getInt32FieldList()"
+     [exec] [libprotobuf WARNING google/protobuf/compiler/java/java_context.cc:149] field "io_protocol_tests.TestConflictingFieldNames.EnumField" is conflicting with another field: both repeated field "EnumField" and singular field "enum_field_count" generate the method "getEnumFieldCount()"
+     [exec] [libprotobuf WARNING google/protobuf/compiler/java/java_context.cc:149] field "io_protocol_tests.TestConflictingFieldNames.StringField" is conflicting with another field: both repeated field "StringField" and singular field "string_field_count" generate the method "getStringFieldCount()"
+     [exec] [libprotobuf WARNING google/protobuf/compiler/java/java_context.cc:149] field "io_protocol_tests.TestConflictingFieldNames.BytesField" is conflicting with another field: both repeated field "BytesField" and singular field "bytes_field_count" generate the method "getBytesFieldCount()"
+     [exec] [libprotobuf WARNING google/protobuf/compiler/java/java_context.cc:149] field "io_protocol_tests.TestConflictingFieldNames.MessageField" is conflicting with another field: both repeated field "MessageField" and singular field "message_field_count" generate the method "getMessageFieldCount()"
+     [exec] [libprotobuf WARNING google/protobuf/compiler/java/java_context.cc:149] field "io_protocol_tests.TestConflictingFieldNames.int32_field_list" is conflicting with another field: both repeated field "Int32Field" and singular field "int32_field_list" generate the method "getInt32FieldList()"
+     [exec] [libprotobuf WARNING google/protobuf/compiler/java/java_context.cc:149] field "io_protocol_tests.TestConflictingFieldNames.field_name" is conflicting with another field: capitalized name of field "field_name" conflicts with field "field__name"
+     [exec] [libprotobuf WARNING google/protobuf/compiler/java/java_context.cc:149] field "io_protocol_tests.TestConflictingFieldNames.field__name" is conflicting with another field: capitalized name of field "field_name" conflicts with field "field__name"
+     [exec] [libprotobuf WARNING google/protobuf/compiler/java/java_context.cc:149] field "io_protocol_tests.TestConflictingFieldNames._2conflict" is conflicting with another field: capitalized name of field "_2conflict" conflicts with field "__2conflict"
+     [exec] [libprotobuf WARNING google/protobuf/compiler/java/java_context.cc:149] field "io_protocol_tests.TestConflictingFieldNames.__2conflict" is conflicting with another field: capitalized name of field "_2conflict" conflicts with field "__2conflict"
+[[1;34mINFO[m] Executed tasks
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mbuild-helper-maven-plugin:1.10:add-test-source[m [1m(add-generated-test-sources)[m @ [36mprotobuf-java[0;1m ---[m
+[[1;34mINFO[m] Test Source directory: /usr/local/google/home/deannagarcia/protobuf/java/core/target/generated-test-sources added.
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-resources-plugin:3.2.0:testResources[m [1m(default-testResources)[m @ [36mprotobuf-java[0;1m ---[m
+[[1;34mINFO[m] Using 'UTF-8' encoding to copy filtered resources.
+[[1;34mINFO[m] Using 'UTF-8' encoding to copy filtered properties files.
+[[1;34mINFO[m] Copying 2 resources
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-compiler-plugin:3.6.1:testCompile[m [1m(default-testCompile)[m @ [36mprotobuf-java[0;1m ---[m
+[[1;34mINFO[m] Changes detected - recompiling the module!
+[[1;34mINFO[m] Compiling 182 source files to /usr/local/google/home/deannagarcia/protobuf/java/core/target/test-classes
+[[1;34mINFO[m] /usr/local/google/home/deannagarcia/protobuf/java/core/src/test/java/com/google/protobuf/TestUtil.java: Some input files use or override a deprecated API.
+[[1;34mINFO[m] /usr/local/google/home/deannagarcia/protobuf/java/core/src/test/java/com/google/protobuf/TestUtil.java: Recompile with -Xlint:deprecation for details.
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mkotlin-maven-plugin:1.4.31:test-compile[m [1m(test-compile)[m @ [36mprotobuf-java[0;1m ---[m
+[[1;31mERROR[m] /usr/local/google/home/deannagarcia/protobuf/java/core/src/test/kotlin/com/google/protobuf/ExtendableMessageExtensionsTest.kt: (15, 5) Unresolved reference. None of the following candidates is applicable because of receiver type mismatch: 
+public operator fun <M : com.google.protobuf.GeneratedMessage.ExtendableMessage<TypeVariable(M)>, B : com.google.protobuf.GeneratedMessage.ExtendableBuilder<TypeVariable(M), TypeVariable(B)>, T> TypeVariable(B).set(extension: ExtensionLite<TypeVariable(M), TypeVariable(T)>, value: TypeVariable(T)): Unit defined in com.google.protobuf.kotlin
+public operator fun <M : com.google.protobuf.GeneratedMessageLite.ExtendableMessage<TypeVariable(M), TypeVariable(B)>, B : com.google.protobuf.GeneratedMessageLite.ExtendableBuilder<TypeVariable(M), TypeVariable(B)>, T> TypeVariable(B).set(extension: ExtensionLite<TypeVariable(M), TypeVariable(T)>, value: TypeVariable(T)): Unit defined in com.google.protobuf.kotlin
+[[1;31mERROR[m] /usr/local/google/home/deannagarcia/protobuf/java/core/src/test/kotlin/com/google/protobuf/ExtendableMessageExtensionsTest.kt: (15, 12) No set method providing array access
+[[1;31mERROR[m] /usr/local/google/home/deannagarcia/protobuf/java/core/src/test/kotlin/com/google/protobuf/ExtendableMessageExtensionsTest.kt: (23, 16) Unresolved reference. None of the following candidates is applicable because of receiver type mismatch: 
+public operator fun <M : com.google.protobuf.GeneratedMessageLite.ExtendableMessage<TypeVariable(M), *>, MOrBT : com.google.protobuf.GeneratedMessageLite.ExtendableMessageOrBuilder<TypeVariable(M), *>, T> TypeVariable(MOrBT).get(extension: ExtensionLite<TypeVariable(M), TypeVariable(T)>): TypeVariable(T) defined in com.google.protobuf.kotlin
+public operator fun <M : com.google.protobuf.GeneratedMessage.ExtendableMessage<TypeVariable(M)>, MorBT : com.google.protobuf.GeneratedMessage.ExtendableMessageOrBuilder<TypeVariable(M)>, T> TypeVariable(MorBT).get(extension: ExtensionLite<TypeVariable(M), TypeVariable(T)>): TypeVariable(T) defined in com.google.protobuf.kotlin
+[[1;31mERROR[m] /usr/local/google/home/deannagarcia/protobuf/java/core/src/test/kotlin/com/google/protobuf/ExtendableMessageExtensionsTest.kt: (23, 23) No get method providing array access
+[[1;31mERROR[m] /usr/local/google/home/deannagarcia/protobuf/java/core/src/test/kotlin/com/google/protobuf/ExtendableMessageExtensionsTest.kt: (31, 16) Unresolved reference. None of the following candidates is applicable because of receiver type mismatch: 
+public operator fun <M : com.google.protobuf.GeneratedMessageLite.ExtendableMessage<TypeVariable(M), *>, MOrBT : com.google.protobuf.GeneratedMessageLite.ExtendableMessageOrBuilder<TypeVariable(M), *>, T> TypeVariable(MOrBT).get(extension: ExtensionLite<TypeVariable(M), TypeVariable(T)>): TypeVariable(T) defined in com.google.protobuf.kotlin
+public operator fun <M : com.google.protobuf.GeneratedMessage.ExtendableMessage<TypeVariable(M)>, MorBT : com.google.protobuf.GeneratedMessage.ExtendableMessageOrBuilder<TypeVariable(M)>, T> TypeVariable(MorBT).get(extension: ExtensionLite<TypeVariable(M), TypeVariable(T)>): TypeVariable(T) defined in com.google.protobuf.kotlin
+[[1;31mERROR[m] /usr/local/google/home/deannagarcia/protobuf/java/core/src/test/kotlin/com/google/protobuf/ExtendableMessageExtensionsTest.kt: (31, 23) No get method providing array access
+[[1;31mERROR[m] /usr/local/google/home/deannagarcia/protobuf/java/core/src/test/kotlin/com/google/protobuf/ExtendableMessageExtensionsTest.kt: (39, 41) Unresolved reference. None of the following candidates is applicable because of receiver type mismatch: 
+public operator fun <M : com.google.protobuf.GeneratedMessage.ExtendableMessage<TypeVariable(M)>, MorBT : com.google.protobuf.GeneratedMessage.ExtendableMessageOrBuilder<TypeVariable(M)>> TypeVariable(MorBT).contains(extension: ExtensionLite<TypeVariable(M), *>): Boolean defined in com.google.protobuf.kotlin
+public operator fun <M : com.google.protobuf.GeneratedMessageLite.ExtendableMessage<TypeVariable(M), *>, MorBT : com.google.protobuf.GeneratedMessageLite.ExtendableMessageOrBuilder<TypeVariable(M), *>> TypeVariable(MorBT).contains(extension: ExtensionLite<TypeVariable(M), *>): Boolean defined in com.google.protobuf.kotlin
+[[1;31mERROR[m] /usr/local/google/home/deannagarcia/protobuf/java/core/src/test/kotlin/com/google/protobuf/ExtendableMessageExtensionsTest.kt: (46, 41) Unresolved reference. None of the following candidates is applicable because of receiver type mismatch: 
+public operator fun <M : com.google.protobuf.GeneratedMessage.ExtendableMessage<TypeVariable(M)>, MorBT : com.google.protobuf.GeneratedMessage.ExtendableMessageOrBuilder<TypeVariable(M)>> TypeVariable(MorBT).contains(extension: ExtensionLite<TypeVariable(M), *>): Boolean defined in com.google.protobuf.kotlin
+public operator fun <M : com.google.protobuf.GeneratedMessageLite.ExtendableMessage<TypeVariable(M), *>, MorBT : com.google.protobuf.GeneratedMessageLite.ExtendableMessageOrBuilder<TypeVariable(M), *>> TypeVariable(MorBT).contains(extension: ExtensionLite<TypeVariable(M), *>): Boolean defined in com.google.protobuf.kotlin
+[[1;31mERROR[m] /usr/local/google/home/deannagarcia/protobuf/java/core/src/test/kotlin/com/google/protobuf/ExtendableMessageExtensionsTest.kt: (52, 41) Unresolved reference. None of the following candidates is applicable because of receiver type mismatch: 
+public operator fun <M : com.google.protobuf.GeneratedMessage.ExtendableMessage<TypeVariable(M)>, MorBT : com.google.protobuf.GeneratedMessage.ExtendableMessageOrBuilder<TypeVariable(M)>> TypeVariable(MorBT).contains(extension: ExtensionLite<TypeVariable(M), *>): Boolean defined in com.google.protobuf.kotlin
+public operator fun <M : com.google.protobuf.GeneratedMessageLite.ExtendableMessage<TypeVariable(M), *>, MorBT : com.google.protobuf.GeneratedMessageLite.ExtendableMessageOrBuilder<TypeVariable(M), *>> TypeVariable(MorBT).contains(extension: ExtensionLite<TypeVariable(M), *>): Boolean defined in com.google.protobuf.kotlin
+[[1;31mERROR[m] /usr/local/google/home/deannagarcia/protobuf/java/core/src/test/kotlin/com/google/protobuf/ExtendableMessageExtensionsTest.kt: (58, 41) Unresolved reference. None of the following candidates is applicable because of receiver type mismatch: 
+public operator fun <M : com.google.protobuf.GeneratedMessage.ExtendableMessage<TypeVariable(M)>, MorBT : com.google.protobuf.GeneratedMessage.ExtendableMessageOrBuilder<TypeVariable(M)>> TypeVariable(MorBT).contains(extension: ExtensionLite<TypeVariable(M), *>): Boolean defined in com.google.protobuf.kotlin
+public operator fun <M : com.google.protobuf.GeneratedMessageLite.ExtendableMessage<TypeVariable(M), *>, MorBT : com.google.protobuf.GeneratedMessageLite.ExtendableMessageOrBuilder<TypeVariable(M), *>> TypeVariable(MorBT).contains(extension: ExtensionLite<TypeVariable(M), *>): Boolean defined in com.google.protobuf.kotlin
+[[1;34mINFO[m] [1m------------------------------------------------------------------------[m
+[[1;34mINFO[m] [1;31mBUILD FAILURE[m
+[[1;34mINFO[m] [1m------------------------------------------------------------------------[m
+[[1;34mINFO[m] Total time:  01:24 min
+[[1;34mINFO[m] Finished at: 2021-03-18T23:34:30Z
+[[1;34mINFO[m] [1m------------------------------------------------------------------------[m
+[[1;31mERROR[m] Failed to execute goal [32morg.jetbrains.kotlin:kotlin-maven-plugin:1.4.31:test-compile[m [1m(test-compile)[m on project [36mprotobuf-java[m: [1;31mCompilation failure[m: Compilation failure: 
+[[1;31mERROR[m] /usr/local/google/home/deannagarcia/protobuf/java/core/src/test/kotlin/com/google/protobuf/ExtendableMessageExtensionsTest.kt:[15,5] Unresolved reference. None of the following candidates is applicable because of receiver type mismatch: 
+[[1;31mERROR[m] public operator fun <M : com.google.protobuf.GeneratedMessage.ExtendableMessage<TypeVariable(M)>, B : com.google.protobuf.GeneratedMessage.ExtendableBuilder<TypeVariable(M), TypeVariable(B)>, T> TypeVariable(B).set(extension: ExtensionLite<TypeVariable(M), TypeVariable(T)>, value: TypeVariable(T)): Unit defined in com.google.protobuf.kotlin
+[[1;31mERROR[m] public operator fun <M : com.google.protobuf.GeneratedMessageLite.ExtendableMessage<TypeVariable(M), TypeVariable(B)>, B : com.google.protobuf.GeneratedMessageLite.ExtendableBuilder<TypeVariable(M), TypeVariable(B)>, T> TypeVariable(B).set(extension: ExtensionLite<TypeVariable(M), TypeVariable(T)>, value: TypeVariable(T)): Unit defined in com.google.protobuf.kotlin
+[[1;31mERROR[m] /usr/local/google/home/deannagarcia/protobuf/java/core/src/test/kotlin/com/google/protobuf/ExtendableMessageExtensionsTest.kt:[15,12] No set method providing array access
+[[1;31mERROR[m] /usr/local/google/home/deannagarcia/protobuf/java/core/src/test/kotlin/com/google/protobuf/ExtendableMessageExtensionsTest.kt:[23,16] Unresolved reference. None of the following candidates is applicable because of receiver type mismatch: 
+[[1;31mERROR[m] public operator fun <M : com.google.protobuf.GeneratedMessageLite.ExtendableMessage<TypeVariable(M), *>, MOrBT : com.google.protobuf.GeneratedMessageLite.ExtendableMessageOrBuilder<TypeVariable(M), *>, T> TypeVariable(MOrBT).get(extension: ExtensionLite<TypeVariable(M), TypeVariable(T)>): TypeVariable(T) defined in com.google.protobuf.kotlin
+[[1;31mERROR[m] public operator fun <M : com.google.protobuf.GeneratedMessage.ExtendableMessage<TypeVariable(M)>, MorBT : com.google.protobuf.GeneratedMessage.ExtendableMessageOrBuilder<TypeVariable(M)>, T> TypeVariable(MorBT).get(extension: ExtensionLite<TypeVariable(M), TypeVariable(T)>): TypeVariable(T) defined in com.google.protobuf.kotlin
+[[1;31mERROR[m] /usr/local/google/home/deannagarcia/protobuf/java/core/src/test/kotlin/com/google/protobuf/ExtendableMessageExtensionsTest.kt:[23,23] No get method providing array access
+[[1;31mERROR[m] /usr/local/google/home/deannagarcia/protobuf/java/core/src/test/kotlin/com/google/protobuf/ExtendableMessageExtensionsTest.kt:[31,16] Unresolved reference. None of the following candidates is applicable because of receiver type mismatch: 
+[[1;31mERROR[m] public operator fun <M : com.google.protobuf.GeneratedMessageLite.ExtendableMessage<TypeVariable(M), *>, MOrBT : com.google.protobuf.GeneratedMessageLite.ExtendableMessageOrBuilder<TypeVariable(M), *>, T> TypeVariable(MOrBT).get(extension: ExtensionLite<TypeVariable(M), TypeVariable(T)>): TypeVariable(T) defined in com.google.protobuf.kotlin
+[[1;31mERROR[m] public operator fun <M : com.google.protobuf.GeneratedMessage.ExtendableMessage<TypeVariable(M)>, MorBT : com.google.protobuf.GeneratedMessage.ExtendableMessageOrBuilder<TypeVariable(M)>, T> TypeVariable(MorBT).get(extension: ExtensionLite<TypeVariable(M), TypeVariable(T)>): TypeVariable(T) defined in com.google.protobuf.kotlin
+[[1;31mERROR[m] /usr/local/google/home/deannagarcia/protobuf/java/core/src/test/kotlin/com/google/protobuf/ExtendableMessageExtensionsTest.kt:[31,23] No get method providing array access
+[[1;31mERROR[m] /usr/local/google/home/deannagarcia/protobuf/java/core/src/test/kotlin/com/google/protobuf/ExtendableMessageExtensionsTest.kt:[39,41] Unresolved reference. None of the following candidates is applicable because of receiver type mismatch: 
+[[1;31mERROR[m] public operator fun <M : com.google.protobuf.GeneratedMessage.ExtendableMessage<TypeVariable(M)>, MorBT : com.google.protobuf.GeneratedMessage.ExtendableMessageOrBuilder<TypeVariable(M)>> TypeVariable(MorBT).contains(extension: ExtensionLite<TypeVariable(M), *>): Boolean defined in com.google.protobuf.kotlin
+[[1;31mERROR[m] public operator fun <M : com.google.protobuf.GeneratedMessageLite.ExtendableMessage<TypeVariable(M), *>, MorBT : com.google.protobuf.GeneratedMessageLite.ExtendableMessageOrBuilder<TypeVariable(M), *>> TypeVariable(MorBT).contains(extension: ExtensionLite<TypeVariable(M), *>): Boolean defined in com.google.protobuf.kotlin
+[[1;31mERROR[m] /usr/local/google/home/deannagarcia/protobuf/java/core/src/test/kotlin/com/google/protobuf/ExtendableMessageExtensionsTest.kt:[46,41] Unresolved reference. None of the following candidates is applicable because of receiver type mismatch: 
+[[1;31mERROR[m] public operator fun <M : com.google.protobuf.GeneratedMessage.ExtendableMessage<TypeVariable(M)>, MorBT : com.google.protobuf.GeneratedMessage.ExtendableMessageOrBuilder<TypeVariable(M)>> TypeVariable(MorBT).contains(extension: ExtensionLite<TypeVariable(M), *>): Boolean defined in com.google.protobuf.kotlin
+[[1;31mERROR[m] public operator fun <M : com.google.protobuf.GeneratedMessageLite.ExtendableMessage<TypeVariable(M), *>, MorBT : com.google.protobuf.GeneratedMessageLite.ExtendableMessageOrBuilder<TypeVariable(M), *>> TypeVariable(MorBT).contains(extension: ExtensionLite<TypeVariable(M), *>): Boolean defined in com.google.protobuf.kotlin
+[[1;31mERROR[m] /usr/local/google/home/deannagarcia/protobuf/java/core/src/test/kotlin/com/google/protobuf/ExtendableMessageExtensionsTest.kt:[52,41] Unresolved reference. None of the following candidates is applicable because of receiver type mismatch: 
+[[1;31mERROR[m] public operator fun <M : com.google.protobuf.GeneratedMessage.ExtendableMessage<TypeVariable(M)>, MorBT : com.google.protobuf.GeneratedMessage.ExtendableMessageOrBuilder<TypeVariable(M)>> TypeVariable(MorBT).contains(extension: ExtensionLite<TypeVariable(M), *>): Boolean defined in com.google.protobuf.kotlin
+[[1;31mERROR[m] public operator fun <M : com.google.protobuf.GeneratedMessageLite.ExtendableMessage<TypeVariable(M), *>, MorBT : com.google.protobuf.GeneratedMessageLite.ExtendableMessageOrBuilder<TypeVariable(M), *>> TypeVariable(MorBT).contains(extension: ExtensionLite<TypeVariable(M), *>): Boolean defined in com.google.protobuf.kotlin
+[[1;31mERROR[m] /usr/local/google/home/deannagarcia/protobuf/java/core/src/test/kotlin/com/google/protobuf/ExtendableMessageExtensionsTest.kt:[58,41] Unresolved reference. None of the following candidates is applicable because of receiver type mismatch: 
+[[1;31mERROR[m] public operator fun <M : com.google.protobuf.GeneratedMessage.ExtendableMessage<TypeVariable(M)>, MorBT : com.google.protobuf.GeneratedMessage.ExtendableMessageOrBuilder<TypeVariable(M)>> TypeVariable(MorBT).contains(extension: ExtensionLite<TypeVariable(M), *>): Boolean defined in com.google.protobuf.kotlin
+[[1;31mERROR[m] public operator fun <M : com.google.protobuf.GeneratedMessageLite.ExtendableMessage<TypeVariable(M), *>, MorBT : com.google.protobuf.GeneratedMessageLite.ExtendableMessageOrBuilder<TypeVariable(M), *>> TypeVariable(MorBT).contains(extension: ExtensionLite<TypeVariable(M), *>): Boolean defined in com.google.protobuf.kotlin
+[[1;31mERROR[m] -> [1m[Help 1][m
+[[1;31mERROR[m] 
+[[1;31mERROR[m] To see the full stack trace of the errors, re-run Maven with the [1m-e[m switch.
+[[1;31mERROR[m] Re-run Maven using the [1m-X[m switch to enable full debug logging.
+[[1;31mERROR[m] 
+[[1;31mERROR[m] For more information about the errors and possible solutions, please read the following articles:
+[[1;31mERROR[m] [1m[Help 1][m http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException
