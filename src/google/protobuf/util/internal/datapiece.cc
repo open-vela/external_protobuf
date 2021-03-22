@@ -48,8 +48,13 @@ namespace util {
 namespace converter {
 
 using util::Status;
+using util::error::Code;
 
 namespace {
+
+inline Status InvalidArgument(StringPiece value_str) {
+  return Status(util::error::INVALID_ARGUMENT, value_str);
+}
 
 template <typename To, typename From>
 util::StatusOr<To> ValidateNumberConversion(To after, From before) {
@@ -57,7 +62,7 @@ util::StatusOr<To> ValidateNumberConversion(To after, From before) {
       MathUtil::Sign<From>(before) == MathUtil::Sign<To>(after)) {
     return after;
   } else {
-    return util::InvalidArgumentError(std::is_integral<From>::value
+    return InvalidArgument(std::is_integral<From>::value
                                ? ValueAsString(before)
                                : std::is_same<From, double>::value
                                      ? DoubleAsString(before)
@@ -102,7 +107,7 @@ util::StatusOr<float> DoubleToFloat(double before) {
   } else if (before > std::numeric_limits<float>::max() ||
              before < -std::numeric_limits<float>::max()) {
     // Double value outside of the range of float.
-    return util::InvalidArgumentError(DoubleAsString(before));
+    return InvalidArgument(DoubleAsString(before));
   } else {
     return static_cast<float>(before);
   }
@@ -174,7 +179,7 @@ util::StatusOr<double> DataPiece::ToDouble() const {
     if (value.ok() && !std::isfinite(value.value())) {
       // safe_strtod converts out-of-range values to +inf/-inf, but we want
       // to report them as errors.
-      return util::InvalidArgumentError(StrCat("\"", str_, "\""));
+      return InvalidArgument(StrCat("\"", str_, "\""));
     } else {
       return value;
     }
@@ -204,7 +209,7 @@ util::StatusOr<bool> DataPiece::ToBool() const {
     case TYPE_STRING:
       return StringToNumber<bool>(safe_strtob);
     default:
-      return util::InvalidArgumentError(
+      return InvalidArgument(
           ValueAsStringOrDefault("Wrong type. Cannot convert to Bool."));
   }
 }
@@ -219,7 +224,7 @@ util::StatusOr<std::string> DataPiece::ToString() const {
       return base64;
     }
     default:
-      return util::InvalidArgumentError(
+      return InvalidArgument(
           ValueAsStringOrDefault("Cannot convert to string."));
   }
 }
@@ -260,11 +265,11 @@ util::StatusOr<std::string> DataPiece::ToBytes() const {
   if (type_ == TYPE_STRING) {
     std::string decoded;
     if (!DecodeBase64(str_, &decoded)) {
-      return util::InvalidArgumentError(ValueAsStringOrDefault("Invalid data in input."));
+      return InvalidArgument(ValueAsStringOrDefault("Invalid data in input."));
     }
     return decoded;
   } else {
-    return util::InvalidArgumentError(ValueAsStringOrDefault(
+    return InvalidArgument(ValueAsStringOrDefault(
         "Wrong type. Only String or Bytes can be converted to Bytes."));
   }
 }
@@ -324,7 +329,7 @@ util::StatusOr<int> DataPiece::ToEnum(const google::protobuf::Enum* enum_type,
     // enum because we preserve unknown enum values as well.
     return ToInt32();
   }
-  return util::InvalidArgumentError(
+  return InvalidArgument(
       ValueAsStringOrDefault("Cannot find enum with given value."));
 }
 
@@ -344,7 +349,7 @@ util::StatusOr<To> DataPiece::GenericConvert() const {
     case TYPE_FLOAT:
       return NumberConvertAndCheck<To, float>(float_);
     default:  // TYPE_ENUM, TYPE_STRING, TYPE_CORD, TYPE_BOOL
-      return util::InvalidArgumentError(ValueAsStringOrDefault(
+      return InvalidArgument(ValueAsStringOrDefault(
           "Wrong type. Bool, Enum, String and Cord not supported in "
           "GenericConvert."));
   }
@@ -354,11 +359,11 @@ template <typename To>
 util::StatusOr<To> DataPiece::StringToNumber(bool (*func)(StringPiece,
                                                           To*)) const {
   if (str_.size() > 0 && (str_[0] == ' ' || str_[str_.size() - 1] == ' ')) {
-    return util::InvalidArgumentError(StrCat("\"", str_, "\""));
+    return InvalidArgument(StrCat("\"", str_, "\""));
   }
   To result;
   if (func(str_, &result)) return result;
-  return util::InvalidArgumentError(StrCat("\"", std::string(str_), "\""));
+  return InvalidArgument(StrCat("\"", std::string(str_), "\""));
 }
 
 bool DataPiece::DecodeBase64(StringPiece src, std::string* dest) const {

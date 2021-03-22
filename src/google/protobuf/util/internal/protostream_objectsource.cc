@@ -60,8 +60,11 @@
 namespace google {
 namespace protobuf {
 namespace util {
+namespace error {
+using util::error::Code;
+using util::error::INTERNAL;
+}  // namespace error
 namespace converter {
-
 using ::PROTOBUF_NAMESPACE_ID::internal::WireFormat;
 using ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite;
 
@@ -102,7 +105,7 @@ util::StatusOr<std::string> MapKeyDefaultValueAsString(
     case google::protobuf::Field::TYPE_STRING:
       return std::string();
     default:
-      return util::InternalError("Invalid map key type.");
+      return util::Status(util::error::INTERNAL, "Invalid map key type.");
   }
 }
 }  // namespace
@@ -282,7 +285,8 @@ util::StatusOr<uint32_t> ProtoStreamObjectSource::RenderMap(
           if (key_field == nullptr) {
             // The Type info for this map entry is incorrect. It should always
             // have a field named "key" and with field number 1.
-            return util::InternalError("Invalid map entry.");
+            return util::Status(util::error::INTERNAL,
+                                "Invalid map entry.");
           }
           ASSIGN_OR_RETURN(map_key, MapKeyDefaultValueAsString(*key_field));
         }
@@ -290,7 +294,7 @@ util::StatusOr<uint32_t> ProtoStreamObjectSource::RenderMap(
       } else {
         // The Type info for this map entry is incorrect. It should contain
         // exactly two fields with field number 1 and 2.
-        return util::InternalError("Invalid map entry.");
+        return util::Status(util::error::INTERNAL, "Invalid map entry.");
       }
     }
     stream_->PopLimit(old_limit);
@@ -317,12 +321,15 @@ util::Status ProtoStreamObjectSource::RenderTimestamp(
   int64_t seconds = p.first;
   int32_t nanos = p.second;
   if (seconds > kTimestampMaxSeconds || seconds < kTimestampMinSeconds) {
-    return util::InternalError(
-        StrCat("Timestamp seconds exceeds limit for field: ", field_name));
+    return util::Status(
+        util::error::INTERNAL,
+        StrCat("Timestamp seconds exceeds limit for field: ",
+                     field_name));
   }
 
   if (nanos < 0 || nanos >= kNanosPerSecond) {
-    return util::InternalError(
+    return util::Status(
+        util::error::INTERNAL,
         StrCat("Timestamp nanos exceeds limit for field: ", field_name));
   }
 
@@ -339,19 +346,22 @@ util::Status ProtoStreamObjectSource::RenderDuration(
   int64_t seconds = p.first;
   int32_t nanos = p.second;
   if (seconds > kDurationMaxSeconds || seconds < kDurationMinSeconds) {
-    return util::InternalError(
+    return util::Status(
+        util::error::INTERNAL,
         StrCat("Duration seconds exceeds limit for field: ", field_name));
   }
 
   if (nanos <= -kNanosPerSecond || nanos >= kNanosPerSecond) {
-    return util::InternalError(
+    return util::Status(
+        util::error::INTERNAL,
         StrCat("Duration nanos exceeds limit for field: ", field_name));
   }
 
   std::string sign = "";
   if (seconds < 0) {
     if (nanos > 0) {
-      return util::InternalError(
+      return util::Status(
+          util::error::INTERNAL,
           StrCat("Duration nanos is non-negative, but seconds is "
                        "negative for field: ",
                        field_name));
@@ -604,7 +614,8 @@ util::Status ProtoStreamObjectSource::RenderAny(
   // If there is a value but no type, we cannot render it, so report an error.
   if (type_url.empty()) {
     // TODO(sven): Add an external message once those are ready.
-    return util::InternalError("Invalid Any, the type_url is missing.");
+    return util::Status(util::error::INTERNAL,
+                        "Invalid Any, the type_url is missing.");
   }
 
   util::StatusOr<const google::protobuf::Type*> resolved_type =
@@ -613,7 +624,8 @@ util::Status ProtoStreamObjectSource::RenderAny(
   if (!resolved_type.ok()) {
     // Convert into an internal error, since this means the backend gave us
     // an invalid response (missing or invalid type information).
-    return util::InternalError(resolved_type.status().message());
+    return util::Status(util::error::INTERNAL,
+                        resolved_type.status().message());
   }
   // nested_type cannot be null at this time.
   const google::protobuf::Type* nested_type = resolved_type.value();
@@ -650,7 +662,8 @@ util::Status ProtoStreamObjectSource::RenderFieldMask(
       }
     }
     if (paths_field_tag != tag) {
-      return util::InternalError("Invalid FieldMask, unexpected field.");
+      return util::Status(util::error::INTERNAL,
+                          "Invalid FieldMask, unexpected field.");
     }
     std::string str;
     os->stream_->ReadVarint32(&buffer32);  // string size.
@@ -734,7 +747,8 @@ util::Status ProtoStreamObjectSource::RenderField(
     const google::protobuf::Type* type =
         typeinfo_->GetTypeByTypeUrl(field->type_url());
     if (type == nullptr) {
-      return util::InternalError(
+      return util::Status(
+          util::error::INTERNAL,
           StrCat("Invalid configuration. Could not find the type: ",
                        field->type_url()));
     }
@@ -751,7 +765,8 @@ util::Status ProtoStreamObjectSource::RenderField(
     --recursion_depth_;
 
     if (!stream_->ConsumedEntireMessage()) {
-      return util::InvalidArgumentError(
+      return util::Status(
+          util::error::INVALID_ARGUMENT,
           "Nested protocol message not parsed in its entirety.");
     }
     stream_->PopLimit(old_limit);
@@ -1050,7 +1065,8 @@ std::pair<int64_t, int32_t> ProtoStreamObjectSource::ReadSecondsAndNanos(
 util::Status ProtoStreamObjectSource::IncrementRecursionDepth(
     StringPiece type_name, StringPiece field_name) const {
   if (++recursion_depth_ > max_recursion_depth_) {
-    return util::InvalidArgumentError(
+    return util::Status(
+        util::error::INVALID_ARGUMENT,
         StrCat("Message too deep. Max recursion depth reached for type '",
                      type_name, "', field '", field_name, "'"));
   }
