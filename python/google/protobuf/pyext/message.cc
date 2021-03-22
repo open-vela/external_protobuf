@@ -197,12 +197,12 @@ static int AddDescriptors(PyObject* cls, const Descriptor* descriptor) {
 }
 
 static PyObject* New(PyTypeObject* type, PyObject* args, PyObject* kwargs) {
-  static const char *kwlist[] = {"name", "bases", "dict", 0};
+  static char *kwlist[] = {"name", "bases", "dict", 0};
   PyObject *bases, *dict;
   const char* name;
 
   // Check arguments: (name, bases, dict)
-  if (!PyArg_ParseTupleAndKeywords(args, kwargs, "sO!O!:type", const_cast<char**>(kwlist),
+  if (!PyArg_ParseTupleAndKeywords(args, kwargs, "sO!O!:type", kwlist,
                                    &name,
                                    &PyTuple_Type, &bases,
                                    &PyDict_Type, &dict)) {
@@ -547,7 +547,7 @@ PyObject* PickleError_class;
 
 // Format an error message for unexpected types.
 // Always return with an exception set.
-void FormatTypeError(PyObject* arg, const char* expected_types) {
+void FormatTypeError(PyObject* arg, char* expected_types) {
   // This function is often called with an exception set.
   // Clear it to call PyObject_Repr() in good conditions.
   PyErr_Clear();
@@ -1680,9 +1680,9 @@ static PyObject* InternalSerializeToString(
     CMessage* self, PyObject* args, PyObject* kwargs,
     bool require_initialized) {
   // Parse the "deterministic" kwarg; defaults to False.
-  static const char* kwlist[] = { "deterministic", 0 };
+  static char* kwlist[] = { "deterministic", 0 };
   PyObject* deterministic_obj = Py_None;
-  if (!PyArg_ParseTupleAndKeywords(args, kwargs, "|O", const_cast<char**>(kwlist),
+  if (!PyArg_ParseTupleAndKeywords(args, kwargs, "|O", kwlist,
                                    &deterministic_obj)) {
     return NULL;
   }
@@ -1928,8 +1928,9 @@ PyObject* SetAllowOversizeProtos(PyObject* m, PyObject* arg) {
 }
 
 static PyObject* MergeFromString(CMessage* self, PyObject* arg) {
-  Py_buffer data;
-  if (PyObject_GetBuffer(arg, &data, PyBUF_SIMPLE) < 0) {
+  const void* data;
+  Py_ssize_t data_length;
+  if (PyObject_AsReadBuffer(arg, &data, &data_length) < 0) {
     return NULL;
   }
 
@@ -1942,8 +1943,7 @@ static PyObject* MergeFromString(CMessage* self, PyObject* arg) {
   const char* ptr;
   internal::ParseContext ctx(
       depth, false, &ptr,
-      StringPiece(static_cast<const char*>(data.buf), data.len));
-  PyBuffer_Release(&data);
+      StringPiece(static_cast<const char*>(data), data_length));
   ctx.data().pool = factory->pool->pool;
   ctx.data().factory = factory->message_factory;
 
@@ -1969,9 +1969,9 @@ static PyObject* MergeFromString(CMessage* self, PyObject* arg) {
     // TODO(jieluo): Raise error and return NULL instead.
     // b/27494216
     PyErr_Warn(nullptr, "Unexpected end-group tag: Not all data was converted");
-    return PyInt_FromLong(data.len - ctx.BytesUntilLimit(ptr));
+    return PyInt_FromLong(data_length - ctx.BytesUntilLimit(ptr));
   }
-  return PyInt_FromLong(data.len);
+  return PyInt_FromLong(data_length);
 }
 
 static PyObject* ParseFromString(CMessage* self, PyObject* arg) {

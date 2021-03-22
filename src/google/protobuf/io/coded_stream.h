@@ -133,8 +133,6 @@
 #else
 #ifdef __APPLE__
 #include <machine/endian.h>  // __BYTE_ORDER
-#elif defined(__FreeBSD__)
-#include <sys/endian.h>  // __BYTE_ORDER
 #else
 #include <endian.h>  // __BYTE_ORDER
 #endif

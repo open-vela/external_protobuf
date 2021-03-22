@@ -55,6 +55,8 @@ namespace converter {
 
 using io::CodedOutputStream;
 using ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite;
+using util::error::INVALID_ARGUMENT;
+
 
 ProtoWriter::ProtoWriter(TypeResolver* type_resolver,
                          const google::protobuf::Type& type,
@@ -693,7 +695,8 @@ ProtoWriter* ProtoWriter::RenderPrimitiveField(
       break;
     }
     default:  // TYPE_GROUP, TYPE_MESSAGE, TYPE_UNKNOWN.
-      status = util::InvalidArgumentError(data.ValueAsStringOrDefault(""));
+      status = util::Status(util::error::INVALID_ARGUMENT,
+                            data.ValueAsStringOrDefault(""));
   }
 
   if (!status.ok()) {

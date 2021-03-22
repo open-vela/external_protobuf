@@ -251,7 +251,7 @@ static PyObject* GetOrBuildOptions(const DescriptorClass *descriptor) {
     return NULL;
   }
   ScopedPyObjectPtr value(
-      PyObject_Call(message_class->AsPyObject(), NULL, NULL));
+      PyEval_CallObject(message_class->AsPyObject(), NULL));
   Py_DECREF(message_class);
   if (value == NULL) {
     return NULL;
