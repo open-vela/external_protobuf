@@ -841,7 +841,8 @@ class MessageTest(unittest.TestCase):
     m1.MergeFromString(m2.SerializeToString())
     self.assertEqual(1, m1.optional_nested_message.bb)
 
-  def testMergeFromStringUsingMemoryView(self, message_module):
+  @unittest.skipIf(six.PY2, 'memoryview objects are not supported on py2')
+  def testMergeFromStringUsingMemoryViewWorksInPy3(self, message_module):
     m2 = message_module.TestAllTypes()
     m2.optional_string = 'scalar string'
     m2.repeated_string.append('repeated string')
@@ -862,6 +863,12 @@ class MessageTest(unittest.TestCase):
     self.assertIsInstance(m1.repeated_bytes[0], bytes)
     self.assertIsInstance(m1.optional_string, six.text_type)
     self.assertIsInstance(m1.repeated_string[0], six.text_type)
+
+  @unittest.skipIf(six.PY3, 'memoryview is supported by py3')
+  def testMergeFromStringUsingMemoryViewIsPy2Error(self, message_module):
+    memview = memoryview(b'')
+    with self.assertRaises(TypeError):
+      message_module.TestAllTypes.FromString(memview)
 
   def testMergeFromEmpty(self, message_module):
     m1 = message_module.TestAllTypes()
