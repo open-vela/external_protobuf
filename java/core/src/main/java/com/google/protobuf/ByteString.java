@@ -1043,10 +1043,8 @@ public abstract class ByteString implements Iterable<Byte>, Serializable {
     }
 
     /**
-     * Creates a byte string with the size and contents of this output stream. This does not create
-     * a new copy of the underlying bytes. If the stream size grows dynamically, the runtime is
-     * O(log n) in respect to the number of bytes written to the {@link Output}. If the stream size
-     * stays within the initial capacity, the runtime is O(1).
+     * Creates a byte string. Its size is the current size of this output stream and its output has
+     * been copied to it.
      *
      * @return the current contents of this output stream, as a byte string.
      */
