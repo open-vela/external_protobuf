@@ -403,6 +403,15 @@ java_EXTRA_DIST=                                                                
   java/core/src/main/java/com/google/protobuf/Utf8.java                            \
   java/core/src/main/java/com/google/protobuf/WireFormat.java                      \
   java/core/src/main/java/com/google/protobuf/Writer.java                          \
+  java/core/src/main/kotlin/com/google/protobuf/DslList.kt                         \
+  java/core/src/main/kotlin/com/google/protobuf/DslMap.kt                          \
+  java/core/src/main/kotlin/com/google/protobuf/DslProxy.kt                        \
+  java/core/src/main/kotlin/com/google/protobuf/ExtendableMessageExtensions.kt     \
+  java/core/src/main/kotlin/com/google/protobuf/ExtendableMessageLiteExtensions.kt \
+  java/core/src/main/kotlin/com/google/protobuf/ExtensionList.kt                   \
+  java/core/src/main/kotlin/com/google/protobuf/OnlyForUseByGeneratedProtoCode.kt  \
+  java/core/src/main/kotlin/com/google/protobuf/ProtoDslMarker.kt                  \
+  java/core/src/main/kotlin/com/google/protobuf/UnmodifiableCollections.kt         \
   java/core/src/test/java/com/google/protobuf/AbstractMessageTest.java             \
   java/core/src/test/java/com/google/protobuf/AbstractProto2LiteSchemaTest.java    \
   java/core/src/test/java/com/google/protobuf/AbstractProto2SchemaTest.java        \
@@ -498,9 +507,18 @@ java_EXTRA_DIST=                                                                
   java/core/src/test/java/com/google/protobuf/WireFormatTest.java                  \
   java/core/src/test/java/com/google/protobuf/WrappersLiteOfMethodTest.java        \
   java/core/src/test/java/com/google/protobuf/WrappersOfMethodTest.java            \
+  java/core/src/test/kotlin/com/google/protobuf/DslListTest.kt                     \
+  java/core/src/test/kotlin/com/google/protobuf/DslMapTest.kt                      \
+  java/core/src/test/kotlin/com/google/protobuf/ExtendableMessageExtensionsTest.kt \
+  java/core/src/test/kotlin/com/google/protobuf/ExtensionListTest.kt               \
+  java/core/src/test/kotlin/com/google/protobuf/Proto2Test.kt                      \
+  java/core/src/test/kotlin/com/google/protobuf/Proto3Test.kt                      \
   java/core/src/test/proto/com/google/protobuf/any_test.proto                      \
   java/core/src/test/proto/com/google/protobuf/cached_field_size_test.proto        \
   java/core/src/test/proto/com/google/protobuf/deprecated_file.proto               \
+  java/core/src/test/proto/com/google/protobuf/evil_names_proto2.proto             \
+  java/core/src/test/proto/com/google/protobuf/evil_names_proto3.proto             \
+  java/core/src/test/proto/com/google/protobuf/example_extensible_message.proto    \
   java/core/src/test/proto/com/google/protobuf/field_presence_test.proto           \
   java/core/src/test/proto/com/google/protobuf/lazy_fields_lite.proto              \
   java/core/src/test/proto/com/google/protobuf/lite_equals_and_hash.proto          \
@@ -510,6 +528,7 @@ java_EXTRA_DIST=                                                                
   java/core/src/test/proto/com/google/protobuf/map_lite_test.proto                 \
   java/core/src/test/proto/com/google/protobuf/map_test.proto                      \
   java/core/src/test/proto/com/google/protobuf/message_lite_extension_util_test.proto\
+  java/core/src/test/proto/com/google/protobuf/multiple_files_proto3.proto         \
   java/core/src/test/proto/com/google/protobuf/multiple_files_test.proto           \
   java/core/src/test/proto/com/google/protobuf/nested_builders_test.proto          \
   java/core/src/test/proto/com/google/protobuf/nested_extension.proto              \
@@ -539,6 +558,8 @@ java_EXTRA_DIST=                                                                
   java/lite/process-lite-sources-build.xml                                         \
   java/lite/src/test/java/com/google/protobuf/LiteTest.java                        \
   java/lite/src/test/java/com/google/protobuf/Proto2MessageLiteInfoFactory.java    \
+  java/lite/src/test/kotlin/com/google/protobuf/ExtendableMessageLiteExtensionsTest.kt \
+  java/lite/src/test/kotlin/com/google/protobuf/Proto2LiteTest.kt                  \
   java/pom.xml                                                                     \
   java/util/BUILD                                                                  \
   java/util/pom.xml                                                                \

@@ -38,6 +38,11 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava-testlib</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>com.google.truth</groupId>
       <artifactId>truth</artifactId>
       <scope>test</scope>
@@ -85,7 +90,7 @@
               <goal>copy-resources</goal>
             </goals>
             <configuration>
-              <outputDirectory>${generated.sources.dir}/com/google/protobuf</outputDirectory>
+              <outputDirectory>${generated.sources.dir}/java/com/google/protobuf</outputDirectory>
               <resources>
                 <resource>
                   <directory>${basedir}/../core/src/main/java/com/google/protobuf</directory>
@@ -173,7 +178,6 @@
                     <include>UnknownFieldSetLite.java</include>
                     <include>UnknownFieldSetLiteSchema.java</include>
                     <include>UnmodifiableLazyStringList.java</include>
-                    <include>UnsafeByteOperations.java</include>
                     <include>UnsafeUtil.java</include>
                     <include>Utf8.java</include>
                     <include>WireFormat.java</include>
@@ -341,5 +345,4 @@
       </plugin>
     </plugins>
   </build>
-
 </project>
