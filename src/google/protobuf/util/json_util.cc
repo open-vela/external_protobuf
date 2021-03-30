@@ -154,8 +154,9 @@ class StatusErrorListener : public converter::ErrorListener {
 
   void MissingField(const converter::LocationTrackerInterface& loc,
                     StringPiece missing_name) override {
-    status_ = util::InvalidArgumentError(StrCat(
-        GetLocString(loc), ": missing field ", std::string(missing_name)));
+    status_ = util::InvalidArgumentError(
+        StrCat(
+            GetLocString(loc), ": missing field ", std::string(missing_name)));
   }
 
  private:
