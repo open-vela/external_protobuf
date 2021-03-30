@@ -14,38 +14,6 @@ exports_files(["LICENSE"])
 # build configuration
 ################################################################################
 
-# TODO(yannic): Remove in 3.14.0.
-string_flag(
-    name = "incompatible_use_com_google_googletest",
-    build_setting_default = "true",
-    values = ["true", "false"]
-)
-
-config_setting(
-    name = "use_com_google_googletest",
-    flag_values = {
-        "//:incompatible_use_com_google_googletest": "true"
-    },
-)
-
-GTEST = select({
-    "//:use_com_google_googletest": [
-        "@com_google_googletest//:gtest",
-    ],
-    "//conditions:default": [
-        "//external:gtest",
-    ],
-})
-
-GTEST_MAIN = select({
-    "//:use_com_google_googletest": [
-        "@com_google_googletest//:gtest_main",
-    ],
-    "//conditions:default": [
-        "//external:gtest_main",
-    ],
-})
-
 ################################################################################
 # ZLIB configuration
 ################################################################################
@@ -433,6 +401,7 @@ cc_library(
         "src/google/protobuf/compiler/java/java_generator.cc",
         "src/google/protobuf/compiler/java/java_generator_factory.cc",
         "src/google/protobuf/compiler/java/java_helpers.cc",
+        "src/google/protobuf/compiler/java/java_kotlin_generator.cc",
         "src/google/protobuf/compiler/java/java_map_field.cc",
         "src/google/protobuf/compiler/java/java_map_field_lite.cc",
         "src/google/protobuf/compiler/java/java_message.cc",
@@ -571,6 +540,7 @@ COMMON_TEST_SRCS = [
 
 cc_binary(
     name = "test_plugin",
+    testonly = True,
     srcs = [
         # AUTOGEN(test_plugin_srcs)
         "src/google/protobuf/compiler/mock_code_generator.cc",
@@ -580,7 +550,8 @@ cc_binary(
     deps = [
         ":protobuf",
         ":protoc_lib",
-    ] + GTEST,
+        "@com_google_googletest//:gtest",
+    ],
 )
 
 cc_test(
@@ -592,7 +563,9 @@ cc_test(
     ],
     deps = [
         ":protobuf_lite",
-    ] + GTEST_MAIN,
+        "@com_google_googletest//:gtest",
+        "@com_google_googletest//:gtest_main",
+    ],
 )
 
 cc_test(
@@ -695,7 +668,9 @@ cc_test(
         ":cc_test_protos",
         ":protobuf",
         ":protoc_lib",
-    ] + PROTOBUF_DEPS + GTEST_MAIN,
+        "@com_google_googletest//:gtest",
+        "@com_google_googletest//:gtest_main",
+    ] + PROTOBUF_DEPS,
 )
 
 ################################################################################

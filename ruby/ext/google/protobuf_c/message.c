@@ -704,8 +704,7 @@ static VALUE Message_eq(VALUE _self, VALUE _other) {
   Message* self = ruby_to_Message(_self);
   Message* other = ruby_to_Message(_other);
 
-  return self->msgdef == other->msgdef &&
-                 Message_Equal(self->msg, other->msg, self->msgdef)
+  return Message_Equal(self->msg, other->msg, self->msgdef)
              ? Qtrue
              : Qfalse;
 }
