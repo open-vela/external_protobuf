@@ -247,7 +247,9 @@ TEST(Status, AssignEmpty) {
   ASSERT_TRUE(a.ok());
 }
 
-TEST(Status, EqualsOK) { ASSERT_EQ(util::OkStatus(), util::Status()); }
+TEST(Status, EqualsOK) {
+  ASSERT_EQ(util::OkStatus(), util::Status());
+}
 
 TEST(Status, EqualsSame) {
   const util::Status a = util::CancelledError("message");

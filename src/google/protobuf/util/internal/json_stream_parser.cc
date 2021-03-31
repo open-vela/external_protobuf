@@ -302,8 +302,7 @@ util::Status JsonStreamParser::RunParser() {
         break;
 
       default:
-        result =
-            util::InternalError(StrCat("Unknown parse type: ", type));
+        result = util::InternalError(StrCat("Unknown parse type: ", type));
         break;
     }
     if (!result.ok()) {
@@ -873,9 +872,8 @@ util::Status JsonStreamParser::ReportFailure(StringPiece message,
   StringPiece segment(begin, end - begin);
   std::string location(p_start - begin, ' ');
   location.push_back('^');
-  auto status = util::InvalidArgumentError(
+  return util::InvalidArgumentError(
       StrCat(message, "\n", segment, "\n", location));
-  return status;
 }
 
 util::Status JsonStreamParser::ReportUnknown(StringPiece message,
@@ -894,8 +892,9 @@ util::Status JsonStreamParser::ReportUnknown(StringPiece message,
 util::Status JsonStreamParser::IncrementRecursionDepth(
     StringPiece key) const {
   if (++recursion_depth_ > max_recursion_depth_) {
-    return util::InvalidArgumentError(StrCat(
-        "Message too deep. Max recursion depth reached for key '", key, "'"));
+    return util::InvalidArgumentError(
+        StrCat("Message too deep. Max recursion depth reached for key '",
+                     key, "'"));
   }
   return util::Status();
 }
