@@ -174,8 +174,10 @@ struct StatusOrHelper::Specialize<T*> {
   static inline bool IsValueNull(const T* t) { return t == nullptr; }
 };
 
-template <typename T>
-inline StatusOr<T>::StatusOr() : status_(util::UnknownError("")) {}
+template<typename T>
+inline StatusOr<T>::StatusOr()
+    : status_(util::UnknownError("")) {
+}
 
 template<typename T>
 inline StatusOr<T>::StatusOr(const Status& status) {

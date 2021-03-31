@@ -85,7 +85,8 @@ inline std::string StatusCodeToString(StatusCode code) {
 
 }  // namespace
 
-Status::Status() : error_code_(StatusCode::kOk) {}
+Status::Status() : error_code_(StatusCode::kOk) {
+}
 
 Status::Status(StatusCode error_code, StringPiece error_message)
     : error_code_(error_code) {
@@ -116,12 +117,15 @@ std::string Status::ToString() const {
     if (error_message_.empty()) {
       return StatusCodeToString(error_code_);
     } else {
-      return StatusCodeToString(error_code_) + ":" + error_message_;
+      return StatusCodeToString(error_code_) + ":" +
+          error_message_;
     }
   }
 }
 
-Status OkStatus() { return Status(); }
+Status OkStatus() {
+  return Status();
+}
 
 std::ostream& operator<<(std::ostream& os, const Status& x) {
   os << x.ToString();
