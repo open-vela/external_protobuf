@@ -530,6 +530,27 @@ java_EXTRA_DIST=                                                                
   java/core/src/test/proto/com/google/protobuf/test_check_utf8_size.proto          \
   java/core/src/test/proto/com/google/protobuf/test_custom_options.proto           \
   java/core/src/test/proto/com/google/protobuf/wrappers_test.proto                 \
+  java/kotlin/src/main/kotlin/com/google/protobuf/DslList.kt                       \
+  java/kotlin/src/main/kotlin/com/google/protobuf/DslMap.kt                        \
+  java/kotlin/src/main/kotlin/com/google/protobuf/DslProxy.kt                      \
+  java/kotlin/src/main/kotlin/com/google/protobuf/ExtendableMessageExtensions.kt   \
+  java/kotlin/src/main/kotlin/com/google/protobuf/ExtendableMessageLiteExtensions.kt\
+  java/kotlin/src/main/kotlin/com/google/protobuf/ExtensionList.kt                 \
+  java/kotlin/src/main/kotlin/com/google/protobuf/OnlyForUseByGeneratedProtoCode.kt\
+  java/kotlin/src/main/kotlin/com/google/protobuf/ProtoDslMarker.kt                \
+  java/kotlin/src/main/kotlin/com/google/protobuf/UnmodifiableCollections.kt       \
+  java/kotlin/src/test/kotlin/com/google/protobuf/DslListTest.kt                   \
+  java/kotlin/src/test/kotlin/com/google/protobuf/DslMapTest.kt                    \
+  java/kotlin/src/test/kotlin/com/google/protobuf/ExtendableMessageExtensionsTest.kt\
+  java/kotlin/src/test/kotlin/com/google/protobuf/ExtensionListTest.kt             \
+  java/kotlin/src/test/kotlin/com/google/protobuf/Proto2Test.kt                    \
+  java/kotlin/src/test/kotlin/com/google/protobuf/Proto3Test.kt                    \
+  java/kotlin/src/test/proto/com/google/protobuf/evil_names_proto2.proto           \
+  java/kotlin/src/test/proto/com/google/protobuf/evil_names_proto3.proto           \
+  java/kotlin/src/test/proto/com/google/protobuf/example_extensible_message.proto  \
+  java/kotlin/src/test/proto/com/google/protobuf/multiple_files_proto3.proto       \
+  java/kotlin-lite/src/test/kotlin/com/google/protobuf/ExtendableMessageLiteExtensionsTest.kt\
+  java/kotlin-lite/src/test/kotlin/com/google/protobuf/Proto2LiteTest.kt           \
   java/lite.md                                                                     \
   java/lite/BUILD                                                                  \
   java/lite/generate-sources-build.xml                                             \
