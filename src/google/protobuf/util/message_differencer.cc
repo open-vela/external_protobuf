@@ -148,16 +148,18 @@ class MessageDifferencer::MultipleFieldsMapKeyComparator
     const FieldDescriptor* field = key_field_path[path_index];
     std::vector<SpecificField> current_parent_fields(parent_fields);
     if (path_index == static_cast<int64_t>(key_field_path.size() - 1)) {
-      if (field->is_map()) {
-        return message_differencer_->CompareMapField(message1, message2, field,
-                                                     &current_parent_fields);
-      } else if (field->is_repeated()) {
-        return message_differencer_->CompareRepeatedField(
-            message1, message2, field, &current_parent_fields);
+      if (field->is_repeated()) {
+        if (!message_differencer_->CompareRepeatedField(
+                message1, message2, field, &current_parent_fields)) {
+          return false;
+        }
       } else {
-        return message_differencer_->CompareFieldValueUsingParentFields(
-            message1, message2, field, -1, -1, &current_parent_fields);
+        if (!message_differencer_->CompareFieldValueUsingParentFields(
+                message1, message2, field, -1, -1, &current_parent_fields)) {
+          return false;
+        }
       }
+      return true;
     } else {
       const Reflection* reflection1 = message1.GetReflection();
       const Reflection* reflection2 = message2.GetReflection();
@@ -828,17 +830,24 @@ bool MessageDifferencer::CompareWithFieldsInternal(
 
     bool fieldDifferent = false;
     assert(field1 != NULL);
-    if (field1->is_map()) {
-      fieldDifferent =
-          !CompareMapField(message1, message2, field1, parent_fields);
-    } else if (field1->is_repeated()) {
+    if (field1->is_repeated()) {
       fieldDifferent =
           !CompareRepeatedField(message1, message2, field1, parent_fields);
+      if (fieldDifferent) {
+        if (reporter_ == NULL) return false;
+        isDifferent = true;
+      }
     } else {
       fieldDifferent = !CompareFieldValueUsingParentFields(
           message1, message2, field1, -1, -1, parent_fields);
 
-      if (reporter_ != nullptr) {
+      // If we have found differences, either report them or terminate if
+      // no reporter is present.
+      if (fieldDifferent && reporter_ == NULL) {
+        return false;
+      }
+
+      if (reporter_ != NULL) {
         SpecificField specific_field;
         specific_field.field = field1;
         parent_fields->push_back(specific_field);
@@ -850,10 +859,6 @@ bool MessageDifferencer::CompareWithFieldsInternal(
         }
         parent_fields->pop_back();
       }
-    }
-    if (fieldDifferent) {
-      if (reporter_ == nullptr) return false;
-      isDifferent = true;
     }
     // Increment the field indices.
     ++field_index1;
@@ -997,19 +1002,17 @@ bool MessageDifferencer::CompareMapFieldByMapReflection(
   return true;
 }
 
-bool MessageDifferencer::CompareMapField(
+bool MessageDifferencer::CompareRepeatedField(
     const Message& message1, const Message& message2,
     const FieldDescriptor* repeated_field,
     std::vector<SpecificField>* parent_fields) {
-  GOOGLE_DCHECK(repeated_field->is_map());
-
   // the input FieldDescriptor is guaranteed to be repeated field.
   const Reflection* reflection1 = message1.GetReflection();
   const Reflection* reflection2 = message2.GetReflection();
 
   // When both map fields are on map, do not sync to repeated field.
   // TODO(jieluo): Add support for reporter
-  if (reporter_ == nullptr &&
+  if (repeated_field->is_map() && reporter_ == nullptr &&
       // Users didn't set custom map field key comparator
       map_field_key_comparator_.find(repeated_field) ==
           map_field_key_comparator_.end() &&
@@ -1048,26 +1051,6 @@ bool MessageDifferencer::CompareMapField(
       }
     }
   }
-
-  return CompareRepeatedRep(message1, message2, repeated_field, parent_fields);
-}
-
-bool MessageDifferencer::CompareRepeatedField(
-    const Message& message1, const Message& message2,
-    const FieldDescriptor* repeated_field,
-    std::vector<SpecificField>* parent_fields) {
-  GOOGLE_DCHECK(!repeated_field->is_map());
-  return CompareRepeatedRep(message1, message2, repeated_field, parent_fields);
-}
-
-bool MessageDifferencer::CompareRepeatedRep(
-    const Message& message1, const Message& message2,
-    const FieldDescriptor* repeated_field,
-    std::vector<SpecificField>* parent_fields) {
-  // the input FieldDescriptor is guaranteed to be repeated field.
-  GOOGLE_DCHECK(repeated_field->is_repeated());
-  const Reflection* reflection1 = message1.GetReflection();
-  const Reflection* reflection2 = message2.GetReflection();
 
   const int count1 = reflection1->FieldSize(message1, repeated_field);
   const int count2 = reflection2->FieldSize(message2, repeated_field);
