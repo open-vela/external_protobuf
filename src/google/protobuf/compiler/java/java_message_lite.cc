@@ -35,7 +35,6 @@
 #include <google/protobuf/compiler/java/java_message_lite.h>
 
 #include <algorithm>
-#include <cstdint>
 #include <map>
 #include <memory>
 #include <vector>
@@ -472,7 +471,7 @@ void ImmutableMessageLiteGenerator::GenerateDynamicMethodNewBuildMessageInfo(
 
   // Collect field info into a sequence of UTF-16 chars. It will be embedded
   // as a Java string in the generated code.
-  std::vector<uint16_t> chars;
+  std::vector<uint16> chars;
 
   int flags = 0;
   if (IsProto2(descriptor_->file())) {
@@ -554,7 +553,7 @@ void ImmutableMessageLiteGenerator::GenerateDynamicMethodNewBuildMessageInfo(
   printer->Print("java.lang.String info =\n");
   std::string line;
   for (size_t i = 0; i < chars.size(); i++) {
-    uint16_t code = chars[i];
+    uint16 code = chars[i];
     EscapeUtf16ToString(code, &line);
     if (line.size() >= 80) {
       printer->Print("    \"$string$\" +\n", "string", line);

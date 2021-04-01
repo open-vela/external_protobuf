@@ -149,12 +149,6 @@ public final class Durations {
     return (duration.getSeconds() == 0) ? duration.getNanos() < 0 : duration.getSeconds() < 0;
   }
 
-  /** Returns whether the given {@link Duration} is positive or not. */
-  public static boolean isPositive(Duration duration) {
-    checkValid(duration);
-    return !isNegative(duration) && !duration.equals(ZERO);
-  }
-
   /**
    * Ensures that the given {@link Duration} is not negative.
    *
@@ -163,6 +157,7 @@ public final class Durations {
    */
   @CanIgnoreReturnValue
   public static Duration checkNotNegative(Duration duration) {
+    checkValid(duration);
     checkArgument(!isNegative(duration), "duration (%s) must not be negative", toString(duration));
     return duration;
   }
@@ -175,7 +170,11 @@ public final class Durations {
    */
   @CanIgnoreReturnValue
   public static Duration checkPositive(Duration duration) {
-    checkArgument(isPositive(duration), "duration (%s) must be positive", toString(duration));
+    checkValid(duration);
+    checkArgument(
+        !isNegative(duration) && !duration.equals(ZERO),
+        "duration (%s) must be positive",
+        toString(duration));
     return duration;
   }
 
