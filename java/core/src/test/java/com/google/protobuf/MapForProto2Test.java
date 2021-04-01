@@ -1163,8 +1163,8 @@ public class MapForProto2Test extends TestCase {
   }
 
   public void testReservedWordsFieldNames() {
-    ReservedAsMapField unused1 = ReservedAsMapField.newBuilder().build();
-    ReservedAsMapFieldWithEnumValue unused2 = ReservedAsMapFieldWithEnumValue.newBuilder().build();
+    ReservedAsMapField.newBuilder().build();
+    ReservedAsMapFieldWithEnumValue.newBuilder().build();
   }
 
   public void testGetMap() {

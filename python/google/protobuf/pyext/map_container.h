@@ -33,7 +33,6 @@
 
 #include <Python.h>
 
-#include <cstdint>
 #include <memory>
 
 #include <google/protobuf/descriptor.h>
@@ -57,7 +56,7 @@ struct MapContainer : public ContainerBase {
 
   // We bump this whenever we perform a mutation, to invalidate existing
   // iterators.
-  uint64_t version;
+  uint64 version;
 };
 
 struct MessageMapContainer : public MapContainer {
