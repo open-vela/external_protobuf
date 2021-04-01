@@ -67,7 +67,7 @@ class InternalMetadata {
   template <typename T>
   void Delete() {
     // Note that Delete<> should be called not more than once.
-    if (have_unknown_fields()) {
+    if (have_unknown_fields() && arena() == NULL) {
       DeleteOutOfLineHelper<T>();
     }
   }
@@ -204,9 +204,7 @@ class InternalMetadata {
 
   template <typename T>
   PROTOBUF_NOINLINE void DeleteOutOfLineHelper() {
-    if (arena() == NULL) {
-      delete PtrValue<Container<T>>();
-    }
+    delete PtrValue<Container<T>>();
   }
 
   template <typename T>

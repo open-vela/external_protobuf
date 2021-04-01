@@ -69,7 +69,7 @@ public class DynamicMessageTest extends TestCase {
     Message.Builder builder = DynamicMessage.newBuilder(TestAllTypes.getDescriptor());
     Message firstMessage = builder.build();
     // double build()
-    Message unused = builder.build();
+    builder.build();
     // clear() after build()
     builder.clear();
     // setters after build()

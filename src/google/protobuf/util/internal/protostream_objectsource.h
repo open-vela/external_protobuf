@@ -31,7 +31,6 @@
 #ifndef GOOGLE_PROTOBUF_UTIL_CONVERTER_PROTOSTREAM_OBJECTSOURCE_H__
 #define GOOGLE_PROTOBUF_UTIL_CONVERTER_PROTOSTREAM_OBJECTSOURCE_H__
 
-#include <cstdint>
 #include <functional>
 #include <string>
 #include <unordered_map>
@@ -74,7 +73,6 @@ class TypeInfo;
 //   Status status = os.WriteTo(<some ObjectWriter>);
 class PROTOBUF_EXPORT ProtoStreamObjectSource : public ObjectSource {
  public:
-
   struct RenderOptions {
     RenderOptions() = default;
     RenderOptions(const RenderOptions&) = default;
@@ -143,20 +141,20 @@ class PROTOBUF_EXPORT ProtoStreamObjectSource : public ObjectSource {
   // already inside of an object, and skip calling StartObject and EndObject.
   virtual util::Status WriteMessage(const google::protobuf::Type& type,
                                     StringPiece name,
-                                    const uint32_t end_tag,
+                                    const uint32 end_tag,
                                     bool include_start_and_end,
                                     ObjectWriter* ow) const;
 
   // Renders a repeating field (packed or unpacked).  Returns the next tag after
   // reading all sequential repeating elements. The caller should use this tag
   // before reading more tags from the stream.
-  virtual util::StatusOr<uint32_t> RenderList(
+  virtual util::StatusOr<uint32> RenderList(
       const google::protobuf::Field* field, StringPiece name,
-      uint32_t list_tag, ObjectWriter* ow) const;
+      uint32 list_tag, ObjectWriter* ow) const;
 
   // Looks up a field and verify its consistency with wire type in tag.
   const google::protobuf::Field* FindAndVerifyField(
-      const google::protobuf::Type& type, uint32_t tag) const;
+      const google::protobuf::Type& type, uint32 tag) const;
 
   // Renders a field value to the ObjectWriter.
   virtual util::Status RenderField(const google::protobuf::Field* field,
@@ -189,9 +187,9 @@ class PROTOBUF_EXPORT ProtoStreamObjectSource : public ObjectSource {
   // Renders a NWP map.
   // Returns the next tag after reading all map entries. The caller should use
   // this tag before reading more tags from the stream.
-  util::StatusOr<uint32_t> RenderMap(const google::protobuf::Field* field,
-                                     StringPiece name, uint32_t list_tag,
-                                     ObjectWriter* ow) const;
+  util::StatusOr<uint32> RenderMap(const google::protobuf::Field* field,
+                                   StringPiece name, uint32 list_tag,
+                                   ObjectWriter* ow) const;
 
   // Renders a packed repeating field. A packed field is stored as:
   // {tag length item1 item2 item3} instead of the less efficient
@@ -283,11 +281,11 @@ class PROTOBUF_EXPORT ProtoStreamObjectSource : public ObjectSource {
 
   // Utility to read int64 and int32 values from a message type in stream_.
   // Used for reading google.protobuf.Timestamp and Duration messages.
-  std::pair<int64_t, int32_t> ReadSecondsAndNanos(
+  std::pair<int64, int32> ReadSecondsAndNanos(
       const google::protobuf::Type& type) const;
 
   // Helper function to check recursion depth and increment it. It will return
-  // OkStatus() if the current depth is allowed. Otherwise an error is returned.
+  // Status::OK if the current depth is allowed. Otherwise an error is returned.
   // type_name and field_name are used for error reporting.
   util::Status IncrementRecursionDepth(StringPiece type_name,
                                        StringPiece field_name) const;
