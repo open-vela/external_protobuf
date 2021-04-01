@@ -18,7 +18,7 @@ else
 PTHREAD_DEF =
 endif
 
-PROTOBUF_VERSION = 26:6:0
+PROTOBUF_VERSION = 26:4:0
 
 if GCC
 # Turn on all warnings except for sign comparison (we ignore sign comparison
@@ -30,7 +30,7 @@ endif
 
 AM_CXXFLAGS = $(NO_OPT_CXXFLAGS) $(PROTOBUF_OPT_FLAG)
 
-AM_LDFLAGS = $(PTHREAD_CFLAGS) ${LIBLOG_LIBS}
+AM_LDFLAGS = $(PTHREAD_CFLAGS)
 
 # If I say "dist_include_DATA", automake complains that $(includedir) is not
 # a "legitimate" directory for DATA.  Screw you, automake.
@@ -150,7 +150,6 @@ nobase_include_HEADERS =                                         \
   google/protobuf/compiler/csharp/csharp_generator.h             \
   google/protobuf/compiler/csharp/csharp_names.h                 \
   google/protobuf/compiler/java/java_generator.h                 \
-  google/protobuf/compiler/java/java_kotlin_generator.h          \
   google/protobuf/compiler/java/java_names.h                     \
   google/protobuf/compiler/js/js_generator.h                     \
   google/protobuf/compiler/js/well_known_types_embed.h           \
@@ -375,7 +374,6 @@ libprotoc_la_SOURCES =                                         \
   google/protobuf/compiler/java/java_generator_factory.h       \
   google/protobuf/compiler/java/java_helpers.cc                \
   google/protobuf/compiler/java/java_helpers.h                 \
-  google/protobuf/compiler/java/java_kotlin_generator.cc       \
   google/protobuf/compiler/java/java_map_field.cc              \
   google/protobuf/compiler/java/java_map_field.h               \
   google/protobuf/compiler/java/java_map_field_lite.cc         \
