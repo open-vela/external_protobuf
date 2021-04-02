@@ -62,7 +62,6 @@ class ImmutableMapFieldGenerator : public ImmutableFieldGenerator {
   void GenerateFieldBuilderInitializationCode(io::Printer* printer) const;
   void GenerateEqualsCode(io::Printer* printer) const;
   void GenerateHashCode(io::Printer* printer) const;
-  void GenerateKotlinDslMembers(io::Printer* printer) const;
 
   std::string GetBoxedType() const;
 
