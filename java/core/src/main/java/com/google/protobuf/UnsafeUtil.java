@@ -346,7 +346,7 @@ final class UnsafeUtil {
     return MEMORY_ACCESSOR.supportsUnsafeByteBufferOperations();
   }
 
-  static boolean determineAndroidSupportByAddressSize(Class<?> addressClass) {
+  private static boolean determineAndroidSupportByAddressSize(Class<?> addressClass) {
     if (!Android.isOnAndroidDevice()) {
       return false;
     }

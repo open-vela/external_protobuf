@@ -34,8 +34,6 @@
 
 #include <google/protobuf/compiler/command_line_interface.h>
 
-#include <cstdint>
-
 #include <google/protobuf/stubs/platform_macros.h>
 
 #include <stdio.h>
@@ -290,10 +288,7 @@ class CommandLineInterface::ErrorPrinter
       public DescriptorPool::ErrorCollector {
  public:
   ErrorPrinter(ErrorFormat format, DiskSourceTree* tree = NULL)
-      : format_(format),
-        tree_(tree),
-        found_errors_(false),
-        found_warnings_(false) {}
+      : format_(format), tree_(tree), found_errors_(false) {}
   ~ErrorPrinter() {}
 
   // implements MultiFileErrorCollector ------------------------------
@@ -305,7 +300,6 @@ class CommandLineInterface::ErrorPrinter
 
   void AddWarning(const std::string& filename, int line, int column,
                   const std::string& message) {
-    found_warnings_ = true;
     AddErrorOrWarning(filename, line, column, message, "warning", std::clog);
   }
 
@@ -332,8 +326,6 @@ class CommandLineInterface::ErrorPrinter
   }
 
   bool FoundErrors() const { return found_errors_; }
-
-  bool FoundWarnings() const { return found_warnings_; }
 
  private:
   void AddErrorOrWarning(const std::string& filename, int line, int column,
@@ -373,7 +365,6 @@ class CommandLineInterface::ErrorPrinter
   const ErrorFormat format_;
   DiskSourceTree* tree_;
   bool found_errors_;
-  bool found_warnings_;
 };
 
 // -------------------------------------------------------------------
@@ -591,12 +582,10 @@ bool CommandLineInterface::GeneratorContextImpl::WriteAllToZip(
 
   if (stream.GetErrno() != 0) {
     std::cerr << filename << ": " << strerror(stream.GetErrno()) << std::endl;
-    return false;
   }
 
   if (!stream.Close()) {
     std::cerr << filename << ": " << strerror(stream.GetErrno()) << std::endl;
-    return false;
   }
 
   return true;
@@ -1047,6 +1036,16 @@ int CommandLineInterface::Run(int argc, const char* const argv[]) {
   }
 
 
+  for (auto fd : parsed_files) {
+    if (!AllowProto3Optional(*fd) && ContainsProto3Optional(fd)) {
+      std::cerr << fd->name()
+                << ": This file contains proto3 optional fields, but "
+                   "--experimental_allow_proto3_optional was not set."
+                << std::endl;
+      return 1;
+    }
+  }
+
   // We construct a separate GeneratorContext for each output location.  Note
   // that two code generators may output to the same location, in which case
   // they should share a single GeneratorContext so that OpenForInsert() works.
@@ -1128,8 +1127,7 @@ int CommandLineInterface::Run(int argc, const char* const argv[]) {
     }
   }
 
-  if (error_collector->FoundErrors() ||
-      (fatal_warnings_ && error_collector->FoundWarnings())) {
+  if (error_collector->FoundErrors()) {
     return 1;
   }
 
@@ -1215,6 +1213,13 @@ PopulateSingleSimpleDescriptorDatabase(const std::string& descriptor_set_name) {
 }
 
 }  // namespace
+
+bool CommandLineInterface::AllowProto3Optional(
+    const FileDescriptor& file) const {
+  // Proto3 optional is enabled by default now, the experimental flag is no
+  // longer required.
+  return true;
+}
 
 
 bool CommandLineInterface::VerifyInputFilesInDescriptors(
@@ -1332,6 +1337,7 @@ void CommandLineInterface::Clear() {
   source_info_in_descriptor_set_ = false;
   disallow_services_ = false;
   direct_dependencies_explicitly_set_ = false;
+  allow_proto3_optional_ = false;
   deterministic_output_ = false;
 }
 
@@ -1642,7 +1648,7 @@ bool CommandLineInterface::ParseArgument(const char* arg, std::string* name,
       *name == "--version" || *name == "--decode_raw" ||
       *name == "--print_free_field_numbers" ||
       *name == "--experimental_allow_proto3_optional" ||
-      *name == "--deterministic_output" || *name == "--fatal_warnings") {
+      *name == "--deterministic_output") {
     // HACK:  These are the only flags that don't take a value.
     //   They probably should not be hard-coded like this but for now it's
     //   not worth doing better.
@@ -1851,7 +1857,8 @@ CommandLineInterface::InterpretArgument(const std::string& name,
 
 
   } else if (name == "--experimental_allow_proto3_optional") {
-    // Flag is no longer observed, but we allow it for backward compat.
+    allow_proto3_optional_ = true;
+
   } else if (name == "--encode" || name == "--decode" ||
              name == "--decode_raw") {
     if (mode_ != MODE_COMPILE) {
@@ -1895,12 +1902,6 @@ CommandLineInterface::InterpretArgument(const std::string& name,
       return PARSE_ARGUMENT_FAIL;
     }
 
-  } else if (name == "--fatal_warnings") {
-    if (fatal_warnings_) {
-      std::cerr << name << " may only be passed once." << std::endl;
-      return PARSE_ARGUMENT_FAIL;
-    }
-    fatal_warnings_ = true;
   } else if (name == "--plugin") {
     if (plugin_prefix_.empty()) {
       std::cerr << "This compiler does not support plugins." << std::endl;
@@ -2060,10 +2061,6 @@ Parse PROTO_FILES and generate output based on the options given:
   --error_format=FORMAT       Set the format in which to print errors.
                               FORMAT may be 'gcc' (the default) or 'msvs'
                               (Microsoft Visual Studio format).
-  --fatal_warnings            Make warnings be fatal (similar to -Werr in
-                              gcc). This flag will make protoc return
-                              with a non-zero exit code if any warnings
-                              are generated.
   --print_free_field_numbers  Print the free field numbers of the messages
                               defined in the given proto files. Groups share
                               the same field number space with the parent
@@ -2109,7 +2106,7 @@ Parse PROTO_FILES and generate output based on the options given:
 }
 
 bool CommandLineInterface::EnforceProto3OptionalSupport(
-    const std::string& codegen_name, uint64_t supported_features,
+    const std::string& codegen_name, uint64 supported_features,
     const std::vector<const FileDescriptor*>& parsed_files) const {
   bool supports_proto3_optional =
       supported_features & CodeGenerator::FEATURE_PROTO3_OPTIONAL;

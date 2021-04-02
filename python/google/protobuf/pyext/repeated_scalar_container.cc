@@ -33,7 +33,6 @@
 
 #include <google/protobuf/pyext/repeated_scalar_container.h>
 
-#include <cstdint>
 #include <memory>
 
 #include <google/protobuf/stubs/common.h>
@@ -208,25 +207,25 @@ static PyObject* Item(PyObject* pself, Py_ssize_t index) {
   PyObject* result = nullptr;
   switch (field_descriptor->cpp_type()) {
     case FieldDescriptor::CPPTYPE_INT32: {
-      int32_t value =
+      int32 value =
           reflection->GetRepeatedInt32(*message, field_descriptor, index);
       result = PyInt_FromLong(value);
       break;
     }
     case FieldDescriptor::CPPTYPE_INT64: {
-      int64_t value =
+      int64 value =
           reflection->GetRepeatedInt64(*message, field_descriptor, index);
       result = PyLong_FromLongLong(value);
       break;
     }
     case FieldDescriptor::CPPTYPE_UINT32: {
-      uint32_t value =
+      uint32 value =
           reflection->GetRepeatedUInt32(*message, field_descriptor, index);
       result = PyLong_FromLongLong(value);
       break;
     }
     case FieldDescriptor::CPPTYPE_UINT64: {
-      uint64_t value =
+      uint64 value =
           reflection->GetRepeatedUInt64(*message, field_descriptor, index);
       result = PyLong_FromUnsignedLongLong(value);
       break;

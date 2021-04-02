@@ -80,9 +80,13 @@ class TestGenerator : public CodeGenerator {
     // Check field accessors for a required string:
     TryInsert("test.pb.h", "field_get:foo.Bar.requiredString", context);
     TryInsert("test.pb.h", "field_set:foo.Bar.requiredString", context);
+    TryInsert("test.pb.h", "field_set_char:foo.Bar.requiredString", context);
+    TryInsert("test.pb.h", "field_set_pointer:foo.Bar.requiredString", context);
     TryInsert("test.pb.h", "field_mutable:foo.Bar.requiredString", context);
     TryInsert("test.pb.h", "field_set_allocated:foo.Bar.requiredString",
               context);
+    TryInsert("test.pb.h", "field_set_char:foo.Bar.requiredString", context);
+    TryInsert("test.pb.h", "field_set_pointer:foo.Bar.requiredString", context);
 
     // Check field accessors for a repeated string:
     TryInsert("test.pb.h", "field_get:foo.Bar.repeatedString", context);
@@ -100,8 +104,12 @@ class TestGenerator : public CodeGenerator {
     // Check field accessors for a string inside oneof{}:
     TryInsert("test.pb.h", "field_get:foo.Bar.oneOfString", context);
     TryInsert("test.pb.h", "field_set:foo.Bar.oneOfString", context);
+    TryInsert("test.pb.h", "field_set_char:foo.Bar.oneOfString", context);
+    TryInsert("test.pb.h", "field_set_pointer:foo.Bar.oneOfString", context);
     TryInsert("test.pb.h", "field_mutable:foo.Bar.oneOfString", context);
     TryInsert("test.pb.h", "field_set_allocated:foo.Bar.oneOfString", context);
+    TryInsert("test.pb.h", "field_set_char:foo.Bar.oneOfString", context);
+    TryInsert("test.pb.h", "field_set_pointer:foo.Bar.oneOfString", context);
 
     // Check field accessors for an optional message:
     TryInsert("test.pb.h", "field_get:foo.Bar.optMessage", context);
