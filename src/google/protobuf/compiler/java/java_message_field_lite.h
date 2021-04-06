@@ -73,7 +73,6 @@ class ImmutableMessageFieldLiteGenerator : public ImmutableFieldLiteGenerator {
   void GenerateInitializationCode(io::Printer* printer) const;
   void GenerateFieldInfo(io::Printer* printer,
                          std::vector<uint16_t>* output) const;
-  void GenerateKotlinDslMembers(io::Printer* printer) const;
 
   std::string GetBoxedType() const;
 
@@ -119,7 +118,6 @@ class RepeatedImmutableMessageFieldLiteGenerator
   void GenerateInitializationCode(io::Printer* printer) const;
   void GenerateFieldInfo(io::Printer* printer,
                          std::vector<uint16_t>* output) const;
-  void GenerateKotlinDslMembers(io::Printer* printer) const;
 
   std::string GetBoxedType() const;
 
