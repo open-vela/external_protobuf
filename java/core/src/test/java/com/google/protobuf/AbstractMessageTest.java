@@ -283,7 +283,7 @@ public class AbstractMessageTest extends TestCase {
     Message.Builder abstractMessageBuilder =
         new AbstractMessageWrapper.Builder(TestRequiredForeign.newBuilder());
     // mergeFrom() should not throw initialization error.
-    Message unused1 = abstractMessageBuilder.mergeFrom(bytes).buildPartial();
+    abstractMessageBuilder.mergeFrom(bytes).buildPartial();
     try {
       abstractMessageBuilder.mergeFrom(bytes).build();
       fail();
@@ -295,7 +295,7 @@ public class AbstractMessageTest extends TestCase {
     Message.Builder dynamicMessageBuilder =
         DynamicMessage.newBuilder(TestRequiredForeign.getDescriptor());
     // mergeFrom() should not throw initialization error.
-    Message unused2 = dynamicMessageBuilder.mergeFrom(bytes).buildPartial();
+    dynamicMessageBuilder.mergeFrom(bytes).buildPartial();
     try {
       dynamicMessageBuilder.mergeFrom(bytes).build();
       fail();
