@@ -34,7 +34,6 @@
 
 #include <stdlib.h>
 
-#include <cstdint>
 #include <iostream>
 #include <memory>
 #include <vector>
@@ -89,11 +88,11 @@ MockCodeGenerator::MockCodeGenerator(const std::string& name) : name_(name) {}
 MockCodeGenerator::~MockCodeGenerator() {}
 
 uint64_t MockCodeGenerator::GetSupportedFeatures() const {
-  uint64_t all_features = CodeGenerator::FEATURE_PROTO3_OPTIONAL;
+  uint64 all_features = CodeGenerator::FEATURE_PROTO3_OPTIONAL;
   return all_features & ~suppressed_features_;
 }
 
-void MockCodeGenerator::SuppressFeatures(uint64_t features) {
+void MockCodeGenerator::SuppressFeatures(uint64 features) {
   suppressed_features_ = features;
 }
 

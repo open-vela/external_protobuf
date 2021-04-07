@@ -76,7 +76,6 @@ import junit.framework.TestCase;
  *
  * @author kenton@google.com Kenton Varda
  */
-@SuppressWarnings({"ProtoBuilderReturnValueIgnored", "ReturnValueIgnored"})
 public class GeneratedMessageTest extends TestCase {
   TestUtil.ReflectionTester reflectionTester =
       new TestUtil.ReflectionTester(TestAllTypes.getDescriptor(), null);
