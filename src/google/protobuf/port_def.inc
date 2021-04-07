@@ -198,23 +198,21 @@
 //   You can #define these annotations yourself if the default implementation
 //   is not right for you.
 
-#ifndef PROTOBUF_NO_INLINE
 #ifdef GOOGLE_ATTRIBUTE_ALWAYS_INLINE
 #define PROTOBUF_ALWAYS_INLINE GOOGLE_ATTRIBUTE_ALWAYS_INLINE
 #define PROTOBUF_NDEBUG_INLINE GOOGLE_ATTRIBUTE_ALWAYS_INLINE
-#elif defined(__GNUC__) && \
+#else
+#if defined(__GNUC__) && \
     (__GNUC__ > 3 || (__GNUC__ == 3 && __GNUC_MINOR__ >= 1))
 // For functions we want to force inline.
 // Introduced in gcc 3.1.
 #define PROTOBUF_ALWAYS_INLINE __attribute__((always_inline))
 #define PROTOBUF_NDEBUG_INLINE __attribute__((always_inline))
-#endif
-#endif
-
-#ifndef PROTOBUF_ALWAYS_INLINE
+#else
 // Other compilers will have to figure it out for themselves.
 #define PROTOBUF_ALWAYS_INLINE
 #define PROTOBUF_NDEBUG_INLINE
+#endif
 #endif
 
 #ifdef GOOGLE_ATTRIBUTE_NOINLINE
@@ -337,7 +335,7 @@
 
 // Shared google3/opensource definitions. //////////////////////////////////////
 
-#define PROTOBUF_VERSION 3015007
+#define PROTOBUF_VERSION 3015008
 #define PROTOBUF_MIN_HEADER_VERSION_FOR_PROTOC 3015000
 #define PROTOBUF_MIN_PROTOC_VERSION 3015000
 #define PROTOBUF_VERSION_SUFFIX ""
