@@ -37,7 +37,7 @@
 #include "message.h"
 #include "repeated_field.h"
 
-VALUE cParseError;
+VALUE cError;
 VALUE cTypeError;
 
 const upb_fielddef* map_field_key(const upb_fielddef* field) {
@@ -180,6 +180,7 @@ static void Arena_mark(void *data) {
 static void Arena_free(void *data) {
   Arena *arena = data;
   upb_arena_free(arena->arena);
+  xfree(arena);
 }
 
 static VALUE cArena;
@@ -441,10 +442,8 @@ void Init_protobuf_c() {
   Map_register(protobuf);
   Message_register(protobuf);
 
-  cParseError = rb_const_get(protobuf, rb_intern("ParseError"));
-  rb_gc_register_mark_object(cParseError);
+  cError = rb_const_get(protobuf, rb_intern("Error"));
   cTypeError = rb_const_get(protobuf, rb_intern("TypeError"));
-  rb_gc_register_mark_object(cTypeError);
 
   rb_define_singleton_method(protobuf, "discard_unknown",
                              Google_Protobuf_discard_unknown, 1);

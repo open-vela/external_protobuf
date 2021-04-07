@@ -603,12 +603,7 @@ final class RopeByteString extends ByteString {
 
   @Override
   public CodedInputStream newCodedInput() {
-    // Passing along direct references to internal ByteBuffers can support more efficient parsing
-    // via aliasing in CodedInputStream for users who wish to use it.
-    //
-    // Otherwise we force data copies, both in copying as an input stream and in buffering in the
-    // CodedInputSteam.
-    return CodedInputStream.newInstance(asReadOnlyByteBufferList(), /* bufferIsImmutable= */ true);
+    return CodedInputStream.newInstance(new RopeInputStream());
   }
 
   @Override
