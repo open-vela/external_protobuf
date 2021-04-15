@@ -418,8 +418,8 @@ bool IsStringOrMessage(const FieldDescriptor* field);
 std::string UnderscoresToCamelCase(const std::string& input,
                                    bool cap_next_letter);
 
-inline bool HasFieldPresence(const FileDescriptor* file) {
-  return file->syntax() != FileDescriptor::SYNTAX_PROTO3;
+inline bool IsProto3(const FileDescriptor* file) {
+  return file->syntax() == FileDescriptor::SYNTAX_PROTO3;
 }
 
 inline bool HasHasbit(const FieldDescriptor* field) {
@@ -774,10 +774,10 @@ class PROTOC_EXPORT NamespaceOpener {
   std::vector<std::string> name_stack_;
 };
 
-enum class Utf8CheckMode {
-  kStrict = 0,  // Parsing will fail if non UTF-8 data is in string fields.
-  kVerify = 1,  // Only log an error but parsing will succeed.
-  kNone = 2,    // No UTF-8 check.
+enum Utf8CheckMode {
+  STRICT = 0,  // Parsing will fail if non UTF-8 data is in string fields.
+  VERIFY = 1,  // Only log an error but parsing will succeed.
+  NONE = 2,    // No UTF-8 check.
 };
 
 Utf8CheckMode GetUtf8CheckMode(const FieldDescriptor* field,
@@ -864,10 +864,6 @@ struct OneOfRangeImpl {
 };
 
 inline OneOfRangeImpl OneOfRange(const Descriptor* desc) { return {desc}; }
-
-void GenerateParserLoop(const Descriptor* descriptor, int num_hasbits,
-                        const Options& options,
-                        MessageSCCAnalyzer* scc_analyzer, io::Printer* printer);
 
 PROTOC_EXPORT std::string StripProto(const std::string& filename);
 
