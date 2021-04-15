@@ -345,7 +345,7 @@
 #endif
 
 
-#define PROTOBUF_VERSION 3015006
+#define PROTOBUF_VERSION 3015008
 #define PROTOBUF_MIN_HEADER_VERSION_FOR_PROTOC 3015000
 #define PROTOBUF_MIN_PROTOC_VERSION 3015000
 #define PROTOBUF_VERSION_SUFFIX ""
@@ -444,6 +444,8 @@
 #ifdef _MSC_VER
 #pragma push_macro("CREATE_NEW")
 #undef CREATE_NEW
+#pragma push_macro("DELETE")
+#undef DELETE
 #pragma push_macro("DOUBLE_CLICK")
 #undef DOUBLE_CLICK
 #pragma push_macro("ERROR")
@@ -489,7 +491,7 @@
 #endif  // _MSC_VER
 
 #if defined(__clang__) || defined(__GNUC__) || defined(_MSC_VER)
-// Don't let Objective-C Macros interfere with proto identifiers with the same 
+// Don't let Objective-C Macros interfere with proto identifiers with the same
 // name.
 #pragma push_macro("DEBUG")
 #undef DEBUG
