@@ -1022,13 +1022,13 @@ Utf8CheckMode GetUtf8CheckMode(const FieldDescriptor* field,
                                const Options& options) {
   if (field->file()->syntax() == FileDescriptor::SYNTAX_PROTO3 &&
       FieldEnforceUtf8(field, options)) {
-    return Utf8CheckMode::kStrict;
+    return STRICT;
   } else if (GetOptimizeFor(field->file(), options) !=
                  FileOptions::LITE_RUNTIME &&
              FileUtf8Verification(field->file(), options)) {
-    return Utf8CheckMode::kVerify;
+    return VERIFY;
   } else {
-    return Utf8CheckMode::kNone;
+    return NONE;
   }
 }
 
@@ -1039,7 +1039,7 @@ static void GenerateUtf8CheckCode(const FieldDescriptor* field,
                                   const char* verify_function,
                                   const Formatter& format) {
   switch (GetUtf8CheckMode(field, options)) {
-    case Utf8CheckMode::kStrict: {
+    case STRICT: {
       if (for_parse) {
         format("DO_(");
       }
@@ -1059,7 +1059,7 @@ static void GenerateUtf8CheckCode(const FieldDescriptor* field,
       format.Outdent();
       break;
     }
-    case Utf8CheckMode::kVerify: {
+    case VERIFY: {
       format("::$proto_ns$::internal::WireFormat::$1$(\n", verify_function);
       format.Indent();
       format(parameters);
@@ -1072,7 +1072,7 @@ static void GenerateUtf8CheckCode(const FieldDescriptor* field,
       format.Outdent();
       break;
     }
-    case Utf8CheckMode::kNone:
+    case NONE:
       break;
   }
 }
