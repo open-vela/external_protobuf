@@ -125,8 +125,7 @@ void MessageFieldGenerator::GenerateAccessorDeclarations(
   }
   format(
       "$deprecated_attr$const $type$& ${1$$name$$}$() const;\n"
-      "PROTOBUF_FUTURE_MUST_USE_RESULT $deprecated_attr$$type$* "
-      "${1$$release_name$$}$();\n"
+      "$deprecated_attr$$type$* ${1$$release_name$$}$();\n"
       "$deprecated_attr$$type$* ${1$mutable_$name$$}$();\n"
       "$deprecated_attr$void ${1$set_allocated_$name$$}$"
       "($type$* $name$);\n",
@@ -321,7 +320,7 @@ void MessageFieldGenerator::GenerateInternalAccessorDefinitions(
     format(
         "::$proto_ns$::MessageLite*\n"
         "$classname$::_Internal::mutable_$name$($classname$* msg) {\n");
-    if (HasHasbit(descriptor_)) {
+    if (HasFieldPresence(descriptor_->file())) {
       format("  msg->$set_hasbit$\n");
     }
     format(
@@ -354,7 +353,7 @@ void MessageFieldGenerator::GenerateClearingCode(io::Printer* printer) const {
   GOOGLE_CHECK(!IsFieldStripped(descriptor_, options_));
 
   Formatter format(printer, variables_);
-  if (!HasHasbit(descriptor_)) {
+  if (!HasFieldPresence(descriptor_->file())) {
     // If we don't have has-bits, message presence is indicated only by ptr !=
     // NULL. Thus on clear, we need to delete the object.
     format(
@@ -372,7 +371,7 @@ void MessageFieldGenerator::GenerateMessageClearingCode(
   GOOGLE_CHECK(!IsFieldStripped(descriptor_, options_));
 
   Formatter format(printer, variables_);
-  if (!HasHasbit(descriptor_)) {
+  if (!HasFieldPresence(descriptor_->file())) {
     // If we don't have has-bits, message presence is indicated only by ptr !=
     // NULL. Thus on clear, we need to delete the object.
     format(

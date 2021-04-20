@@ -531,9 +531,8 @@ class _Parser(object):
                            '"{1}" fields.'.format(
                                message.DESCRIPTOR.full_name, name))
         names.append(name)
-        value = js[name]
         # Check no other oneof field is parsed.
-        if field.containing_oneof is not None and value is not None:
+        if field.containing_oneof is not None:
           oneof_name = field.containing_oneof.name
           if oneof_name in names:
             raise ParseError('Message type "{0}" should not have multiple '
@@ -541,6 +540,7 @@ class _Parser(object):
                                  message.DESCRIPTOR.full_name, oneof_name))
           names.append(oneof_name)
 
+        value = js[name]
         if value is None:
           if (field.cpp_type == descriptor.FieldDescriptor.CPPTYPE_MESSAGE
               and field.message_type.full_name == 'google.protobuf.Value'):

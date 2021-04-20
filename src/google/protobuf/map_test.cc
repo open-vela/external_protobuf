@@ -1471,19 +1471,19 @@ TEST_F(MapFieldReflectionTest, RepeatedFieldRefForRegularFields) {
   std::unique_ptr<Message> entry_int32_int32(
       MessageFactory::generated_factory()
           ->GetPrototype(fd_map_int32_int32->message_type())
-          ->New(message.GetArena()));
+          ->New());
   std::unique_ptr<Message> entry_int32_double(
       MessageFactory::generated_factory()
           ->GetPrototype(fd_map_int32_double->message_type())
-          ->New(message.GetArena()));
+          ->New());
   std::unique_ptr<Message> entry_string_string(
       MessageFactory::generated_factory()
           ->GetPrototype(fd_map_string_string->message_type())
-          ->New(message.GetArena()));
+          ->New());
   std::unique_ptr<Message> entry_int32_foreign_message(
       MessageFactory::generated_factory()
           ->GetPrototype(fd_map_int32_foreign_message->message_type())
-          ->New(message.GetArena()));
+          ->New());
 
   EXPECT_EQ(10, mf_int32_int32.size());
   EXPECT_EQ(10, mmf_int32_int32.size());
@@ -1889,15 +1889,6 @@ TEST_F(MapFieldReflectionTest, RepeatedFieldRefForRegularFields) {
 
     EXPECT_EQ(int32_value9a, int32_value0b);
     EXPECT_EQ(int32_value0a, int32_value9b);
-  }
-
-  // TODO(b/181148674): After supporting arena agnostic delete or let map entry
-  // handle heap allocation, this could be removed.
-  if (message.GetArena() != nullptr) {
-    entry_int32_int32.release();
-    entry_int32_double.release();
-    entry_string_string.release();
-    entry_int32_foreign_message.release();
   }
 }
 
@@ -2413,21 +2404,6 @@ TEST(GeneratedMapFieldTest, SerializationToStream) {
   }
   EXPECT_TRUE(message2.ParseFromString(data));
   MapTestUtil::ExpectMapFieldsSet(message2);
-}
-
-TEST(GeneratedMapFieldTest, ParseFailsIfMalformed) {
-  unittest::TestMapSubmessage o, p;
-  auto m = o.mutable_test_map()->mutable_map_int32_foreign_message();
-  (*m)[0].set_c(-1);
-  std::string serialized;
-  EXPECT_TRUE(o.SerializeToString(&serialized));
-
-  // Should parse correctly.
-  EXPECT_TRUE(p.ParseFromString(serialized));
-
-  // Overwriting the last byte to 0xFF results in malformed wire.
-  serialized[serialized.size() - 1] = 0xFF;
-  EXPECT_FALSE(p.ParseFromString(serialized));
 }
 
 
@@ -3795,3 +3771,5 @@ TEST(MoveTest, MoveAssignmentWorks) {
 }  // namespace internal
 }  // namespace protobuf
 }  // namespace google
+
+#include <google/protobuf/port_undef.inc>
