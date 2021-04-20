@@ -48,7 +48,6 @@
 #include <google/protobuf/compiler/cpp/cpp_field.h>
 #include <google/protobuf/compiler/cpp/cpp_helpers.h>
 #include <google/protobuf/compiler/cpp/cpp_padding_optimizer.h>
-#include <google/protobuf/compiler/cpp/cpp_parse_function_generator.h>
 #include <google/protobuf/descriptor.pb.h>
 #include <google/protobuf/io/coded_stream.h>
 #include <google/protobuf/io/printer.h>
@@ -238,7 +237,7 @@ bool EmitFieldNonDefaultCondition(io::Printer* printer,
 
 // Does the given field have a has_$name$() method?
 bool HasHasMethod(const FieldDescriptor* field) {
-  if (!IsProto3(field->file())) {
+  if (HasFieldPresence(field->file())) {
     // In proto1/proto2, every field has a has_$name$() method.
     return true;
   }
@@ -277,7 +276,7 @@ void CollectMapInfo(const Options& options, const Descriptor* descriptor,
 bool HasPrivateHasMethod(const FieldDescriptor* field) {
   // Only for oneofs in message types with no field presence. has_$name$(),
   // based on the oneof case, is still useful internally for generated code.
-  return IsProto3(field->file()) && field->real_containing_oneof();
+  return (!HasFieldPresence(field->file()) && field->real_containing_oneof());
 }
 
 // TODO(ckennelly):  Cull these exclusions if/when these protos do not have
@@ -1018,8 +1017,8 @@ void MessageGenerator::GenerateClassDefinition(io::Printer* printer) {
         "$classname$*>(&_$classname$_default_instance_); }\n");
     auto utf8_check = GetUtf8CheckMode(descriptor_->field(0), options_);
     if (descriptor_->field(0)->type() == FieldDescriptor::TYPE_STRING &&
-        utf8_check != Utf8CheckMode::kNone) {
-      if (utf8_check == Utf8CheckMode::kStrict) {
+        utf8_check != NONE) {
+      if (utf8_check == STRICT) {
         format(
             "  static bool ValidateKey(std::string* s) {\n"
             "    return ::$proto_ns$::internal::WireFormatLite::"
@@ -1028,7 +1027,7 @@ void MessageGenerator::GenerateClassDefinition(io::Printer* printer) {
             " }\n",
             descriptor_->field(0)->full_name());
       } else {
-        GOOGLE_CHECK_EQ(utf8_check, Utf8CheckMode::kVerify);
+        GOOGLE_CHECK_EQ(utf8_check, VERIFY);
         format(
             "  static bool ValidateKey(std::string* s) {\n"
             "#ifndef NDEBUG\n"
@@ -1047,8 +1046,8 @@ void MessageGenerator::GenerateClassDefinition(io::Printer* printer) {
       format("  static bool ValidateKey(void*) { return true; }\n");
     }
     if (descriptor_->field(1)->type() == FieldDescriptor::TYPE_STRING &&
-        utf8_check != Utf8CheckMode::kNone) {
-      if (utf8_check == Utf8CheckMode::kStrict) {
+        utf8_check != NONE) {
+      if (utf8_check == STRICT) {
         format(
             "  static bool ValidateValue(std::string* s) {\n"
             "    return ::$proto_ns$::internal::WireFormatLite::"
@@ -1057,7 +1056,7 @@ void MessageGenerator::GenerateClassDefinition(io::Printer* printer) {
             " }\n",
             descriptor_->field(1)->full_name());
       } else {
-        GOOGLE_CHECK_EQ(utf8_check, Utf8CheckMode::kVerify);
+        GOOGLE_CHECK_EQ(utf8_check, VERIFY);
         format(
             "  static bool ValidateValue(std::string* s) {\n"
             "#ifndef NDEBUG\n"
@@ -2897,13 +2896,15 @@ void MessageGenerator::GenerateSwap(io::Printer* printer) {
 
   if (HasGeneratedMethods(descriptor_->file(), options_)) {
     if (descriptor_->extension_range_count() > 0) {
-      format("_extensions_.InternalSwap(&other->_extensions_);\n");
+      format("_extensions_.Swap(&other->_extensions_);\n");
     }
 
     std::map<std::string, std::string> vars;
     SetUnknkownFieldsVariable(descriptor_, options_, &vars);
     format.AddMap(vars);
-    format("_internal_metadata_.InternalSwap(&other->_internal_metadata_);\n");
+    format(
+        "_internal_metadata_.Swap<$unknown_fields_type$>(&other->_internal_"
+        "metadata_);\n");
 
     if (!has_bit_indices_.empty()) {
       for (int i = 0; i < HasBitsSize(); ++i) {
@@ -3254,8 +3255,8 @@ void MessageGenerator::GenerateMergeFromCodedStream(io::Printer* printer) {
         "}\n");
     return;
   }
-  GenerateParseFunction(descriptor_, max_has_bit_index_, options_,
-                        scc_analyzer_, printer);
+  GenerateParserLoop(descriptor_, max_has_bit_index_, options_, scc_analyzer_,
+                     printer);
 }
 
 void MessageGenerator::GenerateSerializeOneofFields(
@@ -3409,7 +3410,7 @@ void MessageGenerator::GenerateSerializeWithCachedSizesBody(
     LazySerializerEmitter(MessageGenerator* mg, io::Printer* printer)
         : mg_(mg),
           format_(printer),
-          eager_(IsProto3(mg->descriptor_->file())),
+          eager_(!HasFieldPresence(mg->descriptor_->file())),
           cached_has_bit_index_(kNoHasbit) {}
 
     ~LazySerializerEmitter() { Flush(); }

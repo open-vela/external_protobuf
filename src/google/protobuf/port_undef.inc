@@ -78,9 +78,6 @@
 #undef PROTOBUF_ATTRIBUTE_NO_DESTROY
 #undef PROTOBUF_ATTRIBUTE_INIT_PRIORITY
 #undef PROTOBUF_PRAGMA_INIT_SEG
-#undef PROTOBUF_ASAN
-#undef PROTOBUF_MSAN
-#undef PROTOBUF_TSAN
 
 #ifdef PROTOBUF_FUTURE_BREAKING_CHANGES
 #undef PROTOBUF_FUTURE_BREAKING_CHANGES
@@ -89,11 +86,9 @@
 // Restore macro that may have been #undef'd in port_def.inc.
 #ifdef _MSC_VER
 #pragma pop_macro("CREATE_NEW")
-#pragma pop_macro("DELETE")
 #pragma pop_macro("DOUBLE_CLICK")
 #pragma pop_macro("ERROR")
 #pragma pop_macro("ERROR_BUSY")
-#pragma pop_macro("ERROR_INSTALL_FAILED")
 #pragma pop_macro("ERROR_NOT_FOUND")
 #pragma pop_macro("GetMessage")
 #pragma pop_macro("IGNORE")

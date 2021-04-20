@@ -1008,6 +1008,7 @@ python_EXTRA_DIST=                                                           \
   python/google/protobuf/internal/packed_field_test.proto                    \
   python/google/protobuf/internal/proto_builder_test.py                      \
   python/google/protobuf/internal/python_message.py                          \
+  python/google/protobuf/internal/python_protobuf.cc                         \
   python/google/protobuf/internal/reflection_test.py                         \
   python/google/protobuf/internal/service_reflection_test.py                 \
   python/google/protobuf/internal/symbol_database_test.py                    \
@@ -1028,6 +1029,7 @@ python_EXTRA_DIST=                                                           \
   python/google/protobuf/json_format.py                                      \
   python/google/protobuf/message.py                                          \
   python/google/protobuf/message_factory.py                                  \
+  python/google/protobuf/python_protobuf.h                                   \
   python/google/protobuf/proto_api.h                                         \
   python/google/protobuf/proto_builder.py                                    \
   python/google/protobuf/pyext/README                                        \
