@@ -8,4 +8,9 @@ set -ex
 # Change to repo root
 cd $(dirname $0)/../../..
 
-kokoro/linux/aarch64/test_cpp_aarch64.sh
+# Initialize any submodules.
+git submodule update --init --recursive
+
+kokoro/linux/aarch64/qemu_helpers/prepare_qemu.sh
+
+kokoro/linux/aarch64/test_javascript_aarch64.sh
