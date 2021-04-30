@@ -59,7 +59,7 @@ namespace protobuf {
 namespace compiler {
 namespace cpp {
 
-inline std::string ProtobufNamespace(const Options& /* options */) {
+inline std::string ProtobufNamespace(const Options& options) {
   return "PROTOBUF_NAMESPACE_ID";
 }
 
@@ -67,12 +67,12 @@ inline std::string MacroPrefix(const Options& options) {
   return options.opensource_runtime ? "GOOGLE_PROTOBUF" : "GOOGLE_PROTOBUF";
 }
 
-inline std::string DeprecatedAttribute(const Options& /* options */,
+inline std::string DeprecatedAttribute(const Options& options,
                                        const FieldDescriptor* d) {
   return d->options().deprecated() ? "PROTOBUF_DEPRECATED " : "";
 }
 
-inline std::string DeprecatedAttribute(const Options& /* options */,
+inline std::string DeprecatedAttribute(const Options& options,
                                        const EnumValueDescriptor* d) {
   return d->options().deprecated() ? "PROTOBUF_DEPRECATED_ENUM " : "";
 }
@@ -220,9 +220,6 @@ const char* DeclaredTypeMethodName(FieldDescriptor::Type type);
 // Return the code that evaluates to the number when compiled.
 std::string Int32ToString(int number);
 
-// Return the code that evaluates to the number when compiled.
-std::string Int64ToString(const Options& options, int64_t number);
-
 // Get code that evaluates to the field's default value.
 std::string DefaultValue(const Options& options, const FieldDescriptor* field);
 
@@ -345,7 +342,7 @@ inline bool IsLazy(const FieldDescriptor* field, const Options& options) {
          !options.opensource_runtime;
 }
 
-inline bool IsFieldUsed(const FieldDescriptor* /* field */, const Options& /* options */) {
+inline bool IsFieldUsed(const FieldDescriptor* field, const Options& options) {
   return true;
 }
 
@@ -713,8 +710,8 @@ class PROTOC_EXPORT Formatter {
     std::vector<int> path;
     descriptor->GetLocationPath(&path);
     GeneratedCodeInfo::Annotation annotation;
-    for (int index: path) {
-      annotation.add_path(index);
+    for (int i = 0; i < path.size(); ++i) {
+      annotation.add_path(path[i]);
     }
     annotation.set_source_file(descriptor->file()->name());
     return annotation.SerializeAsString();
@@ -746,21 +743,21 @@ class PROTOC_EXPORT NamespaceOpener {
   void ChangeTo(const std::string& name) {
     std::vector<std::string> new_stack_ =
         Split(name, "::", true);
-    size_t len = std::min(name_stack_.size(), new_stack_.size());
-    size_t common_idx = 0;
+    int len = std::min(name_stack_.size(), new_stack_.size());
+    int common_idx = 0;
     while (common_idx < len) {
       if (name_stack_[common_idx] != new_stack_[common_idx]) break;
       common_idx++;
     }
-    for (auto it = name_stack_.crbegin(); it != name_stack_.crend() - common_idx; ++it) {
-      if (*it == "PROTOBUF_NAMESPACE_ID") {
+    for (int i = name_stack_.size() - 1; i >= common_idx; i--) {
+      if (name_stack_[i] == "PROTOBUF_NAMESPACE_ID") {
         printer_->Print("PROTOBUF_NAMESPACE_CLOSE\n");
       } else {
-        printer_->Print("}  // namespace $ns$\n", "ns", *it);
+        printer_->Print("}  // namespace $ns$\n", "ns", name_stack_[i]);
       }
     }
     name_stack_.swap(new_stack_);
-    for (size_t i = common_idx; i < name_stack_.size(); ++i) {
+    for (int i = common_idx; i < name_stack_.size(); i++) {
       if (name_stack_[i] == "PROTOBUF_NAMESPACE_ID") {
         printer_->Print("PROTOBUF_NAMESPACE_OPEN\n");
       } else {
