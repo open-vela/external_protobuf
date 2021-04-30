@@ -151,8 +151,8 @@ class PROTOBUF_EXPORT Duration final :
   int GetCachedSize() const final { return _cached_size_.Get(); }
 
   private:
-  inline void SharedCtor();
-  inline void SharedDtor();
+  void SharedCtor();
+  void SharedDtor();
   void SetCachedSize(int size) const final;
   void InternalSwap(Duration* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;

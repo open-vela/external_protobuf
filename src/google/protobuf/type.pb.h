@@ -264,8 +264,8 @@ class PROTOBUF_EXPORT Type final :
   int GetCachedSize() const final { return _cached_size_.Get(); }
 
   private:
-  inline void SharedCtor();
-  inline void SharedDtor();
+  void SharedCtor();
+  void SharedDtor();
   void SetCachedSize(int size) const final;
   void InternalSwap(Type* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
@@ -498,8 +498,8 @@ class PROTOBUF_EXPORT Field final :
   int GetCachedSize() const final { return _cached_size_.Get(); }
 
   private:
-  inline void SharedCtor();
-  inline void SharedDtor();
+  void SharedCtor();
+  void SharedDtor();
   void SetCachedSize(int size) const final;
   void InternalSwap(Field* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
@@ -856,8 +856,8 @@ class PROTOBUF_EXPORT Enum final :
   int GetCachedSize() const final { return _cached_size_.Get(); }
 
   private:
-  inline void SharedCtor();
-  inline void SharedDtor();
+  void SharedCtor();
+  void SharedDtor();
   void SetCachedSize(int size) const final;
   void InternalSwap(Enum* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
@@ -1064,8 +1064,8 @@ class PROTOBUF_EXPORT EnumValue final :
   int GetCachedSize() const final { return _cached_size_.Get(); }
 
   private:
-  inline void SharedCtor();
-  inline void SharedDtor();
+  void SharedCtor();
+  void SharedDtor();
   void SetCachedSize(int size) const final;
   void InternalSwap(EnumValue* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
@@ -1232,8 +1232,8 @@ class PROTOBUF_EXPORT Option final :
   int GetCachedSize() const final { return _cached_size_.Get(); }
 
   private:
-  inline void SharedCtor();
-  inline void SharedDtor();
+  void SharedCtor();
+  void SharedDtor();
   void SetCachedSize(int size) const final;
   void InternalSwap(Option* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;

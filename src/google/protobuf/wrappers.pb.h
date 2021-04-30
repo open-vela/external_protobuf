@@ -183,8 +183,8 @@ class PROTOBUF_EXPORT DoubleValue final :
   int GetCachedSize() const final { return _cached_size_.Get(); }
 
   private:
-  inline void SharedCtor();
-  inline void SharedDtor();
+  void SharedCtor();
+  void SharedDtor();
   void SetCachedSize(int size) const final;
   void InternalSwap(DoubleValue* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
@@ -315,8 +315,8 @@ class PROTOBUF_EXPORT FloatValue final :
   int GetCachedSize() const final { return _cached_size_.Get(); }
 
   private:
-  inline void SharedCtor();
-  inline void SharedDtor();
+  void SharedCtor();
+  void SharedDtor();
   void SetCachedSize(int size) const final;
   void InternalSwap(FloatValue* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
@@ -447,8 +447,8 @@ class PROTOBUF_EXPORT Int64Value final :
   int GetCachedSize() const final { return _cached_size_.Get(); }
 
   private:
-  inline void SharedCtor();
-  inline void SharedDtor();
+  void SharedCtor();
+  void SharedDtor();
   void SetCachedSize(int size) const final;
   void InternalSwap(Int64Value* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
@@ -579,8 +579,8 @@ class PROTOBUF_EXPORT UInt64Value final :
   int GetCachedSize() const final { return _cached_size_.Get(); }
 
   private:
-  inline void SharedCtor();
-  inline void SharedDtor();
+  void SharedCtor();
+  void SharedDtor();
   void SetCachedSize(int size) const final;
   void InternalSwap(UInt64Value* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
@@ -711,8 +711,8 @@ class PROTOBUF_EXPORT Int32Value final :
   int GetCachedSize() const final { return _cached_size_.Get(); }
 
   private:
-  inline void SharedCtor();
-  inline void SharedDtor();
+  void SharedCtor();
+  void SharedDtor();
   void SetCachedSize(int size) const final;
   void InternalSwap(Int32Value* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
@@ -843,8 +843,8 @@ class PROTOBUF_EXPORT UInt32Value final :
   int GetCachedSize() const final { return _cached_size_.Get(); }
 
   private:
-  inline void SharedCtor();
-  inline void SharedDtor();
+  void SharedCtor();
+  void SharedDtor();
   void SetCachedSize(int size) const final;
   void InternalSwap(UInt32Value* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
@@ -975,8 +975,8 @@ class PROTOBUF_EXPORT BoolValue final :
   int GetCachedSize() const final { return _cached_size_.Get(); }
 
   private:
-  inline void SharedCtor();
-  inline void SharedDtor();
+  void SharedCtor();
+  void SharedDtor();
   void SetCachedSize(int size) const final;
   void InternalSwap(BoolValue* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
@@ -1107,8 +1107,8 @@ class PROTOBUF_EXPORT StringValue final :
   int GetCachedSize() const final { return _cached_size_.Get(); }
 
   private:
-  inline void SharedCtor();
-  inline void SharedDtor();
+  void SharedCtor();
+  void SharedDtor();
   void SetCachedSize(int size) const final;
   void InternalSwap(StringValue* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
@@ -1244,8 +1244,8 @@ class PROTOBUF_EXPORT BytesValue final :
   int GetCachedSize() const final { return _cached_size_.Get(); }
 
   private:
-  inline void SharedCtor();
-  inline void SharedDtor();
+  void SharedCtor();
+  void SharedDtor();
   void SetCachedSize(int size) const final;
   void InternalSwap(BytesValue* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;

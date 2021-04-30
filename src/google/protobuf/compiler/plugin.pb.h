@@ -204,8 +204,8 @@ class PROTOC_EXPORT Version final :
   int GetCachedSize() const final { return _cached_size_.Get(); }
 
   private:
-  inline void SharedCtor();
-  inline void SharedDtor();
+  void SharedCtor();
+  void SharedDtor();
   void SetCachedSize(int size) const final;
   void InternalSwap(Version* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
@@ -398,8 +398,8 @@ class PROTOC_EXPORT CodeGeneratorRequest final :
   int GetCachedSize() const final { return _cached_size_.Get(); }
 
   private:
-  inline void SharedCtor();
-  inline void SharedDtor();
+  void SharedCtor();
+  void SharedDtor();
   void SetCachedSize(int size) const final;
   void InternalSwap(CodeGeneratorRequest* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
@@ -613,8 +613,8 @@ class PROTOC_EXPORT CodeGeneratorResponse_File final :
   int GetCachedSize() const final { return _cached_size_.Get(); }
 
   private:
-  inline void SharedCtor();
-  inline void SharedDtor();
+  void SharedCtor();
+  void SharedDtor();
   void SetCachedSize(int size) const final;
   void InternalSwap(CodeGeneratorResponse_File* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
@@ -822,8 +822,8 @@ class PROTOC_EXPORT CodeGeneratorResponse final :
   int GetCachedSize() const final { return _cached_size_.Get(); }
 
   private:
-  inline void SharedCtor();
-  inline void SharedDtor();
+  void SharedCtor();
+  void SharedDtor();
   void SetCachedSize(int size) const final;
   void InternalSwap(CodeGeneratorResponse* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
