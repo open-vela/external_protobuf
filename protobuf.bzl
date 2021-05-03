@@ -328,12 +328,7 @@ def _internal_gen_well_known_protos_java_impl(ctx):
     deps = [d[ProtoInfo] for d in ctx.attr.deps]
 
     srcjar = ctx.actions.declare_file("{}.srcjar".format(ctx.attr.name))
-    if ctx.attr.javalite:
-        java_out = "lite:%s" % srcjar.path
-    else:
-        java_out = srcjar
-
-    args.add("--java_out", java_out)
+    args.add("--java_out", srcjar)
 
     descriptors = depset(
         transitive = [dep.transitive_descriptor_sets for dep in deps],
@@ -372,9 +367,6 @@ internal_gen_well_known_protos_java = rule(
         "deps": attr.label_list(
             mandatory = True,
             providers = [ProtoInfo],
-        ),
-        "javalite": attr.bool(
-            default = False,
         ),
         "_protoc": attr.label(
             executable = True,

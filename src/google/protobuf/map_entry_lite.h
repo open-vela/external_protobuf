@@ -194,7 +194,7 @@ class MapEntryImpl : public Base {
         _has_bits_{} {}
 
   ~MapEntryImpl() {
-    if (Base::GetArenaForAllocation() != NULL) return;
+    if (Base::GetArena() != NULL) return;
     KeyTypeHandler::DeleteNoArena(key_);
     ValueTypeHandler::DeleteNoArena(value_);
   }
@@ -209,12 +209,11 @@ class MapEntryImpl : public Base {
   }
   inline KeyMapEntryAccessorType* mutable_key() {
     set_has_key();
-    return KeyTypeHandler::EnsureMutable(&key_, Base::GetArenaForAllocation());
+    return KeyTypeHandler::EnsureMutable(&key_, Base::GetArena());
   }
   inline ValueMapEntryAccessorType* mutable_value() {
     set_has_value();
-    return ValueTypeHandler::EnsureMutable(&value_,
-                                           Base::GetArenaForAllocation());
+    return ValueTypeHandler::EnsureMutable(&value_, Base::GetArena());
   }
 
   // implements MessageLite =========================================
@@ -302,14 +301,13 @@ class MapEntryImpl : public Base {
   void MergeFromInternal(const MapEntryImpl& from) {
     if (from._has_bits_[0]) {
       if (from.has_key()) {
-        KeyTypeHandler::EnsureMutable(&key_, Base::GetArenaForAllocation());
-        KeyTypeHandler::Merge(from.key(), &key_, Base::GetArenaForAllocation());
+        KeyTypeHandler::EnsureMutable(&key_, Base::GetArena());
+        KeyTypeHandler::Merge(from.key(), &key_, Base::GetArena());
         set_has_key();
       }
       if (from.has_value()) {
-        ValueTypeHandler::EnsureMutable(&value_, Base::GetArenaForAllocation());
-        ValueTypeHandler::Merge(from.value(), &value_,
-                                Base::GetArenaForAllocation());
+        ValueTypeHandler::EnsureMutable(&value_, Base::GetArena());
+        ValueTypeHandler::Merge(from.value(), &value_, Base::GetArena());
         set_has_value();
       }
     }
@@ -317,8 +315,8 @@ class MapEntryImpl : public Base {
 
  public:
   void Clear() override {
-    KeyTypeHandler::Clear(&key_, Base::GetArenaForAllocation());
-    ValueTypeHandler::Clear(&value_, Base::GetArenaForAllocation());
+    KeyTypeHandler::Clear(&key_, Base::GetArena());
+    ValueTypeHandler::Clear(&value_, Base::GetArena());
     clear_has_key();
     clear_has_value();
   }
@@ -330,8 +328,7 @@ class MapEntryImpl : public Base {
    public:
     explicit Parser(MapField* mf) : mf_(mf), map_(mf->MutableMap()) {}
     ~Parser() {
-      if (entry_ != nullptr && entry_->GetArenaForAllocation() == nullptr)
-        delete entry_;
+      if (entry_ != nullptr && entry_->GetArena() == nullptr) delete entry_;
     }
 
     // This does what the typical MergePartialFromCodedStream() is expected to

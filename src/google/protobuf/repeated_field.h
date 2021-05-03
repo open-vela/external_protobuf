@@ -595,10 +595,12 @@ class PROTOBUF_EXPORT RepeatedPtrFieldBase {
 #endif
   }
 
+ public:
   // Must be called from destructor.
   template <typename TypeHandler>
   void Destroy();
 
+ protected:
   bool empty() const;
   int size() const;
 
@@ -686,7 +688,7 @@ class PROTOBUF_EXPORT RepeatedPtrFieldBase {
   void UnsafeArenaAddAllocated(typename TypeHandler::Type* value);
 
   template <typename TypeHandler>
-  PROTOBUF_FUTURE_MUST_USE_RESULT typename TypeHandler::Type* ReleaseLast() {
+  typename TypeHandler::Type* ReleaseLast() {
     typename TypeImplementsMergeBehavior<typename TypeHandler::Type>::type t;
     return ReleaseLastInternal<TypeHandler>(t);
   }
@@ -700,7 +702,7 @@ class PROTOBUF_EXPORT RepeatedPtrFieldBase {
   template <typename TypeHandler>
   void AddCleared(typename TypeHandler::Type* value);
   template <typename TypeHandler>
-  PROTOBUF_FUTURE_MUST_USE_RESULT typename TypeHandler::Type* ReleaseCleared();
+  typename TypeHandler::Type* ReleaseCleared();
 
   template <typename TypeHandler>
   void AddAllocatedInternal(typename TypeHandler::Type* value, std::true_type);
@@ -798,7 +800,6 @@ class PROTOBUF_EXPORT RepeatedPtrFieldBase {
   // reinterpreting pointers as being to Message instead of a specific Message
   // subclass.
   friend class MapFieldBase;
-  friend class MapFieldBaseStub;
 
   // The table-driven MergePartialFromCodedStream implementation needs to
   // operate on RepeatedPtrField<MessageLite>.
@@ -829,8 +830,11 @@ class GenericTypeHandler {
       delete value;
     }
   }
-  static inline Arena* GetOwningArena(GenericType* value) {
-    return Arena::GetOwningArena<Type>(value);
+  static inline Arena* GetArena(GenericType* value) {
+    return Arena::GetArena<Type>(value);
+  }
+  static inline void* GetMaybeArenaPointer(GenericType* value) {
+    return Arena::GetArena<Type>(value);
   }
 
   static inline void Clear(GenericType* value) { value->Clear(); }
@@ -859,9 +863,13 @@ template <>
 MessageLite* GenericTypeHandler<MessageLite>::NewFromPrototype(
     const MessageLite* prototype, Arena* arena);
 template <>
-inline Arena* GenericTypeHandler<MessageLite>::GetOwningArena(
+inline Arena* GenericTypeHandler<MessageLite>::GetArena(MessageLite* value) {
+  return value->GetArena();
+}
+template <>
+inline void* GenericTypeHandler<MessageLite>::GetMaybeArenaPointer(
     MessageLite* value) {
-  return value->GetOwningArena();
+  return value->GetMaybeArenaPointer();
 }
 template <>
 void GenericTypeHandler<MessageLite>::Merge(const MessageLite& from,
@@ -881,7 +889,9 @@ template <>
 PROTOBUF_EXPORT Message* GenericTypeHandler<Message>::NewFromPrototype(
     const Message* prototype, Arena* arena);
 template <>
-PROTOBUF_EXPORT Arena* GenericTypeHandler<Message>::GetOwningArena(
+PROTOBUF_EXPORT Arena* GenericTypeHandler<Message>::GetArena(Message* value);
+template <>
+PROTOBUF_EXPORT void* GenericTypeHandler<Message>::GetMaybeArenaPointer(
     Message* value);
 
 class StringTypeHandler {
@@ -899,7 +909,10 @@ class StringTypeHandler {
                                               Arena* arena) {
     return New(arena);
   }
-  static inline Arena* GetOwningArena(std::string*) { return nullptr; }
+  static inline Arena* GetArena(std::string*) { return NULL; }
+  static inline void* GetMaybeArenaPointer(std::string* /* value */) {
+    return NULL;
+  }
   static inline void Delete(std::string* value, Arena* arena) {
     if (arena == NULL) {
       delete value;
@@ -1071,7 +1084,7 @@ class RepeatedPtrField final : private internal::RepeatedPtrFieldBase {
   // If this RepeatedPtrField is on an arena, an object copy is required to pass
   // ownership back to the user (for compatible semantics). Use
   // UnsafeArenaReleaseLast() if this behavior is undesired.
-  PROTOBUF_FUTURE_MUST_USE_RESULT Element* ReleaseLast();
+  Element* ReleaseLast();
 
   // Add an already-allocated object, skipping arena-ownership checks. The user
   // must guarantee that the given object is in the same arena as this
@@ -1141,7 +1154,7 @@ class RepeatedPtrField final : private internal::RepeatedPtrFieldBase {
   //
   // This method cannot be called when the repeated field is on an arena; doing
   // so will trigger a GOOGLE_DCHECK-failure.
-  PROTOBUF_FUTURE_MUST_USE_RESULT Element* ReleaseCleared();
+  Element* ReleaseCleared();
 
   // Removes the element referenced by position.
   //
@@ -1483,6 +1496,7 @@ inline const Element* RepeatedField<Element>::data() const {
 template <typename Element>
 inline void RepeatedField<Element>::InternalSwap(RepeatedField* other) {
   GOOGLE_DCHECK(this != other);
+  GOOGLE_DCHECK(GetArena() == other->GetArena());
 
   // Swap all fields at once.
   static_assert(std::is_standard_layout<RepeatedField<Element>>::value,
@@ -1930,7 +1944,7 @@ template <typename TypeHandler>
 void RepeatedPtrFieldBase::AddAllocatedInternal(
     typename TypeHandler::Type* value, std::true_type) {
   Arena* element_arena =
-      reinterpret_cast<Arena*>(TypeHandler::GetOwningArena(value));
+      reinterpret_cast<Arena*>(TypeHandler::GetMaybeArenaPointer(value));
   Arena* arena = GetArena();
   if (arena == element_arena && rep_ && rep_->allocated_size < total_size_) {
     // Fast path: underlying arena representation (tagged pointer) is equal to
@@ -1946,7 +1960,8 @@ void RepeatedPtrFieldBase::AddAllocatedInternal(
     current_size_ = current_size_ + 1;
     rep_->allocated_size = rep_->allocated_size + 1;
   } else {
-    AddAllocatedSlowWithCopy<TypeHandler>(value, element_arena, arena);
+    AddAllocatedSlowWithCopy<TypeHandler>(value, TypeHandler::GetArena(value),
+                                          arena);
   }
 }
 
@@ -2078,7 +2093,7 @@ inline void RepeatedPtrFieldBase::AddCleared(
     typename TypeHandler::Type* value) {
   GOOGLE_DCHECK(GetArena() == NULL)
       << "AddCleared() can only be used on a RepeatedPtrField not on an arena.";
-  GOOGLE_DCHECK(TypeHandler::GetOwningArena(value) == nullptr)
+  GOOGLE_DCHECK(TypeHandler::GetArena(value) == NULL)
       << "AddCleared() can only accept values not on an arena.";
   if (!rep_ || rep_->allocated_size == total_size_) {
     Reserve(total_size_ + 1);
@@ -2620,14 +2635,17 @@ class RepeatedPtrOverPtrsIterator {
 
 void RepeatedPtrFieldBase::InternalSwap(RepeatedPtrFieldBase* other) {
   GOOGLE_DCHECK(this != other);
+  GOOGLE_DCHECK(GetArena() == other->GetArena());
 
   // Swap all fields at once.
   static_assert(std::is_standard_layout<RepeatedPtrFieldBase>::value,
                 "offsetof() requires standard layout before c++17");
   internal::memswap<offsetof(RepeatedPtrFieldBase, rep_) + sizeof(this->rep_) -
-                    offsetof(RepeatedPtrFieldBase, arena_)>(
-      reinterpret_cast<char*>(this) + offsetof(RepeatedPtrFieldBase, arena_),
-      reinterpret_cast<char*>(other) + offsetof(RepeatedPtrFieldBase, arena_));
+                    offsetof(RepeatedPtrFieldBase, current_size_)>(
+      reinterpret_cast<char*>(this) +
+          offsetof(RepeatedPtrFieldBase, current_size_),
+      reinterpret_cast<char*>(other) +
+          offsetof(RepeatedPtrFieldBase, current_size_));
 }
 
 }  // namespace internal

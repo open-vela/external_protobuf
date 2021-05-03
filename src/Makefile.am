@@ -150,7 +150,6 @@ nobase_include_HEADERS =                                         \
   google/protobuf/compiler/csharp/csharp_generator.h             \
   google/protobuf/compiler/csharp/csharp_names.h                 \
   google/protobuf/compiler/java/java_generator.h                 \
-  google/protobuf/compiler/java/java_kotlin_generator.h          \
   google/protobuf/compiler/java/java_names.h                     \
   google/protobuf/compiler/js/js_generator.h                     \
   google/protobuf/compiler/js/well_known_types_embed.h           \
@@ -346,8 +345,6 @@ libprotoc_la_SOURCES =                                         \
   google/protobuf/compiler/cpp/cpp_options.h                   \
   google/protobuf/compiler/cpp/cpp_padding_optimizer.cc        \
   google/protobuf/compiler/cpp/cpp_padding_optimizer.h         \
-  google/protobuf/compiler/cpp/cpp_parse_function_generator.cc \
-  google/protobuf/compiler/cpp/cpp_parse_function_generator.h  \
   google/protobuf/compiler/cpp/cpp_primitive_field.cc          \
   google/protobuf/compiler/cpp/cpp_primitive_field.h           \
   google/protobuf/compiler/cpp/cpp_service.cc                  \
@@ -377,7 +374,6 @@ libprotoc_la_SOURCES =                                         \
   google/protobuf/compiler/java/java_generator_factory.h       \
   google/protobuf/compiler/java/java_helpers.cc                \
   google/protobuf/compiler/java/java_helpers.h                 \
-  google/protobuf/compiler/java/java_kotlin_generator.cc       \
   google/protobuf/compiler/java/java_map_field.cc              \
   google/protobuf/compiler/java/java_map_field.h               \
   google/protobuf/compiler/java/java_map_field_lite.cc         \
