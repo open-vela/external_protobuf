@@ -65,7 +65,7 @@ PROTOBUF_NAMESPACE_OPEN
 
 // ===================================================================
 
-class PROTOBUF_EXPORT FieldMask final :
+class PROTOBUF_EXPORT FieldMask PROTOBUF_FINAL :
     public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:google.protobuf.FieldMask) */ {
  public:
   inline FieldMask() : FieldMask(nullptr) {}
@@ -83,9 +83,8 @@ class PROTOBUF_EXPORT FieldMask final :
     return *this;
   }
   inline FieldMask& operator=(FieldMask&& from) noexcept {
-    if (this == &from) return *this;
-    if (GetOwningArena() == from.GetOwningArena()) {
-      InternalSwap(&from);
+    if (GetArena() == from.GetArena()) {
+      if (this != &from) InternalSwap(&from);
     } else {
       CopyFrom(from);
     }
@@ -116,7 +115,7 @@ class PROTOBUF_EXPORT FieldMask final :
   }
   inline void Swap(FieldMask* other) {
     if (other == this) return;
-    if (GetOwningArena() == other->GetOwningArena()) {
+    if (GetArena() == other->GetArena()) {
       InternalSwap(other);
     } else {
       ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
@@ -124,14 +123,14 @@ class PROTOBUF_EXPORT FieldMask final :
   }
   void UnsafeArenaSwap(FieldMask* other) {
     if (other == this) return;
-    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    GOOGLE_DCHECK(GetArena() == other->GetArena());
     InternalSwap(other);
   }
 
   // implements Message ----------------------------------------------
 
   inline FieldMask* New() const final {
-    return new FieldMask();
+    return CreateMaybeMessage<FieldMask>(nullptr);
   }
 
   FieldMask* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
@@ -151,8 +150,8 @@ class PROTOBUF_EXPORT FieldMask final :
   int GetCachedSize() const final { return _cached_size_.Get(); }
 
   private:
-  void SharedCtor();
-  void SharedDtor();
+  inline void SharedCtor();
+  inline void SharedDtor();
   void SetCachedSize(int size) const final;
   void InternalSwap(FieldMask* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;

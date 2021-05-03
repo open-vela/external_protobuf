@@ -95,10 +95,4 @@ class EncodeDecodeTest < Test::Unit::TestCase
     end
   end
 
-  def test_json_name
-    msg = A::B::C::TestJsonName.new(:value => 42)
-    json = msg.to_json
-    assert_match json, "{\"CustomJsonName\":42}"
-  end
-
 end

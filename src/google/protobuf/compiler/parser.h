@@ -523,6 +523,7 @@ class PROTOBUF_EXPORT Parser {
     return syntax_identifier_ == "proto3";
   }
 
+
   bool ValidateEnum(const EnumDescriptorProto* proto);
 
   // =================================================================

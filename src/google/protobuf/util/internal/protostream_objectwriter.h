@@ -108,13 +108,6 @@ class PROTOBUF_EXPORT ProtoStreamObjectWriter : public ProtoWriter {
     // is disabled.
     bool suppress_implicit_message_list_error;
 
-    // If true, disable implicitly creating scalar list.
-    bool disable_implicit_scalar_list;
-
-    // If true, suppress the error of implicitly creating scalar list when it
-    // is disabled.
-    bool suppress_implicit_scalar_list_error;
-
     // If true, suppress the error of rendering scalar field if the source is an
     // object.
     bool suppress_object_to_scalar_error;
@@ -132,8 +125,6 @@ class PROTOBUF_EXPORT ProtoStreamObjectWriter : public ProtoWriter {
           use_legacy_json_map_format(false),
           disable_implicit_message_list(false),
           suppress_implicit_message_list_error(false),
-          disable_implicit_scalar_list(false),
-          suppress_implicit_scalar_list_error(false),
           suppress_object_to_scalar_error(false),
           use_json_name_in_missing_fields(false) {}
 
