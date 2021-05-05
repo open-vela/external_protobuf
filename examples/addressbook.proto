@@ -23,10 +23,6 @@ option java_outer_classname = "AddressBookProtos";
 option csharp_namespace = "Google.Protobuf.Examples.AddressBook";
 // [END csharp_declaration]
 
-// [START go_declaration]
-option go_package = "../tutorial";
-// [END go_declaration]
-
 // [START messages]
 message Person {
   string name = 1;

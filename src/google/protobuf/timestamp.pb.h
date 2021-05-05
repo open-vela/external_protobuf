@@ -65,7 +65,7 @@ PROTOBUF_NAMESPACE_OPEN
 
 // ===================================================================
 
-class PROTOBUF_EXPORT Timestamp final :
+class PROTOBUF_EXPORT Timestamp PROTOBUF_FINAL :
     public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:google.protobuf.Timestamp) */ {
  public:
   inline Timestamp() : Timestamp(nullptr) {}
@@ -83,9 +83,8 @@ class PROTOBUF_EXPORT Timestamp final :
     return *this;
   }
   inline Timestamp& operator=(Timestamp&& from) noexcept {
-    if (this == &from) return *this;
-    if (GetOwningArena() == from.GetOwningArena()) {
-      InternalSwap(&from);
+    if (GetArena() == from.GetArena()) {
+      if (this != &from) InternalSwap(&from);
     } else {
       CopyFrom(from);
     }
@@ -116,7 +115,7 @@ class PROTOBUF_EXPORT Timestamp final :
   }
   inline void Swap(Timestamp* other) {
     if (other == this) return;
-    if (GetOwningArena() == other->GetOwningArena()) {
+    if (GetArena() == other->GetArena()) {
       InternalSwap(other);
     } else {
       ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
@@ -124,14 +123,14 @@ class PROTOBUF_EXPORT Timestamp final :
   }
   void UnsafeArenaSwap(Timestamp* other) {
     if (other == this) return;
-    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    GOOGLE_DCHECK(GetArena() == other->GetArena());
     InternalSwap(other);
   }
 
   // implements Message ----------------------------------------------
 
   inline Timestamp* New() const final {
-    return new Timestamp();
+    return CreateMaybeMessage<Timestamp>(nullptr);
   }
 
   Timestamp* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
@@ -151,8 +150,8 @@ class PROTOBUF_EXPORT Timestamp final :
   int GetCachedSize() const final { return _cached_size_.Get(); }
 
   private:
-  void SharedCtor();
-  void SharedDtor();
+  inline void SharedCtor();
+  inline void SharedDtor();
   void SetCachedSize(int size) const final;
   void InternalSwap(Timestamp* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
@@ -219,7 +218,7 @@ class PROTOBUF_EXPORT Timestamp final :
 
 // int64 seconds = 1;
 inline void Timestamp::clear_seconds() {
-  seconds_ = int64_t{0};
+  seconds_ = PROTOBUF_LONGLONG(0);
 }
 inline ::PROTOBUF_NAMESPACE_ID::int64 Timestamp::_internal_seconds() const {
   return seconds_;
