@@ -19,7 +19,7 @@ PROTOBUF_PRAGMA_INIT_SEG
 PROTOBUF_NAMESPACE_OPEN
 constexpr Duration::Duration(
   ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized)
-  : seconds_(int64_t{0})
+  : seconds_(PROTOBUF_LONGLONG(0))
   , nanos_(0){}
 struct DurationDefaultTypeInternal {
   constexpr DurationDefaultTypeInternal()
@@ -110,7 +110,7 @@ Duration::~Duration() {
 }
 
 void Duration::SharedDtor() {
-  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+  GOOGLE_DCHECK(GetArena() == nullptr);
 }
 
 void Duration::ArenaDtor(void* object) {
@@ -285,7 +285,7 @@ bool Duration::IsInitialized() const {
 
 void Duration::InternalSwap(Duration* other) {
   using std::swap;
-  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
       PROTOBUF_FIELD_OFFSET(Duration, nanos_)
       + sizeof(Duration::nanos_)

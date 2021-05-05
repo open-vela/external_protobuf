@@ -58,7 +58,6 @@ class MapFieldGenerator : public FieldGenerator {
   void GenerateSerializeWithCachedSizesToArray(io::Printer* printer) const;
   void GenerateByteSize(io::Printer* printer) const;
   void GenerateConstinitInitializer(io::Printer* printer) const;
-  bool GenerateArenaDestructorCode(io::Printer* printer) const override;
 
  private:
   GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(MapFieldGenerator);

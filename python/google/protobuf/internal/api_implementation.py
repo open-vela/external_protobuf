@@ -32,8 +32,8 @@
 """
 
 import os
-import sys
 import warnings
+import sys
 
 try:
   # pylint: disable=g-import-not-at-top
@@ -60,11 +60,10 @@ if _api_version < 0:  # Still unspecified?
       raise ImportError('_use_fast_cpp_protos import succeeded but was None')
     del _use_fast_cpp_protos
     _api_version = 2
+    # Can not import both use_fast_cpp_protos and use_pure_python.
     from google.protobuf import use_pure_python
     raise RuntimeError(
-        'Conflicting deps on both :use_fast_cpp_protos and :use_pure_python.\n'
-        ' go/build_deps_on_BOTH_use_fast_cpp_protos_AND_use_pure_python\n'
-        'This should be impossible via a link error at build time...')
+        'Conflict depend on both use_fast_cpp_protos and use_pure_python')
   except ImportError:
     try:
       # pylint: disable=g-import-not-at-top
