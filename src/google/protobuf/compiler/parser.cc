@@ -1782,12 +1782,12 @@ bool Parser::ParseReserved(EnumDescriptorProto* message,
   DO(Consume("reserved"));
   if (LookingAtType(io::Tokenizer::TYPE_STRING)) {
     LocationRecorder location(message_location,
-                              EnumDescriptorProto::kReservedNameFieldNumber);
+                              DescriptorProto::kReservedNameFieldNumber);
     location.StartAt(start_token);
     return ParseReservedNames(message, location);
   } else {
     LocationRecorder location(message_location,
-                              EnumDescriptorProto::kReservedRangeFieldNumber);
+                              DescriptorProto::kReservedRangeFieldNumber);
     location.StartAt(start_token);
     return ParseReservedNumbers(message, location);
   }
@@ -2214,6 +2214,7 @@ bool Parser::ParseServiceMethod(MethodDescriptorProto* method,
 
   return true;
 }
+
 
 bool Parser::ParseMethodOptions(const LocationRecorder& parent_location,
                                 const FileDescriptorProto* containing_file,

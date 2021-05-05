@@ -1,5 +1,7 @@
 <?php
 
+require_once('generated/NoNamespaceEnum.php');
+require_once('generated/NoNamespaceMessage.php');
 require_once('test_base.php');
 require_once('test_util.php');
 
@@ -757,10 +759,10 @@ class GeneratedClassTest extends TestBase
     public function testMessageWithoutNamespace()
     {
         $m = new TestMessage();
-        $n = new NoNamespaceMessage();
+        $n = new NoNameSpaceMessage();
         $m->setOptionalNoNamespaceMessage($n);
         $repeatedNoNamespaceMessage = $m->getRepeatedNoNamespaceMessage();
-        $repeatedNoNamespaceMessage[] = new NoNamespaceMessage();
+        $repeatedNoNamespaceMessage[] = new NoNameSpaceMessage();
         $m->setRepeatedNoNamespaceMessage($repeatedNoNamespaceMessage);
 
         // test nested messages
@@ -773,9 +775,9 @@ class GeneratedClassTest extends TestBase
     public function testEnumWithoutNamespace()
     {
         $m = new TestMessage();
-        $m->setOptionalNoNamespaceEnum(NoNamespaceEnum::VALUE_A);
+        $m->setOptionalNoNamespaceEnum(NoNameSpaceEnum::VALUE_A);
         $repeatedNoNamespaceEnum = $m->getRepeatedNoNamespaceEnum();
-        $repeatedNoNamespaceEnum[] = NoNamespaceEnum::VALUE_A;
+        $repeatedNoNamespaceEnum[] = NoNameSpaceEnum::VALUE_A;
         $m->setRepeatedNoNamespaceEnum($repeatedNoNamespaceEnum);
         $this->assertTrue(true);
     }
