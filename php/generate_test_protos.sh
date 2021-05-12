@@ -4,17 +4,7 @@ set -e
 
 cd `dirname $0`
 
-./prepare_c_extension.sh
-
-if ../src/protoc --help > /dev/null; then
-  PROTOC=src/protoc
-else
-  (cd .. && bazel build -c opt :protoc)
-  PROTOC=bazel-bin/protoc
-fi
-
-
-if [[ -d tmp && -z $(find tests/proto ../$PROTOC -newer tmp) ]]; then
+if [[ -d tmp && -z $(find tests/proto ../src/protoc -newer tmp) ]]; then
   # Generated protos are already present and up to date, so we can skip protoc.
   #
   # Protoc is very fast, but sometimes it is not available (like if we haven't
@@ -26,13 +16,12 @@ fi
 rm -rf tmp
 mkdir -p tmp
 
-cd ..
-find php/tests/proto -type f -name "*.proto"| xargs $PROTOC --php_out=php/tmp -Isrc -Iphp/tests
+find tests/proto -type f -name "*.proto"| xargs ../src/protoc --php_out=tmp -I../src -Itests
 
 if [ "$1" = "--aggregate_metadata" ]; then
   # Overwrite some of the files to use aggregation.
   AGGREGATED_FILES="tests/proto/test.proto tests/proto/test_include.proto tests/proto/test_import_descriptor_proto.proto"
-  $PROTOC --php_out=aggregate_metadata=foo#bar:php/tmp -Isrc -Iphp/tests $AGGREGATED_FILES
+  ../src/protoc --php_out=aggregate_metadata=foo#bar:tmp -I../src -Itests $AGGREGATED_FILES
 fi
 
 echo "Generated test protos from tests/proto -> tmp"
