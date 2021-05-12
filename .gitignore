@@ -82,7 +82,10 @@ src/**/*.log
 src/**/*.trs
 
 # JavaBuild output.
-java/**/target
+java/core/target
+java/lite/target
+java/util/target
+javanano/target
 java/.idea
 java/**/*.iml
 
