@@ -18,7 +18,7 @@ else
 PTHREAD_DEF =
 endif
 
-PROTOBUF_VERSION = 28:0:0
+PROTOBUF_VERSION = 28:1:0
 
 if GCC
 # Turn on all warnings except for sign comparison (we ignore sign comparison
@@ -95,15 +95,12 @@ nobase_include_HEADERS =                                         \
   google/protobuf/empty.pb.h                                     \
   google/protobuf/extension_set.h                                \
   google/protobuf/extension_set_inl.h                            \
-  google/protobuf/field_access_listener.h                        \
   google/protobuf/field_mask.pb.h                                \
   google/protobuf/generated_enum_reflection.h                    \
   google/protobuf/generated_enum_util.h                          \
   google/protobuf/generated_message_reflection.h                 \
   google/protobuf/generated_message_table_driven.h               \
-  google/protobuf/generated_message_tctable_decl.h               \
   google/protobuf/generated_message_tctable_impl.h               \
-  google/protobuf/generated_message_tctable_impl.inc             \
   google/protobuf/generated_message_util.h                       \
   google/protobuf/has_bits.h                                     \
   google/protobuf/implicit_weak_message.h                        \
@@ -207,7 +204,6 @@ libprotobuf_lite_la_SOURCES =                                  \
   google/protobuf/arena.cc                                     \
   google/protobuf/arenastring.cc                               \
   google/protobuf/extension_set.cc                             \
-  google/protobuf/field_access_listener.cc                     \
   google/protobuf/generated_enum_util.cc                       \
   google/protobuf/generated_message_util.cc                    \
   google/protobuf/generated_message_table_driven_lite.h        \
@@ -894,9 +890,7 @@ endif
 no_warning_test.cc:
 	echo "// Generated from Makefile.am" > no_warning_test.cc
 	for FILE in $(nobase_include_HEADERS); do \
-          if [[ $$FILE != *.inc ]]; then \
-	    echo "#include <$${FILE}>" >> no_warning_test.cc; \
-	  fi \
+    echo "#include <$${FILE}>" >> no_warning_test.cc; \
 	done
 	echo "int main(int, char**) { return 0; }" >> no_warning_test.cc
 
