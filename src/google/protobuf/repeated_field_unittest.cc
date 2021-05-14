@@ -889,8 +889,12 @@ TEST(RepeatedPtrField, UnambiguousConstructor) {
 
   // Construction from string iterators for the unique string overload "g"
   // works.
+<<<<<<< HEAD
+=======
   // std::string b[2] = {"abc", "xyz"};
+>>>>>>> refs/tags/sync-piper
   // Disabling this for now, this is actually ambiguous with libstdc++.
+  // std::string b[2] = {"abc", "xyz"};
   // EXPECT_TRUE(X::g({b, b + 2}));
 
   // Construction from string iterators for "f" is ambiguous, since both
