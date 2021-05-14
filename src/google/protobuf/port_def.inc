@@ -107,7 +107,7 @@
 #ifdef PROTOBUF_VERSION
 #error PROTOBUF_VERSION was previously defined
 #endif
-#define PROTOBUF_VERSION 3017000
+#define PROTOBUF_VERSION 3017001
 
 #ifdef PROTOBUF_MIN_HEADER_VERSION_FOR_PROTOC
 #error PROTOBUF_MIN_HEADER_VERSION_FOR_PROTOC was previously defined
@@ -175,24 +175,6 @@
 #elif defined(_MSC_VER)
 // Seems to have been around since at least Visual Studio 2005
 # define PROTOBUF_NOINLINE __declspec(noinline)
-#endif
-
-#ifdef PROTOBUF_MUSTTAIL
-#error PROTOBUF_MUSTTAIL was previously defined
-#endif
-#ifdef PROTOBUF_TAILCALL
-#error PROTOBUF_TAILCALL was previously defined
-#endif
-#if __has_cpp_attribute(clang::musttail) && \
-  !defined(_ARCH_PPC) && !defined(__wasm__)
-#  ifndef PROTO2_OPENSOURCE
-// Compilation fails on powerpc64le: b/187985113
-#  endif
-#define PROTOBUF_MUSTTAIL [[clang::musttail]]
-#define PROTOBUF_TAILCALL true
-#else
-#define PROTOBUF_MUSTTAIL
-#define PROTOBUF_TAILCALL false
 #endif
 
 #ifdef PROTOBUF_EXCLUSIVE_LOCKS_REQUIRED
@@ -407,19 +389,8 @@
 #ifdef PROTOBUF_MUST_USE_RESULT
 #error PROTOBUF_MUST_USE_RESULT was previously defined
 #endif
+# define PROTOBUF_FUTURE_MUST_USE_RESULT
 # define PROTOBUF_MUST_USE_RESULT
-
-#ifdef PROTOBUF_MUST_USE_EXTRACT_RESULT
-#error PROTOBUF_MUST_USE_EXTRACT_RESULT was previously defined
-#endif
-
-#ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
-#error PROTOBUF_FORCE_COPY_IN_RELEASE was previously defined
-#endif
-
-#ifdef PROTOBUF_FORCE_COPY_IN_SWAP
-#error PROTOBUF_FORCE_COPY_IN_SWAP was previously defined
-#endif
 
 #ifdef PROTOBUF_FALLTHROUGH_INTENDED
 #error PROTOBUF_FALLTHROUGH_INTENDED was previously defined
@@ -480,11 +451,6 @@
 #define PROTOBUF_ALIGNAS(byte_alignment) alignas(byte_alignment)
 #endif
 
-#ifdef PROTOBUF_FINAL
-#error PROTOBUF_FINAL was previously defined
-#endif
-#define PROTOBUF_FINAL final
-
 #ifdef PROTOBUF_THREAD_LOCAL
 #error PROTOBUF_THREAD_LOCAL was previously defined
 #endif
@@ -504,7 +470,7 @@
 // we need to simulate the arena ownership.
 // This experiment is purely for the purpose of gathering data. All code guarded
 // by this flag is supposed to be removed after this experiment.
-#define PROTOBUF_MESSAGE_OWNED_ARENA_EXPERIMENT
+// #define PROTOBUF_MESSAGE_OWNED_ARENA_EXPERIMENT
 #ifdef PROTOBUF_CONSTINIT
 #error PROTOBUF_CONSTINIT was previously defined
 #endif
@@ -540,7 +506,7 @@
 #ifdef PROTOBUF_ATTRIBUTE_INIT_PRIORITY
 #error PROTOBUF_ATTRIBUTE_INIT_PRIORITY was previously defined
 #endif
-#if PROTOBUF_GNUC_MIN(3, 0) && (!defined(__APPLE__) || defined(__clang__))
+#if PROTOBUF_GNUC_MIN(3, 0)
 #define PROTOBUF_ATTRIBUTE_INIT_PRIORITY __attribute__((init_priority((102))))
 #else
 #define PROTOBUF_ATTRIBUTE_INIT_PRIORITY

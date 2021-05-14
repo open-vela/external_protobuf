@@ -205,19 +205,8 @@ void SetIntVar(const Options& options, const std::string& type,
                std::map<std::string, std::string>* variables) {
   (*variables)[type] = IntTypeName(options, type);
 }
-bool IsEagerlyVerifiedLazyImpl(const FieldDescriptor* field,
-                               const Options& options,
-                               MessageSCCAnalyzer* scc_analyzer) {
-  return false;
-}
 
 }  // namespace
-
-bool IsLazy(const FieldDescriptor* field, const Options& options,
-            MessageSCCAnalyzer* scc_analyzer) {
-  return IsLazilyVerifiedLazy(field, options) ||
-         IsEagerlyVerifiedLazyImpl(field, options, scc_analyzer);
-}
 
 void SetCommonVars(const Options& options,
                    std::map<std::string, std::string>* variables) {
@@ -256,9 +245,9 @@ void SetCommonVars(const Options& options,
   (*variables)["string"] = "std::string";
 }
 
-void SetUnknownFieldsVariable(const Descriptor* descriptor,
-                              const Options& options,
-                              std::map<std::string, std::string>* variables) {
+void SetUnknkownFieldsVariable(const Descriptor* descriptor,
+                               const Options& options,
+                               std::map<std::string, std::string>* variables) {
   std::string proto_ns = ProtobufNamespace(options);
   std::string unknown_fields_type;
   if (UseUnknownFieldSet(descriptor->file(), options)) {
@@ -796,20 +785,20 @@ std::string SafeFunctionName(const Descriptor* descriptor,
   return function_name;
 }
 
-static bool HasLazyFields(const Descriptor* descriptor, const Options& options,
-                          MessageSCCAnalyzer* scc_analyzer) {
+static bool HasLazyFields(const Descriptor* descriptor,
+                          const Options& options) {
   for (int field_idx = 0; field_idx < descriptor->field_count(); field_idx++) {
-    if (IsLazy(descriptor->field(field_idx), options, scc_analyzer)) {
+    if (IsLazy(descriptor->field(field_idx), options)) {
       return true;
     }
   }
   for (int idx = 0; idx < descriptor->extension_count(); idx++) {
-    if (IsLazy(descriptor->extension(idx), options, scc_analyzer)) {
+    if (IsLazy(descriptor->extension(idx), options)) {
       return true;
     }
   }
   for (int idx = 0; idx < descriptor->nested_type_count(); idx++) {
-    if (HasLazyFields(descriptor->nested_type(idx), options, scc_analyzer)) {
+    if (HasLazyFields(descriptor->nested_type(idx), options)) {
       return true;
     }
   }
@@ -817,16 +806,15 @@ static bool HasLazyFields(const Descriptor* descriptor, const Options& options,
 }
 
 // Does the given FileDescriptor use lazy fields?
-bool HasLazyFields(const FileDescriptor* file, const Options& options,
-                   MessageSCCAnalyzer* scc_analyzer) {
+bool HasLazyFields(const FileDescriptor* file, const Options& options) {
   for (int i = 0; i < file->message_type_count(); i++) {
     const Descriptor* descriptor(file->message_type(i));
-    if (HasLazyFields(descriptor, options, scc_analyzer)) {
+    if (HasLazyFields(descriptor, options)) {
       return true;
     }
   }
   for (int field_idx = 0; field_idx < file->extension_count(); field_idx++) {
-    if (IsLazy(file->extension(field_idx), options, scc_analyzer)) {
+    if (IsLazy(file->extension(field_idx), options)) {
       return true;
     }
   }
@@ -1155,9 +1143,6 @@ bool IsImplicitWeakField(const FieldDescriptor* field, const Options& options,
 MessageAnalysis MessageSCCAnalyzer::GetSCCAnalysis(const SCC* scc) {
   if (analysis_cache_.count(scc)) return analysis_cache_[scc];
   MessageAnalysis result{};
-  if (UsingImplicitWeakFields(scc->GetFile(), options_)) {
-    result.contains_weak = true;
-  }
   for (int i = 0; i < scc->descriptors.size(); i++) {
     const Descriptor* descriptor = scc->descriptors[i];
     if (descriptor->extension_range_count() > 0) {
@@ -1167,9 +1152,6 @@ MessageAnalysis MessageSCCAnalyzer::GetSCCAnalysis(const SCC* scc) {
       const FieldDescriptor* field = descriptor->field(i);
       if (field->is_required()) {
         result.contains_required = true;
-      }
-      if (field->options().weak()) {
-        result.contains_weak = true;
       }
       switch (field->type()) {
         case FieldDescriptor::TYPE_STRING:
@@ -1189,7 +1171,6 @@ MessageAnalysis MessageSCCAnalyzer::GetSCCAnalysis(const SCC* scc) {
             if (!ShouldIgnoreRequiredFieldCheck(field, options_)) {
               result.contains_required |= analysis.contains_required;
             }
-            result.contains_weak |= analysis.contains_weak;
           } else {
             // This field points back into the same SCC hence the messages
             // in the SCC are recursive. Note if SCC contains more than two
