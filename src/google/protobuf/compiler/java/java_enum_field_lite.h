@@ -62,20 +62,20 @@ class ImmutableEnumFieldLiteGenerator : public ImmutableFieldLiteGenerator {
   explicit ImmutableEnumFieldLiteGenerator(const FieldDescriptor* descriptor,
                                            int messageBitIndex,
                                            Context* context);
-  ~ImmutableEnumFieldLiteGenerator() override;
+  ~ImmutableEnumFieldLiteGenerator();
 
   // implements ImmutableFieldLiteGenerator
   // ------------------------------------
-  int GetNumBitsForMessage() const override;
-  void GenerateInterfaceMembers(io::Printer* printer) const override;
-  void GenerateMembers(io::Printer* printer) const override;
-  void GenerateBuilderMembers(io::Printer* printer) const override;
-  void GenerateInitializationCode(io::Printer* printer) const override;
+  int GetNumBitsForMessage() const;
+  void GenerateInterfaceMembers(io::Printer* printer) const;
+  void GenerateMembers(io::Printer* printer) const;
+  void GenerateBuilderMembers(io::Printer* printer) const;
+  void GenerateInitializationCode(io::Printer* printer) const;
   void GenerateFieldInfo(io::Printer* printer,
-                         std::vector<uint16_t>* output) const override;
-  void GenerateKotlinDslMembers(io::Printer* printer) const override;
+                         std::vector<uint16_t>* output) const;
+  void GenerateKotlinDslMembers(io::Printer* printer) const;
 
-  std::string GetBoxedType() const override;
+  std::string GetBoxedType() const;
 
  protected:
   const FieldDescriptor* descriptor_;
@@ -93,12 +93,12 @@ class ImmutableEnumOneofFieldLiteGenerator
  public:
   ImmutableEnumOneofFieldLiteGenerator(const FieldDescriptor* descriptor,
                                        int messageBitIndex, Context* context);
-  ~ImmutableEnumOneofFieldLiteGenerator() override;
+  ~ImmutableEnumOneofFieldLiteGenerator();
 
-  void GenerateMembers(io::Printer* printer) const override;
-  void GenerateBuilderMembers(io::Printer* printer) const override;
+  void GenerateMembers(io::Printer* printer) const;
+  void GenerateBuilderMembers(io::Printer* printer) const;
   void GenerateFieldInfo(io::Printer* printer,
-                         std::vector<uint16_t>* output) const override;
+                         std::vector<uint16_t>* output) const;
 
  private:
   GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(ImmutableEnumOneofFieldLiteGenerator);
@@ -109,19 +109,19 @@ class RepeatedImmutableEnumFieldLiteGenerator
  public:
   explicit RepeatedImmutableEnumFieldLiteGenerator(
       const FieldDescriptor* descriptor, int messageBitIndex, Context* context);
-  ~RepeatedImmutableEnumFieldLiteGenerator() override;
+  ~RepeatedImmutableEnumFieldLiteGenerator();
 
   // implements ImmutableFieldLiteGenerator ------------------------------------
-  int GetNumBitsForMessage() const override;
-  void GenerateInterfaceMembers(io::Printer* printer) const override;
-  void GenerateMembers(io::Printer* printer) const override;
-  void GenerateBuilderMembers(io::Printer* printer) const override;
-  void GenerateInitializationCode(io::Printer* printer) const override;
+  int GetNumBitsForMessage() const;
+  void GenerateInterfaceMembers(io::Printer* printer) const;
+  void GenerateMembers(io::Printer* printer) const;
+  void GenerateBuilderMembers(io::Printer* printer) const;
+  void GenerateInitializationCode(io::Printer* printer) const;
   void GenerateFieldInfo(io::Printer* printer,
-                         std::vector<uint16_t>* output) const override;
-  void GenerateKotlinDslMembers(io::Printer* printer) const override;
+                         std::vector<uint16_t>* output) const;
+  void GenerateKotlinDslMembers(io::Printer* printer) const;
 
-  std::string GetBoxedType() const override;
+  std::string GetBoxedType() const;
 
  private:
   const FieldDescriptor* descriptor_;
