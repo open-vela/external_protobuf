@@ -724,12 +724,12 @@ public final class Descriptors {
 
     /** Determines if the given field number is an extension. */
     public boolean isExtensionNumber(final int number) {
-      int index = Arrays.binarySearch(extensionRangeLowerBounds, number);
-      if (index < 0) {
-        index = ~index - 1;
+      for (final DescriptorProto.ExtensionRange range : proto.getExtensionRangeList()) {
+        if (range.getStart() <= number && number < range.getEnd()) {
+          return true;
+        }
       }
-      // extensionRangeLowerBounds[index] is the biggest value <= number
-      return index >= 0 && number < extensionRangeUpperBounds[index];
+      return false;
     }
 
     /** Determines if the given field number is reserved. */
@@ -831,9 +831,6 @@ public final class Descriptors {
     private final OneofDescriptor[] oneofs;
     private final int realOneofCount;
 
-    private final int[] extensionRangeLowerBounds;
-    private final int[] extensionRangeUpperBounds;
-
     // Used to create a placeholder when the type cannot be found.
     Descriptor(final String fullname) throws DescriptorValidationException {
       String name = fullname;
@@ -862,9 +859,6 @@ public final class Descriptors {
 
       // Create a placeholder FileDescriptor to hold this message.
       this.file = new FileDescriptor(packageName, this);
-
-      extensionRangeLowerBounds = new int[] {1};
-      extensionRangeUpperBounds = new int[] {536870912};
     }
 
     private Descriptor(
@@ -928,20 +922,6 @@ public final class Descriptors {
       this.realOneofCount = this.oneofs.length - syntheticOneofCount;
 
       file.pool.addSymbol(this);
-
-      // NOTE: The defined extension ranges are guaranteed to be disjoint.
-      extensionRangeLowerBounds = new int[proto.getExtensionRangeCount()];
-      extensionRangeUpperBounds = new int[proto.getExtensionRangeCount()];
-      int i = 0;
-      for (final DescriptorProto.ExtensionRange range : proto.getExtensionRangeList()) {
-        extensionRangeLowerBounds[i] = range.getStart();
-        extensionRangeUpperBounds[i] = range.getEnd();
-        i++;
-      }
-      // Since the ranges are disjoint, sorting these independently must still produce the correct
-      // order.
-      Arrays.sort(extensionRangeLowerBounds);
-      Arrays.sort(extensionRangeUpperBounds);
     }
 
     /** Look up and cross-link all field types, etc. */

@@ -336,7 +336,13 @@ class PROTOBUF_EXPORT MapFieldBase {
         mutex_(GOOGLE_PROTOBUF_LINKER_INITIALIZED),
         state_(STATE_MODIFIED_MAP) {}
   explicit MapFieldBase(Arena* arena)
-      : arena_(arena), repeated_field_(nullptr), state_(STATE_MODIFIED_MAP) {}
+      : arena_(arena), repeated_field_(NULL), state_(STATE_MODIFIED_MAP) {
+    // Mutex's destructor needs to be called explicitly to release resources
+    // acquired in its constructor.
+    if (arena) {
+      arena->OwnDestructor(&mutex_);
+    }
+  }
   virtual ~MapFieldBase();
 
   // Returns reference to internal repeated field. Data written using

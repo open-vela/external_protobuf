@@ -62,7 +62,6 @@ void MapFieldBase::Swap(MapFieldBase* other) {
 }
 
 void MapFieldBase::InternalSwap(MapFieldBase* other) {
-  std::swap(arena_, other->arena_);
   std::swap(repeated_field_, other->repeated_field_);
   // a relaxed swap of the atomic
   auto other_state = other->state_.load(std::memory_order_relaxed);
@@ -137,8 +136,12 @@ void MapFieldBase::SyncRepeatedFieldWithMap() const {
       // Double check state
       if (state_.load(std::memory_order_relaxed) == CLEAN) {
         if (repeated_field_ == nullptr) {
-          repeated_field_ =
-              Arena::CreateMessage<RepeatedPtrField<Message> >(arena_);
+          if (arena_ == nullptr) {
+            repeated_field_ = new RepeatedPtrField<Message>();
+          } else {
+            repeated_field_ =
+                Arena::CreateMessage<RepeatedPtrField<Message> >(arena_);
+          }
         }
         state_.store(CLEAN, std::memory_order_release);
       }
@@ -183,11 +186,11 @@ DynamicMapField::DynamicMapField(const Message* default_entry, Arena* arena)
       default_entry_(default_entry) {}
 
 DynamicMapField::~DynamicMapField() {
-  if (arena_ != nullptr) return;
-  // DynamicMapField owns map values. Need to delete them before clearing the
-  // map.
-  for (auto& kv : map_) {
-    kv.second.DeleteData();
+  // DynamicMapField owns map values. Need to delete them before clearing
+  // the map.
+  for (Map<MapKey, MapValueRef>::iterator iter = map_.begin();
+       iter != map_.end(); ++iter) {
+    iter->second.DeleteData();
   }
   map_.clear();
 }
@@ -399,8 +402,13 @@ void DynamicMapField::SyncRepeatedFieldWithMapNoLock() const {
   const FieldDescriptor* key_des = default_entry_->GetDescriptor()->map_key();
   const FieldDescriptor* val_des = default_entry_->GetDescriptor()->map_value();
   if (MapFieldBase::repeated_field_ == NULL) {
-    MapFieldBase::repeated_field_ =
-        Arena::CreateMessage<RepeatedPtrField<Message> >(MapFieldBase::arena_);
+    if (MapFieldBase::arena_ == NULL) {
+      MapFieldBase::repeated_field_ = new RepeatedPtrField<Message>();
+    } else {
+      MapFieldBase::repeated_field_ =
+          Arena::CreateMessage<RepeatedPtrField<Message> >(
+              MapFieldBase::arena_);
+    }
   }
 
   MapFieldBase::repeated_field_->Clear();
