@@ -2107,35 +2107,39 @@ TEST_F(RepeatedFieldInsertionIteratorsTest,
 TEST_F(RepeatedFieldInsertionIteratorsTest,
        UnsafeArenaAllocatedRepeatedPtrFieldWithStringIntData) {
   std::vector<Nested*> data;
-  Arena arena;
-  auto* goldenproto = Arena::CreateMessage<TestAllTypes>(&arena);
+  TestAllTypes goldenproto;
   for (int i = 0; i < 10; ++i) {
-    auto* new_data = goldenproto->add_repeated_nested_message();
+    Nested* new_data = new Nested;
     new_data->set_bb(i);
     data.push_back(new_data);
+
+    new_data = goldenproto.add_repeated_nested_message();
+    new_data->set_bb(i);
   }
-  auto* testproto = Arena::CreateMessage<TestAllTypes>(&arena);
+  TestAllTypes testproto;
   std::copy(data.begin(), data.end(),
             UnsafeArenaAllocatedRepeatedPtrFieldBackInserter(
-                testproto->mutable_repeated_nested_message()));
-  EXPECT_EQ(testproto->DebugString(), goldenproto->DebugString());
+                testproto.mutable_repeated_nested_message()));
+  EXPECT_EQ(testproto.DebugString(), goldenproto.DebugString());
 }
 
 TEST_F(RepeatedFieldInsertionIteratorsTest,
        UnsafeArenaAllocatedRepeatedPtrFieldWithString) {
   std::vector<std::string*> data;
-  Arena arena;
-  auto* goldenproto = Arena::CreateMessage<TestAllTypes>(&arena);
+  TestAllTypes goldenproto;
   for (int i = 0; i < 10; ++i) {
-    auto* new_data = goldenproto->add_repeated_string();
+    std::string* new_data = new std::string;
     *new_data = "name-" + StrCat(i);
     data.push_back(new_data);
+
+    new_data = goldenproto.add_repeated_string();
+    *new_data = "name-" + StrCat(i);
   }
-  auto* testproto = Arena::CreateMessage<TestAllTypes>(&arena);
+  TestAllTypes testproto;
   std::copy(data.begin(), data.end(),
             UnsafeArenaAllocatedRepeatedPtrFieldBackInserter(
-                testproto->mutable_repeated_string()));
-  EXPECT_EQ(testproto->DebugString(), goldenproto->DebugString());
+                testproto.mutable_repeated_string()));
+  EXPECT_EQ(testproto.DebugString(), goldenproto.DebugString());
 }
 
 TEST_F(RepeatedFieldInsertionIteratorsTest, MoveStrings) {

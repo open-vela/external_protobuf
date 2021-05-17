@@ -36,13 +36,10 @@
 
 #include <cstdint>
 #include <memory>
-#include <string>
 
 #include <google/protobuf/compiler/cpp/cpp_helpers.h>
 #include <google/protobuf/compiler/cpp/cpp_primitive_field.h>
 #include <google/protobuf/compiler/cpp/cpp_string_field.h>
-#include <google/protobuf/stubs/strutil.h>
-#include <google/protobuf/stubs/substitute.h>
 #include <google/protobuf/stubs/logging.h>
 #include <google/protobuf/stubs/common.h>
 #include <google/protobuf/compiler/cpp/cpp_enum_field.h>
@@ -51,6 +48,7 @@
 #include <google/protobuf/descriptor.pb.h>
 #include <google/protobuf/io/printer.h>
 #include <google/protobuf/wire_format.h>
+#include <google/protobuf/stubs/strutil.h>
 
 namespace google {
 namespace protobuf {
@@ -58,23 +56,6 @@ namespace compiler {
 namespace cpp {
 
 using internal::WireFormat;
-
-
-void AddAccessorAnnotations(const FieldDescriptor* descriptor,
-                            const Options& options,
-                            std::map<std::string, std::string>* variables) {
-  // Can be expanded to include more specific calls, for example, for arena or
-  // clear calls.
-  static constexpr const char* kAccessorsAnnotations[] = {
-      "annotate_add",     "annotate_get",         "annotate_has",
-      "annotate_list",    "annotate_mutable",     "annotate_mutable_list",
-      "annotate_release", "annotate_set",         "annotate_size",
-      "annotate_clear",   "annotate_add_mutable",
-  };
-  for (size_t i = 0; i < GOOGLE_ARRAYSIZE(kAccessorsAnnotations); ++i) {
-    (*variables)[kAccessorsAnnotations[i]] = "";
-  }
-}
 
 void SetCommonFieldVariables(const FieldDescriptor* descriptor,
                              std::map<std::string, std::string>* variables,
@@ -100,8 +81,7 @@ void SetCommonFieldVariables(const FieldDescriptor* descriptor,
   } else {
     (*variables)["set_hasbit_io"] = "";
   }
-
-  AddAccessorAnnotations(descriptor, options, variables);
+  (*variables)["annotate_accessor"] = "";
 
   // These variables are placeholders to pick out the beginning and ends of
   // identifiers for annotations (when doing so with existing variables would
