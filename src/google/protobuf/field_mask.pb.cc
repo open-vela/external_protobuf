@@ -103,7 +103,7 @@ FieldMask::~FieldMask() {
 }
 
 void FieldMask::SharedDtor() {
-  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+  GOOGLE_DCHECK(GetArena() == nullptr);
 }
 
 void FieldMask::ArenaDtor(void* object) {

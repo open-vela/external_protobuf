@@ -346,8 +346,18 @@ template <>
 PROTOBUF_NOINLINE
 #endif
     Arena*
-    GenericTypeHandler<Message>::GetOwningArena(Message* value) {
-  return value->GetOwningArena();
+    GenericTypeHandler<Message>::GetArena(Message* value) {
+  return value->GetArena();
+}
+template <>
+#if defined(_MSC_VER) && (_MSC_VER >= 1800)
+// Note: force noinline to workaround MSVC compiler bug with /Zc:inline, issue
+// #240
+PROTOBUF_NOINLINE
+#endif
+    void*
+    GenericTypeHandler<Message>::GetMaybeArenaPointer(Message* value) {
+  return value->GetMaybeArenaPointer();
 }
 }  // namespace internal
 

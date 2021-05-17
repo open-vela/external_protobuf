@@ -98,7 +98,7 @@ Empty::~Empty() {
 }
 
 void Empty::SharedDtor() {
-  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+  GOOGLE_DCHECK(GetArena() == nullptr);
 }
 
 void Empty::ArenaDtor(void* object) {
