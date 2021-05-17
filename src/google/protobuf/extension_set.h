@@ -282,13 +282,12 @@ class PROTOBUF_EXPORT ExtensionSet {
   void UnsafeArenaSetAllocatedMessage(int number, FieldType type,
                                       const FieldDescriptor* descriptor,
                                       MessageLite* message);
-  PROTOBUF_FUTURE_MUST_USE_RESULT MessageLite* ReleaseMessage(
-      int number, const MessageLite& prototype);
+  MessageLite* ReleaseMessage(int number, const MessageLite& prototype);
   MessageLite* UnsafeArenaReleaseMessage(int number,
                                          const MessageLite& prototype);
 
-  PROTOBUF_FUTURE_MUST_USE_RESULT MessageLite* ReleaseMessage(
-      const FieldDescriptor* descriptor, MessageFactory* factory);
+  MessageLite* ReleaseMessage(const FieldDescriptor* descriptor,
+                              MessageFactory* factory);
   MessageLite* UnsafeArenaReleaseMessage(const FieldDescriptor* descriptor,
                                          MessageFactory* factory);
 #undef desc
@@ -355,7 +354,7 @@ class PROTOBUF_EXPORT ExtensionSet {
 #undef desc
 
   void RemoveLast(int number);
-  PROTOBUF_FUTURE_MUST_USE_RESULT MessageLite* ReleaseLast(int number);
+  MessageLite* ReleaseLast(int number);
   void SwapElements(int number, int index1, int index2);
 
   // -----------------------------------------------------------------
@@ -535,8 +534,7 @@ class PROTOBUF_EXPORT ExtensionSet {
     virtual MessageLite* MutableMessage(const MessageLite& prototype) = 0;
     virtual void SetAllocatedMessage(MessageLite* message) = 0;
     virtual void UnsafeArenaSetAllocatedMessage(MessageLite* message) = 0;
-    virtual PROTOBUF_FUTURE_MUST_USE_RESULT MessageLite* ReleaseMessage(
-        const MessageLite& prototype) = 0;
+    virtual MessageLite* ReleaseMessage(const MessageLite& prototype) = 0;
     virtual MessageLite* UnsafeArenaReleaseMessage(
         const MessageLite& prototype) = 0;
 
@@ -1262,8 +1260,8 @@ class MessageTypeTraits {
                                              ExtensionSet* set) {
     set->UnsafeArenaSetAllocatedMessage(number, field_type, NULL, message);
   }
-  static inline PROTOBUF_FUTURE_MUST_USE_RESULT MutableType
-  Release(int number, FieldType /* field_type */, ExtensionSet* set) {
+  static inline MutableType Release(int number, FieldType /* field_type */,
+                                    ExtensionSet* set) {
     return static_cast<Type*>(
         set->ReleaseMessage(number, Type::default_instance()));
   }
@@ -1478,11 +1476,9 @@ class ExtensionIdentifier {
   template <typename _proto_TypeTraits,                                       \
             ::PROTOBUF_NAMESPACE_ID::internal::FieldType _field_type,         \
             bool _is_packed>                                                  \
-  inline PROTOBUF_FUTURE_MUST_USE_RESULT                                      \
-      typename _proto_TypeTraits::Singular::MutableType                       \
-      ReleaseExtension(                                                       \
-          const ::PROTOBUF_NAMESPACE_ID::internal::ExtensionIdentifier<       \
-              CLASSNAME, _proto_TypeTraits, _field_type, _is_packed>& id) {   \
+  inline typename _proto_TypeTraits::Singular::MutableType ReleaseExtension(  \
+      const ::PROTOBUF_NAMESPACE_ID::internal::ExtensionIdentifier<           \
+          CLASSNAME, _proto_TypeTraits, _field_type, _is_packed>& id) {       \
     return _proto_TypeTraits::Release(id.number(), _field_type,               \
                                       &_extensions_);                         \
   }                                                                           \

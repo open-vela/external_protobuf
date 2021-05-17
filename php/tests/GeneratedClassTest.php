@@ -1,5 +1,7 @@
 <?php
 
+require_once('generated/NoNamespaceEnum.php');
+require_once('generated/NoNamespaceMessage.php');
 require_once('test_base.php');
 require_once('test_util.php');
 
@@ -476,12 +478,10 @@ class GeneratedClassTest extends TestBase
         $sub_m->setA(1);
         $m->setOptionalMessage($sub_m);
         $this->assertSame(1, $m->getOptionalMessage()->getA());
-        $this->assertTrue($m->hasOptionalMessage());
 
         $null = null;
         $m->setOptionalMessage($null);
         $this->assertNull($m->getOptionalMessage());
-        $this->assertFalse($m->hasOptionalMessage());
     }
 
     public function testLegacyMessageField()
@@ -759,10 +759,10 @@ class GeneratedClassTest extends TestBase
     public function testMessageWithoutNamespace()
     {
         $m = new TestMessage();
-        $n = new NoNamespaceMessage();
+        $n = new NoNameSpaceMessage();
         $m->setOptionalNoNamespaceMessage($n);
         $repeatedNoNamespaceMessage = $m->getRepeatedNoNamespaceMessage();
-        $repeatedNoNamespaceMessage[] = new NoNamespaceMessage();
+        $repeatedNoNamespaceMessage[] = new NoNameSpaceMessage();
         $m->setRepeatedNoNamespaceMessage($repeatedNoNamespaceMessage);
 
         // test nested messages
@@ -775,9 +775,9 @@ class GeneratedClassTest extends TestBase
     public function testEnumWithoutNamespace()
     {
         $m = new TestMessage();
-        $m->setOptionalNoNamespaceEnum(NoNamespaceEnum::VALUE_A);
+        $m->setOptionalNoNamespaceEnum(NoNameSpaceEnum::VALUE_A);
         $repeatedNoNamespaceEnum = $m->getRepeatedNoNamespaceEnum();
-        $repeatedNoNamespaceEnum[] = NoNamespaceEnum::VALUE_A;
+        $repeatedNoNamespaceEnum[] = NoNameSpaceEnum::VALUE_A;
         $m->setRepeatedNoNamespaceEnum($repeatedNoNamespaceEnum);
         $this->assertTrue(true);
     }
@@ -1750,13 +1750,6 @@ class GeneratedClassTest extends TestBase
         $m->clear();
         $this->assertFalse($m->hasOneofInt32());
         $this->assertFalse($m->hasOneofString());
-
-        $sub_m = new Sub();
-        $sub_m->setA(1);
-        $m->setOneofMessage($sub_m);
-        $this->assertTrue($m->hasOneofMessage());
-        $m->setOneofMessage(null);
-        $this->assertFalse($m->hasOneofMessage());
     }
 
     #########################################################
@@ -1764,18 +1757,9 @@ class GeneratedClassTest extends TestBase
     #########################################################
 
     public function testUserDefinedClass() {
-        if (getenv("USE_ZEND_ALLOC") === "0") {
-            // We're running a memory test. This test appears to leak in a way
-            // we cannot control, PHP bug?
-            //
-            // TODO: investigate further.
-            $this->markTestSkipped();
-            return;
-        }
-
-        # This is not allowed, but at least we shouldn't crash.
-        $this->expectException(Exception::class);
-        new C();
+      # This is not allowed, but at least we shouldn't crash.
+      $this->expectException(Exception::class);
+      $p = new C();
     }
 
     #########################################################
@@ -1786,16 +1770,9 @@ class GeneratedClassTest extends TestBase
     {
         throw new Exception('Intended');
     }
+
     public function testNoSegfaultWithError()
     {
-        if (getenv("USE_ZEND_ALLOC") === "0") {
-            // We're running a memory test. This test appears to leak in a way
-            // we cannot control, PHP bug?
-            //
-            // TODO: investigate further.
-            $this->markTestSkipped();
-            return;
-        }
         $this->expectException(Exception::class);
 
         new TestMessage(['optional_int32' => $this->throwIntendedException()]);

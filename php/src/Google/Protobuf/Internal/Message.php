@@ -240,14 +240,10 @@ class Message
         $field = $this->desc->getFieldByNumber($number);
         $oneof = $this->desc->getOneofDecl()[$field->getOneofIndex()];
         $oneof_name = $oneof->getName();
-        if ($value === null) {
-            $this->$oneof_name = new OneofField($oneof);
-        } else {
-            $oneof_field = $this->$oneof_name;
-            $oneof_field->setValue($value);
-            $oneof_field->setFieldName($field->getName());
-            $oneof_field->setNumber($number);
-        }
+        $oneof_field = $this->$oneof_name;
+        $oneof_field->setValue($value);
+        $oneof_field->setFieldName($field->getName());
+        $oneof_field->setNumber($number);
     }
 
     protected function whichOneof($oneof_name)
@@ -1192,7 +1188,6 @@ class Message
                 $v->mergeFromJsonArray($value, $ignore_unknown);
                 $fields[$key] = $v;
             }
-            return;
         }
         if (is_a($this, "Google\Protobuf\Value")) {
             if (is_bool($array)) {
@@ -1246,13 +1241,7 @@ class Message
             if (is_null($field)) {
                 $field = $this->desc->getFieldByName($key);
                 if (is_null($field)) {
-                    if ($ignore_unknown) {
-                        continue;
-                    } else {
-                        throw new GPBDecodeException(
-                            $key . ' is unknown.'
-                        );
-                    }
+                    continue;
                 }
             }
             if ($field->isMap()) {
