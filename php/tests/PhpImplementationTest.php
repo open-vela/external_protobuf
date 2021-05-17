@@ -18,7 +18,7 @@ use Google\Protobuf\Internal\CodedOutputStream;
  * Please note, this test is only intended to be run without the protobuf C
  * extension.
  */
-class PhpImplementationTest extends TestBase
+class ImplementationTest extends TestBase
 {
     /**
      * Avoid calling setUp, which has void return type (not avalialbe in php7.0).

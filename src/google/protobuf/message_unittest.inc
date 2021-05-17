@@ -548,9 +548,8 @@ TEST(MESSAGE_TEST_NAME, ReleaseMustUseResult) {
   message.set_allocated_optional_foreign_message(f);
   auto* mf = message.mutable_optional_foreign_message();
   EXPECT_EQ(mf, f);
-  std::unique_ptr<UNITTEST::ForeignMessage> rf(
-      message.release_optional_foreign_message());
-  EXPECT_NE(rf.get(), nullptr);
+  EXPECT_NE(message.release_optional_foreign_message(), nullptr);
+  delete f;
 }
 
 TEST(MESSAGE_TEST_NAME, ParseFailsOnInvalidMessageEnd) {

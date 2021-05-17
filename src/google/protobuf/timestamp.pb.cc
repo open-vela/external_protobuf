@@ -19,7 +19,7 @@ PROTOBUF_PRAGMA_INIT_SEG
 PROTOBUF_NAMESPACE_OPEN
 constexpr Timestamp::Timestamp(
   ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized)
-  : seconds_(int64_t{0})
+  : seconds_(PROTOBUF_LONGLONG(0))
   , nanos_(0){}
 struct TimestampDefaultTypeInternal {
   constexpr TimestampDefaultTypeInternal()
@@ -110,7 +110,7 @@ Timestamp::~Timestamp() {
 }
 
 void Timestamp::SharedDtor() {
-  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+  GOOGLE_DCHECK(GetArena() == nullptr);
 }
 
 void Timestamp::ArenaDtor(void* object) {
