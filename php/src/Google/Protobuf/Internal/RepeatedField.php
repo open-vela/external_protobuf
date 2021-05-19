@@ -177,7 +177,8 @@ class RepeatedField implements \ArrayAccess, \IteratorAggregate, \Countable
                 break;
             case GPBType::MESSAGE:
                 if (is_null($value)) {
-                    throw new \TypeError("RepeatedField element cannot be null.");
+                  trigger_error("RepeatedField element cannot be null.",
+                                E_USER_ERROR);
                 }
                 GPBUtil::checkMessage($value, $this->klass);
                 break;

@@ -129,19 +129,6 @@ namespace Google.Protobuf
         }
 
         /// <summary>
-        /// Parses a message from the given span.
-        /// </summary>
-        /// <param name="data">The data to parse.</param>
-        /// <returns>The parsed message.</returns>
-        [SecuritySafeCritical]
-        public IMessage ParseFrom(ReadOnlySpan<byte> data)
-        {
-            IMessage message = factory();
-            message.MergeFrom(data, DiscardUnknownFields, Extensions);
-            return message;
-        }
-
-        /// <summary>
         /// Parses a length-delimited message from the given stream.
         /// </summary>
         /// <remarks>
@@ -322,19 +309,6 @@ namespace Google.Protobuf
         /// <returns>The parsed message.</returns>
         [SecuritySafeCritical]
         public new T ParseFrom(ReadOnlySequence<byte> data)
-        {
-            T message = factory();
-            message.MergeFrom(data, DiscardUnknownFields, Extensions);
-            return message;
-        }
-
-        /// <summary>
-        /// Parses a message from the given span.
-        /// </summary>
-        /// <param name="data">The data to parse.</param>
-        /// <returns>The parsed message.</returns>
-        [SecuritySafeCritical]
-        public new T ParseFrom(ReadOnlySpan<byte> data)
         {
             T message = factory();
             message.MergeFrom(data, DiscardUnknownFields, Extensions);
