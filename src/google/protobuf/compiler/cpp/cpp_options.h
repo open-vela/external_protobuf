@@ -74,7 +74,6 @@ struct Options {
     kTCTableGuarded,
     kTCTableAlways
   } tctable_mode = kTCTableNever;
-  bool inject_field_listener_events = false;
 };
 
 }  // namespace cpp

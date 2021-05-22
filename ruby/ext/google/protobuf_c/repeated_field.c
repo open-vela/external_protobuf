@@ -149,8 +149,7 @@ VALUE RepeatedField_deep_copy(VALUE _self) {
   return new_rptfield;
 }
 
-const upb_array* RepeatedField_GetUpbArray(VALUE val, const upb_fielddef* field,
-                                           upb_arena* arena) {
+const upb_array* RepeatedField_GetUpbArray(VALUE val, const upb_fielddef *field) {
   RepeatedField* self;
   TypeInfo type_info = TypeInfo_get(field);
 
@@ -168,7 +167,6 @@ const upb_array* RepeatedField_GetUpbArray(VALUE val, const upb_fielddef* field,
     rb_raise(cTypeError, "Repeated field array has wrong message/enum class");
   }
 
-  Arena_fuse(self->arena, arena);
   return self->array;
 }
 
@@ -414,7 +412,7 @@ static VALUE RepeatedField_dup(VALUE _self) {
   int size = upb_array_size(self->array);
   int i;
 
-  Arena_fuse(self->arena, arena);
+  upb_arena_fuse(arena, Arena_get(self->arena));
 
   for (i = 0; i < size; i++) {
     upb_msgval msgval = upb_array_get(self->array, i);

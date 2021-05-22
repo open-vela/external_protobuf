@@ -1212,8 +1212,7 @@ inline void TestUtil::ReflectionTester::ExpectMessagesReleasedViaReflection(
         break;
       case NOT_NULL:
         EXPECT_TRUE(released != nullptr);
-        if (Arena::InternalHelper<Message>::GetArenaForAllocation(message) ==
-            nullptr) {
+        if (message->GetArena() == nullptr) {
           // released message must be same as sub_message if source message is
           // not on arena.
           EXPECT_EQ(&sub_message, released);
