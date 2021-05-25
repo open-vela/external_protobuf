@@ -129,7 +129,7 @@ void MapFieldGenerator::GenerateInlineAccessorDefinitions(
       "}\n"
       "inline const ::$proto_ns$::Map< $key_cpp$, $val_cpp$ >&\n"
       "$classname$::$name$() const {\n"
-      "$annotate_get$"
+      "$annotate_accessor$"
       "  // @@protoc_insertion_point(field_map:$full_name$)\n"
       "  return _internal_$name$();\n"
       "}\n"
@@ -139,7 +139,7 @@ void MapFieldGenerator::GenerateInlineAccessorDefinitions(
       "}\n"
       "inline ::$proto_ns$::Map< $key_cpp$, $val_cpp$ >*\n"
       "$classname$::mutable_$name$() {\n"
-      "$annotate_mutable$"
+      "$annotate_accessor$"
       "  // @@protoc_insertion_point(field_mutable_map:$full_name$)\n"
       "  return _internal_mutable_$name$();\n"
       "}\n");
