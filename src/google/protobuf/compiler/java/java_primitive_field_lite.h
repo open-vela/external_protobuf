@@ -62,20 +62,20 @@ class ImmutablePrimitiveFieldLiteGenerator
  public:
   explicit ImmutablePrimitiveFieldLiteGenerator(
       const FieldDescriptor* descriptor, int messageBitIndex, Context* context);
-  ~ImmutablePrimitiveFieldLiteGenerator() override;
+  ~ImmutablePrimitiveFieldLiteGenerator();
 
   // implements ImmutableFieldLiteGenerator
   // ------------------------------------
-  int GetNumBitsForMessage() const override;
-  void GenerateInterfaceMembers(io::Printer* printer) const override;
-  void GenerateMembers(io::Printer* printer) const override;
-  void GenerateBuilderMembers(io::Printer* printer) const override;
-  void GenerateInitializationCode(io::Printer* printer) const override;
+  int GetNumBitsForMessage() const;
+  void GenerateInterfaceMembers(io::Printer* printer) const;
+  void GenerateMembers(io::Printer* printer) const;
+  void GenerateBuilderMembers(io::Printer* printer) const;
+  void GenerateInitializationCode(io::Printer* printer) const;
   void GenerateFieldInfo(io::Printer* printer,
-                         std::vector<uint16_t>* output) const override;
-  void GenerateKotlinDslMembers(io::Printer* printer) const override;
+                         std::vector<uint16_t>* output) const;
+  void GenerateKotlinDslMembers(io::Printer* printer) const;
 
-  std::string GetBoxedType() const override;
+  std::string GetBoxedType() const;
 
  protected:
   const FieldDescriptor* descriptor_;
@@ -110,19 +110,19 @@ class RepeatedImmutablePrimitiveFieldLiteGenerator
  public:
   explicit RepeatedImmutablePrimitiveFieldLiteGenerator(
       const FieldDescriptor* descriptor, int messageBitIndex, Context* context);
-  ~RepeatedImmutablePrimitiveFieldLiteGenerator() override;
+  virtual ~RepeatedImmutablePrimitiveFieldLiteGenerator();
 
   // implements ImmutableFieldLiteGenerator ------------------------------------
-  int GetNumBitsForMessage() const override;
-  void GenerateInterfaceMembers(io::Printer* printer) const override;
-  void GenerateMembers(io::Printer* printer) const override;
-  void GenerateBuilderMembers(io::Printer* printer) const override;
-  void GenerateInitializationCode(io::Printer* printer) const override;
+  int GetNumBitsForMessage() const;
+  void GenerateInterfaceMembers(io::Printer* printer) const;
+  void GenerateMembers(io::Printer* printer) const;
+  void GenerateBuilderMembers(io::Printer* printer) const;
+  void GenerateInitializationCode(io::Printer* printer) const;
   void GenerateFieldInfo(io::Printer* printer,
-                         std::vector<uint16_t>* output) const override;
-  void GenerateKotlinDslMembers(io::Printer* printer) const override;
-
-  std::string GetBoxedType() const override;
+                         std::vector<uint16_t>* output) const;
+  void GenerateKotlinDslMembers(io::Printer* printer) const;
+      
+  std::string GetBoxedType() const;
 
  private:
   const FieldDescriptor* descriptor_;
