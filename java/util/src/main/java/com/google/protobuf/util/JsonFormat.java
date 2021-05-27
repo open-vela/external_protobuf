@@ -1295,6 +1295,7 @@ public class JsonFormat {
   private static class ParserImpl {
     private final com.google.protobuf.TypeRegistry registry;
     private final TypeRegistry oldRegistry;
+    private final JsonParser jsonParser;
     private final boolean ignoringUnknownFields;
     private final int recursionLimit;
     private int currentDepth;
@@ -1307,6 +1308,7 @@ public class JsonFormat {
       this.registry = registry;
       this.oldRegistry = oldRegistry;
       this.ignoringUnknownFields = ignoreUnknownFields;
+      this.jsonParser = new JsonParser();
       this.recursionLimit = recursionLimit;
       this.currentDepth = 0;
     }
@@ -1315,7 +1317,7 @@ public class JsonFormat {
       try {
         JsonReader reader = new JsonReader(json);
         reader.setLenient(false);
-        merge(JsonParser.parseReader(reader), builder);
+        merge(jsonParser.parse(reader), builder);
       } catch (InvalidProtocolBufferException e) {
         throw e;
       } catch (JsonIOException e) {
@@ -1335,7 +1337,7 @@ public class JsonFormat {
       try {
         JsonReader reader = new JsonReader(new StringReader(json));
         reader.setLenient(false);
-        merge(JsonParser.parseReader(reader), builder);
+        merge(jsonParser.parse(reader), builder);
       } catch (InvalidProtocolBufferException e) {
         throw e;
       } catch (Exception e) {
