@@ -183,7 +183,8 @@
 #ifdef PROTOBUF_TAILCALL
 #error PROTOBUF_TAILCALL was previously defined
 #endif
-#if __has_cpp_attribute(clang::musttail) && !defined(_ARCH_PPC)
+#if __has_cpp_attribute(clang::musttail) && \
+  !defined(_ARCH_PPC) && !defined(__wasm__)
 #  ifndef PROTO2_OPENSOURCE
 // Compilation fails on powerpc64le: b/187985113
 #  endif
@@ -408,6 +409,14 @@
 #endif
 # define PROTOBUF_MUST_USE_RESULT
 
+#ifdef PROTOBUF_MUST_USE_EXTRACT_RESULT
+#error PROTOBUF_MUST_USE_EXTRACT_RESULT was previously defined
+#endif
+
+#ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
+#error PROTOBUF_FORCE_COPY_IN_RELEASE was previously defined
+#endif
+
 #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
 #error PROTOBUF_FORCE_COPY_IN_SWAP was previously defined
 #endif
@@ -499,10 +508,9 @@
 #ifdef PROTOBUF_CONSTINIT
 #error PROTOBUF_CONSTINIT was previously defined
 #endif
-#if defined(__cpp_constinit) && !PROTOBUF_GNUC_MIN(3, 0) && !defined(_MSC_VER)
+#if defined(__cpp_constinit) && !PROTOBUF_GNUC_MIN(3, 0)
 // Our use of constinit does not yet work with GCC:
 // https://github.com/protocolbuffers/protobuf/issues/8310
-// Does not work yet with Visual Studio 2019 Update 16.10
 #define PROTOBUF_CONSTINIT constinit
 #elif __has_cpp_attribute(clang::require_constant_initialization)
 #define PROTOBUF_CONSTINIT [[clang::require_constant_initialization]]

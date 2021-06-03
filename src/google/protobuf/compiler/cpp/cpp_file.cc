@@ -1139,7 +1139,7 @@ void FileGenerator::GenerateLibraryIncludes(io::Printer* printer) {
     GOOGLE_CHECK(!options_.opensource_runtime);
     IncludeFile("net/proto2/public/weak_field_map.h", printer);
   }
-  if (HasLazyFields(file_, options_)) {
+  if (HasLazyFields(file_, options_, &scc_analyzer_)) {
     GOOGLE_CHECK(!options_.opensource_runtime);
     IncludeFile("net/proto2/public/lazy_field.h", printer);
   }
@@ -1298,7 +1298,7 @@ void FileGenerator::GenerateGlobalStateFunctionDeclarations(
       std::max(size_t(1), message_generators_.size()));
   if (HasDescriptorMethods(file_, options_)) {
     format(
-        "extern $dllexport_decl $const ::$proto_ns$::internal::DescriptorTable "
+        "$dllexport_decl $extern const ::$proto_ns$::internal::DescriptorTable "
         "$desc_table$;\n");
   }
 }
