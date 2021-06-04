@@ -193,10 +193,8 @@ else (protobuf_BUILD_SHARED_LIBS)
 endif (protobuf_BUILD_SHARED_LIBS)
 
 if (MSVC)
-  if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-    # Build with multiple processes
-    add_definitions(/MP)
-  endif()
+  # Build with multiple processes
+  add_definitions(/MP)
   # MSVC warning suppressions
   add_definitions(
     /wd4018 # 'expression' : signed/unsigned mismatch
@@ -224,14 +222,12 @@ if (MSVC)
   # Suppress linker warnings about files with no symbols defined.
   set(CMAKE_STATIC_LINKER_FLAGS "${CMAKE_STATIC_LINKER_FLAGS} /ignore:4221")
 
-  if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-    # Configure Resource Compiler
-    enable_language(RC)
-    # use English language (0x409) in resource compiler
-    set(rc_flags "/l0x409")
-    # fix rc.exe invocations because of usage of add_definitions()
-    set(CMAKE_RC_COMPILE_OBJECT "<CMAKE_RC_COMPILER> ${rc_flags} <DEFINES> /fo<OBJECT> <SOURCE>")
-  endif()
+  # Configure Resource Compiler
+  enable_language(RC)
+  # use English language (0x409) in resource compiler
+  set(rc_flags "/l0x409")
+  # fix rc.exe invocations because of usage of add_definitions()
+  set(CMAKE_RC_COMPILE_OBJECT "<CMAKE_RC_COMPILER> ${rc_flags} <DEFINES> /fo<OBJECT> <SOURCE>")
 
   configure_file(version.rc.in ${CMAKE_CURRENT_BINARY_DIR}/version.rc @ONLY)
 endif (MSVC)
