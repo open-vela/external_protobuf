@@ -46,8 +46,9 @@ namespace protobuf {
 namespace compiler {
 namespace csharp {
 
-SourceGeneratorBase::SourceGeneratorBase(
-    const Options *options) : options_(options) {
+SourceGeneratorBase::SourceGeneratorBase(const FileDescriptor* descriptor,
+                                         const Options *options)
+    : descriptor_(descriptor), options_(options) {
 }
 
 SourceGeneratorBase::~SourceGeneratorBase() {

@@ -220,7 +220,8 @@ DefaultValueObjectWriter::Node* DefaultValueObjectWriter::Node::FindChild(
   if (name.empty() || kind_ != OBJECT) {
     return nullptr;
   }
-  for (Node* child : children_) {
+  for (int i = 0; i < children_.size(); ++i) {
+    Node* child = children_[i];
     if (child->name() == name) {
       return child;
     }
@@ -264,7 +265,8 @@ void DefaultValueObjectWriter::Node::WriteTo(ObjectWriter* ow) {
 }
 
 void DefaultValueObjectWriter::Node::WriteChildren(ObjectWriter* ow) {
-  for (Node* child : children_) {
+  for (int i = 0; i < children_.size(); ++i) {
+    Node* child = children_[i];
     child->WriteTo(ow);
   }
 }

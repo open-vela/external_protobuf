@@ -65,7 +65,7 @@ class ImmutableMapFieldGenerator : public ImmutableFieldGenerator {
   void GenerateHashCode(io::Printer* printer) const override;
   void GenerateKotlinDslMembers(io::Printer* printer) const override;
 
-  std::string GetBoxedType() const override;
+  std::string GetBoxedType() const;
 
  private:
   const FieldDescriptor* descriptor_;
