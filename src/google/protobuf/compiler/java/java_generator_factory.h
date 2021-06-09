@@ -81,13 +81,13 @@ class ImmutableGeneratorFactory : public GeneratorFactory {
   virtual ~ImmutableGeneratorFactory();
 
   virtual MessageGenerator* NewMessageGenerator(
-      const Descriptor* descriptor) const override;
+      const Descriptor* descriptor) const;
 
   virtual ExtensionGenerator* NewExtensionGenerator(
-      const FieldDescriptor* descriptor) const override;
+      const FieldDescriptor* descriptor) const;
 
   virtual ServiceGenerator* NewServiceGenerator(
-      const ServiceDescriptor* descriptor) const override;
+      const ServiceDescriptor* descriptor) const;
 
  private:
   Context* context_;
