@@ -254,7 +254,7 @@ Version::Version(const Version& from)
   // @@protoc_insertion_point(copy_constructor:google.protobuf.compiler.Version)
 }
 
-void Version::SharedCtor() {
+inline void Version::SharedCtor() {
 suffix_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 ::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
     reinterpret_cast<char*>(&major_) - reinterpret_cast<char*>(this)),
@@ -583,7 +583,7 @@ CodeGeneratorRequest::CodeGeneratorRequest(const CodeGeneratorRequest& from)
   // @@protoc_insertion_point(copy_constructor:google.protobuf.compiler.CodeGeneratorRequest)
 }
 
-void CodeGeneratorRequest::SharedCtor() {
+inline void CodeGeneratorRequest::SharedCtor() {
 parameter_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 compiler_version_ = nullptr;
 }
@@ -939,7 +939,7 @@ CodeGeneratorResponse_File::CodeGeneratorResponse_File(const CodeGeneratorRespon
   // @@protoc_insertion_point(copy_constructor:google.protobuf.compiler.CodeGeneratorResponse.File)
 }
 
-void CodeGeneratorResponse_File::SharedCtor() {
+inline void CodeGeneratorResponse_File::SharedCtor() {
 name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 insertion_point_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 content_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
@@ -1282,7 +1282,7 @@ CodeGeneratorResponse::CodeGeneratorResponse(const CodeGeneratorResponse& from)
   // @@protoc_insertion_point(copy_constructor:google.protobuf.compiler.CodeGeneratorResponse)
 }
 
-void CodeGeneratorResponse::SharedCtor() {
+inline void CodeGeneratorResponse::SharedCtor() {
 error_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 supported_features_ = uint64_t{0u};
 }

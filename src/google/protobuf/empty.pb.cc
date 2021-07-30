@@ -91,7 +91,7 @@ Empty::Empty(const Empty& from)
   // @@protoc_insertion_point(copy_constructor:google.protobuf.Empty)
 }
 
-void Empty::SharedCtor() {
+inline void Empty::SharedCtor() {
 }
 
 Empty::~Empty() {
