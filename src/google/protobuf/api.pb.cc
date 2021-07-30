@@ -215,7 +215,7 @@ Api::Api(const Api& from)
   // @@protoc_insertion_point(copy_constructor:google.protobuf.Api)
 }
 
-void Api::SharedCtor() {
+inline void Api::SharedCtor() {
 name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 version_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 ::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
@@ -625,7 +625,7 @@ Method::Method(const Method& from)
   // @@protoc_insertion_point(copy_constructor:google.protobuf.Method)
 }
 
-void Method::SharedCtor() {
+inline void Method::SharedCtor() {
 name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 request_type_url_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 response_type_url_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
@@ -1013,7 +1013,7 @@ Mixin::Mixin(const Mixin& from)
   // @@protoc_insertion_point(copy_constructor:google.protobuf.Mixin)
 }
 
-void Mixin::SharedCtor() {
+inline void Mixin::SharedCtor() {
 name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 root_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
