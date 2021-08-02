@@ -102,6 +102,7 @@ cc_library(
     deps = [
         ":fastdecode",
         ":port",
+        "//third_party/wyhash",
     ],
 )
 
@@ -259,6 +260,7 @@ cc_library(
     srcs = ["upb.c"],
     hdrs = ["upb.h"],
     copts = UPB_DEFAULT_COPTS,
+    deps = ["//third_party/wyhash"],
 )
 
 upb_amalgamation(
@@ -285,6 +287,7 @@ cc_library(
     srcs = ["php-upb.c"],
     hdrs = ["php-upb.h"],
     copts = UPB_DEFAULT_COPTS,
+    deps = ["//third_party/wyhash"],
 )
 
 upb_amalgamation(
@@ -310,6 +313,7 @@ cc_library(
     srcs = ["ruby-upb.c"],
     hdrs = ["ruby-upb.h"],
     copts = UPB_DEFAULT_COPTS,
+    deps = ["//third_party/wyhash"],
 )
 
 exports_files(
