@@ -41,6 +41,7 @@
 
 #include "message.h"
 #include "protobuf.h"
+#include "third_party/wyhash/wyhash.h"
 
 static upb_strview Convert_StringData(VALUE str, upb_arena *arena) {
   upb_strview ret;
@@ -327,19 +328,19 @@ bool Msgval_IsEqual(upb_msgval val1, upb_msgval val2, TypeInfo type_info) {
 uint64_t Msgval_GetHash(upb_msgval val, TypeInfo type_info, uint64_t seed) {
   switch (type_info.type) {
     case UPB_TYPE_BOOL:
-      return Wyhash(&val, 1, seed, kWyhashSalt);
+      return wyhash(&val, 1, seed, _wyp);
     case UPB_TYPE_FLOAT:
     case UPB_TYPE_INT32:
     case UPB_TYPE_UINT32:
     case UPB_TYPE_ENUM:
-      return Wyhash(&val, 4, seed, kWyhashSalt);
+      return wyhash(&val, 4, seed, _wyp);
     case UPB_TYPE_DOUBLE:
     case UPB_TYPE_INT64:
     case UPB_TYPE_UINT64:
-      return Wyhash(&val, 8, seed, kWyhashSalt);
+      return wyhash(&val, 8, seed, _wyp);
     case UPB_TYPE_STRING:
     case UPB_TYPE_BYTES:
-      return Wyhash(val.str_val.data, val.str_val.size, seed, kWyhashSalt);
+      return wyhash(val.str_val.data, val.str_val.size, seed, _wyp);
     case UPB_TYPE_MESSAGE:
       return Message_Hash(val.msg_val, type_info.def.msgdef, seed);
     default:
