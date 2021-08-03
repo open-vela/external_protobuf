@@ -32,7 +32,6 @@
 
 #include <google/protobuf/stubs/stringprintf.h>
 
-#include <array>
 #include <cerrno>
 #include <string>
 
@@ -92,9 +91,7 @@ TEST(StringPrintfTest, Multibyte) {
   // out of memory while trying to determine destination buffer size.
   // see b/4194543.
 
-  char* old_locale_c = setlocale(LC_CTYPE, nullptr);
-  ASSERT_TRUE(old_locale_c != nullptr);
-  std::string old_locale = old_locale_c;
+  char* old_locale = setlocale(LC_CTYPE, nullptr);
   // Push locale with multibyte mode
   setlocale(LC_CTYPE, "en_US.utf8");
 
@@ -109,25 +106,24 @@ TEST(StringPrintfTest, Multibyte) {
 
   // Repeat with longer string, to make sure that the dynamically
   // allocated path in StringAppendV is handled correctly.
-  const size_t n = 2048;
-  std::array<char, n+1> buf;
-  memset(&buf[0], ' ', n-3);
-  memcpy(&buf[0] + n - 3, kInvalidCodePoint, 4);
-  value =  StringPrintf("%.*s", n, &buf[0]);
+  int n = 2048;
+  char* buf = new char[n+1];
+  memset(buf, ' ', n-3);
+  memcpy(buf + n - 3, kInvalidCodePoint, 4);
+  value =  StringPrintf("%.*s", n, buf);
   // See GRTEv2 vs. GRTEv3 comment above.
-  EXPECT_TRUE(value.empty() || value == &buf[0]);
+  EXPECT_TRUE(value.empty() || value == buf);
+  delete[] buf;
 
-  setlocale(LC_CTYPE, old_locale.c_str());
+  setlocale(LC_CTYPE, old_locale);
 }
 
 TEST(StringPrintfTest, NoMultibyte) {
   // No multibyte handling, but the string contains funny chars.
-  char* old_locale_c = setlocale(LC_CTYPE, nullptr);
-  ASSERT_TRUE(old_locale_c != nullptr);
-  std::string old_locale = old_locale_c;
+  char* old_locale = setlocale(LC_CTYPE, nullptr);
   setlocale(LC_CTYPE, "POSIX");
   std::string value = StringPrintf("%.*s", 3, "\375\067s");
-  setlocale(LC_CTYPE, old_locale.c_str());
+  setlocale(LC_CTYPE, old_locale);
   EXPECT_EQ("\375\067s", value);
 }
 

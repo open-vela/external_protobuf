@@ -53,14 +53,13 @@ const char kAnyFullTypeName[] = "google.protobuf.Any";
 const char kTypeGoogleApisComPrefix[] = "type.googleapis.com/";
 const char kTypeGoogleProdComPrefix[] = "type.googleprod.com/";
 
-bool AnyMetadata::InternalPackFrom(Arena* arena,
-                                   const MessageLite& message,
+bool AnyMetadata::InternalPackFrom(const MessageLite& message,
                                    StringPiece type_url_prefix,
                                    StringPiece type_name) {
   type_url_->Set(&::google::protobuf::internal::GetEmptyString(),
-                 GetTypeUrl(type_name, type_url_prefix), arena);
+                 GetTypeUrl(type_name, type_url_prefix), nullptr);
   return message.SerializeToString(
-      value_->Mutable(ArenaStringPtr::EmptyDefault{}, arena));
+      value_->Mutable(ArenaStringPtr::EmptyDefault{}, nullptr));
 }
 
 bool AnyMetadata::InternalUnpackTo(StringPiece type_name,
