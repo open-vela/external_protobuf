@@ -30,8 +30,11 @@
 
 package com.google.protobuf;
 
-import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.Truth.assertWithMessage;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.lang.ref.SoftReference;
 import java.nio.ByteBuffer;
@@ -53,7 +56,7 @@ import java.util.logging.Logger;
  * @author martinrb@google.com (Martin Buchholz)
  */
 final class IsValidUtf8TestUtil {
-  private static final Logger logger = Logger.getLogger(IsValidUtf8TestUtil.class.getName());
+  private static Logger logger = Logger.getLogger(IsValidUtf8TestUtil.class.getName());
 
   private IsValidUtf8TestUtil() {}
 
@@ -77,7 +80,8 @@ final class IsValidUtf8TestUtil {
         }
       };
 
-  private static final ThreadLocal<SoftReference<ByteBuffer>> directBuffer = new ThreadLocal<>();
+  private static ThreadLocal<SoftReference<ByteBuffer>> directBuffer =
+      new ThreadLocal<SoftReference<ByteBuffer>>();
 
   /**
    * Factory for direct {@link ByteBuffer} instances. To reduce direct memory usage, this uses a
@@ -167,7 +171,7 @@ final class IsValidUtf8TestUtil {
     final long expected;
 
     public Shard(long index, long start, long lim, long expected) {
-      assertThat(start).isLessThan(lim);
+      assertTrue(start < lim);
       this.index = index;
       this.start = start;
       this.lim = lim;
@@ -212,11 +216,11 @@ final class IsValidUtf8TestUtil {
       generateFourByteShards(128, FOUR_BYTE_SHARDS_EXPECTED_ROUNTRIPPABLES);
 
   private static List<Shard> generateFourByteShards(int numShards, long[] expected) {
-    assertThat(expected).hasLength(numShards);
-    List<Shard> shards = new ArrayList<>(numShards);
+    assertEquals(numShards, expected.length);
+    List<Shard> shards = new ArrayList<Shard>(numShards);
     long lim = 1L << 32;
     long increment = lim / numShards;
-    assertThat(lim % numShards).isEqualTo(0);
+    assertTrue(lim % numShards == 0);
     for (int i = 0; i < numShards; i++) {
       shards.add(new Shard(i, increment * i, increment * (i + 1), expected[i]));
     }
@@ -272,11 +276,11 @@ final class IsValidUtf8TestUtil {
       }
 
       // Check agreement with static Utf8 methods.
-      assertThat(Utf8.isValidUtf8(bytes)).isEqualTo(isRoundTrippable);
-      assertThat(Utf8.isValidUtf8(bytes, 0, numBytes)).isEqualTo(isRoundTrippable);
+      assertEquals(isRoundTrippable, Utf8.isValidUtf8(bytes));
+      assertEquals(isRoundTrippable, Utf8.isValidUtf8(bytes, 0, numBytes));
 
       try {
-        assertThat(Utf8.decodeUtf8(bytes, 0, numBytes)).isEqualTo(s);
+        assertEquals(s, Utf8.decodeUtf8(bytes, 0, numBytes));
       } catch (InvalidProtocolBufferException e) {
         if (isRoundTrippable) {
           System.out.println("Could not decode utf-8");
@@ -300,32 +304,31 @@ final class IsValidUtf8TestUtil {
         System.out.printf("state=%04x %04x %04x i=%d j=%d%n", state1, state2, state3, i, j);
         outputFailure(byteChar, bytes, bytesReencoded);
       }
-      assertThat((state3 == Utf8.COMPLETE)).isEqualTo(isRoundTrippable);
+      assertEquals(isRoundTrippable, (state3 == Utf8.COMPLETE));
 
       // Test ropes built out of small partial sequences
       ByteString rope =
           RopeByteString.newInstanceForTest(
               bs.substring(0, i),
               RopeByteString.newInstanceForTest(bs.substring(i, j), bs.substring(j, numBytes)));
-      assertThat(rope.getClass()).isSameInstanceAs(RopeByteString.class);
+      assertSame(RopeByteString.class, rope.getClass());
 
       ByteString[] byteStrings = {bs, bs.substring(0, numBytes), rope};
       for (ByteString x : byteStrings) {
-        assertThat(x.isValidUtf8()).isEqualTo(isRoundTrippable);
-        assertThat(x.partialIsValidUtf8(Utf8.COMPLETE, 0, numBytes)).isEqualTo(state3);
+        assertEquals(isRoundTrippable, x.isValidUtf8());
+        assertEquals(state3, x.partialIsValidUtf8(Utf8.COMPLETE, 0, numBytes));
 
-        assertThat(x.partialIsValidUtf8(Utf8.COMPLETE, 0, i)).isEqualTo(state1);
-        assertThat(x.substring(0, i).partialIsValidUtf8(Utf8.COMPLETE, 0, i)).isEqualTo(state1);
-        assertThat(x.partialIsValidUtf8(state1, i, j - i)).isEqualTo(state2);
-        assertThat(x.substring(i, j).partialIsValidUtf8(state1, 0, j - i)).isEqualTo(state2);
-        assertThat(x.partialIsValidUtf8(state2, j, numBytes - j)).isEqualTo(state3);
-        assertThat(x.substring(j, numBytes).partialIsValidUtf8(state2, 0, numBytes - j))
-            .isEqualTo(state3);
+        assertEquals(state1, x.partialIsValidUtf8(Utf8.COMPLETE, 0, i));
+        assertEquals(state1, x.substring(0, i).partialIsValidUtf8(Utf8.COMPLETE, 0, i));
+        assertEquals(state2, x.partialIsValidUtf8(state1, i, j - i));
+        assertEquals(state2, x.substring(i, j).partialIsValidUtf8(state1, 0, j - i));
+        assertEquals(state3, x.partialIsValidUtf8(state2, j, numBytes - j));
+        assertEquals(state3, x.substring(j, numBytes).partialIsValidUtf8(state2, 0, numBytes - j));
       }
 
       // ByteString reduplication should not affect its UTF-8 validity.
       ByteString ropeADope = RopeByteString.newInstanceForTest(bs, bs.substring(0, numBytes));
-      assertThat(ropeADope.isValidUtf8()).isEqualTo(isRoundTrippable);
+      assertEquals(isRoundTrippable, ropeADope.isValidUtf8());
 
       if (isRoundTrippable) {
         countRoundTripped++;
@@ -336,7 +339,7 @@ final class IsValidUtf8TestUtil {
       }
     }
     logger.info("Round tripped " + countRoundTripped + " of " + count);
-    assertThat(countRoundTripped).isEqualTo(expectedCount);
+    assertEquals(expectedCount, countRoundTripped);
   }
 
   /**
@@ -394,17 +397,17 @@ final class IsValidUtf8TestUtil {
       }
       boolean isRoundTrippable = factory.newByteString(bytes).isValidUtf8();
       CoderResult result = decoder.decode(bb, cb, true);
-      assertThat(result.isError()).isFalse();
+      assertFalse(result.isError());
       result = decoder.flush(cb);
-      assertThat(result.isError()).isFalse();
+      assertFalse(result.isError());
 
       int charLen = cb.position();
       cb.rewind();
       cb.limit(charLen);
       result = encoder.encode(cb, bbReencoded, true);
-      assertThat(result.isError()).isFalse();
+      assertFalse(result.isError());
       result = encoder.flush(bbReencoded);
-      assertThat(result.isError()).isFalse();
+      assertFalse(result.isError());
 
       boolean bytesEqual = true;
       int bytesLen = bbReencoded.position();
@@ -431,7 +434,7 @@ final class IsValidUtf8TestUtil {
       }
     }
     logger.info("Round tripped " + countRoundTripped + " of " + count);
-    assertThat(countRoundTripped).isEqualTo(expectedCount);
+    assertEquals(expectedCount, countRoundTripped);
   }
 
   private static void outputFailure(long byteChar, byte[] bytes, byte[] after) {
@@ -439,8 +442,10 @@ final class IsValidUtf8TestUtil {
   }
 
   private static void outputFailure(long byteChar, byte[] bytes, byte[] after, int len) {
-    assertWithMessage("Failure: (%s) %s => %s",
-            Long.toHexString(byteChar), toHexString(bytes), toHexString(after, len)).fail();
+    fail(
+        String.format(
+            "Failure: (%s) %s => %s",
+            Long.toHexString(byteChar), toHexString(bytes), toHexString(after, len)));
   }
 
   private static String toHexString(byte[] b) {
