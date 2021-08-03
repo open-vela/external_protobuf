@@ -495,12 +495,12 @@ class Proto2Test {
         this[UnittestProto.repeatedBytesExtension] += toBytes("316")
         this[UnittestProto.repeatedGroupExtension] += repeatedGroupExtension { a = 317 }
         this[UnittestProto.repeatedNestedMessageExtension] +=
-          TestAllTypesKt.nestedMessage { bb = 318 }
+	  TestAllTypesKt.nestedMessage { bb = 318 }
         this[UnittestProto.repeatedForeignMessageExtension] += foreignMessage { c = 319 }
         this[UnittestProto.repeatedImportMessageExtension] +=
           ImportMessage.newBuilder().setD(320).build()
         this[UnittestProto.repeatedLazyMessageExtension] +=
-          TestAllTypesKt.nestedMessage { bb = 327 }
+	  TestAllTypesKt.nestedMessage { bb = 327 }
         this[UnittestProto.repeatedNestedEnumExtension] += NestedEnum.BAZ
         this[UnittestProto.repeatedForeignEnumExtension] += ForeignEnum.FOREIGN_BAZ
         this[UnittestProto.repeatedImportEnumExtension] += ImportEnum.IMPORT_BAZ

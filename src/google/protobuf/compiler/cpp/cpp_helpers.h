@@ -363,7 +363,7 @@ inline bool IsEagerlyVerifiedLazy(const FieldDescriptor* field,
 }
 
 inline bool IsFieldUsed(const FieldDescriptor* /* field */,
-                        const Options& options) {
+                        const Options& /* options */) {
   return true;
 }
 
