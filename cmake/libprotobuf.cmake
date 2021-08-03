@@ -108,7 +108,7 @@ set(libprotobuf_includes
   ${protobuf_source_dir}/src/google/protobuf/wrappers.pb.h
 )
 
-if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+if (MSVC)
 set(libprotobuf_rc_files
   ${CMAKE_CURRENT_BINARY_DIR}/version.rc
 )

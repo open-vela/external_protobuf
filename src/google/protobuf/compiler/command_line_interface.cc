@@ -298,36 +298,36 @@ class CommandLineInterface::ErrorPrinter
 
   // implements MultiFileErrorCollector ------------------------------
   void AddError(const std::string& filename, int line, int column,
-                const std::string& message) override {
+                const std::string& message) {
     found_errors_ = true;
     AddErrorOrWarning(filename, line, column, message, "error", std::cerr);
   }
 
   void AddWarning(const std::string& filename, int line, int column,
-                  const std::string& message) override {
+                  const std::string& message) {
     found_warnings_ = true;
     AddErrorOrWarning(filename, line, column, message, "warning", std::clog);
   }
 
   // implements io::ErrorCollector -----------------------------------
-  void AddError(int line, int column, const std::string& message) override {
+  void AddError(int line, int column, const std::string& message) {
     AddError("input", line, column, message);
   }
 
-  void AddWarning(int line, int column, const std::string& message) override {
+  void AddWarning(int line, int column, const std::string& message) {
     AddErrorOrWarning("input", line, column, message, "warning", std::clog);
   }
 
   // implements DescriptorPool::ErrorCollector-------------------------
   void AddError(const std::string& filename, const std::string& element_name,
                 const Message* descriptor, ErrorLocation location,
-                const std::string& message) override {
+                const std::string& message) {
     AddErrorOrWarning(filename, -1, -1, message, "error", std::cerr);
   }
 
   void AddWarning(const std::string& filename, const std::string& element_name,
                   const Message* descriptor, ErrorLocation location,
-                  const std::string& message) override {
+                  const std::string& message) {
     AddErrorOrWarning(filename, -1, -1, message, "warning", std::clog);
   }
 
@@ -400,14 +400,14 @@ class CommandLineInterface::GeneratorContextImpl : public GeneratorContext {
   void GetOutputFilenames(std::vector<std::string>* output_filenames);
 
   // implements GeneratorContext --------------------------------------
-  io::ZeroCopyOutputStream* Open(const std::string& filename) override;
-  io::ZeroCopyOutputStream* OpenForAppend(const std::string& filename) override;
+  io::ZeroCopyOutputStream* Open(const std::string& filename);
+  io::ZeroCopyOutputStream* OpenForAppend(const std::string& filename);
   io::ZeroCopyOutputStream* OpenForInsert(const std::string& filename,
-                                          const std::string& insertion_point) override;
+                                          const std::string& insertion_point);
   io::ZeroCopyOutputStream* OpenForInsertWithGeneratedCodeInfo(
       const std::string& filename, const std::string& insertion_point,
-      const google::protobuf::GeneratedCodeInfo& info) override;
-  void ListParsedFiles(std::vector<const FileDescriptor*>* output) override {
+      const google::protobuf::GeneratedCodeInfo& info);
+  void ListParsedFiles(std::vector<const FileDescriptor*>* output) {
     *output = parsed_files_;
   }
 
