@@ -756,6 +756,7 @@ protobuf_test_SOURCES =                                        \
   google/protobuf/generated_message_reflection_unittest.cc     \
   google/protobuf/map_field_test.cc                            \
   google/protobuf/map_test.cc                                  \
+  google/protobuf/map_test.inc                                 \
   google/protobuf/message_unittest.cc                          \
   google/protobuf/message_unittest.inc                         \
   google/protobuf/no_field_presence_test.cc                    \
