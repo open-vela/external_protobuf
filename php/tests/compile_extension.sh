@@ -4,6 +4,7 @@ set -e
 
 cd $(dirname $0)
 
+../prepare_c_extension.sh
 pushd  ../ext/google/protobuf > /dev/null
 
 CONFIGURE_OPTIONS=("./configure" "--with-php-config=$(which php-config)")
