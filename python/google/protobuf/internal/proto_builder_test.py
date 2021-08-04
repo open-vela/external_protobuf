@@ -32,13 +32,16 @@
 
 """Tests for google.protobuf.proto_builder."""
 
-import collections
+try:
+    from collections import OrderedDict
+except ImportError:
+    from ordereddict import OrderedDict  #PY26
 try:
   import unittest2 as unittest
 except ImportError:
   import unittest
 
-from google.protobuf import descriptor_pb2  # pylint: disable=g-import-not-at-top
+from google.protobuf import descriptor_pb2
 from google.protobuf import descriptor
 from google.protobuf import descriptor_pool
 from google.protobuf import proto_builder
@@ -48,7 +51,7 @@ from google.protobuf import text_format
 class ProtoBuilderTest(unittest.TestCase):
 
   def setUp(self):
-    self.ordered_fields = collections.OrderedDict([
+    self.ordered_fields = OrderedDict([
         ('foo', descriptor_pb2.FieldDescriptorProto.TYPE_INT64),
         ('bar', descriptor_pb2.FieldDescriptorProto.TYPE_STRING),
         ])
