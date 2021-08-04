@@ -30,9 +30,7 @@
 
 #include <google/protobuf/compiler/cpp/cpp_parse_function_generator.h>
 
-#include <algorithm>
 #include <limits>
-#include <string>
 
 #include <google/protobuf/compiler/cpp/cpp_helpers.h>
 #include <google/protobuf/wire_format.h>
@@ -66,6 +64,16 @@ bool HasInternalAccessors(const FieldOptions::CType ctype) {
   return ctype == FieldOptions::STRING || ctype == FieldOptions::CORD;
 }
 
+bool IsTcTableEnabled(const Options& options) {
+  return options.tctable_mode == Options::kTCTableAlways;
+}
+bool IsTcTableGuarded(const Options& options) {
+  return options.tctable_mode == Options::kTCTableGuarded;
+}
+bool IsTcTableDisabled(const Options& options) {
+  return options.tctable_mode == Options::kTCTableNever;
+}
+
 int TagSize(uint32_t field_number) {
   if (field_number < 16) return 1;
   GOOGLE_CHECK_LT(field_number, (1 << 14))
@@ -73,38 +81,22 @@ int TagSize(uint32_t field_number) {
   return 2;
 }
 
-const char* CodedTagType(int tag_size) {
-  return tag_size == 1 ? "uint8_t" : "uint16_t";
-}
-
 const char* TagType(const FieldDescriptor* field) {
   return CodedTagType(TagSize(field->number()));
 }
 
-std::string TcParserBaseName(const Options& options) {
-  return StrCat("::", ProtobufNamespace(options),
-                      "::internal::TcParserBase::");
-}
-
-std::string MessageTcParseFunctionName(const FieldDescriptor* field,
-                                       const Options& options) {
-  if (field->message_type()->field_count() == 0 ||
-      !HasGeneratedMethods(field->message_type()->file(), options)) {
-    // For files with `option optimize_for = CODE_SIZE`, or which derive from
-    // `ZeroFieldsBase`, we need to call the `_InternalParse` function, because
-    // there is no generated tailcall function. For tailcall parsing, this is
-    // done by helpers in TcParserBase.
-    return StrCat(TcParserBaseName(options),
-                        (field->is_repeated() ? "Repeated" : "Singular"),
-                        "ParseMessage<",
-                        QualifiedClassName(field->message_type()),  //
-                        ", ", TagType(field), ">");
+std::string MessageParseFunctionName(const FieldDescriptor* field,
+                                     const Options& options) {
+  std::string name =
+      "::" + ProtobufNamespace(options) + "::internal::TcParserBase::";
+  if (field->is_repeated()) {
+    name.append("Repeated");
+  } else {
+    name.append("Singular");
   }
-  // This matches macros in generated_message_tctable_impl.h:
-  return StrCat("PROTOBUF_TC_PARSE_",
-                      (field->is_repeated() ? "REPEATED" : "SINGULAR"),
-                      TagSize(field->number()), "(",
-                      QualifiedClassName(field->message_type()), ")");
+  name.append("ParseMessage<" + QualifiedClassName(field->message_type()) +
+              ", " + TagType(field) + ">");
+  return name;
 }
 
 std::string FieldParseFunctionName(const FieldDescriptor* field,
@@ -112,6 +104,10 @@ std::string FieldParseFunctionName(const FieldDescriptor* field,
                                    uint32_t table_size_log2);
 
 }  // namespace
+
+const char* CodedTagType(int tag_size) {
+  return tag_size == 1 ? "uint8_t" : "uint16_t";
+}
 
 TailCallTableInfo::TailCallTableInfo(const Descriptor* descriptor,
                                      const Options& options,
@@ -143,9 +139,9 @@ TailCallTableInfo::TailCallTableInfo(const Descriptor* descriptor,
     // Anything difficult slow path:
     if (field->is_map()) continue;
     if (field->real_containing_oneof()) continue;
+    if (field->options().lazy()) continue;
     if (field->options().weak()) continue;
     if (IsImplicitWeakField(field, options, scc_analyzer)) continue;
-    if (IsLazy(field, options, scc_analyzer)) continue;
 
     // The largest tag that can be read by the tailcall parser is two bytes
     // when varint-coded. This allows 14 bits for the numeric tag value:
@@ -193,7 +189,7 @@ TailCallTableInfo::TailCallTableInfo(const Descriptor* descriptor,
 
     switch (field->type()) {
       case FieldDescriptor::TYPE_MESSAGE:
-        name = MessageTcParseFunctionName(field, options);
+        name = MessageParseFunctionName(field, options);
         break;
 
       case FieldDescriptor::TYPE_FIXED64:
@@ -234,6 +230,16 @@ TailCallTableInfo::TailCallTableInfo(const Descriptor* descriptor,
     fast_path_fields[idx].field = field;
   }
 
+  // Construct a mask of has-bits for required fields numbered <= 32.
+  has_hasbits_required_mask = 0;
+  for (auto field : FieldRange(descriptor)) {
+    if (field->is_required()) {
+      int idx = has_bit_indices[field->index()];
+      if (idx >= 32) continue;
+      has_hasbits_required_mask |= 1u << idx;
+    }
+  }
+
   // If there are no fallback fields, and at most one extension range, the
   // parser can use a generic fallback function. Otherwise, a message-specific
   // fallback routine is needed.
@@ -243,17 +249,15 @@ TailCallTableInfo::TailCallTableInfo(const Descriptor* descriptor,
 
 ParseFunctionGenerator::ParseFunctionGenerator(
     const Descriptor* descriptor, int max_has_bit_index,
-    const std::vector<int>& has_bit_indices,
-    const std::vector<int>& inlined_string_indices, const Options& options,
+    const std::vector<int>& has_bit_indices, const Options& options,
     MessageSCCAnalyzer* scc_analyzer,
     const std::map<std::string, std::string>& vars)
     : descriptor_(descriptor),
       scc_analyzer_(scc_analyzer),
       options_(options),
       variables_(vars),
-      inlined_string_indices_(inlined_string_indices),
       num_hasbits_(max_has_bit_index) {
-  if (should_generate_tctable()) {
+  if (IsTcTableGuarded(options_) || IsTcTableEnabled(options_)) {
     tc_table_info_.reset(new TailCallTableInfo(descriptor_, options_,
                                                has_bit_indices, scc_analyzer));
   }
@@ -264,46 +268,28 @@ ParseFunctionGenerator::ParseFunctionGenerator(
 
 void ParseFunctionGenerator::GenerateMethodDecls(io::Printer* printer) {
   Formatter format(printer, variables_);
-  if (should_generate_tctable()) {
-    auto declare_function = [&format](const char* name,
-                                      const std::string& guard) {
-      if (!guard.empty()) {
-        format.Outdent();
-        format("#if $1$\n", guard);
-        format.Indent();
-      }
-      format("static const char* $1$(PROTOBUF_TC_PARAM_DECL);\n", name);
-      if (!guard.empty()) {
-        format.Outdent();
-        format("#endif  // $1$\n", guard);
-        format.Indent();
-      }
-    };
-    if (should_generate_guarded_tctable()) {
-      format.Outdent();
-      format("#ifdef PROTOBUF_TAIL_CALL_TABLE_PARSER_ENABLED\n");
-      format.Indent();
-    }
-    format("// The Tct_* functions are internal to the protobuf runtime:\n");
-    // These guards are defined in port_def.inc:
-    declare_function("Tct_ParseS1", "PROTOBUF_TC_STATIC_PARSE_SINGULAR1");
-    declare_function("Tct_ParseS2", "PROTOBUF_TC_STATIC_PARSE_SINGULAR2");
-    declare_function("Tct_ParseR1", "PROTOBUF_TC_STATIC_PARSE_REPEATED1");
-    declare_function("Tct_ParseR2", "PROTOBUF_TC_STATIC_PARSE_REPEATED2");
+  if (IsTcTableGuarded(options_)) {
+    format.Outdent();
+    format("#ifdef PROTOBUF_TAIL_CALL_TABLE_PARSER_ENABLED\n");
+    format.Indent();
+  }
+  if (IsTcTableGuarded(options_) || IsTcTableEnabled(options_)) {
     if (tc_table_info_->use_generated_fallback) {
-      format.Outdent();
       format(
-          " private:\n"
-          "  ");
-      declare_function("Tct_ParseFallback", "");
-      format(" public:\n");
-      format.Indent();
+          "static const char* Tct_ParseFallback(\n"
+          "    ::$proto_ns$::MessageLite *msg, const char *ptr,\n"
+          "    ::$proto_ns$::internal::ParseContext *ctx,\n"
+          "    const ::$proto_ns$::internal::TailCallParseTableBase *table,\n"
+          "    uint64_t hasbits, ::$proto_ns$::internal::TcFieldData data);\n"
+          "inline const char* Tct_FallbackImpl(\n"
+          "    const char* ptr, ::$proto_ns$::internal::ParseContext* ctx,\n"
+          "    const void*, $uint64$ hasbits);\n");
     }
-    if (should_generate_guarded_tctable()) {
-      format.Outdent();
-      format("#endif\n");
-      format.Indent();
-    }
+  }
+  if (IsTcTableGuarded(options_)) {
+    format.Outdent();
+    format("#endif\n");
+    format.Indent();
   }
   format(
       "const char* _InternalParse(const char* ptr, "
@@ -312,10 +298,8 @@ void ParseFunctionGenerator::GenerateMethodDecls(io::Printer* printer) {
 
 void ParseFunctionGenerator::GenerateMethodImpls(io::Printer* printer) {
   Formatter format(printer, variables_);
-  bool need_parse_function = true;
   if (descriptor_->options().message_set_wire_format()) {
     // Special-case MessageSet.
-    need_parse_function = false;
     format(
         "const char* $classname$::_InternalParse(const char* ptr,\n"
         "                  ::$proto_ns$::internal::ParseContext* ctx) {\n"
@@ -323,157 +307,85 @@ void ParseFunctionGenerator::GenerateMethodImpls(io::Printer* printer) {
         "  return _extensions_.ParseMessageSet(ptr, \n"
         "      internal_default_instance(), &_internal_metadata_, ctx);\n"
         "}\n");
-  }
-  if (!should_generate_tctable()) {
-    if (need_parse_function) {
-      GenerateLoopingParseFunction(format);
-    }
     return;
   }
-  if (should_generate_guarded_tctable()) {
+  if (IsTcTableGuarded(options_)) {
     format("#ifdef PROTOBUF_TAIL_CALL_TABLE_PARSER_ENABLED\n\n");
   }
-  if (need_parse_function) {
-    GenerateTailcallParseFunction(format);
-  }
-  if (tc_table_info_->use_generated_fallback) {
-    GenerateTailcallFallbackFunction(format);
-  }
-  GenerateTailcallFieldParseFunctions(format);
-  if (should_generate_guarded_tctable()) {
-    if (need_parse_function) {
-      format("\n#else  // PROTOBUF_TAIL_CALL_TABLE_PARSER_ENABLED\n\n");
-      GenerateLoopingParseFunction(format);
+  if (IsTcTableGuarded(options_) || IsTcTableEnabled(options_)) {
+    format(
+        "const char* $classname$::_InternalParse(\n"
+        "    const char* ptr, ::$proto_ns$::internal::ParseContext* ctx) {\n"
+        "  return ::$proto_ns$::internal::TcParser<$1$>::ParseLoop(\n"
+        "      this, ptr, ctx, &_table_.header);\n"
+        "}\n"
+        "\n",
+        tc_table_info_->table_size_log2);
+    if (tc_table_info_->use_generated_fallback) {
+      GenerateTailcallFallbackFunction(format);
     }
+  }
+  if (IsTcTableGuarded(options_)) {
+    format("\n#else  // PROTOBUF_TAIL_CALL_TABLE_PARSER_ENABLED\n\n");
+  }
+  if (IsTcTableGuarded(options_) || IsTcTableDisabled(options_)) {
+    GenerateLoopingParseFunction(format);
+  }
+  if (IsTcTableGuarded(options_)) {
     format("\n#endif  // PROTOBUF_TAIL_CALL_TABLE_PARSER_ENABLED\n");
   }
 }
 
-bool ParseFunctionGenerator::should_generate_tctable() const {
-  if (options_.tctable_mode == Options::kTCTableNever) {
-    return false;
-  }
-  return true;
-}
-
-void ParseFunctionGenerator::GenerateTailcallParseFunction(Formatter& format) {
-  GOOGLE_CHECK(should_generate_tctable());
-
-  // Generate an `_InternalParse` that starts the tail-calling loop.
-  format(
-      "const char* $classname$::_InternalParse(\n"
-      "    const char* ptr, ::$proto_ns$::internal::ParseContext* ctx) {\n"
-      "$annotate_deserialize$"
-      "  ptr = ::$proto_ns$::internal::TcParser<$1$>::ParseLoop(\n"
-      "      this, ptr, ctx, &_table_.header);\n",
-      tc_table_info_->table_size_log2);
-  format(
-      "  return ptr;\n"
-      "}\n\n");
-}
-
 void ParseFunctionGenerator::GenerateTailcallFallbackFunction(
     Formatter& format) {
-  GOOGLE_CHECK(should_generate_tctable());
   format(
       "const char* $classname$::Tct_ParseFallback(PROTOBUF_TC_PARAM_DECL) {\n"
+      "  return static_cast<$classname$*>(msg)->Tct_FallbackImpl(ptr, ctx, "
+      "table, hasbits);\n"
+      "}\n\n");
+
+  format(
+      "const char* $classname$::Tct_FallbackImpl(const char* ptr, "
+      "::$proto_ns$::internal::ParseContext* ctx, const void*, "
+      "$uint64$ hasbits) {\n"
       "#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) return nullptr\n");
   format.Indent();
-  format("auto* typed_msg = static_cast<$classname$*>(msg);\n");
 
   if (num_hasbits_ > 0) {
     // Sync hasbits
-    format("typed_msg->_has_bits_[0] = hasbits;\n");
+    format("_has_bits_[0] = hasbits;\n");
   }
 
-  format.Set("msg", "typed_msg->");
-  format.Set("this", "typed_msg");
-  format.Set("has_bits", "typed_msg->_has_bits_");
-  format.Set("next_tag", "goto next_tag");
+  format.Set("has_bits", "_has_bits_");
+  format.Set("continue", "goto success");
   GenerateParseIterationBody(format, descriptor_,
                              tc_table_info_->fallback_fields);
 
   format.Outdent();
+  format("success:\n");
+  format("  return ptr;\n");
   format(
-      "next_tag:\n"
-      "message_done:\n"
-      "  return ptr;\n"
       "#undef CHK_\n"
       "}\n");
 }
 
-void ParseFunctionGenerator::GenerateTailcallFieldParseFunctions(
-    Formatter& format) {
-  GOOGLE_CHECK(should_generate_tctable());
-  // There are four cases where a tailcall target are needed for messages:
-  //   {singular, repeated} x {1, 2}-byte tag
-  struct {
-    const char* type;
-    int size;
-  } const kTagLayouts[] = {
-      {"uint8_t", 1},
-      {"uint16_t", 2},
-  };
-  // Singular:
-  for (const auto& layout : kTagLayouts) {
-    // Guard macros are defined in port_def.inc.
-    format(
-        "#if PROTOBUF_TC_STATIC_PARSE_SINGULAR$1$\n"
-        "const char* $classname$::Tct_ParseS$1$(PROTOBUF_TC_PARAM_DECL) {\n"
-        "  if (PROTOBUF_PREDICT_FALSE(data.coded_tag<$2$>() != 0))\n"
-        "    PROTOBUF_MUSTTAIL "
-        "return table->fallback(PROTOBUF_TC_PARAM_PASS);\n"
-        "  ptr += $1$;\n"
-        "  hasbits |= (uint64_t{1} << data.hasbit_idx());\n"
-        "  ::$proto_ns$::internal::TcParserBase::SyncHasbits"
-        "(msg, hasbits, table);\n"
-        "  auto& field = ::$proto_ns$::internal::TcParserBase::"
-        "RefAt<$classtype$*>(msg, data.offset());\n"
-        "  if (field == nullptr)\n"
-        "    field = CreateMaybeMessage<$classtype$>(ctx->data().arena);\n"
-        "  return ctx->ParseMessage(field, ptr);\n"
-        "}\n"
-        "#endif  // PROTOBUF_TC_STATIC_PARSE_SINGULAR$1$\n",
-        layout.size, layout.type);
-  }
-  // Repeated:
-  for (const auto& layout : kTagLayouts) {
-    // Guard macros are defined in port_def.inc.
-    format(
-        "#if PROTOBUF_TC_STATIC_PARSE_REPEATED$1$\n"
-        "const char* $classname$::Tct_ParseR$1$(PROTOBUF_TC_PARAM_DECL) {\n"
-        "  if (PROTOBUF_PREDICT_FALSE(data.coded_tag<$2$>() != 0)) {\n"
-        "    PROTOBUF_MUSTTAIL "
-        "return table->fallback(PROTOBUF_TC_PARAM_PASS);\n"
-        "  }\n"
-        "  ptr += $1$;\n"
-        "  auto& field = ::$proto_ns$::internal::TcParserBase::RefAt<"
-        "::$proto_ns$::RepeatedPtrField<$classname$>>(msg, data.offset());\n"
-        "  ::$proto_ns$::internal::TcParserBase::SyncHasbits"
-        "(msg, hasbits, table);\n"
-        "  ptr = ctx->ParseMessage(field.Add(), ptr);\n"
-        "  return ptr;\n"
-        "}\n"
-        "#endif  // PROTOBUF_TC_STATIC_PARSE_REPEATED$1$\n",
-        layout.size, layout.type);
-  }
-}
-
 void ParseFunctionGenerator::GenerateDataDecls(io::Printer* printer) {
-  if (!should_generate_tctable()) {
+  if (descriptor_->options().message_set_wire_format()) {
     return;
   }
   Formatter format(printer, variables_);
-  if (should_generate_guarded_tctable()) {
+  if (IsTcTableGuarded(options_)) {
     format.Outdent();
     format("#ifdef PROTOBUF_TAIL_CALL_TABLE_PARSER_ENABLED\n");
     format.Indent();
   }
-  format(
-      "static const ::$proto_ns$::internal::TailCallParseTable<$1$>\n"
-      "    _table_;\n",
-      tc_table_info_->table_size_log2);
-  if (should_generate_guarded_tctable()) {
+  if (IsTcTableGuarded(options_) || IsTcTableEnabled(options_)) {
+    format(
+        "static const ::$proto_ns$::internal::TailCallParseTable<$1$>\n"
+        "    _table_;\n",
+        tc_table_info_->table_size_log2);
+  }
+  if (IsTcTableGuarded(options_)) {
     format.Outdent();
     format("#endif  // PROTOBUF_TAIL_CALL_TABLE_PARSER_ENABLED\n");
     format.Indent();
@@ -481,15 +393,17 @@ void ParseFunctionGenerator::GenerateDataDecls(io::Printer* printer) {
 }
 
 void ParseFunctionGenerator::GenerateDataDefinitions(io::Printer* printer) {
-  if (!should_generate_tctable()) {
+  if (descriptor_->options().message_set_wire_format()) {
     return;
   }
   Formatter format(printer, variables_);
-  if (should_generate_guarded_tctable()) {
+  if (IsTcTableGuarded(options_)) {
     format("#ifdef PROTOBUF_TAIL_CALL_TABLE_PARSER_ENABLED\n");
   }
-  GenerateTailCallTable(format);
-  if (should_generate_guarded_tctable()) {
+  if (IsTcTableGuarded(options_) || IsTcTableEnabled(options_)) {
+    GenerateTailCallTable(format);
+  }
+  if (IsTcTableGuarded(options_)) {
     format("#endif  // PROTOBUF_TAIL_CALL_TABLE_PARSER_ENABLED\n");
   }
 }
@@ -501,8 +415,6 @@ void ParseFunctionGenerator::GenerateLoopingParseFunction(Formatter& format) {
       "$annotate_deserialize$"
       "#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure\n");
   format.Indent();
-  format.Set("msg", "");
-  format.Set("this", "this");
   int hasbits_size = 0;
   if (num_hasbits_ > 0) {
     hasbits_size = (num_hasbits_ + 31) / 32;
@@ -515,7 +427,7 @@ void ParseFunctionGenerator::GenerateLoopingParseFunction(Formatter& format) {
   } else {
     format.Set("has_bits", "_has_bits_");
   }
-  format.Set("next_tag", "continue");
+  format.Set("continue", "continue");
   format("while (!ctx->Done(&ptr)) {\n");
   format.Indent();
 
@@ -526,26 +438,26 @@ void ParseFunctionGenerator::GenerateLoopingParseFunction(Formatter& format) {
   format("}  // while\n");
 
   format.Outdent();
-  format("message_done:\n");
+  format("success:\n");
   if (hasbits_size) format("  _has_bits_.Or(has_bits);\n");
 
   format(
       "  return ptr;\n"
       "failure:\n"
       "  ptr = nullptr;\n"
-      "  goto message_done;\n"
+      "  goto success;\n"
       "#undef CHK_\n"
       "}\n");
 }
 
 void ParseFunctionGenerator::GenerateTailCallTable(Formatter& format) {
-  GOOGLE_CHECK(should_generate_tctable());
   // All entries without a fast-path parsing function need a fallback.
   std::string fallback;
   if (tc_table_info_->use_generated_fallback) {
     fallback = ClassName(descriptor_) + "::Tct_ParseFallback";
   } else {
-    fallback = TcParserBaseName(options_) + "GenericFallback";
+    fallback = "::" + ProtobufNamespace(options_) +
+               "::internal::TcParserBase::GenericFallback";
     if (GetOptimizeFor(descriptor_->file(), options_) ==
         FileOptions::LITE_RUNTIME) {
       fallback += "Lite";
@@ -581,8 +493,10 @@ void ParseFunctionGenerator::GenerateTailCallTable(Formatter& format) {
     format("0, 0, 0,  // no _extensions_\n");
   }
   format(
-      "&$1$._instance,\n"
-      "$2$  // fallback\n",
+      "$1$,  // has_bits_required_mask\n"
+      "&$2$._instance,\n"
+      "$3$  // fallback\n",
+      tc_table_info_->has_hasbits_required_mask,
       DefaultInstanceName(descriptor_, options_), fallback);
   format.Outdent();
   format("}, {\n");
@@ -622,25 +536,13 @@ void ParseFunctionGenerator::GenerateArenaString(Formatter& format,
                 "::" + MakeDefaultName(field) + ".get()";
   format(
       "if (arena != nullptr) {\n"
-      "  ptr = ctx->ReadArenaString(ptr, &$msg$$name$_, arena");
-  if (IsStringInlined(field, options_)) {
-    GOOGLE_DCHECK(!inlined_string_indices_.empty());
-    int inlined_string_index = inlined_string_indices_[field->index()];
-    GOOGLE_DCHECK_GE(inlined_string_index, 0);
-    format(
-        ", $msg$_internal_$name$_donated(), &_inlined_string_donated_[$1$], "
-        "~0x$2$u",
-        inlined_string_index / 32,
-        strings::Hex(1u << (inlined_string_index % 32), strings::ZERO_PAD_8));
-  }
-  format(
-      ");\n"
+      "  ptr = ctx->ReadArenaString(ptr, &$1$_, arena);\n"
       "} else {\n"
       "  ptr = ::$proto_ns$::internal::InlineGreedyStringParser("
-      "$msg$$name$_.MutableNoArenaNoDefault(&$1$), ptr, ctx);\n"
+      "$1$_.MutableNoArenaNoDefault(&$2$), ptr, ctx);\n"
       "}\n"
-      "const std::string* str = &$msg$$name$_.Get(); (void)str;\n",
-      default_string);
+      "const std::string* str = &$1$_.Get(); (void)str;\n",
+      FieldName(field), default_string);
 }
 
 void ParseFunctionGenerator::GenerateStrings(Formatter& format,
@@ -658,24 +560,24 @@ void ParseFunctionGenerator::GenerateStrings(Formatter& format,
       !field->real_containing_oneof() && ctype == FieldOptions::STRING) {
     GenerateArenaString(format, field);
   } else {
-    std::string parser_name;
+    std::string name;
     switch (ctype) {
       case FieldOptions::STRING:
-        parser_name = "GreedyStringParser";
+        name = "GreedyStringParser";
         break;
       case FieldOptions::CORD:
-        parser_name = "CordParser";
+        name = "CordParser";
         break;
       case FieldOptions::STRING_PIECE:
-        parser_name = "StringPieceParser";
+        name = "StringPieceParser";
         break;
     }
     format(
-        "auto str = $msg$$1$$2$_$name$();\n"
-        "ptr = ::$proto_ns$::internal::Inline$3$(str, ptr, ctx);\n",
+        "auto str = $1$$2$_$3$();\n"
+        "ptr = ::$proto_ns$::internal::Inline$4$(str, ptr, ctx);\n",
         HasInternalAccessors(ctype) ? "_internal_" : "",
         field->is_repeated() && !field->is_packable() ? "add" : "mutable",
-        parser_name);
+        FieldName(field), name);
   }
   if (!check_utf8) return;  // return if this is a bytes field
   auto level = GetUtf8CheckMode(field, options_);
@@ -712,20 +614,24 @@ void ParseFunctionGenerator::GenerateStrings(Formatter& format,
 void ParseFunctionGenerator::GenerateLengthDelim(Formatter& format,
                                                  const FieldDescriptor* field) {
   if (field->is_packable()) {
+    std::string enum_validator;
     if (field->type() == FieldDescriptor::TYPE_ENUM &&
         !HasPreservingUnknownEnumSemantics(field)) {
-      std::string enum_type = QualifiedClassName(field->enum_type(), options_);
+      enum_validator =
+          StrCat(", ", QualifiedClassName(field->enum_type(), options_),
+                       "_IsValid, &_internal_metadata_, ", field->number());
       format(
           "ptr = "
           "::$proto_ns$::internal::Packed$1$Parser<$unknown_fields_type$>("
-          "$msg$_internal_mutable_$name$(), ptr, ctx, $2$_IsValid, "
-          "&$msg$_internal_metadata_, $3$);\n",
-          DeclaredTypeMethodName(field->type()), enum_type, field->number());
+          "_internal_mutable_$2$(), ptr, ctx$3$);\n",
+          DeclaredTypeMethodName(field->type()), FieldName(field),
+          enum_validator);
     } else {
       format(
           "ptr = ::$proto_ns$::internal::Packed$1$Parser("
-          "$msg$_internal_mutable_$name$(), ptr, ctx);\n",
-          DeclaredTypeMethodName(field->type()));
+          "_internal_mutable_$2$(), ptr, ctx$3$);\n",
+          DeclaredTypeMethodName(field->type()), FieldName(field),
+          enum_validator);
     }
   } else {
     auto field_type = field->type();
@@ -745,59 +651,61 @@ void ParseFunctionGenerator::GenerateLengthDelim(Formatter& format,
               !HasPreservingUnknownEnumSemantics(field)) {
             format(
                 "auto object = "
-                "::$proto_ns$::internal::InitEnumParseWrapper<"
-                "$unknown_fields_type$>(&$msg$$name$_, $1$_IsValid, "
-                "$2$, &$msg$_internal_metadata_);\n"
+                "::$proto_ns$::internal::InitEnumParseWrapper<$unknown_"
+                "fields_type$>("
+                "&$1$_, $2$_IsValid, $3$, &_internal_metadata_);\n"
                 "ptr = ctx->ParseMessage(&object, ptr);\n",
-                QualifiedClassName(val->enum_type(), options_),
+                FieldName(field), QualifiedClassName(val->enum_type()),
                 field->number());
           } else {
-            format("ptr = ctx->ParseMessage(&$msg$$name$_, ptr);\n");
+            format("ptr = ctx->ParseMessage(&$1$_, ptr);\n", FieldName(field));
           }
         } else if (IsLazy(field, options_, scc_analyzer_)) {
           if (field->real_containing_oneof()) {
             format(
-                "if (!$msg$_internal_has_$name$()) {\n"
-                "  $msg$clear_$1$();\n"
-                "  $msg$$1$_.$name$_ = ::$proto_ns$::Arena::CreateMessage<\n"
+                "if (!_internal_has_$1$()) {\n"
+                "  clear_$2$();\n"
+                "  $2$_.$1$_ = ::$proto_ns$::Arena::CreateMessage<\n"
                 "      ::$proto_ns$::internal::LazyField>("
-                "$msg$GetArenaForAllocation());\n"
-                "  $msg$set_has_$name$();\n"
+                "GetArenaForAllocation());\n"
+                "  set_has_$1$();\n"
                 "}\n"
-                "ptr = ctx->ParseMessage($msg$$1$_.$name$_, ptr);\n",
-                field->containing_oneof()->name());
+                "ptr = ctx->ParseMessage($2$_.$1$_, ptr);\n",
+                FieldName(field), field->containing_oneof()->name());
           } else if (HasHasbit(field)) {
             format(
-                "_Internal::set_has_$name$(&$has_bits$);\n"
-                "ptr = ctx->ParseMessage(&$msg$$name$_, ptr);\n");
+                "_Internal::set_has_$1$(&$has_bits$);\n"
+                "ptr = ctx->ParseMessage(&$1$_, ptr);\n",
+                FieldName(field));
           } else {
-            format("ptr = ctx->ParseMessage(&$msg$$name$_, ptr);\n");
+            format("ptr = ctx->ParseMessage(&$1$_, ptr);\n", FieldName(field));
           }
         } else if (IsImplicitWeakField(field, options_, scc_analyzer_)) {
           if (!field->is_repeated()) {
             format(
-                "ptr = ctx->ParseMessage(_Internal::mutable_$name$($this$), "
-                "ptr);\n");
+                "ptr = ctx->ParseMessage(_Internal::mutable_$1$(this), "
+                "ptr);\n",
+                FieldName(field));
           } else {
             format(
-                "ptr = ctx->ParseMessage($msg$$name$_.AddWeak("
-                "reinterpret_cast<const ::$proto_ns$::MessageLite*>($1$ptr_)"
+                "ptr = ctx->ParseMessage($1$_.AddWeak(reinterpret_cast<const "
+                "::$proto_ns$::MessageLite*>($2$::_$3$_default_instance_ptr_)"
                 "), ptr);\n",
-                QualifiedDefaultInstanceName(field->message_type(), options_));
+                FieldName(field), Namespace(field->message_type(), options_),
+                ClassName(field->message_type()));
           }
         } else if (IsWeak(field, options_)) {
           format(
               "{\n"
               "  auto* default_ = &reinterpret_cast<const Message&>($1$);\n"
-              "  ptr = ctx->ParseMessage($msg$_weak_field_map_.MutableMessage("
-              "$2$, default_), ptr);\n"
+              "  ptr = ctx->ParseMessage(_weak_field_map_.MutableMessage($2$,"
+              " default_), ptr);\n"
               "}\n",
               QualifiedDefaultInstanceName(field->message_type(), options_),
               field->number());
         } else {
-          format(
-              "ptr = ctx->ParseMessage($msg$_internal_$mutable_field$(), "
-              "ptr);\n");
+          format("ptr = ctx->ParseMessage(_internal_$1$_$2$(), ptr);\n",
+                 field->is_repeated() ? "add" : "mutable", FieldName(field));
         }
         break;
       }
@@ -820,39 +728,29 @@ static bool ShouldRepeat(const FieldDescriptor* descriptor,
 void ParseFunctionGenerator::GenerateFieldBody(
     Formatter& format, WireFormatLite::WireType wiretype,
     const FieldDescriptor* field) {
-  Formatter::SaveState formatter_state(&format);
-  format.AddMap(
-      {{"name", FieldName(field)},
-       {"primitive_type", PrimitiveTypeName(options_, field->cpp_type())}});
-  if (field->is_repeated()) {
-    format.AddMap({{"put_field", StrCat("add_", FieldName(field))},
-                   {"mutable_field", StrCat("add_", FieldName(field))}});
-  } else {
-    format.AddMap(
-        {{"put_field", StrCat("set_", FieldName(field))},
-         {"mutable_field", StrCat("mutable_", FieldName(field))}});
-  }
   uint32_t tag = WireFormatLite::MakeTag(field->number(), wiretype);
   switch (wiretype) {
     case WireFormatLite::WIRETYPE_VARINT: {
       std::string type = PrimitiveTypeName(options_, field->cpp_type());
+      std::string prefix = field->is_repeated() ? "add" : "set";
       if (field->type() == FieldDescriptor::TYPE_ENUM) {
-        format.Set("enum_type",
-                   QualifiedClassName(field->enum_type(), options_));
         format(
             "$uint64$ val = ::$proto_ns$::internal::ReadVarint64(&ptr);\n"
             "CHK_(ptr);\n");
         if (!HasPreservingUnknownEnumSemantics(field)) {
-          format("if (PROTOBUF_PREDICT_TRUE($enum_type$_IsValid(val))) {\n");
+          format("if (PROTOBUF_PREDICT_TRUE($1$_IsValid(val))) {\n",
+                 QualifiedClassName(field->enum_type(), options_));
           format.Indent();
         }
-        format("$msg$_internal_$put_field$(static_cast<$enum_type$>(val));\n");
+        format("_internal_$1$_$2$(static_cast<$3$>(val));\n", prefix,
+               FieldName(field),
+               QualifiedClassName(field->enum_type(), options_));
         if (!HasPreservingUnknownEnumSemantics(field)) {
           format.Outdent();
           format(
               "} else {\n"
               "  ::$proto_ns$::internal::WriteVarint("
-              "$1$, val, $msg$mutable_unknown_fields());\n"
+              "$1$, val, mutable_unknown_fields());\n"
               "}\n",
               field->number());
         }
@@ -867,38 +765,42 @@ void ParseFunctionGenerator::GenerateFieldBody(
           zigzag = "ZigZag";
         }
         if (field->is_repeated() || field->real_containing_oneof()) {
+          std::string prefix = field->is_repeated() ? "add" : "set";
           format(
-              "$msg$_internal_$put_field$("
-              "::$proto_ns$::internal::ReadVarint$1$$2$(&ptr));\n"
+              "_internal_$1$_$2$("
+              "::$proto_ns$::internal::ReadVarint$3$$4$(&ptr));\n"
               "CHK_(ptr);\n",
-              zigzag, size);
+              prefix, FieldName(field), zigzag, size);
         } else {
           if (HasHasbit(field)) {
-            format("_Internal::set_has_$name$(&$has_bits$);\n");
+            format("_Internal::set_has_$1$(&$has_bits$);\n", FieldName(field));
           }
           format(
-              "$msg$$name$_ = ::$proto_ns$::internal::ReadVarint$1$$2$(&ptr);\n"
+              "$1$_ = ::$proto_ns$::internal::ReadVarint$2$$3$(&ptr);\n"
               "CHK_(ptr);\n",
-              zigzag, size);
+              FieldName(field), zigzag, size);
         }
       }
       break;
     }
     case WireFormatLite::WIRETYPE_FIXED32:
     case WireFormatLite::WIRETYPE_FIXED64: {
+      std::string type = PrimitiveTypeName(options_, field->cpp_type());
       if (field->is_repeated() || field->real_containing_oneof()) {
+        std::string prefix = field->is_repeated() ? "add" : "set";
         format(
-            "$msg$_internal_$put_field$("
-            "::$proto_ns$::internal::UnalignedLoad<$primitive_type$>(ptr));\n"
-            "ptr += sizeof($primitive_type$);\n");
+            "_internal_$1$_$2$("
+            "::$proto_ns$::internal::UnalignedLoad<$3$>(ptr));\n"
+            "ptr += sizeof($3$);\n",
+            prefix, FieldName(field), type);
       } else {
         if (HasHasbit(field)) {
-          format("_Internal::set_has_$name$(&$has_bits$);\n");
+          format("_Internal::set_has_$1$(&$has_bits$);\n", FieldName(field));
         }
         format(
-            "$msg$$name$_ = "
-            "::$proto_ns$::internal::UnalignedLoad<$primitive_type$>(ptr);\n"
-            "ptr += sizeof($primitive_type$);\n");
+            "$1$_ = ::$proto_ns$::internal::UnalignedLoad<$2$>(ptr);\n"
+            "ptr += sizeof($2$);\n",
+            FieldName(field), type);
       }
       break;
     }
@@ -909,9 +811,9 @@ void ParseFunctionGenerator::GenerateFieldBody(
     }
     case WireFormatLite::WIRETYPE_START_GROUP: {
       format(
-          "ptr = ctx->ParseGroup($msg$_internal_$mutable_field$(), ptr, $1$);\n"
+          "ptr = ctx->ParseGroup(_internal_$1$_$2$(), ptr, $3$);\n"
           "CHK_(ptr);\n",
-          tag);
+          field->is_repeated() ? "add" : "mutable", FieldName(field), tag);
       break;
     }
     case WireFormatLite::WIRETYPE_END_GROUP: {
@@ -943,90 +845,14 @@ static uint32_t ExpectedTag(const FieldDescriptor* field,
   return expected_tag;
 }
 
-// These variables are used by the generated parse iteration, and must already
-// be defined in the generated code:
-// - `const char* ptr`: the input buffer.
-// - `ParseContext* ctx`: the associated context for `ptr`.
-// - implicit `this`: i.e., we must be in a non-static member function.
-//
-// The macro `CHK_(x)` must be defined. It should return an error condition if
-// the macro parameter is false.
-//
-// Whenever an END_GROUP tag was read, or tag 0 was read, the generated code
-// branches to the label `message_done`.
-//
-// These formatter variables are used:
-// - `next_tag`: a single statement to begin parsing the next tag.
-//
-// At the end of the generated code, the enclosing function should proceed to
-// parse the next tag in the stream.
 void ParseFunctionGenerator::GenerateParseIterationBody(
     Formatter& format, const Descriptor* descriptor,
     const std::vector<const FieldDescriptor*>& ordered_fields) {
   format(
       "$uint32$ tag;\n"
       "ptr = ::$proto_ns$::internal::ReadTag(ptr, &tag);\n");
+  if (!ordered_fields.empty()) format("switch (tag >> 3) {\n");
 
-  if (!ordered_fields.empty()) {
-    GenerateFieldSwitch(format, ordered_fields);
-    // Each field `case` only considers field number. Field numbers that are
-    // not defined in the message, or tags with an incompatible wire type, are
-    // considered "unusual" cases. They will be handled by the logic below.
-    format.Outdent();
-    format("handle_unusual:\n");
-    format.Indent();
-  }
-
-  // Unusual/extension/unknown case:
-  format(
-      "if ((tag == 0) || ((tag & 7) == 4)) {\n"
-      "  CHK_(ptr);\n"
-      "  ctx->SetLastTag(tag);\n"
-      "  goto message_done;\n"
-      "}\n");
-  if (IsMapEntryMessage(descriptor)) {
-    format("$next_tag$;\n");
-  } else {
-    if (descriptor->extension_range_count() > 0) {
-      format("if (");
-      for (int i = 0; i < descriptor->extension_range_count(); i++) {
-        const Descriptor::ExtensionRange* range =
-            descriptor->extension_range(i);
-        if (i > 0) format(" ||\n    ");
-
-        uint32_t start_tag = WireFormatLite::MakeTag(
-            range->start, static_cast<WireFormatLite::WireType>(0));
-        uint32_t end_tag = WireFormatLite::MakeTag(
-            range->end, static_cast<WireFormatLite::WireType>(0));
-
-        if (range->end > FieldDescriptor::kMaxNumber) {
-          format("($1$u <= tag)", start_tag);
-        } else {
-          format("($1$u <= tag && tag < $2$u)", start_tag, end_tag);
-        }
-      }
-      format(
-          ") {\n"
-          "  ptr = $msg$_extensions_.ParseField(tag, ptr, "
-          "internal_default_instance(), &$msg$_internal_metadata_, ctx);\n"
-          "  CHK_(ptr != nullptr);\n"
-          "  $next_tag$;\n"
-          "}\n");
-    }
-    format(
-        "ptr = UnknownFieldParse(\n"
-        "    tag,\n"
-        "    $msg$_internal_metadata_.mutable_unknown_fields<"
-        "$unknown_fields_type$>(),\n"
-        "    ptr, ctx);\n"
-        "CHK_(ptr != nullptr);\n");
-  }
-}
-
-void ParseFunctionGenerator::GenerateFieldSwitch(
-    Formatter& format,
-    const std::vector<const FieldDescriptor*>& ordered_fields) {
-  format("switch (tag >> 3) {\n");
   format.Indent();
 
   for (const auto* field : ordered_fields) {
@@ -1067,18 +893,61 @@ void ParseFunctionGenerator::GenerateFieldSwitch(
                         field);
       format.Outdent();
     }
-    format(
-        "} else\n"
-        "  goto handle_unusual;\n"
-        "$next_tag$;\n");
     format.Outdent();
+    format(
+        "  } else goto handle_unusual;\n"
+        "  $continue$;\n");
   }  // for loop over ordered fields
 
+  // Default case
+  if (!ordered_fields.empty()) format("default: {\n");
+  if (!ordered_fields.empty()) format("handle_unusual:\n");
   format(
-      "default:\n"
-      "  goto handle_unusual;\n");
+      "  if ((tag == 0) || ((tag & 7) == 4)) {\n"
+      "    CHK_(ptr);\n"
+      "    ctx->SetLastTag(tag);\n"
+      "    goto success;\n"
+      "  }\n");
+  if (IsMapEntryMessage(descriptor)) {
+    format("  $continue$;\n");
+  } else {
+    if (descriptor->extension_range_count() > 0) {
+      format("if (");
+      for (int i = 0; i < descriptor->extension_range_count(); i++) {
+        const Descriptor::ExtensionRange* range =
+            descriptor->extension_range(i);
+        if (i > 0) format(" ||\n    ");
+
+        uint32_t start_tag = WireFormatLite::MakeTag(
+            range->start, static_cast<WireFormatLite::WireType>(0));
+        uint32_t end_tag = WireFormatLite::MakeTag(
+            range->end, static_cast<WireFormatLite::WireType>(0));
+
+        if (range->end > FieldDescriptor::kMaxNumber) {
+          format("($1$u <= tag)", start_tag);
+        } else {
+          format("($1$u <= tag && tag < $2$u)", start_tag, end_tag);
+        }
+      }
+      format(") {\n");
+      format(
+          "  ptr = _extensions_.ParseField(tag, ptr,\n"
+          "      internal_default_instance(), &_internal_metadata_, ctx);\n"
+          "  CHK_(ptr != nullptr);\n"
+          "  $continue$;\n"
+          "}\n");
+    }
+    format(
+        "  ptr = UnknownFieldParse(tag,\n"
+        "      _internal_metadata_.mutable_unknown_fields<$unknown_"
+        "fields_type$>(),\n"
+        "      ptr, ctx);\n"
+        "  CHK_(ptr != nullptr);\n"
+        "  $continue$;\n");
+  }
+  if (!ordered_fields.empty()) format("}\n");  // default case
   format.Outdent();
-  format("}  // switch\n");
+  if (!ordered_fields.empty()) format("}  // switch\n");
 }
 
 namespace {
@@ -1268,30 +1137,31 @@ std::string GetTailCallFieldHandlerName(ParseCardinality card,
 
   name.append(CodedTagType(tag_length_bytes));
 
+  std::string tcpb =
+      StrCat(ProtobufNamespace(options), "::internal::TcParserBase");
+
   switch (type_format) {
     case TypeFormat::kVar64:
     case TypeFormat::kVar32:
     case TypeFormat::kBool:
-      name.append(
-          StrCat(", ", TcParserBaseName(options), "kNoConversion"));
+      name.append(StrCat(", ::", tcpb, "::kNoConversion"));
       break;
 
     case TypeFormat::kSInt64:
     case TypeFormat::kSInt32:
-      name.append(StrCat(", ", TcParserBaseName(options), "kZigZag"));
+      name.append(StrCat(", ::", tcpb, "::kZigZag"));
       break;
 
     case TypeFormat::kBytes:
-      name.append(StrCat(", ", TcParserBaseName(options), "kNoUtf8"));
+      name.append(StrCat(", ::", tcpb, "::kNoUtf8"));
       break;
 
     case TypeFormat::kString:
-      name.append(StrCat(", ", TcParserBaseName(options), "kUtf8"));
+      name.append(StrCat(", ::", tcpb, "::kUtf8"));
       break;
 
     case TypeFormat::kStringValidateOnly:
-      name.append(
-          StrCat(", ", TcParserBaseName(options), "kUtf8ValidateOnly"));
+      name.append(StrCat(", ::", tcpb, "::kUtf8ValidateOnly"));
       break;
 
     default:

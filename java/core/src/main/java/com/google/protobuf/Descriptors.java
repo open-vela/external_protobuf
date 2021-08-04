@@ -1309,14 +1309,11 @@ public final class Descriptors {
       SINT32(JavaType.INT),
       SINT64(JavaType.LONG);
 
-      // Private copy to avoid repeated allocations from calls to values() in valueOf().
-      private static final Type[] types = values();
-
-      Type(JavaType javaType) {
+      Type(final JavaType javaType) {
         this.javaType = javaType;
       }
 
-      private final JavaType javaType;
+      private JavaType javaType;
 
       public FieldDescriptorProto.Type toProto() {
         return FieldDescriptorProto.Type.forNumber(ordinal() + 1);
@@ -1327,13 +1324,13 @@ public final class Descriptors {
       }
 
       public static Type valueOf(final FieldDescriptorProto.Type type) {
-        return types[type.getNumber() - 1];
+        return values()[type.getNumber() - 1];
       }
     }
 
     static {
       // Refuse to init if someone added a new declared type.
-      if (Type.types.length != FieldDescriptorProto.Type.values().length) {
+      if (Type.values().length != FieldDescriptorProto.Type.values().length) {
         throw new RuntimeException(
             "descriptor.proto has a new declared type but Descriptors.java wasn't updated.");
       }
