@@ -34,9 +34,13 @@ load(
     "upb_proto_library",
     "upb_proto_reflection_library",
 )
-load("@rules_fuzzing//fuzzing:cc_defs.bzl", "cc_fuzz_test")
 
 licenses(["notice"])
+
+config_setting(
+    name = "fuzz",
+    values = {"define": "fuzz=true"},
+)
 
 cc_library(
     name = "upb_test",
@@ -140,9 +144,18 @@ cc_test(
 )
 
 # OSS-Fuzz test
-cc_fuzz_test(
+cc_binary(
     name = "file_descriptor_parsenew_fuzzer",
+    testonly = 1,
     srcs = ["file_descriptor_parsenew_fuzzer.cc"],
+    copts = UPB_DEFAULT_CPPOPTS + select({
+        "//conditions:default": [],
+        ":fuzz": ["-fsanitize=fuzzer,address"],
+    }),
+    defines = select({
+        "//conditions:default": [],
+        ":fuzz": ["HAVE_FUZZER"],
+    }),
     deps = [
         "//:descriptor_upb_proto",
         "//:upb",
