@@ -1,55 +1,98 @@
-workspace(name = "upb")
+workspace(name = "com_google_protobuf")
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-load("//bazel:workspace_deps.bzl", "upb_deps")
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
-upb_deps()
+local_repository(
+    name = "com_google_protobuf_examples",
+    path = "examples",
+)
 
 http_archive(
-    name = "lua",
-    build_file = "//bazel:lua.BUILD",
-    sha256 = "b9e2e4aad6789b3b63a056d442f7b39f0ecfca3ae0f1fc0ae4e9614401b69f4b",
-    strip_prefix = "lua-5.2.4",
+    name = "com_google_googletest",
+    sha256 = "9dc9157a9a1551ec7a7e43daea9a694a0bb5fb8bec81235d8a1e6ef64c716dcb",
+    strip_prefix = "googletest-release-1.10.0",
     urls = [
-        "https://mirror.bazel.build/www.lua.org/ftp/lua-5.2.4.tar.gz",
-        "https://www.lua.org/ftp/lua-5.2.4.tar.gz",
+        "https://mirror.bazel.build/github.com/google/googletest/archive/release-1.10.0.tar.gz",
+        "https://github.com/google/googletest/archive/release-1.10.0.tar.gz",
     ],
 )
 
 http_archive(
-     name = "com_google_googletest",
-     urls = ["https://github.com/google/googletest/archive/b6cd405286ed8635ece71c72f118e659f4ade3fb.zip"],  # 2019-01-07
-     strip_prefix = "googletest-b6cd405286ed8635ece71c72f118e659f4ade3fb",
-     sha256 = "ff7a82736e158c077e76188232eac77913a15dac0b22508c390ab3f88e6d6d86",
-)
-
-http_archive(
     name = "com_github_google_benchmark",
-    urls = ["https://github.com/google/benchmark/archive/16703ff83c1ae6d53e5155df3bb3ab0bc96083be.zip"],
-    strip_prefix = "benchmark-16703ff83c1ae6d53e5155df3bb3ab0bc96083be",
-    sha256 = "59f918c8ccd4d74b6ac43484467b500f1d64b40cc1010daa055375b322a43ba3",
+    sha256 = "2a778d821997df7d8646c9c59b8edb9a573a6e04c534c01892a40aa524a7b68c",
+    strip_prefix = "benchmark-bf585a2789e30585b4e3ce6baf11ef2750b54677",
+    urls = [
+        "https://github.com/google/benchmark/archive/bf585a2789e30585b4e3ce6baf11ef2750b54677.zip",
+    ],
 )
 
-http_archive(
-    name = "com_google_googleapis",
-    urls = ["https://github.com/googleapis/googleapis/archive/refs/heads/master.zip"],
-    build_file = "//benchmarks:BUILD.googleapis",
-    strip_prefix = "googleapis-master",
-    patch_cmds = ["find google -type f -name BUILD.bazel -delete"],
+# Load common dependencies.
+load("//:protobuf_deps.bzl", "protobuf_deps")
+protobuf_deps()
+
+bind(
+    name = "python_headers",
+    actual = "//util/python:python_headers",
 )
 
-http_archive(
-    name = "rules_fuzzing",
-    sha256 = "127d7c45e9b7520b3c42145b3cb1b8c26477cdaed0521b02a0298907339fefa1",
-    strip_prefix = "rules_fuzzing-0.2.0",
-    urls = ["https://github.com/bazelbuild/rules_fuzzing/archive/v0.2.0.zip"],
+load("@rules_jvm_external//:defs.bzl", "maven_install")
+maven_install(
+    artifacts = [
+        "com.google.code.gson:gson:2.8.6",
+        "com.google.errorprone:error_prone_annotations:2.3.2",
+        "com.google.guava:guava:30.1.1-jre",
+        "com.google.truth:truth:1.1.2",
+        "junit:junit:4.12",
+        "org.easymock:easymock:3.2",
+        "org.easymock:easymockclassextension:3.2",
+    ],
+    repositories = [
+        "https://repo1.maven.org/maven2",
+        "https://repo.maven.apache.org/maven2",
+    ],
+    # For updating instructions, see: 
+    # https://github.com/bazelbuild/rules_jvm_external#updating-maven_installjson
+    maven_install_json = "//:maven_install.json",
 )
 
-load("@rules_fuzzing//fuzzing:repositories.bzl", "rules_fuzzing_dependencies")
+load("@maven//:defs.bzl", "pinned_maven_install")
+pinned_maven_install()
 
-rules_fuzzing_dependencies()
+bind(
+    name = "guava",
+    actual = "@maven//:com_google_guava_guava",
+)
 
-load("@rules_fuzzing//fuzzing:init.bzl", "rules_fuzzing_init")
+bind(
+    name = "gson",
+    actual = "@maven//:com_google_code_gson_gson",
+)
 
-rules_fuzzing_init()
+bind(
+    name = "error_prone_annotations",
+    actual = "@maven//:com_google_errorprone_error_prone_annotations",
+)
+
+bind(
+    name = "junit",
+    actual = "@maven//:junit_junit",
+)
+
+bind(
+    name = "easymock",
+    actual = "@maven//:org_easymock_easymock",
+)
+
+bind(
+    name = "easymock_classextension",
+    actual = "@maven//:org_easymock_easymockclassextension",
+)
+
+bind(
+    name = "truth",
+    actual = "@maven//:com_google_truth_truth",
+)
+
+# For `cc_proto_blacklist_test` and `build_test`.
+load("@bazel_skylib//:workspace.bzl", "bazel_skylib_workspace")
+bazel_skylib_workspace()
