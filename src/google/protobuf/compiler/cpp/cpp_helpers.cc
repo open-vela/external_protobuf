@@ -169,30 +169,6 @@ static std::unordered_set<std::string>* MakeKeywordsMap() {
 
 static std::unordered_set<std::string>& kKeywords = *MakeKeywordsMap();
 
-// Encode [0..63] as 'A'-'Z', 'a'-'z', '0'-'9', '_'
-char Base63Char(int value) {
-  GOOGLE_CHECK_GE(value, 0);
-  if (value < 26) return 'A' + value;
-  value -= 26;
-  if (value < 26) return 'a' + value;
-  value -= 26;
-  if (value < 10) return '0' + value;
-  GOOGLE_CHECK_EQ(value, 10);
-  return '_';
-}
-
-// Given a c identifier has 63 legal characters we can't implement base64
-// encoding. So we return the k least significant "digits" in base 63.
-template <typename I>
-std::string Base63(I n, int k) {
-  std::string res;
-  while (k-- > 0) {
-    res += Base63Char(static_cast<int>(n % 63));
-    n /= 63;
-  }
-  return res;
-}
-
 std::string IntTypeName(const Options& options, const std::string& type) {
   if (options.opensource_runtime) {
     return "::PROTOBUF_NAMESPACE_ID::" + type;
@@ -801,8 +777,8 @@ std::string SafeFunctionName(const Descriptor* descriptor,
   return function_name;
 }
 
-bool IsStringInlined(const FieldDescriptor* descriptor,
-                     const Options& options) {
+bool IsStringInlined(const FieldDescriptor* /* descriptor */,
+                     const Options& /* options */) {
   return false;
 }
 
@@ -963,13 +939,15 @@ bool HasEnumDefinitions(const FileDescriptor* file) {
   return false;
 }
 
-bool ShouldVerify(const Descriptor* descriptor, const Options& options,
-                  MessageSCCAnalyzer* scc_analyzer) {
+bool ShouldVerify(const Descriptor* /* descriptor */,
+                  const Options& /* options */,
+                  MessageSCCAnalyzer* /* scc_analyzer */) {
   return false;
 }
 
-bool ShouldVerify(const FileDescriptor* file, const Options& options,
-                  MessageSCCAnalyzer* scc_analyzer) {
+bool ShouldVerify(const FileDescriptor* /* file */,
+                  const Options& /* options */,
+                  MessageSCCAnalyzer* /* scc_analyzer */) {
   return false;
 }
 
@@ -1165,7 +1143,7 @@ bool IsImplicitWeakField(const FieldDescriptor* field, const Options& options,
 
 MessageAnalysis MessageSCCAnalyzer::GetSCCAnalysis(const SCC* scc) {
   if (analysis_cache_.count(scc)) return analysis_cache_[scc];
-  MessageAnalysis result{};
+  MessageAnalysis result;
   if (UsingImplicitWeakFields(scc->GetFile(), options_)) {
     result.contains_weak = true;
   }
@@ -1492,7 +1470,7 @@ FileOptions_OptimizeMode GetOptimizeFor(const FileDescriptor* file,
   return FileOptions::SPEED;
 }
 
-bool EnableMessageOwnedArena(const Descriptor* desc) {
+bool EnableMessageOwnedArena(const Descriptor* /* desc */) {
   return false;
 }
 
