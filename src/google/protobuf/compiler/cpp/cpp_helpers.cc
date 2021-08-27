@@ -777,10 +777,8 @@ std::string SafeFunctionName(const Descriptor* descriptor,
   return function_name;
 }
 
-bool IsStringInlined(const FieldDescriptor* descriptor,
-                     const Options& options) {
-  (void)descriptor;
-  (void)options;
+bool IsStringInlined(const FieldDescriptor* /* descriptor */,
+                     const Options& /* options */) {
   return false;
 }
 
@@ -941,19 +939,15 @@ bool HasEnumDefinitions(const FileDescriptor* file) {
   return false;
 }
 
-bool ShouldVerify(const Descriptor* descriptor, const Options& options,
-                  MessageSCCAnalyzer* scc_analyzer) {
-  (void)descriptor;
-  (void)options;
-  (void)scc_analyzer;
+bool ShouldVerify(const Descriptor* /* descriptor */,
+                  const Options& /* options */,
+                  MessageSCCAnalyzer* /* scc_analyzer */) {
   return false;
 }
 
-bool ShouldVerify(const FileDescriptor* file, const Options& options,
-                  MessageSCCAnalyzer* scc_analyzer) {
-  (void)file;
-  (void)options;
-  (void)scc_analyzer;
+bool ShouldVerify(const FileDescriptor* /* file */,
+                  const Options& /* options */,
+                  MessageSCCAnalyzer* /* scc_analyzer */) {
   return false;
 }
 
@@ -1476,8 +1470,7 @@ FileOptions_OptimizeMode GetOptimizeFor(const FileDescriptor* file,
   return FileOptions::SPEED;
 }
 
-bool EnableMessageOwnedArena(const Descriptor* desc) {
-  (void)desc;
+bool EnableMessageOwnedArena(const Descriptor* /* desc */) {
   return false;
 }
 
