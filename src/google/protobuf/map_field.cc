@@ -40,7 +40,7 @@ namespace protobuf {
 namespace internal {
 
 MapFieldBase::~MapFieldBase() {
-  if (repeated_field_ != nullptr && arena_ == nullptr) delete repeated_field_;
+  if (repeated_field_ != NULL && arena_ == NULL) delete repeated_field_;
 }
 
 const RepeatedPtrFieldBase& MapFieldBase::GetRepeatedField() const {
@@ -56,44 +56,9 @@ RepeatedPtrFieldBase* MapFieldBase::MutableRepeatedField() {
   return reinterpret_cast<RepeatedPtrFieldBase*>(repeated_field_);
 }
 
-void MapFieldBase::SwapState(MapFieldBase* other) {
-  // a relaxed swap of the atomic
-  auto other_state = other->state_.load(std::memory_order_relaxed);
-  auto this_state = state_.load(std::memory_order_relaxed);
-  other->state_.store(this_state, std::memory_order_relaxed);
-  state_.store(other_state, std::memory_order_relaxed);
-}
-
-void SwapRepeatedPtrToNull(RepeatedPtrField<Message>** from,
-                           RepeatedPtrField<Message>** to, Arena* from_arena,
-                           Arena* to_arena) {
-  GOOGLE_DCHECK(*from != nullptr);
-  GOOGLE_DCHECK(*to == nullptr);
-  *to = Arena::CreateMessage<RepeatedPtrField<Message> >(to_arena);
-  **to = std::move(**from);
-  if (from_arena == nullptr) {
-    delete *from;
-  }
-  *from = nullptr;
-}
-
 void MapFieldBase::Swap(MapFieldBase* other) {
-  if (arena_ == other->arena_) {
-    InternalSwap(other);
-    return;
-  }
-  if (repeated_field_ != nullptr || other->repeated_field_ != nullptr) {
-    if (repeated_field_ == nullptr) {
-      SwapRepeatedPtrToNull(&other->repeated_field_, &repeated_field_,
-                            other->arena_, arena_);
-    } else if (other->repeated_field_ == nullptr) {
-      SwapRepeatedPtrToNull(&repeated_field_, &other->repeated_field_, arena_,
-                            other->arena_);
-    } else {
-      repeated_field_->Swap(other->repeated_field_);
-    }
-  }
-  SwapState(other);
+  // TODO(teboring): This is incorrect when on different arenas.
+  InternalSwap(other);
 }
 
 void MapFieldBase::UnsafeShallowSwap(MapFieldBase* other) {
@@ -104,7 +69,11 @@ void MapFieldBase::UnsafeShallowSwap(MapFieldBase* other) {
 void MapFieldBase::InternalSwap(MapFieldBase* other) {
   std::swap(arena_, other->arena_);
   std::swap(repeated_field_, other->repeated_field_);
-  SwapState(other);
+  // a relaxed swap of the atomic
+  auto other_state = other->state_.load(std::memory_order_relaxed);
+  auto this_state = state_.load(std::memory_order_relaxed);
+  other->state_.store(this_state, std::memory_order_relaxed);
+  state_.store(other_state, std::memory_order_relaxed);
 }
 
 size_t MapFieldBase::SpaceUsedExcludingSelfLong() const {
@@ -117,7 +86,7 @@ size_t MapFieldBase::SpaceUsedExcludingSelfLong() const {
 }
 
 size_t MapFieldBase::SpaceUsedExcludingSelfNoLock() const {
-  if (repeated_field_ != nullptr) {
+  if (repeated_field_ != NULL) {
     return repeated_field_->SpaceUsedExcludingSelfLong();
   } else {
     return 0;
@@ -187,7 +156,7 @@ void MapFieldBase::SyncRepeatedFieldWithMap() const {
 }
 
 void MapFieldBase::SyncRepeatedFieldWithMapNoLock() const {
-  if (repeated_field_ == nullptr) {
+  if (repeated_field_ == NULL) {
     repeated_field_ = Arena::CreateMessage<RepeatedPtrField<Message> >(arena_);
   }
 }
@@ -434,7 +403,7 @@ void DynamicMapField::SyncRepeatedFieldWithMapNoLock() const {
   const Reflection* reflection = default_entry_->GetReflection();
   const FieldDescriptor* key_des = default_entry_->GetDescriptor()->map_key();
   const FieldDescriptor* val_des = default_entry_->GetDescriptor()->map_value();
-  if (MapFieldBase::repeated_field_ == nullptr) {
+  if (MapFieldBase::repeated_field_ == NULL) {
     MapFieldBase::repeated_field_ =
         Arena::CreateMessage<RepeatedPtrField<Message> >(MapFieldBase::arena_);
   }
@@ -597,7 +566,7 @@ void DynamicMapField::SyncMapWithRepeatedFieldNoLock() const {
 
 size_t DynamicMapField::SpaceUsedExcludingSelfNoLock() const {
   size_t size = 0;
-  if (MapFieldBase::repeated_field_ != nullptr) {
+  if (MapFieldBase::repeated_field_ != NULL) {
     size += MapFieldBase::repeated_field_->SpaceUsedExcludingSelfLong();
   }
   size += sizeof(map_);
