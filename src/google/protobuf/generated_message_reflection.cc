@@ -2491,12 +2491,18 @@ bool Reflection::HasBit(const Message& message,
     // (which uses HasField()) needs to be consistent with this.
     switch (field->cpp_type()) {
       case FieldDescriptor::CPPTYPE_STRING:
-        if (IsInlined(field)) {
-          return !GetField<InlinedStringField>(message, field)
-                      .GetNoArena()
-                      .empty();
+        switch (field->options().ctype()) {
+          default: {
+            if (IsInlined(field)) {
+              return !GetField<InlinedStringField>(message, field)
+                          .GetNoArena()
+                          .empty();
+            }
+
+            return GetField<ArenaStringPtr>(message, field).Get().size() > 0;
+          }
         }
-        return GetField<ArenaStringPtr>(message, field).Get().size() > 0;
+        return false;
       case FieldDescriptor::CPPTYPE_BOOL:
         return GetRaw<bool>(message, field) != false;
       case FieldDescriptor::CPPTYPE_INT32:

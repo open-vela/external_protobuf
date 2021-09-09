@@ -468,6 +468,12 @@
 #error PROTOBUF_FORCE_COPY_IN_MOVE was previously defined
 #endif
 
+// Force copy the default string to a string field so that non-optimized builds
+// have harder-to-rely-on address stability.
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+#error PROTOBUF_FORCE_COPY_DEFAULT_STRING was previously defined
+#endif
+
 #ifdef PROTOBUF_FALLTHROUGH_INTENDED
 #error PROTOBUF_FALLTHROUGH_INTENDED was previously defined
 #endif
@@ -766,8 +772,6 @@
 #pragma warning(disable : 4073)
 // To silence the fact that we will pop this push from another file
 #pragma warning(disable : 5031)
-// Conditional expression is constant
-#pragma warning(disable: 4127)
 #endif
 
 // We don't want code outside port_def doing complex testing, so
