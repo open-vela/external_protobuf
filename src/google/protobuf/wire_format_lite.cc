@@ -34,7 +34,6 @@
 
 #include <google/protobuf/wire_format_lite.h>
 
-#include <limits>
 #include <stack>
 #include <string>
 #include <vector>
@@ -304,7 +303,7 @@ bool WireFormatLite::ReadPackedEnumPreserveUnknowns(
     if (!ReadPrimitive<int, WireFormatLite::TYPE_ENUM>(input, &value)) {
       return false;
     }
-    if (is_valid == nullptr || is_valid(value)) {
+    if (is_valid == NULL || is_valid(value)) {
       values->Add(value);
     } else {
       uint32_t tag = WireFormatLite::MakeTag(field_number,
@@ -476,13 +475,11 @@ void WireFormatLite::WriteEnum(int field_number, int value,
   WriteEnumNoTag(value, output);
 }
 
-constexpr size_t kInt32MaxSize = std::numeric_limits<int32_t>::max();
-
 void WireFormatLite::WriteString(int field_number, const std::string& value,
                                  io::CodedOutputStream* output) {
   // String is for UTF-8 text only
   WriteTag(field_number, WIRETYPE_LENGTH_DELIMITED, output);
-  GOOGLE_CHECK_LE(value.size(), kInt32MaxSize);
+  GOOGLE_CHECK_LE(value.size(), static_cast<size_t>(kint32max));
   output->WriteVarint32(value.size());
   output->WriteString(value);
 }
@@ -491,14 +488,14 @@ void WireFormatLite::WriteStringMaybeAliased(int field_number,
                                              io::CodedOutputStream* output) {
   // String is for UTF-8 text only
   WriteTag(field_number, WIRETYPE_LENGTH_DELIMITED, output);
-  GOOGLE_CHECK_LE(value.size(), kInt32MaxSize);
+  GOOGLE_CHECK_LE(value.size(), static_cast<size_t>(kint32max));
   output->WriteVarint32(value.size());
   output->WriteRawMaybeAliased(value.data(), value.size());
 }
 void WireFormatLite::WriteBytes(int field_number, const std::string& value,
                                 io::CodedOutputStream* output) {
   WriteTag(field_number, WIRETYPE_LENGTH_DELIMITED, output);
-  GOOGLE_CHECK_LE(value.size(), kInt32MaxSize);
+  GOOGLE_CHECK_LE(value.size(), static_cast<size_t>(kint32max));
   output->WriteVarint32(value.size());
   output->WriteString(value);
 }
@@ -506,7 +503,7 @@ void WireFormatLite::WriteBytesMaybeAliased(int field_number,
                                             const std::string& value,
                                             io::CodedOutputStream* output) {
   WriteTag(field_number, WIRETYPE_LENGTH_DELIMITED, output);
-  GOOGLE_CHECK_LE(value.size(), kInt32MaxSize);
+  GOOGLE_CHECK_LE(value.size(), static_cast<size_t>(kint32max));
   output->WriteVarint32(value.size());
   output->WriteRawMaybeAliased(value.data(), value.size());
 }
@@ -586,7 +583,7 @@ void PrintUTF8ErrorLog(const char* field_name, const char* operation_str,
 bool WireFormatLite::VerifyUtf8String(const char* data, int size, Operation op,
                                       const char* field_name) {
   if (!IsStructurallyValidUTF8(data, size)) {
-    const char* operation_str = nullptr;
+    const char* operation_str = NULL;
     switch (op) {
       case PARSE:
         operation_str = "parsing";
