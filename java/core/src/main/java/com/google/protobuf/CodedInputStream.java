@@ -33,6 +33,7 @@ package com.google.protobuf;
 import static com.google.protobuf.Internal.EMPTY_BYTE_ARRAY;
 import static com.google.protobuf.Internal.EMPTY_BYTE_BUFFER;
 import static com.google.protobuf.Internal.UTF_8;
+import static com.google.protobuf.Internal.checkNotNull;
 import static com.google.protobuf.WireFormat.FIXED32_SIZE;
 import static com.google.protobuf.WireFormat.FIXED64_SIZE;
 import static com.google.protobuf.WireFormat.MAX_VARINT_SIZE;
@@ -46,7 +47,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Reads and decodes protocol message fields.
@@ -2013,20 +2013,20 @@ public abstract class CodedInputStream {
     private ByteBuffer slice(long begin, long end) throws IOException {
       int prevPos = buffer.position();
       int prevLimit = buffer.limit();
+      // View ByteBuffer as Buffer to avoid cross-Java version issues.
+      // See https://issues.apache.org/jira/browse/MRESOLVER-85
+      Buffer asBuffer = buffer;
       try {
-        // Casts to Buffer here are required for Java 8 compatibility
-        // no matter what tricorder tells you. see
-        // https://issues.apache.org/jira/browse/MRESOLVER-85
-        ((Buffer) buffer).position(bufferPos(begin));
-        ((Buffer) buffer).limit(bufferPos(end));
+        asBuffer.position(bufferPos(begin));
+        asBuffer.limit(bufferPos(end));
         return buffer.slice();
       } catch (IllegalArgumentException e) {
         InvalidProtocolBufferException ex = InvalidProtocolBufferException.truncatedMessage();
         ex.initCause(e);
         throw ex;
       } finally {
-        ((Buffer) buffer).position(prevPos);
-        ((Buffer) buffer).limit(prevLimit);
+        asBuffer.position(prevPos);
+        asBuffer.limit(prevLimit);
       }
     }
   }
@@ -2056,7 +2056,8 @@ public abstract class CodedInputStream {
     private int currentLimit = Integer.MAX_VALUE;
 
     private StreamDecoder(final InputStream input, int bufferSize) {
-      this.input = Objects.requireNonNull(input, "input");
+      checkNotNull(input, "input");
+      this.input = input;
       this.buffer = new byte[bufferSize];
       this.bufferSize = 0;
       pos = 0;
@@ -3963,18 +3964,18 @@ public abstract class CodedInputStream {
     private ByteBuffer slice(int begin, int end) throws IOException {
       int prevPos = currentByteBuffer.position();
       int prevLimit = currentByteBuffer.limit();
+      // View ByteBuffer as Buffer to avoid cross-Java version issues.
+      // See https://issues.apache.org/jira/browse/MRESOLVER-85
+      Buffer asBuffer = currentByteBuffer;
       try {
-        // casts to Buffer here are required for Java 8 compatibility
-        // no matter what tricorder tells you. see
-        // https://issues.apache.org/jira/browse/MRESOLVER-85
-        ((Buffer) currentByteBuffer).position(begin);
-        ((Buffer) currentByteBuffer).limit(end);
+        asBuffer.position(begin);
+        asBuffer.limit(end);
         return currentByteBuffer.slice();
       } catch (IllegalArgumentException e) {
         throw InvalidProtocolBufferException.truncatedMessage();
       } finally {
-        ((Buffer) currentByteBuffer).position(prevPos);
-        ((Buffer) currentByteBuffer).limit(prevLimit);
+        asBuffer.position(prevPos);
+        asBuffer.limit(prevLimit);
       }
     }
   }
