@@ -794,7 +794,7 @@ class TableArena {
     size = RoundUp(size);
 
     Block* to_relocate = nullptr;
-    Block* to_use = nullptr;
+    Block* to_use;
 
     for (size_t i = 0; i < kSmallSizes.size(); ++i) {
       if (small_size_blocks_[i] != nullptr && size <= kSmallSizes[i]) {
@@ -993,12 +993,12 @@ class TableArena {
     to_relocate->PrependTo(full_blocks_);
   }
 
-  static constexpr std::array<uint8_t, 6> kSmallSizes = {
-      {// Sizes for pointer arrays.
-       8, 16, 24, 32,
-       // Sizes for string arrays (for descriptor names).
-       // The most common array sizes are 2 and 3.
-       2 * sizeof(std::string), 3 * sizeof(std::string)}};
+  static constexpr std::array<uint8_t, 6> kSmallSizes = {{
+      // Sizes for pointer arrays.
+      8, 16, 24, 32,
+      // Sizes for string arrays (for descriptor names).
+      // The most common array sizes are 2 and 3.
+      2 * sizeof(std::string), 3 * sizeof(std::string)}};
 
   // Helper function to iterate all lists.
   std::array<Block*, 2 + kSmallSizes.size()> GetLists() const {
@@ -1720,7 +1720,7 @@ DescriptorPool::Tables::AllocateFieldNames(const std::string& name,
   const int total_count = 2 + (lower_eq_name ? 0 : 1) +
                           (camel_eq_name ? 0 : 1) +
                           (json_eq_name || json_eq_camel ? 0 : 1);
-  FieldNamesResult result{nullptr, 0, 0, 0};
+  FieldNamesResult result;
   // We use std::array to allow handling of the destruction of the strings.
   switch (total_count) {
     case 2:
@@ -2826,12 +2826,7 @@ bool RetrieveOptions(int depth, const Message& options,
     DynamicMessageFactory factory;
     std::unique_ptr<Message> dynamic_options(
         factory.GetPrototype(option_descriptor)->New());
-    std::string serialized = options.SerializeAsString();
-    io::CodedInputStream input(
-        reinterpret_cast<const uint8_t*>(serialized.c_str()),
-        serialized.size());
-    input.SetExtensionRegistry(pool, &factory);
-    if (dynamic_options->ParseFromCodedStream(&input)) {
+    if (dynamic_options->ParseFromString(options.SerializeAsString())) {
       return RetrieveOptionsAssumingRightPool(depth, *dynamic_options,
                                               option_entries);
     } else {
@@ -5947,23 +5942,11 @@ void DescriptorBuilder::CrossLinkMessage(Descriptor* message,
       }
       // Must go through oneof_decls_ array to get a non-const version of the
       // OneofDescriptor.
-      auto& out_oneof_decl = message->oneof_decls_[oneof_decl->index()];
-      if (out_oneof_decl.field_count_ == 0) {
-        out_oneof_decl.fields_ = message->field(i);
-      }
-
-      if (!had_errors_) {
-        // Verify that they are contiguous.
-        // This is assumed by OneofDescriptor::field(i).
-        // But only if there are no errors.
-        GOOGLE_CHECK_EQ(out_oneof_decl.fields_ + out_oneof_decl.field_count_,
-                 message->field(i));
-      }
-      ++out_oneof_decl.field_count_;
+      ++message->oneof_decls_[oneof_decl->index()].field_count_;
     }
   }
 
-  // Then verify the sizes.
+  // Then allocate the arrays.
   for (int i = 0; i < message->oneof_decl_count(); i++) {
     OneofDescriptor* oneof_decl = &message->oneof_decls_[i];
 
@@ -5973,8 +5956,24 @@ void DescriptorBuilder::CrossLinkMessage(Descriptor* message,
                "Oneof must have at least one field.");
     }
 
+    oneof_decl->fields_ = tables_->AllocateArray<const FieldDescriptor*>(
+        oneof_decl->field_count_);
+    oneof_decl->field_count_ = 0;
+
     if (oneof_decl->options_ == nullptr) {
       oneof_decl->options_ = &OneofOptions::default_instance();
+    }
+  }
+
+  // Then fill them in.
+  for (int i = 0; i < message->field_count(); i++) {
+    const OneofDescriptor* oneof_decl = message->field(i)->containing_oneof();
+    if (oneof_decl != nullptr) {
+      OneofDescriptor* mutable_oneof_decl =
+          &message->oneof_decls_[oneof_decl->index()];
+      message->fields_[i].index_in_oneof_ = mutable_oneof_decl->field_count_;
+      mutable_oneof_decl->fields_[mutable_oneof_decl->field_count_++] =
+          message->field(i);
     }
   }
 
@@ -6530,7 +6529,7 @@ void DescriptorBuilder::ValidateMessageOptions(Descriptor* message,
 
   const int64_t max_extension_range =
       static_cast<int64_t>(message->options().message_set_wire_format()
-                               ? std::numeric_limits<int32_t>::max()
+                               ? kint32max
                                : FieldDescriptor::kMaxNumber);
   for (int i = 0; i < message->extension_range_count(); ++i) {
     if (message->extension_range(i)->end > max_extension_range + 1) {
@@ -7320,7 +7319,7 @@ bool DescriptorBuilder::OptionInterpreter::SetOptionValue(
     case FieldDescriptor::CPPTYPE_INT32:
       if (uninterpreted_option_->has_positive_int_value()) {
         if (uninterpreted_option_->positive_int_value() >
-            static_cast<uint64_t>(std::numeric_limits<int32_t>::max())) {
+            static_cast<uint64_t>(kint32max)) {
           return AddValueError("Value out of range for int32 option \"" +
                                option_field->full_name() + "\".");
         } else {
@@ -7330,7 +7329,7 @@ bool DescriptorBuilder::OptionInterpreter::SetOptionValue(
         }
       } else if (uninterpreted_option_->has_negative_int_value()) {
         if (uninterpreted_option_->negative_int_value() <
-            static_cast<int64_t>(std::numeric_limits<int32_t>::min())) {
+            static_cast<int64_t>(kint32min)) {
           return AddValueError("Value out of range for int32 option \"" +
                                option_field->full_name() + "\".");
         } else {
@@ -7347,7 +7346,7 @@ bool DescriptorBuilder::OptionInterpreter::SetOptionValue(
     case FieldDescriptor::CPPTYPE_INT64:
       if (uninterpreted_option_->has_positive_int_value()) {
         if (uninterpreted_option_->positive_int_value() >
-            static_cast<uint64_t>(std::numeric_limits<int64_t>::max())) {
+            static_cast<uint64_t>(kint64max)) {
           return AddValueError("Value out of range for int64 option \"" +
                                option_field->full_name() + "\".");
         } else {
@@ -7367,8 +7366,7 @@ bool DescriptorBuilder::OptionInterpreter::SetOptionValue(
 
     case FieldDescriptor::CPPTYPE_UINT32:
       if (uninterpreted_option_->has_positive_int_value()) {
-        if (uninterpreted_option_->positive_int_value() >
-            std::numeric_limits<uint32_t>::max()) {
+        if (uninterpreted_option_->positive_int_value() > kuint32max) {
           return AddValueError("Value out of range for uint32 option \"" +
                                option_field->name() + "\".");
         } else {

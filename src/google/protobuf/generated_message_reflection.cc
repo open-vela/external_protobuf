@@ -248,12 +248,6 @@ UnknownFieldSet* Reflection::MutableUnknownFields(Message* message) const {
       ->mutable_unknown_fields<UnknownFieldSet>();
 }
 
-bool Reflection::IsLazyExtension(const Message& message,
-                                 const FieldDescriptor* field) const {
-  return field->is_extension() &&
-         GetExtensionSet(message).HasLazy(field->number());
-}
-
 bool Reflection::IsLazilyVerifiedLazyField(const FieldDescriptor* field) const {
   return field->options().lazy();
 }
@@ -2491,12 +2485,18 @@ bool Reflection::HasBit(const Message& message,
     // (which uses HasField()) needs to be consistent with this.
     switch (field->cpp_type()) {
       case FieldDescriptor::CPPTYPE_STRING:
-        if (IsInlined(field)) {
-          return !GetField<InlinedStringField>(message, field)
-                      .GetNoArena()
-                      .empty();
+        switch (field->options().ctype()) {
+          default: {
+            if (IsInlined(field)) {
+              return !GetField<InlinedStringField>(message, field)
+                          .GetNoArena()
+                          .empty();
+            }
+
+            return GetField<ArenaStringPtr>(message, field).Get().size() > 0;
+          }
         }
-        return GetField<ArenaStringPtr>(message, field).Get().size() > 0;
+        return false;
       case FieldDescriptor::CPPTYPE_BOOL:
         return GetRaw<bool>(message, field) != false;
       case FieldDescriptor::CPPTYPE_INT32:
@@ -2620,19 +2620,19 @@ void Reflection::ClearOneof(Message* message,
   }
 }
 
-#define HANDLE_TYPE(TYPE, CPPTYPE, CTYPE)                                  \
-  template <>                                                              \
-  const RepeatedField<TYPE>& Reflection::GetRepeatedFieldInternal<TYPE>(   \
-      const Message& message, const FieldDescriptor* field) const {        \
-    return *static_cast<RepeatedField<TYPE>*>(MutableRawRepeatedField(     \
-        const_cast<Message*>(&message), field, CPPTYPE, CTYPE, nullptr));  \
-  }                                                                        \
-                                                                           \
-  template <>                                                              \
-  RepeatedField<TYPE>* Reflection::MutableRepeatedFieldInternal<TYPE>(     \
-      Message * message, const FieldDescriptor* field) const {             \
-    return static_cast<RepeatedField<TYPE>*>(                              \
-        MutableRawRepeatedField(message, field, CPPTYPE, CTYPE, nullptr)); \
+#define HANDLE_TYPE(TYPE, CPPTYPE, CTYPE)                                \
+  template <>                                                            \
+  const RepeatedField<TYPE>& Reflection::GetRepeatedFieldInternal<TYPE>( \
+      const Message& message, const FieldDescriptor* field) const {      \
+    return *static_cast<RepeatedField<TYPE>*>(MutableRawRepeatedField(   \
+        const_cast<Message*>(&message), field, CPPTYPE, CTYPE, NULL));   \
+  }                                                                      \
+                                                                         \
+  template <>                                                            \
+  RepeatedField<TYPE>* Reflection::MutableRepeatedFieldInternal<TYPE>(   \
+      Message * message, const FieldDescriptor* field) const {           \
+    return static_cast<RepeatedField<TYPE>*>(                            \
+        MutableRawRepeatedField(message, field, CPPTYPE, CTYPE, NULL));  \
   }
 
 HANDLE_TYPE(int32_t, FieldDescriptor::CPPTYPE_INT32, -1);
@@ -2651,7 +2651,7 @@ void* Reflection::MutableRawRepeatedString(Message* message,
                                            bool is_string) const {
   return MutableRawRepeatedField(message, field,
                                  FieldDescriptor::CPPTYPE_STRING,
-                                 FieldOptions::STRING, nullptr);
+                                 FieldOptions::STRING, NULL);
 }
 
 // Template implementations of basic accessors.  Inline because each

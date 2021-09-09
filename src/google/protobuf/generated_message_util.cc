@@ -591,12 +591,12 @@ bool IsNull<WireFormatLite::TYPE_BYTES>(const void* ptr) {
 
 template <>
 bool IsNull<WireFormatLite::TYPE_GROUP>(const void* ptr) {
-  return Get<const MessageLite*>(ptr) == nullptr;
+  return Get<const MessageLite*>(ptr) == NULL;
 }
 
 template <>
 bool IsNull<WireFormatLite::TYPE_MESSAGE>(const void* ptr) {
-  return Get<const MessageLite*>(ptr) == nullptr;
+  return Get<const MessageLite*>(ptr) == NULL;
 }
 
 
@@ -739,7 +739,7 @@ MessageLite* DuplicateIfNonNullInternal(MessageLite* message) {
     ret->CheckTypeAndMergeFrom(*message);
     return ret;
   } else {
-    return nullptr;
+    return NULL;
   }
 }
 
@@ -761,7 +761,7 @@ MessageLite* GetOwnedMessageInternal(Arena* message_arena,
          submessage_arena);
   GOOGLE_DCHECK(message_arena != submessage_arena);
   GOOGLE_DCHECK_EQ(submessage_arena, nullptr);
-  if (message_arena != nullptr && submessage_arena == nullptr) {
+  if (message_arena != NULL && submessage_arena == NULL) {
     message_arena->Own(submessage);
     return submessage;
   } else {

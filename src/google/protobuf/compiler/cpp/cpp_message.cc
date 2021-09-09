@@ -1437,8 +1437,7 @@ void MessageGenerator::GenerateClassDefinition(io::Printer* printer) {
   if (EnableMessageOwnedArena(descriptor_)) {
     format(
         "inline $classname$() : $classname$("
-        "::$proto_ns$::Arena::InternalHelper<$classname$>::\n"
-        "    CreateMessageOwnedArena(), true) {}\n");
+        "new ::$proto_ns$::Arena(), true) {}\n");
   } else {
     format("inline $classname$() : $classname$(nullptr) {}\n");
   }
@@ -1531,8 +1530,10 @@ void MessageGenerator::GenerateClassDefinition(io::Printer* printer) {
     format("enum $1$Case {\n", UnderscoresToCamelCase(oneof->name(), true));
     format.Indent();
     for (auto field : FieldRange(oneof)) {
-      format("$1$ = $2$,\n", OneofCaseConstantName(field),  // 1
-             field->number());                              // 2
+      std::string oneof_enum_case_field_name =
+          UnderscoresToCamelCase(field->name(), true);
+      format("k$1$ = $2$,\n", oneof_enum_case_field_name,  // 1
+             field->number());                             // 2
     }
     format("$1$_NOT_SET = 0,\n", ToUpper(oneof->name()));
     format.Outdent();
@@ -1564,8 +1565,7 @@ void MessageGenerator::GenerateClassDefinition(io::Printer* printer) {
           "bool PackFrom(const ::$proto_ns$::Message& message,\n"
           "              ::PROTOBUF_NAMESPACE_ID::ConstStringParam "
           "type_url_prefix) {\n"
-          "  return _any_metadata_.PackFrom(GetArena(), message, "
-          "type_url_prefix);\n"
+          "  return _any_metadata_.PackFrom(GetArena(), message, type_url_prefix);\n"
           "}\n"
           "bool UnpackTo(::$proto_ns$::Message* message) const {\n"
           "  return _any_metadata_.UnpackTo(message);\n"
@@ -1586,8 +1586,7 @@ void MessageGenerator::GenerateClassDefinition(io::Printer* printer) {
           "bool PackFrom(const T& message,\n"
           "              ::PROTOBUF_NAMESPACE_ID::ConstStringParam "
           "type_url_prefix) {\n"
-          "  return _any_metadata_.PackFrom<T>(GetArena(), message, "
-          "type_url_prefix);"
+          "  return _any_metadata_.PackFrom<T>(GetArena(), message, type_url_prefix);"
           "}\n"
           "template <typename T, class = typename std::enable_if<"
           "!std::is_convertible<T, const ::$proto_ns$::Message&>"
@@ -1599,14 +1598,13 @@ void MessageGenerator::GenerateClassDefinition(io::Printer* printer) {
       format(
           "template <typename T>\n"
           "bool PackFrom(const T& message) {\n"
-          "  return _any_metadata_.PackFrom(GetArena(), message);\n"
+          "  return _any_metadata_.PackFrom(message);\n"
           "}\n"
           "template <typename T>\n"
           "bool PackFrom(const T& message,\n"
           "              ::PROTOBUF_NAMESPACE_ID::ConstStringParam "
           "type_url_prefix) {\n"
-          "  return _any_metadata_.PackFrom(GetArena(), message, "
-          "type_url_prefix);\n"
+          "  return _any_metadata_.PackFrom(message, type_url_prefix);\n"
           "}\n"
           "template <typename T>\n"
           "bool UnpackTo(T* message) const {\n"
@@ -1628,12 +1626,12 @@ void MessageGenerator::GenerateClassDefinition(io::Printer* printer) {
       "}\n"
       "inline void Swap($classname$* other) {\n"
       "  if (other == this) return;\n"
-      "#ifdef PROTOBUF_FORCE_COPY_IN_SWAP\n"
+#ifdef PROTOBUF_FORCE_COPY_IN_SWAP
       "  if (GetOwningArena() != nullptr &&\n"
-      "      GetOwningArena() == other->GetOwningArena()) {\n "
-      "#else  // PROTOBUF_FORCE_COPY_IN_SWAP\n"
+      "      GetOwningArena() == other->GetOwningArena()) {\n"
+#else   // PROTOBUF_FORCE_COPY_IN_SWAP
       "  if (GetOwningArena() == other->GetOwningArena()) {\n"
-      "#endif  // !PROTOBUF_FORCE_COPY_IN_SWAP\n"
+#endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
       "    InternalSwap(other);\n"
       "  } else {\n"
       "    ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);\n"
@@ -2798,7 +2796,7 @@ void MessageGenerator::GenerateSharedConstructorCode(io::Printer* printer) {
   if (HasSimpleBaseClass(descriptor_, options_)) return;
   Formatter format(printer, variables_);
 
-  format("inline void $classname$::SharedCtor() {\n");
+  format("void $classname$::SharedCtor() {\n");
 
   std::vector<bool> processed(optimized_order_.size(), false);
   GenerateConstructorBody(printer, processed, false);
