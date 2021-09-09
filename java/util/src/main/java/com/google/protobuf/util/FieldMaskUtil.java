@@ -400,12 +400,19 @@ public final class FieldMaskUtil {
   }
 
   /**
-   * Returns the result of keeping only the masked fields of the given proto.
+   * Returns the result of merging the given proto with the given mask and a default instance.
+   */
+  public static <P extends Message> P trim(FieldMask mask, P source) {
+   return trim(mask, source, new MergeOptions());
+  }
+
+   /**
+   * Returns the result of merging the given proto with the given mask and a default instance.
    */
   @SuppressWarnings("unchecked")
-  public static <P extends Message> P trim(FieldMask mask, P source) {
-   Message.Builder destination = source.newBuilderForType();
-    merge(mask, source, destination);
+  public static <P extends Message> P trim(FieldMask mask, P source, MergeOptions options) {
+    Message.Builder destination = source.newBuilderForType();
+    merge(mask, source, destination, options);
     return (P) destination.build();
   }
 }

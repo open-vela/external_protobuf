@@ -385,7 +385,7 @@ Type::Type(const Type& from)
   // @@protoc_insertion_point(copy_constructor:google.protobuf.Type)
 }
 
-inline void Type::SharedCtor() {
+void Type::SharedCtor() {
 name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 ::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
     reinterpret_cast<char*>(&source_context_) - reinterpret_cast<char*>(this)),
@@ -767,7 +767,7 @@ Field::Field(const Field& from)
   // @@protoc_insertion_point(copy_constructor:google.protobuf.Field)
 }
 
-inline void Field::SharedCtor() {
+void Field::SharedCtor() {
 name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 type_url_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 json_name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
@@ -847,7 +847,7 @@ const char* Field::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::inte
       // int32 number = 3;
       case 3:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 24)) {
-          number_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+          number_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else
           goto handle_unusual;
@@ -875,7 +875,7 @@ const char* Field::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::inte
       // int32 oneof_index = 7;
       case 7:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 56)) {
-          oneof_index_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+          oneof_index_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else
           goto handle_unusual;
@@ -1259,7 +1259,7 @@ Enum::Enum(const Enum& from)
   // @@protoc_insertion_point(copy_constructor:google.protobuf.Enum)
 }
 
-inline void Enum::SharedCtor() {
+void Enum::SharedCtor() {
 name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 ::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
     reinterpret_cast<char*>(&source_context_) - reinterpret_cast<char*>(this)),
@@ -1588,7 +1588,7 @@ EnumValue::EnumValue(const EnumValue& from)
   // @@protoc_insertion_point(copy_constructor:google.protobuf.EnumValue)
 }
 
-inline void EnumValue::SharedCtor() {
+void EnumValue::SharedCtor() {
 name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 number_ = 0;
 }
@@ -1646,7 +1646,7 @@ const char* EnumValue::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::
       // int32 number = 2;
       case 2:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
-          number_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+          number_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else
           goto handle_unusual;
@@ -1857,7 +1857,7 @@ Option::Option(const Option& from)
   // @@protoc_insertion_point(copy_constructor:google.protobuf.Option)
 }
 
-inline void Option::SharedCtor() {
+void Option::SharedCtor() {
 name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 value_ = nullptr;
 }
