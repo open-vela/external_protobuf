@@ -116,7 +116,6 @@
 #include <climits>
 #include <cstddef>
 #include <cstring>
-#include <limits>
 #include <string>
 #include <type_traits>
 #include <utility>
@@ -1552,7 +1551,7 @@ inline CodedInputStream::CodedInputStream(ZeroCopyInputStream* input)
       last_tag_(0),
       legitimate_message_end_(false),
       aliasing_enabled_(false),
-      current_limit_(std::numeric_limits<int32_t>::max()),
+      current_limit_(kint32max),
       buffer_size_after_limit_(0),
       total_bytes_limit_(kDefaultTotalBytesLimit),
       recursion_budget_(default_recursion_limit_),
