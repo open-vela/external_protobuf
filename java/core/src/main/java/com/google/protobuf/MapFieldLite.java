@@ -30,13 +30,12 @@
 
 package com.google.protobuf;
 
-import static com.google.protobuf.Internal.checkNotNull;
-
 import com.google.protobuf.Internal.EnumLite;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -64,7 +63,7 @@ public final class MapFieldLite<K, V> extends LinkedHashMap<K, V> {
     EMPTY_MAP_FIELD.makeImmutable();
   }
 
-  /** Returns an singleton immutable empty MapFieldLite instance. */
+  /** Returns a singleton immutable empty MapFieldLite instance. */
   @SuppressWarnings({"unchecked", "cast"})
   public static <K, V> MapFieldLite<K, V> emptyMapField() {
     return (MapFieldLite<K, V>) EMPTY_MAP_FIELD;
@@ -92,9 +91,9 @@ public final class MapFieldLite<K, V> extends LinkedHashMap<K, V> {
   @Override
   public V put(K key, V value) {
     ensureMutable();
-    checkNotNull(key);
+    Objects.requireNonNull(key);
 
-    checkNotNull(value);
+    Objects.requireNonNull(value);
     return super.put(key, value);
   }
 
@@ -117,8 +116,8 @@ public final class MapFieldLite<K, V> extends LinkedHashMap<K, V> {
 
   private static void checkForNullKeysAndValues(Map<?, ?> m) {
     for (Object key : m.keySet()) {
-      checkNotNull(key);
-      checkNotNull(m.get(key));
+      Objects.requireNonNull(key);
+      Objects.requireNonNull(m.get(key));
     }
   }
 
