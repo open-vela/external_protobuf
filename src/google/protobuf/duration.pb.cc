@@ -100,7 +100,7 @@ Duration::Duration(const Duration& from)
   // @@protoc_insertion_point(copy_constructor:google.protobuf.Duration)
 }
 
-void Duration::SharedCtor() {
+inline void Duration::SharedCtor() {
 ::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
     reinterpret_cast<char*>(&seconds_) - reinterpret_cast<char*>(this)),
     0, static_cast<size_t>(reinterpret_cast<char*>(&nanos_) -
@@ -157,7 +157,7 @@ const char* Duration::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::i
       // int32 nanos = 2;
       case 2:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
-          nanos_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          nanos_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
         } else
           goto handle_unusual;

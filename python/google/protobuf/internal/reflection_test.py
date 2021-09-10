@@ -38,9 +38,14 @@ pure-Python protocol compiler.
 import copy
 import gc
 import operator
+import six
 import struct
 import warnings
-import unittest
+
+try:
+  import unittest2 as unittest  #PY26
+except ImportError:
+  import unittest
 
 from google.protobuf import unittest_import_pb2
 from google.protobuf import unittest_mset_pb2
@@ -60,6 +65,10 @@ from google.protobuf.internal import test_util
 from google.protobuf.internal import testing_refleaks
 from google.protobuf.internal import decoder
 from google.protobuf.internal import _parameterized
+
+
+if six.PY3:
+  long = int  # pylint: disable=redefined-builtin,invalid-name
 
 
 warnings.simplefilter('error', DeprecationWarning)
@@ -402,7 +411,7 @@ class ReflectionTest(unittest.TestCase):
     TestGetAndDeserialize('optional_int32', 1, int)
     TestGetAndDeserialize('optional_int32', 1 << 30, int)
     TestGetAndDeserialize('optional_uint32', 1 << 30, int)
-    integer_64 = int
+    integer_64 = long
     if struct.calcsize('L') == 4:
       # Python only has signed ints, so 32-bit python can't fit an uint32
       # in an int.
@@ -843,14 +852,14 @@ class ReflectionTest(unittest.TestCase):
                       setattr, proto, 'optional_bytes', u'unicode object')
 
     # Check that the default value is of python's 'unicode' type.
-    self.assertEqual(type(proto.optional_string), str)
+    self.assertEqual(type(proto.optional_string), six.text_type)
 
-    proto.optional_string = str('Testing')
+    proto.optional_string = six.text_type('Testing')
     self.assertEqual(proto.optional_string, str('Testing'))
 
     # Assign a value of type 'str' which can be encoded in UTF-8.
     proto.optional_string = str('Testing')
-    self.assertEqual(proto.optional_string, str('Testing'))
+    self.assertEqual(proto.optional_string, six.text_type('Testing'))
 
     # Try to assign a 'bytes' object which contains non-UTF-8.
     self.assertRaises(ValueError,
@@ -865,7 +874,8 @@ class ReflectionTest(unittest.TestCase):
 
   def testBytesInTextFormat(self, message_module):
     proto = message_module.TestAllTypes(optional_bytes=b'\x00\x7f\x80\xff')
-    self.assertEqual(u'optional_bytes: "\\000\\177\\200\\377"\n', str(proto))
+    self.assertEqual(u'optional_bytes: "\\000\\177\\200\\377"\n',
+                     six.text_type(proto))
 
   def testEmptyNestedMessage(self, message_module):
     proto = message_module.TestAllTypes()
@@ -1498,9 +1508,7 @@ class Proto2ReflectionTest(unittest.TestCase):
         options=descriptor_pb2.MessageOptions(),
         # pylint: disable=protected-access
         create_key=descriptor._internal_create_key)
-
-    class MyProtoClass(
-        message.Message, metaclass=reflection.GeneratedProtocolMessageType):
+    class MyProtoClass(six.with_metaclass(reflection.GeneratedProtocolMessageType, message.Message)):
       DESCRIPTOR = mydescriptor
     myproto_instance = MyProtoClass()
     self.assertEqual(0, myproto_instance.foo_field)
@@ -1548,8 +1556,8 @@ class Proto2ReflectionTest(unittest.TestCase):
     self.assertTrue('price' in desc.fields_by_name)
     self.assertTrue('owners' in desc.fields_by_name)
 
-    class CarMessage(
-        message.Message, metaclass=reflection.GeneratedProtocolMessageType):
+    class CarMessage(six.with_metaclass(reflection.GeneratedProtocolMessageType,
+                                        message.Message)):
       DESCRIPTOR = desc
 
     prius = CarMessage()
@@ -2086,7 +2094,7 @@ class Proto2ReflectionTest(unittest.TestCase):
     bytes_read = message2.MergeFromString(raw.item[0].message)
     self.assertEqual(len(raw.item[0].message), bytes_read)
 
-    self.assertEqual(type(message2.str), str)
+    self.assertEqual(type(message2.str), six.text_type)
     self.assertEqual(message2.str, test_utf8)
 
     # The pure Python API throws an exception on MergeFromString(),
@@ -3332,8 +3340,7 @@ class ClassAPITest(unittest.TestCase):
     msg_descriptor = descriptor.MakeDescriptor(
         file_descriptor.message_type[0])
 
-    class MessageClass(
-        message.Message, metaclass=reflection.GeneratedProtocolMessageType):
+    class MessageClass(six.with_metaclass(reflection.GeneratedProtocolMessageType, message.Message)):
       DESCRIPTOR = msg_descriptor
     msg = MessageClass()
     msg_str = (
