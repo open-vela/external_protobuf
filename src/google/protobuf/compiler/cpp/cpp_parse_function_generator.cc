@@ -859,7 +859,8 @@ void ParseFunctionGenerator::GenerateFieldBody(
               field->number());
         }
       } else {
-        std::string size = (field->type() == FieldDescriptor::TYPE_SINT32 ||
+        std::string size = (field->type() == FieldDescriptor::TYPE_INT32  ||
+                            field->type() == FieldDescriptor::TYPE_SINT32 ||
                             field->type() == FieldDescriptor::TYPE_UINT32)
                                ? "32"
                                : "64";
@@ -1146,9 +1147,8 @@ std::string FieldParseFunctionName(const FieldDescriptor* field,
           type_format = TypeFormat::kStringValidateOnly;
           break;
         default:
-          GOOGLE_LOG(DFATAL)
-              << "Mode not handled: "
-              << static_cast<int>(GetUtf8CheckMode(field, options));
+          GOOGLE_LOG(DFATAL) << "Mode not handled: "
+                      << static_cast<int>(GetUtf8CheckMode(field, options));
           return "";
       }
       break;

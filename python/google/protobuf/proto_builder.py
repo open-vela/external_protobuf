@@ -30,7 +30,10 @@
 
 """Dynamic Protobuf class creator."""
 
-from collections import OrderedDict
+try:
+  from collections import OrderedDict
+except ImportError:
+  from ordereddict import OrderedDict  #PY26
 import hashlib
 import os
 

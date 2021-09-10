@@ -36,6 +36,7 @@ __author__ = 'robinson@google.com (Will Robinson)'
 
 import threading
 import warnings
+import six
 
 from google.protobuf.internal import api_implementation
 
@@ -110,7 +111,7 @@ _Deprecated.count = 100
 _internal_create_key = object()
 
 
-class DescriptorBase(metaclass=DescriptorMetaclass):
+class DescriptorBase(six.with_metaclass(DescriptorMetaclass)):
 
   """Descriptors base class.
 

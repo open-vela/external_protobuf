@@ -42,14 +42,23 @@ Simple usage example:
 
 __author__ = 'jieluo@google.com (Jie Luo)'
 
+# pylint: disable=g-statement-before-imports,g-import-not-at-top
+try:
+  from collections import OrderedDict
+except ImportError:
+  from ordereddict import OrderedDict  # PY26
+# pylint: enable=g-statement-before-imports,g-import-not-at-top
 
 import base64
-from collections import OrderedDict
 import json
 import math
+
 from operator import methodcaller
+
 import re
 import sys
+
+import six
 
 from google.protobuf.internal import type_checkers
 from google.protobuf import descriptor
@@ -69,8 +78,9 @@ _INFINITY = 'Infinity'
 _NEG_INFINITY = '-Infinity'
 _NAN = 'NaN'
 
-_UNPAIRED_SURROGATE_PATTERN = re.compile(
-    u'[\ud800-\udbff](?![\udc00-\udfff])|(?<![\ud800-\udbff])[\udc00-\udfff]')
+_UNPAIRED_SURROGATE_PATTERN = re.compile(six.u(
+    r'[\ud800-\udbff](?![\udc00-\udfff])|(?<![\ud800-\udbff])[\udc00-\udfff]'
+))
 
 _VALID_EXTENSION_NAME = re.compile(r'\[[a-zA-Z0-9\._]*\]$')
 
@@ -416,8 +426,7 @@ def Parse(text, message, ignore_unknown_fields=False, descriptor_pool=None):
   Raises::
     ParseError: On JSON parsing problems.
   """
-  if not isinstance(text, str):
-    text = text.decode('utf-8')
+  if not isinstance(text, six.text_type): text = text.decode('utf-8')
   try:
     js = json.loads(text, object_pairs_hook=_DuplicateChecker)
   except ValueError as e:
@@ -446,7 +455,7 @@ def ParseDict(js_dict,
   return message
 
 
-_INT_OR_FLOAT = (int, float)
+_INT_OR_FLOAT = six.integer_types + (float,)
 
 
 class _Parser(object):
@@ -637,7 +646,7 @@ class _Parser(object):
       message.null_value = 0
     elif isinstance(value, bool):
       message.bool_value = value
-    elif isinstance(value, str):
+    elif isinstance(value, six.string_types):
       message.string_value = value
     elif isinstance(value, _INT_OR_FLOAT):
       message.number_value = value
@@ -720,7 +729,7 @@ def _ConvertScalarFieldValue(value, field, require_str=False):
     return _ConvertBool(value, require_str)
   elif field.cpp_type == descriptor.FieldDescriptor.CPPTYPE_STRING:
     if field.type == descriptor.FieldDescriptor.TYPE_BYTES:
-      if isinstance(value, str):
+      if isinstance(value, six.text_type):
         encoded = value.encode('utf-8')
       else:
         encoded = value
@@ -767,7 +776,7 @@ def _ConvertInteger(value):
   if isinstance(value, float) and not value.is_integer():
     raise ParseError('Couldn\'t parse integer: {0}.'.format(value))
 
-  if isinstance(value, str) and value.find(' ') != -1:
+  if isinstance(value, six.text_type) and value.find(' ') != -1:
     raise ParseError('Couldn\'t parse integer: "{0}".'.format(value))
 
   if isinstance(value, bool):

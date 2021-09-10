@@ -35,7 +35,10 @@
 __author__ = 'petar@google.com (Petar Petrov)'
 
 
-import unittest
+try:
+  import unittest2 as unittest  #PY26
+except ImportError:
+  import unittest
 
 from google.protobuf import unittest_pb2
 from google.protobuf import service_reflection

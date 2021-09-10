@@ -34,9 +34,19 @@
 
 __author__ = 'jieluo@google.com (Jie Luo)'
 
-import collections.abc as collections_abc
 import datetime
-import unittest
+
+try:
+  # Since python 3
+  import collections.abc as collections_abc
+except ImportError:
+  # Won't work after python 3.8
+  import collections as collections_abc
+
+try:
+  import unittest2 as unittest  #PY26
+except ImportError:
+  import unittest
 
 from google.protobuf import any_pb2
 from google.protobuf import duration_pb2
