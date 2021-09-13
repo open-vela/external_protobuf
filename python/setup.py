@@ -16,9 +16,9 @@ import platform
 # namespace_packages option for the "google" package.
 from setuptools import setup, Extension, find_packages
 
-from distutils.command.build_ext import build_ext as _build_ext
 from distutils.command.build_py import build_py as _build_py
 from distutils.command.clean import clean as _clean
+from distutils.command.build_ext import build_ext as _build_ext
 from distutils.spawn import find_executable
 
 # Find the Protocol Compiler.
@@ -157,6 +157,7 @@ class build_py(_build_py):
     return [(pkg, mod, fil) for (pkg, mod, fil) in modules
             if not any(fnmatch.fnmatchcase(fil, pat=pat) for pat in exclude)]
 
+
 class build_ext(_build_ext):
   def get_ext_filename(self, ext_name):
       # since python3.5, python extensions' shared libraries use a suffix that corresponds to the value
@@ -171,6 +172,7 @@ class build_ext(_build_ext):
       if new_ext_suffix and filename.endswith(orig_ext_suffix):
         filename = filename[:-len(orig_ext_suffix)] + new_ext_suffix
       return filename
+
 
 class test_conformance(_build_py):
   target = 'test_python'
