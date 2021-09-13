@@ -591,12 +591,12 @@ bool IsNull<WireFormatLite::TYPE_BYTES>(const void* ptr) {
 
 template <>
 bool IsNull<WireFormatLite::TYPE_GROUP>(const void* ptr) {
-  return Get<const MessageLite*>(ptr) == nullptr;
+  return Get<const MessageLite*>(ptr) == NULL;
 }
 
 template <>
 bool IsNull<WireFormatLite::TYPE_MESSAGE>(const void* ptr) {
-  return Get<const MessageLite*>(ptr) == nullptr;
+  return Get<const MessageLite*>(ptr) == NULL;
 }
 
 
@@ -701,13 +701,13 @@ uint8_t* SerializeInternalToArray(const uint8_t* base,
       // Special cases
       case FieldMetadata::kSpecial: {
         io::ArrayOutputStream array_stream(array_output.ptr, INT_MAX);
-        io::CodedOutputStream output_stream(&array_stream);
-        output_stream.SetSerializationDeterministic(is_deterministic);
+        io::CodedOutputStream output(&array_stream);
+        output.SetSerializationDeterministic(is_deterministic);
         func = reinterpret_cast<SpecialSerializer>(
             const_cast<void*>(field_metadata.ptr));
         func(base, field_metadata.offset, field_metadata.tag,
-             field_metadata.has_offset, &output_stream);
-        array_output.ptr += output_stream.ByteCount();
+             field_metadata.has_offset, &output);
+        array_output.ptr += output.ByteCount();
       } break;
       default:
         // __builtin_unreachable()
@@ -739,7 +739,7 @@ MessageLite* DuplicateIfNonNullInternal(MessageLite* message) {
     ret->CheckTypeAndMergeFrom(*message);
     return ret;
   } else {
-    return nullptr;
+    return NULL;
   }
 }
 
@@ -761,7 +761,7 @@ MessageLite* GetOwnedMessageInternal(Arena* message_arena,
          submessage_arena);
   GOOGLE_DCHECK(message_arena != submessage_arena);
   GOOGLE_DCHECK_EQ(submessage_arena, nullptr);
-  if (message_arena != nullptr && submessage_arena == nullptr) {
+  if (message_arena != NULL && submessage_arena == NULL) {
     message_arena->Own(submessage);
     return submessage;
   } else {

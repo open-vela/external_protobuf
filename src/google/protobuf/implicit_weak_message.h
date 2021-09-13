@@ -103,12 +103,12 @@ class ImplicitWeakTypeHandler {
   static constexpr bool Moveable = false;
 
   static inline MessageLite* NewFromPrototype(const MessageLite* prototype,
-                                              Arena* arena = nullptr) {
+                                              Arena* arena = NULL) {
     return prototype->New(arena);
   }
 
   static inline void Delete(MessageLite* value, Arena* arena) {
-    if (arena == nullptr) {
+    if (arena == NULL) {
       delete value;
     }
   }
