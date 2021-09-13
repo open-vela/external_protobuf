@@ -284,7 +284,3 @@ with info about your project (name and website) so we can add an entry for you.
 1. eigr/protocol
    * Website: https://eigr.io
    * Extension: 1110-1114
-
-1. Container Object Storage Interface (COSI)
-   * Website: https://github.com/kubernetes-sigs/container-object-storage-interface-spec
-   * Extension: 1115-1124
