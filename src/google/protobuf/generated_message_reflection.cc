@@ -53,9 +53,7 @@
 #include <google/protobuf/stubs/strutil.h>
 
 
-// clang-format off
 #include <google/protobuf/port_def.inc>
-// clang-format on
 
 #define GOOGLE_PROTOBUF_HAS_ONEOF
 
@@ -2493,18 +2491,12 @@ bool Reflection::HasBit(const Message& message,
     // (which uses HasField()) needs to be consistent with this.
     switch (field->cpp_type()) {
       case FieldDescriptor::CPPTYPE_STRING:
-        switch (field->options().ctype()) {
-          default: {
-            if (IsInlined(field)) {
-              return !GetField<InlinedStringField>(message, field)
-                          .GetNoArena()
-                          .empty();
-            }
-
-            return GetField<ArenaStringPtr>(message, field).Get().size() > 0;
-          }
+        if (IsInlined(field)) {
+          return !GetField<InlinedStringField>(message, field)
+                      .GetNoArena()
+                      .empty();
         }
-        return false;
+        return GetField<ArenaStringPtr>(message, field).Get().size() > 0;
       case FieldDescriptor::CPPTYPE_BOOL:
         return GetRaw<bool>(message, field) != false;
       case FieldDescriptor::CPPTYPE_INT32:

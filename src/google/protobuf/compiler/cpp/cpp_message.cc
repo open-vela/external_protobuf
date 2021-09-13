@@ -1716,6 +1716,12 @@ void MessageGenerator::GenerateClassDefinition(io::Printer* printer) {
           "$uint8$* _InternalSerialize(\n"
           "    $uint8$* target, ::$proto_ns$::io::EpsCopyOutputStream* stream) "
           "const final;\n");
+
+      // DiscardUnknownFields() is implemented in message.cc using reflections.
+      // We need to implement this function in generated code for messages.
+      if (!UseUnknownFieldSet(descriptor_->file(), options_)) {
+        format("void DiscardUnknownFields()$ full_final$;\n");
+      }
     }
   }
 
