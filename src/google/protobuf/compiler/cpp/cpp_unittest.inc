@@ -1159,8 +1159,10 @@ class GENERATED_SERVICE_TEST_NAME : public testing::Test {
 
     // implements TestService ----------------------------------------
 
-    void Foo(RpcController* controller, const UNITTEST::FooRequest* request,
-             UNITTEST::FooResponse* response, Closure* done) override {
+    void Foo(RpcController* controller,
+             const UNITTEST::FooRequest* request,
+             UNITTEST::FooResponse* response,
+             Closure* done) override {
       ASSERT_FALSE(called_);
       called_ = true;
       method_ = "Foo";
@@ -1170,8 +1172,10 @@ class GENERATED_SERVICE_TEST_NAME : public testing::Test {
       done_ = done;
     }
 
-    void Bar(RpcController* controller, const UNITTEST::BarRequest* request,
-             UNITTEST::BarResponse* response, Closure* done) override {
+    void Bar(RpcController* controller,
+             const UNITTEST::BarRequest* request,
+             UNITTEST::BarResponse* response,
+             Closure* done) override {
       ASSERT_FALSE(called_);
       called_ = true;
       method_ = "Bar";
@@ -1210,8 +1214,10 @@ class GENERATED_SERVICE_TEST_NAME : public testing::Test {
 
     // implements TestService ----------------------------------------
 
-    void CallMethod(const MethodDescriptor* method, RpcController* controller,
-                    const Message* request, Message* response,
+    void CallMethod(const MethodDescriptor* method,
+                    RpcController* controller,
+                    const Message* request,
+                    Message* response,
                     Closure* done) override {
       ASSERT_FALSE(called_);
       called_ = true;
@@ -1268,7 +1274,7 @@ class GENERATED_SERVICE_TEST_NAME : public testing::Test {
       stub_(&mock_channel_),
       done_(::google::protobuf::NewPermanentCallback(&DoNothing)) {}
 
-  void SetUp() override {
+  virtual void SetUp() override {
     ASSERT_TRUE(foo_ != NULL);
     ASSERT_TRUE(bar_ != NULL);
   }
@@ -1431,7 +1437,8 @@ TEST_F(GENERATED_SERVICE_TEST_NAME, NotImplemented) {
 
 class OneofTest : public testing::Test {
  protected:
-  void SetUp() override {}
+  virtual void SetUp() override {
+  }
 
   void ExpectEnumCasesWork(const UNITTEST::TestOneof2 &message) {
     switch (message.foo_case()) {

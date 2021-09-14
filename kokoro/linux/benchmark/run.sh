@@ -8,9 +8,15 @@ set -ex
 export OUTPUT_DIR=testoutput
 repo_root="$(pwd)"
 
-# TODO(jtattermusch): Add back support for benchmarking with tcmalloc for C++ and python.
-# This feature was removed since it used to use tcmalloc from https://github.com/gperftools/gperftools.git
-# which is very outdated. See https://github.com/protocolbuffers/protobuf/issues/8725.
+# tcmalloc
+if [ ! -f gperftools/.libs/libtcmalloc.so ]; then
+  git clone https://github.com/gperftools/gperftools.git
+  pushd gperftools
+  ./autogen.sh
+  ./configure
+  make -j8
+  popd
+fi
 
 # download datasets for benchmark
 pushd benchmarks
@@ -39,10 +45,10 @@ echo "benchmarking pure python..."
 ./python-pure-python-benchmark --json --behavior_prefix="pure-python-benchmark" $datasets  >> tmp/python_result.json
 echo "," >> "tmp/python_result.json"
 echo "benchmarking python cpp reflection..."
-env LD_LIBRARY_PATH="${repo_root}/src/.libs" ./python-cpp-reflection-benchmark --json --behavior_prefix="cpp-reflection-benchmark" $datasets  >> tmp/python_result.json
+env LD_PRELOAD="${repo_root}/gperftools/.libs/libtcmalloc.so" LD_LIBRARY_PATH="${repo_root}/src/.libs" ./python-cpp-reflection-benchmark --json --behavior_prefix="cpp-reflection-benchmark" $datasets  >> tmp/python_result.json
 echo "," >> "tmp/python_result.json"
 echo "benchmarking python cpp generated code..."
-env LD_LIBRARY_PATH="${repo_root}/src/.libs" ./python-cpp-generated-code-benchmark --json --behavior_prefix="cpp-generated-code-benchmark" $datasets >> tmp/python_result.json
+env LD_PRELOAD="${repo_root}/gperftools/.libs/libtcmalloc.so" LD_LIBRARY_PATH="${repo_root}/src/.libs" ./python-cpp-generated-code-benchmark --json --behavior_prefix="cpp-generated-code-benchmark" $datasets >> tmp/python_result.json
 echo "]" >> "tmp/python_result.json"
 popd
 
@@ -50,6 +56,7 @@ popd
 ./configure
 make clean && make -j8
 
+# build Java protobuf
 pushd java
 mvn package -B -Dmaven.test.skip=true
 popd
@@ -61,7 +68,7 @@ pushd benchmarks
 # TODO(jtattermusch): find a less clumsy way of protecting python_result.json contents
 mv tmp/python_result.json . && make clean && make -j8 cpp-benchmark && mv python_result.json tmp
 echo "benchmarking cpp..."
-env ./cpp-benchmark --benchmark_min_time=5.0 --benchmark_out_format=json --benchmark_out="tmp/cpp_result.json" $datasets
+env LD_PRELOAD="${repo_root}/gperftools/.libs/libtcmalloc.so" ./cpp-benchmark --benchmark_min_time=5.0 --benchmark_out_format=json --benchmark_out="tmp/cpp_result.json" $datasets
 
 # TODO(jtattermusch): add benchmarks for https://github.com/protocolbuffers/protobuf-go.
 # The original benchmarks for https://github.com/golang/protobuf were removed
@@ -70,16 +77,15 @@ env ./cpp-benchmark --benchmark_min_time=5.0 --benchmark_out_format=json --bench
 # * the https://github.com/golang/protobuf implementation has been superseded by
 #   https://github.com/protocolbuffers/protobuf-go
 
-# build and run java benchmark (java 11 is required)
+# build and run java benchmark
 make java-benchmark
 echo "benchmarking java..."
 ./java-benchmark -Cresults.file.options.file="tmp/java_result.json" $datasets
 
-# TODO(jtattermusch): re-enable JS benchmarks once https://github.com/protocolbuffers/protobuf/issues/8747 is fixed.
 # build and run js benchmark
-# make js-benchmark
-# echo "benchmarking js..."
-# ./js-benchmark $datasets  --json_output=$(pwd)/tmp/node_result.json
+make js-benchmark
+echo "benchmarking js..."
+./js-benchmark $datasets  --json_output=$(pwd)/tmp/node_result.json
 
 # TODO(jtattermusch): add php-c-benchmark. Currently its build is broken.
 
@@ -87,11 +93,12 @@ echo "benchmarking java..."
 cat tmp/cpp_result.json
 cat tmp/java_result.json
 cat tmp/python_result.json
+cat tmp/node_result.json
 
 # print the postprocessed results to the build job log
 # TODO(jtattermusch): re-enable uploading results to bigquery (it is currently broken)
 make python_add_init
 env LD_LIBRARY_PATH="${repo_root}/src/.libs" python -m util.result_parser \
-	-cpp="../tmp/cpp_result.json" -java="../tmp/java_result.json" -python="../tmp/python_result.json"
+	-cpp="../tmp/cpp_result.json" -java="../tmp/java_result.json" -python="../tmp/python_result.json" -node="../tmp/node_result.json"
 popd
 
