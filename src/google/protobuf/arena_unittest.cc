@@ -759,7 +759,6 @@ TEST(ArenaTest, AddAllocatedWithReflection) {
 }
 
 TEST(ArenaTest, RepeatedPtrFieldAddClearedTest) {
-#ifndef PROTOBUF_FUTURE_BREAKING_CHANGES
   {
     RepeatedPtrField<TestAllTypes> repeated_field;
     EXPECT_TRUE(repeated_field.empty());
@@ -770,7 +769,6 @@ TEST(ArenaTest, RepeatedPtrFieldAddClearedTest) {
     EXPECT_TRUE(repeated_field.empty());
     EXPECT_EQ(0, repeated_field.size());
   }
-#endif  // !PROTOBUF_FUTURE_BREAKING_CHANGES
   {
     RepeatedPtrField<TestAllTypes> repeated_field;
     EXPECT_TRUE(repeated_field.empty());
@@ -1153,7 +1151,7 @@ TEST(ArenaTest, RepeatedFieldOnArena) {
 
     // Fill some repeated fields on the arena to test for leaks. Also verify no
     // memory allocations.
-    RepeatedField<int32_t> repeated_int32(&arena);
+    RepeatedField<int32> repeated_int32(&arena);
     RepeatedPtrField<TestAllTypes> repeated_message(&arena);
     for (int i = 0; i < 100; i++) {
       repeated_int32.Add(42);
