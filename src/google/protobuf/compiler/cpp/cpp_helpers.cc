@@ -58,7 +58,6 @@
 #include <google/protobuf/stubs/substitute.h>
 #include <google/protobuf/stubs/hash.h>
 
-// Must be last.
 #include <google/protobuf/port_def.inc>
 
 namespace google {
@@ -171,7 +170,11 @@ static std::unordered_set<std::string>* MakeKeywordsMap() {
 static std::unordered_set<std::string>& kKeywords = *MakeKeywordsMap();
 
 std::string IntTypeName(const Options& options, const std::string& type) {
-  return type + "_t";
+  if (options.opensource_runtime) {
+    return "::PROTOBUF_NAMESPACE_ID::" + type;
+  } else {
+    return "::" + type;
+  }
 }
 
 void SetIntVar(const Options& options, const std::string& type,
@@ -453,19 +456,6 @@ std::string FieldName(const FieldDescriptor* field) {
   return result;
 }
 
-std::string OneofCaseConstantName(const FieldDescriptor* field) {
-  GOOGLE_DCHECK(field->containing_oneof());
-  std::string field_name = UnderscoresToCamelCase(field->name(), true);
-  return "k" + field_name;
-}
-
-std::string QualifiedOneofCaseConstantName(const FieldDescriptor* field) {
-  GOOGLE_DCHECK(field->containing_oneof());
-  const std::string qualification =
-      QualifiedClassName(field->containing_type());
-  return StrCat(qualification, "::", OneofCaseConstantName(field));
-}
-
 std::string EnumValueName(const EnumValueDescriptor* enum_value) {
   std::string result = enum_value->name();
   if (kKeywords.count(result) > 0) {
@@ -532,13 +522,13 @@ std::string StripProto(const std::string& filename) {
 const char* PrimitiveTypeName(FieldDescriptor::CppType type) {
   switch (type) {
     case FieldDescriptor::CPPTYPE_INT32:
-      return "int32_t";
+      return "::google::protobuf::int32";
     case FieldDescriptor::CPPTYPE_INT64:
-      return "int64_t";
+      return "::google::protobuf::int64";
     case FieldDescriptor::CPPTYPE_UINT32:
-      return "uint32_t";
+      return "::google::protobuf::uint32";
     case FieldDescriptor::CPPTYPE_UINT64:
-      return "uint64_t";
+      return "::google::protobuf::uint64";
     case FieldDescriptor::CPPTYPE_DOUBLE:
       return "double";
     case FieldDescriptor::CPPTYPE_FLOAT:
@@ -787,10 +777,8 @@ std::string SafeFunctionName(const Descriptor* descriptor,
   return function_name;
 }
 
-bool IsStringInlined(const FieldDescriptor* descriptor,
-                     const Options& options) {
-  (void)descriptor;
-  (void)options;
+bool IsStringInlined(const FieldDescriptor* /* descriptor */,
+                     const Options& /* options */) {
   return false;
 }
 
@@ -951,19 +939,15 @@ bool HasEnumDefinitions(const FileDescriptor* file) {
   return false;
 }
 
-bool ShouldVerify(const Descriptor* descriptor, const Options& options,
-                  MessageSCCAnalyzer* scc_analyzer) {
-  (void)descriptor;
-  (void)options;
-  (void)scc_analyzer;
+bool ShouldVerify(const Descriptor* /* descriptor */,
+                  const Options& /* options */,
+                  MessageSCCAnalyzer* /* scc_analyzer */) {
   return false;
 }
 
-bool ShouldVerify(const FileDescriptor* file, const Options& options,
-                  MessageSCCAnalyzer* scc_analyzer) {
-  (void)file;
-  (void)options;
-  (void)scc_analyzer;
+bool ShouldVerify(const FileDescriptor* /* file */,
+                  const Options& /* options */,
+                  MessageSCCAnalyzer* /* scc_analyzer */) {
   return false;
 }
 
@@ -1168,8 +1152,8 @@ MessageAnalysis MessageSCCAnalyzer::GetSCCAnalysis(const SCC* scc) {
     if (descriptor->extension_range_count() > 0) {
       result.contains_extension = true;
     }
-    for (int j = 0; j < descriptor->field_count(); j++) {
-      const FieldDescriptor* field = descriptor->field(j);
+    for (int i = 0; i < descriptor->field_count(); i++) {
+      const FieldDescriptor* field = descriptor->field(i);
       if (field->is_required()) {
         result.contains_required = true;
       }
@@ -1486,8 +1470,7 @@ FileOptions_OptimizeMode GetOptimizeFor(const FileDescriptor* file,
   return FileOptions::SPEED;
 }
 
-bool EnableMessageOwnedArena(const Descriptor* desc) {
-  (void)desc;
+bool EnableMessageOwnedArena(const Descriptor* /* desc */) {
   return false;
 }
 
