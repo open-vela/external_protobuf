@@ -293,7 +293,7 @@ class PROTOBUF_EXPORT Message : public MessageLite {
   // method after parsing.
   //
   // See Reflection::GetUnknownFields() for more on unknown fields.
-  void DiscardUnknownFields();
+  virtual void DiscardUnknownFields();
 
   // Computes (an estimate of) the total number of bytes currently used for
   // storing the message in memory.  The default implementation calls the
@@ -1019,11 +1019,6 @@ class PROTOBUF_EXPORT Reflection final {
     return IsLazilyVerifiedLazyField(field) ||
            IsEagerlyVerifiedLazyField(field);
   }
-
-  // Returns true if the field is lazy extension. It is meant to allow python
-  // reparse lazy field until b/157559327 is fixed.
-  bool IsLazyExtension(const Message& message,
-                       const FieldDescriptor* field) const;
 
   bool IsLazilyVerifiedLazyField(const FieldDescriptor* field) const;
   bool IsEagerlyVerifiedLazyField(const FieldDescriptor* field) const;
