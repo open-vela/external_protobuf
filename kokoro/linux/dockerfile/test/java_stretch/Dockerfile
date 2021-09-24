@@ -24,7 +24,7 @@ RUN apt-get update && apt-get install -y \
   maven \
   openjdk-8-jdk \
   # Python dependencies
-  python3-setuptools \
-  python3-pip \
+  python-setuptools \
+  python-pip \
   virtualenv \
   && apt-get clean

@@ -490,6 +490,43 @@ bool UsesTypeFromFile(const Descriptor* message, const FileDescriptor* file,
   return false;
 }
 
+// Ruby doesn't currently support proto2.  This causes a failure even for proto3
+// files that import proto2.  But in some cases, the proto2 file is only being
+// imported to extend another proto2 message.  The prime example is declaring
+// custom options by extending FileOptions/FieldOptions/etc.
+//
+// If the proto3 messages don't have any proto2 submessages, it is safe to omit
+// the dependency completely.  Users won't be able to use any proto2 extensions,
+// but they already couldn't because proto2 messages aren't supported.
+//
+// If/when we add proto2 support, we should remove this.
+bool MaybeEmitDependency(const FileDescriptor* import,
+                         const FileDescriptor* from,
+                         io::Printer* printer,
+                         std::string* error) {
+  if (from->syntax() == FileDescriptor::SYNTAX_PROTO3 &&
+      import->syntax() == FileDescriptor::SYNTAX_PROTO2) {
+    for (int i = 0; i < from->message_type_count(); i++) {
+      if (UsesTypeFromFile(from->message_type(i), import, error)) {
+        // Error text was already set by UsesTypeFromFile().
+        return false;
+      }
+    }
+
+    // Ok to omit this proto2 dependency -- so we won't print anything.
+    GOOGLE_LOG(WARNING) << "Omitting proto2 dependency '" << import->name()
+                        << "' from proto3 output file '"
+                        << GetOutputFilename(from->name())
+                        << "' because we don't support proto2 and no proto2 "
+                           "types from that file are being used.";
+    return true;
+  } else {
+    printer->Print(
+      "require '$name$'\n", "name", GetRequireName(import->name()));
+    return true;
+  }
+}
+
 bool GenerateDslDescriptor(const FileDescriptor* file, io::Printer* printer,
                            std::string* error) {
   printer->Print(
@@ -535,7 +572,9 @@ bool GenerateFile(const FileDescriptor* file, io::Printer* printer,
     "filename", file->name());
 
   for (int i = 0; i < file->dependency_count(); i++) {
-    printer->Print("require '$name$'\n", "name", GetRequireName(file->dependency(i)->name()));
+    if (!MaybeEmitDependency(file->dependency(i), file, printer, error)) {
+      return false;
+    }
   }
 
   // TODO: Remove this when ruby supports extensions for proto2 syntax.
