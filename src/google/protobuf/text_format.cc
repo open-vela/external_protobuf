@@ -348,12 +348,6 @@ class TextFormat::Parser::ParserImpl {
   }
 
  private:
-  static constexpr int32_t kint32max = std::numeric_limits<int32_t>::max();
-  static constexpr uint32_t kuint32max = std::numeric_limits<uint32_t>::max();
-  static constexpr int64_t kint64min = std::numeric_limits<int64_t>::min();
-  static constexpr int64_t kint64max = std::numeric_limits<int64_t>::max();
-  static constexpr uint64_t kuint64max = std::numeric_limits<uint64_t>::max();
-
   GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(ParserImpl);
 
   // Reports an error with the given message with information indicating
@@ -1439,8 +1433,8 @@ class TextFormat::Printer::TextGenerator
 class TextFormat::Printer::DebugStringFieldValuePrinter
     : public TextFormat::FastFieldValuePrinter {
  public:
-  void PrintMessageStart(const Message& /*message*/, int /*field_index*/,
-                         int /*field_count*/, bool single_line_mode,
+  void PrintMessageStart(const Message& message, int field_index,
+                         int field_count, bool single_line_mode,
                          BaseTextGenerator* generator) const override {
     // This is safe as only TextGenerator is used with
     // DebugStringFieldValuePrinter.
@@ -1491,7 +1485,7 @@ const Descriptor* TextFormat::Finder::FindAnyType(
 }
 
 MessageFactory* TextFormat::Finder::FindExtensionFactory(
-    const FieldDescriptor* /*field*/) const {
+    const FieldDescriptor* field) const {
   return nullptr;
 }
 
@@ -1757,7 +1751,7 @@ void TextFormat::FastFieldValuePrinter::PrintDouble(
   generator->PrintString(!std::isnan(val) ? SimpleDtoa(val) : "nan");
 }
 void TextFormat::FastFieldValuePrinter::PrintEnum(
-    int32_t /*val*/, const std::string& name, BaseTextGenerator* generator) const {
+    int32_t val, const std::string& name, BaseTextGenerator* generator) const {
   generator->PrintString(name);
 }
 
@@ -1772,13 +1766,13 @@ void TextFormat::FastFieldValuePrinter::PrintBytes(
   PrintString(val, generator);
 }
 void TextFormat::FastFieldValuePrinter::PrintFieldName(
-    const Message& message, int /*field_index*/, int /*field_count*/,
+    const Message& message, int field_index, int field_count,
     const Reflection* reflection, const FieldDescriptor* field,
     BaseTextGenerator* generator) const {
   PrintFieldName(message, reflection, field, generator);
 }
 void TextFormat::FastFieldValuePrinter::PrintFieldName(
-    const Message& /*message*/, const Reflection* /*reflection*/,
+    const Message& message, const Reflection* reflection,
     const FieldDescriptor* field, BaseTextGenerator* generator) const {
   if (field->is_extension()) {
     generator->PrintLiteral("[");
@@ -1792,7 +1786,7 @@ void TextFormat::FastFieldValuePrinter::PrintFieldName(
   }
 }
 void TextFormat::FastFieldValuePrinter::PrintMessageStart(
-    const Message& /*message*/, int /*field_index*/, int /*field_count*/,
+    const Message& message, int field_index, int field_count,
     bool single_line_mode, BaseTextGenerator* generator) const {
   if (single_line_mode) {
     generator->PrintLiteral(" { ");
@@ -1801,12 +1795,12 @@ void TextFormat::FastFieldValuePrinter::PrintMessageStart(
   }
 }
 bool TextFormat::FastFieldValuePrinter::PrintMessageContent(
-    const Message& /*message*/, int /*field_index*/, int /*field_count*/,
-    bool /*single_line_mode*/, BaseTextGenerator* /*generator*/) const {
+    const Message& message, int field_index, int field_count,
+    bool single_line_mode, BaseTextGenerator* generator) const {
   return false;  // Use the default printing function.
 }
 void TextFormat::FastFieldValuePrinter::PrintMessageEnd(
-    const Message& /*message*/, int /*field_index*/, int /*field_count*/,
+    const Message& message, int field_index, int field_count,
     bool single_line_mode, BaseTextGenerator* generator) const {
   if (single_line_mode) {
     generator->PrintLiteral("} ");
@@ -1868,7 +1862,7 @@ class FieldValuePrinterWrapper : public TextFormat::FastFieldValuePrinter {
                  TextFormat::BaseTextGenerator* generator) const override {
     generator->PrintString(delegate_->PrintEnum(val, name));
   }
-  void PrintFieldName(const Message& message, int /*field_index*/, int /*field_count*/,
+  void PrintFieldName(const Message& message, int field_index, int field_count,
                       const Reflection* reflection,
                       const FieldDescriptor* field,
                       TextFormat::BaseTextGenerator* generator) const override {

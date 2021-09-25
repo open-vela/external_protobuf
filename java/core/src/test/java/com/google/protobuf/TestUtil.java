@@ -3758,9 +3758,7 @@ public final class TestUtil {
 
   /** @param filePath The path relative to {@link #getTestDataDir}. */
   public static String readTextFromFile(String filePath) {
-    return readBytesFromFile(filePath)
-        .toStringUtf8()
-        .replace(System.getProperty("line.separator"), "\n");
+    return readBytesFromFile(filePath).toStringUtf8().replace(System.getProperty("line.separator"), "\n");
   }
 
   private static File getTestDataDir() {
@@ -3815,7 +3813,8 @@ public final class TestUtil {
 
   private static ByteString readBytesFromResource(String name) {
     try {
-      return ByteString.readFrom(TestUtil.class.getResourceAsStream(name));
+      return ByteString.copyFrom(
+          com.google.common.io.ByteStreams.toByteArray(TestUtil.class.getResourceAsStream(name)));
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
