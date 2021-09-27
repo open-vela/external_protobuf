@@ -38,7 +38,6 @@
 #include <stdio.h>
 
 #include <algorithm>
-#include <atomic>
 #include <climits>
 #include <cmath>
 #include <limits>
@@ -85,18 +84,11 @@ inline bool IsOctNumber(const std::string& str) {
 
 }  // namespace
 
-namespace internal {
-// Controls insertion of DEBUG_STRING_SILENT_MARKER.
-PROTOBUF_EXPORT std::atomic<bool> enable_debug_text_format_marker;
-}  // namespace internal
-
 std::string Message::DebugString() const {
   std::string debug_string;
 
   TextFormat::Printer printer;
   printer.SetExpandAny(true);
-  printer.SetInsertSilentMarker(internal::enable_debug_text_format_marker.load(
-      std::memory_order_relaxed));
 
   printer.PrintToString(*this, &debug_string);
 
@@ -109,8 +101,6 @@ std::string Message::ShortDebugString() const {
   TextFormat::Printer printer;
   printer.SetSingleLineMode(true);
   printer.SetExpandAny(true);
-  printer.SetInsertSilentMarker(internal::enable_debug_text_format_marker.load(
-      std::memory_order_relaxed));
 
   printer.PrintToString(*this, &debug_string);
   // Single line mode currently might have an extra space at the end.
@@ -127,8 +117,6 @@ std::string Message::Utf8DebugString() const {
   TextFormat::Printer printer;
   printer.SetUseUtf8StringEscaping(true);
   printer.SetExpandAny(true);
-  printer.SetInsertSilentMarker(internal::enable_debug_text_format_marker.load(
-      std::memory_order_relaxed));
 
   printer.PrintToString(*this, &debug_string);
 
@@ -1451,8 +1439,8 @@ class TextFormat::Printer::TextGenerator
 class TextFormat::Printer::DebugStringFieldValuePrinter
     : public TextFormat::FastFieldValuePrinter {
  public:
-  void PrintMessageStart(const Message& /*message*/, int /*field_index*/,
-                         int /*field_count*/, bool single_line_mode,
+  void PrintMessageStart(const Message& message, int field_index,
+                         int field_count, bool single_line_mode,
                          BaseTextGenerator* generator) const override {
     // This is safe as only TextGenerator is used with
     // DebugStringFieldValuePrinter.
@@ -1503,7 +1491,7 @@ const Descriptor* TextFormat::Finder::FindAnyType(
 }
 
 MessageFactory* TextFormat::Finder::FindExtensionFactory(
-    const FieldDescriptor* /*field*/) const {
+    const FieldDescriptor* field) const {
   return nullptr;
 }
 
@@ -1565,6 +1553,7 @@ bool TextFormat::Parser::ParseFromString(ConstStringParam input,
   io::ArrayInputStream input_stream(input.data(), input.size());
   return Parse(&input_stream, output);
 }
+
 
 bool TextFormat::Parser::Merge(io::ZeroCopyInputStream* input,
                                Message* output) {
@@ -1768,7 +1757,7 @@ void TextFormat::FastFieldValuePrinter::PrintDouble(
   generator->PrintString(!std::isnan(val) ? SimpleDtoa(val) : "nan");
 }
 void TextFormat::FastFieldValuePrinter::PrintEnum(
-    int32_t /*val*/, const std::string& name, BaseTextGenerator* generator) const {
+    int32_t val, const std::string& name, BaseTextGenerator* generator) const {
   generator->PrintString(name);
 }
 
@@ -1783,13 +1772,13 @@ void TextFormat::FastFieldValuePrinter::PrintBytes(
   PrintString(val, generator);
 }
 void TextFormat::FastFieldValuePrinter::PrintFieldName(
-    const Message& message, int /*field_index*/, int /*field_count*/,
+    const Message& message, int field_index, int field_count,
     const Reflection* reflection, const FieldDescriptor* field,
     BaseTextGenerator* generator) const {
   PrintFieldName(message, reflection, field, generator);
 }
 void TextFormat::FastFieldValuePrinter::PrintFieldName(
-    const Message& /*message*/, const Reflection* /*reflection*/,
+    const Message& message, const Reflection* reflection,
     const FieldDescriptor* field, BaseTextGenerator* generator) const {
   if (field->is_extension()) {
     generator->PrintLiteral("[");
@@ -1803,7 +1792,7 @@ void TextFormat::FastFieldValuePrinter::PrintFieldName(
   }
 }
 void TextFormat::FastFieldValuePrinter::PrintMessageStart(
-    const Message& /*message*/, int /*field_index*/, int /*field_count*/,
+    const Message& message, int field_index, int field_count,
     bool single_line_mode, BaseTextGenerator* generator) const {
   if (single_line_mode) {
     generator->PrintLiteral(" { ");
@@ -1812,12 +1801,12 @@ void TextFormat::FastFieldValuePrinter::PrintMessageStart(
   }
 }
 bool TextFormat::FastFieldValuePrinter::PrintMessageContent(
-    const Message& /*message*/, int /*field_index*/, int /*field_count*/,
-    bool /*single_line_mode*/, BaseTextGenerator* /*generator*/) const {
+    const Message& message, int field_index, int field_count,
+    bool single_line_mode, BaseTextGenerator* generator) const {
   return false;  // Use the default printing function.
 }
 void TextFormat::FastFieldValuePrinter::PrintMessageEnd(
-    const Message& /*message*/, int /*field_index*/, int /*field_count*/,
+    const Message& message, int field_index, int field_count,
     bool single_line_mode, BaseTextGenerator* generator) const {
   if (single_line_mode) {
     generator->PrintLiteral("} ");
@@ -1879,7 +1868,7 @@ class FieldValuePrinterWrapper : public TextFormat::FastFieldValuePrinter {
                  TextFormat::BaseTextGenerator* generator) const override {
     generator->PrintString(delegate_->PrintEnum(val, name));
   }
-  void PrintFieldName(const Message& message, int /*field_index*/, int /*field_count*/,
+  void PrintFieldName(const Message& message, int field_index, int field_count,
                       const Reflection* reflection,
                       const FieldDescriptor* field,
                       TextFormat::BaseTextGenerator* generator) const override {
