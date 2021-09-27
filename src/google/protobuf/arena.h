@@ -65,6 +65,13 @@ namespace google {
 namespace protobuf {
 
 struct ArenaOptions;  // defined below
+
+}  // namespace protobuf
+}  // namespace google
+
+namespace google {
+namespace protobuf {
+
 class Arena;    // defined below
 class Message;  // defined in message.h
 class MessageLite;
