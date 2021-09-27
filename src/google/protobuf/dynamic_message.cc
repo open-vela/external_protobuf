@@ -355,7 +355,7 @@ DynamicMessage::DynamicMessage(DynamicMessageFactory::TypeInfo* type_info,
   SharedCtor(lock_factory);
 }
 
-inline void* DynamicMessage::MutableRaw(int i) {
+void* DynamicMessage::MutableRaw(int i) {
   return OffsetToPointer(
       OffsetValue(type_info_->offsets[i], type_info_->type->field(i)->type()));
 }
