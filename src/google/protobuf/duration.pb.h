@@ -139,7 +139,11 @@ class PROTOBUF_EXPORT Duration final :
 
   // implements Message ----------------------------------------------
 
-  Duration* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+  inline Duration* New() const final {
+    return new Duration();
+  }
+
+  Duration* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
     return CreateMaybeMessage<Duration>(arena);
   }
   using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
@@ -163,8 +167,6 @@ class PROTOBUF_EXPORT Duration final :
   void SharedDtor();
   void SetCachedSize(int size) const final;
   void InternalSwap(Duration* other);
-
-  private:
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
     return "google.protobuf.Duration";

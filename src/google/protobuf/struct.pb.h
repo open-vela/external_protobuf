@@ -204,7 +204,11 @@ class PROTOBUF_EXPORT Struct final :
 
   // implements Message ----------------------------------------------
 
-  Struct* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+  inline Struct* New() const final {
+    return new Struct();
+  }
+
+  Struct* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
     return CreateMaybeMessage<Struct>(arena);
   }
   using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
@@ -228,8 +232,6 @@ class PROTOBUF_EXPORT Struct final :
   void SharedDtor();
   void SetCachedSize(int size) const final;
   void InternalSwap(Struct* other);
-
-  private:
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
     return "google.protobuf.Struct";
@@ -373,7 +375,11 @@ class PROTOBUF_EXPORT Value final :
 
   // implements Message ----------------------------------------------
 
-  Value* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+  inline Value* New() const final {
+    return new Value();
+  }
+
+  Value* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
     return CreateMaybeMessage<Value>(arena);
   }
   using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
@@ -397,8 +403,6 @@ class PROTOBUF_EXPORT Value final :
   void SharedDtor();
   void SetCachedSize(int size) const final;
   void InternalSwap(Value* other);
-
-  private:
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
     return "google.protobuf.Value";
@@ -464,7 +468,7 @@ class PROTOBUF_EXPORT Value final :
   template <typename ArgT0 = const std::string&, typename... ArgT>
   void set_string_value(ArgT0&& arg0, ArgT... args);
   std::string* mutable_string_value();
-  PROTOBUF_NODISCARD std::string* release_string_value();
+  PROTOBUF_MUST_USE_RESULT std::string* release_string_value();
   void set_allocated_string_value(std::string* string_value);
   private:
   const std::string& _internal_string_value() const;
@@ -492,7 +496,7 @@ class PROTOBUF_EXPORT Value final :
   public:
   void clear_struct_value();
   const ::PROTOBUF_NAMESPACE_ID::Struct& struct_value() const;
-  PROTOBUF_NODISCARD ::PROTOBUF_NAMESPACE_ID::Struct* release_struct_value();
+  PROTOBUF_MUST_USE_RESULT ::PROTOBUF_NAMESPACE_ID::Struct* release_struct_value();
   ::PROTOBUF_NAMESPACE_ID::Struct* mutable_struct_value();
   void set_allocated_struct_value(::PROTOBUF_NAMESPACE_ID::Struct* struct_value);
   private:
@@ -510,7 +514,7 @@ class PROTOBUF_EXPORT Value final :
   public:
   void clear_list_value();
   const ::PROTOBUF_NAMESPACE_ID::ListValue& list_value() const;
-  PROTOBUF_NODISCARD ::PROTOBUF_NAMESPACE_ID::ListValue* release_list_value();
+  PROTOBUF_MUST_USE_RESULT ::PROTOBUF_NAMESPACE_ID::ListValue* release_list_value();
   ::PROTOBUF_NAMESPACE_ID::ListValue* mutable_list_value();
   void set_allocated_list_value(::PROTOBUF_NAMESPACE_ID::ListValue* list_value);
   private:
@@ -630,7 +634,11 @@ class PROTOBUF_EXPORT ListValue final :
 
   // implements Message ----------------------------------------------
 
-  ListValue* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+  inline ListValue* New() const final {
+    return new ListValue();
+  }
+
+  ListValue* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
     return CreateMaybeMessage<ListValue>(arena);
   }
   using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
@@ -654,8 +662,6 @@ class PROTOBUF_EXPORT ListValue final :
   void SharedDtor();
   void SetCachedSize(int size) const final;
   void InternalSwap(ListValue* other);
-
-  private:
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
     return "google.protobuf.ListValue";

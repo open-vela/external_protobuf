@@ -139,7 +139,11 @@ class PROTOBUF_EXPORT SourceContext final :
 
   // implements Message ----------------------------------------------
 
-  SourceContext* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+  inline SourceContext* New() const final {
+    return new SourceContext();
+  }
+
+  SourceContext* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
     return CreateMaybeMessage<SourceContext>(arena);
   }
   using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
@@ -163,8 +167,6 @@ class PROTOBUF_EXPORT SourceContext final :
   void SharedDtor();
   void SetCachedSize(int size) const final;
   void InternalSwap(SourceContext* other);
-
-  private:
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
     return "google.protobuf.SourceContext";
@@ -195,7 +197,7 @@ class PROTOBUF_EXPORT SourceContext final :
   template <typename ArgT0 = const std::string&, typename... ArgT>
   void set_file_name(ArgT0&& arg0, ArgT... args);
   std::string* mutable_file_name();
-  PROTOBUF_NODISCARD std::string* release_file_name();
+  PROTOBUF_MUST_USE_RESULT std::string* release_file_name();
   void set_allocated_file_name(std::string* file_name);
   private:
   const std::string& _internal_file_name() const;

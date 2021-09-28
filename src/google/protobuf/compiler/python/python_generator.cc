@@ -803,7 +803,8 @@ void Generator::PrintCreateDescriptor(
     m["name"] = desc->name();
     m["full_name"] = desc->full_name();
     m["index"] = StrCat(desc->index());
-    options_string = OptionsValue(desc->options().SerializeAsString());
+    options_string =
+        OptionsValue(desc->options().SerializeAsString());
     if (options_string == "None") {
       m["serialized_options"] = "";
     } else {

@@ -158,7 +158,7 @@ struct DescriptorTable;
 class MapFieldBase;
 class SwapFieldHelper;
 class CachedSize;
-}  // namespace internal
+}
 class UnknownFieldSet;  // unknown_field_set.h
 namespace io {
 class ZeroCopyInputStream;   // zero_copy_stream.h
@@ -169,7 +169,7 @@ class CodedOutputStream;     // coded_stream.h
 namespace python {
 class MapReflectionFriend;  // scalar_map_container.h
 class MessageReflectionFriend;
-}  // namespace python
+}
 namespace expr {
 class CelMapReflectionFriend;  // field_backed_map_impl.cc
 }
@@ -244,11 +244,18 @@ class PROTOBUF_EXPORT Message : public MessageLite {
   // Construct a new instance of the same type.  Ownership is passed to the
   // caller.  (This is also defined in MessageLite, but is defined again here
   // for return-type covariance.)
-  Message* New() const { return New(nullptr); }
+  Message* New() const override = 0;
 
   // Construct a new instance on the arena. Ownership is passed to the caller
-  // if arena is a nullptr.
-  Message* New(Arena* arena) const override = 0;
+  // if arena is a nullptr. Default implementation allows for API compatibility
+  // during the Arena transition.
+  Message* New(Arena* arena) const override {
+    Message* message = New();
+    if (arena != nullptr) {
+      arena->Own(message);
+    }
+    return message;
+  }
 
   // Make this message into a copy of the given message.  The given message
   // must have the same descriptor, but need not necessarily be the same class.
@@ -500,8 +507,8 @@ class PROTOBUF_EXPORT Reflection final {
   void RemoveLast(Message* message, const FieldDescriptor* field) const;
   // Removes the last element of a repeated message field, and returns the
   // pointer to the caller.  Caller takes ownership of the returned pointer.
-  PROTOBUF_NODISCARD Message* ReleaseLast(Message* message,
-                                          const FieldDescriptor* field) const;
+  PROTOBUF_MUST_USE_RESULT Message* ReleaseLast(
+      Message* message, const FieldDescriptor* field) const;
 
   // Similar to ReleaseLast() without internal safety and ownershp checks. This
   // method should only be used when the objects are on the same arena or paired
@@ -655,7 +662,7 @@ class PROTOBUF_EXPORT Reflection final {
   // If the field existed (HasField() is true), then the returned pointer will
   // be the same as the pointer returned by MutableMessage().
   // This function has the same effect as ClearField().
-  PROTOBUF_NODISCARD Message* ReleaseMessage(
+  PROTOBUF_MUST_USE_RESULT Message* ReleaseMessage(
       Message* message, const FieldDescriptor* field,
       MessageFactory* factory = nullptr) const;
 
