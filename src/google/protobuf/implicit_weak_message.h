@@ -63,6 +63,7 @@ class PROTOBUF_EXPORT ImplicitWeakMessage : public MessageLite {
 
   std::string GetTypeName() const override { return ""; }
 
+  MessageLite* New() const override { return new ImplicitWeakMessage; }
   MessageLite* New(Arena* arena) const override {
     return Arena::CreateMessage<ImplicitWeakMessage>(arena);
   }
@@ -112,6 +113,9 @@ class ImplicitWeakTypeHandler {
     }
   }
   static inline Arena* GetArena(MessageLite* value) {
+    return value->GetArena();
+  }
+  static inline void* GetMaybeArenaPointer(MessageLite* value) {
     return value->GetArena();
   }
   static inline void Clear(MessageLite* value) { value->Clear(); }

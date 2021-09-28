@@ -38,7 +38,6 @@
 #include <stdio.h>
 
 #include <algorithm>
-#include <atomic>
 #include <climits>
 #include <cmath>
 #include <limits>
@@ -85,18 +84,11 @@ inline bool IsOctNumber(const std::string& str) {
 
 }  // namespace
 
-namespace internal {
-// Controls insertion of DEBUG_STRING_SILENT_MARKER.
-PROTOBUF_EXPORT std::atomic<bool> enable_debug_text_format_marker;
-}  // namespace internal
-
 std::string Message::DebugString() const {
   std::string debug_string;
 
   TextFormat::Printer printer;
   printer.SetExpandAny(true);
-  printer.SetInsertSilentMarker(internal::enable_debug_text_format_marker.load(
-      std::memory_order_relaxed));
 
   printer.PrintToString(*this, &debug_string);
 
@@ -109,8 +101,6 @@ std::string Message::ShortDebugString() const {
   TextFormat::Printer printer;
   printer.SetSingleLineMode(true);
   printer.SetExpandAny(true);
-  printer.SetInsertSilentMarker(internal::enable_debug_text_format_marker.load(
-      std::memory_order_relaxed));
 
   printer.PrintToString(*this, &debug_string);
   // Single line mode currently might have an extra space at the end.
@@ -127,8 +117,6 @@ std::string Message::Utf8DebugString() const {
   TextFormat::Printer printer;
   printer.SetUseUtf8StringEscaping(true);
   printer.SetExpandAny(true);
-  printer.SetInsertSilentMarker(internal::enable_debug_text_format_marker.load(
-      std::memory_order_relaxed));
 
   printer.PrintToString(*this, &debug_string);
 
@@ -1565,6 +1553,7 @@ bool TextFormat::Parser::ParseFromString(ConstStringParam input,
   io::ArrayInputStream input_stream(input.data(), input.size());
   return Parse(&input_stream, output);
 }
+
 
 bool TextFormat::Parser::Merge(io::ZeroCopyInputStream* input,
                                Message* output) {

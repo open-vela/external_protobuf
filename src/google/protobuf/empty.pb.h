@@ -139,7 +139,11 @@ class PROTOBUF_EXPORT Empty final :
 
   // implements Message ----------------------------------------------
 
-  Empty* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+  inline Empty* New() const final {
+    return new Empty();
+  }
+
+  Empty* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
     return CreateMaybeMessage<Empty>(arena);
   }
   using ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase::CopyFrom;
@@ -151,8 +155,6 @@ class PROTOBUF_EXPORT Empty final :
     ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase::MergeImpl(this, from);
   }
   public:
-
-  private:
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
     return "google.protobuf.Empty";
