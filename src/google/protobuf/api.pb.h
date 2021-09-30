@@ -52,7 +52,7 @@ struct PROTOBUF_EXPORT TableStruct_google_2fprotobuf_2fapi_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::FieldMetadata field_metadata[];
   static const ::PROTOBUF_NAMESPACE_ID::internal::SerializationTable serialization_table[];
-  static const ::PROTOBUF_NAMESPACE_ID::uint32 offsets[];
+  static const uint32_t offsets[];
 };
 PROTOBUF_EXPORT extern const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_google_2fprotobuf_2fapi_2eproto;
 PROTOBUF_NAMESPACE_OPEN
@@ -130,7 +130,12 @@ class PROTOBUF_EXPORT Api final :
   }
   inline void Swap(Api* other) {
     if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() != nullptr &&
+        GetOwningArena() == other->GetOwningArena()) {
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
     if (GetOwningArena() == other->GetOwningArena()) {
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
       InternalSwap(other);
     } else {
       ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
@@ -144,11 +149,7 @@ class PROTOBUF_EXPORT Api final :
 
   // implements Message ----------------------------------------------
 
-  inline Api* New() const final {
-    return new Api();
-  }
-
-  Api* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+  Api* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
     return CreateMaybeMessage<Api>(arena);
   }
   using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
@@ -163,8 +164,8 @@ class PROTOBUF_EXPORT Api final :
 
   size_t ByteSizeLong() const final;
   const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
-  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
-      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  uint8_t* _InternalSerialize(
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
   int GetCachedSize() const final { return _cached_size_.Get(); }
 
   private:
@@ -172,6 +173,8 @@ class PROTOBUF_EXPORT Api final :
   void SharedDtor();
   void SetCachedSize(int size) const final;
   void InternalSwap(Api* other);
+
+  private:
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
     return "google.protobuf.Api";
@@ -262,7 +265,7 @@ class PROTOBUF_EXPORT Api final :
   template <typename ArgT0 = const std::string&, typename... ArgT>
   void set_name(ArgT0&& arg0, ArgT... args);
   std::string* mutable_name();
-  PROTOBUF_MUST_USE_RESULT std::string* release_name();
+  PROTOBUF_NODISCARD std::string* release_name();
   void set_allocated_name(std::string* name);
   private:
   const std::string& _internal_name() const;
@@ -276,7 +279,7 @@ class PROTOBUF_EXPORT Api final :
   template <typename ArgT0 = const std::string&, typename... ArgT>
   void set_version(ArgT0&& arg0, ArgT... args);
   std::string* mutable_version();
-  PROTOBUF_MUST_USE_RESULT std::string* release_version();
+  PROTOBUF_NODISCARD std::string* release_version();
   void set_allocated_version(std::string* version);
   private:
   const std::string& _internal_version() const;
@@ -291,7 +294,7 @@ class PROTOBUF_EXPORT Api final :
   public:
   void clear_source_context();
   const ::PROTOBUF_NAMESPACE_ID::SourceContext& source_context() const;
-  PROTOBUF_MUST_USE_RESULT ::PROTOBUF_NAMESPACE_ID::SourceContext* release_source_context();
+  PROTOBUF_NODISCARD ::PROTOBUF_NAMESPACE_ID::SourceContext* release_source_context();
   ::PROTOBUF_NAMESPACE_ID::SourceContext* mutable_source_context();
   void set_allocated_source_context(::PROTOBUF_NAMESPACE_ID::SourceContext* source_context);
   private:
@@ -385,7 +388,12 @@ class PROTOBUF_EXPORT Method final :
   }
   inline void Swap(Method* other) {
     if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() != nullptr &&
+        GetOwningArena() == other->GetOwningArena()) {
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
     if (GetOwningArena() == other->GetOwningArena()) {
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
       InternalSwap(other);
     } else {
       ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
@@ -399,11 +407,7 @@ class PROTOBUF_EXPORT Method final :
 
   // implements Message ----------------------------------------------
 
-  inline Method* New() const final {
-    return new Method();
-  }
-
-  Method* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+  Method* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
     return CreateMaybeMessage<Method>(arena);
   }
   using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
@@ -418,8 +422,8 @@ class PROTOBUF_EXPORT Method final :
 
   size_t ByteSizeLong() const final;
   const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
-  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
-      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  uint8_t* _InternalSerialize(
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
   int GetCachedSize() const final { return _cached_size_.Get(); }
 
   private:
@@ -427,6 +431,8 @@ class PROTOBUF_EXPORT Method final :
   void SharedDtor();
   void SetCachedSize(int size) const final;
   void InternalSwap(Method* other);
+
+  private:
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
     return "google.protobuf.Method";
@@ -481,7 +487,7 @@ class PROTOBUF_EXPORT Method final :
   template <typename ArgT0 = const std::string&, typename... ArgT>
   void set_name(ArgT0&& arg0, ArgT... args);
   std::string* mutable_name();
-  PROTOBUF_MUST_USE_RESULT std::string* release_name();
+  PROTOBUF_NODISCARD std::string* release_name();
   void set_allocated_name(std::string* name);
   private:
   const std::string& _internal_name() const;
@@ -495,7 +501,7 @@ class PROTOBUF_EXPORT Method final :
   template <typename ArgT0 = const std::string&, typename... ArgT>
   void set_request_type_url(ArgT0&& arg0, ArgT... args);
   std::string* mutable_request_type_url();
-  PROTOBUF_MUST_USE_RESULT std::string* release_request_type_url();
+  PROTOBUF_NODISCARD std::string* release_request_type_url();
   void set_allocated_request_type_url(std::string* request_type_url);
   private:
   const std::string& _internal_request_type_url() const;
@@ -509,7 +515,7 @@ class PROTOBUF_EXPORT Method final :
   template <typename ArgT0 = const std::string&, typename... ArgT>
   void set_response_type_url(ArgT0&& arg0, ArgT... args);
   std::string* mutable_response_type_url();
-  PROTOBUF_MUST_USE_RESULT std::string* release_response_type_url();
+  PROTOBUF_NODISCARD std::string* release_response_type_url();
   void set_allocated_response_type_url(std::string* response_type_url);
   private:
   const std::string& _internal_response_type_url() const;
@@ -618,7 +624,12 @@ class PROTOBUF_EXPORT Mixin final :
   }
   inline void Swap(Mixin* other) {
     if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() != nullptr &&
+        GetOwningArena() == other->GetOwningArena()) {
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
     if (GetOwningArena() == other->GetOwningArena()) {
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
       InternalSwap(other);
     } else {
       ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
@@ -632,11 +643,7 @@ class PROTOBUF_EXPORT Mixin final :
 
   // implements Message ----------------------------------------------
 
-  inline Mixin* New() const final {
-    return new Mixin();
-  }
-
-  Mixin* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+  Mixin* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
     return CreateMaybeMessage<Mixin>(arena);
   }
   using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
@@ -651,8 +658,8 @@ class PROTOBUF_EXPORT Mixin final :
 
   size_t ByteSizeLong() const final;
   const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
-  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
-      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  uint8_t* _InternalSerialize(
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
   int GetCachedSize() const final { return _cached_size_.Get(); }
 
   private:
@@ -660,6 +667,8 @@ class PROTOBUF_EXPORT Mixin final :
   void SharedDtor();
   void SetCachedSize(int size) const final;
   void InternalSwap(Mixin* other);
+
+  private:
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
     return "google.protobuf.Mixin";
@@ -691,7 +700,7 @@ class PROTOBUF_EXPORT Mixin final :
   template <typename ArgT0 = const std::string&, typename... ArgT>
   void set_name(ArgT0&& arg0, ArgT... args);
   std::string* mutable_name();
-  PROTOBUF_MUST_USE_RESULT std::string* release_name();
+  PROTOBUF_NODISCARD std::string* release_name();
   void set_allocated_name(std::string* name);
   private:
   const std::string& _internal_name() const;
@@ -705,7 +714,7 @@ class PROTOBUF_EXPORT Mixin final :
   template <typename ArgT0 = const std::string&, typename... ArgT>
   void set_root(ArgT0&& arg0, ArgT... args);
   std::string* mutable_root();
-  PROTOBUF_MUST_USE_RESULT std::string* release_root();
+  PROTOBUF_NODISCARD std::string* release_root();
   void set_allocated_root(std::string* root);
   private:
   const std::string& _internal_root() const;
@@ -779,6 +788,11 @@ inline void Api::set_allocated_name(std::string* name) {
   }
   name_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), name,
       GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (name_.IsDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited())) {
+    name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
   // @@protoc_insertion_point(field_set_allocated:google.protobuf.Api.name)
 }
 
@@ -902,6 +916,11 @@ inline void Api::set_allocated_version(std::string* version) {
   }
   version_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), version,
       GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (version_.IsDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited())) {
+    version_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
   // @@protoc_insertion_point(field_set_allocated:google.protobuf.Api.version)
 }
 
@@ -1098,6 +1117,11 @@ inline void Method::set_allocated_name(std::string* name) {
   }
   name_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), name,
       GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (name_.IsDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited())) {
+    name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
   // @@protoc_insertion_point(field_set_allocated:google.protobuf.Method.name)
 }
 
@@ -1144,6 +1168,11 @@ inline void Method::set_allocated_request_type_url(std::string* request_type_url
   }
   request_type_url_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), request_type_url,
       GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (request_type_url_.IsDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited())) {
+    request_type_url_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
   // @@protoc_insertion_point(field_set_allocated:google.protobuf.Method.request_type_url)
 }
 
@@ -1210,6 +1239,11 @@ inline void Method::set_allocated_response_type_url(std::string* response_type_u
   }
   response_type_url_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), response_type_url,
       GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (response_type_url_.IsDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited())) {
+    response_type_url_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
   // @@protoc_insertion_point(field_set_allocated:google.protobuf.Method.response_type_url)
 }
 
@@ -1337,6 +1371,11 @@ inline void Mixin::set_allocated_name(std::string* name) {
   }
   name_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), name,
       GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (name_.IsDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited())) {
+    name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
   // @@protoc_insertion_point(field_set_allocated:google.protobuf.Mixin.name)
 }
 
@@ -1383,6 +1422,11 @@ inline void Mixin::set_allocated_root(std::string* root) {
   }
   root_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), root,
       GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (root_.IsDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited())) {
+    root_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
   // @@protoc_insertion_point(field_set_allocated:google.protobuf.Mixin.root)
 }
 
