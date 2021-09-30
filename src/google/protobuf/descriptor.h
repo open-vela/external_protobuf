@@ -184,6 +184,29 @@ struct DebugStringOptions {
 // Must be instantiated as mutable in a descriptor.
 namespace internal {
 
+// Data required to do lazy initialization.
+struct PROTOBUF_EXPORT LazyInitData {
+#ifndef SWIG
+  internal::once_flag once;
+#endif
+  struct Field {
+    const std::string* type_name;
+    const std::string* default_value_enum_name;
+  };
+  struct Descriptor {
+    const std::string* name;
+    const FileDescriptor* file;
+  };
+  struct File {
+    const std::string** dependencies_names;
+  };
+  union {
+    Field field;
+    Descriptor descriptor;
+    File file;
+  };
+};
+
 class PROTOBUF_EXPORT LazyDescriptor {
  public:
   // Init function to be called at init time of a descriptor containing
@@ -209,19 +232,18 @@ class PROTOBUF_EXPORT LazyDescriptor {
   // Returns the current value of the descriptor, thread-safe. If SetLazy(...)
   // has been called, will do a one-time cross link of the type specified,
   // building the descriptor file that contains the type if necessary.
-  inline const Descriptor* Get(const ServiceDescriptor* service) {
-    Once(service);
+  inline const Descriptor* Get() {
+    Once();
     return descriptor_;
   }
 
  private:
-  void Once(const ServiceDescriptor* service);
+  static void OnceStatic(LazyDescriptor* lazy);
+  void OnceInternal();
+  void Once();
 
-  union {
-    const Descriptor* descriptor_;
-    const char* lazy_name_;
-  };
-  internal::once_flag* once_;
+  const Descriptor* descriptor_;
+  LazyInitData* once_;
 };
 
 class PROTOBUF_EXPORT SymbolBase {
@@ -542,18 +564,8 @@ class PROTOBUF_EXPORT Descriptor : private internal::SymbolBase {
   bool is_placeholder_ : 1;
   // True if this is a placeholder and the type name wasn't fully-qualified.
   bool is_unqualified_placeholder_ : 1;
-  // Well known type.  Stored like this to conserve space.
-  uint8_t well_known_type_ : 5;
-
-  // This points to the last field _number_ that is part of the sequence
-  // starting at 1, where
-  //     `desc->field(i)->number() == i + 1`
-  // A value of `0` means no field matches. That is, there are no fields or the
-  // first field is not field `1`.
-  // Uses 16-bit to avoid extra padding. Unlikely to have more than 2^16
-  // sequentially numbered fields in a message.
-  uint16_t sequential_field_limit_;
-
+  // Well known type.  Stored as char to conserve space.
+  char well_known_type_;
   int field_count_;
 
   // all_names_ = [name, full_name]
@@ -591,7 +603,6 @@ class PROTOBUF_EXPORT Descriptor : private internal::SymbolBase {
   friend class DescriptorPool;
   friend class EnumDescriptor;
   friend class FieldDescriptor;
-  friend class FileDescriptorTables;
   friend class OneofDescriptor;
   friend class MethodDescriptor;
   friend class FileDescriptor;
@@ -894,19 +905,19 @@ class PROTOBUF_EXPORT FieldDescriptor : private internal::SymbolBase {
   // Returns true if this is a map message type.
   bool is_map_message_type() const;
 
-  bool has_default_value_ : 1;
-  bool proto3_optional_ : 1;
+  bool has_default_value_;
+  bool proto3_optional_;
   // Whether the user has specified the json_name field option in the .proto
   // file.
-  bool has_json_name_ : 1;
-  bool is_extension_ : 1;
-  bool is_oneof_ : 1;
-
-  // Actually a `Label` but stored as uint8_t to save space.
-  uint8_t label_ : 2;
+  bool has_json_name_;
+  bool is_extension_;
 
   // Actually a `Type`, but stored as uint8_t to save space.
   mutable uint8_t type_;
+  // Actually a `Label` but stored as uint8_t to save space.
+  uint8_t label_;
+
+  bool is_oneof_ : 1;
 
   // Logically:
   //   all_names_ = [name, full_name, lower, camel, json]
@@ -918,15 +929,14 @@ class PROTOBUF_EXPORT FieldDescriptor : private internal::SymbolBase {
   uint8_t lowercase_name_index_ : 2;
   uint8_t camelcase_name_index_ : 2;
   uint8_t json_name_index_ : 3;
-  // Sadly, `number_` located here to reduce padding. Unrelated to all_names_
-  // and its indices above.
-  int number_;
   const std::string* all_names_;
   const FileDescriptor* file_;
 
-  internal::once_flag* type_once_;
+  internal::LazyInitData* type_once_;
   static void TypeOnceInit(const FieldDescriptor* to_init);
   void InternalTypeOnceInit() const;
+  int number_;
+  int index_in_oneof_;
   const Descriptor* containing_type_;
   union {
     const OneofDescriptor* containing_oneof;
@@ -935,7 +945,6 @@ class PROTOBUF_EXPORT FieldDescriptor : private internal::SymbolBase {
   union {
     mutable const Descriptor* message_type;
     mutable const EnumDescriptor* enum_type;
-    const char* lazy_type_name;
   } type_descriptor_;
   const FieldOptions* options_;
   // IMPORTANT:  If you add a new field, make sure to search for all instances
@@ -952,7 +961,6 @@ class PROTOBUF_EXPORT FieldDescriptor : private internal::SymbolBase {
     bool default_value_bool_;
 
     mutable const EnumValueDescriptor* default_value_enum_;
-    const char* lazy_default_value_enum_name_;
     const std::string* default_value_string_;
     mutable std::atomic<const Message*> default_generated_instance_;
   };
@@ -1040,8 +1048,8 @@ class PROTOBUF_EXPORT OneofDescriptor : private internal::SymbolBase {
   // all_names_ = [name, full_name]
   const std::string* all_names_;
   const Descriptor* containing_type_;
+  const FieldDescriptor** fields_;
   const OneofOptions* options_;
-  const FieldDescriptor* fields_;
 
   // IMPORTANT:  If you add a new field, make sure to search for all instances
   // of Allocate<OneofDescriptor>() and AllocateArray<OneofDescriptor>()
@@ -1156,9 +1164,6 @@ class PROTOBUF_EXPORT EnumDescriptor : private internal::SymbolBase {
   friend class io::Printer;
   friend class compiler::cpp::Formatter;
 
-  // Allow access to FindValueByNumberCreatingIfUnknown.
-  friend class descriptor_unittest::DescriptorTest;
-
   // Looks up a value by number.  If the value does not exist, dynamically
   // creates a new EnumValueDescriptor for that value, assuming that it was
   // unknown. If a new descriptor is created, this is done in a thread-safe way,
@@ -1179,18 +1184,9 @@ class PROTOBUF_EXPORT EnumDescriptor : private internal::SymbolBase {
   void GetLocationPath(std::vector<int>* output) const;
 
   // True if this is a placeholder for an unknown type.
-  bool is_placeholder_ : 1;
+  bool is_placeholder_;
   // True if this is a placeholder and the type name wasn't fully-qualified.
-  bool is_unqualified_placeholder_ : 1;
-
-  // This points to the last value _index_ that is part of the sequence starting
-  // with the first label, where
-  //   `enum->value(i)->number() == enum->value(0)->number() + i`
-  // We measure relative to the first label to adapt to enum labels starting at
-  // 0 or 1.
-  // Uses 16-bit to avoid extra padding. Unlikely to have more than 2^15
-  // sequentially numbered labels in an enum.
-  int16_t sequential_value_limit_;
+  bool is_unqualified_placeholder_;
 
   int value_count_;
 
@@ -1215,7 +1211,6 @@ class PROTOBUF_EXPORT EnumDescriptor : private internal::SymbolBase {
   friend class DescriptorBuilder;
   friend class Descriptor;
   friend class FieldDescriptor;
-  friend class FileDescriptorTables;
   friend class EnumValueDescriptor;
   friend class FileDescriptor;
   friend class DescriptorPool;
@@ -1620,16 +1615,7 @@ class PROTOBUF_EXPORT FileDescriptor {
   const std::string* name_;
   const std::string* package_;
   const DescriptorPool* pool_;
-
-  // Data required to do lazy initialization.
-  struct PROTOBUF_EXPORT LazyInitData {
-#ifndef SWIG
-    internal::once_flag once;
-#endif
-    const char** dependencies_names;
-  };
-
-  LazyInitData* dependencies_once_;
+  internal::LazyInitData* dependencies_once_;
   static void DependenciesOnceInit(const FileDescriptor* to_init);
   void InternalDependenciesOnceInit() const;
 
@@ -2110,6 +2096,7 @@ PROTOBUF_DEFINE_ACCESSOR(FieldDescriptor, file, const FileDescriptor*)
 PROTOBUF_DEFINE_ACCESSOR(FieldDescriptor, number, int)
 PROTOBUF_DEFINE_ACCESSOR(FieldDescriptor, is_extension, bool)
 PROTOBUF_DEFINE_ACCESSOR(FieldDescriptor, containing_type, const Descriptor*)
+PROTOBUF_DEFINE_ACCESSOR(FieldDescriptor, index_in_oneof, int)
 PROTOBUF_DEFINE_OPTIONS_ACCESSOR(FieldDescriptor, FieldOptions)
 PROTOBUF_DEFINE_ACCESSOR(FieldDescriptor, has_default_value, bool)
 PROTOBUF_DEFINE_ACCESSOR(FieldDescriptor, has_json_name, bool)
@@ -2125,7 +2112,6 @@ PROTOBUF_DEFINE_STRING_ACCESSOR(FieldDescriptor, default_value_string)
 PROTOBUF_DEFINE_NAME_ACCESSOR(OneofDescriptor)
 PROTOBUF_DEFINE_ACCESSOR(OneofDescriptor, containing_type, const Descriptor*)
 PROTOBUF_DEFINE_ACCESSOR(OneofDescriptor, field_count, int)
-PROTOBUF_DEFINE_ARRAY_ACCESSOR(OneofDescriptor, field, const FieldDescriptor*)
 PROTOBUF_DEFINE_OPTIONS_ACCESSOR(OneofDescriptor, OneofOptions)
 
 PROTOBUF_DEFINE_NAME_ACCESSOR(EnumDescriptor)
@@ -2247,11 +2233,6 @@ inline const OneofDescriptor* FieldDescriptor::containing_oneof() const {
   return is_oneof_ ? scope_.containing_oneof : nullptr;
 }
 
-inline int FieldDescriptor::index_in_oneof() const {
-  GOOGLE_DCHECK(is_oneof_);
-  return static_cast<int>(this - scope_.containing_oneof->field(0));
-}
-
 inline const Descriptor* FieldDescriptor::extension_scope() const {
   GOOGLE_CHECK(is_extension_);
   return scope_.extension_scope;
@@ -2263,7 +2244,7 @@ inline FieldDescriptor::Label FieldDescriptor::label() const {
 
 inline FieldDescriptor::Type FieldDescriptor::type() const {
   if (type_once_) {
-    internal::call_once(*type_once_, &FieldDescriptor::TypeOnceInit, this);
+    internal::call_once(type_once_->once, &FieldDescriptor::TypeOnceInit, this);
   }
   return static_cast<Type>(type_);
 }
@@ -2407,6 +2388,12 @@ inline const FileDescriptor* FileDescriptor::weak_dependency(int index) const {
 
 inline FileDescriptor::Syntax FileDescriptor::syntax() const {
   return static_cast<Syntax>(syntax_);
+}
+
+// Can't use PROTOBUF_DEFINE_ARRAY_ACCESSOR because fields_ is actually an array
+// of pointers rather than the usual array of objects.
+inline const FieldDescriptor* OneofDescriptor::field(int index) const {
+  return fields_[index];
 }
 
 }  // namespace protobuf

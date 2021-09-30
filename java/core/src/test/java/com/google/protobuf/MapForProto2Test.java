@@ -32,8 +32,6 @@ package com.google.protobuf;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assertWithMessage;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
 
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import map_test.MapForProto2TestProto.BizarroTestMap;
@@ -51,10 +49,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -485,8 +481,15 @@ public class MapForProto2Test {
   }
 
   @Test
-  public void testPutChecksNullValues() throws Exception {
+  public void testPutChecksNullKeysAndValues() throws Exception {
     TestMap.Builder builder = TestMap.newBuilder();
+
+    try {
+      builder.putInt32ToStringField(1, null);
+      assertWithMessage("expected exception").fail();
+    } catch (NullPointerException e) {
+      // expected.
+    }
 
     try {
       builder.putInt32ToBytesField(1, null);
@@ -514,17 +517,6 @@ public class MapForProto2Test {
       assertWithMessage("expected exception").fail();
     } catch (NullPointerException e) {
       // expected.
-    }
-  }
-
-  @Test
-  public void testPutChecksNullKey() throws Exception {
-    TestMap.Builder builder = TestMap.newBuilder();
-
-    try {
-      builder.putStringToInt32Field(null, 1);
-      assertWithMessage("expected exception").fail();
-    } catch (NullPointerException expected) {
     }
   }
 
@@ -1225,55 +1217,5 @@ public class MapForProto2Test {
     assertThat(message.getInt32ToBytesFieldMap()).isEqualTo(message.getInt32ToBytesFieldMap());
     assertThat(message.getInt32ToEnumFieldMap()).isEqualTo(message.getInt32ToEnumFieldMap());
     assertThat(message.getInt32ToMessageFieldMap()).isEqualTo(message.getInt32ToMessageFieldMap());
-  }
-
-  @Test
-  public void testPutAllWithNullStringValue() throws Exception {
-    TestMap.Builder sourceBuilder = TestMap.newBuilder();
-
-    // order preserving map used here to help test rollback
-    Map<Integer, String> data = new TreeMap<>();
-    data.put(7, "foo");
-    data.put(8, "bar");
-    data.put(9, null);
-    try {
-      sourceBuilder.putAllInt32ToStringField(data);
-      fail("allowed null string value");
-    } catch (NullPointerException expected) {
-      // Verify rollback of previously added values.
-      // They all go in or none do.
-      assertThat(sourceBuilder.getInt32ToStringFieldMap()).isEmpty();
-    }
-  }
-
-  @Test
-  public void testPutAllWithNullStringKey() throws Exception {
-    TestMap.Builder sourceBuilder = TestMap.newBuilder();
-
-    // order preserving map used here to help test rollback
-    Map<Integer, String> data = new LinkedHashMap<>();
-    data.put(7, "foo");
-    data.put(null, "bar");
-    data.put(9, "baz");
-    try {
-      sourceBuilder.putAllInt32ToStringField(data);
-      fail("allowed null string key");
-    } catch (NullPointerException expected) {
-      // Verify rollback of previously added values.
-      // They all go in or none do.
-      assertThat(sourceBuilder.getInt32ToStringFieldMap()).isEmpty();
-    }
-  }
-
-  @Test
-  public void testPutNullStringValue() throws Exception {
-    TestMap.Builder sourceBuilder = TestMap.newBuilder();
-
-    try {
-      sourceBuilder.putInt32ToStringField(8, null);
-      fail("allowed null string value");
-    } catch (NullPointerException expected) {
-      assertNotNull(expected.getMessage());
-    }
   }
 }

@@ -1558,7 +1558,7 @@ public class JsonFormat {
       try {
         Timestamp value = Timestamps.parse(json.getAsString());
         builder.mergeFrom(value.toByteString());
-      } catch (ParseException | UnsupportedOperationException e) {
+      } catch (ParseException e) {
         throw new InvalidProtocolBufferException("Failed to parse timestamp: " + json);
       }
     }
@@ -1568,7 +1568,7 @@ public class JsonFormat {
       try {
         Duration value = Durations.parse(json.getAsString());
         builder.mergeFrom(value.toByteString());
-      } catch (ParseException | UnsupportedOperationException e) {
+      } catch (ParseException e) {
         throw new InvalidProtocolBufferException("Failed to parse duration: " + json);
       }
     }

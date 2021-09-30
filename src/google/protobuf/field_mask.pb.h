@@ -50,7 +50,7 @@ struct PROTOBUF_EXPORT TableStruct_google_2fprotobuf_2ffield_5fmask_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::FieldMetadata field_metadata[];
   static const ::PROTOBUF_NAMESPACE_ID::internal::SerializationTable serialization_table[];
-  static const uint32_t offsets[];
+  static const ::PROTOBUF_NAMESPACE_ID::uint32 offsets[];
 };
 PROTOBUF_EXPORT extern const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_google_2fprotobuf_2ffield_5fmask_2eproto;
 PROTOBUF_NAMESPACE_OPEN
@@ -120,12 +120,7 @@ class PROTOBUF_EXPORT FieldMask final :
   }
   inline void Swap(FieldMask* other) {
     if (other == this) return;
-  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
-    if (GetOwningArena() != nullptr &&
-        GetOwningArena() == other->GetOwningArena()) {
-   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
     if (GetOwningArena() == other->GetOwningArena()) {
-  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
       InternalSwap(other);
     } else {
       ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
@@ -139,7 +134,11 @@ class PROTOBUF_EXPORT FieldMask final :
 
   // implements Message ----------------------------------------------
 
-  FieldMask* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+  inline FieldMask* New() const final {
+    return new FieldMask();
+  }
+
+  FieldMask* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
     return CreateMaybeMessage<FieldMask>(arena);
   }
   using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
@@ -154,8 +153,8 @@ class PROTOBUF_EXPORT FieldMask final :
 
   size_t ByteSizeLong() const final;
   const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
-  uint8_t* _InternalSerialize(
-      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
   int GetCachedSize() const final { return _cached_size_.Get(); }
 
   private:
@@ -163,8 +162,6 @@ class PROTOBUF_EXPORT FieldMask final :
   void SharedDtor();
   void SetCachedSize(int size) const final;
   void InternalSwap(FieldMask* other);
-
-  private:
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
     return "google.protobuf.FieldMask";
