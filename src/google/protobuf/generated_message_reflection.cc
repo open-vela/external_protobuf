@@ -53,9 +53,7 @@
 #include <google/protobuf/stubs/strutil.h>
 
 
-// clang-format off
 #include <google/protobuf/port_def.inc>
-// clang-format on
 
 #define GOOGLE_PROTOBUF_HAS_ONEOF
 
@@ -248,12 +246,6 @@ const UnknownFieldSet& Reflection::GetUnknownFields(
 UnknownFieldSet* Reflection::MutableUnknownFields(Message* message) const {
   return MutableInternalMetadata(message)
       ->mutable_unknown_fields<UnknownFieldSet>();
-}
-
-bool Reflection::IsLazyExtension(const Message& message,
-                                 const FieldDescriptor* field) const {
-  return field->is_extension() &&
-         GetExtensionSet(message).HasLazy(field->number());
 }
 
 bool Reflection::IsLazilyVerifiedLazyField(const FieldDescriptor* field) const {
@@ -995,8 +987,6 @@ void Reflection::SwapFieldsImpl(
   GOOGLE_DCHECK(!unsafe_shallow_swap || message1->GetArenaForAllocation() ==
                                      message2->GetArenaForAllocation());
 
-  const Message* prototype =
-      message_factory_->GetPrototype(message1->GetDescriptor());
   for (const auto* field : fields) {
     CheckInvalidAccess(schema_, field);
     if (field->is_extension()) {
@@ -1005,7 +995,7 @@ void Reflection::SwapFieldsImpl(
             MutableExtensionSet(message2), field->number());
       } else {
         MutableExtensionSet(message1)->SwapExtension(
-            prototype, MutableExtensionSet(message2), field->number());
+            MutableExtensionSet(message2), field->number());
       }
     } else {
       if (schema_.InRealOneof(field)) {
@@ -1613,7 +1603,7 @@ std::string Reflection::GetString(const Message& message,
 
 const std::string& Reflection::GetStringReference(const Message& message,
                                                   const FieldDescriptor* field,
-                                                  std::string* /*scratch*/) const {
+                                                  std::string* scratch) const {
   USAGE_CHECK_ALL(GetStringReference, SINGULAR, STRING);
   if (field->is_extension()) {
     return GetExtensionSet(message).GetString(field->number(),
@@ -1701,7 +1691,7 @@ std::string Reflection::GetRepeatedString(const Message& message,
 
 const std::string& Reflection::GetRepeatedStringReference(
     const Message& message, const FieldDescriptor* field, int index,
-    std::string* /*scratch*/) const {
+    std::string* scratch) const {
   USAGE_CHECK_ALL(GetRepeatedStringReference, REPEATED, STRING);
   if (field->is_extension()) {
     return GetExtensionSet(message).GetRepeatedString(field->number(), index);
@@ -2239,7 +2229,7 @@ void Reflection::UnsafeArenaAddAllocatedMessage(Message* message,
 void* Reflection::MutableRawRepeatedField(Message* message,
                                           const FieldDescriptor* field,
                                           FieldDescriptor::CppType cpptype,
-                                          int /*ctype*/,
+                                          int ctype,
                                           const Descriptor* desc) const {
   USAGE_CHECK_REPEATED("MutableRawRepeatedField");
   CheckInvalidAccess(schema_, field);
@@ -2630,19 +2620,19 @@ void Reflection::ClearOneof(Message* message,
   }
 }
 
-#define HANDLE_TYPE(TYPE, CPPTYPE, CTYPE)                                  \
-  template <>                                                              \
-  const RepeatedField<TYPE>& Reflection::GetRepeatedFieldInternal<TYPE>(   \
-      const Message& message, const FieldDescriptor* field) const {        \
-    return *static_cast<RepeatedField<TYPE>*>(MutableRawRepeatedField(     \
-        const_cast<Message*>(&message), field, CPPTYPE, CTYPE, nullptr));  \
-  }                                                                        \
-                                                                           \
-  template <>                                                              \
-  RepeatedField<TYPE>* Reflection::MutableRepeatedFieldInternal<TYPE>(     \
-      Message * message, const FieldDescriptor* field) const {             \
-    return static_cast<RepeatedField<TYPE>*>(                              \
-        MutableRawRepeatedField(message, field, CPPTYPE, CTYPE, nullptr)); \
+#define HANDLE_TYPE(TYPE, CPPTYPE, CTYPE)                                \
+  template <>                                                            \
+  const RepeatedField<TYPE>& Reflection::GetRepeatedFieldInternal<TYPE>( \
+      const Message& message, const FieldDescriptor* field) const {      \
+    return *static_cast<RepeatedField<TYPE>*>(MutableRawRepeatedField(   \
+        const_cast<Message*>(&message), field, CPPTYPE, CTYPE, NULL));   \
+  }                                                                      \
+                                                                         \
+  template <>                                                            \
+  RepeatedField<TYPE>* Reflection::MutableRepeatedFieldInternal<TYPE>(   \
+      Message * message, const FieldDescriptor* field) const {           \
+    return static_cast<RepeatedField<TYPE>*>(                            \
+        MutableRawRepeatedField(message, field, CPPTYPE, CTYPE, NULL));  \
   }
 
 HANDLE_TYPE(int32_t, FieldDescriptor::CPPTYPE_INT32, -1);
@@ -2658,10 +2648,10 @@ HANDLE_TYPE(bool, FieldDescriptor::CPPTYPE_BOOL, -1);
 
 void* Reflection::MutableRawRepeatedString(Message* message,
                                            const FieldDescriptor* field,
-                                           bool /*is_string*/) const {
+                                           bool is_string) const {
   return MutableRawRepeatedField(message, field,
                                  FieldDescriptor::CPPTYPE_STRING,
-                                 FieldOptions::STRING, nullptr);
+                                 FieldOptions::STRING, NULL);
 }
 
 // Template implementations of basic accessors.  Inline because each
@@ -3013,7 +3003,7 @@ void RegisterFileLevelMetadata(const DescriptorTable* table) {
 }
 
 void UnknownFieldSetSerializer(const uint8_t* base, uint32_t offset,
-                               uint32_t /*tag*/, uint32_t /*has_offset*/,
+                               uint32_t tag, uint32_t has_offset,
                                io::CodedOutputStream* output) {
   const void* ptr = base + offset;
   const InternalMetadata* metadata = static_cast<const InternalMetadata*>(ptr);

@@ -51,7 +51,7 @@ struct PROTOBUF_EXPORT TableStruct_google_2fprotobuf_2fempty_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::FieldMetadata field_metadata[];
   static const ::PROTOBUF_NAMESPACE_ID::internal::SerializationTable serialization_table[];
-  static const uint32_t offsets[];
+  static const ::PROTOBUF_NAMESPACE_ID::uint32 offsets[];
 };
 PROTOBUF_EXPORT extern const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_google_2fprotobuf_2fempty_2eproto;
 PROTOBUF_NAMESPACE_OPEN
@@ -120,12 +120,7 @@ class PROTOBUF_EXPORT Empty final :
   }
   inline void Swap(Empty* other) {
     if (other == this) return;
-  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
-    if (GetOwningArena() != nullptr &&
-        GetOwningArena() == other->GetOwningArena()) {
-   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
     if (GetOwningArena() == other->GetOwningArena()) {
-  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
       InternalSwap(other);
     } else {
       ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
@@ -139,7 +134,11 @@ class PROTOBUF_EXPORT Empty final :
 
   // implements Message ----------------------------------------------
 
-  Empty* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+  inline Empty* New() const final {
+    return new Empty();
+  }
+
+  Empty* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
     return CreateMaybeMessage<Empty>(arena);
   }
   using ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase::CopyFrom;
@@ -151,8 +150,6 @@ class PROTOBUF_EXPORT Empty final :
     ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase::MergeImpl(this, from);
   }
   public:
-
-  private:
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
     return "google.protobuf.Empty";

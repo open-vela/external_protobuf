@@ -73,19 +73,15 @@ nobase_include_HEADERS =                                         \
   google/protobuf/arenastring.h                                  \
   google/protobuf/compiler/code_generator.h                      \
   google/protobuf/compiler/command_line_interface.h              \
-  google/protobuf/compiler/cpp/cpp_file.h                        \
   google/protobuf/compiler/cpp/cpp_generator.h                   \
-  google/protobuf/compiler/cpp/cpp_helpers.h                     \
-  google/protobuf/compiler/cpp/cpp_names.h                       \
-  google/protobuf/compiler/csharp/csharp_doc_comment.h           \
   google/protobuf/compiler/csharp/csharp_generator.h             \
   google/protobuf/compiler/csharp/csharp_names.h                 \
-  google/protobuf/compiler/csharp/csharp_options.h               \
   google/protobuf/compiler/importer.h                            \
   google/protobuf/compiler/java/java_generator.h                 \
   google/protobuf/compiler/java/java_kotlin_generator.h          \
   google/protobuf/compiler/java/java_names.h                     \
   google/protobuf/compiler/js/js_generator.h                     \
+  google/protobuf/compiler/js/well_known_types_embed.h           \
   google/protobuf/compiler/objectivec/objectivec_generator.h     \
   google/protobuf/compiler/objectivec/objectivec_helpers.h       \
   google/protobuf/compiler/parser.h                              \
@@ -100,7 +96,6 @@ nobase_include_HEADERS =                                         \
   google/protobuf/duration.pb.h                                  \
   google/protobuf/dynamic_message.h                              \
   google/protobuf/empty.pb.h                                     \
-  google/protobuf/explicitly_constructed.h                       \
   google/protobuf/extension_set.h                                \
   google/protobuf/extension_set_inl.h                            \
   google/protobuf/field_access_listener.h                        \
@@ -110,7 +105,6 @@ nobase_include_HEADERS =                                         \
   google/protobuf/generated_message_bases.h                      \
   google/protobuf/generated_message_reflection.h                 \
   google/protobuf/generated_message_table_driven.h               \
-  google/protobuf/generated_message_table_driven_lite.h          \
   google/protobuf/generated_message_tctable_decl.h               \
   google/protobuf/generated_message_tctable_impl.h               \
   google/protobuf/generated_message_tctable_impl.inc             \
@@ -139,14 +133,15 @@ nobase_include_HEADERS =                                         \
   google/protobuf/metadata.h                                     \
   google/protobuf/metadata_lite.h                                \
   google/protobuf/parse_context.h                                \
-  google/protobuf/port.h                                         \
   google/protobuf/port_def.inc                                   \
   google/protobuf/port_undef.inc                                 \
+  google/protobuf/port.h                                         \
   google/protobuf/reflection.h                                   \
   google/protobuf/reflection_ops.h                               \
   google/protobuf/repeated_field.h                               \
   google/protobuf/service.h                                      \
   google/protobuf/source_context.pb.h                            \
+  google/protobuf/string_member_robber.h                         \
   google/protobuf/struct.pb.h                                    \
   google/protobuf/stubs/bytestream.h                             \
   google/protobuf/stubs/callback.h                               \
@@ -196,7 +191,7 @@ libprotobuf_lite_la_SOURCES =                                  \
   google/protobuf/extension_set.cc                             \
   google/protobuf/generated_enum_util.cc                       \
   google/protobuf/generated_message_table_driven_lite.cc       \
-  google/protobuf/generated_message_tctable_lite.cc            \
+  google/protobuf/generated_message_table_driven_lite.h        \
   google/protobuf/generated_message_util.cc                    \
   google/protobuf/implicit_weak_message.cc                     \
   google/protobuf/inlined_string_field.cc                      \
@@ -210,17 +205,21 @@ libprotobuf_lite_la_SOURCES =                                  \
   google/protobuf/message_lite.cc                              \
   google/protobuf/parse_context.cc                             \
   google/protobuf/repeated_field.cc                            \
-  google/protobuf/string_member_robber.h                       \
   google/protobuf/stubs/bytestream.cc                          \
+  google/protobuf/stubs/bytestream.h                           \
   google/protobuf/stubs/common.cc                              \
+  google/protobuf/stubs/hash.h                                 \
   google/protobuf/stubs/int128.cc                              \
   google/protobuf/stubs/int128.h                               \
+  google/protobuf/stubs/map_util.h                             \
   google/protobuf/stubs/mathutil.h                             \
-  google/protobuf/stubs/status.cc                              \
   google/protobuf/stubs/status_macros.h                        \
+  google/protobuf/stubs/status.cc                              \
+  google/protobuf/stubs/status.h                               \
   google/protobuf/stubs/statusor.cc                            \
   google/protobuf/stubs/statusor.h                             \
   google/protobuf/stubs/stringpiece.cc                         \
+  google/protobuf/stubs/stringpiece.h                          \
   google/protobuf/stubs/stringprintf.cc                        \
   google/protobuf/stubs/stringprintf.h                         \
   google/protobuf/stubs/structurally_valid.cc                  \
@@ -253,7 +252,7 @@ libprotobuf_la_SOURCES =                                       \
   google/protobuf/generated_message_bases.cc                   \
   google/protobuf/generated_message_reflection.cc              \
   google/protobuf/generated_message_table_driven.cc            \
-  google/protobuf/generated_message_tctable_full.cc            \
+  google/protobuf/generated_message_table_driven_lite.h        \
   google/protobuf/io/gzip_stream.cc                            \
   google/protobuf/io/printer.cc                                \
   google/protobuf/io/tokenizer.cc                              \
@@ -304,6 +303,7 @@ libprotobuf_la_SOURCES =                                       \
   google/protobuf/util/internal/structured_objectwriter.h      \
   google/protobuf/util/internal/type_info.cc                   \
   google/protobuf/util/internal/type_info.h                    \
+  google/protobuf/util/internal/type_info_test_helper.cc       \
   google/protobuf/util/internal/type_info_test_helper.h        \
   google/protobuf/util/internal/utility.cc                     \
   google/protobuf/util/internal/utility.h                      \
@@ -334,8 +334,10 @@ libprotoc_la_SOURCES =                                         \
   google/protobuf/compiler/cpp/cpp_field.cc                    \
   google/protobuf/compiler/cpp/cpp_field.h                     \
   google/protobuf/compiler/cpp/cpp_file.cc                     \
+  google/protobuf/compiler/cpp/cpp_file.h                      \
   google/protobuf/compiler/cpp/cpp_generator.cc                \
   google/protobuf/compiler/cpp/cpp_helpers.cc                  \
+  google/protobuf/compiler/cpp/cpp_helpers.h                   \
   google/protobuf/compiler/cpp/cpp_map_field.cc                \
   google/protobuf/compiler/cpp/cpp_map_field.h                 \
   google/protobuf/compiler/cpp/cpp_message.cc                  \
@@ -343,6 +345,7 @@ libprotoc_la_SOURCES =                                         \
   google/protobuf/compiler/cpp/cpp_message_field.cc            \
   google/protobuf/compiler/cpp/cpp_message_field.h             \
   google/protobuf/compiler/cpp/cpp_message_layout_helper.h     \
+  google/protobuf/compiler/cpp/cpp_names.h                     \
   google/protobuf/compiler/cpp/cpp_options.h                   \
   google/protobuf/compiler/cpp/cpp_padding_optimizer.cc        \
   google/protobuf/compiler/cpp/cpp_padding_optimizer.h         \
@@ -355,6 +358,7 @@ libprotoc_la_SOURCES =                                         \
   google/protobuf/compiler/cpp/cpp_string_field.cc             \
   google/protobuf/compiler/cpp/cpp_string_field.h              \
   google/protobuf/compiler/csharp/csharp_doc_comment.cc        \
+  google/protobuf/compiler/csharp/csharp_doc_comment.h         \
   google/protobuf/compiler/csharp/csharp_enum.cc               \
   google/protobuf/compiler/csharp/csharp_enum.h                \
   google/protobuf/compiler/csharp/csharp_enum_field.cc         \
@@ -370,10 +374,11 @@ libprotoc_la_SOURCES =                                         \
   google/protobuf/compiler/csharp/csharp_message.h             \
   google/protobuf/compiler/csharp/csharp_message_field.cc      \
   google/protobuf/compiler/csharp/csharp_message_field.h       \
+  google/protobuf/compiler/csharp/csharp_options.h             \
   google/protobuf/compiler/csharp/csharp_primitive_field.cc    \
   google/protobuf/compiler/csharp/csharp_primitive_field.h     \
-  google/protobuf/compiler/csharp/csharp_reflection_class.cc   \
-  google/protobuf/compiler/csharp/csharp_reflection_class.h    \
+  google/protobuf/compiler/csharp/csharp_reflection_class.cc     \
+  google/protobuf/compiler/csharp/csharp_reflection_class.h      \
   google/protobuf/compiler/csharp/csharp_repeated_enum_field.cc \
   google/protobuf/compiler/csharp/csharp_repeated_enum_field.h \
   google/protobuf/compiler/csharp/csharp_repeated_message_field.cc \
@@ -443,7 +448,6 @@ libprotoc_la_SOURCES =                                         \
   google/protobuf/compiler/java/java_string_field_lite.h       \
   google/protobuf/compiler/js/js_generator.cc                  \
   google/protobuf/compiler/js/well_known_types_embed.cc        \
-  google/protobuf/compiler/js/well_known_types_embed.h         \
   google/protobuf/compiler/objectivec/objectivec_enum.cc       \
   google/protobuf/compiler/objectivec/objectivec_enum.h        \
   google/protobuf/compiler/objectivec/objectivec_enum_field.cc \
@@ -456,6 +460,7 @@ libprotoc_la_SOURCES =                                         \
   google/protobuf/compiler/objectivec/objectivec_file.h        \
   google/protobuf/compiler/objectivec/objectivec_generator.cc  \
   google/protobuf/compiler/objectivec/objectivec_helpers.cc    \
+  google/protobuf/compiler/objectivec/objectivec_helpers.h     \
   google/protobuf/compiler/objectivec/objectivec_map_field.cc  \
   google/protobuf/compiler/objectivec/objectivec_map_field.h   \
   google/protobuf/compiler/objectivec/objectivec_message.cc    \
@@ -537,19 +542,19 @@ protoc_inputs =                                                   \
 
 EXTRA_DIST =                                                   \
   $(protoc_inputs)                                             \
-  README.md                                                    \
+  solaris/libstdc++.la                                         \
   google/protobuf/compiler/package_info.h                      \
   google/protobuf/compiler/ruby/ruby_generated_code.proto      \
   google/protobuf/compiler/ruby/ruby_generated_code_pb.rb      \
   google/protobuf/compiler/ruby/ruby_generated_code_proto2_import.proto         \
-  google/protobuf/compiler/ruby/ruby_generated_code_proto2.proto \
-  google/protobuf/compiler/ruby/ruby_generated_code_proto2_pb.rb \
-  google/protobuf/compiler/ruby/ruby_generated_pkg_explicit.proto \
+  google/protobuf/compiler/ruby/ruby_generated_code_proto2.proto         \
+  google/protobuf/compiler/ruby/ruby_generated_code_proto2_pb.rb         \
+  google/protobuf/compiler/ruby/ruby_generated_pkg_explicit.proto        \
   google/protobuf/compiler/ruby/ruby_generated_pkg_explicit_legacy.proto \
   google/protobuf/compiler/ruby/ruby_generated_pkg_explicit_legacy_pb.rb \
-  google/protobuf/compiler/ruby/ruby_generated_pkg_explicit_pb.rb \
-  google/protobuf/compiler/ruby/ruby_generated_pkg_implicit.proto \
-  google/protobuf/compiler/ruby/ruby_generated_pkg_implicit_pb.rb \
+  google/protobuf/compiler/ruby/ruby_generated_pkg_explicit_pb.rb        \
+  google/protobuf/compiler/ruby/ruby_generated_pkg_implicit.proto        \
+  google/protobuf/compiler/ruby/ruby_generated_pkg_implicit_pb.rb        \
   google/protobuf/compiler/zip_output_unittest.sh              \
   google/protobuf/io/gzip_stream.h                             \
   google/protobuf/io/gzip_stream_unittest.sh                   \
@@ -565,16 +570,16 @@ EXTRA_DIST =                                                   \
   google/protobuf/testdata/golden_packed_fields_message        \
   google/protobuf/testdata/map_test_data.txt                   \
   google/protobuf/testdata/text_format_unittest_data.txt       \
-  google/protobuf/testdata/text_format_unittest_data_oneof_implemented.txt \
-  google/protobuf/testdata/text_format_unittest_data_pointy.txt \
-  google/protobuf/testdata/text_format_unittest_data_pointy_oneof.txt \
-  google/protobuf/testdata/text_format_unittest_extensions_data.txt \
-  google/protobuf/testdata/text_format_unittest_extensions_data_pointy.txt \
+  google/protobuf/testdata/text_format_unittest_data_oneof_implemented.txt  \
+  google/protobuf/testdata/text_format_unittest_data_pointy.txt             \
+  google/protobuf/testdata/text_format_unittest_data_pointy_oneof.txt       \
+  google/protobuf/testdata/text_format_unittest_extensions_data.txt         \
+  google/protobuf/testdata/text_format_unittest_extensions_data_pointy.txt  \
   google/protobuf/util/package_info.h                          \
   libprotobuf-lite.map                                         \
   libprotobuf.map                                              \
   libprotoc.map                                                \
-  solaris/libstdc++.la                                        
+  README.md
 
 protoc_lite_outputs =                                          \
   google/protobuf/map_lite_unittest.pb.cc                      \
@@ -699,10 +704,11 @@ endif
 $(protoc_outputs): unittest_proto_middleman
 
 COMMON_TEST_SOURCES =                                          \
-  $(COMMON_LITE_TEST_SOURCES)                                  \
-  google/protobuf/compiler/cpp/cpp_unittest.h                  \
+  google/protobuf/arena_test_util.cc                           \
+  google/protobuf/arena_test_util.h                            \
   google/protobuf/map_test_util.h                              \
   google/protobuf/map_test_util.inc                            \
+  google/protobuf/map_test_util_impl.h                         \
   google/protobuf/reflection_tester.cc                         \
   google/protobuf/reflection_tester.h                          \
   google/protobuf/test_util.cc                                 \
@@ -732,7 +738,6 @@ protobuf_test_CPPFLAGS = -I$(GOOGLETEST_SRC_DIR)/include \
 # See configure.ac for more info.
 protobuf_test_CXXFLAGS = $(NO_OPT_CXXFLAGS)
 protobuf_test_SOURCES =                                        \
-  $(COMMON_TEST_SOURCES)                                       \
   google/protobuf/any_test.cc                                  \
   google/protobuf/arena_unittest.cc                            \
   google/protobuf/arenastring_unittest.cc                      \
@@ -743,6 +748,7 @@ protobuf_test_SOURCES =                                        \
   google/protobuf/compiler/cpp/cpp_move_unittest.cc            \
   google/protobuf/compiler/cpp/cpp_plugin_unittest.cc          \
   google/protobuf/compiler/cpp/cpp_unittest.cc                 \
+  google/protobuf/compiler/cpp/cpp_unittest.h                  \
   google/protobuf/compiler/cpp/cpp_unittest.inc                \
   google/protobuf/compiler/cpp/metadata_test.cc                \
   google/protobuf/compiler/csharp/csharp_bootstrap_unittest.cc \
@@ -810,7 +816,8 @@ protobuf_test_SOURCES =                                        \
   google/protobuf/util/type_resolver_util_test.cc              \
   google/protobuf/well_known_types_unittest.cc                 \
   google/protobuf/wire_format_unittest.cc                      \
-  google/protobuf/wire_format_unittest.inc
+  google/protobuf/wire_format_unittest.inc                     \
+  $(COMMON_TEST_SOURCES)
 
 nodist_protobuf_test_SOURCES = $(protoc_outputs)
 $(am_protobuf_test_OBJECTS): unittest_proto_middleman
@@ -836,7 +843,6 @@ COMMON_LITE_TEST_SOURCES =                                             \
   google/protobuf/arena_test_util.h                                    \
   google/protobuf/map_lite_test_util.cc                                \
   google/protobuf/map_lite_test_util.h                                 \
-  google/protobuf/map_test_util_impl.h                                 \
   google/protobuf/test_util_lite.cc                                    \
   google/protobuf/test_util_lite.h
 
