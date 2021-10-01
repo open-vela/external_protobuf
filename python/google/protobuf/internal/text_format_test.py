@@ -1,6 +1,4 @@
-#! /usr/bin/env python
 # -*- coding: utf-8 -*-
-#
 # Protocol Buffers - Google's data interchange format
 # Copyright 2008 Google Inc.  All rights reserved.
 # https://developers.google.com/protocol-buffers/
@@ -521,6 +519,35 @@ class TextFormatMessageToStringTests(TextFormatBase):
         '  label: LABEL_OPTIONAL\n'
         '  type: TYPE_INT32\n'
         '  oneof_index: 0\n'
+        '}\n'
+        'field {\n'
+        '  name: "map_field"\n'
+        '  number: 3\n'
+        '  label: LABEL_REPEATED\n'
+        '  type: TYPE_MESSAGE\n'
+        '  type_name: ".protobuf_unittest.TestMessageWithCustomOptions.'
+        'MapFieldEntry"\n'
+        '  options {\n'
+        '    [protobuf_unittest.field_opt1]: 12345\n'
+        '  }\n'
+        '}\n'
+        'nested_type {\n'
+        '  name: "MapFieldEntry"\n'
+        '  field {\n'
+        '    name: "key"\n'
+        '    number: 1\n'
+        '    label: LABEL_OPTIONAL\n'
+        '    type: TYPE_STRING\n'
+        '  }\n'
+        '  field {\n'
+        '    name: "value"\n'
+        '    number: 2\n'
+        '    label: LABEL_OPTIONAL\n'
+        '    type: TYPE_STRING\n'
+        '  }\n'
+        '  options {\n'
+        '    map_entry: true\n'
+        '  }\n'
         '}\n'
         'enum_type {\n'
         '  name: "AnEnum"\n'

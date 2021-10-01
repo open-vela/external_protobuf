@@ -974,7 +974,7 @@ $annotate_extension_set$
 template <typename _proto_TypeTraits,
           ::PROTOBUF_NAMESPACE_ID::internal::FieldType _field_type,
           bool _is_packed>
-inline PROTOBUF_MUST_USE_RESULT
+PROTOBUF_NODISCARD inline
     typename _proto_TypeTraits::Singular::MutableType
     ReleaseExtension(
         const ::PROTOBUF_NAMESPACE_ID::internal::ExtensionIdentifier<
@@ -1437,7 +1437,8 @@ void MessageGenerator::GenerateClassDefinition(io::Printer* printer) {
   if (EnableMessageOwnedArena(descriptor_)) {
     format(
         "inline $classname$() : $classname$("
-        "new ::$proto_ns$::Arena(), true) {}\n");
+        "::$proto_ns$::Arena::InternalHelper<$classname$>::\n"
+        "    CreateMessageOwnedArena(), true) {}\n");
   } else {
     format("inline $classname$() : $classname$(nullptr) {}\n");
   }
@@ -1530,10 +1531,8 @@ void MessageGenerator::GenerateClassDefinition(io::Printer* printer) {
     format("enum $1$Case {\n", UnderscoresToCamelCase(oneof->name(), true));
     format.Indent();
     for (auto field : FieldRange(oneof)) {
-      std::string oneof_enum_case_field_name =
-          UnderscoresToCamelCase(field->name(), true);
-      format("k$1$ = $2$,\n", oneof_enum_case_field_name,  // 1
-             field->number());                             // 2
+      format("$1$ = $2$,\n", OneofCaseConstantName(field),  // 1
+             field->number());                              // 2
     }
     format("$1$_NOT_SET = 0,\n", ToUpper(oneof->name()));
     format.Outdent();
@@ -1565,7 +1564,8 @@ void MessageGenerator::GenerateClassDefinition(io::Printer* printer) {
           "bool PackFrom(const ::$proto_ns$::Message& message,\n"
           "              ::PROTOBUF_NAMESPACE_ID::ConstStringParam "
           "type_url_prefix) {\n"
-          "  return _any_metadata_.PackFrom(GetArena(), message, type_url_prefix);\n"
+          "  return _any_metadata_.PackFrom(GetArena(), message, "
+          "type_url_prefix);\n"
           "}\n"
           "bool UnpackTo(::$proto_ns$::Message* message) const {\n"
           "  return _any_metadata_.UnpackTo(message);\n"
@@ -1586,7 +1586,8 @@ void MessageGenerator::GenerateClassDefinition(io::Printer* printer) {
           "bool PackFrom(const T& message,\n"
           "              ::PROTOBUF_NAMESPACE_ID::ConstStringParam "
           "type_url_prefix) {\n"
-          "  return _any_metadata_.PackFrom<T>(GetArena(), message, type_url_prefix);"
+          "  return _any_metadata_.PackFrom<T>(GetArena(), message, "
+          "type_url_prefix);"
           "}\n"
           "template <typename T, class = typename std::enable_if<"
           "!std::is_convertible<T, const ::$proto_ns$::Message&>"
@@ -1598,13 +1599,14 @@ void MessageGenerator::GenerateClassDefinition(io::Printer* printer) {
       format(
           "template <typename T>\n"
           "bool PackFrom(const T& message) {\n"
-          "  return _any_metadata_.PackFrom(message);\n"
+          "  return _any_metadata_.PackFrom(GetArena(), message);\n"
           "}\n"
           "template <typename T>\n"
           "bool PackFrom(const T& message,\n"
           "              ::PROTOBUF_NAMESPACE_ID::ConstStringParam "
           "type_url_prefix) {\n"
-          "  return _any_metadata_.PackFrom(message, type_url_prefix);\n"
+          "  return _any_metadata_.PackFrom(GetArena(), message, "
+          "type_url_prefix);\n"
           "}\n"
           "template <typename T>\n"
           "bool UnpackTo(T* message) const {\n"
@@ -1626,12 +1628,12 @@ void MessageGenerator::GenerateClassDefinition(io::Printer* printer) {
       "}\n"
       "inline void Swap($classname$* other) {\n"
       "  if (other == this) return;\n"
-#ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+      "#ifdef PROTOBUF_FORCE_COPY_IN_SWAP\n"
       "  if (GetOwningArena() != nullptr &&\n"
-      "      GetOwningArena() == other->GetOwningArena()) {\n"
-#else   // PROTOBUF_FORCE_COPY_IN_SWAP
+      "      GetOwningArena() == other->GetOwningArena()) {\n "
+      "#else  // PROTOBUF_FORCE_COPY_IN_SWAP\n"
       "  if (GetOwningArena() == other->GetOwningArena()) {\n"
-#endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+      "#endif  // !PROTOBUF_FORCE_COPY_IN_SWAP\n"
       "    InternalSwap(other);\n"
       "  } else {\n"
       "    ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);\n"
@@ -1647,11 +1649,7 @@ void MessageGenerator::GenerateClassDefinition(io::Printer* printer) {
       "\n"
       "// implements Message ----------------------------------------------\n"
       "\n"
-      "inline $classname$* New() const final {\n"
-      "  return new $classname$();\n"
-      "}\n"
-      "\n"
-      "$classname$* New(::$proto_ns$::Arena* arena) const final {\n"
+      "$classname$* New(::$proto_ns$::Arena* arena = nullptr) const final {\n"
       "  return CreateMaybeMessage<$classname$>(arena);\n"
       "}\n");
 
@@ -1714,12 +1712,6 @@ void MessageGenerator::GenerateClassDefinition(io::Printer* printer) {
           "$uint8$* _InternalSerialize(\n"
           "    $uint8$* target, ::$proto_ns$::io::EpsCopyOutputStream* stream) "
           "const final;\n");
-
-      // DiscardUnknownFields() is implemented in message.cc using reflections.
-      // We need to implement this function in generated code for messages.
-      if (!UseUnknownFieldSet(descriptor_->file(), options_)) {
-        format("void DiscardUnknownFields()$ full_final$;\n");
-      }
     }
   }
 
@@ -1740,6 +1732,7 @@ void MessageGenerator::GenerateClassDefinition(io::Printer* printer) {
 
   format(
       // Friend AnyMetadata so that it can call this FullMessageName() method.
+      "\nprivate:\n"
       "friend class ::$proto_ns$::internal::AnyMetadata;\n"
       "static $1$ FullMessageName() {\n"
       "  return \"$full_name$\";\n"
@@ -2796,7 +2789,7 @@ void MessageGenerator::GenerateSharedConstructorCode(io::Printer* printer) {
   if (HasSimpleBaseClass(descriptor_, options_)) return;
   Formatter format(printer, variables_);
 
-  format("void $classname$::SharedCtor() {\n");
+  format("inline void $classname$::SharedCtor() {\n");
 
   std::vector<bool> processed(optimized_order_.size(), false);
   GenerateConstructorBody(printer, processed, false);
@@ -3119,7 +3112,9 @@ void MessageGenerator::GenerateStructors(io::Printer* printer) {
         "metadata_);\n");
 
     if (descriptor_->extension_range_count() > 0) {
-      format("_extensions_.MergeFrom(from._extensions_);\n");
+      format(
+          "_extensions_.MergeFrom(internal_default_instance(), "
+          "from._extensions_);\n");
     }
 
     GenerateConstructorBody(printer, processed, true);
@@ -3714,7 +3709,9 @@ void MessageGenerator::GenerateClassSpecificMergeFrom(io::Printer* printer) {
   // Merging of extensions and unknown fields is done last, to maximize
   // the opportunity for tail calls.
   if (descriptor_->extension_range_count() > 0) {
-    format("_extensions_.MergeFrom(from._extensions_);\n");
+    format(
+        "_extensions_.MergeFrom(internal_default_instance(), "
+        "from._extensions_);\n");
   }
 
   format(
