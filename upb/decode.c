@@ -92,7 +92,7 @@ static const unsigned fixed64_ok = (1 << UPB_DTYPE_DOUBLE) |
                                    (1 << UPB_DTYPE_SFIXED64);
 
 /* Op: an action to be performed for a wire-type/field-type combination. */
-#define OP_UNKNOWN -1             /* Unknown field. */
+#define OP_UNKNOWN -1
 #define OP_SCALAR_LG2(n) (n)      /* n in [0, 2, 3] => op in [0, 2, 3] */
 #define OP_STRING 4
 #define OP_BYTES 5
@@ -125,25 +125,25 @@ static const int8_t varint_ops[19] = {
 
 static const int8_t delim_ops[37] = {
     /* For non-repeated field type. */
-    OP_UNKNOWN, /* field not found */
-    OP_UNKNOWN, /* DOUBLE */
-    OP_UNKNOWN, /* FLOAT */
-    OP_UNKNOWN, /* INT64 */
-    OP_UNKNOWN, /* UINT64 */
-    OP_UNKNOWN, /* INT32 */
-    OP_UNKNOWN, /* FIXED64 */
-    OP_UNKNOWN, /* FIXED32 */
-    OP_UNKNOWN, /* BOOL */
-    OP_STRING,  /* STRING */
-    OP_UNKNOWN, /* GROUP */
-    OP_SUBMSG,  /* MESSAGE */
-    OP_BYTES,   /* BYTES */
-    OP_UNKNOWN, /* UINT32 */
-    OP_UNKNOWN, /* ENUM */
-    OP_UNKNOWN, /* SFIXED32 */
-    OP_UNKNOWN, /* SFIXED64 */
-    OP_UNKNOWN, /* SINT32 */
-    OP_UNKNOWN, /* SINT64 */
+    OP_UNKNOWN,       /* field not found */
+    OP_UNKNOWN,       /* DOUBLE */
+    OP_UNKNOWN,       /* FLOAT */
+    OP_UNKNOWN,       /* INT64 */
+    OP_UNKNOWN,       /* UINT64 */
+    OP_UNKNOWN,       /* INT32 */
+    OP_UNKNOWN,       /* FIXED64 */
+    OP_UNKNOWN,       /* FIXED32 */
+    OP_UNKNOWN,       /* BOOL */
+    OP_STRING,        /* STRING */
+    OP_UNKNOWN,       /* GROUP */
+    OP_SUBMSG,        /* MESSAGE */
+    OP_BYTES,         /* BYTES */
+    OP_UNKNOWN,       /* UINT32 */
+    OP_UNKNOWN,       /* ENUM */
+    OP_UNKNOWN,       /* SFIXED32 */
+    OP_UNKNOWN,       /* SFIXED64 */
+    OP_UNKNOWN,       /* SINT32 */
+    OP_UNKNOWN,       /* SINT64 */
     /* For repeated field type. */
     OP_FIXPCK_LG2(3), /* REPEATED DOUBLE */
     OP_FIXPCK_LG2(2), /* REPEATED FLOAT */
@@ -609,23 +609,74 @@ static bool decode_tryfastdispatch(upb_decstate *d, const char **ptr,
   return false;
 }
 
-static const char *decode_mset_item(upb_decstate *d, const char *ptr,
-                                    upb_msg *msg, const upb_msglayout *layout) {
-  // We create a temporary upb_msglayout here and abuse its fields as temporary
-  // storage, to avoid creating lots of MessageSet-specific parsing code-paths:
-  //   1. We store 'layout' in item_layout.subs.  We will need this later as
-  //      a key to look up extensions for this MessageSet.
-  //   2. We use item_layout.fields as temporary storage to store the extension we
-  //      found when parsing the type id.
-  upb_msglayout item_layout = {
-      .subs = (const upb_msglayout_sub[]){{.submsg = layout}},
-      .fields = NULL,
-      .size = 0,
-      .field_count = 0,
-      .ext = _UPB_MSGEXT_MSET_ITEM,
-      .dense_below = 0,
-      .table_mask = -1};
-  return decode_group(d, ptr, msg, &item_layout, 1);
+UPB_FORCEINLINE
+static const char *decode_wireval(upb_decstate *d, const char *ptr,
+                                  const upb_msglayout_field *field,
+                                  int wire_type, wireval *val, int *op) {
+  switch (wire_type) {
+    case UPB_WIRE_TYPE_VARINT:
+      ptr = decode_varint64(d, ptr, &val->uint64_val);
+      *op = varint_ops[field->descriptortype];
+      decode_munge(field->descriptortype, val);
+      return ptr;
+    case UPB_WIRE_TYPE_32BIT:
+      memcpy(&val->uint32_val, ptr, 4);
+      val->uint32_val = _upb_be_swap32(val->uint32_val);
+      *op = OP_SCALAR_LG2(2);
+      if (((1 << field->descriptortype) & fixed32_ok) == 0) *op = OP_UNKNOWN;
+      return ptr + 4;
+    case UPB_WIRE_TYPE_64BIT:
+      memcpy(&val->uint64_val, ptr, 8);
+      val->uint64_val = _upb_be_swap64(val->uint64_val);
+      *op = OP_SCALAR_LG2(3);
+      if (((1 << field->descriptortype) & fixed64_ok) == 0) *op = OP_UNKNOWN;
+      return ptr + 8;
+    case UPB_WIRE_TYPE_DELIMITED: {
+      int ndx = field->descriptortype;
+      uint64_t size;
+      if (_upb_getmode(field) == _UPB_MODE_ARRAY) ndx += 18;
+      ptr = decode_varint64(d, ptr, &size);
+      if (size >= INT32_MAX ||
+          ptr - d->end + (int32_t)size > d->limit) {
+        decode_err(d); /* Length overflow. */
+      }
+      *op = delim_ops[ndx];
+      val->size = size;
+      return ptr;
+    }
+    case UPB_WIRE_TYPE_START_GROUP:
+      val->uint32_val = field->number;
+      *op = OP_SUBMSG;
+      if (field->descriptortype != UPB_DTYPE_GROUP) *op = OP_UNKNOWN;
+      return ptr;
+    default:
+      decode_err(d);
+  }
+}
+
+UPB_FORCEINLINE
+static const char *decode_skipunknown(upb_decstate *d, const char *ptr,
+                                      upb_msg *msg, int field_number,
+                                      int wire_type, wireval val,
+                                      const char **field_start) {
+  if (field_number == 0) decode_err(d);
+  if (wire_type == UPB_WIRE_TYPE_DELIMITED) ptr += val.size;
+  if (msg) {
+    if (wire_type == UPB_WIRE_TYPE_START_GROUP) {
+      d->unknown = *field_start;
+      d->unknown_msg = msg;
+      ptr = decode_group(d, ptr, NULL, NULL, field_number);
+      d->unknown_msg = NULL;
+      *field_start = d->unknown;
+    }
+    if (!_upb_msg_addunknown(msg, *field_start, ptr - *field_start,
+                              &d->arena)) {
+      decode_err(d);
+    }
+  } else if (wire_type == UPB_WIRE_TYPE_START_GROUP) {
+    ptr = decode_group(d, ptr, NULL, NULL, field_number);
+  }
+  return ptr;
 }
 
 UPB_NOINLINE
@@ -648,60 +699,13 @@ static const char *decode_msg(upb_decstate *d, const char *ptr, upb_msg *msg,
 
     field = upb_find_field(d, layout, field_number, &last_field_index);
 
-    switch (wire_type) {
-      case UPB_WIRE_TYPE_VARINT:
-        ptr = decode_varint64(d, ptr, &val.uint64_val);
-        op = varint_ops[field->descriptortype];
-        decode_munge(field->descriptortype, &val);
-        break;
-      case UPB_WIRE_TYPE_32BIT:
-        memcpy(&val.uint32_val, ptr, 4);
-        val.uint32_val = _upb_be_swap32(val.uint32_val);
-        ptr += 4;
-        op = OP_SCALAR_LG2(2);
-        if (((1 << field->descriptortype) & fixed32_ok) == 0) goto unknown;
-        break;
-      case UPB_WIRE_TYPE_64BIT:
-        memcpy(&val.uint64_val, ptr, 8);
-        val.uint64_val = _upb_be_swap64(val.uint64_val);
-        ptr += 8;
-        op = OP_SCALAR_LG2(3);
-        if (((1 << field->descriptortype) & fixed64_ok) == 0) goto unknown;
-        break;
-      case UPB_WIRE_TYPE_DELIMITED: {
-        int ndx = field->descriptortype;
-        uint64_t size;
-        if (_upb_getmode(field) == _UPB_MODE_ARRAY) ndx += 18;
-        ptr = decode_varint64(d, ptr, &size);
-        if (size >= INT32_MAX ||
-            ptr - d->end + (int32_t)size > d->limit) {
-          decode_err(d); /* Length overflow. */
-        }
-        op = delim_ops[ndx];
-        val.size = size;
-        break;
-      }
-      case UPB_WIRE_TYPE_START_GROUP:
-        val.uint32_val = field_number;
-        if (field->descriptortype == UPB_DTYPE_GROUP) {
-          op = OP_SUBMSG;
-        } else {
-          if (layout->ext == _UPB_MSGEXT_MSET &&
-              field_number == _UPB_MSET_ITEM && d->extreg) {
-            ptr = decode_mset_item(d, ptr, msg, layout);
-            goto success;
-          }
-          op = OP_UNKNOWN;
-        }
-        break;
-      case UPB_WIRE_TYPE_END_GROUP:
-        d->end_group = field_number;
-        return ptr;
-      default:
-        decode_err(d);
+    if (wire_type == UPB_WIRE_TYPE_END_GROUP) {
+      d->end_group = field_number;
+      return ptr;
     }
 
-   have_field:
+    ptr = decode_wireval(d, ptr, field, wire_type, &val, &op);
+
     if (op >= 0) {
       /* Known field, possibly an extension. */
       upb_msg *field_msg = msg;
@@ -731,58 +735,10 @@ static const char *decode_msg(upb_decstate *d, const char *ptr, upb_msg *msg,
           UPB_UNREACHABLE();
       }
     } else {
-    unknown:
-      /* Skip unknown field. */
-      if (field_number == 0) decode_err(d);
-
-      if (layout && UPB_UNLIKELY(layout->ext == _UPB_MSGEXT_MSET_ITEM)) {
-        /* MessageSet handling. */
-        switch (field_number) {
-          case _UPB_MSET_TYPEID: {
-            if (wire_type != UPB_WIRE_TYPE_VARINT) break;
-            const upb_msglayout_ext *ext = _upb_extreg_get(
-                d->extreg, layout->subs[0].submsg, val.uint64_val);
-            if (!ext) break;
-            ((upb_msglayout*)layout)->fields = &ext->field;
-            goto success;
-          }
-          case _UPB_MSET_MESSAGE:
-            if (wire_type != UPB_WIRE_TYPE_DELIMITED) break;
-            if (layout->fields) {
-              // We saw type_id previously and succeeded in looking up msg.
-              field = layout->fields;
-              op = OP_SUBMSG;
-              goto have_field;
-            } else {
-              // TODO: out of order MessageSet.
-              // This is a very rare case: all serializers will emit in-order
-              // MessageSets.  To hit this case there has to be some kind of
-              // re-ordering proxy.  We should eventually handle this case, but
-              // not today.
-            }
-            break;
-        }
-      }
-
-      if (wire_type == UPB_WIRE_TYPE_DELIMITED) ptr += val.size;
-      if (msg) {
-        if (wire_type == UPB_WIRE_TYPE_START_GROUP) {
-          d->unknown = field_start;
-          d->unknown_msg = msg;
-          ptr = decode_group(d, ptr, NULL, NULL, field_number);
-          d->unknown_msg = NULL;
-          field_start = d->unknown;
-        }
-        if (!_upb_msg_addunknown(msg, field_start, ptr - field_start,
-                                 &d->arena)) {
-          decode_err(d);
-        }
-      } else if (wire_type == UPB_WIRE_TYPE_START_GROUP) {
-        ptr = decode_group(d, ptr, NULL, NULL, field_number);
-      }
+      ptr = decode_skipunknown(d, ptr, msg, field_number, wire_type, val,
+                               &field_start);
     }
 
-   success:
     if (decode_isdone(d, &ptr)) return ptr;
     if (decode_tryfastdispatch(d, &ptr, msg, layout)) return ptr;
   }
