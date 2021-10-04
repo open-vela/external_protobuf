@@ -1106,11 +1106,7 @@ void WriteMessage(const protobuf::Descriptor* message, Output& output,
   std::string msgext = "_UPB_MSGEXT_NONE";
 
   if (message->extension_range_count()) {
-    if (message->options().message_set_wire_format()) {
-      msgext = "_UPB_MSGEXT_MSET";
-    } else {
-      msgext = "_UPB_MSGEXT_EXTENDABLE";
-    }
+    msgext = "_UPB_MSGEXT_EXTENDABLE";
   }
 
   output("const upb_msglayout $0 = {\n", MessageInit(message));
