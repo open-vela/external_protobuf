@@ -95,7 +95,7 @@ class ParseContext;
 class ExtensionSet;
 class LazyField;
 class RepeatedPtrFieldBase;
-class TcParser;
+class TcParserBase;
 class WireFormatLite;
 class WeakFieldMap;
 
@@ -482,7 +482,7 @@ class PROTOBUF_EXPORT MessageLite {
   friend class internal::ExtensionSet;
   friend class internal::LazyField;
   friend class internal::SwapFieldHelper;
-  friend class internal::TcParser;
+  friend class internal::TcParserBase;
   friend class internal::WeakFieldMap;
   friend class internal::WireFormatLite;
 

@@ -46,7 +46,6 @@ import com.google.protobuf.Message;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import javax.annotation.Nullable;
 
 /**
  * Utility helper functions to work with {@link com.google.protobuf.FieldMask}.
@@ -231,8 +230,10 @@ public final class FieldMaskUtil {
     return isValid(descriptor, path);
   }
 
-  /** Checks whether paths in a given fields mask are valid. */
-  public static boolean isValid(@Nullable Descriptor descriptor, String path) {
+  /**
+   * Checks whether paths in a given fields mask are valid.
+   */
+  public static boolean isValid(Descriptor descriptor, String path) {
     String[] parts = path.split(FIELD_SEPARATOR_REGEX);
     if (parts.length == 0) {
       return false;

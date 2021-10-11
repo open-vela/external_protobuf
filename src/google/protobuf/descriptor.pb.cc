@@ -1429,8 +1429,7 @@ void FileDescriptorSet::CopyFrom(const FileDescriptorSet& from) {
 }
 
 bool FileDescriptorSet::IsInitialized() const {
-  if (!::PROTOBUF_NAMESPACE_ID::internal::AllAreInitialized(file_))
-    return false;
+  if (!::PROTOBUF_NAMESPACE_ID::internal::AllAreInitialized(file_)) return false;
   return true;
 }
 
@@ -2081,14 +2080,10 @@ void FileDescriptorProto::CopyFrom(const FileDescriptorProto& from) {
 }
 
 bool FileDescriptorProto::IsInitialized() const {
-  if (!::PROTOBUF_NAMESPACE_ID::internal::AllAreInitialized(message_type_))
-    return false;
-  if (!::PROTOBUF_NAMESPACE_ID::internal::AllAreInitialized(enum_type_))
-    return false;
-  if (!::PROTOBUF_NAMESPACE_ID::internal::AllAreInitialized(service_))
-    return false;
-  if (!::PROTOBUF_NAMESPACE_ID::internal::AllAreInitialized(extension_))
-    return false;
+  if (!::PROTOBUF_NAMESPACE_ID::internal::AllAreInitialized(message_type_)) return false;
+  if (!::PROTOBUF_NAMESPACE_ID::internal::AllAreInitialized(enum_type_)) return false;
+  if (!::PROTOBUF_NAMESPACE_ID::internal::AllAreInitialized(service_)) return false;
+  if (!::PROTOBUF_NAMESPACE_ID::internal::AllAreInitialized(extension_)) return false;
   if (_internal_has_options()) {
     if (!options_->IsInitialized()) return false;
   }
@@ -3170,18 +3165,12 @@ void DescriptorProto::CopyFrom(const DescriptorProto& from) {
 }
 
 bool DescriptorProto::IsInitialized() const {
-  if (!::PROTOBUF_NAMESPACE_ID::internal::AllAreInitialized(field_))
-    return false;
-  if (!::PROTOBUF_NAMESPACE_ID::internal::AllAreInitialized(nested_type_))
-    return false;
-  if (!::PROTOBUF_NAMESPACE_ID::internal::AllAreInitialized(enum_type_))
-    return false;
-  if (!::PROTOBUF_NAMESPACE_ID::internal::AllAreInitialized(extension_range_))
-    return false;
-  if (!::PROTOBUF_NAMESPACE_ID::internal::AllAreInitialized(extension_))
-    return false;
-  if (!::PROTOBUF_NAMESPACE_ID::internal::AllAreInitialized(oneof_decl_))
-    return false;
+  if (!::PROTOBUF_NAMESPACE_ID::internal::AllAreInitialized(field_)) return false;
+  if (!::PROTOBUF_NAMESPACE_ID::internal::AllAreInitialized(nested_type_)) return false;
+  if (!::PROTOBUF_NAMESPACE_ID::internal::AllAreInitialized(enum_type_)) return false;
+  if (!::PROTOBUF_NAMESPACE_ID::internal::AllAreInitialized(extension_range_)) return false;
+  if (!::PROTOBUF_NAMESPACE_ID::internal::AllAreInitialized(extension_)) return false;
+  if (!::PROTOBUF_NAMESPACE_ID::internal::AllAreInitialized(oneof_decl_)) return false;
   if (_internal_has_options()) {
     if (!options_->IsInitialized()) return false;
   }
@@ -3405,8 +3394,7 @@ bool ExtensionRangeOptions::IsInitialized() const {
     return false;
   }
 
-  if (!::PROTOBUF_NAMESPACE_ID::internal::AllAreInitialized(uninterpreted_option_))
-    return false;
+  if (!::PROTOBUF_NAMESPACE_ID::internal::AllAreInitialized(uninterpreted_option_)) return false;
   return true;
 }
 
@@ -4959,8 +4947,7 @@ void EnumDescriptorProto::CopyFrom(const EnumDescriptorProto& from) {
 }
 
 bool EnumDescriptorProto::IsInitialized() const {
-  if (!::PROTOBUF_NAMESPACE_ID::internal::AllAreInitialized(value_))
-    return false;
+  if (!::PROTOBUF_NAMESPACE_ID::internal::AllAreInitialized(value_)) return false;
   if (_internal_has_options()) {
     if (!options_->IsInitialized()) return false;
   }
@@ -5583,8 +5570,7 @@ void ServiceDescriptorProto::CopyFrom(const ServiceDescriptorProto& from) {
 }
 
 bool ServiceDescriptorProto::IsInitialized() const {
-  if (!::PROTOBUF_NAMESPACE_ID::internal::AllAreInitialized(method_))
-    return false;
+  if (!::PROTOBUF_NAMESPACE_ID::internal::AllAreInitialized(method_)) return false;
   if (_internal_has_options()) {
     if (!options_->IsInitialized()) return false;
   }
@@ -7079,8 +7065,7 @@ bool FileOptions::IsInitialized() const {
     return false;
   }
 
-  if (!::PROTOBUF_NAMESPACE_ID::internal::AllAreInitialized(uninterpreted_option_))
-    return false;
+  if (!::PROTOBUF_NAMESPACE_ID::internal::AllAreInitialized(uninterpreted_option_)) return false;
   return true;
 }
 
@@ -7474,8 +7459,7 @@ bool MessageOptions::IsInitialized() const {
     return false;
   }
 
-  if (!::PROTOBUF_NAMESPACE_ID::internal::AllAreInitialized(uninterpreted_option_))
-    return false;
+  if (!::PROTOBUF_NAMESPACE_ID::internal::AllAreInitialized(uninterpreted_option_)) return false;
   return true;
 }
 
@@ -7882,8 +7866,7 @@ bool FieldOptions::IsInitialized() const {
     return false;
   }
 
-  if (!::PROTOBUF_NAMESPACE_ID::internal::AllAreInitialized(uninterpreted_option_))
-    return false;
+  if (!::PROTOBUF_NAMESPACE_ID::internal::AllAreInitialized(uninterpreted_option_)) return false;
   return true;
 }
 
@@ -8096,8 +8079,7 @@ bool OneofOptions::IsInitialized() const {
     return false;
   }
 
-  if (!::PROTOBUF_NAMESPACE_ID::internal::AllAreInitialized(uninterpreted_option_))
-    return false;
+  if (!::PROTOBUF_NAMESPACE_ID::internal::AllAreInitialized(uninterpreted_option_)) return false;
   return true;
 }
 
@@ -8378,8 +8360,7 @@ bool EnumOptions::IsInitialized() const {
     return false;
   }
 
-  if (!::PROTOBUF_NAMESPACE_ID::internal::AllAreInitialized(uninterpreted_option_))
-    return false;
+  if (!::PROTOBUF_NAMESPACE_ID::internal::AllAreInitialized(uninterpreted_option_)) return false;
   return true;
 }
 
@@ -8628,8 +8609,7 @@ bool EnumValueOptions::IsInitialized() const {
     return false;
   }
 
-  if (!::PROTOBUF_NAMESPACE_ID::internal::AllAreInitialized(uninterpreted_option_))
-    return false;
+  if (!::PROTOBUF_NAMESPACE_ID::internal::AllAreInitialized(uninterpreted_option_)) return false;
   return true;
 }
 
@@ -8873,8 +8853,7 @@ bool ServiceOptions::IsInitialized() const {
     return false;
   }
 
-  if (!::PROTOBUF_NAMESPACE_ID::internal::AllAreInitialized(uninterpreted_option_))
-    return false;
+  if (!::PROTOBUF_NAMESPACE_ID::internal::AllAreInitialized(uninterpreted_option_)) return false;
   return true;
 }
 
@@ -9166,8 +9145,7 @@ bool MethodOptions::IsInitialized() const {
     return false;
   }
 
-  if (!::PROTOBUF_NAMESPACE_ID::internal::AllAreInitialized(uninterpreted_option_))
-    return false;
+  if (!::PROTOBUF_NAMESPACE_ID::internal::AllAreInitialized(uninterpreted_option_)) return false;
   return true;
 }
 
@@ -9887,8 +9865,7 @@ void UninterpretedOption::CopyFrom(const UninterpretedOption& from) {
 }
 
 bool UninterpretedOption::IsInitialized() const {
-  if (!::PROTOBUF_NAMESPACE_ID::internal::AllAreInitialized(name_))
-    return false;
+  if (!::PROTOBUF_NAMESPACE_ID::internal::AllAreInitialized(name_)) return false;
   return true;
 }
 
