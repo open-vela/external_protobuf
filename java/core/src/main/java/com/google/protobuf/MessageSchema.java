@@ -5808,9 +5808,9 @@ final class MessageSchema<T> implements Schema<T> {
       final long offset = offset(typeAndOffset);
       switch (type(typeAndOffset)) {
         case 0: // DOUBLE:
-            return Double.doubleToRawLongBits(UnsafeUtil.getDouble(message, offset)) != 0L;
+          return UnsafeUtil.getDouble(message, offset) != 0D;
         case 1: // FLOAT:
-            return Float.floatToRawIntBits(UnsafeUtil.getFloat(message, offset)) != 0;
+          return UnsafeUtil.getFloat(message, offset) != 0F;
         case 2: // INT64:
           return UnsafeUtil.getLong(message, offset) != 0L;
         case 3: // UINT64:

@@ -68,13 +68,13 @@ final class SchemaUtil {
   }
 
   public static void writeDouble(int fieldNumber, double value, Writer writer) throws IOException {
-    if (Double.doubleToRawLongBits(value) != 0) {
+    if (Double.compare(value, 0.0) != 0) {
       writer.writeDouble(fieldNumber, value);
     }
   }
 
   public static void writeFloat(int fieldNumber, float value, Writer writer) throws IOException {
-    if (Float.floatToRawIntBits(value) != 0) {
+    if (Float.compare(value, 0.0f) != 0) {
       writer.writeFloat(fieldNumber, value);
     }
   }

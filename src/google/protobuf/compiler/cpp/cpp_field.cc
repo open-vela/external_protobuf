@@ -340,7 +340,7 @@ FieldGenerator* FieldGeneratorMap::MakeGenerator(
     switch (field->cpp_type()) {
       case FieldDescriptor::CPPTYPE_MESSAGE:
         if (field->is_map()) {
-          return new MapFieldGenerator(field, options, scc_analyzer);
+          return new MapFieldGenerator(field, options);
         } else {
           return new RepeatedMessageFieldGenerator(field, options,
                                                    scc_analyzer);
