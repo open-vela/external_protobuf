@@ -82,14 +82,14 @@ module Google
         end
       end
 
+      def self.from_time(time)
+        new.from_time(time)
+      end
+
       def from_time(time)
         self.seconds = time.to_i
         self.nanos = time.nsec
         self
-      end
-
-      def self.from_time(time)
-        new.from_time(time)
       end
 
       def to_i
@@ -136,6 +136,10 @@ module Google
           raise UnexpectedStructType
         end
       end
+      
+      def self.from_ruby(value)
+        Value.new.from_ruby(value)
+      end
 
       def from_ruby(value)
         case value
@@ -160,6 +164,8 @@ module Google
         else
           raise UnexpectedStructType
         end
+        
+        self
       end
     end
 
@@ -230,6 +236,5 @@ module Google
         ret
       end
     end
-
   end
 end
