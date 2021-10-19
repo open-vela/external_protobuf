@@ -648,10 +648,10 @@ class SecondaryDescriptorFromDescriptorDB(DescriptorPoolTestBase,
     enum_value.number = 0
     self.db.Add(file_proto)
 
-    self.assertRaisesRegex(KeyError, 'SubMessage',
+    self.assertRaisesRegexp(KeyError, 'SubMessage',
                             self.pool.FindMessageTypeByName,
                             'collector.ErrorMessage')
-    self.assertRaisesRegex(KeyError, 'SubMessage',
+    self.assertRaisesRegexp(KeyError, 'SubMessage',
                             self.pool.FindFileByName, 'error_file')
     with self.assertRaises(KeyError) as exc:
       self.pool.FindFileByName('none_file')
