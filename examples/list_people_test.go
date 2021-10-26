@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	pb "github.com/protocolbuffers/protobuf/examples/go/tutorialpb"
+	pb "github.com/protocolbuffers/protobuf/examples/tutorial"
 )
 
 func TestWritePersonWritesPerson(t *testing.T) {
