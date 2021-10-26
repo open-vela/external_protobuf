@@ -4,8 +4,8 @@ import (
 	"strings"
 	"testing"
 
-	pb "github.com/protocolbuffers/protobuf/examples/go/tutorialpb"
-	"google.golang.org/protobuf/proto"
+	"github.com/golang/protobuf/proto"
+	pb "github.com/protocolbuffers/protobuf/examples/tutorial"
 )
 
 func TestPromptForAddressReturnsAddress(t *testing.T) {
@@ -51,7 +51,7 @@ unknown
 	}
 	for i := 0; i < phones; i++ {
 		if !proto.Equal(got.Phones[i], want[i]) {
-			t.Errorf("want phone %q, got %q", want[i], got.Phones[i])
+			t.Errorf("want phone %q, got %q", *want[i], *got.Phones[i])
 		}
 
 	}
