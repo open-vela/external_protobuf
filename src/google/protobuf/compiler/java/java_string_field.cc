@@ -968,14 +968,16 @@ void RepeatedImmutableStringFieldGenerator::GenerateKotlinDslMembers(
 
   // property for List<String>
   WriteFieldAccessorDocComment(printer, descriptor_, LIST_GETTER);
-  printer->Print(variables_,
-                 "$kt_deprecation$public val $kt_name$: "
-                 "com.google.protobuf.kotlin.DslList"
-                 "<kotlin.String, ${$$kt_capitalized_name$Proxy$}$>\n"
-                 "  @kotlin.jvm.JvmSynthetic\n"
-                 "  get() = com.google.protobuf.kotlin.DslList(\n"
-                 "    $kt_dsl_builder$.${$get$capitalized_name$List$}$()\n"
-                 "  )\n");
+  printer->Print(
+      variables_,
+      "public val $kt_name$: "
+      "com.google.protobuf.kotlin.DslList"
+      "<kotlin.String, ${$$kt_capitalized_name$Proxy$}$>\n"
+      "  @kotlin.OptIn"
+      "(com.google.protobuf.kotlin.OnlyForUseByGeneratedProtoCode::class)\n"
+      "  get() = com.google.protobuf.kotlin.DslList(\n"
+      "    $kt_dsl_builder$.${$get$capitalized_name$List$}$()\n"
+      "  )\n");
 
   // List<String>.add(String)
   WriteFieldAccessorDocComment(printer, descriptor_, LIST_ADDER,
@@ -992,14 +994,13 @@ void RepeatedImmutableStringFieldGenerator::GenerateKotlinDslMembers(
   // List<String> += String
   WriteFieldAccessorDocComment(printer, descriptor_, LIST_ADDER,
                                /* builder */ false);
-   printer->Print(variables_,
+  printer->Print(variables_,
                  "@kotlin.jvm.JvmSynthetic\n"
                  "@kotlin.jvm.JvmName(\"plusAssign$kt_capitalized_name$\")\n"
-                 "@Suppress(\"NOTHING_TO_INLINE\")\n"
-                 "public inline operator fun com.google.protobuf.kotlin.DslList"
+                 "public operator fun com.google.protobuf.kotlin.DslList"
                  "<kotlin.String, ${$$kt_capitalized_name$Proxy$}$>."
                  "plusAssign(value: kotlin.String) {\n"
-                 "  add(value)\n"
+                 "  $kt_dsl_builder$.${$add$capitalized_name$$}$(value)\n"
                  "}\n");
 
   // List<String>.addAll(Iterable<String>)
@@ -1022,11 +1023,10 @@ void RepeatedImmutableStringFieldGenerator::GenerateKotlinDslMembers(
       variables_,
       "@kotlin.jvm.JvmSynthetic\n"
       "@kotlin.jvm.JvmName(\"plusAssignAll$kt_capitalized_name$\")\n"
-      "@Suppress(\"NOTHING_TO_INLINE\")\n"
-      "public inline operator fun com.google.protobuf.kotlin.DslList"
+      "public operator fun com.google.protobuf.kotlin.DslList"
       "<kotlin.String, ${$$kt_capitalized_name$Proxy$}$>."
       "plusAssign(values: kotlin.collections.Iterable<kotlin.String>) {\n"
-      "  addAll(values)\n"
+      "  $kt_dsl_builder$.${$addAll$capitalized_name$$}$(values)\n"
       "}\n");
 
   // List<String>[Int] = String
