@@ -3,15 +3,8 @@ load("@rules_proto//proto:defs.bzl", "proto_lang_toolchain")
 load("//:internal.bzl", "conformance_test")
 load("//java/internal:testing.bzl", "junit_tests")
 
-exports_files(
-    ["lite.awk"],
-    visibility = ["//java/core:__pkg__"],
-)
-
-exports_files(
-    ["pom_template.xml"],
-    visibility = ["//java/core:__pkg__"],
-)
+exports_files(["lite.awk"], visibility = ["//java/core:__pkg__"])
+exports_files(["pom_template.xml"], visibility = ["//java/core:__pkg__"])
 
 alias(
     name = "lite",
@@ -24,13 +17,26 @@ proto_lang_toolchain(
     command_line = "--java_out=lite:$(OUT)",
     runtime = ":lite",
     visibility = ["//visibility:public"],
+    # keep this in sync w/ LITE_WELL_KNOWN_PROTO_MAP in //:BUILD
+    blacklisted_protos = [
+        "//:any_proto",
+        "//:api_proto",
+        "//:duration_proto",
+        "//:empty_proto",
+        "//:field_mask_proto",
+        "//:source_context_proto",
+        "//:struct_proto",
+        "//:timestamp_proto",
+        "//:type_proto",
+        "//:wrappers_proto",
+    ],
 )
 
 test_suite(
     name = "tests",
     tests = [
-        "conformance_test",
         "lite_build_test",
+        "conformance_test",
         "lite_tests",
         "//java/core:lite_tests",
     ],
@@ -45,21 +51,21 @@ build_test(
 
 conformance_test(
     name = "conformance_test",
-    failure_list = "//:conformance/failure_list_java_lite.txt",
     testee = "//:conformance_java_lite",
+    failure_list = "//:conformance/failure_list_java_lite.txt",
     text_format_failure_list = "//:conformance/text_format_failure_list_java_lite.txt",
 )
 
 junit_tests(
     name = "lite_tests",
-    size = "small",
     srcs = glob(["src/test/**/*.java"]),
+    size = "small",
     deps = [
         ":lite",
+        "//external:junit",
+        "//external:truth",
         "//java/core:generic_test_protos_java_proto_lite",
         "//java/core:java_test_protos_java_proto_lite",
         "//java/core:test_util_lite",
-        "@maven//:com_google_truth_truth",
-        "@maven//:junit_junit",
     ],
 )
