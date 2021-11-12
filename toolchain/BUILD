@@ -4,9 +4,7 @@ package(default_visibility = ["//visibility:public"])
 
 filegroup(name = "empty")
 
-TOOLCHAINS = {
-    "darwin-x86_64": "cc-compiler-osx-x86_64",
-    "darwin-aarch_64": "cc-compiler-osx-aarch_64",
+LINUX_TOOLCHAINS = {
     "linux-aarch_64": "cc-compiler-linux-aarch_64",
     "linux-ppcle_64": "cc-compiler-linux-ppcle_64",
     "linux-s390_64": "cc-compiler-linux-s390_64",
@@ -16,7 +14,7 @@ TOOLCHAINS = {
 
 cc_toolchain_suite(
     name = "clang_suite",
-    toolchains = TOOLCHAINS
+    toolchains = LINUX_TOOLCHAINS
 )
 
 [
@@ -34,18 +32,13 @@ cc_toolchain_suite(
         toolchain_config = ":" + cpu + "-config",
         toolchain_identifier = toolchain,
     )
-    for cpu, toolchain in TOOLCHAINS.items()
+    for cpu, toolchain in LINUX_TOOLCHAINS.items()
 ]
 
 cc_toolchain_config(
     name = "linux-aarch_64-config",
     bit_flag = "-m64",
-    cpp_flag = "-lstdc++",
-    include_flag = [
-        "-I/usr/aarch64-linux-gnu/include/c++/8/aarch64-linux-gnu/",
-        "-I/usr/aarch64-linux-gnu/include/c++/8"
-    ],
-    linker_path = "/usr/bin/ld",
+    include_flag = "-I/usr/aarch64-linux-gnu/include/c++/8/aarch64-linux-gnu/",
     target_cpu = "aarch64",
     target_full_name = "aarch64-linux-gnu",
     toolchain_dir = "/usr/aarch64-linux-gnu/include",
@@ -55,12 +48,7 @@ cc_toolchain_config(
 cc_toolchain_config(
     name = "linux-ppcle_64-config",
     bit_flag = "-m64",
-    cpp_flag = "-lstdc++",
-    include_flag = [
-        "-I/usr/powerpc64le-linux-gnu/include/c++/8/powerpc64le-linux-gnu/",
-        "-I/usr/powerpc64le-linux-gnu/include/c++/8/"
-    ],
-    linker_path = "/usr/bin/ld",
+    include_flag = "-I/usr/powerpc64le-linux-gnu/include/c++/8/powerpc64le-linux-gnu/",
     target_cpu = "ppc64",
     target_full_name = "powerpc64le-linux-gnu",
     toolchain_dir = "/usr/powerpc64le-linux-gnu/include",
@@ -70,12 +58,7 @@ cc_toolchain_config(
 cc_toolchain_config(
     name = "linux-s390_64-config",
     bit_flag = "-m64",
-    cpp_flag = "-lstdc++",
-    include_flag = [
-        "-I/usr/s390x-linux-gnu/include/c++/8/s390x-linux-gnu/",
-        "-I/usr/s390x-linux-gnu/include/c++/8/"
-    ],
-    linker_path = "/usr/bin/ld",
+    include_flag = "-I/usr/s390x-linux-gnu/include/c++/8/s390x-linux-gnu/",
     target_cpu = "systemz",
     target_full_name = "s390x-linux-gnu",
     toolchain_dir = "/usr/s390x-linux-gnu/include",
@@ -85,8 +68,6 @@ cc_toolchain_config(
 cc_toolchain_config(
     name = "linux-x86_32-config",
     bit_flag = "-m32",
-    cpp_flag = "-lstdc++",
-    linker_path = "/usr/bin/ld",
     target_cpu = "x86_32",
     target_full_name = "i386-linux-gnu",
     toolchain_dir = "/usr/include/i386-linux-gnu",
@@ -96,42 +77,8 @@ cc_toolchain_config(
 cc_toolchain_config(
     name = "linux-x86_64-config",
     bit_flag = "-m64",
-    cpp_flag = "-lstdc++",
-    linker_path = "/usr/bin/ld",
     target_cpu = "x86_64",
     target_full_name = "x86_64-linux-gnu",
     toolchain_dir = "/usr/include/x86_64-linux-gnu",
     toolchain_name = "linux_x86_64",
-)
-
-cc_toolchain_config(
-    name = "darwin-aarch_64-config",
-    bit_flag = "-m64",
-    cpp_flag = "-lc++",
-    include_flag = [
-        "-I/tools/apple_sdks/xcode_13_0/macosx/usr/include/c++/v1",
-        "-I/tools/apple_sdks/xcode_13_0/macosx/usr/include"
-    ],
-    linker_path = "/tools",
-    sysroot = "/tools/apple_sdks/xcode_13_0/macosx",
-    target_cpu = "aarch64",
-    target_full_name = "aarch64-apple-macosx11.3",
-    toolchain_dir = "/tools/apple_sdks/xcode_13_0/macosx",
-    toolchain_name = "darwin_aarch_64",
-)
-
-cc_toolchain_config(
-    name = "darwin-x86_64-config",
-    bit_flag = "-m64",
-    cpp_flag = "-lc++",
-    include_flag = [
-        "-I/tools/apple_sdks/xcode_13_0/macosx/usr/include/c++/v1",
-        "-I/tools/apple_sdks/xcode_13_0/macosx/usr/include"
-    ],
-    linker_path = "/tools",
-    sysroot = "/tools/apple_sdks/xcode_13_0/macosx",
-    target_cpu = "x86_64",
-    target_full_name = "x86_64-apple-macosx11.3",
-    toolchain_dir = "/tools/apple_sdks/xcode_13_0/macosx",
-    toolchain_name = "darwin_x86_64",
 )
