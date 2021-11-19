@@ -37,8 +37,6 @@ cc_binary(
     srcs = [
         "descriptor.c",
         "descriptor.h",
-        "descriptor_containers.c",
-        "descriptor_containers.h",
         "descriptor_pool.c",
         "descriptor_pool.h",
         "protobuf.c",
