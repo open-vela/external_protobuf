@@ -43,8 +43,6 @@ cc_binary(
         "descriptor_containers.h",
         "descriptor_pool.c",
         "descriptor_pool.h",
-        "message.c",
-        "message.h",
         "protobuf.c",
         "protobuf.h",
         "python.h",
@@ -65,11 +63,9 @@ cc_binary(
     deps = [
         ":version_script.lds",
         "//:reflection",
-        "//:textformat",
         "//:upb",
         "//upb/util:compare",
         "//upb/util:def_to_proto",
-        "//upb/util:required_fields",
         "@system_python//:python_headers",
     ],
 )
