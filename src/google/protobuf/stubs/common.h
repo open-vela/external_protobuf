@@ -189,6 +189,10 @@ class FatalException : public std::exception {
 };
 #endif
 
+// This is at the end of the file instead of the beginning to work around a bug
+// in some versions of MSVC.
+using std::string;
+
 }  // namespace protobuf
 }  // namespace google
 
