@@ -1675,9 +1675,7 @@ CommandLineInterface::InterpretArgument(const std::string& name,
     // file names (e.g. foo\*.proto), so we do it ourselves.
     switch (google::protobuf::io::win32::ExpandWildcards(
         value,
-        [this](const std::string& path) {
-          this->input_files_.push_back(path);
-        })) {
+        [this](const string& path) { this->input_files_.push_back(path); })) {
       case google::protobuf::io::win32::ExpandWildcardsResult::kSuccess:
         break;
       case google::protobuf::io::win32::ExpandWildcardsResult::
