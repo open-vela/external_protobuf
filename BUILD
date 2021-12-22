@@ -26,7 +26,6 @@ ZLIB_DEPS = ["@zlib//:zlib"]
 ################################################################################
 
 MSVC_COPTS = [
-    "/DHAVE_PTHREAD",
     "/wd4018",  # -Wno-sign-compare
     "/wd4065",  # switch statement contains 'default' but no 'case' labels
     "/wd4146",  # unary minus operator applied to unsigned type, result still unsigned
@@ -46,7 +45,6 @@ MSVC_COPTS = [
 COPTS = select({
     ":msvc": MSVC_COPTS,
     "//conditions:default": [
-        "-DHAVE_PTHREAD",
         "-DHAVE_ZLIB",
         "-Wmissing-field-initializers",
         "-Woverloaded-virtual",
@@ -65,10 +63,28 @@ create_compiler_config_setting(
     ],
 )
 
+# Android NDK builds can specify different crosstool_top flags to choose which
+# STL they use for C++. We need these multiple variants to catch all of those
+# versions of crosstool_top and reliably detect Android.
+#
+# For more info on the various crosstool_tops used by NDK Bazel builds, see:
+# https://docs.bazel.build/versions/master/android-ndk.html#configuring-the-stl
+
 config_setting(
     name = "android",
     values = {
         "crosstool_top": "//external:android/crosstool",
+    },
+    visibility = [
+        # Public, but Protobuf only visibility.
+        "//:__subpackages__",
+    ],
+)
+
+config_setting(
+    name = "android-stlport",
+    values = {
+        "crosstool_top": "@androidndk//:toolchain-stlport",
     },
     visibility = [
         # Public, but Protobuf only visibility.
@@ -98,11 +114,24 @@ config_setting(
     ],
 )
 
+config_setting(
+    name = "android-default",
+    values = {
+        "crosstool_top": "@androidndk//:default_crosstool",
+    },
+    visibility = [
+        # Public, but Protobuf only visibility.
+        "//:__subpackages__",
+    ],
+)
+
 # Android and MSVC builds do not need to link in a separate pthread library.
 LINK_OPTS = select({
     ":android": [],
+    ":android-stlport": [],
     ":android-libcpp": [],
     ":android-gnu-libstdcpp": [],
+    ":android-default": [],
     ":msvc": [
         # Suppress linker warnings about files with no symbols defined.
         "-ignore:4221",
@@ -133,6 +162,7 @@ cc_library(
         "src/google/protobuf/extension_set.cc",
         "src/google/protobuf/generated_enum_util.cc",
         "src/google/protobuf/generated_message_table_driven_lite.cc",
+        "src/google/protobuf/generated_message_tctable_lite.cc",
         "src/google/protobuf/generated_message_util.cc",
         "src/google/protobuf/implicit_weak_message.cc",
         "src/google/protobuf/inlined_string_field.cc",
@@ -146,6 +176,7 @@ cc_library(
         "src/google/protobuf/message_lite.cc",
         "src/google/protobuf/parse_context.cc",
         "src/google/protobuf/repeated_field.cc",
+        "src/google/protobuf/repeated_ptr_field.cc",
         "src/google/protobuf/stubs/bytestream.cc",
         "src/google/protobuf/stubs/common.cc",
         "src/google/protobuf/stubs/int128.cc",
@@ -193,6 +224,7 @@ cc_library(
         "src/google/protobuf/generated_message_bases.cc",
         "src/google/protobuf/generated_message_reflection.cc",
         "src/google/protobuf/generated_message_table_driven.cc",
+        "src/google/protobuf/generated_message_tctable_full.cc",
         "src/google/protobuf/io/gzip_stream.cc",
         "src/google/protobuf/io/printer.cc",
         "src/google/protobuf/io/tokenizer.cc",
@@ -222,7 +254,6 @@ cc_library(
         "src/google/protobuf/util/internal/protostream_objectsource.cc",
         "src/google/protobuf/util/internal/protostream_objectwriter.cc",
         "src/google/protobuf/util/internal/type_info.cc",
-        "src/google/protobuf/util/internal/type_info_test_helper.cc",
         "src/google/protobuf/util/internal/utility.cc",
         "src/google/protobuf/util/json_util.cc",
         "src/google/protobuf/util/message_differencer.cc",
@@ -621,6 +652,8 @@ cc_proto_library(
 COMMON_TEST_SRCS = [
     # AUTOGEN(common_test_srcs)
     "src/google/protobuf/arena_test_util.cc",
+    "src/google/protobuf/map_lite_test_util.cc",
+    "src/google/protobuf/test_util_lite.cc",
     "src/google/protobuf/map_test_util.inc",
     "src/google/protobuf/reflection_tester.cc",
     "src/google/protobuf/test_util.cc",
@@ -950,7 +983,6 @@ py_proto_library(
     protoc = ":protoc",
     py_libs = [
         ":python_srcs",
-        "@six//:six",
     ],
     srcs_version = "PY2AND3",
     visibility = ["//visibility:public"],
@@ -1203,22 +1235,24 @@ cc_binary(
     ],
 )
 
-sh_test(
-    name = "build_files_updated_unittest",
-    srcs = [
-        "build_files_updated_unittest.sh",
-    ],
-    data = [
-        "BUILD",
-        "cmake/extract_includes.bat.in",
-        "cmake/libprotobuf.cmake",
-        "cmake/libprotobuf-lite.cmake",
-        "cmake/libprotoc.cmake",
-        "cmake/tests.cmake",
-        "src/Makefile.am",
-        "update_file_lists.sh",
-    ],
-)
+# TODO: re-enable this test if appropriate, or replace with something that
+# uses the new setup.
+# sh_test(
+#     name = "build_files_updated_unittest",
+#     srcs = [
+#         "build_files_updated_unittest.sh",
+#     ],
+#     data = [
+#         "BUILD",
+#         "cmake/extract_includes.bat.in",
+#         "cmake/libprotobuf.cmake",
+#         "cmake/libprotobuf-lite.cmake",
+#         "cmake/libprotoc.cmake",
+#         "cmake/tests.cmake",
+#         "src/Makefile.am",
+#         "update_file_lists.sh",
+#     ],
+# )
 
 java_proto_library(
     name = "test_messages_proto2_java_proto",

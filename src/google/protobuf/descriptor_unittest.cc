@@ -299,7 +299,7 @@ class MockErrorCollector : public DescriptorPool::ErrorCollector {
 // Test simple files.
 class FileDescriptorTest : public testing::Test {
  protected:
-  virtual void SetUp() override {
+  void SetUp() override {
     // Build descriptors for the following definitions:
     //
     //   // in "foo.proto"
@@ -614,7 +614,7 @@ TEST_F(FileDescriptorTest, DebugStringRoundTrip) {
 // Test simple flat messages and fields.
 class DescriptorTest : public testing::Test {
  protected:
-  virtual void SetUp() override {
+  void SetUp() override {
     // Build descriptors for the following definitions:
     //
     //   // in "foo.proto"
@@ -774,6 +774,11 @@ class DescriptorTest : public testing::Test {
   void CopyWithJsonName(const Descriptor* message, DescriptorProto* proto) {
     message->CopyTo(proto);
     message->CopyJsonNameTo(proto);
+  }
+
+  const EnumValueDescriptor* FindValueByNumberCreatingIfUnknown(
+      const EnumDescriptor* desc, int number) {
+    return desc->FindValueByNumberCreatingIfUnknown(number);
   }
 
   DescriptorPool pool_;
@@ -1101,7 +1106,7 @@ TEST_F(DescriptorTest, FieldEnumType) {
 // Test simple flat messages and fields.
 class OneofDescriptorTest : public testing::Test {
  protected:
-  virtual void SetUp() override {
+  void SetUp() override {
     // Build descriptors for the following definitions:
     //
     //   package garply;
@@ -1361,7 +1366,7 @@ TEST_F(StylizedFieldNamesTest, FindByCamelcaseName) {
 // Test enum descriptors.
 class EnumDescriptorTest : public testing::Test {
  protected:
-  virtual void SetUp() override {
+  void SetUp() override {
     // Build descriptors for the following definitions:
     //
     //   // in "foo.proto"
@@ -1512,7 +1517,7 @@ TEST_F(EnumDescriptorTest, ValueType) {
 // Test service descriptors.
 class ServiceDescriptorTest : public testing::Test {
  protected:
-  virtual void SetUp() override {
+  void SetUp() override {
     // Build descriptors for the following messages and service:
     //    // in "foo.proto"
     //    message FooRequest  {}
@@ -1673,7 +1678,7 @@ TEST_F(ServiceDescriptorTest, MethodOutputType) {
 // Test nested types.
 class NestedDescriptorTest : public testing::Test {
  protected:
-  virtual void SetUp() override {
+  void SetUp() override {
     // Build descriptors for the following definitions:
     //
     //   // in "foo.proto"
@@ -1887,7 +1892,7 @@ TEST_F(NestedDescriptorTest, FindEnumValueByName) {
 // Test extensions.
 class ExtensionDescriptorTest : public testing::Test {
  protected:
-  virtual void SetUp() override {
+  void SetUp() override {
     // Build descriptors for the following definitions:
     //
     //   enum Baz {}
@@ -2210,7 +2215,7 @@ TEST(OverlappingExtensionRangeTest, ExtensionRangeBefore) {
 // Test reserved fields.
 class ReservedDescriptorTest : public testing::Test {
  protected:
-  virtual void SetUp() override {
+  void SetUp() override {
     // Build descriptors for the following definitions:
     //
     //   message Foo {
@@ -2288,7 +2293,7 @@ TEST_F(ReservedDescriptorTest, IsReservedName) {
 // Test reserved enum fields.
 class ReservedEnumDescriptorTest : public testing::Test {
  protected:
-  virtual void SetUp() override {
+  void SetUp() override {
     // Build descriptors for the following definitions:
     //
     //   enum Foo {
@@ -2814,7 +2819,7 @@ class AllowUnknownDependenciesTest
   DescriptorPoolMode mode() { return std::get<0>(GetParam()); }
   const char* syntax() { return std::get<1>(GetParam()); }
 
-  virtual void SetUp() override {
+  void SetUp() override {
     FileDescriptorProto foo_proto, bar_proto;
 
     switch (mode()) {
@@ -2942,6 +2947,8 @@ TEST_P(AllowUnknownDependenciesTest, PlaceholderTypes) {
   EXPECT_EQ("Qux", qux_type->name());
   EXPECT_EQ("corge.Qux", qux_type->full_name());
   EXPECT_TRUE(qux_type->is_placeholder());
+  // Placeholder enum values should not be findable.
+  EXPECT_EQ(qux_type->FindValueByNumber(0), nullptr);
 
   // Placeholder types should not be findable.
   EXPECT_EQ(bar_type_, pool_->FindMessageTypeByName(bar_type_->full_name()));
@@ -3142,6 +3149,7 @@ TEST(CustomOptions, OptionLocations) {
   const FileDescriptor* file = message->file();
   const FieldDescriptor* field = message->FindFieldByName("field1");
   const OneofDescriptor* oneof = message->FindOneofByName("AnOneof");
+  const FieldDescriptor* map_field = message->FindFieldByName("map_field");
   const EnumDescriptor* enm = message->FindEnumTypeByName("AnEnum");
   // TODO(benjy): Support EnumValue options, once the compiler does.
   const ServiceDescriptor* service =
@@ -3157,6 +3165,8 @@ TEST(CustomOptions, OptionLocations) {
   EXPECT_EQ(42,  // Check that we get the default for an option we don't set.
             field->options().GetExtension(protobuf_unittest::field_opt2));
   EXPECT_EQ(-99, oneof->options().GetExtension(protobuf_unittest::oneof_opt1));
+  EXPECT_EQ(int64_t{12345},
+            map_field->options().GetExtension(protobuf_unittest::field_opt1));
   EXPECT_EQ(-789, enm->options().GetExtension(protobuf_unittest::enum_opt1));
   EXPECT_EQ(123, enm->value(1)->options().GetExtension(
                      protobuf_unittest::enum_value_opt1));
@@ -3172,6 +3182,13 @@ TEST(CustomOptions, OptionLocations) {
 
 TEST(CustomOptions, OptionTypes) {
   const MessageOptions* options = nullptr;
+
+  constexpr int32_t kint32min = std::numeric_limits<int32_t>::min();
+  constexpr int32_t kint32max = std::numeric_limits<int32_t>::max();
+  constexpr uint32_t kuint32max = std::numeric_limits<uint32_t>::max();
+  constexpr int64_t kint64min = std::numeric_limits<int64_t>::min();
+  constexpr int64_t kint64max = std::numeric_limits<int64_t>::max();
+  constexpr uint64_t kuint64max = std::numeric_limits<uint64_t>::max();
 
   options =
       &protobuf_unittest::CustomOptionMinIntegerValues::descriptor()->options();
@@ -6792,7 +6809,7 @@ class DatabaseBackedPoolTest : public testing::Test {
 
   SimpleDescriptorDatabase database_;
 
-  virtual void SetUp() override {
+  void SetUp() override {
     AddToDatabase(
         &database_,
         "name: 'foo.proto' "
@@ -7289,10 +7306,9 @@ class AbortingErrorCollector : public DescriptorPool::ErrorCollector {
  public:
   AbortingErrorCollector() {}
 
-  virtual void AddError(const std::string& filename,
-                        const std::string& element_name, const Message* message,
-                        ErrorLocation location,
-                        const std::string& error_message) override {
+  void AddError(const std::string& filename, const std::string& element_name,
+                const Message* message, ErrorLocation location,
+                const std::string& error_message) override {
     GOOGLE_LOG(FATAL) << "AddError() called unexpectedly: " << filename << " ["
                << element_name << "]: " << error_message;
   }
@@ -7307,7 +7323,7 @@ class SingletonSourceTree : public compiler::SourceTree {
   SingletonSourceTree(const std::string& filename, const std::string& contents)
       : filename_(filename), contents_(contents) {}
 
-  virtual io::ZeroCopyInputStream* Open(const std::string& filename) override {
+  io::ZeroCopyInputStream* Open(const std::string& filename) override {
     return filename == filename_
                ? new io::ArrayInputStream(contents_.data(), contents_.size())
                : nullptr;

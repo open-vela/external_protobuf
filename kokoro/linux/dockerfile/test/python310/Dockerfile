@@ -1,4 +1,4 @@
-FROM python:2.7-buster
+FROM python:3.10-buster
 
 # Install dependencies.  We start with the basic ones require to build protoc
 # and the C++ build

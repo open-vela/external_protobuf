@@ -1140,6 +1140,7 @@ TEST(RepeatedPtrField, ClearedElements) {
 
   field.Clear();
   EXPECT_EQ(field.ClearedCount(), 2);
+#ifndef PROTOBUF_FUTURE_BREAKING_CHANGES
   EXPECT_EQ(field.ReleaseCleared(), original);  // Take ownership again.
   EXPECT_EQ(field.ClearedCount(), 1);
   EXPECT_NE(field.Add(), original);
@@ -1151,6 +1152,7 @@ TEST(RepeatedPtrField, ClearedElements) {
   EXPECT_EQ(field.ClearedCount(), 1);
   EXPECT_EQ(field.Add(), original);
   EXPECT_EQ(field.ClearedCount(), 0);
+#endif  // !PROTOBUF_FUTURE_BREAKING_CHANGES
 }
 
 // Test all code paths in AddAllocated().
@@ -1534,7 +1536,7 @@ TEST(RepeatedPtrField, ExtractSubrange) {
 
           // Create a catcher array and call ExtractSubrange.
           std::string* catcher[10];
-          for (int i = 0; i < 10; ++i) catcher[i] = NULL;
+          for (int i = 0; i < 10; ++i) catcher[i] = nullptr;
           field.ExtractSubrange(start, num, catcher);
 
           // Does the resulting array have the right size?
@@ -1543,7 +1545,7 @@ TEST(RepeatedPtrField, ExtractSubrange) {
           // Were the removed elements extracted into the catcher array?
           for (int i = 0; i < num; ++i)
             EXPECT_EQ(*catcher[i], *subject[start + i]);
-          EXPECT_EQ(NULL, catcher[num]);
+          EXPECT_EQ(nullptr, catcher[num]);
 
           // Does the resulting array contain the right values?
           for (int i = 0; i < start; ++i)
@@ -1908,7 +1910,7 @@ TEST_F(RepeatedPtrFieldPtrsIteratorTest, PtrSTLAlgorithms_lower_bound) {
         std::lower_bound(proto_array_.pointer_begin(),
                          proto_array_.pointer_end(), &v, StringLessThan());
 
-    GOOGLE_CHECK(*it != NULL);
+    GOOGLE_CHECK(*it != nullptr);
 
     EXPECT_EQ(**it, "n");
     EXPECT_TRUE(it == proto_array_.pointer_begin() + 3);
@@ -1919,7 +1921,7 @@ TEST_F(RepeatedPtrFieldPtrsIteratorTest, PtrSTLAlgorithms_lower_bound) {
         const_proto_array_->pointer_begin(), const_proto_array_->pointer_end(),
         &v, StringLessThan());
 
-    GOOGLE_CHECK(*it != NULL);
+    GOOGLE_CHECK(*it != nullptr);
 
     EXPECT_EQ(**it, "n");
     EXPECT_TRUE(it == const_proto_array_->pointer_begin() + 3);
