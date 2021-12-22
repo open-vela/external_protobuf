@@ -28,7 +28,6 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#define PY_SSIZE_T_CLEAN
 #include <Python.h>
 
 #include <google/protobuf/message_lite.h>
@@ -96,6 +95,7 @@ static PyMethodDef ModuleMethods[] = {
     // DO NOT USE: For migration and testing only.
     {NULL, NULL}};
 
+#if PY_MAJOR_VERSION >= 3
 static struct PyModuleDef _module = {PyModuleDef_HEAD_INIT,
                                      "_message",
                                      module_docstring,
@@ -105,17 +105,27 @@ static struct PyModuleDef _module = {PyModuleDef_HEAD_INIT,
                                      NULL,
                                      NULL,
                                      NULL};
+#define INITFUNC PyInit__message
+#define INITFUNC_ERRORVAL NULL
+#else  // Python 2
+#define INITFUNC init_message
+#define INITFUNC_ERRORVAL
+#endif
 
-PyMODINIT_FUNC PyInit__message() {
+PyMODINIT_FUNC INITFUNC() {
   PyObject* m;
+#if PY_MAJOR_VERSION >= 3
   m = PyModule_Create(&_module);
+#else
+  m = Py_InitModule3("_message", ModuleMethods, module_docstring);
+#endif
   if (m == NULL) {
-    return NULL;
+    return INITFUNC_ERRORVAL;
   }
 
   if (!google::protobuf::python::InitProto2MessageModule(m)) {
     Py_DECREF(m);
-    return NULL;
+    return INITFUNC_ERRORVAL;
   }
 
   // Adds the C++ API
@@ -127,8 +137,10 @@ PyMODINIT_FUNC PyInit__message() {
           })) {
     PyModule_AddObject(m, "proto_API", api);
   } else {
-    return NULL;
+    return INITFUNC_ERRORVAL;
   }
 
+#if PY_MAJOR_VERSION >= 3
   return m;
+#endif
 }

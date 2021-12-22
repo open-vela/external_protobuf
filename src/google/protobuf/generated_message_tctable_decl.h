@@ -65,42 +65,39 @@ struct TcFieldData {
   uint64_t data;
 };
 
-struct TcParseTableBase;
+struct TailCallParseTableBase;
 
 // TailCallParseFunc is the function pointer type used in the tailcall table.
 typedef const char* (*TailCallParseFunc)(PROTOBUF_TC_PARAM_DECL);
 
 #if defined(_MSC_VER) && !defined(_WIN64)
 #pragma warning(push)
-// TcParseTableBase is intentionally overaligned on 32 bit targets.
+// TailCallParseTableBase is intentionally overaligned on 32 bit targets.
 #pragma warning(disable : 4324)
 #endif
 
 // Base class for message-level table with info for the tail-call parser.
-struct alignas(uint64_t) TcParseTableBase {
+struct alignas(uint64_t) TailCallParseTableBase {
   // Common attributes for message layout:
   uint16_t has_bits_offset;
   uint16_t extension_offset;
   uint32_t extension_range_low;
   uint32_t extension_range_high;
-  uint8_t fast_idx_mask;
-  uint8_t reserved;
-  uint16_t num_fields;
   const MessageLite* default_instance;
 
   // Handler for fields which are not handled by table dispatch.
   TailCallParseFunc fallback;
 
   // Table entry for fast-path tailcall dispatch handling.
-  struct FastFieldEntry {
+  struct FieldEntry {
     // Target function for dispatch:
     TailCallParseFunc target;
     // Field data used during parse:
     TcFieldData bits;
   };
   // There is always at least one table entry.
-  const FastFieldEntry* fast_entry(size_t idx) const {
-    return reinterpret_cast<const FastFieldEntry*>(this + 1) + idx;
+  const FieldEntry* table() const {
+    return reinterpret_cast<const FieldEntry*>(this + 1);
   }
 };
 
@@ -108,12 +105,12 @@ struct alignas(uint64_t) TcParseTableBase {
 #pragma warning(pop)
 #endif
 
-static_assert(sizeof(TcParseTableBase::FastFieldEntry) <= 16,
+static_assert(sizeof(TailCallParseTableBase::FieldEntry) <= 16,
               "Field entry is too big.");
 
-template <size_t kFastTableSizeLog2>
-struct TcParseTable {
-  TcParseTableBase header;
+template <size_t kTableSizeLog2>
+struct TailCallParseTable {
+  TailCallParseTableBase header;
 
   // Entries for each field.
   //
@@ -121,14 +118,15 @@ struct TcParseTable {
   // number is masked to fit inside the table. Note that the parsing logic
   // generally calls `TailCallParseTableBase::table()` instead of accessing
   // this field directly.
-  TcParseTableBase::FastFieldEntry entries[(1 << kFastTableSizeLog2)];
+  TailCallParseTableBase::FieldEntry entries[(1 << kTableSizeLog2)];
 };
 
-static_assert(std::is_standard_layout<TcParseTable<1>>::value,
-              "TcParseTable must be standard layout.");
+static_assert(std::is_standard_layout<TailCallParseTable<1>>::value,
+              "TailCallParseTable must be standard layout.");
 
-static_assert(offsetof(TcParseTable<1>, entries) == sizeof(TcParseTableBase),
-              "Table entries must be laid out after TcParseTableBase.");
+static_assert(offsetof(TailCallParseTable<1>, entries) ==
+                  sizeof(TailCallParseTableBase),
+              "Table entries must be laid out after TailCallParseTableBase.");
 
 }  // namespace internal
 }  // namespace protobuf

@@ -38,7 +38,6 @@
 
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/descriptor.pb.h>
-#include <google/protobuf/io/zero_copy_stream.h>
 
 #include <google/protobuf/port_def.inc>
 
@@ -54,8 +53,8 @@ namespace objectivec {
 bool PROTOC_EXPORT UseProtoPackageAsDefaultPrefix();
 void PROTOC_EXPORT SetUseProtoPackageAsDefaultPrefix(bool on_or_off);
 // Get/Set the path to a file to load as exceptions when
-// `UseProtoPackageAsDefaultPrefix()` is `true`. An empty string means there
-// should be no exceptions.
+// `UseProtoPackageAsDefaultPrefixUseProtoPackageAsDefaultPrefix()` is `true`.
+// And empty string means there should be no exceptions loaded.
 std::string PROTOC_EXPORT GetProtoPackagePrefixExceptionList();
 void PROTOC_EXPORT SetProtoPackagePrefixExceptionList(
     const std::string& file_path);
@@ -68,8 +67,6 @@ struct Options {
   std::string generate_for_named_framework;
   std::string named_framework_to_proto_path_mappings_path;
   std::string runtime_import_prefix;
-  bool prefixes_must_be_registered;
-  bool require_prefixes;
 };
 
 // Escape C++ trigraphs by escaping question marks to "\?".
@@ -263,7 +260,7 @@ class PROTOC_EXPORT TextFormatDecodeData {
   TextFormatDecodeData(const TextFormatDecodeData&) = delete;
   TextFormatDecodeData& operator=(const TextFormatDecodeData&) = delete;
 
-  void AddString(int32_t key, const std::string& input_for_decode,
+  void AddString(int32 key, const std::string& input_for_decode,
                  const std::string& desired_output);
   size_t num_entries() const { return entries_.size(); }
   std::string Data() const;
@@ -272,7 +269,7 @@ class PROTOC_EXPORT TextFormatDecodeData {
                                          const std::string& desired_output);
 
  private:
-  typedef std::pair<int32_t, std::string> DataEntry;
+  typedef std::pair<int32, std::string> DataEntry;
   std::vector<DataEntry> entries_;
 };
 
@@ -287,11 +284,6 @@ class PROTOC_EXPORT LineConsumer {
 bool PROTOC_EXPORT ParseSimpleFile(const std::string& path,
                                    LineConsumer* line_consumer,
                                    std::string* out_error);
-
-bool PROTOC_EXPORT ParseSimpleStream(io::ZeroCopyInputStream& input_stream,
-                                     const std::string& stream_name,
-                                     LineConsumer* line_consumer,
-                                     std::string* out_error);
 
 // Helper class for parsing framework import mappings and generating
 // import statements.

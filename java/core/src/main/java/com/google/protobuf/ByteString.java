@@ -45,7 +45,6 @@ import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -74,7 +73,6 @@ import java.util.NoSuchElementException;
  * @author carlanton@google.com Carl Haverl
  * @author martinrb@google.com Martin Buchholz
  */
-@CheckReturnValue
 public abstract class ByteString implements Iterable<Byte>, Serializable {
 
   /**
@@ -461,7 +459,7 @@ public abstract class ByteString implements Iterable<Byte>, Serializable {
    * @return new {@code ByteString}
    */
   public static ByteString copyFromUtf8(String text) {
-    return new LiteralByteString(text.getBytes(StandardCharsets.UTF_8));
+    return new LiteralByteString(text.getBytes(Internal.UTF_8));
   }
 
   // =================================================================
@@ -481,8 +479,7 @@ public abstract class ByteString implements Iterable<Byte>, Serializable {
    * @param streamToDrain The source stream, which is read completely but not closed.
    * @return A new {@code ByteString} which is made up of chunks of various sizes, depending on the
    *     behavior of the underlying stream.
-   * @throws IOException if there is a problem reading the underlying stream
-   * @throws IllegalArgumentException if the stream supplies more than Integer.MAX_VALUE bytes
+   * @throws IOException IOException is thrown if there is a problem reading the underlying stream.
    */
   public static ByteString readFrom(InputStream streamToDrain) throws IOException {
     return readFrom(streamToDrain, MIN_READ_FROM_CHUNK_SIZE, MAX_READ_FROM_CHUNK_SIZE);
@@ -502,23 +499,13 @@ public abstract class ByteString implements Iterable<Byte>, Serializable {
    * @param streamToDrain The source stream, which is read completely but not closed.
    * @param chunkSize The size of the chunks in which to read the stream.
    * @return A new {@code ByteString} which is made up of chunks of the given size.
-   * @throws IOException if there is a problem reading the underlying stream
-   * @throws IllegalArgumentException if the stream supplies more than Integer.MAX_VALUE bytes
+   * @throws IOException IOException is thrown if there is a problem reading the underlying stream.
    */
   public static ByteString readFrom(InputStream streamToDrain, int chunkSize) throws IOException {
     return readFrom(streamToDrain, chunkSize, chunkSize);
   }
 
-  /**
-   * Helper method that takes the chunk size range as a parameter.
-   *
-   * @param streamToDrain the source stream, which is read completely but not closed
-   * @param minChunkSize the minimum size of the chunks in which to read the stream
-   * @param maxChunkSize the maximum size of the chunks in which to read the stream
-   * @return a new {@code ByteString} which is made up of chunks within the given size range
-   * @throws IOException if there is a problem reading the underlying stream
-   * @throws IllegalArgumentException if the stream supplies more than Integer.MAX_VALUE bytes
-   */
+  // Helper method that takes the chunk size range as a parameter.
   public static ByteString readFrom(InputStream streamToDrain, int minChunkSize, int maxChunkSize)
       throws IOException {
     Collection<ByteString> results = new ArrayList<ByteString>();
@@ -577,8 +564,6 @@ public abstract class ByteString implements Iterable<Byte>, Serializable {
    *
    * @param other string to concatenate
    * @return a new {@code ByteString} instance
-   * @throws IllegalArgumentException if the combined size of the two byte strings exceeds
-   *     Integer.MAX_VALUE
    */
   public final ByteString concat(ByteString other) {
     if (Integer.MAX_VALUE - size() < other.size()) {
@@ -599,8 +584,6 @@ public abstract class ByteString implements Iterable<Byte>, Serializable {
    *
    * @param byteStrings strings to be concatenated
    * @return new {@code ByteString}
-   * @throws IllegalArgumentException if the combined size of the byte strings exceeds
-   *     Integer.MAX_VALUE
    */
   public static ByteString copyFrom(Iterable<ByteString> byteStrings) {
     // Determine the size;
@@ -834,7 +817,7 @@ public abstract class ByteString implements Iterable<Byte>, Serializable {
    * @return new string using UTF-8 encoding
    */
   public final String toStringUtf8() {
-    return toString(StandardCharsets.UTF_8);
+    return toString(Internal.UTF_8);
   }
 
   /**
@@ -1277,7 +1260,6 @@ public abstract class ByteString implements Iterable<Byte>, Serializable {
    * @return the length of the range.
    * @throws IndexOutOfBoundsException some or all of the range falls outside of the array.
    */
-  @CanIgnoreReturnValue
   static int checkRange(int startIndex, int endIndex, int size) {
     final int length = endIndex - startIndex;
     if ((startIndex | endIndex | length | (size - endIndex)) < 0) {

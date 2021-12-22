@@ -34,7 +34,6 @@
 #include <map>
 #include <string>
 
-#include <google/protobuf/compiler/cpp/cpp_helpers.h>
 #include <google/protobuf/compiler/cpp/cpp_message_field.h>
 
 namespace google {
@@ -44,9 +43,8 @@ namespace cpp {
 
 class MapFieldGenerator : public FieldGenerator {
  public:
-  MapFieldGenerator(const FieldDescriptor* descriptor, const Options& options,
-                    MessageSCCAnalyzer* scc_analyzer);
-  ~MapFieldGenerator() override;
+  MapFieldGenerator(const FieldDescriptor* descriptor, const Options& options);
+  ~MapFieldGenerator();
 
   // implements FieldGenerator ---------------------------------------
   void GeneratePrivateMembers(io::Printer* printer) const override;
@@ -60,13 +58,10 @@ class MapFieldGenerator : public FieldGenerator {
   void GenerateSerializeWithCachedSizesToArray(
       io::Printer* printer) const override;
   void GenerateByteSize(io::Printer* printer) const override;
-  void GenerateIsInitialized(io::Printer* printer) const override;
   void GenerateConstinitInitializer(io::Printer* printer) const override;
   bool GenerateArenaDestructorCode(io::Printer* printer) const override;
 
  private:
-  const bool has_required_fields_;
-
   GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(MapFieldGenerator);
 };
 

@@ -70,7 +70,6 @@ These are projects we know about implementing Protocol Buffers for other program
 * Kotlin: https://github.com/marcoferrer/kroto-plus
 * Kotlin: https://github.com/Kotlin/kotlinx.serialization
 * Kotlin: https://github.com/ButterCam/sisyphus
-* Kotlin: https://github.com/open-toast/protokt
 * Lua: http://code.google.com/p/protoc-gen-lua/
 * Lua: http://github.com/indygreg/lua-protobuf
 * Lua: https://github.com/Neopallium/lua-pb
@@ -97,9 +96,7 @@ These are projects we know about implementing Protocol Buffers for other program
 * Ruby: http://github.com/mozy/ruby-protocol-buffers
 * Ruby: https://github.com/bmizerany/beefcake/tree/master/lib/beefcake
 * Ruby: https://github.com/localshred/protobuf
-* Rust: https://github.com/tokio-rs/prost
 * Rust: https://github.com/stepancheg/rust-protobuf/
-* Rust: https://github.com/tafia/quick-protobuf
 * Scala: http://github.com/jeffplaisance/scala-protobuf
 * Scala: http://code.google.com/p/protobuf-scala
 * Scala: https://github.com/SandroGrzicic/ScalaBuff
@@ -108,7 +105,6 @@ These are projects we know about implementing Protocol Buffers for other program
 * Swift: https://github.com/alexeyxo/protobuf-swift
 * Swift: https://github.com/apple/swift-protobuf/
 * Typescript: https://github.com/thesayyn/protoc-gen-ts
-* Typescript: https://github.com/pbkit/pbkit
 * Vala: https://launchpad.net/protobuf-vala
 * Visual Basic: http://code.google.com/p/protobuf-net/
 
@@ -131,9 +127,7 @@ GRPC (http://www.grpc.io/) is Google's RPC implementation for Protocol Buffers. 
 * https://github.com/awakesecurity/gRPC-haskell (Haskell)
 * https://github.com/Yeolar/raster (C++)
 * https://github.com/jnordberg/wsrpc (JavaScript Node.js/Browser)
-* https://github.com/pbkit/npm-packages/blob/main/frpc-test/src/index.spec.ts (TypeScript Node.js/Browser)
 * https://github.com/ppissias/xsrpcj (Java)
-* https://github.com/twitchtv/twirp (Multiple languages)
 
 Inactive:
 

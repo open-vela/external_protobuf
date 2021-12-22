@@ -1,3 +1,5 @@
+#! /usr/bin/env python
+#
 # Protocol Buffers - Google's data interchange format
 # Copyright 2008 Google Inc.  All rights reserved.
 # https://developers.google.com/protocol-buffers/
@@ -31,7 +33,10 @@
 """Tests for google.protobuf.proto_builder."""
 
 import collections
-import unittest
+try:
+  import unittest2 as unittest
+except ImportError:
+  import unittest
 
 from google.protobuf import descriptor_pb2  # pylint: disable=g-import-not-at-top
 from google.protobuf import descriptor

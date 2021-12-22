@@ -37,11 +37,9 @@ import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Descriptors.DescriptorValidationException;
 import com.google.protobuf.Descriptors.EnumDescriptor;
 import com.google.protobuf.Descriptors.FileDescriptor;
-import com.google.protobuf.InvalidProtocolBufferException;
 import org.jruby.*;
 import org.jruby.anno.JRubyClass;
 import org.jruby.anno.JRubyMethod;
-import org.jruby.exceptions.RaiseException;
 import org.jruby.runtime.*;
 import org.jruby.runtime.builtin.IRubyObject;
 
@@ -63,6 +61,7 @@ public class RubyDescriptorPool extends RubyObject {
 
         cDescriptorPool.defineAnnotatedMethods(RubyDescriptorPool.class);
         descriptorPool = (RubyDescriptorPool) cDescriptorPool.newInstance(runtime.getCurrentContext(), Block.NULL_BLOCK);
+        cBuilder = (RubyClass) runtime.getClassFromPath("Google::Protobuf::Internal::Builder");
         cDescriptor = (RubyClass) runtime.getClassFromPath("Google::Protobuf::Descriptor");
         cEnumDescriptor = (RubyClass) runtime.getClassFromPath("Google::Protobuf::EnumDescriptor");
     }
@@ -75,10 +74,9 @@ public class RubyDescriptorPool extends RubyObject {
 
     @JRubyMethod
     public IRubyObject build(ThreadContext context, Block block) {
-        RubyClass cBuilder = (RubyClass) context.runtime.getClassFromPath("Google::Protobuf::Internal::Builder");
-        RubyBasicObject ctx = (RubyBasicObject) cBuilder.newInstance(context, this, Block.NULL_BLOCK);
+        RubyBuilder ctx = (RubyBuilder) cBuilder.newInstance(context, this, Block.NULL_BLOCK);
         ctx.instance_eval(context, block);
-        ctx.callMethod(context, "build"); // Needs to be called to support the deprecated syntax
+        ctx.build(context); // Needs to be called to support the deprecated syntax
         return context.nil;
     }
 
@@ -109,18 +107,6 @@ public class RubyDescriptorPool extends RubyObject {
     @JRubyMethod(meta = true, name = "generated_pool")
     public static IRubyObject generatedPool(ThreadContext context, IRubyObject recv) {
         return descriptorPool;
-    }
-
-    @JRubyMethod(required = 1)
-    public IRubyObject add_serialized_file (ThreadContext context, IRubyObject data ) {
-        byte[] bin = data.convertToString().getBytes();
-        try {
-            FileDescriptorProto.Builder builder = FileDescriptorProto.newBuilder().mergeFrom(bin);
-            registerFileDescriptor(context, builder);
-        } catch (InvalidProtocolBufferException e) {
-            throw RaiseException.from(context.runtime, (RubyClass) context.runtime.getClassFromPath("Google::Protobuf::ParseError"), e.getMessage());
-        }
-        return context.nil;
     }
 
     protected void registerFileDescriptor(ThreadContext context, FileDescriptorProto.Builder builder) {
@@ -171,6 +157,7 @@ public class RubyDescriptorPool extends RubyObject {
         return fileDescriptors.toArray(new FileDescriptor[fileDescriptors.size()]);
     }
 
+    private static RubyClass cBuilder;
     private static RubyClass cDescriptor;
     private static RubyClass cEnumDescriptor;
     private static RubyDescriptorPool descriptorPool;

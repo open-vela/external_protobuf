@@ -34,7 +34,6 @@ import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assertWithMessage;
 import static com.google.protobuf.TestUtil.TEST_REQUIRED_INITIALIZED;
 import static com.google.protobuf.TestUtil.TEST_REQUIRED_UNINITIALIZED;
-import static org.junit.Assert.assertThrows;
 
 import com.google.protobuf.DescriptorProtos.DescriptorProto;
 import com.google.protobuf.DescriptorProtos.FieldDescriptorProto;
@@ -42,7 +41,6 @@ import com.google.protobuf.DescriptorProtos.FileDescriptorProto;
 import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import com.google.protobuf.Descriptors.FileDescriptor;
-import com.google.protobuf.TextFormat.InvalidEscapeSequenceException;
 import com.google.protobuf.TextFormat.Parser.SingularOverwritePolicy;
 import com.google.protobuf.testing.proto.TestProto3Optional;
 import com.google.protobuf.testing.proto.TestProto3Optional.NestedEnum;
@@ -59,12 +57,10 @@ import protobuf_unittest.UnittestProto.TestOneof2;
 import protobuf_unittest.UnittestProto.TestRequired;
 import proto2_wireformat_unittest.UnittestMsetWireFormat.TestMessageSet;
 import java.io.StringReader;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 import org.junit.Test;
-import org.junit.function.ThrowingRunnable;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
@@ -278,7 +274,7 @@ public class TextFormatTest {
    * are converted directly to bytes, *not* encoded using UTF-8.
    */
   private ByteString bytes(String str) {
-    return ByteString.copyFrom(str.getBytes(StandardCharsets.ISO_8859_1));
+    return ByteString.copyFrom(str.getBytes(Internal.ISO_8859_1));
   }
 
   /**
@@ -600,7 +596,9 @@ public class TextFormatTest {
                 .setPackage("google.protobuf")
                 .setSyntax("proto3")
                 .addMessageType(
-                    DescriptorProto.newBuilder().setName("Any").addAllField(Arrays.asList(fields)))
+                    DescriptorProto.newBuilder()
+                        .setName("Any")
+                        .addAllField(Arrays.asList(fields)))
                 .build(),
             new FileDescriptor[0]);
     return fileDescriptor.getMessageTypes().get(0);
@@ -876,11 +874,6 @@ public class TextFormatTest {
   }
 
   // =================================================================
-  @Test
-  public void testEscapeQuestionMark() throws InvalidEscapeSequenceException {
-    assertThat(TextFormat.unescapeText("?")).isEqualTo("?");
-    assertThat(TextFormat.unescapeText("\\?")).isEqualTo("?");
-  }
 
   @Test
   public void testEscape() throws Exception {
@@ -1236,36 +1229,6 @@ public class TextFormatTest {
     TextFormat.printer()
         .printFieldValue(TestAllTypes.getDescriptor().findFieldByName(fieldName), value, sb);
     assertThat(sb.toString()).isEqualTo(expect);
-  }
-
-  @Test
-  public void testPrintFieldValueThrows() throws Exception {
-    assertPrintFieldThrowsClassCastException(5, "repeated_string");
-    assertPrintFieldThrowsClassCastException(5L, "repeated_string");
-    assertPrintFieldThrowsClassCastException(ByteString.EMPTY, "repeated_string");
-    assertPrintFieldThrowsClassCastException(5, "repeated_float");
-    assertPrintFieldThrowsClassCastException(5D, "repeated_float");
-    assertPrintFieldThrowsClassCastException("text", "repeated_float");
-    assertPrintFieldThrowsClassCastException(5, "repeated_double");
-    assertPrintFieldThrowsClassCastException(5F, "repeated_double");
-    assertPrintFieldThrowsClassCastException("text", "repeated_double");
-    assertPrintFieldThrowsClassCastException(123L, "repeated_int32");
-    assertPrintFieldThrowsClassCastException(123, "repeated_int64");
-    assertPrintFieldThrowsClassCastException(1, "repeated_bytes");
-  }
-
-  private void assertPrintFieldThrowsClassCastException(final Object value, String fieldName)
-      throws Exception {
-    final StringBuilder stringBuilder = new StringBuilder();
-    final FieldDescriptor fieldDescriptor = TestAllTypes.getDescriptor().findFieldByName(fieldName);
-    assertThrows(
-        ClassCastException.class,
-        new ThrowingRunnable() {
-          @Override
-          public void run() throws Throwable {
-            TextFormat.printer().printFieldValue(fieldDescriptor, value, stringBuilder);
-          }
-        });
   }
 
   @Test
@@ -1815,16 +1778,5 @@ public class TextFormatTest {
             + "  value: 30\n"
             + "}\n";
     assertThat(TextFormat.printer().printToString(message)).isEqualTo(text);
-  }
-
-  @Test
-  public void testPreservesFloatingPointNegative0() throws Exception {
-    proto3_unittest.UnittestProto3.TestAllTypes message =
-        proto3_unittest.UnittestProto3.TestAllTypes.newBuilder()
-            .setOptionalFloat(-0.0f)
-            .setOptionalDouble(-0.0)
-            .build();
-    assertThat(TextFormat.printer().printToString(message))
-        .isEqualTo("optional_float: -0.0\noptional_double: -0.0\n");
   }
 }

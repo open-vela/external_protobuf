@@ -68,7 +68,7 @@
 (eval-when-compile
   (and (= emacs-major-version 24)
        (>= emacs-minor-version 4)
-       (require 'cl-lib))
+       (require 'cl))
   (require 'cc-langs)
   (require 'cc-fonts))
 
@@ -193,7 +193,7 @@
 ;;;###autoload (add-to-list 'auto-mode-alist '("\\.proto\\'" . protobuf-mode))
 
 ;;;###autoload
-(define-derived-mode protobuf-mode prog-mode "Protobuf"
+(defun protobuf-mode ()
   "Major mode for editing Protocol Buffers description language.
 
 The hook `c-mode-common-hook' is run with no argument at mode

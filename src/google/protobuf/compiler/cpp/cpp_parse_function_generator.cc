@@ -81,9 +81,9 @@ const char* TagType(const FieldDescriptor* field) {
   return CodedTagType(TagSize(field->number()));
 }
 
-std::string TcParserName(const Options& options) {
+std::string TcParserBaseName(const Options& options) {
   return StrCat("::", ProtobufNamespace(options),
-                      "::internal::TcParser::");
+                      "::internal::TcParserBase::");
 }
 
 std::string MessageTcParseFunctionName(const FieldDescriptor* field,
@@ -93,8 +93,8 @@ std::string MessageTcParseFunctionName(const FieldDescriptor* field,
     // For files with `option optimize_for = CODE_SIZE`, or which derive from
     // `ZeroFieldsBase`, we need to call the `_InternalParse` function, because
     // there is no generated tailcall function. For tailcall parsing, this is
-    // done by helpers in TcParser.
-    return StrCat(TcParserName(options),
+    // done by helpers in TcParserBase.
+    return StrCat(TcParserBaseName(options),
                         (field->is_repeated() ? "Repeated" : "Singular"),
                         "ParseMessage<",
                         QualifiedClassName(field->message_type()),  //
@@ -108,7 +108,8 @@ std::string MessageTcParseFunctionName(const FieldDescriptor* field,
 }
 
 std::string FieldParseFunctionName(const FieldDescriptor* field,
-                                   const Options& options);
+                                   const Options& options,
+                                   uint32_t table_size_log2);
 
 }  // namespace
 
@@ -208,14 +209,14 @@ TailCallTableInfo::TailCallTableInfo(const Descriptor* descriptor,
       case FieldDescriptor::TYPE_SINT64:
       case FieldDescriptor::TYPE_SINT32:
       case FieldDescriptor::TYPE_BOOL:
-        name = FieldParseFunctionName(field, options);
+        name = FieldParseFunctionName(field, options, table_size_log2);
         break;
 
       case FieldDescriptor::TYPE_BYTES:
         if (field->options().ctype() == FieldOptions::STRING &&
             field->default_value_string().empty() &&
             !IsStringInlined(field, options)) {
-          name = FieldParseFunctionName(field, options);
+          name = FieldParseFunctionName(field, options, table_size_log2);
         }
         break;
 
@@ -364,8 +365,9 @@ void ParseFunctionGenerator::GenerateTailcallParseFunction(Formatter& format) {
       "const char* $classname$::_InternalParse(\n"
       "    const char* ptr, ::$proto_ns$::internal::ParseContext* ctx) {\n"
       "$annotate_deserialize$"
-      "  ptr = ::$proto_ns$::internal::TcParser::ParseLoop(\n"
-      "      this, ptr, ctx, &_table_.header);\n");
+      "  ptr = ::$proto_ns$::internal::TcParser<$1$>::ParseLoop(\n"
+      "      this, ptr, ctx, &_table_.header);\n",
+      tc_table_info_->table_size_log2);
   format(
       "  return ptr;\n"
       "}\n\n");
@@ -424,9 +426,9 @@ void ParseFunctionGenerator::GenerateTailcallFieldParseFunctions(
         "return table->fallback(PROTOBUF_TC_PARAM_PASS);\n"
         "  ptr += $1$;\n"
         "  hasbits |= (uint64_t{1} << data.hasbit_idx());\n"
-        "  ::$proto_ns$::internal::TcParser::SyncHasbits"
+        "  ::$proto_ns$::internal::TcParserBase::SyncHasbits"
         "(msg, hasbits, table);\n"
-        "  auto& field = ::$proto_ns$::internal::TcParser::"
+        "  auto& field = ::$proto_ns$::internal::TcParserBase::"
         "RefAt<$classtype$*>(msg, data.offset());\n"
         "  if (field == nullptr)\n"
         "    field = CreateMaybeMessage<$classtype$>(ctx->data().arena);\n"
@@ -446,9 +448,9 @@ void ParseFunctionGenerator::GenerateTailcallFieldParseFunctions(
         "return table->fallback(PROTOBUF_TC_PARAM_PASS);\n"
         "  }\n"
         "  ptr += $1$;\n"
-        "  auto& field = ::$proto_ns$::internal::TcParser::RefAt<"
+        "  auto& field = ::$proto_ns$::internal::TcParserBase::RefAt<"
         "::$proto_ns$::RepeatedPtrField<$classname$>>(msg, data.offset());\n"
-        "  ::$proto_ns$::internal::TcParser::SyncHasbits"
+        "  ::$proto_ns$::internal::TcParserBase::SyncHasbits"
         "(msg, hasbits, table);\n"
         "  ptr = ctx->ParseMessage(field.Add(), ptr);\n"
         "  return ptr;\n"
@@ -469,7 +471,7 @@ void ParseFunctionGenerator::GenerateDataDecls(io::Printer* printer) {
     format.Indent();
   }
   format(
-      "static const ::$proto_ns$::internal::TcParseTable<$1$>\n"
+      "static const ::$proto_ns$::internal::TailCallParseTable<$1$>\n"
       "    _table_;\n",
       tc_table_info_->table_size_log2);
   if (should_generate_guarded_tctable()) {
@@ -544,7 +546,7 @@ void ParseFunctionGenerator::GenerateTailCallTable(Formatter& format) {
   if (tc_table_info_->use_generated_fallback) {
     fallback = ClassName(descriptor_) + "::Tct_ParseFallback";
   } else {
-    fallback = TcParserName(options_) + "GenericFallback";
+    fallback = TcParserBaseName(options_) + "GenericFallback";
     if (GetOptimizeFor(descriptor_->file(), options_) ==
         FileOptions::LITE_RUNTIME) {
       fallback += "Lite";
@@ -559,48 +561,33 @@ void ParseFunctionGenerator::GenerateTailCallTable(Formatter& format) {
   // the table is sufficient we can use a generic routine, that just handles
   // unknown fields and potentially an extension range.
   format(
-      "const ::$proto_ns$::internal::TcParseTable<$1$>\n"
+      "const ::$proto_ns$::internal::TailCallParseTable<$1$>\n"
       "    $classname$::_table_ = {\n",
       tc_table_info_->table_size_log2);
-  {
-    auto table_scope = format.ScopedIndent();
-    format("{\n");
-    {
-      auto header_scope = format.ScopedIndent();
-      if (num_hasbits_ > 0 || IsMapEntryMessage(descriptor_)) {
-        format("PROTOBUF_FIELD_OFFSET($classname$, _has_bits_),\n");
-      } else {
-        format("0,  // no _has_bits_\n");
-      }
-      if (descriptor_->extension_range_count() == 1) {
-        format(
-            "PROTOBUF_FIELD_OFFSET($classname$, _extensions_),\n"
-            "$1$, $2$,  // extension_range_{low,high}\n",
-            descriptor_->extension_range(0)->start,
-            descriptor_->extension_range(0)->end);
-      } else {
-        format("0, 0, 0,  // no _extensions_\n");
-      }
-      format(
-          "$1$, 0, $2$,  // fast_idx_mask, reserved, num_fields\n"
-          "&$3$._instance,\n"
-          "$4$  // fallback\n",
-          (((1 << tc_table_info_->table_size_log2) - 1) << 3),
-          descriptor_->field_count(),
-          DefaultInstanceName(descriptor_, options_), fallback);
-    }
-    format("}, {\n");
-    {
-      auto fast_scope = format.ScopedIndent();
-      GenerateFastFieldEntries(format, fallback);
-    }
-    format("},\n");  // entries[]
+  format.Indent();
+  format("{\n");
+  format.Indent();
+  if (num_hasbits_ > 0 || IsMapEntryMessage(descriptor_)) {
+    format("PROTOBUF_FIELD_OFFSET($classname$, _has_bits_),\n");
+  } else {
+    format("0,  // no _has_bits_\n");
   }
-  format("};\n\n");  // _table_
-}
-
-void ParseFunctionGenerator::GenerateFastFieldEntries(
-    Formatter& format, const std::string& fallback) {
+  if (descriptor_->extension_range_count() == 1) {
+    format(
+        "PROTOBUF_FIELD_OFFSET($classname$, _extensions_),\n"
+        "$1$, $2$,  // extension_range_{low,high}\n",
+        descriptor_->extension_range(0)->start,
+        descriptor_->extension_range(0)->end);
+  } else {
+    format("0, 0, 0,  // no _extensions_\n");
+  }
+  format(
+      "&$1$._instance,\n"
+      "$2$  // fallback\n",
+      DefaultInstanceName(descriptor_, options_), fallback);
+  format.Outdent();
+  format("}, {\n");
+  format.Indent();
   for (const auto& info : tc_table_info_->fast_path_fields) {
     if (info.field != nullptr) {
       PrintFieldComment(format, info.field);
@@ -617,6 +604,10 @@ void ParseFunctionGenerator::GenerateFastFieldEntries(
     }
     format("},\n");
   }
+  format.Outdent();
+  format("},\n");  // entries[]
+  format.Outdent();
+  format("};\n\n");  // _table_
 }
 
 void ParseFunctionGenerator::GenerateArenaString(Formatter& format,
@@ -643,8 +634,6 @@ void ParseFunctionGenerator::GenerateArenaString(Formatter& format,
         ", ~0x$2$u",
         inlined_string_index / 32,
         strings::Hex(1u << (inlined_string_index % 32), strings::ZERO_PAD_8));
-  } else {
-    GOOGLE_DCHECK(field->default_value_string().empty());
   }
   format(
       ");\n"
@@ -752,7 +741,7 @@ void ParseFunctionGenerator::GenerateLengthDelim(Formatter& format,
       case FieldDescriptor::TYPE_MESSAGE: {
         if (field->is_map()) {
           const FieldDescriptor* val =
-              field->message_type()->map_value();
+              field->message_type()->FindFieldByName("value");
           GOOGLE_CHECK(val);
           if (val->type() == FieldDescriptor::TYPE_ENUM &&
               !HasPreservingUnknownEnumSemantics(field)) {
@@ -777,22 +766,15 @@ void ParseFunctionGenerator::GenerateLengthDelim(Formatter& format,
                 "$msg$GetArenaForAllocation());\n"
                 "  $msg$set_has_$name$();\n"
                 "}\n"
-                "auto* lazy_field = $msg$$1$_.$name$_;\n",
+                "ptr = ctx->ParseMessage($msg$$1$_.$name$_, ptr);\n",
                 field->containing_oneof()->name());
           } else if (HasHasbit(field)) {
             format(
                 "_Internal::set_has_$name$(&$has_bits$);\n"
-                "auto* lazy_field = &$msg$$name$_;\n");
+                "ptr = ctx->ParseMessage(&$msg$$name$_, ptr);\n");
           } else {
-            format("auto* lazy_field = &$msg$$name$_;\n");
+            format("ptr = ctx->ParseMessage(&$msg$$name$_, ptr);\n");
           }
-          format(
-              "::$proto_ns$::internal::LazyFieldParseHelper<\n"
-              "  ::$proto_ns$::internal::LazyField> parse_helper(\n"
-              "    $1$::default_instance(),\n"
-              "    $msg$GetArenaForAllocation(), lazy_field);\n"
-              "ptr = ctx->ParseMessage(&parse_helper, ptr);\n",
-              FieldMessageTypeName(field, options_));
         } else if (IsImplicitWeakField(field, options_, scc_analyzer_)) {
           if (!field->is_repeated()) {
             format(
@@ -877,8 +859,7 @@ void ParseFunctionGenerator::GenerateFieldBody(
               field->number());
         }
       } else {
-        std::string size = (field->type() == FieldDescriptor::TYPE_INT32 ||
-                            field->type() == FieldDescriptor::TYPE_SINT32 ||
+        std::string size = (field->type() == FieldDescriptor::TYPE_SINT32 ||
                             field->type() == FieldDescriptor::TYPE_UINT32)
                                ? "32"
                                : "64";
@@ -1105,7 +1086,8 @@ void ParseFunctionGenerator::GenerateFieldSwitch(
 namespace {
 
 std::string FieldParseFunctionName(const FieldDescriptor* field,
-                                   const Options& options) {
+                                   const Options& options,
+                                   uint32_t table_size_log2) {
   ParseCardinality card =  //
       field->is_packed()               ? ParseCardinality::kPacked
       : field->is_repeated()           ? ParseCardinality::kRepeated
@@ -1164,8 +1146,9 @@ std::string FieldParseFunctionName(const FieldDescriptor* field,
           type_format = TypeFormat::kStringValidateOnly;
           break;
         default:
-          GOOGLE_LOG(DFATAL) << "Mode not handled: "
-                      << static_cast<int>(GetUtf8CheckMode(field, options));
+          GOOGLE_LOG(DFATAL)
+              << "Mode not handled: "
+              << static_cast<int>(GetUtf8CheckMode(field, options));
           return "";
       }
       break;
@@ -1175,8 +1158,8 @@ std::string FieldParseFunctionName(const FieldDescriptor* field,
       return "";
   }
 
-  return "::" + ProtobufNamespace(options) + "::internal::TcParser::" +
-         GetTailCallFieldHandlerName(card, type_format,
+  return "::" + ProtobufNamespace(options) + "::internal::" +
+         GetTailCallFieldHandlerName(card, type_format, table_size_log2,
                                      TagSize(field->number()), options);
 }
 
@@ -1184,9 +1167,31 @@ std::string FieldParseFunctionName(const FieldDescriptor* field,
 
 std::string GetTailCallFieldHandlerName(ParseCardinality card,
                                         TypeFormat type_format,
+                                        int table_size_log2,
                                         int tag_length_bytes,
                                         const Options& options) {
   std::string name;
+
+  switch (card) {
+    case ParseCardinality::kPacked:
+    case ParseCardinality::kRepeated:
+      name = "TcParserBase::";
+      break;
+
+    case ParseCardinality::kSingular:
+    case ParseCardinality::kOneof:
+      switch (type_format) {
+        case TypeFormat::kBytes:
+        case TypeFormat::kString:
+        case TypeFormat::kStringValidateOnly:
+          name = "TcParserBase::";
+          break;
+
+        default:
+          name = StrCat("TcParser<", table_size_log2, ">::");
+          break;
+      }
+  }
 
   // The field implementation functions are prefixed by cardinality:
   //   `Singular` for optional or implicit fields.
@@ -1269,24 +1274,26 @@ std::string GetTailCallFieldHandlerName(ParseCardinality card,
     case TypeFormat::kVar64:
     case TypeFormat::kVar32:
     case TypeFormat::kBool:
-      StrAppend(&name, ", ", TcParserName(options), "kNoConversion");
+      name.append(
+          StrCat(", ", TcParserBaseName(options), "kNoConversion"));
       break;
 
     case TypeFormat::kSInt64:
     case TypeFormat::kSInt32:
-      StrAppend(&name, ", ", TcParserName(options), "kZigZag");
+      name.append(StrCat(", ", TcParserBaseName(options), "kZigZag"));
       break;
 
     case TypeFormat::kBytes:
-      StrAppend(&name, ", ", TcParserName(options), "kNoUtf8");
+      name.append(StrCat(", ", TcParserBaseName(options), "kNoUtf8"));
       break;
 
     case TypeFormat::kString:
-      StrAppend(&name, ", ", TcParserName(options), "kUtf8");
+      name.append(StrCat(", ", TcParserBaseName(options), "kUtf8"));
       break;
 
     case TypeFormat::kStringValidateOnly:
-      StrAppend(&name, ", ", TcParserName(options), "kUtf8ValidateOnly");
+      name.append(
+          StrCat(", ", TcParserBaseName(options), "kUtf8ValidateOnly"));
       break;
 
     default:
