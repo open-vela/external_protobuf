@@ -1,4 +1,4 @@
-FROM debian:jessie
+FROM debian:stretch
 
 # Install dependencies.  We start with the basic ones require to build protoc
 # and the C++ build
@@ -20,6 +20,9 @@ RUN apt-get update && apt-get install -y \
   parallel \
   time \
   wget \
+  # Java dependencies
+  maven \
+  openjdk-8-jdk \
   && apt-get clean
 
 # Install rvm
@@ -32,6 +35,8 @@ RUN /bin/bash -l -c "rvm install 2.5.1"
 RUN /bin/bash -l -c "rvm install 2.6.0"
 RUN /bin/bash -l -c "rvm install 2.7.0"
 RUN /bin/bash -l -c "rvm install 3.0.0"
+RUN /bin/bash -l -c "rvm install jruby-9.2.19.0"
+RUN /bin/bash -l -c "rvm install jruby-9.3.0.0"
 
 RUN /bin/bash -l -c "echo 'gem: --no-ri --no-rdoc' > ~/.gemrc"
 RUN /bin/bash -l -c "echo 'export PATH=/usr/local/rvm/bin:$PATH' >> ~/.bashrc"

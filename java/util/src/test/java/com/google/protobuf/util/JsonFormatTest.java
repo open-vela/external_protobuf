@@ -822,12 +822,42 @@ public class JsonFormatTest {
   }
 
   @Test
+  public void testTimestampMergeError() throws Exception {
+    final String incorrectTimestampString = "{\"seconds\":1800,\"nanos\":0}";
+    try {
+      TestTimestamp.Builder builder = TestTimestamp.newBuilder();
+      mergeFromJson(String.format("{\"timestamp_value\": %s}", incorrectTimestampString), builder);
+      assertWithMessage("expected exception").fail();
+    } catch (InvalidProtocolBufferException e) {
+      // Exception expected.
+      assertThat(e)
+          .hasMessageThat()
+          .isEqualTo("Failed to parse timestamp: " + incorrectTimestampString);
+    }
+  }
+
+  @Test
   public void testDuration() throws Exception {
     TestDuration message =
         TestDuration.newBuilder().setDurationValue(Durations.parse("12345s")).build();
 
     assertThat(toJsonString(message)).isEqualTo("{\n" + "  \"durationValue\": \"12345s\"\n" + "}");
     assertRoundTripEquals(message);
+  }
+
+  @Test
+  public void testDurationMergeError() throws Exception {
+    final String incorrectDurationString = "{\"seconds\":10,\"nanos\":500}";
+    try {
+      TestDuration.Builder builder = TestDuration.newBuilder();
+      mergeFromJson(String.format("{\"duration_value\": %s}", incorrectDurationString), builder);
+      assertWithMessage("expected exception").fail();
+    } catch (InvalidProtocolBufferException e) {
+      // Exception expected.
+      assertThat(e)
+          .hasMessageThat()
+          .isEqualTo("Failed to parse duration: " + incorrectDurationString);
+    }
   }
 
   @Test
@@ -1856,5 +1886,13 @@ public class JsonFormatTest {
                 .printingEnumsAsInts()
                 .print(message))
         .isEqualTo("{\n" + "  \"optionalBool\": false\n" + "}");
+  }
+
+  @Test
+  public void testPreservesFloatingPointNegative0() throws Exception {
+    TestAllTypes message =
+        TestAllTypes.newBuilder().setOptionalFloat(-0.0f).setOptionalDouble(-0.0).build();
+    assertThat(JsonFormat.printer().print(message))
+        .isEqualTo("{\n  \"optionalFloat\": -0.0,\n  \"optionalDouble\": -0.0\n}");
   }
 }

@@ -9,7 +9,6 @@ set PACKAGE_NAME=protobuf
 set REPO_DIR=protobuf
 set BUILD_DLL=OFF
 set UNICODE=ON
-set PB_TEST_DEP="six==1.9"
 set OTHER_TEST_DEP="setuptools==38.5.1"
 set OLD_PATH=C:\Program Files (x86)\MSBuild\14.0\bin\;%PATH%
 
@@ -71,6 +70,16 @@ CALL build_single_artifact.bat || goto :error
 
 SET PYTHON=C:\python39
 SET PYTHON_VERSION=3.9
+SET PYTHON_ARCH=64
+CALL build_single_artifact.bat || goto :error
+
+SET PYTHON=C:\python310_32bit
+SET PYTHON_VERSION=3.10
+SET PYTHON_ARCH=32
+CALL build_single_artifact.bat || goto :error
+
+SET PYTHON=C:\python310
+SET PYTHON_VERSION=3.10
 SET PYTHON_ARCH=64
 CALL build_single_artifact.bat || goto :error
 
