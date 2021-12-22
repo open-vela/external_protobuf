@@ -1,4 +1,6 @@
+#! /usr/bin/env python
 # -*- coding: utf-8 -*-
+#
 # Protocol Buffers - Google's data interchange format
 # Copyright 2008 Google Inc.  All rights reserved.
 # https://developers.google.com/protocol-buffers/
@@ -37,7 +39,6 @@ import copy
 import gc
 import operator
 import struct
-import sys
 import warnings
 import unittest
 
@@ -377,8 +378,7 @@ class ReflectionTest(unittest.TestCase):
     self.assertRaises(TypeError, setattr, proto, 'optional_float', 'foo')
     self.assertRaises(TypeError, setattr, proto, 'optional_double', 'foo')
     # TODO(jieluo): Fix type checking difference for python and c extension
-    if (api_implementation.Type() == 'python' or
-        (sys.version_info.major, sys.version_info.minor) >= (3, 10)):
+    if api_implementation.Type() == 'python':
       self.assertRaises(TypeError, setattr, proto, 'optional_bool', 1.1)
     else:
       proto.optional_bool = 1.1
@@ -429,7 +429,7 @@ class ReflectionTest(unittest.TestCase):
       pb.optional_uint64 = '2'
 
     # The exact error should propagate with a poorly written custom integer.
-    with self.assertRaisesRegex(RuntimeError, 'my_error'):
+    with self.assertRaisesRegexp(RuntimeError, 'my_error'):
       pb.optional_uint64 = test_util.NonStandardInteger(5, 'my_error')
 
   def assetIntegerBoundsChecking(self, integer_fn, message_module):

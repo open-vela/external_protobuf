@@ -54,9 +54,9 @@ void SetMessageVariables(const FieldDescriptor* descriptor,
   (*variables)["full_name"] = descriptor->full_name();
 
   const FieldDescriptor* key =
-      descriptor->message_type()->map_key();
+      descriptor->message_type()->FindFieldByName("key");
   const FieldDescriptor* val =
-      descriptor->message_type()->map_value();
+      descriptor->message_type()->FindFieldByName("value");
   (*variables)["key_cpp"] = PrimitiveTypeName(options, key->cpp_type());
   switch (val->cpp_type()) {
     case FieldDescriptor::CPPTYPE_MESSAGE:
@@ -84,11 +84,8 @@ void SetMessageVariables(const FieldDescriptor* descriptor,
 }
 
 MapFieldGenerator::MapFieldGenerator(const FieldDescriptor* descriptor,
-                                     const Options& options,
-                                     MessageSCCAnalyzer* scc_analyzer)
-    : FieldGenerator(descriptor, options),
-      has_required_fields_(
-          scc_analyzer->HasRequiredFields(descriptor->message_type())) {
+                                     const Options& options)
+    : FieldGenerator(descriptor, options) {
   SetMessageVariables(descriptor, &variables_, options);
 }
 
@@ -207,9 +204,9 @@ void MapFieldGenerator::GenerateSerializeWithCachedSizesToArray(
   format("if (!this->_internal_$name$().empty()) {\n");
   format.Indent();
   const FieldDescriptor* key_field =
-      descriptor_->message_type()->map_key();
+      descriptor_->message_type()->FindFieldByName("key");
   const FieldDescriptor* value_field =
-      descriptor_->message_type()->map_value();
+      descriptor_->message_type()->FindFieldByName("value");
   const bool string_key = key_field->type() == FieldDescriptor::TYPE_STRING;
   const bool string_value = value_field->type() == FieldDescriptor::TYPE_STRING;
 
@@ -294,15 +291,6 @@ void MapFieldGenerator::GenerateByteSize(io::Printer* printer) const {
       "  total_size += $map_classname$::Funcs::ByteSizeLong(it->first, "
       "it->second);\n"
       "}\n");
-}
-
-void MapFieldGenerator::GenerateIsInitialized(io::Printer* printer) const {
-  if (!has_required_fields_) return;
-
-  Formatter format(printer, variables_);
-  format(
-      "if (!::$proto_ns$::internal::AllAreInitialized($name$_)) return "
-      "false;\n");
 }
 
 void MapFieldGenerator::GenerateConstinitInitializer(

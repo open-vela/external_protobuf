@@ -1,3 +1,5 @@
+#! /usr/bin/env python
+#
 # Protocol Buffers - Google's data interchange format
 # Copyright 2008 Google Inc.  All rights reserved.
 # https://developers.google.com/protocol-buffers/
@@ -401,19 +403,9 @@ class DescriptorPoolTestBase(object):
         # TODO(jieluo): Fix python and cpp extension diff.
         return
     self.pool = descriptor_pool.DescriptorPool()
-    file1 = self.pool.AddSerializedFile(
-        self.factory_test1_fd.SerializeToString())
-    file2 = self.pool.AddSerializedFile(
-        self.factory_test2_fd.SerializeToString())
-    self.assertEqual(file1.name,
-                     'google/protobuf/internal/factory_test1.proto')
-    self.assertEqual(file2.name,
-                     'google/protobuf/internal/factory_test2.proto')
+    self.pool.AddSerializedFile(self.factory_test1_fd.SerializeToString())
+    self.pool.AddSerializedFile(self.factory_test2_fd.SerializeToString())
     self.testFindMessageTypeByName()
-    file_json = self.pool.AddSerializedFile(
-        more_messages_pb2.DESCRIPTOR.serialized_pb)
-    field = file_json.message_types_by_name['class'].fields_by_name['int_field']
-    self.assertEqual(field.json_name, 'json_int')
 
 
   def testEnumDefaultValue(self):
@@ -648,10 +640,10 @@ class SecondaryDescriptorFromDescriptorDB(DescriptorPoolTestBase,
     enum_value.number = 0
     self.db.Add(file_proto)
 
-    self.assertRaisesRegex(KeyError, 'SubMessage',
+    self.assertRaisesRegexp(KeyError, 'SubMessage',
                             self.pool.FindMessageTypeByName,
                             'collector.ErrorMessage')
-    self.assertRaisesRegex(KeyError, 'SubMessage',
+    self.assertRaisesRegexp(KeyError, 'SubMessage',
                             self.pool.FindFileByName, 'error_file')
     with self.assertRaises(KeyError) as exc:
       self.pool.FindFileByName('none_file')

@@ -50,7 +50,7 @@ class MessageFieldGenerator : public FieldGenerator {
   MessageFieldGenerator(const FieldDescriptor* descriptor,
                         const Options& options,
                         MessageSCCAnalyzer* scc_analyzer);
-  ~MessageFieldGenerator() override;
+  ~MessageFieldGenerator();
 
   // implements FieldGenerator ---------------------------------------
   void GeneratePrivateMembers(io::Printer* printer) const override;
@@ -71,12 +71,10 @@ class MessageFieldGenerator : public FieldGenerator {
   void GenerateSerializeWithCachedSizesToArray(
       io::Printer* printer) const override;
   void GenerateByteSize(io::Printer* printer) const override;
-  void GenerateIsInitialized(io::Printer* printer) const override;
   void GenerateConstinitInitializer(io::Printer* printer) const override;
 
  protected:
   const bool implicit_weak_field_;
-  const bool has_required_fields_;
 
  private:
   GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(MessageFieldGenerator);
@@ -87,7 +85,7 @@ class MessageOneofFieldGenerator : public MessageFieldGenerator {
   MessageOneofFieldGenerator(const FieldDescriptor* descriptor,
                              const Options& options,
                              MessageSCCAnalyzer* scc_analyzer);
-  ~MessageOneofFieldGenerator() override;
+  ~MessageOneofFieldGenerator();
 
   // implements FieldGenerator ---------------------------------------
   void GenerateInlineAccessorDefinitions(io::Printer* printer) const override;
@@ -101,7 +99,6 @@ class MessageOneofFieldGenerator : public MessageFieldGenerator {
   void GenerateSwappingCode(io::Printer* printer) const override;
   void GenerateDestructorCode(io::Printer* printer) const override;
   void GenerateConstructorCode(io::Printer* printer) const override;
-  void GenerateIsInitialized(io::Printer* printer) const override;
 
  private:
   GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(MessageOneofFieldGenerator);
@@ -112,7 +109,7 @@ class RepeatedMessageFieldGenerator : public FieldGenerator {
   RepeatedMessageFieldGenerator(const FieldDescriptor* descriptor,
                                 const Options& options,
                                 MessageSCCAnalyzer* scc_analyzer);
-  ~RepeatedMessageFieldGenerator() override;
+  ~RepeatedMessageFieldGenerator();
 
   // implements FieldGenerator ---------------------------------------
   void GeneratePrivateMembers(io::Printer* printer) const override;
@@ -126,12 +123,10 @@ class RepeatedMessageFieldGenerator : public FieldGenerator {
   void GenerateSerializeWithCachedSizesToArray(
       io::Printer* printer) const override;
   void GenerateByteSize(io::Printer* printer) const override;
-  void GenerateIsInitialized(io::Printer* printer) const override;
   void GenerateConstinitInitializer(io::Printer* printer) const override;
 
  private:
   const bool implicit_weak_field_;
-  const bool has_required_fields_;
 
   GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(RepeatedMessageFieldGenerator);
 };

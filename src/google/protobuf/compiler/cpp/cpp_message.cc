@@ -230,22 +230,12 @@ bool EmitFieldNonDefaultCondition(io::Printer* printer,
     } else if (field->cpp_type() == FieldDescriptor::CPPTYPE_MESSAGE) {
       // Message fields still have has_$name$() methods.
       format("if ($prefix$_internal_has_$name$()) {\n");
-    } else if (field->cpp_type() == FieldDescriptor::CPPTYPE_FLOAT) {
+    } else if (field->cpp_type() == FieldDescriptor::CPPTYPE_DOUBLE ||
+               field->cpp_type() == FieldDescriptor::CPPTYPE_FLOAT) {
+      // Handle float comparison to prevent -Wfloat-equal warnings
       format(
-          "static_assert(sizeof(uint32_t) == sizeof(float), \"Code assumes "
-          "uint32_t and float are the same size.\");\n"
-          "float tmp_$name$ = $prefix$_internal_$name$();\n"
-          "uint32_t raw_$name$;\n"
-          "memcpy(&raw_$name$, &tmp_$name$, sizeof(tmp_$name$));\n"
-          "if (raw_$name$ != 0) {\n");
-    } else if (field->cpp_type() == FieldDescriptor::CPPTYPE_DOUBLE) {
-      format(
-          "static_assert(sizeof(uint64_t) == sizeof(double), \"Code assumes "
-          "uint64_t and double are the same size.\");\n"
-          "double tmp_$name$ = $prefix$_internal_$name$();\n"
-          "uint64_t raw_$name$;\n"
-          "memcpy(&raw_$name$, &tmp_$name$, sizeof(tmp_$name$));\n"
-          "if (raw_$name$ != 0) {\n");
+          "if (!($prefix$_internal_$name$() <= 0 && $prefix$_internal_$name$() "
+          ">= 0)) {\n");
     } else {
       format("if ($prefix$_internal_$name$() != 0) {\n");
     }
@@ -276,8 +266,8 @@ void CollectMapInfo(const Options& options, const Descriptor* descriptor,
                     std::map<std::string, std::string>* variables) {
   GOOGLE_CHECK(IsMapEntryMessage(descriptor));
   std::map<std::string, std::string>& vars = *variables;
-  const FieldDescriptor* key = descriptor->map_key();
-  const FieldDescriptor* val = descriptor->map_value();
+  const FieldDescriptor* key = descriptor->FindFieldByName("key");
+  const FieldDescriptor* val = descriptor->FindFieldByName("value");
   vars["key_cpp"] = PrimitiveTypeName(options, key->cpp_type());
   switch (val->cpp_type()) {
     case FieldDescriptor::CPPTYPE_MESSAGE:
@@ -984,7 +974,7 @@ $annotate_extension_set$
 template <typename _proto_TypeTraits,
           ::PROTOBUF_NAMESPACE_ID::internal::FieldType _field_type,
           bool _is_packed>
-PROTOBUF_NODISCARD inline
+inline PROTOBUF_MUST_USE_RESULT
     typename _proto_TypeTraits::Singular::MutableType
     ReleaseExtension(
         const ::PROTOBUF_NAMESPACE_ID::internal::ExtensionIdentifier<
@@ -1447,8 +1437,7 @@ void MessageGenerator::GenerateClassDefinition(io::Printer* printer) {
   if (EnableMessageOwnedArena(descriptor_)) {
     format(
         "inline $classname$() : $classname$("
-        "::$proto_ns$::Arena::InternalHelper<$classname$>::\n"
-        "    CreateMessageOwnedArena(), true) {}\n");
+        "new ::$proto_ns$::Arena(), true) {}\n");
   } else {
     format("inline $classname$() : $classname$(nullptr) {}\n");
   }
@@ -1541,8 +1530,10 @@ void MessageGenerator::GenerateClassDefinition(io::Printer* printer) {
     format("enum $1$Case {\n", UnderscoresToCamelCase(oneof->name(), true));
     format.Indent();
     for (auto field : FieldRange(oneof)) {
-      format("$1$ = $2$,\n", OneofCaseConstantName(field),  // 1
-             field->number());                              // 2
+      std::string oneof_enum_case_field_name =
+          UnderscoresToCamelCase(field->name(), true);
+      format("k$1$ = $2$,\n", oneof_enum_case_field_name,  // 1
+             field->number());                             // 2
     }
     format("$1$_NOT_SET = 0,\n", ToUpper(oneof->name()));
     format.Outdent();
@@ -1574,8 +1565,7 @@ void MessageGenerator::GenerateClassDefinition(io::Printer* printer) {
           "bool PackFrom(const ::$proto_ns$::Message& message,\n"
           "              ::PROTOBUF_NAMESPACE_ID::ConstStringParam "
           "type_url_prefix) {\n"
-          "  return _any_metadata_.PackFrom(GetArena(), message, "
-          "type_url_prefix);\n"
+          "  return _any_metadata_.PackFrom(GetArena(), message, type_url_prefix);\n"
           "}\n"
           "bool UnpackTo(::$proto_ns$::Message* message) const {\n"
           "  return _any_metadata_.UnpackTo(message);\n"
@@ -1596,8 +1586,7 @@ void MessageGenerator::GenerateClassDefinition(io::Printer* printer) {
           "bool PackFrom(const T& message,\n"
           "              ::PROTOBUF_NAMESPACE_ID::ConstStringParam "
           "type_url_prefix) {\n"
-          "  return _any_metadata_.PackFrom<T>(GetArena(), message, "
-          "type_url_prefix);"
+          "  return _any_metadata_.PackFrom<T>(GetArena(), message, type_url_prefix);"
           "}\n"
           "template <typename T, class = typename std::enable_if<"
           "!std::is_convertible<T, const ::$proto_ns$::Message&>"
@@ -1609,14 +1598,13 @@ void MessageGenerator::GenerateClassDefinition(io::Printer* printer) {
       format(
           "template <typename T>\n"
           "bool PackFrom(const T& message) {\n"
-          "  return _any_metadata_.PackFrom(GetArena(), message);\n"
+          "  return _any_metadata_.PackFrom(message);\n"
           "}\n"
           "template <typename T>\n"
           "bool PackFrom(const T& message,\n"
           "              ::PROTOBUF_NAMESPACE_ID::ConstStringParam "
           "type_url_prefix) {\n"
-          "  return _any_metadata_.PackFrom(GetArena(), message, "
-          "type_url_prefix);\n"
+          "  return _any_metadata_.PackFrom(message, type_url_prefix);\n"
           "}\n"
           "template <typename T>\n"
           "bool UnpackTo(T* message) const {\n"
@@ -1638,12 +1626,12 @@ void MessageGenerator::GenerateClassDefinition(io::Printer* printer) {
       "}\n"
       "inline void Swap($classname$* other) {\n"
       "  if (other == this) return;\n"
-      "#ifdef PROTOBUF_FORCE_COPY_IN_SWAP\n"
+#ifdef PROTOBUF_FORCE_COPY_IN_SWAP
       "  if (GetOwningArena() != nullptr &&\n"
-      "      GetOwningArena() == other->GetOwningArena()) {\n "
-      "#else  // PROTOBUF_FORCE_COPY_IN_SWAP\n"
+      "      GetOwningArena() == other->GetOwningArena()) {\n"
+#else   // PROTOBUF_FORCE_COPY_IN_SWAP
       "  if (GetOwningArena() == other->GetOwningArena()) {\n"
-      "#endif  // !PROTOBUF_FORCE_COPY_IN_SWAP\n"
+#endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
       "    InternalSwap(other);\n"
       "  } else {\n"
       "    ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);\n"
@@ -1659,7 +1647,11 @@ void MessageGenerator::GenerateClassDefinition(io::Printer* printer) {
       "\n"
       "// implements Message ----------------------------------------------\n"
       "\n"
-      "$classname$* New(::$proto_ns$::Arena* arena = nullptr) const final {\n"
+      "inline $classname$* New() const final {\n"
+      "  return new $classname$();\n"
+      "}\n"
+      "\n"
+      "$classname$* New(::$proto_ns$::Arena* arena) const final {\n"
       "  return CreateMaybeMessage<$classname$>(arena);\n"
       "}\n");
 
@@ -1722,6 +1714,12 @@ void MessageGenerator::GenerateClassDefinition(io::Printer* printer) {
           "$uint8$* _InternalSerialize(\n"
           "    $uint8$* target, ::$proto_ns$::io::EpsCopyOutputStream* stream) "
           "const final;\n");
+
+      // DiscardUnknownFields() is implemented in message.cc using reflections.
+      // We need to implement this function in generated code for messages.
+      if (!UseUnknownFieldSet(descriptor_->file(), options_)) {
+        format("void DiscardUnknownFields()$ full_final$;\n");
+      }
     }
   }
 
@@ -1742,7 +1740,6 @@ void MessageGenerator::GenerateClassDefinition(io::Printer* printer) {
 
   format(
       // Friend AnyMetadata so that it can call this FullMessageName() method.
-      "\nprivate:\n"
       "friend class ::$proto_ns$::internal::AnyMetadata;\n"
       "static $1$ FullMessageName() {\n"
       "  return \"$full_name$\";\n"
@@ -2747,22 +2744,19 @@ std::pair<size_t, size_t> MessageGenerator::GenerateOffsets(
 
     // Some information about a field is in the pdproto profile. The profile is
     // only available at compile time. So we embed such information in the
-    // offset of the field, so that the information is available when
-    // reflectively accessing the field at run time.
+    // offset of the field, so that the information is available when reflective
+    // accessing the field at run time.
     //
     // Embed whether the field is used to the MSB of the offset.
     if (!IsFieldUsed(field, options_)) {
-      format(" | 0x80000000u  // unused\n");
-    }
-
-    // Embed whether the field is eagerly verified lazy or inlined string to the
-    // LSB of the offset.
-    if (IsEagerlyVerifiedLazy(field, options_, scc_analyzer_)) {
-      format(" | 0x1u  // eagerly verified lazy\n");
+      format(" | 0x80000000u, // unused\n");
+    } else if (IsEagerlyVerifiedLazy(field, options_, scc_analyzer_)) {
+      format(" | 0x1u, // eagerly verified lazy\n");
     } else if (IsStringInlined(field, options_)) {
-      format(" | 0x1u  // inlined\n");
+      format(" | 0x1u, // inlined\n");
+    } else {
+      format(",\n");
     }
-    format(",\n");
   }
 
   int count = 0;
@@ -2802,7 +2796,7 @@ void MessageGenerator::GenerateSharedConstructorCode(io::Printer* printer) {
   if (HasSimpleBaseClass(descriptor_, options_)) return;
   Formatter format(printer, variables_);
 
-  format("inline void $classname$::SharedCtor() {\n");
+  format("void $classname$::SharedCtor() {\n");
 
   std::vector<bool> processed(optimized_order_.size(), false);
   GenerateConstructorBody(printer, processed, false);
@@ -3125,9 +3119,7 @@ void MessageGenerator::GenerateStructors(io::Printer* printer) {
         "metadata_);\n");
 
     if (descriptor_->extension_range_count() > 0) {
-      format(
-          "_extensions_.MergeFrom(internal_default_instance(), "
-          "from._extensions_);\n");
+      format("_extensions_.MergeFrom(from._extensions_);\n");
     }
 
     GenerateConstructorBody(printer, processed, true);
@@ -3722,9 +3714,7 @@ void MessageGenerator::GenerateClassSpecificMergeFrom(io::Printer* printer) {
   // Merging of extensions and unknown fields is done last, to maximize
   // the opportunity for tail calls.
   if (descriptor_->extension_range_count() > 0) {
-    format(
-        "_extensions_.MergeFrom(internal_default_instance(), "
-        "from._extensions_);\n");
+    format("_extensions_.MergeFrom(from._extensions_);\n");
   }
 
   format(
@@ -4526,7 +4516,42 @@ void MessageGenerator::GenerateIsInitialized(io::Printer* printer) {
 
   // Now check that all non-oneof embedded messages are initialized.
   for (auto field : optimized_order_) {
-    field_generators_.get(field).GenerateIsInitialized(printer);
+    // TODO(ckennelly): Push this down into a generator?
+    if (field->cpp_type() == FieldDescriptor::CPPTYPE_MESSAGE &&
+        !ShouldIgnoreRequiredFieldCheck(field, options_) &&
+        scc_analyzer_->HasRequiredFields(field->message_type())) {
+      if (field->is_repeated()) {
+        if (IsImplicitWeakField(field, options_, scc_analyzer_)) {
+          format(
+              "if "
+              "(!::$proto_ns$::internal::AllAreInitializedWeak($1$_.weak)"
+              ")"
+              " return false;\n",
+              FieldName(field));
+        } else {
+          format(
+              "if (!::$proto_ns$::internal::AllAreInitialized($1$_))"
+              " return false;\n",
+              FieldName(field));
+        }
+      } else if (field->options().weak()) {
+        continue;
+      } else if (IsEagerlyVerifiedLazy(field, options_, scc_analyzer_)) {
+        GOOGLE_CHECK(!field->real_containing_oneof());
+        format(
+            "if (_internal_has_$1$()) {\n"
+            "  if (!$1$().IsInitialized()) return false;\n"
+            "}\n",
+            FieldName(field));
+      } else {
+        GOOGLE_CHECK(!field->real_containing_oneof());
+        format(
+            "if (_internal_has_$1$()) {\n"
+            "  if (!$1$_->IsInitialized()) return false;\n"
+            "}\n",
+            FieldName(field));
+      }
+    }
   }
   if (num_weak_fields_) {
     // For Weak fields.
@@ -4554,9 +4579,23 @@ void MessageGenerator::GenerateIsInitialized(io::Printer* printer) {
     for (auto field : FieldRange(oneof)) {
       format("case k$1$: {\n", UnderscoresToCamelCase(field->name(), true));
       format.Indent();
-      if (!IsFieldStripped(field, options_)) {
-        field_generators_.get(field).GenerateIsInitialized(printer);
+
+      if (!IsFieldStripped(field, options_) &&
+          field->cpp_type() == FieldDescriptor::CPPTYPE_MESSAGE &&
+          !ShouldIgnoreRequiredFieldCheck(field, options_) &&
+          scc_analyzer_->HasRequiredFields(field->message_type())) {
+        GOOGLE_CHECK(!(field->options().weak() || !field->real_containing_oneof()));
+        if (field->options().weak()) {
+          // Just skip.
+        } else {
+          format(
+              "if (has_$1$()) {\n"
+              "  if (!this->$1$().IsInitialized()) return false;\n"
+              "}\n",
+              FieldName(field));
+        }
       }
+
       format("break;\n");
       format.Outdent();
       format("}\n");

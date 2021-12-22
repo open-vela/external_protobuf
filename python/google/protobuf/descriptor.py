@@ -647,7 +647,7 @@ class EnumDescriptor(_NestedDescriptorBase):
     full_name (str): Full name of the type, including package name
       and any enclosing type(s).
 
-    values (list[EnumValueDescriptor]): List of the values
+    values (list[EnumValueDescriptors]): List of the values
       in this enum.
     values_by_name (dict(str, EnumValueDescriptor)): Same as :attr:`values`,
       but indexed by the "name" field of each EnumValueDescriptor.
@@ -951,7 +951,7 @@ class FileDescriptor(DescriptorBase):
     public_dependencies (list[FileDescriptor]): A subset of
       :attr:`dependencies`, which were declared as "public".
     message_types_by_name (dict(str, Descriptor)): Mapping from message names
-      to their :class:`Descriptor`.
+      to their :class:`Desctiptor`.
     enum_types_by_name (dict(str, EnumDescriptor)): Mapping from enum names to
       their :class:`EnumDescriptor`.
     extensions_by_name (dict(str, FieldDescriptor)): Mapping from extension

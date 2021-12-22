@@ -1,4 +1,6 @@
+#! /usr/bin/env python
 # -*- coding: utf-8 -*-
+#
 # Protocol Buffers - Google's data interchange format
 # Copyright 2008 Google Inc.  All rights reserved.
 # https://developers.google.com/protocol-buffers/
@@ -2033,7 +2035,7 @@ class Proto3Test(unittest.TestCase):
 
   def testMergeFromBadType(self):
     msg = map_unittest_pb2.TestMap()
-    with self.assertRaisesRegex(
+    with self.assertRaisesRegexp(
         TypeError,
         r'Parameter to MergeFrom\(\) must be instance of same class: expected '
         r'.+TestMap got int\.'):
@@ -2041,7 +2043,7 @@ class Proto3Test(unittest.TestCase):
 
   def testCopyFromBadType(self):
     msg = map_unittest_pb2.TestMap()
-    with self.assertRaisesRegex(
+    with self.assertRaisesRegexp(
         TypeError,
         r'Parameter to [A-Za-z]*From\(\) must be instance of same class: '
         r'expected .+TestMap got int\.'):

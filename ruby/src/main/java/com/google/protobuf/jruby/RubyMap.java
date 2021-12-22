@@ -37,6 +37,7 @@ import com.google.protobuf.DynamicMessage;
 import org.jruby.*;
 import org.jruby.anno.JRubyClass;
 import org.jruby.anno.JRubyMethod;
+import org.jruby.internal.runtime.methods.DynamicMethod;
 import org.jruby.runtime.Block;
 import org.jruby.runtime.Helpers;
 import org.jruby.runtime.ObjectAllocator;
@@ -79,12 +80,11 @@ public class RubyMap extends RubyObject {
      * on the same values as field-type symbols in message descriptors) that
      * indicate the type of the map key and value fields.
      *
-     * The supported key types are: :int32, :int64, :uint32, :uint64, :fixed32,
-     * :fixed64, :sfixed32, :sfixed64, :sint32, :sint64, :bool, :string, :bytes.
+     * The supported key types are: :int32, :int64, :uint32, :uint64, :bool,
+     * :string, :bytes.
      *
-     * The supported value types are: :int32, :int64, :uint32, :uint64, :fixed32,
-     * :fixed64, :sfixed32, :sfixed64, :sint32, :sint64, :bool, :string, :bytes,
-     * :enum, :message.
+     * The supported value types are: :int32, :int64, :uint32, :uint64, :bool,
+     * :string, :bytes, :enum, :message.
      *
      * The third argument, value_typeclass, must be present if value_type is :enum
      * or :message. As in RepeatedField#new, this argument must be a message class
@@ -113,14 +113,8 @@ public class RubyMap extends RubyObject {
                 break;
             case INT32:
             case INT64:
-            case SINT32:
-            case SINT64:
             case UINT32:
             case UINT64:
-            case FIXED32:
-            case FIXED64:
-            case SFIXED32:
-            case SFIXED64:
             case BOOL:
                 // These are OK.
                 break;
@@ -160,7 +154,7 @@ public class RubyMap extends RubyObject {
          * other types for keys, so deal with them specifically first
          */
         if (keyTypeIsString && !(key instanceof RubySymbol || key instanceof RubyString)) {
-            throw Utils.createTypeError(context, "Expected string for map key");
+            throw context.runtime.newTypeError("Expected string for map key");
         }
         key = Utils.checkType(context, keyType, "key", key, (RubyModule) valueTypeClass);
         value = Utils.checkType(context, valueType, "value", value, (RubyModule) valueTypeClass);
@@ -332,7 +326,7 @@ public class RubyMap extends RubyObject {
      *
      * Returns the number of entries (key-value pairs) in the map.
      */
-    @JRubyMethod(name = {"length", "size"})
+    @JRubyMethod
     public IRubyObject length(ThreadContext context) {
         return context.runtime.newFixnum(this.table.size());
     }
@@ -405,7 +399,7 @@ public class RubyMap extends RubyObject {
 
     protected RubyMap mergeIntoSelf(final ThreadContext context, IRubyObject hashmap) {
         if (hashmap instanceof RubyHash) {
-            ((RubyHash) hashmap).visitAll(context, new RubyHash.Visitor() {
+            ((RubyHash) hashmap).visitAll(new RubyHash.Visitor() {
                 @Override
                 public void visit(IRubyObject key, IRubyObject val) {
                     if (val instanceof RubyHash && !valueTypeClass.isNil()) {
@@ -413,14 +407,14 @@ public class RubyMap extends RubyObject {
                     }
                     indexSet(context, key, val);
                 }
-            }, null);
+            });
         } else if (hashmap instanceof RubyMap) {
             RubyMap other = (RubyMap) hashmap;
             if (!typeCompatible(other)) {
                 throw Utils.createTypeError(context, "Attempt to merge Map with mismatching types");
             }
         } else {
-            throw Utils.createTypeError(context, "Unknown type merging into Map");
+            throw context.runtime.newTypeError("Unknown type merging into Map");
         }
         return this;
     }

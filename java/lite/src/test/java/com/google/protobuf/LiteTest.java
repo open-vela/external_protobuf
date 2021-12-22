@@ -55,7 +55,6 @@ import map_lite_test.MapTestProto.TestMap;
 import map_lite_test.MapTestProto.TestMap.MessageValue;
 import protobuf_unittest.NestedExtensionLite;
 import protobuf_unittest.NonNestedExtensionLite;
-import protobuf_unittest.UnittestProto.TestOneof2;
 import protobuf_unittest.lite_equals_and_hash.LiteEqualsAndHash.Bar;
 import protobuf_unittest.lite_equals_and_hash.LiteEqualsAndHash.BarPrime;
 import protobuf_unittest.lite_equals_and_hash.LiteEqualsAndHash.Foo;
@@ -68,7 +67,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -1432,41 +1430,6 @@ public class LiteTest {
   }
 
   @Test
-  public void testMergeFrom_failureWhenReadingValue_propagatesOriginalException() {
-    final byte[] bytes = TestOneof2.newBuilder().setFooInt(123).build().toByteArray();
-    final IOException injectedException = new IOException("oh no");
-    CodedInputStream failingInputStream =
-        CodedInputStream.newInstance(
-            new InputStream() {
-              boolean first = true;
-
-              @Override
-              public int read(byte[] b, int off, int len) throws IOException {
-                if (!first) {
-                  throw injectedException;
-                }
-                first = false;
-                System.arraycopy(bytes, 0, b, off, len);
-                return len;
-              }
-
-              @Override
-              public int read() {
-                throw new UnsupportedOperationException();
-              }
-            },
-            bytes.length - 1);
-    TestOneof2.Builder builder = TestOneof2.newBuilder();
-
-    try {
-      builder.mergeFrom(failingInputStream, ExtensionRegistryLite.getEmptyRegistry());
-      assertWithMessage("Expected mergeFrom to fail").fail();
-    } catch (IOException e) {
-      assertThat(e).isSameInstanceAs(injectedException);
-    }
-  }
-
-  @Test
   public void testToStringDefaultInstance() throws Exception {
     assertToStringEquals("", TestAllTypesLite.getDefaultInstance());
   }
@@ -1721,7 +1684,7 @@ public class LiteTest {
   public void testMergeFromStream_invalidBytes() throws Exception {
     TestAllTypesLite.Builder builder = TestAllTypesLite.newBuilder().setDefaultBool(true);
     try {
-      builder.mergeFrom(CodedInputStream.newInstance("Invalid bytes".getBytes(StandardCharsets.UTF_8)));
+      builder.mergeFrom(CodedInputStream.newInstance("Invalid bytes".getBytes(Internal.UTF_8)));
       assertWithMessage("expected exception").fail();
     } catch (InvalidProtocolBufferException expected) {
     }
@@ -2751,36 +2714,6 @@ public class LiteTest {
                 encodeHex(serializedMessage), expectedString, encodeHex(expectedBytes)))
         .that(contains(serializedMessage, expectedBytes))
         .isTrue();
-  }
-
-  @Test
-  public void testPreservesFloatingPointNegative0() throws Exception {
-    proto3_unittest.UnittestProto3.TestAllTypes message =
-        proto3_unittest.UnittestProto3.TestAllTypes.newBuilder()
-            .setOptionalFloat(-0.0f)
-            .setOptionalDouble(-0.0)
-            .build();
-    assertThat(
-            proto3_unittest.UnittestProto3.TestAllTypes.parseFrom(
-                message.toByteString(), ExtensionRegistryLite.getEmptyRegistry()))
-        .isEqualTo(message);
-  }
-
-  @Test
-  public void testNegative0FloatingPointEquality() throws Exception {
-    // Like Double#equals and Float#equals, we treat -0.0 as not being equal to +0.0 even though
-    // IEEE 754 mandates that they are equivalent. This test asserts that behavior.
-    proto3_unittest.UnittestProto3.TestAllTypes message1 =
-        proto3_unittest.UnittestProto3.TestAllTypes.newBuilder()
-            .setOptionalFloat(-0.0f)
-            .setOptionalDouble(-0.0)
-            .build();
-    proto3_unittest.UnittestProto3.TestAllTypes message2 =
-        proto3_unittest.UnittestProto3.TestAllTypes.newBuilder()
-            .setOptionalFloat(0.0f)
-            .setOptionalDouble(0.0)
-            .build();
-    assertThat(message1).isNotEqualTo(message2);
   }
 
   private String encodeHex(ByteString bytes) {

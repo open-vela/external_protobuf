@@ -1,3 +1,5 @@
+#! /usr/bin/env python
+#
 # Protocol Buffers - Google's data interchange format
 # Copyright 2008 Google Inc.  All rights reserved.
 # https://developers.google.com/protocol-buffers/
@@ -49,28 +51,6 @@ from google.protobuf import text_format
 
 TEST_EMPTY_MESSAGE_DESCRIPTOR_ASCII = """
 name: 'TestEmptyMessage'
-"""
-
-TEST_FILE_DESCRIPTOR_DEBUG = """syntax = "proto2";
-
-package protobuf_unittest;
-
-message NestedMessage {
-  enum ForeignEnum {
-    FOREIGN_FOO = 4;
-    FOREIGN_BAR = 5;
-    FOREIGN_BAZ = 6;
-  }
-  optional int32 bb = 1;
-}
-
-message ResponseMessage {
-}
-
-service Service {
-  rpc CallMethod(.protobuf_unittest.NestedMessage) returns (.protobuf_unittest.ResponseMessage);
-}
-
 """
 
 
@@ -142,13 +122,6 @@ class DescriptorTest(unittest.TestCase):
 
   def testContainingServiceFixups(self):
     self.assertEqual(self.my_service, self.my_method.containing_service)
-
-  @unittest.skipIf(
-    api_implementation.Type() != 'cpp',
-    'GetDebugString is only available with the cpp implementation',
-  )
-  def testGetDebugString(self):
-    self.assertEqual(self.my_file.GetDebugString(), TEST_FILE_DESCRIPTOR_DEBUG)
 
   def testGetOptions(self):
     self.assertEqual(self.my_enum.GetOptions(),
