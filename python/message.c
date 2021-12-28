@@ -29,7 +29,6 @@
 
 #include "python/convert.h"
 #include "python/descriptor.h"
-#include "python/repeated.h"
 #include "upb/def.h"
 #include "upb/reflection.h"
 #include "upb/text_encode.h"
@@ -336,14 +335,14 @@ static bool PyUpb_CMessage_InitMapAttribute(PyObject* _self, PyObject* name,
   return false;
 }
 
-static bool PyUpb_CMessage_InitRepeatedAttribute(PyObject* _self,
-                                                 PyObject* name,
-                                                 PyObject* value) {
-  PyObject* repeated = PyUpb_CMessage_GetAttr(_self, name);
-  PyObject* tmp = PyUpb_RepeatedContainer_Extend(repeated, value);
-  if (!tmp) return false;
-  Py_DECREF(tmp);
-  return true;
+static bool PyUpb_CMessage_InitRepeatedAttribute(void) {
+  // TODO(haberman): disabled until repeated container is in.
+  // PyObject* repeated = PyUpb_CMessage_GetAttr(_self, name);
+  // PyObject* tmp = PyUpb_RepeatedContainer_Extend(repeated, value);
+  // if (!tmp) return -1;
+  // Py_DECREF(tmp);
+  PyErr_SetString(PyExc_NotImplementedError, "repeated init");
+  return false;
 }
 
 static bool PyUpb_CMessage_InitMessageAttribute(PyObject* _self, PyObject* name,
@@ -414,7 +413,7 @@ int PyUpb_CMessage_InitAttributes(PyObject* _self, PyObject* args,
     if (upb_fielddef_ismap(f)) {
       if (!PyUpb_CMessage_InitMapAttribute(_self, name, f, value)) return -1;
     } else if (upb_fielddef_isseq(f)) {
-      if (!PyUpb_CMessage_InitRepeatedAttribute(_self, name, value)) return -1;
+      if (!PyUpb_CMessage_InitRepeatedAttribute()) return -1;
     } else if (upb_fielddef_issubmsg(f)) {
       if (!PyUpb_CMessage_InitMessageAttribute(_self, name, value)) return -1;
     } else {
@@ -602,7 +601,8 @@ static void PyUpb_CMessage_SyncSubobjs(PyUpb_CMessage* self) {
       // PyUpb_MapContainer_SwitchToSet(obj, (upb_map*)msgval.map_val);
     } else if (upb_fielddef_isseq(f)) {
       if (!msgval.array_val) continue;
-      PyUpb_RepeatedContainer_Reify(obj, (upb_array*)msgval.array_val);
+      // TODO(haberman): re-enable when repeated fields are checked in.
+      // PyUpb_RepeatedContainer_SwitchToSet(obj, (upb_array*)msgval.array_val);
     } else {
       PyUpb_CMessage* sub = (void*)obj;
       assert(self == sub->ptr.parent);
@@ -718,7 +718,6 @@ PyObject* PyUpb_CMessage_Get(upb_msg* u_msg, const upb_msgdef* m,
 
 PyObject* PyUpb_CMessage_GetUnsetWrapper(PyUpb_CMessage* self,
                                          const upb_fielddef* field) {
-  PyObject* _self = (void*)self;
   // Non-present messages return magical "empty" messages that point to their
   // parent, but will materialize into real messages if any fields are
   // assigned.
@@ -735,7 +734,10 @@ PyObject* PyUpb_CMessage_GetUnsetWrapper(PyUpb_CMessage* self,
     PyErr_SetString(PyExc_NotImplementedError, "unset map");
     return NULL;
   } else if (upb_fielddef_isseq(field)) {
-    subobj = PyUpb_RepeatedContainer_NewUnset(_self, field, self->arena);
+    // TODO(haberman): re-enable when repeated fields are checked in.
+    // subobj = PyUpb_RepeatedContainer_NewUnset(_self, field, self->arena);
+    PyErr_SetString(PyExc_NotImplementedError, "unset repeated");
+    return NULL;
   } else {
     subobj = PyUpb_CMessage_NewUnset(&self->ob_base, field, self->arena);
   }
@@ -758,8 +760,11 @@ PyObject* PyUpb_CMessage_GetPresentWrapper(PyUpb_CMessage* self,
     PyErr_SetString(PyExc_NotImplementedError, "access map");
     return NULL;
   } else {
-    return PyUpb_RepeatedContainer_GetOrCreateWrapper(mutval.array, field,
-                                                      self->arena);
+    // TODO(haberman): re-enable when repeated fields are checked in.
+    // return PyUpb_RepeatedContainer_GetOrCreateWrapper(mutval.array, _self,
+    //                                                   field, self->arena);
+    PyErr_SetString(PyExc_NotImplementedError, "access repeated");
+    return NULL;
   }
 }
 
@@ -925,7 +930,7 @@ static PyObject* PyUpb_CMessage_ListFields(PyObject* _self, PyObject* arg) {
     field_desc = NULL;
     py_val = NULL;
     if (!tuple) goto err;
-    if (!PyList_Append(list, tuple)) goto err;
+    if (PyList_Append(list, tuple)) goto err;
     Py_DECREF(tuple);
     tuple = NULL;
   }
