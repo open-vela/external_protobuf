@@ -27,7 +27,6 @@
 
 #include "python/convert.h"
 
-#include "python/message.h"
 #include "python/protobuf.h"
 #include "upb/reflection.h"
 #include "upb/util/compare.h"
@@ -54,8 +53,9 @@ PyObject* PyUpb_UpbToPy(upb_msgval val, const upb_fielddef *f, PyObject *arena) 
     case UPB_TYPE_STRING:
       return PyUnicode_DecodeUTF8(val.str_val.data, val.str_val.size, NULL);
     case UPB_TYPE_MESSAGE:
-      return PyUpb_CMessage_Get((upb_msg*)val.msg_val,
-                                upb_fielddef_msgsubdef(f), arena);
+      PyErr_Format(PyExc_NotImplementedError,
+                   "Conversion of message types not yet implemented");
+      return NULL;
     default:
       PyErr_Format(PyExc_SystemError,
                    "Getting a value from a field of unknown type %d",
