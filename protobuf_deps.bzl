@@ -29,7 +29,7 @@ def protobuf_deps():
     if not native.existing_rule("zlib"):
         http_archive(
             name = "zlib",
-            build_file = Label("//:third_party/zlib.BUILD"),
+            build_file = "@com_google_protobuf//:third_party/zlib.BUILD",
             sha256 = "629380c90a77b964d896ed37163f5c3a34f6e6d897311f1df2a7016355c45eff",
             strip_prefix = "zlib-1.2.11",
             urls = ["https://github.com/madler/zlib/archive/v1.2.11.tar.gz"],
@@ -72,14 +72,4 @@ def protobuf_deps():
             sha256 = "f36441aa876c4f6427bfb2d1f2d723b48e9d930b62662bf723ddfb8fc80f0140",
             strip_prefix = "rules_jvm_external-4.1",
             urls = ["https://github.com/bazelbuild/rules_jvm_external/archive/4.1.zip"],
-        )
-    
-    if not native.existing_rule("rules_pkg"):
-        http_archive(
-            name = "rules_pkg",
-            urls = [
-                "https://mirror.bazel.build/github.com/bazelbuild/rules_pkg/releases/download/0.5.1/rules_pkg-0.5.1.tar.gz",
-                "https://github.com/bazelbuild/rules_pkg/releases/download/0.5.1/rules_pkg-0.5.1.tar.gz",
-            ],
-            sha256 = "a89e203d3cf264e564fcb96b6e06dd70bc0557356eb48400ce4b5d97c2c3720d",
         )

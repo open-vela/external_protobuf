@@ -148,7 +148,10 @@ __author__ = 'tmarek@google.com (Torsten Marek)'
 import functools
 import re
 import types
-import unittest
+try:
+  import unittest2 as unittest
+except ImportError:
+  import unittest
 import uuid
 
 try:
