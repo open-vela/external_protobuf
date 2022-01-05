@@ -67,7 +67,7 @@ using internal::WireFormatLite;
 namespace {
 std::string MapValueImmutableClassdName(const Descriptor* descriptor,
                                         ClassNameResolver* name_resolver) {
-  const FieldDescriptor* value_field = descriptor->map_value();
+  const FieldDescriptor* value_field = descriptor->FindFieldByName("value");
   GOOGLE_CHECK_EQ(FieldDescriptor::TYPE_MESSAGE, value_field->type());
   return name_resolver->GetImmutableClassName(value_field->message_type());
 }
