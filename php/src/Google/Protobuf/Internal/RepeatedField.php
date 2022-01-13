@@ -39,7 +39,6 @@ namespace Google\Protobuf\Internal;
 
 use Google\Protobuf\Internal\GPBType;
 use Google\Protobuf\Internal\GPBUtil;
-use Traversable;
 
 /**
  * RepeatedField is used by generated protocol message classes to manipulate
@@ -122,7 +121,6 @@ class RepeatedField implements \ArrayAccess, \IteratorAggregate, \Countable
      * @throws \ErrorException Invalid type for index.
      * @throws \ErrorException Non-existing index.
      */
-    #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         return $this->container[$offset];
@@ -140,7 +138,7 @@ class RepeatedField implements \ArrayAccess, \IteratorAggregate, \Countable
      * @throws \ErrorException Non-existing index.
      * @throws \ErrorException Incorrect type of the element.
      */
-    public function offsetSet($offset, $value): void
+    public function offsetSet($offset, $value)
     {
         switch ($this->type) {
             case GPBType::SFIXED32:
@@ -211,7 +209,7 @@ class RepeatedField implements \ArrayAccess, \IteratorAggregate, \Countable
      * @throws \ErrorException The element to be removed is not at the end of the
      * RepeatedField.
      */
-    public function offsetUnset($offset): void
+    public function offsetUnset($offset)
     {
         $count = count($this->container);
         if (!is_numeric($offset) || $count === 0 || $offset !== $count - 1) {
@@ -232,7 +230,7 @@ class RepeatedField implements \ArrayAccess, \IteratorAggregate, \Countable
      * @return bool True if the element at the given offset exists.
      * @throws \ErrorException Invalid type for index.
      */
-    public function offsetExists($offset): bool
+    public function offsetExists($offset)
     {
         return isset($this->container[$offset]);
     }
@@ -240,7 +238,7 @@ class RepeatedField implements \ArrayAccess, \IteratorAggregate, \Countable
     /**
      * @ignore
      */
-    public function getIterator(): Traversable
+    public function getIterator()
     {
         return new RepeatedFieldIter($this->container);
     }
@@ -252,7 +250,7 @@ class RepeatedField implements \ArrayAccess, \IteratorAggregate, \Countable
      *
      * @return integer The number of stored elements.
      */
-    public function count(): int
+    public function count()
     {
         return count($this->container);
     }

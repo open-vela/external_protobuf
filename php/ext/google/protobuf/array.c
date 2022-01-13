@@ -287,7 +287,7 @@ PHP_METHOD(RepeatedField, append) {
 }
 
 /**
- * RepeatedField::offsetExists(): bool
+ * RepeatedField::offsetExists()
  *
  * Implements the ArrayAccess interface. Invoked when PHP code calls:
  *
@@ -309,7 +309,7 @@ PHP_METHOD(RepeatedField, offsetExists) {
 }
 
 /**
- * RepeatedField::offsetGet(): mixed
+ * RepeatedField::offsetGet()
  *
  * Implements the ArrayAccess interface. Invoked when PHP code calls:
  *
@@ -341,7 +341,7 @@ PHP_METHOD(RepeatedField, offsetGet) {
 }
 
 /**
- * RepeatedField::offsetSet(): void
+ * RepeatedField::offsetSet()
  *
  * Implements the ArrayAccess interface. Invoked when PHP code calls:
  *
@@ -386,7 +386,7 @@ PHP_METHOD(RepeatedField, offsetSet) {
 }
 
 /**
- * RepeatedField::offsetUnset(): void
+ * RepeatedField::offsetUnset()
  *
  * Implements the ArrayAccess interface. Invoked when PHP code calls:
  *
@@ -416,7 +416,7 @@ PHP_METHOD(RepeatedField, offsetUnset) {
 }
 
 /**
- * RepeatedField::count(): int
+ * RepeatedField::count()
  *
  * Implements the Countable interface. Invoked when PHP code calls:
  *
@@ -436,7 +436,7 @@ PHP_METHOD(RepeatedField, count) {
 }
 
 /**
- * RepeatedField::getIterator(): Traversable
+ * RepeatedField::getIterator()
  *
  * Implements the IteratorAggregate interface. Invoked when PHP code calls:
  *
@@ -459,39 +459,24 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_append, 0, 0, 1)
   ZEND_ARG_INFO(0, newval)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_WITH_TENTATIVE_RETURN_TYPE_INFO_EX(arginfo_offsetGet, 0, 0, IS_MIXED, 1)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_offsetGet, 0, 0, 1)
   ZEND_ARG_INFO(0, index)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_count, 0, 0, IS_LONG, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_offsetSet, 0, 2, IS_VOID, 0)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_offsetSet, 0, 0, 2)
   ZEND_ARG_INFO(0, index)
   ZEND_ARG_INFO(0, newval)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_offsetUnset, 0, 0, IS_VOID, 0)
-  ZEND_ARG_INFO(0, index)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_offsetExists, 0, 0, _IS_BOOL, 0)
-  ZEND_ARG_INFO(0, index)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_getIterator, 0, 0, Traversable, 0)
-ZEND_END_ARG_INFO()
-
-
 static zend_function_entry repeated_field_methods[] = {
-  PHP_ME(RepeatedField, __construct,  arginfo_construct,    ZEND_ACC_PUBLIC)
-  PHP_ME(RepeatedField, append,       arginfo_append,       ZEND_ACC_PUBLIC)
-  PHP_ME(RepeatedField, offsetExists, arginfo_offsetExists, ZEND_ACC_PUBLIC)
-  PHP_ME(RepeatedField, offsetGet,    arginfo_offsetGet,    ZEND_ACC_PUBLIC)
-  PHP_ME(RepeatedField, offsetSet,    arginfo_offsetSet,    ZEND_ACC_PUBLIC)
-  PHP_ME(RepeatedField, offsetUnset,  arginfo_offsetUnset,  ZEND_ACC_PUBLIC)
-  PHP_ME(RepeatedField, count,        arginfo_count,        ZEND_ACC_PUBLIC)
-  PHP_ME(RepeatedField, getIterator,  arginfo_getIterator,  ZEND_ACC_PUBLIC)
+  PHP_ME(RepeatedField, __construct,  arginfo_construct, ZEND_ACC_PUBLIC)
+  PHP_ME(RepeatedField, append,       arginfo_append,    ZEND_ACC_PUBLIC)
+  PHP_ME(RepeatedField, offsetExists, arginfo_offsetGet, ZEND_ACC_PUBLIC)
+  PHP_ME(RepeatedField, offsetGet,    arginfo_offsetGet, ZEND_ACC_PUBLIC)
+  PHP_ME(RepeatedField, offsetSet,    arginfo_offsetSet, ZEND_ACC_PUBLIC)
+  PHP_ME(RepeatedField, offsetUnset,  arginfo_offsetGet, ZEND_ACC_PUBLIC)
+  PHP_ME(RepeatedField, count,        arginfo_void,      ZEND_ACC_PUBLIC)
+  PHP_ME(RepeatedField, getIterator,  arginfo_void,      ZEND_ACC_PUBLIC)
   ZEND_FE_END
 };
 
@@ -565,7 +550,7 @@ static void RepeatedFieldIter_make(zval *val, zval *repeated_field) {
  */
 
 /**
- * RepeatedFieldIter::rewind(): void
+ * RepeatedFieldIter::rewind()
  *
  * Implements the Iterator interface. Sets the iterator to the first element.
  */
@@ -575,7 +560,7 @@ PHP_METHOD(RepeatedFieldIter, rewind) {
 }
 
 /**
- * RepeatedFieldIter::current(): mixed
+ * RepeatedFieldIter::current()
  *
  * Implements the Iterator interface. Returns the current value.
  */
@@ -598,7 +583,7 @@ PHP_METHOD(RepeatedFieldIter, current) {
 }
 
 /**
- * RepeatedFieldIter::key(): mixed
+ * RepeatedFieldIter::key()
  *
  * Implements the Iterator interface. Returns the current key.
  */
@@ -608,7 +593,7 @@ PHP_METHOD(RepeatedFieldIter, key) {
 }
 
 /**
- * RepeatedFieldIter::next(): void
+ * RepeatedFieldIter::next()
  *
  * Implements the Iterator interface. Advances to the next element.
  */
@@ -618,7 +603,7 @@ PHP_METHOD(RepeatedFieldIter, next) {
 }
 
 /**
- * RepeatedFieldIter::valid(): bool
+ * RepeatedFieldIter::valid()
  *
  * Implements the Iterator interface. Returns true if this is a valid element.
  */
@@ -628,27 +613,12 @@ PHP_METHOD(RepeatedFieldIter, valid) {
   RETURN_BOOL(intern->position < upb_array_size(field->array));
 }
 
-ZEND_BEGIN_ARG_WITH_TENTATIVE_RETURN_TYPE_INFO_EX(arginfo_current, 0, 0, IS_MIXED, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_TENTATIVE_RETURN_TYPE_INFO_EX(arginfo_key, 0, 0, IS_MIXED, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_next, 0, 0, IS_VOID, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_valid, 0, 0, _IS_BOOL, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_rewind, 0, 0, IS_VOID, 0)
-ZEND_END_ARG_INFO()
-
 static zend_function_entry repeated_field_iter_methods[] = {
-  PHP_ME(RepeatedFieldIter, rewind,      arginfo_rewind, ZEND_ACC_PUBLIC)
-  PHP_ME(RepeatedFieldIter, current,     arginfo_current,   ZEND_ACC_PUBLIC)
-  PHP_ME(RepeatedFieldIter, key,         arginfo_key,   ZEND_ACC_PUBLIC)
-  PHP_ME(RepeatedFieldIter, next,        arginfo_next,   ZEND_ACC_PUBLIC)
-  PHP_ME(RepeatedFieldIter, valid,       arginfo_valid,  ZEND_ACC_PUBLIC)
+  PHP_ME(RepeatedFieldIter, rewind,      arginfo_void, ZEND_ACC_PUBLIC)
+  PHP_ME(RepeatedFieldIter, current,     arginfo_void, ZEND_ACC_PUBLIC)
+  PHP_ME(RepeatedFieldIter, key,         arginfo_void, ZEND_ACC_PUBLIC)
+  PHP_ME(RepeatedFieldIter, next,        arginfo_void, ZEND_ACC_PUBLIC)
+  PHP_ME(RepeatedFieldIter, valid,       arginfo_void, ZEND_ACC_PUBLIC)
   ZEND_FE_END
 };
 
