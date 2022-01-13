@@ -4,14 +4,14 @@
   <parent>
     <groupId>com.google.protobuf</groupId>
     <artifactId>protobuf-parent</artifactId>
-    <version>3.19.3</version>
+    <version>3.19.1</version>
   </parent>
 
   <artifactId>protobuf-kotlin-lite</artifactId>
 
-  <name>Protocol Buffers [Kotlin-Lite]</name>
+  <name>Protocol Buffers [Lite]</name>
   <description>
-    Lite version of Kotlin Protocol Buffers library. This version is optimized for code size, but does
+    Lite version of Protocol Buffers library. This version is optimized for code size, but does
     not guarantee API/ABI stability.
   </description>
 
