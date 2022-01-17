@@ -35,7 +35,6 @@
 #include <string.h>
 
 #include "upb/reflection.h"
-#include "upb/upb_internal.h"
 
 // Must be last.
 #include "upb/port_def.inc"
@@ -178,18 +177,12 @@ static void txtenc_field(txtenc* e, upb_MessageValue val,
     case kUpb_CType_Bool:
       txtenc_putstr(e, val.bool_val ? "true" : "false");
       break;
-    case kUpb_CType_Float: {
-      char buf[32];
-      _upb_EncodeRoundTripFloat(val.float_val, buf, sizeof(buf));
-      txtenc_putstr(e, buf);
+    case kUpb_CType_Float:
+      txtenc_printf(e, "%f", val.float_val);
       break;
-    }
-    case kUpb_CType_Double: {
-      char buf[32];
-      _upb_EncodeRoundTripDouble(val.double_val, buf, sizeof(buf));
-      txtenc_putstr(e, buf);
+    case kUpb_CType_Double:
+      txtenc_printf(e, "%f", val.double_val);
       break;
-    }
     case kUpb_CType_Int32:
       txtenc_printf(e, "%" PRId32, val.int32_val);
       break;
