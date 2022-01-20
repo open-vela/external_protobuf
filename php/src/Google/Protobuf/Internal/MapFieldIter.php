@@ -68,10 +68,9 @@ class MapFieldIter implements \Iterator
      *
      * @return void
      */
-    #[\ReturnTypeWillChange]
     public function rewind()
     {
-        reset($this->container);
+        return reset($this->container);
     }
 
     /**
@@ -79,7 +78,6 @@ class MapFieldIter implements \Iterator
      *
      * @return object The element at the current position.
      */
-    #[\ReturnTypeWillChange]
     public function current()
     {
         return current($this->container);
@@ -90,7 +88,6 @@ class MapFieldIter implements \Iterator
      *
      * @return object The current key.
      */
-    #[\ReturnTypeWillChange]
     public function key()
     {
         $key = key($this->container);
@@ -120,10 +117,9 @@ class MapFieldIter implements \Iterator
      *
      * @return void
      */
-    #[\ReturnTypeWillChange]
     public function next()
     {
-        next($this->container);
+        return next($this->container);
     }
 
     /**
@@ -131,7 +127,7 @@ class MapFieldIter implements \Iterator
      *
      * @return bool True if there are more elements to iterate.
      */
-    public function valid(): bool
+    public function valid()
     {
         return key($this->container) !== null;
     }
