@@ -239,8 +239,7 @@ namespace Google.Protobuf.Reflection
                 }
                 else
                 {
-                    // Packed by default with proto3
-                    return Proto.Options == null || !Proto.Options.HasPacked || Proto.Options.Packed;
+                    return !Proto.Options.HasPacked || Proto.Options.Packed;
                 }
             }
         }
