@@ -82,6 +82,28 @@ const zval *get_generated_pool();
 // PHP 7.2.0.
 #if PHP_VERSION_ID < 70200
 #define zend_ce_countable spl_ce_Countable
+#define ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(name, return_reference, required_num_args, class_name, allow_null) \
+        ZEND_BEGIN_ARG_INFO_EX(name, return_reference, required_num_args, allow_null)
+#endif
+
+// In PHP 8.1, mismatched tentative return types emit a deprecation notice.
+// https://wiki.php.net/rfc/internal_method_return_types
+//
+// When compiling for earlier php versions, the return type is dropped.
+#if PHP_VERSION_ID < 80100
+#define ZEND_BEGIN_ARG_WITH_TENTATIVE_RETURN_TYPE_INFO_EX(name, return_reference, required_num_args, type, allow_null) \
+        ZEND_BEGIN_ARG_INFO_EX(name, return_reference, required_num_args, allow_null)
+#define IS_MIXED 16
+#endif
+
+#if PHP_VERSION_ID < 70100
+#define IS_VOID 99
+#endif
+
+#ifndef IS_MIXED
+#define IS_MIXED 99
+#define IS_BOOL 99
+#define IS_LONG 99
 #endif
 
 ZEND_BEGIN_ARG_INFO(arginfo_void, 0)
@@ -91,7 +113,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_setter, 0, 0, 1)
   ZEND_ARG_INFO(0, value)
 ZEND_END_ARG_INFO()
 
-#define PHP_PROTOBUF_VERSION "3.19.3"
+#define PHP_PROTOBUF_VERSION "3.19.1"
 
 // ptr -> PHP object cache. This is a weak map that caches lazily-created
 // wrapper objects around upb types:
