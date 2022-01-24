@@ -31,33 +31,33 @@
 #ifndef __GOOGLE_PROTOBUF_RUBY_PROTOBUF_H__
 #define __GOOGLE_PROTOBUF_RUBY_PROTOBUF_H__
 
-#include <ruby/encoding.h>
 #include <ruby/ruby.h>
 #include <ruby/vm.h>
+#include <ruby/encoding.h>
 
-#include "defs.h"
 #include "ruby-upb.h"
+#include "defs.h"
 
 // These operate on a map field (i.e., a repeated field of submessages whose
 // submessage type is a map-entry msgdef).
-const upb_FieldDef* map_field_key(const upb_FieldDef* field);
-const upb_FieldDef* map_field_value(const upb_FieldDef* field);
+const upb_fielddef* map_field_key(const upb_fielddef* field);
+const upb_fielddef* map_field_value(const upb_fielddef* field);
 
 // -----------------------------------------------------------------------------
 // Arena
 // -----------------------------------------------------------------------------
 
-// A Ruby object that wraps an underlying upb_Arena.  Any objects that are
+// A Ruby object that wraps an underlying upb_arena.  Any objects that are
 // allocated from this arena should reference the Arena in rb_gc_mark(), to
 // ensure that the object's underlying memory outlives any Ruby object that can
 // reach it.
 
 VALUE Arena_new();
-upb_Arena* Arena_get(VALUE arena);
+upb_arena *Arena_get(VALUE arena);
 
 // Fuses this arena to another, throwing a Ruby exception if this is not
 // possible.
-void Arena_fuse(VALUE arena, upb_Arena* other);
+void Arena_fuse(VALUE arena, upb_arena *other);
 
 // Pins this Ruby object to the lifetime of this arena, so that as long as the
 // arena is alive this object will not be collected.
@@ -93,11 +93,10 @@ typedef struct StringBuilder StringBuilder;
 
 StringBuilder* StringBuilder_New();
 void StringBuilder_Free(StringBuilder* b);
-void StringBuilder_Printf(StringBuilder* b, const char* fmt, ...);
+void StringBuilder_Printf(StringBuilder* b, const char *fmt, ...);
 VALUE StringBuilder_ToRubyString(StringBuilder* b);
 
-void StringBuilder_PrintMsgval(StringBuilder* b, upb_MessageValue val,
-                               TypeInfo info);
+void StringBuilder_PrintMsgval(StringBuilder* b, upb_msgval val, TypeInfo info);
 
 // -----------------------------------------------------------------------------
 // Utilities.
@@ -106,9 +105,7 @@ void StringBuilder_PrintMsgval(StringBuilder* b, upb_MessageValue val,
 extern VALUE cTypeError;
 
 #ifdef NDEBUG
-#define PBRUBY_ASSERT(expr) \
-  do {                      \
-  } while (false && (expr))
+#define PBRUBY_ASSERT(expr) do {} while (false && (expr))
 #else
 #define PBRUBY_ASSERT(expr) assert(expr)
 #endif
