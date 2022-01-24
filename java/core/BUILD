@@ -231,7 +231,6 @@ java_library(
         "@maven//:com_google_guava_guava",
         "@maven//:junit_junit",
     ],
-    visibility = ["//java:__subpackages__"],
 )
 
 test_suite(
@@ -240,7 +239,6 @@ test_suite(
         "conformance_test",
         "core_build_test",
         "core_tests",
-        "utf8_tests",
     ],
 )
 
@@ -260,12 +258,10 @@ conformance_test(
 
 junit_tests(
     name = "core_tests",
-    size = "small",
+    size = "large",
     srcs = glob(
         ["src/test/java/**/*.java"],
         exclude = [
-            "src/test/java/com/google/protobuf/DecodeUtf8Test.java",
-            "src/test/java/com/google/protobuf/IsValidUtf8Test.java",
             "src/test/java/com/google/protobuf/TestUtil.java",
             "src/test/java/com/google/protobuf/TestUtilLite.java",
         ],
@@ -280,24 +276,6 @@ junit_tests(
         "@maven//:com_google_truth_truth",
         "@maven//:junit_junit",
         "@maven//:org_easymock_easymock",
-    ],
-)
-
-# The UTF-8 validation tests are much slower than the other tests, so they get
-# their own test target with a longer timeout.
-junit_tests(
-    name = "utf8_tests",
-    size = "large",
-    srcs = [
-        "src/test/java/com/google/protobuf/DecodeUtf8Test.java",
-        "src/test/java/com/google/protobuf/IsValidUtf8Test.java",
-        "src/test/java/com/google/protobuf/IsValidUtf8TestUtil.java",
-    ],
-    deps = [
-        ":core",
-        "@maven//:com_google_guava_guava",
-        "@maven//:com_google_truth_truth",
-        "@maven//:junit_junit",
     ],
 )
 
@@ -335,7 +313,6 @@ java_library(
     ],
     visibility = [
         "//java/lite:__pkg__",
-        "//java/kotlin-lite:__pkg__",
     ],
     deps = [
         ":generic_test_protos_java_proto_lite",
@@ -384,7 +361,6 @@ LITE_TEST_EXCLUSIONS = [
     "src/test/java/com/google/protobuf/TypeRegistryTest.java",
     "src/test/java/com/google/protobuf/UnknownEnumValueTest.java",
     "src/test/java/com/google/protobuf/UnknownFieldSetLiteTest.java",
-    "src/test/java/com/google/protobuf/UnknownFieldSetPerformanceTest.java",
     "src/test/java/com/google/protobuf/UnknownFieldSetTest.java",
     "src/test/java/com/google/protobuf/WellKnownTypesTest.java",
     "src/test/java/com/google/protobuf/WireFormatTest.java",
