@@ -33,6 +33,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 #if NET35
@@ -190,6 +191,7 @@ namespace Google.Protobuf.Reflection
         /// a wrapper type, and handle the result appropriately.
         /// </para>
         /// </remarks>
+        [DynamicallyAccessedMembers(GeneratedClrTypeInfo.MessageAccessibility)]
         public Type ClrType { get; }
 
         /// <summary>
