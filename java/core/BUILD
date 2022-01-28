@@ -176,6 +176,21 @@ proto_lang_toolchain(
     command_line = "--java_out=$(OUT)",
     runtime = ":core",
     visibility = ["//visibility:public"],
+    # keep this in sync w/ WELL_KNOWN_PROTO_MAP in //:BUILD
+    blacklisted_protos = [
+        "//:any_proto",
+        "//:api_proto",
+        "//:compiler_plugin_proto",
+        "//:descriptor_proto",
+        "//:duration_proto",
+        "//:empty_proto",
+        "//:field_mask_proto",
+        "//:source_context_proto",
+        "//:struct_proto",
+        "//:timestamp_proto",
+        "//:type_proto",
+        "//:wrappers_proto",
+    ],
 )
 
 proto_library(
@@ -216,6 +231,7 @@ java_library(
         "@maven//:com_google_guava_guava",
         "@maven//:junit_junit",
     ],
+    visibility = ["//java:__subpackages__"],
 )
 
 test_suite(
@@ -319,6 +335,7 @@ java_library(
     ],
     visibility = [
         "//java/lite:__pkg__",
+        "//java/kotlin-lite:__pkg__",
     ],
     deps = [
         ":generic_test_protos_java_proto_lite",
