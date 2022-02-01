@@ -30,6 +30,7 @@
 
 #include <google/protobuf/pyext/unknown_fields.h>
 
+#define PY_SSIZE_T_CLEAN
 #include <Python.h>
 #include <set>
 #include <memory>
@@ -218,7 +219,7 @@ const UnknownField* GetUnknownField(PyUnknownFieldRef* self) {
                  "The parent message might be cleared.");
     return nullptr;
   }
-  ssize_t total_size = fields->field_count();
+  Py_ssize_t total_size = fields->field_count();
   if (self->index >= total_size) {
     PyErr_Format(PyExc_ValueError,
                  "UnknownField does not exist. "
