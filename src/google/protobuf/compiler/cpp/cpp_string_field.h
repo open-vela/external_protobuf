@@ -37,7 +37,6 @@
 
 #include <map>
 #include <string>
-
 #include <google/protobuf/compiler/cpp/cpp_field.h>
 
 namespace google {
@@ -49,7 +48,7 @@ class StringFieldGenerator : public FieldGenerator {
  public:
   StringFieldGenerator(const FieldDescriptor* descriptor,
                        const Options& options);
-  ~StringFieldGenerator() override;
+  ~StringFieldGenerator();
 
   // implements FieldGenerator ---------------------------------------
   void GeneratePrivateMembers(io::Printer* printer) const override;
@@ -65,13 +64,11 @@ class StringFieldGenerator : public FieldGenerator {
   void GenerateConstructorCode(io::Printer* printer) const override;
   void GenerateCopyConstructorCode(io::Printer* printer) const override;
   void GenerateDestructorCode(io::Printer* printer) const override;
-  void GenerateArenaDestructorCode(io::Printer* printer) const override;
   void GenerateSerializeWithCachedSizesToArray(
       io::Printer* printer) const override;
   void GenerateByteSize(io::Printer* printer) const override;
   void GenerateConstinitInitializer(io::Printer* printer) const override;
   bool IsInlined() const override { return inlined_; }
-  ArenaDtorNeeds NeedsArenaDestructor() const override;
 
  private:
   bool inlined_;
@@ -82,7 +79,7 @@ class StringOneofFieldGenerator : public StringFieldGenerator {
  public:
   StringOneofFieldGenerator(const FieldDescriptor* descriptor,
                             const Options& options);
-  ~StringOneofFieldGenerator() override;
+  ~StringOneofFieldGenerator();
 
   // implements FieldGenerator ---------------------------------------
   void GenerateInlineAccessorDefinitions(io::Printer* printer) const override;
@@ -102,7 +99,7 @@ class RepeatedStringFieldGenerator : public FieldGenerator {
  public:
   RepeatedStringFieldGenerator(const FieldDescriptor* descriptor,
                                const Options& options);
-  ~RepeatedStringFieldGenerator() override;
+  ~RepeatedStringFieldGenerator();
 
   // implements FieldGenerator ---------------------------------------
   void GeneratePrivateMembers(io::Printer* printer) const override;

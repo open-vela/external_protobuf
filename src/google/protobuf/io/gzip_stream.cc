@@ -36,7 +36,6 @@
 
 #if HAVE_ZLIB
 #include <google/protobuf/io/gzip_stream.h>
-#include <google/protobuf/port.h>
 
 #include <google/protobuf/stubs/common.h>
 #include <google/protobuf/stubs/logging.h>
@@ -71,7 +70,7 @@ GzipInputStream::GzipInputStream(ZeroCopyInputStream* sub_stream, Format format,
   output_position_ = output_buffer_;
 }
 GzipInputStream::~GzipInputStream() {
-  internal::SizedDelete(output_buffer_, output_buffer_length_);
+  operator delete(output_buffer_);
   zerror_ = inflateEnd(&zcontext_);
 }
 
@@ -245,7 +244,7 @@ void GzipOutputStream::Init(ZeroCopyOutputStream* sub_stream,
 
 GzipOutputStream::~GzipOutputStream() {
   Close();
-  internal::SizedDelete(input_buffer_, input_buffer_length_);
+  operator delete(input_buffer_);
 }
 
 // private

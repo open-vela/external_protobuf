@@ -33,7 +33,6 @@
 #ifndef GOOGLE_PROTOBUF_REFLECTION_H__
 #define GOOGLE_PROTOBUF_REFLECTION_H__
 
-
 #include <memory>
 
 #include <google/protobuf/message.h>
@@ -43,7 +42,6 @@
 #error "You cannot SWIG proto headers"
 #endif
 
-// Must be included last.
 #include <google/protobuf/port_def.inc>
 
 namespace google {

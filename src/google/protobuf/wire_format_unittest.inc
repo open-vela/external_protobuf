@@ -493,9 +493,8 @@ TEST(WireFormatTest, SerializeMessageSetVariousWaysAreEqual) {
 
   // Serialize to flat array
   {
-    uint8_t* target =
-        reinterpret_cast<uint8_t*>(::google::protobuf::string_as_array(&flat_data));
-    uint8_t* end = message_set.SerializeWithCachedSizesToArray(target);
+    uint8* target = reinterpret_cast<uint8*>(::google::protobuf::string_as_array(&flat_data));
+    uint8* end = message_set.SerializeWithCachedSizesToArray(target);
     EXPECT_EQ(size, end - target);
   }
 
@@ -575,7 +574,7 @@ TEST(WireFormatTest, ParseMessageSet) {
 
   // Also parse using WireFormat.
   PROTO2_WIREFORMAT_UNITTEST::TestMessageSet dynamic_message_set;
-  io::CodedInputStream input(reinterpret_cast<const uint8_t*>(data.data()),
+  io::CodedInputStream input(reinterpret_cast<const uint8*>(data.data()),
                              data.size());
   ASSERT_TRUE(WireFormat::ParseAndMergePartial(&input, &dynamic_message_set));
   EXPECT_EQ(message_set.DebugString(), dynamic_message_set.DebugString());
@@ -598,7 +597,7 @@ TEST(WireFormatTest, ParseMessageSetWithReverseTagOrder) {
     coded_output.WriteVarint32(message.ByteSizeLong());
     message.SerializeWithCachedSizes(&coded_output);
     // Write the type id.
-    uint32_t type_id = message.GetDescriptor()->extension(0)->number();
+    uint32 type_id = message.GetDescriptor()->extension(0)->number();
     WireFormatLite::WriteUInt32(WireFormatLite::kMessageSetTypeIdNumber,
                                 type_id, &coded_output);
     coded_output.WriteTag(WireFormatLite::kMessageSetItemEndTag);
@@ -616,7 +615,7 @@ TEST(WireFormatTest, ParseMessageSetWithReverseTagOrder) {
   {
     // Test parse the message via Reflection.
     PROTO2_WIREFORMAT_UNITTEST::TestMessageSet message_set;
-    io::CodedInputStream input(reinterpret_cast<const uint8_t*>(data.data()),
+    io::CodedInputStream input(reinterpret_cast<const uint8*>(data.data()),
                                data.size());
     EXPECT_TRUE(WireFormat::ParseAndMergePartial(&input, &message_set));
     EXPECT_TRUE(input.ConsumedEntireMessage());
@@ -661,7 +660,7 @@ void SerializeReverseOrder(
   coded_output->WriteVarint32(message.GetCachedSize());
   SerializeReverseOrder(message, coded_output);
   // Write the type id.
-  uint32_t type_id = message.GetDescriptor()->extension(0)->number();
+  uint32 type_id = message.GetDescriptor()->extension(0)->number();
   WireFormatLite::WriteUInt32(WireFormatLite::kMessageSetTypeIdNumber, type_id,
                               coded_output);
   coded_output->WriteTag(WireFormatLite::kMessageSetItemEndTag);
@@ -775,43 +774,6 @@ TEST(WireFormatTest, RecursionLimit) {
     UNITTEST::TestRecursiveMessage message2;
     EXPECT_FALSE(message2.ParseFromCodedStream(&input));
   }
-}
-
-TEST(WireFormatTest, LargeRecursionLimit) {
-  const int kLargeLimit = io::CodedInputStream::GetDefaultRecursionLimit() + 50;
-  UNITTEST::TestRecursiveMessage src, dst, *a;
-  a = src.mutable_a();
-  for (int i = 0; i < kLargeLimit - 1; i++) {
-    a = a->mutable_a();
-  }
-  a->set_i(1);
-
-  std::string data = src.SerializeAsString();
-  {
-    // Parse with default recursion limit. Should fail.
-    io::ArrayInputStream raw_input(data.data(), data.size());
-    io::CodedInputStream input(&raw_input);
-    ASSERT_FALSE(dst.ParseFromCodedStream(&input));
-  }
-
-  {
-    // Parse with custom recursion limit. Should pass.
-    io::ArrayInputStream raw_input(data.data(), data.size());
-    io::CodedInputStream input(&raw_input);
-    input.SetRecursionLimit(kLargeLimit);
-    ASSERT_TRUE(dst.ParseFromCodedStream(&input));
-  }
-
-  // Verifies the recursion depth.
-  int depth = 1;
-  a = dst.mutable_a();
-  while (a->has_a()) {
-    a = a->mutable_a();
-    depth++;
-  }
-
-  EXPECT_EQ(a->i(), 1);
-  EXPECT_EQ(depth, kLargeLimit);
 }
 
 TEST(WireFormatTest, UnknownFieldRecursionLimit) {
@@ -951,7 +913,7 @@ TEST(WireFormatTest, RepeatedScalarsDifferentTagSizes) {
 }
 
 TEST(WireFormatTest, CompatibleTypes) {
-  const int64_t data = 0x100000000LL;
+  const int64 data = 0x100000000LL;
   UNITTEST::Int64Message msg1;
   msg1.set_data(data);
   std::string serialized;
@@ -965,17 +927,17 @@ TEST(WireFormatTest, CompatibleTypes) {
   // Test int64 is compatible with uint64
   UNITTEST::Uint64Message msg3;
   ASSERT_TRUE(msg3.ParseFromString(serialized));
-  ASSERT_EQ(static_cast<uint64_t>(data), msg3.data());
+  ASSERT_EQ(static_cast<uint64>(data), msg3.data());
 
   // Test int64 is compatible with int32
   UNITTEST::Int32Message msg4;
   ASSERT_TRUE(msg4.ParseFromString(serialized));
-  ASSERT_EQ(static_cast<int32_t>(data), msg4.data());
+  ASSERT_EQ(static_cast<int32>(data), msg4.data());
 
   // Test int64 is compatible with uint32
   UNITTEST::Uint32Message msg5;
   ASSERT_TRUE(msg5.ParseFromString(serialized));
-  ASSERT_EQ(static_cast<uint32_t>(data), msg5.data());
+  ASSERT_EQ(static_cast<uint32>(data), msg5.data());
 }
 
 class Proto3PrimitiveRepeatedWireFormatTest : public ::testing::Test {
@@ -1117,7 +1079,7 @@ class Proto3PrimitiveRepeatedWireFormatTest : public ::testing::Test {
 
     message->Clear();
     io::CodedInputStream input(
-        reinterpret_cast<const uint8_t*>(compatible_data.data()),
+        reinterpret_cast<const uint8*>(compatible_data.data()),
         compatible_data.size());
     WireFormat::ParseAndMergePartial(&input, message);
     ExpectProto3PrimitiveRepeatedFieldsSet(*message);
@@ -1327,8 +1289,8 @@ bool ReadMessage(const std::string& wire_buffer, T* message) {
 class Utf8ValidationTest : public ::testing::Test {
  protected:
   Utf8ValidationTest() {}
-  ~Utf8ValidationTest() override {}
-  void SetUp() override {
+  virtual ~Utf8ValidationTest() {}
+  virtual void SetUp() {
   }
 
 };
@@ -1485,7 +1447,7 @@ TEST_F(Utf8ValidationTest, OldVerifyUTF8String) {
 
 
 TEST(RepeatedVarint, Int32) {
-  RepeatedField<int32_t> v;
+  RepeatedField<int32> v;
 
   // Insert -2^n, 2^n and 2^n-1.
   for (int n = 0; n < 10; n++) {
@@ -1504,7 +1466,7 @@ TEST(RepeatedVarint, Int32) {
 }
 
 TEST(RepeatedVarint, Int64) {
-  RepeatedField<int64_t> v;
+  RepeatedField<int64> v;
 
   // Insert -2^n, 2^n and 2^n-1.
   for (int n = 0; n < 10; n++) {
@@ -1523,7 +1485,7 @@ TEST(RepeatedVarint, Int64) {
 }
 
 TEST(RepeatedVarint, SInt32) {
-  RepeatedField<int32_t> v;
+  RepeatedField<int32> v;
 
   // Insert -2^n, 2^n and 2^n-1.
   for (int n = 0; n < 10; n++) {
@@ -1542,7 +1504,7 @@ TEST(RepeatedVarint, SInt32) {
 }
 
 TEST(RepeatedVarint, SInt64) {
-  RepeatedField<int64_t> v;
+  RepeatedField<int64> v;
 
   // Insert -2^n, 2^n and 2^n-1.
   for (int n = 0; n < 10; n++) {
@@ -1561,7 +1523,7 @@ TEST(RepeatedVarint, SInt64) {
 }
 
 TEST(RepeatedVarint, UInt32) {
-  RepeatedField<uint32_t> v;
+  RepeatedField<uint32> v;
 
   // Insert 2^n and 2^n-1.
   for (int n = 0; n < 10; n++) {
@@ -1579,7 +1541,7 @@ TEST(RepeatedVarint, UInt32) {
 }
 
 TEST(RepeatedVarint, UInt64) {
-  RepeatedField<uint64_t> v;
+  RepeatedField<uint64> v;
 
   // Insert 2^n and 2^n-1.
   for (int n = 0; n < 10; n++) {
