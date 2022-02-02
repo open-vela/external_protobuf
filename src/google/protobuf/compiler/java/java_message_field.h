@@ -37,7 +37,6 @@
 
 #include <map>
 #include <string>
-
 #include <google/protobuf/compiler/java/java_field.h>
 
 namespace google {
@@ -62,7 +61,7 @@ class ImmutableMessageFieldGenerator : public ImmutableFieldGenerator {
                                           int messageBitIndex,
                                           int builderBitIndex,
                                           Context* context);
-  ~ImmutableMessageFieldGenerator() override;
+  ~ImmutableMessageFieldGenerator();
 
   // implements ImmutableFieldGenerator
   // ---------------------------------------
@@ -103,7 +102,6 @@ class ImmutableMessageFieldGenerator : public ImmutableFieldGenerator {
 
  private:
   GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(ImmutableMessageFieldGenerator);
-  void GenerateKotlinOrNull(io::Printer* printer) const;
 };
 
 class ImmutableMessageOneofFieldGenerator
@@ -112,7 +110,7 @@ class ImmutableMessageOneofFieldGenerator
   ImmutableMessageOneofFieldGenerator(const FieldDescriptor* descriptor,
                                       int messageBitIndex, int builderBitIndex,
                                       Context* context);
-  ~ImmutableMessageOneofFieldGenerator() override;
+  ~ImmutableMessageOneofFieldGenerator();
 
   void GenerateMembers(io::Printer* printer) const override;
   void GenerateBuilderMembers(io::Printer* printer) const override;

@@ -580,7 +580,7 @@ class MergedDescriptorDatabaseTest : public testing::Test {
       : forward_merged_(&database1_, &database2_),
         reverse_merged_(&database2_, &database1_) {}
 
-  void SetUp() override {
+  virtual void SetUp() {
     AddToDatabase(
         &database1_,
         "name: \"foo.proto\" "

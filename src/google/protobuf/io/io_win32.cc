@@ -397,8 +397,7 @@ ExpandWildcardsResult ExpandWildcards(
       matched = ExpandWildcardsResult::kSuccess;
       string filename;
       if (!strings::wcs_to_utf8(metadata.cFileName, &filename)) {
-        matched = ExpandWildcardsResult::kErrorOutputPathConversion;
-        break;
+        return ExpandWildcardsResult::kErrorOutputPathConversion;
       }
 
       if (dirname.empty()) {

@@ -14,13 +14,13 @@ set(libprotobuf_files
   ${protobuf_source_dir}/src/google/protobuf/field_mask.pb.cc
   ${protobuf_source_dir}/src/google/protobuf/generated_message_bases.cc
   ${protobuf_source_dir}/src/google/protobuf/generated_message_reflection.cc
+  ${protobuf_source_dir}/src/google/protobuf/generated_message_table_driven.cc
   ${protobuf_source_dir}/src/google/protobuf/generated_message_tctable_full.cc
   ${protobuf_source_dir}/src/google/protobuf/io/gzip_stream.cc
   ${protobuf_source_dir}/src/google/protobuf/io/printer.cc
   ${protobuf_source_dir}/src/google/protobuf/io/tokenizer.cc
   ${protobuf_source_dir}/src/google/protobuf/map_field.cc
   ${protobuf_source_dir}/src/google/protobuf/message.cc
-  ${protobuf_source_dir}/src/google/protobuf/reflection_internal.h
   ${protobuf_source_dir}/src/google/protobuf/reflection_ops.cc
   ${protobuf_source_dir}/src/google/protobuf/service.cc
   ${protobuf_source_dir}/src/google/protobuf/source_context.pb.cc
@@ -125,6 +125,8 @@ if(MSVC AND protobuf_BUILD_SHARED_LIBS)
 endif()
 set_target_properties(libprotobuf PROPERTIES
     VERSION ${protobuf_VERSION}
+    # Use only the first SO version component for compatibility with Makefile emitted SONAME.
+    SOVERSION 30
     OUTPUT_NAME ${LIB_PREFIX}protobuf
     DEBUG_POSTFIX "${protobuf_DEBUG_POSTFIX}")
 add_library(protobuf::libprotobuf ALIAS libprotobuf)

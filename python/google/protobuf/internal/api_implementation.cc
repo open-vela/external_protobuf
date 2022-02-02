@@ -82,24 +82,24 @@ static struct PyModuleDef _module = {PyModuleDef_HEAD_INIT,
                                      kModuleName,
                                      kModuleDocstring,
                                      -1,
-                                     nullptr,
-                                     nullptr,
-                                     nullptr,
-                                     nullptr,
-                                     nullptr};
+                                     NULL,
+                                     NULL,
+                                     NULL,
+                                     NULL,
+                                     NULL};
 
 extern "C" {
 PyMODINIT_FUNC PyInit__api_implementation() {
   PyObject* module = PyModule_Create(&_module);
-  if (module == nullptr) {
-    return nullptr;
+  if (module == NULL) {
+    return NULL;
   }
 
   // Adds the module variable "api_version".
   if (PyModule_AddIntConstant(module, const_cast<char*>(kImplVersionName),
                               kImplVersion)) {
     Py_DECREF(module);
-    return nullptr;
+    return NULL;
   }
 
   return module;

@@ -33,8 +33,8 @@ package com.google.protobuf;
 import java.io.IOException;
 
 /**
- * Thrown when a protocol message being parsed is invalid in some way. For instance,
- * it contains a malformed varint or a negative byte length.
+ * Thrown when a protocol message being parsed is invalid in some way, e.g. it contains a malformed
+ * varint or a negative byte length.
  *
  * @author kenton@google.com Kenton Varda
  */
@@ -43,15 +43,15 @@ public class InvalidProtocolBufferException extends IOException {
   private MessageLite unfinishedMessage = null;
   private boolean wasThrownFromInputStream;
 
-  public InvalidProtocolBufferException(String description) {
+  public InvalidProtocolBufferException(final String description) {
     super(description);
   }
 
-  public InvalidProtocolBufferException(Exception e) {
+  public InvalidProtocolBufferException(IOException e) {
     super(e.getMessage(), e);
   }
 
-  public InvalidProtocolBufferException(String description, Exception e) {
+  public InvalidProtocolBufferException(final String description, IOException e) {
     super(description, e);
   }
 

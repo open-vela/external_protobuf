@@ -94,28 +94,28 @@ static PyMethodDef ModuleMethods[] = {
      (PyCFunction)google::protobuf::python::cmessage::SetAllowOversizeProtos, METH_O,
      "Enable/disable oversize proto parsing."},
     // DO NOT USE: For migration and testing only.
-    {nullptr, nullptr}};
+    {NULL, NULL}};
 
 static struct PyModuleDef _module = {PyModuleDef_HEAD_INIT,
                                      "_message",
                                      module_docstring,
                                      -1,
                                      ModuleMethods, /* m_methods */
-                                     nullptr,
-                                     nullptr,
-                                     nullptr,
-                                     nullptr};
+                                     NULL,
+                                     NULL,
+                                     NULL,
+                                     NULL};
 
 PyMODINIT_FUNC PyInit__message() {
   PyObject* m;
   m = PyModule_Create(&_module);
-  if (m == nullptr) {
-    return nullptr;
+  if (m == NULL) {
+    return NULL;
   }
 
   if (!google::protobuf::python::InitProto2MessageModule(m)) {
     Py_DECREF(m);
-    return nullptr;
+    return NULL;
   }
 
   // Adds the C++ API
@@ -127,7 +127,7 @@ PyMODINIT_FUNC PyInit__message() {
           })) {
     PyModule_AddObject(m, "proto_API", api);
   } else {
-    return nullptr;
+    return NULL;
   }
 
   return m;

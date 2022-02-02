@@ -59,7 +59,7 @@ namespace internal {
 // 3. Call get() and get_mutable() only if the object is initialized.
 // 4. Call Destruct() only if the object is initialized.
 //    After the call, the object becomes uninitialized.
-template <typename T, size_t min_align = 1>
+template <typename T>
 class ExplicitlyConstructed {
  public:
   void DefaultConstruct() { new (&union_) T(); }
@@ -76,17 +76,11 @@ class ExplicitlyConstructed {
 
  private:
   union AlignedUnion {
-    alignas(min_align > alignof(T) ? min_align
-                                   : alignof(T)) char space[sizeof(T)];
+    alignas(T) char space[sizeof(T)];
     int64_t align_to_int64;
     void* align_to_ptr;
   } union_;
 };
-
-// ArenaStringPtr compatible explicitly constructed string type.
-// This empty string type is aligned with a minimum alignment of 8 bytes
-// which is the minimum requirement of ArenaStringPtr
-using ExplicitlyConstructedArenaString = ExplicitlyConstructed<std::string, 8>;
 
 }  // namespace internal
 }  // namespace protobuf
