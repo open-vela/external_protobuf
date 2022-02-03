@@ -46,7 +46,6 @@ COPTS = select({
     ":msvc": MSVC_COPTS,
     "//conditions:default": [
         "-DHAVE_ZLIB",
-        "-Wmissing-field-initializers",
         "-Woverloaded-virtual",
         "-Wno-sign-compare",
     ],
