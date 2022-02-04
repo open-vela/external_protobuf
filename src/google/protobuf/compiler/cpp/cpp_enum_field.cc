@@ -33,11 +33,10 @@
 //  Sanjay Ghemawat, Jeff Dean, and others.
 
 #include <google/protobuf/compiler/cpp/cpp_enum_field.h>
-
+#include <google/protobuf/compiler/cpp/cpp_helpers.h>
 #include <google/protobuf/io/printer.h>
 #include <google/protobuf/wire_format.h>
 #include <google/protobuf/stubs/strutil.h>
-#include <google/protobuf/compiler/cpp/cpp_helpers.h>
 
 namespace google {
 namespace protobuf {
@@ -144,7 +143,7 @@ void EnumFieldGenerator::GenerateSerializeWithCachedSizesToArray(
   Formatter format(printer, variables_);
   format(
       "target = stream->EnsureSpace(target);\n"
-      "target = ::_pbi::WireFormatLite::WriteEnumToArray(\n"
+      "target = ::$proto_ns$::internal::WireFormatLite::WriteEnumToArray(\n"
       "  $number$, this->_internal_$name$(), target);\n");
 }
 
@@ -152,7 +151,9 @@ void EnumFieldGenerator::GenerateByteSize(io::Printer* printer) const {
   Formatter format(printer, variables_);
   format(
       "total_size += $tag_size$ +\n"
-      "  ::_pbi::WireFormatLite::EnumSize(this->_internal_$name$());\n");
+      "  "
+      "::$proto_ns$::internal::WireFormatLite::EnumSize(this->_internal_$name$("
+      "));\n");
 }
 
 void EnumFieldGenerator::GenerateConstinitInitializer(
@@ -351,7 +352,7 @@ void RepeatedEnumFieldGenerator::GenerateSerializeWithCachedSizesToArray(
     format(
         "for (int i = 0, n = this->_internal_$name$_size(); i < n; i++) {\n"
         "  target = stream->EnsureSpace(target);\n"
-        "  target = ::_pbi::WireFormatLite::WriteEnumToArray(\n"
+        "  target = ::$proto_ns$::internal::WireFormatLite::WriteEnumToArray(\n"
         "      $number$, this->_internal_$name$(i), target);\n"
         "}\n");
   }
@@ -367,7 +368,7 @@ void RepeatedEnumFieldGenerator::GenerateByteSize(io::Printer* printer) const {
   format.Indent();
   format(
       "for (unsigned int i = 0; i < count; i++) {\n"
-      "  data_size += ::_pbi::WireFormatLite::EnumSize(\n"
+      "  data_size += ::$proto_ns$::internal::WireFormatLite::EnumSize(\n"
       "    this->_internal_$name$(static_cast<int>(i)));\n"
       "}\n");
 
@@ -375,9 +376,10 @@ void RepeatedEnumFieldGenerator::GenerateByteSize(io::Printer* printer) const {
     format(
         "if (data_size > 0) {\n"
         "  total_size += $tag_size$ +\n"
-        "    ::_pbi::WireFormatLite::Int32Size(static_cast<$int32$>(data_size));\n"
+        "    ::$proto_ns$::internal::WireFormatLite::Int32Size(\n"
+        "        static_cast<$int32$>(data_size));\n"
         "}\n"
-        "int cached_size = ::_pbi::ToCachedSize(data_size);\n"
+        "int cached_size = ::$proto_ns$::internal::ToCachedSize(data_size);\n"
         "_$name$_cached_byte_size_.store(cached_size,\n"
         "                                std::memory_order_relaxed);\n"
         "total_size += data_size;\n");

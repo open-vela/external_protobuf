@@ -30,11 +30,11 @@
 
 #include <google/protobuf/compiler/java/java_map_field.h>
 
-#include <google/protobuf/io/printer.h>
 #include <google/protobuf/compiler/java/java_context.h>
 #include <google/protobuf/compiler/java/java_doc_comment.h>
 #include <google/protobuf/compiler/java/java_helpers.h>
 #include <google/protobuf/compiler/java/java_name_resolver.h>
+#include <google/protobuf/io/printer.h>
 
 namespace google {
 namespace protobuf {
@@ -99,8 +99,6 @@ void SetMessageVariables(const FieldDescriptor* descriptor, int messageBitIndex,
   const JavaType keyJavaType = GetJavaType(key);
   const JavaType valueJavaType = GetJavaType(value);
 
-  std::string pass_through_nullness = "/* nullable */\n";
-
   (*variables)["key_type"] = TypeName(key, name_resolver, false);
   std::string boxed_key_type = TypeName(key, name_resolver, true);
   (*variables)["boxed_key_type"] = boxed_key_type;
@@ -131,9 +129,6 @@ void SetMessageVariables(const FieldDescriptor* descriptor, int messageBitIndex,
 
     (*variables)["value_enum_type"] = TypeName(value, name_resolver, false);
 
-    (*variables)["value_enum_type_pass_through_nullness"] =
-        pass_through_nullness + (*variables)["value_enum_type"];
-
     if (SupportUnknownEnumValue(descriptor->file())) {
       // Map unknown values to a special UNRECOGNIZED value if supported.
       (*variables)["unrecognized_value"] =
@@ -145,11 +140,6 @@ void SetMessageVariables(const FieldDescriptor* descriptor, int messageBitIndex,
     }
   } else {
     (*variables)["value_type"] = TypeName(value, name_resolver, false);
-
-    (*variables)["value_type_pass_through_nullness"] =
-        (IsReferenceType(valueJavaType) ? pass_through_nullness : "") +
-        (*variables)["value_type"];
-
     (*variables)["boxed_value_type"] = TypeName(value, name_resolver, true);
     (*variables)["value_wire_type"] = WireType(value);
     (*variables)["value_default_value"] =
@@ -228,12 +218,11 @@ void ImmutableMapFieldGenerator::GenerateInterfaceMembers(
         "${$get$capitalized_name$Map$}$();\n");
     printer->Annotate("{", "}", descriptor_);
     WriteFieldDocComment(printer, descriptor_);
-    printer->Print(variables_,
-                   "$deprecation$$value_enum_type_pass_through_nullness$ "
-                   "${$get$capitalized_name$OrDefault$}$(\n"
-                   "    $key_type$ key,\n"
-                   "    $value_enum_type_pass_through_nullness$ "
-                   "        defaultValue);\n");
+    printer->Print(
+        variables_,
+        "$deprecation$$value_enum_type$ ${$get$capitalized_name$OrDefault$}$(\n"
+        "    $key_type$ key,\n"
+        "    $value_enum_type$ defaultValue);\n");
     printer->Annotate("{", "}", descriptor_);
     WriteFieldDocComment(printer, descriptor_);
     printer->Print(
@@ -287,10 +276,9 @@ void ImmutableMapFieldGenerator::GenerateInterfaceMembers(
     WriteFieldDocComment(printer, descriptor_);
     printer->Print(variables_,
                    "$deprecation$\n"
-                   "$value_type_pass_through_nullness$ "
-                   "${$get$capitalized_name$OrDefault$}$(\n"
+                   "$value_type$ ${$get$capitalized_name$OrDefault$}$(\n"
                    "    $key_type$ key,\n"
-                   "    $value_type_pass_through_nullness$ defaultValue);\n");
+                   "    $value_type$ defaultValue);\n");
     printer->Annotate("{", "}", descriptor_);
     WriteFieldDocComment(printer, descriptor_);
     printer->Print(variables_,
@@ -550,10 +538,9 @@ void ImmutableMapFieldGenerator::GenerateMapGetters(
         variables_,
         "@java.lang.Override\n"
         "$deprecation$\n"
-        "public $value_enum_type_pass_through_nullness$ "
-        "${$get$capitalized_name$OrDefault$}$(\n"
+        "public $value_enum_type$ ${$get$capitalized_name$OrDefault$}$(\n"
         "    $key_type$ key,\n"
-        "    $value_enum_type_pass_through_nullness$ defaultValue) {\n"
+        "    $value_enum_type$ defaultValue) {\n"
         "  $key_null_check$\n"
         "  java.util.Map<$boxed_key_type$, $boxed_value_type$> map =\n"
         "      internalGet$capitalized_name$().getMap();\n"

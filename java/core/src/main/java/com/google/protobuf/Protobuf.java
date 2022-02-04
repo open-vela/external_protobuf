@@ -41,7 +41,6 @@ import java.util.concurrent.ConcurrentMap;
  * than directly accessing internal APIs) in order to perform operations on protobuf messages.
  */
 @ExperimentalApi
-@CheckReturnValue
 final class Protobuf {
   private static final Protobuf INSTANCE = new Protobuf();
 
@@ -128,7 +127,6 @@ final class Protobuf {
    * @return the previously registered schema, or {@code null} if no schema was registered
    *     previously.
    */
-  @CanIgnoreReturnValue
   public Schema<?> registerSchemaOverride(Class<?> messageType, Schema<?> schema) {
     checkNotNull(messageType, "messageType");
     checkNotNull(schema, "schema");

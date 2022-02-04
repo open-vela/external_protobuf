@@ -96,8 +96,8 @@ bool FileExists(const std::string& path) {
 
 class CommandLineInterfaceTest : public testing::Test {
  protected:
-  void SetUp() override;
-  void TearDown() override;
+  virtual void SetUp();
+  virtual void TearDown();
 
   // Runs the CommandLineInterface with the given command line.  The
   // command is automatically split on spaces, and the string "$tmpdir"
@@ -256,14 +256,14 @@ class CommandLineInterfaceTest : public testing::Test {
 class CommandLineInterfaceTest::NullCodeGenerator : public CodeGenerator {
  public:
   NullCodeGenerator() : called_(false) {}
-  ~NullCodeGenerator() override {}
+  ~NullCodeGenerator() {}
 
   mutable bool called_;
   mutable std::string parameter_;
 
   // implements CodeGenerator ----------------------------------------
   bool Generate(const FileDescriptor* file, const std::string& parameter,
-                GeneratorContext* context, std::string* error) const override {
+                GeneratorContext* context, std::string* error) const {
     called_ = true;
     parameter_ = parameter;
     return true;
@@ -2518,12 +2518,12 @@ enum EncodeDecodeTestMode { PROTO_PATH, DESCRIPTOR_SET_IN };
 
 class EncodeDecodeTest : public testing::TestWithParam<EncodeDecodeTestMode> {
  protected:
-  void SetUp() override {
+  virtual void SetUp() {
     WriteUnittestProtoDescriptorSet();
     duped_stdin_ = dup(STDIN_FILENO);
   }
 
-  void TearDown() override {
+  virtual void TearDown() {
     dup2(duped_stdin_, STDIN_FILENO);
     close(duped_stdin_);
   }
