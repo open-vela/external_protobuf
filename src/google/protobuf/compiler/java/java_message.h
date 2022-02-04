@@ -37,7 +37,6 @@
 
 #include <map>
 #include <string>
-
 #include <google/protobuf/compiler/java/java_field.h>
 
 namespace google {
@@ -101,7 +100,7 @@ class MessageGenerator {
 class ImmutableMessageGenerator : public MessageGenerator {
  public:
   ImmutableMessageGenerator(const Descriptor* descriptor, Context* context);
-  ~ImmutableMessageGenerator() override;
+  virtual ~ImmutableMessageGenerator();
 
   void Generate(io::Printer* printer) override;
   void GenerateInterface(io::Printer* printer) override;
@@ -137,7 +136,6 @@ class ImmutableMessageGenerator : public MessageGenerator {
   void GenerateParsingConstructor(io::Printer* printer);
   void GenerateMutableCopy(io::Printer* printer);
   void GenerateKotlinExtensions(io::Printer* printer) const;
-  void GenerateKotlinOrNull(io::Printer* printer) const;
   void GenerateAnyMethods(io::Printer* printer);
 
   Context* context_;

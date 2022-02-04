@@ -48,7 +48,7 @@ class ScopedPythonPtr {
  public:
   // Takes the ownership of the specified object to ScopedPythonPtr.
   // The reference count of the specified py_object is not incremented.
-  explicit ScopedPythonPtr(PyObjectStruct* py_object = nullptr)
+  explicit ScopedPythonPtr(PyObjectStruct* py_object = NULL)
       : ptr_(py_object) {}
 
   // If a PyObject is owned, decrement its reference count.
@@ -70,7 +70,7 @@ class ScopedPythonPtr {
   // The caller now owns the returned reference.
   PyObjectStruct* release() {
     PyObject* p = ptr_;
-    ptr_ = nullptr;
+    ptr_ = NULL;
     return p;
   }
 

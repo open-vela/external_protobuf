@@ -238,13 +238,13 @@ public final class Durations {
   }
 
   /**
-   * Parse a string to produce a duration.
+   * Parse from a string to produce a duration.
    *
-   * @return a Duration parsed from the string
-   * @throws ParseException if the string is not in the duration format
+   * @return A Duration parsed from the string.
+   * @throws ParseException if parsing fails.
    */
   public static Duration parse(String value) throws ParseException {
-    // Must end with "s".
+    // Must ended with "s".
     if (value.isEmpty() || value.charAt(value.length() - 1) != 's') {
       throw new ParseException("Invalid duration string: " + value, 0);
     }
@@ -272,9 +272,7 @@ public final class Durations {
     try {
       return normalizedDuration(seconds, nanos);
     } catch (IllegalArgumentException e) {
-      ParseException ex = new ParseException("Duration value is out of range.", 0);
-      ex.initCause(e);
-      throw ex;
+      throw new ParseException("Duration value is out of range.", 0);
     }
   }
 

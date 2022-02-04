@@ -32,18 +32,17 @@
 //  Based on original Protocol Buffers design by
 //  Sanjay Ghemawat, Jeff Dean, and others.
 
-#include <google/protobuf/compiler/java/java_message_field.h>
-
 #include <map>
 #include <string>
 
-#include <google/protobuf/io/printer.h>
-#include <google/protobuf/wire_format.h>
-#include <google/protobuf/stubs/strutil.h>
 #include <google/protobuf/compiler/java/java_context.h>
 #include <google/protobuf/compiler/java/java_doc_comment.h>
 #include <google/protobuf/compiler/java/java_helpers.h>
+#include <google/protobuf/compiler/java/java_message_field.h>
 #include <google/protobuf/compiler/java/java_name_resolver.h>
+#include <google/protobuf/io/printer.h>
+#include <google/protobuf/wire_format.h>
+#include <google/protobuf/stubs/strutil.h>
 
 namespace google {
 namespace protobuf {
@@ -439,16 +438,6 @@ void ImmutableMessageFieldGenerator::GenerateKotlinDslMembers(
       "public fun ${$has$kt_capitalized_name$$}$(): kotlin.Boolean {\n"
       "  return $kt_dsl_builder$.${$has$capitalized_name$$}$()\n"
       "}\n");
-
-  GenerateKotlinOrNull(printer);
-}
-
-void ImmutableMessageFieldGenerator::GenerateKotlinOrNull(io::Printer* printer) const {
-  if (descriptor_->has_optional_keyword()) {
-    printer->Print(variables_,
-                   "public val $classname$Kt.Dsl.$name$OrNull: $kt_type$?\n"
-                   "  get() = $kt_dsl_builder$.$name$OrNull\n");
-  }
 }
 
 void ImmutableMessageFieldGenerator::GenerateFieldBuilderInitializationCode(
@@ -709,9 +698,8 @@ void ImmutableMessageOneofFieldGenerator::GenerateBuilderMembers(
 
       "if ($has_oneof_case_message$) {\n"
       "  $name$Builder_.mergeFrom(value);\n"
-      "} else {\n"
-      "  $name$Builder_.setMessage(value);\n"
-      "}\n",
+      "}\n"
+      "$name$Builder_.setMessage(value);\n",
 
       "$set_oneof_case_message$;\n"
       "return this;\n");

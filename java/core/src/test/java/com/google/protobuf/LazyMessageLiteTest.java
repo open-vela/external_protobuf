@@ -254,7 +254,7 @@ public class LazyMessageLiteTest {
     ByteString data1 = outer.toByteString();
 
     // The following should not alter the content of the 'outer' message.
-    LazyMessageLite.Builder merged = outer.toBuilder();
+    LazyMessageLite.Builder merged = LazyMessageLite.newBuilder().mergeFrom(outer);
     LazyInnerMessageLite anotherInner = LazyInnerMessageLite.newBuilder().setNum(12345).build();
     merged.setOneofInner(anotherInner);
 

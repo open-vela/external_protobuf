@@ -361,7 +361,7 @@ class ConformanceJava {
 
       case TEXT_FORMAT:
         return Conformance.ConformanceResponse.newBuilder()
-            .setTextPayload(TextFormat.printer().printToString(testMessage))
+            .setTextPayload(TextFormat.printToString(testMessage))
             .build();
 
       default:

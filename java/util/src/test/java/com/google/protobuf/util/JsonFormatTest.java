@@ -79,27 +79,15 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 @RunWith(JUnit4.class)
 public class JsonFormatTest {
-
-  private static Locale originalLocale;
-
-  @BeforeClass
-  public static void setLocale() {
-    originalLocale = Locale.getDefault();
+  public JsonFormatTest() {
     // Test that locale does not affect JsonFormat.
     Locale.setDefault(Locale.forLanguageTag("hi-IN"));
-  }
-
-  @AfterClass
-  public static void resetLocale() {
-    Locale.setDefault(originalLocale);
   }
 
   private void setAllFields(TestAllTypes.Builder builder) {
@@ -355,94 +343,29 @@ public class JsonFormatTest {
       assertThat(builder.getRepeatedInt64(i)).isEqualTo(expectedValues[i]);
       assertThat(builder.getRepeatedUint64(i)).isEqualTo(expectedValues[i]);
     }
+
+    // Non-integers will still be rejected.
+    assertRejects("optionalInt32", "1.5");
+    assertRejects("optionalUint32", "1.5");
+    assertRejects("optionalInt64", "1.5");
+    assertRejects("optionalUint64", "1.5");
   }
 
-  @Test
-  public void testRejectTooLargeFloat() throws IOException {
-    TestAllTypes.Builder builder = TestAllTypes.newBuilder();
-    double tooLarge = 2.0 * Float.MAX_VALUE;
-    try {
-      mergeFromJson("{\"" + "optionalFloat" + "\":" + tooLarge + "}", builder);
-      assertWithMessage("InvalidProtocolBufferException expected.").fail();
-    } catch (InvalidProtocolBufferException expected) {
-      assertThat(expected).hasMessageThat().isEqualTo("Out of range float value: " + tooLarge);
-    }
-  }
-
-  @Test
-  public void testRejectMalformedFloat() throws IOException {
-    TestAllTypes.Builder builder = TestAllTypes.newBuilder();
-    try {
-      mergeFromJson("{\"optionalFloat\":3.5aa}", builder);
-      assertWithMessage("InvalidProtocolBufferException expected.").fail();
-    } catch (InvalidProtocolBufferException expected) {
-      assertThat(expected).hasCauseThat().isNotNull();
-    }
-  }
-
-  @Test
-  public void testRejectFractionalInt64() throws IOException {
-    TestAllTypes.Builder builder = TestAllTypes.newBuilder();
-    try {
-      mergeFromJson("{\"" + "optionalInt64" + "\":" + "1.5" + "}", builder);
-      assertWithMessage("Exception is expected.").fail();
-    } catch (InvalidProtocolBufferException expected) {
-      assertThat(expected).hasMessageThat().isEqualTo("Not an int64 value: 1.5");
-      assertThat(expected).hasCauseThat().isNotNull();
-    }
-  }
-
-  @Test
-  public void testRejectFractionalInt32() throws IOException {
-    TestAllTypes.Builder builder = TestAllTypes.newBuilder();
-    try {
-      mergeFromJson("{\"" + "optionalInt32" + "\":" + "1.5" + "}", builder);
-      assertWithMessage("Exception is expected.").fail();
-    } catch (InvalidProtocolBufferException expected) {
-      assertThat(expected).hasMessageThat().isEqualTo("Not an int32 value: 1.5");
-      assertThat(expected).hasCauseThat().isNotNull();
-    }
-  }
-
-  @Test
-  public void testRejectFractionalUnsignedInt32() throws IOException {
-    TestAllTypes.Builder builder = TestAllTypes.newBuilder();
-    try {
-      mergeFromJson("{\"" + "optionalUint32" + "\":" + "1.5" + "}", builder);
-      assertWithMessage("Exception is expected.").fail();
-    } catch (InvalidProtocolBufferException expected) {
-      assertThat(expected).hasMessageThat().isEqualTo("Not an uint32 value: 1.5");
-      assertThat(expected).hasCauseThat().isNotNull();
-    }
-  }
-
-  @Test
-  public void testRejectFractionalUnsignedInt64() throws IOException {
-    TestAllTypes.Builder builder = TestAllTypes.newBuilder();
-    try {
-      mergeFromJson("{\"" + "optionalUint64" + "\":" + "1.5" + "}", builder);
-      assertWithMessage("Exception is expected.").fail();
-    } catch (InvalidProtocolBufferException expected) {
-      assertThat(expected).hasMessageThat().isEqualTo("Not an uint64 value: 1.5");
-      assertThat(expected).hasCauseThat().isNotNull();
-    }
-  }
-
-  private void assertRejects(String name, String value) throws IOException {
+  private void assertRejects(String name, String value) {
     TestAllTypes.Builder builder = TestAllTypes.newBuilder();
     try {
       // Numeric form is rejected.
       mergeFromJson("{\"" + name + "\":" + value + "}", builder);
       assertWithMessage("Exception is expected.").fail();
-    } catch (InvalidProtocolBufferException expected) {
-      assertThat(expected).hasMessageThat().contains(value);
+    } catch (IOException e) {
+      // Expected.
     }
     try {
       // String form is also rejected.
       mergeFromJson("{\"" + name + "\":\"" + value + "\"}", builder);
       assertWithMessage("Exception is expected.").fail();
-    } catch (InvalidProtocolBufferException expected) {
-      assertThat(expected).hasMessageThat().contains(value);
+    } catch (IOException e) {
+      // Expected.
     }
   }
 
@@ -910,7 +833,6 @@ public class JsonFormatTest {
       assertThat(e)
           .hasMessageThat()
           .isEqualTo("Failed to parse timestamp: " + incorrectTimestampString);
-      assertThat(e).hasCauseThat().isNotNull();
     }
   }
 
@@ -935,7 +857,6 @@ public class JsonFormatTest {
       assertThat(e)
           .hasMessageThat()
           .isEqualTo("Failed to parse duration: " + incorrectDurationString);
-      assertThat(e).hasCauseThat().isNotNull();
     }
   }
 
@@ -1052,9 +973,8 @@ public class JsonFormatTest {
     try {
       toJsonString(message);
       assertWithMessage("Exception is expected.").fail();
-    } catch (InvalidProtocolBufferException expected) {
-      assertThat(expected).hasMessageThat().isEqualTo(
-          "Cannot find type for url: type.googleapis.com/json_test.TestAllTypes");
+    } catch (IOException e) {
+      // Expected.
     }
 
     JsonFormat.TypeRegistry registry =
@@ -1368,13 +1288,7 @@ public class JsonFormatTest {
 
   @Test
   public void testParserRejectInvalidBase64() throws Exception {
-    TestAllTypes.Builder builder = TestAllTypes.newBuilder();
-    try {
-      mergeFromJson("{\"" + "optionalBytes" + "\":" + "!@#$" + "}", builder);
-      assertWithMessage("Exception is expected.").fail();
-    } catch (InvalidProtocolBufferException expected) {
-      assertThat(expected).hasCauseThat().isNotNull();
-    }
+    assertRejects("optionalBytes", "!@#$");
   }
 
   @Test

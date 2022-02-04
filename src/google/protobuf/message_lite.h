@@ -39,7 +39,6 @@
 #ifndef GOOGLE_PROTOBUF_MESSAGE_LITE_H__
 #define GOOGLE_PROTOBUF_MESSAGE_LITE_H__
 
-
 #include <climits>
 #include <string>
 
@@ -47,12 +46,12 @@
 #include <google/protobuf/stubs/logging.h>
 #include <google/protobuf/io/coded_stream.h>
 #include <google/protobuf/arena.h>
+#include <google/protobuf/explicitly_constructed.h>
+#include <google/protobuf/metadata_lite.h>
 #include <google/protobuf/stubs/once.h>
 #include <google/protobuf/port.h>
 #include <google/protobuf/stubs/strutil.h>
-#include <google/protobuf/explicitly_constructed.h>
-#include <google/protobuf/metadata_lite.h>
-#include <google/protobuf/stubs/hash.h>  // TODO(b/211442718): cleanup
+
 
 // clang-format off
 #include <google/protobuf/port_def.inc>
@@ -131,9 +130,8 @@ inline int ToIntSize(size_t size) {
 }
 
 // Default empty string object. Don't use this directly. Instead, call
-// GetEmptyString() to get the reference. This empty string is aligned with a
-// minimum alignment of 8 bytes to match the requirement of ArenaStringPtr.
-PROTOBUF_EXPORT extern ExplicitlyConstructedArenaString
+// GetEmptyString() to get the reference.
+PROTOBUF_EXPORT extern ExplicitlyConstructed<std::string>
     fixed_address_empty_string;
 
 
@@ -189,8 +187,8 @@ class PROTOBUF_EXPORT MessageLite {
   // if arena is a nullptr.
   virtual MessageLite* New(Arena* arena) const = 0;
 
-  // Returns user-owned arena; nullptr if it's message owned.
-  Arena* GetArena() const { return _internal_metadata_.user_arena(); }
+  // Same as GetOwningArena.
+  Arena* GetArena() const { return GetOwningArena(); }
 
   // Clear all fields of the message and set them to their default values.
   // Clear() avoids freeing memory, assuming that any memory allocated
@@ -424,8 +422,6 @@ class PROTOBUF_EXPORT MessageLite {
     return nullptr;
   }
 
-  virtual void OnDemandRegisterArenaDtor(Arena* /*arena*/) {}
-
  protected:
   template <typename T>
   static T* CreateMaybeMessage(Arena* arena) {
@@ -476,6 +472,9 @@ class PROTOBUF_EXPORT MessageLite {
   }
 
  private:
+  // TODO(gerbens) make this a pure abstract function
+  virtual const void* InternalGetTable() const { return nullptr; }
+
   friend class FastReflectionMessageMutator;
   friend class FastReflectionStringSetter;
   friend class Message;
