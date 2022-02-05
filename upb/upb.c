@@ -341,6 +341,7 @@ static void upb_FixLocale(char* p) {
   }
 }
 
+
 void _upb_EncodeRoundTripDouble(double val, char* buf, size_t size) {
   assert(size >= kUpb_RoundTripBufferSize);
   snprintf(buf, size, "%.*g", DBL_DIG, val);
