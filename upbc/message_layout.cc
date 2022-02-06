@@ -190,7 +190,7 @@ void MessageLayout::PlaceNonOneofFields(
   }
 
   // Place hasbits at the beginning.
-  hasbit_bytes_ = hasbit_count_ ? DivRoundUp(hasbit_count_ + 1, 8) : 0;
+  hasbit_bytes_ = DivRoundUp(hasbit_count_, 8);
   Place(SizeAndAlign{{hasbit_bytes_, hasbit_bytes_}, {1, 1}});
 
   // Place non-oneof fields.

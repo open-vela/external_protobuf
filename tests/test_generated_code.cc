@@ -30,10 +30,9 @@
  * upb/def.c and tests/conformance_upb.c, respectively).
  */
 
-#include "gtest/gtest.h"
 #include "src/google/protobuf/test_messages_proto3.upb.h"
 #include "tests/test.upb.h"
-#include "upb/upb.hpp"
+#include "gtest/gtest.h"
 
 #define MIN(x, y) ((x) < (y) ? (x) : (y))
 
@@ -296,14 +295,12 @@ static void check_int32_map_one_entry(
   EXPECT_EQ(
       1, protobuf_test_messages_proto3_TestAllTypesProto3_map_int32_int32_size(
              msg));
-  EXPECT_TRUE(
-      protobuf_test_messages_proto3_TestAllTypesProto3_map_int32_int32_get(
-          msg, test_int32, &val));
+  EXPECT_TRUE(protobuf_test_messages_proto3_TestAllTypesProto3_map_int32_int32_get(
+      msg, test_int32, &val));
   EXPECT_EQ(val, test_int32_2);
 
-  EXPECT_FALSE(
-      protobuf_test_messages_proto3_TestAllTypesProto3_map_int32_int32_get(
-          msg, test_int32_3, &val));
+  EXPECT_FALSE(protobuf_test_messages_proto3_TestAllTypesProto3_map_int32_int32_get(
+      msg, test_int32_3, &val));
 
   /* Test that iteration reveals a single k/v pair in the map. */
   iter = kUpb_Map_Begin;
@@ -412,16 +409,6 @@ TEST(GeneratedCode, TestRepeated) {
   EXPECT_EQ(5, elems[0]);
 
   upb_Arena_Free(arena);
-}
-
-TEST(GeneratedCode, Issue9440) {
-  upb::Arena arena;
-  upb_test_HelloRequest* msg = upb_test_HelloRequest_new(arena.ptr());
-  upb_test_HelloRequest_set_id(msg, 8);
-  EXPECT_EQ(8, upb_test_HelloRequest_id(msg));
-  char str[] = "1";
-  upb_test_HelloRequest_set_version(msg, upb_StringView{str, strlen(str)});
-  EXPECT_EQ(8, upb_test_HelloRequest_id(msg));
 }
 
 TEST(GeneratedCode, NullDecodeBuffer) {
