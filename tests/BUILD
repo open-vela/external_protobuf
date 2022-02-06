@@ -83,7 +83,6 @@ proto_library(
     srcs = [
         "test_cpp.proto",
     ],
-    deps = ["@com_google_protobuf//:timestamp_proto"]
 )
 
 upb_proto_library(
