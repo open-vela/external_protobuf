@@ -103,7 +103,7 @@ class ProtostreamObjectSourceTest
     helper_.ResetTypeInfo(Book::descriptor(), Proto3Message::descriptor());
   }
 
-  ~ProtostreamObjectSourceTest() override {}
+  virtual ~ProtostreamObjectSourceTest() {}
 
   void DoTest(const Message& msg, const Descriptor* descriptor) {
     util::Status status = ExecuteTest(msg, descriptor);

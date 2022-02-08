@@ -49,7 +49,6 @@
 #include <gtest/gtest.h>
 #include <google/protobuf/stubs/casts.h>
 
-// Must be included last.
 #include <google/protobuf/port_def.inc>
 
 

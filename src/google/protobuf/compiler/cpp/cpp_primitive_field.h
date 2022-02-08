@@ -37,7 +37,6 @@
 
 #include <map>
 #include <string>
-
 #include <google/protobuf/compiler/cpp/cpp_field.h>
 
 namespace google {
@@ -49,7 +48,7 @@ class PrimitiveFieldGenerator : public FieldGenerator {
  public:
   PrimitiveFieldGenerator(const FieldDescriptor* descriptor,
                           const Options& options);
-  ~PrimitiveFieldGenerator() override;
+  ~PrimitiveFieldGenerator();
 
   // implements FieldGenerator ---------------------------------------
   void GeneratePrivateMembers(io::Printer* printer) const override;
@@ -73,7 +72,7 @@ class PrimitiveOneofFieldGenerator : public PrimitiveFieldGenerator {
  public:
   PrimitiveOneofFieldGenerator(const FieldDescriptor* descriptor,
                                const Options& options);
-  ~PrimitiveOneofFieldGenerator() override;
+  ~PrimitiveOneofFieldGenerator();
 
   // implements FieldGenerator ---------------------------------------
   void GenerateInlineAccessorDefinitions(io::Printer* printer) const override;
@@ -89,7 +88,7 @@ class RepeatedPrimitiveFieldGenerator : public FieldGenerator {
  public:
   RepeatedPrimitiveFieldGenerator(const FieldDescriptor* descriptor,
                                   const Options& options);
-  ~RepeatedPrimitiveFieldGenerator() override;
+  ~RepeatedPrimitiveFieldGenerator();
 
   // implements FieldGenerator ---------------------------------------
   void GeneratePrivateMembers(io::Printer* printer) const override;

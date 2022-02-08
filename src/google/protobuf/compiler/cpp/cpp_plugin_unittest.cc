@@ -54,10 +54,11 @@ namespace {
 class TestGenerator : public CodeGenerator {
  public:
   TestGenerator() {}
-  ~TestGenerator() override {}
+  ~TestGenerator() {}
 
-  bool Generate(const FileDescriptor* file, const std::string& parameter,
-                GeneratorContext* context, std::string* error) const override {
+  virtual bool Generate(const FileDescriptor* file,
+                        const std::string& parameter, GeneratorContext* context,
+                        std::string* error) const {
     TryInsert("test.pb.h", "includes", context);
     TryInsert("test.pb.h", "namespace_scope", context);
     TryInsert("test.pb.h", "global_scope", context);

@@ -134,7 +134,7 @@ class BaseProtoStreamObjectWriterTest
     ResetTypeInfo(descriptors);
   }
 
-  ~BaseProtoStreamObjectWriterTest() override {}
+  virtual ~BaseProtoStreamObjectWriterTest() {}
 
   void CheckOutput(const Message& expected, int expected_length) {
     size_t nbytes;
@@ -178,7 +178,7 @@ class ProtoStreamObjectWriterTest : public BaseProtoStreamObjectWriterTest {
 
   void ResetProtoWriter() { ResetTypeInfo(Book::descriptor()); }
 
-  ~ProtoStreamObjectWriterTest() override {}
+  virtual ~ProtoStreamObjectWriterTest() {}
 };
 
 INSTANTIATE_TEST_SUITE_P(DifferentTypeInfoSourceTest,

@@ -53,7 +53,6 @@
 #endif
 #include <ctype.h>
 #include <errno.h>
-
 #include <fstream>
 #include <iostream>
 
@@ -88,7 +87,6 @@
 #include <google/protobuf/stubs/stl_util.h>
 
 
-// Must be included last.
 #include <google/protobuf/port_def.inc>
 
 namespace google {
@@ -291,12 +289,12 @@ class CommandLineInterface::ErrorPrinter
       public io::ErrorCollector,
       public DescriptorPool::ErrorCollector {
  public:
-  ErrorPrinter(ErrorFormat format, DiskSourceTree* tree = nullptr)
+  ErrorPrinter(ErrorFormat format, DiskSourceTree* tree = NULL)
       : format_(format),
         tree_(tree),
         found_errors_(false),
         found_warnings_(false) {}
-  ~ErrorPrinter() override {}
+  ~ErrorPrinter() {}
 
   // implements MultiFileErrorCollector ------------------------------
   void AddError(const std::string& filename, int line, int column,
@@ -343,8 +341,8 @@ class CommandLineInterface::ErrorPrinter
                          std::ostream& out) {
     // Print full path when running under MSVS
     std::string dfile;
-    if (format_ == CommandLineInterface::ERROR_FORMAT_MSVS &&
-        tree_ != nullptr && tree_->VirtualFileToDiskFile(filename, &dfile)) {
+    if (format_ == CommandLineInterface::ERROR_FORMAT_MSVS && tree_ != NULL &&
+        tree_->VirtualFileToDiskFile(filename, &dfile)) {
       out << dfile;
     } else {
       out << filename;
@@ -436,7 +434,7 @@ class CommandLineInterface::MemoryOutputStream
                      const std::string& filename,
                      const std::string& insertion_point,
                      const google::protobuf::GeneratedCodeInfo& info);
-  ~MemoryOutputStream() override;
+  virtual ~MemoryOutputStream();
 
   // implements ZeroCopyOutputStream ---------------------------------
   bool Next(void** data, int* size) override {
@@ -1118,7 +1116,7 @@ int CommandLineInterface::Run(int argc, const char* const argv[]) {
       FileDescriptorProto file;
       file.set_name("empty_message.proto");
       file.add_message_type()->set_name("EmptyMessage");
-      GOOGLE_CHECK(pool.BuildFile(file) != nullptr);
+      GOOGLE_CHECK(pool.BuildFile(file) != NULL);
       codec_type_ = "EmptyMessage";
       if (!EncodeOrDecode(&pool)) {
         return 1;
@@ -1272,7 +1270,7 @@ bool CommandLineInterface::ParseInputFiles(
     // Import the file.
     const FileDescriptor* parsed_file =
         descriptor_pool->FindFileByName(input_file);
-    if (parsed_file == nullptr) {
+    if (parsed_file == NULL) {
       result = false;
       break;
     }
@@ -1498,7 +1496,7 @@ CommandLineInterface::ParseArgumentStatus CommandLineInterface::ParseArguments(
     for (std::vector<OutputDirective>::const_iterator j =
              output_directives_.begin();
          j != output_directives_.end(); ++j) {
-      if (j->generator == nullptr) {
+      if (j->generator == NULL) {
         std::string plugin_name = PluginName(plugin_prefix_, j->name);
         if (plugin_name == i->first) {
           foundImplicitPlugin = true;
@@ -1608,7 +1606,7 @@ bool CommandLineInterface::ParseArgument(const char* arg, std::string* name,
     // Two dashes:  Multi-character name, with '=' separating name and
     //   value.
     const char* equals_pos = strchr(arg, '=');
-    if (equals_pos != nullptr) {
+    if (equals_pos != NULL) {
       *name = std::string(arg, equals_pos - arg);
       *value = equals_pos + 1;
       parsed_value = true;
@@ -1950,11 +1948,11 @@ CommandLineInterface::InterpretArgument(const std::string& name,
     // Some other flag.  Look it up in the generators list.
     const GeneratorInfo* generator_info =
         FindOrNull(generators_by_flag_name_, name);
-    if (generator_info == nullptr &&
+    if (generator_info == NULL &&
         (plugin_prefix_.empty() || !HasSuffixString(name, "_out"))) {
       // Check if it's a generator option flag.
       generator_info = FindOrNull(generators_by_option_name_, name);
-      if (generator_info != nullptr) {
+      if (generator_info != NULL) {
         std::string* parameters =
             &generator_parameters_[generator_info->flag_name];
         if (!parameters->empty()) {
@@ -1983,8 +1981,8 @@ CommandLineInterface::InterpretArgument(const std::string& name,
 
       OutputDirective directive;
       directive.name = name;
-      if (generator_info == nullptr) {
-        directive.generator = nullptr;
+      if (generator_info == NULL) {
+        directive.generator = NULL;
       } else {
         directive.generator = generator_info->generator;
       }
@@ -2140,7 +2138,7 @@ bool CommandLineInterface::GenerateOutput(
     GeneratorContext* generator_context) {
   // Call the generator.
   std::string error;
-  if (output_directive.generator == nullptr) {
+  if (output_directive.generator == NULL) {
     // This is a plugin.
     GOOGLE_CHECK(HasPrefixString(output_directive.name, "--") &&
           HasSuffixString(output_directive.name, "_out"))
@@ -2321,7 +2319,7 @@ bool CommandLineInterface::GeneratePluginOutput(
       // before the new one is opened.
       current_output.reset();
       current_output.reset(generator_context->Open(output_file.name()));
-    } else if (current_output == nullptr) {
+    } else if (current_output == NULL) {
       *error = strings::Substitute(
           "$0: First file chunk returned by plugin did not specify a file "
           "name.",
@@ -2351,7 +2349,7 @@ bool CommandLineInterface::GeneratePluginOutput(
 bool CommandLineInterface::EncodeOrDecode(const DescriptorPool* pool) {
   // Look up the type.
   const Descriptor* type = pool->FindMessageTypeByName(codec_type_);
-  if (type == nullptr) {
+  if (type == NULL) {
     std::cerr << "Type not defined: " << codec_type_ << std::endl;
     return false;
   }

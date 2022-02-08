@@ -78,7 +78,7 @@ class GeneratorFactory {
 class ImmutableGeneratorFactory : public GeneratorFactory {
  public:
   ImmutableGeneratorFactory(Context* context);
-  ~ImmutableGeneratorFactory() override;
+  virtual ~ImmutableGeneratorFactory();
 
   MessageGenerator* NewMessageGenerator(
       const Descriptor* descriptor) const override;
