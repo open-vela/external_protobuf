@@ -30,14 +30,13 @@
 
 #include <google/protobuf/arenastring.h>
 
-#include <cstddef>
 #include <google/protobuf/stubs/logging.h>
 #include <google/protobuf/stubs/common.h>
+#include <google/protobuf/parse_context.h>
 #include <google/protobuf/io/coded_stream.h>
+#include <google/protobuf/message_lite.h>
 #include <google/protobuf/stubs/mutex.h>
 #include <google/protobuf/stubs/strutil.h>
-#include <google/protobuf/message_lite.h>
-#include <google/protobuf/parse_context.h>
 #include <google/protobuf/stubs/stl_util.h>
 
 // clang-format off
@@ -47,27 +46,6 @@
 namespace google {
 namespace protobuf {
 namespace internal {
-
-namespace  {
-
-// Enforce that allocated data aligns to at least 8 bytes, and that
-// the alignment of the global const string value does as well.
-// The alignment guaranteed by `new std::string` depends on both:
-// - new align = __STDCPP_DEFAULT_NEW_ALIGNMENT__ / max_align_t
-// - alignof(std::string)
-#ifdef __STDCPP_DEFAULT_NEW_ALIGNMENT__
-constexpr size_t kNewAlign = __STDCPP_DEFAULT_NEW_ALIGNMENT__;
-#elif (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__) < 40900
-constexpr size_t kNewAlign = alignof(::max_align_t);
-#else
-constexpr size_t kNewAlign = alignof(std::max_align_t);
-#endif
-constexpr size_t kStringAlign = alignof(std::string);
-
-static_assert((kStringAlign > kNewAlign ? kStringAlign : kNewAlign) >= 8, "");
-static_assert(alignof(ExplicitlyConstructedArenaString) >= 8, "");
-
-}  // namespace
 
 const std::string& LazyString::Init() const {
   static WrappedMutex mu{GOOGLE_PROTOBUF_LINKER_INITIALIZED};
@@ -83,61 +61,38 @@ const std::string& LazyString::Init() const {
   return *res;
 }
 
-namespace {
-
-
-// Creates a heap allocated std::string value.
-inline TaggedPtr<std::string> CreateString(ConstStringParam value) {
-  TaggedPtr<std::string> res;
-  res.SetAllocated(new std::string(value.data(), value.length()));
-  return res;
-}
-
-#if !GOOGLE_PROTOBUF_INTERNAL_DONATE_STEAL
-
-// Creates an arena allocated std::string value.
-TaggedPtr<std::string> CreateArenaString(Arena& arena, ConstStringParam s) {
-  TaggedPtr<std::string> res;
-  res.SetMutableArena(Arena::Create<std::string>(&arena, s.data(), s.length()));
-  return res;
-}
-
-#endif  // !GOOGLE_PROTOBUF_INTERNAL_DONATE_STEAL
-
-}  // namespace
 
 std::string* ArenaStringPtr::SetAndReturnNewString() {
   std::string* new_string = new std::string();
-  tagged_ptr_.SetAllocated(new_string);
+  tagged_ptr_.Set(new_string);
   return new_string;
 }
 
-void ArenaStringPtr::DestroyNoArenaSlowPath() {
-  GOOGLE_DCHECK(tagged_ptr_.IsAllocated());
-  delete UnsafeMutablePointer();
-}
+void ArenaStringPtr::DestroyNoArenaSlowPath() { delete UnsafeMutablePointer(); }
 
-void ArenaStringPtr::Set(const std::string*, ConstStringParam value,
-                         ::google::protobuf::Arena* arena) {
-  if (IsDefault()) {
-    // If we're not on an arena, skip straight to a true string to avoid
-    // possible copy cost later.
-    tagged_ptr_ = arena != nullptr ? CreateArenaString(*arena, value)
-                                   : CreateString(value);
+void ArenaStringPtr::Set(const std::string* default_value,
+                         ConstStringParam value, ::google::protobuf::Arena* arena) {
+  if (IsDefault(default_value)) {
+    tagged_ptr_.Set(Arena::Create<std::string>(arena, value));
   } else {
     UnsafeMutablePointer()->assign(value.data(), value.length());
   }
 }
-void ArenaStringPtr::Set(const std::string*, std::string&& value,
+
+void ArenaStringPtr::Set(const std::string* default_value, std::string&& value,
                          ::google::protobuf::Arena* arena) {
-  if (IsDefault()) {
-    NewString(arena, std::move(value));
-  } else if (IsFixedSizeArena()) {
+  if (IsDefault(default_value)) {
+    if (arena == nullptr) {
+      tagged_ptr_.Set(new std::string(std::move(value)));
+    } else {
+      tagged_ptr_.Set(Arena::Create<std::string>(arena, std::move(value)));
+    }
+  } else if (IsDonatedString()) {
     std::string* current = tagged_ptr_.Get();
     auto* s = new (current) std::string(std::move(value));
     arena->OwnDestructor(s);
-    tagged_ptr_.SetMutableArena(s);
-  } else /* !IsFixedSizeArena() */ {
+    tagged_ptr_.Set(s);
+  } else /* !IsDonatedString() */ {
     *UnsafeMutablePointer() = std::move(value);
   }
 }
@@ -163,7 +118,7 @@ void ArenaStringPtr::Set(NonEmptyDefault, std::string&& value,
 }
 
 std::string* ArenaStringPtr::Mutable(EmptyDefault, ::google::protobuf::Arena* arena) {
-  if (!IsFixedSizeArena() && !IsDefault()) {
+  if (!IsDonatedString() && !IsDefault(&GetEmptyStringAlreadyInited())) {
     return UnsafeMutablePointer();
   } else {
     return MutableSlow(arena);
@@ -172,34 +127,41 @@ std::string* ArenaStringPtr::Mutable(EmptyDefault, ::google::protobuf::Arena* ar
 
 std::string* ArenaStringPtr::Mutable(const LazyString& default_value,
                                      ::google::protobuf::Arena* arena) {
-  if (!IsFixedSizeArena() && !IsDefault()) {
+  if (!IsDonatedString() && !IsDefault(nullptr)) {
     return UnsafeMutablePointer();
   } else {
     return MutableSlow(arena, default_value);
   }
 }
 
-std::string* ArenaStringPtr::MutableNoCopy(const std::string*,
+std::string* ArenaStringPtr::MutableNoCopy(const std::string* default_value,
                                            ::google::protobuf::Arena* arena) {
-  if (!IsFixedSizeArena() && !IsDefault()) {
+  if (!IsDonatedString() && !IsDefault(default_value)) {
     return UnsafeMutablePointer();
   } else {
-    GOOGLE_DCHECK(IsDefault());
+    GOOGLE_DCHECK(IsDefault(default_value));
     // Allocate empty. The contents are not relevant.
-    return NewString(arena);
+    std::string* new_string = Arena::Create<std::string>(arena);
+    tagged_ptr_.Set(new_string);
+    return new_string;
   }
 }
 
 template <typename... Lazy>
 std::string* ArenaStringPtr::MutableSlow(::google::protobuf::Arena* arena,
                                          const Lazy&... lazy_default) {
-  GOOGLE_DCHECK(IsDefault());
-  return NewString(arena, lazy_default.get()...);
+  const std::string* const default_value =
+      sizeof...(Lazy) == 0 ? &GetEmptyStringAlreadyInited() : nullptr;
+  GOOGLE_DCHECK(IsDefault(default_value));
+  std::string* new_string =
+      Arena::Create<std::string>(arena, lazy_default.get()...);
+  tagged_ptr_.Set(new_string);
+  return new_string;
 }
 
 std::string* ArenaStringPtr::Release(const std::string* default_value,
                                      ::google::protobuf::Arena* arena) {
-  if (IsDefault()) {
+  if (IsDefault(default_value)) {
     return nullptr;
   } else {
     return ReleaseNonDefault(default_value, arena);
@@ -208,9 +170,9 @@ std::string* ArenaStringPtr::Release(const std::string* default_value,
 
 std::string* ArenaStringPtr::ReleaseNonDefault(const std::string* default_value,
                                                ::google::protobuf::Arena* arena) {
-  GOOGLE_DCHECK(!IsDefault());
+  GOOGLE_DCHECK(!IsDefault(default_value));
 
-  if (!IsFixedSizeArena()) {
+  if (!IsDonatedString()) {
     std::string* released;
     if (arena != nullptr) {
       released = new std::string;
@@ -218,12 +180,12 @@ std::string* ArenaStringPtr::ReleaseNonDefault(const std::string* default_value,
     } else {
       released = UnsafeMutablePointer();
     }
-    tagged_ptr_.SetDefault(default_value);
+    tagged_ptr_.Set(const_cast<std::string*>(default_value));
     return released;
-  } else /* IsFixedSizeArena() */ {
+  } else /* IsDonatedString() */ {
     GOOGLE_DCHECK(arena != nullptr);
     std::string* released = new std::string(Get());
-    tagged_ptr_.SetDefault(default_value);
+    tagged_ptr_.Set(const_cast<std::string*>(default_value));
     return released;
   }
 }
@@ -231,28 +193,33 @@ std::string* ArenaStringPtr::ReleaseNonDefault(const std::string* default_value,
 void ArenaStringPtr::SetAllocated(const std::string* default_value,
                                   std::string* value, ::google::protobuf::Arena* arena) {
   // Release what we have first.
-  if (arena == nullptr && !IsDefault()) {
+  if (arena == nullptr && !IsDefault(default_value)) {
     delete UnsafeMutablePointer();
   }
   if (value == nullptr) {
-    tagged_ptr_.SetDefault(default_value);
+    tagged_ptr_.Set(const_cast<std::string*>(default_value));
   } else {
-#ifndef NDEBUG
+#ifdef NDEBUG
+    tagged_ptr_.Set(value);
+    if (arena != nullptr) {
+      arena->Own(value);
+    }
+#else
     // On debug builds, copy the string so the address differs.  delete will
     // fail if value was a stack-allocated temporary/etc., which would have
     // failed when arena ran its cleanup list.
-    std::string* new_value = new std::string(std::move(*value));
+    std::string* new_value = Arena::Create<std::string>(arena, *value);
     delete value;
-    value = new_value;
-#endif  // !NDEBUG
-    InitAllocated(value, arena);
+    tagged_ptr_.Set(new_value);
+#endif
   }
 }
 
-void ArenaStringPtr::Destroy(const std::string*, ::google::protobuf::Arena* arena) {
+void ArenaStringPtr::Destroy(const std::string* default_value,
+                             ::google::protobuf::Arena* arena) {
   if (arena == nullptr) {
-    GOOGLE_DCHECK(!IsFixedSizeArena());
-    if (!IsDefault()) {
+    GOOGLE_DCHECK(!IsDonatedString());
+    if (!IsDefault(default_value)) {
       delete UnsafeMutablePointer();
     }
   }
@@ -267,12 +234,12 @@ void ArenaStringPtr::Destroy(NonEmptyDefault, ::google::protobuf::Arena* arena) 
 }
 
 void ArenaStringPtr::ClearToEmpty() {
-  if (IsDefault()) {
+  if (IsDefault(&GetEmptyStringAlreadyInited())) {
     // Already set to default -- do nothing.
   } else {
     // Unconditionally mask away the tag.
     //
-    // UpdateArenaString uses assign when capacity is larger than the new
+    // UpdateDonatedString uses assign when capacity is larger than the new
     // value, which is trivially true in the donated string case.
     // const_cast<std::string*>(PtrValue<std::string>())->clear();
     tagged_ptr_.Get()->clear();
@@ -282,11 +249,17 @@ void ArenaStringPtr::ClearToEmpty() {
 void ArenaStringPtr::ClearToDefault(const LazyString& default_value,
                                     ::google::protobuf::Arena* arena) {
   (void)arena;
-  if (IsDefault()) {
+  if (IsDefault(nullptr)) {
     // Already set to default -- do nothing.
-  } else {
+  } else if (!IsDonatedString()) {
     UnsafeMutablePointer()->assign(default_value.get());
   }
+}
+
+inline void SetStrWithHeapBuffer(std::string* str, ArenaStringPtr* s) {
+  TaggedPtr<std::string> res;
+  res.Set(str);
+  s->UnsafeSetTaggedPointer(res);
 }
 
 const char* EpsCopyInputStream::ReadArenaString(const char* ptr,
@@ -297,9 +270,12 @@ const char* EpsCopyInputStream::ReadArenaString(const char* ptr,
   int size = ReadSize(&ptr);
   if (!ptr) return nullptr;
 
-  auto* str = s->NewString(arena);
+  auto* str = Arena::Create<std::string>(arena);
   ptr = ReadString(ptr, size, str);
   GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+
+  SetStrWithHeapBuffer(str, s);
+
   return ptr;
 }
 

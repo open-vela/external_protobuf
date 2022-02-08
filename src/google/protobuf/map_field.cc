@@ -29,23 +29,18 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <google/protobuf/map_field.h>
+#include <google/protobuf/map_field_inl.h>
 
 #include <vector>
 
-#include <google/protobuf/map_field_inl.h>
-
-// Must be included last.
 #include <google/protobuf/port_def.inc>
 
 namespace google {
 namespace protobuf {
 namespace internal {
 
-void MapFieldBase::Destruct() {
-  if (arena_ == nullptr) {
-    delete repeated_field_;
-  }
-  repeated_field_ = nullptr;
+MapFieldBase::~MapFieldBase() {
+  if (repeated_field_ != nullptr && arena_ == nullptr) delete repeated_field_;
 }
 
 const RepeatedPtrFieldBase& MapFieldBase::GetRepeatedField() const {
@@ -224,15 +219,13 @@ DynamicMapField::DynamicMapField(const Message* default_entry, Arena* arena)
       default_entry_(default_entry) {}
 
 DynamicMapField::~DynamicMapField() {
-  if (arena_ == nullptr) {
-    // DynamicMapField owns map values. Need to delete them before clearing the
-    // map.
-    for (auto& kv : map_) {
-      kv.second.DeleteData();
-    }
-    map_.clear();
+  if (arena_ != nullptr) return;
+  // DynamicMapField owns map values. Need to delete them before clearing the
+  // map.
+  for (auto& kv : map_) {
+    kv.second.DeleteData();
   }
-  Destruct();
+  map_.clear();
 }
 
 int DynamicMapField::size() const { return GetMap().size(); }

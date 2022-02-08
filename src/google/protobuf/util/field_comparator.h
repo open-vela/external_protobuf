@@ -33,15 +33,12 @@
 #ifndef GOOGLE_PROTOBUF_UTIL_FIELD_COMPARATOR_H__
 #define GOOGLE_PROTOBUF_UTIL_FIELD_COMPARATOR_H__
 
-
 #include <cstdint>
 #include <map>
 #include <string>
 #include <vector>
 
 #include <google/protobuf/stubs/common.h>
-
-// Must be included last.
 #include <google/protobuf/port_def.inc>
 
 namespace google {

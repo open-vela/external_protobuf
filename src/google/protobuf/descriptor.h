@@ -54,7 +54,6 @@
 #ifndef GOOGLE_PROTOBUF_DESCRIPTOR_H__
 #define GOOGLE_PROTOBUF_DESCRIPTOR_H__
 
-
 #include <atomic>
 #include <map>
 #include <memory>
@@ -67,8 +66,6 @@
 #include <google/protobuf/stubs/mutex.h>
 #include <google/protobuf/stubs/once.h>
 #include <google/protobuf/port.h>
-
-// Must be included last.
 #include <google/protobuf/port_def.inc>
 
 // TYPE_BOOL is defined in the MacOS's ConditionalMacros.h.
@@ -187,19 +184,6 @@ struct DebugStringOptions {
 // Must be instantiated as mutable in a descriptor.
 namespace internal {
 
-// The classes in this file represent a significant memory footprint for the
-// library. We make sure we are not accidentally making them larger by
-// hardcoding the struct size for a specific platform. Use as:
-//
-//   PROTOBUF_INTERNAL_CHECK_CLASS_SIZE(type, expected_size_in_x84-64);
-//
-
-#if !defined(PROTOBUF_INTERNAL_CHECK_CLASS_SIZE)
-#define PROTOBUF_INTERNAL_CHECK_CLASS_SIZE(t, expected)
-#endif
-
-class FlatAllocator;
-
 class PROTOBUF_EXPORT LazyDescriptor {
  public:
   // Init function to be called at init time of a descriptor containing
@@ -233,8 +217,10 @@ class PROTOBUF_EXPORT LazyDescriptor {
  private:
   void Once(const ServiceDescriptor* service);
 
-  const Descriptor* descriptor_;
-  // The once_ flag is followed by a NUL terminated string for the type name.
+  union {
+    const Descriptor* descriptor_;
+    const char* lazy_name_;
+  };
   internal::once_flag* once_;
 };
 
@@ -612,7 +598,6 @@ class PROTOBUF_EXPORT Descriptor : private internal::SymbolBase {
   GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(Descriptor);
 };
 
-PROTOBUF_INTERNAL_CHECK_CLASS_SIZE(Descriptor, 136);
 
 // Describes a single field of a message.  To get the descriptor for a given
 // field, first get the Descriptor for the message in which it is defined,
@@ -939,8 +924,6 @@ class PROTOBUF_EXPORT FieldDescriptor : private internal::SymbolBase {
   const std::string* all_names_;
   const FileDescriptor* file_;
 
-  // The once_flag is followed by a NUL terminated string for the type name and
-  // enum default value (or empty string if no default enum).
   internal::once_flag* type_once_;
   static void TypeOnceInit(const FieldDescriptor* to_init);
   void InternalTypeOnceInit() const;
@@ -952,6 +935,7 @@ class PROTOBUF_EXPORT FieldDescriptor : private internal::SymbolBase {
   union {
     mutable const Descriptor* message_type;
     mutable const EnumDescriptor* enum_type;
+    const char* lazy_type_name;
   } type_descriptor_;
   const FieldOptions* options_;
   // IMPORTANT:  If you add a new field, make sure to search for all instances
@@ -968,6 +952,7 @@ class PROTOBUF_EXPORT FieldDescriptor : private internal::SymbolBase {
     bool default_value_bool_;
 
     mutable const EnumValueDescriptor* default_value_enum_;
+    const char* lazy_default_value_enum_name_;
     const std::string* default_value_string_;
     mutable std::atomic<const Message*> default_generated_instance_;
   };
@@ -989,7 +974,6 @@ class PROTOBUF_EXPORT FieldDescriptor : private internal::SymbolBase {
   GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(FieldDescriptor);
 };
 
-PROTOBUF_INTERNAL_CHECK_CLASS_SIZE(FieldDescriptor, 72);
 
 // Describes a oneof defined in a message type.
 class PROTOBUF_EXPORT OneofDescriptor : private internal::SymbolBase {
@@ -1069,8 +1053,6 @@ class PROTOBUF_EXPORT OneofDescriptor : private internal::SymbolBase {
   friend class Descriptor;
   GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(OneofDescriptor);
 };
-
-PROTOBUF_INTERNAL_CHECK_CLASS_SIZE(OneofDescriptor, 40);
 
 // Describes an enum type defined in a .proto file.  To get the EnumDescriptor
 // for a generated enum type, call TypeName_descriptor().  Use DescriptorPool
@@ -1241,8 +1223,6 @@ class PROTOBUF_EXPORT EnumDescriptor : private internal::SymbolBase {
   GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(EnumDescriptor);
 };
 
-PROTOBUF_INTERNAL_CHECK_CLASS_SIZE(EnumDescriptor, 72);
-
 // Describes an individual enum constant of a particular type.  To get the
 // EnumValueDescriptor for a given enum value, first get the EnumDescriptor
 // for its type, then use EnumDescriptor::FindValueByName() or
@@ -1326,8 +1306,6 @@ class PROTOBUF_EXPORT EnumValueDescriptor : private internal::SymbolBaseN<0>,
   GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(EnumValueDescriptor);
 };
 
-PROTOBUF_INTERNAL_CHECK_CLASS_SIZE(EnumValueDescriptor, 32);
-
 // Describes an RPC service. Use DescriptorPool to construct your own
 // descriptors.
 class PROTOBUF_EXPORT ServiceDescriptor : private internal::SymbolBase {
@@ -1358,7 +1336,6 @@ class PROTOBUF_EXPORT ServiceDescriptor : private internal::SymbolBase {
 
   // Look up a MethodDescriptor by name.
   const MethodDescriptor* FindMethodByName(ConstStringParam name) const;
-
   // See Descriptor::CopyTo().
   void CopyTo(ServiceDescriptorProto* proto) const;
 
@@ -1409,7 +1386,6 @@ class PROTOBUF_EXPORT ServiceDescriptor : private internal::SymbolBase {
   GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(ServiceDescriptor);
 };
 
-PROTOBUF_INTERNAL_CHECK_CLASS_SIZE(ServiceDescriptor, 48);
 
 // Describes an individual service method.  To obtain a MethodDescriptor given
 // a service, first get its ServiceDescriptor, then call
@@ -1498,12 +1474,11 @@ class PROTOBUF_EXPORT MethodDescriptor : private internal::SymbolBase {
   GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(MethodDescriptor);
 };
 
-PROTOBUF_INTERNAL_CHECK_CLASS_SIZE(MethodDescriptor, 64);
 
 // Describes a whole .proto file.  To get the FileDescriptor for a compiled-in
 // file, get the descriptor for something defined in that file and call
 // descriptor->file().  Use DescriptorPool to construct your own descriptors.
-class PROTOBUF_EXPORT FileDescriptor : private internal::SymbolBase {
+class PROTOBUF_EXPORT FileDescriptor {
  public:
   typedef FileDescriptorProto Proto;
 
@@ -1640,27 +1615,21 @@ class PROTOBUF_EXPORT FileDescriptor : private internal::SymbolBase {
                          SourceLocation* out_location) const;
 
  private:
-  friend class Symbol;
   typedef FileOptions OptionsType;
-
-  bool is_placeholder_;
-  // Indicates the FileDescriptor is completed building. Used to verify
-  // that type accessor functions that can possibly build a dependent file
-  // aren't called during the process of building the file.
-  bool finished_building_;
-  // Actually a `Syntax` but stored as uint8_t to save space.
-  uint8_t syntax_;
-  // This one is here to fill the padding.
-  int extension_count_;
 
   const std::string* name_;
   const std::string* package_;
   const DescriptorPool* pool_;
 
-  // dependencies_once_ contain a once_flag followed by N NUL terminated
-  // strings. Dependencies that do not need to be loaded will be empty. ie just
-  // {'\0'}
-  internal::once_flag* dependencies_once_;
+  // Data required to do lazy initialization.
+  struct PROTOBUF_EXPORT LazyInitData {
+#ifndef SWIG
+    internal::once_flag once;
+#endif
+    const char** dependencies_names;
+  };
+
+  LazyInitData* dependencies_once_;
   static void DependenciesOnceInit(const FileDescriptor* to_init);
   void InternalDependenciesOnceInit() const;
 
@@ -1671,6 +1640,16 @@ class PROTOBUF_EXPORT FileDescriptor : private internal::SymbolBase {
   int message_type_count_;
   int enum_type_count_;
   int service_count_;
+
+  bool is_placeholder_;
+  // Indicates the FileDescriptor is completed building. Used to verify
+  // that type accessor functions that can possibly build a dependent file
+  // aren't called during the process of building the file.
+  bool finished_building_;
+  // Actually a `Syntax` but stored as uint8_t to save space.
+  uint8_t syntax_;
+  // This one is here to fill the padding.
+  int extension_count_;
 
   mutable const FileDescriptor** dependencies_;
   int* public_dependencies_;
@@ -1702,7 +1681,6 @@ class PROTOBUF_EXPORT FileDescriptor : private internal::SymbolBase {
   GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(FileDescriptor);
 };
 
-PROTOBUF_INTERNAL_CHECK_CLASS_SIZE(FileDescriptor, 144);
 
 // ===================================================================
 
@@ -1995,6 +1973,7 @@ class PROTOBUF_EXPORT DescriptorPool {
   friend class ServiceDescriptor;
   friend class MethodDescriptor;
   friend class FileDescriptor;
+  friend class StreamDescriptor;
   friend class DescriptorBuilder;
   friend class FileDescriptorTables;
 
@@ -2034,8 +2013,7 @@ class PROTOBUF_EXPORT DescriptorPool {
 
   // Create a placeholder FileDescriptor of the specified name
   FileDescriptor* NewPlaceholderFile(StringPiece name) const;
-  FileDescriptor* NewPlaceholderFileWithMutexHeld(
-      StringPiece name, internal::FlatAllocator& alloc) const;
+  FileDescriptor* NewPlaceholderFileWithMutexHeld(StringPiece name) const;
 
   enum PlaceholderType {
     PLACEHOLDER_MESSAGE,
@@ -2434,7 +2412,6 @@ inline FileDescriptor::Syntax FileDescriptor::syntax() const {
 }  // namespace protobuf
 }  // namespace google
 
-#undef PROTOBUF_INTERNAL_CHECK_CLASS_SIZE
 #include <google/protobuf/port_undef.inc>
 
 #endif  // GOOGLE_PROTOBUF_DESCRIPTOR_H__

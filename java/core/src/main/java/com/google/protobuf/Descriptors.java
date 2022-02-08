@@ -278,13 +278,14 @@ public final class Descriptors {
     /**
      * Construct a {@code FileDescriptor}.
      *
-     * @param proto the protocol message form of the FileDescriptort
-     * @param dependencies {@code FileDescriptor}s corresponding to all of the file's dependencies
+     * @param proto The protocol message form of the FileDescriptor.
+     * @param dependencies {@code FileDescriptor}s corresponding to all of the file's dependencies.
      * @throws DescriptorValidationException {@code proto} is not a valid descriptor. This can occur
-     *     for a number of reasons; for instance, because a field has an undefined type or because
-     *     two messages were defined with the same name.
+     *     for a number of reasons, e.g. because a field has an undefined type or because two
+     *     messages were defined with the same name.
      */
-    public static FileDescriptor buildFrom(FileDescriptorProto proto, FileDescriptor[] dependencies)
+    public static FileDescriptor buildFrom(
+        final FileDescriptorProto proto, final FileDescriptor[] dependencies)
         throws DescriptorValidationException {
       return buildFrom(proto, dependencies, false);
     }
@@ -292,19 +293,18 @@ public final class Descriptors {
     /**
      * Construct a {@code FileDescriptor}.
      *
-     * @param proto the protocol message form of the FileDescriptor
-     * @param dependencies {@code FileDescriptor}s corresponding to all of the file's dependencies
-     * @param allowUnknownDependencies if true, non-existing dependencies will be ignored and
-     *     undefined message types will be replaced with a placeholder type. Undefined enum types
-     *     still cause a DescriptorValidationException.
+     * @param proto The protocol message form of the FileDescriptor.
+     * @param dependencies {@code FileDescriptor}s corresponding to all of the file's dependencies.
+     * @param allowUnknownDependencies If true, non-exist dependenncies will be ignored and
+     *     undefined message types will be replaced with a placeholder type.
      * @throws DescriptorValidationException {@code proto} is not a valid descriptor. This can occur
-     *     for a number of reasons; for instance, because a field has an undefined type or because
-     *     two messages were defined with the same name.
+     *     for a number of reasons, e.g. because a field has an undefined type or because two
+     *     messages were defined with the same name.
      */
     public static FileDescriptor buildFrom(
-        FileDescriptorProto proto,
-        FileDescriptor[] dependencies,
-        boolean allowUnknownDependencies)
+        final FileDescriptorProto proto,
+        final FileDescriptor[] dependencies,
+        final boolean allowUnknownDependencies)
         throws DescriptorValidationException {
       // Building descriptors involves two steps:  translating and linking.
       // In the translation step (implemented by FileDescriptor's
@@ -315,8 +315,8 @@ public final class Descriptors {
       // FieldDescriptor for an embedded message contains a pointer directly
       // to the Descriptor for that message's type.  We also detect undefined
       // types in the linking step.
-      DescriptorPool pool = new DescriptorPool(dependencies, allowUnknownDependencies);
-      FileDescriptor result =
+      final DescriptorPool pool = new DescriptorPool(dependencies, allowUnknownDependencies);
+      final FileDescriptor result =
           new FileDescriptor(proto, dependencies, pool, allowUnknownDependencies);
       result.crossLink();
       return result;
@@ -1837,8 +1837,8 @@ public final class Descriptors {
       // The number represents an unknown enum value.
       synchronized (this) {
         if (cleanupQueue == null) {
-          cleanupQueue = new ReferenceQueue<>();
-          unknownValues = new HashMap<>();
+          cleanupQueue = new ReferenceQueue<EnumValueDescriptor>();
+          unknownValues = new HashMap<Integer, WeakReference<EnumValueDescriptor>>();
         } else {
           while (true) {
             UnknownEnumValueReference toClean = (UnknownEnumValueReference) cleanupQueue.poll();
@@ -2415,7 +2415,7 @@ public final class Descriptors {
     }
 
     private final Set<FileDescriptor> dependencies;
-    private final boolean allowUnknownDependencies;
+    private boolean allowUnknownDependencies;
 
     private final Map<String, GenericDescriptor> descriptorsByName = new HashMap<>();
 
@@ -2475,6 +2475,7 @@ public final class Descriptors {
         final GenericDescriptor relativeTo,
         final DescriptorPool.SearchFilter filter)
         throws DescriptorValidationException {
+      // TODO(kenton):  This could be optimized in a number of ways.
 
       GenericDescriptor result;
       String fullname;
@@ -2546,11 +2547,11 @@ public final class Descriptors {
           logger.warning(
               "The descriptor for message type \""
                   + name
-                  + "\" cannot be found and a placeholder is created for it");
+                  + "\" can not be found and a placeholder is created for it");
           // We create a dummy message descriptor here regardless of the
           // expected type. If the type should be message, this dummy
           // descriptor will work well and if the type should be enum, a
-          // DescriptorValidationException will be thrown later. In either
+          // DescriptorValidationException will be thrown latter. In either
           // case, the code works as expected: we allow unknown message types
           // but not unknown enum types.
           result = new Descriptor(fullname);
@@ -2765,7 +2766,8 @@ public final class Descriptors {
         final OneofDescriptorProto proto,
         final FileDescriptor file,
         final Descriptor parent,
-        final int index) {
+        final int index)
+        throws DescriptorValidationException {
       this.proto = proto;
       fullName = computeFullName(file, parent, proto.getName());
       this.file = file;

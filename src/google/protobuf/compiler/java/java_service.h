@@ -78,7 +78,7 @@ class ImmutableServiceGenerator : public ServiceGenerator {
  public:
   ImmutableServiceGenerator(const ServiceDescriptor* descriptor,
                             Context* context);
-  ~ImmutableServiceGenerator() override;
+  virtual ~ImmutableServiceGenerator();
 
   void Generate(io::Printer* printer) override;
 
