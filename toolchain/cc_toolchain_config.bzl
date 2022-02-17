@@ -102,18 +102,13 @@ def _impl(ctx):
       ],
   )
 
-  if 'osx' in ctx.attr.target_full_name:
-    sysroot_action_set = all_link_actions
-  else:
-    sysroot_action_set = all_link_actions + all_compile_actions
-
   sysroot_flags = feature(
       name = "sysroot_flags",
       #Only enable this if a sysroot was specified
       enabled = (ctx.attr.sysroot != ""),
       flag_sets = [
           flag_set(
-              actions = sysroot_action_set,
+              actions = all_link_actions + all_compile_actions,
               flag_groups = [
                   flag_group(
                       flags = [
