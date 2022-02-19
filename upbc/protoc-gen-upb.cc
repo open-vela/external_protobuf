@@ -34,6 +34,7 @@
 #include "google/protobuf/descriptor.h"
 #include "google/protobuf/descriptor.pb.h"
 #include "google/protobuf/wire_format.h"
+#include "upb/mini_table.hpp"
 #include "upbc/common.h"
 #include "upbc/message_layout.h"
 
@@ -266,20 +267,20 @@ std::string SizeLg2(const protobuf::FieldDescriptor* field) {
 std::string SizeRep(const protobuf::FieldDescriptor* field) {
   switch (field->cpp_type()) {
     case protobuf::FieldDescriptor::CPPTYPE_MESSAGE:
-      return "upb_FieldRep_Pointer";
+      return "kUpb_FieldRep_Pointer";
     case protobuf::FieldDescriptor::CPPTYPE_ENUM:
     case protobuf::FieldDescriptor::CPPTYPE_FLOAT:
     case protobuf::FieldDescriptor::CPPTYPE_INT32:
     case protobuf::FieldDescriptor::CPPTYPE_UINT32:
-      return "upb_FieldRep_4Byte";
+      return "kUpb_FieldRep_4Byte";
     case protobuf::FieldDescriptor::CPPTYPE_BOOL:
-      return "upb_FieldRep_1Byte";
+      return "kUpb_FieldRep_1Byte";
     case protobuf::FieldDescriptor::CPPTYPE_DOUBLE:
     case protobuf::FieldDescriptor::CPPTYPE_INT64:
     case protobuf::FieldDescriptor::CPPTYPE_UINT64:
-      return "upb_FieldRep_8Byte";
+      return "kUpb_FieldRep_8Byte";
     case protobuf::FieldDescriptor::CPPTYPE_STRING:
-      return "upb_FieldRep_StringView";
+      return "kUpb_FieldRep_StringView";
     default:
       fprintf(stderr, "Unexpected type");
       abort();
@@ -352,6 +353,123 @@ std::string CType(const protobuf::FieldDescriptor* field) {
 std::string CTypeConst(const protobuf::FieldDescriptor* field) {
   return CTypeInternal(field, true);
 }
+
+// TODO: shared function defined by minitable
+upb_MiniTable_Field* FindField(upb_MiniTable* mt, uint32_t field_number) {
+  int n = mt->field_count;
+  for (int i = 0; i < n; i++) {
+    if (mt->fields[i].number == field_number) {
+      return const_cast<upb_MiniTable_Field*>(&mt->fields[i]);
+    }
+  }
+  assert(false);
+  return NULL;
+}
+
+class FileLayout {
+ public:
+  FileLayout(const protobuf::FileDescriptor* fd, upb_MiniTablePlatform platform)
+      : platform_(platform) {
+    ComputeLayout(fd);
+  }
+
+  upb_MiniTable* GetTable(const protobuf::Descriptor* m) {
+    auto it = table_map_.find(m);
+    assert(it != table_map_.end());
+    return it->second;
+  }
+
+ private:
+  void ComputeLayout(const protobuf::FileDescriptor* fd) {
+    for (const auto& m : SortedMessages(fd)) {
+      table_map_[m] = MakeMiniTable(m);
+    }
+    for (const auto& m : SortedMessages(fd)) {
+      upb_MiniTable* mt = GetTable(m);
+      for (const auto& f : FieldNumberOrder(m)) {
+        if (f->message_type() && f->message_type()->file() == f->file()) {
+          upb_MiniTable_Field* mt_f = FindField(mt, f->number());
+          upb_MiniTable* sub_mt = GetTable(f->message_type());
+          upb_MiniTable_SetSubMessage(mt, mt_f, sub_mt);
+        }
+        // TODO: proto2 enums.
+      }
+    }
+  }
+
+  upb_MiniTable* MakeMiniTable(const protobuf::Descriptor* m) {
+    if (m->options().message_set_wire_format()) {
+      return upb_MiniTable_BuildMessageSet(platform_, arena_.ptr());
+    } else if (m->options().map_entry()) {
+      return upb_MiniTable_BuildMapEntry(
+          static_cast<upb_FieldType>(m->map_key()->type()),
+          static_cast<upb_FieldType>(m->map_value()->type()), platform_,
+          arena_.ptr());
+    } else {
+      return MakeRegularMiniTable(m);
+    }
+  }
+
+  upb_MiniTable* MakeRegularMiniTable(const protobuf::Descriptor* m) {
+    upb::MtDataEncoder e;
+    e.StartMessage(GetMessageModifiers(m));
+    for (const auto& f : FieldNumberOrder(m)) {
+      e.PutField(static_cast<upb_FieldType>(f->type()), f->number(),
+                 GetFieldModifiers(f));
+    }
+    for (int i = 0; i < m->real_oneof_decl_count(); i++) {
+      const protobuf::OneofDescriptor* oneof = m->oneof_decl(i);
+      e.StartOneof();
+      for (int j = 0; j < oneof->field_count(); j++) {
+        const protobuf::FieldDescriptor* f = oneof->field(i);
+        e.PutOneofField(f->number());
+      }
+    }
+    const auto& str = e.data();
+    upb::Status status;
+    upb_MiniTable* ret = upb_MiniTable_Build(str.data(), str.size(), platform_,
+                                             arena_.ptr(), status.ptr());
+    assert(ret);
+    return ret;
+  }
+
+  uint64_t GetMessageModifiers(const protobuf::Descriptor* m) {
+    uint64_t ret = 0;
+
+    if (m->file()->syntax() == protobuf::FileDescriptor::SYNTAX_PROTO2) {
+      ret |= kUpb_MessageModifier_HasClosedEnums;
+    } else {
+      ret |= kUpb_MessageModifier_DefaultIsPacked;
+    }
+
+    if (m->extension_range_count() > 0) {
+      ret |= kUpb_MessageModifier_IsExtendable;
+    }
+
+    assert(!m->options().map_entry());
+    return ret;
+  }
+
+  uint64_t GetFieldModifiers(const protobuf::FieldDescriptor* f) {
+    uint64_t ret = 0;
+
+    if (f->is_repeated()) ret |= kUpb_FieldModifier_IsRepeated;
+    if (f->is_required()) ret |= kUpb_FieldModifier_IsRequired;
+    if (f->is_packed()) ret |= kUpb_FieldModifier_IsPacked;  // TODO
+    if (f->is_optional() && !f->has_presence()) {
+      ret |= kUpb_FieldModifier_IsProto3Singular;
+    }
+
+    return ret;
+  }
+
+ private:
+  typedef absl::flat_hash_map<const protobuf::Descriptor*, upb_MiniTable*>
+      TableMap;
+  upb::Arena arena_;
+  TableMap table_map_;
+  upb_MiniTablePlatform platform_;
+};
 
 void DumpEnumValues(const protobuf::EnumDescriptor* desc, Output& output) {
   std::vector<const protobuf::EnumValueDescriptor*> values;
@@ -1136,10 +1254,10 @@ void WriteField(const protobuf::FieldDescriptor* field,
   std::string rep;
   if (field->is_map()) {
     mode = "kUpb_FieldMode_Map";
-    rep = "upb_FieldRep_Pointer";
+    rep = "kUpb_FieldRep_Pointer";
   } else if (field->is_repeated()) {
     mode = "kUpb_FieldMode_Array";
-    rep = "upb_FieldRep_Pointer";
+    rep = "kUpb_FieldRep_Pointer";
   } else {
     mode = "kUpb_FieldMode_Scalar";
     rep = SizeRep(field);
@@ -1153,7 +1271,7 @@ void WriteField(const protobuf::FieldDescriptor* field,
     absl::StrAppend(&mode, " | upb_LabelFlags_IsExtension");
   }
 
-  output("{$0, $1, $2, $3, $4, $5 | ($6 << upb_FieldRep_Shift)}",
+  output("{$0, $1, $2, $3, $4, $5 | ($6 << kUpb_FieldRep_Shift)}",
          field->number(), offset, presence, submsg_index,
          TableDescriptorType(field), mode, rep);
 }
@@ -1478,6 +1596,8 @@ bool Generator::Generate(const protobuf::FileDescriptor* file,
       return false;
     }
   }
+
+  FileLayout layout(file, kUpb_MiniTablePlatform_64Bit);
 
   Output h_output(context->Open(HeaderFilename(file)));
   WriteHeader(file, h_output);
