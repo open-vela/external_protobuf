@@ -110,12 +110,34 @@ cc_library(
 )
 
 cc_library(
+    name = "mini_table",
+    srcs = ["upb/mini_table.c"],
+    hdrs = [
+        "upb/mini_table.h",
+        "upb/mini_table.hpp",
+    ],
+    copts = UPB_DEFAULT_COPTS,
+    visibility = ["//visibility:public"],
+    deps = [":upb"],
+)
+
+cc_test(
+    name = "mini_table_test",
+    srcs = ["upb/mini_table_test.cc"],
+    deps = [
+        ":mini_table",
+        "@com_google_googletest//:gtest_main",
+        "@com_google_absl//absl/container:flat_hash_set",
+    ],
+)
+
+cc_library(
     name = "fastdecode",
     srcs = [
         "upb/decode.h",
+        "upb/decode_internal.h",
         "upb/decode_fast.c",
         "upb/decode_fast.h",
-        "upb/decode_internal.h",
         "upb/msg.h",
         "upb/msg_internal.h",
         "upb/upb_internal.h",
@@ -190,7 +212,6 @@ cc_library(
     name = "textformat",
     srcs = [
         "upb/text_encode.c",
-        "upb/upb_internal.h",
     ],
     hdrs = [
         "upb/text_encode.h",
@@ -208,7 +229,6 @@ cc_library(
     srcs = [
         "upb/json_decode.c",
         "upb/json_encode.c",
-        "upb/upb_internal.h",
     ],
     hdrs = [
         "upb/json_decode.h",
@@ -264,34 +284,31 @@ upb_proto_library(
     testonly = 1,
     deps = ["@com_google_protobuf//:test_messages_proto3_proto"],
 )
-
 cc_test(
     name = "msg_test",
     srcs = ["upb/msg_test.cc"],
     deps = [
-        ":json",
-        ":msg_test_upb_proto_reflection",
         "@com_google_googletest//:gtest_main",
+        ":msg_test_upb_proto_reflection",
+        ":json",
     ],
 )
 
 proto_library(
     name = "msg_test_proto",
-    testonly = 1,
     srcs = ["upb/msg_test.proto"],
     deps = ["@com_google_protobuf//:test_messages_proto3_proto"],
 )
 
 upb_proto_reflection_library(
     name = "msg_test_upb_proto_reflection",
-    testonly = 1,
     deps = [":msg_test_proto"],
 )
 
 proto_library(
     name = "test_cpp_proto",
     srcs = ["upb/test_cpp.proto"],
-    deps = ["@com_google_protobuf//:timestamp_proto"],
+    deps = ["@com_google_protobuf//:timestamp_proto"]
 )
 
 upb_proto_library(
@@ -304,16 +321,6 @@ upb_proto_reflection_library(
     deps = ["test_cpp_proto"],
 )
 
-upb_proto_library(
-    name = "timestamp_upb_proto",
-    deps = ["@com_google_protobuf//:timestamp_proto"],
-)
-
-upb_proto_reflection_library(
-    name = "timestamp_upb_proto_reflection",
-    deps = ["@com_google_protobuf//:timestamp_proto"],
-)
-
 cc_test(
     name = "test_cpp",
     srcs = ["upb/test_cpp.cc"],
@@ -321,8 +328,6 @@ cc_test(
     deps = [
         ":test_cpp_upb_proto",
         ":test_cpp_upb_proto_reflection",
-        ":timestamp_upb_proto",
-        ":timestamp_upb_proto_reflection",
         "//:json",
         "//:port",
         "//:reflection",

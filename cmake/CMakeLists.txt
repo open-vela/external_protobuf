@@ -81,11 +81,17 @@ target_link_libraries(upb
   fastdecode
   port
   /third_party/utf8_range)
+add_library(mini_table
+  ../upb/mini_table.c
+  ../upb/mini_table.h
+  ../upb/mini_table.hpp)
+target_link_libraries(mini_table
+  upb)
 add_library(fastdecode
   ../upb/decode.h
+  ../upb/decode_internal.h
   ../upb/decode_fast.c
   ../upb/decode_fast.h
-  ../upb/decode_internal.h
   ../upb/msg.h
   ../upb/msg_internal.h
   ../upb/upb_internal.h)
@@ -112,7 +118,6 @@ target_link_libraries(reflection
   upb)
 add_library(textformat
   ../upb/text_encode.c
-  ../upb/upb_internal.h
   ../upb/text_encode.h)
 target_link_libraries(textformat
   port
@@ -120,7 +125,6 @@ target_link_libraries(textformat
 add_library(json
   ../upb/json_decode.c
   ../upb/json_encode.c
-  ../upb/upb_internal.h
   ../upb/json_decode.h
   ../upb/json_encode.h)
 target_link_libraries(json
