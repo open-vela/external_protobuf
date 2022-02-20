@@ -222,6 +222,7 @@ cc_library(
     deps = [
         ":port",
         ":reflection",
+        ":table",
     ],
 )
 
@@ -254,6 +255,7 @@ cc_test(
         ":empty_upbdefs_proto",
         ":test_messages_proto3_proto_upb",
         ":test_upb_proto",
+        ":upb",
         "@com_google_googletest//:gtest_main",
     ],
 )
