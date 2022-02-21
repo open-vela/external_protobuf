@@ -77,7 +77,7 @@ cc_library(
         "upb/port_def.inc",
         "upb/port_undef.inc",
     ],
-    visibility = ["//:__subpackages__"],
+    visibility = ["//tests:__pkg__"],
 )
 
 cc_library(
@@ -106,6 +106,28 @@ cc_library(
         ":fastdecode",
         ":port",
         "//third_party/utf8_range",
+    ],
+)
+
+cc_library(
+    name = "mini_table",
+    srcs = ["upb/mini_table.c"],
+    hdrs = [
+        "upb/mini_table.h",
+        "upb/mini_table.hpp",
+    ],
+    copts = UPB_DEFAULT_COPTS,
+    visibility = ["//visibility:public"],
+    deps = [":upb"],
+)
+
+cc_test(
+    name = "mini_table_test",
+    srcs = ["upb/mini_table_test.cc"],
+    deps = [
+        ":mini_table",
+        "@com_google_googletest//:gtest_main",
+        "@com_google_absl//absl/container:flat_hash_set",
     ],
 )
 
@@ -200,7 +222,6 @@ cc_library(
     deps = [
         ":port",
         ":reflection",
-        ":table",
     ],
 )
 
@@ -233,7 +254,6 @@ cc_test(
         ":empty_upbdefs_proto",
         ":test_messages_proto3_proto_upb",
         ":test_upb_proto",
-        ":upb",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -272,11 +292,7 @@ cc_test(
     srcs = ["upb/msg_test.cc"],
     deps = [
         ":json",
-        ":msg_test_upb_proto",
         ":msg_test_upb_proto_reflection",
-        ":reflection",
-        ":test_messages_proto3_proto_upb",
-        ":upb",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -286,12 +302,6 @@ proto_library(
     testonly = 1,
     srcs = ["upb/msg_test.proto"],
     deps = ["@com_google_protobuf//:test_messages_proto3_proto"],
-)
-
-upb_proto_library(
-    name = "msg_test_upb_proto",
-    testonly = 1,
-    deps = [":msg_test_proto"],
 )
 
 upb_proto_reflection_library(
