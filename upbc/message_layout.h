@@ -31,8 +31,6 @@
 #include "absl/base/macros.h"
 #include "absl/container/flat_hash_map.h"
 #include "google/protobuf/descriptor.h"
-#include "upb/upb.hpp"
-#include "upb/mini_table.h"
 
 namespace upbc {
 
@@ -134,7 +132,7 @@ class MessageLayout {
   Size size_;
   int hasbit_count_;
   int hasbit_bytes_;
-  int required_count_ = 0;
+  int required_count_;
 };
 
 // Returns fields in order of "hotness", eg. how frequently they appear in
