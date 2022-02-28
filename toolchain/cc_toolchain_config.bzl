@@ -28,16 +28,13 @@ all_compile_actions = [
 ]
 
 def _impl(ctx):
-  if 'mingw' in ctx.attr.target_full_name:
-      artifact_name_patterns = [
-          artifact_name_pattern(
-              category_name = "executable",
-              prefix = "",
-              extension = ".exe",
-          ),
-      ]
-  else:
-      artifact_name_patterns = []
+  artifact_name_patterns = [
+      artifact_name_pattern(
+          category_name = "executable",
+          prefix = "",
+          extension = ".exe",
+      ),
+  ]
 
   tool_paths = [
       tool_path(
