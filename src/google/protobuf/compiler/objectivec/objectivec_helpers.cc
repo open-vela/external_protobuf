@@ -95,16 +95,14 @@ class SimpleLineCollector : public LineConsumer {
   std::unordered_set<std::string>* set_;
 };
 
-class PackageToPrefixesCollector : public LineConsumer {
+class ExpectedPrefixesCollector : public LineConsumer {
  public:
-  PackageToPrefixesCollector(const std::string &usage,
-                             std::map<std::string, std::string>* inout_package_to_prefix_map)
-      : usage_(usage), prefix_map_(inout_package_to_prefix_map) {}
+  ExpectedPrefixesCollector(std::map<std::string, std::string>* inout_package_to_prefix_map)
+      : prefix_map_(inout_package_to_prefix_map) {}
 
   virtual bool ConsumeLine(const StringPiece& line, std::string* out_error) override;
 
  private:
-  const std::string usage_;
   std::map<std::string, std::string>* prefix_map_;
 };
 
@@ -112,10 +110,10 @@ class PrefixModeStorage {
  public:
   PrefixModeStorage();
 
-  const std::string package_to_prefix_mappings_path() const { return package_to_prefix_mappings_path_; }
-  void set_package_to_prefix_mappings_path(const std::string& path) {
-    package_to_prefix_mappings_path_ = path;
-    package_to_prefix_map_.clear();
+  const std::string prefix_to_proto_package_mappings_path() const { return prefix_to_proto_package_mappings_path_; }
+  void set_prefix_to_proto_package_mappings_path(const std::string& path) {
+    prefix_to_proto_package_mappings_path_ = path;
+    prefix_to_proto_package_map_.clear();
   }
 
   std::string prefix_from_proto_package_mappings(const FileDescriptor* file);
@@ -137,8 +135,8 @@ class PrefixModeStorage {
 
  private:
   bool use_package_name_;
-  std::map<std::string, std::string> package_to_prefix_map_;
-  std::string package_to_prefix_mappings_path_;
+  std::map<std::string, std::string> prefix_to_proto_package_map_;
+  std::string prefix_to_proto_package_mappings_path_;
   std::string exception_path_;
   std::string forced_prefix_;
   std::unordered_set<std::string> exceptions_;
@@ -168,20 +166,20 @@ std::string PrefixModeStorage::prefix_from_proto_package_mappings(const FileDesc
     return "";
   }
 
-  if (package_to_prefix_map_.empty() && !package_to_prefix_mappings_path_.empty()) {
+  if (prefix_to_proto_package_map_.empty() && !prefix_to_proto_package_mappings_path_.empty()) {
     std::string error_str;
     // Re use the same collector as we use for expected_prefixes_path since the file
     // format is the same.
-    PackageToPrefixesCollector collector("Package to prefixes", &package_to_prefix_map_);
-    if (!ParseSimpleFile(package_to_prefix_mappings_path_, &collector, &error_str)) {
+    ExpectedPrefixesCollector collector(&prefix_to_proto_package_map_);
+    if (!ParseSimpleFile(prefix_to_proto_package_mappings_path_, &collector, &error_str)) {
       if (error_str.empty()) {
         error_str = std::string("protoc:0: warning: Failed to parse")
            + std::string(" prefix to proto package mappings file: ")
-           + package_to_prefix_mappings_path_;
+           + prefix_to_proto_package_mappings_path_;
       }
       std::cerr << error_str << std::endl;
       std::cerr.flush();
-      package_to_prefix_map_.clear();
+      prefix_to_proto_package_map_.clear();      
     }
   }
 
@@ -192,9 +190,9 @@ std::string PrefixModeStorage::prefix_from_proto_package_mappings(const FileDesc
   const std::string lookup_key = package.empty() ? no_package_prefix + file->name() : package;
 
   std::map<std::string, std::string>::const_iterator prefix_lookup =
-      package_to_prefix_map_.find(lookup_key);
+      prefix_to_proto_package_map_.find(lookup_key);
 
-  if (prefix_lookup != package_to_prefix_map_.end()) {
+  if (prefix_lookup != prefix_to_proto_package_map_.end()) {
     return prefix_lookup->second;
   }  
 
@@ -230,12 +228,12 @@ PrefixModeStorage g_prefix_mode;
 
 }  // namespace
 
-std::string GetPackageToPrefixMappingsPath() {
-  return g_prefix_mode.package_to_prefix_mappings_path();
+std::string GetPrefixToProtoPackageMappingsPath() {
+  return g_prefix_mode.prefix_to_proto_package_mappings_path();
 }
 
-void SetPackageToPrefixMappingsPath(const std::string& file_path) {
-  g_prefix_mode.set_package_to_prefix_mappings_path(file_path);
+void SetPrefixToProtoPackageMappingsPath(const std::string& file_path) {
+  g_prefix_mode.set_prefix_to_proto_package_mappings_path(file_path);
 }
 
 bool UseProtoPackageAsDefaultPrefix() {
@@ -1280,11 +1278,12 @@ void RemoveComment(StringPiece* input) {
 
 namespace {
 
-bool PackageToPrefixesCollector::ConsumeLine(
+bool ExpectedPrefixesCollector::ConsumeLine(
     const StringPiece& line, std::string* out_error) {
   int offset = line.find('=');
   if (offset == StringPiece::npos) {
-    *out_error = usage_ + " file line without equal sign: '" + StrCat(line) + "'.";
+    *out_error = std::string("Expected prefixes file line without equal sign: '") +
+                 std::string(line) + "'.";
     return false;
   }
   StringPiece package = line.substr(0, offset);
@@ -1305,7 +1304,7 @@ bool LoadExpectedPackagePrefixes(const Options& generation_options,
     return true;
   }
 
-  PackageToPrefixesCollector collector("Expected prefixes", prefix_map);
+  ExpectedPrefixesCollector collector(prefix_map);
   return ParseSimpleFile(
       generation_options.expected_prefixes_path, &collector, out_error);
 }
