@@ -1,14 +1,8 @@
 
-# Pulled from: https://github.com/cyb70289/utf8
-
 cc_library(
     name = "utf8_range",
     hdrs = ["utf8_range.h"],
-    srcs = [
-        "naive.c",
-        "range2-neon.c",
-        "range2-sse.c",
-    ],
+    srcs = ["utf8_range.c"],
     visibility = ["//:__pkg__"],
 )
 
