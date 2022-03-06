@@ -34,7 +34,6 @@
 #include "google/protobuf/descriptor.h"
 #include "google/protobuf/descriptor.pb.h"
 #include "google/protobuf/wire_format.h"
-#include "upb/mini_table.hpp"
 #include "upbc/common.h"
 #include "upbc/message_layout.h"
 
@@ -73,41 +72,6 @@ std::string ExtensionLayout(const google::protobuf::FieldDescriptor* ext) {
 const char* kEnumsInit = "enums_layout";
 const char* kExtensionsInit = "extensions_layout";
 const char* kMessagesInit = "messages_layout";
-
-enum SubTag {
-  kNull = 0,
-  kMessage = 1,
-  kEnum = 2,
-  kMask = 3,
-};
-
-upb_MiniTable_Sub PackSub(const char* data, SubTag tag) {
-  uintptr_t val = reinterpret_cast<uintptr_t>(data);
-  assert((val & kMask) == 0);
-  upb_MiniTable_Sub sub;
-  sub.submsg = reinterpret_cast<upb_MiniTable*>(val | tag);
-  return sub;
-}
-
-bool IsNull(upb_MiniTable_Sub sub) {
-  return reinterpret_cast<uintptr_t>(sub.subenum) == 0;
-}
-
-void WriteSub(upb_MiniTable_Sub sub, Output& output) {
-  uintptr_t as_int = reinterpret_cast<uintptr_t>(sub.submsg);
-  const char* str = reinterpret_cast<const char*>(as_int & ~SubTag::kMask);
-  switch (as_int & SubTag::kMask) {
-    case SubTag::kMessage:
-      output("    {.submsg = &$0},\n", str);
-      break;
-    case SubTag::kEnum:
-      output("    {.subenum = &$0},\n", str);
-      break;
-    default:
-      output("    {.submsg = NULL},\n", str);
-      break;
-  }
-}
 
 void AddEnums(const protobuf::Descriptor* message,
               std::vector<const protobuf::EnumDescriptor*>* enums) {
@@ -311,6 +275,29 @@ std::string SizeLg2(const protobuf::FieldDescriptor* field) {
   }
 }
 
+std::string SizeRep(const protobuf::FieldDescriptor* field) {
+  switch (field->cpp_type()) {
+    case protobuf::FieldDescriptor::CPPTYPE_MESSAGE:
+      return "kUpb_FieldRep_Pointer";
+    case protobuf::FieldDescriptor::CPPTYPE_ENUM:
+    case protobuf::FieldDescriptor::CPPTYPE_FLOAT:
+    case protobuf::FieldDescriptor::CPPTYPE_INT32:
+    case protobuf::FieldDescriptor::CPPTYPE_UINT32:
+      return "kUpb_FieldRep_4Byte";
+    case protobuf::FieldDescriptor::CPPTYPE_BOOL:
+      return "kUpb_FieldRep_1Byte";
+    case protobuf::FieldDescriptor::CPPTYPE_DOUBLE:
+    case protobuf::FieldDescriptor::CPPTYPE_INT64:
+    case protobuf::FieldDescriptor::CPPTYPE_UINT64:
+      return "kUpb_FieldRep_8Byte";
+    case protobuf::FieldDescriptor::CPPTYPE_STRING:
+      return "kUpb_FieldRep_StringView";
+    default:
+      fprintf(stderr, "Unexpected type");
+      abort();
+  }
+}
+
 bool HasNonZeroDefault(const protobuf::FieldDescriptor* field) {
   switch (field->cpp_type()) {
     case protobuf::FieldDescriptor::CPPTYPE_MESSAGE:
@@ -381,236 +368,6 @@ std::string CType(const protobuf::FieldDescriptor* field) {
 std::string CTypeConst(const protobuf::FieldDescriptor* field) {
   return CTypeInternal(field, true);
 }
-
-// TODO: shared function defined by minitable
-upb_MiniTable_Field* FindField(upb_MiniTable* mt, uint32_t field_number) {
-  int n = mt->field_count;
-  for (int i = 0; i < n; i++) {
-    if (mt->fields[i].number == field_number) {
-      return const_cast<upb_MiniTable_Field*>(&mt->fields[i]);
-    }
-  }
-  assert(false);
-  return NULL;
-}
-
-class FilePlatformLayout {
- public:
-  FilePlatformLayout(const protobuf::FileDescriptor* fd,
-                     upb_MiniTablePlatform platform)
-      : platform_(platform) {
-    BuildMiniTables(fd);
-    BuildExtensions(fd);
-  }
-
-  upb_MiniTable* GetMiniTable(const protobuf::Descriptor* m) const {
-    auto it = table_map_.find(m);
-    assert(it != table_map_.end());
-    return it->second;
-  }
-
-  const upb_MiniTable_Extension* GetExtension(
-      const protobuf::FieldDescriptor* fd) const {
-    auto it = extension_map_.find(fd);
-    assert(it != extension_map_.end());
-    return it->second;
-  }
-
- private:
-  void BuildMiniTables(const protobuf::FileDescriptor* fd) {
-    for (const auto& m : SortedMessages(fd)) {
-      table_map_[m] = MakeMiniTable(m);
-    }
-    ResolveIntraFileReferences();
-    SetSubTableStrings();
-  }
-
-  void ResolveIntraFileReferences() {
-    // This properly resolves references within a file, in order to set any
-    // necessary flags (eg. is a map).
-    for (const auto& pair : table_map_) {
-      upb_MiniTable* mt = pair.second;
-      // First we properly resolve for defs within the file.
-      for (const auto& f : FieldNumberOrder(pair.first)) {
-        if (f->message_type() && f->message_type()->file() == f->file()) {
-          upb_MiniTable_Field* mt_f = FindField(mt, f->number());
-          upb_MiniTable* sub_mt = GetMiniTable(f->message_type());
-          upb_MiniTable_SetSubMessage(mt, mt_f, sub_mt);
-        }
-        // TODO: proto2 enums.
-      }
-    }
-  }
-
-  void SetSubTableStrings() {
-    for (const auto& pair : table_map_) {
-      upb_MiniTable* mt = pair.second;
-      for (const auto& f : FieldNumberOrder(pair.first)) {
-        upb_MiniTable_Field* mt_f = FindField(mt, f->number());
-        assert(mt_f);
-        upb_MiniTable_Sub sub = PackSubForField(f);
-        if (IsNull(sub)) continue;
-        *const_cast<upb_MiniTable_Sub*>(&mt->subs[mt_f->submsg_index]) = sub;
-      }
-    }
-  }
-
-  upb_MiniTable_Sub PackSubForField(const protobuf::FieldDescriptor* f) {
-    if (f->message_type()) {
-      return PackSub(AllocStr(MessageInit(f->message_type())),
-                      SubTag::kMessage);
-    } else if (f->enum_type() && f->enum_type()->file()->syntax() ==
-                                      protobuf::FileDescriptor::SYNTAX_PROTO2) {
-      return PackSub(AllocStr(EnumInit(f->enum_type())), SubTag::kEnum);
-    } else {
-      return PackSub(nullptr, SubTag::kNull);
-    }
-  }
-
-  const char* AllocStr(const std::string& str) {
-    char* ret =
-        static_cast<char*>(upb_Arena_Malloc(arena_.ptr(), str.size() + 1));
-    memcpy(ret, str.data(), str.size());
-    ret[str.size()] = '\0';
-    return ret;
-  }
-
-  void BuildExtensions(const protobuf::FileDescriptor* fd) {
-    auto sorted = SortedExtensions(fd);
-    upb::MtDataEncoder e;
-    e.StartMessage(0);
-    for (const auto& f : sorted) {
-      e.PutField(static_cast<upb_FieldType>(f->type()), f->number(),
-                 GetFieldModifiers(f));
-    }
-    upb::Status status;
-    size_t ext_count;
-    upb_MiniTable_Extension* exts =
-        upb_MiniTable_BuildExtensions(e.data().data(), e.data().size(),
-                                      &ext_count, arena_.ptr(), status.ptr());
-    if (!exts) {
-      fprintf(stderr, "Error building mini-table: %s\n", status.error_message());
-    }
-    ABSL_ASSERT(exts);
-    if (ext_count != sorted.size()) {
-      fprintf(stderr, "ext_count: %zu, sorted.size(): %zu, data(): %s\n", ext_count,
-              sorted.size(), e.data().c_str());
-    }
-    ABSL_ASSERT(ext_count == sorted.size());
-    for (size_t i = 0; i < ext_count; i++) {
-      extension_map_[sorted[i]] = &exts[i];
-    }
-  }
-
-
-
-  upb_MiniTable* MakeMiniTable(const protobuf::Descriptor* m) {
-    if (m->options().message_set_wire_format()) {
-      return upb_MiniTable_BuildMessageSet(platform_, arena_.ptr());
-    } else if (m->options().map_entry()) {
-      return upb_MiniTable_BuildMapEntry(
-          static_cast<upb_FieldType>(m->map_key()->type()),
-          static_cast<upb_FieldType>(m->map_value()->type()), platform_,
-          arena_.ptr());
-    } else {
-      return MakeRegularMiniTable(m);
-    }
-  }
-
-  upb_MiniTable* MakeRegularMiniTable(const protobuf::Descriptor* m) {
-    upb::MtDataEncoder e;
-    e.StartMessage(GetMessageModifiers(m));
-    for (const auto& f : FieldNumberOrder(m)) {
-      e.PutField(static_cast<upb_FieldType>(f->type()), f->number(),
-                 GetFieldModifiers(f));
-    }
-    for (int i = 0; i < m->real_oneof_decl_count(); i++) {
-      const protobuf::OneofDescriptor* oneof = m->oneof_decl(i);
-      e.StartOneof();
-      for (int j = 0; j < oneof->field_count(); j++) {
-        const protobuf::FieldDescriptor* f = oneof->field(j);
-        e.PutOneofField(f->number());
-      }
-    }
-    const auto& str = e.data();
-    upb::Status status;
-    upb_MiniTable* ret = upb_MiniTable_Build(str.data(), str.size(), platform_,
-                                             arena_.ptr(), status.ptr());
-    if (!ret) {
-      fprintf(stderr, "Error building mini-table: %s\n", status.error_message());
-    }
-    assert(ret);
-    return ret;
-  }
-
-  uint64_t GetMessageModifiers(const protobuf::Descriptor* m) {
-    uint64_t ret = 0;
-
-    if (m->file()->syntax() == protobuf::FileDescriptor::SYNTAX_PROTO2) {
-      ret |= kUpb_MessageModifier_HasClosedEnums;
-    } else {
-      ret |= kUpb_MessageModifier_DefaultIsPacked;
-    }
-
-    if (m->extension_range_count() > 0) {
-      ret |= kUpb_MessageModifier_IsExtendable;
-    }
-
-    assert(!m->options().map_entry());
-    return ret;
-  }
-
-  uint64_t GetFieldModifiers(const protobuf::FieldDescriptor* f) {
-    uint64_t ret = 0;
-
-    if (f->is_repeated()) ret |= kUpb_FieldModifier_IsRepeated;
-    if (f->is_required()) ret |= kUpb_FieldModifier_IsRequired;
-    if (f->is_packed()) ret |= kUpb_FieldModifier_IsPacked;  // TODO
-    if (f->is_optional() && !f->has_presence()) {
-      ret |= kUpb_FieldModifier_IsProto3Singular;
-    }
-
-    return ret;
-  }
-
- private:
-  typedef absl::flat_hash_map<const protobuf::Descriptor*, upb_MiniTable*>
-      TableMap;
-  typedef absl::flat_hash_map<const protobuf::FieldDescriptor*, upb_MiniTable_Extension*>
-      ExtensionMap;
-  upb::Arena arena_;
-  TableMap table_map_;
-  ExtensionMap extension_map_;
-  upb_MiniTablePlatform platform_;
-};
-
-class FileLayout {
- public:
-  FileLayout(const protobuf::FileDescriptor* fd)
-      : descriptor_(fd),
-        layout32_(fd, kUpb_MiniTablePlatform_32Bit),
-        layout64_(fd, kUpb_MiniTablePlatform_64Bit) {}
-
-  const protobuf::FileDescriptor* descriptor() const { return descriptor_; }
-
-  const upb_MiniTable* GetMiniTable32(const protobuf::Descriptor* m) const {
-    return layout32_.GetMiniTable(m);
-  }
-
-  const upb_MiniTable* GetMiniTable64(const protobuf::Descriptor* m) const {
-    return layout64_.GetMiniTable(m);
-  }
-
-  const upb_MiniTable_Extension* GetExtension(
-      const protobuf::FieldDescriptor* f) const {
-    return layout64_.GetExtension(f);
-  }
-
- private:
-  const protobuf::FileDescriptor* descriptor_;
-  FilePlatformLayout layout32_;
-  FilePlatformLayout layout64_;
-};
 
 void DumpEnumValues(const protobuf::EnumDescriptor* desc, Output& output) {
   std::vector<const protobuf::EnumValueDescriptor*> values;
@@ -1112,6 +869,29 @@ void WriteHeader(const protobuf::FileDescriptor* file, Output& output) {
       ToPreproc(file->name()));
 }
 
+int TableDescriptorType(const protobuf::FieldDescriptor* field) {
+  if (field->file()->syntax() == protobuf::FileDescriptor::SYNTAX_PROTO2 &&
+      field->type() == protobuf::FieldDescriptor::TYPE_STRING) {
+    // From the perspective of the binary encoder/decoder, proto2 string fields
+    // are identical to bytes fields. Only in proto3 do we check UTF-8 for
+    // string fields at parse time.
+    //
+    // If we ever use these tables for JSON encoding/decoding (for example by
+    // embedding field names on the side) we will have to revisit this, because
+    // string vs. bytes behavior is not affected by proto2 vs proto3.
+    return protobuf::FieldDescriptor::TYPE_BYTES;
+  } else if (field->enum_type() &&
+             field->enum_type()->file()->syntax() ==
+                 protobuf::FileDescriptor::SYNTAX_PROTO3) {
+    // From the perspective of the binary decoder, proto3 enums are identical to
+    // int32 fields.  Only in proto2 do we check enum values to make sure they
+    // are defined in the enum.
+    return protobuf::FieldDescriptor::TYPE_INT32;
+  } else {
+    return field->type();
+  }
+}
+
 struct SubLayoutArray {
  public:
   SubLayoutArray(const protobuf::Descriptor* message);
@@ -1367,83 +1147,73 @@ std::vector<TableEntry> FastDecodeTable(const protobuf::Descriptor* message,
   return table;
 }
 
-std::string GetModeInit(uint8_t mode) {
-  // We could just emit this as a number (and we may yet go in that direction)
-  // but for now emitting symbolic constants gives this better readability and
-  // debuggability.
-  std::string ret;
-  switch (mode & kUpb_FieldMode_Mask) {
-    case kUpb_FieldMode_Map:
-      ret = "kUpb_FieldMode_Map";
-      break;
-    case kUpb_FieldMode_Array:
-      ret = "kUpb_FieldMode_Array";
-      break;
-    case kUpb_FieldMode_Scalar:
-      ret = "kUpb_FieldMode_Scalar";
-      break;
-    default:
-      break;
-  }
-
-  if (mode & kUpb_LabelFlags_IsPacked) {
-    absl::StrAppend(&ret, " | kUpb_LabelFlags_IsPacked");
-  }
-
-  if (mode & kUpb_LabelFlags_IsExtension) {
-    absl::StrAppend(&ret, " | kUpb_LabelFlags_IsExtension");
-  }
-
+void WriteField(const protobuf::FieldDescriptor* field,
+                absl::string_view offset, absl::string_view presence,
+                int submsg_index, Output& output) {
+  std::string mode;
   std::string rep;
-  switch (mode >> kUpb_FieldRep_Shift) {
-    case kUpb_FieldRep_1Byte:
-      rep = "kUpb_FieldRep_1Byte";
-      break;
-    case kUpb_FieldRep_4Byte:
-      rep = "kUpb_FieldRep_4Byte";
-      break;
-    case kUpb_FieldRep_Pointer:
-      rep = "kUpb_FieldRep_Pointer";
-      break;
-    case kUpb_FieldRep_StringView:
-      rep = "kUpb_FieldRep_StringView";
-      break;
-    case kUpb_FieldRep_8Byte:
-      rep = "kUpb_FieldRep_8Byte";
-      break;
+  if (field->is_map()) {
+    mode = "kUpb_FieldMode_Map";
+    rep = "kUpb_FieldRep_Pointer";
+  } else if (field->is_repeated()) {
+    mode = "kUpb_FieldMode_Array";
+    rep = "kUpb_FieldRep_Pointer";
+  } else {
+    mode = "kUpb_FieldMode_Scalar";
+    rep = SizeRep(field);
   }
 
-  absl::StrAppend(&ret, " | (", rep, " << kUpb_FieldRep_Shift)");
-  return ret;
-}
+  if (field->is_packed()) {
+    absl::StrAppend(&mode, " | kUpb_LabelFlags_IsPacked");
+  }
 
-void WriteField(const upb_MiniTable_Field* field64,
-                const upb_MiniTable_Field* field32, Output& output) {
-  output("{$0, UPB_SIZE($1, $2), $3, $4, $5, $6}", field64->number,
-         field64->offset, field32->offset, field32->presence,
-         field64->submsg_index, field64->descriptortype,
-         GetModeInit(field64->mode));
+  if (field->is_extension()) {
+    absl::StrAppend(&mode, " | kUpb_LabelFlags_IsExtension");
+  }
+
+  output("{$0, $1, $2, $3, $4, $5 | ($6 << kUpb_FieldRep_Shift)}",
+         field->number(), offset, presence, submsg_index,
+         TableDescriptorType(field), mode, rep);
 }
 
 // Writes a single field into a .upb.c source file.
-void WriteMessageField(const upb_MiniTable_Field* field64,
-                       const upb_MiniTable_Field* field32,
+void WriteMessageField(const protobuf::FieldDescriptor* field,
+                       const MessageLayout& layout, int submsg_index,
                        Output& output) {
+  std::string presence = "0";
+
+  if (MessageLayout::HasHasbit(field)) {
+    int index = layout.GetHasbitIndex(field);
+    assert(index != 0);
+    presence = absl::StrCat(index);
+  } else if (field->real_containing_oneof()) {
+    MessageLayout::Size case_offset =
+        layout.GetOneofCaseOffset(field->real_containing_oneof());
+
+    // We encode as negative to distinguish from hasbits.
+    case_offset.size32 = ~case_offset.size32;
+    case_offset.size64 = ~case_offset.size64;
+    assert(case_offset.size32 < 0);
+    assert(case_offset.size64 < 0);
+    presence = GetSizeInit(case_offset);
+  }
+
   output("  ");
-  WriteField(field64, field32, output);
+  WriteField(field, GetSizeInit(layout.GetFieldOffset(field)), presence,
+             submsg_index, output);
   output(",\n");
 }
 
 // Writes a single message into a .upb.c source file.
-void WriteMessage(const protobuf::Descriptor* message, const FileLayout& layout,
-                  Output& output, bool fasttable_enabled) {
+void WriteMessage(const protobuf::Descriptor* message, Output& output,
+                  bool fasttable_enabled) {
   std::string msg_name = ToCIdent(message->full_name());
   std::string fields_array_ref = "NULL";
   std::string submsgs_array_ref = "NULL";
   std::string subenums_array_ref = "NULL";
-  const upb_MiniTable* mt_32 = layout.GetMiniTable32(message);
-  const upb_MiniTable* mt_64 = layout.GetMiniTable64(message);
-  MessageLayout msg_layout(message);
+  uint8_t dense_below = 0;
+  const int dense_below_max = std::numeric_limits<decltype(dense_below)>::max();
+  MessageLayout layout(message);
   SubLayoutArray sublayout_array(message);
 
   if (sublayout_array.total_count()) {
@@ -1464,13 +1234,31 @@ void WriteMessage(const protobuf::Descriptor* message, const FileLayout& layout,
     output("};\n\n");
   }
 
-  if (mt_64->field_count > 0) {
+  std::vector<const protobuf::FieldDescriptor*> field_number_order =
+      FieldNumberOrder(message);
+  if (!field_number_order.empty()) {
     std::string fields_array_name = msg_name + "__fields";
     fields_array_ref = "&" + fields_array_name + "[0]";
     output("static const upb_MiniTable_Field $0[$1] = {\n", fields_array_name,
-           mt_64->field_count);
-    for (int i = 0; i < mt_64->field_count; i++) {
-      WriteMessageField(&mt_64->fields[i], &mt_32->fields[i], output);
+           field_number_order.size());
+    for (int i = 0; i < static_cast<int>(field_number_order.size()); i++) {
+      auto field = field_number_order[i];
+      int sublayout_index = 0;
+
+      if (i < dense_below_max && field->number() == i + 1 &&
+          (i == 0 || field_number_order[i - 1]->number() == i)) {
+        dense_below = i + 1;
+      }
+
+      if (field->cpp_type() == protobuf::FieldDescriptor::CPPTYPE_MESSAGE) {
+        sublayout_index = sublayout_array.GetIndex(field->message_type());
+      } else if (field->enum_type() &&
+                 field->enum_type()->file()->syntax() ==
+                     protobuf::FileDescriptor::SYNTAX_PROTO2) {
+        sublayout_index = sublayout_array.GetIndex(field->enum_type());
+      }
+
+      WriteMessageField(field, layout, sublayout_index, output);
     }
     output("};\n\n");
   }
@@ -1479,7 +1267,7 @@ void WriteMessage(const protobuf::Descriptor* message, const FileLayout& layout,
   uint8_t table_mask = -1;
 
   if (fasttable_enabled) {
-    table = FastDecodeTable(message, msg_layout);
+    table = FastDecodeTable(message, layout);
   }
 
   if (table.size() > 1) {
@@ -1500,9 +1288,9 @@ void WriteMessage(const protobuf::Descriptor* message, const FileLayout& layout,
   output("const upb_MiniTable $0 = {\n", MessageInit(message));
   output("  $0,\n", submsgs_array_ref);
   output("  $0,\n", fields_array_ref);
-  output("  $0, $1, $2, $3, $4, $5,\n", GetSizeInit(msg_layout.message_size()),
-         mt_64->field_count, msgext, mt_64->dense_below, table_mask,
-         msg_layout.required_count());
+  output("  $0, $1, $2, $3, $4, $5,\n", GetSizeInit(layout.message_size()),
+         field_number_order.size(), msgext, dense_below, table_mask,
+         layout.required_count());
   if (!table.empty()) {
     output("  UPB_FASTTABLE_INIT({\n");
     for (const auto& ent : table) {
@@ -1565,15 +1353,14 @@ int WriteEnums(const protobuf::FileDescriptor* file, Output& output) {
   return this_file_enums.size();
 }
 
-int WriteMessages(const FileLayout& layout, Output& output,
+int WriteMessages(const protobuf::FileDescriptor* file, Output& output,
                   bool fasttable_enabled) {
-  const protobuf::FileDescriptor* file = layout.descriptor();
   std::vector<const protobuf::Descriptor*> file_messages = SortedMessages(file);
 
   if (file_messages.empty()) return 0;
 
   for (auto message : file_messages) {
-    WriteMessage(message, layout, output, fasttable_enabled);
+    WriteMessage(message, output, fasttable_enabled);
   }
 
   output("static const upb_MiniTable *$0[$1] = {\n", kMessagesInit,
@@ -1586,14 +1373,24 @@ int WriteMessages(const FileLayout& layout, Output& output,
   return file_messages.size();
 }
 
-void WriteExtension(const upb_MiniTable_Extension* ext, Output& output) {
-  WriteField(&ext->field, &ext->field, output);
+void WriteExtension(const protobuf::FieldDescriptor* ext, Output& output) {
+  output("const upb_MiniTable_Extension $0 = {\n  ", ExtensionLayout(ext));
+  WriteField(ext, "0", "0", 0, output);
   output(",\n");
-  WriteSub(ext->sub, output);
+  output("    &$0,\n", MessageInit(ext->containing_type()));
+  if (ext->message_type()) {
+    output("    {.submsg = &$0},\n", MessageInit(ext->message_type()));
+  } else if (ext->enum_type() && ext->enum_type()->file()->syntax() ==
+                                     protobuf::FileDescriptor::SYNTAX_PROTO2) {
+    output("    {.subenum = &$0},\n", EnumInit(ext->enum_type()));
+  } else {
+    output("    {.submsg = NULL},\n");
+  }
+  output("\n};\n");
 }
 
-int WriteExtensions(const FileLayout& layout, Output& output) {
-  auto exts = SortedExtensions(layout.descriptor());
+int WriteExtensions(const protobuf::FileDescriptor* file, Output& output) {
+  auto exts = SortedExtensions(file);
   absl::flat_hash_set<const protobuf::Descriptor*> forward_decls;
 
   if (exts.empty()) return 0;
@@ -1614,9 +1411,7 @@ int WriteExtensions(const FileLayout& layout, Output& output) {
   }
 
   for (auto ext : exts) {
-    output("const upb_MiniTable_Extension $0 = {\n  ", ExtensionLayout(ext));
-    WriteExtension(layout.GetExtension(ext), output);
-    output("\n};\n");
+    WriteExtension(ext, output);
   }
 
   output(
@@ -1635,9 +1430,8 @@ int WriteExtensions(const FileLayout& layout, Output& output) {
 }
 
 // Writes a .upb.c source file.
-void WriteSource(const FileLayout& layout, Output& output,
+void WriteSource(const protobuf::FileDescriptor* file, Output& output,
                  bool fasttable_enabled) {
-  const protobuf::FileDescriptor* file = layout.descriptor();
   EmitFileWarning(file, output);
 
   output(
@@ -1656,7 +1450,7 @@ void WriteSource(const FileLayout& layout, Output& output,
       "\n");
 
   int msg_count = WriteMessages(file, output, fasttable_enabled);
-  int ext_count = WriteExtensions(layout, output);
+  int ext_count = WriteExtensions(file, output);
   int enum_count = WriteEnums(file, output);
 
   output("const upb_MiniTable_File $0 = {\n", FileLayoutName(file));
@@ -1699,8 +1493,6 @@ bool Generator::Generate(const protobuf::FileDescriptor* file,
     }
   }
 
-  FileLayout layout(file);
-
   std::unique_ptr<protobuf::io::ZeroCopyOutputStream> h_output_stream(
       context->Open(HeaderFilename(file)));
   Output h_output(h_output_stream.get());
@@ -1709,7 +1501,7 @@ bool Generator::Generate(const protobuf::FileDescriptor* file,
   std::unique_ptr<protobuf::io::ZeroCopyOutputStream> c_output_stream(
       context->Open(SourceFilename(file)));
   Output c_output(c_output_stream.get());
-  WriteSource(layout, c_output, fasttable_enabled);
+  WriteSource(file, c_output, fasttable_enabled);
 
   return true;
 }
