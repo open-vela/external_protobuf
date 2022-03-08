@@ -1,9 +1,5 @@
 /*
-<<<<<<< HEAD
- * Copyright (c) 2009-2021, Google LLC
-=======
  * Copyright (c) 2009-2022, Google LLC
->>>>>>> mini-table-1
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
