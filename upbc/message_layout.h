@@ -31,6 +31,8 @@
 #include "absl/base/macros.h"
 #include "absl/container/flat_hash_map.h"
 #include "google/protobuf/descriptor.h"
+#include "upb/upb.hpp"
+#include "upb/mini_table.h"
 
 namespace upbc {
 
@@ -114,6 +116,9 @@ class MessageLayout {
   static bool IsPowerOfTwo(size_t val) { return (val & (val - 1)) == 0; }
 
   static size_t Align(size_t val, size_t align) {
+    if (!IsPowerOfTwo(align)) {
+      fprintf(stderr, "YO! Align is: %d\n", (int)align);
+    }
     ABSL_ASSERT(IsPowerOfTwo(align));
     return (val + align - 1) & ~(align - 1);
   }
@@ -132,7 +137,7 @@ class MessageLayout {
   Size size_;
   int hasbit_count_;
   int hasbit_bytes_;
-  int required_count_;
+  int required_count_ = 0;
 };
 
 // Returns fields in order of "hotness", eg. how frequently they appear in
