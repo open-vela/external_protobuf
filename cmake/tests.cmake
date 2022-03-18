@@ -56,6 +56,7 @@ set(tests_protos
   google/protobuf/unittest_drop_unknown_fields.proto
   google/protobuf/unittest_embed_optimize_for.proto
   google/protobuf/unittest_empty.proto
+  google/protobuf/unittest_enormous_descriptor.proto
   google/protobuf/unittest_import.proto
   google/protobuf/unittest_import_public.proto
   google/protobuf/unittest_lazy_dependencies.proto
@@ -92,7 +93,7 @@ set(tests_protos
 )
 
 macro(compile_proto_file filename)
-  get_filename_component(dirname ${filename} PATH)
+  get_filename_component(dirname ${filename} DIRECTORY)
   get_filename_component(basename ${filename} NAME_WE)
   add_custom_command(
     OUTPUT ${protobuf_SOURCE_DIR}/src/${dirname}/${basename}.pb.cc
