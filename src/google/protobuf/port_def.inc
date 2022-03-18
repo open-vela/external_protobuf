@@ -172,7 +172,7 @@
 #ifdef PROTOBUF_VERSION_SUFFIX
 #error PROTOBUF_VERSION_SUFFIX was previously defined
 #endif
-#define PROTOBUF_VERSION_SUFFIX "-rc2"
+#define PROTOBUF_VERSION_SUFFIX "-rc1"
 
 #if defined(PROTOBUF_NAMESPACE) || defined(PROTOBUF_NAMESPACE_ID)
 #error PROTOBUF_NAMESPACE or PROTOBUF_NAMESPACE_ID was previously defined
@@ -533,6 +533,17 @@
   __builtin_assume(pred)
 #else
 #define PROTOBUF_ASSUME(pred) GOOGLE_DCHECK(pred)
+#endif
+
+// PROTOBUF_HAS_BUILTIN_MUL_OVERFLOW tells the compiler if it has
+// __builtin_mul_overflow intrinsic to check for multiplication overflow.
+#ifdef PROTOBUF_HAS_BUILTIN_MUL_OVERFLOW
+#error PROTOBUF_HAS_BUILTIN_MUL_OVERFLOW was previously defined
+#endif
+#if __has_builtin(__builtin_mul_overflow)
+#define PROTOBUF_HAS_BUILTIN_MUL_OVERFLOW 1
+#else
+#define PROTOBUF_HAS_BUILTIN_MUL_OVERFLOW 0
 #endif
 
 // Specify memory alignment for structs, classes, etc.
