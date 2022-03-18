@@ -837,11 +837,9 @@ php_EXTRA_DIST=                                                       \
   php/ext/google/protobuf/package.xml                                 \
   php/ext/google/protobuf/php-upb.c                                   \
   php/ext/google/protobuf/php-upb.h                                   \
-  php/ext/google/protobuf/php_protobuf.h                              \  
   php/ext/google/protobuf/protobuf.c                                  \
   php/ext/google/protobuf/protobuf.h                                  \
   php/ext/google/protobuf/wkt.inc                                     \
-  php/ext/google/protobuf/tests/unnecessary_zval.phpt                 \
   php/generate_descriptor_protos.sh                                   \
   php/generate_test_protos.sh                                         \
   php/release.sh                                                      \
@@ -1398,7 +1396,6 @@ EXTRA_DIST = $(@DIST_LANG@_EXTRA_DIST)              \
   update_file_lists.sh                              \
   BUILD                                             \
   WORKSPACE                                         \
-  CMakeLists.txt                                    \
   cmake/CMakeLists.txt                              \
   cmake/README.md                                   \
   cmake/conformance.cmake                           \
