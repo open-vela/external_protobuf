@@ -54,9 +54,6 @@
 #include <google/protobuf/compiler/java/java_shared_code_generator.h>
 #include <google/protobuf/descriptor.pb.h>
 
-// Must be last.
-#include <google/protobuf/port_def.inc>
-
 namespace google {
 namespace protobuf {
 namespace compiler {
@@ -735,5 +732,3 @@ bool FileGenerator::ShouldIncludeDependency(const FileDescriptor* descriptor,
 }  // namespace compiler
 }  // namespace protobuf
 }  // namespace google
-
-#include <google/protobuf/port_undef.inc>

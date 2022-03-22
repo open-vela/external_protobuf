@@ -535,6 +535,17 @@
 #define PROTOBUF_ASSUME(pred) GOOGLE_DCHECK(pred)
 #endif
 
+// PROTOBUF_HAS_BUILTIN_MUL_OVERFLOW tells the compiler if it has
+// __builtin_mul_overflow intrinsic to check for multiplication overflow.
+#ifdef PROTOBUF_HAS_BUILTIN_MUL_OVERFLOW
+#error PROTOBUF_HAS_BUILTIN_MUL_OVERFLOW was previously defined
+#endif
+#if __has_builtin(__builtin_mul_overflow)
+#define PROTOBUF_HAS_BUILTIN_MUL_OVERFLOW 1
+#else
+#define PROTOBUF_HAS_BUILTIN_MUL_OVERFLOW 0
+#endif
+
 // Specify memory alignment for structs, classes, etc.
 // Use like:
 //   class PROTOBUF_ALIGNAS(16) MyClass { ... }
@@ -771,8 +782,6 @@
 #undef ERROR_INSTALL_FAILED
 #pragma push_macro("ERROR_NOT_FOUND")
 #undef ERROR_NOT_FOUND
-#pragma push_macro("GetClassName")
-#undef GetClassName
 #pragma push_macro("GetMessage")
 #undef GetMessage
 #pragma push_macro("IGNORE")
