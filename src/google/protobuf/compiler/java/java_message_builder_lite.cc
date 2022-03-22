@@ -53,9 +53,6 @@
 #include <google/protobuf/compiler/java/java_name_resolver.h>
 #include <google/protobuf/descriptor.pb.h>
 
-// Must be last.
-#include <google/protobuf/port_def.inc>
-
 namespace google {
 namespace protobuf {
 namespace compiler {
@@ -152,5 +149,3 @@ void MessageBuilderLiteGenerator::GenerateCommonBuilderMethods(
 }  // namespace compiler
 }  // namespace protobuf
 }  // namespace google
-
-#include <google/protobuf/port_undef.inc>

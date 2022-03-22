@@ -49,9 +49,6 @@
 #include <google/protobuf/descriptor.pb.h>
 #include <google/protobuf/stubs/hash.h>  // for hash<T *>
 
-// Must be last.
-#include <google/protobuf/port_def.inc>
-
 namespace google {
 namespace protobuf {
 namespace compiler {
@@ -1112,5 +1109,3 @@ void EscapeUtf16ToString(uint16_t code, std::string* output) {
 }  // namespace compiler
 }  // namespace protobuf
 }  // namespace google
-
-#include <google/protobuf/port_undef.inc>
