@@ -147,10 +147,10 @@ class PROTOBUF_EXPORT SourceContext final :
   const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
   uint8_t* _InternalSerialize(
       uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
-  int GetCachedSize() const final { return _impl_._cached_size_.Get(); }
+  int GetCachedSize() const final { return _cached_size_.Get(); }
 
   private:
-  void SharedCtor(::PROTOBUF_NAMESPACE_ID::Arena* arena, bool is_message_owned);
+  void SharedCtor();
   void SharedDtor();
   void SetCachedSize(int size) const final;
   void InternalSwap(SourceContext* other);
@@ -198,11 +198,8 @@ class PROTOBUF_EXPORT SourceContext final :
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
-  struct Impl_ {
-    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr file_name_;
-    mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
-  };
-  union { Impl_ _impl_; };
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr file_name_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_google_2fprotobuf_2fsource_5fcontext_2eproto;
 };
 // ===================================================================
@@ -218,7 +215,7 @@ class PROTOBUF_EXPORT SourceContext final :
 
 // string file_name = 1;
 inline void SourceContext::clear_file_name() {
-  _impl_.file_name_.ClearToEmpty();
+  file_name_.ClearToEmpty();
 }
 inline const std::string& SourceContext::file_name() const {
   // @@protoc_insertion_point(field_get:google.protobuf.SourceContext.file_name)
@@ -228,7 +225,7 @@ template <typename ArgT0, typename... ArgT>
 inline PROTOBUF_ALWAYS_INLINE
 void SourceContext::set_file_name(ArgT0&& arg0, ArgT... args) {
  
- _impl_.file_name_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+ file_name_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
   // @@protoc_insertion_point(field_set:google.protobuf.SourceContext.file_name)
 }
 inline std::string* SourceContext::mutable_file_name() {
@@ -237,19 +234,19 @@ inline std::string* SourceContext::mutable_file_name() {
   return _s;
 }
 inline const std::string& SourceContext::_internal_file_name() const {
-  return _impl_.file_name_.Get();
+  return file_name_.Get();
 }
 inline void SourceContext::_internal_set_file_name(const std::string& value) {
   
-  _impl_.file_name_.Set(value, GetArenaForAllocation());
+  file_name_.Set(value, GetArenaForAllocation());
 }
 inline std::string* SourceContext::_internal_mutable_file_name() {
   
-  return _impl_.file_name_.Mutable(GetArenaForAllocation());
+  return file_name_.Mutable(GetArenaForAllocation());
 }
 inline std::string* SourceContext::release_file_name() {
   // @@protoc_insertion_point(field_release:google.protobuf.SourceContext.file_name)
-  return _impl_.file_name_.Release();
+  return file_name_.Release();
 }
 inline void SourceContext::set_allocated_file_name(std::string* file_name) {
   if (file_name != nullptr) {
@@ -257,10 +254,10 @@ inline void SourceContext::set_allocated_file_name(std::string* file_name) {
   } else {
     
   }
-  _impl_.file_name_.SetAllocated(file_name, GetArenaForAllocation());
+  file_name_.SetAllocated(file_name, GetArenaForAllocation());
 #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  if (_impl_.file_name_.IsDefault()) {
-    _impl_.file_name_.Set("", GetArenaForAllocation());
+  if (file_name_.IsDefault()) {
+    file_name_.Set("", GetArenaForAllocation());
   }
 #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
   // @@protoc_insertion_point(field_set_allocated:google.protobuf.SourceContext.file_name)

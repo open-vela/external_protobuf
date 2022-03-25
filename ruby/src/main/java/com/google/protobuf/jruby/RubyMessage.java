@@ -62,9 +62,6 @@ import java.util.List;
 import java.util.Map;
 
 public class RubyMessage extends RubyObject {
-    private final String DEFAULT_VALUE = "google.protobuf.FieldDescriptorProto.default_value";
-    private final String TYPE = "type";
-
     public RubyMessage(Ruby runtime, RubyClass klazz, Descriptor descriptor) {
         super(runtime, klazz);
 
@@ -680,8 +677,6 @@ public class RubyMessage extends RubyObject {
             throw context.runtime.newRuntimeError("Recursion limit exceeded during encoding.");
         }
 
-        RubySymbol typeBytesSymbol = RubySymbol.newSymbol(context.runtime, "TYPE_BYTES");
-
         // Handle the typical case where the fields.keySet contain the fieldDescriptors
         for (FieldDescriptor fieldDescriptor : fields.keySet()) {
             IRubyObject value = fields.get(fieldDescriptor);
@@ -712,12 +707,13 @@ public class RubyMessage extends RubyObject {
                  * stringDefaultValue}.
                  */
                 boolean isDefaultStringForBytes = false;
-                if (DEFAULT_VALUE.equals(fieldDescriptor.getFullName())) {
-                    FieldDescriptor enumFieldDescriptorForType =
-                        this.builder.getDescriptorForType().findFieldByName(TYPE);
-                    if (typeBytesSymbol.equals(fields.get(enumFieldDescriptorForType))) {
-                        isDefaultStringForBytes = true;
-                    }
+                FieldDescriptor enumFieldDescriptorForType =
+                    this.builder.getDescriptorForType().findFieldByName("type");
+                String type = enumFieldDescriptorForType == null ?
+                    null : fields.get(enumFieldDescriptorForType).toString();
+                if (type != null && type.equals("TYPE_BYTES") &&
+                    fieldDescriptor.getFullName().equals("google.protobuf.FieldDescriptorProto.default_value")) {
+                    isDefaultStringForBytes = true;
                 }
                 builder.setField(fieldDescriptor, convert(context, fieldDescriptor, value, depth, recursionLimit, isDefaultStringForBytes));
             }
