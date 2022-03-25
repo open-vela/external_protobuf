@@ -42,7 +42,6 @@
 #include <climits>
 #include <cmath>
 #include <limits>
-#include <utility>
 #include <vector>
 
 #include <google/protobuf/io/coded_stream.h>
@@ -456,9 +455,8 @@ class TextFormat::Parser::ParserImpl {
         }
       }
       reflection->SetString(message, any_type_url_field,
-                            std::move(prefix_and_full_type_name));
-      reflection->SetString(message, any_value_field,
-                            std::move(serialized_value));
+                            prefix_and_full_type_name);
+      reflection->SetString(message, any_value_field, serialized_value);
       return true;
     }
     if (TryConsume("[")) {
@@ -805,7 +803,7 @@ class TextFormat::Parser::ParserImpl {
       case FieldDescriptor::CPPTYPE_STRING: {
         std::string value;
         DO(ConsumeString(&value));
-        SET_FIELD(String, std::move(value));
+        SET_FIELD(String, value);
         break;
       }
 
