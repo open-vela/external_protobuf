@@ -996,6 +996,8 @@ public abstract class CodedOutputStream extends ByteOutput {
       writeLazy(bytes, 0, bytes.length);
     } catch (IndexOutOfBoundsException e) {
       throw new OutOfSpaceException(e);
+    } catch (OutOfSpaceException e) {
+      throw e;
     }
   }
 
@@ -1343,19 +1345,49 @@ public abstract class CodedOutputStream extends ByteOutput {
 
     @Override
     public final void writeUInt32NoTag(int value) throws IOException {
-      try {
-        while (true) {
-          if ((value & ~0x7F) == 0) {
-            buffer[position++] = (byte) value;
-            return;
-          } else {
-            buffer[position++] = (byte) ((value & 0x7F) | 0x80);
-            value >>>= 7;
-          }
+      if (HAS_UNSAFE_ARRAY_OPERATIONS
+          && !Android.isOnAndroidDevice()
+          && spaceLeft() >= MAX_VARINT32_SIZE) {
+        if ((value & ~0x7F) == 0) {
+          UnsafeUtil.putByte(buffer, position++, (byte) value);
+          return;
         }
-      } catch (IndexOutOfBoundsException e) {
-        throw new OutOfSpaceException(
-            String.format("Pos: %d, limit: %d, len: %d", position, limit, 1), e);
+        UnsafeUtil.putByte(buffer, position++, (byte) (value | 0x80));
+        value >>>= 7;
+        if ((value & ~0x7F) == 0) {
+          UnsafeUtil.putByte(buffer, position++, (byte) value);
+          return;
+        }
+        UnsafeUtil.putByte(buffer, position++, (byte) (value | 0x80));
+        value >>>= 7;
+        if ((value & ~0x7F) == 0) {
+          UnsafeUtil.putByte(buffer, position++, (byte) value);
+          return;
+        }
+        UnsafeUtil.putByte(buffer, position++, (byte) (value | 0x80));
+        value >>>= 7;
+        if ((value & ~0x7F) == 0) {
+          UnsafeUtil.putByte(buffer, position++, (byte) value);
+          return;
+        }
+        UnsafeUtil.putByte(buffer, position++, (byte) (value | 0x80));
+        value >>>= 7;
+        UnsafeUtil.putByte(buffer, position++, (byte) value);
+      } else {
+        try {
+          while (true) {
+            if ((value & ~0x7F) == 0) {
+              buffer[position++] = (byte) value;
+              return;
+            } else {
+              buffer[position++] = (byte) ((value & 0x7F) | 0x80);
+              value >>>= 7;
+            }
+          }
+        } catch (IndexOutOfBoundsException e) {
+          throw new OutOfSpaceException(
+              String.format("Pos: %d, limit: %d, len: %d", position, limit, 1), e);
+        }
       }
     }
 

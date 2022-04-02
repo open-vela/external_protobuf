@@ -122,7 +122,6 @@ class PROTOBUF_EXPORT Parser {
 
  private:
   class LocationRecorder;
-  struct MapField;
 
   // =================================================================
   // Error recovery helpers
@@ -378,9 +377,6 @@ class PROTOBUF_EXPORT Parser {
                                 int location_field_number_for_nested_type,
                                 const LocationRecorder& field_location,
                                 const FileDescriptorProto* containing_file);
-
-  bool ParseMapType(MapField* map_field, FieldDescriptorProto* field,
-                    LocationRecorder& type_name_location);
 
   // Parse an "extensions" declaration.
   bool ParseExtensions(DescriptorProto* message,

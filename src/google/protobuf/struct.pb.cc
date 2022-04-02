@@ -22,7 +22,7 @@ namespace _pbi = _pb::internal;
 
 PROTOBUF_NAMESPACE_OPEN
 PROTOBUF_CONSTEXPR Struct_FieldsEntry_DoNotUse::Struct_FieldsEntry_DoNotUse(
-    ::_pbi::ConstantInitialized) {}
+    ::_pbi::ConstantInitialized){}
 struct Struct_FieldsEntry_DoNotUseDefaultTypeInternal {
   PROTOBUF_CONSTEXPR Struct_FieldsEntry_DoNotUseDefaultTypeInternal()
       : _instance(::_pbi::ConstantInitialized{}) {}
@@ -33,9 +33,8 @@ struct Struct_FieldsEntry_DoNotUseDefaultTypeInternal {
 };
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 Struct_FieldsEntry_DoNotUseDefaultTypeInternal _Struct_FieldsEntry_DoNotUse_default_instance_;
 PROTOBUF_CONSTEXPR Struct::Struct(
-    ::_pbi::ConstantInitialized): _impl_{
-    /*decltype(_impl_.fields_)*/{::_pbi::ConstantInitialized()}
-  , /*decltype(_impl_._cached_size_)*/{}} {}
+    ::_pbi::ConstantInitialized)
+  : fields_(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized{}){}
 struct StructDefaultTypeInternal {
   PROTOBUF_CONSTEXPR StructDefaultTypeInternal()
       : _instance(::_pbi::ConstantInitialized{}) {}
@@ -46,10 +45,8 @@ struct StructDefaultTypeInternal {
 };
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 StructDefaultTypeInternal _Struct_default_instance_;
 PROTOBUF_CONSTEXPR Value::Value(
-    ::_pbi::ConstantInitialized): _impl_{
-    /*decltype(_impl_.kind_)*/{}
-  , /*decltype(_impl_._cached_size_)*/{}
-  , /*decltype(_impl_._oneof_case_)*/{}} {}
+    ::_pbi::ConstantInitialized)
+  : _oneof_case_{}{}
 struct ValueDefaultTypeInternal {
   PROTOBUF_CONSTEXPR ValueDefaultTypeInternal()
       : _instance(::_pbi::ConstantInitialized{}) {}
@@ -60,9 +57,8 @@ struct ValueDefaultTypeInternal {
 };
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 ValueDefaultTypeInternal _Value_default_instance_;
 PROTOBUF_CONSTEXPR ListValue::ListValue(
-    ::_pbi::ConstantInitialized): _impl_{
-    /*decltype(_impl_.values_)*/{}
-  , /*decltype(_impl_._cached_size_)*/{}} {}
+    ::_pbi::ConstantInitialized)
+  : values_(){}
 struct ListValueDefaultTypeInternal {
   PROTOBUF_CONSTEXPR ListValueDefaultTypeInternal()
       : _instance(::_pbi::ConstantInitialized{}) {}
@@ -94,11 +90,11 @@ const uint32_t TableStruct_google_2fprotobuf_2fstruct_2eproto::offsets[] PROTOBU
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
-  PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::Struct, _impl_.fields_),
+  PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::Struct, fields_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::Value, _internal_metadata_),
   ~0u,  // no _extensions_
-  PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::Value, _impl_._oneof_case_[0]),
+  PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::Value, _oneof_case_[0]),
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
   ::_pbi::kInvalidFieldOffsetTag,
@@ -107,14 +103,14 @@ const uint32_t TableStruct_google_2fprotobuf_2fstruct_2eproto::offsets[] PROTOBU
   ::_pbi::kInvalidFieldOffsetTag,
   ::_pbi::kInvalidFieldOffsetTag,
   ::_pbi::kInvalidFieldOffsetTag,
-  PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::Value, _impl_.kind_),
+  PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::Value, kind_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::ListValue, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
-  PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::ListValue, _impl_.values_),
+  PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::ListValue, values_),
 };
 static const ::_pbi::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, 8, -1, sizeof(::PROTOBUF_NAMESPACE_ID::Struct_FieldsEntry_DoNotUse)},
@@ -200,8 +196,9 @@ class Struct::_Internal {
 
 Struct::Struct(::PROTOBUF_NAMESPACE_ID::Arena* arena,
                          bool is_message_owned)
-  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
-  SharedCtor(arena, is_message_owned);
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned),
+  fields_(arena) {
+  SharedCtor();
   if (arena != nullptr && !is_message_owned) {
     arena->OwnCustomDestructor(this, &Struct::ArenaDtor);
   }
@@ -209,23 +206,12 @@ Struct::Struct(::PROTOBUF_NAMESPACE_ID::Arena* arena,
 }
 Struct::Struct(const Struct& from)
   : ::PROTOBUF_NAMESPACE_ID::Message() {
-  new (&_impl_) Impl_{
-      /*decltype(_impl_.fields_)*/{}
-    , /*decltype(_impl_._cached_size_)*/{}};
-
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  _impl_.fields_.MergeFrom(from._impl_.fields_);
+  fields_.MergeFrom(from.fields_);
   // @@protoc_insertion_point(copy_constructor:google.protobuf.Struct)
 }
 
-inline void Struct::SharedCtor(
-    ::_pb::Arena* arena, bool is_message_owned) {
-  (void)arena;
-  (void)is_message_owned;
-  new (&_impl_) Impl_{
-      /*decltype(_impl_.fields_)*/{::_pbi::ArenaInitialized(), arena}
-    , /*decltype(_impl_._cached_size_)*/{}
-  };
+inline void Struct::SharedCtor() {
 }
 
 Struct::~Struct() {
@@ -240,16 +226,15 @@ Struct::~Struct() {
 
 inline void Struct::SharedDtor() {
   GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
-  _impl_.fields_.Destruct();
-  _impl_.fields_.~MapField();
+  fields_.Destruct();
 }
 
 void Struct::ArenaDtor(void* object) {
   Struct* _this = reinterpret_cast< Struct* >(object);
-  _this->_impl_.fields_.Destruct();
+  _this->fields_.Destruct();
 }
 void Struct::SetCachedSize(int size) const {
-  _impl_._cached_size_.Set(size);
+  _cached_size_.Set(size);
 }
 
 void Struct::Clear() {
@@ -258,7 +243,7 @@ void Struct::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  _impl_.fields_.Clear();
+  fields_.Clear();
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
@@ -274,7 +259,7 @@ const char* Struct::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
           ptr -= 1;
           do {
             ptr += 1;
-            ptr = ctx->ParseMessage(&_impl_.fields_, ptr);
+            ptr = ctx->ParseMessage(&fields_, ptr);
             CHK_(ptr);
             if (!ctx->DataAvailable(ptr)) break;
           } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<10>(ptr));
@@ -361,7 +346,7 @@ size_t Struct::ByteSizeLong() const {
     total_size += Struct_FieldsEntry_DoNotUse::Funcs::ByteSizeLong(it->first, it->second);
   }
 
-  return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
+  return MaybeComputeUnknownFieldsSize(total_size, &_cached_size_);
 }
 
 const ::PROTOBUF_NAMESPACE_ID::Message::ClassData Struct::_class_data_ = {
@@ -383,7 +368,7 @@ void Struct::MergeFrom(const Struct& from) {
   uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
-  _impl_.fields_.MergeFrom(from._impl_.fields_);
+  fields_.MergeFrom(from.fields_);
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
 }
 
@@ -401,7 +386,7 @@ bool Struct::IsInitialized() const {
 void Struct::InternalSwap(Struct* other) {
   using std::swap;
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
-  _impl_.fields_.InternalSwap(&other->_impl_.fields_);
+  fields_.InternalSwap(&other->fields_);
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata Struct::GetMetadata() const {
@@ -420,11 +405,11 @@ class Value::_Internal {
 
 const ::PROTOBUF_NAMESPACE_ID::Struct&
 Value::_Internal::struct_value(const Value* msg) {
-  return *msg->_impl_.kind_.struct_value_;
+  return *msg->kind_.struct_value_;
 }
 const ::PROTOBUF_NAMESPACE_ID::ListValue&
 Value::_Internal::list_value(const Value* msg) {
-  return *msg->_impl_.kind_.list_value_;
+  return *msg->kind_.list_value_;
 }
 void Value::set_allocated_struct_value(::PROTOBUF_NAMESPACE_ID::Struct* struct_value) {
   ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArenaForAllocation();
@@ -437,7 +422,7 @@ void Value::set_allocated_struct_value(::PROTOBUF_NAMESPACE_ID::Struct* struct_v
           message_arena, struct_value, submessage_arena);
     }
     set_has_struct_value();
-    _impl_.kind_.struct_value_ = struct_value;
+    kind_.struct_value_ = struct_value;
   }
   // @@protoc_insertion_point(field_set_allocated:google.protobuf.Value.struct_value)
 }
@@ -452,23 +437,18 @@ void Value::set_allocated_list_value(::PROTOBUF_NAMESPACE_ID::ListValue* list_va
           message_arena, list_value, submessage_arena);
     }
     set_has_list_value();
-    _impl_.kind_.list_value_ = list_value;
+    kind_.list_value_ = list_value;
   }
   // @@protoc_insertion_point(field_set_allocated:google.protobuf.Value.list_value)
 }
 Value::Value(::PROTOBUF_NAMESPACE_ID::Arena* arena,
                          bool is_message_owned)
   : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
-  SharedCtor(arena, is_message_owned);
+  SharedCtor();
   // @@protoc_insertion_point(arena_constructor:google.protobuf.Value)
 }
 Value::Value(const Value& from)
   : ::PROTOBUF_NAMESPACE_ID::Message() {
-  new (&_impl_) Impl_{
-      decltype(_impl_.kind_){}
-    , /*decltype(_impl_._cached_size_)*/{}
-    , /*decltype(_impl_._oneof_case_)*/{}};
-
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   clear_has_kind();
   switch (from.kind_case()) {
@@ -503,16 +483,8 @@ Value::Value(const Value& from)
   // @@protoc_insertion_point(copy_constructor:google.protobuf.Value)
 }
 
-inline void Value::SharedCtor(
-    ::_pb::Arena* arena, bool is_message_owned) {
-  (void)arena;
-  (void)is_message_owned;
-  new (&_impl_) Impl_{
-      decltype(_impl_.kind_){}
-    , /*decltype(_impl_._cached_size_)*/{}
-    , /*decltype(_impl_._oneof_case_)*/{}
-  };
-  clear_has_kind();
+inline void Value::SharedCtor() {
+clear_has_kind();
 }
 
 Value::~Value() {
@@ -532,7 +504,7 @@ inline void Value::SharedDtor() {
 }
 
 void Value::SetCachedSize(int size) const {
-  _impl_._cached_size_.Set(size);
+  _cached_size_.Set(size);
 }
 
 void Value::clear_kind() {
@@ -547,7 +519,7 @@ void Value::clear_kind() {
       break;
     }
     case kStringValue: {
-      _impl_.kind_.string_value_.Destroy();
+      kind_.string_value_.Destroy();
       break;
     }
     case kBoolValue: {
@@ -556,13 +528,13 @@ void Value::clear_kind() {
     }
     case kStructValue: {
       if (GetArenaForAllocation() == nullptr) {
-        delete _impl_.kind_.struct_value_;
+        delete kind_.struct_value_;
       }
       break;
     }
     case kListValue: {
       if (GetArenaForAllocation() == nullptr) {
-        delete _impl_.kind_.list_value_;
+        delete kind_.list_value_;
       }
       break;
     }
@@ -570,7 +542,7 @@ void Value::clear_kind() {
       break;
     }
   }
-  _impl_._oneof_case_[0] = KIND_NOT_SET;
+  _oneof_case_[0] = KIND_NOT_SET;
 }
 
 
@@ -757,21 +729,21 @@ size_t Value::ByteSizeLong() const {
     case kStructValue: {
       total_size += 1 +
         ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
-          *_impl_.kind_.struct_value_);
+          *kind_.struct_value_);
       break;
     }
     // .google.protobuf.ListValue list_value = 6;
     case kListValue: {
       total_size += 1 +
         ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
-          *_impl_.kind_.list_value_);
+          *kind_.list_value_);
       break;
     }
     case KIND_NOT_SET: {
       break;
     }
   }
-  return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
+  return MaybeComputeUnknownFieldsSize(total_size, &_cached_size_);
 }
 
 const ::PROTOBUF_NAMESPACE_ID::Message::ClassData Value::_class_data_ = {
@@ -839,8 +811,8 @@ bool Value::IsInitialized() const {
 void Value::InternalSwap(Value* other) {
   using std::swap;
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
-  swap(_impl_.kind_, other->_impl_.kind_);
-  swap(_impl_._oneof_case_[0], other->_impl_._oneof_case_[0]);
+  swap(kind_, other->kind_);
+  swap(_oneof_case_[0], other->_oneof_case_[0]);
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata Value::GetMetadata() const {
@@ -857,28 +829,19 @@ class ListValue::_Internal {
 
 ListValue::ListValue(::PROTOBUF_NAMESPACE_ID::Arena* arena,
                          bool is_message_owned)
-  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
-  SharedCtor(arena, is_message_owned);
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned),
+  values_(arena) {
+  SharedCtor();
   // @@protoc_insertion_point(arena_constructor:google.protobuf.ListValue)
 }
 ListValue::ListValue(const ListValue& from)
-  : ::PROTOBUF_NAMESPACE_ID::Message() {
-  new (&_impl_) Impl_{
-      decltype(_impl_.values_){from._impl_.values_}
-    , /*decltype(_impl_._cached_size_)*/{}};
-
+  : ::PROTOBUF_NAMESPACE_ID::Message(),
+      values_(from.values_) {
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   // @@protoc_insertion_point(copy_constructor:google.protobuf.ListValue)
 }
 
-inline void ListValue::SharedCtor(
-    ::_pb::Arena* arena, bool is_message_owned) {
-  (void)arena;
-  (void)is_message_owned;
-  new (&_impl_) Impl_{
-      decltype(_impl_.values_){arena}
-    , /*decltype(_impl_._cached_size_)*/{}
-  };
+inline void ListValue::SharedCtor() {
 }
 
 ListValue::~ListValue() {
@@ -892,11 +855,10 @@ ListValue::~ListValue() {
 
 inline void ListValue::SharedDtor() {
   GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
-  _impl_.values_.~RepeatedPtrField();
 }
 
 void ListValue::SetCachedSize(int size) const {
-  _impl_._cached_size_.Set(size);
+  _cached_size_.Set(size);
 }
 
 void ListValue::Clear() {
@@ -905,7 +867,7 @@ void ListValue::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  _impl_.values_.Clear();
+  values_.Clear();
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
@@ -983,12 +945,12 @@ size_t ListValue::ByteSizeLong() const {
 
   // repeated .google.protobuf.Value values = 1;
   total_size += 1UL * this->_internal_values_size();
-  for (const auto& msg : this->_impl_.values_) {
+  for (const auto& msg : this->values_) {
     total_size +=
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(msg);
   }
 
-  return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
+  return MaybeComputeUnknownFieldsSize(total_size, &_cached_size_);
 }
 
 const ::PROTOBUF_NAMESPACE_ID::Message::ClassData ListValue::_class_data_ = {
@@ -1010,7 +972,7 @@ void ListValue::MergeFrom(const ListValue& from) {
   uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
-  _impl_.values_.MergeFrom(from._impl_.values_);
+  values_.MergeFrom(from.values_);
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
 }
 
@@ -1028,7 +990,7 @@ bool ListValue::IsInitialized() const {
 void ListValue::InternalSwap(ListValue* other) {
   using std::swap;
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
-  _impl_.values_.InternalSwap(&other->_impl_.values_);
+  values_.InternalSwap(&other->values_);
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata ListValue::GetMetadata() const {
