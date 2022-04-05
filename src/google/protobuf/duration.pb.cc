@@ -22,10 +22,9 @@ namespace _pbi = _pb::internal;
 
 PROTOBUF_NAMESPACE_OPEN
 PROTOBUF_CONSTEXPR Duration::Duration(
-    ::_pbi::ConstantInitialized): _impl_{
-    /*decltype(_impl_.seconds_)*/int64_t{0}
-  , /*decltype(_impl_.nanos_)*/0
-  , /*decltype(_impl_._cached_size_)*/{}} {}
+    ::_pbi::ConstantInitialized)
+  : seconds_(int64_t{0})
+  , nanos_(0){}
 struct DurationDefaultTypeInternal {
   PROTOBUF_CONSTEXPR DurationDefaultTypeInternal()
       : _instance(::_pbi::ConstantInitialized{}) {}
@@ -47,8 +46,8 @@ const uint32_t TableStruct_google_2fprotobuf_2fduration_2eproto::offsets[] PROTO
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
-  PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::Duration, _impl_.seconds_),
-  PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::Duration, _impl_.nanos_),
+  PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::Duration, seconds_),
+  PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::Duration, nanos_),
 };
 static const ::_pbi::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, -1, sizeof(::PROTOBUF_NAMESPACE_ID::Duration)},
@@ -92,32 +91,23 @@ class Duration::_Internal {
 Duration::Duration(::PROTOBUF_NAMESPACE_ID::Arena* arena,
                          bool is_message_owned)
   : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
-  SharedCtor(arena, is_message_owned);
+  SharedCtor();
   // @@protoc_insertion_point(arena_constructor:google.protobuf.Duration)
 }
 Duration::Duration(const Duration& from)
   : ::PROTOBUF_NAMESPACE_ID::Message() {
-  new (&_impl_) Impl_{
-      decltype(_impl_.seconds_){}
-    , decltype(_impl_.nanos_){}
-    , /*decltype(_impl_._cached_size_)*/{}};
-
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  ::memcpy(&_impl_.seconds_, &from._impl_.seconds_,
-    static_cast<size_t>(reinterpret_cast<char*>(&_impl_.nanos_) -
-    reinterpret_cast<char*>(&_impl_.seconds_)) + sizeof(_impl_.nanos_));
+  ::memcpy(&seconds_, &from.seconds_,
+    static_cast<size_t>(reinterpret_cast<char*>(&nanos_) -
+    reinterpret_cast<char*>(&seconds_)) + sizeof(nanos_));
   // @@protoc_insertion_point(copy_constructor:google.protobuf.Duration)
 }
 
-inline void Duration::SharedCtor(
-    ::_pb::Arena* arena, bool is_message_owned) {
-  (void)arena;
-  (void)is_message_owned;
-  new (&_impl_) Impl_{
-      decltype(_impl_.seconds_){int64_t{0}}
-    , decltype(_impl_.nanos_){0}
-    , /*decltype(_impl_._cached_size_)*/{}
-  };
+inline void Duration::SharedCtor() {
+::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
+    reinterpret_cast<char*>(&seconds_) - reinterpret_cast<char*>(this)),
+    0, static_cast<size_t>(reinterpret_cast<char*>(&nanos_) -
+    reinterpret_cast<char*>(&seconds_)) + sizeof(nanos_));
 }
 
 Duration::~Duration() {
@@ -134,7 +124,7 @@ inline void Duration::SharedDtor() {
 }
 
 void Duration::SetCachedSize(int size) const {
-  _impl_._cached_size_.Set(size);
+  _cached_size_.Set(size);
 }
 
 void Duration::Clear() {
@@ -143,9 +133,9 @@ void Duration::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  ::memset(&_impl_.seconds_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&_impl_.nanos_) -
-      reinterpret_cast<char*>(&_impl_.seconds_)) + sizeof(_impl_.nanos_));
+  ::memset(&seconds_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&nanos_) -
+      reinterpret_cast<char*>(&seconds_)) + sizeof(nanos_));
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
@@ -158,7 +148,7 @@ const char* Duration::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx)
       // int64 seconds = 1;
       case 1:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
-          _impl_.seconds_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          seconds_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else
           goto handle_unusual;
@@ -166,7 +156,7 @@ const char* Duration::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx)
       // int32 nanos = 2;
       case 2:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 16)) {
-          _impl_.nanos_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+          nanos_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
         } else
           goto handle_unusual;
@@ -238,11 +228,11 @@ size_t Duration::ByteSizeLong() const {
     total_size += ::_pbi::WireFormatLite::Int32SizePlusOne(this->_internal_nanos());
   }
 
-  return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
+  return MaybeComputeUnknownFieldsSize(total_size, &_cached_size_);
 }
 
 const ::PROTOBUF_NAMESPACE_ID::Message::ClassData Duration::_class_data_ = {
-    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSourceCheck,
+    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSizeCheck,
     Duration::MergeImpl
 };
 const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*Duration::GetClassData() const { return &_class_data_; }
@@ -284,11 +274,11 @@ void Duration::InternalSwap(Duration* other) {
   using std::swap;
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
-      PROTOBUF_FIELD_OFFSET(Duration, _impl_.nanos_)
-      + sizeof(Duration::_impl_.nanos_)
-      - PROTOBUF_FIELD_OFFSET(Duration, _impl_.seconds_)>(
-          reinterpret_cast<char*>(&_impl_.seconds_),
-          reinterpret_cast<char*>(&other->_impl_.seconds_));
+      PROTOBUF_FIELD_OFFSET(Duration, nanos_)
+      + sizeof(Duration::nanos_)
+      - PROTOBUF_FIELD_OFFSET(Duration, seconds_)>(
+          reinterpret_cast<char*>(&seconds_),
+          reinterpret_cast<char*>(&other->seconds_));
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata Duration::GetMetadata() const {
