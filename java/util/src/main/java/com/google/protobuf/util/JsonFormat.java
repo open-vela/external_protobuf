@@ -1718,8 +1718,7 @@ public class JsonFormat {
         FieldDescriptor field, JsonElement json, Message.Builder builder)
         throws InvalidProtocolBufferException {
       if (!(json instanceof JsonArray)) {
-        throw new InvalidProtocolBufferException(
-            "Expected an array for " + field.getName() + " but found " + json);
+        throw new InvalidProtocolBufferException("Expect an array but found: " + json);
       }
       JsonArray array = (JsonArray) json;
       for (int i = 0; i < array.size(); ++i) {
