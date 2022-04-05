@@ -1,4 +1,4 @@
-using Google.Protobuf.TestProtos.Proto2;
+﻿using Google.Protobuf.TestProtos.Proto2;
 using Proto2 = Google.Protobuf.TestProtos.Proto2;
 using NUnit.Framework;
 

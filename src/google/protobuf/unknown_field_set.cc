@@ -111,7 +111,7 @@ void UnknownFieldSet::MergeToInternalMetadata(
 size_t UnknownFieldSet::SpaceUsedExcludingSelfLong() const {
   if (fields_.empty()) return 0;
 
-  size_t total_size = sizeof(UnknownField) * fields_.capacity();
+  size_t total_size = sizeof(fields_) + sizeof(UnknownField) * fields_.size();
 
   for (const UnknownField& field : fields_) {
     switch (field.type()) {
