@@ -160,7 +160,6 @@ def _impl(ctx):
           feature(
               name = "targets_windows",
               enabled = True,
-              #implies = ["copy_dynamic_libraries_to_binary"],
           )
       )
   else:
