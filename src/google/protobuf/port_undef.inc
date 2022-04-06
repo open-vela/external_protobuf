@@ -67,7 +67,6 @@
 #undef PROTOBUF_FORCE_COPY_IN_RELEASE
 #undef PROTOBUF_FORCE_COPY_IN_SWAP
 #undef PROTOBUF_FORCE_COPY_IN_MOVE
-#undef PROTOBUF_FORCE_RESET_IN_CLEAR
 #undef PROTOBUF_FORCE_COPY_DEFAULT_STRING
 #undef PROTOBUF_NAMESPACE_OPEN
 #undef PROTOBUF_NAMESPACE_CLOSE
@@ -114,7 +113,6 @@
 #pragma pop_macro("ERROR_NOT_FOUND")
 #pragma pop_macro("GetClassName")
 #pragma pop_macro("GetMessage")
-#pragma pop_macro("GetObject")
 #pragma pop_macro("IGNORE")
 #pragma pop_macro("IN")
 #pragma pop_macro("INPUT_KEYBOARD")

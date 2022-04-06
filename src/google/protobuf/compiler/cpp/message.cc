@@ -547,7 +547,9 @@ void GenerateExtensionAnnotations(
   for (const auto& annotation : accessor_annotations_to_hooks) {
     (*variables)[annotation.first] = "";
   }
-  if (!HasTracker(descriptor, options)) {
+  if (!options.field_listener_options.inject_field_listener_events ||
+      descriptor->file()->options().optimize_for() ==
+          google::protobuf::FileOptions::LITE_RUNTIME) {
     return;
   }
   StringPiece tracker = (*variables)["tracker"];
@@ -628,7 +630,9 @@ MessageGenerator::MessageGenerator(
   variables_["annotate_bytesize"] = "";
   variables_["annotate_mergefrom"] = "";
 
-  if (HasTracker(descriptor_, options_)) {
+  if (options.field_listener_options.inject_field_listener_events &&
+      descriptor->file()->options().optimize_for() !=
+          google::protobuf::FileOptions::LITE_RUNTIME) {
     const std::string injector_template =
         StrCat("  ", variables_["tracker"], ".");
 
@@ -1861,7 +1865,9 @@ void MessageGenerator::GenerateClassDefinition(io::Printer* printer) {
         "\n");
   }
 
-  if (HasTracker(descriptor_, options_)) {
+  if (options_.field_listener_options.inject_field_listener_events &&
+      descriptor_->file()->options().optimize_for() !=
+          google::protobuf::FileOptions::LITE_RUNTIME) {
     format("static ::$proto_ns$::AccessListener<$1$> _tracker_;\n",
            ClassName(descriptor_));
   }
@@ -1944,12 +1950,9 @@ void MessageGenerator::GenerateClassDefinition(io::Printer* printer) {
   }
 
   format.Outdent();
-  format("};\n");
-
-  // Only create the _impl_ field if it contains data.
-  if (HasImplData(descriptor_, options_)) {
-    format("union { Impl_ _impl_; };\n");
-  }
+  format(
+      "};\n"
+      "union { Impl_ _impl_; };\n");
 
   // The TableStruct struct needs access to the private parts, in order to
   // construct the offsets of all members.
@@ -2182,7 +2185,9 @@ void MessageGenerator::GenerateClassMethods(io::Printer* printer) {
         "\n");
   }
 
-  if (HasTracker(descriptor_, options_)) {
+  if (options_.field_listener_options.inject_field_listener_events &&
+      descriptor_->file()->options().optimize_for() !=
+          google::protobuf::FileOptions::LITE_RUNTIME) {
     format(
         "::$proto_ns$::AccessListener<$classtype$> "
         "$1$::$tracker$(&FullMessageName);\n",
@@ -2491,7 +2496,7 @@ void MessageGenerator::GenerateArenaDestructorCode(io::Printer* printer) {
 void MessageGenerator::GenerateConstexprConstructor(io::Printer* printer) {
   Formatter format(printer, variables_);
 
-  if (IsMapEntryMessage(descriptor_) || !HasImplData(descriptor_, options_)) {
+  if (IsMapEntryMessage(descriptor_)) {
     format(
         "PROTOBUF_CONSTEXPR $classname$::$classname$(\n"
         "    ::_pbi::ConstantInitialized) {}\n");
@@ -2643,69 +2648,65 @@ void MessageGenerator::GenerateStructors(io::Printer* printer) {
         "  : $superclass$() {\n");
     format.Indent();
 
-    if (HasImplData(descriptor_, options_)) {
-      const char* field_sep = " ";
-      const auto put_sep = [&] {
-        format("\n$1$ ", field_sep);
-        field_sep = ",";
-      };
+    const char* field_sep = " ";
+    const auto put_sep = [&] {
+      format("\n$1$ ", field_sep);
+      field_sep = ",";
+    };
 
-      format("new (&_impl_) Impl_{");
-      format.Indent();
+    format("new (&_impl_) Impl_{");
+    format.Indent();
 
-      if (descriptor_->extension_range_count() > 0) {
-        put_sep();
-        format("/*decltype($extensions$)*/{}");
-      }
-      if (!inlined_string_indices_.empty()) {
-        // Do not copy inlined_string_donated_, because this is not an arena
-        // constructor.
-        put_sep();
-        format("decltype($inlined_string_donated_array$){}");
-      }
-      bool need_to_emit_cached_size =
-          !HasSimpleBaseClass(descriptor_, options_);
-      if (!has_bit_indices_.empty()) {
-        put_sep();
-        format("decltype($has_bits$){from.$has_bits$}");
-        if (need_to_emit_cached_size) {
-          put_sep();
-          format("/*decltype($cached_size$)*/{}");
-          need_to_emit_cached_size = false;
-        }
-      }
-
-      // Initialize member variables with arena constructor.
-      for (auto field : optimized_order_) {
-        put_sep();
-        field_generators_.get(field).GenerateCopyAggregateInitializer(printer);
-      }
-      for (auto oneof : OneOfRange(descriptor_)) {
-        put_sep();
-        format("decltype(_impl_.$1$_){}", oneof->name());
-      }
-
+    if (descriptor_->extension_range_count() > 0) {
+      put_sep();
+      format("/*decltype($extensions$)*/{}");
+    }
+    if (!inlined_string_indices_.empty()) {
+      // Do not copy inlined_string_donated_, because this is not an arena
+      // constructor.
+      put_sep();
+      format("decltype($inlined_string_donated_array$){}");
+    }
+    bool need_to_emit_cached_size = !HasSimpleBaseClass(descriptor_, options_);
+    if (!has_bit_indices_.empty()) {
+      put_sep();
+      format("decltype($has_bits$){from.$has_bits$}");
       if (need_to_emit_cached_size) {
         put_sep();
         format("/*decltype($cached_size$)*/{}");
+        need_to_emit_cached_size = false;
       }
-
-      if (descriptor_->real_oneof_decl_count() != 0) {
-        put_sep();
-        format("/*decltype($oneof_case$)*/{}");
-      }
-      if (num_weak_fields_ > 0) {
-        put_sep();
-        format("decltype($weak_field_map$){from.$weak_field_map$}");
-      }
-      if (IsAnyMessage(descriptor_, options_)) {
-        put_sep();
-        format(
-            "/*decltype($any_metadata$)*/{&_impl_.type_url_, &_impl_.value_}");
-      }
-      format.Outdent();
-      format("};\n\n");
     }
+
+    // Initialize member variables with arena constructor.
+    for (auto field : optimized_order_) {
+      put_sep();
+      field_generators_.get(field).GenerateCopyAggregateInitializer(printer);
+    }
+    for (auto oneof : OneOfRange(descriptor_)) {
+      put_sep();
+      format("decltype(_impl_.$1$_){}", oneof->name());
+    }
+
+    if (need_to_emit_cached_size) {
+      put_sep();
+      format("/*decltype($cached_size$)*/{}");
+    }
+
+    if (descriptor_->real_oneof_decl_count() != 0) {
+      put_sep();
+      format("/*decltype($oneof_case$)*/{}");
+    }
+    if (num_weak_fields_ > 0) {
+      put_sep();
+      format("decltype($weak_field_map$){from.$weak_field_map$}");
+    }
+    if (IsAnyMessage(descriptor_, options_)) {
+      put_sep();
+      format("/*decltype($any_metadata$)*/{&_impl_.type_url_, &_impl_.value_}");
+    }
+    format.Outdent();
+    format("};\n\n");
 
     format(
         "_internal_metadata_.MergeFrom<$unknown_fields_type$>(from._internal_"
@@ -3144,7 +3145,7 @@ void MessageGenerator::GenerateMergeFrom(io::Printer* printer) {
       format(
           "const ::$proto_ns$::Message::ClassData "
           "$classname$::_class_data_ = {\n"
-          "    ::$proto_ns$::Message::CopyWithSourceCheck,\n"
+          "    ::$proto_ns$::Message::CopyWithSizeCheck,\n"
           "    $classname$::MergeImpl\n"
           "};\n"
           "const ::$proto_ns$::Message::ClassData*"
@@ -3358,12 +3359,12 @@ void MessageGenerator::GenerateCopyFrom(io::Printer* printer) {
     // takes in the Message base class as a parameter); instead we just
     // let the base Message::CopyFrom take care of it.  The base MergeFrom
     // knows how to quickly confirm the types exactly match, and if so, will
-    // use GetClassData() to get the address of Message::CopyWithSourceCheck,
+    // use GetClassData() to get the address of Message::CopyWithSizeCheck,
     // which calls Clear() and then MergeFrom(), as well as making sure that
-    // clearing the destination message doesn't alter the source, when in debug
-    // builds. Most callers avoid this by passing a "from" message that is the
-    // same type as the message being merged into, rather than a generic
-    // Message.
+    // clearing the destination message doesn't alter the size of the source,
+    // when in debug builds.
+    // Most callers avoid this by passing a "from" message that is the same
+    // type as the message being merged into, rather than a generic Message.
   }
 
   // Generate the class-specific CopyFrom.
@@ -3375,33 +3376,20 @@ void MessageGenerator::GenerateCopyFrom(io::Printer* printer) {
 
   format("if (&from == this) return;\n");
 
-  if (!options_.opensource_runtime && HasMessageFieldOrExtension(descriptor_)) {
+  if (!options_.opensource_runtime) {
     // This check is disabled in the opensource release because we're
     // concerned that many users do not define NDEBUG in their release builds.
-    // It is also disabled if a message has neither message fields nor
-    // extensions, as it's impossible to copy from its descendant.
-    //
-    // Note that FailIfCopyFromDescendant is implemented by reflection and not
-    // available for lite runtime. In that case, check if the size of the source
-    // has changed after Clear.
-    format("#ifndef NDEBUG\n");
-    if (HasDescriptorMethods(descriptor_->file(), options_)) {
-      format("FailIfCopyFromDescendant(this, from);\n");
-    } else {
-      format("size_t from_size = from.ByteSizeLong();\n");
-    }
     format(
+        "#ifndef NDEBUG\n"
+        "size_t from_size = from.ByteSizeLong();\n"
         "#endif\n"
-        "Clear();\n");
-    if (!HasDescriptorMethods(descriptor_->file(), options_)) {
-      format(
-          "#ifndef NDEBUG\n"
-          "$CHK$_EQ(from_size, from.ByteSizeLong())\n"
-          "  << \"Source of CopyFrom changed when clearing target.  Either \"\n"
-          "     \"source is a nested message in target (not allowed), or \"\n"
-          "     \"another thread is modifying the source.\";\n"
-          "#endif\n");
-    }
+        "Clear();\n"
+        "#ifndef NDEBUG\n"
+        "$CHK$_EQ(from_size, from.ByteSizeLong())\n"
+        "  << \"Source of CopyFrom changed when clearing target.  Either \"\n"
+        "     \"source is a nested message in target (not allowed), or \"\n"
+        "     \"another thread is modifying the source.\";\n"
+        "#endif\n");
   } else {
     format("Clear();\n");
   }
