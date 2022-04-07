@@ -34,6 +34,8 @@
 
 #include <google/protobuf/stubs/logging.h>
 #include <google/protobuf/stubs/common.h>
+#include <google/protobuf/arena_test_util.h>
+#include <google/protobuf/map_test_util.h>
 #include <google/protobuf/map_unittest.pb.h>
 #include <google/protobuf/unittest.pb.h>
 #include <google/protobuf/arena.h>
@@ -42,8 +44,6 @@
 #include <google/protobuf/message.h>
 #include <google/protobuf/repeated_field.h>
 #include <gtest/gtest.h>
-#include <google/protobuf/arena_test_util.h>
-#include <google/protobuf/map_test_util.h>
 
 // Must be included last.
 #include <google/protobuf/port_def.inc>
