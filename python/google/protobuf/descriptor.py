@@ -44,10 +44,7 @@ if api_implementation.Type() == 'cpp':
   # Used by MakeDescriptor in cpp mode
   import binascii
   import os
-  if api_implementation._Version() == 3:
-    from google3.third_party.upb.python import _message
-  else:
-    from google.protobuf.pyext import _message
+  from google.protobuf.pyext import _message
   _USE_C_DESCRIPTORS = True
 
 
