@@ -501,6 +501,10 @@
 #error PROTOBUF_FORCE_COPY_IN_MOVE was previously defined
 #endif
 
+#ifdef PROTOBUF_FORCE_RESET_IN_CLEAR
+#error PROTOBUF_FORCE_RESET_IN_CLEAR was previously defined
+#endif
+
 // Force copy the default string to a string field so that non-optimized builds
 // have harder-to-rely-on address stability.
 #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
@@ -771,8 +775,12 @@
 #undef ERROR_INSTALL_FAILED
 #pragma push_macro("ERROR_NOT_FOUND")
 #undef ERROR_NOT_FOUND
+#pragma push_macro("GetClassName")
+#undef GetClassName
 #pragma push_macro("GetMessage")
 #undef GetMessage
+#pragma push_macro("GetObject")
+#undef GetObject
 #pragma push_macro("IGNORE")
 #undef IGNORE
 #pragma push_macro("IN")
