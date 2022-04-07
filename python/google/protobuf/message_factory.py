@@ -118,8 +118,6 @@ class MessageFactory(object):
         self.GetPrototype(extension.containing_type)
       extended_class = self._classes[extension.containing_type]
       extended_class.RegisterExtension(extension)
-      if extension.message_type:
-        self.GetPrototype(extension.message_type)
     return result_class
 
   def GetMessages(self, files):
@@ -156,8 +154,6 @@ class MessageFactory(object):
           self.GetPrototype(extension.containing_type)
         extended_class = self._classes[extension.containing_type]
         extended_class.RegisterExtension(extension)
-        if extension.message_type:
-          self.GetPrototype(extension.message_type)
     return result
 
 
