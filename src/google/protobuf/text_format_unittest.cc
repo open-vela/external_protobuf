@@ -47,6 +47,8 @@
 #include <google/protobuf/testing/file.h>
 #include <google/protobuf/any.pb.h>
 #include <google/protobuf/map_unittest.pb.h>
+#include <google/protobuf/test_util.h>
+#include <google/protobuf/test_util2.h>
 #include <google/protobuf/unittest.pb.h>
 #include <google/protobuf/unittest_mset.pb.h>
 #include <google/protobuf/unittest_mset_wire_format.pb.h>
@@ -59,8 +61,6 @@
 #include <gtest/gtest.h>
 #include <google/protobuf/stubs/logging.h>
 #include <google/protobuf/stubs/substitute.h>
-#include <google/protobuf/test_util.h>
-#include <google/protobuf/test_util2.h>
 
 
 // Must be included last.

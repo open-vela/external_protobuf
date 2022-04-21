@@ -50,7 +50,7 @@ class Annotation extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type array<int>|\Google\Protobuf\Internal\RepeatedField $path
+     *     @type int[]|\Google\Protobuf\Internal\RepeatedField $path
      *           Identifies the element in the original source .proto file. This field
      *           is formatted the same as SourceCodeInfo.Location.path.
      *     @type string $source_file
@@ -86,7 +86,7 @@ class Annotation extends \Google\Protobuf\Internal\Message
      * is formatted the same as SourceCodeInfo.Location.path.
      *
      * Generated from protobuf field <code>repeated int32 path = 1 [packed = true];</code>
-     * @param array<int>|\Google\Protobuf\Internal\RepeatedField $var
+     * @param int[]|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setPath($var)

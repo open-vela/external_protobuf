@@ -60,11 +60,11 @@ class Type extends \Google\Protobuf\Internal\Message
      *
      *     @type string $name
      *           The fully qualified message name.
-     *     @type array<\Google\Protobuf\Field>|\Google\Protobuf\Internal\RepeatedField $fields
+     *     @type \Google\Protobuf\Field[]|\Google\Protobuf\Internal\RepeatedField $fields
      *           The list of fields.
-     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $oneofs
+     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $oneofs
      *           The list of types appearing in `oneof` definitions in this type.
-     *     @type array<\Google\Protobuf\Option>|\Google\Protobuf\Internal\RepeatedField $options
+     *     @type \Google\Protobuf\Option[]|\Google\Protobuf\Internal\RepeatedField $options
      *           The protocol buffer options.
      *     @type \Google\Protobuf\SourceContext $source_context
      *           The source context.
@@ -118,7 +118,7 @@ class Type extends \Google\Protobuf\Internal\Message
      * The list of fields.
      *
      * Generated from protobuf field <code>repeated .google.protobuf.Field fields = 2;</code>
-     * @param array<\Google\Protobuf\Field>|\Google\Protobuf\Internal\RepeatedField $var
+     * @param \Google\Protobuf\Field[]|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setFields($var)
@@ -144,7 +144,7 @@ class Type extends \Google\Protobuf\Internal\Message
      * The list of types appearing in `oneof` definitions in this type.
      *
      * Generated from protobuf field <code>repeated string oneofs = 3;</code>
-     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
+     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setOneofs($var)
@@ -170,7 +170,7 @@ class Type extends \Google\Protobuf\Internal\Message
      * The protocol buffer options.
      *
      * Generated from protobuf field <code>repeated .google.protobuf.Option options = 4;</code>
-     * @param array<\Google\Protobuf\Option>|\Google\Protobuf\Internal\RepeatedField $var
+     * @param \Google\Protobuf\Option[]|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setOptions($var)

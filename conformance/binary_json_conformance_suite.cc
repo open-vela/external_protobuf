@@ -2226,11 +2226,11 @@ void BinaryAndJsonConformanceSuite::RunJsonTestsForNonRepeatedTypes() {
       "optional_aliased_enum: ALIAS_BAZ");
   RunValidJsonTest(
       "EnumFieldWithAliasUseAlias", REQUIRED,
-      R"({"optionalAliasedEnum": "MOO"})",
+      R"({"optionalAliasedEnum": "QUX"})",
       "optional_aliased_enum: ALIAS_BAZ");
   RunValidJsonTest(
       "EnumFieldWithAliasLowerCase", REQUIRED,
-      R"({"optionalAliasedEnum": "moo"})",
+      R"({"optionalAliasedEnum": "qux"})",
       "optional_aliased_enum: ALIAS_BAZ");
   RunValidJsonTest(
       "EnumFieldWithAliasDifferentCase", REQUIRED,

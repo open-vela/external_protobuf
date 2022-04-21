@@ -732,8 +732,10 @@ void DescriptorPool_CreateWithSymbolTable(zval *zv, upb_DefPool *symtab) {
 }
 
 upb_DefPool *DescriptorPool_GetSymbolTable() {
-  return get_global_symtab();
+  DescriptorPool *intern = GetPool(get_generated_pool());
+  return intern->symtab;
 }
+
 
 /*
  * DescriptorPool::getGeneratedPool()
@@ -741,7 +743,9 @@ upb_DefPool *DescriptorPool_GetSymbolTable() {
  * Returns the generated DescriptorPool.
  */
 PHP_METHOD(DescriptorPool, getGeneratedPool) {
-  DescriptorPool_CreateWithSymbolTable(return_value, get_global_symtab());
+  zval ret;
+  ZVAL_COPY(&ret, get_generated_pool());
+  RETURN_COPY_VALUE(&ret);
 }
 
 /*
@@ -876,14 +880,14 @@ static void add_name_mappings(const upb_FileDef *file) {
   }
 }
 
-static void add_descriptor(upb_DefPool *symtab,
+static void add_descriptor(DescriptorPool *pool,
                            const google_protobuf_FileDescriptorProto *file) {
   upb_StringView name = google_protobuf_FileDescriptorProto_name(file);
   upb_Status status;
   const upb_FileDef *file_def;
   upb_Status_Clear(&status);
 
-  if (upb_DefPool_FindFileByNameWithSize(symtab, name.data, name.size)) {
+  if (upb_DefPool_FindFileByNameWithSize(pool->symtab, name.data, name.size)) {
     // Already added.
     // TODO(teboring): Re-enable this warning when aggregate metadata is
     // deprecated.
@@ -898,10 +902,10 @@ static void add_descriptor(upb_DefPool *symtab,
   // doesn't add it as a dependency even if the proto file actually does
   // depend on it.
   if (depends_on_descriptor(file)) {
-    google_protobuf_FileDescriptorProto_getmsgdef(symtab);
+    google_protobuf_FileDescriptorProto_getmsgdef(pool->symtab);
   }
 
-  file_def = upb_DefPool_AddFile(symtab, file, &status);
+  file_def = upb_DefPool_AddFile(pool->symtab, file, &status);
   CheckUpbStatus(&status, "Unable to load descriptor");
   add_name_mappings(file_def);
 }
@@ -911,7 +915,7 @@ static void add_descriptor(upb_DefPool *symtab,
  *
  * Adds the given descriptor data to this DescriptorPool.
  */
-static void add_descriptor_set(upb_DefPool *symtab, const char *data,
+static void add_descriptor_set(DescriptorPool *pool, const char *data,
                                int data_len, upb_Arena *arena) {
   size_t i, n;
   google_protobuf_FileDescriptorSet *set;
@@ -928,12 +932,13 @@ static void add_descriptor_set(upb_DefPool *symtab, const char *data,
 
   for (i = 0; i < n; i++) {
     const google_protobuf_FileDescriptorProto* file = files[i];
-    add_descriptor(symtab, file);
+    add_descriptor(pool, file);
   }
 }
 
 bool DescriptorPool_HasFile(const char *filename) {
-  return upb_DefPool_FindFileByName(get_global_symtab(), filename) != NULL;
+  DescriptorPool *intern = GetPool(get_generated_pool());
+  return upb_DefPool_FindFileByName(intern->symtab, filename) != NULL;
 }
 
 void DescriptorPool_AddDescriptor(const char *filename, const char *data,
@@ -947,7 +952,7 @@ void DescriptorPool_AddDescriptor(const char *filename, const char *data,
     return;
   }
 
-  add_descriptor(get_global_symtab(), file);
+  add_descriptor(GetPool(get_generated_pool()), file);
   upb_Arena_Free(arena);
 }
 
@@ -969,7 +974,7 @@ PHP_METHOD(DescriptorPool, internalAddGeneratedFile) {
   }
 
   arena = upb_Arena_New();
-  add_descriptor_set(intern->symtab, data, data_len, arena);
+  add_descriptor_set(intern, data, data_len, arena);
   upb_Arena_Free(arena);
 }
 
@@ -1010,7 +1015,7 @@ zend_class_entry *InternalDescriptorPool_class_entry;
  * instance.
  */
 PHP_METHOD(InternalDescriptorPool, getGeneratedPool) {
-  DescriptorPool_CreateWithSymbolTable(return_value, get_global_symtab());
+  RETURN_COPY(get_generated_pool());
 }
 
 static zend_function_entry InternalDescriptorPool_methods[] = {

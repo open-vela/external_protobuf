@@ -13,9 +13,7 @@ pushd $(dirname $0)/..
 # Windows and Unix.
 if [ -z "$PROTOC" ]; then
   # TODO(jonskeet): Use an array and a for loop instead?
-  if [ -x solution/Debug/protoc.exe ]; then
-    PROTOC=solution/Debug/protoc.exe
-  elif [ -x cmake/build/Debug/protoc.exe ]; then
+  if [ -x cmake/build/Debug/protoc.exe ]; then
     PROTOC=cmake/build/Debug/protoc.exe
   elif [ -x cmake/build/Release/protoc.exe ]; then
     PROTOC=cmake/build/Release/protoc.exe

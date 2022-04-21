@@ -29,7 +29,7 @@ class FileDescriptorSet extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type array<\Google\Protobuf\Internal\FileDescriptorProto>|\Google\Protobuf\Internal\RepeatedField $file
+     *     @type \Google\Protobuf\Internal\FileDescriptorProto[]|\Google\Protobuf\Internal\RepeatedField $file
      * }
      */
     public function __construct($data = NULL) {
@@ -48,7 +48,7 @@ class FileDescriptorSet extends \Google\Protobuf\Internal\Message
 
     /**
      * Generated from protobuf field <code>repeated .google.protobuf.FileDescriptorProto file = 1;</code>
-     * @param array<\Google\Protobuf\Internal\FileDescriptorProto>|\Google\Protobuf\Internal\RepeatedField $var
+     * @param \Google\Protobuf\Internal\FileDescriptorProto[]|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setFile($var)
