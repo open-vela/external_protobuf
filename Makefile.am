@@ -816,10 +816,10 @@ objectivec_EXTRA_DIST=                                                       \
   Protobuf.podspec
 
 php_EXTRA_DIST=                                                       \
+  composer.json                                                       \
   php/README.md                                                       \
   php/REFCOUNTING.md                                                  \
   php/composer.json                                                   \
-  php/composer.json.dist                                              \
   php/ext/google/protobuf/arena.c                                     \
   php/ext/google/protobuf/arena.h                                     \
   php/ext/google/protobuf/array.c                                     \
@@ -1403,7 +1403,6 @@ EXTRA_DIST = $(@DIST_LANG@_EXTRA_DIST)              \
   BUILD                                             \
   WORKSPACE                                         \
   CMakeLists.txt                                    \
-  cmake/abseil-cpp.cmake                            \
   cmake/CMakeLists.txt                              \
   cmake/README.md                                   \
   cmake/conformance.cmake                           \
