@@ -1861,8 +1861,7 @@ TEST_F(ParserValidationErrorTest, FieldNumberError) {
       "message Foo {\n"
       "  optional int32 bar = 0;\n"
       "}\n",
-      "1:23: Field numbers must be positive integers.\n"
-      "1:23: Suggested field numbers for Foo: 1\n");
+      "1:23: Field numbers must be positive integers.\n");
 }
 
 TEST_F(ParserValidationErrorTest, FieldExtendeeError) {
@@ -1927,8 +1926,7 @@ TEST_F(ParserValidationErrorTest, ExtensionRangeNumberError) {
       "message Foo {\n"
       "  extensions 0;\n"
       "}\n",
-      "1:13: Extension numbers must be positive integers.\n"
-      "1:13: Suggested field numbers for Foo: 1\n");
+      "1:13: Extension numbers must be positive integers.\n");
 }
 
 TEST_F(ParserValidationErrorTest, Proto3ExtensionError) {

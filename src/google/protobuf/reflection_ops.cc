@@ -170,10 +170,8 @@ void ReflectionOps::Merge(const Message& from, Message* to) {
     }
   }
 
-  if (!from_reflection->GetUnknownFields(from).empty()) {
-    to_reflection->MutableUnknownFields(to)->MergeFrom(
-        from_reflection->GetUnknownFields(from));
-  }
+  to_reflection->MutableUnknownFields(to)->MergeFrom(
+      from_reflection->GetUnknownFields(from));
 }
 
 void ReflectionOps::Clear(Message* message) {

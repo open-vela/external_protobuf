@@ -34,5 +34,4 @@ if [[ ! -f BUILD_STAMP ]] || [[ "$(cat BUILD_STAMP)" != "$FINGERPRINT" ]]; then
 fi
 
 make
-TEST_PHP_ARGS="-q" make test
 popd > /dev/null

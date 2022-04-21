@@ -76,7 +76,7 @@ public class LazyStringEndToEndTest {
     ByteString bytes = tV2.toByteString();
     assertThat(bytes).isEqualTo(TEST_ALL_TYPES_SERIALIZED_WITH_ILLEGAL_UTF8);
 
-    String unused = tV2.getOptionalString();
+    tV2.getOptionalString();
     bytes = tV2.toByteString();
     assertThat(bytes).isEqualTo(TEST_ALL_TYPES_SERIALIZED_WITH_ILLEGAL_UTF8);
   }

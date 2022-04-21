@@ -4,32 +4,33 @@ Copyright 2008 Google Inc.
 
 https://developers.google.com/protocol-buffers/
 
-## Use the Protobuf Java Lite Runtime
+## Use Protobuf Java Lite Runtime
 
-The Protobuf Java Lite runtime is separated from the main Java runtime because
-it's designed and implemented with different constraints. In particular, the Java
-Lite runtime is much smaller which makes it more suitable to be used on Android.
+Protobuf Java Lite runtime is separated from the main Java runtime because
+it's designed/implemented with different constraints. In particular, Java
+Lite runtime has a much smaller code size which makes it more suitable to
+be used on Android.
 
-In order to achieve maximum performance and code size, we do
+Note that in order to achieve maximum performance and code size, we will
 NOT guarantee API/ABI stability for Java Lite. If this is not acceptable
-for your use-case, use the full Java runtime instead. Note that
+for your use-case, please use the full Java runtime instead. Note that
 the latest version of Java Lite is not compatible with the 3.0.0 version.
 
 You can generate Java Lite code for your .proto files:
 
     $ protoc --java_out=lite:${OUTPUT_DIR} path/to/your/proto/file
 
-The "optimize_for = LITE_RUNTIME" option in the .proto file no longer has any
-effect on Java code.
+Note that "optimize_for = LITE_RUNTIME" option in proto file is deprecated
+and will not have any effect any more.
 
 Include the generated Java files in your project and add a dependency on the
-protobuf Java Lite runtime. If you are using Maven, include the following:
+protobuf Java runtime. If you are using Maven, use the following:
 
 ```xml
 <dependency>
   <groupId>com.google.protobuf</groupId>
   <artifactId>protobuf-javalite</artifactId>
-  <version>3.20.1-rc-1</version>
+  <version>3.20.1</version>
 </dependency>
 ```
 
