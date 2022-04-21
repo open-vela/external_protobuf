@@ -238,10 +238,6 @@ inline void TestUtil::ReflectionTester::SetAllFieldsViaReflection(
   sub_message = reflection->MutableMessage(message, F("optional_lazy_message"));
   sub_message->GetReflection()->SetInt32(sub_message, nested_b_, 127);
 
-  sub_message = reflection->MutableMessage(
-      message, F("optional_unverified_lazy_message"));
-  sub_message->GetReflection()->SetInt32(sub_message, nested_b_, 128);
-
   // -----------------------------------------------------------------
 
   reflection->AddInt32(message, F("repeated_int32"), 201);
@@ -352,7 +348,7 @@ inline void TestUtil::ReflectionTester::SetOneofViaReflection(
   Message* sub_message = reflection->MutableMessage(
       message, descriptor->FindFieldByName("foo_lazy_message"));
   sub_message->GetReflection()->SetInt64(
-      sub_message, sub_message->GetDescriptor()->FindFieldByName("moo_int"),
+      sub_message, sub_message->GetDescriptor()->FindFieldByName("qux_int"),
       100);
 
   reflection->SetString(message, descriptor->FindFieldByName("bar_cord"),
@@ -380,7 +376,7 @@ inline void TestUtil::ReflectionTester::ExpectOneofSetViaReflection(
       message, descriptor->FindFieldByName("foo_lazy_message"));
   EXPECT_EQ(100, sub_message->GetReflection()->GetInt64(
                      *sub_message,
-                     sub_message->GetDescriptor()->FindFieldByName("moo_int")));
+                     sub_message->GetDescriptor()->FindFieldByName("qux_int")));
 
   EXPECT_EQ("101", reflection->GetString(
                        message, descriptor->FindFieldByName("bar_cord")));
@@ -472,8 +468,6 @@ inline void TestUtil::ReflectionTester::ExpectAllFieldsSetViaReflection1(
   EXPECT_TRUE(
       reflection->HasField(message, F("optional_public_import_message")));
   EXPECT_TRUE(reflection->HasField(message, F("optional_lazy_message")));
-  EXPECT_TRUE(
-      reflection->HasField(message, F("optional_unverified_lazy_message")));
 
   sub_message = &reflection->GetMessage(message, F("optionalgroup"));
   EXPECT_TRUE(sub_message->GetReflection()->HasField(*sub_message, group_a_));
@@ -487,9 +481,6 @@ inline void TestUtil::ReflectionTester::ExpectAllFieldsSetViaReflection1(
       &reflection->GetMessage(message, F("optional_public_import_message"));
   EXPECT_TRUE(sub_message->GetReflection()->HasField(*sub_message, import_e_));
   sub_message = &reflection->GetMessage(message, F("optional_lazy_message"));
-  EXPECT_TRUE(sub_message->GetReflection()->HasField(*sub_message, nested_b_));
-  sub_message =
-      &reflection->GetMessage(message, F("optional_unverified_lazy_message"));
   EXPECT_TRUE(sub_message->GetReflection()->HasField(*sub_message, nested_b_));
 
   EXPECT_TRUE(reflection->HasField(message, F("optional_nested_enum")));
@@ -538,10 +529,6 @@ inline void TestUtil::ReflectionTester::ExpectAllFieldsSetViaReflection1(
             sub_message->GetReflection()->GetInt32(*sub_message, import_e_));
   sub_message = &reflection->GetMessage(message, F("optional_lazy_message"));
   EXPECT_EQ(127,
-            sub_message->GetReflection()->GetInt32(*sub_message, nested_b_));
-  sub_message =
-      &reflection->GetMessage(message, F("optional_unverified_lazy_message"));
-  EXPECT_EQ(128,
             sub_message->GetReflection()->GetInt32(*sub_message, nested_b_));
 
   EXPECT_EQ(nested_baz_,
@@ -910,8 +897,6 @@ inline void TestUtil::ReflectionTester::ExpectClearViaReflection(
   EXPECT_FALSE(
       reflection->HasField(message, F("optional_public_import_message")));
   EXPECT_FALSE(reflection->HasField(message, F("optional_lazy_message")));
-  EXPECT_FALSE(
-      reflection->HasField(message, F("optional_unverified_lazy_message")));
 
   EXPECT_FALSE(reflection->HasField(message, F("optional_nested_enum")));
   EXPECT_FALSE(reflection->HasField(message, F("optional_foreign_enum")));
@@ -962,10 +947,6 @@ inline void TestUtil::ReflectionTester::ExpectClearViaReflection(
   EXPECT_FALSE(sub_message->GetReflection()->HasField(*sub_message, import_e_));
   EXPECT_EQ(0, sub_message->GetReflection()->GetInt32(*sub_message, import_e_));
   sub_message = &reflection->GetMessage(message, F("optional_lazy_message"));
-  EXPECT_FALSE(sub_message->GetReflection()->HasField(*sub_message, nested_b_));
-  EXPECT_EQ(0, sub_message->GetReflection()->GetInt32(*sub_message, nested_b_));
-  sub_message =
-      &reflection->GetMessage(message, F("optional_unverified_lazy_message"));
   EXPECT_FALSE(sub_message->GetReflection()->HasField(*sub_message, nested_b_));
   EXPECT_EQ(0, sub_message->GetReflection()->GetInt32(*sub_message, nested_b_));
 
