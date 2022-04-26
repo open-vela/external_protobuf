@@ -30,8 +30,6 @@
 #ifndef GOOGLE_PROTOBUF_STUBS_TIME_H_
 #define GOOGLE_PROTOBUF_STUBS_TIME_H_
 
-#include <cstdint>
-
 #include <google/protobuf/stubs/common.h>
 
 #include <google/protobuf/port_def.inc>
@@ -53,12 +51,12 @@ struct DateTime {
 // negative to represent time before 1970-01-01) to DateTime. Returns false
 // if the timestamp is not in the range between 0001-01-01T00:00:00 and
 // 9999-12-31T23:59:59.
-bool PROTOBUF_EXPORT SecondsToDateTime(int64_t seconds, DateTime* time);
+bool PROTOBUF_EXPORT SecondsToDateTime(int64 seconds, DateTime* time);
 // Converts DateTime to a timestamp (seconds since 1970-01-01T00:00:00).
 // Returns false if the DateTime is not valid or is not in the valid range.
-bool PROTOBUF_EXPORT DateTimeToSeconds(const DateTime& time, int64_t* seconds);
+bool PROTOBUF_EXPORT DateTimeToSeconds(const DateTime& time, int64* seconds);
 
-void PROTOBUF_EXPORT GetCurrentTime(int64_t* seconds, int32_t* nanos);
+void PROTOBUF_EXPORT GetCurrentTime(int64* seconds, int32* nanos);
 
 // Formats a time string in RFC3339 format.
 //
@@ -67,11 +65,11 @@ void PROTOBUF_EXPORT GetCurrentTime(int64_t* seconds, int32_t* nanos);
 // value.
 //
 // Note that "nanos" must in the range of [0, 999999999].
-std::string PROTOBUF_EXPORT FormatTime(int64_t seconds, int32_t nanos);
+std::string PROTOBUF_EXPORT FormatTime(int64 seconds, int32 nanos);
 // Parses a time string. This method accepts RFC3339 date/time string with UTC
 // offset. For example, "2015-05-20T13:29:35.120-08:00".
-bool PROTOBUF_EXPORT ParseTime(const std::string& value, int64_t* seconds,
-                               int32_t* nanos);
+bool PROTOBUF_EXPORT ParseTime(const std::string& value, int64* seconds,
+                               int32* nanos);
 
 }  // namespace internal
 }  // namespace protobuf
