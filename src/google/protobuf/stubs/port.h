@@ -163,68 +163,68 @@ void __sanitizer_unaligned_store64(void *p, uint64_t v);
 }  // extern "C"
 #endif  // __cplusplus
 
-inline uint16_t GOOGLE_UNALIGNED_LOAD16(const void *p) {
+inline uint16 GOOGLE_UNALIGNED_LOAD16(const void *p) {
   return __sanitizer_unaligned_load16(p);
 }
 
-inline uint32_t GOOGLE_UNALIGNED_LOAD32(const void *p) {
+inline uint32 GOOGLE_UNALIGNED_LOAD32(const void *p) {
   return __sanitizer_unaligned_load32(p);
 }
 
-inline uint64_t GOOGLE_UNALIGNED_LOAD64(const void *p) {
+inline uint64 GOOGLE_UNALIGNED_LOAD64(const void *p) {
   return __sanitizer_unaligned_load64(p);
 }
 
-inline void GOOGLE_UNALIGNED_STORE16(void *p, uint16_t v) {
+inline void GOOGLE_UNALIGNED_STORE16(void *p, uint16 v) {
   __sanitizer_unaligned_store16(p, v);
 }
 
-inline void GOOGLE_UNALIGNED_STORE32(void *p, uint32_t v) {
+inline void GOOGLE_UNALIGNED_STORE32(void *p, uint32 v) {
   __sanitizer_unaligned_store32(p, v);
 }
 
-inline void GOOGLE_UNALIGNED_STORE64(void *p, uint64_t v) {
+inline void GOOGLE_UNALIGNED_STORE64(void *p, uint64 v) {
   __sanitizer_unaligned_store64(p, v);
 }
 
 #elif defined(GOOGLE_PROTOBUF_USE_UNALIGNED) && GOOGLE_PROTOBUF_USE_UNALIGNED
 
-#define GOOGLE_UNALIGNED_LOAD16(_p) (*reinterpret_cast<const uint16_t *>(_p))
-#define GOOGLE_UNALIGNED_LOAD32(_p) (*reinterpret_cast<const uint32_t *>(_p))
-#define GOOGLE_UNALIGNED_LOAD64(_p) (*reinterpret_cast<const uint64_t *>(_p))
+#define GOOGLE_UNALIGNED_LOAD16(_p) (*reinterpret_cast<const uint16 *>(_p))
+#define GOOGLE_UNALIGNED_LOAD32(_p) (*reinterpret_cast<const uint32 *>(_p))
+#define GOOGLE_UNALIGNED_LOAD64(_p) (*reinterpret_cast<const uint64 *>(_p))
 
-#define GOOGLE_UNALIGNED_STORE16(_p, _val) (*reinterpret_cast<uint16_t *>(_p) = (_val))
-#define GOOGLE_UNALIGNED_STORE32(_p, _val) (*reinterpret_cast<uint32_t *>(_p) = (_val))
-#define GOOGLE_UNALIGNED_STORE64(_p, _val) (*reinterpret_cast<uint64_t *>(_p) = (_val))
+#define GOOGLE_UNALIGNED_STORE16(_p, _val) (*reinterpret_cast<uint16 *>(_p) = (_val))
+#define GOOGLE_UNALIGNED_STORE32(_p, _val) (*reinterpret_cast<uint32 *>(_p) = (_val))
+#define GOOGLE_UNALIGNED_STORE64(_p, _val) (*reinterpret_cast<uint64 *>(_p) = (_val))
 
 #else
-inline uint16_t GOOGLE_UNALIGNED_LOAD16(const void *p) {
-  uint16_t t;
+inline uint16 GOOGLE_UNALIGNED_LOAD16(const void *p) {
+  uint16 t;
   memcpy(&t, p, sizeof t);
   return t;
 }
 
-inline uint32_t GOOGLE_UNALIGNED_LOAD32(const void *p) {
-  uint32_t t;
+inline uint32 GOOGLE_UNALIGNED_LOAD32(const void *p) {
+  uint32 t;
   memcpy(&t, p, sizeof t);
   return t;
 }
 
-inline uint64_t GOOGLE_UNALIGNED_LOAD64(const void *p) {
-  uint64_t t;
+inline uint64 GOOGLE_UNALIGNED_LOAD64(const void *p) {
+  uint64 t;
   memcpy(&t, p, sizeof t);
   return t;
 }
 
-inline void GOOGLE_UNALIGNED_STORE16(void *p, uint16_t v) {
+inline void GOOGLE_UNALIGNED_STORE16(void *p, uint16 v) {
   memcpy(p, &v, sizeof v);
 }
 
-inline void GOOGLE_UNALIGNED_STORE32(void *p, uint32_t v) {
+inline void GOOGLE_UNALIGNED_STORE32(void *p, uint32 v) {
   memcpy(p, &v, sizeof v);
 }
 
-inline void GOOGLE_UNALIGNED_STORE64(void *p, uint64_t v) {
+inline void GOOGLE_UNALIGNED_STORE64(void *p, uint64 v) {
   memcpy(p, &v, sizeof v);
 }
 #endif
@@ -251,14 +251,14 @@ inline void GOOGLE_UNALIGNED_STORE64(void *p, uint64_t v) {
 #elif !defined(__linux__) && !defined(__ANDROID__) && !defined(__CYGWIN__)
 
 #ifndef bswap_16
-static inline uint16_t bswap_16(uint16_t x) {
-  return static_cast<uint16_t>(((x & 0xFF) << 8) | ((x & 0xFF00) >> 8));
+static inline uint16 bswap_16(uint16 x) {
+  return static_cast<uint16>(((x & 0xFF) << 8) | ((x & 0xFF00) >> 8));
 }
 #define bswap_16(x) bswap_16(x)
 #endif
 
 #ifndef bswap_32
-static inline uint32_t bswap_32(uint32_t x) {
+static inline uint32 bswap_32(uint32 x) {
   return (((x & 0xFF) << 24) |
           ((x & 0xFF00) << 8) |
           ((x & 0xFF0000) >> 8) |
@@ -268,7 +268,7 @@ static inline uint32_t bswap_32(uint32_t x) {
 #endif
 
 #ifndef bswap_64
-static inline uint64_t bswap_64(uint64_t x) {
+static inline uint64 bswap_64(uint64 x) {
   return (((x & uint64_t{0xFFu}) << 56) | ((x & uint64_t{0xFF00u}) << 40) |
           ((x & uint64_t{0xFF0000u}) << 24) |
           ((x & uint64_t{0xFF000000u}) << 8) |
@@ -287,9 +287,9 @@ static inline uint64_t bswap_64(uint64_t x) {
 
 class Bits {
  public:
-  static uint32_t Log2FloorNonZero(uint32_t n) {
+  static uint32 Log2FloorNonZero(uint32 n) {
 #if defined(__GNUC__)
-  return 31 ^ static_cast<uint32_t>(__builtin_clz(n));
+  return 31 ^ static_cast<uint32>(__builtin_clz(n));
 #elif defined(_MSC_VER)
   unsigned long where;
   _BitScanReverse(&where, n);
@@ -299,7 +299,7 @@ class Bits {
 #endif
   }
 
-  static uint32_t Log2FloorNonZero64(uint64_t n) {
+  static uint32 Log2FloorNonZero64(uint64 n) {
     // Older versions of clang run into an instruction-selection failure when
     // it encounters __builtin_clzll:
     // https://bugs.chromium.org/p/nativeclient/issues/detail?id=4395
@@ -307,7 +307,7 @@ class Bits {
     // To work around this, when we build with those we use the portable
     // implementation instead.
 #if defined(__GNUC__) && !defined(GOOGLE_PROTOBUF_USE_PORTABLE_LOG2)
-  return 63 ^ static_cast<uint32_t>(__builtin_clzll(n));
+  return 63 ^ static_cast<uint32>(__builtin_clzll(n));
 #elif defined(_MSC_VER) && defined(_M_X64)
   unsigned long where;
   _BitScanReverse64(&where, n);
@@ -317,14 +317,14 @@ class Bits {
 #endif
   }
  private:
-  static int Log2FloorNonZero_Portable(uint32_t n) {
+  static int Log2FloorNonZero_Portable(uint32 n) {
     if (n == 0)
       return -1;
     int log = 0;
-    uint32_t value = n;
+    uint32 value = n;
     for (int i = 4; i >= 0; --i) {
       int shift = (1 << i);
-      uint32_t x = value >> shift;
+      uint32 x = value >> shift;
       if (x != 0) {
         value = x;
         log += shift;
@@ -334,11 +334,11 @@ class Bits {
     return log;
   }
 
-  static int Log2FloorNonZero64_Portable(uint64_t n) {
-    const uint32_t topbits = static_cast<uint32_t>(n >> 32);
+  static int Log2FloorNonZero64_Portable(uint64 n) {
+    const uint32 topbits = static_cast<uint32>(n >> 32);
     if (topbits == 0) {
       // Top bits are zero, so scan in bottom bits
-      return static_cast<int>(Log2FloorNonZero(static_cast<uint32_t>(n)));
+      return static_cast<int>(Log2FloorNonZero(static_cast<uint32>(n)));
     } else {
       return 32 + static_cast<int>(Log2FloorNonZero(topbits));
     }
@@ -347,60 +347,60 @@ class Bits {
 
 // ===================================================================
 // from google3/util/endian/endian.h
-PROTOBUF_EXPORT uint32_t ghtonl(uint32_t x);
+PROTOBUF_EXPORT uint32 ghtonl(uint32 x);
 
 class BigEndian {
  public:
 #ifdef PROTOBUF_LITTLE_ENDIAN
 
-  static uint16_t FromHost16(uint16_t x) { return bswap_16(x); }
-  static uint16_t ToHost16(uint16_t x) { return bswap_16(x); }
+  static uint16 FromHost16(uint16 x) { return bswap_16(x); }
+  static uint16 ToHost16(uint16 x) { return bswap_16(x); }
 
-  static uint32_t FromHost32(uint32_t x) { return bswap_32(x); }
-  static uint32_t ToHost32(uint32_t x) { return bswap_32(x); }
+  static uint32 FromHost32(uint32 x) { return bswap_32(x); }
+  static uint32 ToHost32(uint32 x) { return bswap_32(x); }
 
-  static uint64_t FromHost64(uint64_t x) { return bswap_64(x); }
-  static uint64_t ToHost64(uint64_t x) { return bswap_64(x); }
+  static uint64 FromHost64(uint64 x) { return bswap_64(x); }
+  static uint64 ToHost64(uint64 x) { return bswap_64(x); }
 
   static bool IsLittleEndian() { return true; }
 
 #else
 
-  static uint16_t FromHost16(uint16_t x) { return x; }
-  static uint16_t ToHost16(uint16_t x) { return x; }
+  static uint16 FromHost16(uint16 x) { return x; }
+  static uint16 ToHost16(uint16 x) { return x; }
 
-  static uint32_t FromHost32(uint32_t x) { return x; }
-  static uint32_t ToHost32(uint32_t x) { return x; }
+  static uint32 FromHost32(uint32 x) { return x; }
+  static uint32 ToHost32(uint32 x) { return x; }
 
-  static uint64_t FromHost64(uint64_t x) { return x; }
-  static uint64_t ToHost64(uint64_t x) { return x; }
+  static uint64 FromHost64(uint64 x) { return x; }
+  static uint64 ToHost64(uint64 x) { return x; }
 
   static bool IsLittleEndian() { return false; }
 
 #endif /* ENDIAN */
 
   // Functions to do unaligned loads and stores in big-endian order.
-  static uint16_t Load16(const void *p) {
+  static uint16 Load16(const void *p) {
     return ToHost16(GOOGLE_UNALIGNED_LOAD16(p));
   }
 
-  static void Store16(void *p, uint16_t v) {
+  static void Store16(void *p, uint16 v) {
     GOOGLE_UNALIGNED_STORE16(p, FromHost16(v));
   }
 
-  static uint32_t Load32(const void *p) {
+  static uint32 Load32(const void *p) {
     return ToHost32(GOOGLE_UNALIGNED_LOAD32(p));
   }
 
-  static void Store32(void *p, uint32_t v) {
+  static void Store32(void *p, uint32 v) {
     GOOGLE_UNALIGNED_STORE32(p, FromHost32(v));
   }
 
-  static uint64_t Load64(const void *p) {
+  static uint64 Load64(const void *p) {
     return ToHost64(GOOGLE_UNALIGNED_LOAD64(p));
   }
 
-  static void Store64(void *p, uint64_t v) {
+  static void Store64(void *p, uint64 v) {
     GOOGLE_UNALIGNED_STORE64(p, FromHost64(v));
   }
 };
