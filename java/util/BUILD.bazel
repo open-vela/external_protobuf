@@ -83,7 +83,7 @@ pkg_files(
         "src/test/**/*.java",
         "src/test/**/*.proto",
     ]) + [
-        "BUILD.bazel",
+        "BUILD",
         "pom.xml",
         "pom_template.xml",
     ],

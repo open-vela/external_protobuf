@@ -61,7 +61,7 @@ java_library(
 
 pkg_files(
     name = "dist_files",
-    srcs = ["BUILD.bazel"],
+    srcs = ["BUILD"],
     strip_prefix = strip_prefix.from_root(""),
     visibility = ["//benchmarks:__pkg__"],
 )
