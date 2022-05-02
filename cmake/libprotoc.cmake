@@ -88,7 +88,6 @@ set(libprotoc_headers
   ${protobuf_SOURCE_DIR}/src/google/protobuf/compiler/code_generator.h
   ${protobuf_SOURCE_DIR}/src/google/protobuf/compiler/command_line_interface.h
   ${protobuf_SOURCE_DIR}/src/google/protobuf/compiler/cpp/file.h
-  ${protobuf_SOURCE_DIR}/src/google/protobuf/compiler/cpp/cpp_generator.h
   ${protobuf_SOURCE_DIR}/src/google/protobuf/compiler/cpp/generator.h
   ${protobuf_SOURCE_DIR}/src/google/protobuf/compiler/cpp/helpers.h
   ${protobuf_SOURCE_DIR}/src/google/protobuf/compiler/cpp/names.h
@@ -97,7 +96,6 @@ set(libprotoc_headers
   ${protobuf_SOURCE_DIR}/src/google/protobuf/compiler/csharp/csharp_names.h
   ${protobuf_SOURCE_DIR}/src/google/protobuf/compiler/csharp/csharp_options.h
   ${protobuf_SOURCE_DIR}/src/google/protobuf/compiler/java/generator.h
-  ${protobuf_SOURCE_DIR}/src/google/protobuf/compiler/java/java_generator.h
   ${protobuf_SOURCE_DIR}/src/google/protobuf/compiler/java/kotlin_generator.h
   ${protobuf_SOURCE_DIR}/src/google/protobuf/compiler/java/names.h
   ${protobuf_SOURCE_DIR}/src/google/protobuf/compiler/objectivec/objectivec_generator.h
@@ -106,7 +104,6 @@ set(libprotoc_headers
   ${protobuf_SOURCE_DIR}/src/google/protobuf/compiler/plugin.h
   ${protobuf_SOURCE_DIR}/src/google/protobuf/compiler/python/generator.h
   ${protobuf_SOURCE_DIR}/src/google/protobuf/compiler/python/pyi_generator.h
-  ${protobuf_SOURCE_DIR}/src/google/protobuf/compiler/python/python_generator.h
   ${protobuf_SOURCE_DIR}/src/google/protobuf/compiler/ruby/ruby_generator.h
 )
 
@@ -123,7 +120,7 @@ if(protobuf_HAVE_LD_VERSION_SCRIPT)
 endif()
 target_link_libraries(libprotoc PRIVATE libprotobuf)
 target_include_directories(libprotoc
- PRIVATE ${ABSL_ROOT_DIR}
+  PRIVATE ${ABSL_ROOT_DIR}
 )
 if(protobuf_BUILD_SHARED_LIBS)
   target_compile_definitions(libprotoc
