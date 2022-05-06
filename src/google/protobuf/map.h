@@ -1363,8 +1363,11 @@ class Map {
   }
   template <class InputIt>
   void insert(InputIt first, InputIt last) {
-    for (; first != last; ++first) {
-      try_emplace(first->first, first->second);
+    for (InputIt it = first; it != last; ++it) {
+      iterator exist_it = find(it->first);
+      if (exist_it == end()) {
+        operator[](it->first) = it->second;
+      }
     }
   }
   void insert(std::initializer_list<value_type> values) {
