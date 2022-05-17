@@ -17,27 +17,26 @@ package_naming(
 pkg_files(
     name = "wkt_protos_files",
     srcs = [
-        "//:any_proto",
-        "//:api_proto",
-        "//:duration_proto",
-        "//:empty_proto",
-        "//:field_mask_proto",
-        "//:source_context_proto",
-        "//:struct_proto",
-        "//:timestamp_proto",
-        "//:type_proto",
-        "//:wrappers_proto",
+        "//:src/google/protobuf/any.proto",
+        "//:src/google/protobuf/api.proto",
+        "//:src/google/protobuf/descriptor.proto",
+        "//:src/google/protobuf/duration.proto",
+        "//:src/google/protobuf/empty.proto",
+        "//:src/google/protobuf/field_mask.proto",
+        "//:src/google/protobuf/source_context.proto",
+        "//:src/google/protobuf/struct.proto",
+        "//:src/google/protobuf/timestamp.proto",
+        "//:src/google/protobuf/type.proto",
+        "//:src/google/protobuf/wrappers.proto",
     ],
     prefix = "include/google/protobuf",
     visibility = ["//visibility:private"],
 )
 
 pkg_files(
-    name = "descriptor_protos_files",
-    srcs = [
-        "//:descriptor_proto",
-    ],
-    prefix = "include/google/protobuf",
+    name = "compiler_plugin_protos_files",
+    srcs = ["//:src/google/protobuf/compiler/plugin.proto"],
+    prefix = "include/google/protobuf/compiler",
     visibility = ["//visibility:private"],
 )
 
@@ -76,11 +75,10 @@ pkg_files(
 pkg_zip(
     name = "protoc_release",
     srcs = [
-        ":descriptor_protos_files",
+        ":compiler_plugin_protos_files",
         ":protoc_files",
         ":protoc_readme",
         ":wkt_protos_files",
-        "//src/google/protobuf/compiler:compiler_plugin_protos_files",
     ],
     package_file_name = "protoc-{version}-{platform}.zip",
     package_variables = ":protobuf_pkg_naming",
@@ -97,14 +95,10 @@ pkg_filegroup(
     srcs = [
         ":dist_files",
         "//:common_dist_files",
-        "//:cpp_dist_files",
+        "//:cpp_dist_files",  # to build protoc
         "//benchmarks:all_dist_files",
         "//build_defs:dist_files",
         "//conformance:all_dist_files",
-        "//src/google/protobuf/compiler:all_dist_files",
-        "//src/google/protobuf/io:dist_files",
-        "//src/google/protobuf/stubs:dist_files",
-        "//src/google/protobuf/testing:dist_files",
         "@com_google_protobuf_examples//:dist_files",
     ],
 )
@@ -114,7 +108,6 @@ pkg_filegroup(
     srcs = [
         ":dist_common",
         "//:cpp_dist_files",
-        "//src/google/protobuf/compiler:all_dist_files",
     ],
 )
 
@@ -236,7 +229,7 @@ pkg_filegroup(
     name = "python_srcs",
     srcs = [
         ":dist_common",
-        "//python:dist_files",
+        "//:python_dist_files",
     ],
 )
 
@@ -320,7 +313,7 @@ gen_file_lists(
     src_libs = {
         # source rule: name in generated file
         "//:protobuf": "libprotobuf",
-        "//src/google/protobuf/compiler:protoc_lib": "libprotoc",
+        "//:protoc_lib": "libprotoc",
         "//:protobuf_lite": "libprotobuf_lite",
     },
 )
@@ -340,7 +333,7 @@ gen_automake_file_lists(
         "//:objectivec_dist_files": "dist_objectivec",
         "//objectivec:dist_files": "dist_objectivec2",
         "//php:dist_files": "dist_php",
-        "//python:dist_files": "dist_python",
+        "//:python_dist_files": "dist_python",
         "//ruby:dist_files": "dist_ruby",
     },
 )
@@ -355,13 +348,8 @@ cc_dist_library(
         "//build_defs:config_msvc": [],
         "//conditions:default": ["-lpthread"],
     }),
-    tags = ["manual"],
     deps = [
-        "//:arena",
         "//:protobuf_lite",
-        "//src/google/protobuf/io",
-        "//src/google/protobuf/io:io_win32",
-        "//src/google/protobuf/stubs:lite",
     ],
 )
 
@@ -374,19 +362,9 @@ cc_dist_library(
             "-lpthread",
         ],
     }),
-    tags = ["manual"],
     deps = [
-        "//:arena",
         "//:protobuf",
         "//:protobuf_lite",
-        "//src/google/protobuf/compiler:importer",
-        "//src/google/protobuf/io",
-        "//src/google/protobuf/io:gzip_stream",
-        "//src/google/protobuf/io:io_win32",
-        "//src/google/protobuf/io:printer",
-        "//src/google/protobuf/io:tokenizer",
-        "//src/google/protobuf/stubs",
-        "//src/google/protobuf/stubs:lite",
     ],
 )
 
