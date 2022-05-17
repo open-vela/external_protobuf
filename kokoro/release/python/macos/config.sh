@@ -27,10 +27,11 @@ function pre_build {
 
     # Build protoc and protobuf libraries
     use_bazel.sh 5.1.1
-    bazel build -c opt //:protoc
-    local _bazel_bin=$(bazel info -c opt bazel-bin)
-    export PROTOC=${_bazel_bin}/protoc
-    export LIBPROTOBUF=${_bazel_bin}/libprotobuf.a
+    bazel build //:protoc
+    export PROTOC=$PWD/bazel-bin/protoc
+    mkdir src/.libs
+    ln -s $PWD/bazel-bin/libprotobuf.a src/.libs/libprotobuf.a
+    ln -s $PWD/bazel-bin/libprotobuf_lite.a src/.libs/libprotobuf-lite.a
 
     # Generate python dependencies.
     pushd python
@@ -52,8 +53,7 @@ function bdist_wheel_cmd {
     # Modify build version
     pwd
     ls
-    python setup.py build_ext --cpp_implementation -O${LIBPROTOBUF}
-    python setup.py bdist_wheel --cpp_implementation
+    python setup.py bdist_wheel --cpp_implementation --compile_static_extension
     cp dist/*.whl $abs_wheelhouse
 }
 
