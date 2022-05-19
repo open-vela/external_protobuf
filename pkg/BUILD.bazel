@@ -16,27 +16,17 @@ package_naming(
 
 pkg_files(
     name = "wkt_protos_files",
-    srcs = [
-        "//:src/google/protobuf/any.proto",
-        "//:src/google/protobuf/api.proto",
-        "//:src/google/protobuf/descriptor.proto",
-        "//:src/google/protobuf/duration.proto",
-        "//:src/google/protobuf/empty.proto",
-        "//:src/google/protobuf/field_mask.proto",
-        "//:src/google/protobuf/source_context.proto",
-        "//:src/google/protobuf/struct.proto",
-        "//:src/google/protobuf/timestamp.proto",
-        "//:src/google/protobuf/type.proto",
-        "//:src/google/protobuf/wrappers.proto",
-    ],
+    srcs = ["//src/google/protobuf:well_known_type_protos"],
     prefix = "include/google/protobuf",
     visibility = ["//visibility:private"],
 )
 
 pkg_files(
-    name = "compiler_plugin_protos_files",
-    srcs = ["//:src/google/protobuf/compiler/plugin.proto"],
-    prefix = "include/google/protobuf/compiler",
+    name = "descriptor_protos_files",
+    srcs = [
+        "//:descriptor_proto",
+    ],
+    prefix = "include/google/protobuf",
     visibility = ["//visibility:private"],
 )
 
@@ -75,10 +65,11 @@ pkg_files(
 pkg_zip(
     name = "protoc_release",
     srcs = [
-        ":compiler_plugin_protos_files",
+        ":descriptor_protos_files",
         ":protoc_files",
         ":protoc_readme",
         ":wkt_protos_files",
+        "//src/google/protobuf/compiler:compiler_plugin_protos_files",
     ],
     package_file_name = "protoc-{version}-{platform}.zip",
     package_variables = ":protobuf_pkg_naming",
@@ -95,10 +86,10 @@ pkg_filegroup(
     srcs = [
         ":dist_files",
         "//:common_dist_files",
-        "//:cpp_dist_files",  # to build protoc
         "//benchmarks:all_dist_files",
         "//build_defs:dist_files",
         "//conformance:all_dist_files",
+        "//src:all_dist_files",
         "@com_google_protobuf_examples//:dist_files",
     ],
 )
@@ -107,7 +98,7 @@ pkg_filegroup(
     name = "cpp_srcs",
     srcs = [
         ":dist_common",
-        "//:cpp_dist_files",
+        "//src:all_dist_files",
     ],
 )
 
@@ -229,7 +220,7 @@ pkg_filegroup(
     name = "python_srcs",
     srcs = [
         ":dist_common",
-        "//:python_dist_files",
+        "//python:dist_files",
     ],
 )
 
@@ -313,7 +304,7 @@ gen_file_lists(
     src_libs = {
         # source rule: name in generated file
         "//:protobuf": "libprotobuf",
-        "//:protoc_lib": "libprotoc",
+        "//src/google/protobuf/compiler:protoc_lib": "libprotoc",
         "//:protobuf_lite": "libprotobuf_lite",
     },
 )
@@ -333,7 +324,7 @@ gen_automake_file_lists(
         "//:objectivec_dist_files": "dist_objectivec",
         "//objectivec:dist_files": "dist_objectivec2",
         "//php:dist_files": "dist_php",
-        "//:python_dist_files": "dist_python",
+        "//python:dist_files": "dist_python",
         "//ruby:dist_files": "dist_ruby",
     },
 )
@@ -348,8 +339,13 @@ cc_dist_library(
         "//build_defs:config_msvc": [],
         "//conditions:default": ["-lpthread"],
     }),
+    tags = ["manual"],
     deps = [
         "//:protobuf_lite",
+        "//src/google/protobuf:arena",
+        "//src/google/protobuf/io",
+        "//src/google/protobuf/io:io_win32",
+        "//src/google/protobuf/stubs:lite",
     ],
 )
 
@@ -362,9 +358,25 @@ cc_dist_library(
             "-lpthread",
         ],
     }),
+    tags = ["manual"],
     deps = [
         "//:protobuf",
         "//:protobuf_lite",
+        "//src/google/protobuf:arena",
+        "//src/google/protobuf/compiler:importer",
+        "//src/google/protobuf/io",
+        "//src/google/protobuf/io:gzip_stream",
+        "//src/google/protobuf/io:io_win32",
+        "//src/google/protobuf/io:printer",
+        "//src/google/protobuf/io:tokenizer",
+        "//src/google/protobuf/stubs",
+        "//src/google/protobuf/stubs:lite",
+        "//src/google/protobuf/util:delimited_message_util",
+        "//src/google/protobuf/util:differencer",
+        "//src/google/protobuf/util:field_mask_util",
+        "//src/google/protobuf/util:json_util",
+        "//src/google/protobuf/util:time_util",
+        "//src/google/protobuf/util:type_resolver_util",
     ],
 )
 
