@@ -461,20 +461,21 @@ public final class Descriptors {
     }
 
     /**
-     * This method is to be called by generated code only. It updates the
+     * This method is to be called by generated code only. It is used to update the
      * FileDescriptorProto associated with the descriptor by parsing it again with the given
      * ExtensionRegistry. This is needed to recognize custom options.
      */
     public static void internalUpdateFileDescriptor(
-        FileDescriptor descriptor, ExtensionRegistry registry) {
+        final FileDescriptor descriptor, final ExtensionRegistry registry) {
       ByteString bytes = descriptor.proto.toByteString();
+      FileDescriptorProto proto;
       try {
-        FileDescriptorProto proto = FileDescriptorProto.parseFrom(bytes, registry);
-        descriptor.setProto(proto);
+        proto = FileDescriptorProto.parseFrom(bytes, registry);
       } catch (InvalidProtocolBufferException e) {
         throw new IllegalArgumentException(
             "Failed to parse protocol buffer descriptor for generated code.", e);
       }
+      descriptor.setProto(proto);
     }
 
     /**
