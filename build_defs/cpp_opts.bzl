@@ -1,4 +1,4 @@
-"""C++ compile/link options for Protobuf libraries."""
+# C++ compile/link options for Protobuf.
 
 COPTS = select({
     "//build_defs:config_msvc": [
@@ -37,4 +37,11 @@ LINK_OPTS = select({
         "-lpthread",
         "-lm",
     ],
+})
+
+# When cross-compiling for Windows we need to statically link pthread and the C++ library.
+PROTOC_LINK_OPTS = select({
+    "//build_defs:config_win32": ["-static"],
+    "//build_defs:config_win64": ["-static"],
+    "//conditions:default": [],
 })
