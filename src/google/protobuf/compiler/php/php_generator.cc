@@ -417,6 +417,16 @@ std::string LegacyReadOnlyGeneratedClassFileName(const DescriptorType* desc,
   return desc->name() + ".php";
 }
 
+template <typename DescriptorType>
+std::string LegacyReadOnlyGeneratedClassFileName(const DescriptorType* desc,
+                                   const Options& options) {
+  std::string php_namespace = RootPhpNamespace(desc, options);
+  if (!php_namespace.empty()) {
+    return php_namespace + "/" + desc->name() + ".php";
+  }
+  return desc->name() + ".php";
+}
+
 std::string GeneratedServiceFileName(const ServiceDescriptor* service,
                                      const Options& options) {
   std::string result = FullClassName(service, options) + "Interface";
@@ -1288,6 +1298,32 @@ void LegacyReadOnlyGenerateClassFile(const FileDescriptor* file,
       "fullname", newname);
 }
 
+template <typename DescriptorType>
+void LegacyReadOnlyGenerateClassFile(const FileDescriptor* file,
+                             const DescriptorType* desc, const Options& options,
+                             GeneratorContext* generator_context) {
+  std::string filename = LegacyReadOnlyGeneratedClassFileName(desc, options);
+  std::unique_ptr<io::ZeroCopyOutputStream> output(
+      generator_context->Open(filename));
+  io::Printer printer(output.get(), '^');
+
+  GenerateHead(file, &printer);
+
+  std::string php_namespace = RootPhpNamespace(desc, options);
+  if (!php_namespace.empty()) {
+    printer.Print(
+        "namespace ^name^;\n\n",
+        "name", php_namespace);
+  }
+  std::string newname = FullClassName(desc, options);
+  printer.Print("class_exists(^new^::class);\n",
+      "new", GeneratedClassNameImpl(desc));
+  printer.Print("@trigger_error(__NAMESPACE__ . '\\^old^ is deprecated and will be removed in "
+      "the next major release. Use ^fullname^ instead', E_USER_DEPRECATED);\n\n",
+      "old", desc->name(),
+      "fullname", newname);
+}
+
 void GenerateEnumFile(const FileDescriptor* file, const EnumDescriptor* en,
                       const Options& options,
                       GeneratorContext* generator_context) {
@@ -1421,6 +1457,19 @@ void GenerateEnumFile(const FileDescriptor* file, const EnumDescriptor* en,
         "old", en->name());
     LegacyReadOnlyGenerateClassFile(file, en, options, generator_context);
   }
+
+  // Write legacy file for backwards compatibility with "readonly" keywword
+  std::string lower = en->name();
+  std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
+  if (lower == "readonly") {
+    printer.Print(
+        "// Adding a class alias for backwards compatibility with the \"readonly\" keyword.\n");
+    printer.Print(
+        "class_alias(^new^::class, __NAMESPACE__ . '\\^old^');\n\n",
+        "new", fullname,
+        "old", en->name());
+    LegacyReadOnlyGenerateClassFile(file, en, options, generator_context);
+  }
 }
 
 void GenerateMessageFile(const FileDescriptor* file, const Descriptor* message,
@@ -1534,6 +1583,19 @@ void GenerateMessageFile(const FileDescriptor* file, const Descriptor* message,
         "class_alias(^new^::class, \\^old^::class);\n\n",
         "new", fullname,
         "old", LegacyFullClassName(message, options));
+  }
+
+  // Write legacy file for backwards compatibility with "readonly" keywword
+  std::string lower = message->name();
+  std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
+  if (lower == "readonly") {
+    printer.Print(
+        "// Adding a class alias for backwards compatibility with the \"readonly\" keyword.\n");
+    printer.Print(
+        "class_alias(^new^::class, __NAMESPACE__ . '\\^old^');\n\n",
+        "new", fullname,
+        "old", message->name());
+    LegacyReadOnlyGenerateClassFile(file, message, options, generator_context);
   }
 
   // Write legacy file for backwards compatibility with "readonly" keywword
