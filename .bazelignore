@@ -1,1 +1,5 @@
-_build
+# These are fetched as external repositories.
+third_party/abseil-cpp
+third_party/benchmark
+third_party/googletest
+_build/
