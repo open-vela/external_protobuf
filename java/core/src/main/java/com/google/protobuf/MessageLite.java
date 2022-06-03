@@ -344,6 +344,7 @@ public interface MessageLite extends MessageLiteOrBuilder {
      *     a protobuf in the first place.
      * @throws IOException an I/O error reading from the stream
      */
+    @CanIgnoreReturnValue // TODO(kak): should this be @CheckReturnValue instead?
     boolean mergeDelimitedFrom(InputStream input) throws IOException;
 
     /**
@@ -356,6 +357,7 @@ public interface MessageLite extends MessageLiteOrBuilder {
      *     a protobuf in the first place.
      * @throws IOException an I/O error reading from the stream
      */
+    @CanIgnoreReturnValue // TODO(kak): should this be @CheckReturnValue instead?
     boolean mergeDelimitedFrom(InputStream input, ExtensionRegistryLite extensionRegistry)
         throws IOException;
   }
