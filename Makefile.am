@@ -993,7 +993,6 @@ php_EXTRA_DIST=                                                       \
 
 # Note: please keep this in sync with the python_dist_files rule in BUILD.bazel.
 python_EXTRA_DIST=                                                           \
-  python/BUILD.bazel                                                         \
   python/MANIFEST.in                                                         \
   python/google/__init__.py                                                  \
   python/google/protobuf/__init__.py                                         \
@@ -1108,7 +1107,6 @@ python_EXTRA_DIST=                                                           \
   python/google/protobuf/text_format.py                                      \
   python/google/protobuf/unknown_fields.py                                   \
   python/google/protobuf/util/__init__.py                                    \
-  python/internal.bzl                                                        \
   python/release.sh                                                          \
   python/mox.py                                                              \
   python/setup.cfg                                                           \
@@ -1214,6 +1212,7 @@ EXTRA_DIST = $(@DIST_LANG@_EXTRA_DIST)              \
   build_files_updated_unittest.sh                   \
   cmake/CMakeLists.txt                              \
   cmake/README.md                                   \
+  cmake/abseil-cpp.cmake                            \
   cmake/conformance.cmake                           \
   cmake/examples.cmake                              \
   cmake/extract_includes.bat.in                     \

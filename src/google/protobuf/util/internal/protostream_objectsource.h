@@ -77,6 +77,9 @@ class PROTOBUF_EXPORT ProtoStreamObjectSource : public ObjectSource {
  public:
 
   struct RenderOptions {
+    RenderOptions() = default;
+    RenderOptions(const RenderOptions&) = default;
+
     // Sets whether or not to use lowerCamelCase casing for enum values. If set
     // to false, enum values are output without any case conversions.
     //
