@@ -320,11 +320,3 @@ with info about your project (name and website) so we can add an entry for you.
 1. Protoc-gen-authz
    * Website: https://github.com/Neakxs/protoc-gen-authz
    * Extension: 1145
-
-1. Protonium
-   * Website: https://github.com/zyp/protonium
-   * Extension: 1146
-
-1. Protoc-gen-xo
-   * Website: https://github.com/xo/ecosystem
-   * Extension: 1147

@@ -72,13 +72,12 @@
 #ifndef GOOGLE_PROTOBUF_STUBS_STATUSOR_H_
 #define GOOGLE_PROTOBUF_STUBS_STATUSOR_H_
 
-#include <google/protobuf/stubs/status.h>
-
 #include <new>
 #include <string>
 #include <utility>
 
-// Must be included last.
+#include <google/protobuf/stubs/status.h>
+
 #include <google/protobuf/port_def.inc>
 
 namespace google {
@@ -86,10 +85,9 @@ namespace protobuf {
 namespace util {
 namespace statusor_internal {
 
-template <typename T>
+template<typename T>
 class StatusOr {
-  template <typename U>
-  friend class StatusOr;
+  template<typename U> friend class StatusOr;
 
  public:
   using value_type = T;
@@ -127,14 +125,14 @@ class StatusOr {
   StatusOr(const StatusOr& other);
 
   // Conversion copy constructor, T must be copy constructible from U
-  template <typename U>
+  template<typename U>
   StatusOr(const StatusOr<U>& other);
 
   // Assignment operator.
   StatusOr& operator=(const StatusOr& other);
 
   // Conversion assignment operator, T must be assignable from U
-  template <typename U>
+  template<typename U>
   StatusOr& operator=(const StatusOr<U>& other);
 
   // Returns a reference to our status. If this contains a T, then
@@ -145,14 +143,7 @@ class StatusOr {
   bool ok() const;
 
   // Returns a reference to our current value, or CHECK-fails if !this->ok().
-  const T& value() const;
-  T& value();
-
-  // Returns a reference to our current value; UB if not OK.
-  const T& operator*() const { return value(); }
-  T& operator*() { return value(); }
-  const T* operator->() const { return &value(); }
-  T* operator->() { return &value(); }
+  const T& value () const;
 
  private:
   Status status_;
@@ -168,17 +159,17 @@ class PROTOBUF_EXPORT StatusOrHelper {
   static void Crash(const util::Status& status);
 
   // Customized behavior for StatusOr<T> vs. StatusOr<T*>
-  template <typename T>
+  template<typename T>
   struct Specialize;
 };
 
-template <typename T>
+template<typename T>
 struct StatusOrHelper::Specialize {
   // For non-pointer T, a reference can never be nullptr.
   static inline bool IsValueNull(const T& /*t*/) { return false; }
 };
 
-template <typename T>
+template<typename T>
 struct StatusOrHelper::Specialize<T*> {
   static inline bool IsValueNull(const T* t) { return t == nullptr; }
 };
@@ -186,7 +177,7 @@ struct StatusOrHelper::Specialize<T*> {
 template <typename T>
 inline StatusOr<T>::StatusOr() : status_(util::UnknownError("")) {}
 
-template <typename T>
+template<typename T>
 inline StatusOr<T>::StatusOr(const Status& status) {
   if (status.ok()) {
     status_ = util::InternalError("OkStatus() is not a valid argument.");
@@ -195,7 +186,7 @@ inline StatusOr<T>::StatusOr(const Status& status) {
   }
 }
 
-template <typename T>
+template<typename T>
 inline StatusOr<T>::StatusOr(const T& value) {
   if (StatusOrHelper::Specialize<T>::IsValueNull(value)) {
     status_ = util::InternalError("nullptr is not a valid argument.");
@@ -205,41 +196,43 @@ inline StatusOr<T>::StatusOr(const T& value) {
   }
 }
 
-template <typename T>
+template<typename T>
 inline StatusOr<T>::StatusOr(const StatusOr<T>& other)
-    : status_(other.status_), value_(other.value_) {}
+    : status_(other.status_), value_(other.value_) {
+}
 
-template <typename T>
+template<typename T>
 inline StatusOr<T>& StatusOr<T>::operator=(const StatusOr<T>& other) {
   status_ = other.status_;
   value_ = other.value_;
   return *this;
 }
 
-template <typename T>
-template <typename U>
+template<typename T>
+template<typename U>
 inline StatusOr<T>::StatusOr(const StatusOr<U>& other)
-    : status_(other.status_), value_(other.status_.ok() ? other.value_ : T()) {}
+    : status_(other.status_), value_(other.status_.ok() ? other.value_ : T()) {
+}
 
-template <typename T>
-template <typename U>
+template<typename T>
+template<typename U>
 inline StatusOr<T>& StatusOr<T>::operator=(const StatusOr<U>& other) {
   status_ = other.status_;
   if (status_.ok()) value_ = other.value_;
   return *this;
 }
 
-template <typename T>
+template<typename T>
 inline const Status& StatusOr<T>::status() const {
   return status_;
 }
 
-template <typename T>
+template<typename T>
 inline bool StatusOr<T>::ok() const {
   return status().ok();
 }
 
-template <typename T>
+template<typename T>
 inline const T& StatusOr<T>::value() const {
   if (!status_.ok()) {
     StatusOrHelper::Crash(status_);
@@ -247,13 +240,6 @@ inline const T& StatusOr<T>::value() const {
   return value_;
 }
 
-template <typename T>
-inline T& StatusOr<T>::value() {
-  if (!status_.ok()) {
-    StatusOrHelper::Crash(status_);
-  }
-  return value_;
-}
 }  // namespace statusor_internal
 
 using ::google::protobuf::util::statusor_internal::StatusOr;
