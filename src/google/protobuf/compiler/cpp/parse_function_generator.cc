@@ -47,6 +47,15 @@ namespace {
 using google::protobuf::internal::WireFormat;
 using google::protobuf::internal::WireFormatLite;
 
+bool UseDirectTcParserTable(const FieldDescriptor* field,
+                            const Options& options) {
+  auto* m = field->message_type();
+  return !m->options().message_set_wire_format() &&
+         m->file()->options().optimize_for() != FileOptions::CODE_SIZE &&
+         !HasSimpleBaseClass(m, options) && !HasTracker(m, options)
+      ;
+}
+
 std::vector<const FieldDescriptor*> GetOrderedFields(
     const Descriptor* descriptor, const Options& options) {
   std::vector<const FieldDescriptor*> ordered_fields;
@@ -84,7 +93,7 @@ bool IsFieldEligibleForFastParsing(
   if (field->is_map() || field->real_containing_oneof() ||
       field->options().weak() ||
       IsImplicitWeakField(field, options, scc_analyzer) ||
-      IsLazy(field, options, scc_analyzer)) {
+      IsLazy(field, options, scc_analyzer) || ShouldSplit(field, options)) {
     return false;
   }
 
@@ -304,6 +313,16 @@ TailCallTableInfo::TailCallTableInfo(
                      ", _impl_._inlined_string_donated_)}");
   }
 
+  // If this message is split, store the split pointer offset in the third
+  // auxiliary entry.
+  if (ShouldSplit(descriptor, options)) {
+    aux_entries.resize(4);  // pad if necessary
+    aux_entries[2] = StrCat("_fl::Offset{offsetof(",
+                                  ClassName(descriptor), ", _impl_._split_)}");
+    aux_entries[3] = StrCat("_fl::Offset{sizeof(", ClassName(descriptor),
+                                  "::Impl_::Split)}");
+  }
+
   // Fill in mini table entries.
   for (const FieldDescriptor* field : ordered_fields) {
     field_entries.push_back(
@@ -324,10 +343,17 @@ TailCallTableInfo::TailCallTableInfo(
         // Lazy fields are handled by the generated fallback function.
       } else {
         field_entries.back().aux_idx = aux_entries.size();
-        const Descriptor* field_type = field->message_type();
-        aux_entries.push_back(StrCat(
-            "reinterpret_cast<const ", QualifiedClassName(field_type, options),
-            "*>(&", QualifiedDefaultInstanceName(field_type, options), ")"));
+        if (UseDirectTcParserTable(field, options)) {
+          const Descriptor* field_type = field->message_type();
+          aux_entries.push_back(
+              StrCat("::_pbi::TcParser::GetTable<",
+                           QualifiedClassName(field_type, options), ">()"));
+        } else {
+          const Descriptor* field_type = field->message_type();
+          aux_entries.push_back(
+              StrCat("::_pbi::FieldAuxDefaultMessage{}, &",
+                           QualifiedDefaultInstanceName(field_type, options)));
+        }
       }
     } else if (field->type() == FieldDescriptor::TYPE_ENUM &&
                !HasPreservingUnknownEnumSemantics(field)) {
@@ -518,6 +544,9 @@ bool ParseFunctionGenerator::should_generate_tctable() const {
   if (options_.tctable_mode == Options::kTCTableNever) {
     return false;
   }
+  if (HasSimpleBaseClass(descriptor_, options_)) {
+    return false;
+  }
   return true;
 }
 
@@ -547,7 +576,7 @@ void ParseFunctionGenerator::GenerateTailcallFallbackFunction(
 
   if (num_hasbits_ > 0) {
     // Sync hasbits
-    format("typed_msg->_impl_._has_bits_[0] = hasbits;\n");
+    format("typed_msg->_impl_._has_bits_[0] |= hasbits;\n");
   }
   format("uint32_t tag = data.tag();\n");
 
@@ -604,6 +633,7 @@ void ParseFunctionGenerator::GenerateDataDecls(io::Printer* printer) {
   }
   auto field_num_to_entry_table = MakeNumToEntryTable(ordered_fields_);
   format(
+      "friend class ::$proto_ns$::internal::TcParser;\n"
       "static const ::$proto_ns$::internal::"
       "TcParseTable<$1$, $2$, $3$, $4$, $5$> _table_;\n",
       tc_table_info_->table_size_log2, ordered_fields_.size(),
@@ -761,7 +791,7 @@ void ParseFunctionGenerator::GenerateTailCallTable(Formatter& format) {
   // unknown fields and potentially an extension range.
   auto field_num_to_entry_table = MakeNumToEntryTable(ordered_fields_);
   format(
-      "PROTOBUF_ATTRIBUTE_INIT_PRIORITY1\n"
+      "PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1\n"
       "const ::_pbi::TcParseTable<$1$, $2$, $3$, $4$, $5$> "
       "$classname$::_table_ = "
       "{\n",
@@ -899,14 +929,12 @@ void ParseFunctionGenerator::GenerateFastFieldEntries(Formatter& format) {
     if (info.func_name.empty()) {
       format("{::_pbi::TcParser::MiniParse, {}},\n");
     } else {
-      bool cold = ShouldSplit(info.field, options_);
+      GOOGLE_CHECK(!ShouldSplit(info.field, options_));
       format(
           "{$1$,\n"
-          " {$2$, $3$, $4$, PROTOBUF_FIELD_OFFSET($classname$$5$, $6$)}},\n",
+          " {$2$, $3$, $4$, PROTOBUF_FIELD_OFFSET($classname$, $5$)}},\n",
           info.func_name, info.coded_tag, info.hasbit_idx, info.aux_idx,
-          cold ? "::Impl_::Split" : "",
-          cold ? FieldName(info.field) + "_"
-               : FieldMemberName(info.field, /*cold=*/false));
+          FieldMemberName(info.field, /*split=*/false));
     }
   }
 }
@@ -1012,6 +1040,11 @@ static void FormatFieldKind(Formatter& format,
 
     case FieldDescriptor::TYPE_GROUP:
       format("Message | ::_fl::kRepGroup");
+      if (UseDirectTcParserTable(field, options)) {
+        format(" | ::_fl::kTvTable");
+      } else {
+        format(" | ::_fl::kTvDefault");
+      }
       break;
     case FieldDescriptor::TYPE_MESSAGE:
       if (field->is_map()) {
@@ -1022,6 +1055,11 @@ static void FormatFieldKind(Formatter& format,
           format(" | ::_fl::kRepLazy");
         } else if (IsImplicitWeakField(field, options, scc_analyzer)) {
           format(" | ::_fl::kRepIWeak");
+        }
+        if (UseDirectTcParserTable(field, options)) {
+          format(" | ::_fl::kTvTable");
+        } else {
+          format(" | ::_fl::kTvDefault");
         }
       }
       break;
@@ -1035,6 +1073,10 @@ static void FormatFieldKind(Formatter& format,
     } else {
       format(" | ::_fl::kRepAString");
     }
+  }
+
+  if (ShouldSplit(field, options)) {
+    format(" | ::_fl::kSplitTrue");
   }
 
   format(")");
@@ -1051,12 +1093,26 @@ void ParseFunctionGenerator::GenerateFieldEntries(Formatter& format) {
       format("/* weak */ 0, 0, 0, 0");
     } else {
       const OneofDescriptor* oneof = field->real_containing_oneof();
-      bool cold = ShouldSplit(field, options_);
-      format("PROTOBUF_FIELD_OFFSET($classname$$1$, $2$), $3$, $4$,\n ",
-             cold ? "::Impl_::Split" : "",
-             cold ? FieldName(field) + "_"
-                  : FieldMemberName(field, /*cold=*/false),
-             (oneof ? oneof->index() : entry.hasbit_idx), entry.aux_idx);
+      bool split = ShouldSplit(field, options_);
+      if (split) {
+        format("PROTOBUF_FIELD_OFFSET($classname$::Impl_::Split, $1$), ",
+               FieldName(field) + "_");
+      } else {
+        format("PROTOBUF_FIELD_OFFSET($classname$, $1$), ",
+               FieldMemberName(field, /*cold=*/false));
+      }
+      if (oneof) {
+        format("$1$, ", oneof->index());
+      } else if (num_hasbits_ > 0 || IsMapEntryMessage(descriptor_)) {
+        if (entry.hasbit_idx >= 0) {
+          format("_Internal::kHasBitsOffset + $1$, ", entry.hasbit_idx);
+        } else {
+          format("$1$, ", entry.hasbit_idx);
+        }
+      } else {
+        format("0, ");
+      }
+      format("$1$,\n ", entry.aux_idx);
       FormatFieldKind(format, entry, options_, scc_analyzer_);
     }
     format("},\n");
@@ -1691,10 +1747,10 @@ std::string FieldParseFunctionName(
       break;
 
     case FieldDescriptor::TYPE_MESSAGE:
-      name.append("M");
+      name.append(UseDirectTcParserTable(field, options) ? "Mt" : "Md");
       break;
     case FieldDescriptor::TYPE_GROUP:
-      name.append("G");
+      name.append(UseDirectTcParserTable(field, options) ? "Gt" : "Gd");
       break;
 
     default:

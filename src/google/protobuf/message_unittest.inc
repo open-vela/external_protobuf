@@ -124,7 +124,7 @@ TEST(MESSAGE_TEST_NAME, SerializeToBrokenOstream) {
 
 TEST(MESSAGE_TEST_NAME, ParseFromFileDescriptor) {
   std::string filename =
-      TestUtil::GetTestDataPath("net/proto2/internal/testdata/golden_message");
+      TestUtil::GetTestDataPath("third_party/protobuf/testdata/golden_message");
   int file = open(filename.c_str(), O_RDONLY | O_BINARY);
   ASSERT_GE(file, 0);
 
@@ -137,7 +137,7 @@ TEST(MESSAGE_TEST_NAME, ParseFromFileDescriptor) {
 
 TEST(MESSAGE_TEST_NAME, ParsePackedFromFileDescriptor) {
   std::string filename = TestUtil::GetTestDataPath(
-      "net/proto2/internal/testdata/golden_packed_fields_message");
+      "third_party/protobuf/testdata/golden_packed_fields_message");
   int file = open(filename.c_str(), O_RDONLY | O_BINARY);
   ASSERT_GE(file, 0);
 
@@ -420,6 +420,25 @@ TEST(MESSAGE_TEST_NAME, ParseFailsIfExtensionWireMalformed) {
   // Overwriting the last byte to 0xFF results in malformed wire.
   serialized[serialized.size() - 1] = 0xFF;
   EXPECT_FALSE(p.ParseFromString(serialized));
+}
+
+TEST(MESSAGE_TEST_NAME, ParseFailsIfGroupFieldMalformed) {
+  UNITTEST::TestMutualRecursionA original, parsed;
+  original.mutable_bb()
+      ->mutable_a()
+      ->mutable_subgroup()
+      ->mutable_sub_message()
+      ->mutable_b()
+      ->set_optional_int32(-1);
+
+  std::string data;
+  ASSERT_TRUE(original.SerializeToString(&data));
+  // Should parse correctly.
+  ASSERT_TRUE(parsed.ParseFromString(data));
+  // Overwriting the last byte of varint (-1) to 0xFF results in malformed wire.
+  data[data.size() - 2] = 0xFF;
+
+  EXPECT_FALSE(parsed.ParseFromString(data));
 }
 
 TEST(MESSAGE_TEST_NAME, UninitializedAndMalformed) {
