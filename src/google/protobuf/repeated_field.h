@@ -246,7 +246,7 @@ class RepeatedField final {
   Element* mutable_data();
   const Element* data() const;
 
-  // Swaps entire contents with "other". If they are separate arenas, then
+  // Swaps entire contents with "other". If they are separate arenas then,
   // copies data between each other.
   void Swap(RepeatedField* other);
 
@@ -313,14 +313,8 @@ class RepeatedField final {
   iterator erase(const_iterator first, const_iterator last);
 
   // Gets the Arena on which this RepeatedField stores its elements.
-  // Message-owned arenas are not exposed by this method, which will return
-  // nullptr for messages owned by MOAs.
   inline Arena* GetArena() const {
-    Arena* arena = GetOwningArena();
-    if (arena == nullptr || arena->InternalIsMessageOwnedArena()) {
-      return nullptr;
-    }
-    return arena;
+    return GetOwningArena();
   }
 
   // For internal use only.
@@ -454,13 +448,8 @@ class RepeatedField final {
   //
   // Typically, due to the fact that adder is a local stack variable, the
   // compiler will be successful in mem-to-reg transformation and the machine
-  // code will be
-  // loop:
-  // cmp %size, %capacity
-  // jae fallback
-  // mov dword ptr [%buffer + %size * 4], %val
-  // inc %size
-  // jmp loop
+  // code will be loop: cmp %size, %capacity jae fallback mov dword ptr [%buffer
+  // + %size * 4], %val inc %size jmp loop
   //
   // The first version executes at 7 cycles per iteration while the second
   // version executes at only 1 or 2 cycles.
@@ -472,8 +461,6 @@ class RepeatedField final {
       capacity_ = repeated_field_->total_size_;
       buffer_ = repeated_field_->unsafe_elements();
     }
-    FastAdderImpl(const FastAdderImpl&) = delete;
-    FastAdderImpl& operator=(const FastAdderImpl&) = delete;
     ~FastAdderImpl() { repeated_field_->current_size_ = index_; }
 
     void Add(Element val) {
@@ -491,6 +478,8 @@ class RepeatedField final {
     int index_;
     int capacity_;
     Element* buffer_;
+
+    GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(FastAdderImpl);
   };
 
   // FastAdder is a wrapper for adding fields. The specialization above handles
@@ -499,12 +488,11 @@ class RepeatedField final {
   class FastAdderImpl<I, false> {
    public:
     explicit FastAdderImpl(RepeatedField* rf) : repeated_field_(rf) {}
-    FastAdderImpl(const FastAdderImpl&) = delete;
-    FastAdderImpl& operator=(const FastAdderImpl&) = delete;
     void Add(const Element& val) { repeated_field_->Add(val); }
 
    private:
     RepeatedField* repeated_field_;
+    GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(FastAdderImpl);
   };
 
   using FastAdder = FastAdderImpl<>;
