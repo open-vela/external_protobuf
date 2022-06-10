@@ -958,8 +958,6 @@ php_EXTRA_DIST=                                                       \
   php/tests/EncodeDecodeTest.php                                      \
   php/tests/force_c_ext.php                                           \
   php/tests/gdb_test.sh                                               \
-  php/tests/generated_previous/GPBMetadata/ProtoPrevious/TestPreviouslyUnreservedMessage.php \
-  php/tests/generated_previous/Previous/readonly.php                  \
   php/tests/GeneratedClassTest.php                                    \
   php/tests/GeneratedPhpdocTest.php                                   \
   php/tests/GeneratedServiceTest.php                                  \
@@ -969,7 +967,6 @@ php_EXTRA_DIST=                                                       \
   php/tests/multirequest.php                                          \
   php/tests/multirequest.sh                                           \
   php/tests/PhpImplementationTest.php                                 \
-  php/tests/PreviouslyGeneratedClassTest.php                          \
   php/tests/proto/empty/echo.proto                                    \
   php/tests/proto/test.proto                                          \
   php/tests/proto/test_descriptors.proto                              \
@@ -988,7 +985,6 @@ php_EXTRA_DIST=                                                       \
   php/tests/proto/test_service.proto                                  \
   php/tests/proto/test_service_namespace.proto                        \
   php/tests/proto/test_wrapper_type_setters.proto                     \
-  php/tests/proto_previous/test_previously_unreserved_message.proto   \
   php/tests/test_base.php                                             \
   php/tests/test_util.php                                             \
   php/tests/valgrind.supp                                             \
