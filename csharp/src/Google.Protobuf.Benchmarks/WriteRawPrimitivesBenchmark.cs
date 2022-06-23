@@ -32,7 +32,10 @@
 
 using BenchmarkDotNet.Attributes;
 using System;
+using System.Buffers.Binary;
 using System.Collections.Generic;
+using System.IO;
+using System.Buffers;
 using System.Text;
 
 namespace Google.Protobuf.Benchmarks

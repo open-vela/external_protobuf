@@ -42,14 +42,15 @@ namespace Google.Protobuf.Reflection
     internal abstract class FieldAccessorBase : IFieldAccessor
     {
         private readonly Func<IMessage, object> getValueDelegate;
+        private readonly FieldDescriptor descriptor;
 
         internal FieldAccessorBase(PropertyInfo property, FieldDescriptor descriptor)
         {
-            Descriptor = descriptor;
+            this.descriptor = descriptor;
             getValueDelegate = ReflectionUtil.CreateFuncIMessageObject(property.GetGetMethod());
         }
 
-        public FieldDescriptor Descriptor { get; }
+        public FieldDescriptor Descriptor { get { return descriptor; } }
 
         public object GetValue(IMessage message)
         {
