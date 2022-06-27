@@ -333,24 +333,15 @@ namespace Google.Protobuf
                         {
                             if (sourceField != null)
                             {
-                                // Well-known wrapper types are represented as nullable primitive types, so we do not "merge" them.
-                                // Instead, any non-null value just overwrites the previous value directly.
-                                if (field.MessageType.IsWrapperType)
+                                var sourceByteString = ((IMessage)sourceField).ToByteString();
+                                var destinationValue = (IMessage)field.Accessor.GetValue(destination);
+                                if (destinationValue != null)
                                 {
-                                    field.Accessor.SetValue(destination, sourceField);
+                                    destinationValue.MergeFrom(sourceByteString);
                                 }
                                 else
                                 {
-                                    var sourceByteString = ((IMessage)sourceField).ToByteString();
-                                    var destinationValue = (IMessage)field.Accessor.GetValue(destination);
-                                    if (destinationValue != null)
-                                    {
-                                        destinationValue.MergeFrom(sourceByteString);
-                                    }
-                                    else
-                                    {
-                                        field.Accessor.SetValue(destination, field.MessageType.Parser.ParseFrom(sourceByteString));
-                                    }
+                                    field.Accessor.SetValue(destination, field.MessageType.Parser.ParseFrom(sourceByteString));
                                 }
                             }
                         }

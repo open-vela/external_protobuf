@@ -41,7 +41,9 @@ using System.Buffers;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Runtime.CompilerServices;
+#if !NET35
 using System.Threading.Tasks;
+#endif
 
 namespace Google.Protobuf
 {
@@ -347,6 +349,7 @@ namespace Google.Protobuf
             Assert.AreEqual(expected, actual, $"{expected.ToBase64()} != {actual.ToBase64()}");
         }
 
+#if !NET35
         [Test]
         public async Task FromStreamAsync_Seekable()
         {
@@ -370,6 +373,7 @@ namespace Google.Protobuf
             ByteString expected = ByteString.CopyFrom(2, 3, 4);
             Assert.AreEqual(expected, actual, $"{expected.ToBase64()} != {actual.ToBase64()}");
         }
+#endif
 
         [Test]
         public void GetHashCode_Regression()

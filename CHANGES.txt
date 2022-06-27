@@ -1,8 +1,5 @@
+2022-06-27 version 21.2 (C++/Java/Python/PHP/Objective-C/C#/Ruby)
 
-Unreleased version
-  * Handle reflection for message splitting.
-  * make metadata fields lazy.
-  * Extend visibility of plugin library to upb
 
 2022-05-27 version 21.1 (C++/Java/Python/PHP/Objective-C/C#/Ruby)
   
@@ -101,7 +98,6 @@ Unreleased version
   Java
   * Update protobuf_version.bzl to separate protoc and per-language java … (#9900)
   * 6x speedup in ArrayEncoder.writeUInt32NotTag
-  * Java generated code is no longer compatible with runtimes 2.6.1 and earlier
 
   Python
   * Increment python major version to 4 in version.json for python upb (#9926)
@@ -113,7 +109,6 @@ Unreleased version
   * Due to the breaking changes for Python, the major version number for Python
     has been incremented.
   * The binary wheel for macOS now supports Apple silicon.
-  * In TextFormat, transform UnicodeDecodeError into ParseError.
 
 
   PHP
