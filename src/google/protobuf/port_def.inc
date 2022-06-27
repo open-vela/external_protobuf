@@ -139,6 +139,11 @@
 #define PROTOBUF_BUILTIN_BSWAP64(x) __builtin_bswap64(x)
 #endif
 
+// Portable check for gcc-style atomic built-ins
+#if __has_builtin(__atomic_load_n)
+#define PROTOBUF_BUILTIN_ATOMIC 1
+#endif
+
 // Portable check for GCC minimum version:
 // https://gcc.gnu.org/onlinedocs/cpp/Common-Predefined-Macros.html
 #if defined(__GNUC__) && defined(__GNUC_MINOR__) \
@@ -178,7 +183,7 @@
 #ifdef PROTOBUF_VERSION
 #error PROTOBUF_VERSION was previously defined
 #endif
-#define PROTOBUF_VERSION 3021002
+#define PROTOBUF_VERSION 3021001
 
 #ifdef PROTOBUF_MIN_HEADER_VERSION_FOR_PROTOC
 #error PROTOBUF_MIN_HEADER_VERSION_FOR_PROTOC was previously defined
@@ -798,7 +803,7 @@
 
 // Windows declares several inconvenient macro names.  We #undef them and then
 // restore them in port_undef.inc.
-#ifdef _MSC_VER
+#ifdef _WIN32
 #pragma push_macro("CREATE_NEW")
 #undef CREATE_NEW
 #pragma push_macro("DELETE")
@@ -851,7 +856,7 @@
 #undef STRICT
 #pragma push_macro("timezone")
 #undef timezone
-#endif  // _MSC_VER
+#endif  // _WIN32
 
 #ifdef __APPLE__
 // Inconvenient macro names from usr/include/math.h in some macOS SDKs.
@@ -865,6 +870,8 @@
 // Inconvenient macro names from usr/include/sys/syslimits.h in some macOS SDKs.
 #pragma push_macro("UID_MAX")
 #undef UID_MAX
+#pragma push_macro("GID_MAX")
+#undef GID_MAX
 #endif  // __APPLE__
 
 #if defined(__clang__) || PROTOBUF_GNUC_MIN(3, 0) || defined(_MSC_VER)
