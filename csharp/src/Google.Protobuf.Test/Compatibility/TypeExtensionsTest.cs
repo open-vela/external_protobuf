@@ -34,6 +34,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
+#if !NET35
 namespace Google.Protobuf.Compatibility
 {
     public class TypeExtensionsTest
@@ -113,3 +114,4 @@ namespace Google.Protobuf.Compatibility
         }
     }
 }
+#endif

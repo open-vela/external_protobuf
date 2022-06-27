@@ -169,6 +169,7 @@ namespace Google.Protobuf
                 // WriteTagAndValue ignores default values
                 var stream = new MemoryStream();
                 CodedOutputStream codedOutput;
+#if !NET35
                 codedOutput = new CodedOutputStream(stream);
                 codec.WriteTagAndValue(codedOutput, codec.DefaultValue);
                 codedOutput.Flush();
@@ -178,6 +179,7 @@ namespace Google.Protobuf
                 {
                     Assert.AreEqual(default(T), codec.DefaultValue);
                 }
+#endif
 
                 // The plain ValueWriter/ValueReader delegates don't.
                 if (codec.DefaultValue != null) // This part isn't appropriate for message types.
