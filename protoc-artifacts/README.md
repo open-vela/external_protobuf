@@ -17,6 +17,9 @@ the following files:
 * [build-zip.sh](build-zip.sh): script to package published maven artifacts in
   our release page.
 
+The [pom.xml](pom.xml) file specifies configuration details used by Maven to
+publish the protoc binaries. This is only used internally for releases.
+
 ## Maven Location
 The published protoc artifacts are available on Maven here:
 
