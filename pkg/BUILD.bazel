@@ -17,8 +17,17 @@ package_naming(
 pkg_files(
     name = "wkt_protos_files",
     srcs = [
-        "//:well_known_type_protos",
-        "//src/google/protobuf:descriptor_proto_srcs",
+        "//:src/google/protobuf/any.proto",
+        "//:src/google/protobuf/api.proto",
+        "//:src/google/protobuf/descriptor.proto",
+        "//:src/google/protobuf/duration.proto",
+        "//:src/google/protobuf/empty.proto",
+        "//:src/google/protobuf/field_mask.proto",
+        "//:src/google/protobuf/source_context.proto",
+        "//:src/google/protobuf/struct.proto",
+        "//:src/google/protobuf/timestamp.proto",
+        "//:src/google/protobuf/type.proto",
+        "//:src/google/protobuf/wrappers.proto",
     ],
     prefix = "include/google/protobuf",
     visibility = ["//visibility:private"],
@@ -26,9 +35,7 @@ pkg_files(
 
 pkg_files(
     name = "compiler_plugin_protos_files",
-    srcs = [
-        "//src/google/protobuf/compiler:compiler_plugin_protos_files",
-    ],
+    srcs = ["//:src/google/protobuf/compiler/plugin.proto"],
     prefix = "include/google/protobuf/compiler",
     visibility = ["//visibility:private"],
 )
@@ -88,10 +95,10 @@ pkg_filegroup(
     srcs = [
         ":dist_files",
         "//:common_dist_files",
+        "//:cpp_dist_files",  # to build protoc
         "//benchmarks:all_dist_files",
         "//build_defs:dist_files",
         "//conformance:all_dist_files",
-        "//src:all_dist_files",
         "@com_google_protobuf_examples//:dist_files",
     ],
 )
@@ -100,7 +107,7 @@ pkg_filegroup(
     name = "cpp_srcs",
     srcs = [
         ":dist_common",
-        "//src:all_dist_files",
+        "//:cpp_dist_files",
     ],
 )
 
@@ -222,7 +229,7 @@ pkg_filegroup(
     name = "python_srcs",
     srcs = [
         ":dist_common",
-        "//python:dist_files",
+        "//:python_dist_files",
     ],
 )
 
@@ -304,33 +311,10 @@ gen_file_lists(
     testonly = 1,
     out_stem = "src_file_lists",
     src_libs = {
-        # {[source rule]: [name in generated file]}
-        # Libraries:
-        ":protobuf": "libprotobuf",
-        ":protobuf_lite": "libprotobuf_lite",
-        ":protoc": "libprotoc",
-        # Protos:
-        "//src/google/protobuf:well_known_type_protos": "wkt_protos",
-        "//src/google/protobuf:descriptor_proto": "descriptor_proto",
-        "//src/google/protobuf/compiler:plugin_proto": "plugin_proto",
-        # Test libraries:
-        ":lite_test_util": "lite_test_util",
-        ":test_util": "test_util",
-        # Tests and test-only protos:
-        "//src/google/protobuf:full_test_srcs": "protobuf_test",
-        "//src/google/protobuf:test_protos": "protobuf_test_protos",
-        "//src/google/protobuf:lite_test_srcs": "protobuf_lite_test",
-        "//src/google/protobuf:lite_test_protos": "protobuf_lite_test_protos",
-        "//src/google/protobuf/compiler:test_srcs": "compiler_test",
-        ":compiler_annotation_test_util": "annotation_test_util",
-        ":compiler_mock_code_generator": "mock_code_generator",
-        "//src/google/protobuf/compiler:test_proto_srcs": "compiler_test_protos",
-        "//src/google/protobuf/compiler:test_plugin_srcs": "test_plugin",
-        "//src/google/protobuf/io:test_srcs": "io_test",
-        ":testinglib": "testing",
-        "//src/google/protobuf/util:test_srcs": "util_test",
-        "//src/google/protobuf/util:test_proto_srcs": "util_test_protos",
-        "//src/google/protobuf/stubs:test_srcs": "stubs_test",
+        # source rule: name in generated file
+        "//:protobuf": "libprotobuf",
+        "//:protoc_lib": "libprotoc",
+        "//:protobuf_lite": "libprotobuf_lite",
     },
 )
 
@@ -349,7 +333,7 @@ gen_automake_file_lists(
         "//:objectivec_dist_files": "dist_objectivec",
         "//objectivec:dist_files": "dist_objectivec2",
         "//php:dist_files": "dist_php",
-        "//python:dist_files": "dist_python",
+        "//:python_dist_files": "dist_python",
         "//ruby:dist_files": "dist_ruby",
     },
 )
@@ -364,13 +348,8 @@ cc_dist_library(
         "//build_defs:config_msvc": [],
         "//conditions:default": ["-lpthread"],
     }),
-    tags = ["manual"],
     deps = [
-        "//src/google/protobuf:arena",
-        "//src/google/protobuf:protobuf_lite",
-        "//src/google/protobuf/io",
-        "//src/google/protobuf/io:io_win32",
-        "//src/google/protobuf/stubs:lite",
+        "//:protobuf_lite",
     ],
 )
 
@@ -383,85 +362,10 @@ cc_dist_library(
             "-lpthread",
         ],
     }),
-    tags = ["manual"],
     deps = [
-        "//src/google/protobuf",
-        "//src/google/protobuf:arena",
-        "//src/google/protobuf:protobuf_lite",
-        "//src/google/protobuf/compiler:importer",
-        "//src/google/protobuf/io",
-        "//src/google/protobuf/io:gzip_stream",
-        "//src/google/protobuf/io:io_win32",
-        "//src/google/protobuf/io:printer",
-        "//src/google/protobuf/io:tokenizer",
-        "//src/google/protobuf/stubs",
-        "//src/google/protobuf/stubs:lite",
-        "//src/google/protobuf/util:delimited_message_util",
-        "//src/google/protobuf/util:differencer",
-        "//src/google/protobuf/util:field_mask_util",
-        "//src/google/protobuf/util:json_util",
-        "//src/google/protobuf/util:time_util",
-        "//src/google/protobuf/util:type_resolver_util",
-        "//src/google/protobuf/util/internal:datapiece",
-        "//src/google/protobuf/util/internal:default_value",
-        "//src/google/protobuf/util/internal:field_mask_utility",
-        "//src/google/protobuf/util/internal:json",
-        "//src/google/protobuf/util/internal:object_writer",
-        "//src/google/protobuf/util/internal:protostream",
-        "//src/google/protobuf/util/internal:type_info",
-        "//src/google/protobuf/util/internal:utility",
+        "//:protobuf",
+        "//:protobuf_lite",
     ],
-)
-
-cc_dist_library(
-    name = "protoc",
-    tags = ["manual"],
-    deps = [
-        "//src/google/protobuf/compiler:code_generator",
-        "//src/google/protobuf/compiler:command_line_interface",
-        "//src/google/protobuf/compiler/cpp",
-        "//src/google/protobuf/compiler/csharp",
-        "//src/google/protobuf/compiler/java",
-        "//src/google/protobuf/compiler/objectivec",
-        "//src/google/protobuf/compiler/php",
-        "//src/google/protobuf/compiler/python",
-        "//src/google/protobuf/compiler/ruby",
-    ],
-)
-
-cc_dist_library(
-    name = "lite_test_util",
-    testonly = 1,
-    tags = ["manual"],
-    deps = ["//src/google/protobuf:lite_test_util"],
-)
-
-cc_dist_library(
-    name = "test_util",
-    testonly = 1,
-    tags = ["manual"],
-    deps = ["//src/google/protobuf:test_util"],
-)
-
-cc_dist_library(
-    name = "compiler_annotation_test_util",
-    deps = ["//src/google/protobuf/compiler:annotation_test_util"],
-    testonly = 1,
-    tags = ["manual"],
-)
-
-cc_dist_library(
-    name = "compiler_mock_code_generator",
-    deps = ["//src/google/protobuf/compiler:mock_code_generator"],
-    testonly = 1,
-    tags = ["manual"],
-)
-
-cc_dist_library(
-    name = "testinglib",
-    deps = ["//src/google/protobuf/testing"],
-    testonly = 1,
-    tags = ["manual"],
 )
 
 ################################################################################

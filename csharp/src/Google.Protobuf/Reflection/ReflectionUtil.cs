@@ -221,18 +221,20 @@ namespace Google.Protobuf.Reflection
 
             public object GetExtension(IMessage message)
             {
-                if (message is not T1 extensionMessage)
+                if (!(message is T1))
                 {
                     throw new InvalidCastException("Cannot access extension on message that isn't IExtensionMessage");
                 }
 
-                if (extension is Extension<T1, T3> ext13)
+                T1 extensionMessage = (T1)message;
+
+                if (extension is Extension<T1, T3>)
                 {
-                    return extensionMessage.GetExtension(ext13);
+                    return extensionMessage.GetExtension(extension as Extension<T1, T3>);
                 }
-                else if (extension is RepeatedExtension<T1, T3> repeatedExt13)
+                else if (extension is RepeatedExtension<T1, T3>)
                 {
-                    return extensionMessage.GetOrInitializeExtension(repeatedExt13);
+                    return extensionMessage.GetOrInitializeExtension(extension as RepeatedExtension<T1, T3>);
                 }
                 else
                 {
@@ -242,14 +244,16 @@ namespace Google.Protobuf.Reflection
 
             public bool HasExtension(IMessage message)
             {
-                if (message is not T1 extensionMessage)
+                if (!(message is T1))
                 {
                     throw new InvalidCastException("Cannot access extension on message that isn't IExtensionMessage");
                 }
 
-                if (extension is Extension<T1, T3> ext13)
+                T1 extensionMessage = (T1)message;
+
+                if (extension is Extension<T1, T3>)
                 {
-                    return extensionMessage.HasExtension(ext13);
+                    return extensionMessage.HasExtension(extension as Extension<T1, T3>);
                 }
                 else if (extension is RepeatedExtension<T1, T3>)
                 {
@@ -263,14 +267,16 @@ namespace Google.Protobuf.Reflection
 
             public void SetExtension(IMessage message, object value)
             {
-                if (message is not T1 extensionMessage)
+                if (!(message is T1))
                 {
                     throw new InvalidCastException("Cannot access extension on message that isn't IExtensionMessage");
                 }
 
-                if (extension is Extension<T1, T3> ext13)
+                T1 extensionMessage = (T1)message;
+
+                if (extension is Extension<T1, T3>)
                 {
-                    extensionMessage.SetExtension(ext13, (T3)value);
+                    extensionMessage.SetExtension(extension as Extension<T1, T3>, (T3)value);
                 }
                 else if (extension is RepeatedExtension<T1, T3>)
                 {
@@ -284,18 +290,20 @@ namespace Google.Protobuf.Reflection
 
             public void ClearExtension(IMessage message)
             {
-                if (message is not T1 extensionMessage)
+                if (!(message is T1))
                 {
                     throw new InvalidCastException("Cannot access extension on message that isn't IExtensionMessage");
                 }
 
-                if (extension is Extension<T1, T3> ext13)
+                T1 extensionMessage = (T1)message;
+
+                if (extension is Extension<T1, T3>)
                 {
-                    extensionMessage.ClearExtension(ext13);
+                    extensionMessage.ClearExtension(extension as Extension<T1, T3>);
                 }
-                else if (extension is RepeatedExtension<T1, T3> repeatedExt13)
+                else if (extension is RepeatedExtension<T1, T3>)
                 {
-                    extensionMessage.GetExtension(repeatedExt13).Clear();
+                    extensionMessage.GetExtension(extension as RepeatedExtension<T1, T3>).Clear();
                 }
                 else
                 {
