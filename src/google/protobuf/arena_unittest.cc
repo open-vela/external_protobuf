@@ -791,7 +791,7 @@ TEST(ArenaTest, AddAllocatedWithReflection) {
 }
 
 TEST(ArenaTest, RepeatedPtrFieldAddClearedTest) {
-#ifndef PROTOBUF_FUTURE_REMOVE_CLEARED_API
+#ifndef PROTOBUF_FUTURE_BREAKING_CHANGES
   {
     RepeatedPtrField<TestAllTypes> repeated_field;
     EXPECT_TRUE(repeated_field.empty());
@@ -802,7 +802,7 @@ TEST(ArenaTest, RepeatedPtrFieldAddClearedTest) {
     EXPECT_TRUE(repeated_field.empty());
     EXPECT_EQ(0, repeated_field.size());
   }
-#endif  // !PROTOBUF_FUTURE_REMOVE_CLEARED_API
+#endif  // !PROTOBUF_FUTURE_BREAKING_CHANGES
   {
     RepeatedPtrField<TestAllTypes> repeated_field;
     EXPECT_TRUE(repeated_field.empty());
@@ -1530,19 +1530,14 @@ TEST(ArenaTest, SpaceReuseForArraysSizeChecks) {
 TEST(ArenaTest, SpaceReusePoisonsAndUnpoisonsMemory) {
 #ifdef ADDRESS_SANITIZER
   char buf[1024]{};
-  constexpr int kSize = 32;
   {
     Arena arena(buf, sizeof(buf));
     std::vector<void*> pointers;
     for (int i = 0; i < 100; ++i) {
-      void* p = Arena::CreateArray<char>(&arena, kSize);
-      // Simulate other ASan client managing shadow memory.
-      ASAN_POISON_MEMORY_REGION(p, kSize);
-      ASAN_UNPOISON_MEMORY_REGION(p, kSize - 4);
-      pointers.push_back(p);
+      pointers.push_back(Arena::CreateArray<char>(&arena, 16));
     }
     for (void* p : pointers) {
-      internal::ArenaTestPeer::ReturnArrayMemory(&arena, p, kSize);
+      internal::ArenaTestPeer::ReturnArrayMemory(&arena, p, 16);
       // The first one is not poisoned because it becomes the freelist.
       if (p != pointers[0]) EXPECT_TRUE(__asan_address_is_poisoned(p));
     }
@@ -1565,6 +1560,91 @@ TEST(ArenaTest, SpaceReusePoisonsAndUnpoisonsMemory) {
 #else   // ADDRESS_SANITIZER
   GTEST_SKIP();
 #endif  // ADDRESS_SANITIZER
+}
+
+namespace {
+uint32_t hooks_num_init = 0;
+uint32_t hooks_num_allocations = 0;
+uint32_t hooks_num_reset = 0;
+uint32_t hooks_num_destruct = 0;
+
+void ClearHookCounts() {
+  hooks_num_init = 0;
+  hooks_num_allocations = 0;
+  hooks_num_reset = 0;
+  hooks_num_destruct = 0;
+}
+}  // namespace
+
+// A helper utility class that handles arena callbacks.
+class ArenaOptionsTestFriend final : public internal::ArenaMetricsCollector {
+ public:
+  static internal::ArenaMetricsCollector* NewWithAllocs() {
+    return new ArenaOptionsTestFriend(true);
+  }
+
+  static internal::ArenaMetricsCollector* NewWithoutAllocs() {
+    return new ArenaOptionsTestFriend(false);
+  }
+
+  static void Enable(ArenaOptions* options) {
+    ClearHookCounts();
+    options->make_metrics_collector = &ArenaOptionsTestFriend::NewWithAllocs;
+  }
+
+  static void EnableWithoutAllocs(ArenaOptions* options) {
+    ClearHookCounts();
+    options->make_metrics_collector = &ArenaOptionsTestFriend::NewWithoutAllocs;
+  }
+
+  explicit ArenaOptionsTestFriend(bool record_allocs)
+      : ArenaMetricsCollector(record_allocs) {
+    ++hooks_num_init;
+  }
+  void OnDestroy(uint64_t space_allocated) override {
+    ++hooks_num_destruct;
+    delete this;
+  }
+  void OnReset(uint64_t space_allocated) override { ++hooks_num_reset; }
+  void OnAlloc(const std::type_info* allocated_type,
+               uint64_t alloc_size) override {
+    ++hooks_num_allocations;
+  }
+};
+
+// Test the hooks are correctly called.
+TEST(ArenaTest, ArenaHooksSanity) {
+  ArenaOptions options;
+  ArenaOptionsTestFriend::Enable(&options);
+
+  // Scope for defining the arena
+  {
+    Arena arena(options);
+    EXPECT_EQ(1, hooks_num_init);
+    EXPECT_EQ(0, hooks_num_allocations);
+    Arena::Create<uint64_t>(&arena);
+    if (std::is_trivially_destructible<uint64_t>::value) {
+      EXPECT_EQ(1, hooks_num_allocations);
+    } else {
+      EXPECT_EQ(2, hooks_num_allocations);
+    }
+    arena.Reset();
+    arena.Reset();
+    EXPECT_EQ(2, hooks_num_reset);
+  }
+  EXPECT_EQ(2, hooks_num_reset);
+  EXPECT_EQ(1, hooks_num_destruct);
+}
+
+// Test that allocation hooks are not called when we don't need them.
+TEST(ArenaTest, ArenaHooksWhenAllocationsNotNeeded) {
+  ArenaOptions options;
+  ArenaOptionsTestFriend::EnableWithoutAllocs(&options);
+
+  Arena arena(options);
+  EXPECT_EQ(0, hooks_num_allocations);
+  Arena::Create<uint64_t>(&arena);
+  EXPECT_EQ(0, hooks_num_allocations);
 }
 
 
