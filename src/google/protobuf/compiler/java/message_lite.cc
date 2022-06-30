@@ -792,7 +792,6 @@ void ImmutableMessageLiteGenerator::GenerateKotlinMembers(
       "message_kt", name_resolver_->GetKotlinExtensionsClassName(descriptor_),
       "message", name_resolver_->GetClassName(descriptor_, true));
 
-  WriteMessageDocComment(printer, descriptor_, /* kdoc */ true);
   printer->Print("object $name$Kt {\n", "name", descriptor_->name());
   printer->Indent();
   GenerateKotlinDsl(printer);
