@@ -125,7 +125,8 @@ void ArenaStringPtr::Set(ConstStringParam value, Arena* arena) {
   } else {
 #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
     if (arena == nullptr) {
-      auto* old = tagged_ptr_.GetIfAllocated();
+      GOOGLE_DCHECK(tagged_ptr_.IsAllocated());
+      auto* old = tagged_ptr_.Get();
       tagged_ptr_ = CreateString(value);
       delete old;
     } else {

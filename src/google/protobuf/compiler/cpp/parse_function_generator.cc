@@ -82,9 +82,8 @@ int TagSize(uint32_t field_number) {
   return 2;
 }
 
-void PopulateFastFieldEntry(const TailCallTableInfo::FieldEntryInfo& entry,
-                            const Options& options,
-                            TailCallTableInfo::FastFieldInfo& info);
+std::string FieldParseFunctionName(
+    const TailCallTableInfo::FieldEntryInfo& entry, const Options& options);
 
 bool IsFieldEligibleForFastParsing(
     const TailCallTableInfo::FieldEntryInfo& entry, const Options& options,
@@ -197,12 +196,18 @@ std::vector<TailCallTableInfo::FastFieldInfo> SplitFastFieldsForSize(
 
     // Fill in this field's entry:
     GOOGLE_CHECK(info.func_name.empty()) << info.func_name;
+    info.func_name = FieldParseFunctionName(entry, options);
     info.field = field;
     info.coded_tag = tag;
-    PopulateFastFieldEntry(entry, options, info);
     // If this field does not have presence, then it can set an out-of-bounds
     // bit (tailcall parsing uses a uint64_t for hasbits, but only stores 32).
     info.hasbit_idx = HasHasbit(field) ? entry.hasbit_idx : 63;
+    if (IsStringInlined(field, options)) {
+      GOOGLE_CHECK(!field->is_repeated());
+      info.aux_idx = static_cast<uint8_t>(entry.inlined_string_idx);
+    } else {
+      info.aux_idx = static_cast<uint8_t>(entry.aux_idx);
+    }
   }
   return result;
 }
@@ -370,8 +375,6 @@ TailCallTableInfo::TailCallTableInfo(
           enum_values[0] <= std::numeric_limits<int16_t>::max() &&
           enum_values.size() <= std::numeric_limits<uint16_t>::max()) {
         entry.is_enum_range = true;
-        entry.enum_range_min = enum_values.front();
-        entry.enum_range_max = enum_values.back();
         aux_entries.push_back(
             StrCat(enum_values[0], ", ", enum_values.size()));
       } else {
@@ -1655,12 +1658,10 @@ void ParseFunctionGenerator::GenerateFieldSwitch(
 
 namespace {
 
-void PopulateFastFieldEntry(const TailCallTableInfo::FieldEntryInfo& entry,
-                            const Options& options,
-                            TailCallTableInfo::FastFieldInfo& info) {
+std::string FieldParseFunctionName(
+    const TailCallTableInfo::FieldEntryInfo& entry, const Options& options) {
   const FieldDescriptor* field = entry.field;
   std::string name = "::_pbi::TcParser::Fast";
-  uint8_t aux_idx = static_cast<uint8_t>(entry.aux_idx);
 
   switch (field->type()) {
     case FieldDescriptor::TYPE_FIXED32:
@@ -1694,22 +1695,9 @@ void PopulateFastFieldEntry(const TailCallTableInfo::FieldEntryInfo& entry,
       }
       if (field->is_repeated() && field->is_packed()) {
         GOOGLE_LOG(DFATAL) << "Enum validation not handled: " << field->DebugString();
-        return;
+        return "";
       }
-      if (entry.is_enum_range) {
-        name.append("Er");
-        if (entry.enum_range_max <= 127) {
-          if (entry.enum_range_min == 0) {
-            name.append("0");
-            aux_idx = entry.enum_range_max;
-          } else if (entry.enum_range_min == 1) {
-            name.append("1");
-            aux_idx = entry.enum_range_max;
-          }
-        }
-      } else {
-        name.append("Ev");
-      }
+      name.append(entry.is_enum_range ? "Er" : "Ev");
       break;
 
     case FieldDescriptor::TYPE_SINT32:
@@ -1739,12 +1727,10 @@ void PopulateFastFieldEntry(const TailCallTableInfo::FieldEntryInfo& entry,
         default:
           GOOGLE_LOG(DFATAL) << "Mode not handled: "
                       << static_cast<int>(GetUtf8CheckMode(field, options));
-          return;
+          return "";
       }
       if (IsStringInlined(field, options)) {
         name.append("i");
-        GOOGLE_CHECK(!field->is_repeated());
-        aux_idx = static_cast<uint8_t>(entry.inlined_string_idx);
       }
       break;
 
@@ -1757,7 +1743,7 @@ void PopulateFastFieldEntry(const TailCallTableInfo::FieldEntryInfo& entry,
 
     default:
       GOOGLE_LOG(DFATAL) << "Type not handled: " << field->DebugString();
-      return;
+      return "";
   }
 
   // The field implementation functions are prefixed by cardinality:
@@ -1772,8 +1758,7 @@ void PopulateFastFieldEntry(const TailCallTableInfo::FieldEntryInfo& entry,
   // Append the tag length. Fast parsing only handles 1- or 2-byte tags.
   name.append(TagSize(field->number()) == 1 ? "1" : "2");
 
-  info.func_name = std::move(name);
-  info.aux_idx = aux_idx;
+  return name;
 }
 
 }  // namespace
