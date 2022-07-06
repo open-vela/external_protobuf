@@ -78,6 +78,7 @@ import java.util.logging.Logger;
  *
  * @author kenton@google.com Kenton Varda
  */
+@CheckReturnValue
 public final class Descriptors {
   private static final Logger logger = Logger.getLogger(Descriptors.class.getName());
   private static final int[] EMPTY_INT_ARRAY = new int[0];
@@ -461,21 +462,20 @@ public final class Descriptors {
     }
 
     /**
-     * This method is to be called by generated code only. It is used to update the
+     * This method is to be called by generated code only. It updates the
      * FileDescriptorProto associated with the descriptor by parsing it again with the given
      * ExtensionRegistry. This is needed to recognize custom options.
      */
     public static void internalUpdateFileDescriptor(
-        final FileDescriptor descriptor, final ExtensionRegistry registry) {
+        FileDescriptor descriptor, ExtensionRegistry registry) {
       ByteString bytes = descriptor.proto.toByteString();
-      FileDescriptorProto proto;
       try {
-        proto = FileDescriptorProto.parseFrom(bytes, registry);
+        FileDescriptorProto proto = FileDescriptorProto.parseFrom(bytes, registry);
+        descriptor.setProto(proto);
       } catch (InvalidProtocolBufferException e) {
         throw new IllegalArgumentException(
             "Failed to parse protocol buffer descriptor for generated code.", e);
       }
-      descriptor.setProto(proto);
     }
 
     /**
