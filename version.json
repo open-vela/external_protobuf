@@ -1,0 +1,17 @@
+{
+    "21.x": {
+        "protoc_version": "21.2",
+        "lts": false,
+        "date": "2022-06-23",
+        "languages": {
+            "cpp": "3.21.2",
+            "csharp": "3.21.2",
+            "java": "3.21.2",
+            "javascript": "3.21.2",
+            "objectivec": "3.21.2",
+            "php": "3.21.2",
+            "python": "4.21.2",
+            "ruby": "3.21.2"
+        }
+    }
+}
