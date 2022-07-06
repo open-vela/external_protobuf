@@ -94,6 +94,23 @@ constexpr int RepeatedFieldLowerClampLimit() {
 constexpr int kRepeatedFieldUpperClampLimit =
     (std::numeric_limits<int>::max() / 2) + 1;
 
+template <typename Iter>
+inline int CalculateReserve(Iter begin, Iter end, std::forward_iterator_tag) {
+  return static_cast<int>(std::distance(begin, end));
+}
+
+template <typename Iter>
+inline int CalculateReserve(Iter /*begin*/, Iter /*end*/,
+                            std::input_iterator_tag /*unused*/) {
+  return -1;
+}
+
+template <typename Iter>
+inline int CalculateReserve(Iter begin, Iter end) {
+  typedef typename std::iterator_traits<Iter>::iterator_category Category;
+  return CalculateReserve(begin, end, Category());
+}
+
 // Swaps two blocks of memory of size sizeof(T).
 template <typename T>
 inline void SwapBlock(char* p, char* q) {
@@ -229,7 +246,7 @@ class RepeatedField final {
   Element* mutable_data();
   const Element* data() const;
 
-  // Swaps entire contents with "other". If they are separate arenas, then
+  // Swaps entire contents with "other". If they are separate arenas then,
   // copies data between each other.
   void Swap(RepeatedField* other);
 
@@ -296,14 +313,8 @@ class RepeatedField final {
   iterator erase(const_iterator first, const_iterator last);
 
   // Gets the Arena on which this RepeatedField stores its elements.
-  // Message-owned arenas are not exposed by this method, which will return
-  // nullptr for messages owned by MOAs.
   inline Arena* GetArena() const {
-    Arena* arena = GetOwningArena();
-    if (arena == nullptr || arena->InternalIsMessageOwnedArena()) {
-      return nullptr;
-    }
-    return arena;
+    return GetOwningArena();
   }
 
   // For internal use only.
@@ -333,16 +344,6 @@ class RepeatedField final {
   // RepeatedField class to avoid costly cache misses due to the indirection.
   int current_size_;
   int total_size_;
-
-  // Replaces current_size_ with new_size and returns the previous value of
-  // current_size_. This function is intended to be the only place where
-  // current_size_ is modified.
-  inline int ExchangeCurrentSize(int new_size) {
-    int prev_size = current_size_;
-    current_size_ = new_size;
-    return prev_size;
-  }
-
   // Pad the Rep after arena allow for power-of-two byte sizes when
   // sizeof(Element) > sizeof(Arena*). eg for 16-byte objects.
   static PROTOBUF_CONSTEXPR const size_t kRepHeaderSize =
@@ -447,13 +448,8 @@ class RepeatedField final {
   //
   // Typically, due to the fact that adder is a local stack variable, the
   // compiler will be successful in mem-to-reg transformation and the machine
-  // code will be
-  // loop:
-  // cmp %size, %capacity
-  // jae fallback
-  // mov dword ptr [%buffer + %size * 4], %val
-  // inc %size
-  // jmp loop
+  // code will be loop: cmp %size, %capacity jae fallback mov dword ptr [%buffer
+  // + %size * 4], %val inc %size jmp loop
   //
   // The first version executes at 7 cycles per iteration while the second
   // version executes at only 1 or 2 cycles.
@@ -465,13 +461,11 @@ class RepeatedField final {
       capacity_ = repeated_field_->total_size_;
       buffer_ = repeated_field_->unsafe_elements();
     }
-    FastAdderImpl(const FastAdderImpl&) = delete;
-    FastAdderImpl& operator=(const FastAdderImpl&) = delete;
-    ~FastAdderImpl() { repeated_field_->ExchangeCurrentSize(index_); }
+    ~FastAdderImpl() { repeated_field_->current_size_ = index_; }
 
     void Add(Element val) {
       if (index_ == capacity_) {
-        repeated_field_->ExchangeCurrentSize(index_);
+        repeated_field_->current_size_ = index_;
         repeated_field_->Reserve(index_ + 1);
         capacity_ = repeated_field_->total_size_;
         buffer_ = repeated_field_->unsafe_elements();
@@ -484,6 +478,8 @@ class RepeatedField final {
     int index_;
     int capacity_;
     Element* buffer_;
+
+    GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(FastAdderImpl);
   };
 
   // FastAdder is a wrapper for adding fields. The specialization above handles
@@ -492,12 +488,11 @@ class RepeatedField final {
   class FastAdderImpl<I, false> {
    public:
     explicit FastAdderImpl(RepeatedField* rf) : repeated_field_(rf) {}
-    FastAdderImpl(const FastAdderImpl&) = delete;
-    FastAdderImpl& operator=(const FastAdderImpl&) = delete;
     void Add(const Element& val) { repeated_field_->Add(val); }
 
    private:
     RepeatedField* repeated_field_;
+    GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(FastAdderImpl);
   };
 
   using FastAdder = FastAdderImpl<>;
@@ -621,13 +616,13 @@ inline int RepeatedField<Element>::Capacity() const {
 template <typename Element>
 inline void RepeatedField<Element>::AddAlreadyReserved(const Element& value) {
   GOOGLE_DCHECK_LT(current_size_, total_size_);
-  elements()[ExchangeCurrentSize(current_size_ + 1)] = value;
+  elements()[current_size_++] = value;
 }
 
 template <typename Element>
 inline Element* RepeatedField<Element>::AddAlreadyReserved() {
   GOOGLE_DCHECK_LT(current_size_, total_size_);
-  return &elements()[ExchangeCurrentSize(current_size_ + 1)];
+  return &elements()[current_size_++];
 }
 
 template <typename Element>
@@ -638,7 +633,9 @@ inline Element* RepeatedField<Element>::AddNAlreadyReserved(int elements) {
   // total_size_ == 0. In this case the return pointer points to a zero size
   // array (n == 0). Hence we can just use unsafe_elements(), because the user
   // cannot dereference the pointer anyway.
-  return unsafe_elements() + ExchangeCurrentSize(current_size_ + elements);
+  Element* ret = unsafe_elements() + current_size_;
+  current_size_ += elements;
+  return ret;
 }
 
 template <typename Element>
@@ -646,11 +643,9 @@ inline void RepeatedField<Element>::Resize(int new_size, const Element& value) {
   GOOGLE_DCHECK_GE(new_size, 0);
   if (new_size > current_size_) {
     Reserve(new_size);
-    std::fill(&elements()[ExchangeCurrentSize(new_size)], &elements()[new_size],
-              value);
-  } else {
-    ExchangeCurrentSize(new_size);
+    std::fill(&elements()[current_size_], &elements()[new_size], value);
   }
+  current_size_ = new_size;
 }
 
 template <typename Element>
@@ -690,41 +685,46 @@ inline void RepeatedField<Element>::Set(int index, const Element& value) {
 
 template <typename Element>
 inline void RepeatedField<Element>::Add(const Element& value) {
-  if (current_size_ == total_size_) {
+  uint32_t size = current_size_;
+  if (static_cast<int>(size) == total_size_) {
     // value could reference an element of the array. Reserving new space will
     // invalidate the reference. So we must make a copy first.
     auto tmp = value;
     Reserve(total_size_ + 1);
-    elements()[ExchangeCurrentSize(current_size_ + 1)] = std::move(tmp);
+    elements()[size] = std::move(tmp);
   } else {
-    elements()[ExchangeCurrentSize(current_size_ + 1)] = value;
+    elements()[size] = value;
   }
+  current_size_ = size + 1;
 }
 
 template <typename Element>
 inline Element* RepeatedField<Element>::Add() {
-  if (current_size_ == total_size_) Reserve(total_size_ + 1);
-  return &elements()[ExchangeCurrentSize(current_size_ + 1)];
+  uint32_t size = current_size_;
+  if (static_cast<int>(size) == total_size_) Reserve(total_size_ + 1);
+  auto ptr = &elements()[size];
+  current_size_ = size + 1;
+  return ptr;
 }
 
 template <typename Element>
 template <typename Iter>
 inline void RepeatedField<Element>::Add(Iter begin, Iter end) {
-  if (std::is_base_of<
-          std::forward_iterator_tag,
-          typename std::iterator_traits<Iter>::iterator_category>::value) {
-    int additional = std::distance(begin, end);
-    if (additional == 0) return;
+  int reserve = internal::CalculateReserve(begin, end);
+  if (reserve != -1) {
+    if (reserve == 0) {
+      return;
+    }
 
-    int new_size = current_size_ + additional;
-    Reserve(new_size);
+    Reserve(reserve + size());
     // TODO(ckennelly):  The compiler loses track of the buffer freshly
     // allocated by Reserve() by the time we call elements, so it cannot
     // guarantee that elements does not alias [begin(), end()).
     //
     // If restrict is available, annotating the pointer obtained from elements()
     // causes this to lower to memcpy instead of memmove.
-    std::copy(begin, end, elements() + ExchangeCurrentSize(new_size));
+    std::copy(begin, end, elements() + size());
+    current_size_ = reserve + size();
   } else {
     FastAdder fast_adder(this);
     for (; begin != end; ++begin) fast_adder.Add(*begin);
@@ -734,7 +734,7 @@ inline void RepeatedField<Element>::Add(Iter begin, Iter end) {
 template <typename Element>
 inline void RepeatedField<Element>::RemoveLast() {
   GOOGLE_DCHECK_GT(current_size_, 0);
-  ExchangeCurrentSize(current_size_ - 1);
+  current_size_--;
 }
 
 template <typename Element>
@@ -759,7 +759,7 @@ void RepeatedField<Element>::ExtractSubrange(int start, int num,
 
 template <typename Element>
 inline void RepeatedField<Element>::Clear() {
-  ExchangeCurrentSize(0);
+  current_size_ = 0;
 }
 
 template <typename Element>
@@ -980,7 +980,7 @@ template <typename Element>
 inline void RepeatedField<Element>::Truncate(int new_size) {
   GOOGLE_DCHECK_LE(new_size, current_size_);
   if (current_size_ > 0) {
-    ExchangeCurrentSize(new_size);
+    current_size_ = new_size;
   }
 }
 
