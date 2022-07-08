@@ -51,11 +51,12 @@ namespace Google.Protobuf.Reflection
         private readonly IDictionary<ObjectIntPair<IDescriptor>, EnumValueDescriptor> enumValuesByNumber =
             new Dictionary<ObjectIntPair<IDescriptor>, EnumValueDescriptor>();
 
-        private readonly HashSet<FileDescriptor> dependencies = new HashSet<FileDescriptor>();
+        private readonly HashSet<FileDescriptor> dependencies;
 
         internal DescriptorPool(IEnumerable<FileDescriptor> dependencyFiles)
         {
-            foreach (FileDescriptor dependencyFile in dependencyFiles)
+            dependencies = new HashSet<FileDescriptor>();
+            foreach (var dependencyFile in dependencyFiles)
             {
                 dependencies.Add(dependencyFile);
                 ImportPublicDependencies(dependencyFile);
@@ -87,8 +88,10 @@ namespace Google.Protobuf.Reflection
         /// or null if the symbol doesn't exist or has the wrong type</returns>
         internal T FindSymbol<T>(string fullName) where T : class
         {
-            descriptorsByName.TryGetValue(fullName, out IDescriptor result);
-            if (result is T descriptor)
+            IDescriptor result;
+            descriptorsByName.TryGetValue(fullName, out result);
+            T descriptor = result as T;
+            if (descriptor != null)
             {
                 return descriptor;
             }
@@ -128,9 +131,10 @@ namespace Google.Protobuf.Reflection
                 name = fullName;
             }
 
-            if (descriptorsByName.TryGetValue(fullName, out IDescriptor old))
+            IDescriptor old;
+            if (descriptorsByName.TryGetValue(fullName, out old))
             {
-                if (old is not PackageDescriptor)
+                if (!(old is PackageDescriptor))
                 {
                     throw new DescriptorValidationException(file,
                                                             "\"" + name +
@@ -149,9 +153,10 @@ namespace Google.Protobuf.Reflection
         internal void AddSymbol(IDescriptor descriptor)
         {
             ValidateSymbolName(descriptor);
-            string fullName = descriptor.FullName;
+            String fullName = descriptor.FullName;
 
-            if (descriptorsByName.TryGetValue(fullName, out IDescriptor old))
+            IDescriptor old;
+            if (descriptorsByName.TryGetValue(fullName, out old))
             {
                 int dotPos = fullName.LastIndexOf('.');
                 string message;
@@ -176,7 +181,8 @@ namespace Google.Protobuf.Reflection
             descriptorsByName[fullName] = descriptor;
         }
 
-        private static readonly Regex ValidationRegex = new Regex("^[_A-Za-z][_A-Za-z0-9]*$", FrameworkPortability.CompiledRegexWhereAvailable);
+        private static readonly Regex ValidationRegex = new Regex("^[_A-Za-z][_A-Za-z0-9]*$",
+                                                                  FrameworkPortability.CompiledRegexWhereAvailable);
 
         /// <summary>
         /// Verifies that the descriptor's name is valid (i.e. it contains
@@ -185,7 +191,7 @@ namespace Google.Protobuf.Reflection
         /// <param name="descriptor"></param>
         private static void ValidateSymbolName(IDescriptor descriptor)
         {
-            if (descriptor.Name.Length == 0)
+            if (descriptor.Name == "")
             {
                 throw new DescriptorValidationException(descriptor, "Missing name.");
             }
@@ -202,13 +208,15 @@ namespace Google.Protobuf.Reflection
         /// </summary>
         internal FieldDescriptor FindFieldByNumber(MessageDescriptor messageDescriptor, int number)
         {
-            fieldsByNumber.TryGetValue(new ObjectIntPair<IDescriptor>(messageDescriptor, number), out FieldDescriptor ret);
+            FieldDescriptor ret;
+            fieldsByNumber.TryGetValue(new ObjectIntPair<IDescriptor>(messageDescriptor, number), out ret);
             return ret;
         }
 
         internal EnumValueDescriptor FindEnumValueByNumber(EnumDescriptor enumDescriptor, int number)
         {
-            enumValuesByNumber.TryGetValue(new ObjectIntPair<IDescriptor>(enumDescriptor, number), out EnumValueDescriptor ret);
+            EnumValueDescriptor ret;
+            enumValuesByNumber.TryGetValue(new ObjectIntPair<IDescriptor>(enumDescriptor, number), out ret);
             return ret;
         }
 
@@ -221,7 +229,8 @@ namespace Google.Protobuf.Reflection
         {
             // for extensions, we use the extended type, otherwise we use the containing type
             ObjectIntPair<IDescriptor> key = new ObjectIntPair<IDescriptor>(field.Proto.HasExtendee ? field.ExtendeeType : field.ContainingType, field.FieldNumber);
-            if (fieldsByNumber.TryGetValue(key, out FieldDescriptor old))
+            FieldDescriptor old;
+            if (fieldsByNumber.TryGetValue(key, out old))
             {
                 throw new DescriptorValidationException(field, "Field number " + field.FieldNumber +
                                                                "has already been used in \"" +

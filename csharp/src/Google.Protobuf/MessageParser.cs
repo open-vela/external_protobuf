@@ -43,8 +43,9 @@ namespace Google.Protobuf
     /// </summary>
     public class MessageParser
     {
-        private readonly Func<IMessage> factory;
-        private protected bool DiscardUnknownFields { get; }
+        private Func<IMessage> factory;
+        // TODO: When we use a C# 7.1 compiler, make this private protected.
+        internal bool DiscardUnknownFields { get; }
 
         internal ExtensionRegistry Extensions { get; }
 
