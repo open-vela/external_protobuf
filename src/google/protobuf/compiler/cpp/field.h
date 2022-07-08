@@ -150,6 +150,9 @@ class FieldGenerator {
   // method, invoked by each of the generated constructors.
   virtual void GenerateConstructorCode(io::Printer* printer) const = 0;
 
+  // Generate initialization code for private members in the cold struct.
+  virtual void GenerateCreateSplitMessageCode(io::Printer* printer) const {}
+
   // Generate any code that needs to go in the class's SharedDtor() method,
   // invoked by the destructor.
   // Most field types don't need this, so the default implementation is empty.
@@ -207,7 +210,6 @@ class FieldGenerator {
   virtual void GenerateIsInitialized(io::Printer* printer) const {}
 
   virtual bool IsInlined() const { return false; }
-
 
   virtual ArenaDtorNeeds NeedsArenaDestructor() const {
     return ArenaDtorNeeds::kNone;

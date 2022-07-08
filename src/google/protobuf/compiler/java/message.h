@@ -123,6 +123,10 @@ class ImmutableMessageGenerator : public MessageGenerator {
 
   void GenerateMessageSerializationMethods(io::Printer* printer);
   void GenerateParseFromMethods(io::Printer* printer);
+  void GenerateSerializeOneField(io::Printer* printer,
+                                 const FieldDescriptor* field);
+  void GenerateSerializeOneExtensionRange(
+      io::Printer* printer, const Descriptor::ExtensionRange* range);
 
   void GenerateBuilder(io::Printer* printer);
   void GenerateIsInitialized(io::Printer* printer);
