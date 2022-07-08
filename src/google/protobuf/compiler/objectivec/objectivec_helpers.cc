@@ -83,7 +83,7 @@ bool BoolFromEnvVar(const char* env_var, bool default_value) {
 
 class SimpleLineCollector : public LineConsumer {
  public:
-  SimpleLineCollector(std::unordered_set<std::string>* inout_set)
+  explicit SimpleLineCollector(std::unordered_set<std::string>* inout_set)
       : set_(inout_set) {}
 
   virtual bool ConsumeLine(const StringPiece& line, std::string* out_error) override {
@@ -112,7 +112,7 @@ class PrefixModeStorage {
  public:
   PrefixModeStorage();
 
-  const std::string package_to_prefix_mappings_path() const { return package_to_prefix_mappings_path_; }
+  std::string package_to_prefix_mappings_path() const { return package_to_prefix_mappings_path_; }
   void set_package_to_prefix_mappings_path(const std::string& path) {
     package_to_prefix_mappings_path_ = path;
     package_to_prefix_map_.clear();
@@ -123,7 +123,7 @@ class PrefixModeStorage {
   bool use_package_name() const { return use_package_name_; }
   void set_use_package_name(bool on_or_off) { use_package_name_ = on_or_off; }
 
-  const std::string exception_path() const { return exception_path_; }
+  std::string exception_path() const { return exception_path_; }
   void set_exception_path(const std::string& path) {
     exception_path_ = path;
     exceptions_.clear();
@@ -134,6 +134,7 @@ class PrefixModeStorage {
   // When using a proto package as the prefix, this should be added as the
   // prefix in front of it.
   const std::string& forced_package_prefix() const { return forced_prefix_; }
+  void set_forced_package_prefix(const std::string& prefix) { forced_prefix_ = prefix; }
 
  private:
   bool use_package_name_;
@@ -155,8 +156,6 @@ PrefixModeStorage::PrefixModeStorage() {
     exception_path_ = exception_path;
   }
 
-  // This one is a not expected to be common, so it doesn't get a generation
-  // option, just the env var.
   const char* prefix = getenv("GPB_OBJC_USE_PACKAGE_AS_PREFIX_PREFIX");
   if (prefix) {
     forced_prefix_ = prefix;
@@ -252,6 +251,14 @@ std::string GetProtoPackagePrefixExceptionList() {
 
 void SetProtoPackagePrefixExceptionList(const std::string& file_path) {
   g_prefix_mode.set_exception_path(file_path);
+}
+
+std::string GetForcedPackagePrefix() {
+  return g_prefix_mode.forced_package_prefix();
+}
+
+void SetForcedPackagePrefix(const std::string& prefix) {
+  g_prefix_mode.set_forced_package_prefix(prefix);
 }
 
 Options::Options() {
@@ -990,9 +997,9 @@ static std::string HandleExtremeFloatingPoint(std::string val,
     return "-INFINITY";
   } else {
     // float strings with ., e or E need to have f appended
-    if (add_float_suffix && (val.find(".") != std::string::npos ||
-                             val.find("e") != std::string::npos ||
-                             val.find("E") != std::string::npos)) {
+    if (add_float_suffix && (val.find('.') != std::string::npos ||
+                             val.find('e') != std::string::npos ||
+                             val.find('E') != std::string::npos)) {
       val += "f";
     }
     return val;
