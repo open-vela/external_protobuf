@@ -53,6 +53,7 @@
 #include <google/protobuf/compiler/java/helpers.h>
 #include <google/protobuf/compiler/java/message_builder.h>
 #include <google/protobuf/compiler/java/message_builder_lite.h>
+#include <google/protobuf/compiler/java/message_serialization.h>
 #include <google/protobuf/compiler/java/name_resolver.h>
 #include <google/protobuf/descriptor.pb.h>
 
@@ -425,6 +426,8 @@ void ImmutableMessageGenerator::Generate(io::Printer* printer) {
     vars["oneof_capitalized_name"] =
         context_->GetOneofGeneratorInfo(oneof)->capitalized_name;
     vars["oneof_index"] = StrCat((oneof)->index());
+    vars["{"] = "";
+    vars["}"] = "";
     // oneofCase_ and oneof_
     printer->Print(vars,
                    "private int $oneof_name$Case_ = 0;\n"
@@ -432,11 +435,12 @@ void ImmutableMessageGenerator::Generate(io::Printer* printer) {
     // OneofCase enum
     printer->Print(
         vars,
-        "public enum $oneof_capitalized_name$Case\n"
+        "public enum ${$$oneof_capitalized_name$Case$}$\n"
         // TODO(dweis): Remove EnumLite when we want to break compatibility with
         // 3.x users
         "    implements com.google.protobuf.Internal.EnumLite,\n"
         "        com.google.protobuf.AbstractMessage.InternalOneOfEnum {\n");
+    printer->Annotate("{", "}", oneof);
     printer->Indent();
     for (int j = 0; j < (oneof)->field_count(); j++) {
       const FieldDescriptor* field = (oneof)->field(j);
@@ -445,6 +449,7 @@ void ImmutableMessageGenerator::Generate(io::Printer* printer) {
           field->options().deprecated() ? "@java.lang.Deprecated " : "",
           "field_name", ToUpper(field->name()), "field_number",
           StrCat(field->number()));
+      printer->Annotate("field_name", field);
     }
     printer->Print("$cap_oneof_name$_NOT_SET(0);\n", "cap_oneof_name",
                    ToUpper(vars["oneof_name"]));
@@ -487,11 +492,12 @@ void ImmutableMessageGenerator::Generate(io::Printer* printer) {
     // oneofCase()
     printer->Print(vars,
                    "public $oneof_capitalized_name$Case\n"
-                   "get$oneof_capitalized_name$Case() {\n"
+                   "${$get$oneof_capitalized_name$Case$}$() {\n"
                    "  return $oneof_capitalized_name$Case.forNumber(\n"
                    "      $oneof_name$Case_);\n"
                    "}\n"
                    "\n");
+    printer->Annotate("{", "}", oneof);
   }
 
   if (IsAnyMessage(descriptor_)) {
@@ -582,13 +588,6 @@ void ImmutableMessageGenerator::GenerateMessageSerializationMethods(
   std::unique_ptr<const FieldDescriptor*[]> sorted_fields(
       SortFieldsByNumber(descriptor_));
 
-  std::vector<const Descriptor::ExtensionRange*> sorted_extensions;
-  sorted_extensions.reserve(descriptor_->extension_range_count());
-  for (int i = 0; i < descriptor_->extension_range_count(); ++i) {
-    sorted_extensions.push_back(descriptor_->extension_range(i));
-  }
-  std::sort(sorted_extensions.begin(), sorted_extensions.end(),
-            ExtensionRangeOrdering());
   printer->Print(
       "@java.lang.Override\n"
       "public void writeTo(com.google.protobuf.CodedOutputStream output)\n"
@@ -623,19 +622,8 @@ void ImmutableMessageGenerator::GenerateMessageSerializationMethods(
     }
   }
 
-  // Merge the fields and the extension ranges, both sorted by field number.
-  for (int i = 0, j = 0;
-       i < descriptor_->field_count() || j < sorted_extensions.size();) {
-    if (i == descriptor_->field_count()) {
-      GenerateSerializeOneExtensionRange(printer, sorted_extensions[j++]);
-    } else if (j == sorted_extensions.size()) {
-      GenerateSerializeOneField(printer, sorted_fields[i++]);
-    } else if (sorted_fields[i]->number() < sorted_extensions[j]->start) {
-      GenerateSerializeOneField(printer, sorted_fields[i++]);
-    } else {
-      GenerateSerializeOneExtensionRange(printer, sorted_extensions[j++]);
-    }
-  }
+  GenerateSerializeFieldsAndExtensions(printer, field_generators_, descriptor_,
+                                       sorted_fields.get());
 
   if (descriptor_->options().message_set_wire_format()) {
     printer->Print("unknownFields.writeAsMessageSetTo(output);\n");
@@ -763,17 +751,6 @@ void ImmutableMessageGenerator::GenerateParseFromMethods(io::Printer* printer) {
       "\n",
       "classname", name_resolver_->GetImmutableClassName(descriptor_), "ver",
       GeneratedCodeVersionSuffix());
-}
-
-void ImmutableMessageGenerator::GenerateSerializeOneField(
-    io::Printer* printer, const FieldDescriptor* field) {
-  field_generators_.get(field).GenerateSerializationCode(printer);
-}
-
-void ImmutableMessageGenerator::GenerateSerializeOneExtensionRange(
-    io::Printer* printer, const Descriptor::ExtensionRange* range) {
-  printer->Print("extensionWriter.writeUntil($end$, output);\n", "end",
-                 StrCat(range->end));
 }
 
 // ===================================================================
@@ -1012,6 +989,8 @@ void ImmutableMessageGenerator::GenerateEqualsAndHashCode(
       " return true;\n"
       "}\n"
       "if (!(obj instanceof $classname$)) {\n"
+      // don't simply return false because mutable and immutable types
+      // can be equal
       "  return super.equals(obj);\n"
       "}\n"
       "$classname$ other = ($classname$) obj;\n"
@@ -1426,7 +1405,8 @@ void ImmutableMessageGenerator::GenerateKotlinDsl(io::Printer* printer) const {
       "  @kotlin.jvm.JvmSynthetic\n"
       "  @kotlin.PublishedApi\n"
       "  internal fun _build(): $message$ = _builder.build()\n",
-      "message", name_resolver_->GetClassName(descriptor_, true));
+      "message",
+      EscapeKotlinKeywords(name_resolver_->GetClassName(descriptor_, true)));
 
   printer->Indent();
 
@@ -1447,7 +1427,7 @@ void ImmutableMessageGenerator::GenerateKotlinDsl(io::Printer* printer) const {
         "oneof_name", context_->GetOneofGeneratorInfo(oneof)->name,
         "oneof_capitalized_name",
         context_->GetOneofGeneratorInfo(oneof)->capitalized_name, "message",
-        name_resolver_->GetClassName(descriptor_, true));
+        EscapeKotlinKeywords(name_resolver_->GetClassName(descriptor_, true)));
   }
 
   if (descriptor_->extension_range_count() > 0) {
@@ -1469,9 +1449,13 @@ void ImmutableMessageGenerator::GenerateKotlinMembers(
       "  $message_kt$.Dsl._create($message$.newBuilder()).apply { block() "
       "}._build()\n",
       "camelcase_name", name_resolver_->GetKotlinFactoryName(descriptor_),
-      "message_kt", name_resolver_->GetKotlinExtensionsClassName(descriptor_),
-      "message", name_resolver_->GetClassName(descriptor_, true));
+      "message_kt",
+      EscapeKotlinKeywords(
+          name_resolver_->GetKotlinExtensionsClassName(descriptor_)),
+      "message",
+      EscapeKotlinKeywords(name_resolver_->GetClassName(descriptor_, true)));
 
+  WriteMessageDocComment(printer, descriptor_, /* kdoc */ true);
   printer->Print("object $name$Kt {\n", "name", descriptor_->name());
   printer->Indent();
   GenerateKotlinDsl(printer);
@@ -1489,12 +1473,14 @@ void ImmutableMessageGenerator::GenerateTopLevelKotlinMembers(
   printer->Print(
       "@kotlin.jvm.JvmSynthetic\n"
       "inline fun $message$.copy(block: $message_kt$.Dsl.() -> "
-      "kotlin.Unit): "
-      "$message$ =\n"
+      "kotlin.Unit): $message$ =\n"
       "  $message_kt$.Dsl._create(this.toBuilder()).apply { block() "
       "}._build()\n\n",
-      "message", name_resolver_->GetClassName(descriptor_, true), "message_kt",
-      name_resolver_->GetKotlinExtensionsClassName(descriptor_));
+      "message",
+      EscapeKotlinKeywords(name_resolver_->GetClassName(descriptor_, true)),
+      "message_kt",
+      EscapeKotlinKeywords(
+          name_resolver_->GetKotlinExtensionsClassName(descriptor_)));
 
   for (int i = 0; i < descriptor_->nested_type_count(); i++) {
     if (IsMapEntry(descriptor_->nested_type(i))) continue;
@@ -1512,18 +1498,21 @@ void ImmutableMessageGenerator::GenerateKotlinOrNull(io::Printer* printer) const
       printer->Print(
           "val $full_classname$OrBuilder.$camelcase_name$OrNull: $full_name$?\n"
           "  get() = if (has$name$()) get$name$() else null\n\n",
-          "full_classname", name_resolver_->GetClassName(descriptor_, true),
+          "full_classname",
+          EscapeKotlinKeywords(name_resolver_->GetClassName(descriptor_, true)),
           "camelcase_name", context_->GetFieldGeneratorInfo(field)->name,
           "full_name",
-          name_resolver_->GetImmutableClassName(field->message_type()), "name",
-          context_->GetFieldGeneratorInfo(field)->capitalized_name);
+          EscapeKotlinKeywords(
+              name_resolver_->GetImmutableClassName(field->message_type())),
+          "name", context_->GetFieldGeneratorInfo(field)->capitalized_name);
     }
   }
 }
 
 void ImmutableMessageGenerator::GenerateKotlinExtensions(
     io::Printer* printer) const {
-  std::string message_name = name_resolver_->GetClassName(descriptor_, true);
+  std::string message_name =
+      EscapeKotlinKeywords(name_resolver_->GetClassName(descriptor_, true));
 
   printer->Print(
       "@Suppress(\"UNCHECKED_CAST\")\n"
