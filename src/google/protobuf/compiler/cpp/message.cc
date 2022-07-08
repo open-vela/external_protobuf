@@ -790,41 +790,38 @@ void MessageGenerator::GenerateFieldAccessorDeclarations(io::Printer* printer) {
 
     std::map<std::string, std::string> vars;
     SetCommonFieldVariables(field, &vars, options_);
-
     format.AddMap(vars);
 
-      if (field->is_repeated()) {
+    if (field->is_repeated()) {
+      format("$deprecated_attr$int ${1$$name$_size$}$() const$2$\n", field,
+             !IsFieldStripped(field, options_) ? ";" : " {__builtin_trap();}");
+      if (!IsFieldStripped(field, options_)) {
         format(
-            "$deprecated_attr$int ${1$$name$_size$}$() const$2$\n", field,
-            !IsFieldStripped(field, options_) ? ";" : " {__builtin_trap();}");
-        if (!IsFieldStripped(field, options_)) {
-          format(
-              "private:\n"
-              "int ${1$_internal_$name$_size$}$() const;\n"
-              "public:\n",
-              field);
-        }
-      } else if (HasHasMethod(field)) {
-        format(
-            "$deprecated_attr$bool ${1$has_$name$$}$() const$2$\n", field,
-            !IsFieldStripped(field, options_) ? ";" : " {__builtin_trap();}");
-        if (!IsFieldStripped(field, options_)) {
-          format(
-              "private:\n"
-              "bool _internal_has_$name$() const;\n"
-              "public:\n");
-        }
-      } else if (HasPrivateHasMethod(field)) {
-        if (!IsFieldStripped(field, options_)) {
-          format(
-              "private:\n"
-              "bool ${1$_internal_has_$name$$}$() const;\n"
-              "public:\n",
-              field);
-        }
+            "private:\n"
+            "int ${1$_internal_$name$_size$}$() const;\n"
+            "public:\n",
+            field);
       }
-      format("$deprecated_attr$void ${1$clear_$name$$}$()$2$\n", field,
-             !IsFieldStripped(field, options_) ? ";" : "{__builtin_trap();}");
+    } else if (HasHasMethod(field)) {
+      format("$deprecated_attr$bool ${1$has_$name$$}$() const$2$\n", field,
+             !IsFieldStripped(field, options_) ? ";" : " {__builtin_trap();}");
+      if (!IsFieldStripped(field, options_)) {
+        format(
+            "private:\n"
+            "bool _internal_has_$name$() const;\n"
+            "public:\n");
+      }
+    } else if (HasPrivateHasMethod(field)) {
+      if (!IsFieldStripped(field, options_)) {
+        format(
+            "private:\n"
+            "bool ${1$_internal_has_$name$$}$() const;\n"
+            "public:\n",
+            field);
+      }
+    }
+    format("$deprecated_attr$void ${1$clear_$name$$}$()$2$\n", field,
+           !IsFieldStripped(field, options_) ? ";" : "{__builtin_trap();}");
 
     // Generate type-specific accessor declarations.
     field_generators_.get(field).GenerateAccessorDeclarations(printer);
@@ -1238,36 +1235,37 @@ void MessageGenerator::GenerateFieldAccessorDefinitions(io::Printer* printer) {
 
     Formatter::SaveState saver(&format);
     format.AddMap(vars);
-      // Generate has_$name$() or $name$_size().
-      if (field->is_repeated()) {
-        if (IsFieldStripped(field, options_)) {
-          format(
-              "inline int $classname$::$name$_size() const { "
-              "__builtin_trap(); }\n");
-        } else {
-          format(
-              "inline int $classname$::_internal_$name$_size() const {\n"
-              "  return $field$$1$.size();\n"
-              "}\n"
-              "inline int $classname$::$name$_size() const {\n"
-              "$annotate_size$"
-              "  return _internal_$name$_size();\n"
-              "}\n",
-              IsImplicitWeakField(field, options_, scc_analyzer_) &&
-                      field->message_type()
-                  ? ".weak"
-                  : "");
-        }
-      } else if (field->real_containing_oneof()) {
-        format.Set("field_name", UnderscoresToCamelCase(field->name(), true));
-        format.Set("oneof_name", field->containing_oneof()->name());
-        format.Set("oneof_index",
-                   StrCat(field->containing_oneof()->index()));
-        GenerateOneofMemberHasBits(field, format);
+
+    // Generate has_$name$() or $name$_size().
+    if (field->is_repeated()) {
+      if (IsFieldStripped(field, options_)) {
+        format(
+            "inline int $classname$::$name$_size() const { "
+            "__builtin_trap(); }\n");
       } else {
-        // Singular field.
-        GenerateSingularFieldHasBits(field, format);
+        format(
+            "inline int $classname$::_internal_$name$_size() const {\n"
+            "  return $field$$1$.size();\n"
+            "}\n"
+            "inline int $classname$::$name$_size() const {\n"
+            "$annotate_size$"
+            "  return _internal_$name$_size();\n"
+            "}\n",
+            IsImplicitWeakField(field, options_, scc_analyzer_) &&
+                    field->message_type()
+                ? ".weak"
+                : "");
       }
+    } else if (field->real_containing_oneof()) {
+      format.Set("field_name", UnderscoresToCamelCase(field->name(), true));
+      format.Set("oneof_name", field->containing_oneof()->name());
+      format.Set("oneof_index",
+                 StrCat(field->containing_oneof()->index()));
+      GenerateOneofMemberHasBits(field, format);
+    } else {
+      // Singular field.
+      GenerateSingularFieldHasBits(field, format);
+    }
 
     if (!IsCrossFileMaybeMap(field)) {
       GenerateFieldClear(field, true, format);
@@ -1988,6 +1986,9 @@ void MessageGenerator::GenerateClassDefinition(io::Printer* printer) {
   }
 
   if (ShouldSplit(descriptor_, options_)) {
+    format(
+        "static Impl_::Split* CreateSplitMessage("
+        "::$proto_ns$::Arena* arena);\n");
     format("friend struct $1$;\n",
            DefaultInstanceType(descriptor_, options_, /*split=*/true));
   }
@@ -2035,6 +2036,7 @@ void MessageGenerator::GenerateSchema(io::Printer* printer, int offset,
     GOOGLE_DCHECK(!IsMapEntryMessage(descriptor_));
     inlined_string_indices_offset = has_offset + has_bit_indices_.size();
   }
+
   format("{ $1$, $2$, $3$, sizeof($classtype$)},\n", offset, has_offset,
          inlined_string_indices_offset);
 }
@@ -2099,14 +2101,7 @@ void MessageGenerator::GenerateClassMethods(io::Printer* printer) {
   if (!has_bit_indices_.empty()) {
     format(
         "using HasBits = "
-        "decltype(std::declval<$classname$>().$has_bits$);\n"
-        "static constexpr int32_t kHasBitsOffset =\n"
-        "  8 * PROTOBUF_FIELD_OFFSET($classname$, _impl_._has_bits_);\n");
-  }
-  if (descriptor_->real_oneof_decl_count() > 0) {
-    format(
-        "static constexpr int32_t kOneofCaseOffset =\n"
-        "  PROTOBUF_FIELD_OFFSET($classtype$, $oneof_case$);\n");
+        "decltype(std::declval<$classname$>().$has_bits$);\n");
   }
   for (auto field : FieldRange(descriptor_)) {
     field_generators_.get(field).GenerateInternalAccessorDeclarations(printer);
@@ -2202,13 +2197,9 @@ void MessageGenerator::GenerateClassMethods(io::Printer* printer) {
     format(
         "void $classname$::PrepareSplitMessageForWrite() {\n"
         "  if (IsSplitMessageDefault()) {\n"
-        "    void* chunk = "
-        "::PROTOBUF_NAMESPACE_ID::internal::CreateSplitMessageGeneric("
-        "GetArenaForAllocation(), &$1$, sizeof(Impl_::Split));\n"
-        "    $split$ = reinterpret_cast<Impl_::Split*>(chunk);\n"
+        "    $split$ = CreateSplitMessage(GetArenaForAllocation());\n"
         "  }\n"
-        "}\n",
-        DefaultInstanceName(descriptor_, options_, /*split=*/true));
+        "}\n");
   }
 
   GenerateVerify(printer);
@@ -2283,16 +2274,7 @@ std::pair<size_t, size_t> MessageGenerator::GenerateOffsets(
   } else {
     format("~0u,  // no _inlined_string_donated_\n");
   }
-  if (ShouldSplit(descriptor_, options_)) {
-    format(
-        "PROTOBUF_FIELD_OFFSET($classtype$, $split$),\n"
-        "sizeof($classtype$::Impl_::Split),\n");
-  } else {
-    format(
-        "~0u,  // no _split_\n"
-        "~0u,  // no sizeof(Split)\n");
-  }
-  const int kNumGenericOffsets = 8;  // the number of fixed offsets above
+  const int kNumGenericOffsets = 6;  // the number of fixed offsets above
   const size_t offsets = kNumGenericOffsets + descriptor_->field_count() +
                          descriptor_->real_oneof_decl_count();
   size_t entries = offsets;
@@ -2320,17 +2302,12 @@ std::pair<size_t, size_t> MessageGenerator::GenerateOffsets(
     // offset of the field, so that the information is available when
     // reflectively accessing the field at run time.
     //
-    // We embed whether the field is cold to the MSB of the offset, and whether
-    // the field is eagerly verified lazy or inlined string to the LSB of the
-    // offset.
-
-    if (ShouldSplit(field, options_)) {
-      format(" | ::_pbi::kSplitFieldOffsetMask /*split*/");
-    }
+    // Embed whether the field is eagerly verified lazy or inlined string to the
+    // LSB of the offset.
     if (IsEagerlyVerifiedLazy(field, options_, scc_analyzer_)) {
-      format(" | 0x1u /*eagerly verified lazy*/");
+      format(" | 0x1u  // eagerly verified lazy\n");
     } else if (IsStringInlined(field, options_)) {
-      format(" | 0x1u /*inlined*/");
+      format(" | 0x1u  // inlined\n");
     }
     format(",\n");
   }
@@ -2489,6 +2466,45 @@ void MessageGenerator::GenerateSharedConstructorCode(io::Printer* printer) {
 
   format.Outdent();
   format("}\n\n");
+}
+
+void MessageGenerator::GenerateCreateSplitMessage(io::Printer* printer) {
+  Formatter format(printer, variables_);
+  format(
+      "$classname$::Impl_::Split* "
+      "$classname$::CreateSplitMessage(::$proto_ns$::Arena* arena) {\n");
+  format.Indent();
+  const char* field_sep = " ";
+  const auto put_sep = [&] {
+    format("\n$1$ ", field_sep);
+    field_sep = ",";
+  };
+  format(
+      "const size_t size = sizeof(Impl_::Split);\n"
+      "void* chunk = (arena == nullptr) ?\n"
+      "  ::operator new(size) :\n"
+      "  arena->AllocateAligned(size, alignof(Impl_::Split));\n"
+      "Impl_::Split* ptr = reinterpret_cast<Impl_::Split*>(chunk);\n"
+      "new (ptr) Impl_::Split{");
+  format.Indent();
+  for (const FieldDescriptor* field : optimized_order_) {
+    GOOGLE_DCHECK(!IsFieldStripped(field, options_));
+    if (ShouldSplit(field, options_)) {
+      put_sep();
+      field_generators_.get(field).GenerateAggregateInitializer(printer);
+    }
+  }
+  format.Outdent();
+  format("};\n");
+  for (const FieldDescriptor* field : optimized_order_) {
+    GOOGLE_DCHECK(!IsFieldStripped(field, options_));
+    if (ShouldSplit(field, options_)) {
+      field_generators_.get(field).GenerateCreateSplitMessageCode(printer);
+    }
+  }
+  format("return ptr;\n");
+  format.Outdent();
+  format("}\n");
 }
 
 void MessageGenerator::GenerateInitDefaultSplitInstance(io::Printer* printer) {
@@ -2928,6 +2944,10 @@ void MessageGenerator::GenerateStructors(io::Printer* printer) {
 
   // Generate the shared constructor code.
   GenerateSharedConstructorCode(printer);
+
+  if (ShouldSplit(descriptor_, options_)) {
+    GenerateCreateSplitMessage(printer);
+  }
 
   // Generate the destructor.
   if (!HasSimpleBaseClass(descriptor_, options_)) {

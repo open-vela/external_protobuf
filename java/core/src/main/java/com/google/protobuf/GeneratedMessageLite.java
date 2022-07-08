@@ -244,16 +244,11 @@ public abstract class GeneratedMessageLite<
    *
    * <p>For use by generated code only.
    */
-  protected abstract Object dynamicMethod(
-      MethodToInvoke method,
-          Object arg0,
-          Object arg1);
+  protected abstract Object dynamicMethod(MethodToInvoke method, Object arg0, Object arg1);
 
   /** Same as {@link #dynamicMethod(MethodToInvoke, Object, Object)} with {@code null} padding. */
   @CanIgnoreReturnValue
-  protected Object dynamicMethod(
-      MethodToInvoke method,
-          Object arg0) {
+  protected Object dynamicMethod(MethodToInvoke method, Object arg0) {
     return dynamicMethod(method, arg0, null);
   }
 
@@ -1250,11 +1245,11 @@ public abstract class GeneratedMessageLite<
     }
 
     @SuppressWarnings("unchecked")
-    Object fromFieldSetType(Object value) {
+    Object fromFieldSetType(final Object value) {
       if (descriptor.isRepeated()) {
         if (descriptor.getLiteJavaType() == WireFormat.JavaType.ENUM) {
-          List<Object> result = new ArrayList<>();
-          for (Object element : (List) value) {
+          final List result = new ArrayList<>();
+          for (final Object element : (List) value) {
             result.add(singularFromFieldSetType(element));
           }
           return result;
@@ -1266,7 +1261,7 @@ public abstract class GeneratedMessageLite<
       }
     }
 
-    Object singularFromFieldSetType(Object value) {
+    Object singularFromFieldSetType(final Object value) {
       if (descriptor.getLiteJavaType() == WireFormat.JavaType.ENUM) {
         return descriptor.enumTypeMap.findValueByNumber((Integer) value);
       } else {
@@ -1274,11 +1269,12 @@ public abstract class GeneratedMessageLite<
       }
     }
 
-    Object toFieldSetType(Object value) {
+    @SuppressWarnings("unchecked")
+    Object toFieldSetType(final Object value) {
       if (descriptor.isRepeated()) {
         if (descriptor.getLiteJavaType() == WireFormat.JavaType.ENUM) {
-          List<Object> result = new ArrayList<>();
-          for (Object element : (List) value) {
+          final List result = new ArrayList<>();
+          for (final Object element : (List) value) {
             result.add(singularToFieldSetType(element));
           }
           return result;
@@ -1290,7 +1286,7 @@ public abstract class GeneratedMessageLite<
       }
     }
 
-    Object singularToFieldSetType(Object value) {
+    Object singularToFieldSetType(final Object value) {
       if (descriptor.getLiteJavaType() == WireFormat.JavaType.ENUM) {
         return ((Internal.EnumLite) value).getNumber();
       } else {
