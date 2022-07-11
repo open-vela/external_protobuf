@@ -31,7 +31,9 @@
 #endregion
 
 using Google.Protobuf.Compatibility;
+using Google.Protobuf.Reflection;
 using System;
+using System.Buffers;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -66,14 +68,18 @@ namespace Google.Protobuf.Collections
     /// in future versions.
     /// </para>
     /// </remarks>
-    public sealed class MapField<TKey, TValue> : IDeepCloneable<MapField<TKey, TValue>>, IDictionary<TKey, TValue>, IEquatable<MapField<TKey, TValue>>, IDictionary, IReadOnlyDictionary<TKey, TValue>
+    public sealed class MapField<TKey, TValue> : IDeepCloneable<MapField<TKey, TValue>>, IDictionary<TKey, TValue>, IEquatable<MapField<TKey, TValue>>, IDictionary
+#if !NET35
+        , IReadOnlyDictionary<TKey, TValue>
+#endif
     {
         private static readonly EqualityComparer<TValue> ValueEqualityComparer = ProtobufEqualityComparers.GetEqualityComparer<TValue>();
         private static readonly EqualityComparer<TKey> KeyEqualityComparer = ProtobufEqualityComparers.GetEqualityComparer<TKey>();
 
         // TODO: Don't create the map/list until we have an entry. (Assume many maps will be empty.)
-        private readonly Dictionary<TKey, LinkedListNode<KeyValuePair<TKey, TValue>>> map = new(KeyEqualityComparer);
-        private readonly LinkedList<KeyValuePair<TKey, TValue>> list = new();
+        private readonly Dictionary<TKey, LinkedListNode<KeyValuePair<TKey, TValue>>> map =
+            new Dictionary<TKey, LinkedListNode<KeyValuePair<TKey, TValue>>>(KeyEqualityComparer);
+        private readonly LinkedList<KeyValuePair<TKey, TValue>> list = new LinkedList<KeyValuePair<TKey, TValue>>();
 
         /// <summary>
         /// Creates a deep clone of this object.
@@ -141,7 +147,8 @@ namespace Google.Protobuf.Collections
         public bool Remove(TKey key)
         {
             ProtoPreconditions.CheckNotNullUnconstrained(key, nameof(key));
-            if (map.TryGetValue(key, out LinkedListNode<KeyValuePair<TKey, TValue>> node))
+            LinkedListNode<KeyValuePair<TKey, TValue>> node;
+            if (map.TryGetValue(key, out node))
             {
                 map.Remove(key);
                 node.List.Remove(node);
@@ -163,14 +170,15 @@ namespace Google.Protobuf.Collections
         /// <returns><c>true</c> if the map contains an element with the specified key; otherwise, <c>false</c>.</returns>
         public bool TryGetValue(TKey key, out TValue value)
         {
-            if (map.TryGetValue(key, out LinkedListNode<KeyValuePair<TKey, TValue>> node))
+            LinkedListNode<KeyValuePair<TKey, TValue>> node;
+            if (map.TryGetValue(key, out node))
             {
                 value = node.Value.Value;
                 return true;
             }
             else
             {
-                value = default;
+                value = default(TValue);
                 return false;
             }
         }
@@ -187,7 +195,8 @@ namespace Google.Protobuf.Collections
             get
             {
                 ProtoPreconditions.CheckNotNullUnconstrained(key, nameof(key));
-                if (TryGetValue(key, out TValue value))
+                TValue value;
+                if (TryGetValue(key, out value))
                 {
                     return value;
                 }
@@ -201,8 +210,9 @@ namespace Google.Protobuf.Collections
                 {
                     ProtoPreconditions.CheckNotNullUnconstrained(value, nameof(value));
                 }
+                LinkedListNode<KeyValuePair<TKey, TValue>> node;
                 var pair = new KeyValuePair<TKey, TValue>(key, value);
-                if (map.TryGetValue(key, out LinkedListNode<KeyValuePair<TKey, TValue>> node))
+                if (map.TryGetValue(key, out node))
                 {
                     node.Value = pair;
                 }
@@ -217,12 +227,12 @@ namespace Google.Protobuf.Collections
         /// <summary>
         /// Gets a collection containing the keys in the map.
         /// </summary>
-        public ICollection<TKey> Keys => new MapView<TKey>(this, pair => pair.Key, ContainsKey);
+        public ICollection<TKey> Keys { get { return new MapView<TKey>(this, pair => pair.Key, ContainsKey); } }
 
         /// <summary>
         /// Gets a collection containing the values in the map.
         /// </summary>
-        public ICollection<TValue> Values => new MapView<TValue>(this, pair => pair.Value, ContainsValue);
+        public ICollection<TValue> Values { get { return new MapView<TValue>(this, pair => pair.Value, ContainsValue); } }
 
         /// <summary>
         /// Adds the specified entries to the map. The keys and values are not automatically cloned.
@@ -243,7 +253,10 @@ namespace Google.Protobuf.Collections
         /// <returns>
         /// An enumerator that can be used to iterate through the collection.
         /// </returns>
-        public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator() => list.GetEnumerator();
+        public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
+        {
+            return list.GetEnumerator();
+        }
 
         /// <summary>
         /// Returns an enumerator that iterates through a collection.
@@ -251,13 +264,19 @@ namespace Google.Protobuf.Collections
         /// <returns>
         /// An <see cref="T:System.Collections.IEnumerator" /> object that can be used to iterate through the collection.
         /// </returns>
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
 
         /// <summary>
         /// Adds the specified item to the map.
         /// </summary>
         /// <param name="item">The item to add to the map.</param>
-        void ICollection<KeyValuePair<TKey, TValue>>.Add(KeyValuePair<TKey, TValue> item) => Add(item.Key, item.Value);
+        void ICollection<KeyValuePair<TKey, TValue>>.Add(KeyValuePair<TKey, TValue> item)
+        {
+            Add(item.Key, item.Value);
+        }
 
         /// <summary>
         /// Removes all items from the map.
@@ -273,16 +292,21 @@ namespace Google.Protobuf.Collections
         /// </summary>
         /// <param name="item">The key/value pair to find.</param>
         /// <returns></returns>
-        bool ICollection<KeyValuePair<TKey, TValue>>.Contains(KeyValuePair<TKey, TValue> item) =>
-            TryGetValue(item.Key, out TValue value) && ValueEqualityComparer.Equals(item.Value, value);
+        bool ICollection<KeyValuePair<TKey, TValue>>.Contains(KeyValuePair<TKey, TValue> item)
+        {
+            TValue value;
+            return TryGetValue(item.Key, out value) && ValueEqualityComparer.Equals(item.Value, value);
+        }
 
         /// <summary>
         /// Copies the key/value pairs in this map to an array.
         /// </summary>
         /// <param name="array">The array to copy the entries into.</param>
         /// <param name="arrayIndex">The index of the array at which to start copying values.</param>
-        void ICollection<KeyValuePair<TKey, TValue>>.CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex) =>
+        void ICollection<KeyValuePair<TKey, TValue>>.CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
+        {
             list.CopyTo(array, arrayIndex);
+        }
 
         /// <summary>
         /// Removes the specified key/value pair from the map.
@@ -296,7 +320,8 @@ namespace Google.Protobuf.Collections
             {
                 throw new ArgumentException("Key is null", nameof(item));
             }
-            if (map.TryGetValue(item.Key, out LinkedListNode<KeyValuePair<TKey, TValue>> node) &&
+            LinkedListNode<KeyValuePair<TKey, TValue>> node;
+            if (map.TryGetValue(item.Key, out node) &&
                 EqualityComparer<TValue>.Default.Equals(item.Value, node.Value.Value))
             {
                 map.Remove(item.Key);
@@ -312,12 +337,12 @@ namespace Google.Protobuf.Collections
         /// <summary>
         /// Gets the number of elements contained in the map.
         /// </summary>
-        public int Count => list.Count;
+        public int Count { get { return list.Count; } }
 
         /// <summary>
         /// Gets a value indicating whether the map is read-only.
         /// </summary>
-        public bool IsReadOnly => false;
+        public bool IsReadOnly { get { return false; } }
 
         /// <summary>
         /// Determines whether the specified <see cref="System.Object" />, is equal to this instance.
@@ -326,7 +351,10 @@ namespace Google.Protobuf.Collections
         /// <returns>
         ///   <c>true</c> if the specified <see cref="System.Object" /> is equal to this instance; otherwise, <c>false</c>.
         /// </returns>
-        public override bool Equals(object other) => Equals(other as MapField<TKey, TValue>);
+        public override bool Equals(object other)
+        {
+            return Equals(other as MapField<TKey, TValue>);
+        }
 
         /// <summary>
         /// Returns a hash code for this instance.
@@ -371,7 +399,8 @@ namespace Google.Protobuf.Collections
             var valueComparer = ValueEqualityComparer;
             foreach (var pair in this)
             {
-                if (!other.TryGetValue(pair.Key, out TValue value))
+                TValue value;
+                if (!other.TryGetValue(pair.Key, out value))
                 {
                     return false;
                 }
@@ -503,20 +532,33 @@ namespace Google.Protobuf.Collections
         }
 
         #region IDictionary explicit interface implementation
+        void IDictionary.Add(object key, object value)
+        {
+            Add((TKey)key, (TValue)value);
+        }
 
-        void IDictionary.Add(object key, object value) => Add((TKey)key, (TValue)value);
+        bool IDictionary.Contains(object key)
+        {
+            if (!(key is TKey))
+            {
+                return false;
+            }
+            return ContainsKey((TKey)key);
+        }
 
-        bool IDictionary.Contains(object key) => key is TKey k && ContainsKey(k);
-
-        IDictionaryEnumerator IDictionary.GetEnumerator() => new DictionaryEnumerator(GetEnumerator());
+        IDictionaryEnumerator IDictionary.GetEnumerator()
+        {
+            return new DictionaryEnumerator(GetEnumerator());
+        }
 
         void IDictionary.Remove(object key)
         {
             ProtoPreconditions.CheckNotNull(key, nameof(key));
-            if (key is TKey k)
+            if (!(key is TKey))
             {
-                Remove(k);
+                return;
             }
+            Remove((TKey)key);
         }
 
         void ICollection.CopyTo(Array array, int index)
@@ -526,27 +568,28 @@ namespace Google.Protobuf.Collections
             temp.CopyTo(array, index);
         }
 
-        bool IDictionary.IsFixedSize => false;
+        bool IDictionary.IsFixedSize { get { return false; } }
 
-        ICollection IDictionary.Keys => (ICollection)Keys;
+        ICollection IDictionary.Keys { get { return (ICollection)Keys; } }
 
-        ICollection IDictionary.Values => (ICollection)Values;
+        ICollection IDictionary.Values { get { return (ICollection)Values; } }
 
-        bool ICollection.IsSynchronized => false;
+        bool ICollection.IsSynchronized { get { return false; } }
 
-        object ICollection.SyncRoot => this;
+        object ICollection.SyncRoot { get { return this; } }
 
         object IDictionary.this[object key]
         {
             get
             {
                 ProtoPreconditions.CheckNotNull(key, nameof(key));
-                if (key is TKey k)
+                if (!(key is TKey))
                 {
-                    TryGetValue(k, out TValue value);
-                    return value;
+                    return null;
                 }
-                return null;
+                TValue value;
+                TryGetValue((TKey)key, out value);
+                return value;
             }
 
             set
@@ -557,8 +600,11 @@ namespace Google.Protobuf.Collections
         #endregion
 
         #region IReadOnlyDictionary explicit interface implementation
+#if !NET35
         IEnumerable<TKey> IReadOnlyDictionary<TKey, TValue>.Keys => Keys;
+
         IEnumerable<TValue> IReadOnlyDictionary<TKey, TValue>.Values => Values;
+#endif
         #endregion
 
         private class DictionaryEnumerator : IDictionaryEnumerator
@@ -570,14 +616,20 @@ namespace Google.Protobuf.Collections
                 this.enumerator = enumerator;
             }
 
-            public bool MoveNext() => enumerator.MoveNext();
+            public bool MoveNext()
+            {
+                return enumerator.MoveNext();
+            }
 
-            public void Reset() => enumerator.Reset();
+            public void Reset()
+            {
+                enumerator.Reset();
+            }
 
-            public object Current => Entry;
-            public DictionaryEntry Entry => new DictionaryEntry(Key, Value);
-            public object Key => enumerator.Current.Key;
-            public object Value => enumerator.Current.Value;
+            public object Current { get { return Entry; } }
+            public DictionaryEntry Entry { get { return new DictionaryEntry(Key, Value); } }
+            public object Key { get { return enumerator.Current.Key; } }
+            public object Value { get { return enumerator.Current.Value; } }
         }
 
         /// <summary>
@@ -636,19 +688,28 @@ namespace Google.Protobuf.Collections
                 this.containsCheck = containsCheck;
             }
 
-            public int Count => parent.Count; 
+            public int Count { get { return parent.Count; } }
 
-            public bool IsReadOnly => true;
+            public bool IsReadOnly { get { return true; } }
 
-            public bool IsSynchronized => false;
+            public bool IsSynchronized { get { return false; } }
 
-            public object SyncRoot => parent;
+            public object SyncRoot { get { return parent; } }
 
-            public void Add(T item) => throw new NotSupportedException();
+            public void Add(T item)
+            {
+                throw new NotSupportedException();
+            }
 
-            public void Clear() => throw new NotSupportedException();
+            public void Clear()
+            {
+                throw new NotSupportedException();
+            }
 
-            public bool Contains(T item) => containsCheck(item);
+            public bool Contains(T item)
+            {
+                return containsCheck(item);
+            }
 
             public void CopyTo(T[] array, int arrayIndex)
             {
@@ -671,9 +732,15 @@ namespace Google.Protobuf.Collections
                 return parent.list.Select(projection).GetEnumerator();
             }
 
-            public bool Remove(T item) => throw new NotSupportedException();
+            public bool Remove(T item)
+            {
+                throw new NotSupportedException();
+            }
 
-            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return GetEnumerator();
+            }
 
             public void CopyTo(Array array, int index)
             {

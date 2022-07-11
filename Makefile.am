@@ -92,7 +92,6 @@ csharp_EXTRA_DIST=                                                           \
   csharp/src/AddressBook/ListPeople.cs                                       \
   csharp/src/AddressBook/Program.cs                                          \
   csharp/src/AddressBook/SampleUsage.cs                                      \
-  csharp/src/Directory.Build.props                                           \
   csharp/src/Google.Protobuf.Benchmarks/BenchmarkDatasetConfig.cs            \
   csharp/src/Google.Protobuf.Benchmarks/BenchmarkMessage1Proto3.cs           \
   csharp/src/Google.Protobuf.Benchmarks/Benchmarks.cs                        \
@@ -120,6 +119,7 @@ csharp_EXTRA_DIST=                                                           \
   csharp/src/Google.Protobuf.Test/Collections/ProtobufEqualityComparersTest.cs \
   csharp/src/Google.Protobuf.Test/Collections/RepeatedFieldTest.cs           \
   csharp/src/Google.Protobuf.Test/Compatibility/PropertyInfoExtensionsTest.cs \
+  csharp/src/Google.Protobuf.Test/Compatibility/StreamExtensionsTest.cs      \
   csharp/src/Google.Protobuf.Test/Compatibility/TypeExtensionsTest.cs        \
   csharp/src/Google.Protobuf.Test/DeprecatedMemberTest.cs                    \
   csharp/src/Google.Protobuf.Test/EqualityTester.cs                          \
@@ -185,11 +185,14 @@ csharp_EXTRA_DIST=                                                           \
   csharp/src/Google.Protobuf/Collections/Lists.cs                            \
   csharp/src/Google.Protobuf/Collections/MapField.cs                         \
   csharp/src/Google.Protobuf/Collections/ProtobufEqualityComparers.cs        \
+  csharp/src/Google.Protobuf/Collections/ReadOnlyDictionary.cs               \
   csharp/src/Google.Protobuf/Collections/RepeatedField.cs                    \
   csharp/src/Google.Protobuf/Compatibility/DynamicallyAccessedMembersAttribute.cs \
   csharp/src/Google.Protobuf/Compatibility/DynamicallyAccessedMemberTypes.cs \
+  csharp/src/Google.Protobuf/Compatibility/MethodInfoExtensions.cs           \
   csharp/src/Google.Protobuf/Compatibility/PropertyInfoExtensions.cs         \
   csharp/src/Google.Protobuf/Compatibility/RequiresUnreferencedCodeAttribute.cs \
+  csharp/src/Google.Protobuf/Compatibility/StreamExtensions.cs               \
   csharp/src/Google.Protobuf/Compatibility/TypeExtensions.cs                 \
   csharp/src/Google.Protobuf/Compatibility/UnconditionalSuppressMessageAttribute.cs \
   csharp/src/Google.Protobuf/Extension.cs                                    \
@@ -590,7 +593,6 @@ java_EXTRA_DIST=                                                                
   java/lite/src/test/java/com/google/protobuf/LiteTest.java                        \
   java/BUILD.bazel                                                                 \
   java/pom.xml                                                                     \
-  java/protoc/pom.xml                                                              \
   java/util/BUILD.bazel                                                            \
   java/util/pom.xml                                                                \
   java/util/pom_template.xml                                                       \
@@ -956,6 +958,8 @@ php_EXTRA_DIST=                                                       \
   php/tests/EncodeDecodeTest.php                                      \
   php/tests/force_c_ext.php                                           \
   php/tests/gdb_test.sh                                               \
+  php/tests/generated_previous/GPBMetadata/ProtoPrevious/TestPreviouslyUnreservedMessage.php \
+  php/tests/generated_previous/Previous/readonly.php                  \
   php/tests/GeneratedClassTest.php                                    \
   php/tests/GeneratedPhpdocTest.php                                   \
   php/tests/GeneratedServiceTest.php                                  \
@@ -965,6 +969,7 @@ php_EXTRA_DIST=                                                       \
   php/tests/multirequest.php                                          \
   php/tests/multirequest.sh                                           \
   php/tests/PhpImplementationTest.php                                 \
+  php/tests/PreviouslyGeneratedClassTest.php                          \
   php/tests/proto/empty/echo.proto                                    \
   php/tests/proto/test.proto                                          \
   php/tests/proto/test_descriptors.proto                              \
@@ -983,6 +988,7 @@ php_EXTRA_DIST=                                                       \
   php/tests/proto/test_service.proto                                  \
   php/tests/proto/test_service_namespace.proto                        \
   php/tests/proto/test_wrapper_type_setters.proto                     \
+  php/tests/proto_previous/test_previously_unreserved_message.proto   \
   php/tests/test_base.php                                             \
   php/tests/test_util.php                                             \
   php/tests/valgrind.supp                                             \
@@ -991,7 +997,6 @@ php_EXTRA_DIST=                                                       \
 
 # Note: please keep this in sync with the python_dist_files rule in BUILD.bazel.
 python_EXTRA_DIST=                                                           \
-  python/BUILD.bazel                                                         \
   python/MANIFEST.in                                                         \
   python/google/__init__.py                                                  \
   python/google/protobuf/__init__.py                                         \
@@ -1106,7 +1111,6 @@ python_EXTRA_DIST=                                                           \
   python/google/protobuf/text_format.py                                      \
   python/google/protobuf/unknown_fields.py                                   \
   python/google/protobuf/util/__init__.py                                    \
-  python/internal.bzl                                                        \
   python/release.sh                                                          \
   python/mox.py                                                              \
   python/setup.cfg                                                           \
