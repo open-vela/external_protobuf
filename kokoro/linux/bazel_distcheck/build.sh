@@ -55,7 +55,6 @@ bazel_args=(
   --
   //...
   -//objectivec/...  # only works on macOS
-  -//csharp/...      # release builds require external dependencies
   @com_google_protobuf_examples//...
 )
 ${SCRIPT_ROOT}/kokoro/common/bazel_wrapper.sh "${bazel_args[@]}"
