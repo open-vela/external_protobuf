@@ -73,7 +73,6 @@
 #undef PROTOBUF_FORCE_COPY_IN_SWAP
 #undef PROTOBUF_FORCE_COPY_IN_MOVE
 #undef PROTOBUF_FORCE_RESET_IN_CLEAR
-#undef PROTOBUF_FUZZ_MESSAGE_SPACE_USED_LONG
 #undef PROTOBUF_FORCE_COPY_DEFAULT_STRING
 #undef PROTOBUF_NAMESPACE_OPEN
 #undef PROTOBUF_NAMESPACE_CLOSE
@@ -109,17 +108,12 @@
 
 #ifdef PROTOBUF_FUTURE_BREAKING_CHANGES
 #undef PROTOBUF_FUTURE_BREAKING_CHANGES
-#undef PROTOBUF_FUTURE_REMOVE_DEFAULT_FIELD_COMPARATOR
-#undef PROTOBUF_FUTURE_REMOVE_CLEARED_API
 #endif
-
-#undef PROTOBUF_FUTURE_FINAL
 
 // Restore macro that may have been #undef'd in port_def.inc.
 #ifdef _WIN32
 #pragma pop_macro("CREATE_NEW")
 #pragma pop_macro("DELETE")
-#pragma pop_macro("DOMAIN")
 #pragma pop_macro("DOUBLE_CLICK")
 #pragma pop_macro("ERROR")
 #pragma pop_macro("ERROR_BUSY")
