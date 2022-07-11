@@ -32,7 +32,6 @@
 #define GOOGLE_PROTOBUF_GENERATED_MESSAGE_TCTABLE_IMPL_H__
 
 #include <cstdint>
-#include <cstdlib>
 #include <type_traits>
 
 #include <google/protobuf/port.h>
@@ -53,12 +52,6 @@ class Message;
 class UnknownFieldSet;
 
 namespace internal {
-
-enum {
-  kInlinedStringAuxIdx = 0,
-  kSplitOffsetAuxIdx = 1,
-  kSplitSizeAuxIdx = 2,
-};
 
 // Field layout enums.
 //
@@ -269,11 +262,11 @@ enum FieldType : uint16_t {
 
 #ifndef NDEBUG
 template <size_t align>
+#ifndef _MSC_VER
+[[noreturn]]
+#endif
 void AlignFail(uintptr_t address) {
   GOOGLE_LOG(FATAL) << "Unaligned (" << align << ") access at " << address;
-
-  // Explicit abort to let compilers know this function does not return
-  abort();
 }
 
 extern template void AlignFail<4>(uintptr_t);
@@ -362,15 +355,6 @@ class PROTOBUF_EXPORT TcParser final {
   static const char* FastEvS2(PROTOBUF_TC_PARAM_DECL);
   static const char* FastEvR1(PROTOBUF_TC_PARAM_DECL);
   static const char* FastEvR2(PROTOBUF_TC_PARAM_DECL);
-
-  static const char* FastEr0S1(PROTOBUF_TC_PARAM_DECL);
-  static const char* FastEr0S2(PROTOBUF_TC_PARAM_DECL);
-  static const char* FastEr0R1(PROTOBUF_TC_PARAM_DECL);
-  static const char* FastEr0R2(PROTOBUF_TC_PARAM_DECL);
-  static const char* FastEr1S1(PROTOBUF_TC_PARAM_DECL);
-  static const char* FastEr1S2(PROTOBUF_TC_PARAM_DECL);
-  static const char* FastEr1R1(PROTOBUF_TC_PARAM_DECL);
-  static const char* FastEr1R2(PROTOBUF_TC_PARAM_DECL);
 
   // Functions referenced by generated fast tables (string types):
   //   B: bytes      S: string     U: UTF-8 string
@@ -465,9 +449,6 @@ class PROTOBUF_EXPORT TcParser final {
 
  private:
   friend class GeneratedTcTableLiteTest;
-  static void* MaybeGetSplitBase(MessageLite* msg, const bool is_split,
-                                 const TcParseTableBase* table,
-                                 google::protobuf::internal::ParseContext* ctx);
 
   template <typename TagType, bool group_coding, bool aux_is_table>
   static inline const char* SingularParseMessageAuxImpl(PROTOBUF_TC_PARAM_DECL);
@@ -545,12 +526,8 @@ class PROTOBUF_EXPORT TcParser final {
   // Implementations for fast enum field parsing functions:
   template <typename TagType, uint16_t xform_val>
   static inline const char* SingularEnum(PROTOBUF_TC_PARAM_DECL);
-  template <typename TagType, uint8_t min>
-  static inline const char* SingularEnumSmallRange(PROTOBUF_TC_PARAM_DECL);
   template <typename TagType, uint16_t xform_val>
   static inline const char* RepeatedEnum(PROTOBUF_TC_PARAM_DECL);
-  template <typename TagType, uint8_t min>
-  static inline const char* RepeatedEnumSmallRange(PROTOBUF_TC_PARAM_DECL);
 
   // Implementations for fast string field parsing functions:
   enum Utf8Type { kNoUtf8 = 0, kUtf8 = 1, kUtf8ValidateOnly = 2 };
