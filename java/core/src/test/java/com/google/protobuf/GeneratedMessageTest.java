@@ -1529,7 +1529,7 @@ public class GeneratedMessageTest {
       assertThat(builder.getFooInt()).isEqualTo(123);
       TestOneof2 message = builder.buildPartial();
       assertThat(message.hasFooInt()).isTrue();
-      assertThat(123).isEqualTo(message.getFooInt());
+      assertThat(message.getFooInt()).isEqualTo(123);
 
       assertThat(builder.clearFooInt().hasFooInt()).isFalse();
       TestOneof2 message2 = builder.build();
@@ -1943,7 +1943,7 @@ public class GeneratedMessageTest {
 
   @Test
   public void
-  extendableBuilder_extensionFieldContainingBuilder_setRepeatedFieldOverwritesElement() {
+      extendableBuilder_extensionFieldContainingBuilder_setRepeatedFieldOverwritesElement() {
     TestAllExtensions.Builder builder = TestAllExtensions.newBuilder();
     builder.addRepeatedField(REPEATED_NESTED_MESSAGE_EXTENSION, NestedMessage.getDefaultInstance());
     // Calling getRepeatedFieldBuilder and ignoring the returned Builder should have no

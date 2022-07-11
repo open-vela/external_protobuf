@@ -1,3 +1,20 @@
+2022-07-01 Unreleased version
+  * Add TransferAllMessages() util function
+  * Break ZeroCopyOutputByteSink into its own file.
+  * Explicitly instantiate InternalMetadata members at UnknownFieldSet.
+  * Support kdoc for Kotlin
+  * Delete unused function: IsProto3Field.
+  * Add C++20 keywords guarded by PROTOBUF_FUTURE_CPP20_KEYWORDS
+  * Escape Kotlin keywords in package names in proto generated code
+  * Fix StrAppend crashing on empty strings.
+
+2022-06-27 Unreleased version
+  * Handle reflection for message splitting.
+  * make metadata fields lazy.
+  * Extend visibility of plugin library to upb
+  * Modernize conformance_cpp.cc.
+  * Don't request 64-byte alignment unless the toolchain supports it.
+
 2022-06-27 version 21.2 (C++/Java/Python/PHP/Objective-C/C#/Ruby)
   C++
   * ArenaString improvements (fix alignment issue)
@@ -103,6 +120,7 @@
   Java
   * Update protobuf_version.bzl to separate protoc and per-language java … (#9900)
   * 6x speedup in ArrayEncoder.writeUInt32NotTag
+  * Java generated code is no longer compatible with runtimes 2.6.1 and earlier
 
   Python
   * Increment python major version to 4 in version.json for python upb (#9926)
@@ -114,6 +132,7 @@
   * Due to the breaking changes for Python, the major version number for Python
     has been incremented.
   * The binary wheel for macOS now supports Apple silicon.
+  * In TextFormat, transform UnicodeDecodeError into ParseError.
 
 
   PHP
