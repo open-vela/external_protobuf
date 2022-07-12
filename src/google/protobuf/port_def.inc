@@ -139,6 +139,11 @@
 #define PROTOBUF_BUILTIN_BSWAP64(x) __builtin_bswap64(x)
 #endif
 
+// Portable check for gcc-style atomic built-ins
+#if __has_builtin(__atomic_load_n)
+#define PROTOBUF_BUILTIN_ATOMIC 1
+#endif
+
 // Portable check for GCC minimum version:
 // https://gcc.gnu.org/onlinedocs/cpp/Common-Predefined-Macros.html
 #if defined(__GNUC__) && defined(__GNUC_MINOR__) \
@@ -171,9 +176,26 @@
 // user code can be updated before upgrading versions of protobuf.
 // PROTOBUF_FUTURE_FINAL is used on classes that are historically not marked as
 // final, but that may be marked final in future (breaking) releases.
-// #define PROTOBUF_FUTURE_BREAKING_CHANGES 1
-// #define PROTOBUF_FUTURE_FINAL final
+
+#ifdef PROTOBUF_FUTURE_BREAKING_CHANGES
+// Used on classes that are historically not marked as final.
+// Owner: kfm@
+#define PROTOBUF_FUTURE_FINAL final
+
+// Used to remove the RTTI checks for `DefaultFieldComparator`.
+// Owner: kfm@
+#define PROTOBUF_FUTURE_REMOVE_DEFAULT_FIELD_COMPARATOR 1
+
+// Used to remove the manipulation of cleared elements in RepeatedPtrField.
+// Owner: mkruskal@
+#define PROTOBUF_FUTURE_REMOVE_CLEARED_API 1
+
+// Used to escape C++20 keywords.
+// Owner: mkruskal@
+#define PROTOBUF_FUTURE_CPP20_KEYWORDS 1
+#else
 #define PROTOBUF_FUTURE_FINAL
+#endif
 
 #ifdef PROTOBUF_VERSION
 #error PROTOBUF_VERSION was previously defined
@@ -527,6 +549,10 @@
 #error PROTOBUF_FORCE_RESET_IN_CLEAR was previously defined
 #endif
 
+#ifdef PROTOBUF_FUZZ_MESSAGE_SPACE_USED_LONG
+#error PROTOBUF_FUZZ_MESSAGE_SPACE_USED_LONG was previously defined
+#endif
+
 // Force copy the default string to a string field so that non-optimized builds
 // have harder-to-rely-on address stability.
 #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
@@ -638,20 +664,25 @@
 #ifdef PROTOBUF_CONSTINIT
 #error PROTOBUF_CONSTINIT was previously defined
 #endif
-#if defined(__cpp_constinit)
+#if defined(__cpp_constinit) && !defined(_MSC_VER)
 #define PROTOBUF_CONSTINIT constinit
 #define PROTOBUF_CONSTEXPR constexpr
 // Some older Clang versions incorrectly raise an error about
 // constant-initializing weak default instance pointers. Versions 12.0 and
 // higher seem to work, except that XCode 12.5.1 shows the error even though it
 // uses Clang 12.0.5.
-#elif __has_cpp_attribute(clang::require_constant_initialization) && \
+// Clang-cl on Windows raises error also.
+#elif !defined(_MSC_VER) && __has_cpp_attribute(clang::require_constant_initialization) && \
     ((defined(__APPLE__) && __clang_major__ >= 13) ||                \
      (!defined(__APPLE__) && __clang_major__ >= 12))
 #define PROTOBUF_CONSTINIT [[clang::require_constant_initialization]]
 #define PROTOBUF_CONSTEXPR constexpr
 #elif PROTOBUF_GNUC_MIN(12, 2)
 #define PROTOBUF_CONSTINIT __constinit
+#define PROTOBUF_CONSTEXPR constexpr
+// MSVC 17 currently seems to raise an error about constant-initialized pointers.
+#elif defined(_MSC_VER) && _MSC_VER >= 1930
+#define PROTOBUF_CONSTINIT
 #define PROTOBUF_CONSTEXPR constexpr
 #else
 #define PROTOBUF_CONSTINIT
@@ -798,11 +829,13 @@
 
 // Windows declares several inconvenient macro names.  We #undef them and then
 // restore them in port_undef.inc.
-#ifdef _MSC_VER
+#ifdef _WIN32
 #pragma push_macro("CREATE_NEW")
 #undef CREATE_NEW
 #pragma push_macro("DELETE")
 #undef DELETE
+#pragma push_macro("DOMAIN")
+#undef DOMAIN
 #pragma push_macro("DOUBLE_CLICK")
 #undef DOUBLE_CLICK
 #pragma push_macro("ERROR")
@@ -851,7 +884,7 @@
 #undef STRICT
 #pragma push_macro("timezone")
 #undef timezone
-#endif  // _MSC_VER
+#endif  // _WIN32
 
 #ifdef __APPLE__
 // Inconvenient macro names from usr/include/math.h in some macOS SDKs.
@@ -865,6 +898,8 @@
 // Inconvenient macro names from usr/include/sys/syslimits.h in some macOS SDKs.
 #pragma push_macro("UID_MAX")
 #undef UID_MAX
+#pragma push_macro("GID_MAX")
+#undef GID_MAX
 #endif  // __APPLE__
 
 #if defined(__clang__) || PROTOBUF_GNUC_MIN(3, 0) || defined(_MSC_VER)
