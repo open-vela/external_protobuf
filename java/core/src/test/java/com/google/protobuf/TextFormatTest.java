@@ -823,7 +823,6 @@ public class TextFormatTest {
     }
   }
 
-  @CanIgnoreReturnValue
   private TestAllTypes assertParseSuccessWithOverwriteForbidden(String text)
       throws TextFormat.ParseException {
     TestAllTypes.Builder builder = TestAllTypes.newBuilder();
