@@ -61,59 +61,45 @@ PROTOBUF_THREAD_LOCAL absl::profiling_internal::ExponentialBiased
 
 }  // namespace
 
-PROTOBUF_THREAD_LOCAL int64_t global_next_sample = 1LL << 10;
+PROTOBUF_THREAD_LOCAL SamplingState global_sampling_state = {
+    .next_sample = int64_t{1} << 10, .sample_stride = int64_t{1} << 10};
 
-ThreadSafeArenaStats::ThreadSafeArenaStats() { PrepareForSampling(); }
+ThreadSafeArenaStats::ThreadSafeArenaStats() { PrepareForSampling(0); }
 ThreadSafeArenaStats::~ThreadSafeArenaStats() = default;
 
-void ThreadSafeArenaStats::PrepareForSampling() {
+void ThreadSafeArenaStats::PrepareForSampling(int64_t stride) {
   num_allocations.store(0, std::memory_order_relaxed);
-  num_resets.store(0, std::memory_order_relaxed);
-  bytes_requested.store(0, std::memory_order_relaxed);
+  bytes_used.store(0, std::memory_order_relaxed);
   bytes_allocated.store(0, std::memory_order_relaxed);
   bytes_wasted.store(0, std::memory_order_relaxed);
   max_bytes_allocated.store(0, std::memory_order_relaxed);
   thread_ids.store(0, std::memory_order_relaxed);
+  weight = stride;
   // The inliner makes hardcoded skip_count difficult (especially when combined
   // with LTO).  We use the ability to exclude stacks by regex when encoding
   // instead.
   depth = absl::GetStackTrace(stack, kMaxStackDepth, /* skip_count= */ 0);
 }
 
-void RecordResetSlow(ThreadSafeArenaStats* info) {
-  const size_t max_bytes =
-      info->max_bytes_allocated.load(std::memory_order_relaxed);
-  const size_t allocated_bytes =
-      info->bytes_allocated.load(std::memory_order_relaxed);
-  if (max_bytes < allocated_bytes) {
-    info->max_bytes_allocated.store(allocated_bytes);
-  }
-  info->bytes_requested.store(0, std::memory_order_relaxed);
-  info->bytes_allocated.store(0, std::memory_order_relaxed);
-  info->bytes_wasted.fetch_add(0, std::memory_order_relaxed);
-  info->num_allocations.fetch_add(0, std::memory_order_relaxed);
-  info->num_resets.fetch_add(1, std::memory_order_relaxed);
-}
-
-void RecordAllocateSlow(ThreadSafeArenaStats* info, size_t requested,
+void RecordAllocateSlow(ThreadSafeArenaStats* info, size_t used,
                         size_t allocated, size_t wasted) {
-  info->bytes_requested.fetch_add(requested, std::memory_order_relaxed);
+  info->num_allocations.fetch_add(1, std::memory_order_relaxed);
+  info->bytes_used.fetch_add(used, std::memory_order_relaxed);
   info->bytes_allocated.fetch_add(allocated, std::memory_order_relaxed);
   info->bytes_wasted.fetch_add(wasted, std::memory_order_relaxed);
-  info->num_allocations.fetch_add(1, std::memory_order_relaxed);
-  const uint64_t tid = (1ULL << (GetCachedTID() % 63));
-  const uint64_t thread_ids = info->thread_ids.load(std::memory_order_relaxed);
-  if (!(thread_ids & tid)) {
-    info->thread_ids.store(thread_ids | tid, std::memory_order_relaxed);
-  }
+  const uint64_t tid = 1ULL << (GetCachedTID() % 63);
+  info->thread_ids.fetch_or(tid, std::memory_order_relaxed);
 }
 
-ThreadSafeArenaStats* SampleSlow(int64_t* next_sample) {
-  bool first = *next_sample < 0;
-  *next_sample = g_exponential_biased_generator.GetStride(
+ThreadSafeArenaStats* SampleSlow(SamplingState& sampling_state) {
+  bool first = sampling_state.next_sample < 0;
+  const int64_t next_stride = g_exponential_biased_generator.GetStride(
       g_arenaz_sample_parameter.load(std::memory_order_relaxed));
   // Small values of interval are equivalent to just sampling next time.
-  ABSL_ASSERT(*next_sample >= 1);
+  ABSL_ASSERT(next_stride >= 1);
+  sampling_state.next_sample = next_stride;
+  const int64_t old_stride =
+      absl::exchange(sampling_state.sample_stride, next_stride);
 
   // g_arenaz_enabled can be dynamically flipped, we need to set a threshold low
   // enough that we will start sampling in a reasonable time, so we just use the
@@ -122,11 +108,11 @@ ThreadSafeArenaStats* SampleSlow(int64_t* next_sample) {
   // We will only be negative on our first count, so we should just retry in
   // that case.
   if (first) {
-    if (PROTOBUF_PREDICT_TRUE(--*next_sample > 0)) return nullptr;
-    return SampleSlow(next_sample);
+    if (PROTOBUF_PREDICT_TRUE(--sampling_state.next_sample > 0)) return nullptr;
+    return SampleSlow(sampling_state);
   }
 
-  return GlobalThreadSafeArenazSampler().Register();
+  return GlobalThreadSafeArenazSampler().Register(old_stride);
 }
 
 void SetThreadSafeArenazEnabled(bool enabled) {
@@ -142,6 +128,10 @@ void SetThreadSafeArenazSampleParameter(int32_t rate) {
   }
 }
 
+int32_t ThreadSafeArenazSampleParameter() {
+  return g_arenaz_sample_parameter.load(std::memory_order_relaxed);
+}
+
 void SetThreadSafeArenazMaxSamples(int32_t max) {
   if (max > 0) {
     GlobalThreadSafeArenazSampler().SetMaxSamples(max);
@@ -153,7 +143,8 @@ void SetThreadSafeArenazMaxSamples(int32_t max) {
 
 void SetThreadSafeArenazGlobalNextSample(int64_t next_sample) {
   if (next_sample >= 0) {
-    global_next_sample = next_sample;
+    global_sampling_state.next_sample = next_sample;
+    global_sampling_state.sample_stride = next_sample;
   } else {
     ABSL_RAW_LOG(ERROR, "Invalid thread safe arenaz next sample: %lld",
                  static_cast<long long>(next_sample));  // NOLINT(runtime/int)
@@ -168,6 +159,7 @@ ThreadSafeArenaStats* SampleSlow(int64_t* next_sample) {
 
 void SetThreadSafeArenazEnabled(bool enabled) {}
 void SetThreadSafeArenazSampleParameter(int32_t rate) {}
+int32_t ThreadSafeArenazSampleParameter() { return 0; }
 void SetThreadSafeArenazMaxSamples(int32_t max) {}
 void SetThreadSafeArenazGlobalNextSample(int64_t next_sample) {}
 #endif  // defined(PROTOBUF_ARENAZ_SAMPLE)
