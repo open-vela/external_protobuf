@@ -311,7 +311,6 @@ class RepeatedField final {
   // This is public due to it being called by generated code.
   inline void InternalSwap(RepeatedField* other);
 
-
  private:
   template <typename T> friend class Arena::InternalHelper;
 
@@ -339,7 +338,7 @@ class RepeatedField final {
   // current_size_. This function is intended to be the only place where
   // current_size_ is modified.
   inline int ExchangeCurrentSize(int new_size) {
-    const int prev_size = current_size_;
+    int prev_size = current_size_;
     current_size_ = new_size;
     return prev_size;
   }
@@ -355,7 +354,6 @@ class RepeatedField final {
                                         kRepHeaderSize);
     }
   };
-
 
   // If total_size_ == 0 this points to an Arena otherwise it points to the
   // elements member of a Rep struct. Using this invariant allows the storage of
@@ -473,7 +471,7 @@ class RepeatedField final {
 
     void Add(Element val) {
       if (index_ == capacity_) {
-        repeated_field_->current_size_ = index_;
+        repeated_field_->ExchangeCurrentSize(index_);
         repeated_field_->Reserve(index_ + 1);
         capacity_ = repeated_field_->total_size_;
         buffer_ = repeated_field_->unsafe_elements();
