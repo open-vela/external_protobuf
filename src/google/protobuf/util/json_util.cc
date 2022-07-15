@@ -45,7 +45,6 @@
 #include <google/protobuf/util/internal/protostream_objectwriter.h>
 #include <google/protobuf/util/type_resolver.h>
 #include <google/protobuf/util/type_resolver_util.h>
-#include <google/protobuf/util/zero_copy_sink.h>
 #include <google/protobuf/stubs/status_macros.h>
 
 // clang-format off
@@ -55,7 +54,35 @@
 namespace google {
 namespace protobuf {
 namespace util {
-using ::google::protobuf::util::zc_sink_internal::ZeroCopyStreamByteSink;
+
+namespace internal {
+ZeroCopyStreamByteSink::~ZeroCopyStreamByteSink() {
+  if (buffer_size_ > 0) {
+    stream_->BackUp(buffer_size_);
+  }
+}
+
+void ZeroCopyStreamByteSink::Append(const char* bytes, size_t len) {
+  while (true) {
+    if (len <= buffer_size_) {  // NOLINT
+      memcpy(buffer_, bytes, len);
+      buffer_ = static_cast<char*>(buffer_) + len;
+      buffer_size_ -= len;
+      return;
+    }
+    if (buffer_size_ > 0) {
+      memcpy(buffer_, bytes, buffer_size_);
+      bytes += buffer_size_;
+      len -= buffer_size_;
+    }
+    if (!stream_->Next(&buffer_, &buffer_size_)) {
+      // There isn't a way for ByteSink to report errors.
+      buffer_size_ = 0;
+      return;
+    }
+  }
+}
+}  // namespace internal
 
 util::Status BinaryToJsonStream(TypeResolver* resolver,
                                 const std::string& type_url,
@@ -154,7 +181,7 @@ util::Status JsonToBinaryStream(TypeResolver* resolver,
                                 const JsonParseOptions& options) {
   google::protobuf::Type type;
   RETURN_IF_ERROR(resolver->ResolveMessageType(type_url, &type));
-  ZeroCopyStreamByteSink sink(binary_output);
+  internal::ZeroCopyStreamByteSink sink(binary_output);
   StatusErrorListener listener;
   converter::ProtoStreamObjectWriter::Options proto_writer_options;
   proto_writer_options.ignore_unknown_fields = options.ignore_unknown_fields;
@@ -164,7 +191,6 @@ util::Status JsonToBinaryStream(TypeResolver* resolver,
       options.case_insensitive_enum_parsing;
   converter::ProtoStreamObjectWriter proto_writer(
       resolver, type, &sink, &listener, proto_writer_options);
-  proto_writer.set_use_strict_base64_decoding(false);
 
   converter::JsonStreamParser parser(&proto_writer);
   const void* buffer;

@@ -119,8 +119,6 @@ const uint32_t TableStruct_google_2fprotobuf_2ftype_2eproto::offsets[] PROTOBUF_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
-  ~0u,  // no _split_
-  ~0u,  // no sizeof(Split)
   PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::Type, _impl_.name_),
   PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::Type, _impl_.fields_),
   PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::Type, _impl_.oneofs_),
@@ -133,8 +131,6 @@ const uint32_t TableStruct_google_2fprotobuf_2ftype_2eproto::offsets[] PROTOBUF_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
-  ~0u,  // no _split_
-  ~0u,  // no sizeof(Split)
   PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::Field, _impl_.kind_),
   PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::Field, _impl_.cardinality_),
   PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::Field, _impl_.number_),
@@ -151,8 +147,6 @@ const uint32_t TableStruct_google_2fprotobuf_2ftype_2eproto::offsets[] PROTOBUF_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
-  ~0u,  // no _split_
-  ~0u,  // no sizeof(Split)
   PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::Enum, _impl_.name_),
   PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::Enum, _impl_.enumvalue_),
   PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::Enum, _impl_.options_),
@@ -164,8 +158,6 @@ const uint32_t TableStruct_google_2fprotobuf_2ftype_2eproto::offsets[] PROTOBUF_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
-  ~0u,  // no _split_
-  ~0u,  // no sizeof(Split)
   PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::EnumValue, _impl_.name_),
   PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::EnumValue, _impl_.number_),
   PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::EnumValue, _impl_.options_),
@@ -175,17 +167,15 @@ const uint32_t TableStruct_google_2fprotobuf_2ftype_2eproto::offsets[] PROTOBUF_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
-  ~0u,  // no _split_
-  ~0u,  // no sizeof(Split)
   PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::Option, _impl_.name_),
   PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::Option, _impl_.value_),
 };
 static const ::_pbi::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, -1, sizeof(::PROTOBUF_NAMESPACE_ID::Type)},
-  { 14, -1, -1, sizeof(::PROTOBUF_NAMESPACE_ID::Field)},
-  { 32, -1, -1, sizeof(::PROTOBUF_NAMESPACE_ID::Enum)},
-  { 45, -1, -1, sizeof(::PROTOBUF_NAMESPACE_ID::EnumValue)},
-  { 56, -1, -1, sizeof(::PROTOBUF_NAMESPACE_ID::Option)},
+  { 12, -1, -1, sizeof(::PROTOBUF_NAMESPACE_ID::Field)},
+  { 28, -1, -1, sizeof(::PROTOBUF_NAMESPACE_ID::Enum)},
+  { 39, -1, -1, sizeof(::PROTOBUF_NAMESPACE_ID::EnumValue)},
+  { 48, -1, -1, sizeof(::PROTOBUF_NAMESPACE_ID::Option)},
 };
 
 static const ::_pb::Message* const file_default_instances[] = {
