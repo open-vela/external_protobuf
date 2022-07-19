@@ -72,14 +72,16 @@ namespace Google.Protobuf.Benchmarks
 
         private static byte[] LoadData(string resource)
         {
-            using var stream = typeof(GoogleMessageBenchmark).Assembly.GetManifestResourceStream($"Google.Protobuf.Benchmarks.{resource}");
-            if (stream == null)
+            using (var stream = typeof(GoogleMessageBenchmark).Assembly.GetManifestResourceStream($"Google.Protobuf.Benchmarks.{resource}"))
             {
-                throw new ArgumentException($"Unable to load embedded resource {resource}");
+                if (stream == null)
+                {
+                    throw new ArgumentException($"Unable to load embedded resource {resource}");
+                }
+                var copy = new MemoryStream();
+                stream.CopyTo(copy);
+                return copy.ToArray();
             }
-            var copy = new MemoryStream();
-            stream.CopyTo(copy);
-            return copy.ToArray();
         }
 
         public override string ToString() => Name;
