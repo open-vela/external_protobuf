@@ -61,7 +61,6 @@ import protobuf_unittest.UnittestProto.TestExtremeDefaultValues;
 import protobuf_unittest.UnittestProto.TestJsonName;
 import protobuf_unittest.UnittestProto.TestMultipleExtensionRanges;
 import protobuf_unittest.UnittestProto.TestRequired;
-import protobuf_unittest.UnittestProto.TestReservedEnumFields;
 import protobuf_unittest.UnittestProto.TestReservedFields;
 import protobuf_unittest.UnittestProto.TestService;
 import java.util.Collections;
@@ -464,15 +463,15 @@ public class DescriptorsTest {
   /** Tests that parsing an unknown enum throws an exception */
   @Test
   public void testParseUnknownEnum() {
-    FieldDescriptorProto.Builder field =
-        FieldDescriptorProto.newBuilder()
-            .setLabel(FieldDescriptorProto.Label.LABEL_OPTIONAL)
-            .setTypeName("UnknownEnum")
-            .setType(FieldDescriptorProto.Type.TYPE_ENUM)
-            .setName("bar")
-            .setNumber(1);
-    DescriptorProto.Builder messageType =
-        DescriptorProto.newBuilder().setName("Foo").addField(field);
+    FieldDescriptorProto.Builder field = FieldDescriptorProto.newBuilder()
+        .setLabel(FieldDescriptorProto.Label.LABEL_OPTIONAL)
+        .setTypeName("UnknownEnum")
+        .setType(FieldDescriptorProto.Type.TYPE_ENUM)
+        .setName("bar")
+        .setNumber(1);
+    DescriptorProto.Builder messageType = DescriptorProto.newBuilder()
+        .setName("Foo")
+        .addField(field);
     FileDescriptorProto fooProto =
         FileDescriptorProto.newBuilder()
             .setName("foo.proto")
@@ -486,6 +485,7 @@ public class DescriptorsTest {
       assertThat(expected.getMessage()).contains("\"UnknownEnum\" is not an enum type.");
     }
   }
+
 
   /**
    * Tests the translate/crosslink for an example where a message field's name and type name are the
@@ -560,10 +560,8 @@ public class DescriptorsTest {
         Descriptors.FileDescriptor.buildFrom(barProto, new FileDescriptor[] {fooFile});
 
     // Items in the FileDescriptor array can be in any order.
-    FileDescriptor unused1 =
-        Descriptors.FileDescriptor.buildFrom(bazProto, new FileDescriptor[] {fooFile, barFile});
-    FileDescriptor unused2 =
-        Descriptors.FileDescriptor.buildFrom(bazProto, new FileDescriptor[] {barFile, fooFile});
+    Descriptors.FileDescriptor.buildFrom(bazProto, new FileDescriptor[] {fooFile, barFile});
+    Descriptors.FileDescriptor.buildFrom(bazProto, new FileDescriptor[] {barFile, fooFile});
   }
 
   @Test
@@ -625,8 +623,7 @@ public class DescriptorsTest {
                             .setName("bar")
                             .setNumber(1)))
             .build();
-    FileDescriptor unused =
-        Descriptors.FileDescriptor.buildFrom(fooProto, new FileDescriptor[0], true);
+    Descriptors.FileDescriptor.buildFrom(fooProto, new FileDescriptor[0], true);
   }
 
   @Test
@@ -660,8 +657,7 @@ public class DescriptorsTest {
         Descriptors.FileDescriptor.buildFrom(forwardProto, new FileDescriptor[] {barFile});
 
     try {
-      FileDescriptor unused =
-          Descriptors.FileDescriptor.buildFrom(fooProto, new FileDescriptor[] {forwardFile});
+      Descriptors.FileDescriptor.buildFrom(fooProto, new FileDescriptor[] {forwardFile});
       assertWithMessage("DescriptorValidationException expected").fail();
     } catch (DescriptorValidationException e) {
       assertThat(e).hasMessageThat().contains("Bar");
@@ -699,8 +695,7 @@ public class DescriptorsTest {
     FileDescriptor barFile = Descriptors.FileDescriptor.buildFrom(barProto, new FileDescriptor[0]);
     FileDescriptor forwardFile =
         Descriptors.FileDescriptor.buildFrom(forwardProto, new FileDescriptor[] {barFile});
-    FileDescriptor unused =
-        Descriptors.FileDescriptor.buildFrom(fooProto, new FileDescriptor[] {forwardFile});
+    Descriptors.FileDescriptor.buildFrom(fooProto, new FileDescriptor[] {forwardFile});
   }
 
   /** Tests the translate/crosslink for an example with a more complex namespace referencing. */
@@ -798,20 +793,6 @@ public class DescriptorsTest {
   }
 
   @Test
-  public void testReservedEnumFields() {
-    EnumDescriptor d = TestReservedEnumFields.getDescriptor();
-    assertThat(d.isReservedNumber(2)).isTrue();
-    assertThat(d.isReservedNumber(8)).isFalse();
-    assertThat(d.isReservedNumber(9)).isTrue();
-    assertThat(d.isReservedNumber(10)).isTrue();
-    assertThat(d.isReservedNumber(11)).isTrue();
-    assertThat(d.isReservedNumber(12)).isFalse();
-    assertThat(d.isReservedName("foo")).isFalse();
-    assertThat(d.isReservedName("bar")).isTrue();
-    assertThat(d.isReservedName("baz")).isTrue();
-  }
-
-  @Test
   public void testToString() {
     assertThat(
             UnittestProto.TestAllTypes.getDescriptor()
@@ -845,8 +826,7 @@ public class DescriptorsTest {
                             .build())
                     .build())
             .build();
-    FileDescriptor unused =
-        Descriptors.FileDescriptor.buildFrom(fileDescriptorProto, new FileDescriptor[0]);
+    Descriptors.FileDescriptor.buildFrom(fileDescriptorProto, new FileDescriptor[0]);
   }
 
   @Test

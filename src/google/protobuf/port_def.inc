@@ -139,11 +139,6 @@
 #define PROTOBUF_BUILTIN_BSWAP64(x) __builtin_bswap64(x)
 #endif
 
-// Portable check for gcc-style atomic built-ins
-#if __has_builtin(__atomic_load_n)
-#define PROTOBUF_BUILTIN_ATOMIC 1
-#endif
-
 // Portable check for GCC minimum version:
 // https://gcc.gnu.org/onlinedocs/cpp/Common-Predefined-Macros.html
 #if defined(__GNUC__) && defined(__GNUC_MINOR__) \
@@ -152,13 +147,6 @@
   (__GNUC__ > (x) || __GNUC__ == (x) && __GNUC_MINOR__ >= (y))
 #else
 #  define PROTOBUF_GNUC_MIN(x, y) 0
-#endif
-
-#if defined(__clang__) && defined(__clang_major__) && defined(__clang_minor__)
-#define PROTOBUF_CLANG_MIN(x, y) \
-  (__clang_major__ > (x) || __clang_major__ == (x) && __clang_minor__ >= (y))
-#else
-#define PROTOBUF_CLANG_MIN(x, y) 0
 #endif
 
 // Portable check for MSVC minimum version:
@@ -183,27 +171,9 @@
 // user code can be updated before upgrading versions of protobuf.
 // PROTOBUF_FUTURE_FINAL is used on classes that are historically not marked as
 // final, but that may be marked final in future (breaking) releases.
-
-#ifdef PROTOBUF_FUTURE_BREAKING_CHANGES
-// Used on classes that are historically not marked as final.
-// Owner: kfm@
-#define PROTOBUF_FUTURE_FINAL final
-
-// Used to remove the RTTI checks for `DefaultFieldComparator`.
-// Owner: kfm@
-#define PROTOBUF_FUTURE_REMOVE_DEFAULT_FIELD_COMPARATOR 1
-
-// Used to remove the manipulation of cleared elements in RepeatedPtrField.
-// Owner: mkruskal@
-#define PROTOBUF_FUTURE_REMOVE_CLEARED_API 1
-
-// Used to escape C++20 keywords.
-// TODO(mkruskal): ping b/238664698 when this lands in opensource.
-// Owner: mkruskal@
-#define PROTOBUF_FUTURE_CPP20_KEYWORDS 1
-#else
+// #define PROTOBUF_FUTURE_BREAKING_CHANGES 1
+// #define PROTOBUF_FUTURE_FINAL final
 #define PROTOBUF_FUTURE_FINAL
-#endif
 
 #ifdef PROTOBUF_VERSION
 #error PROTOBUF_VERSION was previously defined
@@ -557,18 +527,10 @@
 #error PROTOBUF_FORCE_RESET_IN_CLEAR was previously defined
 #endif
 
-#ifdef PROTOBUF_FUZZ_MESSAGE_SPACE_USED_LONG
-#error PROTOBUF_FUZZ_MESSAGE_SPACE_USED_LONG was previously defined
-#endif
-
 // Force copy the default string to a string field so that non-optimized builds
 // have harder-to-rely-on address stability.
 #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
 #error PROTOBUF_FORCE_COPY_DEFAULT_STRING was previously defined
-#endif
-
-#ifdef PROTOBUF_FORCE_ALLOCATION_ON_CONSTRUCTION
-#error PROTOBUF_FORCE_ALLOCATION_ON_CONSTRUCTION was previously defined
 #endif
 
 #ifdef PROTOBUF_FALLTHROUGH_INTENDED
@@ -673,38 +635,25 @@
 // This experiment is purely for the purpose of gathering data. All code guarded
 // by this flag is supposed to be removed after this experiment.
 #define PROTOBUF_MESSAGE_OWNED_ARENA_EXPERIMENT
-
 #ifdef PROTOBUF_CONSTINIT
 #error PROTOBUF_CONSTINIT was previously defined
 #endif
-
-#if defined(_MSC_VER)
-// MSVC 17 currently seems to raise an error about constant-initialized pointers.
-# if PROTOBUF_MSC_VER_MIN(1930)
-#  define PROTOBUF_CONSTINIT
-#  define PROTOBUF_CONSTEXPR constexpr
-# endif
-#else
-# if defined(__cpp_constinit) && !defined(__CYGWIN__)
-#  define PROTOBUF_CONSTINIT constinit
-#  define PROTOBUF_CONSTEXPR constexpr
+#if defined(__cpp_constinit)
+#define PROTOBUF_CONSTINIT constinit
+#define PROTOBUF_CONSTEXPR constexpr
 // Some older Clang versions incorrectly raise an error about
 // constant-initializing weak default instance pointers. Versions 12.0 and
 // higher seem to work, except that XCode 12.5.1 shows the error even though it
 // uses Clang 12.0.5.
-# elif !defined(__CYGWIN__) && \
-    __has_cpp_attribute(clang::require_constant_initialization) && \
-    ((defined(__APPLE__) && PROTOBUF_CLANG_MIN(13, 0)) ||             \
-     (!defined(__APPLE__) && PROTOBUF_CLANG_MIN(12, 0)))
-#  define PROTOBUF_CONSTINIT [[clang::require_constant_initialization]]
-#  define PROTOBUF_CONSTEXPR constexpr
-# elif PROTOBUF_GNUC_MIN(12, 2)
-#  define PROTOBUF_CONSTINIT __constinit
-#  define PROTOBUF_CONSTEXPR constexpr
-# endif
-#endif
-
-#ifndef PROTOBUF_CONSTINIT
+#elif __has_cpp_attribute(clang::require_constant_initialization) && \
+    ((defined(__APPLE__) && __clang_major__ >= 13) ||                \
+     (!defined(__APPLE__) && __clang_major__ >= 12))
+#define PROTOBUF_CONSTINIT [[clang::require_constant_initialization]]
+#define PROTOBUF_CONSTEXPR constexpr
+#elif PROTOBUF_GNUC_MIN(12, 2)
+#define PROTOBUF_CONSTINIT __constinit
+#define PROTOBUF_CONSTEXPR constexpr
+#else
 #define PROTOBUF_CONSTINIT
 #define PROTOBUF_CONSTEXPR
 #endif
@@ -849,13 +798,11 @@
 
 // Windows declares several inconvenient macro names.  We #undef them and then
 // restore them in port_undef.inc.
-#ifdef _WIN32
+#ifdef _MSC_VER
 #pragma push_macro("CREATE_NEW")
 #undef CREATE_NEW
 #pragma push_macro("DELETE")
 #undef DELETE
-#pragma push_macro("DOMAIN")
-#undef DOMAIN
 #pragma push_macro("DOUBLE_CLICK")
 #undef DOUBLE_CLICK
 #pragma push_macro("ERROR")
@@ -904,7 +851,7 @@
 #undef STRICT
 #pragma push_macro("timezone")
 #undef timezone
-#endif  // _WIN32
+#endif  // _MSC_VER
 
 #ifdef __APPLE__
 // Inconvenient macro names from usr/include/math.h in some macOS SDKs.
@@ -918,8 +865,6 @@
 // Inconvenient macro names from usr/include/sys/syslimits.h in some macOS SDKs.
 #pragma push_macro("UID_MAX")
 #undef UID_MAX
-#pragma push_macro("GID_MAX")
-#undef GID_MAX
 #endif  // __APPLE__
 
 #if defined(__clang__) || PROTOBUF_GNUC_MIN(3, 0) || defined(_MSC_VER)
