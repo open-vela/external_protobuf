@@ -38,6 +38,8 @@
 #ifndef GOOGLE_PROTOBUF_GENERATED_MESSAGE_REFLECTION_H__
 #define GOOGLE_PROTOBUF_GENERATED_MESSAGE_REFLECTION_H__
 
+#include <string>
+
 #include <google/protobuf/stubs/casts.h>
 #include <google/protobuf/stubs/common.h>
 #include <google/protobuf/stubs/once.h>
@@ -71,6 +73,16 @@ class DefaultEmptyOneof;
 // Defined in other files.
 class ExtensionSet;  // extension_set.h
 class WeakFieldMap;  // weak_field_map.h
+
+// Tag used on offsets for fields that don't have a real offset.
+// For example, weak message fields go into the WeakFieldMap and not in an
+// actual field.
+constexpr uint32_t kInvalidFieldOffsetTag = 0x40000000u;
+
+// Mask used on offsets for split fields.
+constexpr uint32_t kSplitFieldOffsetMask = 0x80000000u;
+constexpr uint32_t kLazyMask = 0x1u;
+constexpr uint32_t kInlinedMask = 0x1u;
 
 // This struct describes the internal layout of the message, hence this is
 // used to act on the message reflectively.
@@ -234,6 +246,24 @@ struct ReflectionSchema {
     return false;
   }
 
+  bool IsSplit() const { return split_offset_ != -1; }
+
+  bool IsSplit(const FieldDescriptor* field) const {
+    return split_offset_ != -1 &&
+           (offsets_[field->index()] & kSplitFieldOffsetMask) != 0;
+  }
+
+  // Byte offset of _split_.
+  uint32_t SplitOffset() const {
+    GOOGLE_DCHECK(IsSplit());
+    return static_cast<uint32_t>(split_offset_);
+  }
+
+  uint32_t SizeofSplit() const {
+    GOOGLE_DCHECK(IsSplit());
+    return static_cast<uint32_t>(sizeof_split_);
+  }
+
 
   bool HasWeakFields() const { return weak_field_map_offset_ > 0; }
 
@@ -254,6 +284,8 @@ struct ReflectionSchema {
   int weak_field_map_offset_;
   const uint32_t* inlined_string_indices_;
   int inlined_string_donated_offset_;
+  int split_offset_;
+  int sizeof_split_;
 
   // We tag offset values to provide additional data about fields (such as
   // "unused" or "lazy" or "inlined").
@@ -261,15 +293,15 @@ struct ReflectionSchema {
     if (type == FieldDescriptor::TYPE_MESSAGE ||
         type == FieldDescriptor::TYPE_STRING ||
         type == FieldDescriptor::TYPE_BYTES) {
-      return v & 0xFFFFFFFEu;
+      return v & (~kSplitFieldOffsetMask) & (~kInlinedMask) & (~kLazyMask);
     }
-    return v;
+    return v & (~kSplitFieldOffsetMask);
   }
 
   static bool Inlined(uint32_t v, FieldDescriptor::Type type) {
     if (type == FieldDescriptor::TYPE_STRING ||
         type == FieldDescriptor::TYPE_BYTES) {
-      return (v & 1u) != 0u;
+      return (v & kInlinedMask) != 0u;
     } else {
       // Non string/byte fields are not inlined.
       return false;
@@ -312,13 +344,6 @@ struct PROTOBUF_EXPORT DescriptorTable {
   const ServiceDescriptor** file_level_service_descriptors;
 };
 
-enum {
-  // Tag used on offsets for fields that don't have a real offset.
-  // For example, weak message fields go into the WeakFieldMap and not in an
-  // actual field.
-  kInvalidFieldOffsetTag = 0x40000000u,
-};
-
 // AssignDescriptors() pulls the compiled FileDescriptor from the DescriptorPool
 // and uses it to populate all of the global variables which store pointers to
 // the descriptor objects.  It also constructs the reflection objects.  It is
@@ -344,6 +369,34 @@ PROTOBUF_EXPORT void UnknownFieldSetSerializer(const uint8_t* base,
 struct PROTOBUF_EXPORT AddDescriptorsRunner {
   explicit AddDescriptorsRunner(const DescriptorTable* table);
 };
+
+struct DenseEnumCacheInfo {
+  std::atomic<const std::string**> cache;
+  int min_val;
+  int max_val;
+  const EnumDescriptor* (*descriptor_fn)();
+};
+PROTOBUF_EXPORT const std::string& NameOfDenseEnumSlow(int v,
+                                                       DenseEnumCacheInfo*);
+
+// Similar to the routine NameOfEnum, this routine returns the name of an enum.
+// Unlike that routine, it allocates, on-demand, a block of pointers to the
+// std::string objects allocated by reflection to store the enum names. This
+// way, as long as the enum values are fairly dense, looking them up can be
+// very fast. This assumes all the enums fall in the range [min_val .. max_val].
+template <const EnumDescriptor* (*descriptor_fn)(), int min_val, int max_val>
+const std::string& NameOfDenseEnum(int v) {
+  static_assert(max_val - min_val >= 0, "Too mamny enums between min and max.");
+  static DenseEnumCacheInfo deci = {/* atomic ptr */ {}, min_val, max_val,
+                                    descriptor_fn};
+  const std::string** cache = deci.cache.load(std::memory_order_acquire );
+  if (PROTOBUF_PREDICT_TRUE(cache != nullptr)) {
+    if (PROTOBUF_PREDICT_TRUE(v >= min_val && v <= max_val)) {
+      return *cache[v - min_val];
+    }
+  }
+  return NameOfDenseEnumSlow(v, &deci);
+}
 
 }  // namespace internal
 }  // namespace protobuf
