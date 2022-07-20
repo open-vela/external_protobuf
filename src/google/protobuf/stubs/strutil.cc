@@ -501,10 +501,11 @@ int CEscapeInternal(const char* src, int src_len, char* dest,
         if ((!utf8_safe || static_cast<uint8_t>(*src) < 0x80) &&
             (!isprint(*src) ||
              (last_hex_escape && isxdigit(*src)))) {
-          if (dest_len - used < 4) // need space for 4 letter escape
-            return -1;
-          sprintf(dest + used, (use_hex ? "\\x%02x" : "\\%03o"),
-                  static_cast<uint8_t>(*src));
+          // need space for 4 letter escape and the trailing '\0' to
+          // be written by snprintf.
+          if (dest_len - used < 5) return -1;
+          snprintf(dest + used, 5, (use_hex ? "\\x%02x" : "\\%03o"),
+                   static_cast<uint8_t>(*src));
           is_hex_escape = use_hex;
           used += 4;
         } else {
@@ -1566,9 +1567,10 @@ std::string StrCat(const AlphaNum &a, const AlphaNum &b, const AlphaNum &c,
 // the string we're appending to.  However the results of this are random.
 // Therefore, check for this in debug mode.  Use unsigned math so we only have
 // to do one comparison.
-#define GOOGLE_DCHECK_NO_OVERLAP(dest, src) \
-    GOOGLE_DCHECK_GT(uintptr_t((src).data() - (dest).data()), \
-                     uintptr_t((dest).size()))
+#define GOOGLE_DCHECK_NO_OVERLAP(dest, src)               \
+  GOOGLE_DCHECK(((src).size() == 0) ||                    \
+                uintptr_t((src).data() - (dest).data()) > \
+                    uintptr_t((dest).size()))
 
 void StrAppend(std::string *result, const AlphaNum &a) {
   GOOGLE_DCHECK_NO_OVERLAP(*result, a);

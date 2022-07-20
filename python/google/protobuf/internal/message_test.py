@@ -34,10 +34,6 @@
 Note that the golden messages exercise every known field type, thus this
 test ends up exercising and verifying nearly all of the parsing and
 serialization code in the whole library.
-
-TODO(kenton):  Merge with wire_format_test?  It doesn't make a whole lot of
-sense to call this a test of the "message" module, which only declares an
-abstract interface.
 """
 
 __author__ = 'gps@google.com (Gregory P. Smith)'
@@ -475,6 +471,12 @@ class MessageTest(unittest.TestCase):
         '  bb: 3\n'
         '}\n')
     self.assertEqual(sub_msg.bb, 1)
+
+  def testAssignRepeatedField(self, message_module):
+    msg = message_module.NestedTestAllTypes()
+    msg.payload.repeated_int32[:] = [1, 2, 3, 4]
+    self.assertEqual(4, len(msg.payload.repeated_int32))
+    self.assertEqual([1, 2, 3, 4], msg.payload.repeated_int32)
 
   def testMergeFromRepeatedField(self, message_module):
     msg = message_module.TestAllTypes()
@@ -2452,6 +2454,26 @@ class Proto3Test(unittest.TestCase):
       unittest_proto3_arena_pb2.TestAllTypes(optional_string=u'\ud801')
     with self.assertRaises(ValueError):
       unittest_proto3_arena_pb2.TestAllTypes(optional_string=u'\ud801\ud801')
+
+  def testCrashNullAA(self):
+    self.assertEqual(
+        unittest_proto3_arena_pb2.TestAllTypes.NestedMessage(),
+        unittest_proto3_arena_pb2.TestAllTypes.NestedMessage())
+
+  def testCrashNullAB(self):
+    self.assertEqual(
+        unittest_proto3_arena_pb2.TestAllTypes.NestedMessage(),
+        unittest_proto3_arena_pb2.TestAllTypes().optional_nested_message)
+
+  def testCrashNullBA(self):
+    self.assertEqual(
+        unittest_proto3_arena_pb2.TestAllTypes().optional_nested_message,
+        unittest_proto3_arena_pb2.TestAllTypes.NestedMessage())
+
+  def testCrashNullBB(self):
+    self.assertEqual(
+        unittest_proto3_arena_pb2.TestAllTypes().optional_nested_message,
+        unittest_proto3_arena_pb2.TestAllTypes().optional_nested_message)
 
 
 
