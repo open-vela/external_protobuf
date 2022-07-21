@@ -126,6 +126,8 @@ void SetMessageVariables(const FieldDescriptor* descriptor, int messageBitIndex,
   if (GetJavaType(value) == JAVATYPE_ENUM) {
     // We store enums as Integers internally.
     (*variables)["value_type"] = "int";
+    (*variables)["value_type_pass_through_nullness"] =
+        (*variables)["value_type"];
     (*variables)["boxed_value_type"] = "java.lang.Integer";
     (*variables)["value_wire_type"] = WireType(value);
     (*variables)["value_default_value"] =
@@ -247,9 +249,10 @@ void ImmutableMapFieldLiteGenerator::GenerateInterfaceMembers(
       WriteFieldDocComment(printer, descriptor_);
       printer->Print(variables_,
                      "$deprecation$\n"
-                     "$value_type$ ${$get$capitalized_name$ValueOrDefault$}$(\n"
+                     "$value_type_pass_through_nullness$ "
+                     "${$get$capitalized_name$ValueOrDefault$}$(\n"
                      "    $key_type$ key,\n"
-                     "    $value_type$ defaultValue);\n");
+                     "    $value_type_pass_through_nullness$ defaultValue);\n");
       printer->Annotate("{", "}", descriptor_);
       WriteFieldDocComment(printer, descriptor_);
       printer->Print(variables_,
@@ -373,9 +376,10 @@ void ImmutableMapFieldLiteGenerator::GenerateMembers(
         variables_,
         "@java.lang.Override\n"
         "$deprecation$\n"
-        "public $value_enum_type$ ${$get$capitalized_name$OrDefault$}$(\n"
+        "public $value_enum_type_pass_through_nullness$ "
+        "${$get$capitalized_name$OrDefault$}$(\n"
         "    $key_type$ key,\n"
-        "    $value_enum_type$ defaultValue) {\n"
+        "    $value_enum_type_pass_through_nullness$ defaultValue) {\n"
         "  $key_null_check$\n"
         "  java.util.Map<$boxed_key_type$, $boxed_value_type$> map =\n"
         "      internalGet$capitalized_name$();\n"
@@ -429,9 +433,10 @@ void ImmutableMapFieldLiteGenerator::GenerateMembers(
           variables_,
           "@java.lang.Override\n"
           "$deprecation$\n"
-          "public $value_type$ ${$get$capitalized_name$ValueOrDefault$}$(\n"
+          "public $value_type_pass_through_nullness$ "
+          "${$get$capitalized_name$ValueOrDefault$}$(\n"
           "    $key_type$ key,\n"
-          "    $value_type$ defaultValue) {\n"
+          "    $value_type_pass_through_nullness$ defaultValue) {\n"
           "  $key_null_check$\n"
           "  java.util.Map<$boxed_key_type$, $boxed_value_type$> map =\n"
           "      internalGet$capitalized_name$();\n"
@@ -482,9 +487,10 @@ void ImmutableMapFieldLiteGenerator::GenerateMembers(
         variables_,
         "@java.lang.Override\n"
         "$deprecation$\n"
-        "public $value_type$ ${$get$capitalized_name$OrDefault$}$(\n"
+        "public $value_type_pass_through_nullness$ "
+        "${$get$capitalized_name$OrDefault$}$(\n"
         "    $key_type$ key,\n"
-        "    $value_type$ defaultValue) {\n"
+        "    $value_type_pass_through_nullness$ defaultValue) {\n"
         "  $key_null_check$\n"
         "  java.util.Map<$type_parameters$> map =\n"
         "      internalGet$capitalized_name$();\n"
@@ -701,9 +707,10 @@ void ImmutableMapFieldLiteGenerator::GenerateBuilderMembers(
           variables_,
           "@java.lang.Override\n"
           "$deprecation$\n"
-          "public $value_type$ ${$get$capitalized_name$ValueOrDefault$}$(\n"
+          "public $value_type_pass_through_nullness$ "
+          "${$get$capitalized_name$ValueOrDefault$}$(\n"
           "    $key_type$ key,\n"
-          "    $value_type$ defaultValue) {\n"
+          "    $value_type_pass_through_nullness$ defaultValue) {\n"
           "  $key_null_check$\n"
           "  java.util.Map<$boxed_key_type$, $boxed_value_type$> map =\n"
           "      instance.get$capitalized_name$ValueMap();\n"
@@ -776,9 +783,10 @@ void ImmutableMapFieldLiteGenerator::GenerateBuilderMembers(
         variables_,
         "@java.lang.Override\n"
         "$deprecation$\n"
-        "public $value_type$ ${$get$capitalized_name$OrDefault$}$(\n"
+        "public $value_type_pass_through_nullness$ "
+        "${$get$capitalized_name$OrDefault$}$(\n"
         "    $key_type$ key,\n"
-        "    $value_type$ defaultValue) {\n"
+        "    $value_type_pass_through_nullness$ defaultValue) {\n"
         "  $key_null_check$\n"
         "  java.util.Map<$type_parameters$> map =\n"
         "      instance.get$capitalized_name$Map();\n"
@@ -841,7 +849,7 @@ void ImmutableMapFieldLiteGenerator::GenerateKotlinDslMembers(
       "class ${$$kt_capitalized_name$Proxy$}$ private constructor()"
       " : com.google.protobuf.kotlin.DslProxy()\n");
 
-  WriteFieldDocComment(printer, descriptor_);
+  WriteFieldDocComment(printer, descriptor_, /* kdoc */ true);
   printer->Print(
       variables_,
       "$kt_deprecation$ val $kt_name$: "
@@ -853,7 +861,7 @@ void ImmutableMapFieldLiteGenerator::GenerateKotlinDslMembers(
       "    $kt_dsl_builder$.${$get$capitalized_name$Map$}$()\n"
       "  )\n");
 
-  WriteFieldDocComment(printer, descriptor_);
+  WriteFieldDocComment(printer, descriptor_, /* kdoc */ true);
   printer->Print(
       variables_,
       "@JvmName(\"put$kt_capitalized_name$\")\n"
@@ -863,7 +871,7 @@ void ImmutableMapFieldLiteGenerator::GenerateKotlinDslMembers(
       "     $kt_dsl_builder$.${$put$capitalized_name$$}$(key, value)\n"
       "   }\n");
 
-  WriteFieldDocComment(printer, descriptor_);
+  WriteFieldDocComment(printer, descriptor_, /* kdoc */ true);
   printer->Print(
       variables_,
       "@kotlin.jvm.JvmSynthetic\n"
@@ -875,7 +883,7 @@ void ImmutableMapFieldLiteGenerator::GenerateKotlinDslMembers(
       "     put(key, value)\n"
       "   }\n");
 
-  WriteFieldDocComment(printer, descriptor_);
+  WriteFieldDocComment(printer, descriptor_, /* kdoc */ true);
   printer->Print(
       variables_,
       "@kotlin.jvm.JvmSynthetic\n"
@@ -886,7 +894,7 @@ void ImmutableMapFieldLiteGenerator::GenerateKotlinDslMembers(
       "     $kt_dsl_builder$.${$remove$capitalized_name$$}$(key)\n"
       "   }\n");
 
-  WriteFieldDocComment(printer, descriptor_);
+  WriteFieldDocComment(printer, descriptor_, /* kdoc */ true);
   printer->Print(
       variables_,
       "@kotlin.jvm.JvmSynthetic\n"
@@ -898,7 +906,7 @@ void ImmutableMapFieldLiteGenerator::GenerateKotlinDslMembers(
       "     $kt_dsl_builder$.${$putAll$capitalized_name$$}$(map)\n"
       "   }\n");
 
-  WriteFieldDocComment(printer, descriptor_);
+  WriteFieldDocComment(printer, descriptor_, /* kdoc */ true);
   printer->Print(
       variables_,
       "@kotlin.jvm.JvmSynthetic\n"
