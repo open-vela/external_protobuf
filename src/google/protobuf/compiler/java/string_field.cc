@@ -377,7 +377,7 @@ void ImmutableStringFieldGenerator::GenerateBuilderMembers(
 
 void ImmutableStringFieldGenerator::GenerateKotlinDslMembers(
     io::Printer* printer) const {
-  WriteFieldDocComment(printer, descriptor_, /* kdoc */ true);
+  WriteFieldDocComment(printer, descriptor_);
   printer->Print(variables_,
                  "$kt_deprecation$var $kt_name$: kotlin.String\n"
                  "  @JvmName(\"${$get$kt_capitalized_name$$}$\")\n"
@@ -388,15 +388,14 @@ void ImmutableStringFieldGenerator::GenerateKotlinDslMembers(
                  "  }\n");
 
   WriteFieldAccessorDocComment(printer, descriptor_, CLEARER,
-                               /* builder */ false, /* kdoc */ true);
+                               /* builder */ false);
   printer->Print(variables_,
                  "fun ${$clear$kt_capitalized_name$$}$() {\n"
                  "  $kt_dsl_builder$.${$clear$capitalized_name$$}$()\n"
                  "}\n");
 
   if (HasHazzer(descriptor_)) {
-    WriteFieldAccessorDocComment(printer, descriptor_, HAZZER,
-                                 /* builder */ false, /* kdoc */ true);
+    WriteFieldAccessorDocComment(printer, descriptor_, HAZZER);
     printer->Print(
         variables_,
         "fun ${$has$kt_capitalized_name$$}$(): kotlin.Boolean {\n"
@@ -968,8 +967,7 @@ void RepeatedImmutableStringFieldGenerator::GenerateKotlinDslMembers(
       " : com.google.protobuf.kotlin.DslProxy()\n");
 
   // property for List<String>
-  WriteFieldAccessorDocComment(printer, descriptor_, LIST_GETTER,
-                               /* builder */ false, /* kdoc */ true);
+  WriteFieldAccessorDocComment(printer, descriptor_, LIST_GETTER);
   printer->Print(variables_,
                  "$kt_deprecation$ val $kt_name$: "
                  "com.google.protobuf.kotlin.DslList"
@@ -981,7 +979,7 @@ void RepeatedImmutableStringFieldGenerator::GenerateKotlinDslMembers(
 
   // List<String>.add(String)
   WriteFieldAccessorDocComment(printer, descriptor_, LIST_ADDER,
-                               /* builder */ false, /* kdoc */ true);
+                               /* builder */ false);
   printer->Print(variables_,
                  "@kotlin.jvm.JvmSynthetic\n"
                  "@kotlin.jvm.JvmName(\"add$kt_capitalized_name$\")\n"
@@ -993,7 +991,7 @@ void RepeatedImmutableStringFieldGenerator::GenerateKotlinDslMembers(
 
   // List<String> += String
   WriteFieldAccessorDocComment(printer, descriptor_, LIST_ADDER,
-                               /* builder */ false, /* kdoc */ true);
+                               /* builder */ false);
   printer->Print(variables_,
                  "@kotlin.jvm.JvmSynthetic\n"
                  "@kotlin.jvm.JvmName(\"plusAssign$kt_capitalized_name$\")\n"
@@ -1006,7 +1004,7 @@ void RepeatedImmutableStringFieldGenerator::GenerateKotlinDslMembers(
 
   // List<String>.addAll(Iterable<String>)
   WriteFieldAccessorDocComment(printer, descriptor_, LIST_MULTI_ADDER,
-                               /* builder */ false, /* kdoc */ true);
+                               /* builder */ false);
   printer->Print(
       variables_,
       "@kotlin.jvm.JvmSynthetic\n"
@@ -1019,7 +1017,7 @@ void RepeatedImmutableStringFieldGenerator::GenerateKotlinDslMembers(
 
   // List<String> += Iterable<String>
   WriteFieldAccessorDocComment(printer, descriptor_, LIST_MULTI_ADDER,
-                               /* builder */ false, /* kdoc */ true);
+                               /* builder */ false);
   printer->Print(
       variables_,
       "@kotlin.jvm.JvmSynthetic\n"
@@ -1033,7 +1031,7 @@ void RepeatedImmutableStringFieldGenerator::GenerateKotlinDslMembers(
 
   // List<String>[Int] = String
   WriteFieldAccessorDocComment(printer, descriptor_, LIST_INDEXED_SETTER,
-                               /* builder */ false, /* kdoc */ true);
+                               /* builder */ false);
   printer->Print(
       variables_,
       "@kotlin.jvm.JvmSynthetic\n"
@@ -1045,7 +1043,7 @@ void RepeatedImmutableStringFieldGenerator::GenerateKotlinDslMembers(
       "}");
 
   WriteFieldAccessorDocComment(printer, descriptor_, CLEARER,
-                               /* builder */ false, /* kdoc */ true);
+                               /* builder */ false);
   printer->Print(variables_,
                  "@kotlin.jvm.JvmSynthetic\n"
                  "@kotlin.jvm.JvmName(\"clear$kt_capitalized_name$\")\n"
