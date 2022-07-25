@@ -168,7 +168,8 @@ namespace Google.Protobuf
         [Test]
         public void WithFormatDefaultValues_DoesNotAffectProto3OptionalFields()
         {
-            var message = new TestProto3Optional { OptionalInt32 = 0 };
+            var message = new TestProto3Optional();
+            message.OptionalInt32 = 0;
             var formatter = new JsonFormatter(JsonFormatter.Settings.Default.WithFormatDefaultValues(true));
             var json = formatter.Format(message);
             // The non-optional proto3 fields are formatted, as is the optional-but-specified field.
@@ -178,7 +179,8 @@ namespace Google.Protobuf
         [Test]
         public void WithFormatDefaultValues_DoesNotAffectProto2Fields()
         {
-            var message = new TestProtos.Proto2.ForeignMessage { C = 0 };
+            var message = new TestProtos.Proto2.ForeignMessage();
+            message.C = 0;
             var formatter = new JsonFormatter(JsonFormatter.Settings.Default.WithFormatDefaultValues(true));
             var json = formatter.Format(message);
             // The specified field is formatted, but the non-specified field (d) is not.
