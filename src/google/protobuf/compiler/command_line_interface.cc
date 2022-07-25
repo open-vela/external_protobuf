@@ -398,6 +398,7 @@ class CommandLineInterface::GeneratorContextImpl : public GeneratorContext {
 
   // Get name of all output files.
   void GetOutputFilenames(std::vector<std::string>* output_filenames);
+
   // implements GeneratorContext --------------------------------------
   io::ZeroCopyOutputStream* Open(const std::string& filename) override;
   io::ZeroCopyOutputStream* OpenForAppend(const std::string& filename) override;
@@ -962,7 +963,6 @@ PopulateSingleSimpleDescriptorDatabase(const std::string& descriptor_set_name);
 
 int CommandLineInterface::Run(int argc, const char* const argv[]) {
   Clear();
-
   switch (ParseArguments(argc, argv)) {
     case PARSE_ARGUMENT_DONE_AND_EXIT:
       return 0;
@@ -1076,6 +1076,7 @@ int CommandLineInterface::Run(int argc, const char* const argv[]) {
     }
   }
 
+  // Write all output to disk.
   for (const auto& pair : output_directories) {
     const std::string& location = pair.first;
     GeneratorContextImpl* directory = pair.second.get();
@@ -1150,6 +1151,7 @@ int CommandLineInterface::Run(int argc, const char* const argv[]) {
         // Do not add a default case.
     }
   }
+
   return 0;
 }
 
@@ -1273,7 +1275,6 @@ bool CommandLineInterface::ParseInputFiles(
       break;
     }
     parsed_files->push_back(parsed_file);
-
 
     // Enforce --disallow_services.
     if (disallow_services_ && parsed_file->service_count() > 0) {
@@ -1678,7 +1679,8 @@ CommandLineInterface::InterpretArgument(const std::string& name,
         })) {
       case google::protobuf::io::win32::ExpandWildcardsResult::kSuccess:
         break;
-      case google::protobuf::io::win32::ExpandWildcardsResult::kErrorNoMatchingFile:
+      case google::protobuf::io::win32::ExpandWildcardsResult::
+          kErrorNoMatchingFile:
         // Path does not exist, is not a file, or it's longer than MAX_PATH and
         // long path handling is disabled.
         std::cerr << "Invalid file name pattern or missing input file \""

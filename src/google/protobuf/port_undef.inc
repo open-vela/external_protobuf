@@ -38,9 +38,7 @@
 #undef PROTOBUF_BUILTIN_BSWAP16
 #undef PROTOBUF_BUILTIN_BSWAP32
 #undef PROTOBUF_BUILTIN_BSWAP64
-#undef PROTOBUF_BUILTIN_ATOMIC
 #undef PROTOBUF_GNUC_MIN
-#undef PROTOBUF_CLANG_MIN
 #undef PROTOBUF_MSC_VER_MIN
 #undef PROTOBUF_CPLUSPLUS_MIN
 #undef PROTOBUF_NAMESPACE
@@ -74,9 +72,7 @@
 #undef PROTOBUF_FORCE_COPY_IN_SWAP
 #undef PROTOBUF_FORCE_COPY_IN_MOVE
 #undef PROTOBUF_FORCE_RESET_IN_CLEAR
-#undef PROTOBUF_FUZZ_MESSAGE_SPACE_USED_LONG
 #undef PROTOBUF_FORCE_COPY_DEFAULT_STRING
-#undef PROTOBUF_FORCE_ALLOCATION_ON_CONSTRUCTION
 #undef PROTOBUF_NAMESPACE_OPEN
 #undef PROTOBUF_NAMESPACE_CLOSE
 #undef PROTOBUF_UNUSED
@@ -108,22 +104,15 @@
 #undef PROTOBUF_LOCKS_EXCLUDED
 #undef PROTOBUF_NO_THREAD_SAFETY_ANALYSIS
 #undef PROTOBUF_GUARDED_BY
-#undef PROTOBUF_DEBUG
-#undef PROTOBUF_DLOG
 
 #ifdef PROTOBUF_FUTURE_BREAKING_CHANGES
 #undef PROTOBUF_FUTURE_BREAKING_CHANGES
-#undef PROTOBUF_FUTURE_REMOVE_DEFAULT_FIELD_COMPARATOR
-#undef PROTOBUF_FUTURE_REMOVE_CLEARED_API
 #endif
 
-#undef PROTOBUF_FUTURE_FINAL
-
 // Restore macro that may have been #undef'd in port_def.inc.
-#ifdef _WIN32
+#ifdef _MSC_VER
 #pragma pop_macro("CREATE_NEW")
 #pragma pop_macro("DELETE")
-#pragma pop_macro("DOMAIN")
 #pragma pop_macro("DOUBLE_CLICK")
 #pragma pop_macro("ERROR")
 #pragma pop_macro("ERROR_BUSY")
@@ -155,7 +144,6 @@
 #pragma pop_macro("TRUE")
 #pragma pop_macro("FALSE")
 #pragma pop_macro("UID_MAX")
-#pragma pop_macro("GID_MAX")
 #endif  // __APPLE__
 
 #if defined(__clang__) || defined(__GNUC__) || defined(_MSC_VER)
