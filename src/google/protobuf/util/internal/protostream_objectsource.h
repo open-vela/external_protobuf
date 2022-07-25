@@ -77,9 +77,6 @@ class PROTOBUF_EXPORT ProtoStreamObjectSource : public ObjectSource {
  public:
 
   struct RenderOptions {
-    RenderOptions() = default;
-    RenderOptions(const RenderOptions&) = default;
-
     // Sets whether or not to use lowerCamelCase casing for enum values. If set
     // to false, enum values are output without any case conversions.
     //
@@ -167,7 +164,7 @@ class PROTOBUF_EXPORT ProtoStreamObjectSource : public ObjectSource {
   // Reads field value according to Field spec in 'field' and returns the read
   // value as string. This only works for primitive datatypes (no message
   // types).
-  const std::string ReadFieldValueAsString(
+  std::string ReadFieldValueAsString(
       const google::protobuf::Field& field) const;
 
 
