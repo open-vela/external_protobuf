@@ -50,8 +50,7 @@ namespace internal {
 
 namespace  {
 
-// TaggedStringPtr::Flags uses the lower 2 bits as tags.
-// Enforce that allocated data aligns to at least 4 bytes, and that
+// Enforce that allocated data aligns to at least 8 bytes, and that
 // the alignment of the global const string value does as well.
 // The alignment guaranteed by `new std::string` depends on both:
 // - new align = __STDCPP_DEFAULT_NEW_ALIGNMENT__ / max_align_t
@@ -65,8 +64,8 @@ constexpr size_t kNewAlign = alignof(std::max_align_t);
 #endif
 constexpr size_t kStringAlign = alignof(std::string);
 
-static_assert((kStringAlign > kNewAlign ? kStringAlign : kNewAlign) >= 4, "");
-static_assert(alignof(ExplicitlyConstructedArenaString) >= 4, "");
+static_assert((kStringAlign > kNewAlign ? kStringAlign : kNewAlign) >= 8, "");
+static_assert(alignof(ExplicitlyConstructedArenaString) >= 8, "");
 
 }  // namespace
 
@@ -87,7 +86,7 @@ const std::string& LazyString::Init() const {
 namespace {
 
 
-#if defined(NDEBUG) || !GOOGLE_PROTOBUF_INTERNAL_DONATE_STEAL
+#if defined(NDEBUG) || !defined(GOOGLE_PROTOBUF_INTERNAL_DONATE_STEAL)
 
 class ScopedCheckPtrInvariants {
  public:
@@ -103,7 +102,7 @@ inline TaggedStringPtr CreateString(ConstStringParam value) {
   return res;
 }
 
-#if !GOOGLE_PROTOBUF_INTERNAL_DONATE_STEAL
+#ifndef GOOGLE_PROTOBUF_INTERNAL_DONATE_STEAL
 
 // Creates an arena allocated std::string value.
 TaggedStringPtr CreateArenaString(Arena& arena, ConstStringParam s) {
@@ -124,7 +123,19 @@ void ArenaStringPtr::Set(ConstStringParam value, Arena* arena) {
     tagged_ptr_ = arena != nullptr ? CreateArenaString(*arena, value)
                                    : CreateString(value);
   } else {
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    if (arena == nullptr) {
+      auto* old = tagged_ptr_.GetIfAllocated();
+      tagged_ptr_ = CreateString(value);
+      delete old;
+    } else {
+      auto* old = UnsafeMutablePointer();
+      tagged_ptr_ = CreateArenaString(*arena, value);
+      old->assign("garbagedata");
+    }
+#else   // PROTOBUF_FORCE_COPY_DEFAULT_STRING
     UnsafeMutablePointer()->assign(value.data(), value.length());
+#endif  // PROTOBUF_FORCE_COPY_DEFAULT_STRING
   }
 }
 
