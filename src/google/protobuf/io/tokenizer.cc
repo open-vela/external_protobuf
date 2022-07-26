@@ -406,7 +406,7 @@ void Tokenizer::ConsumeString(char delimiter) {
 
       case '\n': {
         if (!allow_multiline_strings_) {
-          AddError("Multiline strings are not allowed. Did you miss a \"?.");
+          AddError("String literals cannot cross line boundaries.");
           return;
         }
         NextChar();
