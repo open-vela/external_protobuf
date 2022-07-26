@@ -418,7 +418,7 @@ namespace Google.Protobuf.Benchmarks
         private static byte[] CreateBufferWithRandomData(Random random, int valueCount, int encodedSize, int paddingValueCount)
         {
             int bufferSize = (valueCount + paddingValueCount) * encodedSize;
-            var buffer = new byte[bufferSize];
+            byte[] buffer = new byte[bufferSize];
             random.NextBytes(buffer);
             return buffer;
         }
