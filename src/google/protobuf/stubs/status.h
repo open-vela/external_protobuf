@@ -31,12 +31,10 @@
 #ifndef GOOGLE_PROTOBUF_STUBS_STATUS_H_
 #define GOOGLE_PROTOBUF_STUBS_STATUS_H_
 
-#include <google/protobuf/stubs/stringpiece.h>
-#include <google/protobuf/stubs/strutil.h>
-
 #include <string>
 
-// Must be included last.
+#include <google/protobuf/stubs/stringpiece.h>
+
 #include <google/protobuf/port_def.inc>
 
 namespace google {
@@ -149,8 +147,6 @@ PROTOBUF_EXPORT Status UnavailableError(StringPiece message);
 PROTOBUF_EXPORT Status UnimplementedError(StringPiece message);
 PROTOBUF_EXPORT Status UnknownError(StringPiece message);
 
-PROTOBUF_EXPORT Status ErrnoToStatus(int error_number, StringPiece message);
-
 }  // namespace status_internal
 
 using ::google::protobuf::util::status_internal::Status;
@@ -190,8 +186,6 @@ using ::google::protobuf::util::status_internal::UnauthenticatedError;
 using ::google::protobuf::util::status_internal::UnavailableError;
 using ::google::protobuf::util::status_internal::UnimplementedError;
 using ::google::protobuf::util::status_internal::UnknownError;
-
-using ::google::protobuf::util::status_internal::ErrnoToStatus;
 
 }  // namespace util
 }  // namespace protobuf
