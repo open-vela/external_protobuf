@@ -109,6 +109,7 @@
 #ifndef GOOGLE_PROTOBUF_IO_CODED_STREAM_H__
 #define GOOGLE_PROTOBUF_IO_CODED_STREAM_H__
 
+
 #include <assert.h>
 
 #include <atomic>
@@ -680,7 +681,7 @@ class PROTOBUF_EXPORT EpsCopyOutputStream {
     if (PROTOBUF_PREDICT_FALSE(end_ - ptr < size)) {
       return WriteRawFallback(data, size, ptr);
     }
-    std::memcpy(ptr, data, static_cast<unsigned int>(size));
+    std::memcpy(ptr, data, size);
     return ptr + size;
   }
   // Writes the buffer specified by data, size to the stream. Possibly by
@@ -1776,7 +1777,7 @@ inline void CodedOutputStream::WriteRawMaybeAliased(const void* data,
 
 inline uint8_t* CodedOutputStream::WriteRawToArray(const void* data, int size,
                                                    uint8_t* target) {
-  memcpy(target, data, static_cast<unsigned int>(size));
+  memcpy(target, data, size);
   return target + size;
 }
 

@@ -334,7 +334,7 @@ std::string GeneratedMetadataFileName(const FileDescriptor* file,
                                       const Options& options) {
   const std::string& proto_file = file->name();
   int start_index = 0;
-  int first_index = proto_file.find_first_of('/', start_index);
+  int first_index = proto_file.find_first_of("/", start_index);
   std::string result = "";
   std::string segment = "";
 
@@ -347,7 +347,7 @@ std::string GeneratedMetadataFileName(const FileDescriptor* file,
 
   // Append directory name.
   std::string file_no_suffix;
-  int lastindex = proto_file.find_last_of('.');
+  int lastindex = proto_file.find_last_of(".");
   if (proto_file == kEmptyFile) {
     return kEmptyMetadataFile;
   } else {
@@ -371,12 +371,12 @@ std::string GeneratedMetadataFileName(const FileDescriptor* file,
           file_no_suffix.substr(start_index, first_index - start_index), true);
       result += ReservedNamePrefix(segment, file) + segment + "/";
       start_index = first_index + 1;
-      first_index = file_no_suffix.find_first_of('/', start_index);
+      first_index = file_no_suffix.find_first_of("/", start_index);
     }
   }
 
   // Append file name.
-  int file_name_start = file_no_suffix.find_last_of('/');
+  int file_name_start = file_no_suffix.find_last_of("/");
   if (file_name_start == std::string::npos) {
     file_name_start = 0;
   } else {
@@ -498,7 +498,7 @@ std::string PhpSetterTypeName(const FieldDescriptor* field,
   }
   if (field->is_repeated()) {
     // accommodate for edge case with multiple types.
-    size_t start_pos = type.find('|');
+    size_t start_pos = type.find("|");
     if (start_pos != std::string::npos) {
       type.replace(start_pos, 1, ">|array<");
     }
@@ -1230,7 +1230,7 @@ void GenerateHead(const FileDescriptor* file, io::Printer* printer) {
 }
 
 std::string FilenameToClassname(const std::string& filename) {
-  int lastindex = filename.find_last_of('.');
+  int lastindex = filename.find_last_of(".");
   std::string result = filename.substr(0, lastindex);
   for (int i = 0; i < result.size(); i++) {
     if (result[i] == '/') {
@@ -1250,7 +1250,7 @@ void GenerateMetadataFile(const FileDescriptor* file, const Options& options,
   GenerateHead(file, &printer);
 
   std::string fullname = FilenameToClassname(filename);
-  int lastindex = fullname.find_last_of('\\');
+  int lastindex = fullname.find_last_of("\\");
 
   if (lastindex != std::string::npos) {
     printer.Print(
@@ -1350,7 +1350,7 @@ void GenerateEnumFile(const FileDescriptor* file, const EnumDescriptor* en,
   GenerateHead(file, &printer);
 
   std::string fullname = FilenameToClassname(filename);
-  int lastindex = fullname.find_last_of('\\');
+  int lastindex = fullname.find_last_of("\\");
 
   if (lastindex != std::string::npos) {
     printer.Print(
@@ -1450,7 +1450,7 @@ void GenerateEnumFile(const FileDescriptor* file, const EnumDescriptor* en,
   Outdent(&printer);
   printer.Print("}\n\n");
 
-  // write legacy alias for backwards compatibility with nested messages and enums
+  // write legacy file for backwards compatibility with nested messages and enums
   if (en->containing_type() != NULL) {
     printer.Print(
         "// Adding a class alias for backwards compatibility with the previous class name.\n");
@@ -1458,6 +1458,7 @@ void GenerateEnumFile(const FileDescriptor* file, const EnumDescriptor* en,
         "class_alias(^new^::class, \\^old^::class);\n\n",
         "new", fullname,
         "old", LegacyFullClassName(en, options));
+    LegacyGenerateClassFile(file, en, options, generator_context);
   }
 
   // Write legacy file for backwards compatibility with "readonly" keywword
@@ -1491,7 +1492,7 @@ void GenerateMessageFile(const FileDescriptor* file, const Descriptor* message,
   GenerateHead(file, &printer);
 
   std::string fullname = FilenameToClassname(filename);
-  int lastindex = fullname.find_last_of('\\');
+  int lastindex = fullname.find_last_of("\\");
 
   if (lastindex != std::string::npos) {
     printer.Print(
@@ -1577,7 +1578,7 @@ void GenerateMessageFile(const FileDescriptor* file, const Descriptor* message,
   Outdent(&printer);
   printer.Print("}\n\n");
 
-  // write legacy alias for backwards compatibility with nested messages and enums
+  // write legacy file for backwards compatibility with nested messages and enums
   if (message->containing_type() != NULL) {
     printer.Print(
         "// Adding a class alias for backwards compatibility with the previous class name.\n");
@@ -1585,6 +1586,7 @@ void GenerateMessageFile(const FileDescriptor* file, const Descriptor* message,
         "class_alias(^new^::class, \\^old^::class);\n\n",
         "new", fullname,
         "old", LegacyFullClassName(message, options));
+    LegacyGenerateClassFile(file, message, options, generator_context);
   }
 
   // Write legacy file for backwards compatibility with "readonly" keywword
@@ -1621,7 +1623,7 @@ void GenerateServiceFile(
   GenerateHead(file, &printer);
 
   std::string fullname = FilenameToClassname(filename);
-  int lastindex = fullname.find_last_of('\\');
+  int lastindex = fullname.find_last_of("\\");
 
   if (!file->options().php_namespace().empty() ||
       (!file->options().has_php_namespace() && !file->package().empty()) ||
