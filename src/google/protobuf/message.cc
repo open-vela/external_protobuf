@@ -213,6 +213,16 @@ uint64_t Message::GetInvariantPerBuild(uint64_t salt) {
   return salt;
 }
 
+namespace internal {
+void* CreateSplitMessageGeneric(Arena* arena, void* default_split,
+                                size_t size) {
+  void* split =
+      (arena == nullptr) ? ::operator new(size) : arena->AllocateAligned(size);
+  memcpy(split, default_split, size);
+  return split;
+}
+}  // namespace internal
+
 // =============================================================================
 // MessageFactory
 
@@ -396,6 +406,15 @@ PROTOBUF_NOINLINE
     GenericTypeHandler<Message>::GetOwningArena(Message* value) {
   return value->GetOwningArena();
 }
+
+template void InternalMetadata::DoClear<UnknownFieldSet>();
+template void InternalMetadata::DoMergeFrom<UnknownFieldSet>(
+    const UnknownFieldSet& other);
+template void InternalMetadata::DoSwap<UnknownFieldSet>(UnknownFieldSet* other);
+template Arena* InternalMetadata::DeleteOutOfLineHelper<UnknownFieldSet>();
+template UnknownFieldSet*
+InternalMetadata::mutable_unknown_fields_slow<UnknownFieldSet>();
+
 }  // namespace internal
 
 }  // namespace protobuf
