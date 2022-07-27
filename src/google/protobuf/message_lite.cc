@@ -521,14 +521,18 @@ void GenericTypeHandler<std::string>::Merge(const std::string& from,
   *to = from;
 }
 
-// Non-inline implementations of InternalMetadata destructor
+// Non-inline implementations of InternalMetadata routines
+#if defined(NDEBUG) || defined(_MSC_VER)
+// for opt and MSVC builds, the destructor is defined in the header.
+#else
 // This is moved out of the header because the GOOGLE_DCHECK produces a lot of code.
-void InternalMetadata::CheckedDestruct() {
+InternalMetadata::~InternalMetadata() {
   if (HasMessageOwnedArenaTag()) {
     GOOGLE_DCHECK(!HasUnknownFieldsTag());
     delete reinterpret_cast<Arena*>(ptr_ - kMessageOwnedArenaTagMask);
   }
 }
+#endif
 
 // Non-inline variants of std::string specializations for
 // various InternalMetadata routines.
