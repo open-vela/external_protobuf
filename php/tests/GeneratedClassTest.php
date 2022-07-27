@@ -338,7 +338,6 @@ class GeneratedClassTest extends TestBase
     {
         $this->assertTrue(class_exists('\Upper\READONLY'));
         $this->assertTrue(class_exists('\Lower\readonly'));
-        $this->assertTrue(class_exists('\Php\Test\TestNamespace\PBEmpty\ReadOnly'));
     }
 
     public function testLegacyReadOnlyEnum()
