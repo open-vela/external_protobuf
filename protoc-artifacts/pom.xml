@@ -4,7 +4,7 @@
   <parent>
     <groupId>com.google</groupId>
     <artifactId>google</artifactId>
-    <version>5</version>
+    <version>1</version>
   </parent>
   <groupId>com.google.protobuf</groupId>
   <artifactId>protoc</artifactId>

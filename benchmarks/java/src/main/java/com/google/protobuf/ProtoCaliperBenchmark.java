@@ -12,8 +12,9 @@ import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Basic benchmarks for Java protobuf parsing. */
-@SuppressWarnings("CheckReturnValue")
+/**
+ * Basic benchmarks for Java protobuf parsing.
+ */
 public class ProtoCaliperBenchmark {
   public enum BenchmarkMessageType {
     GOOGLE_MESSAGE1_PROTO3 {
@@ -150,7 +151,7 @@ public class ProtoCaliperBenchmark {
     }
   }
 
-  @SuppressWarnings({"IgnoredPureGetter", "CheckReturnValue"})
+  @SuppressWarnings("IgnoredPureGetter")
   @Benchmark
   void serializeToByteArray(int reps) throws IOException {
     if (sampleMessageList.size() == 0) {
