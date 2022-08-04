@@ -1577,11 +1577,7 @@ class PROTOBUF_EXPORT FileDescriptor : private internal::SymbolBase {
   const FileOptions& options() const;
 
   // Syntax of this file.
-  enum Syntax
-#ifndef SWIG
-      : int
-#endif  // !SWIG
-  {
+  enum Syntax {
     SYNTAX_UNKNOWN = 0,
     SYNTAX_PROTO2 = 2,
     SYNTAX_PROTO3 = 3,
