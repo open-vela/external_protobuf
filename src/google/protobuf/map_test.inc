@@ -737,6 +737,47 @@ TEST_F(MapImplTest, InsertSingleRValue) {
   EXPECT_FALSE(result2.second);
 }
 
+TEST_F(MapImplTest, InsertSingleBraceInitList) {
+  int32_t key = 0;
+  int32_t value1 = 100;
+  int32_t value2 = 101;
+
+  // Insert a non-existing key.
+  auto result1 = map_.insert({key, value1});
+  ExpectSingleElement(key, value1);
+
+  auto it1 = result1.first;
+  EXPECT_EQ(key, it1->first);
+  EXPECT_EQ(value1, it1->second);
+  EXPECT_TRUE(result1.second);
+
+  // Insert an existing key.
+  auto result2 = map_.insert({key, value2});
+  ExpectSingleElement(key, value1);
+
+  auto it2 = result2.first;
+  EXPECT_TRUE(it1 == it2);
+  EXPECT_FALSE(result2.second);
+}
+
+TEST_F(MapImplTest, InsertSingleBraceInitListTypeMismatch) {
+  int32_t key = 0;
+  int32_t value1 = 100;
+  int32_t value2 = 101;
+  Map<int64_t, int64_t> m;
+
+  // Insert a non-existing key.
+  auto result1 = m.insert({key, value1});
+  EXPECT_TRUE(result1.second);
+
+  // Insert an existing key.
+  auto result2 = m.insert({key, value2});
+  EXPECT_FALSE(result2.second);
+
+  EXPECT_TRUE(result1.first == result2.first);
+}
+
+
 TEST_F(MapImplTest, TryEmplace) {
   using ::testing::Pair;
   using ::testing::UnorderedElementsAre;
@@ -768,6 +809,59 @@ TEST_F(MapImplTest, Emplace) {
   EXPECT_THAT(
       m, UnorderedElementsAre(Pair(1, "one"), Pair(2, "two"), Pair(42, "aaa")));
 }
+
+#ifndef PROTOBUF_FUTURE_MAP_PAIR_UPGRADE
+
+TEST_F(MapImplTest, EmplaceKeyOnly) {
+  using ::testing::Pair;
+  using ::testing::UnorderedElementsAre;
+
+  Map<int32_t, std::string> m;
+
+  m.emplace(1);
+  EXPECT_EQ(m.size(), 1);
+
+  const int32_t key = 42;
+  m.emplace(key);
+  EXPECT_THAT(m, UnorderedElementsAre(Pair(1, ""), Pair(42, "")));
+}
+
+#else
+
+TEST_F(MapImplTest, ValueTypeNoImplicitConversion) {
+  using vt = typename Map<const char*, int>::value_type;
+
+  EXPECT_FALSE((std::is_convertible<
+                vt, std::pair<std::string, std::vector<std::string>>>::value));
+}
+
+enum class ConstructorType {
+  kDefault,
+  kCopy,
+  kMove,
+};
+
+struct ConstructorTag {
+  ConstructorTag() : invoked_constructor(ConstructorType::kDefault) {}
+  ConstructorTag(const ConstructorTag&)
+      : invoked_constructor(ConstructorType::kCopy) {}
+  ConstructorTag(ConstructorTag&&)
+      : invoked_constructor(ConstructorType::kMove) {}
+
+  ConstructorType invoked_constructor;
+};
+
+TEST_F(MapImplTest, ValueTypeHasMoveConstructor) {
+  using vt = typename Map<ConstructorTag, ConstructorTag>::value_type;
+  ConstructorTag l, r;
+
+  vt pair(l, std::move(r));
+
+  EXPECT_EQ(pair.first.invoked_constructor, ConstructorType::kCopy);
+  EXPECT_EQ(pair.second.invoked_constructor, ConstructorType::kMove);
+}
+
+#endif  // !PROTOBUF_FUTURE_MAP_PAIR_UPGRADE
 
 struct CountedInstance {
   CountedInstance() { ++num_created; }
@@ -3749,7 +3843,7 @@ TEST(MapSerializationTest, DeterministicSubmessage) {
   const std::string filename = "golden_message_maps";
   std::string golden;
   GOOGLE_CHECK_OK(File::GetContents(
-      TestUtil::GetTestDataPath("net/proto2/internal/testdata/" + filename),
+      TestUtil::GetTestDataPath("third_party/protobuf/testdata/" + filename),
       &golden, true));
   t.ParseFromString(golden);
   *(p.mutable_m()) = t;
@@ -3791,7 +3885,7 @@ TEST(TextFormatMapTest, DynamicMessage) {
 
   std::string expected_text;
   GOOGLE_CHECK_OK(
-      File::GetContents(TestUtil::GetTestDataPath("net/proto2/internal/"
+      File::GetContents(TestUtil::GetTestDataPath("third_party/protobuf/"
                                                   "testdata/map_test_data.txt"),
                         &expected_text, true));
 
@@ -3808,7 +3902,7 @@ TEST(TextFormatMapTest, Sorted) {
 
   std::string expected_text;
   GOOGLE_CHECK_OK(
-      File::GetContents(TestUtil::GetTestDataPath("net/proto2/internal/"
+      File::GetContents(TestUtil::GetTestDataPath("third_party/protobuf/"
                                                   "testdata/map_test_data.txt"),
                         &expected_text, true));
 
@@ -3828,10 +3922,10 @@ TEST(TextFormatMapTest, Sorted) {
 
 TEST(TextFormatMapTest, ParseCorruptedString) {
   std::string serialized_message;
-  GOOGLE_CHECK_OK(
-      File::GetContents(TestUtil::GetTestDataPath(
-                            "net/proto2/internal/testdata/golden_message_maps"),
-                        &serialized_message, true));
+  GOOGLE_CHECK_OK(File::GetContents(
+      TestUtil::GetTestDataPath(
+          "third_party/protobuf/testdata/golden_message_maps"),
+      &serialized_message, true));
   UNITTEST::TestMaps message;
   GOOGLE_CHECK(message.ParseFromString(serialized_message));
   TestParseCorruptedString<UNITTEST::TestMaps, true>(message);
