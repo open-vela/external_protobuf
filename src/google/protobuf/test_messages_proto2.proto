@@ -295,9 +295,3 @@ message EnumOnlyProto2 {
 message OneStringProto2 {
   optional string data = 1;
 }
-
-message ProtoWithKeywords {
-  optional int32 inline = 1;
-  optional string concept = 2;
-  repeated string requires = 3;
-}
