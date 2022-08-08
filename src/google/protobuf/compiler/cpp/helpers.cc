@@ -34,7 +34,6 @@
 
 #include <google/protobuf/compiler/cpp/helpers.h>
 
-#include <algorithm>
 #include <cstdint>
 #include <functional>
 #include <limits>
@@ -77,8 +76,7 @@ std::string DotsToColons(const std::string& name) {
   return StringReplace(name, ".", "::", true);
 }
 
-static const char* const kKeywordList[] = {
-    //
+static const char* const kKeywordList[] = {  //
     "NULL",
     "alignas",
     "alignof",
@@ -161,20 +159,7 @@ static const char* const kKeywordList[] = {
     "wchar_t",
     "while",
     "xor",
-    "xor_eq",
-#ifdef PROTOBUF_FUTURE_CPP20_KEYWORDS  // C++20 keywords.
-    "char8_t",
-    "char16_t",
-    "char32_t",
-    "concept",
-    "consteval",
-    "constinit",
-    "co_await",
-    "co_return",
-    "co_yield",
-    "requires",
-#endif  // !PROTOBUF_FUTURE_BREAKING_CHANGES
-};
+    "xor_eq"};
 
 static std::unordered_set<std::string>* MakeKeywordsMap() {
   auto* result = new std::unordered_set<std::string>();
@@ -871,9 +856,6 @@ std::string SafeFunctionName(const Descriptor* descriptor,
   return function_name;
 }
 
-bool IsProfileDriven(const Options& options) {
-  return options.access_info_map != nullptr;
-}
 bool IsStringInlined(const FieldDescriptor* descriptor,
                      const Options& options) {
   (void)descriptor;
@@ -920,13 +902,6 @@ bool HasLazyFields(const FileDescriptor* file, const Options& options,
 
 bool ShouldSplit(const Descriptor*, const Options&) { return false; }
 bool ShouldSplit(const FieldDescriptor*, const Options&) { return false; }
-
-bool ShouldForceAllocationOnConstruction(const Descriptor* desc,
-                                         const Options& options) {
-  (void)desc;
-  (void)options;
-  return false;
-}
 
 static bool HasRepeatedFields(const Descriptor* descriptor) {
   for (int i = 0; i < descriptor->field_count(); ++i) {

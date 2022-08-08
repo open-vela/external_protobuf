@@ -40,17 +40,20 @@ namespace Google.Protobuf.Reflection
     /// </summary>
     public sealed class EnumValueDescriptor : DescriptorBase
     {
+        private readonly EnumDescriptor enumDescriptor;
+        private readonly EnumValueDescriptorProto proto;
+
         internal EnumValueDescriptor(EnumValueDescriptorProto proto, FileDescriptor file,
                                      EnumDescriptor parent, int index)
             : base(file, parent.FullName + "." + proto.Name, index)
         {
-            Proto = proto;
-            EnumDescriptor = parent;
+            this.proto = proto;
+            enumDescriptor = parent;
             file.DescriptorPool.AddSymbol(this);
             file.DescriptorPool.AddEnumValueByNumber(this);
         }
 
-        internal EnumValueDescriptorProto Proto { get; }
+        internal EnumValueDescriptorProto Proto { get { return proto; } }
 
         /// <summary>
         /// Returns a clone of the underlying <see cref="EnumValueDescriptorProto"/> describing this enum value.
@@ -63,17 +66,17 @@ namespace Google.Protobuf.Reflection
         /// <summary>
         /// Returns the name of the enum value described by this object.
         /// </summary>
-        public override string Name => Proto.Name;
+        public override string Name { get { return proto.Name; } }
 
         /// <summary>
         /// Returns the number associated with this enum value.
         /// </summary>
-        public int Number => Proto.Number;
+        public int Number { get { return Proto.Number; } }
 
         /// <summary>
         /// Returns the enum descriptor that this value is part of.
         /// </summary>
-        public EnumDescriptor EnumDescriptor { get; }
+        public EnumDescriptor EnumDescriptor { get { return enumDescriptor; } }
 
         /// <summary>
         /// The (possibly empty) set of custom options for this enum value.
