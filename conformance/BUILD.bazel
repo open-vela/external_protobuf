@@ -143,7 +143,7 @@ java_binary(
 filegroup(
     name = "all_files",
     srcs = glob(["**/*"]),
-    visibility = ["//src/google/protobuf/compiler/csharp:__pkg__"],
+    visibility = ["//:__pkg__"],
 )
 
 pkg_files(
