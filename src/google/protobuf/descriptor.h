@@ -54,9 +54,6 @@
 #ifndef GOOGLE_PROTOBUF_DESCRIPTOR_H__
 #define GOOGLE_PROTOBUF_DESCRIPTOR_H__
 
-#include <cstdint>
-
-#include <google/protobuf/stubs/strutil.h>
 
 #include <atomic>
 #include <map>
@@ -1577,11 +1574,7 @@ class PROTOBUF_EXPORT FileDescriptor : private internal::SymbolBase {
   const FileOptions& options() const;
 
   // Syntax of this file.
-  enum Syntax
-#ifndef SWIG
-      : int
-#endif  // !SWIG
-  {
+  enum Syntax {
     SYNTAX_UNKNOWN = 0,
     SYNTAX_PROTO2 = 2,
     SYNTAX_PROTO3 = 3,
@@ -1709,7 +1702,7 @@ class PROTOBUF_EXPORT FileDescriptor : private internal::SymbolBase {
   GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(FileDescriptor);
 };
 
-PROTOBUF_INTERNAL_CHECK_CLASS_SIZE(FileDescriptor, 152);
+PROTOBUF_INTERNAL_CHECK_CLASS_SIZE(FileDescriptor, 144);
 
 // ===================================================================
 
