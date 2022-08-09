@@ -242,17 +242,17 @@ class PROTOBUF_EXPORT MessageDifferencer {
 
     // Reports that a field has been added into Message2.
     virtual void ReportAdded(const Message& message1, const Message& message2,
-                             const std::vector<SpecificField>& field_path) = 0;
+                             const std::vector<SpecificField>& field_path) {}
 
     // Reports that a field has been deleted from Message1.
     virtual void ReportDeleted(
         const Message& message1, const Message& message2,
-        const std::vector<SpecificField>& field_path) = 0;
+        const std::vector<SpecificField>& field_path) {}
 
     // Reports that the value of a field has been modified.
     virtual void ReportModified(
         const Message& message1, const Message& message2,
-        const std::vector<SpecificField>& field_path) = 0;
+        const std::vector<SpecificField>& field_path) {}
 
     // Reports that a repeated field has been moved to another location.  This
     // only applies when using TreatAsSet or TreatAsMap()  -- see below. Also
@@ -524,9 +524,9 @@ class PROTOBUF_EXPORT MessageDifferencer {
   // Note that this method must be called before Compare for the comparator to
   // be used.
   void set_field_comparator(FieldComparator* comparator);
-#ifdef PROTOBUF_FUTURE_BREAKING_CHANGES
+#ifdef PROTOBUF_FUTURE_REMOVE_DEFAULT_FIELD_COMPARATOR
   void set_field_comparator(DefaultFieldComparator* comparator);
-#endif  // PROTOBUF_FUTURE_BREAKING_CHANGES
+#endif  // PROTOBUF_FUTURE_REMOVE_DEFAULT_FIELD_COMPARATOR
 
   // DEPRECATED. Pass a DefaultFieldComparator instance instead.
   // Sets the fraction and margin for the float comparison of a given field.
