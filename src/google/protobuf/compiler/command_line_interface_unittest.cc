@@ -357,9 +357,9 @@ void CommandLineInterfaceTest::RunWithArgs(std::vector<std::string> args) {
     }
 #endif
 
-    if (plugin_path.empty() || !FileExists(plugin_path)) {
+    if (plugin_path.empty()) {
       GOOGLE_LOG(ERROR)
-          << "Plugin tests are likely to fail. Plugin executable not found at: " << plugin_path;
+          << "Plugin executable not found.  Plugin tests are likely to fail.";
     } else {
       args.push_back("--plugin=prefix-gen-plug=" + plugin_path);
     }
@@ -2681,7 +2681,7 @@ class EncodeDecodeTest : public testing::TestWithParam<EncodeDecodeTestMode> {
 
 TEST_P(EncodeDecodeTest, Encode) {
   RedirectStdinFromFile(TestUtil::GetTestDataPath(
-      "third_party/protobuf/"
+      "net/proto2/internal/"
       "testdata/text_format_unittest_data_oneof_implemented.txt"));
   std::string args;
   if (GetParam() != DESCRIPTOR_SET_IN) {
@@ -2690,18 +2690,18 @@ TEST_P(EncodeDecodeTest, Encode) {
   }
   EXPECT_TRUE(Run(args + " --encode=protobuf_unittest.TestAllTypes"));
   ExpectStdoutMatchesBinaryFile(TestUtil::GetTestDataPath(
-      "third_party/protobuf/testdata/golden_message_oneof_implemented"));
+      "net/proto2/internal/testdata/golden_message_oneof_implemented"));
   ExpectStderrMatchesText("");
 }
 
 TEST_P(EncodeDecodeTest, Decode) {
   RedirectStdinFromFile(TestUtil::GetTestDataPath(
-      "third_party/protobuf/testdata/golden_message_oneof_implemented"));
+      "net/proto2/internal/testdata/golden_message_oneof_implemented"));
   EXPECT_TRUE(
       Run(TestUtil::MaybeTranslatePath("net/proto2/internal/unittest.proto") +
           " --decode=protobuf_unittest.TestAllTypes"));
   ExpectStdoutMatchesTextFile(TestUtil::GetTestDataPath(
-      "third_party/protobuf/"
+      "net/proto2/internal/"
       "testdata/text_format_unittest_data_oneof_implemented.txt"));
   ExpectStderrMatchesText("");
 }
@@ -2750,7 +2750,7 @@ TEST_P(EncodeDecodeTest, ProtoParseError) {
 
 TEST_P(EncodeDecodeTest, EncodeDeterministicOutput) {
   RedirectStdinFromFile(TestUtil::GetTestDataPath(
-      "third_party/protobuf/"
+      "net/proto2/internal/"
       "testdata/text_format_unittest_data_oneof_implemented.txt"));
   std::string args;
   if (GetParam() != DESCRIPTOR_SET_IN) {
@@ -2760,13 +2760,13 @@ TEST_P(EncodeDecodeTest, EncodeDeterministicOutput) {
   EXPECT_TRUE(Run(
       args + " --encode=protobuf_unittest.TestAllTypes --deterministic_output"));
   ExpectStdoutMatchesBinaryFile(TestUtil::GetTestDataPath(
-      "third_party/protobuf/testdata/golden_message_oneof_implemented"));
+      "net/proto2/internal/testdata/golden_message_oneof_implemented"));
   ExpectStderrMatchesText("");
 }
 
 TEST_P(EncodeDecodeTest, DecodeDeterministicOutput) {
   RedirectStdinFromFile(TestUtil::GetTestDataPath(
-      "third_party/protobuf/testdata/golden_message_oneof_implemented"));
+      "net/proto2/internal/testdata/golden_message_oneof_implemented"));
   EXPECT_FALSE(
       Run(TestUtil::MaybeTranslatePath("net/proto2/internal/unittest.proto") +
           " --decode=protobuf_unittest.TestAllTypes --deterministic_output"));

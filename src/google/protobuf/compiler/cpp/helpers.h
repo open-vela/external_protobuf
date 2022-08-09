@@ -327,8 +327,6 @@ inline bool IsWeak(const FieldDescriptor* field, const Options& options) {
   return false;
 }
 
-bool IsProfileDriven(const Options& options);
-
 bool IsStringInlined(const FieldDescriptor* descriptor, const Options& options);
 
 // For a string field, returns the effective ctype.  If the actual ctype is
@@ -378,11 +376,6 @@ bool ShouldSplit(const Descriptor* desc, const Options& options);
 
 // Is the given field being split out?
 bool ShouldSplit(const FieldDescriptor* field, const Options& options);
-
-// Should we generate code that force creating an allocation in the constructor
-// of the given message?
-bool ShouldForceAllocationOnConstruction(const Descriptor* desc,
-                                         const Options& options);
 
 inline bool IsFieldUsed(const FieldDescriptor* /* field */,
                         const Options& /* options */) {
