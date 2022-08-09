@@ -73,7 +73,7 @@ void SetEnumVariables(const FieldDescriptor* descriptor, int messageBitIndex,
 
   (*variables)["type"] =
       name_resolver->GetImmutableClassName(descriptor->enum_type());
-  (*variables)["kt_type"] = EscapeKotlinKeywords((*variables)["type"]);
+  (*variables)["kt_type"] = (*variables)["type"];
   (*variables)["mutable_type"] =
       name_resolver->GetMutableClassName(descriptor->enum_type());
   (*variables)["default"] = ImmutableDefaultValue(descriptor, name_resolver);
@@ -286,7 +286,7 @@ void ImmutableEnumFieldLiteGenerator::GenerateBuilderMembers(
 
 void ImmutableEnumFieldLiteGenerator::GenerateKotlinDslMembers(
     io::Printer* printer) const {
-  WriteFieldDocComment(printer, descriptor_, /* kdoc */ true);
+  WriteFieldDocComment(printer, descriptor_);
   printer->Print(variables_,
                  "$kt_deprecation$var $kt_name$: $kt_type$\n"
                  "  @JvmName(\"${$get$kt_capitalized_name$$}$\")\n"
@@ -296,28 +296,15 @@ void ImmutableEnumFieldLiteGenerator::GenerateKotlinDslMembers(
                  "    $kt_dsl_builder$.${$set$capitalized_name$$}$(value)\n"
                  "  }\n");
 
-  if (SupportUnknownEnumValue(descriptor_->file())) {
-    printer->Print(
-        variables_,
-        "$kt_deprecation$ var $kt_name$Value: kotlin.Int\n"
-        "  @JvmName(\"${$get$kt_capitalized_name$Value$}$\")\n"
-        "  get() = $kt_dsl_builder$.${$get$capitalized_name$Value$}$()\n"
-        "  @JvmName(\"${$set$kt_capitalized_name$Value$}$\")\n"
-        "  set(value) {\n"
-        "    $kt_dsl_builder$.${$set$capitalized_name$Value$}$(value)\n"
-        "  }\n");
-  }
-
   WriteFieldAccessorDocComment(printer, descriptor_, CLEARER,
-                               /* builder */ false, /* kdoc */ true);
+                               /* builder */ false);
   printer->Print(variables_,
                  "fun ${$clear$kt_capitalized_name$$}$() {\n"
                  "  $kt_dsl_builder$.${$clear$capitalized_name$$}$()\n"
                  "}\n");
 
   if (HasHazzer(descriptor_)) {
-    WriteFieldAccessorDocComment(printer, descriptor_, HAZZER,
-                                 /* builder */ false, /* kdoc */ true);
+    WriteFieldAccessorDocComment(printer, descriptor_, HAZZER);
     printer->Print(
         variables_,
         "fun ${$has$kt_capitalized_name$$}$(): kotlin.Boolean {\n"
@@ -843,7 +830,7 @@ void RepeatedImmutableEnumFieldLiteGenerator::GenerateKotlinDslMembers(
       "class ${$$kt_capitalized_name$Proxy$}$ private constructor()"
       " : com.google.protobuf.kotlin.DslProxy()\n");
 
-  WriteFieldDocComment(printer, descriptor_, /* kdoc */ true);
+  WriteFieldDocComment(printer, descriptor_);
   printer->Print(variables_,
                  "$kt_deprecation$ val $kt_name$: "
                  "com.google.protobuf.kotlin.DslList"
@@ -854,7 +841,7 @@ void RepeatedImmutableEnumFieldLiteGenerator::GenerateKotlinDslMembers(
                  "  )\n");
 
   WriteFieldAccessorDocComment(printer, descriptor_, LIST_ADDER,
-                               /* builder */ false, /* kdoc */ true);
+                               /* builder */ false);
   printer->Print(variables_,
                  "@kotlin.jvm.JvmSynthetic\n"
                  "@kotlin.jvm.JvmName(\"add$kt_capitalized_name$\")\n"
@@ -865,7 +852,7 @@ void RepeatedImmutableEnumFieldLiteGenerator::GenerateKotlinDslMembers(
                  "}");
 
   WriteFieldAccessorDocComment(printer, descriptor_, LIST_ADDER,
-                               /* builder */ false, /* kdoc */ true);
+                               /* builder */ false);
   printer->Print(variables_,
                  "@kotlin.jvm.JvmSynthetic\n"
                  "@kotlin.jvm.JvmName(\"plusAssign$kt_capitalized_name$\")\n"
@@ -877,7 +864,7 @@ void RepeatedImmutableEnumFieldLiteGenerator::GenerateKotlinDslMembers(
                  "}");
 
   WriteFieldAccessorDocComment(printer, descriptor_, LIST_MULTI_ADDER,
-                               /* builder */ false, /* kdoc */ true);
+                               /* builder */ false);
   printer->Print(variables_,
                  "@kotlin.jvm.JvmSynthetic\n"
                  "@kotlin.jvm.JvmName(\"addAll$kt_capitalized_name$\")\n"
@@ -888,7 +875,7 @@ void RepeatedImmutableEnumFieldLiteGenerator::GenerateKotlinDslMembers(
                  "}");
 
   WriteFieldAccessorDocComment(printer, descriptor_, LIST_MULTI_ADDER,
-                               /* builder */ false, /* kdoc */ true);
+                               /* builder */ false);
   printer->Print(
       variables_,
       "@kotlin.jvm.JvmSynthetic\n"
@@ -901,7 +888,7 @@ void RepeatedImmutableEnumFieldLiteGenerator::GenerateKotlinDslMembers(
       "}");
 
   WriteFieldAccessorDocComment(printer, descriptor_, LIST_INDEXED_SETTER,
-                               /* builder */ false, /* kdoc */ true);
+                               /* builder */ false);
   printer->Print(
       variables_,
       "@kotlin.jvm.JvmSynthetic\n"
@@ -913,7 +900,7 @@ void RepeatedImmutableEnumFieldLiteGenerator::GenerateKotlinDslMembers(
       "}");
 
   WriteFieldAccessorDocComment(printer, descriptor_, CLEARER,
-                               /* builder */ false, /* kdoc */ true);
+                               /* builder */ false);
   printer->Print(variables_,
                  "@kotlin.jvm.JvmSynthetic\n"
                  "@kotlin.jvm.JvmName(\"clear$kt_capitalized_name$\")\n"
