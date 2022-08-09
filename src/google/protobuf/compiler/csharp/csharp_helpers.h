@@ -91,9 +91,7 @@ std::string GetOneofCaseName(const FieldDescriptor* descriptor);
 
 int GetFixedSize(FieldDescriptor::Type type);
 
-// Note that we wouldn't normally want to export this (we're not expecting
-// it to be used outside libprotoc itself) but this exposes it for testing.
-std::string PROTOC_EXPORT UnderscoresToCamelCase(const std::string& input,
+std::string UnderscoresToCamelCase(const std::string& input,
                                    bool cap_next_letter,
                                    bool preserve_period);
 

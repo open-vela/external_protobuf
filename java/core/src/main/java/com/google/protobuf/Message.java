@@ -39,12 +39,11 @@ import java.util.Map;
  *
  * <p>See also {@link MessageLite}, which defines most of the methods that typical users care about.
  * {@link Message} adds methods that are not available in the "lite" runtime. The biggest added
- * features are introspection and reflection; that is, getting descriptors for the message type and
- * accessing the field values dynamically.
+ * features are introspection and reflection; that is, getting descriptors for the message type
+ * and accessing the field values dynamically.
  *
  * @author kenton@google.com Kenton Varda
  */
-@CheckReturnValue
 public interface Message extends MessageLite, MessageOrBuilder {
 
   // (From MessageLite, re-declared here only for return type covariance.)
@@ -103,7 +102,6 @@ public interface Message extends MessageLite, MessageOrBuilder {
     // (From MessageLite.Builder, re-declared here only for return type
     // covariance.)
     @Override
-    @CanIgnoreReturnValue
     Builder clear();
 
     /**
@@ -123,7 +121,6 @@ public interface Message extends MessageLite, MessageOrBuilder {
      *
      * <p>This is equivalent to the {@code Message::MergeFrom} method in C++.
      */
-    @CanIgnoreReturnValue
     Builder mergeFrom(Message other);
 
     // (From MessageLite.Builder, re-declared here only for return type
@@ -138,11 +135,9 @@ public interface Message extends MessageLite, MessageOrBuilder {
     Builder clone();
 
     @Override
-    @CanIgnoreReturnValue
     Builder mergeFrom(CodedInputStream input) throws IOException;
 
     @Override
-    @CanIgnoreReturnValue
     Builder mergeFrom(CodedInputStream input, ExtensionRegistryLite extensionRegistry)
         throws IOException;
 
@@ -195,21 +190,18 @@ public interface Message extends MessageLite, MessageOrBuilder {
      * Sets a field to the given value. The value must be of the correct type for this field, that
      * is, the same type that {@link Message#getField(Descriptors.FieldDescriptor)} returns.
      */
-    @CanIgnoreReturnValue
     Builder setField(Descriptors.FieldDescriptor field, Object value);
 
     /**
      * Clears the field. This is exactly equivalent to calling the generated "clear" accessor method
      * corresponding to the field.
      */
-    @CanIgnoreReturnValue
     Builder clearField(Descriptors.FieldDescriptor field);
 
     /**
      * Clears the oneof. This is exactly equivalent to calling the generated "clear" accessor method
      * corresponding to the oneof.
      */
-    @CanIgnoreReturnValue
     Builder clearOneof(Descriptors.OneofDescriptor oneof);
 
     /**
@@ -220,7 +212,6 @@ public interface Message extends MessageLite, MessageOrBuilder {
      * @throws IllegalArgumentException if the field is not a repeated field, or {@code
      *     field.getContainingType() != getDescriptorForType()}.
      */
-    @CanIgnoreReturnValue
     Builder setRepeatedField(Descriptors.FieldDescriptor field, int index, Object value);
 
     /**
@@ -229,15 +220,12 @@ public interface Message extends MessageLite, MessageOrBuilder {
      * @throws IllegalArgumentException if the field is not a repeated field, or {@code
      *     field.getContainingType() != getDescriptorForType()}
      */
-    @CanIgnoreReturnValue
     Builder addRepeatedField(Descriptors.FieldDescriptor field, Object value);
 
     /** Set the {@link UnknownFieldSet} for this message. */
-    @CanIgnoreReturnValue
     Builder setUnknownFields(UnknownFieldSet unknownFields);
 
     /** Merge some unknown fields into the {@link UnknownFieldSet} for this message. */
-    @CanIgnoreReturnValue
     Builder mergeUnknownFields(UnknownFieldSet unknownFields);
 
     // ---------------------------------------------------------------
@@ -246,38 +234,30 @@ public interface Message extends MessageLite, MessageOrBuilder {
     // (From MessageLite.Builder, re-declared here only for return type
     // covariance.)
     @Override
-    @CanIgnoreReturnValue
     Builder mergeFrom(ByteString data) throws InvalidProtocolBufferException;
 
     @Override
-    @CanIgnoreReturnValue
     Builder mergeFrom(ByteString data, ExtensionRegistryLite extensionRegistry)
         throws InvalidProtocolBufferException;
 
     @Override
-    @CanIgnoreReturnValue
     Builder mergeFrom(byte[] data) throws InvalidProtocolBufferException;
 
     @Override
-    @CanIgnoreReturnValue
     Builder mergeFrom(byte[] data, int off, int len) throws InvalidProtocolBufferException;
 
     @Override
-    @CanIgnoreReturnValue
     Builder mergeFrom(byte[] data, ExtensionRegistryLite extensionRegistry)
         throws InvalidProtocolBufferException;
 
     @Override
-    @CanIgnoreReturnValue
     Builder mergeFrom(byte[] data, int off, int len, ExtensionRegistryLite extensionRegistry)
         throws InvalidProtocolBufferException;
 
     @Override
-    @CanIgnoreReturnValue
     Builder mergeFrom(InputStream input) throws IOException;
 
     @Override
-    @CanIgnoreReturnValue
     Builder mergeFrom(InputStream input, ExtensionRegistryLite extensionRegistry)
         throws IOException;
 
