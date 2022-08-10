@@ -47,8 +47,6 @@ inline void SizedDelete(void* p, size_t size) {
 #if defined(__cpp_sized_deallocation)
   ::operator delete(p, size);
 #else
-  // Avoid -Wunused-parameter
-  (void)size;
   ::operator delete(p);
 #endif
 }
@@ -56,8 +54,6 @@ inline void SizedArrayDelete(void* p, size_t size) {
 #if defined(__cpp_sized_deallocation)
   ::operator delete[](p, size);
 #else
-  // Avoid -Wunused-parameter
-  (void)size;
   ::operator delete[](p);
 #endif
 }

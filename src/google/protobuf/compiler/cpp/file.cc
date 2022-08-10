@@ -51,7 +51,6 @@
 #include <google/protobuf/compiler/cpp/helpers.h>
 #include <google/protobuf/compiler/cpp/message.h>
 #include <google/protobuf/compiler/cpp/service.h>
-#include <google/protobuf/descriptor.h>
 #include <google/protobuf/descriptor.pb.h>
 
 // Must be last.
