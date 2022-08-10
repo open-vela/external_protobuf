@@ -357,9 +357,9 @@ void CommandLineInterfaceTest::RunWithArgs(std::vector<std::string> args) {
     }
 #endif
 
-    if (plugin_path.empty() || !FileExists(plugin_path)) {
+    if (plugin_path.empty()) {
       GOOGLE_LOG(ERROR)
-          << "Plugin tests are likely to fail. Plugin executable not found at: " << plugin_path;
+          << "Plugin executable not found.  Plugin tests are likely to fail.";
     } else {
       args.push_back("--plugin=prefix-gen-plug=" + plugin_path);
     }
