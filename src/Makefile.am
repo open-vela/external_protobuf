@@ -18,7 +18,7 @@ else
 PTHREAD_DEF =
 endif
 
-PROTOBUF_VERSION = 32:4:0
+PROTOBUF_VERSION = 3.21.5
 
 if GCC
 # Turn on all warnings except for sign comparison (we ignore sign comparison
@@ -115,6 +115,7 @@ nobase_include_HEADERS =                                         \
   google/protobuf/generated_message_bases.h                      \
   google/protobuf/generated_message_reflection.h                 \
   google/protobuf/generated_message_tctable_decl.h               \
+  google/protobuf/generated_message_tctable_gen.h                \
   google/protobuf/generated_message_tctable_impl.h               \
   google/protobuf/generated_message_util.h                       \
   google/protobuf/has_bits.h                                     \
@@ -189,7 +190,7 @@ nobase_include_HEADERS =                                         \
 lib_LTLIBRARIES = libprotobuf-lite.la libprotobuf.la libprotoc.la
 
 libprotobuf_lite_la_LIBADD = $(PTHREAD_LIBS) $(LIBATOMIC_LIBS)
-libprotobuf_lite_la_LDFLAGS = -version-info $(PROTOBUF_VERSION) -export-dynamic -no-undefined
+libprotobuf_lite_la_LDFLAGS = -release $(PROTOBUF_VERSION) -export-dynamic -no-undefined
 if HAVE_LD_VERSION_SCRIPT
 libprotobuf_lite_la_LDFLAGS += -Wl,--version-script=$(srcdir)/libprotobuf-lite.map
 EXTRA_libprotobuf_lite_la_DEPENDENCIES = libprotobuf-lite.map
@@ -236,7 +237,7 @@ libprotobuf_lite_la_SOURCES =                                  \
   google/protobuf/wire_format_lite.cc
 
 libprotobuf_la_LIBADD = $(PTHREAD_LIBS) $(LIBATOMIC_LIBS)
-libprotobuf_la_LDFLAGS = -version-info $(PROTOBUF_VERSION) -export-dynamic -no-undefined
+libprotobuf_la_LDFLAGS = -release $(PROTOBUF_VERSION) -export-dynamic -no-undefined
 if HAVE_LD_VERSION_SCRIPT
 libprotobuf_la_LDFLAGS += -Wl,--version-script=$(srcdir)/libprotobuf.map
 EXTRA_libprotobuf_la_DEPENDENCIES = libprotobuf.map
@@ -323,7 +324,7 @@ libprotobuf_la_SOURCES =                                       \
 nodist_libprotobuf_la_SOURCES = $(nodist_libprotobuf_lite_la_SOURCES)
 
 libprotoc_la_LIBADD = $(PTHREAD_LIBS) libprotobuf.la
-libprotoc_la_LDFLAGS = -version-info $(PROTOBUF_VERSION) -export-dynamic -no-undefined
+libprotoc_la_LDFLAGS = -release $(PROTOBUF_VERSION) -export-dynamic -no-undefined
 if HAVE_LD_VERSION_SCRIPT
 libprotoc_la_LDFLAGS += -Wl,--version-script=$(srcdir)/libprotoc.map
 EXTRA_libprotoc_la_DEPENDENCIES = libprotoc.map
