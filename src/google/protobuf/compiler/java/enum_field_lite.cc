@@ -68,8 +68,7 @@ bool EnableExperimentalRuntimeForLite() {
 void SetEnumVariables(const FieldDescriptor* descriptor, int messageBitIndex,
                       int builderBitIndex, const FieldGeneratorInfo* info,
                       ClassNameResolver* name_resolver,
-                      std::map<std::string, std::string>* variables,
-                      Context* context) {
+                      std::map<std::string, std::string>* variables) {
   SetCommonFieldVariables(descriptor, info, variables);
 
   (*variables)["type"] =
@@ -77,8 +76,7 @@ void SetEnumVariables(const FieldDescriptor* descriptor, int messageBitIndex,
   (*variables)["kt_type"] = EscapeKotlinKeywords((*variables)["type"]);
   (*variables)["mutable_type"] =
       name_resolver->GetMutableClassName(descriptor->enum_type());
-  (*variables)["default"] =
-      ImmutableDefaultValue(descriptor, name_resolver, context->options());
+  (*variables)["default"] = ImmutableDefaultValue(descriptor, name_resolver);
   (*variables)["default_number"] =
       StrCat(descriptor->default_value_enum()->number());
   (*variables)["tag"] = StrCat(
@@ -97,12 +95,6 @@ void SetEnumVariables(const FieldDescriptor* descriptor, int messageBitIndex,
   (*variables)["required"] = descriptor->is_required() ? "true" : "false";
 
   if (HasHasbit(descriptor)) {
-    if (!context->options().opensource_runtime) {
-      (*variables)["bit_field_id"] = StrCat(messageBitIndex / 32);
-      (*variables)["bit_field_name"] = GetBitFieldNameForBit(messageBitIndex);
-      (*variables)["bit_field_mask"] =
-          StrCat(1 << (messageBitIndex % 32));
-    }
     // For singular messages and builders, one bit is used for the hasField bit.
     (*variables)["get_has_field_bit_message"] = GenerateGetBit(messageBitIndex);
 
@@ -150,7 +142,7 @@ ImmutableEnumFieldLiteGenerator::ImmutableEnumFieldLiteGenerator(
       name_resolver_(context->GetNameResolver()) {
   SetEnumVariables(descriptor, messageBitIndex, 0,
                    context->GetFieldGeneratorInfo(descriptor), name_resolver_,
-                   &variables_, context);
+                   &variables_);
 }
 
 ImmutableEnumFieldLiteGenerator::~ImmutableEnumFieldLiteGenerator() {}
@@ -177,20 +169,6 @@ void ImmutableEnumFieldLiteGenerator::GenerateInterfaceMembers(
 
 void ImmutableEnumFieldLiteGenerator::GenerateMembers(
     io::Printer* printer) const {
-  if (!context_->options().opensource_runtime) {
-    printer->Print(
-        variables_,
-        "@com.google.protobuf.ProtoField(\n"
-        "  fieldNumber=$number$,\n"
-        "  type=com.google.protobuf.FieldType.$annotation_field_type$,\n"
-        "  isRequired=$required$)\n");
-    if (HasHazzer(descriptor_)) {
-      printer->Print(variables_,
-                     "@com.google.protobuf.ProtoPresenceCheckedField(\n"
-                     "  presenceBitsId=$bit_field_id$,\n"
-                     "  mask=$bit_field_mask$)\n");
-    }
-  }
   printer->Print(variables_, "private int $name$_;\n");
   PrintExtraFieldInfo(variables_, printer);
   if (HasHazzer(descriptor_)) {
@@ -536,7 +514,7 @@ RepeatedImmutableEnumFieldLiteGenerator::
       name_resolver_(context->GetNameResolver()) {
   SetEnumVariables(descriptor, messageBitIndex, 0,
                    context->GetFieldGeneratorInfo(descriptor), name_resolver_,
-                   &variables_, context);
+                   &variables_);
 }
 
 RepeatedImmutableEnumFieldLiteGenerator::
@@ -572,13 +550,6 @@ void RepeatedImmutableEnumFieldLiteGenerator::GenerateInterfaceMembers(
 
 void RepeatedImmutableEnumFieldLiteGenerator::GenerateMembers(
     io::Printer* printer) const {
-  if (!context_->options().opensource_runtime) {
-    printer->Print(
-        variables_,
-        "@com.google.protobuf.ProtoField(\n"
-        "  fieldNumber=$number$,\n"
-        "  type=com.google.protobuf.FieldType.$annotation_field_type$)\n");
-  }
   printer->Print(
       variables_,
       "private com.google.protobuf.Internal.IntList $name$_;\n"

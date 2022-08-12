@@ -61,8 +61,7 @@ void SetPrimitiveVariables(const FieldDescriptor* descriptor,
                            int messageBitIndex, int builderBitIndex,
                            const FieldGeneratorInfo* info,
                            ClassNameResolver* name_resolver,
-                           std::map<std::string, std::string>* variables,
-                           Context* context) {
+                           std::map<std::string, std::string>* variables) {
   SetCommonFieldVariables(descriptor, info, variables);
   JavaType javaType = GetJavaType(descriptor);
 
@@ -107,15 +106,13 @@ void SetPrimitiveVariables(const FieldDescriptor* descriptor,
     (*variables)["repeated_set"] = (*variables)["name"] + "_.set";
   }
 
-  (*variables)["default"] =
-      ImmutableDefaultValue(descriptor, name_resolver, context->options());
+  (*variables)["default"] = ImmutableDefaultValue(descriptor, name_resolver);
   (*variables)["default_init"] =
       IsDefaultValueJavaDefault(descriptor)
           ? ""
-          : ("= " + ImmutableDefaultValue(descriptor, name_resolver,
-                                          context->options()));
-  (*variables)["capitalized_type"] = GetCapitalizedType(
-      descriptor, /* immutable = */ true, context->options());
+          : ("= " + ImmutableDefaultValue(descriptor, name_resolver));
+  (*variables)["capitalized_type"] =
+      GetCapitalizedType(descriptor, /* immutable = */ true);
   (*variables)["tag"] =
       StrCat(static_cast<int32_t>(WireFormat::MakeTag(descriptor)));
   (*variables)["tag_size"] = StrCat(
@@ -212,7 +209,7 @@ ImmutablePrimitiveFieldGenerator::ImmutablePrimitiveFieldGenerator(
     : descriptor_(descriptor), name_resolver_(context->GetNameResolver()) {
   SetPrimitiveVariables(descriptor, messageBitIndex, builderBitIndex,
                         context->GetFieldGeneratorInfo(descriptor),
-                        name_resolver_, &variables_, context);
+                        name_resolver_, &variables_);
 }
 
 ImmutablePrimitiveFieldGenerator::~ImmutablePrimitiveFieldGenerator() {}
@@ -684,7 +681,7 @@ RepeatedImmutablePrimitiveFieldGenerator::
     : descriptor_(descriptor), name_resolver_(context->GetNameResolver()) {
   SetPrimitiveVariables(descriptor, messageBitIndex, builderBitIndex,
                         context->GetFieldGeneratorInfo(descriptor),
-                        name_resolver_, &variables_, context);
+                        name_resolver_, &variables_);
 }
 
 RepeatedImmutablePrimitiveFieldGenerator::

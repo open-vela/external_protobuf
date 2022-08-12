@@ -51,9 +51,7 @@ namespace java {
 
 ImmutableExtensionGenerator::ImmutableExtensionGenerator(
     const FieldDescriptor* descriptor, Context* context)
-    : descriptor_(descriptor),
-      name_resolver_(context->GetNameResolver()),
-      context_(context) {
+    : descriptor_(descriptor), name_resolver_(context->GetNameResolver()) {
   if (descriptor_->extension_scope() != NULL) {
     scope_ =
         name_resolver_->GetImmutableClassName(descriptor_->extension_scope());
@@ -68,7 +66,7 @@ ImmutableExtensionGenerator::~ImmutableExtensionGenerator() {}
 void ExtensionGenerator::InitTemplateVars(
     const FieldDescriptor* descriptor, const std::string& scope, bool immutable,
     ClassNameResolver* name_resolver,
-    std::map<std::string, std::string>* vars_pointer, Context* context) {
+    std::map<std::string, std::string>* vars_pointer) {
   std::map<std::string, std::string>& vars = *vars_pointer;
   vars["scope"] = scope;
   vars["name"] = UnderscoresToCamelCaseCheckReserved(descriptor);
@@ -79,8 +77,7 @@ void ExtensionGenerator::InitTemplateVars(
   vars["index"] = StrCat(descriptor->index());
   vars["default"] = descriptor->is_repeated()
                         ? ""
-                        : DefaultValue(descriptor, immutable, name_resolver,
-                                       context->options());
+                        : DefaultValue(descriptor, immutable, name_resolver);
   vars["type_constant"] = FieldTypeName(GetType(descriptor));
   vars["packed"] = descriptor->is_packed() ? "true" : "false";
   vars["enum_map"] = "null";
@@ -119,7 +116,7 @@ void ImmutableExtensionGenerator::Generate(io::Printer* printer) {
   std::map<std::string, std::string> vars;
   const bool kUseImmutableNames = true;
   InitTemplateVars(descriptor_, scope_, kUseImmutableNames, name_resolver_,
-                   &vars, context_);
+                   &vars);
   printer->Print(vars, "public static final int $constant_name$ = $number$;\n");
 
   WriteFieldDocComment(printer, descriptor_);

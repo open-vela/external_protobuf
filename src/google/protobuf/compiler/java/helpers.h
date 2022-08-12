@@ -41,11 +41,7 @@
 #include <google/protobuf/io/printer.h>
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/compiler/java/context.h>
-#include <google/protobuf/compiler/java/options.h>
 #include <google/protobuf/descriptor.pb.h>
-
-// Must be last.
-#include <google/protobuf/port_def.inc>
 
 namespace google {
 namespace protobuf {
@@ -68,8 +64,7 @@ bool IsForbiddenKotlin(const std::string& field_name);
 // annotation_file should be generated from the filename of the source file
 // being annotated (which in turn must be a Java identifier plus ".java").
 void PrintGeneratedAnnotation(io::Printer* printer, char delimiter = '$',
-                              const std::string& annotation_file = "",
-                              Options options = {});
+                              const std::string& annotation_file = "");
 
 // If a GeneratedMessageLite contains non-lite enums, then its verifier
 // must be instantiated inline, rather than retrieved from the enum class.
@@ -118,8 +113,7 @@ std::string UniqueFileScopeIdentifier(const Descriptor* descriptor);
 std::string FileClassName(const FileDescriptor* file, bool immutable = true);
 
 // Returns the file's Java package name.
-std::string FileJavaPackage(const FileDescriptor* file, bool immutable,
-                            Options options = {});
+std::string FileJavaPackage(const FileDescriptor* file, bool immutable);
 
 // Returns output directory for the given package name.
 std::string JavaPackageToDir(std::string package_name);
@@ -215,8 +209,7 @@ void MaybePrintGeneratedAnnotation(Context* context, io::Printer* printer,
     PrintGeneratedAnnotation(printer, '$',
                              context->options().annotate_code
                                  ? AnnotationFileName(descriptor, suffix)
-                                 : "",
-                             context->options());
+                                 : "");
   }
 }
 
@@ -261,12 +254,10 @@ const char* FieldTypeName(const FieldDescriptor::Type field_type);
 
 class ClassNameResolver;
 std::string DefaultValue(const FieldDescriptor* field, bool immutable,
-                         ClassNameResolver* name_resolver,
-                         Options options = {});
+                         ClassNameResolver* name_resolver);
 inline std::string ImmutableDefaultValue(const FieldDescriptor* field,
-                                         ClassNameResolver* name_resolver,
-                                         Options options = {}) {
-  return DefaultValue(field, true, name_resolver, options);
+                                         ClassNameResolver* name_resolver) {
+  return DefaultValue(field, true, name_resolver);
 }
 bool IsDefaultValueJavaDefault(const FieldDescriptor* field);
 bool IsByteStringWithCustomDefaultValue(const FieldDescriptor* field);
@@ -345,8 +336,7 @@ bool IsReferenceType(JavaType type);
 
 // Returns the capitalized name for calling relative functions in
 // CodedInputStream
-const char* GetCapitalizedType(const FieldDescriptor* field, bool immutable,
-                               Options options);
+const char* GetCapitalizedType(const FieldDescriptor* field, bool immutable);
 
 // For encodings with fixed sizes, returns that size in bytes.  Otherwise
 // returns -1.
@@ -484,5 +474,4 @@ std::pair<int, int> GetTableDrivenNumberOfEntriesAndLookUpStartFieldNumber(
 }  // namespace protobuf
 }  // namespace google
 
-#include <google/protobuf/port_undef.inc>
 #endif  // GOOGLE_PROTOBUF_COMPILER_JAVA_HELPERS_H__
