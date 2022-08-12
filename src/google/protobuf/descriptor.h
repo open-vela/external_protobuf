@@ -199,7 +199,7 @@ namespace internal {
 //
 
 #if !defined(PROTOBUF_INTERNAL_CHECK_CLASS_SIZE)
-#define PROTOBUF_INTERNAL_CHECK_CLASS_SIZE(t, expected) static_assert(true, "")
+#define PROTOBUF_INTERNAL_CHECK_CLASS_SIZE(t, expected)
 #endif
 
 class FlatAllocator;
