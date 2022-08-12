@@ -63,17 +63,14 @@ void SetPrimitiveVariables(const FieldDescriptor* descriptor,
                            int messageBitIndex, int builderBitIndex,
                            const FieldGeneratorInfo* info,
                            ClassNameResolver* name_resolver,
-                           std::map<std::string, std::string>* variables,
-                           Context* context) {
+                           std::map<std::string, std::string>* variables) {
   SetCommonFieldVariables(descriptor, info, variables);
 
   (*variables)["empty_list"] = "com.google.protobuf.LazyStringArrayList.EMPTY";
 
-  (*variables)["default"] =
-      ImmutableDefaultValue(descriptor, name_resolver, context->options());
+  (*variables)["default"] = ImmutableDefaultValue(descriptor, name_resolver);
   (*variables)["default_init"] =
-      "= " +
-      ImmutableDefaultValue(descriptor, name_resolver, context->options());
+      "= " + ImmutableDefaultValue(descriptor, name_resolver);
   (*variables)["capitalized_type"] = "String";
   (*variables)["tag"] =
       StrCat(static_cast<int32_t>(WireFormat::MakeTag(descriptor)));
@@ -154,7 +151,7 @@ ImmutableStringFieldGenerator::ImmutableStringFieldGenerator(
     : descriptor_(descriptor), name_resolver_(context->GetNameResolver()) {
   SetPrimitiveVariables(descriptor, messageBitIndex, builderBitIndex,
                         context->GetFieldGeneratorInfo(descriptor),
-                        name_resolver_, &variables_, context);
+                        name_resolver_, &variables_);
 }
 
 ImmutableStringFieldGenerator::~ImmutableStringFieldGenerator() {}
@@ -756,7 +753,7 @@ RepeatedImmutableStringFieldGenerator::RepeatedImmutableStringFieldGenerator(
     : descriptor_(descriptor), name_resolver_(context->GetNameResolver()) {
   SetPrimitiveVariables(descriptor, messageBitIndex, builderBitIndex,
                         context->GetFieldGeneratorInfo(descriptor),
-                        name_resolver_, &variables_, context);
+                        name_resolver_, &variables_);
 }
 
 RepeatedImmutableStringFieldGenerator::

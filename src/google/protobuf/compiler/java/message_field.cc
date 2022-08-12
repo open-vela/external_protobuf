@@ -59,8 +59,7 @@ namespace {
 void SetMessageVariables(const FieldDescriptor* descriptor, int messageBitIndex,
                          int builderBitIndex, const FieldGeneratorInfo* info,
                          ClassNameResolver* name_resolver,
-                         std::map<std::string, std::string>* variables,
-                         Context* context) {
+                         std::map<std::string, std::string>* variables) {
   SetCommonFieldVariables(descriptor, info, variables);
 
   (*variables)["type"] =
@@ -83,10 +82,8 @@ void SetMessageVariables(const FieldDescriptor* descriptor, int messageBitIndex,
   (*variables)["on_changed"] = "onChanged();";
   (*variables)["ver"] = GeneratedCodeVersionSuffix();
   (*variables)["get_parser"] =
-      ExposePublicParser(descriptor->message_type()->file()) &&
-              context->options().opensource_runtime
-          ? "PARSER"
-          : "parser()";
+      ExposePublicParser(descriptor->message_type()->file()) ? "PARSER"
+                                                             : "parser()";
 
   if (HasHasbit(descriptor)) {
     // For singular messages and builders, one bit is used for the hasField bit.
@@ -136,12 +133,10 @@ void SetMessageVariables(const FieldDescriptor* descriptor, int messageBitIndex,
 ImmutableMessageFieldGenerator::ImmutableMessageFieldGenerator(
     const FieldDescriptor* descriptor, int messageBitIndex, int builderBitIndex,
     Context* context)
-    : descriptor_(descriptor),
-      name_resolver_(context->GetNameResolver()),
-      context_(context) {
+    : descriptor_(descriptor), name_resolver_(context->GetNameResolver()) {
   SetMessageVariables(descriptor, messageBitIndex, builderBitIndex,
                       context->GetFieldGeneratorInfo(descriptor),
-                      name_resolver_, &variables_, context);
+                      name_resolver_, &variables_);
 }
 
 ImmutableMessageFieldGenerator::~ImmutableMessageFieldGenerator() {}
@@ -866,7 +861,7 @@ RepeatedImmutableMessageFieldGenerator::RepeatedImmutableMessageFieldGenerator(
     : descriptor_(descriptor), name_resolver_(context->GetNameResolver()) {
   SetMessageVariables(descriptor, messageBitIndex, builderBitIndex,
                       context->GetFieldGeneratorInfo(descriptor),
-                      name_resolver_, &variables_, context);
+                      name_resolver_, &variables_);
 }
 
 RepeatedImmutableMessageFieldGenerator::

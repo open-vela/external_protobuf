@@ -102,12 +102,7 @@ void SetMessageVariables(const FieldDescriptor* descriptor, int messageBitIndex,
   const JavaType keyJavaType = GetJavaType(key);
   const JavaType valueJavaType = GetJavaType(value);
 
-  // The code that generates the open-source version appears not to understand
-  // #else, so we have an #ifndef instead.
-  std::string pass_through_nullness =
-      context->options().opensource_runtime
-          ? "/* nullable */\n"
-          : "@com.google.protobuf.Internal.ProtoPassThroughNullness ";
+  std::string pass_through_nullness = "/* nullable */\n";
 
   (*variables)["key_type"] = TypeName(key, name_resolver, false);
   std::string boxed_key_type = TypeName(key, name_resolver, true);
@@ -118,8 +113,7 @@ void SetMessageVariables(const FieldDescriptor* descriptor, int messageBitIndex,
   (*variables)["short_key_type"] =
       boxed_key_type.substr(boxed_key_type.rfind('.') + 1);
   (*variables)["key_wire_type"] = WireType(key);
-  (*variables)["key_default_value"] =
-      DefaultValue(key, true, name_resolver, context->options());
+  (*variables)["key_default_value"] = DefaultValue(key, true, name_resolver);
   (*variables)["key_null_check"] =
       IsReferenceType(keyJavaType)
           ? "if (key == null) { throw new NullPointerException(\"map key\"); }"
@@ -138,8 +132,7 @@ void SetMessageVariables(const FieldDescriptor* descriptor, int messageBitIndex,
     (*variables)["boxed_value_type"] = "java.lang.Integer";
     (*variables)["value_wire_type"] = WireType(value);
     (*variables)["value_default_value"] =
-        DefaultValue(value, true, name_resolver, context->options()) +
-        ".getNumber()";
+        DefaultValue(value, true, name_resolver) + ".getNumber()";
 
     (*variables)["value_enum_type"] = TypeName(value, name_resolver, false);
 
@@ -153,7 +146,7 @@ void SetMessageVariables(const FieldDescriptor* descriptor, int messageBitIndex,
     } else {
       // Map unknown values to the default value if we don't have UNRECOGNIZED.
       (*variables)["unrecognized_value"] =
-          DefaultValue(value, true, name_resolver, context->options());
+          DefaultValue(value, true, name_resolver);
     }
   } else {
     (*variables)["value_type"] = TypeName(value, name_resolver, false);
@@ -165,7 +158,7 @@ void SetMessageVariables(const FieldDescriptor* descriptor, int messageBitIndex,
     (*variables)["boxed_value_type"] = TypeName(value, name_resolver, true);
     (*variables)["value_wire_type"] = WireType(value);
     (*variables)["value_default_value"] =
-        DefaultValue(value, true, name_resolver, context->options());
+        DefaultValue(value, true, name_resolver);
   }
   (*variables)["type_parameters"] =
       (*variables)["boxed_key_type"] + ", " + (*variables)["boxed_value_type"];
@@ -201,9 +194,7 @@ void SetMessageVariables(const FieldDescriptor* descriptor, int messageBitIndex,
 ImmutableMapFieldGenerator::ImmutableMapFieldGenerator(
     const FieldDescriptor* descriptor, int messageBitIndex, int builderBitIndex,
     Context* context)
-    : descriptor_(descriptor),
-      name_resolver_(context->GetNameResolver()),
-      context_(context) {
+    : descriptor_(descriptor), name_resolver_(context->GetNameResolver()) {
   SetMessageVariables(descriptor, messageBitIndex, builderBitIndex,
                       context->GetFieldGeneratorInfo(descriptor), context,
                       &variables_);
@@ -227,16 +218,14 @@ void ImmutableMapFieldGenerator::GenerateInterfaceMembers(
                  "    $key_type$ key);\n");
   printer->Annotate("{", "}", descriptor_);
   if (GetJavaType(ValueField(descriptor_)) == JAVATYPE_ENUM) {
-    if (context_->options().opensource_runtime) {
-      printer->Print(variables_,
-                     "/**\n"
-                     " * Use {@link #get$capitalized_name$Map()} instead.\n"
-                     " */\n"
-                     "@java.lang.Deprecated\n"
-                     "java.util.Map<$boxed_key_type$, $value_enum_type$>\n"
-                     "${$get$capitalized_name$$}$();\n");
-      printer->Annotate("{", "}", descriptor_);
-    }
+    printer->Print(variables_,
+                   "/**\n"
+                   " * Use {@link #get$capitalized_name$Map()} instead.\n"
+                   " */\n"
+                   "@java.lang.Deprecated\n"
+                   "java.util.Map<$boxed_key_type$, $value_enum_type$>\n"
+                   "${$get$capitalized_name$$}$();\n");
+    printer->Annotate("{", "}", descriptor_);
     WriteFieldDocComment(printer, descriptor_);
     printer->Print(
         variables_,
@@ -288,16 +277,14 @@ void ImmutableMapFieldGenerator::GenerateInterfaceMembers(
       printer->Annotate("{", "}", descriptor_);
     }
   } else {
-    if (context_->options().opensource_runtime) {
-      printer->Print(variables_,
-                     "/**\n"
-                     " * Use {@link #get$capitalized_name$Map()} instead.\n"
-                     " */\n"
-                     "@java.lang.Deprecated\n"
-                     "java.util.Map<$type_parameters$>\n"
-                     "${$get$capitalized_name$$}$();\n");
-      printer->Annotate("{", "}", descriptor_);
-    }
+    printer->Print(variables_,
+                   "/**\n"
+                   " * Use {@link #get$capitalized_name$Map()} instead.\n"
+                   " */\n"
+                   "@java.lang.Deprecated\n"
+                   "java.util.Map<$type_parameters$>\n"
+                   "${$get$capitalized_name$$}$();\n");
+    printer->Annotate("{", "}", descriptor_);
     WriteFieldDocComment(printer, descriptor_);
     printer->Print(variables_,
                    "$deprecation$java.util.Map<$type_parameters$>\n"
@@ -414,20 +401,18 @@ void ImmutableMapFieldGenerator::GenerateBuilderMembers(
                  "}\n");
   printer->Annotate("{", "}", descriptor_);
   if (GetJavaType(ValueField(descriptor_)) == JAVATYPE_ENUM) {
-    if (context_->options().opensource_runtime) {
-      printer->Print(
-          variables_,
-          "/**\n"
-          " * Use alternate mutation accessors instead.\n"
-          " */\n"
-          "@java.lang.Deprecated\n"
-          "public java.util.Map<$boxed_key_type$, $value_enum_type$>\n"
-          "${$getMutable$capitalized_name$$}$() {\n"
-          "  return internalGetAdapted$capitalized_name$Map(\n"
-          "       internalGetMutable$capitalized_name$().getMutableMap());\n"
-          "}\n");
-      printer->Annotate("{", "}", descriptor_);
-    }
+    printer->Print(
+        variables_,
+        "/**\n"
+        " * Use alternate mutation accessors instead.\n"
+        " */\n"
+        "@java.lang.Deprecated\n"
+        "public java.util.Map<$boxed_key_type$, $value_enum_type$>\n"
+        "${$getMutable$capitalized_name$$}$() {\n"
+        "  return internalGetAdapted$capitalized_name$Map(\n"
+        "       internalGetMutable$capitalized_name$().getMutableMap());\n"
+        "}\n");
+    printer->Annotate("{", "}", descriptor_);
     WriteFieldDocComment(printer, descriptor_);
     printer->Print(variables_,
                    "$deprecation$public Builder ${$put$capitalized_name$$}$(\n"
@@ -452,19 +437,17 @@ void ImmutableMapFieldGenerator::GenerateBuilderMembers(
         "}\n");
     printer->Annotate("{", "}", descriptor_);
     if (SupportUnknownEnumValue(descriptor_->file())) {
-      if (context_->options().opensource_runtime) {
-        printer->Print(
-            variables_,
-            "/**\n"
-            " * Use alternate mutation accessors instead.\n"
-            " */\n"
-            "@java.lang.Deprecated\n"
-            "public java.util.Map<$boxed_key_type$, $boxed_value_type$>\n"
-            "${$getMutable$capitalized_name$Value$}$() {\n"
-            "  return internalGetMutable$capitalized_name$().getMutableMap();\n"
-            "}\n");
-        printer->Annotate("{", "}", descriptor_);
-      }
+      printer->Print(
+          variables_,
+          "/**\n"
+          " * Use alternate mutation accessors instead.\n"
+          " */\n"
+          "@java.lang.Deprecated\n"
+          "public java.util.Map<$boxed_key_type$, $boxed_value_type$>\n"
+          "${$getMutable$capitalized_name$Value$}$() {\n"
+          "  return internalGetMutable$capitalized_name$().getMutableMap();\n"
+          "}\n");
+      printer->Annotate("{", "}", descriptor_);
       WriteFieldDocComment(printer, descriptor_);
       printer->Print(
           variables_,
@@ -490,19 +473,17 @@ void ImmutableMapFieldGenerator::GenerateBuilderMembers(
       printer->Annotate("{", "}", descriptor_);
     }
   } else {
-    if (context_->options().opensource_runtime) {
-      printer->Print(
-          variables_,
-          "/**\n"
-          " * Use alternate mutation accessors instead.\n"
-          " */\n"
-          "@java.lang.Deprecated\n"
-          "public java.util.Map<$type_parameters$>\n"
-          "${$getMutable$capitalized_name$$}$() {\n"
-          "  return internalGetMutable$capitalized_name$().getMutableMap();\n"
-          "}\n");
-      printer->Annotate("{", "}", descriptor_);
-    }
+    printer->Print(
+        variables_,
+        "/**\n"
+        " * Use alternate mutation accessors instead.\n"
+        " */\n"
+        "@java.lang.Deprecated\n"
+        "public java.util.Map<$type_parameters$>\n"
+        "${$getMutable$capitalized_name$$}$() {\n"
+        "  return internalGetMutable$capitalized_name$().getMutableMap();\n"
+        "}\n");
+    printer->Annotate("{", "}", descriptor_);
     WriteFieldDocComment(printer, descriptor_);
     printer->Print(variables_,
                    "$deprecation$"
@@ -549,20 +530,17 @@ void ImmutableMapFieldGenerator::GenerateMapGetters(
       "}\n");
   printer->Annotate("{", "}", descriptor_);
   if (GetJavaType(ValueField(descriptor_)) == JAVATYPE_ENUM) {
-    if (context_->options().opensource_runtime) {
-      printer->Print(
-          variables_,
-          "/**\n"
-          " * Use {@link #get$capitalized_name$Map()} instead.\n"
-          " */\n"
-          "@java.lang.Override\n"
-          "@java.lang.Deprecated\n"
-          "public java.util.Map<$boxed_key_type$, $value_enum_type$>\n"
-          "${$get$capitalized_name$$}$() {\n"
-          "  return get$capitalized_name$Map();\n"
-          "}\n");
-      printer->Annotate("{", "}", descriptor_);
-    }
+    printer->Print(variables_,
+                   "/**\n"
+                   " * Use {@link #get$capitalized_name$Map()} instead.\n"
+                   " */\n"
+                   "@java.lang.Override\n"
+                   "@java.lang.Deprecated\n"
+                   "public java.util.Map<$boxed_key_type$, $value_enum_type$>\n"
+                   "${$get$capitalized_name$$}$() {\n"
+                   "  return get$capitalized_name$Map();\n"
+                   "}\n");
+    printer->Annotate("{", "}", descriptor_);
     WriteFieldDocComment(printer, descriptor_);
     printer->Print(variables_,
                    "@java.lang.Override\n"
@@ -662,19 +640,17 @@ void ImmutableMapFieldGenerator::GenerateMapGetters(
       printer->Annotate("{", "}", descriptor_);
     }
   } else {
-    if (context_->options().opensource_runtime) {
-      printer->Print(variables_,
-                     "/**\n"
-                     " * Use {@link #get$capitalized_name$Map()} instead.\n"
-                     " */\n"
-                     "@java.lang.Override\n"
-                     "@java.lang.Deprecated\n"
-                     "public java.util.Map<$type_parameters$> "
-                     "${$get$capitalized_name$$}$() {\n"
-                     "  return get$capitalized_name$Map();\n"
-                     "}\n");
-      printer->Annotate("{", "}", descriptor_);
-    }
+    printer->Print(variables_,
+                   "/**\n"
+                   " * Use {@link #get$capitalized_name$Map()} instead.\n"
+                   " */\n"
+                   "@java.lang.Override\n"
+                   "@java.lang.Deprecated\n"
+                   "public java.util.Map<$type_parameters$> "
+                   "${$get$capitalized_name$$}$() {\n"
+                   "  return get$capitalized_name$Map();\n"
+                   "}\n");
+    printer->Annotate("{", "}", descriptor_);
     WriteFieldDocComment(printer, descriptor_);
     printer->Print(variables_,
                    "@java.lang.Override\n"

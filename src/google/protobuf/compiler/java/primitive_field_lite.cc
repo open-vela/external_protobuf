@@ -69,18 +69,16 @@ void SetPrimitiveVariables(const FieldDescriptor* descriptor,
                            int messageBitIndex, int builderBitIndex,
                            const FieldGeneratorInfo* info,
                            ClassNameResolver* name_resolver,
-                           std::map<std::string, std::string>* variables,
-                           Context* context) {
+                           std::map<std::string, std::string>* variables) {
   SetCommonFieldVariables(descriptor, info, variables);
   JavaType javaType = GetJavaType(descriptor);
   (*variables)["type"] = PrimitiveTypeName(javaType);
   (*variables)["boxed_type"] = BoxedPrimitiveTypeName(javaType);
   (*variables)["kt_type"] = KotlinTypeName(javaType);
   (*variables)["field_type"] = (*variables)["type"];
-  (*variables)["default"] =
-      ImmutableDefaultValue(descriptor, name_resolver, context->options());
-  (*variables)["capitalized_type"] = GetCapitalizedType(
-      descriptor, /* immutable = */ true, context->options());
+  (*variables)["default"] = ImmutableDefaultValue(descriptor, name_resolver);
+  (*variables)["capitalized_type"] =
+      GetCapitalizedType(descriptor, /* immutable = */ true);
   (*variables)["tag"] =
       StrCat(static_cast<int32_t>(WireFormat::MakeTag(descriptor)));
   (*variables)["tag_size"] = StrCat(
@@ -201,11 +199,10 @@ ImmutablePrimitiveFieldLiteGenerator::ImmutablePrimitiveFieldLiteGenerator(
     const FieldDescriptor* descriptor, int messageBitIndex, Context* context)
     : descriptor_(descriptor),
       messageBitIndex_(messageBitIndex),
-      context_(context),
       name_resolver_(context->GetNameResolver()) {
   SetPrimitiveVariables(descriptor, messageBitIndex, 0,
                         context->GetFieldGeneratorInfo(descriptor),
-                        name_resolver_, &variables_, context);
+                        name_resolver_, &variables_);
 }
 
 ImmutablePrimitiveFieldLiteGenerator::~ImmutablePrimitiveFieldLiteGenerator() {}
@@ -233,20 +230,6 @@ void ImmutablePrimitiveFieldLiteGenerator::GenerateMembers(
     printer->Print(
         variables_,
         "private static final $field_type$ $bytes_default$ = $default$;\n");
-  }
-  if (!context_->options().opensource_runtime) {
-    printer->Print(
-        variables_,
-        "@com.google.protobuf.ProtoField(\n"
-        "  fieldNumber=$number$,\n"
-        "  type=com.google.protobuf.FieldType.$annotation_field_type$,\n"
-        "  isRequired=$required$)\n");
-    if (HasHazzer(descriptor_)) {
-      printer->Print(variables_,
-                     "@com.google.protobuf.ProtoPresenceCheckedField(\n"
-                     "  presenceBitsId=$bit_field_id$,\n"
-                     "  mask=$bit_field_mask$)\n");
-    }
   }
   printer->Print(variables_, "private $field_type$ $name$_;\n");
   PrintExtraFieldInfo(variables_, printer);
@@ -510,7 +493,7 @@ RepeatedImmutablePrimitiveFieldLiteGenerator::
       name_resolver_(context->GetNameResolver()) {
   SetPrimitiveVariables(descriptor, messageBitIndex, 0,
                         context->GetFieldGeneratorInfo(descriptor),
-                        name_resolver_, &variables_, context);
+                        name_resolver_, &variables_);
 }
 
 RepeatedImmutablePrimitiveFieldLiteGenerator::
