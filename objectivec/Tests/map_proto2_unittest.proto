@@ -30,39 +30,61 @@
 
 syntax = "proto2";
 
-package objc.protobuf.tests.options;
+import "unittest_import.proto";
 
-option objc_class_prefix = "GPBTEST";
+// We don't put this in a package within proto2 because we need to make sure
+// that the generated code doesn't depend on being in the proto2 namespace.
+// In map_test_util.h we do "using namespace unittest = objc.protobuf.tests".
+package objc.protobuf.tests;
 
-// Verify that enum types and values get the prefix.
-message TestObjcProtoPrefixMessage {
+enum Proto2MapEnum {
+  PROTO2_MAP_ENUM_FOO   = 0;
+  PROTO2_MAP_ENUM_BAR   = 1;
+  PROTO2_MAP_ENUM_BAZ   = 2;
 }
 
-// Verify that messages that don't already have the prefix get a prefix.
-enum TestObjcProtoPrefixEnum {
-  value = 1;
+enum Proto2MapEnumPlusExtra {
+  E_PROTO2_MAP_ENUM_FOO   = 0;
+  E_PROTO2_MAP_ENUM_BAR   = 1;
+  E_PROTO2_MAP_ENUM_BAZ   = 2;
+  E_PROTO2_MAP_ENUM_EXTRA = 3;
 }
 
-// Verify that messages that already have a prefix aren't prefixed twice.
-message GPBTESTTestHasAPrefixMessage {
+message TestEnumMap {
+  map<int32, Proto2MapEnum> known_map_field = 101;
+  map<int32, Proto2MapEnum> unknown_map_field = 102;
 }
 
-// Verify that enums that already have a prefix aren't prefixed twice.
-enum GPBTESTTestHasAPrefixEnum {
-  valueB = 1;
+message TestEnumMapPlusExtra {
+  map<int32, Proto2MapEnumPlusExtra> known_map_field = 101;
+  map<int32, Proto2MapEnumPlusExtra> unknown_map_field = 102;
 }
 
-// Verify that classes that have the prefix followed by a lowercase
-// letter DO get the prefix.
-message GPBTESTshouldGetAPrefixMessage {
+message TestImportEnumMap {
+  map<int32, objc.protobuf.tests.import.ImportEnumForMap> import_enum_amp = 1;
 }
 
-// Verify that classes named the same as prefixes are prefixed.
-message GPBTEST {
+message TestIntIntMap {
+  map<int32, int32> m = 1;
 }
 
-// Tests that lookup deals with prefix.
-message PrefixedParentMessage {
-  message Child {
-  }
+// Test all key types: string, plus the non-floating-point scalars.
+message TestMaps {
+  map<int32, TestIntIntMap> m_int32 = 1;
+  map<int64, TestIntIntMap> m_int64 = 2;
+  map<uint32, TestIntIntMap> m_uint32 = 3;
+  map<uint64, TestIntIntMap> m_uint64 = 4;
+  map<sint32, TestIntIntMap> m_sint32 = 5;
+  map<sint64, TestIntIntMap> m_sint64 = 6;
+  map<fixed32, TestIntIntMap> m_fixed32 = 7;
+  map<fixed64, TestIntIntMap> m_fixed64 = 8;
+  map<sfixed32, TestIntIntMap> m_sfixed32 = 9;
+  map<sfixed64, TestIntIntMap> m_sfixed64 = 10;
+  map<bool, TestIntIntMap> m_bool = 11;
+  map<string, TestIntIntMap> m_string = 12;
+}
+
+// Test maps in submessages.
+message TestSubmessageMaps {
+  optional TestMaps m = 1;
 }

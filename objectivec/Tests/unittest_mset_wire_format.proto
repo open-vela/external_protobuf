@@ -1,5 +1,5 @@
 // Protocol Buffers - Google's data interchange format
-// Copyright 2016 Google Inc.  All rights reserved.
+// Copyright 2008 Google Inc.  All rights reserved.
 // https://developers.google.com/protocol-buffers/
 //
 // Redistribution and use in source and binary forms, with or without
@@ -28,7 +28,21 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-// This one file in the chain tests is compiled by itself to ensure if was
-// generated with the extra #imports needed to pull in the indirect Root class
-// used in its Root registry.
-#import "UnittestExtensionChainF.pbobjc.m"
+// Author: kenton@google.com (Kenton Varda)
+//  Based on original Protocol Buffers design by
+//  Sanjay Ghemawat, Jeff Dean, and others.
+//
+// This file contains messages for testing message_set_wire_format.
+
+syntax = "proto2";
+package objc.protobuf.tests.wireformat;
+
+// A message with message_set_wire_format.
+message TestMessageSet {
+  option message_set_wire_format = true;
+  extensions 4 to max;
+}
+
+message TestMessageSetWireFormatContainer {
+  optional TestMessageSet message_set = 1;
+}
