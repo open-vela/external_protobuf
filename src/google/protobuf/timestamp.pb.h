@@ -159,7 +159,7 @@ class PROTOBUF_EXPORT Timestamp final :
 
   private:
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
-  static ::absl::string_view FullMessageName() {
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
     return "google.protobuf.Timestamp";
   }
   protected:

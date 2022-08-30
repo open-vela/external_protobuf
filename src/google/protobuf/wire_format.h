@@ -42,7 +42,7 @@
 
 #include <google/protobuf/stubs/common.h>
 #include <google/protobuf/io/coded_stream.h>
-#include "absl/base/casts.h"
+#include <google/protobuf/stubs/casts.h>
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/generated_message_util.h>
 #include <google/protobuf/message.h>
@@ -79,8 +79,6 @@ namespace internal {
 // This class is really a namespace that contains only static methods
 class PROTOBUF_EXPORT WireFormat {
  public:
-  WireFormat() = delete;
-
   // Given a field return its WireType
   static inline WireFormatLite::WireType WireTypeForField(
       const FieldDescriptor* field);
@@ -287,7 +285,6 @@ class PROTOBUF_EXPORT WireFormat {
 
  private:
   struct MessageSetParser;
-  friend class TcParser;
   // Skip a MessageSet field.
   static bool SkipMessageSetField(io::CodedInputStream* input,
                                   uint32_t field_number,
@@ -304,6 +301,8 @@ class PROTOBUF_EXPORT WireFormat {
                                                  uint64_t tag,
                                                  const Reflection* reflection,
                                                  const FieldDescriptor* field);
+
+  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(WireFormat);
 };
 
 // Subclass of FieldSkipper which saves skipped fields to an UnknownFieldSet.
@@ -338,7 +337,7 @@ inline WireFormatLite::WireType WireFormat::WireTypeForFieldType(
   // Some compilers don't like enum -> enum casts, so we implicit_cast to
   // int first.
   return WireFormatLite::WireTypeForFieldType(
-      static_cast<WireFormatLite::FieldType>(absl::implicit_cast<int>(type)));
+      static_cast<WireFormatLite::FieldType>(implicit_cast<int>(type)));
 }
 
 inline uint32_t WireFormat::MakeTag(const FieldDescriptor* field) {
@@ -351,7 +350,7 @@ inline size_t WireFormat::TagSize(int field_number,
   // int first.
   return WireFormatLite::TagSize(
       field_number,
-      static_cast<WireFormatLite::FieldType>(absl::implicit_cast<int>(type)));
+      static_cast<WireFormatLite::FieldType>(implicit_cast<int>(type)));
 }
 
 inline void WireFormat::VerifyUTF8String(const char* data, int size,

@@ -32,7 +32,6 @@
 
 #include <vector>
 
-#include <google/protobuf/port.h>
 #include <google/protobuf/map_field_inl.h>
 
 // Must be included last.
@@ -41,7 +40,6 @@
 namespace google {
 namespace protobuf {
 namespace internal {
-using ::google::protobuf::internal::DownCast;
 
 void MapFieldBase::Destruct() {
   if (arena_ == nullptr) {
@@ -429,7 +427,7 @@ void DynamicMapField::MergeFrom(const MapFieldBase& other) {
 }
 
 void DynamicMapField::Swap(MapFieldBase* other) {
-  DynamicMapField* other_field = DownCast<DynamicMapField*>(other);
+  DynamicMapField* other_field = down_cast<DynamicMapField*>(other);
   std::swap(this->MapFieldBase::repeated_field_, other_field->repeated_field_);
   map_.swap(other_field->map_);
   // a relaxed swap of the atomic

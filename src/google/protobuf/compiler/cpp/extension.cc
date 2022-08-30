@@ -38,8 +38,6 @@
 
 #include <google/protobuf/io/printer.h>
 #include <google/protobuf/stubs/strutil.h>
-#include "absl/strings/str_cat.h"
-#include "absl/strings/str_replace.h"
 #include <google/protobuf/compiler/cpp/helpers.h>
 #include <google/protobuf/descriptor.pb.h>
 
@@ -88,14 +86,14 @@ ExtensionGenerator::ExtensionGenerator(const FieldDescriptor* descriptor,
   variables_["name"] = ResolveKeyword(name);
   variables_["constant_name"] = FieldConstantName(descriptor_);
   variables_["field_type"] =
-      absl::StrCat(static_cast<int>(descriptor_->type()));
+      StrCat(static_cast<int>(descriptor_->type()));
   variables_["packed"] = descriptor_->is_packed() ? "true" : "false";
 
   std::string scope =
       IsScoped() ? ClassName(descriptor_->extension_scope(), false) + "::" : "";
   variables_["scope"] = scope;
   variables_["scoped_name"] = ExtensionName(descriptor_);
-  variables_["number"] = absl::StrCat(descriptor_->number());
+  variables_["number"] = StrCat(descriptor_->number());
 
   bool add_verify_fn =
       // Only verify msgs.
@@ -106,7 +104,7 @@ ExtensionGenerator::ExtensionGenerator(const FieldDescriptor* descriptor,
 
   variables_["verify_fn"] =
       add_verify_fn
-          ? absl::StrCat("&", FieldMessageTypeName(descriptor_, options_),
+          ? StrCat("&", FieldMessageTypeName(descriptor_, options_),
                          "::InternalVerify")
           : "nullptr";
 }

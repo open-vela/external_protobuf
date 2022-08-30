@@ -70,8 +70,6 @@ class FileGenerator {
  public:
   FileGenerator(const FileDescriptor* file, const Options& options,
                 bool immutable_api = true);
-  FileGenerator(const FileGenerator&) = delete;
-  FileGenerator& operator=(const FileGenerator&) = delete;
   ~FileGenerator();
 
   // Checks for problems that would otherwise lead to cryptic compile errors.
@@ -116,6 +114,8 @@ class FileGenerator {
   ClassNameResolver* name_resolver_;
   const Options options_;
   bool immutable_api_;
+
+  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(FileGenerator);
 };
 
 }  // namespace java

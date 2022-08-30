@@ -29,9 +29,9 @@
 
 syntax = "proto2";
 
-package objc.protobuf.tests;
+package protobuf_unittest;
 
-import "objectivec/Tests/unittest.proto";
+import "google/protobuf/unittest.proto";
 
 // The Root for this file should end up adding the local extension and merging
 // in the extensions from unittest.proto's Root.

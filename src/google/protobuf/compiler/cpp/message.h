@@ -36,7 +36,6 @@
 #define GOOGLE_PROTOBUF_COMPILER_CPP_MESSAGE_H__
 
 #include <cstdint>
-#include <limits>
 #include <memory>
 #include <set>
 #include <string>
@@ -70,8 +69,6 @@ class MessageGenerator {
                    const std::map<std::string, std::string>& vars,
                    int index_in_file_messages, const Options& options,
                    MessageSCCAnalyzer* scc_analyzer);
-  MessageGenerator(const MessageGenerator&) = delete;
-  MessageGenerator& operator=(const MessageGenerator&) = delete;
   ~MessageGenerator();
 
   // Append the two types of nested generators to the corresponding vector.
@@ -122,6 +119,7 @@ class MessageGenerator {
   // default instance.
   void GenerateConstexprConstructor(io::Printer* printer);
 
+  void GenerateCreateSplitMessage(io::Printer* printer);
   void GenerateInitDefaultSplitInstance(io::Printer* printer);
 
   // Generate standard Message methods.
@@ -223,6 +221,7 @@ class MessageGenerator {
   std::map<std::string, std::string> variables_;
 
   friend class FileGenerator;
+  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(MessageGenerator);
 };
 
 }  // namespace cpp

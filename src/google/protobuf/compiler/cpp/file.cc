@@ -43,15 +43,14 @@
 #include <vector>
 
 #include <google/protobuf/compiler/scc.h>
-#include "absl/strings/escaping.h"
-#include "absl/strings/str_cat.h"
-#include "absl/strings/str_replace.h"
+#include <google/protobuf/io/printer.h>
+#include <google/protobuf/stubs/strutil.h>
 #include <google/protobuf/compiler/cpp/enum.h>
 #include <google/protobuf/compiler/cpp/extension.h>
+#include <google/protobuf/compiler/cpp/field.h>
 #include <google/protobuf/compiler/cpp/helpers.h>
 #include <google/protobuf/compiler/cpp/message.h>
 #include <google/protobuf/compiler/cpp/service.h>
-#include <google/protobuf/descriptor.h>
 #include <google/protobuf/descriptor.pb.h>
 
 // Must be last.
@@ -172,7 +171,7 @@ void FileGenerator::GenerateMacroUndefs(io::Printer* printer) {
   for (int i = 0; i < fields.size(); i++) {
     const std::string& name = fields[i]->name();
     static const char* kMacroNames[] = {"major", "minor"};
-    for (int j = 0; j < ABSL_ARRAYSIZE(kMacroNames); ++j) {
+    for (int j = 0; j < GOOGLE_ARRAYSIZE(kMacroNames); ++j) {
       if (name == kMacroNames[j]) {
         names_to_undef.push_back(name);
         break;
@@ -496,18 +495,20 @@ void FileGenerator::GenerateSourceDefaultInstance(int idx,
     generator->GenerateInitDefaultSplitInstance(printer);
     format(
         "} {}\n"
+        "  ~$1$() {}\n"
         "  union {\n"
-        "    $1$ _instance;\n"
+        "    $2$ _instance;\n"
         "  };\n"
         "};\n",
-        absl::StrCat(generator->classname_, "::Impl_::Split"));
+        DefaultInstanceType(generator->descriptor_, options_, /*split=*/true),
+        StrCat(generator->classname_, "::Impl_::Split"));
     // NO_DESTROY is not necessary for correctness. The empty destructor is
     // enough. However, the empty destructor fails to be elided in some
     // configurations (like non-opt or with certain sanitizers). NO_DESTROY is
     // there just to improve performance and binary size in these builds.
     format(
         "PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT "
-        "PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 const $1$ $2$;\n",
+        "PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 $1$ $2$;\n",
         DefaultInstanceType(generator->descriptor_, options_, /*split=*/true),
         DefaultInstanceName(generator->descriptor_, options_, /*split=*/true));
   }
@@ -879,7 +880,7 @@ void FileGenerator::GenerateReflectionInitializationCode(io::Printer* printer) {
       format("{ ");
       for (int i = 0; i < file_data.size();) {
         for (int j = 0; j < kBytesPerLine && i < file_data.size(); ++i, ++j) {
-          format("'$1$', ", absl::CEscape(file_data.substr(i, 1)));
+          format("'$1$', ", CEscape(file_data.substr(i, 1)));
         }
         format("\n");
       }
@@ -890,7 +891,7 @@ void FileGenerator::GenerateReflectionInitializationCode(io::Printer* printer) {
       for (int i = 0; i < file_data.size(); i += kBytesPerLine) {
         format(
             "\"$1$\"\n",
-            EscapeTrigraphs(absl::CEscape(file_data.substr(i, kBytesPerLine))));
+            EscapeTrigraphs(CEscape(file_data.substr(i, kBytesPerLine))));
       }
     }
     format(";\n");
@@ -925,7 +926,7 @@ void FileGenerator::GenerateReflectionInitializationCode(io::Printer* printer) {
   // so disable for now.
   bool eager = false;
   format(
-      "static ::absl::once_flag $desc_table$_once;\n"
+      "static ::_pbi::once_flag $desc_table$_once;\n"
       "const ::_pbi::DescriptorTable $desc_table$ = {\n"
       "    false, $1$, $2$, $3$,\n"
       "    \"$filename$\",\n"
@@ -998,7 +999,7 @@ class FileGenerator::ForwardDeclarations {
       const Descriptor* class_desc = p.second;
       format(
           "struct $1$;\n"
-          "$dllexport_decl $extern const $1$ $2$;\n",
+          "$dllexport_decl $extern $1$ $2$;\n",
           DefaultInstanceType(class_desc, options, /*split=*/true),
           DefaultInstanceName(class_desc, options, /*split=*/true));
     }

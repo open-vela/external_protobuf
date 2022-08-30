@@ -49,10 +49,6 @@ class ImmutableExtensionLiteGenerator : public ExtensionGenerator {
  public:
   explicit ImmutableExtensionLiteGenerator(const FieldDescriptor* descriptor,
                                            Context* context);
-  ImmutableExtensionLiteGenerator(const ImmutableExtensionLiteGenerator&) =
-      delete;
-  ImmutableExtensionLiteGenerator& operator=(
-      const ImmutableExtensionLiteGenerator&) = delete;
   ~ImmutableExtensionLiteGenerator() override;
 
   void Generate(io::Printer* printer) override;
@@ -67,7 +63,8 @@ class ImmutableExtensionLiteGenerator : public ExtensionGenerator {
   const FieldDescriptor* descriptor_;
   ClassNameResolver* name_resolver_;
   std::string scope_;
-  Context* context_;
+
+  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(ImmutableExtensionLiteGenerator);
 };
 
 }  // namespace java
