@@ -30,9 +30,8 @@
 
 #include <google/protobuf/util/internal/field_mask_utility.h>
 
-#include "absl/status/status.h"
+#include <google/protobuf/stubs/status.h>
 #include <google/protobuf/stubs/strutil.h>
-#include "absl/strings/str_cat.h"
 #include <google/protobuf/util/internal/utility.h>
 #include <google/protobuf/stubs/status_macros.h>
 
@@ -47,8 +46,8 @@ namespace converter {
 namespace {
 
 // Appends a FieldMask path segment to a prefix.
-std::string AppendPathSegmentToPrefix(absl::string_view prefix,
-                                      absl::string_view segment) {
+std::string AppendPathSegmentToPrefix(StringPiece prefix,
+                                      StringPiece segment) {
   if (prefix.empty()) {
     return std::string(segment);
   }
@@ -57,14 +56,14 @@ std::string AppendPathSegmentToPrefix(absl::string_view prefix,
   }
   // If the segment is a map key, appends it to the prefix without the ".".
   if (HasPrefixString(segment, "[\"")) {
-    return absl::StrCat(prefix, segment);
+    return StrCat(prefix, segment);
   }
-  return absl::StrCat(prefix, ".", segment);
+  return StrCat(prefix, ".", segment);
 }
 
 }  // namespace
 
-std::string ConvertFieldMaskPath(const absl::string_view path,
+std::string ConvertFieldMaskPath(const StringPiece path,
                                  ConverterCallback converter) {
   std::string result;
   result.reserve(path.size() << 1);
@@ -108,7 +107,7 @@ std::string ConvertFieldMaskPath(const absl::string_view path,
   return result;
 }
 
-absl::Status DecodeCompactFieldMaskPaths(absl::string_view paths,
+util::Status DecodeCompactFieldMaskPaths(StringPiece paths,
                                          PathSinkCallback path_sink) {
   std::stack<std::string> prefix;
   int length = paths.length();
@@ -135,7 +134,7 @@ absl::Status DecodeCompactFieldMaskPaths(absl::string_view paths,
         }
         // Un-escaped '"' must be followed with a ']'.
         if (i >= length - 1 || paths[i + 1] != ']') {
-          return absl::InvalidArgumentError(absl::StrCat(
+          return util::InvalidArgumentError(StrCat(
               "Invalid FieldMask '", paths,
               "'. Map keys should be represented as [\"some_key\"]."));
         }
@@ -146,7 +145,7 @@ absl::Status DecodeCompactFieldMaskPaths(absl::string_view paths,
         // Checks whether the key ends at the end of a path segment.
         if (i < length - 1 && paths[i + 1] != '.' && paths[i + 1] != ',' &&
             paths[i + 1] != ')' && paths[i + 1] != '(') {
-          return absl::InvalidArgumentError(absl::StrCat(
+          return util::InvalidArgumentError(StrCat(
               "Invalid FieldMask '", paths,
               "'. Map keys should be at the end of a path segment."));
         }
@@ -157,7 +156,7 @@ absl::Status DecodeCompactFieldMaskPaths(absl::string_view paths,
       // We are not in a map key, look for the start of one.
       if (paths[i] == '[') {
         if (i >= length - 1 || paths[i + 1] != '\"') {
-          return absl::InvalidArgumentError(absl::StrCat(
+          return util::InvalidArgumentError(StrCat(
               "Invalid FieldMask '", paths,
               "'. Map keys should be represented as [\"some_key\"]."));
         }
@@ -174,7 +173,7 @@ absl::Status DecodeCompactFieldMaskPaths(absl::string_view paths,
     }
     // Gets the current segment - sub-string between previous position (after
     // '(', ')', ',', or the beginning of the input) and the current position.
-    absl::string_view segment =
+    StringPiece segment =
         paths.substr(previous_position, i - previous_position);
     std::string current_prefix = prefix.empty() ? "" : prefix.top();
 
@@ -192,8 +191,8 @@ absl::Status DecodeCompactFieldMaskPaths(absl::string_view paths,
     // Removes the last prefix after seeing a ')'.
     if (i < length && paths[i] == ')') {
       if (prefix.empty()) {
-        return absl::InvalidArgumentError(
-            absl::StrCat("Invalid FieldMask '", paths,
+        return util::InvalidArgumentError(
+            StrCat("Invalid FieldMask '", paths,
                          "'. Cannot find matching '(' for all ')'."));
       }
       prefix.pop();
@@ -201,16 +200,16 @@ absl::Status DecodeCompactFieldMaskPaths(absl::string_view paths,
     previous_position = i + 1;
   }
   if (in_map_key) {
-    return absl::InvalidArgumentError(
-        absl::StrCat("Invalid FieldMask '", paths,
+    return util::InvalidArgumentError(
+        StrCat("Invalid FieldMask '", paths,
                      "'. Cannot find matching ']' for all '['."));
   }
   if (!prefix.empty()) {
-    return absl::InvalidArgumentError(
-        absl::StrCat("Invalid FieldMask '", paths,
+    return util::InvalidArgumentError(
+        StrCat("Invalid FieldMask '", paths,
                      "'. Cannot find matching ')' for all '('."));
   }
-  return absl::Status();
+  return util::Status();
 }
 
 }  // namespace converter

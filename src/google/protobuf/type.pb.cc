@@ -119,8 +119,6 @@ const uint32_t TableStruct_google_2fprotobuf_2ftype_2eproto::offsets[] PROTOBUF_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
-  ~0u,  // no _split_
-  ~0u,  // no sizeof(Split)
   PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::Type, _impl_.name_),
   PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::Type, _impl_.fields_),
   PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::Type, _impl_.oneofs_),
@@ -133,8 +131,6 @@ const uint32_t TableStruct_google_2fprotobuf_2ftype_2eproto::offsets[] PROTOBUF_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
-  ~0u,  // no _split_
-  ~0u,  // no sizeof(Split)
   PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::Field, _impl_.kind_),
   PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::Field, _impl_.cardinality_),
   PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::Field, _impl_.number_),
@@ -151,8 +147,6 @@ const uint32_t TableStruct_google_2fprotobuf_2ftype_2eproto::offsets[] PROTOBUF_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
-  ~0u,  // no _split_
-  ~0u,  // no sizeof(Split)
   PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::Enum, _impl_.name_),
   PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::Enum, _impl_.enumvalue_),
   PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::Enum, _impl_.options_),
@@ -164,8 +158,6 @@ const uint32_t TableStruct_google_2fprotobuf_2ftype_2eproto::offsets[] PROTOBUF_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
-  ~0u,  // no _split_
-  ~0u,  // no sizeof(Split)
   PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::EnumValue, _impl_.name_),
   PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::EnumValue, _impl_.number_),
   PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::EnumValue, _impl_.options_),
@@ -175,17 +167,15 @@ const uint32_t TableStruct_google_2fprotobuf_2ftype_2eproto::offsets[] PROTOBUF_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
-  ~0u,  // no _split_
-  ~0u,  // no sizeof(Split)
   PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::Option, _impl_.name_),
   PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::Option, _impl_.value_),
 };
 static const ::_pbi::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, -1, sizeof(::PROTOBUF_NAMESPACE_ID::Type)},
-  { 14, -1, -1, sizeof(::PROTOBUF_NAMESPACE_ID::Field)},
-  { 32, -1, -1, sizeof(::PROTOBUF_NAMESPACE_ID::Enum)},
-  { 45, -1, -1, sizeof(::PROTOBUF_NAMESPACE_ID::EnumValue)},
-  { 56, -1, -1, sizeof(::PROTOBUF_NAMESPACE_ID::Option)},
+  { 12, -1, -1, sizeof(::PROTOBUF_NAMESPACE_ID::Field)},
+  { 28, -1, -1, sizeof(::PROTOBUF_NAMESPACE_ID::Enum)},
+  { 39, -1, -1, sizeof(::PROTOBUF_NAMESPACE_ID::EnumValue)},
+  { 48, -1, -1, sizeof(::PROTOBUF_NAMESPACE_ID::Option)},
 };
 
 static const ::_pb::Message* const file_default_instances[] = {
@@ -242,7 +232,7 @@ static const ::_pbi::DescriptorTable* const descriptor_table_google_2fprotobuf_2
   &::descriptor_table_google_2fprotobuf_2fany_2eproto,
   &::descriptor_table_google_2fprotobuf_2fsource_5fcontext_2eproto,
 };
-static ::absl::once_flag descriptor_table_google_2fprotobuf_2ftype_2eproto_once;
+static ::_pbi::once_flag descriptor_table_google_2fprotobuf_2ftype_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_google_2fprotobuf_2ftype_2eproto = {
     false, false, 1592, descriptor_table_protodef_google_2fprotobuf_2ftype_2eproto,
     "google/protobuf/type.proto",
@@ -531,7 +521,7 @@ const char* Type::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
       // .google.protobuf.Syntax syntax = 6;
       case 6:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 48)) {
-          uint32_t val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+          uint64_t val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
           _internal_set_syntax(static_cast<::PROTOBUF_NAMESPACE_ID::Syntax>(val));
         } else
@@ -895,7 +885,7 @@ const char* Field::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
       // .google.protobuf.Field.Kind kind = 1;
       case 1:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
-          uint32_t val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+          uint64_t val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
           _internal_set_kind(static_cast<::PROTOBUF_NAMESPACE_ID::Field_Kind>(val));
         } else
@@ -904,7 +894,7 @@ const char* Field::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
       // .google.protobuf.Field.Cardinality cardinality = 2;
       case 2:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 16)) {
-          uint32_t val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+          uint64_t val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
           _internal_set_cardinality(static_cast<::PROTOBUF_NAMESPACE_ID::Field_Cardinality>(val));
         } else
@@ -1429,7 +1419,7 @@ const char* Enum::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
       // .google.protobuf.Syntax syntax = 5;
       case 5:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 40)) {
-          uint32_t val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+          uint64_t val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
           _internal_set_syntax(static_cast<::PROTOBUF_NAMESPACE_ID::Syntax>(val));
         } else

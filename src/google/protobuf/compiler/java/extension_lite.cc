@@ -47,9 +47,7 @@ namespace java {
 
 ImmutableExtensionLiteGenerator::ImmutableExtensionLiteGenerator(
     const FieldDescriptor* descriptor, Context* context)
-    : descriptor_(descriptor),
-      name_resolver_(context->GetNameResolver()),
-      context_(context) {
+    : descriptor_(descriptor), name_resolver_(context->GetNameResolver()) {
   if (descriptor_->extension_scope() != NULL) {
     scope_ =
         name_resolver_->GetImmutableClassName(descriptor_->extension_scope());
@@ -64,7 +62,7 @@ void ImmutableExtensionLiteGenerator::Generate(io::Printer* printer) {
   std::map<std::string, std::string> vars;
   const bool kUseImmutableNames = true;
   InitTemplateVars(descriptor_, scope_, kUseImmutableNames, name_resolver_,
-                   &vars, context_);
+                   &vars);
   printer->Print(vars, "public static final int $constant_name$ = $number$;\n");
 
   WriteFieldDocComment(printer, descriptor_);

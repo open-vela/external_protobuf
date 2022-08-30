@@ -40,7 +40,6 @@ namespace google {
 namespace protobuf {
 namespace compiler {
 class AccessInfoMap;
-class SplitMap;
 
 namespace cpp {
 
@@ -59,7 +58,6 @@ struct FieldListenerOptions {
 // Generator options (see generator.cc for a description of each):
 struct Options {
   const AccessInfoMap* access_info_map = nullptr;
-  const SplitMap* split_map = nullptr;
   std::string dllexport_decl;
   std::string runtime_include_base;
   std::string annotation_pragma_name;
@@ -82,10 +80,10 @@ struct Options {
   bool annotate_accessor = false;
   bool unused_field_stripping = false;
   bool unverified_lazy_message_sets = false;
+  bool unverified_lazy = false;
   bool profile_driven_inline_string = true;
   bool message_owned_arena_trial = false;
   bool force_split = false;
-  bool profile_driven_split = true;
 #ifdef PROTOBUF_STABLE_EXPERIMENTS
   bool force_eagerly_verified_lazy = true;
   bool force_inline_string = true;

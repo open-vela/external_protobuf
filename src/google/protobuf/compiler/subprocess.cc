@@ -45,9 +45,7 @@
 
 #include <google/protobuf/stubs/logging.h>
 #include <google/protobuf/stubs/common.h>
-#include "absl/strings/escaping.h"
-#include "absl/strings/substitute.h"
-#include <google/protobuf/io/io_win32.h>
+#include <google/protobuf/stubs/substitute.h>
 #include <google/protobuf/message.h>
 
 namespace google {
@@ -115,7 +113,7 @@ void Subprocess::Start(const std::string& program, SearchMode search_mode) {
   }
 
   // Setup STARTUPINFO to redirect handles.
-  STARTUPINFOW startup_info;
+  STARTUPINFOA startup_info;
   ZeroMemory(&startup_info, sizeof(startup_info));
   startup_info.cb = sizeof(startup_info);
   startup_info.dwFlags = STARTF_USESTDHANDLES;
@@ -127,30 +125,17 @@ void Subprocess::Start(const std::string& program, SearchMode search_mode) {
     GOOGLE_LOG(FATAL) << "GetStdHandle: " << Win32ErrorMessage(GetLastError());
   }
 
-  // get wide string version of program as the path may contain non-ascii characters
-  std::wstring wprogram;
-  if (!io::win32::strings::utf8_to_wcs(program.c_str(), &wprogram)) {
-    GOOGLE_LOG(FATAL) << "utf8_to_wcs: " << Win32ErrorMessage(GetLastError());
-  }
-
   // Invoking cmd.exe allows for '.bat' files from the path as well as '.exe'.
-  std::string command_line = "cmd.exe /c \"" + program + "\"";
-
-  // get wide string version of command line as the path may contain non-ascii characters
-  std::wstring wcommand_line;
-  if (!io::win32::strings::utf8_to_wcs(command_line.c_str(), &wcommand_line)) {
-    GOOGLE_LOG(FATAL) << "utf8_to_wcs: " << Win32ErrorMessage(GetLastError());
-  }
-
   // Using a malloc'ed string because CreateProcess() can mutate its second
   // parameter.
-  wchar_t *wcommand_line_copy = _wcsdup(wcommand_line.c_str());
+  char* command_line =
+      portable_strdup(("cmd.exe /c \"" + program + "\"").c_str());
 
   // Create the process.
   PROCESS_INFORMATION process_info;
 
-  if (CreateProcessW((search_mode == SEARCH_PATH) ? nullptr : wprogram.c_str(),
-                     (search_mode == SEARCH_PATH) ? wcommand_line_copy : NULL,
+  if (CreateProcessA((search_mode == SEARCH_PATH) ? nullptr : program.c_str(),
+                     (search_mode == SEARCH_PATH) ? command_line : nullptr,
                      nullptr,  // process security attributes
                      nullptr,  // thread security attributes
                      TRUE,     // inherit handles?
@@ -170,7 +155,7 @@ void Subprocess::Start(const std::string& program, SearchMode search_mode) {
 
   CloseHandleOrDie(stdin_pipe_read);
   CloseHandleOrDie(stdout_pipe_write);
-  free(wcommand_line_copy);
+  free(command_line);
 }
 
 bool Subprocess::Communicate(const Message& input, Message* output,
@@ -274,12 +259,12 @@ bool Subprocess::Communicate(const Message& input, Message* output,
   child_handle_ = nullptr;
 
   if (exit_code != 0) {
-    *error = absl::Substitute("Plugin failed with status code $0.", exit_code);
+    *error = strings::Substitute("Plugin failed with status code $0.", exit_code);
     return false;
   }
 
   if (!output->ParseFromString(output_data)) {
-    *error = "Plugin output is unparseable: " + absl::CEscape(output_data);
+    *error = "Plugin output is unparseable: " + CEscape(output_data);
     return false;
   }
 
@@ -472,12 +457,12 @@ bool Subprocess::Communicate(const Message& input, Message* output,
     if (WEXITSTATUS(status) != 0) {
       int error_code = WEXITSTATUS(status);
       *error =
-          absl::Substitute("Plugin failed with status code $0.", error_code);
+          strings::Substitute("Plugin failed with status code $0.", error_code);
       return false;
     }
   } else if (WIFSIGNALED(status)) {
     int signal = WTERMSIG(status);
-    *error = absl::Substitute("Plugin killed by signal $0.", signal);
+    *error = strings::Substitute("Plugin killed by signal $0.", signal);
     return false;
   } else {
     *error = "Neither WEXITSTATUS nor WTERMSIG is true?";
@@ -485,7 +470,7 @@ bool Subprocess::Communicate(const Message& input, Message* output,
   }
 
   if (!output->ParseFromString(output_data)) {
-    *error = "Plugin output is unparseable: " + absl::CEscape(output_data);
+    *error = "Plugin output is unparseable: " + CEscape(output_data);
     return false;
   }
 

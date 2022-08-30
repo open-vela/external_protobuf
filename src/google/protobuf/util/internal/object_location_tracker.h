@@ -46,13 +46,14 @@ class ObjectLocationTracker : public LocationTrackerInterface {
  public:
   // Creates an empty location tracker.
   ObjectLocationTracker() {}
-  ObjectLocationTracker(const ObjectLocationTracker&) = delete;
-  ObjectLocationTracker& operator=(const ObjectLocationTracker&) = delete;
 
   ~ObjectLocationTracker() override {}
 
   // Returns empty because nothing is tracked.
   std::string ToString() const override { return ""; }
+
+ private:
+  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(ObjectLocationTracker);
 };
 
 }  // namespace converter

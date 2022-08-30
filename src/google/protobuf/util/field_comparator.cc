@@ -38,6 +38,7 @@
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/message.h>
 #include <google/protobuf/util/message_differencer.h>
+#include <google/protobuf/stubs/map_util.h>
 #include <google/protobuf/stubs/mathutil.h>
 
 namespace google {
@@ -182,23 +183,19 @@ bool SimpleFieldComparator::CompareDoubleOrFloat(const FieldDescriptor& field,
       return true;
     }
     // float_comparison_ == APPROXIMATE covers two use cases.
-    Tolerance* tolerance = nullptr;
-    if (has_default_tolerance_) tolerance = &default_tolerance_;
-
-    auto it = map_tolerance_.find(&field);
-    if (it != map_tolerance_.end()) {
-      tolerance = &it->second;
+    Tolerance* tolerance = FindOrNull(map_tolerance_, &field);
+    if (tolerance == NULL && has_default_tolerance_) {
+      tolerance = &default_tolerance_;
     }
-
-    if (tolerance != nullptr) {
+    if (tolerance == NULL) {
+      return MathUtil::AlmostEquals(value_1, value_2);
+    } else {
       // Use user-provided fraction and margin. Since they are stored as
       // doubles, we explicitly cast them to types of values provided. This
       // is very likely to fail if provided values are not numeric.
       return MathUtil::WithinFractionOrMargin(
           value_1, value_2, static_cast<T>(tolerance->fraction),
           static_cast<T>(tolerance->margin));
-    } else {
-      return MathUtil::AlmostEquals(value_1, value_2);
     }
   }
 }
