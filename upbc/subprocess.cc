@@ -49,16 +49,6 @@
 
 namespace upbc {
 
-namespace {
-char* portable_strdup(const char* s) {
-  char* ns = (char*)malloc(strlen(s) + 1);
-  if (ns != nullptr) {
-    strcpy(ns, s);
-  }
-  return ns;
-}
-}  // namespace
-
 #ifdef _WIN32
 
 static void CloseHandleOrDie(HANDLE handle) {
@@ -287,6 +277,16 @@ Subprocess::~Subprocess() {
     close(child_stdout_);
   }
 }
+
+namespace {
+char* portable_strdup(const char* s) {
+  char* ns = (char*)malloc(strlen(s) + 1);
+  if (ns != nullptr) {
+    strcpy(ns, s);
+  }
+  return ns;
+}
+}  // namespace
 
 void Subprocess::Start(const std::string& program, SearchMode search_mode) {
   // Note that we assume that there are no other threads, thus we don't have to
