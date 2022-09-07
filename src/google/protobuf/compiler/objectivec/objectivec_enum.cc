@@ -35,12 +35,27 @@
 #include <google/protobuf/compiler/objectivec/objectivec_helpers.h>
 #include <google/protobuf/io/printer.h>
 #include <google/protobuf/stubs/strutil.h>
+#include "absl/strings/ascii.h"
+#include "absl/strings/escaping.h"
+#include "absl/strings/str_split.h"
+#include "absl/strings/str_replace.h"
 #include <algorithm> // std::find()
 
 namespace google {
 namespace protobuf {
 namespace compiler {
 namespace objectivec {
+namespace {
+std::string SafelyPrintIntToCode(int v) {
+  if (v == std::numeric_limits<int>::min()) {
+    // Some compilers try to parse -2147483648 as two tokens and then get spicy
+    // about the fact that +2147483648 cannot be represented as an int.
+    return absl::StrCat(v + 1, " - 1");
+  } else {
+    return absl::StrCat(v);
+  }
+}
+}  // namespace
 
 EnumGenerator::EnumGenerator(const EnumDescriptor* descriptor)
     : descriptor_(descriptor),
@@ -128,7 +143,7 @@ void EnumGenerator::GenerateHeader(io::Printer* printer) {
       continue;
     }
     if (all_values_[i]->GetSourceLocation(&location)) {
-      std::string comments = BuildCommentsString(location, true).c_str();
+      std::string comments = BuildCommentsString(location, true);
       if (comments.length() > 0) {
         if (i > 0) {
           printer->Print("\n");
@@ -141,7 +156,7 @@ void EnumGenerator::GenerateHeader(io::Printer* printer) {
         "$name$$deprecated_attribute$ = $value$,\n",
         "name", EnumValueName(all_values_[i]),
         "deprecated_attribute", GetOptionalDeprecatedAttribute(all_values_[i]),
-        "value", StrCat(all_values_[i]->number()));
+        "value", SafelyPrintIntToCode(all_values_[i]->number()));
   }
   printer->Outdent();
   printer->Print(
@@ -195,7 +210,7 @@ void EnumGenerator::GenerateSource(io::Printer* printer) {
   for (int i = 0; i < text_blob.size(); i += kBytesPerLine) {
     printer->Print(
         "\n        \"$data$\"",
-        "data", EscapeTrigraphs(CEscape(text_blob.substr(i, kBytesPerLine))));
+        "data", EscapeTrigraphs(absl::CEscape(text_blob.substr(i, kBytesPerLine))));
   }
   printer->Print(
       ";\n"
@@ -225,7 +240,7 @@ void EnumGenerator::GenerateSource(io::Printer* printer) {
         "                                     enumVerifier:$name$_IsValidValue\n"
         "                              extraTextFormatInfo:extraTextFormatInfo];\n",
         "name", name_,
-        "extraTextFormatInfo", CEscape(text_format_decode_data.Data()));
+        "extraTextFormatInfo", absl::CEscape(text_format_decode_data.Data()));
     }
     printer->Print(
       "    GPBEnumDescriptor *expected = nil;\n"

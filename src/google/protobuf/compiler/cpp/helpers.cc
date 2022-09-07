@@ -34,30 +34,38 @@
 
 #include <google/protobuf/compiler/cpp/helpers.h>
 
+#include <algorithm>
 #include <cstdint>
 #include <functional>
 #include <limits>
 #include <map>
 #include <memory>
 #include <queue>
-#include <unordered_set>
 #include <vector>
 
 #include <google/protobuf/stubs/common.h>
 #include <google/protobuf/stubs/logging.h>
-#include <google/protobuf/descriptor.h>
-#include <google/protobuf/compiler/cpp/names.h>
-#include <google/protobuf/compiler/cpp/options.h>
-#include <google/protobuf/descriptor.pb.h>
 #include <google/protobuf/compiler/scc.h>
 #include <google/protobuf/io/printer.h>
 #include <google/protobuf/io/zero_copy_stream.h>
+#include <google/protobuf/descriptor.h>
 #include <google/protobuf/dynamic_message.h>
 #include <google/protobuf/wire_format.h>
 #include <google/protobuf/wire_format_lite.h>
 #include <google/protobuf/stubs/strutil.h>
-#include <google/protobuf/stubs/substitute.h>
-#include <google/protobuf/stubs/hash.h>
+#include "absl/container/flat_hash_map.h"
+#include "absl/container/flat_hash_set.h"
+#include "absl/strings/ascii.h"
+#include "absl/strings/escaping.h"
+#include "absl/strings/str_cat.h"
+#include "absl/strings/str_replace.h"
+#include "absl/strings/string_view.h"
+#include "absl/strings/substitute.h"
+#include "absl/synchronization/mutex.h"
+#include <google/protobuf/compiler/cpp/names.h>
+#include <google/protobuf/compiler/cpp/options.h>
+#include <google/protobuf/descriptor.pb.h>
+
 
 // Must be last.
 #include <google/protobuf/port_def.inc>
@@ -76,7 +84,8 @@ std::string DotsToColons(const std::string& name) {
   return StringReplace(name, ".", "::", true);
 }
 
-static const char* const kKeywordList[] = {  //
+static const char* const kKeywordList[] = {
+    //
     "NULL",
     "alignas",
     "alignof",
@@ -159,17 +168,32 @@ static const char* const kKeywordList[] = {  //
     "wchar_t",
     "while",
     "xor",
-    "xor_eq"};
+    "xor_eq",
+#ifdef PROTOBUF_FUTURE_CPP20_KEYWORDS  // C++20 keywords.
+    "char8_t",
+    "char16_t",
+    "char32_t",
+    "concept",
+    "consteval",
+    "constinit",
+    "co_await",
+    "co_return",
+    "co_yield",
+    "requires",
+#endif  // !PROTOBUF_FUTURE_BREAKING_CHANGES
+};
 
-static std::unordered_set<std::string>* MakeKeywordsMap() {
-  auto* result = new std::unordered_set<std::string>();
-  for (const auto keyword : kKeywordList) {
-    result->emplace(keyword);
-  }
-  return result;
+const absl::flat_hash_set<std::string>& Keywords() {
+  static const auto* keywords = [] {
+    auto* keywords = new absl::flat_hash_set<std::string>();
+
+    for (const auto keyword : kKeywordList) {
+      keywords->emplace(keyword);
+    }
+    return keywords;
+  }();
+  return *keywords;
 }
-
-static std::unordered_set<std::string>& kKeywords = *MakeKeywordsMap();
 
 std::string IntTypeName(const Options& options, const std::string& type) {
   return type + "_t";
@@ -184,22 +208,6 @@ void SetIntVar(const Options& options, const std::string& type,
 // This is used to determine if message-owned arena will be useful.
 bool AllocExpected(const Descriptor* descriptor) {
   return false;
-}
-
-// Describes different approaches to detect non-canonical int32 encoding. Only
-// kNever or kAlways is eligible for *simple* verification methods.
-enum class VerifyInt32Type {
-  kCustom,  // Only check if field number matches.
-  kNever,   // Do not check.
-  kAlways,  // Always check.
-};
-
-inline VerifySimpleType VerifyInt32TypeToVerifyCustom(VerifyInt32Type t) {
-  static VerifySimpleType kCustomTypes[] = {
-      VerifySimpleType::kCustom, VerifySimpleType::kCustomInt32Never,
-      VerifySimpleType::kCustomInt32Always};
-  return kCustomTypes[static_cast<int32_t>(t) -
-                      static_cast<int32_t>(VerifyInt32Type::kCustom)];
 }
 
 }  // namespace
@@ -399,7 +407,7 @@ std::string QualifiedClassName(const EnumDescriptor* d) {
 
 std::string ExtensionName(const FieldDescriptor* d) {
   if (const Descriptor* scope = d->extension_scope())
-    return StrCat(ClassName(scope), "::", ResolveKeyword(d->name()));
+    return absl::StrCat(ClassName(scope), "::", ResolveKeyword(d->name()));
   return ResolveKeyword(d->name());
 }
 
@@ -494,7 +502,7 @@ std::string SuperClassName(const Descriptor* descriptor,
 }
 
 std::string ResolveKeyword(const std::string& name) {
-  if (kKeywords.count(name) > 0) {
+  if (Keywords().count(name) > 0) {
     return name + "_";
   }
   return name;
@@ -502,23 +510,23 @@ std::string ResolveKeyword(const std::string& name) {
 
 std::string FieldName(const FieldDescriptor* field) {
   std::string result = field->name();
-  LowerString(&result);
-  if (kKeywords.count(result) > 0) {
+  absl::AsciiStrToLower(&result);
+  if (Keywords().count(result) > 0) {
     result.append("_");
   }
   return result;
 }
 
 std::string FieldMemberName(const FieldDescriptor* field, bool split) {
-  StringPiece prefix =
+  absl::string_view prefix =
       IsMapEntryMessage(field->containing_type()) ? "" : "_impl_.";
-  StringPiece split_prefix = split ? "_split_->" : "";
+  absl::string_view split_prefix = split ? "_split_->" : "";
   if (field->real_containing_oneof() == nullptr) {
-    return StrCat(prefix, split_prefix, FieldName(field), "_");
+    return absl::StrCat(prefix, split_prefix, FieldName(field), "_");
   }
   // Oneof fields are never split.
   GOOGLE_CHECK(!split);
-  return StrCat(prefix, field->containing_oneof()->name(), "_.",
+  return absl::StrCat(prefix, field->containing_oneof()->name(), "_.",
                       FieldName(field), "_");
 }
 
@@ -532,12 +540,12 @@ std::string QualifiedOneofCaseConstantName(const FieldDescriptor* field) {
   GOOGLE_DCHECK(field->containing_oneof());
   const std::string qualification =
       QualifiedClassName(field->containing_type());
-  return StrCat(qualification, "::", OneofCaseConstantName(field));
+  return absl::StrCat(qualification, "::", OneofCaseConstantName(field));
 }
 
 std::string EnumValueName(const EnumValueDescriptor* enum_value) {
   std::string result = enum_value->name();
-  if (kKeywords.count(result) > 0) {
+  if (Keywords().count(result) > 0) {
     result.append("_");
   }
   return result;
@@ -577,7 +585,7 @@ std::string FieldConstantName(const FieldDescriptor* field) {
     // This field's camelcase name is not unique.  As a hack, add the field
     // number to the constant name.  This makes the constant rather useless,
     // but what can we do?
-    result += "_" + StrCat(field->number());
+    result += "_" + absl::StrCat(field->number());
   }
 
   return result;
@@ -713,9 +721,9 @@ std::string Int32ToString(int number) {
   if (number == std::numeric_limits<int32_t>::min()) {
     // This needs to be special-cased, see explanation here:
     // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=52661
-    return StrCat(number + 1, " - 1");
+    return absl::StrCat(number + 1, " - 1");
   } else {
-    return StrCat(number);
+    return absl::StrCat(number);
   }
 }
 
@@ -723,13 +731,13 @@ static std::string Int64ToString(int64_t number) {
   if (number == std::numeric_limits<int64_t>::min()) {
     // This needs to be special-cased, see explanation here:
     // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=52661
-    return StrCat("int64_t{", number + 1, "} - 1");
+    return absl::StrCat("int64_t{", number + 1, "} - 1");
   }
-  return StrCat("int64_t{", number, "}");
+  return absl::StrCat("int64_t{", number, "}");
 }
 
 static std::string UInt64ToString(uint64_t number) {
-  return StrCat("uint64_t{", number, "u}");
+  return absl::StrCat("uint64_t{", number, "u}");
 }
 
 std::string DefaultValue(const FieldDescriptor* field) {
@@ -741,7 +749,7 @@ std::string DefaultValue(const Options& options, const FieldDescriptor* field) {
     case FieldDescriptor::CPPTYPE_INT32:
       return Int32ToString(field->default_value_int32());
     case FieldDescriptor::CPPTYPE_UINT32:
-      return StrCat(field->default_value_uint32()) + "u";
+      return absl::StrCat(field->default_value_uint32()) + "u";
     case FieldDescriptor::CPPTYPE_INT64:
       return Int64ToString(field->default_value_int64());
     case FieldDescriptor::CPPTYPE_UINT64:
@@ -782,12 +790,12 @@ std::string DefaultValue(const Options& options, const FieldDescriptor* field) {
     case FieldDescriptor::CPPTYPE_ENUM:
       // Lazy:  Generate a static_cast because we don't have a helper function
       //   that constructs the full name of an enum value.
-      return strings::Substitute(
+      return absl::Substitute(
           "static_cast< $0 >($1)", ClassName(field->enum_type(), true),
           Int32ToString(field->default_value_enum()->number()));
     case FieldDescriptor::CPPTYPE_STRING:
       return "\"" +
-             EscapeTrigraphs(CEscape(field->default_value_string())) +
+             EscapeTrigraphs(absl::CEscape(field->default_value_string())) +
              "\"";
     case FieldDescriptor::CPPTYPE_MESSAGE:
       return "*" + FieldMessageTypeName(field, options) +
@@ -804,13 +812,13 @@ std::string DefaultValue(const Options& options, const FieldDescriptor* field) {
 std::string FilenameIdentifier(const std::string& filename) {
   std::string result;
   for (int i = 0; i < filename.size(); i++) {
-    if (ascii_isalnum(filename[i])) {
+    if (absl::ascii_isalnum(filename[i])) {
       result.push_back(filename[i]);
     } else {
       // Not alphanumeric.  To avoid any possibility of name conflicts we
       // use the hex code for the character.
-      StrAppend(&result, "_",
-                      strings::Hex(static_cast<uint8_t>(filename[i])));
+      absl::StrAppend(&result, "_",
+                      absl::Hex(static_cast<uint8_t>(filename[i])));
     }
   }
   return result;
@@ -826,9 +834,9 @@ std::string QualifiedFileLevelSymbol(const FileDescriptor* file,
                                      const std::string& name,
                                      const Options& options) {
   if (file->package().empty()) {
-    return StrCat("::", name);
+    return absl::StrCat("::", name);
   }
-  return StrCat(Namespace(file, options), "::", name);
+  return absl::StrCat(Namespace(file, options), "::", name);
 }
 
 // Escape C++ trigraphs by escaping question marks to \?
@@ -842,13 +850,13 @@ std::string SafeFunctionName(const Descriptor* descriptor,
                              const std::string& prefix) {
   // Do not use FieldName() since it will escape keywords.
   std::string name = field->name();
-  LowerString(&name);
+  absl::AsciiStrToLower(&name);
   std::string function_name = prefix + name;
   if (descriptor->FindFieldByName(function_name)) {
     // Single underscore will also make it conflicting with the private data
     // member. We use double underscore to escape function names.
     function_name.append("__");
-  } else if (kKeywords.count(name) > 0) {
+  } else if (Keywords().count(name) > 0) {
     // If the field name is a keyword, we append the underscore back to keep it
     // consistent with other function names.
     function_name.append("_");
@@ -856,6 +864,9 @@ std::string SafeFunctionName(const Descriptor* descriptor,
   return function_name;
 }
 
+bool IsProfileDriven(const Options& options) {
+  return options.access_info_map != nullptr;
+}
 bool IsStringInlined(const FieldDescriptor* descriptor,
                      const Options& options) {
   (void)descriptor;
@@ -902,6 +913,13 @@ bool HasLazyFields(const FileDescriptor* file, const Options& options,
 
 bool ShouldSplit(const Descriptor*, const Options&) { return false; }
 bool ShouldSplit(const FieldDescriptor*, const Options&) { return false; }
+
+bool ShouldForceAllocationOnConstruction(const Descriptor* desc,
+                                         const Options& options) {
+  (void)desc;
+  (void)options;
+  return false;
+}
 
 static bool HasRepeatedFields(const Descriptor* descriptor) {
   for (int i = 0; i < descriptor->field_count(); ++i) {
@@ -1041,7 +1059,7 @@ bool ShouldVerify(const FileDescriptor* file, const Options& options,
 
 bool IsUtf8String(const FieldDescriptor* field) {
   return IsProto3(field->file()) &&
-      field->type() == FieldDescriptor::TYPE_STRING;
+         field->type() == FieldDescriptor::TYPE_STRING;
 }
 
 VerifySimpleType ShouldVerifySimple(const Descriptor* descriptor) {
@@ -1091,7 +1109,7 @@ bool IsAnyMessage(const Descriptor* descriptor, const Options& options) {
 }
 
 bool IsWellKnownMessage(const FileDescriptor* file) {
-  static const std::unordered_set<std::string> well_known_files{
+  static const auto* well_known_files = new absl::flat_hash_set<std::string>{
       "google/protobuf/any.proto",
       "google/protobuf/api.proto",
       "google/protobuf/compiler/plugin.proto",
@@ -1105,32 +1123,7 @@ bool IsWellKnownMessage(const FileDescriptor* file) {
       "google/protobuf/type.proto",
       "google/protobuf/wrappers.proto",
   };
-  return well_known_files.find(file->name()) != well_known_files.end();
-}
-
-static bool FieldEnforceUtf8(const FieldDescriptor* field,
-                             const Options& options) {
-  return true;
-}
-
-static bool FileUtf8Verification(const FileDescriptor* file,
-                                 const Options& options) {
-  return true;
-}
-
-// Which level of UTF-8 enforcemant is placed on this file.
-Utf8CheckMode GetUtf8CheckMode(const FieldDescriptor* field,
-                               const Options& options) {
-  if (field->file()->syntax() == FileDescriptor::SYNTAX_PROTO3 &&
-      FieldEnforceUtf8(field, options)) {
-    return Utf8CheckMode::kStrict;
-  } else if (GetOptimizeFor(field->file(), options) !=
-                 FileOptions::LITE_RUNTIME &&
-             FileUtf8Verification(field->file(), options)) {
-    return Utf8CheckMode::kVerify;
-  } else {
-    return Utf8CheckMode::kNone;
-  }
+  return well_known_files->find(file->name()) != well_known_files->end();
 }
 
 static void GenerateUtf8CheckCode(const FieldDescriptor* field,
@@ -1139,8 +1132,10 @@ static void GenerateUtf8CheckCode(const FieldDescriptor* field,
                                   const char* strict_function,
                                   const char* verify_function,
                                   const Formatter& format) {
-  switch (GetUtf8CheckMode(field, options)) {
-    case Utf8CheckMode::kStrict: {
+  switch (internal::cpp::GetUtf8CheckMode(
+      field,
+      GetOptimizeFor(field->file(), options) == FileOptions::LITE_RUNTIME)) {
+    case internal::cpp::Utf8CheckMode::kStrict: {
       if (for_parse) {
         format("DO_(");
       }
@@ -1160,7 +1155,7 @@ static void GenerateUtf8CheckCode(const FieldDescriptor* field,
       format.Outdent();
       break;
     }
-    case Utf8CheckMode::kVerify: {
+    case internal::cpp::Utf8CheckMode::kVerify: {
       format("::$proto_ns$::internal::WireFormat::$1$(\n", verify_function);
       format.Indent();
       format(parameters);
@@ -1173,7 +1168,7 @@ static void GenerateUtf8CheckCode(const FieldDescriptor* field,
       format.Outdent();
       break;
     }
-    case Utf8CheckMode::kNone:
+    case internal::cpp::Utf8CheckMode::kNone:
       break;
   }
 }
@@ -1343,16 +1338,19 @@ bool GetBootstrapBasename(const Options& options, const std::string& basename,
     return false;
   }
 
-  std::unordered_map<std::string, std::string> bootstrap_mapping{
-      {"net/proto2/proto/descriptor",
-       "third_party/protobuf/descriptor"},
-      {"net/proto2/compiler/proto/plugin",
-       "net/proto2/compiler/proto/plugin"},
-      {"net/proto2/compiler/proto/profile",
-       "net/proto2/compiler/proto/profile_bootstrap"},
-  };
-  auto iter = bootstrap_mapping.find(basename);
-  if (iter == bootstrap_mapping.end()) {
+  static const auto* bootstrap_mapping =
+      // TODO(b/242858704) Replace these with string_view once we remove
+      // StringPiece.
+      new absl::flat_hash_map<std::string, std::string>{
+          {"net/proto2/proto/descriptor",
+           "third_party/protobuf/descriptor"},
+          {"net/proto2/compiler/proto/plugin",
+           "net/proto2/compiler/proto/plugin"},
+          {"net/proto2/compiler/proto/profile",
+           "net/proto2/compiler/proto/profile_bootstrap"},
+      };
+  auto iter = bootstrap_mapping->find(basename);
+  if (iter == bootstrap_mapping->end()) {
     *bootstrap_basename = basename;
     return false;
   } else {
@@ -1488,9 +1486,18 @@ static bool HasExtensionFromFile(const Message& msg, const FileDescriptor* file,
 static bool HasBootstrapProblem(const FileDescriptor* file,
                                 const Options& options,
                                 bool* has_opt_codesize_extension) {
-  static auto& cache = *new std::unordered_map<const FileDescriptor*, bool>;
-  auto it = cache.find(file);
-  if (it != cache.end()) return it->second;
+  struct BoostrapGlobals {
+    absl::Mutex mutex;
+    absl::flat_hash_set<const FileDescriptor*> cached ABSL_GUARDED_BY(mutex);
+    absl::flat_hash_set<const FileDescriptor*> non_cached
+        ABSL_GUARDED_BY(mutex);
+  };
+  static auto& bootstrap_cache = *new BoostrapGlobals();
+
+  absl::MutexLock lock(&bootstrap_cache.mutex);
+  if (bootstrap_cache.cached.contains(file)) return true;
+  if (bootstrap_cache.non_cached.contains(file)) return false;
+
   // In order to build the data structures for the reflective parse, it needs
   // to parse the serialized descriptor describing all the messages defined in
   // this file. Obviously this presents a bootstrap problem for descriptor
@@ -1526,9 +1533,13 @@ static bool HasBootstrapProblem(const FileDescriptor* file,
   Message* fd_proto = factory.GetPrototype(fd_proto_descriptor)->New();
   fd_proto->ParseFromString(linkedin_fd_proto.SerializeAsString());
 
-  bool& res = cache[file];
-  res = HasExtensionFromFile(*fd_proto, file, options,
-                             has_opt_codesize_extension);
+  bool res = HasExtensionFromFile(*fd_proto, file, options,
+                                  has_opt_codesize_extension);
+  if (res) {
+    bootstrap_cache.cached.insert(file);
+  } else {
+    bootstrap_cache.non_cached.insert(file);
+  }
   delete fd_proto;
   return res;
 }

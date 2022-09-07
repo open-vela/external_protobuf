@@ -62,6 +62,10 @@ class ImmutablePrimitiveFieldLiteGenerator
  public:
   explicit ImmutablePrimitiveFieldLiteGenerator(
       const FieldDescriptor* descriptor, int messageBitIndex, Context* context);
+  ImmutablePrimitiveFieldLiteGenerator(
+      const ImmutablePrimitiveFieldLiteGenerator&) = delete;
+  ImmutablePrimitiveFieldLiteGenerator& operator=(
+      const ImmutablePrimitiveFieldLiteGenerator&) = delete;
   ~ImmutablePrimitiveFieldLiteGenerator() override;
 
   // implements ImmutableFieldLiteGenerator
@@ -81,10 +85,8 @@ class ImmutablePrimitiveFieldLiteGenerator
   const FieldDescriptor* descriptor_;
   std::map<std::string, std::string> variables_;
   const int messageBitIndex_;
+  Context* context_;
   ClassNameResolver* name_resolver_;
-
- private:
-  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(ImmutablePrimitiveFieldLiteGenerator);
 };
 
 class ImmutablePrimitiveOneofFieldLiteGenerator
@@ -93,6 +95,10 @@ class ImmutablePrimitiveOneofFieldLiteGenerator
   ImmutablePrimitiveOneofFieldLiteGenerator(const FieldDescriptor* descriptor,
                                             int messageBitIndex,
                                             Context* context);
+  ImmutablePrimitiveOneofFieldLiteGenerator(
+      const ImmutablePrimitiveOneofFieldLiteGenerator&) = delete;
+  ImmutablePrimitiveOneofFieldLiteGenerator& operator=(
+      const ImmutablePrimitiveOneofFieldLiteGenerator&) = delete;
   ~ImmutablePrimitiveOneofFieldLiteGenerator() override;
 
   void GenerateMembers(io::Printer* printer) const override;
@@ -100,9 +106,6 @@ class ImmutablePrimitiveOneofFieldLiteGenerator
 
   void GenerateFieldInfo(io::Printer* printer,
                          std::vector<uint16_t>* output) const override;
-
- private:
-  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(ImmutablePrimitiveOneofFieldLiteGenerator);
 };
 
 class RepeatedImmutablePrimitiveFieldLiteGenerator
@@ -110,6 +113,10 @@ class RepeatedImmutablePrimitiveFieldLiteGenerator
  public:
   explicit RepeatedImmutablePrimitiveFieldLiteGenerator(
       const FieldDescriptor* descriptor, int messageBitIndex, Context* context);
+  RepeatedImmutablePrimitiveFieldLiteGenerator(
+      const RepeatedImmutablePrimitiveFieldLiteGenerator&) = delete;
+  RepeatedImmutablePrimitiveFieldLiteGenerator& operator=(
+      const RepeatedImmutablePrimitiveFieldLiteGenerator&) = delete;
   ~RepeatedImmutablePrimitiveFieldLiteGenerator() override;
 
   // implements ImmutableFieldLiteGenerator ------------------------------------
@@ -129,8 +136,6 @@ class RepeatedImmutablePrimitiveFieldLiteGenerator
   std::map<std::string, std::string> variables_;
   Context* context_;
   ClassNameResolver* name_resolver_;
-
-  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(RepeatedImmutablePrimitiveFieldLiteGenerator);
 };
 
 }  // namespace java

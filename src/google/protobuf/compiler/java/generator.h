@@ -55,6 +55,8 @@ namespace java {
 class PROTOC_EXPORT JavaGenerator : public CodeGenerator {
  public:
   JavaGenerator();
+  JavaGenerator(const JavaGenerator&) = delete;
+  JavaGenerator& operator=(const JavaGenerator&) = delete;
   ~JavaGenerator() override;
 
   // implements CodeGenerator ----------------------------------------
@@ -63,8 +65,12 @@ class PROTOC_EXPORT JavaGenerator : public CodeGenerator {
 
   uint64_t GetSupportedFeatures() const override;
 
+  void set_opensource_runtime(bool opensource) {
+    opensource_runtime_ = opensource;
+  }
+
  private:
-  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(JavaGenerator);
+  bool opensource_runtime_ = PROTO2_IS_OSS;
 };
 
 }  // namespace java
