@@ -36,6 +36,7 @@
 
 #include <google/protobuf/io/printer.h>
 #include <google/protobuf/stubs/strutil.h>
+#include "absl/strings/str_cat.h"
 #include <google/protobuf/compiler/java/context.h>
 #include <google/protobuf/compiler/java/doc_comment.h>
 #include <google/protobuf/compiler/java/helpers.h>
@@ -51,7 +52,9 @@ namespace java {
 
 ImmutableExtensionGenerator::ImmutableExtensionGenerator(
     const FieldDescriptor* descriptor, Context* context)
-    : descriptor_(descriptor), name_resolver_(context->GetNameResolver()) {
+    : descriptor_(descriptor),
+      name_resolver_(context->GetNameResolver()),
+      context_(context) {
   if (descriptor_->extension_scope() != NULL) {
     scope_ =
         name_resolver_->GetImmutableClassName(descriptor_->extension_scope());
@@ -66,18 +69,19 @@ ImmutableExtensionGenerator::~ImmutableExtensionGenerator() {}
 void ExtensionGenerator::InitTemplateVars(
     const FieldDescriptor* descriptor, const std::string& scope, bool immutable,
     ClassNameResolver* name_resolver,
-    std::map<std::string, std::string>* vars_pointer) {
+    std::map<std::string, std::string>* vars_pointer, Context* context) {
   std::map<std::string, std::string>& vars = *vars_pointer;
   vars["scope"] = scope;
   vars["name"] = UnderscoresToCamelCaseCheckReserved(descriptor);
   vars["containing_type"] =
       name_resolver->GetClassName(descriptor->containing_type(), immutable);
-  vars["number"] = StrCat(descriptor->number());
+  vars["number"] = absl::StrCat(descriptor->number());
   vars["constant_name"] = FieldConstantName(descriptor);
-  vars["index"] = StrCat(descriptor->index());
+  vars["index"] = absl::StrCat(descriptor->index());
   vars["default"] = descriptor->is_repeated()
                         ? ""
-                        : DefaultValue(descriptor, immutable, name_resolver);
+                        : DefaultValue(descriptor, immutable, name_resolver,
+                                       context->options());
   vars["type_constant"] = FieldTypeName(GetType(descriptor));
   vars["packed"] = descriptor->is_packed() ? "true" : "false";
   vars["enum_map"] = "null";
@@ -116,7 +120,7 @@ void ImmutableExtensionGenerator::Generate(io::Printer* printer) {
   std::map<std::string, std::string> vars;
   const bool kUseImmutableNames = true;
   InitTemplateVars(descriptor_, scope_, kUseImmutableNames, name_resolver_,
-                   &vars);
+                   &vars, context_);
   printer->Print(vars, "public static final int $constant_name$ = $number$;\n");
 
   WriteFieldDocComment(printer, descriptor_);
@@ -156,7 +160,7 @@ int ImmutableExtensionGenerator::GenerateNonNestedInitializationCode(
     printer->Print(
         "$name$.internalInit(descriptor.getExtensions().get($index$));\n",
         "name", UnderscoresToCamelCaseCheckReserved(descriptor_), "index",
-        StrCat(descriptor_->index()));
+        absl::StrCat(descriptor_->index()));
     bytecode_estimate += 21;
   }
   return bytecode_estimate;

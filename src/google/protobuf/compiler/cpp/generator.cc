@@ -42,6 +42,8 @@
 #include <google/protobuf/stubs/strutil.h>
 #include <google/protobuf/io/printer.h>
 #include <google/protobuf/io/zero_copy_stream.h>
+#include "absl/strings/str_cat.h"
+#include "absl/strings/str_replace.h"
 #include <google/protobuf/compiler/cpp/file.h>
 #include <google/protobuf/compiler/cpp/helpers.h>
 #include <google/protobuf/descriptor.pb.h>
@@ -56,7 +58,7 @@ CppGenerator::~CppGenerator() {}
 
 namespace {
 std::string NumberedCcFileName(const std::string& basename, int number) {
-  return StrCat(basename, ".out/", number, ".cc");
+  return absl::StrCat(basename, ".out/", number, ".cc");
 }
 }  // namespace
 
@@ -135,8 +137,6 @@ bool CppGenerator::Generate(const FileDescriptor* file,
               .insert(options[i].second.substr(pos, next_pos - pos));
         pos = next_pos + 1;
       } while (pos < options[i].second.size());
-    } else if (options[i].first == "verified_lazy") {
-      file_options.unverified_lazy = false;
     } else if (options[i].first == "unverified_lazy_message_sets") {
       file_options.unverified_lazy_message_sets = true;
     } else if (options[i].first == "message_owned_arena_trial") {

@@ -47,6 +47,8 @@ const uint32_t TableStruct_google_2fprotobuf_2ftimestamp_2eproto::offsets[] PROT
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
+  ~0u,  // no _split_
+  ~0u,  // no sizeof(Split)
   PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::Timestamp, _impl_.seconds_),
   PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::Timestamp, _impl_.nanos_),
 };
@@ -66,7 +68,7 @@ const char descriptor_table_protodef_google_2fprotobuf_2ftimestamp_2eproto[] PRO
   "tobuf/types/known/timestamppb\370\001\001\242\002\003GPB\252\002"
   "\036Google.Protobuf.WellKnownTypesb\006proto3"
   ;
-static ::_pbi::once_flag descriptor_table_google_2fprotobuf_2ftimestamp_2eproto_once;
+static ::absl::once_flag descriptor_table_google_2fprotobuf_2ftimestamp_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_google_2fprotobuf_2ftimestamp_2eproto = {
     false, false, 239, descriptor_table_protodef_google_2fprotobuf_2ftimestamp_2eproto,
     "google/protobuf/timestamp.proto",

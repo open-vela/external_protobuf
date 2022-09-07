@@ -40,7 +40,6 @@
 #include <string>
 #include <unordered_map>
 
-#include <google/protobuf/io/coded_stream.h>
 #include <google/protobuf/descriptor.pb.h>
 #include <google/protobuf/dynamic_message.h>
 #include <google/protobuf/pyext/descriptor_containers.h>
@@ -48,7 +47,8 @@
 #include <google/protobuf/pyext/message.h>
 #include <google/protobuf/pyext/message_factory.h>
 #include <google/protobuf/pyext/scoped_pyobject_ptr.h>
-#include <google/protobuf/stubs/hash.h>
+#include "absl/strings/string_view.h"
+#include <google/protobuf/io/coded_stream.h>
 
 #define PyString_AsStringAndSize(ob, charpp, sizep)              \
   (PyUnicode_Check(ob)                                           \
@@ -490,6 +490,12 @@ static PyObject* GetConcreteClass(PyBaseDescriptor* self, void *closure) {
       GetDescriptorPool_FromPool(
           _GetDescriptor(self)->file()->pool())->py_message_factory,
       _GetDescriptor(self)));
+
+  if (concrete_class == nullptr) {
+    PyErr_Clear();
+    return nullptr;
+  }
+
   Py_XINCREF(concrete_class);
   return concrete_class->AsPyObject();
 }
@@ -1741,7 +1747,8 @@ static PyObject* FindMethodByName(PyBaseDescriptor *self, PyObject* arg) {
   }
 
   const MethodDescriptor* method_descriptor =
-      _GetDescriptor(self)->FindMethodByName(StringParam(name, name_size));
+      _GetDescriptor(self)->FindMethodByName(
+          absl::string_view(name, name_size));
   if (method_descriptor == nullptr) {
     PyErr_Format(PyExc_KeyError, "Couldn't find method %.200s", name);
     return nullptr;

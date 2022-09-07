@@ -40,7 +40,7 @@
 #include <google/protobuf/io/zero_copy_stream.h>
 #include <google/protobuf/arena.h>
 #include <google/protobuf/port.h>
-#include <google/protobuf/stubs/strutil.h>
+#include "absl/strings/string_view.h"
 #include <google/protobuf/arenastring.h>
 #include <google/protobuf/endian.h>
 #include <google/protobuf/implicit_weak_message.h>
@@ -64,11 +64,11 @@ namespace internal {
 
 // Template code below needs to know about the existence of these functions.
 PROTOBUF_EXPORT void WriteVarint(uint32_t num, uint64_t val, std::string* s);
-PROTOBUF_EXPORT void WriteLengthDelimited(uint32_t num, StringPiece val,
+PROTOBUF_EXPORT void WriteLengthDelimited(uint32_t num, absl::string_view val,
                                           std::string* s);
 // Inline because it is just forwarding to s->WriteVarint
 inline void WriteVarint(uint32_t num, uint64_t val, UnknownFieldSet* s);
-inline void WriteLengthDelimited(uint32_t num, StringPiece val,
+inline void WriteLengthDelimited(uint32_t num, absl::string_view val,
                                  UnknownFieldSet* s);
 
 
@@ -204,6 +204,10 @@ class PROTOBUF_EXPORT EpsCopyInputStream {
   int BytesUntilLimit(const char* ptr) const {
     return limit_ + static_cast<int>(buffer_end_ - ptr);
   }
+  // Maximum number of sequential bytes that can be read starting from `ptr`.
+  int MaximumReadSize(const char* ptr) const {
+    return static_cast<int>(limit_end_ - ptr) + kSlopBytes;
+  }
   // Returns true if more data is available, if false is returned one has to
   // call Done for further checks.
   bool DataAvailable(const char* ptr) { return ptr < limit_end_; }
@@ -229,7 +233,7 @@ class PROTOBUF_EXPORT EpsCopyInputStream {
     return res.second;
   }
 
-  const char* InitFrom(StringPiece flat) {
+  const char* InitFrom(absl::string_view flat) {
     overall_limit_ = 0;
     if (flat.size() > kSlopBytes) {
       limit_ = kSlopBytes;
@@ -387,7 +391,6 @@ class PROTOBUF_EXPORT ParseContext : public EpsCopyInputStream {
   struct Data {
     const DescriptorPool* pool = nullptr;
     MessageFactory* factory = nullptr;
-    Arena* arena = nullptr;
   };
 
   template <typename... T>
@@ -427,12 +430,35 @@ class PROTOBUF_EXPORT ParseContext : public EpsCopyInputStream {
                                     bool>::type = true>
   PROTOBUF_NODISCARD const char* ParseMessage(T* msg, const char* ptr);
 
+  template <typename TcParser, typename Table>
+  PROTOBUF_NODISCARD PROTOBUF_ALWAYS_INLINE const char* ParseMessage(
+      MessageLite* msg, const char* ptr, const Table* table) {
+    int old;
+    ptr = ReadSizeAndPushLimitAndDepthInlined(ptr, &old);
+    ptr = ptr ? TcParser::ParseLoop(msg, ptr, this, table) : nullptr;
+    depth_++;
+    if (!PopLimit(old)) return nullptr;
+    return ptr;
+  }
+
   template <typename T>
   PROTOBUF_NODISCARD PROTOBUF_NDEBUG_INLINE const char* ParseGroup(
       T* msg, const char* ptr, uint32_t tag) {
     if (--depth_ < 0) return nullptr;
     group_depth_++;
     ptr = msg->_InternalParse(ptr, this);
+    group_depth_--;
+    depth_++;
+    if (PROTOBUF_PREDICT_FALSE(!ConsumeEndGroup(tag))) return nullptr;
+    return ptr;
+  }
+
+  template <typename TcParser, typename Table>
+  PROTOBUF_NODISCARD PROTOBUF_ALWAYS_INLINE const char* ParseGroup(
+      MessageLite* msg, const char* ptr, uint32_t tag, const Table* table) {
+    if (--depth_ < 0) return nullptr;
+    group_depth_++;
+    ptr = TcParser::ParseLoop(msg, ptr, this, table);
     group_depth_--;
     depth_++;
     if (PROTOBUF_PREDICT_FALSE(!ConsumeEndGroup(tag))) return nullptr;
@@ -450,6 +476,11 @@ class PROTOBUF_EXPORT ParseContext : public EpsCopyInputStream {
   //   if (--depth_ < 0) return nullptr;
   PROTOBUF_NODISCARD const char* ReadSizeAndPushLimitAndDepth(const char* ptr,
                                                               int* old_limit);
+
+  // As above, but fully inlined for the cases where we care about performance
+  // more than size. eg TcParser.
+  PROTOBUF_NODISCARD PROTOBUF_ALWAYS_INLINE const char*
+  ReadSizeAndPushLimitAndDepthInlined(const char* ptr, int* old_limit);
 
   // The context keeps an internal stack to keep track of the recursive
   // part of the parse state.
@@ -590,6 +621,7 @@ PROTOBUF_NODISCARD PROTOBUF_ALWAYS_INLINE constexpr T RotateLeft(
 
 PROTOBUF_NODISCARD inline PROTOBUF_ALWAYS_INLINE uint64_t
 RotRight7AndReplaceLowByte(uint64_t res, const char& byte) {
+  // TODO(b/239808098): remove the inline assembly
 #if defined(__x86_64__) && defined(__GNUC__)
   // This will only use one register for `res`.
   // `byte` comes as a reference to allow the compiler to generate code like:
@@ -749,9 +781,23 @@ PROTOBUF_NODISCARD const char* ParseContext::ParseMessage(T* msg,
                                                           const char* ptr) {
   int old;
   ptr = ReadSizeAndPushLimitAndDepth(ptr, &old);
-  ptr = ptr ? msg->_InternalParse(ptr, this) : nullptr;
+  if (ptr == nullptr) return ptr;
+  ptr = msg->_InternalParse(ptr, this);
   depth_++;
   if (!PopLimit(old)) return nullptr;
+  return ptr;
+}
+
+inline const char* ParseContext::ReadSizeAndPushLimitAndDepthInlined(
+    const char* ptr, int* old_limit) {
+  int size = ReadSize(&ptr);
+  if (PROTOBUF_PREDICT_FALSE(!ptr)) {
+    // Make sure this isn't uninitialized even on error return
+    *old_limit = 0;
+    return nullptr;
+  }
+  *old_limit = PushLimit(ptr, size);
+  if (--depth_ < 0) return nullptr;
   return ptr;
 }
 
@@ -867,7 +913,7 @@ const char* EpsCopyInputStream::ReadPackedVarint(const char* ptr, Add add) {
 
 // Helper for verification of utf8
 PROTOBUF_EXPORT
-bool VerifyUTF8(StringPiece s, const char* field_name);
+bool VerifyUTF8(absl::string_view s, const char* field_name);
 
 inline bool VerifyUTF8(const std::string* s, const char* field_name) {
   return VerifyUTF8(*s, field_name);

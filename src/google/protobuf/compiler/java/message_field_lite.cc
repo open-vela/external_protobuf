@@ -41,6 +41,7 @@
 #include <google/protobuf/io/printer.h>
 #include <google/protobuf/wire_format.h>
 #include <google/protobuf/stubs/strutil.h>
+#include "absl/strings/str_cat.h"
 #include <google/protobuf/compiler/java/context.h>
 #include <google/protobuf/compiler/java/doc_comment.h>
 #include <google/protobuf/compiler/java/helpers.h>
@@ -59,12 +60,13 @@ namespace {
 void SetMessageVariables(const FieldDescriptor* descriptor, int messageBitIndex,
                          int builderBitIndex, const FieldGeneratorInfo* info,
                          ClassNameResolver* name_resolver,
-                         std::map<std::string, std::string>* variables) {
+                         std::map<std::string, std::string>* variables,
+                         Context* context) {
   SetCommonFieldVariables(descriptor, info, variables);
 
   (*variables)["type"] =
       name_resolver->GetImmutableClassName(descriptor->message_type());
-  (*variables)["kt_type"] = (*variables)["type"];
+  (*variables)["kt_type"] = EscapeKotlinKeywords((*variables)["type"]);
   (*variables)["mutable_type"] =
       name_resolver->GetMutableClassName(descriptor->message_type());
   (*variables)["group_or_message"] =
@@ -118,10 +120,11 @@ ImmutableMessageFieldLiteGenerator::ImmutableMessageFieldLiteGenerator(
     const FieldDescriptor* descriptor, int messageBitIndex, Context* context)
     : descriptor_(descriptor),
       messageBitIndex_(messageBitIndex),
-      name_resolver_(context->GetNameResolver()) {
+      name_resolver_(context->GetNameResolver()),
+      context_(context) {
   SetMessageVariables(descriptor, messageBitIndex, 0,
                       context->GetFieldGeneratorInfo(descriptor),
-                      name_resolver_, &variables_);
+                      name_resolver_, &variables_, context);
 }
 
 ImmutableMessageFieldLiteGenerator::~ImmutableMessageFieldLiteGenerator() {}
@@ -288,7 +291,7 @@ void ImmutableMessageFieldLiteGenerator::GenerateBuilderMembers(
 
 void ImmutableMessageFieldLiteGenerator::GenerateKotlinDslMembers(
     io::Printer* printer) const {
-  WriteFieldDocComment(printer, descriptor_);
+  WriteFieldDocComment(printer, descriptor_, /* kdoc */ true);
   printer->Print(variables_,
                  "$kt_deprecation$var $kt_name$: $kt_type$\n"
                  "  @JvmName(\"${$get$kt_capitalized_name$$}$\")\n"
@@ -299,13 +302,14 @@ void ImmutableMessageFieldLiteGenerator::GenerateKotlinDslMembers(
                  "  }\n");
 
   WriteFieldAccessorDocComment(printer, descriptor_, CLEARER,
-                               /* builder */ false);
+                               /* builder */ false, /* kdoc */ true);
   printer->Print(variables_,
                  "fun ${$clear$kt_capitalized_name$$}$() {\n"
                  "  $kt_dsl_builder$.${$clear$capitalized_name$$}$()\n"
                  "}\n");
 
-  WriteFieldAccessorDocComment(printer, descriptor_, HAZZER);
+  WriteFieldAccessorDocComment(printer, descriptor_, HAZZER,
+                               /* builder */ false, /* kdoc */ true);
   printer->Print(
       variables_,
       "fun ${$has$kt_capitalized_name$$}$(): kotlin.Boolean {\n"
@@ -495,10 +499,12 @@ RepeatedImmutableMessageFieldLiteGenerator::
     RepeatedImmutableMessageFieldLiteGenerator(
         const FieldDescriptor* descriptor, int messageBitIndex,
         Context* context)
-    : descriptor_(descriptor), name_resolver_(context->GetNameResolver()) {
+    : descriptor_(descriptor),
+      name_resolver_(context->GetNameResolver()),
+      context_(context) {
   SetMessageVariables(descriptor, messageBitIndex, 0,
                       context->GetFieldGeneratorInfo(descriptor),
-                      name_resolver_, &variables_);
+                      name_resolver_, &variables_, context);
 }
 
 RepeatedImmutableMessageFieldLiteGenerator::
@@ -528,6 +534,13 @@ void RepeatedImmutableMessageFieldLiteGenerator::GenerateInterfaceMembers(
 
 void RepeatedImmutableMessageFieldLiteGenerator::GenerateMembers(
     io::Printer* printer) const {
+  if (!context_->options().opensource_runtime) {
+    printer->Print(
+        variables_,
+        "@com.google.protobuf.ProtoField(\n"
+        "  fieldNumber=$number$,\n"
+        "  type=com.google.protobuf.FieldType.$annotation_field_type$)\n");
+  }
   printer->Print(
       variables_,
       "private com.google.protobuf.Internal.ProtobufList<$type$> $name$_;\n");
@@ -809,7 +822,7 @@ void RepeatedImmutableMessageFieldLiteGenerator::GenerateKotlinDslMembers(
       "class ${$$kt_capitalized_name$Proxy$}$ private constructor()"
       " : com.google.protobuf.kotlin.DslProxy()\n");
 
-  WriteFieldDocComment(printer, descriptor_);
+  WriteFieldDocComment(printer, descriptor_, /* kdoc */ true);
   printer->Print(variables_,
                  "$kt_deprecation$ val $kt_name$: "
                  "com.google.protobuf.kotlin.DslList"
@@ -820,7 +833,7 @@ void RepeatedImmutableMessageFieldLiteGenerator::GenerateKotlinDslMembers(
                  "  )\n");
 
   WriteFieldAccessorDocComment(printer, descriptor_, LIST_ADDER,
-                               /* builder */ false);
+                               /* builder */ false, /* kdoc */ true);
   printer->Print(variables_,
                  "@kotlin.jvm.JvmSynthetic\n"
                  "@kotlin.jvm.JvmName(\"add$kt_capitalized_name$\")\n"
@@ -831,7 +844,7 @@ void RepeatedImmutableMessageFieldLiteGenerator::GenerateKotlinDslMembers(
                  "}\n");
 
   WriteFieldAccessorDocComment(printer, descriptor_, LIST_ADDER,
-                               /* builder */ false);
+                               /* builder */ false, /* kdoc */ true);
   printer->Print(variables_,
                  "@kotlin.jvm.JvmSynthetic\n"
                  "@kotlin.jvm.JvmName(\"plusAssign$kt_capitalized_name$\")\n"
@@ -843,7 +856,7 @@ void RepeatedImmutableMessageFieldLiteGenerator::GenerateKotlinDslMembers(
                  "}\n");
 
   WriteFieldAccessorDocComment(printer, descriptor_, LIST_MULTI_ADDER,
-                               /* builder */ false);
+                               /* builder */ false, /* kdoc */ true);
   printer->Print(variables_,
                  "@kotlin.jvm.JvmSynthetic\n"
                  "@kotlin.jvm.JvmName(\"addAll$kt_capitalized_name$\")\n"
@@ -854,7 +867,7 @@ void RepeatedImmutableMessageFieldLiteGenerator::GenerateKotlinDslMembers(
                  "}\n");
 
   WriteFieldAccessorDocComment(printer, descriptor_, LIST_MULTI_ADDER,
-                               /* builder */ false);
+                               /* builder */ false, /* kdoc */ true);
   printer->Print(
       variables_,
       "@kotlin.jvm.JvmSynthetic\n"
@@ -867,7 +880,7 @@ void RepeatedImmutableMessageFieldLiteGenerator::GenerateKotlinDslMembers(
       "}\n");
 
   WriteFieldAccessorDocComment(printer, descriptor_, LIST_INDEXED_SETTER,
-                               /* builder */ false);
+                               /* builder */ false, /* kdoc */ true);
   printer->Print(
       variables_,
       "@kotlin.jvm.JvmSynthetic\n"
@@ -879,7 +892,7 @@ void RepeatedImmutableMessageFieldLiteGenerator::GenerateKotlinDslMembers(
       "}\n");
 
   WriteFieldAccessorDocComment(printer, descriptor_, CLEARER,
-                               /* builder */ false);
+                               /* builder */ false, /* kdoc */ true);
   printer->Print(variables_,
                  "@kotlin.jvm.JvmSynthetic\n"
                  "@kotlin.jvm.JvmName(\"clear$kt_capitalized_name$\")\n"

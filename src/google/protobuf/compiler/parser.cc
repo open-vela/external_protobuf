@@ -40,27 +40,29 @@
 
 #include <cstdint>
 #include <limits>
+#include <tuple>
 #include <unordered_map>
 #include <unordered_set>
 
-#include <google/protobuf/stubs/casts.h>
 #include <google/protobuf/stubs/logging.h>
 #include <google/protobuf/stubs/common.h>
 #include <google/protobuf/stubs/strutil.h>
+#include "absl/base/casts.h"
+#include "absl/strings/ascii.h"
+#include "absl/strings/escaping.h"
+#include "absl/strings/str_cat.h"
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/descriptor.pb.h>
 #include <google/protobuf/io/tokenizer.h>
+#include <google/protobuf/port.h>
 #include <google/protobuf/wire_format.h>
-#include <google/protobuf/stubs/map_util.h>
-#include <google/protobuf/stubs/hash.h>
 
 namespace google {
 namespace protobuf {
 namespace compiler {
-
-using internal::WireFormat;
-
 namespace {
+
+using ::google::protobuf::internal::DownCast;
 
 typedef std::unordered_map<std::string, FieldDescriptorProto::Type> TypeNameMap;
 
@@ -634,14 +636,17 @@ bool Parser::Parse(io::Tokenizer* input, FileDescriptorProto* file) {
     root_location.RecordLegacyLocation(file,
                                        DescriptorPool::ErrorCollector::OTHER);
 
-    if (require_syntax_identifier_ || LookingAt("syntax")) {
+    if (require_syntax_identifier_ || LookingAt("syntax")
+    ) {
       if (!ParseSyntaxIdentifier(root_location)) {
         // Don't attempt to parse the file if we didn't recognize the syntax
         // identifier.
         return false;
       }
       // Store the syntax into the file.
-      if (file != nullptr) file->set_syntax(syntax_identifier_);
+      if (file != nullptr) {
+        file->set_syntax(syntax_identifier_);
+      }
     } else if (!stop_after_syntax_identifier_) {
       GOOGLE_LOG(WARNING) << "No syntax specified for the proto file: " << file->name()
                    << ". Please use 'syntax = \"proto2\";' "
@@ -678,9 +683,10 @@ bool Parser::Parse(io::Tokenizer* input, FileDescriptorProto* file) {
 bool Parser::ParseSyntaxIdentifier(const LocationRecorder& parent) {
   LocationRecorder syntax_location(parent,
                                    FileDescriptorProto::kSyntaxFieldNumber);
-  DO(Consume(
-      "syntax",
-      "File must begin with a syntax statement, e.g. 'syntax = \"proto2\";'."));
+    DO(Consume("syntax",
+               "File must begin with a syntax statement, e.g. 'syntax = "
+               "\"proto2\";'."));
+
   DO(Consume("="));
   io::Tokenizer::Token syntax_token = input_->current();
   std::string syntax;
@@ -688,7 +694,6 @@ bool Parser::ParseSyntaxIdentifier(const LocationRecorder& parent) {
   DO(ConsumeEndOfDeclaration(";", &syntax_location));
 
   syntax_identifier_ = syntax;
-
   if (syntax != "proto2" && syntax != "proto3" &&
       !stop_after_syntax_identifier_) {
     AddError(syntax_token.line, syntax_token.column,
@@ -1084,7 +1089,7 @@ bool Parser::ParseMessageFieldNoLabel(
       AddError(name_token.line, name_token.column,
                "Group names must start with a capital letter.");
     }
-    LowerString(field->mutable_name());
+    absl::AsciiStrToLower(field->mutable_name());
 
     field->set_type_name(group->name());
     if (LookingAt("{")) {
@@ -1283,7 +1288,7 @@ bool Parser::ParseDefaultAssignment(
       DO(ConsumeInteger64(max_value, &value,
                           "Expected integer for field default value."));
       // And stringify it again.
-      default_value->append(StrCat(value));
+      default_value->append(absl::StrCat(value));
       break;
     }
 
@@ -1306,7 +1311,7 @@ bool Parser::ParseDefaultAssignment(
       DO(ConsumeInteger64(max_value, &value,
                           "Expected integer for field default value."));
       // And stringify it again.
-      default_value->append(StrCat(value));
+      default_value->append(absl::StrCat(value));
       break;
     }
 
@@ -1346,7 +1351,7 @@ bool Parser::ParseDefaultAssignment(
 
     case FieldDescriptorProto::TYPE_BYTES:
       DO(ConsumeString(default_value, "Expected string."));
-      *default_value = CEscape(*default_value);
+      *default_value = absl::CEscape(*default_value);
       break;
 
     case FieldDescriptorProto::TYPE_ENUM:
@@ -1474,7 +1479,7 @@ bool Parser::ParseOption(Message* options,
   }
 
   UninterpretedOption* uninterpreted_option =
-      down_cast<UninterpretedOption*>(options->GetReflection()->AddMessage(
+      DownCast<UninterpretedOption*>(options->GetReflection()->AddMessage(
           options, uninterpreted_option_field));
 
   // Parse dot-separated name.
@@ -2395,33 +2400,27 @@ bool SourceLocationTable::Find(
     const Message* descriptor,
     DescriptorPool::ErrorCollector::ErrorLocation location, int* line,
     int* column) const {
-  const std::pair<int, int>* result =
-      FindOrNull(location_map_, std::make_pair(descriptor, location));
-  if (result == nullptr) {
+  auto it = location_map_.find({descriptor, location});
+  if (it == location_map_.end()) {
     *line = -1;
     *column = 0;
     return false;
-  } else {
-    *line = result->first;
-    *column = result->second;
-    return true;
   }
+  std::tie(*line, *column) = it->second;
+  return true;
 }
 
 bool SourceLocationTable::FindImport(const Message* descriptor,
                                      const std::string& name, int* line,
                                      int* column) const {
-  const std::pair<int, int>* result =
-      FindOrNull(import_location_map_, std::make_pair(descriptor, name));
-  if (result == nullptr) {
+  auto it = import_location_map_.find({descriptor, name});
+  if (it == import_location_map_.end()) {
     *line = -1;
     *column = 0;
     return false;
-  } else {
-    *line = result->first;
-    *column = result->second;
-    return true;
   }
+  std::tie(*line, *column) = it->second;
+  return true;
 }
 
 void SourceLocationTable::Add(

@@ -37,7 +37,6 @@
 #ifndef GOOGLE_PROTOBUF_IO_PRINTER_H__
 #define GOOGLE_PROTOBUF_IO_PRINTER_H__
 
-
 #include <map>
 #include <string>
 #include <vector>
@@ -194,6 +193,8 @@ class PROTOBUF_EXPORT Printer {
   Printer(ZeroCopyOutputStream* output, char variable_delimiter,
           AnnotationCollector* annotation_collector);
 
+  Printer(const Printer&) = delete;
+  Printer& operator=(const Printer&) = delete;
   ~Printer();
 
   // Link a substitution variable emitted by the last call to Print to the
@@ -252,7 +253,8 @@ class PROTOBUF_EXPORT Printer {
   template <typename... Args>
   void Print(const char* text, const Args&... args) {
     std::map<std::string, std::string> vars;
-    PrintInternal(&vars, text, args...);
+    FillMap(&vars, args...);
+    Print(vars, text);
   }
 
   // Indent text by two spaces.  After calling Indent(), two spaces will be
@@ -300,18 +302,13 @@ class PROTOBUF_EXPORT Printer {
   void Annotate(const char* begin_varname, const char* end_varname,
                 const std::string& file_path, const std::vector<int>& path);
 
-  // Base case
-  void PrintInternal(std::map<std::string, std::string>* vars,
-                     const char* text) {
-    Print(*vars, text);
-  }
+  void FillMap(std::map<std::string, std::string>* vars) {}
 
   template <typename... Args>
-  void PrintInternal(std::map<std::string, std::string>* vars, const char* text,
-                     const char* key, const std::string& value,
-                     const Args&... args) {
+  void FillMap(std::map<std::string, std::string>* vars, const std::string& key,
+               const std::string& value, const Args&... args) {
     (*vars)[key] = value;
-    PrintInternal(vars, text, args...);
+    FillMap(vars, args...);
   }
 
   // Copy size worth of bytes from data to buffer_.
@@ -374,8 +371,6 @@ class PROTOBUF_EXPORT Printer {
   // If non-null, annotation_collector_ is used to store annotations about
   // generated code.
   AnnotationCollector* const annotation_collector_;
-
-  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(Printer);
 };
 
 }  // namespace io
