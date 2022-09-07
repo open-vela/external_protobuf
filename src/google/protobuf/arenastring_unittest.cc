@@ -44,7 +44,7 @@
 #include <google/protobuf/generated_message_util.h>
 #include <google/protobuf/message_lite.h>
 #include <gtest/gtest.h>
-#include "absl/strings/string_view.h"
+#include <google/protobuf/stubs/strutil.h>
 
 
 // Must be included last.

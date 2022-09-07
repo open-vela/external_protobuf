@@ -37,7 +37,6 @@
 #include <google/protobuf/io/printer.h>
 #include <google/protobuf/wire_format.h>
 #include <google/protobuf/stubs/strutil.h>
-#include "absl/strings/str_cat.h"
 #include <google/protobuf/compiler/cpp/helpers.h>
 
 namespace google {
@@ -109,10 +108,10 @@ void SetPrimitiveVariables(const FieldDescriptor* descriptor,
   bool cold = ShouldSplit(descriptor, options);
   (*variables)["cached_byte_size_field"] =
       MakeVarintCachedSizeFieldName(descriptor, cold);
-  (*variables)["tag"] = absl::StrCat(internal::WireFormat::MakeTag(descriptor));
+  (*variables)["tag"] = StrCat(internal::WireFormat::MakeTag(descriptor));
   int fixed_size = FixedSize(descriptor->type());
   if (fixed_size != -1) {
-    (*variables)["fixed_size"] = absl::StrCat(fixed_size);
+    (*variables)["fixed_size"] = StrCat(fixed_size);
   }
   (*variables)["wire_format_field_type"] = FieldDescriptorProto_Type_Name(
       static_cast<FieldDescriptorProto_Type>(descriptor->type()));
@@ -329,9 +328,7 @@ void RepeatedPrimitiveFieldGenerator::GeneratePrivateMembers(
   format("::$proto_ns$::RepeatedField< $type$ > $name$_;\n");
   if (descriptor_->is_packed() && FixedSize(descriptor_->type()) == -1 &&
       HasGeneratedMethods(descriptor_->file(), options_)) {
-    format(
-        "mutable ::$proto_ns$::internal::CachedSize "
-        "$cached_byte_size_name$;\n");
+    format("mutable std::atomic<int> $cached_byte_size_name$;\n");
   }
 }
 
@@ -436,7 +433,7 @@ void RepeatedPrimitiveFieldGenerator::GenerateSerializeWithCachedSizesToArray(
       format(
           "{\n"
           "  int byte_size = "
-          "$cached_byte_size_field$.Get();\n"
+          "$cached_byte_size_field$.load(std::memory_order_relaxed);\n"
           "  if (byte_size > 0) {\n"
           "    target = stream->Write$declared_type$Packed(\n"
           "        $number$, _internal_$name$(), byte_size, target);\n"
@@ -487,7 +484,8 @@ void RepeatedPrimitiveFieldGenerator::GenerateByteSize(
     if (FixedSize(descriptor_->type()) == -1) {
       format(
           "int cached_size = ::_pbi::ToCachedSize(data_size);\n"
-          "$cached_byte_size_field$.Set(cached_size);\n");
+          "$cached_byte_size_field$.store(cached_size,\n"
+          "                                std::memory_order_relaxed);\n");
     }
     format("total_size += data_size;\n");
   } else {

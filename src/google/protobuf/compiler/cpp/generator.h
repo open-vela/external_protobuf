@@ -55,8 +55,6 @@ namespace cpp {
 class PROTOC_EXPORT CppGenerator : public CodeGenerator {
  public:
   CppGenerator();
-  CppGenerator(const CppGenerator&) = delete;
-  CppGenerator& operator=(const CppGenerator&) = delete;
   ~CppGenerator() override;
 
   enum class Runtime {
@@ -96,6 +94,7 @@ class PROTOC_EXPORT CppGenerator : public CodeGenerator {
  private:
   bool opensource_runtime_ = true;
   std::string runtime_include_base_;
+  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(CppGenerator);
 };
 
 }  // namespace cpp

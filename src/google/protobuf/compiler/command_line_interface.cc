@@ -71,9 +71,7 @@
 #include <google/protobuf/compiler/plugin.pb.h>
 #include <google/protobuf/stubs/strutil.h>
 #include <google/protobuf/stubs/stringprintf.h>
-#include "absl/strings/str_replace.h"
-#include "absl/strings/str_split.h"
-#include "absl/strings/substitute.h"
+#include <google/protobuf/stubs/substitute.h>
 #include <google/protobuf/compiler/code_generator.h>
 #include <google/protobuf/compiler/importer.h>
 #include <google/protobuf/compiler/zip_writer.h>
@@ -84,6 +82,7 @@
 #include <google/protobuf/io/printer.h>
 #include <google/protobuf/io/zero_copy_stream_impl.h>
 #include <google/protobuf/text_format.h>
+#include <google/protobuf/stubs/map_util.h>
 #include <google/protobuf/stubs/stl_util.h>
 
 
@@ -175,7 +174,7 @@ bool TryCreateParentDirectory(const std::string& prefix,
   // Recursively create parent directories to the output file.
   // On Windows, both '/' and '\' are valid path separators.
   std::vector<std::string> parts =
-      absl::StrSplit(filename, absl::ByAnyChar("/\\"), absl::SkipEmpty());
+      Split(filename, "/\\", true);
   std::string path_so_far = prefix;
   for (int i = 0; i < parts.size() - 1; i++) {
     path_so_far += parts[i];
@@ -340,12 +339,9 @@ class CommandLineInterface::ErrorPrinter
   void AddErrorOrWarning(const std::string& filename, int line, int column,
                          const std::string& message, const std::string& type,
                          std::ostream& out) {
+    // Print full path when running under MSVS
     std::string dfile;
-    if (
-#ifndef PROTOBUF_OPENSOURCE
-        // Print full path when running under MSVS
-        format_ == CommandLineInterface::ERROR_FORMAT_MSVS &&
-#endif  // !PROTOBUF_OPENSOURCE
+    if (format_ == CommandLineInterface::ERROR_FORMAT_MSVS &&
         tree_ != nullptr && tree_->VirtualFileToDiskFile(filename, &dfile)) {
       out << dfile;
     } else {
@@ -402,6 +398,7 @@ class CommandLineInterface::GeneratorContextImpl : public GeneratorContext {
 
   // Get name of all output files.
   void GetOutputFilenames(std::vector<std::string>* output_filenames);
+
   // implements GeneratorContext --------------------------------------
   io::ZeroCopyOutputStream* Open(const std::string& filename) override;
   io::ZeroCopyOutputStream* OpenForAppend(const std::string& filename) override;
@@ -818,7 +815,7 @@ CommandLineInterface::MemoryOutputStream::~MemoryOutputStream() {
 
     // Find the insertion point.
     std::string magic_string =
-        absl::Substitute("@@protoc_insertion_point($0)", insertion_point_);
+        strings::Substitute("@@protoc_insertion_point($0)", insertion_point_);
     std::string::size_type pos = target->find(magic_string);
 
     if (pos == std::string::npos) {
@@ -966,7 +963,6 @@ PopulateSingleSimpleDescriptorDatabase(const std::string& descriptor_set_name);
 
 int CommandLineInterface::Run(int argc, const char* const argv[]) {
   Clear();
-
   switch (ParseArguments(argc, argv)) {
     case PARSE_ARGUMENT_DONE_AND_EXIT:
       return 0;
@@ -1080,6 +1076,7 @@ int CommandLineInterface::Run(int argc, const char* const argv[]) {
     }
   }
 
+  // Write all output to disk.
   for (const auto& pair : output_directories) {
     const std::string& location = pair.first;
     GeneratorContextImpl* directory = pair.second.get();
@@ -1154,6 +1151,7 @@ int CommandLineInterface::Run(int argc, const char* const argv[]) {
         // Do not add a default case.
     }
   }
+
   return 0;
 }
 
@@ -1277,7 +1275,6 @@ bool CommandLineInterface::ParseInputFiles(
       break;
     }
     parsed_files->push_back(parsed_file);
-
 
     // Enforce --disallow_services.
     if (disallow_services_ && parsed_file->service_count() > 0) {
@@ -1682,7 +1679,8 @@ CommandLineInterface::InterpretArgument(const std::string& name,
         })) {
       case google::protobuf::io::win32::ExpandWildcardsResult::kSuccess:
         break;
-      case google::protobuf::io::win32::ExpandWildcardsResult::kErrorNoMatchingFile:
+      case google::protobuf::io::win32::ExpandWildcardsResult::
+          kErrorNoMatchingFile:
         // Path does not exist, is not a file, or it's longer than MAX_PATH and
         // long path handling is disabled.
         std::cerr << "Invalid file name pattern or missing input file \""
@@ -1703,9 +1701,9 @@ CommandLineInterface::InterpretArgument(const std::string& name,
     // Java's -classpath (and some other languages) delimits path components
     // with colons.  Let's accept that syntax too just to make things more
     // intuitive.
-    std::vector<std::string> parts = absl::StrSplit(
-        value, absl::ByAnyChar(CommandLineInterface::kPathSeparator),
-        absl::SkipEmpty());
+    std::vector<std::string> parts = Split(
+        value, CommandLineInterface::kPathSeparator,
+        true);
 
     for (int i = 0; i < parts.size(); i++) {
       std::string virtual_path;
@@ -1759,7 +1757,7 @@ CommandLineInterface::InterpretArgument(const std::string& name,
 
     direct_dependencies_explicitly_set_ = true;
     std::vector<std::string> direct =
-        absl::StrSplit(value, ":", absl::SkipEmpty());
+        Split(value, ":", true);
     GOOGLE_DCHECK(direct_dependencies_.empty());
     direct_dependencies_.insert(direct.begin(), direct.end());
 
@@ -1785,9 +1783,9 @@ CommandLineInterface::InterpretArgument(const std::string& name,
       return PARSE_ARGUMENT_FAIL;
     }
 
-    descriptor_set_in_names_ = absl::StrSplit(
-        value, absl::ByAnyChar(CommandLineInterface::kPathSeparator),
-        absl::SkipEmpty());
+    descriptor_set_in_names_ = Split(
+        value, CommandLineInterface::kPathSeparator,
+        true);
 
   } else if (name == "-o" || name == "--descriptor_set_out") {
     if (!descriptor_set_out_name_.empty()) {
@@ -1845,7 +1843,7 @@ CommandLineInterface::InterpretArgument(const std::string& name,
     if (!version_info_.empty()) {
       std::cout << version_info_ << std::endl;
     }
-    std::cout << "libprotoc " << internal::ProtocVersionString(PROTOBUF_VERSION)
+    std::cout << "libprotoc " << internal::VersionString(PROTOBUF_VERSION)
               << PROTOBUF_VERSION_SUFFIX << std::endl;
     return PARSE_ARGUMENT_DONE_AND_EXIT;  // Exit without running compiler.
 
@@ -1947,11 +1945,12 @@ CommandLineInterface::InterpretArgument(const std::string& name,
     print_mode_ = PRINT_FREE_FIELDS;
   } else {
     // Some other flag.  Look it up in the generators list.
-    const GeneratorInfo* generator_info = FindGeneratorByFlag(name);
+    const GeneratorInfo* generator_info =
+        FindOrNull(generators_by_flag_name_, name);
     if (generator_info == nullptr &&
         (plugin_prefix_.empty() || !HasSuffixString(name, "_out"))) {
       // Check if it's a generator option flag.
-      generator_info = FindGeneratorByOption(name);
+      generator_info = FindOrNull(generators_by_option_name_, name);
       if (generator_info != nullptr) {
         std::string* parameters =
             &generator_parameters_[generator_info->flag_name];
@@ -2083,15 +2082,16 @@ Parse PROTO_FILES and generate output based on the options given:
                               the executable's own name differs.)";
   }
 
-  for (const auto& kv : generators_by_flag_name_) {
+  for (GeneratorMap::iterator iter = generators_by_flag_name_.begin();
+       iter != generators_by_flag_name_.end(); ++iter) {
     // FIXME(kenton):  If the text is long enough it will wrap, which is ugly,
     //   but fixing this nicely (e.g. splitting on spaces) is probably more
     //   trouble than it's worth.
     std::cout << std::endl
-              << "  " << kv.first << "=OUT_DIR "
-              << std::string(19 - kv.first.size(),
+              << "  " << iter->first << "=OUT_DIR "
+              << std::string(19 - iter->first.size(),
                              ' ')  // Spaces for alignment.
-              << kv.second.help_text;
+              << iter->second.help_text;
   }
   std::cout << R"(
   @<filename>                 Read options and filenames from file. If a
@@ -2123,8 +2123,7 @@ bool CommandLineInterface::EnforceProto3OptionalSupport(
                   << codegen_name
                   << " hasn't been updated to support optional fields in "
                      "proto3. Please ask the owner of this code generator to "
-                     "support proto3 optional."
-                  << std::endl;
+                     "support proto3 optional.";
         return false;
       }
     }
@@ -2297,7 +2296,7 @@ bool CommandLineInterface::GeneratePluginOutput(
 
   std::string communicate_error;
   if (!subprocess.Communicate(request, &response, &communicate_error)) {
-    *error = absl::Substitute("$0: $1", plugin_name, communicate_error);
+    *error = strings::Substitute("$0: $1", plugin_name, communicate_error);
     return false;
   }
 
@@ -2324,7 +2323,7 @@ bool CommandLineInterface::GeneratePluginOutput(
       current_output.reset();
       current_output.reset(generator_context->Open(output_file.name()));
     } else if (current_output == nullptr) {
-      *error = absl::Substitute(
+      *error = strings::Substitute(
           "$0: First file chunk returned by plugin did not specify a file "
           "name.",
           plugin_name);
@@ -2505,20 +2504,6 @@ void CommandLineInterface::GetTransitiveDependencies(
   if (include_source_code_info) {
     file->CopySourceCodeInfoTo(new_descriptor);
   }
-}
-
-const CommandLineInterface::GeneratorInfo*
-CommandLineInterface::FindGeneratorByFlag(const std::string& name) const {
-  auto it = generators_by_flag_name_.find(name);
-  if (it == generators_by_flag_name_.end()) return nullptr;
-  return &it->second;
-}
-
-const CommandLineInterface::GeneratorInfo*
-CommandLineInterface::FindGeneratorByOption(const std::string& option) const {
-  auto it = generators_by_option_name_.find(option);
-  if (it == generators_by_option_name_.end()) return nullptr;
-  return &it->second;
 }
 
 namespace {

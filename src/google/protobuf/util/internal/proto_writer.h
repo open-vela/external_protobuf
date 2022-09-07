@@ -43,13 +43,14 @@
 #include <google/protobuf/io/zero_copy_stream_impl.h>
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/stubs/bytestream.h>
-#include "absl/status/status.h"
+#include <google/protobuf/stubs/status.h>
 #include <google/protobuf/util/internal/datapiece.h>
 #include <google/protobuf/util/internal/error_listener.h>
 #include <google/protobuf/util/internal/structured_objectwriter.h>
 #include <google/protobuf/util/internal/type_info.h>
 #include <google/protobuf/util/type_resolver.h>
-
+#include <google/protobuf/stubs/hash.h>
+#include <google/protobuf/stubs/status.h>
 
 // Must be included last.
 #include <google/protobuf/port_def.inc>
@@ -73,57 +74,53 @@ class PROTOBUF_EXPORT ProtoWriter : public StructuredObjectWriter {
 // Constructor. Does not take ownership of any parameter passed in.
   ProtoWriter(TypeResolver* type_resolver, const google::protobuf::Type& type,
               strings::ByteSink* output, ErrorListener* listener);
-  ProtoWriter() = delete;
-  ProtoWriter(const ProtoWriter&) = delete;
-  ProtoWriter& operator=(const ProtoWriter&) = delete;
   ~ProtoWriter() override;
 
   // ObjectWriter methods.
-  ProtoWriter* StartObject(absl::string_view name) override;
+  ProtoWriter* StartObject(StringPiece name) override;
   ProtoWriter* EndObject() override;
-  ProtoWriter* StartList(absl::string_view name) override;
+  ProtoWriter* StartList(StringPiece name) override;
   ProtoWriter* EndList() override;
-  ProtoWriter* RenderBool(absl::string_view name, bool value) override {
+  ProtoWriter* RenderBool(StringPiece name, bool value) override {
     return RenderDataPiece(name, DataPiece(value));
   }
-  ProtoWriter* RenderInt32(absl::string_view name, int32_t value) override {
+  ProtoWriter* RenderInt32(StringPiece name, int32_t value) override {
     return RenderDataPiece(name, DataPiece(value));
   }
-  ProtoWriter* RenderUint32(absl::string_view name, uint32_t value) override {
+  ProtoWriter* RenderUint32(StringPiece name, uint32_t value) override {
     return RenderDataPiece(name, DataPiece(value));
   }
-  ProtoWriter* RenderInt64(absl::string_view name, int64_t value) override {
+  ProtoWriter* RenderInt64(StringPiece name, int64_t value) override {
     return RenderDataPiece(name, DataPiece(value));
   }
-  ProtoWriter* RenderUint64(absl::string_view name, uint64_t value) override {
+  ProtoWriter* RenderUint64(StringPiece name, uint64_t value) override {
     return RenderDataPiece(name, DataPiece(value));
   }
-  ProtoWriter* RenderDouble(absl::string_view name, double value) override {
+  ProtoWriter* RenderDouble(StringPiece name, double value) override {
     return RenderDataPiece(name, DataPiece(value));
   }
-  ProtoWriter* RenderFloat(absl::string_view name, float value) override {
+  ProtoWriter* RenderFloat(StringPiece name, float value) override {
     return RenderDataPiece(name, DataPiece(value));
   }
-  ProtoWriter* RenderString(absl::string_view name,
-                            absl::string_view value) override {
+  ProtoWriter* RenderString(StringPiece name,
+                            StringPiece value) override {
     return RenderDataPiece(name,
                            DataPiece(value, use_strict_base64_decoding()));
   }
 
-  ProtoWriter* RenderBytes(absl::string_view name,
-                           absl::string_view value) override {
+  ProtoWriter* RenderBytes(StringPiece name, StringPiece value) override {
     return RenderDataPiece(
         name, DataPiece(value, false, use_strict_base64_decoding()));
   }
 
-  ProtoWriter* RenderNull(absl::string_view name) override {
+  ProtoWriter* RenderNull(StringPiece name) override {
     return RenderDataPiece(name, DataPiece::NullData());
   }
 
 
   // Renders a DataPiece 'value' into a field whose wire type is determined
   // from the given field 'name'.
-  virtual ProtoWriter* RenderDataPiece(absl::string_view name,
+  virtual ProtoWriter* RenderDataPiece(StringPiece name,
                                        const DataPiece& data);
 
 
@@ -181,9 +178,6 @@ class PROTOBUF_EXPORT ProtoWriter : public StructuredObjectWriter {
     // Constructor for a field of an element.
     ProtoElement(ProtoElement* parent, const google::protobuf::Field* field,
                  const google::protobuf::Type& type, bool is_list);
-    ProtoElement() = delete;
-    ProtoElement(const ProtoElement&) = delete;
-    ProtoElement& operator=(const ProtoElement&) = delete;
 
     ~ProtoElement() override {}
 
@@ -251,6 +245,8 @@ class PROTOBUF_EXPORT ProtoWriter : public StructuredObjectWriter {
     // Set of oneof indices already seen for the type_. Used to validate
     // incoming messages so no more than one oneof is set.
     std::vector<bool> oneof_indices_;
+
+    GOOGLE_DISALLOW_IMPLICIT_CONSTRUCTORS(ProtoElement);
   };
 
   // Container for inserting 'size' information at the 'pos' position.
@@ -265,20 +261,20 @@ class PROTOBUF_EXPORT ProtoWriter : public StructuredObjectWriter {
   ProtoElement* element() override { return element_.get(); }
 
   // Helper methods for calling ErrorListener. See error_listener.h.
-  void InvalidName(absl::string_view unknown_name, absl::string_view message);
-  void InvalidValue(absl::string_view type_name, absl::string_view value);
-  void MissingField(absl::string_view missing_name);
+  void InvalidName(StringPiece unknown_name, StringPiece message);
+  void InvalidValue(StringPiece type_name, StringPiece value);
+  void MissingField(StringPiece missing_name);
 
   // Common code for BeginObject() and BeginList() that does invalid_depth_
   // bookkeeping associated with name lookup.
-  const google::protobuf::Field* BeginNamed(absl::string_view name,
+  const google::protobuf::Field* BeginNamed(StringPiece name,
                                             bool is_list);
 
   // Lookup the field in the current element. Looks in the base descriptor
   // and in any extension. This will report an error if the field cannot be
   // found when ignore_unknown_names_ is false or if multiple matching
   // extensions are found.
-  const google::protobuf::Field* Lookup(absl::string_view name);
+  const google::protobuf::Field* Lookup(StringPiece name);
 
   // Lookup the field type in the type descriptor. Returns nullptr if the type
   // is not known.
@@ -300,7 +296,7 @@ class PROTOBUF_EXPORT ProtoWriter : public StructuredObjectWriter {
   // false. It also calls the appropriate error callback.
   // unnormalized_name is used for error string.
   bool ValidOneof(const google::protobuf::Field& field,
-                  absl::string_view unnormalized_name);
+                  StringPiece unnormalized_name);
 
   // Returns true if the field is repeated.
   bool IsRepeated(const google::protobuf::Field& field);
@@ -320,7 +316,7 @@ class PROTOBUF_EXPORT ProtoWriter : public StructuredObjectWriter {
 
  private:
   // Writes an ENUM field, including tag, to the stream.
-  static absl::Status WriteEnum(int field_number, const DataPiece& data,
+  static util::Status WriteEnum(int field_number, const DataPiece& data,
                                 const google::protobuf::Enum* enum_type,
                                 io::CodedOutputStream* stream,
                                 bool use_lower_camel_for_enums,
@@ -379,6 +375,8 @@ class PROTOBUF_EXPORT ProtoWriter : public StructuredObjectWriter {
   ErrorListener* listener_;
   int invalid_depth_;
   std::unique_ptr<LocationTrackerInterface> tracker_;
+
+  GOOGLE_DISALLOW_IMPLICIT_CONSTRUCTORS(ProtoWriter);
 };
 
 }  // namespace converter

@@ -66,8 +66,6 @@ namespace java {
 class ImmutableFieldGenerator {
  public:
   ImmutableFieldGenerator() {}
-  ImmutableFieldGenerator(const ImmutableFieldGenerator&) = delete;
-  ImmutableFieldGenerator& operator=(const ImmutableFieldGenerator&) = delete;
   virtual ~ImmutableFieldGenerator();
 
   virtual int GetNumBitsForMessage() const = 0;
@@ -92,14 +90,14 @@ class ImmutableFieldGenerator {
   virtual void GenerateHashCode(io::Printer* printer) const = 0;
 
   virtual std::string GetBoxedType() const = 0;
+
+ private:
+  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(ImmutableFieldGenerator);
 };
 
 class ImmutableFieldLiteGenerator {
  public:
   ImmutableFieldLiteGenerator() {}
-  ImmutableFieldLiteGenerator(const ImmutableFieldLiteGenerator&) = delete;
-  ImmutableFieldLiteGenerator& operator=(const ImmutableFieldLiteGenerator&) =
-      delete;
   virtual ~ImmutableFieldLiteGenerator();
 
   virtual int GetNumBitsForMessage() const = 0;
@@ -112,6 +110,9 @@ class ImmutableFieldLiteGenerator {
   virtual void GenerateKotlinDslMembers(io::Printer* printer) const = 0;
 
   virtual std::string GetBoxedType() const = 0;
+
+ private:
+  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(ImmutableFieldLiteGenerator);
 };
 
 
@@ -120,8 +121,6 @@ template <typename FieldGeneratorType>
 class FieldGeneratorMap {
  public:
   explicit FieldGeneratorMap(const Descriptor* descriptor, Context* context);
-  FieldGeneratorMap(const FieldGeneratorMap&) = delete;
-  FieldGeneratorMap& operator=(const FieldGeneratorMap&) = delete;
   ~FieldGeneratorMap();
 
   const FieldGeneratorType& get(const FieldDescriptor* field) const;
@@ -129,6 +128,8 @@ class FieldGeneratorMap {
  private:
   const Descriptor* descriptor_;
   std::vector<std::unique_ptr<FieldGeneratorType>> field_generators_;
+
+  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(FieldGeneratorMap);
 };
 
 template <typename FieldGeneratorType>

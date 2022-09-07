@@ -46,8 +46,6 @@ class MapFieldGenerator : public FieldGenerator {
  public:
   MapFieldGenerator(const FieldDescriptor* descriptor, const Options& options,
                     MessageSCCAnalyzer* scc_analyzer);
-  MapFieldGenerator(const MapFieldGenerator&) = delete;
-  MapFieldGenerator& operator=(const MapFieldGenerator&) = delete;
   ~MapFieldGenerator() override;
 
   // implements FieldGenerator ---------------------------------------
@@ -73,6 +71,8 @@ class MapFieldGenerator : public FieldGenerator {
 
  private:
   const bool has_required_fields_;
+
+  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(MapFieldGenerator);
 };
 
 }  // namespace cpp

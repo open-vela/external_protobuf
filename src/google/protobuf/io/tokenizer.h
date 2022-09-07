@@ -37,6 +37,7 @@
 #ifndef GOOGLE_PROTOBUF_IO_TOKENIZER_H__
 #define GOOGLE_PROTOBUF_IO_TOKENIZER_H__
 
+
 #include <string>
 #include <vector>
 
@@ -68,8 +69,6 @@ typedef int ColumnNumber;
 class PROTOBUF_EXPORT ErrorCollector {
  public:
   inline ErrorCollector() {}
-  ErrorCollector(const ErrorCollector&) = delete;
-  ErrorCollector& operator=(const ErrorCollector&) = delete;
   virtual ~ErrorCollector();
 
   // Indicates that there was an error in the input at the given line and
@@ -83,6 +82,9 @@ class PROTOBUF_EXPORT ErrorCollector {
   // 1 to each before printing them.
   virtual void AddWarning(int /* line */, ColumnNumber /* column */,
                           const std::string& /* message */) {}
+
+ private:
+  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(ErrorCollector);
 };
 
 // This class converts a stream of raw text into a stream of tokens for
@@ -97,8 +99,6 @@ class PROTOBUF_EXPORT Tokenizer {
   // input stream and writes errors to the given error_collector.
   // The caller keeps ownership of input and error_collector.
   Tokenizer(ZeroCopyInputStream* input, ErrorCollector* error_collector);
-  Tokenizer(const Tokenizer&) = delete;
-  Tokenizer& operator=(const Tokenizer&) = delete;
   ~Tokenizer();
 
   enum TokenType {
@@ -149,11 +149,11 @@ class PROTOBUF_EXPORT Tokenizer {
 
   // Get the current token.  This is updated when Next() is called.  Before
   // the first call to Next(), current() has type TYPE_START and no contents.
-  const Token& current() const;
+  const Token& current();
 
   // Return the previous token -- i.e. what current() returned before the
   // previous call to Next().
-  const Token& previous() const;
+  const Token& previous();
 
   // Advance to the next token.  Returns false if the end of the input is
   // reached.
@@ -276,6 +276,8 @@ class PROTOBUF_EXPORT Tokenizer {
 
   // -----------------------------------------------------------------
  private:
+  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(Tokenizer);
+
   Token current_;   // Returned by current().
   Token previous_;  // Returned by previous().
 
@@ -421,9 +423,9 @@ class PROTOBUF_EXPORT Tokenizer {
 };
 
 // inline methods ====================================================
-inline const Tokenizer::Token& Tokenizer::current() const { return current_; }
+inline const Tokenizer::Token& Tokenizer::current() { return current_; }
 
-inline const Tokenizer::Token& Tokenizer::previous() const { return previous_; }
+inline const Tokenizer::Token& Tokenizer::previous() { return previous_; }
 
 inline void Tokenizer::ParseString(const std::string& text,
                                    std::string* output) {
