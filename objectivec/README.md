@@ -25,7 +25,7 @@ to build the compiler and run the runtime tests, you can use:
 
      $ objectivec/DevTools/full_mac_build.sh
 
-This will generate the `protoc` binary.
+This will generate the `src/protoc` binary.
 
 Building
 --------
@@ -200,13 +200,12 @@ supported keys are:
         entry can be made as "no_package:PATH=prefix", where PATH is the
       path for the .proto file.
 
-  * `use_package_as_prefix`, `package_as_prefix_forced_prefix` and
-    `proto_package_prefix_exceptions_path`: The `value` for
-    `use_package_as_prefix` can be `yes` or `no`, and indicates if a prefix
-    should be derived from the proto package for all the symbols for files that
-    don't have the `objc_class_prefix` file option (mentioned above). This helps
-    ensure the symbols are more unique and means there is less chance of ObjC
-    class name collisions.
+  * `use_package_as_prefix` and `proto_package_prefix_exceptions_path`: The
+    `value` for `use_package_as_prefix` can be `yes` or `no`, and indicates
+    if a prefix should be derived from the proto package for all the symbols
+    for files that don't have the `objc_class_prefix` file option (mentioned
+    above). This helps ensure the symbols are more unique and means there is
+    less chance of ObjC class name collisions.
 
     To help in migrating code to using this support,
     `proto_package_prefix_exceptions_path` can be used to provide the path
@@ -214,16 +213,10 @@ supported keys are:
     if prefixed with `#`). These package won't get the derived prefix, allowing
     migrations to the behavior one proto package at a time across a code base.
 
-    `package_as_prefix_forced_prefix` can be used to provide a value that will
-    be used before all prefixes derived from the packages to help group all of
-    these types with a common prefix. Thus it only makes sense to use it when
-    `use_package_as_prefix` is also enabled. For example, setting this to
-    "XYZ\_" and generating a file with the package "something" defining
-    "MyMessage", would have Objective-C class be `XYZ_Something_MyMessage`.
-
     `use_package_as_prefix` currently defaults to `no` (existing behavior), but
-    that could change in the future as it helps avoid collisions when more
-    protos get added to the build. Note that this would be a breaking change.
+    in the future (as a breaking change), that is likely to change since it
+    helps prepare folks before they end up using a lot of protos and getting a
+    lot of collisions.
 
   * `headers_use_forward_declarations`: The `value` for this can be `yes` or
     `no`, and indicates if the generated headers use forward declarations for

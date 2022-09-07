@@ -159,8 +159,6 @@ class PROTOBUF_EXPORT SourceTreeDescriptorDatabase : public DescriptorDatabase {
 class PROTOBUF_EXPORT Importer {
  public:
   Importer(SourceTree* source_tree, MultiFileErrorCollector* error_collector);
-  Importer(const Importer&) = delete;
-  Importer& operator=(const Importer&) = delete;
   ~Importer();
 
   // Import the given file and build a FileDescriptor representing it.  If
@@ -190,15 +188,15 @@ class PROTOBUF_EXPORT Importer {
  private:
   SourceTreeDescriptorDatabase database_;
   DescriptorPool pool_;
+
+  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(Importer);
 };
 
 // If the importer encounters problems while trying to import the proto files,
 // it reports them to a MultiFileErrorCollector.
 class PROTOBUF_EXPORT MultiFileErrorCollector {
  public:
-  MultiFileErrorCollector() {}
-  MultiFileErrorCollector(const MultiFileErrorCollector&) = delete;
-  MultiFileErrorCollector& operator=(const MultiFileErrorCollector&) = delete;
+  inline MultiFileErrorCollector() {}
   virtual ~MultiFileErrorCollector();
 
   // Line and column numbers are zero-based.  A line number of -1 indicates
@@ -208,6 +206,9 @@ class PROTOBUF_EXPORT MultiFileErrorCollector {
 
   virtual void AddWarning(const std::string& /* filename */, int /* line */,
                           int /* column */, const std::string& /* message */) {}
+
+ private:
+  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(MultiFileErrorCollector);
 };
 
 // Abstract interface which represents a directory tree containing proto files.
@@ -216,9 +217,7 @@ class PROTOBUF_EXPORT MultiFileErrorCollector {
 // below.
 class PROTOBUF_EXPORT SourceTree {
  public:
-  SourceTree() {}
-  SourceTree(const SourceTree&) = delete;
-  SourceTree& operator=(const SourceTree&) = delete;
+  inline SourceTree() {}
   virtual ~SourceTree();
 
   // Open the given file and return a stream that reads it, or NULL if not
@@ -233,6 +232,9 @@ class PROTOBUF_EXPORT SourceTree {
   // better error reporting.
   // TODO(xiaofeng): change this to a pure virtual function.
   virtual std::string GetLastErrorMessage();
+
+ private:
+  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(SourceTree);
 };
 
 // An implementation of SourceTree which loads files from locations on disk.
@@ -241,8 +243,6 @@ class PROTOBUF_EXPORT SourceTree {
 class PROTOBUF_EXPORT DiskSourceTree : public SourceTree {
  public:
   DiskSourceTree();
-  DiskSourceTree(const DiskSourceTree&) = delete;
-  DiskSourceTree& operator=(const DiskSourceTree&) = delete;
   ~DiskSourceTree() override;
 
   // Map a path on disk to a location in the SourceTree.  The path may be
@@ -325,6 +325,8 @@ class PROTOBUF_EXPORT DiskSourceTree : public SourceTree {
 
   // Like Open() but given the actual on-disk path.
   io::ZeroCopyInputStream* OpenDiskFile(const std::string& filename);
+
+  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(DiskSourceTree);
 };
 
 }  // namespace compiler

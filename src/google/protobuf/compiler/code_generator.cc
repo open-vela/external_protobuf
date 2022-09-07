@@ -39,7 +39,6 @@
 #include <google/protobuf/compiler/plugin.pb.h>
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/stubs/strutil.h>
-#include "absl/strings/str_split.h"
 
 namespace google {
 namespace protobuf {
@@ -108,7 +107,7 @@ void GeneratorContext::GetCompilerVersion(Version* version) const {
 void ParseGeneratorParameter(
     const std::string& text,
     std::vector<std::pair<std::string, std::string> >* output) {
-  std::vector<std::string> parts = absl::StrSplit(text, ",", absl::SkipEmpty());
+  std::vector<std::string> parts = Split(text, ",", true);
 
   for (int i = 0; i < parts.size(); i++) {
     std::string::size_type equals_pos = parts[i].find_first_of('=');

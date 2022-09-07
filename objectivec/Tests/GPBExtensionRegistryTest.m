@@ -31,7 +31,7 @@
 #import "GPBTestUtilities.h"
 
 #import "GPBExtensionRegistry.h"
-#import "objectivec/Tests/Unittest.pbobjc.h"
+#import "google/protobuf/Unittest.pbobjc.h"
 
 @interface GPBExtensionRegistryTest : GPBTestCase
 @end

@@ -44,21 +44,19 @@
 //      NullByteSink            Consumes a never-ending stream of bytes
 //
 //   ByteSource:
-//      ArrayByteSource         Reads from an array or string
+//      ArrayByteSource         Reads from an array or string/StringPiece
 //      LimitedByteSource       Limits the number of bytes read from an
 
 #ifndef GOOGLE_PROTOBUF_STUBS_BYTESTREAM_H_
 #define GOOGLE_PROTOBUF_STUBS_BYTESTREAM_H_
 
-#include <google/protobuf/stubs/common.h>
 #include <stddef.h>
-
 #include <string>
 
-#include "absl/strings/string_view.h"
+#include <google/protobuf/stubs/common.h>
+#include <google/protobuf/stubs/stringpiece.h>
 
-// Must be last.
-#include <google/protobuf/port_def.inc>  // NOLINT
+#include <google/protobuf/port_def.inc>
 
 class CordByteSink;
 
@@ -101,7 +99,7 @@ class PROTOBUF_EXPORT ByteSink {
 //
 //   ByteSource* source = ...
 //   while (source->Available() > 0) {
-//     absl::string_view data = source->Peek();
+//     StringPiece data = source->Peek();
 //     ... do something with "data" ...
 //     source->Skip(data.length());
 //   }
@@ -120,18 +118,17 @@ class PROTOBUF_EXPORT ByteSource {
   //       indicative of the fixed-size nature of a ByteSource.
   virtual size_t Available() const = 0;
 
-  // Returns an absl::string_view of the next contiguous region of the source.
-  // Does not reposition the source. The returned region is empty iff
-  // Available() == 0.
+  // Returns a StringPiece of the next contiguous region of the source. Does not
+  // reposition the source. The returned region is empty iff Available() == 0.
   //
   // The returned region is valid until the next call to Skip() or until this
   // object is destroyed, whichever occurs first.
   //
-  // The length of the returned absl::string_view will be <= Available().
-  virtual absl::string_view Peek() = 0;
+  // The length of the returned StringPiece will be <= Available().
+  virtual StringPiece Peek() = 0;
 
-  // Skips the next n bytes. Invalidates any absl::string_view returned by a
-  // previous call to Peek().
+  // Skips the next n bytes. Invalidates any StringPiece returned by a previous
+  // call to Peek().
   //
   // REQUIRES: Available() >= n
   virtual void Skip(size_t n) = 0;
@@ -287,7 +284,7 @@ class PROTOBUF_EXPORT NullByteSink : public ByteSink {
 // Some commonly used implementations of ByteSource
 //
 
-// Implementation of ByteSource that reads from an absl::string_view.
+// Implementation of ByteSource that reads from a StringPiece.
 //
 // Example:
 //
@@ -298,14 +295,14 @@ class PROTOBUF_EXPORT NullByteSink : public ByteSink {
 //
 class PROTOBUF_EXPORT ArrayByteSource : public ByteSource {
  public:
-  explicit ArrayByteSource(absl::string_view s) : input_(s) {}
+  explicit ArrayByteSource(StringPiece s) : input_(s) {}
 
   virtual size_t Available() const override;
-  virtual absl::string_view Peek() override;
+  virtual StringPiece Peek() override;
   virtual void Skip(size_t n) override;
 
  private:
-  absl::string_view input_;
+  StringPiece   input_;
   GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(ArrayByteSource);
 };
 
@@ -333,7 +330,7 @@ class PROTOBUF_EXPORT LimitByteSource : public ByteSource {
   LimitByteSource(ByteSource* source, size_t limit);
 
   virtual size_t Available() const override;
-  virtual absl::string_view Peek() override;
+  virtual StringPiece Peek() override;
   virtual void Skip(size_t n) override;
 
   // We override CopyTo so that we can forward to the underlying source, in
@@ -349,6 +346,6 @@ class PROTOBUF_EXPORT LimitByteSource : public ByteSource {
 }  // namespace protobuf
 }  // namespace google
 
-#include <google/protobuf/port_undef.inc>  // NOLINT
+#include <google/protobuf/port_undef.inc>
 
 #endif  // GOOGLE_PROTOBUF_STUBS_BYTESTREAM_H_

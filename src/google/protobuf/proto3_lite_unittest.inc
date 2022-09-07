@@ -33,6 +33,7 @@
 #include <vector>
 
 #include <google/protobuf/arena.h>
+#include <google/protobuf/testing/googletest.h>
 #include <gtest/gtest.h>
 
 using UNITTEST::TestAllTypes;

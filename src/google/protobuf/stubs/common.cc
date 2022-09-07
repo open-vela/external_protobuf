@@ -50,15 +50,14 @@
 #endif
 
 #include <google/protobuf/stubs/callback.h>
-#include <google/protobuf/stubs/int128.h>
 #include <google/protobuf/stubs/logging.h>
+#include <google/protobuf/stubs/once.h>
+#include <google/protobuf/stubs/status.h>
+#include <google/protobuf/stubs/stringpiece.h>
 #include <google/protobuf/stubs/strutil.h>
+#include <google/protobuf/stubs/int128.h>
 
-#include "absl/status/status.h"
-#include "absl/strings/string_view.h"
-
-// Must be last.
-#include <google/protobuf/port_def.inc>  // NOLINT
+#include <google/protobuf/port_def.inc>
 
 namespace google {
 namespace protobuf {
@@ -105,21 +104,6 @@ std::string VersionString(int version) {
 
   // Guard against broken MSVC snprintf().
   buffer[sizeof(buffer)-1] = '\0';
-
-  return buffer;
-}
-
-std::string ProtocVersionString(int version) {
-  int minor = (version / 1000) % 1000;
-  int micro = version % 1000;
-
-  // 128 bytes should always be enough, but we use snprintf() anyway to be
-  // safe.
-  char buffer[128];
-  snprintf(buffer, sizeof(buffer), "%d.%d", minor, micro);
-
-  // Guard against broken MSVC snprintf().
-  buffer[sizeof(buffer) - 1] = '\0';
 
   return buffer;
 }
@@ -194,7 +178,7 @@ void NullLogHandler(LogLevel /* level */, const char* /* filename */,
 }
 
 static LogHandler* log_handler_ = &DefaultLogHandler;
-static std::atomic<int> log_silencer_count_{0};
+static std::atomic<int> log_silencer_count_ = ATOMIC_VAR_INIT(0);
 
 LogMessage& LogMessage::operator<<(const std::string& value) {
   message_ += value;
@@ -206,12 +190,12 @@ LogMessage& LogMessage::operator<<(const char* value) {
   return *this;
 }
 
-LogMessage& LogMessage::operator<<(absl::string_view value) {
-  absl::StrAppend(&message_, value);
+LogMessage& LogMessage::operator<<(const StringPiece& value) {
+  message_ += value.ToString();
   return *this;
 }
 
-LogMessage& LogMessage::operator<<(const absl::Status& status) {
+LogMessage& LogMessage::operator<<(const util::Status& status) {
   message_ += status.ToString();
   return *this;
 }
@@ -224,18 +208,18 @@ LogMessage& LogMessage::operator<<(const uint128& value) {
 }
 
 LogMessage& LogMessage::operator<<(char value) {
-  return *this << absl::string_view(&value, 1);
+  return *this << StringPiece(&value, 1);
 }
 
 LogMessage& LogMessage::operator<<(void* value) {
-  absl::StrAppend(&message_, strings::Hex(reinterpret_cast<uintptr_t>(value)));
+  StrAppend(&message_, strings::Hex(reinterpret_cast<uintptr_t>(value)));
   return *this;
 }
 
 #undef DECLARE_STREAM_OPERATOR
 #define DECLARE_STREAM_OPERATOR(TYPE)              \
   LogMessage& LogMessage::operator<<(TYPE value) { \
-    absl::StrAppend(&message_, value);             \
+    StrAppend(&message_, value);                   \
     return *this;                                  \
   }
 
@@ -337,4 +321,4 @@ const char* FatalException::what() const throw() {
 }  // namespace protobuf
 }  // namespace google
 
-#include <google/protobuf/port_undef.inc>  // NOLINT
+#include <google/protobuf/port_undef.inc>

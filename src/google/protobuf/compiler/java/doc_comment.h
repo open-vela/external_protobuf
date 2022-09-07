@@ -67,27 +67,21 @@ enum FieldAccessorType {
   LIST_MULTI_ADDER
 };
 
-void WriteMessageDocComment(io::Printer* printer, const Descriptor* message,
-                            const bool kdoc = false);
-void WriteFieldDocComment(io::Printer* printer, const FieldDescriptor* field,
-                          const bool kdoc = false);
+void WriteMessageDocComment(io::Printer* printer, const Descriptor* message);
+void WriteFieldDocComment(io::Printer* printer, const FieldDescriptor* field);
 void WriteFieldAccessorDocComment(io::Printer* printer,
                                   const FieldDescriptor* field,
                                   const FieldAccessorType type,
-                                  const bool builder = false,
-                                  const bool kdoc = false);
+                                  const bool builder = false);
 void WriteFieldEnumValueAccessorDocComment(io::Printer* printer,
                                            const FieldDescriptor* field,
                                            const FieldAccessorType type,
-                                           const bool builder = false,
-                                           const bool kdoc = false);
+                                           const bool builder = false);
 void WriteFieldStringBytesAccessorDocComment(io::Printer* printer,
                                              const FieldDescriptor* field,
                                              const FieldAccessorType type,
-                                             const bool builder = false,
-                                             const bool kdoc = false);
-void WriteEnumDocComment(io::Printer* printer, const EnumDescriptor* enum_,
-                         const bool kdoc = false);
+                                             const bool builder = false);
+void WriteEnumDocComment(io::Printer* printer, const EnumDescriptor* enum_);
 void WriteEnumValueDocComment(io::Printer* printer,
                               const EnumValueDescriptor* value);
 void WriteServiceDocComment(io::Printer* printer,
@@ -96,7 +90,6 @@ void WriteMethodDocComment(io::Printer* printer,
                            const MethodDescriptor* method);
 
 // Exposed for testing only.
-// Also called by proto1-Java code generator.
 PROTOC_EXPORT std::string EscapeJavadoc(const std::string& input);
 
 }  // namespace java

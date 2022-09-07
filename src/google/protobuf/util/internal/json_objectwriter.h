@@ -90,7 +90,7 @@ namespace converter {
 // JsonObjectWriter is thread-unsafe.
 class PROTOBUF_EXPORT JsonObjectWriter : public StructuredObjectWriter {
  public:
-  JsonObjectWriter(absl::string_view indent_string, io::CodedOutputStream* out)
+  JsonObjectWriter(StringPiece indent_string, io::CodedOutputStream* out)
       : element_(new Element(/*parent=*/nullptr, /*is_json_object=*/false)),
         stream_(out),
         sink_(out),
@@ -111,30 +111,27 @@ class PROTOBUF_EXPORT JsonObjectWriter : public StructuredObjectWriter {
       }
     }
   }
-  JsonObjectWriter(const JsonObjectWriter&) = delete;
-  JsonObjectWriter& operator=(const JsonObjectWriter&) = delete;
   ~JsonObjectWriter() override;
 
   // ObjectWriter methods.
-  JsonObjectWriter* StartObject(absl::string_view name) override;
+  JsonObjectWriter* StartObject(StringPiece name) override;
   JsonObjectWriter* EndObject() override;
-  JsonObjectWriter* StartList(absl::string_view name) override;
+  JsonObjectWriter* StartList(StringPiece name) override;
   JsonObjectWriter* EndList() override;
-  JsonObjectWriter* RenderBool(absl::string_view name, bool value) override;
-  JsonObjectWriter* RenderInt32(absl::string_view name, int32_t value) override;
-  JsonObjectWriter* RenderUint32(absl::string_view name,
+  JsonObjectWriter* RenderBool(StringPiece name, bool value) override;
+  JsonObjectWriter* RenderInt32(StringPiece name, int32_t value) override;
+  JsonObjectWriter* RenderUint32(StringPiece name,
                                  uint32_t value) override;
-  JsonObjectWriter* RenderInt64(absl::string_view name, int64_t value) override;
-  JsonObjectWriter* RenderUint64(absl::string_view name,
+  JsonObjectWriter* RenderInt64(StringPiece name, int64_t value) override;
+  JsonObjectWriter* RenderUint64(StringPiece name,
                                  uint64_t value) override;
-  JsonObjectWriter* RenderDouble(absl::string_view name, double value) override;
-  JsonObjectWriter* RenderFloat(absl::string_view name, float value) override;
-  JsonObjectWriter* RenderString(absl::string_view name,
-                                 absl::string_view value) override;
-  JsonObjectWriter* RenderBytes(absl::string_view name,
-                                absl::string_view value) override;
-  JsonObjectWriter* RenderNull(absl::string_view name) override;
-  virtual JsonObjectWriter* RenderNullAsEmpty(absl::string_view name);
+  JsonObjectWriter* RenderDouble(StringPiece name, double value) override;
+  JsonObjectWriter* RenderFloat(StringPiece name, float value) override;
+  JsonObjectWriter* RenderString(StringPiece name,
+                                 StringPiece value) override;
+  JsonObjectWriter* RenderBytes(StringPiece name, StringPiece value) override;
+  JsonObjectWriter* RenderNull(StringPiece name) override;
+  virtual JsonObjectWriter* RenderNullAsEmpty(StringPiece name);
 
   void set_use_websafe_base64_for_bytes(bool value) {
     use_websafe_base64_for_bytes_ = value;
@@ -147,8 +144,6 @@ class PROTOBUF_EXPORT JsonObjectWriter : public StructuredObjectWriter {
         : BaseElement(parent),
           is_first_(true),
           is_json_object_(is_json_object) {}
-    Element(const Element&) = delete;
-    Element& operator=(const Element&) = delete;
 
     // Called before each field of the Element is to be processed.
     // Returns true if this is the first call (processing the first field).
@@ -167,6 +162,8 @@ class PROTOBUF_EXPORT JsonObjectWriter : public StructuredObjectWriter {
    private:
     bool is_first_;
     bool is_json_object_;
+
+    GOOGLE_DISALLOW_IMPLICIT_CONSTRUCTORS(Element);
   };
 
   Element* element() override { return element_.get(); }
@@ -175,8 +172,6 @@ class PROTOBUF_EXPORT JsonObjectWriter : public StructuredObjectWriter {
   class PROTOBUF_EXPORT ByteSinkWrapper : public strings::ByteSink {
    public:
     explicit ByteSinkWrapper(io::CodedOutputStream* stream) : stream_(stream) {}
-    ByteSinkWrapper(const ByteSinkWrapper&) = delete;
-    ByteSinkWrapper& operator=(const ByteSinkWrapper&) = delete;
     ~ByteSinkWrapper() override {}
 
     // ByteSink methods.
@@ -186,13 +181,15 @@ class PROTOBUF_EXPORT JsonObjectWriter : public StructuredObjectWriter {
 
    private:
     io::CodedOutputStream* stream_;
+
+    GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(ByteSinkWrapper);
   };
 
   // Renders a simple value as a string. By default all non-string Render
   // methods convert their argument to a string and call this method. This
   // method can then be used to render the simple value without escaping it.
-  JsonObjectWriter* RenderSimple(absl::string_view name,
-                                 absl::string_view value) {
+  JsonObjectWriter* RenderSimple(StringPiece name,
+                                 StringPiece value) {
     WritePrefix(name);
     WriteRawString(value);
     return this;
@@ -245,13 +242,13 @@ class PROTOBUF_EXPORT JsonObjectWriter : public StructuredObjectWriter {
   // Writes a prefix. This will write out any pretty printing and
   // commas that are required, followed by the name and a ':' if
   // the name is not null.
-  void WritePrefix(absl::string_view name);
+  void WritePrefix(StringPiece name);
 
   // Writes an individual character to the output.
   void WriteChar(const char c) { stream_->WriteRaw(&c, sizeof(c)); }
 
   // Writes a string to the output.
-  void WriteRawString(absl::string_view s) {
+  void WriteRawString(StringPiece s) {
     stream_->WriteRaw(s.data(), s.length());
   }
 
@@ -267,6 +264,8 @@ class PROTOBUF_EXPORT JsonObjectWriter : public StructuredObjectWriter {
   // Whether to use regular or websafe base64 encoding for byte fields. Defaults
   // to regular base64 encoding.
   bool use_websafe_base64_for_bytes_;
+
+  GOOGLE_DISALLOW_IMPLICIT_CONSTRUCTORS(JsonObjectWriter);
 };
 
 }  // namespace converter

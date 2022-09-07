@@ -61,7 +61,6 @@
 
 #include <memory>
 #include <sstream>
-#include <utility>
 
 #include <google/protobuf/testing/file.h>
 #include <google/protobuf/test_util2.h>
@@ -140,7 +139,7 @@ class IoTest : public testing::Test {
 };
 
 const int IoTest::kBlockSizes[] = {-1, 1, 2, 5, 7, 10, 23, 64};
-const int IoTest::kBlockSizeCount = ABSL_ARRAYSIZE(IoTest::kBlockSizes);
+const int IoTest::kBlockSizeCount = GOOGLE_ARRAYSIZE(IoTest::kBlockSizes);
 
 bool IoTest::WriteToOutput(ZeroCopyOutputStream* output, const void* data,
                            int size) {
@@ -571,7 +570,7 @@ TEST_F(IoTest, CompressionOptions) {
   // Some ad-hoc testing of compression options.
 
   std::string golden_filename =
-      TestUtil::GetTestDataPath("third_party/protobuf/testdata/golden_message");
+      TestUtil::GetTestDataPath("net/proto2/internal/testdata/golden_message");
   std::string golden;
   GOOGLE_CHECK_OK(File::GetContents(golden_filename, &golden, true));
 
@@ -1025,7 +1024,7 @@ TEST_F(IoTest, ConcatenatingInputStream) {
                                     &input5, &input6, &input7};
 
   // Create the concatenating stream and read.
-  ConcatenatingInputStream input(streams, ABSL_ARRAYSIZE(streams));
+  ConcatenatingInputStream input(streams, GOOGLE_ARRAYSIZE(streams));
   ReadStuff(&input);
 }
 
