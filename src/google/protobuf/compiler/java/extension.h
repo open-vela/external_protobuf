@@ -66,6 +66,8 @@ namespace java {
 class ExtensionGenerator {
  public:
   explicit ExtensionGenerator() {}
+  ExtensionGenerator(const ExtensionGenerator&) = delete;
+  ExtensionGenerator& operator=(const ExtensionGenerator&) = delete;
   virtual ~ExtensionGenerator() {}
 
   virtual void Generate(io::Printer* printer) = 0;
@@ -79,19 +81,20 @@ class ExtensionGenerator {
   virtual int GenerateRegistrationCode(io::Printer* printer) = 0;
 
  protected:
-  static void InitTemplateVars(
-      const FieldDescriptor* descriptor, const std::string& scope,
-      bool immutable, ClassNameResolver* name_resolver,
-      std::map<std::string, std::string>* vars_pointer);
-
- private:
-  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(ExtensionGenerator);
+  static void InitTemplateVars(const FieldDescriptor* descriptor,
+                               const std::string& scope, bool immutable,
+                               ClassNameResolver* name_resolver,
+                               std::map<std::string, std::string>* vars_pointer,
+                               Context* context);
 };
 
 class ImmutableExtensionGenerator : public ExtensionGenerator {
  public:
   explicit ImmutableExtensionGenerator(const FieldDescriptor* descriptor,
                                        Context* context);
+  ImmutableExtensionGenerator(const ImmutableExtensionGenerator&) = delete;
+  ImmutableExtensionGenerator& operator=(const ImmutableExtensionGenerator&) =
+      delete;
   ~ImmutableExtensionGenerator() override;
 
   void Generate(io::Printer* printer) override;
@@ -102,9 +105,7 @@ class ImmutableExtensionGenerator : public ExtensionGenerator {
   const FieldDescriptor* descriptor_;
   ClassNameResolver* name_resolver_;
   std::string scope_;
-
- private:
-  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(ImmutableExtensionGenerator);
+  Context* context_;
 };
 
 }  // namespace java

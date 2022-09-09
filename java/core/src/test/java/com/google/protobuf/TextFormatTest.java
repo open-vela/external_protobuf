@@ -67,9 +67,7 @@ import org.junit.function.ThrowingRunnable;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-/**
- * Test case for {@link TextFormat}.
- */
+/** Test case for {@link TextFormat}. */
 @RunWith(JUnit4.class)
 public class TextFormatTest {
 
@@ -825,6 +823,7 @@ public class TextFormatTest {
     }
   }
 
+  @CanIgnoreReturnValue
   private TestAllTypes assertParseSuccessWithOverwriteForbidden(String text)
       throws TextFormat.ParseException {
     TestAllTypes.Builder builder = TestAllTypes.newBuilder();
@@ -1450,6 +1449,18 @@ public class TextFormatTest {
             + "unknown_field3: 3\n");
   }
 
+  @Test
+  public void testParseUnknownExtensionWithAnyMessage() throws Exception {
+    assertParseSuccessWithUnknownExtensions(
+        "[unknown_extension]: { "
+            + "  any_value { "
+            + "    [type.googleapis.com/protobuf_unittest.OneString] { "
+            + "      data: 123 "
+            + "    } "
+            + " } "
+            + "}");
+  }
+
   // See additional coverage in testOneofOverwriteForbidden and testMapOverwriteForbidden.
   @Test
   public void testParseNonRepeatedFields() throws Exception {
@@ -1762,6 +1773,7 @@ public class TextFormatTest {
     }
   }
 
+  @SuppressWarnings("LenientFormatStringValidation")
   private void assertLocation(
       TextFormatParseInfoTree tree,
       final Descriptor descriptor,
@@ -1775,6 +1787,7 @@ public class TextFormatTest {
       TextFormatParseLocation expected = TextFormatParseLocation.create(line, column);
       assertThat(location).isEqualTo(expected);
     } else if (line != -1 && column != -1) {
+      // Expected 0 args, but got 3.
       assertWithMessage(
               "Tree/descriptor/fieldname did not contain index %d, line %d column %d expected",
               index, line, column)

@@ -30,15 +30,19 @@
 
 #include <google/protobuf/compiler/php/php_generator.h>
 
+#include <sstream>
+
 #include <google/protobuf/compiler/code_generator.h>
 #include <google/protobuf/compiler/plugin.h>
 #include <google/protobuf/descriptor.h>
+#include <google/protobuf/stubs/strutil.h>
+#include "absl/strings/ascii.h"
+#include "absl/strings/escaping.h"
+#include "absl/strings/str_replace.h"
+#include "absl/strings/str_split.h"
 #include <google/protobuf/descriptor.pb.h>
 #include <google/protobuf/io/printer.h>
 #include <google/protobuf/io/zero_copy_stream.h>
-#include <google/protobuf/stubs/strutil.h>
-
-#include <sstream>
 
 const std::string kDescriptorFile = "google/protobuf/descriptor.proto";
 const std::string kEmptyFile = "google/protobuf/empty.proto";
@@ -334,7 +338,7 @@ std::string GeneratedMetadataFileName(const FileDescriptor* file,
                                       const Options& options) {
   const std::string& proto_file = file->name();
   int start_index = 0;
-  int first_index = proto_file.find_first_of("/", start_index);
+  int first_index = proto_file.find_first_of('/', start_index);
   std::string result = "";
   std::string segment = "";
 
@@ -347,7 +351,7 @@ std::string GeneratedMetadataFileName(const FileDescriptor* file,
 
   // Append directory name.
   std::string file_no_suffix;
-  int lastindex = proto_file.find_last_of(".");
+  int lastindex = proto_file.find_last_of('.');
   if (proto_file == kEmptyFile) {
     return kEmptyMetadataFile;
   } else {
@@ -371,12 +375,12 @@ std::string GeneratedMetadataFileName(const FileDescriptor* file,
           file_no_suffix.substr(start_index, first_index - start_index), true);
       result += ReservedNamePrefix(segment, file) + segment + "/";
       start_index = first_index + 1;
-      first_index = file_no_suffix.find_first_of("/", start_index);
+      first_index = file_no_suffix.find_first_of('/', start_index);
     }
   }
 
   // Append file name.
-  int file_name_start = file_no_suffix.find_last_of("/");
+  int file_name_start = file_no_suffix.find_last_of('/');
   if (file_name_start == std::string::npos) {
     file_name_start = 0;
   } else {
@@ -503,7 +507,7 @@ std::string PhpSetterTypeName(const FieldDescriptor* field,
   }
   if (field->is_repeated()) {
     // accommodate for edge case with multiple types.
-    size_t start_pos = type.find("|");
+    size_t start_pos = type.find('|');
     if (start_pos != std::string::npos) {
       type.replace(start_pos, 1, ">|array<");
     }
@@ -763,8 +767,8 @@ void GenerateFieldAccessor(const FieldDescriptor* field, const Options& options,
         "$arr = GPBUtil::checkMapField($var, "
         "\\Google\\Protobuf\\Internal\\GPBType::^key_type^, "
         "\\Google\\Protobuf\\Internal\\GPBType::^value_type^",
-        "key_type", ToUpper(key->type_name()),
-        "value_type", ToUpper(value->type_name()));
+        "key_type", absl::AsciiStrToUpper(key->type_name()),
+        "value_type", absl::AsciiStrToUpper(value->type_name()));
     if (value->cpp_type() == FieldDescriptor::CPPTYPE_MESSAGE) {
       printer->Print(
           ", \\^class_name^);\n",
@@ -782,7 +786,7 @@ void GenerateFieldAccessor(const FieldDescriptor* field, const Options& options,
     printer->Print(
         "$arr = GPBUtil::checkRepeatedField($var, "
         "\\Google\\Protobuf\\Internal\\GPBType::^type^",
-        "type", ToUpper(field->type_name()));
+        "type", absl::AsciiStrToUpper(field->type_name()));
     if (field->cpp_type() == FieldDescriptor::CPPTYPE_MESSAGE) {
       printer->Print(
           ", \\^class_name^);\n",
@@ -912,9 +916,9 @@ void GenerateMessageToPool(const std::string& name_prefix,
           "->map('^field^', \\Google\\Protobuf\\Internal\\GPBType::^key^, "
           "\\Google\\Protobuf\\Internal\\GPBType::^value^, ^number^^other^)\n",
           "field", field->name(),
-          "key", ToUpper(key->type_name()),
-          "value", ToUpper(val->type_name()),
-          "number", StrCat(field->number()),
+          "key", absl::AsciiStrToUpper(key->type_name()),
+          "value", absl::AsciiStrToUpper(val->type_name()),
+          "number", absl::StrCat(field->number()),
           "other", EnumOrMessageSuffix(val, true));
     } else if (!field->real_containing_oneof()) {
       printer->Print(
@@ -922,8 +926,8 @@ void GenerateMessageToPool(const std::string& name_prefix,
           "\\Google\\Protobuf\\Internal\\GPBType::^type^, ^number^^other^)\n",
           "field", field->name(),
           "label", LabelForField(field),
-          "type", ToUpper(field->type_name()),
-          "number", StrCat(field->number()),
+          "type", absl::AsciiStrToUpper(field->type_name()),
+          "number", absl::StrCat(field->number()),
           "other", EnumOrMessageSuffix(field, true));
     }
   }
@@ -940,8 +944,8 @@ void GenerateMessageToPool(const std::string& name_prefix,
           "->value('^field^', "
           "\\Google\\Protobuf\\Internal\\GPBType::^type^, ^number^^other^)\n",
           "field", field->name(),
-          "type", ToUpper(field->type_name()),
-          "number", StrCat(field->number()),
+          "type", absl::AsciiStrToUpper(field->type_name()),
+          "number", absl::StrCat(field->number()),
           "other", EnumOrMessageSuffix(field, true));
     }
     printer->Print("->finish()\n");
@@ -1235,7 +1239,7 @@ void GenerateHead(const FileDescriptor* file, io::Printer* printer) {
 }
 
 std::string FilenameToClassname(const std::string& filename) {
-  int lastindex = filename.find_last_of(".");
+  int lastindex = filename.find_last_of('.');
   std::string result = filename.substr(0, lastindex);
   for (int i = 0; i < result.size(); i++) {
     if (result[i] == '/') {
@@ -1255,7 +1259,7 @@ void GenerateMetadataFile(const FileDescriptor* file, const Options& options,
   GenerateHead(file, &printer);
 
   std::string fullname = FilenameToClassname(filename);
-  int lastindex = fullname.find_last_of("\\");
+  int lastindex = fullname.find_last_of('\\');
 
   if (lastindex != std::string::npos) {
     printer.Print(
@@ -1367,7 +1371,7 @@ void GenerateEnumFile(const FileDescriptor* file, const EnumDescriptor* en,
   GenerateHead(file, &printer);
 
   std::string fullname = FilenameToClassname(filename);
-  int lastindex = fullname.find_last_of("\\");
+  int lastindex = fullname.find_last_of('\\');
 
   if (lastindex != std::string::npos) {
     printer.Print(
@@ -1467,7 +1471,7 @@ void GenerateEnumFile(const FileDescriptor* file, const EnumDescriptor* en,
   Outdent(&printer);
   printer.Print("}\n\n");
 
-  // write legacy file for backwards compatibility with nested messages and enums
+  // write legacy alias for backwards compatibility with nested messages and enums
   if (en->containing_type() != NULL) {
     printer.Print(
         "// Adding a class alias for backwards compatibility with the previous class name.\n");
@@ -1475,7 +1479,6 @@ void GenerateEnumFile(const FileDescriptor* file, const EnumDescriptor* en,
         "class_alias(^new^::class, \\^old^::class);\n\n",
         "new", fullname,
         "old", LegacyFullClassName(en, options));
-    LegacyGenerateClassFile(file, en, options, generator_context);
   }
 
   // Write legacy file for backwards compatibility with "readonly" keywword
@@ -1509,7 +1512,7 @@ void GenerateMessageFile(const FileDescriptor* file, const Descriptor* message,
   GenerateHead(file, &printer);
 
   std::string fullname = FilenameToClassname(filename);
-  int lastindex = fullname.find_last_of("\\");
+  int lastindex = fullname.find_last_of('\\');
 
   if (lastindex != std::string::npos) {
     printer.Print(
@@ -1595,7 +1598,7 @@ void GenerateMessageFile(const FileDescriptor* file, const Descriptor* message,
   Outdent(&printer);
   printer.Print("}\n\n");
 
-  // write legacy file for backwards compatibility with nested messages and enums
+  // write legacy alias for backwards compatibility with nested messages and enums
   if (message->containing_type() != NULL) {
     printer.Print(
         "// Adding a class alias for backwards compatibility with the previous class name.\n");
@@ -1603,7 +1606,6 @@ void GenerateMessageFile(const FileDescriptor* file, const Descriptor* message,
         "class_alias(^new^::class, \\^old^::class);\n\n",
         "new", fullname,
         "old", LegacyFullClassName(message, options));
-    LegacyGenerateClassFile(file, message, options, generator_context);
   }
 
   // Write legacy file for backwards compatibility with "readonly" keywword
@@ -1640,7 +1642,7 @@ void GenerateServiceFile(
   GenerateHead(file, &printer);
 
   std::string fullname = FilenameToClassname(filename);
-  int lastindex = fullname.find_last_of("\\");
+  int lastindex = fullname.find_last_of('\\');
 
   if (!file->options().php_namespace().empty() ||
       (!file->options().has_php_namespace() && !file->package().empty()) ||
@@ -1751,7 +1753,7 @@ static void GenerateDocCommentBodyForLocation(
     // HTML-escape them so that they don't accidentally close the doc comment.
     comments = EscapePhpdoc(comments);
 
-    std::vector<std::string> lines = Split(comments, "\n", true);
+    std::vector<std::string> lines = absl::StrSplit(comments, "\n", absl::SkipEmpty());
     while (!lines.empty() && lines.back().empty()) {
       lines.pop_back();
     }
@@ -2267,7 +2269,7 @@ void GenerateCWellKnownTypes(const std::vector<const FileDescriptor*>& files,
 
     for (size_t i = 0; i < serialized.size();) {
       for (size_t j = 0; j < 25 && i < serialized.size(); ++i, ++j) {
-        printer.Print("'$ch$', ", "ch", CEscape(serialized.substr(i, 1)));
+        printer.Print("'$ch$', ", "ch", absl::CEscape(serialized.substr(i, 1)));
       }
       printer.Print("\n");
     }
@@ -2394,11 +2396,11 @@ bool Generator::GenerateAll(const std::vector<const FileDescriptor*>& files,
                             std::string* error) const {
   Options options;
 
-  for (const auto& option : Split(parameter, ",", true)) {
-    const std::vector<std::string> option_pair = Split(option, "=", true);
+  for (const auto& option : absl::StrSplit(parameter, ",", absl::SkipEmpty())) {
+    const std::vector<std::string> option_pair = absl::StrSplit(option, "=", absl::SkipEmpty());
     if (HasPrefixString(option_pair[0], "aggregate_metadata")) {
       options.aggregate_metadata = true;
-      for (const auto& prefix : Split(option_pair[1], "#", false)) {
+      for (const auto& prefix : absl::StrSplit(option_pair[1], "#", absl::AllowEmpty())) {
         options.aggregate_metadata_prefixes.emplace(prefix);
         GOOGLE_LOG(INFO) << prefix;
       }
