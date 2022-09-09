@@ -86,11 +86,15 @@ inline const std::string& NullValue_Name(T enum_t_value) {
   static_assert(::std::is_same<T, NullValue>::value ||
     ::std::is_integral<T>::value,
     "Incorrect type passed to function NullValue_Name.");
-  return ::PROTOBUF_NAMESPACE_ID::internal::NameOfEnum(
-    NullValue_descriptor(), enum_t_value);
+  return NullValue_Name(static_cast<NullValue>(enum_t_value));
+}
+template<>
+inline const std::string& NullValue_Name(NullValue value) {
+  return ::PROTOBUF_NAMESPACE_ID::internal::NameOfDenseEnum
+    <NullValue_descriptor, 0, 0>(static_cast<int>(value));
 }
 inline bool NullValue_Parse(
-    ::PROTOBUF_NAMESPACE_ID::ConstStringParam name, NullValue* value) {
+    ::absl::string_view name, NullValue* value) {
   return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<NullValue>(
     NullValue_descriptor(), name, value);
 }
@@ -225,7 +229,7 @@ class PROTOBUF_EXPORT Struct final :
 
   private:
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
-  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+  static ::absl::string_view FullMessageName() {
     return "google.protobuf.Struct";
   }
   protected:
@@ -398,7 +402,7 @@ class PROTOBUF_EXPORT Value final :
 
   private:
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
-  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+  static ::absl::string_view FullMessageName() {
     return "google.protobuf.Value";
   }
   protected:
@@ -657,7 +661,7 @@ class PROTOBUF_EXPORT ListValue final :
 
   private:
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
-  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+  static ::absl::string_view FullMessageName() {
     return "google.protobuf.ListValue";
   }
   protected:

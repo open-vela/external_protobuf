@@ -38,7 +38,6 @@
 #include <google/protobuf/stubs/common.h>
 #include <google/protobuf/unittest.pb.h>
 #include <google/protobuf/descriptor.h>
-#include <google/protobuf/testing/googletest.h>
 #include <gtest/gtest.h>
 #include <google/protobuf/test_util.h>
 
@@ -460,7 +459,7 @@ TEST(ReflectionOpsTest, OneofIsInitialized) {
 static std::string FindInitializationErrors(const Message& message) {
   std::vector<std::string> errors;
   ReflectionOps::FindInitializationErrors(message, "", &errors);
-  return Join(errors, ",");
+  return absl::StrJoin(errors, ",");
 }
 
 TEST(ReflectionOpsTest, FindInitializationErrors) {
