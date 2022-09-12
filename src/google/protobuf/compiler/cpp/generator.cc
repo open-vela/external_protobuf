@@ -83,9 +83,11 @@ absl::flat_hash_map<std::string, std::string> CommonVars(
                                  : "GOOGLE3_PROTOBU"
                                    "F"},
       {"CHK", is_oss ? "GOOGLE_CHECK"
-                     : "CHECK"},
+                     : "CHEC"
+                       "K"},
       {"DCHK", is_oss ? "GOOGLE_DCHECK"
-                      : "DCHECK"},
+                      : "DCHEC"
+                        "K"},
   };
 }
 }  // namespace
