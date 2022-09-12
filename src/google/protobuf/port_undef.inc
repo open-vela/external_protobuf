@@ -121,17 +121,12 @@
 
 #undef PROTOBUF_FUTURE_FINAL
 
-// Restore macros that may have been #undef'd in port_def.inc.
-
 #ifdef PROTOBUF_DID_UNDEF_PACKAGE
 #pragma pop_macro("PACKAGE")
 #undef PROTOBUF_DID_UNDEF_PACKAGE
 #endif
 
-#ifdef PROTOBUF_DID_UNDEF_LINUX
-#pragma pop_macro("linux")
-#endif
-
+// Restore macro that may have been #undef'd in port_def.inc.
 #ifdef _WIN32
 #pragma pop_macro("CREATE_NEW")
 #pragma pop_macro("DELETE")

@@ -29,7 +29,6 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <unordered_map>
-#include <utility>
 
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
