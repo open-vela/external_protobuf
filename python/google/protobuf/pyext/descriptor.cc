@@ -58,37 +58,6 @@
               : 0)                                               \
        : PyBytes_AsStringAndSize(ob, (charpp), (sizep)))
 
-#if PY_VERSION_HEX < 0x030900B1 && !defined(PYPY_VERSION)
-static PyCodeObject* PyFrame_GetCode(PyFrameObject *frame)
-{
-    Py_INCREF(frame->f_code);
-    return frame->f_code;
-}
-
-static PyFrameObject* PyFrame_GetBack(PyFrameObject *frame)
-{
-    Py_XINCREF(frame->f_back);
-    return frame->f_back;
-}
-#endif
-
-#if PY_VERSION_HEX < 0x030B00A7 && !defined(PYPY_VERSION)
-static PyObject* PyFrame_GetLocals(PyFrameObject *frame)
-{
-    if (PyFrame_FastToLocalsWithError(frame) < 0) {
-        return NULL;
-    }
-    Py_INCREF(frame->f_locals);
-    return frame->f_locals;
-}
-
-static PyObject* PyFrame_GetGlobals(PyFrameObject *frame)
-{
-    Py_INCREF(frame->f_globals);
-    return frame->f_globals;
-}
-#endif
-
 namespace google {
 namespace protobuf {
 namespace python {
@@ -127,66 +96,48 @@ bool _CalledFromGeneratedFile(int stacklevel) {
   // This check is not critical and is somewhat difficult to implement correctly
   // in PyPy.
   PyFrameObject* frame = PyEval_GetFrame();
-  PyCodeObject* frame_code = nullptr;
-  PyObject* frame_globals = nullptr;
-  PyObject* frame_locals = nullptr;
-  bool result = false;
-
   if (frame == nullptr) {
-    goto exit;
+    return false;
   }
-  Py_INCREF(frame);
   while (stacklevel-- > 0) {
-    PyFrameObject* next_frame = PyFrame_GetBack(frame);
-    Py_DECREF(frame);
-    frame = next_frame;
+    frame = frame->f_back;
     if (frame == nullptr) {
-      goto exit;
+      return false;
     }
   }
 
-  frame_code = PyFrame_GetCode(frame);
-  if (frame_code->co_filename == nullptr) {
-    goto exit;
+  if (frame->f_code->co_filename == nullptr) {
+    return false;
   }
   char* filename;
   Py_ssize_t filename_size;
-  if (PyString_AsStringAndSize(frame_code->co_filename,
+  if (PyString_AsStringAndSize(frame->f_code->co_filename,
                                &filename, &filename_size) < 0) {
     // filename is not a string.
     PyErr_Clear();
-    goto exit;
+    return false;
   }
   if ((filename_size < 3) ||
       (strcmp(&filename[filename_size - 3], ".py") != 0)) {
     // Cython's stack does not have .py file name and is not at global module
     // scope.
-    result = true;
-    goto exit;
+    return true;
   }
   if (filename_size < 7) {
     // filename is too short.
-    goto exit;
+    return false;
   }
   if (strcmp(&filename[filename_size - 7], "_pb2.py") != 0) {
     // Filename is not ending with _pb2.
-    goto exit;
+    return false;
   }
 
-  frame_globals = PyFrame_GetGlobals(frame);
-  frame_locals = PyFrame_GetLocals(frame);
-  if (frame_globals != frame_locals) {
+  if (frame->f_globals != frame->f_locals) {
     // Not at global module scope
-    goto exit;
+    return false;
   }
 #endif
-  result = true;
-exit:
-  Py_XDECREF(frame_globals);
-  Py_XDECREF(frame_locals);
-  Py_XDECREF(frame_code);
-  Py_XDECREF(frame);
-  return result;
+  return true;
 }
 
 // If the calling code is not a _pb2.py file, raise AttributeError.
