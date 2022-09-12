@@ -35,7 +35,6 @@
 
 #include <cstdint>
 #include <memory>
-#include <vector>
 
 #include "google/protobuf/stubs/logging.h"
 #include "google/protobuf/stubs/common.h"
