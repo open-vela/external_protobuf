@@ -28,18 +28,21 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <google/protobuf/compiler/java/name_resolver.h>
+#include "google/protobuf/compiler/java/name_resolver.h"
 
 #include <map>
 #include <string>
 
-#include <google/protobuf/compiler/code_generator.h>
-#include <google/protobuf/stubs/substitute.h>
-#include <google/protobuf/compiler/java/helpers.h>
-#include <google/protobuf/compiler/java/names.h>
+#include "google/protobuf/compiler/code_generator.h"
+#include "absl/strings/ascii.h"
+#include "absl/strings/str_replace.h"
+#include "absl/strings/substitute.h"
+#include "google/protobuf/compiler/java/helpers.h"
+#include "google/protobuf/compiler/java/names.h"
+
 
 // Must be last.
-#include <google/protobuf/port_def.inc>
+#include "google/protobuf/port_def.inc"
 
 namespace google {
 namespace protobuf {
@@ -108,7 +111,7 @@ std::string ClassNameWithoutPackage(const ServiceDescriptor* descriptor,
 
 // Return true if a and b are equals (case insensitive).
 NameEquality CheckNameEquality(const std::string& a, const std::string& b) {
-  if (ToUpper(a) == ToUpper(b)) {
+  if (absl::AsciiStrToUpper(a) == absl::AsciiStrToUpper(b)) {
     if (a == b) {
       return NameEquality::EXACT_EQUAL;
     }
@@ -140,10 +143,6 @@ bool MessageHasConflictingClassName(const Descriptor* message,
 }
 
 }  // namespace
-
-ClassNameResolver::ClassNameResolver() {}
-
-ClassNameResolver::~ClassNameResolver() {}
 
 std::string ClassNameResolver::GetFileDefaultImmutableClassName(
     const FileDescriptor* file) {
@@ -217,8 +216,12 @@ bool ClassNameResolver::HasConflictingClassName(const FileDescriptor* file,
 }
 
 std::string ClassNameResolver::GetDescriptorClassName(
-    const FileDescriptor* descriptor) {
-  return GetFileImmutableClassName(descriptor);
+    const FileDescriptor* file) {
+  if (options_.opensource_runtime) {
+    return GetFileImmutableClassName(file);
+  } else {
+    return GetFileImmutableClassName(file) + "InternalDescriptors";
+  }
 }
 
 std::string ClassNameResolver::GetClassName(const FileDescriptor* descriptor,
@@ -228,7 +231,7 @@ std::string ClassNameResolver::GetClassName(const FileDescriptor* descriptor,
 
 std::string ClassNameResolver::GetClassName(const FileDescriptor* descriptor,
                                             bool immutable, bool kotlin) {
-  std::string result = FileJavaPackage(descriptor, immutable);
+  std::string result = FileJavaPackage(descriptor, immutable, options_);
   if (!result.empty()) result += '.';
   result += GetFileClassName(descriptor, immutable, kotlin);
   return result;
@@ -248,7 +251,7 @@ std::string ClassNameResolver::GetClassFullName(
     bool immutable, bool is_own_file, bool kotlin) {
   std::string result;
   if (is_own_file) {
-    result = FileJavaPackage(file, immutable);
+    result = FileJavaPackage(file, immutable, options_);
   } else {
     result = GetClassName(file, immutable, kotlin);
   }
@@ -308,13 +311,13 @@ std::string ClassNameResolver::GetJavaClassFullName(
     bool immutable, bool kotlin) {
   std::string result;
   if (MultipleJavaFiles(file, immutable)) {
-    result = FileJavaPackage(file, immutable);
+    result = FileJavaPackage(file, immutable, options_);
     if (!result.empty()) result += '.';
   } else {
     result = GetClassName(file, immutable, kotlin);
     if (!result.empty()) result += '$';
   }
-  result += StringReplace(name_without_package, ".", "$", true);
+  result += absl::StrReplaceAll(name_without_package, {{".", "$"}});
   return result;
 }
 
@@ -372,7 +375,7 @@ std::string ClassNameResolver::GetDowngradedFileClassName(
 
 std::string ClassNameResolver::GetDowngradedClassName(
     const Descriptor* descriptor) {
-  return FileJavaPackage(descriptor->file()) + "." +
+  return FileJavaPackage(descriptor->file(), true, options_) + "." +
          GetDowngradedFileClassName(descriptor->file()) + "." +
          ClassNameWithoutPackage(descriptor, false);
 }
@@ -382,4 +385,4 @@ std::string ClassNameResolver::GetDowngradedClassName(
 }  // namespace protobuf
 }  // namespace google
 
-#include <google/protobuf/port_undef.inc>
+#include "google/protobuf/port_undef.inc"

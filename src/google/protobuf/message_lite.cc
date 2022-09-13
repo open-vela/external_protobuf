@@ -33,28 +33,32 @@
 //  Based on original Protocol Buffers design by
 //  Sanjay Ghemawat, Jeff Dean, and others.
 
-#include <google/protobuf/message_lite.h>
+#include "google/protobuf/message_lite.h"
 
 #include <climits>
 #include <cstdint>
 #include <string>
+#include <utility>
 
-#include <google/protobuf/stubs/logging.h>
-#include <google/protobuf/stubs/common.h>
-#include <google/protobuf/parse_context.h>
-#include <google/protobuf/io/coded_stream.h>
-#include <google/protobuf/io/zero_copy_stream.h>
-#include <google/protobuf/io/zero_copy_stream_impl.h>
-#include <google/protobuf/io/zero_copy_stream_impl_lite.h>
-#include <google/protobuf/arena.h>
-#include <google/protobuf/stubs/strutil.h>
-#include <google/protobuf/generated_message_util.h>
-#include <google/protobuf/repeated_field.h>
-#include <google/protobuf/stubs/stl_util.h>
-#include <google/protobuf/stubs/mutex.h>
+#include "google/protobuf/stubs/logging.h"
+#include "google/protobuf/stubs/common.h"
+#include "google/protobuf/io/coded_stream.h"
+#include "google/protobuf/io/zero_copy_stream.h"
+#include "google/protobuf/io/zero_copy_stream_impl.h"
+#include "google/protobuf/io/zero_copy_stream_impl_lite.h"
+#include "google/protobuf/arena.h"
+#include "absl/base/dynamic_annotations.h"
+#include "absl/strings/internal/resize_uninitialized.h"
+#include "absl/strings/str_cat.h"
+#include "absl/strings/string_view.h"
+#include "absl/synchronization/mutex.h"
+#include "google/protobuf/generated_message_util.h"
+#include "google/protobuf/parse_context.h"
+#include "google/protobuf/repeated_field.h"
+
 
 // Must be included last.
-#include <google/protobuf/port_def.inc>
+#include "google/protobuf/port_def.inc"
 
 namespace google {
 namespace protobuf {
@@ -65,7 +69,7 @@ std::string MessageLite::InitializationErrorString() const {
 
 std::string MessageLite::DebugString() const {
   std::uintptr_t address = reinterpret_cast<std::uintptr_t>(this);
-  return StrCat("MessageLite at 0x", strings::Hex(address));
+  return absl::StrCat("MessageLite at 0x", absl::Hex(address));
 }
 
 namespace {
@@ -112,8 +116,8 @@ std::string InitializationErrorMessage(const char* action,
   return result;
 }
 
-inline StringPiece as_string_view(const void* data, int size) {
-  return StringPiece(static_cast<const char*>(data), size);
+inline absl::string_view as_string_view(const void* data, int size) {
+  return absl::string_view(static_cast<const char*>(data), size);
 }
 
 // Returns true of all required fields are present / have values.
@@ -136,7 +140,7 @@ void MessageLite::LogInitializationErrorMessage() const {
 namespace internal {
 
 template <bool aliasing>
-bool MergeFromImpl(StringPiece input, MessageLite* msg,
+bool MergeFromImpl(absl::string_view input, MessageLite* msg,
                    MessageLite::ParseFlags parse_flags) {
   const char* ptr;
   internal::ParseContext ctx(io::CodedInputStream::GetDefaultRecursionLimit(),
@@ -178,9 +182,9 @@ bool MergeFromImpl(BoundedZCIS input, MessageLite* msg,
   return false;
 }
 
-template bool MergeFromImpl<false>(StringPiece input, MessageLite* msg,
+template bool MergeFromImpl<false>(absl::string_view input, MessageLite* msg,
                                    MessageLite::ParseFlags parse_flags);
-template bool MergeFromImpl<true>(StringPiece input, MessageLite* msg,
+template bool MergeFromImpl<true>(absl::string_view input, MessageLite* msg,
                                   MessageLite::ParseFlags parse_flags);
 template bool MergeFromImpl<false>(io::ZeroCopyInputStream* input,
                                    MessageLite* msg,
@@ -305,11 +309,11 @@ bool MessageLite::ParsePartialFromBoundedZeroCopyStream(
   return ParseFrom<kParsePartial>(internal::BoundedZCIS{input, size});
 }
 
-bool MessageLite::ParseFromString(ConstStringParam data) {
+bool MessageLite::ParseFromString(absl::string_view data) {
   return ParseFrom<kParse>(data);
 }
 
-bool MessageLite::ParsePartialFromString(ConstStringParam data) {
+bool MessageLite::ParsePartialFromString(absl::string_view data) {
   return ParseFrom<kParsePartial>(data);
 }
 
@@ -321,7 +325,7 @@ bool MessageLite::ParsePartialFromArray(const void* data, int size) {
   return ParseFrom<kParsePartial>(as_string_view(data, size));
 }
 
-bool MessageLite::MergeFromString(ConstStringParam data) {
+bool MessageLite::MergeFromString(absl::string_view data) {
   return ParseFrom<kMerge>(data);
 }
 
@@ -451,7 +455,8 @@ bool MessageLite::AppendPartialToString(std::string* output) const {
     return false;
   }
 
-  STLStringResizeUninitializedAmortized(output, old_size + byte_size);
+  absl::strings_internal::STLStringResizeUninitializedAmortized(
+      output, old_size + byte_size);
   uint8_t* start =
       reinterpret_cast<uint8_t*>(io::mutable_string_data(output) + old_size);
   SerializeToArrayImpl(*this, start, byte_size);
@@ -566,7 +571,7 @@ struct ShutdownData {
   }
 
   std::vector<std::pair<void (*)(const void*), const void*>> functions;
-  Mutex mutex;
+  absl::Mutex mutex;
 };
 
 static void RunZeroArgFunc(const void* arg) {
@@ -580,7 +585,7 @@ void OnShutdown(void (*func)()) {
 
 void OnShutdownRun(void (*f)(const void*), const void* arg) {
   auto shutdown_data = ShutdownData::get();
-  MutexLock lock(&shutdown_data->mutex);
+  absl::MutexLock lock(&shutdown_data->mutex);
   shutdown_data->functions.push_back(std::make_pair(f, arg));
 }
 
@@ -599,4 +604,4 @@ void ShutdownProtobufLibrary() {
 }  // namespace protobuf
 }  // namespace google
 
-#include <google/protobuf/port_undef.inc>
+#include "google/protobuf/port_undef.inc"

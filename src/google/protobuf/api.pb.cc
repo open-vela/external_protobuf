@@ -5,15 +5,15 @@
 
 #include <algorithm>
 
-#include <google/protobuf/io/coded_stream.h>
-#include <google/protobuf/extension_set.h>
-#include <google/protobuf/wire_format_lite.h>
-#include <google/protobuf/descriptor.h>
-#include <google/protobuf/generated_message_reflection.h>
-#include <google/protobuf/reflection_ops.h>
-#include <google/protobuf/wire_format.h>
+#include "google/protobuf/io/coded_stream.h"
+#include "google/protobuf/extension_set.h"
+#include "google/protobuf/wire_format_lite.h"
+#include "google/protobuf/descriptor.h"
+#include "google/protobuf/generated_message_reflection.h"
+#include "google/protobuf/reflection_ops.h"
+#include "google/protobuf/wire_format.h"
 // @@protoc_insertion_point(includes)
-#include <google/protobuf/port_def.inc>
+#include "google/protobuf/port_def.inc"
 
 PROTOBUF_PRAGMA_INIT_SEG
 
@@ -85,6 +85,8 @@ const uint32_t TableStruct_google_2fprotobuf_2fapi_2eproto::offsets[] PROTOBUF_S
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
+  ~0u,  // no _split_
+  ~0u,  // no sizeof(Split)
   PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::Api, _impl_.name_),
   PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::Api, _impl_.methods_),
   PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::Api, _impl_.options_),
@@ -98,6 +100,8 @@ const uint32_t TableStruct_google_2fprotobuf_2fapi_2eproto::offsets[] PROTOBUF_S
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
+  ~0u,  // no _split_
+  ~0u,  // no sizeof(Split)
   PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::Method, _impl_.name_),
   PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::Method, _impl_.request_type_url_),
   PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::Method, _impl_.request_streaming_),
@@ -111,13 +115,15 @@ const uint32_t TableStruct_google_2fprotobuf_2fapi_2eproto::offsets[] PROTOBUF_S
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
+  ~0u,  // no _split_
+  ~0u,  // no sizeof(Split)
   PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::Mixin, _impl_.name_),
   PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::Mixin, _impl_.root_),
 };
 static const ::_pbi::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, -1, sizeof(::PROTOBUF_NAMESPACE_ID::Api)},
-  { 13, -1, -1, sizeof(::PROTOBUF_NAMESPACE_ID::Method)},
-  { 26, -1, -1, sizeof(::PROTOBUF_NAMESPACE_ID::Mixin)},
+  { 15, -1, -1, sizeof(::PROTOBUF_NAMESPACE_ID::Method)},
+  { 30, -1, -1, sizeof(::PROTOBUF_NAMESPACE_ID::Mixin)},
 };
 
 static const ::_pb::Message* const file_default_instances[] = {
@@ -151,7 +157,7 @@ static const ::_pbi::DescriptorTable* const descriptor_table_google_2fprotobuf_2
   &::descriptor_table_google_2fprotobuf_2fsource_5fcontext_2eproto,
   &::descriptor_table_google_2fprotobuf_2ftype_2eproto,
 };
-static ::_pbi::once_flag descriptor_table_google_2fprotobuf_2fapi_2eproto_once;
+static ::absl::once_flag descriptor_table_google_2fprotobuf_2fapi_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_google_2fprotobuf_2fapi_2eproto = {
     false, false, 751, descriptor_table_protodef_google_2fprotobuf_2fapi_2eproto,
     "google/protobuf/api.proto",
@@ -373,7 +379,7 @@ const char* Api::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
       // .google.protobuf.Syntax syntax = 7;
       case 7:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 56)) {
-          uint64_t val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          uint32_t val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
           _internal_set_syntax(static_cast<::PROTOBUF_NAMESPACE_ID::Syntax>(val));
         } else
@@ -800,7 +806,7 @@ const char* Method::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
       // .google.protobuf.Syntax syntax = 7;
       case 7:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 56)) {
-          uint64_t val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          uint32_t val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
           _internal_set_syntax(static_cast<::PROTOBUF_NAMESPACE_ID::Syntax>(val));
         } else
@@ -1306,4 +1312,4 @@ Arena::CreateMaybeMessage< ::PROTOBUF_NAMESPACE_ID::Mixin >(Arena* arena) {
 PROTOBUF_NAMESPACE_CLOSE
 
 // @@protoc_insertion_point(global_scope)
-#include <google/protobuf/port_undef.inc>
+#include "google/protobuf/port_undef.inc"
