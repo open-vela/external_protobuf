@@ -5,15 +5,15 @@
 
 #include <algorithm>
 
-#include <google/protobuf/io/coded_stream.h>
-#include <google/protobuf/extension_set.h>
-#include <google/protobuf/wire_format_lite.h>
-#include <google/protobuf/descriptor.h>
-#include <google/protobuf/generated_message_reflection.h>
-#include <google/protobuf/reflection_ops.h>
-#include <google/protobuf/wire_format.h>
+#include "google/protobuf/io/coded_stream.h"
+#include "google/protobuf/extension_set.h"
+#include "google/protobuf/wire_format_lite.h"
+#include "google/protobuf/descriptor.h"
+#include "google/protobuf/generated_message_reflection.h"
+#include "google/protobuf/reflection_ops.h"
+#include "google/protobuf/wire_format.h"
 // @@protoc_insertion_point(includes)
-#include <google/protobuf/port_def.inc>
+#include "google/protobuf/port_def.inc"
 
 PROTOBUF_PRAGMA_INIT_SEG
 
@@ -46,6 +46,8 @@ const uint32_t TableStruct_google_2fprotobuf_2fsource_5fcontext_2eproto::offsets
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
+  ~0u,  // no _split_
+  ~0u,  // no sizeof(Split)
   PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::SourceContext, _impl_.file_name_),
 };
 static const ::_pbi::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
@@ -64,7 +66,7 @@ const char descriptor_table_protodef_google_2fprotobuf_2fsource_5fcontext_2eprot
   "tobuf/types/known/sourcecontextpb\242\002\003GPB\252"
   "\002\036Google.Protobuf.WellKnownTypesb\006proto3"
   ;
-static ::_pbi::once_flag descriptor_table_google_2fprotobuf_2fsource_5fcontext_2eproto_once;
+static ::absl::once_flag descriptor_table_google_2fprotobuf_2fsource_5fcontext_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_google_2fprotobuf_2fsource_5fcontext_2eproto = {
     false, false, 240, descriptor_table_protodef_google_2fprotobuf_2fsource_5fcontext_2eproto,
     "google/protobuf/source_context.proto",
@@ -294,4 +296,4 @@ Arena::CreateMaybeMessage< ::PROTOBUF_NAMESPACE_ID::SourceContext >(Arena* arena
 PROTOBUF_NAMESPACE_CLOSE
 
 // @@protoc_insertion_point(global_scope)
-#include <google/protobuf/port_undef.inc>
+#include "google/protobuf/port_undef.inc"

@@ -32,29 +32,31 @@
 //  Based on original Protocol Buffers design by
 //  Sanjay Ghemawat, Jeff Dean, and others.
 
-#include <google/protobuf/compiler/java/message_builder.h>
+#include "google/protobuf/compiler/java/message_builder.h"
 
 #include <algorithm>
 #include <map>
 #include <memory>
 #include <vector>
 
-#include <google/protobuf/io/coded_stream.h>
-#include <google/protobuf/io/printer.h>
-#include <google/protobuf/wire_format.h>
-#include <google/protobuf/stubs/strutil.h>
-#include <google/protobuf/stubs/substitute.h>
-#include <google/protobuf/compiler/java/context.h>
-#include <google/protobuf/compiler/java/doc_comment.h>
-#include <google/protobuf/compiler/java/enum.h>
-#include <google/protobuf/compiler/java/extension.h>
-#include <google/protobuf/compiler/java/generator_factory.h>
-#include <google/protobuf/compiler/java/helpers.h>
-#include <google/protobuf/compiler/java/name_resolver.h>
-#include <google/protobuf/descriptor.pb.h>
+#include "google/protobuf/io/coded_stream.h"
+#include "google/protobuf/io/printer.h"
+#include "google/protobuf/wire_format.h"
+#include "google/protobuf/stubs/strutil.h"
+#include "absl/strings/ascii.h"
+#include "absl/strings/str_cat.h"
+#include "absl/strings/substitute.h"
+#include "google/protobuf/compiler/java/context.h"
+#include "google/protobuf/compiler/java/doc_comment.h"
+#include "google/protobuf/compiler/java/enum.h"
+#include "google/protobuf/compiler/java/extension.h"
+#include "google/protobuf/compiler/java/generator_factory.h"
+#include "google/protobuf/compiler/java/helpers.h"
+#include "google/protobuf/compiler/java/name_resolver.h"
+#include "google/protobuf/descriptor.pb.h"
 
 // Must be last.
-#include <google/protobuf/port_def.inc>
+#include "google/protobuf/port_def.inc"
 
 namespace google {
 namespace protobuf {
@@ -127,7 +129,7 @@ void MessageBuilderGenerator::Generate(io::Printer* printer) {
     vars["oneof_name"] = context_->GetOneofGeneratorInfo(oneof)->name;
     vars["oneof_capitalized_name"] =
         context_->GetOneofGeneratorInfo(oneof)->capitalized_name;
-    vars["oneof_index"] = StrCat(oneof->index());
+    vars["oneof_index"] = absl::StrCat(oneof->index());
     // oneofCase_ and oneof_
     printer->Print(vars,
                    "private int $oneof_name$Case_ = 0;\n"
@@ -168,24 +170,26 @@ void MessageBuilderGenerator::Generate(io::Printer* printer) {
         .GenerateBuilderMembers(printer);
   }
 
-  // Override methods declared in GeneratedMessage to return the concrete
-  // generated type so callsites won't depend on GeneratedMessage. This
-  // is needed to keep binary compatibility when we change generated code
-  // to subclass a different GeneratedMessage class (e.g., in v3.0.0 release
-  // we changed all generated code to subclass GeneratedMessageV3).
-  printer->Print(
-      "@java.lang.Override\n"
-      "public final Builder setUnknownFields(\n"
-      "    final com.google.protobuf.UnknownFieldSet unknownFields) {\n"
-      "  return super.setUnknownFields(unknownFields);\n"
-      "}\n"
-      "\n"
-      "@java.lang.Override\n"
-      "public final Builder mergeUnknownFields(\n"
-      "    final com.google.protobuf.UnknownFieldSet unknownFields) {\n"
-      "  return super.mergeUnknownFields(unknownFields);\n"
-      "}\n"
-      "\n");
+  if (context_->options().opensource_runtime) {
+    // Override methods declared in GeneratedMessage to return the concrete
+    // generated type so callsites won't depend on GeneratedMessage. This
+    // is needed to keep binary compatibility when we change generated code
+    // to subclass a different GeneratedMessage class (e.g., in v3.0.0 release
+    // we changed all generated code to subclass GeneratedMessageV3).
+    printer->Print(
+        "@java.lang.Override\n"
+        "public final Builder setUnknownFields(\n"
+        "    final com.google.protobuf.UnknownFieldSet unknownFields) {\n"
+        "  return super.setUnknownFields(unknownFields);\n"
+        "}\n"
+        "\n"
+        "@java.lang.Override\n"
+        "public final Builder mergeUnknownFields(\n"
+        "    final com.google.protobuf.UnknownFieldSet unknownFields) {\n"
+        "  return super.mergeUnknownFields(unknownFields);\n"
+        "}\n"
+        "\n");
+  }
 
   printer->Print(
       "\n"
@@ -231,7 +235,7 @@ void MessageBuilderGenerator::GenerateDescriptorMethods(io::Printer* printer) {
       printer->Print(
           "case $number$:\n"
           "  return internalGet$capitalized_name$();\n",
-          "number", StrCat(field->number()), "capitalized_name",
+          "number", absl::StrCat(field->number()), "capitalized_name",
           info->capitalized_name);
     }
     printer->Print(
@@ -256,7 +260,7 @@ void MessageBuilderGenerator::GenerateDescriptorMethods(io::Printer* printer) {
       printer->Print(
           "case $number$:\n"
           "  return internalGetMutable$capitalized_name$();\n",
-          "number", StrCat(field->number()), "capitalized_name",
+          "number", absl::StrCat(field->number()), "capitalized_name",
           info->capitalized_name);
     }
     printer->Print(
@@ -443,75 +447,77 @@ void MessageBuilderGenerator::GenerateCommonBuilderMethods(
       "\n",
       "classname", name_resolver_->GetImmutableClassName(descriptor_));
 
-  // Override methods declared in GeneratedMessage to return the concrete
-  // generated type so callsites won't depend on GeneratedMessage. This
-  // is needed to keep binary compatibility when we change generated code
-  // to subclass a different GeneratedMessage class (e.g., in v3.0.0 release
-  // we changed all generated code to subclass GeneratedMessageV3).
-  printer->Print(
-      "@java.lang.Override\n"
-      "public Builder clone() {\n"
-      "  return super.clone();\n"
-      "}\n"
-      "@java.lang.Override\n"
-      "public Builder setField(\n"
-      "    com.google.protobuf.Descriptors.FieldDescriptor field,\n"
-      "    java.lang.Object value) {\n"
-      "  return super.setField(field, value);\n"
-      "}\n"
-      "@java.lang.Override\n"
-      "public Builder clearField(\n"
-      "    com.google.protobuf.Descriptors.FieldDescriptor field) {\n"
-      "  return super.clearField(field);\n"
-      "}\n"
-      "@java.lang.Override\n"
-      "public Builder clearOneof(\n"
-      "    com.google.protobuf.Descriptors.OneofDescriptor oneof) {\n"
-      "  return super.clearOneof(oneof);\n"
-      "}\n"
-      "@java.lang.Override\n"
-      "public Builder setRepeatedField(\n"
-      "    com.google.protobuf.Descriptors.FieldDescriptor field,\n"
-      "    int index, java.lang.Object value) {\n"
-      "  return super.setRepeatedField(field, index, value);\n"
-      "}\n"
-      "@java.lang.Override\n"
-      "public Builder addRepeatedField(\n"
-      "    com.google.protobuf.Descriptors.FieldDescriptor field,\n"
-      "    java.lang.Object value) {\n"
-      "  return super.addRepeatedField(field, value);\n"
-      "}\n");
-
-  if (descriptor_->extension_range_count() > 0) {
+  if (context_->options().opensource_runtime) {
+    // Override methods declared in GeneratedMessage to return the concrete
+    // generated type so callsites won't depend on GeneratedMessage. This
+    // is needed to keep binary compatibility when we change generated code
+    // to subclass a different GeneratedMessage class (e.g., in v3.0.0 release
+    // we changed all generated code to subclass GeneratedMessageV3).
     printer->Print(
         "@java.lang.Override\n"
-        "public <Type> Builder setExtension(\n"
-        "    com.google.protobuf.GeneratedMessage.GeneratedExtension<\n"
-        "        $classname$, Type> extension,\n"
-        "    Type value) {\n"
-        "  return super.setExtension(extension, value);\n"
+        "public Builder clone() {\n"
+        "  return super.clone();\n"
         "}\n"
         "@java.lang.Override\n"
-        "public <Type> Builder setExtension(\n"
-        "    com.google.protobuf.GeneratedMessage.GeneratedExtension<\n"
-        "        $classname$, java.util.List<Type>> extension,\n"
-        "    int index, Type value) {\n"
-        "  return super.setExtension(extension, index, value);\n"
+        "public Builder setField(\n"
+        "    com.google.protobuf.Descriptors.FieldDescriptor field,\n"
+        "    java.lang.Object value) {\n"
+        "  return super.setField(field, value);\n"
         "}\n"
         "@java.lang.Override\n"
-        "public <Type> Builder addExtension(\n"
-        "    com.google.protobuf.GeneratedMessage.GeneratedExtension<\n"
-        "        $classname$, java.util.List<Type>> extension,\n"
-        "    Type value) {\n"
-        "  return super.addExtension(extension, value);\n"
+        "public Builder clearField(\n"
+        "    com.google.protobuf.Descriptors.FieldDescriptor field) {\n"
+        "  return super.clearField(field);\n"
         "}\n"
         "@java.lang.Override\n"
-        "public <Type> Builder clearExtension(\n"
-        "    com.google.protobuf.GeneratedMessage.GeneratedExtension<\n"
-        "        $classname$, ?> extension) {\n"
-        "  return super.clearExtension(extension);\n"
-        "}\n",
-        "classname", name_resolver_->GetImmutableClassName(descriptor_));
+        "public Builder clearOneof(\n"
+        "    com.google.protobuf.Descriptors.OneofDescriptor oneof) {\n"
+        "  return super.clearOneof(oneof);\n"
+        "}\n"
+        "@java.lang.Override\n"
+        "public Builder setRepeatedField(\n"
+        "    com.google.protobuf.Descriptors.FieldDescriptor field,\n"
+        "    int index, java.lang.Object value) {\n"
+        "  return super.setRepeatedField(field, index, value);\n"
+        "}\n"
+        "@java.lang.Override\n"
+        "public Builder addRepeatedField(\n"
+        "    com.google.protobuf.Descriptors.FieldDescriptor field,\n"
+        "    java.lang.Object value) {\n"
+        "  return super.addRepeatedField(field, value);\n"
+        "}\n");
+
+    if (descriptor_->extension_range_count() > 0) {
+      printer->Print(
+          "@java.lang.Override\n"
+          "public <Type> Builder setExtension(\n"
+          "    com.google.protobuf.GeneratedMessage.GeneratedExtension<\n"
+          "        $classname$, Type> extension,\n"
+          "    Type value) {\n"
+          "  return super.setExtension(extension, value);\n"
+          "}\n"
+          "@java.lang.Override\n"
+          "public <Type> Builder setExtension(\n"
+          "    com.google.protobuf.GeneratedMessage.GeneratedExtension<\n"
+          "        $classname$, java.util.List<Type>> extension,\n"
+          "    int index, Type value) {\n"
+          "  return super.setExtension(extension, index, value);\n"
+          "}\n"
+          "@java.lang.Override\n"
+          "public <Type> Builder addExtension(\n"
+          "    com.google.protobuf.GeneratedMessage.GeneratedExtension<\n"
+          "        $classname$, java.util.List<Type>> extension,\n"
+          "    Type value) {\n"
+          "  return super.addExtension(extension, value);\n"
+          "}\n"
+          "@java.lang.Override\n"
+          "public <Type> Builder clearExtension(\n"
+          "    com.google.protobuf.GeneratedMessage.GeneratedExtension<\n"
+          "        $classname$, ?> extension) {\n"
+          "  return super.clearExtension(extension);\n"
+          "}\n",
+          "classname", name_resolver_->GetImmutableClassName(descriptor_));
+    }
   }
 
   // -----------------------------------------------------------------
@@ -554,7 +560,7 @@ void MessageBuilderGenerator::GenerateCommonBuilderMethods(
       for (int j = 0; j < oneof->field_count(); j++) {
         const FieldDescriptor* field = oneof->field(j);
         printer->Print("case $field_name$: {\n", "field_name",
-                       ToUpper(field->name()));
+                       absl::AsciiStrToUpper(field->name()));
         printer->Indent();
         field_generators_.get(field).GenerateMergingCode(printer);
         printer->Print("break;\n");
@@ -566,7 +572,7 @@ void MessageBuilderGenerator::GenerateCommonBuilderMethods(
           "  break;\n"
           "}\n",
           "cap_oneof_name",
-          ToUpper(context_->GetOneofGeneratorInfo(oneof)->name));
+          absl::AsciiStrToUpper(context_->GetOneofGeneratorInfo(oneof)->name));
       printer->Outdent();
       printer->Print("}\n");
     }
@@ -714,4 +720,4 @@ void MessageBuilderGenerator::GenerateIsInitialized(io::Printer* printer) {
 }  // namespace protobuf
 }  // namespace google
 
-#include <google/protobuf/port_undef.inc>
+#include "google/protobuf/port_undef.inc"
