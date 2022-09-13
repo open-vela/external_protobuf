@@ -30,18 +30,16 @@
 
 // Author: kenton@google.com (Kenton Varda)
 
-#include "google/protobuf/stubs/common.h"
-
-#include <gtest/gtest.h>
-
 #include <vector>
+#include <google/protobuf/stubs/callback.h>
+#include <google/protobuf/stubs/casts.h>
+#include <google/protobuf/stubs/common.h>
+#include <google/protobuf/stubs/logging.h>
+#include <google/protobuf/stubs/strutil.h>
+#include <google/protobuf/stubs/substitute.h>
 
-#include "absl/strings/ascii.h"
-#include "absl/strings/substitute.h"
-#include "google/protobuf/stubs/callback.h"
-#include "google/protobuf/stubs/logging.h"
-#include "google/protobuf/stubs/strutil.h"
-#include "google/protobuf/testing/googletest.h"
+#include <google/protobuf/testing/googletest.h>
+#include <gtest/gtest.h>
 
 namespace google {
 namespace protobuf {
@@ -58,7 +56,7 @@ TEST(VersionTest, VersionMatchesConfig) {
   std::string version = PACKAGE_VERSION;
   int pos = 0;
   while (pos < version.size() &&
-         (absl::ascii_isdigit(version[pos]) || version[pos] == '.')) {
+         (ascii_isdigit(version[pos]) || version[pos] == '.')) {
     ++pos;
   }
   version.erase(pos);
@@ -83,8 +81,9 @@ std::vector<std::string> captured_messages_;
 
 void CaptureLog(LogLevel level, const char* filename, int line,
                 const std::string& message) {
-  captured_messages_.push_back(absl::Substitute(
-      "$0 $1:$2: $3", static_cast<int>(level), filename, line, message));
+  captured_messages_.push_back(
+    strings::Substitute("$0 $1:$2: $3",
+      implicit_cast<int>(level), filename, line, message));
 }
 
 TEST(LoggingTest, DefaultLogging) {

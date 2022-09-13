@@ -30,15 +30,13 @@
 
 // from google3/base/stringprintf_unittest.cc
 
-#include "google/protobuf/stubs/stringprintf.h"
-
+#include <google/protobuf/stubs/stringprintf.h>
+#include <google/protobuf/testing/googletest.h>
 #include <gtest/gtest.h>
 
 #include <array>
 #include <cerrno>
 #include <string>
-
-#include "google/protobuf/testing/googletest.h"
 
 namespace google {
 namespace protobuf {

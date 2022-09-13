@@ -31,10 +31,13 @@
 #endregion
 
 using Google.Protobuf.Reflection;
+using Google.Protobuf.WellKnownTypes;
 using NUnit.Framework;
 using System;
+using System.IO;
 using System.Linq;
 using UnitTest.Issues.TestProtos;
+using static Google.Protobuf.WireFormat;
 using static UnitTest.Issues.TestProtos.ComplexOptionType2.Types;
 using static UnitTest.Issues.TestProtos.UnittestCustomOptionsProto3Extensions;
 using static UnitTest.Issues.TestProtos.DummyMessageContainingEnum.Types;
@@ -62,7 +65,7 @@ namespace Google.Protobuf.Test.Reflection
                 }
                 else
                 {
-                    v = default;
+                    v = default(E);
                     return false;
                 }
             };

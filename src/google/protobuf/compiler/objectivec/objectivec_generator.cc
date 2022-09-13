@@ -32,20 +32,12 @@
 #include <iostream>
 #include <string>
 #include <unordered_set>
-#include "google/protobuf/compiler/objectivec/objectivec_generator.h"
-#include "google/protobuf/compiler/objectivec/objectivec_file.h"
-#include "google/protobuf/compiler/objectivec/objectivec_helpers.h"
-#include "google/protobuf/io/printer.h"
-#include "google/protobuf/io/zero_copy_stream.h"
-#include "google/protobuf/stubs/strutil.h"
-#include "absl/strings/ascii.h"
-#include "absl/strings/escaping.h"
-#include "absl/strings/str_split.h"
-#include "absl/strings/str_replace.h"
-#include "absl/strings/ascii.h"
-#include "absl/strings/escaping.h"
-#include "absl/strings/str_split.h"
-#include "absl/strings/str_replace.h"
+#include <google/protobuf/compiler/objectivec/objectivec_generator.h>
+#include <google/protobuf/compiler/objectivec/objectivec_file.h>
+#include <google/protobuf/compiler/objectivec/objectivec_helpers.h>
+#include <google/protobuf/io/printer.h>
+#include <google/protobuf/io/zero_copy_stream.h>
+#include <google/protobuf/stubs/strutil.h>
 
 namespace google {
 namespace protobuf {
@@ -59,7 +51,7 @@ namespace {
 // invalid, `result` is unchanged.
 bool StringToBool(const std::string& value, bool* result) {
   std::string upper_value(value);
-  absl::AsciiStrToUpper(&upper_value);
+  UpperString(&upper_value);
   if (upper_value == "NO") {
     *result = false;
     return true;
@@ -130,8 +122,8 @@ bool ObjectiveCGenerator::GenerateAll(
       // A semicolon delimited string that lists the paths of .proto files to
       // exclude from the package prefix validations (expected_prefixes_path).
       // This is provided as an "out", to skip some files being checked.
-      for (absl::string_view split_piece : absl::StrSplit(
-               options[i].second, ";", absl::SkipEmpty())) {
+      for (StringPiece split_piece : Split(
+               options[i].second, ";", true)) {
         validation_options.expected_prefixes_suppressions.push_back(
             std::string(split_piece));
       }
@@ -238,10 +230,6 @@ bool ObjectiveCGenerator::GenerateAll(
       //   - A comment can go on a line after a expected package/prefix pair.
       //     (i.e. - "some.proto.package # comment")
       SetProtoPackagePrefixExceptionList(options[i].second);
-    } else if (options[i].first == "package_as_prefix_forced_prefix") {
-      // String to use as the prefix when deriving a prefix from the package
-      // name. So this only applies when use_package_as_prefix is also used.
-      SetForcedPackagePrefix(options[i].second);
     } else if (options[i].first == "headers_use_forward_declarations") {
       if (!StringToBool(options[i].second,
                         &generation_options.headers_use_forward_declarations)) {

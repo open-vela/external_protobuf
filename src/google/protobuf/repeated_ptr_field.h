@@ -58,16 +58,15 @@
 #include <string>
 #include <type_traits>
 
-#include "google/protobuf/stubs/logging.h"
-#include "google/protobuf/stubs/common.h"
-#include "google/protobuf/arena.h"
-#include "google/protobuf/port.h"
-#include "google/protobuf/message_lite.h"
-#include "google/protobuf/port.h"
+#include <google/protobuf/stubs/logging.h>
+#include <google/protobuf/stubs/common.h>
+#include <google/protobuf/arena.h>
+#include <google/protobuf/port.h>
+#include <google/protobuf/message_lite.h>
 
 
 // Must be included last.
-#include "google/protobuf/port_def.inc"
+#include <google/protobuf/port_def.inc>
 
 #ifdef SWIG
 #error "You cannot SWIG proto headers"
@@ -211,8 +210,7 @@ class PROTOBUF_EXPORT RepeatedPtrFieldBase {
   typename TypeHandler::Type* Add(
       const typename TypeHandler::Type* prototype = nullptr) {
     if (rep_ != nullptr && current_size_ < rep_->allocated_size) {
-      return cast<TypeHandler>(
-          rep_->elements[ExchangeCurrentSize(current_size_ + 1)]);
+      return cast<TypeHandler>(rep_->elements[current_size_++]);
     }
     typename TypeHandler::Type* result =
         TypeHandler::NewFromPrototype(prototype, arena_);
@@ -225,9 +223,7 @@ class PROTOBUF_EXPORT RepeatedPtrFieldBase {
       typename std::enable_if<TypeHandler::Movable::value>::type* = nullptr>
   inline void Add(typename TypeHandler::Type&& value) {
     if (rep_ != nullptr && current_size_ < rep_->allocated_size) {
-      *cast<TypeHandler>(
-          rep_->elements[ExchangeCurrentSize(current_size_ + 1)]) =
-          std::move(value);
+      *cast<TypeHandler>(rep_->elements[current_size_++]) = std::move(value);
       return;
     }
     if (!rep_ || rep_->allocated_size == total_size_) {
@@ -236,7 +232,7 @@ class PROTOBUF_EXPORT RepeatedPtrFieldBase {
     ++rep_->allocated_size;
     typename TypeHandler::Type* result =
         TypeHandler::New(arena_, std::move(value));
-    rep_->elements[ExchangeCurrentSize(current_size_ + 1)] = result;
+    rep_->elements[current_size_++] = result;
   }
 
   template <typename TypeHandler>
@@ -287,7 +283,12 @@ class PROTOBUF_EXPORT RepeatedPtrFieldBase {
     const int n = current_size_;
     GOOGLE_DCHECK_GE(n, 0);
     if (n > 0) {
-      ClearNonEmpty<TypeHandler>();
+      void* const* elements = rep_->elements;
+      int i = 0;
+      do {
+        TypeHandler::Clear(cast<TypeHandler>(elements[i++]));
+      } while (i < n);
+      current_size_ = 0;
     }
   }
 
@@ -316,40 +317,11 @@ class PROTOBUF_EXPORT RepeatedPtrFieldBase {
     std::tie(arena_, current_size_, total_size_, rep_) = temp;
   }
 
-  // Prepares the container for adding elements via `AddAllocatedForParse`.
-  // It ensures some invariants to avoid checking then in the Add loop:
-  //  - rep_ is not null.
-  //  - there are no preallocated elements.
-  //  Returns true if the invariants hold and `AddAllocatedForParse` can be
-  //  used.
-  bool PrepareForParse() {
-    if (current_size_ == total_size_) {
-      InternalExtend(1);
-    }
-    return rep_->allocated_size == current_size_;
-  }
-
-  // Similar to `AddAllocated` but faster.
-  // Can only be invoked after a call to `PrepareForParse` that returned `true`,
-  // or other calls to `AddAllocatedForParse`.
-  template <typename TypeHandler>
-  void AddAllocatedForParse(typename TypeHandler::Type* value) {
-    PROTOBUF_ASSUME(rep_ != nullptr);
-    PROTOBUF_ASSUME(current_size_ == rep_->allocated_size);
-    if (current_size_ == total_size_) {
-      // The array is completely full with no cleared objects, so grow it.
-      InternalExtend(1);
-    }
-    rep_->elements[current_size_++] = value;
-    ++rep_->allocated_size;
-  }
-
  protected:
   template <typename TypeHandler>
   void RemoveLast() {
     GOOGLE_DCHECK_GT(current_size_, 0);
-    ExchangeCurrentSize(current_size_ - 1);
-    TypeHandler::Clear(cast<TypeHandler>(rep_->elements[current_size_]));
+    TypeHandler::Clear(cast<TypeHandler>(rep_->elements[--current_size_]));
   }
 
   template <typename TypeHandler>
@@ -431,8 +403,7 @@ class PROTOBUF_EXPORT RepeatedPtrFieldBase {
   template <typename TypeHandler>
   typename TypeHandler::Type* AddFromCleared() {
     if (rep_ != nullptr && current_size_ < rep_->allocated_size) {
-      return cast<TypeHandler>(
-          rep_->elements[ExchangeCurrentSize(current_size_ + 1)]);
+      return cast<TypeHandler>(rep_->elements[current_size_++]);
     } else {
       return nullptr;
     }
@@ -468,7 +439,7 @@ class PROTOBUF_EXPORT RepeatedPtrFieldBase {
       ++rep_->allocated_size;
     }
 
-    rep_->elements[ExchangeCurrentSize(current_size_ + 1)] = value;
+    rep_->elements[current_size_++] = value;
   }
 
   template <typename TypeHandler>
@@ -483,9 +454,8 @@ class PROTOBUF_EXPORT RepeatedPtrFieldBase {
   template <typename TypeHandler>
   typename TypeHandler::Type* UnsafeArenaReleaseLast() {
     GOOGLE_DCHECK_GT(current_size_, 0);
-    ExchangeCurrentSize(current_size_ - 1);
     typename TypeHandler::Type* result =
-        cast<TypeHandler>(rep_->elements[current_size_]);
+        cast<TypeHandler>(rep_->elements[--current_size_]);
     --rep_->allocated_size;
     if (current_size_ < rep_->allocated_size) {
       // There are cleared elements on the end; replace the removed element
@@ -538,7 +508,8 @@ class PROTOBUF_EXPORT RepeatedPtrFieldBase {
         // allocated list.
         elems[rep_->allocated_size] = elems[current_size_];
       }
-      elems[ExchangeCurrentSize(current_size_ + 1)] = value;
+      elems[current_size_] = value;
+      current_size_ = current_size_ + 1;
       rep_->allocated_size = rep_->allocated_size + 1;
     } else {
       AddAllocatedSlowWithCopy<TypeHandler>(value, element_arena, arena);
@@ -560,7 +531,8 @@ class PROTOBUF_EXPORT RepeatedPtrFieldBase {
         // allocated list.
         elems[rep_->allocated_size] = elems[current_size_];
       }
-      elems[ExchangeCurrentSize(current_size_ + 1)] = value;
+      elems[current_size_] = value;
+      current_size_ = current_size_ + 1;
       ++rep_->allocated_size;
     } else {
       UnsafeArenaAddAllocated<TypeHandler>(value);
@@ -640,16 +612,7 @@ class PROTOBUF_EXPORT RepeatedPtrFieldBase {
     temp.Destroy<TypeHandler>();  // Frees rep_ if `other` had no arena.
   }
 
-  // Gets the Arena on which this RepeatedPtrField stores its elements.
-  // Message-owned arenas are not exposed by this method, which will return
-  // nullptr for messages owned by MOAs.
-  inline Arena* GetArena() const {
-    Arena* arena = GetOwningArena();
-    if (arena == nullptr || arena->InternalIsMessageOwnedArena()) {
-      return nullptr;
-    }
-    return arena;
-  }
+  inline Arena* GetArena() const { return arena_; }
 
  protected:
   inline Arena* GetOwningArena() const { return arena_; }
@@ -672,16 +635,6 @@ class PROTOBUF_EXPORT RepeatedPtrFieldBase {
   Arena* arena_;
   int current_size_;
   int total_size_;
-
-  // Replaces current_size_ with new_size and returns the previous value of
-  // current_size_. This function is intended to be the only place where
-  // current_size_ is modified.
-  inline int ExchangeCurrentSize(int new_size) {
-    int prev_size = current_size_;
-    current_size_ = new_size;
-    return prev_size;
-  }
-
   struct Rep {
     int allocated_size;
     // Here we declare a huge array as a way of approximating C's "flexible
@@ -701,26 +654,12 @@ class PROTOBUF_EXPORT RepeatedPtrFieldBase {
     return reinterpret_cast<const typename TypeHandler::Type*>(element);
   }
 
-  // Out-of-line helper routine for Clear() once the inlined check has
-  // determined the container is non-empty
-  template <typename TypeHandler>
-  PROTOBUF_NOINLINE void ClearNonEmpty() {
-    const int n = current_size_;
-    void* const* elements = rep_->elements;
-    int i = 0;
-    GOOGLE_DCHECK_GT(n,
-              0);  // do/while loop to avoid initial test because we know n > 0
-    do {
-      TypeHandler::Clear(cast<TypeHandler>(elements[i++]));
-    } while (i < n);
-    ExchangeCurrentSize(0);
-  }
-
   // Non-templated inner function to avoid code duplication. Takes a function
   // pointer to the type-specific (templated) inner allocate/merge loop.
-  PROTOBUF_NOINLINE void MergeFromInternal(
-      const RepeatedPtrFieldBase& other,
-      void (RepeatedPtrFieldBase::*inner_loop)(void**, void**, int, int)) {
+  void MergeFromInternal(const RepeatedPtrFieldBase& other,
+                         void (RepeatedPtrFieldBase::*inner_loop)(void**,
+                                                                  void**, int,
+                                                                  int)) {
     // Note: wrapper has already guaranteed that other.rep_ != nullptr here.
     int other_size = other.current_size_;
     void** other_elements = other.rep_->elements;
@@ -728,7 +667,7 @@ class PROTOBUF_EXPORT RepeatedPtrFieldBase {
     int allocated_elems = rep_->allocated_size - current_size_;
     (this->*inner_loop)(new_elements, other_elements, other_size,
                         allocated_elems);
-    ExchangeCurrentSize(current_size_ + other_size);
+    current_size_ += other_size;
     if (rep_->allocated_size < current_size_) {
       rep_->allocated_size = current_size_;
     }
@@ -823,7 +762,7 @@ class GenericTypeHandler {
     }
   }
   static inline Arena* GetOwningArena(GenericType* value) {
-    return Arena::InternalGetOwningArena(value);
+    return Arena::GetOwningArena<Type>(value);
   }
 
   static inline void Clear(GenericType* value) { value->Clear(); }
@@ -881,10 +820,10 @@ class StringTypeHandler {
   typedef std::string Type;
   using Movable = IsMovable<Type>;
 
-  static PROTOBUF_NOINLINE std::string* New(Arena* arena) {
+  static inline std::string* New(Arena* arena) {
     return Arena::Create<std::string>(arena);
   }
-  static PROTOBUF_NOINLINE std::string* New(Arena* arena, std::string&& value) {
+  static inline std::string* New(Arena* arena, std::string&& value) {
     return Arena::Create<std::string>(arena, std::move(value));
   }
   static inline std::string* NewFromPrototype(const std::string*,
@@ -1144,7 +1083,7 @@ class RepeatedPtrField final : private internal::RepeatedPtrFieldBase {
   // Gets the number of cleared objects that are currently being kept
   // around for reuse.
   int ClearedCount() const;
-#ifndef PROTOBUF_FUTURE_REMOVE_CLEARED_API
+#ifndef PROTOBUF_FUTURE_BREAKING_CHANGES
   // Adds an element to the pool of cleared objects, passing ownership to
   // the RepeatedPtrField.  The element must be cleared prior to calling
   // this method.
@@ -1159,7 +1098,7 @@ class RepeatedPtrField final : private internal::RepeatedPtrFieldBase {
   // This method cannot be called when the repeated field is on an arena; doing
   // so will trigger a GOOGLE_DCHECK-failure.
   PROTOBUF_NODISCARD Element* ReleaseCleared();
-#endif  // !PROTOBUF_FUTURE_REMOVE_CLEARED_API
+#endif  // !PROTOBUF_FUTURE_BREAKING_CHANGES
 
   // Removes the element referenced by position.
   //
@@ -1202,12 +1141,7 @@ class RepeatedPtrField final : private internal::RepeatedPtrFieldBase {
   void ExtractSubrangeInternal(int start, int num, Element** elements,
                                std::false_type);
 
-  void AddAllocatedForParse(Element* p) {
-    return RepeatedPtrFieldBase::AddAllocatedForParse<TypeHandler>(p);
-  }
-
   friend class Arena;
-  friend class internal::TcParser;
 
   template <typename T>
   friend struct WeakRepeatedPtrField;
@@ -1336,7 +1270,7 @@ inline Element* RepeatedPtrField<Element>::Mutable(int index) {
 }
 
 template <typename Element>
-PROTOBUF_NOINLINE Element* RepeatedPtrField<Element>::Add() {
+inline Element* RepeatedPtrField<Element>::Add() {
   return RepeatedPtrFieldBase::Add<TypeHandler>();
 }
 
@@ -1571,7 +1505,7 @@ inline int RepeatedPtrField<Element>::ClearedCount() const {
   return RepeatedPtrFieldBase::ClearedCount();
 }
 
-#ifndef PROTOBUF_FUTURE_REMOVE_CLEARED_API
+#ifndef PROTOBUF_FUTURE_BREAKING_CHANGES
 template <typename Element>
 inline void RepeatedPtrField<Element>::AddCleared(Element* value) {
   return RepeatedPtrFieldBase::AddCleared<TypeHandler>(value);
@@ -1581,7 +1515,7 @@ template <typename Element>
 inline Element* RepeatedPtrField<Element>::ReleaseCleared() {
   return RepeatedPtrFieldBase::ReleaseCleared<TypeHandler>();
 }
-#endif  // !PROTOBUF_FUTURE_REMOVE_CLEARED_API
+#endif  // !PROTOBUF_FUTURE_BREAKING_CHANGES
 
 template <typename Element>
 inline void RepeatedPtrField<Element>::Reserve(int new_size) {
@@ -2031,6 +1965,6 @@ extern template class PROTOBUF_EXPORT_TEMPLATE_DECLARE
 }  // namespace protobuf
 }  // namespace google
 
-#include "google/protobuf/port_undef.inc"
+#include <google/protobuf/port_undef.inc>
 
 #endif  // GOOGLE_PROTOBUF_REPEATED_PTR_FIELD_H__

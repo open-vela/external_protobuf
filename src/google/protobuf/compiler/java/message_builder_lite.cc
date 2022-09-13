@@ -32,30 +32,29 @@
 //  Based on original Protocol Buffers design by
 //  Sanjay Ghemawat, Jeff Dean, and others.
 
-#include "google/protobuf/compiler/java/message_builder_lite.h"
+#include <google/protobuf/compiler/java/message_builder_lite.h>
 
 #include <algorithm>
 #include <map>
 #include <memory>
 #include <vector>
 
-#include "google/protobuf/io/coded_stream.h"
-#include "google/protobuf/io/printer.h"
-#include "google/protobuf/wire_format.h"
-#include "google/protobuf/stubs/strutil.h"
-#include "absl/strings/str_cat.h"
-#include "absl/strings/substitute.h"
-#include "google/protobuf/compiler/java/context.h"
-#include "google/protobuf/compiler/java/doc_comment.h"
-#include "google/protobuf/compiler/java/enum.h"
-#include "google/protobuf/compiler/java/extension.h"
-#include "google/protobuf/compiler/java/generator_factory.h"
-#include "google/protobuf/compiler/java/helpers.h"
-#include "google/protobuf/compiler/java/name_resolver.h"
-#include "google/protobuf/descriptor.pb.h"
+#include <google/protobuf/io/coded_stream.h>
+#include <google/protobuf/io/printer.h>
+#include <google/protobuf/wire_format.h>
+#include <google/protobuf/stubs/strutil.h>
+#include <google/protobuf/stubs/substitute.h>
+#include <google/protobuf/compiler/java/context.h>
+#include <google/protobuf/compiler/java/doc_comment.h>
+#include <google/protobuf/compiler/java/enum.h>
+#include <google/protobuf/compiler/java/extension.h>
+#include <google/protobuf/compiler/java/generator_factory.h>
+#include <google/protobuf/compiler/java/helpers.h>
+#include <google/protobuf/compiler/java/name_resolver.h>
+#include <google/protobuf/descriptor.pb.h>
 
 // Must be last.
-#include "google/protobuf/port_def.inc"
+#include <google/protobuf/port_def.inc>
 
 namespace google {
 namespace protobuf {
@@ -101,7 +100,7 @@ void MessageBuilderLiteGenerator::Generate(io::Printer* printer) {
     vars["oneof_name"] = context_->GetOneofGeneratorInfo(oneof)->name;
     vars["oneof_capitalized_name"] =
         context_->GetOneofGeneratorInfo(oneof)->capitalized_name;
-    vars["oneof_index"] = absl::StrCat(oneof->index());
+    vars["oneof_index"] = StrCat(oneof->index());
 
     // oneofCase() and clearOneof()
     printer->Print(vars,
@@ -154,4 +153,4 @@ void MessageBuilderLiteGenerator::GenerateCommonBuilderMethods(
 }  // namespace protobuf
 }  // namespace google
 
-#include "google/protobuf/port_undef.inc"
+#include <google/protobuf/port_undef.inc>
