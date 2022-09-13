@@ -32,7 +32,7 @@
 //  Based on original Protocol Buffers design by
 //  Sanjay Ghemawat, Jeff Dean, and others.
 
-#include "google/protobuf/compiler/cpp/file.h"
+#include <google/protobuf/compiler/cpp/file.h>
 
 #include <iostream>
 #include <map>
@@ -42,20 +42,19 @@
 #include <unordered_set>
 #include <vector>
 
-#include "google/protobuf/compiler/scc.h"
-#include "absl/strings/escaping.h"
-#include "absl/strings/str_cat.h"
-#include "absl/strings/str_replace.h"
-#include "google/protobuf/compiler/cpp/enum.h"
-#include "google/protobuf/compiler/cpp/extension.h"
-#include "google/protobuf/compiler/cpp/helpers.h"
-#include "google/protobuf/compiler/cpp/message.h"
-#include "google/protobuf/compiler/cpp/service.h"
-#include "google/protobuf/descriptor.h"
-#include "google/protobuf/descriptor.pb.h"
+#include <google/protobuf/compiler/scc.h>
+#include <google/protobuf/io/printer.h>
+#include <google/protobuf/stubs/strutil.h>
+#include <google/protobuf/compiler/cpp/enum.h>
+#include <google/protobuf/compiler/cpp/extension.h>
+#include <google/protobuf/compiler/cpp/field.h>
+#include <google/protobuf/compiler/cpp/helpers.h>
+#include <google/protobuf/compiler/cpp/message.h>
+#include <google/protobuf/compiler/cpp/service.h>
+#include <google/protobuf/descriptor.pb.h>
 
 // Must be last.
-#include "google/protobuf/port_def.inc"
+#include <google/protobuf/port_def.inc>
 
 namespace google {
 namespace protobuf {
@@ -110,6 +109,7 @@ inline void UnmuteWuninitialized(Formatter& format) {
 FileGenerator::FileGenerator(const FileDescriptor* file, const Options& options)
     : file_(file), options_(options), scc_analyzer_(options) {
   // These variables are the same on a file level
+  SetCommonVars(options, &variables_);
   variables_["dllexport_decl"] = options.dllexport_decl;
   variables_["tablename"] = UniqueName("TableStruct", file_, options_);
   variables_["file_level_metadata"] =
@@ -171,7 +171,7 @@ void FileGenerator::GenerateMacroUndefs(io::Printer* printer) {
   for (int i = 0; i < fields.size(); i++) {
     const std::string& name = fields[i]->name();
     static const char* kMacroNames[] = {"major", "minor"};
-    for (int j = 0; j < ABSL_ARRAYSIZE(kMacroNames); ++j) {
+    for (int j = 0; j < GOOGLE_ARRAYSIZE(kMacroNames); ++j) {
       if (name == kMacroNames[j]) {
         names_to_undef.push_back(name);
         break;
@@ -257,8 +257,7 @@ void FileGenerator::GenerateProtoHeader(io::Printer* printer,
     return;
   }
 
-  GenerateTopHeaderGuard(printer,
-                         google::protobuf::compiler::cpp::GeneratedFileType::kProtoH);
+  GenerateTopHeaderGuard(printer, false);
 
   if (!options_.opensource_runtime) {
     format(
@@ -286,15 +285,13 @@ void FileGenerator::GenerateProtoHeader(io::Printer* printer,
 
   GenerateHeader(printer);
 
-  GenerateBottomHeaderGuard(printer,
-                            google::protobuf::compiler::cpp::GeneratedFileType::kProtoH);
+  GenerateBottomHeaderGuard(printer, false);
 }
 
 void FileGenerator::GeneratePBHeader(io::Printer* printer,
                                      const std::string& info_path) {
   Formatter format(printer, variables_);
-  GenerateTopHeaderGuard(printer,
-                         google::protobuf::compiler::cpp::GeneratedFileType::kPbH);
+  GenerateTopHeaderGuard(printer, true);
 
   if (options_.proto_h) {
     std::string target_basename = StripProto(file_->name());
@@ -333,8 +330,7 @@ void FileGenerator::GeneratePBHeader(io::Printer* printer,
         "\n");
   }
 
-  GenerateBottomHeaderGuard(printer,
-                            google::protobuf::compiler::cpp::GeneratedFileType::kPbH);
+  GenerateBottomHeaderGuard(printer, true);
 }
 
 void FileGenerator::DoIncludeFile(const std::string& google3_name,
@@ -350,7 +346,7 @@ void FileGenerator::DoIncludeFile(const std::string& google3_name,
     path = StringReplace(path, "proto/", "", false);
     path = StringReplace(path, "public/", "", false);
     if (options_.runtime_include_base.empty()) {
-      format("#include \"google/protobuf/$1$\"", path);
+      format("#include <google/protobuf/$1$>", path);
     } else {
       format("#include \"$1$google/protobuf/$2$\"",
              options_.runtime_include_base, path);
@@ -499,18 +495,20 @@ void FileGenerator::GenerateSourceDefaultInstance(int idx,
     generator->GenerateInitDefaultSplitInstance(printer);
     format(
         "} {}\n"
+        "  ~$1$() {}\n"
         "  union {\n"
-        "    $1$ _instance;\n"
+        "    $2$ _instance;\n"
         "  };\n"
         "};\n",
-        absl::StrCat(generator->classname_, "::Impl_::Split"));
+        DefaultInstanceType(generator->descriptor_, options_, /*split=*/true),
+        StrCat(generator->classname_, "::Impl_::Split"));
     // NO_DESTROY is not necessary for correctness. The empty destructor is
     // enough. However, the empty destructor fails to be elided in some
     // configurations (like non-opt or with certain sanitizers). NO_DESTROY is
     // there just to improve performance and binary size in these builds.
     format(
         "PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT "
-        "PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 const $1$ $2$;\n",
+        "PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 $1$ $2$;\n",
         DefaultInstanceType(generator->descriptor_, options_, /*split=*/true),
         DefaultInstanceName(generator->descriptor_, options_, /*split=*/true));
   }
@@ -882,7 +880,7 @@ void FileGenerator::GenerateReflectionInitializationCode(io::Printer* printer) {
       format("{ ");
       for (int i = 0; i < file_data.size();) {
         for (int j = 0; j < kBytesPerLine && i < file_data.size(); ++i, ++j) {
-          format("'$1$', ", absl::CEscape(file_data.substr(i, 1)));
+          format("'$1$', ", CEscape(file_data.substr(i, 1)));
         }
         format("\n");
       }
@@ -893,7 +891,7 @@ void FileGenerator::GenerateReflectionInitializationCode(io::Printer* printer) {
       for (int i = 0; i < file_data.size(); i += kBytesPerLine) {
         format(
             "\"$1$\"\n",
-            EscapeTrigraphs(absl::CEscape(file_data.substr(i, kBytesPerLine))));
+            EscapeTrigraphs(CEscape(file_data.substr(i, kBytesPerLine))));
       }
     }
     format(";\n");
@@ -928,7 +926,7 @@ void FileGenerator::GenerateReflectionInitializationCode(io::Printer* printer) {
   // so disable for now.
   bool eager = false;
   format(
-      "static ::absl::once_flag $desc_table$_once;\n"
+      "static ::_pbi::once_flag $desc_table$_once;\n"
       "const ::_pbi::DescriptorTable $desc_table$ = {\n"
       "    false, $1$, $2$, $3$,\n"
       "    \"$filename$\",\n"
@@ -1001,7 +999,7 @@ class FileGenerator::ForwardDeclarations {
       const Descriptor* class_desc = p.second;
       format(
           "struct $1$;\n"
-          "$dllexport_decl $extern const $1$ $2$;\n",
+          "$dllexport_decl $extern $1$ $2$;\n",
           DefaultInstanceType(class_desc, options, /*split=*/true),
           DefaultInstanceName(class_desc, options, /*split=*/true));
     }
@@ -1087,8 +1085,7 @@ void FileGenerator::GenerateForwardDeclarations(io::Printer* printer) {
   format("PROTOBUF_NAMESPACE_CLOSE\n");
 }
 
-void FileGenerator::GenerateTopHeaderGuard(
-    io::Printer* printer, google::protobuf::compiler::cpp::GeneratedFileType file_type) {
+void FileGenerator::GenerateTopHeaderGuard(io::Printer* printer, bool pb_h) {
   Formatter format(printer, variables_);
   // Generate top of header.
   format(
@@ -1100,7 +1097,7 @@ void FileGenerator::GenerateTopHeaderGuard(
       "\n"
       "#include <limits>\n"
       "#include <string>\n",
-      IncludeGuard(file_, file_type, options_));
+      IncludeGuard(file_, pb_h, options_));
   if (!options_.opensource_runtime && !enum_generators_.empty()) {
     // Add header to provide std::is_integral for safe Enum_Name() function.
     format("#include <type_traits>\n");
@@ -1108,11 +1105,10 @@ void FileGenerator::GenerateTopHeaderGuard(
   format("\n");
 }
 
-void FileGenerator::GenerateBottomHeaderGuard(
-    io::Printer* printer, google::protobuf::compiler::cpp::GeneratedFileType file_type) {
+void FileGenerator::GenerateBottomHeaderGuard(io::Printer* printer, bool pb_h) {
   Formatter format(printer, variables_);
   format("#endif  // $GOOGLE_PROTOBUF$_INCLUDED_$1$\n",
-         IncludeGuard(file_, file_type, options_));
+         IncludeGuard(file_, pb_h, options_));
 }
 
 void FileGenerator::GenerateLibraryIncludes(io::Printer* printer) {

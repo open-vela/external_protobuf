@@ -42,13 +42,13 @@
 #include <string>
 #include <utility>
 
-#include "google/protobuf/descriptor.h"
-#include "google/protobuf/descriptor.pb.h"
-#include "google/protobuf/io/tokenizer.h"
-#include "google/protobuf/repeated_field.h"
+#include <google/protobuf/descriptor.h>
+#include <google/protobuf/descriptor.pb.h>
+#include <google/protobuf/io/tokenizer.h>
+#include <google/protobuf/repeated_field.h>
 
 // Must be included last.
-#include "google/protobuf/port_def.inc"
+#include <google/protobuf/port_def.inc>
 
 namespace google {
 namespace protobuf {
@@ -71,8 +71,6 @@ class SourceLocationTable;
 class PROTOBUF_EXPORT Parser {
  public:
   Parser();
-  Parser(const Parser&) = delete;
-  Parser& operator=(const Parser&) = delete;
   ~Parser();
 
   // Parse the entire input and construct a FileDescriptorProto representing
@@ -547,6 +545,8 @@ class PROTOBUF_EXPORT Parser {
   // the next element (See SourceCodeInfo.Location in descriptor.proto), when
   // ConsumeEndOfDeclaration() is called.
   std::vector<std::string> upcoming_detached_comments_;
+
+  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(Parser);
 };
 
 // A table mapping (descriptor, ErrorLocation) pairs -- as reported by
@@ -597,6 +597,6 @@ class PROTOBUF_EXPORT SourceLocationTable {
 }  // namespace protobuf
 }  // namespace google
 
-#include "google/protobuf/port_undef.inc"
+#include <google/protobuf/port_undef.inc>
 
 #endif  // GOOGLE_PROTOBUF_COMPILER_PARSER_H__

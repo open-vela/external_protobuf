@@ -41,12 +41,11 @@
 #include <string>
 #include <vector>
 
-#include "google/protobuf/stubs/common.h"
-#include "google/protobuf/compiler/cpp/field.h"
-#include "google/protobuf/compiler/cpp/helpers.h"
-#include "google/protobuf/port.h"
-#include "google/protobuf/compiler/scc.h"
-#include "google/protobuf/compiler/cpp/options.h"
+#include <google/protobuf/stubs/common.h>
+#include <google/protobuf/compiler/cpp/field.h>
+#include <google/protobuf/compiler/cpp/helpers.h>
+#include <google/protobuf/compiler/scc.h>
+#include <google/protobuf/compiler/cpp/options.h>
 
 namespace google {
 namespace protobuf {
@@ -71,8 +70,6 @@ class FileGenerator {
  public:
   // See generator.cc for the meaning of dllexport_decl.
   FileGenerator(const FileDescriptor* file, const Options& options);
-  FileGenerator(const FileGenerator&) = delete;
-  FileGenerator& operator=(const FileGenerator&) = delete;
   ~FileGenerator();
 
   // Shared code between the two header generators below.
@@ -137,10 +134,8 @@ class FileGenerator {
   void GenerateForwardDeclarations(io::Printer* printer);
 
   // Generates top or bottom of a header file.
-  void GenerateTopHeaderGuard(
-      io::Printer* printer, google::protobuf::compiler::cpp::GeneratedFileType file_type);
-  void GenerateBottomHeaderGuard(
-      io::Printer* printer, google::protobuf::compiler::cpp::GeneratedFileType file_type);
+  void GenerateTopHeaderGuard(io::Printer* printer, bool pb_h);
+  void GenerateBottomHeaderGuard(io::Printer* printer, bool pb_h);
 
   // Generates #include directives.
   void GenerateLibraryIncludes(io::Printer* printer);
@@ -202,6 +197,8 @@ class FileGenerator {
   std::vector<std::unique_ptr<EnumGenerator>> enum_generators_;
   std::vector<std::unique_ptr<ServiceGenerator>> service_generators_;
   std::vector<std::unique_ptr<ExtensionGenerator>> extension_generators_;
+
+  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(FileGenerator);
 };
 
 }  // namespace cpp

@@ -29,10 +29,7 @@
 
 syntax = "proto2";
 
-// Explicit empty prefix, tests some validations code paths also.
-package objc.protobuf.tests;
-
-option objc_class_prefix = "";
+package protobuf_unittest;
 
 message Message2 {
   enum Enum {

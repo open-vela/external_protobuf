@@ -88,18 +88,18 @@
 // I'd love to hear about other alternatives, though, as this code isn't
 // exactly pretty.
 
-#include "google/protobuf/io/tokenizer.h"
+#include <google/protobuf/io/tokenizer.h>
 
-#include "google/protobuf/stubs/common.h"
-#include "google/protobuf/stubs/logging.h"
-#include "absl/strings/escaping.h"
-#include "google/protobuf/stubs/stringprintf.h"
-#include "google/protobuf/io/strtod.h"
-#include "google/protobuf/io/zero_copy_stream.h"
-#include "google/protobuf/stubs/stl_util.h"
+#include <google/protobuf/stubs/common.h>
+#include <google/protobuf/stubs/logging.h>
+#include <google/protobuf/stubs/strutil.h>
+#include <google/protobuf/stubs/stringprintf.h>
+#include <google/protobuf/io/strtod.h>
+#include <google/protobuf/io/zero_copy_stream.h>
+#include <google/protobuf/stubs/stl_util.h>
 
 // Must be included last.
-#include "google/protobuf/port_def.inc"
+#include <google/protobuf/port_def.inc>
 
 namespace google {
 namespace protobuf {
@@ -406,7 +406,7 @@ void Tokenizer::ConsumeString(char delimiter) {
 
       case '\n': {
         if (!allow_multiline_strings_) {
-          AddError("Multiline strings are not allowed. Did you miss a \"?.");
+          AddError("String literals cannot cross line boundaries.");
           return;
         }
         NextChar();
@@ -1024,7 +1024,7 @@ double Tokenizer::ParseFloat(const std::string& text) {
          static_cast<size_t>(end - start) != text.size() || *start == '-')
       << " Tokenizer::ParseFloat() passed text that could not have been"
          " tokenized as a float: "
-      << absl::CEscape(text);
+      << CEscape(text);
   return result;
 }
 
@@ -1145,7 +1145,7 @@ void Tokenizer::ParseStringAppend(const std::string& text,
   if (text_size == 0) {
     GOOGLE_LOG(DFATAL) << " Tokenizer::ParseStringAppend() passed text that could not"
                    " have been tokenized as a string: "
-                << absl::CEscape(text);
+                << CEscape(text);
     return;
   }
 
@@ -1236,4 +1236,4 @@ bool Tokenizer::IsIdentifier(const std::string& text) {
 }  // namespace protobuf
 }  // namespace google
 
-#include "google/protobuf/port_undef.inc"
+#include <google/protobuf/port_undef.inc>

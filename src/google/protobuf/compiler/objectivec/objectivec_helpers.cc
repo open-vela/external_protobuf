@@ -41,21 +41,17 @@
 #include <unordered_set>
 #include <vector>
 
-#include "google/protobuf/compiler/code_generator.h"
-#include "google/protobuf/compiler/objectivec/objectivec_helpers.h"
-#include "google/protobuf/compiler/objectivec/objectivec_nsobject_methods.h"
-#include "google/protobuf/descriptor.pb.h"
-#include "google/protobuf/io/coded_stream.h"
-#include "google/protobuf/io/printer.h"
-#include "google/protobuf/io/zero_copy_stream_impl.h"
-#include "google/protobuf/io/io_win32.h"
-#include "google/protobuf/port.h"
-#include "google/protobuf/stubs/common.h"
-#include "google/protobuf/stubs/strutil.h"
-#include "absl/strings/ascii.h"
-#include "absl/strings/escaping.h"
-#include "absl/strings/str_split.h"
-#include "absl/strings/str_replace.h"
+#include <google/protobuf/compiler/code_generator.h>
+#include <google/protobuf/compiler/objectivec/objectivec_helpers.h>
+#include <google/protobuf/compiler/objectivec/objectivec_nsobject_methods.h>
+#include <google/protobuf/descriptor.pb.h>
+#include <google/protobuf/io/coded_stream.h>
+#include <google/protobuf/io/printer.h>
+#include <google/protobuf/io/zero_copy_stream_impl.h>
+#include <google/protobuf/io/io_win32.h>
+#include <google/protobuf/port.h>
+#include <google/protobuf/stubs/common.h>
+#include <google/protobuf/stubs/strutil.h>
 
 // NOTE: src/google/protobuf/compiler/plugin.cc makes use of cerr for some
 // error cases, so it seems to be ok to use as a back door for errors.
@@ -69,28 +65,28 @@ namespace objectivec {
 // in this port namespace to avoid ambiguous definition.
 namespace posix {
 #ifdef _WIN32
-using google::protobuf::io::win32::open;
-#else  // !_WIN32
+using ::google::protobuf::io::win32::open;
+#else
 using ::open;
-#endif  // _WIN32
-}  // namespace posix
+#endif
+}  // namespace port
 
 namespace {
 
 bool BoolFromEnvVar(const char* env_var, bool default_value) {
   const char* value = getenv(env_var);
   if (value) {
-    return std::string("YES") == absl::AsciiStrToUpper(value);
+    return std::string("YES") == ToUpper(value);
   }
   return default_value;
 }
 
 class SimpleLineCollector : public LineConsumer {
  public:
-  explicit SimpleLineCollector(std::unordered_set<std::string>* inout_set)
+  SimpleLineCollector(std::unordered_set<std::string>* inout_set)
       : set_(inout_set) {}
 
-  virtual bool ConsumeLine(const absl::string_view& line, std::string* out_error) override {
+  virtual bool ConsumeLine(const StringPiece& line, std::string* out_error) override {
     set_->insert(std::string(line));
     return true;
   }
@@ -105,7 +101,7 @@ class PackageToPrefixesCollector : public LineConsumer {
                              std::map<std::string, std::string>* inout_package_to_prefix_map)
       : usage_(usage), prefix_map_(inout_package_to_prefix_map) {}
 
-  virtual bool ConsumeLine(const absl::string_view& line, std::string* out_error) override;
+  virtual bool ConsumeLine(const StringPiece& line, std::string* out_error) override;
 
  private:
   const std::string usage_;
@@ -116,7 +112,7 @@ class PrefixModeStorage {
  public:
   PrefixModeStorage();
 
-  std::string package_to_prefix_mappings_path() const { return package_to_prefix_mappings_path_; }
+  const std::string package_to_prefix_mappings_path() const { return package_to_prefix_mappings_path_; }
   void set_package_to_prefix_mappings_path(const std::string& path) {
     package_to_prefix_mappings_path_ = path;
     package_to_prefix_map_.clear();
@@ -127,7 +123,7 @@ class PrefixModeStorage {
   bool use_package_name() const { return use_package_name_; }
   void set_use_package_name(bool on_or_off) { use_package_name_ = on_or_off; }
 
-  std::string exception_path() const { return exception_path_; }
+  const std::string exception_path() const { return exception_path_; }
   void set_exception_path(const std::string& path) {
     exception_path_ = path;
     exceptions_.clear();
@@ -138,7 +134,6 @@ class PrefixModeStorage {
   // When using a proto package as the prefix, this should be added as the
   // prefix in front of it.
   const std::string& forced_package_prefix() const { return forced_prefix_; }
-  void set_forced_package_prefix(const std::string& prefix) { forced_prefix_ = prefix; }
 
  private:
   bool use_package_name_;
@@ -160,6 +155,8 @@ PrefixModeStorage::PrefixModeStorage() {
     exception_path_ = exception_path;
   }
 
+  // This one is a not expected to be common, so it doesn't get a generation
+  // option, just the env var.
   const char* prefix = getenv("GPB_OBJC_USE_PACKAGE_AS_PREFIX_PREFIX");
   if (prefix) {
     forced_prefix_ = prefix;
@@ -257,14 +254,6 @@ void SetProtoPackagePrefixExceptionList(const std::string& file_path) {
   g_prefix_mode.set_exception_path(file_path);
 }
 
-std::string GetForcedPackagePrefix() {
-  return g_prefix_mode.forced_package_prefix();
-}
-
-void SetForcedPackagePrefix(const std::string& prefix) {
-  g_prefix_mode.set_forced_package_prefix(prefix);
-}
-
 Options::Options() {
   // While there are generator options, also support env variables to help with
   // build systems where it isn't as easy to hook in for add the generation
@@ -276,7 +265,7 @@ Options::Options() {
   const char* suppressions = getenv("GPB_OBJC_EXPECTED_PACKAGE_PREFIXES_SUPPRESSIONS");
   if (suppressions) {
     expected_prefixes_suppressions =
-        absl::StrSplit(suppressions, ";", absl::SkipEmpty());
+        Split(suppressions, ";", true);
   }
   prefixes_must_be_registered =
       BoolFromEnvVar("GPB_OBJC_PREFIXES_MUST_BE_REGISTERED", false);
@@ -297,7 +286,7 @@ std::unordered_set<std::string> MakeWordsMap(const char* const words[],
 const char* const kUpperSegmentsList[] = {"url", "http", "https"};
 
 std::unordered_set<std::string> kUpperSegments =
-    MakeWordsMap(kUpperSegmentsList, ABSL_ARRAYSIZE(kUpperSegmentsList));
+    MakeWordsMap(kUpperSegmentsList, GOOGLE_ARRAYSIZE(kUpperSegmentsList));
 
 bool ascii_isnewline(char c) {
   return c == '\n' || c == '\r';
@@ -316,7 +305,7 @@ std::string UnderscoresToCamelCase(const std::string& input,
   bool last_char_was_upper = false;
   for (int i = 0; i < input.size(); i++) {
     char c = input[i];
-    if (absl::ascii_isdigit(c)) {
+    if (ascii_isdigit(c)) {
       if (!last_char_was_number) {
         values.push_back(current);
         current = "";
@@ -324,7 +313,7 @@ std::string UnderscoresToCamelCase(const std::string& input,
       current += c;
       last_char_was_number = last_char_was_lower = last_char_was_upper = false;
       last_char_was_number = true;
-    } else if (absl::ascii_islower(c)) {
+    } else if (ascii_islower(c)) {
       // lowercase letter can follow a lowercase or uppercase letter
       if (!last_char_was_lower && !last_char_was_upper) {
         values.push_back(current);
@@ -333,12 +322,12 @@ std::string UnderscoresToCamelCase(const std::string& input,
       current += c;  // already lower
       last_char_was_number = last_char_was_lower = last_char_was_upper = false;
       last_char_was_lower = true;
-    } else if (absl::ascii_isupper(c)) {
+    } else if (ascii_isupper(c)) {
       if (!last_char_was_upper) {
         values.push_back(current);
         current = "";
       }
-      current += absl::ascii_tolower(c);
+      current += ascii_tolower(c);
       last_char_was_number = last_char_was_lower = last_char_was_upper = false;
       last_char_was_upper = true;
     } else {
@@ -358,7 +347,7 @@ std::string UnderscoresToCamelCase(const std::string& input,
     }
     for (int j = 0; j < value.length(); j++) {
       if (j == 0 || all_upper) {
-        value[j] = absl::ascii_toupper(value[j]);
+        value[j] = ascii_toupper(value[j]);
       } else {
         // Nothing, already in lower.
       }
@@ -368,7 +357,7 @@ std::string UnderscoresToCamelCase(const std::string& input,
   if ((result.length() != 0) &&
       !first_capitalized &&
       !first_segment_forces_upper) {
-    result[0] = absl::ascii_tolower(result[0]);
+    result[0] = ascii_tolower(result[0]);
   }
   return result;
 }
@@ -457,9 +446,9 @@ std::string SanitizeNameForObjC(const std::string& prefix,
                                 const std::string& extension,
                                 std::string* out_suffix_added) {
   static const std::unordered_set<std::string> kReservedWords =
-      MakeWordsMap(kReservedWordList, ABSL_ARRAYSIZE(kReservedWordList));
+      MakeWordsMap(kReservedWordList, GOOGLE_ARRAYSIZE(kReservedWordList));
   static const std::unordered_set<std::string> kNSObjectMethods =
-      MakeWordsMap(kNSObjectMethodsList, ABSL_ARRAYSIZE(kNSObjectMethodsList));
+      MakeWordsMap(kNSObjectMethodsList, GOOGLE_ARRAYSIZE(kNSObjectMethodsList));
   std::string sanitized;
   // We add the prefix in the cases where the string is missing a prefix.
   // We define "missing a prefix" as where 'input':
@@ -467,7 +456,7 @@ std::string SanitizeNameForObjC(const std::string& prefix,
   // b) Isn't equivalent to the prefix or
   // c) Has the prefix, but the letter after the prefix is lowercase
   if (HasPrefixString(input, prefix)) {
-    if (input.length() == prefix.length() || !absl::ascii_isupper(input[prefix.length()])) {
+    if (input.length() == prefix.length() || !ascii_isupper(input[prefix.length()])) {
       sanitized = prefix + input;
     } else {
       sanitized = input;
@@ -522,7 +511,7 @@ bool IsSpecialName(const std::string& name, const std::string* special_names,
         // If name is longer than the retained_name[i] that it matches
         // the next character must be not lower case (newton vs newTon vs
         // new_ton).
-        return !absl::ascii_islower(name[length]);
+        return !ascii_islower(name[length]);
       } else {
         return true;
       }
@@ -559,7 +548,7 @@ std::string GetEnumNameForFlagType(const FlagType flag_type) {
   }
 }
 
-void MaybeUnQuote(absl::string_view* input) {
+void MaybeUnQuote(StringPiece* input) {
   if ((input->length() >= 2) &&
       ((*input->data() == '\'' || *input->data() == '"')) &&
       ((*input)[input->length() - 1] == *input->data())) {
@@ -571,15 +560,15 @@ void MaybeUnQuote(absl::string_view* input) {
 }  // namespace
 
 // Escape C++ trigraphs by escaping question marks to \?
-std::string EscapeTrigraphs(absl::string_view to_escape) {
-  return absl::StrReplaceAll(to_escape, {{"?", "\\?"}});
+std::string EscapeTrigraphs(const std::string& to_escape) {
+  return StringReplace(to_escape, "?", "\\?", true);
 }
 
-void TrimWhitespace(absl::string_view* input) {
-  while (!input->empty() && absl::ascii_isspace(*input->data())) {
+void TrimWhitespace(StringPiece* input) {
+  while (!input->empty() && ascii_isspace(*input->data())) {
     input->remove_prefix(1);
   }
-  while (!input->empty() && absl::ascii_isspace((*input)[input->length() - 1])) {
+  while (!input->empty() && ascii_isspace((*input)[input->length() - 1])) {
     input->remove_suffix(1);
   }
 }
@@ -631,7 +620,7 @@ std::string FileClassPrefix(const FileDescriptor* file) {
   // camelcase each one and then join them with underscores, and add an
   // underscore at the end.
   std::string result;
-  const std::vector<std::string> segments = absl::StrSplit(file->package(), ".", absl::SkipEmpty());
+  const std::vector<std::string> segments = Split(file->package(), ".", true);
   for (const auto& segment : segments) {
     const std::string part = UnderscoresToCamelCase(segment, true);
     if (part.empty()) {
@@ -771,10 +760,10 @@ std::string UnCamelCaseEnumShortName(const std::string& name) {
   std::string result;
   for (int i = 0; i < name.size(); i++) {
     char c = name[i];
-    if (i > 0 && absl::ascii_isupper(c)) {
+    if (i > 0 && ascii_isupper(c)) {
       result += '_';
     }
-    result += absl::ascii_toupper(c);
+    result += ascii_toupper(c);
   }
   return result;
 }
@@ -805,7 +794,7 @@ std::string FieldNameCapitalized(const FieldDescriptor* field) {
   // name.
   std::string result = FieldName(field);
   if (result.length() > 0) {
-    result[0] = absl::ascii_toupper(result[0]);
+    result[0] = ascii_toupper(result[0]);
   }
   return result;
 }
@@ -829,7 +818,7 @@ std::string OneofNameCapitalized(const OneofDescriptor* descriptor) {
   // Use the common handling and then up-case the first letter.
   std::string result = OneofName(descriptor);
   if (result.length() > 0) {
-    result[0] = absl::ascii_toupper(result[0]);
+    result[0] = ascii_toupper(result[0]);
   }
   return result;
 }
@@ -852,8 +841,8 @@ std::string UnCamelCaseFieldName(const std::string& name, const FieldDescriptor*
   }
   if (field->type() == FieldDescriptor::TYPE_GROUP) {
     if (worker.length() > 0) {
-      if (absl::ascii_islower(worker[0])) {
-        worker[0] = absl::ascii_toupper(worker[0]);
+      if (ascii_islower(worker[0])) {
+        worker[0] = ascii_toupper(worker[0]);
       }
     }
     return worker;
@@ -861,11 +850,11 @@ std::string UnCamelCaseFieldName(const std::string& name, const FieldDescriptor*
     std::string result;
     for (int i = 0; i < worker.size(); i++) {
       char c = worker[i];
-      if (absl::ascii_isupper(c)) {
+      if (ascii_isupper(c)) {
         if (i > 0) {
           result += '_';
         }
-        result += absl::ascii_tolower(c);
+        result += ascii_tolower(c);
       } else {
         result += c;
       }
@@ -1001,9 +990,9 @@ static std::string HandleExtremeFloatingPoint(std::string val,
     return "-INFINITY";
   } else {
     // float strings with ., e or E need to have f appended
-    if (add_float_suffix && (val.find('.') != std::string::npos ||
-                             val.find('e') != std::string::npos ||
-                             val.find('E') != std::string::npos)) {
+    if (add_float_suffix && (val.find(".") != std::string::npos ||
+                             val.find("e") != std::string::npos ||
+                             val.find("E") != std::string::npos)) {
       val += "f";
     }
     return val;
@@ -1064,17 +1053,17 @@ std::string DefaultValue(const FieldDescriptor* field) {
       if (field->default_value_int32() == INT_MIN) {
         return "-0x80000000";
       }
-      return absl::StrCat(field->default_value_int32());
+      return StrCat(field->default_value_int32());
     case FieldDescriptor::CPPTYPE_UINT32:
-      return absl::StrCat(field->default_value_uint32()) + "U";
+      return StrCat(field->default_value_uint32()) + "U";
     case FieldDescriptor::CPPTYPE_INT64:
       // gcc and llvm reject the decimal form of kint32min and kint64min.
       if (field->default_value_int64() == LLONG_MIN) {
         return "-0x8000000000000000LL";
       }
-      return absl::StrCat(field->default_value_int64()) + "LL";
+      return StrCat(field->default_value_int64()) + "LL";
     case FieldDescriptor::CPPTYPE_UINT64:
-      return absl::StrCat(field->default_value_uint64()) + "ULL";
+      return StrCat(field->default_value_uint64()) + "ULL";
     case FieldDescriptor::CPPTYPE_DOUBLE:
       return HandleExtremeFloatingPoint(
           SimpleDtoa(field->default_value_double()), false);
@@ -1104,9 +1093,9 @@ std::string DefaultValue(const FieldDescriptor* field) {
         uint32_t length = ghtonl(default_string.length());
         std::string bytes((const char*)&length, sizeof(length));
         bytes.append(default_string);
-        return "(NSData*)\"" + EscapeTrigraphs(absl::CEscape(bytes)) + "\"";
+        return "(NSData*)\"" + EscapeTrigraphs(CEscape(bytes)) + "\"";
       } else {
-        return "@\"" + EscapeTrigraphs(absl::CEscape(default_string)) + "\"";
+        return "@\"" + EscapeTrigraphs(CEscape(default_string)) + "\"";
       }
     }
     case FieldDescriptor::CPPTYPE_ENUM:
@@ -1190,7 +1179,7 @@ std::string BuildCommentsString(const SourceLocation& location,
                                ? location.trailing_comments
                                : location.leading_comments;
   std::vector<std::string> lines;
-  lines = absl::StrSplit(comments, "\n", absl::AllowEmpty());
+  lines = Split(comments, "\n", false);
   while (!lines.empty() && lines.back().empty()) {
     lines.pop_back();
   }
@@ -1217,15 +1206,14 @@ std::string BuildCommentsString(const SourceLocation& location,
     add_leading_space = true;
   }
 
-  for (size_t i = 0; i < lines.size(); i++) {
-    std::string line = absl::StrReplaceAll(
-        StripPrefixString(lines[i], " "),
-        {// HeaderDoc and appledoc use '\' and '@' for markers; escape them.
-         {"\\", "\\\\"},
-         {"@", "\\@"},
-         // Decouple / from * to not have inline comments inside comments.
-         {"/*", "/\\*"},
-         {"*/", "*\\/"}});
+  for (int i = 0; i < lines.size(); i++) {
+    std::string line = StripPrefixString(lines[i], " ");
+    // HeaderDoc and appledoc use '\' and '@' for markers; escape them.
+    line = StringReplace(line, "\\", "\\\\", true);
+    line = StringReplace(line, "@", "\\@", true);
+    // Decouple / from * to not have inline comments inside comments.
+    line = StringReplace(line, "/*", "/\\*", true);
+    line = StringReplace(line, "*/", "*\\/", true);
     line = prefix + line;
     StripWhitespace(&line);
     // If not a one line, need to add the first space before *, as
@@ -1246,7 +1234,7 @@ const char* const ProtobufLibraryFrameworkName = "Protobuf";
 std::string ProtobufFrameworkImportSymbol(const std::string& framework_name) {
   // GPB_USE_[framework_name]_FRAMEWORK_IMPORTS
   std::string result = std::string("GPB_USE_");
-  result += absl::AsciiStrToUpper(framework_name);
+  result += ToUpper(framework_name);
   result += "_FRAMEWORK_IMPORTS";
   return result;
 }
@@ -1271,21 +1259,21 @@ bool IsProtobufLibraryBundledProtoFile(const FileDescriptor* file) {
   return false;
 }
 
-bool ReadLine(absl::string_view* input, absl::string_view* line) {
+bool ReadLine(StringPiece* input, StringPiece* line) {
   for (int len = 0; len < input->size(); ++len) {
     if (ascii_isnewline((*input)[len])) {
-      *line = absl::string_view(input->data(), len);
+      *line = StringPiece(input->data(), len);
       ++len;  // advance over the newline
-      *input = absl::string_view(input->data() + len, input->size() - len);
+      *input = StringPiece(input->data() + len, input->size() - len);
       return true;
     }
   }
   return false;  // Ran out of input with no newline.
 }
 
-void RemoveComment(absl::string_view* input) {
+void RemoveComment(StringPiece* input) {
   int offset = input->find('#');
-  if (offset != absl::string_view::npos) {
+  if (offset != StringPiece::npos) {
     input->remove_suffix(input->length() - offset);
   }
 }
@@ -1293,14 +1281,14 @@ void RemoveComment(absl::string_view* input) {
 namespace {
 
 bool PackageToPrefixesCollector::ConsumeLine(
-    const absl::string_view& line, std::string* out_error) {
+    const StringPiece& line, std::string* out_error) {
   int offset = line.find('=');
-  if (offset == absl::string_view::npos) {
-    *out_error = usage_ + " file line without equal sign: '" + absl::StrCat(line) + "'.";
+  if (offset == StringPiece::npos) {
+    *out_error = usage_ + " file line without equal sign: '" + StrCat(line) + "'.";
     return false;
   }
-  absl::string_view package = line.substr(0, offset);
-  absl::string_view prefix = line.substr(offset + 1);
+  StringPiece package = line.substr(0, offset);
+  StringPiece prefix = line.substr(offset + 1);
   TrimWhitespace(&package);
   TrimWhitespace(&prefix);
   MaybeUnQuote(&prefix);
@@ -1422,7 +1410,7 @@ bool ValidateObjCClassPrefix(
   // Check: Warning - Make sure the prefix is is a reasonable value according
   // to Apple's rules (the checks above implicitly whitelist anything that
   // doesn't meet these rules).
-  if (!prefix.empty() && !absl::ascii_isupper(prefix[0])) {
+  if (!prefix.empty() && !ascii_isupper(prefix[0])) {
     std::cerr
          << "protoc:0: warning: Invalid 'option objc_class_prefix = \""
          << prefix << "\";' in '" << file->name() << "';"
@@ -1585,7 +1573,7 @@ class DecodeDataBuilder {
 
   void AddChar(const char desired) {
     ++segment_len_;
-    is_all_upper_ &= absl::ascii_isupper(desired);
+    is_all_upper_ &= ascii_isupper(desired);
   }
 
   void Push() {
@@ -1600,9 +1588,9 @@ class DecodeDataBuilder {
   bool AddFirst(const char desired, const char input) {
     if (desired == input) {
       op_ = kOpAsIs;
-    } else if (desired == absl::ascii_toupper(input)) {
+    } else if (desired == ascii_toupper(input)) {
       op_ = kOpFirstUpper;
-    } else if (desired == absl::ascii_tolower(input)) {
+    } else if (desired == ascii_tolower(input)) {
       op_ = kOpFirstLower;
     } else {
       // Can't be transformed to match.
@@ -1640,7 +1628,7 @@ bool DecodeDataBuilder::AddCharacter(const char desired, const char input) {
   if (desired == input) {
     // If we aren't transforming it, or we're upper casing it and it is
     // supposed to be uppercase; just add it to the segment.
-    if ((op_ != kOpAllUpper) || absl::ascii_isupper(desired)) {
+    if ((op_ != kOpAllUpper) || ascii_isupper(desired)) {
       AddChar(desired);
       return true;
     }
@@ -1652,7 +1640,7 @@ bool DecodeDataBuilder::AddCharacter(const char desired, const char input) {
 
   // If we need to uppercase, and everything so far has been uppercase,
   // promote op to AllUpper.
-  if ((desired == absl::ascii_toupper(input)) && is_all_upper_) {
+  if ((desired == ascii_toupper(input)) && is_all_upper_) {
     op_ = kOpAllUpper;
     AddChar(desired);
     return true;
@@ -1688,8 +1676,8 @@ std::string TextFormatDecodeData::DecodeDataForString(
   if ((input_for_decode.find('\0') != std::string::npos) ||
       (desired_output.find('\0') != std::string::npos)) {
     std::cerr << "error: got a null char in a string for making TextFormat data,"
-         << " input: \"" << absl::CEscape(input_for_decode) << "\", desired: \""
-         << absl::CEscape(desired_output) << "\"." << std::endl;
+         << " input: \"" << CEscape(input_for_decode) << "\", desired: \""
+         << CEscape(desired_output) << "\"." << std::endl;
     std::cerr.flush();
     abort();
   }
@@ -1735,7 +1723,7 @@ class Parser {
 
   // Feeds in some input, parse what it can, returning success/failure. Calling
   // again after an error is undefined.
-  bool ParseChunk(absl::string_view chunk, std::string* out_error);
+  bool ParseChunk(StringPiece chunk, std::string* out_error);
 
   // Should be called to finish parsing (after all input has been provided via
   // successful calls to ParseChunk(), calling after a ParseChunk() failure is
@@ -1750,16 +1738,16 @@ class Parser {
   std::string leftover_;
 };
 
-bool Parser::ParseChunk(absl::string_view chunk, std::string* out_error) {
-  absl::string_view full_chunk;
+bool Parser::ParseChunk(StringPiece chunk, std::string* out_error) {
+  StringPiece full_chunk;
   if (!leftover_.empty()) {
     leftover_ += std::string(chunk);
-    full_chunk = absl::string_view(leftover_);
+    full_chunk = StringPiece(leftover_);
   } else {
     full_chunk = chunk;
   }
 
-  absl::string_view line;
+  StringPiece line;
   while (ReadLine(&full_chunk, &line)) {
     ++line_;
     RemoveComment(&line);
@@ -1795,7 +1783,7 @@ bool Parser::Finish(std::string* out_error) {
 }
 
 std::string FullErrorString(const std::string& name, int line_num, const std::string& msg) {
-  return std::string("error: ") + name + " Line " + absl::StrCat(line_num) + ", " + msg;
+  return std::string("error: ") + name + " Line " + StrCat(line_num) + ", " + msg;
 }
 
 }  // namespace
@@ -1834,7 +1822,7 @@ bool ParseSimpleStream(io::ZeroCopyInputStream& input_stream,
       continue;
     }
 
-    if (!parser.ParseChunk(absl::string_view(static_cast<const char*>(buf), buf_len),
+    if (!parser.ParseChunk(StringPiece(static_cast<const char*>(buf), buf_len),
                            &local_error)) {
       *out_error = FullErrorString(stream_name, parser.last_line(), local_error);
       return false;
@@ -2001,26 +1989,26 @@ void ImportWriter::ParseFrameworkMappings() {
 }
 
 bool ImportWriter::ProtoFrameworkCollector::ConsumeLine(
-    const absl::string_view& line, std::string* out_error) {
+    const StringPiece& line, std::string* out_error) {
   int offset = line.find(':');
-  if (offset == absl::string_view::npos) {
+  if (offset == StringPiece::npos) {
     *out_error =
         std::string("Framework/proto file mapping line without colon sign: '") +
         std::string(line) + "'.";
     return false;
   }
-  absl::string_view framework_name = line.substr(0, offset);
-  absl::string_view proto_file_list = line.substr(offset + 1);
+  StringPiece framework_name = line.substr(0, offset);
+  StringPiece proto_file_list = line.substr(offset + 1);
   TrimWhitespace(&framework_name);
 
   int start = 0;
   while (start < proto_file_list.length()) {
     offset = proto_file_list.find(',', start);
-    if (offset == absl::string_view::npos) {
+    if (offset == StringPiece::npos) {
       offset = proto_file_list.length();
     }
 
-    absl::string_view proto_file = proto_file_list.substr(start, offset - start);
+    StringPiece proto_file = proto_file_list.substr(start, offset - start);
     TrimWhitespace(&proto_file);
     if (!proto_file.empty()) {
       std::map<std::string, std::string>::iterator existing_entry =
@@ -2033,7 +2021,7 @@ bool ImportWriter::ProtoFrameworkCollector::ConsumeLine(
         std::cerr.flush();
       }
 
-      if (proto_file.find(' ') != absl::string_view::npos) {
+      if (proto_file.find(' ') != StringPiece::npos) {
         std::cerr << "note: framework mapping file had a proto file with a "
                      "space in, hopefully that isn't a missing comma: '"
                   << std::string(proto_file) << "'" << std::endl;

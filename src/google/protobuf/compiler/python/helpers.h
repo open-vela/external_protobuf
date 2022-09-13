@@ -33,9 +33,7 @@
 
 #include <string>
 
-#include "absl/strings/str_replace.h"
-#include "google/protobuf/descriptor.h"
-#include "google/protobuf/descriptor.pb.h"
+#include <google/protobuf/descriptor.h>
 
 namespace google {
 namespace protobuf {
@@ -51,7 +49,6 @@ std::string ResolveKeyword(const std::string& name);
 std::string GetFileName(const FileDescriptor* file_des,
                         const std::string& suffix);
 bool HasGenericServices(const FileDescriptor* file);
-std::string GeneratedCodeToBase64(const GeneratedCodeInfo& annotations);
 
 template <typename DescriptorT>
 std::string NamePrefixedWithNestedTypes(const DescriptorT& descriptor,
