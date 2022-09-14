@@ -5,15 +5,15 @@
 
 #include <algorithm>
 
-#include <google/protobuf/io/coded_stream.h>
-#include <google/protobuf/extension_set.h>
-#include <google/protobuf/wire_format_lite.h>
-#include <google/protobuf/descriptor.h>
-#include <google/protobuf/generated_message_reflection.h>
-#include <google/protobuf/reflection_ops.h>
-#include <google/protobuf/wire_format.h>
+#include "google/protobuf/io/coded_stream.h"
+#include "google/protobuf/extension_set.h"
+#include "google/protobuf/wire_format_lite.h"
+#include "google/protobuf/descriptor.h"
+#include "google/protobuf/generated_message_reflection.h"
+#include "google/protobuf/reflection_ops.h"
+#include "google/protobuf/wire_format.h"
 // @@protoc_insertion_point(includes)
-#include <google/protobuf/port_def.inc>
+#include "google/protobuf/port_def.inc"
 
 PROTOBUF_PRAGMA_INIT_SEG
 
@@ -84,6 +84,8 @@ const uint32_t TableStruct_google_2fprotobuf_2fstruct_2eproto::offsets[] PROTOBU
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
+  ~0u,  // no _split_
+  ~0u,  // no sizeof(Split)
   PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::Struct_FieldsEntry_DoNotUse, key_),
   PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::Struct_FieldsEntry_DoNotUse, value_),
   0,
@@ -94,6 +96,8 @@ const uint32_t TableStruct_google_2fprotobuf_2fstruct_2eproto::offsets[] PROTOBU
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
+  ~0u,  // no _split_
+  ~0u,  // no sizeof(Split)
   PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::Struct, _impl_.fields_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::Value, _internal_metadata_),
@@ -101,6 +105,8 @@ const uint32_t TableStruct_google_2fprotobuf_2fstruct_2eproto::offsets[] PROTOBU
   PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::Value, _impl_._oneof_case_[0]),
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
+  ~0u,  // no _split_
+  ~0u,  // no sizeof(Split)
   ::_pbi::kInvalidFieldOffsetTag,
   ::_pbi::kInvalidFieldOffsetTag,
   ::_pbi::kInvalidFieldOffsetTag,
@@ -114,13 +120,15 @@ const uint32_t TableStruct_google_2fprotobuf_2fstruct_2eproto::offsets[] PROTOBU
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
+  ~0u,  // no _split_
+  ~0u,  // no sizeof(Split)
   PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::ListValue, _impl_.values_),
 };
 static const ::_pbi::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
-  { 0, 8, -1, sizeof(::PROTOBUF_NAMESPACE_ID::Struct_FieldsEntry_DoNotUse)},
-  { 10, -1, -1, sizeof(::PROTOBUF_NAMESPACE_ID::Struct)},
-  { 17, -1, -1, sizeof(::PROTOBUF_NAMESPACE_ID::Value)},
-  { 30, -1, -1, sizeof(::PROTOBUF_NAMESPACE_ID::ListValue)},
+  { 0, 10, -1, sizeof(::PROTOBUF_NAMESPACE_ID::Struct_FieldsEntry_DoNotUse)},
+  { 12, -1, -1, sizeof(::PROTOBUF_NAMESPACE_ID::Struct)},
+  { 21, -1, -1, sizeof(::PROTOBUF_NAMESPACE_ID::Value)},
+  { 36, -1, -1, sizeof(::PROTOBUF_NAMESPACE_ID::ListValue)},
 };
 
 static const ::_pb::Message* const file_default_instances[] = {
@@ -148,7 +156,7 @@ const char descriptor_table_protodef_google_2fprotobuf_2fstruct_2eproto[] PROTOB
   "rotobuf/types/known/structpb\370\001\001\242\002\003GPB\252\002\036"
   "Google.Protobuf.WellKnownTypesb\006proto3"
   ;
-static ::_pbi::once_flag descriptor_table_google_2fprotobuf_2fstruct_2eproto_once;
+static ::absl::once_flag descriptor_table_google_2fprotobuf_2fstruct_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_google_2fprotobuf_2fstruct_2eproto = {
     false, false, 638, descriptor_table_protodef_google_2fprotobuf_2fstruct_2eproto,
     "google/protobuf/struct.proto",
@@ -411,6 +419,8 @@ void Struct::InternalSwap(Struct* other) {
 
 class Value::_Internal {
  public:
+  static constexpr int32_t kOneofCaseOffset =
+    PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::Value, _impl_._oneof_case_);
   static const ::PROTOBUF_NAMESPACE_ID::Struct& struct_value(const Value* msg);
   static const ::PROTOBUF_NAMESPACE_ID::ListValue& list_value(const Value* msg);
 };
@@ -593,7 +603,7 @@ const char* Value::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
       // .google.protobuf.NullValue null_value = 1;
       case 1:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
-          uint64_t val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          uint32_t val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
           _internal_set_null_value(static_cast<::PROTOBUF_NAMESPACE_ID::NullValue>(val));
         } else
@@ -1054,4 +1064,4 @@ Arena::CreateMaybeMessage< ::PROTOBUF_NAMESPACE_ID::ListValue >(Arena* arena) {
 PROTOBUF_NAMESPACE_CLOSE
 
 // @@protoc_insertion_point(global_scope)
-#include <google/protobuf/port_undef.inc>
+#include "google/protobuf/port_undef.inc"

@@ -32,26 +32,26 @@
 //  Based on original Protocol Buffers design by
 //  Sanjay Ghemawat, Jeff Dean, and others.
 
-#include <google/protobuf/compiler/parser.h>
+#include "google/protobuf/compiler/parser.h"
 
 #include <algorithm>
 #include <map>
 #include <memory>
 #include <vector>
 
-#include <google/protobuf/test_util2.h>
-#include <google/protobuf/unittest.pb.h>
-#include <google/protobuf/any.pb.h>
-#include <google/protobuf/unittest_custom_options.pb.h>
-#include <google/protobuf/io/tokenizer.h>
-#include <google/protobuf/io/zero_copy_stream_impl.h>
-#include <google/protobuf/descriptor.pb.h>
-#include <google/protobuf/text_format.h>
-#include <google/protobuf/wire_format.h>
-#include <google/protobuf/testing/googletest.h>
+#include "google/protobuf/test_util2.h"
+#include "google/protobuf/unittest.pb.h"
+#include "google/protobuf/any.pb.h"
+#include "google/protobuf/unittest_custom_options.pb.h"
+#include "google/protobuf/io/tokenizer.h"
+#include "google/protobuf/io/zero_copy_stream_impl.h"
+#include "google/protobuf/descriptor.pb.h"
+#include "google/protobuf/text_format.h"
+#include "google/protobuf/wire_format.h"
+#include "google/protobuf/testing/googletest.h"
 #include <gtest/gtest.h>
-#include <google/protobuf/stubs/substitute.h>
-#include <google/protobuf/stubs/map_util.h>
+#include "absl/strings/str_join.h"
+#include "absl/strings/substitute.h"
 
 namespace google {
 namespace protobuf {
@@ -69,11 +69,11 @@ class MockErrorCollector : public io::ErrorCollector {
 
   // implements ErrorCollector ---------------------------------------
   void AddWarning(int line, int column, const std::string& message) override {
-    strings::SubstituteAndAppend(&warning_, "$0:$1: $2\n", line, column, message);
+    absl::SubstituteAndAppend(&warning_, "$0:$1: $2\n", line, column, message);
   }
 
   void AddError(int line, int column, const std::string& message) override {
-    strings::SubstituteAndAppend(&text_, "$0:$1: $2\n", line, column, message);
+    absl::SubstituteAndAppend(&text_, "$0:$1: $2\n", line, column, message);
   }
 };
 
@@ -263,6 +263,7 @@ TEST_F(ParserTest, WarnIfFieldNameContainsNumberImmediatelyFollowUnderscore) {
                   "Number should not come right after an underscore. Found: "
                   "song_name_1.") != std::string::npos);
 }
+
 
 // ===================================================================
 
@@ -1976,88 +1977,8 @@ TEST_F(ParserValidationErrorTest, Proto3JsonConflictError) {
       "  uint32 foo = 1;\n"
       "  uint32 Foo = 2;\n"
       "}\n",
-      "3:9: The default JSON name of field \"Foo\" (\"Foo\") conflicts "
-      "with the default JSON name of field \"foo\" (\"foo\"). "
-      "This is not allowed in proto3.\n");
-}
-
-TEST_F(ParserValidationErrorTest, Proto2JsonConflictError) {
-  // conflicts with default JSON names are not errors in proto2
-  ExpectParsesTo(
-      "syntax = 'proto2';\n"
-      "message TestMessage {\n"
-      "  optional uint32 foo = 1;\n"
-      "  optional uint32 Foo = 2;\n"
-      "}\n",
-
-      "syntax: 'proto2'"
-      "message_type {"
-      "  name: 'TestMessage'"
-      "  field {"
-      "    label: LABEL_OPTIONAL type: TYPE_UINT32 name: 'foo' number: 1"
-      "  }"
-      "  field {"
-      "    label: LABEL_OPTIONAL type: TYPE_UINT32 name: 'Foo' number: 2"
-      "  }"
-      "}"
-      );
-}
-
-TEST_F(ParserValidationErrorTest, Proto3CustomJsonConflictWithDefaultError) {
-  ExpectHasValidationErrors(
-      "syntax = 'proto3';\n"
-      "message TestMessage {\n"
-      "  uint32 foo = 1 [json_name='bar'];\n"
-      "  uint32 bar = 2;\n"
-      "}\n",
-      "3:9: The default JSON name of field \"bar\" (\"bar\") conflicts "
-      "with the custom JSON name of field \"foo\". "
-      "This is not allowed in proto3.\n");
-}
-
-TEST_F(ParserValidationErrorTest, Proto2CustomJsonConflictWithDefaultError) {
-  // conflicts with default JSON names are not errors in proto2
-  ExpectParsesTo(
-      "syntax = 'proto2';\n"
-      "message TestMessage {\n"
-      "  optional uint32 foo = 1 [json_name='bar'];\n"
-      "  optional uint32 bar = 2;\n"
-      "}\n",
-
-      "syntax: 'proto2'"
-      "message_type {"
-      "  name: 'TestMessage'"
-      "  field {"
-      "    label: LABEL_OPTIONAL type: TYPE_UINT32 name: 'foo' number: 1 json_name: 'bar'"
-      "  }"
-      "  field {"
-      "    label: LABEL_OPTIONAL type: TYPE_UINT32 name: 'bar' number: 2"
-      "  }"
-      "}"
-      );
-}
-
-TEST_F(ParserValidationErrorTest, Proto3CustomJsonConflictError) {
-  ExpectHasValidationErrors(
-      "syntax = 'proto3';\n"
-      "message TestMessage {\n"
-      "  uint32 foo = 1 [json_name='baz'];\n"
-      "  uint32 bar = 2 [json_name='baz'];\n"
-      "}\n",
-      "3:9: The custom JSON name of field \"bar\" (\"baz\") conflicts "
-      "with the custom JSON name of field \"foo\".\n");
-}
-
-TEST_F(ParserValidationErrorTest, Proto2CustomJsonConflictError) {
-  ExpectHasValidationErrors(
-      "syntax = 'proto2';\n"
-      "message TestMessage {\n"
-      "  optional uint32 foo = 1 [json_name='baz'];\n"
-      "  optional uint32 bar = 2 [json_name='baz'];\n"
-      "}\n",
-      // fails in proto2 also: can't explicitly configure bad custom JSON names
-      "3:18: The custom JSON name of field \"bar\" (\"baz\") conflicts "
-      "with the custom JSON name of field \"foo\".\n");
+      "3:9: The JSON camel-case name of field \"Foo\" conflicts with field "
+      "\"foo\". This is not allowed in proto3.\n");
 }
 
 TEST_F(ParserValidationErrorTest, EnumNameError) {
@@ -2481,7 +2402,7 @@ TEST_F(ParseDescriptorDebugTest, TestCommentsInDebugString) {
     const std::string debug_string =
         descriptor->DebugStringWithOptions(debug_string_options);
 
-    for (int i = 0; i < GOOGLE_ARRAYSIZE(expected_comments); ++i) {
+    for (int i = 0; i < ABSL_ARRAYSIZE(expected_comments); ++i) {
       std::string::size_type found_pos =
           debug_string.find(expected_comments[i]);
       EXPECT_TRUE(found_pos != std::string::npos)
@@ -2757,8 +2678,8 @@ class SourceInfoTest : public ParserTest {
         return true;
       }
     } else {
-      std::pair<int, int> start_pos = FindOrDie(markers_, start_marker);
-      std::pair<int, int> end_pos = FindOrDie(markers_, end_marker);
+      std::pair<int, int> start_pos = markers_.at(start_marker);
+      std::pair<int, int> end_pos = markers_.at(end_marker);
 
       RepeatedField<int> expected_span;
       expected_span.Add(start_pos.first);
@@ -2789,7 +2710,7 @@ class SourceInfoTest : public ParserTest {
           } else {
             EXPECT_EQ(
                 expected_leading_detached_comments,
-                Join(iter->second->leading_detached_comments(), "\n"));
+                absl::StrJoin(iter->second->leading_detached_comments(), "\n"));
           }
 
           spans_.erase(iter);
