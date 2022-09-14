@@ -5,15 +5,15 @@
 
 #include <algorithm>
 
-#include <google/protobuf/io/coded_stream.h>
-#include <google/protobuf/extension_set.h>
-#include <google/protobuf/wire_format_lite.h>
-#include <google/protobuf/descriptor.h>
-#include <google/protobuf/generated_message_reflection.h>
-#include <google/protobuf/reflection_ops.h>
-#include <google/protobuf/wire_format.h>
+#include "google/protobuf/io/coded_stream.h"
+#include "google/protobuf/extension_set.h"
+#include "google/protobuf/wire_format_lite.h"
+#include "google/protobuf/descriptor.h"
+#include "google/protobuf/generated_message_reflection.h"
+#include "google/protobuf/reflection_ops.h"
+#include "google/protobuf/wire_format.h"
 // @@protoc_insertion_point(includes)
-#include <google/protobuf/port_def.inc>
+#include "google/protobuf/port_def.inc"
 
 PROTOBUF_PRAGMA_INIT_SEG
 
@@ -150,6 +150,8 @@ const uint32_t TableStruct_google_2fprotobuf_2fwrappers_2eproto::offsets[] PROTO
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
+  ~0u,  // no _split_
+  ~0u,  // no sizeof(Split)
   PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::DoubleValue, _impl_.value_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::FloatValue, _internal_metadata_),
@@ -157,6 +159,8 @@ const uint32_t TableStruct_google_2fprotobuf_2fwrappers_2eproto::offsets[] PROTO
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
+  ~0u,  // no _split_
+  ~0u,  // no sizeof(Split)
   PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::FloatValue, _impl_.value_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::Int64Value, _internal_metadata_),
@@ -164,6 +168,8 @@ const uint32_t TableStruct_google_2fprotobuf_2fwrappers_2eproto::offsets[] PROTO
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
+  ~0u,  // no _split_
+  ~0u,  // no sizeof(Split)
   PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::Int64Value, _impl_.value_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::UInt64Value, _internal_metadata_),
@@ -171,6 +177,8 @@ const uint32_t TableStruct_google_2fprotobuf_2fwrappers_2eproto::offsets[] PROTO
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
+  ~0u,  // no _split_
+  ~0u,  // no sizeof(Split)
   PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::UInt64Value, _impl_.value_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::Int32Value, _internal_metadata_),
@@ -178,6 +186,8 @@ const uint32_t TableStruct_google_2fprotobuf_2fwrappers_2eproto::offsets[] PROTO
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
+  ~0u,  // no _split_
+  ~0u,  // no sizeof(Split)
   PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::Int32Value, _impl_.value_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::UInt32Value, _internal_metadata_),
@@ -185,6 +195,8 @@ const uint32_t TableStruct_google_2fprotobuf_2fwrappers_2eproto::offsets[] PROTO
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
+  ~0u,  // no _split_
+  ~0u,  // no sizeof(Split)
   PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::UInt32Value, _impl_.value_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::BoolValue, _internal_metadata_),
@@ -192,6 +204,8 @@ const uint32_t TableStruct_google_2fprotobuf_2fwrappers_2eproto::offsets[] PROTO
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
+  ~0u,  // no _split_
+  ~0u,  // no sizeof(Split)
   PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::BoolValue, _impl_.value_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::StringValue, _internal_metadata_),
@@ -199,6 +213,8 @@ const uint32_t TableStruct_google_2fprotobuf_2fwrappers_2eproto::offsets[] PROTO
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
+  ~0u,  // no _split_
+  ~0u,  // no sizeof(Split)
   PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::StringValue, _impl_.value_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::BytesValue, _internal_metadata_),
@@ -206,18 +222,20 @@ const uint32_t TableStruct_google_2fprotobuf_2fwrappers_2eproto::offsets[] PROTO
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
+  ~0u,  // no _split_
+  ~0u,  // no sizeof(Split)
   PROTOBUF_FIELD_OFFSET(::PROTOBUF_NAMESPACE_ID::BytesValue, _impl_.value_),
 };
 static const ::_pbi::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, -1, sizeof(::PROTOBUF_NAMESPACE_ID::DoubleValue)},
-  { 7, -1, -1, sizeof(::PROTOBUF_NAMESPACE_ID::FloatValue)},
-  { 14, -1, -1, sizeof(::PROTOBUF_NAMESPACE_ID::Int64Value)},
-  { 21, -1, -1, sizeof(::PROTOBUF_NAMESPACE_ID::UInt64Value)},
-  { 28, -1, -1, sizeof(::PROTOBUF_NAMESPACE_ID::Int32Value)},
-  { 35, -1, -1, sizeof(::PROTOBUF_NAMESPACE_ID::UInt32Value)},
-  { 42, -1, -1, sizeof(::PROTOBUF_NAMESPACE_ID::BoolValue)},
-  { 49, -1, -1, sizeof(::PROTOBUF_NAMESPACE_ID::StringValue)},
-  { 56, -1, -1, sizeof(::PROTOBUF_NAMESPACE_ID::BytesValue)},
+  { 9, -1, -1, sizeof(::PROTOBUF_NAMESPACE_ID::FloatValue)},
+  { 18, -1, -1, sizeof(::PROTOBUF_NAMESPACE_ID::Int64Value)},
+  { 27, -1, -1, sizeof(::PROTOBUF_NAMESPACE_ID::UInt64Value)},
+  { 36, -1, -1, sizeof(::PROTOBUF_NAMESPACE_ID::Int32Value)},
+  { 45, -1, -1, sizeof(::PROTOBUF_NAMESPACE_ID::UInt32Value)},
+  { 54, -1, -1, sizeof(::PROTOBUF_NAMESPACE_ID::BoolValue)},
+  { 63, -1, -1, sizeof(::PROTOBUF_NAMESPACE_ID::StringValue)},
+  { 72, -1, -1, sizeof(::PROTOBUF_NAMESPACE_ID::BytesValue)},
 };
 
 static const ::_pb::Message* const file_default_instances[] = {
@@ -246,7 +264,7 @@ const char descriptor_table_protodef_google_2fprotobuf_2fwrappers_2eproto[] PROT
   "erspb\370\001\001\242\002\003GPB\252\002\036Google.Protobuf.WellKno"
   "wnTypesb\006proto3"
   ;
-static ::_pbi::once_flag descriptor_table_google_2fprotobuf_2fwrappers_2eproto_once;
+static ::absl::once_flag descriptor_table_google_2fprotobuf_2fwrappers_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_google_2fprotobuf_2fwrappers_2eproto = {
     false, false, 455, descriptor_table_protodef_google_2fprotobuf_2fwrappers_2eproto,
     "google/protobuf/wrappers.proto",
@@ -1976,4 +1994,4 @@ Arena::CreateMaybeMessage< ::PROTOBUF_NAMESPACE_ID::BytesValue >(Arena* arena) {
 PROTOBUF_NAMESPACE_CLOSE
 
 // @@protoc_insertion_point(global_scope)
-#include <google/protobuf/port_undef.inc>
+#include "google/protobuf/port_undef.inc"

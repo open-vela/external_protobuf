@@ -31,10 +31,18 @@
 #include <map>
 #include <string>
 
-#include <google/protobuf/compiler/objectivec/objectivec_helpers.h>
-#include <google/protobuf/compiler/objectivec/objectivec_primitive_field.h>
-#include <google/protobuf/io/printer.h>
-#include <google/protobuf/stubs/strutil.h>
+#include "google/protobuf/compiler/objectivec/objectivec_helpers.h"
+#include "google/protobuf/compiler/objectivec/objectivec_primitive_field.h"
+#include "google/protobuf/io/printer.h"
+#include "google/protobuf/stubs/strutil.h"
+#include "absl/strings/ascii.h"
+#include "absl/strings/escaping.h"
+#include "absl/strings/str_split.h"
+#include "absl/strings/str_replace.h"
+#include "absl/strings/ascii.h"
+#include "absl/strings/escaping.h"
+#include "absl/strings/str_split.h"
+#include "absl/strings/str_replace.h"
 
 namespace google {
 namespace protobuf {
@@ -150,7 +158,7 @@ int PrimitiveFieldGenerator::ExtraRuntimeHasBitsNeeded(void) const {
 void PrimitiveFieldGenerator::SetExtraRuntimeHasBitsBase(int has_base) {
   if (GetObjectiveCType(descriptor_) == OBJECTIVECTYPE_BOOLEAN) {
     // Set into the offset the has bit to use for the actual value.
-    variables_["storage_offset_value"] = StrCat(has_base);
+    variables_["storage_offset_value"] = absl::StrCat(has_base);
     variables_["storage_offset_comment"] =
         "  // Stored in _has_storage_ to save space.";
   }

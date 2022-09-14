@@ -30,7 +30,7 @@
 
 // Author: kenton@google.com (Kenton Varda)
 
-#include <google/protobuf/compiler/subprocess.h>
+#include "google/protobuf/compiler/subprocess.h"
 
 #include <algorithm>
 #include <cstring>
@@ -43,24 +43,16 @@
 #include <sys/wait.h>
 #endif
 
-#include <google/protobuf/stubs/logging.h>
-#include <google/protobuf/stubs/common.h>
-#include <google/protobuf/stubs/substitute.h>
-#include <google/protobuf/message.h>
+#include "google/protobuf/stubs/logging.h"
+#include "google/protobuf/stubs/common.h"
+#include "absl/strings/escaping.h"
+#include "absl/strings/substitute.h"
+#include "google/protobuf/io/io_win32.h"
+#include "google/protobuf/message.h"
 
 namespace google {
 namespace protobuf {
 namespace compiler {
-
-namespace {
-char* portable_strdup(const char* s) {
-  char* ns = (char*)malloc(strlen(s) + 1);
-  if (ns != nullptr) {
-    strcpy(ns, s);
-  }
-  return ns;
-}
-}  // namespace
 
 #ifdef _WIN32
 
@@ -113,7 +105,7 @@ void Subprocess::Start(const std::string& program, SearchMode search_mode) {
   }
 
   // Setup STARTUPINFO to redirect handles.
-  STARTUPINFOA startup_info;
+  STARTUPINFOW startup_info;
   ZeroMemory(&startup_info, sizeof(startup_info));
   startup_info.cb = sizeof(startup_info);
   startup_info.dwFlags = STARTF_USESTDHANDLES;
@@ -125,17 +117,30 @@ void Subprocess::Start(const std::string& program, SearchMode search_mode) {
     GOOGLE_LOG(FATAL) << "GetStdHandle: " << Win32ErrorMessage(GetLastError());
   }
 
+  // get wide string version of program as the path may contain non-ascii characters
+  std::wstring wprogram;
+  if (!io::win32::strings::utf8_to_wcs(program.c_str(), &wprogram)) {
+    GOOGLE_LOG(FATAL) << "utf8_to_wcs: " << Win32ErrorMessage(GetLastError());
+  }
+
   // Invoking cmd.exe allows for '.bat' files from the path as well as '.exe'.
+  std::string command_line = "cmd.exe /c \"" + program + "\"";
+
+  // get wide string version of command line as the path may contain non-ascii characters
+  std::wstring wcommand_line;
+  if (!io::win32::strings::utf8_to_wcs(command_line.c_str(), &wcommand_line)) {
+    GOOGLE_LOG(FATAL) << "utf8_to_wcs: " << Win32ErrorMessage(GetLastError());
+  }
+
   // Using a malloc'ed string because CreateProcess() can mutate its second
   // parameter.
-  char* command_line =
-      portable_strdup(("cmd.exe /c \"" + program + "\"").c_str());
+  wchar_t *wcommand_line_copy = _wcsdup(wcommand_line.c_str());
 
   // Create the process.
   PROCESS_INFORMATION process_info;
 
-  if (CreateProcessA((search_mode == SEARCH_PATH) ? nullptr : program.c_str(),
-                     (search_mode == SEARCH_PATH) ? command_line : nullptr,
+  if (CreateProcessW((search_mode == SEARCH_PATH) ? nullptr : wprogram.c_str(),
+                     (search_mode == SEARCH_PATH) ? wcommand_line_copy : NULL,
                      nullptr,  // process security attributes
                      nullptr,  // thread security attributes
                      TRUE,     // inherit handles?
@@ -155,7 +160,7 @@ void Subprocess::Start(const std::string& program, SearchMode search_mode) {
 
   CloseHandleOrDie(stdin_pipe_read);
   CloseHandleOrDie(stdout_pipe_write);
-  free(command_line);
+  free(wcommand_line_copy);
 }
 
 bool Subprocess::Communicate(const Message& input, Message* output,
@@ -259,12 +264,12 @@ bool Subprocess::Communicate(const Message& input, Message* output,
   child_handle_ = nullptr;
 
   if (exit_code != 0) {
-    *error = strings::Substitute("Plugin failed with status code $0.", exit_code);
+    *error = absl::Substitute("Plugin failed with status code $0.", exit_code);
     return false;
   }
 
   if (!output->ParseFromString(output_data)) {
-    *error = "Plugin output is unparseable: " + CEscape(output_data);
+    *error = "Plugin output is unparseable: " + absl::CEscape(output_data);
     return false;
   }
 
@@ -302,6 +307,16 @@ Subprocess::~Subprocess() {
     close(child_stdout_);
   }
 }
+
+namespace {
+char* portable_strdup(const char* s) {
+  char* ns = (char*)malloc(strlen(s) + 1);
+  if (ns != nullptr) {
+    strcpy(ns, s);
+  }
+  return ns;
+}
+}  // namespace
 
 void Subprocess::Start(const std::string& program, SearchMode search_mode) {
   // Note that we assume that there are no other threads, thus we don't have to
@@ -457,12 +472,12 @@ bool Subprocess::Communicate(const Message& input, Message* output,
     if (WEXITSTATUS(status) != 0) {
       int error_code = WEXITSTATUS(status);
       *error =
-          strings::Substitute("Plugin failed with status code $0.", error_code);
+          absl::Substitute("Plugin failed with status code $0.", error_code);
       return false;
     }
   } else if (WIFSIGNALED(status)) {
     int signal = WTERMSIG(status);
-    *error = strings::Substitute("Plugin killed by signal $0.", signal);
+    *error = absl::Substitute("Plugin killed by signal $0.", signal);
     return false;
   } else {
     *error = "Neither WEXITSTATUS nor WTERMSIG is true?";
@@ -470,7 +485,7 @@ bool Subprocess::Communicate(const Message& input, Message* output,
   }
 
   if (!output->ParseFromString(output_data)) {
-    *error = "Plugin output is unparseable: " + CEscape(output_data);
+    *error = "Plugin output is unparseable: " + absl::CEscape(output_data);
     return false;
   }
 
