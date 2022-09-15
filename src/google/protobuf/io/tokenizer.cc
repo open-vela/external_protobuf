@@ -1002,20 +1002,9 @@ bool Tokenizer::ParseInteger(const std::string& text, uint64_t max_value,
 }
 
 double Tokenizer::ParseFloat(const std::string& text) {
-  double result = 0;
-  if (!TryParseFloat(text, &result)) {
-    LOG(DFATAL)
-        << " Tokenizer::ParseFloat() passed text that could not have been"
-           " tokenized as a float: "
-        << absl::CEscape(text);
-  }
-  return result;
-}
-
-bool Tokenizer::TryParseFloat(const std::string& text, double* result) {
   const char* start = text.c_str();
   char* end;
-  *result = NoLocaleStrtod(start, &end);
+  double result = NoLocaleStrtod(start, &end);
 
   // "1e" is not a valid float, but if the tokenizer reads it, it will
   // report an error but still return it as a valid token.  We need to
@@ -1031,7 +1020,12 @@ bool Tokenizer::TryParseFloat(const std::string& text, double* result) {
     ++end;
   }
 
-  return static_cast<size_t>(end - start) == text.size() && *start != '-';
+  GOOGLE_LOG_IF(DFATAL,
+         static_cast<size_t>(end - start) != text.size() || *start == '-')
+      << " Tokenizer::ParseFloat() passed text that could not have been"
+         " tokenized as a float: "
+      << absl::CEscape(text);
+  return result;
 }
 
 // Helper to append a Unicode code point to a string as UTF8, without bringing
