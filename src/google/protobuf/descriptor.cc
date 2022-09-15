@@ -58,7 +58,6 @@
 #include "absl/strings/ascii.h"
 #include "absl/strings/escaping.h"
 #include "absl/strings/str_cat.h"
-#include "absl/strings/str_format.h"
 #include "google/protobuf/stubs/stringprintf.h"
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
@@ -3848,8 +3847,6 @@ class DescriptorBuilder {
                           internal::FlatAllocator& alloc);
   void BuildOneof(const OneofDescriptorProto& proto, Descriptor* parent,
                   OneofDescriptor* result, internal::FlatAllocator& alloc);
-  void CheckEnumValueUniqueness(const EnumDescriptorProto& proto,
-                                const EnumDescriptor* result);
   void BuildEnum(const EnumDescriptorProto& proto, const Descriptor* parent,
                  EnumDescriptor* result, internal::FlatAllocator& alloc);
   void BuildEnumValue(const EnumValueDescriptorProto& proto,
@@ -3860,6 +3857,14 @@ class DescriptorBuilder {
   void BuildMethod(const MethodDescriptorProto& proto,
                    const ServiceDescriptor* parent, MethodDescriptor* result,
                    internal::FlatAllocator& alloc);
+
+  void CheckFieldJsonNameUniqueness(const DescriptorProto& proto,
+                                    const Descriptor* result);
+  void CheckFieldJsonNameUniqueness(std::string message_name,
+                                    const DescriptorProto& message,
+                                    bool is_proto2, bool use_custom_names);
+  void CheckEnumValueUniqueness(const EnumDescriptorProto& proto,
+                                const EnumDescriptor* result);
 
   void LogUnusedDependency(const FileDescriptorProto& proto,
                            const FileDescriptor* result);
@@ -5416,7 +5421,10 @@ void DescriptorBuilder::BuildMessage(const DescriptorProto& proto,
     }
   }
 
+  CheckFieldJsonNameUniqueness(proto, result);
 
+  // Check that fields aren't using reserved names or numbers and that they
+  // aren't using extension numbers.
   for (int i = 0; i < result->field_count(); i++) {
     const FieldDescriptor* field = result->field(i);
     for (int j = 0; j < result->extension_range_count(); j++) {
@@ -5477,6 +5485,75 @@ void DescriptorBuilder::BuildMessage(const DescriptorProto& proto,
                                   range2->start, range2->end - 1, range1->start,
                                   range1->end - 1));
       }
+    }
+  }
+}
+
+std::string GetJsonName(const FieldDescriptorProto& field, bool use_custom, bool* was_custom) {
+  if (use_custom && field.has_json_name()) {
+    *was_custom = true;
+    return field.json_name();
+  }
+  *was_custom = false;
+  return ToJsonName(field.name());
+}
+
+void DescriptorBuilder::CheckFieldJsonNameUniqueness(
+    const DescriptorProto& proto, const Descriptor* result) {
+  bool is_proto2 = result->file()->syntax() == FileDescriptor::SYNTAX_PROTO2;
+  std::string message_name = result->full_name();
+  // two passes: one looking only at default JSON names, and one that considers custom JSON names
+  CheckFieldJsonNameUniqueness(message_name, proto, is_proto2, false);
+  CheckFieldJsonNameUniqueness(message_name, proto, is_proto2, true);
+}
+
+struct JsonNameDetails {
+  const FieldDescriptorProto* field;
+  std::string orig_name;
+  bool is_custom;
+};
+
+void DescriptorBuilder::CheckFieldJsonNameUniqueness(
+    std::string message_name,const DescriptorProto& message, bool is_proto2, bool use_custom_names) {
+
+  std::map<std::string, JsonNameDetails> name_to_field;
+  for (int i = 0; i < message.field_size(); ++i) {
+    bool is_custom;
+    std::string name = GetJsonName(message.field(i), use_custom_names, &is_custom);
+    std::string lowercase_name = absl::AsciiStrToLower(name);
+    auto existing = name_to_field.find(lowercase_name);
+    if (existing != name_to_field.end()) {
+      auto match = existing->second;
+      if (use_custom_names && !is_custom && !match.is_custom) {
+        // if this pass is considering custom JSON names, but neither of the
+        // names involved in the conflict are custom, don't bother with a message.
+        // That will have been reported from other pass (non-custom JSON names).
+        continue;
+      }
+      std::string this_type = is_custom ? "custom" : "default";
+      std::string existing_type = match.is_custom ? "custom" : "default";
+      // If the matched name differs (which it can only differ in case), include it
+      // in the error message, for maximum clarity to user.
+      std::string name_suffix = name == match.orig_name ? "" : " (\"" + match.orig_name + "\")";
+      std::string error_message =
+          "The " + this_type + " JSON name of field \"" + message.field(i).name() +
+          "\" (\"" + name + "\") conflicts with the " + existing_type + " JSON name of field \"" +
+          match.field->name() + "\"" + name_suffix + ".";
+
+      bool involves_default = !is_custom || !match.is_custom;
+      if (is_proto2 && involves_default) {
+        AddWarning(message_name, message.field(i),
+                 DescriptorPool::ErrorCollector::NAME, error_message);
+      } else {
+        if (involves_default) {
+          error_message += " This is not allowed in proto3.";
+        }
+        AddError(message_name, message.field(i),
+                 DescriptorPool::ErrorCollector::NAME, error_message);
+      }
+    } else {
+      JsonNameDetails details = { &message.field(i), name, is_custom };
+      name_to_field[lowercase_name] = details;
     }
   }
 }
@@ -5905,15 +5982,15 @@ void DescriptorBuilder::CheckEnumValueUniqueness(
           "Enum name " + value->name() + " has the same name as " +
           values[stripped]->name() +
           " if you ignore case and strip out the enum name prefix (if any). "
-          "This is error-prone and can lead to undefined behavior. "
-          "Please avoid doing this. If you are using allow_alias, please "
-          "assign the same numeric value to both enums.";
+          "(If you are using allow_alias, please assign the same numeric "
+          "value to both enums.)";
       // There are proto2 enums out there with conflicting names, so to preserve
       // compatibility we issue only a warning for proto2.
       if (result->file()->syntax() == FileDescriptor::SYNTAX_PROTO2) {
         AddWarning(value->full_name(), proto.value(i),
                    DescriptorPool::ErrorCollector::NAME, error_message);
       } else {
+        error_message += " This is not allowed in proto3.";
         AddError(value->full_name(), proto.value(i),
                  DescriptorPool::ErrorCollector::NAME, error_message);
       }
@@ -6780,20 +6857,6 @@ void DescriptorBuilder::ValidateProto3(FileDescriptor* file,
   }
 }
 
-static std::string ToLowercaseWithoutUnderscores(const std::string& name) {
-  std::string result;
-  for (char character : name) {
-    if (character != '_') {
-      if (character >= 'A' && character <= 'Z') {
-        result.push_back(character - 'A' + 'a');
-      } else {
-        result.push_back(character);
-      }
-    }
-  }
-  return result;
-}
-
 void DescriptorBuilder::ValidateProto3Message(Descriptor* message,
                                               const DescriptorProto& proto) {
   for (int i = 0; i < message->nested_type_count(); ++i) {
@@ -6817,25 +6880,6 @@ void DescriptorBuilder::ValidateProto3Message(Descriptor* message,
     // Using MessageSet doesn't make sense since we disallow extensions.
     AddError(message->full_name(), proto, DescriptorPool::ErrorCollector::NAME,
              "MessageSet is not supported in proto3.");
-  }
-
-  // In proto3, we reject field names if they conflict in camelCase.
-  // Note that we currently enforce a stricter rule: Field names must be
-  // unique after being converted to lowercase with underscores removed.
-  std::map<std::string, const FieldDescriptor*> name_to_field;
-  for (int i = 0; i < message->field_count(); ++i) {
-    std::string lowercase_name =
-        ToLowercaseWithoutUnderscores(message->field(i)->name());
-    if (name_to_field.find(lowercase_name) != name_to_field.end()) {
-      AddError(message->full_name(), proto.field(i),
-               DescriptorPool::ErrorCollector::NAME,
-               "The JSON camel-case name of field \"" +
-                   message->field(i)->name() + "\" conflicts with field \"" +
-                   name_to_field[lowercase_name]->name() + "\". This is not " +
-                   "allowed in proto3.");
-    } else {
-      name_to_field[lowercase_name] = message->field(i);
-    }
   }
 }
 
@@ -7676,27 +7720,6 @@ bool DescriptorBuilder::OptionInterpreter::ExamineIfOptionIsSet(
   return true;
 }
 
-namespace {
-// Helpers for method below
-
-template <typename T> std::string ValueOutOfRange(
-    absl::string_view type_name, absl::string_view option_name) {
-  return absl::StrFormat(
-    "Value out of range, %d to %d, for %s option \"%s\".", \
-    std::numeric_limits<T>::min(), std::numeric_limits<T>::max(),
-    type_name, option_name);
-}
-
-template <typename T> std::string ValueMustBeInt(
-    absl::string_view type_name, absl::string_view option_name) {
-  return absl::StrFormat(
-    "Value must be integer, from %d to %d, for %s option \"%s\".", \
-    std::numeric_limits<T>::min(), std::numeric_limits<T>::max(),
-    type_name, option_name);
-}
-
-} // namespace
-
 bool DescriptorBuilder::OptionInterpreter::SetOptionValue(
     const FieldDescriptor* option_field, UnknownFieldSet* unknown_fields) {
   // We switch on the CppType to validate.
@@ -7705,7 +7728,8 @@ bool DescriptorBuilder::OptionInterpreter::SetOptionValue(
       if (uninterpreted_option_->has_positive_int_value()) {
         if (uninterpreted_option_->positive_int_value() >
             static_cast<uint64_t>(std::numeric_limits<int32_t>::max())) {
-          return AddValueError(ValueOutOfRange<int32_t>("int32", option_field->full_name()));
+          return AddValueError("Value out of range for int32 option \"" +
+                               option_field->full_name() + "\".");
         } else {
           SetInt32(option_field->number(),
                    uninterpreted_option_->positive_int_value(),
@@ -7714,14 +7738,16 @@ bool DescriptorBuilder::OptionInterpreter::SetOptionValue(
       } else if (uninterpreted_option_->has_negative_int_value()) {
         if (uninterpreted_option_->negative_int_value() <
             static_cast<int64_t>(std::numeric_limits<int32_t>::min())) {
-          return AddValueError(ValueOutOfRange<int32_t>("int32", option_field->full_name()));
+          return AddValueError("Value out of range for int32 option \"" +
+                               option_field->full_name() + "\".");
         } else {
           SetInt32(option_field->number(),
                    uninterpreted_option_->negative_int_value(),
                    option_field->type(), unknown_fields);
         }
       } else {
-        return AddValueError(ValueMustBeInt<int32_t>("int32", option_field->full_name()));
+        return AddValueError("Value must be integer for int32 option \"" +
+                             option_field->full_name() + "\".");
       }
       break;
 
@@ -7729,7 +7755,8 @@ bool DescriptorBuilder::OptionInterpreter::SetOptionValue(
       if (uninterpreted_option_->has_positive_int_value()) {
         if (uninterpreted_option_->positive_int_value() >
             static_cast<uint64_t>(std::numeric_limits<int64_t>::max())) {
-          return AddValueError(ValueOutOfRange<int64_t>("int64", option_field->full_name()));
+          return AddValueError("Value out of range for int64 option \"" +
+                               option_field->full_name() + "\".");
         } else {
           SetInt64(option_field->number(),
                    uninterpreted_option_->positive_int_value(),
@@ -7740,7 +7767,8 @@ bool DescriptorBuilder::OptionInterpreter::SetOptionValue(
                  uninterpreted_option_->negative_int_value(),
                  option_field->type(), unknown_fields);
       } else {
-        return AddValueError(ValueMustBeInt<int64_t>("int64", option_field->full_name()));
+        return AddValueError("Value must be integer for int64 option \"" +
+                             option_field->full_name() + "\".");
       }
       break;
 
@@ -7748,14 +7776,18 @@ bool DescriptorBuilder::OptionInterpreter::SetOptionValue(
       if (uninterpreted_option_->has_positive_int_value()) {
         if (uninterpreted_option_->positive_int_value() >
             std::numeric_limits<uint32_t>::max()) {
-          return AddValueError(ValueOutOfRange<uint32_t>("uint32", option_field->full_name()));
+          return AddValueError("Value out of range for uint32 option \"" +
+                               option_field->name() + "\".");
         } else {
           SetUInt32(option_field->number(),
                     uninterpreted_option_->positive_int_value(),
                     option_field->type(), unknown_fields);
         }
       } else {
-        return AddValueError(ValueMustBeInt<uint32_t>("uint32", option_field->full_name()));
+        return AddValueError(
+            "Value must be non-negative integer for uint32 "
+            "option \"" +
+            option_field->full_name() + "\".");
       }
       break;
 
@@ -7765,7 +7797,10 @@ bool DescriptorBuilder::OptionInterpreter::SetOptionValue(
                   uninterpreted_option_->positive_int_value(),
                   option_field->type(), unknown_fields);
       } else {
-        return AddValueError(ValueMustBeInt<uint64_t>("uint64", option_field->full_name()));
+        return AddValueError(
+            "Value must be non-negative integer for uint64 "
+            "option \"" +
+            option_field->full_name() + "\".");
       }
       break;
 
