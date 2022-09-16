@@ -879,7 +879,7 @@ auto Printer::WithDefs(
           return absl::nullopt;
         }
         if (auto* str = absl::get_if<std::string>(&it->second)) {
-          return absl::string_view(*str);
+          return *str;
         }
 
         auto* f = absl::get_if<std::function<void()>>(&it->second);

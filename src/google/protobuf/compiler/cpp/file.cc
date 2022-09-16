@@ -66,8 +66,6 @@
 #include "google/protobuf/descriptor.pb.h"
 #include "google/protobuf/io/printer.h"
 
-#include "google/protobuf/stubs/strutil.h"  // for StringReplace.
-
 // Must be last.
 #include "google/protobuf/port_def.inc"
 
@@ -124,8 +122,8 @@ FileGenerator::FileGenerator(const FileDescriptor* file, const Options& options)
   }
 
   for (int i = 0; i < file->enum_type_count(); ++i) {
-    enum_generators_.push_back(
-        absl::make_unique<EnumGenerator>(file->enum_type(i), options));
+    enum_generators_.push_back(absl::make_unique<EnumGenerator>(
+        file->enum_type(i), variables_, options));
   }
 
   for (int i = 0; i < file->service_count(); ++i) {
@@ -524,7 +522,7 @@ void FileGenerator::GenerateSourceDefaultInstance(int idx, io::Printer* p) {
 
   // Generate the split instance first because it's needed in the constexpr
   // constructor.
-  if (ShouldSplit(generator->descriptor(), options_)) {
+  if (ShouldSplit(generator->descriptor_, options_)) {
     // Use a union to disable the destructor of the _instance member.
     // We can constant initialize, but the object will still have a non-trivial
     // destructor that we need to elide.
@@ -535,14 +533,13 @@ void FileGenerator::GenerateSourceDefaultInstance(int idx, io::Printer* p) {
     // there just to improve performance and binary size in these builds.
     p->Emit(
         {
-            {"type", DefaultInstanceType(generator->descriptor(), options_,
+            {"type", DefaultInstanceType(generator->descriptor_, options_,
                                          /*split=*/true)},
-            {"name", DefaultInstanceName(generator->descriptor(), options_,
+            {"name", DefaultInstanceName(generator->descriptor_, options_,
                                          /*split=*/true)},
             {"default",
              [&] { generator->GenerateInitDefaultSplitInstance(p); }},
-            {"class", absl::StrCat(ClassName(generator->descriptor()),
-                                   "::Impl_::Split")},
+            {"class", absl::StrCat(generator->classname_, "::Impl_::Split")},
         },
         R"cc(
           struct $type$ {
@@ -561,10 +558,10 @@ void FileGenerator::GenerateSourceDefaultInstance(int idx, io::Printer* p) {
 
   p->Emit(
       {
-          {"type", DefaultInstanceType(generator->descriptor(), options_)},
-          {"name", DefaultInstanceName(generator->descriptor(), options_)},
+          {"type", DefaultInstanceType(generator->descriptor_, options_)},
+          {"name", DefaultInstanceName(generator->descriptor_, options_)},
           {"default", [&] { generator->GenerateInitDefaultSplitInstance(p); }},
-          {"class", ClassName(generator->descriptor())},
+          {"class", generator->classname_},
       },
       R"cc(
         struct $type$ {
@@ -579,8 +576,8 @@ void FileGenerator::GenerateSourceDefaultInstance(int idx, io::Printer* p) {
             PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 $type$ $name$;
       )cc");
 
-  for (int i = 0; i < generator->descriptor()->field_count(); ++i) {
-    const FieldDescriptor* field = generator->descriptor()->field(i);
+  for (int i = 0; i < generator->descriptor_->field_count(); ++i) {
+    const FieldDescriptor* field = generator->descriptor_->field(i);
     if (!IsStringInlined(field, options_)) {
       continue;
     }
@@ -588,9 +585,9 @@ void FileGenerator::GenerateSourceDefaultInstance(int idx, io::Printer* p) {
     // Force the initialization of the inlined string in the default instance.
     p->Emit(
         {
-            {"class", ClassName(generator->descriptor())},
+            {"class", ClassName(generator->descriptor_)},
             {"field", FieldName(field)},
-            {"default", DefaultInstanceName(generator->descriptor(), options_)},
+            {"default", DefaultInstanceName(generator->descriptor_, options_)},
             {"member", FieldMemberName(field, ShouldSplit(field, options_))},
         },
         R"cc(
@@ -603,8 +600,8 @@ void FileGenerator::GenerateSourceDefaultInstance(int idx, io::Printer* p) {
   if (options_.lite_implicit_weak_fields) {
     p->Emit(
         {
-            {"ptr", DefaultInstancePtr(generator->descriptor(), options_)},
-            {"name", DefaultInstanceName(generator->descriptor(), options_)},
+            {"ptr", DefaultInstancePtr(generator->descriptor_, options_)},
+            {"name", DefaultInstanceName(generator->descriptor_, options_)},
         },
         R"cc(
           PROTOBUF_CONSTINIT const void* $ptr$ = &$name$;
@@ -712,7 +709,7 @@ void FileGenerator::GenerateSourceForMessage(int idx, io::Printer* p) {
   }
 
   CrossFileReferences refs;
-  ForEachField(message_generators_[idx]->descriptor(),
+  ForEachField(message_generators_[idx]->descriptor_,
                [this, &refs](const FieldDescriptor* field) {
                  GetCrossFileReferencesForField(field, &refs);
                });
@@ -918,8 +915,8 @@ void FileGenerator::GenerateReflectionInitializationCode(io::Printer* p) {
                for (auto& gen : message_generators_) {
                  p->Emit(
                      {
-                         {"ns", Namespace(gen->descriptor(), options_)},
-                         {"class", ClassName(gen->descriptor())},
+                         {"ns", Namespace(gen->descriptor_, options_)},
+                         {"class", ClassName(gen->descriptor_)},
                      },
                      R"cc(
                        &$ns$::_$class$_default_instance_._instance,
@@ -1216,9 +1213,9 @@ void FileGenerator::GenerateForwardDeclarations(io::Printer* p) {
       decls[Namespace(e, options_)].AddEnum(e);
   }
   for (const auto& mg : message_generators_) {
-    const Descriptor* d = mg->descriptor();
+    const Descriptor* d = mg->descriptor_;
     if (d != nullptr && public_set.count(d->file()) == 0u &&
-        ShouldSplit(mg->descriptor(), options_))
+        ShouldSplit(mg->descriptor_, options_))
       decls[Namespace(d, options_)].AddSplit(d);
   }
 

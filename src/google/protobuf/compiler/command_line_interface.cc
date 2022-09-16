@@ -74,6 +74,7 @@
 #include "google/protobuf/stubs/logging.h"
 #include "google/protobuf/compiler/subprocess.h"
 #include "google/protobuf/compiler/plugin.pb.h"
+#include "google/protobuf/stubs/strutil.h"
 #include "absl/strings/match.h"
 #include "absl/strings/str_format.h"
 #include "absl/strings/str_replace.h"

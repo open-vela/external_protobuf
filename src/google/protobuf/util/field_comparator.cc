@@ -129,7 +129,7 @@ FieldComparator::ComparisonResult SimpleFieldComparator::SimpleCompare(
 bool SimpleFieldComparator::CompareWithDifferencer(
     MessageDifferencer* differencer, const Message& message1,
     const Message& message2, const util::FieldContext* field_context) {
-  return differencer->Compare(message1, message2, false,
+  return differencer->Compare(message1, message2,
                               field_context->parent_fields());
 }
 
