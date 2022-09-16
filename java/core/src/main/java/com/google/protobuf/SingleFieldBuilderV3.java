@@ -156,7 +156,6 @@ public class SingleFieldBuilderV3<
    * @param message the message to set
    * @return the builder
    */
-  @CanIgnoreReturnValue
   public SingleFieldBuilderV3<MType, BType, IType> setMessage(MType message) {
     this.message = checkNotNull(message);
     if (builder != null) {
@@ -173,7 +172,6 @@ public class SingleFieldBuilderV3<
    * @param value the value to merge from
    * @return the builder
    */
-  @CanIgnoreReturnValue
   public SingleFieldBuilderV3<MType, BType, IType> mergeFrom(MType value) {
     if (builder == null && message == message.getDefaultInstanceForType()) {
       message = value;
@@ -190,7 +188,6 @@ public class SingleFieldBuilderV3<
    * @return the builder
    */
   @SuppressWarnings("unchecked")
-  @CanIgnoreReturnValue
   public SingleFieldBuilderV3<MType, BType, IType> clear() {
     message =
         (MType)
