@@ -88,12 +88,10 @@ class ForkPipeRunner : public ConformanceTestRunner {
                  const std::vector<ConformanceTestSuite*>& suites);
 
   ForkPipeRunner(const std::string& executable,
-                 const std::vector<std::string>& executable_args,
-                 bool performance)
+                 const std::vector<std::string>& executable_args)
       : child_pid_(-1),
         executable_(executable),
-        executable_args_(executable_args),
-        performance_(performance) {}
+        executable_args_(executable_args) {}
 
   explicit ForkPipeRunner(const std::string& executable)
       : child_pid_(-1), executable_(executable) {}
@@ -116,7 +114,6 @@ class ForkPipeRunner : public ConformanceTestRunner {
   pid_t child_pid_;
   std::string executable_;
   const std::vector<std::string> executable_args_;
-  bool performance_;
   std::string current_test_name_;
 };
 
@@ -151,12 +148,10 @@ class ConformanceTestSuite {
  public:
   ConformanceTestSuite()
       : verbose_(false),
-        performance_(false),
         enforce_recommended_(false),
         failure_list_flag_name_("--failure_list") {}
   virtual ~ConformanceTestSuite() {}
 
-  void SetPerformance(bool performance) { performance_ = performance; }
   void SetVerbose(bool verbose) { verbose_ = verbose; }
 
   // Whether to require the testee to pass RECOMMENDED tests. By default failing
@@ -277,12 +272,6 @@ class ConformanceTestSuite {
                       const conformance::ConformanceResponse& response,
                       bool need_report_success, bool require_same_wire_format);
 
-  void TruncateDebugPayload(std::string* payload);
-  const conformance::ConformanceRequest TruncateRequest(
-      const conformance::ConformanceRequest& request);
-  const conformance::ConformanceResponse TruncateResponse(
-      const conformance::ConformanceResponse& response);
-
   void ReportSuccess(const std::string& test_name);
   void ReportFailure(const std::string& test_name, ConformanceLevel level,
                      const conformance::ConformanceRequest& request,
@@ -310,7 +299,6 @@ class ConformanceTestSuite {
   int successes_;
   int expected_failures_;
   bool verbose_;
-  bool performance_;
   bool enforce_recommended_;
   std::string output_;
   std::string output_dir_;

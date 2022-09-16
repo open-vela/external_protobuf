@@ -149,6 +149,7 @@ enum FieldRep : uint16_t {
   kRepMessage  = 0,               // MessageLite*
   kRepGroup    = 1 << kRepShift,  // MessageLite* (WT=3,4)
   kRepLazy     = 2 << kRepShift,  // LazyField*
+  kRepIWeak    = 3 << kRepShift,  // ImplicitWeak
 };
 
 // Transform/validation (2 bits):
@@ -167,9 +168,8 @@ enum TransformValidation : uint16_t {
   kTvUtf8      = 2 << kTvShift,  // proto3
 
   // Message fields:
-  kTvDefault   = 1 << kTvShift,  // Aux has default_instance*
+  kTvDefault   = 1 << kTvShift,  // Aux has default_instance
   kTvTable     = 2 << kTvShift,  // Aux has TcParseTableBase*
-  kTvWeakPtr   = 3 << kTvShift,  // Aux has default_instance** (for weak)
 };
 
 static_assert((kTvEnum & kTvRange) != 0,

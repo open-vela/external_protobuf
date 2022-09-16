@@ -41,7 +41,6 @@
 #include "google/protobuf/stubs/common.h"
 #include "google/protobuf/stubs/logging.h"
 #include "absl/base/casts.h"
-#include "absl/strings/cord.h"
 #include "absl/strings/internal/resize_uninitialized.h"
 
 // Must be included last

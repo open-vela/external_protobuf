@@ -31,6 +31,7 @@
 #include "google/protobuf/compiler/java/context.h"
 
 #include "google/protobuf/descriptor.h"
+#include "google/protobuf/stubs/strutil.h"
 #include "absl/strings/str_cat.h"
 #include "google/protobuf/compiler/java/field.h"
 #include "google/protobuf/compiler/java/helpers.h"
