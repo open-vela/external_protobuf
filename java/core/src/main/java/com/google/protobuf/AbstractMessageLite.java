@@ -106,6 +106,7 @@ public abstract class AbstractMessageLite<
     throw new UnsupportedOperationException();
   }
 
+
   int getSerializedSize(Schema schema) {
     int memoizedSerializedSize = getMemoizedSerializedSize();
     if (memoizedSerializedSize == -1) {
