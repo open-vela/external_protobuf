@@ -43,20 +43,19 @@ endif()
 include(${protobuf_SOURCE_DIR}/src/file_lists.cmake)
 
 set(lite_test_protos
-  ${protobuf_lite_test_protos_files}
+  ${protobuf_lite_test_protos_proto_srcs}
 )
 
 set(tests_protos
-  ${protobuf_test_protos_files}
+  ${protobuf_test_protos_proto_srcs}
   ${compiler_test_protos_files}
   ${util_test_protos_files}
 )
 
 macro(compile_proto_file filename)
-  string(REPLACE .proto .pb.h pb_hdr ${filename})
-  string(REPLACE .proto .pb.cc pb_src ${filename})
+  string(REPLACE .proto .pb.cc pb_file ${filename})
   add_custom_command(
-    OUTPUT ${pb_hdr} ${pb_src}
+    OUTPUT ${pb_file}
     DEPENDS ${protobuf_PROTOC_EXE} ${filename}
     COMMAND ${protobuf_PROTOC_EXE} ${filename}
         --proto_path=${protobuf_SOURCE_DIR}/src
@@ -68,13 +67,13 @@ endmacro(compile_proto_file)
 set(lite_test_proto_files)
 foreach(proto_file ${lite_test_protos})
   compile_proto_file(${proto_file})
-  set(lite_test_proto_files ${lite_test_proto_files} ${pb_src} ${pb_hdr})
+  set(lite_test_proto_files ${lite_test_proto_files} ${pb_file})
 endforeach(proto_file)
 
 set(tests_proto_files)
 foreach(proto_file ${tests_protos})
   compile_proto_file(${proto_file})
-  set(tests_proto_files ${tests_proto_files} ${pb_src} ${pb_hdr})
+  set(tests_proto_files ${tests_proto_files} ${pb_file})
 endforeach(proto_file)
 
 add_library(protobuf-lite-test-common STATIC
@@ -86,8 +85,8 @@ target_link_libraries(protobuf-lite-test-common
 set(common_test_files
   ${test_util_hdrs}
   ${test_util_srcs}
-  ${common_test_hdrs}
-  ${common_test_srcs}
+  ${mock_code_generator_srcs}
+  ${testing_srcs}
 )
 
 add_library(protobuf-test-common STATIC
@@ -139,8 +138,8 @@ target_link_libraries(tests protobuf-lite-test-common protobuf-test-common ${pro
 
 set(test_plugin_files
   ${test_plugin_files}
-  ${common_test_hdrs}
-  ${common_test_srcs}
+  ${mock_code_generator_srcs}
+  ${testing_srcs}
 )
 
 add_executable(test_plugin ${test_plugin_files})
@@ -173,23 +172,13 @@ add_custom_target(save-installed-headers)
 add_custom_target(remove-installed-headers)
 add_custom_target(restore-installed-headers)
 
-file(GLOB_RECURSE _local_hdrs
-  "${PROJECT_SOURCE_DIR}/src/*.h"
-  "${PROJECT_SOURCE_DIR}/src/*.inc")
-
-# Exclude the bootstrapping that are directly used by tests.
-set(_exclude_hdrs
+# Explicitly skip the bootstrapping headers as it's directly used in tests
+set(_installed_hdrs ${libprotobuf_hdrs} ${libprotoc_hdrs})
+list(REMOVE_ITEM _installed_hdrs
   "${protobuf_SOURCE_DIR}/src/google/protobuf/descriptor.pb.h"
   "${protobuf_SOURCE_DIR}/src/google/protobuf/compiler/plugin.pb.h")
 
-# Exclude test library headers.
-list(APPEND _exclude_hdrs ${test_util_hdrs} ${lite_test_util_hdrs} ${common_test_hdrs}
-  ${compiler_test_utils_hdrs})
-foreach(_hdr ${_exclude_hdrs})
-  list(REMOVE_ITEM _local_hdrs ${_hdr})
-endforeach()
-
-foreach(_hdr ${_local_hdrs})
+foreach(_hdr ${_installed_hdrs})
   string(REPLACE "${protobuf_SOURCE_DIR}/src" "" _file ${_hdr})
   set(_tmp_file "${CMAKE_BINARY_DIR}/tmp-install-test/${_file}")
   add_custom_command(TARGET remove-installed-headers PRE_BUILD
@@ -204,6 +193,6 @@ endforeach()
 
 add_dependencies(remove-installed-headers save-installed-headers)
 if(protobuf_REMOVE_INSTALLED_HEADERS)
-  # Make sure we remove all the headers *before* any codegen occurs.
-  add_dependencies(${protobuf_PROTOC_EXE} remove-installed-headers)
+  add_dependencies(protobuf-lite-test-common remove-installed-headers)
+  add_dependencies(protobuf-test-common remove-installed-headers)
 endif()

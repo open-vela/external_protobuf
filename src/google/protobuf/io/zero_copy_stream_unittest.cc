@@ -720,9 +720,6 @@ TEST_F(IoTest, StringIo) {
 
 // Verifies that outputs up to kint32max can be created.
 TEST_F(IoTest, LargeOutput) {
-  // Filter out this test on 32-bit architectures.
-  if(sizeof(void*) < 8) return;
-
   std::string str;
   StringOutputStream output(&str);
   void* unused_data;
