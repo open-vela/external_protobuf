@@ -59,8 +59,6 @@
 #include "absl/strings/escaping.h"
 #include "absl/strings/str_cat.h"
 #include "google/protobuf/stubs/stringprintf.h"
-#include "absl/strings/str_replace.h"
-#include "absl/strings/strip.h"
 #include "absl/strings/substitute.h"
 #include "google/protobuf/compiler/python/helpers.h"
 #include "google/protobuf/compiler/python/pyi_generator.h"
@@ -84,8 +82,8 @@ std::string ModuleAlias(const std::string& filename) {
   // We can't have dots in the module name, so we replace each with _dot_.
   // But that could lead to a collision between a.b and a_dot_b, so we also
   // duplicate each underscore.
-  absl::StrReplaceAll({{"_", "__"}}, &module_name);
-  absl::StrReplaceAll({{".", "_dot_"}}, &module_name);
+  GlobalReplaceSubstring("_", "__", &module_name);
+  GlobalReplaceSubstring(".", "_dot_", &module_name);
   return module_name;
 }
 
@@ -317,8 +315,7 @@ bool Generator::Generate(const FileDescriptor* file,
   }
   std::string module_name = ModuleName(file->name());
   if (!opensource_runtime_) {
-    module_name =
-        std::string(absl::StripPrefix(module_name, kThirdPartyPrefix));
+    module_name = StripPrefixString(module_name, kThirdPartyPrefix);
   }
   printer_->Print(
       "_builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, '$module_name$', "
@@ -389,8 +386,7 @@ void Generator::PrintImports() const {
     std::string module_name = ModuleName(filename);
     std::string module_alias = ModuleAlias(filename);
     if (!opensource_runtime_) {
-      module_name =
-          std::string(absl::StripPrefix(module_name, kThirdPartyPrefix));
+      module_name = StripPrefixString(module_name, kThirdPartyPrefix);
     }
     if (ContainsPythonKeyword(module_name)) {
       // If the module path contains a Python keyword, we have to quote the
@@ -423,8 +419,7 @@ void Generator::PrintImports() const {
   for (int i = 0; i < file_->public_dependency_count(); ++i) {
     std::string module_name = ModuleName(file_->public_dependency(i)->name());
     if (!opensource_runtime_) {
-      module_name =
-          std::string(absl::StripPrefix(module_name, kThirdPartyPrefix));
+      module_name = StripPrefixString(module_name, kThirdPartyPrefix);
     }
     printer_->Print("from $module$ import *\n", "module", module_name);
   }
@@ -597,8 +592,7 @@ void Generator::PrintDescriptorKeyAndModuleName(
                   kDescriptorKey, "descriptor_name", name);
   std::string module_name = ModuleName(file_->name());
   if (!opensource_runtime_) {
-    module_name =
-        std::string(absl::StripPrefix(module_name, kThirdPartyPrefix));
+    module_name = StripPrefixString(module_name, kThirdPartyPrefix);
   }
   printer_->Print("__module__ = '$module_name$'\n", "module_name", module_name);
 }
@@ -790,8 +784,7 @@ void Generator::PrintMessage(const Descriptor& message_descriptor,
   printer_->Print(m, "'$descriptor_key$' : $descriptor_name$,\n");
   std::string module_name = ModuleName(file_->name());
   if (!opensource_runtime_) {
-    module_name =
-        std::string(absl::StripPrefix(module_name, kThirdPartyPrefix));
+    module_name = StripPrefixString(module_name, kThirdPartyPrefix);
   }
   printer_->Print("'__module__' : '$module_name$'\n", "module_name",
                   module_name);

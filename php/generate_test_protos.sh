@@ -4,9 +4,7 @@ set -ex
 
 cd `dirname $0`/..
 
-if [[ -z "${PROTOC}" ]]; then
-  PROTOC=$(pwd)/protoc
-fi
+PROTOC=$(pwd)/protoc
 if [ ! -f $PROTOC ]; then
   bazel build -c opt //:protoc
   PROTOC=$(pwd)/bazel-bin/protoc

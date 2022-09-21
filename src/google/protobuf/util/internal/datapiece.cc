@@ -43,7 +43,6 @@
 #include "absl/strings/str_cat.h"
 #include "google/protobuf/util/internal/utility.h"
 #include "google/protobuf/stubs/strutil.h"
-#include "absl/strings/match.h"
 #include "google/protobuf/stubs/mathutil.h"
 
 namespace google {
@@ -264,7 +263,7 @@ std::string DataPiece::ValueAsStringOrDefault(
     case TYPE_FLOAT:
       return FloatAsString(float_);
     case TYPE_BOOL:
-      return bool_ ? "true" : "false";
+      return SimpleBtoa(bool_);
     case TYPE_STRING:
       return absl::StrCat("\"", str_, "\"");
     case TYPE_BYTES: {
@@ -398,7 +397,7 @@ bool DataPiece::DecodeBase64(absl::string_view src, std::string* dest) const {
       absl::WebSafeBase64Escape(*dest, &encoded);
       // Remove trailing padding '=' characters before comparison.
       absl::string_view src_no_padding = absl::string_view(src).substr(
-          0, absl::EndsWith(src, "=") ? src.find_last_not_of('=') + 1
+          0, HasSuffixString(src, "=") ? src.find_last_not_of('=') + 1
                                       : src.length());
       return encoded == src_no_padding;
     }
@@ -410,7 +409,7 @@ bool DataPiece::DecodeBase64(absl::string_view src, std::string* dest) const {
       std::string encoded;
       strings::LegacyBase64EscapeWithoutPadding(*dest, &encoded);
       absl::string_view src_no_padding = absl::string_view(src).substr(
-          0, absl::EndsWith(src, "=") ? src.find_last_not_of('=') + 1
+          0, HasSuffixString(src, "=") ? src.find_last_not_of('=') + 1
                                       : src.length());
       return encoded == src_no_padding;
     }

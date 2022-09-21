@@ -63,10 +63,6 @@
 namespace google {
 namespace protobuf {
 
-MessageLite::~MessageLite(){
-// Defined out of line to save code space
-}
-
 std::string MessageLite::InitializationErrorString() const {
   return "(cannot determine missing fields for lite message)";
 }

@@ -81,7 +81,7 @@ cc_library(
         "//src/google/protobuf/compiler:__pkg__",
     ],
     deps = [
-        "//src/google/protobuf:protobuf_nowkt",
+        "//:protobuf",
         "//src/google/protobuf/compiler:code_generator",
         "@com_google_absl//absl/container:flat_hash_set",
         "@com_google_absl//absl/strings",

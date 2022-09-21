@@ -2,10 +2,6 @@
 
 set -ex
 
-# Fix permissions
-sudo chown -R $(whoami) $HOME/.rvm/
-sudo chown -R $(whoami) /Library/Ruby/
-
 set +ex  # rvm script is very verbose and exits with errorcode
 
 # Fix permissions

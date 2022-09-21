@@ -41,7 +41,6 @@
 #include "absl/base/call_once.h"
 #include "absl/status/status.h"
 #include "absl/status/statusor.h"
-#include "absl/strings/match.h"
 #include "absl/strings/str_cat.h"
 #include "absl/strings/strip.h"
 #include "absl/time/time.h"
@@ -1049,7 +1048,7 @@ Status ProtoStreamObjectWriter::RenderTimestamp(ProtoStreamObjectWriter* ow,
   absl::string_view value(data.str());
 
   int timezone_offset_seconds = 0;
-  if (absl::EndsWith(value, "Z")) {
+  if (HasSuffixString(value, "Z")) {
     value = value.substr(0, value.size() - 1);
   } else {
     size_t pos = value.find_last_of("+-");
@@ -1124,13 +1123,13 @@ Status ProtoStreamObjectWriter::RenderDuration(ProtoStreamObjectWriter* ow,
 
   absl::string_view value(data.str());
 
-  if (!absl::EndsWith(value, "s")) {
+  if (!HasSuffixString(value, "s")) {
     return absl::InvalidArgumentError(
         "Illegal duration format; duration must end with 's'");
   }
   value = value.substr(0, value.size() - 1);
   int sign = 1;
-  if (absl::StartsWith(value, "-")) {
+  if (HasPrefixString(value, "-")) {
     sign = -1;
     value = value.substr(1);
   }
