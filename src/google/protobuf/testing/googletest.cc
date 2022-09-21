@@ -38,7 +38,6 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-#include "absl/strings/match.h"
 #include "absl/strings/str_replace.h"
 #include "google/protobuf/io/io_win32.h"
 #include "google/protobuf/stubs/strutil.h"
@@ -148,7 +147,7 @@ std::string GetTemporaryDirectoryName() {
   }
   // On Win32, tmpnam() returns a file prefixed with '\', but which is supposed
   // to be used in the current working directory.  WTF?
-  if (absl::StartsWith(result, "\\")) {
+  if (HasPrefixString(result, "\\")) {
     result.erase(0, 1);
   }
   // The Win32 API accepts forward slashes as a path delimiter as long as the

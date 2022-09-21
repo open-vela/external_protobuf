@@ -386,7 +386,7 @@ BOOL GPBDictionaryIsInitializedInternalHelper(NSDictionary *dict, GPBFieldDescri
 static void ReadValue(GPBCodedInputStream *stream,
                       GPBGenericValue *valueToFill,
                       GPBDataType type,
-                      id<GPBExtensionRegistry>registry,
+                      GPBExtensionRegistry *registry,
                       GPBFieldDescriptor *field) {
   switch (type) {
     case GPBDataTypeBool:
@@ -454,7 +454,7 @@ static void ReadValue(GPBCodedInputStream *stream,
 
 void GPBDictionaryReadEntry(id mapDictionary,
                             GPBCodedInputStream *stream,
-                            id<GPBExtensionRegistry>registry,
+                            GPBExtensionRegistry *registry,
                             GPBFieldDescriptor *field,
                             GPBMessage *parentMessage) {
   GPBDataType keyDataType = field.mapKeyDataType;

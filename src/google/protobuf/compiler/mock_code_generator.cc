@@ -39,8 +39,11 @@
 #include <memory>
 #include <vector>
 
+#include "google/protobuf/stubs/strutil.h"
+
 #include "google/protobuf/stubs/logging.h"
 #include "google/protobuf/stubs/common.h"
+#include "google/protobuf/testing/file.h"
 #include "google/protobuf/testing/file.h"
 #include "google/protobuf/testing/file.h"
 #include "google/protobuf/compiler/plugin.pb.h"
@@ -49,8 +52,6 @@
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_replace.h"
 #include "absl/strings/str_split.h"
-#include "absl/strings/string_view.h"
-#include "absl/strings/strip.h"
 #include "absl/strings/substitute.h"
 #include "google/protobuf/descriptor.h"
 #include "google/protobuf/io/printer.h"
@@ -207,8 +208,8 @@ bool MockCodeGenerator::Generate(const FileDescriptor* file,
                                  std::string* error) const {
   bool annotate = false;
   for (int i = 0; i < file->message_type_count(); i++) {
-    if (absl::StartsWith(file->message_type(i)->name(), "MockCodeGenerator_")) {
-      absl::string_view command = absl::StripPrefix(
+    if (HasPrefixString(file->message_type(i)->name(), "MockCodeGenerator_")) {
+      std::string command = StripPrefixString(
           file->message_type(i)->name(), "MockCodeGenerator_");
       if (command == "Error") {
         *error = "Saw message type MockCodeGenerator_Error.";
@@ -251,12 +252,12 @@ bool MockCodeGenerator::Generate(const FileDescriptor* file,
     }
   }
 
-  bool insert_endlines = absl::StartsWith(parameter, "insert_endlines=");
-  if (insert_endlines || absl::StartsWith(parameter, "insert=")) {
+  bool insert_endlines = HasPrefixString(parameter, "insert_endlines=");
+  if (insert_endlines || HasPrefixString(parameter, "insert=")) {
     std::vector<std::string> insert_into = absl::StrSplit(
-        absl::StripPrefix(parameter,
-                          insert_endlines ? "insert_endlines=" : "insert="),
-        ',', absl::SkipEmpty());
+        StripPrefixString(
+            parameter, insert_endlines ? "insert_endlines=" : "insert="),
+        ",", absl::SkipEmpty());
 
     for (size_t i = 0; i < insert_into.size(); i++) {
       {
@@ -264,7 +265,7 @@ bool MockCodeGenerator::Generate(const FileDescriptor* file,
         std::string content =
             GetOutputFileContent(name_, "first_insert", file, context);
         if (insert_endlines) {
-          absl::StrReplaceAll({{",", ",\n"}}, &content);
+          GlobalReplaceSubstring(",", ",\n", &content);
         }
         if (annotate) {
           auto* annotation = info.add_annotation();
@@ -289,7 +290,7 @@ bool MockCodeGenerator::Generate(const FileDescriptor* file,
         std::string content =
             GetOutputFileContent(name_, "second_insert", file, context);
         if (insert_endlines) {
-          absl::StrReplaceAll({{",", ",\n"}}, &content);
+          GlobalReplaceSubstring(",", ",\n", &content);
         }
         if (annotate) {
           auto* annotation = info.add_annotation();

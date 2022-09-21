@@ -43,7 +43,6 @@
 #include "absl/status/status.h"
 #include "absl/strings/ascii.h"
 #include "absl/strings/escaping.h"
-#include "absl/strings/match.h"
 #include "absl/strings/str_cat.h"
 #include "absl/strings/string_view.h"
 #include "google/protobuf/util/internal/object_writer.h"
@@ -967,15 +966,15 @@ JsonStreamParser::TokenType JsonStreamParser::GetNextTokenType() {
     return BEGIN_NUMBER;
   }
   if (size >= kKeywordTrue.length() &&
-      absl::StartsWith(data_view, kKeywordTrue)) {
+      HasPrefixString(data_view, kKeywordTrue)) {
     return BEGIN_TRUE;
   }
   if (size >= kKeywordFalse.length() &&
-      absl::StartsWith(data_view, kKeywordFalse)) {
+      HasPrefixString(data_view, kKeywordFalse)) {
     return BEGIN_FALSE;
   }
   if (size >= kKeywordNull.length() &&
-      absl::StartsWith(data_view, kKeywordNull)) {
+      HasPrefixString(data_view, kKeywordNull)) {
     return BEGIN_NULL;
   }
   if (*data == '{') return BEGIN_OBJECT;

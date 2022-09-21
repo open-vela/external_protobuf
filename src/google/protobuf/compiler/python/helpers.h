@@ -42,6 +42,7 @@ namespace protobuf {
 namespace compiler {
 namespace python {
 
+
 std::string ModuleName(const std::string& filename);
 std::string StrippedModuleName(const std::string& filename);
 bool ContainsPythonKeyword(const std::string& module_name);

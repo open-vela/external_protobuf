@@ -32,7 +32,6 @@
 
 #include "absl/base/call_once.h"
 #include "absl/status/status.h"
-#include "absl/strings/ascii.h"
 #include "google/protobuf/stubs/bytestream.h"
 #include "absl/strings/str_cat.h"
 #include "absl/strings/string_view.h"
@@ -142,7 +141,7 @@ class StatusErrorListener : public converter::ErrorListener {
 
   std::string GetLocString(const converter::LocationTrackerInterface& loc) {
     std::string loc_string = loc.ToString();
-    absl::StripAsciiWhitespace(&loc_string);
+    StripWhitespace(&loc_string);
     if (!loc_string.empty()) {
       loc_string = absl::StrCat("(", loc_string, ")");
     }

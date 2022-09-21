@@ -44,7 +44,7 @@
 #include "google/protobuf/compiler/scc.h"
 #include "google/protobuf/compiler/code_generator.h"
 #include "absl/container/flat_hash_map.h"
-#include "absl/strings/match.h"
+#include "google/protobuf/stubs/strutil.h"
 #include "absl/strings/str_split.h"
 #include "google/protobuf/compiler/cpp/names.h"
 #include "google/protobuf/compiler/cpp/options.h"
@@ -52,7 +52,6 @@
 #include "google/protobuf/io/printer.h"
 #include "google/protobuf/descriptor.h"
 #include "google/protobuf/port.h"
-#include "google/protobuf/stubs/strutil.h"
 #include "absl/strings/str_cat.h"
 
 // Must be included last.
@@ -888,21 +887,43 @@ void PrintFieldComment(const Formatter& format, const T* field) {
 
 class PROTOC_EXPORT NamespaceOpener {
  public:
-  explicit NamespaceOpener(io::Printer* p) : p_(p) {}
-  explicit NamespaceOpener(const Formatter& format) : p_(format.printer()) {}
-  NamespaceOpener(absl::string_view name, const Formatter& format)
+  explicit NamespaceOpener(const Formatter& format)
+      : printer_(format.printer()) {}
+  NamespaceOpener(const std::string& name, const Formatter& format)
       : NamespaceOpener(format) {
-    ChangeTo(name);
-  }
-  NamespaceOpener(absl::string_view name, io::Printer* p) : NamespaceOpener(p) {
     ChangeTo(name);
   }
   ~NamespaceOpener() { ChangeTo(""); }
 
-  void ChangeTo(absl::string_view name);
+  void ChangeTo(const std::string& name) {
+    std::vector<std::string> new_stack_ =
+        absl::StrSplit(name, "::", absl::SkipEmpty());
+    size_t len = std::min(name_stack_.size(), new_stack_.size());
+    size_t common_idx = 0;
+    while (common_idx < len) {
+      if (name_stack_[common_idx] != new_stack_[common_idx]) break;
+      common_idx++;
+    }
+    for (auto it = name_stack_.crbegin();
+         it != name_stack_.crend() - common_idx; ++it) {
+      if (*it == "PROTOBUF_NAMESPACE_ID") {
+        printer_->Print("PROTOBUF_NAMESPACE_CLOSE\n");
+      } else {
+        printer_->Print("}  // namespace $ns$\n", "ns", *it);
+      }
+    }
+    name_stack_.swap(new_stack_);
+    for (size_t i = common_idx; i < name_stack_.size(); ++i) {
+      if (name_stack_[i] == "PROTOBUF_NAMESPACE_ID") {
+        printer_->Print("PROTOBUF_NAMESPACE_OPEN\n");
+      } else {
+        printer_->Print("namespace $ns$ {\n", "ns", name_stack_[i]);
+      }
+    }
+  }
 
  private:
-  io::Printer* p_;
+  io::Printer* printer_;
   std::vector<std::string> name_stack_;
 };
 

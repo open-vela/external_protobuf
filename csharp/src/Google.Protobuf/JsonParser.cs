@@ -642,15 +642,19 @@ namespace Google.Protobuf
                             {
                                 return float.NaN;
                             }
-                            float converted = (float) value;
-                            // If the value is out of range of float, the cast representation will be infinite.
-                            // If the original value was infinite as well, that's fine - we'll return the 32-bit
-                            // version (with the correct sign).
-                            if (float.IsInfinity(converted) && !double.IsInfinity(value))
+                            if (value > float.MaxValue || value < float.MinValue)
                             {
+                                if (double.IsPositiveInfinity(value))
+                                {
+                                    return float.PositiveInfinity;
+                                }
+                                if (double.IsNegativeInfinity(value))
+                                {
+                                    return float.NegativeInfinity;
+                                }
                                 throw new InvalidProtocolBufferException($"Value out of range: {value}");
                             }
-                            return converted;
+                            return (float) value;
                         case FieldType.Enum:
                             CheckInteger(value);
                             // Just return it as an int, and let the CLR convert it.

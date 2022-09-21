@@ -53,10 +53,9 @@ cc_library(
         "//src/google/protobuf/compiler:__pkg__",
     ],
     deps = [
-        "//src/google/protobuf:protobuf_nowkt",
+        "//:protobuf",
         "//src/google/protobuf/compiler:code_generator",
         "@com_google_absl//absl/base:core_headers",
-        "@com_google_absl//absl/container:btree",
         "@com_google_absl//absl/container:flat_hash_map",
         "@com_google_absl//absl/container:flat_hash_set",
         "@com_google_absl//absl/container:layout",
@@ -98,7 +97,6 @@ cc_library(
         "unittest.inc",
     ],
     strip_include_prefix = "/src",
-    visibility = ["//pkg:__pkg__"],
 )
 
 cc_test(

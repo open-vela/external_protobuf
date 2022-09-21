@@ -1013,8 +1013,6 @@ class _Parser(object):
     if not tokenizer.TryConsume(','):
       tokenizer.TryConsume(';')
 
-
-  def _LogSilentMarker(self, field_name):
     pass
 
   def _DetectSilentMarker(self, tokenizer, field_name):
