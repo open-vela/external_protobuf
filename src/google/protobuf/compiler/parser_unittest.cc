@@ -147,6 +147,16 @@ class ParserTest : public testing::Test {
     EXPECT_EQ(io::Tokenizer::TYPE_END, input_->current().type);
   }
 
+  // Parse the text and expect that the given warnings are reported.
+  void ExpectHasWarnings(const char* text, const char* expected_warnings) {
+    SetupParser(text);
+    FileDescriptorProto file;
+    parser_->Parse(input_.get(), &file);
+    EXPECT_EQ(io::Tokenizer::TYPE_END, input_->current().type);
+    ASSERT_EQ("", error_collector_.text_);
+    EXPECT_EQ(expected_warnings, error_collector_.warning_);
+  }
+
   // Same as above but does not expect that the parser parses the complete
   // input.
   void ExpectHasEarlyExitErrors(const char* text, const char* expected_errors) {
@@ -1675,6 +1685,17 @@ TEST_F(ParseErrorTest, EnumReservedMissingQuotes) {
       "2:11: Expected enum value or number range.\n");
 }
 
+TEST_F(ParseErrorTest, EnumReservedInvalidIdentifier) {
+  ExpectHasWarnings(
+      R"pb(
+      enum TestEnum {
+        FOO = 1;
+        reserved "foo bar";
+      }
+      )pb",
+      "3:17: Reserved name \"foo bar\" is not a valid identifier.\n");
+}
+
 // -------------------------------------------------------------------
 // Reserved field number errors
 
@@ -1700,6 +1721,16 @@ TEST_F(ParseErrorTest, ReservedMissingQuotes) {
       "  reserved foo;\n"
       "}\n",
       "1:11: Expected field name or number range.\n");
+}
+
+TEST_F(ParseErrorTest, ReservedInvalidIdentifier) {
+  ExpectHasWarnings(
+      R"pb(
+      message Foo {
+        reserved "foo bar";
+      }
+      )pb",
+      "2:17: Reserved name \"foo bar\" is not a valid identifier.\n");
 }
 
 TEST_F(ParseErrorTest, ReservedNegativeNumber) {
@@ -1972,107 +2003,13 @@ TEST_F(ParserValidationErrorTest, Proto3Default) {
 
 TEST_F(ParserValidationErrorTest, Proto3JsonConflictError) {
   ExpectHasValidationErrors(
-      R"pb(
-      syntax = 'proto3';
-      message TestMessage {
-        uint32 foo = 1;
-        uint32 Foo = 2;
-      }
-      )pb",
-      "4:15: The default JSON name of field \"Foo\" (\"Foo\") conflicts "
-      "with the default JSON name of field \"foo\" (\"foo\"). "
-      "This is not allowed in proto3.\n");
-}
-
-TEST_F(ParserValidationErrorTest, Proto2JsonConflictError) {
-  // conflicts with default JSON names are not errors in proto2
-  ExpectParsesTo(
-      R"pb(
-      syntax = "proto2";
-      message TestMessage {
-        optional uint32 foo = 1;
-        optional uint32 Foo = 2;
-      }
-      )pb",
-      R"pb(
-      syntax: 'proto2'
-      message_type {
-        name: 'TestMessage'
-        field {
-          label: LABEL_OPTIONAL type: TYPE_UINT32 name: 'foo' number: 1
-        }
-        field {
-          label: LABEL_OPTIONAL type: TYPE_UINT32 name: 'Foo' number: 2
-        }
-      }
-      )pb"
-      );
-}
-
-TEST_F(ParserValidationErrorTest, Proto3CustomJsonConflictWithDefaultError) {
-  ExpectHasValidationErrors(
-      R"pb(
-      syntax = 'proto3';
-      message TestMessage {
-        uint32 foo = 1 [json_name='bar'];
-        uint32 bar = 2;
-      }
-      )pb",
-      "4:15: The default JSON name of field \"bar\" (\"bar\") conflicts "
-      "with the custom JSON name of field \"foo\". "
-      "This is not allowed in proto3.\n");
-}
-
-TEST_F(ParserValidationErrorTest, Proto2CustomJsonConflictWithDefaultError) {
-  // conflicts with default JSON names are not errors in proto2
-  ExpectParsesTo(
-      R"pb(
-      syntax = 'proto2';
-      message TestMessage {
-        optional uint32 foo = 1 [json_name='bar'];
-        optional uint32 bar = 2;
-      }
-      )pb",
-      R"pb(
-      syntax: 'proto2'
-      message_type {
-        name: 'TestMessage'
-        field {
-          label: LABEL_OPTIONAL type: TYPE_UINT32 name: 'foo' number: 1 json_name: 'bar'
-        }
-        field {
-          label: LABEL_OPTIONAL type: TYPE_UINT32 name: 'bar' number: 2
-        }
-      }
-      )pb"
-      );
-}
-
-TEST_F(ParserValidationErrorTest, Proto3CustomJsonConflictError) {
-  ExpectHasValidationErrors(
-      R"pb(
-      syntax = 'proto3';
-      message TestMessage {
-        uint32 foo = 1 [json_name='baz'];
-        uint32 bar = 2 [json_name='baz'];
-      }
-      )pb",
-      "4:15: The custom JSON name of field \"bar\" (\"baz\") conflicts "
-      "with the custom JSON name of field \"foo\".\n");
-}
-
-TEST_F(ParserValidationErrorTest, Proto2CustomJsonConflictError) {
-  ExpectHasValidationErrors(
-      R"pb(
-      syntax = 'proto2';
-      message TestMessage {
-        optional uint32 foo = 1 [json_name='baz'];
-        optional uint32 bar = 2 [json_name='baz'];
-      }
-      )pb",
-      // fails in proto2 also: can't explicitly configure bad custom JSON names
-      "4:24: The custom JSON name of field \"bar\" (\"baz\") conflicts "
-      "with the custom JSON name of field \"foo\".\n");
+      "syntax = 'proto3';\n"
+      "message TestMessage {\n"
+      "  uint32 foo = 1;\n"
+      "  uint32 Foo = 2;\n"
+      "}\n",
+      "3:9: The JSON camel-case name of field \"Foo\" conflicts with field "
+      "\"foo\". This is not allowed in proto3.\n");
 }
 
 TEST_F(ParserValidationErrorTest, EnumNameError) {
