@@ -43,6 +43,7 @@
 #include "google/protobuf/compiler/parser.h"
 #include "google/protobuf/unittest.pb.h"
 #include "google/protobuf/unittest_custom_options.pb.h"
+#include "google/protobuf/descriptor.pb.h"
 #include "google/protobuf/stubs/common.h"
 #include "google/protobuf/stubs/logging.h"
 #include "google/protobuf/stubs/stringprintf.h"
@@ -551,6 +552,27 @@ TEST_F(FileDescriptorTest, Syntax) {
     file->CopyTo(&other);
     EXPECT_EQ("proto3", other.syntax());
   }
+}
+
+TEST_F(FileDescriptorTest, CopyHeadingTo) {
+  FileDescriptorProto proto;
+  proto.set_name("foo.proto");
+  proto.set_package("foo.bar.baz");
+  proto.set_syntax("proto3");
+
+  // Won't be copied.
+  proto.add_message_type()->set_name("Foo");
+
+  DescriptorPool pool;
+  const FileDescriptor* file = pool.BuildFile(proto);
+  ASSERT_NE(file, nullptr);
+
+  FileDescriptorProto other;
+  file->CopyHeadingTo(&other);
+  EXPECT_EQ(other.name(), "foo.proto");
+  EXPECT_EQ(other.package(), "foo.bar.baz");
+  EXPECT_EQ(other.syntax(), "proto3");
+  EXPECT_TRUE(other.message_type().empty());
 }
 
 void ExtractDebugString(
@@ -1063,6 +1085,34 @@ TEST_F(DescriptorTest, FieldLabel) {
   EXPECT_TRUE(baz_->is_repeated());
 }
 
+TEST_F(DescriptorTest, NeedsUtf8Check) {
+  EXPECT_FALSE(foo_->requires_utf8_validation());
+  EXPECT_FALSE(bar_->requires_utf8_validation());
+
+  // Build a copy of the file in proto3.
+  FileDescriptorProto foo_file3;
+  foo_file_->CopyTo(&foo_file3);
+  foo_file3.set_syntax("proto3");
+
+  // Make this valid proto3 by removing `required` and the one group field.
+  for (auto& f : *foo_file3.mutable_message_type(1)->mutable_field()) {
+    f.clear_label();
+    if (f.type() == FieldDescriptorProto::TYPE_GROUP) {
+      f.set_type(FieldDescriptorProto::TYPE_MESSAGE);
+    }
+  }
+  // Make this valid proto3 by making the first enum value be zero.
+  foo_file3.mutable_enum_type(0)->mutable_value(0)->set_number(0);
+
+  DescriptorPool pool3;
+  const Descriptor* message3 = pool3.BuildFile(foo_file3)->message_type(1);
+  const FieldDescriptor* foo3 = message3->field(0);
+  const FieldDescriptor* bar3 = message3->field(1);
+
+  EXPECT_TRUE(foo3->requires_utf8_validation());
+  EXPECT_FALSE(bar3->requires_utf8_validation());
+}
+
 TEST_F(DescriptorTest, IsMap) {
   EXPECT_TRUE(map_->is_map());
   EXPECT_FALSE(baz_->is_map());
@@ -1533,6 +1583,23 @@ TEST_F(EnumDescriptorTest, ValueType) {
   EXPECT_EQ(enum_, bar_->type());
   EXPECT_EQ(enum2_, foo2_->type());
   EXPECT_EQ(enum2_, baz2_->type());
+}
+
+TEST_F(EnumDescriptorTest, IsClosed) {
+  // enum_ is proto2.
+  EXPECT_TRUE(enum_->is_closed());
+
+  // Make a proto3 version of enum_.
+  FileDescriptorProto foo_file3;
+  foo_file_->CopyTo(&foo_file3);
+  foo_file3.set_syntax("proto3");
+
+  // Make this valid proto3 by making the first enum value be zero.
+  foo_file3.mutable_enum_type(0)->mutable_value(0)->set_number(0);
+
+  DescriptorPool pool3;
+  const EnumDescriptor* enum3 = pool3.BuildFile(foo_file3)->enum_type(0);
+  EXPECT_FALSE(enum3->is_closed());
 }
 
 // ===================================================================
@@ -5557,7 +5624,7 @@ TEST_F(ValidationErrorTest, Int32OptionValueOutOfPositiveRange) {
       "                                 positive_int_value: 0x80000000 } "
       "}",
 
-      "foo.proto: foo.proto: OPTION_VALUE: Value out of range "
+      "foo.proto: foo.proto: OPTION_VALUE: Value out of range, -2147483648 to 2147483647, "
       "for int32 option \"foo\".\n");
 }
 
@@ -5574,7 +5641,7 @@ TEST_F(ValidationErrorTest, Int32OptionValueOutOfNegativeRange) {
       "                                 negative_int_value: -0x80000001 } "
       "}",
 
-      "foo.proto: foo.proto: OPTION_VALUE: Value out of range "
+      "foo.proto: foo.proto: OPTION_VALUE: Value out of range, -2147483648 to 2147483647, "
       "for int32 option \"foo\".\n");
 }
 
@@ -5590,7 +5657,7 @@ TEST_F(ValidationErrorTest, Int32OptionValueIsNotPositiveInt) {
       "                                        is_extension: true } "
       "                                 string_value: \"5\" } }",
 
-      "foo.proto: foo.proto: OPTION_VALUE: Value must be integer "
+      "foo.proto: foo.proto: OPTION_VALUE: Value must be integer, from -2147483648 to 2147483647, "
       "for int32 option \"foo\".\n");
 }
 
@@ -5608,7 +5675,7 @@ TEST_F(ValidationErrorTest, Int64OptionValueOutOfRange) {
       "} "
       "}",
 
-      "foo.proto: foo.proto: OPTION_VALUE: Value out of range "
+      "foo.proto: foo.proto: OPTION_VALUE: Value out of range, -9223372036854775808 to 9223372036854775807, "
       "for int64 option \"foo\".\n");
 }
 
@@ -5624,7 +5691,7 @@ TEST_F(ValidationErrorTest, Int64OptionValueIsNotPositiveInt) {
       "                                        is_extension: true } "
       "                                 identifier_value: \"5\" } }",
 
-      "foo.proto: foo.proto: OPTION_VALUE: Value must be integer "
+      "foo.proto: foo.proto: OPTION_VALUE: Value must be integer, from -9223372036854775808 to 9223372036854775807, "
       "for int64 option \"foo\".\n");
 }
 
@@ -5640,7 +5707,7 @@ TEST_F(ValidationErrorTest, UInt32OptionValueOutOfRange) {
       "                                        is_extension: true } "
       "                                 positive_int_value: 0x100000000 } }",
 
-      "foo.proto: foo.proto: OPTION_VALUE: Value out of range "
+      "foo.proto: foo.proto: OPTION_VALUE: Value out of range, 0 to 4294967295, "
       "for uint32 option \"foo\".\n");
 }
 
@@ -5656,7 +5723,7 @@ TEST_F(ValidationErrorTest, UInt32OptionValueIsNotPositiveInt) {
       "                                        is_extension: true } "
       "                                 double_value: -5.6 } }",
 
-      "foo.proto: foo.proto: OPTION_VALUE: Value must be non-negative integer "
+      "foo.proto: foo.proto: OPTION_VALUE: Value must be integer, from 0 to 4294967295, "
       "for uint32 option \"foo\".\n");
 }
 
@@ -5672,7 +5739,7 @@ TEST_F(ValidationErrorTest, UInt64OptionValueIsNotPositiveInt) {
       "                                        is_extension: true } "
       "                                 negative_int_value: -5 } }",
 
-      "foo.proto: foo.proto: OPTION_VALUE: Value must be non-negative integer "
+      "foo.proto: foo.proto: OPTION_VALUE: Value must be integer, from 0 to 18446744073709551615, "
       "for uint64 option \"foo\".\n");
 }
 
