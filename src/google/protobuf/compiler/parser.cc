@@ -291,8 +291,7 @@ bool Parser::ConsumeInteger64(uint64_t max_value, uint64_t* output,
 
 bool Parser::TryConsumeInteger64(uint64_t max_value, uint64_t* output) {
   if (LookingAtType(io::Tokenizer::TYPE_INTEGER) &&
-      io::Tokenizer::ParseInteger(input_->current().text, max_value,
-                                  output)) {
+      io::Tokenizer::ParseInteger(input_->current().text, max_value, output)) {
     input_->Next();
     return true;
   }
@@ -308,8 +307,8 @@ bool Parser::ConsumeNumber(double* output, const char* error) {
     // Also accept integers.
     uint64_t value = 0;
     if (io::Tokenizer::ParseInteger(input_->current().text,
-                                     std::numeric_limits<uint64_t>::max(),
-                                     &value)) {
+                                    std::numeric_limits<uint64_t>::max(),
+                                    &value)) {
       *output = value;
     } else if (input_->current().text[0] == '0') {
       // octal or hexadecimal; don't bother parsing as float
@@ -1270,11 +1269,11 @@ bool Parser::ParseDefaultAssignment(
   DO(Consume("default"));
   DO(Consume("="));
 
-  // We don't need to create separate spans in source code info for name and value,
-  // since there's no way to represent them distinctly in a location path. But we will
-  // want a separate recorder for the value, just to have more precise location info
-  // in error messages. So we let it create a location in no_op, so it doesn't add a
-  // span to the file descriptor.
+  // We don't need to create separate spans in source code info for name and
+  // value, since there's no way to represent them distinctly in a location
+  // path. But we will want a separate recorder for the value, just to have more
+  // precise location info in error messages. So we let it create a location in
+  // no_op, so it doesn't add a span to the file descriptor.
   SourceCodeInfo no_op;
   LocationRecorder value_location(location, &no_op);
   value_location.RecordLegacyLocation(
@@ -1350,18 +1349,19 @@ bool Parser::ParseDefaultAssignment(
     }
 
     case FieldDescriptorProto::TYPE_FLOAT:
-    case FieldDescriptorProto::TYPE_DOUBLE:
+    case FieldDescriptorProto::TYPE_DOUBLE: {
       // These types can be negative.
       if (TryConsume("-")) {
         default_value->append("-");
       }
       // Parse the integer because we have to convert hex integers to decimal
       // floats.
-      double value;
+      double value = 0;
       DO(ConsumeNumber(&value, "Expected number."));
       // And stringify it again.
       default_value->append(SimpleDtoa(value));
       break;
+    }
 
     case FieldDescriptorProto::TYPE_BOOL:
       if (TryConsume("true")) {
@@ -1414,11 +1414,11 @@ bool Parser::ParseJsonName(FieldDescriptorProto* field,
   LocationRecorder location(field_location,
                             FieldDescriptorProto::kJsonNameFieldNumber);
 
-  // We don't need to create separate spans in source code info for name and value,
-  // since there's no way to represent them distinctly in a location path. But we will
-  // want a separate recorder for them, just to have more precise location info
-  // in error messages. So we let them create a location in no_op, so they don't
-  // add a span to the file descriptor.
+  // We don't need to create separate spans in source code info for name and
+  // value, since there's no way to represent them distinctly in a location
+  // path. But we will want a separate recorder for them, just to have more
+  // precise location info in error messages. So we let them create a location
+  // in no_op, so they don't add a span to the file descriptor.
   SourceCodeInfo no_op;
   {
     LocationRecorder name_location(location, &no_op);
@@ -1608,7 +1608,9 @@ bool Parser::ParseOption(Message* options,
           }
           break;
         }
-        // value too large for an integer; fall through below to treat as floating point
+        // value too large for an integer; fall through below to treat as
+        // floating point
+        ABSL_FALLTHROUGH_INTENDED;
       }
 
       case io::Tokenizer::TYPE_FLOAT: {
@@ -1781,7 +1783,9 @@ bool Parser::ParseReservedName(std::string* name, const char* error_message) {
   int col = input_->current().column;
   DO(ConsumeString(name, error_message));
   if (!io::Tokenizer::IsIdentifier(*name)) {
-    AddWarning(line, col, absl::StrFormat("Reserved name \"%s\" is not a valid identifier.", *name));
+    AddWarning(line, col,
+               absl::StrFormat(
+                   "Reserved name \"%s\" is not a valid identifier.", *name));
   }
   return true;
 }
@@ -1879,8 +1883,7 @@ bool Parser::ParseReservedNumbers(EnumDescriptorProto* proto,
   do {
     LocationRecorder location(parent_location, proto->reserved_range_size());
 
-    EnumDescriptorProto::EnumReservedRange* range =
-        proto->add_reserved_range();
+    EnumDescriptorProto::EnumReservedRange* range = proto->add_reserved_range();
     int start, end;
     io::Tokenizer::Token start_token;
     {
