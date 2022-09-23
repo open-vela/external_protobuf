@@ -1737,13 +1737,11 @@ TEST_F(ParseErrorTest, EnumReservedMissingQuotes) {
 
 TEST_F(ParseErrorTest, EnumReservedInvalidIdentifier) {
   ExpectHasWarnings(
-      R"pb(
-      enum TestEnum {
-        FOO = 1;
-        reserved "foo bar";
-      }
-      )pb",
-      "3:17: Reserved name \"foo bar\" is not a valid identifier.\n");
+      "enum TestEnum {\n"
+      "  FOO = 1;\n"
+      "  reserved \"foo bar\";\n"
+      "}\n",
+      "2:11: Reserved name \"foo bar\" is not a valid identifier.\n");
 }
 
 // -------------------------------------------------------------------
@@ -1775,12 +1773,10 @@ TEST_F(ParseErrorTest, ReservedMissingQuotes) {
 
 TEST_F(ParseErrorTest, ReservedInvalidIdentifier) {
   ExpectHasWarnings(
-      R"pb(
-      message Foo {
-        reserved "foo bar";
-      }
-      )pb",
-      "2:17: Reserved name \"foo bar\" is not a valid identifier.\n");
+      "enum TestEnum {\n"
+      "  reserved \"foo bar\";\n"
+      "}\n",
+      "1:11: Reserved name \"foo bar\" is not a valid identifier.\n");
 }
 
 TEST_F(ParseErrorTest, ReservedNegativeNumber) {
@@ -2069,14 +2065,12 @@ TEST_F(ParserValidationErrorTest, Proto3Default) {
 
 TEST_F(ParserValidationErrorTest, Proto3JsonConflictError) {
   ExpectHasValidationErrors(
-      R"pb(
-      syntax = 'proto3';
-      message TestMessage {
-        uint32 foo = 1;
-        uint32 Foo = 2;
-      }
-      )pb",
-      "4:15: The default JSON name of field \"Foo\" (\"Foo\") conflicts "
+      "syntax = 'proto3';\n"
+      "message TestMessage {\n"
+      "  uint32 foo = 1;\n"
+      "  uint32 Foo = 2;\n"
+      "}\n",
+      "3:9: The default JSON name of field \"Foo\" (\"Foo\") conflicts "
       "with the default JSON name of field \"foo\" (\"foo\"). "
       "This is not allowed in proto3.\n");
 }
@@ -2085,90 +2079,107 @@ TEST_F(ParserValidationErrorTest, Proto2JsonConflictError) {
   // conflicts with default JSON names are not errors in proto2
   ExpectParsesTo(
       R"pb(
-      syntax = "proto2";
+        syntax = "proto2"
+        ;
       message TestMessage {
         optional uint32 foo = 1;
         optional uint32 Foo = 2;
       }
       )pb",
       R"pb(
-      syntax: 'proto2'
-      message_type {
-        name: 'TestMessage'
-        field {
-          label: LABEL_OPTIONAL type: TYPE_UINT32 name: 'foo' number: 1
+        syntax: 'proto2'
+        message_type {
+          name: 'TestMessage'
+          field {
+            label: LABEL_OPTIONAL
+            type: TYPE_UINT32
+            name: 'foo'
+            number: 1
+          }
+          field {
+            label: LABEL_OPTIONAL
+            type: TYPE_UINT32
+            name: 'Foo'
+            number: 2
+          }
         }
-        field {
-          label: LABEL_OPTIONAL type: TYPE_UINT32 name: 'Foo' number: 2
-        }
-      }
-      )pb"
-      );
-}
-
-TEST_F(ParserValidationErrorTest, Proto3CustomJsonConflictWithDefaultError) {
-  ExpectHasValidationErrors(
-      R"pb(
-      syntax = 'proto3';
-      message TestMessage {
-        uint32 foo = 1 [json_name='bar'];
-        uint32 bar = 2;
-      }
-      )pb",
-      "4:15: The default JSON name of field \"bar\" (\"bar\") conflicts "
-      "with the custom JSON name of field \"foo\". "
-      "This is not allowed in proto3.\n");
+      )pb");
 }
 
 TEST_F(ParserValidationErrorTest, Proto2CustomJsonConflictWithDefaultError) {
   // conflicts with default JSON names are not errors in proto2
   ExpectParsesTo(
       R"pb(
-      syntax = 'proto2';
+        syntax = 'proto2'
+        ;
       message TestMessage {
         optional uint32 foo = 1 [json_name='bar'];
         optional uint32 bar = 2;
       }
       )pb",
       R"pb(
-      syntax: 'proto2'
-      message_type {
-        name: 'TestMessage'
-        field {
-          label: LABEL_OPTIONAL type: TYPE_UINT32 name: 'foo' number: 1 json_name: 'bar'
+        syntax: 'proto2'
+        message_type {
+          name: 'TestMessage'
+          field {
+            label: LABEL_OPTIONAL
+            type: TYPE_UINT32
+            name: 'foo'
+            number: 1
+            json_name: 'bar'
+          }
+          field {
+            label: LABEL_OPTIONAL
+            type: TYPE_UINT32
+            name: 'bar'
+            number: 2
+          }
         }
-        field {
-          label: LABEL_OPTIONAL type: TYPE_UINT32 name: 'bar' number: 2
-        }
+      )pb");
+}
+
+// TODO(b/248626372) Re-enable these in google3.
+TEST_F(ParserValidationErrorTest, Proto3CustomJsonConflictWithDefaultError) {
+  ExpectHasValidationErrors(
+      R"pb(
+        syntax = 'proto3'
+        ;
+      message TestMessage {
+        uint32 foo = 1 [json_name='bar'];
+        uint32 bar = 2;
       }
-      )pb"
-      );
+      )pb",
+      "5:15: The default JSON name of field \"bar\" (\"bar\") conflicts "
+      "with the custom JSON name of field \"foo\". "
+      "This is not allowed in proto3.\n");
 }
 
 TEST_F(ParserValidationErrorTest, Proto3CustomJsonConflictError) {
   ExpectHasValidationErrors(
       R"pb(
-      syntax = 'proto3';
+        syntax = 'proto3'
+        ;
       message TestMessage {
         uint32 foo = 1 [json_name='baz'];
         uint32 bar = 2 [json_name='baz'];
       }
       )pb",
-      "4:15: The custom JSON name of field \"bar\" (\"baz\") conflicts "
+      "5:15: The custom JSON name of field \"bar\" (\"baz\") conflicts "
       "with the custom JSON name of field \"foo\".\n");
 }
 
 TEST_F(ParserValidationErrorTest, Proto2CustomJsonConflictError) {
   ExpectHasValidationErrors(
       R"pb(
-      syntax = 'proto2';
+        syntax = 'proto2'
+        ;
       message TestMessage {
         optional uint32 foo = 1 [json_name='baz'];
         optional uint32 bar = 2 [json_name='baz'];
       }
       )pb",
       // fails in proto2 also: can't explicitly configure bad custom JSON names
-      "4:24: The custom JSON name of field \"bar\" (\"baz\") conflicts "
+      "5:24: The custom JSON name of field \"bar\" (\"baz\") conflicts "
       "with the custom JSON name of field \"foo\".\n");
 }
 

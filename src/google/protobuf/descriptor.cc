@@ -5430,6 +5430,7 @@ void DescriptorBuilder::BuildMessage(const DescriptorProto& proto,
     }
   }
 
+  // TODO(b/248626372) Make this consistent with OSS behavior.
   CheckFieldJsonNameUniqueness(proto, result);
 
   // Check that fields aren't using reserved names or numbers and that they
@@ -5517,20 +5518,19 @@ struct JsonNameDetails {
   bool is_custom;
 };
 
-JsonNameDetails GetJsonNameDetails(const FieldDescriptorProto* field, bool use_custom) {
+JsonNameDetails GetJsonNameDetails(const FieldDescriptorProto* field,
+                                   bool use_custom) {
   if (use_custom && field->has_json_name()) {
     return {field, field->json_name(), true};
   }
   return {field, ToJsonName(field->name()), false};
 }
 
-
-} // namespace
+}  // namespace
 
 void DescriptorBuilder::CheckFieldJsonNameUniqueness(
     const std::string& message_name, const DescriptorProto& message,
     FileDescriptor::Syntax syntax, bool use_custom_names) {
-
   absl::flat_hash_map<std::string, JsonNameDetails> name_to_field;
   for (const FieldDescriptorProto& field : message.field()) {
     JsonNameDetails details = GetJsonNameDetails(&field, use_custom_names);
@@ -5556,11 +5556,11 @@ void DescriptorBuilder::CheckFieldJsonNameUniqueness(
     if (details.orig_name != match.orig_name) {
       name_suffix = absl::StrCat(" (\"", match.orig_name, "\")");
     }
-    std::string error_message =
-        absl::StrFormat("The %s JSON name of field \"%s\" (\"%s\") conflicts "
-                        "with the %s JSON name of field \"%s\"%s.",
-                        this_type, field.name(), details.orig_name, existing_type,
-                        match.field->name(), name_suffix);
+    std::string error_message = absl::StrFormat(
+        "The %s JSON name of field \"%s\" (\"%s\") conflicts "
+        "with the %s JSON name of field \"%s\"%s.",
+        this_type, field.name(), details.orig_name, existing_type,
+        match.field->name(), name_suffix);
 
     bool involves_default = !details.is_custom || !match.is_custom;
     if (syntax == FileDescriptor::SYNTAX_PROTO2 && involves_default) {
@@ -6873,6 +6873,7 @@ void DescriptorBuilder::ValidateProto3(FileDescriptor* file,
   }
 }
 
+
 void DescriptorBuilder::ValidateProto3Message(Descriptor* message,
                                               const DescriptorProto& proto) {
   for (int i = 0; i < message->nested_type_count(); ++i) {
@@ -6897,6 +6898,7 @@ void DescriptorBuilder::ValidateProto3Message(Descriptor* message,
     AddError(message->full_name(), proto, DescriptorPool::ErrorCollector::NAME,
              "MessageSet is not supported in proto3.");
   }
+
 }
 
 void DescriptorBuilder::ValidateProto3Field(FieldDescriptor* field,
@@ -7739,23 +7741,24 @@ bool DescriptorBuilder::OptionInterpreter::ExamineIfOptionIsSet(
 namespace {
 // Helpers for method below
 
-template <typename T> std::string ValueOutOfRange(
-    absl::string_view type_name, absl::string_view option_name) {
-  return absl::StrFormat(
-    "Value out of range, %d to %d, for %s option \"%s\".", \
-    std::numeric_limits<T>::min(), std::numeric_limits<T>::max(),
-    type_name, option_name);
+template <typename T>
+std::string ValueOutOfRange(absl::string_view type_name,
+                            absl::string_view option_name) {
+  return absl::StrFormat("Value out of range, %d to %d, for %s option \"%s\".",
+                         std::numeric_limits<T>::min(),
+                         std::numeric_limits<T>::max(), type_name, option_name);
 }
 
-template <typename T> std::string ValueMustBeInt(
-    absl::string_view type_name, absl::string_view option_name) {
+template <typename T>
+std::string ValueMustBeInt(absl::string_view type_name,
+                           absl::string_view option_name) {
   return absl::StrFormat(
-    "Value must be integer, from %d to %d, for %s option \"%s\".", \
-    std::numeric_limits<T>::min(), std::numeric_limits<T>::max(),
-    type_name, option_name);
+      "Value must be integer, from %d to %d, for %s option \"%s\".",
+      std::numeric_limits<T>::min(), std::numeric_limits<T>::max(), type_name,
+      option_name);
 }
 
-} // namespace
+}  // namespace
 
 bool DescriptorBuilder::OptionInterpreter::SetOptionValue(
     const FieldDescriptor* option_field, UnknownFieldSet* unknown_fields) {
@@ -7765,7 +7768,8 @@ bool DescriptorBuilder::OptionInterpreter::SetOptionValue(
       if (uninterpreted_option_->has_positive_int_value()) {
         if (uninterpreted_option_->positive_int_value() >
             static_cast<uint64_t>(std::numeric_limits<int32_t>::max())) {
-          return AddValueError(ValueOutOfRange<int32_t>("int32", option_field->full_name()));
+          return AddValueError(
+              ValueOutOfRange<int32_t>("int32", option_field->full_name()));
         } else {
           SetInt32(option_field->number(),
                    uninterpreted_option_->positive_int_value(),
@@ -7774,14 +7778,16 @@ bool DescriptorBuilder::OptionInterpreter::SetOptionValue(
       } else if (uninterpreted_option_->has_negative_int_value()) {
         if (uninterpreted_option_->negative_int_value() <
             static_cast<int64_t>(std::numeric_limits<int32_t>::min())) {
-          return AddValueError(ValueOutOfRange<int32_t>("int32", option_field->full_name()));
+          return AddValueError(
+              ValueOutOfRange<int32_t>("int32", option_field->full_name()));
         } else {
           SetInt32(option_field->number(),
                    uninterpreted_option_->negative_int_value(),
                    option_field->type(), unknown_fields);
         }
       } else {
-        return AddValueError(ValueMustBeInt<int32_t>("int32", option_field->full_name()));
+        return AddValueError(
+            ValueMustBeInt<int32_t>("int32", option_field->full_name()));
       }
       break;
 
@@ -7789,7 +7795,8 @@ bool DescriptorBuilder::OptionInterpreter::SetOptionValue(
       if (uninterpreted_option_->has_positive_int_value()) {
         if (uninterpreted_option_->positive_int_value() >
             static_cast<uint64_t>(std::numeric_limits<int64_t>::max())) {
-          return AddValueError(ValueOutOfRange<int64_t>("int64", option_field->full_name()));
+          return AddValueError(
+              ValueOutOfRange<int64_t>("int64", option_field->full_name()));
         } else {
           SetInt64(option_field->number(),
                    uninterpreted_option_->positive_int_value(),
@@ -7800,7 +7807,8 @@ bool DescriptorBuilder::OptionInterpreter::SetOptionValue(
                  uninterpreted_option_->negative_int_value(),
                  option_field->type(), unknown_fields);
       } else {
-        return AddValueError(ValueMustBeInt<int64_t>("int64", option_field->full_name()));
+        return AddValueError(
+            ValueMustBeInt<int64_t>("int64", option_field->full_name()));
       }
       break;
 
@@ -7808,14 +7816,16 @@ bool DescriptorBuilder::OptionInterpreter::SetOptionValue(
       if (uninterpreted_option_->has_positive_int_value()) {
         if (uninterpreted_option_->positive_int_value() >
             std::numeric_limits<uint32_t>::max()) {
-          return AddValueError(ValueOutOfRange<uint32_t>("uint32", option_field->full_name()));
+          return AddValueError(
+              ValueOutOfRange<uint32_t>("uint32", option_field->full_name()));
         } else {
           SetUInt32(option_field->number(),
                     uninterpreted_option_->positive_int_value(),
                     option_field->type(), unknown_fields);
         }
       } else {
-        return AddValueError(ValueMustBeInt<uint32_t>("uint32", option_field->full_name()));
+        return AddValueError(
+            ValueMustBeInt<uint32_t>("uint32", option_field->full_name()));
       }
       break;
 
@@ -7825,7 +7835,8 @@ bool DescriptorBuilder::OptionInterpreter::SetOptionValue(
                   uninterpreted_option_->positive_int_value(),
                   option_field->type(), unknown_fields);
       } else {
-        return AddValueError(ValueMustBeInt<uint64_t>("uint64", option_field->full_name()));
+        return AddValueError(
+            ValueMustBeInt<uint64_t>("uint64", option_field->full_name()));
       }
       break;
 
