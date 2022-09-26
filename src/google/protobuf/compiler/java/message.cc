@@ -440,6 +440,7 @@ void ImmutableMessageGenerator::Generate(io::Printer* printer) {
     // oneofCase_ and oneof_
     printer->Print(vars,
                    "private int $oneof_name$Case_ = 0;\n"
+                   "@SuppressWarnings(\"serial\")\n"
                    "private java.lang.Object $oneof_name$_;\n");
     // OneofCase enum
     printer->Print(
@@ -1525,7 +1526,7 @@ void ImmutableMessageGenerator::GenerateKotlinOrNull(io::Printer* printer) const
     const FieldDescriptor* field = descriptor_->field(i);
     if (field->has_presence() && GetJavaType(field) == JAVATYPE_MESSAGE) {
       printer->Print(
-          "public val $full_classname$OrBuilder.$camelcase_name$OrNull: $full_name$?\n"
+          "val $full_classname$OrBuilder.$camelcase_name$OrNull: $full_name$?\n"
           "  get() = if (has$name$()) get$name$() else null\n\n",
           "full_classname",
           EscapeKotlinKeywords(name_resolver_->GetClassName(descriptor_, true)),
@@ -1740,6 +1741,7 @@ void ImmutableMessageGenerator::GenerateAnyMethods(io::Printer* printer) {
       "      defaultInstance.getDescriptorForType().getFullName());\n"
       "}\n"
       "\n"
+      "@SuppressWarnings(\"serial\")\n"
       "private volatile com.google.protobuf.Message cachedUnpackValue;\n"
       "\n"
       "@java.lang.SuppressWarnings(\"unchecked\")\n"
