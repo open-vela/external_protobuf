@@ -335,7 +335,6 @@ void ImmutableMapFieldGenerator::GenerateMembers(io::Printer* printer) const {
       "              $value_default_value$);\n"
       "}\n");
   printer->Print(variables_,
-                 "@SuppressWarnings(\"serial\")\n"
                  "private com.google.protobuf.MapField<\n"
                  "    $type_parameters$> $name$_;\n"
                  "private com.google.protobuf.MapField<$type_parameters$>\n"
