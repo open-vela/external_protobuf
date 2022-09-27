@@ -91,7 +91,7 @@ inline PROTOBUF_ALWAYS_INLINE void* AlignTo(void* p, size_t a) {
 // a default memory order (std::memory_order_seq_cst).
 template <typename T>
 struct Atomic {
-  PROTOBUF_CONSTEXPR explicit Atomic(T v) : val(v) {}
+  constexpr explicit Atomic(T v) : val(v) {}
 
   T relaxed_get() const { return val.load(std::memory_order_relaxed); }
   T relaxed_get() { return val.load(std::memory_order_relaxed); }
@@ -114,7 +114,7 @@ struct Atomic {
 struct ArenaBlock {
   // For the sentry block with zero-size where ptr_, limit_, cleanup_nodes all
   // point to "this".
-  PROTOBUF_CONSTEXPR ArenaBlock()
+  constexpr ArenaBlock()
       : next(nullptr), cleanup_nodes(this), relaxed_size(0) {}
 
   ArenaBlock(ArenaBlock* next, size_t size)
@@ -577,6 +577,13 @@ class PROTOBUF_EXPORT SerialArena {
  private:
   friend class ThreadSafeArena;
 
+  static constexpr ArenaBlock kSentryBlock = {};
+
+  static ArenaBlock* SentryBlock() {
+    // const_cast<> is okay as kSentryBlock will never be mutated.
+    return const_cast<ArenaBlock*>(&kSentryBlock);
+  }
+
   // Creates a new SerialArena inside mem using the remaining memory as for
   // future allocations.
   // The `parent` arena must outlive the serial arena, which is guaranteed
@@ -865,7 +872,7 @@ class PROTOBUF_EXPORT ThreadSafeArena {
 #pragma warning(disable : 4324)
 #endif
   struct alignas(kCacheAlignment) CacheAlignedLifecycleIdGenerator {
-    PROTOBUF_CONSTEXPR CacheAlignedLifecycleIdGenerator() : id{0} {}
+    constexpr CacheAlignedLifecycleIdGenerator() : id{0} {}
 
     Atomic<LifecycleIdAtomic> id;
   };
