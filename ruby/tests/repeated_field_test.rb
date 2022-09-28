@@ -697,7 +697,6 @@ class RepeatedFieldTest < Test::Unit::TestCase
       value :A, 1
       value :B, 2
       value :C, 3
-      value :v0, 4
     end
   end
 

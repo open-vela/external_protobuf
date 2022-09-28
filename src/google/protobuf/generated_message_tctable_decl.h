@@ -36,16 +36,15 @@
 #define GOOGLE_PROTOBUF_GENERATED_MESSAGE_TCTABLE_DECL_H__
 
 #include <array>
-#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <type_traits>
 
-#include "google/protobuf/message_lite.h"
-#include "google/protobuf/parse_context.h"
+#include <google/protobuf/message_lite.h>
+#include <google/protobuf/parse_context.h>
 
 // Must come last:
-#include "google/protobuf/port_def.inc"
+#include <google/protobuf/port_def.inc>
 
 namespace google {
 namespace protobuf {
@@ -86,27 +85,6 @@ struct TcFieldData {
   uint8_t aux_idx() const { return static_cast<uint8_t>(data >> 24); }
   uint16_t offset() const { return static_cast<uint16_t>(data >> 48); }
 
-  // Constructor for special entries that do not represent a field.
-  //  - End group: `nonfield_info` is the decoded tag.
-  constexpr TcFieldData(uint16_t coded_tag, uint16_t nonfield_info)
-      : data(uint64_t{nonfield_info} << 16 |  //
-             uint64_t{coded_tag}) {}
-
-  // Fields used in non-field entries
-  //
-  //     Bit:
-  //     +-----------+-------------------+
-  //     |63    ..     32|31     ..     0|
-  //     +---------------+---------------+
-  //     :   .   :   .   :   . 16|=======| [16] coded_tag()
-  //     :   .   :   . 32|=======|   .   : [16] decoded_tag()
-  //     :---.---:---.---:   .   :   .   : [32] (unused)
-  //     +-----------+-------------------+
-  //     |63    ..     32|31     ..     0|
-  //     +---------------+---------------+
-
-  uint16_t decoded_tag() const { return static_cast<uint16_t>(data >> 16); }
-
   // Fields used in mini table parsing:
   //
   //     Bit:
@@ -141,8 +119,6 @@ struct Offset {
 // TcParseTableBase is intentionally overaligned on 32 bit targets.
 #pragma warning(disable : 4324)
 #endif
-
-struct FieldAuxDefaultMessage {};
 
 // Base class for message-level table with info for the tail-call parser.
 struct alignas(uint64_t) TcParseTableBase {
@@ -197,42 +173,13 @@ struct alignas(uint64_t) TcParseTableBase {
   // Table entry for fast-path tailcall dispatch handling.
   struct FastFieldEntry {
     // Target function for dispatch:
-    mutable std::atomic<TailCallParseFunc> target_atomic;
-
+    TailCallParseFunc target;
     // Field data used during parse:
     TcFieldData bits;
-
-    // Default initializes this instance with undefined values.
-    FastFieldEntry() = default;
-
-    // Constant initializes this instance
-    constexpr FastFieldEntry(TailCallParseFunc func, TcFieldData bits)
-        : target_atomic(func), bits(bits) {}
-
-    // FastFieldEntry is copy-able and assignable, which is intended
-    // mainly for testing and debugging purposes.
-    FastFieldEntry(const FastFieldEntry& rhs) noexcept
-        : FastFieldEntry(rhs.target(), rhs.bits) {}
-    FastFieldEntry& operator=(const FastFieldEntry& rhs) noexcept {
-      SetTarget(rhs.target());
-      bits = rhs.bits;
-      return *this;
-    }
-
-    // Protocol buffer code should use these relaxed accessors.
-    TailCallParseFunc target() const {
-      return target_atomic.load(std::memory_order_relaxed);
-    }
-    void SetTarget(TailCallParseFunc func) const {
-      return target_atomic.store(func, std::memory_order_relaxed);
-    }
   };
   // There is always at least one table entry.
   const FastFieldEntry* fast_entry(size_t idx) const {
     return reinterpret_cast<const FastFieldEntry*>(this + 1) + idx;
-  }
-  FastFieldEntry* fast_entry(size_t idx) {
-    return reinterpret_cast<FastFieldEntry*>(this + 1) + idx;
   }
 
   // Returns a begin iterator (pointer) to the start of the field lookup table.
@@ -240,15 +187,11 @@ struct alignas(uint64_t) TcParseTableBase {
     return reinterpret_cast<const uint16_t*>(reinterpret_cast<uintptr_t>(this) +
                                              lookup_table_offset);
   }
-  uint16_t* field_lookup_begin() {
-    return reinterpret_cast<uint16_t*>(reinterpret_cast<uintptr_t>(this) +
-                                       lookup_table_offset);
-  }
 
   // Field entry for all fields.
   struct FieldEntry {
     uint32_t offset;     // offset in the message object
-    int32_t has_idx;     // has-bit index, relative to the message object
+    int32_t has_idx;     // has-bit index
     uint16_t aux_idx;    // index for `field_aux`.
     uint16_t type_card;  // `FieldType` and `Cardinality` (see _impl.h)
   };
@@ -258,44 +201,27 @@ struct alignas(uint64_t) TcParseTableBase {
     return reinterpret_cast<const FieldEntry*>(
         reinterpret_cast<uintptr_t>(this) + field_entries_offset);
   }
-  FieldEntry* field_entries_begin() {
-    return reinterpret_cast<FieldEntry*>(reinterpret_cast<uintptr_t>(this) +
-                                         field_entries_offset);
-  }
 
   // Auxiliary entries for field types that need extra information.
   union FieldAux {
-    constexpr FieldAux() : message_default_p(nullptr) {}
+    constexpr FieldAux() : message_default(nullptr) {}
     constexpr FieldAux(bool (*enum_validator)(int))
         : enum_validator(enum_validator) {}
     constexpr FieldAux(field_layout::Offset off) : offset(off.off) {}
     constexpr FieldAux(int16_t range_start, uint16_t range_length)
         : enum_range{range_start, range_length} {}
-    constexpr FieldAux(const MessageLite* msg) : message_default_p(msg) {}
-    constexpr FieldAux(FieldAuxDefaultMessage, const void* msg)
-        : message_default_p(msg) {}
-    constexpr FieldAux(const TcParseTableBase* table) : table(table) {}
+    constexpr FieldAux(const MessageLite* msg) : message_default(msg) {}
     bool (*enum_validator)(int);
     struct {
       int16_t start;    // minimum enum number (if it fits)
       uint16_t length;  // length of range (i.e., max = start + length - 1)
     } enum_range;
     uint32_t offset;
-    const void* message_default_p;
-    const TcParseTableBase* table;
-
-    const MessageLite* message_default() const {
-      return static_cast<const MessageLite*>(message_default_p);
-    }
+    const MessageLite* message_default;
   };
   const FieldAux* field_aux(uint32_t idx) const {
     return reinterpret_cast<const FieldAux*>(reinterpret_cast<uintptr_t>(this) +
                                              aux_offset) +
-           idx;
-  }
-  FieldAux* field_aux(uint32_t idx) {
-    return reinterpret_cast<FieldAux*>(reinterpret_cast<uintptr_t>(this) +
-                                       aux_offset) +
            idx;
   }
   const FieldAux* field_aux(const FieldEntry* entry) const {
@@ -307,11 +233,6 @@ struct alignas(uint64_t) TcParseTableBase {
     return reinterpret_cast<const char*>(reinterpret_cast<uintptr_t>(this) +
                                          aux_offset +
                                          num_aux_entries * sizeof(FieldAux));
-  }
-  char* name_data() {
-    return reinterpret_cast<char*>(reinterpret_cast<uintptr_t>(this) +
-                                   aux_offset +
-                                   num_aux_entries * sizeof(FieldAux));
   }
 };
 
@@ -386,6 +307,6 @@ static_assert(offsetof(TcParseTable<1>, fast_entries) ==
 }  // namespace protobuf
 }  // namespace google
 
-#include "google/protobuf/port_undef.inc"
+#include <google/protobuf/port_undef.inc>
 
 #endif  // GOOGLE_PROTOBUF_GENERATED_MESSAGE_TCTABLE_DECL_H__

@@ -32,6 +32,7 @@
 
 using Google.Protobuf.Collections;
 using System;
+using System.Linq;
 
 namespace Google.Protobuf
 {
@@ -49,7 +50,7 @@ namespace Google.Protobuf
     internal sealed class ExtensionValue<T> : IExtensionValue
     {
         private T field;
-        private readonly FieldCodec<T> codec;
+        private FieldCodec<T> codec;
 
         internal ExtensionValue(FieldCodec<T> codec)
         {

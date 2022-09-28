@@ -28,44 +28,67 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "google/protobuf/util/json_util.h"
+#include <google/protobuf/util/json_util.h>
 
-#include "absl/base/call_once.h"
-#include "absl/status/status.h"
-#include "absl/strings/ascii.h"
-#include "google/protobuf/stubs/bytestream.h"
-#include "absl/strings/str_cat.h"
-#include "absl/strings/string_view.h"
-#include "google/protobuf/io/coded_stream.h"
-#include "google/protobuf/io/zero_copy_sink.h"
-#include "google/protobuf/io/zero_copy_stream.h"
-#include "google/protobuf/util/internal/default_value_objectwriter.h"
-#include "google/protobuf/util/internal/error_listener.h"
-#include "google/protobuf/util/internal/json_objectwriter.h"
-#include "google/protobuf/util/internal/json_stream_parser.h"
-#include "google/protobuf/util/internal/protostream_objectsource.h"
-#include "google/protobuf/util/internal/protostream_objectwriter.h"
-#include "google/protobuf/util/type_resolver.h"
-#include "google/protobuf/util/type_resolver_util.h"
-#include "google/protobuf/stubs/status_macros.h"
-
+#include <google/protobuf/stubs/common.h>
+#include <google/protobuf/stubs/once.h>
+#include <google/protobuf/stubs/status.h>
+#include <google/protobuf/stubs/bytestream.h>
+#include <google/protobuf/stubs/strutil.h>
+#include <google/protobuf/io/coded_stream.h>
+#include <google/protobuf/io/zero_copy_stream.h>
+#include <google/protobuf/util/internal/default_value_objectwriter.h>
+#include <google/protobuf/util/internal/error_listener.h>
+#include <google/protobuf/util/internal/json_objectwriter.h>
+#include <google/protobuf/util/internal/json_stream_parser.h>
+#include <google/protobuf/util/internal/protostream_objectsource.h>
+#include <google/protobuf/util/internal/protostream_objectwriter.h>
+#include <google/protobuf/util/type_resolver.h>
+#include <google/protobuf/util/type_resolver_util.h>
+#include <google/protobuf/stubs/status_macros.h>
 
 // clang-format off
-#include "google/protobuf/port_def.inc"
+#include <google/protobuf/port_def.inc>
 // clang-format on
-
 
 namespace google {
 namespace protobuf {
 namespace util {
-using ::google::protobuf::io::zc_sink_internal::ZeroCopyStreamByteSink;
 
-absl::Status BinaryToJsonStream(TypeResolver* resolver,
+namespace internal {
+ZeroCopyStreamByteSink::~ZeroCopyStreamByteSink() {
+  if (buffer_size_ > 0) {
+    stream_->BackUp(buffer_size_);
+  }
+}
+
+void ZeroCopyStreamByteSink::Append(const char* bytes, size_t len) {
+  while (true) {
+    if (len <= buffer_size_) {  // NOLINT
+      memcpy(buffer_, bytes, len);
+      buffer_ = static_cast<char*>(buffer_) + len;
+      buffer_size_ -= len;
+      return;
+    }
+    if (buffer_size_ > 0) {
+      memcpy(buffer_, bytes, buffer_size_);
+      bytes += buffer_size_;
+      len -= buffer_size_;
+    }
+    if (!stream_->Next(&buffer_, &buffer_size_)) {
+      // There isn't a way for ByteSink to report errors.
+      buffer_size_ = 0;
+      return;
+    }
+  }
+}
+}  // namespace internal
+
+util::Status BinaryToJsonStream(TypeResolver* resolver,
                                 const std::string& type_url,
                                 io::ZeroCopyInputStream* binary_input,
                                 io::ZeroCopyOutputStream* json_output,
                                 const JsonPrintOptions& options) {
-
   io::CodedInputStream in_stream(binary_input);
   google::protobuf::Type type;
   RETURN_IF_ERROR(resolver->ResolveMessageType(type_url, &type));
@@ -91,7 +114,7 @@ absl::Status BinaryToJsonStream(TypeResolver* resolver,
   }
 }
 
-absl::Status BinaryToJsonString(TypeResolver* resolver,
+util::Status BinaryToJsonString(TypeResolver* resolver,
                                 const std::string& type_url,
                                 const std::string& binary_input,
                                 std::string* json_output,
@@ -106,60 +129,59 @@ namespace {
 class StatusErrorListener : public converter::ErrorListener {
  public:
   StatusErrorListener() {}
-  StatusErrorListener(const StatusErrorListener&) = delete;
-  StatusErrorListener& operator=(const StatusErrorListener&) = delete;
   ~StatusErrorListener() override {}
 
-  absl::Status GetStatus() { return status_; }
+  util::Status GetStatus() { return status_; }
 
   void InvalidName(const converter::LocationTrackerInterface& loc,
-                   absl::string_view unknown_name,
-                   absl::string_view message) override {
+                   StringPiece unknown_name,
+                   StringPiece message) override {
     std::string loc_string = GetLocString(loc);
     if (!loc_string.empty()) {
       loc_string.append(" ");
     }
-    status_ = absl::InvalidArgumentError(
-        absl::StrCat(loc_string, unknown_name, ": ", message));
+    status_ = util::InvalidArgumentError(
+        StrCat(loc_string, unknown_name, ": ", message));
   }
 
   void InvalidValue(const converter::LocationTrackerInterface& loc,
-                    absl::string_view type_name,
-                    absl::string_view value) override {
-    status_ = absl::InvalidArgumentError(
-        absl::StrCat(GetLocString(loc), ": invalid value ", std::string(value),
+                    StringPiece type_name,
+                    StringPiece value) override {
+    status_ = util::InvalidArgumentError(
+        StrCat(GetLocString(loc), ": invalid value ", std::string(value),
                      " for type ", std::string(type_name)));
   }
 
   void MissingField(const converter::LocationTrackerInterface& loc,
-                    absl::string_view missing_name) override {
-    status_ = absl::InvalidArgumentError(absl::StrCat(
+                    StringPiece missing_name) override {
+    status_ = util::InvalidArgumentError(StrCat(
         GetLocString(loc), ": missing field ", std::string(missing_name)));
   }
 
  private:
-  absl::Status status_;
+  util::Status status_;
 
   std::string GetLocString(const converter::LocationTrackerInterface& loc) {
     std::string loc_string = loc.ToString();
-    absl::StripAsciiWhitespace(&loc_string);
+    StripWhitespace(&loc_string);
     if (!loc_string.empty()) {
-      loc_string = absl::StrCat("(", loc_string, ")");
+      loc_string = StrCat("(", loc_string, ")");
     }
     return loc_string;
   }
+
+  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(StatusErrorListener);
 };
 }  // namespace
 
-absl::Status JsonToBinaryStream(TypeResolver* resolver,
+util::Status JsonToBinaryStream(TypeResolver* resolver,
                                 const std::string& type_url,
                                 io::ZeroCopyInputStream* json_input,
                                 io::ZeroCopyOutputStream* binary_output,
                                 const JsonParseOptions& options) {
-
   google::protobuf::Type type;
   RETURN_IF_ERROR(resolver->ResolveMessageType(type_url, &type));
-  ZeroCopyStreamByteSink sink(binary_output);
+  internal::ZeroCopyStreamByteSink sink(binary_output);
   StatusErrorListener listener;
   converter::ProtoStreamObjectWriter::Options proto_writer_options;
   proto_writer_options.ignore_unknown_fields = options.ignore_unknown_fields;
@@ -169,7 +191,6 @@ absl::Status JsonToBinaryStream(TypeResolver* resolver,
       options.case_insensitive_enum_parsing;
   converter::ProtoStreamObjectWriter proto_writer(
       resolver, type, &sink, &listener, proto_writer_options);
-  proto_writer.set_use_strict_base64_decoding(false);
 
   converter::JsonStreamParser parser(&proto_writer);
   const void* buffer;
@@ -177,16 +198,16 @@ absl::Status JsonToBinaryStream(TypeResolver* resolver,
   while (json_input->Next(&buffer, &length)) {
     if (length == 0) continue;
     RETURN_IF_ERROR(parser.Parse(
-        absl::string_view(static_cast<const char*>(buffer), length)));
+        StringPiece(static_cast<const char*>(buffer), length)));
   }
   RETURN_IF_ERROR(parser.FinishParse());
 
   return listener.GetStatus();
 }
 
-absl::Status JsonToBinaryString(TypeResolver* resolver,
+util::Status JsonToBinaryString(TypeResolver* resolver,
                                 const std::string& type_url,
-                                absl::string_view json_input,
+                                StringPiece json_input,
                                 std::string* binary_output,
                                 const JsonParseOptions& options) {
   io::ArrayInputStream input_stream(json_input.data(), json_input.size());
@@ -198,7 +219,7 @@ absl::Status JsonToBinaryString(TypeResolver* resolver,
 namespace {
 const char* kTypeUrlPrefix = "type.googleapis.com";
 TypeResolver* generated_type_resolver_ = nullptr;
-absl::once_flag generated_type_resolver_init_;
+PROTOBUF_NAMESPACE_ID::internal::once_flag generated_type_resolver_init_;
 
 std::string GetTypeUrl(const Message& message) {
   return std::string(kTypeUrlPrefix) + "/" +
@@ -216,20 +237,20 @@ void InitGeneratedTypeResolver() {
 }
 
 TypeResolver* GetGeneratedTypeResolver() {
-  absl::call_once(generated_type_resolver_init_, InitGeneratedTypeResolver);
+  PROTOBUF_NAMESPACE_ID::internal::call_once(generated_type_resolver_init_,
+                                             InitGeneratedTypeResolver);
   return generated_type_resolver_;
 }
 }  // namespace
 
-absl::Status MessageToJsonString(const Message& message, std::string* output,
+util::Status MessageToJsonString(const Message& message, std::string* output,
                                  const JsonOptions& options) {
-
   const DescriptorPool* pool = message.GetDescriptor()->file()->pool();
   TypeResolver* resolver =
       pool == DescriptorPool::generated_pool()
           ? GetGeneratedTypeResolver()
           : NewTypeResolverForDescriptorPool(kTypeUrlPrefix, pool);
-  absl::Status result =
+  util::Status result =
       BinaryToJsonString(resolver, GetTypeUrl(message),
                          message.SerializeAsString(), output, options);
   if (pool != DescriptorPool::generated_pool()) {
@@ -238,19 +259,18 @@ absl::Status MessageToJsonString(const Message& message, std::string* output,
   return result;
 }
 
-absl::Status JsonStringToMessage(absl::string_view input, Message* message,
+util::Status JsonStringToMessage(StringPiece input, Message* message,
                                  const JsonParseOptions& options) {
-
   const DescriptorPool* pool = message->GetDescriptor()->file()->pool();
   TypeResolver* resolver =
       pool == DescriptorPool::generated_pool()
           ? GetGeneratedTypeResolver()
           : NewTypeResolverForDescriptorPool(kTypeUrlPrefix, pool);
   std::string binary;
-  absl::Status result = JsonToBinaryString(resolver, GetTypeUrl(*message),
+  util::Status result = JsonToBinaryString(resolver, GetTypeUrl(*message),
                                            input, &binary, options);
   if (result.ok() && !message->ParseFromString(binary)) {
-    result = absl::InvalidArgumentError(
+    result = util::InvalidArgumentError(
         "JSON transcoder produced invalid protobuf output.");
   }
   if (pool != DescriptorPool::generated_pool()) {
