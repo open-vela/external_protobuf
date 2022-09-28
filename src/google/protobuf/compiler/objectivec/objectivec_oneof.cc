@@ -28,14 +28,13 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "google/protobuf/compiler/objectivec/objectivec_oneof.h"
-
 #include <map>
 #include <string>
 
-#include "absl/strings/str_cat.h"
-#include "google/protobuf/compiler/objectivec/objectivec_helpers.h"
-#include "google/protobuf/io/printer.h"
+#include <google/protobuf/compiler/objectivec/objectivec_oneof.h>
+#include <google/protobuf/compiler/objectivec/objectivec_helpers.h>
+#include <google/protobuf/io/printer.h>
+#include <google/protobuf/stubs/strutil.h>
 
 namespace google {
 namespace protobuf {
@@ -47,7 +46,7 @@ OneofGenerator::OneofGenerator(const OneofDescriptor* descriptor)
   variables_["enum_name"] = OneofEnumName(descriptor_);
   variables_["name"] = OneofName(descriptor_);
   variables_["capitalized_name"] = OneofNameCapitalized(descriptor_);
-  variables_["raw_index"] = absl::StrCat(descriptor_->index());
+  variables_["raw_index"] = StrCat(descriptor_->index());
   const Descriptor* msg_descriptor = descriptor_->containing_type();
   variables_["owning_message_class"] = ClassName(msg_descriptor);
 
@@ -66,7 +65,7 @@ OneofGenerator::~OneofGenerator() {}
 void OneofGenerator::SetOneofIndexBase(int index_base) {
   int index = descriptor_->index() + index_base;
   // Flip the sign to mark it as a oneof.
-  variables_["index"] = absl::StrCat(-index);
+  variables_["index"] = StrCat(-index);
 }
 
 void OneofGenerator::GenerateCaseEnum(io::Printer* printer) {
@@ -85,7 +84,7 @@ void OneofGenerator::GenerateCaseEnum(io::Printer* printer) {
         "$enum_name$_$field_name$ = $field_number$,\n",
         "enum_name", enum_name,
         "field_name", field_name,
-        "field_number", absl::StrCat(field->number()));
+        "field_number", StrCat(field->number()));
   }
   printer->Outdent();
   printer->Print(

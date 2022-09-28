@@ -31,12 +31,10 @@
 // Author: kenton@google.com (Kenton Varda)
 //  Based on original Protocol Buffers design by
 //  Sanjay Ghemawat, Jeff Dean, and others.
-#include "google/protobuf/compiler/csharp/csharp_doc_comment.h"
-
-#include "absl/strings/str_replace.h"
-#include "absl/strings/str_split.h"
-#include "google/protobuf/descriptor.h"
-#include "google/protobuf/io/printer.h"
+#include <google/protobuf/compiler/csharp/csharp_doc_comment.h>
+#include <google/protobuf/descriptor.h>
+#include <google/protobuf/io/printer.h>
+#include <google/protobuf/stubs/strutil.h>
 
 namespace google {
 namespace protobuf {
@@ -56,9 +54,10 @@ void WriteDocCommentBodyImpl(io::Printer* printer, SourceLocation location) {
     }
     // XML escaping... no need for apostrophes etc as the whole text is going to be a child
     // node of a summary element, not part of an attribute.
-    comments = absl::StrReplaceAll(comments, {{"&", "&amp;"}, {"<", "&lt;"}});
+    comments = StringReplace(comments, "&", "&amp;", true);
+    comments = StringReplace(comments, "<", "&lt;", true);
     std::vector<std::string> lines;
-    lines = absl::StrSplit(comments, "\n", absl::AllowEmpty());
+    lines = Split(comments, "\n", false);
     // TODO: We really should work out which part to put in the summary and which to put in the remarks...
     // but that needs to be part of a bigger effort to understand the markdown better anyway.
     printer->Print("/// <summary>\n");
