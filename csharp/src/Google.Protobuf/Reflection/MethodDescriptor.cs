@@ -40,31 +40,35 @@ namespace Google.Protobuf.Reflection
     /// </summary>
     public sealed class MethodDescriptor : DescriptorBase
     {
+        private readonly MethodDescriptorProto proto;
+        private readonly ServiceDescriptor service;
+        private MessageDescriptor inputType;
+        private MessageDescriptor outputType;
 
         /// <value>
         /// The service this method belongs to.
         /// </value>
-        public ServiceDescriptor Service { get; }
+        public ServiceDescriptor Service { get { return service; } }
 
         /// <value>
         /// The method's input type.
         /// </value>
-        public MessageDescriptor InputType { get; private set; }
+        public MessageDescriptor InputType { get { return inputType; } }
 
         /// <value>
         /// The method's input type.
         /// </value>
-        public MessageDescriptor OutputType { get; private set; }
+        public MessageDescriptor OutputType { get { return outputType; } }
 
         /// <value>
         /// Indicates if client streams multiple requests.
         /// </value>
-        public bool IsClientStreaming => Proto.ClientStreaming;
+        public bool IsClientStreaming { get { return proto.ClientStreaming; } }
 
         /// <value>
         /// Indicates if server streams multiple responses.
         /// </value>
-        public bool IsServerStreaming => Proto.ServerStreaming;
+        public bool IsServerStreaming { get { return proto.ServerStreaming; } }
 
         /// <summary>
         /// The (possibly empty) set of custom options for this method.
@@ -87,7 +91,7 @@ namespace Google.Protobuf.Reflection
         public T GetOption<T>(Extension<MethodOptions, T> extension)
         {
             var value = Proto.Options.GetExtension(extension);
-            return value is IDeepCloneable<T> c ? c.Clone() : value;
+            return value is IDeepCloneable<T> ? (value as IDeepCloneable<T>).Clone() : value;
         }
 
         /// <summary>
@@ -103,12 +107,12 @@ namespace Google.Protobuf.Reflection
                                   ServiceDescriptor parent, int index)
             : base(file, parent.FullName + "." + proto.Name, index)
         {
-            Proto = proto;
-            Service = parent;
+            this.proto = proto;
+            service = parent;
             file.DescriptorPool.AddSymbol(this);
         }
 
-        internal MethodDescriptorProto Proto { get; private set; }
+        internal MethodDescriptorProto Proto { get { return proto; } }
 
         /// <summary>
         /// Returns a clone of the underlying <see cref="MethodDescriptorProto"/> describing this method.
@@ -121,23 +125,23 @@ namespace Google.Protobuf.Reflection
         /// <summary>
         /// The brief name of the descriptor's target.
         /// </summary>
-        public override string Name => Proto.Name;
+        public override string Name { get { return proto.Name; } }
 
         internal void CrossLink()
         {
             IDescriptor lookup = File.DescriptorPool.LookupSymbol(Proto.InputType, this);
-            if (lookup is not MessageDescriptor inpoutType)
+            if (!(lookup is MessageDescriptor))
             {
                 throw new DescriptorValidationException(this, "\"" + Proto.InputType + "\" is not a message type.");
             }
-            InputType = inpoutType;
+            inputType = (MessageDescriptor) lookup;
 
             lookup = File.DescriptorPool.LookupSymbol(Proto.OutputType, this);
-            if (lookup is not MessageDescriptor outputType)
+            if (!(lookup is MessageDescriptor))
             {
                 throw new DescriptorValidationException(this, "\"" + Proto.OutputType + "\" is not a message type.");
             }
-            OutputType = outputType;
+            outputType = (MessageDescriptor) lookup;
         }
     }
 }

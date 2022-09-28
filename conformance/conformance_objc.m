@@ -77,7 +77,7 @@ static ConformanceResponse *DoTest(ConformanceRequest *request) {
       if ([request.messageType isEqual:@"protobuf_test_messages.proto3.TestAllTypesProto3"]) {
         msgClass = [Proto3TestAllTypesProto3 class];
       } else if ([request.messageType isEqual:@"protobuf_test_messages.proto2.TestAllTypesProto2"]) {
-        msgClass = [Proto2TestAllTypesProto2 class];
+        msgClass = [TestAllTypesProto2 class];
       } else {
         response.runtimeError =
             [NSString stringWithFormat:@"Protobuf request had an unknown message_type: %@",
@@ -110,13 +110,13 @@ static ConformanceResponse *DoTest(ConformanceRequest *request) {
 
   if (testMessage) {
     switch (request.requestedOutputFormat) {
-      case ConformanceWireFormat_GPBUnrecognizedEnumeratorValue:
-      case ConformanceWireFormat_Unspecified:
+      case WireFormat_GPBUnrecognizedEnumeratorValue:
+      case WireFormat_Unspecified:
         response.runtimeError =
             [NSString stringWithFormat:@"Unrecognized/unspecified output format: %@", request];
         break;
 
-      case ConformanceWireFormat_Protobuf:
+      case WireFormat_Protobuf:
         response.protobufPayload = testMessage.data;
         if (!response.protobufPayload) {
           response.serializeError =
@@ -124,17 +124,17 @@ static ConformanceResponse *DoTest(ConformanceRequest *request) {
         }
         break;
 
-      case ConformanceWireFormat_Json:
+      case WireFormat_Json:
         response.skipped = @"ObjC doesn't support generating JSON";
         break;
 
-      case ConformanceWireFormat_Jspb:
+      case WireFormat_Jspb:
         response.skipped =
             @"ConformanceRequest had a requested_output_format of JSPB WireFormat; that"
             " isn't supposed to happen with opensource.";
         break;
 
-      case ConformanceWireFormat_TextFormat:
+      case WireFormat_TextFormat:
         // ObjC only has partial objc generation, so don't attempt any tests that need
         // support.
         response.skipped = @"ObjC doesn't support generating TextFormat";

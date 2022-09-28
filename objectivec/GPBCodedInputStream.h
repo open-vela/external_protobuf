@@ -30,9 +30,8 @@
 
 #import <Foundation/Foundation.h>
 
-#import "GPBExtensionRegistry.h"
-
 @class GPBMessage;
+@class GPBExtensionRegistry;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -185,7 +184,7 @@ CF_EXTERN_C_END
  *                          extensions for message.
  **/
 - (void)readMessage:(GPBMessage *)message
-    extensionRegistry:(nullable id<GPBExtensionRegistry>)extensionRegistry;
+  extensionRegistry:(nullable GPBExtensionRegistry *)extensionRegistry;
 
 /**
  * Reads and discards a single field, given its tag value.
@@ -221,7 +220,7 @@ CF_EXTERN_C_END
 /**
  * Moves the limit to the given byte offset starting at the current location.
  *
- * @exception GPBCodedInputStreamException If the requested bytes exceed the
+ * @exception GPBCodedInputStreamException If the requested bytes exceeed the
  *            current limit.
  *
  * @param byteLimit The number of bytes to move the limit, offset to the current
