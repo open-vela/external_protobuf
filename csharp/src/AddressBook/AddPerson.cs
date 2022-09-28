@@ -107,8 +107,10 @@ namespace Google.Protobuf.Examples.AddressBook
 
             if (File.Exists(args[0]))
             {
-                using Stream file = File.OpenRead(args[0]);
-                addressBook = AddressBook.Parser.ParseFrom(file);
+                using (Stream file = File.OpenRead(args[0]))
+                {
+                    addressBook = AddressBook.Parser.ParseFrom(file);
+                }
             }
             else
             {

@@ -30,12 +30,9 @@
 syntax = "proto2";
 
 import "google/protobuf/any.proto";
-import "objectivec/Tests/unittest.proto";
+import "google/protobuf/unittest.proto";
 
-package objc.protobuf.tests;
-
-// Explicit empty prefix, tests some validations code paths also.
-option objc_class_prefix = "";
+package protobuf_unittest;
 
 // Used to check that Headerdocs and appledoc work correctly. If these comments
 // are not handled correctly, Xcode will fail to build the tests.
@@ -239,7 +236,8 @@ extend self {
   repeated   sint32 byref               =  3004 [packed = true];
 }
 
-// Test handing of fields that start with init*.
+// Test handing of fields that start with init* since Xcode 5's ARC support
+// doesn't like messages that look like initializers but aren't.
 message ObjCInitFoo {
   optional string init_val = 11;
   optional int32 init_size = 12;
