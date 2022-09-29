@@ -1,4 +1,4 @@
-# C++ compile/link options for Protobuf.
+"""C++ compile/link options for Protobuf libraries."""
 
 COPTS = select({
     "//build_defs:config_msvc": [
@@ -19,6 +19,7 @@ COPTS = select({
         "-DHAVE_ZLIB",
         "-Woverloaded-virtual",
         "-Wno-sign-compare",
+        "-Werror",
     ],
 })
 
