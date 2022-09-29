@@ -1023,6 +1023,7 @@ upb_amalgamation(
     ],
     prefix = "ruby-",
     strip_import_prefix = ["src"],
+    visibility = ["@com_google_protobuf//ruby:__pkg__"],
 )
 
 cc_library(
