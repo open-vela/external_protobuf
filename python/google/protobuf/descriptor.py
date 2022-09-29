@@ -873,14 +873,11 @@ class ServiceDescriptor(_NestedDescriptorBase):
 
     Args:
       name (str): Name of the method.
-
     Returns:
-      MethodDescriptor: The descriptor for the requested method.
-
-    Raises:
-      KeyError: if the method cannot be found in the service.
+      MethodDescriptor or None: the descriptor for the requested method, if
+      found.
     """
-    return self.methods_by_name[name]
+    return self.methods_by_name.get(name, None)
 
   def CopyToProto(self, proto):
     """Copies this to a descriptor_pb2.ServiceDescriptorProto.
@@ -1021,7 +1018,13 @@ class FileDescriptor(DescriptorBase):
       # FileDescriptor() is called from various places, not only from generated
       # files, to register dynamic proto files and messages.
       # pylint: disable=g-explicit-bool-comparison
-      if serialized_pb:
+      if serialized_pb == b'':
+        # Cpp generated code must be linked in if serialized_pb is ''
+        try:
+          return _message.default_pool.FindFileByName(name)
+        except KeyError:
+          raise RuntimeError('Please link in cpp generated lib for %s' % (name))
+      elif serialized_pb:
         return _message.default_pool.AddSerializedFile(serialized_pb)
       else:
         return super(FileDescriptor, cls).__new__(cls)
