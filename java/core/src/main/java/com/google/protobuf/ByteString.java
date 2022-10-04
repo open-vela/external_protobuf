@@ -75,6 +75,7 @@ import java.util.NoSuchElementException;
  */
 @CheckReturnValue
 public abstract class ByteString implements Iterable<Byte>, Serializable {
+  private static final long serialVersionUID = 1L;
 
   /**
    * When two strings to be concatenated have a combined length shorter than this, we just copy
@@ -946,6 +947,8 @@ public abstract class ByteString implements Iterable<Byte>, Serializable {
 
   /** Base class for leaf {@link ByteString}s (i.e. non-ropes). */
   abstract static class LeafByteString extends ByteString {
+    private static final long serialVersionUID = 1L;
+
     @Override
     protected final int getTreeDepth() {
       return 0;
@@ -1611,6 +1614,7 @@ public abstract class ByteString implements Iterable<Byte>, Serializable {
   // Keep this class private to avoid deadlocks in classloading across threads as ByteString's
   // static initializer loads LiteralByteString and another thread loads BoundedByteString.
   private static final class BoundedByteString extends LiteralByteString {
+    private static final long serialVersionUID = 1L;
 
     private final int bytesOffset;
     private final int bytesLength;
