@@ -41,18 +41,22 @@
 #include <map>
 #include <string>
 
-#include <google/protobuf/compiler/scc.h>
-#include <google/protobuf/compiler/code_generator.h>
-#include <google/protobuf/compiler/cpp/names.h>
-#include <google/protobuf/compiler/cpp/options.h>
-#include <google/protobuf/descriptor.pb.h>
-#include <google/protobuf/io/printer.h>
-#include <google/protobuf/descriptor.h>
-#include <google/protobuf/port.h>
-#include <google/protobuf/stubs/strutil.h>
+#include "google/protobuf/compiler/scc.h"
+#include "google/protobuf/compiler/code_generator.h"
+#include "absl/container/flat_hash_map.h"
+#include "absl/strings/match.h"
+#include "absl/strings/str_split.h"
+#include "google/protobuf/compiler/cpp/names.h"
+#include "google/protobuf/compiler/cpp/options.h"
+#include "google/protobuf/descriptor.pb.h"
+#include "google/protobuf/io/printer.h"
+#include "google/protobuf/descriptor.h"
+#include "google/protobuf/port.h"
+#include "google/protobuf/stubs/strutil.h"
+#include "absl/strings/str_cat.h"
 
 // Must be included last.
-#include <google/protobuf/port_def.inc>
+#include "google/protobuf/port_def.inc"
 
 namespace google {
 namespace protobuf {
@@ -83,9 +87,6 @@ inline std::string DeprecatedAttribute(const Options& /* options */,
 // of '-'.
 extern const char kThickSeparator[];
 extern const char kThinSeparator[];
-
-void SetCommonVars(const Options& options,
-                   std::map<std::string, std::string>* variables);
 
 // Variables to access message data from the message scope.
 void SetCommonMessageDataVariables(
@@ -220,7 +221,7 @@ inline const Descriptor* FieldScope(const FieldDescriptor* field) {
 std::string FieldMessageTypeName(const FieldDescriptor* field,
                                  const Options& options);
 
-// Get the C++ type name for a primitive type (e.g. "double", "::google::protobuf::int32", etc.).
+// Get the C++ type name for a primitive type (e.g. "double", "::int32", etc.).
 const char* PrimitiveTypeName(FieldDescriptor::CppType type);
 std::string PrimitiveTypeName(const Options& options,
                               FieldDescriptor::CppType type);
@@ -296,7 +297,7 @@ std::string QualifiedFileLevelSymbol(const FileDescriptor* file,
                                      const Options& options);
 
 // Escape C++ trigraphs by escaping question marks to \?
-std::string EscapeTrigraphs(const std::string& to_escape);
+std::string EscapeTrigraphs(absl::string_view to_escape);
 
 // Escaped function name to eliminate naming conflict.
 std::string SafeFunctionName(const Descriptor* descriptor,
@@ -326,6 +327,8 @@ inline bool IsWeak(const FieldDescriptor* field, const Options& options) {
   }
   return false;
 }
+
+bool IsProfileDriven(const Options& options);
 
 bool IsStringInlined(const FieldDescriptor* descriptor, const Options& options);
 
@@ -376,6 +379,11 @@ bool ShouldSplit(const Descriptor* desc, const Options& options);
 
 // Is the given field being split out?
 bool ShouldSplit(const FieldDescriptor* field, const Options& options);
+
+// Should we generate code that force creating an allocation in the constructor
+// of the given message?
+bool ShouldForceAllocationOnConstruction(const Descriptor* desc,
+                                         const Options& options);
 
 inline bool IsFieldUsed(const FieldDescriptor* /* field */,
                         const Options& /* options */) {
@@ -455,35 +463,13 @@ inline bool IsProto3(const FileDescriptor* file) {
   return file->syntax() == FileDescriptor::SYNTAX_PROTO3;
 }
 
-inline bool HasHasbit(const FieldDescriptor* field) {
-  // This predicate includes proto3 message fields only if they have "optional".
-  //   Foo submsg1 = 1;           // HasHasbit() == false
-  //   optional Foo submsg2 = 2;  // HasHasbit() == true
-  // This is slightly odd, as adding "optional" to a singular proto3 field does
-  // not change the semantics or API. However whenever any field in a message
-  // has a hasbit, it forces reflection to include hasbit offsets for *all*
-  // fields, even if almost all of them are set to -1 (no hasbit). So to avoid
-  // causing a sudden size regression for ~all proto3 messages, we give proto3
-  // message fields a hasbit only if "optional" is present. If the user is
-  // explicitly writing "optional", it is likely they are writing it on
-  // primitive fields also.
-  return (field->has_optional_keyword() || field->is_required()) &&
-         !field->options().weak();
-}
-
-// Returns true if 'enum' semantics are such that unknown values are preserved
-// in the enum field itself, rather than going to the UnknownFieldSet.
-inline bool HasPreservingUnknownEnumSemantics(const FieldDescriptor* field) {
-  return field->file()->syntax() == FileDescriptor::SYNTAX_PROTO3;
-}
-
 inline bool IsCrossFileMessage(const FieldDescriptor* field) {
   return field->type() == FieldDescriptor::TYPE_MESSAGE &&
          field->message_type()->file() != field->file();
 }
 
 inline std::string MakeDefaultName(const FieldDescriptor* field) {
-  return StrCat("_i_give_permission_to_break_this_code_default_",
+  return absl::StrCat("_i_give_permission_to_break_this_code_default_",
                       FieldName(field), "_");
 }
 
@@ -498,11 +484,11 @@ inline std::string MakeDefaultName(const FieldDescriptor* field) {
 // exists at some nested level like:
 //   internal_container_._i_give_permission_to_break_this_code_default_field_;
 inline std::string MakeDefaultFieldName(const FieldDescriptor* field) {
-  return StrCat("Impl_::", MakeDefaultName(field));
+  return absl::StrCat("Impl_::", MakeDefaultName(field));
 }
 
 inline std::string MakeVarintCachedSizeName(const FieldDescriptor* field) {
-  return StrCat("_", FieldName(field), "_cached_byte_size_");
+  return absl::StrCat("_", FieldName(field), "_cached_byte_size_");
 }
 
 // Semantically distinct from MakeVarintCachedSizeName in that it gives the C++
@@ -518,7 +504,7 @@ inline std::string MakeVarintCachedSizeName(const FieldDescriptor* field) {
 //   internal_container_._field_cached_byte_size_;
 inline std::string MakeVarintCachedSizeFieldName(const FieldDescriptor* field,
                                                  bool split) {
-  return StrCat("_impl_.", split ? "_split_->" : "", "_",
+  return absl::StrCat("_impl_.", split ? "_split_->" : "", "_",
                       FieldName(field), "_cached_byte_size_");
 }
 
@@ -531,12 +517,26 @@ bool IsAnyMessage(const Descriptor* descriptor, const Options& options);
 
 bool IsWellKnownMessage(const FileDescriptor* descriptor);
 
-inline std::string IncludeGuard(const FileDescriptor* file, bool pb_h,
+enum class GeneratedFileType : int { kPbH, kProtoH, kProtoStaticReflectionH };
+
+inline std::string IncludeGuard(const FileDescriptor* file,
+                                GeneratedFileType file_type,
                                 const Options& options) {
   // If we are generating a .pb.h file and the proto_h option is enabled, then
   // the .pb.h gets an extra suffix.
-  std::string filename_identifier = FilenameIdentifier(
-      file->name() + (pb_h && options.proto_h ? ".pb.h" : ""));
+  std::string extension;
+  switch (file_type) {
+    case GeneratedFileType::kPbH:
+      extension = ".pb.h";
+      break;
+    case GeneratedFileType::kProtoH:
+      extension = ".proto.h";
+      break;
+    case GeneratedFileType::kProtoStaticReflectionH:
+      extension = ".proto.static_reflection.h";
+  }
+  std::string filename_identifier =
+      FilenameIdentifier(file->name() + extension);
 
   if (IsWellKnownMessage(file)) {
     // For well-known messages we need third_party/protobuf and net/proto2 to
@@ -850,9 +850,9 @@ class PROTOC_EXPORT Formatter {
   template <typename I, typename = typename std::enable_if<
                             std::is_integral<I>::value>::type>
   static std::string ToString(I x) {
-    return StrCat(x);
+    return absl::StrCat(x);
   }
-  static std::string ToString(strings::Hex x) { return StrCat(x); }
+  static std::string ToString(absl::Hex x) { return absl::StrCat(x); }
   static std::string ToString(const FieldDescriptor* d) { return Payload(d); }
   static std::string ToString(const Descriptor* d) { return Payload(d); }
   static std::string ToString(const EnumDescriptor* d) { return Payload(d); }
@@ -888,54 +888,23 @@ void PrintFieldComment(const Formatter& format, const T* field) {
 
 class PROTOC_EXPORT NamespaceOpener {
  public:
-  explicit NamespaceOpener(const Formatter& format)
-      : printer_(format.printer()) {}
-  NamespaceOpener(const std::string& name, const Formatter& format)
+  explicit NamespaceOpener(io::Printer* p) : p_(p) {}
+  explicit NamespaceOpener(const Formatter& format) : p_(format.printer()) {}
+  NamespaceOpener(absl::string_view name, const Formatter& format)
       : NamespaceOpener(format) {
+    ChangeTo(name);
+  }
+  NamespaceOpener(absl::string_view name, io::Printer* p) : NamespaceOpener(p) {
     ChangeTo(name);
   }
   ~NamespaceOpener() { ChangeTo(""); }
 
-  void ChangeTo(const std::string& name) {
-    std::vector<std::string> new_stack_ =
-        Split(name, "::", true);
-    size_t len = std::min(name_stack_.size(), new_stack_.size());
-    size_t common_idx = 0;
-    while (common_idx < len) {
-      if (name_stack_[common_idx] != new_stack_[common_idx]) break;
-      common_idx++;
-    }
-    for (auto it = name_stack_.crbegin();
-         it != name_stack_.crend() - common_idx; ++it) {
-      if (*it == "PROTOBUF_NAMESPACE_ID") {
-        printer_->Print("PROTOBUF_NAMESPACE_CLOSE\n");
-      } else {
-        printer_->Print("}  // namespace $ns$\n", "ns", *it);
-      }
-    }
-    name_stack_.swap(new_stack_);
-    for (size_t i = common_idx; i < name_stack_.size(); ++i) {
-      if (name_stack_[i] == "PROTOBUF_NAMESPACE_ID") {
-        printer_->Print("PROTOBUF_NAMESPACE_OPEN\n");
-      } else {
-        printer_->Print("namespace $ns$ {\n", "ns", name_stack_[i]);
-      }
-    }
-  }
+  void ChangeTo(absl::string_view name);
 
  private:
-  io::Printer* printer_;
+  io::Printer* p_;
   std::vector<std::string> name_stack_;
 };
-
-enum class Utf8CheckMode {
-  kStrict = 0,  // Parsing will fail if non UTF-8 data is in string fields.
-  kVerify = 1,  // Only log an error but parsing will succeed.
-  kNone = 2,    // No UTF-8 check.
-};
-
-Utf8CheckMode GetUtf8CheckMode(const FieldDescriptor* field,
-                               const Options& options);
 
 void GenerateUtf8CheckCodeForString(const FieldDescriptor* field,
                                     const Options& options, bool for_parse,
@@ -946,43 +915,6 @@ void GenerateUtf8CheckCodeForCord(const FieldDescriptor* field,
                                   const Options& options, bool for_parse,
                                   const char* parameters,
                                   const Formatter& format);
-
-template <typename T>
-struct FieldRangeImpl {
-  struct Iterator {
-    using iterator_category = std::forward_iterator_tag;
-    using value_type = const FieldDescriptor*;
-    using difference_type = int;
-
-    value_type operator*() { return descriptor->field(idx); }
-
-    friend bool operator==(const Iterator& a, const Iterator& b) {
-      GOOGLE_DCHECK(a.descriptor == b.descriptor);
-      return a.idx == b.idx;
-    }
-    friend bool operator!=(const Iterator& a, const Iterator& b) {
-      return !(a == b);
-    }
-
-    Iterator& operator++() {
-      idx++;
-      return *this;
-    }
-
-    int idx;
-    const T* descriptor;
-  };
-
-  Iterator begin() const { return {0, descriptor}; }
-  Iterator end() const { return {descriptor->field_count(), descriptor}; }
-
-  const T* descriptor;
-};
-
-template <typename T>
-FieldRangeImpl<T> FieldRange(const T* desc) {
-  return {desc};
-}
 
 struct OneOfRangeImpl {
   struct Iterator {
@@ -1059,6 +991,6 @@ bool HasMessageFieldOrExtension(const Descriptor* desc);
 }  // namespace protobuf
 }  // namespace google
 
-#include <google/protobuf/port_undef.inc>
+#include "google/protobuf/port_undef.inc"
 
 #endif  // GOOGLE_PROTOBUF_COMPILER_CPP_HELPERS_H__
