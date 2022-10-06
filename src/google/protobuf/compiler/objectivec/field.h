@@ -33,7 +33,6 @@
 
 #include <map>
 #include <string>
-
 #include "google/protobuf/descriptor.h"
 #include "google/protobuf/io/printer.h"
 
@@ -64,14 +63,15 @@ class FieldGenerator {
   virtual void GenerateCFunctionImplementations(io::Printer* printer) const;
 
   // Exposed for subclasses, should always call it on the parent class also.
-  virtual void DetermineForwardDeclarations(std::set<std::string>* fwd_decls,
-                                            bool include_external_types) const;
+  virtual void DetermineForwardDeclarations(
+      std::set<std::string>* fwd_decls,
+      bool include_external_types) const;
   virtual void DetermineObjectiveCClassDefinitions(
       std::set<std::string>* fwd_decls) const;
 
   // Used during generation, not intended to be extended by subclasses.
-  void GenerateFieldDescription(io::Printer* printer,
-                                bool include_default) const;
+  void GenerateFieldDescription(
+      io::Printer* printer, bool include_default) const;
   void GenerateFieldNumberConstant(io::Printer* printer) const;
 
   // Exposed to get and set the has bits information.
@@ -111,12 +111,10 @@ class SingleFieldGenerator : public FieldGenerator {
   SingleFieldGenerator(const SingleFieldGenerator&) = delete;
   SingleFieldGenerator& operator=(const SingleFieldGenerator&) = delete;
 
-  virtual void GenerateFieldStorageDeclaration(
-      io::Printer* printer) const override;
+  virtual void GenerateFieldStorageDeclaration(io::Printer* printer) const override;
   virtual void GeneratePropertyDeclaration(io::Printer* printer) const override;
 
-  virtual void GeneratePropertyImplementation(
-      io::Printer* printer) const override;
+  virtual void GeneratePropertyImplementation(io::Printer* printer) const override;
 
   virtual bool RuntimeUsesHasBit(void) const override;
 
@@ -132,8 +130,7 @@ class ObjCObjFieldGenerator : public SingleFieldGenerator {
   ObjCObjFieldGenerator(const ObjCObjFieldGenerator&) = delete;
   ObjCObjFieldGenerator& operator=(const ObjCObjFieldGenerator&) = delete;
 
-  virtual void GenerateFieldStorageDeclaration(
-      io::Printer* printer) const override;
+  virtual void GenerateFieldStorageDeclaration(io::Printer* printer) const override;
   virtual void GeneratePropertyDeclaration(io::Printer* printer) const override;
 
  protected:
@@ -147,12 +144,10 @@ class RepeatedFieldGenerator : public ObjCObjFieldGenerator {
   RepeatedFieldGenerator(const RepeatedFieldGenerator&) = delete;
   RepeatedFieldGenerator& operator=(const RepeatedFieldGenerator&) = delete;
 
-  virtual void GenerateFieldStorageDeclaration(
-      io::Printer* printer) const override;
+  virtual void GenerateFieldStorageDeclaration(io::Printer* printer) const override;
   virtual void GeneratePropertyDeclaration(io::Printer* printer) const override;
 
-  virtual void GeneratePropertyImplementation(
-      io::Printer* printer) const override;
+  virtual void GeneratePropertyImplementation(io::Printer* printer) const override;
 
   virtual bool RuntimeUsesHasBit(void) const override;
 
