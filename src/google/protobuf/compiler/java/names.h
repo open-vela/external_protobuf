@@ -40,9 +40,6 @@
 
 #include <string>
 
-#include "google/protobuf/descriptor.h"
-#include "google/protobuf/compiler/java/options.h"
-
 namespace google {
 namespace protobuf {
 
@@ -88,39 +85,13 @@ std::string ClassName(const ServiceDescriptor* descriptor);
 //
 // Returns:
 //   Java package name.
-std::string FileJavaPackage(const FileDescriptor* descriptor,
-                            Options options = {});
+std::string FileJavaPackage(const FileDescriptor* descriptor);
 
 // Requires:
 //   descriptor != NULL
 // Returns:
 //   Capitalized camel case name field name.
 std::string CapitalizedFieldName(const FieldDescriptor* descriptor);
-
-// Returns:
-//   Converts a name to camel-case. If cap_first_letter is true, capitalize the
-//   first letter.
-std::string UnderscoresToCamelCase(const std::string& name,
-                                   bool cap_first_letter);
-// Requires:
-//   field != NULL
-// Returns:
-//   Converts the field's name to camel-case, e.g. "foo_bar_baz" becomes
-//   "fooBarBaz" or "FooBarBaz", respectively.
-std::string UnderscoresToCamelCase(const FieldDescriptor* field);
-
-// Requires:
-//   method != NULL
-// Returns:
-//   Similar, but for method names.  (Typically, this merely has the effect
-//   of lower-casing the first letter of the name.)
-std::string UnderscoresToCamelCase(const MethodDescriptor* method);
-
-// Requires:
-//   field != NULL
-// Returns:
-//   Same as UnderscoresToCamelCase, but checks for reserved keywords
-std::string UnderscoresToCamelCaseCheckReserved(const FieldDescriptor* field);
 
 }  // namespace java
 }  // namespace compiler
