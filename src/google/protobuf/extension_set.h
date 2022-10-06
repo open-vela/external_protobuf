@@ -46,17 +46,16 @@
 #include <utility>
 #include <vector>
 
-#include "google/protobuf/stubs/common.h"
-#include "google/protobuf/stubs/logging.h"
-#include "google/protobuf/port.h"
-#include "google/protobuf/io/coded_stream.h"
-#include "google/protobuf/port.h"
-#include "google/protobuf/parse_context.h"
-#include "google/protobuf/repeated_field.h"
-#include "google/protobuf/wire_format_lite.h"
+#include <google/protobuf/stubs/common.h>
+#include <google/protobuf/stubs/logging.h>
+#include <google/protobuf/io/coded_stream.h>
+#include <google/protobuf/port.h>
+#include <google/protobuf/parse_context.h>
+#include <google/protobuf/repeated_field.h>
+#include <google/protobuf/wire_format_lite.h>
 
 // clang-format off
-#include "google/protobuf/port_def.inc"  // Must be last
+#include <google/protobuf/port_def.inc>  // Must be last
 // clang-format on
 
 #ifdef SWIG
@@ -186,8 +185,6 @@ class PROTOBUF_EXPORT ExtensionSet {
   constexpr ExtensionSet();
   explicit ExtensionSet(Arena* arena);
   ExtensionSet(ArenaInitialized, Arena* arena) : ExtensionSet(arena) {}
-  ExtensionSet(const ExtensionSet&) = delete;
-  ExtensionSet& operator=(const ExtensionSet&) = delete;
   ~ExtensionSet();
 
   // These are called at startup by protocol-compiler-generated code to
@@ -541,8 +538,6 @@ class PROTOBUF_EXPORT ExtensionSet {
   class PROTOBUF_EXPORT LazyMessageExtension {
    public:
     LazyMessageExtension() {}
-    LazyMessageExtension(const LazyMessageExtension&) = delete;
-    LazyMessageExtension& operator=(const LazyMessageExtension&) = delete;
     virtual ~LazyMessageExtension() {}
 
     virtual LazyMessageExtension* New(Arena* arena) const = 0;
@@ -579,6 +574,8 @@ class PROTOBUF_EXPORT ExtensionSet {
 
    private:
     virtual void UnusedKeyMethod();  // Dummy key method to avoid weak vtable.
+
+    GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(LazyMessageExtension);
   };
   // Give access to function defined below to see LazyMessageExtension.
   friend LazyMessageExtension* MaybeCreateLazyExtension(Arena* arena);
@@ -911,6 +908,8 @@ class PROTOBUF_EXPORT ExtensionSet {
   } map_;
 
   static void DeleteFlatMap(const KeyValue* flat, uint16_t flat_capacity);
+
+  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(ExtensionSet);
 };
 
 constexpr ExtensionSet::ExtensionSet()
@@ -1263,8 +1262,6 @@ class EnumTypeTraits {
   template <typename ExtendeeT>
   static void Register(int number, FieldType type, bool is_packed,
                        LazyEagerVerifyFnType fn) {
-    // Avoid -Wunused-parameter
-    (void)fn;
     ExtensionSet::RegisterEnumExtension(&ExtendeeT::default_instance(), number,
                                         type, false, is_packed, IsValid);
   }
@@ -1331,8 +1328,6 @@ class RepeatedEnumTypeTraits {
   template <typename ExtendeeT>
   static void Register(int number, FieldType type, bool is_packed,
                        LazyEagerVerifyFnType fn) {
-    // Avoid -Wunused-parameter
-    (void)fn;
     ExtensionSet::RegisterEnumExtension(&ExtendeeT::default_instance(), number,
                                         type, true, is_packed, IsValid);
   }
@@ -1561,6 +1556,6 @@ void LinkExtensionReflection(
 }  // namespace protobuf
 }  // namespace google
 
-#include "google/protobuf/port_undef.inc"
+#include <google/protobuf/port_undef.inc>
 
 #endif  // GOOGLE_PROTOBUF_EXTENSION_SET_H__

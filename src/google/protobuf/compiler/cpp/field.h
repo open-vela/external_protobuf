@@ -40,9 +40,9 @@
 #include <memory>
 #include <string>
 
-#include "google/protobuf/descriptor.h"
-#include "google/protobuf/compiler/cpp/helpers.h"
-#include "google/protobuf/compiler/cpp/options.h"
+#include <google/protobuf/descriptor.h>
+#include <google/protobuf/compiler/cpp/helpers.h>
+#include <google/protobuf/compiler/cpp/options.h>
 
 namespace google {
 namespace protobuf {
@@ -74,8 +74,6 @@ class FieldGenerator {
   explicit FieldGenerator(const FieldDescriptor* descriptor,
                           const Options& options)
       : descriptor_(descriptor), options_(options) {}
-  FieldGenerator(const FieldGenerator&) = delete;
-  FieldGenerator& operator=(const FieldGenerator&) = delete;
   virtual ~FieldGenerator();
   virtual void GenerateSerializeWithCachedSizes(
       io::Printer* printer) const final{};
@@ -152,6 +150,9 @@ class FieldGenerator {
   // method, invoked by each of the generated constructors.
   virtual void GenerateConstructorCode(io::Printer* printer) const = 0;
 
+  // Generate initialization code for private members in the cold struct.
+  virtual void GenerateCreateSplitMessageCode(io::Printer* printer) const {}
+
   // Generate any code that needs to go in the class's SharedDtor() method,
   // invoked by the destructor.
   // Most field types don't need this, so the default implementation is empty.
@@ -221,6 +222,9 @@ class FieldGenerator {
   const FieldDescriptor* descriptor_;
   const Options& options_;
   std::map<std::string, std::string> variables_;
+
+ private:
+  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(FieldGenerator);
 };
 
 // Convenience class which constructs FieldGenerators for a Descriptor.
@@ -228,8 +232,6 @@ class FieldGeneratorMap {
  public:
   FieldGeneratorMap(const Descriptor* descriptor, const Options& options,
                     MessageSCCAnalyzer* scc_analyzer);
-  FieldGeneratorMap(const FieldGeneratorMap&) = delete;
-  FieldGeneratorMap& operator=(const FieldGeneratorMap&) = delete;
   ~FieldGeneratorMap();
 
   const FieldGenerator& get(const FieldDescriptor* field) const;
@@ -256,6 +258,8 @@ class FieldGeneratorMap {
   static FieldGenerator* MakeGenerator(const FieldDescriptor* field,
                                        const Options& options,
                                        MessageSCCAnalyzer* scc_analyzer);
+
+  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(FieldGeneratorMap);
 };
 
 }  // namespace cpp

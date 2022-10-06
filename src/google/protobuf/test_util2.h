@@ -31,29 +31,22 @@
 #ifndef GOOGLE_PROTOBUF_TEST_UTIL2_H__
 #define GOOGLE_PROTOBUF_TEST_UTIL2_H__
 
-#include "google/protobuf/stubs/strutil.h"
+#include <google/protobuf/stubs/strutil.h>
 
-#include "google/protobuf/testing/googletest.h"
-#include "absl/strings/str_replace.h"
-#include "google/protobuf/io/zero_copy_stream.h"
-#include "google/protobuf/io/zero_copy_stream_impl_lite.h"
-#include "google/protobuf/util/message_differencer.h"
+#include <google/protobuf/testing/googletest.h>
+#include <google/protobuf/io/zero_copy_stream.h>
+#include <google/protobuf/io/zero_copy_stream_impl_lite.h>
+#include <google/protobuf/util/message_differencer.h>
 
 namespace google {
 namespace protobuf {
 namespace TestUtil {
 
-// Translate net/proto2/* or third_party/protobuf/* to google/protobuf/*.
+// Translate net/proto2/* -> google/protobuf/*
 inline std::string TranslatePathToOpensource(const std::string& google3_path) {
-  std::string net_proto2 = "net/proto2/";
-  std::string third_party_protobuf = "third_party/protobuf/";
-  std::string path;
-  if (google3_path.find(net_proto2) == 0) {
-    path = google3_path.substr(net_proto2.size());
-  } else {
-    GOOGLE_CHECK(google3_path.find(third_party_protobuf) == 0) << google3_path;
-    path = google3_path.substr(third_party_protobuf.size());
-  }
+  const std::string prefix = "net/proto2/";
+  GOOGLE_CHECK(google3_path.find(prefix) == 0) << google3_path;
+  std::string path = google3_path.substr(prefix.size());
 
   path = StringReplace(path, "internal/", "", false);
   path = StringReplace(path, "proto/", "", false);
