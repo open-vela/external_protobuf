@@ -1,84 +1,84 @@
-Protocol Buffers - Google's data interchange format
-===================================================
 
-Copyright 2008 Google Inc.
+# μpb: small, fast C protos
 
-https://developers.google.com/protocol-buffers/
+μpb (often written 'upb') is a small
+[protobuf](https://github.com/protocolbuffers/protobuf) implementation written
+in C.
 
-Overview
---------
+upb is the core runtime for protobuf languages extensions in
+[Ruby](https://github.com/protocolbuffers/protobuf/tree/master/ruby),
+[PHP](https://github.com/protocolbuffers/protobuf/tree/master/php), and
+[Python](https://github.com/protocolbuffers/upb/tree/main/python).
 
-Protocol Buffers (a.k.a., protobuf) are Google's language-neutral,
-platform-neutral, extensible mechanism for serializing structured data. You
-can find [protobuf's documentation on the Google Developers site](https://developers.google.com/protocol-buffers/).
+While upb offers a C API, the C API & ABI **are not stable**. For this reason,
+upb is not generally offered as a C library for direct consumption, and there
+are no releases.
 
-This README file contains protobuf installation instructions. To install
-protobuf, you need to install the protocol compiler (used to compile .proto
-files) and the protobuf runtime for your chosen programming language.
+## Features
 
-Protocol Compiler Installation
-------------------------------
+upb has comparable speed to protobuf C++, but is an order of magnitude smaller
+in code size.
 
-The protocol compiler is written in C++. If you are using C++, please follow
-the [C++ Installation Instructions](src/README.md) to install protoc along
-with the C++ runtime.
+Like the main protobuf implementation in C++, it supports:
 
-For non-C++ users, the simplest way to install the protocol compiler is to
-download a pre-built binary from our release page:
+- a generated API (in C)
+- reflection
+- binary & JSON wire formats
+- text format serialization
+- all standard features of protobufs (oneofs, maps, unknown fields, extensions,
+  etc.)
+- full conformance with the protobuf conformance tests
 
-  [https://github.com/protocolbuffers/protobuf/releases](https://github.com/protocolbuffers/protobuf/releases)
+upb also supports some features that C++ does not:
 
-In the downloads section of each release, you can find pre-built binaries in
-zip packages: protoc-$VERSION-$PLATFORM.zip. It contains the protoc binary
-as well as a set of standard .proto files distributed along with protobuf.
+- **optional reflection:** generated messages are agnostic to whether
+  reflection will be linked in or not.
+- **no global state:** no pre-main registration or other global state.
+- **fast reflection-based parsing:** messages loaded at runtime parse
+  just as fast as compiled-in messages.
 
-If you are looking for an old version that is not available in the release
-page, check out the maven repo here:
+However there are a few features it does not support:
 
-  [https://repo1.maven.org/maven2/com/google/protobuf/protoc/](https://repo1.maven.org/maven2/com/google/protobuf/protoc/)
+- text format parsing
+- deep descriptor verification: upb's descriptor validation is not as exhaustive
+  as `protoc`.
 
-These pre-built binaries are only provided for released versions. If you want
-to use the github main version at HEAD, or you need to modify protobuf code,
-or you are using C++, it's recommended to build your own protoc binary from
-source.
+## Install
 
-If you would like to build protoc binary from source, see the [C++ Installation
-Instructions](src/README.md).
+For Ruby, use [RubyGems](https://rubygems.org/gems/google-protobuf):
 
-Protobuf Runtime Installation
------------------------------
+```
+$ gem install google-protobuf
+```
 
-Protobuf supports several different programming languages. For each programming
-language, you can find instructions in the corresponding source directory about
-how to install protobuf runtime for that specific language:
+For PHP, use [PECL](https://pecl.php.net/package/protobuf):
 
-| Language                             | Source                                                      |
-|--------------------------------------|-------------------------------------------------------------|
-| C++ (include C++ runtime and protoc) | [src](src)                                                  |
-| Java                                 | [java](java)                                                |
-| Python                               | [python](python)                                            |
-| Objective-C                          | [objectivec](objectivec)                                    |
-| C#                                   | [csharp](csharp)                                            |
-| Ruby                                 | [ruby](ruby)                                                |
-| Go                                   | [protocolbuffers/protobuf-go](https://github.com/protocolbuffers/protobuf-go)|
-| PHP                                  | [php](php)                                                  |
-| Dart                                 | [dart-lang/protobuf](https://github.com/dart-lang/protobuf) |
+```
+$ sudo pecl install protobuf
+```
 
-Quick Start
------------
+For Python, use [PyPI](https://pypi.org/project/protobuf/):
 
-The best way to learn how to use protobuf is to follow the tutorials in our
-developer guide:
+```
+$ sudo pip install protobuf
+```
 
-https://developers.google.com/protocol-buffers/docs/tutorials
+Alternatively, you can build and install upb using
+[vcpkg](https://github.com/microsoft/vcpkg/) dependency manager:
 
-If you want to learn from code examples, take a look at the examples in the
-[examples](examples) directory.
+    git clone https://github.com/Microsoft/vcpkg.git
+    cd vcpkg
+    ./bootstrap-vcpkg.sh
+    ./vcpkg integrate install
+    ./vcpkg install upb
 
-Documentation
--------------
+The upb port in vcpkg is kept up to date by microsoft team members and community
+contributors.
 
-The complete documentation for Protocol Buffers is available via the
-web at:
+If the version is out of date, please
+[create an issue or pull request](https://github.com/Microsoft/vcpkg) on the
+vcpkg repository.
 
-https://developers.google.com/protocol-buffers/
+## Contributing
+
+Please see [CONTRIBUTING.md](CONTRIBUTING.md).
