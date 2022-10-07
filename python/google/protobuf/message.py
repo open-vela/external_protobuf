@@ -74,8 +74,7 @@ class Message(object):
 
   __slots__ = []
 
-  #: The :class:`google.protobuf.Descriptor`
-  # for this message type.
+  #: The :class:`google.protobuf.descriptor.Descriptor` for this message type.
   DESCRIPTOR = None
 
   def __deepcopy__(self, memo=None):
