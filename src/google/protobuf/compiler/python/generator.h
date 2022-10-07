@@ -37,11 +37,11 @@
 
 #include <string>
 
-#include "absl/synchronization/mutex.h"
-#include "google/protobuf/compiler/code_generator.h"
+#include <google/protobuf/stubs/mutex.h>
+#include <google/protobuf/compiler/code_generator.h>
 
 // Must be included last.
-#include "google/protobuf/port_def.inc"
+#include <google/protobuf/port_def.inc>
 
 namespace google {
 namespace protobuf {
@@ -64,18 +64,9 @@ namespace python {
 // If you create your own protocol compiler binary and you want it to support
 // Python output, you can do so by registering an instance of this
 // CodeGenerator with the CommandLineInterface in your main() function.
-
-struct GeneratorOptions {
-  bool generate_pyi = false;
-  bool annotate_pyi = false;
-  bool bootstrap = false;
-};
-
 class PROTOC_EXPORT Generator : public CodeGenerator {
  public:
   Generator();
-  Generator(const Generator&) = delete;
-  Generator& operator=(const Generator&) = delete;
   ~Generator() override;
 
   // CodeGenerator methods.
@@ -85,13 +76,7 @@ class PROTOC_EXPORT Generator : public CodeGenerator {
 
   uint64_t GetSupportedFeatures() const override;
 
-  void set_opensource_runtime(bool opensource) {
-    opensource_runtime_ = opensource;
-  }
-
  private:
-  GeneratorOptions ParseParameter(const std::string& parameter,
-                                  std::string* error) const;
   void PrintImports() const;
   void PrintFileDescriptor() const;
   void PrintAllNestedEnumsInFile() const;
@@ -143,7 +128,6 @@ class PROTOC_EXPORT Generator : public CodeGenerator {
       const FieldDescriptor& extension_field) const;
   void FixForeignFieldsInNestedExtensions(const Descriptor& descriptor) const;
 
-  void PrintTopBoilerplate() const;
   void PrintServices() const;
   void PrintServiceDescriptors() const;
   void PrintServiceDescriptor(const ServiceDescriptor& descriptor) const;
@@ -161,8 +145,6 @@ class PROTOC_EXPORT Generator : public CodeGenerator {
   std::string ModuleLevelMessageName(const Descriptor& descriptor) const;
   std::string ModuleLevelServiceDescriptorName(
       const ServiceDescriptor& descriptor) const;
-  std::string PublicPackage() const;
-  std::string InternalPackage() const;
 
   template <typename DescriptorT, typename DescriptorProtoT>
   void PrintSerializedPbInterval(const DescriptorT& descriptor,
@@ -184,12 +166,13 @@ class PROTOC_EXPORT Generator : public CodeGenerator {
 
   // Very coarse-grained lock to ensure that Generate() is reentrant.
   // Guards file_, printer_ and file_descriptor_serialized_.
-  mutable absl::Mutex mutex_;
+  mutable Mutex mutex_;
   mutable const FileDescriptor* file_;  // Set in Generate().  Under mutex_.
   mutable std::string file_descriptor_serialized_;
   mutable io::Printer* printer_;  // Set in Generate().  Under mutex_.
+  mutable bool pure_python_workable_;
 
-  bool opensource_runtime_ = true;
+  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(Generator);
 };
 
 }  // namespace python
@@ -197,6 +180,6 @@ class PROTOC_EXPORT Generator : public CodeGenerator {
 }  // namespace protobuf
 }  // namespace google
 
-#include "google/protobuf/port_undef.inc"
+#include <google/protobuf/port_undef.inc>
 
 #endif  // GOOGLE_PROTOBUF_COMPILER_PYTHON_GENERATOR_H__

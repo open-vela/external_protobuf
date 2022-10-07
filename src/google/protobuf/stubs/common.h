@@ -43,9 +43,10 @@
 #include <string>
 #include <vector>
 
-#include "absl/strings/string_view.h"
-#include "google/protobuf/stubs/platform_macros.h"
-#include "google/protobuf/stubs/port.h"
+#include <google/protobuf/stubs/macros.h>
+#include <google/protobuf/stubs/platform_macros.h>
+#include <google/protobuf/stubs/port.h>
+#include <google/protobuf/stubs/stringpiece.h>
 
 #ifndef PROTOBUF_USE_EXCEPTIONS
 #if defined(_MSC_VER) && defined(_CPPUNWIND)
@@ -68,7 +69,7 @@
 #include <pthread.h>
 #endif
 
-#include "google/protobuf/port_def.inc"
+#include <google/protobuf/port_def.inc>
 
 namespace std {}
 
@@ -105,12 +106,7 @@ void PROTOBUF_EXPORT VerifyVersion(int headerVersion, int minLibraryVersion,
                                    const char* filename);
 
 // Converts a numeric version number to a string.
-std::string PROTOBUF_EXPORT
-VersionString(int version);  // NOLINT(runtime/string)
-
-// Prints the protoc compiler version (no major version)
-std::string PROTOBUF_EXPORT
-ProtocVersionString(int version);  // NOLINT(runtime/string)
+std::string PROTOBUF_EXPORT VersionString(int version);
 
 }  // namespace internal
 
@@ -133,12 +129,12 @@ namespace internal {
 // structurally_valid.cc.
 PROTOBUF_EXPORT bool IsStructurallyValidUTF8(const char* buf, int len);
 
-inline bool IsStructurallyValidUTF8(absl::string_view str) {
+inline bool IsStructurallyValidUTF8(StringPiece str) {
   return IsStructurallyValidUTF8(str.data(), static_cast<int>(str.length()));
 }
 
 // Returns initial number of bytes of structurally valid UTF-8.
-PROTOBUF_EXPORT int UTF8SpnStructurallyValid(absl::string_view str);
+PROTOBUF_EXPORT int UTF8SpnStructurallyValid(StringPiece str);
 
 // Coerce UTF-8 byte string in src_str to be
 // a structurally-valid equal-length string by selectively
@@ -152,8 +148,7 @@ PROTOBUF_EXPORT int UTF8SpnStructurallyValid(absl::string_view str);
 //
 // Optimized for: all structurally valid and no byte copying is done.
 //
-PROTOBUF_EXPORT char* UTF8CoerceToStructurallyValid(absl::string_view str,
-                                                    char* dst,
+PROTOBUF_EXPORT char* UTF8CoerceToStructurallyValid(StringPiece str, char* dst,
                                                     char replace_char);
 
 }  // namespace internal
@@ -197,6 +192,6 @@ class FatalException : public std::exception {
 }  // namespace protobuf
 }  // namespace google
 
-#include "google/protobuf/port_undef.inc"
+#include <google/protobuf/port_undef.inc>
 
 #endif  // GOOGLE_PROTOBUF_COMMON_H__
