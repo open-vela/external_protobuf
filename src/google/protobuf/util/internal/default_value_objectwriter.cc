@@ -28,13 +28,14 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "google/protobuf/util/internal/default_value_objectwriter.h"
+#include <google/protobuf/util/internal/default_value_objectwriter.h>
 
 #include <cstdint>
+#include <unordered_map>
 
-#include "absl/container/flat_hash_map.h"
-#include "google/protobuf/util/internal/constants.h"
-#include "google/protobuf/util/internal/utility.h"
+#include <google/protobuf/util/internal/constants.h>
+#include <google/protobuf/util/internal/utility.h>
+#include <google/protobuf/stubs/map_util.h>
 
 namespace google {
 namespace protobuf {
@@ -46,11 +47,11 @@ namespace {
 // passed converter function on the DataPiece created from "value" argument.
 // If value is empty or if conversion fails, the default_value is returned.
 template <typename T>
-T ConvertTo(absl::string_view value,
-            absl::StatusOr<T> (DataPiece::*converter_fn)() const,
+T ConvertTo(StringPiece value,
+            util::StatusOr<T> (DataPiece::*converter_fn)() const,
             T default_value) {
   if (value.empty()) return default_value;
-  absl::StatusOr<T> result = (DataPiece(value, true).*converter_fn)();
+  util::StatusOr<T> result = (DataPiece(value, true).*converter_fn)();
   return result.ok() ? result.value() : default_value;
 }
 }  // namespace
@@ -75,7 +76,7 @@ DefaultValueObjectWriter::~DefaultValueObjectWriter() {
 }
 
 DefaultValueObjectWriter* DefaultValueObjectWriter::RenderBool(
-    absl::string_view name, bool value) {
+    StringPiece name, bool value) {
   if (current_ == nullptr) {
     ow_->RenderBool(name, value);
   } else {
@@ -85,7 +86,7 @@ DefaultValueObjectWriter* DefaultValueObjectWriter::RenderBool(
 }
 
 DefaultValueObjectWriter* DefaultValueObjectWriter::RenderInt32(
-    absl::string_view name, int32_t value) {
+    StringPiece name, int32_t value) {
   if (current_ == nullptr) {
     ow_->RenderInt32(name, value);
   } else {
@@ -95,7 +96,7 @@ DefaultValueObjectWriter* DefaultValueObjectWriter::RenderInt32(
 }
 
 DefaultValueObjectWriter* DefaultValueObjectWriter::RenderUint32(
-    absl::string_view name, uint32_t value) {
+    StringPiece name, uint32_t value) {
   if (current_ == nullptr) {
     ow_->RenderUint32(name, value);
   } else {
@@ -105,7 +106,7 @@ DefaultValueObjectWriter* DefaultValueObjectWriter::RenderUint32(
 }
 
 DefaultValueObjectWriter* DefaultValueObjectWriter::RenderInt64(
-    absl::string_view name, int64_t value) {
+    StringPiece name, int64_t value) {
   if (current_ == nullptr) {
     ow_->RenderInt64(name, value);
   } else {
@@ -115,7 +116,7 @@ DefaultValueObjectWriter* DefaultValueObjectWriter::RenderInt64(
 }
 
 DefaultValueObjectWriter* DefaultValueObjectWriter::RenderUint64(
-    absl::string_view name, uint64_t value) {
+    StringPiece name, uint64_t value) {
   if (current_ == nullptr) {
     ow_->RenderUint64(name, value);
   } else {
@@ -125,7 +126,7 @@ DefaultValueObjectWriter* DefaultValueObjectWriter::RenderUint64(
 }
 
 DefaultValueObjectWriter* DefaultValueObjectWriter::RenderDouble(
-    absl::string_view name, double value) {
+    StringPiece name, double value) {
   if (current_ == nullptr) {
     ow_->RenderDouble(name, value);
   } else {
@@ -135,7 +136,7 @@ DefaultValueObjectWriter* DefaultValueObjectWriter::RenderDouble(
 }
 
 DefaultValueObjectWriter* DefaultValueObjectWriter::RenderFloat(
-    absl::string_view name, float value) {
+    StringPiece name, float value) {
   if (current_ == nullptr) {
     ow_->RenderBool(name, value);
   } else {
@@ -145,12 +146,12 @@ DefaultValueObjectWriter* DefaultValueObjectWriter::RenderFloat(
 }
 
 DefaultValueObjectWriter* DefaultValueObjectWriter::RenderString(
-    absl::string_view name, absl::string_view value) {
+    StringPiece name, StringPiece value) {
   if (current_ == nullptr) {
     ow_->RenderString(name, value);
   } else {
-    // Since absl::string_view is essentially a pointer, takes a copy of
-    // "value" to avoid ownership issues.
+    // Since StringPiece is essentially a pointer, takes a copy of "value" to
+    // avoid ownership issues.
     string_values_.emplace_back(new std::string(value));
     RenderDataPiece(name, DataPiece(*string_values_.back(), true));
   }
@@ -158,12 +159,12 @@ DefaultValueObjectWriter* DefaultValueObjectWriter::RenderString(
 }
 
 DefaultValueObjectWriter* DefaultValueObjectWriter::RenderBytes(
-    absl::string_view name, absl::string_view value) {
+    StringPiece name, StringPiece value) {
   if (current_ == nullptr) {
     ow_->RenderBytes(name, value);
   } else {
-    // Since absl::string_view is essentially a pointer, takes a copy of
-    // "value" to avoid ownership issues.
+    // Since StringPiece is essentially a pointer, takes a copy of "value" to
+    // avoid ownership issues.
     string_values_.emplace_back(new std::string(value));
     RenderDataPiece(name, DataPiece(*string_values_.back(), false, true));
   }
@@ -171,7 +172,7 @@ DefaultValueObjectWriter* DefaultValueObjectWriter::RenderBytes(
 }
 
 DefaultValueObjectWriter* DefaultValueObjectWriter::RenderNull(
-    absl::string_view name) {
+    StringPiece name) {
   if (current_ == nullptr) {
     ow_->RenderNull(name);
   } else {
@@ -215,7 +216,7 @@ DefaultValueObjectWriter::Node::Node(
       field_scrub_callback_(std::move(field_scrub_callback)) {}
 
 DefaultValueObjectWriter::Node* DefaultValueObjectWriter::Node::FindChild(
-    absl::string_view name) {
+    StringPiece name) {
   if (name.empty() || kind_ != OBJECT) {
     return nullptr;
   }
@@ -282,7 +283,7 @@ const google::protobuf::Type* DefaultValueObjectWriter::Node::GetMapValueType(
       // get the field_type in this case.
       break;
     }
-    absl::StatusOr<const google::protobuf::Type*> sub_type =
+    util::StatusOr<const google::protobuf::Type*> sub_type =
         typeinfo->ResolveTypeUrl(sub_field.type_url());
     if (!sub_type.ok()) {
       GOOGLE_LOG(WARNING) << "Cannot resolve type '" << sub_field.type_url() << "'.";
@@ -308,11 +309,11 @@ void DefaultValueObjectWriter::Node::PopulateChildren(
     return;
   }
   std::vector<Node*> new_children;
-  absl::flat_hash_map<absl::string_view, int> orig_children_map;
+  std::unordered_map<std::string, int> orig_children_map;
 
   // Creates a map of child nodes to speed up lookup.
   for (int i = 0; i < children_.size(); ++i) {
-    orig_children_map.try_emplace(children_[i]->name_, i);
+    InsertIfNotPresent(&orig_children_map, children_[i]->name_, i);
   }
 
   for (int i = 0; i < type_->fields_size(); ++i) {
@@ -329,7 +330,8 @@ void DefaultValueObjectWriter::Node::PopulateChildren(
       continue;
     }
 
-    auto found = orig_children_map.find(field.name());
+    std::unordered_map<std::string, int>::iterator found =
+        orig_children_map.find(field.name());
     // If the child field has already been set, we just add it to the new list
     // of children.
     if (found != orig_children_map.end()) {
@@ -344,7 +346,7 @@ void DefaultValueObjectWriter::Node::PopulateChildren(
 
     if (field.kind() == google::protobuf::Field::TYPE_MESSAGE) {
       kind = OBJECT;
-      absl::StatusOr<const google::protobuf::Type*> found_result =
+      util::StatusOr<const google::protobuf::Type*> found_result =
           typeinfo->ResolveTypeUrl(field.type_url());
       if (!found_result.ok()) {
         // "field" is of an unknown type.
@@ -496,7 +498,7 @@ DataPiece DefaultValueObjectWriter::CreateDefaultDataPieceForField(
 }
 
 DefaultValueObjectWriter* DefaultValueObjectWriter::StartObject(
-    absl::string_view name) {
+    StringPiece name) {
   if (current_ == nullptr) {
     std::vector<std::string> path;
     root_.reset(CreateNewNode(std::string(name), &type_, OBJECT,
@@ -547,7 +549,7 @@ DefaultValueObjectWriter* DefaultValueObjectWriter::EndObject() {
 }
 
 DefaultValueObjectWriter* DefaultValueObjectWriter::StartList(
-    absl::string_view name) {
+    StringPiece name) {
   if (current_ == nullptr) {
     std::vector<std::string> path;
     root_.reset(CreateNewNode(std::string(name), &type_, LIST,
@@ -591,18 +593,18 @@ DefaultValueObjectWriter* DefaultValueObjectWriter::EndList() {
   return this;
 }
 
-void DefaultValueObjectWriter::RenderDataPiece(absl::string_view name,
+void DefaultValueObjectWriter::RenderDataPiece(StringPiece name,
                                                const DataPiece& data) {
   MaybePopulateChildrenOfAny(current_);
   if (current_->type() != nullptr && current_->type()->name() == kAnyType &&
       name == "@type") {
-    absl::StatusOr<std::string> data_string = data.ToString();
+    util::StatusOr<std::string> data_string = data.ToString();
     if (data_string.ok()) {
       const std::string& string_value = data_string.value();
       // If the type of current_ is "Any" and its "@type" field is being set
       // here, sets the type of current_ to be the type specified by the
       // "@type".
-      absl::StatusOr<const google::protobuf::Type*> found_type =
+      util::StatusOr<const google::protobuf::Type*> found_type =
           typeinfo_->ResolveTypeUrl(string_value);
       if (!found_type.ok()) {
         GOOGLE_LOG(WARNING) << "Failed to resolve type '" << string_value << "'.";

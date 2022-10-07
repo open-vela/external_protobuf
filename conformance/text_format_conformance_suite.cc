@@ -30,11 +30,11 @@
 
 #include "text_format_conformance_suite.h"
 
-#include "google/protobuf/any.pb.h"
-#include "google/protobuf/text_format.h"
+#include <google/protobuf/any.pb.h>
+#include <google/protobuf/text_format.h>
 #include "conformance_test.h"
-#include "google/protobuf/test_messages_proto2.pb.h"
-#include "google/protobuf/test_messages_proto3.pb.h"
+#include <google/protobuf/test_messages_proto2.pb.h>
+#include <google/protobuf/test_messages_proto3.pb.h>
 
 namespace proto2_messages = protobuf_test_messages::proto2;
 
@@ -85,9 +85,10 @@ bool TextFormatConformanceTestSuite::ParseResponse(
     case ConformanceResponse::kProtobufPayload: {
       if (requested_output != conformance::PROTOBUF) {
         ReportFailure(test_name, level, request, response,
-                      absl::StrCat("Test was asked for ",
+                      StrCat("Test was asked for ",
                                    WireFormatToString(requested_output),
-                                   " output but provided PROTOBUF instead."));
+                                   " output but provided PROTOBUF instead.")
+                          .c_str());
         return false;
       }
 
@@ -102,11 +103,11 @@ bool TextFormatConformanceTestSuite::ParseResponse(
 
     case ConformanceResponse::kTextPayload: {
       if (requested_output != conformance::TEXT_FORMAT) {
-        ReportFailure(
-            test_name, level, request, response,
-            absl::StrCat("Test was asked for ",
-                         WireFormatToString(requested_output),
-                         " output but provided TEXT_FORMAT instead."));
+        ReportFailure(test_name, level, request, response,
+                      StrCat("Test was asked for ",
+                                   WireFormatToString(requested_output),
+                                   " output but provided TEXT_FORMAT instead.")
+                          .c_str());
         return false;
       }
 
@@ -140,7 +141,7 @@ void TextFormatConformanceTestSuite::ExpectParseFailure(const string& test_name,
   const ConformanceRequest& request = setting.GetRequest();
   ConformanceResponse response;
   string effective_test_name =
-      absl::StrCat(setting.ConformanceLevelToString(level),
+      StrCat(setting.ConformanceLevelToString(level),
                    ".Proto3.TextFormatInput.", test_name);
 
   RunTest(effective_test_name, request, &response);
@@ -262,64 +263,64 @@ void TextFormatConformanceTestSuite::RunSuiteImpl() {
     const std::string field_name =
         field_type == "String" ? "optional_string" : "optional_bytes";
     RunValidTextFormatTest(
-        absl::StrCat("StringLiteralConcat", field_type), REQUIRED,
-        absl::StrCat(field_name, ": 'first' \"second\"\n'third'"));
+        StrCat("StringLiteralConcat", field_type), REQUIRED,
+        StrCat(field_name, ": 'first' \"second\"\n'third'"));
     RunValidTextFormatTest(
-        absl::StrCat("StringLiteralBasicEscapes", field_type), REQUIRED,
-        absl::StrCat(field_name, ": '\\a\\b\\f\\n\\r\\t\\v\\?\\\\\\'\\\"'"));
+        StrCat("StringLiteralBasicEscapes", field_type), REQUIRED,
+        StrCat(field_name, ": '\\a\\b\\f\\n\\r\\t\\v\\?\\\\\\'\\\"'"));
     RunValidTextFormatTest(
-        absl::StrCat("StringLiteralOctalEscapes", field_type), REQUIRED,
-        absl::StrCat(field_name, ": '\\341\\210\\264'"));
-    RunValidTextFormatTest(absl::StrCat("StringLiteralHexEscapes", field_type),
+        StrCat("StringLiteralOctalEscapes", field_type), REQUIRED,
+        StrCat(field_name, ": '\\341\\210\\264'"));
+    RunValidTextFormatTest(StrCat("StringLiteralHexEscapes", field_type),
                            REQUIRED,
-                           absl::StrCat(field_name, ": '\\xe1\\x88\\xb4'"));
+                           StrCat(field_name, ": '\\xe1\\x88\\xb4'"));
     RunValidTextFormatTest(
-        absl::StrCat("StringLiteralShortUnicodeEscape", field_type),
-        RECOMMENDED, absl::StrCat(field_name, ": '\\u1234'"));
+        StrCat("StringLiteralShortUnicodeEscape", field_type),
+        RECOMMENDED, StrCat(field_name, ": '\\u1234'"));
     RunValidTextFormatTest(
-        absl::StrCat("StringLiteralLongUnicodeEscapes", field_type),
-        RECOMMENDED, absl::StrCat(field_name, ": '\\U00001234\\U00010437'"));
+        StrCat("StringLiteralLongUnicodeEscapes", field_type),
+        RECOMMENDED, StrCat(field_name, ": '\\U00001234\\U00010437'"));
     // String literals don't include line feeds.
-    ExpectParseFailure(absl::StrCat("StringLiteralIncludesLF", field_type),
+    ExpectParseFailure(StrCat("StringLiteralIncludesLF", field_type),
                        REQUIRED,
-                       absl::StrCat(field_name, ": 'first line\nsecond line'"));
+                       StrCat(field_name, ": 'first line\nsecond line'"));
     // Unicode escapes don't include code points that lie beyond the planes
     // (> 0x10ffff).
     ExpectParseFailure(
-        absl::StrCat("StringLiteralLongUnicodeEscapeTooLarge", field_type),
-        REQUIRED, absl::StrCat(field_name, ": '\\U00110000'"));
+        StrCat("StringLiteralLongUnicodeEscapeTooLarge", field_type),
+        REQUIRED, StrCat(field_name, ": '\\U00110000'"));
     // Unicode escapes don't include surrogates.
     ExpectParseFailure(
-        absl::StrCat("StringLiteralShortUnicodeEscapeSurrogatePair",
+        StrCat("StringLiteralShortUnicodeEscapeSurrogatePair",
                      field_type),
-        RECOMMENDED, absl::StrCat(field_name, ": '\\ud801\\udc37'"));
+        RECOMMENDED, StrCat(field_name, ": '\\ud801\\udc37'"));
     ExpectParseFailure(
-        absl::StrCat("StringLiteralShortUnicodeEscapeSurrogateFirstOnly",
+        StrCat("StringLiteralShortUnicodeEscapeSurrogateFirstOnly",
                      field_type),
-        RECOMMENDED, absl::StrCat(field_name, ": '\\ud800'"));
+        RECOMMENDED, StrCat(field_name, ": '\\ud800'"));
     ExpectParseFailure(
-        absl::StrCat("StringLiteralShortUnicodeEscapeSurrogateSecondOnly",
+        StrCat("StringLiteralShortUnicodeEscapeSurrogateSecondOnly",
                      field_type),
-        RECOMMENDED, absl::StrCat(field_name, ": '\\udc00'"));
+        RECOMMENDED, StrCat(field_name, ": '\\udc00'"));
     ExpectParseFailure(
-        absl::StrCat("StringLiteralLongUnicodeEscapeSurrogateFirstOnly",
+        StrCat("StringLiteralLongUnicodeEscapeSurrogateFirstOnly",
                      field_type),
-        RECOMMENDED, absl::StrCat(field_name, ": '\\U0000d800'"));
+        RECOMMENDED, StrCat(field_name, ": '\\U0000d800'"));
     ExpectParseFailure(
-        absl::StrCat("StringLiteralLongUnicodeEscapeSurrogateSecondOnly",
+        StrCat("StringLiteralLongUnicodeEscapeSurrogateSecondOnly",
                      field_type),
-        RECOMMENDED, absl::StrCat(field_name, ": '\\U0000dc00'"));
+        RECOMMENDED, StrCat(field_name, ": '\\U0000dc00'"));
     ExpectParseFailure(
-        absl::StrCat("StringLiteralLongUnicodeEscapeSurrogatePair", field_type),
-        RECOMMENDED, absl::StrCat(field_name, ": '\\U0000d801\\U00000dc37'"));
+        StrCat("StringLiteralLongUnicodeEscapeSurrogatePair", field_type),
+        RECOMMENDED, StrCat(field_name, ": '\\U0000d801\\U00000dc37'"));
     ExpectParseFailure(
-        absl::StrCat("StringLiteralUnicodeEscapeSurrogatePairLongShort",
+        StrCat("StringLiteralUnicodeEscapeSurrogatePairLongShort",
                      field_type),
-        RECOMMENDED, absl::StrCat(field_name, ": '\\U0000d801\\udc37'"));
+        RECOMMENDED, StrCat(field_name, ": '\\U0000d801\\udc37'"));
     ExpectParseFailure(
-        absl::StrCat("StringLiteralUnicodeEscapeSurrogatePairShortLong",
+        StrCat("StringLiteralUnicodeEscapeSurrogatePairShortLong",
                      field_type),
-        RECOMMENDED, absl::StrCat(field_name, ": '\\ud801\\U0000dc37'"));
+        RECOMMENDED, StrCat(field_name, ": '\\ud801\\U0000dc37'"));
 
     // The following method depend on the type of field, as strings have extra
     // validation.
@@ -329,10 +330,10 @@ void TextFormatConformanceTestSuite::RunSuiteImpl() {
             : &TextFormatConformanceTestSuite::RunValidTextFormatTest;
 
     // String fields reject invalid UTF-8 byte sequences; bytes fields don't.
-    (this->*test_method)(absl::StrCat(field_type, "FieldBadUTF8Octal"),
-                         REQUIRED, absl::StrCat(field_name, ": '\\300'"));
-    (this->*test_method)(absl::StrCat(field_type, "FieldBadUTF8Hex"), REQUIRED,
-                         absl::StrCat(field_name, ": '\\xc0'"));
+    (this->*test_method)(StrCat(field_type, "FieldBadUTF8Octal"),
+                         REQUIRED, StrCat(field_name, ": '\\300'"));
+    (this->*test_method)(StrCat(field_type, "FieldBadUTF8Hex"), REQUIRED,
+                         StrCat(field_name, ": '\\xc0'"));
   }
 
   // Group fields

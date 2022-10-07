@@ -12,8 +12,7 @@
 
   <name>Protocol Buffers [Util]</name>
   <description>Utilities for Protocol Buffers</description>
-  <dependencies>
-    {dependencies}
-  </dependencies>
+
+  {dependencies}
 
 </project>

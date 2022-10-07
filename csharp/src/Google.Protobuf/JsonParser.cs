@@ -70,7 +70,8 @@ namespace Google.Protobuf
 
         // TODO: Consider introducing a class containing parse state of the parser, tokenizer and depth. That would simplify these handlers
         // and the signatures of various methods.
-        private static readonly Dictionary<string, Action<JsonParser, IMessage, JsonTokenizer>> WellKnownTypeHandlers = new()
+        private static readonly Dictionary<string, Action<JsonParser, IMessage, JsonTokenizer>>
+            WellKnownTypeHandlers = new Dictionary<string, Action<JsonParser, IMessage, JsonTokenizer>>
         {
             { Timestamp.Descriptor.FullName, (parser, message, tokenizer) => MergeTimestamp(message, tokenizer.Next()) },
             { Duration.Descriptor.FullName, (parser, message, tokenizer) => MergeDuration(message, tokenizer.Next()) },
@@ -155,7 +156,8 @@ namespace Google.Protobuf
             }
             if (message.Descriptor.IsWellKnownType)
             {
-                if (WellKnownTypeHandlers.TryGetValue(message.Descriptor.FullName, out Action<JsonParser, IMessage, JsonTokenizer> handler))
+                Action<JsonParser, IMessage, JsonTokenizer> handler;
+                if (WellKnownTypeHandlers.TryGetValue(message.Descriptor.FullName, out handler))
                 {
                     handler(this, message, tokenizer);
                     return;
@@ -185,7 +187,8 @@ namespace Google.Protobuf
                     throw new InvalidOperationException("Unexpected token type " + token.Type);
                 }
                 string name = token.StringValue;
-                if (jsonFieldMap.TryGetValue(name, out FieldDescriptor field))
+                FieldDescriptor field;
+                if (jsonFieldMap.TryGetValue(name, out field))
                 {
                     if (field.ContainingOneof != null)
                     {
@@ -300,7 +303,11 @@ namespace Google.Protobuf
                 }
                 object key = ParseMapKey(keyField, token.StringValue);
                 object value = ParseSingleValue(valueField, tokenizer);
-                dictionary[key] = value ?? throw new InvalidProtocolBufferException("Map values must not be null");
+                if (value == null)
+                {
+                    throw new InvalidProtocolBufferException("Map values must not be null");
+                }
+                dictionary[key] = value;
             }
         }
 
@@ -642,15 +649,19 @@ namespace Google.Protobuf
                             {
                                 return float.NaN;
                             }
-                            float converted = (float) value;
-                            // If the value is out of range of float, the cast representation will be infinite.
-                            // If the original value was infinite as well, that's fine - we'll return the 32-bit
-                            // version (with the correct sign).
-                            if (float.IsInfinity(converted) && !double.IsInfinity(value))
+                            if (value > float.MaxValue || value < float.MinValue)
                             {
+                                if (double.IsPositiveInfinity(value))
+                                {
+                                    return float.PositiveInfinity;
+                                }
+                                if (double.IsNegativeInfinity(value))
+                                {
+                                    return float.NegativeInfinity;
+                                }
                                 throw new InvalidProtocolBufferException($"Value out of range: {value}");
                             }
-                            return converted;
+                            return (float) value;
                         case FieldType.Enum:
                             CheckInteger(value);
                             // Just return it as an int, and let the CLR convert it.
@@ -842,7 +853,7 @@ namespace Google.Protobuf
                 if (secondsToAdd < 0 && nanosToAdd > 0)
                 {
                     secondsToAdd++;
-                    nanosToAdd -= Duration.NanosecondsPerSecond;
+                    nanosToAdd = nanosToAdd - Duration.NanosecondsPerSecond;
                 }
                 if (secondsToAdd != 0 || nanosToAdd != 0)
                 {
@@ -1038,20 +1049,23 @@ namespace Google.Protobuf
             /// when unknown fields are encountered.
             /// </summary>
             /// <param name="ignoreUnknownFields"><c>true</c> if unknown fields should be ignored when parsing; <c>false</c> to throw an exception.</param>
-            public Settings WithIgnoreUnknownFields(bool ignoreUnknownFields) => new(RecursionLimit, TypeRegistry, ignoreUnknownFields);
+            public Settings WithIgnoreUnknownFields(bool ignoreUnknownFields) =>
+                new Settings(RecursionLimit, TypeRegistry, ignoreUnknownFields);
 
             /// <summary>
             /// Creates a new <see cref="Settings"/> object based on this one, but with the specified recursion limit.
             /// </summary>
             /// <param name="recursionLimit">The new recursion limit.</param>
-            public Settings WithRecursionLimit(int recursionLimit) => new(recursionLimit, TypeRegistry, IgnoreUnknownFields);
+            public Settings WithRecursionLimit(int recursionLimit) =>
+                new Settings(recursionLimit, TypeRegistry, IgnoreUnknownFields);
 
             /// <summary>
             /// Creates a new <see cref="Settings"/> object based on this one, but with the specified type registry.
             /// </summary>
             /// <param name="typeRegistry">The new type registry. Must not be null.</param>
             public Settings WithTypeRegistry(TypeRegistry typeRegistry) =>
-                new(RecursionLimit,
+                new Settings(
+                    RecursionLimit,
                     ProtoPreconditions.CheckNotNull(typeRegistry, nameof(typeRegistry)),
                     IgnoreUnknownFields);
         }

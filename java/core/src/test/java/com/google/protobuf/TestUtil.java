@@ -235,7 +235,6 @@ import protobuf_unittest.UnittestProto.TestRequired;
 import protobuf_unittest.UnittestProto.TestUnpackedTypes;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -3843,11 +3842,7 @@ public final class TestUtil {
 
   private static ByteString readBytesFromResource(String name) {
     try {
-      InputStream in = TestUtil.class.getResourceAsStream(name);
-      if (in == null) { //
-        throw new RuntimeException("Tests data file " + name + " is missing.");
-      }
-      return ByteString.readFrom(in);
+      return ByteString.readFrom(TestUtil.class.getResourceAsStream(name));
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
