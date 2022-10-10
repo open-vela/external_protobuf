@@ -105,7 +105,7 @@ struct ParseProto2Descriptor : Proto2Descriptor {
   /// Functions for writing fields. ///
 
   // Marks a field as having been "seen". This will clear the field if it is
-  // the first occurrence thereof.
+  // the first occurence thereof.
   //
   // All setters call this function automatically, but it may also be called
   // eagerly to clear a pre-existing value that might not be overwritten, such

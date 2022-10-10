@@ -23,7 +23,7 @@ def internal_ruby_extension(
             ":srcs",
             ":test_ruby_protos",
             ":tests",
-            "@utf8_range//:utf8_range_srcs",
+            "//third_party/utf8_range:all_files",
         ],
         tags = ["manual"],
         outs = [extension],

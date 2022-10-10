@@ -97,7 +97,7 @@ EnumGenerator::ValueLimits EnumGenerator::ValueLimits::FromEnum(
     }
   }
 
-  return EnumGenerator::ValueLimits{min_desc, max_desc};
+  return {min_desc, max_desc};
 }
 
 EnumGenerator::EnumGenerator(const EnumDescriptor* descriptor,
