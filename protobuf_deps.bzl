@@ -54,6 +54,15 @@ def protobuf_deps():
             urls = ["https://github.com/madler/zlib/archive/v1.2.12.tar.gz"],
         )
 
+    if not native.existing_rule("jsoncpp"):
+        http_archive(
+            name = "jsoncpp",
+            build_file = "@com_google_protobuf//:third_party/jsoncpp.BUILD",
+            sha256 = "e34a628a8142643b976c7233ef381457efad79468c67cb1ae0b83a33d7493999",
+            strip_prefix = "jsoncpp-1.9.4",
+            urls = ["https://github.com/open-source-parsers/jsoncpp/archive/refs/tags/1.9.4.tar.gz"],
+        )
+
     if not native.existing_rule("rules_cc"):
         _github_archive(
             name = "rules_cc",
