@@ -32,26 +32,27 @@
 //  Based on original Protocol Buffers design by
 //  Sanjay Ghemawat, Jeff Dean, and others.
 
-#include <google/protobuf/stubs/logging.h>
-#include <google/protobuf/stubs/common.h>
-#include <google/protobuf/io/coded_stream.h>
-#include <google/protobuf/io/zero_copy_stream_impl.h>
-#include <google/protobuf/io/zero_copy_stream_impl_lite.h>
-#include <google/protobuf/descriptor.h>
-#include <google/protobuf/wire_format.h>
-#include <google/protobuf/wire_format_lite.h>
+#include "google/protobuf/stubs/logging.h"
+#include "google/protobuf/stubs/common.h"
+#include "google/protobuf/io/coded_stream.h"
+#include "google/protobuf/io/zero_copy_stream_impl.h"
+#include "google/protobuf/io/zero_copy_stream_impl_lite.h"
+#include "google/protobuf/descriptor.h"
+#include "google/protobuf/wire_format.h"
+#include "google/protobuf/wire_format_lite.h"
 #include <gmock/gmock.h>
-#include <google/protobuf/testing/googletest.h>
+#include "google/protobuf/testing/googletest.h"
 #include <gtest/gtest.h>
-#include <google/protobuf/stubs/casts.h>
-#include <google/protobuf/stubs/logging.h>
-#include <google/protobuf/stubs/strutil.h>
-#include <google/protobuf/dynamic_message.h>
-#include <google/protobuf/test_util2.h>
-#include <google/protobuf/stubs/stl_util.h>
+#include "absl/base/casts.h"
+#include "google/protobuf/stubs/logging.h"
+#include "absl/strings/cord.h"
+#include "absl/strings/match.h"
+#include "google/protobuf/dynamic_message.h"
+#include "google/protobuf/test_util2.h"
+#include "google/protobuf/stubs/stl_util.h"
 
 // clang-format off
-#include <google/protobuf/port_def.inc>
+#include "google/protobuf/port_def.inc"
 // clang-format on
 
 namespace google {
@@ -63,15 +64,15 @@ TEST(WireFormatTest, EnumsInSync) {
   // Verify that WireFormatLite::FieldType and WireFormatLite::CppType match
   // FieldDescriptor::Type and FieldDescriptor::CppType.
 
-  EXPECT_EQ(implicit_cast<int>(FieldDescriptor::MAX_TYPE),
-            implicit_cast<int>(WireFormatLite::MAX_FIELD_TYPE));
-  EXPECT_EQ(implicit_cast<int>(FieldDescriptor::MAX_CPPTYPE),
-            implicit_cast<int>(WireFormatLite::MAX_CPPTYPE));
+  EXPECT_EQ(absl::implicit_cast<int>(FieldDescriptor::MAX_TYPE),
+            absl::implicit_cast<int>(WireFormatLite::MAX_FIELD_TYPE));
+  EXPECT_EQ(absl::implicit_cast<int>(FieldDescriptor::MAX_CPPTYPE),
+            absl::implicit_cast<int>(WireFormatLite::MAX_CPPTYPE));
 
   for (int i = 1; i <= WireFormatLite::MAX_FIELD_TYPE; i++) {
-    EXPECT_EQ(implicit_cast<int>(FieldDescriptor::TypeToCppType(
+    EXPECT_EQ(absl::implicit_cast<int>(FieldDescriptor::TypeToCppType(
                   static_cast<FieldDescriptor::Type>(i))),
-              implicit_cast<int>(WireFormatLite::FieldTypeToCppType(
+              absl::implicit_cast<int>(WireFormatLite::FieldTypeToCppType(
                   static_cast<WireFormatLite::FieldType>(i))));
   }
 }
@@ -1560,7 +1561,7 @@ TEST_F(Utf8ValidationTest, OldVerifyUTF8String) {
 #ifdef GOOGLE_PROTOBUF_UTF8_VALIDATION_ENABLED
   ASSERT_EQ(1, errors.size());
   EXPECT_TRUE(
-      HasPrefixString(errors[0],
+      absl::StartsWith(errors[0],
                        "String field contains invalid UTF-8 data when "
                        "serializing a protocol buffer. Use the "
                        "'bytes' type if you intend to send raw bytes."));
@@ -1706,4 +1707,4 @@ TEST(RepeatedVarint, Enum) {
 }  // namespace protobuf
 }  // namespace google
 
-#include <google/protobuf/port_undef.inc>
+#include "google/protobuf/port_undef.inc"
