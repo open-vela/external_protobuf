@@ -39,7 +39,6 @@
 #define GOOGLE_PROTOBUF_TEXT_FORMAT_H__
 
 
-#include <atomic>
 #include <map>
 #include <memory>
 #include <string>
@@ -66,11 +65,6 @@ namespace protobuf {
 namespace internal {
 PROTOBUF_EXPORT extern const char kDebugStringSilentMarker[1];
 PROTOBUF_EXPORT extern const char kDebugStringSilentMarkerForDetection[3];
-
-PROTOBUF_EXPORT extern std::atomic<bool> enable_debug_text_redaction_marker;
-PROTOBUF_EXPORT extern std::atomic<bool> enable_debug_text_random_marker;
-PROTOBUF_EXPORT extern std::atomic<bool> enable_debug_text_format_marker;
-
 }  // namespace internal
 
 namespace io {
@@ -386,17 +380,8 @@ class PROTOBUF_EXPORT TextFormat {
     friend std::string Message::ShortDebugString() const;
     friend std::string Message::Utf8DebugString() const;
 
-    // Sets whether silent markers will be inserted.
+    // Sets whether *DebugString should insert a silent marker.
     void SetInsertSilentMarker(bool v) { insert_silent_marker_ = v; }
-
-    // Sets whether strings will be redacted and thus unparsable.
-    void SetRedactDebugString(bool redact) { redact_debug_string_ = redact; }
-
-    // Sets whether the output string should be made non-deterministic.
-    // This discourages equality checks based on serialized string comparisons.
-    void SetRandomizeDebugString(bool randomize) {
-      randomize_debug_string_ = randomize;
-    }
 
     // Forward declaration of an internal class used to print the text
     // output to the OutputStream (see text_format.cc for implementation).
@@ -461,8 +446,6 @@ class PROTOBUF_EXPORT TextFormat {
     bool use_field_number_;
     bool use_short_repeated_primitives_;
     bool insert_silent_marker_;
-    bool redact_debug_string_;
-    bool randomize_debug_string_;
     bool hide_unknown_fields_;
     bool print_message_fields_in_index_order_;
     bool expand_any_;

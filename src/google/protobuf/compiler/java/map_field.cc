@@ -848,6 +848,7 @@ void ImmutableMapFieldGenerator::GenerateBuilderParsingCode(
         "    $name$__.getKey(), $name$__.getValue());\n");
   }
 }
+
 void ImmutableMapFieldGenerator::GenerateSerializationCode(
     io::Printer* printer) const {
   printer->Print(variables_,

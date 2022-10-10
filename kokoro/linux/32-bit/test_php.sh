@@ -36,7 +36,7 @@ build_php_c() {
   test_php_c
 }
 
-mkdir -p build
+mkdir build
 pushd build
 cmake ..
 cmake --build . -- -j20
