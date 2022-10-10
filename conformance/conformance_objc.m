@@ -56,7 +56,8 @@ static NSData *CheckedReadDataOfLength(NSFileHandle *handle, NSUInteger numBytes
     return nil;  // EOF.
   }
   if (dataLen != numBytes) {
-    Die(@"Failed to read the request length (%d), only got: %@", numBytes, data);
+    Die(@"Failed to read the request length (%d), only got: %@",
+        numBytes, data);
   }
   return data;
 }
@@ -75,9 +76,8 @@ static ConformanceResponse *DoTest(ConformanceRequest *request) {
       Class msgClass = nil;
       if ([request.messageType isEqual:@"protobuf_test_messages.proto3.TestAllTypesProto3"]) {
         msgClass = [Proto3TestAllTypesProto3 class];
-      } else if ([request.messageType
-                     isEqual:@"protobuf_test_messages.proto2.TestAllTypesProto2"]) {
-        msgClass = [Proto2TestAllTypesProto2 class];
+      } else if ([request.messageType isEqual:@"protobuf_test_messages.proto2.TestAllTypesProto2"]) {
+        msgClass = [TestAllTypesProto2 class];
       } else {
         response.runtimeError =
             [NSString stringWithFormat:@"Protobuf request had an unknown message_type: %@",
@@ -87,7 +87,8 @@ static ConformanceResponse *DoTest(ConformanceRequest *request) {
       NSError *error = nil;
       testMessage = [msgClass parseFromData:request.protobufPayload error:&error];
       if (!testMessage) {
-        response.parseError = [NSString stringWithFormat:@"Parse error: %@", error];
+        response.parseError =
+            [NSString stringWithFormat:@"Parse error: %@", error];
       }
       break;
     }
@@ -97,8 +98,9 @@ static ConformanceResponse *DoTest(ConformanceRequest *request) {
       break;
 
     case ConformanceRequest_Payload_OneOfCase_JspbPayload:
-      response.skipped = @"ConformanceRequest had a jspb_payload ConformanceRequest.payload;"
-                          " those aren't supposed to happen with opensource.";
+      response.skipped =
+          @"ConformanceRequest had a jspb_payload ConformanceRequest.payload;"
+          " those aren't supposed to happen with opensource.";
       break;
 
     case ConformanceRequest_Payload_OneOfCase_TextPayload:
@@ -108,31 +110,31 @@ static ConformanceResponse *DoTest(ConformanceRequest *request) {
 
   if (testMessage) {
     switch (request.requestedOutputFormat) {
-      case ConformanceWireFormat_GPBUnrecognizedEnumeratorValue:
-      case ConformanceWireFormat_Unspecified:
+      case WireFormat_GPBUnrecognizedEnumeratorValue:
+      case WireFormat_Unspecified:
         response.runtimeError =
             [NSString stringWithFormat:@"Unrecognized/unspecified output format: %@", request];
         break;
 
-      case ConformanceWireFormat_Protobuf:
+      case WireFormat_Protobuf:
         response.protobufPayload = testMessage.data;
         if (!response.protobufPayload) {
           response.serializeError =
-              [NSString stringWithFormat:@"Failed to make data from: %@", testMessage];
+            [NSString stringWithFormat:@"Failed to make data from: %@", testMessage];
         }
         break;
 
-      case ConformanceWireFormat_Json:
+      case WireFormat_Json:
         response.skipped = @"ObjC doesn't support generating JSON";
         break;
 
-      case ConformanceWireFormat_Jspb:
+      case WireFormat_Jspb:
         response.skipped =
             @"ConformanceRequest had a requested_output_format of JSPB WireFormat; that"
-             " isn't supposed to happen with opensource.";
+            " isn't supposed to happen with opensource.";
         break;
 
-      case ConformanceWireFormat_TextFormat:
+      case WireFormat_TextFormat:
         // ObjC only has partial objc generation, so don't attempt any tests that need
         // support.
         response.skipped = @"ObjC doesn't support generating TextFormat";
@@ -171,7 +173,8 @@ static BOOL DoTestIo(NSFileHandle *input, NSFileHandle *output) {
   }
 
   NSError *error = nil;
-  ConformanceRequest *request = [ConformanceRequest parseFromData:data error:&error];
+  ConformanceRequest *request = [ConformanceRequest parseFromData:data
+                                                            error:&error];
   if (!request) {
     Die(@"Failed to parse the message data: %@", error);
   }

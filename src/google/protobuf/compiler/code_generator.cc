@@ -32,14 +32,13 @@
 //  Based on original Protocol Buffers design by
 //  Sanjay Ghemawat, Jeff Dean, and others.
 
-#include "google/protobuf/compiler/code_generator.h"
+#include <google/protobuf/compiler/code_generator.h>
 
-#include "google/protobuf/stubs/logging.h"
-#include "google/protobuf/stubs/common.h"
-#include "google/protobuf/compiler/plugin.pb.h"
-#include "google/protobuf/descriptor.h"
-#include "absl/strings/str_split.h"
-#include "absl/strings/strip.h"
+#include <google/protobuf/stubs/logging.h>
+#include <google/protobuf/stubs/common.h>
+#include <google/protobuf/compiler/plugin.pb.h>
+#include <google/protobuf/descriptor.h>
+#include <google/protobuf/stubs/strutil.h>
 
 namespace google {
 namespace protobuf {
@@ -108,7 +107,7 @@ void GeneratorContext::GetCompilerVersion(Version* version) const {
 void ParseGeneratorParameter(
     const std::string& text,
     std::vector<std::pair<std::string, std::string> >* output) {
-  std::vector<std::string> parts = absl::StrSplit(text, ",", absl::SkipEmpty());
+  std::vector<std::string> parts = Split(text, ",", true);
 
   for (int i = 0; i < parts.size(); i++) {
     std::string::size_type equals_pos = parts[i].find_first_of('=');
@@ -126,10 +125,10 @@ void ParseGeneratorParameter(
 
 // Strips ".proto" or ".protodevel" from the end of a filename.
 std::string StripProto(const std::string& filename) {
-  if (absl::EndsWith(filename, ".protodevel")) {
-    return std::string(absl::StripSuffix(filename, ".protodevel"));
+  if (HasSuffixString(filename, ".protodevel")) {
+    return StripSuffixString(filename, ".protodevel");
   } else {
-    return std::string(absl::StripSuffix(filename, ".proto"));
+    return StripSuffixString(filename, ".proto");
   }
 }
 
