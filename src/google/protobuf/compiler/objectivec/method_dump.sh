@@ -82,9 +82,9 @@ int main(int argc, const char * argv[]) {
     for (NSString *item in array) {
       // Some items with _ in them get returned in quotes, so do not add more.
       if ([item hasPrefix:@"\""]) {
-        printf("    %s,\n", item.UTF8String);
+        printf("\t%s,\n", item.UTF8String);
       } else {
-        printf("    \"%s\",\n", item.UTF8String);
+        printf("\t\"%s\",\n", item.UTF8String);
       }
     }
   }
