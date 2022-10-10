@@ -38,6 +38,7 @@
 #include "absl/status/status.h"
 #include "absl/strings/escaping.h"
 #include "absl/strings/str_cat.h"
+#include "google/protobuf/util/internal/utility.h"
 #include "google/protobuf/util/type_resolver.h"
 
 // clang-format off

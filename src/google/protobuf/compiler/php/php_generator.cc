@@ -33,6 +33,7 @@
 #include <sstream>
 
 #include "google/protobuf/compiler/code_generator.h"
+#include "google/protobuf/stubs/strutil.h"
 #include "absl/strings/ascii.h"
 #include "absl/strings/escaping.h"
 #include "absl/strings/str_replace.h"
@@ -41,8 +42,6 @@
 #include "google/protobuf/descriptor.pb.h"
 #include "google/protobuf/io/printer.h"
 #include "google/protobuf/io/zero_copy_stream.h"
-
-#include "google/protobuf/stubs/strutil.h"  // for StringReplace.
 
 const std::string kDescriptorFile = "google/protobuf/descriptor.proto";
 const std::string kEmptyFile = "google/protobuf/empty.proto";

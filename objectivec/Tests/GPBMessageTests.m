@@ -1843,8 +1843,8 @@
 }
 
 - (void)testPropertyNaming {
-  // names.cc has some special handing to get proper all caps for a few cases to
-  // meet objc developer expectations.
+  // objectivec_helpers.cc has some special handing to get proper all caps
+  // for a few cases to meet objc developer expectations.
   //
   // This "test" confirms that the expected names are generated, otherwise the
   // test itself will fail to compile.
@@ -1861,7 +1861,7 @@
 }
 
 - (void)testEnumNaming {
-  // names.cc has some interesting cases to deal with in
+  // objectivec_helpers.cc has some interesting cases to deal with in
   // EnumValueName/EnumValueShortName.  Confirm that things generated as
   // expected.
 
@@ -1966,8 +1966,9 @@
 }
 
 - (void)testReservedWordNaming {
-  // names.cc has some special handing to make sure that some "reserved" objc
-  // names get renamed in a way so they don't conflict.
+  // objectivec_helpers.cc has some special handing to make sure that
+  // some "reserved" objc names get renamed in a way so they
+  // don't conflict.
   //
   // This "test" confirms that the expected names are generated,
   // otherwise the test itself will fail to compile.
