@@ -422,7 +422,7 @@ void Tokenizer::ConsumeString(char delimiter) {
           // Possibly followed by two more octal digits, but these will
           // just be consumed by the main loop anyway so we don't need
           // to do so explicitly here.
-        } else if (TryConsume('x') || TryConsume('X')) {
+        } else if (TryConsume('x')) {
           if (!TryConsumeOne<HexDigit>()) {
             AddError("Expected hex digits for escape sequence.");
           }
@@ -1216,7 +1216,7 @@ void Tokenizer::ParseStringAppend(const std::string& text,
         }
         output->push_back(static_cast<char>(code));
 
-      } else if (*ptr == 'x' || *ptr == 'X') {
+      } else if (*ptr == 'x') {
         // A hex escape.  May zero, one, or two digits.  (The zero case
         // will have been caught as an error earlier.)
         int code = 0;
