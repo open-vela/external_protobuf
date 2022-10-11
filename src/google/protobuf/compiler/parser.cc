@@ -34,36 +34,33 @@
 //
 // Recursive descent FTW.
 
-#include "google/protobuf/compiler/parser.h"
+#include <google/protobuf/compiler/parser.h>
 
 #include <float.h>
 
 #include <cstdint>
 #include <limits>
-#include <tuple>
 #include <unordered_map>
 #include <unordered_set>
 
-#include "google/protobuf/stubs/logging.h"
-#include "google/protobuf/stubs/common.h"
-#include "google/protobuf/stubs/strutil.h"
-#include "absl/base/casts.h"
-#include "absl/strings/ascii.h"
-#include "absl/strings/escaping.h"
-#include "absl/strings/str_cat.h"
-#include "absl/strings/str_format.h"
-#include "google/protobuf/descriptor.h"
-#include "google/protobuf/descriptor.pb.h"
-#include "google/protobuf/io/tokenizer.h"
-#include "google/protobuf/port.h"
-#include "google/protobuf/wire_format.h"
+#include <google/protobuf/stubs/casts.h>
+#include <google/protobuf/stubs/logging.h>
+#include <google/protobuf/stubs/common.h>
+#include <google/protobuf/stubs/strutil.h>
+#include <google/protobuf/descriptor.h>
+#include <google/protobuf/descriptor.pb.h>
+#include <google/protobuf/io/tokenizer.h>
+#include <google/protobuf/wire_format.h>
+#include <google/protobuf/stubs/map_util.h>
+#include <google/protobuf/stubs/hash.h>
 
 namespace google {
 namespace protobuf {
 namespace compiler {
-namespace {
 
-using ::google::protobuf::internal::DownCast;
+using internal::WireFormat;
+
+namespace {
 
 typedef std::unordered_map<std::string, FieldDescriptorProto::Type> TypeNameMap;
 
@@ -289,16 +286,6 @@ bool Parser::ConsumeInteger64(uint64_t max_value, uint64_t* output,
   }
 }
 
-bool Parser::TryConsumeInteger64(uint64_t max_value, uint64_t* output) {
-  if (LookingAtType(io::Tokenizer::TYPE_INTEGER) &&
-      io::Tokenizer::ParseInteger(input_->current().text, max_value,
-                                  output)) {
-    input_->Next();
-    return true;
-  }
-  return false;
-}
-
 bool Parser::ConsumeNumber(double* output, const char* error) {
   if (LookingAtType(io::Tokenizer::TYPE_FLOAT)) {
     *output = io::Tokenizer::ParseFloat(input_->current().text);
@@ -307,19 +294,13 @@ bool Parser::ConsumeNumber(double* output, const char* error) {
   } else if (LookingAtType(io::Tokenizer::TYPE_INTEGER)) {
     // Also accept integers.
     uint64_t value = 0;
-    if (io::Tokenizer::ParseInteger(input_->current().text,
+    if (!io::Tokenizer::ParseInteger(input_->current().text,
                                      std::numeric_limits<uint64_t>::max(),
                                      &value)) {
-      *output = value;
-    } else if (input_->current().text[0] == '0') {
-      // octal or hexadecimal; don't bother parsing as float
-      AddError("Integer out of range.");
-      // We still return true because we did, in fact, parse a number.
-    } else if (!io::Tokenizer::TryParseFloat(input_->current().text, output)) {
-      // out of int range, and not valid float? 🤷
       AddError("Integer out of range.");
       // We still return true because we did, in fact, parse a number.
     }
+    *output = value;
     input_->Next();
     return true;
   } else if (LookingAt("inf")) {
@@ -406,14 +387,11 @@ void Parser::AddError(const std::string& error) {
   AddError(input_->current().line, input_->current().column, error);
 }
 
-void Parser::AddWarning(int line, int column, const std::string& warning) {
-  if (error_collector_ != nullptr) {
-    error_collector_->AddWarning(line, column, warning);
-  }
-}
-
 void Parser::AddWarning(const std::string& warning) {
-  AddWarning(input_->current().line, input_->current().column, warning);
+  if (error_collector_ != nullptr) {
+    error_collector_->AddWarning(input_->current().line,
+                                 input_->current().column, warning);
+  }
 }
 
 // -------------------------------------------------------------------
@@ -656,17 +634,14 @@ bool Parser::Parse(io::Tokenizer* input, FileDescriptorProto* file) {
     root_location.RecordLegacyLocation(file,
                                        DescriptorPool::ErrorCollector::OTHER);
 
-    if (require_syntax_identifier_ || LookingAt("syntax")
-    ) {
+    if (require_syntax_identifier_ || LookingAt("syntax")) {
       if (!ParseSyntaxIdentifier(root_location)) {
         // Don't attempt to parse the file if we didn't recognize the syntax
         // identifier.
         return false;
       }
       // Store the syntax into the file.
-      if (file != nullptr) {
-        file->set_syntax(syntax_identifier_);
-      }
+      if (file != nullptr) file->set_syntax(syntax_identifier_);
     } else if (!stop_after_syntax_identifier_) {
       GOOGLE_LOG(WARNING) << "No syntax specified for the proto file: " << file->name()
                    << ". Please use 'syntax = \"proto2\";' "
@@ -703,10 +678,9 @@ bool Parser::Parse(io::Tokenizer* input, FileDescriptorProto* file) {
 bool Parser::ParseSyntaxIdentifier(const LocationRecorder& parent) {
   LocationRecorder syntax_location(parent,
                                    FileDescriptorProto::kSyntaxFieldNumber);
-    DO(Consume("syntax",
-               "File must begin with a syntax statement, e.g. 'syntax = "
-               "\"proto2\";'."));
-
+  DO(Consume(
+      "syntax",
+      "File must begin with a syntax statement, e.g. 'syntax = \"proto2\";'."));
   DO(Consume("="));
   io::Tokenizer::Token syntax_token = input_->current();
   std::string syntax;
@@ -714,6 +688,7 @@ bool Parser::ParseSyntaxIdentifier(const LocationRecorder& parent) {
   DO(ConsumeEndOfDeclaration(";", &syntax_location));
 
   syntax_identifier_ = syntax;
+
   if (syntax != "proto2" && syntax != "proto3" &&
       !stop_after_syntax_identifier_) {
     AddError(syntax_token.line, syntax_token.column,
@@ -1109,7 +1084,7 @@ bool Parser::ParseMessageFieldNoLabel(
       AddError(name_token.line, name_token.column,
                "Group names must start with a capital letter.");
     }
-    absl::AsciiStrToLower(field->mutable_name());
+    LowerString(field->mutable_name());
 
     field->set_type_name(group->name());
     if (LookingAt("{")) {
@@ -1308,7 +1283,7 @@ bool Parser::ParseDefaultAssignment(
       DO(ConsumeInteger64(max_value, &value,
                           "Expected integer for field default value."));
       // And stringify it again.
-      default_value->append(absl::StrCat(value));
+      default_value->append(StrCat(value));
       break;
     }
 
@@ -1331,7 +1306,7 @@ bool Parser::ParseDefaultAssignment(
       DO(ConsumeInteger64(max_value, &value,
                           "Expected integer for field default value."));
       // And stringify it again.
-      default_value->append(absl::StrCat(value));
+      default_value->append(StrCat(value));
       break;
     }
 
@@ -1371,7 +1346,7 @@ bool Parser::ParseDefaultAssignment(
 
     case FieldDescriptorProto::TYPE_BYTES:
       DO(ConsumeString(default_value, "Expected string."));
-      *default_value = absl::CEscape(*default_value);
+      *default_value = CEscape(*default_value);
       break;
 
     case FieldDescriptorProto::TYPE_ENUM:
@@ -1499,7 +1474,7 @@ bool Parser::ParseOption(Message* options,
   }
 
   UninterpretedOption* uninterpreted_option =
-      DownCast<UninterpretedOption*>(options->GetReflection()->AddMessage(
+      down_cast<UninterpretedOption*>(options->GetReflection()->AddMessage(
           options, uninterpreted_option_field));
 
   // Parse dot-separated name.
@@ -1571,20 +1546,18 @@ bool Parser::ParseOption(Message* options,
             is_negative
                 ? static_cast<uint64_t>(std::numeric_limits<int64_t>::max()) + 1
                 : std::numeric_limits<uint64_t>::max();
-        if (TryConsumeInteger64(max_value, &value)) {
-          if (is_negative) {
-            value_location.AddPath(
-                UninterpretedOption::kNegativeIntValueFieldNumber);
-            uninterpreted_option->set_negative_int_value(
-                static_cast<int64_t>(0 - value));
-          } else {
-            value_location.AddPath(
-                UninterpretedOption::kPositiveIntValueFieldNumber);
-            uninterpreted_option->set_positive_int_value(value);
-          }
-          break;
+        DO(ConsumeInteger64(max_value, &value, "Expected integer."));
+        if (is_negative) {
+          value_location.AddPath(
+              UninterpretedOption::kNegativeIntValueFieldNumber);
+          uninterpreted_option->set_negative_int_value(
+              static_cast<int64_t>(0 - value));
+        } else {
+          value_location.AddPath(
+              UninterpretedOption::kPositiveIntValueFieldNumber);
+          uninterpreted_option->set_positive_int_value(value);
         }
-        // value too large for an integer; fall through below to treat as floating point
+        break;
       }
 
       case io::Tokenizer::TYPE_FLOAT: {
@@ -1750,23 +1723,11 @@ bool Parser::ParseReserved(DescriptorProto* message,
   }
 }
 
-bool Parser::ParseReservedName(std::string* name, const char* error_message) {
-  // Capture the position of the token, in case we have to report an
-  // error after it is consumed.
-  int line = input_->current().line;
-  int col = input_->current().column;
-  DO(ConsumeString(name, error_message));
-  if (!io::Tokenizer::IsIdentifier(*name)) {
-    AddWarning(line, col, absl::StrFormat("Reserved name \"%s\" is not a valid identifier.", *name));
-  }
-  return true;
-}
-
 bool Parser::ParseReservedNames(DescriptorProto* message,
                                 const LocationRecorder& parent_location) {
   do {
     LocationRecorder location(parent_location, message->reserved_name_size());
-    DO(ParseReservedName(message->add_reserved_name(), "Expected field name."));
+    DO(ConsumeString(message->add_reserved_name(), "Expected field name."));
   } while (TryConsume(","));
   DO(ConsumeEndOfDeclaration(";", &parent_location));
   return true;
@@ -1821,42 +1782,42 @@ bool Parser::ParseReservedNumbers(DescriptorProto* message,
   return true;
 }
 
-bool Parser::ParseReserved(EnumDescriptorProto* proto,
-                           const LocationRecorder& enum_location) {
+bool Parser::ParseReserved(EnumDescriptorProto* message,
+                           const LocationRecorder& message_location) {
   io::Tokenizer::Token start_token = input_->current();
   // Parse the declaration.
   DO(Consume("reserved"));
   if (LookingAtType(io::Tokenizer::TYPE_STRING)) {
-    LocationRecorder location(enum_location,
+    LocationRecorder location(message_location,
                               EnumDescriptorProto::kReservedNameFieldNumber);
     location.StartAt(start_token);
-    return ParseReservedNames(proto, location);
+    return ParseReservedNames(message, location);
   } else {
-    LocationRecorder location(enum_location,
+    LocationRecorder location(message_location,
                               EnumDescriptorProto::kReservedRangeFieldNumber);
     location.StartAt(start_token);
-    return ParseReservedNumbers(proto, location);
+    return ParseReservedNumbers(message, location);
   }
 }
 
-bool Parser::ParseReservedNames(EnumDescriptorProto* proto,
+bool Parser::ParseReservedNames(EnumDescriptorProto* message,
                                 const LocationRecorder& parent_location) {
   do {
-    LocationRecorder location(parent_location, proto->reserved_name_size());
-    DO(ParseReservedName(proto->add_reserved_name(), "Expected enum value."));
+    LocationRecorder location(parent_location, message->reserved_name_size());
+    DO(ConsumeString(message->add_reserved_name(), "Expected enum value."));
   } while (TryConsume(","));
   DO(ConsumeEndOfDeclaration(";", &parent_location));
   return true;
 }
 
-bool Parser::ParseReservedNumbers(EnumDescriptorProto* proto,
+bool Parser::ParseReservedNumbers(EnumDescriptorProto* message,
                                   const LocationRecorder& parent_location) {
   bool first = true;
   do {
-    LocationRecorder location(parent_location, proto->reserved_range_size());
+    LocationRecorder location(parent_location, message->reserved_range_size());
 
     EnumDescriptorProto::EnumReservedRange* range =
-        proto->add_reserved_range();
+        message->add_reserved_range();
     int start, end;
     io::Tokenizer::Token start_token;
     {
@@ -2434,27 +2395,33 @@ bool SourceLocationTable::Find(
     const Message* descriptor,
     DescriptorPool::ErrorCollector::ErrorLocation location, int* line,
     int* column) const {
-  auto it = location_map_.find({descriptor, location});
-  if (it == location_map_.end()) {
+  const std::pair<int, int>* result =
+      FindOrNull(location_map_, std::make_pair(descriptor, location));
+  if (result == nullptr) {
     *line = -1;
     *column = 0;
     return false;
+  } else {
+    *line = result->first;
+    *column = result->second;
+    return true;
   }
-  std::tie(*line, *column) = it->second;
-  return true;
 }
 
 bool SourceLocationTable::FindImport(const Message* descriptor,
                                      const std::string& name, int* line,
                                      int* column) const {
-  auto it = import_location_map_.find({descriptor, name});
-  if (it == import_location_map_.end()) {
+  const std::pair<int, int>* result =
+      FindOrNull(import_location_map_, std::make_pair(descriptor, name));
+  if (result == nullptr) {
     *line = -1;
     *column = 0;
     return false;
+  } else {
+    *line = result->first;
+    *column = result->second;
+    return true;
   }
-  std::tie(*line, *column) = it->second;
-  return true;
 }
 
 void SourceLocationTable::Add(
