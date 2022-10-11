@@ -7,7 +7,7 @@ cd $(dirname $0)/../../..
 cd python
 
 PYTHON="/opt/python/cp38-cp38/bin/python"
-${PYTHON} -m pip install --user pytest auditwheel
+${PYTHON} -m pip install --user pytest auditwheel numpy
 
 # check that we are really using aarch64 python
 (${PYTHON} -c 'import sysconfig; print(sysconfig.get_platform())' | grep -q "linux-aarch64") || (echo "Wrong python platform, needs to be aarch64 python."; exit 1)
@@ -16,7 +16,7 @@ ${PYTHON} -m pip install --user pytest auditwheel
 # we've built the python extension previously with --inplace option
 # so we can just discover all the unittests and run them directly under 
 # the python/ directory.
-LD_LIBRARY_PATH=../src/.libs PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=cpp ${PYTHON} -m pytest google/protobuf
+LD_LIBRARY_PATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=cpp ${PYTHON} -m pytest google/protobuf
 
 # step 2: run auditwheel show to check that the wheel is manylinux2014 compatible.
 # auditwheel needs to run on wheel's target platform (or under an emulator)
