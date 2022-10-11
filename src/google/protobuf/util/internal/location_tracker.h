@@ -33,10 +33,10 @@
 
 #include <string>
 
-#include "google/protobuf/port.h"
+#include <google/protobuf/stubs/common.h>
 
 // Must be included last.
-#include "google/protobuf/port_def.inc"
+#include <google/protobuf/port_def.inc>
 
 namespace google {
 namespace protobuf {
@@ -47,8 +47,6 @@ namespace converter {
 // the location information for the purpose of error reporting.
 class PROTOBUF_EXPORT LocationTrackerInterface {
  public:
-  LocationTrackerInterface(const LocationTrackerInterface&) = delete;
-  LocationTrackerInterface& operator=(const LocationTrackerInterface&) = delete;
   virtual ~LocationTrackerInterface() {}
 
   // Returns the object location as human readable string.
@@ -59,6 +57,7 @@ class PROTOBUF_EXPORT LocationTrackerInterface {
 
  private:
   // Please do not add any data members to this class.
+  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(LocationTrackerInterface);
 };
 
 }  // namespace converter
@@ -66,6 +65,6 @@ class PROTOBUF_EXPORT LocationTrackerInterface {
 }  // namespace protobuf
 }  // namespace google
 
-#include "google/protobuf/port_undef.inc"
+#include <google/protobuf/port_undef.inc>
 
 #endif  // GOOGLE_PROTOBUF_UTIL_INTERNAL_LOCATION_TRACKER_H__
