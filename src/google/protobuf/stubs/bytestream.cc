@@ -28,13 +28,12 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "google/protobuf/stubs/bytestream.h"
+#include <google/protobuf/stubs/bytestream.h>
 
 #include <string.h>
-
 #include <algorithm>
 
-#include "google/protobuf/stubs/logging.h"
+#include <google/protobuf/stubs/logging.h>
 
 namespace google {
 namespace protobuf {
@@ -42,7 +41,7 @@ namespace strings {
 
 void ByteSource::CopyTo(ByteSink* sink, size_t n) {
   while (n > 0) {
-    absl::string_view fragment = Peek();
+    StringPiece fragment = Peek();
     if (fragment.empty()) {
       GOOGLE_LOG(DFATAL) << "ByteSource::CopyTo() overran input.";
       break;
@@ -124,10 +123,8 @@ char* GrowingArrayByteSink::GetBuffer(size_t* nbytes) {
 void GrowingArrayByteSink::Expand(size_t amount) {  // Expand by at least 50%.
   size_t new_capacity = std::max(capacity_ + amount, (3 * capacity_) / 2);
   char* bigger = new char[new_capacity];
-  if(buf_ != nullptr) {
-    memcpy(bigger, buf_, size_);
-    delete[] buf_;
-  }
+  memcpy(bigger, buf_, size_);
+  delete[] buf_;
   buf_ = bigger;
   capacity_ = new_capacity;
 }
@@ -152,7 +149,9 @@ size_t ArrayByteSource::Available() const {
   return input_.size();
 }
 
-absl::string_view ArrayByteSource::Peek() { return input_; }
+StringPiece ArrayByteSource::Peek() {
+  return input_;
+}
 
 void ArrayByteSource::Skip(size_t n) {
   GOOGLE_DCHECK_LE(n, input_.size());
@@ -173,9 +172,9 @@ size_t LimitByteSource::Available() const {
   return available;
 }
 
-absl::string_view LimitByteSource::Peek() {
-  absl::string_view piece = source_->Peek();
-  return absl::string_view(piece.data(), std::min(piece.size(), limit_));
+StringPiece LimitByteSource::Peek() {
+  StringPiece piece = source_->Peek();
+  return StringPiece(piece.data(), std::min(piece.size(), limit_));
 }
 
 void LimitByteSource::Skip(size_t n) {

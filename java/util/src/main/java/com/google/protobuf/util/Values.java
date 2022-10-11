@@ -75,7 +75,10 @@ public final class Values {
    * element in the iterable.
    */
   public static Value of(Iterable<Value> values) {
-    return Value.newBuilder().setListValue(ListValue.newBuilder().addAllValues(values)).build();
+    Value.Builder valueBuilder = Value.newBuilder();
+    ListValue.Builder listValue = valueBuilder.getListValueBuilder();
+    listValue.addAllValues(values);
+    return valueBuilder.build();
   }
 
   private Values() {}
