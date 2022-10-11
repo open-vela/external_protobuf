@@ -44,17 +44,16 @@
 #include <string>
 #include <vector>
 
-#include "google/protobuf/stubs/common.h"
-#include "google/protobuf/stubs/logging.h"
-#include "google/protobuf/io/coded_stream.h"
-#include "google/protobuf/io/zero_copy_stream_impl_lite.h"
-#include "google/protobuf/port.h"
-#include "google/protobuf/message_lite.h"
-#include "google/protobuf/parse_context.h"
-#include "google/protobuf/port.h"
+#include <google/protobuf/stubs/common.h>
+#include <google/protobuf/stubs/logging.h>
+#include <google/protobuf/io/coded_stream.h>
+#include <google/protobuf/io/zero_copy_stream_impl_lite.h>
+#include <google/protobuf/port.h>
+#include <google/protobuf/message_lite.h>
+#include <google/protobuf/parse_context.h>
 
 // Must be included last.
-#include "google/protobuf/port_def.inc"
+#include <google/protobuf/port_def.inc>
 
 #ifdef SWIG
 #error "You cannot SWIG proto headers"
@@ -87,8 +86,6 @@ class UnknownField;  // below
 class PROTOBUF_EXPORT UnknownFieldSet {
  public:
   UnknownFieldSet();
-  UnknownFieldSet(const UnknownFieldSet&) = delete;
-  UnknownFieldSet& operator=(const UnknownFieldSet&) = delete;
   ~UnknownFieldSet();
 
   // Remove all fields.
@@ -212,6 +209,7 @@ class PROTOBUF_EXPORT UnknownFieldSet {
   }
 
   std::vector<UnknownField> fields_;
+  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(UnknownFieldSet);
 };
 
 namespace internal {
@@ -219,7 +217,7 @@ namespace internal {
 inline void WriteVarint(uint32_t num, uint64_t val, UnknownFieldSet* unknown) {
   unknown->AddVarint(num, val);
 }
-inline void WriteLengthDelimited(uint32_t num, absl::string_view val,
+inline void WriteLengthDelimited(uint32_t num, StringPiece val,
                                  UnknownFieldSet* unknown) {
   unknown->AddLengthDelimited(num)->assign(val.data(), val.size());
 }
@@ -405,5 +403,5 @@ inline void UnknownField::SetType(Type type) {
 }  // namespace protobuf
 }  // namespace google
 
-#include "google/protobuf/port_undef.inc"
+#include <google/protobuf/port_undef.inc>
 #endif  // GOOGLE_PROTOBUF_UNKNOWN_FIELD_SET_H__

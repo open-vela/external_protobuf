@@ -12,5 +12,4 @@ export LC_ALL=en_US.UTF-8
 KOKORO_INSTALL_RVM=yes
 source kokoro/macos/prepare_build_macos_rc
 
-cd ruby
-./travis-test.sh ruby-3.1.0
+./tests.sh ruby31

@@ -35,7 +35,7 @@
 // TODO(kenton):  Improve this unittest to bring it up to the standards of
 //   other proto2 unittests.
 
-#include "google/protobuf/repeated_field.h"
+#include <google/protobuf/repeated_field.h>
 
 #include <algorithm>
 #include <cstdlib>
@@ -47,18 +47,17 @@
 #include <type_traits>
 #include <vector>
 
-#include "google/protobuf/stubs/logging.h"
-#include "google/protobuf/stubs/common.h"
-#include "google/protobuf/unittest.pb.h"
+#include <google/protobuf/stubs/logging.h>
+#include <google/protobuf/stubs/common.h>
+#include <google/protobuf/unittest.pb.h>
+#include <google/protobuf/stubs/strutil.h>
 #include <gmock/gmock.h>
+#include <google/protobuf/testing/googletest.h>
 #include <gtest/gtest.h>
-#include "absl/numeric/bits.h"
-#include "absl/strings/cord.h"
-#include "absl/strings/str_cat.h"
-#include "google/protobuf/stubs/strutil.h"
+#include <google/protobuf/stubs/stl_util.h>
 
 // Must be included last.
-#include "google/protobuf/port_def.inc"
+#include <google/protobuf/port_def.inc>
 
 namespace google {
 namespace protobuf {
@@ -180,7 +179,7 @@ void CheckAllocationSizes(bool is_ptr) {
         // Must be `>= 16`, as expected by the Arena.
         ASSERT_GE(last_alloc, 16);
         // Must be of a power of two.
-        size_t log2 = absl::bit_width(last_alloc) - 1;
+        size_t log2 = Bits::Log2FloorNonZero64(last_alloc);
         ASSERT_EQ((1 << log2), last_alloc);
       }
 
@@ -306,60 +305,6 @@ TEST(RepeatedField, SwapLargeLarge) {
   }
 }
 
-template <int kSize>
-void TestMemswap() {
-  SCOPED_TRACE(kSize);
-
-  const auto a_char = [](int i) -> char { return (i % ('z' - 'a')) + 'a'; };
-  const auto b_char = [](int i) -> char { return (i % ('Z' - 'A')) + 'A'; };
-  std::string a, b;
-  for (int i = 0; i < kSize; ++i) {
-    a += a_char(i);
-    b += b_char(i);
-  }
-  // We will not swap these.
-  a += "+";
-  b += "-";
-
-  std::string expected_a = b, expected_b = a;
-  expected_a.back() = '+';
-  expected_b.back() = '-';
-
-  internal::memswap<kSize>(&a[0], &b[0]);
-
-  // ODR use the functions in a way that forces the linker to keep them. That
-  // way we can see their generated code.
-  volatile auto odr_use_for_asm_dump = &internal::memswap<kSize>;
-  (void)odr_use_for_asm_dump;
-
-  EXPECT_EQ(expected_a, a);
-  EXPECT_EQ(expected_b, b);
-}
-
-TEST(Memswap, VerifyWithSmallAndLargeSizes) {
-  // Arbitrary sizes
-  TestMemswap<0>();
-  TestMemswap<1>();
-  TestMemswap<10>();
-  TestMemswap<100>();
-  TestMemswap<1000>();
-  TestMemswap<10000>();
-  TestMemswap<100000>();
-  TestMemswap<1000000>();
-
-  // Pointer aligned sizes
-  TestMemswap<sizeof(void*) * 1>();
-  TestMemswap<sizeof(void*) * 7>();
-  TestMemswap<sizeof(void*) * 17>();
-  TestMemswap<sizeof(void*) * 27>();
-
-  // Test also just the block size and no leftover.
-  TestMemswap<64 * 1>();
-  TestMemswap<64 * 2>();
-  TestMemswap<64 * 3>();
-  TestMemswap<64 * 4>();
-}
-
 // Determines how much space was reserved by the given field by adding elements
 // to it until it re-allocates its space.
 static int ReservedSpace(RepeatedField<int>* field) {
@@ -429,14 +374,14 @@ TEST(RepeatedField, ReserveNothing) {
 
 TEST(RepeatedField, ReserveLowerClamp) {
   int clamped_value = internal::CalculateReserveSize<bool, sizeof(void*)>(0, 1);
-  EXPECT_GE(clamped_value, sizeof(void*) / sizeof(bool));
+  EXPECT_GE(clamped_value, 8 / sizeof(bool));
   EXPECT_EQ((internal::RepeatedFieldLowerClampLimit<bool, sizeof(void*)>()),
             clamped_value);
   // EXPECT_EQ(clamped_value, (internal::CalculateReserveSize<bool,
   // sizeof(void*)>( clamped_value, 2)));
 
   clamped_value = internal::CalculateReserveSize<int, sizeof(void*)>(0, 1);
-  EXPECT_GE(clamped_value, sizeof(void*) / sizeof(int));
+  EXPECT_GE(clamped_value, 8 / sizeof(int));
   EXPECT_EQ((internal::RepeatedFieldLowerClampLimit<int, sizeof(void*)>()),
             clamped_value);
   // EXPECT_EQ(clamped_value, (internal::CalculateReserveSize<int,
@@ -643,16 +588,14 @@ TEST(RepeatedField, AddRange4) {
 // an input iterator.
 TEST(RepeatedField, AddRange5) {
   RepeatedField<int> me;
-  me.Add(0);
 
   std::stringstream ss;
   ss << 1 << ' ' << 2;
 
   me.Add(std::istream_iterator<int>(ss), std::istream_iterator<int>());
-  ASSERT_EQ(me.size(), 3);
-  ASSERT_EQ(me.Get(0), 0);
-  ASSERT_EQ(me.Get(1), 1);
-  ASSERT_EQ(me.Get(2), 2);
+  ASSERT_EQ(me.size(), 2);
+  ASSERT_EQ(me.Get(0), 1);
+  ASSERT_EQ(me.Get(1), 2);
 }
 
 TEST(RepeatedField, AddAndAssignRanges) {
@@ -1315,7 +1258,7 @@ TEST(RepeatedPtrField, ClearedElements) {
 
   field.Clear();
   EXPECT_EQ(field.ClearedCount(), 2);
-#ifndef PROTOBUF_FUTURE_REMOVE_CLEARED_API
+#ifndef PROTOBUF_FUTURE_BREAKING_CHANGES
   EXPECT_EQ(field.ReleaseCleared(), original);  // Take ownership again.
   EXPECT_EQ(field.ClearedCount(), 1);
   EXPECT_NE(field.Add(), original);
@@ -1327,7 +1270,7 @@ TEST(RepeatedPtrField, ClearedElements) {
   EXPECT_EQ(field.ClearedCount(), 1);
   EXPECT_EQ(field.Add(), original);
   EXPECT_EQ(field.ClearedCount(), 0);
-#endif  // !PROTOBUF_FUTURE_REMOVE_CLEARED_API
+#endif  // !PROTOBUF_FUTURE_BREAKING_CHANGES
 }
 
 // Test all code paths in AddAllocated().
@@ -2334,11 +2277,11 @@ TEST_F(RepeatedFieldInsertionIteratorsTest,
   TestAllTypes goldenproto;
   for (int i = 0; i < 10; ++i) {
     std::string* new_data = new std::string;
-    *new_data = "name-" + absl::StrCat(i);
+    *new_data = "name-" + StrCat(i);
     data.push_back(new_data);
 
     new_data = goldenproto.add_repeated_string();
-    *new_data = "name-" + absl::StrCat(i);
+    *new_data = "name-" + StrCat(i);
   }
   TestAllTypes testproto;
   std::copy(data.begin(), data.end(),
@@ -2371,7 +2314,7 @@ TEST_F(RepeatedFieldInsertionIteratorsTest,
   auto* goldenproto = Arena::CreateMessage<TestAllTypes>(&arena);
   for (int i = 0; i < 10; ++i) {
     auto* new_data = goldenproto->add_repeated_string();
-    *new_data = "name-" + absl::StrCat(i);
+    *new_data = "name-" + StrCat(i);
     data.push_back(new_data);
   }
   auto* testproto = Arena::CreateMessage<TestAllTypes>(&arena);
@@ -2417,4 +2360,4 @@ TEST_F(RepeatedFieldInsertionIteratorsTest, MoveProtos) {
 }  // namespace protobuf
 }  // namespace google
 
-#include "google/protobuf/port_undef.inc"
+#include <google/protobuf/port_undef.inc>
