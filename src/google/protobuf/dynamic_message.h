@@ -44,18 +44,18 @@
 #include <unordered_map>
 #include <vector>
 
-#include "absl/synchronization/mutex.h"
-#include "google/protobuf/message.h"
-#include "google/protobuf/port.h"
-#include "google/protobuf/reflection.h"
-#include "google/protobuf/repeated_field.h"
+#include <google/protobuf/stubs/common.h>
+#include <google/protobuf/stubs/mutex.h>
+#include <google/protobuf/message.h>
+#include <google/protobuf/reflection.h>
+#include <google/protobuf/repeated_field.h>
 
 #ifdef SWIG
 #error "You cannot SWIG proto headers"
 #endif
 
 // Must be included last.
-#include "google/protobuf/port_def.inc"
+#include <google/protobuf/port_def.inc>
 
 namespace google {
 namespace protobuf {
@@ -81,9 +81,6 @@ class DescriptorPool;  // descriptor.h
 // encapsulates this "cache".  All DynamicMessages of the same type created
 // from the same factory will share the same support data.  Any Descriptors
 // used with a particular factory must outlive the factory.
-//
-// The thread safety for this class is subtle, see comments around GetPrototype
-// for details
 class PROTOBUF_EXPORT DynamicMessageFactory : public MessageFactory {
  public:
   // Construct a DynamicMessageFactory that will search for extensions in
@@ -98,8 +95,6 @@ class PROTOBUF_EXPORT DynamicMessageFactory : public MessageFactory {
   //   this is almost never what you want to do.  Almost all users should use
   //   the zero-arg constructor.
   DynamicMessageFactory(const DescriptorPool* pool);
-  DynamicMessageFactory(const DynamicMessageFactory&) = delete;
-  DynamicMessageFactory& operator=(const DynamicMessageFactory&) = delete;
 
   ~DynamicMessageFactory() override;
 
@@ -138,10 +133,12 @@ class PROTOBUF_EXPORT DynamicMessageFactory : public MessageFactory {
 
   struct TypeInfo;
   std::unordered_map<const Descriptor*, const TypeInfo*> prototypes_;
-  mutable absl::Mutex prototypes_mutex_;
+  mutable internal::WrappedMutex prototypes_mutex_;
 
   friend class DynamicMessage;
   const Message* GetPrototypeNoLock(const Descriptor* type);
+
+  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(DynamicMessageFactory);
 };
 
 // Helper for computing a sorted list of map entries via reflection.
@@ -225,6 +222,6 @@ class PROTOBUF_EXPORT DynamicMapSorter {
 }  // namespace protobuf
 }  // namespace google
 
-#include "google/protobuf/port_undef.inc"
+#include <google/protobuf/port_undef.inc>
 
 #endif  // GOOGLE_PROTOBUF_DYNAMIC_MESSAGE_H__

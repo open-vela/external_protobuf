@@ -29,7 +29,7 @@
 
 syntax = "proto2";
 
-package objc.protobuf.tests.deprecated;
+package protobuf_deprecated;
 option objc_class_prefix = "Dep";
 
 //
