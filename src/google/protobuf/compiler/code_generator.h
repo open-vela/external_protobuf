@@ -41,11 +41,10 @@
 #include <string>
 #include <utility>
 #include <vector>
-
-#include "google/protobuf/port.h"
+#include <google/protobuf/stubs/common.h>
 
 // Must be included last.
-#include "google/protobuf/port_def.inc"
+#include <google/protobuf/port_def.inc>
 
 namespace google {
 namespace protobuf {
@@ -70,9 +69,7 @@ class GeneratorContext;
 // be registered with CommandLineInterface to support various languages.
 class PROTOC_EXPORT CodeGenerator {
  public:
-  CodeGenerator() {}
-  CodeGenerator(const CodeGenerator&) = delete;
-  CodeGenerator& operator=(const CodeGenerator&) = delete;
+  inline CodeGenerator() {}
   virtual ~CodeGenerator();
 
   // Generates code for the given proto file, generating one or more files in
@@ -123,6 +120,9 @@ class PROTOC_EXPORT CodeGenerator {
   // version of the library. When protobufs does a api breaking change, the
   // method can be removed.
   virtual bool HasGenerateAll() const { return true; }
+
+ private:
+  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(CodeGenerator);
 };
 
 // CodeGenerators generate one or more files in a given directory.  This
@@ -131,10 +131,8 @@ class PROTOC_EXPORT CodeGenerator {
 // runs.
 class PROTOC_EXPORT GeneratorContext {
  public:
-  GeneratorContext() {
+  inline GeneratorContext() {
   }
-  GeneratorContext(const GeneratorContext&) = delete;
-  GeneratorContext& operator=(const GeneratorContext&) = delete;
   virtual ~GeneratorContext();
 
   // Opens the given file, truncating it if it exists, and returns a
@@ -179,6 +177,9 @@ class PROTOC_EXPORT GeneratorContext {
   // this GeneratorContext.
   virtual void GetCompilerVersion(Version* version) const;
 
+
+ private:
+  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(GeneratorContext);
 };
 
 // The type GeneratorContext was once called OutputDirectory. This typedef
@@ -201,6 +202,6 @@ PROTOC_EXPORT std::string StripProto(const std::string& filename);
 }  // namespace protobuf
 }  // namespace google
 
-#include "google/protobuf/port_undef.inc"
+#include <google/protobuf/port_undef.inc>
 
 #endif  // GOOGLE_PROTOBUF_COMPILER_CODE_GENERATOR_H__

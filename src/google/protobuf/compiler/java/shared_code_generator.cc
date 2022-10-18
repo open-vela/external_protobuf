@@ -30,19 +30,19 @@
 
 // Author: xiaofeng@google.com (Feng Xiao)
 
-#include "google/protobuf/compiler/java/shared_code_generator.h"
+#include <google/protobuf/compiler/java/shared_code_generator.h>
 
 #include <memory>
 
-#include "google/protobuf/compiler/code_generator.h"
-#include "google/protobuf/io/printer.h"
-#include "google/protobuf/io/zero_copy_stream.h"
-#include "google/protobuf/descriptor.h"
-#include "absl/strings/escaping.h"
-#include "google/protobuf/compiler/java/helpers.h"
-#include "google/protobuf/compiler/java/name_resolver.h"
-#include "google/protobuf/compiler/java/names.h"
-#include "google/protobuf/descriptor.pb.h"
+#include <google/protobuf/compiler/code_generator.h>
+#include <google/protobuf/io/printer.h>
+#include <google/protobuf/io/zero_copy_stream.h>
+#include <google/protobuf/descriptor.h>
+#include <google/protobuf/stubs/strutil.h>
+#include <google/protobuf/compiler/java/helpers.h>
+#include <google/protobuf/compiler/java/name_resolver.h>
+#include <google/protobuf/compiler/java/names.h>
+#include <google/protobuf/descriptor.pb.h>
 
 namespace google {
 namespace protobuf {
@@ -51,16 +51,14 @@ namespace java {
 
 SharedCodeGenerator::SharedCodeGenerator(const FileDescriptor* file,
                                          const Options& options)
-    : name_resolver_(new ClassNameResolver(options)),
-      file_(file),
-      options_(options) {}
+    : name_resolver_(new ClassNameResolver), file_(file), options_(options) {}
 
 SharedCodeGenerator::~SharedCodeGenerator() {}
 
 void SharedCodeGenerator::Generate(
     GeneratorContext* context, std::vector<std::string>* file_list,
     std::vector<std::string>* annotation_file_list) {
-  std::string java_package = FileJavaPackage(file_, true, options_);
+  std::string java_package = FileJavaPackage(file_);
   std::string package_dir = JavaPackageToDir(java_package);
 
   if (HasDescriptorMethods(file_, options_.enforce_lite)) {
@@ -89,12 +87,7 @@ void SharedCodeGenerator::Generate(
           "package", java_package);
     }
     PrintGeneratedAnnotation(printer.get(), '$',
-                             options_.annotate_code ? info_relative_path : "",
-                             options_);
-
-    if (!options_.opensource_runtime) {
-      printer->Print("@com.google.protobuf.Internal.ProtoNonnullApi\n");
-    }
+                             options_.annotate_code ? info_relative_path : "");
     printer->Print(
         "public final class $classname$ {\n"
         "  public static com.google.protobuf.Descriptors.FileDescriptor\n"
@@ -159,7 +152,7 @@ void SharedCodeGenerator::GenerateDescriptors(io::Printer* printer) {
       }
     }
     printer->Print("\"$data$\"", "data",
-                   absl::CEscape(file_data.substr(i, kBytesPerLine)));
+                   CEscape(file_data.substr(i, kBytesPerLine)));
   }
 
   printer->Outdent();
@@ -170,7 +163,7 @@ void SharedCodeGenerator::GenerateDescriptors(io::Printer* printer) {
   std::vector<std::pair<std::string, std::string> > dependencies;
   for (int i = 0; i < file_->dependency_count(); i++) {
     std::string filename = file_->dependency(i)->name();
-    std::string package = FileJavaPackage(file_->dependency(i), true, options_);
+    std::string package = FileJavaPackage(file_->dependency(i));
     std::string classname =
         name_resolver_->GetDescriptorClassName(file_->dependency(i));
     std::string full_name;
@@ -187,15 +180,13 @@ void SharedCodeGenerator::GenerateDescriptors(io::Printer* printer) {
   printer->Print(
       "descriptor = com.google.protobuf.Descriptors.FileDescriptor\n"
       "  .internalBuildGeneratedFileFrom(descriptorData,\n");
-  if (options_.opensource_runtime) {
-    printer->Print(
-        "    new com.google.protobuf.Descriptors.FileDescriptor[] {\n");
+  printer->Print(
+      "    new com.google.protobuf.Descriptors.FileDescriptor[] {\n");
 
-    for (int i = 0; i < dependencies.size(); i++) {
-      const std::string& dependency = dependencies[i].second;
-      printer->Print("      $dependency$.getDescriptor(),\n", "dependency",
-                     dependency);
-    }
+  for (int i = 0; i < dependencies.size(); i++) {
+    const std::string& dependency = dependencies[i].second;
+    printer->Print("      $dependency$.getDescriptor(),\n", "dependency",
+                   dependency);
   }
 
   printer->Print("    });\n");
