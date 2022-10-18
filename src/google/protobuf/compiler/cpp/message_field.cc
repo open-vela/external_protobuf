@@ -32,13 +32,13 @@
 //  Based on original Protocol Buffers design by
 //  Sanjay Ghemawat, Jeff Dean, and others.
 
-#include <google/protobuf/compiler/cpp/message_field.h>
+#include "google/protobuf/compiler/cpp/message_field.h"
 
-#include <google/protobuf/io/printer.h>
-#include <google/protobuf/compiler/cpp/field.h>
-#include <google/protobuf/compiler/cpp/helpers.h>
+#include "google/protobuf/io/printer.h"
+#include "google/protobuf/compiler/cpp/field.h"
+#include "google/protobuf/compiler/cpp/helpers.h"
 
-#include <google/protobuf/stubs/strutil.h>
+#include "google/protobuf/stubs/strutil.h"
 
 namespace google {
 namespace protobuf {
@@ -73,7 +73,7 @@ void SetMessageVariables(const FieldDescriptor* descriptor,
       QualifiedDefaultInstancePtr(descriptor->message_type(), options),
       implicit_weak);
   (*variables)["type_reference_function"] =
-      implicit_weak ? ("  ::" + (*variables)["proto_ns"] +
+      implicit_weak ? ("  ::" + ProtobufNamespace(options) +
                        "::internal::StrongReference(reinterpret_cast<const " +
                        (*variables)["type"] + "&>(\n" +
                        (*variables)["type_default_instance"] + "));\n")
@@ -191,12 +191,19 @@ void MessageFieldGenerator::GenerateInlineAccessorDefinitions(
   } else {
     format("  $field$ = $name$;\n");
   }
+  auto nonempty = [this](const char* fn) {
+    auto var_it = variables_.find(fn);
+    return var_it != variables_.end() && !var_it->second.empty();
+  };
+  if (nonempty("set_hasbit") || nonempty("clear_hasbit")) {
+    format(
+        "  if ($name$) {\n"
+        "    $set_hasbit$\n"
+        "  } else {\n"
+        "    $clear_hasbit$\n"
+        "  }\n");
+  }
   format(
-      "  if ($name$) {\n"
-      "    $set_hasbit$\n"
-      "  } else {\n"
-      "    $clear_hasbit$\n"
-      "  }\n"
       "$annotate_set$"
       "  // @@protoc_insertion_point(field_unsafe_arena_set_allocated"
       ":$full_name$)\n"
@@ -343,7 +350,7 @@ void MessageFieldGenerator::GenerateInternalAccessorDefinitions(
     format(
         "::$proto_ns$::MessageLite*\n"
         "$classname$::_Internal::mutable_$name$($classname$* msg) {\n");
-    if (HasHasbit(descriptor_)) {
+    if (internal::cpp::HasHasbit(descriptor_)) {
       format("  msg->$set_hasbit$\n");
     }
     if (descriptor_->real_containing_oneof() == nullptr) {
@@ -376,7 +383,7 @@ void MessageFieldGenerator::GenerateClearingCode(io::Printer* printer) const {
   GOOGLE_CHECK(!IsFieldStripped(descriptor_, options_));
 
   Formatter format(printer, variables_);
-  if (!HasHasbit(descriptor_)) {
+  if (!internal::cpp::HasHasbit(descriptor_)) {
     // If we don't have has-bits, message presence is indicated only by ptr !=
     // nullptr. Thus on clear, we need to delete the object.
     format(
@@ -394,7 +401,7 @@ void MessageFieldGenerator::GenerateMessageClearingCode(
   GOOGLE_CHECK(!IsFieldStripped(descriptor_, options_));
 
   Formatter format(printer, variables_);
-  if (!HasHasbit(descriptor_)) {
+  if (!internal::cpp::HasHasbit(descriptor_)) {
     // If we don't have has-bits, message presence is indicated only by ptr !=
     // nullptr. Thus on clear, we need to delete the object.
     format(
