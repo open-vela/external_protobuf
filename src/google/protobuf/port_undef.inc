@@ -35,14 +35,10 @@
 #error "port_undef.inc must be included after port_def.inc"
 #endif
 
-#undef PROTOBUF_POISON_MEMORY_REGION
-#undef PROTOBUF_UNPOISON_MEMORY_REGION
 #undef PROTOBUF_BUILTIN_BSWAP16
 #undef PROTOBUF_BUILTIN_BSWAP32
 #undef PROTOBUF_BUILTIN_BSWAP64
-#undef PROTOBUF_BUILTIN_ATOMIC
 #undef PROTOBUF_GNUC_MIN
-#undef PROTOBUF_CLANG_MIN
 #undef PROTOBUF_MSC_VER_MIN
 #undef PROTOBUF_CPLUSPLUS_MIN
 #undef PROTOBUF_NAMESPACE
@@ -57,6 +53,7 @@
 #undef PROTOBUF_DEPRECATED
 #undef PROTOBUF_DEPRECATED_ENUM
 #undef PROTOBUF_DEPRECATED_MSG
+#undef PROTOBUF_FUNC_ALIGN
 #undef PROTOBUF_RETURNS_NONNULL
 #undef PROTOBUF_ATTRIBUTE_REINITIALIZES
 #undef PROTOBUF_RTTI
@@ -75,9 +72,7 @@
 #undef PROTOBUF_FORCE_COPY_IN_SWAP
 #undef PROTOBUF_FORCE_COPY_IN_MOVE
 #undef PROTOBUF_FORCE_RESET_IN_CLEAR
-#undef PROTOBUF_FUZZ_MESSAGE_SPACE_USED_LONG
 #undef PROTOBUF_FORCE_COPY_DEFAULT_STRING
-#undef PROTOBUF_FORCE_ALLOCATION_ON_CONSTRUCTION
 #undef PROTOBUF_NAMESPACE_OPEN
 #undef PROTOBUF_NAMESPACE_CLOSE
 #undef PROTOBUF_UNUSED
@@ -104,47 +99,26 @@
 #undef PROTOBUF_MSAN
 #undef PROTOBUF_TSAN
 #undef PROTOBUF_TAIL_CALL_TABLE_PARSER_ENABLED
-#undef PROTOBUF_USE_TABLE_PARSER_ON_REFLECTION
 #undef PROTOBUF_TC_PARAM_DECL
 #undef PROTOBUF_EXCLUSIVE_LOCKS_REQUIRED
 #undef PROTOBUF_LOCKS_EXCLUDED
 #undef PROTOBUF_NO_THREAD_SAFETY_ANALYSIS
 #undef PROTOBUF_GUARDED_BY
-#undef PROTOBUF_DEBUG
-#undef PROTOBUF_DLOG
-#undef PROTO2_IS_OSS
 
 #ifdef PROTOBUF_FUTURE_BREAKING_CHANGES
 #undef PROTOBUF_FUTURE_BREAKING_CHANGES
-#undef PROTOBUF_FUTURE_MAP_PAIR_UPGRADE
-#undef PROTOBUF_FUTURE_REMOVE_DEFAULT_FIELD_COMPARATOR
-#undef PROTOBUF_FUTURE_REMOVE_CLEARED_API
 #endif
 
-#undef PROTOBUF_FUTURE_FINAL
-
-// Restore macros that may have been #undef'd in port_def.inc.
-
-#ifdef PROTOBUF_DID_UNDEF_PACKAGE
-#pragma pop_macro("PACKAGE")
-#undef PROTOBUF_DID_UNDEF_PACKAGE
-#endif
-
-#ifdef PROTOBUF_DID_UNDEF_LINUX
-#pragma pop_macro("linux")
-#endif
-
-#ifdef _WIN32
+// Restore macro that may have been #undef'd in port_def.inc.
+#ifdef _MSC_VER
 #pragma pop_macro("CREATE_NEW")
 #pragma pop_macro("DELETE")
-#pragma pop_macro("DOMAIN")
 #pragma pop_macro("DOUBLE_CLICK")
 #pragma pop_macro("ERROR")
 #pragma pop_macro("ERROR_BUSY")
 #pragma pop_macro("ERROR_INSTALL_FAILED")
 #pragma pop_macro("ERROR_NOT_FOUND")
 #pragma pop_macro("GetClassName")
-#pragma pop_macro("GetCurrentTime")
 #pragma pop_macro("GetMessage")
 #pragma pop_macro("GetObject")
 #pragma pop_macro("IGNORE")
@@ -170,8 +144,6 @@
 #pragma pop_macro("TRUE")
 #pragma pop_macro("FALSE")
 #pragma pop_macro("UID_MAX")
-#pragma pop_macro("GID_MAX")
-#pragma pop_macro("TYPE_BOOL")
 #endif  // __APPLE__
 
 #if defined(__clang__) || defined(__GNUC__) || defined(_MSC_VER)

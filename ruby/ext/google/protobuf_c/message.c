@@ -37,7 +37,6 @@
 #include "repeated_field.h"
 
 static VALUE cParseError = Qnil;
-static VALUE cAbstractMessage = Qnil;
 static ID descriptor_instancevar_interned;
 
 static VALUE initialize_rb_class_with_no_args(VALUE klass) {
@@ -696,20 +695,15 @@ bool Message_Equal(const upb_Message* m1, const upb_Message* m2,
   if (m1 == m2) return true;
 
   size_t size1, size2;
-  int encode_opts =
-      kUpb_EncodeOption_SkipUnknown | kUpb_EncodeOption_Deterministic;
+  int encode_opts = kUpb_Encode_SkipUnknown | kUpb_Encode_Deterministic;
   upb_Arena* arena_tmp = upb_Arena_New();
   const upb_MiniTable* layout = upb_MessageDef_MiniTable(m);
 
   // Compare deterministically serialized payloads with no unknown fields.
-  char* data1;
-  char* data2;
-  upb_EncodeStatus status1 =
-      upb_Encode(m1, layout, encode_opts, arena_tmp, &data1, &size1);
-  upb_EncodeStatus status2 =
-      upb_Encode(m2, layout, encode_opts, arena_tmp, &data2, &size2);
+  char* data1 = upb_Encode(m1, layout, encode_opts, arena_tmp, &size1);
+  char* data2 = upb_Encode(m2, layout, encode_opts, arena_tmp, &size2);
 
-  if (status1 == kUpb_EncodeStatus_Ok && status2 == kUpb_EncodeStatus_Ok) {
+  if (data1 && data2) {
     bool ret = (size1 == size2) && (memcmp(data1, data2, size1) == 0);
     upb_Arena_Free(arena_tmp);
     return ret;
@@ -741,16 +735,15 @@ static VALUE Message_eq(VALUE _self, VALUE _other) {
 uint64_t Message_Hash(const upb_Message* msg, const upb_MessageDef* m,
                       uint64_t seed) {
   upb_Arena* arena = upb_Arena_New();
-  char* data;
+  const char* data;
   size_t size;
 
   // Hash a deterministically serialized payloads with no unknown fields.
-  upb_EncodeStatus status = upb_Encode(
-      msg, upb_MessageDef_MiniTable(m),
-      kUpb_EncodeOption_SkipUnknown | kUpb_EncodeOption_Deterministic, arena,
-      &data, &size);
+  data = upb_Encode(msg, upb_MessageDef_MiniTable(m),
+                    kUpb_Encode_SkipUnknown | kUpb_Encode_Deterministic, arena,
+                    &size);
 
-  if (status == kUpb_EncodeStatus_Ok) {
+  if (data) {
     uint64_t ret = _upb_Hash(data, size, seed);
     upb_Arena_Free(arena);
     return ret;
@@ -976,8 +969,7 @@ static VALUE Message_decode(int argc, VALUE* argv, VALUE klass) {
       rb_raise(rb_eArgError, "Expected hash arguments.");
     }
 
-    VALUE depth =
-        rb_hash_lookup(hash_args, ID2SYM(rb_intern("recursion_limit")));
+    VALUE depth = rb_hash_lookup(hash_args, ID2SYM(rb_intern("recursion_limit")));
 
     if (depth != Qnil && TYPE(depth) == T_FIXNUM) {
       options |= UPB_DECODE_MAXDEPTH(FIX2INT(depth));
@@ -991,10 +983,9 @@ static VALUE Message_decode(int argc, VALUE* argv, VALUE klass) {
   VALUE msg_rb = initialize_rb_class_with_no_args(klass);
   Message* msg = ruby_to_Message(msg_rb);
 
-  upb_DecodeStatus status =
-      upb_Decode(RSTRING_PTR(data), RSTRING_LEN(data), (upb_Message*)msg->msg,
-                 upb_MessageDef_MiniTable(msg->msgdef), NULL, options,
-                 Arena_get(msg->arena));
+  upb_DecodeStatus status = upb_Decode(
+      RSTRING_PTR(data), RSTRING_LEN(data), (upb_Message*)msg->msg,
+      upb_MessageDef_MiniTable(msg->msgdef), NULL, options, Arena_get(msg->arena));
 
   if (status != kUpb_DecodeStatus_Ok) {
     rb_raise(cParseError, "Error occurred during parsing");
@@ -1078,7 +1069,7 @@ static VALUE Message_decode_json(int argc, VALUE* argv, VALUE klass) {
 static VALUE Message_encode(int argc, VALUE* argv, VALUE klass) {
   Message* msg = ruby_to_Message(argv[0]);
   int options = 0;
-  char* data;
+  const char* data;
   size_t size;
 
   if (CLASS_OF(argv[0]) != klass) {
@@ -1094,21 +1085,19 @@ static VALUE Message_encode(int argc, VALUE* argv, VALUE klass) {
     if (TYPE(hash_args) != T_HASH) {
       rb_raise(rb_eArgError, "Expected hash arguments.");
     }
-    VALUE depth =
-        rb_hash_lookup(hash_args, ID2SYM(rb_intern("recursion_limit")));
+    VALUE depth = rb_hash_lookup(hash_args, ID2SYM(rb_intern("recursion_limit")));
 
     if (depth != Qnil && TYPE(depth) == T_FIXNUM) {
       options |= UPB_DECODE_MAXDEPTH(FIX2INT(depth));
     }
   }
 
-  upb_Arena* arena = upb_Arena_New();
+  upb_Arena *arena = upb_Arena_New();
 
-  upb_EncodeStatus status =
-      upb_Encode(msg->msg, upb_MessageDef_MiniTable(msg->msgdef), options,
-                 arena, &data, &size);
+  data = upb_Encode(msg->msg, upb_MessageDef_MiniTable(msg->msgdef),
+                    options, arena, &size);
 
-  if (status == kUpb_EncodeStatus_Ok) {
+  if (data) {
     VALUE ret = rb_str_new(data, size);
     rb_enc_associate(ret, rb_ascii8bit_encoding());
     upb_Arena_Free(arena);
@@ -1146,8 +1135,7 @@ static VALUE Message_encode_json(int argc, VALUE* argv, VALUE klass) {
   if (argc == 2) {
     VALUE hash_args = argv[1];
     if (TYPE(hash_args) != T_HASH) {
-      if (RTEST(rb_funcall(hash_args, rb_intern("respond_to?"), 1,
-                           rb_str_new2("to_h")))) {
+      if (RTEST(rb_funcall(hash_args, rb_intern("respond_to?"), 1, rb_str_new2("to_h")))) {
         hash_args = rb_funcall(hash_args, rb_intern("to_h"), 0);
       } else {
         rb_raise(rb_eArgError, "Expected hash arguments.");
@@ -1213,8 +1201,36 @@ VALUE build_class_from_descriptor(VALUE descriptor) {
   klass = rb_define_class_id(
       // Docs say this parameter is ignored. User will assign return value to
       // their own toplevel constant class name.
-      rb_intern("Message"), cAbstractMessage);
+      rb_intern("Message"), rb_cObject);
   rb_ivar_set(klass, descriptor_instancevar_interned, descriptor);
+  rb_define_alloc_func(klass, Message_alloc);
+  rb_require("google/protobuf/message_exts");
+  rb_include_module(klass, rb_eval_string("::Google::Protobuf::MessageExts"));
+  rb_extend_object(
+      klass, rb_eval_string("::Google::Protobuf::MessageExts::ClassMethods"));
+
+  rb_define_method(klass, "method_missing", Message_method_missing, -1);
+  rb_define_method(klass, "respond_to_missing?", Message_respond_to_missing,
+                   -1);
+  rb_define_method(klass, "initialize", Message_initialize, -1);
+  rb_define_method(klass, "dup", Message_dup, 0);
+  // Also define #clone so that we don't inherit Object#clone.
+  rb_define_method(klass, "clone", Message_dup, 0);
+  rb_define_method(klass, "==", Message_eq, 1);
+  rb_define_method(klass, "eql?", Message_eq, 1);
+  rb_define_method(klass, "freeze", Message_freeze, 0);
+  rb_define_method(klass, "hash", Message_hash, 0);
+  rb_define_method(klass, "to_h", Message_to_h, 0);
+  rb_define_method(klass, "inspect", Message_inspect, 0);
+  rb_define_method(klass, "to_s", Message_inspect, 0);
+  rb_define_method(klass, "[]", Message_index, 1);
+  rb_define_method(klass, "[]=", Message_index_set, 2);
+  rb_define_singleton_method(klass, "decode", Message_decode, -1);
+  rb_define_singleton_method(klass, "encode", Message_encode, -1);
+  rb_define_singleton_method(klass, "decode_json", Message_decode_json, -1);
+  rb_define_singleton_method(klass, "encode_json", Message_encode_json, -1);
+  rb_define_singleton_method(klass, "descriptor", Message_descriptor, 0);
+
   return klass;
 }
 
@@ -1306,13 +1322,11 @@ upb_Message* Message_deep_copy(const upb_Message* msg, const upb_MessageDef* m,
   const upb_MiniTable* layout = upb_MessageDef_MiniTable(m);
   size_t size;
 
+  char* data = upb_Encode(msg, layout, 0, tmp_arena, &size);
   upb_Message* new_msg = upb_Message_New(m, arena);
-  char* data;
 
-  if (upb_Encode(msg, layout, 0, tmp_arena, &data, &size) !=
-          kUpb_EncodeStatus_Ok ||
-      upb_Decode(data, size, new_msg, layout, NULL, 0, arena) !=
-          kUpb_DecodeStatus_Ok) {
+  if (!data || upb_Decode(data, size, new_msg, layout, NULL, 0, arena) !=
+                   kUpb_DecodeStatus_Ok) {
     upb_Arena_Free(tmp_arena);
     rb_raise(cParseError, "Error occurred copying proto");
   }
@@ -1383,42 +1397,11 @@ const upb_Message* Message_GetUpbMessage(VALUE value, const upb_MessageDef* m,
   return self->msg;
 }
 
-static void Message_define_class(VALUE klass) {
-  rb_define_alloc_func(klass, Message_alloc);
-
-  rb_require("google/protobuf/message_exts");
-  rb_define_method(klass, "method_missing", Message_method_missing, -1);
-  rb_define_method(klass, "respond_to_missing?", Message_respond_to_missing,
-                   -1);
-  rb_define_method(klass, "initialize", Message_initialize, -1);
-  rb_define_method(klass, "dup", Message_dup, 0);
-  // Also define #clone so that we don't inherit Object#clone.
-  rb_define_method(klass, "clone", Message_dup, 0);
-  rb_define_method(klass, "==", Message_eq, 1);
-  rb_define_method(klass, "eql?", Message_eq, 1);
-  rb_define_method(klass, "freeze", Message_freeze, 0);
-  rb_define_method(klass, "hash", Message_hash, 0);
-  rb_define_method(klass, "to_h", Message_to_h, 0);
-  rb_define_method(klass, "inspect", Message_inspect, 0);
-  rb_define_method(klass, "to_s", Message_inspect, 0);
-  rb_define_method(klass, "[]", Message_index, 1);
-  rb_define_method(klass, "[]=", Message_index_set, 2);
-  rb_define_singleton_method(klass, "decode", Message_decode, -1);
-  rb_define_singleton_method(klass, "encode", Message_encode, -1);
-  rb_define_singleton_method(klass, "decode_json", Message_decode_json, -1);
-  rb_define_singleton_method(klass, "encode_json", Message_encode_json, -1);
-  rb_define_singleton_method(klass, "descriptor", Message_descriptor, 0);
-}
-
 void Message_register(VALUE protobuf) {
   cParseError = rb_const_get(protobuf, rb_intern("ParseError"));
-  cAbstractMessage =
-      rb_define_class_under(protobuf, "AbstractMessage", rb_cObject);
-  Message_define_class(cAbstractMessage);
-  rb_gc_register_address(&cAbstractMessage);
 
   // Ruby-interned string: "descriptor". We use this identifier to store an
   // instance variable on message classes we create in order to link them back
   // to their descriptors.
-  descriptor_instancevar_interned = rb_intern("@descriptor");
+  descriptor_instancevar_interned = rb_intern("descriptor");
 }
