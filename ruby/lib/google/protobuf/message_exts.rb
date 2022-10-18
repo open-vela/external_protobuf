@@ -49,10 +49,5 @@ module Google
       end
 
     end
-    class AbstractMessage
-      include MessageExts
-      extend MessageExts::ClassMethods
-    end
-    private_constant :AbstractMessage
   end
 end

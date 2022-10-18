@@ -44,16 +44,16 @@
 #include <limits>
 #include <string>
 
-#include "google/protobuf/stubs/common.h"
-#include "google/protobuf/stubs/logging.h"
-#include "google/protobuf/io/coded_stream.h"
-#include "google/protobuf/port.h"
-#include "absl/base/casts.h"
-#include "google/protobuf/arenastring.h"
-#include "google/protobuf/message_lite.h"
-#include "google/protobuf/port.h"
-#include "google/protobuf/repeated_field.h"
+#include <google/protobuf/stubs/common.h>
+#include <google/protobuf/stubs/logging.h>
+#include <google/protobuf/io/coded_stream.h>
+#include <google/protobuf/port.h>
+#include <google/protobuf/stubs/casts.h>
+#include <google/protobuf/arenastring.h>
+#include <google/protobuf/message_lite.h>
+#include <google/protobuf/repeated_field.h>
 
+// Do UTF-8 validation on string type in Debug build only
 #ifndef NDEBUG
 #define GOOGLE_PROTOBUF_UTF8_VALIDATION_ENABLED
 #endif
@@ -70,7 +70,7 @@
 
 
 // Must be included last.
-#include "google/protobuf/port_def.inc"
+#include <google/protobuf/port_def.inc>
 
 namespace google {
 namespace protobuf {
@@ -87,7 +87,6 @@ namespace internal {
 // This class is really a namespace that contains only static methods.
 class PROTOBUF_EXPORT WireFormatLite {
  public:
-  WireFormatLite() = delete;
   // -----------------------------------------------------------------
   // Helper constants and functions related to the format.  These are
   // mostly meant for internal and generated code to use.
@@ -103,11 +102,7 @@ class PROTOBUF_EXPORT WireFormatLite {
   // identifies the encoding of this data, it is possible to skip
   // unrecognized fields for forwards compatibility.
 
-  enum WireType
-#ifndef SWIG
-      : int
-#endif  // !SWIG
-  {
+  enum WireType {
     WIRETYPE_VARINT = 0,
     WIRETYPE_FIXED64 = 1,
     WIRETYPE_LENGTH_DELIMITED = 2,
@@ -747,6 +742,8 @@ class PROTOBUF_EXPORT WireFormatLite {
   static const WireFormatLite::WireType kWireTypeForFieldType[];
   static void WriteSubMessageMaybeToArray(int size, const MessageLite& value,
                                           io::CodedOutputStream* output);
+
+  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(WireFormatLite);
 };
 
 // A class which deals with unknown values.  The default implementation just
@@ -821,19 +818,19 @@ inline size_t WireFormatLite::TagSize(int field_number,
 }
 
 inline uint32_t WireFormatLite::EncodeFloat(float value) {
-  return absl::bit_cast<uint32_t>(value);
+  return bit_cast<uint32_t>(value);
 }
 
 inline float WireFormatLite::DecodeFloat(uint32_t value) {
-  return absl::bit_cast<float>(value);
+  return bit_cast<float>(value);
 }
 
 inline uint64_t WireFormatLite::EncodeDouble(double value) {
-  return absl::bit_cast<uint64_t>(value);
+  return bit_cast<uint64_t>(value);
 }
 
 inline double WireFormatLite::DecodeDouble(uint64_t value) {
-  return absl::bit_cast<double>(value);
+  return bit_cast<double>(value);
 }
 
 // ZigZag Transform:  Encodes signed integers so that they can be
@@ -1906,6 +1903,6 @@ bool ParseMessageSetItemImpl(io::CodedInputStream* input, MS ms) {
 }  // namespace protobuf
 }  // namespace google
 
-#include "google/protobuf/port_undef.inc"
+#include <google/protobuf/port_undef.inc>
 
 #endif  // GOOGLE_PROTOBUF_WIRE_FORMAT_LITE_H__
