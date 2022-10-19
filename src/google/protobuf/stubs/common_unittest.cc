@@ -40,6 +40,7 @@
 #include "absl/strings/substitute.h"
 #include "google/protobuf/stubs/callback.h"
 #include "google/protobuf/stubs/logging.h"
+#include "google/protobuf/stubs/strutil.h"
 #include "google/protobuf/testing/googletest.h"
 
 namespace google {

@@ -30,17 +30,14 @@
 
 #include "google/protobuf/compiler/objectivec/text_format_decode_data.h"
 
-#include <iostream>
-#include <ostream>
-#include <sstream>
-#include <string>
-#include <vector>
-
-#include "google/protobuf/compiler/code_generator.h"
 #include "absl/strings/ascii.h"
 #include "absl/strings/escaping.h"
-#include "absl/strings/match.h"
+#include "absl/strings/str_replace.h"
+#include "absl/strings/str_split.h"
+#include "google/protobuf/compiler/code_generator.h"
+#include "google/protobuf/compiler/objectivec/names.h"
 #include "google/protobuf/io/coded_stream.h"
+#include "google/protobuf/io/printer.h"
 #include "google/protobuf/io/zero_copy_stream_impl.h"
 
 // NOTE: src/google/protobuf/compiler/plugin.cc makes use of cerr for some
@@ -170,6 +167,10 @@ std::string DirectDecodeString(const std::string& str) {
 
 }  // namespace
 
+TextFormatDecodeData::TextFormatDecodeData() {}
+
+TextFormatDecodeData::~TextFormatDecodeData() {}
+
 void TextFormatDecodeData::AddString(int32_t key,
                                      const std::string& input_for_decode,
                                      const std::string& desired_output) {
@@ -218,8 +219,8 @@ std::string TextFormatDecodeData::DecodeDataForString(
     std::cerr.flush();
     abort();
   }
-  if ((absl::StrContains(input_for_decode, '\0')) ||
-      (absl::StrContains(desired_output, '\0'))) {
+  if ((input_for_decode.find('\0') != std::string::npos) ||
+      (desired_output.find('\0') != std::string::npos)) {
     std::cerr
         << "error: got a null char in a string for making TextFormat data,"
         << " input: \"" << absl::CEscape(input_for_decode) << "\", desired: \""

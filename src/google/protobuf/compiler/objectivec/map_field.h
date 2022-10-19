@@ -32,8 +32,6 @@
 #define GOOGLE_PROTOBUF_COMPILER_OBJECTIVEC_MAP_FIELD_H__
 
 #include <map>
-#include <memory>
-#include <set>
 #include <string>
 
 #include "google/protobuf/compiler/objectivec/field.h"
@@ -47,19 +45,20 @@ class MapFieldGenerator : public RepeatedFieldGenerator {
   friend FieldGenerator* FieldGenerator::Make(const FieldDescriptor* field);
 
  public:
-  void FinishInitialization() override;
+  virtual void FinishInitialization(void) override;
 
   MapFieldGenerator(const MapFieldGenerator&) = delete;
   MapFieldGenerator& operator=(const MapFieldGenerator&) = delete;
 
  protected:
   explicit MapFieldGenerator(const FieldDescriptor* descriptor);
-  ~MapFieldGenerator() override = default;
+  virtual ~MapFieldGenerator();
 
-  void DetermineObjectiveCClassDefinitions(
+  virtual void DetermineObjectiveCClassDefinitions(
       std::set<std::string>* fwd_decls) const override;
-  void DetermineForwardDeclarations(std::set<std::string>* fwd_decls,
-                                    bool include_external_types) const override;
+  virtual void DetermineForwardDeclarations(
+      std::set<std::string>* fwd_decls,
+      bool include_external_types) const override;
 
  private:
   std::unique_ptr<FieldGenerator> value_field_generator_;

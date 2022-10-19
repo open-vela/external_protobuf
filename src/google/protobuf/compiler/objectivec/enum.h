@@ -46,7 +46,7 @@ namespace objectivec {
 class EnumGenerator {
  public:
   explicit EnumGenerator(const EnumDescriptor* descriptor);
-  ~EnumGenerator() = default;
+  ~EnumGenerator();
 
   EnumGenerator(const EnumGenerator&) = delete;
   EnumGenerator& operator=(const EnumGenerator&) = delete;

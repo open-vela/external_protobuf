@@ -31,9 +31,7 @@
 #include "google/protobuf/compiler/objectivec/enum.h"
 
 #include <algorithm>
-#include <limits>
 #include <map>
-#include <set>
 #include <string>
 
 #include "absl/strings/escaping.h"
@@ -91,6 +89,8 @@ EnumGenerator::EnumGenerator(const EnumDescriptor* descriptor)
     all_values_.push_back(value);
   }
 }
+
+EnumGenerator::~EnumGenerator() {}
 
 void EnumGenerator::GenerateHeader(io::Printer* printer) {
   std::string enum_comments;
@@ -151,7 +151,7 @@ void EnumGenerator::GenerateHeader(io::Printer* printer) {
         if (i > 0) {
           printer->Print("\n");
         }
-        printer->Print(comments);
+        printer->Print(comments.c_str());
       }
     }
 

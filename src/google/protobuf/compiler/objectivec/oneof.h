@@ -31,7 +31,6 @@
 #ifndef GOOGLE_PROTOBUF_COMPILER_OBJECTIVEC_ONEOF_H__
 #define GOOGLE_PROTOBUF_COMPILER_OBJECTIVEC_ONEOF_H__
 
-#include <map>
 #include <set>
 #include <string>
 #include <vector>
@@ -47,7 +46,7 @@ namespace objectivec {
 class OneofGenerator {
  public:
   explicit OneofGenerator(const OneofDescriptor* descriptor);
-  ~OneofGenerator() = default;
+  ~OneofGenerator();
 
   OneofGenerator(const OneofGenerator&) = delete;
   OneofGenerator& operator=(const OneofGenerator&) = delete;
@@ -62,8 +61,8 @@ class OneofGenerator {
   void GeneratePropertyImplementation(io::Printer* printer);
   void GenerateClearFunctionImplementation(io::Printer* printer);
 
-  std::string DescriptorName() const;
-  std::string HasIndexAsString() const;
+  std::string DescriptorName(void) const;
+  std::string HasIndexAsString(void) const;
 
  private:
   const OneofDescriptor* descriptor_;

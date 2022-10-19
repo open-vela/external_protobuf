@@ -32,12 +32,8 @@
 #define GOOGLE_PROTOBUF_COMPILER_OBJECTIVEC_FIELD_H__
 
 #include <map>
-#include <memory>
-#include <set>
 #include <string>
-#include <vector>
 
-#include "absl/strings/match.h"
 #include "google/protobuf/descriptor.h"
 #include "google/protobuf/io/printer.h"
 
@@ -50,7 +46,7 @@ class FieldGenerator {
  public:
   static FieldGenerator* Make(const FieldDescriptor* field);
 
-  virtual ~FieldGenerator() = default;
+  virtual ~FieldGenerator();
 
   FieldGenerator(const FieldGenerator&) = delete;
   FieldGenerator& operator=(const FieldGenerator&) = delete;
@@ -79,10 +75,10 @@ class FieldGenerator {
   void GenerateFieldNumberConstant(io::Printer* printer) const;
 
   // Exposed to get and set the has bits information.
-  virtual bool RuntimeUsesHasBit() const = 0;
+  virtual bool RuntimeUsesHasBit(void) const = 0;
   void SetRuntimeHasBit(int has_index);
-  void SetNoHasBit();
-  virtual int ExtraRuntimeHasBitsNeeded() const;
+  void SetNoHasBit(void);
+  virtual int ExtraRuntimeHasBitsNeeded(void) const;
   virtual void SetExtraRuntimeHasBitsBase(int index_base);
   void SetOneofIndexBase(int index_base);
 
@@ -92,7 +88,8 @@ class FieldGenerator {
 
   bool needs_textformat_name_support() const {
     const std::string& field_flags = variable("fieldflags");
-    return absl::StrContains(field_flags, "GPBFieldTextFormatNameCustom");
+    return field_flags.find("GPBFieldTextFormatNameCustom") !=
+           std::string::npos;
   }
   std::string generated_objc_name() const { return variable("name"); }
   std::string raw_field_name() const { return variable("raw_field_name"); }
@@ -100,8 +97,8 @@ class FieldGenerator {
  protected:
   explicit FieldGenerator(const FieldDescriptor* descriptor);
 
-  virtual void FinishInitialization();
-  bool WantsHasProperty() const;
+  virtual void FinishInitialization(void);
+  bool WantsHasProperty(void) const;
 
   const FieldDescriptor* descriptor_;
   std::map<std::string, std::string> variables_;
@@ -109,17 +106,19 @@ class FieldGenerator {
 
 class SingleFieldGenerator : public FieldGenerator {
  public:
-  ~SingleFieldGenerator() override = default;
+  virtual ~SingleFieldGenerator();
 
   SingleFieldGenerator(const SingleFieldGenerator&) = delete;
   SingleFieldGenerator& operator=(const SingleFieldGenerator&) = delete;
 
-  void GenerateFieldStorageDeclaration(io::Printer* printer) const override;
-  void GeneratePropertyDeclaration(io::Printer* printer) const override;
+  virtual void GenerateFieldStorageDeclaration(
+      io::Printer* printer) const override;
+  virtual void GeneratePropertyDeclaration(io::Printer* printer) const override;
 
-  void GeneratePropertyImplementation(io::Printer* printer) const override;
+  virtual void GeneratePropertyImplementation(
+      io::Printer* printer) const override;
 
-  bool RuntimeUsesHasBit() const override;
+  virtual bool RuntimeUsesHasBit(void) const override;
 
  protected:
   explicit SingleFieldGenerator(const FieldDescriptor* descriptor);
@@ -128,13 +127,14 @@ class SingleFieldGenerator : public FieldGenerator {
 // Subclass with common support for when the field ends up as an ObjC Object.
 class ObjCObjFieldGenerator : public SingleFieldGenerator {
  public:
-  ~ObjCObjFieldGenerator() override = default;
+  virtual ~ObjCObjFieldGenerator();
 
   ObjCObjFieldGenerator(const ObjCObjFieldGenerator&) = delete;
   ObjCObjFieldGenerator& operator=(const ObjCObjFieldGenerator&) = delete;
 
-  void GenerateFieldStorageDeclaration(io::Printer* printer) const override;
-  void GeneratePropertyDeclaration(io::Printer* printer) const override;
+  virtual void GenerateFieldStorageDeclaration(
+      io::Printer* printer) const override;
+  virtual void GeneratePropertyDeclaration(io::Printer* printer) const override;
 
  protected:
   explicit ObjCObjFieldGenerator(const FieldDescriptor* descriptor);
@@ -142,28 +142,30 @@ class ObjCObjFieldGenerator : public SingleFieldGenerator {
 
 class RepeatedFieldGenerator : public ObjCObjFieldGenerator {
  public:
-  ~RepeatedFieldGenerator() override = default;
+  virtual ~RepeatedFieldGenerator();
 
   RepeatedFieldGenerator(const RepeatedFieldGenerator&) = delete;
   RepeatedFieldGenerator& operator=(const RepeatedFieldGenerator&) = delete;
 
-  void GenerateFieldStorageDeclaration(io::Printer* printer) const override;
-  void GeneratePropertyDeclaration(io::Printer* printer) const override;
+  virtual void GenerateFieldStorageDeclaration(
+      io::Printer* printer) const override;
+  virtual void GeneratePropertyDeclaration(io::Printer* printer) const override;
 
-  void GeneratePropertyImplementation(io::Printer* printer) const override;
+  virtual void GeneratePropertyImplementation(
+      io::Printer* printer) const override;
 
-  bool RuntimeUsesHasBit() const override;
+  virtual bool RuntimeUsesHasBit(void) const override;
 
  protected:
   explicit RepeatedFieldGenerator(const FieldDescriptor* descriptor);
-  void FinishInitialization() override;
+  virtual void FinishInitialization(void) override;
 };
 
 // Convenience class which constructs FieldGenerators for a Descriptor.
 class FieldGeneratorMap {
  public:
   explicit FieldGeneratorMap(const Descriptor* descriptor);
-  ~FieldGeneratorMap() = default;
+  ~FieldGeneratorMap();
 
   FieldGeneratorMap(const FieldGeneratorMap&) = delete;
   FieldGeneratorMap& operator=(const FieldGeneratorMap&) = delete;
@@ -172,12 +174,12 @@ class FieldGeneratorMap {
   const FieldGenerator& get_extension(int index) const;
 
   // Assigns the has bits and returns the number of bits needed.
-  int CalculateHasBits();
+  int CalculateHasBits(void);
 
   void SetOneofIndexBase(int index_base);
 
   // Check if any field of this message has a non zero default.
-  bool DoesAnyFieldHaveNonZeroDefault() const;
+  bool DoesAnyFieldHaveNonZeroDefault(void) const;
 
  private:
   const Descriptor* descriptor_;

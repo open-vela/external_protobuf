@@ -36,6 +36,7 @@
 
 #include <iostream>
 #include <stack>
+#include <unordered_map>
 
 #include "google/protobuf/stubs/logging.h"
 #include "google/protobuf/stubs/common.h"
