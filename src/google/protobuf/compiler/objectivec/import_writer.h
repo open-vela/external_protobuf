@@ -31,7 +31,6 @@
 #ifndef GOOGLE_PROTOBUF_COMPILER_OBJECTIVEC_IMPORT_WRITER_H__
 #define GOOGLE_PROTOBUF_COMPILER_OBJECTIVEC_IMPORT_WRITER_H__
 
-#include <map>
 #include <string>
 #include <vector>
 
@@ -51,7 +50,7 @@ class ImportWriter {
                const std::string& named_framework_to_proto_path_mappings_path,
                const std::string& runtime_import_prefix,
                bool include_wkt_imports);
-  ~ImportWriter() = default;
+  ~ImportWriter();
 
   void AddFile(const FileDescriptor* file, const std::string& header_extension);
   void Print(io::Printer* printer) const;

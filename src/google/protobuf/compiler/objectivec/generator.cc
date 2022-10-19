@@ -32,16 +32,14 @@
 
 #include <fstream>
 #include <iostream>
-#include <memory>
 #include <string>
-#include <utility>
-#include <vector>
+#include <unordered_set>
 
-#include "absl/container/flat_hash_set.h"
 #include "absl/strings/ascii.h"
 #include "absl/strings/str_split.h"
 #include "absl/strings/strip.h"
 #include "google/protobuf/compiler/objectivec/file.h"
+#include "google/protobuf/compiler/objectivec/helpers.h"
 #include "google/protobuf/compiler/objectivec/names.h"
 #include "google/protobuf/io/printer.h"
 #include "google/protobuf/io/zero_copy_stream.h"
@@ -72,6 +70,10 @@ bool StringToBool(const std::string& value, bool* result) {
 }
 
 }  // namespace
+
+ObjectiveCGenerator::ObjectiveCGenerator() {}
+
+ObjectiveCGenerator::~ObjectiveCGenerator() {}
 
 bool ObjectiveCGenerator::HasGenerateAll() const { return true; }
 
@@ -125,7 +127,7 @@ bool ObjectiveCGenerator::GenerateAll(
       // exclude from the package prefix validations (expected_prefixes_path).
       // This is provided as an "out", to skip some files being checked.
       for (absl::string_view split_piece :
-           absl::StrSplit(options[i].second, ';', absl::SkipEmpty())) {
+           absl::StrSplit(options[i].second, ";", absl::SkipEmpty())) {
         validation_options.expected_prefixes_suppressions.push_back(
             std::string(split_piece));
       }
@@ -259,9 +261,9 @@ bool ObjectiveCGenerator::GenerateAll(
 
   // These are not official generation options and could be removed/changed in
   // the future and doing that won't count as a breaking change.
-  bool headers_only = getenv("GPB_OBJC_HEADERS_ONLY") != nullptr;
-  absl::flat_hash_set<std::string> skip_impls;
-  if (getenv("GPB_OBJC_SKIP_IMPLS_FILE") != nullptr) {
+  bool headers_only = getenv("GPB_OBJC_HEADERS_ONLY") != NULL;
+  std::unordered_set<std::string> skip_impls;
+  if (getenv("GPB_OBJC_SKIP_IMPLS_FILE") != NULL) {
     std::ifstream skip_file(getenv("GPB_OBJC_SKIP_IMPLS_FILE"));
     if (skip_file.is_open()) {
       std::string line;

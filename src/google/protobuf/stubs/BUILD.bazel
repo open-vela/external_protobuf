@@ -12,9 +12,13 @@ package(
 cc_library(
     name = "lite",
     srcs = [
+        "bytestream.cc",
         "common.cc",
+        "structurally_valid.cc",
+        "strutil.cc",
     ],
     hdrs = [
+        "bytestream.h",
         "callback.h",
         "common.h",
         "logging.h",
@@ -22,6 +26,7 @@ cc_library(
         "platform_macros.h",
         "port.h",
         "status_macros.h",
+        "strutil.h",
     ],
     copts = COPTS,
     include_prefix = "google/protobuf/stubs",
@@ -42,6 +47,7 @@ cc_library(
     copts = COPTS,
     include_prefix = "google/protobuf/stubs",
     textual_hdrs = [
+        "bytestream.h",
         "callback.h",
         "common.h",
         "logging.h",
@@ -49,6 +55,7 @@ cc_library(
         "platform_macros.h",
         "port.h",
         "status_macros.h",
+        "strutil.h",
     ],
     deps = [
         ":lite",
@@ -62,7 +69,10 @@ cc_library(
 cc_test(
     name = "stubs_test",
     srcs = [
+        "bytestream_unittest.cc",
         "common_unittest.cc",
+        "structurally_valid_unittest.cc",
+        "strutil_unittest.cc",
     ],
     copts = COPTS + select({
         "//build_defs:config_msvc": [],

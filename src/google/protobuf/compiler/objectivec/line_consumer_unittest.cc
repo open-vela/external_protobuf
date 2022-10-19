@@ -30,12 +30,8 @@
 
 #include "google/protobuf/compiler/objectivec/line_consumer.h"
 
-#include <string>
-#include <tuple>
-#include <utility>
-#include <vector>
-
 #include <gtest/gtest.h>
+
 #include "absl/strings/str_cat.h"
 #include "google/protobuf/io/zero_copy_stream_impl_lite.h"
 
@@ -52,7 +48,8 @@ class TestLineCollector : public LineConsumer {
                              bool skip_msg = false)
       : lines_(inout_lines), reject_(reject_line), skip_msg_(skip_msg) {}
 
-  bool ConsumeLine(absl::string_view line, std::string* out_error) override {
+  bool ConsumeLine(const absl::string_view& line,
+                   std::string* out_error) override {
     if (reject_ && *reject_ == line) {
       if (!skip_msg_) {
         *out_error = std::string("Rejected '") + *reject_ + "'";

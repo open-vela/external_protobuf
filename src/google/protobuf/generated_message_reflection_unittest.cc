@@ -50,7 +50,6 @@
 #include "google/protobuf/stubs/common.h"
 #include "google/protobuf/map_unittest.pb.h"
 #include "google/protobuf/unittest.pb.h"
-#include "google/protobuf/unittest.pb.h"
 #include "google/protobuf/unittest_mset.pb.h"
 #include "google/protobuf/unittest_mset_wire_format.pb.h"
 #include "google/protobuf/arena.h"

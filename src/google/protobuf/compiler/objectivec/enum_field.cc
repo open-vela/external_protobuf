@@ -31,7 +31,6 @@
 #include "google/protobuf/compiler/objectivec/enum_field.h"
 
 #include <map>
-#include <set>
 #include <string>
 
 #include "google/protobuf/compiler/objectivec/helpers.h"
@@ -71,6 +70,8 @@ EnumFieldGenerator::EnumFieldGenerator(const FieldDescriptor* descriptor)
     : SingleFieldGenerator(descriptor) {
   SetEnumVariables(descriptor, &variables_);
 }
+
+EnumFieldGenerator::~EnumFieldGenerator() {}
 
 void EnumFieldGenerator::GenerateCFunctionDeclarations(
     io::Printer* printer) const {
@@ -141,7 +142,9 @@ RepeatedEnumFieldGenerator::RepeatedEnumFieldGenerator(
   variables_["array_storage_type"] = "GPBEnumArray";
 }
 
-void RepeatedEnumFieldGenerator::FinishInitialization() {
+RepeatedEnumFieldGenerator::~RepeatedEnumFieldGenerator() {}
+
+void RepeatedEnumFieldGenerator::FinishInitialization(void) {
   RepeatedFieldGenerator::FinishInitialization();
   variables_["array_comment"] = "// |" + variables_["name"] + "| contains |" +
                                 variables_["storage_type"] + "|\n";
