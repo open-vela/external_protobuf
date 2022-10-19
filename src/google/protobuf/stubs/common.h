@@ -43,10 +43,27 @@
 #include <string>
 #include <vector>
 
-#include <google/protobuf/stubs/macros.h>
-#include <google/protobuf/stubs/platform_macros.h>
-#include <google/protobuf/stubs/port.h>
-#include <google/protobuf/stubs/stringpiece.h>
+#include "absl/strings/string_view.h"
+#include "google/protobuf/stubs/platform_macros.h"
+#include "google/protobuf/stubs/port.h"
+
+// Enforce C++14 as the minimum.
+#if defined(_MSVC_LANG)
+#if _MSVC_LANG < 201402L
+#error "C++ versions less than C++14 are not supported."
+#endif  // _MSVC_LANG < 201402L
+#elif defined(__cplusplus)
+// Special-case GCC < 5.0, as it has a strange __cplusplus value for C++14
+#if defined(__GNUC__) && __GNUC__ < 5
+#if __cplusplus < 201300L
+#error "C++ versions less than C++14 are not supported."
+#endif  // __cplusplus < 201300L
+#else // defined(__GNUC__) && __GNUC__ < 5
+#if __cplusplus < 201402L
+#error "C++ versions less than C++14 are not supported."
+#endif  // __cplusplus < 201402L
+#endif // defined(__GNUC__) && __GNUC__ < 5
+#endif
 
 #ifndef PROTOBUF_USE_EXCEPTIONS
 #if defined(_MSC_VER) && defined(_CPPUNWIND)
@@ -69,7 +86,7 @@
 #include <pthread.h>
 #endif
 
-#include <google/protobuf/port_def.inc>
+#include "google/protobuf/port_def.inc"
 
 namespace std {}
 
@@ -106,7 +123,12 @@ void PROTOBUF_EXPORT VerifyVersion(int headerVersion, int minLibraryVersion,
                                    const char* filename);
 
 // Converts a numeric version number to a string.
-std::string PROTOBUF_EXPORT VersionString(int version);
+std::string PROTOBUF_EXPORT
+VersionString(int version);  // NOLINT(runtime/string)
+
+// Prints the protoc compiler version (no major version)
+std::string PROTOBUF_EXPORT
+ProtocVersionString(int version);  // NOLINT(runtime/string)
 
 }  // namespace internal
 
@@ -129,12 +151,12 @@ namespace internal {
 // structurally_valid.cc.
 PROTOBUF_EXPORT bool IsStructurallyValidUTF8(const char* buf, int len);
 
-inline bool IsStructurallyValidUTF8(StringPiece str) {
+inline bool IsStructurallyValidUTF8(absl::string_view str) {
   return IsStructurallyValidUTF8(str.data(), static_cast<int>(str.length()));
 }
 
 // Returns initial number of bytes of structurally valid UTF-8.
-PROTOBUF_EXPORT int UTF8SpnStructurallyValid(StringPiece str);
+PROTOBUF_EXPORT int UTF8SpnStructurallyValid(absl::string_view str);
 
 // Coerce UTF-8 byte string in src_str to be
 // a structurally-valid equal-length string by selectively
@@ -148,7 +170,8 @@ PROTOBUF_EXPORT int UTF8SpnStructurallyValid(StringPiece str);
 //
 // Optimized for: all structurally valid and no byte copying is done.
 //
-PROTOBUF_EXPORT char* UTF8CoerceToStructurallyValid(StringPiece str, char* dst,
+PROTOBUF_EXPORT char* UTF8CoerceToStructurallyValid(absl::string_view str,
+                                                    char* dst,
                                                     char replace_char);
 
 }  // namespace internal
@@ -192,6 +215,6 @@ class FatalException : public std::exception {
 }  // namespace protobuf
 }  // namespace google
 
-#include <google/protobuf/port_undef.inc>
+#include "google/protobuf/port_undef.inc"
 
 #endif  // GOOGLE_PROTOBUF_COMMON_H__
