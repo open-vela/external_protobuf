@@ -29,10 +29,14 @@ from distutils.spawn import find_executable
 # Find the Protocol Compiler.
 if 'PROTOC' in os.environ and os.path.exists(os.environ['PROTOC']):
   protoc = os.environ['PROTOC']
-elif os.path.exists('../src/protoc'):
-  protoc = '../src/protoc'
-elif os.path.exists('../src/protoc.exe'):
-  protoc = '../src/protoc.exe'
+elif os.path.exists('../bazel-bin/protoc'):
+  protoc = '../bazel-bin/protoc'
+elif os.path.exists('../bazel-bin/protoc.exe'):
+  protoc = '../bazel-bin/protoc.exe'
+elif os.path.exists('protoc'):
+  protoc = '../protoc'
+elif os.path.exists('protoc.exe'):
+  protoc = '../protoc.exe'
 elif os.path.exists('../vsprojects/Debug/protoc.exe'):
   protoc = '../vsprojects/Debug/protoc.exe'
 elif os.path.exists('../vsprojects/Release/protoc.exe'):
@@ -203,13 +207,13 @@ class BuildExtCmd(_build_ext):
 
 
 class TestConformanceCmd(_build_py):
-  target = 'test_python'
+  target = '//python:conformance_test'
 
   def run(self):
     # Python 2.6 dodges these extra failures.
     os.environ['CONFORMANCE_PYTHON_EXTRA_FAILURES'] = (
         '--failure_list failure_list_python-post26.txt')
-    cmd = 'cd ../conformance && make %s' % (TestConformanceCmd.target)
+    cmd = 'bazel test %s' % (TestConformanceCmd.target,)
     subprocess.check_call(cmd, shell=True)
 
 
@@ -220,6 +224,59 @@ def GetOptionFromArgv(option_str):
   return False
 
 
+def _GetFlagValues(flag_long, flag_short):
+  """Searches sys.argv for distutils-style flags and yields values."""
+
+  expect_value = flag_long.endswith('=')
+  flag_res = [re.compile(r'--?%s(=(.*))?' %
+                         (flag_long[:-1] if expect_value else flag_long))]
+  if flag_short:
+    flag_res.append(re.compile(r'-%s(.*)?' % (flag_short,)))
+
+  flag_match = None
+  for arg in sys.argv:
+    # If the last arg was like '-O', check if this is the library we want.
+    if flag_match is not None:
+      yield arg
+      flag_match = None
+      continue
+
+    for flag_re in flag_res:
+      m = flag_re.match(arg)
+      if m is None:
+        continue
+      if not expect_value:
+        yield arg
+        continue
+      groups = m.groups()
+      # Check for matches:
+      #   --long-name=foo => ('=foo', 'foo')
+      #   -Xfoo => ('foo')
+      # N.B.: if the flag is like '--long-name=', then there is a value
+      # (the empty string).
+      if groups[0] or groups[-1]:
+        yield groups[-1]
+        continue
+      flag_match = m
+
+  return False
+
+
+def HasStaticLibprotobufOpt():
+  """Returns true if there is a --link-objects arg for libprotobuf."""
+
+  lib_re = re.compile(r'(.*[/\\])?(lib)?protobuf([.]pic)?[.](a|lib)')
+  for value in _GetFlagValues('link-objects=', 'O'):
+    if lib_re.match(value):
+      return True
+  return False
+
+
+def HasLibraryDirsOpt():
+  """Returns true if there is a --library-dirs arg."""
+  return any(_GetFlagValues('library-dirs=', 'L'))
+
+
 if __name__ == '__main__':
   ext_module_list = []
   warnings_as_errors = '--warnings_as_errors'
@@ -227,14 +284,39 @@ if __name__ == '__main__':
     # Link libprotobuf.a and libprotobuf-lite.a statically with the
     # extension. Note that those libraries have to be compiled with
     # -fPIC for this to work.
-    compile_static_ext = GetOptionFromArgv('--compile_static_extension')
-    libraries = ['protobuf']
+    compile_static_ext = HasStaticLibprotobufOpt()
+    if GetOptionFromArgv('--compile_static_extension'):
+      # FUTURE: add a warning and deprecate --compile_static_extension.
+      compile_static_ext = True
     extra_objects = None
     if compile_static_ext:
       libraries = None
-      extra_objects = ['../src/.libs/libprotobuf.a',
-                       '../src/.libs/libprotobuf-lite.a']
-    TestConformanceCmd.target = 'test_python_cpp'
+      library_dirs = None
+      if not HasStaticLibprotobufOpt():
+        if os.path.exists('../bazel-bin/src/google/protobuf/libprotobuf.a'):
+          extra_objects = ['../bazel-bin/src/google/protobuf/libprotobuf.a']
+        else:
+          extra_objects = ['../libprotobuf.a']
+          extra_objects += list(
+              glob.iglob('../third_party/utf8_range/*.a'))
+          # Repeat all of these enough times to eliminate order-dependence.
+          extra_objects += list(
+              glob.iglob('../third_party/abseil-cpp/absl/**/*.a'))
+          extra_objects += list(
+              glob.iglob('../third_party/abseil-cpp/absl/**/*.a'))
+          extra_objects += list(
+              glob.iglob('../third_party/abseil-cpp/absl/**/*.a'))
+    else:
+      libraries = ['protobuf']
+      if HasLibraryDirsOpt():
+        library_dirs = None
+      elif os.path.exists('../bazel-bin/src/google/protobuf/libprotobuf.a'):
+        library_dirs = ['../bazel-bin/src/google/protobuf']
+      else:
+        library_dirs = ['..']
+
+    TestConformanceCmd.target = ('//python:conformance_test_cpp '
+                                 '--define=use_fast_cpp_protos=true')
 
     extra_compile_args = []
 
@@ -259,7 +341,7 @@ if __name__ == '__main__':
       extra_compile_args.append('-Wno-invalid-offsetof')
       extra_compile_args.append('-Wno-sign-compare')
       extra_compile_args.append('-Wno-unused-variable')
-      extra_compile_args.append('-std=c++11')
+      extra_compile_args.append('-std=c++14')
 
     if sys.platform == 'darwin':
       extra_compile_args.append('-Wno-shorten-64-to-32')
@@ -301,11 +383,11 @@ if __name__ == '__main__':
         Extension(
             'google.protobuf.pyext._message',
             glob.glob('google/protobuf/pyext/*.cc'),
-            include_dirs=['.', '../src'],
+            include_dirs=['.', '../src', '../third_party/abseil-cpp'],
             libraries=libraries,
             extra_objects=extra_objects,
             extra_link_args=message_extra_link_args,
-            library_dirs=['../src/.libs'],
+            library_dirs=library_dirs,
             extra_compile_args=extra_compile_args,
         ),
         Extension(

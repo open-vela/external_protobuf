@@ -32,13 +32,12 @@
 //  Based on original Protocol Buffers design by
 //  Sanjay Ghemawat, Jeff Dean, and others.
 
-#include <google/protobuf/compiler/cpp/enum_field.h>
+#include "google/protobuf/compiler/cpp/enum_field.h"
 
-#include <google/protobuf/io/printer.h>
-#include <google/protobuf/wire_format.h>
-#include <google/protobuf/stubs/strutil.h>
-#include <google/protobuf/compiler/cpp/field.h>
-#include <google/protobuf/compiler/cpp/helpers.h>
+#include "google/protobuf/io/printer.h"
+#include "google/protobuf/wire_format.h"
+#include "google/protobuf/compiler/cpp/field.h"
+#include "google/protobuf/compiler/cpp/helpers.h"
 
 namespace google {
 namespace protobuf {
@@ -104,7 +103,7 @@ void EnumFieldGenerator::GenerateInlineAccessorDefinitions(
       "  return _internal_$name$();\n"
       "}\n"
       "inline void $classname$::_internal_set_$name$($type$ value) {\n");
-  if (!HasPreservingUnknownEnumSemantics(descriptor_)) {
+  if (!internal::cpp::HasPreservingUnknownEnumSemantics(descriptor_)) {
     format("  assert($type$_IsValid(value));\n");
   }
   format(
@@ -204,7 +203,7 @@ void EnumOneofFieldGenerator::GenerateInlineAccessorDefinitions(
       "  return _internal_$name$();\n"
       "}\n"
       "inline void $classname$::_internal_set_$name$($type$ value) {\n");
-  if (!HasPreservingUnknownEnumSemantics(descriptor_)) {
+  if (!internal::cpp::HasPreservingUnknownEnumSemantics(descriptor_)) {
     format("  assert($type$_IsValid(value));\n");
   }
   format(
@@ -252,7 +251,9 @@ void RepeatedEnumFieldGenerator::GeneratePrivateMembers(
   format("::$proto_ns$::RepeatedField<int> $name$_;\n");
   if (descriptor_->is_packed() &&
       HasGeneratedMethods(descriptor_->file(), options_)) {
-    format("mutable std::atomic<int> $cached_byte_size_name$;\n");
+    format(
+        "mutable ::$proto_ns$::internal::CachedSize "
+        "$cached_byte_size_name$;\n");
   }
 }
 
@@ -289,7 +290,7 @@ void RepeatedEnumFieldGenerator::GenerateInlineAccessorDefinitions(
       "  return _internal_$name$(index);\n"
       "}\n"
       "inline void $classname$::set_$name$(int index, $type$ value) {\n");
-  if (!HasPreservingUnknownEnumSemantics(descriptor_)) {
+  if (!internal::cpp::HasPreservingUnknownEnumSemantics(descriptor_)) {
     format("  assert($type$_IsValid(value));\n");
   }
   format(
@@ -298,7 +299,7 @@ void RepeatedEnumFieldGenerator::GenerateInlineAccessorDefinitions(
       "  // @@protoc_insertion_point(field_set:$full_name$)\n"
       "}\n"
       "inline void $classname$::_internal_add_$name$($type$ value) {\n");
-  if (!HasPreservingUnknownEnumSemantics(descriptor_)) {
+  if (!internal::cpp::HasPreservingUnknownEnumSemantics(descriptor_)) {
     format("  assert($type$_IsValid(value));\n");
   }
   format(
@@ -364,7 +365,7 @@ void RepeatedEnumFieldGenerator::GenerateSerializeWithCachedSizesToArray(
     format(
         "{\n"
         "  int byte_size = "
-        "$cached_byte_size_field$.load(std::memory_order_relaxed);\n"
+        "$cached_byte_size_field$.Get();\n"
         "  if (byte_size > 0) {\n"
         "    target = stream->WriteEnumPacked(\n"
         "        $number$, $field$, byte_size, target);\n"
@@ -384,7 +385,7 @@ void RepeatedEnumFieldGenerator::GenerateByteSize(io::Printer* printer) const {
   Formatter format(printer, variables_);
   format(
       "{\n"
-      "  size_t data_size = 0;\n"
+      "  ::size_t data_size = 0;\n"
       "  unsigned int count = static_cast<unsigned "
       "int>(this->_internal_$name$_size());");
   format.Indent();
@@ -402,8 +403,7 @@ void RepeatedEnumFieldGenerator::GenerateByteSize(io::Printer* printer) const {
         "::_pbi::WireFormatLite::Int32Size(static_cast<$int32$>(data_size));\n"
         "}\n"
         "int cached_size = ::_pbi::ToCachedSize(data_size);\n"
-        "$cached_byte_size_field$.store(cached_size,\n"
-        "                                std::memory_order_relaxed);\n"
+        "$cached_byte_size_field$.Set(cached_size);\n"
         "total_size += data_size;\n");
   } else {
     format("total_size += ($tag_size$UL * count) + data_size;\n");
