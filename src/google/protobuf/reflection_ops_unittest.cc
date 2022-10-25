@@ -32,16 +32,17 @@
 //  Based on original Protocol Buffers design by
 //  Sanjay Ghemawat, Jeff Dean, and others.
 
-#include "google/protobuf/reflection_ops.h"
+#include <google/protobuf/reflection_ops.h>
 
-#include "google/protobuf/stubs/logging.h"
-#include "google/protobuf/stubs/common.h"
-#include "google/protobuf/unittest.pb.h"
-#include "google/protobuf/descriptor.h"
+#include <google/protobuf/stubs/logging.h>
+#include <google/protobuf/stubs/common.h>
+#include <google/protobuf/unittest.pb.h>
+#include <google/protobuf/descriptor.h>
+#include <google/protobuf/testing/googletest.h>
 #include <gtest/gtest.h>
-#include "absl/strings/str_join.h"
-#include "google/protobuf/test_util.h"
+#include <google/protobuf/test_util.h>
 
+#include <google/protobuf/stubs/strutil.h>
 
 namespace google {
 namespace protobuf {
@@ -459,7 +460,7 @@ TEST(ReflectionOpsTest, OneofIsInitialized) {
 static std::string FindInitializationErrors(const Message& message) {
   std::vector<std::string> errors;
   ReflectionOps::FindInitializationErrors(message, "", &errors);
-  return absl::StrJoin(errors, ",");
+  return Join(errors, ",");
 }
 
 TEST(ReflectionOpsTest, FindInitializationErrors) {
