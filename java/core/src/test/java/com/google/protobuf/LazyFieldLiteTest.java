@@ -238,6 +238,7 @@ public class LazyFieldLiteTest {
         .isEqualTo(messageWithExtensions);
   }
 
+
   // Help methods.
 
   private LazyFieldLite createLazyFieldLiteFromMessage(MessageLite message) {
@@ -261,4 +262,5 @@ public class LazyFieldLiteTest {
     assertThat(unexpected).isNotSameInstanceAs(actual);
     assertThat((unexpected != null && unexpected.equals(actual))).isFalse();
   }
+
 }
