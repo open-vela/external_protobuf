@@ -35,29 +35,31 @@
 // This test is testing a lot more than just the UnknownFieldSet class.  It
 // tests handling of unknown fields throughout the system.
 
-#include <google/protobuf/unknown_field_set.h>
+#include "google/protobuf/unknown_field_set.h"
 
 #include <string>
-#include <unordered_set>
 #include <vector>
 
-#include <google/protobuf/stubs/callback.h>
-#include <google/protobuf/stubs/common.h>
-#include <google/protobuf/stubs/logging.h>
-#include <google/protobuf/unittest.pb.h>
-#include <google/protobuf/unittest_lite.pb.h>
-#include <google/protobuf/io/coded_stream.h>
-#include <google/protobuf/io/zero_copy_stream_impl.h>
-#include <google/protobuf/descriptor.h>
-#include <google/protobuf/stubs/mutex.h>
-#include <google/protobuf/text_format.h>
-#include <google/protobuf/wire_format.h>
+#include "google/protobuf/stubs/callback.h"
+#include "google/protobuf/stubs/common.h"
+#include "google/protobuf/stubs/logging.h"
+#include "google/protobuf/unittest.pb.h"
+#include "google/protobuf/unittest_lite.pb.h"
+#include "google/protobuf/io/coded_stream.h"
+#include "google/protobuf/io/zero_copy_stream_impl.h"
+#include "google/protobuf/descriptor.h"
+#include "google/protobuf/text_format.h"
+#include "google/protobuf/wire_format.h"
 #include <gmock/gmock.h>
-#include <google/protobuf/testing/googletest.h>
+#include "google/protobuf/testing/googletest.h"
 #include <gtest/gtest.h>
-#include <google/protobuf/stubs/time.h>
-#include <google/protobuf/test_util.h>
-#include <google/protobuf/stubs/stl_util.h>
+#include "absl/container/flat_hash_set.h"
+#include "absl/strings/cord.h"
+#include "absl/synchronization/mutex.h"
+#include "absl/time/clock.h"
+#include "absl/time/time.h"
+#include "google/protobuf/test_util.h"
+
 
 namespace google {
 namespace protobuf {
@@ -134,7 +136,7 @@ TEST_F(UnknownFieldSetTest, AllFieldsPresent) {
     }
   }
 
-  std::unordered_set<uint32_t> unknown_tags;
+  absl::flat_hash_set<uint32_t> unknown_tags;
   for (int i = 0; i < unknown_fields_->field_count(); i++) {
     unknown_tags.insert(unknown_fields_->field(i).number());
   }
@@ -204,15 +206,13 @@ TEST_F(UnknownFieldSetTest, SerializeFastAndSlowAreEquivalent) {
   slow_buffer.resize(size);
   fast_buffer.resize(size);
 
-  uint8_t* target =
-      reinterpret_cast<uint8_t*>(::google::protobuf::string_as_array(&fast_buffer));
+  uint8_t* target = reinterpret_cast<uint8_t*>(&fast_buffer[0]);
   uint8_t* result = WireFormat::SerializeUnknownFieldsToArray(
       empty_message_.unknown_fields(), target);
   EXPECT_EQ(size, result - target);
 
   {
-    io::ArrayOutputStream raw_stream(::google::protobuf::string_as_array(&slow_buffer), size,
-                                     1);
+    io::ArrayOutputStream raw_stream(&slow_buffer[0], size, 1);
     io::CodedOutputStream output_stream(&raw_stream);
     WireFormat::SerializeUnknownFields(empty_message_.unknown_fields(),
                                        &output_stream);
@@ -648,7 +648,7 @@ void CheckDeleteByNumber(const std::vector<int>& field_numbers,
   }
 }
 
-#define MAKE_VECTOR(x) std::vector<int>(x, x + GOOGLE_ARRAYSIZE(x))
+#define MAKE_VECTOR(x) std::vector<int>(x, x + ABSL_ARRAYSIZE(x))
 TEST_F(UnknownFieldSetTest, DeleteByNumber) {
   CheckDeleteByNumber(std::vector<int>(), 1, std::vector<int>());
   static const int kTestFieldNumbers1[] = {1, 2, 3};
