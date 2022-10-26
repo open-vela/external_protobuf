@@ -30,8 +30,8 @@
 
 #import "GPBTestUtilities.h"
 
-#import "objectivec/Tests/Unittest.pbobjc.h"
-#import "objectivec/Tests/UnittestObjc.pbobjc.h"
+#import "google/protobuf/Unittest.pbobjc.h"
+#import "google/protobuf/UnittestObjc.pbobjc.h"
 
 static const int kNumThreads = 100;
 static const int kNumMessages = 100;
@@ -49,7 +49,8 @@ static const int kNumMessages = 100;
 - (NSArray *)createThreadsWithSelector:(SEL)selector object:(id)object {
   NSMutableArray *array = [NSMutableArray array];
   for (NSUInteger i = 0; i < kNumThreads; i++) {
-    NSThread *thread = [[NSThread alloc] initWithTarget:self selector:selector object:object];
+    NSThread *thread =
+        [[NSThread alloc] initWithTarget:self selector:selector object:object];
     [array addObject:thread];
     [thread release];
   }
@@ -87,8 +88,9 @@ static const int kNumMessages = 100;
 
 - (void)testConcurrentReadOfUnsetMessageField {
   NSArray *messages = [self createMessagesWithType:[TestAllTypes class]];
-  NSArray *threads = [self createThreadsWithSelector:@selector(readForeignMessage:)
-                                              object:messages];
+  NSArray *threads =
+      [self createThreadsWithSelector:@selector(readForeignMessage:)
+                               object:messages];
   [self startThreads:threads];
   [self joinThreads:threads];
   for (TestAllTypes *message in messages) {
@@ -106,7 +108,9 @@ static const int kNumMessages = 100;
 
 - (void)testConcurrentReadOfUnsetRepeatedIntField {
   NSArray *messages = [self createMessagesWithType:[TestAllTypes class]];
-  NSArray *threads = [self createThreadsWithSelector:@selector(readRepeatedInt32:) object:messages];
+  NSArray *threads =
+      [self createThreadsWithSelector:@selector(readRepeatedInt32:)
+                               object:messages];
   [self startThreads:threads];
   [self joinThreads:threads];
   for (TestAllTypes *message in messages) {
@@ -124,8 +128,9 @@ static const int kNumMessages = 100;
 
 - (void)testConcurrentReadOfUnsetRepeatedStringField {
   NSArray *messages = [self createMessagesWithType:[TestAllTypes class]];
-  NSArray *threads = [self createThreadsWithSelector:@selector(readRepeatedString:)
-                                              object:messages];
+  NSArray *threads =
+      [self createThreadsWithSelector:@selector(readRepeatedString:)
+                               object:messages];
   [self startThreads:threads];
   [self joinThreads:threads];
   for (TestAllTypes *message in messages) {
@@ -142,8 +147,11 @@ static const int kNumMessages = 100;
 }
 
 - (void)testConcurrentReadOfUnsetInt32Int32MapField {
-  NSArray *messages = [self createMessagesWithType:[TestRecursiveMessageWithRepeatedField class]];
-  NSArray *threads = [self createThreadsWithSelector:@selector(readInt32Int32Map:) object:messages];
+  NSArray *messages =
+      [self createMessagesWithType:[TestRecursiveMessageWithRepeatedField class]];
+  NSArray *threads =
+      [self createThreadsWithSelector:@selector(readInt32Int32Map:)
+                               object:messages];
   [self startThreads:threads];
   [self joinThreads:threads];
   for (TestRecursiveMessageWithRepeatedField *message in messages) {
@@ -160,9 +168,11 @@ static const int kNumMessages = 100;
 }
 
 - (void)testConcurrentReadOfUnsetStringStringMapField {
-  NSArray *messages = [self createMessagesWithType:[TestRecursiveMessageWithRepeatedField class]];
-  NSArray *threads = [self createThreadsWithSelector:@selector(readStringStringMap:)
-                                              object:messages];
+  NSArray *messages =
+      [self createMessagesWithType:[TestRecursiveMessageWithRepeatedField class]];
+  NSArray *threads =
+      [self createThreadsWithSelector:@selector(readStringStringMap:)
+                               object:messages];
   [self startThreads:threads];
   [self joinThreads:threads];
   for (TestRecursiveMessageWithRepeatedField *message in messages) {
@@ -186,7 +196,8 @@ static const int kNumMessages = 100;
   NSArray *threads = [self createThreadsWithSelector:sel object:messages];
   [self startThreads:threads];
   [self joinThreads:threads];
-  GPBExtensionDescriptor *extension = [UnittestRoot optionalForeignMessageExtension];
+  GPBExtensionDescriptor *extension =
+      [UnittestRoot optionalForeignMessageExtension];
   for (TestAllExtensions *message in messages) {
     XCTAssertFalse([message hasExtension:extension]);
   }

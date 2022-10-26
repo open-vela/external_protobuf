@@ -5,12 +5,8 @@ set -ex
 
 test_version() {
   version=$1
-  bazel_args="\
-    $(../kokoro/common/bazel_flags.sh) \
-    --action_env=PATH \
-    --action_env=GEM_PATH \
-    --action_env=GEM_HOME \
-    --test_env=KOKORO_RUBY_VERSION=$version"
+
+  RUBY_CONFORMANCE=test_ruby
 
   if [[ $version == jruby-9* ]] ; then
     bash --login -c \
@@ -18,14 +14,21 @@ test_version() {
        which ruby && \
        git clean -f && \
        gem install --no-document bundler && bundle && \
-       bazel test //ruby/... $bazel_args --define=ruby_platform=java"
+       rake test && \
+       rake gc_test && \
+       cd ../conformance && make test_jruby && \
+       cd ../ruby/compatibility_tests/v3.0.0 && ./test.sh"
   else
     bash --login -c \
       "rvm install $version && rvm use $version && \
        which ruby && \
        git clean -f && \
        gem install --no-document bundler -v 1.17.3 && bundle && \
-       bazel test //ruby/... $bazel_args --define=ruby_platform=c"
+       rake test && \
+       rake gc_test && \
+       cd ../conformance && make ${RUBY_CONFORMANCE} && \
+       cd ../ruby/compatibility_tests/v3.0.0 && \
+       cp -R ../../lib lib && ./test.sh"
   fi
 }
 

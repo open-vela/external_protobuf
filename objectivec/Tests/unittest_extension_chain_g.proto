@@ -29,15 +29,13 @@
 
 syntax = "proto2";
 
-package objc.protobuf.tests.chain;
+package protobuf_unittest;
 
-import "objectivec/Tests/unittest_extension_chain_c.proto";
-
-option objc_class_prefix = "Chain";
+import "unittest_extension_chain_c.proto";
 
 // The Root for this file should just be merging in the extensions from C's
 // Root.
 
-message GMessage {
-  optional CMessage c = 1;
+message ChainGMessage {
+  optional ChainCMessage c = 1;
 }
