@@ -33,7 +33,6 @@
 __author__ = 'matthewtoia@google.com (Matt Toia)'
 
 import copy
-import os
 import unittest
 import warnings
 
@@ -55,7 +54,6 @@ from google.protobuf import descriptor_database
 from google.protobuf import descriptor_pool
 from google.protobuf import message_factory
 from google.protobuf import symbol_database
-
 
 
 warnings.simplefilter('error', DeprecationWarning)
@@ -415,6 +413,19 @@ class DescriptorPoolTestBase(object):
     field = file_json.message_types_by_name['class'].fields_by_name['int_field']
     self.assertEqual(field.json_name, 'json_int')
 
+  def testAddSerializedFileTwice(self):
+    if isinstance(self, SecondaryDescriptorFromDescriptorDB):
+      if api_implementation.Type() != 'python':
+        # Cpp extension cannot call Add on a DescriptorPool
+        # that uses a DescriptorDatabase.
+        # TODO(jieluo): Fix python and cpp extension diff.
+        return
+    self.pool = descriptor_pool.DescriptorPool()
+    file1_first = self.pool.AddSerializedFile(
+        self.factory_test1_fd.SerializeToString())
+    file1_again = self.pool.AddSerializedFile(
+        self.factory_test1_fd.SerializeToString())
+    self.assertIs(file1_first, file1_again)
 
   def testEnumDefaultValue(self):
     """Test the default value of enums which don't start at zero."""
@@ -1115,33 +1126,49 @@ TEST1_FILE = ProtoFile(
 
 TEST2_FILE = ProtoFile(
     'google/protobuf/internal/descriptor_pool_test2.proto',
-    'google.protobuf.python.internal',
-    {
-        'DescriptorPoolTest3': MessageType({
-            'NestedEnum': EnumType([('NU', 13), ('XI', 14)]),
-            'NestedMessage': MessageType({
-                'NestedEnum': EnumType([('OMICRON', 15), ('PI', 16)]),
-                'DeepNestedMessage': MessageType({
-                    'NestedEnum': EnumType([('RHO', 17), ('SIGMA', 18)]),
+    'google.protobuf.python.internal', {
+        'DescriptorPoolTest3':
+            MessageType(
+                {
+                    'NestedEnum':
+                        EnumType([('NU', 13), ('XI', 14)]),
+                    'NestedMessage':
+                        MessageType(
+                            {
+                                'NestedEnum':
+                                    EnumType([('OMICRON', 15), ('PI', 16)]),
+                                'DeepNestedMessage':
+                                    MessageType(
+                                        {
+                                            'NestedEnum':
+                                                EnumType([('RHO', 17),
+                                                          ('SIGMA', 18)]),
+                                        }, [
+                                            ('nested_enum',
+                                             EnumField(1, 'NestedEnum', 'RHO')),
+                                            ('nested_field',
+                                             StringField(2, 'sigma')),
+                                        ]),
+                            }, [
+                                ('nested_enum', EnumField(
+                                    1, 'NestedEnum', 'PI')),
+                                ('nested_field', StringField(2, 'nu')),
+                                ('deep_nested_message',
+                                 MessageField(3, 'DeepNestedMessage')),
+                            ])
                 }, [
-                    ('nested_enum', EnumField(1, 'NestedEnum', 'RHO')),
-                    ('nested_field', StringField(2, 'sigma')),
+                    ('nested_enum', EnumField(1, 'NestedEnum', 'XI')),
+                    ('nested_message', MessageField(2, 'NestedMessage')),
+                ],
+                extensions=[
+                    ('descriptor_pool_test',
+                     ExtensionField(1001, 'DescriptorPoolTest1')),
                 ]),
-            }, [
-                ('nested_enum', EnumField(1, 'NestedEnum', 'PI')),
-                ('nested_field', StringField(2, 'nu')),
-                ('deep_nested_message', MessageField(3, 'DeepNestedMessage')),
-            ])
-        }, [
-            ('nested_enum', EnumField(1, 'NestedEnum', 'XI')),
-            ('nested_message', MessageField(2, 'NestedMessage')),
-        ], extensions=[
-            ('descriptor_pool_test',
-             ExtensionField(1001, 'DescriptorPoolTest1')),
-        ]),
     },
-    dependencies=['google/protobuf/internal/descriptor_pool_test1.proto',
-                  'google/protobuf/internal/more_messages.proto'],
+    dependencies=[
+        'google/protobuf/internal/more_messages.proto',
+        'google/protobuf/internal/descriptor_pool_test1.proto',
+    ],
     public_dependencies=['google/protobuf/internal/more_messages.proto'])
 
 

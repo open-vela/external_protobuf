@@ -38,8 +38,9 @@
 #include <map>
 #include <string>
 
-#include <google/protobuf/stubs/common.h>
-#include <google/protobuf/compiler/cpp/options.h>
+#include "absl/container/flat_hash_map.h"
+#include "google/protobuf/compiler/cpp/options.h"
+#include "google/protobuf/port.h"
 
 namespace google {
 namespace protobuf {
@@ -66,6 +67,8 @@ class ExtensionGenerator {
   explicit ExtensionGenerator(const FieldDescriptor* descriptor,
                               const Options& options,
                               MessageSCCAnalyzer* scc_analyzer);
+  ExtensionGenerator(const ExtensionGenerator&) = delete;
+  ExtensionGenerator& operator=(const ExtensionGenerator&) = delete;
   ~ExtensionGenerator();
 
   // Header stuff.
@@ -82,9 +85,7 @@ class ExtensionGenerator {
   Options options_;
   MessageSCCAnalyzer* scc_analyzer_;
 
-  std::map<std::string, std::string> variables_;
-
-  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(ExtensionGenerator);
+  absl::flat_hash_map<absl::string_view, std::string> variables_;
 };
 
 }  // namespace cpp
