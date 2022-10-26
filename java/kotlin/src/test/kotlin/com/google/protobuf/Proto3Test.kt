@@ -31,13 +31,13 @@
 package com.google.protobuf.kotlin
 
 import com.google.common.truth.Truth.assertThat
-import com.google.protobuf.kotlin.generator.`in`.EvilNamesProto3OuterClass.Class
-import com.google.protobuf.kotlin.generator.`in`.EvilNamesProto3OuterClass.EvilNamesProto3
-import com.google.protobuf.kotlin.generator.`in`.EvilNamesProto3OuterClass.HardKeywordsAllTypesProto3
-import com.google.protobuf.kotlin.generator.`in`.HardKeywordsAllTypesProto3Kt
-import com.google.protobuf.kotlin.generator.`in`.class_
-import com.google.protobuf.kotlin.generator.`in`.evilNamesProto3
-import com.google.protobuf.kotlin.generator.`in`.hardKeywordsAllTypesProto3
+import com.google.protobuf.kotlin.generator.EvilNamesProto3OuterClass.Class
+import com.google.protobuf.kotlin.generator.EvilNamesProto3OuterClass.EvilNamesProto3
+import com.google.protobuf.kotlin.generator.EvilNamesProto3OuterClass.HardKeywordsAllTypesProto3
+import com.google.protobuf.kotlin.generator.HardKeywordsAllTypesProto3Kt
+import com.google.protobuf.kotlin.generator.class_
+import com.google.protobuf.kotlin.generator.evilNamesProto3
+import com.google.protobuf.kotlin.generator.hardKeywordsAllTypesProto3
 import proto3_unittest.TestAllTypesKt
 import proto3_unittest.TestAllTypesKt.nestedMessage
 import proto3_unittest.UnittestProto3.TestAllTypes
@@ -54,7 +54,6 @@ import org.junit.runners.JUnit4
 
 @RunWith(JUnit4::class)
 class Proto3Test {
-  @Suppress("CheckResult")
   @Test
   fun testGettersAndSetters() {
     testAllTypes {
@@ -66,17 +65,11 @@ class Proto3Test {
       assertThat(optionalNestedMessage).isEqualTo(TestAllTypesKt.nestedMessage { bb = 118 })
       optionalNestedEnum = NestedEnum.BAZ
       assertThat(optionalNestedEnum).isEqualTo(NestedEnum.BAZ)
-      assertThat(optionalNestedEnumValue).isEqualTo(3)
-      optionalNestedEnumValue = 1
-      assertThat(optionalNestedEnumValue).isEqualTo(1)
-      assertThat(optionalNestedEnum).isEqualTo(NestedEnum.FOO)
-
       oneofUint32 = 601
       assertThat(oneofUint32).isEqualTo(601)
     }
   }
 
-  @Suppress("CheckResult")
   @Test
   fun testRepeatedGettersAndSetters() {
     testAllTypes {
@@ -266,7 +259,6 @@ class Proto3Test {
     assertThat(class_ {}).isEqualTo(Class.newBuilder().build())
   }
 
-  @Suppress("CheckResult")
   @Test
   fun testHardKeywordGettersAndSetters() {
     hardKeywordsAllTypesProto3 {
@@ -299,7 +291,6 @@ class Proto3Test {
     }
   }
 
-  @Suppress("CheckResult")
   @Test
   fun testHardKeywordHazzers() {
     hardKeywordsAllTypesProto3 {
@@ -317,7 +308,6 @@ class Proto3Test {
     }
   }
 
-  @Suppress("CheckResult")
   @Test
   fun testHardKeywordClears() {
     hardKeywordsAllTypesProto3 {
