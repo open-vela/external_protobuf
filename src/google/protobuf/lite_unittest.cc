@@ -34,21 +34,22 @@
 #include <iostream>
 #include <string>
 
-#include <google/protobuf/stubs/logging.h>
-#include <google/protobuf/stubs/common.h>
-#include <google/protobuf/map_lite_unittest.pb.h>
-#include <google/protobuf/unittest_lite.pb.h>
+#include "google/protobuf/stubs/logging.h"
+#include "google/protobuf/stubs/common.h"
+#include "google/protobuf/map_lite_unittest.pb.h"
+#include "google/protobuf/unittest_lite.pb.h"
 #include <gtest/gtest.h>
-#include <google/protobuf/stubs/strutil.h>
-#include <google/protobuf/arena_test_util.h>
-#include <google/protobuf/io/coded_stream.h>
-#include <google/protobuf/io/zero_copy_stream.h>
-#include <google/protobuf/io/zero_copy_stream_impl.h>
-#include <google/protobuf/io/zero_copy_stream_impl_lite.h>
-#include <google/protobuf/map_lite_test_util.h>
-#include <google/protobuf/parse_context.h>
-#include <google/protobuf/test_util_lite.h>
-#include <google/protobuf/wire_format_lite.h>
+#include "absl/strings/match.h"
+#include "absl/strings/string_view.h"
+#include "google/protobuf/arena_test_util.h"
+#include "google/protobuf/io/coded_stream.h"
+#include "google/protobuf/io/zero_copy_stream.h"
+#include "google/protobuf/io/zero_copy_stream_impl.h"
+#include "google/protobuf/io/zero_copy_stream_impl_lite.h"
+#include "google/protobuf/map_lite_test_util.h"
+#include "google/protobuf/parse_context.h"
+#include "google/protobuf/test_util_lite.h"
+#include "google/protobuf/wire_format_lite.h"
 
 namespace google {
 namespace protobuf {
@@ -674,8 +675,7 @@ TEST(Lite, AllLite28) {
     MapLiteTestUtil::SetMapFields(&message1);
     size_t size = message1.ByteSizeLong();
     data.resize(size);
-    ::uint8_t* start =
-        reinterpret_cast<::uint8_t*>(::google::protobuf::string_as_array(&data));
+    ::uint8_t* start = reinterpret_cast<::uint8_t*>(&data[0]);
     ::uint8_t* end = message1.SerializeWithCachedSizesToArray(start);
     EXPECT_EQ(size, end - start);
     EXPECT_TRUE(message2.ParseFromString(data));
@@ -695,7 +695,7 @@ TEST(Lite, AllLite29) {
     data.resize(size);
     {
       // Allow the output stream to buffer only one byte at a time.
-      io::ArrayOutputStream array_stream(::google::protobuf::string_as_array(&data), size, 1);
+      io::ArrayOutputStream array_stream(&data[0], size, 1);
       io::CodedOutputStream output_stream(&array_stream);
       message1.SerializeWithCachedSizes(&output_stream);
       EXPECT_FALSE(output_stream.HadError());
@@ -1143,8 +1143,8 @@ TEST(Lite, CorrectEnding) {
 
 TEST(Lite, DebugString) {
   protobuf_unittest::TestAllTypesLite message1, message2;
-  EXPECT_TRUE(HasPrefixString(message1.DebugString(), "MessageLite at 0x"));
-  EXPECT_TRUE(HasPrefixString(message2.DebugString(), "MessageLite at 0x"));
+  EXPECT_TRUE(absl::StartsWith(message1.DebugString(), "MessageLite at 0x"));
+  EXPECT_TRUE(absl::StartsWith(message2.DebugString(), "MessageLite at 0x"));
 
   // DebugString() and ShortDebugString() are the same for now.
   EXPECT_EQ(message1.DebugString(), message1.ShortDebugString());
