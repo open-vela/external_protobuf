@@ -138,6 +138,7 @@ public class ExtensionRegistryLite {
     return result;
   }
 
+
   /** Returns an unmodifiable view of the registry. */
   public ExtensionRegistryLite getUnmodifiable() {
     return new ExtensionRegistryLite(this);

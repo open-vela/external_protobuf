@@ -32,7 +32,6 @@
 #define GOOGLE_PROTOBUF_COMPILER_OBJECTIVEC_ENUM_FIELD_H__
 
 #include <map>
-#include <set>
 #include <string>
 
 #include "google/protobuf/compiler/objectivec/field.h"
@@ -49,25 +48,28 @@ class EnumFieldGenerator : public SingleFieldGenerator {
   EnumFieldGenerator& operator=(const EnumFieldGenerator&) = delete;
 
  public:
-  void GenerateCFunctionDeclarations(io::Printer* printer) const override;
-  void GenerateCFunctionImplementations(io::Printer* printer) const override;
-  void DetermineForwardDeclarations(std::set<std::string>* fwd_decls,
-                                    bool include_external_types) const override;
+  virtual void GenerateCFunctionDeclarations(
+      io::Printer* printer) const override;
+  virtual void GenerateCFunctionImplementations(
+      io::Printer* printer) const override;
+  virtual void DetermineForwardDeclarations(
+      std::set<std::string>* fwd_decls,
+      bool include_external_types) const override;
 
  protected:
   explicit EnumFieldGenerator(const FieldDescriptor* descriptor);
-  ~EnumFieldGenerator() override = default;
+  virtual ~EnumFieldGenerator();
 };
 
 class RepeatedEnumFieldGenerator : public RepeatedFieldGenerator {
   friend FieldGenerator* FieldGenerator::Make(const FieldDescriptor* field);
 
  public:
-  void FinishInitialization() override;
+  virtual void FinishInitialization() override;
 
  protected:
   explicit RepeatedEnumFieldGenerator(const FieldDescriptor* descriptor);
-  ~RepeatedEnumFieldGenerator() override = default;
+  virtual ~RepeatedEnumFieldGenerator();
 };
 
 }  // namespace objectivec

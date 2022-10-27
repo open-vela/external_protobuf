@@ -23,10 +23,6 @@ endif()
 if(POLICY CMP0063)
   cmake_policy(SET CMP0063 NEW)
 endif()
-# option() honor variables
-if (POLICY CMP0077)
-  cmake_policy(SET CMP0077 NEW)
-endif (POLICY CMP0077)
 
 # Project
 project(protobuf C CXX)
@@ -334,7 +330,6 @@ set_property(CACHE protobuf_ABSL_PROVIDER PROPERTY STRINGS "module" "package")
 include(${protobuf_SOURCE_DIR}/cmake/abseil-cpp.cmake)
 
 if (protobuf_BUILD_PROTOBUF_BINARIES)
-  include(${protobuf_SOURCE_DIR}/cmake/utf8_range.cmake)
   include(${protobuf_SOURCE_DIR}/cmake/libprotobuf-lite.cmake)
   if (NOT DEFINED protobuf_LIB_PROTOBUF_LITE)
     set(protobuf_LIB_PROTOBUF_LITE libprotobuf-lite)

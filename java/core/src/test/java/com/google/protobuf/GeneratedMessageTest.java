@@ -801,6 +801,7 @@ public class GeneratedMessageTest {
     assertThat(fieldBuilder.build().getField(field)).isEqualTo(expected);
   }
 
+
   @Test
   public void testGetBuilderForNonMessageExtensionField() {
     TestAllExtensions.Builder builder = TestAllExtensions.newBuilder();

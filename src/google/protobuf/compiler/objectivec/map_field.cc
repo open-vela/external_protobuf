@@ -30,13 +30,12 @@
 
 #include "google/protobuf/compiler/objectivec/map_field.h"
 
-#include <set>
+#include <map>
 #include <string>
-#include <vector>
 
-#include "absl/strings/match.h"
 #include "google/protobuf/compiler/objectivec/helpers.h"
 #include "google/protobuf/compiler/objectivec/names.h"
+#include "google/protobuf/io/printer.h"
 
 namespace google {
 namespace protobuf {
@@ -79,7 +78,7 @@ const char* MapEntryTypeName(const FieldDescriptor* descriptor, bool isKey) {
   // Some compilers report reaching end of function even though all cases of
   // the enum are handed in the switch.
   GOOGLE_LOG(FATAL) << "Can't get here.";
-  return nullptr;
+  return NULL;
 }
 
 }  // namespace
@@ -100,17 +99,18 @@ MapFieldGenerator::MapFieldGenerator(const FieldDescriptor* descriptor)
   std::vector<std::string> field_flags;
   field_flags.push_back("GPBFieldMapKey" + GetCapitalizedType(key_descriptor));
   // Pull over the current text format custom name values that was calculated.
-  if (absl::StrContains(variables_["fieldflags"],
-                        "GPBFieldTextFormatNameCustom")) {
+  if (variables_["fieldflags"].find("GPBFieldTextFormatNameCustom") !=
+      std::string::npos) {
     field_flags.push_back("GPBFieldTextFormatNameCustom");
   }
   // Pull over some info from the value's flags.
   const std::string& value_field_flags =
       value_field_generator_->variable("fieldflags");
-  if (absl::StrContains(value_field_flags, "GPBFieldHasDefaultValue")) {
+  if (value_field_flags.find("GPBFieldHasDefaultValue") != std::string::npos) {
     field_flags.push_back("GPBFieldHasDefaultValue");
   }
-  if (absl::StrContains(value_field_flags, "GPBFieldHasEnumDescriptor")) {
+  if (value_field_flags.find("GPBFieldHasEnumDescriptor") !=
+      std::string::npos) {
     field_flags.push_back("GPBFieldHasEnumDescriptor");
   }
 
@@ -146,7 +146,9 @@ MapFieldGenerator::MapFieldGenerator(const FieldDescriptor* descriptor)
       value_field_generator_->variable("dataTypeSpecific_value");
 }
 
-void MapFieldGenerator::FinishInitialization() {
+MapFieldGenerator::~MapFieldGenerator() {}
+
+void MapFieldGenerator::FinishInitialization(void) {
   RepeatedFieldGenerator::FinishInitialization();
   // Use the array_comment support in RepeatedFieldGenerator to output what the
   // values in the map are.

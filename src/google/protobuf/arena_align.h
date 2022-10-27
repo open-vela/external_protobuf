@@ -71,9 +71,6 @@
 #include "google/protobuf/stubs/common.h"
 #include "absl/numeric/bits.h"
 
-// Must be included last.
-#include "google/protobuf/port_def.inc"
-
 namespace google {
 namespace protobuf {
 namespace internal {
@@ -154,7 +151,5 @@ inline ArenaAlign ArenaAlignAs(size_t align) {
 }  // namespace internal
 }  // namespace protobuf
 }  // namespace google
-
-#include "google/protobuf/port_undef.inc"
 
 #endif  // GOOGLE_PROTOBUF_ARENA_ALIGN_H__

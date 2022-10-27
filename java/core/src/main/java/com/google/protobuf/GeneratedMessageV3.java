@@ -456,6 +456,7 @@ public abstract class GeneratedMessageV3 extends AbstractMessage implements Seri
         size == 0 ? AbstractProtobufList.DEFAULT_CAPACITY : size * 2);
   }
 
+
   @Override
   public void writeTo(final CodedOutputStream output) throws IOException {
     MessageReflection.writeMessageTo(this, getAllFieldsRaw(), output, false);
@@ -472,6 +473,7 @@ public abstract class GeneratedMessageV3 extends AbstractMessage implements Seri
         this, getAllFieldsRaw());
     return memoizedSize;
   }
+
 
   /**
    * This class is used to make a generated protected method inaccessible from user's code (e.g.,
@@ -518,7 +520,6 @@ public abstract class GeneratedMessageV3 extends AbstractMessage implements Seri
         });
   }
 
-  /** Builder class for {@link GeneratedMessageV3}. */
   @SuppressWarnings("unchecked")
   public abstract static class Builder<BuilderType extends Builder<BuilderType>>
       extends AbstractMessage.Builder<BuilderType> {
@@ -878,7 +879,7 @@ public abstract class GeneratedMessageV3 extends AbstractMessage implements Seri
     }
 
     /**
-     * Called when a builder or one of its nested children has changed and any parent should be
+     * Called when a the builder or one of its nested children has changed and any parent should be
      * notified of its invalidation.
      */
     protected final void onChanged() {
@@ -918,7 +919,6 @@ public abstract class GeneratedMessageV3 extends AbstractMessage implements Seri
   // =================================================================
   // Extensions-related stuff
 
-  /** Extends {@link MessageOrBuilder} with extension-related functions. */
   public interface ExtendableMessageOrBuilder<MessageType extends ExtendableMessage>
       extends MessageOrBuilder {
     // Re-define for return type covariance.
@@ -1168,6 +1168,7 @@ public abstract class GeneratedMessageV3 extends AbstractMessage implements Seri
         throws IOException {
       return parseUnknownField(input, unknownFields, extensionRegistry, tag);
     }
+
 
     /** Used by parsing constructors in generated classes. */
     @Override
@@ -1845,6 +1846,7 @@ public abstract class GeneratedMessageV3 extends AbstractMessage implements Seri
   static interface ExtensionDescriptorRetriever {
     FieldDescriptor getDescriptor();
   }
+
 
   // =================================================================
 

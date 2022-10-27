@@ -32,6 +32,8 @@
 
 #include <gtest/gtest.h>
 
+#include "google/protobuf/io/zero_copy_stream_impl_lite.h"
+
 namespace google {
 namespace protobuf {
 namespace compiler {

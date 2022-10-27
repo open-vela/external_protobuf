@@ -31,7 +31,6 @@
 #ifndef GOOGLE_PROTOBUF_COMPILER_OBJECTIVEC_MESSAGE_H__
 #define GOOGLE_PROTOBUF_COMPILER_OBJECTIVEC_MESSAGE_H__
 
-#include <memory>
 #include <set>
 #include <string>
 #include <vector>
@@ -53,7 +52,7 @@ class MessageGenerator {
  public:
   MessageGenerator(const std::string& root_classname,
                    const Descriptor* descriptor);
-  ~MessageGenerator() = default;
+  ~MessageGenerator();
 
   MessageGenerator(const MessageGenerator&) = delete;
   MessageGenerator& operator=(const MessageGenerator&) = delete;

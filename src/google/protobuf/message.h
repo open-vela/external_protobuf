@@ -157,7 +157,6 @@ class MapIterator;
 class MapReflectionTester;
 
 namespace internal {
-struct FuzzPeer;
 struct DescriptorTable;
 class MapFieldBase;
 class SwapFieldHelper;
@@ -1111,7 +1110,6 @@ class PROTOBUF_EXPORT Reflection final {
   friend class internal::WireFormat;
   friend class internal::ReflectionOps;
   friend class internal::SwapFieldHelper;
-  friend struct internal::FuzzPeer;
   // Needed for implementing text format for map.
   friend class internal::MapFieldPrinterHelper;
 

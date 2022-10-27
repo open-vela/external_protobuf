@@ -1274,9 +1274,7 @@ VALUE build_module_from_enumdesc(VALUE _enumdesc) {
   int n = upb_EnumDef_ValueCount(e);
   for (int i = 0; i < n; i++) {
     const upb_EnumValueDef* ev = upb_EnumDef_Value(e, i);
-    upb_Arena* arena = upb_Arena_New();
-    const char* src_name = upb_EnumValueDef_Name(ev);
-    char* name = upb_strdup2(src_name, strlen(src_name), arena);
+    char* name = strdup(upb_EnumValueDef_Name(ev));
     int32_t value = upb_EnumValueDef_Number(ev);
     if (name[0] < 'A' || name[0] > 'Z') {
       if (name[0] >= 'a' && name[0] <= 'z') {
@@ -1289,7 +1287,7 @@ VALUE build_module_from_enumdesc(VALUE _enumdesc) {
       }
     }
     rb_define_const(mod, name, INT2NUM(value));
-    upb_Arena_Free(arena);
+    free(name);
   }
 
   rb_define_singleton_method(mod, "lookup", enum_lookup, 1);

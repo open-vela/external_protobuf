@@ -35,6 +35,7 @@
 #ifndef GOOGLE_PROTOBUF_COMPILER_CPP_ENUM_H__
 #define GOOGLE_PROTOBUF_COMPILER_CPP_ENUM_H__
 
+#include <map>
 #include <set>
 #include <string>
 

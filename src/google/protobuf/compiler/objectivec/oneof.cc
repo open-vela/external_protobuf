@@ -30,6 +30,7 @@
 
 #include "google/protobuf/compiler/objectivec/oneof.h"
 
+#include <map>
 #include <string>
 
 #include "absl/strings/str_cat.h"
@@ -60,6 +61,8 @@ OneofGenerator::OneofGenerator(const OneofDescriptor* descriptor)
   }
   variables_["comments"] = comments;
 }
+
+OneofGenerator::~OneofGenerator() {}
 
 void OneofGenerator::SetOneofIndexBase(int index_base) {
   int index = descriptor_->index() + index_base;
@@ -125,11 +128,11 @@ void OneofGenerator::GenerateClearFunctionImplementation(io::Printer* printer) {
   // clang-format on
 }
 
-std::string OneofGenerator::DescriptorName() const {
+std::string OneofGenerator::DescriptorName(void) const {
   return variables_.find("name")->second;
 }
 
-std::string OneofGenerator::HasIndexAsString() const {
+std::string OneofGenerator::HasIndexAsString(void) const {
   return variables_.find("index")->second;
 }
 
