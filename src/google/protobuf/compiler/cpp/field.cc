@@ -38,7 +38,6 @@
 #include <memory>
 #include <string>
 
-#include "absl/container/flat_hash_map.h"
 #include "absl/strings/str_cat.h"
 #include "absl/strings/string_view.h"
 #include "absl/strings/substitute.h"
@@ -47,6 +46,7 @@
 #include "google/protobuf/compiler/cpp/string_field.h"
 #include "google/protobuf/stubs/logging.h"
 #include "google/protobuf/stubs/common.h"
+#include "google/protobuf/io/printer.h"
 #include "google/protobuf/wire_format.h"
 #include "google/protobuf/compiler/cpp/enum_field.h"
 #include "google/protobuf/compiler/cpp/map_field.h"
@@ -62,12 +62,12 @@ using internal::WireFormat;
 
 namespace {
 
-void MaySetAnnotationVariable(
-    const Options& options, absl::string_view annotation_name,
-    absl::string_view substitute_template_prefix,
-    absl::string_view prepared_template, int field_index,
-    absl::string_view access_type,
-    absl::flat_hash_map<absl::string_view, std::string>* variables) {
+void MaySetAnnotationVariable(const Options& options,
+                              absl::string_view annotation_name,
+                              absl::string_view substitute_template_prefix,
+                              absl::string_view prepared_template,
+                              int field_index, absl::string_view access_type,
+                              std::map<std::string, std::string>* variables) {
   if (options.field_listener_options.forbidden_field_listener_events.count(
           std::string(annotation_name)))
     return;
@@ -124,9 +124,9 @@ std::string GenerateTemplateForSingleString(const FieldDescriptor* descriptor,
 
 }  // namespace
 
-void AddAccessorAnnotations(
-    const FieldDescriptor* descriptor, const Options& options,
-    absl::flat_hash_map<absl::string_view, std::string>* variables) {
+void AddAccessorAnnotations(const FieldDescriptor* descriptor,
+                            const Options& options,
+                            std::map<std::string, std::string>* variables) {
   // Can be expanded to include more specific calls, for example, for arena or
   // clear calls.
   static constexpr const char* kAccessorsAnnotations[] = {
@@ -232,10 +232,10 @@ void AddAccessorAnnotations(
                            "OnAddMutable", variables);
 }
 
-absl::flat_hash_map<absl::string_view, std::string> FieldVars(
+absl::flat_hash_map<std::string, std::string> FieldVars(
     const FieldDescriptor* desc, const Options& opts) {
   bool split = ShouldSplit(desc, opts);
-  absl::flat_hash_map<absl::string_view, std::string> vars = {
+  absl::flat_hash_map<std::string, std::string> vars = {
       {"ns", Namespace(desc, opts)},
       {"name", FieldName(desc)},
       {"index", absl::StrCat(desc->index())},
@@ -261,7 +261,7 @@ absl::flat_hash_map<absl::string_view, std::string> FieldVars(
 
   // TODO(b/245791219): Refactor AddAccessorAnnotations to avoid this
   // workaround.
-  absl::flat_hash_map<absl::string_view, std::string> workaround = {
+  std::map<std::string, std::string> workaround = {
       {"field", vars["field"]},
       {"tracker", "Impl_::_tracker_"},
   };
@@ -273,10 +273,9 @@ absl::flat_hash_map<absl::string_view, std::string> FieldVars(
   return vars;
 }
 
-void SetCommonFieldVariables(
-    const FieldDescriptor* descriptor,
-    absl::flat_hash_map<absl::string_view, std::string>* variables,
-    const Options& options) {
+void SetCommonFieldVariables(const FieldDescriptor* descriptor,
+                             std::map<std::string, std::string>* variables,
+                             const Options& options) {
   SetCommonMessageDataVariables(descriptor->containing_type(), variables);
 
   for (auto& pair : FieldVars(descriptor, options)) {
@@ -284,7 +283,7 @@ void SetCommonFieldVariables(
   }
 }
 
-absl::flat_hash_map<absl::string_view, std::string> OneofFieldVars(
+absl::flat_hash_map<std::string, std::string> OneofFieldVars(
     const FieldDescriptor* descriptor) {
   if (descriptor->containing_oneof() == nullptr) {
     return {};
@@ -295,7 +294,7 @@ absl::flat_hash_map<absl::string_view, std::string> OneofFieldVars(
 
 void SetCommonOneofFieldVariables(
     const FieldDescriptor* descriptor,
-    absl::flat_hash_map<absl::string_view, std::string>* variables) {
+    std::map<std::string, std::string>* variables) {
   for (auto& pair : OneofFieldVars(descriptor)) {
     variables->emplace(pair);
   }

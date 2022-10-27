@@ -36,6 +36,7 @@
 
 #include <algorithm>
 #include <cstdint>
+#include <map>
 #include <memory>
 #include <string>
 #include <vector>
@@ -43,7 +44,6 @@
 #include "google/protobuf/io/coded_stream.h"
 #include "google/protobuf/io/printer.h"
 #include "google/protobuf/wire_format.h"
-#include "absl/container/flat_hash_map.h"
 #include "absl/strings/ascii.h"
 #include "absl/strings/str_cat.h"
 #include "absl/strings/substitute.h"
@@ -117,7 +117,7 @@ void ImmutableMessageLiteGenerator::GenerateInterface(io::Printer* printer) {
   MaybePrintGeneratedAnnotation(context_, printer, descriptor_,
                                 /* immutable = */ true, "OrBuilder");
 
-  absl::flat_hash_map<absl::string_view, std::string> variables = {
+  std::map<std::string, std::string> variables = {
       {"{", ""},
       {"}", ""},
       {"deprecation",
@@ -173,8 +173,7 @@ void ImmutableMessageLiteGenerator::GenerateInterface(io::Printer* printer) {
 void ImmutableMessageLiteGenerator::Generate(io::Printer* printer) {
   bool is_own_file = IsOwnFile(descriptor_, /* immutable = */ true);
 
-  absl::flat_hash_map<absl::string_view, std::string> variables = {{"{", ""},
-                                                                   {"}", ""}};
+  std::map<std::string, std::string> variables = {{"{", ""}, {"}", ""}};
   variables["static"] = is_own_file ? " " : " static ";
   variables["classname"] = descriptor_->name();
   variables["extra_interfaces"] = ExtraMessageInterfaces(descriptor_);
@@ -243,8 +242,7 @@ void ImmutableMessageLiteGenerator::Generate(io::Printer* printer) {
   }
 
   // oneof
-  absl::flat_hash_map<absl::string_view, std::string> vars = {{"{", ""},
-                                                              {"}", ""}};
+  std::map<std::string, std::string> vars = {{"{", ""}, {"}", ""}};
   for (auto oneof : oneofs_) {
     vars["oneof_name"] = context_->GetOneofGeneratorInfo(oneof)->name;
     vars["oneof_capitalized_name"] =
