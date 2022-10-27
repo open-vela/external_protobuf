@@ -30,6 +30,7 @@
 
 #include "google/protobuf/compiler/objectivec/map_field.h"
 
+#include <map>
 #include <set>
 #include <string>
 #include <vector>

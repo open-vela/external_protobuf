@@ -32,6 +32,7 @@
 
 #include <algorithm>
 #include <limits>
+#include <map>
 #include <set>
 #include <string>
 

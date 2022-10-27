@@ -36,12 +36,13 @@
 #include "google/protobuf/compiler/java/string_field_lite.h"
 
 #include <cstdint>
+#include <map>
 #include <string>
 
 #include "google/protobuf/stubs/logging.h"
 #include "google/protobuf/stubs/common.h"
+#include "google/protobuf/io/printer.h"
 #include "google/protobuf/wire_format.h"
-#include "absl/container/flat_hash_map.h"
 #include "absl/strings/str_cat.h"
 #include "google/protobuf/compiler/java/context.h"
 #include "google/protobuf/compiler/java/doc_comment.h"
@@ -58,11 +59,12 @@ using internal::WireFormatLite;
 
 namespace {
 
-void SetPrimitiveVariables(
-    const FieldDescriptor* descriptor, int messageBitIndex, int builderBitIndex,
-    const FieldGeneratorInfo* info, ClassNameResolver* name_resolver,
-    absl::flat_hash_map<absl::string_view, std::string>* variables,
-    Context* context) {
+void SetPrimitiveVariables(const FieldDescriptor* descriptor,
+                           int messageBitIndex, int builderBitIndex,
+                           const FieldGeneratorInfo* info,
+                           ClassNameResolver* name_resolver,
+                           std::map<std::string, std::string>* variables,
+                           Context* context) {
   SetCommonFieldVariables(descriptor, info, variables);
 
   (*variables)["empty_list"] =
@@ -87,12 +89,11 @@ void SetPrimitiveVariables(
   // by the proto compiler
   (*variables)["deprecation"] =
       descriptor->options().deprecated() ? "@java.lang.Deprecated " : "";
-  variables->insert(
-      {"kt_deprecation",
-       descriptor->options().deprecated()
-           ? absl::StrCat("@kotlin.Deprecated(message = \"Field ",
-                          (*variables)["name"], " is deprecated\") ")
-           : ""});
+  (*variables)["kt_deprecation"] =
+      descriptor->options().deprecated()
+          ? "@kotlin.Deprecated(message = \"Field " + (*variables)["name"] +
+                " is deprecated\") "
+          : "";
   (*variables)["required"] = descriptor->is_required() ? "true" : "false";
   if (!context->options().opensource_runtime) {
     (*variables)["enforce_utf8"] = CheckUtf8(descriptor) ? "true" : "false";
@@ -119,8 +120,8 @@ void SetPrimitiveVariables(
     (*variables)["set_has_field_bit_message"] = "";
     (*variables)["clear_has_field_bit_message"] = "";
 
-    variables->insert({"is_field_present_message",
-                       absl::StrCat("!", (*variables)["name"], "_.isEmpty()")});
+    (*variables)["is_field_present_message"] =
+        "!" + (*variables)["name"] + "_.isEmpty()";
   }
 
   (*variables)["get_has_field_bit_from_local"] =
@@ -128,8 +129,7 @@ void SetPrimitiveVariables(
   (*variables)["set_has_field_bit_to_local"] =
       GenerateSetBitToLocal(messageBitIndex);
   // Annotations often use { and } variables to denote text ranges.
-  (*variables)["{"] = "";
-  (*variables)["}"] = "";
+  (*variables)["{"] = (*variables)["}"] = "";
 }
 
 }  // namespace

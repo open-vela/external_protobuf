@@ -34,9 +34,6 @@
 
 #include "google/protobuf/compiler/cpp/string_field.h"
 
-#include <string>
-
-#include "absl/container/flat_hash_map.h"
 #include "absl/strings/str_cat.h"
 #include "google/protobuf/compiler/cpp/helpers.h"
 #include "google/protobuf/descriptor.pb.h"
@@ -48,12 +45,13 @@ namespace cpp {
 
 namespace {
 
-void SetStringVariables(
-    const FieldDescriptor* descriptor,
-    absl::flat_hash_map<absl::string_view, std::string>* variables,
-    const Options& options) {
+void SetStringVariables(const FieldDescriptor* descriptor,
+                        std::map<std::string, std::string>* variables,
+                        const Options& options) {
   SetCommonFieldVariables(descriptor, variables, options);
 
+  const std::string kNS = "::" + ProtobufNamespace(options) + "::internal::";
+  const std::string kArenaStringPtr = kNS + "ArenaStringPtr";
 
   (*variables)["default"] = DefaultValue(options, descriptor);
   (*variables)["default_length"] =
@@ -62,21 +60,17 @@ void SetStringVariables(
   (*variables)["default_variable_field"] = MakeDefaultFieldName(descriptor);
 
   if (descriptor->default_value_string().empty()) {
-    const std::string default_string =
-        absl::StrCat("::", ProtobufNamespace(options),
-                     "::internal::GetEmptyStringAlreadyInited()");
-    (*variables)["default_string"] = default_string;
-    (*variables)["default_value"] = absl::StrCat("&", default_string);
+    (*variables)["default_string"] = kNS + "GetEmptyStringAlreadyInited()";
+    (*variables)["default_value"] = "&" + (*variables)["default_string"];
     (*variables)["lazy_variable_args"] = "";
   } else {
-    const std::string lazy_variable =
+    (*variables)["lazy_variable"] =
         absl::StrCat(QualifiedClassName(descriptor->containing_type(), options),
                      "::", MakeDefaultFieldName(descriptor));
-    (*variables)["lazy_variable"] = lazy_variable;
 
-    (*variables)["default_string"] = absl::StrCat(lazy_variable, ".get()");
+    (*variables)["default_string"] = (*variables)["lazy_variable"] + ".get()";
     (*variables)["default_value"] = "nullptr";
-    (*variables)["lazy_variable_args"] = absl::StrCat(lazy_variable, ", ");
+    (*variables)["lazy_variable_args"] = (*variables)["lazy_variable"] + ", ";
   }
 
   (*variables)["pointer_type"] =
