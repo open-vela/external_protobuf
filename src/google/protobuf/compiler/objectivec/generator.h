@@ -34,7 +34,6 @@
 #define GOOGLE_PROTOBUF_COMPILER_OBJECTIVEC_GENERATOR_H__
 
 #include <string>
-#include <vector>
 
 #include "google/protobuf/compiler/code_generator.h"
 #include "google/protobuf/descriptor.h"
@@ -53,8 +52,8 @@ namespace objectivec {
 // CodeGenerator with the CommandLineInterface in your main() function.
 class PROTOC_EXPORT ObjectiveCGenerator : public CodeGenerator {
  public:
-  ObjectiveCGenerator() = default;
-  ~ObjectiveCGenerator() override = default;
+  ObjectiveCGenerator();
+  ~ObjectiveCGenerator();
 
   ObjectiveCGenerator(const ObjectiveCGenerator&) = delete;
   ObjectiveCGenerator& operator=(const ObjectiveCGenerator&) = delete;

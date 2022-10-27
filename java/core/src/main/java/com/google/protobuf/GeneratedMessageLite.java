@@ -586,6 +586,7 @@ public abstract class GeneratedMessageLite<
     }
   }
 
+
   // =================================================================
   // Extensions-related stuff
 
@@ -1249,6 +1250,7 @@ public abstract class GeneratedMessageLite<
       return ((Builder) to).mergeFrom((GeneratedMessageLite) from);
     }
 
+
     @Override
     public int compareTo(ExtensionDescriptor other) {
       return number - other.number;
@@ -1288,6 +1290,7 @@ public abstract class GeneratedMessageLite<
       }
     }
   }
+
 
   /**
    * Lite equivalent to {@link GeneratedMessage.GeneratedExtension}.

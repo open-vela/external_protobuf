@@ -185,6 +185,7 @@ final class FieldSet<T extends FieldSet.FieldDescriptorLite<T>> {
     return clone;
   }
 
+
   // =================================================================
 
   /** See {@link Message.Builder#clear()}. */
@@ -572,6 +573,7 @@ final class FieldSet<T extends FieldSet.FieldDescriptorLite<T>> {
       return WireFormat.readPrimitiveField(input, type, WireFormat.Utf8Validation.LOOSE);
     }
   }
+
 
   /** See {@link Message#writeTo(CodedOutputStream)}. */
   public void writeTo(final CodedOutputStream output) throws IOException {

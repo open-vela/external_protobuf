@@ -117,4 +117,5 @@ public final class UnsafeByteOperations {
   public static void unsafeWriteTo(ByteString bytes, ByteOutput output) throws IOException {
     bytes.writeTo(output);
   }
+
 }

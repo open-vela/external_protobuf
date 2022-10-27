@@ -34,8 +34,6 @@
 
 #include "google/protobuf/compiler/command_line_interface.h"
 
-#include "absl/container/flat_hash_map.h"
-
 #include "google/protobuf/stubs/platform_macros.h"
 
 #include <stdio.h>
@@ -62,6 +60,7 @@
 
 #include <memory>
 #include <string>
+#include <unordered_set>
 #include <utility>
 #include <vector>
 
@@ -75,12 +74,10 @@
 #include "google/protobuf/stubs/logging.h"
 #include "google/protobuf/compiler/subprocess.h"
 #include "google/protobuf/compiler/plugin.pb.h"
-#include "absl/container/flat_hash_set.h"
 #include "absl/strings/match.h"
 #include "absl/strings/str_format.h"
 #include "absl/strings/str_replace.h"
 #include "absl/strings/str_split.h"
-#include "absl/strings/string_view.h"
 #include "absl/strings/substitute.h"
 #include "google/protobuf/compiler/code_generator.h"
 #include "google/protobuf/compiler/importer.h"
@@ -427,7 +424,7 @@ class CommandLineInterface::GeneratorContextImpl : public GeneratorContext {
   // The files_ field maps from path keys to file content values. It's a map
   // instead of an unordered_map so that files are written in order (good when
   // writing zips).
-  absl::flat_hash_map<std::string, std::string> files_;
+  std::map<std::string, std::string> files_;
   const std::vector<const FileDescriptor*>& parsed_files_;
   bool had_error_;
 };
@@ -1076,7 +1073,7 @@ int CommandLineInterface::Run(int argc, const char* const argv[]) {
 
       if (!generator) {
         // First time we've seen this output location.
-        generator = std::make_unique<GeneratorContextImpl>(parsed_files);
+        generator.reset(new GeneratorContextImpl(parsed_files));
       }
 
       if (!GenerateOutput(parsed_files, output_directives_[i],
@@ -1495,15 +1492,19 @@ CommandLineInterface::ParseArgumentStatus CommandLineInterface::ParseArguments(
 
   // Make sure each plugin option has a matching plugin output.
   bool foundUnknownPluginOption = false;
-  for (const auto& kv : plugin_parameters_) {
-    if (plugins_.find(kv.first) != plugins_.end()) {
+  for (std::map<std::string, std::string>::const_iterator i =
+           plugin_parameters_.begin();
+       i != plugin_parameters_.end(); ++i) {
+    if (plugins_.find(i->first) != plugins_.end()) {
       continue;
     }
     bool foundImplicitPlugin = false;
-    for (const auto& d : output_directives_) {
-      if (d.generator == nullptr) {
-        std::string plugin_name = PluginName(plugin_prefix_, d.name);
-        if (plugin_name == kv.first) {
+    for (std::vector<OutputDirective>::const_iterator j =
+             output_directives_.begin();
+         j != output_directives_.end(); ++j) {
+      if (j->generator == nullptr) {
+        std::string plugin_name = PluginName(plugin_prefix_, j->name);
+        if (plugin_name == i->first) {
           foundImplicitPlugin = true;
           break;
         }
@@ -1512,7 +1513,7 @@ CommandLineInterface::ParseArgumentStatus CommandLineInterface::ParseArguments(
     if (!foundImplicitPlugin) {
       std::cerr << "Unknown flag: "
                 // strip prefix + "gen-" and add back "_opt"
-                << "--" + kv.first.substr(plugin_prefix_.size() + 4) + "_opt"
+                << "--" + i->first.substr(plugin_prefix_.size() + 4) + "_opt"
                 << std::endl;
       foundUnknownPluginOption = true;
     }
@@ -2251,7 +2252,7 @@ bool CommandLineInterface::GenerateDependencyManifestFile(
   io::Printer printer(&out, '$');
 
   for (int i = 0; i < output_filenames.size(); i++) {
-    printer.Print(output_filenames[i]);
+    printer.Print(output_filenames[i].c_str());
     if (i == output_filenames.size() - 1) {
       printer.Print(":");
     } else {

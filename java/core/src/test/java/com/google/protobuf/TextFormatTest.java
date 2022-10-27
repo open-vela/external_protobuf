@@ -724,6 +724,7 @@ public class TextFormatTest {
     assertThat(actual).isEqualTo(expected);
   }
 
+
   @Test
   public void testMergeAny_customBuiltTypeRegistry() throws Exception {
     TestAny.Builder builder = TestAny.newBuilder();
@@ -757,6 +758,7 @@ public class TextFormatTest {
                         .build())
                 .build());
   }
+
 
   private void assertParseError(String error, String text) {
     // Test merge().
@@ -1397,6 +1399,7 @@ public class TextFormatTest {
         .isEqualTo("1: \"\\343\\201\\202\"\n");
   }
 
+
   @Test
   public void testParseUnknownExtensions() throws Exception {
     TestUtil.TestLogHandler logHandler = new TestUtil.TestLogHandler();
@@ -1841,4 +1844,5 @@ public class TextFormatTest {
     assertThat(TextFormat.printer().printToString(message))
         .isEqualTo("optional_float: -0.0\noptional_double: -0.0\n");
   }
+
 }

@@ -30,8 +30,6 @@
 
 #include "google/protobuf/compiler/objectivec/text_format_decode_data.h"
 
-#include <string>
-
 #include <gtest/gtest.h>
 
 // Must be included last

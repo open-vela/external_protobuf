@@ -103,7 +103,7 @@ struct MoveHelper<false, false, true, T> {  // strings and similar
 };
 
 // MapEntryImpl is used to implement parsing and serialization of map entries.
-// It uses Curiously Recurring Template Pattern (CRTP) to provide the type of
+// It uses Curious Recursive Template Pattern (CRTP) to provide the type of
 // the eventual code to the template code.
 template <typename Derived, typename Base, typename Key, typename Value,
           WireFormatLite::FieldType kKeyFieldType,
@@ -171,10 +171,10 @@ class MapEntryImpl : public Base {
 
   // accessors ======================================================
 
-  inline const KeyMapEntryAccessorType& key() const {
+  virtual inline const KeyMapEntryAccessorType& key() const {
     return KeyTypeHandler::GetExternalReference(key_);
   }
-  inline const ValueMapEntryAccessorType& value() const {
+  virtual inline const ValueMapEntryAccessorType& value() const {
     return ValueTypeHandler::DefaultIfNotInitialized(value_);
   }
   inline KeyMapEntryAccessorType* mutable_key() {
@@ -429,14 +429,10 @@ class MapEntryImpl : public Base {
   typedef void DestructorSkippable_;
   template <typename C, typename K, typename V, WireFormatLite::FieldType,
             WireFormatLite::FieldType>
-  friend class ::PROTOBUF_NAMESPACE_ID::internal::MapEntry;
+  friend class internal::MapEntry;
   template <typename C, typename K, typename V, WireFormatLite::FieldType,
             WireFormatLite::FieldType>
-  friend class ::PROTOBUF_NAMESPACE_ID::internal::MapFieldLite;
-
-  template <typename DerivedT, typename KeyT, typename TT,
-            WireFormatLite::FieldType, WireFormatLite::FieldType>
-  friend class ::PROTOBUF_NAMESPACE_ID::internal::MapField;
+  friend class internal::MapFieldLite;
 };
 
 template <typename T, typename Key, typename Value,

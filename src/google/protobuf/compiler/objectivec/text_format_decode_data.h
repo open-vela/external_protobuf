@@ -32,7 +32,6 @@
 #define GOOGLE_PROTOBUF_COMPILER_OBJECTIVEC_TEXT_FORMAT_DECODE_DATA_H__
 
 #include <string>
-#include <utility>
 #include <vector>
 
 // Must be included last
@@ -50,8 +49,8 @@ namespace objectivec {
 // the input into the expected output.
 class PROTOC_EXPORT TextFormatDecodeData {
  public:
-  TextFormatDecodeData() = default;
-  ~TextFormatDecodeData() = default;
+  TextFormatDecodeData();
+  ~TextFormatDecodeData();
 
   TextFormatDecodeData(const TextFormatDecodeData&) = delete;
   TextFormatDecodeData& operator=(const TextFormatDecodeData&) = delete;

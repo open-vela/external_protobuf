@@ -1728,6 +1728,7 @@ public final class Descriptors {
       // down-cast and call mergeFrom directly.
       return ((Message.Builder) to).mergeFrom((Message) from);
     }
+
   }
 
   // =================================================================

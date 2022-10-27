@@ -40,23 +40,20 @@
 
 #include <cstdint>
 #include <limits>
-#include <string>
 #include <tuple>
-#include <utility>
+#include <unordered_map>
+#include <unordered_set>
 
 #include "google/protobuf/stubs/logging.h"
 #include "google/protobuf/stubs/common.h"
+#include "google/protobuf/stubs/strutil.h"
 #include "absl/base/casts.h"
-#include "absl/container/flat_hash_map.h"
-#include "absl/container/flat_hash_set.h"
 #include "absl/strings/ascii.h"
 #include "absl/strings/escaping.h"
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_format.h"
-#include "absl/strings/string_view.h"
 #include "google/protobuf/descriptor.h"
 #include "google/protobuf/descriptor.pb.h"
-#include "google/protobuf/io/strtod.h"
 #include "google/protobuf/io/tokenizer.h"
 #include "google/protobuf/port.h"
 #include "google/protobuf/wire_format.h"
@@ -68,8 +65,7 @@ namespace {
 
 using ::google::protobuf::internal::DownCast;
 
-using TypeNameMap =
-    absl::flat_hash_map<absl::string_view, FieldDescriptorProto::Type>;
+typedef std::unordered_map<std::string, FieldDescriptorProto::Type> TypeNameMap;
 
 const TypeNameMap& GetTypeNameTable() {
   static auto* table = new auto([]() {
@@ -801,7 +797,7 @@ bool Parser::ParseMessageDefinition(
     //
     // We have to make sure the oneof names don't conflict with any other
     // field or oneof.
-    absl::flat_hash_set<std::string> names;
+    std::unordered_set<std::string> names;
     for (const auto& field : message->field()) {
       names.insert(field.name());
     }
@@ -826,7 +822,7 @@ bool Parser::ParseMessageDefinition(
         names.insert(oneof_name);
         field.set_oneof_index(message->oneof_decl_size());
         OneofDescriptorProto* oneof = message->add_oneof_decl();
-        oneof->set_name(std::move(oneof_name));
+        oneof->set_name(oneof_name);
       }
     }
   }
@@ -1350,7 +1346,7 @@ bool Parser::ParseDefaultAssignment(
       double value = 0.0;
       DO(ConsumeNumber(&value, "Expected number."));
       // And stringify it again.
-      default_value->append(io::SimpleDtoa(value));
+      default_value->append(SimpleDtoa(value));
       break;
     }
     case FieldDescriptorProto::TYPE_BOOL:

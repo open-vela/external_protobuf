@@ -40,6 +40,7 @@
 #include <vector>
 
 #include "google/protobuf/wire_format.h"
+#include "google/protobuf/stubs/strutil.h"
 #include "absl/container/flat_hash_set.h"
 #include "absl/strings/ascii.h"
 #include "absl/strings/escaping.h"
@@ -51,7 +52,6 @@
 #include "absl/strings/substitute.h"
 #include "google/protobuf/compiler/java/name_resolver.h"
 #include "google/protobuf/descriptor.pb.h"
-#include "google/protobuf/io/strtod.h"
 
 // Must be last.
 #include "google/protobuf/port_def.inc"
@@ -84,10 +84,11 @@ void PrintGeneratedAnnotation(io::Printer* printer, char delimiter,
   printer->Print(ptemplate.c_str(), "annotation_file", annotation_file);
 }
 
-void PrintEnumVerifierLogic(
-    io::Printer* printer, const FieldDescriptor* descriptor,
-    const absl::flat_hash_map<absl::string_view, std::string>& variables,
-    const char* var_name, const char* terminating_string, bool enforce_lite) {
+void PrintEnumVerifierLogic(io::Printer* printer,
+                            const FieldDescriptor* descriptor,
+                            const std::map<std::string, std::string>& variables,
+                            const char* var_name,
+                            const char* terminating_string, bool enforce_lite) {
   std::string enum_verifier_string =
       enforce_lite ? absl::StrCat(var_name, ".internalGetVerifier()")
                    : absl::StrCat(
@@ -478,7 +479,7 @@ std::string DefaultValue(const FieldDescriptor* field, bool immutable,
       } else if (value != value) {
         return "Double.NaN";
       } else {
-        return io::SimpleDtoa(value) + "D";
+        return SimpleDtoa(value) + "D";
       }
     }
     case FieldDescriptor::CPPTYPE_FLOAT: {
@@ -490,7 +491,7 @@ std::string DefaultValue(const FieldDescriptor* field, bool immutable,
       } else if (value != value) {
         return "Float.NaN";
       } else {
-        return io::SimpleFtoa(value) + "F";
+        return SimpleFtoa(value) + "F";
       }
     }
     case FieldDescriptor::CPPTYPE_BOOL:

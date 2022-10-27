@@ -70,7 +70,6 @@ using protobuf_unittest::TestAllExtensions;
 using protobuf_unittest::TestAllTypes;
 using protobuf_unittest::TestEmptyMessage;
 using protobuf_unittest::TestOneof2;
-using protobuf_unittest::TestRepeatedString;
 
 namespace google {
 namespace protobuf {

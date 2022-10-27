@@ -122,7 +122,7 @@ std::string BuildCommentsString(const SourceLocation& location,
 
 template <class TDescriptor>
 std::string GetOptionalDeprecatedAttribute(const TDescriptor* descriptor,
-                                           const FileDescriptor* file = nullptr,
+                                           const FileDescriptor* file = NULL,
                                            bool preSpace = true,
                                            bool postNewline = false) {
   bool isDeprecated = descriptor->options().deprecated();

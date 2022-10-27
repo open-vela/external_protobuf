@@ -36,7 +36,6 @@
 
 #include <algorithm>
 #include <array>
-#include <cstdlib>
 #include <functional>
 #include <limits>
 #include <map>
@@ -49,6 +48,7 @@
 
 #include "google/protobuf/stubs/common.h"
 #include "google/protobuf/stubs/logging.h"
+#include "google/protobuf/stubs/strutil.h"
 #include "absl/base/call_once.h"
 #include "absl/base/casts.h"
 #include "absl/base/dynamic_annotations.h"
@@ -2477,9 +2477,9 @@ std::string FieldDescriptor::DefaultValueAsString(
     case CPPTYPE_UINT64:
       return absl::StrCat(default_value_uint64_t());
     case CPPTYPE_FLOAT:
-      return io::SimpleFtoa(default_value_float());
+      return SimpleFtoa(default_value_float());
     case CPPTYPE_DOUBLE:
-      return io::SimpleDtoa(default_value_double());
+      return SimpleDtoa(default_value_double());
     case CPPTYPE_BOOL:
       return default_value_bool() ? "true" : "false";
     case CPPTYPE_STRING:
@@ -5562,23 +5562,19 @@ void DescriptorBuilder::BuildFieldOrExtension(const FieldDescriptorProto& proto,
       switch (result->cpp_type()) {
         case FieldDescriptor::CPPTYPE_INT32:
           result->default_value_int32_t_ =
-              std::strtol(proto.default_value().c_str(), &end_pos, 0);
+              strtol(proto.default_value().c_str(), &end_pos, 0);
           break;
         case FieldDescriptor::CPPTYPE_INT64:
-          static_assert(sizeof(int64_t) == sizeof(long long),
-                        "sizeof int64_t is not sizeof long long");
           result->default_value_int64_t_ =
-              std::strtoll(proto.default_value().c_str(), &end_pos, 0);
+              strto64(proto.default_value().c_str(), &end_pos, 0);
           break;
         case FieldDescriptor::CPPTYPE_UINT32:
           result->default_value_uint32_t_ =
-              std::strtoul(proto.default_value().c_str(), &end_pos, 0);
+              strtoul(proto.default_value().c_str(), &end_pos, 0);
           break;
         case FieldDescriptor::CPPTYPE_UINT64:
-          static_assert(sizeof(uint64_t) == sizeof(unsigned long long),
-                        "sizeof uint64_t is not sizeof unsigned long long");
           result->default_value_uint64_t_ =
-              std::strtoull(proto.default_value().c_str(), &end_pos, 0);
+              strtou64(proto.default_value().c_str(), &end_pos, 0);
           break;
         case FieldDescriptor::CPPTYPE_FLOAT:
           if (proto.default_value() == "inf") {
