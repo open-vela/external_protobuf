@@ -32,7 +32,7 @@
 //  Based on original Protocol Buffers design by
 //  Sanjay Ghemawat, Jeff Dean, and others.
 
-#include <google/protobuf/text_format.h>
+#include "google/protobuf/text_format.h"
 
 #include <float.h>
 #include <stdio.h>
@@ -42,29 +42,33 @@
 #include <climits>
 #include <cmath>
 #include <limits>
+#include <string>
 #include <utility>
 #include <vector>
 
-#include <google/protobuf/io/coded_stream.h>
-#include <google/protobuf/io/tokenizer.h>
-#include <google/protobuf/io/zero_copy_stream.h>
-#include <google/protobuf/io/zero_copy_stream_impl.h>
-#include <google/protobuf/stubs/strutil.h>
-#include <google/protobuf/any.h>
-#include <google/protobuf/descriptor.h>
-#include <google/protobuf/descriptor.pb.h>
-#include <google/protobuf/dynamic_message.h>
-#include <google/protobuf/io/strtod.h>
-#include <google/protobuf/map_field.h>
-#include <google/protobuf/message.h>
-#include <google/protobuf/repeated_field.h>
-#include <google/protobuf/unknown_field_set.h>
-#include <google/protobuf/wire_format_lite.h>
-#include <google/protobuf/stubs/map_util.h>
-#include <google/protobuf/stubs/stl_util.h>
+#include "google/protobuf/io/coded_stream.h"
+#include "google/protobuf/io/tokenizer.h"
+#include "google/protobuf/io/zero_copy_stream.h"
+#include "google/protobuf/io/zero_copy_stream_impl.h"
+#include "absl/strings/ascii.h"
+#include "absl/strings/escaping.h"
+#include "absl/strings/numbers.h"
+#include "absl/strings/str_cat.h"
+#include "absl/strings/str_join.h"
+#include "absl/strings/string_view.h"
+#include "google/protobuf/any.h"
+#include "google/protobuf/descriptor.h"
+#include "google/protobuf/descriptor.pb.h"
+#include "google/protobuf/dynamic_message.h"
+#include "google/protobuf/io/strtod.h"
+#include "google/protobuf/map_field.h"
+#include "google/protobuf/message.h"
+#include "google/protobuf/repeated_field.h"
+#include "google/protobuf/unknown_field_set.h"
+#include "google/protobuf/wire_format_lite.h"
 
 // Must be included last.
-#include <google/protobuf/port_def.inc>
+#include "google/protobuf/port_def.inc"
 
 namespace google {
 namespace protobuf {
@@ -87,6 +91,12 @@ namespace internal {
 const char kDebugStringSilentMarker[] = "";
 const char kDebugStringSilentMarkerForDetection[] = "\t ";
 
+// Controls insertion of a marker making debug strings non-parseable.
+PROTOBUF_EXPORT std::atomic<bool> enable_debug_text_redaction_marker;
+
+// Controls insertion of a randomized marker in debug strings.
+PROTOBUF_EXPORT std::atomic<bool> enable_debug_text_random_marker;
+
 // Controls insertion of kDebugStringSilentMarker.
 PROTOBUF_EXPORT std::atomic<bool> enable_debug_text_format_marker;
 }  // namespace internal
@@ -98,6 +108,12 @@ std::string Message::DebugString() const {
   printer.SetExpandAny(true);
   printer.SetInsertSilentMarker(internal::enable_debug_text_format_marker.load(
       std::memory_order_relaxed));
+  printer.SetRedactDebugString(
+      internal::enable_debug_text_redaction_marker.load(
+          std::memory_order_relaxed));
+  printer.SetRandomizeDebugString(
+      internal::enable_debug_text_random_marker.load(
+          std::memory_order_relaxed));
 
   printer.PrintToString(*this, &debug_string);
 
@@ -112,6 +128,12 @@ std::string Message::ShortDebugString() const {
   printer.SetExpandAny(true);
   printer.SetInsertSilentMarker(internal::enable_debug_text_format_marker.load(
       std::memory_order_relaxed));
+  printer.SetRedactDebugString(
+      internal::enable_debug_text_redaction_marker.load(
+          std::memory_order_relaxed));
+  printer.SetRandomizeDebugString(
+      internal::enable_debug_text_random_marker.load(
+          std::memory_order_relaxed));
 
   printer.PrintToString(*this, &debug_string);
   // Single line mode currently might have an extra space at the end.
@@ -130,6 +152,12 @@ std::string Message::Utf8DebugString() const {
   printer.SetExpandAny(true);
   printer.SetInsertSilentMarker(internal::enable_debug_text_format_marker.load(
       std::memory_order_relaxed));
+  printer.SetRedactDebugString(
+      internal::enable_debug_text_redaction_marker.load(
+          std::memory_order_relaxed));
+  printer.SetRandomizeDebugString(
+      internal::enable_debug_text_random_marker.load(
+          std::memory_order_relaxed));
 
   printer.PrintToString(*this, &debug_string);
 
@@ -137,6 +165,23 @@ std::string Message::Utf8DebugString() const {
 }
 
 void Message::PrintDebugString() const { printf("%s", DebugString().c_str()); }
+
+namespace internal {
+
+void PerformAbslStringify(const Message& message,
+                          absl::FunctionRef<void(absl::string_view)> append) {
+  // TODO(b/249835002): consider using the single line version for short
+  TextFormat::Printer printer;
+  printer.SetExpandAny(true);
+  printer.SetInsertSilentMarker(true);
+  printer.SetRedactDebugString(true);
+  printer.SetRandomizeDebugString(true);
+  std::string result;
+  printer.PrintToString(message, &result);
+  append(result);
+}
+
+}  // namespace internal
 
 
 // ===========================================================================
@@ -175,14 +220,13 @@ TextFormat::ParseLocationRange TextFormat::ParseInfoTree::GetLocationRange(
     index = 0;
   }
 
-  const std::vector<TextFormat::ParseLocationRange>* locations =
-      FindOrNull(locations_, field);
-  if (locations == nullptr ||
-      index >= static_cast<int64_t>(locations->size())) {
+  auto it = locations_.find(field);
+  if (it == locations_.end() ||
+      index >= static_cast<int64_t>(it->second.size())) {
     return TextFormat::ParseLocationRange();
   }
 
-  return (*locations)[index];
+  return it->second[static_cast<size_t>(index)];
 }
 
 TextFormat::ParseInfoTree* TextFormat::ParseInfoTree::GetTreeForNested(
@@ -197,7 +241,7 @@ TextFormat::ParseInfoTree* TextFormat::ParseInfoTree::GetTreeForNested(
     return nullptr;
   }
 
-  return it->second[index].get();
+  return it->second[static_cast<size_t>(index)].get();
 }
 
 namespace {
@@ -294,6 +338,8 @@ class TextFormat::Parser::ParserImpl {
     // Consume the starting token.
     tokenizer_.Next();
   }
+  ParserImpl(const ParserImpl&) = delete;
+  ParserImpl& operator=(const ParserImpl&) = delete;
   ~ParserImpl() {}
 
   // Parses the ASCII representation specified in input and saves the
@@ -368,8 +414,6 @@ class TextFormat::Parser::ParserImpl {
   static constexpr int64_t kint64max = std::numeric_limits<int64_t>::max();
   static constexpr uint64_t kuint64max = std::numeric_limits<uint64_t>::max();
 
-  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(ParserImpl);
-
   // Reports an error with the given message with information indicating
   // the position (as derived from the current token).
   void ReportError(const std::string& message) {
@@ -429,7 +473,7 @@ class TextFormat::Parser::ParserImpl {
       std::string full_type_name, prefix;
       DO(ConsumeAnyTypeUrl(&full_type_name, &prefix));
       std::string prefix_and_full_type_name =
-          StrCat(prefix, full_type_name);
+          absl::StrCat(prefix, full_type_name);
       DO(ConsumeBeforeWhitespace("]"));
       TryConsumeWhitespace();
       // ':' is optional between message labels and values.
@@ -489,7 +533,7 @@ class TextFormat::Parser::ParserImpl {
       TryConsumeWhitespace();
 
       int32_t field_number;
-      if (allow_field_number_ && safe_strto32(field_name, &field_number)) {
+      if (allow_field_number_ && absl::SimpleAtoi(field_name, &field_number)) {
         if (descriptor->IsExtensionNumber(field_number)) {
           field = finder_
                       ? finder_->FindExtensionByNumber(descriptor, field_number)
@@ -507,7 +551,7 @@ class TextFormat::Parser::ParserImpl {
         // field names.
         if (field == nullptr) {
           std::string lower_field_name = field_name;
-          LowerString(&lower_field_name);
+          absl::AsciiStrToLower(&lower_field_name);
           field = descriptor->FindFieldByName(lower_field_name);
           // If the case-insensitive match worked but the field is NOT a group,
           if (field != nullptr &&
@@ -523,7 +567,7 @@ class TextFormat::Parser::ParserImpl {
 
         if (field == nullptr && allow_case_insensitive_field_) {
           std::string lower_field_name = field_name;
-          LowerString(&lower_field_name);
+          absl::AsciiStrToLower(&lower_field_name);
           field = descriptor->FindFieldByLowercaseName(lower_field_name);
         }
 
@@ -561,6 +605,11 @@ class TextFormat::Parser::ParserImpl {
         }
       }
       return SkipFieldMessage();
+    }
+
+    if (field->options().deprecated()) {
+      ReportWarning("text format contains deprecated field \"" + field_name +
+                    "\"");
     }
 
     if (singular_overwrite_policy_ == FORBID_SINGULAR_OVERWRITES) {
@@ -638,11 +687,6 @@ class TextFormat::Parser::ParserImpl {
     // semicolons.
     TryConsume(";") || TryConsume(",");
 
-    if (field->options().deprecated()) {
-      ReportWarning("text format contains deprecated field \"" + field_name +
-                    "\"");
-    }
-
     // If a parse info tree exists, add the location for the parsed
     // field.
     if (parse_info_tree_ != nullptr) {
@@ -695,7 +739,7 @@ class TextFormat::Parser::ParserImpl {
                            const FieldDescriptor* field) {
     if (--recursion_limit_ < 0) {
       ReportError(
-          StrCat("Message is too deep, the parser exceeded the "
+          absl::StrCat("Message is too deep, the parser exceeded the "
                        "configured recursion limit of ",
                        initial_recursion_limit_, "."));
       return false;
@@ -731,7 +775,7 @@ class TextFormat::Parser::ParserImpl {
   bool SkipFieldMessage() {
     if (--recursion_limit_ < 0) {
       ReportError(
-          StrCat("Message is too deep, the parser exceeded the "
+          absl::StrCat("Message is too deep, the parser exceeded the "
                        "configured recursion limit of ",
                        initial_recursion_limit_, "."));
       return false;
@@ -845,7 +889,7 @@ class TextFormat::Parser::ParserImpl {
         } else if (LookingAt("-") ||
                    LookingAtType(io::Tokenizer::TYPE_INTEGER)) {
           DO(ConsumeSignedInteger(&int_value, kint32max));
-          value = StrCat(int_value);  // for error reporting
+          value = absl::StrCat(int_value);  // for error reporting
           enum_value = enum_type->FindValueByNumber(int_value);
         } else {
           ReportError("Expected integer or identifier, got: " +
@@ -891,7 +935,7 @@ class TextFormat::Parser::ParserImpl {
   bool SkipFieldValue() {
     if (--recursion_limit_ < 0) {
       ReportError(
-          StrCat("Message is too deep, the parser exceeded the "
+          absl::StrCat("Message is too deep, the parser exceeded the "
                        "configured recursion limit of ",
                        initial_recursion_limit_, "."));
       return false;
@@ -905,16 +949,18 @@ class TextFormat::Parser::ParserImpl {
       return true;
     }
     if (TryConsume("[")) {
-      while (true) {
-        if (!LookingAt("{") && !LookingAt("<")) {
-          DO(SkipFieldValue());
-        } else {
-          DO(SkipFieldMessage());
+      if (!TryConsume("]")) {
+        while (true) {
+          if (!LookingAt("{") && !LookingAt("<")) {
+            DO(SkipFieldValue());
+          } else {
+            DO(SkipFieldMessage());
+          }
+          if (TryConsume("]")) {
+            break;
+          }
+          DO(Consume(","));
         }
-        if (TryConsume("]")) {
-          break;
-        }
-        DO(Consume(","));
       }
       ++recursion_limit_;
       return true;
@@ -957,7 +1003,7 @@ class TextFormat::Parser::ParserImpl {
     //   inf, inff, infinity, nan
     if (has_minus && LookingAtType(io::Tokenizer::TYPE_IDENTIFIER)) {
       std::string text = tokenizer_.current().text;
-      LowerString(&text);
+      absl::AsciiStrToLower(&text);
       if (text != "inf" &&
           text != "infinity" && text != "nan") {
         ReportError("Invalid float number: " + text);
@@ -1162,7 +1208,7 @@ class TextFormat::Parser::ParserImpl {
       tokenizer_.Next();
     } else if (LookingAtType(io::Tokenizer::TYPE_IDENTIFIER)) {
       std::string text = tokenizer_.current().text;
-      LowerString(&text);
+      absl::AsciiStrToLower(&text);
       if (text == "inf" ||
           text == "infinity") {
         *value = std::numeric_limits<double>::infinity();
@@ -1284,7 +1330,7 @@ class TextFormat::Parser::ParserImpl {
     had_silent_marker_ = false;
     if (LookingAtType(io::Tokenizer::TYPE_WHITESPACE)) {
       if (tokenizer_.current().text ==
-          StrCat(" ", internal::kDebugStringSilentMarkerForDetection)) {
+          absl::StrCat(" ", internal::kDebugStringSilentMarkerForDetection)) {
         had_silent_marker_ = true;
       }
       tokenizer_.Next();
@@ -1300,6 +1346,8 @@ class TextFormat::Parser::ParserImpl {
     explicit ParserErrorCollector(TextFormat::Parser::ParserImpl* parser)
         : parser_(parser) {}
 
+    ParserErrorCollector(const ParserErrorCollector&) = delete;
+    ParserErrorCollector& operator=(const ParserErrorCollector&) = delete;
     ~ParserErrorCollector() override {}
 
     void AddError(int line, int column, const std::string& message) override {
@@ -1311,7 +1359,6 @@ class TextFormat::Parser::ParserImpl {
     }
 
    private:
-    GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(ParserErrorCollector);
     TextFormat::Parser::ParserImpl* parser_;
   };
 
@@ -1362,6 +1409,8 @@ class TextFormat::Printer::TextGenerator
         indent_level_(initial_indent_level),
         initial_indent_level_(initial_indent_level) {}
 
+  TextGenerator(const TextGenerator&) = delete;
+  TextGenerator& operator=(const TextGenerator&) = delete;
   ~TextGenerator() override {
     // Only BackUp() if we're sure we've successfully called Next() at least
     // once.
@@ -1421,15 +1470,15 @@ class TextFormat::Printer::TextGenerator
   // error.)
   bool failed() const { return failed_; }
 
-  void PrintMaybeWithMarker(StringPiece text) {
+  void PrintMaybeWithMarker(absl::string_view text) {
     Print(text.data(), text.size());
     if (ConsumeInsertSilentMarker()) {
       PrintLiteral(internal::kDebugStringSilentMarker);
     }
   }
 
-  void PrintMaybeWithMarker(StringPiece text_head,
-                            StringPiece text_tail) {
+  void PrintMaybeWithMarker(absl::string_view text_head,
+                            absl::string_view text_tail) {
     Print(text_head.data(), text_head.size());
     if (ConsumeInsertSilentMarker()) {
       PrintLiteral(internal::kDebugStringSilentMarker);
@@ -1438,8 +1487,6 @@ class TextFormat::Printer::TextGenerator
   }
 
  private:
-  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(TextGenerator);
-
   void Write(const char* data, size_t size) {
     if (failed_) return;
     if (size == 0) return;
@@ -1549,7 +1596,7 @@ class TextFormat::Printer::FastFieldValuePrinterUtf8Escaping
   void PrintString(const std::string& val,
                    TextFormat::BaseTextGenerator* generator) const override {
     generator->PrintLiteral("\"");
-    generator->PrintString(strings::Utf8SafeCEscape(val));
+    generator->PrintString(absl::Utf8SafeCEscape(val));
     generator->PrintLiteral("\"");
   }
   void PrintBytes(const std::string& val,
@@ -1603,12 +1650,12 @@ TextFormat::Parser::~Parser() {}
 
 namespace {
 
-bool CheckParseInputSize(StringPiece input,
+bool CheckParseInputSize(absl::string_view input,
                          io::ErrorCollector* error_collector) {
   if (input.size() > INT_MAX) {
     error_collector->AddError(
         -1, 0,
-        StrCat(
+        absl::StrCat(
             "Input size too large: ", static_cast<int64_t>(input.size()),
             " bytes", " > ", INT_MAX, " bytes."));
     return false;
@@ -1635,7 +1682,7 @@ bool TextFormat::Parser::Parse(io::ZeroCopyInputStream* input,
   return MergeUsingImpl(input, output, &parser);
 }
 
-bool TextFormat::Parser::ParseFromString(ConstStringParam input,
+bool TextFormat::Parser::ParseFromString(absl::string_view input,
                                          Message* output) {
   DO(CheckParseInputSize(input, error_collector_));
   io::ArrayInputStream input_stream(input.data(), input.size());
@@ -1653,7 +1700,7 @@ bool TextFormat::Parser::Merge(io::ZeroCopyInputStream* input,
   return MergeUsingImpl(input, output, &parser);
 }
 
-bool TextFormat::Parser::MergeFromString(ConstStringParam input,
+bool TextFormat::Parser::MergeFromString(absl::string_view input,
                                          Message* output) {
   DO(CheckParseInputSize(input, error_collector_));
   io::ArrayInputStream input_stream(input.data(), input.size());
@@ -1669,7 +1716,7 @@ bool TextFormat::Parser::MergeUsingImpl(io::ZeroCopyInputStream* /* input */,
     output->FindInitializationErrors(&missing_fields);
     parser_impl->ReportError(-1, 0,
                              "Message missing required fields: " +
-                                 Join(missing_fields, ", "));
+                                 absl::StrJoin(missing_fields, ", "));
     return false;
   }
   return true;
@@ -1698,12 +1745,12 @@ bool TextFormat::Parser::ParseFieldValueFromString(const std::string& input,
   return Parser().Merge(input, output);
 }
 
-/* static */ bool TextFormat::ParseFromString(ConstStringParam input,
+/* static */ bool TextFormat::ParseFromString(absl::string_view input,
                                               Message* output) {
   return Parser().ParseFromString(input, output);
 }
 
-/* static */ bool TextFormat::MergeFromString(ConstStringParam input,
+/* static */ bool TextFormat::MergeFromString(absl::string_view input,
                                               Message* output) {
   return Parser().MergeFromString(input, output);
 }
@@ -1723,13 +1770,7 @@ class StringBaseTextGenerator : public TextFormat::BaseTextGenerator {
     output_.append(text, size);
   }
 
-// Some compilers do not support ref-qualifiers even in C++11 mode.
-// Disable the optimization for now and revisit it later.
-#if 0  // LANG_CXX11
   std::string Consume() && { return std::move(output_); }
-#else  // !LANG_CXX11
-  const std::string& Get() { return output_; }
-#endif  // LANG_CXX11
 
  private:
   std::string output_;
@@ -1743,17 +1784,10 @@ class StringBaseTextGenerator : public TextFormat::BaseTextGenerator {
 TextFormat::FieldValuePrinter::FieldValuePrinter() {}
 TextFormat::FieldValuePrinter::~FieldValuePrinter() {}
 
-#if 0  // LANG_CXX11
 #define FORWARD_IMPL(fn, ...)            \
   StringBaseTextGenerator generator;     \
   delegate_.fn(__VA_ARGS__, &generator); \
   return std::move(generator).Consume()
-#else  // !LANG_CXX11
-#define FORWARD_IMPL(fn, ...)            \
-  StringBaseTextGenerator generator;     \
-  delegate_.fn(__VA_ARGS__, &generator); \
-  return generator.Get()
-#endif  // LANG_CXX11
 
 std::string TextFormat::FieldValuePrinter::PrintBool(bool val) const {
   FORWARD_IMPL(PrintBool, val);
@@ -1819,27 +1853,27 @@ void TextFormat::FastFieldValuePrinter::PrintBool(
 }
 void TextFormat::FastFieldValuePrinter::PrintInt32(
     int32_t val, BaseTextGenerator* generator) const {
-  generator->PrintString(StrCat(val));
+  generator->PrintString(absl::StrCat(val));
 }
 void TextFormat::FastFieldValuePrinter::PrintUInt32(
     uint32_t val, BaseTextGenerator* generator) const {
-  generator->PrintString(StrCat(val));
+  generator->PrintString(absl::StrCat(val));
 }
 void TextFormat::FastFieldValuePrinter::PrintInt64(
     int64_t val, BaseTextGenerator* generator) const {
-  generator->PrintString(StrCat(val));
+  generator->PrintString(absl::StrCat(val));
 }
 void TextFormat::FastFieldValuePrinter::PrintUInt64(
     uint64_t val, BaseTextGenerator* generator) const {
-  generator->PrintString(StrCat(val));
+  generator->PrintString(absl::StrCat(val));
 }
 void TextFormat::FastFieldValuePrinter::PrintFloat(
     float val, BaseTextGenerator* generator) const {
-  generator->PrintString(!std::isnan(val) ? SimpleFtoa(val) : "nan");
+  generator->PrintString(!std::isnan(val) ? io::SimpleFtoa(val) : "nan");
 }
 void TextFormat::FastFieldValuePrinter::PrintDouble(
     double val, BaseTextGenerator* generator) const {
-  generator->PrintString(!std::isnan(val) ? SimpleDtoa(val) : "nan");
+  generator->PrintString(!std::isnan(val) ? io::SimpleDtoa(val) : "nan");
 }
 void TextFormat::FastFieldValuePrinter::PrintEnum(
     int32_t /*val*/, const std::string& name,
@@ -1850,7 +1884,7 @@ void TextFormat::FastFieldValuePrinter::PrintEnum(
 void TextFormat::FastFieldValuePrinter::PrintString(
     const std::string& val, BaseTextGenerator* generator) const {
   generator->PrintLiteral("\"");
-  generator->PrintString(CEscape(val));
+  generator->PrintString(absl::CEscape(val));
   generator->PrintLiteral("\"");
 }
 void TextFormat::FastFieldValuePrinter::PrintBytes(
@@ -1997,6 +2031,8 @@ TextFormat::Printer::Printer()
       use_field_number_(false),
       use_short_repeated_primitives_(false),
       insert_silent_marker_(false),
+      redact_debug_string_(false),
+      randomize_debug_string_(false),
       hide_unknown_fields_(false),
       print_message_fields_in_index_order_(false),
       expand_any_(false),
@@ -2088,6 +2124,13 @@ bool TextFormat::Printer::PrintUnknownFieldsToString(
 bool TextFormat::Printer::Print(const Message& message,
                                 io::ZeroCopyOutputStream* output) const {
   TextGenerator generator(output, insert_silent_marker_, initial_indent_level_);
+
+#ifndef PROTO2_OPENSOURCE
+#ifdef SUPPORT_EXPLICIT_DEBUG_STRING
+  internal::PrintTextMarker(&generator, redact_debug_string_,
+                            randomize_debug_string_, single_line_mode_);
+#endif
+#endif
 
   Print(message, &generator);
 
@@ -2510,7 +2553,7 @@ void TextFormat::Printer::PrintFieldName(const Message& message,
   // if use_field_number_ is true, prints field number instead
   // of field name.
   if (use_field_number_) {
-    generator->PrintString(StrCat(field->number()));
+    generator->PrintString(absl::StrCat(field->number()));
     return;
   }
 
@@ -2589,7 +2632,7 @@ void TextFormat::Printer::PrintFieldValue(const Message& message,
         // it is possible for the user to force an unknown integer value.  So we
         // simply use the integer value itself as the enum value name in this
         // case.
-        printer->PrintEnum(enum_value, StrCat(enum_value), generator);
+        printer->PrintEnum(enum_value, absl::StrCat(enum_value), generator);
       }
       break;
     }
@@ -2639,13 +2682,13 @@ void TextFormat::Printer::PrintUnknownFields(
     int recursion_budget) const {
   for (int i = 0; i < unknown_fields.field_count(); i++) {
     const UnknownField& field = unknown_fields.field(i);
-    std::string field_number = StrCat(field.number());
+    std::string field_number = absl::StrCat(field.number());
 
     switch (field.type()) {
       case UnknownField::TYPE_VARINT:
         generator->PrintString(field_number);
         generator->PrintMaybeWithMarker(": ");
-        generator->PrintString(StrCat(field.varint()));
+        generator->PrintString(absl::StrCat(field.varint()));
         if (single_line_mode_) {
           generator->PrintLiteral(" ");
         } else {
@@ -2656,7 +2699,7 @@ void TextFormat::Printer::PrintUnknownFields(
         generator->PrintString(field_number);
         generator->PrintMaybeWithMarker(": ", "0x");
         generator->PrintString(
-            StrCat(strings::Hex(field.fixed32(), strings::ZERO_PAD_8)));
+            absl::StrCat(absl::Hex(field.fixed32(), absl::kZeroPad8)));
         if (single_line_mode_) {
           generator->PrintLiteral(" ");
         } else {
@@ -2668,7 +2711,7 @@ void TextFormat::Printer::PrintUnknownFields(
         generator->PrintString(field_number);
         generator->PrintMaybeWithMarker(": ", "0x");
         generator->PrintString(
-            StrCat(strings::Hex(field.fixed64(), strings::ZERO_PAD_16)));
+            absl::StrCat(absl::Hex(field.fixed64(), absl::kZeroPad16)));
         if (single_line_mode_) {
           generator->PrintLiteral(" ");
         } else {
@@ -2708,7 +2751,7 @@ void TextFormat::Printer::PrintUnknownFields(
           // This field is not parseable as a Message (or we ran out of
           // recursion budget). So it is probably just a plain string.
           generator->PrintMaybeWithMarker(": ", "\"");
-          generator->PrintString(CEscape(value));
+          generator->PrintString(absl::CEscape(value));
           if (single_line_mode_) {
             generator->PrintLiteral("\" ");
           } else {
@@ -2743,4 +2786,4 @@ void TextFormat::Printer::PrintUnknownFields(
 }  // namespace protobuf
 }  // namespace google
 
-#include <google/protobuf/port_undef.inc>
+#include "google/protobuf/port_undef.inc"

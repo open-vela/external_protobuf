@@ -38,33 +38,31 @@
 #include <memory>
 #include <vector>
 
-#include <google/protobuf/any.pb.h>
-#include <google/protobuf/compiler/importer.h>
-#include <google/protobuf/compiler/parser.h>
-#include <google/protobuf/unittest.pb.h>
-#include <google/protobuf/unittest_custom_options.pb.h>
-#include <google/protobuf/stubs/common.h>
-#include <google/protobuf/stubs/logging.h>
-#include <google/protobuf/stubs/stringprintf.h>
-#include <google/protobuf/unittest_lazy_dependencies.pb.h>
-#include <google/protobuf/unittest_proto3_arena.pb.h>
-#include <google/protobuf/io/tokenizer.h>
-#include <google/protobuf/io/zero_copy_stream_impl.h>
-#include <google/protobuf/descriptor.pb.h>
-#include <google/protobuf/descriptor.h>
-#include <google/protobuf/descriptor_database.h>
-#include <google/protobuf/dynamic_message.h>
-#include <google/protobuf/text_format.h>
-#include <google/protobuf/stubs/strutil.h>
+#include "google/protobuf/any.pb.h"
+#include "google/protobuf/compiler/importer.h"
+#include "google/protobuf/compiler/parser.h"
+#include "google/protobuf/unittest.pb.h"
+#include "google/protobuf/descriptor.pb.h"
+#include "absl/strings/str_format.h"
+#include "google/protobuf/unittest_custom_options.pb.h"
+#include "google/protobuf/stubs/common.h"
+#include "google/protobuf/stubs/logging.h"
+#include "google/protobuf/unittest_lazy_dependencies.pb.h"
+#include "google/protobuf/unittest_proto3_arena.pb.h"
+#include "google/protobuf/descriptor.pb.h"
+#include "google/protobuf/descriptor.h"
+#include "google/protobuf/descriptor_database.h"
+#include "google/protobuf/dynamic_message.h"
+#include "google/protobuf/text_format.h"
 #include <gmock/gmock.h>
-#include <google/protobuf/testing/googletest.h>
+#include "google/protobuf/testing/googletest.h"
 #include <gtest/gtest.h>
-#include <google/protobuf/stubs/logging.h>
-#include <google/protobuf/stubs/substitute.h>
+#include "google/protobuf/stubs/logging.h"
+#include "absl/strings/substitute.h"
 
 
 // Must be included last.
-#include <google/protobuf/port_def.inc>
+#include "google/protobuf/port_def.inc"
 
 using ::testing::AnyOf;
 
@@ -247,7 +245,7 @@ class MockErrorCollector : public DescriptorPool::ErrorCollector {
         break;
     }
 
-    strings::SubstituteAndAppend(&text_, "$0: $1: $2: $3\n", filename,
+    absl::SubstituteAndAppend(&text_, "$0: $1: $2: $3\n", filename,
                               element_name, location_name, message);
   }
 
@@ -292,7 +290,7 @@ class MockErrorCollector : public DescriptorPool::ErrorCollector {
         break;
     }
 
-    strings::SubstituteAndAppend(&warning_text_, "$0: $1: $2: $3\n", filename,
+    absl::SubstituteAndAppend(&warning_text_, "$0: $1: $2: $3\n", filename,
                               element_name, location_name, message);
   }
 };
@@ -553,6 +551,29 @@ TEST_F(FileDescriptorTest, Syntax) {
   }
 }
 
+TEST_F(FileDescriptorTest, CopyHeadingTo) {
+  FileDescriptorProto proto;
+  proto.set_name("foo.proto");
+  proto.set_package("foo.bar.baz");
+  proto.set_syntax("proto3");
+  proto.mutable_options()->set_java_package("foo.bar.baz");
+
+  // Won't be copied.
+  proto.add_message_type()->set_name("Foo");
+
+  DescriptorPool pool;
+  const FileDescriptor* file = pool.BuildFile(proto);
+  ASSERT_NE(file, nullptr);
+
+  FileDescriptorProto other;
+  file->CopyHeadingTo(&other);
+  EXPECT_EQ(other.name(), "foo.proto");
+  EXPECT_EQ(other.package(), "foo.bar.baz");
+  EXPECT_EQ(other.syntax(), "proto3");
+  EXPECT_EQ(other.options().java_package(), "foo.bar.baz");
+  EXPECT_TRUE(other.message_type().empty());
+}
+
 void ExtractDebugString(
     const FileDescriptor* file, std::set<std::string>* visited,
     std::vector<std::pair<std::string, std::string>>* debug_strings) {
@@ -569,7 +590,7 @@ class SimpleErrorCollector : public io::ErrorCollector {
  public:
   // implements ErrorCollector ---------------------------------------
   void AddError(int line, int column, const std::string& message) override {
-    last_error_ = StringPrintf("%d:%d:", line, column) + message;
+    last_error_ = absl::StrFormat("%d:%d:%s", line, column, message);
   }
 
   const std::string& last_error() { return last_error_; }
@@ -1063,6 +1084,34 @@ TEST_F(DescriptorTest, FieldLabel) {
   EXPECT_TRUE(baz_->is_repeated());
 }
 
+TEST_F(DescriptorTest, NeedsUtf8Check) {
+  EXPECT_FALSE(foo_->requires_utf8_validation());
+  EXPECT_FALSE(bar_->requires_utf8_validation());
+
+  // Build a copy of the file in proto3.
+  FileDescriptorProto foo_file3;
+  foo_file_->CopyTo(&foo_file3);
+  foo_file3.set_syntax("proto3");
+
+  // Make this valid proto3 by removing `required` and the one group field.
+  for (auto& f : *foo_file3.mutable_message_type(1)->mutable_field()) {
+    f.clear_label();
+    if (f.type() == FieldDescriptorProto::TYPE_GROUP) {
+      f.set_type(FieldDescriptorProto::TYPE_MESSAGE);
+    }
+  }
+  // Make this valid proto3 by making the first enum value be zero.
+  foo_file3.mutable_enum_type(0)->mutable_value(0)->set_number(0);
+
+  DescriptorPool pool3;
+  const Descriptor* message3 = pool3.BuildFile(foo_file3)->message_type(1);
+  const FieldDescriptor* foo3 = message3->field(0);
+  const FieldDescriptor* bar3 = message3->field(1);
+
+  EXPECT_TRUE(foo3->requires_utf8_validation());
+  EXPECT_FALSE(bar3->requires_utf8_validation());
+}
+
 TEST_F(DescriptorTest, IsMap) {
   EXPECT_TRUE(map_->is_map());
   EXPECT_FALSE(baz_->is_map());
@@ -1533,6 +1582,23 @@ TEST_F(EnumDescriptorTest, ValueType) {
   EXPECT_EQ(enum_, bar_->type());
   EXPECT_EQ(enum2_, foo2_->type());
   EXPECT_EQ(enum2_, baz2_->type());
+}
+
+TEST_F(EnumDescriptorTest, IsClosed) {
+  // enum_ is proto2.
+  EXPECT_TRUE(enum_->is_closed());
+
+  // Make a proto3 version of enum_.
+  FileDescriptorProto foo_file3;
+  foo_file_->CopyTo(&foo_file3);
+  foo_file3.set_syntax("proto3");
+
+  // Make this valid proto3 by making the first enum value be zero.
+  foo_file3.mutable_enum_type(0)->mutable_value(0)->set_number(0);
+
+  DescriptorPool pool3;
+  const EnumDescriptor* enum3 = pool3.BuildFile(foo_file3)->enum_type(0);
+  EXPECT_FALSE(enum3->is_closed());
 }
 
 // ===================================================================
@@ -2706,15 +2772,19 @@ TEST_F(MiscTest, DefaultValues) {
       ->set_default_value("hello");
   AddField(message_proto, "data", 9, label, FD::TYPE_BYTES)
       ->set_default_value("\\001\\002\\003");
+  AddField(message_proto, "data2", 10, label, FD::TYPE_BYTES)
+      ->set_default_value("\\X01\\X2\\X3");
+  AddField(message_proto, "data3", 11, label, FD::TYPE_BYTES)
+      ->set_default_value("\\x01\\x2\\x3");
 
   FieldDescriptorProto* enum_field =
-      AddField(message_proto, "enum", 10, label, FD::TYPE_ENUM);
+      AddField(message_proto, "enum", 12, label, FD::TYPE_ENUM);
   enum_field->set_type_name("DummyEnum");
   enum_field->set_default_value("B");
 
   // Strings are allowed to have empty defaults.  (At one point, due to
   // a bug, empty defaults for strings were rejected.  Oops.)
-  AddField(message_proto, "empty_string", 11, label, FD::TYPE_STRING)
+  AddField(message_proto, "empty_string", 13, label, FD::TYPE_STRING)
       ->set_default_value("");
 
   // Add a second set of fields with implicit default values.
@@ -2744,7 +2814,7 @@ TEST_F(MiscTest, DefaultValues) {
   ASSERT_EQ(1, file->message_type_count());
   const Descriptor* message = file->message_type(0);
 
-  ASSERT_EQ(21, message->field_count());
+  ASSERT_EQ(23, message->field_count());
 
   // Check the default values.
   ASSERT_TRUE(message->field(0)->has_default_value());
@@ -2758,6 +2828,8 @@ TEST_F(MiscTest, DefaultValues) {
   ASSERT_TRUE(message->field(8)->has_default_value());
   ASSERT_TRUE(message->field(9)->has_default_value());
   ASSERT_TRUE(message->field(10)->has_default_value());
+  ASSERT_TRUE(message->field(11)->has_default_value());
+  ASSERT_TRUE(message->field(12)->has_default_value());
 
   EXPECT_EQ(-1, message->field(0)->default_value_int32());
   EXPECT_EQ(int64_t{-1000000000000}, message->field(1)->default_value_int64());
@@ -2768,11 +2840,11 @@ TEST_F(MiscTest, DefaultValues) {
   EXPECT_TRUE(message->field(6)->default_value_bool());
   EXPECT_EQ("hello", message->field(7)->default_value_string());
   EXPECT_EQ("\001\002\003", message->field(8)->default_value_string());
-  EXPECT_EQ(enum_value_b, message->field(9)->default_value_enum());
-  EXPECT_EQ("", message->field(10)->default_value_string());
+  EXPECT_EQ("\001\002\003", message->field(9)->default_value_string());
+  EXPECT_EQ("\001\002\003", message->field(10)->default_value_string());
+  EXPECT_EQ(enum_value_b, message->field(11)->default_value_enum());
+  EXPECT_EQ("", message->field(12)->default_value_string());
 
-  ASSERT_FALSE(message->field(11)->has_default_value());
-  ASSERT_FALSE(message->field(12)->has_default_value());
   ASSERT_FALSE(message->field(13)->has_default_value());
   ASSERT_FALSE(message->field(14)->has_default_value());
   ASSERT_FALSE(message->field(15)->has_default_value());
@@ -2781,17 +2853,19 @@ TEST_F(MiscTest, DefaultValues) {
   ASSERT_FALSE(message->field(18)->has_default_value());
   ASSERT_FALSE(message->field(19)->has_default_value());
   ASSERT_FALSE(message->field(20)->has_default_value());
+  ASSERT_FALSE(message->field(21)->has_default_value());
+  ASSERT_FALSE(message->field(22)->has_default_value());
 
-  EXPECT_EQ(0, message->field(11)->default_value_int32());
-  EXPECT_EQ(0, message->field(12)->default_value_int64());
-  EXPECT_EQ(0, message->field(13)->default_value_uint32());
-  EXPECT_EQ(0, message->field(14)->default_value_uint64());
-  EXPECT_EQ(0.0f, message->field(15)->default_value_float());
-  EXPECT_EQ(0.0, message->field(16)->default_value_double());
-  EXPECT_FALSE(message->field(17)->default_value_bool());
-  EXPECT_EQ("", message->field(18)->default_value_string());
-  EXPECT_EQ("", message->field(19)->default_value_string());
-  EXPECT_EQ(enum_value_a, message->field(20)->default_value_enum());
+  EXPECT_EQ(0, message->field(13)->default_value_int32());
+  EXPECT_EQ(0, message->field(14)->default_value_int64());
+  EXPECT_EQ(0, message->field(15)->default_value_uint32());
+  EXPECT_EQ(0, message->field(16)->default_value_uint64());
+  EXPECT_EQ(0.0f, message->field(17)->default_value_float());
+  EXPECT_EQ(0.0, message->field(18)->default_value_double());
+  EXPECT_FALSE(message->field(19)->default_value_bool());
+  EXPECT_EQ("", message->field(20)->default_value_string());
+  EXPECT_EQ("", message->field(21)->default_value_string());
+  EXPECT_EQ(enum_value_a, message->field(22)->default_value_enum());
 }
 
 TEST_F(MiscTest, FieldOptions) {
@@ -4244,7 +4318,7 @@ TEST_F(ValidationErrorTest, ReservedFieldsDebugString) {
 }
 
 TEST_F(ValidationErrorTest, DebugStringReservedRangeMax) {
-  const FileDescriptor* file = BuildFile(strings::Substitute(
+  const FileDescriptor* file = BuildFile(absl::Substitute(
       "name: \"foo.proto\" "
       "enum_type { "
       "  name: \"Bar\""
@@ -5294,8 +5368,7 @@ TEST_F(ValidationErrorTest, InputTypeNotDefined) {
       "  method { name: \"A\" input_type: \"Bar\" output_type: \"Foo\" }"
       "}",
 
-      "foo.proto: TestService.A: INPUT_TYPE: \"Bar\" is not defined.\n"
-  );
+      "foo.proto: TestService.A: INPUT_TYPE: \"Bar\" is not defined.\n");
 }
 
 TEST_F(ValidationErrorTest, InputTypeNotAMessage) {
@@ -5308,8 +5381,7 @@ TEST_F(ValidationErrorTest, InputTypeNotAMessage) {
       "  method { name: \"A\" input_type: \"Bar\" output_type: \"Foo\" }"
       "}",
 
-      "foo.proto: TestService.A: INPUT_TYPE: \"Bar\" is not a message type.\n"
-  );
+      "foo.proto: TestService.A: INPUT_TYPE: \"Bar\" is not a message type.\n");
 }
 
 TEST_F(ValidationErrorTest, OutputTypeNotDefined) {
@@ -5321,8 +5393,7 @@ TEST_F(ValidationErrorTest, OutputTypeNotDefined) {
       "  method { name: \"A\" input_type: \"Foo\" output_type: \"Bar\" }"
       "}",
 
-      "foo.proto: TestService.A: OUTPUT_TYPE: \"Bar\" is not defined.\n"
-  );
+      "foo.proto: TestService.A: OUTPUT_TYPE: \"Bar\" is not defined.\n");
 }
 
 TEST_F(ValidationErrorTest, OutputTypeNotAMessage) {
@@ -5335,8 +5406,8 @@ TEST_F(ValidationErrorTest, OutputTypeNotAMessage) {
       "  method { name: \"A\" input_type: \"Foo\" output_type: \"Bar\" }"
       "}",
 
-      "foo.proto: TestService.A: OUTPUT_TYPE: \"Bar\" is not a message type.\n"
-  );
+      "foo.proto: TestService.A: OUTPUT_TYPE: \"Bar\" is not a message "
+      "type.\n");
 }
 
 
@@ -5557,7 +5628,7 @@ TEST_F(ValidationErrorTest, Int32OptionValueOutOfPositiveRange) {
       "                                 positive_int_value: 0x80000000 } "
       "}",
 
-      "foo.proto: foo.proto: OPTION_VALUE: Value out of range "
+      "foo.proto: foo.proto: OPTION_VALUE: Value out of range, -2147483648 to 2147483647, "
       "for int32 option \"foo\".\n");
 }
 
@@ -5574,7 +5645,7 @@ TEST_F(ValidationErrorTest, Int32OptionValueOutOfNegativeRange) {
       "                                 negative_int_value: -0x80000001 } "
       "}",
 
-      "foo.proto: foo.proto: OPTION_VALUE: Value out of range "
+      "foo.proto: foo.proto: OPTION_VALUE: Value out of range, -2147483648 to 2147483647, "
       "for int32 option \"foo\".\n");
 }
 
@@ -5590,7 +5661,7 @@ TEST_F(ValidationErrorTest, Int32OptionValueIsNotPositiveInt) {
       "                                        is_extension: true } "
       "                                 string_value: \"5\" } }",
 
-      "foo.proto: foo.proto: OPTION_VALUE: Value must be integer "
+      "foo.proto: foo.proto: OPTION_VALUE: Value must be integer, from -2147483648 to 2147483647, "
       "for int32 option \"foo\".\n");
 }
 
@@ -5608,7 +5679,7 @@ TEST_F(ValidationErrorTest, Int64OptionValueOutOfRange) {
       "} "
       "}",
 
-      "foo.proto: foo.proto: OPTION_VALUE: Value out of range "
+      "foo.proto: foo.proto: OPTION_VALUE: Value out of range, -9223372036854775808 to 9223372036854775807, "
       "for int64 option \"foo\".\n");
 }
 
@@ -5624,7 +5695,7 @@ TEST_F(ValidationErrorTest, Int64OptionValueIsNotPositiveInt) {
       "                                        is_extension: true } "
       "                                 identifier_value: \"5\" } }",
 
-      "foo.proto: foo.proto: OPTION_VALUE: Value must be integer "
+      "foo.proto: foo.proto: OPTION_VALUE: Value must be integer, from -9223372036854775808 to 9223372036854775807, "
       "for int64 option \"foo\".\n");
 }
 
@@ -5640,7 +5711,7 @@ TEST_F(ValidationErrorTest, UInt32OptionValueOutOfRange) {
       "                                        is_extension: true } "
       "                                 positive_int_value: 0x100000000 } }",
 
-      "foo.proto: foo.proto: OPTION_VALUE: Value out of range "
+      "foo.proto: foo.proto: OPTION_VALUE: Value out of range, 0 to 4294967295, "
       "for uint32 option \"foo\".\n");
 }
 
@@ -5656,7 +5727,7 @@ TEST_F(ValidationErrorTest, UInt32OptionValueIsNotPositiveInt) {
       "                                        is_extension: true } "
       "                                 double_value: -5.6 } }",
 
-      "foo.proto: foo.proto: OPTION_VALUE: Value must be non-negative integer "
+      "foo.proto: foo.proto: OPTION_VALUE: Value must be integer, from 0 to 4294967295, "
       "for uint32 option \"foo\".\n");
 }
 
@@ -5672,7 +5743,7 @@ TEST_F(ValidationErrorTest, UInt64OptionValueIsNotPositiveInt) {
       "                                        is_extension: true } "
       "                                 negative_int_value: -5 } }",
 
-      "foo.proto: foo.proto: OPTION_VALUE: Value must be non-negative integer "
+      "foo.proto: foo.proto: OPTION_VALUE: Value must be integer, from 0 to 18446744073709551615, "
       "for uint64 option \"foo\".\n");
 }
 
@@ -5844,7 +5915,7 @@ TEST_F(ValidationErrorTest, DuplicateExtensionFieldNumber) {
 // errors.  The "value" argument is embedded inside the
 // "uninterpreted_option" portion of the result.
 static std::string EmbedAggregateValue(const char* value) {
-  return strings::Substitute(
+  return absl::Substitute(
       "name: \"foo.proto\" "
       "dependency: \"google/protobuf/descriptor.proto\" "
       "message_type { name: \"Foo\" } "
@@ -5968,8 +6039,8 @@ TEST_F(ValidationErrorTest, RollbackAfterError) {
       "  }"
       "}",
 
-      "foo.proto: TestService.Baz: INPUT_TYPE: \"NoSuchType\" is not defined.\n"
-  );
+      "foo.proto: TestService.Baz: INPUT_TYPE: \"NoSuchType\" is not "
+      "defined.\n");
 
   // Make sure that if we build the same file again with the error fixed,
   // it works.  If the above rollback was incomplete, then some symbols will
@@ -6129,7 +6200,9 @@ static const char* kMapEntryKeyTypeErrorMessage =
 TEST_F(ValidationErrorTest, MapEntryBase) {
   FileDescriptorProto file_proto;
   FillValidMapEntry(&file_proto);
-  BuildFile(file_proto.DebugString());
+  std::string text_proto;
+  TextFormat::PrintToString(file_proto, &text_proto);
+  BuildFile(text_proto);
 }
 
 TEST_F(ValidationErrorTest, MapEntryExtensionRange) {
@@ -7323,34 +7396,29 @@ class ExponentialErrorDatabase : public DescriptorDatabase {
   }
 
  private:
-  void FullMatch(const std::string& name, const std::string& begin_with,
-                 const std::string& end_with, int* file_num) {
-    int begin_size = begin_with.size();
-    int end_size = end_with.size();
-    if (name.substr(0, begin_size) != begin_with ||
-        name.substr(name.size() - end_size, end_size) != end_with) {
-      return;
-    }
-    safe_strto32(
-        name.substr(begin_size, name.size() - end_size - begin_size), file_num);
+  void FullMatch(absl::string_view name, absl::string_view begin_with,
+                 absl::string_view end_with, int32_t* file_num) {
+    if (!absl::ConsumePrefix(&name, begin_with)) return;
+    if (!absl::ConsumeSuffix(&name, end_with)) return;
+    GOOGLE_CHECK(absl::SimpleAtoi(name, file_num));
   }
 
   bool PopulateFile(int file_num, FileDescriptorProto* output) {
     GOOGLE_CHECK_GE(file_num, 0);
     output->Clear();
-    output->set_name(strings::Substitute("file$0.proto", file_num));
+    output->set_name(absl::Substitute("file$0.proto", file_num));
     // file0.proto doesn't define Message0
     if (file_num > 0) {
       DescriptorProto* message = output->add_message_type();
-      message->set_name(strings::Substitute("Message$0", file_num));
+      message->set_name(absl::Substitute("Message$0", file_num));
       for (int i = 0; i < file_num; ++i) {
-        output->add_dependency(strings::Substitute("file$0.proto", i));
+        output->add_dependency(absl::Substitute("file$0.proto", i));
         FieldDescriptorProto* field = message->add_field();
-        field->set_name(strings::Substitute("field$0", i));
+        field->set_name(absl::Substitute("field$0", i));
         field->set_number(i);
         field->set_label(FieldDescriptorProto::LABEL_OPTIONAL);
         field->set_type(FieldDescriptorProto::TYPE_MESSAGE);
-        field->set_type_name(strings::Substitute("Message$0", i));
+        field->set_type_name(absl::Substitute("Message$0", i));
       }
     }
     return true;
@@ -7400,6 +7468,8 @@ TEST_F(DatabaseBackedPoolTest, DoesntFallbackOnWrongType) {
 class AbortingErrorCollector : public DescriptorPool::ErrorCollector {
  public:
   AbortingErrorCollector() {}
+  AbortingErrorCollector(const AbortingErrorCollector&) = delete;
+  AbortingErrorCollector& operator=(const AbortingErrorCollector&) = delete;
 
   void AddError(const std::string& filename, const std::string& element_name,
                 const Message* message, ErrorLocation location,
@@ -7407,9 +7477,6 @@ class AbortingErrorCollector : public DescriptorPool::ErrorCollector {
     GOOGLE_LOG(FATAL) << "AddError() called unexpectedly: " << filename << " ["
                << element_name << "]: " << error_message;
   }
-
- private:
-  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(AbortingErrorCollector);
 };
 
 // A source tree containing only one file.
@@ -7417,8 +7484,10 @@ class SingletonSourceTree : public compiler::SourceTree {
  public:
   SingletonSourceTree(const std::string& filename, const std::string& contents)
       : filename_(filename), contents_(contents) {}
+  SingletonSourceTree(const SingletonSourceTree&) = delete;
+  SingletonSourceTree& operator=(const SingletonSourceTree&) = delete;
 
-  io::ZeroCopyInputStream* Open(const std::string& filename) override {
+  io::ZeroCopyInputStream* Open(absl::string_view filename) override {
     return filename == filename_
                ? new io::ArrayInputStream(contents_.data(), contents_.size())
                : nullptr;
@@ -7427,8 +7496,6 @@ class SingletonSourceTree : public compiler::SourceTree {
  private:
   const std::string filename_;
   const std::string contents_;
-
-  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(SingletonSourceTree);
 };
 
 const char* const kSourceLocationTestInput =
@@ -7523,7 +7590,7 @@ class SourceLocationTest : public testing::Test {
   }
 
   static std::string PrintSourceLocation(const SourceLocation& loc) {
-    return strings::Substitute("$0:$1-$2:$3", 1 + loc.start_line,
+    return absl::Substitute("$0:$1-$2:$3", 1 + loc.start_line,
                             1 + loc.start_column, 1 + loc.end_line,
                             1 + loc.end_column);
   }
@@ -8427,4 +8494,4 @@ TEST_F(LazilyBuildDependenciesTest, Dependency) {
 }  // namespace protobuf
 }  // namespace google
 
-#include <google/protobuf/port_undef.inc>
+#include "google/protobuf/port_undef.inc"
