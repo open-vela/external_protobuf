@@ -41,6 +41,9 @@ import unittest
 
 from google.protobuf import any_pb2
 from google.protobuf import struct_pb2
+from google.protobuf import any_test_pb2
+from google.protobuf import map_unittest_pb2
+from google.protobuf import unittest_custom_options_pb2
 from google.protobuf import unittest_mset_pb2
 from google.protobuf import unittest_pb2
 from google.protobuf import unittest_proto3_arena_pb2
@@ -53,9 +56,6 @@ from google.protobuf.internal import test_util
 from google.protobuf import descriptor_pool
 from google.protobuf import text_format
 from google.protobuf.internal import _parameterized
-from google.protobuf import any_test_pb2
-from google.protobuf import map_unittest_pb2
-from google.protobuf import unittest_custom_options_pb2
 # pylint: enable=g-import-not-at-top
 
 
@@ -1598,47 +1598,6 @@ class Proto2Tests(TextFormatBase):
     self.assertEqual(23, message.message_set.Extensions[ext1].i)
     self.assertEqual('foo', message.message_set.Extensions[ext2].str)
 
-    # Handle Any messages inside unknown extensions.
-    message = any_test_pb2.TestAny()
-    text = ('any_value {\n'
-            '  [type.googleapis.com/google.protobuf.internal.TestAny] {\n'
-            '    [unknown_extension] {\n'
-            '      str: "string"\n'
-            '      any_value {\n'
-            '        [type.googleapis.com/protobuf_unittest.OneString] {\n'
-            '          data: "string"\n'
-            '        }\n'
-            '      }\n'
-            '    }\n'
-            '  }\n'
-            '}\n'
-            'int32_value: 123')
-    text_format.Parse(text, message, allow_unknown_extension=True)
-    self.assertEqual(123, message.int32_value)
-
-    # Fail if invalid Any message type url inside unknown extensions.
-    message = any_test_pb2.TestAny()
-    text = ('any_value {\n'
-            '  [type.googleapis.com.invalid/google.protobuf.internal.TestAny] {\n'
-            '    [unknown_extension] {\n'
-            '      str: "string"\n'
-            '      any_value {\n'
-            '        [type.googleapis.com/protobuf_unittest.OneString] {\n'
-            '          data: "string"\n'
-            '        }\n'
-            '      }\n'
-            '    }\n'
-            '  }\n'
-            '}\n'
-            'int32_value: 123')
-    self.assertRaisesRegex(
-        text_format.ParseError,
-        '[type.googleapis.com.invalid/google.protobuf.internal.TestAny]',
-        text_format.Parse,
-        text,
-        message,
-        allow_unknown_extension=True)
-
   def testParseBadIdentifier(self):
     message = unittest_pb2.TestAllTypes()
     text = ('optional_nested_message { "bb": 1 }')
@@ -2482,6 +2441,7 @@ class OptionalColonMessageToStringTest(unittest.TestCase):
     output = text_format.MessageToString(
         message, use_short_repeated_primitives=True, force_colon=True)
     self.assertEqual('repeated_int32: [1]\n', output)
+
 
 if __name__ == '__main__':
   unittest.main()

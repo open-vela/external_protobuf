@@ -78,7 +78,6 @@ import java.util.logging.Logger;
  *
  * @author kenton@google.com Kenton Varda
  */
-@CheckReturnValue
 public final class Descriptors {
   private static final Logger logger = Logger.getLogger(Descriptors.class.getName());
   private static final int[] EMPTY_INT_ARRAY = new int[0];
@@ -462,20 +461,21 @@ public final class Descriptors {
     }
 
     /**
-     * This method is to be called by generated code only. It updates the
+     * This method is to be called by generated code only. It is used to update the
      * FileDescriptorProto associated with the descriptor by parsing it again with the given
      * ExtensionRegistry. This is needed to recognize custom options.
      */
     public static void internalUpdateFileDescriptor(
-        FileDescriptor descriptor, ExtensionRegistry registry) {
+        final FileDescriptor descriptor, final ExtensionRegistry registry) {
       ByteString bytes = descriptor.proto.toByteString();
+      FileDescriptorProto proto;
       try {
-        FileDescriptorProto proto = FileDescriptorProto.parseFrom(bytes, registry);
-        descriptor.setProto(proto);
+        proto = FileDescriptorProto.parseFrom(bytes, registry);
       } catch (InvalidProtocolBufferException e) {
         throw new IllegalArgumentException(
             "Failed to parse protocol buffer descriptor for generated code.", e);
       }
+      descriptor.setProto(proto);
     }
 
     /**
@@ -1728,6 +1728,7 @@ public final class Descriptors {
       // down-cast and call mergeFrom directly.
       return ((Message.Builder) to).mergeFrom((Message) from);
     }
+
   }
 
   // =================================================================
@@ -1785,27 +1786,6 @@ public final class Descriptors {
     /** Get a list of defined values for this enum. */
     public List<EnumValueDescriptor> getValues() {
       return Collections.unmodifiableList(Arrays.asList(values));
-    }
-
-    /** Determines if the given field number is reserved. */
-    public boolean isReservedNumber(final int number) {
-      for (final EnumDescriptorProto.EnumReservedRange range : proto.getReservedRangeList()) {
-        if (range.getStart() <= number && number <= range.getEnd()) {
-          return true;
-        }
-      }
-      return false;
-    }
-
-    /** Determines if the given field name is reserved. */
-    public boolean isReservedName(final String name) {
-      checkNotNull(name);
-      for (final String reservedName : proto.getReservedNameList()) {
-        if (reservedName.equals(name)) {
-          return true;
-        }
-      }
-      return false;
     }
 
     /**
