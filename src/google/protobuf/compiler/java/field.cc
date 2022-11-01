@@ -32,27 +32,29 @@
 //  Based on original Protocol Buffers design by
 //  Sanjay Ghemawat, Jeff Dean, and others.
 
-#include <google/protobuf/compiler/java/field.h>
+#include "google/protobuf/compiler/java/field.h"
 
 #include <memory>
+#include <string>
 
-#include <google/protobuf/stubs/logging.h>
-#include <google/protobuf/stubs/common.h>
-#include <google/protobuf/io/printer.h>
-#include <google/protobuf/stubs/strutil.h>
-#include <google/protobuf/stubs/substitute.h>
-#include <google/protobuf/compiler/java/context.h>
-#include <google/protobuf/compiler/java/enum_field.h>
-#include <google/protobuf/compiler/java/enum_field_lite.h>
-#include <google/protobuf/compiler/java/helpers.h>
-#include <google/protobuf/compiler/java/map_field.h>
-#include <google/protobuf/compiler/java/map_field_lite.h>
-#include <google/protobuf/compiler/java/message_field.h>
-#include <google/protobuf/compiler/java/message_field_lite.h>
-#include <google/protobuf/compiler/java/primitive_field.h>
-#include <google/protobuf/compiler/java/primitive_field_lite.h>
-#include <google/protobuf/compiler/java/string_field.h>
-#include <google/protobuf/compiler/java/string_field_lite.h>
+#include "google/protobuf/stubs/logging.h"
+#include "google/protobuf/stubs/common.h"
+#include "google/protobuf/io/printer.h"
+#include "absl/container/flat_hash_map.h"
+#include "absl/strings/str_cat.h"
+#include "absl/strings/substitute.h"
+#include "google/protobuf/compiler/java/context.h"
+#include "google/protobuf/compiler/java/enum_field.h"
+#include "google/protobuf/compiler/java/enum_field_lite.h"
+#include "google/protobuf/compiler/java/helpers.h"
+#include "google/protobuf/compiler/java/map_field.h"
+#include "google/protobuf/compiler/java/map_field_lite.h"
+#include "google/protobuf/compiler/java/message_field.h"
+#include "google/protobuf/compiler/java/message_field_lite.h"
+#include "google/protobuf/compiler/java/primitive_field.h"
+#include "google/protobuf/compiler/java/primitive_field_lite.h"
+#include "google/protobuf/compiler/java/string_field.h"
+#include "google/protobuf/compiler/java/string_field_lite.h"
 
 
 namespace google {
@@ -241,16 +243,16 @@ template <>
 FieldGeneratorMap<ImmutableFieldLiteGenerator>::~FieldGeneratorMap() {}
 
 
-void SetCommonFieldVariables(const FieldDescriptor* descriptor,
-                             const FieldGeneratorInfo* info,
-                             std::map<std::string, std::string>* variables) {
+void SetCommonFieldVariables(
+    const FieldDescriptor* descriptor, const FieldGeneratorInfo* info,
+    absl::flat_hash_map<absl::string_view, std::string>* variables) {
   (*variables)["field_name"] = descriptor->name();
   (*variables)["name"] = info->name;
   (*variables)["classname"] = descriptor->containing_type()->name();
   (*variables)["capitalized_name"] = info->capitalized_name;
   (*variables)["disambiguated_reason"] = info->disambiguated_reason;
   (*variables)["constant_name"] = FieldConstantName(descriptor);
-  (*variables)["number"] = StrCat(descriptor->number());
+  (*variables)["number"] = absl::StrCat(descriptor->number());
   (*variables)["kt_dsl_builder"] = "_builder";
   // These variables are placeholders to pick out the beginning and ends of
   // identifiers for annotations (when doing so with existing variables would
@@ -273,31 +275,32 @@ void SetCommonFieldVariables(const FieldDescriptor* descriptor,
     (*variables)["annotation_field_type"] =
         std::string(FieldTypeName(descriptor->type())) + "_LIST";
     if (descriptor->is_packed()) {
-      (*variables)["annotation_field_type"] =
-          (*variables)["annotation_field_type"] + "_PACKED";
+      variables->insert(
+          {"annotation_field_type",
+           absl::StrCat((*variables)["annotation_field_type"], "_PACKED")});
     }
   }
 }
 
-void SetCommonOneofVariables(const FieldDescriptor* descriptor,
-                             const OneofGeneratorInfo* info,
-                             std::map<std::string, std::string>* variables) {
+void SetCommonOneofVariables(
+    const FieldDescriptor* descriptor, const OneofGeneratorInfo* info,
+    absl::flat_hash_map<absl::string_view, std::string>* variables) {
   (*variables)["oneof_name"] = info->name;
   (*variables)["oneof_capitalized_name"] = info->capitalized_name;
   (*variables)["oneof_index"] =
-      StrCat(descriptor->containing_oneof()->index());
+      absl::StrCat(descriptor->containing_oneof()->index());
   (*variables)["oneof_stored_type"] = GetOneofStoredType(descriptor);
   (*variables)["set_oneof_case_message"] =
-      info->name + "Case_ = " + StrCat(descriptor->number());
+      info->name + "Case_ = " + absl::StrCat(descriptor->number());
   (*variables)["clear_oneof_case_message"] = info->name + "Case_ = 0";
   (*variables)["has_oneof_case_message"] =
-      info->name + "Case_ == " + StrCat(descriptor->number());
+      info->name + "Case_ == " + absl::StrCat(descriptor->number());
 }
 
-void PrintExtraFieldInfo(const std::map<std::string, std::string>& variables,
-                         io::Printer* printer) {
-  const std::map<std::string, std::string>::const_iterator it =
-      variables.find("disambiguated_reason");
+void PrintExtraFieldInfo(
+    const absl::flat_hash_map<absl::string_view, std::string>& variables,
+    io::Printer* printer) {
+  auto it = variables.find("disambiguated_reason");
   if (it != variables.end() && !it->second.empty()) {
     printer->Print(
         variables,
