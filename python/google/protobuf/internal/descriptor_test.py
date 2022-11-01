@@ -35,6 +35,7 @@ __author__ = 'robinson@google.com (Will Robinson)'
 import unittest
 import warnings
 
+from google.protobuf import unittest_custom_options_pb2
 from google.protobuf import unittest_import_pb2
 from google.protobuf import unittest_pb2
 from google.protobuf import descriptor_pb2
@@ -44,7 +45,6 @@ from google.protobuf import descriptor
 from google.protobuf import descriptor_pool
 from google.protobuf import symbol_database
 from google.protobuf import text_format
-from google.protobuf import unittest_custom_options_pb2
 
 
 TEST_EMPTY_MESSAGE_DESCRIPTOR_ASCII = """
@@ -117,30 +117,6 @@ class DescriptorTest(unittest.TestCase):
 
   def GetDescriptorPool(self):
     return symbol_database.Default().pool
-
-  def testMissingPackage(self):
-    file_proto = descriptor_pb2.FileDescriptorProto(
-        name='some/filename/some.proto')
-    serialized = file_proto.SerializeToString()
-    pool = descriptor_pool.DescriptorPool()
-    file_descriptor = pool.AddSerializedFile(serialized)
-    self.assertEqual('', file_descriptor.package)
-
-  def testEmptyPackage(self):
-    file_proto = descriptor_pb2.FileDescriptorProto(
-        name='some/filename/some.proto', package='')
-    serialized = file_proto.SerializeToString()
-    pool = descriptor_pool.DescriptorPool()
-    file_descriptor = pool.AddSerializedFile(serialized)
-    self.assertEqual('', file_descriptor.package)
-
-  def testFindMethodByName(self):
-    service_descriptor = (unittest_custom_options_pb2.
-                          TestServiceWithCustomOptions.DESCRIPTOR)
-    method_descriptor = service_descriptor.FindMethodByName('Foo')
-    self.assertEqual(method_descriptor.name, 'Foo')
-    with self.assertRaises(KeyError):
-      service_descriptor.FindMethodByName('MethodDoesNotExist')
 
   def testEnumValueName(self):
     self.assertEqual(self.my_message.EnumValueName('ForeignEnum', 4),
@@ -619,12 +595,6 @@ class GeneratedDescriptorTest(unittest.TestCase):
   def CheckDescriptorMapping(self, mapping):
     # Verifies that a property like 'messageDescriptor.fields' has all the
     # properties of an immutable abc.Mapping.
-    iterated_keys = []
-    for key in mapping:
-      iterated_keys.append(key)
-    self.assertEqual(len(iterated_keys), len(mapping))
-    self.assertEqual(set(iterated_keys), set(mapping.keys()))
-
     self.assertNotEqual(
         mapping, unittest_pb2.TestAllExtensions.DESCRIPTOR.fields_by_name)
     self.assertNotEqual(mapping, {})
@@ -641,15 +611,10 @@ class GeneratedDescriptorTest(unittest.TestCase):
     with self.assertRaises(TypeError):
       mapping.get()
     # TODO(jieluo): Fix python and cpp extension diff.
-    if api_implementation.Type() == 'cpp':
-      self.assertEqual(None, mapping.get([]))
-    else:
+    if api_implementation.Type() == 'python':
       self.assertRaises(TypeError, mapping.get, [])
-      with self.assertRaises(TypeError):
-        if [] in mapping:
-          pass
-      with self.assertRaises(TypeError):
-        _ = mapping[[]]
+    else:
+      self.assertEqual(None, mapping.get([]))
     # keys(), iterkeys() &co
     item = (next(iter(mapping.keys())), next(iter(mapping.values())))
     self.assertEqual(item, next(iter(mapping.items())))
@@ -661,12 +626,10 @@ class GeneratedDescriptorTest(unittest.TestCase):
     self.assertRaises(KeyError, mapping.__getitem__, 'key_error')
     self.assertRaises(KeyError, mapping.__getitem__, len(mapping) + 1)
     # TODO(jieluo): Add __repr__ support for DescriptorMapping.
-    if api_implementation.Type() == 'cpp':
-      self.assertEqual(str(mapping)[0], '<')
-    else:
-      print(str(dict(mapping.items()))[:100])
-      print(str(mapping)[:100])
+    if api_implementation.Type() == 'python':
       self.assertEqual(len(str(dict(mapping.items()))), len(str(mapping)))
+    else:
+      self.assertEqual(str(mapping)[0], '<')
 
   def testDescriptor(self):
     message_descriptor = unittest_pb2.TestAllTypes.DESCRIPTOR
@@ -823,16 +786,6 @@ class DescriptorCopyToProtoTest(unittest.TestCase):
           deprecated: true
         >
       >
-      field {
-        name: "deprecated_message"
-        number: 3
-        label: LABEL_OPTIONAL
-        type: TYPE_MESSAGE
-        type_name: ".protobuf_unittest.TestAllTypes.NestedMessage"
-        options {
-          deprecated: true
-        }
-      }
       field {
         name: "deprecated_int32_in_oneof"
         number: 2

@@ -36,6 +36,7 @@ __author__ = 'bohdank@google.com (Bohdan Koval)'
 import sys
 import unittest
 
+from google.protobuf import map_unittest_pb2
 from google.protobuf import unittest_mset_pb2
 from google.protobuf import unittest_pb2
 from google.protobuf import unittest_proto3_arena_pb2
@@ -49,7 +50,6 @@ from google.protobuf.internal import type_checkers
 from google.protobuf.internal import wire_format
 from google.protobuf import descriptor
 from google.protobuf import unknown_fields
-from google.protobuf import map_unittest_pb2
 try:
   import tracemalloc  # pylint: disable=g-import-not-at-top
 except ImportError:

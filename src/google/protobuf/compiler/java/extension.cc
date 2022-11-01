@@ -32,18 +32,17 @@
 //  Based on original Protocol Buffers design by
 //  Sanjay Ghemawat, Jeff Dean, and others.
 
-#include "google/protobuf/compiler/java/extension.h"
+#include <google/protobuf/compiler/java/extension.h>
 
-#include "google/protobuf/io/printer.h"
-#include "absl/container/flat_hash_map.h"
-#include "absl/strings/str_cat.h"
-#include "google/protobuf/compiler/java/context.h"
-#include "google/protobuf/compiler/java/doc_comment.h"
-#include "google/protobuf/compiler/java/helpers.h"
-#include "google/protobuf/compiler/java/name_resolver.h"
+#include <google/protobuf/io/printer.h>
+#include <google/protobuf/stubs/strutil.h>
+#include <google/protobuf/compiler/java/context.h>
+#include <google/protobuf/compiler/java/doc_comment.h>
+#include <google/protobuf/compiler/java/helpers.h>
+#include <google/protobuf/compiler/java/name_resolver.h>
 
 // Must be last.
-#include "google/protobuf/port_def.inc"
+#include <google/protobuf/port_def.inc>
 
 namespace google {
 namespace protobuf {
@@ -52,9 +51,7 @@ namespace java {
 
 ImmutableExtensionGenerator::ImmutableExtensionGenerator(
     const FieldDescriptor* descriptor, Context* context)
-    : descriptor_(descriptor),
-      name_resolver_(context->GetNameResolver()),
-      context_(context) {
+    : descriptor_(descriptor), name_resolver_(context->GetNameResolver()) {
   if (descriptor_->extension_scope() != NULL) {
     scope_ =
         name_resolver_->GetImmutableClassName(descriptor_->extension_scope());
@@ -69,20 +66,18 @@ ImmutableExtensionGenerator::~ImmutableExtensionGenerator() {}
 void ExtensionGenerator::InitTemplateVars(
     const FieldDescriptor* descriptor, const std::string& scope, bool immutable,
     ClassNameResolver* name_resolver,
-    absl::flat_hash_map<absl::string_view, std::string>* vars_pointer,
-    Context* context) {
-  absl::flat_hash_map<absl::string_view, std::string>& vars = *vars_pointer;
+    std::map<std::string, std::string>* vars_pointer) {
+  std::map<std::string, std::string>& vars = *vars_pointer;
   vars["scope"] = scope;
   vars["name"] = UnderscoresToCamelCaseCheckReserved(descriptor);
   vars["containing_type"] =
       name_resolver->GetClassName(descriptor->containing_type(), immutable);
-  vars["number"] = absl::StrCat(descriptor->number());
+  vars["number"] = StrCat(descriptor->number());
   vars["constant_name"] = FieldConstantName(descriptor);
-  vars["index"] = absl::StrCat(descriptor->index());
+  vars["index"] = StrCat(descriptor->index());
   vars["default"] = descriptor->is_repeated()
                         ? ""
-                        : DefaultValue(descriptor, immutable, name_resolver,
-                                       context->options());
+                        : DefaultValue(descriptor, immutable, name_resolver);
   vars["type_constant"] = FieldTypeName(GetType(descriptor));
   vars["packed"] = descriptor->is_packed() ? "true" : "false";
   vars["enum_map"] = "null";
@@ -118,10 +113,10 @@ void ExtensionGenerator::InitTemplateVars(
 }
 
 void ImmutableExtensionGenerator::Generate(io::Printer* printer) {
-  absl::flat_hash_map<absl::string_view, std::string> vars;
+  std::map<std::string, std::string> vars;
   const bool kUseImmutableNames = true;
   InitTemplateVars(descriptor_, scope_, kUseImmutableNames, name_resolver_,
-                   &vars, context_);
+                   &vars);
   printer->Print(vars, "public static final int $constant_name$ = $number$;\n");
 
   WriteFieldDocComment(printer, descriptor_);
@@ -161,7 +156,7 @@ int ImmutableExtensionGenerator::GenerateNonNestedInitializationCode(
     printer->Print(
         "$name$.internalInit(descriptor.getExtensions().get($index$));\n",
         "name", UnderscoresToCamelCaseCheckReserved(descriptor_), "index",
-        absl::StrCat(descriptor_->index()));
+        StrCat(descriptor_->index()));
     bytecode_estimate += 21;
   }
   return bytecode_estimate;
@@ -179,4 +174,4 @@ int ImmutableExtensionGenerator::GenerateRegistrationCode(
 }  // namespace protobuf
 }  // namespace google
 
-#include "google/protobuf/port_undef.inc"
+#include <google/protobuf/port_undef.inc>

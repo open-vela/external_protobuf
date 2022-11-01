@@ -42,27 +42,25 @@
 // compiler/cpp/unittest, except using the reflection interface
 // rather than generated accessors.
 
-#include "google/protobuf/generated_message_reflection.h"
+#include <google/protobuf/generated_message_reflection.h>
 
 #include <memory>
 
-#include "google/protobuf/stubs/logging.h"
-#include "google/protobuf/stubs/common.h"
-#include "google/protobuf/unittest.pb.h"
-#include "google/protobuf/unittest.pb.h"
-#include "google/protobuf/unittest_mset.pb.h"
-#include "google/protobuf/unittest_mset_wire_format.pb.h"
-#include "google/protobuf/arena.h"
-#include "google/protobuf/descriptor.h"
-#include "google/protobuf/testing/googletest.h"
+#include <google/protobuf/stubs/logging.h>
+#include <google/protobuf/stubs/common.h>
+#include <google/protobuf/map_unittest.pb.h>
+#include <google/protobuf/unittest.pb.h>
+#include <google/protobuf/unittest_mset.pb.h>
+#include <google/protobuf/unittest_mset_wire_format.pb.h>
+#include <google/protobuf/arena.h>
+#include <google/protobuf/descriptor.h>
+#include <google/protobuf/testing/googletest.h>
 #include <gtest/gtest.h>
-#include "absl/strings/cord.h"
-#include "google/protobuf/map_test_util.h"
-#include "google/protobuf/map_unittest.pb.h"
-#include "google/protobuf/test_util.h"
+#include <google/protobuf/map_test_util.h>
+#include <google/protobuf/test_util.h>
 
 // Must be included last.
-#include "google/protobuf/port_def.inc"
+#include <google/protobuf/port_def.inc>
 
 namespace google {
 namespace protobuf {
@@ -1263,6 +1261,8 @@ TEST(GeneratedMessageReflectionTest, UsageErrors) {
   const Reflection* reflection = message.GetReflection();
   const Descriptor* descriptor = message.GetDescriptor();
 
+#define f(NAME) descriptor->FindFieldByName(NAME)
+
   // Testing every single failure mode would be too much work.  Let's just
   // check a few.
   EXPECT_DEATH(
@@ -1301,6 +1301,8 @@ TEST(GeneratedMessageReflectionTest, UsageErrors) {
       "  Message type: protobuf_unittest.TestAllTypes\n"
       "  Field       : protobuf_unittest.ForeignMessage.c\n"
       "  Problem     : Field does not match message type.");
+
+#undef f
 }
 
 #endif  // PROTOBUF_HAS_DEATH_TEST

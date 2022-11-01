@@ -156,7 +156,6 @@ public class SingleFieldBuilder<
    * @param message the message to set
    * @return the builder
    */
-  @CanIgnoreReturnValue
   public SingleFieldBuilder<MType, BType, IType> setMessage(MType message) {
     this.message = checkNotNull(message);
     if (builder != null) {
@@ -173,7 +172,6 @@ public class SingleFieldBuilder<
    * @param value the value to merge from
    * @return the builder
    */
-  @CanIgnoreReturnValue
   public SingleFieldBuilder<MType, BType, IType> mergeFrom(MType value) {
     if (builder == null && message == message.getDefaultInstanceForType()) {
       message = value;
@@ -190,7 +188,6 @@ public class SingleFieldBuilder<
    * @return the builder
    */
   @SuppressWarnings("unchecked")
-  @CanIgnoreReturnValue
   public SingleFieldBuilder<MType, BType, IType> clear() {
     message =
         (MType)
@@ -202,9 +199,6 @@ public class SingleFieldBuilder<
       builder = null;
     }
     onChanged();
-    // After clearing, parent is dirty, but this field builder is now clean and any changes should
-    // trickle up.
-    isClean = true;
     return this;
   }
 

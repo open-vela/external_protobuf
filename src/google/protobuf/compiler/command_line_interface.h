@@ -39,21 +39,19 @@
 #define GOOGLE_PROTOBUF_COMPILER_COMMAND_LINE_INTERFACE_H__
 
 #include <cstdint>
-#include <functional>
 #include <map>
 #include <memory>
 #include <set>
 #include <string>
+#include <unordered_map>
+#include <unordered_set>
 #include <utility>
 #include <vector>
 
-#include "absl/container/flat_hash_map.h"
-#include "absl/container/flat_hash_set.h"
-#include "absl/strings/string_view.h"
-#include "google/protobuf/port.h"
+#include <google/protobuf/stubs/common.h>
 
 // Must be included last.
-#include "google/protobuf/port_def.inc"
+#include <google/protobuf/port_def.inc>
 
 namespace google {
 namespace protobuf {
@@ -117,8 +115,6 @@ class PROTOC_EXPORT CommandLineInterface {
   static const char* const kPathSeparator;
 
   CommandLineInterface();
-  CommandLineInterface(const CommandLineInterface&) = delete;
-  CommandLineInterface& operator=(const CommandLineInterface&) = delete;
   ~CommandLineInterface();
 
   // Register a code generator for a language.
@@ -216,8 +212,8 @@ class PROTOC_EXPORT CommandLineInterface {
   class ErrorPrinter;
   class GeneratorContextImpl;
   class MemoryOutputStream;
-  using GeneratorContextMap =
-      absl::flat_hash_map<std::string, std::unique_ptr<GeneratorContextImpl>>;
+  typedef std::unordered_map<std::string, std::unique_ptr<GeneratorContextImpl>>
+      GeneratorContextMap;
 
   // Clear state from previous Run().
   void Clear();
@@ -356,20 +352,16 @@ class PROTOC_EXPORT CommandLineInterface {
     CodeGenerator* generator;
     std::string help_text;
   };
-
-  const GeneratorInfo* FindGeneratorByFlag(const std::string& name) const;
-  const GeneratorInfo* FindGeneratorByOption(const std::string& option) const;
-
-  using GeneratorMap = std::map<std::string, GeneratorInfo>;
+  typedef std::map<std::string, GeneratorInfo> GeneratorMap;
   GeneratorMap generators_by_flag_name_;
   GeneratorMap generators_by_option_name_;
   // A map from generator names to the parameters specified using the option
   // flag. For example, if the user invokes the compiler with:
   //   protoc --foo_out=outputdir --foo_opt=enable_bar ...
   // Then there will be an entry ("--foo_out", "enable_bar") in this map.
-  absl::flat_hash_map<std::string, std::string> generator_parameters_;
+  std::map<std::string, std::string> generator_parameters_;
   // Similar to generator_parameters_, but stores the parameters for plugins.
-  absl::flat_hash_map<std::string, std::string> plugin_parameters_;
+  std::map<std::string, std::string> plugin_parameters_;
 
   // See AllowPlugins().  If this is empty, plugins aren't allowed.
   std::string plugin_prefix_;
@@ -377,7 +369,7 @@ class PROTOC_EXPORT CommandLineInterface {
   // Maps specific plugin names to files.  When executing a plugin, this map
   // is searched first to find the plugin executable.  If not found here, the
   // PATH (or other OS-specific search strategy) is searched.
-  absl::flat_hash_map<std::string, std::string> plugins_;
+  std::map<std::string, std::string> plugins_;
 
   // Stuff parsed from command line.
   enum Mode {
@@ -406,7 +398,7 @@ class PROTOC_EXPORT CommandLineInterface {
   // True if we should treat warnings as errors that fail the compilation.
   bool fatal_warnings_ = false;
 
-  std::vector<std::pair<std::string, std::string>>
+  std::vector<std::pair<std::string, std::string> >
       proto_path_;                        // Search path for proto files.
   std::vector<std::string> input_files_;  // Names of the input proto files.
 
@@ -459,12 +451,14 @@ class PROTOC_EXPORT CommandLineInterface {
 
   // When using --encode, this will be passed to SetSerializationDeterministic.
   bool deterministic_output_ = false;
+
+  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(CommandLineInterface);
 };
 
 }  // namespace compiler
 }  // namespace protobuf
 }  // namespace google
 
-#include "google/protobuf/port_undef.inc"
+#include <google/protobuf/port_undef.inc>
 
 #endif  // GOOGLE_PROTOBUF_COMPILER_COMMAND_LINE_INTERFACE_H__

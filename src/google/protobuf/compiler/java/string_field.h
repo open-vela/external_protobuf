@@ -39,7 +39,7 @@
 #include <map>
 #include <string>
 
-#include "google/protobuf/compiler/java/field.h"
+#include <google/protobuf/compiler/java/field.h>
 
 namespace google {
 namespace protobuf {
@@ -62,9 +62,6 @@ class ImmutableStringFieldGenerator : public ImmutableFieldGenerator {
   explicit ImmutableStringFieldGenerator(const FieldDescriptor* descriptor,
                                          int messageBitIndex,
                                          int builderBitIndex, Context* context);
-  ImmutableStringFieldGenerator(const ImmutableStringFieldGenerator&) = delete;
-  ImmutableStringFieldGenerator& operator=(
-      const ImmutableStringFieldGenerator&) = delete;
   ~ImmutableStringFieldGenerator() override;
 
   // implements ImmutableFieldGenerator
@@ -91,8 +88,11 @@ class ImmutableStringFieldGenerator : public ImmutableFieldGenerator {
 
  protected:
   const FieldDescriptor* descriptor_;
-  absl::flat_hash_map<absl::string_view, std::string> variables_;
+  std::map<std::string, std::string> variables_;
   ClassNameResolver* name_resolver_;
+
+ private:
+  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(ImmutableStringFieldGenerator);
 };
 
 class ImmutableStringOneofFieldGenerator
@@ -101,10 +101,6 @@ class ImmutableStringOneofFieldGenerator
   ImmutableStringOneofFieldGenerator(const FieldDescriptor* descriptor,
                                      int messageBitIndex, int builderBitIndex,
                                      Context* context);
-  ImmutableStringOneofFieldGenerator(
-      const ImmutableStringOneofFieldGenerator&) = delete;
-  ImmutableStringOneofFieldGenerator& operator=(
-      const ImmutableStringOneofFieldGenerator&) = delete;
   ~ImmutableStringOneofFieldGenerator() override;
 
  private:
@@ -116,6 +112,8 @@ class ImmutableStringOneofFieldGenerator
   void GenerateBuilderParsingCode(io::Printer* printer) const override;
   void GenerateSerializationCode(io::Printer* printer) const override;
   void GenerateSerializedSizeCode(io::Printer* printer) const override;
+
+  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(ImmutableStringOneofFieldGenerator);
 };
 
 class RepeatedImmutableStringFieldGenerator : public ImmutableFieldGenerator {
@@ -123,10 +121,6 @@ class RepeatedImmutableStringFieldGenerator : public ImmutableFieldGenerator {
   explicit RepeatedImmutableStringFieldGenerator(
       const FieldDescriptor* descriptor, int messageBitIndex,
       int builderBitIndex, Context* context);
-  RepeatedImmutableStringFieldGenerator(
-      const RepeatedImmutableStringFieldGenerator&) = delete;
-  RepeatedImmutableStringFieldGenerator& operator=(
-      const RepeatedImmutableStringFieldGenerator&) = delete;
   ~RepeatedImmutableStringFieldGenerator() override;
 
   // implements ImmutableFieldGenerator ---------------------------------------
@@ -152,8 +146,10 @@ class RepeatedImmutableStringFieldGenerator : public ImmutableFieldGenerator {
 
  private:
   const FieldDescriptor* descriptor_;
-  absl::flat_hash_map<absl::string_view, std::string> variables_;
+  std::map<std::string, std::string> variables_;
   ClassNameResolver* name_resolver_;
+
+  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(RepeatedImmutableStringFieldGenerator);
 };
 
 }  // namespace java
