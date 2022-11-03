@@ -67,7 +67,9 @@ class DslListTest {
   fun dslListIsNotEvenSecretlyMutable() {
     val dslList = DslList<Int, DummyProxy>(mutableListOf(1, 2, 3))
     val dslListAsJavaUtil = dslList as java.util.List<Int>
-    assertFailsWith<UnsupportedOperationException> { dslListAsJavaUtil.add(4) }
+    assertFailsWith<UnsupportedOperationException> {
+      dslListAsJavaUtil.add(4)
+    }
   }
 
   @Suppress("PLATFORM_CLASS_MAPPED_TO_KOTLIN", "UNCHECKED_CAST")
@@ -77,7 +79,9 @@ class DslListTest {
     val iterator = dslList.iterator() as java.util.Iterator<Int>
     iterator.next()
 
-    assertFailsWith<UnsupportedOperationException> { iterator.remove() }
+    assertFailsWith<UnsupportedOperationException> {
+      iterator.remove()
+    }
   }
 
   @Suppress("PLATFORM_CLASS_MAPPED_TO_KOTLIN", "UNCHECKED_CAST")
@@ -87,7 +91,9 @@ class DslListTest {
     val iterator = dslList.listIterator() as java.util.ListIterator<Int>
     iterator.next()
 
-    assertFailsWith<UnsupportedOperationException> { iterator.remove() }
+    assertFailsWith<UnsupportedOperationException> {
+      iterator.remove()
+    }
   }
 
   @Suppress("PLATFORM_CLASS_MAPPED_TO_KOTLIN", "UNCHECKED_CAST")
@@ -97,7 +103,9 @@ class DslListTest {
     val iterator = dslList.listIterator(1) as java.util.ListIterator<Int>
     iterator.next()
 
-    assertFailsWith<UnsupportedOperationException> { iterator.remove() }
+    assertFailsWith<UnsupportedOperationException> {
+      iterator.remove()
+    }
   }
 
   @Test
