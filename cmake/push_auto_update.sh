@@ -1,8 +1,9 @@
 #!/bin/bash
 
-# This script updates the CMake file lists (i.e. src/file_lists.cmake), commits
-# the resulting change, and pushes it. This does not do anything useful when
-# run manually, but should be run by our GitHub action instead.
+# This script updates checked-in generated files (currently CMakeLists.txt,
+# descriptor.upb.h, and descriptor.upb.c), commits the resulting change, and
+# pushes it. This does not do anything useful when run manually, but should be
+# run by our GitHub action instead.
 
 set -ex
 
@@ -13,7 +14,8 @@ if (git log -1 --pretty=format:'%an' | grep -q "Protobuf Team Bot"); then
   exit 0
 fi
 
-$(dirname -- "$0")/update_file_lists.sh
+cd $(dirname -- "$0")/..
+bazel test //cmake:test_generated_files || bazel-bin/cmake/test_generated_files --fix
 
 # Try to determine the most recent pull request number.
 title=$(git log -1 --pretty='%s')
