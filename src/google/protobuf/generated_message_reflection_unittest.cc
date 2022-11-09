@@ -48,6 +48,7 @@
 
 #include "google/protobuf/stubs/logging.h"
 #include "google/protobuf/stubs/common.h"
+#include "google/protobuf/map_unittest.pb.h"
 #include "google/protobuf/unittest.pb.h"
 #include "google/protobuf/unittest.pb.h"
 #include "google/protobuf/unittest_mset.pb.h"
@@ -58,7 +59,6 @@
 #include <gtest/gtest.h>
 #include "absl/strings/cord.h"
 #include "google/protobuf/map_test_util.h"
-#include "google/protobuf/map_unittest.pb.h"
 #include "google/protobuf/test_util.h"
 
 // Must be included last.

@@ -26,10 +26,5 @@ set_target_properties(libprotoc PROPERTIES
     COMPILE_DEFINITIONS LIBPROTOC_EXPORTS
     VERSION ${protobuf_VERSION}
     OUTPUT_NAME ${LIB_PREFIX}protoc
-    DEBUG_POSTFIX "${protobuf_DEBUG_POSTFIX}"
-    # For -fvisibility=hidden and -fvisibility-inlines-hidden
-    C_VISIBILITY_PRESET hidden
-    CXX_VISIBILITY_PRESET hidden
-    VISIBILITY_INLINES_HIDDEN ON
-)
+    DEBUG_POSTFIX "${protobuf_DEBUG_POSTFIX}")
 add_library(protobuf::libprotoc ALIAS libprotoc)

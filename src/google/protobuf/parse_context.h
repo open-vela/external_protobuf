@@ -36,6 +36,8 @@
 #include <string>
 #include <type_traits>
 
+#include "google/protobuf/io/coded_stream.h"
+#include "google/protobuf/io/zero_copy_stream.h"
 #include "google/protobuf/arena.h"
 #include "absl/strings/internal/resize_uninitialized.h"
 #include "absl/strings/string_view.h"
@@ -43,8 +45,6 @@
 #include "google/protobuf/endian.h"
 #include "google/protobuf/implicit_weak_message.h"
 #include "google/protobuf/inlined_string_field.h"
-#include "google/protobuf/io/coded_stream.h"
-#include "google/protobuf/io/zero_copy_stream.h"
 #include "google/protobuf/metadata_lite.h"
 #include "google/protobuf/port.h"
 #include "google/protobuf/repeated_field.h"
@@ -445,9 +445,7 @@ class PROTOBUF_EXPORT ParseContext : public EpsCopyInputStream {
       MessageLite* msg, const char* ptr, const Table* table) {
     int old;
     ptr = ReadSizeAndPushLimitAndDepthInlined(ptr, &old);
-    auto old_depth = depth_;
     ptr = ptr ? TcParser::ParseLoop(msg, ptr, this, table) : nullptr;
-    if (ptr != nullptr) GOOGLE_DCHECK_EQ(old_depth, depth_);
     depth_++;
     if (!PopLimit(old)) return nullptr;
     return ptr;
@@ -458,13 +456,7 @@ class PROTOBUF_EXPORT ParseContext : public EpsCopyInputStream {
       T* msg, const char* ptr, uint32_t tag) {
     if (--depth_ < 0) return nullptr;
     group_depth_++;
-    auto old_depth = depth_;
-    auto old_group_depth = group_depth_;
     ptr = msg->_InternalParse(ptr, this);
-    if (ptr != nullptr) {
-      GOOGLE_DCHECK_EQ(old_depth, depth_);
-      GOOGLE_DCHECK_EQ(old_group_depth, group_depth_);
-    }
     group_depth_--;
     depth_++;
     if (PROTOBUF_PREDICT_FALSE(!ConsumeEndGroup(tag))) return nullptr;
@@ -476,13 +468,7 @@ class PROTOBUF_EXPORT ParseContext : public EpsCopyInputStream {
       MessageLite* msg, const char* ptr, uint32_t tag, const Table* table) {
     if (--depth_ < 0) return nullptr;
     group_depth_++;
-    auto old_depth = depth_;
-    auto old_group_depth = group_depth_;
     ptr = TcParser::ParseLoop(msg, ptr, this, table);
-    if (ptr != nullptr) {
-      GOOGLE_DCHECK_EQ(old_depth, depth_);
-      GOOGLE_DCHECK_EQ(old_group_depth, group_depth_);
-    }
     group_depth_--;
     depth_++;
     if (PROTOBUF_PREDICT_FALSE(!ConsumeEndGroup(tag))) return nullptr;
@@ -849,9 +835,7 @@ PROTOBUF_NODISCARD const char* ParseContext::ParseMessage(T* msg,
   int old;
   ptr = ReadSizeAndPushLimitAndDepth(ptr, &old);
   if (ptr == nullptr) return ptr;
-  auto old_depth = depth_;
   ptr = msg->_InternalParse(ptr, this);
-  if (ptr != nullptr) GOOGLE_DCHECK_EQ(old_depth, depth_);
   depth_++;
   if (!PopLimit(old)) return nullptr;
   return ptr;

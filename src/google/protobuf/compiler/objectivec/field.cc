@@ -32,6 +32,7 @@
 
 #include <iostream>
 #include <ostream>
+#include <set>
 #include <string>
 #include <vector>
 
@@ -230,13 +231,12 @@ void FieldGenerator::GenerateCFunctionImplementations(
 }
 
 void FieldGenerator::DetermineForwardDeclarations(
-    absl::btree_set<std::string>* fwd_decls,
-    bool include_external_types) const {
+    std::set<std::string>* fwd_decls, bool include_external_types) const {
   // Nothing
 }
 
 void FieldGenerator::DetermineObjectiveCClassDefinitions(
-    absl::btree_set<std::string>* fwd_decls) const {
+    std::set<std::string>* fwd_decls) const {
   // Nothing
 }
 

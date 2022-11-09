@@ -1699,8 +1699,7 @@ TEST(RepeatedPtrField, ExtractSubrange) {
           // Create an array with "sz" elements and "extra" cleared elements.
           // Use an arena to avoid copies from debug-build stability checks.
           Arena arena;
-          auto& field =
-              *Arena::CreateMessage<RepeatedPtrField<std::string>>(&arena);
+          RepeatedPtrField<std::string> field(&arena);
           for (int i = 0; i < sz + extra; ++i) {
             subject.push_back(new std::string());
             field.AddAllocated(subject[i]);

@@ -33,6 +33,8 @@
 #include "google/protobuf/compiler/plugin.h"
 
 #include <iostream>
+#include <set>
+
 #ifdef _WIN32
 #include <fcntl.h>
 #else
