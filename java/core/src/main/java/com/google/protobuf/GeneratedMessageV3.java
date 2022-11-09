@@ -136,7 +136,8 @@ public abstract class GeneratedMessageV3 extends AbstractMessage implements Seri
   protected void mergeFromAndMakeImmutableInternal(
       CodedInputStream input, ExtensionRegistryLite extensionRegistry)
       throws InvalidProtocolBufferException {
-    Schema<GeneratedMessageV3> schema = Protobuf.getInstance().schemaFor(this);
+    Schema<GeneratedMessageV3> schema =
+        (Schema<GeneratedMessageV3>) Protobuf.getInstance().schemaFor(this);
     try {
       schema.mergeFrom(this, CodedInputStreamReader.forCodedInput(input), extensionRegistry);
     } catch (InvalidProtocolBufferException e) {
@@ -155,7 +156,7 @@ public abstract class GeneratedMessageV3 extends AbstractMessage implements Seri
    * @param getBytesForString whether to generate ByteString for string fields
    */
   private Map<FieldDescriptor, Object> getAllFieldsMutable(boolean getBytesForString) {
-    final TreeMap<FieldDescriptor, Object> result = new TreeMap<>();
+    final TreeMap<FieldDescriptor, Object> result = new TreeMap<FieldDescriptor, Object>();
     final Descriptor descriptor = internalGetFieldAccessorTable().descriptor;
     final List<FieldDescriptor> fields = descriptor.getFields();
 
@@ -519,8 +520,8 @@ public abstract class GeneratedMessageV3 extends AbstractMessage implements Seri
 
   /** Builder class for {@link GeneratedMessageV3}. */
   @SuppressWarnings("unchecked")
-  public abstract static class Builder<BuilderT extends Builder<BuilderT>>
-      extends AbstractMessage.Builder<BuilderT> {
+  public abstract static class Builder<BuilderType extends Builder<BuilderType>>
+      extends AbstractMessage.Builder<BuilderType> {
 
     private BuilderParent builderParent;
 
@@ -582,8 +583,8 @@ public abstract class GeneratedMessageV3 extends AbstractMessage implements Seri
     }
 
     @Override
-    public BuilderT clone() {
-      BuilderT builder = (BuilderT) getDefaultInstanceForType().newBuilderForType();
+    public BuilderType clone() {
+      BuilderType builder = (BuilderType) getDefaultInstanceForType().newBuilderForType();
       builder.mergeFrom(buildPartial());
       return builder;
     }
@@ -593,10 +594,10 @@ public abstract class GeneratedMessageV3 extends AbstractMessage implements Seri
      * builtin fields back to the initial values.
      */
     @Override
-    public BuilderT clear() {
+    public BuilderType clear() {
       unknownFieldsOrBuilder = UnknownFieldSet.getDefaultInstance();
       onChanged();
-      return (BuilderT) this;
+      return (BuilderType) this;
     }
 
     /**
@@ -617,7 +618,7 @@ public abstract class GeneratedMessageV3 extends AbstractMessage implements Seri
 
     /** Internal helper which returns a mutable map. */
     private Map<FieldDescriptor, Object> getAllFieldsMutable() {
-      final TreeMap<FieldDescriptor, Object> result = new TreeMap<>();
+      final TreeMap<FieldDescriptor, Object> result = new TreeMap<FieldDescriptor, Object>();
       final Descriptor descriptor = internalGetFieldAccessorTable().descriptor;
       final List<FieldDescriptor> fields = descriptor.getFields();
 
@@ -700,21 +701,21 @@ public abstract class GeneratedMessageV3 extends AbstractMessage implements Seri
     }
 
     @Override
-    public BuilderT setField(final FieldDescriptor field, final Object value) {
+    public BuilderType setField(final FieldDescriptor field, final Object value) {
       internalGetFieldAccessorTable().getField(field).set(this, value);
-      return (BuilderT) this;
+      return (BuilderType) this;
     }
 
     @Override
-    public BuilderT clearField(final FieldDescriptor field) {
+    public BuilderType clearField(final FieldDescriptor field) {
       internalGetFieldAccessorTable().getField(field).clear(this);
-      return (BuilderT) this;
+      return (BuilderType) this;
     }
 
     @Override
-    public BuilderT clearOneof(final OneofDescriptor oneof) {
+    public BuilderType clearOneof(final OneofDescriptor oneof) {
       internalGetFieldAccessorTable().getOneof(oneof).clear(this);
-      return (BuilderT) this;
+      return (BuilderType) this;
     }
 
     @Override
@@ -728,51 +729,51 @@ public abstract class GeneratedMessageV3 extends AbstractMessage implements Seri
     }
 
     @Override
-    public BuilderT setRepeatedField(
+    public BuilderType setRepeatedField(
         final FieldDescriptor field, final int index, final Object value) {
       internalGetFieldAccessorTable().getField(field).setRepeated(this, index, value);
-      return (BuilderT) this;
+      return (BuilderType) this;
     }
 
     @Override
-    public BuilderT addRepeatedField(final FieldDescriptor field, final Object value) {
+    public BuilderType addRepeatedField(final FieldDescriptor field, final Object value) {
       internalGetFieldAccessorTable().getField(field).addRepeated(this, value);
-      return (BuilderT) this;
+      return (BuilderType) this;
     }
 
-    private BuilderT setUnknownFieldsInternal(final UnknownFieldSet unknownFields) {
+    private BuilderType setUnknownFieldsInternal(final UnknownFieldSet unknownFields) {
       unknownFieldsOrBuilder = unknownFields;
       onChanged();
-      return (BuilderT) this;
+      return (BuilderType) this;
     }
 
     @Override
-    public BuilderT setUnknownFields(final UnknownFieldSet unknownFields) {
+    public BuilderType setUnknownFields(final UnknownFieldSet unknownFields) {
       return setUnknownFieldsInternal(unknownFields);
     }
 
     /**
      * This method is obsolete, but we must retain it for compatibility with older generated code.
      */
-    protected BuilderT setUnknownFieldsProto3(final UnknownFieldSet unknownFields) {
+    protected BuilderType setUnknownFieldsProto3(final UnknownFieldSet unknownFields) {
       return setUnknownFieldsInternal(unknownFields);
     }
 
     @Override
-    public BuilderT mergeUnknownFields(final UnknownFieldSet unknownFields) {
+    public BuilderType mergeUnknownFields(final UnknownFieldSet unknownFields) {
       if (UnknownFieldSet.getDefaultInstance().equals(unknownFields)) {
-        return (BuilderT) this;
+        return (BuilderType) this;
       }
 
       if (UnknownFieldSet.getDefaultInstance().equals(unknownFieldsOrBuilder)) {
         unknownFieldsOrBuilder = unknownFields;
         onChanged();
-        return (BuilderT) this;
+        return (BuilderType) this;
       }
 
       getUnknownFieldSetBuilder().mergeFrom(unknownFields);
       onChanged();
-      return (BuilderT) this;
+      return (BuilderType) this;
     }
 
     @Override
@@ -918,49 +919,49 @@ public abstract class GeneratedMessageV3 extends AbstractMessage implements Seri
   // Extensions-related stuff
 
   /** Extends {@link MessageOrBuilder} with extension-related functions. */
-  public interface ExtendableMessageOrBuilder<MessageT extends ExtendableMessage>
+  public interface ExtendableMessageOrBuilder<MessageType extends ExtendableMessage>
       extends MessageOrBuilder {
     // Re-define for return type covariance.
     @Override
     Message getDefaultInstanceForType();
 
     /** Check if a singular extension is present. */
-    <T> boolean hasExtension(ExtensionLite<MessageT, T> extension);
+    <Type> boolean hasExtension(ExtensionLite<MessageType, Type> extension);
 
     /** Get the number of elements in a repeated extension. */
-    <T> int getExtensionCount(ExtensionLite<MessageT, List<T>> extension);
+    <Type> int getExtensionCount(ExtensionLite<MessageType, List<Type>> extension);
 
     /** Get the value of an extension. */
-    <T> T getExtension(ExtensionLite<MessageT, T> extension);
+    <Type> Type getExtension(ExtensionLite<MessageType, Type> extension);
 
     /** Get one element of a repeated extension. */
-    <T> T getExtension(ExtensionLite<MessageT, List<T>> extension, int index);
+    <Type> Type getExtension(ExtensionLite<MessageType, List<Type>> extension, int index);
 
     /** Check if a singular extension is present. */
-    <T> boolean hasExtension(
-        Extension<MessageT, T> extension);
+    <Type> boolean hasExtension(
+        Extension<MessageType, Type> extension);
     /** Check if a singular extension is present. */
-    <T> boolean hasExtension(
-        GeneratedExtension<MessageT, T> extension);
+    <Type> boolean hasExtension(
+        GeneratedExtension<MessageType, Type> extension);
     /** Get the number of elements in a repeated extension. */
-    <T> int getExtensionCount(
-        Extension<MessageT, List<T>> extension);
+    <Type> int getExtensionCount(
+        Extension<MessageType, List<Type>> extension);
     /** Get the number of elements in a repeated extension. */
-    <T> int getExtensionCount(
-        GeneratedExtension<MessageT, List<T>> extension);
+    <Type> int getExtensionCount(
+        GeneratedExtension<MessageType, List<Type>> extension);
     /** Get the value of an extension. */
-    <T> T getExtension(
-        Extension<MessageT, T> extension);
+    <Type> Type getExtension(
+        Extension<MessageType, Type> extension);
     /** Get the value of an extension. */
-    <T> T getExtension(
-        GeneratedExtension<MessageT, T> extension);
+    <Type> Type getExtension(
+        GeneratedExtension<MessageType, Type> extension);
     /** Get one element of a repeated extension. */
-    <T> T getExtension(
-        Extension<MessageT, List<T>> extension,
+    <Type> Type getExtension(
+        Extension<MessageType, List<Type>> extension,
         int index);
     /** Get one element of a repeated extension. */
-    <T> T getExtension(
-        GeneratedExtension<MessageT, List<T>> extension,
+    <Type> Type getExtension(
+        GeneratedExtension<MessageType, List<Type>> extension,
         int index);
   }
 
@@ -996,8 +997,8 @@ public abstract class GeneratedMessageV3 extends AbstractMessage implements Seri
    *
    * <p>See also {@link ExtendableBuilder}.
    */
-  public abstract static class ExtendableMessage<MessageT extends ExtendableMessage>
-      extends GeneratedMessageV3 implements ExtendableMessageOrBuilder<MessageT> {
+  public abstract static class ExtendableMessage<MessageType extends ExtendableMessage>
+      extends GeneratedMessageV3 implements ExtendableMessageOrBuilder<MessageType> {
 
     private static final long serialVersionUID = 1L;
 
@@ -1007,12 +1008,12 @@ public abstract class GeneratedMessageV3 extends AbstractMessage implements Seri
       this.extensions = FieldSet.newFieldSet();
     }
 
-    protected ExtendableMessage(ExtendableBuilder<MessageT, ?> builder) {
+    protected ExtendableMessage(ExtendableBuilder<MessageType, ?> builder) {
       super(builder);
       this.extensions = builder.buildExtensions();
     }
 
-    private void verifyExtensionContainingType(final Extension<MessageT, ?> extension) {
+    private void verifyExtensionContainingType(final Extension<MessageType, ?> extension) {
       if (extension.getDescriptor().getContainingType() != getDescriptorForType()) {
         // This can only happen if someone uses unchecked operations.
         throw new IllegalArgumentException(
@@ -1027,8 +1028,8 @@ public abstract class GeneratedMessageV3 extends AbstractMessage implements Seri
     /** Check if a singular extension is present. */
     @Override
     @SuppressWarnings("unchecked")
-    public final <T> boolean hasExtension(final ExtensionLite<MessageT, T> extensionLite) {
-      Extension<MessageT, T> extension = checkNotLite(extensionLite);
+    public final <Type> boolean hasExtension(final ExtensionLite<MessageType, Type> extensionLite) {
+      Extension<MessageType, Type> extension = checkNotLite(extensionLite);
 
       verifyExtensionContainingType(extension);
       return extensions.hasField(extension.getDescriptor());
@@ -1037,8 +1038,9 @@ public abstract class GeneratedMessageV3 extends AbstractMessage implements Seri
     /** Get the number of elements in a repeated extension. */
     @Override
     @SuppressWarnings("unchecked")
-    public final <T> int getExtensionCount(final ExtensionLite<MessageT, List<T>> extensionLite) {
-      Extension<MessageT, List<T>> extension = checkNotLite(extensionLite);
+    public final <Type> int getExtensionCount(
+        final ExtensionLite<MessageType, List<Type>> extensionLite) {
+      Extension<MessageType, List<Type>> extension = checkNotLite(extensionLite);
 
       verifyExtensionContainingType(extension);
       final FieldDescriptor descriptor = extension.getDescriptor();
@@ -1048,83 +1050,83 @@ public abstract class GeneratedMessageV3 extends AbstractMessage implements Seri
     /** Get the value of an extension. */
     @Override
     @SuppressWarnings("unchecked")
-    public final <T> T getExtension(final ExtensionLite<MessageT, T> extensionLite) {
-      Extension<MessageT, T> extension = checkNotLite(extensionLite);
+    public final <Type> Type getExtension(final ExtensionLite<MessageType, Type> extensionLite) {
+      Extension<MessageType, Type> extension = checkNotLite(extensionLite);
 
       verifyExtensionContainingType(extension);
       FieldDescriptor descriptor = extension.getDescriptor();
       final Object value = extensions.getField(descriptor);
       if (value == null) {
         if (descriptor.isRepeated()) {
-          return (T) Collections.emptyList();
+          return (Type) Collections.emptyList();
         } else if (descriptor.getJavaType() == FieldDescriptor.JavaType.MESSAGE) {
-          return (T) extension.getMessageDefaultInstance();
+          return (Type) extension.getMessageDefaultInstance();
         } else {
-          return (T) extension.fromReflectionType(descriptor.getDefaultValue());
+          return (Type) extension.fromReflectionType(descriptor.getDefaultValue());
         }
       } else {
-        return (T) extension.fromReflectionType(value);
+        return (Type) extension.fromReflectionType(value);
       }
     }
 
     /** Get one element of a repeated extension. */
     @Override
     @SuppressWarnings("unchecked")
-    public final <T> T getExtension(
-        final ExtensionLite<MessageT, List<T>> extensionLite, final int index) {
-      Extension<MessageT, List<T>> extension = checkNotLite(extensionLite);
+    public final <Type> Type getExtension(
+        final ExtensionLite<MessageType, List<Type>> extensionLite, final int index) {
+      Extension<MessageType, List<Type>> extension = checkNotLite(extensionLite);
 
       verifyExtensionContainingType(extension);
       FieldDescriptor descriptor = extension.getDescriptor();
-      return (T)
+      return (Type)
           extension.singularFromReflectionType(extensions.getRepeatedField(descriptor, index));
     }
 
     /** Check if a singular extension is present. */
     @Override
-    public final <T> boolean hasExtension(final Extension<MessageT, T> extension) {
-      return hasExtension((ExtensionLite<MessageT, T>) extension);
+    public final <Type> boolean hasExtension(final Extension<MessageType, Type> extension) {
+      return hasExtension((ExtensionLite<MessageType, Type>) extension);
     }
     /** Check if a singular extension is present. */
     @Override
-    public final <T> boolean hasExtension(
-        final GeneratedExtension<MessageT, T> extension) {
-      return hasExtension((ExtensionLite<MessageT, T>) extension);
+    public final <Type> boolean hasExtension(
+        final GeneratedExtension<MessageType, Type> extension) {
+      return hasExtension((ExtensionLite<MessageType, Type>) extension);
     }
     /** Get the number of elements in a repeated extension. */
     @Override
-    public final <T> int getExtensionCount(
-        final Extension<MessageT, List<T>> extension) {
-      return getExtensionCount((ExtensionLite<MessageT, List<T>>) extension);
+    public final <Type> int getExtensionCount(
+        final Extension<MessageType, List<Type>> extension) {
+      return getExtensionCount((ExtensionLite<MessageType, List<Type>>) extension);
     }
     /** Get the number of elements in a repeated extension. */
     @Override
-    public final <T> int getExtensionCount(
-        final GeneratedExtension<MessageT, List<T>> extension) {
-      return getExtensionCount((ExtensionLite<MessageT, List<T>>) extension);
+    public final <Type> int getExtensionCount(
+        final GeneratedExtension<MessageType, List<Type>> extension) {
+      return getExtensionCount((ExtensionLite<MessageType, List<Type>>) extension);
     }
     /** Get the value of an extension. */
     @Override
-    public final <T> T getExtension(final Extension<MessageT, T> extension) {
-      return getExtension((ExtensionLite<MessageT, T>) extension);
+    public final <Type> Type getExtension(final Extension<MessageType, Type> extension) {
+      return getExtension((ExtensionLite<MessageType, Type>) extension);
     }
     /** Get the value of an extension. */
     @Override
-    public final <T> T getExtension(
-        final GeneratedExtension<MessageT, T> extension) {
-      return getExtension((ExtensionLite<MessageT, T>) extension);
+    public final <Type> Type getExtension(
+        final GeneratedExtension<MessageType, Type> extension) {
+      return getExtension((ExtensionLite<MessageType, Type>) extension);
     }
     /** Get one element of a repeated extension. */
     @Override
-    public final <T> T getExtension(
-        final Extension<MessageT, List<T>> extension, final int index) {
-      return getExtension((ExtensionLite<MessageT, List<T>>) extension, index);
+    public final <Type> Type getExtension(
+        final Extension<MessageType, List<Type>> extension, final int index) {
+      return getExtension((ExtensionLite<MessageType, List<Type>>) extension, index);
     }
     /** Get one element of a repeated extension. */
     @Override
-    public final <T> T getExtension(
-        final GeneratedExtension<MessageT, List<T>> extension, final int index) {
-      return getExtension((ExtensionLite<MessageT, List<T>>) extension, index);
+    public final <Type> Type getExtension(
+        final GeneratedExtension<MessageType, List<Type>> extension, final int index) {
+      return getExtension((ExtensionLite<MessageType, List<Type>>) extension, index);
     }
 
     /** Called by subclasses to check if all extensions are initialized. */
@@ -1361,9 +1363,9 @@ public abstract class GeneratedMessageV3 extends AbstractMessage implements Seri
    */
   @SuppressWarnings("unchecked")
   public abstract static class ExtendableBuilder<
-          MessageT extends ExtendableMessage,
-          BuilderT extends ExtendableBuilder<MessageT, BuilderT>>
-      extends Builder<BuilderT> implements ExtendableMessageOrBuilder<MessageT> {
+          MessageType extends ExtendableMessage,
+          BuilderType extends ExtendableBuilder<MessageType, BuilderType>>
+      extends Builder<BuilderType> implements ExtendableMessageOrBuilder<MessageType> {
 
     private FieldSet.Builder<FieldDescriptor> extensions;
 
@@ -1379,7 +1381,7 @@ public abstract class GeneratedMessageV3 extends AbstractMessage implements Seri
     }
 
     @Override
-    public BuilderT clear() {
+    public BuilderType clear() {
       extensions = null;
       return super.clear();
     }
@@ -1390,7 +1392,7 @@ public abstract class GeneratedMessageV3 extends AbstractMessage implements Seri
       }
     }
 
-    private void verifyExtensionContainingType(final Extension<MessageT, ?> extension) {
+    private void verifyExtensionContainingType(final Extension<MessageType, ?> extension) {
       if (extension.getDescriptor().getContainingType() != getDescriptorForType()) {
         // This can only happen if someone uses unchecked operations.
         throw new IllegalArgumentException(
@@ -1404,17 +1406,18 @@ public abstract class GeneratedMessageV3 extends AbstractMessage implements Seri
 
     /** Check if a singular extension is present. */
     @Override
-    public final <T> boolean hasExtension(final ExtensionLite<MessageT, T> extensionLite) {
-      Extension<MessageT, T> extension = checkNotLite(extensionLite);
+    public final <Type> boolean hasExtension(final ExtensionLite<MessageType, Type> extensionLite) {
+      Extension<MessageType, Type> extension = checkNotLite(extensionLite);
 
       verifyExtensionContainingType(extension);
-      return extensions != null && extensions.hasField(extension.getDescriptor());
+      return extensions == null ? false : extensions.hasField(extension.getDescriptor());
     }
 
     /** Get the number of elements in a repeated extension. */
     @Override
-    public final <T> int getExtensionCount(final ExtensionLite<MessageT, List<T>> extensionLite) {
-      Extension<MessageT, List<T>> extension = checkNotLite(extensionLite);
+    public final <Type> int getExtensionCount(
+        final ExtensionLite<MessageType, List<Type>> extensionLite) {
+      Extension<MessageType, List<Type>> extension = checkNotLite(extensionLite);
 
       verifyExtensionContainingType(extension);
       final FieldDescriptor descriptor = extension.getDescriptor();
@@ -1423,182 +1426,184 @@ public abstract class GeneratedMessageV3 extends AbstractMessage implements Seri
 
     /** Get the value of an extension. */
     @Override
-    public final <T> T getExtension(final ExtensionLite<MessageT, T> extensionLite) {
-      Extension<MessageT, T> extension = checkNotLite(extensionLite);
+    public final <Type> Type getExtension(final ExtensionLite<MessageType, Type> extensionLite) {
+      Extension<MessageType, Type> extension = checkNotLite(extensionLite);
 
       verifyExtensionContainingType(extension);
       FieldDescriptor descriptor = extension.getDescriptor();
       final Object value = extensions == null ? null : extensions.getField(descriptor);
       if (value == null) {
         if (descriptor.isRepeated()) {
-          return (T) Collections.emptyList();
+          return (Type) Collections.emptyList();
         } else if (descriptor.getJavaType() == FieldDescriptor.JavaType.MESSAGE) {
-          return (T) extension.getMessageDefaultInstance();
+          return (Type) extension.getMessageDefaultInstance();
         } else {
-          return (T) extension.fromReflectionType(descriptor.getDefaultValue());
+          return (Type) extension.fromReflectionType(descriptor.getDefaultValue());
         }
       } else {
-        return (T) extension.fromReflectionType(value);
+        return (Type) extension.fromReflectionType(value);
       }
     }
 
     /** Get one element of a repeated extension. */
     @Override
-    public final <T> T getExtension(
-        final ExtensionLite<MessageT, List<T>> extensionLite, final int index) {
-      Extension<MessageT, List<T>> extension = checkNotLite(extensionLite);
+    public final <Type> Type getExtension(
+        final ExtensionLite<MessageType, List<Type>> extensionLite, final int index) {
+      Extension<MessageType, List<Type>> extension = checkNotLite(extensionLite);
 
       verifyExtensionContainingType(extension);
       FieldDescriptor descriptor = extension.getDescriptor();
       if (extensions == null) {
         throw new IndexOutOfBoundsException();
       }
-      return (T)
+      return (Type)
           extension.singularFromReflectionType(extensions.getRepeatedField(descriptor, index));
     }
 
     /** Set the value of an extension. */
-    public final <T> BuilderT setExtension(
-        final ExtensionLite<MessageT, T> extensionLite, final T value) {
-      Extension<MessageT, T> extension = checkNotLite(extensionLite);
+    public final <Type> BuilderType setExtension(
+        final ExtensionLite<MessageType, Type> extensionLite, final Type value) {
+      Extension<MessageType, Type> extension = checkNotLite(extensionLite);
 
       verifyExtensionContainingType(extension);
       ensureExtensionsIsMutable();
       final FieldDescriptor descriptor = extension.getDescriptor();
       extensions.setField(descriptor, extension.toReflectionType(value));
       onChanged();
-      return (BuilderT) this;
+      return (BuilderType) this;
     }
 
     /** Set the value of one element of a repeated extension. */
-    public final <T> BuilderT setExtension(
-        final ExtensionLite<MessageT, List<T>> extensionLite, final int index, final T value) {
-      Extension<MessageT, List<T>> extension = checkNotLite(extensionLite);
+    public final <Type> BuilderType setExtension(
+        final ExtensionLite<MessageType, List<Type>> extensionLite,
+        final int index,
+        final Type value) {
+      Extension<MessageType, List<Type>> extension = checkNotLite(extensionLite);
 
       verifyExtensionContainingType(extension);
       ensureExtensionsIsMutable();
       final FieldDescriptor descriptor = extension.getDescriptor();
       extensions.setRepeatedField(descriptor, index, extension.singularToReflectionType(value));
       onChanged();
-      return (BuilderT) this;
+      return (BuilderType) this;
     }
 
     /** Append a value to a repeated extension. */
-    public final <T> BuilderT addExtension(
-        final ExtensionLite<MessageT, List<T>> extensionLite, final T value) {
-      Extension<MessageT, List<T>> extension = checkNotLite(extensionLite);
+    public final <Type> BuilderType addExtension(
+        final ExtensionLite<MessageType, List<Type>> extensionLite, final Type value) {
+      Extension<MessageType, List<Type>> extension = checkNotLite(extensionLite);
 
       verifyExtensionContainingType(extension);
       ensureExtensionsIsMutable();
       final FieldDescriptor descriptor = extension.getDescriptor();
       extensions.addRepeatedField(descriptor, extension.singularToReflectionType(value));
       onChanged();
-      return (BuilderT) this;
+      return (BuilderType) this;
     }
 
     /** Clear an extension. */
-    public final BuilderT clearExtension(final ExtensionLite<MessageT, ?> extensionLite) {
-      Extension<MessageT, ?> extension = checkNotLite(extensionLite);
+    public final BuilderType clearExtension(final ExtensionLite<MessageType, ?> extensionLite) {
+      Extension<MessageType, ?> extension = checkNotLite(extensionLite);
 
       verifyExtensionContainingType(extension);
       ensureExtensionsIsMutable();
       extensions.clearField(extension.getDescriptor());
       onChanged();
-      return (BuilderT) this;
+      return (BuilderType) this;
     }
 
     /** Check if a singular extension is present. */
     @Override
-    public final <T> boolean hasExtension(final Extension<MessageT, T> extension) {
-      return hasExtension((ExtensionLite<MessageT, T>) extension);
+    public final <Type> boolean hasExtension(final Extension<MessageType, Type> extension) {
+      return hasExtension((ExtensionLite<MessageType, Type>) extension);
     }
     /** Check if a singular extension is present. */
     @Override
-    public final <T> boolean hasExtension(
-        final GeneratedExtension<MessageT, T> extension) {
-      return hasExtension((ExtensionLite<MessageT, T>) extension);
+    public final <Type> boolean hasExtension(
+        final GeneratedExtension<MessageType, Type> extension) {
+      return hasExtension((ExtensionLite<MessageType, Type>) extension);
     }
     /** Get the number of elements in a repeated extension. */
     @Override
-    public final <T> int getExtensionCount(
-        final Extension<MessageT, List<T>> extension) {
-      return getExtensionCount((ExtensionLite<MessageT, List<T>>) extension);
+    public final <Type> int getExtensionCount(
+        final Extension<MessageType, List<Type>> extension) {
+      return getExtensionCount((ExtensionLite<MessageType, List<Type>>) extension);
     }
     /** Get the number of elements in a repeated extension. */
     @Override
-    public final <T> int getExtensionCount(
-        final GeneratedExtension<MessageT, List<T>> extension) {
-      return getExtensionCount((ExtensionLite<MessageT, List<T>>) extension);
+    public final <Type> int getExtensionCount(
+        final GeneratedExtension<MessageType, List<Type>> extension) {
+      return getExtensionCount((ExtensionLite<MessageType, List<Type>>) extension);
     }
     /** Get the value of an extension. */
     @Override
-    public final <T> T getExtension(final Extension<MessageT, T> extension) {
-      return getExtension((ExtensionLite<MessageT, T>) extension);
+    public final <Type> Type getExtension(final Extension<MessageType, Type> extension) {
+      return getExtension((ExtensionLite<MessageType, Type>) extension);
     }
     /** Get the value of an extension. */
     @Override
-    public final <T> T getExtension(
-        final GeneratedExtension<MessageT, T> extension) {
-      return getExtension((ExtensionLite<MessageT, T>) extension);
+    public final <Type> Type getExtension(
+        final GeneratedExtension<MessageType, Type> extension) {
+      return getExtension((ExtensionLite<MessageType, Type>) extension);
     }
     /** Get the value of an extension. */
     @Override
-    public final <T> T getExtension(
-        final Extension<MessageT, List<T>> extension, final int index) {
-      return getExtension((ExtensionLite<MessageT, List<T>>) extension, index);
+    public final <Type> Type getExtension(
+        final Extension<MessageType, List<Type>> extension, final int index) {
+      return getExtension((ExtensionLite<MessageType, List<Type>>) extension, index);
     }
     /** Get the value of an extension. */
     @Override
-    public final <T> T getExtension(
-        final GeneratedExtension<MessageT, List<T>> extension, final int index) {
-      return getExtension((ExtensionLite<MessageT, List<T>>) extension, index);
+    public final <Type> Type getExtension(
+        final GeneratedExtension<MessageType, List<Type>> extension, final int index) {
+      return getExtension((ExtensionLite<MessageType, List<Type>>) extension, index);
     }
     /** Set the value of an extension. */
-    public final <T> BuilderT setExtension(
-        final Extension<MessageT, T> extension, final T value) {
-      return setExtension((ExtensionLite<MessageT, T>) extension, value);
+    public final <Type> BuilderType setExtension(
+        final Extension<MessageType, Type> extension, final Type value) {
+      return setExtension((ExtensionLite<MessageType, Type>) extension, value);
     }
     /** Set the value of an extension. */
-    public <T> BuilderT setExtension(
-        final GeneratedExtension<MessageT, T> extension, final T value) {
-      return setExtension((ExtensionLite<MessageT, T>) extension, value);
+    public <Type> BuilderType setExtension(
+        final GeneratedExtension<MessageType, Type> extension, final Type value) {
+      return setExtension((ExtensionLite<MessageType, Type>) extension, value);
     }
     /** Set the value of one element of a repeated extension. */
-    public final <T> BuilderT setExtension(
-        final Extension<MessageT, List<T>> extension,
-        final int index, final T value) {
-      return setExtension((ExtensionLite<MessageT, List<T>>) extension, index, value);
+    public final <Type> BuilderType setExtension(
+        final Extension<MessageType, List<Type>> extension,
+        final int index, final Type value) {
+      return setExtension((ExtensionLite<MessageType, List<Type>>) extension, index, value);
     }
     /** Set the value of one element of a repeated extension. */
-    public <T> BuilderT setExtension(
-        final GeneratedExtension<MessageT, List<T>> extension,
-        final int index, final T value) {
-      return setExtension((ExtensionLite<MessageT, List<T>>) extension, index, value);
+    public <Type> BuilderType setExtension(
+        final GeneratedExtension<MessageType, List<Type>> extension,
+        final int index, final Type value) {
+      return setExtension((ExtensionLite<MessageType, List<Type>>) extension, index, value);
     }
     /** Append a value to a repeated extension. */
-    public final <T> BuilderT addExtension(
-        final Extension<MessageT, List<T>> extension, final T value) {
-      return addExtension((ExtensionLite<MessageT, List<T>>) extension, value);
+    public final <Type> BuilderType addExtension(
+        final Extension<MessageType, List<Type>> extension, final Type value) {
+      return addExtension((ExtensionLite<MessageType, List<Type>>) extension, value);
     }
     /** Append a value to a repeated extension. */
-    public <T> BuilderT addExtension(
-        final GeneratedExtension<MessageT, List<T>> extension, final T value) {
-      return addExtension((ExtensionLite<MessageT, List<T>>) extension, value);
+    public <Type> BuilderType addExtension(
+        final GeneratedExtension<MessageType, List<Type>> extension, final Type value) {
+      return addExtension((ExtensionLite<MessageType, List<Type>>) extension, value);
     }
     /** Clear an extension. */
-    public final <T> BuilderT clearExtension(
-        final Extension<MessageT, ?> extension) {
-      return clearExtension((ExtensionLite<MessageT, ?>) extension);
+    public final <Type> BuilderType clearExtension(
+        final Extension<MessageType, ?> extension) {
+      return clearExtension((ExtensionLite<MessageType, ?>) extension);
     }
     /** Clear an extension. */
-    public <T> BuilderT clearExtension(
-        final GeneratedExtension<MessageT, ?> extension) {
-      return clearExtension((ExtensionLite<MessageT, ?>) extension);
+    public <Type> BuilderType clearExtension(
+        final GeneratedExtension<MessageType, ?> extension) {
+      return clearExtension((ExtensionLite<MessageType, ?>) extension);
     }
 
     /** Called by subclasses to check if all extensions are initialized. */
     protected boolean extensionsAreInitialized() {
-      return extensions == null || extensions.isInitialized();
+      return extensions == null ? true : extensions.isInitialized();
     }
 
     /**
@@ -1734,60 +1739,60 @@ public abstract class GeneratedMessageV3 extends AbstractMessage implements Seri
     public boolean hasField(final FieldDescriptor field) {
       if (field.isExtension()) {
         verifyContainingType(field);
-        return extensions != null && extensions.hasField(field);
+        return extensions == null ? false : extensions.hasField(field);
       } else {
         return super.hasField(field);
       }
     }
 
     @Override
-    public BuilderT setField(final FieldDescriptor field, final Object value) {
+    public BuilderType setField(final FieldDescriptor field, final Object value) {
       if (field.isExtension()) {
         verifyContainingType(field);
         ensureExtensionsIsMutable();
         extensions.setField(field, value);
         onChanged();
-        return (BuilderT) this;
+        return (BuilderType) this;
       } else {
         return super.setField(field, value);
       }
     }
 
     @Override
-    public BuilderT clearField(final FieldDescriptor field) {
+    public BuilderType clearField(final FieldDescriptor field) {
       if (field.isExtension()) {
         verifyContainingType(field);
         ensureExtensionsIsMutable();
         extensions.clearField(field);
         onChanged();
-        return (BuilderT) this;
+        return (BuilderType) this;
       } else {
         return super.clearField(field);
       }
     }
 
     @Override
-    public BuilderT setRepeatedField(
+    public BuilderType setRepeatedField(
         final FieldDescriptor field, final int index, final Object value) {
       if (field.isExtension()) {
         verifyContainingType(field);
         ensureExtensionsIsMutable();
         extensions.setRepeatedField(field, index, value);
         onChanged();
-        return (BuilderT) this;
+        return (BuilderType) this;
       } else {
         return super.setRepeatedField(field, index, value);
       }
     }
 
     @Override
-    public BuilderT addRepeatedField(final FieldDescriptor field, final Object value) {
+    public BuilderType addRepeatedField(final FieldDescriptor field, final Object value) {
       if (field.isExtension()) {
         verifyContainingType(field);
         ensureExtensionsIsMutable();
         extensions.addRepeatedField(field, value);
         onChanged();
-        return (BuilderT) this;
+        return (BuilderType) this;
       } else {
         return super.addRepeatedField(field, value);
       }
@@ -1958,7 +1963,8 @@ public abstract class GeneratedMessageV3 extends AbstractMessage implements Seri
           if (field.isRepeated()) {
             if (field.getJavaType() == FieldDescriptor.JavaType.MESSAGE) {
               if (field.isMapField()) {
-                fields[i] = new MapFieldAccessor(field, messageClass);
+                fields[i] =
+                    new MapFieldAccessor(field, camelCaseNames[i], messageClass, builderClass);
               } else {
                 fields[i] =
                     new RepeatedMessageFieldAccessor(
@@ -2123,16 +2129,22 @@ public abstract class GeneratedMessageV3 extends AbstractMessage implements Seri
         if (fieldDescriptor != null) {
           return message.hasField(fieldDescriptor);
         } else {
-          return ((Internal.EnumLite) invokeOrDie(caseMethod, message)).getNumber() != 0;
+          if (((Internal.EnumLite) invokeOrDie(caseMethod, message)).getNumber() == 0) {
+            return false;
+          }
         }
+        return true;
       }
 
       public boolean has(GeneratedMessageV3.Builder builder) {
         if (fieldDescriptor != null) {
           return builder.hasField(fieldDescriptor);
         } else {
-          return ((Internal.EnumLite) invokeOrDie(caseMethodBuilder, builder)).getNumber() != 0;
+          if (((Internal.EnumLite) invokeOrDie(caseMethodBuilder, builder)).getNumber() == 0) {
+            return false;
+          }
         }
+        return true;
       }
 
       public FieldDescriptor get(final GeneratedMessageV3 message) {
@@ -2422,9 +2434,9 @@ public abstract class GeneratedMessageV3 extends AbstractMessage implements Seri
 
     private static class RepeatedFieldAccessor implements FieldAccessor {
       interface MethodInvoker {
-        Object get(final GeneratedMessageV3 message);
+        public Object get(final GeneratedMessageV3 message);
 
-        Object get(GeneratedMessageV3.Builder<?> builder);
+        public Object get(GeneratedMessageV3.Builder<?> builder);
 
         Object getRepeated(final GeneratedMessageV3 message, final int index);
 
@@ -2443,15 +2455,15 @@ public abstract class GeneratedMessageV3 extends AbstractMessage implements Seri
       }
 
       private static final class ReflectionInvoker implements MethodInvoker {
-        private final Method getMethod;
-        private final Method getMethodBuilder;
-        private final Method getRepeatedMethod;
-        private final Method getRepeatedMethodBuilder;
-        private final Method setRepeatedMethod;
-        private final Method addRepeatedMethod;
-        private final Method getCountMethod;
-        private final Method getCountMethodBuilder;
-        private final Method clearMethod;
+        protected final Method getMethod;
+        protected final Method getMethodBuilder;
+        protected final Method getRepeatedMethod;
+        protected final Method getRepeatedMethodBuilder;
+        protected final Method setRepeatedMethod;
+        protected final Method addRepeatedMethod;
+        protected final Method getCountMethod;
+        protected final Method getCountMethodBuilder;
+        protected final Method clearMethod;
 
         ReflectionInvoker(
             final FieldDescriptor descriptor,
@@ -2647,7 +2659,10 @@ public abstract class GeneratedMessageV3 extends AbstractMessage implements Seri
 
     private static class MapFieldAccessor implements FieldAccessor {
       MapFieldAccessor(
-          final FieldDescriptor descriptor, final Class<? extends GeneratedMessageV3> messageClass) {
+          final FieldDescriptor descriptor,
+          final String camelCaseName,
+          final Class<? extends GeneratedMessageV3> messageClass,
+          final Class<? extends Builder> builderClass) {
         field = descriptor;
         Method getDefaultInstanceMethod = getMethodOrDie(messageClass, "getDefaultInstance");
         MapField<?, ?> defaultMapField =
@@ -2817,12 +2832,12 @@ public abstract class GeneratedMessageV3 extends AbstractMessage implements Seri
         }
       }
 
-      private final EnumDescriptor enumDescriptor;
+      private EnumDescriptor enumDescriptor;
 
-      private final Method valueOfMethod;
-      private final Method getValueDescriptorMethod;
+      private Method valueOfMethod;
+      private Method getValueDescriptorMethod;
 
-      private final boolean supportUnknownEnumValue;
+      private boolean supportUnknownEnumValue;
       private Method getValueMethod;
       private Method getValueMethodBuilder;
       private Method setValueMethod;
@@ -2883,13 +2898,12 @@ public abstract class GeneratedMessageV3 extends AbstractMessage implements Seri
         }
       }
 
-      private final EnumDescriptor enumDescriptor;
+      private EnumDescriptor enumDescriptor;
 
       private final Method valueOfMethod;
       private final Method getValueDescriptorMethod;
 
-      private final boolean supportUnknownEnumValue;
-
+      private boolean supportUnknownEnumValue;
       private Method getRepeatedValueMethod;
       private Method getRepeatedValueMethodBuilder;
       private Method setRepeatedValueMethod;
@@ -3127,13 +3141,13 @@ public abstract class GeneratedMessageV3 extends AbstractMessage implements Seri
   /**
    * Checks that the {@link Extension} is non-Lite and returns it as a {@link GeneratedExtension}.
    */
-  private static <MessageT extends ExtendableMessage<MessageT>, T>
-      Extension<MessageT, T> checkNotLite(ExtensionLite<MessageT, T> extension) {
+  private static <MessageType extends ExtendableMessage<MessageType>, T>
+      Extension<MessageType, T> checkNotLite(ExtensionLite<MessageType, T> extension) {
     if (extension.isLite()) {
       throw new IllegalArgumentException("Expected non-lite extension.");
     }
 
-    return (Extension<MessageT, T>) extension;
+    return (Extension<MessageType, T>) extension;
   }
 
   protected static boolean isStringEmpty(final Object value) {

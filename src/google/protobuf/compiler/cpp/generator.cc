@@ -42,7 +42,6 @@
 
 #include "absl/strings/match.h"
 #include "absl/strings/str_cat.h"
-#include "absl/strings/string_view.h"
 #include "google/protobuf/compiler/cpp/file.h"
 #include "google/protobuf/compiler/cpp/helpers.h"
 #include "google/protobuf/descriptor.pb.h"
@@ -169,7 +168,7 @@ bool CppGenerator::Generate(const FileDescriptor* file,
         }
         if (next_pos > pos)
           file_options.field_listener_options.forbidden_field_listener_events
-              .emplace(value.substr(pos, next_pos - pos));
+              .insert(value.substr(pos, next_pos - pos));
         pos = next_pos + 1;
       } while (pos < value.size());
     } else if (key == "unverified_lazy_message_sets") {

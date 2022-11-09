@@ -36,6 +36,7 @@
 
 #include <string>
 
+#include "google/protobuf/io/printer.h"
 #include "absl/container/flat_hash_map.h"
 #include "absl/strings/str_cat.h"
 #include "google/protobuf/compiler/java/context.h"
@@ -43,7 +44,6 @@
 #include "google/protobuf/compiler/java/helpers.h"
 #include "google/protobuf/compiler/java/name_resolver.h"
 #include "google/protobuf/descriptor.pb.h"
-#include "google/protobuf/io/printer.h"
 
 // Must be last.
 #include "google/protobuf/port_def.inc"

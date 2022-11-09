@@ -1182,11 +1182,6 @@ static PyObject* GetHasOptions(PyBaseDescriptor *self, void *closure) {
     Py_RETURN_FALSE;
   }
 }
-
-static PyObject* GetIsClosed(PyBaseDescriptor* self, void* closure) {
-  return PyBool_FromLong(_GetDescriptor(self)->is_closed());
-}
-
 static int SetHasOptions(PyBaseDescriptor *self, PyObject *value,
                          void *closure) {
   return CheckCalledFromGeneratedFile("has_options");
@@ -1230,7 +1225,6 @@ static PyGetSetDef Getters[] = {
      "Containing type"},
     {"has_options", (getter)GetHasOptions, (setter)SetHasOptions,
      "Has Options"},
-    {"is_closed", (getter)GetIsClosed, nullptr, "If the enum is closed"},
     {"_options", (getter) nullptr, (setter)SetOptions, "Options"},
     {"_serialized_options", (getter) nullptr, (setter)SetSerializedOptions,
      "Serialized Options"},

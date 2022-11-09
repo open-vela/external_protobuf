@@ -35,6 +35,7 @@
 #ifndef GOOGLE_PROTOBUF_COMPILER_JAVA_PRIMITIVE_FIELD_H__
 #define GOOGLE_PROTOBUF_COMPILER_JAVA_PRIMITIVE_FIELD_H__
 
+#include <map>
 #include <string>
 
 #include "google/protobuf/compiler/java/field.h"
@@ -69,8 +70,6 @@ class ImmutablePrimitiveFieldGenerator : public ImmutableFieldGenerator {
 
   // implements ImmutableFieldGenerator
   // ---------------------------------------
-  int GetMessageBitIndex() const override;
-  int GetBuilderBitIndex() const override;
   int GetNumBitsForMessage() const override;
   int GetNumBitsForBuilder() const override;
   void GenerateInterfaceMembers(io::Printer* printer) const override;
@@ -93,8 +92,6 @@ class ImmutablePrimitiveFieldGenerator : public ImmutableFieldGenerator {
 
  protected:
   const FieldDescriptor* descriptor_;
-  int message_bit_index_;
-  int builder_bit_index_;
   absl::flat_hash_map<absl::string_view, std::string> variables_;
   ClassNameResolver* name_resolver_;
 };
@@ -122,7 +119,7 @@ class ImmutablePrimitiveOneofFieldGenerator
 };
 
 class RepeatedImmutablePrimitiveFieldGenerator
-    : public ImmutablePrimitiveFieldGenerator {
+    : public ImmutableFieldGenerator {
  public:
   explicit RepeatedImmutablePrimitiveFieldGenerator(
       const FieldDescriptor* descriptor, int messageBitIndex,
@@ -155,6 +152,11 @@ class RepeatedImmutablePrimitiveFieldGenerator
   void GenerateKotlinDslMembers(io::Printer* printer) const override;
 
   std::string GetBoxedType() const override;
+
+ private:
+  const FieldDescriptor* descriptor_;
+  absl::flat_hash_map<absl::string_view, std::string> variables_;
+  ClassNameResolver* name_resolver_;
 };
 
 }  // namespace java

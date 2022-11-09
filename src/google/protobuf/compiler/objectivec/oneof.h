@@ -31,6 +31,7 @@
 #ifndef GOOGLE_PROTOBUF_COMPILER_OBJECTIVEC_ONEOF_H__
 #define GOOGLE_PROTOBUF_COMPILER_OBJECTIVEC_ONEOF_H__
 
+#include <set>
 #include <string>
 #include <vector>
 

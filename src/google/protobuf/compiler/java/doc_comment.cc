@@ -36,8 +36,9 @@
 
 #include <vector>
 
-#include "absl/strings/str_split.h"
+#include "google/protobuf/io/printer.h"
 #include "google/protobuf/descriptor.h"
+#include "absl/strings/str_split.h"
 #include "google/protobuf/descriptor.pb.h"
 #include "google/protobuf/io/printer.h"
 

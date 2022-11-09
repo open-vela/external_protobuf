@@ -32,7 +32,6 @@
 // See https://github.com/protocolbuffers/protobuf/pull/710 for details.
 
 #include "google/protobuf/util/delimited_message_util.h"
-
 #include "google/protobuf/io/coded_stream.h"
 
 namespace google {

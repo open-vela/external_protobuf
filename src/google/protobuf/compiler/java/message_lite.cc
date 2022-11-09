@@ -40,6 +40,9 @@
 #include <string>
 #include <vector>
 
+#include "google/protobuf/io/coded_stream.h"
+#include "google/protobuf/io/printer.h"
+#include "google/protobuf/wire_format.h"
 #include "absl/container/flat_hash_map.h"
 #include "absl/strings/ascii.h"
 #include "absl/strings/str_cat.h"
@@ -54,9 +57,6 @@
 #include "google/protobuf/compiler/java/message_builder_lite.h"
 #include "google/protobuf/compiler/java/name_resolver.h"
 #include "google/protobuf/descriptor.pb.h"
-#include "google/protobuf/io/coded_stream.h"
-#include "google/protobuf/io/printer.h"
-#include "google/protobuf/wire_format.h"
 
 // Must be last.
 #include "google/protobuf/port_def.inc"
@@ -81,8 +81,7 @@ ImmutableMessageLiteGenerator::ImmutableMessageLiteGenerator(
          "generate non-lite messages.";
   for (int i = 0; i < descriptor_->field_count(); i++) {
     if (IsRealOneof(descriptor_->field(i))) {
-      const OneofDescriptor* oneof = descriptor_->field(i)->containing_oneof();
-      GOOGLE_CHECK(oneofs_.emplace(oneof->index(), oneof).first->second == oneof);
+      oneofs_.insert(descriptor_->field(i)->containing_oneof());
     }
   }
 }
@@ -153,8 +152,7 @@ void ImmutableMessageLiteGenerator::GenerateInterface(io::Printer* printer) {
     field_generators_.get(descriptor_->field(i))
         .GenerateInterfaceMembers(printer);
   }
-  for (auto& kv : oneofs_) {
-    const OneofDescriptor* oneof = kv.second;
+  for (auto oneof : oneofs_) {
     variables["oneof_capitalized_name"] =
         context_->GetOneofGeneratorInfo(oneof)->capitalized_name;
     variables["classname"] =
@@ -247,8 +245,7 @@ void ImmutableMessageLiteGenerator::Generate(io::Printer* printer) {
   // oneof
   absl::flat_hash_map<absl::string_view, std::string> vars = {{"{", ""},
                                                               {"}", ""}};
-  for (auto& kv : oneofs_) {
-    const OneofDescriptor* oneof = kv.second;
+  for (auto oneof : oneofs_) {
     vars["oneof_name"] = context_->GetOneofGeneratorInfo(oneof)->name;
     vars["oneof_capitalized_name"] =
         context_->GetOneofGeneratorInfo(oneof)->capitalized_name;
@@ -525,11 +522,11 @@ void ImmutableMessageLiteGenerator::GenerateDynamicMethodNewBuildMessageInfo(
 
     // Record the number of oneofs.
     WriteIntToUtf16CharSequence(oneofs_.size(), &chars);
-    for (auto& kv : oneofs_) {
+    for (auto oneof : oneofs_) {
       printer->Print(
           "\"$oneof_name$_\",\n"
           "\"$oneof_name$Case_\",\n",
-          "oneof_name", context_->GetOneofGeneratorInfo(kv.second)->name);
+          "oneof_name", context_->GetOneofGeneratorInfo(oneof)->name);
     }
 
     // Integers for bit fields.
@@ -787,8 +784,7 @@ void ImmutableMessageLiteGenerator::GenerateKotlinDsl(
         .GenerateKotlinDslMembers(printer);
   }
 
-  for (auto& kv : oneofs_) {
-    const OneofDescriptor* oneof = kv.second;
+  for (auto oneof : oneofs_) {
     printer->Print(
         "public val $oneof_name$Case: $message$.$oneof_capitalized_name$Case\n"
         "  @JvmName(\"get$oneof_capitalized_name$Case\")\n"

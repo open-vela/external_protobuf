@@ -60,8 +60,6 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//src/google/protobuf:protobuf_nowkt",
-        "@com_google_absl//absl/container:flat_hash_map",
-        "@com_google_absl//absl/memory",
         "@com_google_absl//absl/strings",
     ],
 )
@@ -85,7 +83,6 @@ cc_library(
         ":code_generator",
         ":importer",
         "//src/google/protobuf:protobuf_nowkt",
-        "@com_google_absl//absl/container:btree",
         "@com_google_absl//absl/strings",
         "@com_google_absl//absl/strings:str_format",
     ],
@@ -247,9 +244,9 @@ cc_test(
         ":command_line_interface",
         ":mock_code_generator",
         "//:protobuf",
+        "//src/google/protobuf/compiler/cpp:names",
         "//src/google/protobuf:cc_test_protos",
         "//src/google/protobuf:test_util2",
-        "//src/google/protobuf/compiler/cpp:names",
         "//src/google/protobuf/io",
         "//src/google/protobuf/stubs",
         "//src/google/protobuf/testing",

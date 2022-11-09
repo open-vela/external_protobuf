@@ -36,13 +36,14 @@
 #define GOOGLE_PROTOBUF_COMPILER_JAVA_FIELD_H__
 
 #include <cstdint>
+#include <map>
 #include <memory>
 #include <string>
 
 #include "google/protobuf/stubs/logging.h"
 #include "google/protobuf/stubs/common.h"
-#include "absl/container/flat_hash_map.h"
 #include "google/protobuf/descriptor.h"
+#include "absl/container/flat_hash_map.h"
 #include "google/protobuf/port.h"
 
 namespace google {
@@ -71,8 +72,6 @@ class ImmutableFieldGenerator {
   ImmutableFieldGenerator& operator=(const ImmutableFieldGenerator&) = delete;
   virtual ~ImmutableFieldGenerator();
 
-  virtual int GetMessageBitIndex() const = 0;
-  virtual int GetBuilderBitIndex() const = 0;
   virtual int GetNumBitsForMessage() const = 0;
   virtual int GetNumBitsForBuilder() const = 0;
   virtual void GenerateInterfaceMembers(io::Printer* printer) const = 0;
