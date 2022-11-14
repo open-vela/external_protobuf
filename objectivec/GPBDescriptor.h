@@ -62,17 +62,14 @@ typedef NS_ENUM(uint8_t, GPBFieldType) {
 /**
  * Describes a proto message.
  **/
-@interface GPBDescriptor : NSObject <NSCopying>
-
-- (instancetype)init NS_UNAVAILABLE;
-+ (instancetype)new NS_UNAVAILABLE;
+@interface GPBDescriptor : NSObject<NSCopying>
 
 /** Name of the message. */
 @property(nonatomic, readonly, copy) NSString *name;
 /** Fields declared in the message. */
-@property(nonatomic, readonly, strong, nullable) NSArray<GPBFieldDescriptor *> *fields;
+@property(nonatomic, readonly, strong, nullable) NSArray<GPBFieldDescriptor*> *fields;
 /** Oneofs declared in the message. */
-@property(nonatomic, readonly, strong, nullable) NSArray<GPBOneofDescriptor *> *oneofs;
+@property(nonatomic, readonly, strong, nullable) NSArray<GPBOneofDescriptor*> *oneofs;
 /** Extension range declared for the message. */
 @property(nonatomic, readonly, nullable) const GPBExtensionRange *extensionRanges;
 /** Number of extension ranges declared for the message. */
@@ -126,9 +123,6 @@ typedef NS_ENUM(uint8_t, GPBFieldType) {
  **/
 @interface GPBFileDescriptor : NSObject
 
-- (instancetype)init NS_UNAVAILABLE;
-+ (instancetype)new NS_UNAVAILABLE;
-
 /** The package declared in the proto file. */
 @property(nonatomic, readonly, copy) NSString *package;
 /** The objc prefix declared in the proto file. */
@@ -142,14 +136,10 @@ typedef NS_ENUM(uint8_t, GPBFieldType) {
  * Describes a oneof field.
  **/
 @interface GPBOneofDescriptor : NSObject
-
-- (instancetype)init NS_UNAVAILABLE;
-+ (instancetype)new NS_UNAVAILABLE;
-
 /** Name of the oneof field. */
 @property(nonatomic, readonly) NSString *name;
 /** Fields declared in the oneof. */
-@property(nonatomic, readonly) NSArray<GPBFieldDescriptor *> *fields;
+@property(nonatomic, readonly) NSArray<GPBFieldDescriptor*> *fields;
 
 /**
  * Gets the field for the given number.
@@ -175,9 +165,6 @@ typedef NS_ENUM(uint8_t, GPBFieldType) {
  * Describes a proto field.
  **/
 @interface GPBFieldDescriptor : NSObject
-
-- (instancetype)init NS_UNAVAILABLE;
-+ (instancetype)new NS_UNAVAILABLE;
 
 /** Name of the field. */
 @property(nonatomic, readonly, copy) NSString *name;
@@ -227,9 +214,6 @@ typedef NS_ENUM(uint8_t, GPBFieldType) {
  * Describes a proto enum.
  **/
 @interface GPBEnumDescriptor : NSObject
-
-- (instancetype)init NS_UNAVAILABLE;
-+ (instancetype)new NS_UNAVAILABLE;
 
 /** Name of the enum. */
 @property(nonatomic, readonly, copy) NSString *name;
@@ -309,11 +293,7 @@ typedef NS_ENUM(uint8_t, GPBFieldType) {
 /**
  * Describes a proto extension.
  **/
-@interface GPBExtensionDescriptor : NSObject <NSCopying>
-
-- (instancetype)init NS_UNAVAILABLE;
-+ (instancetype)new NS_UNAVAILABLE;
-
+@interface GPBExtensionDescriptor : NSObject<NSCopying>
 /** Field number under which the extension is stored. */
 @property(nonatomic, readonly) uint32_t fieldNumber;
 /** The containing message class, i.e. the class extended by this extension. */

@@ -34,7 +34,7 @@
 #import "GPBCodedOutputStream.h"
 #import "GPBUnknownFieldSet_PackagePrivate.h"
 #import "GPBUtilities_PackagePrivate.h"
-#import "objectivec/Tests/Unittest.pbobjc.h"
+#import "google/protobuf/Unittest.pbobjc.h"
 
 @interface CodedInputStreamTests : GPBTestCase
 @end
@@ -82,10 +82,8 @@
   [self assertReadZigZag64:bytes(0xFE, 0xFF, 0xFF, 0xFF, 0x0F) value:(int32_t)0x7FFFFFFF];
   [self assertReadZigZag64:bytes(0xFF, 0xFF, 0xFF, 0xFF, 0x0F) value:(int32_t)0x80000000];
 
-  [self assertReadZigZag64:bytes(0xFE, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x01)
-                     value:0x7FFFFFFFFFFFFFFFL];
-  [self assertReadZigZag64:bytes(0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x01)
-                     value:0x8000000000000000L];
+  [self assertReadZigZag64:bytes(0xFE, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x01) value:0x7FFFFFFFFFFFFFFFL];
+  [self assertReadZigZag64:bytes(0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x01) value:0x8000000000000000L];
 }
 
 - (void)assertReadVarint:(NSData*)data value:(int64_t)value {
@@ -203,25 +201,30 @@
                    value:(0x22 << 0) | (0x22 << 7) | (0x22 << 14) | (0x74 << 21)];
   // 2961488830
   [self assertReadVarint:bytes(0xbe, 0xf7, 0x92, 0x84, 0x0b)
-                   value:(0x3e << 0) | (0x77 << 7) | (0x12 << 14) | (0x04 << 21) | (0x0bLL << 28)];
+                   value:(0x3e << 0) | (0x77 << 7) | (0x12 << 14) |
+                         (0x04 << 21) | (0x0bLL << 28)];
 
   // 64-bit
   // 7256456126
   [self assertReadVarint:bytes(0xbe, 0xf7, 0x92, 0x84, 0x1b)
-                   value:(0x3e << 0) | (0x77 << 7) | (0x12 << 14) | (0x04 << 21) | (0x1bLL << 28)];
+                   value:(0x3e << 0) | (0x77 << 7) | (0x12 << 14) |
+                         (0x04 << 21) | (0x1bLL << 28)];
   // 41256202580718336
   [self assertReadVarint:bytes(0x80, 0xe6, 0xeb, 0x9c, 0xc3, 0xc9, 0xa4, 0x49)
-                   value:(0x00 << 0) | (0x66 << 7) | (0x6b << 14) | (0x1c << 21) | (0x43LL << 28) |
-                         (0x49LL << 35) | (0x24LL << 42) | (0x49LL << 49)];
+                   value:(0x00 << 0) | (0x66 << 7) | (0x6b << 14) |
+                         (0x1c << 21) | (0x43LL << 28) | (0x49LL << 35) |
+                         (0x24LL << 42) | (0x49LL << 49)];
   // 11964378330978735131
-  [self assertReadVarint:bytes(0x9b, 0xa8, 0xf9, 0xc2, 0xbb, 0xd6, 0x80, 0x85, 0xa6, 0x01)
-                   value:(0x1b << 0) | (0x28 << 7) | (0x79 << 14) | (0x42 << 21) | (0x3bLL << 28) |
-                         (0x56LL << 35) | (0x00LL << 42) | (0x05LL << 49) | (0x26LL << 56) |
-                         (0x01ULL << 63)];
+  [self
+      assertReadVarint:bytes(0x9b, 0xa8, 0xf9, 0xc2, 0xbb, 0xd6, 0x80, 0x85,
+                             0xa6, 0x01)
+                 value:(0x1b << 0) | (0x28 << 7) | (0x79 << 14) | (0x42 << 21) |
+                       (0x3bLL << 28) | (0x56LL << 35) | (0x00LL << 42) |
+                       (0x05LL << 49) | (0x26LL << 56) | (0x01ULL << 63)];
 
   // Failures
-  [self assertReadVarintFailure:bytes(0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-                                      0x00)];
+  [self assertReadVarintFailure:bytes(0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+                                      0x80, 0x80, 0x80, 0x00)];
   [self assertReadVarintFailure:bytes(0x80)];
 }
 
@@ -265,12 +268,16 @@
 }
 
 - (void)testReadLittleEndian {
-  [self assertReadLittleEndian32:bytes(0x78, 0x56, 0x34, 0x12) value:0x12345678];
-  [self assertReadLittleEndian32:bytes(0xf0, 0xde, 0xbc, 0x9a) value:0x9abcdef0];
+  [self assertReadLittleEndian32:bytes(0x78, 0x56, 0x34, 0x12)
+                           value:0x12345678];
+  [self assertReadLittleEndian32:bytes(0xf0, 0xde, 0xbc, 0x9a)
+                           value:0x9abcdef0];
 
-  [self assertReadLittleEndian64:bytes(0xf0, 0xde, 0xbc, 0x9a, 0x78, 0x56, 0x34, 0x12)
+  [self assertReadLittleEndian64:bytes(0xf0, 0xde, 0xbc, 0x9a, 0x78, 0x56, 0x34,
+                                       0x12)
                            value:0x123456789abcdef0LL];
-  [self assertReadLittleEndian64:bytes(0x78, 0x56, 0x34, 0x12, 0xf0, 0xde, 0xbc, 0x9a)
+  [self assertReadLittleEndian64:bytes(0x78, 0x56, 0x34, 0x12, 0xf0, 0xde, 0xbc,
+                                       0x9a)
                            value:0x9abcdef012345678LL];
 }
 
@@ -280,7 +287,8 @@
   NSData* rawBytes = message.data;
   XCTAssertEqual(message.serializedSize, (size_t)rawBytes.length);
 
-  TestAllTypes* message2 = [TestAllTypes parseFromData:rawBytes extensionRegistry:nil error:NULL];
+  TestAllTypes* message2 =
+      [TestAllTypes parseFromData:rawBytes extensionRegistry:nil error:NULL];
   [self assertAllFieldsSet:message2 repeatedCount:kGPBDefaultRepeatCount];
 }
 
@@ -292,7 +300,8 @@
   // skipField() to skip each field on the other.  Expect the same tags.
   GPBCodedInputStream* input1 = [GPBCodedInputStream streamWithData:rawBytes];
   GPBCodedInputStream* input2 = [GPBCodedInputStream streamWithData:rawBytes];
-  GPBUnknownFieldSet* unknownFields = [[[GPBUnknownFieldSet alloc] init] autorelease];
+  GPBUnknownFieldSet* unknownFields =
+      [[[GPBUnknownFieldSet alloc] init] autorelease];
 
   while (YES) {
     int32_t tag = [input1 readTag];
@@ -320,9 +329,10 @@
   // Serialize and parse it.  Make sure to parse from an InputStream, not
   // directly from a ByteString, so that CodedInputStream uses buffered
   // reading.
-  NSData* messageData = message.data;
+  NSData *messageData = message.data;
   XCTAssertNotNil(messageData);
-  GPBCodedInputStream* stream = [GPBCodedInputStream streamWithData:messageData];
+  GPBCodedInputStream* stream =
+      [GPBCodedInputStream streamWithData:messageData];
   TestAllTypes* message2 = [TestAllTypes parseFromCodedInputStream:stream
                                                  extensionRegistry:nil
                                                              error:NULL];
@@ -340,7 +350,8 @@
 
 - (void)testReadMaliciouslyLargeBlob {
   NSOutputStream* rawOutput = [NSOutputStream outputStreamToMemory];
-  GPBCodedOutputStream* output = [GPBCodedOutputStream streamWithOutputStream:rawOutput];
+  GPBCodedOutputStream* output =
+      [GPBCodedOutputStream streamWithOutputStream:rawOutput];
 
   int32_t tag = GPBWireFormatMakeTag(1, GPBWireFormatLengthDelimited);
   [output writeRawVarint32:tag];
@@ -349,7 +360,8 @@
   [output writeRawData:[NSData dataWithBytes:bytes length:32]];
   [output flush];
 
-  NSData* data = [rawOutput propertyForKey:NSStreamDataWrittenToMemoryStreamKey];
+  NSData* data =
+      [rawOutput propertyForKey:NSStreamDataWrittenToMemoryStreamKey];
   GPBCodedInputStream* input =
       [GPBCodedInputStream streamWithData:[NSMutableData dataWithData:data]];
   XCTAssertEqual(tag, [input readTag]);
@@ -358,21 +370,23 @@
 }
 
 - (void)testReadEmptyString {
-  NSData* data = bytes(0x00);
+  NSData *data = bytes(0x00);
   GPBCodedInputStream* input = [GPBCodedInputStream streamWithData:data];
   XCTAssertEqualObjects(@"", [input readString]);
 }
 
 - (void)testInvalidGroupEndTagThrows {
-  NSData* data = bytes(0x0B, 0x1A, 0x02, 0x4B, 0x50, 0x14);
+  NSData *data = bytes(0x0B, 0x1A, 0x02, 0x4B, 0x50, 0x14);
   GPBCodedInputStream* input = [GPBCodedInputStream streamWithData:data];
-  XCTAssertThrowsSpecificNamed([input skipMessage], NSException, GPBCodedInputStreamException,
+  XCTAssertThrowsSpecificNamed([input skipMessage],
+                               NSException,
+                               GPBCodedInputStreamException,
                                @"should throw a GPBCodedInputStreamException exception ");
 }
 
 - (void)testBytesWithNegativeSize {
-  NSData* data = bytes(0xFF, 0xFF, 0xFF, 0xFF, 0x0F);
-  GPBCodedInputStream* input = [GPBCodedInputStream streamWithData:data];
+  NSData *data = bytes(0xFF, 0xFF, 0xFF, 0xFF, 0x0F);
+  GPBCodedInputStream *input = [GPBCodedInputStream streamWithData:data];
   XCTAssertNil([input readBytes]);
 }
 
@@ -382,10 +396,11 @@
 // again, it will help validate that class' handing of bad utf8.
 - (void)testReadMalformedString {
   NSOutputStream* rawOutput = [NSOutputStream outputStreamToMemory];
-  GPBCodedOutputStream* output = [GPBCodedOutputStream streamWithOutputStream:rawOutput];
+  GPBCodedOutputStream* output =
+      [GPBCodedOutputStream streamWithOutputStream:rawOutput];
 
-  int32_t tag =
-      GPBWireFormatMakeTag(TestAllTypes_FieldNumber_DefaultString, GPBWireFormatLengthDelimited);
+  int32_t tag = GPBWireFormatMakeTag(TestAllTypes_FieldNumber_DefaultString,
+                                     GPBWireFormatLengthDelimited);
   [output writeRawVarint32:tag];
   [output writeRawVarint32:5];
   // Create an invalid utf-8 byte array.
@@ -393,9 +408,10 @@
   [output writeRawData:[NSData dataWithBytes:bytes length:sizeof(bytes)]];
   [output flush];
 
-  NSData* data = [rawOutput propertyForKey:NSStreamDataWrittenToMemoryStreamKey];
+  NSData *data =
+      [rawOutput propertyForKey:NSStreamDataWrittenToMemoryStreamKey];
   GPBCodedInputStream* input = [GPBCodedInputStream streamWithData:data];
-  NSError* error = nil;
+  NSError *error = nil;
   TestAllTypes* message = [TestAllTypes parseFromCodedInputStream:input
                                                 extensionRegistry:nil
                                                             error:&error];
@@ -409,25 +425,27 @@
   // correctly. (Again, this is inpart in case a custom string class is ever
   // used again.)
   const char* strs[] = {
-      "\xEF\xBB\xBF String with BOM",
-      "String with \xEF\xBB\xBF in middle",
-      "String with end bom \xEF\xBB\xBF",
-      "\xEF\xBB\xBF\xe2\x99\xa1",  // BOM White Heart
-      "\xEF\xBB\xBF\xEF\xBB\xBF String with Two BOM",
+    "\xEF\xBB\xBF String with BOM",
+    "String with \xEF\xBB\xBF in middle",
+    "String with end bom \xEF\xBB\xBF",
+    "\xEF\xBB\xBF\xe2\x99\xa1",  // BOM White Heart
+    "\xEF\xBB\xBF\xEF\xBB\xBF String with Two BOM",
   };
   for (size_t i = 0; i < GPBARRAYSIZE(strs); ++i) {
     NSOutputStream* rawOutput = [NSOutputStream outputStreamToMemory];
-    GPBCodedOutputStream* output = [GPBCodedOutputStream streamWithOutputStream:rawOutput];
+    GPBCodedOutputStream* output =
+        [GPBCodedOutputStream streamWithOutputStream:rawOutput];
 
-    int32_t tag =
-        GPBWireFormatMakeTag(TestAllTypes_FieldNumber_DefaultString, GPBWireFormatLengthDelimited);
+    int32_t tag = GPBWireFormatMakeTag(TestAllTypes_FieldNumber_DefaultString,
+                                       GPBWireFormatLengthDelimited);
     [output writeRawVarint32:tag];
     size_t length = strlen(strs[i]);
     [output writeRawVarint32:(int32_t)length];
     [output writeRawData:[NSData dataWithBytes:strs[i] length:length]];
     [output flush];
 
-    NSData* data = [rawOutput propertyForKey:NSStreamDataWrittenToMemoryStreamKey];
+    NSData* data =
+        [rawOutput propertyForKey:NSStreamDataWrittenToMemoryStreamKey];
     GPBCodedInputStream* input = [GPBCodedInputStream streamWithData:data];
     TestAllTypes* message = [TestAllTypes parseFromCodedInputStream:input
                                                   extensionRegistry:nil

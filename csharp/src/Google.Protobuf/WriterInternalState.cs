@@ -30,8 +30,20 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
+using System;
+using System.Buffers;
+using System.Buffers.Binary;
+using System.Collections.Generic;
+using System.IO;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Security;
+using System.Text;
+using Google.Protobuf.Collections;
+
 namespace Google.Protobuf
 {
+    
     // warning: this is a mutable struct, so it needs to be only passed as a ref!
     internal struct WriterInternalState
     {
