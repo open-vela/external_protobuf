@@ -67,9 +67,7 @@ import org.junit.function.ThrowingRunnable;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-/**
- * Test case for {@link TextFormat}.
- */
+/** Test case for {@link TextFormat}. */
 @RunWith(JUnit4.class)
 public class TextFormatTest {
 
@@ -726,7 +724,6 @@ public class TextFormatTest {
     assertThat(actual).isEqualTo(expected);
   }
 
-
   @Test
   public void testMergeAny_customBuiltTypeRegistry() throws Exception {
     TestAny.Builder builder = TestAny.newBuilder();
@@ -760,7 +757,6 @@ public class TextFormatTest {
                         .build())
                 .build());
   }
-
 
   private void assertParseError(String error, String text) {
     // Test merge().
@@ -825,6 +821,7 @@ public class TextFormatTest {
     }
   }
 
+  @CanIgnoreReturnValue
   private TestAllTypes assertParseSuccessWithOverwriteForbidden(String text)
       throws TextFormat.ParseException {
     TestAllTypes.Builder builder = TestAllTypes.newBuilder();
@@ -1400,7 +1397,6 @@ public class TextFormatTest {
         .isEqualTo("1: \"\\343\\201\\202\"\n");
   }
 
-
   @Test
   public void testParseUnknownExtensions() throws Exception {
     TestUtil.TestLogHandler logHandler = new TestUtil.TestLogHandler();
@@ -1448,6 +1444,18 @@ public class TextFormatTest {
             + "unknown_field2: 2\n"
             + "[unknown_extension]: 12345\n"
             + "unknown_field3: 3\n");
+  }
+
+  @Test
+  public void testParseUnknownExtensionWithAnyMessage() throws Exception {
+    assertParseSuccessWithUnknownExtensions(
+        "[unknown_extension]: { "
+            + "  any_value { "
+            + "    [type.googleapis.com/protobuf_unittest.OneString] { "
+            + "      data: 123 "
+            + "    } "
+            + " } "
+            + "}");
   }
 
   // See additional coverage in testOneofOverwriteForbidden and testMapOverwriteForbidden.
@@ -1762,6 +1770,7 @@ public class TextFormatTest {
     }
   }
 
+  @SuppressWarnings("LenientFormatStringValidation")
   private void assertLocation(
       TextFormatParseInfoTree tree,
       final Descriptor descriptor,
@@ -1775,6 +1784,7 @@ public class TextFormatTest {
       TextFormatParseLocation expected = TextFormatParseLocation.create(line, column);
       assertThat(location).isEqualTo(expected);
     } else if (line != -1 && column != -1) {
+      // Expected 0 args, but got 3.
       assertWithMessage(
               "Tree/descriptor/fieldname did not contain index %d, line %d column %d expected",
               index, line, column)
@@ -1831,5 +1841,4 @@ public class TextFormatTest {
     assertThat(TextFormat.printer().printToString(message))
         .isEqualTo("optional_float: -0.0\noptional_double: -0.0\n");
   }
-
 }
