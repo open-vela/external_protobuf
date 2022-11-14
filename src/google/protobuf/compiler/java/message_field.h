@@ -35,6 +35,7 @@
 #ifndef GOOGLE_PROTOBUF_COMPILER_JAVA_MESSAGE_FIELD_H__
 #define GOOGLE_PROTOBUF_COMPILER_JAVA_MESSAGE_FIELD_H__
 
+#include <map>
 #include <string>
 
 #include "google/protobuf/compiler/java/field.h"
@@ -95,7 +96,7 @@ class ImmutableMessageFieldGenerator : public ImmutableFieldGenerator {
   const FieldDescriptor* descriptor_;
   int message_bit_index_;
   int builder_bit_index_;
-  absl::flat_hash_map<absl::string_view, std::string> variables_;
+  std::map<std::string, std::string> variables_;
   ClassNameResolver* name_resolver_;
   Context* context_;
 

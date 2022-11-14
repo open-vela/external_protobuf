@@ -30,7 +30,9 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using Google.Protobuf.Collections;
 
 namespace Google.Protobuf
@@ -71,12 +73,13 @@ namespace Google.Protobuf
             {
                 return true;
             }
-            return other is UnknownField otherField
-                && Lists.Equals(varintList, otherField.varintList)
-                && Lists.Equals(fixed32List, otherField.fixed32List)
-                && Lists.Equals(fixed64List, otherField.fixed64List)
-                && Lists.Equals(lengthDelimitedList, otherField.lengthDelimitedList)
-                && Lists.Equals(groupList, otherField.groupList);
+            UnknownField otherField = other as UnknownField;
+            return otherField != null
+                   && Lists.Equals(varintList, otherField.varintList)
+                   && Lists.Equals(fixed32List, otherField.fixed32List)
+                   && Lists.Equals(fixed64List, otherField.fixed64List)
+                   && Lists.Equals(lengthDelimitedList, otherField.lengthDelimitedList)
+                   && Lists.Equals(groupList, otherField.groupList);
         }
 
         /// <summary>
