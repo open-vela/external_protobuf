@@ -109,6 +109,7 @@
 #ifndef GOOGLE_PROTOBUF_IO_CODED_STREAM_H__
 #define GOOGLE_PROTOBUF_IO_CODED_STREAM_H__
 
+
 #include <assert.h>
 
 #include <atomic>
@@ -127,15 +128,15 @@
 #endif
 
 
-#include "google/protobuf/stubs/common.h"
-#include "google/protobuf/stubs/logging.h"
-#include "absl/numeric/bits.h"
-#include "absl/strings/string_view.h"
-#include "google/protobuf/port.h"
+#include <google/protobuf/stubs/common.h>
+#include <google/protobuf/stubs/logging.h>
+#include <google/protobuf/stubs/strutil.h>
+#include <google/protobuf/port.h>
+#include <google/protobuf/stubs/port.h>
 
 
 // Must be included last.
-#include "google/protobuf/port_def.inc"
+#include <google/protobuf/port_def.inc>
 
 namespace google {
 namespace protobuf {
@@ -177,8 +178,6 @@ class PROTOBUF_EXPORT CodedInputStream {
   // faster than using an ArrayInputStream.  PushLimit(size) is implied by
   // this constructor.
   explicit CodedInputStream(const uint8_t* buffer, int size);
-  CodedInputStream(const CodedInputStream&) = delete;
-  CodedInputStream& operator=(const CodedInputStream&) = delete;
 
   // Destroy the CodedInputStream and position the underlying
   // ZeroCopyInputStream at the first unread byte.  If an error occurred while
@@ -519,6 +518,8 @@ class PROTOBUF_EXPORT CodedInputStream {
   MessageFactory* GetExtensionFactory();
 
  private:
+  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(CodedInputStream);
+
   const uint8_t* buffer_;
   const uint8_t* buffer_end_;  // pointer to the end of the buffer.
   ZeroCopyInputStream* input_;
@@ -680,7 +681,7 @@ class PROTOBUF_EXPORT EpsCopyOutputStream {
     if (PROTOBUF_PREDICT_FALSE(end_ - ptr < size)) {
       return WriteRawFallback(data, size, ptr);
     }
-    std::memcpy(ptr, data, static_cast<unsigned int>(size));
+    std::memcpy(ptr, data, size);
     return ptr + size;
   }
   // Writes the buffer specified by data, size to the stream. Possibly by
@@ -898,12 +899,25 @@ class PROTOBUF_EXPORT EpsCopyOutputStream {
   PROTOBUF_ALWAYS_INLINE static uint8_t* UnsafeVarint(T value, uint8_t* ptr) {
     static_assert(std::is_unsigned<T>::value,
                   "Varint serialization must be unsigned");
-    while (PROTOBUF_PREDICT_FALSE(value >= 0x80)) {
-      *ptr = static_cast<uint8_t>(value | 0x80);
-      value >>= 7;
-      ++ptr;
+    ptr[0] = static_cast<uint8_t>(value);
+    if (value < 0x80) {
+      return ptr + 1;
     }
-    *ptr++ = static_cast<uint8_t>(value);
+    // Turn on continuation bit in the byte we just wrote.
+    ptr[0] |= static_cast<uint8_t>(0x80);
+    value >>= 7;
+    ptr[1] = static_cast<uint8_t>(value);
+    if (value < 0x80) {
+      return ptr + 2;
+    }
+    ptr += 2;
+    do {
+      // Turn on continuation bit in the byte we just wrote.
+      ptr[-1] |= static_cast<uint8_t>(0x80);
+      value >>= 7;
+      *ptr = static_cast<uint8_t>(value);
+      ++ptr;
+    } while (value >= 0x80);
     return ptr;
   }
 
@@ -1047,8 +1061,6 @@ class PROTOBUF_EXPORT CodedOutputStream {
   template <class Stream, class = typename std::enable_if<std::is_base_of<
                               ZeroCopyOutputStream, Stream>::value>::type>
   CodedOutputStream(Stream* stream, bool eager_init);
-  CodedOutputStream(const CodedOutputStream&) = delete;
-  CodedOutputStream& operator=(const CodedOutputStream&) = delete;
 
   // Destroy the CodedOutputStream and position the underlying
   // ZeroCopyOutputStream immediately after the last byte written.
@@ -1146,12 +1158,10 @@ class PROTOBUF_EXPORT CodedOutputStream {
   void WriteVarint32(uint32_t value);
   // Like WriteVarint32()  but writing directly to the target array.
   static uint8_t* WriteVarint32ToArray(uint32_t value, uint8_t* target);
-  // Like WriteVarint32ToArray()
-  PROTOBUF_DEPRECATED_MSG("Please use WriteVarint32ToArray() instead")
+  // Like WriteVarint32()  but writing directly to the target array, and with
+  // the less common-case paths being out of line rather than inlined.
   static uint8_t* WriteVarint32ToArrayOutOfLine(uint32_t value,
-                                                uint8_t* target) {
-    return WriteVarint32ToArray(value, target);
-  }
+                                                uint8_t* target);
   // Write an unsigned integer with Varint encoding.
   void WriteVarint64(uint64_t value);
   // Like WriteVarint64()  but writing directly to the target array.
@@ -1275,6 +1285,10 @@ class PROTOBUF_EXPORT CodedOutputStream {
   static void SetDefaultSerializationDeterministic() {
     default_serialization_deterministic_.store(true, std::memory_order_relaxed);
   }
+  // REQUIRES: value >= 0x80, and that (value & 7f) has been written to *target.
+  static uint8_t* WriteVarint32ToArrayOutOfLineHelper(uint32_t value,
+                                                      uint8_t* target);
+  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(CodedOutputStream);
 };
 
 // inline methods ====================================================
@@ -1633,6 +1647,16 @@ inline uint8_t* CodedOutputStream::WriteVarint32ToArray(uint32_t value,
   return EpsCopyOutputStream::UnsafeVarint(value, target);
 }
 
+inline uint8_t* CodedOutputStream::WriteVarint32ToArrayOutOfLine(
+    uint32_t value, uint8_t* target) {
+  target[0] = static_cast<uint8_t>(value);
+  if (value < 0x80) {
+    return target + 1;
+  } else {
+    return WriteVarint32ToArrayOutOfLineHelper(value, target);
+  }
+}
+
 inline uint8_t* CodedOutputStream::WriteVarint64ToArray(uint64_t value,
                                                         uint8_t* target) {
   return EpsCopyOutputStream::UnsafeVarint(value, target);
@@ -1705,16 +1729,15 @@ inline size_t CodedOutputStream::VarintSize32(uint32_t value) {
   // This computes value == 0 ? 1 : floor(log2(value)) / 7 + 1
   // Use an explicit multiplication to implement the divide of
   // a number in the 1..31 range.
-  //
-  // Explicit OR 0x1 to avoid calling absl::bit_width(0), which is
-  // requires a branch to check for on many platforms.
-  uint32_t log2value = absl::bit_width(value | 0x1) - 1;
+  // Explicit OR 0x1 to avoid calling Bits::Log2FloorNonZero(0), which is
+  // undefined.
+  uint32_t log2value = Bits::Log2FloorNonZero(value | 0x1);
   return static_cast<size_t>((log2value * 9 + 73) / 64);
 }
 
 inline size_t CodedOutputStream::VarintSize32PlusOne(uint32_t value) {
   // Same as above, but one more.
-  uint32_t log2value = absl::bit_width(value | 0x1) - 1;
+  uint32_t log2value = Bits::Log2FloorNonZero(value | 0x1);
   return static_cast<size_t>((log2value * 9 + 73 + 64) / 64);
 }
 
@@ -1722,16 +1745,15 @@ inline size_t CodedOutputStream::VarintSize64(uint64_t value) {
   // This computes value == 0 ? 1 : floor(log2(value)) / 7 + 1
   // Use an explicit multiplication to implement the divide of
   // a number in the 1..63 range.
-  //
-  // Explicit OR 0x1 to avoid calling absl::bit_width(0), which is
-  // requires a branch to check for on many platforms.
-  uint32_t log2value = absl::bit_width(value | 0x1) - 1;
+  // Explicit OR 0x1 to avoid calling Bits::Log2FloorNonZero(0), which is
+  // undefined.
+  uint32_t log2value = Bits::Log2FloorNonZero64(value | 0x1);
   return static_cast<size_t>((log2value * 9 + 73) / 64);
 }
 
 inline size_t CodedOutputStream::VarintSize64PlusOne(uint64_t value) {
   // Same as above, but one more.
-  uint32_t log2value = absl::bit_width(value | 0x1) - 1;
+  uint32_t log2value = Bits::Log2FloorNonZero64(value | 0x1);
   return static_cast<size_t>((log2value * 9 + 73 + 64) / 64);
 }
 
@@ -1755,7 +1777,7 @@ inline void CodedOutputStream::WriteRawMaybeAliased(const void* data,
 
 inline uint8_t* CodedOutputStream::WriteRawToArray(const void* data, int size,
                                                    uint8_t* target) {
-  memcpy(target, data, static_cast<unsigned int>(size));
+  memcpy(target, data, size);
   return target + size;
 }
 
@@ -1772,6 +1794,6 @@ inline uint8_t* CodedOutputStream::WriteStringToArray(const std::string& str,
 #pragma runtime_checks("c", restore)
 #endif  // _MSC_VER && !defined(__INTEL_COMPILER)
 
-#include "google/protobuf/port_undef.inc"
+#include <google/protobuf/port_undef.inc>
 
 #endif  // GOOGLE_PROTOBUF_IO_CODED_STREAM_H__

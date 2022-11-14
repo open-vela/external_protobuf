@@ -26,6 +26,8 @@ To use PHP runtime library requires:
 #### Prerequirements
 
 To install the c extension, the following tools are needed:
+* autoconf
+* automake
 * libtool
 * make
 * gcc
@@ -34,7 +36,7 @@ To install the c extension, the following tools are needed:
 
 On Ubuntu, you can install them with:
 ```
-sudo apt-get install -y php-pear php-dev libtool make gcc
+sudo apt-get install -y php-pear php5-dev autoconf automake libtool make gcc
 ```
 On other platforms, please use the corresponding package managing tool to
 install them before proceeding.
@@ -64,8 +66,6 @@ sudo pecl install protobuf-{VERSION}
 
 Simply add "google/protobuf" to the 'require' section of composer.json in your
 project.
-
-To use the pure PHP implementation, you need to install bcmath.
 
 ### Protoc
 
@@ -98,18 +98,24 @@ Known Issues
 
 ## Development
 
+### Docker Image
+
+We provide a docker image for php development, which is also used in our automatic tests:
+```
+docker run --security-opt seccomp=unconfined -it protobuftesting/php_8dbe419c6df1a8b3af0ae3a267c112efb436b45c
+```
+
 ### Test Native PHP
 
 ```
-# Install Dependencies (Linux)
-apt-get install bazel composer php-dev
-
 # Download protobuf
 git clone https://github.com/protocolbuffers/protobuf.git
 cd protobuf
 
 # Build protoc
-bazel build :protoc
+./autogen.sh
+./configure
+make -j4
 
 # Test native php
 cd php

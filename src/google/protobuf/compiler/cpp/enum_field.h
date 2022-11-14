@@ -35,9 +35,10 @@
 #ifndef GOOGLE_PROTOBUF_COMPILER_CPP_ENUM_FIELD_H__
 #define GOOGLE_PROTOBUF_COMPILER_CPP_ENUM_FIELD_H__
 
+#include <map>
 #include <string>
 
-#include "google/protobuf/compiler/cpp/field.h"
+#include <google/protobuf/compiler/cpp/field.h>
 
 namespace google {
 namespace protobuf {
@@ -47,8 +48,6 @@ namespace cpp {
 class EnumFieldGenerator : public FieldGenerator {
  public:
   EnumFieldGenerator(const FieldDescriptor* descriptor, const Options& options);
-  EnumFieldGenerator(const EnumFieldGenerator&) = delete;
-  EnumFieldGenerator& operator=(const EnumFieldGenerator&) = delete;
   ~EnumFieldGenerator() override;
 
   // implements FieldGenerator ---------------------------------------
@@ -67,14 +66,15 @@ class EnumFieldGenerator : public FieldGenerator {
       io::Printer* printer) const override;
   void GenerateAggregateInitializer(io::Printer* printer) const override;
   void GenerateCopyAggregateInitializer(io::Printer* printer) const override;
+
+ private:
+  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(EnumFieldGenerator);
 };
 
 class EnumOneofFieldGenerator : public EnumFieldGenerator {
  public:
   EnumOneofFieldGenerator(const FieldDescriptor* descriptor,
                           const Options& options);
-  EnumOneofFieldGenerator(const EnumOneofFieldGenerator&) = delete;
-  EnumOneofFieldGenerator& operator=(const EnumOneofFieldGenerator&) = delete;
   ~EnumOneofFieldGenerator() override;
 
   // implements FieldGenerator ---------------------------------------
@@ -82,6 +82,9 @@ class EnumOneofFieldGenerator : public EnumFieldGenerator {
   void GenerateClearingCode(io::Printer* printer) const override;
   void GenerateSwappingCode(io::Printer* printer) const override;
   void GenerateConstructorCode(io::Printer* printer) const override;
+
+ private:
+  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(EnumOneofFieldGenerator);
 };
 
 class RepeatedEnumFieldGenerator : public FieldGenerator {
@@ -89,9 +92,6 @@ class RepeatedEnumFieldGenerator : public FieldGenerator {
   RepeatedEnumFieldGenerator(const FieldDescriptor* descriptor,
                              const Options& options);
   ~RepeatedEnumFieldGenerator() override;
-  RepeatedEnumFieldGenerator(const RepeatedEnumFieldGenerator&) = delete;
-  RepeatedEnumFieldGenerator& operator=(const RepeatedEnumFieldGenerator&) =
-      delete;
 
   // implements FieldGenerator ---------------------------------------
   void GeneratePrivateMembers(io::Printer* printer) const override;
@@ -112,6 +112,9 @@ class RepeatedEnumFieldGenerator : public FieldGenerator {
       io::Printer* printer) const override;
   void GenerateAggregateInitializer(io::Printer* printer) const override;
   void GenerateCopyAggregateInitializer(io::Printer* printer) const override;
+
+ private:
+  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(RepeatedEnumFieldGenerator);
 };
 
 }  // namespace cpp

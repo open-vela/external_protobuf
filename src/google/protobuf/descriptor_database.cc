@@ -32,16 +32,14 @@
 //  Based on original Protocol Buffers design by
 //  Sanjay Ghemawat, Jeff Dean, and others.
 
-#include "google/protobuf/descriptor_database.h"
+#include <google/protobuf/descriptor_database.h>
 
 #include <algorithm>
 #include <set>
-#include <utility>
 
-#include "absl/strings/ascii.h"
-#include "absl/strings/match.h"
-#include "absl/strings/str_replace.h"
-#include "google/protobuf/descriptor.pb.h"
+#include <google/protobuf/descriptor.pb.h>
+#include <google/protobuf/stubs/map_util.h>
+#include <google/protobuf/stubs/stl_util.h>
 
 
 namespace google {
@@ -54,7 +52,7 @@ void RecordMessageNames(const DescriptorProto& desc_proto,
   GOOGLE_CHECK(desc_proto.has_name());
   std::string full_name = prefix.empty()
                               ? desc_proto.name()
-                              : absl::StrCat(prefix, ".", desc_proto.name());
+                              : StrCat(prefix, ".", desc_proto.name());
   output->insert(full_name);
 
   for (const auto& d : desc_proto.nested_type()) {
@@ -119,7 +117,7 @@ SimpleDescriptorDatabase::~SimpleDescriptorDatabase() {}
 template <typename Value>
 bool SimpleDescriptorDatabase::DescriptorIndex<Value>::AddFile(
     const FileDescriptorProto& file, Value value) {
-  if (!by_name_.insert({file.name(), value}).second) {
+  if (!InsertIfNotPresent(&by_name_, file.name(), value)) {
     GOOGLE_LOG(ERROR) << "File already exists in database: " << file.name();
     return false;
   }
@@ -153,7 +151,7 @@ namespace {
 
 // Returns true if and only if all characters in the name are alphanumerics,
 // underscores, or periods.
-bool ValidateSymbolName(absl::string_view name) {
+bool ValidateSymbolName(StringPiece name) {
   for (char c : name) {
     // I don't trust ctype.h due to locales.  :(
     if (c != '.' && c != '_' && (c < '0' || c > '9') && (c < 'A' || c > 'Z') &&
@@ -187,9 +185,9 @@ typename Container::const_iterator FindLastLessOrEqual(
 // True if either the arguments are equal or super_symbol identifies a
 // parent symbol of sub_symbol (e.g. "foo.bar" is a parent of
 // "foo.bar.baz", but not a parent of "foo.barbaz").
-bool IsSubSymbol(absl::string_view sub_symbol, absl::string_view super_symbol) {
+bool IsSubSymbol(StringPiece sub_symbol, StringPiece super_symbol) {
   return sub_symbol == super_symbol ||
-         (absl::StartsWith(super_symbol, sub_symbol) &&
+         (HasPrefixString(super_symbol, sub_symbol) &&
           super_symbol[sub_symbol.size()] == '.');
 }
 
@@ -273,11 +271,10 @@ bool SimpleDescriptorDatabase::DescriptorIndex<Value>::AddExtension(
   if (!field.extendee().empty() && field.extendee()[0] == '.') {
     // The extension is fully-qualified.  We can use it as a lookup key in
     // the by_symbol_ table.
-    if (!by_extension_
-             .insert(
-                 {std::make_pair(field.extendee().substr(1), field.number()),
-                  value})
-             .second) {
+    if (!InsertIfNotPresent(
+            &by_extension_,
+            std::make_pair(field.extendee().substr(1), field.number()),
+            value)) {
       GOOGLE_LOG(ERROR) << "Extension conflicts with extension already in database: "
                     "extend "
                  << field.extendee() << " { " << field.name() << " = "
@@ -295,9 +292,7 @@ bool SimpleDescriptorDatabase::DescriptorIndex<Value>::AddExtension(
 template <typename Value>
 Value SimpleDescriptorDatabase::DescriptorIndex<Value>::FindFile(
     const std::string& filename) {
-  auto it = by_name_.find(filename);
-  if (it == by_name_.end()) return {};
-  return it->second;
+  return FindWithDefault(by_name_, filename, Value());
 }
 
 template <typename Value>
@@ -313,9 +308,8 @@ Value SimpleDescriptorDatabase::DescriptorIndex<Value>::FindSymbol(
 template <typename Value>
 Value SimpleDescriptorDatabase::DescriptorIndex<Value>::FindExtension(
     const std::string& containing_type, int field_number) {
-  auto it = by_extension_.find({containing_type, field_number});
-  if (it == by_extension_.end()) return {};
-  return it->second;
+  return FindWithDefault(
+      by_extension_, std::make_pair(containing_type, field_number), Value());
 }
 
 template <typename Value>
@@ -355,10 +349,6 @@ bool SimpleDescriptorDatabase::Add(const FileDescriptorProto& file) {
 
 bool SimpleDescriptorDatabase::AddAndOwn(const FileDescriptorProto* file) {
   files_to_delete_.emplace_back(file);
-  return index_.AddFile(*file, file);
-}
-
-bool SimpleDescriptorDatabase::AddUnowned(const FileDescriptorProto* file) {
   return index_.AddFile(*file, file);
 }
 
@@ -407,24 +397,24 @@ class EncodedDescriptorDatabase::DescriptorIndex {
   template <typename FileProto>
   bool AddFile(const FileProto& file, Value value);
 
-  Value FindFile(absl::string_view filename);
-  Value FindSymbol(absl::string_view name);
-  Value FindSymbolOnlyFlat(absl::string_view name) const;
-  Value FindExtension(absl::string_view containing_type, int field_number);
-  bool FindAllExtensionNumbers(absl::string_view containing_type,
+  Value FindFile(StringPiece filename);
+  Value FindSymbol(StringPiece name);
+  Value FindSymbolOnlyFlat(StringPiece name) const;
+  Value FindExtension(StringPiece containing_type, int field_number);
+  bool FindAllExtensionNumbers(StringPiece containing_type,
                                std::vector<int>* output);
   void FindAllFileNames(std::vector<std::string>* output) const;
 
  private:
   friend class EncodedDescriptorDatabase;
 
-  bool AddSymbol(absl::string_view symbol);
+  bool AddSymbol(StringPiece symbol);
 
   template <typename DescProto>
-  bool AddNestedExtensions(absl::string_view filename,
+  bool AddNestedExtensions(StringPiece filename,
                            const DescProto& message_type);
   template <typename FieldProto>
-  bool AddExtension(absl::string_view filename, const FieldProto& field);
+  bool AddExtension(StringPiece filename, const FieldProto& field);
 
   // All the maps below have two representations:
   //  - a std::set<> where we insert initially.
@@ -437,8 +427,8 @@ class EncodedDescriptorDatabase::DescriptorIndex {
 
   using String = std::string;
 
-  String EncodeString(absl::string_view str) const { return String(str); }
-  absl::string_view DecodeString(const String& str, int) const { return str; }
+  String EncodeString(StringPiece str) const { return String(str); }
+  StringPiece DecodeString(const String& str, int) const { return str; }
 
   struct EncodedEntry {
     // Do not use `Value` here to avoid the padding of that object.
@@ -455,7 +445,7 @@ class EncodedDescriptorDatabase::DescriptorIndex {
     int data_offset;
     String encoded_name;
 
-    absl::string_view name(const DescriptorIndex& index) const {
+    StringPiece name(const DescriptorIndex& index) const {
       return index.DecodeString(encoded_name, data_offset);
     }
   };
@@ -465,10 +455,10 @@ class EncodedDescriptorDatabase::DescriptorIndex {
     bool operator()(const FileEntry& a, const FileEntry& b) const {
       return a.name(index) < b.name(index);
     }
-    bool operator()(const FileEntry& a, absl::string_view b) const {
+    bool operator()(const FileEntry& a, StringPiece b) const {
       return a.name(index) < b;
     }
-    bool operator()(absl::string_view a, const FileEntry& b) const {
+    bool operator()(StringPiece a, const FileEntry& b) const {
       return a < b.name(index);
     }
   };
@@ -479,17 +469,17 @@ class EncodedDescriptorDatabase::DescriptorIndex {
     int data_offset;
     String encoded_symbol;
 
-    absl::string_view package(const DescriptorIndex& index) const {
+    StringPiece package(const DescriptorIndex& index) const {
       return index.DecodeString(index.all_values_[data_offset].encoded_package,
                                 data_offset);
     }
-    absl::string_view symbol(const DescriptorIndex& index) const {
+    StringPiece symbol(const DescriptorIndex& index) const {
       return index.DecodeString(encoded_symbol, data_offset);
     }
 
     std::string AsString(const DescriptorIndex& index) const {
       auto p = package(index);
-      return absl::StrCat(p, p.empty() ? "" : ".", symbol(index));
+      return StrCat(p, p.empty() ? "" : ".", symbol(index));
     }
   };
 
@@ -499,16 +489,16 @@ class EncodedDescriptorDatabase::DescriptorIndex {
     std::string AsString(const SymbolEntry& entry) const {
       return entry.AsString(index);
     }
-    static absl::string_view AsString(absl::string_view str) { return str; }
+    static StringPiece AsString(StringPiece str) { return str; }
 
-    std::pair<absl::string_view, absl::string_view> GetParts(
+    std::pair<StringPiece, StringPiece> GetParts(
         const SymbolEntry& entry) const {
       auto package = entry.package(index);
-      if (package.empty()) return {entry.symbol(index), absl::string_view{}};
+      if (package.empty()) return {entry.symbol(index), StringPiece{}};
       return {package, entry.symbol(index)};
     }
-    std::pair<absl::string_view, absl::string_view> GetParts(
-        absl::string_view str) const {
+    std::pair<StringPiece, StringPiece> GetParts(
+        StringPiece str) const {
       return {str, {}};
     }
 
@@ -535,7 +525,7 @@ class EncodedDescriptorDatabase::DescriptorIndex {
   struct ExtensionEntry {
     int data_offset;
     String encoded_extendee;
-    absl::string_view extendee(const DescriptorIndex& index) const {
+    StringPiece extendee(const DescriptorIndex& index) const {
       return index.DecodeString(encoded_extendee, data_offset).substr(1);
     }
     int extension_number;
@@ -548,10 +538,10 @@ class EncodedDescriptorDatabase::DescriptorIndex {
              std::make_tuple(b.extendee(index), b.extension_number);
     }
     bool operator()(const ExtensionEntry& a,
-                    std::tuple<absl::string_view, int> b) const {
+                    std::tuple<StringPiece, int> b) const {
       return std::make_tuple(a.extendee(index), a.extension_number) < b;
     }
-    bool operator()(std::tuple<absl::string_view, int> a,
+    bool operator()(std::tuple<StringPiece, int> a,
                     const ExtensionEntry& b) const {
       return a < std::make_tuple(b.extendee(index), b.extension_number);
     }
@@ -644,10 +634,9 @@ bool EncodedDescriptorDatabase::DescriptorIndex::AddFile(const FileProto& file,
   }
   all_values_.back().encoded_package = EncodeString(file.package());
 
-  if (!by_name_
-           .insert({static_cast<int>(all_values_.size() - 1),
-                    EncodeString(file.name())})
-           .second ||
+  if (!InsertIfNotPresent(
+          &by_name_, FileEntry{static_cast<int>(all_values_.size() - 1),
+                               EncodeString(file.name())}) ||
       std::binary_search(by_name_flat_.begin(), by_name_flat_.end(),
                          file.name(), by_name_.key_comp())) {
     GOOGLE_LOG(ERROR) << "File already exists in database: " << file.name();
@@ -673,7 +662,7 @@ bool EncodedDescriptorDatabase::DescriptorIndex::AddFile(const FileProto& file,
 }
 
 template <typename Iter, typename Iter2, typename Index>
-static bool CheckForMutualSubsymbols(absl::string_view symbol_name, Iter* iter,
+static bool CheckForMutualSubsymbols(StringPiece symbol_name, Iter* iter,
                                      Iter2 end, const Index& index) {
   if (*iter != end) {
     if (IsSubSymbol((*iter)->AsString(index), symbol_name)) {
@@ -701,7 +690,7 @@ static bool CheckForMutualSubsymbols(absl::string_view symbol_name, Iter* iter,
 }
 
 bool EncodedDescriptorDatabase::DescriptorIndex::AddSymbol(
-    absl::string_view symbol) {
+    StringPiece symbol) {
   SymbolEntry entry = {static_cast<int>(all_values_.size() - 1),
                        EncodeString(symbol)};
   std::string entry_as_string = entry.AsString(*this);
@@ -741,7 +730,7 @@ bool EncodedDescriptorDatabase::DescriptorIndex::AddSymbol(
 
 template <typename DescProto>
 bool EncodedDescriptorDatabase::DescriptorIndex::AddNestedExtensions(
-    absl::string_view filename, const DescProto& message_type) {
+    StringPiece filename, const DescProto& message_type) {
   for (const auto& nested_type : message_type.nested_type()) {
     if (!AddNestedExtensions(filename, nested_type)) return false;
   }
@@ -753,14 +742,14 @@ bool EncodedDescriptorDatabase::DescriptorIndex::AddNestedExtensions(
 
 template <typename FieldProto>
 bool EncodedDescriptorDatabase::DescriptorIndex::AddExtension(
-    absl::string_view filename, const FieldProto& field) {
+    StringPiece filename, const FieldProto& field) {
   if (!field.extendee().empty() && field.extendee()[0] == '.') {
     // The extension is fully-qualified.  We can use it as a lookup key in
     // the by_symbol_ table.
-    if (!by_extension_
-             .insert({static_cast<int>(all_values_.size() - 1),
-                      EncodeString(field.extendee()), field.number()})
-             .second ||
+    if (!InsertIfNotPresent(
+            &by_extension_,
+            ExtensionEntry{static_cast<int>(all_values_.size() - 1),
+                           EncodeString(field.extendee()), field.number()}) ||
         std::binary_search(
             by_extension_flat_.begin(), by_extension_flat_.end(),
             std::make_pair(field.extendee().substr(1), field.number()),
@@ -780,14 +769,14 @@ bool EncodedDescriptorDatabase::DescriptorIndex::AddExtension(
 }
 
 std::pair<const void*, int>
-EncodedDescriptorDatabase::DescriptorIndex::FindSymbol(absl::string_view name) {
+EncodedDescriptorDatabase::DescriptorIndex::FindSymbol(StringPiece name) {
   EnsureFlat();
   return FindSymbolOnlyFlat(name);
 }
 
 std::pair<const void*, int>
 EncodedDescriptorDatabase::DescriptorIndex::FindSymbolOnlyFlat(
-    absl::string_view name) const {
+    StringPiece name) const {
   auto iter =
       FindLastLessOrEqual(&by_symbol_flat_, name, by_symbol_.key_comp());
 
@@ -799,7 +788,7 @@ EncodedDescriptorDatabase::DescriptorIndex::FindSymbolOnlyFlat(
 
 std::pair<const void*, int>
 EncodedDescriptorDatabase::DescriptorIndex::FindExtension(
-    absl::string_view containing_type, int field_number) {
+    StringPiece containing_type, int field_number) {
   EnsureFlat();
 
   auto it = std::lower_bound(
@@ -831,7 +820,7 @@ void EncodedDescriptorDatabase::DescriptorIndex::EnsureFlat() {
 }
 
 bool EncodedDescriptorDatabase::DescriptorIndex::FindAllExtensionNumbers(
-    absl::string_view containing_type, std::vector<int>* output) {
+    StringPiece containing_type, std::vector<int>* output) {
   EnsureFlat();
 
   bool success = false;
@@ -864,7 +853,7 @@ void EncodedDescriptorDatabase::DescriptorIndex::FindAllFileNames(
 
 std::pair<const void*, int>
 EncodedDescriptorDatabase::DescriptorIndex::FindFile(
-    absl::string_view filename) {
+    StringPiece filename) {
   EnsureFlat();
 
   auto it = std::lower_bound(by_name_flat_.begin(), by_name_flat_.end(),
