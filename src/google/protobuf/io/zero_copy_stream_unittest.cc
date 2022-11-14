@@ -61,21 +61,22 @@
 
 #include <memory>
 #include <sstream>
+#include <utility>
 
-#include <google/protobuf/testing/file.h>
-#include <google/protobuf/test_util2.h>
-#include <google/protobuf/io/coded_stream.h>
-#include <google/protobuf/io/io_win32.h>
-#include <google/protobuf/io/zero_copy_stream_impl.h>
+#include "google/protobuf/testing/file.h"
+#include "google/protobuf/io/coded_stream.h"
+#include "google/protobuf/io/io_win32.h"
+#include "google/protobuf/io/zero_copy_stream_impl.h"
+#include "google/protobuf/test_util2.h"
 
 #if HAVE_ZLIB
-#include <google/protobuf/io/gzip_stream.h>
+#include "google/protobuf/io/gzip_stream.h"
 #endif
 
-#include <google/protobuf/stubs/common.h>
-#include <google/protobuf/stubs/logging.h>
-#include <google/protobuf/testing/file.h>
-#include <google/protobuf/testing/googletest.h>
+#include "google/protobuf/stubs/common.h"
+#include "google/protobuf/stubs/logging.h"
+#include "google/protobuf/testing/file.h"
+#include "google/protobuf/testing/googletest.h"
 #include <gtest/gtest.h>
 
 namespace google {
@@ -139,7 +140,7 @@ class IoTest : public testing::Test {
 };
 
 const int IoTest::kBlockSizes[] = {-1, 1, 2, 5, 7, 10, 23, 64};
-const int IoTest::kBlockSizeCount = GOOGLE_ARRAYSIZE(IoTest::kBlockSizes);
+const int IoTest::kBlockSizeCount = ABSL_ARRAYSIZE(IoTest::kBlockSizes);
 
 bool IoTest::WriteToOutput(ZeroCopyOutputStream* output, const void* data,
                            int size) {
@@ -570,7 +571,7 @@ TEST_F(IoTest, CompressionOptions) {
   // Some ad-hoc testing of compression options.
 
   std::string golden_filename =
-      TestUtil::GetTestDataPath("net/proto2/internal/testdata/golden_message");
+      TestUtil::GetTestDataPath("third_party/protobuf/testdata/golden_message");
   std::string golden;
   GOOGLE_CHECK_OK(File::GetContents(golden_filename, &golden, true));
 
@@ -719,6 +720,9 @@ TEST_F(IoTest, StringIo) {
 
 // Verifies that outputs up to kint32max can be created.
 TEST_F(IoTest, LargeOutput) {
+  // Filter out this test on 32-bit architectures and tsan builds.
+  if(sizeof(void*) < 8) return;
+#ifndef THREAD_SANITIZER
   std::string str;
   StringOutputStream output(&str);
   void* unused_data;
@@ -730,6 +734,7 @@ TEST_F(IoTest, LargeOutput) {
   // Further increases should be possible.
   output.Next(&unused_data, &size);
   EXPECT_GT(size, 0);
+#endif  // THREAD_SANITIZER
 }
 
 
@@ -1024,7 +1029,7 @@ TEST_F(IoTest, ConcatenatingInputStream) {
                                     &input5, &input6, &input7};
 
   // Create the concatenating stream and read.
-  ConcatenatingInputStream input(streams, GOOGLE_ARRAYSIZE(streams));
+  ConcatenatingInputStream input(streams, ABSL_ARRAYSIZE(streams));
   ReadStuff(&input);
 }
 
@@ -1052,7 +1057,7 @@ TEST_F(IoTest, LimitingInputStream) {
 TEST_F(IoTest, LimitingInputStreamByteCount) {
   const int kHalfBufferSize = 128;
   const int kBufferSize = kHalfBufferSize * 2;
-  uint8 buffer[kBufferSize];
+  uint8 buffer[kBufferSize] = {};
 
   // Set up input. Only allow half to be read at once.
   ArrayInputStream array_input(buffer, kBufferSize, kHalfBufferSize);

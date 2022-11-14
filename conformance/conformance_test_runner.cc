@@ -54,16 +54,19 @@
 //   4. testee sends M bytes representing a ConformanceResponse proto
 
 #include <errno.h>
+#include <signal.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
 
 #include <algorithm>
+#include <cstdlib>
 #include <fstream>
+#include <future>
 #include <vector>
 
-#include <google/protobuf/stubs/stringprintf.h>
-#include "conformance.pb.h"
+#include "absl/strings/str_format.h"
+#include "conformance/conformance.pb.h"
 #include "conformance_test.h"
 
 using conformance::ConformanceResponse;
@@ -73,10 +76,10 @@ using std::vector;
 
 #define STRINGIFY(x) #x
 #define TOSTRING(x) STRINGIFY(x)
-#define GOOGLE_CHECK_SYSCALL(call) \
-  if (call < 0) { \
+#define GOOGLE_CHECK_SYSCALL(call)                            \
+  if (call < 0) {                                      \
     perror(#call " " __FILE__ ":" TOSTRING(__LINE__)); \
-    exit(1); \
+    exit(1);                                           \
   }
 
 namespace google {
@@ -93,8 +96,7 @@ void ParseFailureList(const char *filename,
 
   for (string line; getline(infile, line);) {
     // Remove whitespace.
-    line.erase(std::remove_if(line.begin(), line.end(), ::isspace),
-               line.end());
+    line.erase(std::remove_if(line.begin(), line.end(), ::isspace), line.end());
 
     // Remove comments.
     line = line.substr(0, line.find("#"));
@@ -106,8 +108,7 @@ void ParseFailureList(const char *filename,
 }
 
 void UsageError() {
-  fprintf(stderr,
-          "Usage: conformance-test-runner [options] <test-program>\n");
+  fprintf(stderr, "Usage: conformance-test-runner [options] <test-program>\n");
   fprintf(stderr, "\n");
   fprintf(stderr, "Options:\n");
   fprintf(stderr,
@@ -122,8 +123,7 @@ void UsageError() {
           "  --text_format_failure_list <filename>   Use to specify list \n");
   fprintf(stderr,
           "                              of tests that are expected to \n");
-  fprintf(stderr,
-          "                              fail in the \n");
+  fprintf(stderr, "                              fail in the \n");
   fprintf(stderr,
           "                              text_format_conformance_suite.  \n");
   fprintf(stderr,
@@ -139,22 +139,19 @@ void UsageError() {
           "                              this flag if you want to be\n");
   fprintf(stderr,
           "                              strictly conforming to protobuf\n");
-  fprintf(stderr,
-          "                              spec.\n");
+  fprintf(stderr, "                              spec.\n");
   fprintf(stderr,
           "  --output_dir                <dirname> Directory to write\n"
           "                              output files.\n");
   exit(1);
 }
 
-void ForkPipeRunner::RunTest(
-    const std::string& test_name,
-    const std::string& request,
-    std::string* response) {
+void ForkPipeRunner::RunTest(const std::string &test_name,
+                             const std::string &request,
+                             std::string *response) {
   if (child_pid_ < 0) {
     SpawnTestProgram();
   }
-
   current_test_name_ = test_name;
 
   uint32_t len = request.size();
@@ -169,44 +166,55 @@ void ForkPipeRunner::RunTest(
     waitpid(child_pid_, &status, WEXITED);
 
     string error_msg;
+    conformance::ConformanceResponse response_obj;
     if (WIFEXITED(status)) {
-      StringAppendF(&error_msg,
-                    "child exited, status=%d", WEXITSTATUS(status));
+      if (WEXITSTATUS(status) == 0) {
+        absl::StrAppendFormat(&error_msg,
+                              "child timed out, killed by signal %d",
+                              WTERMSIG(status));
+        response_obj.set_timeout_error(error_msg);
+      } else {
+        absl::StrAppendFormat(&error_msg, "child exited, status=%d",
+                              WEXITSTATUS(status));
+        response_obj.set_runtime_error(error_msg);
+      }
     } else if (WIFSIGNALED(status)) {
-      StringAppendF(&error_msg,
-                    "child killed by signal %d", WTERMSIG(status));
+      absl::StrAppendFormat(&error_msg, "child killed by signal %d",
+                            WTERMSIG(status));
     }
     GOOGLE_LOG(INFO) << error_msg;
     child_pid_ = -1;
 
-    conformance::ConformanceResponse response_obj;
-    response_obj.set_runtime_error(error_msg);
     response_obj.SerializeToString(response);
     return;
   }
 
   response->resize(len);
-  CheckedRead(read_fd_, (void*)response->c_str(), len);
+  CheckedRead(read_fd_, (void *)response->c_str(), len);
 }
 
-int ForkPipeRunner::Run(
-    int argc, char *argv[], const std::vector<ConformanceTestSuite*>& suites) {
+int ForkPipeRunner::Run(int argc, char *argv[],
+                        const std::vector<ConformanceTestSuite *> &suites) {
   if (suites.empty()) {
     fprintf(stderr, "No test suites found.\n");
     return EXIT_FAILURE;
   }
   bool all_ok = true;
-  for (ConformanceTestSuite* suite : suites) {
+  for (ConformanceTestSuite *suite : suites) {
     string program;
     std::vector<string> program_args;
     string failure_list_filename;
     conformance::FailureSet failure_list;
 
+    bool performance = false;
     for (int arg = 1; arg < argc; ++arg) {
       if (strcmp(argv[arg], suite->GetFailureListFlagName().c_str()) == 0) {
         if (++arg == argc) UsageError();
         failure_list_filename = argv[arg];
         ParseFailureList(argv[arg], &failure_list);
+      } else if (strcmp(argv[arg], "--performance") == 0) {
+        performance = true;
+        suite->SetPerformance(true);
       } else if (strcmp(argv[arg], "--verbose") == 0) {
         suite->SetVerbose(true);
       } else if (strcmp(argv[arg], "--enforce_recommended") == 0) {
@@ -216,7 +224,7 @@ int ForkPipeRunner::Run(
         suite->SetOutputDir(argv[arg]);
       } else if (argv[arg][0] == '-') {
         bool recognized_flag = false;
-        for (ConformanceTestSuite* suite : suites) {
+        for (ConformanceTestSuite *suite : suites) {
           if (strcmp(argv[arg], suite->GetFailureListFlagName().c_str()) == 0) {
             if (++arg == argc) UsageError();
             recognized_flag = true;
@@ -227,7 +235,7 @@ int ForkPipeRunner::Run(
           UsageError();
         }
       } else {
-        program += argv[arg];
+        program += argv[arg++];
         while (arg < argc) {
           program_args.push_back(argv[arg]);
           arg++;
@@ -235,11 +243,11 @@ int ForkPipeRunner::Run(
       }
     }
 
-    ForkPipeRunner runner(program, program_args);
+    ForkPipeRunner runner(program, program_args, performance);
 
     std::string output;
-    all_ok = all_ok &&
-        suite->RunSuite(&runner, &output, failure_list_filename, &failure_list);
+    all_ok = all_ok && suite->RunSuite(&runner, &output, failure_list_filename,
+                                       &failure_list);
 
     fwrite(output.c_str(), 1, output.size(), stderr);
   }
@@ -303,8 +311,10 @@ void ForkPipeRunner::SpawnTestProgram() {
 
     std::vector<const char *> argv;
     argv.push_back(executable.get());
+    GOOGLE_LOG(INFO) << argv[0];
     for (size_t i = 0; i < executable_args_.size(); ++i) {
       argv.push_back(executable_args_[i].c_str());
+      GOOGLE_LOG(INFO) << executable_args_[i];
     }
     argv.push_back(nullptr);
     // Never returns.
@@ -322,8 +332,36 @@ void ForkPipeRunner::CheckedWrite(int fd, const void *buf, size_t len) {
 bool ForkPipeRunner::TryRead(int fd, void *buf, size_t len) {
   size_t ofs = 0;
   while (len > 0) {
-    ssize_t bytes_read = read(fd, (char*)buf + ofs, len);
-
+    std::future<ssize_t> future = std::async(
+        std::launch::async,
+        [](int fd, void *buf, size_t ofs, size_t len) {
+          return read(fd, (char *)buf + ofs, len);
+        },
+        fd, buf, ofs, len);
+    std::future_status status;
+    if (performance_) {
+      status = future.wait_for(std::chrono::seconds(5));
+      if (status == std::future_status::timeout) {
+        GOOGLE_LOG(ERROR) << current_test_name_ << ": timeout from test program";
+        kill(child_pid_, SIGQUIT);
+        // TODO(sandyzhang): Only log in flag-guarded mode, since reading output
+        // from SIGQUIT is slow and verbose.
+        std::vector<char> err;
+        err.resize(5000);
+        ssize_t err_bytes_read;
+        size_t err_ofs = 0;
+        do {
+          err_bytes_read =
+              read(fd, (void *)&err[err_ofs], err.size() - err_ofs);
+          err_ofs += err_bytes_read;
+        } while (err_bytes_read > 0 && err_ofs < err.size());
+        GOOGLE_LOG(ERROR) << "child_pid_=" << child_pid_ << " SIGQUIT: \n" << &err[0];
+        return false;
+      }
+    } else {
+      future.wait();
+    }
+    ssize_t bytes_read = future.get();
     if (bytes_read == 0) {
       GOOGLE_LOG(ERROR) << current_test_name_ << ": unexpected EOF from test program";
       return false;
