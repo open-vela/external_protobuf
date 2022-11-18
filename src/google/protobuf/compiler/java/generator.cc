@@ -32,19 +32,23 @@
 //  Based on original Protocol Buffers design by
 //  Sanjay Ghemawat, Jeff Dean, and others.
 
-#include "google/protobuf/compiler/java/generator.h"
+#include <google/protobuf/compiler/java/generator.h>
 
 
 #include <memory>
 
-#include "absl/strings/str_format.h"
-#include "google/protobuf/compiler/java/file.h"
-#include "google/protobuf/compiler/java/helpers.h"
-#include "google/protobuf/compiler/java/name_resolver.h"
-#include "google/protobuf/compiler/java/options.h"
-#include "google/protobuf/compiler/java/shared_code_generator.h"
-#include "google/protobuf/descriptor.pb.h"
+#include <google/protobuf/io/printer.h>
+#include <google/protobuf/io/zero_copy_stream.h>
+#include <google/protobuf/stubs/stringprintf.h>
+#include <google/protobuf/compiler/java/file.h>
+#include <google/protobuf/compiler/java/generator_factory.h>
+#include <google/protobuf/compiler/java/helpers.h>
+#include <google/protobuf/compiler/java/name_resolver.h>
+#include <google/protobuf/compiler/java/options.h>
+#include <google/protobuf/compiler/java/shared_code_generator.h>
+#include <google/protobuf/descriptor.pb.h>
 
+#include <google/protobuf/stubs/strutil.h>
 
 namespace google {
 namespace protobuf {
@@ -69,8 +73,6 @@ bool JavaGenerator::Generate(const FileDescriptor* file,
   std::vector<std::pair<std::string, std::string> > options;
   ParseGeneratorParameter(parameter, &options);
   Options file_options;
-
-  file_options.opensource_runtime = opensource_runtime_;
 
   for (int i = 0; i < options.size(); i++) {
     if (options[i].first == "output_list_file") {

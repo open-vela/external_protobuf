@@ -31,17 +31,14 @@
 // Author: kenton@google.com (Kenton Varda)
 // emulates google3/testing/base/public/googletest.cc
 
-#include "google/protobuf/testing/googletest.h"
-
-#include <errno.h>
-#include <stdlib.h>
+#include <google/protobuf/testing/googletest.h>
+#include <google/protobuf/testing/file.h>
+#include <google/protobuf/io/io_win32.h>
+#include <google/protobuf/stubs/strutil.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-
-#include "absl/strings/match.h"
-#include "absl/strings/str_replace.h"
-#include "google/protobuf/io/io_win32.h"
-#include "google/protobuf/testing/file.h"
+#include <errno.h>
+#include <stdlib.h>
 #ifdef _MSC_VER
 // #include <direct.h>
 #else
@@ -147,13 +144,13 @@ std::string GetTemporaryDirectoryName() {
   }
   // On Win32, tmpnam() returns a file prefixed with '\', but which is supposed
   // to be used in the current working directory.  WTF?
-  if (absl::StartsWith(result, "\\")) {
+  if (HasPrefixString(result, "\\")) {
     result.erase(0, 1);
   }
   // The Win32 API accepts forward slashes as a path delimiter as long as the
   // path doesn't use the "\\?\" prefix.
   // Let's avoid confusion and use only forward slashes.
-  result = absl::StrReplaceAll(result, {{"\\", "/"}});
+  result = StringReplace(result, "\\", "/", true);
 #endif  // _WIN32
   return result;
 }

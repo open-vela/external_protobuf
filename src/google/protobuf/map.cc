@@ -28,13 +28,13 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "google/protobuf/map.h"
+#include <google/protobuf/map.h>
 
 namespace google {
 namespace protobuf {
 namespace internal {
 
-const TableEntryPtr kGlobalEmptyTable[kGlobalEmptyTableSize] = {};
+void* const kGlobalEmptyTable[kGlobalEmptyTableSize] = {nullptr};
 
 }  // namespace internal
 }  // namespace protobuf
