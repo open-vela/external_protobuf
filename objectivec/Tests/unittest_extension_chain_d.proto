@@ -1,6 +1,5 @@
 // Protocol Buffers - Google's data interchange format
 // Copyright 2016 Google Inc.  All rights reserved.
-// https://developers.google.com/protocol-buffers/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -30,23 +29,21 @@
 
 syntax = "proto2";
 
-package objc.protobuf.tests.chain;
+package protobuf_unittest;
 
-import "objectivec/Tests/unittest.proto";
+import "google/protobuf/unittest.proto";
 
-import "objectivec/Tests/unittest_extension_chain_b.proto";
-import "objectivec/Tests/unittest_extension_chain_c.proto";
-
-option objc_class_prefix = "Chain";
+import "unittest_extension_chain_b.proto";
+import "unittest_extension_chain_c.proto";
 
 // The root should end up needing to merge B (C will be merged into B, so it
 // doesn't need to be directly merged).
 
-message DMessage {
-  optional BMessage b = 1;
-  optional CMessage c = 2;
+message ChainDMessage {
+  optional ChainBMessage b = 1;
+  optional ChainCMessage c = 2;
 }
 
-extend objc.protobuf.tests.TestAllExtensions {
+extend TestAllExtensions {
   optional int32 chain_d_extension = 10004;
 }

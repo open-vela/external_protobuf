@@ -31,10 +31,11 @@
 #ifndef GOOGLE_PROTOBUF_COMPILER_CPP_MAP_FIELD_H__
 #define GOOGLE_PROTOBUF_COMPILER_CPP_MAP_FIELD_H__
 
+#include <map>
 #include <string>
 
-#include "google/protobuf/compiler/cpp/helpers.h"
-#include "google/protobuf/compiler/cpp/message_field.h"
+#include <google/protobuf/compiler/cpp/helpers.h>
+#include <google/protobuf/compiler/cpp/message_field.h>
 
 namespace google {
 namespace protobuf {
@@ -45,8 +46,6 @@ class MapFieldGenerator : public FieldGenerator {
  public:
   MapFieldGenerator(const FieldDescriptor* descriptor, const Options& options,
                     MessageSCCAnalyzer* scc_analyzer);
-  MapFieldGenerator(const MapFieldGenerator&) = delete;
-  MapFieldGenerator& operator=(const MapFieldGenerator&) = delete;
   ~MapFieldGenerator() override;
 
   // implements FieldGenerator ---------------------------------------
@@ -72,6 +71,8 @@ class MapFieldGenerator : public FieldGenerator {
 
  private:
   const bool has_required_fields_;
+
+  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(MapFieldGenerator);
 };
 
 }  // namespace cpp
