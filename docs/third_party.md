@@ -21,6 +21,7 @@ These are projects we know about implementing Protocol Buffers for other program
 * C: https://github.com/eerimoq/pbtools
 * C++: https://github.com/protocolbuffers/protobuf (Google-official implementation)
 * C++: https://EmbeddedProto.com
+* C++: https://github.com/yksten/ProtobufWrapper
 * C/C++: http://spbc.sf.net/
 * C#: https://code.google.com/p/protobuf-csharp-port
 * C#: https://silentorbit.com/protobuf/
@@ -203,3 +204,4 @@ There are miscellaneous other things you may find useful as a Protocol Buffers d
     * [vim-protolint: A protobuf linter for Vim](https://github.com/yoheimuta/vim-protolint)
 * [super-linter: Protocol Buffer lint as GitHub Action](https://github.com/github/super-linter)
 * [protoc-gen-fieldmask - A plugin to generate static type fieldmask paths](https://github.com/idodod/protoc-gen-fieldmask)
+* [protoc-gen-bq-schema - A protoc plugin to generate BigQuery schema files](https://github.com/GoogleCloudPlatform/protoc-gen-bq-schema)
