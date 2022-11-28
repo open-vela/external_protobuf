@@ -34,17 +34,15 @@
 #import "GPBDictionary.h"
 
 #import "GPBTestUtilities.h"
-#import "objectivec/Tests/UnittestRuntimeProto2.pbobjc.h"
-
-// Disable clang-format for the macros.
-// clang-format off
+#import "google/protobuf/UnittestRuntimeProto2.pbobjc.h"
 
 // Pull in the macros (using an external file because expanding all tests
 // in a single file makes a file that is failing to work with within Xcode.
 //%PDDM-IMPORT-DEFINES GPBDictionaryTests.pddm
 
-//%PDDM-EXPAND TESTS_FOR_POD_VALUES(String,NSString,*,Objects,@"foo",@"bar",@"baz",@"mumble")
+//%PDDM-EXPAND TESTS_FOR_POD_VALUES(String, NSString, *, Objects, @"foo", @"bar", @"baz", @"mumble")
 // This block of code is generated, do not edit it directly.
+// clang-format off
 
 // To let the testing macros work, add some extra methods to simplify things.
 @interface GPBStringEnumDictionary (TestingTweak)
@@ -89,7 +87,8 @@ static BOOL TestingEnum_IsValidValue(int32_t value) {
   XCTAssertNotNil(dict);
   XCTAssertEqual(dict.count, 0U);
   XCTAssertFalse([dict getUInt32:NULL forKey:@"foo"]);
-  [dict enumerateKeysAndUInt32sUsingBlock:^(__unused NSString *aKey, __unused uint32_t aValue, __unused BOOL *stop) {
+  [dict enumerateKeysAndUInt32sUsingBlock:^(NSString *aKey, uint32_t aValue, BOOL *stop) {
+    #pragma unused(aKey, aValue, stop)
     XCTFail(@"Shouldn't get here!");
   }];
   [dict release];
@@ -159,7 +158,8 @@ static BOOL TestingEnum_IsValidValue(int32_t value) {
 
   // Stopping the enumeration.
   idx = 0;
-  [dict enumerateKeysAndUInt32sUsingBlock:^(__unused NSString *aKey, __unused uint32_t aValue, BOOL *stop) {
+  [dict enumerateKeysAndUInt32sUsingBlock:^(NSString *aKey, uint32_t aValue, BOOL *stop) {
+    #pragma unused(aKey, aValue)
     if (idx == 1) *stop = YES;
     XCTAssertNotEqual(idx, 2U);
     ++idx;
@@ -448,7 +448,8 @@ static BOOL TestingEnum_IsValidValue(int32_t value) {
   XCTAssertNotNil(dict);
   XCTAssertEqual(dict.count, 0U);
   XCTAssertFalse([dict getInt32:NULL forKey:@"foo"]);
-  [dict enumerateKeysAndInt32sUsingBlock:^(__unused NSString *aKey, __unused int32_t aValue, __unused BOOL *stop) {
+  [dict enumerateKeysAndInt32sUsingBlock:^(NSString *aKey, int32_t aValue, BOOL *stop) {
+    #pragma unused(aKey, aValue, stop)
     XCTFail(@"Shouldn't get here!");
   }];
   [dict release];
@@ -518,7 +519,8 @@ static BOOL TestingEnum_IsValidValue(int32_t value) {
 
   // Stopping the enumeration.
   idx = 0;
-  [dict enumerateKeysAndInt32sUsingBlock:^(__unused NSString *aKey, __unused int32_t aValue, BOOL *stop) {
+  [dict enumerateKeysAndInt32sUsingBlock:^(NSString *aKey, int32_t aValue, BOOL *stop) {
+    #pragma unused(aKey, aValue)
     if (idx == 1) *stop = YES;
     XCTAssertNotEqual(idx, 2U);
     ++idx;
@@ -807,7 +809,8 @@ static BOOL TestingEnum_IsValidValue(int32_t value) {
   XCTAssertNotNil(dict);
   XCTAssertEqual(dict.count, 0U);
   XCTAssertFalse([dict getUInt64:NULL forKey:@"foo"]);
-  [dict enumerateKeysAndUInt64sUsingBlock:^(__unused NSString *aKey, __unused uint64_t aValue, __unused BOOL *stop) {
+  [dict enumerateKeysAndUInt64sUsingBlock:^(NSString *aKey, uint64_t aValue, BOOL *stop) {
+    #pragma unused(aKey, aValue, stop)
     XCTFail(@"Shouldn't get here!");
   }];
   [dict release];
@@ -877,7 +880,8 @@ static BOOL TestingEnum_IsValidValue(int32_t value) {
 
   // Stopping the enumeration.
   idx = 0;
-  [dict enumerateKeysAndUInt64sUsingBlock:^(__unused NSString *aKey, __unused uint64_t aValue, BOOL *stop) {
+  [dict enumerateKeysAndUInt64sUsingBlock:^(NSString *aKey, uint64_t aValue, BOOL *stop) {
+    #pragma unused(aKey, aValue)
     if (idx == 1) *stop = YES;
     XCTAssertNotEqual(idx, 2U);
     ++idx;
@@ -1166,7 +1170,8 @@ static BOOL TestingEnum_IsValidValue(int32_t value) {
   XCTAssertNotNil(dict);
   XCTAssertEqual(dict.count, 0U);
   XCTAssertFalse([dict getInt64:NULL forKey:@"foo"]);
-  [dict enumerateKeysAndInt64sUsingBlock:^(__unused NSString *aKey, __unused int64_t aValue, __unused BOOL *stop) {
+  [dict enumerateKeysAndInt64sUsingBlock:^(NSString *aKey, int64_t aValue, BOOL *stop) {
+    #pragma unused(aKey, aValue, stop)
     XCTFail(@"Shouldn't get here!");
   }];
   [dict release];
@@ -1236,7 +1241,8 @@ static BOOL TestingEnum_IsValidValue(int32_t value) {
 
   // Stopping the enumeration.
   idx = 0;
-  [dict enumerateKeysAndInt64sUsingBlock:^(__unused NSString *aKey, __unused int64_t aValue, BOOL *stop) {
+  [dict enumerateKeysAndInt64sUsingBlock:^(NSString *aKey, int64_t aValue, BOOL *stop) {
+    #pragma unused(aKey, aValue)
     if (idx == 1) *stop = YES;
     XCTAssertNotEqual(idx, 2U);
     ++idx;
@@ -1525,7 +1531,8 @@ static BOOL TestingEnum_IsValidValue(int32_t value) {
   XCTAssertNotNil(dict);
   XCTAssertEqual(dict.count, 0U);
   XCTAssertFalse([dict getBool:NULL forKey:@"foo"]);
-  [dict enumerateKeysAndBoolsUsingBlock:^(__unused NSString *aKey, __unused BOOL aValue, __unused BOOL *stop) {
+  [dict enumerateKeysAndBoolsUsingBlock:^(NSString *aKey, BOOL aValue, BOOL *stop) {
+    #pragma unused(aKey, aValue, stop)
     XCTFail(@"Shouldn't get here!");
   }];
   [dict release];
@@ -1595,7 +1602,8 @@ static BOOL TestingEnum_IsValidValue(int32_t value) {
 
   // Stopping the enumeration.
   idx = 0;
-  [dict enumerateKeysAndBoolsUsingBlock:^(__unused NSString *aKey, __unused BOOL aValue, BOOL *stop) {
+  [dict enumerateKeysAndBoolsUsingBlock:^(NSString *aKey, BOOL aValue, BOOL *stop) {
+    #pragma unused(aKey, aValue)
     if (idx == 1) *stop = YES;
     XCTAssertNotEqual(idx, 2U);
     ++idx;
@@ -1884,7 +1892,8 @@ static BOOL TestingEnum_IsValidValue(int32_t value) {
   XCTAssertNotNil(dict);
   XCTAssertEqual(dict.count, 0U);
   XCTAssertFalse([dict getFloat:NULL forKey:@"foo"]);
-  [dict enumerateKeysAndFloatsUsingBlock:^(__unused NSString *aKey, __unused float aValue, __unused BOOL *stop) {
+  [dict enumerateKeysAndFloatsUsingBlock:^(NSString *aKey, float aValue, BOOL *stop) {
+    #pragma unused(aKey, aValue, stop)
     XCTFail(@"Shouldn't get here!");
   }];
   [dict release];
@@ -1954,7 +1963,8 @@ static BOOL TestingEnum_IsValidValue(int32_t value) {
 
   // Stopping the enumeration.
   idx = 0;
-  [dict enumerateKeysAndFloatsUsingBlock:^(__unused NSString *aKey, __unused float aValue, BOOL *stop) {
+  [dict enumerateKeysAndFloatsUsingBlock:^(NSString *aKey, float aValue, BOOL *stop) {
+    #pragma unused(aKey, aValue)
     if (idx == 1) *stop = YES;
     XCTAssertNotEqual(idx, 2U);
     ++idx;
@@ -2243,7 +2253,8 @@ static BOOL TestingEnum_IsValidValue(int32_t value) {
   XCTAssertNotNil(dict);
   XCTAssertEqual(dict.count, 0U);
   XCTAssertFalse([dict getDouble:NULL forKey:@"foo"]);
-  [dict enumerateKeysAndDoublesUsingBlock:^(__unused NSString *aKey, __unused double aValue, __unused BOOL *stop) {
+  [dict enumerateKeysAndDoublesUsingBlock:^(NSString *aKey, double aValue, BOOL *stop) {
+    #pragma unused(aKey, aValue, stop)
     XCTFail(@"Shouldn't get here!");
   }];
   [dict release];
@@ -2313,7 +2324,8 @@ static BOOL TestingEnum_IsValidValue(int32_t value) {
 
   // Stopping the enumeration.
   idx = 0;
-  [dict enumerateKeysAndDoublesUsingBlock:^(__unused NSString *aKey, __unused double aValue, BOOL *stop) {
+  [dict enumerateKeysAndDoublesUsingBlock:^(NSString *aKey, double aValue, BOOL *stop) {
+    #pragma unused(aKey, aValue)
     if (idx == 1) *stop = YES;
     XCTAssertNotEqual(idx, 2U);
     ++idx;
@@ -2602,7 +2614,8 @@ static BOOL TestingEnum_IsValidValue(int32_t value) {
   XCTAssertNotNil(dict);
   XCTAssertEqual(dict.count, 0U);
   XCTAssertFalse([dict getEnum:NULL forKey:@"foo"]);
-  [dict enumerateKeysAndEnumsUsingBlock:^(__unused NSString *aKey, __unused int32_t aValue, __unused BOOL *stop) {
+  [dict enumerateKeysAndEnumsUsingBlock:^(NSString *aKey, int32_t aValue, BOOL *stop) {
+    #pragma unused(aKey, aValue, stop)
     XCTFail(@"Shouldn't get here!");
   }];
   [dict release];
@@ -2672,7 +2685,8 @@ static BOOL TestingEnum_IsValidValue(int32_t value) {
 
   // Stopping the enumeration.
   idx = 0;
-  [dict enumerateKeysAndEnumsUsingBlock:^(__unused NSString *aKey, __unused int32_t aValue, BOOL *stop) {
+  [dict enumerateKeysAndEnumsUsingBlock:^(NSString *aKey, int32_t aValue, BOOL *stop) {
+    #pragma unused(aKey, aValue)
     if (idx == 1) *stop = YES;
     XCTAssertNotEqual(idx, 2U);
     ++idx;
@@ -3029,7 +3043,8 @@ static BOOL TestingEnum_IsValidValue(int32_t value) {
 
   // Stopping the enumeration.
   idx = 0;
-  [dict enumerateKeysAndRawValuesUsingBlock:^(__unused NSString *aKey, __unused int32_t aValue, BOOL *stop) {
+  [dict enumerateKeysAndRawValuesUsingBlock:^(NSString *aKey, int32_t aValue, BOOL *stop) {
+    #pragma unused(aKey, aValue)
     if (idx == 1) *stop = YES;
     XCTAssertNotEqual(idx, 2U);
     ++idx;
@@ -3366,4 +3381,6 @@ static BOOL TestingEnum_IsValidValue(int32_t value) {
 
 @end
 
-//%PDDM-EXPAND-END TESTS_FOR_POD_VALUES(String,NSString,*,Objects,@"foo",@"bar",@"baz",@"mumble")
+// clang-format on
+//%PDDM-EXPAND-END TESTS_FOR_POD_VALUES(String, NSString, *, Objects, @"foo", @"bar", @"baz", @"mumble")
+
