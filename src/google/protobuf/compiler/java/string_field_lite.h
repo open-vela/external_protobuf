@@ -37,9 +37,10 @@
 #define GOOGLE_PROTOBUF_COMPILER_JAVA_STRING_FIELD_LITE_H__
 
 #include <cstdint>
+#include <map>
 #include <string>
 
-#include "google/protobuf/compiler/java/field.h"
+#include <google/protobuf/compiler/java/field.h>
 
 namespace google {
 namespace protobuf {
@@ -62,10 +63,6 @@ class ImmutableStringFieldLiteGenerator : public ImmutableFieldLiteGenerator {
   explicit ImmutableStringFieldLiteGenerator(const FieldDescriptor* descriptor,
                                              int messageBitIndex,
                                              Context* context);
-  ImmutableStringFieldLiteGenerator(const ImmutableStringFieldLiteGenerator&) =
-      delete;
-  ImmutableStringFieldLiteGenerator& operator=(
-      const ImmutableStringFieldLiteGenerator&) = delete;
   ~ImmutableStringFieldLiteGenerator() override;
 
   // implements ImmutableFieldLiteGenerator
@@ -83,10 +80,12 @@ class ImmutableStringFieldLiteGenerator : public ImmutableFieldLiteGenerator {
 
  protected:
   const FieldDescriptor* descriptor_;
-  absl::flat_hash_map<absl::string_view, std::string> variables_;
+  std::map<std::string, std::string> variables_;
   const int messageBitIndex_;
   ClassNameResolver* name_resolver_;
-  Context* context_;
+
+ private:
+  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(ImmutableStringFieldLiteGenerator);
 };
 
 class ImmutableStringOneofFieldLiteGenerator
@@ -94,10 +93,6 @@ class ImmutableStringOneofFieldLiteGenerator
  public:
   ImmutableStringOneofFieldLiteGenerator(const FieldDescriptor* descriptor,
                                          int messageBitIndex, Context* context);
-  ImmutableStringOneofFieldLiteGenerator(
-      const ImmutableStringOneofFieldLiteGenerator&) = delete;
-  ImmutableStringOneofFieldLiteGenerator& operator=(
-      const ImmutableStringOneofFieldLiteGenerator&) = delete;
   ~ImmutableStringOneofFieldLiteGenerator() override;
 
  private:
@@ -105,6 +100,8 @@ class ImmutableStringOneofFieldLiteGenerator
   void GenerateBuilderMembers(io::Printer* printer) const override;
   void GenerateFieldInfo(io::Printer* printer,
                          std::vector<uint16_t>* output) const override;
+
+  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(ImmutableStringOneofFieldLiteGenerator);
 };
 
 class RepeatedImmutableStringFieldLiteGenerator
@@ -112,10 +109,6 @@ class RepeatedImmutableStringFieldLiteGenerator
  public:
   explicit RepeatedImmutableStringFieldLiteGenerator(
       const FieldDescriptor* descriptor, int messageBitIndex, Context* context);
-  RepeatedImmutableStringFieldLiteGenerator(
-      const RepeatedImmutableStringFieldLiteGenerator&) = delete;
-  RepeatedImmutableStringFieldLiteGenerator& operator=(
-      const RepeatedImmutableStringFieldLiteGenerator&) = delete;
   ~RepeatedImmutableStringFieldLiteGenerator() override;
 
   // implements ImmutableFieldLiteGenerator ------------------------------------
@@ -132,9 +125,10 @@ class RepeatedImmutableStringFieldLiteGenerator
 
  private:
   const FieldDescriptor* descriptor_;
-  absl::flat_hash_map<absl::string_view, std::string> variables_;
+  std::map<std::string, std::string> variables_;
   ClassNameResolver* name_resolver_;
-  Context* context_;
+
+  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(RepeatedImmutableStringFieldLiteGenerator);
 };
 
 }  // namespace java
