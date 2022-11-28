@@ -35,10 +35,9 @@
 #ifndef GOOGLE_PROTOBUF_COMPILER_CPP_PRIMITIVE_FIELD_H__
 #define GOOGLE_PROTOBUF_COMPILER_CPP_PRIMITIVE_FIELD_H__
 
-#include <map>
 #include <string>
 
-#include <google/protobuf/compiler/cpp/field.h>
+#include "google/protobuf/compiler/cpp/field.h"
 
 namespace google {
 namespace protobuf {
@@ -49,6 +48,8 @@ class PrimitiveFieldGenerator : public FieldGenerator {
  public:
   PrimitiveFieldGenerator(const FieldDescriptor* descriptor,
                           const Options& options);
+  PrimitiveFieldGenerator(const PrimitiveFieldGenerator&) = delete;
+  PrimitiveFieldGenerator& operator=(const PrimitiveFieldGenerator&) = delete;
   ~PrimitiveFieldGenerator() override;
 
   // implements FieldGenerator ---------------------------------------
@@ -67,15 +68,15 @@ class PrimitiveFieldGenerator : public FieldGenerator {
       io::Printer* printer) const override;
   void GenerateAggregateInitializer(io::Printer* printer) const override;
   void GenerateCopyAggregateInitializer(io::Printer* printer) const override;
-
- private:
-  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(PrimitiveFieldGenerator);
 };
 
 class PrimitiveOneofFieldGenerator : public PrimitiveFieldGenerator {
  public:
   PrimitiveOneofFieldGenerator(const FieldDescriptor* descriptor,
                                const Options& options);
+  PrimitiveOneofFieldGenerator(const PrimitiveOneofFieldGenerator&) = delete;
+  PrimitiveOneofFieldGenerator& operator=(const PrimitiveOneofFieldGenerator&) =
+      delete;
   ~PrimitiveOneofFieldGenerator() override;
 
   // implements FieldGenerator ---------------------------------------
@@ -83,15 +84,16 @@ class PrimitiveOneofFieldGenerator : public PrimitiveFieldGenerator {
   void GenerateClearingCode(io::Printer* printer) const override;
   void GenerateSwappingCode(io::Printer* printer) const override;
   void GenerateConstructorCode(io::Printer* printer) const override;
-
- private:
-  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(PrimitiveOneofFieldGenerator);
 };
 
 class RepeatedPrimitiveFieldGenerator : public FieldGenerator {
  public:
   RepeatedPrimitiveFieldGenerator(const FieldDescriptor* descriptor,
                                   const Options& options);
+  RepeatedPrimitiveFieldGenerator(const RepeatedPrimitiveFieldGenerator&) =
+      delete;
+  RepeatedPrimitiveFieldGenerator& operator=(
+      const RepeatedPrimitiveFieldGenerator&) = delete;
   ~RepeatedPrimitiveFieldGenerator() override;
 
   // implements FieldGenerator ---------------------------------------
@@ -113,9 +115,6 @@ class RepeatedPrimitiveFieldGenerator : public FieldGenerator {
       io::Printer* printer) const override;
   void GenerateAggregateInitializer(io::Printer* printer) const override;
   void GenerateCopyAggregateInitializer(io::Printer* printer) const override;
-
- private:
-  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(RepeatedPrimitiveFieldGenerator);
 };
 
 }  // namespace cpp
