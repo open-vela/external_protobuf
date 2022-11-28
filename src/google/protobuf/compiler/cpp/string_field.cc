@@ -32,14 +32,13 @@
 //  Based on original Protocol Buffers design by
 //  Sanjay Ghemawat, Jeff Dean, and others.
 
-#include "google/protobuf/compiler/cpp/string_field.h"
+#include <google/protobuf/compiler/cpp/string_field.h>
 
-#include <string>
+#include <google/protobuf/io/printer.h>
+#include <google/protobuf/stubs/strutil.h>
+#include <google/protobuf/compiler/cpp/helpers.h>
+#include <google/protobuf/descriptor.pb.h>
 
-#include "absl/container/flat_hash_map.h"
-#include "absl/strings/str_cat.h"
-#include "google/protobuf/compiler/cpp/helpers.h"
-#include "google/protobuf/descriptor.pb.h"
 
 namespace google {
 namespace protobuf {
@@ -48,41 +47,39 @@ namespace cpp {
 
 namespace {
 
-void SetStringVariables(
-    const FieldDescriptor* descriptor,
-    absl::flat_hash_map<absl::string_view, std::string>* variables,
-    const Options& options) {
+void SetStringVariables(const FieldDescriptor* descriptor,
+                        std::map<std::string, std::string>* variables,
+                        const Options& options) {
   SetCommonFieldVariables(descriptor, variables, options);
 
+  const std::string kNS = "::" + (*variables)["proto_ns"] + "::internal::";
+  const std::string kArenaStringPtr = kNS + "ArenaStringPtr";
 
   (*variables)["default"] = DefaultValue(options, descriptor);
   (*variables)["default_length"] =
-      absl::StrCat(descriptor->default_value_string().length());
+      StrCat(descriptor->default_value_string().length());
   (*variables)["default_variable_name"] = MakeDefaultName(descriptor);
   (*variables)["default_variable_field"] = MakeDefaultFieldName(descriptor);
 
   if (descriptor->default_value_string().empty()) {
-    const std::string default_string =
-        absl::StrCat("::", ProtobufNamespace(options),
-                     "::internal::GetEmptyStringAlreadyInited()");
-    (*variables)["default_string"] = default_string;
-    (*variables)["default_value"] = absl::StrCat("&", default_string);
+    (*variables)["default_string"] = kNS + "GetEmptyStringAlreadyInited()";
+    (*variables)["default_value"] = "&" + (*variables)["default_string"];
     (*variables)["lazy_variable_args"] = "";
   } else {
-    const std::string lazy_variable =
-        absl::StrCat(QualifiedClassName(descriptor->containing_type(), options),
+    (*variables)["lazy_variable"] =
+        StrCat(QualifiedClassName(descriptor->containing_type(), options),
                      "::", MakeDefaultFieldName(descriptor));
-    (*variables)["lazy_variable"] = lazy_variable;
 
-    (*variables)["default_string"] = absl::StrCat(lazy_variable, ".get()");
+    (*variables)["default_string"] = (*variables)["lazy_variable"] + ".get()";
     (*variables)["default_value"] = "nullptr";
-    (*variables)["lazy_variable_args"] = absl::StrCat(lazy_variable, ", ");
+    (*variables)["lazy_variable_args"] = (*variables)["lazy_variable"] + ", ";
   }
 
   (*variables)["pointer_type"] =
       descriptor->type() == FieldDescriptor::TYPE_BYTES ? "void" : "char";
   (*variables)["setter"] =
       descriptor->type() == FieldDescriptor::TYPE_BYTES ? "SetBytes" : "Set";
+  (*variables)["null_check"] = (*variables)["DCHK"] + "(value != nullptr);\n";
   // NOTE: Escaped here to unblock proto1->proto2 migration.
   // TODO(liujisi): Extend this to apply for other conflicting methods.
   (*variables)["release_name"] =
@@ -92,7 +89,7 @@ void SetStringVariables(
   if (options.opensource_runtime) {
     (*variables)["string_piece"] = "::std::string";
   } else {
-    (*variables)["string_piece"] = "::absl::string_view";
+    (*variables)["string_piece"] = "::StringPiece";
   }
 }
 
@@ -289,7 +286,7 @@ void StringFieldGenerator::GenerateInlineAccessorDefinitions(
       "$maybe_prepare_split_message$"
       "  // @@protoc_insertion_point(field_release:$full_name$)\n");
 
-  if (internal::cpp::HasHasbit(descriptor_)) {
+  if (HasHasbit(descriptor_)) {
     format(
         "  if (!_internal_has_$name$()) {\n"
         "    return nullptr;\n"
@@ -300,7 +297,9 @@ void StringFieldGenerator::GenerateInlineAccessorDefinitions(
       if (descriptor_->default_value_string().empty()) {
         format(
             "#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING\n"
-            "  $field$.Set(\"\", GetArenaForAllocation());\n"
+            "  if ($field$.IsDefault()) {\n"
+            "    $field$.Set(\"\", GetArenaForAllocation());\n"
+            "  }\n"
             "#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING\n");
       }
       format("  return p;\n");
@@ -316,20 +315,12 @@ void StringFieldGenerator::GenerateInlineAccessorDefinitions(
   format(
       "}\n"
       "inline void $classname$::set_allocated_$name$(std::string* $name$) {\n"
-      "$maybe_prepare_split_message$");
-
-  auto nonempty = [this](const char* fn) {
-    auto var_it = variables_.find(fn);
-    return var_it != variables_.end() && !var_it->second.empty();
-  };
-  if (nonempty("set_hasbit") || nonempty("clear_hasbit")) {
-    format(
-        "  if ($name$ != nullptr) {\n"
-        "    $set_hasbit$\n"
-        "  } else {\n"
-        "    $clear_hasbit$\n"
-        "  }\n");
-  }
+      "$maybe_prepare_split_message$"
+      "  if ($name$ != nullptr) {\n"
+      "    $set_hasbit$\n"
+      "  } else {\n"
+      "    $clear_hasbit$\n"
+      "  }\n");
   if (!inlined_) {
     format("  $field$.SetAllocated($name$, GetArenaForAllocation());\n");
     if (descriptor_->default_value_string().empty()) {
@@ -386,7 +377,7 @@ void StringFieldGenerator::GenerateMessageClearingCode(
   // If we have a hasbit, then the Clear() method of the protocol buffer
   // will have checked that this field is set.  If so, we can avoid redundant
   // checks against the default variable.
-  const bool must_be_present = internal::cpp::HasHasbit(descriptor_);
+  const bool must_be_present = HasHasbit(descriptor_);
 
   if (inlined_ && must_be_present) {
     // Calling mutable_$name$() gives us a string reference and sets the has bit
@@ -454,6 +445,21 @@ void StringFieldGenerator::GenerateConstructorCode(io::Printer* printer) const {
   }
 }
 
+void StringFieldGenerator::GenerateCreateSplitMessageCode(
+    io::Printer* printer) const {
+  GOOGLE_CHECK(ShouldSplit(descriptor_, options_));
+  GOOGLE_CHECK(!inlined_);
+  Formatter format(printer, variables_);
+  format("ptr->$name$_.InitDefault();\n");
+  if (IsString(descriptor_, options_) &&
+      descriptor_->default_value_string().empty()) {
+    format(
+        "#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING\n"
+        "  ptr->$name$_.Set(\"\", GetArenaForAllocation());\n"
+        "#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING\n");
+  }
+}
+
 void StringFieldGenerator::GenerateCopyConstructorCode(
     io::Printer* printer) const {
   Formatter format(printer, variables_);
@@ -462,7 +468,7 @@ void StringFieldGenerator::GenerateCopyConstructorCode(
     format("new (&_this->$field$) ::_pbi::InlinedStringField();\n");
   }
 
-  if (internal::cpp::HasHasbit(descriptor_)) {
+  if (HasHasbit(descriptor_)) {
     format("if (from._internal_has_$name$()) {\n");
   } else {
     format("if (!from._internal_$name$().empty()) {\n");
@@ -548,9 +554,13 @@ void StringFieldGenerator::GenerateConstexprAggregateInitializer(
     format("/*decltype($field$)*/{nullptr, false}");
     return;
   }
-  format(
-      "/*decltype($field$)*/{&::_pbi::fixed_address_empty_string, "
-      "::_pbi::ConstantInitialized{}}");
+  if (descriptor_->default_value_string().empty()) {
+    format(
+        "/*decltype($field$)*/{&::_pbi::fixed_address_empty_string, "
+        "::_pbi::ConstantInitialized{}}");
+  } else {
+    format("/*decltype($field$)*/{nullptr, ::_pbi::ConstantInitialized{}}");
+  }
 }
 
 void StringFieldGenerator::GenerateAggregateInitializer(
@@ -582,7 +592,7 @@ StringOneofFieldGenerator::StringOneofFieldGenerator(
   SetCommonOneofFieldVariables(descriptor, &variables_);
   variables_["field_name"] = UnderscoresToCamelCase(descriptor->name(), true);
   variables_["oneof_index"] =
-      absl::StrCat(descriptor->containing_oneof()->index());
+      StrCat(descriptor->containing_oneof()->index());
 }
 
 StringOneofFieldGenerator::~StringOneofFieldGenerator() {}
@@ -727,12 +737,12 @@ void RepeatedStringFieldGenerator::GenerateAccessorDeclarations(
   if (!options_.opensource_runtime) {
     format(
         "$deprecated_attr$void ${1$set_$name$$}$(int index, "
-        "absl::string_view value);\n",
+        "StringPiece value);\n",
         descriptor_);
   }
   format(
       "$deprecated_attr$void ${1$set_$name$$}$("
-      "int index, const $pointer_type$* value, ::size_t size);\n"
+      "int index, const $pointer_type$* value, size_t size);\n"
       "$deprecated_attr$std::string* ${1$add_$name$$}$();\n"
       "$deprecated_attr$void ${1$add_$name$$}$(const std::string& value);\n"
       "$deprecated_attr$void ${1$add_$name$$}$(std::string&& value);\n"
@@ -740,12 +750,12 @@ void RepeatedStringFieldGenerator::GenerateAccessorDeclarations(
       descriptor_);
   if (!options_.opensource_runtime) {
     format(
-        "$deprecated_attr$void ${1$add_$name$$}$(absl::string_view value);\n",
+        "$deprecated_attr$void ${1$add_$name$$}$(StringPiece value);\n",
         descriptor_);
   }
   format(
       "$deprecated_attr$void ${1$add_$name$$}$(const $pointer_type$* "
-      "value, ::size_t size)"
+      "value, size_t size)"
       ";\n"
       "$deprecated_attr$const ::$proto_ns$::RepeatedPtrField<std::string>& "
       "${1$$name$$}$() "
@@ -814,7 +824,7 @@ void RepeatedStringFieldGenerator::GenerateInlineAccessorDefinitions(
       "  // @@protoc_insertion_point(field_set:$full_name$)\n"
       "}\n"
       "inline void $classname$::set_$name$(int index, const char* value) {\n"
-      "  $DCHK$(value != nullptr);"
+      "  $null_check$"
       "  $field$.Mutable(index)->assign(value);\n"
       "$annotate_set$"
       "  // @@protoc_insertion_point(field_set_char:$full_name$)\n"
@@ -822,7 +832,7 @@ void RepeatedStringFieldGenerator::GenerateInlineAccessorDefinitions(
   if (!options_.opensource_runtime) {
     format(
         "inline void "
-        "$classname$::set_$name$(int index, absl::string_view value) {\n"
+        "$classname$::set_$name$(int index, StringPiece value) {\n"
         "  $field$.Mutable(index)->assign(value.data(), value.size());\n"
         "$annotate_set$"
         "  // @@protoc_insertion_point(field_set_string_piece:$full_name$)\n"
@@ -831,7 +841,7 @@ void RepeatedStringFieldGenerator::GenerateInlineAccessorDefinitions(
   format(
       "inline void "
       "$classname$::set_$name$"
-      "(int index, const $pointer_type$* value, ::size_t size) {\n"
+      "(int index, const $pointer_type$* value, size_t size) {\n"
       "  $field$.Mutable(index)->assign(\n"
       "    reinterpret_cast<const char*>(value), size);\n"
       "$annotate_set$"
@@ -851,14 +861,14 @@ void RepeatedStringFieldGenerator::GenerateInlineAccessorDefinitions(
       "  // @@protoc_insertion_point(field_add:$full_name$)\n"
       "}\n"
       "inline void $classname$::add_$name$(const char* value) {\n"
-      "  $DCHK$(value != nullptr);"
+      "  $null_check$"
       "  $field$.Add()->assign(value);\n"
       "$annotate_add$"
       "  // @@protoc_insertion_point(field_add_char:$full_name$)\n"
       "}\n");
   if (!options_.opensource_runtime) {
     format(
-        "inline void $classname$::add_$name$(absl::string_view value) {\n"
+        "inline void $classname$::add_$name$(StringPiece value) {\n"
         "  $field$.Add()->assign(value.data(), value.size());\n"
         "$annotate_add$"
         "  // @@protoc_insertion_point(field_add_string_piece:$full_name$)\n"
@@ -866,7 +876,7 @@ void RepeatedStringFieldGenerator::GenerateInlineAccessorDefinitions(
   }
   format(
       "inline void "
-      "$classname$::add_$name$(const $pointer_type$* value, ::size_t size) {\n"
+      "$classname$::add_$name$(const $pointer_type$* value, size_t size) {\n"
       "  $field$.Add()->assign(reinterpret_cast<const char*>(value), size);\n"
       "$annotate_add$"
       "  // @@protoc_insertion_point(field_add_pointer:$full_name$)\n"
