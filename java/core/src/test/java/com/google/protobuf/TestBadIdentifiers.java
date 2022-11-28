@@ -49,7 +49,7 @@ public class TestBadIdentifiers extends TestCase {
         TestBadIdentifiersProto.Override.getDefaultInstance();
   }
 
-  @SuppressWarnings({"IgnoredPureGetter", "CheckReturnValue"}) // TODO(b/221602772): Fix this
+  @SuppressWarnings("IgnoredPureGetter") // TODO(b/221602772): Fix this
   public void testGetDescriptor() {
     TestBadIdentifiersProto.getDescriptor();
     TestBadIdentifiersProto.Descriptor.getDefaultInstance().getDescriptor();
@@ -99,6 +99,7 @@ public class TestBadIdentifiers extends TestCase {
     assertEquals("", message.getFieldName33());
     assertEquals(0, message.get2Conflict34());
     assertEquals(0, message.get2Conflict35());
+
   }
 
   public void testNumberFields() throws Exception {
@@ -119,5 +120,6 @@ public class TestBadIdentifiers extends TestCase {
     assertEquals(0, message.get32());
     assertEquals(0, message.get64Count());
     assertEquals(0, message.get64List().size());
+
   }
 }

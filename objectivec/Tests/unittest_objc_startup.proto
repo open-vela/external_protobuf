@@ -30,21 +30,20 @@
 
 syntax = "proto2";
 
-package objc.protobuf.tests.startup;
-option objc_class_prefix = "TestObjCStartup";
+package protobuf_objc_unittest;
 
-message Message {
+message TestObjCStartupMessage {
   extensions 1 to max;
 }
 
-extend Message {
+extend TestObjCStartupMessage {
   // Singular
   optional    int32 optional_int32_extension    = 1;
   repeated    int32 repeated_int32_extension    = 2;
 }
 
-message Nested {
-  extend Message {
+message TestObjCStartupNested {
+  extend TestObjCStartupMessage {
     optional string nested_string_extension = 3;
   }
 }
