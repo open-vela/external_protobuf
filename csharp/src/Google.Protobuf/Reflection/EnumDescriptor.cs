@@ -41,12 +41,17 @@ namespace Google.Protobuf.Reflection
     /// </summary>
     public sealed class EnumDescriptor : DescriptorBase
     {
+        private readonly EnumDescriptorProto proto;
+        private readonly MessageDescriptor containingType;
+        private readonly IList<EnumValueDescriptor> values;
+        private readonly Type clrType;
+
         internal EnumDescriptor(EnumDescriptorProto proto, FileDescriptor file, MessageDescriptor parent, int index, Type clrType)
             : base(file, file.ComputeFullName(parent, proto.Name), index)
         {
-            Proto = proto;
-            ClrType = clrType;
-            ContainingType = parent;
+            this.proto = proto;
+            this.clrType = clrType;
+            containingType = parent;
 
             if (proto.Value.Count == 0)
             {
@@ -55,13 +60,13 @@ namespace Google.Protobuf.Reflection
                 throw new DescriptorValidationException(this, "Enums must contain at least one value.");
             }
 
-            Values = DescriptorUtil.ConvertAndMakeReadOnly(proto.Value,
+            values = DescriptorUtil.ConvertAndMakeReadOnly(proto.Value,
                                                            (value, i) => new EnumValueDescriptor(value, file, this, i));
 
             File.DescriptorPool.AddSymbol(this);
         }
 
-        internal EnumDescriptorProto Proto { get; }
+        internal EnumDescriptorProto Proto { get { return proto; } }
 
         /// <summary>
         /// Returns a clone of the underlying <see cref="EnumDescriptorProto"/> describing this enum.
@@ -74,29 +79,39 @@ namespace Google.Protobuf.Reflection
         /// <summary>
         /// The brief name of the descriptor's target.
         /// </summary>
-        public override string Name => Proto.Name;
+        public override string Name { get { return proto.Name; } }
 
-        internal override IReadOnlyList<DescriptorBase> GetNestedDescriptorListForField(int fieldNumber) =>
-            fieldNumber switch
+        internal override IReadOnlyList<DescriptorBase> GetNestedDescriptorListForField(int fieldNumber)
+        {
+            switch (fieldNumber)
             {
-                EnumDescriptorProto.ValueFieldNumber => (IReadOnlyList<DescriptorBase>)Values,
-                _ => null,
-            };
+                case EnumDescriptorProto.ValueFieldNumber:
+                    return (IReadOnlyList<DescriptorBase>) Values;
+                default:
+                    return null;
+            }
+        }
 
         /// <summary>
         /// The CLR type for this enum. For generated code, this will be a CLR enum type.
         /// </summary>
-        public Type ClrType { get; }
+        public Type ClrType { get { return clrType; } }
 
         /// <value>
         /// If this is a nested type, get the outer descriptor, otherwise null.
         /// </value>
-        public MessageDescriptor ContainingType { get; }
+        public MessageDescriptor ContainingType
+        {
+            get { return containingType; }
+        }
 
         /// <value>
         /// An unmodifiable list of defined value descriptors for this enum.
         /// </value>
-        public IList<EnumValueDescriptor> Values { get; }
+        public IList<EnumValueDescriptor> Values
+        {
+            get { return values; }
+        }
 
         /// <summary>
         /// Finds an enum value by number. If multiple enum values have the
