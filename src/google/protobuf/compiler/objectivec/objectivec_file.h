@@ -65,7 +65,7 @@ class FileGenerator {
   struct CommonState {
     CommonState();
 
-    const std::vector<const FileDescriptor*>
+    std::vector<const FileDescriptor*>
     CollectMinimalFileDepsContainingExtensions(const FileDescriptor* file);
 
    private:
