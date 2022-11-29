@@ -534,6 +534,7 @@ public class JsonFormat {
       this.types = types;
     }
 
+
     /** A Builder is used to build {@link TypeRegistry}. */
     public static class Builder {
       private Builder() {}
