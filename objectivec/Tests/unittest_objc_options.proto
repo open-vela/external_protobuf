@@ -30,8 +30,7 @@
 
 syntax = "proto2";
 
-package objc.protobuf.tests.options;
-
+package protobuf_objc_unittest;
 option objc_class_prefix = "GPBTEST";
 
 // Verify that enum types and values get the prefix.
@@ -59,10 +58,4 @@ message GPBTESTshouldGetAPrefixMessage {
 
 // Verify that classes named the same as prefixes are prefixed.
 message GPBTEST {
-}
-
-// Tests that lookup deals with prefix.
-message PrefixedParentMessage {
-  message Child {
-  }
 }

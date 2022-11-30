@@ -32,11 +32,12 @@ syntax = "proto2";
 
 package google.protobuf.python.internal;
 
+import "google/protobuf/internal/descriptor_pool_test1.proto";
 import public "google/protobuf/internal/more_messages.proto";
 
-import "google/protobuf/internal/descriptor_pool_test1.proto";
 
 message DescriptorPoolTest3 {
+
   extend DescriptorPoolTest1 {
     optional DescriptorPoolTest3 descriptor_pool_test = 1001;
   }
@@ -69,3 +70,4 @@ message DescriptorPoolTest3 {
 
   optional NestedMessage nested_message = 2;
 }
+
