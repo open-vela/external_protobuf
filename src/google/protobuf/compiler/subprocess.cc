@@ -30,7 +30,7 @@
 
 // Author: kenton@google.com (Kenton Varda)
 
-#include "google/protobuf/compiler/subprocess.h"
+#include <google/protobuf/compiler/subprocess.h>
 
 #include <algorithm>
 #include <cstring>
@@ -43,16 +43,25 @@
 #include <sys/wait.h>
 #endif
 
-#include "google/protobuf/stubs/logging.h"
-#include "google/protobuf/stubs/common.h"
-#include "absl/strings/escaping.h"
-#include "absl/strings/substitute.h"
-#include "google/protobuf/io/io_win32.h"
-#include "google/protobuf/message.h"
+#include <google/protobuf/stubs/logging.h>
+#include <google/protobuf/stubs/common.h>
+#include <google/protobuf/stubs/substitute.h>
+#include <google/protobuf/message.h>
+#include <google/protobuf/io/io_win32.h>
 
 namespace google {
 namespace protobuf {
 namespace compiler {
+
+namespace {
+char* portable_strdup(const char* s) {
+  char* ns = (char*)malloc(strlen(s) + 1);
+  if (ns != nullptr) {
+    strcpy(ns, s);
+  }
+  return ns;
+}
+}  // namespace
 
 #ifdef _WIN32
 
@@ -264,12 +273,12 @@ bool Subprocess::Communicate(const Message& input, Message* output,
   child_handle_ = nullptr;
 
   if (exit_code != 0) {
-    *error = absl::Substitute("Plugin failed with status code $0.", exit_code);
+    *error = strings::Substitute("Plugin failed with status code $0.", exit_code);
     return false;
   }
 
   if (!output->ParseFromString(output_data)) {
-    *error = "Plugin output is unparseable: " + absl::CEscape(output_data);
+    *error = "Plugin output is unparseable: " + CEscape(output_data);
     return false;
   }
 
@@ -307,16 +316,6 @@ Subprocess::~Subprocess() {
     close(child_stdout_);
   }
 }
-
-namespace {
-char* portable_strdup(const char* s) {
-  char* ns = (char*)malloc(strlen(s) + 1);
-  if (ns != nullptr) {
-    strcpy(ns, s);
-  }
-  return ns;
-}
-}  // namespace
 
 void Subprocess::Start(const std::string& program, SearchMode search_mode) {
   // Note that we assume that there are no other threads, thus we don't have to
@@ -472,12 +471,12 @@ bool Subprocess::Communicate(const Message& input, Message* output,
     if (WEXITSTATUS(status) != 0) {
       int error_code = WEXITSTATUS(status);
       *error =
-          absl::Substitute("Plugin failed with status code $0.", error_code);
+          strings::Substitute("Plugin failed with status code $0.", error_code);
       return false;
     }
   } else if (WIFSIGNALED(status)) {
     int signal = WTERMSIG(status);
-    *error = absl::Substitute("Plugin killed by signal $0.", signal);
+    *error = strings::Substitute("Plugin killed by signal $0.", signal);
     return false;
   } else {
     *error = "Neither WEXITSTATUS nor WTERMSIG is true?";
@@ -485,7 +484,7 @@ bool Subprocess::Communicate(const Message& input, Message* output,
   }
 
   if (!output->ParseFromString(output_data)) {
-    *error = "Plugin output is unparseable: " + absl::CEscape(output_data);
+    *error = "Plugin output is unparseable: " + CEscape(output_data);
     return false;
   }
 

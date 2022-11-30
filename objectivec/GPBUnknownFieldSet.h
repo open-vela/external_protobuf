@@ -37,9 +37,10 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * A collection of unknown fields. Fields parsed from the binary representation
  * of a message that are unknown end up in an instance of this set. This only
- * applies for files declared with the "proto2" syntax.
+ * applies for files declared with the "proto2" syntax. Files declared with the
+ * "proto3" syntax discard the unknown values.
  **/
-@interface GPBUnknownFieldSet : NSObject <NSCopying>
+@interface GPBUnknownFieldSet : NSObject<NSCopying>
 
 /**
  * Tests to see if the given field number has a value.
