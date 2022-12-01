@@ -32,13 +32,16 @@
 //  Based on original Protocol Buffers design by
 //  Sanjay Ghemawat, Jeff Dean, and others.
 
-#include <google/protobuf/compiler/cpp/enum_field.h>
+#include "google/protobuf/compiler/cpp/enum_field.h"
 
-#include <google/protobuf/io/printer.h>
-#include <google/protobuf/wire_format.h>
-#include <google/protobuf/stubs/strutil.h>
-#include <google/protobuf/compiler/cpp/field.h>
-#include <google/protobuf/compiler/cpp/helpers.h>
+#include <string>
+#include <tuple>
+
+#include "absl/container/flat_hash_map.h"
+#include "google/protobuf/compiler/cpp/field.h"
+#include "google/protobuf/compiler/cpp/helpers.h"
+#include "google/protobuf/descriptor.pb.h"
+#include "google/protobuf/wire_format.h"
 
 namespace google {
 namespace protobuf {
@@ -47,9 +50,10 @@ namespace cpp {
 
 namespace {
 
-void SetEnumVariables(const FieldDescriptor* descriptor,
-                      std::map<std::string, std::string>* variables,
-                      const Options& options) {
+void SetEnumVariables(
+    const FieldDescriptor* descriptor,
+    absl::flat_hash_map<absl::string_view, std::string>* variables,
+    const Options& options) {
   SetCommonFieldVariables(descriptor, variables, options);
   const EnumValueDescriptor* default_value = descriptor->default_value_enum();
   (*variables)["type"] = QualifiedClassName(descriptor->enum_type(), options);
@@ -81,9 +85,10 @@ void EnumFieldGenerator::GeneratePrivateMembers(io::Printer* printer) const {
 void EnumFieldGenerator::GenerateAccessorDeclarations(
     io::Printer* printer) const {
   Formatter format(printer, variables_);
+  format("$deprecated_attr$$type$ ${1$$name$$}$() const;\n", descriptor_);
+  format("$deprecated_attr$void ${1$set_$name$$}$($type$ value);\n",
+         std::make_tuple(descriptor_, GeneratedCodeInfo::Annotation::SET));
   format(
-      "$deprecated_attr$$type$ ${1$$name$$}$() const;\n"
-      "$deprecated_attr$void ${1$set_$name$$}$($type$ value);\n"
       "private:\n"
       "$type$ ${1$_internal_$name$$}$() const;\n"
       "void ${1$_internal_set_$name$$}$($type$ value);\n"
@@ -104,7 +109,7 @@ void EnumFieldGenerator::GenerateInlineAccessorDefinitions(
       "  return _internal_$name$();\n"
       "}\n"
       "inline void $classname$::_internal_set_$name$($type$ value) {\n");
-  if (!HasPreservingUnknownEnumSemantics(descriptor_)) {
+  if (!internal::cpp::HasPreservingUnknownEnumSemantics(descriptor_)) {
     format("  assert($type$_IsValid(value));\n");
   }
   format(
@@ -193,7 +198,7 @@ void EnumOneofFieldGenerator::GenerateInlineAccessorDefinitions(
   Formatter format(printer, variables_);
   format(
       "inline $type$ $classname$::_internal_$name$() const {\n"
-      "  if (_internal_has_$name$()) {\n"
+      "  if ($has_field$) {\n"
       "    return static_cast< $type$ >($field$);\n"
       "  }\n"
       "  return static_cast< $type$ >($default$);\n"
@@ -204,11 +209,11 @@ void EnumOneofFieldGenerator::GenerateInlineAccessorDefinitions(
       "  return _internal_$name$();\n"
       "}\n"
       "inline void $classname$::_internal_set_$name$($type$ value) {\n");
-  if (!HasPreservingUnknownEnumSemantics(descriptor_)) {
+  if (!internal::cpp::HasPreservingUnknownEnumSemantics(descriptor_)) {
     format("  assert($type$_IsValid(value));\n");
   }
   format(
-      "  if (!_internal_has_$name$()) {\n"
+      "  if ($not_has_field$) {\n"
       "    clear_$oneof_name$();\n"
       "    set_has_$name$();\n"
       "  }\n"
@@ -252,7 +257,9 @@ void RepeatedEnumFieldGenerator::GeneratePrivateMembers(
   format("::$proto_ns$::RepeatedField<int> $name$_;\n");
   if (descriptor_->is_packed() &&
       HasGeneratedMethods(descriptor_->file(), options_)) {
-    format("mutable std::atomic<int> $cached_byte_size_name$;\n");
+    format(
+        "mutable ::$proto_ns$::internal::CachedSize "
+        "$cached_byte_size_name$;\n");
   }
 }
 
@@ -289,7 +296,7 @@ void RepeatedEnumFieldGenerator::GenerateInlineAccessorDefinitions(
       "  return _internal_$name$(index);\n"
       "}\n"
       "inline void $classname$::set_$name$(int index, $type$ value) {\n");
-  if (!HasPreservingUnknownEnumSemantics(descriptor_)) {
+  if (!internal::cpp::HasPreservingUnknownEnumSemantics(descriptor_)) {
     format("  assert($type$_IsValid(value));\n");
   }
   format(
@@ -298,7 +305,7 @@ void RepeatedEnumFieldGenerator::GenerateInlineAccessorDefinitions(
       "  // @@protoc_insertion_point(field_set:$full_name$)\n"
       "}\n"
       "inline void $classname$::_internal_add_$name$($type$ value) {\n");
-  if (!HasPreservingUnknownEnumSemantics(descriptor_)) {
+  if (!internal::cpp::HasPreservingUnknownEnumSemantics(descriptor_)) {
     format("  assert($type$_IsValid(value));\n");
   }
   format(
@@ -364,7 +371,7 @@ void RepeatedEnumFieldGenerator::GenerateSerializeWithCachedSizesToArray(
     format(
         "{\n"
         "  int byte_size = "
-        "$cached_byte_size_field$.load(std::memory_order_relaxed);\n"
+        "$cached_byte_size_field$.Get();\n"
         "  if (byte_size > 0) {\n"
         "    target = stream->WriteEnumPacked(\n"
         "        $number$, $field$, byte_size, target);\n"
@@ -384,7 +391,7 @@ void RepeatedEnumFieldGenerator::GenerateByteSize(io::Printer* printer) const {
   Formatter format(printer, variables_);
   format(
       "{\n"
-      "  size_t data_size = 0;\n"
+      "  ::size_t data_size = 0;\n"
       "  unsigned int count = static_cast<unsigned "
       "int>(this->_internal_$name$_size());");
   format.Indent();
@@ -402,8 +409,7 @@ void RepeatedEnumFieldGenerator::GenerateByteSize(io::Printer* printer) const {
         "::_pbi::WireFormatLite::Int32Size(static_cast<$int32$>(data_size));\n"
         "}\n"
         "int cached_size = ::_pbi::ToCachedSize(data_size);\n"
-        "$cached_byte_size_field$.store(cached_size,\n"
-        "                                std::memory_order_relaxed);\n"
+        "$cached_byte_size_field$.Set(cached_size);\n"
         "total_size += data_size;\n");
   } else {
     format("total_size += ($tag_size$UL * count) + data_size;\n");
