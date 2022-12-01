@@ -109,7 +109,8 @@ def MessageToJson(
         names as defined in the .proto file. If False, convert the field
         names to lowerCamelCase.
     indent: The JSON object will be pretty-printed with this indent level.
-        An indent level of 0 or negative will only insert newlines.
+        An indent level of 0 or negative will only insert newlines. If the
+        indent level is None, no newlines will be inserted.
     sort_keys: If True, then the output will be sorted by field names.
     use_integers_for_enums: If true, print integers instead of enum names.
     descriptor_pool: A Descriptor Pool for resolving types. If None use the
@@ -286,10 +287,11 @@ class _Printer(object):
       if enum_value is not None:
         return enum_value.name
       else:
-        if field.file.syntax == 'proto3':
+        if field.enum_type.is_closed:
+          raise SerializeToJsonError('Enum field contains an integer value '
+                                     'which can not mapped to an enum value.')
+        else:
           return value
-        raise SerializeToJsonError('Enum field contains an integer value '
-                                   'which can not mapped to an enum value.')
     elif field.cpp_type == descriptor.FieldDescriptor.CPPTYPE_STRING:
       if field.type == descriptor.FieldDescriptor.TYPE_BYTES:
         # Use base64 Data encoding for bytes
@@ -798,11 +800,11 @@ def _ConvertScalarFieldValue(value, field, path, require_str=False):
           raise ParseError('Invalid enum value {0} for enum type {1}'.format(
               value, field.enum_type.full_name))
         if enum_value is None:
-          if field.file.syntax == 'proto3':
-            # Proto3 accepts unknown enums.
+          if field.enum_type.is_closed:
+            raise ParseError('Invalid enum value {0} for enum type {1}'.format(
+                value, field.enum_type.full_name))
+          else:
             return number
-          raise ParseError('Invalid enum value {0} for enum type {1}'.format(
-              value, field.enum_type.full_name))
       return enum_value.number
   except ParseError as e:
     raise ParseError('{0} at {1}'.format(e, path))
