@@ -38,7 +38,7 @@
 // will not cross the end of the buffer, since we can avoid a lot
 // of branching in this case.
 
-#include <google/protobuf/io/coded_stream.h>
+#include "google/protobuf/io/coded_stream.h"
 
 #include <limits.h>
 
@@ -46,16 +46,18 @@
 #include <cstring>
 #include <utility>
 
-#include <google/protobuf/stubs/logging.h>
-#include <google/protobuf/stubs/common.h>
-#include <google/protobuf/arena.h>
-#include <google/protobuf/io/zero_copy_stream.h>
-#include <google/protobuf/io/zero_copy_stream_impl_lite.h>
-#include <google/protobuf/stubs/stl_util.h>
+#include "google/protobuf/stubs/logging.h"
+#include "google/protobuf/stubs/common.h"
+#include "absl/strings/internal/resize_uninitialized.h"
+#include "absl/strings/string_view.h"
+#include "google/protobuf/arena.h"
+#include "google/protobuf/io/zero_copy_stream.h"
+#include "google/protobuf/io/zero_copy_stream_impl_lite.h"
+#include "google/protobuf/port.h"
 
 
 // Must be included last.
-#include <google/protobuf/port_def.inc>
+#include "google/protobuf/port_def.inc"
 
 namespace google {
 namespace protobuf {
@@ -260,7 +262,7 @@ bool CodedInputStream::ReadString(std::string* buffer, int size) {
   if (size < 0) return false;  // security: size is often user-supplied
 
   if (BufferSize() >= size) {
-    STLStringResizeUninitialized(buffer, size);
+    absl::strings_internal::STLStringResizeUninitialized(buffer, size);
     std::pair<char*, bool> z = as_string_data(buffer);
     if (z.second) {
       // Oddly enough, memcpy() requires its first two args to be non-NULL even
@@ -940,28 +942,8 @@ uint8_t* CodedOutputStream::WriteStringWithSizeToArray(const std::string& str,
   return WriteStringToArray(str, target);
 }
 
-uint8_t* CodedOutputStream::WriteVarint32ToArrayOutOfLineHelper(uint32_t value,
-                                                              uint8_t* target) {
-  GOOGLE_DCHECK_GE(value, 0x80);
-  target[0] |= static_cast<uint8_t>(0x80);
-  value >>= 7;
-  target[1] = static_cast<uint8_t>(value);
-  if (value < 0x80) {
-    return target + 2;
-  }
-  target += 2;
-  do {
-    // Turn on continuation bit in the byte we just wrote.
-    target[-1] |= static_cast<uint8_t>(0x80);
-    value >>= 7;
-    *target = static_cast<uint8_t>(value);
-    ++target;
-  } while (value >= 0x80);
-  return target;
-}
-
 }  // namespace io
 }  // namespace protobuf
 }  // namespace google
 
-#include <google/protobuf/port_undef.inc>
+#include "google/protobuf/port_undef.inc"

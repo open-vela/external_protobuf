@@ -32,12 +32,17 @@
 //  Based on original Protocol Buffers design by
 //  Sanjay Ghemawat, Jeff Dean, and others.
 
-#include <google/protobuf/compiler/cpp/primitive_field.h>
+#include "google/protobuf/compiler/cpp/primitive_field.h"
 
-#include <google/protobuf/io/printer.h>
-#include <google/protobuf/wire_format.h>
-#include <google/protobuf/stubs/strutil.h>
-#include <google/protobuf/compiler/cpp/helpers.h>
+#include <string>
+#include <tuple>
+
+#include "google/protobuf/io/printer.h"
+#include "absl/container/flat_hash_map.h"
+#include "absl/strings/str_cat.h"
+#include "google/protobuf/compiler/cpp/helpers.h"
+#include "google/protobuf/descriptor.pb.h"
+#include "google/protobuf/wire_format.h"
 
 namespace google {
 namespace protobuf {
@@ -98,9 +103,10 @@ int FixedSize(FieldDescriptor::Type type) {
   return -1;
 }
 
-void SetPrimitiveVariables(const FieldDescriptor* descriptor,
-                           std::map<std::string, std::string>* variables,
-                           const Options& options) {
+void SetPrimitiveVariables(
+    const FieldDescriptor* descriptor,
+    absl::flat_hash_map<absl::string_view, std::string>* variables,
+    const Options& options) {
   SetCommonFieldVariables(descriptor, variables, options);
   (*variables)["type"] = PrimitiveTypeName(options, descriptor->cpp_type());
   (*variables)["default"] = DefaultValue(options, descriptor);
@@ -108,10 +114,10 @@ void SetPrimitiveVariables(const FieldDescriptor* descriptor,
   bool cold = ShouldSplit(descriptor, options);
   (*variables)["cached_byte_size_field"] =
       MakeVarintCachedSizeFieldName(descriptor, cold);
-  (*variables)["tag"] = StrCat(internal::WireFormat::MakeTag(descriptor));
+  (*variables)["tag"] = absl::StrCat(internal::WireFormat::MakeTag(descriptor));
   int fixed_size = FixedSize(descriptor->type());
   if (fixed_size != -1) {
-    (*variables)["fixed_size"] = StrCat(fixed_size);
+    (*variables)["fixed_size"] = absl::StrCat(fixed_size);
   }
   (*variables)["wire_format_field_type"] = FieldDescriptorProto_Type_Name(
       static_cast<FieldDescriptorProto_Type>(descriptor->type()));
@@ -139,9 +145,10 @@ void PrimitiveFieldGenerator::GeneratePrivateMembers(
 void PrimitiveFieldGenerator::GenerateAccessorDeclarations(
     io::Printer* printer) const {
   Formatter format(printer, variables_);
+  format("$deprecated_attr$$type$ ${1$$name$$}$() const;\n", descriptor_);
+  format("$deprecated_attr$void ${1$set_$name$$}$($type$ value);\n",
+         std::make_tuple(descriptor_, GeneratedCodeInfo::Annotation::SET));
   format(
-      "$deprecated_attr$$type$ ${1$$name$$}$() const;\n"
-      "$deprecated_attr$void ${1$set_$name$$}$($type$ value);\n"
       "private:\n"
       "$type$ ${1$_internal_$name$$}$() const;\n"
       "void ${1$_internal_set_$name$$}$($type$ value);\n"
@@ -263,13 +270,13 @@ void PrimitiveOneofFieldGenerator::GenerateInlineAccessorDefinitions(
   Formatter format(printer, variables_);
   format(
       "inline $type$ $classname$::_internal_$name$() const {\n"
-      "  if (_internal_has_$name$()) {\n"
+      "  if ($has_field$) {\n"
       "    return $field$;\n"
       "  }\n"
       "  return $default$;\n"
       "}\n"
       "inline void $classname$::_internal_set_$name$($type$ value) {\n"
-      "  if (!_internal_has_$name$()) {\n"
+      "  if ($not_has_field$) {\n"
       "    clear_$oneof_name$();\n"
       "    set_has_$name$();\n"
       "  }\n"
@@ -328,7 +335,9 @@ void RepeatedPrimitiveFieldGenerator::GeneratePrivateMembers(
   format("::$proto_ns$::RepeatedField< $type$ > $name$_;\n");
   if (descriptor_->is_packed() && FixedSize(descriptor_->type()) == -1 &&
       HasGeneratedMethods(descriptor_->file(), options_)) {
-    format("mutable std::atomic<int> $cached_byte_size_name$;\n");
+    format(
+        "mutable ::$proto_ns$::internal::CachedSize "
+        "$cached_byte_size_name$;\n");
   }
 }
 
@@ -433,7 +442,7 @@ void RepeatedPrimitiveFieldGenerator::GenerateSerializeWithCachedSizesToArray(
       format(
           "{\n"
           "  int byte_size = "
-          "$cached_byte_size_field$.load(std::memory_order_relaxed);\n"
+          "$cached_byte_size_field$.Get();\n"
           "  if (byte_size > 0) {\n"
           "    target = stream->Write$declared_type$Packed(\n"
           "        $number$, _internal_$name$(), byte_size, target);\n"
@@ -465,13 +474,13 @@ void RepeatedPrimitiveFieldGenerator::GenerateByteSize(
   int fixed_size = FixedSize(descriptor_->type());
   if (fixed_size == -1) {
     format(
-        "size_t data_size = ::_pbi::WireFormatLite::\n"
+        "::size_t data_size = ::_pbi::WireFormatLite::\n"
         "  $declared_type$Size(this->$field$);\n");
   } else {
     format(
         "unsigned int count = static_cast<unsigned "
         "int>(this->_internal_$name$_size());\n"
-        "size_t data_size = $fixed_size$UL * count;\n");
+        "::size_t data_size = $fixed_size$UL * count;\n");
   }
 
   if (descriptor_->is_packed()) {
@@ -484,8 +493,7 @@ void RepeatedPrimitiveFieldGenerator::GenerateByteSize(
     if (FixedSize(descriptor_->type()) == -1) {
       format(
           "int cached_size = ::_pbi::ToCachedSize(data_size);\n"
-          "$cached_byte_size_field$.store(cached_size,\n"
-          "                                std::memory_order_relaxed);\n");
+          "$cached_byte_size_field$.Set(cached_size);\n");
     }
     format("total_size += data_size;\n");
   } else {
