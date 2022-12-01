@@ -46,7 +46,6 @@
 //   "parametized tests" so that one set of tests can be used on all the
 //   implementations.
 
-#include <algorithm>
 #include <chrono>
 #include <thread>
 
@@ -62,27 +61,22 @@
 
 #include <memory>
 #include <sstream>
-#include <utility>
-#include <vector>
 
-#include "google/protobuf/testing/file.h"
-#include "google/protobuf/io/coded_stream.h"
-#include "google/protobuf/io/io_win32.h"
-#include "google/protobuf/io/zero_copy_stream_impl.h"
-#include "google/protobuf/test_util2.h"
+#include <google/protobuf/testing/file.h>
+#include <google/protobuf/test_util2.h>
+#include <google/protobuf/io/coded_stream.h>
+#include <google/protobuf/io/io_win32.h>
+#include <google/protobuf/io/zero_copy_stream_impl.h>
 
 #if HAVE_ZLIB
-#include "google/protobuf/io/gzip_stream.h"
+#include <google/protobuf/io/gzip_stream.h>
 #endif
 
-#include "google/protobuf/stubs/common.h"
-#include "google/protobuf/stubs/logging.h"
-#include "google/protobuf/testing/file.h"
-#include "google/protobuf/testing/googletest.h"
+#include <google/protobuf/stubs/common.h>
+#include <google/protobuf/stubs/logging.h>
+#include <google/protobuf/testing/file.h>
+#include <google/protobuf/testing/googletest.h>
 #include <gtest/gtest.h>
-
-// Must be included last.
-#include "google/protobuf/port_def.inc"
 
 namespace google {
 namespace protobuf {
@@ -145,7 +139,7 @@ class IoTest : public testing::Test {
 };
 
 const int IoTest::kBlockSizes[] = {-1, 1, 2, 5, 7, 10, 23, 64};
-const int IoTest::kBlockSizeCount = ABSL_ARRAYSIZE(IoTest::kBlockSizes);
+const int IoTest::kBlockSizeCount = GOOGLE_ARRAYSIZE(IoTest::kBlockSizes);
 
 bool IoTest::WriteToOutput(ZeroCopyOutputStream* output, const void* data,
                            int size) {
@@ -576,7 +570,7 @@ TEST_F(IoTest, CompressionOptions) {
   // Some ad-hoc testing of compression options.
 
   std::string golden_filename =
-      TestUtil::GetTestDataPath("third_party/protobuf/testdata/golden_message");
+      TestUtil::GetTestDataPath("net/proto2/internal/testdata/golden_message");
   std::string golden;
   GOOGLE_CHECK_OK(File::GetContents(golden_filename, &golden, true));
 
@@ -725,9 +719,6 @@ TEST_F(IoTest, StringIo) {
 
 // Verifies that outputs up to kint32max can be created.
 TEST_F(IoTest, LargeOutput) {
-  // Filter out this test on 32-bit architectures and tsan builds.
-  if(sizeof(void*) < 8) return;
-#ifndef THREAD_SANITIZER
   std::string str;
   StringOutputStream output(&str);
   void* unused_data;
@@ -739,90 +730,6 @@ TEST_F(IoTest, LargeOutput) {
   // Further increases should be possible.
   output.Next(&unused_data, &size);
   EXPECT_GT(size, 0);
-#endif  // THREAD_SANITIZER
-}
-
-TEST(DefaultReadCordTest, ReadSmallCord) {
-  std::string source = "abcdefghijk";
-  ArrayInputStream input(source.data(), source.size());
-
-  absl::Cord dest;
-  EXPECT_TRUE(input.Skip(1));
-  EXPECT_TRUE(input.ReadCord(&dest, source.size() - 2));
-
-  EXPECT_EQ(dest, "bcdefghij");
-}
-
-TEST(DefaultReadCordTest, ReadSmallCordAfterBackUp) {
-  std::string source = "abcdefghijk";
-  ArrayInputStream input(source.data(), source.size());
-
-  absl::Cord dest;
-  const void* buffer;
-  int size;
-  EXPECT_TRUE(input.Next(&buffer, &size));
-  input.BackUp(size - 1);
-
-  EXPECT_TRUE(input.ReadCord(&dest, source.size() - 2));
-
-  EXPECT_EQ(dest, "bcdefghij");
-}
-
-TEST(DefaultReadCordTest, ReadLargeCord) {
-  std::string source = "abcdefghijk";
-  for (int i = 0; i < 1024; i++) {
-    source.append("abcdefghijk");
-  }
-
-  absl::Cord dest;
-  ArrayInputStream input(source.data(), source.size());
-  EXPECT_TRUE(input.Skip(1));
-  EXPECT_TRUE(input.ReadCord(&dest, source.size() - 2));
-
-  absl::Cord expected(source);
-  expected.RemovePrefix(1);
-  expected.RemoveSuffix(1);
-
-  EXPECT_EQ(expected, dest);
-}
-
-TEST(DefaultReadCordTest, ReadLargeCordAfterBackup) {
-  std::string source = "abcdefghijk";
-  for (int i = 0; i < 1024; i++) {
-    source.append("abcdefghijk");
-  }
-
-  absl::Cord dest;
-  ArrayInputStream input(source.data(), source.size());
-
-  const void* buffer;
-  int size;
-  EXPECT_TRUE(input.Next(&buffer, &size));
-  input.BackUp(size - 1);
-
-  EXPECT_TRUE(input.ReadCord(&dest, source.size() - 2));
-
-  absl::Cord expected(source);
-  expected.RemovePrefix(1);
-  expected.RemoveSuffix(1);
-
-  EXPECT_EQ(expected, dest);
-
-  EXPECT_TRUE(input.Next(&buffer, &size));
-  EXPECT_EQ("k", std::string(reinterpret_cast<const char*>(buffer), size));
-}
-
-TEST(DefaultReadCordTest, ReadCordEof) {
-  std::string source = "abcdefghijk";
-
-  absl::Cord dest;
-  ArrayInputStream input(source.data(), source.size());
-  input.Skip(1);
-  EXPECT_FALSE(input.ReadCord(&dest, source.size()));
-
-  absl::Cord expected(source);
-  expected.RemovePrefix(1);
-  EXPECT_EQ(expected, dest);
 }
 
 
@@ -1117,7 +1024,7 @@ TEST_F(IoTest, ConcatenatingInputStream) {
                                     &input5, &input6, &input7};
 
   // Create the concatenating stream and read.
-  ConcatenatingInputStream input(streams, ABSL_ARRAYSIZE(streams));
+  ConcatenatingInputStream input(streams, GOOGLE_ARRAYSIZE(streams));
   ReadStuff(&input);
 }
 
@@ -1145,7 +1052,7 @@ TEST_F(IoTest, LimitingInputStream) {
 TEST_F(IoTest, LimitingInputStreamByteCount) {
   const int kHalfBufferSize = 128;
   const int kBufferSize = kHalfBufferSize * 2;
-  uint8 buffer[kBufferSize] = {};
+  uint8 buffer[kBufferSize];
 
   // Set up input. Only allow half to be read at once.
   ArrayInputStream array_input(buffer, kBufferSize, kHalfBufferSize);

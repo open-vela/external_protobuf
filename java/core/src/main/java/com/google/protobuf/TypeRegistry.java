@@ -55,6 +55,7 @@ public class TypeRegistry {
     return EmptyTypeRegistryHolder.EMPTY;
   }
 
+
   public static Builder newBuilder() {
     return new Builder();
   }
