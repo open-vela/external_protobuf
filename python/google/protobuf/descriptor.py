@@ -66,7 +66,6 @@ if _USE_C_DESCRIPTORS:
   # and make it return True when the descriptor is an instance of the extension
   # type written in C++.
   class DescriptorMetaclass(type):
-
     def __instancecheck__(cls, obj):
       if super(DescriptorMetaclass, cls).__instancecheck__(obj):
         return True
@@ -634,29 +633,13 @@ class FieldDescriptor(DescriptorBase):
     if (self.cpp_type == FieldDescriptor.CPPTYPE_MESSAGE or
         self.containing_oneof):
       return True
-    # self.containing_type is used here instead of self.file for legacy
-    # compatibility. FieldDescriptor.file was added in cl/153110619
-    # Some old/generated code didn't link file to FieldDescriptor.
-    # TODO(jieluo): remove syntax usage b/240619313
-    return self.containing_type.syntax == 'proto2'
-
-  @property
-  def is_packed(self):
-    """Returns if the field is packed."""
-    if self.label != FieldDescriptor.LABEL_REPEATED:
-      return False
-    field_type = self.type
-    if (field_type == FieldDescriptor.TYPE_STRING or
-        field_type == FieldDescriptor.TYPE_GROUP or
-        field_type == FieldDescriptor.TYPE_MESSAGE or
-        field_type == FieldDescriptor.TYPE_BYTES):
-      return False
-    if self.containing_type.syntax == 'proto2':
-      return self.has_options and self.GetOptions().packed
-    else:
-      return (not self.has_options or
-              not self.GetOptions().HasField('packed') or
-              self.GetOptions().packed)
+    if hasattr(self.file, 'syntax'):
+      return self.file.syntax == 'proto2'
+    if hasattr(self.message_type, 'syntax'):
+      return self.message_type.syntax == 'proto2'
+    raise RuntimeError(
+        'has_presence is not ready to use because field %s is not'
+        ' linked with message type nor file' % self.full_name)
 
   @staticmethod
   def ProtoTypeToCppProtoType(proto_type):
@@ -736,18 +719,6 @@ class EnumDescriptor(_NestedDescriptorBase):
     self.values_by_name = dict((v.name, v) for v in values)
     # Values are reversed to ensure that the first alias is retained.
     self.values_by_number = dict((v.number, v) for v in reversed(values))
-
-  @property
-  def is_closed(self):
-    """If the enum is closed.
-
-    closed enum means:
-      - Has a fixed set of named values.
-      - Encountering values not in this set causes them to be treated as
-        unknown fields.
-      - The first value (i.e., the default) may be nonzero.
-    """
-    return self.file.syntax == 'proto2'
 
   def CopyToProto(self, proto):
     """Copies this to a descriptor_pb2.EnumDescriptorProto.
@@ -902,14 +873,11 @@ class ServiceDescriptor(_NestedDescriptorBase):
 
     Args:
       name (str): Name of the method.
-
     Returns:
-      MethodDescriptor: The descriptor for the requested method.
-
-    Raises:
-      KeyError: if the method cannot be found in the service.
+      MethodDescriptor or None: the descriptor for the requested method, if
+      found.
     """
-    return self.methods_by_name[name]
+    return self.methods_by_name.get(name, None)
 
   def CopyToProto(self, proto):
     """Copies this to a descriptor_pb2.ServiceDescriptorProto.
@@ -1050,7 +1018,13 @@ class FileDescriptor(DescriptorBase):
       # FileDescriptor() is called from various places, not only from generated
       # files, to register dynamic proto files and messages.
       # pylint: disable=g-explicit-bool-comparison
-      if serialized_pb:
+      if serialized_pb == b'':
+        # Cpp generated code must be linked in if serialized_pb is ''
+        try:
+          return _message.default_pool.FindFileByName(name)
+        except KeyError:
+          raise RuntimeError('Please link in cpp generated lib for %s' % (name))
+      elif serialized_pb:
         return _message.default_pool.AddSerializedFile(serialized_pb)
       else:
         return super(FileDescriptor, cls).__new__(cls)

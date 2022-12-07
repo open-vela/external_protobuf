@@ -32,14 +32,13 @@
 //  Based on original Protocol Buffers design by
 //  Sanjay Ghemawat, Jeff Dean, and others.
 
-#include "google/protobuf/compiler/cpp/message_field.h"
+#include <google/protobuf/compiler/cpp/message_field.h>
 
-#include "absl/container/flat_hash_map.h"
-#include "google/protobuf/stubs/logging.h"
-#include "absl/strings/str_cat.h"
-#include "google/protobuf/compiler/cpp/field.h"
-#include "google/protobuf/compiler/cpp/helpers.h"
-#include "google/protobuf/io/printer.h"
+#include <google/protobuf/io/printer.h>
+#include <google/protobuf/compiler/cpp/field.h>
+#include <google/protobuf/compiler/cpp/helpers.h>
+
+#include <google/protobuf/stubs/strutil.h>
 
 namespace google {
 namespace protobuf {
@@ -57,34 +56,28 @@ std::string ReinterpretCast(const std::string& type,
   }
 }
 
-void SetMessageVariables(
-    const FieldDescriptor* descriptor, const Options& options,
-    bool implicit_weak,
-    absl::flat_hash_map<absl::string_view, std::string>* variables) {
+void SetMessageVariables(const FieldDescriptor* descriptor,
+                         const Options& options, bool implicit_weak,
+                         std::map<std::string, std::string>* variables) {
   SetCommonFieldVariables(descriptor, variables, options);
   (*variables)["type"] = FieldMessageTypeName(descriptor, options);
-  variables->insert(
-      {"casted_member", ReinterpretCast(absl::StrCat((*variables)["type"], "*"),
-                                        (*variables)["field"], implicit_weak)});
-  variables->insert(
-      {"casted_member_const",
-       ReinterpretCast(absl::StrCat("const ", (*variables)["type"], "&"),
-                       absl::StrCat("*", (*variables)["field"]),
-                       implicit_weak)});
+  (*variables)["casted_member"] = ReinterpretCast(
+      (*variables)["type"] + "*", (*variables)["field"], implicit_weak);
+  (*variables)["casted_member_const"] =
+      ReinterpretCast("const " + (*variables)["type"] + "&",
+                      "*" + (*variables)["field"], implicit_weak);
   (*variables)["type_default_instance"] =
       QualifiedDefaultInstanceName(descriptor->message_type(), options);
   (*variables)["type_default_instance_ptr"] = ReinterpretCast(
       "const ::PROTOBUF_NAMESPACE_ID::MessageLite*",
       QualifiedDefaultInstancePtr(descriptor->message_type(), options),
       implicit_weak);
-  variables->insert(
-      {"type_reference_function",
-       implicit_weak
-           ? absl::StrCat("  ::", ProtobufNamespace(options),
-                          "::internal::StrongReference(reinterpret_cast<const ",
-                          (*variables)["type"], "&>(\n",
-                          (*variables)["type_default_instance"], "));\n")
-           : ""});
+  (*variables)["type_reference_function"] =
+      implicit_weak ? ("  ::" + (*variables)["proto_ns"] +
+                       "::internal::StrongReference(reinterpret_cast<const " +
+                       (*variables)["type"] + "&>(\n" +
+                       (*variables)["type_default_instance"] + "));\n")
+                    : "";
   // NOTE: Escaped here to unblock proto1->proto2 migration.
   // TODO(liujisi): Extend this to apply for other conflicting methods.
   (*variables)["release_name"] =
@@ -198,19 +191,12 @@ void MessageFieldGenerator::GenerateInlineAccessorDefinitions(
   } else {
     format("  $field$ = $name$;\n");
   }
-  auto nonempty = [this](const char* fn) {
-    auto var_it = variables_.find(fn);
-    return var_it != variables_.end() && !var_it->second.empty();
-  };
-  if (nonempty("set_hasbit") || nonempty("clear_hasbit")) {
-    format(
-        "  if ($name$) {\n"
-        "    $set_hasbit$\n"
-        "  } else {\n"
-        "    $clear_hasbit$\n"
-        "  }\n");
-  }
   format(
+      "  if ($name$) {\n"
+      "    $set_hasbit$\n"
+      "  } else {\n"
+      "    $clear_hasbit$\n"
+      "  }\n"
       "$annotate_set$"
       "  // @@protoc_insertion_point(field_unsafe_arena_set_allocated"
       ":$full_name$)\n"
@@ -357,14 +343,14 @@ void MessageFieldGenerator::GenerateInternalAccessorDefinitions(
     format(
         "::$proto_ns$::MessageLite*\n"
         "$classname$::_Internal::mutable_$name$($classname$* msg) {\n");
-    if (internal::cpp::HasHasbit(descriptor_)) {
+    if (HasHasbit(descriptor_)) {
       format("  msg->$set_hasbit$\n");
     }
     if (descriptor_->real_containing_oneof() == nullptr) {
       format("  if (msg->$field$ == nullptr) {\n");
     } else {
       format(
-          "  if (msg->$not_has_field$) {\n"
+          "  if (!msg->_internal_has_$name$()) {\n"
           "    msg->clear_$oneof_name$();\n"
           "    msg->set_has_$name$();\n");
     }
@@ -387,10 +373,10 @@ void MessageFieldGenerator::GenerateInternalAccessorDefinitions(
 }
 
 void MessageFieldGenerator::GenerateClearingCode(io::Printer* printer) const {
-  GOOGLE_ABSL_CHECK(!IsFieldStripped(descriptor_, options_));
+  GOOGLE_CHECK(!IsFieldStripped(descriptor_, options_));
 
   Formatter format(printer, variables_);
-  if (!internal::cpp::HasHasbit(descriptor_)) {
+  if (!HasHasbit(descriptor_)) {
     // If we don't have has-bits, message presence is indicated only by ptr !=
     // nullptr. Thus on clear, we need to delete the object.
     format(
@@ -405,10 +391,10 @@ void MessageFieldGenerator::GenerateClearingCode(io::Printer* printer) const {
 
 void MessageFieldGenerator::GenerateMessageClearingCode(
     io::Printer* printer) const {
-  GOOGLE_ABSL_CHECK(!IsFieldStripped(descriptor_, options_));
+  GOOGLE_CHECK(!IsFieldStripped(descriptor_, options_));
 
   Formatter format(printer, variables_);
-  if (!internal::cpp::HasHasbit(descriptor_)) {
+  if (!HasHasbit(descriptor_)) {
     // If we don't have has-bits, message presence is indicated only by ptr !=
     // nullptr. Thus on clear, we need to delete the object.
     format(
@@ -424,7 +410,7 @@ void MessageFieldGenerator::GenerateMessageClearingCode(
 }
 
 void MessageFieldGenerator::GenerateMergingCode(io::Printer* printer) const {
-  GOOGLE_ABSL_CHECK(!IsFieldStripped(descriptor_, options_));
+  GOOGLE_CHECK(!IsFieldStripped(descriptor_, options_));
 
   Formatter format(printer, variables_);
   if (implicit_weak_field_) {
@@ -439,14 +425,14 @@ void MessageFieldGenerator::GenerateMergingCode(io::Printer* printer) const {
 }
 
 void MessageFieldGenerator::GenerateSwappingCode(io::Printer* printer) const {
-  GOOGLE_ABSL_CHECK(!IsFieldStripped(descriptor_, options_));
+  GOOGLE_CHECK(!IsFieldStripped(descriptor_, options_));
 
   Formatter format(printer, variables_);
   format("swap($field$, other->$field$);\n");
 }
 
 void MessageFieldGenerator::GenerateDestructorCode(io::Printer* printer) const {
-  GOOGLE_ABSL_CHECK(!IsFieldStripped(descriptor_, options_));
+  GOOGLE_CHECK(!IsFieldStripped(descriptor_, options_));
 
   Formatter format(printer, variables_);
   if (options_.opensource_runtime) {
@@ -464,29 +450,20 @@ void MessageFieldGenerator::GenerateDestructorCode(io::Printer* printer) const {
   format("delete $field$;\n");
 }
 
-using internal::cpp::HasHasbit;
-
 void MessageFieldGenerator::GenerateCopyConstructorCode(
     io::Printer* printer) const {
-  GOOGLE_ABSL_CHECK(!IsFieldStripped(descriptor_, options_));
+  GOOGLE_CHECK(!IsFieldStripped(descriptor_, options_));
 
   Formatter format(printer, variables_);
-  if (HasHasbit(descriptor_)) {
-    format(
-        "if ((from.$has_hasbit$) != 0) {\n"
-        "  _this->$field$ = new $type$(*from.$field$);\n"
-        "}\n");
-  } else {
-    format(
-        "if (from._internal_has_$name$()) {\n"
-        "  _this->$field$ = new $type$(*from.$field$);\n"
-        "}\n");
-  }
+  format(
+      "if (from._internal_has_$name$()) {\n"
+      "  _this->$field$ = new $type$(*from.$field$);\n"
+      "}\n");
 }
 
 void MessageFieldGenerator::GenerateSerializeWithCachedSizesToArray(
     io::Printer* printer) const {
-  GOOGLE_ABSL_CHECK(!IsFieldStripped(descriptor_, options_));
+  GOOGLE_CHECK(!IsFieldStripped(descriptor_, options_));
 
   Formatter format(printer, variables_);
   if (descriptor_->type() == FieldDescriptor::TYPE_MESSAGE) {
@@ -504,7 +481,7 @@ void MessageFieldGenerator::GenerateSerializeWithCachedSizesToArray(
 }
 
 void MessageFieldGenerator::GenerateByteSize(io::Printer* printer) const {
-  GOOGLE_ABSL_CHECK(!IsFieldStripped(descriptor_, options_));
+  GOOGLE_CHECK(!IsFieldStripped(descriptor_, options_));
 
   Formatter format(printer, variables_);
   format(
@@ -514,22 +491,15 @@ void MessageFieldGenerator::GenerateByteSize(io::Printer* printer) const {
 }
 
 void MessageFieldGenerator::GenerateIsInitialized(io::Printer* printer) const {
-  GOOGLE_ABSL_CHECK(!IsFieldStripped(descriptor_, options_));
+  GOOGLE_CHECK(!IsFieldStripped(descriptor_, options_));
 
   if (!has_required_fields_) return;
 
   Formatter format(printer, variables_);
-  if (HasHasbit(descriptor_)) {
-    format(
-        "if (($has_hasbit$) != 0) {\n"
-        "  if (!$field$->IsInitialized()) return false;\n"
-        "}\n");
-  } else {
-    format(
-        "if (_internal_has_$name$()) {\n"
-        "  if (!$field$->IsInitialized()) return false;\n"
-        "}\n");
-  }
+  format(
+      "if (_internal_has_$name$()) {\n"
+      "  if (!$field$->IsInitialized()) return false;\n"
+      "}\n");
 }
 
 void MessageFieldGenerator::GenerateConstexprAggregateInitializer(
@@ -607,7 +577,7 @@ void MessageOneofFieldGenerator::GenerateInlineAccessorDefinitions(
       "$annotate_release$"
       "  // @@protoc_insertion_point(field_release:$full_name$)\n"
       "$type_reference_function$"
-      "  if ($has_field$) {\n"
+      "  if (_internal_has_$name$()) {\n"
       "    clear_has_$oneof_name$();\n"
       "    $type$* temp = $casted_member$;\n"
       "    if (GetArenaForAllocation() != nullptr) {\n"
@@ -623,7 +593,7 @@ void MessageOneofFieldGenerator::GenerateInlineAccessorDefinitions(
   format(
       "inline const $type$& $classname$::_internal_$name$() const {\n"
       "$type_reference_function$"
-      "  return $has_field$\n"
+      "  return _internal_has_$name$()\n"
       "      ? $casted_member_const$\n"
       "      : reinterpret_cast< $type$&>($type_default_instance$);\n"
       "}\n"
@@ -637,7 +607,7 @@ void MessageOneofFieldGenerator::GenerateInlineAccessorDefinitions(
       "  // @@protoc_insertion_point(field_unsafe_arena_release"
       ":$full_name$)\n"
       "$type_reference_function$"
-      "  if ($has_field$) {\n"
+      "  if (_internal_has_$name$()) {\n"
       "    clear_has_$oneof_name$();\n"
       "    $type$* temp = $casted_member$;\n"
       "    $field$ = nullptr;\n"
@@ -669,7 +639,7 @@ void MessageOneofFieldGenerator::GenerateInlineAccessorDefinitions(
       "}\n"
       "inline $type$* $classname$::_internal_mutable_$name$() {\n"
       "$type_reference_function$"
-      "  if ($not_has_field$) {\n"
+      "  if (!_internal_has_$name$()) {\n"
       "    clear_$oneof_name$();\n"
       "    set_has_$name$();\n");
   if (implicit_weak_field_) {
@@ -696,7 +666,7 @@ void MessageOneofFieldGenerator::GenerateInlineAccessorDefinitions(
 
 void MessageOneofFieldGenerator::GenerateClearingCode(
     io::Printer* printer) const {
-  GOOGLE_ABSL_CHECK(!IsFieldStripped(descriptor_, options_));
+  GOOGLE_CHECK(!IsFieldStripped(descriptor_, options_));
 
   Formatter format(printer, variables_);
   format(
@@ -733,7 +703,7 @@ void MessageOneofFieldGenerator::GenerateIsInitialized(
 
   Formatter format(printer, variables_);
   format(
-      "if ($has_field$) {\n"
+      "if (_internal_has_$name$()) {\n"
       "  if (!$field$->IsInitialized()) return false;\n"
       "}\n");
 }
@@ -867,7 +837,7 @@ void RepeatedMessageFieldGenerator::GenerateInlineAccessorDefinitions(
 
 void RepeatedMessageFieldGenerator::GenerateClearingCode(
     io::Printer* printer) const {
-  GOOGLE_ABSL_CHECK(!IsFieldStripped(descriptor_, options_));
+  GOOGLE_CHECK(!IsFieldStripped(descriptor_, options_));
 
   Formatter format(printer, variables_);
   format("$field$.Clear();\n");
@@ -875,7 +845,7 @@ void RepeatedMessageFieldGenerator::GenerateClearingCode(
 
 void RepeatedMessageFieldGenerator::GenerateMergingCode(
     io::Printer* printer) const {
-  GOOGLE_ABSL_CHECK(!IsFieldStripped(descriptor_, options_));
+  GOOGLE_CHECK(!IsFieldStripped(descriptor_, options_));
 
   Formatter format(printer, variables_);
   format("_this->$field$.MergeFrom(from.$field$);\n");
@@ -883,7 +853,7 @@ void RepeatedMessageFieldGenerator::GenerateMergingCode(
 
 void RepeatedMessageFieldGenerator::GenerateSwappingCode(
     io::Printer* printer) const {
-  GOOGLE_ABSL_CHECK(!IsFieldStripped(descriptor_, options_));
+  GOOGLE_CHECK(!IsFieldStripped(descriptor_, options_));
 
   Formatter format(printer, variables_);
   format("$field$.InternalSwap(&other->$field$);\n");
@@ -896,7 +866,7 @@ void RepeatedMessageFieldGenerator::GenerateConstructorCode(
 
 void RepeatedMessageFieldGenerator::GenerateDestructorCode(
     io::Printer* printer) const {
-  GOOGLE_ABSL_CHECK(!IsFieldStripped(descriptor_, options_));
+  GOOGLE_CHECK(!IsFieldStripped(descriptor_, options_));
 
   Formatter format(printer, variables_);
   if (implicit_weak_field_) {
@@ -908,7 +878,7 @@ void RepeatedMessageFieldGenerator::GenerateDestructorCode(
 
 void RepeatedMessageFieldGenerator::GenerateSerializeWithCachedSizesToArray(
     io::Printer* printer) const {
-  GOOGLE_ABSL_CHECK(!IsFieldStripped(descriptor_, options_));
+  GOOGLE_CHECK(!IsFieldStripped(descriptor_, options_));
 
   Formatter format(printer, variables_);
   if (implicit_weak_field_) {
@@ -953,7 +923,7 @@ void RepeatedMessageFieldGenerator::GenerateSerializeWithCachedSizesToArray(
 
 void RepeatedMessageFieldGenerator::GenerateByteSize(
     io::Printer* printer) const {
-  GOOGLE_ABSL_CHECK(!IsFieldStripped(descriptor_, options_));
+  GOOGLE_CHECK(!IsFieldStripped(descriptor_, options_));
 
   Formatter format(printer, variables_);
   format(
@@ -966,7 +936,7 @@ void RepeatedMessageFieldGenerator::GenerateByteSize(
 
 void RepeatedMessageFieldGenerator::GenerateIsInitialized(
     io::Printer* printer) const {
-  GOOGLE_ABSL_CHECK(!IsFieldStripped(descriptor_, options_));
+  GOOGLE_CHECK(!IsFieldStripped(descriptor_, options_));
 
   if (!has_required_fields_) return;
 
