@@ -32,31 +32,30 @@
 //  Based on original Protocol Buffers design by
 //  Sanjay Ghemawat, Jeff Dean, and others.
 
-#include "google/protobuf/compiler/java/file.h"
+#include <google/protobuf/compiler/java/file.h>
 
 #include <memory>
-#include <vector>
+#include <set>
 
-#include "absl/container/btree_set.h"
-#include "absl/strings/str_cat.h"
-#include "google/protobuf/compiler/code_generator.h"
-#include "google/protobuf/compiler/java/context.h"
-#include "google/protobuf/compiler/java/enum.h"
-#include "google/protobuf/compiler/java/enum_lite.h"
-#include "google/protobuf/compiler/java/extension.h"
-#include "google/protobuf/compiler/java/generator_factory.h"
-#include "google/protobuf/compiler/java/helpers.h"
-#include "google/protobuf/compiler/java/message.h"
-#include "google/protobuf/compiler/java/name_resolver.h"
-#include "google/protobuf/compiler/java/service.h"
-#include "google/protobuf/compiler/java/shared_code_generator.h"
-#include "google/protobuf/descriptor.pb.h"
-#include "google/protobuf/dynamic_message.h"
-#include "google/protobuf/io/printer.h"
-#include "google/protobuf/io/zero_copy_stream.h"
+#include <google/protobuf/compiler/code_generator.h>
+#include <google/protobuf/io/printer.h>
+#include <google/protobuf/io/zero_copy_stream.h>
+#include <google/protobuf/dynamic_message.h>
+#include <google/protobuf/stubs/strutil.h>
+#include <google/protobuf/compiler/java/context.h>
+#include <google/protobuf/compiler/java/enum.h>
+#include <google/protobuf/compiler/java/enum_lite.h>
+#include <google/protobuf/compiler/java/extension.h>
+#include <google/protobuf/compiler/java/generator_factory.h>
+#include <google/protobuf/compiler/java/helpers.h>
+#include <google/protobuf/compiler/java/message.h>
+#include <google/protobuf/compiler/java/name_resolver.h>
+#include <google/protobuf/compiler/java/service.h>
+#include <google/protobuf/compiler/java/shared_code_generator.h>
+#include <google/protobuf/descriptor.pb.h>
 
 // Must be last.
-#include "google/protobuf/port_def.inc"
+#include <google/protobuf/port_def.inc>
 
 namespace google {
 namespace protobuf {
@@ -77,8 +76,8 @@ struct FieldDescriptorCompare {
   }
 };
 
-using FieldDescriptorSet =
-    absl::btree_set<const FieldDescriptor*, FieldDescriptorCompare>;
+typedef std::set<const FieldDescriptor*, FieldDescriptorCompare>
+    FieldDescriptorSet;
 
 // Recursively searches the given message to collect extensions.
 // Returns true if all the extensions can be recognized. The extensions will be
@@ -176,10 +175,10 @@ void MaybeRestartJavaMethod(io::Printer* printer, int* bytecode_estimate,
 
   if ((*bytecode_estimate) > bytesPerMethod) {
     ++(*method_num);
-    printer->Print(chain_statement, "method_num", absl::StrCat(*method_num));
+    printer->Print(chain_statement, "method_num", StrCat(*method_num));
     printer->Outdent();
     printer->Print("}\n");
-    printer->Print(method_decl, "method_num", absl::StrCat(*method_num));
+    printer->Print(method_decl, "method_num", StrCat(*method_num));
     printer->Indent();
     *bytecode_estimate = 0;
   }
@@ -189,7 +188,7 @@ void MaybeRestartJavaMethod(io::Printer* printer, int* bytecode_estimate,
 FileGenerator::FileGenerator(const FileDescriptor* file, const Options& options,
                              bool immutable_api)
     : file_(file),
-      java_package_(FileJavaPackage(file, immutable_api, options)),
+      java_package_(FileJavaPackage(file, immutable_api)),
       message_generators_(file->message_type_count()),
       extension_generators_(file->extension_count()),
       context_(new Context(file, options)),
@@ -197,7 +196,7 @@ FileGenerator::FileGenerator(const FileDescriptor* file, const Options& options,
       options_(options),
       immutable_api_(immutable_api) {
   classname_ = name_resolver_->GetFileClassName(file, immutable_api);
-    generator_factory_.reset(new ImmutableGeneratorFactory(context_.get()));
+  generator_factory_.reset(new ImmutableGeneratorFactory(context_.get()));
   for (int i = 0; i < file_->message_type_count(); ++i) {
     message_generators_[i].reset(
         generator_factory_->NewMessageGenerator(file_->message_type(i)));
@@ -272,12 +271,8 @@ void FileGenerator::Generate(io::Printer* printer) {
         "package", java_package_);
   }
   PrintGeneratedAnnotation(
-      printer, '$', options_.annotate_code ? classname_ + ".java.pb.meta" : "",
-      options_);
+      printer, '$', options_.annotate_code ? classname_ + ".java.pb.meta" : "");
 
-  if (!options_.opensource_runtime) {
-    printer->Print("@com.google.protobuf.Internal.ProtoNonnullApi\n");
-  }
   printer->Print(
       "$deprecation$public final class $classname$ {\n"
       "  private $ctor$() {}\n",
@@ -406,14 +401,11 @@ void FileGenerator::GenerateDescriptorInitializationCodeForImmutable(
       "    descriptor;\n"
       "static {\n",
       // TODO(dweis): Mark this as final.
-      "final", options_.opensource_runtime ? "" : "final");
+      "final", "");
   printer->Indent();
 
-  if (options_.opensource_runtime) {
-    SharedCodeGenerator shared_code_generator(file_, options_);
-    shared_code_generator.GenerateDescriptors(printer);
-  } else {
-  }
+  SharedCodeGenerator shared_code_generator(file_, options_);
+  shared_code_generator.GenerateDescriptors(printer);
 
   int bytecode_estimate = 0;
   int method_num = 0;
@@ -457,16 +449,16 @@ void FileGenerator::GenerateDescriptorInitializationCodeForImmutable(
   FieldDescriptorSet extensions;
   CollectExtensions(file_proto, *file_->pool(), &extensions, file_data);
 
-  if (!extensions.empty()) {
+  if (extensions.size() > 0) {
     // Must construct an ExtensionRegistry containing all existing extensions
     // and use it to parse the descriptor data again to recognize extensions.
     printer->Print(
         "com.google.protobuf.ExtensionRegistry registry =\n"
         "    com.google.protobuf.ExtensionRegistry.newInstance();\n");
     FieldDescriptorSet::iterator it;
-    for (const FieldDescriptor* field : extensions) {
+    for (it = extensions.begin(); it != extensions.end(); it++) {
       std::unique_ptr<ExtensionGenerator> generator(
-          generator_factory_->NewExtensionGenerator(field));
+          generator_factory_->NewExtensionGenerator(*it));
       bytecode_estimate += generator->GenerateRegistrationCode(printer);
       MaybeRestartJavaMethod(
           printer, &bytecode_estimate, &method_num,
@@ -507,8 +499,8 @@ void FileGenerator::GenerateDescriptorInitializationCodeForMutable(
 
   printer->Print(
       "descriptor = $immutable_package$.$descriptor_classname$.descriptor;\n",
-      "immutable_package", FileJavaPackage(file_, true, options_),
-      "descriptor_classname", name_resolver_->GetDescriptorClassName(file_));
+      "immutable_package", FileJavaPackage(file_, true), "descriptor_classname",
+      name_resolver_->GetDescriptorClassName(file_));
 
   for (int i = 0; i < file_->message_type_count(); i++) {
     message_generators_[i]->GenerateStaticVariableInitializers(printer);
@@ -526,7 +518,7 @@ void FileGenerator::GenerateDescriptorInitializationCodeForMutable(
   FieldDescriptorSet extensions;
   CollectExtensions(file_proto, *file_->pool(), &extensions, file_data);
 
-  if (!extensions.empty()) {
+  if (extensions.size() > 0) {
     // Try to load immutable messages' outer class. Its initialization code
     // will take care of interpreting custom options.
     printer->Print(
@@ -547,14 +539,15 @@ void FileGenerator::GenerateDescriptorInitializationCodeForMutable(
         "com.google.protobuf.ExtensionRegistry registry =\n"
         "    com.google.protobuf.ExtensionRegistry.newInstance();\n"
         "com.google.protobuf.MessageLite defaultExtensionInstance = null;\n");
-
-    for (const FieldDescriptor* field : extensions) {
+    FieldDescriptorSet::iterator it;
+    for (it = extensions.begin(); it != extensions.end(); it++) {
+      const FieldDescriptor* field = *it;
       std::string scope;
       if (field->extension_scope() != NULL) {
         scope = name_resolver_->GetMutableClassName(field->extension_scope()) +
                 ".getDescriptor()";
       } else {
-        scope = FileJavaPackage(field->file(), true, options_) + "." +
+        scope = FileJavaPackage(field->file(), true) + "." +
                 name_resolver_->GetDescriptorClassName(field->file()) +
                 ".descriptor";
       }
@@ -567,11 +560,11 @@ void FileGenerator::GenerateDescriptorInitializationCodeForMutable(
             "      $scope$.getExtensions().get($index$),\n"
             "      (com.google.protobuf.Message) defaultExtensionInstance);\n"
             "}\n",
-            "scope", scope, "index", absl::StrCat(field->index()), "class",
+            "scope", scope, "index", StrCat(field->index()), "class",
             name_resolver_->GetImmutableClassName(field->message_type()));
       } else {
         printer->Print("registry.add($scope$.getExtensions().get($index$));\n",
-                       "scope", scope, "index", absl::StrCat(field->index()));
+                       "scope", scope, "index", StrCat(field->index()));
       }
     }
     printer->Print(
@@ -689,23 +682,6 @@ std::string FileGenerator::GetKotlinClassname() {
   return name_resolver_->GetFileClassName(file_, immutable_api_, true);
 }
 
-void FileGenerator::GenerateKotlin(io::Printer* printer) {
-  printer->Print(
-      "// Generated by the protocol buffer compiler. DO NOT EDIT!\n"
-      "// source: $filename$\n"
-      "\n",
-      "filename", file_->name());
-  printer->Print(
-      "// Generated files should ignore deprecation warnings\n"
-      "@file:Suppress(\"DEPRECATION\")\n");
-  if (!java_package_.empty()) {
-    printer->Print(
-        "package $package$;\n"
-        "\n",
-        "package", EscapeKotlinKeywords(java_package_));
-  }
-}
-
 void FileGenerator::GenerateKotlinSiblings(
     const std::string& package_dir, GeneratorContext* context,
     std::vector<std::string>* file_list,
@@ -728,18 +704,15 @@ void FileGenerator::GenerateKotlinSiblings(
         options_.annotate_code ? &annotation_collector : nullptr);
 
     printer.Print(
-        "// Generated by the protocol buffer compiler. DO NOT EDIT!\n"
+        "//Generated by the protocol buffer compiler. DO NOT EDIT!\n"
         "// source: $filename$\n"
         "\n",
         "filename", descriptor->file()->name());
-    printer.Print(
-        "// Generated files should ignore deprecation warnings\n"
-        "@file:Suppress(\"DEPRECATION\")\n");
     if (!java_package_.empty()) {
       printer.Print(
           "package $package$;\n"
           "\n",
-          "package", EscapeKotlinKeywords(java_package_));
+          "package", java_package_);
     }
 
     generator->GenerateKotlinMembers(&printer);
@@ -763,4 +736,4 @@ bool FileGenerator::ShouldIncludeDependency(const FileDescriptor* descriptor,
 }  // namespace protobuf
 }  // namespace google
 
-#include "google/protobuf/port_undef.inc"
+#include <google/protobuf/port_undef.inc>

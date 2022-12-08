@@ -424,6 +424,7 @@ public class CodedInputStreamTest {
     }
   }
 
+
   /**
    * Test that a bug in skipRawBytes() has been fixed: if the skip skips exactly up to a limit, this
    * should not break things.
@@ -670,6 +671,7 @@ public class CodedInputStreamTest {
       } catch (InvalidProtocolBufferException e) {
         // success.
       }
+
 
       CodedInputStream input = inputType.newDecoder(data100);
       input.setRecursionLimit(8);

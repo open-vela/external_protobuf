@@ -27,6 +27,7 @@ jobs:
           chmod a+x $HOME/bin/bazel
       - name: Install git
         run: |
+          apt-get update -q
           apt-get install -qy --no-install-recommends git
       - name: Checkout
         uses: actions/checkout@v3

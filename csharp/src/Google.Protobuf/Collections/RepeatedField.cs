@@ -35,6 +35,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Security;
+using System.Threading;
 
 namespace Google.Protobuf.Collections
 {
@@ -47,7 +48,10 @@ namespace Google.Protobuf.Collections
     /// supported by Protocol Buffers but nor does it guarantee that all operations will work in such cases.
     /// </remarks>
     /// <typeparam name="T">The element type of the repeated field.</typeparam>
-    public sealed class RepeatedField<T> : IList<T>, IList, IDeepCloneable<RepeatedField<T>>, IEquatable<RepeatedField<T>>, IReadOnlyList<T>
+    public sealed class RepeatedField<T> : IList<T>, IList, IDeepCloneable<RepeatedField<T>>, IEquatable<RepeatedField<T>>
+#if !NET35
+        , IReadOnlyList<T>
+#endif
     {
         private static readonly EqualityComparer<T> EqualityComparer = ProtobufEqualityComparers.GetEqualityComparer<T>();
         private static readonly T[] EmptyArray = new T[0];
@@ -73,7 +77,8 @@ namespace Google.Protobuf.Collections
             if (array != EmptyArray)
             {
                 clone.array = (T[])array.Clone();
-                if (clone.array is IDeepCloneable<T>[] cloneableArray)
+                IDeepCloneable<T>[] cloneableArray = clone.array as IDeepCloneable<T>[];
+                if (cloneableArray != null)
                 {
                     for (int i = 0; i < count; i++)
                     {
@@ -279,9 +284,8 @@ namespace Google.Protobuf.Collections
         }
 
         /// <summary>
-        /// Gets and sets the capacity of the RepeatedField's internal array.
-        /// When set, the internal array is reallocated to the given capacity.
-        /// <exception cref="ArgumentOutOfRangeException">The new value is less than <see cref="Count"/>.</exception>
+        /// Gets and sets the capacity of the RepeatedField's internal array.  WHen set, the internal array is reallocated to the given capacity.
+        /// <exception cref="ArgumentOutOfRangeException">The new value is less than Count -or- when Count is less than 0.</exception>
         /// </summary>
         public int Capacity
         {
@@ -339,10 +343,7 @@ namespace Google.Protobuf.Collections
         /// </summary>
         public void Clear()
         {
-            // Clear the content of the array (so that any objects it referred to can be garbage collected)
-            // but keep the capacity the same. This allows large repeated fields to be reused without
-            // array reallocation.
-            Array.Clear(array, 0, count);
+            array = EmptyArray;
             count = 0;
         }
 
@@ -351,7 +352,10 @@ namespace Google.Protobuf.Collections
         /// </summary>
         /// <param name="item">The item to find.</param>
         /// <returns><c>true</c> if this collection contains the given item; <c>false</c> otherwise.</returns>
-        public bool Contains(T item) => IndexOf(item) != -1;
+        public bool Contains(T item)
+        {
+            return IndexOf(item) != -1;
+        }
 
         /// <summary>
         /// Copies this collection to the given array.
@@ -377,7 +381,7 @@ namespace Google.Protobuf.Collections
             }            
             Array.Copy(array, index + 1, array, index, count - index - 1);
             count--;
-            array[count] = default;
+            array[count] = default(T);
             return true;
         }
 
@@ -401,7 +405,8 @@ namespace Google.Protobuf.Collections
 
             // Optimization 1: If the collection we're adding is already a RepeatedField<T>,
             // we know the values are valid.
-            if (values is RepeatedField<T> otherRepeatedField)
+            var otherRepeatedField = values as RepeatedField<T>;
+            if (otherRepeatedField != null)
             {
                 EnsureSize(count + otherRepeatedField.count);
                 Array.Copy(otherRepeatedField.array, 0, array, count, otherRepeatedField.count);
@@ -411,7 +416,8 @@ namespace Google.Protobuf.Collections
 
             // Optimization 2: The collection is an ICollection, so we can expand
             // just once and ask the collection to copy itself into the array.
-            if (values is ICollection collection)
+            var collection = values as ICollection;
+            if (collection != null)
             {
                 var extraCount = collection.Count;
                 // For reference types and nullable value types, we need to check that there are no nulls
@@ -481,15 +487,21 @@ namespace Google.Protobuf.Collections
         /// <returns>
         ///   <c>true</c> if the specified <see cref="System.Object" /> is equal to this instance; otherwise, <c>false</c>.
         /// </returns>
-        public override bool Equals(object obj) => Equals(obj as RepeatedField<T>);
-        
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as RepeatedField<T>);
+        }
+
         /// <summary>
         /// Returns an enumerator that iterates through a collection.
         /// </summary>
         /// <returns>
         /// An <see cref="T:System.Collections.IEnumerator" /> object that can be used to iterate through the collection.
         /// </returns>
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
 
         /// <summary>
         /// Returns a hash code for this instance.
@@ -514,7 +526,7 @@ namespace Google.Protobuf.Collections
         /// <returns><c>true</c> if <paramref name="other"/> refers to an equal repeated field; <c>false</c> otherwise.</returns>
         public bool Equals(RepeatedField<T> other)
         {
-            if (other is null)
+            if (ReferenceEquals(other, null))
             {
                 return false;
             }
@@ -587,7 +599,7 @@ namespace Google.Protobuf.Collections
             }
             Array.Copy(array, index + 1, array, index, count - index - 1);
             count--;
-            array[count] = default;
+            array[count] = default(T);
         }
 
         /// <summary>
@@ -633,7 +645,10 @@ namespace Google.Protobuf.Collections
         #region Explicit interface implementation for IList and ICollection.
         bool IList.IsFixedSize => false;
 
-        void ICollection.CopyTo(Array array, int index) => Array.Copy(this.array, 0, array, index, count);
+        void ICollection.CopyTo(Array array, int index)
+        {
+            Array.Copy(this.array, 0, array, index, count);
+        }
 
         bool ICollection.IsSynchronized => false;
 
@@ -641,8 +656,8 @@ namespace Google.Protobuf.Collections
 
         object IList.this[int index]
         {
-            get => this[index];
-            set => this[index] = (T)value;
+            get { return this[index]; }
+            set { this[index] = (T)value; }
         }
 
         int IList.Add(object value)
@@ -651,18 +666,32 @@ namespace Google.Protobuf.Collections
             return count - 1;
         }
 
-        bool IList.Contains(object value) => (value is T t && Contains(t));
+        bool IList.Contains(object value)
+        {
+            return (value is T && Contains((T)value));
+        }
 
-        int IList.IndexOf(object value) => (value is T t) ? IndexOf(t) : -1;
+        int IList.IndexOf(object value)
+        {
+            if (!(value is T))
+            {
+                return -1;
+            }
+            return IndexOf((T)value);
+        }
 
-        void IList.Insert(int index, object value) => Insert(index, (T) value);
+        void IList.Insert(int index, object value)
+        {
+            Insert(index, (T) value);
+        }
 
         void IList.Remove(object value)
         {
-            if (value is T t)
+            if (!(value is T))
             {
-                Remove(t);
+                return;
             }
+            Remove((T)value);
         }
         #endregion        
     }

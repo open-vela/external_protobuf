@@ -35,10 +35,10 @@
 #ifndef GOOGLE_PROTOBUF_COMPILER_CPP_STRING_FIELD_H__
 #define GOOGLE_PROTOBUF_COMPILER_CPP_STRING_FIELD_H__
 
+#include <map>
 #include <string>
 
-#include "google/protobuf/stubs/logging.h"
-#include "google/protobuf/compiler/cpp/field.h"
+#include <google/protobuf/compiler/cpp/field.h>
 
 namespace google {
 namespace protobuf {
@@ -49,8 +49,6 @@ class StringFieldGenerator : public FieldGenerator {
  public:
   StringFieldGenerator(const FieldDescriptor* descriptor,
                        const Options& options);
-  StringFieldGenerator(const StringFieldGenerator&) = delete;
-  StringFieldGenerator& operator=(const StringFieldGenerator&) = delete;
   ~StringFieldGenerator() override;
 
   // implements FieldGenerator ---------------------------------------
@@ -65,6 +63,7 @@ class StringFieldGenerator : public FieldGenerator {
   void GenerateMergingCode(io::Printer* printer) const override;
   void GenerateSwappingCode(io::Printer* printer) const override;
   void GenerateConstructorCode(io::Printer* printer) const override;
+  void GenerateCreateSplitMessageCode(io::Printer* printer) const override;
   void GenerateCopyConstructorCode(io::Printer* printer) const override;
   void GenerateDestructorCode(io::Printer* printer) const override;
   void GenerateArenaDestructorCode(io::Printer* printer) const override;
@@ -80,15 +79,13 @@ class StringFieldGenerator : public FieldGenerator {
 
  private:
   bool inlined_;
+  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(StringFieldGenerator);
 };
 
 class StringOneofFieldGenerator : public StringFieldGenerator {
  public:
   StringOneofFieldGenerator(const FieldDescriptor* descriptor,
                             const Options& options);
-  StringOneofFieldGenerator(const StringOneofFieldGenerator&) = delete;
-  StringOneofFieldGenerator& operator=(const StringOneofFieldGenerator&) =
-      delete;
   ~StringOneofFieldGenerator() override;
 
   // implements FieldGenerator ---------------------------------------
@@ -100,15 +97,15 @@ class StringOneofFieldGenerator : public StringFieldGenerator {
   void GenerateMessageClearingCode(io::Printer* printer) const override;
   void GenerateSwappingCode(io::Printer* printer) const override;
   void GenerateConstructorCode(io::Printer* printer) const override;
+
+ private:
+  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(StringOneofFieldGenerator);
 };
 
 class RepeatedStringFieldGenerator : public FieldGenerator {
  public:
   RepeatedStringFieldGenerator(const FieldDescriptor* descriptor,
                                const Options& options);
-  RepeatedStringFieldGenerator(const RepeatedStringFieldGenerator&) = delete;
-  RepeatedStringFieldGenerator& operator=(const RepeatedStringFieldGenerator&) =
-      delete;
   ~RepeatedStringFieldGenerator() override;
 
   // implements FieldGenerator ---------------------------------------
@@ -120,12 +117,15 @@ class RepeatedStringFieldGenerator : public FieldGenerator {
   void GenerateSwappingCode(io::Printer* printer) const override;
   void GenerateConstructorCode(io::Printer* printer) const override {}
   void GenerateCopyConstructorCode(io::Printer*  /*printer*/) const override {
-    GOOGLE_ABSL_CHECK(!ShouldSplit(descriptor_, options_));
+    GOOGLE_CHECK(!ShouldSplit(descriptor_, options_));
   }
   void GenerateDestructorCode(io::Printer* printer) const override;
   void GenerateSerializeWithCachedSizesToArray(
       io::Printer* printer) const override;
   void GenerateByteSize(io::Printer* printer) const override;
+
+ private:
+  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(RepeatedStringFieldGenerator);
 };
 
 }  // namespace cpp
