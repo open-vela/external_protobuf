@@ -43,27 +43,10 @@
 #include <string>
 #include <vector>
 
-#include "absl/strings/string_view.h"
-#include "google/protobuf/stubs/platform_macros.h"
-#include "google/protobuf/stubs/port.h"
-
-// Enforce C++14 as the minimum.
-#if defined(_MSVC_LANG)
-#if _MSVC_LANG < 201402L
-#error "C++ versions less than C++14 are not supported."
-#endif  // _MSVC_LANG < 201402L
-#elif defined(__cplusplus)
-// Special-case GCC < 5.0, as it has a strange __cplusplus value for C++14
-#if defined(__GNUC__) && __GNUC__ < 5
-#if __cplusplus < 201300L
-#error "C++ versions less than C++14 are not supported."
-#endif  // __cplusplus < 201300L
-#else // defined(__GNUC__) && __GNUC__ < 5
-#if __cplusplus < 201402L
-#error "C++ versions less than C++14 are not supported."
-#endif  // __cplusplus < 201402L
-#endif // defined(__GNUC__) && __GNUC__ < 5
-#endif
+#include <google/protobuf/stubs/macros.h>
+#include <google/protobuf/stubs/platform_macros.h>
+#include <google/protobuf/stubs/port.h>
+#include <google/protobuf/stubs/stringpiece.h>
 
 #ifndef PROTOBUF_USE_EXCEPTIONS
 #if defined(_MSC_VER) && defined(_CPPUNWIND)
@@ -86,7 +69,7 @@
 #include <pthread.h>
 #endif
 
-#include "google/protobuf/port_def.inc"
+#include <google/protobuf/port_def.inc>
 
 namespace std {}
 
@@ -99,7 +82,7 @@ namespace internal {
 
 // The current version, represented as a single integer to make comparison
 // easier:  major * 10^6 + minor * 10^3 + micro
-#define GOOGLE_PROTOBUF_VERSION 3021010
+#define GOOGLE_PROTOBUF_VERSION 3021011
 
 // A suffix string for alpha, beta or rc releases. Empty for stable releases.
 #define GOOGLE_PROTOBUF_VERSION_SUFFIX ""
@@ -123,12 +106,7 @@ void PROTOBUF_EXPORT VerifyVersion(int headerVersion, int minLibraryVersion,
                                    const char* filename);
 
 // Converts a numeric version number to a string.
-std::string PROTOBUF_EXPORT
-VersionString(int version);  // NOLINT(runtime/string)
-
-// Prints the protoc compiler version (no major version)
-std::string PROTOBUF_EXPORT
-ProtocVersionString(int version);  // NOLINT(runtime/string)
+std::string PROTOBUF_EXPORT VersionString(int version);
 
 }  // namespace internal
 
@@ -141,6 +119,39 @@ ProtocVersionString(int version);  // NOLINT(runtime/string)
     GOOGLE_PROTOBUF_VERSION, GOOGLE_PROTOBUF_MIN_LIBRARY_VERSION,         \
     __FILE__)
 
+
+// ===================================================================
+// from google3/util/utf8/public/unilib.h
+
+namespace internal {
+
+// Checks if the buffer contains structurally-valid UTF-8.  Implemented in
+// structurally_valid.cc.
+PROTOBUF_EXPORT bool IsStructurallyValidUTF8(const char* buf, int len);
+
+inline bool IsStructurallyValidUTF8(StringPiece str) {
+  return IsStructurallyValidUTF8(str.data(), static_cast<int>(str.length()));
+}
+
+// Returns initial number of bytes of structurally valid UTF-8.
+PROTOBUF_EXPORT int UTF8SpnStructurallyValid(StringPiece str);
+
+// Coerce UTF-8 byte string in src_str to be
+// a structurally-valid equal-length string by selectively
+// overwriting illegal bytes with replace_char (typically ' ' or '?').
+// replace_char must be legal printable 7-bit Ascii 0x20..0x7e.
+// src_str is read-only.
+//
+// Returns pointer to output buffer, src_str.data() if no changes were made,
+//  or idst if some bytes were changed. idst is allocated by the caller
+//  and must be at least as big as src_str
+//
+// Optimized for: all structurally valid and no byte copying is done.
+//
+PROTOBUF_EXPORT char* UTF8CoerceToStructurallyValid(StringPiece str, char* dst,
+                                                    char replace_char);
+
+}  // namespace internal
 
 // This lives in message_lite.h now, but we leave this here for any users that
 // #include common.h and not message_lite.h.
@@ -181,6 +192,6 @@ class FatalException : public std::exception {
 }  // namespace protobuf
 }  // namespace google
 
-#include "google/protobuf/port_undef.inc"
+#include <google/protobuf/port_undef.inc>
 
 #endif  // GOOGLE_PROTOBUF_COMMON_H__
