@@ -43,11 +43,10 @@
 #include <algorithm>
 #include <iostream>
 
-#include <google/protobuf/stubs/common.h>
-#include <google/protobuf/stubs/logging.h>
-#include <google/protobuf/io/io_win32.h>
-#include <google/protobuf/io/zero_copy_stream_impl.h>
-#include <google/protobuf/stubs/stl_util.h>
+#include "google/protobuf/stubs/common.h"
+#include "google/protobuf/stubs/logging.h"
+#include "google/protobuf/io/io_win32.h"
+#include "google/protobuf/io/zero_copy_stream_impl.h"
 
 
 namespace google {
@@ -170,8 +169,8 @@ int FileInputStream::CopyingFileInputStream::Skip(int count) {
 
 // ===================================================================
 
-FileOutputStream::FileOutputStream(int file_descriptor, int /*block_size*/)
-    : CopyingOutputStreamAdaptor(&copying_output_),
+FileOutputStream::FileOutputStream(int file_descriptor, int block_size)
+    : CopyingOutputStreamAdaptor(&copying_output_, block_size),
       copying_output_(file_descriptor) {}
 
 bool FileOutputStream::Close() {
