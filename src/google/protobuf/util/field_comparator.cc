@@ -30,16 +30,17 @@
 
 // Author: ksroka@google.com (Krzysztof Sroka)
 
-#include <google/protobuf/util/field_comparator.h>
+#include "google/protobuf/util/field_comparator.h"
 
 #include <limits>
 #include <string>
 
-#include <google/protobuf/descriptor.h>
-#include <google/protobuf/message.h>
-#include <google/protobuf/util/message_differencer.h>
-#include <google/protobuf/stubs/map_util.h>
-#include <google/protobuf/stubs/mathutil.h>
+#include "google/protobuf/descriptor.h"
+#include "google/protobuf/message.h"
+#include "google/protobuf/stubs/logging.h"
+#include "google/protobuf/stubs/logging.h"
+#include "google/protobuf/util/message_differencer.h"
+#include "google/protobuf/stubs/mathutil.h"
 
 namespace google {
 namespace protobuf {
@@ -121,8 +122,8 @@ FieldComparator::ComparisonResult SimpleFieldComparator::SimpleCompare(
       return RECURSE;
 
     default:
-      GOOGLE_LOG(FATAL) << "No comparison code for field " << field->full_name()
-                 << " of CppType = " << field->cpp_type();
+      GOOGLE_ABSL_LOG(FATAL) << "No comparison code for field " << field->full_name()
+                      << " of CppType = " << field->cpp_type();
       return DIFFERENT;
   }
 }
@@ -130,7 +131,7 @@ FieldComparator::ComparisonResult SimpleFieldComparator::SimpleCompare(
 bool SimpleFieldComparator::CompareWithDifferencer(
     MessageDifferencer* differencer, const Message& message1,
     const Message& message2, const util::FieldContext* field_context) {
-  return differencer->Compare(message1, message2,
+  return differencer->Compare(message1, message2, false,
                               field_context->parent_fields());
 }
 
@@ -143,8 +144,8 @@ void SimpleFieldComparator::SetDefaultFractionAndMargin(double fraction,
 void SimpleFieldComparator::SetFractionAndMargin(const FieldDescriptor* field,
                                                  double fraction,
                                                  double margin) {
-  GOOGLE_CHECK(FieldDescriptor::CPPTYPE_FLOAT == field->cpp_type() ||
-        FieldDescriptor::CPPTYPE_DOUBLE == field->cpp_type())
+  GOOGLE_ABSL_CHECK(FieldDescriptor::CPPTYPE_FLOAT == field->cpp_type() ||
+             FieldDescriptor::CPPTYPE_DOUBLE == field->cpp_type())
       << "Field has to be float or double type. Field name is: "
       << field->full_name();
   map_tolerance_[field] = Tolerance(fraction, margin);
@@ -183,19 +184,23 @@ bool SimpleFieldComparator::CompareDoubleOrFloat(const FieldDescriptor& field,
       return true;
     }
     // float_comparison_ == APPROXIMATE covers two use cases.
-    Tolerance* tolerance = FindOrNull(map_tolerance_, &field);
-    if (tolerance == NULL && has_default_tolerance_) {
-      tolerance = &default_tolerance_;
+    Tolerance* tolerance = nullptr;
+    if (has_default_tolerance_) tolerance = &default_tolerance_;
+
+    auto it = map_tolerance_.find(&field);
+    if (it != map_tolerance_.end()) {
+      tolerance = &it->second;
     }
-    if (tolerance == NULL) {
-      return MathUtil::AlmostEquals(value_1, value_2);
-    } else {
+
+    if (tolerance != nullptr) {
       // Use user-provided fraction and margin. Since they are stored as
       // doubles, we explicitly cast them to types of values provided. This
       // is very likely to fail if provided values are not numeric.
       return MathUtil::WithinFractionOrMargin(
           value_1, value_2, static_cast<T>(tolerance->fraction),
           static_cast<T>(tolerance->margin));
+    } else {
+      return MathUtil::AlmostEquals(value_1, value_2);
     }
   }
 }
