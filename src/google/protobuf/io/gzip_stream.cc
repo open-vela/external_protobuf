@@ -35,12 +35,11 @@
 
 
 #if HAVE_ZLIB
-#include "google/protobuf/io/gzip_stream.h"
+#include <google/protobuf/io/gzip_stream.h>
+#include <google/protobuf/port.h>
 
-#include "google/protobuf/stubs/common.h"
-#include "google/protobuf/stubs/logging.h"
-#include "google/protobuf/stubs/logging.h"
-#include "google/protobuf/port.h"
+#include <google/protobuf/stubs/common.h>
+#include <google/protobuf/stubs/logging.h>
 
 namespace google {
 namespace protobuf {
@@ -66,7 +65,7 @@ GzipInputStream::GzipInputStream(ZeroCopyInputStream* sub_stream, Format format,
     output_buffer_length_ = buffer_size;
   }
   output_buffer_ = operator new(output_buffer_length_);
-  GOOGLE_ABSL_CHECK(output_buffer_ != NULL);
+  GOOGLE_CHECK(output_buffer_ != NULL);
   zcontext_.next_out = static_cast<Bytef*>(output_buffer_);
   zcontext_.avail_out = output_buffer_length_;
   output_position_ = output_buffer_;
@@ -221,7 +220,7 @@ void GzipOutputStream::Init(ZeroCopyOutputStream* sub_stream,
 
   input_buffer_length_ = options.buffer_size;
   input_buffer_ = operator new(input_buffer_length_);
-  GOOGLE_ABSL_CHECK(input_buffer_ != NULL);
+  GOOGLE_CHECK(input_buffer_ != NULL);
 
   zcontext_.zalloc = Z_NULL;
   zcontext_.zfree = Z_NULL;
@@ -260,7 +259,7 @@ int GzipOutputStream::Deflate(int flush) {
         sub_data_size_ = 0;
         return Z_BUF_ERROR;
       }
-      GOOGLE_ABSL_CHECK_GT(sub_data_size_, 0);
+      GOOGLE_CHECK_GT(sub_data_size_, 0);
       zcontext_.next_out = static_cast<Bytef*>(sub_data_);
       zcontext_.avail_out = sub_data_size_;
     }
@@ -295,12 +294,12 @@ bool GzipOutputStream::Next(void** data, int* size) {
     *size = input_buffer_length_;
   } else {
     // The loop in Deflate should consume all avail_in
-    GOOGLE_ABSL_LOG(DFATAL) << "Deflate left bytes unconsumed";
+    GOOGLE_LOG(DFATAL) << "Deflate left bytes unconsumed";
   }
   return true;
 }
 void GzipOutputStream::BackUp(int count) {
-  GOOGLE_ABSL_CHECK_GE(zcontext_.avail_in, static_cast<uInt>(count));
+  GOOGLE_CHECK_GE(zcontext_.avail_in, static_cast<uInt>(count));
   zcontext_.avail_in -= count;
 }
 int64_t GzipOutputStream::ByteCount() const {

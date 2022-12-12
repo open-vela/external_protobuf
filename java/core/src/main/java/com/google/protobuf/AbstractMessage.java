@@ -83,6 +83,7 @@ public abstract class AbstractMessage
     throw new UnsupportedOperationException("Nested builder is not supported for this type.");
   }
 
+
   @Override
   public List<String> findInitializationErrors() {
     return MessageReflection.findMissingFields(this);
@@ -570,7 +571,7 @@ public abstract class AbstractMessage
   protected static int hashLong(long n) {
     return (int) (n ^ (n >>> 32));
   }
-
+  //
   /**
    * @deprecated from v3.0.0-beta-3+, for compatibility with v2.5.0 and v2.6.1
    * generated code.
@@ -579,7 +580,7 @@ public abstract class AbstractMessage
   protected static int hashBoolean(boolean b) {
     return b ? 1231 : 1237;
   }
-
+  //
   /**
    * @deprecated from v3.0.0-beta-3+, for compatibility with v2.5.0 and v2.6.1
    * generated code.
@@ -588,7 +589,7 @@ public abstract class AbstractMessage
   protected static int hashEnum(EnumLite e) {
     return e.getNumber();
   }
-
+  //
   /**
    * @deprecated from v3.0.0-beta-3+, for compatibility with v2.5.0 and v2.6.1
    * generated code.
