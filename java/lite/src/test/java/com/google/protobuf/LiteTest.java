@@ -51,7 +51,6 @@ import com.google.protobuf.UnittestLite.TestAllTypesLite.RepeatedGroup;
 import com.google.protobuf.UnittestLite.TestAllTypesLiteOrBuilder;
 import com.google.protobuf.UnittestLite.TestHugeFieldNumbersLite;
 import com.google.protobuf.UnittestLite.TestNestedExtensionLite;
-import com.google.protobuf.testing.Proto3TestingLite.Proto3MessageLite;
 import map_lite_test.MapTestProto.TestMap;
 import map_lite_test.MapTestProto.TestMap.MessageValue;
 import protobuf_unittest.NestedExtensionLite;
@@ -223,22 +222,6 @@ public class LiteTest {
     assertThat(initialized).isTrue();
     // We have to cast to Byte first. Casting to byte causes a type error
     assertThat(((Byte) memo.get(message)).intValue()).isEqualTo(1);
-  }
-
-  @Test
-  public void testProto3EnumListValueCopyOnWrite() {
-    Proto3MessageLite.Builder builder = Proto3MessageLite.newBuilder();
-
-    Proto3MessageLite message = builder.build();
-    builder.addFieldEnumList30Value(Proto3MessageLite.TestEnum.ONE_VALUE);
-    assertThat(message.getFieldEnumList30List()).isEmpty();
-    assertThat(builder.getFieldEnumList30List()).containsExactly(Proto3MessageLite.TestEnum.ONE);
-    assertThat(message.getFieldEnumList30List()).isEmpty();
-    Proto3MessageLite messageAfterBuild = builder.build();
-    builder.clearFieldEnumList30();
-    assertThat(builder.getFieldEnumList30List()).isEmpty();
-    assertThat(messageAfterBuild.getFieldEnumList30List())
-        .containsExactly(Proto3MessageLite.TestEnum.ONE);
   }
 
   @Test
@@ -1525,6 +1508,7 @@ public class LiteTest {
     proto = TestAllTypesLite.newBuilder().setOptionalFloat(2.72f).setOptionalDouble(3.14).build();
     assertToStringEquals("optional_double: 3.14\noptional_float: 2.72", proto);
   }
+
 
   @Test
   public void testToStringStringFields() throws Exception {

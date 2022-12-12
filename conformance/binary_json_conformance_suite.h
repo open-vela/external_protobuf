@@ -31,8 +31,7 @@
 #ifndef CONFORMANCE_BINARY_JSON_CONFORMANCE_SUITE_H
 #define CONFORMANCE_BINARY_JSON_CONFORMANCE_SUITE_H
 
-#include "google/protobuf/descriptor.h"
-#include "json/json.h"
+#include "third_party/jsoncpp/json.h"
 #include "conformance_test.h"
 
 namespace google {
@@ -44,8 +43,6 @@ class BinaryAndJsonConformanceSuite : public ConformanceTestSuite {
 
  private:
   void RunSuiteImpl() override;
-  void RunBinaryPerformanceTests();
-  void RunJsonPerformanceTests();
   void RunJsonTests();
   void RunJsonTestsForFieldNameConvention();
   void RunJsonTestsForNonRepeatedTypes();
@@ -56,19 +53,9 @@ class BinaryAndJsonConformanceSuite : public ConformanceTestSuite {
   void RunJsonTestsForStruct();
   void RunJsonTestsForValue();
   void RunJsonTestsForAny();
-  void RunJsonTestsForUnknownEnumStringValues();
   void RunValidJsonTest(const std::string& test_name, ConformanceLevel level,
                         const std::string& input_json,
                         const std::string& equivalent_text_format);
-  void RunValidJsonTest(const std::string& test_name, ConformanceLevel level,
-                        const std::string& input_json,
-                        const std::string& equivalent_text_format,
-                        bool is_proto3);
-  void RunValidJsonTestWithMessage(const std::string& test_name,
-                                   ConformanceLevel level,
-                                   const std::string& input_json,
-                                   const std::string& equivalent_text_forma,
-                                   const Message& prototype);
   void RunValidJsonTestWithProtobufInput(
       const std::string& test_name, ConformanceLevel level,
       const protobuf_test_messages::proto3::TestAllTypesProto3& input,
@@ -91,10 +78,6 @@ class BinaryAndJsonConformanceSuite : public ConformanceTestSuite {
                                   const std::string& input_protobuf,
                                   const std::string& expected_protobuf,
                                   bool is_proto3);
-  void RunBinaryPerformanceMergeMessageWithField(const std::string& test_name,
-                                                 const std::string& field_proto,
-                                                 bool is_proto3);
-
   void RunValidProtobufTestWithMessage(
       const std::string& test_name, ConformanceLevel level,
       const Message* input, const std::string& equivalent_text_format,
@@ -147,13 +130,6 @@ class BinaryAndJsonConformanceSuite : public ConformanceTestSuite {
   void TestValidDataForOneofType(google::protobuf::FieldDescriptor::Type);
   void TestMergeOneofMessage();
   void TestOverwriteMessageValueMap();
-  void TestBinaryPerformanceForAlternatingUnknownFields();
-  void TestBinaryPerformanceMergeMessageWithRepeatedFieldForType(
-      google::protobuf::FieldDescriptor::Type);
-  void TestBinaryPerformanceMergeMessageWithUnknownFieldForType(
-      google::protobuf::FieldDescriptor::Type);
-  void TestJsonPerformanceMergeMessageWithRepeatedFieldForType(
-      google::protobuf::FieldDescriptor::Type, std::string field_value);
 
   std::unique_ptr<google::protobuf::util::TypeResolver> type_resolver_;
   std::string type_url_;
