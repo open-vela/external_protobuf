@@ -32,26 +32,27 @@
 //  Based on original Protocol Buffers design by
 //  Sanjay Ghemawat, Jeff Dean, and others.
 
-#include <google/protobuf/compiler/parser.h>
+#include "google/protobuf/compiler/parser.h"
 
 #include <algorithm>
 #include <map>
 #include <memory>
 #include <vector>
 
-#include <google/protobuf/test_util2.h>
-#include <google/protobuf/unittest.pb.h>
-#include <google/protobuf/any.pb.h>
-#include <google/protobuf/unittest_custom_options.pb.h>
-#include <google/protobuf/io/tokenizer.h>
-#include <google/protobuf/io/zero_copy_stream_impl.h>
-#include <google/protobuf/descriptor.pb.h>
-#include <google/protobuf/text_format.h>
-#include <google/protobuf/wire_format.h>
-#include <google/protobuf/testing/googletest.h>
+#include "google/protobuf/any.pb.h"
+#include "google/protobuf/descriptor.pb.h"
+#include "google/protobuf/text_format.h"
+#include "google/protobuf/testing/googletest.h"
 #include <gtest/gtest.h>
-#include <google/protobuf/stubs/substitute.h>
-#include <google/protobuf/stubs/map_util.h>
+#include "absl/container/flat_hash_map.h"
+#include "absl/strings/str_join.h"
+#include "absl/strings/substitute.h"
+#include "google/protobuf/test_util2.h"
+#include "google/protobuf/unittest.pb.h"
+#include "google/protobuf/unittest_custom_options.pb.h"
+#include "google/protobuf/unittest_import.pb.h"
+#include "google/protobuf/unittest_import_public.pb.h"
+#include "google/protobuf/wire_format.h"
 
 namespace google {
 namespace protobuf {
@@ -69,11 +70,11 @@ class MockErrorCollector : public io::ErrorCollector {
 
   // implements ErrorCollector ---------------------------------------
   void AddWarning(int line, int column, const std::string& message) override {
-    strings::SubstituteAndAppend(&warning_, "$0:$1: $2\n", line, column, message);
+    absl::SubstituteAndAppend(&warning_, "$0:$1: $2\n", line, column, message);
   }
 
   void AddError(int line, int column, const std::string& message) override {
-    strings::SubstituteAndAppend(&text_, "$0:$1: $2\n", line, column, message);
+    absl::SubstituteAndAppend(&text_, "$0:$1: $2\n", line, column, message);
   }
 };
 
@@ -145,6 +146,16 @@ class ParserTest : public testing::Test {
   void ExpectHasErrors(const char* text, const char* expected_errors) {
     ExpectHasEarlyExitErrors(text, expected_errors);
     EXPECT_EQ(io::Tokenizer::TYPE_END, input_->current().type);
+  }
+
+  // Parse the text and expect that the given warnings are reported.
+  void ExpectHasWarnings(const char* text, const char* expected_warnings) {
+    SetupParser(text);
+    FileDescriptorProto file;
+    ASSERT_TRUE(parser_->Parse(input_.get(), &file));
+    EXPECT_EQ(io::Tokenizer::TYPE_END, input_->current().type);
+    ASSERT_EQ("", error_collector_.text_);
+    EXPECT_EQ(expected_warnings, error_collector_.warning_);
   }
 
   // Same as above but does not expect that the parser parses the complete
@@ -263,6 +274,7 @@ TEST_F(ParserTest, WarnIfFieldNameContainsNumberImmediatelyFollowUnderscore) {
                   "Number should not come right after an underscore. Found: "
                   "song_name_1.") != std::string::npos);
 }
+
 
 // ===================================================================
 
@@ -587,6 +599,56 @@ TEST_F(ParseMessageTest, FieldOptions) {
       "                                                   is_extension: true } "
       "                                            identifier_value: \"hey\" }"
       "          }"
+      "  }"
+      "}");
+}
+
+TEST_F(ParseMessageTest, FieldOptionsSupportLargeDecimalLiteral) {
+  // decimal integer literal > uint64 max
+  ExpectParsesTo(
+      "import \"google/protobuf/descriptor.proto\";\n"
+      "extend google.protobuf.FieldOptions {\n"
+      "  optional double f = 10101;\n"
+      "}\n"
+      "message TestMessage {\n"
+      "  optional double a = 1 [default = 18446744073709551616];\n"
+      "  optional double b = 2 [default = -18446744073709551616];\n"
+      "  optional double c = 3 [(f) = 18446744073709551616];\n"
+      "  optional double d = 4 [(f) = -18446744073709551616];\n"
+      "}\n",
+
+      "dependency: \"google/protobuf/descriptor.proto\""
+      "extension {"
+      "  name: \"f\" label: LABEL_OPTIONAL type: TYPE_DOUBLE number: 10101"
+      "  extendee: \"google.protobuf.FieldOptions\""
+      "}"
+      "message_type {"
+      "  name: \"TestMessage\""
+      "  field {"
+      "    name: \"a\" label: LABEL_OPTIONAL type: TYPE_DOUBLE number: 1"
+      "    default_value: \"1.8446744073709552e+19\""
+      "  }"
+      "  field {"
+      "    name: \"b\" label: LABEL_OPTIONAL type: TYPE_DOUBLE number: 2"
+      "    default_value: \"-1.8446744073709552e+19\""
+      "  }"
+      "  field {"
+      "    name: \"c\" label: LABEL_OPTIONAL type: TYPE_DOUBLE number: 3"
+      "    options{"
+      "      uninterpreted_option{"
+      "        name{ name_part: \"f\" is_extension: true }"
+      "        double_value: 1.8446744073709552e+19"
+      "      }"
+      "    }"
+      "  }"
+      "  field {"
+      "    name: \"d\" label: LABEL_OPTIONAL type: TYPE_DOUBLE number: 4"
+      "    options{"
+      "      uninterpreted_option{"
+      "        name{ name_part: \"f\" is_extension: true }"
+      "        double_value: -1.8446744073709552e+19"
+      "      }"
+      "    }"
       "  }"
       "}");
 }
@@ -1674,6 +1736,17 @@ TEST_F(ParseErrorTest, EnumReservedMissingQuotes) {
       "2:11: Expected enum value or number range.\n");
 }
 
+TEST_F(ParseErrorTest, EnumReservedInvalidIdentifier) {
+  ExpectHasWarnings(
+      R"pb(
+      enum TestEnum {
+        FOO = 1;
+        reserved "foo bar";
+      }
+      )pb",
+      "3:17: Reserved name \"foo bar\" is not a valid identifier.\n");
+}
+
 // -------------------------------------------------------------------
 // Reserved field number errors
 
@@ -1699,6 +1772,16 @@ TEST_F(ParseErrorTest, ReservedMissingQuotes) {
       "  reserved foo;\n"
       "}\n",
       "1:11: Expected field name or number range.\n");
+}
+
+TEST_F(ParseErrorTest, ReservedInvalidIdentifier) {
+  ExpectHasWarnings(
+      R"pb(
+      message Foo {
+        reserved "foo bar";
+      }
+      )pb",
+      "2:17: Reserved name \"foo bar\" is not a valid identifier.\n");
 }
 
 TEST_F(ParseErrorTest, ReservedNegativeNumber) {
@@ -1888,6 +1971,22 @@ TEST_F(ParserValidationErrorTest, FieldDefaultValueError) {
       "  optional Baz bar = 1 [default=NO_SUCH_VALUE];\n"
       "}\n",
       "2:32: Enum type \"Baz\" has no value named \"NO_SUCH_VALUE\".\n");
+}
+
+TEST_F(ParserValidationErrorTest, FieldDefaultIntegerOutOfRange) {
+  ExpectHasErrors(
+      "message Foo {\n"
+      "  optional double bar = 1 [default = 0x10000000000000000];\n"
+      "}\n",
+      "1:37: Integer out of range.\n");
+}
+
+TEST_F(ParserValidationErrorTest, FieldOptionOutOfRange) {
+  ExpectHasErrors(
+      "message Foo {\n"
+      "  optional double bar = 1 [foo = 0x10000000000000000];\n"
+      "}\n",
+      "1:33: Integer out of range.\n");
 }
 
 TEST_F(ParserValidationErrorTest, FileOptionNameError) {
@@ -2224,7 +2323,7 @@ TEST_F(ParseDescriptorDebugTest, TestAllDescriptorTypes) {
   // need to link to a FileDecriptor, then output back to a proto. We'll
   // also need to give it the same name as the original.
   parsed.set_name(
-      TestUtil::MaybeTranslatePath("net/proto2/internal/unittest.proto"));
+      TestUtil::MaybeTranslatePath("third_party/protobuf/unittest.proto"));
   // We need the imported dependency before we can build our parsed proto
   const FileDescriptor* public_import =
       protobuf_unittest_import::PublicImportMessage::descriptor()->file();
@@ -2401,7 +2500,7 @@ TEST_F(ParseDescriptorDebugTest, TestCommentsInDebugString) {
     const std::string debug_string =
         descriptor->DebugStringWithOptions(debug_string_options);
 
-    for (int i = 0; i < GOOGLE_ARRAYSIZE(expected_comments); ++i) {
+    for (int i = 0; i < ABSL_ARRAYSIZE(expected_comments); ++i) {
       std::string::size_type found_pos =
           debug_string.find(expected_comments[i]);
       EXPECT_TRUE(found_pos != std::string::npos)
@@ -2677,8 +2776,8 @@ class SourceInfoTest : public ParserTest {
         return true;
       }
     } else {
-      std::pair<int, int> start_pos = FindOrDie(markers_, start_marker);
-      std::pair<int, int> end_pos = FindOrDie(markers_, end_marker);
+      std::pair<int, int> start_pos = markers_.at(start_marker);
+      std::pair<int, int> end_pos = markers_.at(end_marker);
 
       RepeatedField<int> expected_span;
       expected_span.Add(start_pos.first);
@@ -2709,7 +2808,7 @@ class SourceInfoTest : public ParserTest {
           } else {
             EXPECT_EQ(
                 expected_leading_detached_comments,
-                Join(iter->second->leading_detached_comments(), "\n"));
+                absl::StrJoin(iter->second->leading_detached_comments(), "\n"));
           }
 
           spans_.erase(iter);
@@ -2745,7 +2844,7 @@ class SourceInfoTest : public ParserTest {
 
   typedef std::multimap<SpanKey, const SourceCodeInfo::Location*> SpanMap;
   SpanMap spans_;
-  std::map<char, std::pair<int, int> > markers_;
+  absl::flat_hash_map<char, std::pair<int, int>> markers_;
   std::string text_without_markers_;
 
   void ExtractMarkers(const char* text) {
