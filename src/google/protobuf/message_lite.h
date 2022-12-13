@@ -41,24 +41,21 @@
 
 
 #include <climits>
-#include <iosfwd>
 #include <string>
 
-#include "google/protobuf/stubs/common.h"
-#include "google/protobuf/arena.h"
-#include "google/protobuf/port.h"
-#include "absl/base/call_once.h"
-#include "google/protobuf/stubs/logging.h"
-#include "absl/strings/cord.h"
-#include "absl/strings/string_view.h"
-#include "google/protobuf/explicitly_constructed.h"
-#include "google/protobuf/io/coded_stream.h"
-#include "google/protobuf/metadata_lite.h"
-#include "google/protobuf/port.h"
-
+#include <google/protobuf/stubs/common.h>
+#include <google/protobuf/stubs/logging.h>
+#include <google/protobuf/io/coded_stream.h>
+#include <google/protobuf/arena.h>
+#include <google/protobuf/stubs/once.h>
+#include <google/protobuf/port.h>
+#include <google/protobuf/stubs/strutil.h>
+#include <google/protobuf/explicitly_constructed.h>
+#include <google/protobuf/metadata_lite.h>
+#include <google/protobuf/stubs/hash.h>  // TODO(b/211442718): cleanup
 
 // clang-format off
-#include "google/protobuf/port_def.inc"
+#include <google/protobuf/port_def.inc>
 // clang-format on
 
 #ifdef SWIG
@@ -104,7 +101,7 @@ class GenericTypeHandler;  // defined in repeated_field.h
 // computed size to a cached size.  Since we don't proceed with serialization
 // if the total size was > INT_MAX, it is not important what this function
 // returns for inputs > INT_MAX.  However this case should not error or
-// GOOGLE_ABSL_CHECK-fail, because the full size_t resolution is still returned from
+// GOOGLE_CHECK-fail, because the full size_t resolution is still returned from
 // ByteSizeLong() and checked against INT_MAX; we can catch the overflow
 // there.
 inline int ToCachedSize(size_t size) { return static_cast<int>(size); }
@@ -119,11 +116,11 @@ inline size_t FromIntSize(int size) {
   return static_cast<unsigned int>(size);
 }
 
-// For cases where a legacy function returns an integer size.  We GOOGLE_ABSL_DCHECK()
+// For cases where a legacy function returns an integer size.  We GOOGLE_DCHECK()
 // that the conversion will fit within an integer; if this is false then we
 // are losing information.
 inline int ToIntSize(size_t size) {
-  GOOGLE_ABSL_DCHECK_LE(size, static_cast<size_t>(INT_MAX));
+  GOOGLE_DCHECK_LE(size, static_cast<size_t>(INT_MAX));
   return static_cast<int>(size);
 }
 
@@ -171,8 +168,6 @@ PROTOBUF_EXPORT size_t StringSpaceUsedExcludingSelfLong(const std::string& str);
 class PROTOBUF_EXPORT MessageLite {
  public:
   constexpr MessageLite() {}
-  MessageLite(const MessageLite&) = delete;
-  MessageLite& operator=(const MessageLite&) = delete;
   virtual ~MessageLite() = default;
 
   // Basic Operations ------------------------------------------------
@@ -188,7 +183,8 @@ class PROTOBUF_EXPORT MessageLite {
   // if arena is a nullptr.
   virtual MessageLite* New(Arena* arena) const = 0;
 
-  Arena* GetArena() const { return _internal_metadata_.arena(); }
+  // Returns user-owned arena; nullptr if it's message owned.
+  Arena* GetArena() const { return _internal_metadata_.user_arena(); }
 
   // Clear all fields of the message and set them to their default values.
   // Clear() assumes that any memory allocated to hold parts of the message
@@ -281,11 +277,11 @@ class PROTOBUF_EXPORT MessageLite {
   // format, matching the encoding output by MessageLite::SerializeToString().
   // If you'd like to convert a human-readable string into a protocol buffer
   // object, see google::protobuf::TextFormat::ParseFromString().
-  PROTOBUF_ATTRIBUTE_REINITIALIZES bool ParseFromString(absl::string_view data);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES bool ParseFromString(ConstStringParam data);
   // Like ParseFromString(), but accepts messages that are missing
   // required fields.
   PROTOBUF_ATTRIBUTE_REINITIALIZES bool ParsePartialFromString(
-      absl::string_view data);
+      ConstStringParam data);
   // Parse a protocol buffer contained in an array of bytes.
   PROTOBUF_ATTRIBUTE_REINITIALIZES bool ParseFromArray(const void* data,
                                                        int size);
@@ -316,7 +312,7 @@ class PROTOBUF_EXPORT MessageLite {
   bool MergePartialFromCodedStream(io::CodedInputStream* input);
 
   // Merge a protocol buffer contained in a string.
-  bool MergeFromString(absl::string_view data);
+  bool MergeFromString(ConstStringParam data);
 
 
   // Serialization ---------------------------------------------------
@@ -325,7 +321,7 @@ class PROTOBUF_EXPORT MessageLite {
 
   // Write a protocol buffer of this message to the given output.  Returns
   // false on a write error.  If the message is missing required fields,
-  // this may GOOGLE_ABSL_CHECK-fail.
+  // this may GOOGLE_CHECK-fail.
   bool SerializeToCodedStream(io::CodedOutputStream* output) const;
   // Like SerializeToCodedStream(), but allows missing required fields.
   bool SerializePartialToCodedStream(io::CodedOutputStream* output) const;
@@ -372,36 +368,6 @@ class PROTOBUF_EXPORT MessageLite {
   // Like AppendToString(), but allows missing required fields.
   bool AppendPartialToString(std::string* output) const;
 
-  // Reads a protocol buffer from a Cord and merges it into this message.
-  bool MergeFromCord(const absl::Cord& cord);
-  // Like MergeFromCord(), but accepts messages that are missing
-  // required fields.
-  bool MergePartialFromCord(const absl::Cord& cord);
-  // Parse a protocol buffer contained in a Cord.
-  PROTOBUF_ATTRIBUTE_REINITIALIZES bool ParseFromCord(const absl::Cord& cord);
-  // Like ParseFromCord(), but accepts messages that are missing
-  // required fields.
-  PROTOBUF_ATTRIBUTE_REINITIALIZES bool ParsePartialFromCord(
-      const absl::Cord& cord);
-
-  // Serialize the message and store it in the given Cord.  All required
-  // fields must be set.
-  bool SerializeToCord(absl::Cord* output) const;
-  // Like SerializeToCord(), but allows missing required fields.
-  bool SerializePartialToCord(absl::Cord* output) const;
-
-  // Make a Cord encoding the message. Is equivalent to calling
-  // SerializeToCord() on a Cord and using that.  Returns an empty
-  // Cord if SerializeToCord() would have returned an error.
-  absl::Cord SerializeAsCord() const;
-  // Like SerializeAsCord(), but allows missing required fields.
-  absl::Cord SerializePartialAsCord() const;
-
-  // Like SerializeToCord(), but appends to the data to the Cord's existing
-  // contents.  All required fields must be set.
-  bool AppendToCord(absl::Cord* output) const;
-  // Like AppendToCord(), but allows missing required fields.
-  bool AppendPartialToCord(absl::Cord* output) const;
 
   // Computes the serialized size of the message.  This recursively calls
   // ByteSizeLong() on all embedded messages.
@@ -459,18 +425,23 @@ class PROTOBUF_EXPORT MessageLite {
     return Arena::CreateMaybeMessage<T>(arena);
   }
 
-  inline explicit MessageLite(Arena* arena) : _internal_metadata_(arena) {}
+  inline explicit MessageLite(Arena* arena, bool is_message_owned = false)
+      : _internal_metadata_(arena, is_message_owned) {}
 
   // Returns the arena, if any, that directly owns this message and its internal
   // memory (Arena::Own is different in that the arena doesn't directly own the
   // internal memory). This method is used in proto's implementation for
   // swapping, moving and setting allocated, for deciding whether the ownership
   // of this message or its internal memory could be changed.
-  Arena* GetOwningArena() const { return _internal_metadata_.arena(); }
+  Arena* GetOwningArena() const { return _internal_metadata_.owning_arena(); }
 
   // Returns the arena, used for allocating internal objects(e.g., child
   // messages, etc), or owning incoming objects (e.g., set allocated).
   Arena* GetArenaForAllocation() const { return _internal_metadata_.arena(); }
+
+  // Returns true if this message is enabled for message-owned arena (MOA)
+  // trials. No lite messages are eligible for MOA.
+  static bool InMoaTrial() { return false; }
 
   internal::InternalMetadata _internal_metadata_;
 
@@ -521,17 +492,19 @@ class PROTOBUF_EXPORT MessageLite {
   void LogInitializationErrorMessage() const;
 
   bool MergeFromImpl(io::CodedInputStream* input, ParseFlags parse_flags);
+
+  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(MessageLite);
 };
 
 namespace internal {
 
 template <bool alias>
-bool MergeFromImpl(absl::string_view input, MessageLite* msg,
+bool MergeFromImpl(StringPiece input, MessageLite* msg,
                    MessageLite::ParseFlags parse_flags);
-extern template bool MergeFromImpl<false>(absl::string_view input,
+extern template bool MergeFromImpl<false>(StringPiece input,
                                           MessageLite* msg,
                                           MessageLite::ParseFlags parse_flags);
-extern template bool MergeFromImpl<true>(absl::string_view input,
+extern template bool MergeFromImpl<true>(StringPiece input,
                                          MessageLite* msg,
                                          MessageLite::ParseFlags parse_flags);
 
@@ -613,6 +586,6 @@ T* OnShutdownDelete(T* p) {
 }  // namespace protobuf
 }  // namespace google
 
-#include "google/protobuf/port_undef.inc"
+#include <google/protobuf/port_undef.inc>
 
 #endif  // GOOGLE_PROTOBUF_MESSAGE_LITE_H__

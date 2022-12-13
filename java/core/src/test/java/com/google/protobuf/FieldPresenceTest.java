@@ -500,4 +500,5 @@ public class FieldPresenceTest {
     assertThat(builder.isInitialized()).isTrue();
     assertThat(builder.buildPartial().isInitialized()).isTrue();
   }
+
 }

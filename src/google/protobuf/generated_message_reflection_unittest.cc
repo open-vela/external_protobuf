@@ -42,26 +42,25 @@
 // compiler/cpp/unittest, except using the reflection interface
 // rather than generated accessors.
 
-#include "google/protobuf/generated_message_reflection.h"
+#include <google/protobuf/generated_message_reflection.h>
 
 #include <memory>
 
-#include "google/protobuf/arena.h"
-#include "google/protobuf/descriptor.h"
-#include "google/protobuf/testing/googletest.h"
+#include <google/protobuf/stubs/logging.h>
+#include <google/protobuf/stubs/common.h>
+#include <google/protobuf/map_unittest.pb.h>
+#include <google/protobuf/unittest.pb.h>
+#include <google/protobuf/unittest_mset.pb.h>
+#include <google/protobuf/unittest_mset_wire_format.pb.h>
+#include <google/protobuf/arena.h>
+#include <google/protobuf/descriptor.h>
+#include <google/protobuf/testing/googletest.h>
 #include <gtest/gtest.h>
-#include "google/protobuf/stubs/logging.h"
-#include "absl/strings/cord.h"
-#include "google/protobuf/map_test_util.h"
-#include "google/protobuf/map_unittest.pb.h"
-#include "google/protobuf/test_util.h"
-#include "google/protobuf/unittest.pb.h"
-#include "google/protobuf/unittest.pb.h"
-#include "google/protobuf/unittest_mset.pb.h"
-#include "google/protobuf/unittest_mset_wire_format.pb.h"
+#include <google/protobuf/map_test_util.h>
+#include <google/protobuf/test_util.h>
 
 // Must be included last.
-#include "google/protobuf/port_def.inc"
+#include <google/protobuf/port_def.inc>
 
 namespace google {
 namespace protobuf {
@@ -95,7 +94,7 @@ namespace {
 const FieldDescriptor* F(const std::string& name) {
   const FieldDescriptor* result =
       unittest::TestAllTypes::descriptor()->FindFieldByName(name);
-  GOOGLE_ABSL_CHECK(result != nullptr);
+  GOOGLE_CHECK(result != nullptr);
   return result;
 }
 
@@ -614,16 +613,10 @@ TEST(GeneratedMessageReflectionTest, ReleaseLast) {
   (void)expected;  // unused in somce configurations
   std::unique_ptr<Message> released(message.GetReflection()->ReleaseLast(
       &message, descriptor->FindFieldByName("repeated_foreign_message")));
-#ifndef PROTOBUF_FORCE_COPY_IN_RELEASE
   EXPECT_EQ(expected, released.get());
-#endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
 }
 
 TEST(GeneratedMessageReflectionTest, ReleaseLastExtensions) {
-#ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
-  GTEST_SKIP() << "Won't work with FORCE_COPY_IN_RELEASE.";
-#endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
-
   unittest::TestAllExtensions message;
   const Descriptor* descriptor = message.GetDescriptor();
   TestUtil::ReflectionTester reflection_tester(descriptor);
@@ -1047,9 +1040,7 @@ TEST(GeneratedMessageReflectionTest, SetAllocatedOneofMessageTest) {
   released = reflection->ReleaseMessage(
       &to_message, descriptor->FindFieldByName("foo_lazy_message"));
   EXPECT_TRUE(released != nullptr);
-#ifndef PROTOBUF_FORCE_COPY_IN_RELEASE
   EXPECT_EQ(&sub_message, released);
-#endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
   delete released;
 
   TestUtil::ReflectionTester::SetOneofViaReflection(&from_message2);
@@ -1067,9 +1058,7 @@ TEST(GeneratedMessageReflectionTest, SetAllocatedOneofMessageTest) {
   released = reflection->ReleaseMessage(
       &to_message, descriptor->FindFieldByName("foo_message"));
   EXPECT_TRUE(released != nullptr);
-#ifndef PROTOBUF_FORCE_COPY_IN_RELEASE
   EXPECT_EQ(&sub_message2, released);
-#endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
   delete released;
 }
 
@@ -1190,9 +1179,7 @@ TEST(GeneratedMessageReflectionTest, ReleaseOneofMessageTest) {
       &message, descriptor->FindFieldByName("foo_lazy_message"));
 
   EXPECT_TRUE(released != nullptr);
-#ifndef PROTOBUF_FORCE_COPY_IN_RELEASE
   EXPECT_EQ(&sub_message, released);
-#endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
   delete released;
 
   released = reflection->ReleaseMessage(
@@ -1274,6 +1261,8 @@ TEST(GeneratedMessageReflectionTest, UsageErrors) {
   const Reflection* reflection = message.GetReflection();
   const Descriptor* descriptor = message.GetDescriptor();
 
+#define f(NAME) descriptor->FindFieldByName(NAME)
+
   // Testing every single failure mode would be too much work.  Let's just
   // check a few.
   EXPECT_DEATH(
@@ -1312,6 +1301,8 @@ TEST(GeneratedMessageReflectionTest, UsageErrors) {
       "  Message type: protobuf_unittest.TestAllTypes\n"
       "  Field       : protobuf_unittest.ForeignMessage.c\n"
       "  Problem     : Field does not match message type.");
+
+#undef f
 }
 
 #endif  // PROTOBUF_HAS_DEATH_TEST
