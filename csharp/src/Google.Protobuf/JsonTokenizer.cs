@@ -29,7 +29,6 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
-
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -363,19 +362,29 @@ namespace Google.Protobuf
             private char ReadEscapedCharacter()
             {
                 char c = reader.ReadOrFail("Unexpected end of text while reading character escape sequence");
-                return c switch
+                switch (c)
                 {
-                    'n' => '\n',
-                    '\\' => '\\',
-                    'b' => '\b',
-                    'f' => '\f',
-                    'r' => '\r',
-                    't' => '\t',
-                    '"' => '"',
-                    '/' => '/',
-                    'u' => ReadUnicodeEscape(),
-                    _ => throw reader.CreateException(string.Format(CultureInfo.InvariantCulture, "Invalid character in character escape sequence: U+{0:x4}", (int)c)),
-                };
+                    case 'n':
+                        return '\n';
+                    case '\\':
+                        return '\\';
+                    case 'b':
+                        return '\b';
+                    case 'f':
+                        return '\f';
+                    case 'r':
+                        return '\r';
+                    case 't':
+                        return '\t';
+                    case '"':
+                        return '"';
+                    case '/':
+                        return '/';
+                    case 'u':
+                        return ReadUnicodeEscape();
+                    default:
+                        throw reader.CreateException(string.Format(CultureInfo.InvariantCulture, "Invalid character in character escape sequence: U+{0:x4}", (int) c));
+                }
             }
 
             /// <summary>
@@ -489,7 +498,8 @@ namespace Google.Protobuf
                     throw reader.CreateException("Invalid numeric literal");
                 }
                 builder.Append(first);
-                char? next = ConsumeDigits(builder, out int digitCount);
+                int digitCount;
+                char? next = ConsumeDigits(builder, out digitCount);
                 if (first == '0' && digitCount != 0)
                 {
                     throw reader.CreateException("Invalid numeric literal: leading 0 for non-zero value.");
@@ -500,7 +510,8 @@ namespace Google.Protobuf
             private char? ReadFrac(StringBuilder builder)
             {
                 builder.Append('.'); // Already consumed this
-                char? next = ConsumeDigits(builder, out int digitCount);
+                int digitCount;
+                char? next = ConsumeDigits(builder, out digitCount);
                 if (digitCount == 0)
                 {
                     throw reader.CreateException("Invalid numeric literal: fraction with no trailing digits");
@@ -524,7 +535,8 @@ namespace Google.Protobuf
                 {
                     reader.PushBack(next.Value);
                 }
-                next = ConsumeDigits(builder, out int digitCount);
+                int digitCount;
+                next = ConsumeDigits(builder, out digitCount);
                 if (digitCount == 0)
                 {
                     throw reader.CreateException("Invalid numeric literal: exponent without value");
@@ -579,13 +591,20 @@ namespace Google.Protobuf
             {
                 containerStack.Pop();
                 var parent = containerStack.Peek();
-                state = parent switch
+                switch (parent)
                 {
-                    ContainerType.Object => State.ObjectAfterProperty,
-                    ContainerType.Array => State.ArrayAfterValue,
-                    ContainerType.Document => State.ExpectedEndOfDocument,
-                    _ => throw new InvalidOperationException("Unexpected container type: " + parent),
-                };
+                    case ContainerType.Object:
+                        state = State.ObjectAfterProperty;
+                        break;
+                    case ContainerType.Array:
+                        state = State.ArrayAfterValue;
+                        break;
+                    case ContainerType.Document:
+                        state = State.ExpectedEndOfDocument;
+                        break;
+                    default:
+                        throw new InvalidOperationException("Unexpected container type: " + parent);
+                }
             }
 
             private enum ContainerType

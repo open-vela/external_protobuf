@@ -32,17 +32,15 @@
 //  Based on original Protocol Buffers design by
 //  Sanjay Ghemawat, Jeff Dean, and others.
 
-#include "google/protobuf/repeated_field.h"
+#include <google/protobuf/repeated_field.h>
 
 #include <algorithm>
-#include <string>
 
-#include "google/protobuf/stubs/logging.h"
-#include "google/protobuf/stubs/logging.h"
-#include "absl/strings/cord.h"
+#include <google/protobuf/stubs/logging.h>
+#include <google/protobuf/stubs/common.h>
 
 // Must be included last.
-#include "google/protobuf/port_def.inc"
+#include <google/protobuf/port_def.inc>
 
 namespace google {
 namespace protobuf {
@@ -55,6 +53,7 @@ template class PROTOBUF_EXPORT_TEMPLATE_DEFINE RepeatedField<int64_t>;
 template class PROTOBUF_EXPORT_TEMPLATE_DEFINE RepeatedField<uint64_t>;
 template class PROTOBUF_EXPORT_TEMPLATE_DEFINE RepeatedField<float>;
 template class PROTOBUF_EXPORT_TEMPLATE_DEFINE RepeatedField<double>;
+template class PROTOBUF_EXPORT_TEMPLATE_DEFINE RepeatedPtrField<std::string>;
 
 namespace internal {
 template class PROTOBUF_EXPORT_TEMPLATE_DEFINE RepeatedIterator<bool>;
@@ -69,4 +68,4 @@ template class PROTOBUF_EXPORT_TEMPLATE_DEFINE RepeatedIterator<double>;
 }  // namespace protobuf
 }  // namespace google
 
-#include "google/protobuf/port_undef.inc"
+#include <google/protobuf/port_undef.inc>

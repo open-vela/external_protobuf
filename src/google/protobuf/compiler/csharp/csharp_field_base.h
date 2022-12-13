@@ -32,16 +32,12 @@
 #define GOOGLE_PROTOBUF_COMPILER_CSHARP_FIELD_BASE_H__
 
 #include <string>
+#include <google/protobuf/stubs/strutil.h>
 
-#include "google/protobuf/compiler/code_generator.h"
-#include "absl/container/flat_hash_map.h"
-#include "absl/strings/ascii.h"
-#include "absl/strings/escaping.h"
-#include "absl/strings/str_replace.h"
-#include "absl/strings/str_split.h"
-#include "google/protobuf/compiler/csharp/csharp_source_generator_base.h"
-#include "google/protobuf/descriptor.h"
-#include "google/protobuf/io/printer.h"
+#include <google/protobuf/compiler/code_generator.h>
+#include <google/protobuf/compiler/csharp/csharp_source_generator_base.h>
+#include <google/protobuf/descriptor.h>
+#include <google/protobuf/io/printer.h>
 
 namespace google {
 namespace protobuf {
@@ -78,7 +74,7 @@ class FieldGeneratorBase : public SourceGeneratorBase {
  protected:
   const FieldDescriptor* descriptor_;
   const int presenceIndex_;
-  absl::flat_hash_map<absl::string_view, std::string> variables_;
+  std::map<std::string, std::string> variables_;
 
   void AddDeprecatedFlag(io::Printer* printer);
   void AddNullCheck(io::Printer* printer);
@@ -86,7 +82,7 @@ class FieldGeneratorBase : public SourceGeneratorBase {
 
   void AddPublicMemberAttributes(io::Printer* printer);
   void SetCommonOneofFieldVariables(
-      absl::flat_hash_map<absl::string_view, std::string>* variables);
+      std::map<std::string, std::string>* variables);
 
   std::string oneof_property_name();
   std::string oneof_case_name(); 
@@ -102,8 +98,7 @@ class FieldGeneratorBase : public SourceGeneratorBase {
   std::string capitalized_type_name();
 
  private:
-  void SetCommonFieldVariables(
-      absl::flat_hash_map<absl::string_view, std::string>* variables);
+  void SetCommonFieldVariables(std::map<std::string, std::string>* variables);
   std::string GetStringDefaultValueInternal(const FieldDescriptor* descriptor);
   std::string GetBytesDefaultValueInternal(const FieldDescriptor* descriptor);
 };
