@@ -30,19 +30,21 @@
 
 // Author: haberman@google.com (Josh Haberman)
 
-#include "google/protobuf/pyext/map_container.h"
+#include <google/protobuf/pyext/map_container.h>
 
 #include <cstdint>
 #include <memory>
-#include <string>
 
-#include "google/protobuf/map.h"
-#include "google/protobuf/map_field.h"
-#include "google/protobuf/message.h"
-#include "google/protobuf/pyext/message.h"
-#include "google/protobuf/pyext/message_factory.h"
-#include "google/protobuf/pyext/repeated_composite_container.h"
-#include "google/protobuf/pyext/scoped_pyobject_ptr.h"
+#include <google/protobuf/stubs/logging.h>
+#include <google/protobuf/stubs/common.h>
+#include <google/protobuf/map.h>
+#include <google/protobuf/map_field.h>
+#include <google/protobuf/message.h>
+#include <google/protobuf/pyext/message.h>
+#include <google/protobuf/pyext/message_factory.h>
+#include <google/protobuf/pyext/repeated_composite_container.h>
+#include <google/protobuf/pyext/scoped_pyobject_ptr.h>
+#include <google/protobuf/stubs/map_util.h>
 
 namespace google {
 namespace protobuf {
@@ -124,27 +126,27 @@ static bool PythonToMapKey(MapContainer* self, PyObject* obj, MapKey* key) {
       self->parent_field_descriptor->message_type()->map_key();
   switch (field_descriptor->cpp_type()) {
     case FieldDescriptor::CPPTYPE_INT32: {
-      PROTOBUF_CHECK_GET_INT32(obj, value, false);
+      GOOGLE_CHECK_GET_INT32(obj, value, false);
       key->SetInt32Value(value);
       break;
     }
     case FieldDescriptor::CPPTYPE_INT64: {
-      PROTOBUF_CHECK_GET_INT64(obj, value, false);
+      GOOGLE_CHECK_GET_INT64(obj, value, false);
       key->SetInt64Value(value);
       break;
     }
     case FieldDescriptor::CPPTYPE_UINT32: {
-      PROTOBUF_CHECK_GET_UINT32(obj, value, false);
+      GOOGLE_CHECK_GET_UINT32(obj, value, false);
       key->SetUInt32Value(value);
       break;
     }
     case FieldDescriptor::CPPTYPE_UINT64: {
-      PROTOBUF_CHECK_GET_UINT64(obj, value, false);
+      GOOGLE_CHECK_GET_UINT64(obj, value, false);
       key->SetUInt64Value(value);
       break;
     }
     case FieldDescriptor::CPPTYPE_BOOL: {
-      PROTOBUF_CHECK_GET_BOOL(obj, value, false);
+      GOOGLE_CHECK_GET_BOOL(obj, value, false);
       key->SetBoolValue(value);
       break;
     }
@@ -230,37 +232,37 @@ static bool PythonToMapValueRef(MapContainer* self, PyObject* obj,
       self->parent_field_descriptor->message_type()->map_value();
   switch (field_descriptor->cpp_type()) {
     case FieldDescriptor::CPPTYPE_INT32: {
-      PROTOBUF_CHECK_GET_INT32(obj, value, false);
+      GOOGLE_CHECK_GET_INT32(obj, value, false);
       value_ref->SetInt32Value(value);
       return true;
     }
     case FieldDescriptor::CPPTYPE_INT64: {
-      PROTOBUF_CHECK_GET_INT64(obj, value, false);
+      GOOGLE_CHECK_GET_INT64(obj, value, false);
       value_ref->SetInt64Value(value);
       return true;
     }
     case FieldDescriptor::CPPTYPE_UINT32: {
-      PROTOBUF_CHECK_GET_UINT32(obj, value, false);
+      GOOGLE_CHECK_GET_UINT32(obj, value, false);
       value_ref->SetUInt32Value(value);
       return true;
     }
     case FieldDescriptor::CPPTYPE_UINT64: {
-      PROTOBUF_CHECK_GET_UINT64(obj, value, false);
+      GOOGLE_CHECK_GET_UINT64(obj, value, false);
       value_ref->SetUInt64Value(value);
       return true;
     }
     case FieldDescriptor::CPPTYPE_FLOAT: {
-      PROTOBUF_CHECK_GET_FLOAT(obj, value, false);
+      GOOGLE_CHECK_GET_FLOAT(obj, value, false);
       value_ref->SetFloatValue(value);
       return true;
     }
     case FieldDescriptor::CPPTYPE_DOUBLE: {
-      PROTOBUF_CHECK_GET_DOUBLE(obj, value, false);
+      GOOGLE_CHECK_GET_DOUBLE(obj, value, false);
       value_ref->SetDoubleValue(value);
       return true;
     }
     case FieldDescriptor::CPPTYPE_BOOL: {
-      PROTOBUF_CHECK_GET_BOOL(obj, value, false);
+      GOOGLE_CHECK_GET_BOOL(obj, value, false);
       value_ref->SetBoolValue(value);
       return true;
     }
@@ -273,7 +275,7 @@ static bool PythonToMapValueRef(MapContainer* self, PyObject* obj,
       return true;
     }
     case FieldDescriptor::CPPTYPE_ENUM: {
-      PROTOBUF_CHECK_GET_INT32(obj, value, false);
+      GOOGLE_CHECK_GET_INT32(obj, value, false);
       if (allow_unknown_enum_values) {
         value_ref->SetEnumValue(value);
         return true;

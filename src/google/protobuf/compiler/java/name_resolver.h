@@ -31,14 +31,13 @@
 #ifndef GOOGLE_PROTOBUF_COMPILER_JAVA_NAME_RESOLVER_H__
 #define GOOGLE_PROTOBUF_COMPILER_JAVA_NAME_RESOLVER_H__
 
+#include <map>
 #include <string>
 
-#include "absl/container/flat_hash_map.h"
-#include "google/protobuf/compiler/java/options.h"
-#include "google/protobuf/port.h"
+#include <google/protobuf/stubs/common.h>
 
 // Must be last.
-#include "google/protobuf/port_def.inc"
+#include <google/protobuf/port_def.inc>
 
 namespace google {
 namespace protobuf {
@@ -59,11 +58,8 @@ enum NameEquality { NO_MATCH, EXACT_EQUAL, EQUAL_IGNORE_CASE };
 // Thread-safety note: This class is *not* thread-safe.
 class ClassNameResolver {
  public:
-  explicit ClassNameResolver(const Options& options = {}) : options_(options) {}
-  ~ClassNameResolver() = default;
-
-  ClassNameResolver(const ClassNameResolver&) = delete;
-  ClassNameResolver& operator=(const ClassNameResolver&) = delete;
+  ClassNameResolver();
+  ~ClassNameResolver();
 
   // Gets the unqualified outer class name for the file.
   std::string GetFileClassName(const FileDescriptor* file, bool immutable);
@@ -139,8 +135,6 @@ class ClassNameResolver {
                                const FileDescriptor* file, bool immutable,
                                bool is_own_file, bool kotlin);
 
-  Options options_;
-
  private:
   // Get the Java Class style full name of a message.
   std::string GetJavaClassFullName(const std::string& name_without_package,
@@ -149,8 +143,10 @@ class ClassNameResolver {
                                    const FileDescriptor* file, bool immutable,
                                    bool kotlin);
   // Caches the result to provide better performance.
-  absl::flat_hash_map<const FileDescriptor*, std::string>
+  std::map<const FileDescriptor*, std::string>
       file_immutable_outer_class_names_;
+
+  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(ClassNameResolver);
 };
 
 }  // namespace java
@@ -158,6 +154,6 @@ class ClassNameResolver {
 }  // namespace protobuf
 }  // namespace google
 
-#include "google/protobuf/port_undef.inc"
+#include <google/protobuf/port_undef.inc>
 
 #endif  // GOOGLE_PROTOBUF_COMPILER_JAVA_NAME_RESOLVER_H__

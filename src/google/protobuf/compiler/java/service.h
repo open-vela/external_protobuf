@@ -35,7 +35,8 @@
 #ifndef GOOGLE_PROTOBUF_COMPILER_JAVA_SERVICE_H__
 #define GOOGLE_PROTOBUF_COMPILER_JAVA_SERVICE_H__
 
-#include "google/protobuf/descriptor.h"
+#include <map>
+#include <google/protobuf/descriptor.h>
 
 namespace google {
 namespace protobuf {
@@ -59,8 +60,6 @@ namespace java {
 class ServiceGenerator {
  public:
   explicit ServiceGenerator(const ServiceDescriptor* descriptor);
-  ServiceGenerator(const ServiceGenerator&) = delete;
-  ServiceGenerator& operator=(const ServiceGenerator&) = delete;
   virtual ~ServiceGenerator();
 
   virtual void Generate(io::Printer* printer) = 0;
@@ -70,15 +69,15 @@ class ServiceGenerator {
 
  protected:
   const ServiceDescriptor* descriptor_;
+
+ private:
+  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(ServiceGenerator);
 };
 
 class ImmutableServiceGenerator : public ServiceGenerator {
  public:
   ImmutableServiceGenerator(const ServiceDescriptor* descriptor,
                             Context* context);
-  ImmutableServiceGenerator(const ImmutableServiceGenerator&) = delete;
-  ImmutableServiceGenerator& operator=(const ImmutableServiceGenerator&) =
-      delete;
   ~ImmutableServiceGenerator() override;
 
   void Generate(io::Printer* printer) override;
@@ -129,6 +128,7 @@ class ImmutableServiceGenerator : public ServiceGenerator {
 
   Context* context_;
   ClassNameResolver* name_resolver_;
+  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(ImmutableServiceGenerator);
 };
 
 }  // namespace java

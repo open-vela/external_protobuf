@@ -31,16 +31,15 @@
 // This file defines a C++ DescriptorDatabase, which wraps a Python Database
 // and delegate all its operations to Python methods.
 
-#include "google/protobuf/pyext/descriptor_database.h"
+#include <google/protobuf/pyext/descriptor_database.h>
 
 #include <cstdint>
-#include <string>
-#include <vector>
 
-#include "google/protobuf/descriptor.pb.h"
-#include "google/protobuf/stubs/logging.h"
-#include "google/protobuf/pyext/message.h"
-#include "google/protobuf/pyext/scoped_pyobject_ptr.h"
+#include <google/protobuf/stubs/logging.h>
+#include <google/protobuf/stubs/common.h>
+#include <google/protobuf/descriptor.pb.h>
+#include <google/protobuf/pyext/message.h>
+#include <google/protobuf/pyext/scoped_pyobject_ptr.h>
 
 namespace google {
 namespace protobuf {
@@ -62,7 +61,7 @@ static bool GetFileDescriptorProto(PyObject* py_descriptor,
       // Expected error: item was simply not found.
       PyErr_Clear();
     } else {
-      GOOGLE_ABSL_LOG(ERROR) << "DescriptorDatabase method raised an error";
+      GOOGLE_LOG(ERROR) << "DescriptorDatabase method raised an error";
       PyErr_Print();
     }
     return false;
@@ -86,7 +85,7 @@ static bool GetFileDescriptorProto(PyObject* py_descriptor,
     ScopedPyObjectPtr serialized_pb(
         PyObject_CallMethod(py_descriptor, "SerializeToString", nullptr));
     if (serialized_pb == nullptr) {
-      GOOGLE_ABSL_LOG(ERROR)
+      GOOGLE_LOG(ERROR)
           << "DescriptorDatabase method did not return a FileDescriptorProto";
       PyErr_Print();
       return false;
@@ -94,14 +93,14 @@ static bool GetFileDescriptorProto(PyObject* py_descriptor,
     char* str;
     Py_ssize_t len;
     if (PyBytes_AsStringAndSize(serialized_pb.get(), &str, &len) < 0) {
-      GOOGLE_ABSL_LOG(ERROR)
+      GOOGLE_LOG(ERROR)
           << "DescriptorDatabase method did not return a FileDescriptorProto";
       PyErr_Print();
       return false;
     }
     FileDescriptorProto file_proto;
     if (!file_proto.ParseFromArray(str, len)) {
-      GOOGLE_ABSL_LOG(ERROR)
+      GOOGLE_LOG(ERROR)
           << "DescriptorDatabase method did not return a FileDescriptorProto";
       return false;
     }
@@ -172,8 +171,9 @@ bool PyDescriptorDatabase::FindAllExtensionNumbers(
     ScopedPyObjectPtr item(PySequence_GetItem(py_list.get(), i));
     item_value = PyLong_AsLong(item.get());
     if (item_value < 0) {
-      GOOGLE_ABSL_LOG(ERROR) << "FindAllExtensionNumbers method did not return "
-                      << "valid extension numbers.";
+      GOOGLE_LOG(ERROR)
+          << "FindAllExtensionNumbers method did not return "
+          << "valid extension numbers.";
       PyErr_Print();
       return false;
     }

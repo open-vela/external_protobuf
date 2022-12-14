@@ -61,4 +61,5 @@ public final class StructsTest {
     assertThat(Structs.of("k1", Values.of(1), "k2", Values.of(2), "k3", Values.of(3)))
         .isEqualTo(expected.build());
   }
+
 }
