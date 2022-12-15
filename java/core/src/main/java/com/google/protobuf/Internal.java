@@ -375,7 +375,6 @@ public final class Internal {
     }
   }
 
-
   /** An empty byte array constant used in generated code. */
   public static final byte[] EMPTY_BYTE_ARRAY = new byte[0];
 
@@ -385,7 +384,6 @@ public final class Internal {
   /** An empty coded input stream constant used in generated code. */
   public static final CodedInputStream EMPTY_CODED_INPUT_STREAM =
       CodedInputStream.newInstance(EMPTY_BYTE_ARRAY);
-
 
   /** Helper method to merge two MessageLite instances. */
   static Object mergeMessage(Object destination, Object source) {
@@ -600,6 +598,7 @@ public final class Internal {
     void addInt(int element);
 
     /** Like {@link #set(int, Object)} but more efficient in that it doesn't box the element. */
+    @CanIgnoreReturnValue
     int setInt(int index, int element);
 
     /** Returns a mutable clone of this list with the specified capacity. */
@@ -620,6 +619,7 @@ public final class Internal {
     void addBoolean(boolean element);
 
     /** Like {@link #set(int, Object)} but more efficient in that it doesn't box the element. */
+    @CanIgnoreReturnValue
     boolean setBoolean(int index, boolean element);
 
     /** Returns a mutable clone of this list with the specified capacity. */
@@ -640,6 +640,7 @@ public final class Internal {
     void addLong(long element);
 
     /** Like {@link #set(int, Object)} but more efficient in that it doesn't box the element. */
+    @CanIgnoreReturnValue
     long setLong(int index, long element);
 
     /** Returns a mutable clone of this list with the specified capacity. */
@@ -660,6 +661,7 @@ public final class Internal {
     void addDouble(double element);
 
     /** Like {@link #set(int, Object)} but more efficient in that it doesn't box the element. */
+    @CanIgnoreReturnValue
     double setDouble(int index, double element);
 
     /** Returns a mutable clone of this list with the specified capacity. */
@@ -680,11 +682,11 @@ public final class Internal {
     void addFloat(float element);
 
     /** Like {@link #set(int, Object)} but more efficient in that it doesn't box the element. */
+    @CanIgnoreReturnValue
     float setFloat(int index, float element);
 
     /** Returns a mutable clone of this list with the specified capacity. */
     @Override
     FloatList mutableCopyWithCapacity(int capacity);
   }
-
 }

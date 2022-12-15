@@ -31,21 +31,22 @@
 // Author: kenton@google.com (Kenton Varda)
 //  Based on original Protocol Buffers design by
 //  Sanjay Ghemawat, Jeff Dean, and others.
-#include <google/protobuf/reflection_ops.h>
+#include "google/protobuf/reflection_ops.h"
 
 #include <string>
 #include <vector>
 
-#include <google/protobuf/stubs/logging.h>
-#include <google/protobuf/stubs/common.h>
-#include <google/protobuf/descriptor.h>
-#include <google/protobuf/descriptor.pb.h>
-#include <google/protobuf/map_field.h>
-#include <google/protobuf/map_field_inl.h>
-#include <google/protobuf/unknown_field_set.h>
+#include "google/protobuf/stubs/logging.h"
+#include "google/protobuf/stubs/logging.h"
+#include "absl/strings/str_cat.h"
+#include "google/protobuf/descriptor.h"
+#include "google/protobuf/descriptor.pb.h"
+#include "google/protobuf/map_field.h"
+#include "google/protobuf/map_field_inl.h"
+#include "google/protobuf/unknown_field_set.h"
 
 // Must be included last.
-#include <google/protobuf/port_def.inc>
+#include "google/protobuf/port_def.inc"
 
 namespace google {
 namespace protobuf {
@@ -57,7 +58,8 @@ static const Reflection* GetReflectionOrDie(const Message& m) {
     const Descriptor* d = m.GetDescriptor();
     const std::string& mtype = d ? d->name() : "unknown";
     // RawMessage is one known type for which GetReflection() returns nullptr.
-    GOOGLE_LOG(FATAL) << "Message does not support reflection (type " << mtype << ").";
+    GOOGLE_ABSL_LOG(FATAL) << "Message does not support reflection (type " << mtype
+                    << ").";
   }
   return r;
 }
@@ -69,10 +71,10 @@ void ReflectionOps::Copy(const Message& from, Message* to) {
 }
 
 void ReflectionOps::Merge(const Message& from, Message* to) {
-  GOOGLE_CHECK_NE(&from, to);
+  GOOGLE_ABSL_CHECK_NE(&from, to);
 
   const Descriptor* descriptor = from.GetDescriptor();
-  GOOGLE_CHECK_EQ(to->GetDescriptor(), descriptor)
+  GOOGLE_ABSL_CHECK_EQ(to->GetDescriptor(), descriptor)
       << "Tried to merge messages of different types "
       << "(merge " << descriptor->full_name() << " to "
       << to->GetDescriptor()->full_name() << ")";
@@ -197,7 +199,7 @@ bool ReflectionOps::IsInitialized(const Message& message, bool check_fields,
   if (const int field_count = descriptor->field_count()) {
     const FieldDescriptor* begin = descriptor->field(0);
     const FieldDescriptor* end = begin + field_count;
-    GOOGLE_DCHECK_EQ(descriptor->field(field_count - 1), end - 1);
+    GOOGLE_ABSL_DCHECK_EQ(descriptor->field(field_count - 1), end - 1);
 
     if (check_fields) {
       // Check required fields of this message.
@@ -374,7 +376,7 @@ static std::string SubMessagePrefix(const std::string& prefix,
   }
   if (index != -1) {
     result.append("[");
-    result.append(StrCat(index));
+    result.append(absl::StrCat(index));
     result.append("]");
   }
   result.append(".");
@@ -425,10 +427,10 @@ void ReflectionOps::FindInitializationErrors(const Message& message,
 
 void GenericSwap(Message* lhs, Message* rhs) {
 #ifndef PROTOBUF_FORCE_COPY_IN_SWAP
-  GOOGLE_DCHECK(Arena::InternalGetOwningArena(lhs) !=
-         Arena::InternalGetOwningArena(rhs));
-  GOOGLE_DCHECK(Arena::InternalGetOwningArena(lhs) != nullptr ||
-         Arena::InternalGetOwningArena(rhs) != nullptr);
+  GOOGLE_ABSL_DCHECK(Arena::InternalGetOwningArena(lhs) !=
+              Arena::InternalGetOwningArena(rhs));
+  GOOGLE_ABSL_DCHECK(Arena::InternalGetOwningArena(lhs) != nullptr ||
+              Arena::InternalGetOwningArena(rhs) != nullptr);
 #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
   // At least one of these must have an arena, so make `rhs` point to it.
   Arena* arena = Arena::InternalGetOwningArena(rhs);
@@ -456,4 +458,4 @@ void GenericSwap(Message* lhs, Message* rhs) {
 }  // namespace protobuf
 }  // namespace google
 
-#include <google/protobuf/port_undef.inc>
+#include "google/protobuf/port_undef.inc"
