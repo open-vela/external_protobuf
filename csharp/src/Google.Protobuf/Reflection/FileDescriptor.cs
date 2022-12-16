@@ -35,6 +35,7 @@ using Google.Protobuf.WellKnownTypes;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using static Google.Protobuf.Reflection.SourceCodeInfo.Types;
@@ -172,18 +173,25 @@ namespace Google.Protobuf.Reflection
             return list[index];
         }
 
-        private IReadOnlyList<DescriptorBase> GetNestedDescriptorListForField(int fieldNumber) =>
-            fieldNumber switch
+        private IReadOnlyList<DescriptorBase> GetNestedDescriptorListForField(int fieldNumber)
+        {
+            switch (fieldNumber)
             {
-                FileDescriptorProto.ServiceFieldNumber => (IReadOnlyList<DescriptorBase>)Services,
-                FileDescriptorProto.MessageTypeFieldNumber => (IReadOnlyList<DescriptorBase>)MessageTypes,
-                FileDescriptorProto.EnumTypeFieldNumber => (IReadOnlyList<DescriptorBase>)EnumTypes,
-                _ => null,
-            };
+                case FileDescriptorProto.ServiceFieldNumber:
+                    return (IReadOnlyList<DescriptorBase>) Services;
+                case FileDescriptorProto.MessageTypeFieldNumber:
+                    return (IReadOnlyList<DescriptorBase>) MessageTypes;
+                case FileDescriptorProto.EnumTypeFieldNumber:
+                    return (IReadOnlyList<DescriptorBase>) EnumTypes;
+                default:
+                    return null;
+            }
+        }
 
         internal DescriptorDeclaration GetDeclaration(IDescriptor descriptor)
         {
-            declarations.Value.TryGetValue(descriptor, out DescriptorDeclaration declaration);
+            DescriptorDeclaration declaration;
+            declarations.Value.TryGetValue(descriptor, out declaration);
             return declaration;
         }
 
@@ -219,7 +227,8 @@ namespace Google.Protobuf.Reflection
                     throw new DescriptorValidationException(@this, "Invalid public dependency index.");
                 }
                 string name = proto.Dependency[index];
-                if (!nameToFileMap.TryGetValue(name, out FileDescriptor file))
+                FileDescriptor file;
+                if (!nameToFileMap.TryGetValue(name, out file))
                 {
                     if (!allowUnknownDependencies)
                     {
@@ -323,7 +332,7 @@ namespace Google.Protobuf.Reflection
         /// <param name="name">The unqualified type name to look for.</param>
         /// <typeparam name="T">The type of descriptor to look for</typeparam>
         /// <returns>The type's descriptor, or null if not found.</returns>
-        public T FindTypeByName<T>(string name)
+        public T FindTypeByName<T>(String name)
             where T : class, IDescriptor
         {
             // Don't allow looking up nested types.  This will make optimization
@@ -498,7 +507,8 @@ namespace Google.Protobuf.Reflection
                 var dependencies = new List<FileDescriptor>();
                 foreach (var dependencyName in proto.Dependency)
                 {
-                    if (!descriptorsByName.TryGetValue(dependencyName, out FileDescriptor dependency))
+                    FileDescriptor dependency;
+                    if (!descriptorsByName.TryGetValue(dependencyName, out dependency))
                     {
                         throw new ArgumentException($"Dependency missing: {dependencyName}");
                     }
@@ -555,7 +565,7 @@ namespace Google.Protobuf.Reflection
         /// <value>
         /// The file descriptor for <c>descriptor.proto</c>.
         /// </value>
-        public static FileDescriptor DescriptorProtoFileDescriptor => DescriptorReflection.Descriptor;
+        public static FileDescriptor DescriptorProtoFileDescriptor { get { return DescriptorReflection.Descriptor; } }
 
         /// <summary>
         /// The (possibly empty) set of custom options for this file.

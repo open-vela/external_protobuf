@@ -32,23 +32,23 @@
 //  Based on original Protocol Buffers design by
 //  Sanjay Ghemawat, Jeff Dean, and others.
 
-#include "google/protobuf/wire_format_lite.h"
+#include <google/protobuf/wire_format_lite.h>
 
 #include <limits>
 #include <stack>
 #include <string>
 #include <vector>
 
-#include "google/protobuf/stubs/logging.h"
-#include "google/protobuf/stubs/logging.h"
-#include "absl/strings/cord.h"
-#include "absl/strings/str_cat.h"
-#include "absl/strings/str_format.h"
-#include "utf8_validity.h"
+#include <google/protobuf/stubs/logging.h>
+#include <google/protobuf/stubs/common.h>
+#include <google/protobuf/io/coded_stream.h>
+#include <google/protobuf/io/zero_copy_stream.h>
+#include <google/protobuf/io/zero_copy_stream_impl_lite.h>
+#include <google/protobuf/stubs/stringprintf.h>
 
 
 // Must be included last.
-#include "google/protobuf/port_def.inc"
+#include <google/protobuf/port_def.inc>
 
 namespace google {
 namespace protobuf {
@@ -483,7 +483,7 @@ void WireFormatLite::WriteString(int field_number, const std::string& value,
                                  io::CodedOutputStream* output) {
   // String is for UTF-8 text only
   WriteTag(field_number, WIRETYPE_LENGTH_DELIMITED, output);
-  GOOGLE_ABSL_CHECK_LE(value.size(), kInt32MaxSize);
+  GOOGLE_CHECK_LE(value.size(), kInt32MaxSize);
   output->WriteVarint32(value.size());
   output->WriteString(value);
 }
@@ -492,14 +492,14 @@ void WireFormatLite::WriteStringMaybeAliased(int field_number,
                                              io::CodedOutputStream* output) {
   // String is for UTF-8 text only
   WriteTag(field_number, WIRETYPE_LENGTH_DELIMITED, output);
-  GOOGLE_ABSL_CHECK_LE(value.size(), kInt32MaxSize);
+  GOOGLE_CHECK_LE(value.size(), kInt32MaxSize);
   output->WriteVarint32(value.size());
   output->WriteRawMaybeAliased(value.data(), value.size());
 }
 void WireFormatLite::WriteBytes(int field_number, const std::string& value,
                                 io::CodedOutputStream* output) {
   WriteTag(field_number, WIRETYPE_LENGTH_DELIMITED, output);
-  GOOGLE_ABSL_CHECK_LE(value.size(), kInt32MaxSize);
+  GOOGLE_CHECK_LE(value.size(), kInt32MaxSize);
   output->WriteVarint32(value.size());
   output->WriteString(value);
 }
@@ -507,7 +507,7 @@ void WireFormatLite::WriteBytesMaybeAliased(int field_number,
                                             const std::string& value,
                                             io::CodedOutputStream* output) {
   WriteTag(field_number, WIRETYPE_LENGTH_DELIMITED, output);
-  GOOGLE_ABSL_CHECK_LE(value.size(), kInt32MaxSize);
+  GOOGLE_CHECK_LE(value.size(), kInt32MaxSize);
   output->WriteVarint32(value.size());
   output->WriteRawMaybeAliased(value.data(), value.size());
 }
@@ -593,8 +593,8 @@ bool WireFormatLite::ReadBytes(io::CodedInputStream* input, std::string** p) {
   return ReadBytesToString(input, *p);
 }
 
-void PrintUTF8ErrorLog(absl::string_view message_name,
-                       absl::string_view field_name, const char* operation_str,
+void PrintUTF8ErrorLog(StringPiece message_name,
+                       StringPiece field_name, const char* operation_str,
                        bool emit_stacktrace) {
   std::string stacktrace;
   (void)emit_stacktrace;  // Parameter is used by Google-internal code.
@@ -602,25 +602,25 @@ void PrintUTF8ErrorLog(absl::string_view message_name,
   if (!field_name.empty()) {
     if (!message_name.empty()) {
       quoted_field_name =
-          absl::StrCat(" '", message_name, ".", field_name, "'");
+          StrCat(" '", message_name, ".", field_name, "'");
     } else {
-      quoted_field_name = absl::StrCat(" '", field_name, "'");
+      quoted_field_name = StrCat(" '", field_name, "'");
     }
   }
   std::string error_message =
-      absl::StrCat("String field", quoted_field_name,
+      StrCat("String field", quoted_field_name,
                    " contains invalid UTF-8 data "
                    "when ",
                    operation_str,
                    " a protocol buffer. Use the 'bytes' type if you intend to "
                    "send raw bytes. ",
                    stacktrace);
-  GOOGLE_ABSL_LOG(ERROR) << error_message;
+  GOOGLE_LOG(ERROR) << error_message;
 }
 
 bool WireFormatLite::VerifyUtf8String(const char* data, int size, Operation op,
                                       const char* field_name) {
-  if (!utf8_range::IsStructurallyValid({data, static_cast<size_t>(size)})) {
+  if (!IsStructurallyValidUTF8(data, size)) {
     const char* operation_str = nullptr;
     switch (op) {
       case PARSE:
@@ -815,4 +815,4 @@ size_t WireFormatLite::SInt64Size(const RepeatedField<int64_t>& value) {
 }  // namespace protobuf
 }  // namespace google
 
-#include "google/protobuf/port_undef.inc"
+#include <google/protobuf/port_undef.inc>

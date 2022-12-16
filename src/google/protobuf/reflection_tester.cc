@@ -28,14 +28,14 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "google/protobuf/reflection_tester.h"
+#include <google/protobuf/reflection_tester.h>
 
 #include <gtest/gtest.h>
-#include "google/protobuf/map_field.h"
-#include "google/protobuf/message.h"
+#include <google/protobuf/map_field.h>
+#include <google/protobuf/message.h>
 
 // Must include last.
-#include "google/protobuf/port_def.inc"
+#include <google/protobuf/port_def.inc>
 
 namespace google {
 namespace protobuf {
@@ -193,7 +193,7 @@ MapReflectionTester::MapReflectionTester(const Descriptor* base_descriptor)
       map_int32_foreign_message_key_,
       map_int32_foreign_message_val_};
   for (const FieldDescriptor* fdesc : all_map_descriptors) {
-    GOOGLE_ABSL_CHECK(fdesc->containing_type() != nullptr) << fdesc->name();
+    GOOGLE_CHECK(fdesc->containing_type() != nullptr) << fdesc->name();
     if (fdesc->name() == "key") {
       EXPECT_EQ(fdesc->containing_type()->map_key(), fdesc);
     } else {
@@ -207,7 +207,7 @@ MapReflectionTester::MapReflectionTester(const Descriptor* base_descriptor)
 const FieldDescriptor* MapReflectionTester::F(const std::string& name) {
   const FieldDescriptor* result = nullptr;
   result = base_descriptor_->FindFieldByName(name);
-  GOOGLE_ABSL_CHECK(result != nullptr);
+  GOOGLE_CHECK(result != nullptr);
   return result;
 }
 
@@ -1670,4 +1670,4 @@ void MapReflectionTester::ExpectClearViaReflectionIterator(Message* message) {
 }  // namespace protobuf
 }  // namespace google
 
-#include "google/protobuf/port_undef.inc"
+#include <google/protobuf/port_undef.inc>

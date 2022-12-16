@@ -46,6 +46,13 @@ import com.google.protobuf.UnittestLite.TestEmptyMessageLite
 import com.google.protobuf.UnittestLite.TestEmptyMessageWithExtensionsLite
 import com.google.protobuf.copy
 import com.google.protobuf.foreignMessageLite
+import com.google.protobuf.kotlin.generator.EvilNamesProto2OuterClass.EvilNamesProto2
+import com.google.protobuf.kotlin.generator.EvilNamesProto2OuterClass.HardKeywordsAllTypesProto2
+import com.google.protobuf.kotlin.generator.EvilNamesProto2OuterClass.Interface
+import com.google.protobuf.kotlin.generator.HardKeywordsAllTypesProto2Kt
+import com.google.protobuf.kotlin.generator.evilNamesProto2
+import com.google.protobuf.kotlin.generator.hardKeywordsAllTypesProto2
+import com.google.protobuf.kotlin.generator.interface_
 import com.google.protobuf.optionalGroupExtensionLite
 import com.google.protobuf.repeatedGroupExtensionLite
 import com.google.protobuf.testAllExtensionsLite
@@ -55,13 +62,6 @@ import com.google.protobuf.testEmptyMessageWithExtensionsLite
 import protobuf_unittest.MapLiteUnittest.MapEnumLite
 import protobuf_unittest.MapLiteUnittest.TestMapLite
 import protobuf_unittest.testMapLite
-import `in`.com.google.protobuf.kotlin.generator.EvilNamesProto2
-import `in`.com.google.protobuf.kotlin.generator.HardKeywordsAllTypesProto2
-import `in`.com.google.protobuf.kotlin.generator.Interface
-import `in`.com.google.protobuf.kotlin.generator.HardKeywordsAllTypesProto2Kt
-import `in`.com.google.protobuf.kotlin.generator.evilNamesProto2
-import `in`.com.google.protobuf.kotlin.generator.hardKeywordsAllTypesProto2
-import `in`.com.google.protobuf.kotlin.generator.interface_
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -178,7 +178,6 @@ class Proto2LiteTest {
       .isEqualTo(TestUtilLite.getAllLiteSetBuilder().build())
   }
 
-  @Suppress("CheckResult")
   @Test
   fun testGetters() {
     testAllTypesLite {
@@ -199,7 +198,6 @@ class Proto2LiteTest {
     }
   }
 
-  @Suppress("CheckResult")
   @Test
   fun testDefaultGetters() {
     testAllTypesLite {
@@ -210,7 +208,6 @@ class Proto2LiteTest {
     }
   }
 
-  @Suppress("CheckResult")
   @Test
   fun testRepeatedGettersAndSetters() {
     testAllTypesLite {
@@ -301,7 +298,6 @@ class Proto2LiteTest {
     }
   }
 
-  @Suppress("CheckResult")
   @Test
   fun testHazzers() {
     testAllTypesLite {
@@ -332,7 +328,6 @@ class Proto2LiteTest {
     }
   }
 
-  @Suppress("CheckResult")
   @Test
   fun testClears() {
     testAllTypesLite {
@@ -404,57 +399,38 @@ class Proto2LiteTest {
   fun testExtensionsSet() {
     assertThat(
         testAllExtensionsLite {
-          setExtension(UnittestLite.optionalInt32ExtensionLite, 101)
-          setExtension(UnittestLite.optionalInt64ExtensionLite, 102L)
-          setExtension(UnittestLite.optionalUint32ExtensionLite, 103)
-          setExtension(UnittestLite.optionalUint64ExtensionLite, 104L)
-          setExtension(UnittestLite.optionalSint32ExtensionLite, 105)
-          setExtension(UnittestLite.optionalSint64ExtensionLite, 106L)
-          setExtension(UnittestLite.optionalFixed32ExtensionLite, 107)
-          setExtension(UnittestLite.optionalFixed64ExtensionLite, 108L)
-          setExtension(UnittestLite.optionalSfixed32ExtensionLite, 109)
-          setExtension(UnittestLite.optionalSfixed64ExtensionLite, 110L)
-          setExtension(UnittestLite.optionalFloatExtensionLite, 111F)
-          setExtension(UnittestLite.optionalDoubleExtensionLite, 112.0)
-          setExtension(UnittestLite.optionalBoolExtensionLite, true)
-          setExtension(UnittestLite.optionalStringExtensionLite, "115")
-          setExtension(UnittestLite.optionalBytesExtensionLite, toBytes("116"))
-          setExtension(
-            UnittestLite.optionalGroupExtensionLite,
-            optionalGroupExtensionLite { a = 117 }
-          )
-          setExtension(
-            UnittestLite.optionalNestedMessageExtensionLite,
+          this[UnittestLite.optionalInt32ExtensionLite] = 101
+          this[UnittestLite.optionalInt64ExtensionLite] = 102L
+          this[UnittestLite.optionalUint32ExtensionLite] = 103
+          this[UnittestLite.optionalUint64ExtensionLite] = 104L
+          this[UnittestLite.optionalSint32ExtensionLite] = 105
+          this[UnittestLite.optionalSint64ExtensionLite] = 106L
+          this[UnittestLite.optionalFixed32ExtensionLite] = 107
+          this[UnittestLite.optionalFixed64ExtensionLite] = 108L
+          this[UnittestLite.optionalSfixed32ExtensionLite] = 109
+          this[UnittestLite.optionalSfixed64ExtensionLite] = 110L
+          this[UnittestLite.optionalFloatExtensionLite] = 111F
+          this[UnittestLite.optionalDoubleExtensionLite] = 112.0
+          this[UnittestLite.optionalBoolExtensionLite] = true
+          this[UnittestLite.optionalStringExtensionLite] = "115"
+          this[UnittestLite.optionalBytesExtensionLite] = toBytes("116")
+          this[UnittestLite.optionalGroupExtensionLite] = optionalGroupExtensionLite { a = 117 }
+          this[UnittestLite.optionalNestedMessageExtensionLite] =
             TestAllTypesLiteKt.nestedMessage { bb = 118 }
-          )
-          setExtension(
-            UnittestLite.optionalForeignMessageExtensionLite,
-            foreignMessageLite { c = 119 }
-          )
-          setExtension(
-            UnittestLite.optionalImportMessageExtensionLite,
+          this[UnittestLite.optionalForeignMessageExtensionLite] = foreignMessageLite { c = 119 }
+          this[UnittestLite.optionalImportMessageExtensionLite] =
             ImportMessageLite.newBuilder().setD(120).build()
-          )
-          setExtension(
-            UnittestLite.optionalPublicImportMessageExtensionLite,
+          this[UnittestLite.optionalPublicImportMessageExtensionLite] =
             PublicImportMessageLite.newBuilder().setE(126).build()
-          )
-          setExtension(
-            UnittestLite.optionalLazyMessageExtensionLite,
+          this[UnittestLite.optionalLazyMessageExtensionLite] =
             TestAllTypesLiteKt.nestedMessage { bb = 127 }
-          )
-          setExtension(
-            UnittestLite.optionalUnverifiedLazyMessageExtensionLite,
+          this[UnittestLite.optionalUnverifiedLazyMessageExtensionLite] =
             TestAllTypesLiteKt.nestedMessage { bb = 128 }
-          )
-          setExtension(UnittestLite.optionalNestedEnumExtensionLite, NestedEnum.BAZ)
-          setExtension(
-            UnittestLite.optionalForeignEnumExtensionLite,
-            ForeignEnumLite.FOREIGN_LITE_BAZ
-          )
-          setExtension(UnittestLite.optionalImportEnumExtensionLite, ImportEnumLite.IMPORT_LITE_BAZ)
-          setExtension(UnittestLite.optionalStringPieceExtensionLite, "124")
-          setExtension(UnittestLite.optionalCordExtensionLite, "125")
+          this[UnittestLite.optionalNestedEnumExtensionLite] = NestedEnum.BAZ
+          this[UnittestLite.optionalForeignEnumExtensionLite] = ForeignEnumLite.FOREIGN_LITE_BAZ
+          this[UnittestLite.optionalImportEnumExtensionLite] = ImportEnumLite.IMPORT_LITE_BAZ
+          this[UnittestLite.optionalStringPieceExtensionLite] = "124"
+          this[UnittestLite.optionalCordExtensionLite] = "125"
           this[UnittestLite.repeatedInt32ExtensionLite].add(201)
           this[UnittestLite.repeatedInt64ExtensionLite].add(202L)
           this[UnittestLite.repeatedUint32ExtensionLite].add(203)
@@ -544,7 +520,6 @@ class Proto2LiteTest {
       .isEqualTo(TestUtilLite.getAllLiteExtensionsSet())
   }
 
-  @Suppress("CheckResult")
   @Test
   fun testExtensionGetters() {
     testAllExtensionsLite {
@@ -568,7 +543,6 @@ class Proto2LiteTest {
     }
   }
 
-  @Suppress("CheckResult")
   @Test
   fun testRepeatedExtensionGettersAndSetters() {
     testAllExtensionsLite {
@@ -658,7 +632,6 @@ class Proto2LiteTest {
     }
   }
 
-  @Suppress("CheckResult")
   @Test
   fun testExtensionContains() {
     testAllExtensionsLite {
@@ -690,7 +663,6 @@ class Proto2LiteTest {
     }
   }
 
-  @Suppress("CheckResult")
   @Test
   fun testExtensionClears() {
     testAllExtensionsLite {
@@ -779,7 +751,6 @@ class Proto2LiteTest {
       )
   }
 
-  @Suppress("CheckResult")
   @Test
   fun testMapGettersAndSetters() {
     testMapLite {
@@ -835,7 +806,6 @@ class Proto2LiteTest {
     }
   }
 
-  @Suppress("CheckResult")
   @Test
   fun testMapRemove() {
     testMapLite {
@@ -861,7 +831,6 @@ class Proto2LiteTest {
     }
   }
 
-  @Suppress("CheckResult")
   @Test
   fun testMapClear() {
     testMapLite {
@@ -908,6 +877,7 @@ class Proto2LiteTest {
           boolean = 1L
           sealed = "foo"
           interface_ = 1F
+          in_ = 1
           object_ = "foo"
           cachedSize_ = "foo"
           serializedSize_ = true
@@ -933,6 +903,7 @@ class Proto2LiteTest {
           .setBoolean(1L)
           .setSealed("foo")
           .setInterface(1F)
+          .setIn(1)
           .setObject("foo")
           .setCachedSize_("foo")
           .setSerializedSize_(true)
@@ -943,12 +914,14 @@ class Proto2LiteTest {
     assertThat(interface_ {}).isEqualTo(Interface.newBuilder().build())
   }
 
-  @Suppress("CheckResult")
   @Test
   fun testHardKeywordGettersAndSetters() {
     hardKeywordsAllTypesProto2 {
       as_ = 1
       assertThat(as_).isEqualTo(1)
+
+      in_ = "foo"
+      assertThat(in_).isEqualTo("foo")
 
       break_ = HardKeywordsAllTypesProto2.NestedEnum.FOO
       assertThat(break_).isEqualTo(HardKeywordsAllTypesProto2.NestedEnum.FOO)
@@ -973,12 +946,14 @@ class Proto2LiteTest {
     }
   }
 
-  @Suppress("CheckResult")
   @Test
   fun testHardKeywordHazzers() {
     hardKeywordsAllTypesProto2 {
       as_ = 1
       assertThat(hasAs_()).isTrue()
+
+      in_ = "foo"
+      assertThat(hasIn_()).isTrue()
 
       break_ = HardKeywordsAllTypesProto2.NestedEnum.FOO
       assertThat(hasBreak_()).isTrue()
@@ -988,13 +963,16 @@ class Proto2LiteTest {
     }
   }
 
-  @Suppress("CheckResult")
   @Test
   fun testHardKeywordClears() {
     hardKeywordsAllTypesProto2 {
       as_ = 1
       clearAs_()
       assertThat(hasAs_()).isFalse()
+
+      in_ = "foo"
+      clearIn_()
+      assertThat(hasIn_()).isFalse()
 
       break_ = HardKeywordsAllTypesProto2.NestedEnum.FOO
       clearBreak_()
