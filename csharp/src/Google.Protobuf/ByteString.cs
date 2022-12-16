@@ -37,8 +37,13 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Text;
+#if !NET35
 using System.Threading;
 using System.Threading.Tasks;
+#endif
+#if NET35
+using Google.Protobuf.Compatibility;
+#endif
 
 namespace Google.Protobuf
 {
@@ -181,6 +186,7 @@ namespace Google.Protobuf
             return AttachBytes(bytes);
         }
 
+#if !NET35
         /// <summary>
         /// Constructs a <see cref="ByteString"/> from data in the given stream, asynchronously.
         /// </summary>
@@ -189,11 +195,12 @@ namespace Google.Protobuf
         /// <param name="stream">The stream to copy into a ByteString.</param>
         /// <param name="cancellationToken">The cancellation token to use when reading from the stream, if any.</param>
         /// <returns>A ByteString with content read from the given stream.</returns>
-        public static Task<ByteString> FromStreamAsync(Stream stream, CancellationToken cancellationToken = default)
+        public static Task<ByteString> FromStreamAsync(Stream stream, CancellationToken cancellationToken = default(CancellationToken))
         {
             ProtoPreconditions.CheckNotNull(stream, nameof(stream));
             return ByteStringAsync.FromStreamAsyncCore(stream, cancellationToken);
         }
+#endif
 
         /// <summary>
         /// Constructs a <see cref="ByteString" /> from the given array. The contents
@@ -340,7 +347,7 @@ namespace Google.Protobuf
             {
                 return true;
             }
-            if (lhs is null || rhs is null)
+            if (ReferenceEquals(lhs, null) || ReferenceEquals(rhs, null))
             {
                 return false;
             }

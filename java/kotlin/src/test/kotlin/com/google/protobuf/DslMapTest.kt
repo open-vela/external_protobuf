@@ -44,7 +44,8 @@ class DslMapTest {
 
   @Test
   fun matchesMap() {
-    assertThat(DslMap<Int, Int, DummyProxy>(mapOf(1 to -1, 2 to -2))).containsExactly(1, -1, 2, -2)
+    assertThat(DslMap<Int, Int, DummyProxy>(mapOf(1 to -1, 2 to -2)))
+      .containsExactly(1, -1, 2, -2)
   }
 
   @Test
@@ -90,7 +91,9 @@ class DslMapTest {
   fun dslMapIsNotEvenSecretlyMutable() {
     val dslMap = DslMap<Int, Int, DummyProxy>(mutableMapOf(1 to -1))
     val dslMapAsJavaUtilMap = dslMap as java.util.Map<Int, Int>
-    assertFailsWith<UnsupportedOperationException> { dslMapAsJavaUtilMap.put(2, -2) }
+    assertFailsWith<UnsupportedOperationException> {
+      dslMapAsJavaUtilMap.put(2, -2)
+    }
   }
 
   @Suppress("PLATFORM_CLASS_MAPPED_TO_KOTLIN", "UNCHECKED_CAST")
@@ -98,7 +101,9 @@ class DslMapTest {
   fun dslMapKeysAreNotEvenSecretlyMutable() {
     val dslMap = DslMap<Int, Int, DummyProxy>(mutableMapOf(1 to -1))
     val dslMapKeysAsJavaUtilSet = dslMap.keys as java.util.Set<Int>
-    assertFailsWith<UnsupportedOperationException> { dslMapKeysAsJavaUtilSet.remove(1) }
+    assertFailsWith<UnsupportedOperationException> {
+      dslMapKeysAsJavaUtilSet.remove(1)
+    }
   }
 
   @Suppress("PLATFORM_CLASS_MAPPED_TO_KOTLIN", "UNCHECKED_CAST")
@@ -108,7 +113,9 @@ class DslMapTest {
     val dslMapKeysAsJavaUtilSet = dslMap.keys as java.util.Set<Int>
     val itr = dslMapKeysAsJavaUtilSet.iterator()
     itr.next()
-    assertFailsWith<UnsupportedOperationException> { itr.remove() }
+    assertFailsWith<UnsupportedOperationException> {
+      itr.remove()
+    }
   }
 
   @Suppress("PLATFORM_CLASS_MAPPED_TO_KOTLIN", "UNCHECKED_CAST")
@@ -116,7 +123,9 @@ class DslMapTest {
   fun dslMapValuesAreNotEvenSecretlyMutable() {
     val dslMap = DslMap<Int, Int, DummyProxy>(mutableMapOf(1 to -1))
     val dslMapValuesAsJavaUtilCollection = dslMap.values as java.util.Collection<Int>
-    assertFailsWith<UnsupportedOperationException> { dslMapValuesAsJavaUtilCollection.remove(1) }
+    assertFailsWith<UnsupportedOperationException> {
+      dslMapValuesAsJavaUtilCollection.remove(1)
+    }
   }
 
   @Suppress("PLATFORM_CLASS_MAPPED_TO_KOTLIN", "UNCHECKED_CAST")
@@ -126,7 +135,9 @@ class DslMapTest {
     val dslMapValuesAsJavaUtilCollection = dslMap.values as java.util.Collection<Int>
     val itr = dslMapValuesAsJavaUtilCollection.iterator()
     itr.next()
-    assertFailsWith<UnsupportedOperationException> { itr.remove() }
+    assertFailsWith<UnsupportedOperationException> {
+      itr.remove()
+    }
   }
 
   @Suppress("PLATFORM_CLASS_MAPPED_TO_KOTLIN", "UNCHECKED_CAST")
@@ -135,7 +146,9 @@ class DslMapTest {
     val dslMap = DslMap<Int, Int, DummyProxy>(mutableMapOf(1 to -1))
     val dslMapEntriesAsJavaUtilSet = dslMap.entries as java.util.Set<Map.Entry<Int, Int>>
     val entry = dslMap.entries.single()
-    assertFailsWith<UnsupportedOperationException> { dslMapEntriesAsJavaUtilSet.remove(entry) }
+    assertFailsWith<UnsupportedOperationException> {
+      dslMapEntriesAsJavaUtilSet.remove(entry)
+    }
   }
 
   @Suppress("PLATFORM_CLASS_MAPPED_TO_KOTLIN", "UNCHECKED_CAST")
@@ -145,7 +158,9 @@ class DslMapTest {
     val dslMapEntriesAsJavaUtilSet = dslMap.entries as java.util.Set<Map.Entry<Int, Int>>
     val itr = dslMapEntriesAsJavaUtilSet.iterator()
     itr.next()
-    assertFailsWith<UnsupportedOperationException> { itr.remove() }
+    assertFailsWith<UnsupportedOperationException> {
+      itr.remove()
+    }
   }
 
   @Suppress("PLATFORM_CLASS_MAPPED_TO_KOTLIN", "UNCHECKED_CAST")
@@ -153,7 +168,9 @@ class DslMapTest {
   fun dslMapEntryObjectsAreNotEvenSecretlyMutable() {
     val dslMap = DslMap<Int, Int, DummyProxy>(mutableMapOf(1 to -1))
     val dslMapEntryAsJavaUtilMapEntry = dslMap.entries.single() as java.util.Map.Entry<Int, Int>
-    assertFailsWith<UnsupportedOperationException> { dslMapEntryAsJavaUtilMapEntry.value = 2 }
+    assertFailsWith<UnsupportedOperationException> {
+      dslMapEntryAsJavaUtilMapEntry.value = 2
+    }
   }
 
   @Test

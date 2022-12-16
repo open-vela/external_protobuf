@@ -4,5 +4,6 @@
 
 set -ex
 
-cmake -DCMAKE_POSITION_INDEPENDENT_CODE=ON -Dprotobuf_WITH_ZLIB=0 -Dprotobuf_BUILD_TESTS=OFF .
+./autogen.sh
+CXXFLAGS="-fPIC -g -O2" ./configure --host=aarch64
 make -j8

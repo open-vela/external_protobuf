@@ -67,19 +67,12 @@ public class LazyStringArrayList extends AbstractProtobufList<String>
     EMPTY_LIST.makeImmutable();
   }
 
-  /** Returns an empty immutable {@code LazyStringArrayList} instance */
-  public static LazyStringArrayList emptyList() {
+  static LazyStringArrayList emptyList() {
     return EMPTY_LIST;
   }
 
-  /**
-   * For compatibility with older runtimes.
-   *
-   * <p>TODO(b/258340024) Remove this in a breaking release.
-   *
-   * @deprecated use {@link emptyList()} instead
-   */
-  @Deprecated public static final LazyStringList EMPTY = EMPTY_LIST;
+  // For compatibility with older runtimes.
+  public static final LazyStringList EMPTY = EMPTY_LIST;
 
   private final List<Object> list;
 
