@@ -34,14 +34,13 @@
 
 #include <algorithm>
 
-#include <google/protobuf/stubs/logging.h>
-#include <google/protobuf/stubs/common.h>
-#include <google/protobuf/implicit_weak_message.h>
-#include <google/protobuf/repeated_field.h>
-#include <google/protobuf/port.h>
+#include "google/protobuf/stubs/logging.h"
+#include "google/protobuf/implicit_weak_message.h"
+#include "google/protobuf/port.h"
+#include "google/protobuf/repeated_field.h"
 
 // Must be included last.
-#include <google/protobuf/port_def.inc>
+#include "google/protobuf/port_def.inc"
 
 namespace google {
 namespace protobuf {
@@ -59,10 +58,10 @@ void** RepeatedPtrFieldBase::InternalExtend(int extend_amount) {
   Arena* arena = GetOwningArena();
   new_size = internal::CalculateReserveSize<void*, kRepHeaderSize>(total_size_,
                                                                    new_size);
-  GOOGLE_CHECK_LE(static_cast<int64_t>(new_size),
-           static_cast<int64_t>(
-               (std::numeric_limits<size_t>::max() - kRepHeaderSize) /
-               sizeof(old_rep->elements[0])))
+  GOOGLE_ABSL_CHECK_LE(static_cast<int64_t>(new_size),
+                static_cast<int64_t>(
+                    (std::numeric_limits<size_t>::max() - kRepHeaderSize) /
+                    sizeof(old_rep->elements[0])))
       << "Requested size is too large to fit into size_t.";
   size_t bytes = kRepHeaderSize + sizeof(old_rep->elements[0]) * new_size;
   if (arena == nullptr) {
@@ -99,8 +98,8 @@ void RepeatedPtrFieldBase::Reserve(int new_size) {
 }
 
 void RepeatedPtrFieldBase::DestroyProtos() {
-  GOOGLE_DCHECK(rep_);
-  GOOGLE_DCHECK(arena_ == nullptr);
+  GOOGLE_ABSL_DCHECK(rep_);
+  GOOGLE_ABSL_DCHECK(arena_ == nullptr);
   int n = rep_->allocated_size;
   void* const* elements = rep_->elements;
   for (int i = 0; i < n; i++) {
@@ -116,7 +115,7 @@ void* RepeatedPtrFieldBase::AddOutOfLineHelper(void* obj) {
     InternalExtend(1);  // Equivalent to "Reserve(total_size_ + 1)"
   }
   ++rep_->allocated_size;
-  rep_->elements[current_size_++] = obj;
+  rep_->elements[ExchangeCurrentSize(current_size_ + 1)] = obj;
   return obj;
 }
 
@@ -125,13 +124,14 @@ void RepeatedPtrFieldBase::CloseGap(int start, int num) {
   // Close up a gap of "num" elements starting at offset "start".
   for (int i = start + num; i < rep_->allocated_size; ++i)
     rep_->elements[i - num] = rep_->elements[i];
-  current_size_ -= num;
+  ExchangeCurrentSize(current_size_ - num);
   rep_->allocated_size -= num;
 }
 
 MessageLite* RepeatedPtrFieldBase::AddWeak(const MessageLite* prototype) {
   if (rep_ != nullptr && current_size_ < rep_->allocated_size) {
-    return reinterpret_cast<MessageLite*>(rep_->elements[current_size_++]);
+    return reinterpret_cast<MessageLite*>(
+        rep_->elements[ExchangeCurrentSize(current_size_ + 1)]);
   }
   if (!rep_ || rep_->allocated_size == total_size_) {
     Reserve(total_size_ + 1);
@@ -140,7 +140,7 @@ MessageLite* RepeatedPtrFieldBase::AddWeak(const MessageLite* prototype) {
   MessageLite* result = prototype
                             ? prototype->New(arena_)
                             : Arena::CreateMessage<ImplicitWeakMessage>(arena_);
-  rep_->elements[current_size_++] = result;
+  rep_->elements[ExchangeCurrentSize(current_size_ + 1)] = result;
   return result;
 }
 
@@ -149,4 +149,4 @@ MessageLite* RepeatedPtrFieldBase::AddWeak(const MessageLite* prototype) {
 }  // namespace protobuf
 }  // namespace google
 
-#include <google/protobuf/port_undef.inc>
+#include "google/protobuf/port_undef.inc"

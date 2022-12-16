@@ -74,7 +74,8 @@ class Message(object):
 
   __slots__ = []
 
-  #: The :class:`google.protobuf.descriptor.Descriptor` for this message type.
+  #: The :class:`google.protobuf.Descriptor`
+  # for this message type.
   DESCRIPTOR = None
 
   def __deepcopy__(self, memo=None):
@@ -191,7 +192,7 @@ class Message(object):
     raise NotImplementedError
 
   def ParseFromString(self, serialized):
-    """Parse serialized protocol buffer data into this message.
+    """Parse serialized protocol buffer data in binary form into this message.
 
     Like :func:`MergeFromString()`, except we clear the object first.
 
