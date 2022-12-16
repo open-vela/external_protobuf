@@ -4,6 +4,9 @@ on:
   - push
   - pull_request
 
+permissions:
+  contents: read  #  to fetch code (actions/checkout)
+
 jobs:
   build-php:
     name: Build PHP extension
@@ -27,7 +30,6 @@ jobs:
           chmod a+x $HOME/bin/bazel
       - name: Install git
         run: |
-          apt-get update -q
           apt-get install -qy --no-install-recommends git
       - name: Checkout
         uses: actions/checkout@v3

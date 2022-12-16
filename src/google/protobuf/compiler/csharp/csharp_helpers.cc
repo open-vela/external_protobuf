@@ -32,28 +32,33 @@
 //  Based on original Protocol Buffers design by
 //  Sanjay Ghemawat, Jeff Dean, and others.
 
+#include "google/protobuf/compiler/csharp/csharp_helpers.h"
+
 #include <algorithm>
 #include <limits>
-#include <vector>
 #include <sstream>
+#include <vector>
 
-#include <google/protobuf/compiler/csharp/csharp_helpers.h>
-#include <google/protobuf/compiler/csharp/csharp_names.h>
-#include <google/protobuf/descriptor.pb.h>
-#include <google/protobuf/io/printer.h>
-#include <google/protobuf/wire_format.h>
-#include <google/protobuf/stubs/strutil.h>
+#include "absl/container/flat_hash_set.h"
+#include "google/protobuf/stubs/logging.h"
+#include "absl/strings/ascii.h"
+#include "absl/strings/str_replace.h"
+#include "absl/strings/string_view.h"
+#include "google/protobuf/compiler/csharp/csharp_enum_field.h"
+#include "google/protobuf/compiler/csharp/csharp_field_base.h"
+#include "google/protobuf/compiler/csharp/csharp_map_field.h"
+#include "google/protobuf/compiler/csharp/csharp_message_field.h"
+#include "google/protobuf/compiler/csharp/csharp_options.h"
+#include "google/protobuf/compiler/csharp/csharp_primitive_field.h"
+#include "google/protobuf/compiler/csharp/csharp_repeated_enum_field.h"
+#include "google/protobuf/compiler/csharp/csharp_repeated_message_field.h"
+#include "google/protobuf/compiler/csharp/csharp_repeated_primitive_field.h"
+#include "google/protobuf/compiler/csharp/csharp_wrapper_field.h"
+#include "google/protobuf/compiler/csharp/names.h"
+#include "google/protobuf/descriptor.pb.h"
 
-#include <google/protobuf/compiler/csharp/csharp_field_base.h>
-#include <google/protobuf/compiler/csharp/csharp_enum_field.h>
-#include <google/protobuf/compiler/csharp/csharp_map_field.h>
-#include <google/protobuf/compiler/csharp/csharp_message_field.h>
-#include <google/protobuf/compiler/csharp/csharp_options.h>
-#include <google/protobuf/compiler/csharp/csharp_primitive_field.h>
-#include <google/protobuf/compiler/csharp/csharp_repeated_enum_field.h>
-#include <google/protobuf/compiler/csharp/csharp_repeated_message_field.h>
-#include <google/protobuf/compiler/csharp/csharp_repeated_primitive_field.h>
-#include <google/protobuf/compiler/csharp/csharp_wrapper_field.h>
+// Must be last.
+#include "google/protobuf/port_def.inc"
 
 namespace google {
 namespace protobuf {
@@ -102,86 +107,8 @@ CSharpType GetCSharpType(FieldDescriptor::Type type) {
       // No default because we want the compiler to complain if any new
       // types are added.
   }
-  GOOGLE_LOG(FATAL)<< "Can't get here.";
+  GOOGLE_ABSL_LOG(FATAL) << "Can't get here.";
   return (CSharpType) -1;
-}
-
-std::string StripDotProto(const std::string& proto_file) {
-  int lastindex = proto_file.find_last_of(".");
-  return proto_file.substr(0, lastindex);
-}
-
-std::string GetFileNamespace(const FileDescriptor* descriptor) {
-  if (descriptor->options().has_csharp_namespace()) {
-    return descriptor->options().csharp_namespace();
-  }
-  return UnderscoresToCamelCase(descriptor->package(), true, true);
-}
-
-// Returns the Pascal-cased last part of the proto file. For example,
-// input of "google/protobuf/foo_bar.proto" would result in "FooBar".
-std::string GetFileNameBase(const FileDescriptor* descriptor) {
-    std::string proto_file = descriptor->name();
-    int lastslash = proto_file.find_last_of("/");
-    std::string base = proto_file.substr(lastslash + 1);
-    return UnderscoresToPascalCase(StripDotProto(base));
-}
-
-std::string GetReflectionClassUnqualifiedName(const FileDescriptor* descriptor) {
-  // TODO: Detect collisions with existing messages,
-  // and append an underscore if necessary.
-  return GetFileNameBase(descriptor) + "Reflection";
-}
-
-std::string GetExtensionClassUnqualifiedName(const FileDescriptor* descriptor) {
-  // TODO: Detect collisions with existing messages,
-  // and append an underscore if necessary.
-  return GetFileNameBase(descriptor) + "Extensions";
-}
-
-// TODO(jtattermusch): can we reuse a utility function?
-std::string UnderscoresToCamelCase(const std::string& input,
-                                   bool cap_next_letter,
-                                   bool preserve_period) {
-  std::string result;
-  // Note:  I distrust ctype.h due to locales.
-  for (int i = 0; i < input.size(); i++) {
-    if ('a' <= input[i] && input[i] <= 'z') {
-      if (cap_next_letter) {
-        result += input[i] + ('A' - 'a');
-      } else {
-        result += input[i];
-      }
-      cap_next_letter = false;
-    } else if ('A' <= input[i] && input[i] <= 'Z') {
-      if (i == 0 && !cap_next_letter) {
-        // Force first letter to lower-case unless explicitly told to
-        // capitalize it.
-        result += input[i] + ('a' - 'A');
-      } else {
-        // Capital letters after the first are left as-is.
-        result += input[i];
-      }
-      cap_next_letter = false;
-    } else if ('0' <= input[i] && input[i] <= '9') {
-      result += input[i];
-      cap_next_letter = true;
-    } else {
-      cap_next_letter = true;
-      if (input[i] == '.' && preserve_period) {
-        result += '.';
-      }
-    }
-  }
-  // Add a trailing "_" if the name should be altered.
-  if (input.size() > 0 && input[input.size() - 1] == '#') {
-    result += '_';
-  }
-  return result;
-}
-
-std::string UnderscoresToPascalCase(const std::string& input) {
-  return UnderscoresToCamelCase(input, true);
 }
 
 // Convert a string which is expected to be SHOUTY_CASE (but may not be *precisely* shouty)
@@ -200,18 +127,18 @@ std::string ShoutyToPascalCase(const std::string& input) {
   char previous = '_';
   for (int i = 0; i < input.size(); i++) {
     char current = input[i];
-    if (!ascii_isalnum(current)) {
+    if (!absl::ascii_isalnum(current)) {
       previous = current;
       continue;
     }
-    if (!ascii_isalnum(previous)) {
-      result += ascii_toupper(current);
-    } else if (ascii_isdigit(previous)) {
-      result += ascii_toupper(current);
-    } else if (ascii_islower(previous)) {
+    if (!absl::ascii_isalnum(previous)) {
+      result += absl::ascii_toupper(current);
+    } else if (absl::ascii_isdigit(previous)) {
+      result += absl::ascii_toupper(current);
+    } else if (absl::ascii_islower(previous)) {
       result += current;
     } else {
-      result += ascii_tolower(current);
+      result += absl::ascii_tolower(current);
     }
     previous = current;
   }
@@ -229,7 +156,7 @@ std::string TryRemovePrefix(const std::string& prefix, const std::string& value)
   std::string prefix_to_match = "";
   for (size_t i = 0; i < prefix.size(); i++) {
     if (prefix[i] != '_') {
-      prefix_to_match += ascii_tolower(prefix[i]);
+      prefix_to_match += absl::ascii_tolower(prefix[i]);
     }
   }
 
@@ -242,7 +169,7 @@ std::string TryRemovePrefix(const std::string& prefix, const std::string& value)
     if (value[value_index] == '_') {
       continue;
     }
-    if (ascii_tolower(value[value_index]) != prefix_to_match[prefix_index++]) {
+    if (absl::ascii_tolower(value[value_index]) != prefix_to_match[prefix_index++]) {
       // Failed to match the prefix - bail out early.
       return value;
     }
@@ -276,7 +203,7 @@ std::string GetEnumValueName(const std::string& enum_name, const std::string& en
   std::string result = ShoutyToPascalCase(stripped);
   // Just in case we have an enum name of FOO and a value of FOO_2... make sure the returned
   // string is a valid identifier.
-  if (ascii_isdigit(result[0])) {
+  if (absl::ascii_isdigit(result[0])) {
     result = "_" + result;
   }
   return result;
@@ -320,32 +247,6 @@ uint GetGroupEndTag(const Descriptor* descriptor) {
   return 0;
 }
 
-std::string ToCSharpName(const std::string& name, const FileDescriptor* file) {
-  std::string result = GetFileNamespace(file);
-  if (!result.empty()) {
-    result += '.';
-  }
-  std::string classname;
-  if (file->package().empty()) {
-    classname = name;
-  } else {
-    // Strip the proto package from full_name since we've replaced it with
-    // the C# namespace.
-    classname = name.substr(file->package().size() + 1);
-  }
-  result += StringReplace(classname, ".", ".Types.", true);
-  return "global::" + result;
-}
-
-std::string GetReflectionClassName(const FileDescriptor* descriptor) {
-  std::string result = GetFileNamespace(descriptor);
-  if (!result.empty()) {
-    result += '.';
-  }
-  result += GetReflectionClassUnqualifiedName(descriptor);
-  return "global::" + result;
-}
-
 std::string GetFullExtensionName(const FieldDescriptor* descriptor) {
   if (descriptor->extension_scope()) {
     return GetClassName(descriptor->extension_scope()) + ".Extensions." + GetPropertyName(descriptor);
@@ -353,14 +254,6 @@ std::string GetFullExtensionName(const FieldDescriptor* descriptor) {
   else {
     return GetExtensionClassUnqualifiedName(descriptor->file())  + "." + GetPropertyName(descriptor);
   }
-}
-
-std::string GetClassName(const Descriptor* descriptor) {
-  return ToCSharpName(descriptor->full_name(), descriptor->file());
-}
-
-std::string GetClassName(const EnumDescriptor* descriptor) {
-  return ToCSharpName(descriptor->full_name(), descriptor->file());
 }
 
 // Groups are hacky:  The name of the field is just the lower-cased name
@@ -379,15 +272,30 @@ std::string GetFieldConstantName(const FieldDescriptor* field) {
 }
 
 std::string GetPropertyName(const FieldDescriptor* descriptor) {
+  // Names of members declared or overridden in the message.
+  static const auto& reserved_member_names = *new absl::flat_hash_set<absl::string_view>({
+    "Types",
+    "Descriptor",
+    "Equals",
+    "ToString",
+    "GetHashCode",
+    "WriteTo",
+    "Clone",
+    "CalculateSize",
+    "MergeFrom",
+    "OnConstruction",
+    "Parser"
+    });
+
   // TODO(jtattermusch): consider introducing csharp_property_name field option
   std::string property_name = UnderscoresToPascalCase(GetFieldName(descriptor));
-  // Avoid either our own type name or reserved names. Note that not all names
-  // are reserved - a field called to_string, write_to etc would still cause a problem.
+  // Avoid either our own type name or reserved names.
   // There are various ways of ending up with naming collisions, but we try to avoid obvious
-  // ones.
+  // ones. In particular, we avoid the names of all the members we generate.
+  // Note that we *don't* add an underscore for MemberwiseClone or GetType. Those generate
+  // warnings, but not errors; changing the name now could be a breaking change.
   if (property_name == descriptor->containing_type()->name()
-      || property_name == "Types"
-      || property_name == "Descriptor") {
+      || reserved_member_names.find(property_name) != reserved_member_names.end()) {
     property_name += "_";
   }
   return property_name;
@@ -398,40 +306,6 @@ std::string GetOneofCaseName(const FieldDescriptor* descriptor) {
   // value as well, we need to reserve that by appending an underscore.
   std::string property_name = GetPropertyName(descriptor);
   return property_name == "None" ? "None_" : property_name;
-}
-
-std::string GetOutputFile(const FileDescriptor* descriptor,
-                          const std::string file_extension,
-                          const bool generate_directories,
-                          const std::string base_namespace,
-                          std::string* error) {
-  std::string relative_filename = GetFileNameBase(descriptor) + file_extension;
-  if (!generate_directories) {
-    return relative_filename;
-  }
-  std::string ns = GetFileNamespace(descriptor);
-  std::string namespace_suffix = ns;
-  if (!base_namespace.empty()) {
-    // Check that the base_namespace is either equal to or a leading part of
-    // the file namespace. This isn't just a simple prefix; "Foo.B" shouldn't
-    // be regarded as a prefix of "Foo.Bar". The simplest option is to add "."
-    // to both.
-    std::string extended_ns = ns + ".";
-    if (extended_ns.find(base_namespace + ".") != 0) {
-      *error = "Namespace " + ns + " is not a prefix namespace of base namespace " + base_namespace;
-      return ""; // This will be ignored, because we've set an error.
-    }
-    namespace_suffix = ns.substr(base_namespace.length());
-    if (namespace_suffix.find(".") == 0) {
-      namespace_suffix = namespace_suffix.substr(1);
-    }
-  }
-
-  std::string namespace_dir = StringReplace(namespace_suffix, ".", "/", true);
-  if (!namespace_dir.empty()) {
-    namespace_dir += "/";
-  }
-  return namespace_dir + relative_filename;
 }
 
 // TODO: c&p from Java protoc plugin
@@ -463,7 +337,7 @@ int GetFixedSize(FieldDescriptor::Type type) {
     // No default because we want the compiler to complain if any new
     // types are added.
   }
-  GOOGLE_LOG(FATAL) << "Can't get here.";
+  GOOGLE_ABSL_LOG(FATAL) << "Can't get here.";
   return -1;
 }
 
@@ -588,7 +462,7 @@ bool IsNullable(const FieldDescriptor* descriptor) {
       return true;
 
     default:
-      GOOGLE_LOG(FATAL) << "Unknown field type.";
+      GOOGLE_ABSL_LOG(FATAL) << "Unknown field type.";
       return true;
   }
 }
@@ -597,3 +471,5 @@ bool IsNullable(const FieldDescriptor* descriptor) {
 }  // namespace compiler
 }  // namespace protobuf
 }  // namespace google
+
+#include "google/protobuf/port_undef.inc"

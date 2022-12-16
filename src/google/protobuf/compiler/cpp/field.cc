@@ -32,25 +32,27 @@
 //  Based on original Protocol Buffers design by
 //  Sanjay Ghemawat, Jeff Dean, and others.
 
-#include <google/protobuf/compiler/cpp/field.h>
+#include "google/protobuf/compiler/cpp/field.h"
 
 #include <cstdint>
 #include <memory>
 #include <string>
 
-#include <google/protobuf/stubs/strutil.h>
-#include <google/protobuf/stubs/substitute.h>
-#include <google/protobuf/compiler/cpp/helpers.h>
-#include <google/protobuf/compiler/cpp/primitive_field.h>
-#include <google/protobuf/compiler/cpp/string_field.h>
-#include <google/protobuf/stubs/logging.h>
-#include <google/protobuf/stubs/common.h>
-#include <google/protobuf/io/printer.h>
-#include <google/protobuf/wire_format.h>
-#include <google/protobuf/compiler/cpp/enum_field.h>
-#include <google/protobuf/compiler/cpp/map_field.h>
-#include <google/protobuf/compiler/cpp/message_field.h>
-#include <google/protobuf/descriptor.pb.h>
+#include "google/protobuf/descriptor.h"
+#include "absl/container/flat_hash_map.h"
+#include "absl/strings/str_cat.h"
+#include "absl/strings/str_format.h"
+#include "absl/strings/string_view.h"
+#include "absl/strings/substitute.h"
+#include "google/protobuf/compiler/cpp/helpers.h"
+#include "google/protobuf/compiler/cpp/primitive_field.h"
+#include "google/protobuf/compiler/cpp/string_field.h"
+#include "google/protobuf/stubs/logging.h"
+#include "google/protobuf/compiler/cpp/enum_field.h"
+#include "google/protobuf/compiler/cpp/map_field.h"
+#include "google/protobuf/compiler/cpp/message_field.h"
+#include "google/protobuf/descriptor.pb.h"
+#include "google/protobuf/wire_format.h"
 
 namespace google {
 namespace protobuf {
@@ -61,71 +63,73 @@ using internal::WireFormat;
 
 namespace {
 
-void MaySetAnnotationVariable(const Options& options,
-                              StringPiece annotation_name,
-                              StringPiece substitute_template_prefix,
-                              StringPiece prepared_template,
-                              int field_index, StringPiece access_type,
-                              std::map<std::string, std::string>* variables) {
-  if (options.field_listener_options.forbidden_field_listener_events.count(
-          std::string(annotation_name)))
+void MaySetAnnotationVariable(
+    const Options& options, absl::string_view annotation_name,
+    absl::string_view substitute_template_prefix,
+    absl::string_view prepared_template, int field_index,
+    absl::string_view access_type,
+    absl::flat_hash_map<absl::string_view, std::string>* variables) {
+  if (options.field_listener_options.forbidden_field_listener_events.contains(
+          annotation_name))
     return;
-  (*variables)[StrCat("annotate_", annotation_name)] = strings::Substitute(
-      StrCat(substitute_template_prefix, prepared_template, ");\n"),
+  (*variables)[absl::StrCat("annotate_", annotation_name)] = absl::Substitute(
+      absl::StrCat(substitute_template_prefix, prepared_template, ");\n"),
       field_index, access_type);
 }
 
 std::string GenerateTemplateForOneofString(const FieldDescriptor* descriptor,
-                                           StringPiece proto_ns,
-                                           StringPiece field_member) {
+                                           absl::string_view proto_ns,
+                                           absl::string_view field_member) {
   std::string field_name = google::protobuf::compiler::cpp::FieldName(descriptor);
   std::string field_pointer =
       descriptor->options().ctype() == google::protobuf::FieldOptions::STRING
           ? "$0.UnsafeGetPointer()"
           : "$0";
+  std::string has_field = absl::StrFormat(
+      "%s_case() == k%s", descriptor->containing_oneof()->name(),
+      UnderscoresToCamelCase(descriptor->name(), true));
 
   if (descriptor->default_value_string().empty()) {
-    return strings::Substitute(StrCat("_internal_has_", field_name, "() ? ",
-                                         field_pointer, ": nullptr"),
-                            field_member);
+    return absl::Substitute(
+        absl::StrCat(has_field, " ? ", field_pointer, ": nullptr"),
+        field_member);
   }
 
   if (descriptor->options().ctype() == google::protobuf::FieldOptions::STRING_PIECE) {
-    return strings::Substitute(StrCat("_internal_has_", field_name, "() ? ",
-                                         field_pointer, ": nullptr"),
-                            field_member);
+    return absl::Substitute(
+        absl::StrCat(has_field, " ? ", field_pointer, ": nullptr"),
+        field_member);
   }
 
   std::string default_value_pointer =
       descriptor->options().ctype() == google::protobuf::FieldOptions::STRING
           ? "&$1.get()"
           : "&$1";
-  return strings::Substitute(
-      StrCat("_internal_has_", field_name, "() ? ", field_pointer, " : ",
-                   default_value_pointer),
-      field_member, MakeDefaultFieldName(descriptor));
+  return absl::Substitute(absl::StrCat(has_field, " ? ", field_pointer, " : ",
+                                       default_value_pointer),
+                          field_member, MakeDefaultFieldName(descriptor));
 }
 
 std::string GenerateTemplateForSingleString(const FieldDescriptor* descriptor,
-                                            StringPiece field_member) {
+                                            absl::string_view field_member) {
   if (descriptor->default_value_string().empty()) {
-    return StrCat("&", field_member);
+    return absl::StrCat("&", field_member);
   }
 
   if (descriptor->options().ctype() == google::protobuf::FieldOptions::STRING) {
-    return strings::Substitute(
+    return absl::Substitute(
         "$0.IsDefault() ? &$1.get() : $0.UnsafeGetPointer()", field_member,
         MakeDefaultFieldName(descriptor));
   }
 
-  return StrCat("&", field_member);
+  return absl::StrCat("&", field_member);
 }
 
 }  // namespace
 
-void AddAccessorAnnotations(const FieldDescriptor* descriptor,
-                            const Options& options,
-                            std::map<std::string, std::string>* variables) {
+void AddAccessorAnnotations(
+    const FieldDescriptor* descriptor, const Options& options,
+    absl::flat_hash_map<absl::string_view, std::string>* variables) {
   // Can be expanded to include more specific calls, for example, for arena or
   // clear calls.
   static constexpr const char* kAccessorsAnnotations[] = {
@@ -134,12 +138,12 @@ void AddAccessorAnnotations(const FieldDescriptor* descriptor,
       "annotate_release", "annotate_set",         "annotate_size",
       "annotate_clear",   "annotate_add_mutable",
   };
-  for (size_t i = 0; i < GOOGLE_ARRAYSIZE(kAccessorsAnnotations); ++i) {
+  for (size_t i = 0; i < ABSL_ARRAYSIZE(kAccessorsAnnotations); ++i) {
     (*variables)[kAccessorsAnnotations[i]] = "";
   }
   if (options.annotate_accessor) {
-    for (size_t i = 0; i < GOOGLE_ARRAYSIZE(kAccessorsAnnotations); ++i) {
-      (*variables)[kAccessorsAnnotations[i]] = StrCat(
+    for (size_t i = 0; i < ABSL_ARRAYSIZE(kAccessorsAnnotations); ++i) {
+      (*variables)[kAccessorsAnnotations[i]] = absl::StrCat(
           "  ", FieldName(descriptor), "_AccessedNoStrip = true;\n");
     }
   }
@@ -153,9 +157,8 @@ void AddAccessorAnnotations(const FieldDescriptor* descriptor,
   std::string field_member = (*variables)["field"];
   const google::protobuf::OneofDescriptor* oneof_member =
       descriptor->real_containing_oneof();
-  const std::string proto_ns = (*variables)["proto_ns"];
   const std::string substitute_template_prefix =
-      StrCat("  ", (*variables)["tracker"], ".$1<$0>(this, ");
+      absl::StrCat("  ", (*variables)["tracker"], ".$1<$0>(this, ");
   std::string prepared_template;
 
   // Flat template is needed if the prepared one is introspecting the values
@@ -166,9 +169,9 @@ void AddAccessorAnnotations(const FieldDescriptor* descriptor,
   if (descriptor->is_repeated() && !descriptor->is_map()) {
     if (descriptor->type() != FieldDescriptor::TYPE_MESSAGE &&
         descriptor->type() != FieldDescriptor::TYPE_GROUP) {
-      prepared_template = strings::Substitute("&$0.Get(index)", field_member);
+      prepared_template = absl::Substitute("&$0.Get(index)", field_member);
       prepared_add_template =
-          strings::Substitute("&$0.Get($0.size() - 1)", field_member);
+          absl::Substitute("&$0.Get($0.size() - 1)", field_member);
     } else {
       prepared_template = "nullptr";
       prepared_add_template = "nullptr";
@@ -181,18 +184,18 @@ void AddAccessorAnnotations(const FieldDescriptor* descriptor,
   } else if (descriptor->cpp_type() == FieldDescriptor::CPPTYPE_STRING) {
     if (oneof_member) {
       prepared_template = GenerateTemplateForOneofString(
-          descriptor, (*variables)["proto_ns"], field_member);
+          descriptor, ProtobufNamespace(options), field_member);
     } else {
       prepared_template =
           GenerateTemplateForSingleString(descriptor, field_member);
     }
   } else {
-    prepared_template = StrCat("&", field_member);
+    prepared_template = absl::StrCat("&", field_member);
   }
   if (descriptor->is_repeated() && !descriptor->is_map() &&
       descriptor->type() != FieldDescriptor::TYPE_MESSAGE &&
       descriptor->type() != FieldDescriptor::TYPE_GROUP) {
-    prepared_flat_template = StrCat("&", field_member);
+    prepared_flat_template = absl::StrCat("&", field_member);
   } else {
     prepared_flat_template = prepared_template;
   }
@@ -232,71 +235,121 @@ void AddAccessorAnnotations(const FieldDescriptor* descriptor,
                            "OnAddMutable", variables);
 }
 
-void SetCommonFieldVariables(const FieldDescriptor* descriptor,
-                             std::map<std::string, std::string>* variables,
-                             const Options& options) {
-  SetCommonVars(options, variables);
+absl::flat_hash_map<absl::string_view, std::string> FieldVars(
+    const FieldDescriptor* desc, const Options& opts) {
+  bool split = ShouldSplit(desc, opts);
+  absl::flat_hash_map<absl::string_view, std::string> vars = {
+      {"ns", Namespace(desc, opts)},
+      {"name", FieldName(desc)},
+      {"index", absl::StrCat(desc->index())},
+      {"number", absl::StrCat(desc->number())},
+      {"classname", ClassName(FieldScope(desc), false)},
+      {"declared_type", DeclaredTypeMethodName(desc->type())},
+      {"field", FieldMemberName(desc, split)},
+      {"tag_size",
+       absl::StrCat(WireFormat::TagSize(desc->number(), desc->type()))},
+      {"deprecated_attr", DeprecatedAttribute(opts, desc)},
+      {"set_hasbit", ""},
+      {"clear_hasbit", ""},
+      {"maybe_prepare_split_message",
+       split ? "PrepareSplitMessageForWrite();" : ""},
+
+      // These variables are placeholders to pick out the beginning and ends of
+      // identifiers for annotations (when doing so with existing variables
+      // would be ambiguous or impossible). They should never be set to anything
+      // but the empty string.
+      {"{", ""},
+      {"}", ""},
+  };
+
+  // TODO(b/245791219): Refactor AddAccessorAnnotations to avoid this
+  // workaround.
+  absl::flat_hash_map<absl::string_view, std::string> workaround = {
+      {"field", vars["field"]},
+      {"tracker", "Impl_::_tracker_"},
+  };
+  AddAccessorAnnotations(desc, opts, &workaround);
+  for (auto& pair : workaround) {
+    vars.emplace(pair);
+  }
+
+  return vars;
+}
+
+void SetCommonFieldVariables(
+    const FieldDescriptor* descriptor,
+    absl::flat_hash_map<absl::string_view, std::string>* variables,
+    const Options& options) {
   SetCommonMessageDataVariables(descriptor->containing_type(), variables);
 
-  (*variables)["ns"] = Namespace(descriptor, options);
-  (*variables)["name"] = FieldName(descriptor);
-  (*variables)["index"] = StrCat(descriptor->index());
-  (*variables)["number"] = StrCat(descriptor->number());
-  (*variables)["classname"] = ClassName(FieldScope(descriptor), false);
-  (*variables)["declared_type"] = DeclaredTypeMethodName(descriptor->type());
-  bool split = ShouldSplit(descriptor, options);
-  (*variables)["field"] = FieldMemberName(descriptor, split);
+  for (auto& pair : FieldVars(descriptor, options)) {
+    variables->emplace(pair);
+  }
+}
 
-  (*variables)["tag_size"] = StrCat(
-      WireFormat::TagSize(descriptor->number(), descriptor->type()));
-  (*variables)["deprecated_attr"] = DeprecatedAttribute(options, descriptor);
+absl::flat_hash_map<absl::string_view, std::string> OneofFieldVars(
+    const FieldDescriptor* descriptor) {
+  if (descriptor->containing_oneof() == nullptr) {
+    return {};
+  }
+  std::string oneof_name = descriptor->containing_oneof()->name();
+  std::string field_name = UnderscoresToCamelCase(descriptor->name(), true);
 
-  (*variables)["set_hasbit"] = "";
-  (*variables)["clear_hasbit"] = "";
-  (*variables)["maybe_prepare_split_message"] =
-      split ? "  PrepareSplitMessageForWrite();\n" : "";
+  return {
+      {"oneof_name", oneof_name},
+      {"field_name", field_name},
+      {"oneof_index", absl::StrCat(descriptor->containing_oneof()->index())},
+      {"has_field",
+       absl::StrFormat("%s_case() == k%s", oneof_name, field_name)},
+      {"not_has_field",
+       absl::StrFormat("%s_case() != k%s", oneof_name, field_name)},
+  };
+}
 
-  AddAccessorAnnotations(descriptor, options, variables);
-
-  // These variables are placeholders to pick out the beginning and ends of
-  // identifiers for annotations (when doing so with existing variables would
-  // be ambiguous or impossible). They should never be set to anything but the
-  // empty string.
-  (*variables)["{"] = "";
-  (*variables)["}"] = "";
+void SetCommonOneofFieldVariables(
+    const FieldDescriptor* descriptor,
+    absl::flat_hash_map<absl::string_view, std::string>* variables) {
+  for (auto& pair : OneofFieldVars(descriptor)) {
+    variables->emplace(pair);
+  }
 }
 
 void FieldGenerator::SetHasBitIndex(int32_t has_bit_index) {
-  if (!HasHasbit(descriptor_)) {
-    GOOGLE_CHECK_EQ(has_bit_index, -1);
+  if (!internal::cpp::HasHasbit(descriptor_) || has_bit_index < 0) {
+    GOOGLE_ABSL_CHECK_EQ(has_bit_index, -1);
     return;
   }
-  variables_["set_hasbit"] = StrCat(
-      variables_["has_bits"], "[", has_bit_index / 32, "] |= 0x",
-      strings::Hex(1u << (has_bit_index % 32), strings::ZERO_PAD_8), "u;");
-  variables_["clear_hasbit"] = StrCat(
-      variables_["has_bits"], "[", has_bit_index / 32, "] &= ~0x",
-      strings::Hex(1u << (has_bit_index % 32), strings::ZERO_PAD_8), "u;");
+  int32_t index = has_bit_index / 32;
+  std::string mask =
+      absl::StrCat(absl::Hex(1u << (has_bit_index % 32), absl::kZeroPad8));
+  const std::string& has_bits = variables_["has_bits"];
+
+  variables_["has_hasbit"] =
+      absl::StrFormat("%s[%d] & 0x%su", has_bits, index, mask);
+  variables_["set_hasbit"] =
+      absl::StrFormat("%s[%d] |= 0x%su;", has_bits, index, mask);
+  variables_["clear_hasbit"] =
+      absl::StrFormat("%s[%d] &= ~0x%su;", has_bits, index, mask);
 }
 
 void FieldGenerator::SetInlinedStringIndex(int32_t inlined_string_index) {
   if (!IsStringInlined(descriptor_, options_)) {
-    GOOGLE_CHECK_EQ(inlined_string_index, -1);
+    GOOGLE_ABSL_CHECK_EQ(inlined_string_index, -1);
     return;
   }
   // The first bit is the tracking bit for on demand registering ArenaDtor.
-  GOOGLE_CHECK_GT(inlined_string_index, 0)
+  GOOGLE_ABSL_CHECK_GT(inlined_string_index, 0)
       << "_inlined_string_donated_'s bit 0 is reserved for arena dtor tracking";
-  variables_["inlined_string_donated"] = StrCat(
+  variables_["inlined_string_donated"] = absl::StrCat(
       "(", variables_["inlined_string_donated_array"], "[",
       inlined_string_index / 32, "] & 0x",
-      strings::Hex(1u << (inlined_string_index % 32), strings::ZERO_PAD_8),
+      absl::Hex(1u << (inlined_string_index % 32), absl::kZeroPad8),
       "u) != 0;");
   variables_["donating_states_word"] =
-      StrCat(variables_["inlined_string_donated_array"], "[",
+      absl::StrCat(variables_["inlined_string_donated_array"], "[",
                    inlined_string_index / 32, "]");
-  variables_["mask_for_undonate"] = StrCat(
-      "~0x", strings::Hex(1u << (inlined_string_index % 32), strings::ZERO_PAD_8),
+  variables_["mask_for_undonate"] = absl::StrCat(
+      "~0x", absl::Hex(1u << (inlined_string_index % 32), absl::kZeroPad8),
       "u");
 }
 
@@ -330,11 +383,12 @@ void FieldGenerator::GenerateCopyConstructorCode(io::Printer* printer) const {
   }
 }
 
-void SetCommonOneofFieldVariables(
-    const FieldDescriptor* descriptor,
-    std::map<std::string, std::string>* variables) {
-  const std::string prefix = descriptor->containing_oneof()->name() + "_.";
-  (*variables)["oneof_name"] = descriptor->containing_oneof()->name();
+void FieldGenerator::GenerateIfHasField(io::Printer* printer) const {
+  GOOGLE_ABSL_CHECK(internal::cpp::HasHasbit(descriptor_));
+  GOOGLE_ABSL_CHECK(variables_.find("has_hasbit") != variables_.end());
+
+  Formatter format(printer, variables_);
+  format("if (($has_hasbit$) != 0) {\n");
 }
 
 FieldGenerator::~FieldGenerator() {}
@@ -411,7 +465,7 @@ FieldGeneratorMap::~FieldGeneratorMap() {}
 
 const FieldGenerator& FieldGeneratorMap::get(
     const FieldDescriptor* field) const {
-  GOOGLE_CHECK_EQ(field->containing_type(), descriptor_);
+  GOOGLE_ABSL_CHECK_EQ(field->containing_type(), descriptor_);
   return *field_generators_[field->index()];
 }
 

@@ -35,7 +35,7 @@
 // TODO(kenton):  Improve this unittest to bring it up to the standards of
 //   other proto2 unittests.
 
-#include <google/protobuf/repeated_field.h>
+#include "google/protobuf/repeated_field.h"
 
 #include <algorithm>
 #include <cstdlib>
@@ -47,17 +47,17 @@
 #include <type_traits>
 #include <vector>
 
-#include <google/protobuf/stubs/logging.h>
-#include <google/protobuf/stubs/common.h>
-#include <google/protobuf/unittest.pb.h>
-#include <google/protobuf/stubs/strutil.h>
 #include <gmock/gmock.h>
-#include <google/protobuf/testing/googletest.h>
 #include <gtest/gtest.h>
-#include <google/protobuf/stubs/stl_util.h>
+#include "google/protobuf/stubs/logging.h"
+#include "absl/numeric/bits.h"
+#include "absl/strings/cord.h"
+#include "absl/strings/str_cat.h"
+#include "google/protobuf/unittest.pb.h"
+
 
 // Must be included last.
-#include <google/protobuf/port_def.inc>
+#include "google/protobuf/port_def.inc"
 
 namespace google {
 namespace protobuf {
@@ -179,7 +179,7 @@ void CheckAllocationSizes(bool is_ptr) {
         // Must be `>= 16`, as expected by the Arena.
         ASSERT_GE(last_alloc, 16);
         // Must be of a power of two.
-        size_t log2 = Bits::Log2FloorNonZero64(last_alloc);
+        size_t log2 = absl::bit_width(last_alloc) - 1;
         ASSERT_EQ((1 << log2), last_alloc);
       }
 
@@ -195,7 +195,7 @@ TEST(RepeatedField, ArenaAllocationSizesMatchExpectedValues) {
   // This is important to avoid a branch in the reallocation path.
   // This is also important because allocating anything less would be wasting
   // memory.
-  // If the allocation size is wrong, ReturnArrayMemory will GOOGLE_DCHECK.
+  // If the allocation size is wrong, ReturnArrayMemory will GOOGLE_ABSL_DCHECK.
   CheckAllocationSizes<RepeatedField<bool>>(false);
   CheckAllocationSizes<RepeatedField<uint8_t>>(false);
   CheckAllocationSizes<RepeatedField<uint16_t>>(false);
@@ -305,6 +305,60 @@ TEST(RepeatedField, SwapLargeLarge) {
   }
 }
 
+template <int kSize>
+void TestMemswap() {
+  SCOPED_TRACE(kSize);
+
+  const auto a_char = [](int i) -> char { return (i % ('z' - 'a')) + 'a'; };
+  const auto b_char = [](int i) -> char { return (i % ('Z' - 'A')) + 'A'; };
+  std::string a, b;
+  for (int i = 0; i < kSize; ++i) {
+    a += a_char(i);
+    b += b_char(i);
+  }
+  // We will not swap these.
+  a += "+";
+  b += "-";
+
+  std::string expected_a = b, expected_b = a;
+  expected_a.back() = '+';
+  expected_b.back() = '-';
+
+  internal::memswap<kSize>(&a[0], &b[0]);
+
+  // ODR use the functions in a way that forces the linker to keep them. That
+  // way we can see their generated code.
+  volatile auto odr_use_for_asm_dump = &internal::memswap<kSize>;
+  (void)odr_use_for_asm_dump;
+
+  EXPECT_EQ(expected_a, a);
+  EXPECT_EQ(expected_b, b);
+}
+
+TEST(Memswap, VerifyWithSmallAndLargeSizes) {
+  // Arbitrary sizes
+  TestMemswap<0>();
+  TestMemswap<1>();
+  TestMemswap<10>();
+  TestMemswap<100>();
+  TestMemswap<1000>();
+  TestMemswap<10000>();
+  TestMemswap<100000>();
+  TestMemswap<1000000>();
+
+  // Pointer aligned sizes
+  TestMemswap<sizeof(void*) * 1>();
+  TestMemswap<sizeof(void*) * 7>();
+  TestMemswap<sizeof(void*) * 17>();
+  TestMemswap<sizeof(void*) * 27>();
+
+  // Test also just the block size and no leftover.
+  TestMemswap<64 * 1>();
+  TestMemswap<64 * 2>();
+  TestMemswap<64 * 3>();
+  TestMemswap<64 * 4>();
+}
+
 // Determines how much space was reserved by the given field by adding elements
 // to it until it re-allocates its space.
 static int ReservedSpace(RepeatedField<int>* field) {
@@ -374,14 +428,14 @@ TEST(RepeatedField, ReserveNothing) {
 
 TEST(RepeatedField, ReserveLowerClamp) {
   int clamped_value = internal::CalculateReserveSize<bool, sizeof(void*)>(0, 1);
-  EXPECT_GE(clamped_value, 8 / sizeof(bool));
+  EXPECT_GE(clamped_value, sizeof(void*) / sizeof(bool));
   EXPECT_EQ((internal::RepeatedFieldLowerClampLimit<bool, sizeof(void*)>()),
             clamped_value);
   // EXPECT_EQ(clamped_value, (internal::CalculateReserveSize<bool,
   // sizeof(void*)>( clamped_value, 2)));
 
   clamped_value = internal::CalculateReserveSize<int, sizeof(void*)>(0, 1);
-  EXPECT_GE(clamped_value, 8 / sizeof(int));
+  EXPECT_GE(clamped_value, sizeof(void*) / sizeof(int));
   EXPECT_EQ((internal::RepeatedFieldLowerClampLimit<int, sizeof(void*)>()),
             clamped_value);
   // EXPECT_EQ(clamped_value, (internal::CalculateReserveSize<int,
@@ -588,14 +642,16 @@ TEST(RepeatedField, AddRange4) {
 // an input iterator.
 TEST(RepeatedField, AddRange5) {
   RepeatedField<int> me;
+  me.Add(0);
 
   std::stringstream ss;
   ss << 1 << ' ' << 2;
 
   me.Add(std::istream_iterator<int>(ss), std::istream_iterator<int>());
-  ASSERT_EQ(me.size(), 2);
-  ASSERT_EQ(me.Get(0), 1);
-  ASSERT_EQ(me.Get(1), 2);
+  ASSERT_EQ(me.size(), 3);
+  ASSERT_EQ(me.Get(0), 0);
+  ASSERT_EQ(me.Get(1), 1);
+  ASSERT_EQ(me.Get(2), 2);
 }
 
 TEST(RepeatedField, AddAndAssignRanges) {
@@ -900,6 +956,80 @@ TEST(RepeatedField, Truncate) {
 #endif
 }
 
+TEST(RepeatedField, Cords) {
+  RepeatedField<absl::Cord> field;
+
+  field.Add(absl::Cord("foo"));
+  field.Add(absl::Cord("bar"));
+  field.Add(absl::Cord("baz"));
+  field.Add(absl::Cord("moo"));
+  field.Add(absl::Cord("corge"));
+
+  EXPECT_EQ("foo", std::string(field.Get(0)));
+  EXPECT_EQ("corge", std::string(field.Get(4)));
+
+  // Test swap.  Note:  One of the swapped objects is using internal storage,
+  //   the other is not.
+  RepeatedField<absl::Cord> field2;
+  field2.Add(absl::Cord("grault"));
+  field.Swap(&field2);
+  EXPECT_EQ(1, field.size());
+  EXPECT_EQ("grault", std::string(field.Get(0)));
+  EXPECT_EQ(5, field2.size());
+  EXPECT_EQ("foo", std::string(field2.Get(0)));
+  EXPECT_EQ("corge", std::string(field2.Get(4)));
+
+  // Test SwapElements().
+  field2.SwapElements(1, 3);
+  EXPECT_EQ("moo", std::string(field2.Get(1)));
+  EXPECT_EQ("bar", std::string(field2.Get(3)));
+
+  // Make sure cords are cleared correctly.
+  field2.RemoveLast();
+  EXPECT_TRUE(field2.Add()->empty());
+  field2.Clear();
+  EXPECT_TRUE(field2.Add()->empty());
+}
+
+TEST(RepeatedField, TruncateCords) {
+  RepeatedField<absl::Cord> field;
+
+  field.Add(absl::Cord("foo"));
+  field.Add(absl::Cord("bar"));
+  field.Add(absl::Cord("baz"));
+  field.Add(absl::Cord("moo"));
+  EXPECT_EQ(4, field.size());
+
+  field.Truncate(3);
+  EXPECT_EQ(3, field.size());
+
+  field.Add(absl::Cord("corge"));
+  EXPECT_EQ(4, field.size());
+  EXPECT_EQ("corge", std::string(field.Get(3)));
+
+  // Truncating to the current size should be fine (no-op), but truncating
+  // to a larger size should crash.
+  field.Truncate(field.size());
+#ifdef PROTOBUF_HAS_DEATH_TEST
+  EXPECT_DEBUG_DEATH(field.Truncate(field.size() + 1), "new_size");
+#endif
+}
+
+TEST(RepeatedField, ResizeCords) {
+  RepeatedField<absl::Cord> field;
+  field.Resize(2, absl::Cord("foo"));
+  EXPECT_EQ(2, field.size());
+  field.Resize(5, absl::Cord("bar"));
+  EXPECT_EQ(5, field.size());
+  field.Resize(4, absl::Cord("baz"));
+  ASSERT_EQ(4, field.size());
+  EXPECT_EQ("foo", std::string(field.Get(0)));
+  EXPECT_EQ("foo", std::string(field.Get(1)));
+  EXPECT_EQ("bar", std::string(field.Get(2)));
+  EXPECT_EQ("bar", std::string(field.Get(3)));
+  field.Resize(0, absl::Cord("moo"));
+  EXPECT_TRUE(field.empty());
+}
 
 TEST(RepeatedField, ExtractSubrange) {
   // Exhaustively test every subrange in arrays of all sizes from 0 through 9.
@@ -1258,7 +1388,7 @@ TEST(RepeatedPtrField, ClearedElements) {
 
   field.Clear();
   EXPECT_EQ(field.ClearedCount(), 2);
-#ifndef PROTOBUF_FUTURE_BREAKING_CHANGES
+#ifndef PROTOBUF_FUTURE_REMOVE_CLEARED_API
   EXPECT_EQ(field.ReleaseCleared(), original);  // Take ownership again.
   EXPECT_EQ(field.ClearedCount(), 1);
   EXPECT_NE(field.Add(), original);
@@ -1270,7 +1400,7 @@ TEST(RepeatedPtrField, ClearedElements) {
   EXPECT_EQ(field.ClearedCount(), 1);
   EXPECT_EQ(field.Add(), original);
   EXPECT_EQ(field.ClearedCount(), 0);
-#endif  // !PROTOBUF_FUTURE_BREAKING_CHANGES
+#endif  // !PROTOBUF_FUTURE_REMOVE_CLEARED_API
 }
 
 // Test all code paths in AddAllocated().
@@ -1642,7 +1772,8 @@ TEST(RepeatedPtrField, ExtractSubrange) {
           // Create an array with "sz" elements and "extra" cleared elements.
           // Use an arena to avoid copies from debug-build stability checks.
           Arena arena;
-          RepeatedPtrField<std::string> field(&arena);
+          auto& field =
+              *Arena::CreateMessage<RepeatedPtrField<std::string>>(&arena);
           for (int i = 0; i < sz + extra; ++i) {
             subject.push_back(new std::string());
             field.AddAllocated(subject[i]);
@@ -2086,7 +2217,7 @@ TEST_F(RepeatedPtrFieldPtrsIteratorTest, PtrSTLAlgorithms_lower_bound) {
         std::lower_bound(proto_array_.pointer_begin(),
                          proto_array_.pointer_end(), &v, StringLessThan());
 
-    GOOGLE_CHECK(*it != nullptr);
+    GOOGLE_ABSL_CHECK(*it != nullptr);
 
     EXPECT_EQ(**it, "n");
     EXPECT_TRUE(it == proto_array_.pointer_begin() + 3);
@@ -2097,7 +2228,7 @@ TEST_F(RepeatedPtrFieldPtrsIteratorTest, PtrSTLAlgorithms_lower_bound) {
         const_proto_array_->pointer_begin(), const_proto_array_->pointer_end(),
         &v, StringLessThan());
 
-    GOOGLE_CHECK(*it != nullptr);
+    GOOGLE_ABSL_CHECK(*it != nullptr);
 
     EXPECT_EQ(**it, "n");
     EXPECT_TRUE(it == const_proto_array_->pointer_begin() + 3);
@@ -2277,11 +2408,11 @@ TEST_F(RepeatedFieldInsertionIteratorsTest,
   TestAllTypes goldenproto;
   for (int i = 0; i < 10; ++i) {
     std::string* new_data = new std::string;
-    *new_data = "name-" + StrCat(i);
+    *new_data = "name-" + absl::StrCat(i);
     data.push_back(new_data);
 
     new_data = goldenproto.add_repeated_string();
-    *new_data = "name-" + StrCat(i);
+    *new_data = "name-" + absl::StrCat(i);
   }
   TestAllTypes testproto;
   std::copy(data.begin(), data.end(),
@@ -2314,7 +2445,7 @@ TEST_F(RepeatedFieldInsertionIteratorsTest,
   auto* goldenproto = Arena::CreateMessage<TestAllTypes>(&arena);
   for (int i = 0; i < 10; ++i) {
     auto* new_data = goldenproto->add_repeated_string();
-    *new_data = "name-" + StrCat(i);
+    *new_data = "name-" + absl::StrCat(i);
     data.push_back(new_data);
   }
   auto* testproto = Arena::CreateMessage<TestAllTypes>(&arena);
@@ -2360,4 +2491,4 @@ TEST_F(RepeatedFieldInsertionIteratorsTest, MoveProtos) {
 }  // namespace protobuf
 }  // namespace google
 
-#include <google/protobuf/port_undef.inc>
+#include "google/protobuf/port_undef.inc"
