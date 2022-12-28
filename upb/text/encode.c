@@ -38,8 +38,6 @@
 #include "upb/lex/round_trip.h"
 #include "upb/port/vsnprintf_compat.h"
 #include "upb/reflection/message.h"
-#include "upb/wire/eps_copy_input_stream.h"
-#include "upb/wire/reader.h"
 #include "upb/wire/types.h"
 
 // Must be last.
@@ -312,6 +310,23 @@ static void txtenc_map(txtenc* e, const upb_Map* map, const upb_FieldDef* f) {
     }               \
   } while (0)
 
+static const char* txtenc_parsevarint(const char* ptr, const char* limit,
+                                      uint64_t* val) {
+  uint8_t byte;
+  int bitpos = 0;
+  *val = 0;
+
+  do {
+    CHK(bitpos < 70 && ptr < limit);
+    byte = *ptr;
+    *val |= (uint64_t)(byte & 0x7F) << bitpos;
+    ptr++;
+    bitpos += 7;
+  } while (byte & 0x80);
+
+  return ptr;
+}
+
 /*
  * Unknown fields are printed by number.
  *
@@ -322,95 +337,89 @@ static void txtenc_map(txtenc* e, const upb_Map* map, const upb_FieldDef* f) {
  *   1: 111
  * }
  */
-static const char* txtenc_unknown(txtenc* e, const char* ptr,
-                                  upb_EpsCopyInputStream* stream,
+static const char* txtenc_unknown(txtenc* e, const char* ptr, const char* end,
                                   int groupnum) {
-  // We are guaranteed that the unknown data is valid wire format, and will not
-  // contain tag zero.
-  uint32_t end_group = groupnum > 0
-                           ? ((groupnum << kUpb_WireReader_WireTypeBits) |
-                              kUpb_WireType_EndGroup)
-                           : 0;
-
-  while (!upb_EpsCopyInputStream_IsDone(stream, &ptr)) {
+  while (ptr < end) {
+    uint64_t tag_64;
     uint32_t tag;
-    CHK(ptr = upb_WireReader_ReadTag(ptr, &tag));
-    if (tag == end_group) return ptr;
+    CHK(ptr = txtenc_parsevarint(ptr, end, &tag_64));
+    CHK(tag_64 < UINT32_MAX);
+    tag = (uint32_t)tag_64;
+
+    if ((tag & 7) == kUpb_WireType_EndGroup) {
+      CHK((tag >> 3) == (uint32_t)groupnum);
+      return ptr;
+    }
 
     txtenc_indent(e);
-    txtenc_printf(e, "%d: ", (int)upb_WireReader_GetFieldNumber(tag));
+    txtenc_printf(e, "%d: ", (int)(tag >> 3));
 
-    switch (upb_WireReader_GetWireType(tag)) {
+    switch (tag & 7) {
       case kUpb_WireType_Varint: {
         uint64_t val;
-        CHK(ptr = upb_WireReader_ReadVarint(ptr, &val));
+        CHK(ptr = txtenc_parsevarint(ptr, end, &val));
         txtenc_printf(e, "%" PRIu64, val);
         break;
       }
       case kUpb_WireType_32Bit: {
         uint32_t val;
-        ptr = upb_WireReader_ReadFixed32(ptr, &val);
+        CHK(end - ptr >= 4);
+        memcpy(&val, ptr, 4);
+        ptr += 4;
         txtenc_printf(e, "0x%08" PRIu32, val);
         break;
       }
       case kUpb_WireType_64Bit: {
         uint64_t val;
-        ptr = upb_WireReader_ReadFixed64(ptr, &val);
+        CHK(end - ptr >= 8);
+        memcpy(&val, ptr, 8);
+        ptr += 8;
         txtenc_printf(e, "0x%016" PRIu64, val);
         break;
       }
       case kUpb_WireType_Delimited: {
-        int size;
+        uint64_t len;
+        size_t avail = end - ptr;
         char* start = e->ptr;
         size_t start_overflow = e->overflow;
-        CHK(ptr = upb_WireReader_ReadSize(ptr, &size));
-        CHK(upb_EpsCopyInputStream_CheckDataSizeAvailable(stream, ptr, size));
+        CHK(ptr = txtenc_parsevarint(ptr, end, &len));
+        CHK(avail >= len);
 
-        // Speculatively try to parse as message.
+        /* Speculatively try to parse as message. */
         txtenc_putstr(e, "{");
         txtenc_endfield(e);
-
-        // EpsCopyInputStream can't back up, so create a sub-stream for the
-        // speculative parse.
-        upb_EpsCopyInputStream sub_stream;
-        const char* sub_ptr = upb_EpsCopyInputStream_GetAliasedPtr(stream, ptr);
-        upb_EpsCopyInputStream_Init(&sub_stream, &sub_ptr, size, true);
-
         e->indent_depth++;
-        if (txtenc_unknown(e, sub_ptr, &sub_stream, -1)) {
-          ptr = upb_EpsCopyInputStream_Skip(stream, ptr, size);
+        if (txtenc_unknown(e, ptr, end, -1)) {
           e->indent_depth--;
           txtenc_indent(e);
           txtenc_putstr(e, "}");
         } else {
-          // Didn't work out, print as raw bytes.
+          /* Didn't work out, print as raw bytes. */
+          upb_StringView str;
           e->indent_depth--;
           e->ptr = start;
           e->overflow = start_overflow;
-          const char* str = ptr;
-          ptr = upb_EpsCopyInputStream_ReadString(stream, &str, size, NULL);
-          assert(ptr);
-          txtenc_string(e, (upb_StringView){.data = str, .size = size}, true);
+          str.data = ptr;
+          str.size = len;
+          txtenc_string(e, str, true);
         }
+        ptr += len;
         break;
       }
       case kUpb_WireType_StartGroup:
         txtenc_putstr(e, "{");
         txtenc_endfield(e);
         e->indent_depth++;
-        CHK(ptr = txtenc_unknown(e, ptr, stream,
-                                 upb_WireReader_GetFieldNumber(tag)));
+        CHK(ptr = txtenc_unknown(e, ptr, end, tag >> 3));
         e->indent_depth--;
         txtenc_indent(e);
         txtenc_putstr(e, "}");
         break;
-      default:
-        return NULL;
     }
     txtenc_endfield(e);
   }
 
-  return end_group == 0 && !upb_EpsCopyInputStream_IsError(stream) ? ptr : NULL;
+  return groupnum == -1 ? ptr : NULL;
 }
 
 #undef CHK
@@ -432,13 +441,11 @@ static void txtenc_msg(txtenc* e, const upb_Message* msg,
   }
 
   if ((e->options & UPB_TXTENC_SKIPUNKNOWN) == 0) {
-    size_t size;
-    const char* ptr = upb_Message_GetUnknown(msg, &size);
-    if (size != 0) {
-      char* start = e->ptr;
-      upb_EpsCopyInputStream stream;
-      upb_EpsCopyInputStream_Init(&stream, &ptr, size, true);
-      if (!txtenc_unknown(e, ptr, &stream, -1)) {
+    size_t len;
+    const char* ptr = upb_Message_GetUnknown(msg, &len);
+    char* start = e->ptr;
+    if (ptr) {
+      if (!txtenc_unknown(e, ptr, ptr + len, -1)) {
         /* Unknown failed to parse, back up and don't print it at all. */
         e->ptr = start;
       }

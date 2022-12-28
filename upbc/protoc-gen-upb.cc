@@ -137,6 +137,34 @@ std::string CTypeInternal(const protobuf::FieldDescriptor* field,
   }
 }
 
+std::string SizeLg2(const protobuf::FieldDescriptor* field) {
+  switch (field->cpp_type()) {
+    case protobuf::FieldDescriptor::CPPTYPE_MESSAGE:
+      return "UPB_SIZE(2, 3)";
+    case protobuf::FieldDescriptor::CPPTYPE_ENUM:
+      return std::to_string(2);
+    case protobuf::FieldDescriptor::CPPTYPE_BOOL:
+      return std::to_string(0);
+    case protobuf::FieldDescriptor::CPPTYPE_FLOAT:
+      return std::to_string(2);
+    case protobuf::FieldDescriptor::CPPTYPE_INT32:
+      return std::to_string(2);
+    case protobuf::FieldDescriptor::CPPTYPE_UINT32:
+      return std::to_string(2);
+    case protobuf::FieldDescriptor::CPPTYPE_DOUBLE:
+      return std::to_string(3);
+    case protobuf::FieldDescriptor::CPPTYPE_INT64:
+      return std::to_string(3);
+    case protobuf::FieldDescriptor::CPPTYPE_UINT64:
+      return std::to_string(3);
+    case protobuf::FieldDescriptor::CPPTYPE_STRING:
+      return "UPB_SIZE(3, 4)";
+    default:
+      fprintf(stderr, "Unexpected type");
+      abort();
+  }
+}
+
 std::string FloatToCLiteral(float value) {
   if (value == std::numeric_limits<float>::infinity()) {
     return "kUpb_FltInfinity";
@@ -197,30 +225,6 @@ std::string CType(const protobuf::FieldDescriptor* field) {
 
 std::string CTypeConst(const protobuf::FieldDescriptor* field) {
   return CTypeInternal(field, true);
-}
-
-std::string MapKeyCType(const protobuf::FieldDescriptor* map_field) {
-  return CType(map_field->message_type()->map_key());
-}
-
-std::string MapValueCType(const protobuf::FieldDescriptor* map_field) {
-  return CType(map_field->message_type()->map_value());
-}
-
-std::string MapKeySize(const protobuf::FieldDescriptor* map_field,
-                       absl::string_view expr) {
-  return map_field->message_type()->map_key()->cpp_type() ==
-                 protobuf::FieldDescriptor::CPPTYPE_STRING
-             ? "0"
-             : absl::StrCat("sizeof(", expr, ")");
-}
-
-std::string MapValueSize(const protobuf::FieldDescriptor* map_field,
-                         absl::string_view expr) {
-  return map_field->message_type()->map_value()->cpp_type() ==
-                 protobuf::FieldDescriptor::CPPTYPE_STRING
-             ? "0"
-             : absl::StrCat("sizeof(", expr, ")");
 }
 
 std::string FieldInitializer(const FileLayout& layout,
@@ -432,39 +436,38 @@ void GenerateMapGetters(const protobuf::FieldDescriptor* field,
                         const FileLayout& layout, absl::string_view msg_name,
                         const NameToFieldDescriptorMap& field_names,
                         Output& output) {
+  const protobuf::Descriptor* entry = field->message_type();
+  const protobuf::FieldDescriptor* key = entry->FindFieldByNumber(1);
+  const protobuf::FieldDescriptor* val = entry->FindFieldByNumber(2);
   std::string resolved_name = ResolveFieldName(field, field_names);
   output(
       R"cc(
         UPB_INLINE size_t $0_$1_size(const $0* msg) {
-          const upb_MiniTableField field = $2;
-          const upb_Map* map = upb_Message_GetMap(msg, &field);
-          return map ? _upb_Map_Size(map) : 0;
+          return _upb_msg_map_size(msg, $2);
         }
       )cc",
-      msg_name, resolved_name, FieldInitializer(layout, field));
+      msg_name, resolved_name, layout.GetFieldOffset(field));
   output(
       R"cc(
         UPB_INLINE bool $0_$1_get(const $0* msg, $2 key, $3* val) {
-          const upb_MiniTableField field = $4;
-          const upb_Map* map = upb_Message_GetMap(msg, &field);
-          if (!map) return false;
-          return _upb_Map_Get(map, &key, $5, val, $6);
+          return _upb_msg_map_get(msg, $4, &key, $5, val, $6);
         }
       )cc",
-      msg_name, resolved_name, MapKeyCType(field), MapValueCType(field),
-      FieldInitializer(layout, field), MapKeySize(field, "key"),
-      MapValueSize(field, "*val"));
+      msg_name, resolved_name, CType(key), CType(val),
+      layout.GetFieldOffset(field),
+      key->cpp_type() == protobuf::FieldDescriptor::CPPTYPE_STRING
+          ? "0"
+          : "sizeof(key)",
+      val->cpp_type() == protobuf::FieldDescriptor::CPPTYPE_STRING
+          ? "0"
+          : "sizeof(*val)");
   output(
       R"cc(
         UPB_INLINE $0 $1_$2_next(const $1* msg, size_t* iter) {
-          const upb_MiniTableField field = $3;
-          const upb_Map* map = upb_Message_GetMap(msg, &field);
-          if (!map) return NULL;
-          return ($0)_upb_map_next(map, iter);
+          return ($0)_upb_msg_map_next(msg, $3, iter);
         }
       )cc",
-      CTypeConst(field), msg_name, resolved_name,
-      FieldInitializer(layout, field));
+      CTypeConst(field), msg_name, resolved_name, layout.GetFieldOffset(field));
 }
 
 void GenerateMapEntryGetters(const protobuf::FieldDescriptor* field,
@@ -490,20 +493,12 @@ void GenerateRepeatedGetters(const protobuf::FieldDescriptor* field,
                              Output& output) {
   output(
       R"cc(
-        UPB_INLINE $0 const* $1_$2(const $1* msg, size_t* size) {
-          const upb_MiniTableField field = $3;
-          const upb_Array* arr = upb_Message_GetArray(msg, &field);
-          if (arr) {
-            if (size) *size = arr->size;
-            return ($0 const*)_upb_array_constptr(arr);
-          } else {
-            if (size) *size = 0;
-            return NULL;
-          }
+        UPB_INLINE $0 const* $1_$2(const $1* msg, size_t* len) {
+          return ($0 const*)_upb_array_accessor(msg, $3, len);
         }
       )cc",
       CTypeConst(field), msg_name, ResolveFieldName(field, field_names),
-      FieldInitializer(layout, field));
+      layout.GetFieldOffset(field));
 }
 
 void GenerateScalarGetters(const protobuf::FieldDescriptor* field,
@@ -544,50 +539,46 @@ void GenerateMapSetters(const protobuf::FieldDescriptor* field,
                         const FileLayout& layout, absl::string_view msg_name,
                         const NameToFieldDescriptorMap& field_names,
                         Output& output) {
+  const protobuf::Descriptor* entry = field->message_type();
+  const protobuf::FieldDescriptor* key = entry->FindFieldByNumber(1);
+  const protobuf::FieldDescriptor* val = entry->FindFieldByNumber(2);
   std::string resolved_name = ResolveFieldName(field, field_names);
   output(
       R"cc(
-        UPB_INLINE void $0_$1_clear($0* msg) {
-          const upb_MiniTableField field = $2;
-          upb_Map* map = (upb_Map*)upb_Message_GetMap(msg, &field);
-          if (!map) return;
-          _upb_Map_Clear(map);
-        }
+        UPB_INLINE void $0_$1_clear($0* msg) { _upb_msg_map_clear(msg, $2); }
       )cc",
-      msg_name, resolved_name, FieldInitializer(layout, field));
+      msg_name, resolved_name, layout.GetFieldOffset(field));
   output(
       R"cc(
         UPB_INLINE bool $0_$1_set($0* msg, $2 key, $3 val, upb_Arena* a) {
-          const upb_MiniTableField field = $4;
-          upb_Map* map = _upb_MiniTable_GetOrCreateMutableMap(msg, &field, $5, $6, a);
-          return _upb_Map_Insert(map, &key, $5, &val, $6, a) !=
-                 kUpb_MapInsertStatus_OutOfMemory;
+          return _upb_msg_map_set(msg, $4, &key, $5, &val, $6, a);
         }
       )cc",
-      msg_name, resolved_name, MapKeyCType(field), MapValueCType(field),
-      FieldInitializer(layout, field), MapKeySize(field, "key"),
-      MapValueSize(field, "val"));
+      msg_name, resolved_name, CType(key), CType(val),
+      layout.GetFieldOffset(field),
+      key->cpp_type() == protobuf::FieldDescriptor::CPPTYPE_STRING
+          ? "0"
+          : "sizeof(key)",
+      val->cpp_type() == protobuf::FieldDescriptor::CPPTYPE_STRING
+          ? "0"
+          : "sizeof(val)");
   output(
       R"cc(
         UPB_INLINE bool $0_$1_delete($0* msg, $2 key) {
-          const upb_MiniTableField field = $3;
-          upb_Map* map = (upb_Map*)upb_Message_GetMap(msg, &field);
-          if (!map) return false;
-          return _upb_Map_Delete(map, &key, $4, NULL);
+          return _upb_msg_map_delete(msg, $3, &key, $4);
         }
       )cc",
-      msg_name, resolved_name, MapKeyCType(field),
-      FieldInitializer(layout, field), MapKeySize(field, "key"));
+      msg_name, resolved_name, CType(key), layout.GetFieldOffset(field),
+      key->cpp_type() == protobuf::FieldDescriptor::CPPTYPE_STRING
+          ? "0"
+          : "sizeof(key)");
   output(
       R"cc(
         UPB_INLINE $0 $1_$2_nextmutable($1* msg, size_t* iter) {
-          const upb_MiniTableField field = $3;
-          upb_Map* map = (upb_Map*)upb_Message_GetMap(msg, &field);
-          if (!map) return NULL;
-          return ($0)_upb_map_next(map, iter);
+          return ($0)_upb_msg_map_next(msg, $3, iter);
         }
       )cc",
-      CType(field), msg_name, resolved_name, FieldInitializer(layout, field));
+      CType(field), msg_name, resolved_name, layout.GetFieldOffset(field));
 }
 
 void GenerateRepeatedSetters(const protobuf::FieldDescriptor* field,
@@ -598,58 +589,41 @@ void GenerateRepeatedSetters(const protobuf::FieldDescriptor* field,
   std::string resolved_name = ResolveFieldName(field, field_names);
   output(
       R"cc(
-        UPB_INLINE $0* $1_mutable_$2($1* msg, size_t* size) {
-          upb_MiniTableField field = $3;
-          upb_Array* arr = upb_Message_GetMutableArray(msg, &field);
-          if (arr) {
-            if (size) *size = arr->size;
-            return ($0*)_upb_array_ptr(arr);
-          } else {
-            if (size) *size = 0;
-            return NULL;
-          }
+        UPB_INLINE $0* $1_mutable_$2($1* msg, size_t* len) {
+          return ($0*)_upb_array_mutable_accessor(msg, $3, len);
         }
       )cc",
-      CType(field), msg_name, resolved_name, FieldInitializer(layout, field));
+      CType(field), msg_name, resolved_name, layout.GetFieldOffset(field));
   output(
       R"cc(
-        UPB_INLINE $0* $1_resize_$2($1* msg, size_t size, upb_Arena* arena) {
-          upb_MiniTableField field = $3;
-          return ($0*)upb_Message_ResizeArray(msg, &field, size, arena);
+        UPB_INLINE $0* $1_resize_$2($1* msg, size_t len, upb_Arena* arena) {
+          return ($0*)_upb_Array_Resize_accessor2(msg, $3, len, $4, arena);
         }
       )cc",
-      CType(field), msg_name, resolved_name, FieldInitializer(layout, field));
+      CType(field), msg_name, resolved_name, layout.GetFieldOffset(field),
+      SizeLg2(field));
   if (field->cpp_type() == protobuf::FieldDescriptor::CPPTYPE_MESSAGE) {
     output(
         R"cc(
           UPB_INLINE struct $0* $1_add_$2($1* msg, upb_Arena* arena) {
-            upb_MiniTableField field = $4;
-            upb_Array* arr = upb_Message_GetOrCreateMutableArray(msg, &field, arena);
-            if (!arr || !_upb_Array_ResizeUninitialized(arr, arr->size + 1, arena)) {
-              return NULL;
-            }
             struct $0* sub = (struct $0*)_upb_Message_New(&$3, arena);
-            if (!arr || !sub) return NULL;
-            _upb_Array_Set(arr, arr->size - 1, &sub, sizeof(sub));
+            bool ok = _upb_Array_Append_accessor2(msg, $4, $5, &sub, arena);
+            if (!ok) return NULL;
             return sub;
           }
         )cc",
         MessageName(field->message_type()), msg_name, resolved_name,
-        MessageInit(field->message_type()), FieldInitializer(layout, field));
+        MessageInit(field->message_type()), layout.GetFieldOffset(field),
+        SizeLg2(field));
   } else {
     output(
         R"cc(
           UPB_INLINE bool $1_add_$2($1* msg, $0 val, upb_Arena* arena) {
-            upb_MiniTableField field = $3;
-            upb_Array* arr = upb_Message_GetOrCreateMutableArray(msg, &field, arena);
-            if (!arr || !_upb_Array_ResizeUninitialized(arr, arr->size + 1, arena)) {
-              return false;
-            }
-            _upb_Array_Set(arr, arr->size - 1, &val, sizeof(val));
-            return true;
+            return _upb_Array_Append_accessor2(msg, $3, $4, &val, arena);
           }
         )cc",
-        CType(field), msg_name, resolved_name, FieldInitializer(layout, field));
+        CType(field), msg_name, resolved_name, layout.GetFieldOffset(field),
+        SizeLg2(field));
   }
 }
 
