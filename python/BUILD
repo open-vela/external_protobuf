@@ -29,7 +29,6 @@ load("//python:py_extension.bzl", "py_extension")
 
 load("@bazel_skylib//lib:selects.bzl", "selects")
 load("@bazel_skylib//rules:common_settings.bzl", "bool_flag", "string_flag")
-load("@rules_pkg//:mappings.bzl", "pkg_files")
 load("//bazel:build_defs.bzl", "UPB_DEFAULT_COPTS")
 
 licenses(["notice"])
@@ -188,8 +187,8 @@ _message_target_compatible_with = {
 # }
 # end:google_only
 
-filegroup(
-    name = "message_srcs",
+py_extension(
+    name = "_message",
     srcs = [
         "convert.c",
         "convert.h",
@@ -213,17 +212,6 @@ filegroup(
         "unknown_fields.c",
         "unknown_fields.h",
     ],
-)
-
-pkg_files(
-    name = "message_extension",
-    srcs = [":message_srcs"],
-    prefix = "python/",
-)
-
-py_extension(
-    name = "_message",
-    srcs = [":message_srcs"],
     copts = UPB_DEFAULT_COPTS + select(LIMITED_API_FLAG_SELECT) + [
         # The Python API requires patterns that are ISO C incompatible, like
         # casts between function pointers and object pointers.
@@ -239,6 +227,7 @@ py_extension(
         "//:textformat",
         "//:upb",
         "//:wire",
+        "//:wire_types",
         "//upb/util:compare",
         "//upb/util:def_to_proto",
         "//upb/util:required_fields",
