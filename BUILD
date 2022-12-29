@@ -266,12 +266,14 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":collections_internal",
+        ":eps_copy_input_stream",
         ":hash",
         ":message_internal",
         ":mini_table_internal",
         ":port",
         ":upb",
         ":wire",
+        ":wire_reader",
     ],
 )
 
@@ -576,10 +578,13 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":collections_internal",
+        ":eps_copy_input_stream",
         ":lex",
         ":port",
         ":reflection",
         ":wire",
+        ":wire_reader",
+        ":wire_types",
     ],
 )
 
@@ -908,7 +913,6 @@ cc_library(
     hdrs = [
         "upb/wire/decode.h",
         "upb/wire/encode.h",
-        "upb/wire/types.h",
     ],
     copts = UPB_DEFAULT_COPTS,
     visibility = ["//visibility:public"],
@@ -934,21 +938,53 @@ cc_library(
         "upb/wire/decode_fast.h",
         "upb/wire/decode_internal.h",
         "upb/wire/encode.h",
-        "upb/wire/eps_copy_input_stream.h",
         "upb/wire/swap_internal.h",
-        "upb/wire/types.h",
     ],
     copts = UPB_DEFAULT_COPTS,
     visibility = ["//:__subpackages__"],
     deps = [
         ":base",
         ":collections_internal",
+        ":eps_copy_input_stream",
         ":hash",
         ":mem_internal",
         ":message_internal",
         ":mini_table_internal",
         ":port",
+        ":wire_types",
         "@utf8_range",
+    ],
+)
+
+cc_library(
+    name = "wire_types",
+    hdrs = ["upb/wire/types.h"],
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "eps_copy_input_stream",
+    srcs = ["upb/wire/eps_copy_input_stream.c"],
+    hdrs = ["upb/wire/eps_copy_input_stream.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":mem",
+        ":port",
+    ],
+)
+
+cc_library(
+    name = "wire_reader",
+    srcs = [
+        "upb/wire/reader.c",
+        "upb/wire/swap_internal.h",
+    ],
+    hdrs = ["upb/wire/reader.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":eps_copy_input_stream",
+        ":port",
+        ":wire_types",
     ],
 )
 
@@ -956,7 +992,8 @@ cc_test(
     name = "eps_copy_input_stream_test",
     srcs = ["upb/wire/eps_copy_input_stream_test.cc"],
     deps = [
-        ":wire_internal",
+        ":eps_copy_input_stream",
+        ":upb",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -1013,6 +1050,7 @@ upb_amalgamation(
         ":base",
         ":collections_internal",
         ":descriptor_upb_proto",
+        ":eps_copy_input_stream",
         ":fastdecode",
         ":hash",
         ":lex",
@@ -1025,6 +1063,8 @@ upb_amalgamation(
         ":reflection_internal",
         ":upb",
         ":wire_internal",
+        ":wire_reader",
+        ":wire_types",
     ],
     strip_import_prefix = ["src"],
 )
@@ -1048,6 +1088,7 @@ upb_amalgamation(
         ":collections_internal",
         ":descriptor_upb_proto",
         ":descriptor_upb_proto_reflection",
+        ":eps_copy_input_stream",
         ":fastdecode",
         ":hash",
         ":json",
@@ -1061,6 +1102,8 @@ upb_amalgamation(
         ":reflection_internal",
         ":upb",
         ":wire_internal",
+        ":wire_reader",
+        ":wire_types",
     ],
     prefix = "php-",
     strip_import_prefix = ["src"],
@@ -1085,6 +1128,7 @@ upb_amalgamation(
         ":base",
         ":collections_internal",
         ":descriptor_upb_proto",
+        ":eps_copy_input_stream",
         ":fastdecode",
         ":hash",
         ":json",
@@ -1098,6 +1142,8 @@ upb_amalgamation(
         ":reflection_internal",
         ":upb",
         ":wire_internal",
+        ":wire_reader",
+        ":wire_types",
     ],
     prefix = "ruby-",
     strip_import_prefix = ["src"],
