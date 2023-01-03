@@ -1,4 +1,3 @@
-load("@rules_pkg//:mappings.bzl", "pkg_files")
 load(
     "//bazel:upb_proto_library.bzl",
     "upb_proto_library",
@@ -108,9 +107,11 @@ cc_library(
     hdrs = ["compare.h"],
     visibility = ["//visibility:public"],
     deps = [
+        "//:eps_copy_input_stream",
         "//:port",
         "//:reflection",
-        "//:wire",
+        "//:wire_reader",
+        "//:wire_types",
     ],
 )
 
@@ -125,21 +126,8 @@ cc_test(
     deps = [
         ":compare",
         "//:wire_internal",
+        "//:wire_types",
         "@com_google_absl//absl/strings",
         "@com_google_googletest//:gtest_main",
     ],
-)
-
-pkg_files(
-    name = "util_source_files",
-    srcs = [
-        "compare.c",
-        "compare.h",
-        "def_to_proto.c",
-        "def_to_proto.h",
-        "required_fields.c",
-        "required_fields.h",
-    ],
-    visibility = ["//visibility:public"],
-    prefix = "upb/util",
 )
