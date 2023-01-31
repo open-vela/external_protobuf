@@ -175,8 +175,6 @@ static NSArray *NewFieldsArrayForHasIndex(int hasIndex, NSArray *allMessageField
                              fieldCount:(uint32_t)fieldCount
                             storageSize:(uint32_t)storageSize
                                   flags:(GPBDescriptorInitializationFlags)flags {
-  GPBInternalCompileAssert(GOOGLE_PROTOBUF_OBJC_MIN_SUPPORTED_VERSION <= 30006,
-                           time_to_remove_this_old_version_shim);
   // The rootClass is no longer used, but it is passed as [ROOT class] to
   // ensure it was started up during initialization also when the message
   // scopes extensions.
@@ -207,13 +205,6 @@ static NSArray *NewFieldsArrayForHasIndex(int hasIndex, NSArray *allMessageField
   [fields_ release];
   [oneofs_ release];
   [super dealloc];
-}
-
-// No need to provide -hash/-isEqual: as the instances are singletons and the
-// default from NSObject is fine.
-- (instancetype)copyWithZone:(__unused NSZone *)zone {
-  // Immutable.
-  return [self retain];
 }
 
 - (void)setupOneofs:(const char **)oneofNames
@@ -257,8 +248,6 @@ static NSArray *NewFieldsArrayForHasIndex(int hasIndex, NSArray *allMessageField
 }
 
 - (void)setupContainingMessageClassName:(const char *)msgClassName {
-  GPBInternalCompileAssert(GOOGLE_PROTOBUF_OBJC_MIN_SUPPORTED_VERSION <= 30003,
-                           time_to_remove_this_old_version_shim);
   // Note: Only fetch the class here, can't send messages to it because
   // that could cause cycles back to this class within +initialize if
   // two messages have each other in fields (i.e. - they build a graph).
@@ -336,6 +325,10 @@ static NSArray *NewFieldsArrayForHasIndex(int hasIndex, NSArray *allMessageField
   return result;
 }
 
+- (id)copyWithZone:(__unused NSZone *)zone {
+  return [self retain];
+}
+
 - (GPBFieldDescriptor *)fieldWithNumber:(uint32_t)fieldNumber {
   for (GPBFieldDescriptor *descriptor in fields_) {
     if (GPBFieldNumber(descriptor) == fieldNumber) {
@@ -402,31 +395,6 @@ static NSArray *NewFieldsArrayForHasIndex(int hasIndex, NSArray *allMessageField
   [super dealloc];
 }
 
-- (BOOL)isEqual:(id)other {
-  if (other == self) {
-    return YES;
-  }
-  if (![other isKindOfClass:[GPBFileDescriptor class]]) {
-    return NO;
-  }
-  GPBFileDescriptor *otherFile = other;
-  // objcPrefix can be nil, otherwise, straight up compare.
-  return (syntax_ == otherFile->syntax_ && [package_ isEqual:otherFile->package_] &&
-          (objcPrefix_ == otherFile->objcPrefix_ ||
-           (otherFile->objcPrefix_ && [objcPrefix_ isEqual:otherFile->objcPrefix_])));
-}
-
-- (NSUInteger)hash {
-  // The prefix is recommended to be the same for a given package, so just hash
-  // the package.
-  return [package_ hash];
-}
-
-- (instancetype)copyWithZone:(__unused NSZone *)zone {
-  // Immutable.
-  return [self retain];
-}
-
 @end
 
 @implementation GPBOneofDescriptor
@@ -450,13 +418,6 @@ static NSArray *NewFieldsArrayForHasIndex(int hasIndex, NSArray *allMessageField
 - (void)dealloc {
   [fields_ release];
   [super dealloc];
-}
-
-// No need to provide -hash/-isEqual: as the instances are singletons and the
-// default from NSObject is fine.
-- (instancetype)copyWithZone:(__unused NSZone *)zone {
-  // Immutable.
-  return [self retain];
 }
 
 - (NSString *)name {
@@ -540,8 +501,6 @@ uint32_t GPBFieldAlternateTag(GPBFieldDescriptor *self) {
     // If proto3 optionals weren't known (i.e. generated code from an
     // older version), compute the flag for the rest of the runtime.
     if ((descriptorFlags & GPBDescriptorInitializationFlag_Proto3OptionalKnown) == 0) {
-      GPBInternalCompileAssert(GOOGLE_PROTOBUF_OBJC_MIN_SUPPORTED_VERSION <= 30004,
-                               time_to_remove_proto3_optional_fallback);
       // If it was...
       //  - proto3 syntax
       //  - not repeated/map
@@ -560,8 +519,6 @@ uint32_t GPBFieldAlternateTag(GPBFieldDescriptor *self) {
     // If the ClosedEnum flag wasn't known (i.e. generated code from an older
     // version), compute the flag for the rest of the runtime.
     if ((descriptorFlags & GPBDescriptorInitializationFlag_ClosedEnumSupportKnown) == 0) {
-      GPBInternalCompileAssert(GOOGLE_PROTOBUF_OBJC_MIN_SUPPORTED_VERSION <= 30005,
-                               time_to_remove_closed_enum_fallback);
       // NOTE: This isn't correct, it is using the syntax of the file that
       // declared the field, not the syntax of the file that declared the
       // enum; but for older generated code, that's all we have and that happens
@@ -600,8 +557,6 @@ uint32_t GPBFieldAlternateTag(GPBFieldDescriptor *self) {
       if ((descriptorFlags & GPBDescriptorInitializationFlag_UsesClassRefs) != 0) {
         msgClass_ = coreDesc->dataTypeSpecific.clazz;
       } else {
-        GPBInternalCompileAssert(GOOGLE_PROTOBUF_OBJC_MIN_SUPPORTED_VERSION <= 30003,
-                                 time_to_remove_non_class_ref_support);
         // Backwards compatibility for sources generated with older protoc.
         const char *className = coreDesc->dataTypeSpecific.className;
         msgClass_ = objc_getClass(className);
@@ -640,13 +595,6 @@ uint32_t GPBFieldAlternateTag(GPBFieldDescriptor *self) {
     [defaultValue_.valueData release];
   }
   [super dealloc];
-}
-
-// No need to provide -hash/-isEqual: as the instances are singletons and the
-// default from NSObject is fine.
-- (instancetype)copyWithZone:(__unused NSZone *)zone {
-  // Immutable.
-  return [self retain];
 }
 
 - (GPBDataType)dataType {
@@ -867,8 +815,6 @@ uint32_t GPBFieldAlternateTag(GPBFieldDescriptor *self) {
                                 values:(const int32_t *)values
                                  count:(uint32_t)valueCount
                           enumVerifier:(GPBEnumValidationFunc)enumVerifier {
-  GPBInternalCompileAssert(GOOGLE_PROTOBUF_OBJC_MIN_SUPPORTED_VERSION <= 30005,
-                           time_to_remove_this_old_version_shim);
   return [self allocDescriptorForName:name
                            valueNames:valueNames
                                values:values
@@ -883,8 +829,6 @@ uint32_t GPBFieldAlternateTag(GPBFieldDescriptor *self) {
                                  count:(uint32_t)valueCount
                           enumVerifier:(GPBEnumValidationFunc)enumVerifier
                    extraTextFormatInfo:(const char *)extraTextFormatInfo {
-  GPBInternalCompileAssert(GOOGLE_PROTOBUF_OBJC_MIN_SUPPORTED_VERSION <= 30005,
-                           time_to_remove_this_old_version_shim);
   return [self allocDescriptorForName:name
                            valueNames:valueNames
                                values:values
@@ -915,13 +859,6 @@ uint32_t GPBFieldAlternateTag(GPBFieldDescriptor *self) {
   [name_ release];
   if (nameOffsets_) free(nameOffsets_);
   [super dealloc];
-}
-
-// No need to provide -hash/-isEqual: as the instances are singletons and the
-// default from NSObject is fine.
-- (instancetype)copyWithZone:(__unused NSZone *)zone {
-  // Immutable.
-  return [self retain];
 }
 
 - (BOOL)isClosed {
@@ -1075,8 +1012,6 @@ uint32_t GPBFieldAlternateTag(GPBFieldDescriptor *self) {
   if ((self = [super init])) {
     description_ = desc;
     if (!usesClassRefs) {
-      GPBInternalCompileAssert(GOOGLE_PROTOBUF_OBJC_MIN_SUPPORTED_VERSION <= 30003,
-                               time_to_remove_this_support);
       // Legacy without class ref support.
       const char *className = description_->messageOrGroupClass.name;
       if (className) {
@@ -1117,8 +1052,6 @@ uint32_t GPBFieldAlternateTag(GPBFieldDescriptor *self) {
 }
 
 - (instancetype)initWithExtensionDescription:(GPBExtensionDescription *)desc {
-  GPBInternalCompileAssert(GOOGLE_PROTOBUF_OBJC_MIN_SUPPORTED_VERSION <= 30003,
-                           time_to_remove_this_old_version_shim);
   return [self initWithExtensionDescription:desc usesClassRefs:NO];
 }
 
@@ -1129,8 +1062,6 @@ uint32_t GPBFieldAlternateTag(GPBFieldDescriptor *self) {
   [super dealloc];
 }
 
-// No need to provide -hash/-isEqual: as the instances are singletons and the
-// default from NSObject is fine.
 - (instancetype)copyWithZone:(__unused NSZone *)zone {
   // Immutable.
   return [self retain];

@@ -40,8 +40,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Store an unknown field. These are used in conjunction with
  * GPBUnknownFieldSet.
  **/
-__attribute__((objc_subclassing_restricted))
-@interface GPBUnknownField : NSObject<NSCopying>
+@interface GPBUnknownField : NSObject <NSCopying>
 
 /** Initialize a field with the given number. */
 - (instancetype)initWithNumber:(int32_t)number;
