@@ -202,8 +202,7 @@ void EnumGenerator::GenerateSource(io::Printer* printer) const {
       // clang-format off
       "GPBEnumDescriptor *$name$_EnumDescriptor(void) {\n"
       "  static _Atomic(GPBEnumDescriptor*) descriptor = nil;\n"
-      "  if (!descriptor) {\n"
-      "    GPB_DEBUG_CHECK_RUNTIME_VERSIONS();\n",
+      "  if (!descriptor) {\n",
       // clang-format on
       "name", name_);
 
