@@ -51,7 +51,6 @@ static GPBFileDescriptor *GPBStructRoot_FileDescriptor(void) {
 GPBEnumDescriptor *GPBNullValue_EnumDescriptor(void) {
   static _Atomic(GPBEnumDescriptor*) descriptor = nil;
   if (!descriptor) {
-    GPB_DEBUG_CHECK_RUNTIME_VERSIONS();
     static const char *valueNames =
         "NullValue\000";
     static const int32_t values[] = {
@@ -97,7 +96,6 @@ typedef struct GPBStruct__storage_ {
 + (GPBDescriptor *)descriptor {
   static GPBDescriptor *descriptor = nil;
   if (!descriptor) {
-    GPB_DEBUG_CHECK_RUNTIME_VERSIONS();
     static GPBMessageFieldDescription fields[] = {
       {
         .name = "fields",
@@ -152,7 +150,6 @@ typedef struct GPBValue__storage_ {
 + (GPBDescriptor *)descriptor {
   static GPBDescriptor *descriptor = nil;
   if (!descriptor) {
-    GPB_DEBUG_CHECK_RUNTIME_VERSIONS();
     static GPBMessageFieldDescription fields[] = {
       {
         .name = "nullValue",
@@ -265,7 +262,6 @@ typedef struct GPBListValue__storage_ {
 + (GPBDescriptor *)descriptor {
   static GPBDescriptor *descriptor = nil;
   if (!descriptor) {
-    GPB_DEBUG_CHECK_RUNTIME_VERSIONS();
     static GPBMessageFieldDescription fields[] = {
       {
         .name = "valuesArray",
