@@ -1,28 +1,19 @@
-name: Auto-generate checked-in files
+name: Generate Files
 
+# After any push to the main branch, re-generate pregenerated files.
 on:
   push:
     branches:
       - main
       - '[0-9]+.x'
-      # The 21.x branch predates support for auto-generation, so we make sure
-      # to exclude it.
-      - '!21.x'
 
-permissions: {}
 jobs:
-  cmake:
-    permissions:
-      contents: write  #  for git push
-
-    if: github.repository == 'protocolbuffers/protobuf'
-    runs-on: ubuntu-latest
-
-    strategy:
-      fail-fast: false   # Don't cancel all jobs if one fails.
+  generate:
+    if: github.repository == 'protocolbuffers/upb'
+    runs-on: ubuntu-22-large
 
     steps:
-      - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
+      - uses: actions/checkout@v3
         with:
           # Note: this token has an expiration date, so if the workflow starts
           # failing then you may need to generate a fresh token.
@@ -30,4 +21,4 @@ jobs:
       - name: Configure name and email address in Git
         run: cd ${{ github.workspace }} && git config user.name "Protobuf Team Bot" && git config user.email "protobuf-team-bot@google.com"
       - name: Commit and push update
-        run: cd ${{ github.workspace }} && ./push_auto_update.sh
+        run: cd ${{ github.workspace }} && ./cmake/push_auto_update.sh
