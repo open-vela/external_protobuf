@@ -48,7 +48,6 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @note This class is not meant to be subclassed.
  **/
-__attribute__((objc_subclassing_restricted))
 @interface GPBInt32Array : NSObject <NSCopying>
 
 /** The number of elements contained in the array. */
@@ -223,7 +222,6 @@ __attribute__((objc_subclassing_restricted))
  *
  * @note This class is not meant to be subclassed.
  **/
-__attribute__((objc_subclassing_restricted))
 @interface GPBUInt32Array : NSObject <NSCopying>
 
 /** The number of elements contained in the array. */
@@ -398,7 +396,6 @@ __attribute__((objc_subclassing_restricted))
  *
  * @note This class is not meant to be subclassed.
  **/
-__attribute__((objc_subclassing_restricted))
 @interface GPBInt64Array : NSObject <NSCopying>
 
 /** The number of elements contained in the array. */
@@ -573,7 +570,6 @@ __attribute__((objc_subclassing_restricted))
  *
  * @note This class is not meant to be subclassed.
  **/
-__attribute__((objc_subclassing_restricted))
 @interface GPBUInt64Array : NSObject <NSCopying>
 
 /** The number of elements contained in the array. */
@@ -748,7 +744,6 @@ __attribute__((objc_subclassing_restricted))
  *
  * @note This class is not meant to be subclassed.
  **/
-__attribute__((objc_subclassing_restricted))
 @interface GPBFloatArray : NSObject <NSCopying>
 
 /** The number of elements contained in the array. */
@@ -923,7 +918,6 @@ __attribute__((objc_subclassing_restricted))
  *
  * @note This class is not meant to be subclassed.
  **/
-__attribute__((objc_subclassing_restricted))
 @interface GPBDoubleArray : NSObject <NSCopying>
 
 /** The number of elements contained in the array. */
@@ -1098,7 +1092,6 @@ __attribute__((objc_subclassing_restricted))
  *
  * @note This class is not meant to be subclassed.
  **/
-__attribute__((objc_subclassing_restricted))
 @interface GPBBoolArray : NSObject <NSCopying>
 
 /** The number of elements contained in the array. */
@@ -1273,7 +1266,6 @@ __attribute__((objc_subclassing_restricted))
  *
  * @note This class is not meant to be subclassed.
  **/
-__attribute__((objc_subclassing_restricted))
 @interface GPBEnumArray : NSObject <NSCopying>
 
 /** The number of elements contained in the array. */
@@ -1591,7 +1583,6 @@ NS_ASSUME_NONNULL_END
 //% *
 //% * @note This class is not meant to be subclassed.
 //% **/
-//%__attribute__((objc_subclassing_restricted))
 //%@interface GPB##NAME##Array : NSObject <NSCopying>
 //%
 //%/** The number of elements contained in the array. */
@@ -1684,7 +1675,6 @@ NS_ASSUME_NONNULL_END
 //% *
 //% * @note This class is not meant to be subclassed.
 //% **/
-//%__attribute__((objc_subclassing_restricted))
 //%@interface GPB##NAME##Array : NSObject <NSCopying>
 //%
 //%/** The number of elements contained in the array. */
