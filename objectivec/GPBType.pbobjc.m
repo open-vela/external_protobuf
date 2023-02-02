@@ -18,10 +18,12 @@
 // static values in struct initializers.
 // We don't use [Foo class] because it is not a static value.
 GPBObjCClassDeclaration(GPBAny);
+GPBObjCClassDeclaration(GPBEnum);
 GPBObjCClassDeclaration(GPBEnumValue);
 GPBObjCClassDeclaration(GPBField);
 GPBObjCClassDeclaration(GPBOption);
 GPBObjCClassDeclaration(GPBSourceContext);
+GPBObjCClassDeclaration(GPBType);
 
 #pragma mark - GPBTypeRoot
 
@@ -282,7 +284,7 @@ typedef struct GPBType__storage_ {
       },
     };
     GPBDescriptor *localDescriptor =
-        [GPBDescriptor allocDescriptorForClass:[GPBType class]
+        [GPBDescriptor allocDescriptorForClass:GPBObjCClass(GPBType)
                                           file:GPBTypeRoot_FileDescriptor()
                                         fields:fields
                                     fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
@@ -436,7 +438,7 @@ typedef struct GPBField__storage_ {
       },
     };
     GPBDescriptor *localDescriptor =
-        [GPBDescriptor allocDescriptorForClass:[GPBField class]
+        [GPBDescriptor allocDescriptorForClass:GPBObjCClass(GPBField)
                                           file:GPBTypeRoot_FileDescriptor()
                                         fields:fields
                                     fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
@@ -553,7 +555,7 @@ typedef struct GPBEnum__storage_ {
       },
     };
     GPBDescriptor *localDescriptor =
-        [GPBDescriptor allocDescriptorForClass:[GPBEnum class]
+        [GPBDescriptor allocDescriptorForClass:GPBObjCClass(GPBEnum)
                                           file:GPBTypeRoot_FileDescriptor()
                                         fields:fields
                                     fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
@@ -631,7 +633,7 @@ typedef struct GPBEnumValue__storage_ {
       },
     };
     GPBDescriptor *localDescriptor =
-        [GPBDescriptor allocDescriptorForClass:[GPBEnumValue class]
+        [GPBDescriptor allocDescriptorForClass:GPBObjCClass(GPBEnumValue)
                                           file:GPBTypeRoot_FileDescriptor()
                                         fields:fields
                                     fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
@@ -686,7 +688,7 @@ typedef struct GPBOption__storage_ {
       },
     };
     GPBDescriptor *localDescriptor =
-        [GPBDescriptor allocDescriptorForClass:[GPBOption class]
+        [GPBDescriptor allocDescriptorForClass:GPBObjCClass(GPBOption)
                                           file:GPBTypeRoot_FileDescriptor()
                                         fields:fields
                                     fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
