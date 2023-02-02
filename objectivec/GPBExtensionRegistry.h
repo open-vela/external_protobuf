@@ -72,8 +72,7 @@ NS_ASSUME_NONNULL_BEGIN
  * MyMessage *msg = [MyMessage parseData:data extensionRegistry:registry error:&parseError];
  * ```
  **/
-__attribute__((objc_subclassing_restricted))
-@interface GPBExtensionRegistry : NSObject<NSCopying, GPBExtensionRegistry>
+@interface GPBExtensionRegistry : NSObject <NSCopying, GPBExtensionRegistry>
 
 /**
  * Adds the given GPBExtensionDescriptor to this registry.
