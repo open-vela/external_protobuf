@@ -1,0 +1,252 @@
+name: C++ Tests
+
+on:
+  workflow_call:
+    inputs:
+      safe-checkout:
+        required: true
+        description: "The SHA key for the commit we want to run over"
+        type: string
+
+jobs:
+  linux:
+    strategy:
+      fail-fast: false   # Don't cancel all jobs if one fails.
+      matrix:
+        config:
+          - { name: Optimized, flags: --config=opt }
+          - { name: Debug, flags: --config=dbg }
+          - { name: ASAN, flags: --config=asan }
+          - { name: MSAN, flags: --config=kokoro-msan }
+          - { name: TSAN, flags: --config=tsan }
+          - { name: UBSAN, flags: --config=ubsan }
+          - { name: No-RTTI, flags: --cxxopt=-fno-rtti }
+        include:
+          # Set defaults
+          - image: us-docker.pkg.dev/protobuf-build/containers/test/linux/sanitize@sha256:dbd2f15fb69734d72c3fd10cb819bbe2ce4890acf49e9a2f9403983fe48e8807
+          - targets: //pkg/... //src/... @com_google_protobuf_examples//...
+
+          # Override cases with custom images
+          - config: { name: "TCMalloc" }
+            image: "us-docker.pkg.dev/protobuf-build/containers/test/linux/tcmalloc@sha256:9d975616c3fd44d5a091aeb60ee94f37e22fb367d471d258fc18cb4a2387c943"
+            targets: "//src/..."
+          - config: { name: "aarch64" }
+            targets: "//src/... //src/google/protobuf/compiler:protoc_aarch64_test"
+            image: "us-docker.pkg.dev/protobuf-build/containers/test/linux/emulation:aarch64-e863f8ec6b1dfe41f7dc573bac9c8072a0a68b1b"
+          - config: { name: "Bazel4" }
+            targets: "//src/..."
+            image: "us-docker.pkg.dev/protobuf-build/containers/common/linux/bazel:4.2.3-3b71de326b62f67bf754c4dc4016d6a2fa9dd664"
+    name: Linux ${{ matrix.config.name }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout pending changes
+        uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
+        with:
+          ref: ${{ inputs.safe-checkout }}
+      - name: Run tests
+        uses: ./.github/actions/bazel-docker
+        with:
+          image: ${{ matrix.image }}
+          credentials: ${{ secrets.GAR_SERVICE_ACCOUNT }}
+          bazel-cache: cpp_linux/${{ matrix.config.name }}
+          bazel: test ${{ matrix.targets }} ${{ matrix.config.flags }} --distinct_host_configuration=false
+
+  linux-cmake:
+    strategy:
+      fail-fast: false   # Don't cancel all jobs if one fails.
+      matrix:
+        include:
+          - command: >
+              /test.sh
+              -Dprotobuf_BUILD_CONFORMANCE=ON
+              -Dprotobuf_BUILD_EXAMPLES=ON
+              -DCMAKE_CXX_STANDARD=14
+          - name: Ninja
+            command: >
+              /test.sh
+              -G Ninja
+              -Dprotobuf_BUILD_CONFORMANCE=ON
+              -DCMAKE_CXX_STANDARD=14
+          - name: Shared
+            command: >
+              /test.sh
+              -Dprotobuf_BUILD_CONFORMANCE=ON
+              -Dprotobuf_BUILD_SHARED_LIBS=ON
+              -DCMAKE_CXX_STANDARD=14
+          - name: Install
+            command: >
+              /install.sh -DCMAKE_CXX_STANDARD=14 \&\& /test.sh
+              -Dprotobuf_REMOVE_INSTALLED_HEADERS=ON
+              -Dprotobuf_BUILD_PROTOBUF_BINARIES=OFF
+              -Dprotobuf_BUILD_CONFORMANCE=ON
+              -DCMAKE_CXX_STANDARD=14
+          - name: 32-bit
+            image: us-docker.pkg.dev/protobuf-build/containers/test/linux/32bit@sha256:6651a299483f7368876db7aed0802ad4ebf038d626d8995ba7df08978ff43210
+            platform: linux/386
+            command: >-
+              /bin/bash -c '
+              cd /workspace;
+              cmake . -DCMAKE_CXX_STANDARD=14;
+              cmake --build . --parallel 20;
+              ctest --verbose --parallel 20'
+
+    name: Linux CMake ${{ matrix.name}}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout pending changes
+        uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
+        with:
+          submodules: recursive
+          ref: ${{ inputs.safe-checkout }}
+      - name: Run tests
+        uses: ./.github/actions/docker
+        with:
+          image: ${{ matrix.image || 'us-docker.pkg.dev/protobuf-build/containers/test/linux/cmake@sha256:cc23dbe065668158ca2732aa305a07bd0913a175b2079d27d9c16925d23f2335' }}
+          platform: ${{ matrix.platform }}
+          credentials: ${{ secrets.GAR_SERVICE_ACCOUNT }}
+          command: ${{ matrix.command }}
+  non-linux:
+    strategy:
+      fail-fast: false   # Don't cancel all jobs if one fails.
+      matrix:
+        include:
+          - name: MacOS
+            os: macos-12
+            bazel: //src/...
+          - name: Windows
+            os: windows-2019
+            bazel: //src/...  @com_google_protobuf_examples//... --test_tag_filters=-conformance --build_tag_filters=-conformance
+    name: ${{ matrix.name }} Bazel
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout pending changes
+        uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
+        with:
+          ref: ${{ inputs.safe-checkout }}
+      - name: Run tests
+        uses: ./.github/actions/bazel
+        with:
+          credentials: ${{ secrets.GAR_SERVICE_ACCOUNT }}
+          bazel: test ${{ matrix.bazel }}
+          bazel-cache: cpp_${{ matrix.os }}
+
+  macos-cmake:
+    name: MacOS CMake
+    runs-on: macos-12
+    steps:
+      - name: Checkout pending changes
+        uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
+        with:
+          submodules: recursive
+          ref: ${{ inputs.safe-checkout }}
+
+      - name: Configure CMake
+        uses: ./.github/actions/bash
+        with:
+          credentials: ${{ secrets.GAR_SERVICE_ACCOUNT }}
+          command: cmake . -DCMAKE_CXX_STANDARD=14
+      - name: Build
+        run: cmake --build . --parallel 8
+      - name: Test
+        run: ctest --verbose -C Debug
+
+  windows-cmake:
+    strategy:
+      fail-fast: false   # Don't cancel all jobs if one fails.
+      matrix:
+        include:
+          - name: Visual Studio
+            flags: >-
+              -Dprotobuf_BUILD_SHARED_LIBS=OFF
+              -Dprotobuf_BUILD_EXAMPLES=ON
+          - name: Shared
+            flags: -Dprotobuf_BUILD_SHARED_LIBS=ON
+
+    name: Windows CMake ${{ matrix.name}}
+    runs-on: windows-2019
+    steps:
+      - name: Checkout pending changes
+        uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
+        with:
+          submodules: recursive
+          ref: ${{ inputs.safe-checkout }}
+
+      - name: Setup MSVC
+        uses: microsoft/setup-msbuild@d3ea839497466fb4c6b91ce85831f3a251a2fe3f # v1.0.0
+        with:
+          vs-version: '15'
+          msbuild-architecture: x64
+
+      - name: Configure CMake
+        uses: ./.github/actions/bash
+        with:
+          credentials: ${{ secrets.GAR_SERVICE_ACCOUNT }}
+          command: |
+            cmake . -G "Visual Studio 16 2019" -A x64 \
+              -Dprotobuf_BUILD_CONFORMANCE=OFF \
+              -Dprotobuf_WITH_ZLIB=OFF \
+              ${{ matrix.flags }}
+
+      - name: Build for Windows 15 2017
+        run: >-
+          msbuild.exe protobuf.sln /maxcpucount:8 /p:BuildInParallel=true
+          /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=15.0
+
+      - name: Run Tests
+        run: ctest --verbose -C Debug
+
+  windows-cmake-install:
+    name: Windows CMake Install
+    runs-on: windows-2019
+    steps:
+      - name: Checkout pending changes
+        uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
+        with:
+          submodules: recursive
+          ref: ${{ inputs.safe-checkout }}
+
+      - name: Setup MSVC
+        uses: microsoft/setup-msbuild@d3ea839497466fb4c6b91ce85831f3a251a2fe3f # v1.0.0
+        with:
+          vs-version: '15'
+          msbuild-architecture: x64
+
+      - name: Configure CMake for Install
+        uses: ./.github/actions/bash
+        with:
+          credentials: ${{ secrets.GAR_SERVICE_ACCOUNT }}
+          command: |
+            mkdir build
+            pushd build
+            cmake .. -G "Visual Studio 16 2019" -A x64 \
+              -Dprotobuf_BUILD_CONFORMANCE=OFF \
+              -Dprotobuf_WITH_ZLIB=OFF
+            popd
+
+      - name: Build and Install Protobuf for Windows 15 2017
+        run: |
+          pushd build
+          msbuild.exe INSTALL.vcxproj /p:Platform=x64 /p:VisualStudioVersion=15.0 /maxcpucount:8 /p:BuildInParallel=true
+          popd
+
+      - name: Clear CMake cache
+        shell: bash
+        run: rm -rf build/*
+
+      - name: Configure CMake
+        uses: ./.github/actions/bash
+        with:
+          credentials: ${{ secrets.GAR_SERVICE_ACCOUNT }}
+          command: |
+            cmake . -G "Visual Studio 16 2019" -A x64 \
+              -Dprotobuf_REMOVE_INSTALLED_HEADERS=ON \
+              -Dprotobuf_BUILD_PROTOBUF_BINARIES=OFF \
+              -Dprotobuf_BUILD_CONFORMANCE=OFF
+
+      - name: Build for Windows 15 2017
+        run: >-
+          msbuild.exe protobuf.sln /maxcpucount:8 /p:BuildInParallel=true
+          /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=15.0
+
+      - name: Run Tests
+        run: ctest --verbose -C Debug
