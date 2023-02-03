@@ -135,9 +135,8 @@ namespace Google.Protobuf
 
             var ex = Assert.Throws<InvalidOperationException>(() => message.GetExtension(wrongTypedExtension));
 
-            var fullAssemblyName = typeof(TestAllTypes).Assembly.FullName;
-            var expectedMessage = $"The stored extension value has a type of 'Google.Protobuf.TestProtos.Proto2.TestAllTypes+Types+NestedMessage, {fullAssemblyName}'. " +
-                $"This a different from the requested type of 'Google.Protobuf.TestProtos.Proto2.TestAllTypes, {fullAssemblyName}'.";
+            var expectedMessage = "The stored extension value has a type of 'Google.Protobuf.TestProtos.Proto2.TestAllTypes+Types+NestedMessage, Google.Protobuf.Test.TestProtos, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a7d26565bac4d604'. " +
+                "This a different from the requested type of 'Google.Protobuf.TestProtos.Proto2.TestAllTypes, Google.Protobuf.Test.TestProtos, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a7d26565bac4d604'.";
             Assert.AreEqual(expectedMessage, ex.Message);
         }
 
@@ -166,9 +165,8 @@ namespace Google.Protobuf
 
             var ex = Assert.Throws<InvalidOperationException>(() => message.GetExtension(wrongTypedExtension));
 
-            var fullAssemblyName = typeof(TestAllTypes).Assembly.FullName;
-            var expectedMessage = $"The stored extension value has a type of 'Google.Protobuf.TestProtos.Proto2.TestAllTypes+Types+NestedMessage, {fullAssemblyName}'. " +
-                $"This a different from the requested type of 'Google.Protobuf.TestProtos.Proto2.TestAllTypes, {fullAssemblyName}'.";
+            var expectedMessage = "The stored extension value has a type of 'Google.Protobuf.TestProtos.Proto2.TestAllTypes+Types+NestedMessage, Google.Protobuf.Test.TestProtos, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a7d26565bac4d604'. " +
+                "This a different from the requested type of 'Google.Protobuf.TestProtos.Proto2.TestAllTypes, Google.Protobuf.Test.TestProtos, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a7d26565bac4d604'.";
             Assert.AreEqual(expectedMessage, ex.Message);
         }
 

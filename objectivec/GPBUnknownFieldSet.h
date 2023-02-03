@@ -39,8 +39,7 @@ NS_ASSUME_NONNULL_BEGIN
  * of a message that are unknown end up in an instance of this set. This only
  * applies for files declared with the "proto2" syntax.
  **/
-__attribute__((objc_subclassing_restricted))
-@interface GPBUnknownFieldSet : NSObject<NSCopying>
+@interface GPBUnknownFieldSet : NSObject <NSCopying>
 
 /**
  * Tests to see if the given field number has a value.

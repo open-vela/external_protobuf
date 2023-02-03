@@ -8,7 +8,7 @@ if [[ -z "${PROTOC}" ]]; then
   PROTOC=$(pwd)/protoc
 fi
 if [ ! -f $PROTOC ]; then
-  ${BAZEL:-bazel} $BAZEL_STARTUP_FLAGS build -c opt //:protoc $BAZEL_FLAGS
+  bazel build -c opt //:protoc
   PROTOC=$(pwd)/bazel-bin/protoc
 fi
 
