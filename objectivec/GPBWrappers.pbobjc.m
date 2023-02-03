@@ -9,21 +9,6 @@
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-#pragma clang diagnostic ignored "-Wdollar-in-identifier-extension"
-
-#pragma mark - Objective C Class declarations
-// Forward declarations of Objective C classes that we can use as
-// static values in struct initializers.
-// We don't use [Foo class] because it is not a static value.
-GPBObjCClassDeclaration(GPBBoolValue);
-GPBObjCClassDeclaration(GPBBytesValue);
-GPBObjCClassDeclaration(GPBDoubleValue);
-GPBObjCClassDeclaration(GPBFloatValue);
-GPBObjCClassDeclaration(GPBInt32Value);
-GPBObjCClassDeclaration(GPBInt64Value);
-GPBObjCClassDeclaration(GPBStringValue);
-GPBObjCClassDeclaration(GPBUInt32Value);
-GPBObjCClassDeclaration(GPBUInt64Value);
 
 #pragma mark - GPBWrappersRoot
 
@@ -65,7 +50,6 @@ typedef struct GPBDoubleValue__storage_ {
 + (GPBDescriptor *)descriptor {
   static GPBDescriptor *descriptor = nil;
   if (!descriptor) {
-    GPB_DEBUG_CHECK_RUNTIME_VERSIONS();
     static GPBMessageFieldDescription fields[] = {
       {
         .name = "value",
@@ -78,7 +62,7 @@ typedef struct GPBDoubleValue__storage_ {
       },
     };
     GPBDescriptor *localDescriptor =
-        [GPBDescriptor allocDescriptorForClass:GPBObjCClass(GPBDoubleValue)
+        [GPBDescriptor allocDescriptorForClass:[GPBDoubleValue class]
                                           file:GPBWrappersRoot_FileDescriptor()
                                         fields:fields
                                     fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
@@ -110,7 +94,6 @@ typedef struct GPBFloatValue__storage_ {
 + (GPBDescriptor *)descriptor {
   static GPBDescriptor *descriptor = nil;
   if (!descriptor) {
-    GPB_DEBUG_CHECK_RUNTIME_VERSIONS();
     static GPBMessageFieldDescription fields[] = {
       {
         .name = "value",
@@ -123,7 +106,7 @@ typedef struct GPBFloatValue__storage_ {
       },
     };
     GPBDescriptor *localDescriptor =
-        [GPBDescriptor allocDescriptorForClass:GPBObjCClass(GPBFloatValue)
+        [GPBDescriptor allocDescriptorForClass:[GPBFloatValue class]
                                           file:GPBWrappersRoot_FileDescriptor()
                                         fields:fields
                                     fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
@@ -155,7 +138,6 @@ typedef struct GPBInt64Value__storage_ {
 + (GPBDescriptor *)descriptor {
   static GPBDescriptor *descriptor = nil;
   if (!descriptor) {
-    GPB_DEBUG_CHECK_RUNTIME_VERSIONS();
     static GPBMessageFieldDescription fields[] = {
       {
         .name = "value",
@@ -168,7 +150,7 @@ typedef struct GPBInt64Value__storage_ {
       },
     };
     GPBDescriptor *localDescriptor =
-        [GPBDescriptor allocDescriptorForClass:GPBObjCClass(GPBInt64Value)
+        [GPBDescriptor allocDescriptorForClass:[GPBInt64Value class]
                                           file:GPBWrappersRoot_FileDescriptor()
                                         fields:fields
                                     fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
@@ -200,7 +182,6 @@ typedef struct GPBUInt64Value__storage_ {
 + (GPBDescriptor *)descriptor {
   static GPBDescriptor *descriptor = nil;
   if (!descriptor) {
-    GPB_DEBUG_CHECK_RUNTIME_VERSIONS();
     static GPBMessageFieldDescription fields[] = {
       {
         .name = "value",
@@ -213,7 +194,7 @@ typedef struct GPBUInt64Value__storage_ {
       },
     };
     GPBDescriptor *localDescriptor =
-        [GPBDescriptor allocDescriptorForClass:GPBObjCClass(GPBUInt64Value)
+        [GPBDescriptor allocDescriptorForClass:[GPBUInt64Value class]
                                           file:GPBWrappersRoot_FileDescriptor()
                                         fields:fields
                                     fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
@@ -245,7 +226,6 @@ typedef struct GPBInt32Value__storage_ {
 + (GPBDescriptor *)descriptor {
   static GPBDescriptor *descriptor = nil;
   if (!descriptor) {
-    GPB_DEBUG_CHECK_RUNTIME_VERSIONS();
     static GPBMessageFieldDescription fields[] = {
       {
         .name = "value",
@@ -258,7 +238,7 @@ typedef struct GPBInt32Value__storage_ {
       },
     };
     GPBDescriptor *localDescriptor =
-        [GPBDescriptor allocDescriptorForClass:GPBObjCClass(GPBInt32Value)
+        [GPBDescriptor allocDescriptorForClass:[GPBInt32Value class]
                                           file:GPBWrappersRoot_FileDescriptor()
                                         fields:fields
                                     fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
@@ -290,7 +270,6 @@ typedef struct GPBUInt32Value__storage_ {
 + (GPBDescriptor *)descriptor {
   static GPBDescriptor *descriptor = nil;
   if (!descriptor) {
-    GPB_DEBUG_CHECK_RUNTIME_VERSIONS();
     static GPBMessageFieldDescription fields[] = {
       {
         .name = "value",
@@ -303,7 +282,7 @@ typedef struct GPBUInt32Value__storage_ {
       },
     };
     GPBDescriptor *localDescriptor =
-        [GPBDescriptor allocDescriptorForClass:GPBObjCClass(GPBUInt32Value)
+        [GPBDescriptor allocDescriptorForClass:[GPBUInt32Value class]
                                           file:GPBWrappersRoot_FileDescriptor()
                                         fields:fields
                                     fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
@@ -334,7 +313,6 @@ typedef struct GPBBoolValue__storage_ {
 + (GPBDescriptor *)descriptor {
   static GPBDescriptor *descriptor = nil;
   if (!descriptor) {
-    GPB_DEBUG_CHECK_RUNTIME_VERSIONS();
     static GPBMessageFieldDescription fields[] = {
       {
         .name = "value",
@@ -347,7 +325,7 @@ typedef struct GPBBoolValue__storage_ {
       },
     };
     GPBDescriptor *localDescriptor =
-        [GPBDescriptor allocDescriptorForClass:GPBObjCClass(GPBBoolValue)
+        [GPBDescriptor allocDescriptorForClass:[GPBBoolValue class]
                                           file:GPBWrappersRoot_FileDescriptor()
                                         fields:fields
                                     fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
@@ -379,7 +357,6 @@ typedef struct GPBStringValue__storage_ {
 + (GPBDescriptor *)descriptor {
   static GPBDescriptor *descriptor = nil;
   if (!descriptor) {
-    GPB_DEBUG_CHECK_RUNTIME_VERSIONS();
     static GPBMessageFieldDescription fields[] = {
       {
         .name = "value",
@@ -392,7 +369,7 @@ typedef struct GPBStringValue__storage_ {
       },
     };
     GPBDescriptor *localDescriptor =
-        [GPBDescriptor allocDescriptorForClass:GPBObjCClass(GPBStringValue)
+        [GPBDescriptor allocDescriptorForClass:[GPBStringValue class]
                                           file:GPBWrappersRoot_FileDescriptor()
                                         fields:fields
                                     fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
@@ -424,7 +401,6 @@ typedef struct GPBBytesValue__storage_ {
 + (GPBDescriptor *)descriptor {
   static GPBDescriptor *descriptor = nil;
   if (!descriptor) {
-    GPB_DEBUG_CHECK_RUNTIME_VERSIONS();
     static GPBMessageFieldDescription fields[] = {
       {
         .name = "value",
@@ -437,7 +413,7 @@ typedef struct GPBBytesValue__storage_ {
       },
     };
     GPBDescriptor *localDescriptor =
-        [GPBDescriptor allocDescriptorForClass:GPBObjCClass(GPBBytesValue)
+        [GPBDescriptor allocDescriptorForClass:[GPBBytesValue class]
                                           file:GPBWrappersRoot_FileDescriptor()
                                         fields:fields
                                     fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
