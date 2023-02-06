@@ -551,6 +551,7 @@ filegroup(
         "unittest_proto3_arena_lite.proto",
         "unittest_proto3_lite.proto",
         "unittest_proto3_optional.proto",
+        "unittest_retention.proto",
         "unittest_well_known_types.proto",
     ],
     visibility = ["//:__subpackages__"],
@@ -606,6 +607,7 @@ proto_library(
         "unittest_proto3_arena_lite.proto",
         "unittest_proto3_lite.proto",
         "unittest_proto3_optional.proto",
+        "unittest_retention.proto",
         "unittest_well_known_types.proto",
     ],
     strip_import_prefix = "/src",
@@ -1016,6 +1018,7 @@ cc_test(
 
 cc_test(
     name = "map_test",
+    timeout = "long",
     srcs = [
         "map_test.cc",
         "map_test.inc",
@@ -1272,6 +1275,17 @@ cc_test(
         "//src/google/protobuf/testing",
         "@com_google_absl//absl/log:scoped_mock_log",
         "@com_google_googletest//:gtest",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "retention_test",
+    srcs = ["retention_test.cc"],
+    deps = [
+        ":cc_test_protos",
+        ":protobuf",
+        "//src/google/protobuf/compiler:retention",
         "@com_google_googletest//:gtest_main",
     ],
 )
