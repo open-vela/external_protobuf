@@ -1,3 +1,4 @@
+// -*- c++ -*-
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
 // https://developers.google.com/protocol-buffers/
@@ -119,6 +120,7 @@
 #ifdef PROTOBUF_FUTURE_BREAKING_CHANGES
 #undef PROTOBUF_FUTURE_BREAKING_CHANGES
 #undef PROTOBUF_FUTURE_REMOVE_CLEARED_API
+#undef PROTOBUF_FUTURE_DESCRIPTOR_EXTENSION_DECL
 #endif
 
 // Restore macros that may have been #undef'd in port_def.inc.
