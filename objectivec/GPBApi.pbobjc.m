@@ -15,7 +15,6 @@
 // Forward declarations of Objective C classes that we can use as
 // static values in struct initializers.
 // We don't use [Foo class] because it is not a static value.
-GPBObjCClassDeclaration(GPBApi);
 GPBObjCClassDeclaration(GPBMethod);
 GPBObjCClassDeclaration(GPBMixin);
 GPBObjCClassDeclaration(GPBOption);
@@ -73,7 +72,6 @@ typedef struct GPBApi__storage_ {
 + (GPBDescriptor *)descriptor {
   static GPBDescriptor *descriptor = nil;
   if (!descriptor) {
-    GPB_DEBUG_CHECK_RUNTIME_VERSIONS();
     static GPBMessageFieldDescription fields[] = {
       {
         .name = "name",
@@ -140,7 +138,7 @@ typedef struct GPBApi__storage_ {
       },
     };
     GPBDescriptor *localDescriptor =
-        [GPBDescriptor allocDescriptorForClass:GPBObjCClass(GPBApi)
+        [GPBDescriptor allocDescriptorForClass:[GPBApi class]
                                           file:GPBApiRoot_FileDescriptor()
                                         fields:fields
                                     fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
@@ -194,7 +192,6 @@ typedef struct GPBMethod__storage_ {
 + (GPBDescriptor *)descriptor {
   static GPBDescriptor *descriptor = nil;
   if (!descriptor) {
-    GPB_DEBUG_CHECK_RUNTIME_VERSIONS();
     static GPBMessageFieldDescription fields[] = {
       {
         .name = "name",
@@ -261,7 +258,7 @@ typedef struct GPBMethod__storage_ {
       },
     };
     GPBDescriptor *localDescriptor =
-        [GPBDescriptor allocDescriptorForClass:GPBObjCClass(GPBMethod)
+        [GPBDescriptor allocDescriptorForClass:[GPBMethod class]
                                           file:GPBApiRoot_FileDescriptor()
                                         fields:fields
                                     fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
@@ -312,7 +309,6 @@ typedef struct GPBMixin__storage_ {
 + (GPBDescriptor *)descriptor {
   static GPBDescriptor *descriptor = nil;
   if (!descriptor) {
-    GPB_DEBUG_CHECK_RUNTIME_VERSIONS();
     static GPBMessageFieldDescription fields[] = {
       {
         .name = "name",
@@ -334,7 +330,7 @@ typedef struct GPBMixin__storage_ {
       },
     };
     GPBDescriptor *localDescriptor =
-        [GPBDescriptor allocDescriptorForClass:GPBObjCClass(GPBMixin)
+        [GPBDescriptor allocDescriptorForClass:[GPBMixin class]
                                           file:GPBApiRoot_FileDescriptor()
                                         fields:fields
                                     fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))

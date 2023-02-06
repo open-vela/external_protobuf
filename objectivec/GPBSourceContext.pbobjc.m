@@ -9,13 +9,6 @@
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-#pragma clang diagnostic ignored "-Wdollar-in-identifier-extension"
-
-#pragma mark - Objective C Class declarations
-// Forward declarations of Objective C classes that we can use as
-// static values in struct initializers.
-// We don't use [Foo class] because it is not a static value.
-GPBObjCClassDeclaration(GPBSourceContext);
 
 #pragma mark - GPBSourceContextRoot
 
@@ -57,7 +50,6 @@ typedef struct GPBSourceContext__storage_ {
 + (GPBDescriptor *)descriptor {
   static GPBDescriptor *descriptor = nil;
   if (!descriptor) {
-    GPB_DEBUG_CHECK_RUNTIME_VERSIONS();
     static GPBMessageFieldDescription fields[] = {
       {
         .name = "fileName",
@@ -70,7 +62,7 @@ typedef struct GPBSourceContext__storage_ {
       },
     };
     GPBDescriptor *localDescriptor =
-        [GPBDescriptor allocDescriptorForClass:GPBObjCClass(GPBSourceContext)
+        [GPBDescriptor allocDescriptorForClass:[GPBSourceContext class]
                                           file:GPBSourceContextRoot_FileDescriptor()
                                         fields:fields
                                     fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))

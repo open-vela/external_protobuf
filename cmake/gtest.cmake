@@ -31,10 +31,10 @@ else()
         COMPILE_DEFINITIONS
           "GTEST_CREATE_SHARED_LIBRARY=1"
     )
-
-    if (protobuf_INSTALL)
-      set(protobuf_INSTALL_TESTS ON)
-    endif()
+    install(TARGETS gmock EXPORT protobuf-targets
+      RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+      LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+      ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
   endif()
 
   target_link_libraries(gmock ${CMAKE_THREAD_LIBS_INIT})

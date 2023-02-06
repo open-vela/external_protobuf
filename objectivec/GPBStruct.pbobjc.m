@@ -51,7 +51,6 @@ static GPBFileDescriptor *GPBStructRoot_FileDescriptor(void) {
 GPBEnumDescriptor *GPBNullValue_EnumDescriptor(void) {
   static _Atomic(GPBEnumDescriptor*) descriptor = nil;
   if (!descriptor) {
-    GPB_DEBUG_CHECK_RUNTIME_VERSIONS();
     static const char *valueNames =
         "NullValue\000";
     static const int32_t values[] = {
@@ -97,7 +96,6 @@ typedef struct GPBStruct__storage_ {
 + (GPBDescriptor *)descriptor {
   static GPBDescriptor *descriptor = nil;
   if (!descriptor) {
-    GPB_DEBUG_CHECK_RUNTIME_VERSIONS();
     static GPBMessageFieldDescription fields[] = {
       {
         .name = "fields",
@@ -110,7 +108,7 @@ typedef struct GPBStruct__storage_ {
       },
     };
     GPBDescriptor *localDescriptor =
-        [GPBDescriptor allocDescriptorForClass:GPBObjCClass(GPBStruct)
+        [GPBDescriptor allocDescriptorForClass:[GPBStruct class]
                                           file:GPBStructRoot_FileDescriptor()
                                         fields:fields
                                     fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
@@ -152,7 +150,6 @@ typedef struct GPBValue__storage_ {
 + (GPBDescriptor *)descriptor {
   static GPBDescriptor *descriptor = nil;
   if (!descriptor) {
-    GPB_DEBUG_CHECK_RUNTIME_VERSIONS();
     static GPBMessageFieldDescription fields[] = {
       {
         .name = "nullValue",
@@ -210,7 +207,7 @@ typedef struct GPBValue__storage_ {
       },
     };
     GPBDescriptor *localDescriptor =
-        [GPBDescriptor allocDescriptorForClass:GPBObjCClass(GPBValue)
+        [GPBDescriptor allocDescriptorForClass:[GPBValue class]
                                           file:GPBStructRoot_FileDescriptor()
                                         fields:fields
                                     fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
@@ -265,7 +262,6 @@ typedef struct GPBListValue__storage_ {
 + (GPBDescriptor *)descriptor {
   static GPBDescriptor *descriptor = nil;
   if (!descriptor) {
-    GPB_DEBUG_CHECK_RUNTIME_VERSIONS();
     static GPBMessageFieldDescription fields[] = {
       {
         .name = "valuesArray",
@@ -278,7 +274,7 @@ typedef struct GPBListValue__storage_ {
       },
     };
     GPBDescriptor *localDescriptor =
-        [GPBDescriptor allocDescriptorForClass:GPBObjCClass(GPBListValue)
+        [GPBDescriptor allocDescriptorForClass:[GPBListValue class]
                                           file:GPBStructRoot_FileDescriptor()
                                         fields:fields
                                     fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))

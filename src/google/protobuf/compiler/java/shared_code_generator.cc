@@ -39,7 +39,6 @@
 #include "google/protobuf/compiler/java/helpers.h"
 #include "google/protobuf/compiler/java/name_resolver.h"
 #include "google/protobuf/compiler/java/names.h"
-#include "google/protobuf/compiler/retention.h"
 #include "google/protobuf/descriptor.h"
 #include "google/protobuf/descriptor.pb.h"
 #include "google/protobuf/io/printer.h"
@@ -135,7 +134,8 @@ void SharedCodeGenerator::GenerateDescriptors(io::Printer* printer) {
   // This makes huge bytecode files and can easily hit the compiler's internal
   // code size limits (error "code to large").  String literals are apparently
   // embedded raw, which is what we want.
-  FileDescriptorProto file_proto = StripSourceRetentionOptions(*file_);
+  FileDescriptorProto file_proto;
+  file_->CopyTo(&file_proto);
 
   std::string file_data;
   file_proto.SerializeToString(&file_data);
