@@ -731,11 +731,9 @@ TEST_F(IoTest, StringIo) {
 
 // Verifies that outputs up to kint32max can be created.
 TEST_F(IoTest, LargeOutput) {
-  // Filter out this test on 32-bit architectures and builds where our test
-  // infrastructure can't handle it.
+  // Filter out this test on 32-bit architectures and tsan builds.
   if(sizeof(void*) < 8) return;
-#if !defined(THREAD_SANITIZER) && !defined(MEMORY_SANITIZER) && \
-    !defined(_MSC_VER)
+#ifndef THREAD_SANITIZER
   std::string str;
   StringOutputStream output(&str);
   void* unused_data;
@@ -747,7 +745,7 @@ TEST_F(IoTest, LargeOutput) {
   // Further increases should be possible.
   output.Next(&unused_data, &size);
   EXPECT_GT(size, 0);
-#endif  // !THREAD_SANITIZER && !MEMORY_SANITIZER
+#endif  // THREAD_SANITIZER
 }
 
 TEST(DefaultReadCordTest, ReadSmallCord) {

@@ -550,6 +550,7 @@ pkg_files(
         allow_empty = True,
     ) + [
         "BUILD.bazel",
+        "CHANGES.txt",
         "CMakeLists.txt",
         "CONTRIBUTORS.txt",
         "LICENSE",

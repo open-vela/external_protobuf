@@ -34,7 +34,6 @@
 
 #include <memory>
 #include <string>
-#include <tuple>
 
 #include "absl/container/flat_hash_map.h"
 #include "absl/log/absl_check.h"
@@ -203,11 +202,8 @@ void MessageFieldGenerator::GenerateAccessorDeclarations(
   format(
       "$deprecated_attr$const $type$& ${1$$name$$}$() const;\n"
       "PROTOBUF_NODISCARD $deprecated_attr$$type$* "
-      "${1$$release_name$$}$();\n",
-      descriptor_);
-  format("$deprecated_attr$$type$* ${1$mutable_$name$$}$();\n",
-         std::make_tuple(descriptor_, GeneratedCodeInfo::Annotation::ALIAS));
-  format(
+      "${1$$release_name$$}$();\n"
+      "$deprecated_attr$$type$* ${1$mutable_$name$$}$();\n"
       "$deprecated_attr$void ${1$set_allocated_$name$$}$"
       "($type$* $name$);\n"
       "private:\n"
@@ -797,13 +793,10 @@ void RepeatedMessageFieldGenerator::GeneratePrivateMembers(
 void RepeatedMessageFieldGenerator::GenerateAccessorDeclarations(
     io::Printer* printer) const {
   Formatter format(printer, variables_);
-  format("$deprecated_attr$$type$* ${1$mutable_$name$$}$(int index);\n",
-         std::make_tuple(descriptor_, GeneratedCodeInfo::Annotation::ALIAS));
   format(
+      "$deprecated_attr$$type$* ${1$mutable_$name$$}$(int index);\n"
       "$deprecated_attr$::$proto_ns$::RepeatedPtrField< $type$ >*\n"
-      "    ${1$mutable_$name$$}$();\n",
-      std::make_tuple(descriptor_, GeneratedCodeInfo::Annotation::ALIAS));
-  format(
+      "    ${1$mutable_$name$$}$();\n"
       "private:\n"
       "const $type$& ${1$_internal_$name$$}$(int index) const;\n"
       "$type$* ${1$_internal_add_$name$$}$();\n"
