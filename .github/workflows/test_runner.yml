@@ -20,8 +20,8 @@ on:
     branches:
       - main
       - '[0-9]+.x'
-      # The 21.x and 22.x branches still use Kokoro
-      - '!2[12].x'
+      # The 21.x branch still uses Kokoro
+      - '!21.x'
       # For testing purposes so we can stage this on the `gha` branch.
       - gha
 
@@ -30,8 +30,8 @@ on:
     branches:
       - main
       - '[0-9]+.x'
-      # The 21.x and 22.x branches still use Kokoro
-      - '!2[12].x'
+      # The 21.x branch still uses Kokoro
+      - '!21.x'
       # For testing purposes so we can stage this on the `gha` branch.
       - gha
 
@@ -40,7 +40,7 @@ on:
     branches:
       - main
       - '[0-9]+.x'
-      # The 21.x branch still use Kokoro
+      # The 21.x branch still uses Kokoro
       - '!21.x'
       # For testing purposes so we can stage this on the `gha` branch.
       - gha
@@ -91,7 +91,7 @@ jobs:
     steps:
       - uses: actions-ecosystem/action-remove-labels@2ce5d41b4b6aa8503e285553f75ed56e0a40bae0 # v1.3.0
         with:
-          labels: ':a: safe for tests'
+          labels: safe for tests
 
   # Note: this pattern of passing the head sha is vulnerable to PWN requests for
   # pull_request_target events. We carefully limit those workflows to require a
