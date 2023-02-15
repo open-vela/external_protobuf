@@ -125,7 +125,7 @@ TEST(FastVarints, NameHere) {
   // clang-format on
   uint8_t serialize_buffer[64];
 
-  for (int size : {8, 32, 64, -8, -32, -64}) {
+  for (int size : {8, 32, 64}) {
     SCOPED_TRACE(size);
     auto next_i = [](uint64_t i) {
       // if i + 1 is a power of two, return that.
@@ -192,20 +192,11 @@ TEST(FastVarints, NameHere) {
           case 8:
             fn = &TcParser::FastV8S1;
             break;
-          case -8:
-            fn = &TcParser::FastTV8S1<kFieldOffset, kHasBitIndex>;
-            break;
           case 32:
             fn = &TcParser::FastV32S1;
             break;
-          case -32:
-            fn = &TcParser::FastTV32S1<uint32_t, kFieldOffset, kHasBitIndex>;
-            break;
           case 64:
             fn = &TcParser::FastV64S1;
-            break;
-          case -64:
-            fn = &TcParser::FastTV64S1<uint64_t, kFieldOffset, kHasBitIndex>;
             break;
         }
         fallback_ptr_received = absl::nullopt;
@@ -215,7 +206,6 @@ TEST(FastVarints, NameHere) {
                      Xor2SerializedBytes(parse_table.fast_entries[0].bits, ptr),
                      &parse_table.header, /*hasbits=*/0);
         switch (size) {
-          case -8:
           case 8: {
             if (end_ptr == nullptr) {
               // If end_ptr is nullptr, that means the FastParser gave up and
@@ -240,7 +230,6 @@ TEST(FastVarints, NameHere) {
             EXPECT_EQ(actual_field, static_cast<decltype(actual_field)>(i))  //
                 << " hex: " << absl::StrCat(absl::Hex(actual_field));
           }; break;
-          case -32:
           case 32: {
             ASSERT_TRUE(end_ptr);
             ASSERT_EQ(end_ptr - ptr, serialized.size());
@@ -249,7 +238,6 @@ TEST(FastVarints, NameHere) {
             EXPECT_EQ(actual_field, static_cast<decltype(actual_field)>(i))  //
                 << " hex: " << absl::StrCat(absl::Hex(actual_field));
           }; break;
-          case -64:
           case 64: {
             ASSERT_EQ(end_ptr - ptr, serialized.size());
 
