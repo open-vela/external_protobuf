@@ -36,13 +36,11 @@
 #include <string>
 #include <type_traits>
 
-#include "absl/base/config.h"
 #include "absl/log/absl_check.h"
 #include "absl/log/absl_log.h"
 #include "absl/strings/cord.h"
 #include "absl/strings/internal/resize_uninitialized.h"
 #include "absl/strings/string_view.h"
-#include "absl/types/optional.h"
 #include "google/protobuf/arena.h"
 #include "google/protobuf/arenastring.h"
 #include "google/protobuf/endian.h"
@@ -133,53 +131,8 @@ class PROTOBUF_EXPORT EpsCopyInputStream {
     if (count > 0) StreamBackUp(count);
   }
 
-#if defined(ABSL_HAVE_ADDRESS_SANITIZER) || defined(ABSL_HAVE_MEMORY_SANITIZER)
-  // In sanitizer mode we use an optional<int> to guarantee that:
-  //  - We do not read an uninitialized token.
-  //  - Every non-empty token is moved from and consumed.
-  class LimitToken {
-   public:
-    LimitToken() = default;
-    explicit LimitToken(int token) : token_(token) {}
-    LimitToken(LimitToken&& other) { *this = std::move(other); }
-    LimitToken& operator=(LimitToken&& other) {
-      token_ = std::exchange(other.token_, absl::nullopt);
-      return *this;
-    }
-
-    ~LimitToken() { ABSL_CHECK(!token_.has_value()); }
-
-    LimitToken(const LimitToken&) = delete;
-    LimitToken& operator=(const LimitToken&) = delete;
-
-    int token() && {
-      ABSL_CHECK(token_.has_value());
-      return *std::exchange(token_, absl::nullopt);
-    }
-
-   private:
-    absl::optional<int> token_;
-  };
-#else
-  class LimitToken {
-   public:
-    LimitToken() = default;
-    explicit LimitToken(int token) : token_(token) {}
-    LimitToken(LimitToken&&) = default;
-    LimitToken& operator=(LimitToken&&) = default;
-
-    LimitToken(const LimitToken&) = delete;
-    LimitToken& operator=(const LimitToken&) = delete;
-
-    int token() const { return token_; }
-
-   private:
-    int token_;
-  };
-#endif
-
   // If return value is negative it's an error
-  PROTOBUF_NODISCARD LimitToken PushLimit(const char* ptr, int limit) {
+  PROTOBUF_NODISCARD int PushLimit(const char* ptr, int limit) {
     ABSL_DCHECK(limit >= 0 && limit <= INT_MAX - kSlopBytes);
     // This add is safe due to the invariant above, because
     // ptr - buffer_end_ <= kSlopBytes.
@@ -187,14 +140,12 @@ class PROTOBUF_EXPORT EpsCopyInputStream {
     limit_end_ = buffer_end_ + (std::min)(0, limit);
     auto old_limit = limit_;
     limit_ = limit;
-    return LimitToken(old_limit - limit);
+    return old_limit - limit;
   }
 
-  PROTOBUF_NODISCARD bool PopLimit(LimitToken delta) {
-    // We must update the limit first before the early return. Otherwise, we can
-    // end up with an invalid limit and it can lead to integer overflows.
-    limit_ = limit_ + std::move(delta).token();
+  PROTOBUF_NODISCARD bool PopLimit(int delta) {
     if (PROTOBUF_PREDICT_FALSE(!EndedAtLimit())) return false;
+    limit_ = limit_ + delta;
     // TODO(gerbens) We could remove this line and hoist the code to
     // DoneFallback. Study the perf/bin-size effects.
     limit_end_ = buffer_end_ + (std::min)(0, limit_);
@@ -519,14 +470,13 @@ class PROTOBUF_EXPORT ParseContext : public EpsCopyInputStream {
   template <typename TcParser, typename Table>
   PROTOBUF_NODISCARD PROTOBUF_ALWAYS_INLINE const char* ParseMessage(
       MessageLite* msg, const char* ptr, const Table* table) {
-    LimitToken old;
+    int old;
     ptr = ReadSizeAndPushLimitAndDepthInlined(ptr, &old);
-    if (ptr == nullptr) return ptr;
     auto old_depth = depth_;
-    ptr = TcParser::ParseLoop(msg, ptr, this, table);
+    ptr = ptr ? TcParser::ParseLoop(msg, ptr, this, table) : nullptr;
     if (ptr != nullptr) ABSL_DCHECK_EQ(old_depth, depth_);
     depth_++;
-    if (!PopLimit(std::move(old))) return nullptr;
+    if (!PopLimit(old)) return nullptr;
     return ptr;
   }
 
@@ -568,20 +518,20 @@ class PROTOBUF_EXPORT ParseContext : public EpsCopyInputStream {
 
  private:
   // Out-of-line routine to save space in ParseContext::ParseMessage<T>
-  //   LimitToken old;
+  //   int old;
   //   ptr = ReadSizeAndPushLimitAndDepth(ptr, &old)
   // is equivalent to:
   //   int size = ReadSize(&ptr);
   //   if (!ptr) return nullptr;
-  //   LimitToken old = PushLimit(ptr, size);
+  //   int old = PushLimit(ptr, size);
   //   if (--depth_ < 0) return nullptr;
-  PROTOBUF_NODISCARD const char* ReadSizeAndPushLimitAndDepth(
-      const char* ptr, LimitToken* old_limit);
+  PROTOBUF_NODISCARD const char* ReadSizeAndPushLimitAndDepth(const char* ptr,
+                                                              int* old_limit);
 
   // As above, but fully inlined for the cases where we care about performance
   // more than size. eg TcParser.
   PROTOBUF_NODISCARD PROTOBUF_ALWAYS_INLINE const char*
-  ReadSizeAndPushLimitAndDepthInlined(const char* ptr, LimitToken* old_limit);
+  ReadSizeAndPushLimitAndDepthInlined(const char* ptr, int* old_limit);
 
   // The context keeps an internal stack to keep track of the recursive
   // part of the parse state.
@@ -931,25 +881,27 @@ template <typename T, typename std::enable_if<
                           !std::is_base_of<MessageLite, T>::value, bool>::type>
 PROTOBUF_NODISCARD const char* ParseContext::ParseMessage(T* msg,
                                                           const char* ptr) {
-  LimitToken old;
+  int old;
   ptr = ReadSizeAndPushLimitAndDepth(ptr, &old);
   if (ptr == nullptr) return ptr;
   auto old_depth = depth_;
   ptr = msg->_InternalParse(ptr, this);
   if (ptr != nullptr) ABSL_DCHECK_EQ(old_depth, depth_);
   depth_++;
-  if (!PopLimit(std::move(old))) return nullptr;
+  if (!PopLimit(old)) return nullptr;
   return ptr;
 }
 
 inline const char* ParseContext::ReadSizeAndPushLimitAndDepthInlined(
-    const char* ptr, LimitToken* old_limit) {
+    const char* ptr, int* old_limit) {
   int size = ReadSize(&ptr);
-  if (PROTOBUF_PREDICT_FALSE(!ptr) || depth_ <= 0) {
+  if (PROTOBUF_PREDICT_FALSE(!ptr)) {
+    // Make sure this isn't uninitialized even on error return
+    *old_limit = 0;
     return nullptr;
   }
   *old_limit = PushLimit(ptr, size);
-  --depth_;
+  if (--depth_ < 0) return nullptr;
   return ptr;
 }
 
