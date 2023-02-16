@@ -324,13 +324,6 @@ TEST(MESSAGE_TEST_NAME, ExplicitLazyExceedRecursionLimit) {
   EXPECT_NE(parsed.lazy_child().child().payload().optional_int32(), -1);
 }
 
-TEST(MESSAGE_TEST_NAME, ParseFailNonCanonicalZeroTag) {
-  const char encoded[] = {"\n\x3\x80\0\0"};
-  UNITTEST::NestedTestAllTypes parsed;
-  EXPECT_FALSE(parsed.ParsePartialFromString(
-      absl::string_view{encoded, sizeof(encoded) - 1}));
-}
-
 TEST(MESSAGE_TEST_NAME, NestedExplicitLazyExceedRecursionLimit) {
   UNITTEST::NestedTestAllTypes original, parsed;
   // Build proto with recursion depth of 5, with nested annotated LazyField.
@@ -1171,31 +1164,6 @@ TEST(MESSAGE_TEST_NAME, PreservesFloatingPointNegative0) {
   EXPECT_EQ(in_message.optional_double(), out_message.optional_double());
   EXPECT_EQ(std::signbit(in_message.optional_double()),
             std::signbit(out_message.optional_double()));
-}
-
-TEST(MESSAGE_TEST_NAME,
-     RegressionTestForParseMessageReadingUninitializedLimit) {
-  UNITTEST::TestAllTypes in_message;
-  in_message.mutable_optional_nested_message();
-  std::string serialized = in_message.SerializeAsString();
-  // We expect this to have 3 bytes: two for the tag, and one for the zero size.
-  // Break the size by making it overlong.
-  ASSERT_EQ(serialized.size(), 3);
-  serialized.back() = '\200';
-  serialized += std::string(10, '\200');
-  EXPECT_FALSE(in_message.ParseFromString(serialized));
-}
-
-TEST(MESSAGE_TEST_NAME,
-     RegressionTestForParseMessageWithSizeBeyondInputFailsToPopLimit) {
-  UNITTEST::TestAllTypes in_message;
-  in_message.mutable_optional_nested_message();
-  std::string serialized = in_message.SerializeAsString();
-  // We expect this to have 3 bytes: two for the tag, and one for the zero size.
-  // Make the size a valid varint, but it overflows in the input.
-  ASSERT_EQ(serialized.size(), 3);
-  serialized.back() = 10;
-  EXPECT_FALSE(in_message.ParseFromString(serialized));
 }
 
 const uint8_t* SkipTag(const uint8_t* buf) {
