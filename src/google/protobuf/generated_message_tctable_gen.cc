@@ -824,7 +824,8 @@ TailCallTableInfo::TailCallTableInfo(
   // If there are no fallback fields, and at most one extension range, the
   // parser can use a generic fallback function. Otherwise, a message-specific
   // fallback routine is needed.
-  use_generated_fallback = !fallback_fields.empty();
+  use_generated_fallback =
+      !fallback_fields.empty() || descriptor->extension_range_count() > 1;
 }
 
 }  // namespace internal

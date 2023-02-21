@@ -279,22 +279,6 @@ CF_EXTERN_C_END
     extensionRegistry:(nullable id<GPBExtensionRegistry>)extensionRegistry;
 
 /**
- * Parses the given data as this message's class, and merges those values into
- * this message.
- *
- * @param data              The binary representation of the message to merge.
- * @param extensionRegistry The extension registry to use to look up extensions.
- * @param errorPtr          An optional error pointer to fill in with a failure
- *                          reason if the data can not be parsed. Will only be
- *                          filled in if the data failed to be parsed.
- *
- * @return Boolean indicating success. errorPtr will only be fill in on failure.
- **/
-- (BOOL)mergeFromData:(NSData *)data
-    extensionRegistry:(nullable id<GPBExtensionRegistry>)extensionRegistry
-                error:(NSError **)errorPtr;
-
-/**
  * Merges the fields from another message (of the same type) into this
  * message.
  *
@@ -309,10 +293,6 @@ CF_EXTERN_C_END
  *
  * @note This can raise the GPBCodedOutputStreamException_* exceptions.
  *
- * @note The most common cause of this failing is from one thread calling this
- *       while another thread has a reference to this message or a message used
- *       within a field and that other thread mutating the message while this
- *       serialization is taking place.
  **/
 - (void)writeToCodedOutputStream:(GPBCodedOutputStream *)output;
 
@@ -322,11 +302,6 @@ CF_EXTERN_C_END
  * @param output The output stream into which to write the message.
  *
  * @note This can raise the GPBCodedOutputStreamException_* exceptions.
- *
- * @note The most common cause of this failing is from one thread calling this
- *       while another thread has a reference to this message or a message used
- *       within a field and that other thread mutating the message while this
- *       serialization is taking place.
  **/
 - (void)writeToOutputStream:(NSOutputStream *)output;
 
@@ -337,11 +312,6 @@ CF_EXTERN_C_END
  * @param output The coded output stream into which to write the message.
  *
  * @note This can raise the GPBCodedOutputStreamException_* exceptions.
- *
- * @note The most common cause of this failing is from one thread calling this
- *       while another thread has a reference to this message or a message used
- *       within a field and that other thread mutating the message while this
- *       serialization is taking place.
  **/
 - (void)writeDelimitedToCodedOutputStream:(GPBCodedOutputStream *)output;
 
@@ -352,11 +322,6 @@ CF_EXTERN_C_END
  * @param output The output stream into which to write the message.
  *
  * @note This can raise the GPBCodedOutputStreamException_* exceptions.
- *
- * @note The most common cause of this failing is from one thread calling this
- *       while another thread has a reference to this message or a message used
- *       within a field and that other thread mutating the message while this
- *       serialization is taking place.
  **/
 - (void)writeDelimitedToOutputStream:(NSOutputStream *)output;
 
@@ -371,11 +336,6 @@ CF_EXTERN_C_END
  * @note In DEBUG ONLY, the message is also checked for all required field,
  *       if one is missing, nil will be returned.
  *
- * @note The most common cause of this failing is from one thread calling this
- *       while another thread has a reference to this message or a message used
- *       within a field and that other thread mutating the message while this
- *       serialization is taking place.
- *
  * @return The binary representation of the message.
  **/
 - (nullable NSData *)data;
@@ -386,11 +346,6 @@ CF_EXTERN_C_END
  *
  * @note This value is not cached, so if you are using it repeatedly, it is
  *       recommended to keep a local copy.
- *
- * @note The most common cause of this failing is from one thread calling this
- *       while another thread has a reference to this message or a message used
- *       within a field and that other thread mutating the message while this
- *       serialization is taking place.
  *
  * @return The binary representation of the size along with the message.
  **/
