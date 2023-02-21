@@ -324,6 +324,13 @@ TEST(MESSAGE_TEST_NAME, ExplicitLazyExceedRecursionLimit) {
   EXPECT_NE(parsed.lazy_child().child().payload().optional_int32(), -1);
 }
 
+TEST(MESSAGE_TEST_NAME, ParseFailNonCanonicalZeroTag) {
+  const char encoded[] = {"\n\x3\x80\0\0"};
+  UNITTEST::NestedTestAllTypes parsed;
+  EXPECT_FALSE(parsed.ParsePartialFromString(
+      absl::string_view{encoded, sizeof(encoded) - 1}));
+}
+
 TEST(MESSAGE_TEST_NAME, NestedExplicitLazyExceedRecursionLimit) {
   UNITTEST::NestedTestAllTypes original, parsed;
   // Build proto with recursion depth of 5, with nested annotated LazyField.
@@ -458,6 +465,24 @@ TEST(MESSAGE_TEST_NAME, ParseFailsIfGroupFieldMalformed) {
   EXPECT_FALSE(parsed.ParseFromString(data));
 }
 
+TEST(MESSAGE_TEST_NAME, ParseFailsIfRepeatedGroupFieldMalformed) {
+  UNITTEST::TestMutualRecursionA original, parsed;
+  original.mutable_bb()
+      ->mutable_a()
+      ->add_subgroupr()
+      ->mutable_payload()
+      ->set_optional_int64(-1);
+
+  std::string data;
+  ASSERT_TRUE(original.SerializeToString(&data));
+  // Should parse correctly.
+  ASSERT_TRUE(parsed.ParseFromString(data));
+  // Overwriting the last byte of varint (-1) to 0xFF results in malformed wire.
+  data[data.size() - 2] = 0xFF;
+
+  EXPECT_FALSE(parsed.ParseFromString(data));
+}
+
 TEST(MESSAGE_TEST_NAME, UninitializedAndMalformed) {
   UNITTEST::TestRequiredForeign o, p1, p2;
   o.mutable_optional_message()->set_a(-1);
@@ -508,6 +533,8 @@ TEST(MESSAGE_TEST_NAME, ParseStrictlyBoundedStream) {
 TEST(MESSAGE_TEST_NAME, AllSetMethodsOnStringField) {
   UNITTEST::TestAllTypes msg;
 
+  msg.set_optional_string(absl::string_view("Abcdef"));
+  EXPECT_EQ(msg.optional_string(), "Abcdef");
 
   msg.set_optional_string("Asciiz");
   EXPECT_EQ(msg.optional_string(), "Asciiz");
@@ -526,6 +553,38 @@ TEST(MESSAGE_TEST_NAME, AllSetMethodsOnStringField) {
   value = "std::string value 3";
   msg.set_optional_string(std::move(value));
   EXPECT_EQ(msg.optional_string(), "std::string value 3");
+}
+
+
+TEST(MESSAGE_TEST_NAME, AllAddMethodsOnRepeatedStringField) {
+  UNITTEST::TestAllTypes msg;
+
+  msg.add_repeated_string(absl::string_view("Abcdef"));
+  EXPECT_EQ(msg.repeated_string(0), "Abcdef");
+  msg.clear_repeated_string();
+
+  msg.add_repeated_string("Asciiz");
+  EXPECT_EQ(msg.repeated_string(0), "Asciiz");
+  msg.clear_repeated_string();
+
+  msg.add_repeated_string("Length delimited", 6);
+  EXPECT_EQ(msg.repeated_string(0), "Length");
+  msg.clear_repeated_string();
+
+  std::string value = "std::string value 1";
+  msg.add_repeated_string(value);
+  EXPECT_EQ(msg.repeated_string(0), "std::string value 1");
+  msg.clear_repeated_string();
+
+  value = "std::string value 2";
+  msg.add_repeated_string(std::cref(value));
+  EXPECT_EQ(msg.repeated_string(0), "std::string value 2");
+  msg.clear_repeated_string();
+
+  value = "std::string value 3";
+  msg.add_repeated_string(std::move(value));
+  EXPECT_EQ(msg.repeated_string(0), "std::string value 3");
+  msg.clear_repeated_string();
 }
 
 TEST(MESSAGE_TEST_NAME, SuccessAfterParsingFailure) {
@@ -1164,6 +1223,31 @@ TEST(MESSAGE_TEST_NAME, PreservesFloatingPointNegative0) {
   EXPECT_EQ(in_message.optional_double(), out_message.optional_double());
   EXPECT_EQ(std::signbit(in_message.optional_double()),
             std::signbit(out_message.optional_double()));
+}
+
+TEST(MESSAGE_TEST_NAME,
+     RegressionTestForParseMessageReadingUninitializedLimit) {
+  UNITTEST::TestAllTypes in_message;
+  in_message.mutable_optional_nested_message();
+  std::string serialized = in_message.SerializeAsString();
+  // We expect this to have 3 bytes: two for the tag, and one for the zero size.
+  // Break the size by making it overlong.
+  ASSERT_EQ(serialized.size(), 3);
+  serialized.back() = '\200';
+  serialized += std::string(10, '\200');
+  EXPECT_FALSE(in_message.ParseFromString(serialized));
+}
+
+TEST(MESSAGE_TEST_NAME,
+     RegressionTestForParseMessageWithSizeBeyondInputFailsToPopLimit) {
+  UNITTEST::TestAllTypes in_message;
+  in_message.mutable_optional_nested_message();
+  std::string serialized = in_message.SerializeAsString();
+  // We expect this to have 3 bytes: two for the tag, and one for the zero size.
+  // Make the size a valid varint, but it overflows in the input.
+  ASSERT_EQ(serialized.size(), 3);
+  serialized.back() = 10;
+  EXPECT_FALSE(in_message.ParseFromString(serialized));
 }
 
 const uint8_t* SkipTag(const uint8_t* buf) {

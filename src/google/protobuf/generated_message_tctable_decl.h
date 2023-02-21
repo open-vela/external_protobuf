@@ -54,6 +54,7 @@ namespace internal {
 // Additional information about this field:
 struct TcFieldData {
   constexpr TcFieldData() : data(0) {}
+  explicit constexpr TcFieldData(uint64_t data) : data(data) {}
 
   // Fast table entry constructor:
   constexpr TcFieldData(uint16_t coded_tag, uint8_t hasbit_idx, uint8_t aux_idx,
@@ -62,6 +63,24 @@ struct TcFieldData {
              uint64_t{aux_idx} << 24 |     //
              uint64_t{hasbit_idx} << 16 |  //
              uint64_t{coded_tag}) {}
+
+  // Constructor to create an explicit 'uninitialized' instance.
+  // This constructor can be used to pass an uninitialized `data` value to a
+  // table driven parser function that does not use `data`. The purpose of this
+  // is that it allows the compiler to reallocate and re-purpose the register
+  // that is currently holding its value for other data. This reduces register
+  // allocations inside the highly optimized varint parsing functions.
+  //
+  // Applications not using `data` use the `PROTOBUF_TC_PARAM_NO_DATA_DECL`
+  // macro to declare the standard input arguments with no name for the `data`
+  // argument. Callers then use the `PROTOBUF_TC_PARAM_NO_DATA_PASS` macro.
+  //
+  // Example:
+  //   if (ptr == nullptr) {
+  //      PROTOBUF_MUSTTAIL return Error(PROTOBUF_TC_PARAM_NO_DATA_PASS);
+  //   }
+  struct DefaultInit {};
+  TcFieldData(DefaultInit) {}  // NOLINT(google-explicit-constructor)
 
   // Fields used in fast table parsing:
   //
@@ -122,7 +141,9 @@ struct TcFieldData {
   uint32_t tag() const { return static_cast<uint32_t>(data); }
   uint32_t entry_offset() const { return static_cast<uint32_t>(data >> 32); }
 
-  uint64_t data;
+  union {
+    uint64_t data;
+  };
 };
 
 struct TcParseTableBase;
@@ -149,8 +170,6 @@ struct alignas(uint64_t) TcParseTableBase {
   // Common attributes for message layout:
   uint16_t has_bits_offset;
   uint16_t extension_offset;
-  uint32_t extension_range_low;
-  uint32_t extension_range_high;
   uint32_t max_field_number;
   uint8_t fast_idx_mask;
   uint16_t lookup_table_offset;
@@ -173,7 +192,6 @@ struct alignas(uint64_t) TcParseTableBase {
   // compiled.
   constexpr TcParseTableBase(
       uint16_t has_bits_offset, uint16_t extension_offset,
-      uint32_t extension_range_low, uint32_t extension_range_high,
       uint32_t max_field_number, uint8_t fast_idx_mask,
       uint16_t lookup_table_offset, uint32_t skipmap32,
       uint32_t field_entries_offset, uint16_t num_field_entries,
@@ -181,8 +199,6 @@ struct alignas(uint64_t) TcParseTableBase {
       const MessageLite* default_instance, TailCallParseFunc fallback)
       : has_bits_offset(has_bits_offset),
         extension_offset(extension_offset),
-        extension_range_low(extension_range_low),
-        extension_range_high(extension_range_high),
         max_field_number(max_field_number),
         fast_idx_mask(fast_idx_mask),
         lookup_table_offset(lookup_table_offset),
