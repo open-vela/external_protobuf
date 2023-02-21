@@ -130,9 +130,7 @@ abstract class AbstractProtobufList<E> extends AbstractList<E> implements Protob
 
   @Override
   public final void makeImmutable() {
-    if (isMutable) {
-      isMutable = false;
-    }
+    isMutable = false;
   }
 
   @Override
