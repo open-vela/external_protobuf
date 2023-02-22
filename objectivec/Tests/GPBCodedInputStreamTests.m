@@ -28,7 +28,6 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#import <Foundation/Foundation.h>
 #import "GPBTestUtilities.h"
 
 #import "GPBCodedInputStream.h"
@@ -371,23 +370,10 @@
                                @"should throw a GPBCodedInputStreamException exception ");
 }
 
-- (void)testBytesOver2GB {
-  NSData* data = bytes(0xFF, 0xFF, 0xFF, 0xFF, 0x0F, 0x01, 0x02, 0x03);  // don't need all the bytes
+- (void)testBytesWithNegativeSize {
+  NSData* data = bytes(0xFF, 0xFF, 0xFF, 0xFF, 0x0F);
   GPBCodedInputStream* input = [GPBCodedInputStream streamWithData:data];
-  @try {
-    __unused NSData* result = [input readBytes];
-    XCTFail(@"Should have thrown");
-  } @catch (NSException* anException) {
-    // Ensure the correct error within the exception.
-    XCTAssertTrue([anException isKindOfClass:[NSException class]]);
-    XCTAssertEqualObjects(anException.name, GPBCodedInputStreamException);
-    NSDictionary* userInfo = anException.userInfo;
-    XCTAssertNotNil(userInfo);
-    NSError* err = userInfo[GPBCodedInputStreamUnderlyingErrorKey];
-    XCTAssertNotNil(err);
-    XCTAssertEqualObjects(err.domain, GPBCodedInputStreamErrorDomain);
-    XCTAssertEqual(err.code, GPBCodedInputStreamErrorInvalidSize);
-  }
+  XCTAssertNil([input readBytes]);
 }
 
 // Verifies fix for b/10315336.
