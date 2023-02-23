@@ -140,9 +140,9 @@ class IterableByteBufferInputStream extends InputStream {
       updateCurrentByteBufferPos(length);
     } else {
       int prevPos = currentByteBuffer.position();
-      Java8Compatibility.position(currentByteBuffer, currentByteBufferPos);
+      currentByteBuffer.position(currentByteBufferPos);
       currentByteBuffer.get(output, offset, length);
-      Java8Compatibility.position(currentByteBuffer, prevPos);
+      currentByteBuffer.position(prevPos);
       updateCurrentByteBufferPos(length);
     }
     return length;
