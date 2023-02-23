@@ -770,7 +770,7 @@ final class Utf8 {
       if (out.hasArray()) {
         final int offset = out.arrayOffset();
         int endIndex = Utf8.encode(in, out.array(), offset + out.position(), out.remaining());
-        Java8Compatibility.position(out, endIndex - offset);
+        out.position(endIndex - offset);
       } else if (out.isDirect()) {
         encodeUtf8Direct(in, out);
       } else {
@@ -801,7 +801,7 @@ final class Utf8 {
         }
         if (inIx == inLength) {
           // Successfully encoded the entire string.
-          Java8Compatibility.position(out, outIx + inIx);
+          out.position(outIx + inIx);
           return;
         }
 
@@ -844,7 +844,7 @@ final class Utf8 {
         }
 
         // Successfully encoded the entire string.
-        Java8Compatibility.position(out, outIx);
+        out.position(outIx);
       } catch (IndexOutOfBoundsException e) {
         // TODO(nathanmittler): Consider making the API throw IndexOutOfBoundsException instead.
 
@@ -1545,7 +1545,7 @@ final class Utf8 {
       }
       if (inIx == inLimit) {
         // We're done, it was ASCII encoded.
-        Java8Compatibility.position(out, (int) (outIx - address));
+        out.position((int) (outIx - address));
         return;
       }
 
@@ -1585,7 +1585,7 @@ final class Utf8 {
       }
 
       // All bytes have been encoded.
-      Java8Compatibility.position(out, (int) (outIx - address));
+      out.position((int) (outIx - address));
     }
 
     /**

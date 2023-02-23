@@ -1271,7 +1271,7 @@ public abstract class CodedOutputStream extends ByteOutput {
         write(value.array(), value.arrayOffset(), value.capacity());
       } else {
         ByteBuffer duplicated = value.duplicate();
-        Java8Compatibility.clear(duplicated);
+        duplicated.clear();
         write(duplicated);
       }
     }
@@ -1522,7 +1522,7 @@ public abstract class CodedOutputStream extends ByteOutput {
     @Override
     public void flush() {
       // Update the position on the buffer.
-      Java8Compatibility.position(byteBuffer, initialPosition + getTotalBytesWritten());
+      byteBuffer.position(initialPosition + getTotalBytesWritten());
     }
   }
 
@@ -1684,7 +1684,7 @@ public abstract class CodedOutputStream extends ByteOutput {
         write(value.array(), value.arrayOffset(), value.capacity());
       } else {
         ByteBuffer duplicated = value.duplicate();
-        Java8Compatibility.clear(duplicated);
+        duplicated.clear();
         write(duplicated);
       }
     }
@@ -1794,18 +1794,18 @@ public abstract class CodedOutputStream extends ByteOutput {
           // Save the current position and increment past the length field. We'll come back
           // and write the length field after the encoding is complete.
           final int startOfBytes = buffer.position() + minLengthVarIntSize;
-          Java8Compatibility.position(buffer, startOfBytes);
+          buffer.position(startOfBytes);
 
           // Encode the string.
           encode(value);
 
           // Now go back to the beginning and write the length.
           int endOfBytes = buffer.position();
-          Java8Compatibility.position(buffer, startPos);
+          buffer.position(startPos);
           writeUInt32NoTag(endOfBytes - startOfBytes);
 
           // Reposition the buffer past the written data.
-          Java8Compatibility.position(buffer, endOfBytes);
+          buffer.position(endOfBytes);
         } else {
           final int length = Utf8.encodedLength(value);
           writeUInt32NoTag(length);
@@ -1813,7 +1813,7 @@ public abstract class CodedOutputStream extends ByteOutput {
         }
       } catch (UnpairedSurrogateException e) {
         // Roll back the change and convert to an IOException.
-        Java8Compatibility.position(buffer, startPos);
+        buffer.position(startPos);
 
         // TODO(nathanmittler): We should throw an IOException here instead.
         inefficientWriteStringNoTag(value, e);
@@ -1826,7 +1826,7 @@ public abstract class CodedOutputStream extends ByteOutput {
     @Override
     public void flush() {
       // Update the position of the original buffer.
-      Java8Compatibility.position(originalBuffer, buffer.position());
+      originalBuffer.position(buffer.position());
     }
 
     @Override
@@ -2014,7 +2014,7 @@ public abstract class CodedOutputStream extends ByteOutput {
         write(value.array(), value.arrayOffset(), value.capacity());
       } else {
         ByteBuffer duplicated = value.duplicate();
-        Java8Compatibility.clear(duplicated);
+        duplicated.clear();
         write(duplicated);
       }
     }
@@ -2150,7 +2150,7 @@ public abstract class CodedOutputStream extends ByteOutput {
           // Save the current position and increment past the length field. We'll come back
           // and write the length field after the encoding is complete.
           int stringStart = bufferPos(position) + minLengthVarIntSize;
-          Java8Compatibility.position(buffer, stringStart);
+          buffer.position(stringStart);
 
           // Encode the string.
           Utf8.encodeUtf8(value, buffer);
@@ -2187,7 +2187,7 @@ public abstract class CodedOutputStream extends ByteOutput {
     @Override
     public void flush() {
       // Update the position of the original buffer.
-      Java8Compatibility.position(originalBuffer, bufferPos(position));
+      originalBuffer.position(bufferPos(position));
     }
 
     @Override
@@ -2201,7 +2201,7 @@ public abstract class CodedOutputStream extends ByteOutput {
     }
 
     private void repositionBuffer(long pos) {
-      Java8Compatibility.position(buffer, bufferPos(pos));
+      buffer.position(bufferPos(pos));
     }
 
     private int bufferPos(long pos) {
@@ -2478,7 +2478,7 @@ public abstract class CodedOutputStream extends ByteOutput {
         write(value.array(), value.arrayOffset(), value.capacity());
       } else {
         ByteBuffer duplicated = value.duplicate();
-        Java8Compatibility.clear(duplicated);
+        duplicated.clear();
         write(duplicated);
       }
     }
@@ -2792,7 +2792,7 @@ public abstract class CodedOutputStream extends ByteOutput {
         write(value.array(), value.arrayOffset(), value.capacity());
       } else {
         ByteBuffer duplicated = value.duplicate();
-        Java8Compatibility.clear(duplicated);
+        duplicated.clear();
         write(duplicated);
       }
     }

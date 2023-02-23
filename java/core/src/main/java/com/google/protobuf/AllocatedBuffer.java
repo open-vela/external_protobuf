@@ -189,7 +189,7 @@ abstract class AllocatedBuffer {
 
       @Override
       public AllocatedBuffer position(int position) {
-        Java8Compatibility.position(buffer, position);
+        buffer.position(position);
         return this;
       }
 
