@@ -1,5 +1,5 @@
 // Protocol Buffers - Google's data interchange format
-// Copyright 2008 Google Inc.  All rights reserved.
+// Copyright 2023 Google Inc.  All rights reserved.
 // https://developers.google.com/protocol-buffers/
 //
 // Redistribution and use in source and binary forms, with or without
@@ -28,33 +28,30 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#import <Foundation/Foundation.h>
+#include "google/protobuf/reflection_mode.h"
 
-#import "GPBUnknownFieldSet.h"
+// Must be included last.
+#include "google/protobuf/port_def.inc"
 
-@class GPBCodedOutputStream;
-@class GPBCodedInputStream;
+namespace google {
+namespace protobuf {
+namespace internal {
 
-@interface GPBUnknownFieldSet ()
+#if !defined(PROTOBUF_NO_THREADLOCAL)
 
-+ (BOOL)isFieldTag:(int32_t)tag;
+#if defined(PROTOBUF_USE_DLLS)
+ReflectionMode& ScopedReflectionMode::reflection_mode() {
+  static PROTOBUF_THREAD_LOCAL ReflectionMode reflection_mode =
+      ReflectionMode::kDefault;
+  return reflection_mode;
+}
+#else
+PROTOBUF_CONSTINIT PROTOBUF_THREAD_LOCAL ReflectionMode
+    ScopedReflectionMode::reflection_mode_ = ReflectionMode::kDefault;
+#endif
 
-- (NSData *)data;
+#endif
 
-- (size_t)serializedSize;
-- (size_t)serializedSizeAsMessageSet;
-
-- (void)writeToCodedOutputStream:(GPBCodedOutputStream *)output;
-- (void)writeAsMessageSetTo:(GPBCodedOutputStream *)output;
-
-- (void)mergeUnknownFields:(GPBUnknownFieldSet *)other;
-
-- (void)mergeFromCodedInputStream:(GPBCodedInputStream *)input;
-
-- (void)mergeVarintField:(int32_t)number value:(int32_t)value;
-- (BOOL)mergeFieldFrom:(int32_t)tag input:(GPBCodedInputStream *)input;
-- (void)mergeMessageSetMessage:(int32_t)number data:(NSData *)messageData;
-
-- (void)addUnknownMapEntry:(int32_t)fieldNum value:(NSData *)data;
-
-@end
+}  // namespace internal
+}  // namespace protobuf
+}  // namespace google
