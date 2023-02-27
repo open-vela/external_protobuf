@@ -1199,7 +1199,10 @@ class MessageReflection {
       if (field.getLiteType() == WireFormat.FieldType.ENUM) {
         while (input.getBytesUntilLimit() > 0) {
           final int rawValue = input.readEnum();
-          if (field.legacyEnumFieldTreatedAsClosed()) {
+          if (field.getFile().supportsUnknownEnumValue()) {
+            target.addRepeatedField(
+                field, field.getEnumType().findValueByNumberCreatingIfUnknown(rawValue));
+          } else {
             final Object value = field.getEnumType().findValueByNumber(rawValue);
             // If the number isn't recognized as a valid value for this enum,
             // add it to the unknown fields.
@@ -1210,9 +1213,6 @@ class MessageReflection {
             } else {
               target.addRepeatedField(field, value);
             }
-          } else {
-            target.addRepeatedField(
-                field, field.getEnumType().findValueByNumberCreatingIfUnknown(rawValue));
           }
         }
       } else {
@@ -1239,7 +1239,9 @@ class MessageReflection {
           }
         case ENUM:
           final int rawValue = input.readEnum();
-          if (field.legacyEnumFieldTreatedAsClosed()) {
+          if (field.getFile().supportsUnknownEnumValue()) {
+            value = field.getEnumType().findValueByNumberCreatingIfUnknown(rawValue);
+          } else {
             value = field.getEnumType().findValueByNumber(rawValue);
             // If the number isn't recognized as a valid value for this enum,
             // add it to the unknown fields.
@@ -1249,8 +1251,6 @@ class MessageReflection {
               }
               return true;
             }
-          } else {
-            value = field.getEnumType().findValueByNumberCreatingIfUnknown(rawValue);
           }
           break;
         default:
