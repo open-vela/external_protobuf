@@ -20,7 +20,6 @@ proto_library(
         "//:__pkg__",
         "//pkg:__pkg__",
     ],
-    strip_import_prefix = "/src",
     deps = ["//:descriptor_proto"],
 )
 
@@ -116,6 +115,7 @@ cc_library(
         "//src/google/protobuf/compiler/php",
         "//src/google/protobuf/compiler/python",
         "//src/google/protobuf/compiler/ruby",
+        "//src/google/protobuf/compiler/rust",
         "@com_google_absl//absl/log:initialize",
     ],
 )
@@ -208,10 +208,7 @@ filegroup(
 
 exports_files(
     srcs = ["plugin.proto"],
-    visibility = [
-        "//:__pkg__",
-        "//python:__pkg__",
-    ],
+    visibility = ["//:__pkg__"],
 )
 
 cc_library(

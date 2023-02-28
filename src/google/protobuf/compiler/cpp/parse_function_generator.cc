@@ -216,17 +216,6 @@ void ParseFunctionGenerator::GenerateTailcallParseFunction(Formatter& format) {
       "}\n\n");
 }
 
-static bool NeedsUnknownEnumSupport(const Descriptor* descriptor) {
-  for (int i = 0; i < descriptor->field_count(); ++i) {
-    auto* field = descriptor->field(i);
-    if (field->is_repeated() && field->cpp_type() == field->CPPTYPE_ENUM &&
-        !internal::cpp::HasPreservingUnknownEnumSemantics(field)) {
-      return true;
-    }
-  }
-  return false;
-}
-
 void ParseFunctionGenerator::GenerateTailcallFallbackFunction(
     Formatter& format) {
   ABSL_CHECK(should_generate_tctable());
@@ -236,21 +225,18 @@ void ParseFunctionGenerator::GenerateTailcallFallbackFunction(
   format.Indent();
   format("auto* typed_msg = static_cast<$classname$*>(msg);\n");
 
-  // If we need a side channel, generate the check to jump to the generic
-  // handler to deal with the side channel data.
-  if (NeedsUnknownEnumSupport(descriptor_)) {
-    format(
-        "if (PROTOBUF_PREDICT_FALSE(\n"
-        "    _pbi::TcParser::MustFallbackToGeneric(PROTOBUF_TC_PARAM_PASS))) "
-        "{\n"
-        "  PROTOBUF_MUSTTAIL return "
-        "::_pbi::TcParser::GenericFallback$1$(PROTOBUF_TC_PARAM_PASS);\n"
-        "}\n",
-        GetOptimizeFor(descriptor_->file(), options_) ==
-                FileOptions::LITE_RUNTIME
-            ? "Lite"
-            : "");
-  }
+  // Generate the check to jump to the generic handler to deal with the side
+  // channel data.
+  format(
+      "if (PROTOBUF_PREDICT_FALSE(\n"
+      "    _pbi::TcParser::MustFallbackToGeneric(PROTOBUF_TC_PARAM_PASS))) "
+      "{\n"
+      "  PROTOBUF_MUSTTAIL return "
+      "::_pbi::TcParser::GenericFallback$1$(PROTOBUF_TC_PARAM_PASS);\n"
+      "}\n",
+      GetOptimizeFor(descriptor_->file(), options_) == FileOptions::LITE_RUNTIME
+          ? "Lite"
+          : "");
 
   if (num_hasbits_ > 0) {
     // Sync hasbits
@@ -494,14 +480,10 @@ void ParseFunctionGenerator::GenerateTailCallTable(Formatter& format) {
       } else {
         format("0,  // no _has_bits_\n");
       }
-      if (descriptor_->extension_range_count() == 1) {
-        format(
-            "PROTOBUF_FIELD_OFFSET($classname$, $extensions$),\n"
-            "$1$, $2$,  // extension_range_{low,high}\n",
-            descriptor_->extension_range(0)->start,
-            descriptor_->extension_range(0)->end);
+      if (descriptor_->extension_range_count() != 0) {
+        format("PROTOBUF_FIELD_OFFSET($classname$, $extensions$),\n");
       } else {
-        format("0, 0, 0,  // no _extensions_\n");
+        format("0, // no _extensions_\n");
       }
       format("$1$, $2$,  // max_field_number, fast_idx_mask\n",
              (ordered_fields_.empty() ? 0 : ordered_fields_.back()->number()),
@@ -1151,7 +1133,7 @@ void ParseFunctionGenerator::GenerateFieldBody(
         format.Set("enum_type",
                    QualifiedClassName(field->enum_type(), options_));
         format(
-            "$uint32$ val = ::$proto_ns$::internal::ReadVarint32(&ptr);\n"
+            "$int32$ val = ::$proto_ns$::internal::ReadVarint32(&ptr);\n"
             "CHK_(ptr);\n");
         if (!internal::cpp::HasPreservingUnknownEnumSemantics(field)) {
           format(
