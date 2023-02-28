@@ -95,8 +95,7 @@ public interface MessageOrBuilder extends MessageLiteOrBuilder {
 
   /**
    * Returns true if the given field is set. This is exactly equivalent to calling the generated
-   * "has" accessor method corresponding to the field. The return value of hasField() is
-   * semantically meaningful only for fields where field.hasPresence() == true.
+   * "has" accessor method corresponding to the field.
    *
    * @throws IllegalArgumentException The field is a repeated field, or {@code
    *     field.getContainingType() != getDescriptorForType()}.
