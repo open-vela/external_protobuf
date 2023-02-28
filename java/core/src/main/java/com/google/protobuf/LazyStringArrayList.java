@@ -61,7 +61,11 @@ import java.util.RandomAccess;
 public class LazyStringArrayList extends AbstractProtobufList<String>
     implements LazyStringList, RandomAccess {
 
-  private static final LazyStringArrayList EMPTY_LIST = new LazyStringArrayList(false);
+  private static final LazyStringArrayList EMPTY_LIST = new LazyStringArrayList();
+
+  static {
+    EMPTY_LIST.makeImmutable();
+  }
 
   /** Returns an empty immutable {@code LazyStringArrayList} instance */
   public static LazyStringArrayList emptyList() {
@@ -81,11 +85,6 @@ public class LazyStringArrayList extends AbstractProtobufList<String>
 
   public LazyStringArrayList() {
     this(DEFAULT_CAPACITY);
-  }
-
-  private LazyStringArrayList(boolean isMutable) {
-    super(isMutable);
-    this.list = Collections.emptyList();
   }
 
   public LazyStringArrayList(int initialCapacity) {
