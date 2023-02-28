@@ -75,6 +75,7 @@ class Reflection;       // message.h
 class UnknownFieldSet;  // unknown_field_set.h
 namespace internal {
 class FieldSkipper;  // wire_format_lite.h
+class WireFormat;
 enum class LazyVerifyOption;
 }  // namespace internal
 }  // namespace protobuf
@@ -514,6 +515,7 @@ class PROTOBUF_EXPORT ExtensionSet {
   friend class RepeatedEnumTypeTraits;
 
   friend class google::protobuf::Reflection;
+  friend class google::protobuf::internal::WireFormat;
 
   const int32_t& GetRefInt32(int number, const int32_t& default_value) const;
   const int64_t& GetRefInt64(int number, const int64_t& default_value) const;
@@ -560,6 +562,8 @@ class PROTOBUF_EXPORT ExtensionSet {
 
     virtual bool IsInitialized(const MessageLite* prototype,
                                Arena* arena) const = 0;
+    virtual bool IsEagerSerializeSafe(const MessageLite* prototype,
+                                      Arena* arena) const = 0;
 
     PROTOBUF_DEPRECATED_MSG("Please use ByteSizeLong() instead")
     virtual int ByteSize() const { return internal::ToIntSize(ByteSizeLong()); }
@@ -571,9 +575,9 @@ class PROTOBUF_EXPORT ExtensionSet {
     virtual void MergeFromMessage(const MessageLite& msg, Arena* arena) = 0;
     virtual void Clear() = 0;
 
-    virtual const char* _InternalParse(const Message& prototype, Arena* arena,
-                                       LazyVerifyOption option, const char* ptr,
-                                       ParseContext* ctx) = 0;
+    virtual const char* _InternalParse(const MessageLite& prototype,
+                                       Arena* arena, LazyVerifyOption option,
+                                       const char* ptr, ParseContext* ctx) = 0;
     virtual uint8_t* WriteMessageToArray(
         const MessageLite* prototype, int number, uint8_t* target,
         io::EpsCopyOutputStream* stream) const = 0;
