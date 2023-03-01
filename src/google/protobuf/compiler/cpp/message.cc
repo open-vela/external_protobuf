@@ -251,6 +251,18 @@ bool EmitFieldNonDefaultCondition(io::Printer* p, const std::string& prefix,
   return false;
 }
 
+// Does the given field have a has_$name$() method?
+bool HasHasMethod(const FieldDescriptor* field) {
+  if (!IsProto3(field->file())) {
+    // In proto1/proto2, every field has a has_$name$() method.
+    return true;
+  }
+  // For message types without true field presence, only fields with a message
+  // type or inside an one-of have a has_$name$() method.
+  return field->cpp_type() == FieldDescriptor::CPPTYPE_MESSAGE ||
+         field->has_optional_keyword() || field->real_containing_oneof();
+}
+
 bool HasInternalHasMethod(const FieldDescriptor* field) {
   return !HasHasbit(field) &&
          field->cpp_type() == FieldDescriptor::CPPTYPE_MESSAGE;
@@ -1024,7 +1036,7 @@ void MessageGenerator::GenerateOneofMemberHasBits(const FieldDescriptor* field,
   // N.B.: Without field presence, we do not use has-bits or generate
   // has_$name$() methods, but oneofs still have set_has_$name$().
   // Oneofs also have private _internal_has_$name$() a helper method.
-  if (field->has_presence()) {
+  if (HasHasMethod(field)) {
     format(
         "inline bool $classname$::has_$name$() const {\n"
         "$annotate_has$"
@@ -3637,8 +3649,7 @@ void MessageGenerator::GenerateSerializeWithCachedSizesBody(io::Printer* p) {
     LazySerializerEmitter(MessageGenerator* mg, io::Printer* p)
         : mg_(mg),
           p_(p),
-          eager_(mg->descriptor_->file()->syntax() ==
-                 FileDescriptor::SYNTAX_PROTO3),
+          eager_(IsProto3(mg->descriptor_->file())),
           cached_has_bit_index_(kNoHasbit) {}
 
     ~LazySerializerEmitter() { Flush(); }
