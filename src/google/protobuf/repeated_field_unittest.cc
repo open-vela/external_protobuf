@@ -201,24 +201,34 @@ TEST(RepeatedField, ArenaAllocationSizesMatchExpectedValues) {
   CheckAllocationSizes<RepeatedField<uint64_t>>(false);
 }
 
-TEST(RepeatedField, NaturalGrowthOnArenasReuseBlocks) {
+template <typename Rep>
+void CheckNaturalGrowthOnArenasReuseBlocks(bool is_ptr) {
   Arena arena;
-  std::vector<RepeatedField<int>*> values;
+  std::vector<Rep*> values;
+  using T = typename Rep::value_type;
 
   static constexpr int kNumFields = 100;
   static constexpr int kNumElems = 1000;
   for (int i = 0; i < kNumFields; ++i) {
-    values.push_back(Arena::CreateMessage<RepeatedField<int>>(&arena));
+    values.push_back(Arena::CreateMessage<Rep>(&arena));
     auto& field = *values.back();
     for (int j = 0; j < kNumElems; ++j) {
-      field.Add(j);
+      field.Add(T{});
     }
   }
 
-  size_t expected = values.size() * values[0]->Capacity() * sizeof(int);
-  // Use a 2% slack for other overhead. If we were not reusing the blocks, the
-  // actual value would be ~2x the expected.
-  EXPECT_THAT(arena.SpaceUsed(), AllOf(Ge(expected), Le(1.02 * expected)));
+  size_t used_bytes_if_reusing =
+      values.size() * values[0]->Capacity() * (is_ptr ? sizeof(T*) : sizeof(T));
+  // Use a 2% slack for other overhead.
+  // If we were not reusing the blocks, the actual value would be ~2x the
+  // expected.
+  EXPECT_THAT(
+      arena.SpaceUsed() - (is_ptr ? sizeof(T) * kNumElems * kNumFields : 0),
+      AllOf(Ge(used_bytes_if_reusing), Le(1.02 * used_bytes_if_reusing)));
+}
+
+TEST(RepeatedField, NaturalGrowthOnArenasReuseBlocks) {
+  CheckNaturalGrowthOnArenasReuseBlocks<RepeatedField<int>>(false);
 }
 
 // Test swapping between various types of RepeatedFields.
@@ -1348,27 +1358,7 @@ TEST(RepeatedPtrField, ArenaAllocationSizesMatchExpectedValues) {
 }
 
 TEST(RepeatedPtrField, NaturalGrowthOnArenasReuseBlocks) {
-  using Rep = RepeatedPtrField<std::string>;
-  Arena arena;
-  std::vector<Rep*> values;
-
-  static constexpr int kNumFields = 100;
-  static constexpr int kNumElems = 1000;
-  for (int i = 0; i < kNumFields; ++i) {
-    values.push_back(Arena::CreateMessage<Rep>(&arena));
-    auto& field = *values.back();
-    for (int j = 0; j < kNumElems; ++j) {
-      field.Add("");
-    }
-  }
-
-  size_t expected =
-      values.size() * values[0]->Capacity() * sizeof(std::string*) +
-      sizeof(std::string) * kNumElems * kNumFields;
-  // Use a 2% slack for other overhead.
-  // If we were not reusing the blocks, the actual value would be ~2x the
-  // expected.
-  EXPECT_THAT(arena.SpaceUsed(), AllOf(Ge(expected), Le(1.02 * expected)));
+  CheckNaturalGrowthOnArenasReuseBlocks<RepeatedPtrField<std::string>>(true);
 }
 
 TEST(RepeatedPtrField, AddAndAssignRanges) {

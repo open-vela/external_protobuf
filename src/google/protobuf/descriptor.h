@@ -65,7 +65,6 @@
 #include "google/protobuf/port.h"
 #include "absl/base/attributes.h"
 #include "absl/base/call_once.h"
-#include "absl/container/btree_map.h"
 #include "absl/container/flat_hash_map.h"
 #include "absl/log/absl_check.h"
 #include "absl/log/absl_log.h"
@@ -768,25 +767,6 @@ class PROTOBUF_EXPORT FieldDescriptor : private internal::SymbolBase {
   // Returns true if this TYPE_STRING-typed field requires UTF-8 validation on
   // parse.
   bool requires_utf8_validation() const;
-
-  // Determines if the given enum field is treated as closed based on legacy
-  // non-conformant behavior.
-  //
-  // Conformant behavior determines closedness based on the enum and
-  // can be queried using EnumDescriptor::is_closed().
-  //
-  // Some runtimes currently have a quirk where non-closed enums are
-  // treated as closed when used as the type of fields defined in a
-  // `syntax = proto2;` file. This quirk is not present in all runtimes; as of
-  // writing, we know that:
-  //
-  // - C++, Java, and C++-based Python share this quirk.
-  // - UPB and UPB-based Python do not.
-  // - PHP and Ruby treat all enums as open regardless of declaration.
-  //
-  // Care should be taken when using this function to respect the target
-  // runtime's enum handling quirks.
-  bool legacy_enum_field_treated_as_closed() const;
 
   // Index of this field within the message's field array, or the file or
   // extension scope's extensions array.
@@ -1922,7 +1902,7 @@ class PROTOBUF_EXPORT DescriptorPool {
     // in a .proto file.
     enum ErrorLocation {
       NAME,           // the symbol name, or the package name for files
-      NUMBER,         // field, extension range or extension decl number
+      NUMBER,         // field or extension range number
       TYPE,           // field type
       EXTENDEE,       // field extendee
       DEFAULT_VALUE,  // field default value
@@ -2460,11 +2440,6 @@ inline bool FieldDescriptor::has_presence() const {
 inline bool FieldDescriptor::requires_utf8_validation() const {
   return type() == TYPE_STRING &&
          file()->syntax() == FileDescriptor::SYNTAX_PROTO3;
-}
-
-inline bool FieldDescriptor::legacy_enum_field_treated_as_closed() const {
-  return type() == TYPE_ENUM &&
-         file()->syntax() == FileDescriptor::SYNTAX_PROTO2;
 }
 
 // To save space, index() is computed by looking at the descriptor's position
