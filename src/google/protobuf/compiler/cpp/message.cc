@@ -85,7 +85,6 @@ using ::google::protobuf::internal::WireFormat;
 using ::google::protobuf::internal::WireFormatLite;
 using ::google::protobuf::internal::cpp::HasHasbit;
 using ::google::protobuf::internal::cpp::Utf8CheckMode;
-using Semantic = ::google::protobuf::io::AnnotationCollector::Semantic;
 using Sub = ::google::protobuf::io::Printer::Sub;
 
 static constexpr int kNoHasbit = -1;
@@ -731,10 +730,7 @@ void MessageGenerator::GenerateFieldAccessorDeclarations(io::Printer* p) {
          {"clearer",
           [&] {
             p->Emit({Sub("clear_name", absl::StrCat("clear_", name))
-                         .AnnotatedAs({
-                             field,
-                             Semantic::kSet,
-                         })},
+                         .AnnotatedAs(field)},
                     R"cc(
                       $deprecated_attr $void $clear_name$() $impl$;
                     )cc");
@@ -1288,14 +1284,16 @@ void MessageGenerator::GenerateClassDefinition(io::Printer* p) {
       "}\n"
       "\n");
 
-  format(
-      "inline const $unknown_fields_type$& unknown_fields() const {\n"
-      "  return $unknown_fields$;\n"
-      "}\n"
-      "inline $unknown_fields_type$* mutable_unknown_fields() {\n"
-      "  return $mutable_unknown_fields$;\n"
-      "}\n"
-      "\n");
+  if (PublicUnknownFieldsAccessors(descriptor_)) {
+    format(
+        "inline const $unknown_fields_type$& unknown_fields() const {\n"
+        "  return $unknown_fields$;\n"
+        "}\n"
+        "inline $unknown_fields_type$* mutable_unknown_fields() {\n"
+        "  return $mutable_unknown_fields$;\n"
+        "}\n"
+        "\n");
+  }
 
   // Only generate this member if it's not disabled.
   if (HasDescriptorMethods(descriptor_->file(), options_) &&
