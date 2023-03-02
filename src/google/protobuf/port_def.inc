@@ -218,17 +218,17 @@ static_assert(PROTOBUF_CPLUSPLUS_MIN(201402L), "Protobuf only supports C++14 and
 #ifdef PROTOBUF_VERSION
 #error PROTOBUF_VERSION was previously defined
 #endif
-#define PROTOBUF_VERSION 4022000
+#define PROTOBUF_VERSION 3021012
 
 #ifdef PROTOBUF_MIN_HEADER_VERSION_FOR_PROTOC
 #error PROTOBUF_MIN_HEADER_VERSION_FOR_PROTOC was previously defined
 #endif
-#define PROTOBUF_MIN_HEADER_VERSION_FOR_PROTOC 4022000
+#define PROTOBUF_MIN_HEADER_VERSION_FOR_PROTOC 3021000
 
 #ifdef PROTOBUF_MIN_PROTOC_VERSION
 #error PROTOBUF_MIN_PROTOC_VERSION was previously defined
 #endif
-#define PROTOBUF_MIN_PROTOC_VERSION 4022000
+#define PROTOBUF_MIN_PROTOC_VERSION 3021000
 
 #ifdef PROTOBUF_VERSION_SUFFIX
 #error PROTOBUF_VERSION_SUFFIX was previously defined
@@ -259,6 +259,21 @@ static_assert(PROTOBUF_CPLUSPLUS_MIN(201402L), "Protobuf only supports C++14 and
 # define PROTOBUF_ALWAYS_INLINE __forceinline
 #else
 # define PROTOBUF_ALWAYS_INLINE
+#endif
+
+#ifdef PROTOBUF_ALWAYS_INLINE_CALL
+#error PROTOBUF_ALWAYS_INLINE_CALL was previously defined
+#endif
+// For functions we want to force inline from the caller, instead of in the
+// declaration of the callee.
+// This is useful for lambdas where it is not easy to specify ALWAYS_INLINE.
+// Use like:
+//   PROTOBUF_ALWAYS_INLINE_CALL res = SomeFunc(args...);
+#if defined(__clang__) && !defined(PROTOBUF_NO_INLINE_CALL) && \
+    __has_cpp_attribute(clang::always_inline)
+#define PROTOBUF_ALWAYS_INLINE_CALL [[clang::always_inline]]
+#else
+#define PROTOBUF_ALWAYS_INLINE_CALL
 #endif
 
 #ifdef PROTOBUF_NDEBUG_INLINE
@@ -433,7 +448,7 @@ static_assert(PROTOBUF_CPLUSPLUS_MIN(201402L), "Protobuf only supports C++14 and
 
 // The minimum library version which works with the current version of the
 // headers.
-#define GOOGLE_PROTOBUF_MIN_LIBRARY_VERSION 4022000
+#define GOOGLE_PROTOBUF_MIN_LIBRARY_VERSION 3021000
 
 #ifdef PROTOBUF_RTTI
 #error PROTOBUF_RTTI was previously defined
@@ -856,6 +871,19 @@ static_assert(PROTOBUF_CPLUSPLUS_MIN(201402L), "Protobuf only supports C++14 and
 // PROTOBUF_TC_PARAM_PASS passes values to match PROTOBUF_TC_PARAM_DECL.
 #define PROTOBUF_TC_PARAM_PASS msg, ptr, ctx, data, table, hasbits
 
+// PROTOBUF_TC_PARAM_NO_DATA_DECL and PROTOBUF_TC_PARAM_NO_DATA_PASS provide the
+// exact same ABI as above, except that they don't name or pass the `data`
+// argument. Specific functions such as `Error() and `ToTagDispatch()` don't
+// use the `data` argument. By not passing `data` down the call stack, we free
+// up the register holding that value, which may matter in highly optimized
+// functions such as varint parsing.
+#define PROTOBUF_TC_PARAM_NO_DATA_DECL                                        \
+  ::google::protobuf::MessageLite *msg, const char *ptr,                                \
+      ::google::protobuf::internal::ParseContext *ctx, ::google::protobuf::internal::TcFieldData, \
+      const ::google::protobuf::internal::TcParseTableBase *table, uint64_t hasbits
+#define PROTOBUF_TC_PARAM_NO_DATA_PASS \
+  msg, ptr, ctx, ::google::protobuf::internal::TcFieldData::DefaultInit(), table, hasbits
+
 #ifdef PROTOBUF_UNUSED
 #error PROTOBUF_UNUSED was previously defined
 #endif
@@ -1014,6 +1042,13 @@ static_assert(PROTOBUF_CPLUSPLUS_MIN(201402L), "Protobuf only supports C++14 and
 //   int index = ...
 //   int value = vec[index];
 #pragma GCC diagnostic ignored "-Wsign-conversion"
+#if __GNUC__ == 12 && __GNUC_MINOR__ < 4
+// Wrong warning emitted when assigning a single char c-string to a std::string
+// in c++20 mode and optimization on.
+// https://gcc.gnu.org/bugzilla/show_bug.cgi?id=105329
+// Planned to be fixed by 12.3 but widen window to 12.4.
+#pragma GCC diagnostic ignored "-Wrestrict"
+#endif
 #endif  // __GNUC__
 
 // Silence some MSVC warnings in all our code.
