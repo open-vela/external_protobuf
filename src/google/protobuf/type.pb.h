@@ -416,10 +416,6 @@ class PROTOBUF_EXPORT Type final :
   public:
   // .google.protobuf.SourceContext source_context = 5;
   bool has_source_context() const;
-  private:
-  bool _internal_has_source_context() const;
-
-  public:
   void clear_source_context() ;
   const ::PROTOBUF_NAMESPACE_ID::SourceContext& source_context() const;
   PROTOBUF_NODISCARD ::PROTOBUF_NAMESPACE_ID::SourceContext* release_source_context();
@@ -450,13 +446,14 @@ class PROTOBUF_EXPORT Type final :
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
   struct Impl_ {
+    ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
+    mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
     ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::PROTOBUF_NAMESPACE_ID::Field > fields_;
     ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string> oneofs_;
     ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::PROTOBUF_NAMESPACE_ID::Option > options_;
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr name_;
     ::PROTOBUF_NAMESPACE_ID::SourceContext* source_context_;
     int syntax_;
-    mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   };
   union { Impl_ _impl_; };
   friend struct ::TableStruct_google_2fprotobuf_2ftype_2eproto;
@@ -1008,10 +1005,6 @@ class PROTOBUF_EXPORT Enum final :
   public:
   // .google.protobuf.SourceContext source_context = 4;
   bool has_source_context() const;
-  private:
-  bool _internal_has_source_context() const;
-
-  public:
   void clear_source_context() ;
   const ::PROTOBUF_NAMESPACE_ID::SourceContext& source_context() const;
   PROTOBUF_NODISCARD ::PROTOBUF_NAMESPACE_ID::SourceContext* release_source_context();
@@ -1042,12 +1035,13 @@ class PROTOBUF_EXPORT Enum final :
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
   struct Impl_ {
+    ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
+    mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
     ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::PROTOBUF_NAMESPACE_ID::EnumValue > enumvalue_;
     ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::PROTOBUF_NAMESPACE_ID::Option > options_;
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr name_;
     ::PROTOBUF_NAMESPACE_ID::SourceContext* source_context_;
     int syntax_;
-    mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   };
   union { Impl_ _impl_; };
   friend struct ::TableStruct_google_2fprotobuf_2ftype_2eproto;
@@ -1387,10 +1381,6 @@ class PROTOBUF_EXPORT Option final :
   public:
   // .google.protobuf.Any value = 2;
   bool has_value() const;
-  private:
-  bool _internal_has_value() const;
-
-  public:
   void clear_value() ;
   const ::PROTOBUF_NAMESPACE_ID::Any& value() const;
   PROTOBUF_NODISCARD ::PROTOBUF_NAMESPACE_ID::Any* release_value();
@@ -1411,9 +1401,10 @@ class PROTOBUF_EXPORT Option final :
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
   struct Impl_ {
+    ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
+    mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr name_;
     ::PROTOBUF_NAMESPACE_ID::Any* value_;
-    mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   };
   union { Impl_ _impl_; };
   friend struct ::TableStruct_google_2fprotobuf_2ftype_2eproto;
@@ -1643,11 +1634,10 @@ Type::options() const {
 }
 
 // .google.protobuf.SourceContext source_context = 5;
-inline bool Type::_internal_has_source_context() const {
-  return this != internal_default_instance() && _impl_.source_context_ != nullptr;
-}
 inline bool Type::has_source_context() const {
-  return _internal_has_source_context();
+  bool value = (_impl_._has_bits_[0] & 0x00000001u) != 0;
+  PROTOBUF_ASSUME(!value || _impl_.source_context_ != nullptr);
+  return value;
 }
 inline const ::PROTOBUF_NAMESPACE_ID::SourceContext& Type::_internal_source_context() const {
   const ::PROTOBUF_NAMESPACE_ID::SourceContext* p = _impl_.source_context_;
@@ -1664,10 +1654,15 @@ inline void Type::unsafe_arena_set_allocated_source_context(
     delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(_impl_.source_context_);
   }
   _impl_.source_context_ = source_context;
+  if (source_context) {
+    _impl_._has_bits_[0] |= 0x00000001u;
+  } else {
+    _impl_._has_bits_[0] &= ~0x00000001u;
+  }
   // @@protoc_insertion_point(field_unsafe_arena_set_allocated:google.protobuf.Type.source_context)
 }
 inline ::PROTOBUF_NAMESPACE_ID::SourceContext* Type::release_source_context() {
-  
+  _impl_._has_bits_[0] &= ~0x00000001u;
   ::PROTOBUF_NAMESPACE_ID::SourceContext* temp = _impl_.source_context_;
   _impl_.source_context_ = nullptr;
 #ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
@@ -1683,13 +1678,13 @@ inline ::PROTOBUF_NAMESPACE_ID::SourceContext* Type::release_source_context() {
 }
 inline ::PROTOBUF_NAMESPACE_ID::SourceContext* Type::unsafe_arena_release_source_context() {
   // @@protoc_insertion_point(field_release:google.protobuf.Type.source_context)
-  
+  _impl_._has_bits_[0] &= ~0x00000001u;
   ::PROTOBUF_NAMESPACE_ID::SourceContext* temp = _impl_.source_context_;
   _impl_.source_context_ = nullptr;
   return temp;
 }
 inline ::PROTOBUF_NAMESPACE_ID::SourceContext* Type::_internal_mutable_source_context() {
-  
+  _impl_._has_bits_[0] |= 0x00000001u;
   if (_impl_.source_context_ == nullptr) {
     auto* p = CreateMaybeMessage<::PROTOBUF_NAMESPACE_ID::SourceContext>(GetArenaForAllocation());
     _impl_.source_context_ = p;
@@ -1714,9 +1709,9 @@ inline void Type::set_allocated_source_context(::PROTOBUF_NAMESPACE_ID::SourceCo
       source_context = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
           message_arena, source_context, submessage_arena);
     }
-
+    _impl_._has_bits_[0] |= 0x00000001u;
   } else {
-
+    _impl_._has_bits_[0] &= ~0x00000001u;
   }
   _impl_.source_context_ = source_context;
   // @@protoc_insertion_point(field_set_allocated:google.protobuf.Type.source_context)
@@ -2206,11 +2201,10 @@ Enum::options() const {
 }
 
 // .google.protobuf.SourceContext source_context = 4;
-inline bool Enum::_internal_has_source_context() const {
-  return this != internal_default_instance() && _impl_.source_context_ != nullptr;
-}
 inline bool Enum::has_source_context() const {
-  return _internal_has_source_context();
+  bool value = (_impl_._has_bits_[0] & 0x00000001u) != 0;
+  PROTOBUF_ASSUME(!value || _impl_.source_context_ != nullptr);
+  return value;
 }
 inline const ::PROTOBUF_NAMESPACE_ID::SourceContext& Enum::_internal_source_context() const {
   const ::PROTOBUF_NAMESPACE_ID::SourceContext* p = _impl_.source_context_;
@@ -2227,10 +2221,15 @@ inline void Enum::unsafe_arena_set_allocated_source_context(
     delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(_impl_.source_context_);
   }
   _impl_.source_context_ = source_context;
+  if (source_context) {
+    _impl_._has_bits_[0] |= 0x00000001u;
+  } else {
+    _impl_._has_bits_[0] &= ~0x00000001u;
+  }
   // @@protoc_insertion_point(field_unsafe_arena_set_allocated:google.protobuf.Enum.source_context)
 }
 inline ::PROTOBUF_NAMESPACE_ID::SourceContext* Enum::release_source_context() {
-  
+  _impl_._has_bits_[0] &= ~0x00000001u;
   ::PROTOBUF_NAMESPACE_ID::SourceContext* temp = _impl_.source_context_;
   _impl_.source_context_ = nullptr;
 #ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
@@ -2246,13 +2245,13 @@ inline ::PROTOBUF_NAMESPACE_ID::SourceContext* Enum::release_source_context() {
 }
 inline ::PROTOBUF_NAMESPACE_ID::SourceContext* Enum::unsafe_arena_release_source_context() {
   // @@protoc_insertion_point(field_release:google.protobuf.Enum.source_context)
-  
+  _impl_._has_bits_[0] &= ~0x00000001u;
   ::PROTOBUF_NAMESPACE_ID::SourceContext* temp = _impl_.source_context_;
   _impl_.source_context_ = nullptr;
   return temp;
 }
 inline ::PROTOBUF_NAMESPACE_ID::SourceContext* Enum::_internal_mutable_source_context() {
-  
+  _impl_._has_bits_[0] |= 0x00000001u;
   if (_impl_.source_context_ == nullptr) {
     auto* p = CreateMaybeMessage<::PROTOBUF_NAMESPACE_ID::SourceContext>(GetArenaForAllocation());
     _impl_.source_context_ = p;
@@ -2277,9 +2276,9 @@ inline void Enum::set_allocated_source_context(::PROTOBUF_NAMESPACE_ID::SourceCo
       source_context = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
           message_arena, source_context, submessage_arena);
     }
-
+    _impl_._has_bits_[0] |= 0x00000001u;
   } else {
-
+    _impl_._has_bits_[0] &= ~0x00000001u;
   }
   _impl_.source_context_ = source_context;
   // @@protoc_insertion_point(field_set_allocated:google.protobuf.Enum.source_context)
@@ -2468,11 +2467,10 @@ inline void Option::set_allocated_name(std::string* value) {
 }
 
 // .google.protobuf.Any value = 2;
-inline bool Option::_internal_has_value() const {
-  return this != internal_default_instance() && _impl_.value_ != nullptr;
-}
 inline bool Option::has_value() const {
-  return _internal_has_value();
+  bool value = (_impl_._has_bits_[0] & 0x00000001u) != 0;
+  PROTOBUF_ASSUME(!value || _impl_.value_ != nullptr);
+  return value;
 }
 inline const ::PROTOBUF_NAMESPACE_ID::Any& Option::_internal_value() const {
   const ::PROTOBUF_NAMESPACE_ID::Any* p = _impl_.value_;
@@ -2489,10 +2487,15 @@ inline void Option::unsafe_arena_set_allocated_value(
     delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(_impl_.value_);
   }
   _impl_.value_ = value;
+  if (value) {
+    _impl_._has_bits_[0] |= 0x00000001u;
+  } else {
+    _impl_._has_bits_[0] &= ~0x00000001u;
+  }
   // @@protoc_insertion_point(field_unsafe_arena_set_allocated:google.protobuf.Option.value)
 }
 inline ::PROTOBUF_NAMESPACE_ID::Any* Option::release_value() {
-  
+  _impl_._has_bits_[0] &= ~0x00000001u;
   ::PROTOBUF_NAMESPACE_ID::Any* temp = _impl_.value_;
   _impl_.value_ = nullptr;
 #ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
@@ -2508,13 +2511,13 @@ inline ::PROTOBUF_NAMESPACE_ID::Any* Option::release_value() {
 }
 inline ::PROTOBUF_NAMESPACE_ID::Any* Option::unsafe_arena_release_value() {
   // @@protoc_insertion_point(field_release:google.protobuf.Option.value)
-  
+  _impl_._has_bits_[0] &= ~0x00000001u;
   ::PROTOBUF_NAMESPACE_ID::Any* temp = _impl_.value_;
   _impl_.value_ = nullptr;
   return temp;
 }
 inline ::PROTOBUF_NAMESPACE_ID::Any* Option::_internal_mutable_value() {
-  
+  _impl_._has_bits_[0] |= 0x00000001u;
   if (_impl_.value_ == nullptr) {
     auto* p = CreateMaybeMessage<::PROTOBUF_NAMESPACE_ID::Any>(GetArenaForAllocation());
     _impl_.value_ = p;
@@ -2539,9 +2542,9 @@ inline void Option::set_allocated_value(::PROTOBUF_NAMESPACE_ID::Any* value) {
       value = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
           message_arena, value, submessage_arena);
     }
-
+    _impl_._has_bits_[0] |= 0x00000001u;
   } else {
-
+    _impl_._has_bits_[0] &= ~0x00000001u;
   }
   _impl_.value_ = value;
   // @@protoc_insertion_point(field_set_allocated:google.protobuf.Option.value)
