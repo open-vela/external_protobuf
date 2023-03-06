@@ -630,7 +630,6 @@ class PROTOBUF_EXPORT Reflection final {
                                         std::string* scratch) const;
 
 
-
   // Singular field mutators -----------------------------------------
   // These mutate the value of a non-repeated field.
 
