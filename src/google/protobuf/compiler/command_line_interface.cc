@@ -36,7 +36,6 @@
 
 #include "absl/container/btree_set.h"
 #include "absl/container/flat_hash_map.h"
-#include "google/protobuf/compiler/allowlists/allowlists.h"
 
 #include "google/protobuf/stubs/platform_macros.h"
 
@@ -87,7 +86,6 @@
 #include "absl/strings/substitute.h"
 #include "google/protobuf/compiler/code_generator.h"
 #include "google/protobuf/compiler/importer.h"
-#include "google/protobuf/compiler/retention.h"
 #include "google/protobuf/compiler/zip_writer.h"
 #include "google/protobuf/descriptor.h"
 #include "google/protobuf/dynamic_message.h"
@@ -2633,7 +2631,7 @@ void CommandLineInterface::GetTransitiveDependencies(
 
   // Add this file.
   FileDescriptorProto* new_descriptor = output->Add();
-  *new_descriptor = StripSourceRetentionOptions(*file);
+  file->CopyTo(new_descriptor);
   if (include_json_name) {
     file->CopyJsonNameTo(new_descriptor);
   }
