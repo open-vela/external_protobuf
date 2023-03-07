@@ -67,8 +67,6 @@ class MapFieldLite {
 
  public:
   typedef Map<Key, T> MapType;
-  static constexpr WireFormatLite::FieldType kKeyFieldType = key_wire_type;
-  static constexpr WireFormatLite::FieldType kValueFieldType = value_wire_type;
 
   constexpr MapFieldLite() : map_() {}
   explicit MapFieldLite(Arena* arena) : map_(arena) {}

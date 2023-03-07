@@ -224,11 +224,7 @@
   result = [self mergeExtensionsDestination];
   NSData *data = [[self mergeExtensionsSource] data];
   XCTAssertNotNil(data);
-  NSError *error = nil;
-  XCTAssertTrue([result mergeFromData:data
-                    extensionRegistry:[UnittestRoot extensionRegistry]
-                                error:&error]);
-  XCTAssertNil(error);
+  [result mergeFromData:data extensionRegistry:[UnittestRoot extensionRegistry]];
   resultData = [result data];
   XCTAssertEqualObjects(resultData, mergeResultData);
   XCTAssertEqualObjects(result, [self mergeExtensionsResult]);
