@@ -1266,17 +1266,12 @@
   XCTAssertEqual(error.code, GPBCodedInputStreamErrorRecursionDepthExceeded);
 }
 
-- (void)testParseDelimitedDataOver2GB {
-  NSData *data = DataFromCStr("\xFF\xFF\xFF\xFF\x0F\x01\x02\0x3");  // Don't need all the bytes
+- (void)testParseDelimitedDataWithNegativeSize {
+  NSData *data = DataFromCStr("\xFF\xFF\xFF\xFF\x0F");
   GPBCodedInputStream *input = [GPBCodedInputStream streamWithData:data];
   NSError *error;
-  GPBMessage *result = [GPBMessage parseDelimitedFromCodedInputStream:input
-                                                    extensionRegistry:nil
-                                                                error:&error];
-  XCTAssertNil(result);
-  XCTAssertNotNil(error);
-  XCTAssertEqualObjects(error.domain, GPBCodedInputStreamErrorDomain);
-  XCTAssertEqual(error.code, GPBCodedInputStreamErrorInvalidSize);
+  [GPBMessage parseDelimitedFromCodedInputStream:input extensionRegistry:nil error:&error];
+  XCTAssertNil(error);
 }
 
 #ifdef DEBUG
