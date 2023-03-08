@@ -3937,6 +3937,7 @@ class DescriptorBuilder {
   void SuggestFieldNumbers(FileDescriptor* file,
                            const FileDescriptorProto& proto);
 
+
   // Must be run only after cross-linking.
   void InterpretOptions();
 
@@ -6459,6 +6460,7 @@ void DescriptorBuilder::CrossLinkExtensionRange(
     range->options_ = &ExtensionRangeOptions::default_instance();
   }
 }
+
 
 
 void DescriptorBuilder::CrossLinkField(FieldDescriptor* field,
