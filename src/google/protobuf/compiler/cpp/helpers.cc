@@ -211,9 +211,9 @@ bool IsLazy(const FieldDescriptor* field, const Options& options,
 
 // Returns true if "field" is a message field that is backed by LazyField per
 // profile (go/pdlazy).
-inline bool IsEagerlyVerifiedLazyByProfile(const FieldDescriptor* field,
-                                           const Options& options,
-                                           MessageSCCAnalyzer* scc_analyzer) {
+inline bool IsLazyByProfile(const FieldDescriptor* field,
+                            const Options& options,
+                            MessageSCCAnalyzer* scc_analyzer) {
   return false;
 }
 
@@ -1092,10 +1092,6 @@ bool ShouldVerify(const FileDescriptor* file, const Options& options,
   return false;
 }
 
-bool IsUtf8String(const FieldDescriptor* field) {
-  return IsProto3(field->file()) &&
-         field->type() == FieldDescriptor::TYPE_STRING;
-}
 
 VerifySimpleType ShouldVerifySimple(const Descriptor* descriptor) {
   (void)descriptor;
