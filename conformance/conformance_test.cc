@@ -162,19 +162,12 @@ ConformanceTestSuite::ConformanceRequestSetting::NewTestMessage() const {
 }
 
 string ConformanceTestSuite::ConformanceRequestSetting::GetTestName() const {
-  string rname;
-  switch (prototype_message_.GetDescriptor()->file()->syntax()) {
-    case FileDescriptor::SYNTAX_PROTO3:
-      rname = ".Proto3.";
-      break;
-    case FileDescriptor::SYNTAX_PROTO2:
-      rname = ".Proto2.";
-      break;
-    default:
-      break;
-  }
+  string rname = prototype_message_.GetDescriptor()->file()->syntax() ==
+                         FileDescriptor::SYNTAX_PROTO3
+                     ? "Proto3"
+                     : "Proto2";
 
-  return absl::StrCat(ConformanceLevelToString(level_), rname,
+  return absl::StrCat(ConformanceLevelToString(level_), ".", rname, ".",
                       InputFormatString(input_format_), ".", test_name_, ".",
                       OutputFormatString(output_format_));
 }
