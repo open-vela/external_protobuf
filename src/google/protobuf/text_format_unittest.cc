@@ -51,6 +51,7 @@
 #include "absl/log/absl_check.h"
 #include "absl/log/die_if_null.h"
 #include "absl/log/scoped_mock_log.h"
+#include "absl/strings/cord.h"
 #include "absl/strings/escaping.h"
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_format.h"
@@ -295,6 +296,22 @@ TEST_F(TextFormatTest, PrintUnknownFields) {
                          "8: 2\n"
                          "8: 3\n"),
             message.DebugString());
+}
+
+TEST_F(TextFormatTest, PrintUnknownFieldsDeepestStackWorks) {
+  // Test printing of unknown fields in a message.
+
+  unittest::TestEmptyMessage message;
+  UnknownFieldSet* unknown_fields = message.mutable_unknown_fields();
+
+  for (int i = 0; i < 200; ++i) {
+    unknown_fields = unknown_fields->AddGroup(1);
+  }
+
+  unknown_fields->AddVarint(2, 100);
+
+  std::string str;
+  EXPECT_TRUE(TextFormat::PrintToString(message, &str));
 }
 
 TEST_F(TextFormatTest, PrintUnknownFieldsHidden) {
@@ -817,6 +834,12 @@ TEST_F(TextFormatTest, ParseBasic) {
   io::ArrayInputStream input_stream(proto_text_format_.data(),
                                     proto_text_format_.size());
   TextFormat::Parse(&input_stream, &proto_);
+  TestUtil::ExpectAllFieldsSet(proto_);
+}
+
+TEST_F(TextFormatTest, ParseCordBasic) {
+  absl::Cord cord(proto_text_format_);
+  TextFormat::ParseFromCord(cord, &proto_);
   TestUtil::ExpectAllFieldsSet(proto_);
 }
 
@@ -2349,6 +2372,7 @@ TEST(TextFormatFloatingPointTest, PreservesNegative0) {
   EXPECT_EQ(std::signbit(in_message.optional_double()),
             std::signbit(out_message.optional_double()));
 }
+
 
 }  // namespace text_format_unittest
 }  // namespace protobuf
