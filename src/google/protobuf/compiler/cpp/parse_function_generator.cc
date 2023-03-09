@@ -90,23 +90,13 @@ class ParseFunctionGenerator::GeneratedOptionProvider final
   explicit GeneratedOptionProvider(ParseFunctionGenerator* gen) : gen_(gen) {}
   TailCallTableInfo::PerFieldOptions GetForField(
       const FieldDescriptor* field) const final {
-    const auto verify_flag = [&] {
-      if (IsEagerlyVerifiedLazy(field, gen_->options_, gen_->scc_analyzer_))
-        return internal::field_layout::kTvEager;
-      if (IsLazilyVerifiedLazy(field, gen_->options_))
-        return internal::field_layout::kTvLazy;
-      return internal::field_layout::TransformValidation{};
-    };
-    return {
-        verify_flag(),
-        IsStringInlined(field, gen_->options_),
-        IsImplicitWeakField(field, gen_->options_, gen_->scc_analyzer_),
-        UseDirectTcParserTable(field, gen_->options_),
-        GetOptimizeFor(field->file(), gen_->options_) ==
-            FileOptions::LITE_RUNTIME,
-        ShouldSplit(field, gen_->options_),
-        /* uses_codegen */ true,
-    };
+    return {IsLazy(field, gen_->options_, gen_->scc_analyzer_),
+            IsStringInlined(field, gen_->options_),
+            IsImplicitWeakField(field, gen_->options_, gen_->scc_analyzer_),
+            UseDirectTcParserTable(field, gen_->options_),
+            GetOptimizeFor(field->file(), gen_->options_) ==
+                FileOptions::LITE_RUNTIME,
+            ShouldSplit(field, gen_->options_)};
   }
 
  private:
@@ -226,6 +216,17 @@ void ParseFunctionGenerator::GenerateTailcallParseFunction(Formatter& format) {
       "}\n\n");
 }
 
+static bool NeedsUnknownEnumSupport(const Descriptor* descriptor) {
+  for (int i = 0; i < descriptor->field_count(); ++i) {
+    auto* field = descriptor->field(i);
+    if (field->is_repeated() && field->cpp_type() == field->CPPTYPE_ENUM &&
+        !internal::cpp::HasPreservingUnknownEnumSemantics(field)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 void ParseFunctionGenerator::GenerateTailcallFallbackFunction(
     Formatter& format) {
   ABSL_CHECK(should_generate_tctable());
@@ -235,18 +236,21 @@ void ParseFunctionGenerator::GenerateTailcallFallbackFunction(
   format.Indent();
   format("auto* typed_msg = static_cast<$classname$*>(msg);\n");
 
-  // Generate the check to jump to the generic handler to deal with the side
-  // channel data.
-  format(
-      "if (PROTOBUF_PREDICT_FALSE(\n"
-      "    _pbi::TcParser::MustFallbackToGeneric(PROTOBUF_TC_PARAM_PASS))) "
-      "{\n"
-      "  PROTOBUF_MUSTTAIL return "
-      "::_pbi::TcParser::GenericFallback$1$(PROTOBUF_TC_PARAM_PASS);\n"
-      "}\n",
-      GetOptimizeFor(descriptor_->file(), options_) == FileOptions::LITE_RUNTIME
-          ? "Lite"
-          : "");
+  // If we need a side channel, generate the check to jump to the generic
+  // handler to deal with the side channel data.
+  if (NeedsUnknownEnumSupport(descriptor_)) {
+    format(
+        "if (PROTOBUF_PREDICT_FALSE(\n"
+        "    _pbi::TcParser::MustFallbackToGeneric(PROTOBUF_TC_PARAM_PASS))) "
+        "{\n"
+        "  PROTOBUF_MUSTTAIL return "
+        "::_pbi::TcParser::GenericFallback$1$(PROTOBUF_TC_PARAM_PASS);\n"
+        "}\n",
+        GetOptimizeFor(descriptor_->file(), options_) ==
+                FileOptions::LITE_RUNTIME
+            ? "Lite"
+            : "");
+  }
 
   if (num_hasbits_ > 0) {
     // Sync hasbits
@@ -490,10 +494,14 @@ void ParseFunctionGenerator::GenerateTailCallTable(Formatter& format) {
       } else {
         format("0,  // no _has_bits_\n");
       }
-      if (descriptor_->extension_range_count() != 0) {
-        format("PROTOBUF_FIELD_OFFSET($classname$, $extensions$),\n");
+      if (descriptor_->extension_range_count() == 1) {
+        format(
+            "PROTOBUF_FIELD_OFFSET($classname$, $extensions$),\n"
+            "$1$, $2$,  // extension_range_{low,high}\n",
+            descriptor_->extension_range(0)->start,
+            descriptor_->extension_range(0)->end);
       } else {
-        format("0, // no _extensions_\n");
+        format("0, 0, 0,  // no _extensions_\n");
       }
       format("$1$, $2$,  // max_field_number, fast_idx_mask\n",
              (ordered_fields_.empty() ? 0 : ordered_fields_.back()->number()),
@@ -614,11 +622,6 @@ void ParseFunctionGenerator::GenerateTailCallTable(Formatter& format) {
                        QualifiedDefaultInstancePtr(
                            aux_entry.field->message_type(), options_));
                 break;
-              case TailCallTableInfo::kMessageVerifyFunc:
-                format("{$1$::InternalVerify},\n",
-                       QualifiedClassName(aux_entry.field->message_type(),
-                                          options_));
-                break;
               case TailCallTableInfo::kEnumRange:
                 format("{$1$, $2$},\n", aux_entry.enum_range.start,
                        aux_entry.enum_range.size);
@@ -630,29 +633,6 @@ void ParseFunctionGenerator::GenerateTailCallTable(Formatter& format) {
                 break;
               case TailCallTableInfo::kNumericOffset:
                 format("{_fl::Offset{$1$}},\n", aux_entry.offset);
-                break;
-              case TailCallTableInfo::kMapAuxInfo: {
-                auto utf8_check = internal::cpp::GetUtf8CheckMode(
-                    aux_entry.field,
-                    GetOptimizeFor(aux_entry.field->file(), options_) ==
-                        FileOptions::LITE_RUNTIME);
-                auto* map_value = aux_entry.field->message_type()->map_value();
-                const bool validated_enum =
-                    map_value->type() == FieldDescriptor::TYPE_ENUM &&
-                    !internal::cpp::HasPreservingUnknownEnumSemantics(
-                        map_value);
-                format(
-                    "{::_pbi::TcParser::GetMapAuxInfo<decltype($classname$("
-                    ").$1$)>($2$, $3$, $4$)},\n",
-                    FieldMemberName(aux_entry.field, /*split=*/false),
-                    utf8_check == internal::cpp::Utf8CheckMode::kStrict,
-                    utf8_check == internal::cpp::Utf8CheckMode::kVerify,
-                    validated_enum);
-                break;
-              }
-              case TailCallTableInfo::kCreateInArena:
-                format("{::_pbi::TcParser::CreateInArenaStorageCb<$1$>},\n",
-                       QualifiedClassName(aux_entry.desc, options_));
                 break;
             }
           }
@@ -777,16 +757,13 @@ static void FormatFieldKind(Formatter& format,
         format(" | ::_fl::kRep$1$", rep);
       }
 
-      static constexpr const char* kXFormNames[2][4] = {
-          {nullptr, "Default", "Table", "WeakPtr"}, {nullptr, "Eager", "Lazy"}};
-
+      static constexpr const char* kXFormNames[] = {nullptr, "Default", "Table",
+                                                    "WeakPtr"};
       static_assert((fl::kTvDefault >> fl::kTvShift) == 1, "");
       static_assert((fl::kTvTable >> fl::kTvShift) == 2, "");
       static_assert((fl::kTvWeakPtr >> fl::kTvShift) == 3, "");
-      static_assert((fl::kTvEager >> fl::kTvShift) == 1, "");
-      static_assert((fl::kTvLazy >> fl::kTvShift) == 2, "");
 
-      if (auto* xform = kXFormNames[rep_index == 2][tv_index]) {
+      if (auto* xform = kXFormNames[tv_index]) {
         format(" | ::_fl::kTv$1$", xform);
       }
       break;
@@ -1174,7 +1151,7 @@ void ParseFunctionGenerator::GenerateFieldBody(
         format.Set("enum_type",
                    QualifiedClassName(field->enum_type(), options_));
         format(
-            "$int32$ val = ::$proto_ns$::internal::ReadVarint32(&ptr);\n"
+            "$uint32$ val = ::$proto_ns$::internal::ReadVarint32(&ptr);\n"
             "CHK_(ptr);\n");
         if (!internal::cpp::HasPreservingUnknownEnumSemantics(field)) {
           format(
