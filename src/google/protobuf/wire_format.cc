@@ -874,7 +874,7 @@ const char* WireFormat::_InternalParseAndMergeField(
             ptr = internal::PackedEnumParser(rep_enum, ptr, ctx);
           } else {
             return ctx->ReadPackedVarint(
-                ptr, [rep_enum, field, reflection, msg](uint64_t val) {
+                ptr, [rep_enum, field, reflection, msg](int32_t val) {
                   if (field->enum_type()->FindValueByNumber(val) != nullptr) {
                     rep_enum->Add(val);
                   } else {
@@ -1466,11 +1466,11 @@ uint8_t* WireFormat::InternalSerializeMessageSetItem(
   // Write type ID.
   target = WireFormatLite::WriteUInt32ToArray(
       WireFormatLite::kMessageSetTypeIdNumber, field->number(), target);
-  // Write message.
-  auto& msg = message_reflection->GetMessage(message, field);
-  target = WireFormatLite::InternalWriteMessage(
-      WireFormatLite::kMessageSetMessageNumber, msg, msg.GetCachedSize(),
-      target, stream);
+    // Write message.
+    auto& msg = message_reflection->GetMessage(message, field);
+    target = WireFormatLite::InternalWriteMessage(
+        WireFormatLite::kMessageSetMessageNumber, msg, msg.GetCachedSize(),
+        target, stream);
   // End group.
   target = stream->EnsureSpace(target);
   target = io::CodedOutputStream::WriteTagToArray(

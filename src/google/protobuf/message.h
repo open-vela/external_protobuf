@@ -118,6 +118,7 @@
 #include "google/protobuf/stubs/common.h"
 #include "google/protobuf/arena.h"
 #include "google/protobuf/port.h"
+#include "absl/base/attributes.h"
 #include "absl/base/call_once.h"
 #include "absl/base/casts.h"
 #include "absl/functional/function_ref.h"
@@ -630,6 +631,7 @@ class PROTOBUF_EXPORT Reflection final {
                                         std::string* scratch) const;
 
 
+
   // Singular field mutators -----------------------------------------
   // These mutate the value of a non-repeated field.
 
@@ -960,6 +962,7 @@ class PROTOBUF_EXPORT Reflection final {
   //       reflection->SetEnumValue(message, field, new_value);
   //     }
   //   }
+  ABSL_DEPRECATED("Use EnumDescriptor::is_closed instead.")
   bool SupportsUnknownEnumValues() const;
 
   // Returns the MessageFactory associated with this message.  This can be
