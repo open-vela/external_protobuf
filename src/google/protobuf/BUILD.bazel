@@ -392,7 +392,6 @@ cc_library(
         "generated_message_tctable_gen.cc",
         "map_field.cc",
         "message.cc",
-        "reflection_mode.cc",
         "reflection_ops.cc",
         "service.cc",
         "text_format.cc",
@@ -416,7 +415,6 @@ cc_library(
         "metadata.h",
         "reflection.h",
         "reflection_internal.h",
-        "reflection_mode.h",
         "reflection_ops.h",
         "service.h",
         "text_format.h",
@@ -550,7 +548,6 @@ filegroup(
     srcs = [
         "any_test.proto",
         "map_proto2_unittest.proto",
-        "map_proto3_unittest.proto",
         "map_unittest.proto",
         "unittest.proto",
         "unittest_arena.proto",
@@ -607,7 +604,6 @@ proto_library(
     name = "generic_test_protos",
     srcs = [
         "map_proto2_unittest.proto",
-        "map_proto3_unittest.proto",
         "map_unittest.proto",
         "unittest.proto",
         "unittest_arena.proto",
@@ -1261,7 +1257,6 @@ cc_test(
         "//src/google/protobuf/io",
         "//src/google/protobuf/stubs",
         "//src/google/protobuf/testing",
-        "@com_google_absl//absl/functional:bind_front",
         "@com_google_absl//absl/synchronization",
         "@com_google_googletest//:gtest",
         "@com_google_googletest//:gtest_main",
@@ -1314,16 +1309,6 @@ cc_test(
         ":cc_test_protos",
         ":protobuf",
         "//src/google/protobuf/compiler:retention",
-        "@com_google_googletest//:gtest_main",
-    ],
-)
-
-cc_test(
-    name = "reflection_mode_test",
-    srcs = ["reflection_mode_test.cc"],
-    deps = [
-        ":protobuf_nowkt",
-        "@com_google_googletest//:gtest",
         "@com_google_googletest//:gtest_main",
     ],
 )
