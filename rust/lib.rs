@@ -31,3 +31,6 @@
 //! Rust Protobuf Runtime
 
 // Not yet implemented.
+
+// TODO(b/270138878): Remove once we have real logic in the runtime.
+pub fn do_nothing() {}
