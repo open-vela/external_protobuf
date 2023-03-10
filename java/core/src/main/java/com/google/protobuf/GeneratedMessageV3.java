@@ -139,12 +139,9 @@ public abstract class GeneratedMessageV3 extends AbstractMessage implements Seri
     return internalGetFieldAccessorTable().descriptor;
   }
 
-  /**
-   * TODO(b/248143958): This method should be removed. It enables parsing directly into an
-   * "immutable" message. Have to leave it for now to support old gencode.
-   *
-   * @deprecated use newBuilder().mergeFrom() instead
-   */
+  // TODO(b/248143958): This method should be removed. It enables parsing directly into an
+  // "immutable" message. Have to leave it for now to support old gencode.
+  // @deprecated use newBuilder().mergeFrom() instead
   @Deprecated
   protected void mergeFromAndMakeImmutableInternal(
       CodedInputStream input, ExtensionRegistryLite extensionRegistry)
@@ -245,7 +242,7 @@ public abstract class GeneratedMessageV3 extends AbstractMessage implements Seri
 
   @Override
   public Map<FieldDescriptor, Object> getAllFields() {
-    return Collections.unmodifiableMap(getAllFieldsMutable(/* getBytesForString= */ false));
+    return Collections.unmodifiableMap(getAllFieldsMutable(/* getBytesForString = */ false));
   }
 
   /**
@@ -257,7 +254,7 @@ public abstract class GeneratedMessageV3 extends AbstractMessage implements Seri
    * fields in order by field number.
    */
   Map<FieldDescriptor, Object> getAllFieldsRaw() {
-    return Collections.unmodifiableMap(getAllFieldsMutable(/* getBytesForString= */ true));
+    return Collections.unmodifiableMap(getAllFieldsMutable(/* getBytesForString = */ true));
   }
 
   @Override
@@ -426,26 +423,6 @@ public abstract class GeneratedMessageV3 extends AbstractMessage implements Seri
     return makeMutableCopy(list);
   }
 
-  // TODO(b/258340024): Redundant with makeMutableCopy(). Remove.
-  protected static LongList mutableCopy(LongList list) {
-    return makeMutableCopy(list);
-  }
-
-  // TODO(b/258340024): Redundant with makeMutableCopy(). Remove.
-  protected static FloatList mutableCopy(FloatList list) {
-    return makeMutableCopy(list);
-  }
-
-  // TODO(b/258340024): Redundant with makeMutableCopy(). Remove.
-  protected static DoubleList mutableCopy(DoubleList list) {
-    return makeMutableCopy(list);
-  }
-
-  // TODO(b/258340024): Redundant with makeMutableCopy(). Remove.
-  protected static BooleanList mutableCopy(BooleanList list) {
-    return makeMutableCopy(list);
-  }
-
   protected static LongList emptyLongList() {
     return LongArrayList.emptyList();
   }
@@ -453,6 +430,11 @@ public abstract class GeneratedMessageV3 extends AbstractMessage implements Seri
   // TODO(b/258340024): Unused. Remove.
   protected static LongList newLongList() {
     return new LongArrayList();
+  }
+
+  // TODO(b/258340024): Redundant with makeMutableCopy(). Remove.
+  protected static LongList mutableCopy(LongList list) {
+    return makeMutableCopy(list);
   }
 
   protected static FloatList emptyFloatList() {
@@ -464,6 +446,11 @@ public abstract class GeneratedMessageV3 extends AbstractMessage implements Seri
     return new FloatArrayList();
   }
 
+  // TODO(b/258340024): Redundant with makeMutableCopy(). Remove.
+  protected static FloatList mutableCopy(FloatList list) {
+    return makeMutableCopy(list);
+  }
+
   protected static DoubleList emptyDoubleList() {
     return DoubleArrayList.emptyList();
   }
@@ -473,6 +460,11 @@ public abstract class GeneratedMessageV3 extends AbstractMessage implements Seri
     return new DoubleArrayList();
   }
 
+  // TODO(b/258340024): Redundant with makeMutableCopy(). Remove.
+  protected static DoubleList mutableCopy(DoubleList list) {
+    return makeMutableCopy(list);
+  }
+
   protected static BooleanList emptyBooleanList() {
     return BooleanArrayList.emptyList();
   }
@@ -480,6 +472,11 @@ public abstract class GeneratedMessageV3 extends AbstractMessage implements Seri
   // TODO(b/258340024): Unused. Remove.
   protected static BooleanList newBooleanList() {
     return new BooleanArrayList();
+  }
+
+  // TODO(b/258340024): Redundant with makeMutableCopy(). Remove.
+  protected static BooleanList mutableCopy(BooleanList list) {
+    return makeMutableCopy(list);
   }
 
   @SuppressWarnings("unchecked") // Guaranteed by proto runtime.
@@ -951,7 +948,7 @@ public abstract class GeneratedMessageV3 extends AbstractMessage implements Seri
     protected MapField internalGetMutableMapField(int fieldNumber) {
       // Note that we can't use descriptor names here because this method will
       // be called when descriptor is being initialized.
-      throw new IllegalArgumentException("No map fields found in " + getClass().getName());
+      throw new RuntimeException("No map fields found in " + getClass().getName());
     }
   }
 
@@ -1347,7 +1344,7 @@ public abstract class GeneratedMessageV3 extends AbstractMessage implements Seri
     @Override
     public Map<FieldDescriptor, Object> getAllFields() {
       final Map<FieldDescriptor, Object> result =
-          super.getAllFieldsMutable(/* getBytesForString= */ false);
+          super.getAllFieldsMutable(/* getBytesForString = */ false);
       result.putAll(getExtensionFields());
       return Collections.unmodifiableMap(result);
     }
@@ -1355,7 +1352,7 @@ public abstract class GeneratedMessageV3 extends AbstractMessage implements Seri
     @Override
     public Map<FieldDescriptor, Object> getAllFieldsRaw() {
       final Map<FieldDescriptor, Object> result =
-          super.getAllFieldsMutable(/* getBytesForString= */ false);
+          super.getAllFieldsMutable(/* getBytesForString = */ false);
       result.putAll(getExtensionFields());
       return Collections.unmodifiableMap(result);
     }
@@ -2303,7 +2300,6 @@ public abstract class GeneratedMessageV3 extends AbstractMessage implements Seri
 
     // ---------------------------------------------------------------
 
-    @SuppressWarnings("SameNameButDifferent")
     private static class SingularFieldAccessor implements FieldAccessor {
       private interface MethodInvoker {
         Object get(final GeneratedMessageV3 message);
@@ -2411,7 +2407,10 @@ public abstract class GeneratedMessageV3 extends AbstractMessage implements Seri
         isOneofField =
             descriptor.getContainingOneof() != null
                 && !descriptor.getContainingOneof().isSynthetic();
-        hasHasMethod = descriptor.hasPresence();
+        hasHasMethod =
+            descriptor.getFile().getSyntax() == FileDescriptor.Syntax.PROTO2
+                || descriptor.hasOptionalKeyword()
+                || (!isOneofField && descriptor.getJavaType() == FieldDescriptor.JavaType.MESSAGE);
         ReflectionInvoker reflectionInvoker =
             new ReflectionInvoker(
                 descriptor,
@@ -2536,7 +2535,6 @@ public abstract class GeneratedMessageV3 extends AbstractMessage implements Seri
       }
     }
 
-    @SuppressWarnings("SameNameButDifferent")
     private static class RepeatedFieldAccessor implements FieldAccessor {
       interface MethodInvoker {
         Object get(final GeneratedMessageV3 message);
@@ -2894,7 +2892,7 @@ public abstract class GeneratedMessageV3 extends AbstractMessage implements Seri
         valueOfMethod = getMethodOrDie(type, "valueOf", EnumValueDescriptor.class);
         getValueDescriptorMethod = getMethodOrDie(type, "getValueDescriptor");
 
-        supportUnknownEnumValue = !descriptor.legacyEnumFieldTreatedAsClosed();
+        supportUnknownEnumValue = descriptor.getFile().supportsUnknownEnumValue();
         if (supportUnknownEnumValue) {
           getValueMethod = getMethodOrDie(messageClass, "get" + camelCaseName + "Value");
           getValueMethodBuilder = getMethodOrDie(builderClass, "get" + camelCaseName + "Value");
@@ -2955,7 +2953,7 @@ public abstract class GeneratedMessageV3 extends AbstractMessage implements Seri
         valueOfMethod = getMethodOrDie(type, "valueOf", EnumValueDescriptor.class);
         getValueDescriptorMethod = getMethodOrDie(type, "getValueDescriptor");
 
-        supportUnknownEnumValue = !descriptor.legacyEnumFieldTreatedAsClosed();
+        supportUnknownEnumValue = descriptor.getFile().supportsUnknownEnumValue();
         if (supportUnknownEnumValue) {
           getRepeatedValueMethod =
               getMethodOrDie(messageClass, "get" + camelCaseName + "Value", int.class);

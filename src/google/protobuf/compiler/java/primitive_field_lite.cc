@@ -187,6 +187,10 @@ void SetPrimitiveVariables(
     }
   }
 
+  (*variables)["get_has_field_bit_from_local"] =
+      GenerateGetBitFromLocal(builderBitIndex);
+  (*variables)["set_has_field_bit_to_local"] =
+      GenerateSetBitToLocal(messageBitIndex);
   // Annotations often use { and } variables to denote ranges.
   (*variables)["{"] = "";
   (*variables)["}"] = "";
@@ -215,7 +219,7 @@ int ImmutablePrimitiveFieldLiteGenerator::GetNumBitsForMessage() const {
 
 void ImmutablePrimitiveFieldLiteGenerator::GenerateInterfaceMembers(
     io::Printer* printer) const {
-  if (descriptor_->has_presence()) {
+  if (HasHazzer(descriptor_)) {
     WriteFieldAccessorDocComment(printer, descriptor_, HAZZER);
     printer->Print(variables_,
                    "$deprecation$boolean has$capitalized_name$();\n");
@@ -242,7 +246,7 @@ void ImmutablePrimitiveFieldLiteGenerator::GenerateMembers(
         "  fieldNumber=$number$,\n"
         "  type=com.google.protobuf.FieldType.$annotation_field_type$,\n"
         "  isRequired=$required$)\n");
-    if (HasHasbit(descriptor_)) {
+    if (HasHazzer(descriptor_)) {
       printer->Print(variables_,
                      "@com.google.protobuf.ProtoPresenceCheckedField(\n"
                      "  presenceBitsId=$bit_field_id$,\n"
@@ -251,7 +255,7 @@ void ImmutablePrimitiveFieldLiteGenerator::GenerateMembers(
   }
   printer->Print(variables_, "private $field_type$ $name$_;\n");
   PrintExtraFieldInfo(variables_, printer);
-  if (descriptor_->has_presence()) {
+  if (HasHazzer(descriptor_)) {
     WriteFieldAccessorDocComment(printer, descriptor_, HAZZER);
     printer->Print(
         variables_,
@@ -297,7 +301,7 @@ void ImmutablePrimitiveFieldLiteGenerator::GenerateMembers(
 
 void ImmutablePrimitiveFieldLiteGenerator::GenerateBuilderMembers(
     io::Printer* printer) const {
-  if (descriptor_->has_presence()) {
+  if (HasHazzer(descriptor_)) {
     WriteFieldAccessorDocComment(printer, descriptor_, HAZZER);
     printer->Print(
         variables_,
@@ -358,7 +362,7 @@ void ImmutablePrimitiveFieldLiteGenerator::GenerateKotlinDslMembers(
                  "  $kt_dsl_builder$.${$clear$capitalized_name$$}$()\n"
                  "}\n");
 
-  if (descriptor_->has_presence()) {
+  if (HasHazzer(descriptor_)) {
     WriteFieldAccessorDocComment(printer, descriptor_, HAZZER,
                                  /* builder */ false, /* kdoc */ true);
     printer->Print(
@@ -412,7 +416,7 @@ ImmutablePrimitiveOneofFieldLiteGenerator::
 void ImmutablePrimitiveOneofFieldLiteGenerator::GenerateMembers(
     io::Printer* printer) const {
   PrintExtraFieldInfo(variables_, printer);
-  ABSL_DCHECK(descriptor_->has_presence());
+  ABSL_DCHECK(HasHazzer(descriptor_));
   WriteFieldAccessorDocComment(printer, descriptor_, HAZZER);
   printer->Print(variables_,
                  "@java.lang.Override\n"
@@ -460,7 +464,7 @@ void ImmutablePrimitiveOneofFieldLiteGenerator::GenerateFieldInfo(
 
 void ImmutablePrimitiveOneofFieldLiteGenerator::GenerateBuilderMembers(
     io::Printer* printer) const {
-  ABSL_DCHECK(descriptor_->has_presence());
+  ABSL_DCHECK(HasHazzer(descriptor_));
   WriteFieldAccessorDocComment(printer, descriptor_, HAZZER);
   printer->Print(variables_,
                  "@java.lang.Override\n"
