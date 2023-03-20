@@ -1929,18 +1929,21 @@ typedef struct upb_ExtensionRegistry upb_ExtensionRegistry;
 // The arena must outlive any use of the extreg.
 UPB_API upb_ExtensionRegistry* upb_ExtensionRegistry_New(upb_Arena* arena);
 
+UPB_API bool upb_ExtensionRegistry_Add(upb_ExtensionRegistry* r,
+                                       const upb_MiniTableExtension* e);
+
 // Adds the given extension info for the array |e| of size |count| into the
 // registry. If there are any errors, the entire array is backed out.
 // The extensions must outlive the registry.
 // Possible errors include OOM or an extension number that already exists.
-// TODO: There is currently no way to determine the exact reason for failure.
+// TODO(salo): There is currently no way to know the exact reason for failure.
 bool upb_ExtensionRegistry_AddArray(upb_ExtensionRegistry* r,
                                     const upb_MiniTableExtension** e,
                                     size_t count);
 
 // Looks up the extension (if any) defined for message type |t| and field
 // number |num|. Returns the extension if found, otherwise NULL.
-const upb_MiniTableExtension* upb_ExtensionRegistry_Lookup(
+UPB_API const upb_MiniTableExtension* upb_ExtensionRegistry_Lookup(
     const upb_ExtensionRegistry* r, const upb_MiniTable* t, uint32_t num);
 
 #ifdef __cplusplus
@@ -2204,6 +2207,11 @@ extern "C" {
 UPB_API const upb_MiniTableField* upb_MiniTable_FindFieldByNumber(
     const upb_MiniTable* table, uint32_t number);
 
+UPB_API_INLINE const upb_MiniTableField* upb_MiniTable_GetFieldByIndex(
+    const upb_MiniTable* t, uint32_t index) {
+  return &t->fields[index];
+}
+
 UPB_API upb_FieldType upb_MiniTableField_Type(const upb_MiniTableField* field);
 
 UPB_API_INLINE upb_CType upb_MiniTableField_CType(const upb_MiniTableField* f) {
@@ -2278,10 +2286,11 @@ UPB_API_INLINE const upb_MiniTableEnum* upb_MiniTable_GetSubEnumTable(
 const upb_MiniTableField* upb_MiniTable_GetOneof(const upb_MiniTable* m,
                                                  const upb_MiniTableField* f);
 
-// Returns the next field in the oneof. If this is the last field in the
-// oneof, returns NULL. The ordering of fields in the oneof is not
+// Iterates to the next field in the oneof. If this is the last field in the
+// oneof, returns false. The ordering of fields in the oneof is not
 // guaranteed.
-// REQUIRES: |iter| is and iterator.
+// REQUIRES: |f| is the field initialized by upb_MiniTable_GetOneof and updated
+//           by prior upb_MiniTable_NextOneofField calls.
 bool upb_MiniTable_NextOneofField(const upb_MiniTable* m,
                                   const upb_MiniTableField** f);
 
@@ -3049,6 +3058,13 @@ enum {
 };
 
 #define UPB_DECODE_MAXDEPTH(depth) ((depth) << 16)
+
+// Enforce an upper bound on recursion depth.
+UPB_INLINE int upb_Decode_LimitDepth(uint32_t decode_options, uint32_t limit) {
+  uint32_t max_depth = decode_options >> 16;
+  if (max_depth > limit) max_depth = limit;
+  return (max_depth << 16) | (decode_options & 0xffff);
+}
 
 typedef enum {
   kUpb_DecodeStatus_Ok = 0,
@@ -6517,20 +6533,25 @@ UPB_INLINE bool google_protobuf_FieldOptions_has_retention(const google_protobuf
   const upb_MiniTableField field = {17, 20, 9, 2, 14, kUpb_FieldMode_Scalar | (kUpb_FieldRep_4Byte << kUpb_FieldRep_Shift)};
   return _upb_Message_HasNonExtensionField(msg, &field);
 }
-UPB_INLINE void google_protobuf_FieldOptions_clear_target(google_protobuf_FieldOptions* msg) {
-  const upb_MiniTableField field = {18, 24, 10, 3, 14, kUpb_FieldMode_Scalar | (kUpb_FieldRep_4Byte << kUpb_FieldRep_Shift)};
+UPB_INLINE void google_protobuf_FieldOptions_clear_targets(google_protobuf_FieldOptions* msg) {
+  const upb_MiniTableField field = {19, 24, 0, 3, 14, kUpb_FieldMode_Array | (UPB_SIZE(kUpb_FieldRep_4Byte, kUpb_FieldRep_8Byte) << kUpb_FieldRep_Shift)};
   _upb_Message_ClearNonExtensionField(msg, &field);
 }
-UPB_INLINE int32_t google_protobuf_FieldOptions_target(const google_protobuf_FieldOptions* msg) {
-  int32_t default_val = 0;
-  int32_t ret;
-  const upb_MiniTableField field = {18, 24, 10, 3, 14, kUpb_FieldMode_Scalar | (kUpb_FieldRep_4Byte << kUpb_FieldRep_Shift)};
-  _upb_Message_GetNonExtensionField(msg, &field, &default_val, &ret);
-  return ret;
+UPB_INLINE int32_t const* google_protobuf_FieldOptions_targets(const google_protobuf_FieldOptions* msg, size_t* size) {
+  const upb_MiniTableField field = {19, 24, 0, 3, 14, kUpb_FieldMode_Array | (UPB_SIZE(kUpb_FieldRep_4Byte, kUpb_FieldRep_8Byte) << kUpb_FieldRep_Shift)};
+  const upb_Array* arr = upb_Message_GetArray(msg, &field);
+  if (arr) {
+    if (size) *size = arr->size;
+    return (int32_t const*)_upb_array_constptr(arr);
+  } else {
+    if (size) *size = 0;
+    return NULL;
+  }
 }
-UPB_INLINE bool google_protobuf_FieldOptions_has_target(const google_protobuf_FieldOptions* msg) {
-  const upb_MiniTableField field = {18, 24, 10, 3, 14, kUpb_FieldMode_Scalar | (kUpb_FieldRep_4Byte << kUpb_FieldRep_Shift)};
-  return _upb_Message_HasNonExtensionField(msg, &field);
+UPB_INLINE bool google_protobuf_FieldOptions_has_targets(const google_protobuf_FieldOptions* msg) {
+  size_t size;
+  google_protobuf_FieldOptions_targets(msg, &size);
+  return size != 0;
 }
 UPB_INLINE void google_protobuf_FieldOptions_clear_uninterpreted_option(google_protobuf_FieldOptions* msg) {
   const upb_MiniTableField field = {999, UPB_SIZE(28, 32), 0, 4, 11, kUpb_FieldMode_Array | (UPB_SIZE(kUpb_FieldRep_4Byte, kUpb_FieldRep_8Byte) << kUpb_FieldRep_Shift)};
@@ -6589,9 +6610,29 @@ UPB_INLINE void google_protobuf_FieldOptions_set_retention(google_protobuf_Field
   const upb_MiniTableField field = {17, 20, 9, 2, 14, kUpb_FieldMode_Scalar | (kUpb_FieldRep_4Byte << kUpb_FieldRep_Shift)};
   _upb_Message_SetNonExtensionField(msg, &field, &value);
 }
-UPB_INLINE void google_protobuf_FieldOptions_set_target(google_protobuf_FieldOptions *msg, int32_t value) {
-  const upb_MiniTableField field = {18, 24, 10, 3, 14, kUpb_FieldMode_Scalar | (kUpb_FieldRep_4Byte << kUpb_FieldRep_Shift)};
-  _upb_Message_SetNonExtensionField(msg, &field, &value);
+UPB_INLINE int32_t* google_protobuf_FieldOptions_mutable_targets(google_protobuf_FieldOptions* msg, size_t* size) {
+  upb_MiniTableField field = {19, 24, 0, 3, 14, kUpb_FieldMode_Array | (UPB_SIZE(kUpb_FieldRep_4Byte, kUpb_FieldRep_8Byte) << kUpb_FieldRep_Shift)};
+  upb_Array* arr = upb_Message_GetMutableArray(msg, &field);
+  if (arr) {
+    if (size) *size = arr->size;
+    return (int32_t*)_upb_array_ptr(arr);
+  } else {
+    if (size) *size = 0;
+    return NULL;
+  }
+}
+UPB_INLINE int32_t* google_protobuf_FieldOptions_resize_targets(google_protobuf_FieldOptions* msg, size_t size, upb_Arena* arena) {
+  upb_MiniTableField field = {19, 24, 0, 3, 14, kUpb_FieldMode_Array | (UPB_SIZE(kUpb_FieldRep_4Byte, kUpb_FieldRep_8Byte) << kUpb_FieldRep_Shift)};
+  return (int32_t*)upb_Message_ResizeArray(msg, &field, size, arena);
+}
+UPB_INLINE bool google_protobuf_FieldOptions_add_targets(google_protobuf_FieldOptions* msg, int32_t val, upb_Arena* arena) {
+  upb_MiniTableField field = {19, 24, 0, 3, 14, kUpb_FieldMode_Array | (UPB_SIZE(kUpb_FieldRep_4Byte, kUpb_FieldRep_8Byte) << kUpb_FieldRep_Shift)};
+  upb_Array* arr = upb_Message_GetOrCreateMutableArray(msg, &field, arena);
+  if (!arr || !_upb_Array_ResizeUninitialized(arr, arr->size + 1, arena)) {
+    return false;
+  }
+  _upb_Array_Set(arr, arr->size - 1, &val, sizeof(val));
+  return true;
 }
 UPB_INLINE google_protobuf_UninterpretedOption** google_protobuf_FieldOptions_mutable_uninterpreted_option(google_protobuf_FieldOptions* msg, size_t* size) {
   upb_MiniTableField field = {999, UPB_SIZE(28, 32), 0, 4, 11, kUpb_FieldMode_Array | (UPB_SIZE(kUpb_FieldRep_4Byte, kUpb_FieldRep_8Byte) << kUpb_FieldRep_Shift)};
@@ -8677,18 +8718,50 @@ UPB_API bool upb_MiniTable_SetSubEnum(upb_MiniTable* table,
                                       upb_MiniTableField* field,
                                       const upb_MiniTableEnum* sub);
 
-const char* _upb_MiniTableExtension_Build(const char* data, size_t len,
-                                          upb_MiniTableExtension* ext,
-                                          const upb_MiniTable* extendee,
-                                          upb_MiniTableSub sub,
-                                          upb_MiniTablePlatform platform,
-                                          upb_Status* status);
+// Initializes a MiniTableExtension buffer that has already been allocated.
+// This is needed by upb_FileDef and upb_MessageDef, which allocate all of the
+// extensions together in a single contiguous array.
+const char* _upb_MiniTableExtension_Init(const char* data, size_t len,
+                                         upb_MiniTableExtension* ext,
+                                         const upb_MiniTable* extendee,
+                                         upb_MiniTableSub sub,
+                                         upb_MiniTablePlatform platform,
+                                         upb_Status* status);
 
-UPB_API_INLINE const char* upb_MiniTableExtension_Build(
+UPB_API_INLINE const char* upb_MiniTableExtension_Init(
     const char* data, size_t len, upb_MiniTableExtension* ext,
     const upb_MiniTable* extendee, upb_MiniTableSub sub, upb_Status* status) {
-  return _upb_MiniTableExtension_Build(data, len, ext, extendee, sub,
-                                       kUpb_MiniTablePlatform_Native, status);
+  return _upb_MiniTableExtension_Init(data, len, ext, extendee, sub,
+                                      kUpb_MiniTablePlatform_Native, status);
+}
+
+UPB_API upb_MiniTableExtension* _upb_MiniTableExtension_Build(
+    const char* data, size_t len, const upb_MiniTable* extendee,
+    upb_MiniTableSub sub, upb_MiniTablePlatform platform, upb_Arena* arena,
+    upb_Status* status);
+
+UPB_API_INLINE upb_MiniTableExtension* upb_MiniTableExtension_Build(
+    const char* data, size_t len, const upb_MiniTable* extendee,
+    upb_Arena* arena, upb_Status* status) {
+  upb_MiniTableSub sub = {.submsg = NULL};
+  return _upb_MiniTableExtension_Build(
+      data, len, extendee, sub, kUpb_MiniTablePlatform_Native, arena, status);
+}
+
+UPB_API_INLINE upb_MiniTableExtension* upb_MiniTableExtension_BuildMessage(
+    const char* data, size_t len, const upb_MiniTable* extendee,
+    upb_MiniTable* submsg, upb_Arena* arena, upb_Status* status) {
+  upb_MiniTableSub sub = {.submsg = submsg};
+  return _upb_MiniTableExtension_Build(
+      data, len, extendee, sub, kUpb_MiniTablePlatform_Native, arena, status);
+}
+
+UPB_API_INLINE upb_MiniTableExtension* upb_MiniTableExtension_BuildEnum(
+    const char* data, size_t len, const upb_MiniTable* extendee,
+    upb_MiniTableEnum* subenum, upb_Arena* arena, upb_Status* status) {
+  upb_MiniTableSub sub = {.subenum = subenum};
+  return _upb_MiniTableExtension_Build(
+      data, len, extendee, sub, kUpb_MiniTablePlatform_Native, arena, status);
 }
 
 UPB_API upb_MiniTableEnum* upb_MiniTableEnum_Build(const char* data, size_t len,
@@ -8705,6 +8778,33 @@ upb_MiniTable* upb_MiniTable_BuildWithBuf(const char* data, size_t len,
                                           upb_MiniTablePlatform platform,
                                           upb_Arena* arena, void** buf,
                                           size_t* buf_size, upb_Status* status);
+
+// Returns a list of fields that require linking at runtime, to connect the
+// MiniTable to its sub-messages and sub-enums.  The list of fields will be
+// written to the `subs` array, which must have been allocated by the caller
+// and must be large enough to hold a list of all fields in the message.
+//
+// The order of the fields returned by this function is significant: it matches
+// the order expected by upb_MiniTable_Link() below.
+//
+// The return value packs the sub-message count and sub-enum count into a single
+// integer like so:
+//  return (msg_count << 16) | enum_count;
+UPB_API uint32_t upb_MiniTable_GetSubList(const upb_MiniTable* mt,
+                                          const upb_MiniTableField** subs);
+
+// Links a message to its sub-messages and sub-enums.  The caller must pass
+// arrays of sub-tables and sub-enums, in the same length and order as is
+// returned by upb_MiniTable_GetSubList() above.  However, individual elements
+// of the sub_tables may be NULL if those sub-messages were tree shaken.
+//
+// Returns false if either array is too short, or if any of the tables fails
+// to link.
+UPB_API bool upb_MiniTable_Link(upb_MiniTable* mt,
+                                const upb_MiniTable** sub_tables,
+                                size_t sub_table_count,
+                                const upb_MiniTableEnum** sub_enums,
+                                size_t sub_enum_count);
 
 #ifdef __cplusplus
 } /* extern "C" */
@@ -10544,8 +10644,8 @@ extern "C" {
 #endif
 
 upb_OneofDef* _upb_OneofDef_At(const upb_OneofDef* o, int i);
-bool _upb_OneofDef_Insert(upb_OneofDef* o, const upb_FieldDef* f,
-                          const char* name, size_t size, upb_Arena* a);
+void _upb_OneofDef_Insert(upb_DefBuilder* ctx, upb_OneofDef* o,
+                          const upb_FieldDef* f, const char* name, size_t size);
 
 // Allocate and initialize an array of |n| oneof defs owned by |m|.
 upb_OneofDef* _upb_OneofDefs_New(

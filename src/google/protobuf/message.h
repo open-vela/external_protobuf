@@ -118,6 +118,7 @@
 #include "google/protobuf/stubs/common.h"
 #include "google/protobuf/arena.h"
 #include "google/protobuf/port.h"
+#include "absl/base/attributes.h"
 #include "absl/base/call_once.h"
 #include "absl/base/casts.h"
 #include "absl/functional/function_ref.h"
@@ -630,6 +631,7 @@ class PROTOBUF_EXPORT Reflection final {
                                         std::string* scratch) const;
 
 
+
   // Singular field mutators -----------------------------------------
   // These mutate the value of a non-repeated field.
 
@@ -960,6 +962,7 @@ class PROTOBUF_EXPORT Reflection final {
   //       reflection->SetEnumValue(message, field, new_value);
   //     }
   //   }
+  ABSL_DEPRECATED("Use EnumDescriptor::is_closed instead.")
   bool SupportsUnknownEnumValues() const;
 
   // Returns the MessageFactory associated with this message.  This can be
@@ -1188,8 +1191,8 @@ class PROTOBUF_EXPORT Reflection final {
 
   inline const uint32_t* GetHasBits(const Message& message) const;
   inline uint32_t* MutableHasBits(Message* message) const;
-  inline uint32_t GetOneofCase(const Message& message,
-                               const OneofDescriptor* oneof_descriptor) const;
+  uint32_t GetOneofCase(const Message& message,
+                        const OneofDescriptor* oneof_descriptor) const;
   inline uint32_t* MutableOneofCase(
       Message* message, const OneofDescriptor* oneof_descriptor) const;
   inline bool HasExtensionSet(const Message& /* message */) const {
@@ -1522,13 +1525,6 @@ inline RepeatedPtrField<PB>* Reflection::MutableRepeatedPtrFieldInternal(
 template <typename Type>
 const Type& Reflection::DefaultRaw(const FieldDescriptor* field) const {
   return *reinterpret_cast<const Type*>(schema_.GetFieldDefault(field));
-}
-
-uint32_t Reflection::GetOneofCase(
-    const Message& message, const OneofDescriptor* oneof_descriptor) const {
-  ABSL_DCHECK(!oneof_descriptor->is_synthetic());
-  return internal::GetConstRefAtOffset<uint32_t>(
-      message, schema_.GetOneofCaseOffset(oneof_descriptor));
 }
 
 bool Reflection::HasOneofField(const Message& message,
