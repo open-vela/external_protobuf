@@ -47,6 +47,7 @@
 #include "absl/strings/string_view.h"
 #include "google/protobuf/descriptor.h"
 #include "google/protobuf/descriptor.pb.h"
+#include "google/protobuf/descriptor_legacy.h"
 #include "google/protobuf/io/printer.h"
 #include "google/protobuf/io/zero_copy_stream.h"
 
@@ -1731,6 +1732,10 @@ void GenerateMessageDocComment(io::Printer* printer, const Descriptor* message,
                                const Options& options) {
   printer->Print("/**\n");
   GenerateDocCommentBody(printer, message);
+  if (message->options().deprecated()) {
+    printer->Print(" * @deprecated\n");
+  }
+
   printer->Print(
     " * Generated from protobuf message <code>^messagename^</code>\n"
     " */\n",
@@ -1772,6 +1777,9 @@ void GenerateMessageConstructorDocComment(io::Printer* printer,
 void GenerateServiceDocComment(io::Printer* printer,
                                const ServiceDescriptor* service) {
   printer->Print("/**\n");
+  if (service->options().deprecated()) {
+    printer->Print(" * @deprecated\n");
+  }
   GenerateDocCommentBody(printer, service);
   printer->Print(
     " * Protobuf type <code>^fullname^</code>\n"
@@ -1849,6 +1857,9 @@ void GenerateWrapperFieldSetterDocComment(io::Printer* printer, const FieldDescr
 void GenerateEnumDocComment(io::Printer* printer, const EnumDescriptor* enum_,
                             const Options& options) {
   printer->Print("/**\n");
+  if (enum_->options().deprecated()) {
+    printer->Print(" * @deprecated\n");
+  }
   GenerateDocCommentBody(printer, enum_);
   printer->Print(
     " * Protobuf type <code>^fullname^</code>\n"
@@ -1870,6 +1881,9 @@ void GenerateServiceMethodDocComment(io::Printer* printer,
                                      const MethodDescriptor* method) {
   printer->Print("/**\n");
   GenerateDocCommentBody(printer, method);
+  if (method->options().deprecated()) {
+    printer->Print(" * @deprecated\n");
+  }
   printer->Print(
     " * Method <code>^method_name^</code>\n"
     " *\n",
@@ -2292,7 +2306,9 @@ bool Generator::Generate(const FileDescriptor* file, const Options& options,
     return false;
   }
 
-  if (!options.is_descriptor && file->syntax() != FileDescriptor::SYNTAX_PROTO3) {
+  if (!options.is_descriptor &&
+      FileDescriptorLegacy(file).syntax() !=
+          FileDescriptorLegacy::Syntax::SYNTAX_PROTO3) {
     *error =
         "Can only generate PHP code for proto3 .proto files.\n"
         "Please add 'syntax = \"proto3\";' to the top of your .proto file.\n";
