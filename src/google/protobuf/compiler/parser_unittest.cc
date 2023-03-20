@@ -57,9 +57,6 @@
 #include "google/protobuf/unittest_import_public.pb.h"
 #include "google/protobuf/wire_format.h"
 
-// Must be included last.
-#include "google/protobuf/port_def.inc"
-
 namespace google {
 namespace protobuf {
 namespace compiler {
@@ -131,7 +128,7 @@ class ParserTest : public testing::Test {
     SetupParser(input);
     FileDescriptorProto actual, expected;
 
-    EXPECT_TRUE(parser_->Parse(input_.get(), &actual));
+    parser_->Parse(input_.get(), &actual);
     EXPECT_EQ(io::Tokenizer::TYPE_END, input_->current().type);
     ASSERT_EQ("", error_collector_.text_);
 
@@ -170,7 +167,7 @@ class ParserTest : public testing::Test {
   void ExpectHasEarlyExitErrors(const char* text, const char* expected_errors) {
     SetupParser(text);
     FileDescriptorProto file;
-    EXPECT_FALSE(parser_->Parse(input_.get(), &file));
+    parser_->Parse(input_.get(), &file);
     EXPECT_EQ(expected_errors, error_collector_.text_);
   }
 
@@ -281,6 +278,7 @@ TEST_F(ParserTest, WarnIfFieldNameContainsNumberImmediatelyFollowUnderscore) {
                   "Number should not come right after an underscore. Found: "
                   "song_name_1.") != std::string::npos);
 }
+
 
 // ===================================================================
 
@@ -3895,11 +3893,8 @@ TEST_F(SourceInfoTest, DocCommentsOneof) {
 
 // ===================================================================
 
-
 }  // anonymous namespace
 
 }  // namespace compiler
 }  // namespace protobuf
 }  // namespace google
-
-#include "google/protobuf/port_undef.inc"

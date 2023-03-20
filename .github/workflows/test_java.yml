@@ -39,7 +39,7 @@ jobs:
         with:
           ref: ${{ inputs.safe-checkout }}
       - name: Run tests
-        uses: protocolbuffers/protobuf-ci/bazel-docker@v1
+        uses: ./.github/actions/bazel-docker
         with:
           image: ${{ matrix.image }}
           credentials: ${{ secrets.GAR_SERVICE_ACCOUNT }}
@@ -55,7 +55,7 @@ jobs:
         with:
           ref: ${{ inputs.safe-checkout }}
       - name: Build protoc
-        uses: protocolbuffers/protobuf-ci/bazel@v1
+        uses: ./.github/actions/bazel
         with:
           credentials: ${{ secrets.GAR_SERVICE_ACCOUNT }}
           bazel-cache: java_linux_linkage

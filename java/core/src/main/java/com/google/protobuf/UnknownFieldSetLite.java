@@ -113,9 +113,7 @@ public final class UnknownFieldSetLite {
    * <p>Future calls to methods that attempt to modify this object will throw.
    */
   public void makeImmutable() {
-    if (this.isMutable) {
-      this.isMutable = false;
-    }
+    this.isMutable = false;
   }
 
   /** Throws an {@link UnsupportedOperationException} if immutable. */

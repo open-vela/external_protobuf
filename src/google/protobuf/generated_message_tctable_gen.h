@@ -50,21 +50,15 @@ namespace google {
 namespace protobuf {
 namespace internal {
 
-namespace field_layout {
-enum TransformValidation : uint16_t;
-}  // namespace field_layout
-
 // Helper class for generating tailcall parsing functions.
 struct PROTOBUF_EXPORT TailCallTableInfo {
   struct PerFieldOptions {
-    // kTvEager, kTvLazy, or 0
-    field_layout::TransformValidation lazy_opt;
+    bool is_lazy;
     bool is_string_inlined;
     bool is_implicitly_weak;
     bool use_direct_tcparser_table;
     bool is_lite;
     bool should_split;
-    bool uses_codegen;
   };
   class OptionProvider {
    public:
@@ -109,12 +103,9 @@ struct PROTOBUF_EXPORT TailCallTableInfo {
     kSubMessage,
     kSubTable,
     kSubMessageWeak,
-    kMessageVerifyFunc,
     kEnumRange,
     kEnumValidator,
     kNumericOffset,
-    kMapAuxInfo,
-    kCreateInArena,
   };
   struct AuxEntry {
     AuxType type;
@@ -124,7 +115,6 @@ struct PROTOBUF_EXPORT TailCallTableInfo {
     };
     union {
       const FieldDescriptor* field;
-      const Descriptor* desc;
       uint32_t offset;
       EnumRange enum_range;
     };
