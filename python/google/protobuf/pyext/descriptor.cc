@@ -33,7 +33,6 @@
 #include "google/protobuf/pyext/descriptor.h"
 
 #include "absl/log/absl_check.h"
-#include "google/protobuf/descriptor_legacy.h"
 
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
@@ -693,9 +692,8 @@ static PyObject* EnumValueName(PyBaseDescriptor *self, PyObject *args) {
 }
 
 static PyObject* GetSyntax(PyBaseDescriptor *self, void *closure) {
-  std::string syntax(FileDescriptorLegacy::SyntaxName(
-      FileDescriptorLegacy(_GetDescriptor(self)->file()).syntax()));
-  return PyUnicode_InternFromString(syntax.c_str());
+  return PyUnicode_InternFromString(
+      FileDescriptor::SyntaxName(_GetDescriptor(self)->file()->syntax()));
 }
 
 static PyGetSetDef Getters[] = {
@@ -1514,9 +1512,8 @@ static int SetSerializedOptions(PyFileDescriptor *self, PyObject *value,
 }
 
 static PyObject* GetSyntax(PyFileDescriptor *self, void *closure) {
-  std::string syntax(FileDescriptorLegacy::SyntaxName(
-      FileDescriptorLegacy(_GetDescriptor(self)).syntax()));
-  return PyUnicode_InternFromString(syntax.c_str());
+  return PyUnicode_InternFromString(
+      FileDescriptor::SyntaxName(_GetDescriptor(self)->syntax()));
 }
 
 static PyObject* CopyToProto(PyFileDescriptor *self, PyObject *target) {
