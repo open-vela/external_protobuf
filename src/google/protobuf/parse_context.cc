@@ -319,19 +319,26 @@ const char* EpsCopyInputStream::InitFrom(io::ZeroCopyInputStream* zcis) {
 }
 
 const char* ParseContext::ReadSizeAndPushLimitAndDepth(const char* ptr,
-                                                       LimitToken* old_limit) {
-  return ReadSizeAndPushLimitAndDepthInlined(ptr, old_limit);
+                                                       int* old_limit) {
+  int size = ReadSize(&ptr);
+  if (PROTOBUF_PREDICT_FALSE(!ptr) || depth_ <= 0) {
+    *old_limit = 0;  // Make sure this isn't uninitialized even on error return
+    return nullptr;
+  }
+  *old_limit = PushLimit(ptr, size);
+  --depth_;
+  return ptr;
 }
 
 const char* ParseContext::ParseMessage(MessageLite* msg, const char* ptr) {
-  LimitToken old;
+  int old;
   ptr = ReadSizeAndPushLimitAndDepth(ptr, &old);
   if (ptr == nullptr) return ptr;
   auto old_depth = depth_;
   ptr = msg->_InternalParse(ptr, this);
   if (ptr != nullptr) ABSL_DCHECK_EQ(old_depth, depth_);
   depth_++;
-  if (!PopLimit(std::move(old))) return nullptr;
+  if (!PopLimit(old)) return nullptr;
   return ptr;
 }
 

@@ -133,7 +133,8 @@ struct ReflectionSchema {
   uint32_t GetObjectSize() const { return static_cast<uint32_t>(object_size_); }
 
   bool InRealOneof(const FieldDescriptor* field) const {
-    return field->real_containing_oneof();
+    return field->containing_oneof() &&
+           !field->containing_oneof()->is_synthetic();
   }
 
   // Offset of a non-oneof field.  Getting a field offset is slightly more

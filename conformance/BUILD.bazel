@@ -138,7 +138,6 @@ cc_library(
     includes = ["."],
     deps = [
         ":conformance_cc_proto",
-        "//src/google/protobuf:descriptor_legacy",
         "@com_google_absl//absl/strings",
         "@com_google_absl//absl/strings:str_format",
     ],

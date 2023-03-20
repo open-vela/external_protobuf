@@ -131,8 +131,7 @@ target_link_libraries(lite-test
 )
 
 add_test(NAME lite-test
-  COMMAND lite-test ${protobuf_GTEST_ARGS}
-  WORKING_DIRECTORY ${protobuf_SOURCE_DIR})
+  COMMAND lite-test ${protobuf_GTEST_ARGS})
 
 add_custom_target(full-test
   COMMAND tests
@@ -140,8 +139,7 @@ add_custom_target(full-test
   WORKING_DIRECTORY ${protobuf_SOURCE_DIR})
 
 add_test(NAME full-test
-  COMMAND tests ${protobuf_GTEST_ARGS}
-  WORKING_DIRECTORY ${protobuf_SOURCE_DIR})
+  COMMAND tests ${protobuf_GTEST_ARGS})
 
 # For test purposes, remove headers that should already be installed.  This
 # prevents accidental conflicts and also version skew (since local headers take
