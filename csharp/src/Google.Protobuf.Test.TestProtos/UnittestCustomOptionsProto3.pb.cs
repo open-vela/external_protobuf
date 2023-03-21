@@ -324,24 +324,10 @@ namespace UnitTest.Issues.TestProtos {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int OneofField {
-      get { return HasOneofField ? (int) anOneof_ : 0; }
+      get { return anOneofCase_ == AnOneofOneofCase.OneofField ? (int) anOneof_ : 0; }
       set {
         anOneof_ = value;
         anOneofCase_ = AnOneofOneofCase.OneofField;
-      }
-    }
-    /// <summary>Gets whether the "oneof_field" field is set</summary>
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public bool HasOneofField {
-      get { return anOneofCase_ == AnOneofOneofCase.OneofField; }
-    }
-    /// <summary> Clears the value of the oneof if it's currently set to "oneof_field" </summary>
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public void ClearOneofField() {
-      if (HasOneofField) {
-        ClearAnOneof();
       }
     }
 
@@ -391,7 +377,7 @@ namespace UnitTest.Issues.TestProtos {
     public override int GetHashCode() {
       int hash = 1;
       if (Field1.Length != 0) hash ^= Field1.GetHashCode();
-      if (HasOneofField) hash ^= OneofField.GetHashCode();
+      if (anOneofCase_ == AnOneofOneofCase.OneofField) hash ^= OneofField.GetHashCode();
       hash ^= (int) anOneofCase_;
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
@@ -415,7 +401,7 @@ namespace UnitTest.Issues.TestProtos {
         output.WriteRawTag(10);
         output.WriteString(Field1);
       }
-      if (HasOneofField) {
+      if (anOneofCase_ == AnOneofOneofCase.OneofField) {
         output.WriteRawTag(16);
         output.WriteInt32(OneofField);
       }
@@ -433,7 +419,7 @@ namespace UnitTest.Issues.TestProtos {
         output.WriteRawTag(10);
         output.WriteString(Field1);
       }
-      if (HasOneofField) {
+      if (anOneofCase_ == AnOneofOneofCase.OneofField) {
         output.WriteRawTag(16);
         output.WriteInt32(OneofField);
       }
@@ -450,7 +436,7 @@ namespace UnitTest.Issues.TestProtos {
       if (Field1.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(Field1);
       }
-      if (HasOneofField) {
+      if (anOneofCase_ == AnOneofOneofCase.OneofField) {
         size += 1 + pb::CodedOutputStream.ComputeInt32Size(OneofField);
       }
       if (_unknownFields != null) {

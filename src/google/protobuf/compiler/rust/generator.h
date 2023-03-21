@@ -33,6 +33,7 @@
 
 #include <string>
 
+#include "absl/log/absl_check.h"
 #include "google/protobuf/compiler/code_generator.h"
 
 // Must be included last.
@@ -43,8 +44,7 @@ namespace protobuf {
 namespace compiler {
 namespace rust {
 
-class PROTOC_EXPORT RustGenerator final
-    : public google::protobuf::compiler::CodeGenerator {
+class RustGenerator final : public google::protobuf::compiler::CodeGenerator {
  public:
   RustGenerator() = default;
   RustGenerator(const RustGenerator&) = delete;
@@ -53,7 +53,10 @@ class PROTOC_EXPORT RustGenerator final
 
   bool Generate(const FileDescriptor* file, const std::string& parameter,
                 GeneratorContext* generator_context,
-                std::string* error) const override;
+                std::string* error) const override {
+    ABSL_CHECK(false) << "not yet implemented";
+    return false;
+  }
 
   uint64_t GetSupportedFeatures() const override {
     return FEATURE_PROTO3_OPTIONAL;

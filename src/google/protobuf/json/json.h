@@ -56,6 +56,9 @@ struct ParseOptions {
   // this option. If your enum needs to support different casing, consider using
   // allow_alias instead.
   bool case_insensitive_enum_parsing = false;
+
+  ParseOptions()
+      : ignore_unknown_fields(false), case_insensitive_enum_parsing(false) {}
 };
 
 struct PrintOptions {
@@ -72,9 +75,12 @@ struct PrintOptions {
   bool always_print_enums_as_ints = false;
   // Whether to preserve proto field names
   bool preserve_proto_field_names = false;
-  // If set, int64 values that can be represented exactly as a double are
-  // printed without quotes.
-  bool unquote_int64_if_possible = false;
+
+  PrintOptions()
+      : add_whitespace(false),
+        always_print_primitive_fields(false),
+        always_print_enums_as_ints(false),
+        preserve_proto_field_names(false) {}
 };
 
 // Converts from protobuf message to JSON and appends it to |output|. This is a
