@@ -71,7 +71,6 @@
 #include "google/protobuf/any.h"
 #include "google/protobuf/descriptor.pb.h"
 #include "google/protobuf/descriptor_database.h"
-#include "google/protobuf/descriptor_legacy.h"
 #include "google/protobuf/dynamic_message.h"
 #include "google/protobuf/generated_message_util.h"
 #include "google/protobuf/io/strtod.h"
@@ -1821,35 +1820,6 @@ const SourceCodeInfo_Location* FileDescriptorTables::GetSourceLocation(
 
 DescriptorPool::ErrorCollector::~ErrorCollector() {}
 
-absl::string_view DescriptorPool::ErrorCollector::ErrorLocationName(
-    ErrorLocation location) {
-  switch (location) {
-    case NAME:
-      return "NAME";
-    case NUMBER:
-      return "NUMBER";
-    case TYPE:
-      return "TYPE";
-    case EXTENDEE:
-      return "EXTENDEE";
-    case DEFAULT_VALUE:
-      return "DEFAULT_VALUE";
-    case OPTION_NAME:
-      return "OPTION_NAME";
-    case OPTION_VALUE:
-      return "OPTION_VALUE";
-    case INPUT_TYPE:
-      return "INPUT_TYPE";
-    case OUTPUT_TYPE:
-      return "OUTPUT_TYPE";
-    case IMPORT:
-      return "IMPORT";
-    case OTHER:
-      return "OTHER";
-  }
-  return "UNKNOWN";
-}
-
 DescriptorPool::DescriptorPool()
     : mutex_(nullptr),
       fallback_database_(nullptr),
@@ -3551,11 +3521,6 @@ bool FieldDescriptor::is_packed() const {
   }
 }
 
-bool FieldDescriptor::requires_utf8_validation() const {
-  return type() == TYPE_STRING &&
-         file()->syntax() == FileDescriptor::SYNTAX_PROTO3;
-}
-
 bool Descriptor::GetSourceLocation(SourceLocation* out_location) const {
   std::vector<int> path;
   GetLocationPath(&path);
@@ -3972,7 +3937,6 @@ class DescriptorBuilder {
   void SuggestFieldNumbers(FileDescriptor* file,
                            const FileDescriptorProto& proto);
 
-
   // Must be run only after cross-linking.
   void InterpretOptions();
 
@@ -4146,14 +4110,6 @@ class DescriptorBuilder {
                                 const EnumValueDescriptorProto& proto);
   void ValidateExtensionRangeOptions(
       const std::string& full_name, Descriptor::ExtensionRange* extension_range,
-      const DescriptorProto_ExtensionRange& proto);
-  void ValidateExtensionMetadata(
-      const std::string& full_name,
-      const Descriptor::ExtensionRange& extension_range,
-      const DescriptorProto_ExtensionRange& proto);
-  void ValidateExtensionDeclaration(
-      const std::string& full_name,
-      const Descriptor::ExtensionRange& extension_range,
       const DescriptorProto_ExtensionRange& proto);
   void ValidateServiceOptions(ServiceDescriptor* service,
                               const ServiceDescriptorProto& proto);
@@ -4909,11 +4865,10 @@ PROTOBUF_NOINLINE static bool ExistingFileMatchesProto(
   existing_file->CopyTo(&existing_proto);
   // TODO(liujisi): Remove it when CopyTo supports copying syntax params when
   // syntax="proto2".
-  if (FileDescriptorLegacy(existing_file).syntax() ==
-          FileDescriptorLegacy::Syntax::SYNTAX_PROTO2 &&
+  if (existing_file->syntax() == FileDescriptor::SYNTAX_PROTO2 &&
       proto.has_syntax()) {
-    existing_proto.set_syntax(FileDescriptorLegacy::SyntaxName(
-        FileDescriptorLegacy(existing_file).syntax()));
+    existing_proto.set_syntax(
+        existing_file->SyntaxName(existing_file->syntax()));
   }
 
   return existing_proto.SerializeAsString() == proto.SerializeAsString();
@@ -5030,7 +4985,7 @@ static void PlanAllocationSize(const FileDescriptorProto& proto,
   alloc.PlanArray<FileDescriptor>(1);
   alloc.PlanArray<FileDescriptorTables>(1);
   alloc.PlanArray<std::string>(2
-  );    // name + package
+  );  // name + package
   if (proto.has_options()) alloc.PlanArray<FileOptions>(1);
   if (proto.has_source_code_info()) alloc.PlanArray<SourceCodeInfo>(1);
 
@@ -5420,8 +5375,6 @@ struct IncrementWhenDestroyed {
 
 }  // namespace
 
-
-
 void DescriptorBuilder::BuildMessage(const DescriptorProto& proto,
                                      const Descriptor* parent,
                                      Descriptor* result,
@@ -5519,6 +5472,7 @@ void DescriptorBuilder::BuildMessage(const DescriptorProto& proto,
                                 name));
     }
   }
+
 
   // Check that fields aren't using reserved names or numbers and that they
   // aren't using extension numbers.
@@ -6507,7 +6461,6 @@ void DescriptorBuilder::CrossLinkExtensionRange(
 }
 
 
-
 void DescriptorBuilder::CrossLinkField(FieldDescriptor* field,
                                        const FieldDescriptorProto& proto) {
   if (field->options_ == nullptr) {
@@ -7192,7 +7145,6 @@ void DescriptorBuilder::ValidateEnumValueOptions(
     const EnumValueDescriptorProto& /* proto */) {
   // Nothing to do so far.
 }
-
 
 void DescriptorBuilder::ValidateExtensionRangeOptions(
     const std::string& full_name, Descriptor::ExtensionRange* extension_range,
@@ -8460,11 +8412,22 @@ void LazyDescriptor::Once(const ServiceDescriptor* service) {
 
 namespace cpp {
 bool HasPreservingUnknownEnumSemantics(const FieldDescriptor* field) {
-  return !field->legacy_enum_field_treated_as_closed();
+  return field->file()->syntax() == FileDescriptor::SYNTAX_PROTO3;
 }
 
 bool HasHasbit(const FieldDescriptor* field) {
-  return field->has_presence() && !field->real_containing_oneof() &&
+  // This predicate includes proto3 message fields only if they have "optional".
+  //   Foo submsg1 = 1;           // HasHasbit() == false
+  //   optional Foo submsg2 = 2;  // HasHasbit() == true
+  // This is slightly odd, as adding "optional" to a singular proto3 field does
+  // not change the semantics or API. However whenever any field in a message
+  // has a hasbit, it forces reflection to include hasbit offsets for *all*
+  // fields, even if almost all of them are set to -1 (no hasbit). So to avoid
+  // causing a sudden size regression for ~all proto3 messages, we give proto3
+  // message fields a hasbit only if "optional" is present. If the user is
+  // explicitly writing "optional", it is likely they are writing it on
+  // primitive fields also.
+  return (field->has_optional_keyword() || field->is_required()) &&
          !field->options().weak();
 }
 
@@ -8478,8 +8441,7 @@ static bool FileUtf8Verification(const FileDescriptor* file) {
 
 // Which level of UTF-8 enforcemant is placed on this file.
 Utf8CheckMode GetUtf8CheckMode(const FieldDescriptor* field, bool is_lite) {
-  if (FileDescriptorLegacy(field->file()).syntax() ==
-          FileDescriptorLegacy::Syntax::SYNTAX_PROTO3 &&
+  if (field->file()->syntax() == FileDescriptor::SYNTAX_PROTO3 &&
       FieldEnforceUtf8(field)) {
     return Utf8CheckMode::kStrict;
   } else if (!is_lite && FileUtf8Verification(field->file())) {

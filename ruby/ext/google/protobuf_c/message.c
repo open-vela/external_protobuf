@@ -53,8 +53,6 @@ VALUE MessageOrEnum_GetDescriptor(VALUE klass) {
 // -----------------------------------------------------------------------------
 
 typedef struct {
-  // IMPORTANT: WB_PROTECTED objects must only use the RB_OBJ_WRITE()
-  // macro to update VALUE references, as to trigger write barriers.
   VALUE arena;
   const upb_Message* msg;  // Can get as mutable when non-frozen.
   const upb_MessageDef*
@@ -67,9 +65,9 @@ static void Message_mark(void* _self) {
 }
 
 static rb_data_type_t Message_type = {
-    "Google::Protobuf::Message",
+    "Message",
     {Message_mark, RUBY_DEFAULT_FREE, NULL},
-    .flags = RUBY_TYPED_FREE_IMMEDIATELY | RUBY_TYPED_WB_PROTECTED,
+    .flags = RUBY_TYPED_FREE_IMMEDIATELY,
 };
 
 static Message* ruby_to_Message(VALUE msg_rb) {
@@ -107,7 +105,7 @@ upb_Message* Message_GetMutable(VALUE msg_rb, const upb_MessageDef** m) {
 void Message_InitPtr(VALUE self_, upb_Message* msg, VALUE arena) {
   Message* self = ruby_to_Message(self_);
   self->msg = msg;
-  RB_OBJ_WRITE(self_, &self->arena, arena);
+  self->arena = arena;
   ObjectCache_Add(msg, self_);
 }
 
@@ -1163,12 +1161,6 @@ static VALUE Message_encode_json(int argc, VALUE* argv, VALUE klass) {
     if (RTEST(rb_hash_lookup2(hash_args, ID2SYM(rb_intern("emit_defaults")),
                               Qfalse))) {
       options |= upb_JsonEncode_EmitDefaults;
-    }
-
-    if (RTEST(rb_hash_lookup2(hash_args,
-                              ID2SYM(rb_intern("format_enums_as_integers")),
-                              Qfalse))) {
-      options |= upb_JsonEncode_FormatEnumsAsIntegers;
     }
   }
 
