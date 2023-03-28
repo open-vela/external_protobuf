@@ -37,7 +37,7 @@ jobs:
         with:
           ref: ${{ inputs.safe-checkout }}
       - name: Run tests
-        uses: ./.github/actions/bazel-docker
+        uses: protocolbuffers/protobuf-ci/bazel-docker@v1
         with:
           image: ${{ matrix.image || format('us-docker.pkg.dev/protobuf-build/containers/test/linux/python:{0}-508417e5215994ade7585d28ba3aad681a25fa5d', matrix.version) }}
           credentials: ${{ secrets.GAR_SERVICE_ACCOUNT }}
@@ -65,7 +65,6 @@ jobs:
       - name: Checkout pending changes
         uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
         with:
-          submodules: recursive
           ref: ${{ inputs.safe-checkout }}
 
       - name: Pin Python version
@@ -83,7 +82,7 @@ jobs:
           source venv/bin/activate
 
       - name: Run tests
-        uses: ./.github/actions/bazel
+        uses: protocolbuffers/protobuf-ci/bazel@v1
         env:
           KOKORO_PYTHON_VERSION: ${{ matrix.version }}
         with:

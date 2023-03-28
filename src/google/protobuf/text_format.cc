@@ -48,6 +48,7 @@
 
 #include "absl/container/btree_set.h"
 #include "absl/strings/ascii.h"
+#include "absl/strings/cord.h"
 #include "absl/strings/escaping.h"
 #include "absl/strings/numbers.h"
 #include "absl/strings/str_cat.h"
@@ -62,8 +63,10 @@
 #include "google/protobuf/io/tokenizer.h"
 #include "google/protobuf/io/zero_copy_stream.h"
 #include "google/protobuf/io/zero_copy_stream_impl.h"
+#include "google/protobuf/io/zero_copy_stream_impl_lite.h"
 #include "google/protobuf/map_field.h"
 #include "google/protobuf/message.h"
+#include "google/protobuf/reflection_mode.h"
 #include "google/protobuf/repeated_field.h"
 #include "google/protobuf/unknown_field_set.h"
 #include "google/protobuf/wire_format_lite.h"
@@ -73,6 +76,9 @@
 
 namespace google {
 namespace protobuf {
+
+using internal::ReflectionMode;
+using internal::ScopedReflectionMode;
 
 namespace {
 
@@ -103,6 +109,8 @@ PROTOBUF_EXPORT std::atomic<bool> enable_debug_text_format_marker;
 }  // namespace internal
 
 std::string Message::DebugString() const {
+  // Indicate all scoped reflection calls are from DebugString function.
+  ScopedReflectionMode scope(ReflectionMode::kDebugString);
   std::string debug_string;
 
   TextFormat::Printer printer;
@@ -122,6 +130,8 @@ std::string Message::DebugString() const {
 }
 
 std::string Message::ShortDebugString() const {
+  // Indicate all scoped reflection calls are from DebugString function.
+  ScopedReflectionMode scope(ReflectionMode::kDebugString);
   std::string debug_string;
 
   TextFormat::Printer printer;
@@ -146,6 +156,8 @@ std::string Message::ShortDebugString() const {
 }
 
 std::string Message::Utf8DebugString() const {
+  // Indicate all scoped reflection calls are from DebugString function.
+  ScopedReflectionMode scope(ReflectionMode::kDebugString);
   std::string debug_string;
 
   TextFormat::Printer printer;
@@ -171,6 +183,9 @@ namespace internal {
 
 void PerformAbslStringify(const Message& message,
                           absl::FunctionRef<void(absl::string_view)> append) {
+  // Indicate all scoped reflection calls are from DebugString function.
+  ScopedReflectionMode scope(ReflectionMode::kDebugString);
+
   // TODO(b/249835002): consider using the single line version for short
   TextFormat::Printer printer;
   printer.SetExpandAny(true);
@@ -305,7 +320,8 @@ class TextFormat::Parser::ParserImpl {
              bool allow_case_insensitive_field, bool allow_unknown_field,
              bool allow_unknown_extension, bool allow_unknown_enum,
              bool allow_field_number, bool allow_relaxed_whitespace,
-             bool allow_partial, int recursion_limit)
+             bool allow_partial, int recursion_limit,
+             bool error_on_no_op_fields)
       : error_collector_(error_collector),
         finder_(finder),
         parse_info_tree_(parse_info_tree),
@@ -322,7 +338,8 @@ class TextFormat::Parser::ParserImpl {
         initial_recursion_limit_(recursion_limit),
         recursion_limit_(recursion_limit),
         had_silent_marker_(false),
-        had_errors_(false) {
+        had_errors_(false),
+        error_on_no_op_fields_(error_on_no_op_fields) {
     // For backwards-compatibility with proto1, we need to allow the 'f' suffix
     // for floats.
     tokenizer_.set_allow_f_after_float(true);
@@ -802,60 +819,71 @@ class TextFormat::Parser::ParserImpl {
 // Define an easy to use macro for setting fields. This macro checks
 // to see if the field is repeated (in which case we need to use the Add
 // methods or not (in which case we need to use the Set methods).
-#define SET_FIELD(CPPTYPE, VALUE)                    \
-  if (field->is_repeated()) {                        \
-    reflection->Add##CPPTYPE(message, field, VALUE); \
-  } else {                                           \
-    reflection->Set##CPPTYPE(message, field, VALUE); \
+// When checking for no-op operations, We verify that both the existing value in
+// the message and the new value are the default. If the existing field value is
+// not the default, setting it to the default should not be treated as a no-op.
+#define SET_FIELD(CPPTYPE, CPPTYPELCASE, VALUE)                   \
+  if (field->is_repeated()) {                                     \
+    reflection->Add##CPPTYPE(message, field, VALUE);              \
+  } else {                                                        \
+    if (error_on_no_op_fields_ && !field->has_presence() &&       \
+        field->default_value_##CPPTYPELCASE() ==                  \
+            reflection->Get##CPPTYPE(*message, field) &&          \
+        field->default_value_##CPPTYPELCASE() == VALUE) {         \
+      ReportError("Input field " + field->full_name() +           \
+                  " did not change resulting proto.");            \
+    } else {                                                      \
+      reflection->Set##CPPTYPE(message, field, std::move(VALUE)); \
+    }                                                             \
   }
 
     switch (field->cpp_type()) {
       case FieldDescriptor::CPPTYPE_INT32: {
         int64_t value;
         DO(ConsumeSignedInteger(&value, kint32max));
-        SET_FIELD(Int32, static_cast<int32_t>(value));
+        SET_FIELD(Int32, int32, static_cast<int32_t>(value));
         break;
       }
 
       case FieldDescriptor::CPPTYPE_UINT32: {
         uint64_t value;
         DO(ConsumeUnsignedInteger(&value, kuint32max));
-        SET_FIELD(UInt32, static_cast<uint32_t>(value));
+        SET_FIELD(UInt32, uint32, static_cast<uint32_t>(value));
         break;
       }
 
       case FieldDescriptor::CPPTYPE_INT64: {
         int64_t value;
         DO(ConsumeSignedInteger(&value, kint64max));
-        SET_FIELD(Int64, value);
+        SET_FIELD(Int64, int64, value);
         break;
       }
 
       case FieldDescriptor::CPPTYPE_UINT64: {
         uint64_t value;
         DO(ConsumeUnsignedInteger(&value, kuint64max));
-        SET_FIELD(UInt64, value);
+        SET_FIELD(UInt64, uint64, value);
         break;
       }
 
       case FieldDescriptor::CPPTYPE_FLOAT: {
         double value;
         DO(ConsumeDouble(&value));
-        SET_FIELD(Float, io::SafeDoubleToFloat(value));
+        SET_FIELD(Float, float, io::SafeDoubleToFloat(value));
         break;
       }
 
       case FieldDescriptor::CPPTYPE_DOUBLE: {
         double value;
         DO(ConsumeDouble(&value));
-        SET_FIELD(Double, value);
+        SET_FIELD(Double, double, value);
         break;
       }
 
       case FieldDescriptor::CPPTYPE_STRING: {
         std::string value;
         DO(ConsumeString(&value));
-        SET_FIELD(String, std::move(value));
+        SET_FIELD(String, string, value);
         break;
       }
 
@@ -863,14 +891,14 @@ class TextFormat::Parser::ParserImpl {
         if (LookingAtType(io::Tokenizer::TYPE_INTEGER)) {
           uint64_t value;
           DO(ConsumeUnsignedInteger(&value, 1));
-          SET_FIELD(Bool, value);
+          SET_FIELD(Bool, bool, value);
         } else {
           std::string value;
           DO(ConsumeIdentifier(&value));
           if (value == "true" || value == "True" || value == "t") {
-            SET_FIELD(Bool, true);
+            SET_FIELD(Bool, bool, true);
           } else if (value == "false" || value == "False" || value == "f") {
-            SET_FIELD(Bool, false);
+            SET_FIELD(Bool, bool, false);
           } else {
             ReportError(absl::StrCat("Invalid value for boolean field \"",
                                      field->name(), "\". Value: \"", value,
@@ -905,8 +933,8 @@ class TextFormat::Parser::ParserImpl {
 
         if (enum_value == nullptr) {
           if (int_value != kint64max &&
-              reflection->SupportsUnknownEnumValues()) {
-            SET_FIELD(EnumValue, int_value);
+              !field->legacy_enum_field_treated_as_closed()) {
+            SET_FIELD(EnumValue, int64, int_value);
             return true;
           } else if (!allow_unknown_enum_) {
             ReportError(absl::StrCat("Unknown enumeration value of \"", value,
@@ -920,7 +948,7 @@ class TextFormat::Parser::ParserImpl {
           }
         }
 
-        SET_FIELD(Enum, enum_value);
+        SET_FIELD(Enum, enum, enum_value);
         break;
       }
 
@@ -1389,6 +1417,8 @@ class TextFormat::Parser::ParserImpl {
   int recursion_limit_;
   bool had_silent_marker_;
   bool had_errors_;
+  bool error_on_no_op_fields_;
+
 };
 
 // ===========================================================================
@@ -1657,8 +1687,8 @@ TextFormat::Parser::~Parser() {}
 
 namespace {
 
-bool CheckParseInputSize(absl::string_view input,
-                         io::ErrorCollector* error_collector) {
+template <typename T>
+bool CheckParseInputSize(T& input, io::ErrorCollector* error_collector) {
   if (input.size() > INT_MAX) {
     error_collector->RecordError(
         -1, 0,
@@ -1685,7 +1715,7 @@ bool TextFormat::Parser::Parse(io::ZeroCopyInputStream* input,
                     allow_case_insensitive_field_, allow_unknown_field_,
                     allow_unknown_extension_, allow_unknown_enum_,
                     allow_field_number_, allow_relaxed_whitespace_,
-                    allow_partial_, recursion_limit_);
+                    allow_partial_, recursion_limit_, error_on_no_op_fields_);
   return MergeUsingImpl(input, output, &parser);
 }
 
@@ -1696,6 +1726,13 @@ bool TextFormat::Parser::ParseFromString(absl::string_view input,
   return Parse(&input_stream, output);
 }
 
+bool TextFormat::Parser::ParseFromCord(const absl::Cord& input,
+                                       Message* output) {
+  DO(CheckParseInputSize(input, error_collector_));
+  io::CordInputStream input_stream(&input);
+  return Parse(&input_stream, output);
+}
+
 bool TextFormat::Parser::Merge(io::ZeroCopyInputStream* input,
                                Message* output) {
   ParserImpl parser(output->GetDescriptor(), input, error_collector_, finder_,
@@ -1703,7 +1740,7 @@ bool TextFormat::Parser::Merge(io::ZeroCopyInputStream* input,
                     allow_case_insensitive_field_, allow_unknown_field_,
                     allow_unknown_extension_, allow_unknown_enum_,
                     allow_field_number_, allow_relaxed_whitespace_,
-                    allow_partial_, recursion_limit_);
+                    allow_partial_, recursion_limit_, error_on_no_op_fields_);
   return MergeUsingImpl(input, output, &parser);
 }
 
@@ -1733,12 +1770,13 @@ bool TextFormat::Parser::ParseFieldValueFromString(const std::string& input,
                                                    const FieldDescriptor* field,
                                                    Message* output) {
   io::ArrayInputStream input_stream(input.data(), input.size());
-  ParserImpl parser(
-      output->GetDescriptor(), &input_stream, error_collector_, finder_,
-      parse_info_tree_, ParserImpl::ALLOW_SINGULAR_OVERWRITES,
-      allow_case_insensitive_field_, allow_unknown_field_,
-      allow_unknown_extension_, allow_unknown_enum_, allow_field_number_,
-      allow_relaxed_whitespace_, allow_partial_, recursion_limit_);
+  ParserImpl parser(output->GetDescriptor(), &input_stream, error_collector_,
+                    finder_, parse_info_tree_,
+                    ParserImpl::ALLOW_SINGULAR_OVERWRITES,
+                    allow_case_insensitive_field_, allow_unknown_field_,
+                    allow_unknown_extension_, allow_unknown_enum_,
+                    allow_field_number_, allow_relaxed_whitespace_,
+                    allow_partial_, recursion_limit_, error_on_no_op_fields_);
   return parser.ParseField(field, output);
 }
 
@@ -1755,6 +1793,11 @@ bool TextFormat::Parser::ParseFieldValueFromString(const std::string& input,
 /* static */ bool TextFormat::ParseFromString(absl::string_view input,
                                               Message* output) {
   return Parser().ParseFromString(input, output);
+}
+
+/* static */ bool TextFormat::ParseFromCord(const absl::Cord& input,
+                                            Message* output) {
+  return Parser().ParseFromCord(input, output);
 }
 
 /* static */ bool TextFormat::MergeFromString(absl::string_view input,
@@ -2686,18 +2729,23 @@ void TextFormat::Printer::PrintFieldValue(const Message& message,
   return Parser().ParseFieldValueFromString(input, field, message);
 }
 
+template <typename... T>
+PROTOBUF_NOINLINE void TextFormat::OutOfLinePrintString(
+    BaseTextGenerator* generator, const T&... values) {
+  generator->PrintString(absl::StrCat(values...));
+}
+
 void TextFormat::Printer::PrintUnknownFields(
     const UnknownFieldSet& unknown_fields, BaseTextGenerator* generator,
     int recursion_budget) const {
   for (int i = 0; i < unknown_fields.field_count(); i++) {
     const UnknownField& field = unknown_fields.field(i);
-    std::string field_number = absl::StrCat(field.number());
 
     switch (field.type()) {
       case UnknownField::TYPE_VARINT:
-        generator->PrintString(field_number);
+        OutOfLinePrintString(generator, field.number());
         generator->PrintMaybeWithMarker(MarkerToken(), ": ");
-        generator->PrintString(absl::StrCat(field.varint()));
+        OutOfLinePrintString(generator, field.varint());
         if (single_line_mode_) {
           generator->PrintLiteral(" ");
         } else {
@@ -2705,10 +2753,10 @@ void TextFormat::Printer::PrintUnknownFields(
         }
         break;
       case UnknownField::TYPE_FIXED32: {
-        generator->PrintString(field_number);
+        OutOfLinePrintString(generator, field.number());
         generator->PrintMaybeWithMarker(MarkerToken(), ": ", "0x");
-        generator->PrintString(
-            absl::StrCat(absl::Hex(field.fixed32(), absl::kZeroPad8)));
+        OutOfLinePrintString(generator,
+                             absl::Hex(field.fixed32(), absl::kZeroPad8));
         if (single_line_mode_) {
           generator->PrintLiteral(" ");
         } else {
@@ -2717,10 +2765,10 @@ void TextFormat::Printer::PrintUnknownFields(
         break;
       }
       case UnknownField::TYPE_FIXED64: {
-        generator->PrintString(field_number);
+        OutOfLinePrintString(generator, field.number());
         generator->PrintMaybeWithMarker(MarkerToken(), ": ", "0x");
-        generator->PrintString(
-            absl::StrCat(absl::Hex(field.fixed64(), absl::kZeroPad16)));
+        OutOfLinePrintString(generator,
+                             absl::Hex(field.fixed64(), absl::kZeroPad16));
         if (single_line_mode_) {
           generator->PrintLiteral(" ");
         } else {
@@ -2729,7 +2777,7 @@ void TextFormat::Printer::PrintUnknownFields(
         break;
       }
       case UnknownField::TYPE_LENGTH_DELIMITED: {
-        generator->PrintString(field_number);
+        OutOfLinePrintString(generator, field.number());
         const std::string& value = field.length_delimited();
         // We create a CodedInputStream so that we can adhere to our recursion
         // budget when we attempt to parse the data. UnknownFieldSet parsing is
@@ -2770,7 +2818,7 @@ void TextFormat::Printer::PrintUnknownFields(
         break;
       }
       case UnknownField::TYPE_GROUP:
-        generator->PrintString(field_number);
+        OutOfLinePrintString(generator, field.number());
         if (single_line_mode_) {
           generator->PrintMaybeWithMarker(MarkerToken(), " ", "{ ");
         } else {
