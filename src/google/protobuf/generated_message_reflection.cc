@@ -50,6 +50,7 @@
 #include "absl/synchronization/mutex.h"
 #include "google/protobuf/descriptor.h"
 #include "google/protobuf/descriptor.pb.h"
+#include "google/protobuf/descriptor_legacy.h"
 #include "google/protobuf/extension_set.h"
 #include "google/protobuf/generated_message_tctable_gen.h"
 #include "google/protobuf/generated_message_tctable_impl.h"
@@ -402,8 +403,20 @@ size_t Reflection::SpaceUsedLong(const Message& message) const {
           break;
 
         case FieldDescriptor::CPPTYPE_STRING: {
-          switch (field->options().ctype()) {
-            default:  // TODO(kenton):  Support other string reps.
+          switch (internal::cpp::EffectiveStringCType(field)) {
+            case FieldOptions::CORD:
+              if (schema_.InRealOneof(field)) {
+                total_size += GetField<absl::Cord*>(message, field)
+                                  ->EstimatedMemoryUsage();
+
+              } else {
+                // sizeof(absl::Cord) is included to self.
+                total_size += GetField<absl::Cord>(message, field)
+                                  .EstimatedMemoryUsage() -
+                              sizeof(absl::Cord);
+              }
+              break;
+            default:
             case FieldOptions::STRING:
               if (IsInlined(field)) {
                 const std::string* ptr =
@@ -500,7 +513,10 @@ struct OneofFieldMover {
           to->SetString(from->GetString());
           break;
         }
-        switch (field->options().ctype()) {
+        switch (internal::cpp::EffectiveStringCType(field)) {
+          case FieldOptions::CORD:
+            to->SetCord(from->GetCord());
+            break;
           default:
           case FieldOptions::STRING: {
             to->SetArenaStringPtr(from->GetArenaStringPtr());
@@ -634,7 +650,12 @@ template <bool unsafe_shallow_swap>
 void SwapFieldHelper::SwapStringField(const Reflection* r, Message* lhs,
                                       Message* rhs,
                                       const FieldDescriptor* field) {
-  switch (field->options().ctype()) {
+  switch (internal::cpp::EffectiveStringCType(field)) {
+    case FieldOptions::CORD:
+      // Always shallow swap for Cord.
+      std::swap(*r->MutableRaw<absl::Cord>(lhs, field),
+                *r->MutableRaw<absl::Cord>(rhs, field));
+      break;
     default:
     case FieldOptions::STRING: {
       if (r->IsInlined(field)) {
@@ -890,6 +911,7 @@ void Reflection::SwapOneofField(Message* lhs, Message* rhs,
     LOCAL_VAR_ACCESSOR(int, enum, Enum);
     LOCAL_VAR_ACCESSOR(Message*, message, Message);
     LOCAL_VAR_ACCESSOR(ArenaStringPtr, arena_string_ptr, ArenaStringPtr);
+    LOCAL_VAR_ACCESSOR(absl::Cord*, cord, Cord);
     const std::string& GetString() const { return string_val; }
     void SetString(const std::string& v) { string_val = v; }
     Message* UnsafeGetMessage() const { return GetMessage(); }
@@ -907,6 +929,7 @@ void Reflection::SwapOneofField(Message* lhs, Message* rhs,
       int type_enum;
       Message* type_message;
       internal::ArenaStringPtr type_arena_string_ptr;
+      absl::Cord* type_cord;
     } oneof_val;
 
     // std::string cannot be in union.
@@ -930,6 +953,7 @@ void Reflection::SwapOneofField(Message* lhs, Message* rhs,
     MESSAGE_FIELD_ACCESSOR(bool, bool, Bool);
     MESSAGE_FIELD_ACCESSOR(int, enum, Enum);
     MESSAGE_FIELD_ACCESSOR(ArenaStringPtr, arena_string_ptr, ArenaStringPtr);
+    MESSAGE_FIELD_ACCESSOR(absl::Cord*, cord, Cord);
     std::string GetString() const {
       return reflection->GetString(*message, field);
     }
@@ -957,7 +981,7 @@ void Reflection::SwapOneofField(Message* lhs, Message* rhs,
     const FieldDescriptor* field;
   };
 
-  ABSL_DCHECK(!oneof_descriptor->is_synthetic());
+  ABSL_DCHECK(!OneofDescriptorLegacy(oneof_descriptor).is_synthetic());
   uint32_t oneof_case_lhs = GetOneofCase(*lhs, oneof_descriptor);
   uint32_t oneof_case_rhs = GetOneofCase(*rhs, oneof_descriptor);
 
@@ -1181,7 +1205,7 @@ void Reflection::InternalSwap(Message* lhs, Message* rhs) const {
   const int oneof_decl_count = descriptor_->oneof_decl_count();
   for (int i = 0; i < oneof_decl_count; i++) {
     const OneofDescriptor* oneof = descriptor_->oneof_decl(i);
-    if (!oneof->is_synthetic()) {
+    if (!OneofDescriptorLegacy(oneof).is_synthetic()) {
       SwapOneofField<true>(lhs, rhs, oneof);
     }
   }
@@ -1320,8 +1344,16 @@ void Reflection::ClearField(Message* message,
           break;
 
         case FieldDescriptor::CPPTYPE_STRING: {
-          switch (field->options().ctype()) {
-            default:  // TODO(kenton):  Support other string reps.
+          switch (internal::cpp::EffectiveStringCType(field)) {
+            case FieldOptions::CORD:
+              if (field->has_default_value()) {
+                *MutableRaw<absl::Cord>(message, field) =
+                    field->default_value_string();
+              } else {
+                MutableRaw<absl::Cord>(message, field)->Clear();
+              }
+              break;
+            default:
             case FieldOptions::STRING:
               if (IsInlined(field)) {
                 // Currently, string with default value can't be inlined. So we
@@ -1540,10 +1572,6 @@ bool IsIndexInHasBitSet(const uint32_t* has_bit_set, uint32_t has_bit_index) {
           static_cast<uint32_t>(1)) != 0;
 }
 
-bool CreateUnknownEnumValues(const FileDescriptor* file) {
-  return file->syntax() == FileDescriptor::SYNTAX_PROTO3;
-}
-
 void CheckInOrder(const FieldDescriptor* field, uint32_t* last) {
   *last = *last <= static_cast<uint32_t>(field->number())
               ? static_cast<uint32_t>(field->number())
@@ -1555,7 +1583,7 @@ void CheckInOrder(const FieldDescriptor* field, uint32_t* last) {
 namespace internal {
 bool CreateUnknownEnumValues(const FieldDescriptor* field) {
   bool open_enum = false;
-  return field->file()->syntax() == FileDescriptor::SYNTAX_PROTO3 || open_enum;
+  return !field->legacy_enum_field_treated_as_closed() || open_enum;
 }
 }  // namespace internal
 using internal::CreateUnknownEnumValues;
@@ -1721,8 +1749,14 @@ std::string Reflection::GetString(const Message& message,
     if (schema_.InRealOneof(field) && !HasOneofField(message, field)) {
       return field->default_value_string();
     }
-    switch (field->options().ctype()) {
-      default:  // TODO(kenton):  Support other string reps.
+    switch (internal::cpp::EffectiveStringCType(field)) {
+      case FieldOptions::CORD:
+        if (schema_.InRealOneof(field)) {
+          return std::string(*GetField<absl::Cord*>(message, field));
+        } else {
+          return std::string(GetField<absl::Cord>(message, field));
+        }
+      default:
       case FieldOptions::STRING:
         if (IsInlined(field)) {
           return GetField<InlinedStringField>(message, field).GetNoArena();
@@ -1746,8 +1780,16 @@ const std::string& Reflection::GetStringReference(const Message& message,
     if (schema_.InRealOneof(field) && !HasOneofField(message, field)) {
       return field->default_value_string();
     }
-    switch (field->options().ctype()) {
-      default:  // TODO(kenton):  Support other string reps.
+    switch (internal::cpp::EffectiveStringCType(field)) {
+      case FieldOptions::CORD:
+        if (schema_.InRealOneof(field)) {
+          absl::CopyCordToString(*GetField<absl::Cord*>(message, field),
+                                 scratch);
+        } else {
+          absl::CopyCordToString(GetField<absl::Cord>(message, field), scratch);
+        }
+        return *scratch;
+      default:
       case FieldOptions::STRING:
         if (IsInlined(field)) {
           return GetField<InlinedStringField>(message, field).GetNoArena();
@@ -1759,6 +1801,40 @@ const std::string& Reflection::GetStringReference(const Message& message,
   }
 }
 
+absl::Cord Reflection::GetCord(const Message& message,
+                               const FieldDescriptor* field) const {
+  USAGE_CHECK_ALL(GetCord, SINGULAR, STRING);
+  if (field->is_extension()) {
+    return absl::Cord(GetExtensionSet(message).GetString(
+        field->number(), field->default_value_string()));
+  } else {
+    if (schema_.InRealOneof(field) && !HasOneofField(message, field)) {
+      return absl::Cord(field->default_value_string());
+    }
+    switch (internal::cpp::EffectiveStringCType(field)) {
+      case FieldOptions::CORD:
+        if (schema_.InRealOneof(field)) {
+          return *GetField<absl::Cord*>(message, field);
+        } else {
+          return GetField<absl::Cord>(message, field);
+        }
+      default:
+      case FieldOptions::STRING:
+        if (IsInlined(field)) {
+          return absl::Cord(
+              GetField<InlinedStringField>(message, field).GetNoArena());
+        } else {
+          const auto& str = GetField<ArenaStringPtr>(message, field);
+          return absl::Cord(str.IsDefault() ? field->default_value_string()
+                                            : str.Get());
+        }
+    }
+
+    ABSL_LOG(FATAL) << "Can't get here.";
+    return absl::Cord();  // Make compiler happy.
+  }
+}
+
 
 void Reflection::SetString(Message* message, const FieldDescriptor* field,
                            std::string value) const {
@@ -1767,8 +1843,20 @@ void Reflection::SetString(Message* message, const FieldDescriptor* field,
     return MutableExtensionSet(message)->SetString(
         field->number(), field->type(), std::move(value), field);
   } else {
-    switch (field->options().ctype()) {
-      default:  // TODO(kenton):  Support other string reps.
+    switch (internal::cpp::EffectiveStringCType(field)) {
+      case FieldOptions::CORD:
+        if (schema_.InRealOneof(field)) {
+          if (!HasOneofField(*message, field)) {
+            ClearOneof(message, field->containing_oneof());
+            *MutableField<absl::Cord*>(message, field) =
+                Arena::Create<absl::Cord>(message->GetArenaForAllocation());
+          }
+          *(*MutableField<absl::Cord*>(message, field)) = value;
+          break;
+        }
+        *MutableField<absl::Cord>(message, field) = value;
+        break;
+      default:
       case FieldOptions::STRING: {
         if (IsInlined(field)) {
           const uint32_t index = schema_.InlinedStringIndex(field);
@@ -1799,6 +1887,56 @@ void Reflection::SetString(Message* message, const FieldDescriptor* field,
   }
 }
 
+void Reflection::SetString(Message* message, const FieldDescriptor* field,
+                           const absl::Cord& value) const {
+  USAGE_CHECK_ALL(SetString, SINGULAR, STRING);
+  if (field->is_extension()) {
+    return absl::CopyCordToString(value,
+                                  MutableExtensionSet(message)->MutableString(
+                                      field->number(), field->type(), field));
+  } else {
+    switch (internal::cpp::EffectiveStringCType(field)) {
+      case FieldOptions::CORD:
+        if (schema_.InRealOneof(field)) {
+          if (!HasOneofField(*message, field)) {
+            ClearOneof(message, field->containing_oneof());
+            *MutableField<absl::Cord*>(message, field) =
+                Arena::Create<absl::Cord>(message->GetArenaForAllocation());
+          }
+          *(*MutableField<absl::Cord*>(message, field)) = value;
+        } else {
+          *MutableField<absl::Cord>(message, field) = value;
+        }
+        break;
+      default:
+      case FieldOptions::STRING: {
+        // Oneof string fields are never set as a default instance.
+        // We just need to pass some arbitrary default string to make it work.
+        // This allows us to not have the real default accessible from
+        // reflection.
+        if (schema_.InRealOneof(field) && !HasOneofField(*message, field)) {
+          ClearOneof(message, field->containing_oneof());
+          MutableField<ArenaStringPtr>(message, field)->InitDefault();
+        }
+        if (IsInlined(field)) {
+          auto* str = MutableField<InlinedStringField>(message, field);
+          const uint32_t index = schema_.InlinedStringIndex(field);
+          ABSL_DCHECK_GT(index, 0);
+          uint32_t* states =
+              &MutableInlinedStringDonatedArray(message)[index / 32];
+          uint32_t mask = ~(static_cast<uint32_t>(1) << (index % 32));
+          str->Set(std::string(value), message->GetArenaForAllocation(),
+                   IsInlinedStringDonated(*message, field), states, mask,
+                   message);
+        } else {
+          auto* str = MutableField<ArenaStringPtr>(message, field);
+          str->Set(std::string(value), message->GetArenaForAllocation());
+        }
+        break;
+      }
+    }
+  }
+}
 
 std::string Reflection::GetRepeatedString(const Message& message,
                                           const FieldDescriptor* field,
@@ -2402,7 +2540,7 @@ const void* Reflection::GetRawRepeatedField(const Message& message,
 
 const FieldDescriptor* Reflection::GetOneofFieldDescriptor(
     const Message& message, const OneofDescriptor* oneof_descriptor) const {
-  if (oneof_descriptor->is_synthetic()) {
+  if (OneofDescriptorLegacy(oneof_descriptor).is_synthetic()) {
     const FieldDescriptor* field = oneof_descriptor->field(0);
     return HasField(message, field) ? field : nullptr;
   }
@@ -2485,7 +2623,8 @@ const FieldDescriptor* Reflection::FindKnownExtensionByNumber(
 }
 
 bool Reflection::SupportsUnknownEnumValues() const {
-  return CreateUnknownEnumValues(descriptor_->file());
+  return FileDescriptorLegacy(descriptor_->file()).syntax() ==
+         FileDescriptorLegacy::Syntax::SYNTAX_PROTO3;
 }
 
 // ===================================================================
@@ -2551,9 +2690,16 @@ uint32_t* Reflection::MutableHasBits(Message* message) const {
   return GetPointerAtOffset<uint32_t>(message, schema_.HasBitsOffset());
 }
 
+uint32_t Reflection::GetOneofCase(
+    const Message& message, const OneofDescriptor* oneof_descriptor) const {
+  ABSL_DCHECK(!OneofDescriptorLegacy(oneof_descriptor).is_synthetic());
+  return internal::GetConstRefAtOffset<uint32_t>(
+      message, schema_.GetOneofCaseOffset(oneof_descriptor));
+}
+
 uint32_t* Reflection::MutableOneofCase(
     Message* message, const OneofDescriptor* oneof_descriptor) const {
-  ABSL_DCHECK(!oneof_descriptor->is_synthetic());
+  ABSL_DCHECK(!OneofDescriptorLegacy(oneof_descriptor).is_synthetic());
   return GetPointerAtOffset<uint32_t>(
       message, schema_.GetOneofCaseOffset(oneof_descriptor));
 }
@@ -2665,8 +2811,11 @@ bool Reflection::HasBit(const Message& message,
     // (which uses HasField()) needs to be consistent with this.
     switch (field->cpp_type()) {
       case FieldDescriptor::CPPTYPE_STRING:
-        switch (field->options().ctype()) {
-          default: {
+        switch (internal::cpp::EffectiveStringCType(field)) {
+          case FieldOptions::CORD:
+            return !GetField<const absl::Cord>(message, field).empty();
+          default:
+          case FieldOptions::STRING: {
             if (IsInlined(field)) {
               return !GetField<InlinedStringField>(message, field)
                           .GetNoArena()
@@ -2744,7 +2893,7 @@ void Reflection::SwapBit(Message* message1, Message* message2,
 
 bool Reflection::HasOneof(const Message& message,
                           const OneofDescriptor* oneof_descriptor) const {
-  if (oneof_descriptor->is_synthetic()) {
+  if (OneofDescriptorLegacy(oneof_descriptor).is_synthetic()) {
     return HasField(message, oneof_descriptor->field(0));
   }
   return (GetOneofCase(message, oneof_descriptor) > 0);
@@ -2764,7 +2913,7 @@ void Reflection::ClearOneofField(Message* message,
 
 void Reflection::ClearOneof(Message* message,
                             const OneofDescriptor* oneof_descriptor) const {
-  if (oneof_descriptor->is_synthetic()) {
+  if (OneofDescriptorLegacy(oneof_descriptor).is_synthetic()) {
     ClearField(message, oneof_descriptor->field(0));
     return;
   }
@@ -2777,8 +2926,11 @@ void Reflection::ClearOneof(Message* message,
     if (message->GetArenaForAllocation() == nullptr) {
       switch (field->cpp_type()) {
         case FieldDescriptor::CPPTYPE_STRING: {
-          switch (field->options().ctype()) {
-            default:  // TODO(kenton):  Support other string reps.
+          switch (internal::cpp::EffectiveStringCType(field)) {
+            case FieldOptions::CORD:
+              delete *MutableRaw<absl::Cord*>(message, field);
+              break;
+            default:
             case FieldOptions::STRING: {
               // Oneof string fields are never set as a default instance.
               // We just need to pass some arbitrary default string to make it
@@ -2957,124 +3109,16 @@ static uint32_t AlignTo(uint32_t v) {
 }
 
 static internal::TailCallParseFunc GetFastParseFunction(
-    absl::string_view name) {
-  // This list must be synchronized with TcParser.
-  // Missing entries are replaced with MiniParse in opt mode to avoid runtime
-  // failures. It check-fails in debug mode.
+    const internal::TailCallTableInfo::FastFieldInfo& field_info) {
+#define PROTOBUF_TC_PARSE_FUNCTION_X(value) \
+  {"::_pbi::TcParser::" #value, internal::TcParser::value},
   static const auto* const map =
       new absl::flat_hash_map<absl::string_view, internal::TailCallParseFunc>{
-          {"::_pbi::TcParser::FastF32S1", internal::TcParser::FastF32S1},
-          {"::_pbi::TcParser::FastF32S2", internal::TcParser::FastF32S2},
-          {"::_pbi::TcParser::FastF32R1", internal::TcParser::FastF32R1},
-          {"::_pbi::TcParser::FastF32R2", internal::TcParser::FastF32R2},
-          {"::_pbi::TcParser::FastF32P1", internal::TcParser::FastF32P1},
-          {"::_pbi::TcParser::FastF32P2", internal::TcParser::FastF32P2},
-          {"::_pbi::TcParser::FastF64S1", internal::TcParser::FastF64S1},
-          {"::_pbi::TcParser::FastF64S2", internal::TcParser::FastF64S2},
-          {"::_pbi::TcParser::FastF64R1", internal::TcParser::FastF64R1},
-          {"::_pbi::TcParser::FastF64R2", internal::TcParser::FastF64R2},
-          {"::_pbi::TcParser::FastF64P1", internal::TcParser::FastF64P1},
-          {"::_pbi::TcParser::FastF64P2", internal::TcParser::FastF64P2},
-          {"::_pbi::TcParser::FastV8S1", internal::TcParser::FastV8S1},
-          {"::_pbi::TcParser::FastV8S2", internal::TcParser::FastV8S2},
-          {"::_pbi::TcParser::FastV8R1", internal::TcParser::FastV8R1},
-          {"::_pbi::TcParser::FastV8R2", internal::TcParser::FastV8R2},
-          {"::_pbi::TcParser::FastV8P1", internal::TcParser::FastV8P1},
-          {"::_pbi::TcParser::FastV8P2", internal::TcParser::FastV8P2},
-          {"::_pbi::TcParser::FastV32S1", internal::TcParser::FastV32S1},
-          {"::_pbi::TcParser::FastV32S2", internal::TcParser::FastV32S2},
-          {"::_pbi::TcParser::FastV32R1", internal::TcParser::FastV32R1},
-          {"::_pbi::TcParser::FastV32R2", internal::TcParser::FastV32R2},
-          {"::_pbi::TcParser::FastV32P1", internal::TcParser::FastV32P1},
-          {"::_pbi::TcParser::FastV32P2", internal::TcParser::FastV32P2},
-          {"::_pbi::TcParser::FastV64S1", internal::TcParser::FastV64S1},
-          {"::_pbi::TcParser::FastV64S2", internal::TcParser::FastV64S2},
-          {"::_pbi::TcParser::FastV64R1", internal::TcParser::FastV64R1},
-          {"::_pbi::TcParser::FastV64R2", internal::TcParser::FastV64R2},
-          {"::_pbi::TcParser::FastV64P1", internal::TcParser::FastV64P1},
-          {"::_pbi::TcParser::FastV64P2", internal::TcParser::FastV64P2},
-          {"::_pbi::TcParser::FastZ32S1", internal::TcParser::FastZ32S1},
-          {"::_pbi::TcParser::FastZ32S2", internal::TcParser::FastZ32S2},
-          {"::_pbi::TcParser::FastZ32R1", internal::TcParser::FastZ32R1},
-          {"::_pbi::TcParser::FastZ32R2", internal::TcParser::FastZ32R2},
-          {"::_pbi::TcParser::FastZ32P1", internal::TcParser::FastZ32P1},
-          {"::_pbi::TcParser::FastZ32P2", internal::TcParser::FastZ32P2},
-          {"::_pbi::TcParser::FastZ64S1", internal::TcParser::FastZ64S1},
-          {"::_pbi::TcParser::FastZ64S2", internal::TcParser::FastZ64S2},
-          {"::_pbi::TcParser::FastZ64R1", internal::TcParser::FastZ64R1},
-          {"::_pbi::TcParser::FastZ64R2", internal::TcParser::FastZ64R2},
-          {"::_pbi::TcParser::FastZ64P1", internal::TcParser::FastZ64P1},
-          {"::_pbi::TcParser::FastZ64P2", internal::TcParser::FastZ64P2},
-          {"::_pbi::TcParser::FastErS1", internal::TcParser::FastErS1},
-          {"::_pbi::TcParser::FastErS2", internal::TcParser::FastErS2},
-          {"::_pbi::TcParser::FastErR1", internal::TcParser::FastErR1},
-          {"::_pbi::TcParser::FastErR2", internal::TcParser::FastErR2},
-          {"::_pbi::TcParser::FastErP1", internal::TcParser::FastErP1},
-          {"::_pbi::TcParser::FastErP2", internal::TcParser::FastErP2},
-          {"::_pbi::TcParser::FastEr0S1", internal::TcParser::FastEr0S1},
-          {"::_pbi::TcParser::FastEr0S2", internal::TcParser::FastEr0S2},
-          {"::_pbi::TcParser::FastEr0R1", internal::TcParser::FastEr0R1},
-          {"::_pbi::TcParser::FastEr0R2", internal::TcParser::FastEr0R2},
-          {"::_pbi::TcParser::FastEr0P1", internal::TcParser::FastEr0P1},
-          {"::_pbi::TcParser::FastEr0P2", internal::TcParser::FastEr0P2},
-          {"::_pbi::TcParser::FastEr1S1", internal::TcParser::FastEr1S1},
-          {"::_pbi::TcParser::FastEr1S2", internal::TcParser::FastEr1S2},
-          {"::_pbi::TcParser::FastEr1R1", internal::TcParser::FastEr1R1},
-          {"::_pbi::TcParser::FastEr1R2", internal::TcParser::FastEr1R2},
-          {"::_pbi::TcParser::FastEr1P1", internal::TcParser::FastEr1P1},
-          {"::_pbi::TcParser::FastEr1P2", internal::TcParser::FastEr1P2},
-          {"::_pbi::TcParser::FastEvS1", internal::TcParser::FastEvS1},
-          {"::_pbi::TcParser::FastEvS2", internal::TcParser::FastEvS2},
-          {"::_pbi::TcParser::FastEvR1", internal::TcParser::FastEvR1},
-          {"::_pbi::TcParser::FastEvR2", internal::TcParser::FastEvR2},
-          {"::_pbi::TcParser::FastEvP1", internal::TcParser::FastEvP1},
-          {"::_pbi::TcParser::FastEvP2", internal::TcParser::FastEvP2},
-          {"::_pbi::TcParser::FastBS1", internal::TcParser::FastBS1},
-          {"::_pbi::TcParser::FastBS2", internal::TcParser::FastBS2},
-          {"::_pbi::TcParser::FastBR1", internal::TcParser::FastBR1},
-          {"::_pbi::TcParser::FastBR2", internal::TcParser::FastBR2},
-          {"::_pbi::TcParser::FastSS1", internal::TcParser::FastSS1},
-          {"::_pbi::TcParser::FastSS2", internal::TcParser::FastSS2},
-          {"::_pbi::TcParser::FastSR1", internal::TcParser::FastSR1},
-          {"::_pbi::TcParser::FastSR2", internal::TcParser::FastSR2},
-          {"::_pbi::TcParser::FastUS1", internal::TcParser::FastUS1},
-          {"::_pbi::TcParser::FastUS2", internal::TcParser::FastUS2},
-          {"::_pbi::TcParser::FastUR1", internal::TcParser::FastUR1},
-          {"::_pbi::TcParser::FastUR2", internal::TcParser::FastUR2},
-          {"::_pbi::TcParser::FastBiS1", internal::TcParser::FastBiS1},
-          {"::_pbi::TcParser::FastBiS2", internal::TcParser::FastBiS2},
-          {"::_pbi::TcParser::FastSiS1", internal::TcParser::FastSiS1},
-          {"::_pbi::TcParser::FastSiS2", internal::TcParser::FastSiS2},
-          {"::_pbi::TcParser::FastUiS1", internal::TcParser::FastUiS1},
-          {"::_pbi::TcParser::FastUiS2", internal::TcParser::FastUiS2},
-          {"::_pbi::TcParser::FastBcS1", internal::TcParser::FastBcS1},
-          {"::_pbi::TcParser::FastBcS2", internal::TcParser::FastBcS2},
-          {"::_pbi::TcParser::FastScS1", internal::TcParser::FastScS1},
-          {"::_pbi::TcParser::FastScS2", internal::TcParser::FastScS2},
-          {"::_pbi::TcParser::FastUcS1", internal::TcParser::FastUcS1},
-          {"::_pbi::TcParser::FastUcS2", internal::TcParser::FastUcS2},
-          {"::_pbi::TcParser::FastMdS1", internal::TcParser::FastMdS1},
-          {"::_pbi::TcParser::FastMdS2", internal::TcParser::FastMdS2},
-          {"::_pbi::TcParser::FastGdS1", internal::TcParser::FastGdS1},
-          {"::_pbi::TcParser::FastGdS2", internal::TcParser::FastGdS2},
-          {"::_pbi::TcParser::FastMtS1", internal::TcParser::FastMtS1},
-          {"::_pbi::TcParser::FastMtS2", internal::TcParser::FastMtS2},
-          {"::_pbi::TcParser::FastGtS1", internal::TcParser::FastGtS1},
-          {"::_pbi::TcParser::FastGtS2", internal::TcParser::FastGtS2},
-          {"::_pbi::TcParser::FastMdR1", internal::TcParser::FastMdR1},
-          {"::_pbi::TcParser::FastMdR2", internal::TcParser::FastMdR2},
-          {"::_pbi::TcParser::FastGdR1", internal::TcParser::FastGdR1},
-          {"::_pbi::TcParser::FastGdR2", internal::TcParser::FastGdR2},
-          {"::_pbi::TcParser::FastMtR1", internal::TcParser::FastMtR1},
-          {"::_pbi::TcParser::FastMtR2", internal::TcParser::FastMtR2},
-          {"::_pbi::TcParser::FastGtR1", internal::TcParser::FastGtR1},
-          {"::_pbi::TcParser::FastGtR2", internal::TcParser::FastGtR2},
-          {"::_pbi::TcParser::FastEndG1", internal::TcParser::FastEndG1},
-          {"::_pbi::TcParser::FastEndG2", internal::TcParser::FastEndG2},
-      };
-  auto it = map->find(name);
+          PROTOBUF_TC_PARSE_FUNCTION_LIST};
+#undef PROTOBUF_TC_PARSE_FUNCTION_X
+  auto it = map->find(field_info.func_name);
   if (it == map->end()) {
-    ABSL_DLOG(FATAL) << "Failed to find function: " << name;
+    ABSL_DLOG(FATAL) << "Failed to find function: " << field_info.func_name;
     // Let's not crash in opt, just in case.
     // MiniParse is always a valid parser.
     return &internal::TcParser::MiniParse;
@@ -3082,7 +3126,7 @@ static internal::TailCallParseFunc GetFastParseFunction(
   return it->second;
 }
 
-const internal::TcParseTableBase* Reflection::CreateTcParseTableForMessageSet()
+const internal::TcParseTableBase* Reflection::CreateTcParseTableReflectionOnly()
     const {
   // ParseLoop can't parse message set wire format.
   // Create a dummy table that only exists to make TcParser::ParseLoop jump
@@ -3092,9 +3136,9 @@ const internal::TcParseTableBase* Reflection::CreateTcParseTableForMessageSet()
   // We use `operator new` here because the destruction will be done with
   // `operator delete` unconditionally.
   void* p = ::operator new(sizeof(Table));
-  auto* full_table = ::new (p) Table{
-      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, schema_.default_instance_, nullptr},
-      {{{&internal::TcParser::ReflectionParseLoop, {}}}}};
+  auto* full_table = ::new (p)
+      Table{{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, schema_.default_instance_, nullptr},
+            {{{&internal::TcParser::ReflectionParseLoop, {}}}}};
   ABSL_DCHECK_EQ(static_cast<void*>(&full_table->header),
                  static_cast<void*>(full_table));
   return &full_table->header;
@@ -3110,7 +3154,7 @@ void Reflection::PopulateTcParseFastEntries(
         *fast_entries++ = {internal::TcParser::MiniParse, {}};
       } else {
         // No field, but still a special entry.
-        *fast_entries++ = {GetFastParseFunction(fast_field.func_name),
+        *fast_entries++ = {GetFastParseFunction(fast_field),
                            {fast_field.coded_tag, fast_field.nonfield_info}};
       }
     } else if (fast_field.func_name.find("TcParser::FastEv") !=
@@ -3121,7 +3165,7 @@ void Reflection::PopulateTcParseFastEntries(
       *fast_entries++ = {internal::TcParser::MiniParse, {}};
     } else {
       *fast_entries++ = {
-          GetFastParseFunction(fast_field.func_name),
+          GetFastParseFunction(fast_field),
           {fast_field.coded_tag, fast_field.hasbit_idx, fast_field.aux_idx,
            static_cast<uint16_t>(schema_.GetFieldOffset(fast_field.field))}};
     }
@@ -3148,13 +3192,10 @@ void Reflection::PopulateTcParseEntries(
     TcParseTableBase::FieldEntry* entries) const {
   for (const auto& entry : table_info.field_entries) {
     const FieldDescriptor* field = entry.field;
-    if (field->options().weak()) {
-      // Weak fields are handled by the generated fallback function.
-      // (These are handled by legacy Google-internal logic.)
-      *entries = {};
-    } else if (field->type() == field->TYPE_ENUM &&
-               table_info.aux_entries[entry.aux_idx].type ==
-                   internal::TailCallTableInfo::kEnumValidator) {
+    ABSL_CHECK(!field->options().weak());
+    if (field->type() == field->TYPE_ENUM &&
+        table_info.aux_entries[entry.aux_idx].type ==
+            internal::TailCallTableInfo::kEnumValidator) {
       // Mini parse can't handle it. Fallback to reflection.
       *entries = {};
       table_info.aux_entries[entry.aux_idx] = {};
@@ -3197,7 +3238,16 @@ void Reflection::PopulateTcParseFieldAux(
         break;
       case internal::TailCallTableInfo::kSubTable:
       case internal::TailCallTableInfo::kSubMessageWeak:
+      case internal::TailCallTableInfo::kCreateInArena:
+      case internal::TailCallTableInfo::kMessageVerifyFunc:
         ABSL_LOG(FATAL) << "Not supported";
+        break;
+      case internal::TailCallTableInfo::kMapAuxInfo:
+        // Default constructed info, which causes MpMap to call the fallback.
+        // DynamicMessage uses DynamicMapField, which uses variant keys and
+        // values. TcParser does not support them yet, so mark the field as
+        // unsupported to fallback to reflection.
+        field_aux++->map_info = internal::MapAuxInfo{};
         break;
       case internal::TailCallTableInfo::kSubMessage:
         field_aux++->message_default_p =
@@ -3221,7 +3271,13 @@ const internal::TcParseTableBase* Reflection::CreateTcParseTable() const {
   using TcParseTableBase = internal::TcParseTableBase;
 
   if (descriptor_->options().message_set_wire_format()) {
-    return CreateTcParseTableForMessageSet();
+    return CreateTcParseTableReflectionOnly();
+  }
+
+  for (int i = 0; i < descriptor_->field_count(); ++i) {
+    if (descriptor_->field(i)->options().weak()) {
+      return CreateTcParseTableReflectionOnly();
+    }
   }
 
   std::vector<const FieldDescriptor*> fields;
@@ -3251,18 +3307,28 @@ const internal::TcParseTableBase* Reflection::CreateTcParseTable() const {
     explicit ReflectionOptionProvider(const Reflection& ref) : ref_(ref) {}
     internal::TailCallTableInfo::PerFieldOptions GetForField(
         const FieldDescriptor* field) const final {
-      return {ref_.IsLazyField(field),  //
-              ref_.IsInlined(field),    //
+      const auto verify_flag = [&] {
+        if (ref_.IsEagerlyVerifiedLazyField(field))
+          return internal::field_layout::kTvEager;
+        if (ref_.IsLazilyVerifiedLazyField(field))
+          return internal::field_layout::kTvLazy;
+        return internal::field_layout::TransformValidation{};
+      };
+      return {
+          verify_flag(),          //
+          ref_.IsInlined(field),  //
 
-              // Only LITE can be implicitly weak.
-              /* is_implicitly_weak */ false,
+          // Only LITE can be implicitly weak.
+          /* is_implicitly_weak */ false,
 
-              // We could change this to use direct table.
-              // Might be easier to do when all messages support TDP.
-              /* use_direct_tcparser_table */ false,
+          // We could change this to use direct table.
+          // Might be easier to do when all messages support TDP.
+          /* use_direct_tcparser_table */ false,
 
-              /* is_lite */ false,  //
-              ref_.schema_.IsSplit(field)};
+          /* is_lite */ false,          //
+          ref_.schema_.IsSplit(field),  //
+          /* uses_codegen */ false      //
+      };
     }
 
    private:
@@ -3292,14 +3358,19 @@ const internal::TcParseTableBase* Reflection::CreateTcParseTable() const {
   void* p = ::operator new(byte_size);
   auto* res = ::new (p) TcParseTableBase{
       static_cast<uint16_t>(schema_.HasHasbits() ? schema_.HasBitsOffset() : 0),
-      // extensions handled through reflection.
-      0, 0, 0,
+      schema_.HasExtensionSet()
+          ? static_cast<uint16_t>(schema_.GetExtensionSetOffset())
+          : uint16_t{0},
       static_cast<uint32_t>(fields.empty() ? 0 : fields.back()->number()),
-      static_cast<uint8_t>((fast_entries_count - 1) << 3), lookup_table_offset,
-      table_info.num_to_entry_table.skipmap32, field_entry_offset,
+      static_cast<uint8_t>((fast_entries_count - 1) << 3),
+      lookup_table_offset,
+      table_info.num_to_entry_table.skipmap32,
+      field_entry_offset,
       static_cast<uint16_t>(fields.size()),
-      static_cast<uint16_t>(table_info.aux_entries.size()), aux_offset,
-      schema_.default_instance_, &internal::TcParser::ReflectionFallback};
+      static_cast<uint16_t>(table_info.aux_entries.size()),
+      aux_offset,
+      schema_.default_instance_,
+      &internal::TcParser::ReflectionFallback};
 
   // Now copy the rest of the payloads
   PopulateTcParseFastEntries(table_info, res->fast_entry(0));

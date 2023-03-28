@@ -211,9 +211,9 @@ bool IsLazy(const FieldDescriptor* field, const Options& options,
 
 // Returns true if "field" is a message field that is backed by LazyField per
 // profile (go/pdlazy).
-inline bool IsEagerlyVerifiedLazyByProfile(const FieldDescriptor* field,
-                                           const Options& options,
-                                           MessageSCCAnalyzer* scc_analyzer) {
+inline bool IsLazyByProfile(const FieldDescriptor* field,
+                            const Options& options,
+                            MessageSCCAnalyzer* scc_analyzer) {
   return false;
 }
 
@@ -978,7 +978,8 @@ bool HasRepeatedFields(const FileDescriptor* file) {
 static bool IsStringPieceField(const FieldDescriptor* field,
                                const Options& options) {
   return field->cpp_type() == FieldDescriptor::CPPTYPE_STRING &&
-         EffectiveStringCType(field, options) == FieldOptions::STRING_PIECE;
+         internal::cpp::EffectiveStringCType(field) ==
+             FieldOptions::STRING_PIECE;
 }
 
 static bool HasStringPieceFields(const Descriptor* descriptor,
@@ -1001,7 +1002,7 @@ bool HasStringPieceFields(const FileDescriptor* file, const Options& options) {
 
 static bool IsCordField(const FieldDescriptor* field, const Options& options) {
   return field->cpp_type() == FieldDescriptor::CPPTYPE_STRING &&
-         EffectiveStringCType(field, options) == FieldOptions::CORD;
+         internal::cpp::EffectiveStringCType(field) == FieldOptions::CORD;
 }
 
 static bool HasCordFields(const Descriptor* descriptor,
@@ -1092,10 +1093,6 @@ bool ShouldVerify(const FileDescriptor* file, const Options& options,
   return false;
 }
 
-bool IsUtf8String(const FieldDescriptor* field) {
-  return IsProto3(field->file()) &&
-         field->type() == FieldDescriptor::TYPE_STRING;
-}
 
 VerifySimpleType ShouldVerifySimple(const Descriptor* descriptor) {
   (void)descriptor;
@@ -1120,18 +1117,6 @@ bool IsStringOrMessage(const FieldDescriptor* field) {
 
   ABSL_LOG(FATAL) << "Can't get here.";
   return false;
-}
-
-FieldOptions::CType EffectiveStringCType(const FieldDescriptor* field,
-                                         const Options& options) {
-  ABSL_DCHECK(field->cpp_type() == FieldDescriptor::CPPTYPE_STRING);
-  if (options.opensource_runtime) {
-    // Open-source protobuf release only supports STRING ctype.
-    return FieldOptions::STRING;
-  } else {
-    // Google-internal supports all ctypes.
-    return field->options().ctype();
-  }
 }
 
 bool IsAnyMessage(const FileDescriptor* descriptor, const Options& options) {

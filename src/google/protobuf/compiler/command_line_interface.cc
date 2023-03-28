@@ -36,6 +36,8 @@
 
 #include "absl/container/btree_set.h"
 #include "absl/container/flat_hash_map.h"
+#include "google/protobuf/compiler/allowlists/allowlists.h"
+#include "google/protobuf/descriptor_legacy.h"
 
 #include "google/protobuf/stubs/platform_macros.h"
 
@@ -86,6 +88,7 @@
 #include "absl/strings/substitute.h"
 #include "google/protobuf/compiler/code_generator.h"
 #include "google/protobuf/compiler/importer.h"
+#include "google/protobuf/compiler/retention.h"
 #include "google/protobuf/compiler/zip_writer.h"
 #include "google/protobuf/descriptor.h"
 #include "google/protobuf/dynamic_message.h"
@@ -947,7 +950,7 @@ namespace {
 
 bool ContainsProto3Optional(const Descriptor* desc) {
   for (int i = 0; i < desc->field_count(); i++) {
-    if (desc->field(i)->has_optional_keyword()) {
+    if (FieldDescriptorLegacy(desc->field(i)).has_optional_keyword()) {
       return true;
     }
   }
@@ -960,7 +963,8 @@ bool ContainsProto3Optional(const Descriptor* desc) {
 }
 
 bool ContainsProto3Optional(const FileDescriptor* file) {
-  if (file->syntax() == FileDescriptor::SYNTAX_PROTO3) {
+  if (FileDescriptorLegacy(file).syntax() ==
+      FileDescriptorLegacy::Syntax::SYNTAX_PROTO3) {
     for (int i = 0; i < file->message_type_count(); i++) {
       if (ContainsProto3Optional(file->message_type(i))) {
         return true;
@@ -2631,12 +2635,10 @@ void CommandLineInterface::GetTransitiveDependencies(
 
   // Add this file.
   FileDescriptorProto* new_descriptor = output->Add();
-  file->CopyTo(new_descriptor);
+  *new_descriptor =
+      StripSourceRetentionOptions(*file, include_source_code_info);
   if (include_json_name) {
     file->CopyJsonNameTo(new_descriptor);
-  }
-  if (include_source_code_info) {
-    file->CopySourceCodeInfoTo(new_descriptor);
   }
 }
 
