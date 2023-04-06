@@ -328,9 +328,6 @@ class PROTOBUF_EXPORT WireFormatLite {
   static bool ReadBytes(io::CodedInputStream* input, std::string* value);
   static bool ReadBytes(io::CodedInputStream* input, std::string** p);
 
-  static inline bool ReadBytes(io::CodedInputStream* input, absl::Cord* value);
-  static inline bool ReadBytes(io::CodedInputStream* input, absl::Cord** p);
-
   enum Operation {
     PARSE = 0,
     SERIALIZE = 1,
@@ -712,9 +709,7 @@ class PROTOBUF_EXPORT WireFormatLite {
   static constexpr size_t kBoolSize = 1;
 
   static inline size_t StringSize(const std::string& value);
-  static inline size_t StringSize(const absl::Cord& value);
   static inline size_t BytesSize(const std::string& value);
-  static inline size_t BytesSize(const absl::Cord& value);
 
   template <typename MessageType>
   static inline size_t GroupSize(const MessageType& value);
@@ -1262,17 +1257,6 @@ bool WireFormatLite::ReadPackedPrimitiveNoInline(io::CodedInputStream* input,
   return ReadPackedPrimitive<CType, DeclaredType>(input, values);
 }
 
-inline bool WireFormatLite::ReadBytes(io::CodedInputStream* input,
-                                      absl::Cord* value) {
-  int length;
-  return input->ReadVarintSizeAsInt(&length) && input->ReadCord(value, length);
-}
-
-inline bool WireFormatLite::ReadBytes(io::CodedInputStream* input,
-                                      absl::Cord** p) {
-  return ReadBytes(input, *p);
-}
-
 
 template <typename MessageType>
 inline bool WireFormatLite::ReadGroup(int field_number,
@@ -1801,14 +1785,6 @@ inline size_t WireFormatLite::StringSize(const std::string& value) {
   return LengthDelimitedSize(value.size());
 }
 inline size_t WireFormatLite::BytesSize(const std::string& value) {
-  return LengthDelimitedSize(value.size());
-}
-
-inline size_t WireFormatLite::BytesSize(const absl::Cord& value) {
-  return LengthDelimitedSize(value.size());
-}
-
-inline size_t WireFormatLite::StringSize(const absl::Cord& value) {
   return LengthDelimitedSize(value.size());
 }
 

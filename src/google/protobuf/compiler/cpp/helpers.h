@@ -82,7 +82,7 @@ inline std::string DeprecatedAttribute(const Options& /* options */,
 
 inline std::string DeprecatedAttribute(const Options& /* options */,
                                        const EnumValueDescriptor* d) {
-  return d->options().deprecated() ? "PROTOBUF_DEPRECATED " : "";
+  return d->options().deprecated() ? "PROTOBUF_DEPRECATED_ENUM " : "";
 }
 
 // Commonly-used separator comments.  Thick is a line of '=', thin is a line
@@ -323,6 +323,11 @@ std::string SafeFunctionName(const Descriptor* descriptor,
                              const FieldDescriptor* field,
                              absl::string_view prefix);
 
+// Returns true if generated messages have public unknown fields accessors
+inline bool PublicUnknownFieldsAccessors(const Descriptor* message) {
+  return message->file()->syntax() != FileDescriptor::SYNTAX_PROTO3;
+}
+
 // Returns the optimize mode for <file>, respecting <options.enforce_lite>.
 FileOptions_OptimizeMode GetOptimizeFor(const FileDescriptor* file,
                                         const Options& options);
@@ -346,21 +351,25 @@ bool IsProfileDriven(const Options& options);
 
 bool IsStringInlined(const FieldDescriptor* descriptor, const Options& options);
 
+// For a string field, returns the effective ctype.  If the actual ctype is
+// not supported, returns the default of STRING.
+FieldOptions::CType EffectiveStringCType(const FieldDescriptor* field,
+                                         const Options& options);
+
 inline bool IsCord(const FieldDescriptor* field, const Options& options) {
   return field->cpp_type() == FieldDescriptor::CPPTYPE_STRING &&
-         internal::cpp::EffectiveStringCType(field) == FieldOptions::CORD;
+         EffectiveStringCType(field, options) == FieldOptions::CORD;
 }
 
 inline bool IsString(const FieldDescriptor* field, const Options& options) {
   return field->cpp_type() == FieldDescriptor::CPPTYPE_STRING &&
-         internal::cpp::EffectiveStringCType(field) == FieldOptions::STRING;
+         EffectiveStringCType(field, options) == FieldOptions::STRING;
 }
 
 inline bool IsStringPiece(const FieldDescriptor* field,
                           const Options& options) {
   return field->cpp_type() == FieldDescriptor::CPPTYPE_STRING &&
-         internal::cpp::EffectiveStringCType(field) ==
-             FieldOptions::STRING_PIECE;
+         EffectiveStringCType(field, options) == FieldOptions::STRING_PIECE;
 }
 
 // Does the given FileDescriptor use lazy fields?
@@ -460,6 +469,10 @@ bool IsStringOrMessage(const FieldDescriptor* field);
 
 std::string UnderscoresToCamelCase(absl::string_view input,
                                    bool cap_next_letter);
+
+inline bool IsProto3(const FileDescriptor* file) {
+  return file->syntax() == FileDescriptor::SYNTAX_PROTO3;
+}
 
 inline bool IsCrossFileMessage(const FieldDescriptor* field) {
   return field->type() == FieldDescriptor::TYPE_MESSAGE &&
@@ -1036,6 +1049,8 @@ enum class VerifySimpleType {
 
 // Returns VerifySimpleType if messages can be verified by predefined methods.
 VerifySimpleType ShouldVerifySimple(const Descriptor* descriptor);
+
+bool IsUtf8String(const FieldDescriptor* field);
 
 bool HasMessageFieldOrExtension(const Descriptor* desc);
 

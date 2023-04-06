@@ -339,8 +339,7 @@ public abstract class GeneratedMessageLite<
   }
 
   @Override
-  int getSerializedSize(
-          Schema schema) {
+  int getSerializedSize(Schema schema) {
     if (isMutable()) {
       // The serialized size should never be memoized for mutable instances.
       int size = computeSerializedSize(schema);
@@ -368,8 +367,7 @@ public abstract class GeneratedMessageLite<
     return getSerializedSize(null);
   }
 
-  private int computeSerializedSize(
-          Schema<?> nullableSchema) {
+  private int computeSerializedSize(Schema<?> nullableSchema) {
     if (nullableSchema == null) {
       return Protobuf.getInstance().schemaFor(this).getSerializedSize(this);
     } else {
