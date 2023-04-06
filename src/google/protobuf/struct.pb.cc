@@ -618,7 +618,7 @@ const char* Value::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
       // .google.protobuf.NullValue null_value = 1;
       case 1:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::uint8_t>(tag) == 8)) {
-          ::uint32_t val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+          ::int32_t val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
           _internal_set_null_value(static_cast<::PROTOBUF_NAMESPACE_ID::NullValue>(val));
         } else {
@@ -701,49 +701,46 @@ failure:
   ::uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // .google.protobuf.NullValue null_value = 1;
-  if (kind_case() == kNullValue) {
-    target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteEnumToArray(
-        1, this->_internal_null_value(), target);
+  switch (kind_case()) {
+    case kNullValue: {
+      target = stream->EnsureSpace(target);
+      target = ::_pbi::WireFormatLite::WriteEnumToArray(
+          1, this->_internal_null_value(), target);
+      break;
+    }
+    case kNumberValue: {
+      target = stream->EnsureSpace(target);
+      target = ::_pbi::WireFormatLite::WriteDoubleToArray(
+          2, this->_internal_number_value(), target);
+      break;
+    }
+    case kStringValue: {
+      const std::string& _s = this->_internal_string_value();
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+          _s.data(), static_cast<int>(_s.length()), ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE, "google.protobuf.Value.string_value");
+      target = stream->WriteStringMaybeAliased(3, _s, target);
+      break;
+    }
+    case kBoolValue: {
+      target = stream->EnsureSpace(target);
+      target = ::_pbi::WireFormatLite::WriteBoolToArray(
+          4, this->_internal_bool_value(), target);
+      break;
+    }
+    case kStructValue: {
+      target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+        InternalWriteMessage(5, _Internal::struct_value(this),
+          _Internal::struct_value(this).GetCachedSize(), target, stream);
+      break;
+    }
+    case kListValue: {
+      target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+        InternalWriteMessage(6, _Internal::list_value(this),
+          _Internal::list_value(this).GetCachedSize(), target, stream);
+      break;
+    }
+    default: ;
   }
-
-  // double number_value = 2;
-  if (kind_case() == kNumberValue) {
-    target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteDoubleToArray(
-        2, this->_internal_number_value(), target);
-  }
-
-  // string string_value = 3;
-  if (kind_case() == kStringValue) {
-    const std::string& _s = this->_internal_string_value();
-    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
-        _s.data(), static_cast<int>(_s.length()), ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE, "google.protobuf.Value.string_value");
-    target = stream->WriteStringMaybeAliased(3, _s, target);
-  }
-
-  // bool bool_value = 4;
-  if (kind_case() == kBoolValue) {
-    target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteBoolToArray(
-        4, this->_internal_bool_value(), target);
-  }
-
-  // .google.protobuf.Struct struct_value = 5;
-  if (kind_case() == kStructValue) {
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
-      InternalWriteMessage(5, _Internal::struct_value(this),
-        _Internal::struct_value(this).GetCachedSize(), target, stream);
-  }
-
-  // .google.protobuf.ListValue list_value = 6;
-  if (kind_case() == kListValue) {
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
-      InternalWriteMessage(6, _Internal::list_value(this),
-        _Internal::list_value(this).GetCachedSize(), target, stream);
-  }
-
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);

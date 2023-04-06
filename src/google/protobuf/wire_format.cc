@@ -411,10 +411,6 @@ bool WireFormat::ParseAndMergeMessageSetField(uint32_t field_number,
   }
 }
 
-static bool StrictUtf8Check(const FieldDescriptor* field) {
-  return field->file()->syntax() == FileDescriptor::SYNTAX_PROTO3;
-}
-
 bool WireFormat::ParseAndMergeField(
     uint32_t tag,
     const FieldDescriptor* field,  // May be nullptr for unknown
@@ -484,8 +480,7 @@ bool WireFormat::ParseAndMergeField(
           if (!WireFormatLite::ReadPrimitive<int, WireFormatLite::TYPE_ENUM>(
                   input, &value))
             return false;
-          if (message->GetDescriptor()->file()->syntax() ==
-              FileDescriptor::SYNTAX_PROTO3) {
+          if (!field->legacy_enum_field_treated_as_closed()) {
             message_reflection->AddEnumValue(message, field, value);
           } else {
             const EnumValueDescriptor* enum_value =
@@ -566,7 +561,7 @@ bool WireFormat::ParseAndMergeField(
 
       // Handle strings separately so that we can optimize the ctype=CORD case.
       case FieldDescriptor::TYPE_STRING: {
-        bool strict_utf8_check = StrictUtf8Check(field);
+        bool strict_utf8_check = field->requires_utf8_validation();
         std::string value;
         if (!WireFormatLite::ReadString(input, &value)) return false;
         if (strict_utf8_check) {
@@ -588,6 +583,12 @@ bool WireFormat::ParseAndMergeField(
       }
 
       case FieldDescriptor::TYPE_BYTES: {
+        if (internal::cpp::EffectiveStringCType(field) == FieldOptions::CORD) {
+          absl::Cord value;
+          if (!WireFormatLite::ReadBytes(input, &value)) return false;
+          message_reflection->SetString(message, field, value);
+          break;
+        }
         std::string value;
         if (!WireFormatLite::ReadBytes(input, &value)) return false;
         if (field->is_repeated()) {
@@ -868,13 +869,11 @@ const char* WireFormat::_InternalParseAndMergeField(
         case FieldDescriptor::TYPE_ENUM: {
           auto rep_enum =
               reflection->MutableRepeatedFieldInternal<int>(msg, field);
-          bool open_enum = false;
-          if (field->file()->syntax() == FileDescriptor::SYNTAX_PROTO3 ||
-              open_enum) {
+          if (!field->legacy_enum_field_treated_as_closed()) {
             ptr = internal::PackedEnumParser(rep_enum, ptr, ctx);
           } else {
             return ctx->ReadPackedVarint(
-                ptr, [rep_enum, field, reflection, msg](uint64_t val) {
+                ptr, [rep_enum, field, reflection, msg](int32_t val) {
                   if (field->enum_type()->FindValueByNumber(val) != nullptr) {
                     rep_enum->Add(val);
                   } else {
@@ -982,11 +981,18 @@ const char* WireFormat::_InternalParseAndMergeField(
     // Handle strings separately so that we can optimize the ctype=CORD case.
     case FieldDescriptor::TYPE_STRING:
       utf8_check = true;
-      strict_utf8_check = StrictUtf8Check(field);
+      strict_utf8_check = field->requires_utf8_validation();
       PROTOBUF_FALLTHROUGH_INTENDED;
     case FieldDescriptor::TYPE_BYTES: {
       int size = ReadSize(&ptr);
       if (ptr == nullptr) return nullptr;
+      if (internal::cpp::EffectiveStringCType(field) == FieldOptions::CORD) {
+        absl::Cord value;
+        ptr = ctx->ReadCord(ptr, size, &value);
+        if (ptr == nullptr) return nullptr;
+        reflection->SetString(msg, field, value);
+        return ptr;
+      }
       std::string value;
       ptr = ctx->ReadString(ptr, size, &value);
       if (ptr == nullptr) return nullptr;
@@ -1418,7 +1424,7 @@ uint8_t* WireFormat::InternalSerializeField(const FieldDescriptor* field,
       // Handle strings separately so that we can get string references
       // instead of copying.
       case FieldDescriptor::TYPE_STRING: {
-        bool strict_utf8_check = StrictUtf8Check(field);
+        bool strict_utf8_check = field->requires_utf8_validation();
         std::string scratch;
         const std::string& value =
             field->is_repeated()
@@ -1439,6 +1445,11 @@ uint8_t* WireFormat::InternalSerializeField(const FieldDescriptor* field,
       }
 
       case FieldDescriptor::TYPE_BYTES: {
+        if (internal::cpp::EffectiveStringCType(field) == FieldOptions::CORD) {
+          absl::Cord value = message_reflection->GetCord(message, field);
+          target = stream->WriteString(field->number(), value, target);
+          break;
+        }
         std::string scratch;
         const std::string& value =
             field->is_repeated()
@@ -1466,11 +1477,11 @@ uint8_t* WireFormat::InternalSerializeMessageSetItem(
   // Write type ID.
   target = WireFormatLite::WriteUInt32ToArray(
       WireFormatLite::kMessageSetTypeIdNumber, field->number(), target);
-  // Write message.
-  auto& msg = message_reflection->GetMessage(message, field);
-  target = WireFormatLite::InternalWriteMessage(
-      WireFormatLite::kMessageSetMessageNumber, msg, msg.GetCachedSize(),
-      target, stream);
+    // Write message.
+    auto& msg = message_reflection->GetMessage(message, field);
+    target = WireFormatLite::InternalWriteMessage(
+        WireFormatLite::kMessageSetMessageNumber, msg, msg.GetCachedSize(),
+        target, stream);
   // End group.
   target = stream->EnsureSpace(target);
   target = io::CodedOutputStream::WriteTagToArray(
@@ -1735,6 +1746,13 @@ size_t WireFormat::FieldDataOnlyByteSize(const FieldDescriptor* field,
     // instead of copying.
     case FieldDescriptor::TYPE_STRING:
     case FieldDescriptor::TYPE_BYTES: {
+      if (internal::cpp::EffectiveStringCType(field) == FieldOptions::CORD) {
+        for (size_t j = 0; j < count; j++) {
+          absl::Cord value = message_reflection->GetCord(message, field);
+          data_size += WireFormatLite::StringSize(value);
+        }
+        break;
+      }
       for (size_t j = 0; j < count; j++) {
         std::string scratch;
         const std::string& value =
