@@ -1294,11 +1294,20 @@ public final class TextFormat {
       return consumeByteString().toStringUtf8();
     }
 
+    /** If the next token is a string, consume it and return true. Otherwise, return false. */
+    boolean tryConsumeString() {
+      try {
+        consumeString();
+        return true;
+      } catch (ParseException e) {
+        return false;
+      }
+    }
+
     /**
      * If the next token is a string, consume it, unescape it as a {@link ByteString}, and return
      * it. Otherwise, throw a {@link ParseException}.
      */
-    @CanIgnoreReturnValue
     ByteString consumeByteString() throws ParseException {
       List<ByteString> list = new ArrayList<ByteString>();
       consumeByteString(list);
@@ -1306,16 +1315,6 @@ public final class TextFormat {
         consumeByteString(list);
       }
       return ByteString.copyFrom(list);
-    }
-
-    /** If the next token is a string, consume it and return true. Otherwise, return false. */
-    boolean tryConsumeByteString() {
-      try {
-        consumeByteString();
-        return true;
-      } catch (ParseException e) {
-        return false;
-      }
     }
 
     /**
@@ -2283,8 +2282,11 @@ public final class TextFormat {
 
     /** Skips a field value. */
     private void skipFieldValue(Tokenizer tokenizer) throws ParseException {
-      if (!tokenizer.tryConsumeByteString()
-          && !tokenizer.tryConsumeIdentifier() // includes enum & boolean
+      if (tokenizer.tryConsumeString()) {
+        while (tokenizer.tryConsumeString()) {}
+        return;
+      }
+      if (!tokenizer.tryConsumeIdentifier() // includes enum & boolean
           && !tokenizer.tryConsumeInt64() // includes int32
           && !tokenizer.tryConsumeUInt64() // includes uint32
           && !tokenizer.tryConsumeDouble()

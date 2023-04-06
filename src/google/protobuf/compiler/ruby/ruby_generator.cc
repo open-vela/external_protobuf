@@ -39,7 +39,6 @@
 #include "google/protobuf/compiler/plugin.h"
 #include "google/protobuf/descriptor.h"
 #include "google/protobuf/descriptor.pb.h"
-#include "google/protobuf/descriptor_legacy.h"
 #include "google/protobuf/io/printer.h"
 #include "google/protobuf/io/zero_copy_stream.h"
 
@@ -80,8 +79,8 @@ std::string GetOutputFilename(absl::string_view proto_file) {
 }
 
 std::string LabelForField(const FieldDescriptor* field) {
-  if (FieldDescriptorLegacy(field).has_optional_keyword() &&
-      field->containing_oneof() != nullptr) {
+  if (field->has_optional_keyword() &&
+      field->file()->syntax() == FileDescriptor::SYNTAX_PROTO3) {
     return "proto3_optional";
   }
   switch (field->label()) {
@@ -116,13 +115,13 @@ std::string TypeName(const FieldDescriptor* field) {
   }
 }
 
-std::string StringifySyntax(FileDescriptorLegacy::Syntax syntax) {
+std::string StringifySyntax(FileDescriptor::Syntax syntax) {
   switch (syntax) {
-    case FileDescriptorLegacy::Syntax::SYNTAX_PROTO2:
+    case FileDescriptor::SYNTAX_PROTO2:
       return "proto2";
-    case FileDescriptorLegacy::Syntax::SYNTAX_PROTO3:
+    case FileDescriptor::SYNTAX_PROTO3:
       return "proto3";
-    case FileDescriptorLegacy::Syntax::SYNTAX_UNKNOWN:
+    case FileDescriptor::SYNTAX_UNKNOWN:
     default:
       ABSL_LOG(FATAL) << "Unsupported syntax; this generator only supports "
                          "proto2 and proto3 syntax.";
@@ -476,7 +475,7 @@ bool GenerateDslDescriptor(const FileDescriptor* file, io::Printer* printer,
   printer->Indent();
   printer->Print("add_file(\"$filename$\", :syntax => :$syntax$) do\n",
                  "filename", file->name(), "syntax",
-                 StringifySyntax(FileDescriptorLegacy(file).syntax()));
+                 StringifySyntax(file->syntax()));
   printer->Indent();
   for (int i = 0; i < file->message_type_count(); i++) {
     if (!GenerateMessage(file->message_type(i), printer, error)) {
@@ -521,9 +520,11 @@ bool GenerateFile(const FileDescriptor* file, io::Printer* printer,
     printer->Print("\n");
   }
 
-  // TODO: Remove this when ruby supports extensions.
-  if (file->extension_count() > 0) {
-    ABSL_LOG(WARNING) << "Extensions are not yet supported in Ruby.";
+  // TODO: Remove this when ruby supports extensions for proto2 syntax.
+  if (file->syntax() == FileDescriptor::SYNTAX_PROTO2 &&
+      file->extension_count() > 0) {
+    ABSL_LOG(WARNING)
+        << "Extensions are not yet supported for proto2 .proto files.";
   }
 
   bool use_raw_descriptor = file->name() == "google/protobuf/descriptor.proto";
@@ -559,8 +560,9 @@ bool Generator::Generate(
     const std::string& parameter,
     GeneratorContext* generator_context,
     std::string* error) const {
-  if (FileDescriptorLegacy(file).syntax() ==
-      FileDescriptorLegacy::Syntax::SYNTAX_UNKNOWN) {
+
+  if (file->syntax() != FileDescriptor::SYNTAX_PROTO3 &&
+      file->syntax() != FileDescriptor::SYNTAX_PROTO2) {
     *error = "Invalid or unsupported proto syntax";
     return false;
   }

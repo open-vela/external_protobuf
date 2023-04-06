@@ -123,7 +123,12 @@ void SetEnumVariables(
                                     (*variables)["default"], ".getNumber()")});
   }
 
-  if (SupportUnknownEnumValue(descriptor)) {
+  (*variables)["get_has_field_bit_from_local"] =
+      GenerateGetBitFromLocal(builderBitIndex);
+  (*variables)["set_has_field_bit_to_local"] =
+      GenerateSetBitToLocal(messageBitIndex);
+
+  if (SupportUnknownEnumValue(descriptor->file())) {
     variables->insert(
         {"unknown", absl::StrCat((*variables)["type"], ".UNRECOGNIZED")});
   } else {
@@ -161,13 +166,13 @@ int ImmutableEnumFieldLiteGenerator::GetNumBitsForMessage() const {
 
 void ImmutableEnumFieldLiteGenerator::GenerateInterfaceMembers(
     io::Printer* printer) const {
-  if (descriptor_->has_presence()) {
+  if (HasHazzer(descriptor_)) {
     WriteFieldAccessorDocComment(printer, descriptor_, HAZZER);
     printer->Print(variables_,
                    "$deprecation$boolean ${$has$capitalized_name$$}$();\n");
     printer->Annotate("{", "}", descriptor_);
   }
-  if (SupportUnknownEnumValue(descriptor_)) {
+  if (SupportUnknownEnumValue(descriptor_->file())) {
     WriteFieldEnumValueAccessorDocComment(printer, descriptor_, GETTER);
     printer->Print(variables_,
                    "$deprecation$int ${$get$capitalized_name$Value$}$();\n");
@@ -188,7 +193,7 @@ void ImmutableEnumFieldLiteGenerator::GenerateMembers(
         "  fieldNumber=$number$,\n"
         "  type=com.google.protobuf.FieldType.$annotation_field_type$,\n"
         "  isRequired=$required$)\n");
-    if (HasHasbit(descriptor_)) {
+    if (HasHazzer(descriptor_)) {
       printer->Print(variables_,
                      "@com.google.protobuf.ProtoPresenceCheckedField(\n"
                      "  presenceBitsId=$bit_field_id$,\n"
@@ -197,7 +202,7 @@ void ImmutableEnumFieldLiteGenerator::GenerateMembers(
   }
   printer->Print(variables_, "private int $name$_;\n");
   PrintExtraFieldInfo(variables_, printer);
-  if (descriptor_->has_presence()) {
+  if (HasHazzer(descriptor_)) {
     WriteFieldAccessorDocComment(printer, descriptor_, HAZZER);
     printer->Print(
         variables_,
@@ -207,7 +212,7 @@ void ImmutableEnumFieldLiteGenerator::GenerateMembers(
         "}\n");
     printer->Annotate("{", "}", descriptor_);
   }
-  if (SupportUnknownEnumValue(descriptor_)) {
+  if (SupportUnknownEnumValue(descriptor_->file())) {
     WriteFieldEnumValueAccessorDocComment(printer, descriptor_, GETTER);
     printer->Print(
         variables_,
@@ -227,7 +232,7 @@ void ImmutableEnumFieldLiteGenerator::GenerateMembers(
   printer->Annotate("{", "}", descriptor_);
 
   // Generate private setters for the builder to proxy into.
-  if (SupportUnknownEnumValue(descriptor_)) {
+  if (SupportUnknownEnumValue(descriptor_->file())) {
     WriteFieldEnumValueAccessorDocComment(printer, descriptor_, SETTER);
     printer->Print(variables_,
                    "private void set$capitalized_name$Value(int value) {\n"
@@ -251,7 +256,7 @@ void ImmutableEnumFieldLiteGenerator::GenerateMembers(
 
 void ImmutableEnumFieldLiteGenerator::GenerateBuilderMembers(
     io::Printer* printer) const {
-  if (descriptor_->has_presence()) {
+  if (HasHazzer(descriptor_)) {
     WriteFieldAccessorDocComment(printer, descriptor_, HAZZER);
     printer->Print(
         variables_,
@@ -261,7 +266,7 @@ void ImmutableEnumFieldLiteGenerator::GenerateBuilderMembers(
         "}\n");
     printer->Annotate("{", "}", descriptor_);
   }
-  if (SupportUnknownEnumValue(descriptor_)) {
+  if (SupportUnknownEnumValue(descriptor_->file())) {
     WriteFieldEnumValueAccessorDocComment(printer, descriptor_, GETTER);
     printer->Print(
         variables_,
@@ -322,7 +327,7 @@ void ImmutableEnumFieldLiteGenerator::GenerateKotlinDslMembers(
                  "    $kt_dsl_builder$.${$set$capitalized_name$$}$(value)\n"
                  "  }\n");
 
-  if (SupportUnknownEnumValue(descriptor_)) {
+  if (SupportUnknownEnumValue(descriptor_->file())) {
     printer->Print(
         variables_,
         "$kt_deprecation$public var $kt_name$Value: kotlin.Int\n"
@@ -341,7 +346,7 @@ void ImmutableEnumFieldLiteGenerator::GenerateKotlinDslMembers(
                  "  $kt_dsl_builder$.${$clear$capitalized_name$$}$()\n"
                  "}\n");
 
-  if (descriptor_->has_presence()) {
+  if (HasHazzer(descriptor_)) {
     WriteFieldAccessorDocComment(printer, descriptor_, HAZZER,
                                  /* builder */ false, /* kdoc */ true);
     printer->Print(
@@ -395,7 +400,7 @@ ImmutableEnumOneofFieldLiteGenerator::~ImmutableEnumOneofFieldLiteGenerator() {}
 void ImmutableEnumOneofFieldLiteGenerator::GenerateMembers(
     io::Printer* printer) const {
   PrintExtraFieldInfo(variables_, printer);
-  ABSL_DCHECK(descriptor_->has_presence());
+  ABSL_DCHECK(HasHazzer(descriptor_));
   WriteFieldAccessorDocComment(printer, descriptor_, HAZZER);
   printer->Print(variables_,
                  "@java.lang.Override\n"
@@ -404,7 +409,7 @@ void ImmutableEnumOneofFieldLiteGenerator::GenerateMembers(
                  "}\n");
   printer->Annotate("{", "}", descriptor_);
 
-  if (SupportUnknownEnumValue(descriptor_)) {
+  if (SupportUnknownEnumValue(descriptor_->file())) {
     WriteFieldEnumValueAccessorDocComment(printer, descriptor_, GETTER);
     printer->Print(
         variables_,
@@ -431,7 +436,7 @@ void ImmutableEnumOneofFieldLiteGenerator::GenerateMembers(
   printer->Annotate("{", "}", descriptor_);
 
   // Generate private setters for the builder to proxy into.
-  if (SupportUnknownEnumValue(descriptor_)) {
+  if (SupportUnknownEnumValue(descriptor_->file())) {
     WriteFieldEnumValueAccessorDocComment(printer, descriptor_, SETTER);
     printer->Print(variables_,
                    "private void set$capitalized_name$Value(int value) {\n"
@@ -471,7 +476,7 @@ void ImmutableEnumOneofFieldLiteGenerator::GenerateFieldInfo(
 
 void ImmutableEnumOneofFieldLiteGenerator::GenerateBuilderMembers(
     io::Printer* printer) const {
-  ABSL_DCHECK(descriptor_->has_presence());
+  ABSL_DCHECK(HasHazzer(descriptor_));
   WriteFieldAccessorDocComment(printer, descriptor_, HAZZER);
   printer->Print(variables_,
                  "@java.lang.Override\n"
@@ -480,7 +485,7 @@ void ImmutableEnumOneofFieldLiteGenerator::GenerateBuilderMembers(
                  "}\n");
   printer->Annotate("{", "}", descriptor_);
 
-  if (SupportUnknownEnumValue(descriptor_)) {
+  if (SupportUnknownEnumValue(descriptor_->file())) {
     WriteFieldEnumValueAccessorDocComment(printer, descriptor_, GETTER);
     printer->Print(
         variables_,
@@ -566,7 +571,7 @@ void RepeatedImmutableEnumFieldLiteGenerator::GenerateInterfaceMembers(
       variables_,
       "$deprecation$$type$ ${$get$capitalized_name$$}$(int index);\n");
   printer->Annotate("{", "}", descriptor_);
-  if (SupportUnknownEnumValue(descriptor_)) {
+  if (SupportUnknownEnumValue(descriptor_->file())) {
     WriteFieldEnumValueAccessorDocComment(printer, descriptor_, LIST_GETTER);
     printer->Print(variables_,
                    "$deprecation$java.util.List<java.lang.Integer>\n"
@@ -636,7 +641,7 @@ void RepeatedImmutableEnumFieldLiteGenerator::GenerateMembers(
       "  return result == null ? $unknown$ : result;\n"
       "}\n");
   printer->Annotate("{", "}", descriptor_);
-  if (SupportUnknownEnumValue(descriptor_)) {
+  if (SupportUnknownEnumValue(descriptor_->file())) {
     WriteFieldEnumValueAccessorDocComment(printer, descriptor_, LIST_GETTER);
     printer->Print(variables_,
                    "@java.lang.Override\n"
@@ -702,7 +707,7 @@ void RepeatedImmutableEnumFieldLiteGenerator::GenerateMembers(
                  "  $name$_ = emptyIntList();\n"
                  "}\n");
 
-  if (SupportUnknownEnumValue(descriptor_)) {
+  if (SupportUnknownEnumValue(descriptor_->file())) {
     WriteFieldEnumValueAccessorDocComment(printer, descriptor_, SETTER);
     printer->Print(variables_,
                    "private void set$capitalized_name$Value(\n"
@@ -735,7 +740,7 @@ void RepeatedImmutableEnumFieldLiteGenerator::GenerateFieldInfo(
   WriteIntToUtf16CharSequence(GetExperimentalJavaFieldType(descriptor_),
                               output);
   printer->Print(variables_, "\"$name$_\",\n");
-  if (!SupportUnknownEnumValue(descriptor_)) {
+  if (!SupportUnknownEnumValue(descriptor_->file())) {
     PrintEnumVerifierLogic(printer, descriptor_, variables_,
                            /*var_name=*/"$type$",
                            /*terminating_string=*/",\n",
@@ -810,7 +815,7 @@ void RepeatedImmutableEnumFieldLiteGenerator::GenerateBuilderMembers(
       "}\n");
   printer->Annotate("{", "}", descriptor_);
 
-  if (SupportUnknownEnumValue(descriptor_)) {
+  if (SupportUnknownEnumValue(descriptor_->file())) {
     WriteFieldEnumValueAccessorDocComment(printer, descriptor_, LIST_GETTER);
     printer->Print(variables_,
                    "@java.lang.Override\n"

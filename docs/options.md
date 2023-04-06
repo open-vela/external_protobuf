@@ -456,8 +456,3 @@ with info about your project (name and website) so we can add an entry for you.
 
     *   Website: https://github.com/Neakxs/protocel
     *   Extension: 1177-1178
-
-1.  Cybozu
-
-    *   Website: https://github.com/cybozu/protobuf
-    *   Extension: 1179
