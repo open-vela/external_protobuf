@@ -62,8 +62,8 @@ jobs:
       - name: Checkout pending changes
         uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
         with:
-          submodules: recursive
           ref: ${{ inputs.safe-checkout }}
+          submodules: recursive
       - name: Cross compile protoc for ${{ matrix.arch }}
         id: cross-compile
         uses: protocolbuffers/protobuf-ci/cross-compile-protoc@v1
@@ -119,8 +119,12 @@ jobs:
       - name: Checkout pending changes
         uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
         with:
-          submodules: recursive
           ref: ${{ inputs.safe-checkout }}
+
+      # Initialize/update the submodule from remote to validate a new fetch based on .gitmodules
+      # We have to do this separately since actions/checkout doesn't support the "--remote" flag
+      - name: Update submodules
+        run: git submodule update --init --remote --recursive
 
       - name: Setup ccache
         uses: ./.github/actions/ccache
@@ -141,8 +145,10 @@ jobs:
       - name: Checkout pending changes
         uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
         with:
-          submodules: recursive
           ref: ${{ inputs.safe-checkout }}
+
+      - name: Update submodules
+        run: git submodule update --init --remote --recursive
 
       - name: Setup ccache
         uses: ./.github/actions/ccache
@@ -170,8 +176,10 @@ jobs:
       - name: Checkout pending changes
         uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
         with:
-          submodules: recursive
           ref: ${{ inputs.safe-checkout }}
+
+      - name: Update submodules
+        run: git submodule update --init --remote --recursive
 
       - name: Setup ccache
         uses: ./.github/actions/ccache
@@ -250,8 +258,10 @@ jobs:
       - name: Checkout pending changes
         uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
         with:
-          submodules: recursive
           ref: ${{ inputs.safe-checkout }}
+
+      - name: Update submodules
+        run: git submodule update --init --remote --recursive
 
       - name: Setup ccache
         uses: ./.github/actions/ccache
