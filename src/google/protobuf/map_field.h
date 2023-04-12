@@ -336,7 +336,7 @@ class MapFieldAccessor;
 // This class provides access to map field using reflection, which is the same
 // as those provided for RepeatedPtrField<Message>. It is used for internal
 // reflection implementation only. Users should never use this directly.
-class PROTOBUF_EXPORT MapFieldBase : public MapFieldBaseForParse {
+class PROTOBUF_EXPORT MapFieldBase {
  public:
   MapFieldBase()
       : arena_(nullptr), repeated_field_(nullptr), state_(STATE_MODIFIED_MAP) {}
@@ -358,11 +358,9 @@ class PROTOBUF_EXPORT MapFieldBase : public MapFieldBaseForParse {
 
  protected:
   ~MapFieldBase() {  // "protected" stops users from deleting a `MapFieldBase *`
-    ABSL_DCHECK_EQ(arena_, nullptr);
-    delete repeated_field_;
+    ABSL_DCHECK(repeated_field_ == nullptr);
   }
-  void ArenaDestruct() { mutex_.~Mutex(); }
-  void OwnMutexDestructor(Arena& arena) { arena.OwnDestructor(&mutex_); }
+  void Destruct();
 
  public:
   // Returns reference to internal repeated field. Data written using
@@ -517,7 +515,7 @@ class TypeDefinedMapFieldBase : public MapFieldBase {
 
  protected:
   ~TypeDefinedMapFieldBase() {}
-  using MapFieldBase::ArenaDestruct;
+  using MapFieldBase::Destruct;
 
  public:
   void MapBegin(MapIterator* map_iter) const override;
@@ -525,9 +523,7 @@ class TypeDefinedMapFieldBase : public MapFieldBase {
   bool EqualIterator(const MapIterator& a, const MapIterator& b) const override;
 
   virtual const Map<Key, T>& GetMap() const = 0;
-  // This overrides the base's method to specialize the signature via
-  // covariance, but we do not yet provide an implementation here, so `= 0`.
-  Map<Key, T>* MutableMap() override = 0;
+  virtual Map<Key, T>* MutableMap() = 0;
 
  protected:
   typename Map<Key, T>::const_iterator& InternalGetIterator(
@@ -547,19 +543,19 @@ class TypeDefinedMapFieldBase : public MapFieldBase {
 // internal generated message implementation only. Users should never use this
 // directly.
 template <typename Derived, typename Key, typename T,
-          WireFormatLite::FieldType kKeyFieldType_,
-          WireFormatLite::FieldType kValueFieldType_>
+          WireFormatLite::FieldType kKeyFieldType,
+          WireFormatLite::FieldType kValueFieldType>
 class MapField : public TypeDefinedMapFieldBase<Key, T> {
   // Provide utilities to parse/serialize key/value.  Provide utilities to
   // manipulate internal stored type.
-  typedef MapTypeHandler<kKeyFieldType_, Key> KeyTypeHandler;
-  typedef MapTypeHandler<kValueFieldType_, T> ValueTypeHandler;
+  typedef MapTypeHandler<kKeyFieldType, Key> KeyTypeHandler;
+  typedef MapTypeHandler<kValueFieldType, T> ValueTypeHandler;
 
   // Define message type for internal repeated field.
   typedef Derived EntryType;
 
   // Define abbreviation for parent MapFieldLite
-  typedef MapFieldLite<Derived, Key, T, kKeyFieldType_, kValueFieldType_>
+  typedef MapFieldLite<Derived, Key, T, kKeyFieldType, kValueFieldType>
       MapFieldLiteType;
 
   // Enum needs to be handled differently from other types because it has
@@ -571,14 +567,15 @@ class MapField : public TypeDefinedMapFieldBase<Key, T> {
 
  public:
   typedef Map<Key, T> MapType;
-  static constexpr WireFormatLite::FieldType kKeyFieldType = kKeyFieldType_;
-  static constexpr WireFormatLite::FieldType kValueFieldType = kValueFieldType_;
 
   MapField() : impl_() {}
   MapField(const MapField&) = delete;
   MapField& operator=(const MapField&) = delete;
-  virtual ~MapField() = default;
-  void ArenaDestruct() { TypeDefinedMapFieldBase<Key, T>::ArenaDestruct(); }
+  virtual ~MapField() {}  // Destruct() must already have been called!
+  void Destruct() {
+    impl_.Destruct();
+    TypeDefinedMapFieldBase<Key, T>::Destruct();
+  }
 
   // This constructor is for constant initialized global instances.
   // It uses a linker initialized mutex, so it is not compatible with regular

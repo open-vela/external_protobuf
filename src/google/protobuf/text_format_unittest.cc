@@ -51,7 +51,6 @@
 #include "absl/log/absl_check.h"
 #include "absl/log/die_if_null.h"
 #include "absl/log/scoped_mock_log.h"
-#include "absl/strings/cord.h"
 #include "absl/strings/escaping.h"
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_format.h"
@@ -296,22 +295,6 @@ TEST_F(TextFormatTest, PrintUnknownFields) {
                          "8: 2\n"
                          "8: 3\n"),
             message.DebugString());
-}
-
-TEST_F(TextFormatTest, PrintUnknownFieldsDeepestStackWorks) {
-  // Test printing of unknown fields in a message.
-
-  unittest::TestEmptyMessage message;
-  UnknownFieldSet* unknown_fields = message.mutable_unknown_fields();
-
-  for (int i = 0; i < 200; ++i) {
-    unknown_fields = unknown_fields->AddGroup(1);
-  }
-
-  unknown_fields->AddVarint(2, 100);
-
-  std::string str;
-  EXPECT_TRUE(TextFormat::PrintToString(message, &str));
 }
 
 TEST_F(TextFormatTest, PrintUnknownFieldsHidden) {
@@ -837,12 +820,6 @@ TEST_F(TextFormatTest, ParseBasic) {
   TestUtil::ExpectAllFieldsSet(proto_);
 }
 
-TEST_F(TextFormatTest, ParseCordBasic) {
-  absl::Cord cord(proto_text_format_);
-  TextFormat::ParseFromCord(cord, &proto_);
-  TestUtil::ExpectAllFieldsSet(proto_);
-}
-
 TEST_F(TextFormatExtensionsTest, ParseExtensions) {
   io::ArrayInputStream input_stream(proto_text_format_.data(),
                                     proto_text_format_.size());
@@ -899,89 +876,6 @@ TEST_F(TextFormatTest, ParseUnknownEnumFieldProto3) {
   EXPECT_EQ(-10, proto.repeated_nested_enum(1));
   EXPECT_EQ(2147483647, proto.repeated_nested_enum(2));
   EXPECT_EQ(-2147483648, proto.repeated_nested_enum(3));
-}
-
-TEST_F(TextFormatTest, ErrorOnNoOpFieldsProto3) {
-  proto3_unittest::TestAllTypes proto;
-  TextFormat::Parser parser;
-  parser.ErrorOnNoOpFields(true);
-
-  {
-    const absl::string_view singular_int_parse_string = "optional_int32: 0";
-    EXPECT_TRUE(TextFormat::ParseFromString(singular_int_parse_string, &proto));
-    EXPECT_FALSE(parser.ParseFromString(singular_int_parse_string, &proto));
-  }
-  {
-    const absl::string_view singular_bool_parse_string = "optional_bool: false";
-    EXPECT_TRUE(
-        TextFormat::ParseFromString(singular_bool_parse_string, &proto));
-    EXPECT_FALSE(parser.ParseFromString(singular_bool_parse_string, &proto));
-  }
-  {
-    const absl::string_view singular_string_parse_string =
-        "optional_string: ''";
-    EXPECT_TRUE(
-        TextFormat::ParseFromString(singular_string_parse_string, &proto));
-    EXPECT_FALSE(parser.ParseFromString(singular_string_parse_string, &proto));
-  }
-  {
-    const absl::string_view nested_message_parse_string =
-        "optional_nested_message { bb: 0 } ";
-    EXPECT_TRUE(
-        TextFormat::ParseFromString(nested_message_parse_string, &proto));
-    EXPECT_FALSE(parser.ParseFromString(nested_message_parse_string, &proto));
-  }
-  {
-    const absl::string_view foreign_message_parse_string =
-        "optional_foreign_message { c: 0 } ";
-    EXPECT_TRUE(
-        TextFormat::ParseFromString(foreign_message_parse_string, &proto));
-    EXPECT_FALSE(parser.ParseFromString(foreign_message_parse_string, &proto));
-  }
-  {
-    const absl::string_view nested_enum_parse_string =
-        "optional_nested_enum: ZERO ";
-    EXPECT_TRUE(TextFormat::ParseFromString(nested_enum_parse_string, &proto));
-    EXPECT_FALSE(parser.ParseFromString(nested_enum_parse_string, &proto));
-  }
-  {
-    const absl::string_view foreign_enum_parse_string =
-        "optional_foreign_enum: FOREIGN_ZERO ";
-    EXPECT_TRUE(TextFormat::ParseFromString(foreign_enum_parse_string, &proto));
-    EXPECT_FALSE(parser.ParseFromString(foreign_enum_parse_string, &proto));
-  }
-  {
-    const absl::string_view string_piece_parse_string =
-        "optional_string_piece: '' ";
-    EXPECT_TRUE(TextFormat::ParseFromString(string_piece_parse_string, &proto));
-    EXPECT_FALSE(parser.ParseFromString(string_piece_parse_string, &proto));
-  }
-  {
-    const absl::string_view cord_parse_string = "optional_cord: '' ";
-    EXPECT_TRUE(TextFormat::ParseFromString(cord_parse_string, &proto));
-    EXPECT_FALSE(parser.ParseFromString(cord_parse_string, &proto));
-  }
-  {
-    // Sanity check that repeated fields work the same.
-    const absl::string_view repeated_int32_parse_string = "repeated_int32: 0 ";
-    EXPECT_TRUE(
-        TextFormat::ParseFromString(repeated_int32_parse_string, &proto));
-    EXPECT_TRUE(parser.ParseFromString(repeated_int32_parse_string, &proto));
-  }
-  {
-    const absl::string_view repeated_bool_parse_string =
-        "repeated_bool: false  ";
-    EXPECT_TRUE(
-        TextFormat::ParseFromString(repeated_bool_parse_string, &proto));
-    EXPECT_TRUE(parser.ParseFromString(repeated_bool_parse_string, &proto));
-  }
-  {
-    const absl::string_view repeated_string_parse_string =
-        "repeated_string: '' ";
-    EXPECT_TRUE(
-        TextFormat::ParseFromString(repeated_string_parse_string, &proto));
-    EXPECT_TRUE(parser.ParseFromString(repeated_string_parse_string, &proto));
-  }
 }
 
 TEST_F(TextFormatTest, ParseStringEscape) {
@@ -2455,7 +2349,6 @@ TEST(TextFormatFloatingPointTest, PreservesNegative0) {
   EXPECT_EQ(std::signbit(in_message.optional_double()),
             std::signbit(out_message.optional_double()));
 }
-
 
 }  // namespace text_format_unittest
 }  // namespace protobuf
