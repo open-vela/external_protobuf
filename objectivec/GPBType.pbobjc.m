@@ -54,12 +54,10 @@ GPBEnumDescriptor *GPBSyntax_EnumDescriptor(void) {
   if (!descriptor) {
     GPB_DEBUG_CHECK_RUNTIME_VERSIONS();
     static const char *valueNames =
-        "SyntaxProto2\000SyntaxProto3\000SyntaxEditions"
-        "\000";
+        "SyntaxProto2\000SyntaxProto3\000";
     static const int32_t values[] = {
         GPBSyntax_SyntaxProto2,
         GPBSyntax_SyntaxProto3,
-        GPBSyntax_SyntaxEditions,
     };
     GPBEnumDescriptor *worker =
         [GPBEnumDescriptor allocDescriptorForName:GPBNSStringifySymbol(GPBSyntax)
@@ -80,7 +78,6 @@ BOOL GPBSyntax_IsValidValue(int32_t value__) {
   switch (value__) {
     case GPBSyntax_SyntaxProto2:
     case GPBSyntax_SyntaxProto3:
-    case GPBSyntax_SyntaxEditions:
       return YES;
     default:
       return NO;
@@ -215,7 +212,6 @@ BOOL GPBField_Cardinality_IsValidValue(int32_t value__) {
 @dynamic optionsArray, optionsArray_Count;
 @dynamic hasSourceContext, sourceContext;
 @dynamic syntax;
-@dynamic edition;
 
 typedef struct GPBType__storage_ {
   uint32_t _has_storage_[1];
@@ -225,7 +221,6 @@ typedef struct GPBType__storage_ {
   NSMutableArray *oneofsArray;
   NSMutableArray *optionsArray;
   GPBSourceContext *sourceContext;
-  NSString *edition;
 } GPBType__storage_;
 
 // This method is threadsafe because it is initially called
@@ -288,15 +283,6 @@ typedef struct GPBType__storage_ {
         .offset = (uint32_t)offsetof(GPBType__storage_, syntax),
         .flags = (GPBFieldFlags)(GPBFieldOptional | GPBFieldHasEnumDescriptor | GPBFieldClearHasIvarOnZero),
         .dataType = GPBDataTypeEnum,
-      },
-      {
-        .name = "edition",
-        .dataTypeSpecific.clazz = Nil,
-        .number = GPBType_FieldNumber_Edition,
-        .hasIndex = 3,
-        .offset = (uint32_t)offsetof(GPBType__storage_, edition),
-        .flags = (GPBFieldFlags)(GPBFieldOptional | GPBFieldClearHasIvarOnZero),
-        .dataType = GPBDataTypeString,
       },
     };
     GPBDescriptor *localDescriptor =
@@ -511,7 +497,6 @@ void SetGPBField_Cardinality_RawValue(GPBField *message, int32_t value) {
 @dynamic optionsArray, optionsArray_Count;
 @dynamic hasSourceContext, sourceContext;
 @dynamic syntax;
-@dynamic edition;
 
 typedef struct GPBEnum__storage_ {
   uint32_t _has_storage_[1];
@@ -520,7 +505,6 @@ typedef struct GPBEnum__storage_ {
   NSMutableArray *enumvalueArray;
   NSMutableArray *optionsArray;
   GPBSourceContext *sourceContext;
-  NSString *edition;
 } GPBEnum__storage_;
 
 // This method is threadsafe because it is initially called
@@ -574,15 +558,6 @@ typedef struct GPBEnum__storage_ {
         .offset = (uint32_t)offsetof(GPBEnum__storage_, syntax),
         .flags = (GPBFieldFlags)(GPBFieldOptional | GPBFieldHasEnumDescriptor | GPBFieldClearHasIvarOnZero),
         .dataType = GPBDataTypeEnum,
-      },
-      {
-        .name = "edition",
-        .dataTypeSpecific.clazz = Nil,
-        .number = GPBEnum_FieldNumber_Edition,
-        .hasIndex = 3,
-        .offset = (uint32_t)offsetof(GPBEnum__storage_, edition),
-        .flags = (GPBFieldFlags)(GPBFieldOptional | GPBFieldClearHasIvarOnZero),
-        .dataType = GPBDataTypeString,
       },
     };
     GPBDescriptor *localDescriptor =

@@ -13,8 +13,6 @@ PROTOBUF_MAVEN_ARTIFACTS = [
     "com.google.truth:truth:1.1.2",
     "junit:junit:4.13.2",
     "org.mockito:mockito-core:4.3.1",
-    "biz.aQute.bnd:biz.aQute.bndlib:6.4.0",
-    "info.picocli:picocli:4.6.3",
 ]
 
 def _github_archive(repo, commit, **kwargs):
@@ -151,7 +149,7 @@ def protobuf_deps():
         _github_archive(
             name = "upb",
             repo = "https://github.com/protocolbuffers/upb",
-            commit = "eda3f17ed398b0cd298e4c9f9ea58cfe7d69cab2",
-            sha256 = "f9b1f308e1b60b91b930301b43a8f27ba96e3c16fb527b581e693655313259f4",
+            commit = "9d69c47896648691e854b7078478ed4320efbcab",
+            sha256 = "4b67f05495abfd886227fdae841cdf8c54d0e99b9907ed15b318a451082e9647",
             patches = ["@com_google_protobuf//build_defs:upb.patch"],
         )
