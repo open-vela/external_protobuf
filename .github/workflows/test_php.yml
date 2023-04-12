@@ -40,9 +40,8 @@ jobs:
       - name: Checkout pending changes
         uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
         with:
+          submodules: recursive
           ref: ${{ inputs.safe-checkout }}
-      - name: Update submodules
-        run: git submodule update --init --remote --recursive
       - name: Run tests
         uses: ./.github/actions/docker
         with:
@@ -74,10 +73,8 @@ jobs:
       - name: Checkout pending changes
         uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
         with:
+          submodules: recursive
           ref: ${{ inputs.safe-checkout }}
-
-      - name: Update submodules
-        run: git submodule update --init --remote --recursive
 
       - name: Cross compile protoc for i386
         id: cross-compile
@@ -147,12 +144,8 @@ jobs:
       - name: Checkout pending changes
         uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
         with:
+          submodules: recursive
           ref: ${{ inputs.safe-checkout }}
-
-      # Initialize/update the submodule from remote to validate a new fetch based on .gitmodules
-      # We have to do this separately since actions/checkout doesn't support the "--remote" flag
-      - name: Update submodules
-        run: git submodule update --init --remote --recursive
 
       - name: Install dependencies
         run: brew install coreutils # For sha256sum
