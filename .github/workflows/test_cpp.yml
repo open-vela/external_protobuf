@@ -44,12 +44,12 @@ jobs:
         with:
           ref: ${{ inputs.safe-checkout }}
       - name: Run tests
-        uses: ./.github/actions/bazel-docker
+        uses: protocolbuffers/protobuf-ci/bazel-docker@v1
         with:
           image: ${{ matrix.image }}
           credentials: ${{ secrets.GAR_SERVICE_ACCOUNT }}
           bazel-cache: cpp_linux/${{ matrix.config.name }}
-          bazel: test ${{ matrix.targets }} ${{ matrix.config.flags }} --distinct_host_configuration=false
+          bazel: test ${{ matrix.targets }} ${{ matrix.config.flags }}
 
   linux-release:
     strategy:
@@ -62,8 +62,8 @@ jobs:
       - name: Checkout pending changes
         uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
         with:
-          submodules: recursive
           ref: ${{ inputs.safe-checkout }}
+          submodules: recursive
       - name: Cross compile protoc for ${{ matrix.arch }}
         id: cross-compile
         uses: protocolbuffers/protobuf-ci/cross-compile-protoc@v1
@@ -80,7 +80,6 @@ jobs:
         with:
           image: us-docker.pkg.dev/protobuf-build/containers/test/linux/emulation:${{ matrix.arch }}-3af05275178e16af30961976af126eabbbb2c733
           credentials: ${{ secrets.GAR_SERVICE_ACCOUNT }}
-          skip-staleness-check: true
           entrypoint: bash
           command: >
             -c "set -ex;
@@ -119,16 +118,20 @@ jobs:
       - name: Checkout pending changes
         uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
         with:
-          submodules: recursive
           ref: ${{ inputs.safe-checkout }}
 
+      # Initialize/update the submodule from remote to validate a new fetch based on .gitmodules
+      # We have to do this separately since actions/checkout doesn't support the "--remote" flag
+      - name: Update submodules
+        run: git submodule update --init --remote --recursive
+
       - name: Setup ccache
-        uses: ./.github/actions/ccache
+        uses: protocolbuffers/protobuf-ci/ccache@v1
         with:
           cache-prefix: linux-cmake-${{ matrix.name }}
 
       - name: Run tests
-        uses: ./.github/actions/docker
+        uses: protocolbuffers/protobuf-ci/docker@v1
         with:
           image: us-docker.pkg.dev/protobuf-build/containers/test/linux/cmake@sha256:e0eb6c69b7551d89f0dbdbe11906077a1d501229c28db39623b945e0c5d7029a
           credentials: ${{ secrets.GAR_SERVICE_ACCOUNT }}
@@ -141,16 +144,18 @@ jobs:
       - name: Checkout pending changes
         uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
         with:
-          submodules: recursive
           ref: ${{ inputs.safe-checkout }}
 
+      - name: Update submodules
+        run: git submodule update --init --remote --recursive
+
       - name: Setup ccache
-        uses: ./.github/actions/ccache
+        uses: protocolbuffers/protobuf-ci/ccache@v1
         with:
           cache-prefix: linux-cmake-install
 
       - name: Run tests
-        uses: ./.github/actions/docker
+        uses: protocolbuffers/protobuf-ci/docker@v1
         with:
           image: us-docker.pkg.dev/protobuf-build/containers/test/linux/cmake@sha256:e0eb6c69b7551d89f0dbdbe11906077a1d501229c28db39623b945e0c5d7029a
           credentials: ${{ secrets.GAR_SERVICE_ACCOUNT }}
@@ -170,16 +175,18 @@ jobs:
       - name: Checkout pending changes
         uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
         with:
-          submodules: recursive
           ref: ${{ inputs.safe-checkout }}
 
+      - name: Update submodules
+        run: git submodule update --init --remote --recursive
+
       - name: Setup ccache
-        uses: ./.github/actions/ccache
+        uses: protocolbuffers/protobuf-ci/ccache@v1
         with:
           cache-prefix: linux-cmake-32-bit
 
       - name: Run tests
-        uses: ./.github/actions/docker
+        uses: protocolbuffers/protobuf-ci/docker@v1
         with:
           image: us-docker.pkg.dev/protobuf-build/containers/test/linux/32bit@sha256:f99f051daa8b12f4ebad5927f389bc71372f771ab080290ab451cbaf1648f9ea
           platform: linux/386
@@ -212,7 +219,7 @@ jobs:
         with:
           ref: ${{ inputs.safe-checkout }}
       - name: Run tests
-        uses: ./.github/actions/bazel
+        uses: protocolbuffers/protobuf-ci/bazel@v1
         with:
           credentials: ${{ secrets.GAR_SERVICE_ACCOUNT }}
           bazel: test ${{ matrix.bazel }}
@@ -250,18 +257,20 @@ jobs:
       - name: Checkout pending changes
         uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
         with:
-          submodules: recursive
           ref: ${{ inputs.safe-checkout }}
 
+      - name: Update submodules
+        run: git submodule update --init --remote --recursive
+
       - name: Setup ccache
-        uses: ./.github/actions/ccache
+        uses: protocolbuffers/protobuf-ci/ccache@v1
         with:
           cache-prefix: ${{ matrix.name }}
 
       # Install phase.
       - name: Configure CMake for install
         if: matrix.install-flags
-        uses: ./.github/actions/bash
+        uses: protocolbuffers/protobuf-ci/bash@v1
         with:
           credentials: ${{ secrets.GAR_SERVICE_ACCOUNT }}
           command: cmake . ${{ matrix.install-flags }} ${{ env.CCACHE_CMAKE_FLAGS }}
@@ -283,7 +292,7 @@ jobs:
         run: cmake --build . --target clean && rm CMakeCache.txt
 
       - name: Configure CMake
-        uses: ./.github/actions/bash
+        uses: protocolbuffers/protobuf-ci/bash@v1
         with:
           credentials: ${{ secrets.GAR_SERVICE_ACCOUNT }}
           command: cmake . ${{ matrix.flags }} ${{ env.CCACHE_CMAKE_FLAGS }}
