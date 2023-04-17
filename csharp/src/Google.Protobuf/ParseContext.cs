@@ -64,9 +64,8 @@ namespace Google.Protobuf
             state.recursionLimit = DefaultRecursionLimit;
             state.currentLimit = int.MaxValue;
             state.bufferSize = buffer.Length;
-            // Equivalent to Initialize(buffer, ref state, out ctx);
-            ctx.buffer = buffer;
-            ctx.state = state;
+
+            Initialize(buffer, ref state, out ctx);
         }
 
         /// <summary>
@@ -75,7 +74,6 @@ namespace Google.Protobuf
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static void Initialize(ReadOnlySpan<byte> buffer, ref ParserInternalState state, out ParseContext ctx)
         {
-            // Note: if this code ever changes, also change the initialization above.
             ctx.buffer = buffer;
             ctx.state = state;
         }

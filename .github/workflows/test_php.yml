@@ -40,11 +40,10 @@ jobs:
       - name: Checkout pending changes
         uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
         with:
+          submodules: recursive
           ref: ${{ inputs.safe-checkout }}
-      - name: Update submodules
-        run: git submodule update --init --remote --recursive
       - name: Run tests
-        uses: protocolbuffers/protobuf-ci/docker@v1
+        uses: ./.github/actions/docker
         with:
           image: us-docker.pkg.dev/protobuf-build/containers/test/linux/php:${{ matrix.version }}-508417e5215994ade7585d28ba3aad681a25fa5d
           credentials: ${{ secrets.GAR_SERVICE_ACCOUNT }}
@@ -74,21 +73,19 @@ jobs:
       - name: Checkout pending changes
         uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
         with:
+          submodules: recursive
           ref: ${{ inputs.safe-checkout }}
-
-      - name: Update submodules
-        run: git submodule update --init --remote --recursive
 
       - name: Cross compile protoc for i386
         id: cross-compile
-        uses: protocolbuffers/protobuf-ci/cross-compile-protoc@v1
+        uses: ./.github/actions/cross-compile-protoc
         with:
           image: us-docker.pkg.dev/protobuf-build/containers/common/linux/bazel:5.1.1-6361b3a6e5c97e9951d03a4de28542fc45f1adab
           credentials: ${{ secrets.GAR_SERVICE_ACCOUNT }}
           architecture: linux-i386
 
       - name: Run tests
-        uses: protocolbuffers/protobuf-ci/docker@v1
+        uses: ./.github/actions/docker
         with:
           image: ${{ env.image }}
           skip-staleness-check: true
@@ -113,14 +110,14 @@ jobs:
 
       - name: Cross compile protoc for aarch64
         id: cross-compile
-        uses: protocolbuffers/protobuf-ci/cross-compile-protoc@v1
+        uses: ./.github/actions/cross-compile-protoc
         with:
           image: us-docker.pkg.dev/protobuf-build/containers/common/linux/bazel:5.1.1-6361b3a6e5c97e9951d03a4de28542fc45f1adab
           credentials: ${{ secrets.GAR_SERVICE_ACCOUNT }}
           architecture: linux-aarch64
 
       - name: Run tests
-        uses: protocolbuffers/protobuf-ci/docker@v1
+        uses: ./.github/actions/docker
         with:
           image: us-docker.pkg.dev/protobuf-build/containers/test/linux/php-aarch64:0cc100b6e03d14c1e8f71ae794dc162ed122fe31@sha256:77b70feba68dced1f0fd21b52a08d3d2e0c5c797bfe68435a0038ce87ecfd310
           platform: linux/arm64
@@ -147,12 +144,8 @@ jobs:
       - name: Checkout pending changes
         uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
         with:
+          submodules: recursive
           ref: ${{ inputs.safe-checkout }}
-
-      # Initialize/update the submodule from remote to validate a new fetch based on .gitmodules
-      # We have to do this separately since actions/checkout doesn't support the "--remote" flag
-      - name: Update submodules
-        run: git submodule update --init --remote --recursive
 
       - name: Install dependencies
         run: brew install coreutils # For sha256sum
@@ -166,7 +159,7 @@ jobs:
         run: php --version | grep ${{ matrix.version }} || (echo "Invalid PHP version - $(php --version)" && exit 1)
 
       - name: Run tests
-        uses: protocolbuffers/protobuf-ci/bazel@v1
+        uses: ./.github/actions/bazel
         with:
           credentials: ${{ secrets.GAR_SERVICE_ACCOUNT }}
           bazel-cache: php_macos/${{ matrix.version }}
@@ -180,7 +173,7 @@ jobs:
             popd
 
       - name: Run conformance tests
-        uses: protocolbuffers/protobuf-ci/bazel@v1
+        uses: ./.github/actions/bazel
         with:
           credentials: ${{ secrets.GAR_SERVICE_ACCOUNT }}
           bazel-cache: php_macos/${{ matrix.version }}

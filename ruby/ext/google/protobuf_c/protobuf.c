@@ -171,8 +171,6 @@ void StringBuilder_PrintMsgval(StringBuilder *b, upb_MessageValue val,
 
 typedef struct {
   upb_Arena *arena;
-  // IMPORTANT: WB_PROTECTED objects must only use the RB_OBJ_WRITE()
-  // macro to update VALUE references, as to trigger write barriers.
   VALUE pinned_objs;
 } Arena;
 
@@ -192,7 +190,7 @@ static VALUE cArena;
 const rb_data_type_t Arena_type = {
     "Google::Protobuf::Internal::Arena",
     {Arena_mark, Arena_free, NULL},
-    .flags = RUBY_TYPED_FREE_IMMEDIATELY | RUBY_TYPED_WB_PROTECTED,
+    .flags = RUBY_TYPED_FREE_IMMEDIATELY,
 };
 
 static void* ruby_upb_allocfunc(upb_alloc* alloc, void* ptr, size_t oldsize, size_t size) {
@@ -235,7 +233,7 @@ void Arena_Pin(VALUE _arena, VALUE obj) {
   Arena *arena;
   TypedData_Get_Struct(_arena, Arena, &Arena_type, arena);
   if (arena->pinned_objs == Qnil) {
-    RB_OBJ_WRITE(_arena, &arena->pinned_objs, rb_ary_new());
+    arena->pinned_objs = rb_ary_new();
   }
   rb_ary_push(arena->pinned_objs, obj);
 }

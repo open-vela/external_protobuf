@@ -44,7 +44,6 @@ import org.jruby.runtime.Block;
 import org.jruby.runtime.Helpers;
 import org.jruby.runtime.ThreadContext;
 import org.jruby.runtime.builtin.IRubyObject;
-import org.jruby.util.ByteList;
 
 public class Utils {
   public static FieldDescriptor.Type rubyToFieldType(IRubyObject typeClass) {
@@ -264,9 +263,7 @@ public class Utils {
           IRubyObject wrapped =
               encodeBytes
                   ? RubyString.newString(
-                      runtime,
-                      new ByteList(((ByteString) value).toByteArray()),
-                      ASCIIEncoding.INSTANCE)
+                      runtime, ((ByteString) value).toStringUtf8(), ASCIIEncoding.INSTANCE)
                   : RubyString.newString(runtime, ((ByteString) value).toByteArray());
           wrapped.setFrozen(true);
           return wrapped;

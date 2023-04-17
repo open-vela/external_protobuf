@@ -51,7 +51,6 @@ namespace protobuf {
 namespace compiler {
 namespace cpp {
 namespace {
-using Semantic = ::google::protobuf::io::AnnotationCollector::Semantic;
 using Sub = ::google::protobuf::io::Printer::Sub;
 
 std::vector<Sub> Vars(const FieldDescriptor* field, const Options& opts) {
@@ -173,8 +172,7 @@ class SingularEnum : public FieldGeneratorBase {
 
 void SingularEnum::GenerateAccessorDeclarations(io::Printer* p) const {
   auto v = p->WithVars(
-      AnnotatedAccessors(field_, {"", "_internal_", "_internal_set_"}));
-  auto vs = p->WithVars(AnnotatedAccessors(field_, {"set_"}, Semantic::kSet));
+      AnnotatedAccessors(field_, {"", "set_", "_internal_", "_internal_set_"}));
   p->Emit(R"cc(
     $DEPRECATED$ $Enum$ $name$() const;
     $DEPRECATED$ void $set_name$($Enum$ value);
@@ -195,7 +193,7 @@ void SingularEnum::GenerateInlineAccessorDefinitions(io::Printer* p) const {
       return _internal_$name$();
     }
     inline void $Msg$::set_$name$($Enum$ value) {
-      $PrepareSplitMessageForWrite$ _internal_set_$name$(value);
+      $maybe_prepare_split_message$ _internal_set_$name$(value);
       $annotate_set$;
       // @@protoc_insertion_point(field_set:$pkg.Msg.field$)
     }
@@ -333,12 +331,9 @@ class RepeatedEnum : public FieldGeneratorBase {
 };
 
 void RepeatedEnum::GenerateAccessorDeclarations(io::Printer* p) const {
-  auto v = p->WithVars(AnnotatedAccessors(
-      field_, {"", "_internal_", "_internal_add_", "_internal_mutable_"}));
-  auto vs =
-      p->WithVars(AnnotatedAccessors(field_, {"set_", "add_"}, Semantic::kSet));
-  auto vm =
-      p->WithVars(AnnotatedAccessors(field_, {"mutable_"}, Semantic::kAlias));
+  auto v = p->WithVars(
+      AnnotatedAccessors(field_, {"", "set_", "add_", "mutable_", "_internal_",
+                                  "_internal_add_", "_internal_mutable_"}));
 
   p->Emit(R"cc(
     public:

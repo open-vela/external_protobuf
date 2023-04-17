@@ -73,10 +73,14 @@ std::string PyiGenerator::ModuleLevelName(const DescriptorT& descriptor) const {
   return name;
 }
 
-std::string PyiGenerator::PublicPackage() const { return "google.protobuf"; }
+std::string PyiGenerator::PublicPackage() const {
+  return opensource_runtime_ ? "google.protobuf"
+                             : "google3.net.google.protobuf.python.public";
+}
 
 std::string PyiGenerator::InternalPackage() const {
-  return "google.protobuf.internal";
+  return opensource_runtime_ ? "google.protobuf.internal"
+                             : "google3.net.google.protobuf.python.internal";
 }
 
 struct ImportModules {
