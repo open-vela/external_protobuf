@@ -1925,10 +1925,10 @@ public class JsonFormat {
         // Try to interpret the value as a number.
         try {
           int numericValue = parseInt32(json);
-          if (enumDescriptor.isClosed()) {
-            result = enumDescriptor.findValueByNumber(numericValue);
-          } else {
+          if (enumDescriptor.getFile().getSyntax() == FileDescriptor.Syntax.PROTO3) {
             result = enumDescriptor.findValueByNumberCreatingIfUnknown(numericValue);
+          } else {
+            result = enumDescriptor.findValueByNumber(numericValue);
           }
         } catch (InvalidProtocolBufferException e) {
           // Fall through. This exception is about invalid int32 value we get from parseInt32() but

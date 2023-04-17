@@ -437,10 +437,7 @@ int MapReflectionFriend::ScalarMapSetItem(PyObject* _self, PyObject* key,
       self->version++;
     }
 
-    if (!PythonToMapValueRef(self, v,
-                             !self->parent_field_descriptor->message_type()
-                                  ->map_value()
-                                  ->legacy_enum_field_treated_as_closed(),
+    if (!PythonToMapValueRef(self, v, reflection->SupportsUnknownEnumValues(),
                              &value)) {
       return -1;
     }

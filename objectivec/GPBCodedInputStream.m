@@ -65,21 +65,9 @@ static void RaiseException(NSInteger code, NSString *reason) {
                          userInfo:exceptionInfo] raise];
 }
 
-GPB_INLINE void CheckRecursionLimit(GPBCodedInputStreamState *state) {
+static void CheckRecursionLimit(GPBCodedInputStreamState *state) {
   if (state->recursionDepth >= kDefaultRecursionLimit) {
     RaiseException(GPBCodedInputStreamErrorRecursionDepthExceeded, nil);
-  }
-}
-
-GPB_INLINE void CheckFieldSize(uint64_t size) {
-  // Bytes and Strings have a max size of 2GB. And since messages are on the wire as bytes/length
-  // delimited, they also have a 2GB size limit. The C++ does the same sort of enforcement (see
-  // parse_context, delimited_message_util, message_lite, etc.).
-  // https://protobuf.dev/programming-guides/encoding/#cheat-sheet
-  if (size > 0x7fffffff) {
-    // TODO(thomasvl): Maybe a different error code for this, but adding one is a breaking
-    // change so reuse an existing one.
-    RaiseException(GPBCodedInputStreamErrorInvalidSize, nil);
   }
 }
 
@@ -235,16 +223,14 @@ int32_t GPBCodedInputStreamReadTag(GPBCodedInputStreamState *state) {
 }
 
 NSString *GPBCodedInputStreamReadRetainedString(GPBCodedInputStreamState *state) {
-  uint64_t size = GPBCodedInputStreamReadUInt64(state);
-  CheckFieldSize(size);
-  NSUInteger ns_size = (NSUInteger)size;
+  int32_t size = ReadRawVarint32(state);
   NSString *result;
   if (size == 0) {
     result = @"";
   } else {
     CheckSize(state, size);
     result = [[NSString alloc] initWithBytes:&state->bytes[state->bufferPos]
-                                      length:ns_size
+                                      length:size
                                     encoding:NSUTF8StringEncoding];
     state->bufferPos += size;
     if (!result) {
@@ -260,23 +246,21 @@ NSString *GPBCodedInputStreamReadRetainedString(GPBCodedInputStreamState *state)
 }
 
 NSData *GPBCodedInputStreamReadRetainedBytes(GPBCodedInputStreamState *state) {
-  uint64_t size = GPBCodedInputStreamReadUInt64(state);
-  CheckFieldSize(size);
-  NSUInteger ns_size = (NSUInteger)size;
+  int32_t size = ReadRawVarint32(state);
+  if (size < 0) return nil;
   CheckSize(state, size);
-  NSData *result = [[NSData alloc] initWithBytes:state->bytes + state->bufferPos length:ns_size];
+  NSData *result = [[NSData alloc] initWithBytes:state->bytes + state->bufferPos length:size];
   state->bufferPos += size;
   return result;
 }
 
 NSData *GPBCodedInputStreamReadRetainedBytesNoCopy(GPBCodedInputStreamState *state) {
-  uint64_t size = GPBCodedInputStreamReadUInt64(state);
-  CheckFieldSize(size);
-  NSUInteger ns_size = (NSUInteger)size;
+  int32_t size = ReadRawVarint32(state);
+  if (size < 0) return nil;
   CheckSize(state, size);
   // Cast is safe because freeWhenDone is NO.
   NSData *result = [[NSData alloc] initWithBytesNoCopy:(void *)(state->bytes + state->bufferPos)
-                                                length:ns_size
+                                                length:size
                                           freeWhenDone:NO];
   state->bufferPos += size;
   return result;
@@ -358,12 +342,9 @@ void GPBCodedInputStreamCheckLastTagWas(GPBCodedInputStreamState *state, int32_t
     case GPBWireFormatFixed64:
       SkipRawData(&state_, sizeof(int64_t));
       return YES;
-    case GPBWireFormatLengthDelimited: {
-      uint64_t size = GPBCodedInputStreamReadUInt64(&state_);
-      CheckFieldSize(size);
-      SkipRawData(&state_, size);
+    case GPBWireFormatLengthDelimited:
+      SkipRawData(&state_, ReadRawVarint32(&state_));
       return YES;
-    }
     case GPBWireFormatStartGroup:
       [self skipMessage];
       GPBCodedInputStreamCheckLastTagWas(
@@ -462,8 +443,7 @@ void GPBCodedInputStreamCheckLastTagWas(GPBCodedInputStreamState *state, int32_t
 - (void)readMessage:(GPBMessage *)message
     extensionRegistry:(id<GPBExtensionRegistry>)extensionRegistry {
   CheckRecursionLimit(&state_);
-  uint64_t length = GPBCodedInputStreamReadUInt64(&state_);
-  CheckFieldSize(length);
+  int32_t length = ReadRawVarint32(&state_);
   size_t oldLimit = GPBCodedInputStreamPushLimit(&state_, length);
   ++state_.recursionDepth;
   [message mergeFromCodedInputStream:self extensionRegistry:extensionRegistry];
@@ -477,8 +457,7 @@ void GPBCodedInputStreamCheckLastTagWas(GPBCodedInputStreamState *state, int32_t
                 field:(GPBFieldDescriptor *)field
         parentMessage:(GPBMessage *)parentMessage {
   CheckRecursionLimit(&state_);
-  uint64_t length = GPBCodedInputStreamReadUInt64(&state_);
-  CheckFieldSize(length);
+  int32_t length = ReadRawVarint32(&state_);
   size_t oldLimit = GPBCodedInputStreamPushLimit(&state_, length);
   ++state_.recursionDepth;
   GPBDictionaryReadEntry(mapDictionary, self, extensionRegistry, field, parentMessage);

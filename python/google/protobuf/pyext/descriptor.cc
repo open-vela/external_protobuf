@@ -33,7 +33,6 @@
 #include "google/protobuf/pyext/descriptor.h"
 
 #include "absl/log/absl_check.h"
-#include "google/protobuf/descriptor_legacy.h"
 
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
@@ -126,9 +125,7 @@ PyObject* PyString_FromCppString(const std::string& str) {
 // TODO(amauryfa): Change the proto2 compiler to remove the assignments, and
 // remove this hack.
 bool _CalledFromGeneratedFile(int stacklevel) {
-#ifdef PYPY_VERSION
-  return true;
-#else
+#ifndef PYPY_VERSION
   // This check is not critical and is somewhat difficult to implement correctly
   // in PyPy.
   PyFrameObject* frame = PyEval_GetFrame();
@@ -184,6 +181,7 @@ bool _CalledFromGeneratedFile(int stacklevel) {
     // Not at global module scope
     goto exit;
   }
+#endif
   result = true;
 exit:
   Py_XDECREF(frame_globals);
@@ -191,7 +189,6 @@ exit:
   Py_XDECREF(frame_code);
   Py_XDECREF(frame);
   return result;
-#endif
 }
 
 // If the calling code is not a _pb2.py file, raise AttributeError.
@@ -695,9 +692,8 @@ static PyObject* EnumValueName(PyBaseDescriptor *self, PyObject *args) {
 }
 
 static PyObject* GetSyntax(PyBaseDescriptor *self, void *closure) {
-  std::string syntax(FileDescriptorLegacy::SyntaxName(
-      FileDescriptorLegacy(_GetDescriptor(self)->file()).syntax()));
-  return PyUnicode_InternFromString(syntax.c_str());
+  return PyUnicode_InternFromString(
+      FileDescriptor::SyntaxName(_GetDescriptor(self)->file()->syntax()));
 }
 
 static PyGetSetDef Getters[] = {
@@ -1516,9 +1512,8 @@ static int SetSerializedOptions(PyFileDescriptor *self, PyObject *value,
 }
 
 static PyObject* GetSyntax(PyFileDescriptor *self, void *closure) {
-  std::string syntax(FileDescriptorLegacy::SyntaxName(
-      FileDescriptorLegacy(_GetDescriptor(self)).syntax()));
-  return PyUnicode_InternFromString(syntax.c_str());
+  return PyUnicode_InternFromString(
+      FileDescriptor::SyntaxName(_GetDescriptor(self)->syntax()));
 }
 
 static PyObject* CopyToProto(PyFileDescriptor *self, PyObject *target) {

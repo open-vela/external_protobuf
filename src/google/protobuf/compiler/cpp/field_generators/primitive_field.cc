@@ -38,7 +38,6 @@
 #include <vector>
 
 #include "absl/container/flat_hash_map.h"
-#include "absl/log/absl_check.h"
 #include "absl/log/absl_log.h"
 #include "absl/memory/memory.h"
 #include "absl/types/optional.h"
@@ -57,7 +56,7 @@ namespace {
 using ::google::protobuf::internal::WireFormat;
 using ::google::protobuf::internal::WireFormatLite;
 using Sub = ::google::protobuf::io::Printer::Sub;
-using Semantic = ::google::protobuf::io::AnnotationCollector::Semantic;
+using Annotation = ::google::protobuf::GeneratedCodeInfo::Annotation;
 
 // For encodings with fixed sizes, returns that size in bytes.
 absl::optional<size_t> FixedSize(FieldDescriptor::Type type) {
@@ -194,10 +193,18 @@ class SingularPrimitive final : public FieldGeneratorBase {
 };
 
 void SingularPrimitive::GenerateAccessorDeclarations(io::Printer* p) const {
-  auto v = p->WithVars(
-      AnnotatedAccessors(field_, {"", "_internal_", "_internal_set_"}));
-  auto vs = p->WithVars(AnnotatedAccessors(field_, {"set_"}, Semantic::kSet));
   p->Emit(
+      {
+          Sub("name", p->LookupVar("name")).AnnotatedAs(field_),
+          Sub("set_name", absl::StrCat("set_", p->LookupVar("name")))
+              .AnnotatedAs(field_),
+          Sub("_internal_name",
+              absl::StrCat("_internal_", p->LookupVar("name")))
+              .AnnotatedAs(field_),
+          Sub("_internal_set_name",
+              absl::StrCat("_internal_set_", p->LookupVar("name")))
+              .AnnotatedAs(field_),
+      },
       R"cc(
         $DEPRECATED$ $Type$ $name$() const;
         $DEPRECATED$ void $set_name$($Type$ value);
@@ -301,7 +308,7 @@ class RepeatedPrimitive final : public FieldGeneratorBase {
 
   void GenerateClearingCode(io::Printer* p) const override {
     p->Emit(R"cc(
-      _internal_mutable_$name$()->Clear();
+      $field_$.Clear();
     )cc");
   }
 
@@ -325,7 +332,9 @@ class RepeatedPrimitive final : public FieldGeneratorBase {
 
   void GenerateConstructorCode(io::Printer* p) const override {}
 
-  void GenerateCopyConstructorCode(io::Printer* p) const override {}
+  void GenerateCopyConstructorCode(io::Printer* p) const override {
+    ABSL_CHECK(!ShouldSplit(field_, *opts_));
+  }
 
   void GenerateConstexprAggregateInitializer(io::Printer* p) const override {
     p->Emit(R"cc(
@@ -335,7 +344,6 @@ class RepeatedPrimitive final : public FieldGeneratorBase {
   }
 
   void GenerateAggregateInitializer(io::Printer* p) const override {
-    ABSL_CHECK(!ShouldSplit(descriptor_, options_));
     p->Emit(R"cc(
       decltype($field_$) { arena }
     )cc");
@@ -343,7 +351,6 @@ class RepeatedPrimitive final : public FieldGeneratorBase {
   }
 
   void GenerateCopyAggregateInitializer(io::Printer* p) const override {
-    ABSL_CHECK(!ShouldSplit(descriptor_, options_));
     p->Emit(R"cc(
       decltype($field_$) { from.$field_$ }
     )cc");
@@ -390,27 +397,41 @@ void RepeatedPrimitive::GeneratePrivateMembers(io::Printer* p) const {
 }
 
 void RepeatedPrimitive::GenerateAccessorDeclarations(io::Printer* p) const {
-  auto v = p->WithVars(AnnotatedAccessors(
-      field_, {"", "_internal_", "_internal_add_", "_internal_mutable_"}));
-  auto vs =
-      p->WithVars(AnnotatedAccessors(field_, {"set_", "add_"}, Semantic::kSet));
-  auto va =
-      p->WithVars(AnnotatedAccessors(field_, {"mutable_"}, Semantic::kAlias));
-  p->Emit(R"cc(
-    $DEPRECATED$ $Type$ $name$(int index) const;
-    $DEPRECATED$ void $set_name$(int index, $Type$ value);
-    $DEPRECATED$ void $add_name$($Type$ value);
-    $DEPRECATED$ const $pb$::RepeatedField<$Type$>& $name$() const;
-    $DEPRECATED$ $pb$::RepeatedField<$Type$>* $mutable_name$();
+  p->Emit(
+      {
+          Sub("name", p->LookupVar("name")).AnnotatedAs(field_),
+          Sub("set_name", absl::StrCat("set_", p->LookupVar("name")))
+              .AnnotatedAs(field_),
+          Sub("add_name", absl::StrCat("add_", p->LookupVar("name")))
+              .AnnotatedAs(field_),
+          Sub("mutable_name", absl::StrCat("mutable_", p->LookupVar("name")))
+              .AnnotatedAs(field_),
 
-    private:
-    $Type$ $_internal_name$(int index) const;
-    void $_internal_add_name$($Type$ value);
-    const $pb$::RepeatedField<$Type$>& $_internal_name$() const;
-    $pb$::RepeatedField<$Type$>* $_internal_mutable_name$();
+          Sub("_internal_name",
+              absl::StrCat("_internal_", p->LookupVar("name")))
+              .AnnotatedAs(field_),
+          Sub("_internal_add_name",
+              absl::StrCat("_internal_add_", p->LookupVar("name")))
+              .AnnotatedAs(field_),
+          Sub("_internal_mutable_name",
+              absl::StrCat("_internal_mutable_", p->LookupVar("name")))
+              .AnnotatedAs(field_),
+      },
+      R"cc(
+        $DEPRECATED$ $Type$ $name$(int index) const;
+        $DEPRECATED$ void $set_name$(int index, $Type$ value);
+        $DEPRECATED$ void $add_name$($Type$ value);
+        $DEPRECATED$ const $pb$::RepeatedField<$Type$>& $name$() const;
+        $DEPRECATED$ $pb$::RepeatedField<$Type$>* $mutable_name$();
 
-    public:
-  )cc");
+        private:
+        $Type$ $_internal_name$(int index) const;
+        void $_internal_add_name$($Type$ value);
+        const $pb$::RepeatedField<$Type$>& $_internal_name$() const;
+        $pb$::RepeatedField<$Type$>* $_internal_mutable_name$();
+
+        public:
+      )cc");
 }
 
 void RepeatedPrimitive::GenerateInlineAccessorDefinitions(
@@ -423,7 +444,7 @@ void RepeatedPrimitive::GenerateInlineAccessorDefinitions(
     }
     inline void $Msg$::set_$name$(int index, $Type$ value) {
       $annotate_set$;
-      _internal_mutable_$name$()->Set(index, value);
+      $field_$.Set(index, value);
       // @@protoc_insertion_point(field_set:$pkg.Msg.field$)
     }
     inline void $Msg$::add_$name$($Type$ value) {
@@ -443,11 +464,9 @@ void RepeatedPrimitive::GenerateInlineAccessorDefinitions(
     }
 
     inline $Type$ $Msg$::_internal_$name$(int index) const {
-      return _internal_$name$().Get(index);
+      return $field_$.Get(index);
     }
-    inline void $Msg$::_internal_add_$name$($Type$ value) {
-      _internal_mutable_$name$()->Add(value);
-    }
+    inline void $Msg$::_internal_add_$name$($Type$ value) { $field_$.Add(value); }
     inline const $pb$::RepeatedField<$Type$>& $Msg$::_internal_$name$() const {
       return $field_$;
     }
@@ -503,8 +522,7 @@ void RepeatedPrimitive::GenerateByteSize(io::Printer* p) const {
                   )cc");
                 } else {
                   p->Emit(R"cc(
-                    ::_pbi::WireFormatLite::$DeclaredType$Size(
-                        this->_internal_$name$())
+                    ::_pbi::WireFormatLite::$DeclaredType$Size(this->$field_$)
                   )cc");
                 }
               }}  // Here and below, we need to disable the default ;-chomping

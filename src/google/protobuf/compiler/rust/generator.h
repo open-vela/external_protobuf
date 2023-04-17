@@ -1,5 +1,5 @@
 // Protocol Buffers - Google's data interchange format
-// Copyright 2023 Google Inc.  All rights reserved.
+// Copyright 2008 Google Inc.  All rights reserved.
 // https://developers.google.com/protocol-buffers/
 //
 // Redistribution and use in source and binary forms, with or without
@@ -31,9 +31,9 @@
 #ifndef GOOGLE_PROTOBUF_COMPILER_RUST_GENERATOR_H__
 #define GOOGLE_PROTOBUF_COMPILER_RUST_GENERATOR_H__
 
-#include <cstdint>
 #include <string>
 
+#include "absl/log/absl_check.h"
 #include "google/protobuf/compiler/code_generator.h"
 
 // Must be included last.
@@ -44,8 +44,7 @@ namespace protobuf {
 namespace compiler {
 namespace rust {
 
-class PROTOC_EXPORT RustGenerator final
-    : public google::protobuf::compiler::CodeGenerator {
+class RustGenerator final : public google::protobuf::compiler::CodeGenerator {
  public:
   RustGenerator() = default;
   RustGenerator(const RustGenerator&) = delete;
@@ -54,7 +53,10 @@ class PROTOC_EXPORT RustGenerator final
 
   bool Generate(const FileDescriptor* file, const std::string& parameter,
                 GeneratorContext* generator_context,
-                std::string* error) const override;
+                std::string* error) const override {
+    ABSL_CHECK(false) << "not yet implemented";
+    return false;
+  }
 
   uint64_t GetSupportedFeatures() const override {
     return FEATURE_PROTO3_OPTIONAL;
