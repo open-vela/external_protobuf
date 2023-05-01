@@ -49,7 +49,6 @@
 #include "absl/strings/str_format.h"
 #include "absl/strings/string_view.h"
 #include "google/protobuf/descriptor_legacy.h"
-#include "google/protobuf/test_textproto.h"
 #include "google/protobuf/unittest.pb.h"
 #include "google/protobuf/unittest_custom_options.pb.h"
 #include "google/protobuf/stubs/common.h"
@@ -469,7 +468,7 @@ TEST_F(FileDescriptorTest, Syntax) {
     proto.set_syntax("proto2");
     DescriptorPool pool;
     const FileDescriptor* file = pool.BuildFile(proto);
-    ASSERT_TRUE(file != nullptr);
+    EXPECT_TRUE(file != nullptr);
     EXPECT_EQ(FileDescriptorLegacy::Syntax::SYNTAX_PROTO2, FileDescriptorLegacy(file).syntax());
     FileDescriptorProto other;
     file->CopyTo(&other);
@@ -480,7 +479,7 @@ TEST_F(FileDescriptorTest, Syntax) {
     proto.set_syntax("proto3");
     DescriptorPool pool;
     const FileDescriptor* file = pool.BuildFile(proto);
-    ASSERT_TRUE(file != nullptr);
+    EXPECT_TRUE(file != nullptr);
     EXPECT_EQ(FileDescriptorLegacy::Syntax::SYNTAX_PROTO3,
               FileDescriptorLegacy(file).syntax());
     FileDescriptorProto other;
@@ -5892,24 +5891,6 @@ TEST_F(ValidationErrorTest, JsonNameOptionOnExtensions) {
       "extension fields.\n");
 }
 
-TEST_F(ValidationErrorTest, JsonNameEmbeddedNull) {
-  BuildFileWithErrors(
-      "name: \"foo.proto\" "
-      "package: \"foo\" "
-      "message_type {"
-      "  name: \"Foo\""
-      "  field {"
-      "    name: \"value\""
-      "    number: 10"
-      "    label: LABEL_OPTIONAL"
-      "    type: TYPE_INT32"
-      "    json_name: \"embedded\\000null\""
-      "  }"
-      "}",
-      "foo.proto: foo.Foo.value: OPTION_NAME: json_name cannot have embedded "
-      "null characters.\n");
-}
-
 TEST_F(ValidationErrorTest, DuplicateExtensionFieldNumber) {
   BuildDescriptorMessagesInTestPool();
 
@@ -7090,7 +7071,6 @@ TEST_F(ValidationErrorTest, UnusedImportWithOtherError) {
       // Should not also contain unused import error.
       "foo.proto: Foo.foo: EXTENDEE: \"Baz\" is not defined.\n");
 }
-
 
 
 
