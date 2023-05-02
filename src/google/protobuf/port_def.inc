@@ -246,7 +246,7 @@ static_assert(PROTOBUF_CPLUSPLUS_MIN(201402L), "Protobuf only supports C++14 and
 #ifdef PROTOBUF_VERSION_SUFFIX
 #error PROTOBUF_VERSION_SUFFIX was previously defined
 #endif
-#define PROTOBUF_VERSION_SUFFIX "-rc1"
+#define PROTOBUF_VERSION_SUFFIX "-rc2"
 
 #if defined(PROTOBUF_NAMESPACE) || defined(PROTOBUF_NAMESPACE_ID)
 #error PROTOBUF_NAMESPACE or PROTOBUF_NAMESPACE_ID was previously defined
@@ -322,9 +322,9 @@ static_assert(PROTOBUF_CPLUSPLUS_MIN(201402L), "Protobuf only supports C++14 and
 #ifdef PROTOBUF_TAILCALL
 #error PROTOBUF_TAILCALL was previously defined
 #endif
-#if __has_cpp_attribute(clang::musttail) && !defined(__arm__) &&      \
-    !defined(_ARCH_PPC) && !defined(__wasm__) &&                      \
-    !(defined(_MSC_VER) && defined(_M_IX86)) && !defined(__i386__) && \
+#if __has_cpp_attribute(clang::musttail) && !defined(__arm__) && \
+    !defined(_ARCH_PPC) && !defined(__wasm__) &&                 \
+    !(defined(_MSC_VER) && defined(_M_IX86)) &&                  \
     !(defined(__NDK_MAJOR__) && __NDK_MAJOR <= 24)
 #  ifndef PROTO2_OPENSOURCE
 // Compilation fails on ARM32: b/195943306
