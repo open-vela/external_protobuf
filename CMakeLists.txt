@@ -93,7 +93,7 @@ if (protobuf_BUILD_SHARED_LIBS)
 endif ()
 
 # Version metadata
-set(protobuf_VERSION_STRING "4.22.3")
+set(protobuf_VERSION_STRING "4.23.0-rc-1")
 set(protobuf_DESCRIPTION "Protocol Buffers")
 set(protobuf_CONTACT "protobuf@googlegroups.com")
 
@@ -331,9 +331,6 @@ endif (protobuf_UNICODE)
 
 set(protobuf_ABSL_PROVIDER "module" CACHE STRING "Provider of absl library")
 set_property(CACHE protobuf_ABSL_PROVIDER PROPERTY STRINGS "module" "package")
-
-set(protobuf_JSONCPP_PROVIDER "module" CACHE STRING "Provider of jsoncpp library")
-set_property(CACHE protobuf_JSONCPP_PROVIDER PROPERTY STRINGS "module" "package")
 
 if (protobuf_BUILD_TESTS)
   include(${protobuf_SOURCE_DIR}/cmake/gtest.cmake)

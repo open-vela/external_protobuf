@@ -637,7 +637,8 @@ class CodeGeneratorRequest::_Internal {
   }
 };
 
-const ::PROTOBUF_NAMESPACE_ID::compiler::Version& CodeGeneratorRequest::_Internal::compiler_version(const CodeGeneratorRequest* msg) {
+const ::PROTOBUF_NAMESPACE_ID::compiler::Version&
+CodeGeneratorRequest::_Internal::compiler_version(const CodeGeneratorRequest* msg) {
   return *msg->_impl_.compiler_version_;
 }
 void CodeGeneratorRequest::clear_proto_file() {
@@ -747,7 +748,7 @@ const char* CodeGeneratorRequest::_InternalParse(const char* ptr, ::_pbi::ParseC
           ptr -= 1;
           do {
             ptr += 1;
-            auto str = _internal_mutable_file_to_generate()->Add();
+            auto str = _internal_add_file_to_generate();
             ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
             CHK_(ptr);
             #ifndef NDEBUG
@@ -787,7 +788,7 @@ const char* CodeGeneratorRequest::_InternalParse(const char* ptr, ::_pbi::ParseC
           ptr -= 1;
           do {
             ptr += 1;
-            ptr = ctx->ParseMessage(_internal_mutable_proto_file()->Add(), ptr);
+            ptr = ctx->ParseMessage(_internal_add_proto_file(), ptr);
             CHK_(ptr);
             if (!ctx->DataAvailable(ptr)) break;
           } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<122>(ptr));
@@ -827,7 +828,7 @@ failure:
 
   // repeated string file_to_generate = 1;
   for (int i = 0, n = this->_internal_file_to_generate_size(); i < n; ++i) {
-    const auto& s = this->_internal_file_to_generate().Get(i);
+    const auto& s = this->_internal_file_to_generate(i);
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::VerifyUTF8StringNamedField(s.data(), static_cast<int>(s.length()), ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::SERIALIZE,
                                 "google.protobuf.compiler.CodeGeneratorRequest.file_to_generate");
     target = stream->WriteString(1, s, target);
@@ -852,7 +853,7 @@ failure:
   // repeated .google.protobuf.FileDescriptorProto proto_file = 15;
   for (unsigned i = 0,
       n = static_cast<unsigned>(this->_internal_proto_file_size()); i < n; i++) {
-    const auto& repfield = this->_internal_proto_file().Get(i);
+    const auto& repfield = this->_internal_proto_file(i);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
         InternalWriteMessage(15, repfield, repfield.GetCachedSize(), target, stream);
   }
@@ -990,7 +991,8 @@ class CodeGeneratorResponse_File::_Internal {
   }
 };
 
-const ::PROTOBUF_NAMESPACE_ID::GeneratedCodeInfo& CodeGeneratorResponse_File::_Internal::generated_code_info(const CodeGeneratorResponse_File* msg) {
+const ::PROTOBUF_NAMESPACE_ID::GeneratedCodeInfo&
+CodeGeneratorResponse_File::_Internal::generated_code_info(const CodeGeneratorResponse_File* msg) {
   return *msg->_impl_.generated_code_info_;
 }
 void CodeGeneratorResponse_File::clear_generated_code_info() {
@@ -1479,7 +1481,7 @@ const char* CodeGeneratorResponse::_InternalParse(const char* ptr, ::_pbi::Parse
           ptr -= 1;
           do {
             ptr += 1;
-            ptr = ctx->ParseMessage(_internal_mutable_file()->Add(), ptr);
+            ptr = ctx->ParseMessage(_internal_add_file(), ptr);
             CHK_(ptr);
             if (!ctx->DataAvailable(ptr)) break;
           } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<122>(ptr));
@@ -1536,7 +1538,7 @@ failure:
   // repeated .google.protobuf.compiler.CodeGeneratorResponse.File file = 15;
   for (unsigned i = 0,
       n = static_cast<unsigned>(this->_internal_file_size()); i < n; i++) {
-    const auto& repfield = this->_internal_file().Get(i);
+    const auto& repfield = this->_internal_file(i);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
         InternalWriteMessage(15, repfield, repfield.GetCachedSize(), target, stream);
   }
@@ -1631,7 +1633,8 @@ void CodeGeneratorResponse::InternalSwap(CodeGeneratorResponse* other) {
   _internal_mutable_file()->InternalSwap(other->_internal_mutable_file());
   ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.error_, lhs_arena,
                                        &other->_impl_.error_, rhs_arena);
-        swap(_impl_.supported_features_, other->_impl_.supported_features_);
+
+  swap(_impl_.supported_features_, other->_impl_.supported_features_);
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata CodeGeneratorResponse::GetMetadata() const {

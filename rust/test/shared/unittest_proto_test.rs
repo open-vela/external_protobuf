@@ -28,17 +28,10 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-// This file contains messages for testing repeated field comparison
-// LINT: ALLOW_GROUPS
+use unittest_proto::proto2_unittest::TestAllTypes;
 
-syntax = "proto3";
-
-package proto3_unittest;
-
-option optimize_for = SPEED;
-
-message TestNoPresenceField {
-  bool no_presence_bool = 1;
-  TestNoPresenceField no_presence_nested = 2;
-  repeated TestNoPresenceField no_presence_repeated_nested = 3;
+#[test]
+fn test_serialization() {
+    let test_all_types = TestAllTypes::new();
+    assert_eq!(*test_all_types.serialize(), []);
 }
