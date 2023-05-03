@@ -245,8 +245,7 @@ class Api::_Internal {
   }
 };
 
-const ::PROTOBUF_NAMESPACE_ID::SourceContext&
-Api::_Internal::source_context(const Api* msg) {
+const ::PROTOBUF_NAMESPACE_ID::SourceContext& Api::_Internal::source_context(const Api* msg) {
   return *msg->_impl_.source_context_;
 }
 void Api::clear_options() {
@@ -349,7 +348,7 @@ void Api::SetCachedSize(int size) const {
   _impl_._cached_size_.Set(size);
 }
 
-void Api::Clear() {
+PROTOBUF_NOINLINE void Api::Clear() {
 // @@protoc_insertion_point(message_clear_start:google.protobuf.Api)
   ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
@@ -394,7 +393,7 @@ const char* Api::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
           ptr -= 1;
           do {
             ptr += 1;
-            ptr = ctx->ParseMessage(_internal_add_methods(), ptr);
+            ptr = ctx->ParseMessage(_internal_mutable_methods()->Add(), ptr);
             CHK_(ptr);
             if (!ctx->DataAvailable(ptr)) break;
           } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<18>(ptr));
@@ -408,7 +407,7 @@ const char* Api::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
           ptr -= 1;
           do {
             ptr += 1;
-            ptr = ctx->ParseMessage(_internal_add_options(), ptr);
+            ptr = ctx->ParseMessage(_internal_mutable_options()->Add(), ptr);
             CHK_(ptr);
             if (!ctx->DataAvailable(ptr)) break;
           } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<26>(ptr));
@@ -442,7 +441,7 @@ const char* Api::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
           ptr -= 1;
           do {
             ptr += 1;
-            ptr = ctx->ParseMessage(_internal_add_mixins(), ptr);
+            ptr = ctx->ParseMessage(_internal_mutable_mixins()->Add(), ptr);
             CHK_(ptr);
             if (!ctx->DataAvailable(ptr)) break;
           } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<50>(ptr));
@@ -501,7 +500,7 @@ failure:
   // repeated .google.protobuf.Method methods = 2;
   for (unsigned i = 0,
       n = static_cast<unsigned>(this->_internal_methods_size()); i < n; i++) {
-    const auto& repfield = this->_internal_methods(i);
+    const auto& repfield = this->_internal_methods().Get(i);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
         InternalWriteMessage(2, repfield, repfield.GetCachedSize(), target, stream);
   }
@@ -509,7 +508,7 @@ failure:
   // repeated .google.protobuf.Option options = 3;
   for (unsigned i = 0,
       n = static_cast<unsigned>(this->_internal_options_size()); i < n; i++) {
-    const auto& repfield = this->_internal_options(i);
+    const auto& repfield = this->_internal_options().Get(i);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
         InternalWriteMessage(3, repfield, repfield.GetCachedSize(), target, stream);
   }
@@ -533,7 +532,7 @@ failure:
   // repeated .google.protobuf.Mixin mixins = 6;
   for (unsigned i = 0,
       n = static_cast<unsigned>(this->_internal_mixins_size()); i < n; i++) {
-    const auto& repfield = this->_internal_mixins(i);
+    const auto& repfield = this->_internal_mixins().Get(i);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
         InternalWriteMessage(6, repfield, repfield.GetCachedSize(), target, stream);
   }
@@ -652,7 +651,7 @@ void Api::CopyFrom(const Api& from) {
   MergeFrom(from);
 }
 
-bool Api::IsInitialized() const {
+PROTOBUF_NOINLINE bool Api::IsInitialized() const {
   return true;
 }
 
@@ -796,7 +795,7 @@ void Method::SetCachedSize(int size) const {
   _impl_._cached_size_.Set(size);
 }
 
-void Method::Clear() {
+PROTOBUF_NOINLINE void Method::Clear() {
 // @@protoc_insertion_point(message_clear_start:google.protobuf.Method)
   ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
@@ -875,7 +874,7 @@ const char* Method::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
           ptr -= 1;
           do {
             ptr += 1;
-            ptr = ctx->ParseMessage(_internal_add_options(), ptr);
+            ptr = ctx->ParseMessage(_internal_mutable_options()->Add(), ptr);
             CHK_(ptr);
             if (!ctx->DataAvailable(ptr)) break;
           } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<50>(ptr));
@@ -963,7 +962,7 @@ failure:
   // repeated .google.protobuf.Option options = 6;
   for (unsigned i = 0,
       n = static_cast<unsigned>(this->_internal_options_size()); i < n; i++) {
-    const auto& repfield = this->_internal_options(i);
+    const auto& repfield = this->_internal_options().Get(i);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
         InternalWriteMessage(6, repfield, repfield.GetCachedSize(), target, stream);
   }
@@ -1079,7 +1078,7 @@ void Method::CopyFrom(const Method& from) {
   MergeFrom(from);
 }
 
-bool Method::IsInitialized() const {
+PROTOBUF_NOINLINE bool Method::IsInitialized() const {
   return true;
 }
 
@@ -1185,7 +1184,7 @@ void Mixin::SetCachedSize(int size) const {
   _impl_._cached_size_.Set(size);
 }
 
-void Mixin::Clear() {
+PROTOBUF_NOINLINE void Mixin::Clear() {
 // @@protoc_insertion_point(message_clear_start:google.protobuf.Mixin)
   ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
@@ -1331,7 +1330,7 @@ void Mixin::CopyFrom(const Mixin& from) {
   MergeFrom(from);
 }
 
-bool Mixin::IsInitialized() const {
+PROTOBUF_NOINLINE bool Mixin::IsInitialized() const {
   return true;
 }
 

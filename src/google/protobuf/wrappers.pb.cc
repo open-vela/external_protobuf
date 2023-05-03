@@ -368,7 +368,7 @@ void DoubleValue::SetCachedSize(int size) const {
   _impl_._cached_size_.Set(size);
 }
 
-void DoubleValue::Clear() {
+PROTOBUF_NOINLINE void DoubleValue::Clear() {
 // @@protoc_insertion_point(message_clear_start:google.protobuf.DoubleValue)
   ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
@@ -493,15 +493,14 @@ void DoubleValue::CopyFrom(const DoubleValue& from) {
   MergeFrom(from);
 }
 
-bool DoubleValue::IsInitialized() const {
+PROTOBUF_NOINLINE bool DoubleValue::IsInitialized() const {
   return true;
 }
 
 void DoubleValue::InternalSwap(DoubleValue* other) {
   using std::swap;
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
-
-  swap(_impl_.value_, other->_impl_.value_);
+        swap(_impl_.value_, other->_impl_.value_);
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata DoubleValue::GetMetadata() const {
@@ -553,7 +552,7 @@ void FloatValue::SetCachedSize(int size) const {
   _impl_._cached_size_.Set(size);
 }
 
-void FloatValue::Clear() {
+PROTOBUF_NOINLINE void FloatValue::Clear() {
 // @@protoc_insertion_point(message_clear_start:google.protobuf.FloatValue)
   ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
@@ -678,15 +677,14 @@ void FloatValue::CopyFrom(const FloatValue& from) {
   MergeFrom(from);
 }
 
-bool FloatValue::IsInitialized() const {
+PROTOBUF_NOINLINE bool FloatValue::IsInitialized() const {
   return true;
 }
 
 void FloatValue::InternalSwap(FloatValue* other) {
   using std::swap;
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
-
-  swap(_impl_.value_, other->_impl_.value_);
+        swap(_impl_.value_, other->_impl_.value_);
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata FloatValue::GetMetadata() const {
@@ -738,7 +736,7 @@ void Int64Value::SetCachedSize(int size) const {
   _impl_._cached_size_.Set(size);
 }
 
-void Int64Value::Clear() {
+PROTOBUF_NOINLINE void Int64Value::Clear() {
 // @@protoc_insertion_point(message_clear_start:google.protobuf.Int64Value)
   ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
@@ -794,9 +792,9 @@ failure:
 
   // int64 value = 1;
   if (this->_internal_value() != 0) {
-    target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteInt64ToArray(
-        1, this->_internal_value(), target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+        WriteInt64ToArrayWithField<1>(
+            stream, this->_internal_value(), target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -852,15 +850,14 @@ void Int64Value::CopyFrom(const Int64Value& from) {
   MergeFrom(from);
 }
 
-bool Int64Value::IsInitialized() const {
+PROTOBUF_NOINLINE bool Int64Value::IsInitialized() const {
   return true;
 }
 
 void Int64Value::InternalSwap(Int64Value* other) {
   using std::swap;
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
-
-  swap(_impl_.value_, other->_impl_.value_);
+        swap(_impl_.value_, other->_impl_.value_);
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata Int64Value::GetMetadata() const {
@@ -912,7 +909,7 @@ void UInt64Value::SetCachedSize(int size) const {
   _impl_._cached_size_.Set(size);
 }
 
-void UInt64Value::Clear() {
+PROTOBUF_NOINLINE void UInt64Value::Clear() {
 // @@protoc_insertion_point(message_clear_start:google.protobuf.UInt64Value)
   ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
@@ -1026,15 +1023,14 @@ void UInt64Value::CopyFrom(const UInt64Value& from) {
   MergeFrom(from);
 }
 
-bool UInt64Value::IsInitialized() const {
+PROTOBUF_NOINLINE bool UInt64Value::IsInitialized() const {
   return true;
 }
 
 void UInt64Value::InternalSwap(UInt64Value* other) {
   using std::swap;
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
-
-  swap(_impl_.value_, other->_impl_.value_);
+        swap(_impl_.value_, other->_impl_.value_);
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata UInt64Value::GetMetadata() const {
@@ -1086,7 +1082,7 @@ void Int32Value::SetCachedSize(int size) const {
   _impl_._cached_size_.Set(size);
 }
 
-void Int32Value::Clear() {
+PROTOBUF_NOINLINE void Int32Value::Clear() {
 // @@protoc_insertion_point(message_clear_start:google.protobuf.Int32Value)
   ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
@@ -1142,9 +1138,9 @@ failure:
 
   // int32 value = 1;
   if (this->_internal_value() != 0) {
-    target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteInt32ToArray(
-        1, this->_internal_value(), target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+        WriteInt32ToArrayWithField<1>(
+            stream, this->_internal_value(), target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -1200,15 +1196,14 @@ void Int32Value::CopyFrom(const Int32Value& from) {
   MergeFrom(from);
 }
 
-bool Int32Value::IsInitialized() const {
+PROTOBUF_NOINLINE bool Int32Value::IsInitialized() const {
   return true;
 }
 
 void Int32Value::InternalSwap(Int32Value* other) {
   using std::swap;
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
-
-  swap(_impl_.value_, other->_impl_.value_);
+        swap(_impl_.value_, other->_impl_.value_);
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata Int32Value::GetMetadata() const {
@@ -1260,7 +1255,7 @@ void UInt32Value::SetCachedSize(int size) const {
   _impl_._cached_size_.Set(size);
 }
 
-void UInt32Value::Clear() {
+PROTOBUF_NOINLINE void UInt32Value::Clear() {
 // @@protoc_insertion_point(message_clear_start:google.protobuf.UInt32Value)
   ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
@@ -1374,15 +1369,14 @@ void UInt32Value::CopyFrom(const UInt32Value& from) {
   MergeFrom(from);
 }
 
-bool UInt32Value::IsInitialized() const {
+PROTOBUF_NOINLINE bool UInt32Value::IsInitialized() const {
   return true;
 }
 
 void UInt32Value::InternalSwap(UInt32Value* other) {
   using std::swap;
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
-
-  swap(_impl_.value_, other->_impl_.value_);
+        swap(_impl_.value_, other->_impl_.value_);
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata UInt32Value::GetMetadata() const {
@@ -1434,7 +1428,7 @@ void BoolValue::SetCachedSize(int size) const {
   _impl_._cached_size_.Set(size);
 }
 
-void BoolValue::Clear() {
+PROTOBUF_NOINLINE void BoolValue::Clear() {
 // @@protoc_insertion_point(message_clear_start:google.protobuf.BoolValue)
   ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
@@ -1547,15 +1541,14 @@ void BoolValue::CopyFrom(const BoolValue& from) {
   MergeFrom(from);
 }
 
-bool BoolValue::IsInitialized() const {
+PROTOBUF_NOINLINE bool BoolValue::IsInitialized() const {
   return true;
 }
 
 void BoolValue::InternalSwap(BoolValue* other) {
   using std::swap;
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
-
-  swap(_impl_.value_, other->_impl_.value_);
+        swap(_impl_.value_, other->_impl_.value_);
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata BoolValue::GetMetadata() const {
@@ -1624,7 +1617,7 @@ void StringValue::SetCachedSize(int size) const {
   _impl_._cached_size_.Set(size);
 }
 
-void StringValue::Clear() {
+PROTOBUF_NOINLINE void StringValue::Clear() {
 // @@protoc_insertion_point(message_clear_start:google.protobuf.StringValue)
   ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
@@ -1741,7 +1734,7 @@ void StringValue::CopyFrom(const StringValue& from) {
   MergeFrom(from);
 }
 
-bool StringValue::IsInitialized() const {
+PROTOBUF_NOINLINE bool StringValue::IsInitialized() const {
   return true;
 }
 
@@ -1820,7 +1813,7 @@ void BytesValue::SetCachedSize(int size) const {
   _impl_._cached_size_.Set(size);
 }
 
-void BytesValue::Clear() {
+PROTOBUF_NOINLINE void BytesValue::Clear() {
 // @@protoc_insertion_point(message_clear_start:google.protobuf.BytesValue)
   ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
@@ -1934,7 +1927,7 @@ void BytesValue::CopyFrom(const BytesValue& from) {
   MergeFrom(from);
 }
 
-bool BytesValue::IsInitialized() const {
+PROTOBUF_NOINLINE bool BytesValue::IsInitialized() const {
   return true;
 }
 

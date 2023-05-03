@@ -380,7 +380,7 @@ void Version::SetCachedSize(int size) const {
   _impl_._cached_size_.Set(size);
 }
 
-void Version::Clear() {
+PROTOBUF_NOINLINE void Version::Clear() {
 // @@protoc_insertion_point(message_clear_start:google.protobuf.compiler.Version)
   ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
@@ -482,23 +482,23 @@ failure:
   cached_has_bits = _impl_._has_bits_[0];
   // optional int32 major = 1;
   if (cached_has_bits & 0x00000002u) {
-    target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteInt32ToArray(
-        1, this->_internal_major(), target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+        WriteInt32ToArrayWithField<1>(
+            stream, this->_internal_major(), target);
   }
 
   // optional int32 minor = 2;
   if (cached_has_bits & 0x00000004u) {
-    target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteInt32ToArray(
-        2, this->_internal_minor(), target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+        WriteInt32ToArrayWithField<2>(
+            stream, this->_internal_minor(), target);
   }
 
   // optional int32 patch = 3;
   if (cached_has_bits & 0x00000008u) {
-    target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteInt32ToArray(
-        3, this->_internal_patch(), target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+        WriteInt32ToArrayWithField<3>(
+            stream, this->_internal_patch(), target);
   }
 
   // optional string suffix = 4;
@@ -596,7 +596,7 @@ void Version::CopyFrom(const Version& from) {
   MergeFrom(from);
 }
 
-bool Version::IsInitialized() const {
+PROTOBUF_NOINLINE bool Version::IsInitialized() const {
   return true;
 }
 
@@ -637,8 +637,7 @@ class CodeGeneratorRequest::_Internal {
   }
 };
 
-const ::PROTOBUF_NAMESPACE_ID::compiler::Version&
-CodeGeneratorRequest::_Internal::compiler_version(const CodeGeneratorRequest* msg) {
+const ::PROTOBUF_NAMESPACE_ID::compiler::Version& CodeGeneratorRequest::_Internal::compiler_version(const CodeGeneratorRequest* msg) {
   return *msg->_impl_.compiler_version_;
 }
 void CodeGeneratorRequest::clear_proto_file() {
@@ -713,7 +712,7 @@ void CodeGeneratorRequest::SetCachedSize(int size) const {
   _impl_._cached_size_.Set(size);
 }
 
-void CodeGeneratorRequest::Clear() {
+PROTOBUF_NOINLINE void CodeGeneratorRequest::Clear() {
 // @@protoc_insertion_point(message_clear_start:google.protobuf.compiler.CodeGeneratorRequest)
   ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
@@ -748,7 +747,7 @@ const char* CodeGeneratorRequest::_InternalParse(const char* ptr, ::_pbi::ParseC
           ptr -= 1;
           do {
             ptr += 1;
-            auto str = _internal_add_file_to_generate();
+            auto str = _internal_mutable_file_to_generate()->Add();
             ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
             CHK_(ptr);
             #ifndef NDEBUG
@@ -788,7 +787,7 @@ const char* CodeGeneratorRequest::_InternalParse(const char* ptr, ::_pbi::ParseC
           ptr -= 1;
           do {
             ptr += 1;
-            ptr = ctx->ParseMessage(_internal_add_proto_file(), ptr);
+            ptr = ctx->ParseMessage(_internal_mutable_proto_file()->Add(), ptr);
             CHK_(ptr);
             if (!ctx->DataAvailable(ptr)) break;
           } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<122>(ptr));
@@ -828,7 +827,7 @@ failure:
 
   // repeated string file_to_generate = 1;
   for (int i = 0, n = this->_internal_file_to_generate_size(); i < n; ++i) {
-    const auto& s = this->_internal_file_to_generate(i);
+    const auto& s = this->_internal_file_to_generate().Get(i);
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::VerifyUTF8StringNamedField(s.data(), static_cast<int>(s.length()), ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::SERIALIZE,
                                 "google.protobuf.compiler.CodeGeneratorRequest.file_to_generate");
     target = stream->WriteString(1, s, target);
@@ -853,7 +852,7 @@ failure:
   // repeated .google.protobuf.FileDescriptorProto proto_file = 15;
   for (unsigned i = 0,
       n = static_cast<unsigned>(this->_internal_proto_file_size()); i < n; i++) {
-    const auto& repfield = this->_internal_proto_file(i);
+    const auto& repfield = this->_internal_proto_file().Get(i);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
         InternalWriteMessage(15, repfield, repfield.GetCachedSize(), target, stream);
   }
@@ -944,7 +943,7 @@ void CodeGeneratorRequest::CopyFrom(const CodeGeneratorRequest& from) {
   MergeFrom(from);
 }
 
-bool CodeGeneratorRequest::IsInitialized() const {
+PROTOBUF_NOINLINE bool CodeGeneratorRequest::IsInitialized() const {
   if (!::PROTOBUF_NAMESPACE_ID::internal::AllAreInitialized(_internal_proto_file()))
     return false;
   return true;
@@ -991,8 +990,7 @@ class CodeGeneratorResponse_File::_Internal {
   }
 };
 
-const ::PROTOBUF_NAMESPACE_ID::GeneratedCodeInfo&
-CodeGeneratorResponse_File::_Internal::generated_code_info(const CodeGeneratorResponse_File* msg) {
+const ::PROTOBUF_NAMESPACE_ID::GeneratedCodeInfo& CodeGeneratorResponse_File::_Internal::generated_code_info(const CodeGeneratorResponse_File* msg) {
   return *msg->_impl_.generated_code_info_;
 }
 void CodeGeneratorResponse_File::clear_generated_code_info() {
@@ -1094,7 +1092,7 @@ void CodeGeneratorResponse_File::SetCachedSize(int size) const {
   _impl_._cached_size_.Set(size);
 }
 
-void CodeGeneratorResponse_File::Clear() {
+PROTOBUF_NOINLINE void CodeGeneratorResponse_File::Clear() {
 // @@protoc_insertion_point(message_clear_start:google.protobuf.compiler.CodeGeneratorResponse.File)
   ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
@@ -1325,7 +1323,7 @@ void CodeGeneratorResponse_File::CopyFrom(const CodeGeneratorResponse_File& from
   MergeFrom(from);
 }
 
-bool CodeGeneratorResponse_File::IsInitialized() const {
+PROTOBUF_NOINLINE bool CodeGeneratorResponse_File::IsInitialized() const {
   return true;
 }
 
@@ -1429,7 +1427,7 @@ void CodeGeneratorResponse::SetCachedSize(int size) const {
   _impl_._cached_size_.Set(size);
 }
 
-void CodeGeneratorResponse::Clear() {
+PROTOBUF_NOINLINE void CodeGeneratorResponse::Clear() {
 // @@protoc_insertion_point(message_clear_start:google.protobuf.compiler.CodeGeneratorResponse)
   ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
@@ -1481,7 +1479,7 @@ const char* CodeGeneratorResponse::_InternalParse(const char* ptr, ::_pbi::Parse
           ptr -= 1;
           do {
             ptr += 1;
-            ptr = ctx->ParseMessage(_internal_add_file(), ptr);
+            ptr = ctx->ParseMessage(_internal_mutable_file()->Add(), ptr);
             CHK_(ptr);
             if (!ctx->DataAvailable(ptr)) break;
           } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<122>(ptr));
@@ -1538,7 +1536,7 @@ failure:
   // repeated .google.protobuf.compiler.CodeGeneratorResponse.File file = 15;
   for (unsigned i = 0,
       n = static_cast<unsigned>(this->_internal_file_size()); i < n; i++) {
-    const auto& repfield = this->_internal_file(i);
+    const auto& repfield = this->_internal_file().Get(i);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
         InternalWriteMessage(15, repfield, repfield.GetCachedSize(), target, stream);
   }
@@ -1620,7 +1618,7 @@ void CodeGeneratorResponse::CopyFrom(const CodeGeneratorResponse& from) {
   MergeFrom(from);
 }
 
-bool CodeGeneratorResponse::IsInitialized() const {
+PROTOBUF_NOINLINE bool CodeGeneratorResponse::IsInitialized() const {
   return true;
 }
 
@@ -1633,8 +1631,7 @@ void CodeGeneratorResponse::InternalSwap(CodeGeneratorResponse* other) {
   _internal_mutable_file()->InternalSwap(other->_internal_mutable_file());
   ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.error_, lhs_arena,
                                        &other->_impl_.error_, rhs_arena);
-
-  swap(_impl_.supported_features_, other->_impl_.supported_features_);
+        swap(_impl_.supported_features_, other->_impl_.supported_features_);
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata CodeGeneratorResponse::GetMetadata() const {

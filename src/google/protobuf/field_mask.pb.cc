@@ -153,7 +153,7 @@ void FieldMask::SetCachedSize(int size) const {
   _impl_._cached_size_.Set(size);
 }
 
-void FieldMask::Clear() {
+PROTOBUF_NOINLINE void FieldMask::Clear() {
 // @@protoc_insertion_point(message_clear_start:google.protobuf.FieldMask)
   ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
@@ -175,7 +175,7 @@ const char* FieldMask::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx
           ptr -= 1;
           do {
             ptr += 1;
-            auto str = _internal_add_paths();
+            auto str = _internal_mutable_paths()->Add();
             ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
             CHK_(ptr);
             CHK_(::_pbi::VerifyUTF8(str, "google.protobuf.FieldMask.paths"));
@@ -216,7 +216,7 @@ failure:
 
   // repeated string paths = 1;
   for (int i = 0, n = this->_internal_paths_size(); i < n; ++i) {
-    const auto& s = this->_internal_paths(i);
+    const auto& s = this->_internal_paths().Get(i);
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
         s.data(), static_cast<int>(s.length()), ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE, "google.protobuf.FieldMask.paths");
     target = stream->WriteString(1, s, target);
@@ -274,7 +274,7 @@ void FieldMask::CopyFrom(const FieldMask& from) {
   MergeFrom(from);
 }
 
-bool FieldMask::IsInitialized() const {
+PROTOBUF_NOINLINE bool FieldMask::IsInitialized() const {
   return true;
 }
 

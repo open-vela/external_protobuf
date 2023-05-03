@@ -28,43 +28,34 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-//! Kernel-agnostic logic for the Rust Protobuf Runtime.
-//!
-//! For kernel-specific logic this crate delegates to the respective __runtime
-//! crate.
+use unittest_proto::proto2_unittest::TestAllTypes;
 
-#[cfg(cpp_kernel)]
-pub extern crate cpp as __runtime;
-#[cfg(upb_kernel)]
-pub extern crate upb as __runtime;
+#[test]
+fn serialize_deserialize_message() {
+    let mut msg = TestAllTypes::new();
+    msg.optional_int64_set(Some(42));
+    msg.optional_bool_set(Some(true));
+    msg.optional_bytes_set(Some(b"serialize deserialize test"));
 
-pub use __runtime::SerializedData;
+    let serialized = msg.serialize();
 
-use std::fmt;
-use std::slice;
+    let mut msg2 = TestAllTypes::new();
+    assert!(msg2.deserialize(&serialized).is_ok());
 
-/// Represents error during deserialization.
-#[derive(Debug, Clone)]
-pub struct ParseError;
-
-impl fmt::Display for ParseError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "Couldn't deserialize given bytes into a proto")
-    }
+    assert_eq!(msg.optional_int64(), msg2.optional_int64());
+    assert_eq!(msg.optional_bool(), msg2.optional_bool());
+    assert_eq!(msg.optional_bytes(), msg2.optional_bytes());
 }
 
-/// Represents an ABI-stable version of &[u8]/string_view (a borrowed slice of
-/// bytes) for FFI use only.
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub struct PtrAndLen {
-    /// Borrows the memory.
-    pub ptr: *const u8,
-    pub len: usize,
+#[test]
+fn deserialize_empty() {
+    let mut msg = TestAllTypes::new();
+    assert!(msg.deserialize(&[]).is_ok());
 }
 
-impl PtrAndLen {
-    pub unsafe fn as_ref<'a>(self) -> &'a [u8] {
-        slice::from_raw_parts(self.ptr, self.len)
-    }
+#[test]
+fn deserialize_error() {
+    let mut msg = TestAllTypes::new();
+    let data = b"not a serialized proto";
+    assert!(msg.deserialize(&*data).is_err());
 }
