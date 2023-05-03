@@ -460,8 +460,7 @@ class Type::_Internal {
   }
 };
 
-const ::PROTOBUF_NAMESPACE_ID::SourceContext&
-Type::_Internal::source_context(const Type* msg) {
+const ::PROTOBUF_NAMESPACE_ID::SourceContext& Type::_Internal::source_context(const Type* msg) {
   return *msg->_impl_.source_context_;
 }
 void Type::clear_source_context() {
@@ -561,7 +560,7 @@ void Type::SetCachedSize(int size) const {
   _impl_._cached_size_.Set(size);
 }
 
-void Type::Clear() {
+PROTOBUF_NOINLINE void Type::Clear() {
 // @@protoc_insertion_point(message_clear_start:google.protobuf.Type)
   ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
@@ -606,7 +605,7 @@ const char* Type::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
           ptr -= 1;
           do {
             ptr += 1;
-            ptr = ctx->ParseMessage(_internal_add_fields(), ptr);
+            ptr = ctx->ParseMessage(_internal_mutable_fields()->Add(), ptr);
             CHK_(ptr);
             if (!ctx->DataAvailable(ptr)) break;
           } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<18>(ptr));
@@ -620,7 +619,7 @@ const char* Type::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
           ptr -= 1;
           do {
             ptr += 1;
-            auto str = _internal_add_oneofs();
+            auto str = _internal_mutable_oneofs()->Add();
             ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
             CHK_(ptr);
             CHK_(::_pbi::VerifyUTF8(str, "google.protobuf.Type.oneofs"));
@@ -636,7 +635,7 @@ const char* Type::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
           ptr -= 1;
           do {
             ptr += 1;
-            ptr = ctx->ParseMessage(_internal_add_options(), ptr);
+            ptr = ctx->ParseMessage(_internal_mutable_options()->Add(), ptr);
             CHK_(ptr);
             if (!ctx->DataAvailable(ptr)) break;
           } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<34>(ptr));
@@ -715,14 +714,14 @@ failure:
   // repeated .google.protobuf.Field fields = 2;
   for (unsigned i = 0,
       n = static_cast<unsigned>(this->_internal_fields_size()); i < n; i++) {
-    const auto& repfield = this->_internal_fields(i);
+    const auto& repfield = this->_internal_fields().Get(i);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
         InternalWriteMessage(2, repfield, repfield.GetCachedSize(), target, stream);
   }
 
   // repeated string oneofs = 3;
   for (int i = 0, n = this->_internal_oneofs_size(); i < n; ++i) {
-    const auto& s = this->_internal_oneofs(i);
+    const auto& s = this->_internal_oneofs().Get(i);
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
         s.data(), static_cast<int>(s.length()), ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE, "google.protobuf.Type.oneofs");
     target = stream->WriteString(3, s, target);
@@ -731,7 +730,7 @@ failure:
   // repeated .google.protobuf.Option options = 4;
   for (unsigned i = 0,
       n = static_cast<unsigned>(this->_internal_options_size()); i < n; i++) {
-    const auto& repfield = this->_internal_options(i);
+    const auto& repfield = this->_internal_options().Get(i);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
         InternalWriteMessage(4, repfield, repfield.GetCachedSize(), target, stream);
   }
@@ -866,7 +865,7 @@ void Type::CopyFrom(const Type& from) {
   MergeFrom(from);
 }
 
-bool Type::IsInitialized() const {
+PROTOBUF_NOINLINE bool Type::IsInitialized() const {
   return true;
 }
 
@@ -1032,7 +1031,7 @@ void Field::SetCachedSize(int size) const {
   _impl_._cached_size_.Set(size);
 }
 
-void Field::Clear() {
+PROTOBUF_NOINLINE void Field::Clear() {
 // @@protoc_insertion_point(message_clear_start:google.protobuf.Field)
   ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
@@ -1130,7 +1129,7 @@ const char* Field::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
           ptr -= 1;
           do {
             ptr += 1;
-            ptr = ctx->ParseMessage(_internal_add_options(), ptr);
+            ptr = ctx->ParseMessage(_internal_mutable_options()->Add(), ptr);
             CHK_(ptr);
             if (!ctx->DataAvailable(ptr)) break;
           } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<74>(ptr));
@@ -1205,9 +1204,9 @@ failure:
 
   // int32 number = 3;
   if (this->_internal_number() != 0) {
-    target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteInt32ToArray(
-        3, this->_internal_number(), target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+        WriteInt32ToArrayWithField<3>(
+            stream, this->_internal_number(), target);
   }
 
   // string name = 4;
@@ -1228,9 +1227,9 @@ failure:
 
   // int32 oneof_index = 7;
   if (this->_internal_oneof_index() != 0) {
-    target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteInt32ToArray(
-        7, this->_internal_oneof_index(), target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+        WriteInt32ToArrayWithField<7>(
+            stream, this->_internal_oneof_index(), target);
   }
 
   // bool packed = 8;
@@ -1243,7 +1242,7 @@ failure:
   // repeated .google.protobuf.Option options = 9;
   for (unsigned i = 0,
       n = static_cast<unsigned>(this->_internal_options_size()); i < n; i++) {
-    const auto& repfield = this->_internal_options(i);
+    const auto& repfield = this->_internal_options().Get(i);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
         InternalWriteMessage(9, repfield, repfield.GetCachedSize(), target, stream);
   }
@@ -1396,7 +1395,7 @@ void Field::CopyFrom(const Field& from) {
   MergeFrom(from);
 }
 
-bool Field::IsInitialized() const {
+PROTOBUF_NOINLINE bool Field::IsInitialized() const {
   return true;
 }
 
@@ -1440,8 +1439,7 @@ class Enum::_Internal {
   }
 };
 
-const ::PROTOBUF_NAMESPACE_ID::SourceContext&
-Enum::_Internal::source_context(const Enum* msg) {
+const ::PROTOBUF_NAMESPACE_ID::SourceContext& Enum::_Internal::source_context(const Enum* msg) {
   return *msg->_impl_.source_context_;
 }
 void Enum::clear_source_context() {
@@ -1538,7 +1536,7 @@ void Enum::SetCachedSize(int size) const {
   _impl_._cached_size_.Set(size);
 }
 
-void Enum::Clear() {
+PROTOBUF_NOINLINE void Enum::Clear() {
 // @@protoc_insertion_point(message_clear_start:google.protobuf.Enum)
   ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
@@ -1582,7 +1580,7 @@ const char* Enum::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
           ptr -= 1;
           do {
             ptr += 1;
-            ptr = ctx->ParseMessage(_internal_add_enumvalue(), ptr);
+            ptr = ctx->ParseMessage(_internal_mutable_enumvalue()->Add(), ptr);
             CHK_(ptr);
             if (!ctx->DataAvailable(ptr)) break;
           } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<18>(ptr));
@@ -1596,7 +1594,7 @@ const char* Enum::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
           ptr -= 1;
           do {
             ptr += 1;
-            ptr = ctx->ParseMessage(_internal_add_options(), ptr);
+            ptr = ctx->ParseMessage(_internal_mutable_options()->Add(), ptr);
             CHK_(ptr);
             if (!ctx->DataAvailable(ptr)) break;
           } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<26>(ptr));
@@ -1675,7 +1673,7 @@ failure:
   // repeated .google.protobuf.EnumValue enumvalue = 2;
   for (unsigned i = 0,
       n = static_cast<unsigned>(this->_internal_enumvalue_size()); i < n; i++) {
-    const auto& repfield = this->_internal_enumvalue(i);
+    const auto& repfield = this->_internal_enumvalue().Get(i);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
         InternalWriteMessage(2, repfield, repfield.GetCachedSize(), target, stream);
   }
@@ -1683,7 +1681,7 @@ failure:
   // repeated .google.protobuf.Option options = 3;
   for (unsigned i = 0,
       n = static_cast<unsigned>(this->_internal_options_size()); i < n; i++) {
-    const auto& repfield = this->_internal_options(i);
+    const auto& repfield = this->_internal_options().Get(i);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
         InternalWriteMessage(3, repfield, repfield.GetCachedSize(), target, stream);
   }
@@ -1810,7 +1808,7 @@ void Enum::CopyFrom(const Enum& from) {
   MergeFrom(from);
 }
 
-bool Enum::IsInitialized() const {
+PROTOBUF_NOINLINE bool Enum::IsInitialized() const {
   return true;
 }
 
@@ -1908,7 +1906,7 @@ void EnumValue::SetCachedSize(int size) const {
   _impl_._cached_size_.Set(size);
 }
 
-void EnumValue::Clear() {
+PROTOBUF_NOINLINE void EnumValue::Clear() {
 // @@protoc_insertion_point(message_clear_start:google.protobuf.EnumValue)
   ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
@@ -1952,7 +1950,7 @@ const char* EnumValue::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx
           ptr -= 1;
           do {
             ptr += 1;
-            ptr = ctx->ParseMessage(_internal_add_options(), ptr);
+            ptr = ctx->ParseMessage(_internal_mutable_options()->Add(), ptr);
             CHK_(ptr);
             if (!ctx->DataAvailable(ptr)) break;
           } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<26>(ptr));
@@ -1999,15 +1997,15 @@ failure:
 
   // int32 number = 2;
   if (this->_internal_number() != 0) {
-    target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteInt32ToArray(
-        2, this->_internal_number(), target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+        WriteInt32ToArrayWithField<2>(
+            stream, this->_internal_number(), target);
   }
 
   // repeated .google.protobuf.Option options = 3;
   for (unsigned i = 0,
       n = static_cast<unsigned>(this->_internal_options_size()); i < n; i++) {
-    const auto& repfield = this->_internal_options(i);
+    const auto& repfield = this->_internal_options().Get(i);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
         InternalWriteMessage(3, repfield, repfield.GetCachedSize(), target, stream);
   }
@@ -2082,7 +2080,7 @@ void EnumValue::CopyFrom(const EnumValue& from) {
   MergeFrom(from);
 }
 
-bool EnumValue::IsInitialized() const {
+PROTOBUF_NOINLINE bool EnumValue::IsInitialized() const {
   return true;
 }
 
@@ -2094,8 +2092,7 @@ void EnumValue::InternalSwap(EnumValue* other) {
   _internal_mutable_options()->InternalSwap(other->_internal_mutable_options());
   ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.name_, lhs_arena,
                                        &other->_impl_.name_, rhs_arena);
-
-  swap(_impl_.number_, other->_impl_.number_);
+        swap(_impl_.number_, other->_impl_.number_);
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata EnumValue::GetMetadata() const {
@@ -2116,8 +2113,7 @@ class Option::_Internal {
   }
 };
 
-const ::PROTOBUF_NAMESPACE_ID::Any&
-Option::_Internal::value(const Option* msg) {
+const ::PROTOBUF_NAMESPACE_ID::Any& Option::_Internal::value(const Option* msg) {
   return *msg->_impl_.value_;
 }
 void Option::clear_value() {
@@ -2187,7 +2183,7 @@ void Option::SetCachedSize(int size) const {
   _impl_._cached_size_.Set(size);
 }
 
-void Option::Clear() {
+PROTOBUF_NOINLINE void Option::Clear() {
 // @@protoc_insertion_point(message_clear_start:google.protobuf.Option)
   ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
@@ -2341,7 +2337,7 @@ void Option::CopyFrom(const Option& from) {
   MergeFrom(from);
 }
 
-bool Option::IsInitialized() const {
+PROTOBUF_NOINLINE bool Option::IsInitialized() const {
   return true;
 }
 
