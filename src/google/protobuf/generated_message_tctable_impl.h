@@ -811,10 +811,6 @@ class PROTOBUF_EXPORT TcParser final {
       const char* ptr, Arena* arena, SerialArena* serial_arena,
       ParseContext* ctx, RepeatedPtrField<std::string>& field);
 
-  static MessageLite* NewMessage(Arena* arena, TcParseTableBase::FieldAux aux);
-  static MessageLite* AddMessage(RepeatedPtrFieldBase& field,
-                                 TcParseTableBase::FieldAux aux);
-
   static void AddUnknownEnum(MessageLite* msg, const TcParseTableBase* table,
                              uint32_t tag, int32_t enum_value);
 
@@ -851,10 +847,6 @@ class PROTOBUF_EXPORT TcParser final {
   static void ReportFastUtf8Error(uint32_t decoded_tag,
                                   const TcParseTableBase* table);
   static bool MpVerifyUtf8(absl::string_view wire_bytes,
-                           const TcParseTableBase* table,
-                           const TcParseTableBase::FieldEntry& entry,
-                           uint16_t xform_val);
-  static bool MpVerifyUtf8(const absl::Cord& wire_bytes,
                            const TcParseTableBase* table,
                            const TcParseTableBase::FieldEntry& entry,
                            uint16_t xform_val);
