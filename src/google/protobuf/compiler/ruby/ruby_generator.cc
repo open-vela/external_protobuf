@@ -39,7 +39,6 @@
 #include "absl/log/absl_log.h"
 #include "absl/strings/escaping.h"
 #include "google/protobuf/compiler/plugin.h"
-#include "google/protobuf/compiler/retention.h"
 #include "google/protobuf/descriptor.h"
 #include "google/protobuf/descriptor.pb.h"
 #include "google/protobuf/descriptor_legacy.h"
@@ -239,7 +238,8 @@ void EndPackageModules(int levels, io::Printer* printer) {
 }
 
 std::string SerializedDescriptor(const FileDescriptor* file) {
-  FileDescriptorProto file_proto = StripSourceRetentionOptions(*file);
+  FileDescriptorProto file_proto;
+  file->CopyTo(&file_proto);
   std::string file_data;
   file_proto.SerializeToString(&file_data);
   return file_data;
