@@ -106,15 +106,10 @@ class Context {
   }
 
   // Forwards to Emit(), which will likely be called all the time.
-  void Emit(absl::string_view format,
-            io::Printer::SourceLocation loc =
-                io::Printer::SourceLocation::current()) const {
-    printer_->Emit(format, loc);
-  }
-  void Emit(absl::Span<const io::Printer::Sub> vars, absl::string_view format,
-            io::Printer::SourceLocation loc =
-                io::Printer::SourceLocation::current()) const {
-    printer_->Emit(vars, format, loc);
+  void Emit(absl::string_view format) const { printer_->Emit(format); }
+  void Emit(absl::Span<const io::Printer::Sub> vars,
+            absl::string_view format) const {
+    printer_->Emit(vars, format);
   }
 
  private:
