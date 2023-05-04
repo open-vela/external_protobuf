@@ -49,6 +49,11 @@
 // detect/prohibit anytime it is #included twice without a corresponding
 // #undef.
 
+#ifdef PROTOBUF_PORT_
+#error "port_def.inc included multiple times"
+#endif
+#define PROTOBUF_PORT_
+
 // The definitions in this file are intended to be portable across Clang,
 // GCC, and MSVC. Function-like macros are usable without an #ifdef guard.
 // Syntax macros (for example, attributes) are always defined, although
@@ -231,34 +236,22 @@ static_assert(PROTOBUF_CPLUSPLUS_MIN(201402L), "Protobuf only supports C++14 and
 #ifdef PROTOBUF_VERSION
 #error PROTOBUF_VERSION was previously defined
 #endif
-#define PROTOBUF_VERSION 4023000
+#define PROTOBUF_VERSION 4022003
 
 #ifdef PROTOBUF_MIN_HEADER_VERSION_FOR_PROTOC
 #error PROTOBUF_MIN_HEADER_VERSION_FOR_PROTOC was previously defined
 #endif
-#define PROTOBUF_MIN_HEADER_VERSION_FOR_PROTOC 4023000
+#define PROTOBUF_MIN_HEADER_VERSION_FOR_PROTOC 3021000
 
 #ifdef PROTOBUF_MIN_PROTOC_VERSION
 #error PROTOBUF_MIN_PROTOC_VERSION was previously defined
 #endif
-#define PROTOBUF_MIN_PROTOC_VERSION 4023000
+#define PROTOBUF_MIN_PROTOC_VERSION 3021000
 
 #ifdef PROTOBUF_VERSION_SUFFIX
 #error PROTOBUF_VERSION_SUFFIX was previously defined
 #endif
-#define PROTOBUF_VERSION_SUFFIX "-rc2"
-
-#if defined(PROTOBUF_NAMESPACE) || defined(PROTOBUF_NAMESPACE_ID)
-#error PROTOBUF_NAMESPACE or PROTOBUF_NAMESPACE_ID was previously defined
-#endif
-#define PROTOBUF_NAMESPACE "google::protobuf"
-#define PROTOBUF_NAMESPACE_ID google::protobuf
-#define PROTOBUF_NAMESPACE_OPEN \
-  namespace google {            \
-  namespace protobuf {
-#define PROTOBUF_NAMESPACE_CLOSE \
-  } /* namespace protobuf */     \
-  } /* namespace google */
+#define PROTOBUF_VERSION_SUFFIX ""
 
 #ifdef PROTOBUF_ALWAYS_INLINE
 #error PROTOBUF_ALWAYS_INLINE was previously defined
@@ -434,7 +427,7 @@ static_assert(PROTOBUF_CPLUSPLUS_MIN(201402L), "Protobuf only supports C++14 and
 
 // The minimum library version which works with the current version of the
 // headers.
-#define GOOGLE_PROTOBUF_MIN_LIBRARY_VERSION 4023000
+#define GOOGLE_PROTOBUF_MIN_LIBRARY_VERSION 3021000
 
 #ifdef PROTOBUF_RTTI
 #error PROTOBUF_RTTI was previously defined
@@ -875,6 +868,13 @@ static_assert(PROTOBUF_CPLUSPLUS_MIN(201402L), "Protobuf only supports C++14 and
 #define PROTOBUF_DID_UNDEF_PACKAGE
 #pragma push_macro("PACKAGE")
 #undef PACKAGE
+#endif
+
+// a few common headers define this
+#ifdef PACKED
+#define PROTOBUF_DID_UNDEF_PACKED
+#pragma push_macro("PACKED")
+#undef PACKED
 #endif
 
 // linux is a legacy MACRO defined in most popular C++ standards.
