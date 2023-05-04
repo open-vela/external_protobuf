@@ -28,43 +28,41 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-//! Kernel-agnostic logic for the Rust Protobuf Runtime.
-//!
-//! For kernel-specific logic this crate delegates to the respective __runtime
-//! crate.
+#ifndef GOOGLE_PROTOBUF_TEST_TEXTPROTO_H__
+#define GOOGLE_PROTOBUF_TEST_TEXTPROTO_H__
 
-#[cfg(cpp_kernel)]
-pub extern crate cpp as __runtime;
-#[cfg(upb_kernel)]
-pub extern crate upb as __runtime;
+#include <gmock/gmock.h>
+#include "absl/log/absl_check.h"
+#include "absl/memory/memory.h"
+#include "google/protobuf/text_format.h"
 
-pub use __runtime::SerializedData;
+// This file contains private helpers for dealing with textprotos in our
+// tests.  We make no guarantees about the behavior in real-world situations,
+// and these are only meant for basic unit-tests of protobuf internals.
+namespace google {
+namespace protobuf {
 
-use std::fmt;
-use std::slice;
-
-/// Represents error during deserialization.
-#[derive(Debug, Clone)]
-pub struct ParseError;
-
-impl fmt::Display for ParseError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "Couldn't deserialize given bytes into a proto")
-    }
+MATCHER_P(EqualsProto, textproto, "") {
+  auto msg = absl::WrapUnique(arg.New());
+  return TextFormat::ParseFromString(textproto, msg.get()) &&
+         msg->DebugString() == arg.DebugString();
 }
 
-/// Represents an ABI-stable version of &[u8]/string_view (a borrowed slice of
-/// bytes) for FFI use only.
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub struct PtrAndLen {
-    /// Borrows the memory.
-    pub ptr: *const u8,
-    pub len: usize,
-}
+class ParseTextOrDie {
+ public:
+  explicit ParseTextOrDie(absl::string_view text) : text_(text) {}
+  template <typename Proto>
+  operator Proto() {  // NOLINT(google-explicit-constructor)
+    Proto ret;
+    ABSL_CHECK(TextFormat::ParseFromString(text_, &ret));
+    return ret;
+  }
 
-impl PtrAndLen {
-    pub unsafe fn as_ref<'a>(self) -> &'a [u8] {
-        slice::from_raw_parts(self.ptr, self.len)
-    }
-}
+ private:
+  absl::string_view text_;
+};
+
+}  // namespace protobuf
+}  // namespace google
+
+#endif  // GOOGLE_PROTOBUF_TEST_TEXTPROTO_H__
