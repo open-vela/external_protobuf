@@ -1426,7 +1426,7 @@ void MessageGenerator::GenerateClassDefinition(io::Printer* p) {
       "#endif  // !PROTOBUF_FORCE_COPY_IN_SWAP\n"
       "    InternalSwap(other);\n"
       "  } else {\n"
-      "    $pbi$::GenericSwap(this, other);\n"
+      "    ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);\n"
       "  }\n"
       "}\n"
       "void UnsafeArenaSwap($classname$* other) {\n"
@@ -2022,7 +2022,8 @@ void MessageGenerator::GenerateClassMethods(io::Printer* p) {
     format(
         "void $classname$::PrepareSplitMessageForWrite() {\n"
         "  if (IsSplitMessageDefault()) {\n"
-        "    void* chunk = $pbi$::CreateSplitMessageGeneric("
+        "    void* chunk = "
+        "::PROTOBUF_NAMESPACE_ID::internal::CreateSplitMessageGeneric("
         "GetArenaForAllocation(), &$1$, sizeof(Impl_::Split), this, &$2$);\n"
         "    $split$ = reinterpret_cast<Impl_::Split*>(chunk);\n"
         "  }\n"
@@ -2851,7 +2852,7 @@ void MessageGenerator::GenerateClear(io::Printer* p) {
   const int kMaxUnconditionalPrimitiveBytesClear = 4;
 
   format(
-      "PROTOBUF_NOINLINE void $classname$::Clear() {\n"
+      "void $classname$::Clear() {\n"
       "// @@protoc_insertion_point(message_clear_start:$full_name$)\n");
   format.Indent();
 
@@ -3138,7 +3139,7 @@ void MessageGenerator::GenerateSwap(io::Printer* p) {
         });
 
         format(
-            "$pbi$::memswap<\n"
+            "::PROTOBUF_NAMESPACE_ID::internal::memswap<\n"
             "    PROTOBUF_FIELD_OFFSET($classname$, $last$)\n"
             "    + sizeof($classname$::$last$)\n"
             "    - PROTOBUF_FIELD_OFFSET($classname$, $first$)>(\n"
@@ -3938,7 +3939,7 @@ void MessageGenerator::GenerateByteSize(io::Printer* p) {
   if (descriptor_->options().message_set_wire_format()) {
     // Special-case MessageSet.
     format(
-        "PROTOBUF_NOINLINE ::size_t $classname$::ByteSizeLong() const {\n"
+        "::size_t $classname$::ByteSizeLong() const {\n"
         "$annotate_bytesize$"
         "// @@protoc_insertion_point(message_set_byte_size_start:$full_name$)\n"
         "  ::size_t total_size = $extensions$.MessageSetByteSize();\n"
@@ -4181,7 +4182,7 @@ void MessageGenerator::GenerateByteSize(io::Printer* p) {
 void MessageGenerator::GenerateIsInitialized(io::Printer* p) {
   if (HasSimpleBaseClass(descriptor_, options_)) return;
   Formatter format(p);
-  format("PROTOBUF_NOINLINE bool $classname$::IsInitialized() const {\n");
+  format("bool $classname$::IsInitialized() const {\n");
   format.Indent();
 
   if (descriptor_->extension_range_count() > 0) {
