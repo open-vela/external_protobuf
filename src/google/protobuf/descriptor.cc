@@ -57,7 +57,6 @@
 #include "absl/hash/hash.h"
 #include "absl/log/absl_check.h"
 #include "absl/log/absl_log.h"
-#include "absl/status/statusor.h"
 #include "absl/strings/ascii.h"
 #include "absl/strings/escaping.h"
 #include "absl/strings/match.h"
@@ -1220,11 +1219,10 @@ class FlatAllocator
     : public decltype(ApplyTypeList<FlatAllocatorImpl>(
           SortByAlignment<char, std::string, SourceCodeInfo,
                           FileDescriptorTables,
-        // Option types
+                          // Option types
                           MessageOptions, FieldOptions, EnumOptions,
                           EnumValueOptions, ExtensionRangeOptions, OneofOptions,
-                          ServiceOptions, MethodOptions, FileOptions>())) {
-};
+                          ServiceOptions, MethodOptions, FileOptions>())) {};
 
 }  // namespace internal
 
@@ -1872,7 +1870,7 @@ DescriptorPool::DescriptorPool()
       lazily_build_dependencies_(false),
       allow_unknown_(false),
       enforce_weak_(false),
-      enforce_extension_declarations_(false),
+      enforce_special_extension_ranges_(false),
       disallow_enforce_utf8_(false),
       deprecated_legacy_json_field_conflicts_(false) {}
 
@@ -1887,7 +1885,7 @@ DescriptorPool::DescriptorPool(DescriptorDatabase* fallback_database,
       lazily_build_dependencies_(false),
       allow_unknown_(false),
       enforce_weak_(false),
-      enforce_extension_declarations_(false),
+      enforce_special_extension_ranges_(false),
       disallow_enforce_utf8_(false),
       deprecated_legacy_json_field_conflicts_(false) {}
 
@@ -1901,7 +1899,7 @@ DescriptorPool::DescriptorPool(const DescriptorPool* underlay)
       lazily_build_dependencies_(false),
       allow_unknown_(false),
       enforce_weak_(false),
-      enforce_extension_declarations_(false),
+      enforce_special_extension_ranges_(false),
       disallow_enforce_utf8_(false),
       deprecated_legacy_json_field_conflicts_(false) {}
 
@@ -3710,11 +3708,11 @@ namespace {
 // one of the Options messages in descriptor.proto.
 struct OptionsToInterpret {
   OptionsToInterpret(absl::string_view ns, absl::string_view el,
-                     absl::Span<const int> path, const Message* orig_opt,
+                     const std::vector<int>& path, const Message* orig_opt,
                      Message* opt)
       : name_scope(ns),
         element_name(el),
-        element_path(path.begin(), path.end()),
+        element_path(path),
         original_options(orig_opt),
         options(opt) {}
   std::string name_scope;
@@ -3752,7 +3750,6 @@ class DescriptorBuilder {
   const DescriptorPool* pool_;
   DescriptorPool::Tables* tables_;  // for convenience
   DescriptorPool::ErrorCollector* error_collector_;
-
 
   // As we build descriptors we store copies of the options messages in
   // them. We put pointers to those copies in this vector, as we build, so we
@@ -3930,23 +3927,22 @@ class DescriptorBuilder {
   // later. DescriptorT must be one of the Descriptor messages from
   // descriptor.proto.
   template <class DescriptorT>
-  typename DescriptorT::OptionsType* AllocateOptions(
-      const typename DescriptorT::Proto& proto, const DescriptorT* descriptor,
-      int options_field_tag, absl::string_view option_name,
-      internal::FlatAllocator& alloc);
+  void AllocateOptions(const typename DescriptorT::OptionsType& orig_options,
+                       DescriptorT* descriptor, int options_field_tag,
+                       absl::string_view option_name,
+                       internal::FlatAllocator& alloc);
   // Specialization for FileOptions.
-  FileOptions* AllocateOptions(const FileDescriptorProto& proto,
-                               const FileDescriptor* descriptor,
-                               internal::FlatAllocator& alloc);
+  void AllocateOptions(const FileOptions& orig_options,
+                       FileDescriptor* descriptor,
+                       internal::FlatAllocator& alloc);
 
   // Implementation for AllocateOptions(). Don't call this directly.
   template <class DescriptorT>
-  typename DescriptorT::OptionsType* AllocateOptionsImpl(
+  void AllocateOptionsImpl(
       absl::string_view name_scope, absl::string_view element_name,
-      const typename DescriptorT::Proto& proto,
-      absl::Span<const int> options_path, absl::string_view option_name,
-      internal::FlatAllocator& alloc);
-
+      const typename DescriptorT::OptionsType& orig_options,
+      DescriptorT* descriptor, const std::vector<int>& options_path,
+      absl::string_view option_name, internal::FlatAllocator& alloc);
 
   // Allocates an array of two strings, the first one is a copy of `proto_name`,
   // and the second one is the full name.
@@ -4200,17 +4196,15 @@ class DescriptorBuilder {
   // descriptors, which are the ones that have been interpreted. The const
   // proto references are passed in only so they can be provided to calls to
   // AddError(). Do not look at their options, which have not been interpreted.
-  void ValidateFileOptions(const FileDescriptor* file,
+  void ValidateFileOptions(FileDescriptor* file,
                            const FileDescriptorProto& proto);
-  void ValidateMessageOptions(const Descriptor* message,
+  void ValidateMessageOptions(Descriptor* message,
                               const DescriptorProto& proto);
-  void ValidateOneofOptions(const OneofDescriptor* oneof,
-                            const OneofDescriptorProto& proto);
-  void ValidateFieldOptions(const FieldDescriptor* field,
+  void ValidateFieldOptions(FieldDescriptor* field,
                             const FieldDescriptorProto& proto);
-  void ValidateEnumOptions(const EnumDescriptor* enm,
+  void ValidateEnumOptions(EnumDescriptor* enm,
                            const EnumDescriptorProto& proto);
-  void ValidateEnumValueOptions(const EnumValueDescriptor* enum_value,
+  void ValidateEnumValueOptions(EnumValueDescriptor* enum_value,
                                 const EnumValueDescriptorProto& proto);
   void ValidateExtensionRangeOptions(const DescriptorProto& proto,
                                      const Descriptor& message);
@@ -4219,22 +4213,20 @@ class DescriptorBuilder {
       const RepeatedPtrField<ExtensionRangeOptions_Declaration>& declarations,
       const DescriptorProto_ExtensionRange& proto,
       absl::flat_hash_set<absl::string_view>& full_name_set);
-  void ValidateServiceOptions(const ServiceDescriptor* service,
+  void ValidateServiceOptions(ServiceDescriptor* service,
                               const ServiceDescriptorProto& proto);
-  void ValidateMethodOptions(const MethodDescriptor* method,
+  void ValidateMethodOptions(MethodDescriptor* method,
                              const MethodDescriptorProto& proto);
-  void ValidateProto3(const FileDescriptor* file,
-                      const FileDescriptorProto& proto);
-  void ValidateProto3Message(const Descriptor* message,
-                             const DescriptorProto& proto);
-  void ValidateProto3Field(const FieldDescriptor* field,
+  void ValidateProto3(FileDescriptor* file, const FileDescriptorProto& proto);
+  void ValidateProto3Message(Descriptor* message, const DescriptorProto& proto);
+  void ValidateProto3Field(FieldDescriptor* field,
                            const FieldDescriptorProto& proto);
-  void ValidateProto3Enum(const EnumDescriptor* enm,
+  void ValidateProto3Enum(EnumDescriptor* enm,
                           const EnumDescriptorProto& proto);
 
   // Returns true if the map entry message is compatible with the
   // auto-generated entry message from map fields syntax.
-  bool ValidateMapEntry(const FieldDescriptor* field,
+  bool ValidateMapEntry(FieldDescriptor* field,
                         const FieldDescriptorProto& proto);
 
   // Recursively detects naming conflicts with map entry types for a
@@ -4242,7 +4234,7 @@ class DescriptorBuilder {
   void DetectMapConflicts(const Descriptor* message,
                           const DescriptorProto& proto);
 
-  void ValidateJSType(const FieldDescriptor* field,
+  void ValidateJSType(FieldDescriptor* field,
                       const FieldDescriptorProto& proto);
 };
 
@@ -4858,49 +4850,43 @@ void DescriptorBuilder::ValidateSymbolName(const std::string& name,
 // This generic implementation is good for all descriptors except
 // FileDescriptor.
 template <class DescriptorT>
-typename DescriptorT::OptionsType* DescriptorBuilder::AllocateOptions(
-    const typename DescriptorT::Proto& proto, const DescriptorT* descriptor,
-    int options_field_tag, absl::string_view option_name,
-    internal::FlatAllocator& alloc) {
+void DescriptorBuilder::AllocateOptions(
+    const typename DescriptorT::OptionsType& orig_options,
+    DescriptorT* descriptor, int options_field_tag,
+    absl::string_view option_name, internal::FlatAllocator& alloc) {
   std::vector<int> options_path;
   descriptor->GetLocationPath(&options_path);
   options_path.push_back(options_field_tag);
-  return AllocateOptionsImpl<DescriptorT>(descriptor->full_name(),
-                                          descriptor->full_name(), proto,
-                                          options_path, option_name, alloc);
+  AllocateOptionsImpl(descriptor->full_name(), descriptor->full_name(),
+                      orig_options, descriptor, options_path, option_name,
+                      alloc);
 }
 
 // We specialize for FileDescriptor.
-FileOptions* DescriptorBuilder::AllocateOptions(
-    const FileDescriptorProto& proto, const FileDescriptor* descriptor,
-    internal::FlatAllocator& alloc) {
+void DescriptorBuilder::AllocateOptions(const FileOptions& orig_options,
+                                        FileDescriptor* descriptor,
+                                        internal::FlatAllocator& alloc) {
   std::vector<int> options_path;
   options_path.push_back(FileDescriptorProto::kOptionsFieldNumber);
   // We add the dummy token so that LookupSymbol does the right thing.
-  return AllocateOptionsImpl<FileDescriptor>(
-      absl::StrCat(descriptor->package(), ".dummy"), descriptor->name(), proto,
-      options_path, "google.protobuf.FileOptions", alloc);
+  AllocateOptionsImpl(absl::StrCat(descriptor->package(), ".dummy"),
+                      descriptor->name(), orig_options, descriptor,
+                      options_path, "google.protobuf.FileOptions", alloc);
 }
 
 template <class DescriptorT>
-typename DescriptorT::OptionsType* DescriptorBuilder::AllocateOptionsImpl(
+void DescriptorBuilder::AllocateOptionsImpl(
     absl::string_view name_scope, absl::string_view element_name,
-    const typename DescriptorT::Proto& proto,
-    absl::Span<const int> options_path, absl::string_view option_name,
-    internal::FlatAllocator& alloc) {
-  if (!proto.has_options()) {
-    // Set to default_instance later if necessary.
-    return nullptr;
-  }
-  const typename DescriptorT::OptionsType& orig_options = proto.options();
-
+    const typename DescriptorT::OptionsType& orig_options,
+    DescriptorT* descriptor, const std::vector<int>& options_path,
+    absl::string_view option_name, internal::FlatAllocator& alloc) {
   auto* options = alloc.AllocateArray<typename DescriptorT::OptionsType>(1);
 
   if (!orig_options.IsInitialized()) {
     AddError(absl::StrCat(name_scope, ".", element_name), orig_options,
              DescriptorPool::ErrorCollector::OPTION_NAME,
              "Uninterpreted option is missing name or value.");
-    return nullptr;
+    return;
   }
 
   // Avoid using MergeFrom()/CopyFrom() in this class to make it -fno-rtti
@@ -4908,6 +4894,7 @@ typename DescriptorT::OptionsType* DescriptorBuilder::AllocateOptionsImpl(
   // reflection based method, which requires the Descriptor. However, we are in
   // the middle of building the descriptors, thus the deadlock.
   options->ParseFromString(orig_options.SerializeAsString());
+  descriptor->options_ = options;
 
   // Don't add to options_to_interpret_ unless there were uninterpreted
   // options.  This not only avoids unnecessary work, but prevents a
@@ -4939,9 +4926,7 @@ typename DescriptorT::OptionsType* DescriptorBuilder::AllocateOptionsImpl(
       }
     }
   }
-  return options;
 }
-
 
 // A common pattern:  We want to convert a repeated field in the descriptor
 // to an array of values, calling some method to build each value.
@@ -5226,7 +5211,6 @@ FileDescriptor* DescriptorBuilder::BuildFileImpl(
   FileDescriptor* result = alloc.AllocateArray<FileDescriptor>(1);
   file_ = result;
 
-
   result->is_placeholder_ = false;
   result->finished_building_ = false;
   SourceCodeInfo* info = nullptr;
@@ -5325,7 +5309,6 @@ FileDescriptor* DescriptorBuilder::BuildFileImpl(
       // will be detected and reported in DescriptorBuilder::BuildFile().
       return nullptr;
     }
-
 
     if (dependency == nullptr) {
       if (!pool_->lazily_build_dependencies_) {
@@ -5437,9 +5420,9 @@ FileDescriptor* DescriptorBuilder::BuildFileImpl(
   BUILD_ARRAY(proto, result, extension, BuildExtension, nullptr);
 
   // Copy options.
-  {
-    FileOptions* options = AllocateOptions(proto, result, alloc);
-    result->options_ = options;  // Set to default_instance later if necessary.
+  result->options_ = nullptr;  // Set to default_instance later if necessary.
+  if (proto.has_options()) {
+    AllocateOptions(proto.options(), result, alloc);
   }
 
   // Note that the following steps must occur in exactly the specified order.
@@ -5596,9 +5579,11 @@ void DescriptorBuilder::BuildMessage(const DescriptorProto& proto,
   }
 
   // Copy options.
-  result->options_ =
-      AllocateOptions(proto, result, DescriptorProto::kOptionsFieldNumber,
-                      "google.protobuf.MessageOptions", alloc);
+  if (proto.has_options()) {
+    AllocateOptions(proto.options(), result,
+                    DescriptorProto::kOptionsFieldNumber,
+                    "google.protobuf.MessageOptions", alloc);
+  }
 
   AddSymbol(result->full_name(), parent, result->name(), proto, Symbol(result));
 
@@ -6088,9 +6073,12 @@ void DescriptorBuilder::BuildFieldOrExtension(const FieldDescriptorProto& proto,
   }
 
   // Copy options.
-  result->options_ =
-      AllocateOptions(proto, result, FieldDescriptorProto::kOptionsFieldNumber,
-                      "google.protobuf.FieldOptions", alloc);
+  result->options_ = nullptr;  // Set to default_instance later if necessary.
+  if (proto.has_options()) {
+    AllocateOptions(proto.options(), result,
+                    FieldDescriptorProto::kOptionsFieldNumber,
+                    "google.protobuf.FieldOptions", alloc);
+  }
 
   AddSymbol(result->full_name(), parent, result->name(), proto, Symbol(result));
 }
@@ -6129,9 +6117,9 @@ void DescriptorBuilder::BuildExtensionRange(
     }
     options_path.push_back(index);
     options_path.push_back(DescriptorProto_ExtensionRange::kOptionsFieldNumber);
-    result->options_ = AllocateOptionsImpl<Descriptor::ExtensionRange>(
-        parent->full_name(), parent->full_name(), proto, options_path,
-        "google.protobuf.ExtensionRangeOptions", alloc);
+    AllocateOptionsImpl(parent->full_name(), parent->full_name(),
+                        proto.options(), result, options_path,
+                        "google.protobuf.ExtensionRangeOptions", alloc);
   }
 }
 
@@ -6174,11 +6162,14 @@ void DescriptorBuilder::BuildOneof(const OneofDescriptorProto& proto,
   // We need to fill these in later.
   result->field_count_ = 0;
   result->fields_ = nullptr;
+  result->options_ = nullptr;
 
   // Copy options.
-  result->options_ =
-      AllocateOptions(proto, result, OneofDescriptorProto::kOptionsFieldNumber,
-                      "google.protobuf.OneofOptions", alloc);
+  if (proto.has_options()) {
+    AllocateOptions(proto.options(), result,
+                    OneofDescriptorProto::kOptionsFieldNumber,
+                    "google.protobuf.OneofOptions", alloc);
+  }
 
   AddSymbol(result->full_name(), parent, result->name(), proto, Symbol(result));
 }
@@ -6301,9 +6292,12 @@ void DescriptorBuilder::BuildEnum(const EnumDescriptorProto& proto,
   }
 
   // Copy options.
-  result->options_ =
-      AllocateOptions(proto, result, EnumDescriptorProto::kOptionsFieldNumber,
-                      "google.protobuf.EnumOptions", alloc);
+  result->options_ = nullptr;  // Set to default_instance later if necessary.
+  if (proto.has_options()) {
+    AllocateOptions(proto.options(), result,
+                    EnumDescriptorProto::kOptionsFieldNumber,
+                    "google.protobuf.EnumOptions", alloc);
+  }
 
   AddSymbol(result->full_name(), parent, result->name(), proto, Symbol(result));
 
@@ -6379,9 +6373,12 @@ void DescriptorBuilder::BuildEnumValue(const EnumValueDescriptorProto& proto,
   ValidateSymbolName(proto.name(), result->full_name(), proto);
 
   // Copy options.
-  result->options_ = AllocateOptions(
-      proto, result, EnumValueDescriptorProto::kOptionsFieldNumber,
-      "google.protobuf.EnumValueOptions", alloc);
+  result->options_ = nullptr;  // Set to default_instance later if necessary.
+  if (proto.has_options()) {
+    AllocateOptions(proto.options(), result,
+                    EnumValueDescriptorProto::kOptionsFieldNumber,
+                    "google.protobuf.EnumValueOptions", alloc);
+  }
 
   // Again, enum values are weird because we makes them appear as siblings
   // of the enum type instead of children of it.  So, we use
@@ -6443,9 +6440,12 @@ void DescriptorBuilder::BuildService(const ServiceDescriptorProto& proto,
   BUILD_ARRAY(proto, result, method, BuildMethod, result);
 
   // Copy options.
-  result->options_ = AllocateOptions(
-      proto, result, ServiceDescriptorProto::kOptionsFieldNumber,
-      "google.protobuf.ServiceOptions", alloc);
+  result->options_ = nullptr;  // Set to default_instance later if necessary.
+  if (proto.has_options()) {
+    AllocateOptions(proto.options(), result,
+                    ServiceDescriptorProto::kOptionsFieldNumber,
+                    "google.protobuf.ServiceOptions", alloc);
+  }
 
   AddSymbol(result->full_name(), nullptr, result->name(), proto,
             Symbol(result));
@@ -6466,9 +6466,12 @@ void DescriptorBuilder::BuildMethod(const MethodDescriptorProto& proto,
   result->output_type_.Init();
 
   // Copy options.
-  result->options_ =
-      AllocateOptions(proto, result, MethodDescriptorProto::kOptionsFieldNumber,
-                      "google.protobuf.MethodOptions", alloc);
+  result->options_ = nullptr;  // Set to default_instance later if necessary.
+  if (proto.has_options()) {
+    AllocateOptions(proto.options(), result,
+                    MethodDescriptorProto::kOptionsFieldNumber,
+                    "google.protobuf.MethodOptions", alloc);
+  }
 
   result->client_streaming_ = proto.client_streaming();
   result->server_streaming_ = proto.server_streaming();
@@ -7124,7 +7127,7 @@ static bool IsLite(const FileDescriptor* file) {
          file->options().optimize_for() == FileOptions::LITE_RUNTIME;
 }
 
-void DescriptorBuilder::ValidateFileOptions(const FileDescriptor* file,
+void DescriptorBuilder::ValidateFileOptions(FileDescriptor* file,
                                             const FileDescriptorProto& proto) {
   VALIDATE_OPTIONS_FROM_ARRAY(file, message_type, Message);
   VALIDATE_OPTIONS_FROM_ARRAY(file, enum_type, Enum);
@@ -7153,7 +7156,7 @@ void DescriptorBuilder::ValidateFileOptions(const FileDescriptor* file,
   }
 }
 
-void DescriptorBuilder::ValidateProto3(const FileDescriptor* file,
+void DescriptorBuilder::ValidateProto3(FileDescriptor* file,
                                        const FileDescriptorProto& proto) {
   for (int i = 0; i < file->extension_count(); ++i) {
     ValidateProto3Field(file->extensions_ + i, proto.extension(i));
@@ -7166,7 +7169,7 @@ void DescriptorBuilder::ValidateProto3(const FileDescriptor* file,
   }
 }
 
-void DescriptorBuilder::ValidateProto3Message(const Descriptor* message,
+void DescriptorBuilder::ValidateProto3Message(Descriptor* message,
                                               const DescriptorProto& proto) {
   for (int i = 0; i < message->nested_type_count(); ++i) {
     ValidateProto3Message(message->nested_types_ + i, proto.nested_type(i));
@@ -7192,7 +7195,7 @@ void DescriptorBuilder::ValidateProto3Message(const Descriptor* message,
   }
 }
 
-void DescriptorBuilder::ValidateProto3Field(const FieldDescriptor* field,
+void DescriptorBuilder::ValidateProto3Field(FieldDescriptor* field,
                                             const FieldDescriptorProto& proto) {
   if (field->is_extension() &&
       !AllowedExtendeeInProto3(field->containing_type()->full_name())) {
@@ -7231,7 +7234,7 @@ void DescriptorBuilder::ValidateProto3Field(const FieldDescriptor* field,
   }
 }
 
-void DescriptorBuilder::ValidateProto3Enum(const EnumDescriptor* enm,
+void DescriptorBuilder::ValidateProto3Enum(EnumDescriptor* enm,
                                            const EnumDescriptorProto& proto) {
   if (enm->value_count() > 0 && enm->value(0)->number() != 0) {
     AddError(enm->full_name(), proto.value(0),
@@ -7240,7 +7243,7 @@ void DescriptorBuilder::ValidateProto3Enum(const EnumDescriptor* enm,
   }
 }
 
-void DescriptorBuilder::ValidateMessageOptions(const Descriptor* message,
+void DescriptorBuilder::ValidateMessageOptions(Descriptor* message,
                                                const DescriptorProto& proto) {
   VALIDATE_OPTIONS_FROM_ARRAY(message, field, Field);
   VALIDATE_OPTIONS_FROM_ARRAY(message, nested_type, Message);
@@ -7249,21 +7252,14 @@ void DescriptorBuilder::ValidateMessageOptions(const Descriptor* message,
 
   CheckFieldJsonNameUniqueness(proto, message);
   ValidateExtensionRangeOptions(proto, *message);
-  for (int i = 0; i < message->real_oneof_decl_count(); ++i) {
-    ValidateOneofOptions(message->oneof_decl(i), proto.oneof_decl(i));
-  }
 }
-
-void DescriptorBuilder::ValidateOneofOptions(
-    const OneofDescriptor* /*oneof*/, const OneofDescriptorProto& /*proto*/) {}
 
 
 void DescriptorBuilder::ValidateFieldOptions(
-    const FieldDescriptor* field, const FieldDescriptorProto& proto) {
+    FieldDescriptor* field, const FieldDescriptorProto& proto) {
   if (pool_->lazily_build_dependencies_ && (!field || !field->message_type())) {
     return;
   }
-
   // Only message type fields may be lazy.
   if (field->options().lazy() || field->options().unverified_lazy()) {
     if (field->type() != FieldDescriptor::TYPE_MESSAGE) {
@@ -7336,15 +7332,9 @@ void DescriptorBuilder::ValidateFieldOptions(
              "option json_name is not allowed on extension fields.");
   }
 
-  if (absl::StrContains(field->json_name(), '\0')) {
-    AddError(field->full_name(), proto,
-             DescriptorPool::ErrorCollector::OPTION_NAME,
-             "json_name cannot have embedded null characters.");
-  }
-
 }
 
-void DescriptorBuilder::ValidateEnumOptions(const EnumDescriptor* enm,
+void DescriptorBuilder::ValidateEnumOptions(EnumDescriptor* enm,
                                             const EnumDescriptorProto& proto) {
   VALIDATE_OPTIONS_FROM_ARRAY(enm, value, EnumValue);
 
@@ -7390,7 +7380,7 @@ void DescriptorBuilder::ValidateEnumOptions(const EnumDescriptor* enm,
 }
 
 void DescriptorBuilder::ValidateEnumValueOptions(
-    const EnumValueDescriptor* /* enum_value */,
+    EnumValueDescriptor* /* enum_value */,
     const EnumValueDescriptorProto& /* proto */) {
   // Nothing to do so far.
 }
@@ -7531,7 +7521,7 @@ void DescriptorBuilder::ValidateExtensionRangeOptions(
 }
 
 void DescriptorBuilder::ValidateServiceOptions(
-    const ServiceDescriptor* service, const ServiceDescriptorProto& proto) {
+    ServiceDescriptor* service, const ServiceDescriptorProto& proto) {
   if (IsLite(service->file()) &&
       (service->file()->options().cc_generic_services() ||
        service->file()->options().java_generic_services())) {
@@ -7545,12 +7535,11 @@ void DescriptorBuilder::ValidateServiceOptions(
 }
 
 void DescriptorBuilder::ValidateMethodOptions(
-    const MethodDescriptor* /* method */,
-    const MethodDescriptorProto& /* proto */) {
+    MethodDescriptor* /* method */, const MethodDescriptorProto& /* proto */) {
   // Nothing to do so far.
 }
 
-bool DescriptorBuilder::ValidateMapEntry(const FieldDescriptor* field,
+bool DescriptorBuilder::ValidateMapEntry(FieldDescriptor* field,
                                          const FieldDescriptorProto& proto) {
   const Descriptor* message = field->message_type();
   if (  // Must not contain extensions, extension range or nested message or
@@ -7686,7 +7675,7 @@ void DescriptorBuilder::DetectMapConflicts(const Descriptor* message,
   }
 }
 
-void DescriptorBuilder::ValidateJSType(const FieldDescriptor* field,
+void DescriptorBuilder::ValidateJSType(FieldDescriptor* field,
                                        const FieldDescriptorProto& proto) {
   FieldOptions::JSType jstype = field->options().jstype();
   // The default is always acceptable.

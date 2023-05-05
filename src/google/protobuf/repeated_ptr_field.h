@@ -766,8 +766,8 @@ class PROTOBUF_EXPORT RepeatedPtrFieldBase {
   // The reflection implementation needs to call protected methods directly,
   // reinterpreting pointers as being to Message instead of a specific Message
   // subclass.
-  friend class google::protobuf::Reflection;
-  friend class internal::SwapFieldHelper;
+  friend class ::PROTOBUF_NAMESPACE_ID::Reflection;
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::SwapFieldHelper;
 
   // ExtensionSet stores repeated message extensions as
   // RepeatedPtrField<MessageLite>, but non-lite ExtensionSets need to implement
@@ -1224,8 +1224,7 @@ class RepeatedPtrField final : private internal::RepeatedPtrFieldBase {
   template <typename T>
   friend struct WeakRepeatedPtrField;
 
-  using InternalArenaConstructable_ = void;
-  using DestructorSkippable_ = void;
+  typedef void InternalArenaConstructable_;
 
 };
 
