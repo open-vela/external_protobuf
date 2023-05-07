@@ -99,7 +99,7 @@ struct ArenaAlignDefault {
   }
 
   static inline PROTOBUF_ALWAYS_INLINE constexpr size_t Ceil(size_t n) {
-    return (n + align - 1) & ~(align - 1);
+    return (n + align - 1) & -align;
   }
   static inline PROTOBUF_ALWAYS_INLINE constexpr size_t Floor(size_t n) {
     return (n & ~(align - 1));
@@ -113,7 +113,7 @@ struct ArenaAlignDefault {
   template <typename T>
   static inline PROTOBUF_ALWAYS_INLINE T* Ceil(T* ptr) {
     uintptr_t intptr = reinterpret_cast<uintptr_t>(ptr);
-    return reinterpret_cast<T*>((intptr + align - 1) & ~(align - 1));
+    return reinterpret_cast<T*>((intptr + align - 1) & -align);
   }
 
   template <typename T>
@@ -142,9 +142,7 @@ struct ArenaAlign {
     return (reinterpret_cast<uintptr_t>(ptr) & (align - 1)) == 0U;
   }
 
-  constexpr size_t Ceil(size_t n) const {
-    return (n + align - 1) & ~(align - 1);
-  }
+  constexpr size_t Ceil(size_t n) const { return (n + align - 1) & -align; }
   constexpr size_t Floor(size_t n) const { return (n & ~(align - 1)); }
 
   constexpr size_t Padded(size_t n) const {
@@ -158,7 +156,7 @@ struct ArenaAlign {
   template <typename T>
   T* Ceil(T* ptr) const {
     uintptr_t intptr = reinterpret_cast<uintptr_t>(ptr);
-    return reinterpret_cast<T*>((intptr + align - 1) & ~(align - 1));
+    return reinterpret_cast<T*>((intptr + align - 1) & -align);
   }
 
   template <typename T>

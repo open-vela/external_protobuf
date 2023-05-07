@@ -206,6 +206,7 @@ Key bindings:
   (c-initialize-cc-mode t)
   (c-init-language-vars protobuf-mode)
   (c-common-init 'protobuf-mode)
+  (easy-menu-add protobuf-menu)
   (setq imenu-generic-expression
 	    '(("Message" "^[[:space:]]*message[[:space:]]+\\([[:alnum:]]+\\)" 1)
           ("Enum" "^[[:space:]]*enum[[:space:]]+\\([[:alnum:]]+\\)" 1)
