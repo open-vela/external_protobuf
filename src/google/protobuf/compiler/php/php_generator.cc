@@ -45,7 +45,6 @@
 #include "absl/strings/str_replace.h"
 #include "absl/strings/str_split.h"
 #include "absl/strings/string_view.h"
-#include "google/protobuf/compiler/retention.h"
 #include "google/protobuf/descriptor.h"
 #include "google/protobuf/descriptor.pb.h"
 #include "google/protobuf/descriptor_legacy.h"
@@ -944,7 +943,7 @@ void GenerateAddFileToPool(const FileDescriptor* file, const Options& options,
       // Add messages and enums to descriptor pool.
       FileDescriptorSet files;
       FileDescriptorProto* file_proto = files.add_file();
-      *file_proto = StripSourceRetentionOptions(*file);
+      file->CopyTo(file_proto);
 
       // Filter out descriptor.proto as it cannot be depended on for now.
       RepeatedPtrField<std::string>* dependency =
@@ -1087,7 +1086,7 @@ void GenerateAddFilesToPool(const FileDescriptor* file, const Options& options,
 
     if (needs_aggregate) {
       auto file_proto = sorted_file_set.add_file();
-      *file_proto = StripSourceRetentionOptions(*file_node);
+      file_node->CopyTo(file_proto);
 
       // Filter out descriptor.proto as it cannot be depended on for now.
       RepeatedPtrField<std::string>* dependency =
@@ -2193,7 +2192,8 @@ void GenerateCWellKnownTypes(const std::vector<const FileDescriptor*>& files,
         absl::StrReplaceAll(metadata_classname, {{"\\", "_"}});
     metadata_classname =
         absl::StrReplaceAll(metadata_classname, {{"\\", "\\\\"}});
-    FileDescriptorProto file_proto = StripSourceRetentionOptions(*file);
+    FileDescriptorProto file_proto;
+    file->CopyTo(&file_proto);
     std::string serialized;
     file_proto.SerializeToString(&serialized);
     printer.Print(

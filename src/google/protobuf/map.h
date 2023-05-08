@@ -667,19 +667,6 @@ N MultiplyWithOverflow(N a, N b) {
 #endif
 }
 
-// This struct contains the field of the iterators, but no other API.
-// This allows MapIterator to allocate space for an iterator generically.
-class MapIteratorPayload {
- protected:
-  MapIteratorPayload() = default;
-  MapIteratorPayload(NodeBase* node, const UntypedMapBase* m,
-                     size_t bucket_index)
-      : node_(node), m_(m), bucket_index_(bucket_index) {}
-  NodeBase* node_ = nullptr;
-  const UntypedMapBase* m_ = nullptr;
-  size_t bucket_index_ = 0;
-};
-
 // KeyMapBase is a chaining hash map with the additional feature that some
 // buckets can be converted to use an ordered container.  This ensures O(lg n)
 // bounds on find, insert, and erase, while avoiding the overheads of ordered
@@ -726,7 +713,7 @@ class KeyMapBase : public UntypedMapBase {
   using Tree = internal::TreeForMap<Key>;
   using TreeIterator = typename Tree::iterator;
 
-  class KeyIteratorBase : protected MapIteratorPayload {
+  class KeyIteratorBase {
    public:
     // Invariants:
     // node_ is always correct. This is handy because the most common
@@ -735,26 +722,25 @@ class KeyMapBase : public UntypedMapBase {
     // are updated to be correct also, but those fields can become stale
     // if the underlying map is modified.  When those fields are needed they
     // are rechecked, and updated if necessary.
-    KeyIteratorBase() = default;
+    KeyIteratorBase() : node_(nullptr), m_(nullptr), bucket_index_(0) {}
 
-    explicit KeyIteratorBase(const KeyMapBase* m) {
-      m_ = m;
+    explicit KeyIteratorBase(const KeyMapBase* m) : m_(m) {
       SearchFrom(m->index_of_first_non_null_);
     }
 
     KeyIteratorBase(KeyNode* n, const KeyMapBase* m, size_type index)
-        : MapIteratorPayload(n, m, index) {}
+        : node_(n), m_(m), bucket_index_(index) {}
 
     KeyIteratorBase(TreeIterator tree_it, const KeyMapBase* m, size_type index)
-        : MapIteratorPayload(NodeFromTreeIterator(tree_it), m, index) {}
+        : node_(NodeFromTreeIterator(tree_it)), m_(m), bucket_index_(index) {}
 
     // Advance through buckets, looking for the first that isn't empty.
     // If nothing non-empty is found then leave node_ == nullptr.
     void SearchFrom(size_type start_bucket) {
-      ABSL_DCHECK(map().index_of_first_non_null_ == map().num_buckets_ ||
-                  !map().TableEntryIsEmpty(map().index_of_first_non_null_));
-      for (size_type i = start_bucket; i < map().num_buckets_; ++i) {
-        TableEntryPtr entry = map().table_[i];
+      ABSL_DCHECK(m_->index_of_first_non_null_ == m_->num_buckets_ ||
+                  !m_->TableEntryIsEmpty(m_->index_of_first_non_null_));
+      for (size_type i = start_bucket; i < m_->num_buckets_; ++i) {
+        TableEntryPtr entry = m_->table_[i];
         if (entry == TableEntryPtr{}) continue;
         bucket_index_ = i;
         if (PROTOBUF_PREDICT_TRUE(internal::TableEntryIsList(entry))) {
@@ -787,7 +773,9 @@ class KeyMapBase : public UntypedMapBase {
       }
     }
 
-    auto& map() const { return static_cast<const KeyMapBase&>(*m_); }
+    KeyNode* node_;
+    const KeyMapBase* m_;
+    size_type bucket_index_;
   };
 
  public:
