@@ -202,7 +202,6 @@ PROTOBUF_EXPORT void PerformAbslStringify(
   printer.SetExpandAny(true);
   printer.SetRedactDebugString(true);
   printer.SetRandomizeDebugString(true);
-  printer.SetRootMessageFullName(message.GetDescriptor()->full_name());
   std::string result;
   printer.PrintToString(message, &result);
   append(result);
@@ -2096,8 +2095,7 @@ TextFormat::Printer::Printer()
       print_message_fields_in_index_order_(false),
       expand_any_(false),
       truncate_string_field_longer_than_(0LL),
-      finder_(nullptr),
-      root_message_full_name_("") {
+      finder_(nullptr) {
   SetUseUtf8StringEscaping(false);
 }
 
@@ -2633,6 +2631,7 @@ void TextFormat::Printer::PrintFieldValue(const Message& message,
   const FastFieldValuePrinter* printer = GetFieldPrinter(field);
   if (redact_debug_string_ && field->options().debug_redact()) {
     IncrementRedactedFieldCounter();
+    // TODO(b/258975650): Create OSS redaction documentation
     generator->PrintString("[REDACTED]");
     return;
   }
