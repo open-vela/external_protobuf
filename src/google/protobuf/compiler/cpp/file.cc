@@ -34,7 +34,6 @@
 
 #include "google/protobuf/compiler/cpp/file.h"
 
-#include <functional>
 #include <iostream>
 #include <memory>
 #include <string>
@@ -170,7 +169,7 @@ void FileGenerator::GenerateMacroUndefs(io::Printer* p) {
   // Only do this for protobuf's own types. There are some google3 protos using
   // macros as field names and the generated code compiles after the macro
   // expansion. Undefing these macros actually breaks such code.
-  if (file_->name() != "third_party/protobuf/compiler/plugin.proto" &&
+  if (file_->name() != "net/proto2/compiler/proto/plugin.proto" &&
       file_->name() != "google/protobuf/compiler/plugin.proto") {
     return;
   }
@@ -208,15 +207,6 @@ void FileGenerator::GenerateSharedHeaderCode(io::Printer* p) {
           {"undefs", [&] { GenerateMacroUndefs(p); }},
           {"global_state_decls",
            [&] { GenerateGlobalStateFunctionDeclarations(p); }},
-          {"any_metadata",
-           [&] {
-             NamespaceOpener ns(ProtobufNamespace(options_), p);
-             p->Emit(R"cc(
-               namespace internal {
-               class AnyMetadata;
-               }  // namespace internal
-             )cc");
-           }},
           {"fwd_decls", [&] { GenerateForwardDeclarations(p); }},
           {"proto2_ns_enums",
            [&] { GenerateProto2NamespaceEnumSpecializations(p); }},
@@ -260,7 +250,11 @@ void FileGenerator::GenerateSharedHeaderCode(io::Printer* p) {
           #define $dllexport_macro$$ dllexport_decl$
           $undefs$
 
-          $any_metadata$;
+          PROTOBUF_NAMESPACE_OPEN
+          namespace internal {
+          class AnyMetadata;
+          }  // namespace internal
+          PROTOBUF_NAMESPACE_CLOSE
 
           $global_state_decls$;
           $fwd_decls$
@@ -573,6 +567,7 @@ void FileGenerator::GenerateSourceDefaultInstance(int idx, io::Printer* p) {
       {
           {"type", DefaultInstanceType(generator->descriptor(), options_)},
           {"name", DefaultInstanceName(generator->descriptor(), options_)},
+          {"default", [&] { generator->GenerateInitDefaultSplitInstance(p); }},
           {"class", ClassName(generator->descriptor())},
       },
       R"cc(
@@ -1236,7 +1231,7 @@ void FileGenerator::GenerateForwardDeclarations(io::Printer* p) {
     decl.second.Print(p, options_);
   }
 
-  ns.ChangeTo(ProtobufNamespace(options_));
+  ns.ChangeTo("PROTOBUF_NAMESPACE_ID");
   for (const auto& decl : decls) {
     decl.second.PrintTopLevelDecl(p, options_);
   }

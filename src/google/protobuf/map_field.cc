@@ -201,6 +201,7 @@ DynamicMapField::DynamicMapField(const Message* default_entry)
 
 DynamicMapField::DynamicMapField(const Message* default_entry, Arena* arena)
     : TypeDefinedMapFieldBase<MapKey, MapValueRef>(arena),
+      map_(arena),
       default_entry_(default_entry) {}
 
 DynamicMapField::~DynamicMapField() {
@@ -212,6 +213,8 @@ DynamicMapField::~DynamicMapField() {
   }
   map_.clear();
 }
+
+int DynamicMapField::size() const { return GetMap().size(); }
 
 void DynamicMapField::Clear() {
   Map<MapKey, MapValueRef>* map = &const_cast<DynamicMapField*>(this)->map_;
@@ -230,6 +233,12 @@ void DynamicMapField::Clear() {
   // Data in map and repeated field are both empty, but we can't set status
   // CLEAN which will invalidate previous reference to map.
   MapFieldBase::SetMapDirty();
+}
+
+bool DynamicMapField::ContainsMapKey(const MapKey& map_key) const {
+  const Map<MapKey, MapValueRef>& map = GetMap();
+  Map<MapKey, MapValueRef>::const_iterator iter = map.find(map_key);
+  return iter != map.end();
 }
 
 void DynamicMapField::AllocateMapValue(MapValueRef* map_val) {
@@ -280,6 +289,54 @@ bool DynamicMapField::InsertOrLookupMapValue(const MapKey& map_key,
   // [] may reorder the map and iterators.
   val->CopyFrom(iter->second);
   return false;
+}
+
+bool DynamicMapField::LookupMapValue(const MapKey& map_key,
+                                     MapValueConstRef* val) const {
+  const Map<MapKey, MapValueRef>& map = GetMap();
+  Map<MapKey, MapValueRef>::const_iterator iter = map.find(map_key);
+  if (iter == map.end()) {
+    return false;
+  }
+  // map_key is already in the map. Make sure (*map)[map_key] is not called.
+  // [] may reorder the map and iterators.
+  val->CopyFrom(iter->second);
+  return true;
+}
+
+bool DynamicMapField::DeleteMapValue(const MapKey& map_key) {
+  MapFieldBase::SyncMapWithRepeatedField();
+  Map<MapKey, MapValueRef>::iterator iter = map_.find(map_key);
+  if (iter == map_.end()) {
+    return false;
+  }
+  // Set map dirty only if the delete is successful.
+  MapFieldBase::SetMapDirty();
+  if (arena() == nullptr) {
+    iter->second.DeleteData();
+  }
+  map_.erase(iter);
+  return true;
+}
+
+const Map<MapKey, MapValueRef>& DynamicMapField::GetMap() const {
+  MapFieldBase::SyncMapWithRepeatedField();
+  return map_;
+}
+
+Map<MapKey, MapValueRef>* DynamicMapField::MutableMap() {
+  MapFieldBase::SyncMapWithRepeatedField();
+  MapFieldBase::SetMapDirty();
+  return &map_;
+}
+
+void DynamicMapField::SetMapIteratorValue(MapIterator* map_iter) const {
+  Map<MapKey, MapValueRef>::const_iterator iter =
+      TypeDefinedMapFieldBase<MapKey, MapValueRef>::InternalGetIterator(
+          map_iter);
+  if (iter == map_.end()) return;
+  map_iter->key_.CopyFrom(iter->first);
+  map_iter->value_.CopyFrom(iter->second);
 }
 
 void DynamicMapField::MergeFrom(const MapFieldBase& other) {
@@ -346,6 +403,11 @@ void DynamicMapField::MergeFrom(const MapFieldBase& other) {
       }
     }
   }
+}
+
+void DynamicMapField::Swap(MapFieldBase* other) {
+  MapFieldBase::Swap(other);
+  map_.swap(DownCast<DynamicMapField*>(other)->map_);
 }
 
 void DynamicMapField::SyncRepeatedFieldWithMapNoLock() const {
