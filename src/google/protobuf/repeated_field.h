@@ -137,6 +137,16 @@ void memswap(char* a, char* b) {
 template <typename Element>
 class RepeatedIterator;
 
+// We can't skip the destructor for, e.g., arena allocated RepeatedField<Cord>.
+template <typename Element,
+          bool Trivial = Arena::is_destructor_skippable<Element>::value>
+struct RepeatedFieldDestructorSkippableBase {};
+
+template <typename Element>
+struct RepeatedFieldDestructorSkippableBase<Element, true> {
+  using DestructorSkippable_ = void;
+};
+
 }  // namespace internal
 
 // RepeatedField is used to represent repeated fields of a primitive type (in
@@ -148,7 +158,8 @@ class RepeatedIterator;
 // We have to specialize several methods in the Cord case to get the memory
 // management right; e.g. swapping when appropriate, etc.
 template <typename Element>
-class RepeatedField final {
+class RepeatedField final
+    : private internal::RepeatedFieldDestructorSkippableBase<Element> {
   static_assert(
       alignof(Arena) >= alignof(Element),
       "We only support types that have an alignment smaller than Arena");
@@ -412,17 +423,17 @@ class RepeatedField final {
     return prev_size;
   }
 
-  // Pad the Rep after arena allow for power-of-two byte sizes when
-  // sizeof(Element) > sizeof(Arena*). eg for 16-byte objects.
-  static PROTOBUF_CONSTEXPR const size_t kRepHeaderSize =
-      sizeof(Arena*) < sizeof(Element) ? sizeof(Element) : sizeof(Arena*);
+  // Pad the rep to being max(Arena*, Element) with a minimum align
+  // of 8 as sanitizers are picky on the alignment of containers to
+  // start at 8 byte offsets even when compiling for 32 bit platforms.
   struct Rep {
-    Arena* arena;
-    Element* elements() {
-      return reinterpret_cast<Element*>(reinterpret_cast<char*>(this) +
-                                        kRepHeaderSize);
-    }
+    union {
+      alignas(8) Arena* arena;
+      Element unused;
+    };
+    Element* elements() { return reinterpret_cast<Element*>(this + 1); }
   };
+  static PROTOBUF_CONSTEXPR const size_t kRepHeaderSize = sizeof(Rep);
 
   // If total_size_ == 0 this points to an Arena otherwise it points to the
   // elements member of a Rep struct. Using this invariant allows the storage of
