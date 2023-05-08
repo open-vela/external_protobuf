@@ -120,6 +120,7 @@ class ServiceOptions;
 class MethodOptions;
 class FileOptions;
 class UninterpretedOption;
+class FeatureSet;
 class SourceCodeInfo;
 
 // Defined in message.h
@@ -429,6 +430,8 @@ class PROTOBUF_EXPORT Descriptor : private internal::SymbolBase {
 
     // See Descriptor::CopyTo().
     void CopyTo(DescriptorProto_ExtensionRange* proto) const;
+
+    const ExtensionRangeOptions& options() const;
 
     int start;  // inclusive
     int end;    // exclusive
@@ -2242,7 +2245,7 @@ class PROTOBUF_EXPORT DescriptorPool {
   bool lazily_build_dependencies_;
   bool allow_unknown_;
   bool enforce_weak_;
-  bool enforce_special_extension_ranges_;
+  bool enforce_extension_declarations_;
   bool disallow_enforce_utf8_;
   bool deprecated_legacy_json_field_conflicts_;
 
@@ -2387,6 +2390,9 @@ PROTOBUF_DEFINE_ARRAY_ACCESSOR(FileDescriptor, service,
                                const ServiceDescriptor*)
 PROTOBUF_DEFINE_ARRAY_ACCESSOR(FileDescriptor, extension,
                                const FieldDescriptor*)
+
+PROTOBUF_DEFINE_OPTIONS_ACCESSOR(Descriptor::ExtensionRange,
+                                 ExtensionRangeOptions)
 
 #undef PROTOBUF_DEFINE_ACCESSOR
 #undef PROTOBUF_DEFINE_STRING_ACCESSOR

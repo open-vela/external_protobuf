@@ -1,5 +1,5 @@
 // Protocol Buffers - Google's data interchange format
-// Copyright 2008 Google Inc.  All rights reserved.
+// Copyright 2023 Google Inc.  All rights reserved.
 // https://developers.google.com/protocol-buffers/
 //
 // Redistribution and use in source and binary forms, with or without
@@ -28,32 +28,34 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef GOOGLE_PROTOBUF_COMPILER_ALLOWLISTS_ALLOWLISTS_H__
-#define GOOGLE_PROTOBUF_COMPILER_ALLOWLISTS_ALLOWLISTS_H__
+use unittest_proto::proto2_unittest::TestAllTypes;
 
-#include "absl/strings/string_view.h"
+#[test]
+fn serialize_deserialize_message() {
+    let mut msg = TestAllTypes::new();
+    msg.optional_int64_set(Some(42));
+    msg.optional_bool_set(Some(true));
+    msg.optional_bytes_set(Some(b"serialize deserialize test"));
 
-namespace google {
-namespace protobuf {
-namespace compiler {
+    let serialized = msg.serialize();
 
-// Returns whether a file can use the `import weak` syntax.
-bool IsWeakImportFile(absl::string_view file);
+    let mut msg2 = TestAllTypes::new();
+    assert!(msg2.deserialize(&serialized).is_ok());
 
-// Returns whether a file can have an empty package.
-bool IsEmptyPackageFile(absl::string_view file);
+    assert_eq!(msg.optional_int64(), msg2.optional_int64());
+    assert_eq!(msg.optional_bool(), msg2.optional_bool());
+    assert_eq!(msg.optional_bytes(), msg2.optional_bytes());
+}
 
-// Returns whether a file can contain a cc_open_enum.
-bool IsOpenEnumFile(absl::string_view file);
+#[test]
+fn deserialize_empty() {
+    let mut msg = TestAllTypes::new();
+    assert!(msg.deserialize(&[]).is_ok());
+}
 
-// Returns whether a message can contain a cc_open_enum.
-bool IsOpenEnumMessage(absl::string_view msg);
-
-// Returns whether a file can contain an unused import.
-bool IsUnusedImportFile(absl::string_view file);
-
-}  // namespace compiler
-}  // namespace protobuf
-}  // namespace google
-
-#endif  // GOOGLE_PROTOBUF_ALLOWLISTS_COMPILER_ALLOWLISTS_H__
+#[test]
+fn deserialize_error() {
+    let mut msg = TestAllTypes::new();
+    let data = b"not a serialized proto";
+    assert!(msg.deserialize(&*data).is_err());
+}

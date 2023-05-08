@@ -1,5 +1,5 @@
 // Protocol Buffers - Google's data interchange format
-// Copyright 2008 Google Inc.  All rights reserved.
+// Copyright 2023 Google Inc.  All rights reserved.
 // https://developers.google.com/protocol-buffers/
 //
 // Redistribution and use in source and binary forms, with or without
@@ -28,32 +28,41 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef GOOGLE_PROTOBUF_COMPILER_ALLOWLISTS_ALLOWLISTS_H__
-#define GOOGLE_PROTOBUF_COMPILER_ALLOWLISTS_ALLOWLISTS_H__
+#ifndef GOOGLE_PROTOBUF_TEST_TEXTPROTO_H__
+#define GOOGLE_PROTOBUF_TEST_TEXTPROTO_H__
 
-#include "absl/strings/string_view.h"
+#include <gmock/gmock.h>
+#include "absl/log/absl_check.h"
+#include "absl/memory/memory.h"
+#include "google/protobuf/text_format.h"
 
+// This file contains private helpers for dealing with textprotos in our
+// tests.  We make no guarantees about the behavior in real-world situations,
+// and these are only meant for basic unit-tests of protobuf internals.
 namespace google {
 namespace protobuf {
-namespace compiler {
 
-// Returns whether a file can use the `import weak` syntax.
-bool IsWeakImportFile(absl::string_view file);
+MATCHER_P(EqualsProto, textproto, "") {
+  auto msg = absl::WrapUnique(arg.New());
+  return TextFormat::ParseFromString(textproto, msg.get()) &&
+         msg->DebugString() == arg.DebugString();
+}
 
-// Returns whether a file can have an empty package.
-bool IsEmptyPackageFile(absl::string_view file);
+class ParseTextOrDie {
+ public:
+  explicit ParseTextOrDie(absl::string_view text) : text_(text) {}
+  template <typename Proto>
+  operator Proto() {  // NOLINT(google-explicit-constructor)
+    Proto ret;
+    ABSL_CHECK(TextFormat::ParseFromString(text_, &ret));
+    return ret;
+  }
 
-// Returns whether a file can contain a cc_open_enum.
-bool IsOpenEnumFile(absl::string_view file);
+ private:
+  absl::string_view text_;
+};
 
-// Returns whether a message can contain a cc_open_enum.
-bool IsOpenEnumMessage(absl::string_view msg);
-
-// Returns whether a file can contain an unused import.
-bool IsUnusedImportFile(absl::string_view file);
-
-}  // namespace compiler
 }  // namespace protobuf
 }  // namespace google
 
-#endif  // GOOGLE_PROTOBUF_ALLOWLISTS_COMPILER_ALLOWLISTS_H__
+#endif  // GOOGLE_PROTOBUF_TEST_TEXTPROTO_H__
