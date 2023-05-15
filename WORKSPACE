@@ -1,49 +1,22 @@
-workspace(name = "upb")
+workspace(name = "com_google_protobuf")
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-load("//bazel:workspace_deps.bzl", "upb_deps")
 
-upb_deps()
+local_repository(
+    name = "com_google_protobuf_examples",
+    path = "examples",
+)
 
-load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps")
+# Load common dependencies first to ensure we use the correct version
+load("//:protobuf_deps.bzl", "PROTOBUF_MAVEN_ARTIFACTS", "protobuf_deps")
 protobuf_deps()
 
-load("@utf8_range//:workspace_deps.bzl", "utf8_range_deps")
-utf8_range_deps()
-
+# Bazel platform rules.
 http_archive(
-    name = "lua",
-    build_file = "//bazel:lua.BUILD",
-    sha256 = "b9e2e4aad6789b3b63a056d442f7b39f0ecfca3ae0f1fc0ae4e9614401b69f4b",
-    strip_prefix = "lua-5.2.4",
-    urls = [
-        "https://mirror.bazel.build/www.lua.org/ftp/lua-5.2.4.tar.gz",
-        "https://www.lua.org/ftp/lua-5.2.4.tar.gz",
-    ],
-)
-
-http_archive(
-    name = "com_github_google_benchmark",
-    urls = ["https://github.com/google/benchmark/archive/0baacde3618ca617da95375e0af13ce1baadea47.zip"],
-    strip_prefix = "benchmark-0baacde3618ca617da95375e0af13ce1baadea47",
-    sha256 = "62e2f2e6d8a744d67e4bbc212fcfd06647080de4253c97ad5c6749e09faf2cb0",
-)
-
-http_archive(
-    name = "com_google_googleapis",
-    urls = ["https://github.com/googleapis/googleapis/archive/refs/heads/master.zip"],
-    build_file = "//benchmarks:BUILD.googleapis",
-    strip_prefix = "googleapis-master",
-    patch_cmds = ["find google -type f -name BUILD.bazel -delete"],
-)
-
-http_archive(
-    name = "com_google_absl",
-    sha256 = "e7fdfe0bed87702a22c5b73b6b5fe08bedd25f17d617e52df6061b0f47d480b0",
-    strip_prefix = "abseil-cpp-e6044634dd7caec2d79a13aecc9e765023768757",
-    urls = [
-        "https://github.com/abseil/abseil-cpp/archive/e6044634dd7caec2d79a13aecc9e765023768757.tar.gz"
-    ],
+    name = "platforms",
+    sha256 = "a879ea428c6d56ab0ec18224f976515948822451473a80d06c2e50af0bbe5121",
+    strip_prefix = "platforms-da5541f26b7de1dc8e04c075c99df5351742a4a2",
+    urls = ["https://github.com/bazelbuild/platforms/archive/da5541f26b7de1dc8e04c075c99df5351742a4a2.zip"],  # 2022-05-27
 )
 
 http_archive(
@@ -59,28 +32,105 @@ load("@com_google_googletest//:googletest_deps.bzl", "googletest_deps")
 
 googletest_deps()
 
-load("@rules_pkg//:deps.bzl", "rules_pkg_dependencies")
+load("@rules_jvm_external//:repositories.bzl", "rules_jvm_external_deps")
 
+rules_jvm_external_deps()
+
+load("@rules_jvm_external//:setup.bzl", "rules_jvm_external_setup")
+
+rules_jvm_external_setup()
+
+load("@rules_jvm_external//:defs.bzl", "maven_install")
+
+maven_install(
+    artifacts = PROTOBUF_MAVEN_ARTIFACTS,
+    # For updating instructions, see:
+    # https://github.com/bazelbuild/rules_jvm_external#updating-maven_installjson
+    maven_install_json = "//:maven_install.json",
+    repositories = [
+        "https://repo1.maven.org/maven2",
+        "https://repo.maven.apache.org/maven2",
+    ],
+)
+
+load("@maven//:defs.bzl", "pinned_maven_install")
+
+pinned_maven_install()
+
+# For `cc_proto_blacklist_test` and `build_test`.
+load("@bazel_skylib//:workspace.bzl", "bazel_skylib_workspace")
+
+bazel_skylib_workspace()
+
+load("@rules_pkg//:deps.bzl", "rules_pkg_dependencies")
 rules_pkg_dependencies()
 
-load("//bazel:system_python.bzl", "system_python")
+load("@build_bazel_rules_apple//apple:repositories.bzl", "apple_rules_dependencies")
+apple_rules_dependencies()
+
+# For `kt_jvm_library`
+load("@io_bazel_rules_kotlin//kotlin:repositories.bzl", "kotlin_repositories")
+kotlin_repositories()
+
+load("@io_bazel_rules_kotlin//kotlin:core.bzl", "kt_register_toolchains")
+kt_register_toolchains()
+
+load("@rules_ruby//ruby:defs.bzl", "ruby_runtime")
+ruby_runtime("system_ruby")
+register_toolchains("@system_ruby//:toolchain")
+
+load("@system_ruby//:bundle.bzl", "ruby_bundle")
+ruby_bundle(
+    name = "protobuf_bundle",
+    srcs = ["//ruby:google-protobuf.gemspec"],
+    gemfile = "//ruby:Gemfile",
+)
+
+load("@upb//bazel:workspace_deps.bzl", "upb_deps")
+upb_deps()
+
+load("@upb//bazel:system_python.bzl", "system_python")
 system_python(
     name = "system_python",
     minimum_python_version = "3.7",
 )
 
-load("@system_python//:register.bzl", "register_system_python")
-register_system_python()
-
 load("@system_python//:pip.bzl", "pip_parse")
-
 pip_parse(
     name="pip_deps",
-    requirements = "//python:requirements.txt",
+    requirements = "@upb//python:requirements.txt",
     requirements_overrides = {
-        "3.11": "//python:requirements_311.txt",
+        "3.11": "@upb//python:requirements_311.txt",
     },
 )
 
 load("@pip_deps//:requirements.bzl", "install_deps")
 install_deps()
+
+load("@utf8_range//:workspace_deps.bzl", "utf8_range_deps")
+utf8_range_deps()
+
+http_archive(
+    name = "rules_fuzzing",
+    sha256 = "d9002dd3cd6437017f08593124fdd1b13b3473c7b929ceb0e60d317cb9346118",
+    strip_prefix = "rules_fuzzing-0.3.2",
+    urls = ["https://github.com/bazelbuild/rules_fuzzing/archive/v0.3.2.zip"],
+)
+
+load("@rules_fuzzing//fuzzing:repositories.bzl", "rules_fuzzing_dependencies")
+rules_fuzzing_dependencies()
+
+bind(
+    name = "python_headers",
+    actual = "@system_python//:python_headers",
+)
+
+http_archive(
+    name = "rules_rust",
+    sha256 = "d125fb75432dc3b20e9b5a19347b45ec607fabe75f98c6c4ba9badaab9c193ce",
+    urls = ["https://github.com/bazelbuild/rules_rust/releases/download/0.17.0/rules_rust-v0.17.0.tar.gz"],
+)
+
+load("@rules_rust//rust:repositories.bzl", "rules_rust_dependencies", "rust_register_toolchains")
+rules_rust_dependencies()
+rust_register_toolchains(edition = "2021")
