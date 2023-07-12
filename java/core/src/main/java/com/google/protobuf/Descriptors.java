@@ -1266,9 +1266,7 @@ public final class Descriptors {
      * Returns true if this field was syntactically written with "optional" in the .proto file.
      * Excludes singular proto3 fields that do not have a label.
      */
-    @Deprecated
-    public
-    boolean hasOptionalKeyword() {
+    public boolean hasOptionalKeyword() {
       return isProto3Optional
           || (file.getSyntax() == Syntax.PROTO2 && isOptional() && getContainingOneof() == null);
     }
