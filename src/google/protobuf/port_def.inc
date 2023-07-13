@@ -255,22 +255,22 @@ static_assert(PROTOBUF_ABSL_MIN(20230125, 3),
 #ifdef PROTOBUF_VERSION
 #error PROTOBUF_VERSION was previously defined
 #endif
-#define PROTOBUF_VERSION 4024000
+#define PROTOBUF_VERSION 4023000
 
 #ifdef PROTOBUF_MIN_HEADER_VERSION_FOR_PROTOC
 #error PROTOBUF_MIN_HEADER_VERSION_FOR_PROTOC was previously defined
 #endif
-#define PROTOBUF_MIN_HEADER_VERSION_FOR_PROTOC 4024000
+#define PROTOBUF_MIN_HEADER_VERSION_FOR_PROTOC 4023000
 
 #ifdef PROTOBUF_MIN_PROTOC_VERSION
 #error PROTOBUF_MIN_PROTOC_VERSION was previously defined
 #endif
-#define PROTOBUF_MIN_PROTOC_VERSION 4024000
+#define PROTOBUF_MIN_PROTOC_VERSION 4023000
 
 #ifdef PROTOBUF_VERSION_SUFFIX
 #error PROTOBUF_VERSION_SUFFIX was previously defined
 #endif
-#define PROTOBUF_VERSION_SUFFIX "-rc1"
+#define PROTOBUF_VERSION_SUFFIX ""
 
 #ifdef PROTOBUF_ALWAYS_INLINE
 #error PROTOBUF_ALWAYS_INLINE was previously defined
@@ -446,7 +446,7 @@ static_assert(PROTOBUF_ABSL_MIN(20230125, 3),
 
 // The minimum library version which works with the current version of the
 // headers.
-#define GOOGLE_PROTOBUF_MIN_LIBRARY_VERSION 4024000
+#define GOOGLE_PROTOBUF_MIN_LIBRARY_VERSION 4023000
 
 #ifdef PROTOBUF_RTTI
 #error PROTOBUF_RTTI was previously defined
@@ -1019,6 +1019,19 @@ static_assert(PROTOBUF_ABSL_MIN(20230125, 3),
 #pragma push_macro("TYPE_BOOL")
 #undef TYPE_BOOL
 #endif  // __APPLE__
+
+#ifdef __FreeBSD__
+// Inconvenient macro names from /usr/include/sys/param.h.
+#pragma push_macro("TRUE")
+#undef TRUE
+#pragma push_macro("FALSE")
+#undef FALSE
+// Inconvenient macro names from /usr/include/sys/limits.h.
+#pragma push_macro("UID_MAX")
+#undef UID_MAX
+#pragma push_macro("GID_MAX")
+#undef GID_MAX
+#endif  // __FreeBSD__
 
 #if defined(__clang__) || defined(__GNUC__) || defined(_MSC_VER)
 // Don't let Objective-C Macros interfere with proto identifiers with the same

@@ -651,6 +651,7 @@ set(protobuf_test_files
   ${protobuf_SOURCE_DIR}/src/google/protobuf/feature_resolver_test.cc
   ${protobuf_SOURCE_DIR}/src/google/protobuf/generated_message_reflection_unittest.cc
   ${protobuf_SOURCE_DIR}/src/google/protobuf/generated_message_tctable_lite_test.cc
+  ${protobuf_SOURCE_DIR}/src/google/protobuf/has_bits_test.cc
   ${protobuf_SOURCE_DIR}/src/google/protobuf/inlined_string_field_unittest.cc
   ${protobuf_SOURCE_DIR}/src/google/protobuf/internal_message_util_unittest.cc
   ${protobuf_SOURCE_DIR}/src/google/protobuf/map_field_test.cc
@@ -737,6 +738,7 @@ set(fake_plugin_files
 # @//src/google/protobuf/compiler:test_srcs
 set(compiler_test_files
   ${protobuf_SOURCE_DIR}/src/google/protobuf/compiler/allowlists/allowlist_test.cc
+  ${protobuf_SOURCE_DIR}/src/google/protobuf/compiler/code_generator_unittest.cc
   ${protobuf_SOURCE_DIR}/src/google/protobuf/compiler/command_line_interface_unittest.cc
   ${protobuf_SOURCE_DIR}/src/google/protobuf/compiler/cpp/bootstrap_unittest.cc
   ${protobuf_SOURCE_DIR}/src/google/protobuf/compiler/cpp/generator_unittest.cc
