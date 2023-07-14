@@ -39,9 +39,6 @@
 #include "google/protobuf/compiler/plugin.pb.h"
 #include "google/protobuf/io/io_win32.h"
 
-using google::protobuf::compiler::CodeGeneratorRequest;
-using google::protobuf::compiler::CodeGeneratorResponse;
-
 // This fake protoc plugin does nothing but write out the CodeGeneratorRequest
 // in base64. This is not very useful except that it gives us a way to make
 // assertions in tests about the contents of requests that protoc sends to
@@ -53,12 +50,10 @@ int main(int argc, char* argv[]) {
   google::protobuf::io::win32::setmode(STDOUT_FILENO, _O_BINARY);
 #endif
 
-  CodeGeneratorRequest request;
+  google::protobuf::compiler::CodeGeneratorRequest request;
   ABSL_CHECK(request.ParseFromFileDescriptor(STDIN_FILENO));
   ABSL_CHECK(!request.file_to_generate().empty());
-  CodeGeneratorResponse response;
-  response.set_supported_features(
-      CodeGeneratorResponse::FEATURE_SUPPORTS_EDITIONS);
+  google::protobuf::compiler::CodeGeneratorResponse response;
   response.add_file()->set_name(
       absl::StrCat(request.file_to_generate(0), ".request"));
   response.mutable_file(0)->set_content(
