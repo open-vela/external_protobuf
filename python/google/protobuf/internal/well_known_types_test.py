@@ -528,8 +528,7 @@ class StructTest(unittest.TestCase):
         'key5': [6, 'seven', True, False, None, {'subkey2': 9}],
         'key6': [['nested_list', True]],
         'empty_struct': {},
-        'empty_list': [],
-        'tuple': ((3,2), ())
+        'empty_list': []
     }
     struct.update(dictionary)
     self.assertEqual(5, struct['key1'])

@@ -3914,6 +3914,7 @@ TEST_F(SourceInfoTest, DocCommentsOneof) {
 
 // ===================================================================
 
+#ifdef PROTOBUF_FUTURE_EDITIONS
 typedef ParserTest ParseEditionsTest;
 
 TEST_F(ParseEditionsTest, Editions) {
@@ -4142,6 +4143,7 @@ TEST_F(ParseEditionsTest, FeaturesWithoutEditions) {
       "4:17: Features are only valid under editions.\n");
 }
 
+#endif  // PROTOBUF_FUTURE_EDITIONS
 
 
 }  // anonymous namespace

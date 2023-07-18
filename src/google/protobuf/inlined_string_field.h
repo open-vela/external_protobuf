@@ -38,7 +38,6 @@
 #include "absl/log/absl_check.h"
 #include "absl/strings/string_view.h"
 #include "google/protobuf/arenastring.h"
-#include "google/protobuf/explicitly_constructed.h"
 #include "google/protobuf/message_lite.h"
 
 // Must be included last.
@@ -109,8 +108,6 @@ namespace internal {
 class PROTOBUF_EXPORT InlinedStringField {
  public:
   InlinedStringField() { Init(); }
-  InlinedStringField(const InlinedStringField&) = delete;
-  InlinedStringField& operator=(const InlinedStringField&) = delete;
   inline void Init() { new (get_mutable()) std::string(); }
   // Add the dummy parameter just to make InlinedStringField(nullptr)
   // unambiguous.
@@ -120,7 +117,6 @@ class PROTOBUF_EXPORT InlinedStringField {
       : value_{} {}
   explicit InlinedStringField(const std::string& default_value);
   explicit InlinedStringField(Arena* arena);
-  InlinedStringField(Arena* arena, const InlinedStringField& rhs);
   ~InlinedStringField() { Destruct(); }
 
   // Lvalue Set. To save space, we pack the donating states of multiple
@@ -394,12 +390,6 @@ inline InlinedStringField::InlinedStringField(
 
 
 inline InlinedStringField::InlinedStringField(Arena* /*arena*/) { Init(); }
-
-inline InlinedStringField::InlinedStringField(Arena* arena,
-                                              const InlinedStringField& rhs) {
-  const std::string& src = *rhs.get_const();
-  new (value_) std::string(src);
-}
 
 inline const std::string& InlinedStringField::GetNoArena() const {
   return *get_const();

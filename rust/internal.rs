@@ -61,17 +61,14 @@ impl PtrAndLen {
     /// Unsafely dereference this slice.
     ///
     /// # Safety
-    /// - `self.ptr` must be dereferencable and immutable for `self.len` bytes
-    ///   for the lifetime `'a`. It can be null or dangling if `self.len == 0`.
+    /// - `ptr` must be valid for `len` bytes. It can be null or dangling if
+    ///   `self.len == 0`.
     pub unsafe fn as_ref<'a>(self) -> &'a [u8] {
         if self.ptr.is_null() {
             assert_eq!(self.len, 0, "Non-empty slice with null data pointer");
             &[]
         } else {
-            // SAFETY:
-            // - `ptr` is non-null
-            // - `ptr` is valid for `len` bytes as promised by the caller.
-            unsafe { slice::from_raw_parts(self.ptr, self.len) }
+            slice::from_raw_parts(self.ptr, self.len)
         }
     }
 }
