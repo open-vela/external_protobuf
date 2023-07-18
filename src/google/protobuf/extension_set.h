@@ -49,6 +49,7 @@
 #include "absl/base/call_once.h"
 #include "absl/container/btree_map.h"
 #include "absl/log/absl_check.h"
+#include "google/protobuf/internal_visibility.h"
 #include "google/protobuf/port.h"
 #include "google/protobuf/port.h"
 #include "google/protobuf/io/coded_stream.h"
@@ -76,9 +77,7 @@ class Message;          // message.h
 class MessageFactory;   // message.h
 class Reflection;       // message.h
 class UnknownFieldSet;  // unknown_field_set.h
-#ifdef PROTOBUF_FUTURE_EDITIONS
 class FeatureSet;
-#endif  // PROTOBUF_FUTURE_EDITIONS
 namespace internal {
 class FieldSkipper;  // wire_format_lite.h
 class WireFormat;
@@ -86,11 +85,9 @@ enum class LazyVerifyOption;
 }  // namespace internal
 }  // namespace protobuf
 }  // namespace google
-#ifdef PROTOBUF_FUTURE_EDITIONS
 namespace pb {
 class CppFeatures;
 }  // namespace pb
-#endif  // PROTOBUF_FUTURE_EDITIONS
 
 namespace google {
 namespace protobuf {
@@ -194,10 +191,18 @@ class PROTOBUF_EXPORT GeneratedExtensionFinder {
 // off to the ExtensionSet for parsing.  Etc.
 class PROTOBUF_EXPORT ExtensionSet {
  public:
-  constexpr ExtensionSet();
-  explicit ExtensionSet(Arena* arena);
+  constexpr ExtensionSet() : ExtensionSet(nullptr) {}
+  ExtensionSet(const ExtensionSet& rhs) = delete;
+
+  // Arena enabled constructors: for internal use only.
+  ExtensionSet(internal::InternalVisibility, Arena* arena)
+      : ExtensionSet(arena) {}
+
+  // TODO(b/290091828): make constructor private, and migrate `ArenaInitialized`
+  // to `InternalVisibility` overloaded constructor(s).
+  explicit constexpr ExtensionSet(Arena* arena);
   ExtensionSet(ArenaInitialized, Arena* arena) : ExtensionSet(arena) {}
-  ExtensionSet(const ExtensionSet&) = delete;
+
   ExtensionSet& operator=(const ExtensionSet&) = delete;
   ~ExtensionSet();
 
@@ -932,8 +937,8 @@ class PROTOBUF_EXPORT ExtensionSet {
   static void DeleteFlatMap(const KeyValue* flat, uint16_t flat_capacity);
 };
 
-constexpr ExtensionSet::ExtensionSet()
-    : arena_(nullptr), flat_capacity_(0), flat_size_(0), map_{nullptr} {}
+constexpr ExtensionSet::ExtensionSet(Arena* arena)
+    : arena_(arena), flat_capacity_(0), flat_size_(0), map_{nullptr} {}
 
 // These are just for convenience...
 inline void ExtensionSet::SetString(int number, FieldType type,
@@ -1545,7 +1550,6 @@ class ExtensionIdentifier {
 extern PROTOBUF_ATTRIBUTE_WEAK ExtensionSet::LazyMessageExtension*
 MaybeCreateLazyExtension(Arena* arena);
 
-#ifdef PROTOBUF_FUTURE_EDITIONS
 // Define a specialization of ExtensionIdentifier for bootstrapped extensions
 // that we need to register lazily.
 template <>
@@ -1577,7 +1581,6 @@ class ExtensionIdentifier<FeatureSet, MessageTypeTraits<::pb::CppFeatures>, 11,
   mutable absl::once_flag once_;
 };
 
-#endif  // PROTOBUF_FUTURE_EDITIONS
 
 }  // namespace internal
 
