@@ -119,17 +119,18 @@ namespace google {
 namespace protobuf {
 namespace io {
 
+// Defined in this file.
+class ZeroCopyInputStream;
+class ZeroCopyOutputStream;
+
 // Abstract interface similar to an input stream but designed to minimize
 // copying.
 class PROTOBUF_EXPORT ZeroCopyInputStream {
  public:
-  ZeroCopyInputStream() = default;
-  virtual ~ZeroCopyInputStream() = default;
-
+  ZeroCopyInputStream() {}
   ZeroCopyInputStream(const ZeroCopyInputStream&) = delete;
   ZeroCopyInputStream& operator=(const ZeroCopyInputStream&) = delete;
-  ZeroCopyInputStream(ZeroCopyInputStream&&) = delete;
-  ZeroCopyInputStream& operator=(ZeroCopyInputStream&&) = delete;
+  virtual ~ZeroCopyInputStream() {}
 
   // Obtains a chunk of data from the stream.
   //
