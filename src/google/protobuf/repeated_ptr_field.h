@@ -60,6 +60,7 @@
 #include "google/protobuf/port.h"
 #include "absl/base/attributes.h"
 #include "absl/log/absl_check.h"
+#include "google/protobuf/internal_visibility.h"
 #include "google/protobuf/message_lite.h"
 #include "google/protobuf/port.h"
 
@@ -924,9 +925,18 @@ class RepeatedPtrField final : private internal::RepeatedPtrFieldBase {
 
  public:
   constexpr RepeatedPtrField();
-  explicit RepeatedPtrField(Arena* arena);
+  RepeatedPtrField(const RepeatedPtrField& other)
+      : RepeatedPtrField(nullptr, other) {}
 
-  RepeatedPtrField(const RepeatedPtrField& other);
+  // Arena enabled constructors: for internal use only.
+  RepeatedPtrField(internal::InternalVisibility, Arena* arena)
+      : RepeatedPtrField(arena) {}
+  RepeatedPtrField(internal::InternalVisibility, Arena* arena,
+                   const RepeatedPtrField& rhs)
+      : RepeatedPtrField(arena, rhs) {}
+
+  // TODO(b/290091828): make constructor private
+  explicit RepeatedPtrField(Arena* arena);
 
   template <typename Iter,
             typename = typename std::enable_if<std::is_constructible<
@@ -1214,6 +1224,8 @@ class RepeatedPtrField final : private internal::RepeatedPtrFieldBase {
   }
 
  private:
+  RepeatedPtrField(Arena* arena, const RepeatedPtrField& rhs);
+
   // Note:  RepeatedPtrField SHOULD NOT be subclassed by users.
   class TypeHandler;
 
@@ -1263,15 +1275,17 @@ constexpr RepeatedPtrField<Element>::RepeatedPtrField()
 template <typename Element>
 inline RepeatedPtrField<Element>::RepeatedPtrField(Arena* arena)
     : RepeatedPtrFieldBase(arena) {
-  StaticValidityCheck();
+  // We can't have StaticValidityCheck here because that requires Element to be
+  // a complete type, and in split repeated fields cases, we call
+  // CreateMaybeMessage<RepeatedPtrField<T>> for incomplete Ts.
 }
 
 template <typename Element>
-inline RepeatedPtrField<Element>::RepeatedPtrField(
-    const RepeatedPtrField& other)
-    : RepeatedPtrFieldBase() {
+inline RepeatedPtrField<Element>::RepeatedPtrField(Arena* arena,
+                                                   const RepeatedPtrField& rhs)
+    : RepeatedPtrFieldBase(arena) {
   StaticValidityCheck();
-  MergeFrom(other);
+  MergeFrom(rhs);
 }
 
 template <typename Element>
