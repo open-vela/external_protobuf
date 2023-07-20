@@ -315,6 +315,10 @@ void Timestamp::InternalSwap(Timestamp* other) {
 }  // namespace google
 namespace google {
 namespace protobuf {
+template<> PROTOBUF_NOINLINE ::google::protobuf::Timestamp*
+Arena::CreateMaybeMessage< ::google::protobuf::Timestamp >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::google::protobuf::Timestamp >(arena);
+}
 }  // namespace protobuf
 }  // namespace google
 // @@protoc_insertion_point(global_scope)
