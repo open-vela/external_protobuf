@@ -80,7 +80,7 @@ class Map : public FieldGeneratorBase {
  public:
   Map(const FieldDescriptor* field, const Options& opts,
       MessageSCCAnalyzer* scc)
-      : FieldGeneratorBase(field, opts, scc),
+      : FieldGeneratorBase(field, opts),
         field_(field),
         key_(field->message_type()->map_key()),
         val_(field->message_type()->map_value()),
@@ -141,7 +141,7 @@ class Map : public FieldGeneratorBase {
   }
 
   void GenerateAggregateInitializer(io::Printer* p) const override {
-    if (should_split()) {
+    if (ShouldSplit(field_, *opts_)) {
       p->Emit(R"cc(
         /* decltype($Msg$::Split::$name$_) */ {
             $pbi$::ArenaInitialized(),
@@ -158,7 +158,7 @@ class Map : public FieldGeneratorBase {
   void GenerateConstructorCode(io::Printer* p) const override {}
 
   void GenerateDestructorCode(io::Printer* p) const override {
-    if (should_split()) {
+    if (ShouldSplit(field_, *opts_)) {
       p->Emit(R"cc(
         $cached_split_ptr$->$name$_.~$MapField$();
       )cc");

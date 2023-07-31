@@ -47,7 +47,6 @@
 #include <gtest/gtest.h>
 #include "absl/functional/bind_front.h"
 #include "absl/log/absl_check.h"
-#include "absl/memory/memory.h"
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_split.h"
 #include "absl/strings/string_view.h"
@@ -272,7 +271,6 @@ TEST(MessageDifferencerTest,
   EXPECT_FALSE(default_differencer.Compare(msg2, msg1));
   EXPECT_TRUE(default_differencer.NoPresenceFieldsCausingFailure().empty());
 }
-
 
 TEST(MessageDifferencerTest,
      PartialEqualityTestForceCompareWorksForRepeatedField) {

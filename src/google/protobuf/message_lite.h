@@ -51,7 +51,6 @@
 #include "absl/strings/cord.h"
 #include "absl/strings/string_view.h"
 #include "google/protobuf/explicitly_constructed.h"
-#include "google/protobuf/internal_visibility.h"
 #include "google/protobuf/io/coded_stream.h"
 #include "google/protobuf/metadata_lite.h"
 #include "google/protobuf/port.h"
@@ -462,11 +461,6 @@ class PROTOBUF_EXPORT MessageLite {
   virtual void OnDemandRegisterArenaDtor(Arena* /*arena*/) {}
 
  protected:
-  // Message implementations require access to internally visible API.
-  static constexpr internal::InternalVisibility internal_visibility() {
-    return internal::InternalVisibility{};
-  }
-
   template <typename T>
   static T* CreateMaybeMessage(Arena* arena) {
     return Arena::CreateMaybeMessage<T>(arena);
