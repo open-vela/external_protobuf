@@ -46,12 +46,10 @@
 #include "absl/strings/string_view.h"
 #include "google/protobuf/compiler/cpp/file.h"
 #include "google/protobuf/compiler/cpp/helpers.h"
+#include "google/protobuf/cpp_features.pb.h"
 #include "google/protobuf/descriptor.pb.h"
 #include "google/protobuf/descriptor_visitor.h"
 
-#ifdef PROTOBUF_FUTURE_EDITIONS
-#include "google/protobuf/cpp_features.pb.h"
-#endif  // PROTOBUF_FUTURE_EDITIONS
 
 namespace google {
 namespace protobuf {
@@ -191,8 +189,6 @@ bool CppGenerator::Generate(const FileDescriptor* file,
               .emplace(value.substr(pos, next_pos - pos));
         pos = next_pos + 1;
       } while (pos < value.size());
-    } else if (key == "unverified_lazy_message_sets") {
-      file_options.unverified_lazy_message_sets = true;
     } else if (key == "force_eagerly_verified_lazy") {
       file_options.force_eagerly_verified_lazy = true;
     } else if (key == "experimental_tail_call_table_mode") {
@@ -367,7 +363,6 @@ bool CppGenerator::Generate(const FileDescriptor* file,
 
 absl::Status CppGenerator::ValidateFeatures(const FileDescriptor* file) const {
   absl::Status status = absl::OkStatus();
-#ifdef PROTOBUF_FUTURE_EDITIONS
   google::protobuf::internal::VisitDescriptors(*file, [&](const FieldDescriptor& field) {
     const FeatureSet& source_features = GetSourceFeatures(field);
     const FeatureSet& raw_features = GetSourceRawFeatures(field);
@@ -385,7 +380,6 @@ absl::Status CppGenerator::ValidateFeatures(const FileDescriptor* file) const {
                        " has a closed enum type with implicit presence."));
     }
   });
-#endif  // PROTOBUF_FUTURE_EDITIONS
   return status;
 }
 
