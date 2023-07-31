@@ -130,6 +130,8 @@ class PROTOC_EXPORT CodeGenerator {
   // method can be removed.
   virtual bool HasGenerateAll() const { return true; }
 
+#ifdef PROTOBUF_FUTURE_EDITIONS
+
  protected:
   // Retrieves the resolved source features for a given descriptor.  These
   // should be used to make any feature-based decisions during code generation.
@@ -155,6 +157,7 @@ class PROTOC_EXPORT CodeGenerator {
     StripSourceRetentionOptions(*file.pool(), proto);
     return proto;
   }
+#endif  // PROTOBUF_FUTURE_EDITIONS
 };
 
 // CodeGenerators generate one or more files in a given directory.  This

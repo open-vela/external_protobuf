@@ -58,7 +58,6 @@ absl::string_view PrimitiveRsTypeName(Context<FieldDescriptor> field);
 std::string FieldInfoComment(Context<FieldDescriptor> field);
 
 std::string RustModule(Context<Descriptor> msg);
-std::string RustInternalModuleName(Context<FileDescriptor> file);
 
 std::string GetCrateRelativeQualifiedPath(Context<Descriptor> msg);
 }  // namespace rust
