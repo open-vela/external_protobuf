@@ -879,14 +879,12 @@ bool MessageDifferencer::CompareWithFieldsInternal(
       ++field_index1;
       continue;
     } else if (FieldBefore(field2, field1)) {
-      const bool ignore_field =
-          IsIgnored(message1, message2, field2, *parent_fields);
-      if (!ignore_field && force_compare_no_presence_fields_.contains(field2)) {
+      if (force_compare_no_presence_fields_.contains(field2)) {
         force_compare_failure_triggering_fields_.insert(field2->full_name());
       }
 
       // Field 2 is not in the field list for message 1.
-      if (ignore_field) {
+      if (IsIgnored(message1, message2, field2, *parent_fields)) {
         // We are ignoring field2. Report the ignore and move on to
         // the next field in message2_fields.
         if (reporter_ != NULL) {
