@@ -1351,8 +1351,6 @@ TEST_F(CommandLineInterfaceTest, AllowServicesHasService) {
   ExpectGenerated("test_generator", "", "foo.proto", "Foo");
 }
 
-#ifdef PROTOBUF_FUTURE_EDITIONS
-
 TEST_F(CommandLineInterfaceTest, EditionsAreNotAllowed) {
   CreateTempFile("foo.proto",
                  "edition = \"very-cool\";\n"
@@ -1682,8 +1680,6 @@ TEST_F(CommandLineInterfaceTest, PluginNoEditionsSupport) {
   ExpectErrorSubstring(
       "code generator prefix-gen-plug hasn't been updated to support editions");
 }
-
-#endif  // PROTOBUF_FUTURE_EDITIONS
 
 
 TEST_F(CommandLineInterfaceTest, DirectDependencies_Missing_EmptyList) {
