@@ -36,6 +36,7 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_replace.h"
 #include "absl/strings/string_view.h"
+#include "absl/strings/strip.h"
 #include "absl/strings/substitute.h"
 #include "google/protobuf/compiler/code_generator.h"
 #include "google/protobuf/compiler/rust/context.h"
@@ -110,6 +111,10 @@ absl::string_view PrimitiveRsTypeName(Context<FieldDescriptor> field) {
   switch (field.desc().type()) {
     case FieldDescriptor::TYPE_BOOL:
       return "bool";
+    case FieldDescriptor::TYPE_FIXED32:
+      return "i32";
+    case FieldDescriptor::TYPE_FIXED64:
+      return "i64";
     case FieldDescriptor::TYPE_INT32:
       return "i32";
     case FieldDescriptor::TYPE_INT64:
@@ -122,6 +127,10 @@ absl::string_view PrimitiveRsTypeName(Context<FieldDescriptor> field) {
       return "u32";
     case FieldDescriptor::TYPE_UINT64:
       return "u64";
+    case FieldDescriptor::TYPE_FLOAT:
+      return "f32";
+    case FieldDescriptor::TYPE_DOUBLE:
+      return "f64";
     case FieldDescriptor::TYPE_BYTES:
       return "&[u8]";
     default:
@@ -137,12 +146,16 @@ bool IsSupportedFieldType(Context<FieldDescriptor> field) {
          // cord or string_piece) in V0 API.
          !field.desc().options().has_ctype() &&
          (field.desc().type() == FieldDescriptor::TYPE_BOOL ||
+          field.desc().type() == FieldDescriptor::TYPE_FIXED32 ||
+          field.desc().type() == FieldDescriptor::TYPE_FIXED64 ||
           field.desc().type() == FieldDescriptor::TYPE_INT32 ||
           field.desc().type() == FieldDescriptor::TYPE_INT64 ||
           field.desc().type() == FieldDescriptor::TYPE_SINT32 ||
           field.desc().type() == FieldDescriptor::TYPE_SINT64 ||
           field.desc().type() == FieldDescriptor::TYPE_UINT32 ||
           field.desc().type() == FieldDescriptor::TYPE_UINT64 ||
+          field.desc().type() == FieldDescriptor::TYPE_FLOAT ||
+          field.desc().type() == FieldDescriptor::TYPE_DOUBLE ||
           field.desc().type() == FieldDescriptor::TYPE_BYTES);
 }
 
@@ -152,7 +165,16 @@ std::string RustModule(Context<Descriptor> msg) {
   return absl::StrCat("", absl::StrReplaceAll(package, {{".", "::"}}));
 }
 
+std::string RustInternalModuleName(Context<FileDescriptor> file) {
+  // TODO(b/291853557): Introduce a more robust mangling here to avoid conflicts
+  // between `foo/bar/baz.proto` and `foo_bar/baz.proto`.
+  return absl::StrReplaceAll(StripProto(file.desc().name()), {{"/", "_"}});
+}
+
 std::string GetCrateRelativeQualifiedPath(Context<Descriptor> msg) {
+  if (msg.desc().file()->package().empty()) {
+    return msg.desc().name();
+  }
   return absl::StrCat(RustModule(msg), "::", msg.desc().name());
 }
 

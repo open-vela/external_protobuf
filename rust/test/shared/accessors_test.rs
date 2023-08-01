@@ -28,19 +28,54 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-/// Tests covering accessors for singular bool, int64, and bytes fields.
+/// Tests covering accessors for singular bool, int32, int64, and bytes fields.
 use unittest_proto::proto2_unittest::TestAllTypes;
 
 #[test]
 fn test_default_accessors() {
     let msg = TestAllTypes::new();
+    assert_eq!(msg.default_fixed32(), 47);
+    assert_eq!(msg.default_fixed64(), 48);
     assert_eq!(msg.default_int32(), 41);
     assert_eq!(msg.default_int64(), 42);
     assert_eq!(msg.default_sint32(), -45);
     assert_eq!(msg.default_sint64(), 46);
     assert_eq!(msg.default_uint32(), 43);
     assert_eq!(msg.default_uint64(), 44);
+    assert_eq!(msg.default_float(), 51.5);
+    assert_eq!(msg.default_double(), 52000.0);
     assert_eq!(msg.default_bool(), true);
+}
+
+#[test]
+fn test_optional_fixed32_accessors() {
+    let mut msg = TestAllTypes::new();
+    assert_eq!(msg.optional_fixed32_opt(), None);
+    assert_eq!(msg.optional_fixed32(), 0);
+
+    msg.optional_fixed32_set(Some(99));
+    assert_eq!(msg.optional_fixed32_opt(), Some(99));
+    assert_eq!(msg.optional_fixed32(), 99);
+
+    msg.optional_fixed32_set(None);
+    assert_eq!(msg.optional_fixed32_opt(), None);
+
+    assert_eq!(msg.optional_fixed32(), 0);
+}
+
+#[test]
+fn test_optional_fixed64_accessors() {
+    let mut msg = TestAllTypes::new();
+    assert_eq!(msg.optional_fixed64_opt(), None);
+    assert_eq!(msg.optional_fixed64(), 0);
+
+    msg.optional_fixed64_set(Some(2000));
+    assert_eq!(msg.optional_fixed64_opt(), Some(2000));
+    assert_eq!(msg.optional_fixed64(), 2000);
+
+    msg.optional_fixed64_set(None);
+    assert_eq!(msg.optional_fixed64_opt(), None);
+    assert_eq!(msg.optional_fixed64(), 0);
 }
 
 #[test]
@@ -135,6 +170,36 @@ fn test_optional_uint64_accessors() {
 }
 
 #[test]
+fn test_optional_float_accessors() {
+    let mut msg = TestAllTypes::new();
+    assert_eq!(msg.optional_float_opt(), None);
+    assert_eq!(msg.optional_float(), 0.0);
+
+    msg.optional_float_set(Some(3.14));
+    assert_eq!(msg.optional_float_opt(), Some(3.14));
+    assert_eq!(msg.optional_float(), 3.14);
+
+    msg.optional_float_set(None);
+    assert_eq!(msg.optional_float_opt(), None);
+    assert_eq!(msg.optional_float(), 0.0);
+}
+
+#[test]
+fn test_optional_double_accessors() {
+    let mut msg = TestAllTypes::new();
+    assert_eq!(msg.optional_double_opt(), None);
+    assert_eq!(msg.optional_double(), 0.0);
+
+    msg.optional_double_set(Some(-10.99));
+    assert_eq!(msg.optional_double_opt(), Some(-10.99));
+    assert_eq!(msg.optional_double(), -10.99);
+
+    msg.optional_double_set(None);
+    assert_eq!(msg.optional_double_opt(), None);
+    assert_eq!(msg.optional_double(), 0.0);
+}
+
+#[test]
 fn test_optional_bool_accessors() {
     let mut msg = TestAllTypes::new();
     assert_eq!(msg.optional_bool_opt(), None);
@@ -159,4 +224,14 @@ fn test_optional_bytes_accessors() {
 
     msg.optional_bytes_set(Some(b""));
     assert_eq!(msg.optional_bytes().unwrap(), b"");
+}
+
+#[test]
+#[should_panic = "b/285309454"]
+#[allow(unreachable_code)]
+fn test_singular_msg_field() {
+    let msg = TestAllTypes::new();
+    // TODO("b/285309454"): fetch the inner integer `bb`
+    // call should look like msg.optional_nested_message().bb()
+    match msg.optional_nested_message() {}
 }
