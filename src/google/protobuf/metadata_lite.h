@@ -182,10 +182,11 @@ class PROTOBUF_EXPORT InternalMetadata {
 
   template <typename T>
   PROTOBUF_NOINLINE void DeleteOutOfLineHelper() {
-    delete PtrValue<Container<T>>();
-    // TODO(b/188560391):  This store is load-bearing.  Since we are destructing
-    // the message at this point, see if we can eliminate it.
-    ptr_ = 0;
+    // TODO(b/188560391): Determine if this branch is needed.
+    if (!arena()) {
+      delete PtrValue<Container<T>>();
+      ptr_ = 0;
+    }
   }
 
   template <typename T>

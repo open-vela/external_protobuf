@@ -799,11 +799,9 @@ void Type::MergeImpl(::google::protobuf::Message& to_msg, const ::google::protob
   ::uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
-  _this->_internal_mutable_fields()->MergeFrom(
-      from._internal_fields());
+  _this->_internal_mutable_fields()->MergeFrom(from._internal_fields());
   _this->_internal_mutable_oneofs()->MergeFrom(from._internal_oneofs());
-  _this->_internal_mutable_options()->MergeFrom(
-      from._internal_options());
+  _this->_internal_mutable_options()->MergeFrom(from._internal_options());
   if (!from._internal_name().empty()) {
     _this->_internal_set_name(from._internal_name());
   }
@@ -1265,8 +1263,7 @@ void Field::MergeImpl(::google::protobuf::Message& to_msg, const ::google::proto
   ::uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
-  _this->_internal_mutable_options()->MergeFrom(
-      from._internal_options());
+  _this->_internal_mutable_options()->MergeFrom(from._internal_options());
   if (!from._internal_name().empty()) {
     _this->_internal_set_name(from._internal_name());
   }
@@ -1656,10 +1653,8 @@ void Enum::MergeImpl(::google::protobuf::Message& to_msg, const ::google::protob
   ::uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
-  _this->_internal_mutable_enumvalue()->MergeFrom(
-      from._internal_enumvalue());
-  _this->_internal_mutable_options()->MergeFrom(
-      from._internal_options());
+  _this->_internal_mutable_enumvalue()->MergeFrom(from._internal_enumvalue());
+  _this->_internal_mutable_options()->MergeFrom(from._internal_options());
   if (!from._internal_name().empty()) {
     _this->_internal_set_name(from._internal_name());
   }
@@ -1920,8 +1915,7 @@ void EnumValue::MergeImpl(::google::protobuf::Message& to_msg, const ::google::p
   ::uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
-  _this->_internal_mutable_options()->MergeFrom(
-      from._internal_options());
+  _this->_internal_mutable_options()->MergeFrom(from._internal_options());
   if (!from._internal_name().empty()) {
     _this->_internal_set_name(from._internal_name());
   }

@@ -46,7 +46,6 @@
 #include "absl/status/statusor.h"
 #include "conformance/conformance.pb.h"
 #include "conformance/conformance.pb.h"
-#include "google/protobuf/endian.h"
 #include "google/protobuf/test_messages_proto2.pb.h"
 #include "google/protobuf/test_messages_proto3.pb.h"
 #include "google/protobuf/test_messages_proto3.pb.h"
@@ -229,7 +228,6 @@ absl::StatusOr<bool> Harness::ServeConformanceRequest() {
     // EOF means we're done.
     return true;
   }
-  in_len = internal::little_endian::ToHost(in_len);
 
   std::string serialized_input;
   serialized_input.resize(in_len);
@@ -244,12 +242,9 @@ absl::StatusOr<bool> Harness::ServeConformanceRequest() {
   std::string serialized_output;
   response->SerializeToString(&serialized_output);
 
-  uint32_t out_len = internal::little_endian::FromHost(
-      static_cast<uint32_t>(serialized_output.size()));
-
+  uint32_t out_len = static_cast<uint32_t>(serialized_output.size());
   RETURN_IF_ERROR(WriteFd(STDOUT_FILENO, &out_len, sizeof(out_len)));
-  RETURN_IF_ERROR(WriteFd(STDOUT_FILENO, serialized_output.data(),
-                          serialized_output.size()));
+  RETURN_IF_ERROR(WriteFd(STDOUT_FILENO, serialized_output.data(), out_len));
 
   if (verbose_) {
     ABSL_LOG(INFO) << "conformance-cpp: request=" << request.ShortDebugString()

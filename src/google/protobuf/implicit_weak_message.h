@@ -57,19 +57,13 @@ namespace internal {
 // message type does not get linked into the binary.
 class PROTOBUF_EXPORT ImplicitWeakMessage : public MessageLite {
  public:
-  ImplicitWeakMessage() : ImplicitWeakMessage(nullptr) {}
+  ImplicitWeakMessage() : data_(new std::string) {}
   explicit constexpr ImplicitWeakMessage(ConstantInitialized)
       : data_(nullptr) {}
-  ImplicitWeakMessage(const ImplicitWeakMessage&) = delete;
-  ImplicitWeakMessage& operator=(const ImplicitWeakMessage&) = delete;
-
-  // Arena enabled constructors: for internal use only.
-  ImplicitWeakMessage(internal::InternalVisibility, Arena* arena)
-      : ImplicitWeakMessage(arena) {}
-
-  // TODO(b/290091828): make this constructor private
   explicit ImplicitWeakMessage(Arena* arena)
       : MessageLite(arena), data_(new std::string) {}
+  ImplicitWeakMessage(const ImplicitWeakMessage&) = delete;
+  ImplicitWeakMessage& operator=(const ImplicitWeakMessage&) = delete;
 
   ~ImplicitWeakMessage() override {
     // data_ will be null in the default instance, but we can safely call delete
@@ -162,21 +156,8 @@ struct WeakRepeatedPtrField {
   using DestructorSkippable_ = void;
 
   using TypeHandler = internal::ImplicitWeakTypeHandler<T>;
-
   constexpr WeakRepeatedPtrField() : weak() {}
-  WeakRepeatedPtrField(const WeakRepeatedPtrField& rhs)
-      : WeakRepeatedPtrField(nullptr, rhs) {}
-
-  // Arena enabled constructors: for internal use only.
-  WeakRepeatedPtrField(internal::InternalVisibility, Arena* arena)
-      : WeakRepeatedPtrField(arena) {}
-  WeakRepeatedPtrField(internal::InternalVisibility, Arena* arena,
-                       const WeakRepeatedPtrField& rhs)
-      : WeakRepeatedPtrField(arena, rhs) {}
-
-  // TODO(b/290091828): make this constructor private
   explicit WeakRepeatedPtrField(Arena* arena) : weak(arena) {}
-
   ~WeakRepeatedPtrField() { weak.template Destroy<TypeHandler>(); }
 
   typedef internal::RepeatedPtrIterator<MessageLite> iterator;
@@ -198,13 +179,13 @@ struct WeakRepeatedPtrField {
     return pointer_iterator(base().raw_mutable_data());
   }
   const_pointer_iterator pointer_begin() const {
-    return const_pointer_iterator(base().raw_data());
+    return const_pointer_iterator(base().raw_mutable_data());
   }
   pointer_iterator pointer_end() {
     return pointer_iterator(base().raw_mutable_data() + base().size());
   }
   const_pointer_iterator pointer_end() const {
-    return const_pointer_iterator(base().raw_data() + base().size());
+    return const_pointer_iterator(base().raw_mutable_data() + base().size());
   }
 
   MessageLite* AddWeak(const MessageLite* prototype) {
@@ -227,12 +208,6 @@ struct WeakRepeatedPtrField {
   union {
     RepeatedPtrField<T> weak;
   };
-
- private:
-  WeakRepeatedPtrField(Arena* arena, const WeakRepeatedPtrField& rhs)
-      : WeakRepeatedPtrField(arena) {
-    MergeFrom(rhs);
-  }
 };
 
 }  // namespace protobuf

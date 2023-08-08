@@ -68,7 +68,6 @@
 #include "google/protobuf/descriptor.pb.h"
 #include "google/protobuf/io/printer.h"
 #include "google/protobuf/wire_format.h"
-#include "google/protobuf/wire_format_lite.h"
 
 
 // Must be included last.
@@ -949,7 +948,7 @@ void MessageGenerator::GenerateFieldAccessorDeclarations(io::Printer* p) {
   for (auto oneof : OneOfRange(descriptor_)) {
     p->Emit({{"oneof_name", oneof->name()},
              Sub{"clear_oneof_name", absl::StrCat("clear_", oneof->name())}
-                 .AnnotatedAs({oneof, Semantic::kSet}),
+                 .AnnotatedAs(oneof),
              {"OneOfName", UnderscoresToCamelCase(oneof->name(), true)}},
             R"cc(
               void $clear_oneof_name$();

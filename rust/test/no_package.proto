@@ -32,6 +32,4 @@ syntax = "proto2";
 
 // package intentionally left unspecified.
 
-import public "google/protobuf/rust/test/no_package_import.proto";
-
 message MsgWithoutPackage {}

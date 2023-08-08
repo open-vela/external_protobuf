@@ -599,40 +599,6 @@ int EstimateAlignmentSize(const FieldDescriptor* field) {
   return -1;  // Make compiler happy.
 }
 
-int EstimateSize(const FieldDescriptor* field) {
-  if (field == nullptr) return 0;
-  if (field->is_repeated()) {
-    if (field->is_map()) {
-      return sizeof(google::protobuf::Map<int32_t, int32_t>);
-    }
-    return field->cpp_type() < FieldDescriptor::CPPTYPE_STRING || IsCord(field)
-               ? sizeof(RepeatedField<int32_t>)
-               : sizeof(internal::RepeatedPtrFieldBase);
-  }
-  switch (field->cpp_type()) {
-    case FieldDescriptor::CPPTYPE_BOOL:
-      return 1;
-
-    case FieldDescriptor::CPPTYPE_INT32:
-    case FieldDescriptor::CPPTYPE_UINT32:
-    case FieldDescriptor::CPPTYPE_ENUM:
-    case FieldDescriptor::CPPTYPE_FLOAT:
-      return 4;
-
-    case FieldDescriptor::CPPTYPE_INT64:
-    case FieldDescriptor::CPPTYPE_UINT64:
-    case FieldDescriptor::CPPTYPE_DOUBLE:
-    case FieldDescriptor::CPPTYPE_MESSAGE:
-      return 8;
-
-    case FieldDescriptor::CPPTYPE_STRING:
-      if (IsCord(field)) return sizeof(absl::Cord);
-      return sizeof(internal::ArenaStringPtr);
-  }
-  ABSL_LOG(FATAL) << "Can't get here.";
-  return -1;  // Make compiler happy.
-}
-
 std::string FieldConstantName(const FieldDescriptor* field) {
   std::string field_name = UnderscoresToCamelCase(field->name(), true);
   std::string result = absl::StrCat("k", field_name, "FieldNumber");
@@ -923,8 +889,7 @@ std::string SafeFunctionName(const Descriptor* descriptor,
 }
 
 bool IsProfileDriven(const Options& options) {
-  return !options.bootstrap && !options.opensource_runtime &&
-         options.access_info_map != nullptr;
+  return options.access_info_map != nullptr;
 }
 
 bool IsRarelyPresent(const FieldDescriptor* field, const Options& options) {
@@ -1013,13 +978,6 @@ bool ShouldForceAllocationOnConstruction(const Descriptor* desc,
   (void)desc;
   (void)options;
   return false;
-}
-
-bool IsPresentMessage(const Descriptor* descriptor, const Options& options) {
-  (void)descriptor;
-  (void)options;
-  // Assume that the message is present if there is no profile.
-  return true;
 }
 
 static bool HasRepeatedFields(const Descriptor* descriptor) {
@@ -1190,8 +1148,7 @@ bool IsWellKnownMessage(const FileDescriptor* file) {
   return well_known_files->find(file->name()) != well_known_files->end();
 }
 
-void NamespaceOpener::ChangeTo(absl::string_view name,
-                               io::Printer::SourceLocation loc) {
+void NamespaceOpener::ChangeTo(absl::string_view name) {
   std::vector<std::string> new_stack =
       absl::StrSplit(name, "::", absl::SkipEmpty());
   size_t len = std::min(name_stack_.size(), new_stack.size());
@@ -1206,14 +1163,12 @@ void NamespaceOpener::ChangeTo(absl::string_view name,
   for (size_t i = name_stack_.size(); i > common_idx; i--) {
     p_->Emit({{"ns", name_stack_[i - 1]}}, R"(
       }  // namespace $ns$
-    )",
-             loc);
+    )");
   }
   for (size_t i = common_idx; i < new_stack.size(); ++i) {
     p_->Emit({{"ns", new_stack[i]}}, R"(
       namespace $ns$ {
-    )",
-             loc);
+    )");
   }
 
   name_stack_ = std::move(new_stack);
@@ -1455,8 +1410,10 @@ bool GetBootstrapBasename(const Options& options, absl::string_view basename,
       new absl::flat_hash_map<absl::string_view, std::string>{
           {"net/proto2/proto/descriptor",
            "third_party/protobuf/descriptor"},
+#ifdef PROTOBUF_FUTURE_EDITIONS
           {"third_party/protobuf/cpp_features",
            "third_party/protobuf/cpp_features"},
+#endif  // PROTOBUF_FUTURE_EDITIONS
           {"third_party/protobuf/compiler/plugin",
            "third_party/protobuf/compiler/plugin"},
           {"net/proto2/compiler/proto/profile",
