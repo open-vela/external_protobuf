@@ -1557,32 +1557,17 @@ void** Reflection::MutableSplitField(Message* message) const {
   return internal::GetPointerAtOffset<void*>(message, schema_.SplitOffset());
 }
 
-namespace internal {
-
-template <typename T>
-bool SplitFieldHasExtraIndirectionStatic(const FieldDescriptor* field) {
-  const bool ret = std::is_base_of<RepeatedFieldBase, T>() ||
-                   std::is_base_of<RepeatedPtrFieldBase, T>();
-  ABSL_DCHECK_EQ(SplitFieldHasExtraIndirection(field), ret);
-  return ret;
-}
-
-}  // namespace internal
-
 template <typename Type>
 const Type& Reflection::GetRaw(const Message& message,
                                const FieldDescriptor* field) const {
   ABSL_DCHECK(!schema_.InRealOneof(field) || HasOneofField(message, field))
       << "Field = " << field->full_name();
-  const uint32_t field_offset = schema_.GetFieldOffset(field);
-  if (!schema_.IsSplit(field)) {
-    return internal::GetConstRefAtOffset<Type>(message, field_offset);
+  if (schema_.IsSplit(field)) {
+    return *internal::GetConstPointerAtOffset<Type>(
+        GetSplitField(&message), schema_.GetFieldOffset(field));
   }
-  const void* split = GetSplitField(&message);
-  if (internal::SplitFieldHasExtraIndirectionStatic<Type>(field)) {
-    return **internal::GetConstPointerAtOffset<Type*>(split, field_offset);
-  }
-  return *internal::GetConstPointerAtOffset<Type>(split, field_offset);
+  return internal::GetConstRefAtOffset<Type>(message,
+                                             schema_.GetFieldOffset(field));
 }
 
 template <typename T>

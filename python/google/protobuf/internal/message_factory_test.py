@@ -180,6 +180,7 @@ class MessageFactoryTest(unittest.TestCase):
     msg.extension.add(
         name='extension_field',
         number=2,
+        type=descriptor_pb2.FieldDescriptorProto.TYPE_MESSAGE,
         label=descriptor_pb2.FieldDescriptorProto.LABEL_OPTIONAL,
         type_name='Extension',
         extendee='Container',
@@ -197,6 +198,7 @@ class MessageFactoryTest(unittest.TestCase):
     msg.extension.add(
         name='extension_field',
         number=2,
+        type=descriptor_pb2.FieldDescriptorProto.TYPE_MESSAGE,
         label=descriptor_pb2.FieldDescriptorProto.LABEL_OPTIONAL,
         type_name='Duplicate',
         extendee='Container',
@@ -241,6 +243,7 @@ class MessageFactoryTest(unittest.TestCase):
     f3.extension.add(
         name='top_level_extension_field',
         number=2,
+        type=descriptor_pb2.FieldDescriptorProto.TYPE_MESSAGE,
         label=descriptor_pb2.FieldDescriptorProto.LABEL_OPTIONAL,
         type_name='ValueType',
         extendee='Container',
@@ -248,6 +251,7 @@ class MessageFactoryTest(unittest.TestCase):
     f3.message_type.add(name='Extension').extension.add(
         name='nested_extension_field',
         number=3,
+        type=descriptor_pb2.FieldDescriptorProto.TYPE_MESSAGE,
         label=descriptor_pb2.FieldDescriptorProto.LABEL_OPTIONAL,
         type_name='ValueType',
         extendee='Container',

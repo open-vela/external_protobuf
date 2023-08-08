@@ -229,12 +229,6 @@ std::string FieldMemberName(const FieldDescriptor* field, bool split);
 // 64-bit pointers.
 int EstimateAlignmentSize(const FieldDescriptor* field);
 
-// Returns an estimate of the size of the field.  This
-// can't guarantee to be correct because the generated code could be compiled on
-// different systems with different alignment rules.  The estimates below assume
-// 64-bit pointers.
-int EstimateSize(const FieldDescriptor* field);
-
 // Get the unqualified name that should be used for a field's field
 // number constant.
 std::string FieldConstantName(const FieldDescriptor* field);
@@ -351,7 +345,7 @@ inline bool IsWeak(const FieldDescriptor* field, const Options& options) {
   return false;
 }
 
-inline bool IsCord(const FieldDescriptor* field) {
+inline bool IsCord(const FieldDescriptor* field, const Options& options) {
   return field->cpp_type() == FieldDescriptor::CPPTYPE_STRING &&
          internal::cpp::EffectiveStringCType(field) == FieldOptions::CORD;
 }
@@ -361,7 +355,8 @@ inline bool IsString(const FieldDescriptor* field, const Options& options) {
          internal::cpp::EffectiveStringCType(field) == FieldOptions::STRING;
 }
 
-inline bool IsStringPiece(const FieldDescriptor* field) {
+inline bool IsStringPiece(const FieldDescriptor* field,
+                          const Options& options) {
   return field->cpp_type() == FieldDescriptor::CPPTYPE_STRING &&
          internal::cpp::EffectiveStringCType(field) ==
              FieldOptions::STRING_PIECE;
@@ -433,9 +428,6 @@ bool ShouldSplit(const FieldDescriptor* field, const Options& options);
 // of the given message?
 bool ShouldForceAllocationOnConstruction(const Descriptor* desc,
                                          const Options& options);
-
-// Returns true if the message is present based on PDProto profile.
-bool IsPresentMessage(const Descriptor* descriptor, const Options& options);
 
 // Does the file contain any definitions that need extension_set.h?
 bool HasExtensionsOrExtendableMessage(const FileDescriptor* file);
@@ -979,37 +971,21 @@ void PrintFieldComment(const Formatter& format, const T* field,
 
 class PROTOC_EXPORT NamespaceOpener {
  public:
-  explicit NamespaceOpener(
-      io::Printer* p,
-      io::Printer::SourceLocation loc = io::Printer::SourceLocation::current())
-      : p_(p), loc_(loc) {}
-
-  explicit NamespaceOpener(
-      const Formatter& format,
-      io::Printer::SourceLocation loc = io::Printer::SourceLocation::current())
-      : NamespaceOpener(format.printer(), loc) {}
-
-  NamespaceOpener(
-      absl::string_view name, const Formatter& format,
-      io::Printer::SourceLocation loc = io::Printer::SourceLocation::current())
-      : NamespaceOpener(name, format.printer(), loc) {}
-
-  NamespaceOpener(
-      absl::string_view name, io::Printer* p,
-      io::Printer::SourceLocation loc = io::Printer::SourceLocation::current())
-      : NamespaceOpener(p, loc) {
-    ChangeTo(name, loc);
+  explicit NamespaceOpener(io::Printer* p) : p_(p) {}
+  explicit NamespaceOpener(const Formatter& format) : p_(format.printer()) {}
+  NamespaceOpener(absl::string_view name, const Formatter& format)
+      : NamespaceOpener(format) {
+    ChangeTo(name);
   }
+  NamespaceOpener(absl::string_view name, io::Printer* p) : NamespaceOpener(p) {
+    ChangeTo(name);
+  }
+  ~NamespaceOpener() { ChangeTo(""); }
 
-  ~NamespaceOpener() { ChangeTo("", loc_); }
-
-  void ChangeTo(
-      absl::string_view name,
-      io::Printer::SourceLocation loc = io::Printer::SourceLocation::current());
+  void ChangeTo(absl::string_view name);
 
  private:
   io::Printer* p_;
-  io::Printer::SourceLocation loc_;
   std::vector<std::string> name_stack_;
 };
 

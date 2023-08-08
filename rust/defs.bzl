@@ -12,8 +12,8 @@ load(
 )
 
 visibility([
-    "//experimental/...",
     "//rust/...",
+    "//experimental/...",
 ])
 
 def rust_proto_library(name, deps, visibility = [], **args):

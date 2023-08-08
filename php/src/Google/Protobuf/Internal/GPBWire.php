@@ -241,7 +241,7 @@ class GPBWire
         if (!$input->readRaw(4, $data)) {
             return false;
         }
-        $value = unpack('g', $data)[1];
+        $value = unpack('f', $data)[1];
         return true;
     }
 
@@ -251,7 +251,7 @@ class GPBWire
         if (!$input->readRaw(8, $data)) {
             return false;
         }
-        $value = unpack('e', $data)[1];
+        $value = unpack('d', $data)[1];
         return true;
     }
 
@@ -360,13 +360,13 @@ class GPBWire
 
     public static function writeFloat(&$output, $value)
     {
-        $data = pack("g", $value);
+        $data = pack("f", $value);
         return $output->writeRaw($data, 4);
     }
 
     public static function writeDouble(&$output, $value)
     {
-        $data = pack("e", $value);
+        $data = pack("d", $value);
         return $output->writeRaw($data, 8);
     }
 

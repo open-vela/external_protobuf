@@ -51,7 +51,6 @@ message TestMessageSetContainer {
 message NestedTestMessageSetContainer {
   optional TestMessageSetContainer container = 1;
   optional NestedTestMessageSetContainer child = 2;
-  optional NestedTestMessageSetContainer lazy_child = 3 [lazy = true];
 }
 
 message NestedTestInt {
