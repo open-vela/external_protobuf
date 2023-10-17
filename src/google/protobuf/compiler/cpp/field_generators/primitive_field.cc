@@ -329,6 +329,12 @@ class RepeatedPrimitive final : public FieldGeneratorBase {
       p->Emit(R"cc(
         $field_$.DeleteIfNotDefault();
       )cc");
+    } else {
+#ifndef PROTOBUF_EXPLICIT_CONSTRUCTORS
+      p->Emit(R"cc(
+        $field_$.~RepeatedField();
+      )cc");
+#endif  // !PROTOBUF_EXPLICIT_CONSTRUCTORS
     }
   }
 
