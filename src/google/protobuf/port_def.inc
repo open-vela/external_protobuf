@@ -204,22 +204,22 @@ static_assert(PROTOBUF_ABSL_MIN(20230125, 3),
 #ifdef PROTOBUF_VERSION
 #error PROTOBUF_VERSION was previously defined
 #endif
-#define PROTOBUF_VERSION 4025000
+#define PROTOBUF_VERSION 4024000
 
 #ifdef PROTOBUF_MIN_HEADER_VERSION_FOR_PROTOC
 #error PROTOBUF_MIN_HEADER_VERSION_FOR_PROTOC was previously defined
 #endif
-#define PROTOBUF_MIN_HEADER_VERSION_FOR_PROTOC 4025000
+#define PROTOBUF_MIN_HEADER_VERSION_FOR_PROTOC 4024000
 
 #ifdef PROTOBUF_MIN_PROTOC_VERSION
 #error PROTOBUF_MIN_PROTOC_VERSION was previously defined
 #endif
-#define PROTOBUF_MIN_PROTOC_VERSION 4025000
+#define PROTOBUF_MIN_PROTOC_VERSION 4024000
 
 #ifdef PROTOBUF_VERSION_SUFFIX
 #error PROTOBUF_VERSION_SUFFIX was previously defined
 #endif
-#define PROTOBUF_VERSION_SUFFIX "-rc1"
+#define PROTOBUF_VERSION_SUFFIX ""
 
 #ifdef PROTOBUF_MINIMUM_EDITION
 #error PROTOBUF_MINIMUM_EDITION was previously defined
@@ -406,7 +406,7 @@ static_assert(PROTOBUF_ABSL_MIN(20230125, 3),
 
 // The minimum library version which works with the current version of the
 // headers.
-#define GOOGLE_PROTOBUF_MIN_LIBRARY_VERSION 4025000
+#define GOOGLE_PROTOBUF_MIN_LIBRARY_VERSION 4024000
 
 #ifdef PROTOBUF_RTTI
 #error PROTOBUF_RTTI was previously defined
@@ -570,14 +570,6 @@ static_assert(PROTOBUF_ABSL_MIN(20230125, 3),
 // have harder-to-rely-on address stability.
 #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
 #error PROTOBUF_FORCE_COPY_DEFAULT_STRING was previously defined
-#endif
-
-// Set (and leave set) PROTOBUF_EXPLICIT_CONSTRUCTORS
-// This flag changes the internal implementation class and its uses from using
-// aggregate initialization to using explicit constructor based initialization.
-// TODO: remove this flag and make the code permanent.
-#ifndef PROTOBUF_EXPLICIT_CONSTRUCTORS
-#define PROTOBUF_EXPLICIT_CONSTRUCTORS
 #endif
 
 #ifdef PROTOBUF_FORCE_ALLOCATION_ON_CONSTRUCTION

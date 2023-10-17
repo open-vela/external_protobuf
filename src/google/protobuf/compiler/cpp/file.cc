@@ -909,7 +909,7 @@ void FileGenerator::GenerateSourceForMessage(int idx, io::Printer* p) {
   GenerateSourceIncludes(p);
   GenerateSourcePrelude(p);
 
-  if (IsAnyMessage(file_, options_)) {
+  if (IsAnyMessage(file_)) {
     MuteWuninitialized(p);
   }
 
@@ -943,7 +943,7 @@ void FileGenerator::GenerateSourceForMessage(int idx, io::Printer* p) {
     message_generators_[idx]->GenerateSourceInProto2Namespace(p);
   }
 
-  if (IsAnyMessage(file_, options_)) {
+  if (IsAnyMessage(file_)) {
     UnmuteWuninitialized(p);
   }
 
@@ -989,7 +989,7 @@ void FileGenerator::GenerateSource(io::Printer* p) {
   GetCrossFileReferencesForFile(file_, &refs);
   GenerateInternalForwardDeclarations(refs, p);
 
-  if (IsAnyMessage(file_, options_)) {
+  if (IsAnyMessage(file_)) {
     MuteWuninitialized(p);
   }
 
@@ -1058,7 +1058,7 @@ void FileGenerator::GenerateSource(io::Printer* p) {
     // @@protoc_insertion_point(global_scope)
   )cc");
 
-  if (IsAnyMessage(file_, options_)) {
+  if (IsAnyMessage(file_)) {
     UnmuteWuninitialized(p);
   }
 
@@ -1406,7 +1406,6 @@ class FileGenerator::ForwardDeclarations {
           template <>
           $dllexport_decl $$class$* Arena::CreateMaybeMessage<$class$>(Arena*);
         )cc");
-#ifdef PROTOBUF_EXPLICIT_CONSTRUCTORS
         if (!IsMapEntryMessage(c.second)) {
           p->Emit({{"class", QualifiedClassName(c.second, options)}}, R"cc(
             template <>
@@ -1414,7 +1413,6 @@ class FileGenerator::ForwardDeclarations {
                 Arena*, const $class$&);
           )cc");
         }
-#endif  // PROTOBUF_EXPLICIT_CONSTRUCTORS
       }
     }
   }
