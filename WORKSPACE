@@ -193,9 +193,6 @@ crates_repository(
         "googletest": crate.spec(
             version = ">0.0.0",
         ),
-        "paste": crate.spec(
-          version = ">=1",
-        ),
     },
 )
 

@@ -22,7 +22,6 @@ pub mod __public {
     pub use crate::proxied::{
         Mut, MutProxy, Proxied, ProxiedWithPresence, SettableValue, View, ViewProxy,
     };
-    pub use crate::repeated::{RepeatedFieldRef, RepeatedMut, RepeatedView};
     pub use crate::string::{BytesMut, ProtoStr, ProtoStrMut};
 }
 pub use __public::*;
@@ -47,7 +46,6 @@ mod macros;
 mod optional;
 mod primitive;
 mod proxied;
-mod repeated;
 mod string;
 mod vtable;
 

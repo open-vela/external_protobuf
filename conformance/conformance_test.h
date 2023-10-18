@@ -14,16 +14,13 @@
 #ifndef CONFORMANCE_CONFORMANCE_TEST_H
 #define CONFORMANCE_CONFORMANCE_TEST_H
 
-#include <cstddef>
-#include <memory>
+#include <functional>
 #include <string>
 #include <vector>
 
-#include "google/protobuf/descriptor.pb.h"
 #include "google/protobuf/util/type_resolver.h"
 #include "absl/container/btree_set.h"
 #include "absl/container/flat_hash_set.h"
-#include "absl/strings/string_view.h"
 #include "conformance/conformance.pb.h"
 #include "google/protobuf/descriptor.h"
 #include "google/protobuf/wire_format_lite.h"
@@ -201,15 +198,13 @@ class ConformanceTestSuite {
 
     std::unique_ptr<Message> NewTestMessage() const;
 
-    std::string GetSyntaxIdentifier() const;
-
     std::string GetTestName() const;
 
     const conformance::ConformanceRequest& GetRequest() const {
       return request_;
     }
 
-    ConformanceLevel GetLevel() const { return level_; }
+    const ConformanceLevel GetLevel() const { return level_; }
 
     std::string ConformanceLevelToString(ConformanceLevel level) const;
 
@@ -250,9 +245,9 @@ class ConformanceTestSuite {
                       bool need_report_success, bool require_same_wire_format);
 
   void TruncateDebugPayload(std::string* payload);
-  conformance::ConformanceRequest TruncateRequest(
+  const conformance::ConformanceRequest TruncateRequest(
       const conformance::ConformanceRequest& request);
-  conformance::ConformanceResponse TruncateResponse(
+  const conformance::ConformanceResponse TruncateResponse(
       const conformance::ConformanceResponse& response);
 
   void ReportSuccess(const std::string& test_name);
