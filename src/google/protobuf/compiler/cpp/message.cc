@@ -1532,7 +1532,7 @@ void MessageGenerator::GenerateClassDefinition(io::Printer* p) {
 
     if (!HasSimpleBaseClass(descriptor_, options_)) {
       format(
-          "ABSL_ATTRIBUTE_REINITIALIZES void Clear() final;\n"
+          "PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;\n"
           "bool IsInitialized() const final;\n"
           "\n"
           "::size_t ByteSizeLong() const final;\n");
