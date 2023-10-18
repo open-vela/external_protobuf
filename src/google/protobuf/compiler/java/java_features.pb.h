@@ -201,7 +201,7 @@ class PROTOC_EXPORT JavaFeatures final :
   private:
   static void MergeImpl(::google::protobuf::Message& to_msg, const ::google::protobuf::Message& from_msg);
   public:
-  ABSL_ATTRIBUTE_REINITIALIZES void Clear() final;
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
   ::size_t ByteSizeLong() const final;
