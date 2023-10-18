@@ -311,9 +311,7 @@ class PROTOBUF_EXPORT RepeatedPtrFieldBase {
   // Message creating functor: used in MergeFrom<T>()
   template <typename T>
   static MessageLite* CopyMessage(Arena* arena, const MessageLite& src) {
-    T* msg = Arena::CreateMaybeMessage<T>(arena);
-    msg->MergeFrom(static_cast<const T&>(src));
-    return msg;
+    return Arena::CreateMaybeMessage<T>(arena, static_cast<const T&>(src));
   }
 
   // Appends all message values from `from` to this instance.
@@ -445,11 +443,13 @@ class PROTOBUF_EXPORT RepeatedPtrFieldBase {
   template <typename TypeHandler>
   void AddAllocated(Value<TypeHandler>* value) {
     typename TypeImplementsMergeBehavior<Value<TypeHandler>>::type t;
+    ABSL_DCHECK_NE(value, nullptr);
     AddAllocatedInternal<TypeHandler>(value, t);
   }
 
   template <typename TypeHandler>
   void UnsafeArenaAddAllocated(Value<TypeHandler>* value) {
+    ABSL_DCHECK_NE(value, nullptr);
     // Make room for the new pointer.
     if (current_size_ == total_size_) {
       // The array is completely full with no cleared objects, so grow it.
@@ -1099,13 +1099,13 @@ class RepeatedPtrField final : private internal::RepeatedPtrFieldBase {
   // Calling this routine inside a loop can cause quadratic behavior.
   void DeleteSubrange(int start, int num);
 
-  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear();
+  ABSL_ATTRIBUTE_REINITIALIZES void Clear();
   void MergeFrom(const RepeatedPtrField& other);
-  PROTOBUF_ATTRIBUTE_REINITIALIZES void CopyFrom(const RepeatedPtrField& other);
+  ABSL_ATTRIBUTE_REINITIALIZES void CopyFrom(const RepeatedPtrField& other);
 
   // Replaces the contents with RepeatedPtrField(begin, end).
   template <typename Iter>
-  PROTOBUF_ATTRIBUTE_REINITIALIZES void Assign(Iter begin, Iter end);
+  ABSL_ATTRIBUTE_REINITIALIZES void Assign(Iter begin, Iter end);
 
   // Reserves space to expand the field to at least the given size.  This only
   // resizes the pointer array; it doesn't allocate any objects.  If the
@@ -1181,6 +1181,7 @@ class RepeatedPtrField final : private internal::RepeatedPtrFieldBase {
   //   (ii) if this field holds strings, the passed-in string *must* be
   //   heap-allocated, not arena-allocated. There is no way to dynamically check
   //   this at runtime, so User Beware.
+  // Requires:  value != nullptr
   void AddAllocated(Element* value);
 
   // Removes and returns the last element, passing ownership to the caller.
@@ -1203,6 +1204,7 @@ class RepeatedPtrField final : private internal::RepeatedPtrFieldBase {
   // If you put temp_field on the arena this fails, because the ownership
   // transfers to the arena at the "AddAllocated" call and is not released
   // anymore, causing a double delete. UnsafeArenaAddAllocated prevents this.
+  // Requires:  value != nullptr
   void UnsafeArenaAddAllocated(Element* value);
 
   // Removes and returns the last element.  Unlike ReleaseLast, the returned
