@@ -7,7 +7,6 @@
 
 #include "google/protobuf/generated_message_bases.h"
 
-#include "google/protobuf/generated_message_reflection.h"
 #include "google/protobuf/io/coded_stream.h"
 #include "google/protobuf/io/zero_copy_stream_impl.h"
 #include "google/protobuf/parse_context.h"
@@ -96,11 +95,7 @@ void ZeroFieldsBase::InternalSwap(ZeroFieldsBase* other) {
 }
 
 const Message::ClassData* ZeroFieldsBase::GetClassData() const {
-  static constexpr ClassData data = {
-      &MergeImpl,
-      nullptr,
-      &kDescriptorMethods,
-  };
+  static constexpr ClassData data = {&MergeImpl};
   return &data;
 }
 

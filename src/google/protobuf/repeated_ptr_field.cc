@@ -20,7 +20,6 @@
 #include "absl/log/absl_check.h"
 #include "google/protobuf/arena.h"
 #include "google/protobuf/implicit_weak_message.h"
-#include "google/protobuf/message_lite.h"
 #include "google/protobuf/port.h"
 #include "google/protobuf/repeated_field.h"
 
@@ -35,11 +34,10 @@ namespace internal {
 void** RepeatedPtrFieldBase::InternalExtend(int extend_amount) {
   ABSL_DCHECK(extend_amount > 0);
   constexpr size_t ptr_size = sizeof(rep()->elements[0]);
-  int capacity = Capacity();
-  int new_capacity = capacity + extend_amount;
+  int new_capacity = total_size_ + extend_amount;
   Arena* arena = GetArena();
   new_capacity = internal::CalculateReserveSize<void*, kRepHeaderSize>(
-      capacity, new_capacity);
+      total_size_, new_capacity);
   ABSL_CHECK_LE(
       static_cast<int64_t>(new_capacity),
       static_cast<int64_t>(
@@ -47,6 +45,7 @@ void** RepeatedPtrFieldBase::InternalExtend(int extend_amount) {
       << "Requested size is too large to fit into size_t.";
   size_t bytes = kRepHeaderSize + ptr_size * new_capacity;
   Rep* new_rep;
+  void* old_tagged_ptr = tagged_rep_or_elem_;
   if (arena == nullptr) {
     internal::SizedPtr res = internal::AllocateAtLeast(bytes);
     new_capacity = static_cast<int>((res.n - kRepHeaderSize) / ptr_size);
@@ -56,17 +55,18 @@ void** RepeatedPtrFieldBase::InternalExtend(int extend_amount) {
   }
 
   if (using_sso()) {
-    new_rep->allocated_size = tagged_rep_or_elem_ != nullptr ? 1 : 0;
-    new_rep->elements[0] = tagged_rep_or_elem_;
+    new_rep->allocated_size = old_tagged_ptr != nullptr ? 1 : 0;
+    new_rep->elements[0] = old_tagged_ptr;
   } else {
-    Rep* old_rep = rep();
+    Rep* old_rep =
+        reinterpret_cast<Rep*>(reinterpret_cast<uintptr_t>(old_tagged_ptr) - 1);
     if (old_rep->allocated_size > 0) {
       memcpy(new_rep->elements, old_rep->elements,
              old_rep->allocated_size * ptr_size);
     }
     new_rep->allocated_size = old_rep->allocated_size;
 
-    size_t old_size = capacity * ptr_size + kRepHeaderSize;
+    size_t old_size = total_size_ * ptr_size + kRepHeaderSize;
     if (arena == nullptr) {
       internal::SizedDelete(old_rep, old_size);
     } else {
@@ -76,14 +76,13 @@ void** RepeatedPtrFieldBase::InternalExtend(int extend_amount) {
 
   tagged_rep_or_elem_ =
       reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(new_rep) + 1);
-  capacity_proxy_ = new_capacity - kSSOCapacity;
+  total_size_ = new_capacity;
   return &new_rep->elements[current_size_];
 }
 
 void RepeatedPtrFieldBase::Reserve(int capacity) {
-  int delta = capacity - Capacity();
-  if (delta > 0) {
-    InternalExtend(delta);
+  if (capacity > total_size_) {
+    InternalExtend(capacity - total_size_);
   }
 }
 
@@ -99,7 +98,7 @@ void RepeatedPtrFieldBase::DestroyProtos() {
     for (int i = 0; i < n; i++) {
       delete static_cast<MessageLite*>(elements[i]);
     }
-    const size_t size = Capacity() * sizeof(elements[0]) + kRepHeaderSize;
+    const size_t size = total_size_ * sizeof(elements[0]) + kRepHeaderSize;
     internal::SizedDelete(r, size);
   }
 
@@ -116,9 +115,7 @@ void* RepeatedPtrFieldBase::AddOutOfLineHelper(void* obj) {
     ExchangeCurrentSize(1);
     return tagged_rep_or_elem_ = obj;
   }
-  // Not using `AllocatedSizeAtCapacity` because it's already known that
-  // `tagged_rep_or_elem_ != nullptr`.
-  if (using_sso() || rep()->allocated_size >= Capacity()) {
+  if (using_sso() || rep()->allocated_size == total_size_) {
     InternalExtend(1);  // Equivalent to "Reserve(total_size_ + 1)"
   }
   Rep* r = rep();
@@ -137,7 +134,7 @@ void* RepeatedPtrFieldBase::AddOutOfLineHelper(ElementFactory factory) {
   } else {
     absl::PrefetchToLocalCache(rep());
   }
-  if (PROTOBUF_PREDICT_FALSE(SizeAtCapacity())) {
+  if (PROTOBUF_PREDICT_FALSE(current_size_ == total_size_)) {
     InternalExtend(1);
   } else {
     Rep* r = rep();

@@ -151,9 +151,6 @@ rust_test(
         "//rust:protobuf_cpp": "protobuf",
         "//rust/test/shared:matchers_cpp": "matchers",
     },
-    proc_macro_deps = [
-        "@crate_index//:paste",
-    ],
     tags = [
         # TODO: Enable testing on arm once we support sanitizers for Rust on Arm.
         "not_build:arm",
@@ -173,9 +170,6 @@ rust_test(
         "//rust:protobuf_upb": "protobuf",
         "//rust/test/shared:matchers_upb": "matchers",
     },
-    proc_macro_deps = [
-        "@crate_index//:paste",
-    ],
     tags = [
         # TODO: Enable testing on arm once we support sanitizers for Rust on Arm.
         "not_build:arm",
@@ -193,18 +187,15 @@ rust_test(
     srcs = ["accessors_proto3_test.rs"],
     aliases = {
         "//rust:protobuf_cpp": "protobuf",
-        "//rust/test/shared:matchers_cpp": "matchers",
     },
     tags = [
         # TODO: Enable testing on arm once we support sanitizers for Rust on Arm.
         "not_build:arm",
     ],
     deps = [
-        "//third_party/gtest_rust/googletest",
         "//rust:protobuf_cpp",
         "//rust/test:unittest_proto3_cc_rust_proto",
         "//rust/test:unittest_proto3_optional_cc_rust_proto",
-        "//rust/test/shared:matchers_cpp",
     ],
 )
 
@@ -213,18 +204,15 @@ rust_test(
     srcs = ["accessors_proto3_test.rs"],
     aliases = {
         "//rust:protobuf_upb": "protobuf",
-        "//rust/test/shared:matchers_upb": "matchers",
     },
     tags = [
         # TODO: Enable testing on arm once we support sanitizers for Rust on Arm.
         "not_build:arm",
     ],
     deps = [
-        "//third_party/gtest_rust/googletest",
         "//rust:protobuf_upb",
         "//rust/test:unittest_proto3_optional_upb_rust_proto",
         "//rust/test:unittest_proto3_upb_rust_proto",
-        "//rust/test/shared:matchers_upb",
     ],
 )
 
@@ -257,19 +245,11 @@ rust_test(
 rust_test(
     name = "simple_nested_cpp_test",
     srcs = ["simple_nested_test.rs"],
-    tags = [
-        # TODO: Enable testing on arm once we support sanitizers for Rust on Arm.
-        "not_build:arm",
-    ],
     deps = ["//rust/test:nested_cc_rust_proto"],
 )
 
 rust_test(
     name = "simple_nested_upb_test",
     srcs = ["simple_nested_test.rs"],
-    tags = [
-        # TODO: Enable testing on arm once we support sanitizers for Rust on Arm.
-        "not_build:arm",
-    ],
     deps = ["//rust/test:nested_upb_rust_proto"],
 )

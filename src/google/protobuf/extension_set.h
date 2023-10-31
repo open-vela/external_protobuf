@@ -16,7 +16,6 @@
 #define GOOGLE_PROTOBUF_EXTENSION_SET_H__
 
 #include <algorithm>
-#include <atomic>
 #include <cassert>
 #include <string>
 #include <type_traits>
@@ -58,7 +57,6 @@ class FeatureSet;
 namespace internal {
 class FieldSkipper;  // wire_format_lite.h
 class WireFormat;
-void InitializeLazyExtensionSet();
 }  // namespace internal
 }  // namespace protobuf
 }  // namespace google
@@ -510,8 +508,6 @@ class PROTOBUF_EXPORT ExtensionSet {
   friend class google::protobuf::Reflection;
   friend class google::protobuf::internal::WireFormat;
 
-  friend void internal::InitializeLazyExtensionSet();
-
   const int32_t& GetRefInt32(int number, const int32_t& default_value) const;
   const int64_t& GetRefInt64(int number, const int64_t& default_value) const;
   const uint32_t& GetRefUInt32(int number, const uint32_t& default_value) const;
@@ -583,13 +579,7 @@ class PROTOBUF_EXPORT ExtensionSet {
     virtual void UnusedKeyMethod();  // Dummy key method to avoid weak vtable.
   };
   // Give access to function defined below to see LazyMessageExtension.
-  static LazyMessageExtension* MaybeCreateLazyExtensionImpl(Arena* arena);
-  static LazyMessageExtension* MaybeCreateLazyExtension(Arena* arena) {
-    auto* f = maybe_create_lazy_extension_.load(std::memory_order_relaxed);
-    return f != nullptr ? f(arena) : nullptr;
-  }
-  static std::atomic<LazyMessageExtension* (*)(Arena* arena)>
-      maybe_create_lazy_extension_;
+  friend LazyMessageExtension* MaybeCreateLazyExtension(Arena* arena);
   struct Extension {
     // The order of these fields packs Extension into 24 bytes when using 8
     // byte alignment. Consider this when adding or removing fields here.
@@ -1538,6 +1528,10 @@ class ExtensionIdentifier {
 // -------------------------------------------------------------------
 // Generated accessors
 
+
+// Used to retrieve a lazy extension, may return nullptr in some environments.
+extern PROTOBUF_ATTRIBUTE_WEAK ExtensionSet::LazyMessageExtension*
+MaybeCreateLazyExtension(Arena* arena);
 
 // Define a specialization of ExtensionIdentifier for bootstrapped extensions
 // that we need to register lazily.
