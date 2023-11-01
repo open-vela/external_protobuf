@@ -159,6 +159,11 @@ class Map : public FieldGeneratorBase {
       )cc");
       return;
     }
+#ifndef PROTOBUF_EXPLICIT_CONSTRUCTORS
+    p->Emit(R"cc(
+      $field_$.~$MapField$();
+    )cc");
+#endif  // !PROTOBUF_EXPLICIT_CONSTRUCTORS
   }
 
   void GeneratePrivateMembers(io::Printer* p) const override;
