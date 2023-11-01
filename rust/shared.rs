@@ -18,11 +18,10 @@ use std::fmt;
 #[doc(hidden)]
 pub mod __public {
     pub use crate::optional::{AbsentField, FieldEntry, Optional, PresentField};
-    pub use crate::primitive::{PrimitiveMut, SingularPrimitiveMut};
+    pub use crate::primitive::PrimitiveMut;
     pub use crate::proxied::{
         Mut, MutProxy, Proxied, ProxiedWithPresence, SettableValue, View, ViewProxy,
     };
-    pub use crate::repeated::{RepeatedFieldRef, RepeatedMut, RepeatedView};
     pub use crate::string::{BytesMut, ProtoStr, ProtoStrMut};
 }
 pub use __public::*;
@@ -47,7 +46,6 @@ mod macros;
 mod optional;
 mod primitive;
 mod proxied;
-mod repeated;
 mod string;
 mod vtable;
 

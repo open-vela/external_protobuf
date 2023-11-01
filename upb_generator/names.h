@@ -69,10 +69,6 @@ ABSL_CONST_INIT extern const absl::string_view kRepeatedFieldArrayGetterPostfix;
 ABSL_CONST_INIT extern const absl::string_view
     kRepeatedFieldMutableArrayGetterPostfix;
 
-// Private getter name postfix for map fields.
-ABSL_CONST_INIT extern const absl::string_view kMapGetterPostfix;
-ABSL_CONST_INIT extern const absl::string_view kMutableMapGetterPostfix;
-
 }  // namespace generator
 }  // namespace upb
 

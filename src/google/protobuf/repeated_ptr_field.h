@@ -177,12 +177,12 @@ class PROTOBUF_EXPORT RepeatedPtrFieldBase {
   constexpr RepeatedPtrFieldBase()
       : tagged_rep_or_elem_(nullptr),
         current_size_(0),
-        capacity_proxy_(0),
+        total_size_(kSSOCapacity),
         arena_(nullptr) {}
   explicit RepeatedPtrFieldBase(Arena* arena)
       : tagged_rep_or_elem_(nullptr),
         current_size_(0),
-        capacity_proxy_(0),
+        total_size_(kSSOCapacity),
         arena_(arena) {}
 
   RepeatedPtrFieldBase(const RepeatedPtrFieldBase&) = delete;
@@ -198,13 +198,7 @@ class PROTOBUF_EXPORT RepeatedPtrFieldBase {
 
   bool empty() const { return current_size_ == 0; }
   int size() const { return current_size_; }
-  // Returns the size of the buffer with pointers to elements.
-  //
-  // Note:
-  //
-  //   * prefer `SizeAtCapacity()` to `size() == Capacity()`;
-  //   * prefer `AllocatedSizeAtCapacity()` to `allocated_size() == Capacity()`.
-  int Capacity() const { return capacity_proxy_ + kSSOCapacity; }
+  int Capacity() const { return total_size_; }
 
   template <typename TypeHandler>
   const Value<TypeHandler>& at(int index) const {
@@ -277,7 +271,7 @@ class PROTOBUF_EXPORT RepeatedPtrFieldBase {
     }
     if (!using_sso()) {
       internal::SizedDelete(rep(),
-                            Capacity() * sizeof(elems[0]) + kRepHeaderSize);
+                            total_size_ * sizeof(elems[0]) + kRepHeaderSize);
     }
   }
 
@@ -317,7 +311,9 @@ class PROTOBUF_EXPORT RepeatedPtrFieldBase {
   // Message creating functor: used in MergeFrom<T>()
   template <typename T>
   static MessageLite* CopyMessage(Arena* arena, const MessageLite& src) {
-    return Arena::CreateMaybeMessage<T>(arena, static_cast<const T&>(src));
+    T* msg = Arena::CreateMaybeMessage<T>(arena);
+    msg->MergeFrom(static_cast<const T&>(src));
+    return msg;
   }
 
   // Appends all message values from `from` to this instance.
@@ -423,7 +419,7 @@ class PROTOBUF_EXPORT RepeatedPtrFieldBase {
     size_t allocated_bytes =
         using_sso()
             ? 0
-            : static_cast<size_t>(Capacity()) * sizeof(void*) + kRepHeaderSize;
+            : static_cast<size_t>(total_size_) * sizeof(void*) + kRepHeaderSize;
     const int n = allocated_size();
     void* const* elems = elements();
     for (int i = 0; i < n; ++i) {
@@ -449,19 +445,17 @@ class PROTOBUF_EXPORT RepeatedPtrFieldBase {
   template <typename TypeHandler>
   void AddAllocated(Value<TypeHandler>* value) {
     typename TypeImplementsMergeBehavior<Value<TypeHandler>>::type t;
-    ABSL_DCHECK_NE(value, nullptr);
     AddAllocatedInternal<TypeHandler>(value, t);
   }
 
   template <typename TypeHandler>
   void UnsafeArenaAddAllocated(Value<TypeHandler>* value) {
-    ABSL_DCHECK_NE(value, nullptr);
     // Make room for the new pointer.
-    if (SizeAtCapacity()) {
+    if (current_size_ == total_size_) {
       // The array is completely full with no cleared objects, so grow it.
-      InternalExtend(1);
+      Reserve(total_size_ + 1);
       ++rep()->allocated_size;
-    } else if (AllocatedSizeAtCapacity()) {
+    } else if (allocated_size() == total_size_) {
       // There is no more space in the pointer array because it contains some
       // cleared objects awaiting reuse.  We don't want to grow the array in
       // this case because otherwise a loop calling AddAllocated() followed by
@@ -545,41 +539,41 @@ class PROTOBUF_EXPORT RepeatedPtrFieldBase {
   void AddAllocatedInternal(Value<TypeHandler>* value, std::true_type) {
     Arena* element_arena = TypeHandler::GetArena(value);
     Arena* arena = GetArena();
-    if (arena != element_arena || AllocatedSizeAtCapacity()) {
+    if (arena == element_arena && allocated_size() < total_size_) {
+      // Fast path: underlying arena representation (tagged pointer) is equal to
+      // our arena pointer, and we can add to array without resizing it (at
+      // least one slot that is not allocated).
+      void** elems = elements();
+      if (current_size_ < allocated_size()) {
+        // Make space at [current] by moving first allocated element to end of
+        // allocated list.
+        elems[allocated_size()] = elems[current_size_];
+      }
+      elems[ExchangeCurrentSize(current_size_ + 1)] = value;
+      if (!using_sso()) ++rep()->allocated_size;
+    } else {
       AddAllocatedSlowWithCopy<TypeHandler>(value, element_arena, arena);
-      return;
     }
-    // Fast path: underlying arena representation (tagged pointer) is equal to
-    // our arena pointer, and we can add to array without resizing it (at
-    // least one slot that is not allocated).
-    void** elems = elements();
-    if (current_size_ < allocated_size()) {
-      // Make space at [current] by moving first allocated element to end of
-      // allocated list.
-      elems[allocated_size()] = elems[current_size_];
-    }
-    elems[ExchangeCurrentSize(current_size_ + 1)] = value;
-    if (!using_sso()) ++rep()->allocated_size;
   }
 
   // AddAllocated version that does not implement arena-safe copying behavior.
   template <typename TypeHandler>
   void AddAllocatedInternal(Value<TypeHandler>* value, std::false_type) {
-    if (AllocatedSizeAtCapacity()) {
+    if (allocated_size() < total_size_) {
+      // Fast path: underlying arena representation (tagged pointer) is equal to
+      // our arena pointer, and we can add to array without resizing it (at
+      // least one slot that is not allocated).
+      void** elems = elements();
+      if (current_size_ < allocated_size()) {
+        // Make space at [current] by moving first allocated element to end of
+        // allocated list.
+        elems[allocated_size()] = elems[current_size_];
+      }
+      elems[ExchangeCurrentSize(current_size_ + 1)] = value;
+      if (!using_sso()) ++rep()->allocated_size;
+    } else {
       UnsafeArenaAddAllocated<TypeHandler>(value);
-      return;
     }
-    // Fast path: underlying arena representation (tagged pointer) is equal to
-    // our arena pointer, and we can add to array without resizing it (at
-    // least one slot that is not allocated).
-    void** elems = elements();
-    if (current_size_ < allocated_size()) {
-      // Make space at [current] by moving first allocated element to end of
-      // allocated list.
-      elems[allocated_size()] = elems[current_size_];
-    }
-    elems[ExchangeCurrentSize(current_size_ + 1)] = value;
-    if (!using_sso()) ++rep()->allocated_size;
   }
 
   // Slowpath handles all cases, copying if necessary.
@@ -657,6 +651,8 @@ class PROTOBUF_EXPORT RepeatedPtrFieldBase {
   // Gets the Arena on which this RepeatedPtrField stores its elements.
   inline Arena* GetArena() const { return arena_; }
 
+  inline Arena* GetOwningArena() const { return arena_; }
+
  private:
   using InternalArenaConstructable_ = void;
   using DestructorSkippable_ = void;
@@ -720,25 +716,6 @@ class PROTOBUF_EXPORT RepeatedPtrFieldBase {
   // current_size_ is modified.
   inline int ExchangeCurrentSize(int new_size) {
     return std::exchange(current_size_, new_size);
-  }
-  inline bool SizeAtCapacity() const {
-    // Harden invariant size() <= allocated_size() <= Capacity().
-    ABSL_DCHECK_LE(size(), allocated_size());
-    ABSL_DCHECK_LE(allocated_size(), Capacity());
-    // This is equivalent to `current_size_ == Capacity()`.
-    // Assuming `Capacity()` function is inlined, compiler is likely to optimize
-    // away "+ kSSOCapacity" and reduce it to "current_size_ > capacity_proxy_"
-    // which is an instruction less than "current_size_ == capacity_proxy_ + 1".
-    return current_size_ >= Capacity();
-  }
-  inline bool AllocatedSizeAtCapacity() const {
-    // Harden invariant size() <= allocated_size() <= Capacity().
-    ABSL_DCHECK_LE(size(), allocated_size());
-    ABSL_DCHECK_LE(allocated_size(), Capacity());
-    // This combines optimization mentioned in `SizeAtCapacity()` and simplifies
-    // `allocated_size()` in sso case.
-    return using_sso() ? (tagged_rep_or_elem_ != nullptr)
-                       : rep()->allocated_size >= Capacity();
   }
 
   void* const* elements() const {
@@ -825,7 +802,8 @@ class PROTOBUF_EXPORT RepeatedPtrFieldBase {
 
   // Ensures that capacity is big enough to store one more allocated element.
   inline void MaybeExtend() {
-    if (AllocatedSizeAtCapacity()) {
+    if (using_sso() ? (tagged_rep_or_elem_ != nullptr)
+                    : (rep()->allocated_size == total_size_)) {
       ABSL_DCHECK_EQ(allocated_size(), Capacity());
       InternalExtend(1);
     } else {
@@ -836,11 +814,11 @@ class PROTOBUF_EXPORT RepeatedPtrFieldBase {
   // Ensures that capacity is at least `n` elements.
   // Returns a pointer to the element directly beyond the last element.
   inline void** InternalReserve(int n) {
-    if (n <= Capacity()) {
+    if (n <= total_size_) {
       void** elements = using_sso() ? &tagged_rep_or_elem_ : rep()->elements;
       return elements + current_size_;
     }
-    return InternalExtend(n - Capacity());
+    return InternalExtend(n - total_size_);
   }
 
   // Internal helper for Add: adds "obj" as the next element in the
@@ -862,7 +840,7 @@ class PROTOBUF_EXPORT RepeatedPtrFieldBase {
   // significant performance for memory-sensitive workloads.
   void* tagged_rep_or_elem_;
   int current_size_;
-  int capacity_proxy_;  // we store `capacity - kSSOCapacity` as an optimization
+  int total_size_;
   Arena* arena_;
 };
 
@@ -1121,13 +1099,13 @@ class RepeatedPtrField final : private internal::RepeatedPtrFieldBase {
   // Calling this routine inside a loop can cause quadratic behavior.
   void DeleteSubrange(int start, int num);
 
-  ABSL_ATTRIBUTE_REINITIALIZES void Clear();
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear();
   void MergeFrom(const RepeatedPtrField& other);
-  ABSL_ATTRIBUTE_REINITIALIZES void CopyFrom(const RepeatedPtrField& other);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void CopyFrom(const RepeatedPtrField& other);
 
   // Replaces the contents with RepeatedPtrField(begin, end).
   template <typename Iter>
-  ABSL_ATTRIBUTE_REINITIALIZES void Assign(Iter begin, Iter end);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Assign(Iter begin, Iter end);
 
   // Reserves space to expand the field to at least the given size.  This only
   // resizes the pointer array; it doesn't allocate any objects.  If the
@@ -1203,7 +1181,6 @@ class RepeatedPtrField final : private internal::RepeatedPtrFieldBase {
   //   (ii) if this field holds strings, the passed-in string *must* be
   //   heap-allocated, not arena-allocated. There is no way to dynamically check
   //   this at runtime, so User Beware.
-  // Requires:  value != nullptr
   void AddAllocated(Element* value);
 
   // Removes and returns the last element, passing ownership to the caller.
@@ -1226,7 +1203,6 @@ class RepeatedPtrField final : private internal::RepeatedPtrFieldBase {
   // If you put temp_field on the arena this fails, because the ownership
   // transfers to the arena at the "AddAllocated" call and is not released
   // anymore, causing a double delete. UnsafeArenaAddAllocated prevents this.
-  // Requires:  value != nullptr
   void UnsafeArenaAddAllocated(Element* value);
 
   // Removes and returns the last element.  Unlike ReleaseLast, the returned
@@ -1338,6 +1314,9 @@ class RepeatedPtrField final : private internal::RepeatedPtrFieldBase {
   class TypeHandler;
 
   RepeatedPtrField(Arena* arena, const RepeatedPtrField& rhs);
+
+  // Internal version of GetArena().
+  inline Arena* GetOwningArena() const;
 
 
   // Implementations for ExtractSubrange(). The copying behavior must be
@@ -1694,6 +1673,11 @@ inline Arena* RepeatedPtrField<Element>::GetArena() const {
   return RepeatedPtrFieldBase::GetArena();
 }
 #endif  // !PROTOBUF_FUTURE_REMOVE_CONST_REPEATEDFIELD_GETARENA_API
+
+template <typename Element>
+inline Arena* RepeatedPtrField<Element>::GetOwningArena() const {
+  return RepeatedPtrFieldBase::GetArena();
+}
 
 template <typename Element>
 inline size_t RepeatedPtrField<Element>::SpaceUsedExcludingSelfLong() const {
