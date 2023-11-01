@@ -116,9 +116,11 @@ ParseFunctionGenerator::ParseFunctionGenerator(
   if (should_generate_tctable()) {
     tc_table_info_.reset(new TailCallTableInfo(
         descriptor_, ordered_fields_,
-        {/* is_lite */ GetOptimizeFor(descriptor->file(), options_) ==
-             FileOptions::LITE_RUNTIME,
-         /* uses_codegen */ true, options_.profile_driven_cluster_aux_subtable},
+        {
+            /* is_lite */ GetOptimizeFor(descriptor->file(), options_) ==
+                FileOptions::LITE_RUNTIME,
+            /* uses_codegen */ true,
+        },
         GeneratedOptionProvider(this), has_bit_indices,
         inlined_string_indices));
   }
