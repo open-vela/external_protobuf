@@ -23,13 +23,9 @@ namespace {
 
 std::unique_ptr<AccessorGenerator> AccessorGeneratorFor(
     const FieldDescriptor& desc) {
-  // We do not support [ctype=FOO] (used to set the field type in C++ to
-  // cord or string_piece) in V0 API.
+  // TODO: We do not support [ctype=FOO] (used to set the field
+  // type in C++ to cord or string_piece) in V0.6 API.
   if (desc.options().has_ctype()) {
-    return std::make_unique<UnsupportedField>();
-  }
-
-  if (desc.is_repeated()) {
     return std::make_unique<UnsupportedField>();
   }
 
@@ -47,11 +43,20 @@ std::unique_ptr<AccessorGenerator> AccessorGeneratorFor(
     case FieldDescriptor::TYPE_FLOAT:
     case FieldDescriptor::TYPE_DOUBLE:
     case FieldDescriptor::TYPE_BOOL:
+      if (desc.is_repeated()) {
+        return std::make_unique<RepeatedScalar>();
+      }
       return std::make_unique<SingularScalar>();
     case FieldDescriptor::TYPE_BYTES:
     case FieldDescriptor::TYPE_STRING:
+      if (desc.is_repeated()) {
+        return std::make_unique<UnsupportedField>();
+      }
       return std::make_unique<SingularString>();
     case FieldDescriptor::TYPE_MESSAGE:
+      if (desc.is_repeated()) {
+        return std::make_unique<UnsupportedField>();
+      }
       return std::make_unique<SingularMessage>();
 
     default:
